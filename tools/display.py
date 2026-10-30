@@ -39,6 +39,7 @@ class Display:
             'SDL_JoystickUpdate': ([], None),
             'SDL_GetError': ([], c.c_char_p),
             'SDL_CreateWindow': ([c.c_char_p, c.c_int, c.c_int, c.c_int, c.c_int, c.c_uint32], c.c_void_p),
+            'SDL_SetWindowTitle': ([c.c_void_p, c.c_char_p], None),
             'SDL_CreateRenderer': ([c.c_void_p, c.c_int, c.c_uint32], c.c_void_p),
             'SDL_CreateTexture': ([c.c_void_p, c.c_uint32, c.c_int, c.c_int, c.c_int], c.c_void_p),
             'SDL_UpdateTexture': ([c.c_void_p, c.c_void_p, c.c_void_p, c.c_int], c.c_int),
@@ -60,7 +61,7 @@ class Display:
             function.argtypes, function.restype = arguments, result
         if self.sdl.SDL_Init(0x220) < 0:
             raise ValueError(self.sdl.SDL_GetError().decode())
-        self.window = self.sdl.SDL_CreateWindow(b'EF2000', 0x2fff0000, 0x2fff0000, 960, 720, 0x24)
+        self.window = self.sdl.SDL_CreateWindow(b'EF2000 - click to capture mouse', 0x2fff0000, 0x2fff0000, 960, 720, 0x24)
         self.renderer = self.sdl.SDL_CreateRenderer(self.window, -1, 0) if self.window else None
         self.texture = None
         self.dimensions = None
@@ -71,6 +72,8 @@ class Display:
         self.joystick_axes = joystick_axes or [(i, 1) for i in range(4)]
         self.focused = False
         self.captured = False
+        self.escape_pressed_at = None
+        self.mouse_armed = False
         self.motion_remainder = [0.0, 0.0]
         self.rect = Rect(0, 0, 960, 720)
         if not self.renderer:
@@ -82,6 +85,10 @@ class Display:
         if self.sdl.SDL_SetRelativeMouseMode(int(enabled)) < 0:
             raise ValueError(self.sdl.SDL_GetError().decode())
         self.captured = enabled
+        self.mouse_armed = False
+        title = (b'EF2000 - hold Esc for 3s to release mouse' if enabled
+                 else b'EF2000 - click to capture mouse')
+        self.sdl.SDL_SetWindowTitle(self.window, title)
         self.motion_remainder = [0.0, 0.0]
         x, y = c.c_int(), c.c_int()
         self.sdl.SDL_GetRelativeMouseState(c.byref(x), c.byref(y))
@@ -95,18 +102,28 @@ class Display:
                 self.closed = True
             elif kind == 0x200 and data[12] == 12:
                 self.focused = True
-                self.capture(True)
             elif kind == 0x200 and data[12] == 13:
                 self.focused = False
+                self.escape_pressed_at = None
                 engine.release_keys()
                 self.capture(False)
-            elif kind == 0x401 and not self.captured:
-                self.capture(True)
+            elif kind == 0x401 and data[16] == 1 and not self.captured:
+                x, y = struct.unpack_from('<ii', data, 20)
+                if (self.rect.x <= x < self.rect.x + self.rect.w and
+                        self.rect.y <= y < self.rect.y + self.rect.h):
+                    self.capture(True)
             elif kind in (0x300, 0x301):
                 scan, key = struct.unpack_from('<ii', data, 16)
-                if key == 27 and kind == 0x300 and self.captured:
-                    self.capture(False)
+                if scan == 41:
+                    if kind == 0x301:
+                        self.escape_pressed_at = None
+                    elif not data[13] and self.escape_pressed_at is None:
+                        self.escape_pressed_at = time.monotonic()
                 engine.key_event(scan, key, kind == 0x300, repeat=bool(data[13]))
+        if (self.captured and self.escape_pressed_at is not None and
+                time.monotonic() - self.escape_pressed_at >= 3):
+            self.capture(False)
+            self.escape_pressed_at = None
         self.poll_joystick(engine)
         x, y = c.c_int(), c.c_int()
         buttons = self.sdl.SDL_GetRelativeMouseState(c.byref(x), c.byref(y))
@@ -121,7 +138,12 @@ class Display:
                 self.motion_remainder[axis] = total - delta
                 deltas.append(delta)
             engine.move_mouse(*deltas)
-            engine.mouse_buttons = (buttons & 1) | ((buttons & 4) >> 1) | ((buttons & 2) << 1)
+            # A click acquires the pointer; its held buttons must be released
+            # before a subsequent click can activate anything in the game.
+            if not buttons:
+                self.mouse_armed = True
+            engine.mouse_buttons = ((buttons & 1) | ((buttons & 4) >> 1) |
+                                    ((buttons & 2) << 1)) if self.mouse_armed else 0
         else:
             engine.mouse_buttons = 0
 

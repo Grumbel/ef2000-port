@@ -51,8 +51,113 @@ class SDLInputTests(unittest.TestCase):
         data = bytearray(64)
         struct.pack_into('<I', data, 0, kind)
         struct.pack_into('<ii', data, 16, scan, key)
+        self.push_event(data)
+
+    def push_event(self, data):
         self.display.sdl.SDL_PushEvent.argtypes = [c.c_void_p]
         self.assertEqual(self.display.sdl.SDL_PushEvent(c.create_string_buffer(bytes(data))), 1)
+
+    def focus_event(self, focused):
+        data = bytearray(64)
+        struct.pack_into('<I', data, 0, 0x200)
+        data[12] = 12 if focused else 13
+        self.push_event(data)
+
+    def click_event(self, button=1, x=200, y=200):
+        data = bytearray(64)
+        struct.pack_into('<I', data, 0, 0x401)
+        data[16] = button
+        struct.pack_into('<ii', data, 20, x, y)
+        self.push_event(data)
+
+    def relative_mode(self):
+        self.display.sdl.SDL_GetRelativeMouseMode.argtypes = []
+        self.display.sdl.SDL_GetRelativeMouseMode.restype = c.c_int
+        return bool(self.display.sdl.SDL_GetRelativeMouseMode())
+
+    def test_capture_requires_click_and_never_returns_on_focus(self):
+        self.focus_event(True)
+        self.display.poll(self.host)
+        self.assertFalse(self.display.captured)
+        self.assertFalse(self.relative_mode())
+        self.click_event(button=3)
+        self.click_event(x=-1)
+        self.display.poll(self.host)
+        self.assertFalse(self.display.captured)
+        self.click_event()
+        self.display.poll(self.host)
+        self.assertTrue(self.display.captured)
+        self.assertTrue(self.relative_mode())
+        self.focus_event(False)
+        self.display.poll(self.host)
+        self.assertFalse(self.display.captured)
+        self.assertFalse(self.relative_mode())
+        self.focus_event(True)
+        self.display.poll(self.host)
+        self.assertFalse(self.display.captured)
+        self.assertFalse(self.relative_mode())
+
+    def test_escape_hold_releases_mouse_without_autorepeat_resetting_deadline(self):
+        self.click_event()
+        self.display.poll(self.host)
+        with patch('tools.display.time.monotonic', return_value=100):
+            self.event(0x300, 41, 27)
+            self.display.poll(self.host)
+        self.assertTrue(self.display.captured)
+        with patch('tools.display.time.monotonic', return_value=102.9):
+            data = bytearray(64)
+            struct.pack_into('<I', data, 0, 0x300)
+            data[13] = 1
+            struct.pack_into('<ii', data, 16, 41, 27)
+            self.push_event(data)
+            self.display.poll(self.host)
+        self.assertTrue(self.display.captured)
+        with patch('tools.display.time.monotonic', return_value=103):
+            self.display.poll(self.host)
+        self.assertFalse(self.display.captured)
+        self.assertFalse(self.relative_mode())
+        self.assertIn(41, self.host.pressed_keys)  # Escape still reaches the game.
+        self.event(0x301, 41, 27)
+        self.display.poll(self.host)
+        self.assertNotIn(41, self.host.pressed_keys)
+
+    def test_short_escape_and_focus_loss_cancel_the_release_timer(self):
+        self.click_event()
+        self.display.poll(self.host)
+        with patch('tools.display.time.monotonic', return_value=10):
+            self.event(0x300, 41, 27)
+            self.display.poll(self.host)
+        with patch('tools.display.time.monotonic', return_value=11):
+            self.event(0x301, 41, 27)
+            self.display.poll(self.host)
+        with patch('tools.display.time.monotonic', return_value=20):
+            self.display.poll(self.host)
+        self.assertTrue(self.display.captured)
+        self.event(0x300, 41, 27)
+        self.display.poll(self.host)
+        self.focus_event(False)
+        self.display.poll(self.host)
+        self.assertIsNone(self.display.escape_pressed_at)
+        self.assertFalse(self.host.pressed_keys)
+
+    def test_activation_click_is_consumed_until_buttons_are_released(self):
+        buttons = 1
+        def mouse_state(x, y):
+            c.cast(x, c.POINTER(c.c_int))[0] = 0
+            c.cast(y, c.POINTER(c.c_int))[0] = 0
+            return buttons
+        with patch.object(self.display.sdl, 'SDL_GetRelativeMouseState', side_effect=mouse_state):
+            self.click_event()
+            self.display.poll(self.host)
+            self.assertTrue(self.display.captured)
+            self.assertEqual(self.host.mouse_buttons, 0)
+            self.display.poll(self.host)
+            self.assertEqual(self.host.mouse_buttons, 0)
+            buttons = 0
+            self.display.poll(self.host)
+            buttons = 1
+            self.display.poll(self.host)
+            self.assertEqual(self.host.mouse_buttons, 1)
 
     def test_sdl_keyboard_events_and_focus_loss_release_held_keys(self):
         self.event(0x300, 224, 0)
