@@ -104,7 +104,7 @@ def main():
                              'qemu uses qemu-i386 (default: %(default)s)')
     parser.add_argument('--real-mode', choices=['stop', 'unicorn'], default='unicorn',
                         help='real-mode driver execution (default: %(default)s)')
-    parser.add_argument('--sound', choices=['off', 'probe', 'sb16-probe'], default='off',
+    parser.add_argument('--sound', choices=['off', 'probe', 'sb16-probe', 'sb16'], default='off',
                         help='sound configuration: off disables audio locally; probe runs '
                              'original driver detection; sb16-probe models DSP discovery only, no audio '
                              '(default: %(default)s)')
@@ -150,11 +150,11 @@ def main():
         output.mkdir(parents=True, exist_ok=False)
         overlay = output / 'drive' / 'EF2000'
         overlay.mkdir(parents=True)
-        if args.sound in ('off', 'sb16-probe') or args.controls != 'original':
+        if args.sound in ('off', 'sb16-probe', 'sb16') or args.controls != 'original':
             config = args.executable.resolve().parent / 'EF2000.CFG'
             lines = config.read_bytes().splitlines()
             settings = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127', b'SPEECH': b'0'} if args.sound == 'off' else {}
-            if args.sound == 'sb16-probe':
+            if args.sound in ('sb16-probe', 'sb16'):
                 settings[b'MUSIC'] = b'0,127'  # Isolate digital sound from FM music.
             if args.controls != 'original':
                 settings[b'CONTROL'] = b'1' if args.controls == 'joystick' else b'0'
@@ -216,7 +216,7 @@ def main():
                 run, real_mode_requests = run_real_mode(command, output, log, timeout=args.seconds,
                                                        headless=args.headless, controls=args.controls,
                                                        joystick=args.joystick, joystick_axes=joystick_axes,
-                                                       sound_hardware='sb16-probe' if args.sound == 'sb16-probe' else 'absent')
+                                                       sound_hardware=args.sound if args.sound in ('sb16-probe', 'sb16') else 'absent')
             else:
                 run = subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,
                                      timeout=args.seconds or None, check=False)

@@ -27,7 +27,13 @@ class RealMode(HostInput):
     def __init__(self, sound_hardware='absent'):
         super().__init__()
         self.sound_device = None
-        if sound_hardware == 'sb16-probe':
+        if sound_hardware == 'sb16':
+            try:
+                from .sound_blaster import SoundBlaster16
+            except ImportError:
+                from sound_blaster import SoundBlaster16
+            self.sound_device = SoundBlaster16()
+        elif sound_hardware == 'sb16-probe':
             try:
                 from .sound_blaster import SB16Probe
             except ImportError:
@@ -42,6 +48,11 @@ class RealMode(HostInput):
         self.cpu.hook_add(UC_HOOK_INSN, self.port_in, None, 1, 0, UC_X86_INS_IN)
         self.cpu.hook_add(UC_HOOK_INSN, self.port_out, None, 1, 0, UC_X86_INS_OUT)
         self.cpu.hook_add(UC_HOOK_INTR, self.interrupt)
+        self.pending_real_irq = None
+        self.audio_interrupts = 0
+        if sound_hardware == 'sb16':
+            from unicorn import UC_HOOK_BLOCK
+            self.cpu.hook_add(UC_HOOK_BLOCK, self.audio_block)
         self.io = {}
         self.error = None
         self.failed_memory = None
@@ -252,7 +263,7 @@ class RealMode(HostInput):
     def port_in(self, cpu, port, size, _):
         # Default: absent Sound Blaster. The opt-in probe supplies measured
         # discovery registers only; unknown device requests stop explicitly.
-        if 0x220 <= port <= 0x22f:
+        if 0x220 <= port <= 0x22f or (hasattr(self.sound_device, 'handles') and self.sound_device.handles(port)):
             try:
                 value = (self.sound_device.read(port, size) if self.sound_device
                          else (1 << (size * 8)) - 1)
@@ -267,7 +278,7 @@ class RealMode(HostInput):
         return 0
 
     def port_out(self, cpu, port, size, value, _):
-        if 0x220 <= port <= 0x22f:
+        if 0x220 <= port <= 0x22f or (hasattr(self.sound_device, 'handles') and self.sound_device.handles(port)):
             self.record_io('out', port, size, value)
             if self.sound_device:
                 try:
@@ -278,6 +289,40 @@ class RealMode(HostInput):
             return
         self.error = f'unsupported real-mode OUT port {port:#x}, width {size}'
         cpu.emu_stop()
+
+    def audio_block(self, cpu, address, size, _):
+        from unicorn.x86_const import UC_X86_REG_EFLAGS
+        try:
+            self.sound_device.advance(time.monotonic(), lambda start, length: bytes(cpu.mem_read(start, length)))
+            irq = self.sound_device.pic.next_irq()
+            if irq is not None and cpu.reg_read(UC_X86_REG_EFLAGS) & 0x200:
+                self.pending_real_irq = irq
+                cpu.emu_stop()
+        except Exception as error:
+            self.error = f'audio hardware: {error}'
+            cpu.emu_stop()
+
+    def inject_audio_irq(self):
+        from unicorn.x86_const import (UC_X86_REG_CS, UC_X86_REG_IP,
+            UC_X86_REG_SS, UC_X86_REG_SP, UC_X86_REG_EFLAGS)
+        irq = self.pending_real_irq
+        self.pending_real_irq = None
+        vector = irq + 8
+        offset, segment = struct.unpack('<HH', bytes(self.cpu.mem_read(vector * 4, 4)))
+        if not segment:
+            raise ValueError(f'uninstalled audio IRQ{irq} vector')
+        flags = self.cpu.reg_read(UC_X86_REG_EFLAGS)
+        sp = (self.cpu.reg_read(UC_X86_REG_SP) - 6) & 0xffff
+        frame = struct.pack('<HHH', self.cpu.reg_read(UC_X86_REG_IP),
+                            self.cpu.reg_read(UC_X86_REG_CS), flags & 0xffff)
+        self.cpu.mem_write((self.cpu.reg_read(UC_X86_REG_SS) << 4) + sp, frame)
+        self.cpu.reg_write(UC_X86_REG_SP, sp)
+        self.cpu.reg_write(UC_X86_REG_EFLAGS, flags & ~0x300)
+        self.cpu.reg_write(UC_X86_REG_CS, segment)
+        self.cpu.reg_write(UC_X86_REG_IP, offset)
+        self.sound_device.pic.begin(irq)
+        self.audio_interrupts += 1
+        self.record_io('irq', vector, 0, (segment << 16) | offset)
 
     def record_io(self, operation, port, size, value):
         key = (operation, port, size, value)
@@ -301,7 +346,8 @@ class RealMode(HostInput):
         self.capture(memory)
         self.error = None
         self.io = {}
-        if values[0] == MAGIC and values[-1] == 0x100:
+        snapshot = values[0] == MAGIC and values[-1] == 0x100
+        if snapshot and not hasattr(self.sound_device, 'advance'):
             return packet, memory
         if values[0] == MAGIC and values[-1] == 0x33:
             return self.mouse(values, memory)
@@ -309,11 +355,11 @@ class RealMode(HostInput):
             return self.video(values, memory)
         if values[0] == MAGIC and values[-1] == 0x16:
             return self.keyboard(values, memory)
-        if values[0] != MAGIC or not values[1]:
+        if values[0] != MAGIC or (not values[1] and not snapshot):
             raise ValueError(f'invalid or uninstalled real-mode INT {values[-1]:#x}, AX={values[2]:#x}')
-        segment, offset = values[1] >> 16, values[1] & 0xffff
+        segment, offset = (0xf000, 0) if snapshot else (values[1] >> 16, values[1] & 0xffff)
         address = (segment << 4) + offset
-        if not 0x10000 <= address < 0x90000:
+        if not snapshot and not 0x10000 <= address < 0x90000:
             raise ValueError(f'real-mode entry outside loaded conventional memory: {segment:04x}:{offset:04x}')
         registers = (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX, UC_X86_REG_EDX,
                      UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_DS, UC_X86_REG_ES,
@@ -333,7 +379,22 @@ class RealMode(HostInput):
         self.cpu.reg_write(UC_X86_REG_IP, offset)
         self.error = None
         self.io = {}
-        self.cpu.emu_start(address, 0xf0000, timeout=500000, count=1000000)
+        deadline = time.monotonic() + 0.5
+        if snapshot:
+            self.cpu.reg_write(UC_X86_REG_EFLAGS, 0x202)
+            self.audio_block(self.cpu, address, 0, None)
+        for _ in range(64):
+            if self.pending_real_irq is not None:
+                self.inject_audio_irq()
+            address = (self.cpu.reg_read(UC_X86_REG_CS) << 4) + self.cpu.reg_read(UC_X86_REG_IP)
+            if address == 0xf0000 or self.error:
+                break
+            remaining = int((deadline - time.monotonic()) * 1000000)
+            if remaining <= 0:
+                break
+            self.cpu.emu_start(address, 0xf0000, timeout=remaining, count=1000000)
+            if self.pending_real_irq is None:
+                break
         if not self.error and (self.cpu.reg_read(UC_X86_REG_CS), self.cpu.reg_read(UC_X86_REG_IP)) != (0xf000, 0):
             self.error = 'real-mode instruction/time limit reached before interrupt return'
         if self.error:
@@ -345,7 +406,8 @@ class RealMode(HostInput):
                    zip(('eax', 'ebx', 'ecx', 'edx', 'esi', 'edi'), registers[:6])},
             }
             raise ValueError(self.error)
-        values[2:-1] = [self.cpu.reg_read(register) for register in registers]
+        if not snapshot:
+            values[2:-1] = [self.cpu.reg_read(register) for register in registers]
         return PACKET.pack(*values), bytes(self.cpu.mem_read(MEMORY_START, MEMORY_SIZE))
 
 

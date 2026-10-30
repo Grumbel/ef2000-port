@@ -1047,5 +1047,8 @@ void setup(uptr *initial_stack) {
     for (u32 address = 0x195fb0; address < 0x4de2f0; ++address)
         *(volatile u8 *)guest(address) = 0xa5;
     text("STARTUP synthetic-memory-model\n", 31);
+    *(u8 *)(uptr)(DOS_BASE + 0x449) = 3;
+    *(u16 *)(uptr)(DOS_BASE + 0x44a) = 80;
+    *(u16 *)(uptr)(DOS_BASE + 0x463) = 0x3d4;
     runtime_ready = 1;
 }

@@ -71,6 +71,24 @@ class SB16ReferenceTests(unittest.TestCase):
 @unittest.skipUnless(os.environ.get('EF2000_EXE') and importlib.util.find_spec('unicorn'),
                      'requires original SB16.DIG and Unicorn')
 class OriginalSoundDriverTests(unittest.TestCase):
+    def test_original_driver_completes_dma_irq_self_test(self):
+        from tools.real_mode import RealMode, MEMORY_SIZE, PACKET, MAGIC
+        source = Path(os.environ['EF2000_EXE']).resolve().parent / 'SB16.DIG'
+        image = source.read_bytes()
+        engine = RealMode(sound_hardware='sb16')
+        memory = bytearray(MEMORY_SIZE)
+        struct.pack_into('<H', memory, 0x463, 0x3d4)
+        memory[0x11000:0x11000 + len(image)] = image
+        struct.pack_into('<4H', memory, 0x11016, 0x220, 0xffff, 0xffff, 0xffff)
+        for function in (0x300, 0x304):
+            packet = PACKET.pack(MAGIC, 0x1100016a, function, 0, 0, 0, 0, 0,
+                                 0, 0, 0, 0, 0x202, 0x66)
+            response, memory = engine.execute(packet, bytes(memory[:1024]), bytes(memory))
+        self.assertEqual(PACKET.unpack(response)[2], 0x0405)
+        self.assertEqual(engine.audio_interrupts, 1)
+        self.assertEqual(struct.unpack_from('<H', memory, 0x1157c)[0], 1)
+        self.assertEqual(engine.sound_device.completed[0]['pcm'], b'\x80\x80')
+
     def test_original_driver_parses_resources_before_explicit_pic_boundary(self):
         from tools.real_mode import RealMode, MEMORY_SIZE, PACKET, MAGIC
         source = Path(os.environ['EF2000_EXE']).resolve().parent / 'SB16.DIG'
