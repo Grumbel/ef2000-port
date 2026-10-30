@@ -1,0 +1,117 @@
+# Sound initialization research
+
+## Target and evidence
+
+These findings concern the installed German TACTCOM executable, SHA-256
+`f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd`.
+The digital driver is the original 2,836-byte `SB16.DIG`, SHA-256
+`c8a1e7a0e14c8b696e665520e338711e4c20cc3bb4733f83527add41dd6f6b38`.
+The source installation remains unchanged.
+
+The installed DIG.INI selects Sound Blaster 16, base 220h, and automatic
+IRQ/8-bit DMA/16-bit DMA discovery (-1). MDI.INI selects SBPRO2.MDI for FM
+music. Digital playback and FM synthesis are separate paths; neither has an
+audio output implementation yet.
+
+All driver offsets below are byte offsets in SB16.DIG, also offsets within
+its loaded real-mode segment. The observed native load is at physical 11000h,
+with INT66 entering 1100:016Ah. Addresses differ from protected-mode image
+offsets and must not be transferred to another driver release.
+
+## Observed driver interface
+
+The header starts with `AIL3DIG` and byte 1Ah. Its little-endian word at +34h
+is the real-mode dispatcher entry (016Ah). The dispatcher at 01AEh selects
+a seven-entry table at 010Ah for AX=0300h..0306h and a six-entry table at
+0118h for AX=0400h..0405h.
+
+| Request | Driver offset | Observed behavior |
+| --- | --- | --- |
+| 0300h | 079Dh | Initialize driver-local state; returns AX=1 |
+| 0301h | 07D1h | Return driver information/data structure pointers |
+| 0304h | 0844h | Reset/version/resource discovery, then DMA/IRQ self-test |
+| 0305h | 0993h | Install IRQ path and configure the selected mode |
+| 0400h | 09DFh | Mixer/volume setting and query |
+| 0401h | 09FCh | Program sampling rate and DMA playback |
+
+The names in the last three rows are inferred from the instructions; successful
+playback has not been observed. In particular, 0304h is more than a presence
+check: returning success without its interrupt self-test would conceal missing
+hardware behavior.
+
+At 0623h the driver asserts DSP reset, performs 20 reset-port reads, deasserts
+reset, and waits for data AAh. At 064Eh it sends E1h and reads major then minor
+DSP version bytes. The combined word is stored at driver offset 057Ah.
+At 0867h/0896h it reads mixer registers 80h/81h and stores IRQ, DMA8, and DMA16
+as little-endian 16-bit values at +18h/+1Ah/+1Ch; the base port is at +16h.
+
+## Independent reference experiment
+
+```sh
+python3 tools/reference_run.py --game-dir ../EF2000/c/EF2000 \
+  --output local/sb16-reference --sb16-probe --headless --seconds 10
+python3 tools/read_sb16_probe.py local/sb16-reference/drive/EF2000/SB16.BIN
+```
+
+This executes a bounded read-only DSP probe in a disposable executable copy,
+using DOSBox-X with an explicit SB16, 220h, IRQ7, DMA1/5 profile. No DMA is
+programmed and no sound is played. `sb16-reference.json` records the decoded
+samples, probe/executable/config hashes, and unchanged-source check.
+
+Observed: reset returns AAh; E1h returns version 4.5; ready write status and
+empty read status are 7Fh; mixer 80h is 04h (IRQ7), 81h is 22h (DMA1/5),
+and 82h is 20h. Only low bits 0..2 of mixer 82h identify pending DSP/MPU
+interrupts; the observed 20h does not indicate a pending audio interrupt.
+The exact reserved/status values are a DOSBox-X profile, not a claim about
+every physical card.
+
+The register meanings and handshake are also described in Creative's
+[Sound Blaster Series Hardware Programming Guide](https://www.ardent-tool.com/sound/Sound_Blaster_HW_Programming_Guide_1st.pdf),
+chapters 2 and 6. The probe measurements are the implementation baseline.
+
+## Native diagnostic model and current boundary
+
+```sh
+nix run . -- ../EF2000/c/EF2000/_EF2000.EXE \
+  --output local/sb16-native --sound sb16-probe --headless
+```
+
+This mode is experimental discovery support, not working sound. It implements
+only the measured reset handshake, DSP version FIFO, and read-only resource
+registers. It disables FM music in the local config to isolate digital sound.
+Normal runs still default to all audio disabled; `--sound probe` retains the
+older absent-card diagnostic behavior.
+
+The unchanged original driver reads DSP 0405h and stores 220h/IRQ7/DMA1/DMA5.
+It then installs its real-mode vector 0Fh handler at offset 069Ah and reaches
+IN AL,A1h at driver 0372h. That PIC mask access is the current explicit stop.
+Unicorn's saved IP is 0374h, after the IN instruction; it is not the faulting
+instruction's start. There is no successful 0304h return yet.
+
+The failure record in report.json includes CPU state. `conventional.bin` now
+contains the failed driver's post-execution memory, not merely the pre-call
+snapshot. At the observed 11000h load, verify:
+
+- 11016h: base/IRQ/DMA8/DMA16 words = 0220h, 0007h, 0001h, 0005h.
+- 1157Ah: DSP version word = 0405h.
+
+`tests/test_sound_blaster.py` runs this exact original-driver path when
+EF2000_EXE and Unicorn are available. It verifies both the parsed fields and
+the explicit PIC boundary while checking the source driver's hash.
+
+## Next hardware work
+
+1. Shared master/slave PIC masks and real-mode IRQ7 delivery. The driver accesses
+   A1h/21h at 0372h/037Ah and restores their prior masks during cleanup.
+2. Stateful 8237 DMA programming. The selected channel 5 tables at 0130h..015Fh
+   identify page 8Bh, address C4h, count C6h, mask D4h, mode D6h, and flip-flop
+   reset D8h. Routine 0233h computes the address/count, including word addressing.
+3. DSP transfer commands and completion: the 0304h self-test programs rate 5622h
+   (22,050 Hz) with command 41h and issues B0h, mode 30h, length 0000h. It waits
+   for the installed handler to signal completion. Mixer pending bits,
+   acknowledgement reads, DMA progress, and timing must agree.
+4. Once that self-test really completes, trace original streaming and mixing
+   into the DMA buffer. Add PCM capture first, then an SDL audio sink with
+   independent rate/format validation.
+5. Investigate SBPRO2.MDI/OPL separately for music. Do not declare music working
+   merely because digital effects initialize.

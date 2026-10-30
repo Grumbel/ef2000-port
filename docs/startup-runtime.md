@@ -110,6 +110,10 @@ drivers execute their own code, including Sound Blaster detection against a
 declared absent device. Unsupported nested interrupts or ports stop explicitly.
 `--sound probe` retains original audio settings for this diagnostic path;
 `--real-mode stop --sound probe --headless` reproduces the old first-driver boundary.
+The opt-in `--sound sb16-probe` mode instead exposes the measured DSP reset,
+version, and resource registers, disabling FM music locally to isolate digital
+sound. It stops at the original driver's PIC access; it does not provide audio.
+See [sound-research.md](sound-research.md) for the measured path and next work.
 
 BIOS video and mouse requests use the same bridge. The virtual video adapter
 supports VGA 13h and indexed banked VBE modes 100h, 101h, 103h, and 105h, with

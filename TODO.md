@@ -47,7 +47,11 @@ Implemented and verified:
 
 1. Validate longer flight sessions, mission completion, and physical joystick
    hardware; keep automated UI tests on private Xvfb displays.
-2. Implement sound hardware/audio and additional device APIs; validate physical joystick hardware.
+2. Complete sound hardware/audio: the opt-in SB16 discovery model now reaches
+   the original driver's PIC mask access. Implement shared PIC masks, 8237 DMA,
+   and real-mode IRQ completion so its self-test can actually pass; then validate
+   PCM capture/output. Investigate FM music separately. See `docs/sound-research.md`.
+   Validate physical joystick hardware.
 3. Implement other exception-frame delivery and refine CLI/STI/AC flag reflection,
    timer coalescing/priority, memory residency reference counts, and DOS path handling.
    Keep unknown interfaces and model exhaustion as explicit stops.
@@ -93,3 +97,9 @@ Input support is implemented and verified with an SDL virtual joystick.
 A physical USB stick was unavailable during development; hardware validation
 remains follow-up work. Pause release, device selection, and automatic controls
 have dedicated regression coverage. All commits include exact model attribution.
+
+
+Sound discovery has an independent DOSBox-X probe and captured reference values.
+`--sound sb16-probe` exposes DSP 4.5 and IRQ7/DMA1/5 to the unchanged SB16.DIG,
+then stops explicitly at IN A1h. Default runs still disable audio. Failed
+real-mode calls now retain their mutated memory and CPU state for investigation.

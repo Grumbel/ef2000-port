@@ -83,6 +83,7 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [Execution probes and reference experiments](docs/execution-probes.md)
 - [Native startup harness and validation](docs/startup-runtime.md)
 - [Recovered extender services and differential evidence](docs/x32-services.md)
+- [Sound driver research and diagnostic probe](docs/sound-research.md)
 - [Research and evidence conventions](docs/research.md)
 
 The mouse starts free and is captured only by a left-click inside the game
