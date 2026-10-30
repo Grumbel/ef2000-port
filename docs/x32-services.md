@@ -101,3 +101,97 @@ sentinel register values returned EAX=5 (DOS 5.0), cleared only BL and CX,
 preserved their upper bits, and preserved EDX/ESI/EDI and flags. The harness
 supports this startup query only. The partial-register behavior matters: clearing
 all of ECX would be a broader change than the measured service performs.
+
+## DOS time query
+
+The initializer calls AH=`2ch` through the register-block wrapper's INT 21h at
+image `0x11f2a4`. A separate disposable-copy probe measures four queries:
+
+```sh
+python3 tools/reference_run.py --game-dir ../EF2000/c/EF2000 \
+  --output local/dos-time-reference --time-probe --headless
+python3 tools/read_dos_time_probe.py local/dos-time-reference/drive/EF2000/DOSTIME.BIN
+```
+
+[dos_time.S](../probes/dos_time.S) supplies sentinel registers, records input and
+output flags, and inserts busy waits between queries. The 148-byte version-1
+record contains four full register samples and a completion marker.
+[dos-time-reference.json](dos-time-reference.json) retains the measurements,
+original/patched/hook hashes, and configuration. The source installation remained
+unchanged. This hook measures the service directly, not the full initializer.
+
+Observed: EAX becomes `0x2c00` even with nonzero high bits and AL on input;
+CH/CL return hours/minutes and DH/DL seconds/hundredths. The upper halves of
+ECX/EDX, EBX/ESI/EDI, and flags (including a deliberately set CF) are preserved.
+The four samples advance across the waits.
+
+The harness supports this measured call site using host UTC `CLOCK_REALTIME`,
+not DOSBox local time or its tick cadence. Raw host samples are retained in the
+transcript/report. Native64 uses Linux clock_gettime; QEMU uses clock_gettime64
+with the same 64-bit timespec layout. Both backends pass the startup integration
+check and continue through vector setup and game initialization. See
+[startup-runtime.md](startup-runtime.md) for the current boundary.
+
+## Vectors, descriptors, conventional memory, and files
+
+Additional disposable-copy measurements are in
+[runtime-reference.json](runtime-reference.json). Reproduce each independently:
+
+```sh
+python3 tools/reference_run.py --game-dir ../EF2000/c/EF2000 \
+  --output local/vector-reference --vector-probe --headless
+python3 tools/read_runtime_probe.py local/vector-reference/drive/EF2000/XVECTORS.BIN
+python3 tools/reference_run.py --game-dir ../EF2000/c/EF2000 \
+  --output local/memory-reference --memory-probe --headless
+python3 tools/read_runtime_probe.py local/memory-reference/drive/EF2000/DOSMEM.BIN
+python3 tools/reference_run.py --game-dir ../EF2000/c/EF2000 \
+  --output local/file-reference --file-probe --headless
+python3 tools/read_runtime_probe.py local/file-reference/drive/EF2000/DOSFILES.BIN
+```
+
+Observed `2503h` returns the packed real-mode vector in EBX; `2502h` returns the
+protected offset in EBX and selector in ES. `2505h` sets the real vector from
+EBX; `2504h` sets the protected vector from DS:EDX. CL selects the vector while
+upper ECX bits survive. INT 80h replacement/query/restoration was measured.
+Arithmetic flags other than CF vary with extender bookkeeping; new harness
+services model success/failure CF rather than claiming exact arithmetic flags.
+
+Static dispatch recovery adds `2506h` (file `0x2069`, install a protected handler
+and real-mode thunk), `2532h` (`0x25c9`, query exception handler), and `2533h`
+(`0x260b`, set exception handler). Exceptions below 8 share the protected vector
+table. The harness stores these registrations; exception delivery remains an
+explicit fault. Default handlers and thunk addresses are declared synthetic
+values, not addresses copied from DOSBox.
+
+`252bh` at file `0x2403` implements memory residency. BX=`0501h` locks a
+selector-relative ECX/EDX range; `0601h` unlocks it. The probe measures both.
+Upper EAX is a PTE/accounting temporary in the non-DPMI path, not preserved input.
+The harness maps the observed ranges to Linux mlock/munlock, returning failure
+when the host refuses. It does not reproduce extender PTE reference counts.
+
+Descriptor services are recovered from file `0x274d` (3501h, allocate one),
+`0x27af` (3502h, free), `0x27f2` (3503h, set base), `0x211e` (3504h, query base),
+and `0x2836` (3505h, set limit). The harness maintains 16 user LDT slots and
+updates actual Linux descriptors. Limits above 1 MiB use page granularity.
+`350bh`, file `0x2af5`, returns the smaller of remaining heap ceiling and free
+allocation accounting in the declared no-swap model.
+
+DOS AH=48h takes paragraphs from BX, ignoring upper EBX. Measured success returns
+the real segment in EAX and an application-relative linear pointer in EBX;
+failure returns EAX=8, EBX=available paragraphs, CF=1. The harness allocates from
+`0x10000..0x8ffff`, reserving the final conventional segment for the bridge stack;
+release/resizing is not implemented yet. A host alias at `0x01000000` represents
+DOS physical memory, including the BDA and VGA window, through the loader patches.
+
+The file probe measures read-only open, device info, read, seek, close, missing
+files, and console device info. EAX is zero-extended from DOS AX except that
+X-32 buffered reads can return a full 32-bit count. Filename-copy open clears
+EDX; a completed read clears ECX/EDX. IOCTL 4400h returns EAX=2 for a C: disk
+file and replaces only DX; the console returns `80d3h`. Seek uses CX:DX low
+halves and returns DX:AX low halves, preserving upper EDX. Successful close of
+the measured single-reference file returns EAX=`3e01h`. Linux handles back these
+operations. Writable opens first copy originals to the local drive overlay;
+create/write operations and preservation of source files have native tests.
+Synthetic native guests
+test actual byte transfer, EOF, seek, handle reuse/errors, conventional memory,
+descriptor loads/limits, and vector round trips without original game assets.

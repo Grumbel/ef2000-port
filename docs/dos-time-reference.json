@@ -1,0 +1,62 @@
+{
+  "instrumentation": {
+    "source_sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+    "patched_sha256": "0dc29527df7f70ee801116265deba5bf9d3508697c6c9dcae354b4242555da97",
+    "hook_source_sha256": "34bfaba38483328ad379a8e22064955b6f1a23157753bdb54d876f03a1221164",
+    "payload_patch_range": [
+      0,
+      1292
+    ]
+  },
+  "reference_environment": {
+    "emulator": "DOSBox-X 2026.05.02",
+    "memory_mib": 32,
+    "core": "normal",
+    "cycles": 60000,
+    "headless": true
+  },
+  "source_unchanged": true,
+  "samples": [
+    {
+      "eax": 11264,
+      "ebx": 287454020,
+      "ecx": 1432750620,
+      "edx": 2578060811,
+      "esi": 305419896,
+      "edi": 2309737967,
+      "eflags": 12871,
+      "input_flags": 12871
+    },
+    {
+      "eax": 11264,
+      "ebx": 287454020,
+      "ecx": 1432750620,
+      "edx": 2578060827,
+      "esi": 305419896,
+      "edi": 2309737967,
+      "eflags": 12871,
+      "input_flags": 12871
+    },
+    {
+      "eax": 11264,
+      "ebx": 287454020,
+      "ecx": 1432750620,
+      "edx": 2578060844,
+      "esi": 305419896,
+      "edi": 2309737967,
+      "eflags": 12871,
+      "input_flags": 12871
+    },
+    {
+      "eax": 11264,
+      "ebx": 287454020,
+      "ecx": 1432750620,
+      "edx": 2578060866,
+      "esi": 305419896,
+      "edi": 2309737967,
+      "eflags": 12871,
+      "input_flags": 12871
+    }
+  ],
+  "note": "Disposable-copy entry hook calls the original DOS time service, with busy waits between samples; not a whole-game trace."
+}

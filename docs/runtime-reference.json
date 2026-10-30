@@ -1,0 +1,277 @@
+{
+  "vectors": {
+    "instrumentation": {
+      "source_sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+      "patched_sha256": "37f12b42f7fecd52e3c56428429ed46a49f751fb65c107b1a330132d6f90753c",
+      "hook_source_sha256": "7f41fbd123efed8cfaf7e6254c25f91c1cd692aec8297a243aca298025bbaec2",
+      "payload_patch_range": [
+        0,
+        1469
+      ]
+    },
+    "source_unchanged": true,
+    "record": {
+      "format": "XVEC",
+      "version": 1,
+      "samples": [
+        {
+          "eax": 305407235,
+          "ebx": 0,
+          "ecx": 1432778624,
+          "edx": 2578103244,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12802,
+          "input_flags": 12871,
+          "es": 51,
+          "ds": 51
+        },
+        {
+          "eax": 305407234,
+          "ebx": 3758092032,
+          "ecx": 1432778624,
+          "edx": 2578103244,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12934,
+          "input_flags": 12871,
+          "es": 43,
+          "ds": 51
+        },
+        {
+          "eax": 305407237,
+          "ebx": 305419896,
+          "ecx": 1432778624,
+          "edx": 2578103244,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12822,
+          "input_flags": 12871,
+          "es": 43,
+          "ds": 51
+        },
+        {
+          "eax": 305407235,
+          "ebx": 305419896,
+          "ecx": 1432778624,
+          "edx": 2578103244,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12802,
+          "input_flags": 12871,
+          "es": 43,
+          "ds": 51
+        },
+        {
+          "eax": 305407237,
+          "ebx": 0,
+          "ecx": 1432778624,
+          "edx": 2578103244,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12822,
+          "input_flags": 12871,
+          "es": 43,
+          "ds": 51
+        },
+        {
+          "eax": 305407236,
+          "ebx": 0,
+          "ecx": 1432778624,
+          "edx": 449,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12806,
+          "input_flags": 12871,
+          "es": 43,
+          "ds": 51
+        },
+        {
+          "eax": 305407234,
+          "ebx": 449,
+          "ecx": 1432778624,
+          "edx": 2578103244,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12934,
+          "input_flags": 12871,
+          "es": 51,
+          "ds": 51
+        },
+        {
+          "eax": 305407236,
+          "ebx": 449,
+          "ecx": 1432778624,
+          "edx": 3758092032,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12806,
+          "input_flags": 12871,
+          "es": 51,
+          "ds": 43
+        },
+        {
+          "eax": 75051,
+          "ebx": 1281,
+          "ecx": 134,
+          "edx": 512,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12802,
+          "input_flags": 12871,
+          "es": 51,
+          "ds": 51
+        },
+        {
+          "eax": 9515,
+          "ebx": 1537,
+          "ecx": 134,
+          "edx": 512,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12806,
+          "input_flags": 12871,
+          "es": 51,
+          "ds": 51
+        }
+      ],
+      "saved_pm_selector": 43,
+      "saved_rm_vector": 0,
+      "saved_pm_offset": 3758092032
+    }
+  },
+  "memory": {
+    "instrumentation": {
+      "source_sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+      "patched_sha256": "9703c08321c757e268564fd69d36cf327b2910844fdd6456f77a03c56a737815",
+      "hook_source_sha256": "3232d9662b33be9fc5aa69a8633a05201ee5cb474f0f6ff8bb1d025940515cb6",
+      "payload_patch_range": [
+        0,
+        1291
+      ]
+    },
+    "source_unchanged": true,
+    "record": {
+      "format": "DMEM",
+      "version": 1,
+      "samples": [
+        {
+          "eax": 5632,
+          "ebx": 4026621952,
+          "ecx": 1432778632,
+          "edx": 2578103244,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12822,
+          "input_flags": 12871
+        },
+        {
+          "eax": 8,
+          "ebx": 18432,
+          "ecx": 1432778632,
+          "edx": 2578103244,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12931,
+          "input_flags": 12871
+        }
+      ]
+    }
+  },
+  "files": {
+    "instrumentation": {
+      "source_sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+      "patched_sha256": "d1b7a13c666566649ea0164434e3c8c4a2524bff815077ed3bbf1e0a6bb3b27e",
+      "hook_source_sha256": "2481a2f03e2474178830d2a645225c004db7dcd6d76f4cebc528a1a83d2d6cea",
+      "payload_patch_range": [
+        0,
+        1392
+      ]
+    },
+    "source_unchanged": true,
+    "record": {
+      "format": "DFIL",
+      "version": 1,
+      "samples": [
+        {
+          "eax": 7,
+          "ebx": 3758092288,
+          "ecx": 1432778632,
+          "edx": 0,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12870,
+          "input_flags": 12871
+        },
+        {
+          "eax": 2,
+          "ebx": 7,
+          "ecx": 1432778632,
+          "edx": 2578055170,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12870,
+          "input_flags": 12871
+        },
+        {
+          "eax": 16,
+          "ebx": 7,
+          "ecx": 0,
+          "edx": 0,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12870,
+          "input_flags": 12871
+        },
+        {
+          "eax": 14988,
+          "ebx": 7,
+          "ecx": 1432748032,
+          "edx": 2578055386,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12870,
+          "input_flags": 12871
+        },
+        {
+          "eax": 15873,
+          "ebx": 7,
+          "ecx": 1432778632,
+          "edx": 2578055386,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12870,
+          "input_flags": 12871
+        },
+        {
+          "eax": 2,
+          "ebx": 7,
+          "ecx": 1432778632,
+          "edx": 0,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12871,
+          "input_flags": 12871
+        },
+        {
+          "eax": 32979,
+          "ebx": 1,
+          "ecx": 1432778632,
+          "edx": 2578088147,
+          "esi": 305419896,
+          "edi": 2309737967,
+          "eflags": 12870,
+          "input_flags": 12871
+        }
+      ]
+    }
+  },
+  "reference_environment": {
+    "emulator": "DOSBox-X 2026.05.02",
+    "memory_mib": 32,
+    "core": "normal",
+    "cycles": 60000,
+    "headless": true
+  },
+  "note": "Separate disposable-copy entry probes, not whole-game traces. Values include synthetic DOSBox allocations and extender implementation temporaries."
+}

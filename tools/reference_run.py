@@ -18,10 +18,10 @@ except ImportError:
     from extract_image import extract
 
 
-def instrument_entry(executable, output):
+def instrument_entry(executable, output, probe='x32_services.S'):
     original = executable.read_bytes()
     manifest, _ = extract(original)  # Require the known binary before patching.
-    source = Path(__file__).resolve().parent.parent / 'probes' / 'x32_services.S'
+    source = Path(__file__).resolve().parent.parent / 'probes' / probe
     subprocess.run(['as', '--32', str(source), '-o', str(output / 'hook.o')],
                    check=True, timeout=10)
     subprocess.run(['objcopy', '-O', 'binary', '--only-section=.text',
@@ -55,8 +55,17 @@ def main():
                         metavar='1..60')
     parser.add_argument('--headless', action='store_true',
                         help='use SDL dummy video/audio; no visual verification')
-    parser.add_argument('--entry-probe', action='store_true',
+    probes = parser.add_mutually_exclusive_group()
+    probes.add_argument('--entry-probe', action='store_true',
                         help='instrument the COPY to record original X-32 services and exit')
+    probes.add_argument('--time-probe', action='store_true',
+                        help='instrument the COPY to record DOS time queries and exit')
+    probes.add_argument('--vector-probe', action='store_true',
+                        help='instrument the COPY to measure X-32 interrupt vectors and exit')
+    probes.add_argument('--memory-probe', action='store_true',
+                        help='instrument the COPY to measure DOS conventional allocation and exit')
+    probes.add_argument('--file-probe', action='store_true',
+                        help='instrument the COPY to measure DOS file reads/seeks and exit')
     args = parser.parse_args()
     source = args.game_dir.resolve()
     output = args.output.resolve()
@@ -74,8 +83,12 @@ def main():
     game_copy = output / 'drive' / 'EF2000'
     shutil.copytree(source, game_copy)
     instrumentation = None
-    if args.entry_probe:
-        instrumentation = instrument_entry(game_copy / '_EF2000.EXE', output)
+    if args.entry_probe or args.time_probe or args.vector_probe or args.memory_probe or args.file_probe:
+        instrumentation = instrument_entry(game_copy / '_EF2000.EXE', output,
+            'dos_files.S' if args.file_probe else
+            'dos_memory.S' if args.memory_probe else
+            'x32_vectors.S' if args.vector_probe else
+            'dos_time.S' if args.time_probe else 'x32_services.S')
     config = '''[sdl]
 fullscreen=false
 output=surface
