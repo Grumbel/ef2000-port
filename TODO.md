@@ -9,9 +9,11 @@ commits. Original game binaries/data stay outside Git and the Nix package.
 The native x86-64 Linux harness executes original 32-bit instructions through
 startup, runtime initializers, and game initialization. It reads the game archives
 and configuration, drives timer handlers, and renders the original German
-main menu in a 640×400 VBE mode. An SDL window supplies mouse input. Audio is
-disabled in a local config copy by default. Gameplay beyond the menu remains
-unvalidated. The target executable and
+main menu in a 640×400 VBE mode and flight in 320×200 VGA. An SDL window
+supplies mouse, keyboard, and joystick input. Keyboard view changes and held
+flight controls, plus SDL virtual-joystick banking and button delivery, were
+verified under Xvfb. Audio is disabled in a local config copy by default.
+Broader gameplay and mission completion remain unvalidated. The target executable and
 its SHA-256 are recorded in `docs/executable.md`.
 
 Implemented and verified:
@@ -25,8 +27,13 @@ Implemented and verified:
   Linux page residency, and conventional DOS allocation in a 64 MiB image model.
 - DOS file open/device-info/read/write/seek/close, with a local copy-on-write
   drive overlay preserving original game assets/configuration.
-- Explicit absent-joystick, keyboard acknowledgement, CLI/STI, and PIT programming
-  models, host-timer IRQ0 delivery, and BIOS tick advancement.
+- Keyboard make/break scan codes through IRQ1 and ports 60h/64h, controller
+  acknowledgements, extended keys/modifiers, and focus-loss key release.
+- SDL joystick selection, four mapped/invertible axes, four buttons, disconnect
+  handling, and automatic keyboard fallback; deterministic game-port discharge.
+- CLI/STI and PIT programming, host-timer IRQ0 delivery, and BIOS tick advancement.
+- Wall-clock pacing for the original minimum 50 Hz physics step, and measured
+  X-32 divide-exception delivery to the original renderer recovery handler.
 - Bounded Unicorn execution of original 16-bit driver code; unknown ports/INTs stop.
 - VGA DAC and banked VBE video, original framebuffer export, SDL window, and mouse.
 - Native AC-fault recovery for the CPU probe; flag reflection remains approximate.
@@ -38,10 +45,10 @@ Implemented and verified:
 
 ## Next work
 
-1. Trace menu selections and progress toward mission loading and flight. Verify
-   each new path against actual runtime output; menu rendering does not prove gameplay.
+1. Validate longer flight sessions, mission completion, and physical joystick
+   hardware; keep automated UI tests on private Xvfb displays.
 2. Implement sound hardware/audio and additional device APIs; validate physical joystick hardware.
-3. Implement exception-frame delivery and refine CLI/STI/AC flag reflection,
+3. Implement other exception-frame delivery and refine CLI/STI/AC flag reflection,
    timer coalescing/priority, memory residency reference counts, and DOS path handling.
    Keep unknown interfaces and model exhaustion as explicit stops.
 4. Document data/mission discoveries separately under `docs/`, with fingerprints,
@@ -56,8 +63,11 @@ nix run . -- ../EF2000/c/EF2000/_EF2000.EXE --output local/nix-startup
 nix develop -c env EF2000_EXE=../EF2000/c/EF2000/_EF2000.EXE python3 -m unittest discover -s tests -v
 ```
 
-The original-file test suite currently has 55 passing tests, including native GUI
-rendering/export and native/QEMU diagnostic startup to the same driver boundary.
+The asset-backed suite verifies native GUI rendering/export, native/QEMU
+diagnostic startup, and the exact C5A7Ch renderer overflow through its unchanged
+recovery handler. Run the opt-in SDL suite separately on a private Xvfb display
+with `EF2000_TEST_DISPLAY=:193`; it covers device selection, mapped/inverted
+axes, buttons, hotplug, focus release, and control-mode selection before launch.
 Nix package checks omit tests requiring the external installation. Synthetic guests
 test native signal/syscall/LDT behavior, timer frames, alignment recovery, writable
 overlays, and BIOS bridging without game assets. Emulator tests cover actual
@@ -79,14 +89,7 @@ prerequisites. Use the first root commit as the work-line identifier in its name
 later bundles must continue to include the entire history from this empty base.
 
 
-Mission-loading follow-up: Quick Combat reaches a moving cockpit/terrain under
-Xvfb. DOS date/time and file commit, vendor mouse probes, periodic VGA snapshots,
-and removal of the startup service-count cutoff are implemented. Continue flight
-input and audio work; use Xvfb for all automated UI interaction.
-
-
-Keyboard/joystick: SDL physical keys now drive original IRQ1 through port 60h;
-joystick axes/buttons drive port 201h with deterministic discharge counters.
-Make/break, modifiers, extended keys, focus release, device hotplug, selection,
-axis mapping/inversion, keyboard fallback, and original-flight virtual-stick
-banking are covered. Physical joystick testing remains desirable.
+Input support is implemented and verified with an SDL virtual joystick.
+A physical USB stick was unavailable during development; hardware validation
+remains follow-up work. Pause release, device selection, and automatic controls
+have dedicated regression coverage. All commits include exact model attribution.
