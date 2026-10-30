@@ -104,9 +104,10 @@ def main():
                              'qemu uses qemu-i386 (default: %(default)s)')
     parser.add_argument('--real-mode', choices=['stop', 'unicorn'], default='unicorn',
                         help='real-mode driver execution (default: %(default)s)')
-    parser.add_argument('--sound', choices=['off', 'probe'], default='off',
+    parser.add_argument('--sound', choices=['off', 'probe', 'sb16-probe'], default='off',
                         help='sound configuration: off disables audio locally; probe runs '
-                             'original driver detection (default: %(default)s)')
+                             'original driver detection; sb16-probe models DSP discovery only, no audio '
+                             '(default: %(default)s)')
     parser.add_argument('--no-sound', action='store_const', const='off', dest='sound',
                         help='disable music, sound effects, and speech in a local configuration copy')
     parser.add_argument('--controls', choices=['auto', 'keyboard', 'joystick', 'original'], default='auto',
@@ -149,10 +150,12 @@ def main():
         output.mkdir(parents=True, exist_ok=False)
         overlay = output / 'drive' / 'EF2000'
         overlay.mkdir(parents=True)
-        if args.sound == 'off' or args.controls != 'original':
+        if args.sound in ('off', 'sb16-probe') or args.controls != 'original':
             config = args.executable.resolve().parent / 'EF2000.CFG'
             lines = config.read_bytes().splitlines()
             settings = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127', b'SPEECH': b'0'} if args.sound == 'off' else {}
+            if args.sound == 'sb16-probe':
+                settings[b'MUSIC'] = b'0,127'  # Isolate digital sound from FM music.
             if args.controls != 'original':
                 settings[b'CONTROL'] = b'1' if args.controls == 'joystick' else b'0'
             lines = [line.split(b'=', 1)[0] + b'=' + settings[line.split(b'=', 1)[0]]
@@ -212,7 +215,8 @@ def main():
                     from real_mode import run as run_real_mode
                 run, real_mode_requests = run_real_mode(command, output, log, timeout=args.seconds,
                                                        headless=args.headless, controls=args.controls,
-                                                       joystick=args.joystick, joystick_axes=joystick_axes)
+                                                       joystick=args.joystick, joystick_axes=joystick_axes,
+                                                       sound_hardware='sb16-probe' if args.sound == 'sb16-probe' else 'absent')
             else:
                 run = subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,
                                      timeout=args.seconds or None, check=False)
@@ -247,7 +251,9 @@ def main():
                             'CLI/STI update a virtual interrupt state; PUSHF/POPF reflection is not implemented.',
                             'CPU alignment checking is disabled on the first AC fault; PUSHF reflection differs from DOS.',
                             'Keyboard IRQ1, mouse, and up to four SDL joystick axes/buttons are connected; physical joystick validation is pending.',
-                            'Sound hardware is absent; audio is disabled in a local configuration copy by default.',
+                            ('SB16 discovery only; DMA, device interrupts, and audio output are unimplemented.'
+                             if args.sound == 'sb16-probe' else
+                             'Sound hardware is absent; audio is disabled in a local configuration copy by default.'),
                             'VGA/VBE implements the observed indexed banked modes, not the complete hardware API.'],
         }
         report.update(analyze_calls((output / 'calls.log').read_text()))

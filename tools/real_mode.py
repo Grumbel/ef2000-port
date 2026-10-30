@@ -24,8 +24,17 @@ except ImportError:
 
 
 class RealMode(HostInput):
-    def __init__(self):
+    def __init__(self, sound_hardware='absent'):
         super().__init__()
+        self.sound_device = None
+        if sound_hardware == 'sb16-probe':
+            try:
+                from .sound_blaster import SB16Probe
+            except ImportError:
+                from sound_blaster import SB16Probe
+            self.sound_device = SB16Probe()
+        elif sound_hardware != 'absent':
+            raise ValueError(f'unsupported sound hardware {sound_hardware!r}')
         from unicorn import Uc, UC_ARCH_X86, UC_MODE_16, UC_HOOK_INSN, UC_HOOK_INTR
         from unicorn.x86_const import UC_X86_INS_IN, UC_X86_INS_OUT
         self.cpu = Uc(UC_ARCH_X86, UC_MODE_16)
@@ -241,10 +250,16 @@ class RealMode(HostInput):
         return PACKET.pack(*values), memory
 
     def port_in(self, cpu, port, size, _):
-        # A declared absent Sound Blaster. The original driver must perform its
-        # own detection/failure path; other device requests stop explicitly.
+        # Default: absent Sound Blaster. The opt-in probe supplies measured
+        # discovery registers only; unknown device requests stop explicitly.
         if 0x220 <= port <= 0x22f:
-            value = (1 << (size * 8)) - 1
+            try:
+                value = (self.sound_device.read(port, size) if self.sound_device
+                         else (1 << (size * 8)) - 1)
+            except ValueError as error:
+                self.error = str(error)
+                cpu.emu_stop()
+                return 0
             self.record_io('in', port, size, value)
             return value
         self.error = f'unsupported real-mode IN port {port:#x}, width {size}'
@@ -254,6 +269,12 @@ class RealMode(HostInput):
     def port_out(self, cpu, port, size, value, _):
         if 0x220 <= port <= 0x22f:
             self.record_io('out', port, size, value)
+            if self.sound_device:
+                try:
+                    self.sound_device.write(port, value, size)
+                except ValueError as error:
+                    self.error = str(error)
+                    cpu.emu_stop()
             return
         self.error = f'unsupported real-mode OUT port {port:#x}, width {size}'
         cpu.emu_stop()
@@ -358,8 +379,8 @@ def write_all(fd, data):
 
 
 def run(command, output, log, timeout=15, headless=True, controls='original',
-        joystick='auto', joystick_axes=None):
-    engine = RealMode()
+        joystick='auto', joystick_axes=None, sound_hardware='absent'):
+    engine = RealMode(sound_hardware=sound_hardware)
     display = None
     if not headless:
         try:
