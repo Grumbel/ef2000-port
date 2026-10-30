@@ -25,6 +25,16 @@ class InputTests(unittest.TestCase):
         self.assertEqual(host.shift_flags, 0)
         self.assertEqual(bytes(host.scan_queue), bytes.fromhex('1d1e9e9d'))
 
+    def test_pause_releases_host_state_without_sending_a_break_sequence(self):
+        host = HostInput()
+        host.key_event(72, 0, True)
+        host.key_event(72, 0, False)
+        self.assertFalse(host.pressed_keys)
+        self.assertEqual(bytes(host.scan_queue), bytes.fromhex('e11d45e19dc5'))
+        host.key_event(72, 0, True)
+        host.release_keys()
+        self.assertFalse(host.pressed_keys)
+
     def test_queue_backpressure_wraparound_and_release_delivery(self):
         host = HostInput()
         host.scan_queue.extend([0x1e] * 255 + [0x9e])

@@ -53,6 +53,8 @@ class HostInput:
     def key_event(self, scan, key, down, repeat=False):
         encoded = scan_bytes(scan, down)
         if not encoded:
+            if not down:
+                self.pressed_keys.discard(scan)
             return
         if down:
             self.pressed_keys.add(scan)
