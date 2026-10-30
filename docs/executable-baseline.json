@@ -1,0 +1,43 @@
+{
+  "size": 1684561,
+  "sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+  "mz": {
+    "last_page_bytes": 0,
+    "pages": 3,
+    "relocation_count": 2,
+    "header_paragraphs": 3,
+    "min_extra_paragraphs": 1,
+    "max_extra_paragraphs": 65535,
+    "ss": 0,
+    "sp": 1313,
+    "checksum": 0,
+    "ip": 311,
+    "cs": 0,
+    "relocation_table_offset": 28,
+    "overlay": 0
+  },
+  "dos_image_end": 1536,
+  "load_module_offset": 48,
+  "dos_entry_file_offset": 359,
+  "trailing_bytes": 1683025,
+  "relocations": [
+    {
+      "segment": 0,
+      "offset": 18,
+      "file_offset": 66
+    },
+    {
+      "segment": 0,
+      "offset": 8,
+      "file_offset": 56
+    }
+  ],
+  "markers": {
+    "B23X": 40,
+    "WATCOM": 21697,
+    "DOS extender Copyright": 1902,
+    "__X386_VM_DISABLED": 2145,
+    "RATIONAL DOS/4G": 1681049
+  },
+  "note": "Markers alone do not identify the protected-mode file format."
+}
