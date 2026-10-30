@@ -35,6 +35,8 @@ class RealMode(HostInput):
         self.cpu.hook_add(UC_HOOK_INTR, self.interrupt)
         self.io = {}
         self.error = None
+        self.failed_memory = None
+        self.failure_state = None
         self.mouse_x, self.mouse_y = 320, 100
         self.mouse_motion_x, self.mouse_motion_y = 0, 0
         self.mouse_limits = [0, 639, 0, 199]
@@ -273,6 +275,8 @@ class RealMode(HostInput):
             UC_X86_REG_FS, UC_X86_REG_GS, UC_X86_REG_EFLAGS, UC_X86_REG_CS, UC_X86_REG_IP,
             UC_X86_REG_SS, UC_X86_REG_SP)
         values = list(PACKET.unpack(packet))
+        self.failed_memory = None
+        self.failure_state = None
         self.capture(memory)
         self.error = None
         self.io = {}
@@ -309,10 +313,17 @@ class RealMode(HostInput):
         self.error = None
         self.io = {}
         self.cpu.emu_start(address, 0xf0000, timeout=500000, count=1000000)
+        if not self.error and (self.cpu.reg_read(UC_X86_REG_CS), self.cpu.reg_read(UC_X86_REG_IP)) != (0xf000, 0):
+            self.error = 'real-mode instruction/time limit reached before interrupt return'
         if self.error:
+            self.failed_memory = bytes(self.cpu.mem_read(MEMORY_START, MEMORY_SIZE))
+            self.failure_state = {
+                'cs': self.cpu.reg_read(UC_X86_REG_CS), 'ip': self.cpu.reg_read(UC_X86_REG_IP),
+                'ss': self.cpu.reg_read(UC_X86_REG_SS), 'sp': self.cpu.reg_read(UC_X86_REG_SP),
+                **{name: self.cpu.reg_read(register) for name, register in
+                   zip(('eax', 'ebx', 'ecx', 'edx', 'esi', 'edi'), registers[:6])},
+            }
             raise ValueError(self.error)
-        if (self.cpu.reg_read(UC_X86_REG_CS), self.cpu.reg_read(UC_X86_REG_IP)) != (0xf000, 0):
-            raise ValueError('real-mode instruction/time limit reached before interrupt return')
         values[2:-1] = [self.cpu.reg_read(register) for register in registers]
         return PACKET.pack(*values), bytes(self.cpu.mem_read(MEMORY_START, MEMORY_SIZE))
 
@@ -407,7 +418,10 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
             except Exception as error:
                 record['error'] = str(error)
                 record['io'] = list(engine.io.values())
-                (output / 'conventional.bin').write_bytes(memory)
+                if engine.failure_state is not None:
+                    record['failure_state'] = engine.failure_state
+                (output / 'conventional.bin').write_bytes(
+                    engine.failed_memory if engine.failed_memory is not None else memory)
                 write_all(response_write, bytes(PACKET.size))
         process.wait(timeout=max(0.01, deadline - time.monotonic()) if timeout else None)
         engine.save_video(output)

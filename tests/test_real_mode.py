@@ -52,6 +52,21 @@ class RealModeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'unsupported real-mode IN port 0x123'):
             self.call(0x66, 0, entry=0x10000000, memory=bytes(memory))
 
+    def test_failed_driver_retains_mutated_memory_and_cpu_location(self):
+        memory = bytearray(self.memory)
+        # PUSH CS; POP DS; MOV byte [0100],5a; MOV DX,0123; IN AL,DX; IRET.
+        code = bytes.fromhex('0e1f c60600015a ba2301 ec cf')
+        memory[0x10000:0x10000 + len(code)] = code
+        with self.assertRaisesRegex(ValueError, 'unsupported real-mode IN port 0x123'):
+            self.call(0x66, 0, entry=0x10000000, memory=bytes(memory))
+        self.assertEqual(self.engine.failed_memory[0x10100], 0x5a)
+        self.assertEqual(self.engine.failure_state['cs'], 0x1000)
+        self.assertEqual(self.engine.failure_state['edx'], 0x123)
+        # A later BIOS call must not retain a stale failed-driver snapshot.
+        self.call(0x10, 0x0f00)
+        self.assertIsNone(self.engine.failed_memory)
+        self.assertIsNone(self.engine.failure_state)
+
     def test_vbe_information_modes_bank_round_trip_and_scanline(self):
         result = self.call(0x10, 0x4f00, es=0x2000, di=0x100)
         self.assertEqual(result[2], 0x4f)
