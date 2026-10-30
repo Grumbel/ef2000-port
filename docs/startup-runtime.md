@@ -75,7 +75,10 @@ original file into the overlay; new files are created there. Host filenames are
 currently uppercase. C: root writes stay under `drive/`, including `TACTCOM.$$$`.
 
 DOS AH=2Ch uses host UTC `CLOCK_REALTIME`, truncated to hundredths, with raw samples
-retained in the report. PIT programming drives Linux interval-timer signals;
+retained in the report. Polls are paced at no more than 50 Hz using monotonic
+deadlines. The original physics loop clamps each frame to at least one 50 Hz
+tick; pacing prevents fast native frames from advancing simulation ahead of
+wall time. Missed deadlines are discarded rather than followed by catch-up bursts. PIT programming drives Linux interval-timer signals;
 IRQ0 enters the installed guest handler through a 32-bit IRET frame and updates
 BIOS ticks. PIC acknowledgement permits subsequent interrupts. Masked/coalesced
 ticks are approximate. CLI/STI update a virtual interrupt state; PUSHF/POPF

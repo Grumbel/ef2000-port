@@ -144,6 +144,21 @@ class RuntimeServiceTests(unittest.TestCase):
             jne failed
         """)
 
+    def test_clock_polling_cannot_advance_minimum_physics_ticks_too_fast(self):
+        report = self.run_guest("""
+            movl $0x2c00, %eax
+            int $0x21
+            movl $0x2c00, %eax
+            int $0x21
+            movl $0x2c00, %eax
+            int $0x21
+        """)
+        samples = [s['SECONDS'] * 1000000000 + s['NANOSECONDS']
+                   for s in report['clock_samples']]
+        self.assertEqual(len(samples), 3)
+        for start, end in zip(samples, samples[1:]):
+            self.assertGreaterEqual(end - start, 18000000)
+
     def test_dos_date_and_time_from_arbitrary_call_sites(self):
         from datetime import datetime, timezone
         before = datetime.now(timezone.utc)

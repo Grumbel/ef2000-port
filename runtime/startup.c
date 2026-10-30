@@ -14,6 +14,7 @@
 #define NR_LDT 154
 #define NR_ALTSTACK 131
 #define NR_ACTION 13
+#define NR_SLEEP 230 /* clock_nanosleep */
 #define NR_CLOCK 228 /* clock_gettime */
 #define NR_MLOCK 149
 #define NR_MUNLOCK 150
@@ -31,6 +32,7 @@
 #define NR_LDT 123
 #define NR_ALTSTACK 186
 #define NR_ACTION 174
+#define NR_SLEEP 407 /* clock_nanosleep_time64 */
 #define NR_CLOCK 403 /* clock_gettime64: same 64-bit timespec on both backends */
 #define NR_MLOCK 150
 #define NR_MUNLOCK 151
@@ -313,6 +315,30 @@ static void checkpoint(struct context const *r) {
     text("\n", 1);
     if (selector_limit != 0x260 || !zeroed || !command || !program || r->ss != 7)
         finish(24);
+}
+
+static void pace_clock_poll(void) {
+    /* The original simulation clamps dt to at least one 50 Hz tick per
+     * frame. Do not allow its DOS wall-clock polling to outrun that tick.
+     * Use monotonic deadlines; the returned DOS time remains real UTC. */
+    static struct { unsigned long long seconds, nanoseconds; } previous;
+    struct { unsigned long long seconds, nanoseconds; } now, target;
+    if (syscall4(NR_CLOCK, 1, (uptr)&now, 0, 0) < 0) finish(22);
+    target.seconds = previous.seconds;
+    target.nanoseconds = previous.nanoseconds + 20000000;
+    if (target.nanoseconds >= 1000000000) {
+        target.nanoseconds -= 1000000000;
+        ++target.seconds;
+    }
+    if (now.seconds < target.seconds ||
+        (now.seconds == target.seconds && now.nanoseconds < target.nanoseconds)) {
+        int result;
+        do { result = syscall4(NR_SLEEP, 1, 1, (uptr)&target, 0); } while (result == -4);
+        if (result < 0) finish(22);
+        if (syscall4(NR_CLOCK, 1, (uptr)&now, 0, 0) < 0) finish(22);
+    }
+    previous.seconds = now.seconds;
+    previous.nanoseconds = now.nanoseconds;
 }
 
 static void irq_epilogue(struct context *r) {
@@ -715,6 +741,7 @@ static void guest_fault(u32 signal, struct context *r) {
         r->cx = (r->cx & 0xffff0000u) | year;
         r->dx = (r->dx & 0xffff0000u) | ((month + 1) << 8) | (days + 1);
     } else if (((r->ax >> 8) & 255) == 0x2c) {
+        pace_clock_poll();
         /* Measured DOSBox-X ABI: EAX=2c00, low CX/DX replaced, flags and all
          * other registers preserved. Declared UTC wall-clock model; every
          * sample is recorded, rather than freezing time during initialization.
