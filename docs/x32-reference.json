@@ -1,0 +1,111 @@
+{
+  "original_sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+  "instrumentation": {
+    "source_sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+    "patched_sha256": "a26e2bfbbc92c6c795bd6881863299972a14029c412b34060ca921d491e89e59",
+    "hook_source_sha256": "937f75cf69dd227593c095a0fa842c0b4d6196b8670cb4b97691c7c28a267c2a",
+    "payload_patch_range": [
+      0,
+      1293
+    ]
+  },
+  "reference_environment": {
+    "emulator": "DOSBox-X 2026.05.02 commit 5817c64",
+    "memory_mib": 32,
+    "core": "normal",
+    "cycles": 60000,
+    "headless": true
+  },
+  "record": {
+    "entry": {
+      "esp": 3758091670,
+      "cs": 43,
+      "ds": 51,
+      "es": 51,
+      "fs": 64,
+      "gs": 72,
+      "ss": 59,
+      "eflags": 12802,
+      "ds_limit": 127,
+      "ss_limit": 4095,
+      "fs_limit": 4294967295,
+      "gs_limit": 4294967295,
+      "ds_rights": 4257536,
+      "zero_selector": 35,
+      "zero_base_offset": 4026531840,
+      "auxiliary_selector": 27
+    },
+    "3505": {
+      "eflags": 12866,
+      "eax": 13573,
+      "ecx": 608,
+      "ds_limit": 608,
+      "ds_rights": 4257536
+    },
+    "3509": {
+      "input": {
+        "ebx": 3758091158,
+        "ecx": 16384,
+        "esi": 5107712,
+        "eflags": 12866
+      },
+      "output": {
+        "eflags": 12822,
+        "eax": 13577,
+        "ebx": 3758091158,
+        "ecx": 16384,
+        "edx": 1748684799,
+        "esi": 5107712
+      }
+    },
+    "allocation_before": {
+      "heap_end": 5107712,
+      "stack_end": 3758088192,
+      "free": 2009403392,
+      "minimum_stack": 3221225472,
+      "linear_base": 268435456,
+      "mode": 0
+    },
+    "allocation_after": {
+      "heap_end": 5107712,
+      "stack_end": 3758071808,
+      "free": 2009387008,
+      "minimum_stack": 3221225472,
+      "linear_base": 268435456,
+      "mode": 0
+    },
+    "3508": {
+      "eax": 3221225472,
+      "ecx": 5111808,
+      "eflags": 14982,
+      "heap_end": 5111808,
+      "stack_end": 3758071808,
+      "free": 2009382912,
+      "heap_ceiling": 2147483648,
+      "input_flags": 12822
+    },
+    "dos_version": {
+      "eax": 5,
+      "ebx": 287453952,
+      "ecx": 1432748032,
+      "edx": 2578103244,
+      "esi": 305419896,
+      "edi": 2309737967,
+      "eflags": 14982
+    }
+  },
+  "dos_version_input": {
+    "eax": 12293,
+    "ebx": 287454020,
+    "ecx": 1432778632,
+    "edx": 2578103244,
+    "esi": 305419896,
+    "edi": 2309737967
+  },
+  "source_unchanged": true,
+  "note": "Entry hook replaces application startup and calls the original extender; not a whole-game reference trace.",
+  "3508_input": {
+    "eax": 13576,
+    "ecx": 5111808
+  }
+}
