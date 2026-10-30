@@ -184,16 +184,19 @@ class SoundBlaster16(SB16Probe):
         transfer = self.active
         if not transfer or transfer['paused'] or now < transfer['deadline']:
             return
-        # Stop after one block until its IRQ is serviced; never overwrite a
-        # pending completion with a later block during a delayed host poll.
-        if self.resources[0x82] & 3:
-            return
+        # DMA keeps running while an interrupt is pending. Coalesce IRQs as
+        # hardware does, but retain elapsed PCM blocks rather than repeatedly
+        # interrupting the guest until it catches up with an old deadline.
         channel = 5 if transfer['bits'] == 16 else 1
-        pcm = self.dma.transfer(channel, transfer['units'], read_memory)
-        self.completed.append({key: transfer[key] for key in ('bits', 'channels', 'signed', 'rate')} | {'pcm': pcm, 'generation': self.generation})
-        self.resources[0x82] |= 2 if transfer['bits'] == 16 else 1
-        self.pic.request(7)
-        if transfer['auto']:
-            transfer['deadline'] += transfer['duration']
-        else:
-            self.active = None
+        while now >= transfer['deadline']:
+            pcm = self.dma.transfer(channel, transfer['units'], read_memory)
+            self.completed.append({key: transfer[key] for key in ('bits', 'channels', 'signed', 'rate')} |
+                                  {'pcm': pcm, 'generation': self.generation})
+            if not self.resources[0x82] & 3:
+                self.resources[0x82] |= 2 if transfer['bits'] == 16 else 1
+                self.pic.request(7)
+            if transfer['auto']:
+                transfer['deadline'] += transfer['duration']
+            else:
+                self.active = None
+                break

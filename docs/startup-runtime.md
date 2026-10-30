@@ -179,8 +179,10 @@ use UTC. Vendor mouse extension requests leave registers unchanged, matching
 the regular [DOSBox-X mouse driver](https://github.com/joncampbell123/dosbox-x/blob/master/src/ints/mouse.cpp);
 unimplemented standard mouse functions still stop explicitly.
 
-The PIT signal sends host-only framebuffer snapshots at most 30 times per second,
-so direct VGA drawing remains visible after the loading screen. These snapshots
+The PIT signal services the host bridge at a minimum five-millisecond interval,
+limited by the programmed PIT frequency. Audio uses these service opportunities
+for DMA completion; SDL still limits display rendering to 30 frames per second.
+Direct VGA drawing remains visible after the loading screen. These snapshots
 preserve the guest registers and do not invoke a guest interrupt. Quick Combat
 was verified under a private Xvfb display through loading into a moving cockpit,
 HUD, and terrain. Keyboard make/break and virtual-joystick flight input are now additionally verified;

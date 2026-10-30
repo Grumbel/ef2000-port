@@ -41,6 +41,26 @@ class ISAAudioTests(unittest.TestCase):
         self.assertEqual(dma.address[5], 0x20)
         self.assertEqual(reads, [(0x20040, 4), (0x20044, 4)])
 
+    def test_overdue_auto_init_dma_keeps_pcm_but_coalesces_irq(self):
+        device = SoundBlaster16()
+        device.write(0x226, 1)
+        device.write(0x226, 0)
+        device.read(0x22a)
+        for port, value in ((0xd8, 0), (0xc4, 0), (0xc4, 0x80),
+                            (0xc6, 3), (0xc6, 0), (0x8b, 0),
+                            (0xd6, 0x59), (0xd4, 1)):
+            device.write(port, value)
+        for value in (0xb4, 0x30, 1, 0):
+            device.write(0x22c, value)
+        now = device.active['deadline'] + 2.5 * device.active['duration']
+        device.advance(now, lambda address, length: bytes(length))
+        self.assertEqual(len(device.completed), 3)
+        self.assertEqual(device.pic.pending[0], 0x80)
+        self.assertGreater(device.active['deadline'], now)
+        device.advance(now, lambda address, length: bytes(length))
+        self.assertEqual(len(device.completed), 3)
+        self.assertEqual(device.dma.count[5], 1)
+
     def test_timed_pcm_completion_and_interrupt_acknowledgement(self):
         device = SoundBlaster16()
         device.write(0x226, 1)

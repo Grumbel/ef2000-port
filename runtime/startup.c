@@ -435,7 +435,7 @@ static void guest_fault(u32 signal, struct context *r) {
             struct { unsigned long long seconds, nanoseconds; } now;
             if (syscall4(NR_CLOCK, 1, (uptr)&now, 0, 0) < 0) finish(22);
             u32 millis = (u32)now.seconds * 1000 + (u32)now.nanoseconds / 1000000;
-            if (millis - last_refresh >= 33) {
+            if (millis - last_refresh >= 5) {
                 last_refresh = millis;
                 /* Host-only framebuffer snapshot; no guest interrupt or registers. */
                 struct rm_packet packet = {.magic = 0x314d5258, .vector = 0x100};
