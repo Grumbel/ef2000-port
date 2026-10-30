@@ -1,0 +1,62 @@
+{
+  "profile": {
+    "sbtype": "sb16",
+    "base": 544,
+    "irq": 7,
+    "dma8": 1,
+    "dma16": 5
+  },
+  "instrumentation": {
+    "source_sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+    "patched_sha256": "3c9b1f200b2b5aa6d13b3b589c5f016f4419fe96de212401b31ff524e6d48b0a",
+    "hook_source_sha256": "47c30131b7d619f9529858c8402649a615ee3f82c233c9417c483b5fece804ae",
+    "payload_patch_range": [
+      0,
+      1289
+    ]
+  },
+  "source_unchanged": true,
+  "config_sha256": "183172ef0aba752988089641e47dc1e977d4f481b90356649398b9767d9726ee",
+  "record_sha256": "ae1f5d4a5d7971fe1b7f0e7df7206cca4f5c1493bdf84082a35a1c6e8ad285a7",
+  "record": {
+    "format": "SBDP",
+    "version": 1,
+    "samples": {
+      "reset_response": 170,
+      "write_status": 127,
+      "version_major": 4,
+      "version_minor": 5,
+      "irq_setup": 4,
+      "dma_setup": 34,
+      "interrupt_status": 32,
+      "empty_read_status": 127
+    }
+  },
+  "digital_driver": {
+    "filename": "SB16.DIG",
+    "sha256": "c8a1e7a0e14c8b696e665520e338711e4c20cc3bb4733f83527add41dd6f6b38",
+    "size": 2836,
+    "entry_offset": 362,
+    "commands_0300_0306": [
+      1949,
+      2001,
+      2022,
+      2029,
+      2116,
+      2451,
+      2493
+    ],
+    "commands_0400_0405": [
+      2527,
+      2556,
+      2788,
+      2815,
+      2822,
+      2829
+    ]
+  },
+  "limitations": [
+    "DOSBox-X emulated hardware, not a measurement of a physical ISA card.",
+    "No DMA transfer, interrupt completion, FM synthesis, or audible playback was tested by this probe."
+  ]
+}

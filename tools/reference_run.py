@@ -68,6 +68,8 @@ def main():
                         help='instrument the COPY to measure DOS file reads/seeks and exit')
     probes.add_argument('--exception-probe', action='store_true',
                         help='instrument the COPY to measure an X-32 divide exception frame')
+    probes.add_argument('--sb16-probe', action='store_true',
+                        help='instrument the COPY to measure DSP reset/version and SB16 resources (no playback)')
     args = parser.parse_args()
     source = args.game_dir.resolve()
     output = args.output.resolve()
@@ -85,8 +87,9 @@ def main():
     game_copy = output / 'drive' / 'EF2000'
     shutil.copytree(source, game_copy)
     instrumentation = None
-    if args.entry_probe or args.time_probe or args.vector_probe or args.memory_probe or args.file_probe or args.exception_probe:
+    if args.entry_probe or args.time_probe or args.vector_probe or args.memory_probe or args.file_probe or args.exception_probe or args.sb16_probe:
         instrumentation = instrument_entry(game_copy / '_EF2000.EXE', output,
+            'sb16_dsp.S' if args.sb16_probe else
             'x32_exception.S' if args.exception_probe else
             'dos_files.S' if args.file_probe else
             'dos_memory.S' if args.memory_probe else
@@ -116,6 +119,8 @@ set quick_flag=1
 _ef2000.exe gui
 exit
 '''
+    if args.sb16_probe:
+        config = config.replace('[autoexec]', '[sblaster]\nsbtype=sb16\nsbbase=220\nirq=7\ndma=1\nhdma=5\n[autoexec]')
     (output / 'dosbox-x.conf').write_text(config)
     environment = os.environ.copy()
     if args.headless:
