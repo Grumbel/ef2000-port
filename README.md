@@ -85,8 +85,13 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [Recovered extender services and differential evidence](docs/x32-services.md)
 - [Research and evidence conventions](docs/research.md)
 
-The window captures the mouse for relative movement. Press Escape to release
-the desktop pointer; click the window to capture it again.
+The mouse starts free and is captured only by a left-click inside the game
+image. That first click captures the pointer without activating a game button.
+Hold Escape for three seconds to release the desktop pointer; a short Escape
+press still reaches the game normally. Losing focus also releases capture, and
+regaining focus never captures it again. The window title shows the available
+capture/release action. Relative input remains necessary for reliable menu
+cursor positioning; uncaptured absolute input is not implemented yet.
 
 
 Flight controls default to the first connected SDL joystick, or keyboard when no

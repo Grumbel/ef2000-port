@@ -86,7 +86,9 @@ def analyze_calls(log):
 def main():
     parser = argparse.ArgumentParser(
         description='Run original EF2000 code on Linux (main-menu port; audio disabled by default).',
-        epilog='Example: %(prog)s /path/to/_EF2000.EXE --output local/startup-01')
+        epilog='Mouse: left-click the game image to capture; hold Escape for 3 seconds '
+               'to release. Focus alone never captures. Example: %(prog)s '
+               '/path/to/_EF2000.EXE --output local/startup-01')
     version_file = Path(__file__).resolve().parent.parent / 'VERSION'
     version = os.environ.get('EF2000_VERSION') or version_file.read_text().strip()
     parser.add_argument('--version', action='version', version=f'ef2000 {version}')

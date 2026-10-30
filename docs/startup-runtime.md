@@ -160,8 +160,13 @@ Both profiles now use the same image base, 64 MiB layout, DOS window, and shared
 bootstrap. Some QEMU signal frames lack trap numbers, requiring explicit supported
 opcode decoding for I/O faults.
 
-The window captures the mouse for relative movement. Press Escape to release
-the desktop pointer; click the window to capture it again.
+The mouse starts free and is captured only by a left-click inside the game
+image. That first click captures the pointer without activating a game button.
+Hold Escape for three seconds to release the desktop pointer; a short Escape
+press still reaches the game normally. Losing focus also releases capture, and
+regaining focus never captures it again. The window title shows the available
+capture/release action. Relative input remains necessary for reliable menu
+cursor positioning; uncaptured absolute input is not implemented yet.
 
 
 Mission startup now supports DOS date queries (AH=2Ah), time queries (AH=2Ch)
