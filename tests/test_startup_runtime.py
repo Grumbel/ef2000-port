@@ -61,6 +61,69 @@ class OriginalStartupTests(unittest.TestCase):
         self.assertEqual(self.report['stops'][-1]['AX'], 0x2511)
         self.assertEqual(self.report['returns'][3]['CX'], 0x4e0000)
 
+    def test_original_renderer_overflow_executes_its_unmodified_recovery_handler(self):
+        # Instrument only a disposable extracted image's entry. The exact fault
+        # instruction, exception handler, and recovery code remain original.
+        output = Path(self.directory.name) / 'renderer-overflow'
+        output.mkdir()
+        built = Path(self.directory.name) / 'run'
+        runtime = self.runner.parent.parent / 'runtime'
+        (output / 'hook.S').write_text("""
+            .code32
+            .section .text
+        image_start:
+            .org 0x86
+            jmp begin
+            .org 0x260
+        begin:
+            movw %cs, 0x17bf74
+            pushl %ds
+            pushl %cs
+            popl %ds
+            movl $0x2533, %eax
+            xorl %ecx, %ecx
+            movl $0xfcc6f, %edx
+            int $0x21
+            popl %ds
+            movl $0x000d2e06, %eax
+            movl $13, %edx
+            movl $22, %esi
+            pushl $recovered-image_start
+            movl $0xc5a7c, %edi
+            jmp *%edi
+        recovered:
+            cmpl $0x000d2e06, %eax
+            jne failed
+            cmpl $13, %edx
+            jne failed
+            movl $0xffff, %eax
+            int $0x21
+        failed:
+            movl $0xdead, %eax
+            int $0x21
+        """)
+        for command in (['as', '--32', 'hook.S', '-o', 'hook.o'],
+                        ['objcopy', '-O', 'binary', '--only-section=.text', 'hook.o', 'hook.bin']):
+            subprocess.run(command, cwd=output, capture_output=True, check=True, timeout=10)
+        payload = bytearray((built / 'payload.bin').read_bytes())
+        hook = (output / 'hook.bin').read_bytes()
+        self.assertLess(len(hook), 0x400)
+        payload[:len(hook)] = hook
+        (output / 'payload.bin').write_bytes(payload)
+        shutil.copyfile(built / 'payload.S', output / 'payload.S')
+        subprocess.run(['as', '--64', 'payload.S', '-o', 'payload.o'],
+                       cwd=output, capture_output=True, check=True, timeout=10)
+        command = ['ld', '-m', 'elf_x86_64', '-T', str(runtime / 'native64.ld'),
+                   *(str(built / name) for name in ('entry.o', 'startup.o', 'x32.o')),
+                   'payload.o', '-o', 'overflow.elf']
+        subprocess.run(command, cwd=output, capture_output=True, check=True, timeout=10)
+        run = subprocess.run([str(output / 'overflow.elf'), str(self.executable.parent)],
+                             cwd=output, capture_output=True, text=True, timeout=10)
+        self.assertEqual(run.returncode, 20, run.stdout + run.stderr)
+        self.assertIn('EXCEPTION ENTER VECTOR=00000000 IP=000c5a7c HANDLER=000fcc6f', run.stdout)
+        self.assertIn('EXCEPTION RETURN VECTOR=00000000 IP=000c5acd', run.stdout)
+        self.assertEqual(analyze_calls(run.stdout)['stops'][-1]['AX'], 0xffff)
+
     def test_original_assets_and_input_initialization_are_reached(self):
         self.assertIn('DID1ST.DAT', self.report['file_requests'])
         self.assertIn('./DID.DAT', self.report['file_requests'])

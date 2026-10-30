@@ -66,6 +66,8 @@ def main():
                         help='instrument the COPY to measure DOS conventional allocation and exit')
     probes.add_argument('--file-probe', action='store_true',
                         help='instrument the COPY to measure DOS file reads/seeks and exit')
+    probes.add_argument('--exception-probe', action='store_true',
+                        help='instrument the COPY to measure an X-32 divide exception frame')
     args = parser.parse_args()
     source = args.game_dir.resolve()
     output = args.output.resolve()
@@ -83,8 +85,9 @@ def main():
     game_copy = output / 'drive' / 'EF2000'
     shutil.copytree(source, game_copy)
     instrumentation = None
-    if args.entry_probe or args.time_probe or args.vector_probe or args.memory_probe or args.file_probe:
+    if args.entry_probe or args.time_probe or args.vector_probe or args.memory_probe or args.file_probe or args.exception_probe:
         instrumentation = instrument_entry(game_copy / '_EF2000.EXE', output,
+            'x32_exception.S' if args.exception_probe else
             'dos_files.S' if args.file_probe else
             'dos_memory.S' if args.memory_probe else
             'x32_vectors.S' if args.vector_probe else

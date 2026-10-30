@@ -159,7 +159,7 @@ services model success/failure CF rather than claiming exact arithmetic flags.
 Static dispatch recovery adds `2506h` (file `0x2069`, install a protected handler
 and real-mode thunk), `2532h` (`0x25c9`, query exception handler), and `2533h`
 (`0x260b`, set exception handler). Exceptions below 8 share the protected vector
-table. The harness stores these registrations; exception delivery remains an
+table. The harness stores these registrations. Divide exception delivery is now implemented; other vectors remain an
 explicit fault. Default handlers and thunk addresses are declared synthetic
 values, not addresses copied from DOSBox.
 
@@ -195,3 +195,13 @@ create/write operations and preservation of source files have native tests.
 Synthetic native guests
 test actual byte transfer, EOF, seek, handle reuse/errors, conventional memory,
 descriptor loads/limits, and vector round trips without original game assets.
+
+
+The X-32 divide-handler ABI was measured with `probes/x32_exception.S` in a
+disposable copy. At handler entry the IRET frame occupies offsets 0,4,8; an
+SS-relative context pointer follows at +12. The context stores EAX at +0,
+type=2 at +0Eh, saved EIP at +10h, CS at +14h, and flags at +18h.
+Stack and data segments differ in the reference extender: context accesses need
+SS, as the original game handler's EBP operands already do. Updating saved EIP
+and returning with IRET resumes at the new address while preserving the
+register sentinels. See `exception-reference.json` for hashes and captured words.

@@ -137,7 +137,7 @@ descriptor loading, timer delivery, alignment recovery, overlay writes, and the
 BIOS bridge without original assets. Green asset-free package tests alone do not
 prove menu rendering.
 
-Full exception-frame delivery, swapping, audio,
+Other exception-frame delivery, swapping, audio,
 additional device APIs, and gameplay validation remain outstanding.
 
 ## Segment diagnostic and QEMU
@@ -189,3 +189,14 @@ They exercise actual SDL events, a virtual joystick, axis inversion/remapping,
 focus loss, and device disconnection. Native synthetic guests verify IRQ1
 make/break bytes, IRET-only handlers, controller acknowledgements, and independent
 game-port axis discharge/buttons.
+
+
+Divide exceptions now enter the installed X-32 handler through its measured
+IRET/context-pointer ABI. The handler receives the original fault EIP and
+register/segment context and supplies the recovery EIP. The host resumes at that
+address; it does not replace or skip the game's renderer logic. This covers
+the signed 16-bit projection overflow at original EIP C5A7Ch. Nested exceptions,
+other exception vectors, and arbitrary stack/segment-context edits remain
+unsupported. The reproducible disposable-copy probe is
+`tools/reference_run.py --exception-probe`; measured metadata and resumed
+register sentinels are in `docs/exception-reference.json`.

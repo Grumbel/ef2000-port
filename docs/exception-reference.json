@@ -1,0 +1,63 @@
+{
+  "instrumentation": {
+    "source_sha256": "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd",
+    "patched_sha256": "5eea75c2e84adf19d15fd166611658128f88e4b05a412f61009a8aa508943dde",
+    "hook_source_sha256": "61ed4d1e431215c80cd9da61a2407c39abce035008bc266bd130191b6ada81bd",
+    "payload_patch_range": [
+      0,
+      1291
+    ]
+  },
+  "source_unchanged": true,
+  "record_sha256": "176b73fde22bf48f02d700a245f53f15b12ce4b2bcab906690fb851138e43a89",
+  "record_format": "XCEP",
+  "version": 1,
+  "completion_marker": "DONE",
+  "handler_entry_frame_words": [
+    3758091677,
+    3342379,
+    12358,
+    22540,
+    3758094336,
+    51,
+    3758095296,
+    670448227
+  ],
+  "exception_context_words": [
+    305419896,
+    2818099,
+    4718656,
+    131072,
+    666,
+    43,
+    12870,
+    3758091670,
+    59,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "resumed_registers": {
+    "eax": 305419896,
+    "ebx": 287454020,
+    "ecx": 0,
+    "edx": 0
+  },
+  "observed_layout": {
+    "entry_iret_offset": 0,
+    "entry_context_pointer_offset": 12,
+    "context_eax_offset": 0,
+    "context_type_offset": 14,
+    "context_ip_offset": 16,
+    "context_cs_offset": 20,
+    "context_flags_offset": 24
+  },
+  "limitations": [
+    "Measured divide exception only; other exception types and context edits remain unverified.",
+    "Stack addresses and selectors are specific to the reference extender."
+  ]
+}

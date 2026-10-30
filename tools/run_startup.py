@@ -240,7 +240,7 @@ def main():
                             'Only observed startup requests are supported, not their complete APIs.',
                             'X-32 allocation uses a synthetic no-swap state.',
                             'Game assets are read-only; writes use the local drive overlay. Host filenames are uppercase.',
-                            'Exception vectors are registered but exception delivery is not implemented.',
+                            'Registered divide handlers receive the measured X-32 frame; other exceptions and arbitrary context edits are unsupported.',
                             'PIT IRQ0 is delivered through host signals; masked/coalesced ticks are approximate.',
                             'CLI/STI update a virtual interrupt state; PUSHF/POPF reflection is not implemented.',
                             'CPU alignment checking is disabled on the first AC fault; PUSHF reflection differs from DOS.',

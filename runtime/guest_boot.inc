@@ -38,3 +38,7 @@
     sti
     popl %eax
     iret
+
+.org 0x120
+    /* Host exception-return gate. The original handler returns here by IRET. */
+    int $0x21

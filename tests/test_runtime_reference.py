@@ -2,12 +2,27 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import struct
+import json
+from pathlib import Path
 import unittest
 
 from tools.read_runtime_probe import decode
 
 
 class RuntimeReferenceTests(unittest.TestCase):
+    def test_original_divide_exception_context_and_resume_evidence(self):
+        reference = json.loads((Path(__file__).resolve().parent.parent /
+                                'docs/exception-reference.json').read_text())
+        self.assertTrue(reference['source_unchanged'])
+        frame = reference['handler_entry_frame_words']
+        context = reference['exception_context_words']
+        self.assertEqual(context[3] >> 16, 2)
+        self.assertEqual(context[5], frame[1] & 65535)
+        self.assertEqual(reference['resumed_registers'],
+                         dict(eax=0x12345678, ebx=0x11223344, ecx=0, edx=0))
+        self.assertEqual(reference['instrumentation']['source_sha256'],
+                         'f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd')
+
     def test_packed_vector_selector_and_full_registers(self):
         record = bytearray(0x1a4)
         record[:4] = b'XVEC'

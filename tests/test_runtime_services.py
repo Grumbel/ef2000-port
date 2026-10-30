@@ -69,6 +69,81 @@ class RuntimeServiceTests(unittest.TestCase):
         self.assertEqual(result['stops'][-1]['AX'], 0xffff, transcript)
         return result
 
+    def test_registered_x32_divide_handler_changes_saved_resume_ip(self):
+        self.run_guest("""
+            jmp begin
+        exception:
+            pushl %ebp
+            movl %esp, %ebp
+            pushl %eax
+            movl 16(%ebp), %ebp
+            cmpw $2, 14(%ebp)
+            jne failed
+            cmpl $0x2f, 20(%ebp)
+            jne failed
+            movl $resume-0x10000000, 16(%ebp)
+            popl %eax
+            popl %ebp
+            iret
+        begin:
+            pushl %ds
+            pushl %cs
+            popl %ds
+            movl $0x2533, %eax
+            xorl %ecx, %ecx
+            movl $exception-0x10000000, %edx
+            int $0x21
+            popl %ds
+            movl $0x12345678, %eax
+            movl $0x89abcdef, %ebx
+            xorl %ecx, %ecx
+            xorl %edx, %edx
+            idivl %ecx
+            jmp failed
+        resume:
+            cmpl $0x12345678, %eax
+            jne failed
+            cmpl $0x89abcdef, %ebx
+            jne failed
+            testl %ecx, %ecx
+            jne failed
+        """)
+
+    def test_signed_renderer_overflow_uses_original_style_recovery(self):
+        self.run_guest("""
+            jmp begin
+        exception:
+            pushl %ebp
+            movl %esp, %ebp
+            pushl %eax
+            movl 16(%ebp), %ebp
+            movl $resume-0x10000000, 16(%ebp)
+            popl %eax
+            popl %ebp
+            iret
+        begin:
+            pushl %ds
+            pushl %cs
+            popl %ds
+            movl $0x2533, %eax
+            xorl %ecx, %ecx
+            movl $exception-0x10000000, %edx
+            int $0x21
+            popl %ds
+            movl $0x000d2e06, %eax
+            movl $0x0000000d, %edx
+            movl $22, %esi
+            idivw %si
+            jmp failed
+        resume:
+            cmpl $0x000d2e06, %eax
+            jne failed
+            cmpl $13, %edx
+            jne failed
+            cmpl $22, %esi
+            jne failed
+        """)
+
     def test_dos_date_and_time_from_arbitrary_call_sites(self):
         from datetime import datetime, timezone
         before = datetime.now(timezone.utc)

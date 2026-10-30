@@ -99,6 +99,8 @@ static u32 pit_divisor, pit_low, pit_write_high;
 static u32 dac_cursor;
 static int runtime_ready;
 static u32 irq_in_service, irq_return_pending, pit_bios_clocks, timer_interrupts;
+static struct context divide_context;
+static u32 divide_frame, divide_active, divide_virtual_if;
 
 static uptr guest(u32 offset) { return (u32)(GUEST_BASE + offset); }
 
@@ -342,6 +344,51 @@ static u32 keyboard_read(void) {
 }
 
 static void guest_fault(u32 signal, struct context *r) {
+    if (signal == 11 && r->trap == 13 && r->ip == IMAGE_SIZE + 0x120 && divide_active) {
+        u32 *context = (u32 *)guest(divide_frame);
+        if (context[5] != 0x2f || context[4] < 0x86 || context[4] >= IMAGE_SIZE) finish(21);
+        *r = divide_context;
+        r->ax = context[0];
+        r->ip = context[4];
+        r->flags = context[6] & ~0x10000u;
+        virtual_interrupts = divide_virtual_if;
+        divide_active = 0;
+        text("EXCEPTION RETURN ", 17); field("VECTOR", 0); field("IP", r->ip); text("\n", 1);
+        return;
+    }
+    if (signal == 8 && r->trap == 0 && !divide_active && r->cs == 0x2f && r->ss == 7 &&
+        exception_vectors[0].offset < IMAGE_SIZE && exception_vectors[0].selector == 0x2f &&
+        r->sp >= 0x100 && guest_range(r->sp - 0x100, 0x100)) {
+        /* Measured original X-32 exception ABI: IRET frame followed by an
+         * SS-relative context pointer; context+0e=2, +10=EIP, +14=CS. */
+        divide_context = *r;
+        divide_virtual_if = virtual_interrupts;
+        divide_frame = r->sp - 0x80;
+        divide_active = 1;
+        u32 *context = (u32 *)guest(divide_frame);
+        for (u32 i = 0; i < 16; ++i) context[i] = 0;
+        context[0] = r->ax;
+        context[1] = (r->ds & 0xffff) | (r->cs << 16);
+        context[2] = (r->es & 0xffff) | (r->fs << 16);
+        context[3] = (r->gs & 0xffff) | 0x20000;
+        context[4] = r->ip;
+        context[5] = r->cs;
+        context[6] = r->flags & ~0x10000u;
+        context[7] = r->sp;
+        context[8] = r->ss;
+        r->sp -= 0x100;
+        u32 *frame = (u32 *)guest(r->sp);
+        frame[0] = IMAGE_SIZE + 0x120;
+        frame[1] = r->cs;
+        frame[2] = r->flags & ~0x10100u;
+        frame[3] = divide_frame;
+        r->ip = exception_vectors[0].offset;
+        r->flags &= ~0x10100u;
+        virtual_interrupts = 0;
+        text("EXCEPTION ENTER ", 16); field("VECTOR", 0);
+        field("IP", divide_context.ip); field("HANDLER", r->ip); text("\n", 1);
+        return;
+    }
     if (signal == 5 && r->trap == 1 && irq_return_pending) {
         r->flags &= ~0x10000u;
         irq_epilogue(r);
