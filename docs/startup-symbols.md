@@ -42,6 +42,10 @@ do not assume that its entire reachable code is gameplay rather than runtime.
 The initial selector-limit request, DOS version query, and non-DPMI stack/heap
 success calculations now have implementations. PSP/environment setup and the
 original BSS clearing are checked by the [startup harness](startup-runtime.md).
-The current unknown boundary is DOS AH=`0x2c` at application `0x11f2a4`, in a
-register-based INT 21h wrapper. Runtime initialization has begun; game `main`
-has not yet been verified as reached. Keep unknown behavior as an explicit stop.
+DOS AH=`0x2c` at application `0x11f2a4` now returns a recorded host UTC sample.
+Game initialization now reads the archives/configuration and prints TACTCOM.
+AX=`0x2511` at application `0x1112b7` marshals AIL3DIG driver requests to the
+real-mode engine. The default local no-audio configuration continues through
+timer/input initialization, VGA loading, and the original 640×400 VBE main menu.
+Gameplay and full exception-frame delivery remain outstanding. Keep unknown
+behavior as an explicit stop.

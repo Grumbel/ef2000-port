@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 {
-  description = "EF2000 Linux original-code startup harness and reverse-engineering tools";
+  description = "EF2000 Linux original-code main-menu port and reverse-engineering tools";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
@@ -11,6 +11,7 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
       inherit (pkgs) lib;
+      python = pkgs.python3.withPackages (p: [ p.unicorn ]);
       versionBase = lib.fileContents ./VERSION;
       gitRev = self.shortRev or self.dirtyShortRev or "dirty";
       version =
@@ -29,7 +30,7 @@
         inherit version;
         src = source;
 
-        nativeBuildInputs = [ pkgs.python3 pkgs.makeWrapper ];
+        nativeBuildInputs = [ python pkgs.makeWrapper ];
         # Guest transitions do not provide host TLS for stack canaries; the
         # freestanding harness also needs its linker script's fixed addresses.
         hardeningDisable = [ "pic" "stackprotector" "fortify" "fortify3" ];
@@ -50,8 +51,8 @@
             fi
             $CC -m$width $commonFlags $defines -c runtime/startup.c -o objects/$backend/startup.o
             $CC -m$width $commonFlags $defines -c runtime/x32.c -o objects/$backend/x32.o
-            as --$width "$entry" -o objects/$backend/entry.o
-            as --$width --defsym CHECK_SEGMENT_LIMIT=1 "$entry" -o objects/$backend/entry-limit.o
+            as --$width -I runtime "$entry" -o objects/$backend/entry.o
+            as --$width -I runtime --defsym CHECK_SEGMENT_LIMIT=1 "$entry" -o objects/$backend/entry-limit.o
           done
           runHook postBuild
         '';
@@ -74,10 +75,11 @@
           cp -r docs README.md TODO.md VERSION "$out/share/doc/ef2000/"
           cp LICENSES/GPL-3.0-or-later.txt "$out/share/licenses/ef2000/"
 
-          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000" \
+          makeWrapper ${python}/bin/python3 "$out/bin/ef2000" \
             --add-flags "$out/libexec/ef2000/tools/run_startup.py" \
             --add-flags "--runtime-objects $out/lib/ef2000" \
             --set EF2000_VERSION ${lib.escapeShellArg version} \
+            --set EF2000_SDL_LIBRARY ${pkgs.SDL2}/lib/libSDL2.so \
             --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.qemu-user ]}
           ln -s ef2000 "$out/bin/ef2000-startup"
           makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-inspect" \
@@ -96,7 +98,7 @@
         '';
 
         meta = {
-          description = "Original-code EF2000 startup harness (not yet playable)";
+          description = "Original-code EF2000 main-menu port";
           platforms = [ system ];
           mainProgram = "ef2000";
           license = lib.licenses.gpl3Plus;
@@ -130,7 +132,8 @@
       };
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
-        packages = with pkgs; [ python3 gcc binutils qemu-user dosbox-x gdb ];
+        packages = [ python ] ++ (with pkgs; [ gcc binutils qemu-user dosbox-x gdb ]);
+        EF2000_SDL_LIBRARY = "${pkgs.SDL2}/lib/libSDL2.so";
         EF2000_VERSION = version;
       };
     };

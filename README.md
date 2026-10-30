@@ -10,9 +10,12 @@ maintainable source is the long-term goal.
 The two-stage FlashTek X-32 loader, segment relocation table, initialized image,
 BSS boundaries, and protected-mode entry have been recovered by static analysis.
 The extractor reproduces the static relocation passes. A native x86-64 Linux
-harness executes unchanged original 32-bit startup and runtime initializer code,
-handling the initial selector, DOS-version, stack, and heap interfaces. It now
-stops at a DOS time query; the game is not playable through this port yet.
+harness executes unchanged original 32-bit code through startup and into the
+original **main menu and flight**, displayed in an SDL window with mouse,
+keyboard, and joystick input. It handles
+DOS services, memory allocation, timers, VGA/VBE banked graphics, and BIOS calls.
+Unicorn executes real-mode driver requests. Audio is disabled in a local config
+copy by default. Broader gameplay and mission completion remain unverified.
 The first target is the installed `_EF2000.EXE` in the sibling
 `../EF2000/c/EF2000/` directory. Other releases need separate fingerprints.
 
@@ -32,10 +35,21 @@ nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB
 `ef2000` launcher; `ef2000-startup` remains available as a command alias.
 Builds require no original game files. The launcher accepts your external
 executable, creates a new local output directory, and links it with the
-precompiled harness. `nix build` does not build a complete playable game yet.
+precompiled harness. The executable's parent directory supplies the original
+game assets, opened read-only. Configuration and other writes go under
+`OUTPUT/drive/`. Close the window to stop; its final framebuffer is retained as
+`OUTPUT/framebuffer.png`. Use a fresh output path for each run.
+
+For a bounded run without a window:
+
+```sh
+nix run . -- ../EF2000/c/EF2000/_EF2000.EXE \
+  --output local/menu-capture --headless --seconds 25
+```
 
 Python 3 is sufficient for the analysis tools. Direct startup development also
-requires GCC/binutils; QEMU and DOSBox-X are used by comparison/reference tools:
+requires GCC/binutils, Unicorn, and SDL2 (provided by `nix develop`); QEMU and
+DOSBox-X are used by comparison/reference tools:
 
 ```sh
 python3 tools/inspect_exe.py ../EF2000/c/EF2000/_EF2000.EXE
@@ -70,3 +84,21 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [Native startup harness and validation](docs/startup-runtime.md)
 - [Recovered extender services and differential evidence](docs/x32-services.md)
 - [Research and evidence conventions](docs/research.md)
+
+The window captures the mouse for relative movement. Press Escape to release
+the desktop pointer; click the window to capture it again.
+
+
+Flight controls default to the first connected SDL joystick, or keyboard when no
+joystick is connected. Use `--controls keyboard` or `--controls joystick` to force
+a mode. Keyboard input includes held keys, releases, modifiers, function keys,
+and the numeric keypad; losing focus releases held keys.
+
+The joystick exposes up to four axes and four buttons through the DOS game port.
+Use `--joystick N` to select an SDL device index or `--joystick off` to disable it.
+`--joystick-axes=0,1,3,-2` remaps the four axes and inverts SDL axis 2. Defaults
+are axes 0,1,2,3 and buttons 0–3. Use the original game's joystick calibration
+for the selected stick; only the output directory's config is changed.
+Joystick hotplug is supported; automatic flight-control selection happens at
+startup. Keyboard and joystick flight input were verified under Xvfb, using an
+SDL virtual joystick. A physical USB stick was unavailable for validation.
