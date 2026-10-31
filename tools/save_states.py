@@ -120,7 +120,7 @@ class SaveStates:
             path = self.directory / f'{stamp}-{metadata["mode"]}-{metadata["resolution"]}{"-" + context if context else ""}.efstate'
         path = Path(path)
         fields = {key: value for key, value in vars(engine).items()
-                  if key not in ('cpu', 'sound_device', 'cd_audio')}
+                  if key not in ('cpu', 'sound_device', 'cd_audio', 'io')}
         if getattr(engine, 'cd_audio', None):
             fields['cd_state'] = dict(position=engine.cd_audio.position(), end=engine.cd_audio.end,
                                       playing=engine.cd_audio.playing())
@@ -148,6 +148,8 @@ class SaveStates:
             engine.cd_audio.generation += 1
         sound = fields.pop('sound_state')
         engine.__dict__.update(fields)
+        # Per-request diagnostics use tuple keys and are not emulated state.
+        engine.io = {}
         engine.scan_queue = deque(engine.scan_queue)
         engine.pressed_keys = set(engine.pressed_keys)
         engine.video_modes = {int(key): tuple(value) for key, value in engine.video_modes.items()}

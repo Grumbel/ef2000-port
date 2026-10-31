@@ -565,7 +565,7 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
                     elif saving is not None:
                         try:
                             states.save(engine, saving[1])
-                        except (OSError, ValueError) as error:
+                        except (OSError, ValueError, TypeError) as error:
                             print(f'state: save failed: {error}', flush=True)
                             if display:
                                 display.menu.status = f'Save failed: {error}'
