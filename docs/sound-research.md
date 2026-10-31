@@ -13,6 +13,33 @@ IRQ/8-bit DMA/16-bit DMA discovery (-1). MDI.INI selects SBPRO2.MDI for FM
 music. Digital playback and FM synthesis are separate paths. Experimental SB16 digital
 playback is implemented; FM synthesis and CD audio remain unsupported.
 
+## Original-release CD audio source
+
+The original-release disc supplied in `../EF2000_ISO/EF_DIR.cue` references
+`EF_DIR.img`, a 565,961,760-byte raw image containing exactly 240,630 sectors
+of 2,352 bytes. Track 1 is MODE1/2352; its sector-16 ISO primary volume
+descriptor identifies the volume as `EF_DIR`. Tracks 2–7 are AUDIO.
+
+| Track | INDEX 1 sector | Span to next INDEX 1 or image end |
+| --- | ---: | ---: |
+| 2 | 59,822 | 484.627 s |
+| 3 | 96,169 | 252.213 s |
+| 4 | 115,085 | 469.507 s |
+| 5 | 150,298 | 484.800 s |
+| 6 | 186,658 | 250.933 s |
+| 7 | 205,478 | 468.693 s |
+
+Sector positions use 75 sectors per second. These spans include the following
+track's INDEX 0 pregap where present; they are not pregap-trimmed song lengths.
+The CUE contains explicit INDEX 0 entries for tracks 3–7, which a future disc
+reader should preserve. A one-second sample ten seconds into each audio track,
+decoded as little-endian signed 16-bit stereo PCM at 44,100 Hz, contained
+nonzero samples in every track. This verifies audio data is available; playback
+and the game's CD control path have not yet been tested. Inspection was
+read-only, and no disc content is included in the repository.
+
+## Driver addressing
+
 All driver offsets below are byte offsets in SB16.DIG, also offsets within
 its loaded real-mode segment. The observed native load is at physical 11000h,
 with INT66 entering 1100:016Ah. Addresses differ from protected-mode image
