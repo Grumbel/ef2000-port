@@ -121,13 +121,13 @@ submenus, and Quit. **F11** also toggles fullscreen. The save submenu offers
 **New Save** and existing slots to overwrite; both lists scroll with the keyboard.
 The overlay shows the current loaded/saved slot.
 
-Save states use the native64 backend with the default `--sound off` configuration.
+Save states use the native64 backend, including with `--sound sb16`.
 They include CPU/x87 context, guest and DOS memory, emulated video/input state,
 open-file positions, and the writable drive overlay. Original assets stay
 read-only. Loading replaces this run's drive overlay with the saved copy.
-With audio enabled, **New Save (Unavailable)** explains that saving requires
-`--sound off`. States are tied to the executable, runtime, and device configuration; incompatible
-states are rejected. QEMU and experimental audio checkpoints are not supported.
+SB16 states also preserve DSP, DMA, and interrupt state so audio resumes on load.
+States are tied to the executable, runtime, and device configuration; incompatible
+states are rejected. QEMU checkpoints are not supported.
 Names include the date, observed menu/loading/flight phase, resolution, and
 campaign/mission/navigation filenames when observed. Exact player location and
 mission type are not yet recovered, so names do not guess those fields.

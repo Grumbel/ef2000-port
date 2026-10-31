@@ -16,6 +16,14 @@ class SB16Probe:
         self.mixer_index = 0
         self.resources = {0x80: 0x04, 0x81: 0x22, 0x82: 0x20}
 
+    def save_state(self):
+        return dict(vars(self))
+
+    def restore_state(self, state):
+        self.__dict__.update(state)
+        self.data = deque(self.data)
+        self.resources = {int(key): value for key, value in self.resources.items()}
+
     @staticmethod
     def check_width(size):
         if size != 1:
@@ -82,6 +90,27 @@ class SoundBlaster16(SB16Probe):
         self.speaker = False
         self.mixer_values = {register: 0xf8 for register in range(0x30, 0x3c)}
         self.generation = 0
+
+    def save_state(self):
+        import time
+        state = super().save_state()
+        state['pic'] = dict(vars(self.pic))
+        state['dma'] = dict(vars(self.dma))
+        if self.active is not None:
+            state['active'] = dict(self.active)
+            state['active']['deadline'] -= time.monotonic()
+        return state
+
+    def restore_state(self, state):
+        import time
+        state = dict(state)
+        self.pic.__dict__.update(state.pop('pic'))
+        self.dma.__dict__.update(state.pop('dma'))
+        super().restore_state(state)
+        self.mixer_values = {int(key): value for key, value in self.mixer_values.items()}
+        if self.active is not None:
+            self.active = dict(self.active)
+            self.active['deadline'] += time.monotonic()
 
     def handles(self, port):
         return 0x220 <= port <= 0x22f or port in (0x20, 0x21, 0xa0, 0xa1, 0x3da) or self.dma.handles(port)

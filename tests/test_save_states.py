@@ -14,6 +14,55 @@ import sys
 import tempfile
 import unittest
 import zipfile
+from unittest.mock import patch
+
+from tools.save_states import encode, decode
+from tools.sound_blaster import SB16Probe, SoundBlaster16
+
+
+class SoundStateTests(unittest.TestCase):
+    def test_json_roundtrip_preserves_discovery_queue_and_registers(self):
+        for kind in (SB16Probe, SoundBlaster16):
+            with self.subTest(device=kind.__name__):
+                device = kind()
+                device.write(0x226, 1)
+                device.write(0x226, 0)
+                device.write(0x22c, 0xe1)
+                state = json.loads(json.dumps(device.save_state(), default=encode), object_hook=decode)
+                restored = kind()
+                restored.restore_state(state)
+                self.assertEqual([restored.read(0x22a) for _ in range(3)], [0xaa, 4, 5])
+                restored.write(0x224, 0x81)
+                self.assertEqual(restored.read(0x225), 0x22)
+
+    def test_restored_dma_completes_after_remaining_time_and_raises_irq(self):
+        device = SoundBlaster16()
+        device.write(0x226, 1)
+        device.write(0x226, 0)
+        for port, value in ((0xd8, 0), (0xc4, 0), (0xc4, 0x80),
+                            (0xc6, 3), (0xc6, 0), (0x8b, 0),
+                            (0xd6, 0x49), (0xd4, 1), (0x21, 0x78)):
+            device.write(port, value)
+        with patch('time.monotonic', return_value=100):
+            for value in (0xb0, 0x30, 3, 0):
+                device.write(0x22c, value)
+            state = json.loads(json.dumps(device.save_state(), default=encode), object_hook=decode)
+        self.assertGreater(device.active['deadline'], 100)
+        restored = SoundBlaster16()
+        with patch('time.monotonic', return_value=1000):
+            restored.restore_state(state)
+        restored.advance(1000, lambda address, length: self.fail('DMA completed early'))
+        reads = []
+        def memory(address, length):
+            reads.append((address, length))
+            return bytes(range(length))
+        restored.advance(restored.active['deadline'], memory)
+        self.assertEqual(reads, [(0x10000, 8)])
+        self.assertEqual(restored.completed[0]['pcm'], bytes(range(8)))
+        self.assertEqual(restored.pic.next_irq(), 7)
+        restored.read(0x22f)
+        self.assertEqual(restored.resources[0x82] & 3, 0)
+        self.assertIsNone(restored.active)
 
 
 @unittest.skipUnless(os.environ.get('EF2000_EXE') and platform.machine() == 'x86_64'
@@ -21,6 +70,12 @@ import zipfile
                      'requires EF2000_EXE and native development tools')
 class NativeSaveStateTests(unittest.TestCase):
     def test_save_restore_and_cli_loading_preserve_assets(self):
+        self.check_save_restore('off')
+
+    def test_sb16_save_restore_and_cli_loading_preserve_assets(self):
+        self.check_save_restore('sb16')
+
+    def check_save_restore(self, sound):
         root = Path(__file__).resolve().parent.parent
         executable = Path(os.environ['EF2000_EXE']).resolve()
         originals = [executable, executable.parent / 'EF2000.CFG']
@@ -62,7 +117,7 @@ assert state.get('stage') == 'loaded', state
             output = Path(temporary) / 'save'
             environment = dict(os.environ, XDG_DATA_HOME=str(Path(temporary) / 'data'))
             result = subprocess.run([sys.executable, '-c', script, str(executable),
-                                     '--output', str(output), '--headless', '--seconds', '22'],
+                                     '--output', str(output), '--headless', '--seconds', '22', '--sound', sound],
                                     cwd=root, env=environment, capture_output=True, text=True, timeout=45)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('state: loaded', result.stdout)
@@ -75,7 +130,7 @@ assert state.get('stage') == 'loaded', state
             restored = Path(temporary) / 'restore'
             result = subprocess.run([sys.executable, str(root / 'tools/run_startup.py'),
                                      str(executable), '--output', str(restored), '--headless',
-                                     '--seconds', '7', '--load-state', str(state)],
+                                     '--seconds', '7', '--load-state', str(state), '--sound', sound],
                                     cwd=root, env=environment, capture_output=True, text=True, timeout=20)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('game: restored menu', result.stdout)

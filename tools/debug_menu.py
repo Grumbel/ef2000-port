@@ -39,7 +39,7 @@ class DebugMenu:
         self.page = 'main'
         self.selected = 0
         self.scroll = 0
-        self.status = '' if states else 'Requires native64 / --sound off'
+        self.status = '' if states else 'Requires native64 / --real-mode unicorn'
 
     def rows(self):
         if self.page == 'main':
@@ -83,7 +83,7 @@ class DebugMenu:
         elif self.selected == len(self.rows()) - 1:
             self.page, self.selected = 'main', 0
         elif not self.states:
-            self.status = 'Requires native64 / --sound off'
+            self.status = 'Requires native64 / --real-mode unicorn'
         elif self.states:
             entries = self.states.entries()
             path = None if self.page == 'save' and self.selected == 0 else entries[self.selected - (self.page == 'save')]

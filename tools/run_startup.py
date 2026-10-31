@@ -137,8 +137,8 @@ def main():
     parser.add_argument('--fullscreen', action='store_true', help='start in borderless desktop fullscreen')
     parser.add_argument('--verbose', action='store_true', help='print detailed guest file and bridge activity')
     args = parser.parse_args()
-    if args.load_state and (args.backend != 'native64' or args.real_mode != 'unicorn' or args.sound != 'off'):
-        parser.error('--load-state requires --backend native64 --real-mode unicorn --sound off')
+    if args.load_state and (args.backend != 'native64' or args.real_mode != 'unicorn'):
+        parser.error('--load-state requires --backend native64 --real-mode unicorn')
     if args.load_state and not args.load_state.is_file():
         parser.error(f'save state unavailable: {args.load_state}')
     if args.joystick not in ('auto', 'off') and not args.joystick.isdecimal():
@@ -247,12 +247,13 @@ def main():
                                                       (output / 'x32.o').read_bytes()).hexdigest(),
                             'devices': [args.sound, args.vr], 'format': 1,
                             'host': hashlib.sha256(b''.join((Path(__file__).parent / name).read_bytes()
-                                      for name in ('real_mode.py', 'input_devices.py', 'save_states.py'))).hexdigest()}
-                states = SaveStates(args.state_dir or default_directory(), output, identity) if args.backend == 'native64' and args.sound == 'off' else None
+                                      for name in ('real_mode.py', 'input_devices.py', 'save_states.py',
+                                                   'sound_blaster.py', 'isa_audio.py'))).hexdigest()}
+                states = SaveStates(args.state_dir or default_directory(), output, identity) if args.backend == 'native64' else None
                 if states:
                     print(f'paths: save states={states.directory.resolve()}', flush=True)
                 else:
-                    print('state: checkpoints unavailable for this backend/audio configuration', flush=True)
+                    print('state: checkpoints unavailable for this backend', flush=True)
                 run, real_mode_requests = run_real_mode(command, output, log, timeout=args.seconds,
                                                        headless=args.headless, controls=args.controls,
                                                        joystick=args.joystick, joystick_axes=joystick_axes,

@@ -121,7 +121,7 @@ class SaveStates:
         path = Path(path)
         fields = {key: value for key, value in vars(engine).items()
                   if key not in ('cpu', 'sound_device')}
-        fields['sound_state'] = vars(engine.sound_device) if engine.sound_device else None
+        fields['sound_state'] = engine.sound_device.save_state() if engine.sound_device else None
         temporary = path.with_suffix('.tmp')
         with zipfile.ZipFile(temporary, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=1) as archive:
             archive.writestr('metadata.json', json.dumps(dict(metadata, identity=self.identity)))
@@ -142,7 +142,7 @@ class SaveStates:
         engine.pressed_keys = set(engine.pressed_keys)
         engine.video_modes = {int(key): tuple(value) for key, value in engine.video_modes.items()}
         if sound is not None:
-            engine.sound_device.__dict__.update(sound)
+            engine.sound_device.restore_state(sound)
         engine.release_keys()
         engine.mouse_buttons = 0
         print(f'state: loaded {self.current}', flush=True)
