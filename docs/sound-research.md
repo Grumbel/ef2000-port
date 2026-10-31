@@ -122,8 +122,13 @@ discarded at format changes. SDL output is 44100 Hz signed 16-bit stereo.
 Tests cover frame boundaries, signed/unsigned conversion, DMA/IRQ completion,
 and interrupt coalescing. Set `EF2000_TEST_AUDIO=dummy SDL_AUDIODRIVER=dummy`
 to exercise the real SDL resampler and queue without using speakers.
-Startup PCM and SDL queueing are verified; actual flight effects remain under
-investigation. Unknown hardware operations still stop explicitly.
+Startup and flight PCM plus SDL queueing are verified on private Xvfb with
+SDL's dummy audio device. A 180-second original-game run reached Quick Combat,
+entered the cockpit, and accepted weapon/gear input. A subsequent 131072-byte
+flight interval contained 128378 non-silent samples and 227 distinct byte
+values. This verifies the original mixer produces flight PCM and the host
+queues it; listening quality, underruns, and long missions remain unverified.
+Unknown hardware operations still stop explicitly.
 
 For future rendering research, `../tfx3view` contains the Linux 3View/TFXplorer
 port and the libTFX decoder for EF2000 shape bytecode and DAT archives.

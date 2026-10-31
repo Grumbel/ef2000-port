@@ -113,7 +113,11 @@ declared absent device. Unsupported nested interrupts or ports stop explicitly.
 The opt-in `--sound sb16-probe` mode instead exposes the measured DSP reset,
 version, and resource registers, disabling FM music locally to isolate digital
 sound. It stops at the original driver's PIC access; it does not provide audio.
-See [sound-research.md](sound-research.md) for the measured path and next work.
+`--sound sb16` additionally executes the original DMA/IRQ self-test and enables
+experimental digital effects/speech through SDL. It writes `audio-NNN.wav` and
+`audio.json` in the output directory; headless runs capture without playback.
+Audio remains off by default. FM music and CD audio are unsupported.
+See [sound-research.md](sound-research.md) for the measured path and validation.
 
 BIOS video and mouse requests use the same bridge. The virtual video adapter
 supports VGA 13h and indexed banked VBE modes 100h, 101h, 103h, and 105h, with
