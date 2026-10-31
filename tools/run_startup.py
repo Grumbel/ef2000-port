@@ -111,6 +111,10 @@ def main():
                              '(default: %(default)s)')
     parser.add_argument('--no-sound', action='store_const', const='off', dest='sound',
                         help='disable music, sound effects, and speech in a local configuration copy')
+    parser.add_argument('--vr', choices=['off', 'vfx1'], default='off',
+                        help='experimental headset interface: vfx1 enables the original VFX1 '
+                             'view via F1, with centered tracking and monoscopic output '
+                             '(default: %(default)s)')
     parser.add_argument('--controls', choices=['auto', 'keyboard', 'joystick', 'original'], default='auto',
                         help='flight controls in the local config: auto selects joystick when connected, '
                              'otherwise keyboard (default: %(default)s)')
@@ -133,6 +137,8 @@ def main():
     if not 2 <= len(axis_tokens) <= 4 or any(not t.lstrip('-').isdecimal() or t.startswith('--') for t in axis_tokens):
         parser.error('--joystick-axes requires 2 to 4 comma-separated axis indices, optionally inverted with -')
     joystick_axes = [(int(t.lstrip('-')), -1 if t.startswith('-') else 1) for t in axis_tokens]
+    if args.vr != 'off' and args.real_mode != 'unicorn':
+        parser.error('--vr vfx1 requires --real-mode unicorn')
     if args.seconds < 0:
         parser.error('--seconds must be nonnegative')
     if args.backend == 'native64' and (platform.system() != 'Linux' or
@@ -151,17 +157,18 @@ def main():
         output.mkdir(parents=True, exist_ok=False)
         overlay = output / 'drive' / 'EF2000'
         overlay.mkdir(parents=True)
-        if args.sound in ('off', 'sb16-probe', 'sb16') or args.controls != 'original':
-            config = args.executable.resolve().parent / 'EF2000.CFG'
-            lines = config.read_bytes().splitlines()
-            settings = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127', b'SPEECH': b'0'} if args.sound == 'off' else {}
-            if args.sound in ('sb16-probe', 'sb16'):
-                settings[b'MUSIC'] = b'0,127'  # Isolate digital sound from FM music.
-            if args.controls != 'original':
-                settings[b'CONTROL'] = b'1' if args.controls == 'joystick' else b'0'
-            lines = [line.split(b'=', 1)[0] + b'=' + settings[line.split(b'=', 1)[0]]
-                     if line.split(b'=', 1)[0] in settings else line for line in lines]
-            (overlay / 'EF2000.CFG').write_bytes(b'\r\n'.join(lines) + b'\r\n')
+        # Keep configuration changes in the local overlay.
+        config = args.executable.resolve().parent / 'EF2000.CFG'
+        lines = config.read_bytes().splitlines()
+        settings = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127', b'SPEECH': b'0'} if args.sound == 'off' else {}
+        if args.sound in ('sb16-probe', 'sb16'):
+            settings[b'MUSIC'] = b'0,127'  # Isolate digital sound from FM music.
+        settings[b'VRHELMET'] = b'1' if args.vr == 'vfx1' else b'0'
+        if args.controls != 'original':
+            settings[b'CONTROL'] = b'1' if args.controls == 'joystick' else b'0'
+        lines = [line.split(b'=', 1)[0] + b'=' + settings[line.split(b'=', 1)[0]]
+                 if line.split(b'=', 1)[0] in settings else line for line in lines]
+        (overlay / 'EF2000.CFG').write_bytes(b'\r\n'.join(lines) + b'\r\n')
         for directory in args.executable.resolve().parent.rglob('*'):
             if directory.is_dir():
                 (overlay / directory.relative_to(args.executable.resolve().parent)).mkdir(parents=True, exist_ok=True)
@@ -217,7 +224,8 @@ def main():
                 run, real_mode_requests = run_real_mode(command, output, log, timeout=args.seconds,
                                                        headless=args.headless, controls=args.controls,
                                                        joystick=args.joystick, joystick_axes=joystick_axes,
-                                                       sound_hardware=args.sound if args.sound in ('sb16-probe', 'sb16') else 'absent')
+                                                       sound_hardware=args.sound if args.sound in ('sb16-probe', 'sb16') else 'absent',
+                                                       vr=args.vr)
             else:
                 run = subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,
                                      timeout=args.seconds or None, check=False)
@@ -239,6 +247,7 @@ def main():
             'dos_window_linear_base': 0x01000000,
             'display': 'headless' if args.headless else 'SDL2',
             'sound': args.sound,
+            'vr': args.vr,
             'controls': args.controls,
             'joystick': args.joystick,
             'joystick_axes': args.joystick_axes,

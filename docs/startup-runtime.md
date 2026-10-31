@@ -119,6 +119,11 @@ experimental digital effects/speech through SDL. It writes `audio-NNN.wav` and
 Audio remains off by default. FM music and CD audio are unsupported.
 See [sound-research.md](sound-research.md) for the measured path and validation.
 
+`--vr vfx1` enables original VFX1 detection and centered orientation polling.
+Press F1 in flight to select the headset camera. Output is monoscopic; the
+original game has no stereo renderer to activate. See
+[vfx1-research.md](vfx1-research.md) for evidence and remaining work.
+
 BIOS video and mouse requests use the same bridge. The virtual video adapter
 supports VGA 13h and indexed banked VBE modes 100h, 101h, 103h, and 105h, with
 controller/mode information, bank changes, scanline length, and display start.

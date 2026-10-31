@@ -24,6 +24,25 @@ class RealModeTests(unittest.TestCase):
         self.assertEqual(len(self.memory), MEMORY_SIZE)
         return PACKET.unpack(response)
 
+    def test_vfx1_is_opt_in_and_vendor_probe_preserves_upper_registers(self):
+        original = self.call(0x33, 0x1234607f)
+        self.assertEqual(original[2], 0x1234607f)
+        self.engine = RealMode(vr='vfx1')
+        result = self.call(0x33, 0x1234607f, bx=0x12345678)
+        self.assertEqual(result[2], 0x12347f60)
+        self.assertEqual(result[3], 0x12345678)
+        # Other vendor slots must not falsely identify a device.
+        self.assertEqual(self.call(0x33, 0x617f)[2], 0x617f)
+
+    def test_vfx1_orientation_uses_original_driver_register_order(self):
+        self.engine = RealMode(vr='vfx1')
+        self.engine.vfx_orientation = (1234, -2345, 3456)
+        result = self.call(0x33, 0x6070, bx=0xabcd0301, cx=0xcdef0000, dx=0x12340000)
+        self.assertEqual(result[2:6], (0x6000, 0xabcd04d2, 0xcdeff6d7, 0x12340d80))
+        self.assertEqual(self.call(0x33, 0x6070, bx=0x0401)[3], 0x0401)
+        # Ordinary mouse state is independent of headset angles.
+        self.assertEqual(self.call(0x33, 3)[4:6], (320, 100))
+
     def test_host_framebuffer_snapshot_preserves_packet_and_memory(self):
         memory = bytes((i % 256 for i in range(MEMORY_SIZE)))
         result = self.call(0x100, 0x1234, cx=0x5678, dx=0x9abc, memory=memory)

@@ -24,8 +24,12 @@ except ImportError:
 
 
 class RealMode(HostInput):
-    def __init__(self, sound_hardware='absent'):
+    def __init__(self, sound_hardware='absent', vr='off'):
         super().__init__()
+        if vr not in ('off', 'vfx1'):
+            raise ValueError(f'unsupported VR interface {vr!r}')
+        self.vr = vr
+        self.vfx_orientation = (0, 0, 0)
         self.sound_device = None
         if sound_hardware == 'sb16':
             try:
@@ -213,7 +217,16 @@ class RealMode(HostInput):
 
     def mouse(self, values, memory):
         function = values[2] & 0xffff
-        if function == 0:
+        if self.vr == 'vfx1' and function == 0x607f:
+            # Original D9B30h probes AX=607Fh and checks for AX=7F60h.
+            values[2] = (values[2] & 0xffff0000) | 0x7f60
+        elif self.vr == 'vfx1' and function == 0x6070 and values[3] & 0xffff == 0x0301:
+            # D9BA0h requests BX=0301h; orientation returns in BX/CX/DX.
+            yaw, pitch, roll = self.vfx_orientation
+            for index, angle in ((3, yaw), (4, pitch), (5, roll)):
+                values[index] = (values[index] & 0xffff0000) | (angle & 0xffff)
+            values[2] = (values[2] & 0xffff0000) | 0x6000
+        elif function == 0:
             values[2] = (values[2] & 0xffff0000) | 0xffff
             values[3] = (values[3] & 0xffff0000) | 2
             self.mouse_visible = False
@@ -441,8 +454,8 @@ def write_all(fd, data):
 
 
 def run(command, output, log, timeout=15, headless=True, controls='original',
-        joystick='auto', joystick_axes=None, sound_hardware='absent'):
-    engine = RealMode(sound_hardware=sound_hardware)
+        joystick='auto', joystick_axes=None, sound_hardware='absent', vr='off'):
+    engine = RealMode(sound_hardware=sound_hardware, vr=vr)
     display = None
     if not headless:
         try:
