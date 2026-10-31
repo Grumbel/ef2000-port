@@ -43,7 +43,7 @@ class OriginalStartupTests(unittest.TestCase):
         output = Path(cls.directory.name) / 'run'
         runner = Path(__file__).resolve().parent.parent / 'tools' / 'run_startup.py'
         cls.diagnostic_args = ['--real-mode', 'stop', '--sound', 'probe', '--headless', '--seconds', '15']
-        run = subprocess.run([sys.executable, str(runner), str(cls.executable), '--output', str(output)] + cls.diagnostic_args,
+        run = subprocess.run([sys.executable, str(runner), str(cls.executable), '--output', str(output), '--state-dir', str(output / 'states')] + cls.diagnostic_args,
                              capture_output=True, text=True, timeout=45)
         if run.returncode:
             raise AssertionError(run.stdout + run.stderr)
@@ -160,7 +160,7 @@ class OriginalStartupTests(unittest.TestCase):
     def test_original_game_reaches_banked_gui_and_exports_framebuffer(self):
         output = Path(self.directory.name) / 'gui'
         run = subprocess.run([sys.executable, str(self.runner), str(self.executable),
-                              '--output', str(output), '--headless', '--seconds', '20'],
+                              '--output', str(output), '--state-dir', str(output / 'states'), '--headless', '--seconds', '20'],
                              capture_output=True, text=True, timeout=45)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)  # Deliberate time limit.
         report = json.loads((output / 'report.json').read_text())
@@ -179,7 +179,7 @@ class OriginalStartupTests(unittest.TestCase):
     def test_native_cpu_enforces_expand_down_lower_bound(self):
         output = Path(self.directory.name) / 'limits'
         run = subprocess.run([sys.executable, str(self.runner), str(self.executable),
-                              '--output', str(output), '--check-segment-limit'] + self.diagnostic_args,
+                              '--output', str(output), '--state-dir', str(output / 'states'), '--check-segment-limit'] + self.diagnostic_args,
                              capture_output=True, text=True, timeout=45)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         report = json.loads((output / 'report.json').read_text())
@@ -190,7 +190,7 @@ class OriginalStartupTests(unittest.TestCase):
     def test_qemu_comparison_reaches_same_service_boundary(self):
         output = Path(self.directory.name) / 'qemu'
         run = subprocess.run([sys.executable, str(self.runner), str(self.executable),
-                              '--output', str(output), '--backend', 'qemu'] + self.diagnostic_args,
+                              '--output', str(output), '--state-dir', str(output / 'states'), '--backend', 'qemu'] + self.diagnostic_args,
                              capture_output=True, text=True, timeout=45)
         self.assertEqual(run.returncode, 0, run.stdout + run.stderr)
         report = json.loads((output / 'report.json').read_text())

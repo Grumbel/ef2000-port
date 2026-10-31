@@ -127,8 +127,9 @@ Names include the date, observed menu/loading/flight phase, resolution, and
 campaign/mission/navigation filenames when observed. Exact player location and
 mission type are not yet recovered, so names do not guess those fields.
 
-By default, states go into `OUTPUT/states`. Use `--state-dir DIR` to share a
-save library across runs, and load a state directly with:
+By default, states go into `$XDG_DATA_HOME/ef2000/states` (or
+`~/.local/share/ef2000/states`), shared across runs even with different output
+directories. Older saves in `OUTPUT/states` can be opened using `--state-dir OUTPUT/states`. Use `--state-dir DIR` for another library, or load a state directly with:
 
 ```sh
 nix run . -- ../EF2000/c/EF2000/_EF2000.EXE --output local/restored-run \

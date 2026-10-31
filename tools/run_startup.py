@@ -131,7 +131,7 @@ def main():
                         help='use precompiled harness objects under ROOT/{native64,qemu} '
                              'instead of compiling them with GCC')
     parser.add_argument('--load-state', type=Path, metavar='FILE', help='restore a native save-state bundle at startup')
-    parser.add_argument('--state-dir', type=Path, metavar='DIR', help='save-state directory (default: OUTPUT/states)')
+    parser.add_argument('--state-dir', type=Path, metavar='DIR', help='save-state directory (default: XDG data directory / ef2000/states)')
     parser.add_argument('--fullscreen', action='store_true', help='start in borderless desktop fullscreen')
     parser.add_argument('--verbose', action='store_true', help='print detailed guest file and bridge activity')
     args = parser.parse_args()
@@ -234,9 +234,9 @@ def main():
                 except ImportError:
                     from real_mode import run as run_real_mode
                 try:
-                    from .save_states import SaveStates
+                    from .save_states import SaveStates, default_directory
                 except ImportError:
-                    from save_states import SaveStates
+                    from save_states import SaveStates, default_directory
                 identity = {'source': manifest['source_sha256'],
                             'runtime': hashlib.sha256((output / 'startup.o').read_bytes() +
                                                       (output / 'entry.o').read_bytes() +
@@ -244,7 +244,7 @@ def main():
                             'devices': [args.sound, args.vr], 'format': 1,
                             'host': hashlib.sha256(b''.join((Path(__file__).parent / name).read_bytes()
                                       for name in ('real_mode.py', 'input_devices.py', 'save_states.py'))).hexdigest()}
-                states = SaveStates(args.state_dir or output / 'states', output, identity) if args.backend == 'native64' and args.sound == 'off' else None
+                states = SaveStates(args.state_dir or default_directory(), output, identity) if args.backend == 'native64' and args.sound == 'off' else None
                 if states:
                     print(f'paths: save states={states.directory.resolve()}', flush=True)
                 else:

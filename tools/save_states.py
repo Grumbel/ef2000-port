@@ -6,11 +6,18 @@
 import base64
 from collections import deque
 import json
+import os
 from pathlib import Path
 import shutil
 import tempfile
 import zipfile
 from datetime import datetime
+
+
+def default_directory():
+    configured = Path(os.environ.get('XDG_DATA_HOME', ''))
+    data = configured if configured.is_absolute() else Path.home() / '.local' / 'share'
+    return data / 'ef2000' / 'states'
 
 
 def encode(value):

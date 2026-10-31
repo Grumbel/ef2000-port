@@ -9,7 +9,8 @@ import unittest
 import zipfile
 
 from tools.debug_menu import DebugMenu
-from tools.save_states import SaveStates
+from tools.save_states import SaveStates, default_directory
+from unittest.mock import patch
 
 
 class DebugMenuTests(unittest.TestCase):
@@ -21,6 +22,12 @@ class DebugMenuTests(unittest.TestCase):
         self.display = SimpleNamespace(fullscreen=False, closed=False,
                                        toggle_fullscreen=lambda: setattr(self.display, 'fullscreen', True))
         self.menu = DebugMenu(self.display, self.states)
+
+    def test_default_library_is_shared_between_output_directories(self):
+        with patch.dict('os.environ', {'XDG_DATA_HOME': self.directory.name}):
+            self.assertEqual(default_directory(), Path(self.directory.name) / 'ef2000/states')
+        with patch.dict('os.environ', {'XDG_DATA_HOME': ''}):
+            self.assertEqual(default_directory(), Path.home() / '.local/share/ef2000/states')
 
     def test_keyboard_submenus_new_save_overwrite_and_load(self):
         self.menu.selected = 2

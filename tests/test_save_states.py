@@ -60,12 +60,13 @@ assert state.get('stage') == 'loaded', state
 '''
         with tempfile.TemporaryDirectory(prefix='ef2000-state-') as temporary:
             output = Path(temporary) / 'save'
+            environment = dict(os.environ, XDG_DATA_HOME=str(Path(temporary) / 'data'))
             result = subprocess.run([sys.executable, '-c', script, str(executable),
                                      '--output', str(output), '--headless', '--seconds', '22'],
-                                    cwd=root, capture_output=True, text=True, timeout=45)
+                                    cwd=root, env=environment, capture_output=True, text=True, timeout=45)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('state: loaded', result.stdout)
-            state, = (output / 'states').glob('*.efstate')
+            state, = (Path(temporary) / 'data/ef2000/states').glob('*.efstate')
             self.assertIn('-menu-640x400', state.name)
             self.assertEqual((output / 'drive/checkpoint-test.txt').read_text(), 'saved overlay')
             with zipfile.ZipFile(state) as archive:
@@ -75,7 +76,7 @@ assert state.get('stage') == 'loaded', state
             result = subprocess.run([sys.executable, str(root / 'tools/run_startup.py'),
                                      str(executable), '--output', str(restored), '--headless',
                                      '--seconds', '7', '--load-state', str(state)],
-                                    cwd=root, capture_output=True, text=True, timeout=20)
+                                    cwd=root, env=environment, capture_output=True, text=True, timeout=20)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn('game: restored menu', result.stdout)
             self.assertEqual((restored / 'drive/checkpoint-test.txt').read_text(), 'saved overlay')
