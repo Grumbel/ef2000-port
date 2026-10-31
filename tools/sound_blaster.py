@@ -191,7 +191,10 @@ class SoundBlaster16(SB16Probe):
         while now >= transfer['deadline']:
             pcm = self.dma.transfer(channel, transfer['units'], read_memory)
             self.completed.append({key: transfer[key] for key in ('bits', 'channels', 'signed', 'rate')} |
-                                  {'pcm': pcm, 'generation': self.generation})
+                                  {'pcm': pcm, 'generation': self.generation,
+                                   'gains': tuple(((self.mixer_values[0x30 + i] >> 3) / 31) *
+                                                  ((self.mixer_values[0x32 + i] >> 3) / 31)
+                                                  for i in range(2))})
             if not self.resources[0x82] & 3:
                 self.resources[0x82] |= 2 if transfer['bits'] == 16 else 1
                 self.pic.request(7)

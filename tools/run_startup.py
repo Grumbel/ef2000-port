@@ -106,7 +106,8 @@ def main():
                         help='real-mode driver execution (default: %(default)s)')
     parser.add_argument('--sound', choices=['off', 'probe', 'sb16-probe', 'sb16'], default='off',
                         help='sound configuration: off disables audio locally; probe runs '
-                             'original driver detection; sb16-probe models DSP discovery only, no audio '
+                             'original driver detection; sb16-probe models DSP discovery only; '
+                             'sb16 enables experimental digital effects/speech and WAV capture (no FM music) '
                              '(default: %(default)s)')
     parser.add_argument('--no-sound', action='store_const', const='off', dest='sound',
                         help='disable music, sound effects, and speech in a local configuration copy')
@@ -251,7 +252,9 @@ def main():
                             'CLI/STI update a virtual interrupt state; PUSHF/POPF reflection is not implemented.',
                             'CPU alignment checking is disabled on the first AC fault; PUSHF reflection differs from DOS.',
                             'Keyboard IRQ1, mouse, and up to four SDL joystick axes/buttons are connected; physical joystick validation is pending.',
-                            ('SB16 discovery only; DMA, device interrupts, and audio output are unimplemented.'
+                            ('Experimental SB16 digital playback and WAV capture; FM music is disabled and CD audio is unsupported.'
+                             if args.sound == 'sb16' else
+                             'SB16 discovery only; DMA, device interrupts, and audio output are unimplemented.'
                              if args.sound == 'sb16-probe' else
                              'Sound hardware is absent; audio is disabled in a local configuration copy by default.'),
                             'VGA/VBE implements the observed indexed banked modes, not the complete hardware API.'],

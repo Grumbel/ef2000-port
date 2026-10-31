@@ -463,11 +463,19 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
             value = b'1' if engine.joystick_axes else b'0'
             lines = [b'CONTROL=' + value if line.startswith(b'CONTROL=') else line for line in lines]
             config.write_bytes(b'\r\n'.join(lines) + b'\r\n')
-    request_read, request_write = os.pipe()
-    response_read, response_write = os.pipe()
+    audio_capture = None
+    request_read = request_write = response_read = response_write = -1
     requests = []
     process = None
     try:
+        if sound_hardware == 'sb16':
+            try:
+                from .audio_output import AudioCapture
+            except ImportError:
+                from audio_output import AudioCapture
+            audio_capture = AudioCapture(output, playback=not headless)
+        request_read, request_write = os.pipe()
+        response_read, response_write = os.pipe()
         process = subprocess.Popen(command + [str(request_write), str(response_read)], cwd=output,
             stdout=log, stderr=subprocess.STDOUT, pass_fds=(request_write, response_read))
         os.close(request_write)
@@ -488,6 +496,10 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
             try:
                 poll()
                 response, memory = engine.execute(packet, vectors, memory)
+                if audio_capture:
+                    for block in engine.sound_device.completed:
+                        audio_capture.push(block)
+                    engine.sound_device.completed.clear()
                 if len(response) != PACKET.size or len(memory) != MEMORY_SIZE:
                     raise ValueError('real-mode response changed the bridge memory/packet size')
                 record['output'] = list(PACKET.unpack(response))
@@ -528,5 +540,7 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
         for fd in (request_read, request_write, response_read, response_write):
             if fd >= 0:
                 os.close(fd)
+        if audio_capture is not None:
+            audio_capture.close(engine.audio_interrupts)
         if display is not None:
             display.close()

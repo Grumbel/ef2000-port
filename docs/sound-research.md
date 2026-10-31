@@ -10,8 +10,8 @@ The source installation remains unchanged.
 
 The installed DIG.INI selects Sound Blaster 16, base 220h, and automatic
 IRQ/8-bit DMA/16-bit DMA discovery (-1). MDI.INI selects SBPRO2.MDI for FM
-music. Digital playback and FM synthesis are separate paths; neither has an
-audio output implementation yet.
+music. Digital playback and FM synthesis are separate paths. Experimental SB16 digital
+playback is implemented; FM synthesis and CD audio remain unsupported.
 
 All driver offsets below are byte offsets in SB16.DIG, also offsets within
 its loaded real-mode segment. The observed native load is at physical 11000h,
@@ -34,8 +34,8 @@ a seven-entry table at 010Ah for AX=0300h..0306h and a six-entry table at
 | 0400h | 09DFh | Mixer/volume setting and query |
 | 0401h | 09FCh | Program sampling rate and DMA playback |
 
-The names in the last three rows are inferred from the instructions; successful
-playback has not been observed. In particular, 0304h is more than a presence
+The names in the last three rows are inferred from the instructions. The original
+driver now completes its self-test and produces PCM during startup. In particular, 0304h is more than a presence
 check: returning success without its interrupt self-test would conceal missing
 hardware behavior.
 
@@ -84,9 +84,9 @@ older absent-card diagnostic behavior.
 
 The unchanged original driver reads DSP 0405h and stores 220h/IRQ7/DMA1/DMA5.
 It then installs its real-mode vector 0Fh handler at offset 069Ah and reaches
-IN AL,A1h at driver 0372h. That PIC mask access is the current explicit stop.
+IN AL,A1h at driver 0372h. That PIC mask access is the explicit stop for `sb16-probe`.
 Unicorn's saved IP is 0374h, after the IN instruction; it is not the faulting
-instruction's start. There is no successful 0304h return yet.
+instruction's start. The full `sb16` model instead returns 0405h after the original IRQ handler runs.
 
 The failure record in report.json includes CPU state. `conventional.bin` now
 contains the failed driver's post-execution memory, not merely the pre-call
@@ -99,19 +99,31 @@ snapshot. At the observed 11000h load, verify:
 EF2000_EXE and Unicorn are available. It verifies both the parsed fields and
 the explicit PIC boundary while checking the source driver's hash.
 
-## Next hardware work
+## Experimental digital playback
 
-1. Shared master/slave PIC masks and real-mode IRQ7 delivery. The driver accesses
-   A1h/21h at 0372h/037Ah and restores their prior masks during cleanup.
-2. Stateful 8237 DMA programming. The selected channel 5 tables at 0130h..015Fh
-   identify page 8Bh, address C4h, count C6h, mask D4h, mode D6h, and flip-flop
-   reset D8h. Routine 0233h computes the address/count, including word addressing.
-3. DSP transfer commands and completion: the 0304h self-test programs rate 5622h
-   (22,050 Hz) with command 41h and issues B0h, mode 30h, length 0000h. It waits
-   for the installed handler to signal completion. Mixer pending bits,
-   acknowledgement reads, DMA progress, and timing must agree.
-4. Once that self-test really completes, trace original streaming and mixing
-   into the DMA buffer. Add PCM capture first, then an SDL audio sink with
-   independent rate/format validation.
-5. Investigate SBPRO2.MDI/OPL separately for music. Do not declare music working
-   merely because digital effects initialize.
+Use `--sound sb16` to enable digital effects and speech from the original driver.
+Audio remains off by default. FM music is disabled in the local configuration;
+CD audio is deferred. Headless runs record PCM without opening an audio device.
+Windowed runs additionally send resampled stereo PCM to SDL queued audio.
+
+The model implements PIC masks/acknowledgement, byte/word DMA addressing,
+single-cycle and auto-initialized DSP transfers, and original real-mode IRQ7
+execution. Overdue blocks continue DMA while pending interrupts coalesce.
+The original self-test programs 22050 Hz, signed 16-bit stereo, a one-word DMA
+transfer, and returns 0405h only after its handler increments the completion flag.
+Streaming observed during startup uses 22050 Hz unsigned 8-bit stereo.
+
+`audio-NNN.wav` files preserve source PCM, segmented at format/reset changes.
+`audio.json` records rates, frame counts, nonzero samples, peaks, hashes, IRQ
+count, and SDL queue statistics. Capture precedes master/PCM mixer gain;
+playback applies those gains. Partial frames from the two-byte self-test are
+discarded at format changes. SDL output is 44100 Hz signed 16-bit stereo.
+
+Tests cover frame boundaries, signed/unsigned conversion, DMA/IRQ completion,
+and interrupt coalescing. Set `EF2000_TEST_AUDIO=dummy SDL_AUDIODRIVER=dummy`
+to exercise the real SDL resampler and queue without using speakers.
+Startup PCM and SDL queueing are verified; actual flight effects remain under
+investigation. Unknown hardware operations still stop explicitly.
+
+For future rendering research, `../tfx3view` contains the Linux 3View/TFXplorer
+port and the libTFX decoder for EF2000 shape bytecode and DAT archives.
