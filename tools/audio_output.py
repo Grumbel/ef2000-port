@@ -10,6 +10,7 @@ import hashlib
 import json
 import os
 import sys
+import time
 import wave
 
 
@@ -20,7 +21,8 @@ class AudioSpec(c.Structure):
 
 
 class AudioPlayback:
-    def __init__(self):
+    def __init__(self, mixer=None):
+        self.mixer = mixer
         library = os.environ.get('EF2000_SDL_LIBRARY') or find_library('SDL2')
         if not library:
             raise ValueError('SDL2 audio unavailable')
@@ -51,6 +53,10 @@ class AudioPlayback:
         self.queue_resets = 0
         if self.sdl.SDL_InitSubSystem(0x10) < 0:
             raise ValueError(self.sdl.SDL_GetError().decode())
+        if mixer is not None:
+            self.device = mixer.output.device
+            mixer.buffers[self] = bytearray()
+            return
         desired = AudioSpec(freq=44100, format=0x8010, channels=2, samples=1024)
         obtained = AudioSpec()
         self.device = self.sdl.SDL_OpenAudioDevice(None, 0, c.byref(desired), c.byref(obtained), 0)
@@ -89,6 +95,10 @@ class AudioPlayback:
             if sys.byteorder != 'little':
                 converted.byteswap()
             pcm_output = converted.tobytes()
+            if self.mixer is not None:
+                self.mixer.buffers[self].extend(pcm_output)
+                self.queued_bytes += count
+                return
             if self.sdl.SDL_GetQueuedAudioSize(self.device) > 44100 * 4 * 2:
                 self.sdl.SDL_ClearQueuedAudio(self.device)
                 self.queue_resets += 1
@@ -100,14 +110,49 @@ class AudioPlayback:
         if self.stream:
             self.sdl.SDL_FreeAudioStream(self.stream)
             self.stream = None
-        self.sdl.SDL_CloseAudioDevice(self.device)
+        if self.mixer is None:
+            self.sdl.SDL_CloseAudioDevice(self.device)
         self.sdl.SDL_QuitSubSystem(0x10)
+
+
+class AudioMixer:
+    """Mix independently converted stereo sources into one SDL device."""
+    def __init__(self):
+        self.output = AudioPlayback()
+        self.buffers = {}
+        self.next_frame = time.monotonic() + 0.1
+
+    def source(self):
+        return AudioPlayback(self)
+
+    def flush(self):
+        now = time.monotonic()
+        frames = int((now - self.next_frame) * 44100)
+        if frames <= 0:
+            return
+        self.next_frame += frames / 44100
+        size = frames * 4
+        mixed = [0] * (size // 2)
+        for data in self.buffers.values():
+            samples = array('h', data[:size])
+            if sys.byteorder != 'little':
+                samples.byteswap()
+            for i, sample in enumerate(samples):
+                mixed[i] += sample
+            del data[:size]
+        pcm = array('h', (max(-32768, min(32767, v)) for v in mixed))
+        if sys.byteorder != 'little':
+            pcm.byteswap()
+        self.output.push(pcm.tobytes(), 16, 2, 44100, 0)
+
+    def close(self):
+        self.output.close()
 
 
 class AudioCapture:
     def __init__(self, output, playback=False):
         self.output = output
-        self.playback = AudioPlayback() if playback else None
+        self.playback = AudioPlayback() if playback is True else playback or None
         self.signature = None
         self.carry = b''
         self.writer = None

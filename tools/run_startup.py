@@ -106,6 +106,7 @@ def main():
                              'qemu uses qemu-i386 (default: %(default)s)')
     parser.add_argument('--real-mode', choices=['stop', 'unicorn'], default='unicorn',
                         help='real-mode driver execution (default: %(default)s)')
+    parser.add_argument('--cd-cue', type=Path, help='CUE image for experimental MSCDEX CD audio')
     parser.add_argument('--sound', choices=['off', 'probe', 'sb16-probe', 'sb16'], default='off',
                         help='sound configuration: off disables audio locally; probe runs '
                              'original driver detection; sb16-probe models DSP discovery only; '
@@ -177,6 +178,9 @@ def main():
         settings = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127', b'SPEECH': b'0'} if args.sound == 'off' else {}
         if args.sound in ('sb16-probe', 'sb16'):
             settings[b'MUSIC'] = b'0,127'  # Isolate digital sound from FM music.
+        if args.cd_cue:
+            settings[b'MUSIC'] = b'2,127'
+            (overlay / 'MDI.INI').write_bytes(b'DEVICE None\r\nDRIVER NULL.MDI\r\nIO_ADDR -1\r\nIRQ -1\r\nDMA_8_BIT -1\r\nDMA_16_BIT -1\r\n')
         settings[b'VRHELMET'] = b'1' if args.vr == 'vfx1' else b'0'
         if args.controls != 'original':
             settings[b'CONTROL'] = b'1' if args.controls == 'joystick' else b'0'
@@ -245,10 +249,10 @@ def main():
                             'runtime': hashlib.sha256((output / 'startup.o').read_bytes() +
                                                       (output / 'entry.o').read_bytes() +
                                                       (output / 'x32.o').read_bytes()).hexdigest(),
-                            'devices': [args.sound, args.vr], 'format': 1,
+                            'devices': [args.sound, args.vr, str(args.cd_cue.resolve()) if args.cd_cue else None], 'format': 1,
                             'host': hashlib.sha256(b''.join((Path(__file__).parent / name).read_bytes()
                                       for name in ('real_mode.py', 'input_devices.py', 'save_states.py',
-                                                   'sound_blaster.py', 'isa_audio.py'))).hexdigest()}
+                                                   'sound_blaster.py', 'isa_audio.py', 'cd_audio.py'))).hexdigest()}
                 states = SaveStates(args.state_dir or default_directory(), output, identity) if args.backend == 'native64' else None
                 if states:
                     print(f'paths: save states={states.directory.resolve()}', flush=True)
@@ -259,7 +263,7 @@ def main():
                                                        joystick=args.joystick, joystick_axes=joystick_axes,
                                                        sound_hardware=args.sound if args.sound in ('sb16-probe', 'sb16') else 'absent',
                                                        vr=args.vr, states=states, load_state=args.load_state,
-                                                       fullscreen=args.fullscreen, verbose=args.verbose)
+                                                       fullscreen=args.fullscreen, verbose=args.verbose, cd_cue=args.cd_cue)
             else:
                 run = subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,
                                      timeout=args.seconds or None, check=False)
@@ -281,6 +285,7 @@ def main():
             'dos_window_linear_base': 0x01000000,
             'display': 'headless' if args.headless else 'SDL2',
             'sound': args.sound,
+                  'cd_cue': str(args.cd_cue.resolve()) if args.cd_cue else None,
             'vr': args.vr,
             'controls': args.controls,
             'joystick': args.joystick,
@@ -295,7 +300,7 @@ def main():
                             'CLI/STI update a virtual interrupt state; PUSHF/POPF reflection is not implemented.',
                             'CPU alignment checking is disabled on the first AC fault; PUSHF reflection differs from DOS.',
                             'Keyboard IRQ1, mouse, and up to four SDL joystick axes/buttons are connected; physical joystick validation is pending.',
-                            ('Experimental SB16 digital playback and WAV capture; FM music is disabled and CD audio is unsupported.'
+                            ('Experimental SB16 digital playback and WAV capture; FM music is disabled; --cd-cue enables experimental CD music.'
                              if args.sound == 'sb16' else
                              'SB16 discovery only; DMA, device interrupts, and audio output are unimplemented.'
                              if args.sound == 'sb16-probe' else

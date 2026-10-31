@@ -60,3 +60,18 @@ class SDLPlaybackTests(unittest.TestCase):
             self.assertGreater(output.queued_bytes, 20000)
         finally:
             output.close()
+
+class AudioMixerTests(unittest.TestCase):
+    def test_mixes_sources_on_one_clock_and_clips(self):
+        from tools.audio_output import AudioMixer
+        from unittest.mock import Mock, patch
+        mixer = AudioMixer.__new__(AudioMixer)
+        mixer.output = Mock()
+        mixer.next_frame = 0
+        mixer.buffers = {1: bytearray(struct.pack('<4h', 30000, -30000, 100, 200)),
+                         2: bytearray(struct.pack('<2h', 10000, -10000))}
+        with patch('tools.audio_output.time.monotonic', return_value=1/44100 + 1e-10):
+            mixer.flush()
+        self.assertEqual(mixer.output.push.call_args.args[0], struct.pack('<2h', 32767, -32768))
+        self.assertEqual(mixer.buffers[1], struct.pack('<2h', 100, 200))
+        self.assertEqual(mixer.buffers[2], b'')

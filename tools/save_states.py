@@ -120,7 +120,10 @@ class SaveStates:
             path = self.directory / f'{stamp}-{metadata["mode"]}-{metadata["resolution"]}{"-" + context if context else ""}.efstate'
         path = Path(path)
         fields = {key: value for key, value in vars(engine).items()
-                  if key not in ('cpu', 'sound_device')}
+                  if key not in ('cpu', 'sound_device', 'cd_audio')}
+        if getattr(engine, 'cd_audio', None):
+            fields['cd_state'] = dict(position=engine.cd_audio.position(), end=engine.cd_audio.end,
+                                      playing=engine.cd_audio.playing())
         fields['sound_state'] = engine.sound_device.save_state() if engine.sound_device else None
         temporary = path.with_suffix('.tmp')
         with zipfile.ZipFile(temporary, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=1) as archive:
@@ -136,6 +139,13 @@ class SaveStates:
 
     def restore_engine(self, engine, fields):
         self.context = fields.pop('_save_context', {})
+        cd = fields.pop('cd_state', None)
+        if cd is not None and engine.cd_audio:
+            import time
+            engine.cd_audio.start = engine.cd_audio.cursor = cd['position']
+            engine.cd_audio.end = cd['end']
+            engine.cd_audio.started = time.monotonic() if cd['playing'] else None
+            engine.cd_audio.generation += 1
         sound = fields.pop('sound_state')
         engine.__dict__.update(fields)
         engine.scan_queue = deque(engine.scan_queue)

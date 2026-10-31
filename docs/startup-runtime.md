@@ -116,7 +116,7 @@ sound. It stops at the original driver's PIC access; it does not provide audio.
 `--sound sb16` additionally executes the original DMA/IRQ self-test and enables
 experimental digital effects/speech through SDL. It writes `audio-NNN.wav` and
 `audio.json` in the output directory; headless runs capture without playback.
-Audio remains off by default. FM music and CD audio are unsupported.
+Audio remains off by default. FM music is unsupported. Use `--cd-cue` for experimental CD music; see [cd-audio.md](cd-audio.md).
 See [sound-research.md](sound-research.md) for the measured path and validation.
 
 `--vr vfx1` enables original VFX1 detection and centered orientation polling.

@@ -25,11 +25,16 @@ except ImportError:
 
 
 class RealMode(HostInput):
-    def __init__(self, sound_hardware='absent', vr='off'):
+    def __init__(self, sound_hardware='absent', vr='off', cd_cue=None):
         super().__init__()
         if vr not in ('off', 'vfx1'):
             raise ValueError(f'unsupported VR interface {vr!r}')
         self.vr = vr
+        try:
+            from .cd_audio import CDAudio
+        except ImportError:
+            from cd_audio import CDAudio
+        self.cd_audio = CDAudio(cd_cue) if cd_cue else None
         self.vfx_orientation = (0, 0, 0)
         self.sound_device = None
         if sound_hardware == 'sb16':
@@ -364,6 +369,12 @@ class RealMode(HostInput):
         snapshot = values[0] == MAGIC and values[-1] == 0x100
         if snapshot and not hasattr(self.sound_device, 'advance'):
             return packet, memory
+        if values[0] == MAGIC and values[-1] == 0x2f and values[2] & 0xff00 == 0x1500:
+            if self.cd_audio:
+                values, memory = self.cd_audio.interrupt(values, memory)
+            elif values[2] & 0xffff == 0x1500:
+                values[3] = 0
+            return PACKET.pack(*values), memory
         if values[0] == MAGIC and values[-1] == 0x33:
             return self.mouse(values, memory)
         if values[0] == MAGIC and values[-1] == 0x10:
@@ -457,13 +468,13 @@ def write_all(fd, data):
 
 def run(command, output, log, timeout=15, headless=True, controls='original',
         joystick='auto', joystick_axes=None, sound_hardware='absent', vr='off',
-        states=None, load_state=None, fullscreen=False, verbose=False):
+        states=None, load_state=None, fullscreen=False, verbose=False, cd_cue=None):
     try:
         from .runtime_log import RuntimeLog
     except ImportError:
         from runtime_log import RuntimeLog
     runtime_log = RuntimeLog(output / 'calls.log', verbose)
-    engine = RealMode(sound_hardware=sound_hardware, vr=vr)
+    engine = RealMode(sound_hardware=sound_hardware, vr=vr, cd_cue=cd_cue)
     display = None
     if not headless:
         try:
@@ -490,16 +501,33 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
             config.write_bytes(b'\r\n'.join(lines) + b'\r\n')
             print(f'input: automatic flight controls={"joystick" if engine.joystick_axes else "keyboard"}', flush=True)
     audio_capture = None
+    cd_capture = None
+    mixer = None
+    cd_events = 0
     request_read = request_write = response_read = response_write = -1
     requests = []
     process = None
     try:
+        if cd_cue and not headless:
+            try:
+                from .audio_output import AudioMixer
+            except ImportError:
+                from audio_output import AudioMixer
+            mixer = AudioMixer()
         if sound_hardware == 'sb16':
             try:
                 from .audio_output import AudioCapture
             except ImportError:
                 from audio_output import AudioCapture
-            audio_capture = AudioCapture(output, playback=not headless)
+            audio_capture = AudioCapture(output, playback=mixer.source() if mixer else not headless)
+        if engine.cd_audio:
+            try:
+                from .audio_output import AudioCapture
+            except ImportError:
+                from audio_output import AudioCapture
+            cd_output = output / 'cd-audio'
+            cd_output.mkdir(exist_ok=True)
+            cd_capture = AudioCapture(cd_output, playback=mixer.source() if mixer else not headless)
         request_read, request_write = os.pipe()
         response_read, response_write = os.pipe()
         process = subprocess.Popen(command + [str(request_write), str(response_read)], cwd=output,
@@ -553,10 +581,19 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
                                          'loading' if engine.video_mode == 0x13 else 'startup')
                     print(f'game: {engine.game_phase} (video mode 0x{engine.video_mode:x})', flush=True)
                     last_mode = engine.video_mode
+                if cd_capture:
+                    if len(engine.cd_audio.events) != cd_events:
+                        cd_events = len(engine.cd_audio.events)
+                        (output / 'cd-audio' / 'requests.json').write_text(json.dumps(engine.cd_audio.events, indent=2) + '\n')
+                    block = engine.cd_audio.pcm()
+                    if block:
+                        cd_capture.push(block)
                 if audio_capture:
                     for block in engine.sound_device.completed:
                         audio_capture.push(block)
                     engine.sound_device.completed.clear()
+                if mixer:
+                    mixer.flush()
                 if len(response) != PACKET.size or len(memory) != MEMORY_SIZE:
                     raise ValueError('real-mode response changed the bridge memory/packet size')
                 record['output'] = list(PACKET.unpack(response))
@@ -570,7 +607,10 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
                     poll()
                     display.update(engine, memory)
                     time.sleep(0.01)
-                deadline += time.monotonic() - paused_at
+                pause_duration = time.monotonic() - paused_at
+                if engine.cd_audio and engine.cd_audio.started is not None:
+                    engine.cd_audio.started += pause_duration
+                deadline += pause_duration
                 if bridge_kind == 0x100 and states and states.pending:
                     action, path = states.pending
                     states.pending = None
@@ -624,6 +664,13 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
         for fd in (request_read, request_write, response_read, response_write):
             if fd >= 0:
                 os.close(fd)
+        if cd_capture is not None:
+            cd_capture.close()
+        if mixer:
+            mixer.close()
+        if engine.cd_audio:
+            (output / 'cd-audio' / 'requests.json').write_text(json.dumps(engine.cd_audio.events, indent=2) + '\n')
+            engine.cd_audio.close()
         if audio_capture is not None:
             audio_capture.close(engine.audio_interrupts)
         if display is not None:

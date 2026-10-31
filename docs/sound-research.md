@@ -11,7 +11,7 @@ The source installation remains unchanged.
 The installed DIG.INI selects Sound Blaster 16, base 220h, and automatic
 IRQ/8-bit DMA/16-bit DMA discovery (-1). MDI.INI selects SBPRO2.MDI for FM
 music. Digital playback and FM synthesis are separate paths. Experimental SB16 digital
-playback is implemented; FM synthesis and CD audio remain unsupported.
+playback is implemented; FM synthesis remains unsupported. Experimental CD playback is described in [cd-audio.md](cd-audio.md).
 
 ## Original-release CD audio source
 
@@ -130,7 +130,7 @@ the explicit PIC boundary while checking the source driver's hash.
 
 Use `--sound sb16` to enable digital effects and speech from the original driver.
 Audio remains off by default. FM music is disabled in the local configuration;
-CD audio is deferred. Headless runs record PCM without opening an audio device.
+CD audio can be enabled separately with `--cd-cue`; see [cd-audio.md](cd-audio.md). Headless runs record PCM without opening an audio device.
 Windowed runs additionally send resampled stereo PCM to SDL queued audio.
 
 The model implements PIC masks/acknowledgement, byte/word DMA addressing,
