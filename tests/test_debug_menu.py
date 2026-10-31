@@ -40,6 +40,19 @@ class DebugMenuTests(unittest.TestCase):
         self.menu.key(40)
         self.assertEqual(self.states.pending, ('load', path))
 
+    def test_unavailable_save_explains_audio_requirement(self):
+        menu = DebugMenu(self.display, None)
+        menu.open = True
+        menu.selected = 2
+        menu.key(40)
+        self.assertEqual(menu.rows(), ['New Save (Unavailable)', 'Back'])
+        menu.key(40)
+        self.assertTrue(menu.open)
+        self.assertIn('--sound off', menu.status)
+        menu.selected = 1
+        menu.key(40)
+        self.assertEqual(menu.page, 'main')
+
     def test_fullscreen_resume_and_quit(self):
         self.menu.selected = 1
         self.menu.key(40)

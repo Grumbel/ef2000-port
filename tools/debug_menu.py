@@ -39,14 +39,15 @@ class DebugMenu:
         self.page = 'main'
         self.selected = 0
         self.scroll = 0
-        self.status = '' if states else 'Save states require native64 and sound off'
+        self.status = '' if states else 'Requires native64 / --sound off'
 
     def rows(self):
         if self.page == 'main':
             return ['Resume', f'Fullscreen: {"On" if self.display.fullscreen else "Off"}',
                     'Save State >', 'Load State >', 'Quit']
         entries = [self.states.label(path) for path in self.states.entries()] if self.states else []
-        return (['New Save'] if self.page == 'save' and self.states else []) + entries + ['Back']
+        return (['New Save' if self.states else 'New Save (Unavailable)']
+                if self.page == 'save' else []) + entries + ['Back']
 
     def toggle(self, engine):
         self.open = not self.open
@@ -81,6 +82,8 @@ class DebugMenu:
                 self.display.closed = True
         elif self.selected == len(self.rows()) - 1:
             self.page, self.selected = 'main', 0
+        elif not self.states:
+            self.status = 'Requires native64 / --sound off'
         elif self.states:
             entries = self.states.entries()
             path = None if self.page == 'save' and self.selected == 0 else entries[self.selected - (self.page == 'save')]

@@ -12,7 +12,9 @@ and configuration, drives timer handlers, and renders the original German
 main menu in a 640×400 VBE mode and flight in 320×200 VGA. An SDL window
 supplies mouse, keyboard, and joystick input. Keyboard view changes and held
 flight controls, plus SDL virtual-joystick banking and button delivery, were
-verified under Xvfb. Audio is disabled in a local config copy by default.
+verified under Xvfb. Audio is disabled in a local config copy by default; opt-in `--sound sb16`
+plays original digital sound through SDL and captures PCM. The user reports
+working sound in native flight sessions.
 Broader gameplay and mission completion remain unvalidated. The target executable and
 its SHA-256 are recorded in `docs/executable.md`.
 
@@ -47,15 +49,20 @@ Implemented and verified:
 
 1. Validate longer flight sessions, mission completion, and physical joystick
    hardware; keep automated UI tests on private Xvfb displays.
-2. Complete sound hardware/audio: the opt-in SB16 discovery model now reaches
-   the original driver's PIC mask access. Implement shared PIC masks, 8237 DMA,
-   and real-mode IRQ completion so its self-test can actually pass; then validate
-   PCM capture/output. Investigate FM music separately. See `docs/sound-research.md`.
-   Validate physical joystick hardware.
-3. Implement other exception-frame delivery and refine CLI/STI/AC flag reflection,
+2. Investigate the reported physical Xbox 360 Wireless Controller regression:
+   SDL registers the device and auto selects joystick controls, but flight does
+   not react with `--sound sb16`. Preserve virtual joystick coverage and validate
+   the complete SDL-to-game path, including pause/resume.
+3. Extend native checkpoints to SB16 audio configurations. Currently save/load
+   requires native64 with `--sound off`; the save menu explicitly marks New Save
+   unavailable otherwise. Verify save/load and fresh-process restore after changes.
+4. Investigate FM music separately if needed. Digital SB16 discovery, shared PIC
+   masks, 8237 DMA, real-mode IRQ completion, PCM capture, and SDL playback are
+   implemented; see `docs/sound-research.md`.
+5. Implement other exception-frame delivery and refine CLI/STI/AC flag reflection,
    timer coalescing/priority, memory residency reference counts, and DOS path handling.
    Keep unknown interfaces and model exhaustion as explicit stops.
-4. Document data/mission discoveries separately under `docs/`, with fingerprints,
+6. Document data/mission discoveries separately under `docs/`, with fingerprints,
    offsets, reproducers, and observed/inferred status.
 
 ## Reproduce
@@ -100,6 +107,14 @@ have dedicated regression coverage. All commits include exact model attribution.
 
 
 Sound discovery has an independent DOSBox-X probe and captured reference values.
-`--sound sb16-probe` exposes DSP 4.5 and IRQ7/DMA1/5 to the unchanged SB16.DIG,
-then stops explicitly at IN A1h. Default runs still disable audio. Failed
-real-mode calls now retain their mutated memory and CPU state for investigation.
+`--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA
+model and plays captured digital PCM through SDL. FM music remains disabled in
+this mode. Failed real-mode calls retain mutated memory and CPU state for
+investigation. Sound is working according to the user's current flight report.
+
+The F10 pause overlay provides fullscreen, resume, quit, and scrolling save/load
+submenus. Native checkpoints include CPU/device state and the writable drive
+overlay, with runtime identity validation and `--load-state` / `--state-dir`.
+Save states currently require `--backend native64 --sound off`; unsupported
+configurations show New Save (Unavailable) with the required flags. Save/load
+and fresh-process restore have an original-asset regression test.

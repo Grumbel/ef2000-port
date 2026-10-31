@@ -120,7 +120,8 @@ Save states use the native64 backend with the default `--sound off` configuratio
 They include CPU/x87 context, guest and DOS memory, emulated video/input state,
 open-file positions, and the writable drive overlay. Original assets stay
 read-only. Loading replaces this run's drive overlay with the saved copy.
-States are tied to the executable, runtime, and device configuration; incompatible
+With audio enabled, **New Save (Unavailable)** explains that saving requires
+`--sound off`. States are tied to the executable, runtime, and device configuration; incompatible
 states are rejected. QEMU and experimental audio checkpoints are not supported.
 Names include the date, observed menu/loading/flight phase, resolution, and
 campaign/mission/navigation filenames when observed. Exact player location and
