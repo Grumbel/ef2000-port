@@ -11,6 +11,7 @@ import signal
 import struct
 import subprocess
 import time
+import zipfile
 
 PACKET = struct.Struct('<8I4H2I')
 MAGIC = 0x314d5258
@@ -68,6 +69,7 @@ class RealMode(HostInput):
         self.mouse_buttons = 0
         self.keys = []
         self.video_mode = 3
+        self.game_phase = 'startup'
         self.video_modes = {0x100: (640, 400), 0x101: (640, 480),
                             0x103: (800, 600), 0x105: (1024, 768)}
         self.video_bank = 0
@@ -454,7 +456,13 @@ def write_all(fd, data):
 
 
 def run(command, output, log, timeout=15, headless=True, controls='original',
-        joystick='auto', joystick_axes=None, sound_hardware='absent', vr='off'):
+        joystick='auto', joystick_axes=None, sound_hardware='absent', vr='off',
+        states=None, load_state=None, fullscreen=False, verbose=False):
+    try:
+        from .runtime_log import RuntimeLog
+    except ImportError:
+        from runtime_log import RuntimeLog
+    runtime_log = RuntimeLog(output / 'calls.log', verbose)
     engine = RealMode(sound_hardware=sound_hardware, vr=vr)
     display = None
     if not headless:
@@ -462,9 +470,12 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
             from .display import Display
         except ImportError:
             from display import Display
-        display = Display(joystick=joystick, joystick_axes=joystick_axes)
+        display = Display(joystick=joystick, joystick_axes=joystick_axes, states=states, fullscreen=fullscreen)
         display.poll(engine)
     def poll():
+        runtime_log.poll()
+        if states:
+            states.context = dict(runtime_log.context)
         if display is not None:
             display.poll(engine)
             if display.closed:
@@ -476,6 +487,7 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
             value = b'1' if engine.joystick_axes else b'0'
             lines = [b'CONTROL=' + value if line.startswith(b'CONTROL=') else line for line in lines]
             config.write_bytes(b'\r\n'.join(lines) + b'\r\n')
+            print(f'input: automatic flight controls={"joystick" if engine.joystick_axes else "keyboard"}', flush=True)
     audio_capture = None
     request_read = request_write = response_read = response_write = -1
     requests = []
@@ -496,6 +508,11 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
         os.close(response_read)
         response_read = -1
         deadline = time.monotonic() + timeout if timeout else float('inf')
+        loading = None
+        saving = None
+        last_mode = None
+        if load_state:
+            states.pending = ('load', load_state)
         while True:
             packet = read_exact(request_read, PACKET.size, deadline, poll)
             if packet is None:
@@ -508,7 +525,33 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
             requests.append(record)
             try:
                 poll()
-                response, memory = engine.execute(packet, vectors, memory)
+                bridge_kind = PACKET.unpack(packet)[-1]
+                if bridge_kind == 0x103:
+                    if loading is not None:
+                        states.restore_engine(engine, loading)
+                        runtime_log.context = dict(states.context)
+                        loading = None
+                        last_mode = engine.video_mode
+                        print(f'game: restored {engine.game_phase} (video mode 0x{engine.video_mode:x})', flush=True)
+                    elif saving is not None:
+                        try:
+                            states.save(engine, saving[1])
+                        except (OSError, ValueError) as error:
+                            print(f'state: save failed: {error}', flush=True)
+                            if display:
+                                display.menu.status = f'Save failed: {error}'
+                                display.menu.open = True
+                        saving = None
+                    response = packet
+                else:
+                    response, memory = engine.execute(packet, vectors, memory)
+                if engine.video_mode != last_mode:
+                    engine.game_phase = ('menu' if engine.video_mode == 0x100 else
+                                         'flight' if engine.video_mode == 0x101 or
+                                         (engine.video_mode == 0x13 and last_mode == 0x100) else
+                                         'loading' if engine.video_mode == 0x13 else 'startup')
+                    print(f'game: {engine.game_phase} (video mode 0x{engine.video_mode:x})', flush=True)
+                    last_mode = engine.video_mode
                 if audio_capture:
                     for block in engine.sound_device.completed:
                         audio_capture.push(block)
@@ -519,6 +562,32 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
                 record['io'] = list(engine.io.values())
                 if display is not None:
                     display.update(engine, memory)
+                # Withhold the bridge response while the overlay is open: the
+                # native process is blocked, so guest time and input cannot advance.
+                paused_at = time.monotonic()
+                while display is not None and display.menu.open:
+                    poll()
+                    display.update(engine, memory)
+                    time.sleep(0.01)
+                deadline += time.monotonic() - paused_at
+                if bridge_kind == 0x100 and states and states.pending:
+                    action, path = states.pending
+                    states.pending = None
+                    try:
+                        if action == 'load':
+                            loading = states.prepare_load(path)
+                        else:
+                            saving = (action, path)
+                        values = list(PACKET.unpack(response))
+                        values[-1] = 0x102 if action == 'load' else 0x101
+                        response = PACKET.pack(*values)
+                    except (OSError, ValueError, KeyError, zipfile.BadZipFile) as error:
+                        print(f'state: failed: {error}', flush=True)
+                        if display:
+                            display.menu.status = str(error)
+                            display.menu.open = True
+                        elif load_state:
+                            raise
                 memory = engine.sync_input(memory)
                 write_all(response_write, response + memory)
             except WindowClosed:
@@ -547,6 +616,7 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
         engine.save_video(output)
         return subprocess.CompletedProcess(command, process.returncode), requests
     finally:
+        runtime_log.poll(force=True)
         if process is not None and process.poll() is None:
             process.kill()
             process.wait()

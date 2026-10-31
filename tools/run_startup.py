@@ -130,7 +130,15 @@ def main():
     parser.add_argument('--runtime-objects', type=Path, metavar='ROOT',
                         help='use precompiled harness objects under ROOT/{native64,qemu} '
                              'instead of compiling them with GCC')
+    parser.add_argument('--load-state', type=Path, metavar='FILE', help='restore a native save-state bundle at startup')
+    parser.add_argument('--state-dir', type=Path, metavar='DIR', help='save-state directory (default: OUTPUT/states)')
+    parser.add_argument('--fullscreen', action='store_true', help='start in borderless desktop fullscreen')
+    parser.add_argument('--verbose', action='store_true', help='print detailed guest file and bridge activity')
     args = parser.parse_args()
+    if args.load_state and (args.backend != 'native64' or args.real_mode != 'unicorn' or args.sound != 'off'):
+        parser.error('--load-state requires --backend native64 --real-mode unicorn --sound off')
+    if args.load_state and not args.load_state.is_file():
+        parser.error(f'save state unavailable: {args.load_state}')
     if args.joystick not in ('auto', 'off') and not args.joystick.isdecimal():
         parser.error('--joystick must be auto, off, or a nonnegative device index')
     axis_tokens = args.joystick_axes.split(',')
@@ -153,6 +161,10 @@ def main():
     source = Path(__file__).resolve().parent.parent / 'runtime'
     output = args.output.resolve()
     try:
+        print(f'ef2000: {version}; {platform.platform()}; backend={args.backend}', flush=True)
+        print(f'paths: assets={args.executable.resolve().parent}', flush=True)
+        print(f'paths: output={output}; writable overlay={output / "drive"}', flush=True)
+        print(f'config: sound={args.sound}; controls={args.controls}; joystick={args.joystick}; vr={args.vr}', flush=True)
         manifest, images = extract(args.executable.read_bytes())
         output.mkdir(parents=True, exist_ok=False)
         overlay = output / 'drive' / 'EF2000'
@@ -221,11 +233,28 @@ def main():
                     from .real_mode import run as run_real_mode
                 except ImportError:
                     from real_mode import run as run_real_mode
+                try:
+                    from .save_states import SaveStates
+                except ImportError:
+                    from save_states import SaveStates
+                identity = {'source': manifest['source_sha256'],
+                            'runtime': hashlib.sha256((output / 'startup.o').read_bytes() +
+                                                      (output / 'entry.o').read_bytes() +
+                                                      (output / 'x32.o').read_bytes()).hexdigest(),
+                            'devices': [args.sound, args.vr], 'format': 1,
+                            'host': hashlib.sha256(b''.join((Path(__file__).parent / name).read_bytes()
+                                      for name in ('real_mode.py', 'input_devices.py', 'save_states.py'))).hexdigest()}
+                states = SaveStates(args.state_dir or output / 'states', output, identity) if args.backend == 'native64' and args.sound == 'off' else None
+                if states:
+                    print(f'paths: save states={states.directory.resolve()}', flush=True)
+                else:
+                    print('state: checkpoints unavailable for this backend/audio configuration', flush=True)
                 run, real_mode_requests = run_real_mode(command, output, log, timeout=args.seconds,
                                                        headless=args.headless, controls=args.controls,
                                                        joystick=args.joystick, joystick_axes=joystick_axes,
                                                        sound_hardware=args.sound if args.sound in ('sb16-probe', 'sb16') else 'absent',
-                                                       vr=args.vr)
+                                                       vr=args.vr, states=states, load_state=args.load_state,
+                                                       fullscreen=args.fullscreen, verbose=args.verbose)
             else:
                 run = subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,
                                      timeout=args.seconds or None, check=False)

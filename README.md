@@ -108,3 +108,34 @@ for the selected stick; only the output directory's config is changed.
 Joystick hotplug is supported; automatic flight-control selection happens at
 startup. Keyboard and joystick flight input were verified under Xvfb, using an
 SDL virtual joystick. A physical USB stick was unavailable for validation.
+
+Press **F10** to pause the native game and open the debug overlay. Use the
+arrow keys and Enter, or click an entry. Escape goes back; F10 resumes. The
+menu provides Resume, borderless fullscreen, separate Save State / Load State
+submenus, and Quit. **F11** also toggles fullscreen. The save submenu offers
+**New Save** and existing slots to overwrite; both lists scroll with the keyboard.
+The overlay shows the current loaded/saved slot.
+
+Save states use the native64 backend with the default `--sound off` configuration.
+They include CPU/x87 context, guest and DOS memory, emulated video/input state,
+open-file positions, and the writable drive overlay. Original assets stay
+read-only. Loading replaces this run's drive overlay with the saved copy.
+States are tied to the executable, runtime, and device configuration; incompatible
+states are rejected. QEMU and experimental audio checkpoints are not supported.
+Names include the date, observed menu/loading/flight phase, resolution, and
+campaign/mission/navigation filenames when observed. Exact player location and
+mission type are not yet recovered, so names do not guess those fields.
+
+By default, states go into `OUTPUT/states`. Use `--state-dir DIR` to share a
+save library across runs, and load a state directly with:
+
+```sh
+nix run . -- ../EF2000/c/EF2000/_EF2000.EXE --output local/restored-run \
+  --state-dir local/states --load-state local/states/SAVE.efstate
+```
+
+`--fullscreen` starts in desktop fullscreen. Normal stdout reports paths,
+configuration, renderer/window settings, observed game/video phase changes,
+file creation, and state operations. `--verbose` adds detailed guest file,
+console, PIT, and I/O activity. The complete native transcript remains in
+`OUTPUT/calls.log` regardless of verbosity.

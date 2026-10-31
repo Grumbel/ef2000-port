@@ -20,8 +20,14 @@ class Rect(c.Structure):
     _fields_ = [(name, c.c_int) for name in ('x', 'y', 'w', 'h')]
 
 
+class RendererInfo(c.Structure):
+    _fields_ = [('name', c.c_char_p), ('flags', c.c_uint32),
+                ('count', c.c_uint32), ('formats', c.c_uint32 * 16),
+                ('max_width', c.c_int), ('max_height', c.c_int)]
+
+
 class Display:
-    def __init__(self, joystick='auto', joystick_axes=None):
+    def __init__(self, joystick='auto', joystick_axes=None, states=None, fullscreen=False):
         library = os.environ.get('EF2000_SDL_LIBRARY') or find_library('SDL2')
         if not library:
             raise ValueError('SDL2 unavailable; use the Nix launcher or --headless')
@@ -29,6 +35,8 @@ class Display:
         signatures = {
             'SDL_Init': ([c.c_uint32], c.c_int),
             'SDL_NumJoysticks': ([], c.c_int),
+            'SDL_JoystickName': ([c.c_void_p], c.c_char_p),
+            'SDL_GetRendererInfo': ([c.c_void_p, c.c_void_p], c.c_int),
             'SDL_JoystickOpen': ([c.c_int], c.c_void_p),
             'SDL_JoystickClose': ([c.c_void_p], None),
             'SDL_JoystickGetAttached': ([c.c_void_p], c.c_int),
@@ -39,6 +47,8 @@ class Display:
             'SDL_JoystickUpdate': ([], None),
             'SDL_GetError': ([], c.c_char_p),
             'SDL_CreateWindow': ([c.c_char_p, c.c_int, c.c_int, c.c_int, c.c_int, c.c_uint32], c.c_void_p),
+            'SDL_SetWindowFullscreen': ([c.c_void_p, c.c_uint32], c.c_int),
+            'SDL_GetCurrentVideoDriver': ([], c.c_char_p),
             'SDL_SetWindowTitle': ([c.c_void_p, c.c_char_p], None),
             'SDL_CreateRenderer': ([c.c_void_p, c.c_int, c.c_uint32], c.c_void_p),
             'SDL_CreateTexture': ([c.c_void_p, c.c_uint32, c.c_int, c.c_int, c.c_int], c.c_void_p),
@@ -61,10 +71,16 @@ class Display:
             function.argtypes, function.restype = arguments, result
         if self.sdl.SDL_Init(0x220) < 0:
             raise ValueError(self.sdl.SDL_GetError().decode())
-        self.window = self.sdl.SDL_CreateWindow(b'EF2000 - click to capture mouse', 0x2fff0000, 0x2fff0000, 960, 720, 0x24)
+        self.window = self.sdl.SDL_CreateWindow(b'EF2000 - F10 menu - click to capture mouse', 0x2fff0000, 0x2fff0000, 960, 720, 0x24)
         self.renderer = self.sdl.SDL_CreateRenderer(self.window, -1, 0) if self.window else None
         self.texture = None
         self.dimensions = None
+        self.fullscreen = False
+        try:
+            from .debug_menu import DebugMenu
+        except ImportError:
+            from debug_menu import DebugMenu
+        self.menu = DebugMenu(self, states)
         self.closed = False
         self.last_frame = 0
         self.joystick = None
@@ -81,13 +97,28 @@ class Display:
             self.close()
             raise ValueError(error)
 
+        print(f'video: SDL driver={self.sdl.SDL_GetCurrentVideoDriver().decode()}; window=960x720', flush=True)
+        info = RendererInfo()
+        if self.sdl.SDL_GetRendererInfo(self.renderer, c.byref(info)) == 0:
+            print(f'renderer: {info.name.decode()}; flags=0x{info.flags:x}; max texture={info.max_width}x{info.max_height}', flush=True)
+        if fullscreen:
+            self.toggle_fullscreen()
+
+    def toggle_fullscreen(self):
+        enabled = not self.fullscreen
+        if self.sdl.SDL_SetWindowFullscreen(self.window, 0x1001 if enabled else 0) < 0:
+            print(f'window: fullscreen failed: {self.sdl.SDL_GetError().decode()}', flush=True)
+            return
+        self.fullscreen = enabled
+        print(f'window: fullscreen={enabled}', flush=True)
+
     def capture(self, enabled):
         if self.sdl.SDL_SetRelativeMouseMode(int(enabled)) < 0:
             raise ValueError(self.sdl.SDL_GetError().decode())
         self.captured = enabled
         self.mouse_armed = False
-        title = (b'EF2000 - hold Esc for 3s to release mouse' if enabled
-                 else b'EF2000 - click to capture mouse')
+        title = (b'EF2000 - F10 menu - hold Esc for 3s to release mouse' if enabled
+                 else b'EF2000 - F10 menu - click to capture mouse')
         self.sdl.SDL_SetWindowTitle(self.window, title)
         self.motion_remainder = [0.0, 0.0]
         x, y = c.c_int(), c.c_int()
@@ -100,6 +131,9 @@ class Display:
             kind = struct.unpack_from('<I', data)[0]
             if kind == 0x100:
                 self.closed = True
+            elif kind == 0x200 and data[12] == 6:
+                width, height = struct.unpack_from('<ii', data, 16)
+                print(f'window: size={width}x{height}', flush=True)
             elif kind == 0x200 and data[12] == 12:
                 self.focused = True
             elif kind == 0x200 and data[12] == 13:
@@ -107,6 +141,8 @@ class Display:
                 self.escape_pressed_at = None
                 engine.release_keys()
                 self.capture(False)
+            elif kind == 0x401 and data[16] == 1 and self.menu.open:
+                self.menu.click(*struct.unpack_from('<ii', data, 20))
             elif kind == 0x401 and data[16] == 1 and not self.captured:
                 x, y = struct.unpack_from('<ii', data, 20)
                 if (self.rect.x <= x < self.rect.x + self.rect.w and
@@ -114,6 +150,19 @@ class Display:
                     self.capture(True)
             elif kind in (0x300, 0x301):
                 scan, key = struct.unpack_from('<ii', data, 16)
+                down = kind == 0x300
+                if scan == 67:  # F10 is reserved for the host overlay.
+                    if down and not data[13]:
+                        self.menu.toggle(engine)
+                    continue
+                if scan == 68:  # F11
+                    if down and not data[13]:
+                        self.toggle_fullscreen()
+                    continue
+                if self.menu.open:
+                    if down:
+                        self.menu.key(scan)
+                    continue
                 if scan == 41:
                     if kind == 0x301:
                         self.escape_pressed_at = None
@@ -124,6 +173,11 @@ class Display:
                 time.monotonic() - self.escape_pressed_at >= 3):
             self.capture(False)
             self.escape_pressed_at = None
+        if self.menu.open:
+            engine.mouse_buttons = 0
+            engine.joystick_buttons = 0
+            engine.joystick_axes = []
+            return
         self.poll_joystick(engine)
         x, y = c.c_int(), c.c_int()
         buttons = self.sdl.SDL_GetRelativeMouseState(c.byref(x), c.byref(y))
@@ -151,10 +205,15 @@ class Display:
         if self.joystick and not self.sdl.SDL_JoystickGetAttached(self.joystick):
             self.sdl.SDL_JoystickClose(self.joystick)
             self.joystick = None
+            print('input: joystick disconnected', flush=True)
         index = 0 if self.joystick_selection == 'auto' else (
             int(self.joystick_selection) if self.joystick_selection != 'off' else -1)
         if not self.joystick and 0 <= index < self.sdl.SDL_NumJoysticks():
             self.joystick = self.sdl.SDL_JoystickOpen(index)
+            if self.joystick:
+                print(f'input: joystick {index}: {self.sdl.SDL_JoystickName(self.joystick).decode()}', flush=True)
+            else:
+                print(f'input: joystick {index} unavailable: {self.sdl.SDL_GetError().decode()}', flush=True)
         engine.joystick_axes = []
         engine.joystick_buttons = 0
         if self.joystick:
@@ -177,7 +236,9 @@ class Display:
             return
         frame = engine.frame(memory)
         if frame is None:
-            return
+            if not self.menu.open:
+                return
+            frame = (640, 400, bytes(640 * 400))
         width, height, indices = frame
         self.last_frame = now
         if self.dimensions != (width, height):
@@ -187,7 +248,10 @@ class Display:
             if not self.texture:
                 raise ValueError(self.sdl.SDL_GetError().decode())
             self.dimensions = (width, height)
+            print(f'graphics: framebuffer={width}x{height}; indexed 8-bit', flush=True)
         pixels = indexed_rgb(indices, memory[0xf1000:0xf1300])
+        if self.menu.open:
+            pixels = self.menu.render(pixels, width, height)
         window_width, window_height = c.c_int(), c.c_int()
         self.sdl.SDL_GetWindowSize(self.window, c.byref(window_width), c.byref(window_height))
         render_width = min(window_width.value, window_height.value * 4 // 3)

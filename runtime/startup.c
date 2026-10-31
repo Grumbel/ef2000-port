@@ -93,6 +93,7 @@ static int game_overlay = -1, drive_overlay = -1;
 static int real_mode_request = -1, real_mode_response = -1;
 static int file_handles[64];
 static u8 file_console[64];
+static struct { char path[260]; u32 root, access; int position; } saved_files[64];
 static struct { u32 used, base, limit; } user_descriptors[16];
 static u32 virtual_interrupts = 1;
 static u32 keyboard_ack, keyboard_port61;
@@ -101,6 +102,7 @@ static u32 pit_divisor, pit_low, pit_write_high;
 static u32 dac_cursor;
 static int runtime_ready;
 static u32 irq_in_service, irq_return_pending, pit_bios_clocks, timer_interrupts;
+static void *active_fp;
 static struct context divide_context;
 static u32 divide_frame, divide_active, divide_virtual_if;
 
@@ -288,12 +290,70 @@ static int open_game_file(u32 offset, u32 access, int create) {
     for (u32 handle = 5; handle < 64; ++handle) {
         if (file_handles[handle] < 0) {
             file_handles[handle] = fd;
+            for (u32 i = 0; i <= length; ++i) saved_files[handle].path[i] = path[i];
+            saved_files[handle].root = root;
+            saved_files[handle].access = access;
             file_console[handle] = console;
             return handle;
         }
     }
     syscall4(NR_CLOSE, fd, 0, 0, 0);
     return -4;
+}
+
+/* Checkpoints are taken only at the host timer bridge, outside guest IRQs.
+ * Versioned by the launcher with the executable and runtime fingerprints. */
+static void state_bytes(int fd, void *data, u32 size, int load) {
+    pipe_transfer(fd, data, size, !load);
+}
+static void state_checkpoint(struct context *r, int load) {
+    int fd = syscall4(NR_OPENAT, (uptr)-100, (uptr)"checkpoint.bin",
+                      load ? 0 : 0x241, 0600);
+    if (fd < 0) finish(22);
+    if (!load) for (u32 i = 5; i < 64; ++i)
+        saved_files[i].position = file_handles[i] < 0 ? -1 :
+            syscall4(NR_SEEK, file_handles[i], 0, 1, 0);
+    if (load) for (u32 i = 5; i < 64; ++i) {
+        if (file_handles[i] >= 0) syscall4(NR_CLOSE, file_handles[i], 0, 0, 0);
+        file_handles[i] = -1;
+    }
+#define STATE(value) state_bytes(fd, &(value), sizeof(value), load)
+    STATE(*r);
+    state_bytes(fd, active_fp, 512, load);
+    state_bytes(fd, (void *)GUEST_BASE, IMAGE_SIZE, load);
+    state_bytes(fd, (void *)DOS_BASE, 0x100000, load);
+    STATE(allocation); STATE(real_vectors); STATE(protected_vectors);
+    STATE(exception_vectors); STATE(conventional_end); STATE(user_descriptors);
+    STATE(virtual_interrupts); STATE(keyboard_ack); STATE(keyboard_port61);
+    STATE(gameport_remaining); STATE(pit_divisor); STATE(pit_low); STATE(pit_write_high);
+    STATE(dac_cursor); STATE(irq_in_service); STATE(irq_return_pending);
+    STATE(pit_bios_clocks); STATE(timer_interrupts); STATE(divide_context);
+    STATE(divide_frame); STATE(divide_active); STATE(divide_virtual_if);
+    STATE(saved_files); STATE(file_console);
+    state_bytes(fd, (void *)0x02000000, 0x10000, load);
+#undef STATE
+    syscall4(NR_CLOSE, fd, 0, 0, 0);
+    if (load) {
+        u32 usec = (pit_divisor * 838 + 500) / 1000;
+        if (!usec) usec = 1;
+        struct { uptr interval_sec, interval_usec, value_sec, value_usec; } timer = {0, usec, 0, usec};
+        if (syscall4(NR_TIMER, 0, (uptr)&timer, 0, 0) < 0) finish(22);
+        for (u32 i = 0; i < 16; ++i) {
+            u32 limit = user_descriptors[i].limit;
+            descriptor(i + 6, user_descriptors[i].base,
+                       limit > 0xfffff ? limit >> 12 : limit,
+                       !user_descriptors[i].used ? 0x61 : limit > 0xfffff ? 0x51 : 0x41);
+        }
+        for (u32 i = 5; i < 64; ++i) if (saved_files[i].position >= 0 && saved_files[i].path[0]) {
+            int root = saved_files[i].root ? drive_overlay : game_overlay;
+            int handle = syscall4(NR_OPENAT, root, (uptr)saved_files[i].path, saved_files[i].access, 0);
+            if (handle == -2 && !saved_files[i].root)
+                handle = syscall4(NR_OPENAT, game_directory, (uptr)saved_files[i].path, 0, 0);
+            if (handle < 0) finish(22);
+            file_handles[i] = handle;
+            syscall4(NR_SEEK, handle, saved_files[i].position, 0, 0);
+        }
+    }
 }
 
 static void checkpoint(struct context const *r) {
@@ -440,6 +500,11 @@ static void guest_fault(u32 signal, struct context *r) {
                 /* Host-only framebuffer snapshot; no guest interrupt or registers. */
                 struct rm_packet packet = {.magic = 0x314d5258, .vector = 0x100};
                 if (!real_mode_call(&packet)) finish(22);
+                if (packet.vector == 0x101 || packet.vector == 0x102) {
+                    state_checkpoint(r, packet.vector == 0x102);
+                    packet.vector = 0x103;
+                    if (!real_mode_call(&packet)) finish(22);
+                }
             }
         }
         u32 vector = 8;
@@ -970,6 +1035,7 @@ void fault_handler(int signal, void *information, void *context) {
     r.si = g[REG_RSI]; r.di = g[REG_RDI]; r.bp = g[REG_RBP]; r.sp = g[REG_RSP];
     r.ip = g[REG_RIP]; r.flags = g[REG_EFL]; r.trap = g[REG_TRAPNO];
     r.error = g[REG_ERR]; r.cr2 = g[REG_CR2];
+    active_fp = uc->uc_mcontext.fpregs;
     guest_fault(signal, &r);
     g[REG_RAX] = r.ax; g[REG_RBX] = r.bx; g[REG_RCX] = r.cx; g[REG_RDX] = r.dx;
     g[REG_RSI] = r.si; g[REG_RDI] = r.di; g[REG_RBP] = r.bp; g[REG_RSP] = r.sp;
