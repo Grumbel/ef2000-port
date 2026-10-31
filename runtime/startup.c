@@ -207,6 +207,8 @@ static void record(char const *kind, u32 length, struct context const *r) {
 }
 
 static void descriptor(u32 index, u32 base, u32 limit, u32 flags) {
+    /* X-32 physical selectors into conventional memory use our DOS window. */
+    if (index >= 6 && base < 0x100000 && flags != 0x61) base += DOS_BASE;
     struct descriptor d = {index, base, limit, flags};
     if (syscall4(NR_LDT, 1, (uptr)&d, sizeof(d), 0) < 0) finish(22);
 }
