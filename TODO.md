@@ -49,10 +49,12 @@ Implemented and verified:
 
 1. Validate longer flight sessions, mission completion, and physical joystick
    hardware; keep automated UI tests on private Xvfb displays.
-2. Investigate the reported physical Xbox 360 Wireless Controller regression:
-   SDL registers the device and auto selects joystick controls, but flight does
-   not react with `--sound sb16`. Preserve virtual joystick coverage and validate
-   the complete SDL-to-game path, including pause/resume.
+2. Revalidate the physical Xbox 360 Wireless Controller after fixing the
+   sound-enabled joystick regression: inherited `JOY_FACTOR=0` caused original
+   sound initialization to zero joystick calibration. Joystick selection now
+   substitutes the executable default of 100 in the writable config, preserving
+   nonzero custom scales. Original-code calibration and private-Xvfb SB16
+   virtual-joystick flight now pass. Keep pause/resume coverage on private Xvfb.
 3. Extend native checkpoints to SB16 audio configurations. Currently save/load
    requires native64 with `--sound off`; the save menu explicitly marks New Save
    unavailable otherwise. Verify save/load and fresh-process restore after changes.
@@ -117,4 +119,7 @@ submenus. Native checkpoints include CPU/device state and the writable drive
 overlay, with runtime identity validation and `--load-state` / `--state-dir`.
 Save states currently require `--backend native64 --sound off`; unsupported
 configurations show New Save (Unavailable) with the required flags. Save/load
-and fresh-process restore have an original-asset regression test.
+and fresh-process restore have an original-asset regression test. The default
+library now persists in `$XDG_DATA_HOME/ef2000/states` (fallback
+`~/.local/share/ef2000/states`), independently of disposable output directories.
+Older output-local libraries remain available with `--state-dir OUTPUT/states`.

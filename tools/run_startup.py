@@ -17,8 +17,10 @@ import subprocess
 
 try:
     from .extract_image import extract
+    from .input_devices import flight_control_settings
 except ImportError:
     from extract_image import extract
+    from input_devices import flight_control_settings
 
 
 def analyze_calls(log):
@@ -180,6 +182,8 @@ def main():
             settings[b'CONTROL'] = b'1' if args.controls == 'joystick' else b'0'
         lines = [line.split(b'=', 1)[0] + b'=' + settings[line.split(b'=', 1)[0]]
                  if line.split(b'=', 1)[0] in settings else line for line in lines]
+        if args.controls == 'joystick':
+            lines = flight_control_settings(lines, True)
         (overlay / 'EF2000.CFG').write_bytes(b'\r\n'.join(lines) + b'\r\n')
         for directory in args.executable.resolve().parent.rglob('*'):
             if directory.is_dir():

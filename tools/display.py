@@ -84,6 +84,9 @@ class Display:
         self.closed = False
         self.last_frame = 0
         self.joystick = None
+        self.verbose = False
+        self.last_joystick_trace = None
+        self.next_joystick_trace = 0
         self.joystick_selection = joystick
         self.joystick_axes = joystick_axes or [(i, 1) for i in range(4)]
         self.focused = False
@@ -228,6 +231,14 @@ class Display:
                 engine.joystick_buttons = sum(
                     bool(self.sdl.SDL_JoystickGetButton(self.joystick, button)) << button
                     for button in range(min(4, self.sdl.SDL_JoystickNumButtons(self.joystick))))
+
+        sample = (self.focused, tuple(engine.joystick_axes), engine.joystick_buttons)
+        now = time.monotonic()
+        if self.verbose and sample != self.last_joystick_trace and now >= self.next_joystick_trace:
+            print(f'input: joystick focus={self.focused}; axes={engine.joystick_axes}; '
+                  f'buttons=0x{engine.joystick_buttons:x}', flush=True)
+            self.last_joystick_trace = sample
+            self.next_joystick_trace = now + 0.25
 
     def update(self, engine, memory):
         self.poll(engine)

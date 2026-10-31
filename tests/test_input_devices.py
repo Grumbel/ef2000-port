@@ -4,10 +4,19 @@
 import struct
 import unittest
 
-from tools.input_devices import HostInput, scan_bytes, INPUT_BASE, JOYSTICK_BASE, INPUT_MAGIC
+from tools.input_devices import (HostInput, scan_bytes, flight_control_settings,
+                                 INPUT_BASE, JOYSTICK_BASE, INPUT_MAGIC)
 
 
 class InputTests(unittest.TestCase):
+    def test_joystick_selection_repairs_zero_scale_and_preserves_custom_scale(self):
+        lines = [b'CONTROL=0', b'JOY_FACTOR=0', b'DETAIL=2']
+        self.assertEqual(flight_control_settings(lines, True),
+                         [b'CONTROL=1', b'JOY_FACTOR=100', b'DETAIL=2'])
+        self.assertEqual(flight_control_settings(lines, False), lines)
+        self.assertEqual(flight_control_settings([b'CONTROL=0', b'JOY_FACTOR=75'], True),
+                         [b'CONTROL=1', b'JOY_FACTOR=75'])
+
     def test_pc_make_break_extended_pause_and_modifiers(self):
         self.assertEqual(scan_bytes(4, True), b'\x1e')
         self.assertEqual(scan_bytes(4, False), b'\x9e')

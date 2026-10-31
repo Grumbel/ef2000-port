@@ -107,7 +107,12 @@ are axes 0,1,2,3 and buttons 0–3. Use the original game's joystick calibration
 for the selected stick; only the output directory's config is changed.
 Joystick hotplug is supported; automatic flight-control selection happens at
 startup. Keyboard and joystick flight input were verified under Xvfb, using an
-SDL virtual joystick. A physical USB stick was unavailable for validation.
+SDL virtual joystick. When joystick controls are selected, an inherited
+`JOY_FACTOR=0` is replaced with the executable default of 100 in the writable
+config: digital-sound startup otherwise reduces joystick calibration to zero.
+Add `--verbose` to compare `input: joystick` focus/axes/buttons
+with `trace: GAMEPORT` samples received by the game; moving the stick should change
+both. Focus loss centers axes and releases buttons.
 
 Press **F10** to pause the native game and open the debug overlay. Use the
 arrow keys and Enter, or click an entry. Escape goes back; F10 resumes. The

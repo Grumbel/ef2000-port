@@ -19,9 +19,9 @@ MEMORY_START = 0
 MEMORY_SIZE = 0x100000
 
 try:
-    from .input_devices import HostInput
+    from .input_devices import HostInput, flight_control_settings
 except ImportError:
-    from input_devices import HostInput
+    from input_devices import HostInput, flight_control_settings
 
 
 class RealMode(HostInput):
@@ -471,6 +471,7 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
         except ImportError:
             from display import Display
         display = Display(joystick=joystick, joystick_axes=joystick_axes, states=states, fullscreen=fullscreen)
+        display.verbose = verbose
         display.poll(engine)
     def poll():
         runtime_log.poll()
@@ -485,7 +486,7 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
         if config.exists():
             lines = config.read_bytes().splitlines()
             value = b'1' if engine.joystick_axes else b'0'
-            lines = [b'CONTROL=' + value if line.startswith(b'CONTROL=') else line for line in lines]
+            lines = flight_control_settings(lines, value == b'1')
             config.write_bytes(b'\r\n'.join(lines) + b'\r\n')
             print(f'input: automatic flight controls={"joystick" if engine.joystick_axes else "keyboard"}', flush=True)
     audio_capture = None

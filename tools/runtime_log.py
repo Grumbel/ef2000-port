@@ -35,5 +35,5 @@ class RuntimeLog:
                 print(f'files: game created {line[12:]} (drive overlay)', flush=True)
             elif line.startswith(('FAULT ', 'STOP ', 'EXIT ', 'EXCEPTION ENTER ')):
                 print(f'runtime: {line}', flush=True)
-            elif self.verbose and line.startswith(('FILE ', 'CONSOLE ', 'PIT ', 'REALMODE ', 'IO ', 'JOYSTICK ')):
+            elif self.verbose and line.startswith(('FILE ', 'CONSOLE ', 'PIT ', 'REALMODE ', 'IO ', 'JOYSTICK ', 'GAMEPORT ')):
                 print(f'trace: {line}', flush=True)

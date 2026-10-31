@@ -30,6 +30,20 @@ EXTENDED = dict(zip(range(73, 83), (
 EXTENDED.update({84: 0x35, 88: 0x1c, 228: 0x1d, 230: 0x38})
 
 
+def flight_control_settings(lines, joystick):
+    result = []
+    for line in lines:
+        name, separator, value = line.partition(b'=')
+        if name == b'CONTROL':
+            value = b'1' if joystick else b'0'
+        elif name == b'JOY_FACTOR' and joystick and value.strip() == b'0':
+            # The executable defaults to 100 percent. Digital-sound startup
+            # reapplies this scale to calibration; zero disables both axes.
+            value = b'100'
+        result.append(name + separator + value)
+    return result
+
+
 def scan_bytes(scan, down):
     if scan == 70:  # Print Screen includes the synthetic shift prefix.
         return bytes.fromhex('e02ae037' if down else 'e0b7e0aa')

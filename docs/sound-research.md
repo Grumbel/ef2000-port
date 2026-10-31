@@ -132,3 +132,24 @@ Unknown hardware operations still stop explicitly.
 
 For future rendering research, `../tfx3view` contains the Linux 3View/TFXplorer
 port and the libTFX decoder for EF2000 shape bytecode and DAT archives.
+
+
+## Joystick calibration during digital-sound startup
+
+The original sound initialization at 8B51Eh calls 1C60Ch, which rescales joystick
+calibration by `JOY_FACTOR` (stored at 122DC4h). The supplied config has
+`JOY_FACTOR=0`; the executable's initialized default is 100. With a connected
+joystick and digital sound enabled, a native debugger hardware watchpoint
+observed 1C6AEh store zero at 420D96h, replacing the range of 63 loaded by
+829C2h. D6969h/D6977h then skip flight joystick polling when either range is zero.
+SDL still sees axis/button changes, explaining device registration without
+flight response. Sound-off virtual-joystick flight continued to poll normally.
+
+Selecting joystick controls now replaces only the zero scale with 100 in the
+writable config; existing nonzero scales and original assets are preserved.
+`--controls original` retains original settings. `--verbose` reports SDL
+focus/axis/button changes and native `GAMEPORT` samples for comparison.
+The correction was verified in original-code SB16 startup (both calibration
+ranges remain nonzero) and private-Xvfb flight with a virtual joystick: roll
+changes reached native game-port X counts 64/110/64, and button 0 reached the
+game. The physical Xbox controller still needs a user retest.

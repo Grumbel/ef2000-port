@@ -192,6 +192,14 @@ class SDLInputTests(unittest.TestCase):
             self.display.poll_joystick(self.host)
             self.assertEqual(self.host.joystick_axes, values)
             self.assertEqual(self.host.joystick_buttons, 9)
+            self.display.verbose = True
+            with patch('builtins.print') as printed:
+                self.display.poll_joystick(self.host)
+                printed.assert_called_once_with(
+                    f'input: joystick focus=True; axes={values}; buttons=0x9', flush=True)
+                self.display.poll_joystick(self.host)
+                self.assertEqual(printed.call_count, 1)
+            self.display.verbose = False
             self.display.joystick_axes = [(2, -1), (0, 1)]
             self.display.poll_joystick(self.host)
             self.assertEqual(self.host.joystick_axes, [-32767, -32768])
@@ -254,9 +262,10 @@ class SDLInputTests(unittest.TestCase):
                 output = Path(directory)
                 config = output / 'drive/EF2000/EF2000.CFG'
                 config.parent.mkdir(parents=True)
-                config.write_bytes(b'CONTROL=9\r\nDETAIL=2\r\n')
+                config.write_bytes(b'CONTROL=9\r\nDETAIL=2\r\nJOY_FACTOR=0\r\n')
                 with patch('tools.display.Display', WithVirtualJoystick), (output / 'calls.log').open('w') as log:
                     process, _ = run([sys.executable, '-c', 'pass'], output, log,
                                      headless=False, controls='auto', joystick=joystick)
                 self.assertEqual(process.returncode, 0)
-                self.assertEqual(config.read_bytes(), b'CONTROL=' + expected + b'\r\nDETAIL=2\r\n')
+                self.assertEqual(config.read_bytes(), b'CONTROL=' + expected + b'\r\nDETAIL=2\r\nJOY_FACTOR=' +
+                                 (b'100' if expected == b'1' else b'0') + b'\r\n')
