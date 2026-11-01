@@ -639,7 +639,7 @@ def run(image, instruction_limit=None, game_dir=None,
         timer_instructions=250000, mouse_events=(), key_events=(), windowed=False,
         fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
         smooth_scaling=False, display_instructions=50000,
-        display_factory=None, framebuffer=None, sample_instructions=0,
+        display_factory=None, framebuffer=None, framebuffer_samples=(), sample_instructions=0,
         vga_clock=None, trace_mouse=False, trace_decompress=False):
     """Run original-code x86; windowed sessions continue until closed by default."""
     if instruction_limit is None:
@@ -654,6 +654,12 @@ def run(image, instruction_limit=None, game_dir=None,
         raise ValueError('display_instructions must be positive')
     if sample_instructions < 0:
         raise ValueError('sample_instructions must not be negative')
+    if any(value <= 0 for value in framebuffer_samples):
+        raise ValueError('framebuffer sample instructions must be positive')
+    if framebuffer_samples and framebuffer is None:
+        raise ValueError('framebuffer samples require a framebuffer output path')
+    framebuffer = Path(framebuffer) if framebuffer is not None else None
+    pending_frames = sorted(set(framebuffer_samples))
     from unicorn import Uc, UcError, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR, UC_HOOK_CODE, UC_HOOK_INSN
     from unicorn.x86_const import (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
         UC_X86_REG_EDX, UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EBP,
@@ -780,6 +786,8 @@ def run(image, instruction_limit=None, game_dir=None,
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
               'privileged_ops': [], 'video_modes': [], 'ip_samples': [],
               'instruction_limit': instruction_limit}
+    if pending_frames:
+        result['framebuffer_samples'] = []
     mouse_trace = GuestMouseTrace() if trace_mouse else None
     decompress_trace = {'checks': 0, 'last_success': None, 'failures': []} if trace_decompress else None
 
@@ -947,6 +955,21 @@ def run(image, instruction_limit=None, game_dir=None,
             if not result['video_modes'] or result['video_modes'][-1]['mode'] != mode:
                 result['video_modes'].append({'instruction': timer.instructions, 'mode': mode})
 
+    def save_frame(path):
+        if real_mode is None:
+            return False
+        memory = bytes(cpu.mem_read(DOS_BASE, 0x100000))
+        frame = real_mode.engine.frame(memory)
+        if frame is None:
+            return False
+        try:
+            from .vga import save_indexed
+        except ImportError:
+            from vga import save_indexed
+        width, height, indices = frame
+        save_indexed(indices, memory[0xf1000:0xf1300], width, height, path)
+        return True
+
     def instruction(uc, address, size, _user):
         if not (ENTRY <= address < IMAGE_SIZE or
                 IMAGE_SIZE + 0x100 <= address < IMAGE_SIZE + 0x108 or
@@ -956,6 +979,12 @@ def run(image, instruction_limit=None, game_dir=None,
             uc.emu_stop()
             return
         timer.instructions += 1
+        if pending_frames and timer.instructions == pending_frames[0]:
+            point = pending_frames.pop(0)
+            path = framebuffer.with_name(f'{framebuffer.stem}-{point:09d}{framebuffer.suffix or ".png"}')
+            if save_frame(path):
+                result['framebuffer_samples'].append({'instruction': point,
+                    'video_mode': real_mode.engine.video_mode, 'path': str(path)})
         if decompress_trace is not None and address == 0xfa153:
             # Protected image 0xFA2E4 returns a two-byte Fletcher checksum in
             # AX. 0xFA153 compares it to the original compressed block header,
@@ -1207,17 +1236,8 @@ def run(image, instruction_limit=None, game_dir=None,
     result['real_mode_requests'] = real_mode.requests if real_mode is not None else []
     if real_mode is not None:
         result['video_mode'] = real_mode.engine.video_mode
-        if framebuffer is not None:
-            memory = bytes(cpu.mem_read(DOS_BASE, 0x100000))
-            frame = real_mode.engine.frame(memory)
-            if frame is not None:
-                try:
-                    from .vga import save_indexed
-                except ImportError:
-                    from vga import save_indexed
-                width, height, indices = frame
-                save_indexed(indices, memory[0xf1000:0xf1300], width, height, framebuffer)
-                result['framebuffer'] = str(framebuffer)
+        if framebuffer is not None and save_frame(framebuffer):
+            result['framebuffer'] = str(framebuffer)
     return result
 
 
@@ -1259,6 +1279,8 @@ def main():
                         help='record original LZ output checksums, buffer bounds, and integrity failures')
     parser.add_argument('--framebuffer', type=Path,
                         help='save the last available VGA frame to a PNG (including headless)')
+    parser.add_argument('--framebuffer-sample', type=int, action='append', default=[], metavar='N',
+                        help='also save a PNG at guest instruction N (repeatable; requires --framebuffer)')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
     args = parser.parse_args()
     if args.instruction_limit is not None and args.instruction_limit < 0:
@@ -1269,6 +1291,8 @@ def main():
         parser.error('--display-instructions must be positive')
     if args.sample_instructions < 0:
         parser.error('--sample-instructions must be nonnegative')
+    if any(value <= 0 for value in args.framebuffer_sample) or (args.framebuffer_sample and not args.framebuffer):
+        parser.error('--framebuffer-sample needs a positive N and --framebuffer')
     match = re.fullmatch(r'([1-9][0-9]*)x([1-9][0-9]*)', args.geometry)
     if not match or any(int(value) > 16384 for value in match.groups()):
         parser.error('--geometry must be WIDTHxHEIGHT with dimensions in 1..16384')
@@ -1292,6 +1316,7 @@ def main():
                  geometry=tuple(map(int, match.groups())), aspect_ratio=args.aspect_ratio,
                  smooth_scaling=args.smooth_scaling,
                  display_instructions=args.display_instructions, framebuffer=args.framebuffer,
+                 framebuffer_samples=args.framebuffer_sample,
                  sample_instructions=args.sample_instructions, trace_mouse=args.trace_mouse,
                  trace_decompress=args.trace_decompress)
     print(json.dumps(report, indent=2))

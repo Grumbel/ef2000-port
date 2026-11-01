@@ -506,13 +506,25 @@ class UnicornGuestTests(unittest.TestCase):
         image[ENTRY:ENTRY + 9] = bytes.fromhex('b8 13 00 00 00 cd 10 eb fe')
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'frame.png'
-            result = run(bytes(image), instruction_limit=300, framebuffer=path)
+            result = run(bytes(image), instruction_limit=300, framebuffer=path,
+                         framebuffer_samples=[150, 50, 150])
             self.assertEqual(result['status'], 'instruction_limit', result.get('detail'))
             self.assertEqual(result['video_mode'], 0x13)
             self.assertEqual(result['video_modes'][-1]['mode'], 0x13)
             self.assertEqual(result['framebuffer'], str(path))
             self.assertEqual(path.read_bytes()[:8], b'\x89PNG\r\n\x1a\n')
             self.assertEqual(struct.unpack('>II', path.read_bytes()[16:24]), (320, 200))
+            samples = result['framebuffer_samples']
+            self.assertEqual([entry['instruction'] for entry in samples], [50, 150])
+            self.assertEqual([entry['video_mode'] for entry in samples], [0x13, 0x13])
+            for instruction, entry in zip((50, 150), samples):
+                sampled = path.with_name(f'frame-{instruction:09d}.png')
+                self.assertEqual(entry['path'], str(sampled))
+                self.assertEqual(sampled.read_bytes()[:8], b'\x89PNG\r\n\x1a\n')
+            with self.assertRaises(ValueError):
+                run(bytes(image), framebuffer_samples=[10])
+            with self.assertRaises(ValueError):
+                run(bytes(image), framebuffer=path, framebuffer_samples=[0])
 
     def test_headless_keys_are_written_into_guest_mailbox(self):
         # The guest probes BIOS keyboard once, then loops while a scripted
