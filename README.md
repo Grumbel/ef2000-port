@@ -124,10 +124,14 @@ execution, `modify_ldt`, GCC and binutils. It requires Python 3 and Unicorn
 
 ```sh
 nix run .#unicorn-probe -- /path/to/_EF2000.EXE
+# With SDL3, show indexed video and forward live input:
+nix run .#unicorn-probe -- /path/to/_EF2000.EXE --windowed --geometry 1280x960
 # Or on Windows, with `pip install unicorn`:
 python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --report startup.json --overlay-dir C:\EF2000-user\drive --cd-dir D:\
 # Deterministic headless mouse press/release while probing the VGA menu:
 python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --mouse-event 70:320:100:1 --mouse-event 78:320:100:0
+# Export the final framebuffer without opening a window:
+python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --framebuffer startup.png
 ```
 
 The original `_EF2000.EXE` remains external and SHA-256 validated. The probe
@@ -158,8 +162,25 @@ IRQ0 injection, PIC EOI/IRET, and the original synthetic BIOS timer fallback.
 Ticks are instruction-paced (`--timer-instructions N`, default 250000), not
 wall-clock synchronized. The `--mouse-event TICK:X:Y:BUTTONS` option can
 inject reproducible mouse states (button 1=left, 0=release); events appear in
-the JSON report. There is still no live SDL window, physical keyboard/mouse
-input, native Windows event loop, or support for other hardware IRQs.
+the JSON report. Experimental `--windowed` mode now uses the shared SDL3
+renderer and input layer; headless remains the default. SDL3 events are
+polled every 50,000 guest instructions (tunable with `--display-instructions N`),
+with rendering capped at 30 FPS. VGA DAC writes update the DOS color palette.
+The window accepts keyboard, captured relative mouse, and joystick/gamepad
+input through the Linux backend's host input mailboxes. Registered IRQ1
+keyboard handlers receive pending scan codes at PIT tick opportunities;
+port `201h` emulates joystick discharge and active-low buttons. F10 opens the
+gamepad-controllable debug menu and F11 toggles fullscreen. Window options
+include `--fullscreen`, `--geometry WIDTHxHEIGHT`,
+`--aspect-ratio {4:3,native,stretch}` and `--smooth-scaling`. The optional
+`--framebuffer PATH` writes the latest VGA or VBE frame as a PNG in either
+headless or windowed mode. SDL3 must be installed (`EF2000_SDL_LIBRARY` can
+specify its shared library), and windowed mode has so far been checked using
+an injected test display, not a live X server. The portable backend still
+lacks a native Windows launcher and confirmed playable execution. An
+asset-backed 100-million-instruction probe produced the original 320×200
+Pentium splash screen with its palette; the 30-million-instruction checkpoint
+is still black.
 No CD marker or additional unpacking is needed for that startup path. This
 does not establish that all game features work under the portable backend.
 
@@ -168,8 +189,8 @@ selector values (`CS=0x2f`, `DS/SS=7`) and a synthetic LDT. This corrects the
 early ring-0 shortcut. The data segment's expand-down limit is updated on the
 first 3505 request, and dynamically allocated descriptors are written into the
 guest LDT. It uses IOPL=3 for hooked port operations, and **does not yet
-implement** complete privilege-fault semantics, exceptions, other IRQs, SDL rendering
-or live game input. The diagnostic stops on unsupported requests (exit code 20), guest exit
+implement** complete privilege-fault semantics, exceptions, or all hardware
+IRQs. The diagnostic stops on unsupported requests (exit code 20), guest exit
 (exit code 26), or the instruction budget; it prints the original guest call
 transcript and BSS-clearing checkpoint. The default 30-million-instruction
 budget can be changed with `--instruction-limit`. The legacy ring-0 model is

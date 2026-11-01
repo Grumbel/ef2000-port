@@ -92,7 +92,9 @@
             --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp" \
             --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.qemu-user ]}
           makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn-probe" \
-            --add-flags "$out/libexec/ef2000/tools/unicorn_backend.py"
+            --add-flags "$out/libexec/ef2000/tools/unicorn_backend.py" \
+            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
+            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp"
           ln -s ef2000 "$out/bin/ef2000-startup"
           makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-inspect" \
             --add-flags "$out/libexec/ef2000/tools/inspect_exe.py"
@@ -192,6 +194,8 @@
           printf '  ef2000-build [BUILD_ARGS]       Configure if needed, then build\n'
           printf '  ef2000-run [GAME_ARGS]          Build and run the original DOS game on Linux\n'
           printf '  ef2000-run-gdb [GAME_ARGS]      Build and debug the native game ELF in GDB\n\n'
+          printf '  python tools/unicorn_backend.py /path/to/_EF2000.EXE --windowed\n'
+          printf '                                  Experimental portable Unicorn+SDL3 path\n\n'
           printf 'Examples:\n'
           printf '  ef2000-run --data-dir /path/to/EF2000 --windowed\n'
           printf '  ef2000-run-gdb --data-dir /path/to/EF2000 --verbose\n'

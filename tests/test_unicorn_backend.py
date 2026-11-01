@@ -5,10 +5,12 @@ import os
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import struct
 import tempfile
+from types import SimpleNamespace
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, KeyboardController, MouseScript, ProtectedTimer, RealModeBridge, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, GamePort, KeyboardController, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
                                    serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
@@ -34,6 +36,61 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.assertEqual((keyboard.read(0x64), keyboard.read(0x60)), (0, 0))
         with self.assertRaises(UnsupportedGuestOperation):
             keyboard.write(0x64, 0x20)
+
+    def test_keyboard_reads_host_scancode_mailbox_and_advances_head(self):
+        class Memory:
+            def __init__(self):
+                self.ram = bytearray(0x100000)
+                struct.pack_into('<IHH', self.ram, 0xf1400, 0x31504e49, 255, 1)
+                self.ram[0xf1507] = 0xe0
+                self.ram[0xf1408] = 0x4b
+
+            def mem_read(self, address, size):
+                return bytes(self.ram[address - 0x01000000:address - 0x01000000 + size])
+
+            def mem_write(self, address, data):
+                offset = address - 0x01000000
+                self.ram[offset:offset + len(data)] = data
+
+        guest = Memory()
+        keyboard = KeyboardController()
+        self.assertTrue(keyboard.pending(guest))
+        self.assertEqual(keyboard.read(0x64, guest), 1)
+        self.assertEqual([keyboard.read(0x60, guest) for _ in range(3)], [0xe0, 0x4b, 0])
+        self.assertEqual(struct.unpack_from('<H', guest.ram, 0xf1404)[0], 1)
+        self.assertFalse(keyboard.pending(guest))
+        keyboard.write(0x60, 0xed)
+        self.assertEqual(keyboard.read(0x60, guest), 0xfa)
+        struct.pack_into('<I', guest.ram, 0xf1400, 0)
+        self.assertFalse(keyboard.pending(guest))
+
+    def test_gameport_discharge_and_six_bit_vga_dac(self):
+        class Memory:
+            def __init__(self):
+                self.ram = bytearray(0x100000)
+                struct.pack_into('<I', self.ram, 0xf1400, 0x31504e49)
+                struct.pack_into('<BB4H', self.ram, 0xf1600, 3, 1, 2, 1, 0, 0)
+
+            def mem_read(self, address, size):
+                start = address - 0x01000000
+                return bytes(self.ram[start:start + size])
+
+            def mem_write(self, address, data):
+                start = address - 0x01000000
+                self.ram[start:start + len(data)] = data
+
+        guest = Memory()
+        joystick = GamePort()
+        joystick.write(guest)
+        self.assertEqual([joystick.read(guest) for _ in range(3)], [0xeF, 0xeD, 0xec])
+        struct.pack_into('<I', guest.ram, 0xf1400, 0)
+        self.assertEqual(joystick.read(guest), 0xff)
+        palette = VgaDac()
+        palette.write(guest, 0x3c8, 2)
+        palette.write(guest, 0x3c9, 127)
+        palette.write(guest, 0x3c9, 10)
+        palette.write(guest, 0x3c9, 20)
+        self.assertEqual(bytes(guest.ram[0xf1006:0xf1009]), bytes((63, 10, 20)))
 
     def test_pit_ticks_and_protected_irq0_frame(self):
         import struct
@@ -74,6 +131,34 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.assertFalse(timer.in_service)
         timer.instructions = 4
         self.assertFalse(timer.instruction(guest, 0x2345, vectors, dict(regs, flags=0x3002)))
+        self.assertEqual(timer.interrupts, 1)
+
+    def test_registered_irq1_handler_receives_queued_keyboard_input(self):
+        class Cpu:
+            def __init__(self):
+                self.data = {0x0100046c: b'\0' * 4}
+                self.registers = {}
+
+            def mem_read(self, address, count):
+                return self.data[address][:count]
+
+            def mem_write(self, address, data):
+                self.data[address] = bytes(data)
+
+            def reg_write(self, reg, value):
+                self.registers[reg] = value
+
+        cpu = Cpu()
+        timer = ProtectedTimer(interval=1)
+        vectors = VectorState()
+        vectors.protected[8] = (0x1000, 0x2f)
+        vectors.protected[9] = (0x2000, 0x2f)
+        regs = dict(sp=0x4000, cs=0x2f, ss=7, flags=0x3202,
+                    sp_register='SP', ip_register='IP', flags_register='FLAGS')
+        timer.instructions = 1
+        self.assertTrue(timer.instruction(cpu, 0x3456, vectors, regs, keyboard_pending=True))
+        self.assertEqual(cpu.registers['IP'], 0x2000)
+        self.assertEqual(timer.keyboard_interrupts, 1)
         self.assertEqual(timer.interrupts, 1)
 
     def test_headless_mouse_script_applies_press_and_release_at_ticks(self):
@@ -325,6 +410,59 @@ else:
 
 @unittest.skipUnless(HAS_UNICORN, 'requires Unicorn Python bindings')
 class UnicornGuestTests(unittest.TestCase):
+    def test_headless_vga_frame_can_be_saved_as_png(self):
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 9] = bytes.fromhex('b8 13 00 00 00 cd 10 eb fe')
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'frame.png'
+            result = run(bytes(image), instruction_limit=300, framebuffer=path)
+            self.assertEqual(result['status'], 'instruction_limit', result.get('detail'))
+            self.assertEqual(result['video_mode'], 0x13)
+            self.assertEqual(result['framebuffer'], str(path))
+            self.assertEqual(path.read_bytes()[:8], b'\x89PNG\r\n\x1a\n')
+            self.assertEqual(struct.unpack('>II', path.read_bytes()[16:24]), (320, 200))
+
+    def test_windowed_display_pumps_events_and_closes_safely(self):
+        displays = []
+
+        class FakeDisplay:
+            def __init__(self, **settings):
+                self.settings = settings
+                self.closed = False
+                self.menu = SimpleNamespace(open=False)
+                self.updates = 0
+                self.closed_called = False
+                displays.append(self)
+
+            def poll(self, engine):
+                self.engine = engine
+                engine.key_event(4, ord('a'), True)
+
+            def update(self, engine, memory):
+                self.updates += 1
+                self.snapshot = memory
+                if self.updates == 2:
+                    self.closed = True
+
+            def close(self):
+                self.closed_called = True
+
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 2] = bytes.fromhex('eb fe')
+        result = run(bytes(image), instruction_limit=500, timer_instructions=100,
+                     windowed=True, display_factory=FakeDisplay, display_instructions=10,
+                     geometry=(1280, 720), aspect_ratio='native', smooth_scaling=True)
+        self.assertEqual(result['status'], 'window_closed', result.get('detail'))
+        self.assertEqual(displays[0].updates, 2)
+        self.assertEqual(len(displays[0].snapshot), 0x100000)
+        self.assertEqual(struct.unpack_from('<IHH', displays[0].snapshot, 0xf1400),
+                         (0x31504e49, 0, 1))
+        self.assertEqual(displays[0].snapshot[0xf1408], 0x1e)
+        self.assertTrue(displays[0].closed_called)
+        self.assertEqual(displays[0].settings['geometry'], (1280, 720))
+        self.assertEqual(displays[0].settings['aspect_ratio'], 'native')
+        self.assertTrue(displays[0].settings['smooth_scaling'])
+
     def test_synthetic_guest_receives_irq0_and_returns_through_iret(self):
         image = bytearray(0x195fb0)
         code = bytes.fromhex(

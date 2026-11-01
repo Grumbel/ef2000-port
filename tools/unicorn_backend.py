@@ -17,7 +17,9 @@ import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import re
 import struct
+import time
 
 try:
     from .x32_allocation import Allocation
@@ -37,23 +39,29 @@ class UnsupportedGuestOperation(RuntimeError):
 
 
 class KeyboardController:
-    """Keyboard-controller ACK handshake already modeled by the Linux harness.
-
-    This covers writing a device command to port 60h, polling port 64h for
-    output data, and consuming the device's 0FAh acknowledgement. It does not
-    claim to emulate controller commands or queued physical key events.
-    """
+    """Keyboard ACK handshake and host SDL scan-code queue from DOS RAM."""
 
     def __init__(self):
         self.ack_pending = False
 
-    def read(self, port):
+    def pending(self, cpu):
+        if cpu is None:
+            return False
+        magic, head, tail = struct.unpack('<IHH', bytes(cpu.mem_read(0x010f1400, 8)))
+        return magic == 0x31504e49 and head < 256 and tail < 256 and head != tail
+
+    def read(self, port, cpu=None):
         if port == 0x64:
-            return int(self.ack_pending)
+            return int(self.ack_pending or self.pending(cpu))
         if port == 0x60:
             if self.ack_pending:
                 self.ack_pending = False
                 return 0xfa
+            if self.pending(cpu):
+                head, tail = struct.unpack('<HH', bytes(cpu.mem_read(0x010f1404, 4)))
+                value = cpu.mem_read(0x010f1408 + (head & 255), 1)[0]
+                cpu.mem_write(0x010f1404, struct.pack('<H', (head + 1) & 255))
+                return value
             return 0
         raise UnsupportedGuestOperation(f'unsupported keyboard port {port:04x}')
 
@@ -78,6 +86,7 @@ class ProtectedTimer:
         self.instructions = 0
         self.ticks = 0
         self.interrupts = 0
+        self.keyboard_interrupts = 0
         self.divisor = 65536
         self.low = 0
         self.high_next = False
@@ -101,7 +110,7 @@ class ProtectedTimer:
         elif port == 0x20 and value == 0x20:
             self.eoi_seen = True
 
-    def instruction(self, cpu, address, vectors, regs):
+    def instruction(self, cpu, address, vectors, regs, keyboard_pending=False):
         if self.in_service and self.eoi_seen and regs['sp'] == self.return_sp:
             self.in_service = self.eoi_seen = False
         if self.instructions % self.interval:
@@ -113,7 +122,8 @@ class ProtectedTimer:
             old = struct.unpack('<I', bytes(cpu.mem_read(address_of_ticks, 4)))[0]
             advances, self.bios_accumulator = divmod(self.bios_accumulator, 65536)
             cpu.mem_write(address_of_ticks, struct.pack('<I', (old + advances) & 0xffffffff))
-        handler, selector = vectors.protected[8]
+        irq_vector = 9 if keyboard_pending and vectors.protected[9][0] != IMAGE_SIZE + 0x100 else 8
+        handler, selector = vectors.protected[irq_vector]
         if (self.in_service or handler >= IMAGE_SIZE or selector not in (0x2c, 0x2f) or
             regs['cs'] not in (0x2c, 0x2f) or regs['ss'] != 7 or
             not (regs['flags'] & 0x200) or regs['sp'] < 0x1000):
@@ -127,7 +137,53 @@ class ProtectedTimer:
         self.eoi_seen = False
         self.return_sp = regs['sp']
         self.interrupts += 1
+        if irq_vector == 9:
+            self.keyboard_interrupts += 1
         return True
+
+
+class VgaDac:
+    """Protected-mode VGA DAC writes shared with the DOS framebuffer view."""
+
+    def __init__(self):
+        self.cursor = 0
+
+    def write(self, cpu, port, value):
+        if port == 0x3c8:
+            self.cursor = (value & 255) * 3
+        elif port == 0x3c9:
+            cpu.mem_write(0x010f1000 + self.cursor, bytes((value & 63,)))
+            self.cursor = (self.cursor + 1) % 768
+        else:
+            raise UnsupportedGuestOperation(f'unsupported VGA DAC port {port:04x}')
+
+
+class GamePort:
+    """Four discharge counters and active-low buttons from the SDL mailbox."""
+
+    def __init__(self):
+        self.remaining = [0] * 4
+
+    @staticmethod
+    def state(cpu):
+        raw = bytes(cpu.mem_read(0x010f1400, 4))
+        if struct.unpack('<I', raw)[0] != 0x31504e49:
+            return 0, 0, (0, 0, 0, 0)
+        mask, buttons, *axes = struct.unpack('<BB4H', bytes(cpu.mem_read(0x010f1600, 10)))
+        return mask & 15, buttons & 15, axes
+
+    def write(self, cpu):
+        _, _, axes = self.state(cpu)
+        self.remaining[:] = axes
+
+    def read(self, cpu):
+        mask, buttons, _ = self.state(cpu)
+        value = ((~buttons & 15) << 4) | (~mask & 15)
+        for axis in range(4):
+            if mask & (1 << axis) and self.remaining[axis]:
+                value |= 1 << axis
+                self.remaining[axis] -= 1
+        return value
 
 
 class MouseScript:
@@ -419,7 +475,10 @@ class X32Selectors:
 
 def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
         cd_dir=None, overlay_dir=None, ring3=True, sound='off',
-        timer_instructions=250000, mouse_events=()):
+        timer_instructions=250000, mouse_events=(), windowed=False,
+        fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
+        smooth_scaling=False, display_instructions=50000,
+        display_factory=None, framebuffer=None):
     """Run a bounded original-code probe; report the last guest interaction."""
     if instruction_limit <= 0:
         raise ValueError('instruction limit must be positive')
@@ -427,6 +486,8 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
         raise ValueError('sound must be off or original')
     if timer_instructions <= 0:
         raise ValueError('timer_instructions must be positive')
+    if display_instructions <= 0:
+        raise ValueError('display_instructions must be positive')
     from unicorn import Uc, UcError, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR, UC_HOOK_CODE, UC_HOOK_INSN
     from unicorn.x86_const import (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
         UC_X86_REG_EDX, UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EBP,
@@ -530,9 +591,22 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                     if line.split(b'=', 1)[0] in changes else line for line in lines) + b'\r\n'
     selectors = X32Selectors(cpu, table_base + 0x100)
     keyboard = KeyboardController()
+    dac = VgaDac()
+    gameport = GamePort()
     timer = ProtectedTimer(timer_instructions)
     mouse_script = MouseScript(mouse_events)
-    real_mode = None
+    real_mode = RealModeBridge() if windowed else None
+    display = None
+    if windowed:
+        if display_factory is None:
+            try:
+                from .display import Display
+            except ImportError:
+                from display import Display
+            display_factory = Display
+        display = display_factory(fullscreen=fullscreen, geometry=geometry,
+                                  aspect_ratio=aspect_ratio, smooth_scaling=smooth_scaling)
+        display.poll(real_mode.engine)
     result = {'status': 'instruction_limit', 'events': events, 'console': [],
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
               'privileged_ops': [],
@@ -693,6 +767,35 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
             uc.emu_stop()
             return
         timer.instructions += 1
+        if display is not None and timer.instructions % display_instructions == 0:
+            snapshot = bytes(uc.mem_read(0x01000000, 0x100000))
+            try:
+                display.update(real_mode.engine, snapshot)
+            except (ValueError, OSError) as exc:
+                result['status'] = 'host_display_error'
+                result['detail'] = str(exc)
+                uc.emu_stop()
+                return
+            if display.closed:
+                result['status'] = 'window_closed'
+                uc.emu_stop()
+                return
+            while display.menu.open and not display.closed:
+                try:
+                    display.update(real_mode.engine, snapshot)
+                except (ValueError, OSError) as exc:
+                    result['status'] = 'host_display_error'
+                    result['detail'] = str(exc)
+                    uc.emu_stop()
+                    return
+                time.sleep(0.01)
+            if display.closed:
+                result['status'] = 'window_closed'
+                uc.emu_stop()
+                return
+            snapshot = real_mode.engine.sync_input(snapshot)
+            uc.mem_write(0x010f1400, bytes(snapshot[0xf1400:0xf1508]))
+            uc.mem_write(0x010f1600, bytes(snapshot[0xf1600:0xf160a]))
         if (timer.instructions % timer.interval == 0 or
             (timer.in_service and timer.eoi_seen)):
             previous_ticks = timer.ticks
@@ -701,15 +804,15 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                 'ip_register': UC_X86_REG_EIP, 'flags_register': UC_X86_REG_EFLAGS,
                 'cs': uc.reg_read(UC_X86_REG_CS), 'ss': uc.reg_read(UC_X86_REG_SS),
                 'flags': uc.reg_read(UC_X86_REG_EFLAGS),
-            })
+            }, keyboard_pending=keyboard.pending(uc))
             if real_mode is not None and timer.ticks != previous_ticks:
                 mouse_script.apply(timer.ticks, real_mode.engine)
 
     def port_in(uc, port, size, _user):
-        if port == 0x201:  # No physical joystick: all four buttons/axes high.
-            return (1 << (size * 8)) - 1
+        if port == 0x201:
+            return gameport.read(uc)
         if port in (0x60, 0x64):
-            return keyboard.read(port)
+            return keyboard.read(port, uc)
         if port in (0x61, 0x3da):
             return 0
         result['status'] = 'unsupported_interface'
@@ -729,7 +832,13 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                 result['detail'] = str(exc)
                 uc.emu_stop()
             return
-        if port in (0x61, 0x3c8, 0x3c9, 0x201):
+        if port in (0x3c8, 0x3c9):
+            dac.write(uc, port, value)
+            return
+        if port == 0x201:
+            gameport.write(uc)
+            return
+        if port == 0x61:
             return
         result['status'] = 'unsupported_interface'
         result['detail'] = f'unsupported OUT port={port:04x} value={value:08x}'
@@ -741,11 +850,15 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
         cpu.hook_add(UC_HOOK_INSN, port_in, None, 1, 0, UC_X86_INS_IN)
         cpu.hook_add(UC_HOOK_INSN, port_out, None, 1, 0, UC_X86_INS_OUT)
     try:
-        cpu.emu_start(table_base + 0x200 if ring3 else ENTRY, 0xffffffff,
-                      count=instruction_limit)
-    except UcError as exc:
-        result['status'] = 'cpu_fault'
-        result['detail'] = str(exc)
+        try:
+            cpu.emu_start(table_base + 0x200 if ring3 else ENTRY, 0xffffffff,
+                          count=instruction_limit)
+        except UcError as exc:
+            result['status'] = 'cpu_fault'
+            result['detail'] = str(exc)
+    finally:
+        if display is not None:
+            display.close()
     if files is not None:
         for handle in tuple(files.handles):
             try:
@@ -760,11 +873,23 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     result['conventional_end'] = conventional.end
     result['mouse_events'] = mouse_script.applied
     result['timer'] = {'instructions': timer.instructions, 'ticks': timer.ticks,
-                       'irq0': timer.interrupts, 'divisor': timer.divisor,
+                       'irq0': timer.interrupts - timer.keyboard_interrupts,
+                       'irq1': timer.keyboard_interrupts, 'divisor': timer.divisor,
                        'in_service': timer.in_service}
     result['real_mode_requests'] = real_mode.requests if real_mode is not None else []
     if real_mode is not None:
         result['video_mode'] = real_mode.engine.video_mode
+        if framebuffer is not None:
+            memory = bytes(cpu.mem_read(0x01000000, 0x100000))
+            frame = real_mode.engine.frame(memory)
+            if frame is not None:
+                try:
+                    from .vga import save_indexed
+                except ImportError:
+                    from vga import save_indexed
+                width, height, indices = frame
+                save_indexed(indices, memory[0xf1000:0xf1300], width, height, framebuffer)
+                result['framebuffer'] = str(framebuffer)
     return result
 
 
@@ -783,10 +908,28 @@ def main():
     parser.add_argument('--sound', choices=['off', 'original'], default='off',
                         help='disable original sound drivers in a virtual config copy (default: off)')
     parser.add_argument('--flat-ring0', action='store_true', help='diagnose legacy flat ring-0 CPU model')
+    parser.add_argument('--windowed', action='store_true',
+                        help='show experimental SDL3 video and forward physical input')
+    parser.add_argument('--fullscreen', action='store_true', help='start SDL3 window fullscreen')
+    parser.add_argument('--geometry', default='1280x960', metavar='WIDTHxHEIGHT',
+                        help='initial SDL3 window size (default: %(default)s)')
+    parser.add_argument('--aspect-ratio', choices=('4:3', 'native', 'stretch'), default='4:3',
+                        help='SDL3 output aspect ratio (default: %(default)s)')
+    parser.add_argument('--smooth-scaling', action='store_true',
+                        help='use filtered rather than nearest-neighbor scaling')
+    parser.add_argument('--display-instructions', type=int, default=50000, metavar='N',
+                        help='guest instructions between SDL3 event polls (default: %(default)s)')
+    parser.add_argument('--framebuffer', type=Path,
+                        help='save the last available VGA frame to a PNG (including headless)')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
     args = parser.parse_args()
     if args.timer_instructions <= 0:
         parser.error('--timer-instructions must be positive')
+    if args.display_instructions <= 0:
+        parser.error('--display-instructions must be positive')
+    match = re.fullmatch(r'([1-9][0-9]*)x([1-9][0-9]*)', args.geometry)
+    if not match or any(int(value) > 16384 for value in match.groups()):
+        parser.error('--geometry must be WIDTHxHEIGHT with dimensions in 1..16384')
     try:
         MouseScript(args.mouse_event)
     except ValueError as exc:
@@ -800,7 +943,11 @@ def main():
                  game_dir=args.game_dir or args.executable.parent,
                  cd_dir=args.cd_dir, overlay_dir=args.overlay_dir,
                  ring3=not args.flat_ring0, sound=args.sound,
-                 timer_instructions=args.timer_instructions, mouse_events=args.mouse_event)
+                 timer_instructions=args.timer_instructions, mouse_events=args.mouse_event,
+                 windowed=args.windowed, fullscreen=args.fullscreen,
+                 geometry=tuple(map(int, match.groups())), aspect_ratio=args.aspect_ratio,
+                 smooth_scaling=args.smooth_scaling,
+                 display_instructions=args.display_instructions, framebuffer=args.framebuffer)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')
