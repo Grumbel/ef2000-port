@@ -56,8 +56,11 @@
             as --$width -I runtime --defsym CHECK_SEGMENT_LIMIT=1 "$entry" -o objects/$backend/entry-limit.o
           done
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror -DEF_UNICORN_SDL3 \
-            runtime/unicorn_cpp.cpp -lunicorn -lcrypto -lSDL3 \
+            runtime/unicorn_cpp.cpp runtime/dos_drive.cpp -lunicorn -lcrypto -lSDL3 \
             -o objects/ef2000-unicorn-cpp
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/dos_drive_test.cpp runtime/dos_drive.cpp \
+            -o objects/ef2000-dos-drive-test
           runHook postBuild
         '';
 
@@ -67,6 +70,7 @@
           unset EF2000_EXE
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
           objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
+          objects/ef2000-dos-drive-test
           runHook postCheck
         '';
 

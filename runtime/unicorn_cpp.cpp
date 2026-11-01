@@ -4,6 +4,7 @@
 // Native C++ Unicorn/X-32 runner. This is deliberately a bounded diagnostic
 // during the Python-to-C++ transition; unsupported guest calls stop explicitly.
 // The proprietary executable is read at runtime and is never linked in.
+#include "dos_drive.hpp"
 #include <unicorn/unicorn.h>
 #include <unicorn/x86.h>
 #include <openssl/sha.h>
@@ -80,32 +81,6 @@ struct WindowOptions {
     int width = 1280, height = 960;
     std::string aspect_ratio = "4:3";
 };
-
-std::string virtual_configuration(std::string config, bool joystick) {
-    // Match the Python runner's ephemeral EF2000.CFG view. The game files
-    // themselves are never modified, including when a joystick is attached.
-    std::map<std::string, std::string> overrides = {
-        {"MUSIC", "0,127"}, {"SOUNDFX", "0,127"}, {"SPEECH", "0"},
-        {"VRHELMET", "0"}, {"CONTROL", joystick ? "1" : "0"}};
-    const size_t factor = config.find("JOY_FACTOR=");
-    if (joystick && factor != std::string::npos &&
-        (factor == 0 || config[factor - 1] == '\n')) {
-        const size_t value_start = factor + std::strlen("JOY_FACTOR=");
-        const size_t value_end = config.find_first_of("\r\n", value_start);
-        if (config.substr(value_start, value_end - value_start) == "0")
-            overrides["JOY_FACTOR"] = "100";
-    }
-    for (const auto& [key, value] : overrides) {
-        const std::string prefix = key + "=";
-        const size_t found = config.find(prefix);
-        if (found != std::string::npos && (found == 0 || config[found - 1] == '\n')) {
-            const size_t end = config.find_first_of("\r\n", found);
-            config.replace(found, end == std::string::npos ? end : end - found,
-                           prefix + value);
-        }
-    }
-    return config;
-}
 
 class StartupWindow {
 public:
@@ -338,13 +313,14 @@ static_assert(sizeof(Registers) == sizeof(REG_IDS) / sizeof(int) * sizeof(uint32
 class Machine {
 public:
     explicit Machine(const std::vector<uint8_t>& image, fs::path game_dir, fs::path cd_dir,
+                     fs::path overlay_dir,
                      bool trace_interrupts = false, std::vector<MouseEvent> mouse_events = {},
                      std::vector<TimedKeyEvent> key_events = {},
                      std::vector<JoystickEvent> joystick_events = {})
         : image_size_(image.size()), trace_interrupts_(trace_interrupts),
           mouse_events_(std::move(mouse_events)), key_events_(std::move(key_events)),
           joystick_events_(std::move(joystick_events)),
-          game_dir_(std::move(game_dir)), cd_dir_(std::move(cd_dir)) {
+          dos_drive_(std::move(game_dir), std::move(cd_dir), std::move(overlay_dir)) {
         if (image.size() < ENTRY + 2 || image.size() > IMAGE_SIZE)
             throw std::runtime_error("invalid initialized image length");
         check(uc_open(UC_ARCH_X86, UC_MODE_32, &cpu_), "uc_open");
@@ -467,9 +443,7 @@ private:
     unsigned joystick_count_{}, joystick_buttons_{};
     std::array<int, 4> joystick_axes_{};
     std::array<uint16_t, 4> joystick_remaining_{};
-    fs::path game_dir_, cd_dir_;
-    struct OpenFile { std::vector<uint8_t> bytes; uint64_t pos{}; };
-    std::map<uint16_t, OpenFile> files_;
+    ef2000::DosDrive dos_drive_;
 
     struct VideoFrame { uint16_t width{}, height{}; std::vector<uint8_t> rgba; };
     static std::pair<uint16_t, uint16_t> vbe_dimensions(uint16_t mode) {
@@ -571,50 +545,6 @@ private:
         std::cout << "framebuffer=" << path << " (" << frame.width << "x" << frame.height << ")\n";
     }
 
-    // DOS names are case-insensitive; only files within the chosen asset root
-    // may be opened. Never let original-game requests write to this tree.
-    fs::path resolve_dos_path(std::string name) {
-        if (name.empty() || name.size() >= 260) throw unsigned(3);
-        for (const unsigned char c : name) if (c < 32 || c > 126) throw unsigned(3);
-        std::replace(name.begin(), name.end(), '\\', '/');
-        if (name.size() >= 2 && name[1] == ':') {
-            if (std::toupper(static_cast<unsigned char>(name[0])) != 'C') throw unsigned(15);
-            name.erase(0, 2);
-        }
-        bool absolute = !name.empty() && name[0] == '/';
-        while (!name.empty() && name[0] == '/') name.erase(0, 1);
-        for (char& c : name) c = std::toupper(static_cast<unsigned char>(c));
-        if (absolute && name.rfind("EF2000/", 0) == 0) {
-            name.erase(0, 7);
-            absolute = false;
-        }
-        fs::path path = absolute ? cd_dir_ : game_dir_;
-        if (path.empty()) throw unsigned(2);
-        size_t pos = 0;
-        while (pos < name.size()) {
-            const size_t slash = name.find('/', pos);
-            const std::string part = name.substr(pos, slash == std::string::npos ? slash : slash - pos);
-            if (part.empty() || part == ".." || part.find(':') != std::string::npos) throw unsigned(3);
-            if (part != ".") {
-                bool found = false;
-                std::error_code error;
-                for (const auto& candidate : fs::directory_iterator(path, error)) {
-                    auto filename = candidate.path().filename().string();
-                    for (char& c : filename) c = std::toupper(static_cast<unsigned char>(c));
-                    if (filename == part) { path = candidate.path(); found = true; break; }
-                }
-                if (!found) throw unsigned(2);
-            }
-            if (slash == std::string::npos) break;
-            pos = slash + 1;
-        }
-        const fs::path root = fs::weakly_canonical(absolute ? cd_dir_ : game_dir_);
-        const fs::path target = fs::weakly_canonical(path);
-        auto relative = target.lexically_relative(root);
-        if (relative.empty() || relative == "." || *relative.begin() == "..") throw unsigned(3);
-        if (!fs::is_regular_file(target)) throw unsigned(3);
-        return target;
-    }
     std::string dos_name(uint32_t address) {
         if (address <= 0x260 || address >= IMAGE_SIZE - 260) throw unsigned(3);
         std::array<char, 260> text{};
@@ -623,65 +553,44 @@ private:
         if (nul == text.end()) throw unsigned(3);
         return {text.begin(), nul};
     }
-    uint16_t open_file(const std::string& dos_path) {
-        const fs::path path = resolve_dos_path(dos_path);
-        std::ifstream stream(path, std::ios::binary);
-        if (!stream) throw unsigned(5);
-        std::vector<uint8_t> data((std::istreambuf_iterator<char>(stream)), {});
-        // Keep sound off until the original DOS hardware mixer is ported.
-        if (path.filename() == "EF2000.CFG" || path.filename() == "ef2000.cfg") {
-            const std::string config = virtual_configuration(
-                {data.begin(), data.end()}, joystick_count_ != 0);
-            data.assign(config.begin(), config.end());
-        }
-        for (uint16_t handle = 5; handle < 64; ++handle)
-            if (!files_.count(handle)) { files_.emplace(handle, OpenFile{std::move(data), 0}); return handle; }
-        throw unsigned(4);
-    }
     void dos_files(uint16_t ax, const Registers& before, Registers& after) {
         const uint8_t ah = ax >> 8;
         const uint16_t handle = before.bx & 0xffff;
         try {
             if (ah == 0x3d) {
-                if ((ax & 3) != 0) throw unsigned(5);
                 const std::string name = dos_name(before.dx);
                 if (trace_interrupts_) std::cerr << "cpp-file: open " << name << '\n';
-                after.ax = open_file(name);
+                after.ax = dos_drive_.open(name, ax & 3, joystick_count_ != 0);
                 after.dx = 0;
             } else if (ah == 0x3c) {
-                throw unsigned(5); // No overlay: reject writes to original assets.
+                after.ax = dos_drive_.create(dos_name(before.dx));
             } else if (ah == 0x3e) {
-                if (!files_.erase(handle)) throw unsigned(6);
+                dos_drive_.close(handle);
                 after.ax = 0x3e01;
             } else if (ah == 0x3f) {
-                auto file = files_.find(handle);
-                if (file == files_.end()) throw unsigned(6);
                 const auto address = before.dx, count = before.cx;
                 if (address <= 0x260 || address >= IMAGE_SIZE || count > IMAGE_SIZE - address)
                     throw unsigned(5);
-                const auto& data = file->second.bytes;
-                const size_t begin = std::min<uint64_t>(file->second.pos, data.size());
-                const size_t length = std::min<size_t>(count, data.size() - begin);
-                if (length) write(address, data.data() + begin, length);
-                file->second.pos += length;
+                const auto bytes = dos_drive_.read(handle, count);
+                if (!bytes.empty()) write(address, bytes.data(), bytes.size());
                 after.cx = after.dx = 0;
-                after.ax = length;
+                after.ax = bytes.size();
+            } else if (ah == 0x40) {
+                const auto address = before.dx, count = before.cx;
+                if (address <= 0x260 || address >= IMAGE_SIZE || count > IMAGE_SIZE - address)
+                    throw unsigned(5);
+                std::vector<uint8_t> bytes(count);
+                if (count) check(uc_mem_read(cpu_, address, bytes.data(), count), "read DOS write buffer");
+                after.ax = dos_drive_.write(handle, bytes);
             } else if (ah == 0x42) {
-                auto file = files_.find(handle);
-                if (file == files_.end()) throw unsigned(6);
                 const int32_t offset = int32_t(((before.cx & 0xffff) << 16) | (before.dx & 0xffff));
-                const uint8_t whence = ax & 255;
-                if (whence > 2) throw unsigned(1);
-                const int64_t base = whence == 0 ? 0 : (whence == 1 ? int64_t(file->second.pos) :
-                    int64_t(file->second.bytes.size()));
-                if (base + offset < 0) throw unsigned(1);
-                file->second.pos = base + offset;
-                after.ax = file->second.pos & 0xffff;
-                after.dx = (after.dx & 0xffff0000) | ((file->second.pos >> 16) & 0xffff);
+                const uint64_t position = dos_drive_.seek(handle, offset, ax & 255);
+                after.ax = position & 0xffff;
+                after.dx = (after.dx & 0xffff0000) | ((position >> 16) & 0xffff);
             } else if (ah == 0x68) {
-                if (handle > 2 && !files_.count(handle)) throw unsigned(6);
+                if (handle > 2) dos_drive_.flush(handle);
             } else if (ax == 0x4400) {
-                if (handle > 2 && !files_.count(handle)) throw unsigned(6);
+                if (handle > 2 && !dos_drive_.is_open(handle)) throw unsigned(6);
                 after.dx = (after.dx & 0xffff0000) | (handle <= 2 ? 0x80d3 : 2);
                 after.ax = handle <= 2 ? 0x80d3 : 2;
             } else throw unsigned(1);
@@ -1338,6 +1247,7 @@ private:
             after.flags &= ~1u;
         } else if ((before.ax >> 8 & 255) == 0x3c || (before.ax >> 8 & 255) == 0x3d ||
                    (before.ax >> 8 & 255) == 0x3e || (before.ax >> 8 & 255) == 0x3f ||
+                   (before.ax >> 8 & 255) == 0x40 ||
                    (before.ax >> 8 & 255) == 0x42 || (before.ax >> 8 & 255) == 0x68 ||
                    ax == 0x4400) {
             dos_files(ax, before, after);
@@ -1469,7 +1379,7 @@ private:
 
 void usage(const char* program) {
     std::cout << "Usage: " << program << " _EF2000.EXE [--instruction-limit N]"
-              << " [--game-dir DIR] [--cd-dir DIR] [--windowed]"
+              << " [--game-dir DIR] [--cd-dir DIR] [--overlay-dir DIR] [--windowed]"
               << " [--timer-instructions N]\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
               << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
@@ -1479,6 +1389,8 @@ void usage(const char* program) {
               << "       [--joystick-event TICK:X:Y[:Z:W]:BUTTONS] (2/4 axes)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
+              << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
+              << "       Windowed default: $XDG_STATE_HOME/ef2000/unicorn/drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
               << "       " << program << " --self-test\n";
@@ -1488,7 +1400,7 @@ void usage(const char* program) {
 int main(int argc, char** argv) {
     try {
         std::string path;
-        std::string game_dir, cd_dir;
+        std::string game_dir, cd_dir, overlay_dir;
         uint64_t limit = 30000000;
         bool explicit_limit = false;
         uint64_t timer_interval = 250000;
@@ -1519,6 +1431,8 @@ int main(int argc, char** argv) {
                 game_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--cd-dir") && i + 1 < argc) {
                 cd_dir = argv[++i];
+            } else if (!std::strcmp(argv[i], "--overlay-dir") && i + 1 < argc) {
+                overlay_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--windowed")) {
                 window.enabled = true;
             } else if (!std::strcmp(argv[i], "--fullscreen")) {
@@ -1604,21 +1518,22 @@ int main(int argc, char** argv) {
         }
         if (self_test) {
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
-            constexpr char cfg[] = "CONTROL=1\r\nJOY_FACTOR=0\r\nMUSIC=1,127\r\n";
-            if (virtual_configuration(cfg, false).find("CONTROL=0\r\n") == std::string::npos ||
-                virtual_configuration(cfg, true).find("JOY_FACTOR=100\r\n") == std::string::npos ||
-                virtual_configuration(cfg, true).find("CONTROL=1\r\n") == std::string::npos ||
-                virtual_configuration(cfg, false).find("MUSIC=0,127\r\n") == std::string::npos)
-                throw std::runtime_error("virtual game configuration self-test failed");
             std::vector<uint8_t> image(0x1000);
             constexpr uint8_t guest[] = {0xb8, 0x0b, 0x35, 0x00, 0x00, 0xcd, 0x21,
                                           0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
             std::copy(std::begin(guest), std::end(guest), image.begin() + ENTRY);
-            Machine machine(image, {}, {});
+            Machine machine(image, {}, {}, {});
             return machine.run(10000, {}, 250000, "");
         }
         if (path.empty()) { usage(argv[0]); return 2; }
         if (window.enabled && !explicit_limit) limit = 0;
+        if (window.enabled && overlay_dir.empty()) {
+            if (const char* xdg_state = std::getenv("XDG_STATE_HOME"); xdg_state && *xdg_state)
+                overlay_dir = (fs::path(xdg_state) / "ef2000/unicorn/drive").string();
+            else if (const char* home = std::getenv("HOME"); home && *home)
+                overlay_dir = (fs::path(home) / ".local/state/ef2000/unicorn/drive").string();
+            else throw std::runtime_error("set --overlay-dir or XDG_STATE_HOME for writable DOS files");
+        }
         std::stable_sort(mouse_events.begin(), mouse_events.end(),
                          [](const MouseEvent& a, const MouseEvent& b) { return a.tick < b.tick; });
         std::stable_sort(key_events.begin(), key_events.end(),
@@ -1628,7 +1543,7 @@ int main(int argc, char** argv) {
         const auto image = payload_from_executable(path);
         if (game_dir.empty()) game_dir = fs::path(path).parent_path().string();
         if (cd_dir.empty()) cd_dir = game_dir;
-        Machine machine(image, game_dir, cd_dir, trace_interrupts,
+        Machine machine(image, game_dir, cd_dir, overlay_dir, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events));
         return machine.run(limit, window, timer_interval, framebuffer);
     } catch (const std::exception& error) {
