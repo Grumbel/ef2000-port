@@ -197,6 +197,11 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-probe \
   --instruction-limit 100000000
 # Experimental DMA/PIC/IRQ emulation with SDL3 PCM output in windowed runs
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma
+# Flight-controller diagnostics; SDL3 gamepads use mapped stick axes (not triggers)
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma \
+  --controls joystick --joystick auto --trace-joystick
+# Expose a classic two-axis PC joystick instead of four analog axes:
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --joystick-axes 0,1
 # Capture the original guest DMA audio without an SDL3 sound device
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-dma \
   --instruction-limit 300000000 --wav-capture /tmp/ef2000-pcm
@@ -220,6 +225,28 @@ joystick events are forwarded to the guest, and the CLI supports scripted
 With sound enabled, independent 1.5-billion-instruction replays also reached
 the in-flight cockpit, completing 287–298 guest DMA blocks
 (585,730–608,258 PCM bytes; the DSP service uses host wall-clock timing).
+
+The C++ SDL3 frontend now maps recognized gamepads through SDL's standardized
+left/right stick axes and south/east/west/north buttons, avoiding the raw
+trigger-axis ordering seen on some controllers. Plain joysticks retain raw
+axes. `--joystick auto|off|N` chooses the SDL device, and
+`--joystick-axes 0,1[,2,3]` selects two or four axes; negative indices invert
+an axis, as with the Python frontend. Devices are re-enumerated after a
+disconnect/reconnect. `--controls auto|keyboard|joystick` selects the virtual
+`EF2000.CFG` flight controls; forcing `joystick` maintains a centered two-axis
+gameport even if a physical controller is connected after startup.
+`--trace-joystick` reports the selected device, changing axis/button samples
+and the number of guest port `201h` reads and writes. The console also reports
+guest instructions per wall-clock second plus SDL polling/render counts at
+exit, so performance can be compared on the actual target machine.
+
+The C++ core is still Unicorn-emulated rather than natively executing the
+game. A headless 100M-instruction sound-enabled replay measured about 45M
+guest instructions/s on the available test host; this is not a real-device
+SDL3 window benchmark. Input/event polling is now limited to approximately
+120 Hz, instead of being triggered by every 50K guest instructions, and SDL3
+audio stream formats are changed only when the game's PCM rate changes.
+Whether this sufficiently improves flight performance needs hardware testing.
 
 DOS writes in windowed mode default to
 `$XDG_STATE_HOME/ef2000/unicorn/drive` (or

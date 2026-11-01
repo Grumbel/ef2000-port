@@ -487,3 +487,39 @@ blocks and 137,216 complete-frame WAV PCM bytes. The original driver's
 two-byte initialization self-test has no complete 16-bit stereo frame and is
 not written as an empty WAV file. C++ original-driver and WAV-format tests
 cover these conditions. Physical SDL3 output has not been tested.
+
+#### SDL3 joystick/gamepad diagnosis and execution throughput
+
+The native C++ frontend's original `SDL_GetNumJoystickAxes()` mapping took
+the first four raw axes without distinguishing a gamepad from a flight stick.
+On many modern gamepads those raw axes can include analog triggers, rather
+than the expected right thumbstick. It also only opened a joystick once at
+startup and never retried a disconnected device. The frontend now uses SDL3's
+standardized axes and face buttons for recognized gamepads, keeps raw access
+for other joysticks, and retries enumeration on hotplug. It offers the same
+`--controls` and `--joystick N|off` selection as the Python frontend, plus
+`--joystick-axes 0,1[,2,3]` with optional negative signs for inversion.
+
+For a reproduction on actual hardware:
+
+```sh
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+  --windowed --sound sb16-dma --controls joystick \
+  --joystick auto --joystick-axes 0,1 --trace-joystick
+```
+
+The selected SDL3 device, changing sampled axes/buttons, guest port `201h`
+read/write totals, effective guest instruction throughput and SDL polling/
+frame totals are now logged. The guest-only regression
+`ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 --trace-joystick`
+proves synthetic port charging and sampling without SDL3 or original assets.
+With the full original game, the 100M-instruction sound-enabled checkpoint
+observed over 12,000 real guest gameport reads and three charges from a
+scripted two-axis controller. SDL3 host input itself remains unverified here.
+
+The previous SDL3 window loop polled events and joystick state every 50K
+instructions even on a fast CPU. It now throttles polls to about 120 Hz and
+frame presentations to 30 Hz; audio stream format changes occur only when
+the game's PCM format changes. A headless reference reached approximately
+45M guest instructions per second, but Unicorn instruction execution remains
+a fundamental CPU cost and interactive flight FPS still needs measurement.

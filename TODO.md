@@ -178,8 +178,13 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
   IRQ7/DMA1/5 original-driver self-test, real IVT updates, and sound-enabled
   1.5B-instruction replay to the flight cockpit. Add optional lossless
   complete-frame guest PCM capture via `--wav-capture DIR`.
+- [x] Handle SDL3 gamepads with standardized left/right sticks (no accidental
+  trigger-axis mapping), joystick re-enumeration, explicit control selection,
+  input diagnostics and throttled event pumping. Add a headless original-game
+  gameport read/write checkpoint and synthetic x86 port I/O self-test.
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
-  on actual hardware, and test sustained interactive mission execution.
+  on actual hardware, profile performance bottlenecks in flight, and test
+  sustained interactive mission execution.
 - [ ] Verify audible SDL3 playback using a full original installation and
   physical audio device; improve
   streaming latency if required and port remaining OS services before
