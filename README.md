@@ -195,9 +195,8 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 # Sound-hardware discovery only; does not yet play digital audio
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-probe \
   --instruction-limit 100000000
-# Experimental DMA/PIC/IRQ emulation, still no SDL3 audio playback
-nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-dma \
-  --instruction-limit 100000000
+# Experimental DMA/PIC/IRQ emulation with SDL3 PCM output in windowed runs
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
@@ -232,14 +231,19 @@ The experimental `--sound sb16-dma` mode instead runs guest port I/O through
 native C++ 8237 DMA, 8259 PIC and SB16 DSP models. A synthetic 16-bit test
 program has programmed the sound hardware, transferred guest PCM, received
 IRQ7, acknowledged it from guest code and returned via `IRET`. Modeled DMA
-block and byte counts are reported at exit. SDL3 audio output, periodic
-sound servicing outside 16-bit calls and full original-driver verification
-are still missing.
+block and byte counts are reported at exit. Protected-mode timer ticks can
+also finish DMA blocks and invoke installed real-mode IRQ handlers without
+an outstanding X-32 BIOS call. Windowed runs feed gain-adjusted stereo PCM
+into an SDL3 audio device, using the stream's input-format conversion to
+handle the game's sample rates. Headless runs only count PCM blocks. Audio
+device initialization failures disable playback without stopping the guest.
+The complete original SB16 driver and SDL3 device path have **not** been
+tested in this build environment (the local fixture lacks `SB16.DIG`).
 
 This is still an **experimental migration**, not yet a drop-in replacement
 for the Python app. Real SDL3 window/gamepad operation has not been exercised
-in this build environment, and native PCM playback, periodic audio servicing,
-additional DOS calls and
+in this build environment, and real-device sound playback, original-driver
+integration, additional DOS calls and
 extensive flight-control/playability validation remain open. The working
 Python backend remains available at `nix run .#unicorn` for comparison.
 

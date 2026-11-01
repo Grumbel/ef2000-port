@@ -212,8 +212,8 @@ still requires a full-installation integration test.
 mode and auto-init handling, 8259 interrupt mask/request/in-service/EOI, and
 SB16 DSP rate, playback block, pause and resume commands. Sound device state
 is independent of SDL3: completed DMA blocks retain the exact original guest
-PCM, format, sample rate and mixer gains. The runner currently reports block
-and byte counts but does not output audio.
+PCM, format, sample rate and mixer gains. The runner reports completed block
+and byte counts, and windowed mode can stream normalized PCM through SDL3.
 
 `tests/isa_audio_test.cpp` verifies 8- and 16-bit DMA, page wrapping, reload
 and interrupt masking. `tests/sound_blaster_test.cpp` checks deterministic
@@ -224,7 +224,24 @@ runs a synthetic *16-bit guest program*: it programs DMA/PIC/DSP using real
 acknowledges PIC/DSP and returns via `IRET`. This exercises native Unicorn
 I/O and interrupt injection without proprietary assets.
 
-Periodic DMA processing during protected-mode game execution and SDL3 output
-remain unfinished, so this is **not** yet a working original-game sound backend.
+The C++ main-loop PIT tick now polls overdue DMA while protected-mode guest
+code runs. If IRQ7 becomes unmasked and pending, it copies conventional RAM
+into the real-mode CPU, enters the installed 16-bit ISR with a synthetic
+hardware interrupt stack and interrupts disabled, runs the handler until
+`IRET`, and copies any memory mutations back to the protected-mode DOS map.
+A dedicated synthetic test covers this deferred completion path, including
+an IRQ handler that loads its own DS. Audio service failures stop the guest
+with a diagnostic.
+
+Windowed runs now convert unsigned/signed 8/16-bit original PCM to interleaved
+stereo float samples with mixer gains and partial-frame carry, then feed SDL3
+an audio stream. SDL3 performs sample-rate conversion; queue growth is bounded
+and a missing host audio device only disables sound playback. Headless runs
+still report modeled PCM blocks without playing them. The format converter
+has deterministic tests for signedness, gains and split-frame boundaries.
+
+The C++ original-game sound path is **not** yet validated with a complete
+original installation or a real audio device, so audible playback cannot yet
+be claimed as verified.
 The limited local EF2000 fixture exits from `--sound sb16-dma` with the game's
 "Keine Soundkarte gefunden" message because `SB16.DIG` is absent.

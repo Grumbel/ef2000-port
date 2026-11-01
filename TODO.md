@@ -170,12 +170,16 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
   synthetic guest IN/OUT and interrupt/timeout failures.
 - [x] Port the 8237 DMA, 8259 PIC and SB16 DSP completion models to native C++;
   test a complete synthetic guest-programmed PCM transfer through IRQ7, DSP
-  acknowledgement and real-mode ISR return. `--sound sb16-dma` is still silent.
+  acknowledgement and real-mode ISR return.
+- [x] Poll DSP DMA from protected-mode PIT ticks, run the original 16-bit IRQ
+  handler independently of an outstanding X-32 call, and stream normalized
+  PCM into SDL3 in windowed mode. Synthetic deferred-IRQ and format tests pass.
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
   on actual hardware, and test sustained interactive mission execution.
-- [ ] Service SB16 DMA/IRQ periodically while the protected-mode game runs;
-  add SDL3 PCM playback, full `SB16.DIG` integration tests and remaining OS
-  services before switching `.#unicorn` over to C++.
+- [ ] Verify complete `SB16.DIG` startup, DMA/IRQ and audible SDL3 playback
+  using a full original installation and physical audio device; improve
+  streaming latency if required and port remaining OS services before
+  switching `.#unicorn` over to C++.
 `--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA
 model and plays captured digital PCM through SDL. FM music remains disabled in
 this mode. Failed real-mode calls retain mutated memory and CPU state for
