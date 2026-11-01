@@ -63,6 +63,68 @@ class KeyboardController:
         self.ack_pending = True
 
 
+class RealModeBridge:
+    """Run X-32 AX=2511 through the shared bounded 16-bit Unicorn engine."""
+
+    def __init__(self):
+        try:
+            from .real_mode import RealMode, PACKET, MAGIC
+        except ImportError:
+            from real_mode import RealMode, PACKET, MAGIC
+        self.engine = RealMode()
+        self.packet = PACKET
+        self.magic = MAGIC
+        self.requests = []
+
+    def execute(self, cpu, regs, real_vectors):
+        address = regs['dx']
+        if regs['ds'] != 7 or address <= 0x260 or address > IMAGE_SIZE - 18:
+            raise UnsupportedGuestOperation('invalid AX=2511 real-mode call frame')
+        frame = bytearray(cpu.mem_read(address, 18))
+        vector, ds, es, fs, gs, ax, dx = struct.unpack('<5H2I', frame)
+        if vector >= 256:
+            raise UnsupportedGuestOperation(f'invalid real-mode vector {vector}')
+        entry = real_vectors[vector]
+        values = self._exchange(cpu, real_vectors, vector, entry, ax, regs['bx'],
+                                regs['cx'], dx, regs['si'], regs['di'],
+                                ds, es, fs, gs, regs['flags'])
+        struct.pack_into('<4H', frame, 2, *values[8:12])
+        struct.pack_into('<I', frame, 14, values[5])
+        cpu.mem_write(address, bytes(frame))
+        return dict(regs, ax=values[2], bx=values[3], cx=values[4], dx=values[5],
+                    si=values[6], di=values[7],
+                    flags=(regs['flags'] & ~0x8d5) | (values[12] & 0x8d5))
+
+    def bios(self, cpu, regs, real_vectors, vector):
+        values = self._exchange(cpu, real_vectors, vector, real_vectors[vector],
+                                regs['ax'], regs['bx'], regs['cx'], regs['dx'],
+                                regs['si'], regs['di'], regs['ds'], regs['es'],
+                                0, 0, regs['flags'])
+        return dict(regs, ax=values[2], bx=values[3], cx=values[4], dx=values[5],
+                    si=values[6], di=values[7],
+                    flags=(regs['flags'] & ~0x8d5) | (values[12] & 0x8d5))
+
+    def _exchange(self, cpu, real_vectors, vector, entry, ax, bx, cx, dx,
+                  si, di, ds, es, fs, gs, flags):
+        request = self.packet.pack(self.magic, entry, ax, bx, cx, dx, si, di,
+                                   ds, es, fs, gs, flags, vector)
+        conventional = bytes(cpu.mem_read(0x01000000, 0x100000))
+        vectors = struct.pack('<256I', *real_vectors)
+        record = {'vector': vector, 'entry': entry, 'ax': ax, 'dx': dx}
+        self.requests.append(record)
+        try:
+            response, updated = self.engine.execute(request, vectors, conventional)
+        except ValueError as exc:
+            record['error'] = str(exc)
+            raise UnsupportedGuestOperation(f'real-mode INT {vector:02x}h: {exc}') from exc
+        values = self.packet.unpack(response)
+        if len(updated) != 0x100000:
+            raise UnsupportedGuestOperation('real-mode bridge returned invalid DOS memory size')
+        cpu.mem_write(0x01000000, updated)
+        record.update(result_ax=values[2], result_dx=values[5])
+        return values
+
+
 def startup_memory(image):
     """Return the memory writes performed by the Linux harness before entry."""
     if len(image) > IMAGE_SIZE or len(image) < ENTRY + 2:
@@ -368,12 +430,14 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                     if line.split(b'=', 1)[0] in changes else line for line in lines) + b'\r\n'
     selectors = X32Selectors(cpu, table_base + 0x100)
     keyboard = KeyboardController()
+    real_mode = None
     result = {'status': 'instruction_limit', 'events': events, 'console': [],
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
               'privileged_ops': [],
               'instruction_limit': instruction_limit}
 
     def interrupt(uc, vector, _user):
+        nonlocal real_mode
         # Software INT advances EIP; hardware #GP reports the faulting EIP.
         raw_ip = uc.reg_read(UC_X86_REG_EIP)
         ip = raw_ip if vector == 13 else raw_ip - 2
@@ -406,13 +470,17 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
             }
         try:
             if vector != 0x21:
-                raise UnsupportedGuestOperation(f'unimplemented INT {vector:02x}h at IP={ip:08x}')
-            if (regs['ax'] >> 8) & 0xff == 0x4c:
+                if vector not in (0x10, 0x33, 0x16, 0x1a):
+                    raise UnsupportedGuestOperation(f'unimplemented INT {vector:02x}h at IP={ip:08x}')
+                if real_mode is None:
+                    real_mode = RealModeBridge()
+                next_regs = real_mode.bios(uc, regs, vectors.real, vector)
+            elif (regs['ax'] >> 8) & 0xff == 0x4c:
                 result['status'] = 'guest_exit'
                 result['exit_code'] = regs['ax'] & 0xff
                 uc.emu_stop()
                 return
-            if (regs['ax'] & 0xffff) in (0x2502, 0x2503, 0x2504, 0x2505,
+            elif (regs['ax'] & 0xffff) in (0x2502, 0x2503, 0x2504, 0x2505,
                                          0x2506, 0x250c, 0x2532, 0x2533):
                 next_regs = vectors.service(regs)
             elif (regs['ax'] >> 8) & 0xff == 0x48:
@@ -425,6 +493,10 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                 next_regs = dict(regs)
                 next_regs['ax'] = 0x252b
                 next_regs['flags'] &= ~1
+            elif regs['ax'] & 0xffff == 0x2511:
+                if real_mode is None:
+                    real_mode = RealModeBridge()
+                next_regs = real_mode.execute(uc, regs, vectors.real)
             elif ip != 0x93 and regs['ax'] & 0xffff in (0x3501, 0x3502, 0x3503, 0x3504, 0x3505):
                 next_regs = selectors.service(regs)
             elif (regs['ax'] >> 8) & 0xff == 0x40:
@@ -560,6 +632,9 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     result['ax'] = cpu.reg_read(UC_X86_REG_EAX)
     result['allocation'] = vars(allocation).copy()
     result['conventional_end'] = conventional.end
+    result['real_mode_requests'] = real_mode.requests if real_mode is not None else []
+    if real_mode is not None:
+        result['video_mode'] = real_mode.engine.video_mode
     return result
 
 

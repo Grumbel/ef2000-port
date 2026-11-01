@@ -8,7 +8,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, KeyboardController, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, KeyboardController, RealModeBridge, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
                                    serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
@@ -265,6 +265,46 @@ else:
 
 @unittest.skipUnless(HAS_UNICORN, 'requires Unicorn Python bindings')
 class UnicornGuestTests(unittest.TestCase):
+    def test_portable_real_mode_bridge_updates_registers_and_guest_memory(self):
+        class GuestMemory:
+            def __init__(self):
+                self.ram = bytearray(0x100000)
+                self.frame = bytearray(struct.pack('<5H2I', 0x10, 0, 0, 0, 0, 0x4f00, 0))
+
+            def mem_read(self, address, size):
+                if address == 0x2000:
+                    return bytes(self.frame[:size])
+                if address == 0x01000000:
+                    return bytes(self.ram[:size])
+                raise AssertionError((address, size))
+
+            def mem_write(self, address, data):
+                if address == 0x2000:
+                    self.frame[:] = data
+                elif address == 0x01000000:
+                    self.ram[:] = data
+                else:
+                    raise AssertionError(address)
+
+        import struct
+        guest = GuestMemory()
+        regs = dict(ax=0x2511, bx=0, cx=0, dx=0x2000, si=0, di=0,
+                    ds=7, es=7, flags=0x202)
+        bridge = RealModeBridge()
+        response = bridge.execute(guest, regs, [0] * 256)
+        self.assertEqual(response['ax'], 0x4f)
+        self.assertEqual(bridge.requests[0]['vector'], 0x10)
+        self.assertEqual(guest.ram[0:4], b'VESA')
+        guest.frame[:] = struct.pack('<5H2I', 0x66, 0, 0, 0, 0, 0, 0)
+        guest.ram[0x10000:0x10004] = bytes.fromhex('b8 34 12 cf')
+        response = bridge.execute(guest, regs, [0x10000000 if i == 0x66 else 0
+                                                for i in range(256)])
+        self.assertEqual(response['ax'], 0x1234)
+        self.assertEqual(struct.unpack_from('<I', guest.frame, 10)[0], 0)
+        video = bridge.bios(guest, dict(regs, ax=0x13), [0] * 256, 0x10)
+        self.assertEqual(video['ax'], 0x13)
+        self.assertEqual(bridge.engine.video_mode, 0x13)
+
     def test_synthetic_original_instruction_execution(self):
         image = bytearray(0x195fb0)
         # Real x86 instructions, not a mocked Unicorn API.
@@ -298,8 +338,9 @@ class UnicornGuestTests(unittest.TestCase):
         from tools.extract_image import extract
         image = extract(Path(os.environ['EF2000_EXE']).read_bytes())[1]['payload.bin']
         result = run(image, instruction_limit=30000000, game_dir=os.environ['EF2000_DATA_DIR'])
-        self.assertEqual(result['status'], 'unsupported_interface')
-        self.assertIn('AX=2511', result['detail'])
+        self.assertEqual(result['status'], 'instruction_limit')
+        self.assertEqual(result['video_mode'], 0x13)
+        self.assertTrue(any(entry['vector'] == 0x10 for entry in result['real_mode_requests']))
         self.assertTrue(any('did1st.dat' == e.get('filename') for e in result['events']))
         self.assertTrue(any('did.dat' in e.get('filename', '') for e in result['events']))
         self.assertTrue(any('TACTCOM' in line for line in result['console']))
@@ -315,7 +356,7 @@ class UnicornGuestTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as overlay:
             result = run(image, game_dir=os.environ['EF2000_DATA_DIR'],
                          cd_dir=os.environ['EF2000_CD_DIR'], overlay_dir=overlay)
-            self.assertEqual(result['status'], 'unsupported_interface')
-            self.assertIn('AX=2511', result['detail'])
+            self.assertEqual(result['status'], 'instruction_limit')
+            self.assertEqual(result['video_mode'], 0x13)
             self.assertFalse(any('VIEWS2.DAT' in line.upper() for line in result['console']))
             self.assertFalse((Path(os.environ['EF2000_DATA_DIR']) / 'TACTCOM.$$$').exists())

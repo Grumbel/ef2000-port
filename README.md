@@ -146,10 +146,12 @@ harness. The portable probe now initializes `gui`, `DID=.` and `quick_flag=1`
 equivalently, models the keyboard-controller ACK handshake, and resolves DOS
 paths containing `./`. It disables sound in a virtual, read-only configuration
 copy by default (`--sound original` uses the original settings). On the same
-installed assets it reads the archives, starts `TACTCOM`, and reaches the
-X-32 AX=`2511h` real-mode driver interface rather than the missing-CD path.
-The native Linux backend already handles this driver interface, but the
-portable backend does not yet execute real-mode driver code.
+installed assets it reads the archives, starts `TACTCOM`, and executes
+X-32 AX=`2511h` real-mode driver requests through the same bounded 16-bit
+Unicorn engine used on Linux. Direct INT `10h`, `33h`, `16h`, and `1Ah` BIOS
+calls use that bridge too. The game reaches VGA mode `13h` (320×200) and
+continues through the 30-million-instruction diagnostic budget. No native
+Windows SDL rendering, timer IRQ delivery or interactive input exists yet.
 No CD marker or additional unpacking is needed for that startup path. This
 does not establish that all game features work under the portable backend.
 
