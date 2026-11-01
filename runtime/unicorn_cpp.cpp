@@ -7,6 +7,7 @@
 #include "dos_drive.hpp"
 #include "pcm_audio.hpp"
 #include "real_mode_cpu.hpp"
+#include "wav_capture.hpp"
 #include <unicorn/unicorn.h>
 #include <unicorn/x86.h>
 #include <openssl/sha.h>
@@ -396,7 +397,9 @@ public:
     ~Machine() { if (cpu_) uc_close(cpu_); }
 
     int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
-            const std::string& framebuffer) {
+            const std::string& framebuffer, const std::string& wav_directory) {
+        if (!wav_directory.empty())
+            wav_capture_ = std::make_unique<ef2000::WavCapture>(wav_directory);
         StartupWindow window(std::move(window_options));
         active_window_ = &window;
         const auto joystick = window.joystick_state();
@@ -432,6 +435,7 @@ public:
                 running = refresh(window, completed, "RUNNING GUEST STARTUP");
         }
         if (!framebuffer.empty()) save_framebuffer(framebuffer);
+        if (wav_capture_) wav_capture_->close();
         if (window.enabled()) {
             if (!running) return 0;
             while (refresh(window, completed, "GUEST STOPPED: " + status_ + " / CLOSE WINDOW TO EXIT")) {
@@ -449,12 +453,16 @@ public:
             std::cout << "audio: modeled_dma_blocks=" << audio_blocks_
                       << " captured_pcm_bytes=" << audio_bytes_
                       << " (SDL3 playback when a sound device is available)\n";
+        if (wav_capture_)
+            std::cout << "wav_capture: segments=" << wav_capture_->segments()
+                      << " pcm_bytes=" << wav_capture_->bytes() << '\n';
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
         return (status_ == "instruction_limit" || status_ == "guest_exit") ? 0 : 20;
     }
 
 private:
     StartupWindow* active_window_{};
+    std::unique_ptr<ef2000::WavCapture> wav_capture_;
     uc_engine* cpu_{};
     size_t image_size_;
     uint64_t interrupts_{};
@@ -1051,6 +1059,18 @@ private:
                                                        conventional, registers);
                 record_audio(result.audio_blocks);
                 write(DOS_BASE, result.memory.data(), result.memory.size());
+                // The original 16-bit driver installs hardware handlers by
+                // writing the physical interrupt vector table, bypassing
+                // protected-mode X-32 service 2505h. Synchronize only
+                // modified entries: untouched 2505h registrations need to
+                // survive even when no physical IVT entry was initialized.
+                for (size_t i = 0; i < real_vectors_.size(); ++i) {
+                    const size_t offset = i * sizeof(uint32_t);
+                    if (std::memcmp(conventional.data() + offset,
+                                    result.memory.data() + offset, sizeof(uint32_t)))
+                        std::memcpy(&real_vectors_[i], result.memory.data() + offset,
+                                    sizeof(uint32_t));
+                }
                 const auto& real = result.registers;
                 values.ax = real.ax; values.bx = real.bx; values.cx = real.cx;
                 values.dx = real.dx; values.si = real.si; values.di = real.di;
@@ -1103,6 +1123,9 @@ private:
         static constexpr char environment[] = "DID=.\0quick_flag=1\0\0\x01\0C:\\EF2000\\_EF2000.EXE\0";
         write(PSP_BASE + 0x80, command, sizeof(command) - 1);
         write(ENV_BASE, environment, sizeof(environment) - 1);
+        // The original SB16.DIG delay routine reads 0040:0063 and polls
+        // base+6 (VGA input-status 3DAh) for vertical retrace transitions.
+        write_value<uint16_t>(DOS_BASE + 0x463, 0x3d4);
         write_value<uint16_t>(0x120cc4, 0x1f);
         write_value<uint32_t>(0x120cc6, DOS_BASE);
         write_value<uint16_t>(0x132a24, 0x27);
@@ -1166,6 +1189,7 @@ private:
         audio_blocks_ += blocks.size();
         for (const auto& block : blocks) {
             audio_bytes_ += block.pcm.size();
+            if (wav_capture_) wav_capture_->push(block);
             if (active_window_) active_window_->play_audio(block);
         }
     }
@@ -1494,7 +1518,7 @@ void usage(const char* program) {
     std::cout << "Usage: " << program << " _EF2000.EXE [--instruction-limit N]"
               << " [--game-dir DIR] [--cd-dir DIR] [--overlay-dir DIR] [--windowed]"
               << " [--timer-instructions N]\n"
-              << "       [--sound off|sb16-probe|sb16-dma] (DMA models only; no audio output)\n"
+              << "       [--sound off|sb16-probe|sb16-dma] (SDL3 audio if available)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
               << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
               << "       --instruction-limit 0 means unlimited (window default)\n"
@@ -1503,6 +1527,7 @@ void usage(const char* program) {
               << "       [--joystick-event TICK:X:Y[:Z:W]:BUTTONS] (2/4 axes)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
+              << "       [--wav-capture DIR] (lossless guest SB16 DMA PCM WAV segments)\n"
               << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
               << "       Windowed default: $XDG_STATE_HOME/ef2000/unicorn/drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
@@ -1525,7 +1550,7 @@ int main(int argc, char** argv) {
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
         std::vector<JoystickEvent> joystick_events;
-        std::string framebuffer;
+        std::string framebuffer, wav_directory;
         for (int i = 1; i < argc; ++i) {
             if (!std::strcmp(argv[i], "--help") || !std::strcmp(argv[i], "-h")) {
                 usage(argv[0]); return 0;
@@ -1577,6 +1602,8 @@ int main(int argc, char** argv) {
                 self_test = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
                 framebuffer = argv[++i];
+            } else if (!std::strcmp(argv[i], "--wav-capture") && i + 1 < argc) {
+                wav_directory = argv[++i];
             } else if (!std::strcmp(argv[i], "--trace-interrupts")) {
                 trace_interrupts = true;
             } else if (!std::strcmp(argv[i], "--mouse-event") && i + 1 < argc) {
@@ -1639,14 +1666,17 @@ int main(int argc, char** argv) {
         }
         if (self_test) {
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
+            if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
             std::vector<uint8_t> image(0x1000);
             constexpr uint8_t guest[] = {0xb8, 0x0b, 0x35, 0x00, 0x00, 0xcd, 0x21,
                                           0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
             std::copy(std::begin(guest), std::end(guest), image.begin() + ENTRY);
             Machine machine(image, {}, {}, {});
-            return machine.run(10000, {}, 250000, "");
+            return machine.run(10000, {}, 250000, "", "");
         }
         if (path.empty()) { usage(argv[0]); return 2; }
+        if (!wav_directory.empty() && sound_mode != ef2000::SoundMode::Dma)
+            throw std::runtime_error("--wav-capture requires --sound sb16-dma");
         if (window.enabled && !explicit_limit) limit = 0;
         if (window.enabled && overlay_dir.empty()) {
             if (const char* xdg_state = std::getenv("XDG_STATE_HOME"); xdg_state && *xdg_state)
@@ -1666,7 +1696,7 @@ int main(int argc, char** argv) {
         if (cd_dir.empty()) cd_dir = game_dir;
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events));
-        return machine.run(limit, window, timer_interval, framebuffer);
+        return machine.run(limit, window, timer_interval, framebuffer, wav_directory);
     } catch (const std::exception& error) {
         std::cerr << "ef2000-unicorn-cpp: " << error.what() << '\n';
         return 1;

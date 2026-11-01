@@ -72,7 +72,7 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
   add_executable(ef2000-unicorn-cpp runtime/unicorn_cpp.cpp runtime/dos_drive.cpp
                                   runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp
                                   runtime/sound_blaster.cpp runtime/isa_audio.cpp
-                                  runtime/pcm_audio.cpp)
+                                  runtime/pcm_audio.cpp runtime/wav_capture.cpp)
   target_compile_features(ef2000-unicorn-cpp PRIVATE cxx_std_17)
   target_compile_options(ef2000-unicorn-cpp PRIVATE -Wall -Wextra -Werror)
   target_include_directories(ef2000-unicorn-cpp PRIVATE ${UNICORN_INCLUDE_DIR})
@@ -90,6 +90,15 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
   target_include_directories(ef2000-real-mode-test PRIVATE ${UNICORN_INCLUDE_DIR})
   target_link_libraries(ef2000-real-mode-test PRIVATE ${UNICORN_LIBRARY})
   add_test(NAME real-mode-cpu COMMAND ef2000-real-mode-test)
+  add_executable(ef2000-original-sb16-test tests/original_sound_driver_test.cpp
+                                           runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp
+                                           runtime/sound_blaster.cpp runtime/isa_audio.cpp)
+  target_compile_features(ef2000-original-sb16-test PRIVATE cxx_std_17)
+  target_compile_options(ef2000-original-sb16-test PRIVATE -Wall -Wextra -Werror)
+  target_include_directories(ef2000-original-sb16-test PRIVATE ${UNICORN_INCLUDE_DIR})
+  target_link_libraries(ef2000-original-sb16-test PRIVATE ${UNICORN_LIBRARY} OpenSSL::Crypto)
+  add_test(NAME original-sb16 COMMAND ef2000-original-sb16-test)
+  set_tests_properties(original-sb16 PROPERTIES SKIP_REGULAR_EXPRESSION "original-sb16: skipped")
 else()
   message(STATUS "C++ Unicorn probe disabled (requires Unicorn and OpenSSL headers/libraries)")
 endif()
@@ -116,3 +125,7 @@ add_executable(ef2000-pcm-audio-test tests/pcm_audio_test.cpp runtime/pcm_audio.
 target_compile_features(ef2000-pcm-audio-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-pcm-audio-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME pcm-audio COMMAND ef2000-pcm-audio-test)
+add_executable(ef2000-wav-capture-test tests/wav_capture_test.cpp runtime/wav_capture.cpp)
+target_compile_features(ef2000-wav-capture-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-wav-capture-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME wav-capture COMMAND ef2000-wav-capture-test)

@@ -192,7 +192,9 @@ int main() {
         const double scheduled = background.next_audio_deadline();
         require(scheduled > 0 && !background.audio_service_due(scheduled - 0.5) &&
                 background.audio_service_due(scheduled), "audio background deadline");
-        const auto serviced = background.service_audio(scheduled, vectors, started.memory);
+        auto stale_vectors = vectors;
+        stale_vectors[0x0f] = 0;
+        const auto serviced = background.service_audio(scheduled, stale_vectors, started.memory);
         if (serviced.memory.size() != 0x100000 || serviced.memory[0x21200] != 1 ||
             serviced.audio_blocks.size() != 1 ||
             serviced.audio_blocks[0].pcm !=

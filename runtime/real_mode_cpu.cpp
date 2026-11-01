@@ -9,7 +9,9 @@
 #include <algorithm>
 #include <chrono>
 #include <cstring>
+#include <iomanip>
 #include <iterator>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -224,8 +226,24 @@ RealResult RealModeCpu::execute(uint32_t entry, const std::array<uint32_t, 256>&
     uint16_t result_cs{}, result_ip{};
     check(uc_reg_read(cpu_, UC_X86_REG_CS, &result_cs), "read driver CS");
     check(uc_reg_read(cpu_, UC_X86_REG_IP, &result_ip), "read driver IP");
-    if (result_cs != 0xf000 || result_ip != 0)
-        throw std::runtime_error("real-mode driver instruction/time limit reached");
+    if (result_cs != 0xf000 || result_ip != 0) {
+        uint16_t ss{}, sp{};
+        uint32_t ax{}, flags{};
+        check(uc_reg_read(cpu_, UC_X86_REG_SS, &ss), "read stalled driver SS");
+        check(uc_reg_read(cpu_, UC_X86_REG_SP, &sp), "read stalled driver SP");
+        check(uc_reg_read(cpu_, UC_X86_REG_EAX, &ax), "read stalled driver AX");
+        check(uc_reg_read(cpu_, UC_X86_REG_EFLAGS, &flags), "read stalled driver FLAGS");
+        std::ostringstream detail;
+        detail << "real-mode driver instruction/time limit reached at " << std::hex
+               << std::setfill('0') << std::setw(4) << result_cs << ':'
+               << std::setw(4) << result_ip << " SS:SP=" << ss << ':' << sp
+               << " AX=" << ax << " FLAGS=" << flags;
+        if (sound_mode_ == SoundMode::Dma)
+            detail << " PIC-mask=" << unsigned(sb16_dma_.pic().read(0x21))
+                   << " PIC-IRR=" << unsigned(sb16_dma_.pic().read(0x20))
+                   << " next-audio-deadline=" << std::dec << sb16_dma_.next_deadline();
+        throw std::runtime_error(detail.str());
+    }
 
     RealResult result;
     result.memory.resize(MEMORY_SIZE);
@@ -273,7 +291,19 @@ AudioServiceResult RealModeCpu::service_audio(
     const auto irq = sb16_dma_.pic().next_irq();
     if (irq) {
         const unsigned vector = *irq + 8;
-        const uint32_t target = vectors[vector];
+        // DOS drivers can rewrite the physical IVT directly. X-32's vector
+        // registry only sees requests issued through its 2505h service.
+        // Prefer the actual guest IVT and fall back to registered vectors.
+        auto live_vectors = vectors;
+        for (unsigned i = 0; i < live_vectors.size(); ++i) {
+            const size_t offset = i * 4;
+            const uint32_t direct = uint32_t(memory[offset]) |
+                                    (uint32_t(memory[offset + 1]) << 8) |
+                                    (uint32_t(memory[offset + 2]) << 16) |
+                                    (uint32_t(memory[offset + 3]) << 24);
+            if (direct) live_vectors[i] = direct;
+        }
+        const uint32_t target = live_vectors[vector];
         const uint32_t address = ((target >> 16) << 4) + (target & 0xffff);
         if (!target || address < 0x10000 || address >= 0x90000)
             throw std::runtime_error("uninstalled background audio IRQ vector " +
@@ -284,7 +314,7 @@ AudioServiceResult RealModeCpu::service_audio(
         // hardware frame and keep its conventional-memory side effects.
         RealRegisters regs;
         regs.flags = 0x2;
-        auto handled = execute(target, vectors, memory, regs);
+        auto handled = execute(target, live_vectors, memory, regs);
         result.memory = std::move(handled.memory);
         result.audio_blocks.insert(result.audio_blocks.end(),
                                    std::make_move_iterator(handled.audio_blocks.begin()),
