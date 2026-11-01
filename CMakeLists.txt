@@ -71,7 +71,8 @@ find_package(OpenSSL QUIET COMPONENTS Crypto)
 if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
   add_executable(ef2000-unicorn-cpp runtime/unicorn_cpp.cpp runtime/dos_drive.cpp
                                   runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp
-                                  runtime/sound_blaster.cpp runtime/isa_audio.cpp)
+                                  runtime/sound_blaster.cpp runtime/isa_audio.cpp
+                                  runtime/pcm_audio.cpp)
   target_compile_features(ef2000-unicorn-cpp PRIVATE cxx_std_17)
   target_compile_options(ef2000-unicorn-cpp PRIVATE -Wall -Wextra -Werror)
   target_include_directories(ef2000-unicorn-cpp PRIVATE ${UNICORN_INCLUDE_DIR})
@@ -111,3 +112,7 @@ add_executable(ef2000-sound-blaster-test tests/sound_blaster_test.cpp
 target_compile_features(ef2000-sound-blaster-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-sound-blaster-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME sound-blaster COMMAND ef2000-sound-blaster-test)
+add_executable(ef2000-pcm-audio-test tests/pcm_audio_test.cpp runtime/pcm_audio.cpp)
+target_compile_features(ef2000-pcm-audio-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-pcm-audio-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME pcm-audio COMMAND ef2000-pcm-audio-test)

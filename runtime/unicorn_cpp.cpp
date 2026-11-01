@@ -5,6 +5,7 @@
 // during the Python-to-C++ transition; unsupported guest calls stop explicitly.
 // The proprietary executable is read at runtime and is never linked in.
 #include "dos_drive.hpp"
+#include "pcm_audio.hpp"
 #include "real_mode_cpu.hpp"
 #include <unicorn/unicorn.h>
 #include <unicorn/x86.h>
@@ -17,6 +18,7 @@
 #include <array>
 #include <cctype>
 #include <chrono>
+#include <climits>
 #include <cstdint>
 #include <ctime>
 #include <deque>
@@ -110,6 +112,8 @@ public:
     }
     ~StartupWindow() {
 #ifdef EF_UNICORN_SDL3
+        if (audio_stream_) SDL_DestroyAudioStream(audio_stream_);
+        if (audio_initialized_) SDL_QuitSubSystem(SDL_INIT_AUDIO);
         if (joystick_) SDL_CloseJoystick(joystick_);
         if (texture_) SDL_DestroyTexture(texture_);
         if (renderer_) SDL_DestroyRenderer(renderer_);
@@ -127,6 +131,45 @@ public:
     bool should_present() const {
         return std::chrono::steady_clock::now() - last_present_ >=
                std::chrono::milliseconds(33);
+    }
+    void play_audio(const ef2000::AudioBlock& block) {
+#ifdef EF_UNICORN_SDL3
+        if (!enabled() || audio_disabled_) return;
+        const auto pcm = pcm_converter_.push(block);
+        if (pcm.interleaved.empty()) return;
+        const SDL_AudioSpec input{SDL_AUDIO_F32, 2, int(pcm.rate)};
+        if (!audio_stream_) {
+            if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+                std::cerr << "SDL3 audio unavailable: " << SDL_GetError() << '\n';
+                audio_disabled_ = true;
+                return;
+            }
+            audio_initialized_ = true;
+            audio_stream_ = SDL_OpenAudioDeviceStream(
+                SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &input, nullptr, nullptr);
+            if (!audio_stream_ || !SDL_ResumeAudioStreamDevice(audio_stream_)) {
+                std::cerr << "SDL3 sound device unavailable: " << SDL_GetError() << '\n';
+                if (audio_stream_) SDL_DestroyAudioStream(audio_stream_);
+                audio_stream_ = nullptr;
+                audio_disabled_ = true;
+                return;
+            }
+        }
+        if (!SDL_SetAudioStreamFormat(audio_stream_, &input, nullptr))
+            throw std::runtime_error(std::string("SDL3 input audio format: ") + SDL_GetError());
+        const int backlog = SDL_GetAudioStreamQueued(audio_stream_);
+        if (backlog < 0) throw std::runtime_error(std::string("SDL3 audio queue: ") + SDL_GetError());
+        if (backlog > 44100 * 2 * int(sizeof(float)) * 2 &&
+            !SDL_ClearAudioStream(audio_stream_))
+            throw std::runtime_error(std::string("SDL3 audio overflow: ") + SDL_GetError());
+        if (pcm.interleaved.size() > size_t(INT_MAX / sizeof(float)))
+            throw std::runtime_error("audio block too large for SDL3");
+        if (!SDL_PutAudioStreamData(audio_stream_, pcm.interleaved.data(),
+                                    int(pcm.interleaved.size() * sizeof(float))))
+            throw std::runtime_error(std::string("SDL3 audio playback: ") + SDL_GetError());
+#else
+        (void)block;
+#endif
     }
     std::vector<MouseEvent> take_mouse_events() {
         return std::exchange(pending_mouse_, {});
@@ -239,11 +282,14 @@ public:
     }
 private:
     WindowOptions options_;
+    ef2000::PcmConverter pcm_converter_;
     unsigned mouse_buttons_{};
     std::vector<MouseEvent> pending_mouse_;
     std::vector<KeyEvent> pending_keys_;
     std::chrono::steady_clock::time_point last_present_{};
 #ifdef EF_UNICORN_SDL3
+    SDL_AudioStream* audio_stream_{};
+    bool audio_initialized_{}, audio_disabled_{};
     SDL_FRect viewport(int width, int height) const {
         if (options_.aspect_ratio != "native" || width <= 0 || height <= 0)
             return {0, 0, 640, 480};
@@ -352,6 +398,7 @@ public:
     int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
             const std::string& framebuffer) {
         StartupWindow window(std::move(window_options));
+        active_window_ = &window;
         const auto joystick = window.joystick_state();
         if (joystick.count) set_joystick(joystick.count, joystick.axes, joystick.buttons);
         std::cout << "C++ X-32: original payload " << image_size_ << " bytes; "
@@ -400,12 +447,14 @@ public:
                   << std::dec << "\n";
         if (audio_blocks_)
             std::cout << "audio: modeled_dma_blocks=" << audio_blocks_
-                      << " captured_pcm_bytes=" << audio_bytes_ << " (no playback)\n";
+                      << " captured_pcm_bytes=" << audio_bytes_
+                      << " (SDL3 playback when a sound device is available)\n";
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
         return (status_ == "instruction_limit" || status_ == "guest_exit") ? 0 : 20;
     }
 
 private:
+    StartupWindow* active_window_{};
     uc_engine* cpu_{};
     size_t image_size_;
     uint64_t interrupts_{};
@@ -1000,8 +1049,7 @@ private:
             try {
                 const auto result = real_cpu_.execute(real_vectors_[vector], real_vectors_,
                                                        conventional, registers);
-                audio_blocks_ += result.audio_blocks.size();
-                for (const auto& block : result.audio_blocks) audio_bytes_ += block.pcm.size();
+                record_audio(result.audio_blocks);
                 write(DOS_BASE, result.memory.data(), result.memory.size());
                 const auto& real = result.registers;
                 values.ax = real.ax; values.bx = real.bx; values.cx = real.cx;
@@ -1114,11 +1162,36 @@ private:
         check(uc_reg_read(cpu_, UC_X86_REG_EIP, &ip), "read guest EIP");
         return ip;
     }
+    void record_audio(const std::vector<ef2000::AudioBlock>& blocks) {
+        audio_blocks_ += blocks.size();
+        for (const auto& block : blocks) {
+            audio_bytes_ += block.pcm.size();
+            if (active_window_) active_window_->play_audio(block);
+        }
+    }
+    void service_sound() {
+        const double now = std::chrono::duration<double>(
+            std::chrono::steady_clock::now().time_since_epoch()).count();
+        if (!real_cpu_.audio_service_due(now)) return;
+        try {
+            std::vector<uint8_t> memory(0x100000);
+            check(uc_mem_read(cpu_, DOS_BASE, memory.data(), memory.size()),
+                  "read DOS memory for background audio");
+            const auto result = real_cpu_.service_audio(now, real_vectors_, memory);
+            if (!result.memory.empty())
+                write(DOS_BASE, result.memory.data(), result.memory.size());
+            record_audio(result.audio_blocks);
+        } catch (const std::exception& error) {
+            fail(std::string("background SB16 DMA/IRQ: ") + error.what());
+        }
+    }
     void deliver_tick(uint32_t next_ip) {
         ++ticks_;
         scripted_mouse();
         scripted_keyboard();
         scripted_joystick();
+        service_sound();
+        if (status_ != "instruction_limit") return;
         bios_accumulator_ += pit_divisor_;
         if (bios_accumulator_ >= 65536) {
             uint32_t previous{};
