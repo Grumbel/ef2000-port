@@ -195,6 +195,9 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 # Sound-hardware discovery only; does not yet play digital audio
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-probe \
   --instruction-limit 100000000
+# Experimental DMA/PIC/IRQ emulation, still no SDL3 audio playback
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-dma \
+  --instruction-limit 100000000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
@@ -225,10 +228,17 @@ experimental `--sound sb16-probe` mode instead enables the original digital
 driver and models the measured SB16 reset/version/resource interface at
 port 220h, without enabling FM music. Reached DMA/PIC requests that have
 not yet been ported stop with a diagnostic; this mode does **not** play audio.
+The experimental `--sound sb16-dma` mode instead runs guest port I/O through
+native C++ 8237 DMA, 8259 PIC and SB16 DSP models. A synthetic 16-bit test
+program has programmed the sound hardware, transferred guest PCM, received
+IRQ7, acknowledged it from guest code and returned via `IRET`. Modeled DMA
+block and byte counts are reported at exit. SDL3 audio output, periodic
+sound servicing outside 16-bit calls and full original-driver verification
+are still missing.
 
 This is still an **experimental migration**, not yet a drop-in replacement
 for the Python app. Real SDL3 window/gamepad operation has not been exercised
-in this build environment, and native PCM playback, DMA/IRQ sound services,
+in this build environment, and native PCM playback, periodic audio servicing,
 additional DOS calls and
 extensive flight-control/playability validation remain open. The working
 Python backend remains available at `nix run .#unicorn` for comparison.

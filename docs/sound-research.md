@@ -205,3 +205,26 @@ real-mode SB16 `IN`/`OUT` discovery and the measured register responses. The
 original `SB16.DIG` binary was not present in the local reduced game-asset
 fixture for this validation, so the native C++ original-driver sound path
 still requires a full-installation integration test.
+
+### Native C++ DMA and interrupt modeling
+
+`--sound sb16-dma` adds 8237 DMA channel/page, address/count/flip-flop, mask,
+mode and auto-init handling, 8259 interrupt mask/request/in-service/EOI, and
+SB16 DSP rate, playback block, pause and resume commands. Sound device state
+is independent of SDL3: completed DMA blocks retain the exact original guest
+PCM, format, sample rate and mixer gains. The runner currently reports block
+and byte counts but does not output audio.
+
+`tests/isa_audio_test.cpp` verifies 8- and 16-bit DMA, page wrapping, reload
+and interrupt masking. `tests/sound_blaster_test.cpp` checks deterministic
+timed PCM completion, multi-block auto-initialization and IRQ acknowledgement
+against the Python reference. `tests/real_mode_cpu_test.cpp` additionally
+runs a synthetic *16-bit guest program*: it programs DMA/PIC/DSP using real
+`OUT` instructions, waits for completion, enters its own IRQ7 handler,
+acknowledges PIC/DSP and returns via `IRET`. This exercises native Unicorn
+I/O and interrupt injection without proprietary assets.
+
+Periodic DMA processing during protected-mode game execution and SDL3 output
+remain unfinished, so this is **not** yet a working original-game sound backend.
+The limited local EF2000 fixture exits from `--sound sb16-dma` with the game's
+"Keine Soundkarte gefunden" message because `SB16.DIG` is absent.
