@@ -87,34 +87,56 @@ image, not the on-disk DOS stub.
   `0xACFB8` dispatches the resulting control event.
 - An asset-backed move to mouse `(180,85)` after menu initialization produced
   software cursor `(179,84)` and hit control id 7. A left click registered
-  actions 25 (press), 9 (held), and 33 (release) for that same control. The
-  displayed menu nevertheless remained unchanged by the instruction budget.
-  A second press/release on the same control generated the same action sequence
-  again without transitioning to another screen.
+  actions 25 (press), 9 (held), and 33 (release) for that same control. This
+  coordinate is in the *window title bar*, not the menu icon's clickable body.
 - An earlier press during menu initialization instead entered a wait-for-release
   loop at `0xAC569`. A click probe must move and press *after* that handoff;
   an unchanged screenshot by itself does not identify the failing input stage.
-- The nested widget callback does execute: `0xF1A3F` calls `0xE1D14` with a
-  pressed flag of `0x10`. `--trace-mouse` records the subcontrol event mask,
-  callback address, and the associated parent-control activation attempts in
-  `mouse_gui.subcontrols` and `mouse_gui.activations`.
-- A press/release on *Schnelles Gefecht* (control 7, mouse `(180,85)`) and on
-  *Simulator* (control 8, mouse `(230,120)`) independently reached `0xE1D14`.
-  Both parent controls had status `0x07`, flags `0x6c`, and enabled byte zero.
-  The global activation checks at `0x41EDA8` and `0x41EDAA` were nonzero
-  (`7` and `8`). The callback tests parent status `& 0x06` and accepts only
-  `0` or `2`; status `7` yields `6`, so neither attempt reached the actual
-  activation function `0xA4B08`. The game remained in the original menu.
-- The original GUI script's `JumpToFront` handler at `0xF73A0` sets status bits
-  `0x06`, while the `Style` handler at `0xF73C0` clears those bits and sets
-  `0x02`. Whether an expected state change is missing in the emulated startup
-  or the click must target a different phase of the original menu is not yet
-  established. The observed status is a *guest* state, not an emulator-imposed
-  block; forcibly clearing it is not a validated fix.
+- The title-bar widget runs `0xF1A3F` → `0xE1D14` with a pressed flag of
+  `0x10`. The parent window's status `7` fails the focus/activation gate at
+  `0xA4B08`. *This is not the game menu action.* The original GUI resource
+  declares these windows with `nojump`; the separate `JumpToFront`/`Style`
+  handlers do not establish a missing state transition in the emulator.
+- The asset's `window arcade` starts at `(150,80)` with size `100×40`; its
+  `arcadesel` icon covers the window body below the title. A click at
+  `(165,110)` targets that icon, and release produces action `33`, nested
+  widget flag `0x20`. The low-level widget's callback at `+0x71` is zero,
+  but the game uses separate script masks for `select entering`, `unselect
+  leaving`, and `call release` (handlers `0xF6868`, `0xF74B4`, `0xF757C`).
+  The menu's event loop stops on release, and the original game begins
+  opening/loading `newgui03.lbm` for the next screen. Direct filename opens
+  return DOS error 2, then a successful 178,688-byte read from the archive
+  follows. A later click cannot be used to test a second menu action because
+  the game has already left that event loop.
+- The scripted `S` key also takes the screen-loading path; `Escape` opens the
+  original "Quit EF2000?" confirmation in the same menu. This establishes
+  that keyboard IRQ delivery, GUI command dispatch, and the game-data script
+  are functioning. A framebuffer exported while the next screen is loading
+  can still show the previous menu; verify the subsequent video handoff before
+  reporting navigation failure.
+- Extending the *Schnelles Gefecht* click replay to **230 million protected
+  instructions** completes the handoff: the guest renders the original 640×400
+  Quick Combat screen with difficulty choices, 12 mission buttons, overview,
+  high scores, and `Akzeptieren`. At 158–163 million instructions the screenshot
+  still showed the previous menu because the game was reading the next screen
+  from its archive. This is an instruction-budget artifact, not failed input.
+
+For a repeatable headless Quick Combat screenshot (replace the path with the
+original installation location):
+
+```sh
+python3 tools/unicorn_backend.py /path/to/_EF2000.EXE \
+  --game-dir /path/to --timer-instructions 100000 \
+  --instruction-limit 230000000 \
+  --mouse-event 1400:165:110:0 \
+  --mouse-event 1450:165:110:1 \
+  --mouse-event 1470:165:110:0 \
+  --framebuffer /tmp/ef2000-quick-combat.png \
+  --report /tmp/ef2000-quick-combat.json
+```
 
 These observations establish that the mouse driver, software cursor, control
-hit-test, GUI event dispatcher, and nested callback are connected. They **do
-not** yet validate execution of a menu action or flight transition. The
-top-level widget callback at `0xF1C58` is not used for these controls; follow
-the `JumpToFront`/`Style` control-state transitions before attributing the
-inactive menu to absent assets or changing the guest's status bytes.
+hit-test, GUI event dispatcher, scripted menu activation, and subsequent screen
+load are connected. They **do not** yet validate mission start or flight under
+Unicorn. Do not clear the guest's window-status bits to make clicks work: the
+actual menu icon is already dispatching its action.

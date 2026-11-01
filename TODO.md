@@ -67,11 +67,11 @@ Implemented and verified:
 6. Document data/mission discoveries separately under `docs/`, with fingerprints,
    offsets, reproducers, and observed/inferred status.
 7. Extend the portable Unicorn backend beyond the now-rendered 640×400 main
-   menu: clicks reach guest control hit-testing, event dispatch, and nested
-   widget callbacks, but the original activation gate rejects parent status
-   `7` on both *Schnelles Gefecht* and *Simulator*. Investigate the guest GUI
-   `JumpToFront`/`Style` transition that controls those status bits before
-   trying to activate a menu action or verify flight. Refine instruction-paced
+   menu: clicks on the body of *Schnelles Gefecht* trigger the game's script
+   and, with a 230-million-instruction budget, render the original 640×400
+   Quick Combat mission screen from its archive. Earlier clicks on the title
+   bar exercised only a separate window-management gate. Verify mission
+   selection and flight. Refine instruction-paced
    timers and VGA retrace pacing, and add a native Windows launcher. SDL3
    window behavior is currently checked with an injected display; real GUI
    tests must run in a private Xvfb instance.
