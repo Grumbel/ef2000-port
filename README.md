@@ -91,7 +91,7 @@ nix run . -- ../EF2000/c/EF2000/_EF2000.EXE \
 ```
 
 Python 3 is sufficient for the analysis tools. Direct startup development also
-requires GCC/binutils, Unicorn, and SDL2 (provided by `nix develop`); QEMU and
+requires GCC/binutils, Unicorn, and SDL3 (provided by `nix develop`); QEMU and
 DOSBox-X are used by comparison/reference tools:
 
 ```sh
@@ -103,6 +103,14 @@ EF2000_EXE=../EF2000/c/EF2000/_EF2000.EXE python3 -m unittest discover -s tests 
 # Execute original startup (x86-64 Linux, GCC/binutils; no 32-bit libc required):
 python3 tools/run_startup.py ../EF2000/c/EF2000/_EF2000.EXE --output local/startup-01
 ```
+
+The host window, joystick and PCM audio backends use SDL3 (3.2+), loaded with
+`ctypes`. `EF2000_SDL_LIBRARY` overrides the system SDL3 lookup; the Nix
+launcher and dev shell point it at nixpkgs' `sdl3`. Unlike the original SDL2
+port, window events use SDL3's typed structures, joystick selection enumerates
+instance IDs, and audio playback uses SDL3 audio streams. SDL3 migration does
+not change the Linux-specific original-code execution harness. **Native
+Windows builds remain a separate backend porting task**, not a flake output.
 
 Keep original executables and game data outside this repository. Put generated
 memory dumps, traces, and extracted images in ignored `local/` or `build/`.

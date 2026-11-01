@@ -26,7 +26,7 @@ nix develop -c env EF2000_EXE=../EF2000/c/EF2000/_EF2000.EXE \
 
 Direct execution inside `nix develop` uses `python3 tools/run_startup.py` with the
 same arguments. Outside that environment it needs Python, Unicorn, GCC/binutils,
-and an SDL2 library selected by `EF2000_SDL_LIBRARY` (or the system library lookup).
+and an SDL3 library selected by `EF2000_SDL_LIBRARY` (or the system library lookup).
 Native64 requires x86-64 Linux with `modify_ldt`; it needs no 32-bit libc.
 
 ## Native execution and memory

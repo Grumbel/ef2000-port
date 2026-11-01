@@ -17,7 +17,7 @@ for size in (16, 32, 48, 64, 128, 256):
                     '-i', str(source), '-vf', f'scale={size}:{size}:flags=lanczos',
                     '-frames:v', '1', str(target)], check=True)
 
-# SDL2's built-in BMP loader avoids adding SDL_image to the runtime dependencies.
+# SDL3's built-in BMP loader avoids adding SDL_image to the runtime dependencies.
 subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y',
                 '-i', str(source), '-vf', 'scale=32:32:flags=lanczos',
                 '-frames:v', '1', str(root / 'data/icons/ef2000.bmp')], check=True)

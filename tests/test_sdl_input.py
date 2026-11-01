@@ -12,19 +12,47 @@ from pathlib import Path
 from unittest.mock import patch
 import unittest
 
-from tools.display import Display
+from tools.display import (Display, Event, KEY_DOWN, KEY_UP, MOUSE_BUTTON_DOWN,
+                           WINDOW_FOCUS_GAINED, WINDOW_FOCUS_LOST)
 from tools.input_devices import HostInput
+
+
+class VirtualJoystickDesc(c.Structure):
+    _fields_ = [('version', c.c_uint32), ('type', c.c_uint16), ('padding', c.c_uint16),
+                ('vendor', c.c_uint16), ('product', c.c_uint16),
+                ('axes', c.c_uint16), ('buttons', c.c_uint16), ('balls', c.c_uint16),
+                ('hats', c.c_uint16), ('touchpads', c.c_uint16), ('sensors', c.c_uint16),
+                ('padding2', c.c_uint16 * 2), ('button_mask', c.c_uint32),
+                ('axis_mask', c.c_uint32), ('name', c.c_char_p),
+                ('touchpads_ptr', c.c_void_p), ('sensors_ptr', c.c_void_p),
+                ('userdata', c.c_void_p), ('callbacks', c.c_void_p * 8)]
 
 
 def virtual_api(sdl):
     for name, args, result in (
-        ('SDL_JoystickAttachVirtual', [c.c_int, c.c_int, c.c_int, c.c_int], c.c_int),
-        ('SDL_JoystickDetachVirtual', [c.c_int], c.c_int),
-        ('SDL_JoystickSetVirtualAxis', [c.c_void_p, c.c_int, c.c_int16], c.c_int),
-        ('SDL_JoystickSetVirtualButton', [c.c_void_p, c.c_int, c.c_uint8], c.c_int),
+        ('SDL_AttachVirtualJoystick', [c.POINTER(VirtualJoystickDesc)], c.c_uint32),
+        ('SDL_DetachVirtualJoystick', [c.c_uint32], c.c_bool),
+        ('SDL_SetJoystickVirtualAxis', [c.c_void_p, c.c_int, c.c_int16], c.c_bool),
+        ('SDL_SetJoystickVirtualButton', [c.c_void_p, c.c_int, c.c_bool], c.c_bool),
     ):
         getattr(sdl, name).argtypes = args
         getattr(sdl, name).restype = result
+
+
+def attach_virtual(sdl, axes=4, buttons=4, hats=0):
+    desc = VirtualJoystickDesc(version=c.sizeof(VirtualJoystickDesc), type=0,
+                               axes=axes, buttons=buttons, hats=hats,
+                               name=b'EF2000 test joystick')
+    return sdl.SDL_AttachVirtualJoystick(c.byref(desc))
+
+
+def device_index(sdl, identity):
+    count = c.c_int()
+    devices = sdl.SDL_GetJoysticks(c.byref(count))
+    try:
+        return next(index for index in range(count.value) if devices[index] == identity)
+    finally:
+        sdl.SDL_free(devices)
 
 
 @unittest.skipUnless(os.environ.get('EF2000_TEST_DISPLAY'), 'requires explicit private Xvfb display')
@@ -48,32 +76,30 @@ class SDLInputTests(unittest.TestCase):
             os.environ['DISPLAY'] = self.environment
 
     def event(self, kind, scan=0, key=0):
-        data = bytearray(64)
-        struct.pack_into('<I', data, 0, kind)
-        struct.pack_into('<ii', data, 16, scan, key)
-        self.push_event(data)
+        event = Event()
+        event.key.type, event.key.scan, event.key.key = kind, scan, key
+        self.push_event(event)
 
-    def push_event(self, data):
-        self.display.sdl.SDL_PushEvent.argtypes = [c.c_void_p]
-        self.assertEqual(self.display.sdl.SDL_PushEvent(c.create_string_buffer(bytes(data))), 1)
+    def push_event(self, event):
+        self.display.sdl.SDL_PushEvent.argtypes = [c.POINTER(Event)]
+        self.display.sdl.SDL_PushEvent.restype = c.c_bool
+        self.assertTrue(self.display.sdl.SDL_PushEvent(c.byref(event)))
 
     def focus_event(self, focused):
-        data = bytearray(64)
-        struct.pack_into('<I', data, 0, 0x200)
-        data[12] = 12 if focused else 13
-        self.push_event(data)
+        event = Event()
+        event.window.type = WINDOW_FOCUS_GAINED if focused else WINDOW_FOCUS_LOST
+        self.push_event(event)
 
     def click_event(self, button=1, x=200, y=200):
-        data = bytearray(64)
-        struct.pack_into('<I', data, 0, 0x401)
-        data[16] = button
-        struct.pack_into('<ii', data, 20, x, y)
-        self.push_event(data)
+        event = Event()
+        event.button.type, event.button.button = MOUSE_BUTTON_DOWN, button
+        event.button.x, event.button.y = x, y
+        self.push_event(event)
 
     def relative_mode(self):
-        self.display.sdl.SDL_GetRelativeMouseMode.argtypes = []
-        self.display.sdl.SDL_GetRelativeMouseMode.restype = c.c_int
-        return bool(self.display.sdl.SDL_GetRelativeMouseMode())
+        self.display.sdl.SDL_GetWindowRelativeMouseMode.argtypes = [c.c_void_p]
+        self.display.sdl.SDL_GetWindowRelativeMouseMode.restype = c.c_bool
+        return bool(self.display.sdl.SDL_GetWindowRelativeMouseMode(self.display.window))
 
     def test_capture_requires_click_and_never_returns_on_focus(self):
         self.focus_event(True)
@@ -101,15 +127,13 @@ class SDLInputTests(unittest.TestCase):
         self.click_event()
         self.display.poll(self.host)
         with patch('tools.display.time.monotonic', return_value=100):
-            self.event(0x300, 41, 27)
+            self.event(KEY_DOWN, 41, 27)
             self.display.poll(self.host)
         self.assertTrue(self.display.captured)
         with patch('tools.display.time.monotonic', return_value=102.9):
-            data = bytearray(64)
-            struct.pack_into('<I', data, 0, 0x300)
-            data[13] = 1
-            struct.pack_into('<ii', data, 16, 41, 27)
-            self.push_event(data)
+            event = Event()
+            event.key.type, event.key.scan, event.key.key, event.key.repeat = KEY_DOWN, 41, 27, True
+            self.push_event(event)
             self.display.poll(self.host)
         self.assertTrue(self.display.captured)
         with patch('tools.display.time.monotonic', return_value=103):
@@ -117,7 +141,7 @@ class SDLInputTests(unittest.TestCase):
         self.assertFalse(self.display.captured)
         self.assertFalse(self.relative_mode())
         self.assertIn(41, self.host.pressed_keys)  # Escape still reaches the game.
-        self.event(0x301, 41, 27)
+        self.event(KEY_UP, 41, 27)
         self.display.poll(self.host)
         self.assertNotIn(41, self.host.pressed_keys)
 
@@ -125,15 +149,15 @@ class SDLInputTests(unittest.TestCase):
         self.click_event()
         self.display.poll(self.host)
         with patch('tools.display.time.monotonic', return_value=10):
-            self.event(0x300, 41, 27)
+            self.event(KEY_DOWN, 41, 27)
             self.display.poll(self.host)
         with patch('tools.display.time.monotonic', return_value=11):
-            self.event(0x301, 41, 27)
+            self.event(KEY_UP, 41, 27)
             self.display.poll(self.host)
         with patch('tools.display.time.monotonic', return_value=20):
             self.display.poll(self.host)
         self.assertTrue(self.display.captured)
-        self.event(0x300, 41, 27)
+        self.event(KEY_DOWN, 41, 27)
         self.display.poll(self.host)
         self.focus_event(False)
         self.display.poll(self.host)
@@ -143,8 +167,8 @@ class SDLInputTests(unittest.TestCase):
     def test_activation_click_is_consumed_until_buttons_are_released(self):
         buttons = 1
         def mouse_state(x, y):
-            c.cast(x, c.POINTER(c.c_int))[0] = 0
-            c.cast(y, c.POINTER(c.c_int))[0] = 0
+            c.cast(x, c.POINTER(c.c_float))[0] = 0
+            c.cast(y, c.POINTER(c.c_float))[0] = 0
             return buttons
         with patch.object(self.display.sdl, 'SDL_GetRelativeMouseState', side_effect=mouse_state):
             self.click_event()
@@ -160,15 +184,12 @@ class SDLInputTests(unittest.TestCase):
             self.assertEqual(self.host.mouse_buttons, 1)
 
     def test_sdl_keyboard_events_and_focus_loss_release_held_keys(self):
-        self.event(0x300, 224, 0)
-        self.event(0x300, 82, 0)
-        self.event(0x301, 82, 0)
+        self.event(KEY_DOWN, 224, 0)
+        self.event(KEY_DOWN, 82, 0)
+        self.event(KEY_UP, 82, 0)
         self.display.poll(self.host)
         self.assertEqual(bytes(self.host.scan_queue), bytes.fromhex('1de048e0c8'))
-        data = bytearray(64)
-        struct.pack_into('<I', data, 0, 0x200)
-        data[12] = 13
-        self.display.sdl.SDL_PushEvent(c.create_string_buffer(bytes(data)))
+        self.focus_event(False)
         self.display.poll(self.host)
         self.assertEqual(bytes(self.host.scan_queue), bytes.fromhex('1de048e0c89d'))
         self.assertFalse(self.host.pressed_keys)
@@ -177,18 +198,18 @@ class SDLInputTests(unittest.TestCase):
     def test_virtual_joystick_axes_buttons_focus_and_hotplug(self):
         sdl = self.display.sdl
         virtual_api(sdl)
-        device = sdl.SDL_JoystickAttachVirtual(4, 4, 4, 0)
-        self.assertGreaterEqual(device, 0, sdl.SDL_GetError())
+        device = attach_virtual(sdl)
+        self.assertGreater(device, 0, sdl.SDL_GetError())
         try:
-            self.display.joystick_selection = str(device)
+            self.display.joystick_selection = str(device_index(sdl, device))
             self.display.poll_joystick(self.host)
             stick = self.display.joystick
             self.assertTrue(stick)
             values = [-32768, 0, 32767, -12345]
             for axis, value in enumerate(values):
-                self.assertEqual(sdl.SDL_JoystickSetVirtualAxis(stick, axis, value), 0)
-            self.assertEqual(sdl.SDL_JoystickSetVirtualButton(stick, 0, 1), 0)
-            self.assertEqual(sdl.SDL_JoystickSetVirtualButton(stick, 3, 1), 0)
+                self.assertTrue(sdl.SDL_SetJoystickVirtualAxis(stick, axis, value))
+            self.assertTrue(sdl.SDL_SetJoystickVirtualButton(stick, 0, 1))
+            self.assertTrue(sdl.SDL_SetJoystickVirtualButton(stick, 3, 1))
             self.display.poll_joystick(self.host)
             self.assertEqual(self.host.joystick_axes, values)
             self.assertEqual(self.host.joystick_buttons, 9)
@@ -209,7 +230,7 @@ class SDLInputTests(unittest.TestCase):
             self.assertEqual(self.host.joystick_axes, [0, 0, 0, 0])
             self.assertEqual(self.host.joystick_buttons, 0)
         finally:
-            self.assertEqual(sdl.SDL_JoystickDetachVirtual(device), 0)
+            self.assertTrue(sdl.SDL_DetachVirtualJoystick(device))
         self.display.poll_joystick(self.host)
         self.assertEqual(self.host.joystick_axes, [])
         self.assertEqual(self.host.joystick_buttons, 0)
@@ -217,22 +238,22 @@ class SDLInputTests(unittest.TestCase):
     def test_gamepad_overlay_navigation_repeat_and_button_isolation(self):
         sdl = self.display.sdl
         virtual_api(sdl)
-        device = sdl.SDL_JoystickAttachVirtual(4, 2, 8, 1)
-        self.assertGreaterEqual(device, 0)
+        device = attach_virtual(sdl, axes=2, buttons=8, hats=1)
+        self.assertGreater(device, 0)
         try:
-            self.display.joystick_selection = str(device)
+            self.display.joystick_selection = str(device_index(sdl, device))
             self.display.poll(self.host)
             stick = self.display.joystick
 
             def button(index, down):
-                self.assertEqual(sdl.SDL_JoystickSetVirtualButton(stick, index, down), 0)
+                self.assertTrue(sdl.SDL_SetJoystickVirtualButton(stick, index, down))
                 self.display.poll(self.host)
 
             button(7, 1)  # Start opens the overlay.
             self.assertTrue(self.display.menu.open)
             self.assertEqual(self.host.joystick_buttons, 0)
             button(7, 0)
-            sdl.SDL_JoystickSetVirtualAxis(stick, 1, 25000)
+            sdl.SDL_SetJoystickVirtualAxis(stick, 1, 25000)
             with patch('tools.display.time.monotonic', return_value=10):
                 self.display.poll(self.host)
             self.assertEqual(self.display.menu.selected, 1)
@@ -242,7 +263,7 @@ class SDLInputTests(unittest.TestCase):
             with patch('tools.display.time.monotonic', return_value=10.4):
                 self.display.poll(self.host)
             self.assertEqual(self.display.menu.selected, 2)
-            sdl.SDL_JoystickSetVirtualAxis(stick, 1, 0)
+            sdl.SDL_SetJoystickVirtualAxis(stick, 1, 0)
             self.display.poll(self.host)
             self.display.menu.selected = 4
             button(0, 1)  # A enters Save State.
@@ -259,31 +280,31 @@ class SDLInputTests(unittest.TestCase):
             self.assertEqual(self.host.joystick_buttons, 1)
             button(0, 0)
         finally:
-            sdl.SDL_JoystickDetachVirtual(device)
+            sdl.SDL_DetachVirtualJoystick(device)
 
 
     def test_second_joystick_selection_and_missing_device(self):
         sdl = self.display.sdl
         virtual_api(sdl)
-        devices = [sdl.SDL_JoystickAttachVirtual(4, 2, 2, 0) for _ in range(2)]
-        self.assertTrue(all(device >= 0 for device in devices))
+        devices = [attach_virtual(sdl, axes=2, buttons=2) for _ in range(2)]
+        self.assertTrue(all(device > 0 for device in devices))
         try:
-            self.display.joystick_selection = str(devices[1])
+            self.display.joystick_selection = str(device_index(sdl, devices[1]))
             self.display.poll_joystick(self.host)
             stick = self.display.joystick
             self.assertTrue(stick)
-            sdl.SDL_JoystickSetVirtualAxis(stick, 0, 18000)
-            sdl.SDL_JoystickSetVirtualButton(stick, 1, 1)
+            sdl.SDL_SetJoystickVirtualAxis(stick, 0, 18000)
+            sdl.SDL_SetJoystickVirtualButton(stick, 1, 1)
             self.display.poll_joystick(self.host)
             self.assertEqual(self.host.joystick_axes, [18000, 0])
             self.assertEqual(self.host.joystick_buttons, 2)
-            self.assertEqual(sdl.SDL_JoystickDetachVirtual(devices.pop()), 0)
+            self.assertTrue(sdl.SDL_DetachVirtualJoystick(devices.pop()))
             self.display.poll_joystick(self.host)
             self.assertEqual(self.host.joystick_axes, [])
             self.assertEqual(self.host.joystick_buttons, 0)
         finally:
             for device in reversed(devices):
-                sdl.SDL_JoystickDetachVirtual(device)
+                sdl.SDL_DetachVirtualJoystick(device)
 
     def test_supervisor_selects_automatic_controls_before_launch(self):
         from tools.real_mode import run
@@ -294,13 +315,13 @@ class SDLInputTests(unittest.TestCase):
             def __init__(self, **kwargs):
                 super().__init__(**kwargs)
                 virtual_api(self.sdl)
-                self.device = self.sdl.SDL_JoystickAttachVirtual(4, 4, 4, 0)
+                self.device = attach_virtual(self.sdl)
                 if kwargs.get('joystick') != 'off':
-                    self.joystick_selection = str(self.device)
+                    self.joystick_selection = str(device_index(self.sdl, self.device))
 
             def close(self):
                 if hasattr(self, 'device'):
-                    self.sdl.SDL_JoystickDetachVirtual(self.device)
+                    self.sdl.SDL_DetachVirtualJoystick(self.device)
                     del self.device
                 super().close()
 

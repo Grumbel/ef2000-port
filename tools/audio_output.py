@@ -15,74 +15,75 @@ import wave
 
 
 class AudioSpec(c.Structure):
-    _fields_ = [('freq', c.c_int), ('format', c.c_uint16), ('channels', c.c_uint8),
-                ('silence', c.c_uint8), ('samples', c.c_uint16), ('padding', c.c_uint16),
-                ('size', c.c_uint32), ('callback', c.c_void_p), ('userdata', c.c_void_p)]
+    _fields_ = [('format', c.c_uint32), ('channels', c.c_int), ('freq', c.c_int)]
 
 
 class AudioPlayback:
     def __init__(self, mixer=None):
         self.mixer = mixer
-        library = os.environ.get('EF2000_SDL_LIBRARY') or find_library('SDL2')
-        if not library:
-            raise ValueError('SDL2 audio unavailable')
-        self.sdl = c.CDLL(library)
-        signatures = {
-            'SDL_InitSubSystem': ([c.c_uint32], c.c_int),
-            'SDL_QuitSubSystem': ([c.c_uint32], None),
-            'SDL_GetError': ([], c.c_char_p),
-            'SDL_OpenAudioDevice': ([c.c_char_p, c.c_int, c.POINTER(AudioSpec), c.POINTER(AudioSpec), c.c_int], c.c_uint32),
-            'SDL_CloseAudioDevice': ([c.c_uint32], None),
-            'SDL_PauseAudioDevice': ([c.c_uint32, c.c_int], None),
-            'SDL_QueueAudio': ([c.c_uint32, c.c_void_p, c.c_uint32], c.c_int),
-            'SDL_GetQueuedAudioSize': ([c.c_uint32], c.c_uint32),
-            'SDL_ClearQueuedAudio': ([c.c_uint32], None),
-            'SDL_NewAudioStream': ([c.c_uint16, c.c_uint8, c.c_int, c.c_uint16, c.c_uint8, c.c_int], c.c_void_p),
-            'SDL_AudioStreamPut': ([c.c_void_p, c.c_void_p, c.c_int], c.c_int),
-            'SDL_AudioStreamAvailable': ([c.c_void_p], c.c_int),
-            'SDL_AudioStreamGet': ([c.c_void_p, c.c_void_p, c.c_int], c.c_int),
-            'SDL_FreeAudioStream': ([c.c_void_p], None),
-        }
-        for name, (args, result) in signatures.items():
-            getattr(self.sdl, name).argtypes = args
-            getattr(self.sdl, name).restype = result
+        if mixer is None:
+            library = os.environ.get('EF2000_SDL_LIBRARY') or find_library('SDL3')
+            if not library:
+                raise ValueError('SDL3 audio unavailable')
+            self.sdl = c.CDLL(library)
+            signatures = {
+                'SDL_InitSubSystem': ([c.c_uint32], c.c_bool),
+                'SDL_QuitSubSystem': ([c.c_uint32], None),
+                'SDL_GetError': ([], c.c_char_p),
+                'SDL_OpenAudioDeviceStream': ([c.c_uint32, c.POINTER(AudioSpec), c.c_void_p, c.c_void_p], c.c_void_p),
+                'SDL_ResumeAudioStreamDevice': ([c.c_void_p], c.c_bool),
+                'SDL_CreateAudioStream': ([c.POINTER(AudioSpec), c.POINTER(AudioSpec)], c.c_void_p),
+                'SDL_PutAudioStreamData': ([c.c_void_p, c.c_void_p, c.c_int], c.c_bool),
+                'SDL_GetAudioStreamAvailable': ([c.c_void_p], c.c_int),
+                'SDL_GetAudioStreamQueued': ([c.c_void_p], c.c_int),
+                'SDL_GetAudioStreamData': ([c.c_void_p, c.c_void_p, c.c_int], c.c_int),
+                'SDL_ClearAudioStream': ([c.c_void_p], c.c_bool),
+                'SDL_DestroyAudioStream': ([c.c_void_p], None),
+            }
+            for name, (args, result) in signatures.items():
+                getattr(self.sdl, name).argtypes = args
+                getattr(self.sdl, name).restype = result
+        else:
+            self.sdl = mixer.output.sdl
         self.stream = None
         self.signature = None
         self.queued_bytes = 0
         self.last_peak = 0
         self.queue_resets = 0
-        if self.sdl.SDL_InitSubSystem(0x10) < 0:
-            raise ValueError(self.sdl.SDL_GetError().decode())
         if mixer is not None:
-            self.device = mixer.output.device
             mixer.buffers[self] = bytearray()
             return
-        desired = AudioSpec(freq=44100, format=0x8010, channels=2, samples=1024)
-        obtained = AudioSpec()
-        self.device = self.sdl.SDL_OpenAudioDevice(None, 0, c.byref(desired), c.byref(obtained), 0)
-        if not self.device:
+        if not self.sdl.SDL_InitSubSystem(0x10):
+            raise ValueError(self.sdl.SDL_GetError().decode())
+        desired = AudioSpec(format=0x8010, channels=2, freq=44100)
+        self.device_stream = self.sdl.SDL_OpenAudioDeviceStream(0xffffffff, c.byref(desired), None, None)
+        if not self.device_stream:
             self.sdl.SDL_QuitSubSystem(0x10)
             raise ValueError(self.sdl.SDL_GetError().decode())
-        self.sdl.SDL_PauseAudioDevice(self.device, 0)
+        if not self.sdl.SDL_ResumeAudioStreamDevice(self.device_stream):
+            self.sdl.SDL_DestroyAudioStream(self.device_stream)
+            self.sdl.SDL_QuitSubSystem(0x10)
+            raise ValueError(self.sdl.SDL_GetError().decode())
 
     def push(self, pcm, bits, channels, rate, generation, gains=(1, 1)):
         signature = bits, channels, rate, generation
         if signature != self.signature:
             if self.stream:
-                self.sdl.SDL_FreeAudioStream(self.stream)
-            self.stream = self.sdl.SDL_NewAudioStream(0x8010 if bits == 16 else 8, channels, rate,
-                                                    0x8010, 2, 44100)
+                self.sdl.SDL_DestroyAudioStream(self.stream)
+            source = AudioSpec(format=0x8010 if bits == 16 else 8, channels=channels, freq=rate)
+            target = AudioSpec(format=0x8010, channels=2, freq=44100)
+            self.stream = self.sdl.SDL_CreateAudioStream(c.byref(source), c.byref(target))
             if not self.stream:
                 raise ValueError(self.sdl.SDL_GetError().decode())
             self.signature = signature
-        if self.sdl.SDL_AudioStreamPut(self.stream, c.c_char_p(pcm), len(pcm)) < 0:
+        if not self.sdl.SDL_PutAudioStreamData(self.stream, c.c_char_p(pcm), len(pcm)):
             raise ValueError(self.sdl.SDL_GetError().decode())
-        available = self.sdl.SDL_AudioStreamAvailable(self.stream)
+        available = self.sdl.SDL_GetAudioStreamAvailable(self.stream)
         if available < 0:
             raise ValueError(self.sdl.SDL_GetError().decode())
         if available:
             data = c.create_string_buffer(available)
-            count = self.sdl.SDL_AudioStreamGet(self.stream, data, available)
+            count = self.sdl.SDL_GetAudioStreamData(self.stream, data, available)
             if count < 0:
                 raise ValueError(self.sdl.SDL_GetError().decode())
             converted = array('h', data.raw[:count])
@@ -99,20 +100,21 @@ class AudioPlayback:
                 self.mixer.buffers[self].extend(pcm_output)
                 self.queued_bytes += count
                 return
-            if self.sdl.SDL_GetQueuedAudioSize(self.device) > 44100 * 4 * 2:
-                self.sdl.SDL_ClearQueuedAudio(self.device)
+            if self.sdl.SDL_GetAudioStreamQueued(self.device_stream) > 44100 * 4 * 2:
+                if not self.sdl.SDL_ClearAudioStream(self.device_stream):
+                    raise ValueError(self.sdl.SDL_GetError().decode())
                 self.queue_resets += 1
-            if self.sdl.SDL_QueueAudio(self.device, c.c_char_p(pcm_output), count) < 0:
+            if not self.sdl.SDL_PutAudioStreamData(self.device_stream, c.c_char_p(pcm_output), count):
                 raise ValueError(self.sdl.SDL_GetError().decode())
             self.queued_bytes += count
 
     def close(self):
         if self.stream:
-            self.sdl.SDL_FreeAudioStream(self.stream)
+            self.sdl.SDL_DestroyAudioStream(self.stream)
             self.stream = None
         if self.mixer is None:
-            self.sdl.SDL_CloseAudioDevice(self.device)
-        self.sdl.SDL_QuitSubSystem(0x10)
+            self.sdl.SDL_DestroyAudioStream(self.device_stream)
+            self.sdl.SDL_QuitSubSystem(0x10)
 
 
 class AudioMixer:

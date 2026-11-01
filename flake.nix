@@ -88,7 +88,7 @@
             --add-flags "$out/libexec/ef2000/tools/run_startup.py" \
             --add-flags "--runtime-objects $out/lib/ef2000" \
             --set EF2000_VERSION ${lib.escapeShellArg version} \
-            --set EF2000_SDL_LIBRARY ${pkgs.SDL2}/lib/libSDL2.so \
+            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
             --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp" \
             --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.qemu-user ]}
           ln -s ef2000 "$out/bin/ef2000-startup"
@@ -174,7 +174,7 @@
         packages = [ python ] ++ devCommands ++ (with pkgs; [
           gcc binutils qemu-user dosbox-x cmake ninja gdb ccache
         ]);
-        EF2000_SDL_LIBRARY = "${pkgs.SDL2}/lib/libSDL2.so";
+        EF2000_SDL_LIBRARY = "${pkgs.sdl3}/lib/libSDL3.so";
         EF2000_VERSION = version;
         shellHook = ''
           export EF2000_SOURCE="$PWD"

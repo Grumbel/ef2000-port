@@ -8,7 +8,6 @@ import ctypes as c
 from ctypes.util import find_library
 import os
 from pathlib import Path
-import struct
 import time
 
 try:
@@ -21,10 +20,41 @@ class Rect(c.Structure):
     _fields_ = [(name, c.c_int) for name in ('x', 'y', 'w', 'h')]
 
 
-class RendererInfo(c.Structure):
-    _fields_ = [('name', c.c_char_p), ('flags', c.c_uint32),
-                ('count', c.c_uint32), ('formats', c.c_uint32 * 16),
-                ('max_width', c.c_int), ('max_height', c.c_int)]
+class FRect(c.Structure):
+    _fields_ = [('x', c.c_float), ('y', c.c_float), ('w', c.c_float), ('h', c.c_float)]
+
+
+class WindowEvent(c.Structure):
+    _fields_ = [('type', c.c_uint32), ('reserved', c.c_uint32), ('timestamp', c.c_uint64),
+                ('window_id', c.c_uint32), ('data1', c.c_int32), ('data2', c.c_int32)]
+
+
+class KeyEvent(c.Structure):
+    _fields_ = [('type', c.c_uint32), ('reserved', c.c_uint32), ('timestamp', c.c_uint64),
+                ('window_id', c.c_uint32), ('which', c.c_uint32), ('scan', c.c_int),
+                ('key', c.c_uint32), ('mod', c.c_uint16), ('raw', c.c_uint16),
+                ('down', c.c_bool), ('repeat', c.c_bool)]
+
+
+class MouseButtonEvent(c.Structure):
+    _fields_ = [('type', c.c_uint32), ('reserved', c.c_uint32), ('timestamp', c.c_uint64),
+                ('window_id', c.c_uint32), ('which', c.c_uint32), ('button', c.c_uint8),
+                ('down', c.c_bool), ('clicks', c.c_uint8), ('padding', c.c_uint8),
+                ('x', c.c_float), ('y', c.c_float)]
+
+
+class Event(c.Union):
+    _fields_ = [('type', c.c_uint32), ('window', WindowEvent), ('key', KeyEvent),
+                ('button', MouseButtonEvent), ('padding', c.c_uint8 * 128)]
+
+
+# SDL3 event constants, SDL_events.h (SDL 3.2+).
+WINDOW_RESIZED = 0x206
+WINDOW_FOCUS_GAINED = 0x20e
+WINDOW_FOCUS_LOST = 0x20f
+WINDOW_CLOSE_REQUESTED = 0x210
+KEY_DOWN, KEY_UP = 0x300, 0x301
+MOUSE_BUTTON_DOWN = 0x401
 
 
 ASPECT_RATIOS = ('4:3', 'native', 'stretch')
@@ -48,46 +78,47 @@ def viewport_rect(window_width, window_height, frame_width, frame_height, aspect
 class Display:
     def __init__(self, joystick='auto', joystick_axes=None, states=None, fullscreen=False,
                  geometry=(1280, 960), aspect_ratio='4:3', smooth_scaling=False):
-        library = os.environ.get('EF2000_SDL_LIBRARY') or find_library('SDL2')
+        library = os.environ.get('EF2000_SDL_LIBRARY') or find_library('SDL3')
         if not library:
-            raise ValueError('SDL2 unavailable; use the Nix launcher or --headless')
+            raise ValueError('SDL3 unavailable; use the Nix launcher or --headless')
         self.sdl = c.CDLL(library)
         signatures = {
-            'SDL_Init': ([c.c_uint32], c.c_int),
-            'SDL_NumJoysticks': ([], c.c_int),
-            'SDL_JoystickName': ([c.c_void_p], c.c_char_p),
-            'SDL_GetRendererInfo': ([c.c_void_p, c.c_void_p], c.c_int),
-            'SDL_JoystickOpen': ([c.c_int], c.c_void_p),
-            'SDL_JoystickClose': ([c.c_void_p], None),
-            'SDL_JoystickGetAttached': ([c.c_void_p], c.c_int),
-            'SDL_JoystickNumAxes': ([c.c_void_p], c.c_int),
-            'SDL_JoystickNumButtons': ([c.c_void_p], c.c_int),
-            'SDL_JoystickGetAxis': ([c.c_void_p, c.c_int], c.c_int16),
-            'SDL_JoystickGetButton': ([c.c_void_p, c.c_int], c.c_uint8),
-            'SDL_JoystickNumHats': ([c.c_void_p], c.c_int),
-            'SDL_JoystickGetHat': ([c.c_void_p, c.c_int], c.c_uint8),
-            'SDL_JoystickUpdate': ([], None),
+            'SDL_SetAppMetadata': ([c.c_char_p, c.c_char_p, c.c_char_p], c.c_bool),
+            'SDL_Init': ([c.c_uint32], c.c_bool),
+            'SDL_GetJoysticks': ([c.POINTER(c.c_int)], c.POINTER(c.c_uint32)),
+            'SDL_free': ([c.c_void_p], None),
+            'SDL_GetJoystickName': ([c.c_void_p], c.c_char_p),
+            'SDL_OpenJoystick': ([c.c_uint32], c.c_void_p),
+            'SDL_CloseJoystick': ([c.c_void_p], None),
+            'SDL_JoystickConnected': ([c.c_void_p], c.c_bool),
+            'SDL_GetNumJoystickAxes': ([c.c_void_p], c.c_int),
+            'SDL_GetNumJoystickButtons': ([c.c_void_p], c.c_int),
+            'SDL_GetJoystickAxis': ([c.c_void_p, c.c_int], c.c_int16),
+            'SDL_GetJoystickButton': ([c.c_void_p, c.c_int], c.c_bool),
+            'SDL_GetNumJoystickHats': ([c.c_void_p], c.c_int),
+            'SDL_GetJoystickHat': ([c.c_void_p, c.c_int], c.c_uint8),
+            'SDL_UpdateJoysticks': ([], None),
             'SDL_GetError': ([], c.c_char_p),
-            'SDL_SetHint': ([c.c_char_p, c.c_char_p], c.c_int),
-            'SDL_RWFromFile': ([c.c_char_p, c.c_char_p], c.c_void_p),
-            'SDL_LoadBMP_RW': ([c.c_void_p, c.c_int], c.c_void_p),
-            'SDL_SetWindowIcon': ([c.c_void_p, c.c_void_p], None),
-            'SDL_FreeSurface': ([c.c_void_p], None),
-            'SDL_CreateWindow': ([c.c_char_p, c.c_int, c.c_int, c.c_int, c.c_int, c.c_uint32], c.c_void_p),
-            'SDL_SetWindowFullscreen': ([c.c_void_p, c.c_uint32], c.c_int),
+            'SDL_IOFromFile': ([c.c_char_p, c.c_char_p], c.c_void_p),
+            'SDL_LoadBMP_IO': ([c.c_void_p, c.c_bool], c.c_void_p),
+            'SDL_SetWindowIcon': ([c.c_void_p, c.c_void_p], c.c_bool),
+            'SDL_DestroySurface': ([c.c_void_p], None),
+            'SDL_CreateWindow': ([c.c_char_p, c.c_int, c.c_int, c.c_uint64], c.c_void_p),
+            'SDL_SetWindowFullscreen': ([c.c_void_p, c.c_bool], c.c_bool),
             'SDL_GetCurrentVideoDriver': ([], c.c_char_p),
-            'SDL_SetWindowTitle': ([c.c_void_p, c.c_char_p], None),
-            'SDL_CreateRenderer': ([c.c_void_p, c.c_int, c.c_uint32], c.c_void_p),
+            'SDL_SetWindowTitle': ([c.c_void_p, c.c_char_p], c.c_bool),
+            'SDL_CreateRenderer': ([c.c_void_p, c.c_char_p], c.c_void_p),
+            'SDL_GetRendererName': ([c.c_void_p], c.c_char_p),
             'SDL_CreateTexture': ([c.c_void_p, c.c_uint32, c.c_int, c.c_int, c.c_int], c.c_void_p),
-            'SDL_UpdateTexture': ([c.c_void_p, c.c_void_p, c.c_void_p, c.c_int], c.c_int),
-            'SDL_RenderClear': ([c.c_void_p], c.c_int),
-            'SDL_RenderCopy': ([c.c_void_p, c.c_void_p, c.c_void_p, c.POINTER(Rect)], c.c_int),
-            'SDL_RenderPresent': ([c.c_void_p], None),
-            'SDL_PollEvent': ([c.c_void_p], c.c_int),
-            'SDL_GetWindowSize': ([c.c_void_p, c.POINTER(c.c_int), c.POINTER(c.c_int)], None),
-            'SDL_SetRelativeMouseMode': ([c.c_int], c.c_int),
-            'SDL_GetRelativeMouseState': ([c.POINTER(c.c_int), c.POINTER(c.c_int)], c.c_uint32),
-            'SDL_GetMouseState': ([c.POINTER(c.c_int), c.POINTER(c.c_int)], c.c_uint32),
+            'SDL_SetTextureScaleMode': ([c.c_void_p, c.c_int], c.c_bool),
+            'SDL_UpdateTexture': ([c.c_void_p, c.c_void_p, c.c_void_p, c.c_int], c.c_bool),
+            'SDL_RenderClear': ([c.c_void_p], c.c_bool),
+            'SDL_RenderTexture': ([c.c_void_p, c.c_void_p, c.c_void_p, c.POINTER(FRect)], c.c_bool),
+            'SDL_RenderPresent': ([c.c_void_p], c.c_bool),
+            'SDL_PollEvent': ([c.POINTER(Event)], c.c_bool),
+            'SDL_GetWindowSize': ([c.c_void_p, c.POINTER(c.c_int), c.POINTER(c.c_int)], c.c_bool),
+            'SDL_SetWindowRelativeMouseMode': ([c.c_void_p, c.c_bool], c.c_bool),
+            'SDL_GetRelativeMouseState': ([c.POINTER(c.c_float), c.POINTER(c.c_float)], c.c_uint32),
             'SDL_DestroyTexture': ([c.c_void_p], None),
             'SDL_DestroyRenderer': ([c.c_void_p], None),
             'SDL_DestroyWindow': ([c.c_void_p], None),
@@ -96,22 +127,20 @@ class Display:
         for name, (arguments, result) in signatures.items():
             function = getattr(self.sdl, name)
             function.argtypes, function.restype = arguments, result
-        if self.sdl.SDL_Init(0x220) < 0:
+        if not self.sdl.SDL_SetAppMetadata(b'EF2000', os.environ.get('EF2000_VERSION', '0.1.0-dev').encode(), b'ef2000'):
             raise ValueError(self.sdl.SDL_GetError().decode())
-        for name, value in ((b'SDL_VIDEO_X11_WMCLASS', b'ef2000'),
-                            (b'SDL_VIDEO_WAYLAND_WMCLASS', b'ef2000'),
-                            (b'SDL_APP_NAME', b'EF2000')):
-            self.sdl.SDL_SetHint(name, value)
+        if not self.sdl.SDL_Init(0x220):
+            raise ValueError(self.sdl.SDL_GetError().decode())
         self.window = self.sdl.SDL_CreateWindow(b'EF2000 - F10 menu - click to capture mouse',
-                                                0x2fff0000, 0x2fff0000, *geometry, 0x24)
+                                                *geometry, 0x20)
         icon = os.environ.get('EF2000_ICON_BMP') or str(Path(__file__).resolve().parent.parent / 'data/icons/ef2000.bmp')
         if self.window and os.path.isfile(icon):
-            stream = self.sdl.SDL_RWFromFile(os.fsencode(icon), b'rb')
-            surface = self.sdl.SDL_LoadBMP_RW(stream, 1) if stream else None
+            stream = self.sdl.SDL_IOFromFile(os.fsencode(icon), b'rb')
+            surface = self.sdl.SDL_LoadBMP_IO(stream, True) if stream else None
             if surface:
                 self.sdl.SDL_SetWindowIcon(self.window, surface)
-                self.sdl.SDL_FreeSurface(surface)
-        self.renderer = self.sdl.SDL_CreateRenderer(self.window, -1, 0) if self.window else None
+                self.sdl.SDL_DestroySurface(surface)
+        self.renderer = self.sdl.SDL_CreateRenderer(self.window, None) if self.window else None
         self.texture = None
         self.dimensions = None
         self.fullscreen = False
@@ -148,15 +177,14 @@ class Display:
             raise ValueError(error)
 
         print(f'video: SDL driver={self.sdl.SDL_GetCurrentVideoDriver().decode()}; window={geometry[0]}x{geometry[1]}', flush=True)
-        info = RendererInfo()
-        if self.sdl.SDL_GetRendererInfo(self.renderer, c.byref(info)) == 0:
-            print(f'renderer: {info.name.decode()}; flags=0x{info.flags:x}; max texture={info.max_width}x{info.max_height}', flush=True)
+        name = self.sdl.SDL_GetRendererName(self.renderer)
+        print(f'renderer: {name.decode() if name else "unknown"}', flush=True)
         if fullscreen:
             self.toggle_fullscreen()
 
     def toggle_fullscreen(self):
         enabled = not self.fullscreen
-        if self.sdl.SDL_SetWindowFullscreen(self.window, 0x1001 if enabled else 0) < 0:
+        if not self.sdl.SDL_SetWindowFullscreen(self.window, enabled):
             print(f'window: fullscreen failed: {self.sdl.SDL_GetError().decode()}', flush=True)
             return
         self.fullscreen = enabled
@@ -168,15 +196,12 @@ class Display:
 
     def toggle_smooth_scaling(self):
         self.smooth_scaling = not self.smooth_scaling
-        # SDL's scale-quality hint is applied when the texture is created.
-        if self.texture:
-            self.sdl.SDL_DestroyTexture(self.texture)
-            self.texture = None
-            self.dimensions = None
+        if self.texture and not self.sdl.SDL_SetTextureScaleMode(self.texture, int(self.smooth_scaling)):
+            raise ValueError(self.sdl.SDL_GetError().decode())
         print(f'video: smooth scaling={self.smooth_scaling}', flush=True)
 
     def capture(self, enabled):
-        if self.sdl.SDL_SetRelativeMouseMode(int(enabled)) < 0:
+        if not self.sdl.SDL_SetWindowRelativeMouseMode(self.window, enabled):
             raise ValueError(self.sdl.SDL_GetError().decode())
         self.captured = enabled
         self.mouse_armed = False
@@ -184,42 +209,40 @@ class Display:
                  else b'EF2000 - F10 menu - click to capture mouse')
         self.sdl.SDL_SetWindowTitle(self.window, title)
         self.motion_remainder = [0.0, 0.0]
-        x, y = c.c_int(), c.c_int()
+        x, y = c.c_float(), c.c_float()
         self.sdl.SDL_GetRelativeMouseState(c.byref(x), c.byref(y))
 
     def poll(self, engine):
-        event = (c.c_ubyte * 64)()
+        event = Event()
         while self.sdl.SDL_PollEvent(c.byref(event)):
-            data = bytes(event)
-            kind = struct.unpack_from('<I', data)[0]
-            if kind == 0x100:
+            kind = event.type
+            if kind in (0x100, WINDOW_CLOSE_REQUESTED):
                 self.closed = True
-            elif kind == 0x200 and data[12] == 6:
-                width, height = struct.unpack_from('<ii', data, 16)
-                print(f'window: size={width}x{height}', flush=True)
-            elif kind == 0x200 and data[12] == 12:
+            elif kind == WINDOW_RESIZED:
+                print(f'window: size={event.window.data1}x{event.window.data2}', flush=True)
+            elif kind == WINDOW_FOCUS_GAINED:
                 self.focused = True
-            elif kind == 0x200 and data[12] == 13:
+            elif kind == WINDOW_FOCUS_LOST:
                 self.focused = False
                 self.escape_pressed_at = None
                 engine.release_keys()
                 self.capture(False)
-            elif kind == 0x401 and data[16] == 1 and self.menu.open:
-                self.menu.click(*struct.unpack_from('<ii', data, 20))
-            elif kind == 0x401 and data[16] == 1 and not self.captured:
-                x, y = struct.unpack_from('<ii', data, 20)
+            elif kind == MOUSE_BUTTON_DOWN and event.button.button == 1 and self.menu.open:
+                self.menu.click(event.button.x, event.button.y)
+            elif kind == MOUSE_BUTTON_DOWN and event.button.button == 1 and not self.captured:
+                x, y = event.button.x, event.button.y
                 if (self.rect.x <= x < self.rect.x + self.rect.w and
                         self.rect.y <= y < self.rect.y + self.rect.h):
                     self.capture(True)
-            elif kind in (0x300, 0x301):
-                scan, key = struct.unpack_from('<ii', data, 16)
-                down = kind == 0x300
+            elif kind in (KEY_DOWN, KEY_UP):
+                scan, key = event.key.scan, event.key.key
+                down = kind == KEY_DOWN
                 if scan == 67:  # F10 is reserved for the host overlay.
-                    if down and not data[13]:
+                    if down and not event.key.repeat:
                         self.menu.toggle(engine)
                     continue
                 if scan == 68:  # F11
-                    if down and not data[13]:
+                    if down and not event.key.repeat:
                         self.toggle_fullscreen()
                     continue
                 if self.menu.open:
@@ -229,9 +252,9 @@ class Display:
                 if scan == 41:
                     if kind == 0x301:
                         self.escape_pressed_at = None
-                    elif not data[13] and self.escape_pressed_at is None:
+                    elif not event.key.repeat and self.escape_pressed_at is None:
                         self.escape_pressed_at = time.monotonic()
-                engine.key_event(scan, key, kind == 0x300, repeat=bool(data[13]))
+                engine.key_event(scan, key, down, repeat=event.key.repeat)
         if (self.captured and self.escape_pressed_at is not None and
                 time.monotonic() - self.escape_pressed_at >= 3):
             self.capture(False)
@@ -247,7 +270,7 @@ class Display:
             engine.joystick_buttons = 0
             engine.joystick_axes = []
             return
-        x, y = c.c_int(), c.c_int()
+        x, y = c.c_float(), c.c_float()
         buttons = self.sdl.SDL_GetRelativeMouseState(c.byref(x), c.byref(y))
         if self.captured:
             width, height = self.dimensions or (640, 400)
@@ -270,32 +293,40 @@ class Display:
             engine.mouse_buttons = 0
 
     def poll_joystick(self, engine):
-        if self.joystick and not self.sdl.SDL_JoystickGetAttached(self.joystick):
-            self.sdl.SDL_JoystickClose(self.joystick)
+        if self.joystick and not self.sdl.SDL_JoystickConnected(self.joystick):
+            self.sdl.SDL_CloseJoystick(self.joystick)
             self.joystick = None
             print('input: joystick disconnected', flush=True)
         index = 0 if self.joystick_selection == 'auto' else (
             int(self.joystick_selection) if self.joystick_selection != 'off' else -1)
-        if not self.joystick and 0 <= index < self.sdl.SDL_NumJoysticks():
-            self.joystick = self.sdl.SDL_JoystickOpen(index)
-            if self.joystick:
-                print(f'input: joystick {index}: {self.sdl.SDL_JoystickName(self.joystick).decode()}', flush=True)
-            else:
-                print(f'input: joystick {index} unavailable: {self.sdl.SDL_GetError().decode()}', flush=True)
+        if not self.joystick and index >= 0:
+            count = c.c_int()
+            devices = self.sdl.SDL_GetJoysticks(c.byref(count))
+            try:
+                if devices and index < count.value:
+                    self.joystick = self.sdl.SDL_OpenJoystick(devices[index])
+                    if self.joystick:
+                        name = self.sdl.SDL_GetJoystickName(self.joystick)
+                        print(f'input: joystick {index}: {name.decode() if name else "unknown"}', flush=True)
+                    else:
+                        print(f'input: joystick {index} unavailable: {self.sdl.SDL_GetError().decode()}', flush=True)
+            finally:
+                if devices:
+                    self.sdl.SDL_free(devices)
         engine.joystick_axes = []
         engine.joystick_buttons = 0
         if self.joystick:
-            self.sdl.SDL_JoystickUpdate()
-            count = self.sdl.SDL_JoystickNumAxes(self.joystick)
+            self.sdl.SDL_UpdateJoysticks()
+            count = self.sdl.SDL_GetNumJoystickAxes(self.joystick)
             for axis, sign in self.joystick_axes:
                 if axis >= count:
                     break
-                value = self.sdl.SDL_JoystickGetAxis(self.joystick, axis) if self.focused else 0
+                value = self.sdl.SDL_GetJoystickAxis(self.joystick, axis) if self.focused else 0
                 engine.joystick_axes.append(max(-32768, min(32767, value * sign)))
             if self.focused:
                 engine.joystick_buttons = sum(
-                    bool(self.sdl.SDL_JoystickGetButton(self.joystick, button)) << button
-                    for button in range(min(4, self.sdl.SDL_JoystickNumButtons(self.joystick))))
+                    bool(self.sdl.SDL_GetJoystickButton(self.joystick, button)) << button
+                    for button in range(min(4, self.sdl.SDL_GetNumJoystickButtons(self.joystick))))
 
         sample = (self.focused, tuple(engine.joystick_axes), engine.joystick_buttons)
         now = time.monotonic()
@@ -310,14 +341,14 @@ class Display:
         buttons = 0
         direction = 0
         if self.joystick and self.focused:
-            count = self.sdl.SDL_JoystickNumButtons(self.joystick)
+            count = self.sdl.SDL_GetNumJoystickButtons(self.joystick)
             buttons = sum(1 << button for button in (0, 1, 7)
-                          if button < count and self.sdl.SDL_JoystickGetButton(self.joystick, button))
-            if self.sdl.SDL_JoystickNumHats(self.joystick):
-                hat = self.sdl.SDL_JoystickGetHat(self.joystick, 0)
+                          if button < count and self.sdl.SDL_GetJoystickButton(self.joystick, button))
+            if self.sdl.SDL_GetNumJoystickHats(self.joystick):
+                hat = self.sdl.SDL_GetJoystickHat(self.joystick, 0)
                 direction = -1 if hat & 1 else (1 if hat & 4 else 0)
-            if not direction and self.sdl.SDL_JoystickNumAxes(self.joystick) > 1:
-                axis = self.sdl.SDL_JoystickGetAxis(self.joystick, 1)
+            if not direction and self.sdl.SDL_GetNumJoystickAxes(self.joystick) > 1:
+                axis = self.sdl.SDL_GetJoystickAxis(self.joystick, 1)
                 direction = -1 if axis < -16000 else (1 if axis > 16000 else 0)
 
         pressed = buttons & ~self.menu_buttons
@@ -356,9 +387,10 @@ class Display:
         if self.dimensions != (width, height):
             if self.texture:
                 self.sdl.SDL_DestroyTexture(self.texture)
-            self.sdl.SDL_SetHint(b'SDL_RENDER_SCALE_QUALITY', b'linear' if self.smooth_scaling else b'nearest')
             self.texture = self.sdl.SDL_CreateTexture(self.renderer, 0x17101803, 1, width, height)
             if not self.texture:
+                raise ValueError(self.sdl.SDL_GetError().decode())
+            if not self.sdl.SDL_SetTextureScaleMode(self.texture, int(self.smooth_scaling)):
                 raise ValueError(self.sdl.SDL_GetError().decode())
             self.dimensions = (width, height)
             print(f'graphics: framebuffer={width}x{height}; indexed 8-bit', flush=True)
@@ -368,15 +400,17 @@ class Display:
         window_width, window_height = c.c_int(), c.c_int()
         self.sdl.SDL_GetWindowSize(self.window, c.byref(window_width), c.byref(window_height))
         self.rect = viewport_rect(window_width.value, window_height.value, width, height, self.aspect_ratio)
-        if self.sdl.SDL_UpdateTexture(self.texture, None, c.c_char_p(pixels), width * 3) < 0:
+        if not self.sdl.SDL_UpdateTexture(self.texture, None, c.c_char_p(pixels), width * 3):
             raise ValueError(self.sdl.SDL_GetError().decode())
         self.sdl.SDL_RenderClear(self.renderer)
-        self.sdl.SDL_RenderCopy(self.renderer, self.texture, None, c.byref(self.rect))
+        target = FRect(self.rect.x, self.rect.y, self.rect.w, self.rect.h)
+        if not self.sdl.SDL_RenderTexture(self.renderer, self.texture, None, c.byref(target)):
+            raise ValueError(self.sdl.SDL_GetError().decode())
         self.sdl.SDL_RenderPresent(self.renderer)
 
     def close(self):
         if self.joystick:
-            self.sdl.SDL_JoystickClose(self.joystick)
+            self.sdl.SDL_CloseJoystick(self.joystick)
             self.joystick = None
         if self.texture:
             self.sdl.SDL_DestroyTexture(self.texture)

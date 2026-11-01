@@ -25,18 +25,18 @@ class DisplayScalingTests(unittest.TestCase):
             viewport_rect(1280, 960, 640, 400, 'invalid')
 
     def test_live_menu_toggles_and_texture_recreation(self):
-        destroyed = []
+        scale_modes = []
         display = Display.__new__(Display)
-        display.sdl = SimpleNamespace(SDL_DestroyTexture=destroyed.append)
+        display.sdl = SimpleNamespace(SDL_SetTextureScaleMode=lambda texture, mode: scale_modes.append((texture, mode)) or True)
         display.texture = 123
         display.dimensions = (640, 400)
         display.smooth_scaling = False
         display.aspect_ratio = '4:3'
         display.toggle_smooth_scaling()
         self.assertTrue(display.smooth_scaling)
-        self.assertEqual(destroyed, [123])
-        self.assertIsNone(display.texture)
-        self.assertIsNone(display.dimensions)
+        self.assertEqual(scale_modes, [(123, 1)])
+        self.assertEqual(display.texture, 123)
+        self.assertEqual(display.dimensions, (640, 400))
         for expected in ('native', 'stretch', '4:3'):
             display.cycle_aspect_ratio()
             self.assertEqual(display.aspect_ratio, expected)
