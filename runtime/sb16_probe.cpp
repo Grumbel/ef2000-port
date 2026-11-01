@@ -21,7 +21,7 @@ uint8_t SB16Probe::read(uint16_t port) {
         case 0x225:
             if (mixer_index_ == 0x80) return 0x04; // IRQ7
             if (mixer_index_ == 0x81) return 0x22; // DMA1 / DMA5
-            if (mixer_index_ == 0x82) return 0x20; // No DSP interrupt pending
+            if (mixer_index_ == 0x82) return irq_status_;
             break;
     }
     throw std::runtime_error("unsupported SB16 probe IN port " + std::to_string(port) +

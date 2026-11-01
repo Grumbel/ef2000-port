@@ -16,9 +16,10 @@ public:
     uint8_t read(uint16_t port);
     void write(uint16_t port, uint8_t value);
 
-private:
+protected:
     bool reset_asserted_{}, initialized_{};
     uint8_t mixer_index_{};
+    uint8_t irq_status_{0x20};
     std::deque<uint8_t> data_;
 };
 
