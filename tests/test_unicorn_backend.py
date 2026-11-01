@@ -8,7 +8,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, KeyboardController, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
                                    serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
@@ -24,6 +24,22 @@ class UnicornStartupServiceTests(unittest.TestCase):
         writes = dict(startup_memory(bytes(ENTRY + 2)))
         self.assertEqual(writes[0x02000080], b'\x04 gui\r')
         self.assertIn(b'DID=.\0quick_flag=1\0\0', writes[0x02001000])
+
+    def test_keyboard_ack_handshake_matches_linux_harness(self):
+        keyboard = KeyboardController()
+        self.assertEqual((keyboard.read(0x64), keyboard.read(0x60)), (0, 0))
+        keyboard.write(0x60, 0xed)
+        self.assertEqual(keyboard.read(0x64), 1)
+        self.assertEqual(keyboard.read(0x60), 0xfa)
+        self.assertEqual((keyboard.read(0x64), keyboard.read(0x60)), (0, 0))
+        with self.assertRaises(UnsupportedGuestOperation):
+            keyboard.write(0x64, 0x20)
+
+    def test_invalid_x32_residency_subfunction_sets_carry(self):
+        result = serve_startup_int21(0x2f0, dict(self.regs, ax=0x252b, bx=0x61))
+        self.assertEqual(result['ax'], 0xa5a5a5a5)
+        self.assertEqual(result['flags'] & 1, 1)
+        self.assertEqual(result['bx'], 0x61)
 
     def test_first_x32_selector_limit_request(self):
         result = serve_startup_int21(0x93, self.regs)
@@ -133,6 +149,16 @@ class UnicornStartupServiceTests(unittest.TestCase):
 
 
 class DosFileBridgeTests(unittest.TestCase):
+    def test_virtual_sound_config_preserves_original_asset(self):
+        from tools.unicorn_files import DosFiles
+        with tempfile.TemporaryDirectory() as tmp:
+            config = Path(tmp) / 'EF2000.CFG'
+            config.write_bytes(b'MUSIC=1,127\r\nSOUNDFX=1,127\r\n')
+            files = DosFiles(tmp, config_data=b'MUSIC=0,127\r\nSOUNDFX=0,127\r\n')
+            handle = files.open('EF2000.CFG')
+            self.assertEqual(files.read(handle, 40), b'MUSIC=0,127\r\nSOUNDFX=0,127\r\n')
+            self.assertEqual(config.read_bytes(), b'MUSIC=1,127\r\nSOUNDFX=1,127\r\n')
+
     def test_case_insensitive_read_seek_close(self):
         with tempfile.TemporaryDirectory() as tmp:
             subdir = Path(tmp) / 'Data'
@@ -145,6 +171,9 @@ class DosFileBridgeTests(unittest.TestCase):
             self.assertEqual(files.seek(handle, -2, 2), 8)
             self.assertEqual(files.read(handle, 4), b'89')
             files.close(handle)
+            dotted = files.open('.\\data\\.\\TEST.DAT')
+            self.assertEqual(files.read(dotted, 3), b'012')
+            files.close(dotted)
             with self.assertRaises(DosFileError) as failure:
                 files.read(handle, 1)
             self.assertEqual(failure.exception.code, 6)
@@ -269,7 +298,8 @@ class UnicornGuestTests(unittest.TestCase):
         from tools.extract_image import extract
         image = extract(Path(os.environ['EF2000_EXE']).read_bytes())[1]['payload.bin']
         result = run(image, instruction_limit=30000000, game_dir=os.environ['EF2000_DATA_DIR'])
-        self.assertEqual(result['status'], 'instruction_limit')
+        self.assertEqual(result['status'], 'unsupported_interface')
+        self.assertIn('AX=2511', result['detail'])
         self.assertTrue(any('did1st.dat' == e.get('filename') for e in result['events']))
         self.assertTrue(any('did.dat' in e.get('filename', '') for e in result['events']))
         self.assertTrue(any('TACTCOM' in line for line in result['console']))
@@ -285,6 +315,7 @@ class UnicornGuestTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as overlay:
             result = run(image, game_dir=os.environ['EF2000_DATA_DIR'],
                          cd_dir=os.environ['EF2000_CD_DIR'], overlay_dir=overlay)
-            self.assertEqual(result['status'], 'instruction_limit')
+            self.assertEqual(result['status'], 'unsupported_interface')
+            self.assertIn('AX=2511', result['detail'])
             self.assertFalse(any('VIEWS2.DAT' in line.upper() for line in result['console']))
             self.assertFalse((Path(os.environ['EF2000_DATA_DIR']) / 'TACTCOM.$$$').exists())

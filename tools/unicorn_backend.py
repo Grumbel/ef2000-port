@@ -36,6 +36,33 @@ class UnsupportedGuestOperation(RuntimeError):
     """Guest requested an interface not implemented by this probe."""
 
 
+class KeyboardController:
+    """Keyboard-controller ACK handshake already modeled by the Linux harness.
+
+    This covers writing a device command to port 60h, polling port 64h for
+    output data, and consuming the device's 0FAh acknowledgement. It does not
+    claim to emulate controller commands or queued physical key events.
+    """
+
+    def __init__(self):
+        self.ack_pending = False
+
+    def read(self, port):
+        if port == 0x64:
+            return int(self.ack_pending)
+        if port == 0x60:
+            if self.ack_pending:
+                self.ack_pending = False
+                return 0xfa
+            return 0
+        raise UnsupportedGuestOperation(f'unsupported keyboard port {port:04x}')
+
+    def write(self, port, value):
+        if port != 0x60:
+            raise UnsupportedGuestOperation(f'unsupported keyboard controller command {value:02x}')
+        self.ack_pending = True
+
+
 def startup_memory(image):
     """Return the memory writes performed by the Linux harness before entry."""
     if len(image) > IMAGE_SIZE or len(image) < ENTRY + 2:
@@ -84,6 +111,12 @@ def serve_startup_int21(ip, regs, allocation=None, now=None):
     elif ax == 0x350b and allocation is not None:
         result['ax'] = min(allocation.heap_ceiling - allocation.heap_end, allocation.free_bytes)
         result['flags'] &= ~1
+    elif ax == 0x252b and (((regs['bx'] >> 8) & 255) not in (5, 6) or
+                           (regs['bx'] & 255) > 1):
+        # The original extender rejects invalid residency subfunctions with
+        # a sentinel EAX and carry. The native Linux bridge preserves this.
+        result['ax'] = 0xa5a5a5a5
+        result['flags'] |= 1
     elif (regs['ax'] >> 8) & 0xff == 0x2c:
         # DOSBox-X returns UTC wall-clock HH:MM:SS:hundredths in CX/DX.
         now = now or datetime.now(timezone.utc)
@@ -230,10 +263,12 @@ class X32Selectors:
 
 
 def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
-        cd_dir=None, overlay_dir=None, ring3=True):
+        cd_dir=None, overlay_dir=None, ring3=True, sound='off'):
     """Run a bounded original-code probe; report the last guest interaction."""
     if instruction_limit <= 0:
         raise ValueError('instruction limit must be positive')
+    if sound not in ('off', 'original'):
+        raise ValueError('sound must be off or original')
     from unicorn import Uc, UcError, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR, UC_HOOK_CODE, UC_HOOK_INSN
     from unicorn.x86_const import (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
         UC_X86_REG_EDX, UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EBP,
@@ -315,8 +350,24 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     allocation = Allocation()
     vectors = VectorState(0x2f if ring3 else 0x2c)
     conventional = ConventionalMemory()
-    files = DosFiles(game_dir, cd_dir, overlay_dir) if game_dir is not None else None
+    files = None
+    if game_dir is not None:
+        files = DosFiles(game_dir, cd_dir, overlay_dir)
+        if sound == 'off':
+            try:
+                original_config = DosFiles._walk(files.root, ['EF2000.CFG'], must_exist=True)
+                lines = original_config.read_bytes().splitlines()
+            except (DosFileError, OSError):
+                # Keep an explicit DOS missing-file result for absent configs.
+                pass
+            else:
+                changes = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127',
+                           b'SPEECH': b'0', b'VRHELMET': b'0'}
+                files.config_data = b'\r\n'.join(
+                    line.split(b'=', 1)[0] + b'=' + changes[line.split(b'=', 1)[0]]
+                    if line.split(b'=', 1)[0] in changes else line for line in lines) + b'\r\n'
     selectors = X32Selectors(cpu, table_base + 0x100)
+    keyboard = KeyboardController()
     result = {'status': 'instruction_limit', 'events': events, 'console': [],
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
               'privileged_ops': [],
@@ -467,7 +518,9 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     def port_in(uc, port, size, _user):
         if port == 0x201:  # No physical joystick: all four buttons/axes high.
             return (1 << (size * 8)) - 1
-        if port in (0x60, 0x64, 0x61, 0x3da):
+        if port in (0x60, 0x64):
+            return keyboard.read(port)
+        if port in (0x61, 0x3da):
             return 0
         result['status'] = 'unsupported_interface'
         result['detail'] = f'unsupported IN port={port:04x}'
@@ -475,7 +528,10 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
         return 0
 
     def port_out(uc, port, size, value, _user):
-        if port in (0x20, 0x43, 0x40, 0x61, 0x60, 0x3c8, 0x3c9, 0x201):
+        if port == 0x60:
+            keyboard.write(port, value)
+            return
+        if port in (0x20, 0x43, 0x40, 0x61, 0x3c8, 0x3c9, 0x201):
             return
         result['status'] = 'unsupported_interface'
         result['detail'] = f'unsupported OUT port={port:04x} value={value:08x}'
@@ -515,6 +571,8 @@ def main():
     parser.add_argument('--cd-dir', type=Path, help='read-only root for absolute DOS CD paths')
     parser.add_argument('--overlay-dir', type=Path,
                         help='separate writable DOS drive overlay (original game data remains read-only)')
+    parser.add_argument('--sound', choices=['off', 'original'], default='off',
+                        help='disable original sound drivers in a virtual config copy (default: off)')
     parser.add_argument('--flat-ring0', action='store_true', help='diagnose legacy flat ring-0 CPU model')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
     args = parser.parse_args()
@@ -526,7 +584,7 @@ def main():
     report = run(images['payload.bin'], args.instruction_limit,
                  game_dir=args.game_dir or args.executable.parent,
                  cd_dir=args.cd_dir, overlay_dir=args.overlay_dir,
-                 ring3=not args.flat_ring0)
+                 ring3=not args.flat_ring0, sound=args.sound)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')
