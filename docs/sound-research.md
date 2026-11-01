@@ -180,3 +180,28 @@ The correction was verified in original-code SB16 startup (both calibration
 ranges remain nonzero) and private-Xvfb flight with a virtual joystick: roll
 changes reached native game-port X counts 64/110/64, and button 0 reached the
 game. The physical Xbox controller still needs a user retest.
+
+## Native C++ Unicorn sound-driver bring-up
+
+`ef2000-unicorn-cpp` now has a separate 16-bit Unicorn CPU for original DOS
+driver vectors installed through the X-32 `2505h` service. The guest's 1 MiB
+conventional memory and real-mode interrupt vector table are copied into the
+driver CPU; modified memory, segment registers and general-purpose registers
+are returned to the protected-mode caller after a real far `IRET`.
+Unimplemented nested real-mode interrupts and ports stop with a diagnostic;
+both instruction count and wall-clock execution are bounded.
+
+`--sound sb16-probe` enables the existing digital-sound configuration while
+disabling FM music, and exposes the measured SB16 DSP reset handshake,
+version 4.5 and IRQ7/DMA1/DMA5 mixer resources at base 220h. If the original
+driver reaches unsupported PIC/DMA ports or DSP playback commands, execution
+stops with a diagnostic. This does **not** demonstrate an
+original driver self-test pass, PCM capture or SDL audio playback. The default
+remains `--sound off` and retains the previously validated menu/flight path.
+
+Standalone C++ tests exercise the 16-bit `IRET` path, DOS memory exchange,
+driver code-cache invalidation, bounded execution, nested interrupt failures,
+real-mode SB16 `IN`/`OUT` discovery and the measured register responses. The
+original `SB16.DIG` binary was not present in the local reduced game-asset
+fixture for this validation, so the native C++ original-driver sound path
+still requires a full-installation integration test.

@@ -165,10 +165,14 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
   keyboard controller/gameport, with headless scripted input options.
 - [x] Add a separately rooted C++ DOS copy-on-write overlay for file create,
   open, read, write, seek, flush and close; reject writes without an overlay.
+- [x] Add an independent C++ Unicorn real-mode CPU with bounded driver calls,
+  shared DOS memory/register exchange and opt-in SB16 discovery ports; validate
+  synthetic guest IN/OUT and interrupt/timeout failures.
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
   on actual hardware, and test sustained interactive mission execution.
-- [ ] Implement native guest audio and remaining operating-system services
-  before switching `.#unicorn` over to C++.
+- [ ] Port the original SB16 DMA/PIC/IRQ and SDL3 PCM playback to native C++,
+  then remaining operating-system services before switching `.#unicorn` over
+  to C++.
 `--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA
 model and plays captured digital PCM through SDL. FM music remains disabled in
 this mode. Failed real-mode calls retain mutated memory and CPU state for

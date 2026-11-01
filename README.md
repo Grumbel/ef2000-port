@@ -178,7 +178,9 @@ selector calls, protected vector services and IRQ0/PIT timing, keyboard
 controller and BIOS key services, read-only DOS asset access, the mouse and
 gameport joystick, and the banked VBE BIOS. It also provides a separate
 copy-on-write DOS drive for game-created files; original assets are never
-opened for writing. It captures and displays the
+opened for writing. Installed original 16-bit DOS drivers can now run through
+a separate bounded C++ Unicorn CPU, with their register and conventional-memory
+changes returned to the X-32 caller. It captures and displays the
 original VGA 320×200 and VBE 640×400 palette-indexed frames through SDL3.
 The initial black screen is replaced with a startup message until the guest
 draws its own graphics. Windowed runs have no instruction limit unless one is
@@ -190,6 +192,9 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --geometry 1280x960 \
   --aspect-ratio 4:3 --smooth-scaling
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
   --overlay-dir /path/to/writable-state
+# Sound-hardware discovery only; does not yet play digital audio
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-probe \
+  --instruction-limit 100000000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
@@ -215,11 +220,16 @@ to keep a specific profile or use it in headless mode; without an overlay,
 headless mode rejects all guest writes. The overlay preserves the source
 installation, supports files created by the game, and copies original files
 only when opened for writing. `EF2000.CFG` is still adjusted virtually for
-the connected controls and to disable unimplemented sound devices.
+the connected controls and to disable unimplemented sound devices. The
+experimental `--sound sb16-probe` mode instead enables the original digital
+driver and models the measured SB16 reset/version/resource interface at
+port 220h, without enabling FM music. Reached DMA/PIC requests that have
+not yet been ported stop with a diagnostic; this mode does **not** play audio.
 
 This is still an **experimental migration**, not yet a drop-in replacement
 for the Python app. Real SDL3 window/gamepad operation has not been exercised
-in this build environment, and native sound, additional DOS calls and
+in this build environment, and native PCM playback, DMA/IRQ sound services,
+additional DOS calls and
 extensive flight-control/playability validation remain open. The working
 Python backend remains available at `nix run .#unicorn` for comparison.
 
