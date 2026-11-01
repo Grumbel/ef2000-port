@@ -316,8 +316,66 @@ full-X deflection `[127, 64]` (axis mask `3`, no pressed buttons). All
 604 decompressor checks passed, and the guest remained in VGA mode `0x13`.
 This directly confirms delivery and consumption of the scripted stick
 position by the *original executable*, but **not** an observable aircraft
-control response. Diagnosing its joystick-control interpretation and the
-physics/camera effect remains open.
+control response with a **two-axis** virtual stick.
+
+### Four-axis original flight-control response
+
+The supplied configuration selects `STICK=15` and records four analog
+calibration ranges. To isolate the effect of a full X-axis deflection, two
+otherwise identical original-asset replays used a **four-axis** joystick
+advertised from startup. Both followed the same Quick Combat / Rookie /
+mission 01 mouse script with `--timer-instructions 100000`,
+`--fast-execution` and `--instruction-limit 920000000`:
+
+```sh
+# Control case: all axes centered through the entire flight.
+--joystick-event 0:0:0:0:0:0
+
+# Deflection case: replace the above with both of these events.
+--joystick-event 0:0:0:0:0:0 \
+--joystick-event 8300:32767:0:0:0:0
+
+# Both runs also sampled the same instruction counts.
+--framebuffer-sample 820000000 --framebuffer-sample 850000000 \
+--framebuffer-sample 900000000 --framebuffer-sample 920000000
+```
+
+The **820M pre-input frames were byte-identical** (SHA-256
+`ffe192751250f081cf26b1e1aee10baae7d818a40c92c8289aec1ed0053088d4`).
+The first post-input 850M checkpoint diverged, and by **920M the deflection
+case showed a markedly banked cockpit and terrain**, while the four-axis
+centered control remained nearly level. Both runs delivered **9,089 IRQ0**
+interrupts. The control sampled `[64,64,64,64]` on all 43 game-port charges;
+the deflection replay sampled `[127,64,64,64]` on 13 charges between ticks
+8365 and 9140 (mask `15`). This is direct causal evidence of **original
+flight roll response** through Unicorn's 201h port. It does not yet establish
+pitch, throttle, mission completion, or gameplay timing equivalence. Unlike
+four-axis mode, the earlier two-axis mask `3` was insufficient to demonstrate
+a visible roll response; do not assume the two-axis form works for this
+specific original `STICK` setting.
+
+### Optional batched execution
+
+`--fast-execution` allows Unicorn to execute up to `--fast-quantum N`
+(default 1,000) original instructions per batch, instead of calling Python
+for every guest instruction. The scheduler clips batches at PIT, SDL3 window,
+progress, register-sampling and framebuffer-sampling boundaries. When a
+protected IRQ is injected, a temporary Unicorn code hook at its original
+return IP detects the post-IRETD stack restoration and clears the pending
+PIC acknowledgment. That hook is detached when the interrupt completes;
+without it, a coarse batch could miss the return and permanently mask IRQ0.
+
+On the supplied original archive, the same 10M startup probe took **5.56 s**
+in the original instruction-hook mode and **0.39 s** with batching; the
+returned DOS event transcript and final registers matched. A longer scripted
+Quick Combat / Rookie / mission 01 replay reached the **320×200 cockpit** at
+820M instructions in **38.3 s**, with **8,090** protected IRQ0 deliveries
+and 8,089 completed interrupt returns. Exact mode remains the reference.
+The batched mode reports `execution.timing_approximate=true`: events inside
+a batch are not assigned exact instruction counts, and interrupt handling can
+be delayed by up to the quantum. It deliberately refuses `--trace-mouse` and
+`--trace-decompress`, which rely on instruction-level observation. It is an
+**opt-in performance experiment**, not yet the normal game frontend default.
 
 To reproduce the mission-start integrity check, run the same timed actions
 against the original, unmodified game files:

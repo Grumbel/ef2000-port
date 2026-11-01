@@ -71,6 +71,11 @@ Implemented and verified:
    launcher with standard game-data discovery and a writable state overlay;
    it is **not** the native default or a real-time-playability claim.
    `.#unicorn-probe` remains the bounded headless diagnostic interface. The
+   opt-in `--fast-execution` batches guest instructions and watches IRQ return
+   addresses; an 820M original-asset run reaches the cockpit in 38.3 seconds
+   with 8,090 IRQ0 deliveries. Its intra-batch timing is approximate; compare
+   gameplay/checksums against exact instruction-hook replays before enabling
+   it by default.
    original 640×400 main menu, Quick Combat selection, Rookie difficulty,
    mission 01, and Accept all work through original GUI scripts. The previous
    asset-decompressor `INT 3` failure was fixed by moving DOS RAM, PSP and
@@ -87,11 +92,15 @@ Implemented and verified:
    native joystick input; synthetic OUT/IN 201h tests verify deflection and
    buttons. An original-asset scripted X-axis replay reaches 950M with all
    604 LZ checks intact, but the flight frames do not establish a visible
-   roll response. A 900M follow-up captured **120,120 original IN 201h reads**,
+   roll response **when only two axes are advertised**. A 900M follow-up
+   captured **120,120 original IN 201h reads**,
    **30 OUT 201h writes**, and eight charge cycles sampling the full-X axis
-   count `127`. Input reaches the original flight code, but its control
-   response is not yet verified. Next, validate **joystick pitch/roll/throttle
-   effects**, longer flight, and exit/pause handling, refine
+   count `127`. A matched **four-axis** centered/deflected pair now verifies
+   **original flight roll response**: identical 820M pre-input frames,
+   divergent 850M frames, and a clear bank at 920M under sustained X
+   deflection, with all 9,089 IRQ0 deliveries matched between runs. Next,
+   validate **pitch/throttle effects and two-axis compatibility**, longer
+   flight, and exit/pause handling, refine
    instruction-paced timers and VGA retrace pacing, and add the native Windows
    launcher. SDL3 window behavior is currently checked with an injected
    display; real GUI tests must run in a private Xvfb instance.

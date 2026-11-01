@@ -153,6 +153,17 @@ The windowed app defaults to 100,000 guest instructions per PIT tick (matching
 the original-asset flight replays); the bounded probe retains 250,000.
 Expect lengthy startup and slower-than-real-time gameplay: this is still a
 development interface, not the default native backend.
+For faster experimental execution, pass `--fast-execution` to either Unicorn
+command. This batches up to 1,000 guest instructions between host callbacks,
+while keeping PIT, window, progress and framebuffer sampling boundaries.
+Interrupt returns are watched at their original resume addresses. The
+timing within each batch is approximate; exact mouse/decompressor tracing
+cannot be combined with the fast mode. Use `--fast-quantum N` to reduce the
+maximum timing error, or omit `--fast-execution` for the original instruction-
+hook runner. A 10M-instruction original-asset benchmark dropped from 5.56 to
+0.39 seconds, and a 820M replay reached the flight cockpit in 38.3 seconds,
+with 8,090 protected timer interrupts. Neither result establishes real-time
+playability or equivalence of every flight simulation state.
 
 The original `_EF2000.EXE` remains external and SHA-256 validated. The probe
 implements the observed X-32 stack/heap allocator, selectors, vector services,
@@ -200,7 +211,11 @@ signed SDL axis values (-32768..32767) and a four-bit button mask; optionally
 use `TICK:X:Y:Z:W:BUTTONS` for four axes. A scripted joystick is advertised
 from startup with centered axes, and the virtual config selects joystick
 controls and substitutes `JOY_FACTOR=100` for the original zero calibration
-factor. Original files are never modified.
+factor. Original files are never modified. For the supplied `STICK=15`
+configuration, the four-axis form is needed for the verified in-flight roll
+response: `--joystick-event 0:0:0:0:0:0` followed by
+`--joystick-event 8300:32767:0:0:0:0` visibly banks the original cockpit,
+whereas a two-axis-only replay did not show an unambiguous response.
 The report records video-mode changes with instruction counts, making splash
 and VBE transitions traceable. `--sample-instructions N` adds periodic guest
 instruction-pointer/register snapshots, and DOS file requests report the
