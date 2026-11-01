@@ -30,6 +30,24 @@ nix run . -- ../EF2000/c/EF2000/_EF2000.EXE --output local/nix-startup
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB
 ```
 
+Inside `nix develop`, the following development commands are available:
+
+```sh
+ef2000-configure                       # CMake/Ninja Debug harness in /tmp/ef2000-build
+ef2000-build                           # configure if missing/moved, then build objects
+ef2000-run /path/to/_EF2000.EXE        # build then run, using those objects
+ef2000-run-gdb /path/to/_EF2000.EXE    # build then debug the launched process
+nix develop -c ef2000-build            # also works without an interactive shell
+```
+
+`EF2000_SOURCE` defaults to the directory from which `nix develop` was entered;
+`EF2000_BUILD_DIR` defaults to `/tmp/ef2000-build` and can be overridden.
+`CMAKE_BUILD_TYPE` defaults to `Debug`; the regular Nix package remains optimized.
+The configure command creates a `build` symlink if that path is free. The
+development build contains freestanding native64/QEMU harness objects, not the
+copyrighted game executable. Run commands accept the same game and diagnostic
+options as `ef2000`; they build the harness before launching it.
+
 `packages.default` and `packages.ef2000` are the same native package;
 `packages.ef2000-startup` is an alias. `apps.default` and `apps.ef2000` run the
 `ef2000` launcher; `ef2000-startup` remains available as a command alias.

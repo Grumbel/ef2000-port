@@ -21,7 +21,7 @@
       source = lib.fileset.toSource {
         root = ./.;
         fileset = lib.fileset.unions [
-          ./runtime ./tools ./tests ./probes ./docs ./data ./README.md
+          ./runtime ./tools ./tests ./probes ./docs ./data ./dev ./CMakeLists.txt ./README.md
           ./VERSION ./LICENSES ./REUSE.toml ./TODO.md ./.gitignore ./flake.nix ./flake.lock
         ];
       };
@@ -114,6 +114,16 @@
           license = lib.licenses.gpl3Plus;
         };
       };
+      devCommand = name: script: pkgs.writeShellScriptBin name ''
+        set -euo pipefail
+        exec ${pkgs.bash}/bin/bash ${script} "$@"
+      '';
+      devCommands = [
+        (devCommand "ef2000-configure" ./dev/configure.sh)
+        (devCommand "ef2000-build" ./dev/build.sh)
+        (devCommand "ef2000-run" ./dev/run.sh)
+        (devCommand "ef2000-run-gdb" ./dev/run-gdb.sh)
+      ];
     in {
       packages.${system} = { default = package; ef2000 = package; ef2000-startup = package; };
       apps.${system} = let
@@ -161,9 +171,16 @@
       };
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
-        packages = [ python ] ++ (with pkgs; [ gcc binutils qemu-user dosbox-x gdb ]);
+        packages = [ python ] ++ devCommands ++ (with pkgs; [
+          gcc binutils qemu-user dosbox-x cmake ninja gdb ccache
+        ]);
         EF2000_SDL_LIBRARY = "${pkgs.SDL2}/lib/libSDL2.so";
         EF2000_VERSION = version;
+        shellHook = ''
+          export EF2000_SOURCE="$PWD"
+          export EF2000_BUILD_DIR="''${EF2000_BUILD_DIR:-/tmp/ef2000-build}"
+          export EF2000_ICON_BMP="$EF2000_SOURCE/data/icons/ef2000.bmp"
+        '';
       };
     };
 }
