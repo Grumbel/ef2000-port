@@ -67,6 +67,10 @@ Implemented and verified:
 6. Document data/mission discoveries separately under `docs/`, with fingerprints,
    offsets, reproducers, and observed/inferred status.
 7. Validate **portable Unicorn flight controls and longer gameplay**. The
+   flake exposes `nix run .#unicorn` as a separate experimental windowed
+   launcher with standard game-data discovery and a writable state overlay;
+   it is **not** the native default or a real-time-playability claim.
+   `.#unicorn-probe` remains the bounded headless diagnostic interface. The
    original 640×400 main menu, Quick Combat selection, Rookie difficulty,
    mission 01, and Accept all work through original GUI scripts. The previous
    asset-decompressor `INT 3` failure was fixed by moving DOS RAM, PSP and

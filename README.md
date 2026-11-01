@@ -16,11 +16,10 @@ keyboard, and joystick input. It handles
 DOS services, memory allocation, timers, VGA/VBE banked graphics, and BIOS calls.
 Unicorn executes real-mode driver requests. Audio is disabled in a local config
 copy by default. Broader gameplay and mission completion remain unverified.
-An experimental Unicorn **protected-mode startup probe** now runs the original
-extracted 32-bit instructions on a portable CPU emulator. It passes the
-initial X-32 allocation, descriptor and DOS services, reads original game data,
-and progresses through the game's data-archive startup. It is not yet a
-Windows-playable replacement for the native Linux execution backend.
+An experimental Unicorn backend also runs the original extracted 32-bit
+instructions in a portable CPU emulator. It reaches the original main menu
+and flight cockpit and supports SDL3 input and rendering, but is much slower
+than native execution and is not yet a fully playable Windows replacement.
 The first target is the installed `_EF2000.EXE` in the sibling
 `../EF2000/c/EF2000/` directory. Other releases need separate fingerprints.
 
@@ -62,7 +61,10 @@ The shell greeting lists these commands, usage examples and the active paths.
 
 `packages.default` and `packages.ef2000` are the same native package;
 `packages.ef2000-startup` is an alias. `apps.default` and `apps.ef2000` run the
-`ef2000` launcher; `ef2000-startup` remains available as a command alias.
+native `ef2000` launcher; `ef2000-startup` remains available as a command
+alias. `apps.unicorn` (also `apps.ef2000-unicorn`) launches the experimental
+SDL3/Unicorn window, while `apps.unicorn-probe` retains its bounded headless
+diagnostic behavior.
 Builds require no original game files. The launcher accepts your external
 executable, creates a new local output directory, and links it with the
 precompiled harness. The executable's parent directory supplies the original
@@ -118,21 +120,39 @@ python3 tools/run_startup.py ../EF2000/c/EF2000/_EF2000.EXE --output local/start
 
 ### Experimental portable Unicorn CPU backend
 
-The protected-mode Unicorn probe runs independently of Linux syscalls, ELF
+The protected-mode Unicorn backend runs independently of Linux syscalls, ELF
 execution, `modify_ldt`, GCC and binutils. It requires Python 3 and Unicorn
-2.x and is designed to run on Windows as well as Linux:
+2.x. The flake provides a windowed experimental app alongside the original
+headless diagnostic probe:
 
 ```sh
+# Launch the original menu/flight with SDL3 (experimental and slow):
+nix run .#unicorn -- --data-dir /path/to/EF2000
+# Equivalent: nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE
+# Continue without a window for a limited diagnostic run:
+nix run .#unicorn -- --data-dir /path/to/EF2000 --headless --instruction-limit 30000000
+# Low-level headless probe, unchanged:
 nix run .#unicorn-probe -- /path/to/_EF2000.EXE
-# With SDL3, show indexed video and forward live input:
+# The probe can still show a window explicitly:
 nix run .#unicorn-probe -- /path/to/_EF2000.EXE --windowed --geometry 1280x960
-# Or on Windows, with `pip install unicorn`:
+# Direct Python runner on Windows with `pip install unicorn`:
 python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --report startup.json --overlay-dir C:\EF2000-user\drive --cd-dir D:\
 # Deterministic headless mouse press/release while probing the VGA menu:
 python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --mouse-event 70:320:100:1 --mouse-event 78:320:100:0
 # Export the final framebuffer without opening a window:
 python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --framebuffer startup.png
 ```
+
+The new windowed app discovers the executable under `--data-dir`, from its
+positional path, or in `$XDG_DATA_HOME/ef2000/`. It uses
+`$XDG_STATE_HOME/ef2000/unicorn/drive` as a separate writable DOS overlay
+unless `--overlay-dir` is set. Original game data are never modified. Use
+`--state-dir`, `--user-data-dir`, `--portable`, or `--show-paths` to manage
+locations. Window close returns success; unexpected guest stops remain errors.
+The windowed app defaults to 100,000 guest instructions per PIT tick (matching
+the original-asset flight replays); the bounded probe retains 250,000.
+Expect lengthy startup and slower-than-real-time gameplay: this is still a
+development interface, not the default native backend.
 
 The original `_EF2000.EXE` remains external and SHA-256 validated. The probe
 implements the observed X-32 stack/heap allocator, selectors, vector services,
@@ -159,7 +179,8 @@ calls use that bridge too. The game reaches VGA mode `13h` (320×200) and
 continues through the 30-million-instruction diagnostic budget. The portable
 CPU now models PIT channel 0 programming, BIOS tick accumulation, protected
 IRQ0 injection, PIC EOI/IRET, and the original synthetic BIOS timer fallback.
-Ticks are instruction-paced (`--timer-instructions N`, default 250000), not
+Ticks are instruction-paced (`--timer-instructions N`, default 250000 in the
+probe), not
 wall-clock synchronized. The `--mouse-event TICK:X:Y:BUTTONS` option can
 inject reproducible mouse states (button 1=left, 0=release); events appear in
 the JSON report. Scripted movement updates both absolute coordinates and
@@ -188,7 +209,8 @@ returned error flag and result value; this helps locate post-splash stalls.
 sites, internal GUI cursor positions, control hit-tests, generated events, and
 dispatch codes by timer tick, without dumping every individual poll.
 Experimental `--windowed` mode now uses the shared SDL3
-renderer and input layer; headless remains the default. Windowed sessions
+renderer and input layer; headless remains the default for the probe and the
+window is the default for the new `unicorn` app. Windowed sessions
 now run until closed (or the guest stops), instead of terminating at the
 headless 30-million-instruction budget. Use `--instruction-limit N` to set
 an explicit budget (0 = unlimited). SDL3 events are

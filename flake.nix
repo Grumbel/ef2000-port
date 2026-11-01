@@ -95,6 +95,11 @@
             --add-flags "$out/libexec/ef2000/tools/unicorn_backend.py" \
             --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
             --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp"
+          makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn" \
+            --add-flags "$out/libexec/ef2000/tools/unicorn_app.py" \
+            --set EF2000_VERSION ${lib.escapeShellArg version} \
+            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
+            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp"
           ln -s ef2000 "$out/bin/ef2000-startup"
           makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-inspect" \
             --add-flags "$out/libexec/ef2000/tools/inspect_exe.py"
@@ -136,7 +141,14 @@
           program = "${package}/bin/ef2000";
           meta.description = "Run the original EF2000 game with the native Linux backend";
         };
+        unicorn = {
+          type = "app";
+          program = "${package}/bin/ef2000-unicorn";
+          meta.description = "Experiment with original EF2000 menu and flight using Unicorn and SDL3";
+        };
       in { default = native; ef2000 = native;
+           inherit unicorn;
+           ef2000-unicorn = unicorn;
            unicorn-probe = {
              type = "app";
              program = "${package}/bin/ef2000-unicorn-probe";
@@ -148,6 +160,11 @@
           touch "$out"
         '';
         app-ef2000 = self.checks.${system}.app-default;
+        app-unicorn = pkgs.runCommand "ef2000-unicorn-app-check" {} ''
+          test -x ${package}/bin/ef2000-unicorn
+          ${package}/bin/ef2000-unicorn --help > "$out"
+          test "$(${package}/bin/ef2000-unicorn --version)" = ${lib.escapeShellArg "ef2000-unicorn ${version}"}
+        '';
         help = pkgs.runCommand "ef2000-help-check" {} ''
           ${package}/bin/ef2000 --help > "$out"
         '';
@@ -202,8 +219,13 @@
           printf '  ef2000-build [BUILD_ARGS]       Configure if needed, then build\n'
           printf '  ef2000-run [GAME_ARGS]          Build and run the original DOS game on Linux\n'
           printf '  ef2000-run-gdb [GAME_ARGS]      Build and debug the native game ELF in GDB\n\n'
+          printf 'Portable original-code emulator (experimental, slower than native):\n'
+          printf '  nix run .#unicorn -- --data-dir /path/to/EF2000\n'
+          printf '                                  Start windowed Unicorn/SDL3 game frontend\n'
+          printf '  nix run .#unicorn-probe -- /path/to/_EF2000.EXE\n'
+          printf '                                  Run bounded headless startup diagnostics\n\n'
           printf '  python tools/unicorn_backend.py /path/to/_EF2000.EXE --windowed\n'
-          printf '                                  Experimental portable Unicorn+SDL3 path\n\n'
+          printf '                                  Direct Unicorn backend for development\n\n'
           printf 'Examples:\n'
           printf '  ef2000-run --data-dir /path/to/EF2000 --windowed\n'
           printf '  ef2000-run-gdb --data-dir /path/to/EF2000 --verbose\n'
