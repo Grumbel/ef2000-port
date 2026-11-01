@@ -185,9 +185,32 @@ use those disjoint mappings. With the **same original assets and timed mouse
 replay**, all **68 checksum comparisons pass** and there are **zero failures**.
 The run reaches its requested 330-million-instruction limit, 4.3 million
 instructions beyond the previous integrity failure. Video remains in VBE mode
-`0x100` (640×400) and the last captured frame is black; this does **not** yet
-demonstrate flight rendering. A longer replay is needed to find the next
-execution boundary.
+`0x100` (640×400) and the frame at this point is black. Extending the exact
+same replay to **420 million instructions** reaches **372 passing checksum
+comparisons** and renders the original *TACTCOM 2000* loading screen at **20%**
+with the legend *Erstelle Umgebung* ("Creating environment"). An earlier frame
+at 350 million shows **35%** with *Erstelle Bewaffnung* ("Creating armament"):
+the percentage is **stage-local**, not a monotonic overall progress indicator.
+EIP samples show continuing asset-loading/decompression work, not a stuck spin
+loop. This does **not** yet demonstrate flight rendering; the working native
+backend uses 320×200 VGA once flight begins.
+
+A longer **700-million-instruction** replay with timed framebuffer checkpoints
+still uses VBE `0x100`, but reaches **572 successful decompression checks**
+without an integrity failure. The original loading animation advances as follows:
+
+| Instructions | Screen text | Displayed percent |
+| ---: | --- | ---: |
+| 350 million | *Erstelle Bewaffnung* | 35% |
+| 420 million | *Erstelle Umgebung* | 20% |
+| 500 million | *Erstelle Umgebung* | 57% |
+| 600 million | *Erstelle Umgebung* | 0% |
+| 690 million | *Erstelle Umgebung* | 54% |
+| 700 million | *Erstelle Umgebung* | 60% |
+
+The progress number resets even while the same label is visible. The 700M
+checkpoint remains in mission environment creation, so it is premature to
+claim a flight renderer failure or that the mission has finished loading.
 
 To reproduce the mission-start integrity check, run the same timed actions
 against the original, unmodified game files:
@@ -206,3 +229,9 @@ python3 tools/unicorn_backend.py /path/to/_EF2000.EXE \
   --mouse-event 1950:287:368:0 --trace-decompress \
   --report /tmp/ef2000-unicorn-mission.json
 ```
+
+For longer headless replays, add `--framebuffer /tmp/ef2000-flight.png` and
+repeat `--framebuffer-sample N` for selected guest instruction counts (e.g.
+`350000000`, `420000000`, `500000000`). These checkpoints write numbered PNGs
+next to the final-frame path and list their actual video modes in the JSON
+report. They reveal intermediate loading screens without separate full replays.

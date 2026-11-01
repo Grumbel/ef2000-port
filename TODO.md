@@ -72,10 +72,15 @@ Implemented and verified:
    Quick Combat mission screen from its archive. Earlier clicks on the title
    bar exercised only a separate window-management gate. Difficulty and mission
    selection work, and Accept reaches *Simulation wird geladen...*, but the
-   original decompressor asserts on a checksum mismatch (`INT 3` at `0xFA167`)
-   during asset loading. Capture expected/actual checksum and buffers, compare
-   archive input and state to the working Linux backend, then verify flight.
-   Refine instruction-paced
+   next step is still flight rendering. The original decompressor's former
+   checksum mismatch (`INT 3` at `0xFA167`) was caused by the portable DOS
+   memory window overlapping the protected heap. DOS RAM, PSP and environment
+   now have disjoint mappings; 572 asset integrity checks pass with the
+   original installation through 700 million instructions. The original
+   *TACTCOM 2000* loading screen is still advancing (60% *Erstelle Umgebung*
+   at 700M); the displayed percentage resets within that stage.
+   Use `--framebuffer-sample` to establish when it enters 320×200 flight;
+   refine instruction-paced
    timers and VGA retrace pacing, and add a native Windows launcher. SDL3
    window behavior is currently checked with an injected display; real GUI
    tests must run in a private Xvfb instance.
@@ -109,10 +114,12 @@ handoff. Desktop integration and broader runtime conventions follow when there
 is a playable Linux application. R36S, Android, and other platform ports are
 outside current scope. The source license does not license original game data.
 
-Keep commits on one history. For handoff from this initially empty repository,
-create a full-history bundle with `git bundle create <path> HEAD`, without
-prerequisites. Use the first root commit as the work-line identifier in its name;
-later bundles must continue to include the entire history from this empty base.
+Keep commits on one history. For the current numbered bundle handoff, the
+agreed prerequisite is `4d521589e693f769f2018bd5fb2f5c65ac0c3a44`.
+Create each cumulative bundle from that base to the new tip, including **all**
+agent commits from previous bundles; verify it with `git bundle verify`.
+Each numbered bundle replaces the previous download, never creates a parallel
+workline, and is the only delivery artifact (no patch files).
 
 
 Input support is implemented and verified with an SDL virtual joystick.
