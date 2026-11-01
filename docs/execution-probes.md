@@ -488,6 +488,30 @@ two-byte initialization self-test has no complete 16-bit stereo frame and is
 not written as an empty WAV file. C++ original-driver and WAV-format tests
 cover these conditions. Physical SDL3 output has not been tested.
 
+#### CD-mode X-32 selector regression
+
+A CD-enabled native C++ replay initially stopped at 317 interrupts while
+Miles initialized `NULL.MDI`, reporting `unsupported port IN 2034` at guest
+IP `0x111342`. The driver selects a newly allocated X-32 descriptor before
+setting its base to guest physical `0400h`. Its BIOS CRT-base read must return
+`03D4h` from `0040:0063`; a descriptor pointing at the main image read bogus
+bytes, and changing only the LDT descriptor still returned zero because the
+cached DS base remained stale. The corrected service maps the guest's first
+MiB through the separate DOS RAM window and reloads active data segments on
+3503h/3505h base/limit changes. A `--self-test-bda` synthetic guest validates
+the same order, including a guest-visible 3504h base query.
+
+With the original, unchanged 32-bit executable, the original game directory,
+a disposable 7-track 2352-byte-sector synthetic CUE/BIN and the same timed
+mouse script above, a headless CD-enabled 1.5B-instruction replay completed
+without an unsupported port. It made 37,905 X-32/DOS interrupts, 269 modeled
+SB16 DMA blocks (548,866 PCM bytes) and 12 CD driver requests. The original
+game started a CD track: 569 captured CD blocks totaled 1,364,160 bytes
+(580 CD sectors). The dummy CD data contains silence and does not test music
+content, disc recognition, or audible SDL3 mixing. It does confirm that the
+new selector behavior reaches the game-driven CD playback path rather than
+stopping during Miles initialization.
+
 #### SDL3 joystick/gamepad diagnosis and execution throughput
 
 The native C++ frontend's original `SDL_GetNumJoystickAxes()` mapping took

@@ -87,6 +87,9 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
            --joystick-event 0:0:0:0 --joystick-axes=0,1 --trace-joystick)
   set_tests_properties(unicorn-cpp-gameport PROPERTIES
                        PASS_REGULAR_EXPRESSION "gameport: axes=2 reads=1 writes=1")
+  add_test(NAME unicorn-cpp-bda COMMAND ef2000-unicorn-cpp --self-test-bda)
+  set_tests_properties(unicorn-cpp-bda PROPERTIES
+                       PASS_REGULAR_EXPRESSION "status=guest_exit interrupts=5")
   add_executable(ef2000-real-mode-test tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp
                                      runtime/sb16_probe.cpp runtime/sound_blaster.cpp
                                      runtime/isa_audio.cpp)

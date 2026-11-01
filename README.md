@@ -216,6 +216,8 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --fra
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
 # The same executable has a self-contained synthetic CPU test:
 nix run .#unicorn-cpp -- --self-test
+# Also tests a live X-32 DOS-memory selector and BIOS CRT-base lookup:
+nix run .#unicorn-cpp -- --self-test-bda
 ```
 
 The C++ runner was independently replayed from the original assets through

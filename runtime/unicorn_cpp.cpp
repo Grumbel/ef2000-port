@@ -1260,6 +1260,11 @@ private:
                 values.flags};
             try {
                 const unsigned prior_generation = cd_audio_->generation();
+                if (trace_interrupts_)
+                    std::cerr << "cpp-cd: ax=" << std::hex << real.ax
+                              << " es:bx=" << real.es << ':' << real.bx
+                              << " cx=" << real.cx << " dx=" << real.dx
+                              << std::dec << '\n';
                 const double now = std::chrono::duration<double>(
                     std::chrono::steady_clock::now().time_since_epoch()).count();
                 cd_audio_->interrupt(real, conventional, now);
@@ -1688,7 +1693,25 @@ private:
             else if (ax == 0x3503) selector.base = before.cx;
             else if (ax == 0x3504) after.cx = selector.base;
             else if (ax == 0x3505) selector.limit = before.cx | (before.cx > 0xfffff ? 0xfff : 0);
-            if (ax != 0x3504) write_selector(index);
+            if (ax != 0x3504) {
+                write_selector(index);
+                if (ax == 0x3503 || ax == 0x3505) {
+                    // A guest may already have loaded DS with this selector
+                    // before asking X-32 to set its base/limit (Miles does
+                    // this for the BIOS 0040:0063 CRT status port). Updating
+                    // an LDT entry alone leaves x86's hidden segment cache
+                    // pointing at the old address. Refresh active data
+                    // selectors to reproduce the service's expected effect.
+                    for (const int reg_id : {UC_X86_REG_DS, UC_X86_REG_ES,
+                                             UC_X86_REG_FS, UC_X86_REG_GS}) {
+                        uint32_t current{};
+                        check(uc_reg_read(cpu_, reg_id, &current), "read X-32 segment register");
+                        if (current == (before.bx & 0xffff))
+                            check(uc_reg_write(cpu_, reg_id, &current),
+                                  "refresh X-32 segment cache");
+                    }
+                }
+            }
         } else { fail("unhandled X-32 selector service"); return false; }
         after.flags &= ~1u;
         return true;
@@ -1698,7 +1721,14 @@ private:
         std::array<uint8_t, 8> bytes{};
         if (selector.active) {
             const bool large = selector.limit > 0xfffff;
-            bytes = segment(selector.base, large ? selector.limit >> 12 : selector.limit,
+            // X-32's 3503h base is a *guest physical* address. Our protected
+            // game image occupies host linear address zero, while the original
+            // first MiB (IVT, BIOS data area, DOS drivers) lives at DOS_BASE.
+            // Keep the unmodified base for 3504h queries and redirect only
+            // the underlying LDT descriptor into the conventional-memory map.
+            const uint32_t linear = selector.base < 0x100000 ?
+                DOS_BASE + selector.base : selector.base;
+            bytes = segment(linear, large ? selector.limit >> 12 : selector.limit,
                             0xf2, large ? 0xc : 0x4);
         }
         write(TABLE_BASE + 0x100 + (index + 6) * 8, bytes.data(), bytes.size());
@@ -1728,8 +1758,15 @@ private:
         }
         if (port == 0x201) return discharge_joystick();
         if (port == 0x61) return 0;
-        char message[80];
-        std::snprintf(message, sizeof(message), "unsupported port IN %04x", port);
+        const Registers regs = read_regs();
+        std::array<uint8_t, 12> instruction{};
+        const uc_err fetched = uc_mem_read(cpu_, regs.ip, instruction.data(), instruction.size());
+        char message[256];
+        std::snprintf(message, sizeof(message),
+                      "unsupported port IN %04x at ip=%08x sp=%08x dx=%08x ax=%08x bytes=%02x%02x%02x%02x (%s)",
+                      port, regs.ip, regs.sp, regs.dx, regs.ax,
+                      instruction[0], instruction[1], instruction[2], instruction[3],
+                      uc_strerror(fetched));
         fail(message);
         return 0;
     }
@@ -1785,7 +1822,7 @@ void usage(const char* program) {
               << "       Windowed default: $XDG_STATE_HOME/ef2000/unicorn/drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
-              << "       " << program << " --self-test\n";
+              << "       " << program << " --self-test | --self-test-bda\n";
 }
 } // namespace
 
@@ -1799,7 +1836,7 @@ int main(int argc, char** argv) {
         WindowOptions window;
         ef2000::SoundMode sound_mode = ef2000::SoundMode::Off;
         ControlSelection controls = ControlSelection::Auto;
-        bool self_test = false;
+        bool self_test = false, self_test_bda = false;
         bool trace_interrupts = false;
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
@@ -1879,6 +1916,8 @@ int main(int argc, char** argv) {
                 window.trace_joystick = true;
             } else if (!std::strcmp(argv[i], "--self-test")) {
                 self_test = true;
+            } else if (!std::strcmp(argv[i], "--self-test-bda")) {
+                self_test_bda = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
                 framebuffer = argv[++i];
             } else if (!std::strcmp(argv[i], "--wav-capture") && i + 1 < argc) {
@@ -1943,18 +1982,42 @@ int main(int argc, char** argv) {
             } else if (argv[i][0] != '-' && path.empty()) path = argv[i];
             else throw std::runtime_error("unrecognized option: " + std::string(argv[i]));
         }
-        if (self_test) {
+        if (self_test || self_test_bda) {
+            if (self_test && self_test_bda)
+                throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
             if (!cd_cue.empty()) throw std::runtime_error("self-test does not take a CD image");
             std::vector<uint8_t> image(0x1000);
             // DOS query, ISA gameport charge/read, then DOS exit. The same
             // synthetic payload works without any proprietary game files.
-            constexpr uint8_t guest[] = {0xb8, 0x0b, 0x35, 0x00, 0x00, 0xcd, 0x21,
-                                          0xba, 0x01, 0x02, 0x00, 0x00,
-                                          0xb0, 0x00, 0xee, 0xec,
-                                          0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
-            std::copy(std::begin(guest), std::end(guest), image.begin() + ENTRY);
+            constexpr uint8_t gameport_guest[] = {
+                0xb8, 0x0b, 0x35, 0x00, 0x00, 0xcd, 0x21,
+                0xba, 0x01, 0x02, 0x00, 0x00,
+                0xb0, 0x00, 0xee, 0xec,
+                0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
+            // Guest selects an X-32 descriptor *before* calling 3503/3505
+            // to change its base/limit, then reads physical 0040:0063. This
+            // catches both a wrong DOS-memory map and a stale x86 segment
+            // cache; either failure deliberately traps via INT 82h.
+            constexpr uint8_t bda_guest[] = {
+                0xb8, 0x01, 0x35, 0x00, 0x00, 0xcd, 0x21,
+                0x66, 0x8e, 0xdb,
+                0xb9, 0x00, 0x04, 0x00, 0x00,
+                0xb8, 0x03, 0x35, 0x00, 0x00, 0xcd, 0x21,
+                0xb9, 0xff, 0xff, 0xff, 0xff,
+                0xb8, 0x05, 0x35, 0x00, 0x00, 0xcd, 0x21,
+                0xb8, 0x04, 0x35, 0x00, 0x00, 0xcd, 0x21,
+                0x81, 0xf9, 0x00, 0x04, 0x00, 0x00, 0x74, 0x02, 0xcd, 0x82,
+                0x66, 0xbb, 0x63, 0x00,
+                0x0f, 0xb7, 0x03,
+                0x3d, 0xd4, 0x03, 0x00, 0x00, 0x74, 0x02, 0xcd, 0x82,
+                0x66, 0xbb, 0x07, 0x00, 0x66, 0x8e, 0xdb,
+                0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
+            if (self_test_bda)
+                std::copy(std::begin(bda_guest), std::end(bda_guest), image.begin() + ENTRY);
+            else
+                std::copy(std::begin(gameport_guest), std::end(gameport_guest), image.begin() + ENTRY);
             Machine machine(image, {}, {}, {}, ef2000::SoundMode::Off, false,
                             {}, {}, std::move(joystick_events), controls);
             return machine.run(10000, window, 250000, "", "");

@@ -51,6 +51,23 @@ in this development environment (SDL3 development files and the user's CUE/BIN
 are unavailable here), so the real game's music should be checked on the
 target machine.
 
+### CRT retrace read during Miles initialization
+
+Enabling CD music makes the original game initialize the Miles `NULL.MDI`
+driver even if FM music is disabled. Its delay routine calls X-32 selector
+services 3501h/3503h/3505h to map guest physical address 0400h, then reads the
+BIOS Data Area's CRT controller word at `0040:0063` (03D4h) and polls port
+03DAh. The C++ emulator initially mapped that descriptor into the game image
+instead of the separate 1 MiB DOS-memory window. Merely redirecting the
+descriptor was insufficient: the game loads DS *before* setting the descriptor
+base, so Unicorn's cached DS base must also be refreshed when 3503h/3505h
+change a live selector. Otherwise, the game reads a spurious port such as
+2034h or 0006h and stops at `unsupported port IN`.
+
+`--self-test-bda` exercises that precise order using a synthetic protected-mode
+x86 program. An incorrect mapping or stale segment cache triggers an explicit
+test failure; a successful run exits after five X-32/DOS interrupts.
+
 ## Interface recovered from the installed executable
 
 Offsets refer to the extracted protected-mode payload of the German TACTCOM

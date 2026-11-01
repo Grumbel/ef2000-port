@@ -185,6 +185,9 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
 - [x] Port read-only MSCDEX INT 2Fh and single-BINARY CUE/Red Book audio to C++;
   enable `--cd-cue`, virtual CD-mode `EF2000.CFG`/`MDI.INI`, mix CD/SB16 streams
   via SDL3, and test synthetic disc requests, timing, and PCM capture format.
+- [x] Correct X-32 low-memory selectors and refresh cached live segment bases
+  when Miles maps the BIOS Data Area for CRT-retrace polling. Verify with
+  `--self-test-bda` and a CD-enabled original-game startup replay.
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
   on actual hardware, profile performance bottlenecks in flight, and test
   sustained interactive mission execution.
