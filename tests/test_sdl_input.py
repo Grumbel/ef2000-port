@@ -214,6 +214,52 @@ class SDLInputTests(unittest.TestCase):
         self.assertEqual(self.host.joystick_axes, [])
         self.assertEqual(self.host.joystick_buttons, 0)
 
+    def test_gamepad_overlay_navigation_repeat_and_button_isolation(self):
+        sdl = self.display.sdl
+        virtual_api(sdl)
+        device = sdl.SDL_JoystickAttachVirtual(4, 2, 8, 1)
+        self.assertGreaterEqual(device, 0)
+        try:
+            self.display.joystick_selection = str(device)
+            self.display.poll(self.host)
+            stick = self.display.joystick
+
+            def button(index, down):
+                self.assertEqual(sdl.SDL_JoystickSetVirtualButton(stick, index, down), 0)
+                self.display.poll(self.host)
+
+            button(7, 1)  # Start opens the overlay.
+            self.assertTrue(self.display.menu.open)
+            self.assertEqual(self.host.joystick_buttons, 0)
+            button(7, 0)
+            sdl.SDL_JoystickSetVirtualAxis(stick, 1, 25000)
+            with patch('tools.display.time.monotonic', return_value=10):
+                self.display.poll(self.host)
+            self.assertEqual(self.display.menu.selected, 1)
+            with patch('tools.display.time.monotonic', return_value=10.1):
+                self.display.poll(self.host)
+            self.assertEqual(self.display.menu.selected, 1)
+            with patch('tools.display.time.monotonic', return_value=10.4):
+                self.display.poll(self.host)
+            self.assertEqual(self.display.menu.selected, 2)
+            sdl.SDL_JoystickSetVirtualAxis(stick, 1, 0)
+            self.display.poll(self.host)
+            button(0, 1)  # A enters Save State.
+            self.assertEqual(self.display.menu.page, 'save')
+            button(0, 0)
+            button(1, 1)  # B returns to main.
+            self.assertEqual(self.display.menu.page, 'main')
+            button(1, 0)
+            button(7, 1)  # Start resumes, without leaking pressed buttons.
+            self.assertFalse(self.display.menu.open)
+            self.assertEqual(self.host.joystick_buttons, 0)
+            button(7, 0)
+            button(0, 1)
+            self.assertEqual(self.host.joystick_buttons, 1)
+            button(0, 0)
+        finally:
+            sdl.SDL_JoystickDetachVirtual(device)
+
 
     def test_second_joystick_selection_and_missing_device(self):
         sdl = self.display.sdl

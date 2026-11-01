@@ -116,7 +116,12 @@ both. Focus loss centers axes and releases buttons.
 
 Press **F10** to pause the native game and open the debug overlay. Use the
 arrow keys and Enter, or click an entry. Escape goes back; F10 resumes. The
-menu provides Resume, borderless fullscreen, separate Save State / Load State
+selected joystick also controls the overlay: **Start** (button 7) opens/closes
+it, the D-pad or vertical stick navigates, **A** (button 0) selects, and **B**
+(button 1) goes back. Hold a direction to repeat; menu button presses are not
+passed into the game when resuming. These are SDL button indices, so mappings
+may differ on non-Xbox-style joysticks. The menu provides Resume, borderless
+fullscreen, separate Save State / Load State
 submenus, and Quit. **F11** also toggles fullscreen. The save submenu offers
 **New Save** and existing slots to overwrite; both lists scroll with the keyboard.
 The overlay shows the current loaded/saved slot.

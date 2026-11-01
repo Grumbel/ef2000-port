@@ -44,6 +44,8 @@ class Display:
             'SDL_JoystickNumButtons': ([c.c_void_p], c.c_int),
             'SDL_JoystickGetAxis': ([c.c_void_p, c.c_int], c.c_int16),
             'SDL_JoystickGetButton': ([c.c_void_p, c.c_int], c.c_uint8),
+            'SDL_JoystickNumHats': ([c.c_void_p], c.c_int),
+            'SDL_JoystickGetHat': ([c.c_void_p, c.c_int], c.c_uint8),
             'SDL_JoystickUpdate': ([], None),
             'SDL_GetError': ([], c.c_char_p),
             'SDL_CreateWindow': ([c.c_char_p, c.c_int, c.c_int, c.c_int, c.c_int, c.c_uint32], c.c_void_p),
@@ -89,6 +91,10 @@ class Display:
         self.next_joystick_trace = 0
         self.joystick_selection = joystick
         self.joystick_axes = joystick_axes or [(i, 1) for i in range(4)]
+        self.menu_buttons = 0
+        self.menu_direction = 0
+        self.menu_repeat_at = 0
+        self.menu_release_pending = False
         self.focused = False
         self.captured = False
         self.escape_pressed_at = None
@@ -180,8 +186,13 @@ class Display:
             engine.mouse_buttons = 0
             engine.joystick_buttons = 0
             engine.joystick_axes = []
-            return
         self.poll_joystick(engine)
+        self.poll_menu_joystick(engine)
+        if self.menu.open:
+            engine.mouse_buttons = 0
+            engine.joystick_buttons = 0
+            engine.joystick_axes = []
+            return
         x, y = c.c_int(), c.c_int()
         buttons = self.sdl.SDL_GetRelativeMouseState(c.byref(x), c.byref(y))
         if self.captured:
@@ -239,6 +250,42 @@ class Display:
                   f'buttons=0x{engine.joystick_buttons:x}', flush=True)
             self.last_joystick_trace = sample
             self.next_joystick_trace = now + 0.25
+
+    def poll_menu_joystick(self, engine):
+        """Use the selected SDL joystick for the host overlay, independent of DOS mapping."""
+        buttons = 0
+        direction = 0
+        if self.joystick and self.focused:
+            count = self.sdl.SDL_JoystickNumButtons(self.joystick)
+            buttons = sum(1 << button for button in (0, 1, 7)
+                          if button < count and self.sdl.SDL_JoystickGetButton(self.joystick, button))
+            if self.sdl.SDL_JoystickNumHats(self.joystick):
+                hat = self.sdl.SDL_JoystickGetHat(self.joystick, 0)
+                direction = -1 if hat & 1 else (1 if hat & 4 else 0)
+            if not direction and self.sdl.SDL_JoystickNumAxes(self.joystick) > 1:
+                axis = self.sdl.SDL_JoystickGetAxis(self.joystick, 1)
+                direction = -1 if axis < -16000 else (1 if axis > 16000 else 0)
+
+        pressed = buttons & ~self.menu_buttons
+        self.menu_buttons = buttons
+        if pressed & (1 << 7):
+            self.menu.toggle(engine)
+            self.menu_release_pending = True
+        if self.menu.open:
+            if pressed & (1 << 1):
+                self.menu.key(41)
+            elif pressed & 1:
+                self.menu.key(40)
+            now = time.monotonic()
+            if direction and (direction != self.menu_direction or now >= self.menu_repeat_at):
+                self.menu.key(81 if direction > 0 else 82)
+                self.menu_repeat_at = now + (0.30 if direction != self.menu_direction else 0.12)
+            self.menu_release_pending = True
+        self.menu_direction = direction if self.menu.open else 0
+        if self.menu_release_pending:
+            engine.joystick_buttons = 0
+            if not buttons:
+                self.menu_release_pending = False
 
     def update(self, engine, memory):
         self.poll(engine)

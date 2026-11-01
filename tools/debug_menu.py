@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Small keyboard and mouse operated debug overlay, rendered into the RGB frame."""
+"""Keyboard, mouse, and gamepad operated debug overlay, rendered into the RGB frame."""
 
 # Five by seven bitmap font, kept independent of system fonts and SDL_ttf.
 FONT = dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-./:()>_', (
@@ -113,5 +113,5 @@ class DebugMenu:
             draw_text(pixels, width, height, 16, 64 + (index - self.scroll) * 22,
                       label[:max(1, (width - 32) // (6 * scale))],
                       b'\xff\xdd\x55' if index == self.selected else b'\xdd\xdd\xdd', scale)
-        draw_text(pixels, width, height, 16, height - 20, self.status or 'Arrows / Enter / Esc / F10', b'\xaa\xaa\xaa', 1)
+        draw_text(pixels, width, height, 16, height - 20, self.status or 'Arrows / Enter / Esc / F10 - Pad: Stick / A / B / Start', b'\xaa\xaa\xaa', 1)
         return bytes(pixels)
