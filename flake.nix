@@ -131,9 +131,17 @@
     in {
       packages.${system} = { default = package; ef2000 = package; ef2000-startup = package; };
       apps.${system} = let
-        native = { type = "app"; program = "${package}/bin/ef2000"; };
+        native = {
+          type = "app";
+          program = "${package}/bin/ef2000";
+          meta.description = "Run the original EF2000 game with the native Linux backend";
+        };
       in { default = native; ef2000 = native;
-           unicorn-probe = { type = "app"; program = "${package}/bin/ef2000-unicorn-probe"; }; };
+           unicorn-probe = {
+             type = "app";
+             program = "${package}/bin/ef2000-unicorn-probe";
+             meta.description = "Probe the original EF2000 executable with portable Unicorn emulation";
+           }; };
       checks.${system} = self.packages.${system} // {
         app-default = pkgs.runCommand "ef2000-app-check" {} ''
           test -x ${package}/bin/ef2000
