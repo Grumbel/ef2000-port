@@ -241,6 +241,8 @@ class GuestMouseTrace:
         self.gui_events = {}
         self.gui_dispatches = {}
         self.gui_callbacks = {}
+        self.gui_subcontrols = {}
+        self.gui_activations = {}
 
     def record(self, entry, caller, buttons, x, y, tick):
         key = (entry, caller, buttons, x, y)
@@ -286,12 +288,28 @@ class GuestMouseTrace:
                            control=control, mask=mask, triggered=triggered,
                            callback=callback, called=called)
 
+    def record_gui_subcontrol(self, stage, control, mask, flags, transitions, callback, tick):
+        self._record_group(self.gui_subcontrols,
+                           (stage, control, mask, flags, transitions, callback), tick,
+                           stage=stage, control=control, mask=mask, flags=flags,
+                           transitions=transitions, callback=callback)
+
+    def record_gui_activation(self, stage, control, status, flags, disabled, callback,
+                              system_flags, tick):
+        self._record_group(self.gui_activations,
+                           (stage, control, status, flags, disabled, callback, system_flags), tick,
+                           stage=stage, control=control, status=status,
+                           flags=flags, disabled=disabled, callback=callback,
+                           system_flags=list(system_flags))
+
     def gui_report(self):
         return {'frames': sorted(self.gui_frames.values(), key=lambda row: row['first_tick']),
                 'hits': sorted(self.gui_hits.values(), key=lambda row: row['first_tick']),
                 'events': sorted(self.gui_events.values(), key=lambda row: row['first_tick']),
                 'dispatches': sorted(self.gui_dispatches.values(), key=lambda row: row['first_tick']),
-                'callbacks': sorted(self.gui_callbacks.values(), key=lambda row: row['first_tick'])}
+                'callbacks': sorted(self.gui_callbacks.values(), key=lambda row: row['first_tick']),
+                'subcontrols': sorted(self.gui_subcontrols.values(), key=lambda row: row['first_tick']),
+                'activations': sorted(self.gui_activations.values(), key=lambda row: row['first_tick'])}
 
 
 class KeyScript:
@@ -930,6 +948,41 @@ def run(image, instruction_limit=None, game_dir=None,
                 mask, triggered, callback = struct.unpack('<HHI', uc.mem_read(control + 0xa9, 8))
                 mouse_trace.record_gui_callback(control, mask, triggered, callback,
                                                 address == 0xf1d44, timer.ticks)
+            elif address in (0xf18a4, 0xf18e2, 0xf18fa, 0xf193f, 0xf1a3f):
+                # The main menu's nested widget has separate event-mask and
+                # callback gates from the top-level control at 0xF1C58.
+                if address == 0xf18a4:
+                    event = uc.reg_read(UC_X86_REG_EAX)
+                    control = struct.unpack('<I', uc.mem_read(event + 0x10, 4))[0]
+                else:
+                    control = uc.reg_read(UC_X86_REG_ESI if address in (0xf193f, 0xf1a3f)
+                                          else UC_X86_REG_EAX)
+                if control:
+                    mask, flags = struct.unpack('<HH', uc.mem_read(control + 0x0a, 4))
+                    transitions = struct.unpack('<H', uc.mem_read(control + 0x14, 2))[0]
+                    callback = struct.unpack('<I', uc.mem_read(control + 0x71, 4))[0]
+                    mouse_trace.record_gui_subcontrol(address, control, mask, flags,
+                                                      transitions, callback, timer.ticks)
+            elif address in (0xe1d14, 0xe1d53, 0xe1d95, 0xa4b08,
+                             0xa4b39, 0xa4b5c, 0xa4b79):
+                # The nested widget calls 0xE1D14, which gates an activation
+                # through the parent control's status and enabled flags.
+                if address == 0xe1d14:
+                    subcontrol = uc.reg_read(UC_X86_REG_EAX)
+                    index = uc.mem_read(subcontrol + 0x50, 1)[0]
+                    control = struct.unpack('<I', uc.mem_read(0x41edfc + index * 4, 4))[0]
+                else:
+                    control = uc.reg_read(UC_X86_REG_EDX if address in (0xa4b39, 0xa4b79)
+                                          else UC_X86_REG_EAX)
+                if control:
+                    status = uc.mem_read(control + 0xc4, 1)[0]
+                    flags = uc.mem_read(control + 0x3b, 1)[0]
+                    disabled = uc.mem_read(control + 0x11, 1)[0]
+                    callback = struct.unpack('<I', uc.mem_read(control + 0xbd, 4))[0]
+                    system_flags = struct.unpack('<HH', uc.mem_read(0x41eda8, 4))
+                    mouse_trace.record_gui_activation(address, control, status, flags,
+                                                      disabled, callback, system_flags,
+                                                      timer.ticks)
         if sample_instructions and timer.instructions % sample_instructions == sample_instructions // 2:
             result['ip_samples'].append({'instruction': timer.instructions, 'ip': address,
                                          'ax': uc.reg_read(UC_X86_REG_EAX),

@@ -212,12 +212,17 @@ class UnicornStartupServiceTests(unittest.TestCase):
         trace.record_gui_event(3, 0x123456, True, 121)
         trace.record_gui_dispatch(3, 0x123456, 0x19, 121)
         trace.record_gui_callback(0x123456, 0x20, 0x20, 0xabcd, True, 121)
+        trace.record_gui_subcontrol(0xf18a4, 0x123456, 0x20, 0x40, 0x20, 0xabcd, 121)
+        trace.record_gui_activation(0xa4b08, 0x123456, 2, 4, 0, 0xabcd, (1, 1), 121)
         self.assertEqual([row['left_down'] for row in trace.gui_report()['frames']],
                          [False, True])
         self.assertEqual(trace.gui_report()['hits'][0]['control'], 0x123456)
         self.assertEqual(trace.gui_report()['events'][0]['control_id'], 3)
         self.assertEqual(trace.gui_report()['dispatches'][0]['action'], 0x19)
         self.assertEqual(trace.gui_report()['callbacks'][0]['callback'], 0xabcd)
+        self.assertEqual(trace.gui_report()['subcontrols'][0]['stage'], 0xf18a4)
+        self.assertEqual(trace.gui_report()['activations'][0]['flags'], 4)
+        self.assertEqual(trace.gui_report()['activations'][0]['system_flags'], [1, 1])
 
     def test_headless_key_script_uses_sdl_scans_and_bios_queue(self):
         from tools.input_devices import HostInput
