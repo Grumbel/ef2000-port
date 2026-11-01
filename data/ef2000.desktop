@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
+# SPDX-License-Identifier: CC0-1.0
+[Desktop Entry]
+Type=Application
+Name=EF2000
+GenericName=Flight Simulation Game
+Comment=Run the original EF2000 through its native Linux port
+Exec=ef2000
+Icon=ef2000
+Terminal=false
+Categories=Game;Simulation;
+Keywords=flight;simulation;aircraft;
+StartupWMClass=ef2000
+SingleMainWindow=true

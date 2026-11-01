@@ -7,6 +7,7 @@
 import ctypes as c
 from ctypes.util import find_library
 import os
+from pathlib import Path
 import struct
 import time
 
@@ -27,7 +28,7 @@ class RendererInfo(c.Structure):
 
 
 class Display:
-    def __init__(self, joystick='auto', joystick_axes=None, states=None, fullscreen=False):
+    def __init__(self, joystick='auto', joystick_axes=None, states=None, fullscreen=False, geometry=(960, 720)):
         library = os.environ.get('EF2000_SDL_LIBRARY') or find_library('SDL2')
         if not library:
             raise ValueError('SDL2 unavailable; use the Nix launcher or --headless')
@@ -48,6 +49,11 @@ class Display:
             'SDL_JoystickGetHat': ([c.c_void_p, c.c_int], c.c_uint8),
             'SDL_JoystickUpdate': ([], None),
             'SDL_GetError': ([], c.c_char_p),
+            'SDL_SetHint': ([c.c_char_p, c.c_char_p], c.c_int),
+            'SDL_RWFromFile': ([c.c_char_p, c.c_char_p], c.c_void_p),
+            'SDL_LoadBMP_RW': ([c.c_void_p, c.c_int], c.c_void_p),
+            'SDL_SetWindowIcon': ([c.c_void_p, c.c_void_p], None),
+            'SDL_FreeSurface': ([c.c_void_p], None),
             'SDL_CreateWindow': ([c.c_char_p, c.c_int, c.c_int, c.c_int, c.c_int, c.c_uint32], c.c_void_p),
             'SDL_SetWindowFullscreen': ([c.c_void_p, c.c_uint32], c.c_int),
             'SDL_GetCurrentVideoDriver': ([], c.c_char_p),
@@ -73,7 +79,19 @@ class Display:
             function.argtypes, function.restype = arguments, result
         if self.sdl.SDL_Init(0x220) < 0:
             raise ValueError(self.sdl.SDL_GetError().decode())
-        self.window = self.sdl.SDL_CreateWindow(b'EF2000 - F10 menu - click to capture mouse', 0x2fff0000, 0x2fff0000, 960, 720, 0x24)
+        for name, value in ((b'SDL_VIDEO_X11_WMCLASS', b'ef2000'),
+                            (b'SDL_VIDEO_WAYLAND_WMCLASS', b'ef2000'),
+                            (b'SDL_APP_NAME', b'EF2000')):
+            self.sdl.SDL_SetHint(name, value)
+        self.window = self.sdl.SDL_CreateWindow(b'EF2000 - F10 menu - click to capture mouse',
+                                                0x2fff0000, 0x2fff0000, *geometry, 0x24)
+        icon = os.environ.get('EF2000_ICON_BMP') or str(Path(__file__).resolve().parent.parent / 'data/icons/ef2000.bmp')
+        if self.window and os.path.isfile(icon):
+            stream = self.sdl.SDL_RWFromFile(os.fsencode(icon), b'rb')
+            surface = self.sdl.SDL_LoadBMP_RW(stream, 1) if stream else None
+            if surface:
+                self.sdl.SDL_SetWindowIcon(self.window, surface)
+                self.sdl.SDL_FreeSurface(surface)
         self.renderer = self.sdl.SDL_CreateRenderer(self.window, -1, 0) if self.window else None
         self.texture = None
         self.dimensions = None
@@ -100,13 +118,13 @@ class Display:
         self.escape_pressed_at = None
         self.mouse_armed = False
         self.motion_remainder = [0.0, 0.0]
-        self.rect = Rect(0, 0, 960, 720)
+        self.rect = Rect(0, 0, *geometry)
         if not self.renderer:
             error = self.sdl.SDL_GetError().decode()
             self.close()
             raise ValueError(error)
 
-        print(f'video: SDL driver={self.sdl.SDL_GetCurrentVideoDriver().decode()}; window=960x720', flush=True)
+        print(f'video: SDL driver={self.sdl.SDL_GetCurrentVideoDriver().decode()}; window={geometry[0]}x{geometry[1]}', flush=True)
         info = RendererInfo()
         if self.sdl.SDL_GetRendererInfo(self.renderer, c.byref(info)) == 0:
             print(f'renderer: {info.name.decode()}; flags=0x{info.flags:x}; max texture={info.max_width}x{info.max_height}', flush=True)

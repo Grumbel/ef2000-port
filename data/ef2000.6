@@ -1,0 +1,110 @@
+.\" SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
+.\" SPDX-License-Identifier: GPL-3.0-or-later
+.TH EF2000 6 "2026-11-01" "ef2000" "Games Manual"
+.SH NAME
+ef2000 \- experimental Linux port of the original EF2000 flight simulator
+.SH SYNOPSIS
+.B ef2000
+.RI [ options ] " _EF2000.EXE"
+.B --output
+.I DIR
+.SH DESCRIPTION
+Runs an externally supplied original DOS executable. No commercial game data is included.
+Each run needs a new diagnostics/output directory; the original game files remain read-only.
+.SH OPTIONS
+.TP
+.BR \-h , " --help"
+Show usage.
+.TP
+.BR \-v , " --version"
+Print the version.
+.TP
+.BR \-f , " --fullscreen"
+Start in fullscreen.
+.TP
+.BR \-w , " --windowed"
+Start windowed.
+.TP
+.BR \-g , " --geometry " WxH
+Choose initial window size.
+.TP
+.B --data-dir DIR
+Find the original game executable in DIR.
+.TP
+.B --config-dir DIR
+Read optional user EF2000.CFG from DIR.
+.TP
+.B --state-dir DIR
+Store native save states in DIR.
+.TP
+.B --user-data-dir DIR
+Override the user data directory.
+.TP
+.B --cache-dir DIR
+Override the cache directory.
+.TP
+.B --portable
+Resolve user directories beneath userdata next to the executable.
+.TP
+.B --no-save
+Disable persistent save-state writes.
+.TP
+.B --show-paths
+Print resolved directories and exit.
+.TP
+.B --mute
+Disable audio.
+.TP
+.B --no-sound
+Disable audio (legacy alias).
+.TP
+.B --sound off|probe|sb16-probe|sb16
+Select sound emulation.
+.TP
+.B --backend native64|qemu
+Choose the execution backend.
+.TP
+.B --real-mode stop|unicorn
+Choose real-mode execution.
+.TP
+.B --cd-cue FILE
+Use a CUE image for experimental CD audio.
+.TP
+.B --vr off|vfx1
+Choose the experimental VR interface.
+.TP
+.B --controls auto|keyboard|joystick|original
+Select flight input configuration.
+.TP
+.B --joystick auto|off|N
+Select an SDL joystick.
+.TP
+.B --joystick-axes X,Y,Z,R
+Remap joystick axes, prefixing indices with a minus sign to invert them.
+.TP
+.B --headless
+Disable the display and write a framebuffer on exit.
+.TP
+.B --seconds N
+Stop after the specified number of seconds.
+.TP
+.B --check-segment-limit
+Run a segment-limit diagnostic.
+.TP
+.B --runtime-objects DIR
+Use precompiled runtime harness objects.
+.TP
+.B --load-state FILE
+Restore a native save-state bundle.
+.TP
+.B --output DIR
+Write run artifacts to DIR; otherwise generate a new cache run directory.
+.TP
+.BR \-d , " --debug"
+Enable verbose logging.
+.TP
+.B --verbose
+Log detailed guest activity.
+.PP
+Other runtime-specific options are documented by
+.BR "ef2000 --help" .

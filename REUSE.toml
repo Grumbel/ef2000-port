@@ -6,3 +6,13 @@ version = 1
 path = [".gitignore", "README.md", "TODO.md", "VERSION", "flake.lock", "docs/**"]
 SPDX-FileCopyrightText = "2026 Ingo Ruhnke <grumbel@gmail.com>"
 SPDX-License-Identifier = "GPL-3.0-or-later"
+
+[[annotations]]
+path = ["data/icons/hicolor/**/*.png", "data/icons/ef2000.bmp"]
+SPDX-FileCopyrightText = "2026 OpenAI <codex@openai.com>"
+SPDX-License-Identifier = "CC0-1.0"
+
+[[annotations]]
+path = ["data/overlay-screenshot.png"]
+SPDX-FileCopyrightText = "2026 Ingo Ruhnke <grumbel@gmail.com>"
+SPDX-License-Identifier = "GPL-3.0-or-later"

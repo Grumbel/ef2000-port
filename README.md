@@ -38,7 +38,26 @@ executable, creates a new local output directory, and links it with the
 precompiled harness. The executable's parent directory supplies the original
 game assets, opened read-only. Configuration and other writes go under
 `OUTPUT/drive/`. Close the window to stop; its final framebuffer is retained as
-`OUTPUT/framebuffer.png`. Use a fresh output path for each run.
+`OUTPUT/framebuffer.png`. Use a fresh output path for each explicit `--output` run.
+Without `--output`, a unique diagnostic run directory is created under
+`$XDG_CACHE_HOME/ef2000/runs/`. To launch from the installed desktop entry,
+place the original `_EF2000.EXE` and its companion data files in
+`$XDG_DATA_HOME/ef2000/`, or specify `--data-dir DIR` on the command line.
+The desktop entry does not ship the commercial game files.
+
+The Linux install includes an `ef2000.desktop` launcher, AppStream metadata,
+hicolor icons, and a section 6 man page. `--show-paths` works without the game
+assets or runtime dependencies and prints the resolved directories and their
+sources. `-f`/`-w`, `-g WxH`, `--mute`, and `-d` follow gamepkgstd conventions;
+the existing backend, sound, VR, joystick, and diagnostic options remain.
+
+User configuration is read from `$XDG_CONFIG_HOME/ef2000/EF2000.CFG` if present,
+falling back to the original game file. User save states live under
+`$XDG_STATE_HOME/ef2000/` (default `~/.local/state/ef2000/`). `--config-dir`,
+`--state-dir`, `--user-data-dir`, and `--cache-dir` override their respective
+locations independently. `--portable` (or `portable.txt` next to the supplied
+game executable) uses its sibling `userdata/{config,state,data,cache}`.
+`--no-save` disables persistent save-state access for that run.
 
 For a bounded run without a window:
 
@@ -137,9 +156,10 @@ Names include the date, observed menu/loading/flight phase, resolution, and
 campaign/mission/navigation filenames when observed. Exact player location and
 mission type are not yet recovered, so names do not guess those fields.
 
-By default, states go into `$XDG_DATA_HOME/ef2000/states` (or
-`~/.local/share/ef2000/states`), shared across runs even with different output
-directories. Older saves in `OUTPUT/states` can be opened using `--state-dir OUTPUT/states`. Use `--state-dir DIR` for another library, or load a state directly with:
+The previous default `$XDG_DATA_HOME/ef2000/states` remains readable if the
+new state directory is empty; existing saves are not moved or deleted. Older
+saves in `OUTPUT/states` can be opened using `--state-dir OUTPUT/states`.
+Use `--state-dir DIR` for another library, or load a state directly with:
 
 ```sh
 nix run . -- ../EF2000/c/EF2000/_EF2000.EXE --output local/restored-run \

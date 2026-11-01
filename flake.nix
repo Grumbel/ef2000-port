@@ -21,7 +21,7 @@
       source = lib.fileset.toSource {
         root = ./.;
         fileset = lib.fileset.unions [
-          ./runtime ./tools ./tests ./probes ./docs ./README.md
+          ./runtime ./tools ./tests ./probes ./docs ./data ./README.md
           ./VERSION ./LICENSES ./REUSE.toml ./TODO.md ./.gitignore ./flake.nix ./flake.lock
         ];
       };
@@ -68,18 +68,28 @@
         installPhase = ''
           runHook preInstall
           mkdir -p "$out/bin" "$out/lib/ef2000" "$out/libexec/ef2000" \
-            "$out/share/doc/ef2000" "$out/share/licenses/ef2000"
+            "$out/share/doc/ef2000" "$out/share/licenses/ef2000" \
+            "$out/share/ef2000" "$out/share/applications" "$out/share/metainfo" \
+            "$out/share/man/man6" "$out/share/icons/hicolor/scalable/apps"
           cp -r objects/native64 objects/qemu "$out/lib/ef2000/"
           cp -r runtime tools probes "$out/libexec/ef2000/"
           cp VERSION "$out/libexec/ef2000/"
           cp -r docs README.md TODO.md VERSION "$out/share/doc/ef2000/"
           cp LICENSES/GPL-3.0-or-later.txt "$out/share/licenses/ef2000/"
+          cp LICENSES/CC0-1.0.txt "$out/share/licenses/ef2000/"
+          cp data/ef2000.desktop "$out/share/applications/ef2000.desktop"
+          cp data/ef2000.metainfo.xml "$out/share/metainfo/ef2000.metainfo.xml"
+          cp data/ef2000.6 "$out/share/man/man6/ef2000.6"
+          cp data/icons/ef2000.svg "$out/share/icons/hicolor/scalable/apps/ef2000.svg"
+          cp data/icons/ef2000.bmp "$out/share/ef2000/ef2000.bmp"
+          cp -r data/icons/hicolor/* "$out/share/icons/hicolor/"
 
           makeWrapper ${python}/bin/python3 "$out/bin/ef2000" \
             --add-flags "$out/libexec/ef2000/tools/run_startup.py" \
             --add-flags "--runtime-objects $out/lib/ef2000" \
             --set EF2000_VERSION ${lib.escapeShellArg version} \
             --set EF2000_SDL_LIBRARY ${pkgs.SDL2}/lib/libSDL2.so \
+            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp" \
             --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.qemu-user ]}
           ln -s ef2000 "$out/bin/ef2000-startup"
           makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-inspect" \
@@ -120,6 +130,25 @@
         '';
         version = pkgs.runCommand "ef2000-version-check" {} ''
           test "$(${package}/bin/ef2000 --version)" = ${lib.escapeShellArg "ef2000 ${version}"}
+          touch "$out"
+        '';
+        layout = pkgs.runCommand "ef2000-layout-check" {} ''
+          for path in bin/ef2000 share/ef2000 share/applications/ef2000.desktop \
+            share/metainfo/ef2000.metainfo.xml share/man/man6/ef2000.6 \
+            share/icons/hicolor/48x48/apps/ef2000.png; do
+            test -e "${package}/$path"
+          done
+          touch "$out"
+        '';
+        integration = pkgs.runCommand "ef2000-integration-check" {
+          nativeBuildInputs = [ pkgs.desktop-file-utils pkgs.appstream ];
+        } ''
+          desktop-file-validate ${package}/share/applications/ef2000.desktop
+          appstreamcli validate --no-net ${package}/share/metainfo/ef2000.metainfo.xml
+          touch "$out"
+        '';
+        man = pkgs.runCommand "ef2000-man-check" { nativeBuildInputs = [ pkgs.mandoc ]; } ''
+          mandoc -T lint ${package}/share/man/man6/ef2000.6
           touch "$out"
         '';
         reuse = pkgs.runCommand "ef2000-reuse-check" {

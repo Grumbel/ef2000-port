@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com> -->
+<!-- SPDX-License-Identifier: CC0-1.0 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="48" fill="#13273d"/>
+  <circle cx="128" cy="128" r="99" fill="none" stroke="#4e9daa" stroke-width="9"/>
+  <circle cx="128" cy="128" r="59" fill="none" stroke="#4e9daa" stroke-width="5"/>
+  <path d="M128 29v44M128 183v44M29 128h44M183 128h44" stroke="#4e9daa" stroke-width="7"/>
+  <path d="M128 44 148 110 214 153 214 174 145 150 138 198 156 214 156 228 128 215 100 228 100 214 118 198 111 150 42 174 42 153 108 110Z" fill="#ecedf0" stroke="#0d2639" stroke-width="5" stroke-linejoin="round"/>
+</svg>

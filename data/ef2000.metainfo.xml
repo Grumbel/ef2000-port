@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com> -->
+<!-- SPDX-License-Identifier: CC0-1.0 -->
+<component type="desktop-application">
+  <id>ef2000</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <name>EF2000</name>
+  <summary>Native Linux host for the original EF2000 flight simulator</summary>
+  <description>
+    <p>Run the original EF2000 executable on Linux using an experimental native runtime.
+    The original game files must be supplied separately; this package contains no game assets.</p>
+  </description>
+  <launchable type="desktop-id">ef2000.desktop</launchable>
+  <url type="homepage">https://github.com/Grumbel/ef2000-port</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Native host debug menu (without commercial game artwork)</caption>
+      <image>https://raw.githubusercontent.com/Grumbel/ef2000-port/master/data/overlay-screenshot.png</image>
+    </screenshot>
+  </screenshots>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.1.0-dev" date="2026-11-01"/>
+  </releases>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>gamepad</control>
+  </supports>
+</component>
