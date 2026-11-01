@@ -15,6 +15,7 @@ port/device emulation are not implemented by this probe.
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -32,6 +33,21 @@ IMAGE_SIZE = 0x4000000
 INITIAL_SP = IMAGE_SIZE - 0x1000
 ENTRY = 0x86
 DEFAULT_INSTRUCTION_LIMIT = 30000000
+# The protected image, including its heap and stack, occupies [0, IMAGE_SIZE).
+# Keep DOS RAM and the extender's synthetic selectors outside that range.
+DOS_BASE = 0x05000000
+PSP_BASE = 0x05200000
+ENV_BASE = PSP_BASE + 0x1000
+EXTENDER_BASE = PSP_BASE + 0x2000
+
+
+def fletcher16(data):
+    """The original 0xFA2E4 checksum: two rolling 8-bit byte sums."""
+    low = high = 0
+    for byte in data:
+        low = (low + byte) & 0xff
+        high = (high + low) & 0xff
+    return low | (high << 8)
 
 
 class UnsupportedGuestOperation(RuntimeError):
@@ -47,7 +63,7 @@ class KeyboardController:
     def pending(self, cpu):
         if cpu is None:
             return False
-        magic, head, tail = struct.unpack('<IHH', bytes(cpu.mem_read(0x010f1400, 8)))
+        magic, head, tail = struct.unpack('<IHH', bytes(cpu.mem_read(DOS_BASE + 0xf1400, 8)))
         return magic == 0x31504e49 and head < 256 and tail < 256 and head != tail
 
     def read(self, port, cpu=None):
@@ -58,9 +74,9 @@ class KeyboardController:
                 self.ack_pending = False
                 return 0xfa
             if self.pending(cpu):
-                head, tail = struct.unpack('<HH', bytes(cpu.mem_read(0x010f1404, 4)))
-                value = cpu.mem_read(0x010f1408 + (head & 255), 1)[0]
-                cpu.mem_write(0x010f1404, struct.pack('<H', (head + 1) & 255))
+                head, tail = struct.unpack('<HH', bytes(cpu.mem_read(DOS_BASE + 0xf1404, 4)))
+                value = cpu.mem_read(DOS_BASE + 0xf1408 + (head & 255), 1)[0]
+                cpu.mem_write(DOS_BASE + 0xf1404, struct.pack('<H', (head + 1) & 255))
                 return value
             return 0
         raise UnsupportedGuestOperation(f'unsupported keyboard port {port:04x}')
@@ -118,7 +134,7 @@ class ProtectedTimer:
         self.ticks += 1
         self.bios_accumulator += self.divisor
         if self.bios_accumulator >= 65536:
-            address_of_ticks = 0x0100046c
+            address_of_ticks = DOS_BASE + 0x46c
             old = struct.unpack('<I', bytes(cpu.mem_read(address_of_ticks, 4)))[0]
             advances, self.bios_accumulator = divmod(self.bios_accumulator, 65536)
             cpu.mem_write(address_of_ticks, struct.pack('<I', (old + advances) & 0xffffffff))
@@ -152,7 +168,7 @@ class VgaDac:
         if port == 0x3c8:
             self.cursor = (value & 255) * 3
         elif port == 0x3c9:
-            cpu.mem_write(0x010f1000 + self.cursor, bytes((value & 63,)))
+            cpu.mem_write(DOS_BASE + 0xf1000 + self.cursor, bytes((value & 63,)))
             self.cursor = (self.cursor + 1) % 768
         else:
             raise UnsupportedGuestOperation(f'unsupported VGA DAC port {port:04x}')
@@ -178,10 +194,10 @@ class GamePort:
 
     @staticmethod
     def state(cpu):
-        raw = bytes(cpu.mem_read(0x010f1400, 4))
+        raw = bytes(cpu.mem_read(DOS_BASE + 0xf1400, 4))
         if struct.unpack('<I', raw)[0] != 0x31504e49:
             return 0, 0, (0, 0, 0, 0)
-        mask, buttons, *axes = struct.unpack('<BB4H', bytes(cpu.mem_read(0x010f1600, 10)))
+        mask, buttons, *axes = struct.unpack('<BB4H', bytes(cpu.mem_read(DOS_BASE + 0xf1600, 10)))
         return mask & 15, buttons & 15, axes
 
     def write(self, cpu):
@@ -402,7 +418,7 @@ class RealModeBridge:
                   si, di, ds, es, fs, gs, flags):
         request = self.packet.pack(self.magic, entry, ax, bx, cx, dx, si, di,
                                    ds, es, fs, gs, flags, vector)
-        conventional = bytes(cpu.mem_read(0x01000000, 0x100000))
+        conventional = bytes(cpu.mem_read(DOS_BASE, 0x100000))
         vectors = struct.pack('<256I', *real_vectors)
         record = {'vector': vector, 'entry': entry, 'ax': ax, 'dx': dx}
         self.requests.append(record)
@@ -414,7 +430,7 @@ class RealModeBridge:
         values = self.packet.unpack(response)
         if len(updated) != 0x100000:
             raise UnsupportedGuestOperation('real-mode bridge returned invalid DOS memory size')
-        cpu.mem_write(0x01000000, updated)
+        cpu.mem_write(DOS_BASE, updated)
         record.update(result_ax=values[2], result_bx=values[3], result_dx=values[5])
         return values
 
@@ -427,11 +443,11 @@ def startup_memory(image):
         # The X-32 loader presents PSP, command tail and environment via
         # LDT selectors. Without these the game follows a different boot path
         # than the working Linux native harness (notably DID archive lookup).
-        (0x02000080, b'\x04 gui\r'),
-        (0x02001000, b'DID=.\0quick_flag=1\0\0\x01\0C:\\EF2000\\_EF2000.EXE\0'),
+        (PSP_BASE + 0x80, b'\x04 gui\r'),
+        (ENV_BASE, b'DID=.\0quick_flag=1\0\0\x01\0C:\\EF2000\\_EF2000.EXE\0'),
         (0x120cc4, struct.pack('<H', 0x1f)),
         # Both probe modes map DS to base zero, so DOS RAM offsets are positive.
-        (0x120cc6, struct.pack('<I', 0x01000000)),
+        (0x120cc6, struct.pack('<I', DOS_BASE)),
         (0x132a24, struct.pack('<H', 0x27)),
         (0x195fb0, b'\xa5' * (0x4de2f0 - 0x195fb0)),
     )
@@ -549,7 +565,7 @@ class ConventionalMemory:
             result['ax'] = self.end >> 4
             # The native harness returns a pointer relative to DS at
             # 0x10000000. Our ring-0 flat data selector has base zero.
-            result['bx'] = 0x01000000 + self.end
+            result['bx'] = DOS_BASE + self.end
             self.end += size
             result['flags'] &= ~1
         return result
@@ -624,7 +640,7 @@ def run(image, instruction_limit=None, game_dir=None,
         fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
         smooth_scaling=False, display_instructions=50000,
         display_factory=None, framebuffer=None, sample_instructions=0,
-        vga_clock=None, trace_mouse=False):
+        vga_clock=None, trace_mouse=False, trace_decompress=False):
     """Run original-code x86; windowed sessions continue until closed by default."""
     if instruction_limit is None:
         instruction_limit = 0 if windowed else DEFAULT_INSTRUCTION_LIMIT
@@ -655,6 +671,8 @@ def run(image, instruction_limit=None, game_dir=None,
                  'ss': UC_X86_REG_SS}
     cpu = Uc(UC_ARCH_X86, UC_MODE_32)
     cpu.mem_map(0, IMAGE_SIZE)
+    cpu.mem_map(DOS_BASE, 0x100000)
+    cpu.mem_map(PSP_BASE, 0x3000)
     # Guest selectors reference a synthetic LDT. Establish the descriptor
     # tables explicitly: unlike the Linux backend there is no modify_ldt().
     # Reserve the extender's documented default IRQ trampoline at +0x100.
@@ -670,8 +688,7 @@ def run(image, instruction_limit=None, game_dir=None,
         gdt[24:32] = segment_descriptor(0, 0xffff, 0x92)
     cpu.mem_write(table_base, bytes(gdt))
     ldt = bytearray(0x100)
-    selector_bases = (0, 0x02000000, 0x02001000, 0x01000000,
-                      0x02002000, 0)
+    selector_bases = (0, PSP_BASE, ENV_BASE, DOS_BASE, EXTENDER_BASE, 0)
     for index, base in enumerate(selector_bases):
         # DOS-facing selectors keep the original RPL=3 value; the primary
         # protected data/stack selectors remain RPL=0 for this probe.
@@ -764,6 +781,7 @@ def run(image, instruction_limit=None, game_dir=None,
               'privileged_ops': [], 'video_modes': [], 'ip_samples': [],
               'instruction_limit': instruction_limit}
     mouse_trace = GuestMouseTrace() if trace_mouse else None
+    decompress_trace = {'checks': 0, 'last_success': None, 'failures': []} if trace_decompress else None
 
     def interrupt(uc, vector, _user):
         nonlocal real_mode
@@ -789,6 +807,17 @@ def run(image, instruction_limit=None, game_dir=None,
                 if raw and all(32 <= byte < 127 for byte in raw):
                     event['filename'] = raw.decode('ascii')
         events.append(event)
+        if (vector == 3 and ip == 0xfa166 and decompress_trace is not None and
+                decompress_trace['failures']):
+            # The original LZ decoder deliberately executes INT 3 when its
+            # decompressed-output checksum disagrees with the block header.
+            failed = decompress_trace['failures'][-1]
+            result['status'] = 'guest_integrity_failure'
+            result['detail'] = (f'guest LZ checksum mismatch: '
+                                f'expected={failed["expected"]:04x} '
+                                f'actual={failed["actual"]:04x}')
+            uc.emu_stop()
+            return
         if ip == 0x19a and vector == 0x21:
             # The original image, not the host, clears this initialized region.
             # The exact register values are useful for native/Unicorn comparison.
@@ -927,6 +956,32 @@ def run(image, instruction_limit=None, game_dir=None,
             uc.emu_stop()
             return
         timer.instructions += 1
+        if decompress_trace is not None and address == 0xfa153:
+            # Protected image 0xFA2E4 returns a two-byte Fletcher checksum in
+            # AX. 0xFA153 compares it to the original compressed block header,
+            # then the guest itself trips INT 3 at 0xFA167 on a mismatch.
+            expected = struct.unpack('<H', uc.mem_read(0x16279e, 2))[0]
+            actual = uc.reg_read(UC_X86_REG_EAX) & 0xffff
+            length = struct.unpack('<I', uc.mem_read(0x162790, 4))[0]
+            output = struct.unpack('<I', uc.mem_read(0x162794, 4))[0]
+            frame = uc.reg_read(UC_X86_REG_EBP)
+            return_ip, source, destination = struct.unpack('<3I', uc.mem_read(frame + 4, 12))
+            row = {'tick': timer.ticks, 'instruction': timer.instructions,
+                   'expected': expected, 'actual': actual, 'length': length,
+                   'output': output, 'return_ip': return_ip,
+                   'source_argument': source, 'destination_argument': destination}
+            decompress_trace['checks'] += 1
+            if expected == actual:
+                decompress_trace['last_success'] = row
+            else:
+                if 0 <= output < IMAGE_SIZE and 0 < length <= IMAGE_SIZE - output:
+                    contents = bytes(uc.mem_read(output, length))
+                    row.update(checksum=fletcher16(contents),
+                               sha256=hashlib.sha256(contents).hexdigest(),
+                               head=contents[:32].hex(), tail=contents[-32:].hex())
+                row['recent_filenames'] = [e['filename'] for e in events
+                                           if 'filename' in e][-8:]
+                decompress_trace['failures'].append(row)
         if mouse_trace is not None and real_mode is not None:
             if address in GuestMouseTrace.ENTRIES:
                 caller = struct.unpack('<I', uc.mem_read(uc.reg_read(UC_X86_REG_ESP), 4))[0]
@@ -1029,7 +1084,7 @@ def run(image, instruction_limit=None, game_dir=None,
                                          'sp': uc.reg_read(UC_X86_REG_ESP),
                                          'tick': timer.ticks})
         if display is not None and timer.instructions % display_instructions == 0:
-            snapshot = bytes(uc.mem_read(0x01000000, 0x100000))
+            snapshot = bytes(uc.mem_read(DOS_BASE, 0x100000))
             try:
                 display.update(real_mode.engine, snapshot)
             except (ValueError, OSError) as exc:
@@ -1055,8 +1110,8 @@ def run(image, instruction_limit=None, game_dir=None,
                 uc.emu_stop()
                 return
             snapshot = real_mode.engine.sync_input(snapshot)
-            uc.mem_write(0x010f1400, bytes(snapshot[0xf1400:0xf1508]))
-            uc.mem_write(0x010f1600, bytes(snapshot[0xf1600:0xf160a]))
+            uc.mem_write(DOS_BASE + 0xf1400, bytes(snapshot[0xf1400:0xf1508]))
+            uc.mem_write(DOS_BASE + 0xf1600, bytes(snapshot[0xf1600:0xf160a]))
         if (timer.instructions % timer.interval == 0 or
             (timer.in_service and timer.eoi_seen)):
             previous_ticks = timer.ticks
@@ -1070,8 +1125,8 @@ def run(image, instruction_limit=None, game_dir=None,
                 mouse_script.apply(timer.ticks, real_mode.engine)
                 key_script.apply(timer.ticks, real_mode.engine)
                 if real_mode.engine.scan_queue:
-                    snapshot = real_mode.engine.sync_input(bytes(uc.mem_read(0x01000000, 0x100000)))
-                    uc.mem_write(0x010f1400, bytes(snapshot[0xf1400:0xf1508]))
+                    snapshot = real_mode.engine.sync_input(bytes(uc.mem_read(DOS_BASE, 0x100000)))
+                    uc.mem_write(DOS_BASE + 0xf1400, bytes(snapshot[0xf1400:0xf1508]))
 
     def port_in(uc, port, size, _user):
         if port == 0x201:
@@ -1142,6 +1197,8 @@ def run(image, instruction_limit=None, game_dir=None,
     if mouse_trace is not None:
         result['mouse_call_sites'] = mouse_trace.report()
         result['mouse_gui'] = mouse_trace.gui_report()
+    if decompress_trace is not None:
+        result['decompression'] = decompress_trace
     result['key_events'] = key_script.applied
     result['timer'] = {'instructions': timer.instructions, 'ticks': timer.ticks,
                        'irq0': timer.interrupts - timer.keyboard_interrupts,
@@ -1151,7 +1208,7 @@ def run(image, instruction_limit=None, game_dir=None,
     if real_mode is not None:
         result['video_mode'] = real_mode.engine.video_mode
         if framebuffer is not None:
-            memory = bytes(cpu.mem_read(0x01000000, 0x100000))
+            memory = bytes(cpu.mem_read(DOS_BASE, 0x100000))
             frame = real_mode.engine.frame(memory)
             if frame is not None:
                 try:
@@ -1198,6 +1255,8 @@ def main():
                         help='sample guest EIP and registers every N instructions (0 disables sampling)')
     parser.add_argument('--trace-mouse', action='store_true',
                         help='summarize original guest mouse wrappers, callers, and button state')
+    parser.add_argument('--trace-decompress', action='store_true',
+                        help='record original LZ output checksums, buffer bounds, and integrity failures')
     parser.add_argument('--framebuffer', type=Path,
                         help='save the last available VGA frame to a PNG (including headless)')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
@@ -1233,13 +1292,15 @@ def main():
                  geometry=tuple(map(int, match.groups())), aspect_ratio=args.aspect_ratio,
                  smooth_scaling=args.smooth_scaling,
                  display_instructions=args.display_instructions, framebuffer=args.framebuffer,
-                 sample_instructions=args.sample_instructions, trace_mouse=args.trace_mouse)
+                 sample_instructions=args.sample_instructions, trace_mouse=args.trace_mouse,
+                 trace_decompress=args.trace_decompress)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')
     # An unsupported guest request is the expected diagnostic boundary, not
     # successful full game execution.
-    return {'unsupported_interface': 20, 'guest_exit': 26}.get(report['status'], 21)
+    return {'unsupported_interface': 20, 'guest_integrity_failure': 20,
+            'guest_exit': 26}.get(report['status'], 21)
 
 
 if __name__ == '__main__':

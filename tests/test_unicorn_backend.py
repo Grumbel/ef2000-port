@@ -10,9 +10,9 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, GamePort, GuestMouseTrace, KeyboardController, KeyScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VgaStatus, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, DOS_BASE, PSP_BASE, ENV_BASE, ConventionalMemory, GamePort, GuestMouseTrace, KeyboardController, KeyScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VgaStatus, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
-                                   serve_startup_int21, startup_memory)
+                                   fletcher16, serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
 from tools.x32_allocation import Allocation
 
@@ -22,10 +22,19 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.regs = dict(ax=0x3505, bx=4, cx=0x260, dx=0, si=0, di=0,
                          bp=0, sp=0x3fff000, ip=0x95, flags=0x202)
 
+    def test_original_lz_checksum_uses_two_rolling_eight_bit_sums(self):
+        self.assertEqual(fletcher16(b''), 0)
+        self.assertEqual(fletcher16(b'\x01\x02\x03'), 0x0a06)
+        self.assertEqual(fletcher16(bytes(range(1, 9))), 0x7824)
+        self.assertEqual(fletcher16(b'\xff\x01'), 0xff00)
+
     def test_portable_psp_and_environment_match_native_boot(self):
         writes = dict(startup_memory(bytes(ENTRY + 2)))
-        self.assertEqual(writes[0x02000080], b'\x04 gui\r')
-        self.assertIn(b'DID=.\0quick_flag=1\0\0', writes[0x02001000])
+        self.assertGreaterEqual(DOS_BASE, IMAGE_SIZE)
+        self.assertGreaterEqual(PSP_BASE, IMAGE_SIZE)
+        self.assertEqual(writes[PSP_BASE + 0x80], b'\x04 gui\r')
+        self.assertIn(b'DID=.\0quick_flag=1\0\0', writes[ENV_BASE])
+        self.assertEqual(writes[0x120cc6], struct.pack('<I', DOS_BASE))
 
     def test_keyboard_ack_handshake_matches_linux_harness(self):
         keyboard = KeyboardController()
@@ -46,10 +55,10 @@ class UnicornStartupServiceTests(unittest.TestCase):
                 self.ram[0xf1408] = 0x4b
 
             def mem_read(self, address, size):
-                return bytes(self.ram[address - 0x01000000:address - 0x01000000 + size])
+                return bytes(self.ram[address - DOS_BASE:address - DOS_BASE + size])
 
             def mem_write(self, address, data):
-                offset = address - 0x01000000
+                offset = address - DOS_BASE
                 self.ram[offset:offset + len(data)] = data
 
         guest = Memory()
@@ -72,11 +81,11 @@ class UnicornStartupServiceTests(unittest.TestCase):
                 struct.pack_into('<BB4H', self.ram, 0xf1600, 3, 1, 2, 1, 0, 0)
 
             def mem_read(self, address, size):
-                start = address - 0x01000000
+                start = address - DOS_BASE
                 return bytes(self.ram[start:start + size])
 
             def mem_write(self, address, data):
-                start = address - 0x01000000
+                start = address - DOS_BASE
                 self.ram[start:start + len(data)] = data
 
         guest = Memory()
@@ -102,7 +111,7 @@ class UnicornStartupServiceTests(unittest.TestCase):
 
         class Registers:
             def __init__(self):
-                self.memory = {0x0100046c: b'\0' * 4}
+                self.memory = {DOS_BASE + 0x46c: b'\0' * 4}
                 self.writes = {}
 
             def mem_read(self, address, size):
@@ -128,7 +137,7 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.assertTrue(timer.instruction(guest, 0x2345, vectors, regs))
         self.assertEqual(guest.writes, dict(SP=0x3ff4, IP=0x12345, FLAGS=0x3002))
         self.assertEqual(struct.unpack('<3I', guest.memory[0x3ff4]), (0x2345, 0x2f, 0x3202))
-        self.assertEqual(struct.unpack('<I', guest.memory[0x0100046c])[0], 1)
+        self.assertEqual(struct.unpack('<I', guest.memory[DOS_BASE + 0x46c])[0], 1)
         self.assertEqual(timer.interrupts, 1)
         timer.port_out(0x20, 0x20)
         timer.instructions = 3
@@ -141,7 +150,7 @@ class UnicornStartupServiceTests(unittest.TestCase):
     def test_registered_irq1_handler_receives_queued_keyboard_input(self):
         class Cpu:
             def __init__(self):
-                self.data = {0x0100046c: b'\0' * 4}
+                self.data = {DOS_BASE + 0x46c: b'\0' * 4}
                 self.registers = {}
 
             def mem_read(self, address, count):
@@ -328,7 +337,7 @@ class UnicornStartupServiceTests(unittest.TestCase):
     def test_conventional_memory_bounds(self):
         ram = ConventionalMemory()
         allocated = ram.allocate(dict(self.regs, bx=0x100))
-        self.assertEqual((allocated['ax'], allocated['bx']), (0x1000, 0x1010000))
+        self.assertEqual((allocated['ax'], allocated['bx']), (0x1000, DOS_BASE + 0x10000))
         self.assertEqual(ram.end, 0x11000)
         failed = ram.allocate(dict(self.regs, bx=0xffff))
         self.assertEqual((failed['ax'], failed['flags'] & 1), (8, 1))
@@ -583,14 +592,14 @@ class UnicornGuestTests(unittest.TestCase):
             def mem_read(self, address, size):
                 if address == 0x2000:
                     return bytes(self.frame[:size])
-                if address == 0x01000000:
+                if address == DOS_BASE:
                     return bytes(self.ram[:size])
                 raise AssertionError((address, size))
 
             def mem_write(self, address, data):
                 if address == 0x2000:
                     self.frame[:] = data
-                elif address == 0x01000000:
+                elif address == DOS_BASE:
                     self.ram[:] = data
                 else:
                     raise AssertionError(address)
