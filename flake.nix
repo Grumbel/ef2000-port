@@ -99,6 +99,8 @@
           unset EF2000_EXE
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
           objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
+          objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
+            --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
           objects/ef2000-dos-drive-test
           objects/ef2000-real-mode-test
           objects/ef2000-original-sb16-test

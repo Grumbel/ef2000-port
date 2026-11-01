@@ -80,18 +80,52 @@ struct JoystickSnapshot {
     unsigned count{}, buttons{};
     std::array<int, 4> axes{};
 };
+struct JoystickAxisBinding {
+    unsigned index{};
+    int direction{1};
+};
+enum class ControlSelection { Auto, Keyboard, Joystick };
 struct WindowOptions {
     bool enabled{}, fullscreen{}, smooth_scaling{};
     int width = 1280, height = 960;
     std::string aspect_ratio = "4:3";
+    int joystick_index{}; // -1 disables the physical controller.
+    bool trace_joystick{};
+    std::vector<JoystickAxisBinding> joystick_axes{{0, 1}, {1, 1}, {2, 1}, {3, 1}};
 };
+
+std::vector<JoystickAxisBinding> parse_joystick_axes(const std::string& value) {
+    std::vector<JoystickAxisBinding> mappings;
+    size_t first = 0;
+    while (first < value.size()) {
+        const size_t end = value.find(',', first);
+        const auto token = value.substr(first, end == std::string::npos ?
+                                       std::string::npos : end - first);
+        if (token.empty()) throw std::runtime_error("empty joystick axis mapping");
+        const bool reverse = token[0] == '-';
+        const std::string index = reverse ? token.substr(1) : token;
+        if (index.empty()) throw std::runtime_error("invalid joystick axis mapping");
+        size_t parsed{};
+        const auto axis = std::stoul(index, &parsed);
+        if (parsed != index.size() || axis > 31)
+            throw std::runtime_error("invalid joystick axis number (0..31)");
+        mappings.push_back({unsigned(axis), reverse ? -1 : 1});
+        if (mappings.size() > 4) throw std::runtime_error("too many joystick axes");
+        if (end == std::string::npos) break;
+        first = end + 1;
+    }
+    if ((mappings.size() != 2 && mappings.size() != 4) ||
+        (!value.empty() && value.back() == ','))
+        throw std::runtime_error("--joystick-axes expects two or four comma-separated axes");
+    return mappings;
+}
 
 class StartupWindow {
 public:
     explicit StartupWindow(WindowOptions options) : options_(std::move(options)) {
         if (!options_.enabled) return;
 #ifdef EF_UNICORN_SDL3
-        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
+        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD))
             throw std::runtime_error(std::string("SDL_Init: ") + SDL_GetError());
         window_ = SDL_CreateWindow("EF2000 / Unicorn C++", options_.width, options_.height,
                                    SDL_WINDOW_RESIZABLE |
@@ -103,10 +137,7 @@ public:
                 options_.aspect_ratio == "stretch" ? SDL_LOGICAL_PRESENTATION_STRETCH :
                                                       SDL_LOGICAL_PRESENTATION_LETTERBOX))
             throw std::runtime_error(std::string("SDL_SetRenderLogicalPresentation: ") + SDL_GetError());
-        int count{};
-        SDL_JoystickID* ids = SDL_GetJoysticks(&count);
-        if (ids && count > 0) joystick_ = SDL_OpenJoystick(ids[0]);
-        if (ids) SDL_free(ids);
+        probe_joystick(true);
 #else
         throw std::runtime_error("this binary was built without SDL3; remove --windowed");
 #endif
@@ -115,7 +146,7 @@ public:
 #ifdef EF_UNICORN_SDL3
         if (audio_stream_) SDL_DestroyAudioStream(audio_stream_);
         if (audio_initialized_) SDL_QuitSubSystem(SDL_INIT_AUDIO);
-        if (joystick_) SDL_CloseJoystick(joystick_);
+        close_joystick();
         if (texture_) SDL_DestroyTexture(texture_);
         if (renderer_) SDL_DestroyRenderer(renderer_);
         if (window_) SDL_DestroyWindow(window_);
@@ -133,6 +164,14 @@ public:
         return std::chrono::steady_clock::now() - last_present_ >=
                std::chrono::milliseconds(33);
     }
+    bool should_poll() const {
+        // The Unicorn loop can execute hundreds of 50K-instruction chunks
+        // per second. SDL_PollEvent/joystick updates need only ~120 Hz.
+        return std::chrono::steady_clock::now() - last_poll_ >=
+               std::chrono::milliseconds(8) || should_present();
+    }
+    uint64_t input_polls() const { return input_polls_; }
+    uint64_t frames_presented() const { return frames_presented_; }
     void play_audio(const ef2000::AudioBlock& block) {
 #ifdef EF_UNICORN_SDL3
         if (!enabled() || audio_disabled_) return;
@@ -155,9 +194,16 @@ public:
                 audio_disabled_ = true;
                 return;
             }
+            audio_input_rate_ = pcm.rate;
         }
-        if (!SDL_SetAudioStreamFormat(audio_stream_, &input, nullptr))
-            throw std::runtime_error(std::string("SDL3 input audio format: ") + SDL_GetError());
+        // Changing an SDL audio stream's input format on *every* DMA block
+        // needlessly resets conversion state. Only do it when the guest's
+        // programmed sample rate actually changes.
+        if (audio_input_rate_ != pcm.rate) {
+            if (!SDL_SetAudioStreamFormat(audio_stream_, &input, nullptr))
+                throw std::runtime_error(std::string("SDL3 input audio format: ") + SDL_GetError());
+            audio_input_rate_ = pcm.rate;
+        }
         const int backlog = SDL_GetAudioStreamQueued(audio_stream_);
         if (backlog < 0) throw std::runtime_error(std::string("SDL3 audio queue: ") + SDL_GetError());
         if (backlog > 44100 * 2 * int(sizeof(float)) * 2 &&
@@ -178,17 +224,50 @@ public:
     std::vector<KeyEvent> take_key_events() {
         return std::exchange(pending_keys_, {});
     }
-    JoystickSnapshot joystick_state() const {
+    JoystickSnapshot joystick_state() {
         JoystickSnapshot value;
 #ifdef EF_UNICORN_SDL3
-        if (joystick_ && SDL_JoystickConnected(joystick_)) {
+        probe_joystick();
+        if (gamepad_ || joystick_) {
             SDL_UpdateJoysticks();
-            value.count = std::clamp(SDL_GetNumJoystickAxes(joystick_), 0, 4);
+            const bool focused = (SDL_GetWindowFlags(window_) & SDL_WINDOW_INPUT_FOCUS) != 0;
+            static constexpr SDL_GamepadAxis gamepad_axes[] = {
+                SDL_GAMEPAD_AXIS_LEFTX, SDL_GAMEPAD_AXIS_LEFTY,
+                SDL_GAMEPAD_AXIS_RIGHTX, SDL_GAMEPAD_AXIS_RIGHTY};
+            static constexpr SDL_GamepadButton gamepad_buttons[] = {
+                SDL_GAMEPAD_BUTTON_SOUTH, SDL_GAMEPAD_BUTTON_EAST,
+                SDL_GAMEPAD_BUTTON_WEST, SDL_GAMEPAD_BUTTON_NORTH};
+            const unsigned raw_axes = joystick_ ?
+                unsigned(std::max(0, SDL_GetNumJoystickAxes(joystick_))) : 4u;
+            for (const auto& binding : options_.joystick_axes) {
+                if (binding.index >= raw_axes ||
+                    (gamepad_ && binding.index >= 4)) break;
+                int axis = 0;
+                if (focused) axis = gamepad_ ? SDL_GetGamepadAxis(gamepad_, gamepad_axes[binding.index]) :
+                                               SDL_GetJoystickAxis(joystick_, binding.index);
+                value.axes[value.count++] = std::clamp(axis * binding.direction, -32768, 32767);
+            }
+            if (focused) {
+                const unsigned raw_buttons = joystick_ ?
+                    unsigned(std::max(0, SDL_GetNumJoystickButtons(joystick_))) : 4u;
+                for (unsigned i = 0; i < 4; ++i) {
+                    const bool pressed = gamepad_ ? SDL_GetGamepadButton(gamepad_, gamepad_buttons[i]) :
+                        (i < raw_buttons && SDL_GetJoystickButton(joystick_, i));
+                    if (pressed) value.buttons |= 1u << i;
+                }
+            }
+        }
+        const auto now = std::chrono::steady_clock::now();
+        if (options_.trace_joystick && now >= next_joystick_trace_ &&
+            (value.count != last_joystick_sample_.count ||
+             value.buttons != last_joystick_sample_.buttons ||
+             value.axes != last_joystick_sample_.axes)) {
+            std::cerr << "input: joystick axes=";
             for (unsigned i = 0; i < value.count; ++i)
-                value.axes[i] = SDL_GetJoystickAxis(joystick_, i);
-            const int buttons = std::clamp(SDL_GetNumJoystickButtons(joystick_), 0, 4);
-            for (int i = 0; i < buttons; ++i)
-                if (SDL_GetJoystickButton(joystick_, i)) value.buttons |= 1u << i;
+                std::cerr << (i ? "," : "") << value.axes[i];
+            std::cerr << " buttons=0x" << std::hex << value.buttons << std::dec << '\n';
+            last_joystick_sample_ = value;
+            next_joystick_trace_ = now + std::chrono::milliseconds(250);
         }
 #endif
         return value;
@@ -197,10 +276,15 @@ public:
                  const std::vector<uint8_t>* frame = nullptr, int width = 0, int height = 0) {
 #ifdef EF_UNICORN_SDL3
         if (!enabled()) return true;
+        last_poll_ = std::chrono::steady_clock::now();
+        ++input_polls_;
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT || event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
                 return false;
+            if (event.type == SDL_EVENT_JOYSTICK_ADDED ||
+                event.type == SDL_EVENT_JOYSTICK_REMOVED)
+                next_joystick_probe_ = {};
             if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
                 pending_keys_.push_back({int(event.key.scancode), int(event.key.key),
                                          event.type == SDL_EVENT_KEY_DOWN, bool(event.key.repeat)});
@@ -275,6 +359,7 @@ public:
         }
         if (!SDL_RenderPresent(renderer_))
             throw std::runtime_error(std::string("SDL3 present failed: ") + SDL_GetError());
+        ++frames_presented_;
         return true;
 #else
         (void)instructions; (void)interrupts; (void)status; (void)frame; (void)width; (void)height;
@@ -288,9 +373,12 @@ private:
     std::vector<MouseEvent> pending_mouse_;
     std::vector<KeyEvent> pending_keys_;
     std::chrono::steady_clock::time_point last_present_{};
+    std::chrono::steady_clock::time_point last_poll_{};
+    uint64_t input_polls_{}, frames_presented_{};
 #ifdef EF_UNICORN_SDL3
     SDL_AudioStream* audio_stream_{};
     bool audio_initialized_{}, audio_disabled_{};
+    unsigned audio_input_rate_{};
     SDL_FRect viewport(int width, int height) const {
         if (options_.aspect_ratio != "native" || width <= 0 || height <= 0)
             return {0, 0, 640, 480};
@@ -302,7 +390,53 @@ private:
     SDL_Renderer* renderer_{};
     SDL_Texture* texture_{};
     SDL_Joystick* joystick_{};
+    SDL_Gamepad* gamepad_{};
+    JoystickSnapshot last_joystick_sample_{};
+    std::chrono::steady_clock::time_point next_joystick_probe_{}, next_joystick_trace_{};
     int texture_width_{}, texture_height_{};
+    void close_joystick() {
+        if (gamepad_) SDL_CloseGamepad(gamepad_);
+        if (joystick_) SDL_CloseJoystick(joystick_);
+        gamepad_ = nullptr;
+        joystick_ = nullptr;
+    }
+    void probe_joystick(bool startup = false) {
+        if (options_.joystick_index < 0) {
+            if (startup) std::cerr << "input: physical joystick disabled\n";
+            return;
+        }
+        if ((gamepad_ && !SDL_GamepadConnected(gamepad_)) ||
+            (joystick_ && !SDL_JoystickConnected(joystick_))) {
+            close_joystick();
+            std::cerr << "input: joystick disconnected\n";
+        }
+        if (gamepad_ || joystick_) return;
+        const auto now = std::chrono::steady_clock::now();
+        if (now < next_joystick_probe_) return;
+        next_joystick_probe_ = now + std::chrono::seconds(1);
+        int count{};
+        SDL_JoystickID* ids = SDL_GetJoysticks(&count);
+        if (ids && options_.joystick_index < count) {
+            const auto id = ids[options_.joystick_index];
+            if (SDL_IsGamepad(id)) gamepad_ = SDL_OpenGamepad(id);
+            if (!gamepad_) joystick_ = SDL_OpenJoystick(id);
+            if (gamepad_ || joystick_) {
+                const char* name = gamepad_ ? SDL_GetGamepadName(gamepad_) :
+                                              SDL_GetJoystickName(joystick_);
+                std::cerr << "input: SDL3 " << (gamepad_ ? "gamepad " : "joystick ")
+                          << options_.joystick_index << ": " << (name ? name : "unknown")
+                          << "; mapped DOS gameport axes=" << options_.joystick_axes.size()
+                          << " (use --trace-joystick for input samples)\n";
+            } else {
+                std::cerr << "input: joystick " << options_.joystick_index
+                          << " could not be opened: " << SDL_GetError() << '\n';
+            }
+        } else if (startup) {
+            std::cerr << "input: joystick " << options_.joystick_index
+                      << " not found (SDL3 sees " << count << "); no physical input\n";
+        }
+        if (ids) SDL_free(ids);
+    }
 #endif
 };
 void put16(std::vector<uint8_t>& data, size_t pos, uint16_t value) {
@@ -366,10 +500,11 @@ public:
                      bool trace_interrupts = false,
                      std::vector<MouseEvent> mouse_events = {},
                      std::vector<TimedKeyEvent> key_events = {},
-                     std::vector<JoystickEvent> joystick_events = {})
+                     std::vector<JoystickEvent> joystick_events = {},
+                     ControlSelection controls = ControlSelection::Auto)
         : image_size_(image.size()), trace_interrupts_(trace_interrupts),
           mouse_events_(std::move(mouse_events)), key_events_(std::move(key_events)),
-          joystick_events_(std::move(joystick_events)),
+          joystick_events_(std::move(joystick_events)), controls_(controls),
           dos_drive_(std::move(game_dir), std::move(cd_dir), std::move(overlay_dir)),
           digital_sound_enabled_(sound_mode != ef2000::SoundMode::Off), real_cpu_(sound_mode) {
         if (image.size() < ENTRY + 2 || image.size() > IMAGE_SIZE)
@@ -398,22 +533,27 @@ public:
 
     int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
             const std::string& framebuffer, const std::string& wav_directory) {
+        const bool trace_joystick = window_options.trace_joystick;
         if (!wav_directory.empty())
             wav_capture_ = std::make_unique<ef2000::WavCapture>(wav_directory);
         StartupWindow window(std::move(window_options));
         active_window_ = &window;
         const auto joystick = window.joystick_state();
         if (joystick.count) set_joystick(joystick.count, joystick.axes, joystick.buttons);
+        else if (controls_ == ControlSelection::Joystick && joystick_events_.empty())
+            set_joystick(2, {}, 0);
         std::cout << "C++ X-32: original payload " << image_size_ << " bytes; "
                   << "instruction budget " << (limit ? std::to_string(limit) : "unlimited") << '\n';
         if (!refresh(window, 0, "INITIALIZING X-32 GUEST")) return 0;
+        const auto start = std::chrono::steady_clock::now();
         // Batch execution leaves the CPU in native Unicorn's C core for most
         // instructions while still delivering deterministic PIT ticks. A
         // 1,000-instruction quantum bounds the EOI-to-return observation gap.
         uint64_t completed = 0;
         bool running = true;
         while (running && (!limit || completed < limit) && status_ == "instruction_limit") {
-            uint64_t amount = std::min<uint64_t>(1000, limit ? limit - completed : 1000);
+            constexpr uint64_t quantum = 1000;
+            uint64_t amount = std::min<uint64_t>(quantum, limit ? limit - completed : quantum);
             amount = std::min(amount, timer_interval - completed % timer_interval);
             uint32_t ip{};
             check(uc_reg_read(cpu_, UC_X86_REG_EIP, &ip), "read instruction pointer");
@@ -436,14 +576,8 @@ public:
         }
         if (!framebuffer.empty()) save_framebuffer(framebuffer);
         if (wav_capture_) wav_capture_->close();
-        if (window.enabled()) {
-            if (!running) return 0;
-            while (refresh(window, completed, "GUEST STOPPED: " + status_ + " / CLOSE WINDOW TO EXIT")) {
-#ifdef EF_UNICORN_SDL3
-                SDL_Delay(25);
-#endif
-            }
-        }
+        const double seconds = std::chrono::duration<double>(
+            std::chrono::steady_clock::now() - start).count();
         const Registers regs = read_regs();
         std::cout << "status=" << status_ << " interrupts=" << interrupts_
                   << " ticks=" << ticks_ << " irq0=" << irq0_
@@ -456,7 +590,29 @@ public:
         if (wav_capture_)
             std::cout << "wav_capture: segments=" << wav_capture_->segments()
                       << " pcm_bytes=" << wav_capture_->bytes() << '\n';
+        if (trace_joystick)
+            std::cout << "gameport: axes=" << joystick_count_
+                      << " reads=" << gameport_reads_
+                      << " writes=" << gameport_writes_ << '\n';
+        std::cout << "performance: guest_ips="
+                  << (completed ? std::to_string(uint64_t(completed /
+                        std::max(seconds, 0.000001))) : "n/a")
+                  << " wall_seconds=" << std::fixed << std::setprecision(2) << seconds
+                  << std::defaultfloat;
+        if (window.enabled())
+            std::cout << " sdl_polls=" << window.input_polls()
+                      << " rendered_frames=" << window.frames_presented();
+        std::cout << '\n';
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
+        std::cout.flush();
+        if (window.enabled()) {
+            if (!running) return 0;
+            while (refresh(window, completed, "GUEST STOPPED: " + status_ + " / CLOSE WINDOW TO EXIT")) {
+#ifdef EF_UNICORN_SDL3
+                SDL_Delay(25);
+#endif
+            }
+        }
         return (status_ == "instruction_limit" || status_ == "guest_exit") ? 0 : 20;
     }
 
@@ -467,6 +623,7 @@ private:
     size_t image_size_;
     uint64_t interrupts_{};
     uint64_t audio_blocks_{}, audio_bytes_{};
+    uint64_t gameport_reads_{}, gameport_writes_{};
     uint64_t ticks_{}, irq0_{}, irq1_{};
     uint32_t pit_divisor_ = 65536, pit_low_{}, bios_accumulator_{};
     bool pit_high_next_{}, irq_in_service_{}, eoi_seen_{};
@@ -506,6 +663,7 @@ private:
     std::vector<JoystickEvent> joystick_events_;
     size_t joystick_event_index_{};
     unsigned joystick_count_{}, joystick_buttons_{};
+    ControlSelection controls_;
     std::array<int, 4> joystick_axes_{};
     std::array<uint16_t, 4> joystick_remaining_{};
     ef2000::DosDrive dos_drive_;
@@ -567,6 +725,7 @@ private:
     }
     bool refresh(StartupWindow& window, uint64_t completed, const std::string& status) {
         if (!window.enabled()) return true;
+        if (!window.should_poll()) return true;
         // Poll input often, but only copy the banked VGA framebuffer and
         // build RGBA pixels when the next display refresh is actually due.
         VideoFrame frame;
@@ -587,7 +746,12 @@ private:
         for (const KeyEvent& event : window.take_key_events())
             key_event(event.scan, event.key, event.down, event.repeat);
         const auto joystick = window.joystick_state();
+        // Also clear a disconnected controller; otherwise the old axes and
+        // buttons remain latched forever. Explicit scripts take precedence
+        // when no physical device is attached.
         if (joystick.count) set_joystick(joystick.count, joystick.axes, joystick.buttons);
+        else if (joystick_events_.empty())
+            set_joystick(controls_ == ControlSelection::Joystick ? 2u : 0u, {}, 0);
         sync_scan_mailbox();
         return running;
     }
@@ -627,7 +791,9 @@ private:
             if (ah == 0x3d) {
                 const std::string name = dos_name(before.dx);
                 if (trace_interrupts_) std::cerr << "cpp-file: open " << name << '\n';
-                after.ax = dos_drive_.open(name, ax & 3, joystick_count_ != 0,
+                const bool joystick_controls = controls_ == ControlSelection::Joystick ||
+                    (controls_ == ControlSelection::Auto && joystick_count_ != 0);
+                after.ax = dos_drive_.open(name, ax & 3, joystick_controls,
                                            digital_sound_enabled_);
                 after.dx = 0;
             } else if (ah == 0x3c) {
@@ -737,12 +903,14 @@ private:
         }
     }
     void charge_joystick() {
+        ++gameport_writes_;
         for (unsigned i = 0; i < 4; ++i) {
             const uint32_t normalized = uint32_t(std::clamp(joystick_axes_[i], -32768, 32767) + 32768);
             joystick_remaining_[i] = i < joystick_count_ ? 1 + normalized * 126 / 65535 : 0;
         }
     }
     uint32_t discharge_joystick() {
+        ++gameport_reads_;
         const unsigned mask = (1u << joystick_count_) - 1;
         uint32_t value = ((~joystick_buttons_ & 15) << 4) | (~mask & 15);
         for (unsigned i = 0; i < 4; ++i) {
@@ -1108,8 +1276,11 @@ private:
     Registers read_regs() {
         Registers out;
         uint32_t* values = &out.ax;
+        std::array<void*, std::size(REG_IDS)> addresses{};
         for (size_t i = 0; i < std::size(REG_IDS); ++i)
-            check(uc_reg_read(cpu_, REG_IDS[i], &values[i]), "read x86 register");
+            addresses[i] = &values[i];
+        check(uc_reg_read_batch(cpu_, REG_IDS, addresses.data(), int(addresses.size())),
+              "read x86 registers");
         return out;
     }
     void write_regs(const Registers& before, const Registers& after) {
@@ -1525,6 +1696,9 @@ void usage(const char* program) {
               << "       [--mouse-event TICK:X:Y:BUTTONS] (repeat for scripted GUI clicks)\n"
               << "       [--key-event TICK:SDL_SCAN:ASCII:DOWN] (repeat for guest keys)\n"
               << "       [--joystick-event TICK:X:Y[:Z:W]:BUTTONS] (2/4 axes)\n"
+              << "       [--joystick auto|off|INDEX] [--joystick-axes 0,1[,2,3]]\n"
+              << "       [--controls auto|keyboard|joystick] (virtual EF2000.CFG)\n"
+              << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
               << "       [--wav-capture DIR] (lossless guest SB16 DMA PCM WAV segments)\n"
@@ -1545,6 +1719,7 @@ int main(int argc, char** argv) {
         uint64_t timer_interval = 250000;
         WindowOptions window;
         ef2000::SoundMode sound_mode = ef2000::SoundMode::Off;
+        ControlSelection controls = ControlSelection::Auto;
         bool self_test = false;
         bool trace_interrupts = false;
         std::vector<MouseEvent> mouse_events;
@@ -1598,6 +1773,29 @@ int main(int argc, char** argv) {
                     throw std::runtime_error("invalid --aspect-ratio (4:3, native, stretch)");
             } else if (!std::strcmp(argv[i], "--smooth-scaling")) {
                 window.smooth_scaling = true;
+            } else if (!std::strcmp(argv[i], "--joystick") && i + 1 < argc) {
+                const std::string selection = argv[++i];
+                if (selection == "off") window.joystick_index = -1;
+                else if (selection == "auto") window.joystick_index = 0;
+                else {
+                    size_t parsed{};
+                    const auto index = std::stoul(selection, &parsed);
+                    if (parsed != selection.size() || index > 31)
+                        throw std::runtime_error("--joystick expects auto, off or index 0..31");
+                    window.joystick_index = int(index);
+                }
+            } else if (!std::strcmp(argv[i], "--controls") && i + 1 < argc) {
+                const std::string choice = argv[++i];
+                if (choice == "auto") controls = ControlSelection::Auto;
+                else if (choice == "keyboard") controls = ControlSelection::Keyboard;
+                else if (choice == "joystick") controls = ControlSelection::Joystick;
+                else throw std::runtime_error("--controls expects auto, keyboard or joystick");
+            } else if (!std::strcmp(argv[i], "--joystick-axes") && i + 1 < argc) {
+                window.joystick_axes = parse_joystick_axes(argv[++i]);
+            } else if (!std::strncmp(argv[i], "--joystick-axes=", 16)) {
+                window.joystick_axes = parse_joystick_axes(argv[i] + 16);
+            } else if (!std::strcmp(argv[i], "--trace-joystick")) {
+                window.trace_joystick = true;
             } else if (!std::strcmp(argv[i], "--self-test")) {
                 self_test = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
@@ -1668,11 +1866,16 @@ int main(int argc, char** argv) {
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
             std::vector<uint8_t> image(0x1000);
+            // DOS query, ISA gameport charge/read, then DOS exit. The same
+            // synthetic payload works without any proprietary game files.
             constexpr uint8_t guest[] = {0xb8, 0x0b, 0x35, 0x00, 0x00, 0xcd, 0x21,
+                                          0xba, 0x01, 0x02, 0x00, 0x00,
+                                          0xb0, 0x00, 0xee, 0xec,
                                           0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
             std::copy(std::begin(guest), std::end(guest), image.begin() + ENTRY);
-            Machine machine(image, {}, {}, {});
-            return machine.run(10000, {}, 250000, "", "");
+            Machine machine(image, {}, {}, {}, ef2000::SoundMode::Off, false,
+                            {}, {}, std::move(joystick_events), controls);
+            return machine.run(10000, window, 250000, "", "");
         }
         if (path.empty()) { usage(argv[0]); return 2; }
         if (!wav_directory.empty() && sound_mode != ef2000::SoundMode::Dma)
@@ -1695,7 +1898,7 @@ int main(int argc, char** argv) {
         if (game_dir.empty()) game_dir = fs::path(path).parent_path().string();
         if (cd_dir.empty()) cd_dir = game_dir;
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
-                        std::move(mouse_events), std::move(key_events), std::move(joystick_events));
+                        std::move(mouse_events), std::move(key_events), std::move(joystick_events), controls);
         return machine.run(limit, window, timer_interval, framebuffer, wav_directory);
     } catch (const std::exception& error) {
         std::cerr << "ef2000-unicorn-cpp: " << error.what() << '\n';
