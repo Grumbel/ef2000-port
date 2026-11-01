@@ -4,9 +4,10 @@
 
 """Experimental portable execution of the original X-32 protected-mode image.
 
-This is deliberately a *bounded startup probe*, not a playable backend yet.
-The first X-32 requests are modeled here so we can compare the original
-instruction stream against the native harness before porting its services.
+The probe can reach the original menu and flight, but still lacks playable
+performance and full device/flight-control validation. The X-32 requests are
+modeled here to compare the original instruction stream against the native
+harness while porting its services.
 The CPU now enters ring 3 with original X-32 selectors through an IRETD
 trampoline and a synthetic LDT. The image base remains zero rather than the
 Linux native backend's 0x10000000. Fault recovery, IRQ delivery, and complete
@@ -17,6 +18,7 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import struct
@@ -1319,13 +1321,26 @@ def run(image, instruction_limit=None, game_dir=None,
     return result
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('executable', type=Path, help='original _EF2000.EXE')
+def main(argv=None, *, interactive=False):
+    parser = argparse.ArgumentParser(prog='ef2000-unicorn' if interactive else None,
+                                     description=__doc__)
+    version = os.environ.get('EF2000_VERSION') or (Path(__file__).resolve().parent.parent / 'VERSION').read_text().strip()
+    parser.add_argument('-v', '--version', action='version', version=f'ef2000-unicorn {version}')
+    parser.add_argument('executable', type=Path, nargs='?', help='original _EF2000.EXE')
+    parser.add_argument('--data-dir', type=Path, metavar='DIR',
+                        help='original EF2000 game data containing _EF2000.EXE')
+    parser.add_argument('--user-data-dir', type=Path, metavar='DIR',
+                        help='installed user game data (default: XDG_DATA_HOME/ef2000)')
+    parser.add_argument('--state-dir', type=Path, metavar='DIR',
+                        help='state root for interactive writable game overlay')
+    parser.add_argument('--portable', action='store_true',
+                        help='place user files next to the game executable')
+    parser.add_argument('--show-paths', action='store_true',
+                        help='print resolved game, state, and user-data paths and exit')
     parser.add_argument('--instruction-limit', type=int,
                         help='guest instruction budget (headless default 30000000; '
                              'windowed default unlimited; 0 = unlimited)')
-    parser.add_argument('--timer-instructions', type=int, default=250000,
+    parser.add_argument('--timer-instructions', type=int, default=100000 if interactive else 250000,
                         help='deterministic guest instruction count per PIT tick (default: %(default)s)')
     parser.add_argument('--mouse-event', action='append', default=[], metavar='TICK:X:Y:BUTTONS',
                         help='script mouse coordinates and button mask at a PIT tick; repeat to press/release')
@@ -1341,10 +1356,14 @@ def main():
     parser.add_argument('--sound', choices=['off', 'original'], default='off',
                         help='disable original sound drivers in a virtual config copy (default: off)')
     parser.add_argument('--flat-ring0', action='store_true', help='diagnose legacy flat ring-0 CPU model')
-    parser.add_argument('--windowed', action='store_true',
-                        help='show experimental SDL3 video and forward physical input')
-    parser.add_argument('--fullscreen', action='store_true', help='start SDL3 window fullscreen')
-    parser.add_argument('--geometry', default='1280x960', metavar='WIDTHxHEIGHT',
+    window_mode = parser.add_mutually_exclusive_group()
+    window_mode.add_argument('-w', '--windowed', action='store_true',
+                             help='show experimental SDL3 video and forward physical input')
+    window_mode.add_argument('--headless', action='store_false', dest='windowed',
+                             help='disable SDL window and use bounded diagnostic execution')
+    parser.set_defaults(windowed=interactive)
+    parser.add_argument('-f', '--fullscreen', action='store_true', help='start SDL3 window fullscreen')
+    parser.add_argument('-g', '--geometry', default='1280x960', metavar='WIDTHxHEIGHT',
                         help='initial SDL3 window size (default: %(default)s)')
     parser.add_argument('--aspect-ratio', choices=('4:3', 'native', 'stretch'), default='4:3',
                         help='SDL3 output aspect ratio (default: %(default)s)')
@@ -1354,8 +1373,10 @@ def main():
                         help='guest instructions between SDL3 event polls (default: %(default)s)')
     parser.add_argument('--sample-instructions', type=int, default=0, metavar='N',
                         help='sample guest EIP and registers every N instructions (0 disables sampling)')
-    parser.add_argument('--progress-instructions', type=int, default=0, metavar='N',
-                        help='print running instruction/tick/video/checksum progress to stderr every N instructions')
+    parser.add_argument('--progress-instructions', type=int,
+                        default=100000000 if interactive else 0, metavar='N',
+                        help='print running instruction/tick/video/checksum progress to stderr every N instructions '
+                             '(0 disables progress; default: %(default)s)')
     parser.add_argument('--trace-mouse', action='store_true',
                         help='summarize original guest mouse wrappers, callers, and button state')
     parser.add_argument('--trace-decompress', action='store_true',
@@ -1365,7 +1386,7 @@ def main():
     parser.add_argument('--framebuffer-sample', type=int, action='append', default=[], metavar='N',
                         help='also save a PNG at guest instruction N (repeatable; requires --framebuffer)')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if args.instruction_limit is not None and args.instruction_limit < 0:
         parser.error('--instruction-limit must be nonnegative (0 = unlimited)')
     if args.timer_instructions <= 0:
@@ -1376,6 +1397,8 @@ def main():
         parser.error('--sample-instructions must be nonnegative')
     if args.progress_instructions < 0:
         parser.error('--progress-instructions must be nonnegative')
+    if args.fullscreen and not args.windowed:
+        parser.error('--fullscreen requires a window (omit --headless)')
     if any(value <= 0 for value in args.framebuffer_sample) or (args.framebuffer_sample and not args.framebuffer):
         parser.error('--framebuffer-sample needs a positive N and --framebuffer')
     match = re.fullmatch(r'([1-9][0-9]*)x([1-9][0-9]*)', args.geometry)
@@ -1387,6 +1410,41 @@ def main():
         JoystickScript(args.joystick_event)
     except ValueError as exc:
         parser.error(str(exc))
+    if args.data_dir and args.executable and args.executable.resolve().parent != args.data_dir.resolve():
+        parser.error('--data-dir must match the directory containing the supplied executable')
+    if not args.executable and args.data_dir:
+        args.executable = args.data_dir / '_EF2000.EXE'
+    if args.portable and args.executable is None:
+        parser.error('--portable requires an executable or --data-dir')
+    paths = None
+    if (interactive or args.show_paths or args.portable or args.state_dir or
+            args.user_data_dir or args.executable is None):
+        try:
+            try:
+                from .paths import resolve_paths, format_paths
+            except ImportError:
+                from paths import resolve_paths, format_paths
+            paths = resolve_paths({'state': args.state_dir, 'user_data': args.user_data_dir},
+                                  portable=args.portable, executable=args.executable)
+        except ValueError as exc:
+            parser.error(str(exc))
+    if args.show_paths:
+        print(format_paths(paths, args.data_dir))
+        return 0
+    if args.executable is None:
+        args.executable = paths['user_data'][0] / '_EF2000.EXE'
+        if (args.executable.parent / 'portable.txt').is_file():
+            paths = resolve_paths({'state': args.state_dir, 'user_data': args.user_data_dir},
+                                  portable=args.portable, executable=args.executable)
+    if not args.executable.is_file():
+        parser.error('original _EF2000.EXE missing; supply its path, --data-dir, '
+                     'or install it under the user-data directory shown by --show-paths')
+    if args.overlay_dir is None and interactive:
+        args.overlay_dir = paths['state'][0] / 'unicorn' / 'drive'
+        try:
+            args.overlay_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as exc:
+            parser.error(f'cannot create Unicorn writable overlay: {exc}')
     try:
         from .extract_image import extract
     except ImportError:
@@ -1406,11 +1464,21 @@ def main():
                  sample_instructions=args.sample_instructions, trace_mouse=args.trace_mouse,
                  trace_decompress=args.trace_decompress,
                  progress_instructions=args.progress_instructions)
-    print(json.dumps(report, indent=2))
+    if interactive:
+        print(f'ef2000-unicorn: {report["status"]}; '
+              f'instructions={report["timer"]["instructions"]}', flush=True)
+        if 'detail' in report:
+            print(f'ef2000-unicorn: {report["detail"]}', file=sys.stderr)
+    else:
+        print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')
     # An unsupported guest request is the expected diagnostic boundary, not
     # successful full game execution.
+    if interactive and report['status'] == 'window_closed':
+        return 0
+    if interactive and report['status'] == 'guest_exit':
+        return report.get('exit_code', 0)
     return {'unsupported_interface': 20, 'guest_integrity_failure': 20,
             'guest_exit': 26}.get(report['status'], 21)
 
