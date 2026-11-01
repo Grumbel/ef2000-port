@@ -157,12 +157,16 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
 - [x] Port DOS reads, memory allocation, keyboard ACK, PIT/IRQ0 injection and
   early video/mouse BIOS services; verify the 30M-instruction checkpoint,
   interrupt and IRQ count against the Python reference.
-- [x] Add an SDL3 C++ presentation loop that repaints during CPU startup,
-  exposes mode-13h framebuffer, and explains all-black guest frames.
-- [ ] Finish parity after 30M instructions (X-32 vector `2507h` and
-  real-mode BIOS driver calls), then validate original splash/menu pixels.
-- [ ] Port banked VBE framebuffer, DOS writable overlay, input and sound, and
-  verify menu/flight execution before switching `.#unicorn` over to C++.
+- [x] Add the SDL3 C++ frontend, VGA/VBE banked framebuffer capture and
+  startup progress text; render original splash and menu graphics.
+- [x] Continue beyond 30M through the original Quick Combat mission loading
+  and flight cockpit using a fully C++/Unicorn, scripted 920M-instruction replay.
+- [x] Forward SDL3 mouse, keyboard and joystick input to the guest BIOS/
+  keyboard controller/gameport, with headless scripted input options.
+- [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
+  on actual hardware, and test sustained interactive mission execution.
+- [ ] Implement a writable DOS overlay, native guest audio and remaining
+  operating-system services before switching `.#unicorn` over to C++.
 `--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA
 model and plays captured digital PCM through SDL. FM music remains disabled in
 this mode. Failed real-mode calls retain mutated memory and CPU state for

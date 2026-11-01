@@ -155,7 +155,7 @@
         unicorn-cpp = {
           type = "app";
           program = "${package}/bin/ef2000-unicorn-cpp";
-          meta.description = "Run the native C++ Unicorn/X-32 startup probe (video still in progress)";
+          meta.description = "Experiment with original EF2000 menu and flight in native C++ Unicorn/SDL3";
         };
       in { default = native; ef2000 = native;
            inherit unicorn;
@@ -241,8 +241,8 @@
           printf '                                  Start windowed Unicorn/SDL3 game frontend\n'
           printf '  nix run .#unicorn-probe -- /path/to/_EF2000.EXE\n'
           printf '                                  Run bounded headless startup diagnostics\n\n'
-          printf '  nix run .#unicorn-cpp -- /path/to/_EF2000.EXE [--windowed]\n'
-          printf '                                  Native C++ Unicorn startup/video bring-up\n\n'
+          printf '  nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed\n'
+          printf '                                  Native C++ Unicorn/SDL3 menu and flight frontend\n\n'
           printf '  python tools/unicorn_backend.py /path/to/_EF2000.EXE --windowed\n'
           printf '                                  Direct Unicorn backend for development\n\n'
           printf 'Examples:\n'

@@ -175,13 +175,17 @@ through Unicorn's **C API**, without launching a Python interpreter. The
 original executable remains external and is SHA-256 checked before loading.
 The C++ program now owns the ring-3/LDT bootstrap, early X-32 memory and
 selector calls, protected vector services and IRQ0/PIT timing, keyboard
-controller ACKs, read-only DOS asset access, and initial BIOS mouse/video calls.
-It can capture the real mode-13h VGA palette/framebuffer and present it via
-SDL3. While the original framebuffer is still all black, SDL shows a visible
-startup message and continues presenting new frames instead of appearing hung.
+controller and BIOS key services, read-only DOS asset access, the mouse and
+gameport joystick, and the banked VBE BIOS. It captures and displays the
+original VGA 320×200 and VBE 640×400 palette-indexed frames through SDL3.
+The initial black screen is replaced with a startup message until the guest
+draws its own graphics. Windowed runs have no instruction limit unless one is
+explicitly requested; close the window to stop emulation.
 
 ```sh
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --geometry 1280x960 \
+  --aspect-ratio 4:3 --smooth-scaling
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
@@ -189,17 +193,22 @@ nix develop -c ef2000-build --target ef2000-unicorn-cpp
 nix run .#unicorn-cpp -- --self-test
 ```
 
-This is an **intermediate migration**, not yet a replacement for the
-Python windowed app. On the supplied executable, the C++ runner matches the
-Python runner's 30-million-instruction EIP (`0x110DE6`), interrupt count (282),
-and protected IRQ0 count (190) with `--timer-instructions 100000`. The
-framebuffer is genuinely black at that checkpoint. Further on, the C++
-implementation currently stops at an unsupported X-32/BIOS interaction;
-VBE banked display, DOS driver execution, writable overlay and game controls
-are still being ported. The working Python backend remains available at
-`nix run .#unicorn` until those services match. The native C++ graphical
-window has not been exercised against a live SDL3 installation in this build
-environment; its presentation loop and errors are wired directly to SDL3.
+The C++ runner was independently replayed from the original assets through
+the **Digital Image Design splash**, **main menu**, **Quick Combat mission
+selection**, loading animation and **in-flight cockpit**, using timed mouse
+events and a 920-million-instruction bound. Its final frame comes directly
+from the original game's 320×200 framebuffer; the complete reproduction
+command and observed checkpoints are in
+[execution-probes.md](docs/execution-probes.md). SDL3 mouse, keyboard and
+joystick events are forwarded to the guest, and the CLI supports scripted
+`--mouse-event`, `--key-event` and `--joystick-event` inputs. `--fullscreen`,
+`--geometry`, `--aspect-ratio` and `--smooth-scaling` control SDL3 output.
+
+This is still an **experimental migration**, not yet a drop-in replacement
+for the Python app. Real SDL3 window/gamepad operation has not been exercised
+in this build environment, and native sound, a writable DOS overlay and
+extensive flight-control/playability validation remain open. The working
+Python backend remains available at `nix run .#unicorn` for comparison.
 
 The original `_EF2000.EXE` remains external and SHA-256 validated. The Python probe
 implements the observed X-32 stack/heap allocator, selectors, vector services,

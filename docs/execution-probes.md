@@ -403,3 +403,46 @@ report. They reveal intermediate loading screens without separate full replays.
 Add `--progress-instructions 50000000` to print guest instruction/tick counts,
 EIP, current video mode, and decompression-check counter to stderr while the run
 is still executing. Both diagnostics are disabled unless requested.
+
+### Native C++ original-menu and cockpit replay
+
+The independent C++ runner (`runtime/unicorn_cpp.cpp`) now executes the
+original game without Python at runtime. Use the exact same game installation
+as the Python probe, with its files adjacent to `_EF2000.EXE`. The default
+headless instruction bound is 30M; explicit `--instruction-limit 0` or
+`--windowed` without a bound runs until stopped. This reproducible headless
+sequence selects Quick Combat, a mission and Accept through the guest BIOS
+mouse, then captures a real in-flight VGA frame:
+
+```sh
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+  --timer-instructions 100000 --instruction-limit 920000000 \
+  --mouse-event 1400:165:110:0 --mouse-event 1450:165:110:1 \
+  --mouse-event 1470:165:110:0 \
+  --mouse-event 2700:205:74:0 --mouse-event 2720:205:74:1 \
+  --mouse-event 2740:205:74:0 \
+  --mouse-event 2760:130:176:0 --mouse-event 2780:130:176:1 \
+  --mouse-event 2800:130:176:0 \
+  --mouse-event 2820:287:368:0 --mouse-event 2840:287:368:1 \
+  --mouse-event 2860:287:368:0 \
+  --framebuffer /tmp/ef2000-cpp-flight.ppm
+```
+
+Observed with the supplied game files and a local Unicorn 2 C library:
+
+| Guest instructions | Original guest screen | Frame mode |
+| ---: | --- | --- |
+| 140M | Digital Image Design splash | VBE 640×400 |
+| 250M | Main menu | VBE 640×400 |
+| 260M | Quick Combat mission selection | VBE 640×400 |
+| 440M | TACTCOM loading animation | VBE 640×400 |
+| 920M | In-flight cockpit, HUD and terrain | VGA 320×200 |
+
+SDL3 windowed mode presents these frames, forwards physical mouse and keyboard
+events, and samples the first connected SDL joystick into the original game's
+gameport port 201h. `--geometry`, `--fullscreen`, `--aspect-ratio` and
+`--smooth-scaling` match the Python frontend's display options. Headless
+`--key-event TICK:SDL_SCAN:ASCII:DOWN` and
+`--joystick-event TICK:X:Y[:Z:W]:BUTTONS` provide timed input for investigation.
+Real SDL3 hardware validation, DOS write overlay, digital sound and gameplay
+correctness beyond the checkpoint are still outstanding.
