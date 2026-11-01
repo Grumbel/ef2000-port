@@ -16,6 +16,10 @@ keyboard, and joystick input. It handles
 DOS services, memory allocation, timers, VGA/VBE banked graphics, and BIOS calls.
 Unicorn executes real-mode driver requests. Audio is disabled in a local config
 copy by default. Broader gameplay and mission completion remain unverified.
+An experimental Unicorn **protected-mode startup probe** now runs the original
+extracted 32-bit instructions on a portable CPU emulator. It reaches the
+third X-32 service request (stack allocation at `0x19a`), but is not yet a
+Windows-playable replacement for the native Linux execution backend.
 The first target is the installed `_EF2000.EXE` in the sibling
 `../EF2000/c/EF2000/` directory. Other releases need separate fingerprints.
 
@@ -103,6 +107,30 @@ EF2000_EXE=../EF2000/c/EF2000/_EF2000.EXE python3 -m unittest discover -s tests 
 # Execute original startup (x86-64 Linux, GCC/binutils; no 32-bit libc required):
 python3 tools/run_startup.py ../EF2000/c/EF2000/_EF2000.EXE --output local/startup-01
 ```
+
+### Experimental portable Unicorn CPU backend
+
+The protected-mode Unicorn probe runs independently of Linux syscalls, ELF
+execution, `modify_ldt`, GCC and binutils. It requires Python 3 and Unicorn
+2.x and is designed to run on Windows as well as Linux:
+
+```sh
+nix run .#unicorn-probe -- /path/to/_EF2000.EXE
+# Or on Windows, with `pip install unicorn`:
+python tools/unicorn_backend.py C:\\EF2000\\_EF2000.EXE --report startup.json
+```
+
+The original `_EF2000.EXE` remains external and SHA-256 validated. This probe
+currently emulates only the initial selector-limit and DOS-version requests.
+It uses a synthetic ring-0 LDT and **does not yet implement** the actual ring-3
+X-32 selector privileges/limits, X-32 allocation, other DOS services, IRQs,
+SDL rendering or game input. It stops explicitly at the first unsupported
+request (exit code 20) and prints a JSON report of guest calls and the original
+BSS-clearing checkpoint. Its default six-million-instruction budget covers the
+original startup BSS clearing; adjust with `--instruction-limit`.
+
+This is a first verified CPU-execution milestone, not a new `--backend` choice
+for the playable launcher. The existing Linux native backend remains unchanged.
 
 The host window, joystick and PCM audio backends use SDL3 (3.2+), loaded with
 `ctypes`. `EF2000_SDL_LIBRARY` overrides the system SDL3 lookup; the Nix

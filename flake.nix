@@ -91,6 +91,8 @@
             --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
             --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp" \
             --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.qemu-user ]}
+          makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn-probe" \
+            --add-flags "$out/libexec/ef2000/tools/unicorn_backend.py"
           ln -s ef2000 "$out/bin/ef2000-startup"
           makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-inspect" \
             --add-flags "$out/libexec/ef2000/tools/inspect_exe.py"
@@ -128,7 +130,8 @@
       packages.${system} = { default = package; ef2000 = package; ef2000-startup = package; };
       apps.${system} = let
         native = { type = "app"; program = "${package}/bin/ef2000"; };
-      in { default = native; ef2000 = native; };
+      in { default = native; ef2000 = native;
+           unicorn-probe = { type = "app"; program = "${package}/bin/ef2000-unicorn-probe"; }; };
       checks.${system} = self.packages.${system} // {
         app-default = pkgs.runCommand "ef2000-app-check" {} ''
           test -x ${package}/bin/ef2000
