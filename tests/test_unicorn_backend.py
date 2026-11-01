@@ -558,6 +558,22 @@ class UnicornGuestTests(unittest.TestCase):
         self.assertEqual(result['events'][0]['ax'], 0x1234)
         self.assertEqual(result['events'][0]['ds'], 7)
 
+    def test_dos_file_results_and_instruction_sampling_are_reported(self):
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 14] = bytes.fromhex('b8 00 3d 00 00 ba 00 03 00 00 cd 21 eb fe')
+        image[0x300:0x30c] = b'MISSING.DAT\0'
+        with tempfile.TemporaryDirectory() as directory:
+            result = run(bytes(image), game_dir=directory, instruction_limit=250,
+                         sample_instructions=50)
+        self.assertEqual(result['status'], 'instruction_limit', result.get('detail'))
+        self.assertEqual(result['events'][-1]['filename'], 'MISSING.DAT')
+        self.assertTrue(result['events'][-1]['carry'])
+        self.assertEqual(result['events'][-1]['result_ax'], 2)
+        self.assertEqual(len(result['ip_samples']), 5)
+        self.assertTrue(all(entry['ip'] == ENTRY + 12 for entry in result['ip_samples'][1:]))
+        with self.assertRaises(ValueError):
+            run(bytes(image), sample_instructions=-1)
+
     @unittest.skipUnless(os.environ.get('EF2000_EXE'), 'requires original EF2000_EXE')
     def test_original_extracted_code_reaches_file_open(self):
         from tools.extract_image import extract

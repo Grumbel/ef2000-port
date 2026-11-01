@@ -166,7 +166,10 @@ the JSON report. Similarly `--key-event TICK:SDL_SCAN:ASCII:DOWN` injects
 keyboard make/break events, e.g. `--key-event 600:41:27:1` and
 `--key-event 605:41:27:0` press and release Escape. Both work in headless probes.
 The report records video-mode changes with instruction counts, making splash
-and VBE transitions traceable. Experimental `--windowed` mode now uses the shared SDL3
+and VBE transitions traceable. `--sample-instructions N` adds periodic guest
+instruction-pointer/register snapshots, and DOS file requests report the
+returned error flag and result value; this helps locate post-splash stalls.
+Experimental `--windowed` mode now uses the shared SDL3
 renderer and input layer; headless remains the default. Windowed sessions
 now run until closed (or the guest stops), instead of terminating at the
 headless 30-million-instruction budget. Use `--instruction-limit N` to set

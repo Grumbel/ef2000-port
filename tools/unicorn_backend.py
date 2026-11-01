@@ -504,7 +504,7 @@ def run(image, instruction_limit=None, game_dir=None,
         timer_instructions=250000, mouse_events=(), key_events=(), windowed=False,
         fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
         smooth_scaling=False, display_instructions=50000,
-        display_factory=None, framebuffer=None):
+        display_factory=None, framebuffer=None, sample_instructions=0):
     """Run original-code x86; windowed sessions continue until closed by default."""
     if instruction_limit is None:
         instruction_limit = 0 if windowed else DEFAULT_INSTRUCTION_LIMIT
@@ -516,6 +516,8 @@ def run(image, instruction_limit=None, game_dir=None,
         raise ValueError('timer_instructions must be positive')
     if display_instructions <= 0:
         raise ValueError('display_instructions must be positive')
+    if sample_instructions < 0:
+        raise ValueError('sample_instructions must not be negative')
     from unicorn import Uc, UcError, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR, UC_HOOK_CODE, UC_HOOK_INSN
     from unicorn.x86_const import (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
         UC_X86_REG_EDX, UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EBP,
@@ -638,7 +640,7 @@ def run(image, instruction_limit=None, game_dir=None,
         display.poll(real_mode.engine)
     result = {'status': 'instruction_limit', 'events': events, 'console': [],
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
-              'privileged_ops': [], 'video_modes': [],
+              'privileged_ops': [], 'video_modes': [], 'ip_samples': [],
               'instruction_limit': instruction_limit}
 
     def interrupt(uc, vector, _user):
@@ -786,6 +788,9 @@ def run(image, instruction_limit=None, game_dir=None,
         for name, reg in registers.items():
             if regs[name] != next_regs[name]:
                 uc.reg_write(reg, next_regs[name])
+        if vector == 0x21 and ((regs['ax'] >> 8) & 0xff) in (0x3c, 0x3d, 0x3e, 0x3f, 0x42):
+            event['result_ax'] = next_regs['ax']
+            event['carry'] = bool(next_regs['flags'] & 1)
         if real_mode is not None:
             mode = real_mode.engine.video_mode
             if not result['video_modes'] or result['video_modes'][-1]['mode'] != mode:
@@ -800,6 +805,11 @@ def run(image, instruction_limit=None, game_dir=None,
             uc.emu_stop()
             return
         timer.instructions += 1
+        if sample_instructions and timer.instructions % sample_instructions == sample_instructions // 2:
+            result['ip_samples'].append({'instruction': timer.instructions, 'ip': address,
+                                         'ax': uc.reg_read(UC_X86_REG_EAX),
+                                         'sp': uc.reg_read(UC_X86_REG_ESP),
+                                         'tick': timer.ticks})
         if display is not None and timer.instructions % display_instructions == 0:
             snapshot = bytes(uc.mem_read(0x01000000, 0x100000))
             try:
@@ -961,6 +971,8 @@ def main():
                         help='use filtered rather than nearest-neighbor scaling')
     parser.add_argument('--display-instructions', type=int, default=50000, metavar='N',
                         help='guest instructions between SDL3 event polls (default: %(default)s)')
+    parser.add_argument('--sample-instructions', type=int, default=0, metavar='N',
+                        help='sample guest EIP and registers every N instructions (0 disables sampling)')
     parser.add_argument('--framebuffer', type=Path,
                         help='save the last available VGA frame to a PNG (including headless)')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
@@ -971,6 +983,8 @@ def main():
         parser.error('--timer-instructions must be positive')
     if args.display_instructions <= 0:
         parser.error('--display-instructions must be positive')
+    if args.sample_instructions < 0:
+        parser.error('--sample-instructions must be nonnegative')
     match = re.fullmatch(r'([1-9][0-9]*)x([1-9][0-9]*)', args.geometry)
     if not match or any(int(value) > 16384 for value in match.groups()):
         parser.error('--geometry must be WIDTHxHEIGHT with dimensions in 1..16384')
@@ -993,7 +1007,8 @@ def main():
                  windowed=args.windowed, fullscreen=args.fullscreen,
                  geometry=tuple(map(int, match.groups())), aspect_ratio=args.aspect_ratio,
                  smooth_scaling=args.smooth_scaling,
-                 display_instructions=args.display_instructions, framebuffer=args.framebuffer)
+                 display_instructions=args.display_instructions, framebuffer=args.framebuffer,
+                 sample_instructions=args.sample_instructions)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')
