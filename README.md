@@ -17,8 +17,9 @@ DOS services, memory allocation, timers, VGA/VBE banked graphics, and BIOS calls
 Unicorn executes real-mode driver requests. Audio is disabled in a local config
 copy by default. Broader gameplay and mission completion remain unverified.
 An experimental Unicorn **protected-mode startup probe** now runs the original
-extracted 32-bit instructions on a portable CPU emulator. It reaches the
-third X-32 service request (stack allocation at `0x19a`), but is not yet a
+extracted 32-bit instructions on a portable CPU emulator. It passes the
+initial X-32 allocation, descriptor and DOS services, reads original game data,
+and executes far enough to print the game's missing-CD error. It is not yet a
 Windows-playable replacement for the native Linux execution backend.
 The first target is the installed `_EF2000.EXE` in the sibling
 `../EF2000/c/EF2000/` directory. Other releases need separate fingerprints.
@@ -120,14 +121,22 @@ nix run .#unicorn-probe -- /path/to/_EF2000.EXE
 python tools/unicorn_backend.py C:\\EF2000\\_EF2000.EXE --report startup.json
 ```
 
-The original `_EF2000.EXE` remains external and SHA-256 validated. This probe
-currently emulates only the initial selector-limit and DOS-version requests.
-It uses a synthetic ring-0 LDT and **does not yet implement** the actual ring-3
-X-32 selector privileges/limits, X-32 allocation, other DOS services, IRQs,
-SDL rendering or game input. It stops explicitly at the first unsupported
-request (exit code 20) and prints a JSON report of guest calls and the original
-BSS-clearing checkpoint. Its default six-million-instruction budget covers the
-original startup BSS clearing; adjust with `--instruction-limit`.
+The original `_EF2000.EXE` remains external and SHA-256 validated. The probe
+implements the observed X-32 stack/heap allocator, selectors, vector services,
+DOS clock, conventional-memory allocations, and **read-only** file open/read/
+seek/close/IOCTL. It records guest console output in the JSON report and never
+writes to the original game files. The original DOS game supplied in the ZIP
+checks for `\\CHECK.CD`, which is absent; the probe executes its original error
+path and exits. A game-provided writable overlay and CD emulation are still
+needed for further progress. An alternate asset directory can be supplied with
+`--game-dir DIR`.
+
+The CPU still uses a synthetic ring-0 LDT and **does not yet implement** real
+ring-3 X-32 selector privileges/limits, exceptions, IRQs, SDL rendering or game
+input. The diagnostic stops on unsupported requests (exit code 20), guest exit
+(exit code 26), or the instruction budget; it prints the original guest call
+transcript and BSS-clearing checkpoint. The default 30-million-instruction
+budget can be changed with `--instruction-limit`.
 
 This is a first verified CPU-execution milestone, not a new `--backend` choice
 for the playable launcher. The existing Linux native backend remains unchanged.
