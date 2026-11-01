@@ -374,6 +374,42 @@ class KeyScript:
             self.applied.append({'tick': tick, 'scan': scan, 'ascii': key, 'down': bool(pressed)})
 
 
+class JoystickScript:
+    """Repeatable two- or four-axis signed SDL joystick states at PIT ticks."""
+
+    def __init__(self, entries=()):
+        self.events = []
+        self.applied = []
+        self.axis_count = 0
+        for entry in entries:
+            try:
+                values = tuple(map(int, entry.split(':'))) if isinstance(entry, str) else tuple(entry)
+                if len(values) not in (4, 6) or any(not isinstance(value, int) for value in values):
+                    raise ValueError()
+                tick, *state = values
+                axes, buttons = state[:-1], state[-1]
+                if (tick < 0 or not 0 <= buttons <= 15 or
+                        any(not -32768 <= axis <= 32767 for axis in axes) or
+                        (self.axis_count and len(axes) != self.axis_count)):
+                    raise ValueError()
+            except (TypeError, ValueError):
+                raise ValueError(f'invalid joystick event {entry!r}: expected '
+                                 'TICK:X:Y:BUTTONS or TICK:X:Y:Z:W:BUTTONS') from None
+            self.axis_count = len(axes)
+            self.events.append((tick, tuple(axes), buttons))
+        self.events.sort(key=lambda event: event[0])
+
+    def apply(self, ticks, engine):
+        changed = False
+        while self.events and self.events[0][0] <= ticks:
+            tick, axes, buttons = self.events.pop(0)
+            engine.joystick_axes = list(axes)
+            engine.joystick_buttons = buttons
+            self.applied.append({'tick': tick, 'axes': list(axes), 'buttons': buttons})
+            changed = True
+        return changed
+
+
 class RealModeBridge:
     """Run X-32 AX=2511 through the shared bounded 16-bit Unicorn engine."""
 
@@ -637,7 +673,7 @@ class X32Selectors:
 
 def run(image, instruction_limit=None, game_dir=None,
         cd_dir=None, overlay_dir=None, ring3=True, sound='off',
-        timer_instructions=250000, mouse_events=(), key_events=(), windowed=False,
+        timer_instructions=250000, mouse_events=(), key_events=(), joystick_events=(), windowed=False,
         fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
         smooth_scaling=False, display_instructions=50000,
         display_factory=None, framebuffer=None, framebuffer_samples=(), sample_instructions=0,
@@ -750,10 +786,11 @@ def run(image, instruction_limit=None, game_dir=None,
     allocation = Allocation()
     vectors = VectorState(0x2f if ring3 else 0x2c)
     conventional = ConventionalMemory()
+    joystick_script = JoystickScript(joystick_events)
     files = None
     if game_dir is not None:
         files = DosFiles(game_dir, cd_dir, overlay_dir)
-        if sound == 'off':
+        if sound == 'off' or joystick_script.axis_count:
             try:
                 original_config = DosFiles._walk(files.root, ['EF2000.CFG'], must_exist=True)
                 lines = original_config.read_bytes().splitlines()
@@ -761,11 +798,18 @@ def run(image, instruction_limit=None, game_dir=None,
                 # Keep an explicit DOS missing-file result for absent configs.
                 pass
             else:
-                changes = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127',
-                           b'SPEECH': b'0', b'VRHELMET': b'0'}
-                files.config_data = b'\r\n'.join(
-                    line.split(b'=', 1)[0] + b'=' + changes[line.split(b'=', 1)[0]]
-                    if line.split(b'=', 1)[0] in changes else line for line in lines) + b'\r\n'
+                if sound == 'off':
+                    changes = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127',
+                               b'SPEECH': b'0', b'VRHELMET': b'0'}
+                    lines = [line.split(b'=', 1)[0] + b'=' + changes[line.split(b'=', 1)[0]]
+                             if line.split(b'=', 1)[0] in changes else line for line in lines]
+                if joystick_script.axis_count:
+                    try:
+                        from .input_devices import flight_control_settings
+                    except ImportError:
+                        from input_devices import flight_control_settings
+                    lines = flight_control_settings(lines, True)
+                files.config_data = b'\r\n'.join(lines) + b'\r\n'
     selectors = X32Selectors(cpu, table_base + 0x100)
     keyboard = KeyboardController()
     dac = VgaDac()
@@ -774,7 +818,12 @@ def run(image, instruction_limit=None, game_dir=None,
     timer = ProtectedTimer(timer_instructions)
     mouse_script = MouseScript(mouse_events)
     key_script = KeyScript(key_events)
-    real_mode = RealModeBridge() if windowed else None
+    real_mode = RealModeBridge() if windowed or joystick_script.axis_count else None
+    if joystick_script.axis_count:
+        real_mode.engine.joystick_axes = [0] * joystick_script.axis_count
+        initial = real_mode.engine.sync_input(bytes(cpu.mem_read(DOS_BASE, 0x100000)))
+        cpu.mem_write(DOS_BASE + 0xf1400, bytes(initial[0xf1400:0xf1508]))
+        cpu.mem_write(DOS_BASE + 0xf1600, bytes(initial[0xf1600:0xf160a]))
     display = None
     if windowed:
         if display_factory is None:
@@ -1164,9 +1213,12 @@ def run(image, instruction_limit=None, game_dir=None,
             if real_mode is not None and timer.ticks != previous_ticks:
                 mouse_script.apply(timer.ticks, real_mode.engine)
                 key_script.apply(timer.ticks, real_mode.engine)
-                if real_mode.engine.scan_queue:
+                joystick_changed = joystick_script.apply(timer.ticks, real_mode.engine)
+                if real_mode.engine.scan_queue or joystick_changed:
                     snapshot = real_mode.engine.sync_input(bytes(uc.mem_read(DOS_BASE, 0x100000)))
                     uc.mem_write(DOS_BASE + 0xf1400, bytes(snapshot[0xf1400:0xf1508]))
+                    if joystick_changed:
+                        uc.mem_write(DOS_BASE + 0xf1600, bytes(snapshot[0xf1600:0xf160a]))
 
     def port_in(uc, port, size, _user):
         if port == 0x201:
@@ -1240,6 +1292,7 @@ def run(image, instruction_limit=None, game_dir=None,
     if decompress_trace is not None:
         result['decompression'] = decompress_trace
     result['key_events'] = key_script.applied
+    result['joystick_events'] = joystick_script.applied
     result['timer'] = {'instructions': timer.instructions, 'ticks': timer.ticks,
                        'irq0': timer.interrupts - timer.keyboard_interrupts,
                        'irq1': timer.keyboard_interrupts, 'divisor': timer.divisor,
@@ -1264,6 +1317,9 @@ def main():
                         help='script mouse coordinates and button mask at a PIT tick; repeat to press/release')
     parser.add_argument('--key-event', action='append', default=[], metavar='TICK:SCAN:ASCII:DOWN',
                         help='script SDL keyboard make/break at a PIT tick (e.g. 600:41:27:1 for Escape)')
+    parser.add_argument('--joystick-event', action='append', default=[],
+                        metavar='TICK:X:Y[:Z:W]:BUTTONS',
+                        help='script signed SDL joystick axes (-32768..32767) and button mask (0..15)')
     parser.add_argument('--game-dir', type=Path, help='read-only asset directory (default: EXE directory)')
     parser.add_argument('--cd-dir', type=Path, help='read-only root for absolute DOS CD paths')
     parser.add_argument('--overlay-dir', type=Path,
@@ -1314,6 +1370,7 @@ def main():
     try:
         MouseScript(args.mouse_event)
         KeyScript(args.key_event)
+        JoystickScript(args.joystick_event)
     except ValueError as exc:
         parser.error(str(exc))
     try:
@@ -1326,7 +1383,7 @@ def main():
                  cd_dir=args.cd_dir, overlay_dir=args.overlay_dir,
                  ring3=not args.flat_ring0, sound=args.sound,
                  timer_instructions=args.timer_instructions, mouse_events=args.mouse_event,
-                 key_events=args.key_event,
+                 key_events=args.key_event, joystick_events=args.joystick_event,
                  windowed=args.windowed, fullscreen=args.fullscreen,
                  geometry=tuple(map(int, match.groups())), aspect_ratio=args.aspect_ratio,
                  smooth_scaling=args.smooth_scaling,

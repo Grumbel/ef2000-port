@@ -12,7 +12,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, DOS_BASE, PSP_BASE, ENV_BASE, ConventionalMemory, GamePort, GuestMouseTrace, KeyboardController, KeyScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VgaStatus, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, DOS_BASE, PSP_BASE, ENV_BASE, ConventionalMemory, GamePort, GuestMouseTrace, KeyboardController, KeyScript, JoystickScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VgaStatus, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
                                    fletcher16, serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
@@ -258,6 +258,29 @@ class UnicornStartupServiceTests(unittest.TestCase):
         for bad in ('1:2:3', '-1:41:27:1', '1:256:27:1', '1:41:256:1', '1:41:27:2'):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 KeyScript([bad])
+
+    def test_headless_joystick_script_uses_signed_axes_and_active_low_buttons(self):
+        from tools.input_devices import HostInput, JOYSTICK_BASE
+        engine = HostInput()
+        script = JoystickScript(['8:32767:-32768:1', '12:0:0:0'])
+        self.assertEqual(script.axis_count, 2)
+        self.assertFalse(script.apply(7, engine))
+        self.assertTrue(script.apply(8, engine))
+        self.assertEqual((engine.joystick_axes, engine.joystick_buttons), ([32767, -32768], 1))
+        memory = engine.sync_input(bytes(0x100000))
+        self.assertEqual(struct.unpack_from('<BB4H', memory, JOYSTICK_BASE),
+                         (3, 1, 127, 1, 0, 0))
+        self.assertTrue(script.apply(12, engine))
+        self.assertEqual((engine.joystick_axes, engine.joystick_buttons), ([0, 0], 0))
+        self.assertEqual([row['tick'] for row in script.applied], [8, 12])
+        four = JoystickScript(['1:0:100:-100:0:15'])
+        self.assertEqual(four.axis_count, 4)
+        for bad in ('1:2:3', '-1:0:0:0', '1:32768:0:0', '1:0:-32769:0',
+                    '1:0:0:16', '1:0:0:0:0'):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                JoystickScript([bad])
+        with self.assertRaises(ValueError):
+            JoystickScript(['1:0:0:0', '2:0:0:0:0:0'])
 
     def test_invalid_x32_residency_subfunction_sets_carry(self):
         result = serve_startup_int21(0x2f0, dict(self.regs, ax=0x252b, bx=0x61))
@@ -537,6 +560,16 @@ class UnicornGuestTests(unittest.TestCase):
                      key_events=['1:41:27:1', '2:41:27:0'])
         self.assertEqual(result['status'], 'instruction_limit', result.get('detail'))
         self.assertEqual([e['down'] for e in result['key_events']], [True, False])
+
+    def test_scripted_joystick_reaches_original_gameport_input(self):
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 8] = bytes.fromhex('ba 01 02 00 00 ec eb fd')
+        result = run(bytes(image), instruction_limit=200, timer_instructions=10,
+                     joystick_events=['1:32767:-32768:1'])
+        self.assertEqual(result['status'], 'instruction_limit')
+        self.assertEqual(result['ax'] & 255, 0xec)  # axes 0/1 present, button 0 held
+        self.assertEqual(result['joystick_events'],
+                         [{'tick': 1, 'axes': [32767, -32768], 'buttons': 1}])
 
     def test_windowed_display_pumps_events_and_closes_safely(self):
         displays = []
