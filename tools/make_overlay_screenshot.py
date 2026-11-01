@@ -15,7 +15,7 @@ except ImportError:
     from debug_menu import DebugMenu
 
 root = Path(__file__).resolve().parent.parent
-display = SimpleNamespace(fullscreen=False)
+display = SimpleNamespace(fullscreen=False, aspect_ratio='4:3', smooth_scaling=False)
 menu = DebugMenu(display, None)
 menu.open = True
 pixels = menu.render(bytes([15, 33, 49]) * (640 * 400), 640, 400)

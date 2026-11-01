@@ -27,8 +27,27 @@ class RendererInfo(c.Structure):
                 ('max_width', c.c_int), ('max_height', c.c_int)]
 
 
+ASPECT_RATIOS = ('4:3', 'native', 'stretch')
+
+
+def viewport_rect(window_width, window_height, frame_width, frame_height, aspect_ratio='4:3'):
+    """Compute the destination viewport for CRT, square-pixel or stretched output."""
+    if aspect_ratio == 'stretch':
+        return Rect(0, 0, window_width, window_height)
+    if aspect_ratio == '4:3':
+        ratio_width, ratio_height = 4, 3
+    elif aspect_ratio == 'native':
+        ratio_width, ratio_height = frame_width, frame_height
+    else:
+        raise ValueError(f'invalid aspect ratio: {aspect_ratio}')
+    width = min(window_width, window_height * ratio_width // ratio_height)
+    height = min(window_height, window_width * ratio_height // ratio_width)
+    return Rect((window_width - width) // 2, (window_height - height) // 2, width, height)
+
+
 class Display:
-    def __init__(self, joystick='auto', joystick_axes=None, states=None, fullscreen=False, geometry=(960, 720)):
+    def __init__(self, joystick='auto', joystick_axes=None, states=None, fullscreen=False,
+                 geometry=(1280, 960), aspect_ratio='4:3', smooth_scaling=False):
         library = os.environ.get('EF2000_SDL_LIBRARY') or find_library('SDL2')
         if not library:
             raise ValueError('SDL2 unavailable; use the Nix launcher or --headless')
@@ -96,6 +115,10 @@ class Display:
         self.texture = None
         self.dimensions = None
         self.fullscreen = False
+        if aspect_ratio not in ASPECT_RATIOS:
+            raise ValueError(f'invalid aspect ratio: {aspect_ratio}')
+        self.aspect_ratio = aspect_ratio
+        self.smooth_scaling = smooth_scaling
         try:
             from .debug_menu import DebugMenu
         except ImportError:
@@ -138,6 +161,19 @@ class Display:
             return
         self.fullscreen = enabled
         print(f'window: fullscreen={enabled}', flush=True)
+
+    def cycle_aspect_ratio(self):
+        self.aspect_ratio = ASPECT_RATIOS[(ASPECT_RATIOS.index(self.aspect_ratio) + 1) % len(ASPECT_RATIOS)]
+        print(f'video: aspect ratio={self.aspect_ratio}', flush=True)
+
+    def toggle_smooth_scaling(self):
+        self.smooth_scaling = not self.smooth_scaling
+        # SDL's scale-quality hint is applied when the texture is created.
+        if self.texture:
+            self.sdl.SDL_DestroyTexture(self.texture)
+            self.texture = None
+            self.dimensions = None
+        print(f'video: smooth scaling={self.smooth_scaling}', flush=True)
 
     def capture(self, enabled):
         if self.sdl.SDL_SetRelativeMouseMode(int(enabled)) < 0:
@@ -320,6 +356,7 @@ class Display:
         if self.dimensions != (width, height):
             if self.texture:
                 self.sdl.SDL_DestroyTexture(self.texture)
+            self.sdl.SDL_SetHint(b'SDL_RENDER_SCALE_QUALITY', b'linear' if self.smooth_scaling else b'nearest')
             self.texture = self.sdl.SDL_CreateTexture(self.renderer, 0x17101803, 1, width, height)
             if not self.texture:
                 raise ValueError(self.sdl.SDL_GetError().decode())
@@ -330,10 +367,7 @@ class Display:
             pixels = self.menu.render(pixels, width, height)
         window_width, window_height = c.c_int(), c.c_int()
         self.sdl.SDL_GetWindowSize(self.window, c.byref(window_width), c.byref(window_height))
-        render_width = min(window_width.value, window_height.value * 4 // 3)
-        render_height = render_width * 3 // 4
-        self.rect = Rect((window_width.value - render_width) // 2,
-                         (window_height.value - render_height) // 2, render_width, render_height)
+        self.rect = viewport_rect(window_width.value, window_height.value, width, height, self.aspect_ratio)
         if self.sdl.SDL_UpdateTexture(self.texture, None, c.c_char_p(pixels), width * 3) < 0:
             raise ValueError(self.sdl.SDL_GetError().decode())
         self.sdl.SDL_RenderClear(self.renderer)

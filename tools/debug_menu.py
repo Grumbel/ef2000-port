@@ -44,6 +44,8 @@ class DebugMenu:
     def rows(self):
         if self.page == 'main':
             return ['Resume', f'Fullscreen: {"On" if self.display.fullscreen else "Off"}',
+                    f'Aspect Ratio: {self.display.aspect_ratio}',
+                    f'Smooth Scaling: {"On" if self.display.smooth_scaling else "Off"}',
                     'Save State >', 'Load State >', 'Quit']
         entries = [self.states.label(path) for path in self.states.entries()] if self.states else []
         return (['New Save' if self.states else 'New Save (Unavailable)']
@@ -75,8 +77,12 @@ class DebugMenu:
                 self.open = False
             elif self.selected == 1:
                 self.display.toggle_fullscreen()
-            elif self.selected in (2, 3):
-                self.page = 'save' if self.selected == 2 else 'load'
+            elif self.selected == 2:
+                self.display.cycle_aspect_ratio()
+            elif self.selected == 3:
+                self.display.toggle_smooth_scaling()
+            elif self.selected in (4, 5):
+                self.page = 'save' if self.selected == 4 else 'load'
                 self.selected = 0
             else:
                 self.display.closed = True

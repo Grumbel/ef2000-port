@@ -148,8 +148,14 @@ def main():
     screen = parser.add_mutually_exclusive_group()
     screen.add_argument('-f', '--fullscreen', action='store_true', help='start in borderless desktop fullscreen')
     screen.add_argument('-w', '--windowed', action='store_true', help='start windowed (default)')
-    parser.add_argument('-g', '--geometry', metavar='WxH', default='960x720',
+    parser.add_argument('-g', '--geometry', metavar='WxH', default='1280x960',
                         help='initial window dimensions (default: %(default)s)')
+    parser.add_argument('--aspect-ratio', choices=['4:3', 'native', 'stretch'], default='4:3',
+                        help='display aspect ratio: CRT 4:3, native pixels, or stretch (default: %(default)s)')
+    scaling = parser.add_mutually_exclusive_group()
+    scaling.add_argument('--smooth-scaling', action='store_true', help='use linear texture filtering')
+    scaling.add_argument('--no-smooth-scaling', action='store_false', dest='smooth_scaling',
+                         help='use nearest-neighbour filtering (default)')
     parser.add_argument('--mute', action='store_const', const='off', dest='sound', help='start without audio')
     parser.add_argument('-d', '--debug', action='store_true', help='enable verbose debug diagnostics')
     parser.add_argument('--verbose', action='store_true', help='print detailed guest file and bridge activity')
@@ -317,6 +323,8 @@ def main():
                                                        sound_hardware=args.sound if args.sound in ('sb16-probe', 'sb16') else 'absent',
                                                        vr=args.vr, states=states, load_state=args.load_state,
                                                        fullscreen=args.fullscreen, geometry=geometry,
+                                                       aspect_ratio=args.aspect_ratio,
+                                                       smooth_scaling=args.smooth_scaling,
                                                        verbose=args.verbose, cd_cue=args.cd_cue)
             else:
                 run = subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,

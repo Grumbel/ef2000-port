@@ -244,6 +244,7 @@ class SDLInputTests(unittest.TestCase):
             self.assertEqual(self.display.menu.selected, 2)
             sdl.SDL_JoystickSetVirtualAxis(stick, 1, 0)
             self.display.poll(self.host)
+            self.display.menu.selected = 4
             button(0, 1)  # A enters Save State.
             self.assertEqual(self.display.menu.page, 'save')
             button(0, 0)

@@ -36,4 +36,10 @@ class CLIPathTests(unittest.TestCase):
 
     def test_help_and_version_work_without_game_data(self):
         self.assertIn('ef2000 ', self.run_cli('-v').stdout)
-        self.assertIn('--portable', self.run_cli('--help').stdout)
+        help_text = self.run_cli('--help').stdout
+        self.assertIn('--portable', help_text)
+        self.assertIn('1280x960', help_text)
+        self.assertIn('--aspect-ratio', help_text)
+        self.assertIn('--smooth-scaling', help_text)
+        run = self.run_cli('--aspect-ratio', '5:4', '--show-paths')
+        self.assertNotEqual(run.returncode, 0)

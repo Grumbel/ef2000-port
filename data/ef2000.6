@@ -26,7 +26,16 @@ Start in fullscreen.
 Start windowed.
 .TP
 .BR \-g , " --geometry " WxH
-Choose initial window size.
+Choose initial window size (default 1280x960).
+.TP
+.B --aspect-ratio 4:3|native|stretch
+Display using CRT 4:3 correction, square pixels, or full-window stretch.
+.TP
+.B --smooth-scaling
+Use linear filtering during framebuffer scaling.
+.TP
+.B --no-smooth-scaling
+Use sharp nearest-neighbour filtering (default).
 .TP
 .B --data-dir DIR
 Find the original game executable in DIR.

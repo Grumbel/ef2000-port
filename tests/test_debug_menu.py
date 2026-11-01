@@ -19,8 +19,10 @@ class DebugMenuTests(unittest.TestCase):
         self.addCleanup(self.directory.cleanup)
         root = Path(self.directory.name)
         self.states = SaveStates(root / 'states', root, {'test': 1})
-        self.display = SimpleNamespace(fullscreen=False, closed=False,
-                                       toggle_fullscreen=lambda: setattr(self.display, 'fullscreen', True))
+        self.display = SimpleNamespace(fullscreen=False, closed=False, aspect_ratio='4:3', smooth_scaling=False,
+                                       toggle_fullscreen=lambda: setattr(self.display, 'fullscreen', True),
+                                       cycle_aspect_ratio=lambda: setattr(self.display, 'aspect_ratio', 'native'),
+                                       toggle_smooth_scaling=lambda: setattr(self.display, 'smooth_scaling', True))
         self.menu = DebugMenu(self.display, self.states)
 
     def test_default_library_is_shared_between_output_directories(self):
@@ -30,7 +32,7 @@ class DebugMenuTests(unittest.TestCase):
             self.assertEqual(default_directory(), Path.home() / '.local/state/ef2000')
 
     def test_keyboard_submenus_new_save_overwrite_and_load(self):
-        self.menu.selected = 2
+        self.menu.selected = 4
         self.menu.key(40)
         self.assertEqual(self.menu.rows(), ['New Save', 'Back'])
         self.menu.key(40)
@@ -41,7 +43,7 @@ class DebugMenuTests(unittest.TestCase):
         self.menu.key(40)
         self.assertEqual(self.states.pending, ('save', path))
         self.menu.key(41)
-        self.menu.selected = 3
+        self.menu.selected = 5
         self.menu.key(40)
         self.assertEqual(self.menu.rows(), ['test-menu', 'Back'])
         self.menu.key(40)
@@ -50,7 +52,7 @@ class DebugMenuTests(unittest.TestCase):
     def test_unavailable_save_explains_backend_requirement(self):
         menu = DebugMenu(self.display, None)
         menu.open = True
-        menu.selected = 2
+        menu.selected = 4
         menu.key(40)
         self.assertEqual(menu.rows(), ['New Save (Unavailable)', 'Back'])
         menu.key(40)
@@ -64,11 +66,17 @@ class DebugMenuTests(unittest.TestCase):
         self.menu.selected = 1
         self.menu.key(40)
         self.assertTrue(self.display.fullscreen)
+        self.menu.selected = 2
+        self.menu.key(40)
+        self.assertEqual(self.display.aspect_ratio, 'native')
+        self.menu.selected = 3
+        self.menu.key(40)
+        self.assertTrue(self.display.smooth_scaling)
         self.menu.selected = 0
         self.menu.open = True
         self.menu.key(40)
         self.assertFalse(self.menu.open)
-        self.menu.selected = 4
+        self.menu.selected = 6
         self.menu.key(40)
         self.assertTrue(self.display.closed)
 

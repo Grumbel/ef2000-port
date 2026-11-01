@@ -68,6 +68,12 @@ hicolor icons, and a section 6 man page. `--show-paths` works without the game
 assets or runtime dependencies and prints the resolved directories and their
 sources. `-f`/`-w`, `-g WxH`, `--mute`, and `-d` follow gamepkgstd conventions;
 the existing backend, sound, VR, joystick, and diagnostic options remain.
+The window defaults to **1280×960**. `--aspect-ratio 4:3` (default) displays
+the original image at a 4:3 CRT-like aspect ratio, `native` preserves its
+square-pixel dimensions (e.g. 640×400 becomes 8:5), and `stretch` fills the
+window. `--smooth-scaling` enables linear filtering instead of the default
+nearest-neighbour scaling; `--no-smooth-scaling` selects the sharp setting.
+Both options can also be changed live in the F10 overlay.
 
 User configuration is read from `$XDG_CONFIG_HOME/ef2000/EF2000.CFG` if present,
 falling back to the original game file. User save states live under
