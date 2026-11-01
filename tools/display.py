@@ -12,8 +12,10 @@ import time
 
 try:
     from .vga import indexed_rgb
+    from .debug_menu import draw_text
 except ImportError:
     from vga import indexed_rgb
+    from debug_menu import draw_text
 
 
 class Rect(c.Structure):
@@ -58,6 +60,15 @@ MOUSE_BUTTON_DOWN = 0x401
 
 
 ASPECT_RATIOS = ('4:3', 'native', 'stretch')
+
+
+def startup_rgb():
+    """Visible framebuffer before the original BIOS selects a graphics mode."""
+    width, height = 640, 400
+    pixels = bytearray(width * height * 3)
+    draw_text(pixels, width, height, 32, 40, 'EF2000 STARTING', b'\xe0\xe0\xe0', 3)
+    draw_text(pixels, width, height, 32, 90, 'WAITING FOR ORIGINAL VIDEO', b'\x90\x90\x90', 2)
+    return bytes(pixels)
 
 
 def viewport_rect(window_width, window_height, frame_width, frame_height, aspect_ratio='4:3'):
@@ -155,6 +166,7 @@ class Display:
         self.menu = DebugMenu(self, states)
         self.closed = False
         self.last_frame = 0
+        self.guest_frame_seen = False
         self.joystick = None
         self.verbose = False
         self.last_joystick_trace = None
@@ -379,10 +391,21 @@ class Display:
             return
         frame = engine.frame(memory)
         if frame is None:
-            if not self.menu.open:
-                return
-            frame = (640, 400, bytes(640 * 400))
-        width, height, indices = frame
+            width, height = 640, 400
+            pixels = startup_rgb()
+        else:
+            width, height, indices = frame
+            pixels = indexed_rgb(indices, memory[0xf1000:0xf1300])
+            if not self.guest_frame_seen and any(pixels):
+                self.guest_frame_seen = True
+                print(f'graphics: first nonblack original frame {width}x{height}', flush=True)
+            elif not self.guest_frame_seen:
+                # Video mode 13h is selected at ~11M guest instructions but
+                # the splash is still entirely black at 30M. Keep informing
+                # the user that emulation is making progress until pixels
+                # from the original game actually become visible.
+                width, height = 640, 400
+                pixels = startup_rgb()
         self.last_frame = now
         if self.dimensions != (width, height):
             if self.texture:
@@ -394,7 +417,6 @@ class Display:
                 raise ValueError(self.sdl.SDL_GetError().decode())
             self.dimensions = (width, height)
             print(f'graphics: framebuffer={width}x{height}; indexed 8-bit', flush=True)
-        pixels = indexed_rgb(indices, memory[0xf1000:0xf1300])
         if self.menu.open:
             pixels = self.menu.render(pixels, width, height)
         window_width, window_height = c.c_int(), c.c_int()
@@ -402,11 +424,13 @@ class Display:
         self.rect = viewport_rect(window_width.value, window_height.value, width, height, self.aspect_ratio)
         if not self.sdl.SDL_UpdateTexture(self.texture, None, c.c_char_p(pixels), width * 3):
             raise ValueError(self.sdl.SDL_GetError().decode())
-        self.sdl.SDL_RenderClear(self.renderer)
+        if not self.sdl.SDL_RenderClear(self.renderer):
+            raise ValueError(self.sdl.SDL_GetError().decode())
         target = FRect(self.rect.x, self.rect.y, self.rect.w, self.rect.h)
         if not self.sdl.SDL_RenderTexture(self.renderer, self.texture, None, c.byref(target)):
             raise ValueError(self.sdl.SDL_GetError().decode())
-        self.sdl.SDL_RenderPresent(self.renderer)
+        if not self.sdl.SDL_RenderPresent(self.renderer):
+            raise ValueError(self.sdl.SDL_GetError().decode())
 
     def close(self):
         if self.joystick:

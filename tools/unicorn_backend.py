@@ -1445,8 +1445,12 @@ def main(argv=None, *, interactive=False):
                         default=100000000 if interactive else 0, metavar='N',
                         help='print running instruction/tick/video/checksum progress to stderr every N instructions '
                              '(0 disables progress; default: %(default)s)')
-    parser.add_argument('--fast-execution', action='store_true',
-                        help='batch guest execution for speed; EOI and trace timing is approximate')
+    execution = parser.add_mutually_exclusive_group()
+    execution.add_argument('--fast-execution', action='store_true',
+                           help='batch guest execution for speed; EOI and trace timing is approximate')
+    execution.add_argument('--precise-execution', action='store_false', dest='fast_execution',
+                           help='use the original per-instruction hook for exact diagnostics')
+    parser.set_defaults(fast_execution=interactive)
     parser.add_argument('--fast-quantum', type=int, default=1000, metavar='N',
                         help='maximum guest instructions per fast batch (default: %(default)s)')
     parser.add_argument('--trace-mouse', action='store_true',
