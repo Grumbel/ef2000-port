@@ -53,12 +53,16 @@ std::vector<uint8_t> read_bytes(const fs::path& path) {
     return {(std::istreambuf_iterator<char>(stream)), {}};
 }
 
-std::string virtual_configuration(std::string config, bool joystick) {
+std::string virtual_configuration(std::string config, bool joystick, bool digital_sound) {
     // The guest sees hardware settings appropriate to this backend without
     // changing the original EF2000.CFG file on disk.
     std::map<std::string, std::string> changes = {
-        {"MUSIC", "0,127"}, {"SOUNDFX", "0,127"}, {"SPEECH", "0"},
+        {"MUSIC", "0,127"},
         {"VRHELMET", "0"}, {"CONTROL", joystick ? "1" : "0"}};
+    if (!digital_sound) {
+        changes["SOUNDFX"] = "0,127";
+        changes["SPEECH"] = "0";
+    }
     const size_t factor = config.find("JOY_FACTOR=");
     if (joystick && factor != std::string::npos &&
         (factor == 0 || config[factor - 1] == '\n')) {
@@ -146,7 +150,8 @@ uint16_t DosDrive::insert(File file) {
     throw unsigned(4);
 }
 
-uint16_t DosDrive::open(const std::string& name, unsigned access, bool joystick) {
+uint16_t DosDrive::open(const std::string& name, unsigned access, bool joystick,
+                        bool digital_sound) {
     if (access > 2 || (access != 0 && overlay_root_.empty())) throw unsigned(5);
     const Paths paths = resolve(name);
     const bool overlay = paths.overlay_exists;
@@ -156,7 +161,8 @@ uint16_t DosDrive::open(const std::string& name, unsigned access, bool joystick)
     std::string filename = source.filename().string();
     for (char& c : filename) c = std::toupper(static_cast<unsigned char>(c));
     if (!overlay && filename == "EF2000.CFG") {
-        const std::string configured = virtual_configuration({bytes.begin(), bytes.end()}, joystick);
+        const std::string configured = virtual_configuration(
+            {bytes.begin(), bytes.end()}, joystick, digital_sound);
         bytes.assign(configured.begin(), configured.end());
     }
     return insert({std::move(bytes), 0, access, access ? paths.overlay : fs::path{}});

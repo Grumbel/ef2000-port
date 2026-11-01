@@ -79,7 +79,8 @@ int main() {
         fs::create_directories(game);
         fs::create_directories(cd);
         write_file(game / "CONFIG.DAT", "abcdefgh");
-        write_file(game / "EF2000.CFG", "CONTROL=1\r\nJOY_FACTOR=0\r\nMUSIC=1,127\r\n");
+        write_file(game / "EF2000.CFG", "CONTROL=1\r\nJOY_FACTOR=0\r\nMUSIC=1,127\r\n"
+                                       "SOUNDFX=1,127\r\nSPEECH=1\r\n");
         write_file(cd / "CHECK.CD", "disc");
 
         stage = "read-only files";
@@ -156,6 +157,13 @@ int main() {
                 "attached joystick virtual calibration");
         require(read_file(game / "EF2000.CFG").find("JOY_FACTOR=0") != std::string::npos,
                 "game configuration was modified");
+        handle = drive.open("EF2000.CFG", 0, false, true);
+        const std::string probe_cfg = bytes(drive.read(handle, 256));
+        drive.close(handle);
+        require(probe_cfg.find("SOUNDFX=1,127\r\n") != std::string::npos &&
+                probe_cfg.find("SPEECH=1\r\n") != std::string::npos &&
+                probe_cfg.find("MUSIC=0,127\r\n") != std::string::npos,
+                "SB16 probe must enable digital effects without FM music");
 
         // Replacing an overlay hard link must not modify the original inode.
         stage = "hard link protection";

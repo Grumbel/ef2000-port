@@ -5,6 +5,7 @@
 // during the Python-to-C++ transition; unsupported guest calls stop explicitly.
 // The proprietary executable is read at runtime and is never linked in.
 #include "dos_drive.hpp"
+#include "real_mode_cpu.hpp"
 #include <unicorn/unicorn.h>
 #include <unicorn/x86.h>
 #include <openssl/sha.h>
@@ -314,13 +315,15 @@ class Machine {
 public:
     explicit Machine(const std::vector<uint8_t>& image, fs::path game_dir, fs::path cd_dir,
                      fs::path overlay_dir,
-                     bool trace_interrupts = false, std::vector<MouseEvent> mouse_events = {},
+                     bool sb16_probe = false, bool trace_interrupts = false,
+                     std::vector<MouseEvent> mouse_events = {},
                      std::vector<TimedKeyEvent> key_events = {},
                      std::vector<JoystickEvent> joystick_events = {})
         : image_size_(image.size()), trace_interrupts_(trace_interrupts),
           mouse_events_(std::move(mouse_events)), key_events_(std::move(key_events)),
           joystick_events_(std::move(joystick_events)),
-          dos_drive_(std::move(game_dir), std::move(cd_dir), std::move(overlay_dir)) {
+          dos_drive_(std::move(game_dir), std::move(cd_dir), std::move(overlay_dir)),
+          digital_sound_enabled_(sb16_probe), real_cpu_(sb16_probe) {
         if (image.size() < ENTRY + 2 || image.size() > IMAGE_SIZE)
             throw std::runtime_error("invalid initialized image length");
         check(uc_open(UC_ARCH_X86, UC_MODE_32, &cpu_), "uc_open");
@@ -444,6 +447,8 @@ private:
     std::array<int, 4> joystick_axes_{};
     std::array<uint16_t, 4> joystick_remaining_{};
     ef2000::DosDrive dos_drive_;
+    bool digital_sound_enabled_{};
+    ef2000::RealModeCpu real_cpu_;
 
     struct VideoFrame { uint16_t width{}, height{}; std::vector<uint8_t> rgba; };
     static std::pair<uint16_t, uint16_t> vbe_dimensions(uint16_t mode) {
@@ -560,7 +565,8 @@ private:
             if (ah == 0x3d) {
                 const std::string name = dos_name(before.dx);
                 if (trace_interrupts_) std::cerr << "cpp-file: open " << name << '\n';
-                after.ax = dos_drive_.open(name, ax & 3, joystick_count_ != 0);
+                after.ax = dos_drive_.open(name, ax & 3, joystick_count_ != 0,
+                                           digital_sound_enabled_);
                 after.dx = 0;
             } else if (ah == 0x3c) {
                 after.ax = dos_drive_.create(dos_name(before.dx));
@@ -975,9 +981,36 @@ private:
         values.es = read_value<uint16_t>(frame + 4);
         values.ax = read_value<uint32_t>(frame + 10);
         values.dx = read_value<uint32_t>(frame + 14);
-        if (!bios(vector, values)) return false;
+        const bool builtin = vector == 0x10 || vector == 0x16 ||
+                             vector == 0x33 || vector == 0x2f;
+        if (!builtin && real_vectors_[vector]) {
+            std::vector<uint8_t> conventional(0x100000);
+            check(uc_mem_read(cpu_, DOS_BASE, conventional.data(), conventional.size()),
+                  "read real-mode DOS RAM");
+            const ef2000::RealRegisters registers{
+                values.ax, values.bx, values.cx, values.dx, values.si, values.di,
+                uint16_t(values.ds), uint16_t(values.es),
+                read_value<uint16_t>(frame + 6), read_value<uint16_t>(frame + 8),
+                values.flags};
+            try {
+                const auto result = real_cpu_.execute(real_vectors_[vector], real_vectors_,
+                                                       conventional, registers);
+                write(DOS_BASE, result.memory.data(), result.memory.size());
+                const auto& real = result.registers;
+                values.ax = real.ax; values.bx = real.bx; values.cx = real.cx;
+                values.dx = real.dx; values.si = real.si; values.di = real.di;
+                values.ds = real.ds; values.es = real.es; values.flags = real.flags;
+                write_value<uint16_t>(frame + 6, real.fs);
+                write_value<uint16_t>(frame + 8, real.gs);
+            } catch (const std::exception& error) {
+                fail("original 16-bit driver INT " + std::to_string(vector) + ": " + error.what());
+                return false;
+            }
+        } else if (!bios(vector, values)) return false;
         // The 18-byte X-32 request holds the four segment registers, EAX,
         // EDX. Remaining general registers return through protected registers.
+        write_value<uint16_t>(frame + 2, values.ds & 0xffff);
+        write_value<uint16_t>(frame + 4, values.es & 0xffff);
         write_value<uint32_t>(frame + 14, values.dx);
         after.ax = values.ax;
         after.bx = values.bx;
@@ -1381,6 +1414,7 @@ void usage(const char* program) {
     std::cout << "Usage: " << program << " _EF2000.EXE [--instruction-limit N]"
               << " [--game-dir DIR] [--cd-dir DIR] [--overlay-dir DIR] [--windowed]"
               << " [--timer-instructions N]\n"
+              << "       [--sound off|sb16-probe] (discovery only; no PCM playback yet)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
               << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
               << "       --instruction-limit 0 means unlimited (window default)\n"
@@ -1405,6 +1439,7 @@ int main(int argc, char** argv) {
         bool explicit_limit = false;
         uint64_t timer_interval = 250000;
         WindowOptions window;
+        bool sb16_probe = false;
         bool self_test = false;
         bool trace_interrupts = false;
         std::vector<MouseEvent> mouse_events;
@@ -1433,6 +1468,11 @@ int main(int argc, char** argv) {
                 cd_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--overlay-dir") && i + 1 < argc) {
                 overlay_dir = argv[++i];
+            } else if (!std::strcmp(argv[i], "--sound") && i + 1 < argc) {
+                const std::string mode = argv[++i];
+                if (mode == "sb16-probe") sb16_probe = true;
+                else if (mode == "off") sb16_probe = false;
+                else throw std::runtime_error("invalid --sound (off, sb16-probe)");
             } else if (!std::strcmp(argv[i], "--windowed")) {
                 window.enabled = true;
             } else if (!std::strcmp(argv[i], "--fullscreen")) {
@@ -1543,7 +1583,7 @@ int main(int argc, char** argv) {
         const auto image = payload_from_executable(path);
         if (game_dir.empty()) game_dir = fs::path(path).parent_path().string();
         if (cd_dir.empty()) cd_dir = game_dir;
-        Machine machine(image, game_dir, cd_dir, overlay_dir, trace_interrupts,
+        Machine machine(image, game_dir, cd_dir, overlay_dir, sb16_probe, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events));
         return machine.run(limit, window, timer_interval, framebuffer);
     } catch (const std::exception& error) {

@@ -19,7 +19,8 @@ public:
     DosDrive(std::filesystem::path game_root, std::filesystem::path cd_root,
              std::filesystem::path overlay_root);
 
-    uint16_t open(const std::string& name, unsigned access, bool joystick);
+    uint16_t open(const std::string& name, unsigned access, bool joystick,
+                  bool digital_sound = false);
     uint16_t create(const std::string& name);
     void close(uint16_t handle);
     std::vector<uint8_t> read(uint16_t handle, size_t size);
