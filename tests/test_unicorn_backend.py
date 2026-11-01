@@ -168,16 +168,25 @@ class UnicornStartupServiceTests(unittest.TestCase):
 
     def test_headless_mouse_script_applies_press_and_release_at_ticks(self):
         class Mouse:
-            mouse_x = mouse_y = mouse_buttons = 0
+            mouse_x, mouse_y, mouse_buttons = 320, 100, 0
+            mouse_motion_x = mouse_motion_y = 0
+
+            def move_mouse(self, dx, dy):
+                self.mouse_motion_x += dx
+                self.mouse_motion_y += dy
+                self.mouse_x += dx
+                self.mouse_y += dy
 
         mouse = Mouse()
-        events = MouseScript(['20:320:100:1', '25:320:100:0', '0:20:30:0'])
+        events = MouseScript(['20:200:0:1', '25:200:0:0', '0:320:100:0'])
         events.apply(0, mouse)
-        self.assertEqual((mouse.mouse_x, mouse.mouse_y, mouse.mouse_buttons), (20, 30, 0))
+        self.assertEqual((mouse.mouse_x, mouse.mouse_y, mouse.mouse_buttons), (320, 100, 0))
         events.apply(19, mouse)
         self.assertEqual(mouse.mouse_buttons, 0)
+        self.assertEqual((mouse.mouse_motion_x, mouse.mouse_motion_y), (0, 0))
         events.apply(22, mouse)
-        self.assertEqual((mouse.mouse_x, mouse.mouse_buttons), (320, 1))
+        self.assertEqual((mouse.mouse_x, mouse.mouse_y, mouse.mouse_buttons), (200, 0, 1))
+        self.assertEqual((mouse.mouse_motion_x, mouse.mouse_motion_y), (-120, -100))
         events.apply(25, mouse)
         self.assertEqual(mouse.mouse_buttons, 0)
         self.assertEqual([event['tick'] for event in events.applied], [0, 20, 25])

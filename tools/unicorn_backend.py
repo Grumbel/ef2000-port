@@ -220,7 +220,11 @@ class MouseScript:
     def apply(self, ticks, engine):
         while self.events and self.events[0][0] <= ticks:
             tick, x, y, buttons = self.events.pop(0)
-            engine.mouse_x, engine.mouse_y, engine.mouse_buttons = x, y, buttons
+            # The original menu reads relative mickeys (INT 33h AX=000Bh)
+            # in addition to absolute position (AX=0003h). Share the SDL
+            # movement path so scripts update both representations.
+            engine.move_mouse(x - engine.mouse_x, y - engine.mouse_y)
+            engine.mouse_buttons = buttons
             self.applied.append({'tick': tick, 'x': x, 'y': y, 'buttons': buttons})
 
 
