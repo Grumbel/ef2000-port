@@ -192,6 +192,9 @@ class GamePort:
 
     def __init__(self):
         self.remaining = [0] * 4
+        self.reads = 0
+        self.writes = 0
+        self.states = {}
 
     @staticmethod
     def state(cpu):
@@ -202,10 +205,14 @@ class GamePort:
         return mask & 15, buttons & 15, axes
 
     def write(self, cpu):
-        _, _, axes = self.state(cpu)
+        mask, buttons, axes = self.state(cpu)
         self.remaining[:] = axes
+        self.writes += 1
+        key = (mask, buttons, *axes)
+        self.states[key] = self.states.get(key, 0) + 1
 
     def read(self, cpu):
+        self.reads += 1
         mask, buttons, _ = self.state(cpu)
         value = ((~buttons & 15) << 4) | (~mask & 15)
         for axis in range(4):
@@ -213,6 +220,12 @@ class GamePort:
                 value |= 1 << axis
                 self.remaining[axis] -= 1
         return value
+
+    def report(self):
+        return {'reads': self.reads, 'writes': self.writes,
+                'sampled_states': [{'mask': state[0], 'buttons': state[1],
+                                    'discharge_counts': list(state[2:]), 'count': count}
+                                   for state, count in sorted(self.states.items())]}
 
 
 class MouseScript:
@@ -1293,6 +1306,7 @@ def run(image, instruction_limit=None, game_dir=None,
         result['decompression'] = decompress_trace
     result['key_events'] = key_script.applied
     result['joystick_events'] = joystick_script.applied
+    result['gameport'] = gameport.report()
     result['timer'] = {'instructions': timer.instructions, 'ticks': timer.ticks,
                        'irq0': timer.interrupts - timer.keyboard_interrupts,
                        'irq1': timer.keyboard_interrupts, 'divisor': timer.divisor,

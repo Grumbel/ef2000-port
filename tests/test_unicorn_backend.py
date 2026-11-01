@@ -94,6 +94,10 @@ class UnicornStartupServiceTests(unittest.TestCase):
         joystick = GamePort()
         joystick.write(guest)
         self.assertEqual([joystick.read(guest) for _ in range(3)], [0xeF, 0xeD, 0xec])
+        self.assertEqual(joystick.report()['reads'], 3)
+        self.assertEqual(joystick.report()['writes'], 1)
+        self.assertEqual(joystick.report()['sampled_states'][0]['discharge_counts'],
+                         [2, 1, 0, 0])
         struct.pack_into('<I', guest.ram, 0xf1400, 0)
         self.assertEqual(joystick.read(guest), 0xff)
         palette = VgaDac()
@@ -570,6 +574,17 @@ class UnicornGuestTests(unittest.TestCase):
         self.assertEqual(result['ax'] & 255, 0xec)  # axes 0/1 present, button 0 held
         self.assertEqual(result['joystick_events'],
                          [{'tick': 1, 'axes': [32767, -32768], 'buttons': 1}])
+        self.assertGreater(result['gameport']['reads'], 0)
+        self.assertEqual(result['gameport']['writes'], 0)
+
+        # The original joystick measurement charges its RC counters with OUT
+        # 201h and then samples the discharge with IN 201h.
+        image[ENTRY:ENTRY + 9] = bytes.fromhex('ba 01 02 00 00 ee ec eb fc')
+        charged = run(bytes(image), instruction_limit=200, timer_instructions=10,
+                      joystick_events=['1:32767:0:0'])
+        self.assertGreater(charged['gameport']['writes'], 0)
+        self.assertIn([127, 64, 0, 0],
+                      [row['discharge_counts'] for row in charged['gameport']['sampled_states']])
 
     def test_windowed_display_pumps_events_and_closes_safely(self):
         displays = []
