@@ -93,6 +93,16 @@ struct JoystickAxisBinding {
 };
 enum class ControlSelection { Auto, Keyboard, Joystick };
 enum class ExecutionTiming { Auto, Instruction, Realtime };
+struct PerformanceOptions {
+    unsigned block_clock_check = 256;
+    unsigned vga_clock_check = 32;
+    bool profile{};
+};
+struct PerformanceStats {
+    uint64_t block_clock_checks{}, port_ins{}, port_outs{};
+    uint64_t vga_reads{}, vga_clock_checks{}, audio_reads{}, audio_writes{};
+    std::chrono::steady_clock::duration guest_time{}, audio_time{}, cd_time{}, display_time{};
+};
 struct WindowOptions {
     bool enabled{}, fullscreen{}, smooth_scaling{};
     int width = 1280, height = 960;
@@ -126,6 +136,15 @@ std::vector<JoystickAxisBinding> parse_joystick_axes(const std::string& value) {
         (!value.empty() && value.back() == ','))
         throw std::runtime_error("--joystick-axes expects two or four comma-separated axes");
     return mappings;
+}
+
+unsigned parse_clock_check(const std::string& value, const char* option) {
+    size_t parsed{};
+    const auto number = std::stoul(value, &parsed);
+    if (parsed != value.size() || number < 1 || number > 4096 ||
+        (number & (number - 1)) != 0)
+        throw std::runtime_error(std::string(option) + " expects a power of two (1..4096)");
+    return unsigned(number);
 }
 
 class StartupWindow {
@@ -586,7 +605,9 @@ public:
 
     int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
             const std::string& framebuffer, const std::string& wav_directory,
-            bool realtime = false, double wall_seconds = 0) {
+            bool realtime = false, double wall_seconds = 0,
+            PerformanceOptions performance = {}) {
+        performance_ = performance;
         const bool trace_joystick = window_options.trace_joystick;
         if (!wav_directory.empty())
             wav_capture_ = std::make_unique<ef2000::WavCapture>(wav_directory);
@@ -603,6 +624,7 @@ public:
                   << "instruction budget " << (limit ? std::to_string(limit) : "unlimited")
                   << "; timing " << (realtime ? "real-time PIT" : "instruction-counted") << '\n';
         if (!refresh(window, 0, "INITIALIZING X-32 GUEST")) return 0;
+        perf_stats_ = {}; // Exclude the initial SDL window setup from timed playback.
         const auto start = std::chrono::steady_clock::now();
         // Bounded diagnostic mode retains instruction-based ticks and exact
         // replay positions. With an unlimited interactive budget, avoid the
@@ -624,6 +646,11 @@ public:
         while (running && (!limit || completed < limit) && status_ == "instruction_limit") {
             uint32_t ip{};
             check(uc_reg_read(cpu_, UC_X86_REG_EIP, &ip), "read instruction pointer");
+            // Keep intermittent 3DAh reads fresh across emulation slices in
+            // both instruction-timed diagnostics and real-time mode.
+            vga_reads_until_check_ = 1;
+            const auto guest_started = performance_.profile ? std::chrono::steady_clock::now() :
+                                       std::chrono::steady_clock::time_point{};
             if (realtime) {
                 // Stop at a translated basic-block boundary every ~10 ms.
                 // Unlike Unicorn's instruction-counted emulation this only
@@ -655,6 +682,8 @@ public:
                 check(uc_emu_start(cpu_, ip, 0, 0, amount), "instruction-counted guest execution");
                 completed += amount;
             }
+            if (performance_.profile)
+                perf_stats_.guest_time += std::chrono::steady_clock::now() - guest_started;
             if (status_ != "instruction_limit") break;
             ++slices;
             if (eoi_hook_ && !irq_in_service_) {
@@ -730,6 +759,25 @@ public:
             std::cout << " sdl_polls=" << window.input_polls()
                       << " rendered_frames=" << window.frames_presented();
         std::cout << '\n';
+        if (performance_.profile) {
+            const auto milliseconds = [](std::chrono::steady_clock::duration time) {
+                return std::chrono::duration<double, std::milli>(time).count();
+            };
+            std::cout << "profile: blocks=" << realtime_blocks_
+                      << " block_clock_checks=" << perf_stats_.block_clock_checks
+                      << " port_in=" << perf_stats_.port_ins
+                      << " port_out=" << perf_stats_.port_outs
+                      << " vga_reads=" << perf_stats_.vga_reads
+                      << " vga_clock_checks=" << perf_stats_.vga_clock_checks << '\n';
+            std::cout << "profile_ms: guest=" << std::fixed << std::setprecision(2)
+                      << milliseconds(perf_stats_.guest_time)
+                      << " audio=" << milliseconds(perf_stats_.audio_time)
+                      << " cd=" << milliseconds(perf_stats_.cd_time)
+                      << " display=" << milliseconds(perf_stats_.display_time)
+                      << std::defaultfloat << '\n';
+            std::cout << "profile_audio_bytes: read=" << perf_stats_.audio_reads
+                      << " write=" << perf_stats_.audio_writes << '\n';
+        }
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
         std::cout.flush();
         if (window.enabled()) {
@@ -748,6 +796,11 @@ private:
     std::string invalid_memory_;
     uc_hook slice_hook_{};
     std::chrono::steady_clock::time_point slice_deadline_{};
+    PerformanceOptions performance_{};
+    PerformanceStats perf_stats_{};
+    uint64_t realtime_blocks_{};
+    unsigned vga_reads_until_check_{1};
+    uint32_t vga_status_{};
     StartupWindow* active_window_{};
     std::unique_ptr<ef2000::WavCapture> wav_capture_;
     std::unique_ptr<ef2000::WavCapture> cd_wav_capture_;
@@ -860,6 +913,8 @@ private:
     bool refresh(StartupWindow& window, uint64_t completed, const std::string& status) {
         if (!window.enabled()) return true;
         if (!window.should_poll()) return true;
+        const auto started = performance_.profile ? std::chrono::steady_clock::now() :
+                             std::chrono::steady_clock::time_point{};
         // Poll input often, but only copy the banked VGA framebuffer and
         // build RGBA pixels when the next display refresh is actually due.
         VideoFrame frame;
@@ -887,6 +942,8 @@ private:
         else if (joystick_events_.empty())
             set_joystick(controls_ == ControlSelection::Joystick ? 2u : 0u, {}, 0);
         sync_scan_mailbox();
+        if (performance_.profile)
+            perf_stats_.display_time += std::chrono::steady_clock::now() - started;
         return running;
     }
     void save_framebuffer(const std::string& path) {
@@ -1533,20 +1590,29 @@ private:
         const double now = std::chrono::duration<double>(
             std::chrono::steady_clock::now().time_since_epoch()).count();
         if (!real_cpu_.audio_service_due(now)) return;
+        const auto started = performance_.profile ? std::chrono::steady_clock::now() :
+                             std::chrono::steady_clock::time_point{};
         try {
             std::vector<uint8_t> memory(0x100000);
             check(uc_mem_read(cpu_, DOS_BASE, memory.data(), memory.size()),
                   "read DOS memory for background audio");
+            if (performance_.profile) perf_stats_.audio_reads += memory.size();
             const auto result = real_cpu_.service_audio(now, real_vectors_, memory);
-            if (!result.memory.empty())
+            if (!result.memory.empty()) {
                 write(DOS_BASE, result.memory.data(), result.memory.size());
+                if (performance_.profile) perf_stats_.audio_writes += result.memory.size();
+            }
             record_audio(result.audio_blocks);
         } catch (const std::exception& error) {
             fail(std::string("background SB16 DMA/IRQ: ") + error.what());
         }
+        if (performance_.profile)
+            perf_stats_.audio_time += std::chrono::steady_clock::now() - started;
     }
     void service_cd() {
         if (!cd_audio_) return;
+        const auto started = performance_.profile ? std::chrono::steady_clock::now() :
+                             std::chrono::steady_clock::time_point{};
         try {
             const double now = std::chrono::duration<double>(
                 std::chrono::steady_clock::now().time_since_epoch()).count();
@@ -1558,6 +1624,8 @@ private:
         } catch (const std::exception& error) {
             fail(std::string("background CD audio: ") + error.what());
         }
+        if (performance_.profile)
+            perf_stats_.cd_time += std::chrono::steady_clock::now() - started;
     }
     void deliver_tick(uint32_t next_ip) {
         ++ticks_;
@@ -1839,8 +1907,14 @@ private:
     }
     static void on_realtime_block(uc_engine* cpu, uint64_t, uint32_t, void* user) {
         auto* machine = static_cast<Machine*>(user);
-        if (std::chrono::steady_clock::now() >= machine->slice_deadline_)
-            uc_emu_stop(cpu);
+        // A clock syscall on *every* translated block is expensive on both
+        // Linux and Windows. The callback is still needed for safe block-
+        // boundary stops; sample the deadline once per N blocks instead.
+        if ((++machine->realtime_blocks_ & (machine->performance_.block_clock_check - 1)) == 0) {
+            if (machine->performance_.profile) ++machine->perf_stats_.block_clock_checks;
+            if (std::chrono::steady_clock::now() >= machine->slice_deadline_)
+                uc_emu_stop(cpu);
+        }
     }
     static bool on_invalid_memory(uc_engine*, uc_mem_type type, uint64_t address,
                                   int size, int64_t, void* user) {
@@ -1852,10 +1926,20 @@ private:
         return false;
     }
     uint32_t port_in(uint32_t port) {
+        if (performance_.profile) ++perf_stats_.port_ins;
         if (port == 0x3da) {
-            const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                std::chrono::steady_clock::now().time_since_epoch()).count();
-            return ns % 16666667 >= 15000000 ? 8 : 0;
+            if (performance_.profile) ++perf_stats_.vga_reads;
+            // The original VGA/SB16 code can poll vertical retrace in tight
+            // loops. Avoid the monotonic-clock query and modulo on most INs.
+            // Always sample the first read in each emulation slice.
+            if (--vga_reads_until_check_ == 0) {
+                if (performance_.profile) ++perf_stats_.vga_clock_checks;
+                vga_reads_until_check_ = performance_.vga_clock_check;
+                const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    std::chrono::steady_clock::now().time_since_epoch()).count();
+                vga_status_ = ns % 16666667 >= 15000000 ? 8 : 0;
+            }
+            return vga_status_;
         }
         if (port == 0x64) return keyboard_ack_ || keyboard_pending() ? 1 : 0;
         if (port == 0x60) {
@@ -1883,6 +1967,7 @@ private:
         return 0;
     }
     void port_out(uint32_t port, uint32_t value) {
+        if (performance_.profile) ++perf_stats_.port_outs;
         if (port == 0x20 && (value & 255) == 0x20) { eoi_seen_ = true; return; }
         if (port == 0x43 && ((value & 255) == 0x36 || (value & 255) == 0x34)) {
             pit_high_next_ = false; return;
@@ -1918,6 +2003,8 @@ void usage(const char* program) {
               << "       [--sound off|sb16-probe|sb16-dma] (SDL3 audio if available)\n"
               << "       [--timing auto|instruction|realtime] (auto uses real-time for unlimited windowed runs)\n"
               << "       [--wall-seconds N] (bounded real-time/headless diagnostic)\n"
+              << "       [--block-clock-check N] [--vga-clock-check N] (powers of two, 1..4096)\n"
+              << "       [--profile] (print callback counts and host time by subsystem)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
               << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
               << "       --instruction-limit 0 means unlimited (window default)\n"
@@ -1937,7 +2024,7 @@ void usage(const char* program) {
               << "       Windows default: %LOCALAPPDATA%\\ef2000\\state\\unicorn\\drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
-              << "       " << program << " --self-test | --self-test-bda | --self-test-clock\n";
+              << "       " << program << " --self-test | --self-test-bda | --self-test-clock | --self-test-retrace\n";
 }
 } // namespace
 
@@ -1950,10 +2037,12 @@ int main(int argc, char** argv) {
         uint64_t timer_interval = 250000;
         ExecutionTiming timing = ExecutionTiming::Auto;
         double wall_seconds = 0;
+        PerformanceOptions performance;
         WindowOptions window;
         ef2000::SoundMode sound_mode = ef2000::SoundMode::Off;
         ControlSelection controls = ControlSelection::Auto;
         bool self_test = false, self_test_bda = false, self_test_clock = false;
+        bool self_test_retrace = false;
         bool trace_interrupts = false;
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
@@ -1987,6 +2076,12 @@ int main(int argc, char** argv) {
                 wall_seconds = std::stod(value, &end);
                 if (end != value.size() || !std::isfinite(wall_seconds) || wall_seconds <= 0)
                     throw std::runtime_error("--wall-seconds expects a positive finite number");
+            } else if (!std::strcmp(argv[i], "--block-clock-check") && i + 1 < argc) {
+                performance.block_clock_check = parse_clock_check(argv[++i], "--block-clock-check");
+            } else if (!std::strcmp(argv[i], "--vga-clock-check") && i + 1 < argc) {
+                performance.vga_clock_check = parse_clock_check(argv[++i], "--vga-clock-check");
+            } else if (!std::strcmp(argv[i], "--profile")) {
+                performance.profile = true;
             } else if (!std::strcmp(argv[i], "--game-dir") && i + 1 < argc) {
                 game_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--cd-dir") && i + 1 < argc) {
@@ -2049,6 +2144,8 @@ int main(int argc, char** argv) {
                 self_test_bda = true;
             } else if (!std::strcmp(argv[i], "--self-test-clock")) {
                 self_test_clock = true;
+            } else if (!std::strcmp(argv[i], "--self-test-retrace")) {
+                self_test_retrace = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
                 framebuffer = argv[++i];
             } else if (!std::strcmp(argv[i], "--wav-capture") && i + 1 < argc) {
@@ -2113,8 +2210,9 @@ int main(int argc, char** argv) {
             } else if (argv[i][0] != '-' && path.empty()) path = argv[i];
             else throw std::runtime_error("unrecognized option: " + std::string(argv[i]));
         }
-        if (self_test || self_test_bda || self_test_clock) {
-            if (int(self_test) + int(self_test_bda) + int(self_test_clock) != 1)
+        if (self_test || self_test_bda || self_test_clock || self_test_retrace) {
+            if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
+                int(self_test_retrace) != 1)
                 throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
@@ -2150,16 +2248,29 @@ int main(int argc, char** argv) {
             constexpr uint8_t clock_guest[] = {
                 0xb8, 0x78, 0x56, 0x34, 0x12,  // mov eax,0x12345678
                 0xeb, 0xf9};                  // jmp back seven bytes
+            // Wait for the end of a retrace pulse and then the next pulse.
+            // This detects a stale 3DAh value that would hang game/driver
+            // loops when port reads are sampled instead of clocked individually.
+            constexpr uint8_t retrace_guest[] = {
+                0xba, 0xda, 0x03, 0x00, 0x00,  // mov edx,0x3da
+                0xec, 0xa8, 0x08, 0x75, 0xfb, // wait until bit 3 is clear
+                0xec, 0xa8, 0x08, 0x74, 0xfb, // wait until bit 3 is set
+                0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21}; // DOS exit
             if (self_test_bda)
                 std::copy(std::begin(bda_guest), std::end(bda_guest), image.begin() + ENTRY);
             else if (self_test_clock)
                 std::copy(std::begin(clock_guest), std::end(clock_guest), image.begin() + ENTRY);
+            else if (self_test_retrace)
+                std::copy(std::begin(retrace_guest), std::end(retrace_guest), image.begin() + ENTRY);
             else
                 std::copy(std::begin(gameport_guest), std::end(gameport_guest), image.begin() + ENTRY);
             Machine machine(image, {}, {}, {}, ef2000::SoundMode::Off, false,
                             {}, {}, std::move(joystick_events), controls);
-            return machine.run(self_test_clock ? 0 : 10000, window, 250000, "", "",
-                               self_test_clock, self_test_clock ? 0.25 : 0);
+            const bool realtime_test = self_test_clock || self_test_retrace;
+            return machine.run(realtime_test ? 0 : 10000, window, 250000, "", "",
+                               realtime_test,
+                               realtime_test ? (wall_seconds > 0 ? wall_seconds : 0.25) : 0,
+                               performance);
         }
         if (path.empty()) { usage(argv[0]); return 2; }
         if (!wav_directory.empty() && sound_mode != ef2000::SoundMode::Dma && cd_cue.empty())
@@ -2199,7 +2310,7 @@ int main(int argc, char** argv) {
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
                         controls, cd_cue);
         return machine.run(limit, window, timer_interval, framebuffer, wav_directory,
-                           realtime, wall_seconds);
+                           realtime, wall_seconds, performance);
     } catch (const std::exception& error) {
         std::cerr << "ef2000-unicorn-cpp: " << error.what() << '\n';
         return 1;

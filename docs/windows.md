@@ -31,6 +31,7 @@ PowerShell (or `cmd.exe`):
 .\ef2000-unicorn-cpp.exe --self-test
 .\ef2000-unicorn-cpp.exe --self-test-bda
 .\ef2000-unicorn-cpp.exe --self-test-clock
+.\ef2000-unicorn-cpp.exe --self-test-retrace
 ```
 
 Then point the executable at an original EF2000 installation:
@@ -59,6 +60,31 @@ The same options as on Linux apply, including `--geometry 1280x960`,
 Unlimited windowed sessions default to `--timing realtime`, avoiding
 Unicorn's expensive per-instruction count hook. Deterministic headless probes
 can use `--timing instruction --instruction-limit N`.
+
+The real-time runner checks its deadline every 256 translated basic blocks
+(`--block-clock-check N`) rather than querying the host clock for every block.
+It also samples VGA retrace status every 32 port reads (`--vga-clock-check N`).
+Both options accept powers of two from 1 to 4096; setting both to `1` restores
+the original per-access clock checks for A/B comparisons. `--self-test-retrace`
+checks that the guest can still detect VGA retrace transitions without game
+files.
+
+For performance comparisons, `--profile` prints translated-block and VGA
+poll counts, clock samples, guest execution time, audio-service time and
+frame-presentation time. Normal play does not collect these extra statistics.
+Compare a longer asset-free clock loop under the default sampling and the old
+per-access behavior:
+
+```powershell
+.\ef2000-unicorn-cpp.exe --self-test-clock --wall-seconds 5 --profile
+.\ef2000-unicorn-cpp.exe --self-test-clock --wall-seconds 5 --profile --block-clock-check 1 --vga-clock-check 1
+```
+
+`profile: blocks` is the basic-block count, **not** the number of guest
+instructions. The game runs with `--profile` as well; use a fixed
+`--wall-seconds N` and repeat comparisons at the same in-game stage. The
+display itself is capped near 30 presentations per second, so the reported
+`rendered_frames` alone is not a gameplay speed benchmark.
 
 The MinGW build is checked for PE executables and bundled DLLs by the flake,
 but the actual GUI, joystick, sound and startup paths still require validation

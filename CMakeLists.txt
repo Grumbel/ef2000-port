@@ -104,6 +104,17 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
   add_test(NAME unicorn-cpp-clock COMMAND ef2000-unicorn-cpp --self-test-clock)
   set_tests_properties(unicorn-cpp-clock PROPERTIES
                        PASS_REGULAR_EXPRESSION "status=wall_time_limit interrupts=0 ticks=[1-9].*ax=0x12345678")
+  add_test(NAME unicorn-cpp-retrace COMMAND ef2000-unicorn-cpp --self-test-retrace)
+  set_tests_properties(unicorn-cpp-retrace PROPERTIES
+                       PASS_REGULAR_EXPRESSION "status=guest_exit")
+  add_test(NAME unicorn-cpp-retrace-uncached COMMAND ef2000-unicorn-cpp
+           --self-test-retrace --vga-clock-check 1 --block-clock-check 1)
+  set_tests_properties(unicorn-cpp-retrace-uncached PROPERTIES
+                       PASS_REGULAR_EXPRESSION "status=guest_exit")
+  add_test(NAME unicorn-cpp-profile COMMAND ef2000-unicorn-cpp
+           --self-test-retrace --profile)
+  set_tests_properties(unicorn-cpp-profile PROPERTIES
+                       PASS_REGULAR_EXPRESSION "profile: blocks=[0-9]+.*vga_reads=[1-9]")
   add_executable(ef2000-real-mode-test tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp
                                      runtime/sb16_probe.cpp runtime/sound_blaster.cpp
                                      runtime/isa_audio.cpp)

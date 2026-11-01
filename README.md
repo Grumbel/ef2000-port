@@ -305,6 +305,17 @@ Linux backend still has a fundamental performance advantage because it executes
 the game's protected-mode code directly, without CPU translation. Gameplay
 performance with real SDL3 graphics and input still needs testing.
 
+The default real-time path now samples the block deadline every 256 translated
+blocks and VGA vertical-retrace status every 32 reads of port `3DAh`, avoiding
+most of the host clock lookups caused by busy loops. Set
+`--block-clock-check 1 --vga-clock-check 1` to restore per-access clock queries
+for comparisons. `--profile` adds opt-in counts and host-time measurements for
+guest execution, VGA polling, background audio and window updates. The
+`--self-test-retrace` check verifies that retrace wait loops still finish; a
+repeatable asset-free CPU sample is `--self-test-clock --wall-seconds 5 --profile`.
+These options do not eliminate the remaining Unicorn block callback overhead;
+actual in-game frame pacing must still be compared on hardware.
+
 DOS writes in windowed mode default to
 `$XDG_STATE_HOME/ef2000/unicorn/drive` (or
 `~/.local/state/ef2000/unicorn/drive`). Override this with `--overlay-dir`

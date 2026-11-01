@@ -584,3 +584,50 @@ disposable seven-track CUE/BIN and the sound-enabled timed input above, a
 unsupported interface or memory fault. The synthetic BIN encodes silence;
 this confirms the CD path, not the audible music content. Native SDL3 frame
 rate, audio latency and gameplay timing on real hardware still require testing.
+
+#### Sampling the real-time block and VGA clocks
+
+The real-time block hook formerly queried `steady_clock` at the beginning of
+**every** Unicorn translated basic block. The new default checks the deadline
+every 256 basic blocks instead. The hook still executes for every block, and
+always stops via `uc_emu_stop()` at a block boundary. The 10 ms slice/PIT
+scheduling policy is otherwise unchanged, and Unicorn's native timeout is
+still deliberately unused because of the multi-byte EIP-resumption failure.
+
+The VGA `3DAh` input-status port also queried the host clock on every `IN`
+instruction. It now updates the cached retrace state every 32 reads, always
+refreshing the first read of each emulation slice. The guest's 60 Hz retrace
+period and pulse width are unchanged. `--self-test-retrace` runs original-style
+poll loops until it observes the end and start of successive retrace intervals,
+without any proprietary game data. The check passes at the default clock
+intervals and with both intervals set to `1`.
+
+To compare the two behaviors, use:
+
+```sh
+ef2000-unicorn-cpp --self-test-clock --wall-seconds 5 --profile
+ef2000-unicorn-cpp --self-test-clock --wall-seconds 5 --profile \
+  --block-clock-check 1 --vga-clock-check 1
+```
+
+`--profile` prints callback counts, clock-query counts, total time spent in
+guest execution and separate time spent servicing sound, CD audio and window
+updates; it is not enabled during regular play. The block-clock and VGA-clock
+intervals accept powers of two from 1 through 4096. In the asset-free 1-second
+clock-loop test, with `--profile` enabled for both runs, the same host executed
+36–37 million blocks/s with the old block clock interval (`1`) and 205–213
+million blocks/s with the new interval (`256`) in sequential A/B/B/A runs. This
+is a roughly 5.5–5.8× speedup of that *specific synthetic loop*, not a claim
+about game FPS or audio latency. The retrace test likewise exercises busy
+polling, but real EF2000 gameplay speed needs testing on hardware.
+
+Two sequential 10-second A/B comparisons using the original `_EF2000.EXE`
+and its game files, headless with `--sound sb16-dma --timing realtime --profile`,
+reached the same startup execution address without faults. The legacy
+clock-check settings (`1/1`) executed 79.29M and 79.02M blocks; the new
+defaults (`256/32`) executed 84.35M and 82.80M blocks, an average of about
+**5.6% more translated blocks per wall second** in this startup segment.
+The new run sampled the VGA clock only 47–56K times despite 1.50–1.80M port
+`3DAh` reads. Background DMA audio service consumed 52–72 ms of each 10-second
+run, including copying approximately 67 MiB of guest memory in each direction.
+These runs had no SDL3 display or CD image and do not measure in-flight FPS.
