@@ -14,13 +14,16 @@ import resource
 import re
 import shutil
 import subprocess
+import uuid
 
 try:
     from .extract_image import extract
     from .input_devices import flight_control_settings
+    from .paths import resolve_paths, format_paths
 except ImportError:
     from extract_image import extract
     from input_devices import flight_control_settings
+    from paths import resolve_paths, format_paths
 
 
 def analyze_calls(log):
@@ -93,10 +96,10 @@ def main():
                '/path/to/_EF2000.EXE --output local/startup-01')
     version_file = Path(__file__).resolve().parent.parent / 'VERSION'
     version = os.environ.get('EF2000_VERSION') or version_file.read_text().strip()
-    parser.add_argument('--version', action='version', version=f'ef2000 {version}')
-    parser.add_argument('executable', type=Path,
+    parser.add_argument('-v', '--version', action='version', version=f'ef2000 {version}')
+    parser.add_argument('executable', type=Path, nargs='?',
                         help='path to the original DOS _EF2000.EXE')
-    parser.add_argument('--output', type=Path, required=True, metavar='DIR',
+    parser.add_argument('--output', type=Path, metavar='DIR',
                         help='create DIR for the extracted game payload, compiled startup '
                              'harness, logs, report.json, and framebuffer.png; '
                              'DIR/drive holds local game-file changes '
@@ -134,10 +137,54 @@ def main():
                         help='use precompiled harness objects under ROOT/{native64,qemu} '
                              'instead of compiling them with GCC')
     parser.add_argument('--load-state', type=Path, metavar='FILE', help='restore a native save-state bundle at startup')
-    parser.add_argument('--state-dir', type=Path, metavar='DIR', help='save-state directory (default: XDG data directory / ef2000/states)')
-    parser.add_argument('--fullscreen', action='store_true', help='start in borderless desktop fullscreen')
+    parser.add_argument('--data-dir', type=Path, metavar='DIR', help='directory containing original EF2000 game data')
+    parser.add_argument('--config-dir', type=Path, metavar='DIR', help='user configuration directory')
+    parser.add_argument('--state-dir', type=Path, metavar='DIR', help='save states (default: XDG_STATE_HOME/ef2000)')
+    parser.add_argument('--user-data-dir', type=Path, metavar='DIR', help='user-installed game data directory')
+    parser.add_argument('--cache-dir', type=Path, metavar='DIR', help='regenerable cache directory')
+    parser.add_argument('--portable', action='store_true', help='store user files next to the game executable')
+    parser.add_argument('--no-save', action='store_true', help='disable persistent save states this run')
+    parser.add_argument('--show-paths', action='store_true', help='show resolved user directories and exit')
+    screen = parser.add_mutually_exclusive_group()
+    screen.add_argument('-f', '--fullscreen', action='store_true', help='start in borderless desktop fullscreen')
+    screen.add_argument('-w', '--windowed', action='store_true', help='start windowed (default)')
+    parser.add_argument('-g', '--geometry', metavar='WxH', default='960x720',
+                        help='initial window dimensions (default: %(default)s)')
+    parser.add_argument('--mute', action='store_const', const='off', dest='sound', help='start without audio')
+    parser.add_argument('-d', '--debug', action='store_true', help='enable verbose debug diagnostics')
     parser.add_argument('--verbose', action='store_true', help='print detailed guest file and bridge activity')
     args = parser.parse_args()
+    match = re.fullmatch(r'([1-9][0-9]*)x([1-9][0-9]*)', args.geometry)
+    if not match or any(int(value) > 16384 for value in match.groups()):
+        parser.error('--geometry requires WxH with dimensions from 1 to 16384')
+    geometry = tuple(map(int, match.groups()))
+    if args.show_paths and not args.executable and args.portable:
+        parser.error('--portable --show-paths requires an executable')
+    if not args.executable and args.data_dir:
+        args.executable = args.data_dir / '_EF2000.EXE'
+    try:
+        paths = resolve_paths({'config': args.config_dir, 'state': args.state_dir,
+                               'user_data': args.user_data_dir, 'cache': args.cache_dir},
+                              portable=args.portable, executable=args.executable)
+    except ValueError as error:
+        parser.error(str(error))
+    if args.show_paths:
+        print(format_paths(paths, args.data_dir))
+        return
+    if not args.executable:
+        candidates = [paths['user_data'][0] / '_EF2000.EXE',
+                      Path(__file__).resolve().parent.parent / 'data' / '_EF2000.EXE']
+        args.executable = next((path for path in candidates if path.is_file()), None)
+    if not args.executable:
+        parser.error('original _EF2000.EXE missing; supply its path, --data-dir, '
+                     'or install it in the user-data directory shown by --show-paths')
+    if not args.output:
+        args.output = paths['cache'][0] / 'runs' / uuid.uuid4().hex
+    if args.no_save and args.load_state:
+        parser.error('--no-save cannot be combined with --load-state')
+    if args.data_dir and args.executable.resolve().parent != args.data_dir.resolve():
+        parser.error('--data-dir must match the directory containing the supplied executable')
+    args.verbose |= args.debug
     if args.load_state and (args.backend != 'native64' or args.real_mode != 'unicorn'):
         parser.error('--load-state requires --backend native64 --real-mode unicorn')
     if args.load_state and not args.load_state.is_file():
@@ -165,6 +212,7 @@ def main():
     output = args.output.resolve()
     try:
         print(f'ef2000: {version}; {platform.platform()}; backend={args.backend}', flush=True)
+        print(format_paths(paths, args.data_dir), flush=True)
         print(f'paths: assets={args.executable.resolve().parent}', flush=True)
         print(f'paths: output={output}; writable overlay={output / "drive"}', flush=True)
         print(f'config: sound={args.sound}; controls={args.controls}; joystick={args.joystick}; vr={args.vr}', flush=True)
@@ -173,7 +221,9 @@ def main():
         overlay = output / 'drive' / 'EF2000'
         overlay.mkdir(parents=True)
         # Keep configuration changes in the local overlay.
-        config = args.executable.resolve().parent / 'EF2000.CFG'
+        config = paths['config'][0] / 'EF2000.CFG'
+        if not config.is_file():
+            config = args.executable.resolve().parent / 'EF2000.CFG'
         lines = config.read_bytes().splitlines()
         settings = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127', b'SPEECH': b'0'} if args.sound == 'off' else {}
         if args.sound in ('sb16-probe', 'sb16'):
@@ -242,9 +292,9 @@ def main():
                 except ImportError:
                     from real_mode import run as run_real_mode
                 try:
-                    from .save_states import SaveStates, default_directory
+                    from .save_states import SaveStates, legacy_directory
                 except ImportError:
-                    from save_states import SaveStates, default_directory
+                    from save_states import SaveStates, legacy_directory
                 identity = {'source': manifest['source_sha256'],
                             'runtime': hashlib.sha256((output / 'startup.o').read_bytes() +
                                                       (output / 'entry.o').read_bytes() +
@@ -253,7 +303,10 @@ def main():
                             'host': hashlib.sha256(b''.join((Path(__file__).parent / name).read_bytes()
                                       for name in ('real_mode.py', 'input_devices.py', 'save_states.py',
                                                    'sound_blaster.py', 'isa_audio.py', 'cd_audio.py'))).hexdigest()}
-                states = SaveStates(args.state_dir or default_directory(), output, identity) if args.backend == 'native64' else None
+                from_path = paths['state'][0]
+                states = (SaveStates(from_path, output, identity,
+                                     legacy=legacy_directory() if not args.state_dir and not args.portable else None)
+                          if args.backend == 'native64' and not args.no_save else None)
                 if states:
                     print(f'paths: save states={states.directory.resolve()}', flush=True)
                 else:
@@ -263,7 +316,8 @@ def main():
                                                        joystick=args.joystick, joystick_axes=joystick_axes,
                                                        sound_hardware=args.sound if args.sound in ('sb16-probe', 'sb16') else 'absent',
                                                        vr=args.vr, states=states, load_state=args.load_state,
-                                                       fullscreen=args.fullscreen, verbose=args.verbose, cd_cue=args.cd_cue)
+                                                       fullscreen=args.fullscreen, geometry=geometry,
+                                                       verbose=args.verbose, cd_cue=args.cd_cue)
             else:
                 run = subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,
                                      timeout=args.seconds or None, check=False)

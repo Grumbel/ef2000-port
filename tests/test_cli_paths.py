@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import unittest
+
+
+SCRIPT = Path(__file__).resolve().parent.parent / 'tools/run_startup.py'
+
+
+class CLIPathTests(unittest.TestCase):
+    def run_cli(self, *options, env=None):
+        return subprocess.run([sys.executable, str(SCRIPT), *options],
+                              capture_output=True, text=True, env=env)
+
+    def test_show_paths_needs_no_assets_or_video(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            env = dict(os.environ, HOME=temporary, XDG_STATE_HOME='not/absolute')
+            run = self.run_cli('--show-paths', '--state-dir', str(Path(temporary) / 'states'), env=env)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            self.assertIn(f'state: {temporary}/states (option)', run.stdout)
+            self.assertIn(f'config: {temporary}/.config/ef2000 (default)', run.stdout)
+
+    def test_bad_geometry_and_missing_assets_are_errors(self):
+        run = self.run_cli('--geometry', 'nonsense', '--show-paths')
+        self.assertNotEqual(run.returncode, 0)
+        self.assertIn('--geometry requires', run.stderr)
+        with tempfile.TemporaryDirectory() as temporary:
+            run = self.run_cli('--data-dir', temporary, '--output', str(Path(temporary) / 'run'))
+            self.assertNotEqual(run.returncode, 0)
+            self.assertIn('_EF2000.EXE', run.stderr)
+
+    def test_help_and_version_work_without_game_data(self):
+        self.assertIn('ef2000 ', self.run_cli('-v').stdout)
+        self.assertIn('--portable', self.run_cli('--help').stdout)

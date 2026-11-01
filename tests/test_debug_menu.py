@@ -24,10 +24,10 @@ class DebugMenuTests(unittest.TestCase):
         self.menu = DebugMenu(self.display, self.states)
 
     def test_default_library_is_shared_between_output_directories(self):
-        with patch.dict('os.environ', {'XDG_DATA_HOME': self.directory.name}):
-            self.assertEqual(default_directory(), Path(self.directory.name) / 'ef2000/states')
-        with patch.dict('os.environ', {'XDG_DATA_HOME': ''}):
-            self.assertEqual(default_directory(), Path.home() / '.local/share/ef2000/states')
+        with patch.dict('os.environ', {'XDG_STATE_HOME': self.directory.name}):
+            self.assertEqual(default_directory(), Path(self.directory.name) / 'ef2000')
+        with patch.dict('os.environ', {'XDG_STATE_HOME': ''}):
+            self.assertEqual(default_directory(), Path.home() / '.local/state/ef2000')
 
     def test_keyboard_submenus_new_save_overwrite_and_load(self):
         self.menu.selected = 2

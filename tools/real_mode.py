@@ -468,7 +468,7 @@ def write_all(fd, data):
 
 def run(command, output, log, timeout=15, headless=True, controls='original',
         joystick='auto', joystick_axes=None, sound_hardware='absent', vr='off',
-        states=None, load_state=None, fullscreen=False, verbose=False, cd_cue=None):
+        states=None, load_state=None, fullscreen=False, geometry=(960, 720), verbose=False, cd_cue=None):
     try:
         from .runtime_log import RuntimeLog
     except ImportError:
@@ -481,7 +481,8 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
             from .display import Display
         except ImportError:
             from display import Display
-        display = Display(joystick=joystick, joystick_axes=joystick_axes, states=states, fullscreen=fullscreen)
+        display = Display(joystick=joystick, joystick_axes=joystick_axes, states=states,
+                          fullscreen=fullscreen, geometry=geometry)
         display.verbose = verbose
         display.poll(engine)
     def poll():

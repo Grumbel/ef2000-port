@@ -15,6 +15,14 @@ from datetime import datetime
 
 
 def default_directory():
+    try:
+        from .paths import resolve_paths
+    except ImportError:
+        from paths import resolve_paths
+    return resolve_paths()['state'][0]
+
+
+def legacy_directory():
     configured = Path(os.environ.get('XDG_DATA_HOME', ''))
     data = configured if configured.is_absolute() else Path.home() / '.local' / 'share'
     return data / 'ef2000' / 'states'
@@ -35,8 +43,9 @@ def decode(value):
 
 
 class SaveStates:
-    def __init__(self, directory, output, identity):
+    def __init__(self, directory, output, identity, legacy=None):
         self.directory, self.output, self.identity = Path(directory), Path(output), identity
+        self.legacy = Path(legacy) if legacy and Path(legacy) != self.directory else None
         if self.directory.resolve().is_relative_to((self.output / 'drive').resolve()):
             raise ValueError('save-state directory must be outside the writable drive overlay')
         self.directory.mkdir(parents=True, exist_ok=True)
@@ -46,7 +55,10 @@ class SaveStates:
         self.current = None
 
     def entries(self):
-        return sorted(self.directory.glob('*.efstate'), reverse=True)
+        entries = list(self.directory.glob('*.efstate'))
+        if not entries and self.legacy and self.legacy.is_dir():
+            entries = list(self.legacy.glob('*.efstate'))
+        return sorted(entries, reverse=True)
 
     def label(self, path):
         path = Path(path)
