@@ -108,6 +108,23 @@ class RealModeTests(unittest.TestCase):
         self.assertEqual(self.memory[0xa0000:0xb0000], b'B' * 65536)
         self.assertEqual(self.call(0x10, 0x4f01, cx=0xdead, es=0x2000)[2], 0x14f)
 
+    def test_video_mode_switch_recenters_dos_mouse_and_resets_mickeys(self):
+        self.call(0x33, 0)
+        self.engine.move_mouse(15, -10)
+        self.call(0x10, 0x4f02, bx=0x100)
+        self.assertEqual(self.engine.mouse_limits, [0, 639, 0, 399])
+        self.assertEqual(self.call(0x33, 3)[4:6], (320, 200))
+        self.assertEqual(self.call(0x33, 0xb)[4:6], (0, 0))
+        self.engine.move_mouse(-120, -100)
+        self.assertEqual(self.call(0x33, 3)[4:6], (200, 100))
+        self.assertEqual(self.call(0x33, 0xb)[4:6], (0xff88, 0xff9c))
+        self.call(0x10, 0x4f02, bx=0x101)
+        self.assertEqual(self.call(0x33, 3)[4:6], (320, 240))
+        self.assertEqual(self.engine.mouse_limits, [0, 639, 0, 479])
+        self.call(0x10, 0x0013)
+        self.assertEqual(self.call(0x33, 3)[4:6], (160, 100))
+        self.assertEqual(self.engine.mouse_limits, [0, 319, 0, 199])
+
     def test_mouse_buttons_and_motion_counters(self):
         self.call(0x33, 0)
         self.engine.move_mouse(5, -2)

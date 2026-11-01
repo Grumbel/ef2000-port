@@ -162,6 +162,7 @@ class RealMode(HostInput):
                     self.video_mode, self.video_bank = mode, 0
                     self.video_pitch = self.video_modes[mode][0]
                     self.display_start = (0, 0)
+                    self.reset_mouse_for_mode(*self.video_modes[mode])
                     if not values[3] & 0x8000:
                         self.vram[:] = bytes(len(self.vram))
                     memory[0xa0000:0xb0000] = self.vram[:65536]
@@ -206,6 +207,7 @@ class RealMode(HostInput):
             values[3] &= ~0xff00
         elif function == 0 and values[2] & 0x7f in (3, 0x13):
             self.video_mode = values[2] & 0x7f
+            self.reset_mouse_for_mode(320 if self.video_mode == 0x13 else 640, 200)
             memory = bytearray(memory)
             memory[0x449] = self.video_mode
             struct.pack_into('<H', memory, 0x44a, 40 if self.video_mode == 0x13 else 80)
@@ -215,6 +217,14 @@ class RealMode(HostInput):
         else:
             raise ValueError(f'unsupported video BIOS AX={values[2] & 0xffff:#x}')
         return PACKET.pack(*values), memory
+
+    def reset_mouse_for_mode(self, width, height):
+        # DOS mouse drivers track video-mode changes. Otherwise the VBE
+        # 640x400 menu still reports Y=100 at its visible Y=200 center,
+        # leaving hit tests and the software pointer out of agreement.
+        self.mouse_limits = [0, width - 1, 0, height - 1]
+        self.mouse_x, self.mouse_y = width // 2, height // 2
+        self.mouse_motion_x, self.mouse_motion_y = 0, 0
 
     def move_mouse(self, dx, dy):
         # Mickey counters keep moving even when the absolute position is clipped.

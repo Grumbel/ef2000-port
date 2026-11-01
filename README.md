@@ -166,8 +166,11 @@ the JSON report. Scripted movement updates both absolute coordinates and
 relative mouse-mickey counters, matching live SDL input for original menu
 polling (`INT 33h` functions `03h` and `0Bh`). The original menu maintains
 its own cursor position from relative movement, so the scripted X:Y values
-are not necessarily the on-screen cursor coordinates. Similarly
-`--key-event TICK:SDL_SCAN:ASCII:DOWN` injects
+are not necessarily the on-screen cursor coordinates. The virtual DOS mouse
+also re-centers and adopts the correct bounds when VGA/VBE modes change (for
+example, the menu's 640x400 mode), so BIOS coordinates and the software cursor
+start from matching screen centers.
+The `--key-event TICK:SDL_SCAN:ASCII:DOWN` option injects
 keyboard make/break events, e.g. `--key-event 600:41:27:1` and
 `--key-event 605:41:27:0` press and release Escape. Both work in headless probes.
 The report records video-mode changes with instruction counts, making splash
