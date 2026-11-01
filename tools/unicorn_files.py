@@ -17,8 +17,9 @@ class DosFileError(Exception):
 
 
 class ReadOnlyDosFiles:
-    def __init__(self, root):
+    def __init__(self, root, cd_root=None):
         self.root = Path(root).resolve()
+        self.cd_root = Path(cd_root).resolve() if cd_root is not None else None
         self.handles = {}
 
     def _resolve(self, filename):
@@ -29,22 +30,27 @@ class ReadOnlyDosFiles:
             if path[0] != 'C':
                 raise DosFileError(15)
             path = path[2:]
+        absolute = path.startswith('/')
         path = path.lstrip('/')
-        if path.startswith('EF2000/'):
+        if absolute and path.startswith('EF2000/'):
             path = path[7:]
+            absolute = False
+        root = (self.cd_root if absolute else self.root)
+        if root is None:
+            raise DosFileError(2)
         parts = path.split('/')
         if not parts or any(p in ('', '.', '..') or ':' in p for p in parts):
             raise DosFileError(3)
-        current = self.root
+        current = root
         for part in parts:
             try:
                 match = next(child for child in current.iterdir() if child.name.upper() == part)
             except (StopIteration, OSError):
                 raise DosFileError(2) from None
             current = match
-            if not current.resolve().is_relative_to(self.root):
+            if not current.resolve().is_relative_to(root):
                 raise DosFileError(3)
-        if not current.resolve().is_relative_to(self.root) or not current.is_file():
+        if not current.resolve().is_relative_to(root) or not current.is_file():
             raise DosFileError(3)
         return current
 

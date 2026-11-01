@@ -131,12 +131,23 @@ path and exits. A game-provided writable overlay and CD emulation are still
 needed for further progress. An alternate asset directory can be supplied with
 `--game-dir DIR`.
 
-The CPU still uses a synthetic ring-0 LDT and **does not yet implement** real
-ring-3 X-32 selector privileges/limits, exceptions, IRQs, SDL rendering or game
-input. The diagnostic stops on unsupported requests (exit code 20), guest exit
+The CPU enters ring 3 through an IRETD trampoline with the original X-32
+selector values (`CS=0x2f`, `DS/SS=7`) and a synthetic LDT. This corrects the
+early ring-0 shortcut. The data segment's expand-down limit is updated on the
+first 3505 request, and dynamically allocated descriptors are written into the
+guest LDT. It uses IOPL=3 for hooked port operations, and **does not yet
+implement** complete privilege-fault semantics, exceptions, IRQs, SDL rendering
+or game input. The diagnostic stops on unsupported requests (exit code 20), guest exit
 (exit code 26), or the instruction budget; it prints the original guest call
 transcript and BSS-clearing checkpoint. The default 30-million-instruction
-budget can be changed with `--instruction-limit`.
+budget can be changed with `--instruction-limit`. The legacy ring-0 model is
+available for comparison via `--flat-ring0`.
+
+Absolute DOS paths such as `\\CHECK.CD` are resolved against `--cd-dir`, while
+relative game paths stay under `--game-dir`. The supplied ZIP lacks both
+`CHECK.CD` and `VIEWS/VIEWS2.DAT`; the latter is the next missing asset observed
+when a temporary CD marker is provided for diagnosis. No CD marker or game
+assets are included in the port or its git bundle.
 
 This is a first verified CPU-execution milestone, not a new `--backend` choice
 for the playable launcher. The existing Linux native backend remains unchanged.

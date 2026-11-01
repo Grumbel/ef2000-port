@@ -7,9 +7,10 @@
 This is deliberately a *bounded startup probe*, not a playable backend yet.
 The first X-32 requests are modeled here so we can compare the original
 instruction stream against the native harness before porting its services.
-The CPU uses a synthetic ring-0 LDT with flat segments. Real X-32 ring-3
-selectors, segment limits, fault recovery, interrupts and hardware are not
-implemented by this probe.
+The CPU now enters ring 3 with original X-32 selectors through an IRETD
+trampoline and a synthetic LDT. The image base remains zero rather than the
+Linux native backend's 0x10000000. Fault recovery, IRQ delivery, and complete
+port/device emulation are not implemented by this probe.
 """
 
 import argparse
@@ -41,8 +42,7 @@ def startup_memory(image):
         raise ValueError('invalid protected-mode image length')
     return (
         (0x120cc4, struct.pack('<H', 0x1f)),
-        # The probe uses a zero-based flat data segment (DS=0), so DOS memory
-        # has a positive offset. This must change with real selector support.
+        # Both probe modes map DS to base zero, so DOS RAM offsets are positive.
         (0x120cc6, struct.pack('<I', 0x01000000)),
         (0x132a24, struct.pack('<H', 0x27)),
         (0x195fb0, b'\xa5' * (0x4de2f0 - 0x195fb0)),
@@ -57,9 +57,9 @@ def serve_startup_int21(ip, regs, allocation=None, now=None):
     """
     result = dict(regs)
     ax = regs['ax'] & 0xffff
-    if ip == 0x93 and ax == 0x3505 and regs['bx'] & 0xffff == 4 and regs['cx'] == 0x260:
-        # The original stores DS into BX. The native harness uses DS=7;
-        # this probe uses ring-0 selector 4 until CPL3 is implemented.
+    if ip == 0x93 and ax == 0x3505 and regs['bx'] & 0xffff in (4, 7) and regs['cx'] == 0x260:
+        # The original stores DS into BX; ring 3 uses selector 7. The legacy
+        # diagnostic ring-0 mode retains selector 4.
         result['cx'] = 0x260
         result['flags'] = (regs['flags'] | 0x40) & ~1
     elif ip == 0xa0 and ax == 0x3005:
@@ -189,7 +189,7 @@ class X32Selectors:
             self.entries[index] = [0, 0xffffffff]
             result['bx'] = ((index + 6) << 3) | 7
             self._write(index)
-        elif function == 0x3504 and regs['bx'] & 0xffff in (4, 0x2c):
+        elif function == 0x3504 and regs['bx'] & 0xffff in (4, 7, 0x2c, 0x2f):
             result['cx'] = 0  # Synthetic flat image base, not Linux GUEST_BASE.
         elif (regs['bx'] & 7) == 7 and 6 <= (regs['bx'] >> 3) < 22:
             index = (regs['bx'] >> 3) - 6
@@ -224,17 +224,18 @@ class X32Selectors:
         self.cpu.mem_write(self.ldt_base + (index + 6) * 8, descriptor)
 
 
-def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None):
+def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
+        cd_dir=None, ring3=True):
     """Run a bounded original-code probe; report the last guest interaction."""
     if instruction_limit <= 0:
         raise ValueError('instruction limit must be positive')
-    from unicorn import Uc, UcError, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR, UC_HOOK_CODE
+    from unicorn import Uc, UcError, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR, UC_HOOK_CODE, UC_HOOK_INSN
     from unicorn.x86_const import (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
         UC_X86_REG_EDX, UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EBP,
         UC_X86_REG_ESP, UC_X86_REG_EIP, UC_X86_REG_EFLAGS,
         UC_X86_REG_GDTR, UC_X86_REG_LDTR, UC_X86_REG_CS,
         UC_X86_REG_DS, UC_X86_REG_ES, UC_X86_REG_SS,
-        UC_X86_REG_FS, UC_X86_REG_GS)
+        UC_X86_REG_FS, UC_X86_REG_GS, UC_X86_INS_IN, UC_X86_INS_OUT)
 
     registers = {'ax': UC_X86_REG_EAX, 'bx': UC_X86_REG_EBX,
                  'cx': UC_X86_REG_ECX, 'dx': UC_X86_REG_EDX,
@@ -249,8 +250,11 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None):
     # tables explicitly: unlike the Linux backend there is no modify_ldt().
     table_base = IMAGE_SIZE
     cpu.mem_map(table_base, 0x1000)
-    gdt = bytearray(0x20)
+    gdt = bytearray(0x30)
     gdt[8:16] = segment_descriptor(table_base + 0x100, 0xff, 0x82, 0)
+    if ring3:
+        gdt[16:24] = segment_descriptor(0, 0xffff, 0x9a)
+        gdt[24:32] = segment_descriptor(0, 0xffff, 0x92)
     cpu.mem_write(table_base, bytes(gdt))
     ldt = bytearray(0x100)
     selector_bases = (0, 0x02000000, 0x02001000, 0x01000000,
@@ -258,15 +262,23 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None):
     for index, base in enumerate(selector_bases):
         # DOS-facing selectors keep the original RPL=3 value; the primary
         # protected data/stack selectors remain RPL=0 for this probe.
-        access = 0x9a if index == 5 else (0xf2 if index in (1, 2, 3, 4) else 0x92)
-        ldt[index * 8:index * 8 + 8] = segment_descriptor(base, 0xffff, access)
+        access = ((0xfa if ring3 else 0x9a) if index == 5 else
+                  (0xf2 if ring3 or index in (1, 2, 3, 4) else 0x92))
+        if index == 0 and ring3:
+            ldt[:8] = segment_descriptor(0, 0x7f, 0xf6, 0x4)
+        else:
+            ldt[index * 8:index * 8 + 8] = segment_descriptor(base, 0xffff, access)
     cpu.mem_write(table_base + 0x100, bytes(ldt))
     cpu.reg_write(UC_X86_REG_GDTR, (0, table_base, len(gdt) - 1, 0))
     cpu.reg_write(UC_X86_REG_LDTR, (8, table_base + 0x100, len(ldt) - 1, 0))
-    for reg, selector in ((UC_X86_REG_DS, 4),
-                          (UC_X86_REG_ES, 4), (UC_X86_REG_SS, 4),
-                          (UC_X86_REG_FS, 0xc), (UC_X86_REG_GS, 0x14),
-                          (UC_X86_REG_CS, 0x2c)):
+    initial_segments = (((UC_X86_REG_DS, 0x18), (UC_X86_REG_ES, 0x18),
+                         (UC_X86_REG_SS, 0x18), (UC_X86_REG_FS, 0x18),
+                         (UC_X86_REG_GS, 0x18), (UC_X86_REG_CS, 0x10))
+                        if ring3 else
+                        ((UC_X86_REG_DS, 4), (UC_X86_REG_ES, 4),
+                         (UC_X86_REG_SS, 4), (UC_X86_REG_FS, 0xc),
+                         (UC_X86_REG_GS, 0x14), (UC_X86_REG_CS, 0x2c)))
+    for reg, selector in initial_segments:
         try:
             cpu.reg_write(reg, selector)
         except UcError as exc:
@@ -275,21 +287,47 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None):
     cpu.mem_write(0, image)
     for address, payload in startup_memory(image):
         cpu.mem_write(address, payload)
-    cpu.reg_write(UC_X86_REG_ESP, INITIAL_SP)
-    cpu.reg_write(UC_X86_REG_EIP, ENTRY)
+    if ring3:
+        # IRETD performs the privilege transition that direct uc_reg_write(CS)
+        # cannot. The user-mode trampoline loads DS/ES/FS/GS from the LDT.
+        bootstrap = table_base + 0x200
+        ring3_entry = table_base + 0x300
+        code = bytearray.fromhex('66 b8 07 00 8e d8 8e c0 66 b8 0f 00 8e e0 '
+                                  '66 b8 17 00 8e e8 e9 00 00 00 00')
+        struct.pack_into('<i', code, len(code) - 4,
+                         ENTRY - (ring3_entry + len(code)))
+        cpu.mem_write(bootstrap, b'\xcf')
+        cpu.mem_write(ring3_entry, bytes(code))
+        cpu.mem_write(INITIAL_SP - 20,
+                      struct.pack('<5I', ring3_entry, 0x2f, 0x3202, INITIAL_SP, 7))
+        cpu.reg_write(UC_X86_REG_ESP, INITIAL_SP - 20)
+        cpu.reg_write(UC_X86_REG_EIP, bootstrap)
+    else:
+        cpu.reg_write(UC_X86_REG_ESP, INITIAL_SP)
+        cpu.reg_write(UC_X86_REG_EIP, ENTRY)
     cpu.reg_write(UC_X86_REG_EFLAGS, 0x202)
     events = []
     allocation = Allocation()
-    vectors = VectorState()
+    vectors = VectorState(0x2f if ring3 else 0x2c)
     conventional = ConventionalMemory()
-    files = ReadOnlyDosFiles(game_dir) if game_dir is not None else None
+    files = ReadOnlyDosFiles(game_dir, cd_dir) if game_dir is not None else None
     selectors = X32Selectors(cpu, table_base + 0x100)
     result = {'status': 'instruction_limit', 'events': events, 'console': [],
+              'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
+              'privileged_ops': [],
               'instruction_limit': instruction_limit}
 
     def interrupt(uc, vector, _user):
-        ip = uc.reg_read(UC_X86_REG_EIP) - 2
+        # Software INT advances EIP; hardware #GP reports the faulting EIP.
+        raw_ip = uc.reg_read(UC_X86_REG_EIP)
+        ip = raw_ip if vector == 13 else raw_ip - 2
         regs = {name: uc.reg_read(reg) for name, reg in registers.items()}
+        if vector == 13 and ring3 and ENTRY <= ip < len(image):
+            opcode = uc.mem_read(ip, 1)[0]
+            if opcode in (0xfa, 0xfb):
+                result['privileged_ops'].append({'ip': ip, 'operation': 'cli' if opcode == 0xfa else 'sti'})
+                uc.reg_write(UC_X86_REG_EIP, ip + 1)
+                return
         event = {'ip': ip, 'vector': vector, 'ax': regs['ax'],
                  'bx': regs['bx'], 'cx': regs['cx'], 'dx': regs['dx'],
                  'ds': regs['ds'], 'es': regs['es'], 'sp': regs['sp']}
@@ -384,6 +422,11 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None):
                     next_regs['flags'] |= 1
             else:
                 next_regs = serve_startup_int21(ip, regs, allocation)
+                if ip == 0x93 and ring3:
+                    # The first X-32 3505 call grows the expand-down data
+                    # segment's forbidden low area from 0x7f to 0x260.
+                    uc.mem_write(table_base + 0x100,
+                                 segment_descriptor(0, 0x260, 0xf6, 0x4))
         except UnsupportedGuestOperation as exc:
             result['status'] = 'unsupported_interface'
             result['detail'] = str(exc)
@@ -394,15 +437,37 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None):
                 uc.reg_write(reg, next_regs[name])
 
     def instruction(uc, address, size, _user):
-        if not ENTRY <= address < IMAGE_SIZE:
+        if not (ENTRY <= address < IMAGE_SIZE or
+                ring3 and table_base + 0x200 <= address < table_base + 0x400):
             result['status'] = 'unexpected_execution_address'
             result['detail'] = f'IP={address:08x}'
             uc.emu_stop()
 
+    def port_in(uc, port, size, _user):
+        if port == 0x201:  # No physical joystick: all four buttons/axes high.
+            return (1 << (size * 8)) - 1
+        if port in (0x60, 0x64, 0x61, 0x3da):
+            return 0
+        result['status'] = 'unsupported_interface'
+        result['detail'] = f'unsupported IN port={port:04x}'
+        uc.emu_stop()
+        return 0
+
+    def port_out(uc, port, size, value, _user):
+        if port in (0x20, 0x43, 0x40, 0x61, 0x60, 0x3c8, 0x3c9, 0x201):
+            return
+        result['status'] = 'unsupported_interface'
+        result['detail'] = f'unsupported OUT port={port:04x} value={value:08x}'
+        uc.emu_stop()
+
     cpu.hook_add(UC_HOOK_INTR, interrupt)
     cpu.hook_add(UC_HOOK_CODE, instruction)
+    if ring3:
+        cpu.hook_add(UC_HOOK_INSN, port_in, None, 1, 0, UC_X86_INS_IN)
+        cpu.hook_add(UC_HOOK_INSN, port_out, None, 1, 0, UC_X86_INS_OUT)
     try:
-        cpu.emu_start(ENTRY, IMAGE_SIZE, count=instruction_limit)
+        cpu.emu_start(table_base + 0x200 if ring3 else ENTRY, 0xffffffff,
+                      count=instruction_limit)
     except UcError as exc:
         result['status'] = 'cpu_fault'
         result['detail'] = str(exc)
@@ -418,6 +483,8 @@ def main():
     parser.add_argument('executable', type=Path, help='original _EF2000.EXE')
     parser.add_argument('--instruction-limit', type=int, default=DEFAULT_INSTRUCTION_LIMIT)
     parser.add_argument('--game-dir', type=Path, help='read-only asset directory (default: EXE directory)')
+    parser.add_argument('--cd-dir', type=Path, help='read-only root for absolute DOS CD paths')
+    parser.add_argument('--flat-ring0', action='store_true', help='diagnose legacy flat ring-0 CPU model')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
     args = parser.parse_args()
     try:
@@ -426,7 +493,8 @@ def main():
         from extract_image import extract
     _manifest, images = extract(args.executable.read_bytes())
     report = run(images['payload.bin'], args.instruction_limit,
-                 game_dir=args.game_dir or args.executable.parent)
+                 game_dir=args.game_dir or args.executable.parent,
+                 cd_dir=args.cd_dir, ring3=not args.flat_ring0)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')

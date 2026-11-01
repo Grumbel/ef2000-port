@@ -156,6 +156,22 @@ class DosFileBridgeTests(unittest.TestCase):
             self.assertEqual(failure.exception.code, 5)
             self.assertEqual((Path(tmp) / 'GAME.DAT').read_bytes(), b'game')
 
+    def test_cd_root_is_distinct_from_game_data(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / 'game').mkdir()
+            (root / 'cd').mkdir()
+            (root / 'game' / 'LOCAL.DAT').write_bytes(b'game')
+            (root / 'cd' / 'CHECK.CD').write_bytes(b'cd')
+            files = ReadOnlyDosFiles(root / 'game', root / 'cd')
+            self.assertEqual(files.read(files.open('local.dat'), 4), b'game')
+            self.assertEqual(files.read(files.open('\\CHECK.CD'), 2), b'cd')
+            with self.assertRaises(DosFileError):
+                files.open('check.cd')
+            without_cd = ReadOnlyDosFiles(root / 'game')
+            with self.assertRaises(DosFileError):
+                without_cd.open('\\CHECK.CD')
+
 
 try:
     import unicorn  # noqa: F401
@@ -175,6 +191,7 @@ class UnicornGuestTests(unittest.TestCase):
         self.assertEqual(result['status'], 'unsupported_interface')
         self.assertEqual(result['events'][0]['ip'], ENTRY + 4)
         self.assertEqual(result['events'][0]['ax'], 0x1234)
+        self.assertEqual(result['events'][0]['ds'], 7)
 
     @unittest.skipUnless(os.environ.get('EF2000_EXE'), 'requires original EF2000_EXE')
     def test_original_extracted_code_reaches_file_open(self):
