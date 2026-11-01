@@ -19,7 +19,7 @@ copy by default. Broader gameplay and mission completion remain unverified.
 An experimental Unicorn **protected-mode startup probe** now runs the original
 extracted 32-bit instructions on a portable CPU emulator. It passes the
 initial X-32 allocation, descriptor and DOS services, reads original game data,
-and executes far enough to print the game's missing-CD error. It is not yet a
+and progresses through the game's data-archive startup. It is not yet a
 Windows-playable replacement for the native Linux execution backend.
 The first target is the installed `_EF2000.EXE` in the sibling
 `../EF2000/c/EF2000/` directory. Other releases need separate fingerprints.
@@ -41,7 +41,7 @@ Inside `nix develop`, the following development commands are available:
 ef2000-configure                       # CMake/Ninja Debug harness in /tmp/ef2000-build
 ef2000-build                           # configure if missing/moved, then build objects
 ef2000-run /path/to/_EF2000.EXE        # build then run, using those objects
-ef2000-run-gdb /path/to/_EF2000.EXE    # build then debug the launched process
+ef2000-run-gdb /path/to/_EF2000.EXE    # build then debug native startup.elf in GDB
 nix develop -c ef2000-build            # also works without an interactive shell
 ```
 
@@ -52,6 +52,13 @@ The configure command creates a `build` symlink if that path is free. The
 development build contains freestanding native64/QEMU harness objects, not the
 copyrighted game executable. Run commands accept the same game and diagnostic
 options as `ef2000`; they build the harness before launching it.
+`ef2000-run-gdb` starts GDB on the generated native `startup.elf` directly,
+with Python running outside GDB to service the guest's DOS, BIOS and video
+requests. GDB runs the inferior automatically, quits on a normal zero exit,
+and remains interactive on crashes or nonzero exits. The ELF and its logs live
+in the run's output directory. `--gdb` is also available on the Python runner
+for `native64` with Unicorn real-mode services; QEMU is not supported.
+The shell greeting lists these commands, usage examples and the active paths.
 
 `packages.default` and `packages.ef2000` are the same native package;
 `packages.ef2000-startup` is an alias. `apps.default` and `apps.ef2000` run the
@@ -131,11 +138,15 @@ files and copy-on-first-write under `DIR/EF2000/` (relative game paths) or
 `DIR/` (absolute DOS paths). Without that option, writes fail with DOS error 5.
 An alternate asset directory can be supplied with `--game-dir DIR`.
 
-The original DOS game supplied in the ZIP checks for `\\CHECK.CD`, which is
-absent; the probe executes its original missing-CD error path and exits. With
-a temporary CD marker added for diagnostic testing, it proceeds to the missing
-`\\VIEWS\\VIEWS2.DAT` and creates `TACTCOM.$$$` **only inside the configured
-overlay**. This is not a substitute for the missing CD contents.
+The supplied ZIP **does contain** the original `DID1ST.DAT` and `DID.DAT`
+data archives; the Linux port loads them successfully. An earlier portable
+probe incorrectly reported missing `\\CHECK.CD` and `\\VIEWS\\VIEWS2.DAT`
+because it omitted the DOS PSP command line and environment used by the Linux
+harness. The portable probe now initializes `gui`, `DID=.` and `quick_flag=1`
+equivalently. On the same installed assets it reads the archives, starts
+`TACTCOM`, and reaches the instruction budget rather than the missing-CD path.
+No CD marker or additional unpacking is needed for that startup path. This
+does not establish that all game features work under the portable backend.
 
 The CPU enters ring 3 through an IRETD trampoline with the original X-32
 selector values (`CS=0x2f`, `DS/SS=7`) and a synthetic LDT. This corrects the

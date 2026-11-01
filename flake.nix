@@ -183,6 +183,22 @@
           export EF2000_SOURCE="$PWD"
           export EF2000_BUILD_DIR="''${EF2000_BUILD_DIR:-/tmp/ef2000-build}"
           export EF2000_ICON_BMP="$EF2000_SOURCE/data/icons/ef2000.bmp"
+          printf '\nEF2000 development shell (Debug build, SDL3, Unicorn)\n'
+          printf '  Source:    %s\n' "$EF2000_SOURCE"
+          printf '  Build:     %s\n' "$EF2000_BUILD_DIR"
+          printf '  Build type: %s (set CMAKE_BUILD_TYPE to override)\n\n' "''${CMAKE_BUILD_TYPE:-Debug}"
+          printf 'Development commands:\n'
+          printf '  ef2000-configure [CMAKE_ARGS]   Configure Ninja and link ./build for clangd\n'
+          printf '  ef2000-build [BUILD_ARGS]       Configure if needed, then build\n'
+          printf '  ef2000-run [GAME_ARGS]          Build and run the original DOS game on Linux\n'
+          printf '  ef2000-run-gdb [GAME_ARGS]      Build and debug the native game ELF in GDB\n\n'
+          printf 'Examples:\n'
+          printf '  ef2000-run --data-dir /path/to/EF2000 --windowed\n'
+          printf '  ef2000-run-gdb --data-dir /path/to/EF2000 --verbose\n'
+          printf '  ef2000-run --help               List game, display and diagnostic options\n'
+          printf '  nix develop -c ef2000-run --data-dir /path/to/EF2000\n\n'
+          printf 'The original game assets are external; all guest writes go to a run overlay.\n'
+          printf 'Run logs and extracted startup.elf are saved in each run output directory.\n\n'
         '';
       };
     };

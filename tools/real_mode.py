@@ -10,6 +10,8 @@ import select
 import signal
 import struct
 import subprocess
+import sys
+import threading
 import time
 import zipfile
 
@@ -469,7 +471,8 @@ def write_all(fd, data):
 def run(command, output, log, timeout=15, headless=True, controls='original',
         joystick='auto', joystick_axes=None, sound_hardware='absent', vr='off',
         states=None, load_state=None, fullscreen=False, geometry=(1280, 960),
-        aspect_ratio='4:3', smooth_scaling=False, verbose=False, cd_cue=None):
+        aspect_ratio='4:3', smooth_scaling=False, verbose=False, cd_cue=None,
+        debugger=False):
     try:
         from .runtime_log import RuntimeLog
     except ImportError:
@@ -510,6 +513,7 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
     request_read = request_write = response_read = response_write = -1
     requests = []
     process = None
+    output_thread = None
     try:
         if cd_cue and not headless:
             try:
@@ -534,7 +538,23 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
         request_read, request_write = os.pipe()
         response_read, response_write = os.pipe()
         process = subprocess.Popen(command + [str(request_write), str(response_read)], cwd=output,
-            stdout=log, stderr=subprocess.STDOUT, pass_fds=(request_write, response_read))
+            stdout=subprocess.PIPE if debugger else log,
+            stderr=subprocess.STDOUT, pass_fds=(request_write, response_read))
+        if debugger:
+            # Keep the interactive GDB prompt visible while preserving the
+            # inferior transcript consumed by report.json and runtime polling.
+            def relay_output():
+                while True:
+                    chunk = os.read(process.stdout.fileno(), 4096)
+                    if not chunk:
+                        break
+                    log.write(chunk.decode('utf-8', errors='replace'))
+                    log.flush()
+                    sys.stdout.buffer.write(chunk)
+                    sys.stdout.buffer.flush()
+
+            output_thread = threading.Thread(target=relay_output, daemon=True)
+            output_thread.start()
         os.close(request_write)
         request_write = -1
         os.close(response_read)
@@ -664,6 +684,8 @@ def run(command, output, log, timeout=15, headless=True, controls='original',
         if process is not None and process.poll() is None:
             process.kill()
             process.wait()
+        if output_thread is not None:
+            output_thread.join(timeout=2)
         for fd in (request_read, request_write, response_read, response_write):
             if fd >= 0:
                 os.close(fd)

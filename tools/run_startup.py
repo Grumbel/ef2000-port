@@ -88,6 +88,20 @@ def analyze_calls(log):
             'checkpoint': checkpoint, 'allocation': allocation, 'startup_checkpoint_verified': verified}
 
 
+def gdb_command(inferior):
+    """Debug the original-code ELF while Python continues serving DOS requests."""
+    return ['gdb', '-q', '-ex', 'set pagination off',
+            '-ex', 'set confirm off', '-ex', 'set debuginfod enabled off',
+            '-ex', 'set breakpoint pending on', '-ex', 'run',
+            '-ex', '''python
+try:
+    if int(gdb.parse_and_eval("$_exitcode")) == 0:
+        gdb.execute("quit")
+except Exception:
+    pass
+''', '--args', *inferior]
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Run original EF2000 code on Linux (main-menu port; audio disabled by default).',
@@ -136,6 +150,8 @@ def main():
     parser.add_argument('--runtime-objects', type=Path, metavar='ROOT',
                         help='use precompiled harness objects under ROOT/{native64,qemu} '
                              'instead of compiling them with GCC')
+    parser.add_argument('--gdb', action='store_true',
+                        help='debug the native original-code ELF under GDB; Python serves guest hardware requests')
     parser.add_argument('--load-state', type=Path, metavar='FILE', help='restore a native save-state bundle at startup')
     parser.add_argument('--data-dir', type=Path, metavar='DIR', help='directory containing original EF2000 game data')
     parser.add_argument('--config-dir', type=Path, metavar='DIR', help='user configuration directory')
@@ -208,7 +224,11 @@ def main():
     if args.backend == 'native64' and (platform.system() != 'Linux' or
                                       platform.machine() not in ('x86_64', 'amd64')):
         parser.error('native64 backend requires an x86-64 Linux host')
+    if args.gdb and (args.backend != 'native64' or args.real_mode != 'unicorn'):
+        parser.error('--gdb requires --backend native64 --real-mode unicorn')
     dependencies = ['as', 'ld'] + ([] if args.runtime_objects else ['gcc'])
+    if args.gdb:
+        dependencies.append('gdb')
     if args.backend == 'qemu':
         dependencies.append('qemu-i386')
     for command in dependencies:
@@ -290,6 +310,9 @@ def main():
         command = [str(output / 'startup.elf')] if native else [
             'qemu-i386', '-B', '0x40000000', '-d', 'in_asm', '-D', 'instructions.log', 'startup.elf']
         command.append(str(args.executable.resolve().parent))
+        if args.gdb:
+            command = gdb_command(command)
+            print('debug: GDB controls startup.elf; the Python DOS/video bridge remains active', flush=True)
         real_mode_requests = []
         with (output / 'calls.log').open('w') as log:
             if args.real_mode == 'unicorn' and not args.check_segment_limit:
@@ -325,7 +348,8 @@ def main():
                                                        fullscreen=args.fullscreen, geometry=geometry,
                                                        aspect_ratio=args.aspect_ratio,
                                                        smooth_scaling=args.smooth_scaling,
-                                                       verbose=args.verbose, cd_cue=args.cd_cue)
+                                                       verbose=args.verbose, cd_cue=args.cd_cue,
+                                                       debugger=args.gdb)
             else:
                 run = subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,
                                      timeout=args.seconds or None, check=False)

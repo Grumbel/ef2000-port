@@ -8,6 +8,8 @@ import sys
 import tempfile
 import unittest
 
+from tools.run_startup import gdb_command
+
 
 SCRIPT = Path(__file__).resolve().parent.parent / 'tools/run_startup.py'
 
@@ -41,5 +43,13 @@ class CLIPathTests(unittest.TestCase):
         self.assertIn('1280x960', help_text)
         self.assertIn('--aspect-ratio', help_text)
         self.assertIn('--smooth-scaling', help_text)
+        self.assertIn('--gdb', help_text)
         run = self.run_cli('--aspect-ratio', '5:4', '--show-paths')
         self.assertNotEqual(run.returncode, 0)
+
+    def test_gdb_starts_the_guest_elf_not_the_python_bridge(self):
+        command = gdb_command(['/tmp/guest/startup.elf', '/tmp/game'])
+        self.assertEqual(command[command.index('--args') + 1:],
+                         ['/tmp/guest/startup.elf', '/tmp/game'])
+        self.assertIn('run', command)
+        self.assertIn('$_exitcode', ' '.join(command))
