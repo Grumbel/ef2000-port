@@ -228,6 +228,72 @@ class MouseScript:
             self.applied.append({'tick': tick, 'x': x, 'y': y, 'buttons': buttons})
 
 
+class GuestMouseTrace:
+    """Group original EF2000 mouse-call sites by caller and button state."""
+
+    # Protected-image wrappers around INT 33h AX=3 and AX=0Bh.
+    ENTRIES = {0xcdfe8: 'position', 0xce02c: 'motion', 0xce064: 'buttons'}
+
+    def __init__(self):
+        self.sites = {}
+        self.gui_frames = {}
+        self.gui_hits = {}
+        self.gui_events = {}
+        self.gui_dispatches = {}
+        self.gui_callbacks = {}
+
+    def record(self, entry, caller, buttons, x, y, tick):
+        key = (entry, caller, buttons, x, y)
+        if key not in self.sites:
+            self.sites[key] = {'entry': entry, 'kind': self.ENTRIES[entry],
+                               'caller': caller, 'buttons': buttons,
+                               'x': x, 'y': y, 'first_tick': tick,
+                               'last_tick': tick, 'count': 0}
+        site = self.sites[key]
+        site['count'] += 1
+        site['last_tick'] = tick
+
+    def report(self):
+        return sorted(self.sites.values(), key=lambda site: (
+            site['entry'], site['caller'], site['buttons'], site['first_tick']))
+
+    @staticmethod
+    def _record_group(groups, key, tick, **fields):
+        if key not in groups:
+            groups[key] = dict(fields, first_tick=tick, last_tick=tick, count=0)
+        groups[key]['last_tick'] = tick
+        groups[key]['count'] += 1
+
+    def record_gui_frame(self, x, y, left_down, tick):
+        self._record_group(self.gui_frames, (x, y, left_down), tick,
+                           x=x, y=y, left_down=left_down)
+
+    def record_gui_hit(self, control, left_down, tick):
+        self._record_group(self.gui_hits, (control, left_down), tick,
+                           control=control, left_down=left_down)
+
+    def record_gui_event(self, control_id, control, left_down, tick):
+        self._record_group(self.gui_events, (control_id, control, left_down), tick,
+                           control_id=control_id, control=control, left_down=left_down)
+
+    def record_gui_dispatch(self, control_id, control, action, tick):
+        self._record_group(self.gui_dispatches, (control_id, control, action), tick,
+                           control_id=control_id, control=control, action=action)
+
+    def record_gui_callback(self, control, mask, triggered, callback, called, tick):
+        self._record_group(self.gui_callbacks,
+                           (control, mask, triggered, callback, called), tick,
+                           control=control, mask=mask, triggered=triggered,
+                           callback=callback, called=called)
+
+    def gui_report(self):
+        return {'frames': sorted(self.gui_frames.values(), key=lambda row: row['first_tick']),
+                'hits': sorted(self.gui_hits.values(), key=lambda row: row['first_tick']),
+                'events': sorted(self.gui_events.values(), key=lambda row: row['first_tick']),
+                'dispatches': sorted(self.gui_dispatches.values(), key=lambda row: row['first_tick']),
+                'callbacks': sorted(self.gui_callbacks.values(), key=lambda row: row['first_tick'])}
+
+
 class KeyScript:
     """Reproducible SDL scancodes for BIOS and protected-mode keyboard probes."""
 
@@ -521,7 +587,7 @@ def run(image, instruction_limit=None, game_dir=None,
         fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
         smooth_scaling=False, display_instructions=50000,
         display_factory=None, framebuffer=None, sample_instructions=0,
-        vga_clock=None):
+        vga_clock=None, trace_mouse=False):
     """Run original-code x86; windowed sessions continue until closed by default."""
     if instruction_limit is None:
         instruction_limit = 0 if windowed else DEFAULT_INSTRUCTION_LIMIT
@@ -660,6 +726,7 @@ def run(image, instruction_limit=None, game_dir=None,
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
               'privileged_ops': [], 'video_modes': [], 'ip_samples': [],
               'instruction_limit': instruction_limit}
+    mouse_trace = GuestMouseTrace() if trace_mouse else None
 
     def interrupt(uc, vector, _user):
         nonlocal real_mode
@@ -823,6 +890,46 @@ def run(image, instruction_limit=None, game_dir=None,
             uc.emu_stop()
             return
         timer.instructions += 1
+        if mouse_trace is not None and real_mode is not None:
+            if address in GuestMouseTrace.ENTRIES:
+                caller = struct.unpack('<I', uc.mem_read(uc.reg_read(UC_X86_REG_ESP), 4))[0]
+                engine = real_mode.engine
+                mouse_trace.record(address, caller, engine.mouse_buttons,
+                                   engine.mouse_x, engine.mouse_y, timer.ticks)
+            elif address == 0xacc75:
+                # Main menu's input event has just copied the software cursor
+                # and mouse button into its own event structure.
+                x, y = struct.unpack('<2H', uc.mem_read(0x13725e, 4))
+                event = uc.reg_read(UC_X86_REG_EBX)
+                left_down = bool(uc.mem_read(event + 0x1e, 1)[0] & 1)
+                mouse_trace.record_gui_frame(x, y, left_down, timer.ticks)
+            elif address == 0xacd80:
+                # Main menu's control hit-test accepted a cursor rectangle.
+                mouse_trace.record_gui_hit(uc.reg_read(UC_X86_REG_EDX),
+                                           bool(real_mode.engine.mouse_buttons & 1), timer.ticks)
+            elif address == 0xacfa0:
+                # The GUI's completed event carries a control id and pointer.
+                event = uc.reg_read(UC_X86_REG_EBX)
+                data = bytes(uc.mem_read(event, 0x1f))
+                mouse_trace.record_gui_event(struct.unpack_from('<H', data)[0],
+                                             struct.unpack_from('<I', data, 4)[0],
+                                             bool(data[0x1e] & 1), timer.ticks)
+            elif address == 0xacffc:
+                # The event dispatcher has selected an action code for this
+                # control (0x19 is a left-button-down event).
+                event = uc.reg_read(UC_X86_REG_EDX)
+                data = bytes(uc.mem_read(event, 8))
+                mouse_trace.record_gui_dispatch(struct.unpack_from('<H', data)[0],
+                                                struct.unpack_from('<I', data, 4)[0],
+                                                uc.reg_read(UC_X86_REG_EAX), timer.ticks)
+            elif address in (0xf1d2f, 0xf1d44):
+                # Event masks and dispatch callbacks are evaluated by the
+                # original SuperGUI widget code, not by the DOS mouse driver.
+                control = (uc.reg_read(UC_X86_REG_EAX) if address == 0xf1d2f
+                           else uc.reg_read(UC_X86_REG_EDX))
+                mask, triggered, callback = struct.unpack('<HHI', uc.mem_read(control + 0xa9, 8))
+                mouse_trace.record_gui_callback(control, mask, triggered, callback,
+                                                address == 0xf1d44, timer.ticks)
         if sample_instructions and timer.instructions % sample_instructions == sample_instructions // 2:
             result['ip_samples'].append({'instruction': timer.instructions, 'ip': address,
                                          'ax': uc.reg_read(UC_X86_REG_EAX),
@@ -939,6 +1046,9 @@ def run(image, instruction_limit=None, game_dir=None,
     result['allocation'] = vars(allocation).copy()
     result['conventional_end'] = conventional.end
     result['mouse_events'] = mouse_script.applied
+    if mouse_trace is not None:
+        result['mouse_call_sites'] = mouse_trace.report()
+        result['mouse_gui'] = mouse_trace.gui_report()
     result['key_events'] = key_script.applied
     result['timer'] = {'instructions': timer.instructions, 'ticks': timer.ticks,
                        'irq0': timer.interrupts - timer.keyboard_interrupts,
@@ -993,6 +1103,8 @@ def main():
                         help='guest instructions between SDL3 event polls (default: %(default)s)')
     parser.add_argument('--sample-instructions', type=int, default=0, metavar='N',
                         help='sample guest EIP and registers every N instructions (0 disables sampling)')
+    parser.add_argument('--trace-mouse', action='store_true',
+                        help='summarize original guest mouse wrappers, callers, and button state')
     parser.add_argument('--framebuffer', type=Path,
                         help='save the last available VGA frame to a PNG (including headless)')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
@@ -1028,7 +1140,7 @@ def main():
                  geometry=tuple(map(int, match.groups())), aspect_ratio=args.aspect_ratio,
                  smooth_scaling=args.smooth_scaling,
                  display_instructions=args.display_instructions, framebuffer=args.framebuffer,
-                 sample_instructions=args.sample_instructions)
+                 sample_instructions=args.sample_instructions, trace_mouse=args.trace_mouse)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')

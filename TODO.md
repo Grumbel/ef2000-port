@@ -67,7 +67,9 @@ Implemented and verified:
 6. Document data/mission discoveries separately under `docs/`, with fingerprints,
    offsets, reproducers, and observed/inferred status.
 7. Extend the portable Unicorn backend beyond the now-rendered 640×400 main
-   menu: verify original mouse selections and flight, refine instruction-paced
+   menu: mouse clicks now reach guest control hit-testing and event dispatch,
+   but still do not activate a menu action. Trace the subcontrol callback and
+   verify flight; refine instruction-paced
    timers and VGA retrace pacing, and add a native Windows launcher. SDL3
    window behavior is currently checked with an injected display; real GUI
    tests must run in a private Xvfb instance.

@@ -10,7 +10,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, GamePort, KeyboardController, KeyScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VgaStatus, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, GamePort, GuestMouseTrace, KeyboardController, KeyScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VgaStatus, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
                                    serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
@@ -193,6 +193,31 @@ class UnicornStartupServiceTests(unittest.TestCase):
         for bad in ('1:2:3', '-1:2:3:1', '1:640:0:0', '1:0:0:8', 'abc:0:0:0'):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 MouseScript([bad])
+
+    def test_guest_mouse_trace_groups_calls_by_wrapper_and_button_state(self):
+        trace = GuestMouseTrace()
+        trace.record(0xce064, 0x1234, 0, 320, 200, 100)
+        trace.record(0xce064, 0x1234, 0, 320, 200, 105)
+        trace.record(0xce064, 0x1234, 1, 180, 85, 110)
+        trace.record(0xce02c, 0x5678, 1, 180, 85, 111)
+        sites = trace.report()
+        self.assertEqual([(s['kind'], s['caller'], s['buttons'], s['count']) for s in sites],
+                         [('motion', 0x5678, 1, 1),
+                          ('buttons', 0x1234, 0, 2),
+                          ('buttons', 0x1234, 1, 1)])
+        self.assertEqual((sites[1]['first_tick'], sites[1]['last_tick']), (100, 105))
+        trace.record_gui_frame(180, 85, False, 120)
+        trace.record_gui_frame(180, 85, True, 121)
+        trace.record_gui_hit(0x123456, True, 121)
+        trace.record_gui_event(3, 0x123456, True, 121)
+        trace.record_gui_dispatch(3, 0x123456, 0x19, 121)
+        trace.record_gui_callback(0x123456, 0x20, 0x20, 0xabcd, True, 121)
+        self.assertEqual([row['left_down'] for row in trace.gui_report()['frames']],
+                         [False, True])
+        self.assertEqual(trace.gui_report()['hits'][0]['control'], 0x123456)
+        self.assertEqual(trace.gui_report()['events'][0]['control_id'], 3)
+        self.assertEqual(trace.gui_report()['dispatches'][0]['action'], 0x19)
+        self.assertEqual(trace.gui_report()['callbacks'][0]['callback'], 0xabcd)
 
     def test_headless_key_script_uses_sdl_scans_and_bios_queue(self):
         from tools.input_devices import HostInput

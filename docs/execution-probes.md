@@ -69,3 +69,34 @@ logs changed from text output to a 640x400 surface and recorded
 No requested INT 21h/file-I/O trace appeared in this installed build. Use an
 instrumented build or another tracing method before treating this as a reference
 for loader register state or syscall coverage.
+
+## Unicorn original-menu mouse dispatch
+
+The protected-mode Unicorn probe now reaches the original 640x400 German main
+menu with the supplied `_EF2000.EXE` and its unmodified DID archives. Use
+`--trace-mouse --timer-instructions 100000` alongside timed `--mouse-event`
+options and `--report` to record grouped guest call sites rather than every
+individual mouse poll. The addresses below refer to the extracted protected
+image, not the on-disk DOS stub.
+
+- `0xCDFE8` reads INT 33h function 03h (position and buttons), including the
+  game's historical Y/2 scaling; `0xCE02C` reads relative motion (0Bh), and
+  `0xCE064` reads the button mask alone.
+- The main menu uses the separate `0xAC854` input path. It updates a software
+  cursor from mickeys and passes button state to `0xACBE4` for hit-testing.
+  `0xACFB8` dispatches the resulting control event.
+- An asset-backed move to mouse `(180,85)` after menu initialization produced
+  software cursor `(179,84)` and hit control id 7. A left click registered
+  actions 25 (press), 9 (held), and 33 (release) for that same control. The
+  displayed menu nevertheless remained unchanged by the instruction budget.
+  A second press/release on the same control generated the same action sequence
+  again without transitioning to another screen.
+- An earlier press during menu initialization instead entered a wait-for-release
+  loop at `0xAC569`. A click probe must move and press *after* that handoff;
+  an unchanged screenshot by itself does not identify the failing input stage.
+
+These observations establish that the mouse driver, software cursor, control
+hit-test, and initial GUI event dispatcher are connected. They **do not** yet
+validate execution of a menu action or flight transition. The traced top-level
+widget callback at `0xF1C58` was not reached for this control; the alternate
+subcontrol callback and menu-command path are the next boundaries to investigate.
