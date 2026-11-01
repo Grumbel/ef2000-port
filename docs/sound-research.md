@@ -190,6 +190,10 @@ driver CPU; modified memory, segment registers and general-purpose registers
 are returned to the protected-mode caller after a real far `IRET`.
 Unimplemented nested real-mode interrupts and ports stop with a diagnostic;
 both instruction count and wall-clock execution are bounded.
+The BIOS Data Area's CRT-controller base at `0040:0063` must be initialized to
+`03D4h`: the original driver uses the corresponding `03DAh` retrace input as
+a timing source. Without it, the driver polls a nonexistent port until the
+real-mode execution bound expires.
 
 `--sound sb16-probe` enables the existing digital-sound configuration while
 disabling FM music, and exposes the measured SB16 DSP reset handshake,
@@ -201,10 +205,15 @@ remains `--sound off` and retains the previously validated menu/flight path.
 
 Standalone C++ tests exercise the 16-bit `IRET` path, DOS memory exchange,
 driver code-cache invalidation, bounded execution, nested interrupt failures,
-real-mode SB16 `IN`/`OUT` discovery and the measured register responses. The
-original `SB16.DIG` binary was not present in the local reduced game-asset
-fixture for this validation, so the native C++ original-driver sound path
-still requires a full-installation integration test.
+real-mode SB16 `IN`/`OUT` discovery and the measured register responses.
+`objects/ef2000-original-sb16-test /path/to/SB16.DIG` after a local Nix
+build additionally runs the exact
+2,836-byte original driver, checks its known SHA-256, initializes it and
+verifies that its hardware self-test detects DSP 4.5, IRQ7 and DMA1/5, runs
+the actual driver IRQ handler, and produces the two-byte original PCM test
+transfer. Without the proprietary driver argument this test skips cleanly
+(including in the Nix build). The full supplied EF2000 archive does contain
+`SB16.DIG`, whereas the earlier reduced local fixture did not.
 
 ### Native C++ DMA and interrupt modeling
 
@@ -232,16 +241,29 @@ hardware interrupt stack and interrupts disabled, runs the handler until
 A dedicated synthetic test covers this deferred completion path, including
 an IRQ handler that loads its own DS. Audio service failures stop the guest
 with a diagnostic.
+The real SB16 driver also modifies the physical DOS interrupt vector table
+directly. Background delivery now observes those live 0000:0000 vectors
+instead of relying solely on the last X-32 interrupt-vector registration;
+real-mode vector mutations are copied back to the protected guest memory.
 
 Windowed runs now convert unsigned/signed 8/16-bit original PCM to interleaved
 stereo float samples with mixer gains and partial-frame carry, then feed SDL3
 an audio stream. SDL3 performs sample-rate conversion; queue growth is bounded
 and a missing host audio device only disables sound playback. Headless runs
-still report modeled PCM blocks without playing them. The format converter
+still report modeled PCM blocks without playing them. Optional
+`--wav-capture DIR` saves the unmodified guest DMA frames (converted only to
+the standard WAV sample signedness), splitting files on DSP generation or
+format changes. WAV cannot encode an incomplete multi-channel frame, so a
+trailing partial frame is discarded; no empty WAV segments are emitted and
+existing capture filenames are not overwritten. The format converter
 has deterministic tests for signedness, gains and split-frame boundaries.
 
-The C++ original-game sound path is **not** yet validated with a complete
-original installation or a real audio device, so audible playback cannot yet
-be claimed as verified.
-The limited local EF2000 fixture exits from `--sound sb16-dma` with the game's
-"Keine Soundkarte gefunden" message because `SB16.DIG` is absent.
+With the full original EF2000 archive, sound-enabled C++ replays reached the
+original in-flight cockpit after 1.5 billion guest instructions: 287–298 SB16
+DMA blocks, 585,730–608,258 PCM bytes (host wall-clock audio timing varies
+between runs). A shorter 300M-instruction replay exported 137,216
+complete-frame PCM bytes to WAV (68 DMA blocks; two startup self-test bytes
+were an incomplete stereo frame). The original driver's initialization and
+hardware self-test pass in native C++ as described above. The limited earlier
+fixture alone cannot initialize sound because it lacks `SB16.DIG`.
+Audible playback on a real SDL3 audio device has **not** yet been validated.

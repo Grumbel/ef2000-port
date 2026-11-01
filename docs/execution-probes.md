@@ -450,4 +450,40 @@ bridge now saves guest-created and modified files there without changing the
 original game or CD directories. A standalone native C++ test checks the
 drive mapping, disk writes, read-only behavior, and DOS error codes without
 requiring the proprietary game data. Real SDL3 hardware validation, digital
-sound and gameplay correctness beyond the checkpoint remain outstanding.
+sound playback on a physical device and gameplay correctness beyond the
+checkpoint remain outstanding.
+
+#### Original-driver sound-enabled replay
+
+The full original EF2000 archive includes `SB16.DIG`; a smaller earlier
+fixture did not. The sound-enabled native C++ game reached the original
+320×200 in-flight cockpit after 1.5 billion guest instructions, with 287–298
+DMA blocks totaling 585,730–608,258 PCM bytes in separate runs (audio is
+scheduled against host wall-clock time). The startup splash and menu take
+longer with sound initialization, so the earlier sound-off mouse script
+must be retimed. Using a full installation and a `--cd-dir` containing the
+game's expected CD marker, the sound-enabled script was:
+
+```sh
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+  --game-dir /path/to/EF2000 --cd-dir /path/to/cd-root \
+  --sound sb16-dma --timer-instructions 100000 \
+  --instruction-limit 1500000000 \
+  --mouse-event 5500:165:110:0 --mouse-event 5550:165:110:1 \
+  --mouse-event 5570:165:110:0 \
+  --mouse-event 6800:205:74:0 --mouse-event 6820:205:74:1 \
+  --mouse-event 6840:205:74:0 \
+  --mouse-event 6860:130:176:0 --mouse-event 6880:130:176:1 \
+  --mouse-event 6900:130:176:0 \
+  --mouse-event 6920:287:368:0 --mouse-event 6940:287:368:1 \
+  --mouse-event 6960:287:368:0 \
+  --framebuffer /tmp/ef2000-sb16-flight.ppm
+```
+
+For a shorter, audio-focused run, add `--wav-capture DIR` to
+`--sound sb16-dma`; it saves original guest PCM as ordinary WAV files without
+needing a window or sound device. A 300M-instruction replay produced 68 DMA
+blocks and 137,216 complete-frame WAV PCM bytes. The original driver's
+two-byte initialization self-test has no complete 16-bit stereo frame and is
+not written as an empty WAV file. C++ original-driver and WAV-format tests
+cover these conditions. Physical SDL3 output has not been tested.

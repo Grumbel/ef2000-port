@@ -174,10 +174,14 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
 - [x] Poll DSP DMA from protected-mode PIT ticks, run the original 16-bit IRQ
   handler independently of an outstanding X-32 call, and stream normalized
   PCM into SDL3 in windowed mode. Synthetic deferred-IRQ and format tests pass.
+- [x] Validate the full original `SB16.DIG` in native C++: DSP 4.5,
+  IRQ7/DMA1/5 original-driver self-test, real IVT updates, and sound-enabled
+  1.5B-instruction replay to the flight cockpit. Add optional lossless
+  complete-frame guest PCM capture via `--wav-capture DIR`.
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
   on actual hardware, and test sustained interactive mission execution.
-- [ ] Verify complete `SB16.DIG` startup, DMA/IRQ and audible SDL3 playback
-  using a full original installation and physical audio device; improve
+- [ ] Verify audible SDL3 playback using a full original installation and
+  physical audio device; improve
   streaming latency if required and port remaining OS services before
   switching `.#unicorn` over to C++.
 `--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA

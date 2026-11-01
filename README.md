@@ -197,6 +197,9 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-probe \
   --instruction-limit 100000000
 # Experimental DMA/PIC/IRQ emulation with SDL3 PCM output in windowed runs
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma
+# Capture the original guest DMA audio without an SDL3 sound device
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-dma \
+  --instruction-limit 300000000 --wav-capture /tmp/ef2000-pcm
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
@@ -214,6 +217,9 @@ command and observed checkpoints are in
 joystick events are forwarded to the guest, and the CLI supports scripted
 `--mouse-event`, `--key-event` and `--joystick-event` inputs. `--fullscreen`,
 `--geometry`, `--aspect-ratio` and `--smooth-scaling` control SDL3 output.
+With sound enabled, independent 1.5-billion-instruction replays also reached
+the in-flight cockpit, completing 287–298 guest DMA blocks
+(585,730–608,258 PCM bytes; the DSP service uses host wall-clock timing).
 
 DOS writes in windowed mode default to
 `$XDG_STATE_HOME/ef2000/unicorn/drive` (or
@@ -235,15 +241,21 @@ block and byte counts are reported at exit. Protected-mode timer ticks can
 also finish DMA blocks and invoke installed real-mode IRQ handlers without
 an outstanding X-32 BIOS call. Windowed runs feed gain-adjusted stereo PCM
 into an SDL3 audio device, using the stream's input-format conversion to
-handle the game's sample rates. Headless runs only count PCM blocks. Audio
+handle the game's sample rates. Headless runs can optionally save the source
+PCM as regular WAV files with `--wav-capture DIR` (requires `--sound sb16-dma`);
+format changes open a new file, and existing captures are never overwritten.
+Only complete sample frames can be represented in WAV, so an incomplete
+trailing frame is omitted. By default headless runs only count PCM blocks. Audio
 device initialization failures disable playback without stopping the guest.
-The complete original SB16 driver and SDL3 device path have **not** been
-tested in this build environment (the local fixture lacks `SB16.DIG`).
+The original `SB16.DIG` from the supplied full EF2000 archive passed its
+native C++ IRQ7/DMA self-test, including DSP 4.5 and DMA1/5 detection, and
+the sound-enabled cockpit replay. The smaller reduced testing fixture alone
+was missing that file. Real-device SDL3 audio playback remains untested here.
 
 This is still an **experimental migration**, not yet a drop-in replacement
 for the Python app. Real SDL3 window/gamepad operation has not been exercised
 in this build environment, and real-device sound playback, original-driver
-integration, additional DOS calls and
+integration beyond the tested path, additional DOS calls and
 extensive flight-control/playability validation remain open. The working
 Python backend remains available at `nix run .#unicorn` for comparison.
 
