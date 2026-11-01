@@ -63,6 +63,99 @@ class KeyboardController:
         self.ack_pending = True
 
 
+class ProtectedTimer:
+    """Instruction-paced PIT ticks and protected IRQ0 with a real IRET frame.
+
+    Ticks are deterministic for a fixed instruction stream, not a substitute
+    for the native backend's wall-clock pacing. Only a registered original
+    IRQ0 handler can receive a frame; all other states are left untouched.
+    """
+
+    def __init__(self, interval=250000):
+        if interval <= 0:
+            raise ValueError('timer interval must be positive')
+        self.interval = interval
+        self.instructions = 0
+        self.ticks = 0
+        self.interrupts = 0
+        self.divisor = 65536
+        self.low = 0
+        self.high_next = False
+        self.bios_accumulator = 0
+        self.in_service = False
+        self.eoi_seen = False
+        self.return_sp = 0
+
+    def port_out(self, port, value):
+        value &= 255
+        if port == 0x43:
+            if value not in (0x36, 0x34):
+                raise UnsupportedGuestOperation(f'unsupported PIT command {value:02x}')
+            self.high_next = False
+        elif port == 0x40:
+            if not self.high_next:
+                self.low = value
+            else:
+                self.divisor = self.low | (value << 8) or 65536
+            self.high_next = not self.high_next
+        elif port == 0x20 and value == 0x20:
+            self.eoi_seen = True
+
+    def instruction(self, cpu, address, vectors, regs):
+        if self.in_service and self.eoi_seen and regs['sp'] == self.return_sp:
+            self.in_service = self.eoi_seen = False
+        if self.instructions % self.interval:
+            return False
+        self.ticks += 1
+        self.bios_accumulator += self.divisor
+        if self.bios_accumulator >= 65536:
+            address_of_ticks = 0x0100046c
+            old = struct.unpack('<I', bytes(cpu.mem_read(address_of_ticks, 4)))[0]
+            advances, self.bios_accumulator = divmod(self.bios_accumulator, 65536)
+            cpu.mem_write(address_of_ticks, struct.pack('<I', (old + advances) & 0xffffffff))
+        handler, selector = vectors.protected[8]
+        if (self.in_service or handler >= IMAGE_SIZE or selector not in (0x2c, 0x2f) or
+            regs['cs'] not in (0x2c, 0x2f) or regs['ss'] != 7 or
+            not (regs['flags'] & 0x200) or regs['sp'] < 0x1000):
+            return False
+        cpu.mem_write(regs['sp'] - 12,
+                      struct.pack('<3I', address, regs['cs'], regs['flags']))
+        cpu.reg_write(regs['sp_register'], regs['sp'] - 12)
+        cpu.reg_write(regs['ip_register'], handler)
+        cpu.reg_write(regs['flags_register'], regs['flags'] & ~0x300)
+        self.in_service = True
+        self.eoi_seen = False
+        self.return_sp = regs['sp']
+        self.interrupts += 1
+        return True
+
+
+class MouseScript:
+    """Reproducible host mouse state transitions for headless driver tests."""
+
+    def __init__(self, entries=()):
+        self.events = []
+        self.applied = []
+        for entry in entries:
+            try:
+                values = tuple(map(int, entry.split(':'))) if isinstance(entry, str) else tuple(entry)
+                if len(values) != 4 or any(not isinstance(value, int) for value in values):
+                    raise ValueError()
+                tick, x, y, buttons = values
+                if tick < 0 or not 0 <= x < 640 or not 0 <= y < 480 or not 0 <= buttons < 8:
+                    raise ValueError()
+            except (TypeError, ValueError):
+                raise ValueError(f'invalid mouse event {entry!r}: expected TICK:X:Y:BUTTONS') from None
+            self.events.append((tick, x, y, buttons))
+        self.events.sort(key=lambda event: event[0])
+
+    def apply(self, ticks, engine):
+        while self.events and self.events[0][0] <= ticks:
+            tick, x, y, buttons = self.events.pop(0)
+            engine.mouse_x, engine.mouse_y, engine.mouse_buttons = x, y, buttons
+            self.applied.append({'tick': tick, 'x': x, 'y': y, 'buttons': buttons})
+
+
 class RealModeBridge:
     """Run X-32 AX=2511 through the shared bounded 16-bit Unicorn engine."""
 
@@ -121,7 +214,7 @@ class RealModeBridge:
         if len(updated) != 0x100000:
             raise UnsupportedGuestOperation('real-mode bridge returned invalid DOS memory size')
         cpu.mem_write(0x01000000, updated)
-        record.update(result_ax=values[2], result_dx=values[5])
+        record.update(result_ax=values[2], result_bx=values[3], result_dx=values[5])
         return values
 
 
@@ -325,12 +418,15 @@ class X32Selectors:
 
 
 def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
-        cd_dir=None, overlay_dir=None, ring3=True, sound='off'):
+        cd_dir=None, overlay_dir=None, ring3=True, sound='off',
+        timer_instructions=250000, mouse_events=()):
     """Run a bounded original-code probe; report the last guest interaction."""
     if instruction_limit <= 0:
         raise ValueError('instruction limit must be positive')
     if sound not in ('off', 'original'):
         raise ValueError('sound must be off or original')
+    if timer_instructions <= 0:
+        raise ValueError('timer_instructions must be positive')
     from unicorn import Uc, UcError, UC_ARCH_X86, UC_MODE_32, UC_HOOK_INTR, UC_HOOK_CODE, UC_HOOK_INSN
     from unicorn.x86_const import (UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
         UC_X86_REG_EDX, UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EBP,
@@ -350,8 +446,12 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     cpu.mem_map(0, IMAGE_SIZE)
     # Guest selectors reference a synthetic LDT. Establish the descriptor
     # tables explicitly: unlike the Linux backend there is no modify_ldt().
-    table_base = IMAGE_SIZE
-    cpu.mem_map(table_base, 0x1000)
+    # Reserve the extender's documented default IRQ trampoline at +0x100.
+    # Keep Unicorn's private descriptor tables a page away from guest code.
+    table_base = IMAGE_SIZE + 0x1000
+    cpu.mem_map(IMAGE_SIZE, 0x2000)
+    cpu.mem_write(IMAGE_SIZE + 0x100,
+                  bytes.fromhex('50 b0 20 e6 20 fb 58 cf'))  # EOI, STI, IRET
     gdt = bytearray(0x30)
     gdt[8:16] = segment_descriptor(table_base + 0x100, 0xff, 0x82, 0)
     if ring3:
@@ -430,6 +530,8 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                     if line.split(b'=', 1)[0] in changes else line for line in lines) + b'\r\n'
     selectors = X32Selectors(cpu, table_base + 0x100)
     keyboard = KeyboardController()
+    timer = ProtectedTimer(timer_instructions)
+    mouse_script = MouseScript(mouse_events)
     real_mode = None
     result = {'status': 'instruction_limit', 'events': events, 'console': [],
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
@@ -474,6 +576,7 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                     raise UnsupportedGuestOperation(f'unimplemented INT {vector:02x}h at IP={ip:08x}')
                 if real_mode is None:
                     real_mode = RealModeBridge()
+                    mouse_script.apply(timer.ticks, real_mode.engine)
                 next_regs = real_mode.bios(uc, regs, vectors.real, vector)
             elif (regs['ax'] >> 8) & 0xff == 0x4c:
                 result['status'] = 'guest_exit'
@@ -496,6 +599,7 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
             elif regs['ax'] & 0xffff == 0x2511:
                 if real_mode is None:
                     real_mode = RealModeBridge()
+                    mouse_script.apply(timer.ticks, real_mode.engine)
                 next_regs = real_mode.execute(uc, regs, vectors.real)
             elif ip != 0x93 and regs['ax'] & 0xffff in (0x3501, 0x3502, 0x3503, 0x3504, 0x3505):
                 next_regs = selectors.service(regs)
@@ -582,10 +686,24 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
 
     def instruction(uc, address, size, _user):
         if not (ENTRY <= address < IMAGE_SIZE or
+                IMAGE_SIZE + 0x100 <= address < IMAGE_SIZE + 0x108 or
                 ring3 and table_base + 0x200 <= address < table_base + 0x400):
             result['status'] = 'unexpected_execution_address'
             result['detail'] = f'IP={address:08x}'
             uc.emu_stop()
+            return
+        timer.instructions += 1
+        if (timer.instructions % timer.interval == 0 or
+            (timer.in_service and timer.eoi_seen)):
+            previous_ticks = timer.ticks
+            timer.instruction(uc, address, vectors, {
+                'sp': uc.reg_read(UC_X86_REG_ESP), 'sp_register': UC_X86_REG_ESP,
+                'ip_register': UC_X86_REG_EIP, 'flags_register': UC_X86_REG_EFLAGS,
+                'cs': uc.reg_read(UC_X86_REG_CS), 'ss': uc.reg_read(UC_X86_REG_SS),
+                'flags': uc.reg_read(UC_X86_REG_EFLAGS),
+            })
+            if real_mode is not None and timer.ticks != previous_ticks:
+                mouse_script.apply(timer.ticks, real_mode.engine)
 
     def port_in(uc, port, size, _user):
         if port == 0x201:  # No physical joystick: all four buttons/axes high.
@@ -603,7 +721,15 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
         if port == 0x60:
             keyboard.write(port, value)
             return
-        if port in (0x20, 0x43, 0x40, 0x61, 0x3c8, 0x3c9, 0x201):
+        if port in (0x20, 0x43, 0x40):
+            try:
+                timer.port_out(port, value)
+            except UnsupportedGuestOperation as exc:
+                result['status'] = 'unsupported_interface'
+                result['detail'] = str(exc)
+                uc.emu_stop()
+            return
+        if port in (0x61, 0x3c8, 0x3c9, 0x201):
             return
         result['status'] = 'unsupported_interface'
         result['detail'] = f'unsupported OUT port={port:04x} value={value:08x}'
@@ -632,6 +758,10 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     result['ax'] = cpu.reg_read(UC_X86_REG_EAX)
     result['allocation'] = vars(allocation).copy()
     result['conventional_end'] = conventional.end
+    result['mouse_events'] = mouse_script.applied
+    result['timer'] = {'instructions': timer.instructions, 'ticks': timer.ticks,
+                       'irq0': timer.interrupts, 'divisor': timer.divisor,
+                       'in_service': timer.in_service}
     result['real_mode_requests'] = real_mode.requests if real_mode is not None else []
     if real_mode is not None:
         result['video_mode'] = real_mode.engine.video_mode
@@ -642,6 +772,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('executable', type=Path, help='original _EF2000.EXE')
     parser.add_argument('--instruction-limit', type=int, default=DEFAULT_INSTRUCTION_LIMIT)
+    parser.add_argument('--timer-instructions', type=int, default=250000,
+                        help='deterministic guest instruction count per PIT tick (default: %(default)s)')
+    parser.add_argument('--mouse-event', action='append', default=[], metavar='TICK:X:Y:BUTTONS',
+                        help='script mouse coordinates and button mask at a PIT tick; repeat to press/release')
     parser.add_argument('--game-dir', type=Path, help='read-only asset directory (default: EXE directory)')
     parser.add_argument('--cd-dir', type=Path, help='read-only root for absolute DOS CD paths')
     parser.add_argument('--overlay-dir', type=Path,
@@ -651,6 +785,12 @@ def main():
     parser.add_argument('--flat-ring0', action='store_true', help='diagnose legacy flat ring-0 CPU model')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
     args = parser.parse_args()
+    if args.timer_instructions <= 0:
+        parser.error('--timer-instructions must be positive')
+    try:
+        MouseScript(args.mouse_event)
+    except ValueError as exc:
+        parser.error(str(exc))
     try:
         from .extract_image import extract
     except ImportError:
@@ -659,7 +799,8 @@ def main():
     report = run(images['payload.bin'], args.instruction_limit,
                  game_dir=args.game_dir or args.executable.parent,
                  cd_dir=args.cd_dir, overlay_dir=args.overlay_dir,
-                 ring3=not args.flat_ring0, sound=args.sound)
+                 ring3=not args.flat_ring0, sound=args.sound,
+                 timer_instructions=args.timer_instructions, mouse_events=args.mouse_event)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')

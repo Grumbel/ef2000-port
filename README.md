@@ -126,6 +126,8 @@ execution, `modify_ldt`, GCC and binutils. It requires Python 3 and Unicorn
 nix run .#unicorn-probe -- /path/to/_EF2000.EXE
 # Or on Windows, with `pip install unicorn`:
 python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --report startup.json --overlay-dir C:\EF2000-user\drive --cd-dir D:\
+# Deterministic headless mouse press/release while probing the VGA menu:
+python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --mouse-event 70:320:100:1 --mouse-event 78:320:100:0
 ```
 
 The original `_EF2000.EXE` remains external and SHA-256 validated. The probe
@@ -150,8 +152,14 @@ installed assets it reads the archives, starts `TACTCOM`, and executes
 X-32 AX=`2511h` real-mode driver requests through the same bounded 16-bit
 Unicorn engine used on Linux. Direct INT `10h`, `33h`, `16h`, and `1Ah` BIOS
 calls use that bridge too. The game reaches VGA mode `13h` (320×200) and
-continues through the 30-million-instruction diagnostic budget. No native
-Windows SDL rendering, timer IRQ delivery or interactive input exists yet.
+continues through the 30-million-instruction diagnostic budget. The portable
+CPU now models PIT channel 0 programming, BIOS tick accumulation, protected
+IRQ0 injection, PIC EOI/IRET, and the original synthetic BIOS timer fallback.
+Ticks are instruction-paced (`--timer-instructions N`, default 250000), not
+wall-clock synchronized. The `--mouse-event TICK:X:Y:BUTTONS` option can
+inject reproducible mouse states (button 1=left, 0=release); events appear in
+the JSON report. There is still no live SDL window, physical keyboard/mouse
+input, native Windows event loop, or support for other hardware IRQs.
 No CD marker or additional unpacking is needed for that startup path. This
 does not establish that all game features work under the portable backend.
 
@@ -160,8 +168,8 @@ selector values (`CS=0x2f`, `DS/SS=7`) and a synthetic LDT. This corrects the
 early ring-0 shortcut. The data segment's expand-down limit is updated on the
 first 3505 request, and dynamically allocated descriptors are written into the
 guest LDT. It uses IOPL=3 for hooked port operations, and **does not yet
-implement** complete privilege-fault semantics, exceptions, IRQs, SDL rendering
-or game input. The diagnostic stops on unsupported requests (exit code 20), guest exit
+implement** complete privilege-fault semantics, exceptions, other IRQs, SDL rendering
+or live game input. The diagnostic stops on unsupported requests (exit code 20), guest exit
 (exit code 26), or the instruction budget; it prints the original guest call
 transcript and BSS-clearing checkpoint. The default 30-million-instruction
 budget can be changed with `--instruction-limit`. The legacy ring-0 model is

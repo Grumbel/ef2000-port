@@ -8,7 +8,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, KeyboardController, RealModeBridge, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, KeyboardController, MouseScript, ProtectedTimer, RealModeBridge, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
                                    serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
@@ -34,6 +34,66 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.assertEqual((keyboard.read(0x64), keyboard.read(0x60)), (0, 0))
         with self.assertRaises(UnsupportedGuestOperation):
             keyboard.write(0x64, 0x20)
+
+    def test_pit_ticks_and_protected_irq0_frame(self):
+        import struct
+
+        class Registers:
+            def __init__(self):
+                self.memory = {0x0100046c: b'\0' * 4}
+                self.writes = {}
+
+            def mem_read(self, address, size):
+                return self.memory[address][:size]
+
+            def mem_write(self, address, data):
+                self.memory[address] = bytes(data)
+
+            def reg_write(self, reg, value):
+                self.writes[reg] = value
+
+        timer = ProtectedTimer(interval=2)
+        guest = Registers()
+        vectors = VectorState()
+        vectors.protected[8] = (0x12345, 0x2f)
+        regs = dict(sp=0x4000, cs=0x2f, ss=7, flags=0x3202,
+                    sp_register='SP', ip_register='IP', flags_register='FLAGS')
+        timer.port_out(0x43, 0x36)
+        timer.port_out(0x40, 0)
+        timer.port_out(0x40, 0)
+        self.assertEqual(timer.divisor, 65536)
+        timer.instructions = 2
+        self.assertTrue(timer.instruction(guest, 0x2345, vectors, regs))
+        self.assertEqual(guest.writes, dict(SP=0x3ff4, IP=0x12345, FLAGS=0x3002))
+        self.assertEqual(struct.unpack('<3I', guest.memory[0x3ff4]), (0x2345, 0x2f, 0x3202))
+        self.assertEqual(struct.unpack('<I', guest.memory[0x0100046c])[0], 1)
+        self.assertEqual(timer.interrupts, 1)
+        timer.port_out(0x20, 0x20)
+        timer.instructions = 3
+        self.assertFalse(timer.instruction(guest, 0x2345, vectors, regs))
+        self.assertFalse(timer.in_service)
+        timer.instructions = 4
+        self.assertFalse(timer.instruction(guest, 0x2345, vectors, dict(regs, flags=0x3002)))
+        self.assertEqual(timer.interrupts, 1)
+
+    def test_headless_mouse_script_applies_press_and_release_at_ticks(self):
+        class Mouse:
+            mouse_x = mouse_y = mouse_buttons = 0
+
+        mouse = Mouse()
+        events = MouseScript(['20:320:100:1', '25:320:100:0', '0:20:30:0'])
+        events.apply(0, mouse)
+        self.assertEqual((mouse.mouse_x, mouse.mouse_y, mouse.mouse_buttons), (20, 30, 0))
+        events.apply(19, mouse)
+        self.assertEqual(mouse.mouse_buttons, 0)
+        events.apply(22, mouse)
+        self.assertEqual((mouse.mouse_x, mouse.mouse_buttons), (320, 1))
+        events.apply(25, mouse)
+        self.assertEqual(mouse.mouse_buttons, 0)
+        self.assertEqual([event['tick'] for event in events.applied], [0, 20, 25])
+        for bad in ('1:2:3', '-1:2:3:1', '1:640:0:0', '1:0:0:8', 'abc:0:0:0'):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                MouseScript([bad])
 
     def test_invalid_x32_residency_subfunction_sets_carry(self):
         result = serve_startup_int21(0x2f0, dict(self.regs, ax=0x252b, bx=0x61))
@@ -265,6 +325,23 @@ else:
 
 @unittest.skipUnless(HAS_UNICORN, 'requires Unicorn Python bindings')
 class UnicornGuestTests(unittest.TestCase):
+    def test_synthetic_guest_receives_irq0_and_returns_through_iret(self):
+        image = bytearray(0x195fb0)
+        code = bytes.fromhex(
+            '0e 1f'                # push cs; pop ds
+            'b8 04 25 00 00'      # mov eax,2504h: protected vector set
+            'b9 08 00 00 00'      # mov ecx,8: IRQ0
+            'ba 00 02 00 00'      # mov edx,200h: handler
+            'cd 21 fb eb fe'      # INT 21h; STI; jmp $
+        )
+        image[ENTRY:ENTRY + len(code)] = code
+        image[0x200:0x206] = bytes.fromhex('50 b0 20 e6 20 58')
+        image[0x206] = 0xcf  # IRET
+        result = run(bytes(image), instruction_limit=5000, timer_instructions=100)
+        self.assertEqual(result['status'], 'instruction_limit', result.get('detail'))
+        self.assertGreater(result['timer']['irq0'], 5)
+        self.assertEqual(result['timer']['ticks'], 50)
+
     def test_portable_real_mode_bridge_updates_registers_and_guest_memory(self):
         class GuestMemory:
             def __init__(self):
