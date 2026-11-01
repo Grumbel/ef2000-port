@@ -20,6 +20,11 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.regs = dict(ax=0x3505, bx=4, cx=0x260, dx=0, si=0, di=0,
                          bp=0, sp=0x3fff000, ip=0x95, flags=0x202)
 
+    def test_portable_psp_and_environment_match_native_boot(self):
+        writes = dict(startup_memory(bytes(ENTRY + 2)))
+        self.assertEqual(writes[0x02000080], b'\x04 gui\r')
+        self.assertIn(b'DID=.\0quick_flag=1\0\0', writes[0x02001000])
+
     def test_first_x32_selector_limit_request(self):
         result = serve_startup_int21(0x93, self.regs)
         self.assertEqual(result['cx'], 0x260)
@@ -260,26 +265,26 @@ class UnicornGuestTests(unittest.TestCase):
 
     @unittest.skipUnless(os.environ.get('EF2000_DATA_DIR') and os.environ.get('EF2000_EXE'),
                          'requires original game assets')
-    def test_original_game_reads_assets_and_exits_on_missing_cd(self):
+    def test_original_game_reads_archives_without_separate_cd_files(self):
         from tools.extract_image import extract
         image = extract(Path(os.environ['EF2000_EXE']).read_bytes())[1]['payload.bin']
         result = run(image, instruction_limit=30000000, game_dir=os.environ['EF2000_DATA_DIR'])
-        self.assertEqual(result['status'], 'guest_exit')
+        self.assertEqual(result['status'], 'instruction_limit')
         self.assertTrue(any('did1st.dat' == e.get('filename') for e in result['events']))
-        self.assertTrue(any('did.dat' == e.get('filename') for e in result['events']))
-        self.assertTrue(any('Datenset nicht gefunden' in line for line in result['console']))
+        self.assertTrue(any('did.dat' in e.get('filename', '') for e in result['events']))
+        self.assertTrue(any('TACTCOM' in line for line in result['console']))
+        self.assertFalse(any('Datenset nicht gefunden' in line for line in result['console']))
 
     @unittest.skipUnless(os.environ.get('EF2000_CD_DIR') and
                          os.environ.get('EF2000_DATA_DIR') and os.environ.get('EF2000_EXE'),
                          'requires original game assets and a diagnostic CD marker')
-    def test_guest_writes_only_to_overlay_after_cd_probe(self):
+    def test_cd_marker_does_not_override_archive_startup(self):
         from tools.extract_image import extract
         executable = Path(os.environ['EF2000_EXE'])
         image = extract(executable.read_bytes())[1]['payload.bin']
         with tempfile.TemporaryDirectory() as overlay:
             result = run(image, game_dir=os.environ['EF2000_DATA_DIR'],
                          cd_dir=os.environ['EF2000_CD_DIR'], overlay_dir=overlay)
-            self.assertEqual(result['status'], 'guest_exit')
-            self.assertTrue(any('VIEWS2.DAT' in line.upper() for line in result['console']))
-            self.assertGreater((Path(overlay) / 'TACTCOM.$$$').stat().st_size, 0)
+            self.assertEqual(result['status'], 'instruction_limit')
+            self.assertFalse(any('VIEWS2.DAT' in line.upper() for line in result['console']))
             self.assertFalse((Path(os.environ['EF2000_DATA_DIR']) / 'TACTCOM.$$$').exists())

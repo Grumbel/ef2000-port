@@ -41,6 +41,11 @@ def startup_memory(image):
     if len(image) > IMAGE_SIZE or len(image) < ENTRY + 2:
         raise ValueError('invalid protected-mode image length')
     return (
+        # The X-32 loader presents PSP, command tail and environment via
+        # LDT selectors. Without these the game follows a different boot path
+        # than the working Linux native harness (notably DID archive lookup).
+        (0x02000080, b'\x04 gui\r'),
+        (0x02001000, b'DID=.\0quick_flag=1\0\0\x01\0C:\\EF2000\\_EF2000.EXE\0'),
         (0x120cc4, struct.pack('<H', 0x1f)),
         # Both probe modes map DS to base zero, so DOS RAM offsets are positive.
         (0x120cc6, struct.pack('<I', 0x01000000)),
