@@ -70,8 +70,12 @@ Implemented and verified:
    menu: clicks on the body of *Schnelles Gefecht* trigger the game's script
    and, with a 230-million-instruction budget, render the original 640×400
    Quick Combat mission screen from its archive. Earlier clicks on the title
-   bar exercised only a separate window-management gate. Verify mission
-   selection and flight. Refine instruction-paced
+   bar exercised only a separate window-management gate. Difficulty and mission
+   selection work, and Accept reaches *Simulation wird geladen...*, but the
+   original decompressor asserts on a checksum mismatch (`INT 3` at `0xFA167`)
+   during asset loading. Capture expected/actual checksum and buffers, compare
+   archive input and state to the working Linux backend, then verify flight.
+   Refine instruction-paced
    timers and VGA retrace pacing, and add a native Windows launcher. SDL3
    window behavior is currently checked with an injected display; real GUI
    tests must run in a private Xvfb instance.

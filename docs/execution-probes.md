@@ -140,3 +140,36 @@ hit-test, GUI event dispatcher, scripted menu activation, and subsequent screen
 load are connected. They **do not** yet validate mission start or flight under
 Unicorn. Do not clear the guest's window-status bits to make clicks work: the
 actual menu icon is already dispatching its action.
+
+## Unicorn Quick Combat mission start
+
+The original GUI script in `DID1ST.DAT` defines `window difficulty` at
+`(100,40)`, `window miss_sel` at `(100,135)`, and `window summary` at `(100,240)`.
+Their clickable controls lie in the window bodies, below the title bars:
+
+| Action | Mouse target | Original script action |
+| --- | --- | --- |
+| Rookie difficulty | `(205,74)` | `gpwChangeDifficulty` |
+| Mission 01 | `(130,176)` | `gpwSelectLevel` |
+| Accept box (right of label) | `(287,368)` | `gpwArcadeAccepted` |
+
+After opening Quick Combat with the first-menu icon click at ticks
+`1400/1450/1470`, the new GUI polls events by approximately tick `1678` with
+`--timer-instructions 100000`. A follow-up replay selected Rookie at ticks
+`1790/1810/1830`, mission 01 at `1850/1870/1890`, and accepted at
+`1910/1930/1950` (move/press/release for each). The screen changed to the
+original *Simulation wird geladen...* loading status. The guest then read
+additional mission and effects assets, reaching the original payload's
+decompressor before stopping at instruction `325724093`.
+
+The stop is **not** an unimplemented flight renderer: original code at
+`0xFA153` compares a checksum with word `[0x16279E]`; on mismatch it branches
+to `INT 3` at `0xFA167`. The current portable backend reports
+`unsupported_interface: unimplemented INT 03h at IP=000fa166`, with the last
+video mode still VBE `0x100` (640×400). The routine at `0xFA2E4` computes an
+8-bit two-accumulator checksum over the decompressed output starting at
+`[0x162794]`, with size `[0x162790]`. The preceding archive reads do not by
+themselves identify whether corrupted input, decompressor execution, or another
+guest state caused the mismatch. Preserve the guest breakpoint and compare
+expected/actual checksums and buffer bytes on the next probe; treating `INT 3`
+as a no-op would conceal a failed asset integrity check.
