@@ -158,6 +158,18 @@ class VgaDac:
             raise UnsupportedGuestOperation(f'unsupported VGA DAC port {port:04x}')
 
 
+class VgaStatus:
+    """VGA input-status-1 vertical retrace, matching the native harness."""
+
+    def __init__(self, clock=time.monotonic_ns):
+        self.clock = clock
+
+    def read(self):
+        # The native harness uses a 60 Hz scan period with a 1.67 ms retrace.
+        # A constant zero leaves original code's 03DAh polling loop stalled.
+        return 8 if self.clock() % 16666667 >= 15000000 else 0
+
+
 class GamePort:
     """Four discharge counters and active-low buttons from the SDL mailbox."""
 
@@ -504,7 +516,8 @@ def run(image, instruction_limit=None, game_dir=None,
         timer_instructions=250000, mouse_events=(), key_events=(), windowed=False,
         fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
         smooth_scaling=False, display_instructions=50000,
-        display_factory=None, framebuffer=None, sample_instructions=0):
+        display_factory=None, framebuffer=None, sample_instructions=0,
+        vga_clock=None):
     """Run original-code x86; windowed sessions continue until closed by default."""
     if instruction_limit is None:
         instruction_limit = 0 if windowed else DEFAULT_INSTRUCTION_LIMIT
@@ -622,6 +635,7 @@ def run(image, instruction_limit=None, game_dir=None,
     selectors = X32Selectors(cpu, table_base + 0x100)
     keyboard = KeyboardController()
     dac = VgaDac()
+    vga_status = VgaStatus(clock=vga_clock or time.monotonic_ns)
     gameport = GamePort()
     timer = ProtectedTimer(timer_instructions)
     mouse_script = MouseScript(mouse_events)
@@ -860,7 +874,9 @@ def run(image, instruction_limit=None, game_dir=None,
             return gameport.read(uc)
         if port in (0x60, 0x64):
             return keyboard.read(port, uc)
-        if port in (0x61, 0x3da):
+        if port == 0x3da:
+            return vga_status.read()
+        if port == 0x61:
             return 0
         result['status'] = 'unsupported_interface'
         result['detail'] = f'unsupported IN port={port:04x}'

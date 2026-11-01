@@ -10,7 +10,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, GamePort, KeyboardController, KeyScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, GamePort, KeyboardController, KeyScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VgaStatus, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
                                    serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
@@ -91,6 +91,11 @@ class UnicornStartupServiceTests(unittest.TestCase):
         palette.write(guest, 0x3c9, 10)
         palette.write(guest, 0x3c9, 20)
         self.assertEqual(bytes(guest.ram[0xf1006:0xf1009]), bytes((63, 10, 20)))
+
+    def test_vga_status_switches_at_native_retrace_boundary(self):
+        samples = iter((0, 14999999, 15000000, 16666666, 16666667))
+        status = VgaStatus(clock=lambda: next(samples))
+        self.assertEqual([status.read() for _ in range(5)], [0, 0, 8, 8, 0])
 
     def test_pit_ticks_and_protected_irq0_frame(self):
         import struct
@@ -426,6 +431,20 @@ else:
 
 @unittest.skipUnless(HAS_UNICORN, 'requires Unicorn Python bindings')
 class UnicornGuestTests(unittest.TestCase):
+    def test_original_style_vga_retrace_wait_exits_when_status_toggles(self):
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 17] = bytes.fromhex(
+            'ba da 03 00 00'    # mov edx,3DAh
+            'ec a8 08 74 fb'    # IN AL,DX; TEST AL,8; JZ back to IN
+            'b8 00 4c 00 00'    # mov eax,4C00h
+            'cd 21'             # DOS exit
+        )
+        samples = iter((0, 0, 15000000))
+        result = run(bytes(image), instruction_limit=100,
+                     vga_clock=lambda: next(samples))
+        self.assertEqual(result['status'], 'guest_exit', result.get('detail'))
+        self.assertEqual(result['exit_code'], 0)
+
     def test_headless_vga_frame_can_be_saved_as_png(self):
         image = bytearray(0x195fb0)
         image[ENTRY:ENTRY + 9] = bytes.fromhex('b8 13 00 00 00 cd 10 eb fe')
