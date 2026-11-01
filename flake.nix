@@ -57,7 +57,7 @@
           done
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror -DEF_UNICORN_SDL3 \
             runtime/unicorn_cpp.cpp runtime/dos_drive.cpp runtime/real_mode_cpu.cpp \
-            runtime/sb16_probe.cpp \
+            runtime/sb16_probe.cpp runtime/sound_blaster.cpp runtime/isa_audio.cpp \
             -lunicorn -lcrypto -lSDL3 \
             -o objects/ef2000-unicorn-cpp
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
@@ -65,11 +65,19 @@
             -o objects/ef2000-dos-drive-test
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp \
+            runtime/sound_blaster.cpp runtime/isa_audio.cpp \
             -lunicorn \
             -o objects/ef2000-real-mode-test
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/sb16_probe_test.cpp runtime/sb16_probe.cpp \
             -o objects/ef2000-sb16-probe-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/isa_audio_test.cpp runtime/isa_audio.cpp \
+            -o objects/ef2000-isa-audio-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/sound_blaster_test.cpp runtime/sound_blaster.cpp runtime/isa_audio.cpp \
+            runtime/sb16_probe.cpp \
+            -o objects/ef2000-sound-blaster-test
           runHook postBuild
         '';
 
@@ -82,6 +90,8 @@
           objects/ef2000-dos-drive-test
           objects/ef2000-real-mode-test
           objects/ef2000-sb16-probe-test
+          objects/ef2000-isa-audio-test
+          objects/ef2000-sound-blaster-test
           runHook postCheck
         '';
 

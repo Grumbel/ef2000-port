@@ -3,15 +3,18 @@
 
 #pragma once
 
-#include "sb16_probe.hpp"
+#include "sound_blaster.hpp"
 #include <unicorn/unicorn.h>
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
 namespace ef2000 {
+
+enum class SoundMode { Off, Probe, Dma };
 
 // General-purpose 16-bit driver entry ABI used by the X-32 real-mode bridge.
 // Driver code executes in Unicorn directly, never in a Python subprocess.
@@ -24,11 +27,13 @@ struct RealRegisters {
 struct RealResult {
     RealRegisters registers;
     std::vector<uint8_t> memory;
+    std::vector<AudioBlock> audio_blocks;
 };
 
 class RealModeCpu {
 public:
-    explicit RealModeCpu(bool sb16_probe = false);
+    explicit RealModeCpu(SoundMode mode = SoundMode::Off);
+    explicit RealModeCpu(bool sb16_probe) : RealModeCpu(sb16_probe ? SoundMode::Probe : SoundMode::Off) {}
     ~RealModeCpu();
     RealModeCpu(const RealModeCpu&) = delete;
     RealModeCpu& operator=(const RealModeCpu&) = delete;
@@ -41,13 +46,17 @@ private:
     static void interrupt(uc_engine*, uint32_t vector, void* user);
     static uint32_t port_in(uc_engine*, uint32_t port, int size, void* user);
     static void port_out(uc_engine*, uint32_t port, int size, uint32_t value, void* user);
+    static void audio_block(uc_engine*, uint64_t address, uint32_t size, void* user);
+    void inject_audio_irq(unsigned irq);
     void fail(const std::string& message);
     void check(uc_err error, const char* operation);
 
     uc_engine* cpu_{};
     std::string error_;
-    bool sb16_probe_enabled_{};
+    SoundMode sound_mode_{};
+    std::optional<unsigned> pending_audio_irq_;
     SB16Probe sb16_probe_;
+    SoundBlaster16 sb16_dma_;
 };
 
 } // namespace ef2000

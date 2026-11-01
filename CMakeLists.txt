@@ -70,7 +70,8 @@ find_library(UNICORN_LIBRARY unicorn)
 find_package(OpenSSL QUIET COMPONENTS Crypto)
 if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
   add_executable(ef2000-unicorn-cpp runtime/unicorn_cpp.cpp runtime/dos_drive.cpp
-                                  runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp)
+                                  runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp
+                                  runtime/sound_blaster.cpp runtime/isa_audio.cpp)
   target_compile_features(ef2000-unicorn-cpp PRIVATE cxx_std_17)
   target_compile_options(ef2000-unicorn-cpp PRIVATE -Wall -Wextra -Werror)
   target_include_directories(ef2000-unicorn-cpp PRIVATE ${UNICORN_INCLUDE_DIR})
@@ -81,7 +82,8 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
     target_compile_definitions(ef2000-unicorn-cpp PRIVATE EF_UNICORN_SDL3=1)
   endif()
   add_executable(ef2000-real-mode-test tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp
-                                     runtime/sb16_probe.cpp)
+                                     runtime/sb16_probe.cpp runtime/sound_blaster.cpp
+                                     runtime/isa_audio.cpp)
   target_compile_features(ef2000-real-mode-test PRIVATE cxx_std_17)
   target_compile_options(ef2000-real-mode-test PRIVATE -Wall -Wextra -Werror)
   target_include_directories(ef2000-real-mode-test PRIVATE ${UNICORN_INCLUDE_DIR})
@@ -99,3 +101,13 @@ add_executable(ef2000-sb16-probe-test tests/sb16_probe_test.cpp runtime/sb16_pro
 target_compile_features(ef2000-sb16-probe-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-sb16-probe-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME sb16-probe COMMAND ef2000-sb16-probe-test)
+add_executable(ef2000-isa-audio-test tests/isa_audio_test.cpp runtime/isa_audio.cpp)
+target_compile_features(ef2000-isa-audio-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-isa-audio-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME isa-audio COMMAND ef2000-isa-audio-test)
+add_executable(ef2000-sound-blaster-test tests/sound_blaster_test.cpp
+                                        runtime/sound_blaster.cpp runtime/isa_audio.cpp
+                                        runtime/sb16_probe.cpp)
+target_compile_features(ef2000-sound-blaster-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-sound-blaster-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME sound-blaster COMMAND ef2000-sound-blaster-test)

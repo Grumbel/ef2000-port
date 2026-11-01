@@ -315,7 +315,8 @@ class Machine {
 public:
     explicit Machine(const std::vector<uint8_t>& image, fs::path game_dir, fs::path cd_dir,
                      fs::path overlay_dir,
-                     bool sb16_probe = false, bool trace_interrupts = false,
+                     ef2000::SoundMode sound_mode = ef2000::SoundMode::Off,
+                     bool trace_interrupts = false,
                      std::vector<MouseEvent> mouse_events = {},
                      std::vector<TimedKeyEvent> key_events = {},
                      std::vector<JoystickEvent> joystick_events = {})
@@ -323,7 +324,7 @@ public:
           mouse_events_(std::move(mouse_events)), key_events_(std::move(key_events)),
           joystick_events_(std::move(joystick_events)),
           dos_drive_(std::move(game_dir), std::move(cd_dir), std::move(overlay_dir)),
-          digital_sound_enabled_(sb16_probe), real_cpu_(sb16_probe) {
+          digital_sound_enabled_(sound_mode != ef2000::SoundMode::Off), real_cpu_(sound_mode) {
         if (image.size() < ENTRY + 2 || image.size() > IMAGE_SIZE)
             throw std::runtime_error("invalid initialized image length");
         check(uc_open(UC_ARCH_X86, UC_MODE_32, &cpu_), "uc_open");
@@ -397,6 +398,9 @@ public:
                   << " ticks=" << ticks_ << " irq0=" << irq0_
                   << " ip=0x" << std::hex << regs.ip << " ax=0x" << regs.ax
                   << std::dec << "\n";
+        if (audio_blocks_)
+            std::cout << "audio: modeled_dma_blocks=" << audio_blocks_
+                      << " captured_pcm_bytes=" << audio_bytes_ << " (no playback)\n";
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
         return (status_ == "instruction_limit" || status_ == "guest_exit") ? 0 : 20;
     }
@@ -405,6 +409,7 @@ private:
     uc_engine* cpu_{};
     size_t image_size_;
     uint64_t interrupts_{};
+    uint64_t audio_blocks_{}, audio_bytes_{};
     uint64_t ticks_{}, irq0_{}, irq1_{};
     uint32_t pit_divisor_ = 65536, pit_low_{}, bios_accumulator_{};
     bool pit_high_next_{}, irq_in_service_{}, eoi_seen_{};
@@ -995,6 +1000,8 @@ private:
             try {
                 const auto result = real_cpu_.execute(real_vectors_[vector], real_vectors_,
                                                        conventional, registers);
+                audio_blocks_ += result.audio_blocks.size();
+                for (const auto& block : result.audio_blocks) audio_bytes_ += block.pcm.size();
                 write(DOS_BASE, result.memory.data(), result.memory.size());
                 const auto& real = result.registers;
                 values.ax = real.ax; values.bx = real.bx; values.cx = real.cx;
@@ -1414,7 +1421,7 @@ void usage(const char* program) {
     std::cout << "Usage: " << program << " _EF2000.EXE [--instruction-limit N]"
               << " [--game-dir DIR] [--cd-dir DIR] [--overlay-dir DIR] [--windowed]"
               << " [--timer-instructions N]\n"
-              << "       [--sound off|sb16-probe] (discovery only; no PCM playback yet)\n"
+              << "       [--sound off|sb16-probe|sb16-dma] (DMA models only; no audio output)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
               << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
               << "       --instruction-limit 0 means unlimited (window default)\n"
@@ -1439,7 +1446,7 @@ int main(int argc, char** argv) {
         bool explicit_limit = false;
         uint64_t timer_interval = 250000;
         WindowOptions window;
-        bool sb16_probe = false;
+        ef2000::SoundMode sound_mode = ef2000::SoundMode::Off;
         bool self_test = false;
         bool trace_interrupts = false;
         std::vector<MouseEvent> mouse_events;
@@ -1470,9 +1477,10 @@ int main(int argc, char** argv) {
                 overlay_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--sound") && i + 1 < argc) {
                 const std::string mode = argv[++i];
-                if (mode == "sb16-probe") sb16_probe = true;
-                else if (mode == "off") sb16_probe = false;
-                else throw std::runtime_error("invalid --sound (off, sb16-probe)");
+                if (mode == "sb16-probe") sound_mode = ef2000::SoundMode::Probe;
+                else if (mode == "sb16-dma") sound_mode = ef2000::SoundMode::Dma;
+                else if (mode == "off") sound_mode = ef2000::SoundMode::Off;
+                else throw std::runtime_error("invalid --sound (off, sb16-probe, sb16-dma)");
             } else if (!std::strcmp(argv[i], "--windowed")) {
                 window.enabled = true;
             } else if (!std::strcmp(argv[i], "--fullscreen")) {
@@ -1583,7 +1591,7 @@ int main(int argc, char** argv) {
         const auto image = payload_from_executable(path);
         if (game_dir.empty()) game_dir = fs::path(path).parent_path().string();
         if (cd_dir.empty()) cd_dir = game_dir;
-        Machine machine(image, game_dir, cd_dir, overlay_dir, sb16_probe, trace_interrupts,
+        Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events));
         return machine.run(limit, window, timer_interval, framebuffer);
     } catch (const std::exception& error) {

@@ -102,6 +102,65 @@ int main() {
         const auto major = sb16.execute(entry, vectors, sound_memory, regs);
         require((major.registers.ax & 0xff) == 4, "16-bit SB16 DSP major version");
 
+        // The DMA-mode bridge forwards ordinary guest x86 port instructions
+        // to the original 8237 register/flip-flop interface as well.
+        ef2000::RealModeCpu dma(ef2000::SoundMode::Dma);
+        const uint8_t configure_dma[] = {
+            0xba, 0x0c, 0x00, // MOV DX,0Ch (DMA flip-flop clear)
+            0x30, 0xc0, 0xee, // XOR AL,AL / OUT DX,AL
+            0xba, 0x02, 0x00, // MOV DX,02h (channel 1 address)
+            0xb0, 0x34, 0xee, // Low address byte
+            0xb0, 0x12, 0xee, // High address byte
+            0xba, 0x0c, 0x00, 0xee, // Reset flip-flop
+            0xba, 0x02, 0x00, 0xec, // IN AL,DX -> 34h
+            0xcf};           // IRET
+        std::copy(std::begin(configure_dma), std::end(configure_dma),
+                  sound_memory.begin() + 0x21000);
+        const auto configured = dma.execute(entry, vectors, sound_memory, regs);
+        require((configured.registers.ax & 0xff) == 0x34,
+                "guest 16-bit IN/OUT accesses live C++ DMA state");
+
+        // A complete synthetic original-mode playback cycle: guest programs
+        // PIC, word DMA and DSP via OUT, waits for IRQ7, acknowledges the DSP
+        // and PIC from its own 16-bit ISR, then returns to the X-32 caller.
+        ef2000::RealModeCpu playback(ef2000::SoundMode::Dma);
+        std::vector<uint8_t> playback_memory(0x100000);
+        for (unsigned i = 0; i < 8; ++i) playback_memory[0x10000 + i] = uint8_t(i + 1);
+        std::vector<uint8_t> playback_code;
+        auto emit_out = [&](uint16_t port, uint8_t value) {
+            playback_code.insert(playback_code.end(),
+                                 {0xba, uint8_t(port), uint8_t(port >> 8),
+                                  0xb0, value, 0xee});
+        };
+        emit_out(0x226, 1);
+        emit_out(0x226, 0);
+        emit_out(0x21, 0x78);  // Unmask PIC IRQ7.
+        for (const auto& [port, value] :
+                std::array<std::pair<uint16_t, uint8_t>, 8>{{{0xd8, 0}, {0xc4, 0},
+                    {0xc4, 0x80}, {0xc6, 3}, {0xc6, 0}, {0x8b, 0},
+                    {0xd6, 0x49}, {0xd4, 1}}}) emit_out(port, value);
+        for (const uint8_t command : {0x41, 0xff, 0xff, 0xb0, 0x30, 3, 0})
+            emit_out(0x22c, command);
+        playback_code.insert(playback_code.end(), {
+            0xfb,                         // STI
+            0x80, 0x3e, 0x00, 0x02, 0x01, // CMP byte [0200h],1
+            0x75, 0xf9,                   // JNE back to CMP
+            0xcf});                       // IRET
+        std::copy(playback_code.begin(), playback_code.end(), playback_memory.begin() + 0x21000);
+        const uint8_t irq7_handler[] = {
+            0xfe, 0x06, 0x00, 0x02, // INC byte [0200h]
+            0xba, 0x2f, 0x02, 0xec, // Read 16-bit DSP acknowledgement port
+            0xba, 0x20, 0x00, 0xb0, 0x20, 0xee, // PIC EOI
+            0xcf};                   // IRET back to interrupted code
+        std::copy(std::begin(irq7_handler), std::end(irq7_handler),
+                  playback_memory.begin() + 0x22000);
+        vectors[0x0f] = 0x22000000;
+        const auto played = playback.execute(entry, vectors, playback_memory, regs);
+        require(played.memory[0x21200] == 1, "original-mode IRQ7 handler must run");
+        require(played.audio_blocks.size() == 1 &&
+                played.audio_blocks[0].pcm == std::vector<uint8_t>({1, 2, 3, 4, 5, 6, 7, 8}),
+                "16-bit guest DSP+DMA+IRQ cycle captures exact programmed PCM");
+
         std::cout << "real-mode: guest return, memory exchange and bounded failure tests passed\n";
         return 0;
     } catch (const std::exception& error) {
