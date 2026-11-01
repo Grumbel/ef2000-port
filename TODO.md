@@ -149,6 +149,20 @@ have dedicated regression coverage. All commits include exact model attribution.
 
 
 Sound discovery has an independent DOSBox-X probe and captured reference values.
+
+### Native C++ Unicorn migration (incremental)
+
+- [x] Add original-executable loader, ring-3/LDT bootstrap and X-32 startup
+  services using the Unicorn **C API**, with a synthetic CPU self-test.
+- [x] Port DOS reads, memory allocation, keyboard ACK, PIT/IRQ0 injection and
+  early video/mouse BIOS services; verify the 30M-instruction checkpoint,
+  interrupt and IRQ count against the Python reference.
+- [x] Add an SDL3 C++ presentation loop that repaints during CPU startup,
+  exposes mode-13h framebuffer, and explains all-black guest frames.
+- [ ] Finish parity after 30M instructions (X-32 vector `2507h` and
+  real-mode BIOS driver calls), then validate original splash/menu pixels.
+- [ ] Port banked VBE framebuffer, DOS writable overlay, input and sound, and
+  verify menu/flight execution before switching `.#unicorn` over to C++.
 `--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA
 model and plays captured digital PCM through SDL. FM music remains disabled in
 this mode. Failed real-mode calls retain mutated memory and CPU state for

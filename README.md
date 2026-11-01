@@ -153,8 +153,11 @@ The windowed app defaults to 100,000 guest instructions per PIT tick (matching
 the original-asset flight replays); the bounded probe retains 250,000.
 Expect lengthy startup and slower-than-real-time gameplay: this is still a
 development interface, not the default native backend.
-For faster experimental execution, pass `--fast-execution` to either Unicorn
-command. This batches up to 1,000 guest instructions between host callbacks,
+The windowed Python Unicorn app now defaults to `--fast-execution`, so the
+startup and video event loop do not spend minutes in Python instruction hooks.
+The headless diagnostic probe keeps precise execution by default; pass
+`--fast-execution` to opt in or `--precise-execution` to turn batching off.
+Batching runs up to 1,000 guest instructions between host callbacks,
 while keeping PIT, window, progress and framebuffer sampling boundaries.
 Interrupt returns are watched at their original resume addresses. The
 timing within each batch is approximate; exact mouse/decompressor tracing
@@ -165,7 +168,40 @@ hook runner. A 10M-instruction original-asset benchmark dropped from 5.56 to
 with 8,090 protected timer interrupts. Neither result establishes real-time
 playability or equivalence of every flight simulation state.
 
-The original `_EF2000.EXE` remains external and SHA-256 validated. The probe
+### Native C++ Unicorn migration
+
+The new `ef2000-unicorn-cpp` binary executes the original X-32 image directly
+through Unicorn's **C API**, without launching a Python interpreter. The
+original executable remains external and is SHA-256 checked before loading.
+The C++ program now owns the ring-3/LDT bootstrap, early X-32 memory and
+selector calls, protected vector services and IRQ0/PIT timing, keyboard
+controller ACKs, read-only DOS asset access, and initial BIOS mouse/video calls.
+It can capture the real mode-13h VGA palette/framebuffer and present it via
+SDL3. While the original framebuffer is still all black, SDL shows a visible
+startup message and continues presenting new frames instead of appearing hung.
+
+```sh
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
+nix develop -c ef2000-build --target ef2000-unicorn-cpp
+# The same executable has a self-contained synthetic CPU test:
+nix run .#unicorn-cpp -- --self-test
+```
+
+This is an **intermediate migration**, not yet a replacement for the
+Python windowed app. On the supplied executable, the C++ runner matches the
+Python runner's 30-million-instruction EIP (`0x110DE6`), interrupt count (282),
+and protected IRQ0 count (190) with `--timer-instructions 100000`. The
+framebuffer is genuinely black at that checkpoint. Further on, the C++
+implementation currently stops at an unsupported X-32/BIOS interaction;
+VBE banked display, DOS driver execution, writable overlay and game controls
+are still being ported. The working Python backend remains available at
+`nix run .#unicorn` until those services match. The native C++ graphical
+window has not been exercised against a live SDL3 installation in this build
+environment; its presentation loop and errors are wired directly to SDL3.
+
+The original `_EF2000.EXE` remains external and SHA-256 validated. The Python probe
 implements the observed X-32 stack/heap allocator, selectors, vector services,
 DOS clock, conventional-memory allocations, and DOS file open/read/write/
 create/seek/close/IOCTL/flush. It records guest console output in the JSON
@@ -223,7 +259,7 @@ returned error flag and result value; this helps locate post-splash stalls.
 `--trace-mouse` additionally groups the original guest's mouse-driver call
 sites, internal GUI cursor positions, control hit-tests, generated events, and
 dispatch codes by timer tick, without dumping every individual poll.
-Experimental `--windowed` mode now uses the shared SDL3
+Experimental Python `--windowed` mode now uses the shared SDL3
 renderer and input layer; headless remains the default for the probe and the
 window is the default for the new `unicorn` app. Windowed sessions
 now run until closed (or the guest stops), instead of terminating at the
@@ -231,6 +267,9 @@ headless 30-million-instruction budget. Use `--instruction-limit N` to set
 an explicit budget (0 = unlimited). SDL3 events are
 polled every 50,000 guest instructions (tunable with `--display-instructions N`),
 with rendering capped at 30 FPS. VGA DAC writes update the DOS color palette.
+When the original video mode is absent or renders an entirely black frame,
+the SDL window presents a startup banner until the first nonblack original
+frame arrives. SDL clear/present failures now surface as errors.
 The window accepts keyboard, captured relative mouse, and joystick/gamepad
 input through the Linux backend's host input mailboxes. Registered IRQ1
 keyboard handlers receive pending scan codes at PIT tick opportunities;

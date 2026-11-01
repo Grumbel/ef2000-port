@@ -31,6 +31,7 @@
         src = source;
 
         nativeBuildInputs = [ python pkgs.makeWrapper ];
+        buildInputs = [ pkgs.unicorn pkgs.openssl pkgs.sdl3 ];
         # Guest transitions do not provide host TLS for stack canaries; the
         # freestanding harness also needs its linker script's fixed addresses.
         hardeningDisable = [ "pic" "stackprotector" "fortify" "fortify3" ];
@@ -54,6 +55,9 @@
             as --$width -I runtime "$entry" -o objects/$backend/entry.o
             as --$width -I runtime --defsym CHECK_SEGMENT_LIMIT=1 "$entry" -o objects/$backend/entry-limit.o
           done
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -DEF_UNICORN_SDL3 \
+            runtime/unicorn_cpp.cpp -lunicorn -lcrypto -lSDL3 \
+            -o objects/ef2000-unicorn-cpp
           runHook postBuild
         '';
 
@@ -62,6 +66,7 @@
           runHook preCheck
           unset EF2000_EXE
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+          objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
           runHook postCheck
         '';
 
@@ -72,6 +77,7 @@
             "$out/share/ef2000" "$out/share/applications" "$out/share/metainfo" \
             "$out/share/man/man6" "$out/share/icons/hicolor/scalable/apps"
           cp -r objects/native64 objects/qemu "$out/lib/ef2000/"
+          cp objects/ef2000-unicorn-cpp "$out/bin/ef2000-unicorn-cpp"
           cp -r runtime tools probes "$out/libexec/ef2000/"
           cp VERSION "$out/libexec/ef2000/"
           cp -r docs README.md TODO.md VERSION "$out/share/doc/ef2000/"
@@ -146,8 +152,14 @@
           program = "${package}/bin/ef2000-unicorn";
           meta.description = "Experiment with original EF2000 menu and flight using Unicorn and SDL3";
         };
+        unicorn-cpp = {
+          type = "app";
+          program = "${package}/bin/ef2000-unicorn-cpp";
+          meta.description = "Run the native C++ Unicorn/X-32 startup probe (video still in progress)";
+        };
       in { default = native; ef2000 = native;
            inherit unicorn;
+           inherit unicorn-cpp;
            ef2000-unicorn = unicorn;
            unicorn-probe = {
              type = "app";
@@ -164,6 +176,11 @@
           test -x ${package}/bin/ef2000-unicorn
           ${package}/bin/ef2000-unicorn --help > "$out"
           test "$(${package}/bin/ef2000-unicorn --version)" = ${lib.escapeShellArg "ef2000-unicorn ${version}"}
+        '';
+        app-unicorn-cpp = pkgs.runCommand "ef2000-unicorn-cpp-app-check" {} ''
+          ${package}/bin/ef2000-unicorn-cpp --help > "$out"
+          test -s "$out"
+          ${package}/bin/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
         '';
         help = pkgs.runCommand "ef2000-help-check" {} ''
           ${package}/bin/ef2000 --help > "$out"
@@ -224,6 +241,8 @@
           printf '                                  Start windowed Unicorn/SDL3 game frontend\n'
           printf '  nix run .#unicorn-probe -- /path/to/_EF2000.EXE\n'
           printf '                                  Run bounded headless startup diagnostics\n\n'
+          printf '  nix run .#unicorn-cpp -- /path/to/_EF2000.EXE [--windowed]\n'
+          printf '                                  Native C++ Unicorn startup/video bring-up\n\n'
           printf '  python tools/unicorn_backend.py /path/to/_EF2000.EXE --windowed\n'
           printf '                                  Direct Unicorn backend for development\n\n'
           printf 'Examples:\n'

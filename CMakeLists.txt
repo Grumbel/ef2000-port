@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 cmake_minimum_required(VERSION 3.20)
-project(ef2000 LANGUAGES C ASM)
+project(ef2000 LANGUAGES C CXX ASM)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.
@@ -61,3 +61,23 @@ foreach(backend native64 qemu)
   endforeach()
   add_custom_target("harness-${backend}" ALL DEPENDS ${objects})
 endforeach()
+
+# The native C++ Unicorn probe is optional for environments that only build
+# the Linux guest harness. It is packaged unconditionally by the Nix flake.
+find_path(UNICORN_INCLUDE_DIR unicorn/unicorn.h)
+find_library(UNICORN_LIBRARY unicorn)
+find_package(OpenSSL QUIET COMPONENTS Crypto)
+if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
+  add_executable(ef2000-unicorn-cpp runtime/unicorn_cpp.cpp)
+  target_compile_features(ef2000-unicorn-cpp PRIVATE cxx_std_17)
+  target_compile_options(ef2000-unicorn-cpp PRIVATE -Wall -Wextra -Werror)
+  target_include_directories(ef2000-unicorn-cpp PRIVATE ${UNICORN_INCLUDE_DIR})
+  target_link_libraries(ef2000-unicorn-cpp PRIVATE ${UNICORN_LIBRARY} OpenSSL::Crypto)
+  find_package(SDL3 QUIET CONFIG)
+  if(SDL3_FOUND)
+    target_link_libraries(ef2000-unicorn-cpp PRIVATE SDL3::SDL3)
+    target_compile_definitions(ef2000-unicorn-cpp PRIVATE EF_UNICORN_SDL3=1)
+  endif()
+else()
+  message(STATUS "C++ Unicorn probe disabled (requires Unicorn and OpenSSL headers/libraries)")
+endif()
