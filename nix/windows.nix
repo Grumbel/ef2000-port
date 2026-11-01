@@ -32,6 +32,10 @@ let
     pname = "ef2000-unicorn-${target}";
     inherit (pkgs.unicorn) src version;
     nativeBuildInputs = [ pkgs.cmake pkgs.ninja pkgs.pkg-config ];
+    # Unicorn's MinGW build still compiles QEMU's POSIX thread backend and
+    # links -lpthread. The default MinGW toolchain's mcfgthreads does not
+    # provide pthread.h; winpthreads must be an explicit target dependency.
+    buildInputs = [ crossPkgs.windows.pthreads ];
     cmakeFlags = [
       "-DCMAKE_BUILD_TYPE=Release"
       "-DBUILD_SHARED_LIBS=ON"
@@ -93,7 +97,8 @@ let
           continue
         fi
         f=$(find ${lib.concatStringsSep " " (map toString [
-          stdenv.cc.cc stdenv.cc.libc crossPkgs.windows.mcfgthreads
+          stdenv.cc.cc stdenv.cc.libc
+          crossPkgs.windows.pthreads crossPkgs.windows.mcfgthreads
         ])} -iname "$dll" -print -quit 2>/dev/null || true)
         if [ -n "$f" ]; then cp -L "$f" "$d/"; fi
       done
