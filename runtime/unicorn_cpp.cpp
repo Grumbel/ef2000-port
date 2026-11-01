@@ -21,6 +21,7 @@
 #include <cctype>
 #include <chrono>
 #include <climits>
+#include <cmath>
 #include <cstdint>
 #include <ctime>
 #include <deque>
@@ -86,6 +87,7 @@ struct JoystickAxisBinding {
     int direction{1};
 };
 enum class ControlSelection { Auto, Keyboard, Joystick };
+enum class ExecutionTiming { Auto, Instruction, Realtime };
 struct WindowOptions {
     bool enabled{}, fullscreen{}, smooth_scaling{};
     int width = 1280, height = 960;
@@ -367,7 +369,9 @@ public:
                 !SDL_RenderDebugText(renderer_, 30, 55, "WAITING FOR NONBLACK GAME VIDEO") ||
                 !SDL_RenderDebugText(renderer_, 30, 95, status.c_str()))
                 throw std::runtime_error(std::string("SDL3 text draw failed: ") + SDL_GetError());
-            const std::string progress = "GUEST INSTRUCTION BUDGET: " + std::to_string(instructions);
+            const std::string progress =
+                (status.find("REAL-TIME") != std::string::npos ? "PIT TICKS: " :
+                 "GUEST INSTRUCTION BUDGET: ") + std::to_string(instructions);
             const std::string events = "DOS/X32 INTERRUPTS: " + std::to_string(interrupts);
             if (!SDL_RenderDebugText(renderer_, 30, 125, progress.c_str()) ||
                 !SDL_RenderDebugText(renderer_, 30, 145, events.c_str()))
@@ -547,13 +551,18 @@ public:
                           1, 0, UC_X86_INS_IN), "install port IN hook");
         check(uc_hook_add(cpu_, &hook, UC_HOOK_INSN, (void*)on_port_out, this,
                           1, 0, UC_X86_INS_OUT), "install port OUT hook");
+        check(uc_hook_add(cpu_, &hook, UC_HOOK_MEM_READ_UNMAPPED |
+                          UC_HOOK_MEM_WRITE_UNMAPPED | UC_HOOK_MEM_FETCH_UNMAPPED,
+                          (void*)on_invalid_memory, this, 1, 0),
+              "install invalid-memory diagnostic hook");
     }
     Machine(const Machine&) = delete;
     Machine& operator=(const Machine&) = delete;
     ~Machine() { if (cpu_) uc_close(cpu_); }
 
     int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
-            const std::string& framebuffer, const std::string& wav_directory) {
+            const std::string& framebuffer, const std::string& wav_directory,
+            bool realtime = false, double wall_seconds = 0) {
         const bool trace_joystick = window_options.trace_joystick;
         if (!wav_directory.empty())
             wav_capture_ = std::make_unique<ef2000::WavCapture>(wav_directory);
@@ -567,36 +576,96 @@ public:
         else if (controls_ == ControlSelection::Joystick && joystick_events_.empty())
             set_joystick(2, {}, 0);
         std::cout << "C++ X-32: original payload " << image_size_ << " bytes; "
-                  << "instruction budget " << (limit ? std::to_string(limit) : "unlimited") << '\n';
+                  << "instruction budget " << (limit ? std::to_string(limit) : "unlimited")
+                  << "; timing " << (realtime ? "real-time PIT" : "instruction-counted") << '\n';
         if (!refresh(window, 0, "INITIALIZING X-32 GUEST")) return 0;
         const auto start = std::chrono::steady_clock::now();
-        // Batch execution leaves the CPU in native Unicorn's C core for most
-        // instructions while still delivering deterministic PIT ticks. A
-        // 1,000-instruction quantum bounds the EOI-to-return observation gap.
+        // Bounded diagnostic mode retains instruction-based ticks and exact
+        // replay positions. With an unlimited interactive budget, avoid the
+        // Unicorn per-instruction counting hook altogether: its timeout-only
+        // emulation runs translated blocks much faster and PIT ticks come
+        // from the host monotonic clock.
         uint64_t completed = 0;
+        uint64_t slices = 0;
         bool running = true;
+        constexpr double PIT_HZ = 1193182.0;
+        auto pit_period = [&] {
+            return std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+                std::chrono::duration<double>(pit_divisor_ / PIT_HZ));
+        };
+        auto next_pit = start + pit_period();
+        if (realtime)
+            check(uc_hook_add(cpu_, &slice_hook_, UC_HOOK_BLOCK, (void*)on_realtime_block,
+                              this, 1, 0), "install real-time block-boundary hook");
         while (running && (!limit || completed < limit) && status_ == "instruction_limit") {
-            constexpr uint64_t quantum = 1000;
-            uint64_t amount = std::min<uint64_t>(quantum, limit ? limit - completed : quantum);
-            amount = std::min(amount, timer_interval - completed % timer_interval);
             uint32_t ip{};
             check(uc_reg_read(cpu_, UC_X86_REG_EIP, &ip), "read instruction pointer");
-            check(uc_emu_start(cpu_, ip, 0, 0, amount), "guest execution");
+            if (realtime) {
+                // Stop at a translated basic-block boundary every ~10 ms.
+                // Unlike Unicorn's instruction-counted emulation this only
+                // hooks blocks, not every guest instruction. Avoid the
+                // timeout-based stop, which can leave EIP inside an opcode.
+                slice_deadline_ = std::chrono::steady_clock::now() +
+                                  std::chrono::milliseconds(10);
+                const uc_err result = uc_emu_start(cpu_, ip, 0, 0, 0);
+                if (result != UC_ERR_OK) {
+                    const auto regs = read_regs();
+                    std::ostringstream message;
+                    message << "real-time guest execution: " << uc_strerror(result)
+                            << " ip=0x" << std::hex << regs.ip
+                            << " sp=0x" << regs.sp << std::dec
+                            << " ticks=" << ticks_ << " irqs=" << irq0_
+                            << " ax=0x" << std::hex << regs.ax
+                            << " bx=0x" << regs.bx << " cx=0x" << regs.cx
+                            << " dx=0x" << regs.dx << " si=0x" << regs.si
+                            << " di=0x" << regs.di << " ds=0x" << regs.ds
+                            << " es=0x" << regs.es << std::dec
+                            << " irq_active=" << irq_in_service_
+                            << " fault=" << invalid_memory_;
+                    throw std::runtime_error(message.str());
+                }
+            } else {
+                constexpr uint64_t quantum = 1000;
+                uint64_t amount = std::min<uint64_t>(quantum, limit ? limit - completed : quantum);
+                amount = std::min(amount, timer_interval - completed % timer_interval);
+                check(uc_emu_start(cpu_, ip, 0, 0, amount), "instruction-counted guest execution");
+                completed += amount;
+            }
             if (status_ != "instruction_limit") break;
-            completed += amount;
+            ++slices;
             if (eoi_hook_ && !irq_in_service_) {
                 check(uc_hook_del(cpu_, eoi_hook_), "remove IRQ return hook");
                 eoi_hook_ = 0;
             }
-            if (completed % timer_interval == 0) deliver_tick(ip_at_cpu());
+            if (realtime) {
+                // Audio DMA and Red Book playback need periodic service even
+                // when the guest has programmed a slow BIOS/PIT divisor.
+                service_sound();
+                if (status_ == "instruction_limit") service_cd();
+                const auto now = std::chrono::steady_clock::now();
+                unsigned catchup = 0;
+                while (now >= next_pit && catchup++ < 4 && status_ == "instruction_limit") {
+                    deliver_tick(ip_at_cpu());
+                    next_pit += pit_period();
+                }
+                if (now >= next_pit) next_pit = now + pit_period();
+            } else if (completed % timer_interval == 0) deliver_tick(ip_at_cpu());
+            if (status_ != "instruction_limit") break;
             if (irq_in_service_ && !eoi_hook_) {
                 check(uc_hook_add(cpu_, &eoi_hook_, UC_HOOK_CODE, (void*)on_irq_resume,
                                   this, irq_resume_ip_, irq_resume_ip_), "hook IRQ return");
                 check(uc_ctl_remove_cache(cpu_, irq_resume_ip_, irq_resume_ip_ + 1),
                       "invalidate IRQ return translation");
             }
-            if (window.enabled() && completed % 50000 == 0)
-                running = refresh(window, completed, "RUNNING GUEST STARTUP");
+            if (window.enabled() && (realtime || completed % 50000 == 0))
+                running = refresh(window, realtime ? ticks_ : completed,
+                                  realtime ? "RUNNING GUEST (REAL-TIME)" : "RUNNING GUEST STARTUP");
+            if (realtime && wall_seconds > 0 &&
+                std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count()
+                    >= wall_seconds) {
+                status_ = "wall_time_limit";
+                break;
+            }
         }
         if (!framebuffer.empty()) save_framebuffer(framebuffer);
         if (wav_capture_) wav_capture_->close();
@@ -628,10 +697,11 @@ public:
                       << " reads=" << gameport_reads_
                       << " writes=" << gameport_writes_ << '\n';
         std::cout << "performance: guest_ips="
-                  << (completed ? std::to_string(uint64_t(completed /
+                  << (!realtime && completed ? std::to_string(uint64_t(completed /
                         std::max(seconds, 0.000001))) : "n/a")
                   << " wall_seconds=" << std::fixed << std::setprecision(2) << seconds
-                  << std::defaultfloat;
+                  << std::defaultfloat << " emu_slices=" << slices
+                  << " pit_divisor=" << pit_divisor_;
         if (window.enabled())
             std::cout << " sdl_polls=" << window.input_polls()
                       << " rendered_frames=" << window.frames_presented();
@@ -646,10 +716,14 @@ public:
 #endif
             }
         }
-        return (status_ == "instruction_limit" || status_ == "guest_exit") ? 0 : 20;
+        return (status_ == "instruction_limit" || status_ == "wall_time_limit" ||
+                status_ == "guest_exit") ? 0 : 20;
     }
 
 private:
+    std::string invalid_memory_;
+    uc_hook slice_hook_{};
+    std::chrono::steady_clock::time_point slice_deadline_{};
     StartupWindow* active_window_{};
     std::unique_ptr<ef2000::WavCapture> wav_capture_;
     std::unique_ptr<ef2000::WavCapture> cd_wav_capture_;
@@ -1739,6 +1813,20 @@ private:
     static void on_port_out(uc_engine*, uint32_t port, int, uint32_t value, void* user) {
         static_cast<Machine*>(user)->port_out(port, value);
     }
+    static void on_realtime_block(uc_engine* cpu, uint64_t, uint32_t, void* user) {
+        auto* machine = static_cast<Machine*>(user);
+        if (std::chrono::steady_clock::now() >= machine->slice_deadline_)
+            uc_emu_stop(cpu);
+    }
+    static bool on_invalid_memory(uc_engine*, uc_mem_type type, uint64_t address,
+                                  int size, int64_t, void* user) {
+        auto* machine = static_cast<Machine*>(user);
+        std::ostringstream message;
+        message << "type=" << type << " address=0x" << std::hex << address
+                << std::dec << " size=" << size;
+        machine->invalid_memory_ = message.str();
+        return false;
+    }
     uint32_t port_in(uint32_t port) {
         if (port == 0x3da) {
             const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -1802,8 +1890,10 @@ private:
 void usage(const char* program) {
     std::cout << "Usage: " << program << " _EF2000.EXE [--instruction-limit N]"
               << " [--game-dir DIR] [--cd-dir DIR] [--cd-cue FILE] [--overlay-dir DIR] [--windowed]"
-              << " [--timer-instructions N]\n"
+              << " [--timer-instructions N] (instruction timing only)\n"
               << "       [--sound off|sb16-probe|sb16-dma] (SDL3 audio if available)\n"
+              << "       [--timing auto|instruction|realtime] (auto uses real-time for unlimited windowed runs)\n"
+              << "       [--wall-seconds N] (bounded real-time/headless diagnostic)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
               << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
               << "       --instruction-limit 0 means unlimited (window default)\n"
@@ -1822,7 +1912,7 @@ void usage(const char* program) {
               << "       Windowed default: $XDG_STATE_HOME/ef2000/unicorn/drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
-              << "       " << program << " --self-test | --self-test-bda\n";
+              << "       " << program << " --self-test | --self-test-bda | --self-test-clock\n";
 }
 } // namespace
 
@@ -1833,10 +1923,12 @@ int main(int argc, char** argv) {
         uint64_t limit = 30000000;
         bool explicit_limit = false;
         uint64_t timer_interval = 250000;
+        ExecutionTiming timing = ExecutionTiming::Auto;
+        double wall_seconds = 0;
         WindowOptions window;
         ef2000::SoundMode sound_mode = ef2000::SoundMode::Off;
         ControlSelection controls = ControlSelection::Auto;
-        bool self_test = false, self_test_bda = false;
+        bool self_test = false, self_test_bda = false, self_test_clock = false;
         bool trace_interrupts = false;
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
@@ -1858,6 +1950,18 @@ int main(int argc, char** argv) {
                 timer_interval = std::stoull(value, &end);
                 if (end != value.size() || !timer_interval)
                     throw std::runtime_error("invalid timer interval");
+            } else if (!std::strcmp(argv[i], "--timing") && i + 1 < argc) {
+                const std::string choice = argv[++i];
+                if (choice == "auto") timing = ExecutionTiming::Auto;
+                else if (choice == "instruction") timing = ExecutionTiming::Instruction;
+                else if (choice == "realtime") timing = ExecutionTiming::Realtime;
+                else throw std::runtime_error("--timing expects auto, instruction or realtime");
+            } else if (!std::strcmp(argv[i], "--wall-seconds") && i + 1 < argc) {
+                size_t end{};
+                const std::string value = argv[++i];
+                wall_seconds = std::stod(value, &end);
+                if (end != value.size() || !std::isfinite(wall_seconds) || wall_seconds <= 0)
+                    throw std::runtime_error("--wall-seconds expects a positive finite number");
             } else if (!std::strcmp(argv[i], "--game-dir") && i + 1 < argc) {
                 game_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--cd-dir") && i + 1 < argc) {
@@ -1918,6 +2022,8 @@ int main(int argc, char** argv) {
                 self_test = true;
             } else if (!std::strcmp(argv[i], "--self-test-bda")) {
                 self_test_bda = true;
+            } else if (!std::strcmp(argv[i], "--self-test-clock")) {
+                self_test_clock = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
                 framebuffer = argv[++i];
             } else if (!std::strcmp(argv[i], "--wav-capture") && i + 1 < argc) {
@@ -1982,8 +2088,8 @@ int main(int argc, char** argv) {
             } else if (argv[i][0] != '-' && path.empty()) path = argv[i];
             else throw std::runtime_error("unrecognized option: " + std::string(argv[i]));
         }
-        if (self_test || self_test_bda) {
-            if (self_test && self_test_bda)
+        if (self_test || self_test_bda || self_test_clock) {
+            if (int(self_test) + int(self_test_bda) + int(self_test_clock) != 1)
                 throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
@@ -2014,18 +2120,34 @@ int main(int argc, char** argv) {
                 0x3d, 0xd4, 0x03, 0x00, 0x00, 0x74, 0x02, 0xcd, 0x82,
                 0x66, 0xbb, 0x07, 0x00, 0x66, 0x8e, 0xdb,
                 0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
+            // Repeat a multi-byte instruction indefinitely to exercise
+            // translation-block resume boundaries without game assets.
+            constexpr uint8_t clock_guest[] = {
+                0xb8, 0x78, 0x56, 0x34, 0x12,  // mov eax,0x12345678
+                0xeb, 0xf9};                  // jmp back seven bytes
             if (self_test_bda)
                 std::copy(std::begin(bda_guest), std::end(bda_guest), image.begin() + ENTRY);
+            else if (self_test_clock)
+                std::copy(std::begin(clock_guest), std::end(clock_guest), image.begin() + ENTRY);
             else
                 std::copy(std::begin(gameport_guest), std::end(gameport_guest), image.begin() + ENTRY);
             Machine machine(image, {}, {}, {}, ef2000::SoundMode::Off, false,
                             {}, {}, std::move(joystick_events), controls);
-            return machine.run(10000, window, 250000, "", "");
+            return machine.run(self_test_clock ? 0 : 10000, window, 250000, "", "",
+                               self_test_clock, self_test_clock ? 0.25 : 0);
         }
         if (path.empty()) { usage(argv[0]); return 2; }
         if (!wav_directory.empty() && sound_mode != ef2000::SoundMode::Dma && cd_cue.empty())
             throw std::runtime_error("--wav-capture requires --sound sb16-dma or --cd-cue");
-        if (window.enabled && !explicit_limit) limit = 0;
+        if ((window.enabled || wall_seconds > 0 || timing == ExecutionTiming::Realtime) &&
+            !explicit_limit) limit = 0;
+        const bool realtime = timing == ExecutionTiming::Realtime ||
+            (timing == ExecutionTiming::Auto && !limit &&
+             (window.enabled || wall_seconds > 0));
+        if (realtime && limit)
+            throw std::runtime_error("real-time timing requires --instruction-limit 0");
+        if (wall_seconds > 0 && !realtime)
+            throw std::runtime_error("--wall-seconds requires real-time timing");
         if (window.enabled && overlay_dir.empty()) {
             if (const char* xdg_state = std::getenv("XDG_STATE_HOME"); xdg_state && *xdg_state)
                 overlay_dir = (fs::path(xdg_state) / "ef2000/unicorn/drive").string();
@@ -2045,7 +2167,8 @@ int main(int argc, char** argv) {
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
                         controls, cd_cue);
-        return machine.run(limit, window, timer_interval, framebuffer, wav_directory);
+        return machine.run(limit, window, timer_interval, framebuffer, wav_directory,
+                           realtime, wall_seconds);
     } catch (const std::exception& error) {
         std::cerr << "ef2000-unicorn-cpp: " << error.what() << '\n';
         return 1;

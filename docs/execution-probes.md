@@ -547,3 +547,40 @@ frame presentations to 30 Hz; audio stream format changes occur only when
 the game's PCM format changes. A headless reference reached approximately
 45M guest instructions per second, but Unicorn instruction execution remains
 a fundamental CPU cost and interactive flight FPS still needs measurement.
+
+#### Real-time timer and instruction-hook overhead
+
+In instruction-counted mode, every `uc_emu_start()` supplies a nonzero
+instruction-count limit. Unicorn implements that count with an implicit
+per-instruction code hook, even when the program has no explicit code hooks.
+This is useful for exact reproducers and finite runs, but expensive for an
+interactive game. A standalone 20M-instruction synthetic x86 tight-loop
+microbenchmark on the same host measured approximately 41M guest
+instructions/second with the count limit versus 389M without it. **This
+microbenchmark does not predict actual game FPS or relative game speed.**
+
+Unlimited windowed C++ runs now default to `--timing realtime`: execution
+uses an approximately 10 ms basic-block-boundary stop hook without an
+instruction limit. An earlier attempt using Unicorn's wall-clock timeout
+could resume with EIP inside a multi-byte guest instruction and triggered an
+unmapped read during startup. The block-boundary stop avoids that failure.
+PIT IRQ0 delivery follows the programmed divisor and a monotonic host clock.
+SB16 DMA and CD playback are serviced between these slices rather than only
+on PIT ticks.
+For repeatable instruction-timed mouse/joystick scripts and debugger probes,
+use `--timing instruction` (still the bounded-headless default). A bounded
+headless real-time check is available with `--timing realtime --wall-seconds
+10`; its final reason `wall_time_limit` means the wall-clock diagnostic
+finished, not that a guest instruction limit was reached. Real-time diagnostics
+show `guest_ips=n/a` rather than inventing an instruction count.
+
+The asset-free `--self-test-clock` runs an endless multi-byte instruction
+loop for 250 ms and checks that the wall-clock PIT continues to tick and the
+guest register value remains intact. With the original game directory, a
+disposable seven-track CUE/BIN and the sound-enabled timed input above, a
+75-second headless real-time replay reached a real **320×200 in-flight cockpit**:
+8,917 PIT ticks, 7,343 IRQ0 deliveries, 282 modeled SB16 DMA blocks
+(575,490 PCM bytes), 578 CD playback blocks (1,364,160 PCM bytes) and no
+unsupported interface or memory fault. The synthetic BIN encodes silence;
+this confirms the CD path, not the audible music content. Native SDL3 frame
+rate, audio latency and gameplay timing on real hardware still require testing.

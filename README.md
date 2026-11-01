@@ -197,6 +197,9 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-probe \
   --instruction-limit 100000000
 # Experimental DMA/PIC/IRQ emulation with SDL3 PCM output in windowed runs
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma
+# Real-time PIT scheduler (automatically selected for unlimited windowed runs)
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --instruction-limit 0 --timing realtime
 # Original CD music alongside SB16 effects (CUE and BIN remain read-only)
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma \
   --cd-dir /path/to/EF2000_ISO --cd-cue /path/to/EF2000_ISO/EF_DIR.cue
@@ -213,11 +216,17 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound off \
   --cd-cue /path/to/EF2000_ISO/EF_DIR.cue --wav-capture /tmp/ef2000-audio
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
+# Reproducible instruction-counted debugger mode, including in a window:
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --instruction-limit 30000000 --timing instruction
+# Bounded real-time/headless run for wall-clock pacing diagnostics:
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --timing realtime --wall-seconds 10
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
 # The same executable has a self-contained synthetic CPU test:
 nix run .#unicorn-cpp -- --self-test
 # Also tests a live X-32 DOS-memory selector and BIOS CRT-base lookup:
 nix run .#unicorn-cpp -- --self-test-bda
+nix run .#unicorn-cpp -- --self-test-clock
 ```
 
 The C++ runner was independently replayed from the original assets through
@@ -268,6 +277,26 @@ SDL3 window benchmark. Input/event polling is now limited to approximately
 120 Hz, instead of being triggered by every 50K guest instructions, and SDL3
 audio stream formats are changed only when the game's PCM rate changes.
 Whether this sufficiently improves flight performance needs hardware testing.
+
+Interactive unlimited windowed sessions now default to `--timing realtime`.
+In this mode Unicorn executes translated blocks in approximately 10 ms slices
+with a basic-block-boundary stop hook but no instruction count: passing an
+instruction count would insert a costly implicit per-instruction code hook.
+PIT interrupts instead follow the emulated hardware divisor and the host's
+monotonic clock; SB16 and CD audio continue to be serviced between interrupts.
+`--timing instruction` preserves the original
+instruction-accurate debugger and scripted regression timing, including for
+bounded headless runs. The new `--self-test-clock` verifies timer progress
+using a synthetic busy loop without any game files. A separate 20-million-
+instruction Unicorn tight-loop benchmark on the same host measured about
+389M instructions/s uncounted versus 41M/s with counting (roughly 9.5×);
+this is a microbenchmark, **not** a measured 9.5× game speedup. Real-time mode
+does not know the number of guest instructions executed, so the console reports
+`guest_ips=n/a` with emulation slices and PIT divisor instead. A bounded
+real-time probe finishes with `status=wall_time_limit`. The old native
+Linux backend still has a fundamental performance advantage because it executes
+the game's protected-mode code directly, without CPU translation. Gameplay
+performance with real SDL3 graphics and input still needs testing.
 
 DOS writes in windowed mode default to
 `$XDG_STATE_HOME/ef2000/unicorn/drive` (or

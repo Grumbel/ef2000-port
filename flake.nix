@@ -105,6 +105,7 @@
           objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
             --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
           objects/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'
+          objects/ef2000-unicorn-cpp --self-test-clock | grep -Eq 'status=wall_time_limit interrupts=0 ticks=[1-9].*ax=0x12345678'
           objects/ef2000-dos-drive-test
           objects/ef2000-real-mode-test
           objects/ef2000-original-sb16-test

@@ -188,8 +188,13 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
 - [x] Correct X-32 low-memory selectors and refresh cached live segment bases
   when Miles maps the BIOS Data Area for CRT-retrace polling. Verify with
   `--self-test-bda` and a CD-enabled original-game startup replay.
+- [x] Add a wall-clock/PIT scheduler for unlimited interactive C++ Unicorn
+  sessions. Avoid Unicorn's implicit per-instruction counting hook, retain
+  the exact instruction-mode diagnostics, and test timeout/tick operation
+  with a synthetic CPU loop (`--self-test-clock`).
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
-  on actual hardware, profile performance bottlenecks in flight, and test
+  on actual hardware, profile remaining performance bottlenecks in flight
+  under the real-time scheduler, and test
   sustained interactive mission execution.
 - [ ] Verify audible SDL3 SB16 and original-disc CD music using a full original
   installation and physical audio device; improve

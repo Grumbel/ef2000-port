@@ -90,6 +90,9 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
   add_test(NAME unicorn-cpp-bda COMMAND ef2000-unicorn-cpp --self-test-bda)
   set_tests_properties(unicorn-cpp-bda PROPERTIES
                        PASS_REGULAR_EXPRESSION "status=guest_exit interrupts=5")
+  add_test(NAME unicorn-cpp-clock COMMAND ef2000-unicorn-cpp --self-test-clock)
+  set_tests_properties(unicorn-cpp-clock PROPERTIES
+                       PASS_REGULAR_EXPRESSION "status=wall_time_limit interrupts=0 ticks=[1-9].*ax=0x12345678")
   add_executable(ef2000-real-mode-test tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp
                                      runtime/sb16_probe.cpp runtime/sound_blaster.cpp
                                      runtime/isa_audio.cpp)
