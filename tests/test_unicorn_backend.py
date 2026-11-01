@@ -2,7 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
+from contextlib import redirect_stderr
 from datetime import datetime, timezone
+import io
 import json
 from pathlib import Path
 import struct
@@ -660,6 +662,19 @@ class UnicornGuestTests(unittest.TestCase):
         self.assertTrue(all(entry['ip'] == ENTRY + 12 for entry in result['ip_samples'][1:]))
         with self.assertRaises(ValueError):
             run(bytes(image), sample_instructions=-1)
+
+    def test_bounded_progress_log_reports_live_guest_instruction_state(self):
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 2] = bytes.fromhex('eb fe')
+        log = io.StringIO()
+        with redirect_stderr(log):
+            result = run(bytes(image), instruction_limit=150, progress_instructions=50)
+        self.assertEqual(result['status'], 'instruction_limit')
+        self.assertEqual(log.getvalue().count('unicorn: instructions='), 3)
+        self.assertIn('instructions=100 ticks=', log.getvalue())
+        self.assertIn('video=none checks=-', log.getvalue())
+        with self.assertRaises(ValueError):
+            run(bytes(image), progress_instructions=-1)
 
     @unittest.skipUnless(os.environ.get('EF2000_EXE'), 'requires original EF2000_EXE')
     def test_original_extracted_code_reaches_file_open(self):

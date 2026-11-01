@@ -20,6 +20,7 @@ import json
 from pathlib import Path
 import re
 import struct
+import sys
 import time
 
 try:
@@ -640,7 +641,8 @@ def run(image, instruction_limit=None, game_dir=None,
         fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
         smooth_scaling=False, display_instructions=50000,
         display_factory=None, framebuffer=None, framebuffer_samples=(), sample_instructions=0,
-        vga_clock=None, trace_mouse=False, trace_decompress=False):
+        vga_clock=None, trace_mouse=False, trace_decompress=False,
+        progress_instructions=0):
     """Run original-code x86; windowed sessions continue until closed by default."""
     if instruction_limit is None:
         instruction_limit = 0 if windowed else DEFAULT_INSTRUCTION_LIMIT
@@ -654,6 +656,8 @@ def run(image, instruction_limit=None, game_dir=None,
         raise ValueError('display_instructions must be positive')
     if sample_instructions < 0:
         raise ValueError('sample_instructions must not be negative')
+    if progress_instructions < 0:
+        raise ValueError('progress_instructions must not be negative')
     if any(value <= 0 for value in framebuffer_samples):
         raise ValueError('framebuffer sample instructions must be positive')
     if framebuffer_samples and framebuffer is None:
@@ -979,6 +983,13 @@ def run(image, instruction_limit=None, game_dir=None,
             uc.emu_stop()
             return
         timer.instructions += 1
+        if progress_instructions and timer.instructions % progress_instructions == 0:
+            mode = (f'{real_mode.engine.video_mode:#x}' if real_mode is not None
+                    else 'none')
+            checks = decompress_trace['checks'] if decompress_trace is not None else '-'
+            print(f'unicorn: instructions={timer.instructions} ticks={timer.ticks} '
+                  f'ip={address:08x} video={mode} checks={checks}',
+                  file=sys.stderr, flush=True)
         if pending_frames and timer.instructions == pending_frames[0]:
             point = pending_frames.pop(0)
             path = framebuffer.with_name(f'{framebuffer.stem}-{point:09d}{framebuffer.suffix or ".png"}')
@@ -1273,6 +1284,8 @@ def main():
                         help='guest instructions between SDL3 event polls (default: %(default)s)')
     parser.add_argument('--sample-instructions', type=int, default=0, metavar='N',
                         help='sample guest EIP and registers every N instructions (0 disables sampling)')
+    parser.add_argument('--progress-instructions', type=int, default=0, metavar='N',
+                        help='print running instruction/tick/video/checksum progress to stderr every N instructions')
     parser.add_argument('--trace-mouse', action='store_true',
                         help='summarize original guest mouse wrappers, callers, and button state')
     parser.add_argument('--trace-decompress', action='store_true',
@@ -1291,6 +1304,8 @@ def main():
         parser.error('--display-instructions must be positive')
     if args.sample_instructions < 0:
         parser.error('--sample-instructions must be nonnegative')
+    if args.progress_instructions < 0:
+        parser.error('--progress-instructions must be nonnegative')
     if any(value <= 0 for value in args.framebuffer_sample) or (args.framebuffer_sample and not args.framebuffer):
         parser.error('--framebuffer-sample needs a positive N and --framebuffer')
     match = re.fullmatch(r'([1-9][0-9]*)x([1-9][0-9]*)', args.geometry)
@@ -1318,7 +1333,8 @@ def main():
                  display_instructions=args.display_instructions, framebuffer=args.framebuffer,
                  framebuffer_samples=args.framebuffer_sample,
                  sample_instructions=args.sample_instructions, trace_mouse=args.trace_mouse,
-                 trace_decompress=args.trace_decompress)
+                 trace_decompress=args.trace_decompress,
+                 progress_instructions=args.progress_instructions)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')
