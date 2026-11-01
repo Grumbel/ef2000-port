@@ -273,6 +273,52 @@ This establishes the in-flight keyboard make/break → IRQ1 → original camera
 command → renderer path. It does not yet validate physical keyboard focus,
 joystick axes, throttle, pitch/roll, or mission completion under Unicorn.
 
+### Scripted joystick input and game-port measurements
+
+The headless Unicorn runner accepts deterministic two-axis or four-axis SDL
+joystick samples at PIT ticks. A two-axis, one-button-mask sample has the form
+`--joystick-event TICK:X:Y:BUTTONS`; use
+`--joystick-event TICK:X:Y:Z:W:BUTTONS` for four axes. Axis values are signed
+16-bit SDL values and the button mask selects the low four bits. The first
+scripted event also advertises a centered joystick from startup, so the
+original `EF2000.CFG` is presented with `CONTROL=1`. A shipped
+`JOY_FACTOR=0` is replaced by the executable's default of `100` in the
+in-memory virtual config. The files on disk are unchanged.
+
+For an original-asset flight replay, append these options to the same
+Quick Combat / Rookie / mission 01 mouse script described above:
+
+```sh
+--joystick-event 0:0:0:0 \
+--joystick-event 8300:32767:0:0 \
+--joystick-event 8800:0:0:0 \
+--instruction-limit 950000000 \
+--framebuffer-sample 820000000 \
+--framebuffer-sample 850000000 \
+--framebuffer-sample 880000000 \
+--framebuffer-sample 920000000
+```
+
+The headless replay applied all three joystick states, reached the 950M
+instruction limit and passed 604 original LZ checks without failure. The
+320×200 cockpit continued rendering, but the sampled frames did **not**
+demonstrate a clear roll response to the X-axis deflection. Synthetic guest
+tests establish correct game-port 201h button bits, axis discharge counts,
+and the OUT/IN sequence, but do not by themselves prove original-game flight
+control. Reports now include `gameport.reads`, `gameport.writes`, and
+`gameport.sampled_states` for direct diagnosis of guest port consumption.
+
+A second original-asset replay, with the same scripted inputs and guest port
+instrumentation, completed 900M instructions with **120,120 IN 201h reads**
+and **30 OUT 201h writes**. Of those 30 game-port charge cycles, **22** sampled
+the centered X/Y discharge values `[64, 64]`, and **eight** sampled the
+full-X deflection `[127, 64]` (axis mask `3`, no pressed buttons). All
+604 decompressor checks passed, and the guest remained in VGA mode `0x13`.
+This directly confirms delivery and consumption of the scripted stick
+position by the *original executable*, but **not** an observable aircraft
+control response. Diagnosing its joystick-control interpretation and the
+physics/camera effect remains open.
+
 To reproduce the mission-start integrity check, run the same timed actions
 against the original, unmodified game files:
 

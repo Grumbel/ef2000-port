@@ -174,6 +174,12 @@ start from matching screen centers.
 The `--key-event TICK:SDL_SCAN:ASCII:DOWN` option injects
 keyboard make/break events, e.g. `--key-event 600:41:27:1` and
 `--key-event 605:41:27:0` press and release Escape. Both work in headless probes.
+For game-port diagnostics, repeat `--joystick-event TICK:X:Y:BUTTONS` with
+signed SDL axis values (-32768..32767) and a four-bit button mask; optionally
+use `TICK:X:Y:Z:W:BUTTONS` for four axes. A scripted joystick is advertised
+from startup with centered axes, and the virtual config selects joystick
+controls and substitutes `JOY_FACTOR=100` for the original zero calibration
+factor. Original files are never modified.
 The report records video-mode changes with instruction counts, making splash
 and VBE transitions traceable. `--sample-instructions N` adds periodic guest
 instruction-pointer/register snapshots, and DOS file requests report the

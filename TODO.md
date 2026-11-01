@@ -78,8 +78,16 @@ Implemented and verified:
    screenshots and `--progress-instructions` for live stderr status. A separate
    F4 make/break replay at ticks 8300/8305 produces two original keyboard IRQ1s
    and switches to the original external aircraft view by 860M instructions,
-   with flight still active at 950M. Next, validate **joystick axes and
-   throttle/pitch/roll controls**, longer flight, and exit/pause handling, refine
+   with flight still active at 950M. PIT-timed **headless joystick scripts**
+   now initialize the same game-port mailbox and virtual configuration as
+   native joystick input; synthetic OUT/IN 201h tests verify deflection and
+   buttons. An original-asset scripted X-axis replay reaches 950M with all
+   604 LZ checks intact, but the flight frames do not establish a visible
+   roll response. A 900M follow-up captured **120,120 original IN 201h reads**,
+   **30 OUT 201h writes**, and eight charge cycles sampling the full-X axis
+   count `127`. Input reaches the original flight code, but its control
+   response is not yet verified. Next, validate **joystick pitch/roll/throttle
+   effects**, longer flight, and exit/pause handling, refine
    instruction-paced timers and VGA retrace pacing, and add the native Windows
    launcher. SDL3 window behavior is currently checked with an injected
    display; real GUI tests must run in a private Xvfb instance.
