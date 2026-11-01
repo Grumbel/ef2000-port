@@ -148,7 +148,11 @@ int main() {
             0xcf});                       // IRET
         std::copy(playback_code.begin(), playback_code.end(), playback_memory.begin() + 0x21000);
         const uint8_t irq7_handler[] = {
+            0x1e,                   // PUSH DS
+            0xb8, 0x00, 0x21,       // MOV AX,2100h
+            0x8e, 0xd8,             // MOV DS,AX (IRQ may interrupt any segment)
             0xfe, 0x06, 0x00, 0x02, // INC byte [0200h]
+            0x1f,                   // POP DS
             0xba, 0x2f, 0x02, 0xec, // Read 16-bit DSP acknowledgement port
             0xba, 0x20, 0x00, 0xb0, 0x20, 0xee, // PIC EOI
             0xcf};                   // IRET back to interrupted code
@@ -160,6 +164,45 @@ int main() {
         require(played.audio_blocks.size() == 1 &&
                 played.audio_blocks[0].pcm == std::vector<uint8_t>({1, 2, 3, 4, 5, 6, 7, 8}),
                 "16-bit guest DSP+DMA+IRQ cycle captures exact programmed PCM");
+
+        // The usual game path returns to 32-bit execution before playback
+        // completes. A later protected-mode timer tick must transfer PCM and
+        // run the installed 16-bit IRQ handler without a guest BIOS call.
+        ef2000::RealModeCpu background(ef2000::SoundMode::Dma);
+        std::vector<uint8_t> background_memory = playback_memory;
+        std::vector<uint8_t> start_code;
+        auto background_out = [&](uint16_t port, uint8_t value) {
+            start_code.insert(start_code.end(), {0xba, uint8_t(port), uint8_t(port >> 8),
+                                                  0xb0, value, 0xee});
+        };
+        background_out(0x226, 1);
+        background_out(0x226, 0);
+        background_out(0x21, 0x78);
+        for (const auto& [port, value] :
+                std::array<std::pair<uint16_t, uint8_t>, 8>{{{0xd8, 0}, {0xc4, 0},
+                    {0xc4, 0x80}, {0xc6, 3}, {0xc6, 0}, {0x8b, 0},
+                    {0xd6, 0x49}, {0xd4, 1}}}) background_out(port, value);
+        for (const uint8_t command : {0x41, 0, 1, 0xb0, 0x30, 3, 0})
+            background_out(0x22c, command); // 1 Hz: completion in 2s.
+        start_code.push_back(0xcf);
+        std::copy(start_code.begin(), start_code.end(), background_memory.begin() + 0x21000);
+        const auto started = background.execute(entry, vectors, background_memory, regs);
+        require(started.audio_blocks.empty() && started.memory[0x21200] == 0,
+                "background DMA must not finish inside the initial real-mode call");
+        const double scheduled = background.next_audio_deadline();
+        require(scheduled > 0 && !background.audio_service_due(scheduled - 0.5) &&
+                background.audio_service_due(scheduled), "audio background deadline");
+        const auto serviced = background.service_audio(scheduled, vectors, started.memory);
+        if (serviced.memory.size() != 0x100000 || serviced.memory[0x21200] != 1 ||
+            serviced.audio_blocks.size() != 1 ||
+            serviced.audio_blocks[0].pcm !=
+                std::vector<uint8_t>({1, 2, 3, 4, 5, 6, 7, 8}))
+            throw std::runtime_error("protected-mode audio tick: memory=" +
+                std::to_string(serviced.memory.size()) + " irq_count=" +
+                (serviced.memory.empty() ? "?" : std::to_string(serviced.memory[0x21200])) +
+                " blocks=" + std::to_string(serviced.audio_blocks.size()));
+        require(!background.audio_service_due(scheduled),
+                "completed one-shot DMA must not retrigger after guest EOI");
 
         std::cout << "real-mode: guest return, memory exchange and bounded failure tests passed\n";
         return 0;

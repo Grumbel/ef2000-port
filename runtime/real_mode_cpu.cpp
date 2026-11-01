@@ -6,8 +6,10 @@
 #include <unicorn/x86.h>
 
 #include <array>
+#include <algorithm>
 #include <chrono>
 #include <cstring>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 
@@ -241,6 +243,53 @@ RealResult RealModeCpu::execute(uint32_t entry, const std::array<uint32_t, 256>&
                         uint16_t(output[9]), output[10]};
     if (sound_mode_ == SoundMode::Dma)
         result.audio_blocks = sb16_dma_.take_completed();
+    return result;
+}
+
+double RealModeCpu::next_audio_deadline() const {
+    return sound_mode_ == SoundMode::Dma ? sb16_dma_.next_deadline() : 0;
+}
+
+bool RealModeCpu::audio_service_due(double now) const {
+    if (sound_mode_ != SoundMode::Dma) return false;
+    const double deadline = sb16_dma_.next_deadline();
+    return (deadline && now >= deadline) || sb16_dma_.pic().next_irq().has_value();
+}
+
+AudioServiceResult RealModeCpu::service_audio(
+        double now, const std::array<uint32_t, 256>& vectors,
+        const std::vector<uint8_t>& memory) {
+    AudioServiceResult result;
+    if (!audio_service_due(now)) return result;
+    if (memory.size() != MEMORY_SIZE)
+        throw std::runtime_error("invalid DOS memory size for background audio");
+    sb16_dma_.advance(now, [&](uint32_t address, size_t length) {
+        if (uint64_t(address) + length > memory.size())
+            throw std::runtime_error("background audio DMA outside DOS RAM");
+        return std::vector<uint8_t>(memory.begin() + address,
+                                    memory.begin() + address + length);
+    });
+    result.audio_blocks = sb16_dma_.take_completed();
+    const auto irq = sb16_dma_.pic().next_irq();
+    if (irq) {
+        const unsigned vector = *irq + 8;
+        const uint32_t target = vectors[vector];
+        const uint32_t address = ((target >> 16) << 4) + (target & 0xffff);
+        if (!target || address < 0x10000 || address >= 0x90000)
+            throw std::runtime_error("uninstalled background audio IRQ vector " +
+                                     std::to_string(vector));
+        sb16_dma_.pic().begin(*irq);
+        // The protected-mode CPU has no real-mode CS:IP/SS:SP to interrupt.
+        // Run just the installed DOS handler with a synthetic, IF-cleared
+        // hardware frame and keep its conventional-memory side effects.
+        RealRegisters regs;
+        regs.flags = 0x2;
+        auto handled = execute(target, vectors, memory, regs);
+        result.memory = std::move(handled.memory);
+        result.audio_blocks.insert(result.audio_blocks.end(),
+                                   std::make_move_iterator(handled.audio_blocks.begin()),
+                                   std::make_move_iterator(handled.audio_blocks.end()));
+    }
     return result;
 }
 

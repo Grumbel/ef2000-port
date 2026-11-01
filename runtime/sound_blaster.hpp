@@ -34,6 +34,7 @@ public:
     void advance(double now, const DMA8237::MemoryRead& read_memory);
     std::vector<AudioBlock> take_completed();
     AudioPIC& pic() { return pic_; }
+    const AudioPIC& pic() const { return pic_; }
     bool active() const { return active_.has_value(); }
     double next_deadline() const;
 

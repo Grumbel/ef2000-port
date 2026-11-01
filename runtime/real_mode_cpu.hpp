@@ -30,6 +30,13 @@ struct RealResult {
     std::vector<AudioBlock> audio_blocks;
 };
 
+// No memory buffer is returned if only DMA completed. When an IRQ handler
+// executes, the resulting conventional RAM must be copied into the X-32 map.
+struct AudioServiceResult {
+    std::vector<uint8_t> memory;
+    std::vector<AudioBlock> audio_blocks;
+};
+
 class RealModeCpu {
 public:
     explicit RealModeCpu(SoundMode mode = SoundMode::Off);
@@ -41,6 +48,10 @@ public:
     RealResult execute(uint32_t entry, const std::array<uint32_t, 256>& vectors,
                        const std::vector<uint8_t>& memory, const RealRegisters& regs,
                        uint64_t instruction_limit = 1000000);
+    bool audio_service_due(double now) const;
+    AudioServiceResult service_audio(double now, const std::array<uint32_t, 256>& vectors,
+                                     const std::vector<uint8_t>& memory);
+    double next_audio_deadline() const;
 
 private:
     static void interrupt(uc_engine*, uint32_t vector, void* user);
