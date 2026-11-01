@@ -160,16 +160,49 @@ After opening Quick Combat with the first-menu icon click at ticks
 `1910/1930/1950` (move/press/release for each). The screen changed to the
 original *Simulation wird geladen...* loading status. The guest then read
 additional mission and effects assets, reaching the original payload's
-decompressor before stopping at instruction `325724093`.
+decompressor. The initial replay stopped at instruction `325724093`: original
+code at `0xFA153` checks the decoder output against word `[0x16279E]`, then
+deliberately branches to `INT 3` at `0xFA167` on mismatch. The checksum routine
+at `0xFA2E4` uses two rolling 8-bit accumulators over the output buffer given
+by `[0x162794]` and `[0x162790]`.
 
-The stop is **not** an unimplemented flight renderer: original code at
-`0xFA153` compares a checksum with word `[0x16279E]`; on mismatch it branches
-to `INT 3` at `0xFA167`. The current portable backend reports
-`unsupported_interface: unimplemented INT 03h at IP=000fa166`, with the last
-video mode still VBE `0x100` (640×400). The routine at `0xFA2E4` computes an
-8-bit two-accumulator checksum over the decompressed output starting at
-`[0x162794]`, with size `[0x162790]`. The preceding archive reads do not by
-themselves identify whether corrupted input, decompressor execution, or another
-guest state caused the mismatch. Preserve the guest breakpoint and compare
-expected/actual checksums and buffer bytes on the next probe; treating `INT 3`
-as a no-op would conceal a failed asset integrity check.
+The optional `--trace-decompress` probe records each original checksum compare
+in the JSON report, including the last passing block. On a mismatch it includes
+the expected and actual sums, output address and length, an independent sum,
+SHA-256 and samples of the decompressed bytes. The game breakpoint is preserved
+and reported as `guest_integrity_failure`, not ignored. The original failing
+block expected `0x6F91`, but the guest (and independent recomputation) returned
+`0x3792`. Its 49,152-byte output spanned `0x00FF7C34..0x01003C34`, crossing
+the Unicorn backend's former DOS RAM mapping at `0x01000000`. That mapping,
+plus the former PSP/environment mappings at `0x02000000`, overlapped the
+64 MiB protected application image. The Linux native harness places DOS RAM
+outside its protected image; the portable backend must do likewise.
+
+Unicorn now maps DOS RAM at `0x05000000..0x05100000`, the PSP at
+`0x05200000`, and the environment at `0x05201000`. The ring-3 selector bases,
+DOS allocation pointers, BIOS bridge, timer, VGA palette and input mailboxes
+use those disjoint mappings. With the **same original assets and timed mouse
+replay**, all **68 checksum comparisons pass** and there are **zero failures**.
+The run reaches its requested 330-million-instruction limit, 4.3 million
+instructions beyond the previous integrity failure. Video remains in VBE mode
+`0x100` (640×400) and the last captured frame is black; this does **not** yet
+demonstrate flight rendering. A longer replay is needed to find the next
+execution boundary.
+
+To reproduce the mission-start integrity check, run the same timed actions
+against the original, unmodified game files:
+
+```sh
+python3 tools/unicorn_backend.py /path/to/_EF2000.EXE \
+  --game-dir /path/to --timer-instructions 100000 \
+  --instruction-limit 330000000 \
+  --mouse-event 1400:165:110:0 --mouse-event 1450:165:110:1 \
+  --mouse-event 1470:165:110:0 \
+  --mouse-event 1790:205:74:0 --mouse-event 1810:205:74:1 \
+  --mouse-event 1830:205:74:0 \
+  --mouse-event 1850:130:176:0 --mouse-event 1870:130:176:1 \
+  --mouse-event 1890:130:176:0 \
+  --mouse-event 1910:287:368:0 --mouse-event 1930:287:368:1 \
+  --mouse-event 1950:287:368:0 --trace-decompress \
+  --report /tmp/ef2000-unicorn-mission.json
+```
