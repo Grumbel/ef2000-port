@@ -70,6 +70,7 @@ find_library(UNICORN_LIBRARY unicorn)
 find_package(OpenSSL QUIET COMPONENTS Crypto)
 if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
   add_executable(ef2000-unicorn-cpp runtime/unicorn_cpp.cpp runtime/dos_drive.cpp
+                                  runtime/cd_audio.cpp
                                   runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp
                                   runtime/sound_blaster.cpp runtime/isa_audio.cpp
                                   runtime/pcm_audio.cpp runtime/wav_capture.cpp)
@@ -103,6 +104,11 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND OpenSSL_FOUND)
   target_link_libraries(ef2000-original-sb16-test PRIVATE ${UNICORN_LIBRARY} OpenSSL::Crypto)
   add_test(NAME original-sb16 COMMAND ef2000-original-sb16-test)
   set_tests_properties(original-sb16 PROPERTIES SKIP_REGULAR_EXPRESSION "original-sb16: skipped")
+  add_executable(ef2000-cd-audio-test tests/cd_audio_test.cpp runtime/cd_audio.cpp)
+  target_compile_features(ef2000-cd-audio-test PRIVATE cxx_std_17)
+  target_compile_options(ef2000-cd-audio-test PRIVATE -Wall -Wextra -Werror)
+  target_include_directories(ef2000-cd-audio-test PRIVATE ${UNICORN_INCLUDE_DIR})
+  add_test(NAME cd-audio COMMAND ef2000-cd-audio-test)
 else()
   message(STATUS "C++ Unicorn probe disabled (requires Unicorn and OpenSSL headers/libraries)")
 endif()

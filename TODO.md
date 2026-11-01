@@ -182,11 +182,14 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
   trigger-axis mapping), joystick re-enumeration, explicit control selection,
   input diagnostics and throttled event pumping. Add a headless original-game
   gameport read/write checkpoint and synthetic x86 port I/O self-test.
+- [x] Port read-only MSCDEX INT 2Fh and single-BINARY CUE/Red Book audio to C++;
+  enable `--cd-cue`, virtual CD-mode `EF2000.CFG`/`MDI.INI`, mix CD/SB16 streams
+  via SDL3, and test synthetic disc requests, timing, and PCM capture format.
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
   on actual hardware, profile performance bottlenecks in flight, and test
   sustained interactive mission execution.
-- [ ] Verify audible SDL3 playback using a full original installation and
-  physical audio device; improve
+- [ ] Verify audible SDL3 SB16 and original-disc CD music using a full original
+  installation and physical audio device; improve
   streaming latency if required and port remaining OS services before
   switching `.#unicorn` over to C++.
 `--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA

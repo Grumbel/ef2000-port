@@ -16,6 +16,41 @@ under `cd-audio/`; `requests.json` records command/status and play ranges.
 Windowed playback mixes CD music and SB16 effects into one SDL device. Headless
 runs capture WAV files without opening audio hardware.
 
+## Native C++ Unicorn backend
+
+The C++ runner now independently implements the read-only MSCDEX and CUE/BIN
+reader. Enable it explicitly (a directory by itself is not sufficient):
+
+```sh
+nix run .#unicorn-cpp -- ../EF2000/c/EF2000/_EF2000.EXE \
+  --windowed --sound sb16-dma \
+  --cd-dir ../EF2000_ISO/ --cd-cue ../EF2000_ISO/EF_DIR.cue
+```
+
+`--cd-dir` supplies disc *files* to the DOS drive. `--cd-cue` supplies the
+mixed-mode audio sectors, discovers a simulated D: MSCDEX drive, and presents
+`MUSIC=2,127` plus `NULL.MDI` in the virtual `EF2000.CFG` and `MDI.INI` reads
+without modifying the original installation. One CUE `FILE ... BINARY` with
+consecutive indexed MODE1/2352 and AUDIO tracks is supported, using relative
+paths from the CUE. Requests use the same X-32 real-mode bridge used for the
+game's original SB16 driver. SDL3 automatically mixes two independently
+bound audio streams into the same playback device; stopping/restarting a CD
+track clears queued music without cutting off effects.
+
+For a headless diagnostic, add `--wav-capture DIR`. CD stereo 16-bit 44100 Hz
+samples are saved under `DIR/cd-audio/`, separate from any captured SB16
+effects. Captures never overwrite existing files, and no disc sectors are
+written. CD audio also works with `--sound off` and a cue file. The console
+reports MSCDEX request count, decoded tracks, delivered PCM blocks and bytes.
+
+`tests/cd_audio_test.cpp` tests drive discovery, version, ISO volume descriptor,
+disc/track/device IOCTLs, rejection of a data-track play, a valid play range,
+elapsed-sector PCM bytes, stop, and reset using a generated test disc. The
+C++ integration and SDL3 playback with the real disc have not been exercised
+in this development environment (SDL3 development files and the user's CUE/BIN
+are unavailable here), so the real game's music should be checked on the
+target machine.
+
 ## Interface recovered from the installed executable
 
 Offsets refer to the extracted protected-mode payload of the German TACTCOM

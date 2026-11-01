@@ -81,6 +81,7 @@ int main() {
         write_file(game / "CONFIG.DAT", "abcdefgh");
         write_file(game / "EF2000.CFG", "CONTROL=1\r\nJOY_FACTOR=0\r\nMUSIC=1,127\r\n"
                                        "SOUNDFX=1,127\r\nSPEECH=1\r\n");
+        write_file(game / "MDI.INI", "DEVICE Adlib\r\nDRIVER ADLIB.MDI\r\n");
         write_file(cd / "CHECK.CD", "disc");
 
         stage = "read-only files";
@@ -164,6 +165,28 @@ int main() {
                 probe_cfg.find("SPEECH=1\r\n") != std::string::npos &&
                 probe_cfg.find("MUSIC=0,127\r\n") != std::string::npos,
                 "SB16 probe must enable digital effects without FM music");
+
+        stage = "virtual CD settings";
+        handle = drive.open("EF2000.CFG", 0, false, true, true);
+        const std::string cd_cfg = bytes(drive.read(handle, 256));
+        drive.close(handle);
+        require(cd_cfg.find("MUSIC=2,127\r\n") != std::string::npos &&
+                cd_cfg.find("SOUNDFX=1,127\r\n") != std::string::npos,
+                "MSCDEX music and SB16 effects must be independent");
+        handle = drive.open("MDI.INI", 0, false, true, true);
+        const std::string cd_mdi = bytes(drive.read(handle, 256));
+        drive.close(handle);
+        require(cd_mdi.find("DRIVER NULL.MDI\r\n") != std::string::npos &&
+                cd_mdi.find("IO_ADDR -1\r\n") != std::string::npos,
+                "CD mode must avoid the original FM synthesizer");
+        require(read_file(game / "MDI.INI").find("ADLIB.MDI") != std::string::npos,
+                "virtual CD sound driver must not mutate original assets");
+        handle = drive.open("EF2000.CFG", 0, false, false, true);
+        const std::string cd_only_cfg = bytes(drive.read(handle, 256));
+        drive.close(handle);
+        require(cd_only_cfg.find("MUSIC=2,127\r\n") != std::string::npos &&
+                cd_only_cfg.find("SOUNDFX=0,127\r\n") != std::string::npos,
+                "CD music must work with SB16 disabled");
 
         // Replacing an overlay hard link must not modify the original inode.
         stage = "hard link protection";

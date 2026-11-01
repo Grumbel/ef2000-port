@@ -20,7 +20,7 @@ public:
              std::filesystem::path overlay_root);
 
     uint16_t open(const std::string& name, unsigned access, bool joystick,
-                  bool digital_sound = false);
+                  bool digital_sound = false, bool cd_music = false);
     uint16_t create(const std::string& name);
     void close(uint16_t handle);
     std::vector<uint8_t> read(uint16_t handle, size_t size);

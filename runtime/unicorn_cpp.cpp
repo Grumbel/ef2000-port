@@ -5,6 +5,7 @@
 // during the Python-to-C++ transition; unsupported guest calls stop explicitly.
 // The proprietary executable is read at runtime and is never linked in.
 #include "dos_drive.hpp"
+#include "cd_audio.hpp"
 #include "pcm_audio.hpp"
 #include "real_mode_cpu.hpp"
 #include "wav_capture.hpp"
@@ -145,6 +146,8 @@ public:
     ~StartupWindow() {
 #ifdef EF_UNICORN_SDL3
         if (audio_stream_) SDL_DestroyAudioStream(audio_stream_);
+        if (cd_audio_stream_) SDL_DestroyAudioStream(cd_audio_stream_);
+        if (audio_device_) SDL_CloseAudioDevice(audio_device_);
         if (audio_initialized_) SDL_QuitSubSystem(SDL_INIT_AUDIO);
         close_joystick();
         if (texture_) SDL_DestroyTexture(texture_);
@@ -172,50 +175,63 @@ public:
     }
     uint64_t input_polls() const { return input_polls_; }
     uint64_t frames_presented() const { return frames_presented_; }
-    void play_audio(const ef2000::AudioBlock& block) {
+    void play_audio(const ef2000::AudioBlock& block, bool cd = false) {
 #ifdef EF_UNICORN_SDL3
         if (!enabled() || audio_disabled_) return;
-        const auto pcm = pcm_converter_.push(block);
+        const auto pcm = (cd ? cd_pcm_converter_ : pcm_converter_).push(block);
         if (pcm.interleaved.empty()) return;
         const SDL_AudioSpec input{SDL_AUDIO_F32, 2, int(pcm.rate)};
-        if (!audio_stream_) {
+        if (!audio_initialized_) {
             if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
                 std::cerr << "SDL3 audio unavailable: " << SDL_GetError() << '\n';
                 audio_disabled_ = true;
                 return;
             }
             audio_initialized_ = true;
-            audio_stream_ = SDL_OpenAudioDeviceStream(
-                SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &input, nullptr, nullptr);
-            if (!audio_stream_ || !SDL_ResumeAudioStreamDevice(audio_stream_)) {
+            audio_device_ = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+            if (!audio_device_ || !SDL_ResumeAudioDevice(audio_device_)) {
                 std::cerr << "SDL3 sound device unavailable: " << SDL_GetError() << '\n';
-                if (audio_stream_) SDL_DestroyAudioStream(audio_stream_);
-                audio_stream_ = nullptr;
+                if (audio_device_) SDL_CloseAudioDevice(audio_device_);
+                audio_device_ = 0;
                 audio_disabled_ = true;
                 return;
             }
-            audio_input_rate_ = pcm.rate;
+        }
+        SDL_AudioStream*& stream = cd ? cd_audio_stream_ : audio_stream_;
+        unsigned& rate = cd ? cd_audio_input_rate_ : audio_input_rate_;
+        if (!stream) {
+            stream = SDL_CreateAudioStream(&input, nullptr);
+            if (!stream || !SDL_BindAudioStream(audio_device_, stream))
+                throw std::runtime_error(std::string("SDL3 mixed audio stream: ") + SDL_GetError());
+            rate = pcm.rate;
         }
         // Changing an SDL audio stream's input format on *every* DMA block
         // needlessly resets conversion state. Only do it when the guest's
         // programmed sample rate actually changes.
-        if (audio_input_rate_ != pcm.rate) {
-            if (!SDL_SetAudioStreamFormat(audio_stream_, &input, nullptr))
+        if (rate != pcm.rate) {
+            if (!SDL_SetAudioStreamFormat(stream, &input, nullptr))
                 throw std::runtime_error(std::string("SDL3 input audio format: ") + SDL_GetError());
-            audio_input_rate_ = pcm.rate;
+            rate = pcm.rate;
         }
-        const int backlog = SDL_GetAudioStreamQueued(audio_stream_);
+        const int backlog = SDL_GetAudioStreamQueued(stream);
         if (backlog < 0) throw std::runtime_error(std::string("SDL3 audio queue: ") + SDL_GetError());
-        if (backlog > 44100 * 2 * int(sizeof(float)) * 2 &&
-            !SDL_ClearAudioStream(audio_stream_))
+        if (backlog > int(pcm.rate) * 2 * int(sizeof(float)) * 2 &&
+            !SDL_ClearAudioStream(stream))
             throw std::runtime_error(std::string("SDL3 audio overflow: ") + SDL_GetError());
         if (pcm.interleaved.size() > size_t(INT_MAX / sizeof(float)))
             throw std::runtime_error("audio block too large for SDL3");
-        if (!SDL_PutAudioStreamData(audio_stream_, pcm.interleaved.data(),
+        if (!SDL_PutAudioStreamData(stream, pcm.interleaved.data(),
                                     int(pcm.interleaved.size() * sizeof(float))))
             throw std::runtime_error(std::string("SDL3 audio playback: ") + SDL_GetError());
 #else
-        (void)block;
+        (void)block; (void)cd;
+#endif
+    }
+    void clear_cd_audio() {
+#ifdef EF_UNICORN_SDL3
+        cd_pcm_converter_.reset();
+        if (cd_audio_stream_ && !SDL_ClearAudioStream(cd_audio_stream_))
+            throw std::runtime_error(std::string("SDL3 CD stream reset: ") + SDL_GetError());
 #endif
     }
     std::vector<MouseEvent> take_mouse_events() {
@@ -369,6 +385,7 @@ public:
 private:
     WindowOptions options_;
     ef2000::PcmConverter pcm_converter_;
+    ef2000::PcmConverter cd_pcm_converter_;
     unsigned mouse_buttons_{};
     std::vector<MouseEvent> pending_mouse_;
     std::vector<KeyEvent> pending_keys_;
@@ -377,8 +394,10 @@ private:
     uint64_t input_polls_{}, frames_presented_{};
 #ifdef EF_UNICORN_SDL3
     SDL_AudioStream* audio_stream_{};
+    SDL_AudioStream* cd_audio_stream_{};
+    SDL_AudioDeviceID audio_device_{};
     bool audio_initialized_{}, audio_disabled_{};
-    unsigned audio_input_rate_{};
+    unsigned audio_input_rate_{}, cd_audio_input_rate_{};
     SDL_FRect viewport(int width, int height) const {
         if (options_.aspect_ratio != "native" || width <= 0 || height <= 0)
             return {0, 0, 640, 480};
@@ -501,12 +520,14 @@ public:
                      std::vector<MouseEvent> mouse_events = {},
                      std::vector<TimedKeyEvent> key_events = {},
                      std::vector<JoystickEvent> joystick_events = {},
-                     ControlSelection controls = ControlSelection::Auto)
+                     ControlSelection controls = ControlSelection::Auto,
+                     fs::path cd_cue = {})
         : image_size_(image.size()), trace_interrupts_(trace_interrupts),
           mouse_events_(std::move(mouse_events)), key_events_(std::move(key_events)),
           joystick_events_(std::move(joystick_events)), controls_(controls),
           dos_drive_(std::move(game_dir), std::move(cd_dir), std::move(overlay_dir)),
           digital_sound_enabled_(sound_mode != ef2000::SoundMode::Off), real_cpu_(sound_mode) {
+        if (!cd_cue.empty()) cd_audio_ = std::make_unique<ef2000::CdAudio>(cd_cue);
         if (image.size() < ENTRY + 2 || image.size() > IMAGE_SIZE)
             throw std::runtime_error("invalid initialized image length");
         check(uc_open(UC_ARCH_X86, UC_MODE_32, &cpu_), "uc_open");
@@ -536,6 +557,9 @@ public:
         const bool trace_joystick = window_options.trace_joystick;
         if (!wav_directory.empty())
             wav_capture_ = std::make_unique<ef2000::WavCapture>(wav_directory);
+        if (!wav_directory.empty() && cd_audio_)
+            cd_wav_capture_ = std::make_unique<ef2000::WavCapture>(
+                fs::path(wav_directory) / "cd-audio");
         StartupWindow window(std::move(window_options));
         active_window_ = &window;
         const auto joystick = window.joystick_state();
@@ -576,6 +600,7 @@ public:
         }
         if (!framebuffer.empty()) save_framebuffer(framebuffer);
         if (wav_capture_) wav_capture_->close();
+        if (cd_wav_capture_) cd_wav_capture_->close();
         const double seconds = std::chrono::duration<double>(
             std::chrono::steady_clock::now() - start).count();
         const Registers regs = read_regs();
@@ -590,6 +615,14 @@ public:
         if (wav_capture_)
             std::cout << "wav_capture: segments=" << wav_capture_->segments()
                       << " pcm_bytes=" << wav_capture_->bytes() << '\n';
+        if (cd_audio_)
+            std::cout << "cd_audio: tracks=" << cd_audio_->tracks()
+                      << " requests=" << cd_audio_->commands()
+                      << " pcm_blocks=" << cd_blocks_
+                      << " pcm_bytes=" << cd_audio_->played_bytes() << '\n';
+        if (cd_wav_capture_)
+            std::cout << "cd_wav_capture: segments=" << cd_wav_capture_->segments()
+                      << " pcm_bytes=" << cd_wav_capture_->bytes() << '\n';
         if (trace_joystick)
             std::cout << "gameport: axes=" << joystick_count_
                       << " reads=" << gameport_reads_
@@ -619,10 +652,12 @@ public:
 private:
     StartupWindow* active_window_{};
     std::unique_ptr<ef2000::WavCapture> wav_capture_;
+    std::unique_ptr<ef2000::WavCapture> cd_wav_capture_;
     uc_engine* cpu_{};
     size_t image_size_;
     uint64_t interrupts_{};
     uint64_t audio_blocks_{}, audio_bytes_{};
+    uint64_t cd_blocks_{};
     uint64_t gameport_reads_{}, gameport_writes_{};
     uint64_t ticks_{}, irq0_{}, irq1_{};
     uint32_t pit_divisor_ = 65536, pit_low_{}, bios_accumulator_{};
@@ -669,6 +704,7 @@ private:
     ef2000::DosDrive dos_drive_;
     bool digital_sound_enabled_{};
     ef2000::RealModeCpu real_cpu_;
+    std::unique_ptr<ef2000::CdAudio> cd_audio_;
 
     struct VideoFrame { uint16_t width{}, height{}; std::vector<uint8_t> rgba; };
     static std::pair<uint16_t, uint16_t> vbe_dimensions(uint16_t mode) {
@@ -794,7 +830,7 @@ private:
                 const bool joystick_controls = controls_ == ControlSelection::Joystick ||
                     (controls_ == ControlSelection::Auto && joystick_count_ != 0);
                 after.ax = dos_drive_.open(name, ax & 3, joystick_controls,
-                                           digital_sound_enabled_);
+                                           digital_sound_enabled_, bool(cd_audio_));
                 after.dx = 0;
             } else if (ah == 0x3c) {
                 after.ax = dos_drive_.create(dos_name(before.dx));
@@ -1213,7 +1249,33 @@ private:
         values.dx = read_value<uint32_t>(frame + 14);
         const bool builtin = vector == 0x10 || vector == 0x16 ||
                              vector == 0x33 || vector == 0x2f;
-        if (!builtin && real_vectors_[vector]) {
+        if (cd_audio_ && vector == 0x2f && (values.ax & 0xff00) == 0x1500) {
+            std::vector<uint8_t> conventional(0x100000);
+            check(uc_mem_read(cpu_, DOS_BASE, conventional.data(), conventional.size()),
+                  "read real-mode DOS RAM for MSCDEX");
+            ef2000::RealRegisters real{
+                values.ax, values.bx, values.cx, values.dx, values.si, values.di,
+                uint16_t(values.ds), uint16_t(values.es),
+                read_value<uint16_t>(frame + 6), read_value<uint16_t>(frame + 8),
+                values.flags};
+            try {
+                const unsigned prior_generation = cd_audio_->generation();
+                const double now = std::chrono::duration<double>(
+                    std::chrono::steady_clock::now().time_since_epoch()).count();
+                cd_audio_->interrupt(real, conventional, now);
+                write(DOS_BASE, conventional.data(), conventional.size());
+                if (cd_audio_->generation() != prior_generation && active_window_)
+                    active_window_->clear_cd_audio();
+                values.ax = real.ax; values.bx = real.bx; values.cx = real.cx;
+                values.dx = real.dx; values.si = real.si; values.di = real.di;
+                values.ds = real.ds; values.es = real.es; values.flags = real.flags;
+                write_value<uint16_t>(frame + 6, real.fs);
+                write_value<uint16_t>(frame + 8, real.gs);
+            } catch (const std::exception& error) {
+                fail(std::string("MSCDEX CD driver: ") + error.what());
+                return false;
+            }
+        } else if (!builtin && real_vectors_[vector]) {
             std::vector<uint8_t> conventional(0x100000);
             check(uc_mem_read(cpu_, DOS_BASE, conventional.data(), conventional.size()),
                   "read real-mode DOS RAM");
@@ -1380,12 +1442,27 @@ private:
             fail(std::string("background SB16 DMA/IRQ: ") + error.what());
         }
     }
+    void service_cd() {
+        if (!cd_audio_) return;
+        try {
+            const double now = std::chrono::duration<double>(
+                std::chrono::steady_clock::now().time_since_epoch()).count();
+            if (auto block = cd_audio_->pcm(now)) {
+                ++cd_blocks_;
+                if (cd_wav_capture_) cd_wav_capture_->push(*block);
+                if (active_window_) active_window_->play_audio(*block, true);
+            }
+        } catch (const std::exception& error) {
+            fail(std::string("background CD audio: ") + error.what());
+        }
+    }
     void deliver_tick(uint32_t next_ip) {
         ++ticks_;
         scripted_mouse();
         scripted_keyboard();
         scripted_joystick();
         service_sound();
+        if (status_ == "instruction_limit") service_cd();
         if (status_ != "instruction_limit") return;
         bios_accumulator_ += pit_divisor_;
         if (bios_accumulator_ >= 65536) {
@@ -1687,7 +1764,7 @@ private:
 
 void usage(const char* program) {
     std::cout << "Usage: " << program << " _EF2000.EXE [--instruction-limit N]"
-              << " [--game-dir DIR] [--cd-dir DIR] [--overlay-dir DIR] [--windowed]"
+              << " [--game-dir DIR] [--cd-dir DIR] [--cd-cue FILE] [--overlay-dir DIR] [--windowed]"
               << " [--timer-instructions N]\n"
               << "       [--sound off|sb16-probe|sb16-dma] (SDL3 audio if available)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
@@ -1701,7 +1778,9 @@ void usage(const char* program) {
               << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
-              << "       [--wav-capture DIR] (lossless guest SB16 DMA PCM WAV segments)\n"
+              << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
+              << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
+              << "       --cd-dir DIR provides DOS disc files only; it does not enable music\n"
               << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
               << "       Windowed default: $XDG_STATE_HOME/ef2000/unicorn/drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
@@ -1713,7 +1792,7 @@ void usage(const char* program) {
 int main(int argc, char** argv) {
     try {
         std::string path;
-        std::string game_dir, cd_dir, overlay_dir;
+        std::string game_dir, cd_dir, cd_cue, overlay_dir;
         uint64_t limit = 30000000;
         bool explicit_limit = false;
         uint64_t timer_interval = 250000;
@@ -1746,6 +1825,8 @@ int main(int argc, char** argv) {
                 game_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--cd-dir") && i + 1 < argc) {
                 cd_dir = argv[++i];
+            } else if (!std::strcmp(argv[i], "--cd-cue") && i + 1 < argc) {
+                cd_cue = argv[++i];
             } else if (!std::strcmp(argv[i], "--overlay-dir") && i + 1 < argc) {
                 overlay_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--sound") && i + 1 < argc) {
@@ -1865,6 +1946,7 @@ int main(int argc, char** argv) {
         if (self_test) {
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
+            if (!cd_cue.empty()) throw std::runtime_error("self-test does not take a CD image");
             std::vector<uint8_t> image(0x1000);
             // DOS query, ISA gameport charge/read, then DOS exit. The same
             // synthetic payload works without any proprietary game files.
@@ -1878,8 +1960,8 @@ int main(int argc, char** argv) {
             return machine.run(10000, window, 250000, "", "");
         }
         if (path.empty()) { usage(argv[0]); return 2; }
-        if (!wav_directory.empty() && sound_mode != ef2000::SoundMode::Dma)
-            throw std::runtime_error("--wav-capture requires --sound sb16-dma");
+        if (!wav_directory.empty() && sound_mode != ef2000::SoundMode::Dma && cd_cue.empty())
+            throw std::runtime_error("--wav-capture requires --sound sb16-dma or --cd-cue");
         if (window.enabled && !explicit_limit) limit = 0;
         if (window.enabled && overlay_dir.empty()) {
             if (const char* xdg_state = std::getenv("XDG_STATE_HOME"); xdg_state && *xdg_state)
@@ -1898,7 +1980,8 @@ int main(int argc, char** argv) {
         if (game_dir.empty()) game_dir = fs::path(path).parent_path().string();
         if (cd_dir.empty()) cd_dir = game_dir;
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
-                        std::move(mouse_events), std::move(key_events), std::move(joystick_events), controls);
+                        std::move(mouse_events), std::move(key_events), std::move(joystick_events),
+                        controls, cd_cue);
         return machine.run(limit, window, timer_interval, framebuffer, wav_directory);
     } catch (const std::exception& error) {
         std::cerr << "ef2000-unicorn-cpp: " << error.what() << '\n';

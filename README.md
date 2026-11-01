@@ -197,6 +197,9 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-probe \
   --instruction-limit 100000000
 # Experimental DMA/PIC/IRQ emulation with SDL3 PCM output in windowed runs
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma
+# Original CD music alongside SB16 effects (CUE and BIN remain read-only)
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma \
+  --cd-dir /path/to/EF2000_ISO --cd-cue /path/to/EF2000_ISO/EF_DIR.cue
 # Flight-controller diagnostics; SDL3 gamepads use mapped stick axes (not triggers)
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma \
   --controls joystick --joystick auto --trace-joystick
@@ -205,6 +208,9 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --joystick-axes 0,1
 # Capture the original guest DMA audio without an SDL3 sound device
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-dma \
   --instruction-limit 300000000 --wav-capture /tmp/ef2000-pcm
+# Capture CD music separately as /tmp/ef2000-audio/cd-audio/audio-NNN.wav
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound off \
+  --cd-cue /path/to/EF2000_ISO/EF_DIR.cue --wav-capture /tmp/ef2000-audio
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
@@ -225,6 +231,19 @@ joystick events are forwarded to the guest, and the CLI supports scripted
 With sound enabled, independent 1.5-billion-instruction replays also reached
 the in-flight cockpit, completing 287–298 guest DMA blocks
 (585,730–608,258 PCM bytes; the DSP service uses host wall-clock timing).
+
+Unlike `--cd-dir`, which only exposes files to the guest DOS drive,
+`--cd-cue FILE` also installs the read-only MSCDEX CD-audio interface and
+enables the game's Red Book music setting. The original `NULL.MDI` driver
+replaces the FM synthesizer in its virtual configuration. The C++ runner
+accepts one BINARY CUE image containing indexed MODE1/2352 and AUDIO tracks;
+`--cd-dir` can be combined with `--cd-cue` when the installer files reside
+alongside the disc image. Music and SB16 effects use two streams bound to one
+SDL3 playback device, with independent buffering and rate conversion. Without
+an SDL device, `--wav-capture DIR` can save CD samples in `DIR/cd-audio/`,
+including when `--sound off`. See [CD audio](docs/cd-audio.md) for request
+details and known limitations. Actual original-disc playback on C++ SDL3 still
+needs a listening test; the emulator path has synthetic protocol/PCM tests.
 
 The C++ SDL3 frontend now maps recognized gamepads through SDL's standardized
 left/right stick axes and south/east/west/north buttons, avoiding the raw
@@ -255,7 +274,8 @@ to keep a specific profile or use it in headless mode; without an overlay,
 headless mode rejects all guest writes. The overlay preserves the source
 installation, supports files created by the game, and copies original files
 only when opened for writing. `EF2000.CFG` is still adjusted virtually for
-the connected controls and to disable unimplemented sound devices. The
+the connected controls and to disable unimplemented sound devices (except
+CD music when an image is supplied). The
 experimental `--sound sb16-probe` mode instead enables the original digital
 driver and models the measured SB16 reset/version/resource interface at
 port 220h, without enabling FM music. Reached DMA/PIC requests that have
@@ -269,7 +289,8 @@ also finish DMA blocks and invoke installed real-mode IRQ handlers without
 an outstanding X-32 BIOS call. Windowed runs feed gain-adjusted stereo PCM
 into an SDL3 audio device, using the stream's input-format conversion to
 handle the game's sample rates. Headless runs can optionally save the source
-PCM as regular WAV files with `--wav-capture DIR` (requires `--sound sb16-dma`);
+PCM as regular WAV files with `--wav-capture DIR` (requires `--sound sb16-dma`
+or `--cd-cue`); CD captures use a separate `cd-audio` subdirectory;
 format changes open a new file, and existing captures are never overwritten.
 Only complete sample frames can be represented in WAV, so an incomplete
 trailing frame is omitted. By default headless runs only count PCM blocks. Audio

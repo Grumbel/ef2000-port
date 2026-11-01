@@ -13,6 +13,13 @@ IRQ/8-bit DMA/16-bit DMA discovery (-1). MDI.INI selects SBPRO2.MDI for FM
 music. Digital playback and FM synthesis are separate paths. Experimental SB16 digital
 playback is implemented; FM synthesis remains unsupported. Experimental CD playback is described in [cd-audio.md](cd-audio.md).
 
+The native C++ Unicorn runner also supports the original CD music separately
+from SB16 sound effects via `--cd-cue FILE`, forwarding X-32 MSCDEX INT 2Fh
+requests and reading Red Book stereo PCM directly from the original CUE/BIN.
+Supplying only `--cd-dir` does not activate music. C++ MSCDEX and PCM tests use
+a generated disc image; live playback with the user's original CD image still
+needs validation on the target machine.
+
 ## Original-release CD audio source
 
 The original-release disc supplied in `../EF2000_ISO/EF_DIR.cue` references

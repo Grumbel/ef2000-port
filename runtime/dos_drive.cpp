@@ -53,11 +53,12 @@ std::vector<uint8_t> read_bytes(const fs::path& path) {
     return {(std::istreambuf_iterator<char>(stream)), {}};
 }
 
-std::string virtual_configuration(std::string config, bool joystick, bool digital_sound) {
+std::string virtual_configuration(std::string config, bool joystick, bool digital_sound,
+                                  bool cd_music) {
     // The guest sees hardware settings appropriate to this backend without
     // changing the original EF2000.CFG file on disk.
     std::map<std::string, std::string> changes = {
-        {"MUSIC", "0,127"},
+        {"MUSIC", cd_music ? "2,127" : "0,127"},
         {"VRHELMET", "0"}, {"CONTROL", joystick ? "1" : "0"}};
     if (!digital_sound) {
         changes["SOUNDFX"] = "0,127";
@@ -151,7 +152,7 @@ uint16_t DosDrive::insert(File file) {
 }
 
 uint16_t DosDrive::open(const std::string& name, unsigned access, bool joystick,
-                        bool digital_sound) {
+                        bool digital_sound, bool cd_music) {
     if (access > 2 || (access != 0 && overlay_root_.empty())) throw unsigned(5);
     const Paths paths = resolve(name);
     const bool overlay = paths.overlay_exists;
@@ -160,10 +161,17 @@ uint16_t DosDrive::open(const std::string& name, unsigned access, bool joystick,
     auto bytes = read_bytes(source);
     std::string filename = source.filename().string();
     for (char& c : filename) c = std::toupper(static_cast<unsigned char>(c));
-    if (!overlay && filename == "EF2000.CFG") {
+    if (access == 0 && filename == "EF2000.CFG") {
         const std::string configured = virtual_configuration(
-            {bytes.begin(), bytes.end()}, joystick, digital_sound);
+            {bytes.begin(), bytes.end()}, joystick, digital_sound, cd_music);
         bytes.assign(configured.begin(), configured.end());
+    } else if (access == 0 && cd_music && filename == "MDI.INI") {
+        // Miles still loads a music driver when MUSIC=2 (CD audio), even
+        // though it should never access FM/MPU-401 hardware in that mode.
+        // NULL.MDI is supplied by the original game installation.
+        constexpr char null_mdi[] = "DEVICE None\r\nDRIVER NULL.MDI\r\nIO_ADDR -1\r\n"
+                                    "IRQ -1\r\nDMA_8_BIT -1\r\nDMA_16_BIT -1\r\n";
+        bytes.assign(null_mdi, null_mdi + sizeof(null_mdi) - 1);
     }
     return insert({std::move(bytes), 0, access, access ? paths.overlay : fs::path{}});
 }
