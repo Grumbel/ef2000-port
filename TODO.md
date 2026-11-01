@@ -101,8 +101,8 @@ Implemented and verified:
    deflection, with all 9,089 IRQ0 deliveries matched between runs. Next,
    validate **pitch/throttle effects and two-axis compatibility**, longer
    flight, and exit/pause handling, refine
-   instruction-paced timers and VGA retrace pacing, and add the native Windows
-   launcher. SDL3 window behavior is currently checked with an injected
+   instruction-paced timers and VGA retrace pacing, and validate the Windows
+   C++ Unicorn launcher on Windows or Wine. SDL3 window behavior is currently checked with an injected
    display; real GUI tests must run in a private Xvfb instance.
 
 ## Reproduce
@@ -190,8 +190,13 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
   `--self-test-bda` and a CD-enabled original-game startup replay.
 - [x] Add a wall-clock/PIT scheduler for unlimited interactive C++ Unicorn
   sessions. Avoid Unicorn's implicit per-instruction counting hook, retain
-  the exact instruction-mode diagnostics, and test timeout/tick operation
+  the exact instruction-mode diagnostics, and test block-slice/tick operation
   with a synthetic CPU loop (`--self-test-clock`).
+- [x] Add Win64/Win32 MinGW-w64 C++ Unicorn/SDL3 ZIP packaging using the
+  `sdl-jstest` Nix build pattern, host CryptoAPI for SHA-256 and `%LOCALAPPDATA%`
+  for writable guest files. Keep game and CD assets out of the archives.
+- [ ] Run the bundled Windows synthetic tests under Wine and verify real
+  SDL3 windows, audio, CD music and gamepad input on Windows hardware.
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
   on actual hardware, profile remaining performance bottlenecks in flight
   under the real-time scheduler, and test

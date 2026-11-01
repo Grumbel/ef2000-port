@@ -42,6 +42,8 @@ ef2000-build                           # configure if missing/moved, then build 
 ef2000-run /path/to/_EF2000.EXE        # build then run, using those objects
 ef2000-run-gdb /path/to/_EF2000.EXE    # build then debug native startup.elf in GDB
 nix develop -c ef2000-build            # also works without an interactive shell
+nix build .#ef2000-win64-zip           # Windows x64 archive (C++ Unicorn/SDL3)
+nix build .#ef2000-win32-zip           # Windows x86 archive
 ```
 
 `EF2000_SOURCE` defaults to the directory from which `nix develop` was entered;
@@ -65,6 +67,11 @@ native `ef2000` launcher; `ef2000-startup` remains available as a command
 alias. `apps.unicorn` (also `apps.ef2000-unicorn`) launches the experimental
 SDL3/Unicorn window, while `apps.unicorn-probe` retains its bounded headless
 diagnostic behavior.
+`packages.ef2000-win64-zip` and `packages.ef2000-win32-zip` cross-compile the
+C++ Unicorn/SDL3 frontend with MinGW-w64 and package Windows EXE/DLLs;
+they do not contain the proprietary game files. See the
+[Windows build and usage guide](docs/windows.md). The Python and native64 Linux
+backends are not part of these Windows archives.
 Builds require no original game files. The launcher accepts your external
 executable, creates a new local output directory, and links it with the
 precompiled harness. The executable's parent directory supplies the original
@@ -417,8 +424,9 @@ include `--fullscreen`, `--geometry WIDTHxHEIGHT`,
 `--framebuffer PATH` writes the latest VGA or VBE frame as a PNG in either
 headless or windowed mode. SDL3 must be installed (`EF2000_SDL_LIBRARY` can
 specify its shared library), and windowed mode has so far been checked using
-an injected test display, not a live X server. The portable backend still
-lacks a native Windows launcher and confirmed playable execution. An
+an injected test display, not a live X server. The Python backend still
+lacks a standalone Windows launcher; the C++ runner now has MinGW/SDL3
+archive outputs, though Windows gameplay remains unverified. An
 asset-backed 100-million-instruction probe produced the original 320×200
 Pentium splash screen with its palette; the 30-million-instruction checkpoint
 is still black. The original code then switches into 640×400 VBE mode and
@@ -458,7 +466,8 @@ launcher and dev shell point it at nixpkgs' `sdl3`. Unlike the original SDL2
 port, window events use SDL3's typed structures, joystick selection enumerates
 instance IDs, and audio playback uses SDL3 audio streams. SDL3 migration does
 not change the Linux-specific original-code execution harness. **Native
-Windows builds remain a separate backend porting task**, not a flake output.
+Windows execution of the original code remains a separate backend task**;
+the new Windows flake outputs use the portable C++ Unicorn frontend.
 
 Keep original executables and game data outside this repository. Put generated
 memory dumps, traces, and extracted images in ignored `local/` or `build/`.

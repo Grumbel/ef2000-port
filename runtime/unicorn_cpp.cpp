@@ -1,9 +1,9 @@
 // SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-// Native C++ Unicorn/X-32 runner. This is deliberately a bounded diagnostic
-// during the Python-to-C++ transition; unsupported guest calls stop explicitly.
-// The proprietary executable is read at runtime and is never linked in.
+// Portable C++ Unicorn/X-32 runner for Linux and Windows. Unsupported guest
+// calls stop explicitly; the proprietary executable is only read at runtime
+// and is never linked into the program.
 #include "dos_drive.hpp"
 #include "cd_audio.hpp"
 #include "pcm_audio.hpp"
@@ -11,7 +11,12 @@
 #include "wav_capture.hpp"
 #include <unicorn/unicorn.h>
 #include <unicorn/x86.h>
+#ifdef _WIN32
+#include <windows.h>
+#include <wincrypt.h>
+#else
 #include <openssl/sha.h>
+#endif
 #ifdef EF_UNICORN_SDL3
 #include <SDL3/SDL.h>
 #endif
@@ -478,10 +483,29 @@ std::vector<uint8_t> payload_from_executable(const std::string& path) {
     if (data.size() < 0x80 || le16(data, 0) != 0x5a4d ||
         std::memcmp(data.data() + 0x28, "B23X", 4) != 0)
         throw std::runtime_error("not a supported EF2000 X-32 executable");
-    unsigned char digest[SHA256_DIGEST_LENGTH];
-    SHA256(data.data(), data.size(), digest);
-    char hex[SHA256_DIGEST_LENGTH * 2 + 1]{};
-    for (size_t i = 0; i < SHA256_DIGEST_LENGTH; ++i)
+#ifdef _WIN32
+    // Windows has SHA-256 in CryptoAPI; no OpenSSL DLL is needed in the
+    // distributable, and the original DOS executable remains untouched.
+    HCRYPTPROV provider{};
+    HCRYPTHASH hash{};
+    if (!CryptAcquireContextA(&provider, nullptr, nullptr, PROV_RSA_AES,
+                              CRYPT_VERIFYCONTEXT))
+        throw std::runtime_error("Windows SHA-256 provider unavailable");
+    std::array<uint8_t, 32> digest{};
+    DWORD length = DWORD(digest.size());
+    const bool hashed = CryptCreateHash(provider, CALG_SHA_256, 0, 0, &hash) &&
+                        CryptHashData(hash, data.data(), DWORD(data.size()), 0) &&
+                        CryptGetHashParam(hash, HP_HASHVAL, digest.data(), &length, 0) &&
+                        length == digest.size();
+    if (hash) CryptDestroyHash(hash);
+    CryptReleaseContext(provider, 0);
+    if (!hashed) throw std::runtime_error("Windows SHA-256 computation failed");
+#else
+    std::array<uint8_t, 32> digest{};
+    SHA256(data.data(), data.size(), digest.data());
+#endif
+    char hex[65]{};
+    for (size_t i = 0; i < digest.size(); ++i)
         std::snprintf(hex + 2 * i, 3, "%02x", digest[i]);
     if (std::strcmp(hex, SOURCE_SHA256))
         throw std::runtime_error("unsupported EF2000 executable SHA-256");
@@ -1910,6 +1934,7 @@ void usage(const char* program) {
               << "       --cd-dir DIR provides DOS disc files only; it does not enable music\n"
               << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
               << "       Windowed default: $XDG_STATE_HOME/ef2000/unicorn/drive\n"
+              << "       Windows default: %LOCALAPPDATA%\\ef2000\\state\\unicorn\\drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
               << "       " << program << " --self-test | --self-test-bda | --self-test-clock\n";
@@ -2149,11 +2174,17 @@ int main(int argc, char** argv) {
         if (wall_seconds > 0 && !realtime)
             throw std::runtime_error("--wall-seconds requires real-time timing");
         if (window.enabled && overlay_dir.empty()) {
+#ifdef _WIN32
+            if (const char* local_state = std::getenv("LOCALAPPDATA"); local_state && *local_state)
+                overlay_dir = (fs::path(local_state) / "ef2000/state/unicorn/drive").string();
+            else throw std::runtime_error("set --overlay-dir or LOCALAPPDATA for writable DOS files");
+#else
             if (const char* xdg_state = std::getenv("XDG_STATE_HOME"); xdg_state && *xdg_state)
                 overlay_dir = (fs::path(xdg_state) / "ef2000/unicorn/drive").string();
             else if (const char* home = std::getenv("HOME"); home && *home)
                 overlay_dir = (fs::path(home) / ".local/state/ef2000/unicorn/drive").string();
             else throw std::runtime_error("set --overlay-dir or XDG_STATE_HOME for writable DOS files");
+#endif
         }
         std::stable_sort(mouse_events.begin(), mouse_events.end(),
                          [](const MouseEvent& a, const MouseEvent& b) { return a.tick < b.tick; });

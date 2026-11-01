@@ -25,6 +25,11 @@
           ./VERSION ./LICENSES ./REUSE.toml ./TODO.md ./.gitignore ./flake.nix ./flake.lock
         ];
       };
+      windowsFor = target: crossPkgs: import ./nix/windows.nix {
+        inherit pkgs crossPkgs target version source;
+      };
+      win64 = windowsFor "win64" pkgs.pkgsCross.mingwW64;
+      win32 = windowsFor "win32" pkgs.pkgsCross.mingw32;
       package = pkgs.stdenv.mkDerivation {
         pname = "ef2000";
         inherit version;
@@ -188,7 +193,15 @@
         (devCommand "ef2000-run-gdb" ./dev/run-gdb.sh)
       ];
     in {
-      packages.${system} = { default = package; ef2000 = package; ef2000-startup = package; };
+      packages.${system} = {
+        default = package;
+        ef2000 = package;
+        ef2000-startup = package;
+        ef2000-win64 = win64.dist;
+        ef2000-win64-zip = win64.zip;
+        ef2000-win32 = win32.dist;
+        ef2000-win32-zip = win32.zip;
+      };
       apps.${system} = let
         native = {
           type = "app";
@@ -229,6 +242,22 @@
           ${package}/bin/ef2000-unicorn-cpp --help > "$out"
           test -s "$out"
           ${package}/bin/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
+        '';
+        windows-layout = pkgs.runCommand "ef2000-windows-layout-check" {
+          nativeBuildInputs = [ pkgs.file ];
+        } ''
+          for target in win64 win32; do
+            case "$target" in
+              win64) dist=${win64.dist} ;;
+              win32) dist=${win32.dist} ;;
+            esac
+            dir="$dist/ef2000-${version}-$target"
+            test -s "$dir/ef2000-unicorn-cpp.exe"
+            test -s "$dir/SDL3.dll"
+            test -n "$(find "$dir" -maxdepth 1 -iname '*unicorn*.dll' -print -quit)"
+            file "$dir/ef2000-unicorn-cpp.exe" | grep -q 'PE32'
+          done
+          touch "$out"
         '';
         help = pkgs.runCommand "ef2000-help-check" {} ''
           ${package}/bin/ef2000 --help > "$out"
@@ -291,6 +320,9 @@
           printf '                                  Run bounded headless startup diagnostics\n\n'
           printf '  nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed\n'
           printf '                                  Native C++ Unicorn/SDL3 menu and flight frontend\n\n'
+          printf 'Windows MinGW cross-builds (original game assets are not included):\n'
+          printf '  nix build .#ef2000-win64-zip    Windows x64 executable plus SDL3/Unicorn DLLs\n'
+          printf '  nix build .#ef2000-win32-zip    Windows x86 executable plus SDL3/Unicorn DLLs\n\n'
           printf '  python tools/unicorn_backend.py /path/to/_EF2000.EXE --windowed\n'
           printf '                                  Direct Unicorn backend for development\n\n'
           printf 'Examples:\n'
