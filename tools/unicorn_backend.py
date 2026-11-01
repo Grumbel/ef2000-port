@@ -212,6 +212,32 @@ class MouseScript:
             self.applied.append({'tick': tick, 'x': x, 'y': y, 'buttons': buttons})
 
 
+class KeyScript:
+    """Reproducible SDL scancodes for BIOS and protected-mode keyboard probes."""
+
+    def __init__(self, entries=()):
+        self.events = []
+        self.applied = []
+        for entry in entries:
+            try:
+                values = tuple(map(int, entry.split(':'))) if isinstance(entry, str) else tuple(entry)
+                if len(values) != 4 or any(not isinstance(value, int) for value in values):
+                    raise ValueError()
+                tick, scan, key, pressed = values
+                if tick < 0 or not 0 <= scan <= 255 or not 0 <= key <= 255 or pressed not in (0, 1):
+                    raise ValueError()
+            except (TypeError, ValueError):
+                raise ValueError(f'invalid key event {entry!r}: expected TICK:SDL_SCAN:ASCII:DOWN') from None
+            self.events.append((tick, scan, key, pressed))
+        self.events.sort(key=lambda event: event[0])
+
+    def apply(self, ticks, engine):
+        while self.events and self.events[0][0] <= ticks:
+            tick, scan, key, pressed = self.events.pop(0)
+            engine.key_event(scan, key, bool(pressed))
+            self.applied.append({'tick': tick, 'scan': scan, 'ascii': key, 'down': bool(pressed)})
+
+
 class RealModeBridge:
     """Run X-32 AX=2511 through the shared bounded 16-bit Unicorn engine."""
 
@@ -473,15 +499,17 @@ class X32Selectors:
         self.cpu.mem_write(self.ldt_base + (index + 6) * 8, descriptor)
 
 
-def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
+def run(image, instruction_limit=None, game_dir=None,
         cd_dir=None, overlay_dir=None, ring3=True, sound='off',
-        timer_instructions=250000, mouse_events=(), windowed=False,
+        timer_instructions=250000, mouse_events=(), key_events=(), windowed=False,
         fullscreen=False, geometry=(1280, 960), aspect_ratio='4:3',
         smooth_scaling=False, display_instructions=50000,
         display_factory=None, framebuffer=None):
-    """Run a bounded original-code probe; report the last guest interaction."""
-    if instruction_limit <= 0:
-        raise ValueError('instruction limit must be positive')
+    """Run original-code x86; windowed sessions continue until closed by default."""
+    if instruction_limit is None:
+        instruction_limit = 0 if windowed else DEFAULT_INSTRUCTION_LIMIT
+    if instruction_limit < 0:
+        raise ValueError('instruction limit must not be negative (0 means unlimited)')
     if sound not in ('off', 'original'):
         raise ValueError('sound must be off or original')
     if timer_instructions <= 0:
@@ -595,6 +623,7 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     gameport = GamePort()
     timer = ProtectedTimer(timer_instructions)
     mouse_script = MouseScript(mouse_events)
+    key_script = KeyScript(key_events)
     real_mode = RealModeBridge() if windowed else None
     display = None
     if windowed:
@@ -609,7 +638,7 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
         display.poll(real_mode.engine)
     result = {'status': 'instruction_limit', 'events': events, 'console': [],
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
-              'privileged_ops': [],
+              'privileged_ops': [], 'video_modes': [],
               'instruction_limit': instruction_limit}
 
     def interrupt(uc, vector, _user):
@@ -757,6 +786,10 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
         for name, reg in registers.items():
             if regs[name] != next_regs[name]:
                 uc.reg_write(reg, next_regs[name])
+        if real_mode is not None:
+            mode = real_mode.engine.video_mode
+            if not result['video_modes'] or result['video_modes'][-1]['mode'] != mode:
+                result['video_modes'].append({'instruction': timer.instructions, 'mode': mode})
 
     def instruction(uc, address, size, _user):
         if not (ENTRY <= address < IMAGE_SIZE or
@@ -807,6 +840,10 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
             }, keyboard_pending=keyboard.pending(uc))
             if real_mode is not None and timer.ticks != previous_ticks:
                 mouse_script.apply(timer.ticks, real_mode.engine)
+                key_script.apply(timer.ticks, real_mode.engine)
+                if real_mode.engine.scan_queue:
+                    snapshot = real_mode.engine.sync_input(bytes(uc.mem_read(0x01000000, 0x100000)))
+                    uc.mem_write(0x010f1400, bytes(snapshot[0xf1400:0xf1508]))
 
     def port_in(uc, port, size, _user):
         if port == 0x201:
@@ -872,6 +909,7 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     result['allocation'] = vars(allocation).copy()
     result['conventional_end'] = conventional.end
     result['mouse_events'] = mouse_script.applied
+    result['key_events'] = key_script.applied
     result['timer'] = {'instructions': timer.instructions, 'ticks': timer.ticks,
                        'irq0': timer.interrupts - timer.keyboard_interrupts,
                        'irq1': timer.keyboard_interrupts, 'divisor': timer.divisor,
@@ -896,11 +934,15 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('executable', type=Path, help='original _EF2000.EXE')
-    parser.add_argument('--instruction-limit', type=int, default=DEFAULT_INSTRUCTION_LIMIT)
+    parser.add_argument('--instruction-limit', type=int,
+                        help='guest instruction budget (headless default 30000000; '
+                             'windowed default unlimited; 0 = unlimited)')
     parser.add_argument('--timer-instructions', type=int, default=250000,
                         help='deterministic guest instruction count per PIT tick (default: %(default)s)')
     parser.add_argument('--mouse-event', action='append', default=[], metavar='TICK:X:Y:BUTTONS',
                         help='script mouse coordinates and button mask at a PIT tick; repeat to press/release')
+    parser.add_argument('--key-event', action='append', default=[], metavar='TICK:SCAN:ASCII:DOWN',
+                        help='script SDL keyboard make/break at a PIT tick (e.g. 600:41:27:1 for Escape)')
     parser.add_argument('--game-dir', type=Path, help='read-only asset directory (default: EXE directory)')
     parser.add_argument('--cd-dir', type=Path, help='read-only root for absolute DOS CD paths')
     parser.add_argument('--overlay-dir', type=Path,
@@ -923,6 +965,8 @@ def main():
                         help='save the last available VGA frame to a PNG (including headless)')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
     args = parser.parse_args()
+    if args.instruction_limit is not None and args.instruction_limit < 0:
+        parser.error('--instruction-limit must be nonnegative (0 = unlimited)')
     if args.timer_instructions <= 0:
         parser.error('--timer-instructions must be positive')
     if args.display_instructions <= 0:
@@ -932,6 +976,7 @@ def main():
         parser.error('--geometry must be WIDTHxHEIGHT with dimensions in 1..16384')
     try:
         MouseScript(args.mouse_event)
+        KeyScript(args.key_event)
     except ValueError as exc:
         parser.error(str(exc))
     try:
@@ -944,6 +989,7 @@ def main():
                  cd_dir=args.cd_dir, overlay_dir=args.overlay_dir,
                  ring3=not args.flat_ring0, sound=args.sound,
                  timer_instructions=args.timer_instructions, mouse_events=args.mouse_event,
+                 key_events=args.key_event,
                  windowed=args.windowed, fullscreen=args.fullscreen,
                  geometry=tuple(map(int, match.groups())), aspect_ratio=args.aspect_ratio,
                  smooth_scaling=args.smooth_scaling,

@@ -162,8 +162,15 @@ IRQ0 injection, PIC EOI/IRET, and the original synthetic BIOS timer fallback.
 Ticks are instruction-paced (`--timer-instructions N`, default 250000), not
 wall-clock synchronized. The `--mouse-event TICK:X:Y:BUTTONS` option can
 inject reproducible mouse states (button 1=left, 0=release); events appear in
-the JSON report. Experimental `--windowed` mode now uses the shared SDL3
-renderer and input layer; headless remains the default. SDL3 events are
+the JSON report. Similarly `--key-event TICK:SDL_SCAN:ASCII:DOWN` injects
+keyboard make/break events, e.g. `--key-event 600:41:27:1` and
+`--key-event 605:41:27:0` press and release Escape. Both work in headless probes.
+The report records video-mode changes with instruction counts, making splash
+and VBE transitions traceable. Experimental `--windowed` mode now uses the shared SDL3
+renderer and input layer; headless remains the default. Windowed sessions
+now run until closed (or the guest stops), instead of terminating at the
+headless 30-million-instruction budget. Use `--instruction-limit N` to set
+an explicit budget (0 = unlimited). SDL3 events are
 polled every 50,000 guest instructions (tunable with `--display-instructions N`),
 with rendering capped at 30 FPS. VGA DAC writes update the DOS color palette.
 The window accepts keyboard, captured relative mouse, and joystick/gamepad

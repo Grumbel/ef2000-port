@@ -10,7 +10,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 
-from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, GamePort, KeyboardController, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VectorState,
+from tools.unicorn_backend import (ENTRY, IMAGE_SIZE, ConventionalMemory, GamePort, KeyboardController, KeyScript, MouseScript, ProtectedTimer, RealModeBridge, VgaDac, VectorState,
                                    X32Selectors, UnsupportedGuestOperation, run,
                                    serve_startup_int21, startup_memory)
 from tools.unicorn_files import DosFileError, ReadOnlyDosFiles
@@ -179,6 +179,22 @@ class UnicornStartupServiceTests(unittest.TestCase):
         for bad in ('1:2:3', '-1:2:3:1', '1:640:0:0', '1:0:0:8', 'abc:0:0:0'):
             with self.subTest(bad=bad), self.assertRaises(ValueError):
                 MouseScript([bad])
+
+    def test_headless_key_script_uses_sdl_scans_and_bios_queue(self):
+        from tools.input_devices import HostInput
+        engine = HostInput()
+        script = KeyScript(['8:41:27:1', '12:41:27:0'])
+        script.apply(7, engine)
+        self.assertEqual(list(engine.scan_queue), [])
+        script.apply(8, engine)
+        self.assertEqual(engine.keys, [0x011b])  # Esc: set-1 scan 1 and ASCII 27
+        self.assertEqual(list(engine.scan_queue), [1])
+        script.apply(12, engine)
+        self.assertEqual(list(engine.scan_queue), [1, 0x81])
+        self.assertEqual([entry['tick'] for entry in script.applied], [8, 12])
+        for bad in ('1:2:3', '-1:41:27:1', '1:256:27:1', '1:41:256:1', '1:41:27:2'):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                KeyScript([bad])
 
     def test_invalid_x32_residency_subfunction_sets_carry(self):
         result = serve_startup_int21(0x2f0, dict(self.regs, ax=0x252b, bx=0x61))
@@ -418,9 +434,20 @@ class UnicornGuestTests(unittest.TestCase):
             result = run(bytes(image), instruction_limit=300, framebuffer=path)
             self.assertEqual(result['status'], 'instruction_limit', result.get('detail'))
             self.assertEqual(result['video_mode'], 0x13)
+            self.assertEqual(result['video_modes'][-1]['mode'], 0x13)
             self.assertEqual(result['framebuffer'], str(path))
             self.assertEqual(path.read_bytes()[:8], b'\x89PNG\r\n\x1a\n')
             self.assertEqual(struct.unpack('>II', path.read_bytes()[16:24]), (320, 200))
+
+    def test_headless_keys_are_written_into_guest_mailbox(self):
+        # The guest probes BIOS keyboard once, then loops while a scripted
+        # make/break pair reaches the same mailbox used by live SDL input.
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 9] = bytes.fromhex('b8 01 01 00 00 cd 16 eb fe')
+        result = run(bytes(image), instruction_limit=300, timer_instructions=20,
+                     key_events=['1:41:27:1', '2:41:27:0'])
+        self.assertEqual(result['status'], 'instruction_limit', result.get('detail'))
+        self.assertEqual([e['down'] for e in result['key_events']], [True, False])
 
     def test_windowed_display_pumps_events_and_closes_safely(self):
         displays = []
@@ -449,10 +476,11 @@ class UnicornGuestTests(unittest.TestCase):
 
         image = bytearray(0x195fb0)
         image[ENTRY:ENTRY + 2] = bytes.fromhex('eb fe')
-        result = run(bytes(image), instruction_limit=500, timer_instructions=100,
+        result = run(bytes(image), instruction_limit=0, timer_instructions=100,
                      windowed=True, display_factory=FakeDisplay, display_instructions=10,
                      geometry=(1280, 720), aspect_ratio='native', smooth_scaling=True)
         self.assertEqual(result['status'], 'window_closed', result.get('detail'))
+        self.assertEqual(result['instruction_limit'], 0)
         self.assertEqual(displays[0].updates, 2)
         self.assertEqual(len(displays[0].snapshot), 0x100000)
         self.assertEqual(struct.unpack_from('<IHH', displays[0].snapshot, 0xf1400),
