@@ -3,7 +3,7 @@
 
 """CLI contract for the experimental windowed Unicorn flake app."""
 
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 import io
 from pathlib import Path
 import tempfile
@@ -86,6 +86,15 @@ class UnicornAppTests(unittest.TestCase):
                 code = main(['--show-paths', '--user-data-dir', root], interactive=True)
             self.assertEqual(code, 0)
             self.assertIn(f'user-data: {root} (option)', output.getvalue())
+
+    def test_fast_execution_rejects_incompatible_traces_and_invalid_quantum(self):
+        for arguments in (['--fast-execution', '--trace-decompress'],
+                          ['--fast-execution', '--trace-mouse'],
+                          ['--fast-quantum', '0']):
+            with self.subTest(arguments=arguments), redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as failure:
+                    main(arguments, interactive=True)
+                self.assertEqual(failure.exception.code, 2)
 
 
 if __name__ == '__main__':

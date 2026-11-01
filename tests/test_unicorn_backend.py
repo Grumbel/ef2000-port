@@ -98,6 +98,15 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.assertEqual(joystick.report()['writes'], 1)
         self.assertEqual(joystick.report()['sampled_states'][0]['discharge_counts'],
                          [2, 1, 0, 0])
+        self.assertEqual(joystick.report()['sampled_states'][0]['first_tick'], 0)
+        tick = [12]
+        tracked = GamePort(tick_provider=lambda: tick[0])
+        tracked.write(guest)
+        tick[0] = 15
+        tracked.write(guest)
+        self.assertEqual(tracked.report()['sampled_states'][0]['count'], 2)
+        self.assertEqual((tracked.report()['sampled_states'][0]['first_tick'],
+                          tracked.report()['sampled_states'][0]['last_tick']), (12, 15))
         struct.pack_into('<I', guest.ram, 0xf1400, 0)
         self.assertEqual(joystick.read(guest), 0xff)
         palette = VgaDac()
@@ -143,6 +152,7 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.assertTrue(timer.instruction(guest, 0x2345, vectors, regs))
         self.assertEqual(guest.writes, dict(SP=0x3ff4, IP=0x12345, FLAGS=0x3002))
         self.assertEqual(struct.unpack('<3I', guest.memory[0x3ff4]), (0x2345, 0x2f, 0x3202))
+        self.assertEqual(timer.return_ip, 0x2345)
         self.assertEqual(struct.unpack('<I', guest.memory[DOS_BASE + 0x46c])[0], 1)
         self.assertEqual(timer.interrupts, 1)
         timer.port_out(0x20, 0x20)
@@ -585,6 +595,64 @@ class UnicornGuestTests(unittest.TestCase):
         self.assertGreater(charged['gameport']['writes'], 0)
         self.assertIn([127, 64, 0, 0],
                       [row['discharge_counts'] for row in charged['gameport']['sampled_states']])
+        four_axes = run(bytes(image), instruction_limit=200, timer_instructions=10,
+                        joystick_events=['1:32767:0:0:0:0'], fast_execution=True)
+        self.assertIn((15, [127, 64, 64, 64]),
+                      [(row['mask'], row['discharge_counts'])
+                       for row in four_axes['gameport']['sampled_states']])
+
+    def test_batched_execution_matches_synthetic_timing_and_gameport(self):
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 9] = bytes.fromhex('ba 01 02 00 00 ee ec eb fc')
+        settings = dict(instruction_limit=130, timer_instructions=10,
+                        joystick_events=['1:32767:-32768:1'], sample_instructions=13)
+        exact = run(bytes(image), **settings)
+        fast = run(bytes(image), fast_execution=True, fast_quantum=7, **settings)
+        self.assertEqual(fast['status'], exact['status'])
+        self.assertEqual(fast['timer'], exact['timer'])
+        self.assertEqual(fast['gameport'], exact['gameport'])
+        self.assertEqual(fast['joystick_events'], exact['joystick_events'])
+        self.assertEqual([row['instruction'] for row in fast['ip_samples']],
+                         [row['instruction'] for row in exact['ip_samples']])
+        self.assertEqual(fast['execution']['mode'], 'batched')
+        self.assertTrue(fast['execution']['timing_approximate'])
+        with self.assertRaises(ValueError):
+            run(bytes(image), fast_execution=True, trace_decompress=True)
+        with self.assertRaises(ValueError):
+            run(bytes(image), fast_execution=True, fast_quantum=0)
+
+    def test_batched_video_samples_and_window_close(self):
+        image = bytearray(0x195fb0)
+        image[ENTRY:ENTRY + 9] = bytes.fromhex('b8 13 00 00 00 cd 10 eb fe')
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'screen.png'
+            result = run(bytes(image), instruction_limit=170, fast_execution=True,
+                         fast_quantum=17, framebuffer=path, framebuffer_samples=[50, 150])
+            self.assertEqual(result['status'], 'instruction_limit')
+            self.assertEqual([row['instruction'] for row in result['framebuffer_samples']],
+                             [50, 150])
+            self.assertEqual(result['video_mode'], 0x13)
+
+        class ClosingDisplay:
+            def __init__(self, **_settings):
+                self.closed = False
+                self.menu = SimpleNamespace(open=False)
+                self.updates = 0
+
+            def poll(self, _engine):
+                pass
+
+            def update(self, _engine, _memory):
+                self.updates += 1
+                self.closed = True
+
+            def close(self):
+                pass
+
+        result = run(bytes(image), windowed=True, fast_execution=True,
+                     display_factory=ClosingDisplay, display_instructions=11, fast_quantum=7)
+        self.assertEqual(result['status'], 'window_closed')
+        self.assertEqual(result['timer']['instructions'], 11)
 
     def test_windowed_display_pumps_events_and_closes_safely(self):
         displays = []
@@ -644,6 +712,12 @@ class UnicornGuestTests(unittest.TestCase):
         self.assertEqual(result['status'], 'instruction_limit', result.get('detail'))
         self.assertGreater(result['timer']['irq0'], 5)
         self.assertEqual(result['timer']['ticks'], 50)
+        batched = run(bytes(image), instruction_limit=5000, timer_instructions=100,
+                      fast_execution=True, fast_quantum=17)
+        self.assertEqual(batched['status'], 'instruction_limit')
+        self.assertEqual(batched['timer'], result['timer'])
+        self.assertEqual(batched['execution']['irq_hook_installs'], 50)
+        self.assertEqual(batched['execution']['irq_completions'], 49)
 
     def test_portable_real_mode_bridge_updates_registers_and_guest_memory(self):
         class GuestMemory:

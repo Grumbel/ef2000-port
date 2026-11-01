@@ -113,6 +113,7 @@ class ProtectedTimer:
         self.in_service = False
         self.eoi_seen = False
         self.return_sp = 0
+        self.return_ip = 0
 
     def port_out(self, port, value):
         value &= 255
@@ -155,6 +156,7 @@ class ProtectedTimer:
         self.in_service = True
         self.eoi_seen = False
         self.return_sp = regs['sp']
+        self.return_ip = address
         self.interrupts += 1
         if irq_vector == 9:
             self.keyboard_interrupts += 1
@@ -192,11 +194,12 @@ class VgaStatus:
 class GamePort:
     """Four discharge counters and active-low buttons from the SDL mailbox."""
 
-    def __init__(self):
+    def __init__(self, tick_provider=None):
         self.remaining = [0] * 4
         self.reads = 0
         self.writes = 0
         self.states = {}
+        self.tick_provider = tick_provider or (lambda: 0)
 
     @staticmethod
     def state(cpu):
@@ -211,7 +214,9 @@ class GamePort:
         self.remaining[:] = axes
         self.writes += 1
         key = (mask, buttons, *axes)
-        self.states[key] = self.states.get(key, 0) + 1
+        tick = self.tick_provider()
+        count, first, _last = self.states.get(key, (0, tick, tick))
+        self.states[key] = (count + 1, first, tick)
 
     def read(self, cpu):
         self.reads += 1
@@ -226,8 +231,9 @@ class GamePort:
     def report(self):
         return {'reads': self.reads, 'writes': self.writes,
                 'sampled_states': [{'mask': state[0], 'buttons': state[1],
-                                    'discharge_counts': list(state[2:]), 'count': count}
-                                   for state, count in sorted(self.states.items())]}
+                                    'discharge_counts': list(state[2:]), 'count': record[0],
+                                    'first_tick': record[1], 'last_tick': record[2]}
+                                   for state, record in sorted(self.states.items())]}
 
 
 class MouseScript:
@@ -693,7 +699,7 @@ def run(image, instruction_limit=None, game_dir=None,
         smooth_scaling=False, display_instructions=50000,
         display_factory=None, framebuffer=None, framebuffer_samples=(), sample_instructions=0,
         vga_clock=None, trace_mouse=False, trace_decompress=False,
-        progress_instructions=0):
+        progress_instructions=0, fast_execution=False, fast_quantum=1000):
     """Run original-code x86; windowed sessions continue until closed by default."""
     if instruction_limit is None:
         instruction_limit = 0 if windowed else DEFAULT_INSTRUCTION_LIMIT
@@ -709,6 +715,10 @@ def run(image, instruction_limit=None, game_dir=None,
         raise ValueError('sample_instructions must not be negative')
     if progress_instructions < 0:
         raise ValueError('progress_instructions must not be negative')
+    if fast_quantum <= 0:
+        raise ValueError('fast_quantum must be positive')
+    if fast_execution and (trace_mouse or trace_decompress):
+        raise ValueError('fast execution cannot preserve instruction-level mouse/decompression traces')
     if any(value <= 0 for value in framebuffer_samples):
         raise ValueError('framebuffer sample instructions must be positive')
     if framebuffer_samples and framebuffer is None:
@@ -829,8 +839,8 @@ def run(image, instruction_limit=None, game_dir=None,
     keyboard = KeyboardController()
     dac = VgaDac()
     vga_status = VgaStatus(clock=vga_clock or time.monotonic_ns)
-    gameport = GamePort()
     timer = ProtectedTimer(timer_instructions)
+    gameport = GamePort(tick_provider=lambda: timer.ticks)
     mouse_script = MouseScript(mouse_events)
     key_script = KeyScript(key_events)
     real_mode = RealModeBridge() if windowed or joystick_script.axis_count else None
@@ -854,6 +864,10 @@ def run(image, instruction_limit=None, game_dir=None,
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
               'privileged_ops': [], 'video_modes': [], 'ip_samples': [],
               'instruction_limit': instruction_limit}
+    result['execution'] = {'mode': 'batched' if fast_execution else 'instruction-hook',
+                           'quantum': fast_quantum if fast_execution else 1,
+                           'timing_approximate': bool(fast_execution),
+                           'irq_hook_installs': 0, 'irq_completions': 0}
     if pending_frames:
         result['framebuffer_samples'] = []
     mouse_trace = GuestMouseTrace() if trace_mouse else None
@@ -1235,6 +1249,17 @@ def run(image, instruction_limit=None, game_dir=None,
                     if joystick_changed:
                         uc.mem_write(DOS_BASE + 0xf1600, bytes(snapshot[0xf1600:0xf160a]))
 
+    eoi_hook = None
+
+    def post_eoi_instruction(uc, _address, _size, _user):
+        # The IRQ's IRETD returns to its saved original instruction address.
+        # A hook limited to that exact address observes the restored SP without
+        # running a Python callback for every instruction in the IRQ handler.
+        if (timer.in_service and timer.eoi_seen and
+                uc.reg_read(UC_X86_REG_ESP) == timer.return_sp):
+            timer.in_service = timer.eoi_seen = False
+            result['execution']['irq_completions'] += 1
+
     def port_in(uc, port, size, _user):
         if port == 0x201:
             return gameport.read(uc)
@@ -1274,14 +1299,57 @@ def run(image, instruction_limit=None, game_dir=None,
         uc.emu_stop()
 
     cpu.hook_add(UC_HOOK_INTR, interrupt)
-    cpu.hook_add(UC_HOOK_CODE, instruction)
+    if not fast_execution:
+        cpu.hook_add(UC_HOOK_CODE, instruction)
     if ring3:
         cpu.hook_add(UC_HOOK_INSN, port_in, None, 1, 0, UC_X86_INS_IN)
         cpu.hook_add(UC_HOOK_INSN, port_out, None, 1, 0, UC_X86_INS_OUT)
     try:
         try:
-            cpu.emu_start(table_base + 0x200 if ring3 else ENTRY, 0xffffffff,
-                          count=instruction_limit)
+            if not fast_execution:
+                cpu.emu_start(table_base + 0x200 if ring3 else ENTRY, 0xffffffff,
+                              count=instruction_limit)
+            else:
+                # Run bounded native Unicorn instruction batches without the
+                # expensive per-instruction Python callback. PIT and display
+                # boundaries are exact; an EOI mid-batch is serviced at the
+                # next batch boundary (at most fast_quantum instructions).
+                ip = table_base + 0x200 if ring3 else ENTRY
+                while result['status'] == 'instruction_limit':
+                    count = fast_quantum
+                    count = min(count, timer.interval - timer.instructions % timer.interval)
+                    if instruction_limit:
+                        remaining = instruction_limit - timer.instructions
+                        if remaining <= 0:
+                            break
+                        count = min(count, remaining)
+                    if display is not None:
+                        count = min(count, display_instructions - timer.instructions % display_instructions)
+                    if progress_instructions:
+                        count = min(count, progress_instructions - timer.instructions % progress_instructions)
+                    if pending_frames:
+                        count = min(count, max(1, pending_frames[0] - timer.instructions))
+                    if sample_instructions:
+                        sample_next = (sample_instructions // 2 - timer.instructions - 1) % sample_instructions + 1
+                        count = min(count, sample_next)
+                    cpu.emu_start(ip, 0xffffffff, count=count)
+                    if result['status'] != 'instruction_limit':
+                        break
+                    if eoi_hook is not None and not timer.in_service:
+                        cpu.hook_del(eoi_hook)
+                        eoi_hook = None
+                    timer.instructions += count - 1
+                    ip = cpu.reg_read(UC_X86_REG_EIP)
+                    instruction(cpu, ip, 0, None)
+                    if timer.in_service and eoi_hook is None:
+                        # Arm at the resume address *before* executing the IRQ
+                        # handler, and invalidate the previously translated
+                        # instruction so Unicorn cannot skip this new hook.
+                        eoi_hook = cpu.hook_add(UC_HOOK_CODE, post_eoi_instruction,
+                                                None, timer.return_ip, timer.return_ip)
+                        cpu.ctl_remove_cache(timer.return_ip, timer.return_ip + 1)
+                        result['execution']['irq_hook_installs'] += 1
+                    ip = cpu.reg_read(UC_X86_REG_EIP)
         except UcError as exc:
             result['status'] = 'cpu_fault'
             result['detail'] = str(exc)
@@ -1377,6 +1445,10 @@ def main(argv=None, *, interactive=False):
                         default=100000000 if interactive else 0, metavar='N',
                         help='print running instruction/tick/video/checksum progress to stderr every N instructions '
                              '(0 disables progress; default: %(default)s)')
+    parser.add_argument('--fast-execution', action='store_true',
+                        help='batch guest execution for speed; EOI and trace timing is approximate')
+    parser.add_argument('--fast-quantum', type=int, default=1000, metavar='N',
+                        help='maximum guest instructions per fast batch (default: %(default)s)')
     parser.add_argument('--trace-mouse', action='store_true',
                         help='summarize original guest mouse wrappers, callers, and button state')
     parser.add_argument('--trace-decompress', action='store_true',
@@ -1397,6 +1469,10 @@ def main(argv=None, *, interactive=False):
         parser.error('--sample-instructions must be nonnegative')
     if args.progress_instructions < 0:
         parser.error('--progress-instructions must be nonnegative')
+    if args.fast_quantum <= 0:
+        parser.error('--fast-quantum must be positive')
+    if args.fast_execution and (args.trace_mouse or args.trace_decompress):
+        parser.error('--fast-execution cannot combine with instruction-level tracing')
     if args.fullscreen and not args.windowed:
         parser.error('--fullscreen requires a window (omit --headless)')
     if any(value <= 0 for value in args.framebuffer_sample) or (args.framebuffer_sample and not args.framebuffer):
@@ -1463,7 +1539,8 @@ def main(argv=None, *, interactive=False):
                  framebuffer_samples=args.framebuffer_sample,
                  sample_instructions=args.sample_instructions, trace_mouse=args.trace_mouse,
                  trace_decompress=args.trace_decompress,
-                 progress_instructions=args.progress_instructions)
+                 progress_instructions=args.progress_instructions,
+                 fast_execution=args.fast_execution, fast_quantum=args.fast_quantum)
     if interactive:
         print(f'ef2000-unicorn: {report["status"]}; '
               f'instructions={report["timer"]["instructions"]}', flush=True)
