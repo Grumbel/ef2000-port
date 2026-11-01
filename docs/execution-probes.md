@@ -211,6 +211,37 @@ without an integrity failure. The original loading animation advances as follows
 The progress number resets even while the same label is visible. The 700M
 checkpoint remains in mission environment creation, so it is premature to
 claim a flight renderer failure or that the mission has finished loading.
+Among the last 1,000 real-mode requests at this boundary, 936 are VBE
+`INT 10h AX=4F05h` bank switches, consistent with active 640×400 framebuffer
+updates rather than a guest idle loop.
+
+### Original flight reached under Unicorn
+
+The same asset-backed, scripted Quick Combat replay was extended to **1.02
+billion guest instructions**, using the original installation and unchanged
+menu selection/timer inputs. At **760 million** instructions, the loading screen
+shows **97%** (*Erstelle Umgebung*). At instruction **778,005,467**, the
+original guest invokes the video-mode transition from VBE `0x100` (640×400)
+to VGA `0x13` (320×200). A frame captured at **820 million** shows the
+original cockpit, HUD, instruments, and terrain. The **900-million** and
+**1-billion** frames show changed instruments, terrain, HUD values, and the
+running flight timer, establishing continued original flight simulation and
+rendering rather than a single static picture.
+
+The run stops only at its requested instruction limit (`instruction_limit`),
+at **1,020,000,000 instructions / 10,200 instruction-paced PIT ticks**. All
+**604 original LZ checks pass**, with zero integrity failures. The guest
+remains in VGA `0x13` at that boundary. This is a repeatable positive
+**rendered-flight milestone**, not yet a guarantee of complete playable
+missions, calibrated controls, or sound under Unicorn. Those remain separate
+validation tasks, as does the native Windows launcher.
+
+To extend the replay command below to the same flight milestone, set
+`--instruction-limit 1020000000`, add `--framebuffer /tmp/ef2000-flight.png`,
+and request `--framebuffer-sample 760000000`,
+`--framebuffer-sample 820000000`,
+`--framebuffer-sample 900000000`, and
+`--framebuffer-sample 1000000000`.
 
 To reproduce the mission-start integrity check, run the same timed actions
 against the original, unmodified game files:
@@ -235,3 +266,6 @@ repeat `--framebuffer-sample N` for selected guest instruction counts (e.g.
 `350000000`, `420000000`, `500000000`). These checkpoints write numbered PNGs
 next to the final-frame path and list their actual video modes in the JSON
 report. They reveal intermediate loading screens without separate full replays.
+Add `--progress-instructions 50000000` to print guest instruction/tick counts,
+EIP, current video mode, and decompression-check counter to stderr while the run
+is still executing. Both diagnostics are disabled unless requested.

@@ -66,24 +66,20 @@ Implemented and verified:
    Keep unknown interfaces and model exhaustion as explicit stops.
 6. Document data/mission discoveries separately under `docs/`, with fingerprints,
    offsets, reproducers, and observed/inferred status.
-7. Extend the portable Unicorn backend beyond the now-rendered 640×400 main
-   menu: clicks on the body of *Schnelles Gefecht* trigger the game's script
-   and, with a 230-million-instruction budget, render the original 640×400
-   Quick Combat mission screen from its archive. Earlier clicks on the title
-   bar exercised only a separate window-management gate. Difficulty and mission
-   selection work, and Accept reaches *Simulation wird geladen...*, but the
-   next step is still flight rendering. The original decompressor's former
-   checksum mismatch (`INT 3` at `0xFA167`) was caused by the portable DOS
-   memory window overlapping the protected heap. DOS RAM, PSP and environment
-   now have disjoint mappings; 572 asset integrity checks pass with the
-   original installation through 700 million instructions. The original
-   *TACTCOM 2000* loading screen is still advancing (60% *Erstelle Umgebung*
-   at 700M); the displayed percentage resets within that stage.
-   Use `--framebuffer-sample` to establish when it enters 320×200 flight;
-   refine instruction-paced
-   timers and VGA retrace pacing, and add a native Windows launcher. SDL3
-   window behavior is currently checked with an injected display; real GUI
-   tests must run in a private Xvfb instance.
+7. Validate **portable Unicorn flight controls and longer gameplay**. The
+   original 640×400 main menu, Quick Combat selection, Rookie difficulty,
+   mission 01, and Accept all work through original GUI scripts. The previous
+   asset-decompressor `INT 3` failure was fixed by moving DOS RAM, PSP and
+   environment outside the protected image. A deterministic **1.02-billion-
+   instruction** original-asset replay passes **604 checks**, switches from
+   VBE `0x100` to VGA `0x13` at instruction `778005467`, and renders the
+   **original 320×200 cockpit, terrain, HUD and changing flight instruments**
+   through the final 1.02B checkpoint. Use `--framebuffer-sample` for bounded
+   screenshots and `--progress-instructions` for live stderr status. Next,
+   validate input/controls, longer flight, and exit/pause handling, refine
+   instruction-paced timers and VGA retrace pacing, and add the native Windows
+   launcher. SDL3 window behavior is currently checked with an injected
+   display; real GUI tests must run in a private Xvfb instance.
 
 ## Reproduce
 
