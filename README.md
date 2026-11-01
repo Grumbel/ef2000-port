@@ -187,7 +187,13 @@ an injected test display, not a live X server. The portable backend still
 lacks a native Windows launcher and confirmed playable execution. An
 asset-backed 100-million-instruction probe produced the original 320×200
 Pentium splash screen with its palette; the 30-million-instruction checkpoint
-is still black.
+is still black. The original code then switches into 640×400 VBE mode and
+renders the Digital Image Design splash. That splash remained unchanged
+through a 280-million-instruction probe with 2,800 instruction-paced PIT
+ticks; scripted mouse presses and an Escape make/break (both delivered, with
+two protected IRQ1s for Escape) did not dismiss it. Reaching the interactive
+main menu under Unicorn remains an open diagnostic boundary. The native Linux
+backend does reach it with the same assets.
 No CD marker or additional unpacking is needed for that startup path. This
 does not establish that all game features work under the portable backend.
 

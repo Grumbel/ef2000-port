@@ -583,6 +583,7 @@ class UnicornGuestTests(unittest.TestCase):
         result = run(image, instruction_limit=30000000, game_dir=os.environ['EF2000_DATA_DIR'])
         self.assertEqual(result['status'], 'instruction_limit')
         self.assertEqual(result['video_mode'], 0x13)
+        self.assertEqual([entry['mode'] for entry in result['video_modes']], [3, 0x13])
         self.assertTrue(any(entry['vector'] == 0x10 for entry in result['real_mode_requests']))
         self.assertTrue(any('did1st.dat' == e.get('filename') for e in result['events']))
         self.assertTrue(any('did.dat' in e.get('filename', '') for e in result['events']))
