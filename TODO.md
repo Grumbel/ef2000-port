@@ -75,8 +75,11 @@ Implemented and verified:
    VBE `0x100` to VGA `0x13` at instruction `778005467`, and renders the
    **original 320×200 cockpit, terrain, HUD and changing flight instruments**
    through the final 1.02B checkpoint. Use `--framebuffer-sample` for bounded
-   screenshots and `--progress-instructions` for live stderr status. Next,
-   validate input/controls, longer flight, and exit/pause handling, refine
+   screenshots and `--progress-instructions` for live stderr status. A separate
+   F4 make/break replay at ticks 8300/8305 produces two original keyboard IRQ1s
+   and switches to the original external aircraft view by 860M instructions,
+   with flight still active at 950M. Next, validate **joystick axes and
+   throttle/pitch/roll controls**, longer flight, and exit/pause handling, refine
    instruction-paced timers and VGA retrace pacing, and add the native Windows
    launcher. SDL3 window behavior is currently checked with an injected
    display; real GUI tests must run in a private Xvfb instance.

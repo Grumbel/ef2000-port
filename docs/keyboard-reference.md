@@ -161,8 +161,11 @@ dispatch. These remain a specific reverse-engineering task.
   three seconds also releases host mouse capture. The chart's eject sequence
   is Shift+Escape, not an ordinary press of Escape.
 - Other key actions, including Alt+R VGA/SVGA and Alt+D detail, should
-  normally be transmitted as scan codes. **They have not been individually
-  validated inside the running original game.**
+  normally be transmitted as scan codes. **F4 has now been validated** in the
+  original guest under headless Unicorn: a scripted make/break pair triggers
+  two keyboard IRQ1 deliveries and switches from the cockpit to the original
+  player external view (see [execution probes](execution-probes.md)). Other
+  flight commands have not yet been individually validated in this backend.
 
 Potential follow-up: make F10 padlock views accessible via an alternate
 host-configurable binding (or reserve F10 for the guest with another overlay

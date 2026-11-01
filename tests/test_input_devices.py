@@ -20,6 +20,9 @@ class InputTests(unittest.TestCase):
     def test_pc_make_break_extended_pause_and_modifiers(self):
         self.assertEqual(scan_bytes(4, True), b'\x1e')
         self.assertEqual(scan_bytes(4, False), b'\x9e')
+        # SDL F4 (61) is the original game's external-camera shortcut.
+        self.assertEqual(scan_bytes(61, True), b'\x3e')
+        self.assertEqual(scan_bytes(61, False), b'\xbe')
         self.assertEqual(scan_bytes(82, True), b'\xe0\x48')
         self.assertEqual(scan_bytes(82, False), b'\xe0\xc8')
         self.assertEqual(scan_bytes(70, True), bytes.fromhex('e02ae037'))

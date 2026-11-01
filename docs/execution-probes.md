@@ -243,6 +243,36 @@ and request `--framebuffer-sample 760000000`,
 `--framebuffer-sample 900000000`, and
 `--framebuffer-sample 1000000000`.
 
+### Scripted original flight keyboard input
+
+The original keyboard chart assigns **F4** to player external views. To
+verify input through the portable backend's original keyboard handler, replay
+the same mission start with these extra options:
+
+```sh
+--key-event 8300:61:0:1 --key-event 8305:61:0:0 \
+  --instruction-limit 950000000 \
+  --framebuffer /tmp/ef2000-f4.png \
+  --framebuffer-sample 820000000 --framebuffer-sample 860000000 \
+  --framebuffer-sample 900000000 --framebuffer-sample 940000000
+```
+
+Here `61` is the SDL F4 scancode, mapped to the original PC set-1
+`0x3E` make / `0xBE` break bytes. Both events are injected after flight
+startup (tick 8300). The **820M** pre-input cockpit image is **byte-identical**
+(SHA-256 `2dc4236620235c62a413da89b71e311dddc75eebebb6d4c8187592f0dec4647f`)
+to the earlier unmodified no-input replay. By **860M**, the guest renders an
+external view of its aircraft with the original *Aussen beweglich 1* label;
+the **900M** and **940M** checkpoints retain that view and show continuing
+simulation updates. The report records both applied key events and **two
+protected keyboard IRQ1 deliveries**, compared with zero in the no-input run.
+
+The guest reaches its requested **950M-instruction** limit, remains in
+320×200 VGA, and passes all **604 original LZ checks** without failures.
+This establishes the in-flight keyboard make/break → IRQ1 → original camera
+command → renderer path. It does not yet validate physical keyboard focus,
+joystick axes, throttle, pitch/roll, or mission completion under Unicorn.
+
 To reproduce the mission-start integrity check, run the same timed actions
 against the original, unmodified game files:
 
