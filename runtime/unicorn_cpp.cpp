@@ -17,6 +17,7 @@
 #include <chrono>
 #include <cstdint>
 #include <ctime>
+#include <deque>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -27,6 +28,7 @@
 #include <iterator>
 #include <memory>
 #include <map>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -51,27 +53,88 @@ uint16_t le16(const std::vector<uint8_t>& data, size_t pos) {
 uint32_t le32(const std::vector<uint8_t>& data, size_t pos) {
     return uint32_t(le16(data, pos)) | (uint32_t(le16(data, pos + 2)) << 16);
 }
+struct MouseEvent {
+    uint64_t tick{};
+    int x{}, y{};
+    unsigned buttons{};
+};
+struct KeyEvent {
+    int scan{}, key{};
+    bool down{}, repeat{};
+};
+struct TimedKeyEvent {
+    uint64_t tick{};
+    KeyEvent key;
+};
+struct JoystickEvent {
+    uint64_t tick{};
+    std::array<int, 4> axes{};
+    unsigned count{}, buttons{};
+};
+struct JoystickSnapshot {
+    unsigned count{}, buttons{};
+    std::array<int, 4> axes{};
+};
+struct WindowOptions {
+    bool enabled{}, fullscreen{}, smooth_scaling{};
+    int width = 1280, height = 960;
+    std::string aspect_ratio = "4:3";
+};
+
+std::string virtual_configuration(std::string config, bool joystick) {
+    // Match the Python runner's ephemeral EF2000.CFG view. The game files
+    // themselves are never modified, including when a joystick is attached.
+    std::map<std::string, std::string> overrides = {
+        {"MUSIC", "0,127"}, {"SOUNDFX", "0,127"}, {"SPEECH", "0"},
+        {"VRHELMET", "0"}, {"CONTROL", joystick ? "1" : "0"}};
+    const size_t factor = config.find("JOY_FACTOR=");
+    if (joystick && factor != std::string::npos &&
+        (factor == 0 || config[factor - 1] == '\n')) {
+        const size_t value_start = factor + std::strlen("JOY_FACTOR=");
+        const size_t value_end = config.find_first_of("\r\n", value_start);
+        if (config.substr(value_start, value_end - value_start) == "0")
+            overrides["JOY_FACTOR"] = "100";
+    }
+    for (const auto& [key, value] : overrides) {
+        const std::string prefix = key + "=";
+        const size_t found = config.find(prefix);
+        if (found != std::string::npos && (found == 0 || config[found - 1] == '\n')) {
+            const size_t end = config.find_first_of("\r\n", found);
+            config.replace(found, end == std::string::npos ? end : end - found,
+                           prefix + value);
+        }
+    }
+    return config;
+}
 
 class StartupWindow {
 public:
-    explicit StartupWindow(bool enabled) {
-        if (!enabled) return;
+    explicit StartupWindow(WindowOptions options) : options_(std::move(options)) {
+        if (!options_.enabled) return;
 #ifdef EF_UNICORN_SDL3
-        if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(std::string("SDL_Init: ") + SDL_GetError());
-        window_ = SDL_CreateWindow("EF2000 / Unicorn C++ (early development)", 1280, 960,
-                                   SDL_WINDOW_RESIZABLE);
+        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
+            throw std::runtime_error(std::string("SDL_Init: ") + SDL_GetError());
+        window_ = SDL_CreateWindow("EF2000 / Unicorn C++", options_.width, options_.height,
+                                   SDL_WINDOW_RESIZABLE |
+                                   (options_.fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
         if (!window_) throw std::runtime_error(std::string("SDL_CreateWindow: ") + SDL_GetError());
         renderer_ = SDL_CreateRenderer(window_, nullptr);
         if (!renderer_) throw std::runtime_error(std::string("SDL_CreateRenderer: ") + SDL_GetError());
         if (!SDL_SetRenderLogicalPresentation(renderer_, 640, 480,
-                                              SDL_LOGICAL_PRESENTATION_LETTERBOX))
+                options_.aspect_ratio == "stretch" ? SDL_LOGICAL_PRESENTATION_STRETCH :
+                                                      SDL_LOGICAL_PRESENTATION_LETTERBOX))
             throw std::runtime_error(std::string("SDL_SetRenderLogicalPresentation: ") + SDL_GetError());
+        int count{};
+        SDL_JoystickID* ids = SDL_GetJoysticks(&count);
+        if (ids && count > 0) joystick_ = SDL_OpenJoystick(ids[0]);
+        if (ids) SDL_free(ids);
 #else
         throw std::runtime_error("this binary was built without SDL3; remove --windowed");
 #endif
     }
     ~StartupWindow() {
 #ifdef EF_UNICORN_SDL3
+        if (joystick_) SDL_CloseJoystick(joystick_);
         if (texture_) SDL_DestroyTexture(texture_);
         if (renderer_) SDL_DestroyRenderer(renderer_);
         if (window_) SDL_DestroyWindow(window_);
@@ -85,6 +148,31 @@ public:
         return false;
 #endif
     }
+    bool should_present() const {
+        return std::chrono::steady_clock::now() - last_present_ >=
+               std::chrono::milliseconds(33);
+    }
+    std::vector<MouseEvent> take_mouse_events() {
+        return std::exchange(pending_mouse_, {});
+    }
+    std::vector<KeyEvent> take_key_events() {
+        return std::exchange(pending_keys_, {});
+    }
+    JoystickSnapshot joystick_state() const {
+        JoystickSnapshot value;
+#ifdef EF_UNICORN_SDL3
+        if (joystick_ && SDL_JoystickConnected(joystick_)) {
+            SDL_UpdateJoysticks();
+            value.count = std::clamp(SDL_GetNumJoystickAxes(joystick_), 0, 4);
+            for (unsigned i = 0; i < value.count; ++i)
+                value.axes[i] = SDL_GetJoystickAxis(joystick_, i);
+            const int buttons = std::clamp(SDL_GetNumJoystickButtons(joystick_), 0, 4);
+            for (int i = 0; i < buttons; ++i)
+                if (SDL_GetJoystickButton(joystick_, i)) value.buttons |= 1u << i;
+        }
+#endif
+        return value;
+    }
     bool refresh(uint64_t instructions, uint64_t interrupts, const std::string& status,
                  const std::vector<uint8_t>* frame = nullptr, int width = 0, int height = 0) {
 #ifdef EF_UNICORN_SDL3
@@ -93,7 +181,39 @@ public:
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT || event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED)
                 return false;
+            if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
+                pending_keys_.push_back({int(event.key.scancode), int(event.key.key),
+                                         event.type == SDL_EVENT_KEY_DOWN, bool(event.key.repeat)});
+            if (event.type == SDL_EVENT_MOUSE_MOTION ||
+                event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
+                event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
+                // Translate through SDL's logical-presentation viewport, then
+                // map 4:3 window coordinates into the original guest mode.
+                if (!SDL_ConvertEventToRenderCoordinates(renderer_, &event)) continue;
+                const bool motion = event.type == SDL_EVENT_MOUSE_MOTION;
+                const float x = motion ? event.motion.x : event.button.x;
+                const float y = motion ? event.motion.y : event.button.y;
+                const int guest_width = width ? width : 640;
+                const int guest_height = height ? height : 400;
+                const SDL_FRect target = viewport(guest_width, guest_height);
+                const int mouse_x = std::clamp(int((x - target.x) * guest_width / target.w),
+                                               0, guest_width - 1);
+                const int mouse_y = std::clamp(int((y - target.y) * guest_height / target.h),
+                                               0, guest_height - 1);
+                if (!motion) {
+                    const unsigned bit = event.button.button == SDL_BUTTON_LEFT ? 1u :
+                                         event.button.button == SDL_BUTTON_RIGHT ? 2u :
+                                         event.button.button == SDL_BUTTON_MIDDLE ? 4u : 0u;
+                    if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) mouse_buttons_ |= bit;
+                    else mouse_buttons_ &= ~bit;
+                }
+                pending_mouse_.push_back({0, mouse_x, mouse_y, mouse_buttons_});
+            }
         }
+        const auto now = std::chrono::steady_clock::now();
+        if (now - last_present_ < std::chrono::milliseconds(33)) return true;
+        if (!frame && width > 0) return true;
+        last_present_ = now;
         if (!SDL_SetRenderDrawColor(renderer_, 10, 18, 30, 255) || !SDL_RenderClear(renderer_))
             throw std::runtime_error(std::string("SDL3 clear failed: ") + SDL_GetError());
         bool has_image = false;
@@ -113,9 +233,11 @@ public:
                 if (!texture_) throw std::runtime_error(std::string("SDL3 texture: ") + SDL_GetError());
                 texture_width_ = width;
                 texture_height_ = height;
-                SDL_SetTextureScaleMode(texture_, SDL_SCALEMODE_NEAREST);
+                if (!SDL_SetTextureScaleMode(texture_, options_.smooth_scaling ?
+                        SDL_SCALEMODE_LINEAR : SDL_SCALEMODE_NEAREST))
+                    throw std::runtime_error(std::string("SDL3 texture scale: ") + SDL_GetError());
             }
-            const SDL_FRect destination{0, 0, 640, 480};
+            const SDL_FRect destination = viewport(width, height);
             if (!SDL_UpdateTexture(texture_, nullptr, frame->data(), width * 4) ||
                 !SDL_RenderTexture(renderer_, texture_, nullptr, &destination))
                 throw std::runtime_error(std::string("SDL3 video present failed: ") + SDL_GetError());
@@ -140,10 +262,23 @@ public:
 #endif
     }
 private:
+    WindowOptions options_;
+    unsigned mouse_buttons_{};
+    std::vector<MouseEvent> pending_mouse_;
+    std::vector<KeyEvent> pending_keys_;
+    std::chrono::steady_clock::time_point last_present_{};
 #ifdef EF_UNICORN_SDL3
+    SDL_FRect viewport(int width, int height) const {
+        if (options_.aspect_ratio != "native" || width <= 0 || height <= 0)
+            return {0, 0, 640, 480};
+        const float scale = std::min(640.0f / width, 480.0f / height);
+        const float w = width * scale, h = height * scale;
+        return {(640 - w) / 2, (480 - h) / 2, w, h};
+    }
     SDL_Window* window_{};
     SDL_Renderer* renderer_{};
     SDL_Texture* texture_{};
+    SDL_Joystick* joystick_{};
     int texture_width_{}, texture_height_{};
 #endif
 };
@@ -203,8 +338,12 @@ static_assert(sizeof(Registers) == sizeof(REG_IDS) / sizeof(int) * sizeof(uint32
 class Machine {
 public:
     explicit Machine(const std::vector<uint8_t>& image, fs::path game_dir, fs::path cd_dir,
-                     bool trace_interrupts = false)
+                     bool trace_interrupts = false, std::vector<MouseEvent> mouse_events = {},
+                     std::vector<TimedKeyEvent> key_events = {},
+                     std::vector<JoystickEvent> joystick_events = {})
         : image_size_(image.size()), trace_interrupts_(trace_interrupts),
+          mouse_events_(std::move(mouse_events)), key_events_(std::move(key_events)),
+          joystick_events_(std::move(joystick_events)),
           game_dir_(std::move(game_dir)), cd_dir_(std::move(cd_dir)) {
         if (image.size() < ENTRY + 2 || image.size() > IMAGE_SIZE)
             throw std::runtime_error("invalid initialized image length");
@@ -216,6 +355,8 @@ public:
         write(0, image.data(), image.size());
         initialize_memory();
         initialize_segments();
+        if (!joystick_events_.empty()) set_joystick(joystick_events_.front().count,
+                                                   {0, 0, 0, 0}, 0);
         uc_hook hook{};
         check(uc_hook_add(cpu_, &hook, UC_HOOK_INTR, (void*)on_interrupt, this, 1, 0),
               "install interrupt hook");
@@ -228,19 +369,21 @@ public:
     Machine& operator=(const Machine&) = delete;
     ~Machine() { if (cpu_) uc_close(cpu_); }
 
-    int run(uint64_t limit, bool windowed, uint64_t timer_interval,
+    int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
             const std::string& framebuffer) {
-        StartupWindow window(windowed);
+        StartupWindow window(std::move(window_options));
+        const auto joystick = window.joystick_state();
+        if (joystick.count) set_joystick(joystick.count, joystick.axes, joystick.buttons);
         std::cout << "C++ X-32: original payload " << image_size_ << " bytes; "
-                  << "instruction budget " << limit << '\n';
+                  << "instruction budget " << (limit ? std::to_string(limit) : "unlimited") << '\n';
         if (!refresh(window, 0, "INITIALIZING X-32 GUEST")) return 0;
         // Batch execution leaves the CPU in native Unicorn's C core for most
         // instructions while still delivering deterministic PIT ticks. A
         // 1,000-instruction quantum bounds the EOI-to-return observation gap.
         uint64_t completed = 0;
         bool running = true;
-        while (running && completed < limit && status_ == "instruction_limit") {
-            uint64_t amount = std::min<uint64_t>(1000, limit - completed);
+        while (running && (!limit || completed < limit) && status_ == "instruction_limit") {
+            uint64_t amount = std::min<uint64_t>(1000, limit ? limit - completed : 1000);
             amount = std::min(amount, timer_interval - completed % timer_interval);
             uint32_t ip{};
             check(uc_reg_read(cpu_, UC_X86_REG_EIP, &ip), "read instruction pointer");
@@ -283,10 +426,14 @@ private:
     uc_engine* cpu_{};
     size_t image_size_;
     uint64_t interrupts_{};
-    uint64_t ticks_{}, irq0_{};
+    uint64_t ticks_{}, irq0_{}, irq1_{};
     uint32_t pit_divisor_ = 65536, pit_low_{}, bios_accumulator_{};
     bool pit_high_next_{}, irq_in_service_{}, eoi_seen_{};
     bool keyboard_ack_{};
+    uint8_t shift_flags_{};
+    std::set<int> keys_pressed_;
+    std::deque<uint8_t> scan_queue_;
+    std::deque<uint16_t> bios_keys_;
     uint32_t vga_dac_cursor_{};
     uint32_t irq_return_sp_{}, irq_resume_ip_{};
     uc_hook eoi_hook_{};
@@ -303,24 +450,70 @@ private:
     std::array<std::pair<uint32_t, uint32_t>, 17> exception_vectors_{};
     std::array<uint32_t, 256> real_vectors_{};
     uint16_t video_mode_ = 3;
+    uint16_t video_bank_{};
+    uint32_t video_pitch_ = 640;
+    uint16_t display_x_{}, display_y_{};
+    std::array<uint8_t, 0x100000> vram_{};
     int mouse_x_ = 320, mouse_y_ = 100;
     int mouse_min_x_ = 0, mouse_max_x_ = 639, mouse_min_y_ = 0, mouse_max_y_ = 199;
+    int mouse_motion_x_{}, mouse_motion_y_{};
+    unsigned mouse_buttons_{};
+    std::vector<MouseEvent> mouse_events_;
+    size_t mouse_event_index_{};
+    std::vector<TimedKeyEvent> key_events_;
+    size_t key_event_index_{};
+    std::vector<JoystickEvent> joystick_events_;
+    size_t joystick_event_index_{};
+    unsigned joystick_count_{}, joystick_buttons_{};
+    std::array<int, 4> joystick_axes_{};
+    std::array<uint16_t, 4> joystick_remaining_{};
     fs::path game_dir_, cd_dir_;
     struct OpenFile { std::vector<uint8_t> bytes; uint64_t pos{}; };
     std::map<uint16_t, OpenFile> files_;
 
     struct VideoFrame { uint16_t width{}, height{}; std::vector<uint8_t> rgba; };
+    static std::pair<uint16_t, uint16_t> vbe_dimensions(uint16_t mode) {
+        switch (mode) {
+            case 0x100: return {640, 400};
+            case 0x101: return {640, 480};
+            case 0x103: return {800, 600};
+            case 0x105: return {1024, 768};
+            default: return {0, 0};
+        }
+    }
+    void capture_bank() {
+        if (!vbe_dimensions(video_mode_).first) return;
+        check(uc_mem_read(cpu_, DOS_BASE + 0xa0000, vram_.data() + video_bank_ * 65536,
+                          65536), "capture banked VGA memory");
+    }
     VideoFrame video_frame() {
         VideoFrame frame;
-        if (video_mode_ != 0x13) return frame;
-        frame.width = 320;
-        frame.height = 200;
+        if (video_mode_ == 0x13) {
+            frame.width = 320;
+            frame.height = 200;
+        } else {
+            const auto [width, height] = vbe_dimensions(video_mode_);
+            if (!width) return frame;
+            frame.width = width;
+            frame.height = height;
+        }
         std::array<uint8_t, 768> palette{};
         check(uc_mem_read(cpu_, DOS_BASE + 0xf1000, palette.data(), palette.size()),
               "read VGA DAC palette");
         std::vector<uint8_t> indices(frame.width * frame.height);
-        check(uc_mem_read(cpu_, DOS_BASE + 0xa0000, indices.data(), indices.size()),
-              "read VGA framebuffer");
+        if (video_mode_ == 0x13) {
+            check(uc_mem_read(cpu_, DOS_BASE + 0xa0000, indices.data(), indices.size()),
+                  "read VGA framebuffer");
+        } else {
+            capture_bank();
+            const uint32_t start = display_y_ * video_pitch_ + display_x_;
+            if (uint64_t(start) + uint64_t(frame.height - 1) * video_pitch_ +
+                    frame.width > vram_.size())
+                throw std::runtime_error("VBE display start exceeds banked VRAM");
+            for (unsigned row = 0; row < frame.height; ++row)
+                std::copy_n(vram_.data() + start + row * video_pitch_, frame.width,
+                            indices.data() + row * frame.width);
+        }
         frame.rgba.reserve(indices.size() * 4);
         for (uint8_t index : indices) {
             const size_t pos = size_t(index) * 3;
@@ -333,13 +526,42 @@ private:
     }
     bool refresh(StartupWindow& window, uint64_t completed, const std::string& status) {
         if (!window.enabled()) return true;
-        const auto frame = video_frame();
-        return window.refresh(completed, interrupts_, status, &frame.rgba,
-                              frame.width, frame.height);
+        // Poll input often, but only copy the banked VGA framebuffer and
+        // build RGBA pixels when the next display refresh is actually due.
+        VideoFrame frame;
+        if (video_mode_ == 0x13) {
+            frame.width = 320;
+            frame.height = 200;
+        } else {
+            const auto [width, height] = vbe_dimensions(video_mode_);
+            frame.width = width;
+            frame.height = height;
+        }
+        if (window.should_present()) frame = video_frame();
+        const bool running = window.refresh(completed, interrupts_, status,
+                                            frame.rgba.empty() ? nullptr : &frame.rgba,
+                                            frame.width, frame.height);
+        for (const MouseEvent& event : window.take_mouse_events())
+            set_mouse(event.x, event.y, event.buttons);
+        for (const KeyEvent& event : window.take_key_events())
+            key_event(event.scan, event.key, event.down, event.repeat);
+        const auto joystick = window.joystick_state();
+        if (joystick.count) set_joystick(joystick.count, joystick.axes, joystick.buttons);
+        sync_scan_mailbox();
+        return running;
     }
     void save_framebuffer(const std::string& path) {
         const auto frame = video_frame();
         if (frame.rgba.empty()) return;
+        if (trace_interrupts_) {
+            const auto colors = std::count_if(frame.rgba.begin(), frame.rgba.end(),
+                [](uint8_t channel) { return channel != 0 && channel != 255; });
+            const auto filled = std::count_if(vram_.begin(), vram_.end(),
+                [](uint8_t index) { return index != 0; });
+            std::cerr << "cpp-video: mode=" << std::hex << video_mode_ << std::dec
+                      << " bank=" << video_bank_ << " pitch=" << video_pitch_
+                      << " nonblack_channels=" << colors << " nonzero_vram=" << filled << '\n';
+        }
         std::ofstream output(path, std::ios::binary);
         if (!output) throw std::runtime_error("cannot create framebuffer file: " + path);
         output << "P6\n" << frame.width << " " << frame.height << "\n255\n";
@@ -408,19 +630,8 @@ private:
         std::vector<uint8_t> data((std::istreambuf_iterator<char>(stream)), {});
         // Keep sound off until the original DOS hardware mixer is ported.
         if (path.filename() == "EF2000.CFG" || path.filename() == "ef2000.cfg") {
-            std::string config(data.begin(), data.end());
-            const std::map<std::string, std::string> overrides = {
-                {"MUSIC", "0,127"}, {"SOUNDFX", "0,127"}, {"SPEECH", "0"},
-                {"VRHELMET", "0"}};
-            for (const auto& [key, value] : overrides) {
-                const std::string prefix = key + "=";
-                const size_t found = config.find(prefix);
-                if (found != std::string::npos && (found == 0 || config[found-1] == '\n')) {
-                    const size_t end = config.find_first_of("\r\n", found);
-                    config.replace(found, end == std::string::npos ? end : end - found,
-                                   prefix + value);
-                }
-            }
+            const std::string config = virtual_configuration(
+                {data.begin(), data.end()}, joystick_count_ != 0);
             data.assign(config.begin(), config.end());
         }
         for (uint16_t handle = 5; handle < 64; ++handle)
@@ -494,6 +705,275 @@ private:
         mouse_max_y_ = height - 1;
         mouse_x_ = width / 2;
         mouse_y_ = height / 2;
+        mouse_motion_x_ = mouse_motion_y_ = 0;
+    }
+    void set_mouse(int x, int y, unsigned buttons) {
+        const int dx = x - mouse_x_, dy = y - mouse_y_;
+        mouse_motion_x_ += dx;
+        mouse_motion_y_ += dy;
+        mouse_x_ = std::clamp(mouse_x_ + dx, mouse_min_x_, mouse_max_x_);
+        mouse_y_ = std::clamp(mouse_y_ + dy, mouse_min_y_, mouse_max_y_);
+        mouse_buttons_ = buttons & 7;
+    }
+    void scripted_mouse() {
+        while (mouse_event_index_ < mouse_events_.size() &&
+               mouse_events_[mouse_event_index_].tick <= ticks_) {
+            const MouseEvent& event = mouse_events_[mouse_event_index_++];
+            set_mouse(event.x, event.y, event.buttons);
+            if (trace_interrupts_)
+                std::cerr << "cpp-mouse: tick=" << ticks_ << " x=" << mouse_x_
+                          << " y=" << mouse_y_ << " buttons=" << mouse_buttons_ << '\n';
+        }
+    }
+    void scripted_keyboard() {
+        while (key_event_index_ < key_events_.size() &&
+               key_events_[key_event_index_].tick <= ticks_) {
+            const auto& event = key_events_[key_event_index_++];
+            key_event(event.key.scan, event.key.key, event.key.down, false);
+        }
+        sync_scan_mailbox();
+    }
+    void set_joystick(unsigned count, const std::array<int, 4>& axes, unsigned buttons) {
+        joystick_count_ = std::min(count, 4u);
+        joystick_axes_ = axes;
+        joystick_buttons_ = buttons & 15;
+        sync_joystick_mailbox();
+    }
+    void scripted_joystick() {
+        while (joystick_event_index_ < joystick_events_.size() &&
+               joystick_events_[joystick_event_index_].tick <= ticks_) {
+            const JoystickEvent& event = joystick_events_[joystick_event_index_++];
+            set_joystick(event.count, event.axes, event.buttons);
+            if (trace_interrupts_)
+                std::cerr << "cpp-joystick: tick=" << ticks_ << " x=" << event.axes[0]
+                          << " y=" << event.axes[1] << " count=" << event.count
+                          << " buttons=" << event.buttons << '\n';
+        }
+    }
+    void sync_joystick_mailbox() {
+        write_value<uint8_t>(DOS_BASE + 0xf1600, (1u << joystick_count_) - 1);
+        write_value<uint8_t>(DOS_BASE + 0xf1601, joystick_buttons_);
+        for (unsigned i = 0; i < 4; ++i) {
+            const uint32_t normalized = uint32_t(std::clamp(joystick_axes_[i], -32768, 32767) + 32768);
+            const uint16_t discharge = i < joystick_count_ ? 1 + normalized * 126 / 65535 : 0;
+            write_value<uint16_t>(DOS_BASE + 0xf1602 + i * 2, discharge);
+        }
+    }
+    void charge_joystick() {
+        for (unsigned i = 0; i < 4; ++i) {
+            const uint32_t normalized = uint32_t(std::clamp(joystick_axes_[i], -32768, 32767) + 32768);
+            joystick_remaining_[i] = i < joystick_count_ ? 1 + normalized * 126 / 65535 : 0;
+        }
+    }
+    uint32_t discharge_joystick() {
+        const unsigned mask = (1u << joystick_count_) - 1;
+        uint32_t value = ((~joystick_buttons_ & 15) << 4) | (~mask & 15);
+        for (unsigned i = 0; i < 4; ++i) {
+            if (i < joystick_count_ && joystick_remaining_[i]) {
+                value |= 1u << i;
+                --joystick_remaining_[i];
+            }
+        }
+        return value;
+    }
+    static int pc_scan(int scan, bool& extended) {
+        static constexpr uint8_t letters[] = {0x1e, 0x30, 0x2e, 0x20, 0x12,
+            0x21, 0x22, 0x23, 0x17, 0x24, 0x25, 0x26, 0x32, 0x31,
+            0x18, 0x19, 0x10, 0x13, 0x1f, 0x14, 0x16, 0x2f, 0x11,
+            0x2d, 0x15, 0x2c};
+        static constexpr uint8_t signs[] = {0x1c, 1, 0x0e, 0x0f, 0x39,
+            0x0c, 0x0d, 0x1a, 0x1b, 0x2b, 0x2b, 0x27,
+            0x28, 0x29, 0x33, 0x34, 0x35, 0x3a};
+        static constexpr uint8_t extended_keys[] = {0x52, 0x47, 0x49, 0x53,
+            0x4f, 0x51, 0x4d, 0x4b, 0x50, 0x48};
+        if (scan >= 4 && scan <= 29) return letters[scan - 4];
+        if (scan >= 30 && scan <= 39) return scan - 28;
+        if (scan >= 40 && scan <= 57) return signs[scan - 40];
+        if (scan >= 58 && scan <= 67) return 0x3b + scan - 58;
+        if (scan >= 73 && scan <= 82) { extended = true; return extended_keys[scan - 73]; }
+        if (scan >= 89 && scan <= 99) {
+            static constexpr uint8_t keypad[] = {0x4f, 0x50, 0x51, 0x4b,
+                0x4c, 0x4d, 0x47, 0x48, 0x49, 0x52, 0x53};
+            return keypad[scan - 89];
+        }
+        switch (scan) {
+            case 68: return 0x57; case 69: return 0x58;
+            case 71: return 0x46; case 83: return 0x45;
+            case 85: return 0x37; case 86: return 0x4a; case 87: return 0x4e;
+            case 100: return 0x56;
+            case 224: return 0x1d; case 225: return 0x2a;
+            case 226: return 0x38; case 229: return 0x36;
+            case 84: extended = true; return 0x35;
+            case 88: extended = true; return 0x1c;
+            case 228: extended = true; return 0x1d;
+            case 230: extended = true; return 0x38;
+            default: return -1;
+        }
+    }
+    void key_event(int scan, int key, bool down, bool repeat) {
+        if (scan == 70) { // Print Screen's synthetic shift prefix.
+            const uint8_t bytes[] = {0xe0, uint8_t(down ? 0x2a : 0xb7),
+                                     0xe0, uint8_t(down ? 0x37 : 0xaa)};
+            for (uint8_t byte : bytes) scan_queue_.push_back(byte);
+            return;
+        }
+        if (scan == 72) { // Pause has no release sequence.
+            if (down) for (uint8_t byte : {0xe1, 0x1d, 0x45, 0xe1, 0x9d, 0xc5})
+                scan_queue_.push_back(byte);
+            return;
+        }
+        bool extended = false;
+        const int code = pc_scan(scan, extended);
+        if (code < 0) {
+            if (!down) keys_pressed_.erase(scan);
+            return;
+        }
+        if (down) keys_pressed_.insert(scan);
+        else if (!keys_pressed_.erase(scan)) return;
+        if (extended) scan_queue_.push_back(0xe0);
+        scan_queue_.push_back(uint8_t(code | (down ? 0 : 0x80)));
+        if (down && !repeat) {
+            if (scan == 57) shift_flags_ ^= 0x40;
+            if (scan == 83) shift_flags_ ^= 0x20;
+            if (scan == 71) shift_flags_ ^= 0x10;
+        }
+        const auto pressed = [this](int code) { return keys_pressed_.count(code) != 0; };
+        shift_flags_ = (shift_flags_ & 0xf0) |
+            (pressed(229) ? 1 : 0) | (pressed(225) ? 2 : 0) |
+            ((pressed(224) || pressed(228)) ? 4 : 0) |
+            ((pressed(226) || pressed(230)) ? 8 : 0);
+        if (down && !extended && scan != 224 && scan != 225 && scan != 226 &&
+            scan != 229 && scan != 57 && scan != 71 && scan != 83 && bios_keys_.size() < 64) {
+            int ascii = key >= 0 && key < 256 ? key : 0;
+            if (ascii >= 'a' && ascii <= 'z') {
+                if (shift_flags_ & 4) ascii -= 96;
+                else if (bool(shift_flags_ & 3) != bool(shift_flags_ & 0x40)) ascii -= 32;
+            }
+            if (shift_flags_ & 8) ascii = 0;
+            bios_keys_.push_back(uint16_t((code << 8) | ascii));
+        }
+    }
+    bool keyboard_pending() {
+        if (read_value<uint32_t>(DOS_BASE + 0xf1400) != 0x31504e49) return false;
+        const uint16_t head = read_value<uint16_t>(DOS_BASE + 0xf1404);
+        const uint16_t tail = read_value<uint16_t>(DOS_BASE + 0xf1406);
+        return head < 256 && tail < 256 && head != tail;
+    }
+    void sync_scan_mailbox() {
+        if (scan_queue_.empty()) return;
+        uint16_t head = 0, tail = 0;
+        if (read_value<uint32_t>(DOS_BASE + 0xf1400) == 0x31504e49) {
+            head = read_value<uint16_t>(DOS_BASE + 0xf1404) & 255;
+            tail = read_value<uint16_t>(DOS_BASE + 0xf1406) & 255;
+        }
+        while (!scan_queue_.empty() && ((tail + 1) & 255) != head) {
+            write_value<uint8_t>(DOS_BASE + 0xf1408 + tail, scan_queue_.front());
+            scan_queue_.pop_front();
+            tail = (tail + 1) & 255;
+        }
+        write_value<uint32_t>(DOS_BASE + 0xf1400, 0x31504e49);
+        write_value<uint16_t>(DOS_BASE + 0xf1404, head);
+        write_value<uint16_t>(DOS_BASE + 0xf1406, tail);
+    }
+    bool vbe(Registers& values) {
+        const uint16_t command = values.ax & 0xff;
+        if (trace_interrupts_) {
+            std::cerr << "cpp-vbe: function=" << command << " bx=" << std::hex << values.bx
+                      << " cx=" << values.cx << " dx=" << values.dx << " es=" << values.es
+                      << " di=" << values.di << std::dec << '\n';
+        }
+        values.ax = low16(values.ax, 0x004f);
+        const uint32_t address = ((values.es & 0xffff) << 4) + (values.di & 0xffff);
+        if (command == 0) {
+            if (address > 0x100000 - 512) return fail("VBE info buffer outside DOS RAM"), false;
+            std::array<uint8_t, 512> info{};
+            std::memcpy(info.data(), "VESA", 4);
+            auto write16 = [](uint8_t* target, uint16_t value) {
+                target[0] = value & 255; target[1] = value >> 8;
+            };
+            auto write32 = [&](uint8_t* target, uint32_t value) {
+                write16(target, value & 0xffff); write16(target + 2, value >> 16);
+            };
+            write16(info.data() + 4, 0x0102);
+            write32(info.data() + 6, 0xf0000200);
+            write32(info.data() + 14, 0xf0000300);
+            write16(info.data() + 18, 16);
+            write(DOS_BASE + address, info.data(), info.size());
+            static constexpr char oem[] = "EF2000 virtual VBE BIOS";
+            write(DOS_BASE + 0xf0200, oem, sizeof(oem));
+            uint16_t modes[] = {0x100, 0x101, 0x103, 0x105, 0xffff};
+            write(DOS_BASE + 0xf0300, modes, sizeof(modes));
+        } else if (command == 1) {
+            const auto [width, height] = vbe_dimensions(values.cx & 0x3fff);
+            if (!width) { values.ax = low16(values.ax, 0x014f); return true; }
+            if (address > 0x100000 - 256) return fail("VBE mode-info buffer outside DOS RAM"), false;
+            std::array<uint8_t, 256> info{};
+            auto set16 = [&](size_t pos, uint16_t value) {
+                info[pos] = value & 255; info[pos + 1] = value >> 8;
+            };
+            set16(0, 0x001b);
+            info[2] = 7;
+            set16(4, 64);
+            set16(6, 64);
+            set16(8, 0xa000);
+            set16(16, width);
+            set16(18, width);
+            set16(20, height);
+            const uint8_t attributes[] = {8, 16, 1, 8, 1, 4, 64,
+                                          uint8_t(0x100000 / (width * height) - 1)};
+            std::copy(std::begin(attributes), std::end(attributes), info.begin() + 22);
+            write(DOS_BASE + address, info.data(), info.size());
+        } else if (command == 2) {
+            const uint16_t mode = values.bx & 0x3fff;
+            const auto [width, height] = vbe_dimensions(mode);
+            if (!width || (values.bx & 0x4000)) {
+                values.ax = low16(values.ax, 0x014f);
+            } else {
+                video_mode_ = mode;
+                video_bank_ = 0;
+                video_pitch_ = width;
+                display_x_ = display_y_ = 0;
+                reset_mouse(width, height);
+                if (!(values.bx & 0x8000)) vram_.fill(0);
+                write(DOS_BASE + 0xa0000, vram_.data(), 65536);
+            }
+        } else if (command == 3) {
+            values.bx = low16(values.bx, video_mode_);
+        } else if (command == 5 && (values.bx & 255) == 0) {
+            const uint16_t operation = (values.bx >> 8) & 255;
+            if (operation == 1) values.dx = low16(values.dx, video_bank_);
+            else if (operation == 0 && (values.dx & 0xffff) < 16) {
+                capture_bank();
+                video_bank_ = values.dx & 0xffff;
+                write(DOS_BASE + 0xa0000, vram_.data() + video_bank_ * 65536, 65536);
+            } else values.ax = low16(values.ax, 0x014f);
+        } else if (command == 6 && vbe_dimensions(video_mode_).first &&
+                   (values.bx & 255) <= 1) {
+            const auto [width, height] = vbe_dimensions(video_mode_);
+            const uint32_t pitch = (values.bx & 255) == 0 ?
+                ((values.cx & 0xffff) + 7) & ~7u : video_pitch_;
+            if (pitch < width || pitch * height > vram_.size())
+                values.ax = low16(values.ax, 0x014f);
+            else {
+                video_pitch_ = pitch;
+                values.bx = low16(values.bx, pitch);
+                values.cx = low16(values.cx, pitch);
+                values.dx = low16(values.dx, vram_.size() / pitch);
+            }
+        } else if (command == 7 && vbe_dimensions(video_mode_).first) {
+            const auto [width, height] = vbe_dimensions(video_mode_);
+            const uint16_t x = values.cx & 0xffff, y = values.dx & 0xffff;
+            const uint16_t operation = values.bx & 0xffff;
+            if (operation == 1) {
+                values.cx = low16(values.cx, display_x_);
+                values.dx = low16(values.dx, display_y_);
+            } else if ((operation == 0 || operation == 0x80) &&
+                       x + width <= video_pitch_ &&
+                       (uint64_t(y) + height) * video_pitch_ <= vram_.size()) {
+                display_x_ = x; display_y_ = y;
+            } else values.ax = low16(values.ax, 0x014f);
+        } else values.ax = low16(values.ax, 0x014f);
+        return true;
     }
     bool bios(uint16_t vector, Registers& values) {
         const uint16_t ax = values.ax & 0xffff;
@@ -501,10 +981,11 @@ private:
             if (ax == 0) {
                 values.ax = low16(values.ax, 0xffff);
                 values.bx = low16(values.bx, 2);
-                reset_mouse(video_mode_ == 0x13 ? 320 : 640,
-                            video_mode_ == 0x13 ? 200 : 200);
+                const auto [vbe_width, vbe_height] = vbe_dimensions(video_mode_);
+                reset_mouse(vbe_width ? vbe_width : (video_mode_ == 0x13 ? 320 : 640),
+                            vbe_height ? vbe_height : 200);
             } else if (ax == 3) {
-                values.bx = low16(values.bx, 0);
+                values.bx = low16(values.bx, mouse_buttons_);
                 values.cx = low16(values.cx, mouse_x_);
                 values.dx = low16(values.dx, mouse_y_);
             } else if (ax == 4) {
@@ -517,15 +998,18 @@ private:
                 mouse_min_y_ = values.cx & 0xffff;
                 mouse_max_y_ = values.dx & 0xffff;
             } else if (ax == 0xb) {
-                values.cx = low16(values.cx, 0);
-                values.dx = low16(values.dx, 0);
+                values.cx = low16(values.cx, mouse_motion_x_);
+                values.dx = low16(values.dx, mouse_motion_y_);
+                mouse_motion_x_ = mouse_motion_y_ = 0;
             } else if (ax != 1 && ax != 2 && ax < 0x100) {
                 fail("unsupported BIOS mouse function " + std::to_string(ax));
                 return false;
             }
         } else if (vector == 0x10) {
             const uint8_t ah = ax >> 8;
-            if (ah == 0xf) {
+            if (ah == 0x4f) {
+                if (!vbe(values)) return false;
+            } else if (ah == 0xf) {
                 values.ax = low16(values.ax, ((video_mode_ == 0x13 ? 40 : 80) << 8) | video_mode_);
                 values.bx &= ~0xff00u;
             } else if (ah == 0 && ((ax & 0x7f) == 3 || (ax & 0x7f) == 0x13)) {
@@ -546,8 +1030,17 @@ private:
             }
         } else if (vector == 0x16) {
             const uint8_t ah = ax >> 8;
-            if (ah == 1 || ah == 0x11) values.flags |= 0x40;
-            else if (ah == 2) values.ax &= 0xffffff00;
+            if (ah == 1 || ah == 0x11) {
+                if (bios_keys_.empty()) values.flags |= 0x40;
+                else {
+                    values.ax = low16(values.ax, bios_keys_.front());
+                    values.flags &= ~0x40u;
+                }
+            } else if (ah == 2) values.ax = (values.ax & 0xffffff00) | shift_flags_;
+            else if ((ah == 0 || ah == 0x10) && !bios_keys_.empty()) {
+                values.ax = low16(values.ax, bios_keys_.front());
+                bios_keys_.pop_front();
+            }
             else {
                 fail("unsupported/blocking BIOS keyboard function " + std::to_string(ah));
                 return false;
@@ -569,6 +1062,8 @@ private:
         const uint16_t vector = read_value<uint16_t>(frame);
         if (vector >= 256) { fail("invalid real-mode interrupt vector"); return false; }
         Registers values = before;
+        values.ds = read_value<uint16_t>(frame + 2);
+        values.es = read_value<uint16_t>(frame + 4);
         values.ax = read_value<uint32_t>(frame + 10);
         values.dx = read_value<uint32_t>(frame + 14);
         if (!bios(vector, values)) return false;
@@ -607,7 +1102,7 @@ private:
             if (old[i] != updated[i]) reg(REG_IDS[i], updated[i]);
     }
     void initialize_memory() {
-        static constexpr char command[] = "\x04gui\r";
+        static constexpr char command[] = "\x04 gui\r";
         static constexpr char environment[] = "DID=.\0quick_flag=1\0\0\x01\0C:\\EF2000\\_EF2000.EXE\0";
         write(PSP_BASE + 0x80, command, sizeof(command) - 1);
         write(ENV_BASE, environment, sizeof(environment) - 1);
@@ -672,6 +1167,9 @@ private:
     }
     void deliver_tick(uint32_t next_ip) {
         ++ticks_;
+        scripted_mouse();
+        scripted_keyboard();
+        scripted_joystick();
         bios_accumulator_ += pit_divisor_;
         if (bios_accumulator_ >= 65536) {
             uint32_t previous{};
@@ -681,7 +1179,8 @@ private:
             write_value<uint32_t>(DOS_BASE + 0x46c, previous);
         }
         const Registers regs = read_regs();
-        const auto [handler, selector] = protected_vectors_[8];
+        const int vector = keyboard_pending() && protected_vectors_[9].first != IMAGE_SIZE + 0x100 ? 9 : 8;
+        const auto [handler, selector] = protected_vectors_[vector];
         if (irq_in_service_ || handler >= IMAGE_SIZE ||
             (selector != 0x2c && selector != 0x2f) ||
             (regs.ss != 7 || (regs.flags & 0x200) == 0 || regs.sp < 0x1000)) return;
@@ -697,7 +1196,8 @@ private:
         eoi_seen_ = false;
         irq_return_sp_ = regs.sp;
         irq_resume_ip_ = next_ip;
-        ++irq0_;
+        if (vector == 9) ++irq1_;
+        else ++irq0_;
     }
     static void on_irq_resume(uc_engine*, uint64_t, uint32_t, void* user) {
         auto* machine = static_cast<Machine*>(user);
@@ -920,12 +1420,19 @@ private:
                 std::chrono::steady_clock::now().time_since_epoch()).count();
             return ns % 16666667 >= 15000000 ? 8 : 0;
         }
-        if (port == 0x64) return keyboard_ack_ ? 1 : 0;
+        if (port == 0x64) return keyboard_ack_ || keyboard_pending() ? 1 : 0;
         if (port == 0x60) {
             if (keyboard_ack_) { keyboard_ack_ = false; return 0xfa; }
+            if (keyboard_pending()) {
+                const uint16_t head = read_value<uint16_t>(DOS_BASE + 0xf1404);
+                const uint8_t byte = read_value<uint8_t>(DOS_BASE + 0xf1408 + head);
+                write_value<uint16_t>(DOS_BASE + 0xf1404, (head + 1) & 255);
+                return byte;
+            }
             return 0;
         }
-        if (port == 0x201 || port == 0x61) return 0;
+        if (port == 0x201) return discharge_joystick();
+        if (port == 0x61) return 0;
         char message[80];
         std::snprintf(message, sizeof(message), "unsupported port IN %04x", port);
         fail(message);
@@ -952,7 +1459,8 @@ private:
             vga_dac_cursor_ = (vga_dac_cursor_ + 1) % 768;
             return;
         }
-        if (port == 0x61 || port == 0x201) return;
+        if (port == 0x201) { charge_joystick(); return; }
+        if (port == 0x61) return;
         char message[80];
         std::snprintf(message, sizeof(message), "unsupported port OUT %04x", port);
         fail(message);
@@ -963,9 +1471,15 @@ void usage(const char* program) {
     std::cout << "Usage: " << program << " _EF2000.EXE [--instruction-limit N]"
               << " [--game-dir DIR] [--cd-dir DIR] [--windowed]"
               << " [--timer-instructions N]\n"
+              << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
+              << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
+              << "       --instruction-limit 0 means unlimited (window default)\n"
+              << "       [--mouse-event TICK:X:Y:BUTTONS] (repeat for scripted GUI clicks)\n"
+              << "       [--key-event TICK:SDL_SCAN:ASCII:DOWN] (repeat for guest keys)\n"
+              << "       [--joystick-event TICK:X:Y[:Z:W]:BUTTONS] (2/4 axes)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
-              << "       [--framebuffer picture.ppm] (320x200 VGA mode 13h)\n"
-              << "Experimental native C++ Unicorn X-32 startup probe.\n"
+              << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
+              << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
               << "       " << program << " --self-test\n";
 }
@@ -976,10 +1490,14 @@ int main(int argc, char** argv) {
         std::string path;
         std::string game_dir, cd_dir;
         uint64_t limit = 30000000;
+        bool explicit_limit = false;
         uint64_t timer_interval = 250000;
-        bool windowed = false;
+        WindowOptions window;
         bool self_test = false;
         bool trace_interrupts = false;
+        std::vector<MouseEvent> mouse_events;
+        std::vector<TimedKeyEvent> key_events;
+        std::vector<JoystickEvent> joystick_events;
         std::string framebuffer;
         for (int i = 1; i < argc; ++i) {
             if (!std::strcmp(argv[i], "--help") || !std::strcmp(argv[i], "-h")) {
@@ -989,7 +1507,8 @@ int main(int argc, char** argv) {
                 size_t end{};
                 const std::string value = argv[++i];
                 limit = std::stoull(value, &end);
-                if (end != value.size() || !limit) throw std::runtime_error("invalid instruction limit");
+                if (end != value.size()) throw std::runtime_error("invalid instruction limit");
+                explicit_limit = true;
             } else if (!std::strcmp(argv[i], "--timer-instructions") && i + 1 < argc) {
                 size_t end{};
                 const std::string value = argv[++i];
@@ -1001,31 +1520,117 @@ int main(int argc, char** argv) {
             } else if (!std::strcmp(argv[i], "--cd-dir") && i + 1 < argc) {
                 cd_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--windowed")) {
-                windowed = true;
+                window.enabled = true;
+            } else if (!std::strcmp(argv[i], "--fullscreen")) {
+                window.enabled = window.fullscreen = true;
+            } else if (!std::strcmp(argv[i], "--geometry") && i + 1 < argc) {
+                int width{}, height{};
+                char trailing{};
+                if (std::sscanf(argv[++i], "%dx%d%c", &width, &height, &trailing) != 2 ||
+                    width <= 0 || height <= 0 || width > 16384 || height > 16384)
+                    throw std::runtime_error("invalid --geometry WIDTHxHEIGHT");
+                window.width = width;
+                window.height = height;
+            } else if (!std::strcmp(argv[i], "--aspect-ratio") && i + 1 < argc) {
+                window.aspect_ratio = argv[++i];
+                if (window.aspect_ratio != "4:3" && window.aspect_ratio != "native" &&
+                    window.aspect_ratio != "stretch")
+                    throw std::runtime_error("invalid --aspect-ratio (4:3, native, stretch)");
+            } else if (!std::strcmp(argv[i], "--smooth-scaling")) {
+                window.smooth_scaling = true;
             } else if (!std::strcmp(argv[i], "--self-test")) {
                 self_test = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
                 framebuffer = argv[++i];
             } else if (!std::strcmp(argv[i], "--trace-interrupts")) {
                 trace_interrupts = true;
+            } else if (!std::strcmp(argv[i], "--mouse-event") && i + 1 < argc) {
+                MouseEvent event;
+                unsigned long long tick{};
+                char trailing{};
+                if (std::sscanf(argv[++i], "%llu:%d:%d:%u%c", &tick, &event.x,
+                                &event.y, &event.buttons, &trailing) != 4 ||
+                    event.x < 0 || event.x >= 640 || event.y < 0 || event.y >= 480 ||
+                    event.buttons >= 8)
+                    throw std::runtime_error("invalid --mouse-event TICK:X:Y:BUTTONS");
+                event.tick = tick;
+                mouse_events.push_back(event);
+            } else if (!std::strcmp(argv[i], "--key-event") && i + 1 < argc) {
+                TimedKeyEvent event;
+                unsigned long long tick{};
+                int down{};
+                char trailing{};
+                if (std::sscanf(argv[++i], "%llu:%d:%d:%d%c", &tick,
+                                &event.key.scan, &event.key.key, &down, &trailing) != 4 ||
+                    event.key.scan < 0 || event.key.scan > 255 ||
+                    event.key.key < 0 || event.key.key > 0x10ffff ||
+                    (down != 0 && down != 1))
+                    throw std::runtime_error("invalid --key-event TICK:SDL_SCAN:ASCII:DOWN");
+                event.tick = tick;
+                event.key.down = down;
+                key_events.push_back(event);
+            } else if (!std::strcmp(argv[i], "--joystick-event") && i + 1 < argc) {
+                const std::string value = argv[++i];
+                std::vector<int64_t> fields;
+                size_t begin = 0;
+                while (begin <= value.size()) {
+                    const size_t end = value.find(':', begin);
+                    const std::string field = value.substr(begin, end == std::string::npos ?
+                        std::string::npos : end - begin);
+                    size_t parsed{};
+                    const int64_t number = std::stoll(field, &parsed);
+                    if (parsed != field.size()) throw std::runtime_error("invalid joystick event number");
+                    fields.push_back(number);
+                    if (end == std::string::npos) break;
+                    begin = end + 1;
+                }
+                if ((fields.size() != 4 && fields.size() != 6) || fields[0] < 0 ||
+                    fields.back() < 0 || fields.back() > 15)
+                    throw std::runtime_error("invalid --joystick-event TICK:X:Y[:Z:W]:BUTTONS");
+                JoystickEvent event;
+                event.tick = fields[0];
+                event.count = fields.size() - 2;
+                event.buttons = fields.back();
+                if (!joystick_events.empty() && joystick_events.front().count != event.count)
+                    throw std::runtime_error("mixed joystick axis counts");
+                for (unsigned axis = 0; axis < event.count; ++axis) {
+                    if (fields[axis + 1] < -32768 || fields[axis + 1] > 32767)
+                        throw std::runtime_error("joystick axis outside signed 16-bit range");
+                    event.axes[axis] = fields[axis + 1];
+                }
+                joystick_events.push_back(event);
             } else if (argv[i][0] != '-' && path.empty()) path = argv[i];
             else throw std::runtime_error("unrecognized option: " + std::string(argv[i]));
         }
         if (self_test) {
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
+            constexpr char cfg[] = "CONTROL=1\r\nJOY_FACTOR=0\r\nMUSIC=1,127\r\n";
+            if (virtual_configuration(cfg, false).find("CONTROL=0\r\n") == std::string::npos ||
+                virtual_configuration(cfg, true).find("JOY_FACTOR=100\r\n") == std::string::npos ||
+                virtual_configuration(cfg, true).find("CONTROL=1\r\n") == std::string::npos ||
+                virtual_configuration(cfg, false).find("MUSIC=0,127\r\n") == std::string::npos)
+                throw std::runtime_error("virtual game configuration self-test failed");
             std::vector<uint8_t> image(0x1000);
             constexpr uint8_t guest[] = {0xb8, 0x0b, 0x35, 0x00, 0x00, 0xcd, 0x21,
                                           0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
             std::copy(std::begin(guest), std::end(guest), image.begin() + ENTRY);
             Machine machine(image, {}, {});
-            return machine.run(10000, false, 250000, "");
+            return machine.run(10000, {}, 250000, "");
         }
         if (path.empty()) { usage(argv[0]); return 2; }
+        if (window.enabled && !explicit_limit) limit = 0;
+        std::stable_sort(mouse_events.begin(), mouse_events.end(),
+                         [](const MouseEvent& a, const MouseEvent& b) { return a.tick < b.tick; });
+        std::stable_sort(key_events.begin(), key_events.end(),
+                         [](const TimedKeyEvent& a, const TimedKeyEvent& b) { return a.tick < b.tick; });
+        std::stable_sort(joystick_events.begin(), joystick_events.end(),
+                         [](const JoystickEvent& a, const JoystickEvent& b) { return a.tick < b.tick; });
         const auto image = payload_from_executable(path);
         if (game_dir.empty()) game_dir = fs::path(path).parent_path().string();
         if (cd_dir.empty()) cd_dir = game_dir;
-        Machine machine(image, game_dir, cd_dir, trace_interrupts);
-        return machine.run(limit, windowed, timer_interval, framebuffer);
+        Machine machine(image, game_dir, cd_dir, trace_interrupts,
+                        std::move(mouse_events), std::move(key_events), std::move(joystick_events));
+        return machine.run(limit, window, timer_interval, framebuffer);
     } catch (const std::exception& error) {
         std::cerr << "ef2000-unicorn-cpp: " << error.what() << '\n';
         return 1;
