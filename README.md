@@ -118,18 +118,24 @@ execution, `modify_ldt`, GCC and binutils. It requires Python 3 and Unicorn
 ```sh
 nix run .#unicorn-probe -- /path/to/_EF2000.EXE
 # Or on Windows, with `pip install unicorn`:
-python tools/unicorn_backend.py C:\\EF2000\\_EF2000.EXE --report startup.json
+python tools/unicorn_backend.py C:\EF2000\_EF2000.EXE --report startup.json --overlay-dir C:\EF2000-user\drive --cd-dir D:\
 ```
 
 The original `_EF2000.EXE` remains external and SHA-256 validated. The probe
 implements the observed X-32 stack/heap allocator, selectors, vector services,
-DOS clock, conventional-memory allocations, and **read-only** file open/read/
-seek/close/IOCTL. It records guest console output in the JSON report and never
-writes to the original game files. The original DOS game supplied in the ZIP
-checks for `\\CHECK.CD`, which is absent; the probe executes its original error
-path and exits. A game-provided writable overlay and CD emulation are still
-needed for further progress. An alternate asset directory can be supplied with
-`--game-dir DIR`.
+DOS clock, conventional-memory allocations, and DOS file open/read/write/
+create/seek/close/IOCTL/flush. It records guest console output in the JSON
+report and never writes to the original game files. Original assets and CD
+data are always read-only. Supply `--overlay-dir DIR` to enable game-created
+files and copy-on-first-write under `DIR/EF2000/` (relative game paths) or
+`DIR/` (absolute DOS paths). Without that option, writes fail with DOS error 5.
+An alternate asset directory can be supplied with `--game-dir DIR`.
+
+The original DOS game supplied in the ZIP checks for `\\CHECK.CD`, which is
+absent; the probe executes its original missing-CD error path and exits. With
+a temporary CD marker added for diagnostic testing, it proceeds to the missing
+`\\VIEWS\\VIEWS2.DAT` and creates `TACTCOM.$$$` **only inside the configured
+overlay**. This is not a substitute for the missing CD contents.
 
 The CPU enters ring 3 through an IRETD trampoline with the original X-32
 selector values (`CS=0x2f`, `DS/SS=7`) and a synthetic LDT. This corrects the
@@ -144,10 +150,8 @@ budget can be changed with `--instruction-limit`. The legacy ring-0 model is
 available for comparison via `--flat-ring0`.
 
 Absolute DOS paths such as `\\CHECK.CD` are resolved against `--cd-dir`, while
-relative game paths stay under `--game-dir`. The supplied ZIP lacks both
-`CHECK.CD` and `VIEWS/VIEWS2.DAT`; the latter is the next missing asset observed
-when a temporary CD marker is provided for diagnosis. No CD marker or game
-assets are included in the port or its git bundle.
+relative game paths stay under `--game-dir`. No game or CD assets are included
+in the port or its git bundle.
 
 This is a first verified CPU-execution milestone, not a new `--backend` choice
 for the playable launcher. The existing Linux native backend remains unchanged.

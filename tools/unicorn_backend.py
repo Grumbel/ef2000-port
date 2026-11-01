@@ -21,10 +21,10 @@ import struct
 
 try:
     from .x32_allocation import Allocation
-    from .unicorn_files import DosFileError, ReadOnlyDosFiles
+    from .unicorn_files import DosFileError, DosFiles
 except ImportError:
     from x32_allocation import Allocation
-    from unicorn_files import DosFileError, ReadOnlyDosFiles
+    from unicorn_files import DosFileError, DosFiles
 
 IMAGE_SIZE = 0x4000000
 INITIAL_SP = IMAGE_SIZE - 0x1000
@@ -225,7 +225,7 @@ class X32Selectors:
 
 
 def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
-        cd_dir=None, ring3=True):
+        cd_dir=None, overlay_dir=None, ring3=True):
     """Run a bounded original-code probe; report the last guest interaction."""
     if instruction_limit <= 0:
         raise ValueError('instruction limit must be positive')
@@ -310,7 +310,7 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     allocation = Allocation()
     vectors = VectorState(0x2f if ring3 else 0x2c)
     conventional = ConventionalMemory()
-    files = ReadOnlyDosFiles(game_dir, cd_dir) if game_dir is not None else None
+    files = DosFiles(game_dir, cd_dir, overlay_dir) if game_dir is not None else None
     selectors = X32Selectors(cpu, table_base + 0x100)
     result = {'status': 'instruction_limit', 'events': events, 'console': [],
               'cpu_mode': 'x86-ring3-iopl3' if ring3 else 'x86-ring0-flat',
@@ -373,23 +373,34 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                 next_regs = selectors.service(regs)
             elif (regs['ax'] >> 8) & 0xff == 0x40:
                 handle, count, address = regs['bx'] & 0xffff, regs['cx'], regs['dx']
-                if handle not in (1, 2):
-                    raise UnsupportedGuestOperation('guest file writes require a writable overlay')
                 if address <= 0x260 or address >= IMAGE_SIZE or count > IMAGE_SIZE - address or count > 65536:
                     raise UnsupportedGuestOperation('invalid console output buffer')
-                result['console'].append(bytes(uc.mem_read(address, count)).decode('latin-1'))
-                next_regs = dict(regs, ax=count, flags=regs['flags'] & ~1)
-            elif (regs['ax'] >> 8) & 0xff in (0x3d, 0x3e, 0x3f, 0x42) or (
-                    regs['ax'] & 0xffff in (0x4400,)):
+                payload = bytes(uc.mem_read(address, count))
+                if handle in (1, 2):
+                    result['console'].append(payload.decode('latin-1'))
+                    next_regs = dict(regs, ax=count, flags=regs['flags'] & ~1)
+                else:
+                    if files is None:
+                        raise UnsupportedGuestOperation('DOS file access needs --game-dir')
+                    next_regs = dict(regs)
+                    try:
+                        next_regs['ax'] = files.write(handle, payload)
+                        next_regs['flags'] &= ~1
+                    except DosFileError as exc:
+                        next_regs['ax'] = exc.code
+                        next_regs['flags'] |= 1
+            elif (regs['ax'] >> 8) & 0xff in (0x3c, 0x3d, 0x3e, 0x3f, 0x42, 0x68) or (
+                    regs['ax'] & 0xffff == 0x4400):
                 if files is None:
                     raise UnsupportedGuestOperation('DOS file access needs --game-dir')
                 next_regs = dict(regs)
                 ah = (regs['ax'] >> 8) & 0xff
                 try:
-                    if ah == 0x3d:
+                    if ah in (0x3c, 0x3d):
                         if 'filename' not in event:
                             raise DosFileError(3)
-                        value = files.open(event['filename'], regs['ax'] & 3)
+                        value = (files.create(event['filename']) if ah == 0x3c
+                                 else files.open(event['filename'], regs['ax'] & 3))
                         next_regs['dx'] = 0
                     elif ah == 0x3e:
                         files.close(regs['bx'] & 0xffff)
@@ -409,6 +420,11 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
                         position = files.seek(regs['bx'] & 0xffff, offset, regs['ax'] & 255)
                         next_regs['dx'] = (regs['dx'] & 0xffff0000) | ((position >> 16) & 0xffff)
                         value = position & 0xffff
+                    elif ah == 0x68:
+                        handle = regs['bx'] & 0xffff
+                        if handle > 2:
+                            files.flush(handle)
+                        value = regs['ax']
                     else:
                         handle = regs['bx'] & 0xffff
                         if handle > 2 and handle not in files.handles:
@@ -471,6 +487,14 @@ def run(image, instruction_limit=DEFAULT_INSTRUCTION_LIMIT, game_dir=None,
     except UcError as exc:
         result['status'] = 'cpu_fault'
         result['detail'] = str(exc)
+    if files is not None:
+        for handle in tuple(files.handles):
+            try:
+                files.flush(handle)
+            except DosFileError as exc:
+                result['status'] = 'host_io_error'
+                result['detail'] = f'failed to flush DOS handle {handle}: {exc}'
+                break
     result['ip'] = cpu.reg_read(UC_X86_REG_EIP)
     result['ax'] = cpu.reg_read(UC_X86_REG_EAX)
     result['allocation'] = vars(allocation).copy()
@@ -484,6 +508,8 @@ def main():
     parser.add_argument('--instruction-limit', type=int, default=DEFAULT_INSTRUCTION_LIMIT)
     parser.add_argument('--game-dir', type=Path, help='read-only asset directory (default: EXE directory)')
     parser.add_argument('--cd-dir', type=Path, help='read-only root for absolute DOS CD paths')
+    parser.add_argument('--overlay-dir', type=Path,
+                        help='separate writable DOS drive overlay (original game data remains read-only)')
     parser.add_argument('--flat-ring0', action='store_true', help='diagnose legacy flat ring-0 CPU model')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
     args = parser.parse_args()
@@ -494,7 +520,8 @@ def main():
     _manifest, images = extract(args.executable.read_bytes())
     report = run(images['payload.bin'], args.instruction_limit,
                  game_dir=args.game_dir or args.executable.parent,
-                 cd_dir=args.cd_dir, ring3=not args.flat_ring0)
+                 cd_dir=args.cd_dir, overlay_dir=args.overlay_dir,
+                 ring3=not args.flat_ring0)
     print(json.dumps(report, indent=2))
     if args.report:
         args.report.write_text(json.dumps(report, indent=2) + '\n')

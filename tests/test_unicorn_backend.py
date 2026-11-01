@@ -172,6 +172,54 @@ class DosFileBridgeTests(unittest.TestCase):
             with self.assertRaises(DosFileError):
                 without_cd.open('\\CHECK.CD')
 
+    def test_writable_overlay_copies_original_on_first_write(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            game, overlay = root / 'game', root / 'state'
+            game.mkdir()
+            original = game / 'CONFIG.DAT'
+            original.write_bytes(b'abcdefgh')
+            files = ReadOnlyDosFiles(game, overlay_root=overlay)
+            handle = files.open('config.dat', access=2)
+            self.assertEqual(files.read(handle, 3), b'abc')
+            self.assertEqual(files.write(handle, b'XY'), 2)
+            files.close(handle)
+            self.assertEqual(original.read_bytes(), b'abcdefgh')
+            self.assertEqual((overlay / 'EF2000' / 'CONFIG.DAT').read_bytes(), b'abcXYfgh')
+            handle = files.open('config.dat')
+            self.assertEqual(files.read(handle, 8), b'abcXYfgh')
+            files.close(handle)
+
+    def test_create_seek_and_absolute_drive_overlay(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            game, overlay = root / 'game', root / 'state'
+            game.mkdir()
+            files = ReadOnlyDosFiles(game, overlay_root=overlay)
+            handle = files.create('C:\\TEST.$$$')
+            self.assertEqual(files.write(handle, b'hi'), 2)
+            self.assertEqual(files.seek(handle, 4, 0), 4)
+            self.assertEqual(files.write(handle, b'!'), 1)
+            files.flush(handle)
+            self.assertEqual((overlay / 'TEST.$$$').read_bytes(), b'hi\0\0!')
+            files.close(handle)
+            reopened = files.open('C:\\TEST.$$$')
+            self.assertEqual(files.read(reopened, 5), b'hi\0\0!')
+
+    def test_readonly_files_refuse_mutation_without_overlay(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            original = Path(tmp) / 'DATA.DAT'
+            original.write_bytes(b'original')
+            files = ReadOnlyDosFiles(tmp)
+            with self.assertRaises(DosFileError):
+                files.create('new.dat')
+            with self.assertRaises(DosFileError):
+                files.open('data.dat', access=1)
+            handle = files.open('data.dat')
+            with self.assertRaises(DosFileError):
+                files.write(handle, b'changed')
+            self.assertEqual(original.read_bytes(), b'original')
+
 
 try:
     import unicorn  # noqa: F401
@@ -220,3 +268,18 @@ class UnicornGuestTests(unittest.TestCase):
         self.assertTrue(any('did1st.dat' == e.get('filename') for e in result['events']))
         self.assertTrue(any('did.dat' == e.get('filename') for e in result['events']))
         self.assertTrue(any('Datenset nicht gefunden' in line for line in result['console']))
+
+    @unittest.skipUnless(os.environ.get('EF2000_CD_DIR') and
+                         os.environ.get('EF2000_DATA_DIR') and os.environ.get('EF2000_EXE'),
+                         'requires original game assets and a diagnostic CD marker')
+    def test_guest_writes_only_to_overlay_after_cd_probe(self):
+        from tools.extract_image import extract
+        executable = Path(os.environ['EF2000_EXE'])
+        image = extract(executable.read_bytes())[1]['payload.bin']
+        with tempfile.TemporaryDirectory() as overlay:
+            result = run(image, game_dir=os.environ['EF2000_DATA_DIR'],
+                         cd_dir=os.environ['EF2000_CD_DIR'], overlay_dir=overlay)
+            self.assertEqual(result['status'], 'guest_exit')
+            self.assertTrue(any('VIEWS2.DAT' in line.upper() for line in result['console']))
+            self.assertGreater((Path(overlay) / 'TACTCOM.$$$').stat().st_size, 0)
+            self.assertFalse((Path(os.environ['EF2000_DATA_DIR']) / 'TACTCOM.$$$').exists())
