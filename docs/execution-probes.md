@@ -444,5 +444,10 @@ gameport port 201h. `--geometry`, `--fullscreen`, `--aspect-ratio` and
 `--smooth-scaling` match the Python frontend's display options. Headless
 `--key-event TICK:SDL_SCAN:ASCII:DOWN` and
 `--joystick-event TICK:X:Y[:Z:W]:BUTTONS` provide timed input for investigation.
-Real SDL3 hardware validation, DOS write overlay, digital sound and gameplay
-correctness beyond the checkpoint are still outstanding.
+Use `--overlay-dir DIR` for DOS write access during headless probes, or run
+windowed to use the state directory's `ef2000/unicorn/drive` overlay. The C++
+bridge now saves guest-created and modified files there without changing the
+original game or CD directories. A standalone native C++ test checks the
+drive mapping, disk writes, read-only behavior, and DOS error codes without
+requiring the proprietary game data. Real SDL3 hardware validation, digital
+sound and gameplay correctness beyond the checkpoint remain outstanding.

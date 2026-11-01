@@ -163,10 +163,12 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
   and flight cockpit using a fully C++/Unicorn, scripted 920M-instruction replay.
 - [x] Forward SDL3 mouse, keyboard and joystick input to the guest BIOS/
   keyboard controller/gameport, with headless scripted input options.
+- [x] Add a separately rooted C++ DOS copy-on-write overlay for file create,
+  open, read, write, seek, flush and close; reject writes without an overlay.
 - [ ] Verify live SDL3 rendering, window resizing, gamepad and flight controls
   on actual hardware, and test sustained interactive mission execution.
-- [ ] Implement a writable DOS overlay, native guest audio and remaining
-  operating-system services before switching `.#unicorn` over to C++.
+- [ ] Implement native guest audio and remaining operating-system services
+  before switching `.#unicorn` over to C++.
 `--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA
 model and plays captured digital PCM through SDL. FM music remains disabled in
 this mode. Failed real-mode calls retain mutated memory and CPU state for
