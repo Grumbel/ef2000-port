@@ -143,8 +143,13 @@ data archives; the Linux port loads them successfully. An earlier portable
 probe incorrectly reported missing `\\CHECK.CD` and `\\VIEWS\\VIEWS2.DAT`
 because it omitted the DOS PSP command line and environment used by the Linux
 harness. The portable probe now initializes `gui`, `DID=.` and `quick_flag=1`
-equivalently. On the same installed assets it reads the archives, starts
-`TACTCOM`, and reaches the instruction budget rather than the missing-CD path.
+equivalently, models the keyboard-controller ACK handshake, and resolves DOS
+paths containing `./`. It disables sound in a virtual, read-only configuration
+copy by default (`--sound original` uses the original settings). On the same
+installed assets it reads the archives, starts `TACTCOM`, and reaches the
+X-32 AX=`2511h` real-mode driver interface rather than the missing-CD path.
+The native Linux backend already handles this driver interface, but the
+portable backend does not yet execute real-mode driver code.
 No CD marker or additional unpacking is needed for that startup path. This
 does not establish that all game features work under the portable backend.
 

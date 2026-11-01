@@ -17,10 +17,11 @@ class DosFileError(Exception):
 
 
 class DosFiles:
-    def __init__(self, root, cd_root=None, overlay_root=None):
+    def __init__(self, root, cd_root=None, overlay_root=None, config_data=None):
         self.root = Path(root).resolve()
         self.cd_root = Path(cd_root).resolve() if cd_root is not None else None
         self.overlay_root = Path(overlay_root).resolve() if overlay_root is not None else None
+        self.config_data = config_data
         self.handles = {}
 
     def _resolve(self, filename):
@@ -39,8 +40,8 @@ class DosFiles:
         root = (self.cd_root if absolute else self.root)
         if root is None:
             raise DosFileError(2)
-        parts = path.split('/')
-        if not parts or any(p in ('', '.', '..') or ':' in p for p in parts):
+        parts = [part for part in path.split('/') if part != '.']
+        if not parts or any(p in ('', '..') or ':' in p for p in parts):
             raise DosFileError(3)
         overlay_base = (self.overlay_root if absolute else self.overlay_root / 'EF2000') if self.overlay_root else None
         if overlay_base is not None:
@@ -87,7 +88,9 @@ class DosFiles:
         if source is None:
             raise DosFileError(2)
         try:
-            data = bytearray(source.read_bytes())
+            data = bytearray(self.config_data if (self.config_data is not None and
+                             source == original and source.name.upper() == 'EF2000.CFG')
+                             else source.read_bytes())
         except OSError:
             raise DosFileError(5) from None
         return self._open_handle(data, access, overlay_path if access else None)
@@ -100,8 +103,8 @@ class DosFiles:
         path = path.lstrip('/')
         if absolute and path.startswith('EF2000/'):
             path, absolute = path[7:], False
-        parts = path.split('/')
-        if not parts or any(p in ('', '.', '..') or ':' in p for p in parts):
+        parts = [part for part in path.split('/') if part != '.']
+        if not parts or any(p in ('', '..') or ':' in p for p in parts):
             raise DosFileError(3)
         if self.overlay_root is None:
             raise DosFileError(5)
