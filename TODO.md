@@ -124,6 +124,10 @@ Implemented and verified:
   typed fields, cross-references and count checks. Compare generated missions
   with the built-in TACTCOM editor and historical Strategic Commander output.
   Extract/export for analysis before considering a full editor or modding UI.
+  The **syntactic inventory, block export, route/count validation and 20-pylon
+  flight relationship** are now recovered in `tools/mission_records.py` and
+  `docs/mission-records.md`. Remaining: field units, enum meanings, cross-file
+  references, briefing parsing and original guest reader callsites.
 - [ ] **Version-aware reference/decompilation:** fingerprint the candidate
   `rdeprera/EF2000` v2.0 DOS executable separately; verify its actual
   language, patch level and code/data differences from the German reference.
@@ -135,7 +139,10 @@ Implemented and verified:
   promising an SDL3 GPU implementation. See
   `docs/gfxplus-rendering.md`. The archived `Tactpat.exe` updater has been
   fingerprinted and scanned for embedded Glide 2.1/Voodoo strings, but the
-  **actual installed 3Dfx game executable is still missing**.
+  **actual installed 3Dfx game executable is still missing**. A further public
+  search found patch archives and installers but no verified, directly
+  analyzable installed GFX+ output; resume when a properly sourced 3Dfx
+  `EF2000.EXE` with its companion data files is available.
 
 ## Reproduce
 

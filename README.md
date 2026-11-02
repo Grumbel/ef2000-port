@@ -110,9 +110,12 @@ In particular:
 
 Our German installation already includes **plain-text** `MISSION.CFG`
 (746 mission blocks), `NAVIG.NAV` (1,118 navigation records), and campaign
-files. Reading and validating those records is a promising future
-reconstruction task; a general mission editor is not necessary yet. The
-original game files remain external to the port and its Nix build.
+files. The [read-only mission parser](docs/mission-records.md) now validates
+the record/route counts and can export individual missions and navigation
+blocks as JSON while retaining unknown directives and source line numbers.
+Try `python3 tools/mission_records.py /path/to/EF2000/MISSION.CFG --block MISSION:516`.
+A general mission editor is not necessary yet. The original game files
+remain external to the port and its Nix build.
 
 `EF2000_SOURCE` defaults to the directory from which `nix develop` was entered;
 `EF2000_BUILD_DIR` defaults to `/tmp/ef2000-build` and can be overridden.
@@ -614,6 +617,7 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [Research and evidence conventions](docs/research.md)
 - [Existing modding tools, mission file formats, release variants and 3Dfx research](docs/existing-tools-and-releases.md)
 - [GFX+ 3Dfx patch and rendering interface investigation](docs/gfxplus-rendering.md)
+- [Mission, navigation and campaign text-format reconstruction](docs/mission-records.md)
 
 The mouse starts free and is captured only by a left-click inside the game
 image. That first click captures the pointer without activating a game button.
