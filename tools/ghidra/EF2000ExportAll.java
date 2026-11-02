@@ -11,6 +11,14 @@ import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.FunctionIterator;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.InstructionIterator;
+import ghidra.program.model.listing.Function.FunctionUpdateType;
+import ghidra.program.model.listing.ParameterImpl;
+import ghidra.program.model.listing.Parameter;
+import ghidra.program.model.listing.Variable;
+import ghidra.program.model.listing.VariableStorage;
+import ghidra.program.model.data.DWordDataType;
+import ghidra.program.model.lang.Register;
+import ghidra.program.model.symbol.SourceType;
 import ghidra.program.model.symbol.Reference;
 import ghidra.program.model.lang.PrototypeModel;
 
@@ -28,9 +36,9 @@ public class EF2000ExportAll extends GhidraScript {
     @Override
     protected void run() throws Exception {
         String[] args = getScriptArgs();
-        if (args.length != 5) {
+        if (args.length != 6) {
             throw new IllegalArgumentException(
-                "expected output directory, inventory|decompile, maximum functions (0=all), resume|overwrite, none|fastcall|watcom");
+                "expected output directory, inventory|decompile, maximum functions (0=all), resume|overwrite, none|fastcall|watcom, none|storage");
         }
         if (!currentProgram.getLanguageID().toString().equals("x86:LE:32:default") ||
                 currentProgram.getMemory().getBlock(toAddr(0)) == null ||
@@ -62,6 +70,10 @@ public class EF2000ExportAll extends GhidraScript {
             if (!available) throw new IllegalStateException(
                 "missing experimental Watcom model; prepare a private Ghidra copy with ghidra_watcom.py");
         }
+        if (!args[5].equals("none") && !args[5].equals("storage")) {
+            throw new IllegalArgumentException("expected none or storage fallback");
+        }
+        boolean storageFallback = args[5].equals("storage");
 
         List<Function> functions = new ArrayList<>();
         FunctionIterator iterator = currentProgram.getFunctionManager().getFunctions(true);
@@ -169,7 +181,7 @@ public class EF2000ExportAll extends GhidraScript {
         }
         long functionBytes = 0;
         int written = 0, reused = 0, failed = 0, limited = 0, assemblyFallbacks = 0;
-        int fastcallWritten = 0, watcomWritten = 0;
+        int fastcallWritten = 0, watcomWritten = 0, storageWritten = 0;
         List<String> index = new ArrayList<>();
         index.add("entry\tname\tbody_bytes\tstatus\tfile\terror");
         try {
@@ -202,7 +214,15 @@ public class EF2000ExportAll extends GhidraScript {
                                     usedAlternative = true;
                                 }
                             }
-                            if (!result.decompileCompleted() || result.getDecompiledFunction() == null) {
+                            String pseudoC = result.decompileCompleted() &&
+                                result.getDecompiledFunction() != null ?
+                                result.getDecompiledFunction().getC() : null;
+                            boolean usedStorage = false;
+                            if (pseudoC == null && storageFallback) {
+                                pseudoC = decompileWithTemporaryStorage(function);
+                                usedStorage = pseudoC != null;
+                            }
+                            if (pseudoC == null) {
                                 status = "failed";
                                 error = result.getErrorMessage();
                                 ++failed;
@@ -217,13 +237,19 @@ public class EF2000ExportAll extends GhidraScript {
                                      " parameter evaluation.\n" +
                                      " * This is NOT a proven calling convention or validated original source.\n" :
                                      "") +
+                                    (usedStorage ?
+                                     " * WARNING: default/alternate decompilation failed; C uses a temporary\n" +
+                                     " * custom signature pinning EAX, EDX, EBX, ECX as 32-bit inputs.\n" +
+                                     " * Stack arguments, call sites, and the ABI are NOT verified.\n" : "") +
                                     " */\n\n", offset, function.getName());
                                 Files.createDirectories(file.getParent());
-                                Files.writeString(file, header + result.getDecompiledFunction().getC(),
+                                Files.writeString(file, header + pseudoC,
                                                   StandardCharsets.UTF_8);
-                                status = usedAlternative ? "written_" + fallbackMode + "_fallback" :
+                                status = usedStorage ? "written_storage_fallback" :
+                                         usedAlternative ? "written_" + fallbackMode + "_fallback" :
                                          "written";
-                                if (usedAlternative) {
+                                if (usedStorage) ++storageWritten;
+                                else if (usedAlternative) {
                                     if (fallbackMode.equals("watcom")) ++watcomWritten;
                                     else ++fastcallWritten;
                                 }
@@ -238,6 +264,9 @@ public class EF2000ExportAll extends GhidraScript {
                             // Retain executable-level evidence even when the
                             // high-level decompiler cannot reconcile Watcom
                             // register overlaps or malformed flow graphs.
+                            // A forced refresh must not leave stale pseudo-C
+                            // that the next resume pass would silently reuse.
+                            if (overwrite) Files.deleteIfExists(file);
                             relative = fileName.replace(".c", ".asm");
                             Path assemblyFile = output.resolve(relative);
                             Files.createDirectories(assemblyFile.getParent());
@@ -280,21 +309,84 @@ public class EF2000ExportAll extends GhidraScript {
             "  \"indirect_or_external_call_sites\": %d,\n" +
             "  \"decompilations_written\": %d,\n  \"fastcall_fallback_decompilations\": %d,\n" +
             "  \"watcom_fallback_decompilations\": %d,\n" +
+            "  \"custom_storage_fallback_decompilations\": %d,\n" +
             "  \"decompilations_reused\": %d,\n" +
             "  \"decompilations_failed\": %d,\n  \"assembly_fallbacks\": %d,\n" +
             "  \"orphan_instruction_ranges\": %d,\n" +
             "  \"candidate_entries\": %d,\n  \"decompilations_limited\": %d\n}\n",
             IMAGE_END, functions.size(), functionBytes, instructionCount, instructionBytes,
             orphanInstructionBytes, callSites, directCalls, unresolvedDirectCalls,
-            indirectCalls, written, fastcallWritten, watcomWritten, reused, failed, assemblyFallbacks,
+            indirectCalls, written, fastcallWritten, watcomWritten, storageWritten,
+            reused, failed, assemblyFallbacks,
             orphanRanges.size() - 1,
             candidateEntries.size() - 1, limited);
         Files.writeString(output.resolve("report.json"), report, StandardCharsets.UTF_8);
         println("EF2000: inventoried " + functions.size() + " functions, " +
                 instructionBytes + " instruction bytes, " + unresolvedDirectCalls +
                 " unresolved direct calls; wrote " + written + " (" + fastcallWritten +
-                " fastcall, " + watcomWritten + " Watcom-like fallbacks), reused " + reused +
+                " fastcall, " + watcomWritten + " Watcom-like, " + storageWritten +
+                " temporary-storage fallbacks), reused " + reused +
                 ", failed " + failed + ", limited " + limited + " exports to " + output);
+    }
+
+    /** Retry only a failed function with explicit register inputs.
+     *
+     * Ghidra sometimes creates overlapping inferred input varnodes for X-32
+     * packed stack accesses. A fully custom signature avoids that inference.
+     * Explicitly restore the old signature before aborting the transaction,
+     * including on exceptions. The caller must also use headless -readOnly:
+     * a nested abort alone does not restore signatures in memory promptly.
+     */
+    private String decompileWithTemporaryStorage(Function function) throws Exception {
+        String originalSignature = function.getPrototypeString(false, true);
+        boolean originallyCustom = function.hasCustomVariableStorage();
+        SourceType originalSource = function.getSignatureSource();
+        List<Variable> originalParams = new ArrayList<>();
+        for (Parameter p : function.getParameters()) {
+            originalParams.add(new ParameterImpl(p.getName(), p.getDataType(),
+                p.getVariableStorage(), currentProgram));
+        }
+        int transaction = currentProgram.startTransaction("temporary EF2000 decompiler inputs");
+        try {
+            List<Variable> params = new ArrayList<>();
+            for (String name : new String[] {"EAX", "EDX", "EBX", "ECX"}) {
+                Register register = currentProgram.getLanguage().getRegister(name);
+                params.add(new ParameterImpl("param_" + name, DWordDataType.dataType,
+                    new VariableStorage(currentProgram, register), currentProgram));
+            }
+            function.updateFunction(null, null, FunctionUpdateType.CUSTOM_STORAGE,
+                                    true, SourceType.USER_DEFINED, params.toArray(new Variable[0]));
+            DecompInterface temporary = new DecompInterface();
+            try {
+                if (!temporary.openProgram(currentProgram)) {
+                    throw new IllegalStateException("cannot initialize temporary-storage decompiler");
+                }
+                DecompileResults result = temporary.decompileFunction(function, 30, monitor);
+                return result.decompileCompleted() && result.getDecompiledFunction() != null ?
+                    result.getDecompiledFunction().getC() : null;
+            } finally {
+                temporary.dispose();
+            }
+        } finally {
+            try {
+                // Headless scripts can have an outer transaction, in which
+                // case a nested abort may not immediately restore its state.
+                // Explicitly reinstate the original signature in memory too.
+                function.updateFunction(null, null, originallyCustom ?
+                    FunctionUpdateType.CUSTOM_STORAGE : FunctionUpdateType.DYNAMIC_STORAGE_ALL_PARAMS,
+                    true, originalSource, originalParams.toArray(new Variable[0]));
+            } finally {
+                currentProgram.endTransaction(transaction, false);
+            }
+            Function restored = getFunctionAt(function.getEntryPoint());
+            if (restored == null || restored.hasCustomVariableStorage() != originallyCustom ||
+                    !restored.getPrototypeString(false, true).equals(originalSignature)) {
+                throw new IllegalStateException("temporary signature not restored: before=" +
+                    originalSignature + " custom=" + originallyCustom + " after=" +
+                    (restored == null ? "missing" : restored.getPrototypeString(false, true)) +
+                    " custom=" + (restored == null ? "missing" : restored.hasCustomVariableStorage()));
+            }
+        }
     }
 
     private boolean inImage(Address address) {

@@ -387,3 +387,39 @@ and `0xb8510`. Their decompiler errors are unchanged under both register
 priorities. The custom spec is a **reproducible experiment**, not the complete
 Watcom ABI, and should remain opt-in until its register and stack semantics
 are corroborated against many concrete callers and return sites.
+
+## Full recognized-function pseudo-C coverage (bundle #046)
+
+The final four decompiler failures were input-storage reconciliation errors,
+not missing machine instructions:
+
+| Entry | Original Ghidra error | Tentative role from instruction stream |
+| --- | --- | --- |
+| `0xb3084` | Cannot properly adjust input varnodes | Formatting and displaying world status |
+| `0xb3168` | Cannot properly adjust input varnodes | Related status/layout update |
+| `0xb59a8` | Overlapping input varnodes | Floating-point coordinate calculations and clamping |
+| `0xb8510` | Overlapping input varnodes | Large UI/layout data construction routine |
+
+A disposable project was used to test Ghidra's
+`FunctionUpdateType.CUSTOM_STORAGE` with explicit 32-bit `EAX`, `EDX`, `EBX`,
+`ECX` inputs. This allows Ghidra 11.4.2 to decompile all four functions,
+but the results still contain inferred stack arguments and uncertain
+interprocedural register state. Two independent full-corpus passes yielded:
+
+| Export mode | Pseudo-C | Decompiler failures | Last-resort custom-storage outputs |
+| --- | ---: | ---: | ---: |
+| Plain Ghidra + `--custom-storage-fallback` | **4,203 / 4,203** | **0** | 8 |
+| Watcom-like model + `--custom-storage-fallback` | **4,203 / 4,203** | **0** | 4 |
+
+The custom-storage retry is independent of the modified Ghidra compiler
+specification. It applies temporary function signature annotations in an
+explicit transaction, extracts the generated C, and rolls back that
+transaction after explicitly restoring the original signature. The headless
+analyzer also runs `-readOnly`, protecting the saved Ghidra project. The
+wrapper uses separate ordinary and fallback passes because otherwise a
+temporary annotation can influence C exported later in the same session.
+The exporter labels its files `written_storage_fallback` and emits prominent
+warnings. These are **readable reverse-engineering aids**, not proven C
+implementations. The status `4,203/4,203` measures only functions already
+recognized by this particular analysis project; the 44,884 bytes of
+disassembled instructions outside recognized functions remain unclassified.

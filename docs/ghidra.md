@@ -129,6 +129,55 @@ an explanatory error rather than silently substituting another model.
 On the #044 recovery corpus, this optional mode produced **4,199 pseudo-C
 files and four remaining assembly fallbacks** (one more C function than the
 generic `__fastcall` retry), with no change to discovered function count.
+
+### Complete pseudo-C coverage with temporary custom storage
+
+Ghidra can fail while inferring overlapping input registers or packed stack
+arguments, even when it has successfully disassembled a function. For these
+cases, a final **opt-in** retry pins `EAX`, `EDX`, `EBX`, `ECX` as 32-bit
+parameter locations using Ghidra's `CUSTOM_STORAGE` signature mode. The
+signature changes exist only while the failed function is being retried.
+The tool explicitly restores the original parameters and storage mode,
+aborts its temporary transaction, and checks that the signature is restored.
+The headless invocation also uses **`-readOnly`**, so any project-file
+changes are discarded even if a script or Ghidra crashes.
+The Python wrapper uses **two passes**: normal decompilation first, then a
+second headless process which reuses the unaffected C and retries only the
+remaining failures. This prevents speculative function signatures from
+changing the pseudo-C of later ordinary functions. Consequently the final
+report usually counts ordinary C files as `decompilations_reused`, not
+`decompilations_written`. The first pass's `.asm` diagnostics are intentionally
+retained beside successfully recovered `.c` files for cross-checking; an
+`assembly_fallbacks` count of zero means no recognized function is *only*
+available as assembly.
+
+This workaround requires **no modified Ghidra distribution**; it works with
+the ordinary Ghidra installation in `nix develop`:
+
+```sh
+python3 tools/ghidra_ef2000.py export-all \
+  --custom-storage-fallback \
+  --output local/ghidra/custom-storage-export
+```
+
+Use `--workspace PATH` to select an existing recovered/annotated Ghidra
+project. The documented 4,203-function result came from the independently
+recovered #044 analysis project, not a fresh unanalyzed import.
+
+With the #044 recovery project in Ghidra 11.4.2 this produced **4,203
+pseudo-C files for 4,203 recognized functions**, with eight
+`written_storage_fallback` results, zero failed decompilations and zero
+assembly-only files. Alternatively, combining `--watcom-fallback` and
+`--custom-storage-fallback` (with the private Watcom Ghidra installation
+above) yields four Watcom-model retries and four custom-storage retries.
+The `custom_storage_fallback_decompilations` report field counts the latter.
+
+These additional files have **unverified parameter declarations**, and
+misleading or incomplete call arguments remain possible. The tool labels
+every such file in its header and in `functions.tsv`. It does not prove that
+every function has been discovered, that the original ABI is understood, or
+that the pseudo-C can be compiled to reproduce the original program.
+
 If Ghidra is upgraded, make a copy of your project before opening it with
 the newer release, since Ghidra can migrate the project database.
 

@@ -156,9 +156,9 @@ class GhidraWorkflowTests(unittest.TestCase):
         def fake_ghidra(command, check):
             self.assertTrue(check)
             self.assertIn('-noanalysis', command)
-            self.assertEqual(command[-6:], ['EF2000ExportAll.java',
+            self.assertEqual(command[-7:], ['EF2000ExportAll.java',
                                             str(self.workspace / 'full-export'),
-                                            'inventory', '0', 'resume', 'none'])
+                                            'inventory', '0', 'resume', 'none', 'none'])
             output = self.workspace / 'full-export'
             (output / 'functions.tsv').write_text('entry\tname\n')
             (output / 'calls.tsv').write_text('caller_entry\tcall_site\n')
@@ -175,6 +175,41 @@ class GhidraWorkflowTests(unittest.TestCase):
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
             ghidra.export_all(args)
 
+    def test_custom_storage_fallback_is_independent_of_watcom_model(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(command='export-all', workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  limit=4, overwrite=True, watcom_fallback=True,
+                                  custom_storage_fallback=True)
+        calls = []
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-readOnly', command)
+            calls.append(command[-5:])
+            output = self.workspace / 'full-export'
+            (output / 'report.json').write_text(json.dumps({
+                'initialized_image_bytes': ghidra.IMAGE_SIZE,
+                'discovered_functions': 4203, 'decompilations_written': 4,
+                'decompilations_reused': 0, 'decompilations_failed': 0,
+                'decompilations_limited': 4199,
+            }))
+            (output / 'functions.tsv').write_text('entry\tstatus\n')
+            (output / 'calls.tsv').write_text('call_site\ttarget\n')
+            (output / 'candidate-entries.tsv').write_text('entry\treason\n')
+            (output / 'orphan-ranges.tsv').write_text('start\tend_exclusive\n')
+            (output / 'orphan-instructions.asm').write_text('; nothing unassigned\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.export_all(args)
+        self.assertEqual(calls, [
+            ['decompile', '4', 'overwrite', 'watcom', 'none'],
+            ['decompile', '4', 'resume', 'watcom', 'storage'],
+        ])
+
     def test_full_export_passes_limit_and_overwrite_to_ghidra(self):
         (self.workspace / 'projects').mkdir(parents=True)
         (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
@@ -186,7 +221,7 @@ class GhidraWorkflowTests(unittest.TestCase):
 
         def fake_ghidra(command, check):
             self.assertTrue(check)
-            self.assertEqual(command[-4:], ['decompile', '12', 'overwrite', 'fastcall'])
+            self.assertEqual(command[-5:], ['decompile', '12', 'overwrite', 'fastcall', 'none'])
             output = self.workspace / 'full-export'
             (output / 'report.json').write_text(json.dumps({
                 'initialized_image_bytes': ghidra.IMAGE_SIZE,

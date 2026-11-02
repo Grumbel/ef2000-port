@@ -182,12 +182,23 @@ def export_all(args):
     mode = 'inventory' if args.command == 'inventory' else 'decompile'
     command = project_args(workspace, headless_path(args.analyze_headless)) + [
         '-process', IMAGE_NAME, '-noanalysis',
+        *(['-readOnly'] if getattr(args, 'custom_storage_fallback', False) else []),
         '-postScript', 'EF2000ExportAll.java', str(output), mode,
         str(getattr(args, 'limit', 0)),
         'overwrite' if getattr(args, 'overwrite', False) else 'resume',
         'watcom' if getattr(args, 'watcom_fallback', False) else
         'fastcall' if getattr(args, 'fastcall_fallback', False) else 'none',
+        'storage' if getattr(args, 'custom_storage_fallback', False) else 'none',
     ]
+    if getattr(args, 'custom_storage_fallback', False):
+        # Temporary signature changes can affect how Ghidra renders callers
+        # later in the SAME headless process, even after restoring the
+        # function. Export ordinary C first, then retry only failures in a
+        # separate read-only process while reusing the already-written C.
+        first_pass = command.copy()
+        first_pass[-1] = 'none'
+        subprocess.run(first_pass, check=True)
+        command[-3] = 'resume'
     subprocess.run(command, check=True)
     for name in files:
         file = output / name
@@ -330,6 +341,8 @@ def main(argv=None):
                             help='optionally retry failed pseudo-C with an unverified __fastcall evaluation model')
     all_export.add_argument('--watcom-fallback', action='store_true',
                             help='retry failed pseudo-C using the optional experimental EAX/EDX/EBX/ECX model')
+    all_export.add_argument('--custom-storage-fallback', action='store_true',
+                            help='last-resort decompilation using temporary, unverified register parameters')
     recovery = subparsers.choices['recover-orphans']
     recovery.add_argument('--output', type=Path,
                           help='TSV report (default: workspace/recovery-candidates.tsv)')
