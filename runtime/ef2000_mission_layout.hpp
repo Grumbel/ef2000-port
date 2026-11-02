@@ -57,6 +57,48 @@ struct Mission {
     std::array<std::uint8_t, 4> unknown_17{};
 };
 
+// 0x0000eefc: one member of a TARGET_AREA (LEAD, TWO, THREE, ...).
+// 0x0000f314 allocates unit_count * 0x15 and advances by 0x15 each time.
+struct TargetMember {
+    std::uint8_t target_type = 0;    // +0x00, target-type enum
+    Le32 name_guest_ptr{};           // +0x01, separately allocated text
+    std::array<std::uint8_t, 2> unknown_05{};
+    std::array<Le16, 6> parameters_le{}; // +0x07, six signed numeric fields
+    std::array<std::uint8_t, 2> unknown_13{};
+};
+
+// 0x0000fe4c: PIL record. Unlike the text row, the in-memory object has
+// an unwritten byte at +4. 0x0000f314 uses a 0x16 stride for each pilot.
+struct Pilot {
+    Le32 name_guest_ptr{};           // +0x00, separately allocated text
+    std::uint8_t unknown_04 = 0;
+    std::array<std::uint8_t, 5> parameters_05{};
+    std::array<Le16, 6> parameters_0a_le{};
+};
+
+// 0x0000efe8: ATTACK_NODE, 0x11 bytes. The action is a separate
+// three-entry enum (STRIKE, STRIKE_THEN_TURN, PASS).
+struct AttackNode {
+    Le32 parameter0_le{};
+    Le32 parameter1_le{};
+    std::array<Le16, 4> parameters_08_le{};
+    std::uint8_t action = 0;       // +0x10
+};
+
+// 0x0000f038: ATTACK_ROUTE, 0x06 bytes, with count * 0x11 nodes.
+struct AttackRoute {
+    Le16 node_count_le{};
+    Le32 nodes_guest_ptr{};
+};
+
+// 0x0000f08c: ATTACK_PATTERN, 0x07 bytes, with count * 0x06 routes.
+// The text's pattern name is consumed but not stored by this reader.
+struct AttackPattern {
+    std::uint8_t unknown_00 = 0;  // not written by 0x0000f08c
+    Le16 route_count_le{};
+    Le32 routes_guest_ptr{};
+};
+
 // 0x0000f604 allocates count*0x7c; 0x0000f314 parses each group.
 struct Group {
     std::uint8_t unit_type = 0;    // +0x00, plane/ship/ground enum
@@ -69,7 +111,11 @@ struct Group {
     Le16 waypoint_count_le{};      // +0x1c
     Le16 last_waypoint_le{};       // +0x1e
     Le32 waypoints_guest_ptr{};     // +0x20
-    std::array<std::uint8_t, 0x31> unknown_24{};
+    std::array<std::uint8_t, 0x16> unknown_24{};
+    std::uint8_t target_area_type = 0; // +0x3a, conditionally assigned
+    Le32 target_area_name_guest_ptr{}; // +0x3b, conditional text allocation
+    Position3D target_area_position{}; // +0x3f, conditional
+    Le32 target_members_guest_ptr{};   // +0x51, conditional unit_count * 0x15
     std::array<std::uint8_t, 20> pylons{};  // +0x55, weapon enum indices
     Le32 pilots_guest_ptr{};        // +0x69, conditional
     std::array<std::uint8_t, 7> unknown_6d{};
@@ -128,6 +174,11 @@ struct NavigationRoute {
 static_assert(sizeof(Position3D) == 18);
 static_assert(sizeof(Waypoint) == 25);
 static_assert(sizeof(Mission) == 0x1b);
+static_assert(sizeof(TargetMember) == 0x15);
+static_assert(sizeof(Pilot) == 0x16);
+static_assert(sizeof(AttackNode) == 0x11);
+static_assert(sizeof(AttackRoute) == 6);
+static_assert(sizeof(AttackPattern) == 7);
 static_assert(sizeof(Group) == 0x7c);
 static_assert(sizeof(Base) == 0x53);
 static_assert(sizeof(Timeslot) == 9);
@@ -139,6 +190,10 @@ static_assert(offsetof(Mission, groups_guest_ptr) == 0x13);
 static_assert(offsetof(Group, position) == 0x08);
 static_assert(offsetof(Group, waypoint_count_le) == 0x1c);
 static_assert(offsetof(Group, waypoints_guest_ptr) == 0x20);
+static_assert(offsetof(Group, target_area_type) == 0x3a);
+static_assert(offsetof(Group, target_area_name_guest_ptr) == 0x3b);
+static_assert(offsetof(Group, target_area_position) == 0x3f);
+static_assert(offsetof(Group, target_members_guest_ptr) == 0x51);
 static_assert(offsetof(Group, pylons) == 0x55);
 static_assert(offsetof(Group, pilots_guest_ptr) == 0x69);
 static_assert(offsetof(Group, attack_guest_ptr) == 0x74);
@@ -153,6 +208,14 @@ static_assert(offsetof(NavigationCorridor, route_count_le) == 4);
 static_assert(offsetof(NavigationRoute, waypoints_guest_ptr) == 2);
 static_assert(offsetof(Waypoint, height_le) == 0x0c);
 static_assert(offsetof(Waypoint, action) == 0x18);
+static_assert(offsetof(TargetMember, name_guest_ptr) == 0x01);
+static_assert(offsetof(TargetMember, parameters_le) == 0x07);
+static_assert(offsetof(Pilot, parameters_05) == 0x05);
+static_assert(offsetof(Pilot, parameters_0a_le) == 0x0a);
+static_assert(offsetof(AttackNode, action) == 0x10);
+static_assert(offsetof(AttackRoute, nodes_guest_ptr) == 0x02);
+static_assert(offsetof(AttackPattern, route_count_le) == 0x01);
+static_assert(offsetof(AttackPattern, routes_guest_ptr) == 0x03);
 
 std::int16_t read_signed(Le16 const& value);
 std::int32_t read_signed(Le32 const& value);

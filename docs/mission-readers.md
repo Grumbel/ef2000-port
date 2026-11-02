@@ -1,7 +1,8 @@
 # Original mission/navigation/campaign readers (bundle #065)
 
 The subsequent [native C++ mission layout reconstruction](mission-layout.md)
-adds byte-exact guest structs and two verified waypoint transformations.
+adds byte-exact guest structs, attack/target/pilot nesting and two verified
+waypoint transformations.
 
 This pass identifies **actual input routines** in the German `_EF2000.EXE`
 X-32 image, rather than inferring the input grammar from text-file examples
@@ -20,7 +21,7 @@ original disassembly or a bounded runtime trace before translating to C++.
 | --- | --- |
 | `0x0000f6a8` | Opens the scenario/configuration input, reads mission count and world status, optionally parses pilot state, then loops over `MISSION` sections using `0x0000f604` and `BASE` sections using `0x0000f260`. Called directly from `0x000357ec`, `0x00049228`, `0x00069094`. |
 | `0x0000f604` | Parses one `MISSION` header into an allocated mission record; saves the group count at object offset `+0x12`, a group array pointer at `+0x13`, and calls `0x0000f314` for each group/flight. |
-| `0x0000f314` | Parses a `GROUP` or `FLIGHT` payload, including weapon/pylon records via `0x0000eea0`, position via `0x0000ee5c`, waypoint route via `0x0000ed80`, target and optional attack data. Group entries use a **`0x7c`-byte stride**. |
+| `0x0000f314` | Parses a `GROUP` or `FLIGHT` payload, including weapon/pylon records via `0x0000eea0`, position via `0x0000ee5c`, waypoint route via `0x0000ed80`, target members via `0x0000eefc`, nested attacks via `0x0000f08c`, and pilots via `0x0000fe4c`. Group entries use a **`0x7c`-byte stride**. |
 | `0x0000f260` | Parses a `BASE` header, position and `TIMESLOTS`; each `TIMESLOT` uses `0x0000ee0c`. Header stores the timeslot count at `+0x48` and a pointer at `+0x4a` (both tentative from decompilation). |
 | `0x0000fecc` | Opens navigation input and iterates `BASE_NAVIGATION` entries through `0x0000fc54`. Called from `0x000b0f5c` in both initialization paths. |
 | `0x0000fc54` | Parses `BASE_NAVIGATION` plus position (`0x0000ee5c`), allocates its corridors and calls `0x0000fbcc` for each. |
@@ -29,6 +30,8 @@ original disassembly or a bounded runtime trace before translating to C++.
 | `0x0000ed80` | Common `WAYPOINT` record reader used by mission and navigation routes. Its stores cover a compact **25-byte** record (`0x19` bytes), with coordinates, action code and further parameters; exact field semantics remain unproven. |
 | `0x0001001c` | Opens campaign/conflict input, parses `DIFFICULTY`, `PERFORMANCE`, `WORLD_STATUS`, then `NUM_TARGET_AREAS` / `SSNAME`, mobiles and allegiances. Called from `0x00049228` and `0x000b0f5c`. |
 | `0x0000fcf4` | Reads a campaign `MOB` record, dispatches class byte 0/1/2 to aircraft/ship/ground readers, stores/advances the ordinal at `+0x13`, then parses position and pilot data. |
+| `0x0000f08c` → `0x0000f038` → `0x0000efe8` | Loads `ATTACK_PATTERN` → `ATTACK_ROUTE` → `ATTACK_NODE` into nested 7-, 6-, and 17-byte records. The pattern label is skipped, while each node's action is decoded by `0x0000ef98`. |
+| `0x0000eefc`, `0x0000fe4c` | Read a 21-byte target member and 22-byte pilot record, respectively. Names use separately allocated 32-bit guest pointers. |
 
 The roots and each stated child relation have direct `CALL` evidence in the
 existing `local/ghidra-entries-recovery/custom-storage-export/calls.tsv`.
@@ -72,9 +75,10 @@ initialized payload and reports the names without committing game data:
 | Target types | `0x0000ec8c` | `0x132fb4` | 106 |
 | Statuses | `0x0000ece0` | `0x13336c` | 10 |
 | Waypoint actions | `0x0000ed30` | `0x132c2c` | 19 |
+| Attack node actions | `0x0000ef98` | `0x132cc4` | 3 |
 | Weapons | `0x0000eea0` | `0x1335a0` | 37 |
 
-That gives **310 indexed string labels**. A further hard-coded
+That gives **313 indexed string labels**. A further hard-coded
 comparison sequence at `0x0000ea0c` maps the abbreviated mobile classes
 (`PL`, `SH`, `GB`, `ST`) and their expanded synonyms to **0, 1, 2, 3**.
 These are numeric parser results, not a proof of how the gameplay engine
@@ -140,7 +144,7 @@ python3 -m unittest tests.test_mission_records -v
 - Resolve the data-object allocator `0x0000e744` and register-passed sizes
   so the mission, group, base, corridor, route and waypoint layouts become
   typed structs with bounded fields rather than guessed parameter lists.
-- Correlate the extracted **310 enum labels** to guest struct fields and
+- Correlate the extracted **313 enum labels** to guest struct fields and
   authored mission/campaign rows; test whether repeated labels or sentinel
   values affect game behavior. Preserve unknown edition-specific values.
 - Confirm `0x0000fb10` coordinate clamping and the source-side values with

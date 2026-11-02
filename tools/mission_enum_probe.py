@@ -42,6 +42,7 @@ TABLES = (
     Table('target_types', 0x132fb4, 106, 0x0000ec8c),
     Table('statuses', 0x13336c, 10, 0x0000ece0),
     Table('waypoint_actions', 0x132c2c, 19, 0x0000ed30),
+    Table('attack_node_actions', 0x132cc4, 3, 0x0000ef98),
     Table('weapons', 0x1335a0, 37, 0x0000eea0),
 )
 

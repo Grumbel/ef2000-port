@@ -33,8 +33,11 @@ class MissionEnumProbeTests(unittest.TestCase):
             decode_table(payload, Table('bad', 270, 2, 0))
 
     def test_stable_table_dimensions_and_aliases(self):
-        self.assertEqual(len(TABLES), 10)
-        self.assertEqual(sum(table.count for table in TABLES), 310)
+        self.assertEqual(len(TABLES), 11)
+        self.assertEqual(sum(table.count for table in TABLES), 313)
+        attack = next(table for table in TABLES if table.name == 'attack_node_actions')
+        self.assertEqual((attack.base, attack.count, attack.reader),
+                         (0x132cc4, 3, 0x0000ef98))
         self.assertEqual([index for index, _ in MOBILE_CLASS_ALIASES],
                          [0, 1, 2, 3, 0, 1, 2, 3])
 

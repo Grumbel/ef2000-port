@@ -143,6 +143,30 @@ def inspect_records(records):
             problems.append(f'line {record.line}: {record.keyword} declares '
                             f'{expected} {children}; observed {found}')
 
+    # Original 0x0000f08c allocates ATTACK_PATTERN.route_count * 6 bytes
+    # and calls 0x0000f038 once per route. That reader advances over each
+    # route's variable-length ATTACK_NODE array, so ATTACK_ROUTE headers are
+    # not immediately adjacent like the flat ROUTES above.
+    attack_patterns = {'count': 0, 'routes': 0, 'nodes': 0}
+    for index, pattern in enumerate(records):
+        if pattern.keyword != 'ATTACK_PATTERN':
+            continue
+        attack_patterns['count'] += 1
+        expected = integer(pattern, 1, 'ATTACK_PATTERN route count')
+        cursor = index + 1
+        found = 0
+        while cursor < len(records) and records[cursor].keyword == 'ATTACK_ROUTE':
+            route = records[cursor]
+            cursor += 1
+            found += 1
+            while cursor < len(records) and records[cursor].keyword == 'ATTACK_NODE':
+                cursor += 1
+                attack_patterns['nodes'] += 1
+        attack_patterns['routes'] += found
+        if expected != found:
+            problems.append(f'line {pattern.line}: ATTACK_PATTERN declares '
+                            f'{expected} ATTACK_ROUTE; observed {found}')
+
     # Fourth argument of a BASE_NAVIGATION line is the number of corridors.
     # This is a count relationship observed in the supplied NAVIG.NAV, not a
     # claim about the remaining fields' meanings or units.
@@ -211,6 +235,7 @@ def inspect_records(records):
                           'children': waypoint_totals[name],
                           'waypoint_index_mismatches': index_mismatches[name]}
                    for name in ROUTES if route_totals[name]},
+        'attack_patterns': attack_patterns,
         'waypoint_index_details': waypoint_index_details,
         'block_checks': block_checks,
         'problems': problems,
@@ -274,7 +299,8 @@ def main():
     parser.add_argument('--block', metavar='KIND:INDEX',
                         help='emit one grouped record, e.g. MISSION:516 or BASE_NAVIGATION:4')
     parser.add_argument('--strict', action='store_true',
-                        help='fail on declared counts, route lengths or original WP_ROUTE bounds')
+                        help='fail on declared counts, including nested attack patterns, '
+                             'route lengths or original WP_ROUTE bounds')
     args = parser.parse_args()
     try:
         if args.file.stat().st_size > MAX_INPUT_BYTES:
@@ -310,6 +336,10 @@ def main():
         for name, route in report['routes'].items():
             print(f'  {name}: {route["count"]:,} routes, {route["children"]:,} child records, '
                   f'{route["waypoint_index_mismatches"]} index mismatches')
+        if report['attack_patterns']['count']:
+            patterns = report['attack_patterns']
+            print(f'  ATTACK_PATTERN: {patterns["count"]:,} patterns, '
+                  f'{patterns["routes"]:,} routes, {patterns["nodes"]:,} nodes')
         print(f'  problems: {len(report["problems"])}')
         for problem in report['problems'][:20]:
             print(f'    {problem}')

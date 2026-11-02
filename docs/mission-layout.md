@@ -1,4 +1,4 @@
-# Native C++ reconstruction of packed mission structures (bundle #066)
+# Native C++ reconstruction of packed mission structures (through bundle #067)
 
 Building on the recovered [file reader call map](mission-readers.md), this
 pass turns **measured guest allocation sizes and field writes** into an
@@ -32,6 +32,11 @@ not a claim that original mission handling has been replaced.
 | Base navigation | `0x24` (36) | `0x0000fecc` allocates 36 per `0x0000fc54` entry. |
 | Navigation corridor | 10 | `0x0000fc54` allocates count × 10 and advances by 10 for `0x0000fbcc`. |
 | Navigation route | 6 | `0x0000fbcc` allocates count × 6 and advances by 6 for `0x0000fb10`. |
+| TARGET_AREA member | `0x15` (21) | `0x0000f314` allocates group unit count × 21 at `+0x51`; `0x0000eefc` reads `LEAD` / `TWO` / etc. rows. |
+| PIL / pilot | `0x16` (22) | `0x0000f314` allocates unit count × 22 at `+0x69`; `0x0000fe4c` fills each record. |
+| ATTACK_PATTERN | 7 | `0x0000f314` allocates 7 at `+0x74`, then calls `0x0000f08c`. |
+| ATTACK_ROUTE | 6 | `0x0000f08c` allocates count × 6; `0x0000f038` advances by 6. |
+| ATTACK_NODE | `0x11` (17) | `0x0000f038` allocates count × 17; `0x0000efe8` advances by 17. |
 
 All sizes have matching compile-time assertions. They are specific to the
 German SHA-pinned X-32 image and must not be assumed valid for 3Dfx/GFX+
@@ -47,6 +52,7 @@ or English patch variants without a separate executable analysis.
 | Group | `+0x08` | Embedded 18-byte 3D position. |
 | Group | `+0x1a`, `+0x1c`, `+0x1e` | Route parameter (unclassified), waypoint count, last-waypoint index. |
 | Group | `+0x20` | 32-bit guest waypoint-array pointer. |
+| Group | `+0x3a`, `+0x3b`, `+0x3f`, `+0x51` | Conditional target-area enum, name pointer, 18-byte position and member-array pointer. |
 | Group | `+0x55`–`+0x68` | Exactly 20 weapon-index bytes (`PYLON` records). |
 | Group | `+0x69`, `+0x74` | Conditional pilot-data and attack-data pointers. |
 | BASE | `+0x0d`, `+0x11` | Base-name guest pointer and embedded 3D position. |
@@ -96,6 +102,88 @@ preserved. `clamp_navigation_route()` matches this behavior on the recovered
 separately proven renderer/navigation coordinate convention is still needed
 before naming the numbers as map boundaries.
 
+## Nested target, attack and pilot memory (bundle #067)
+
+The Ghidra reader corpus, checked against raw `objdump` of the pinned
+`payload.bin`, identifies three more record families. The parent stores
+**guest pointers**, but who ultimately frees the allocations is still
+unverified: this diagram describes their **loading relationship**, not
+confirmed lifetime or C++ object ownership.
+
+```mermaid
+flowchart TD
+    G["Group (0x7c)"]
+    G -->|"+0x51, unit count × 0x15"| TM["TargetMember (0x15)"]
+    G -->|"+0x69, unit count × 0x16"| PI["Pilot (0x16)"]
+    G -->|"+0x74"| AP["AttackPattern (0x07)"]
+    AP -->|"+0x03, route count × 6"| AR["AttackRoute (0x06)"]
+    AR -->|"+0x02, node count × 0x11"| AN["AttackNode (0x11)"]
+```
+
+Target-area and pilot strings are allocated separately by the shared text
+reader `0x0000e990`: `Group +0x3b`, `TargetMember +0x01`, and `Pilot +0x00`
+hold 32-bit **guest string pointers**, not inline names. The target area
+position at `Group +0x3f` is a full `Position3D` record. Each target member
+stores its target-type enum at `+0x00`, a name pointer at `+0x01` and six
+16-bit numeric fields at `+0x07,+0x09,...,+0x11`. The two bytes at
+`+0x05` and two at `+0x13` are *not populated by this reader*. Avoid
+assuming they are zero in guest allocations.
+
+`Pilot` has a string pointer at `+0x00`, an unwritten byte at `+0x04`,
+five numeric bytes at `+0x05..+0x09` (each from `0x0000e95c`, truncated)
+and six signed 16-bit numeric fields at `+0x0a..+0x14`. The code briefly
+clears `+0x09`, but then overwrites it with the fifth numeric token.
+The fields' meanings (skill, status, equipment, etc.) are **not yet
+established**. Campaign MOB records also call this same pilot reader.
+
+An `ATTACK_PATTERN` stores a signed 16-bit route count at `+0x01` and a
+four-byte route-array pointer at `+0x03`; **its `+0x00` byte is not
+written by `0x0000f08c`**. In particular, the reader skips over the
+text pattern label (`LAYDOWN_ATTACK`, `STAND_OFF_ATTACK`, etc.), and the
+current code has not demonstrated where that type might otherwise go.
+Each `ATTACK_ROUTE` holds a 16-bit node count at `+0x00` and a guest node
+pointer at `+0x02`. Each `ATTACK_NODE` holds two signed 32-bit numbers at
+`+0x00/+0x04`, four truncated 16-bit numbers at `+0x08..+0x0e`, and the
+one-byte node-action enum at `+0x10`.
+
+The node action has its **own three-value table** at `0x00132cc4`,
+decoded by guest `0x0000ef98`:
+
+| Index | Original text label |
+| ---: | --- |
+| 0 | `STRIKE` |
+| 1 | `STRIKE_THEN_TURN` |
+| 2 | `PASS` |
+
+These are *not* the same numeric indices as the 19-value waypoint-action
+table. `tools/mission_enum_probe.py --table attack_node_actions` now
+extracts these three entries from the SHA-pinned image, without shipping
+the original data in the repository.
+
+### Conditions on the three group allocations
+
+`0x0000f604` passes the mission-type byte in `DL` to the group reader
+`0x0000f314`. Resolving its enums against the original tables yields:
+
+| Conditional field | Reader predicate |
+| --- | --- |
+| `+0x3a..+0x54` target-area data | Flight role `STRIKE` (2), `SEAD_STRIKE` (10), or `RESCUE` (4), **and** mission type `AF_KILL` (6), `SEAD` (7), or `INTERD` (10). |
+| `+0x74` attack-pattern pointer | Flight role `WW` (1), `STRIKE` (2), `SEAD_STRIKE` (10), or `ANTI_SHIP` (11). |
+| `+0x69` pilot-array pointer | Mobile class **0** (plane) and `INCLUDE_PILOTS` enabled in the input header. |
+
+For a nonmatching role, `0x0000f314` explicitly zeros the affected guest
+pointers; it does not necessarily clear every unused target-area scalar
+field. The original allocates pilot and target-member arrays using the
+group's **unit count**, not its waypoint count.
+
+The read-only `tools/mission_records.py --strict` now validates both levels
+of attack cardinality: each `ATTACK_PATTERN` requires the declared number
+of `ATTACK_ROUTE` records, and each route requires the declared number of
+`ATTACK_NODE` records. Against the provided German `MISSION.CFG` there
+are **44 patterns, 264 routes and 1,050 nodes, with zero count errors**;
+this is input-shape evidence, not an assertion that every attack behavior
+has been decompiled.
+
 ## Reproduce
 
 ```sh
@@ -115,7 +203,7 @@ The original observations can be rechecked using the separately supplied
 disassembler or the existing `calls.tsv` and pseudo-C exports. The binary
 and all game data remain outside version control.
 
-Next: validate the lifetime and ownership of group/waypoint arrays at the
-runtime boundary, recover the remaining attack/target and pilot structs,
-and only then consider replacing individual guest functions with typed
-native C++ code.
+Next: trace the allocator and release paths from the mission-selection
+runtime, and establish the use sites of the now-sized attack, target and
+pilot fields. Only then consider replacing individual guest functions with
+typed native C++ code.

@@ -136,6 +136,27 @@ class MissionRecordsTests(unittest.TestCase):
             b'NUM_MISSIONS 0\nWP_ROUTE 2 0 1\nWAYPOINT 0\nWAYPOINT 1\n')
         self.assertEqual(valid['problems'], [])
 
+    def test_nested_attack_pattern_route_and_node_counts(self):
+        # 0x0000f08c -> 0x0000f038 -> 0x0000efe8, with nested variable
+        # length routes. No original assets are needed to validate the shape.
+        data = (b'ATTACK_PATTERN LAYDOWN_ATTACK 2\n'
+                b'ATTACK_ROUTE 1\n'
+                b'ATTACK_NODE 0 0 700 0 0 0 PASS\n'
+                b'ATTACK_ROUTE 2\n'
+                b'ATTACK_NODE 0 0 700 0 0 0 STRIKE\n'
+                b'ATTACK_NODE 0 0 700 0 0 0 PASS\n')
+        report, _ = inspect_bytes(data)
+        self.assertEqual(report['problems'], [])
+        self.assertEqual(report['attack_patterns'], {'count': 1, 'routes': 2, 'nodes': 3})
+        self.assertEqual(report['routes']['ATTACK_ROUTE']['children'], 3)
+
+        wrong, _ = inspect_bytes(data.replace(b'LAYDOWN_ATTACK 2', b'LAYDOWN_ATTACK 3'))
+        self.assertTrue(any('ATTACK_PATTERN declares 3 ATTACK_ROUTE; observed 2' in issue
+                            for issue in wrong['problems']))
+        short, _ = inspect_bytes(data.replace(b'ATTACK_ROUTE 2', b'ATTACK_ROUTE 4'))
+        self.assertTrue(any('ATTACK_ROUTE declares 4 ATTACK_NODE; observed 2' in issue
+                            for issue in short['problems']))
+
     def test_truncated_quoted_field_and_bad_counts_fail(self):
         with self.assertRaisesRegex(ValueError, 'line 1'):
             parse_text('MOB "unterminated')
