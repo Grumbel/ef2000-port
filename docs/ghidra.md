@@ -376,6 +376,71 @@ are still heuristic code boundaries, not proven original Watcom signatures.
 The `--max` cap counts named handler promotions; a verified `E9` handler
 may additionally create its previously absent destination function.
 
+### Recover previously undecoded direct CALL destinations
+
+Newly recovered functions can reveal direct `CALL rel32` targets that Ghidra
+never disassembled. The `recover-calls` command audits **only calls inside
+already recognized functions** and groups unresolved target addresses with
+their exact callsites. Its default is read-only; no function boundaries or
+instructions change during the audit:
+
+```sh
+# Copy an existing #047 recovered workspace, not the original import.
+cp -a /path/to/recovered-047-workspace local/ghidra-call-recovery
+python3 tools/ghidra_ef2000.py recover-calls \
+  --workspace local/ghidra-call-recovery
+
+# Review call-targets.tsv, then only on a disposable workspace:
+python3 tools/ghidra_ef2000.py recover-calls \
+  --workspace local/ghidra-call-recovery --apply --max 2
+python3 tools/ghidra_ef2000.py recover-calls \
+  --workspace local/ghidra-call-recovery --apply
+
+# Independently examine the next layer. No automatic recursive promotion:
+python3 tools/ghidra_ef2000.py inventory \
+  --workspace local/ghidra-call-recovery
+python3 tools/ghidra_ef2000.py recover-calls \
+  --workspace local/ghidra-call-recovery
+
+# If a target begins directly after a RET byte, audit it separately:
+python3 tools/ghidra_ef2000.py recover-calls \
+  --workspace local/ghidra-call-recovery --tier adjacent-ret
+# Apply only after reviewing this weaker boundary evidence:
+python3 tools/ghidra_ef2000.py recover-calls \
+  --workspace local/ghidra-call-recovery --tier adjacent-ret --apply
+
+# Once the desired boundary recovery is complete, refresh all pseudo-C:
+python3 tools/ghidra_ef2000.py export-all \
+  --workspace local/ghidra-call-recovery \
+  --overwrite --custom-storage-fallback
+```
+
+An eligible target must be four-byte aligned in the executable portion of
+the pinned X-32 image, lack an existing function/instruction/typed-data
+definition, start with a saved-register `PUSH` opcode, and be referenced by
+an exact Ghidra CALL reference whose displacement matches the raw `E8`
+instruction bytes. The default `--tier padding` additionally requires one
+of two observed Watcom alignment instructions immediately before the entry:
+`MOV EAX,EAX` or `LEA EAX,[EAX]`.
+
+An **opt-in** `--tier adjacent-ret` instead requires a `C3` (`RET`) byte
+immediately before the aligned target. This can identify adjacent routines
+that omit explicit padding, but the preceding byte is not independently
+proven to be a correctly decoded return instruction. It is a weaker
+boundary hypothesis, so audit its candidates before using `--apply`.
+Both tiers use per-target transactions, a 1 KiB decode bound stopping before
+existing instructions and typed data, and provisional names of the form
+`candidate_direct_call_XXXXXXXX`. No existing function is deliberately split
+or overwritten. These bounds can also cause *incomplete* decompilations:
+function extents and control flow must still be checked manually.
+
+Each pass snapshots the currently unresolved call graph; re-run the audit
+after promotion to reveal calls inside newly decoded functions. The #048
+disposable project used both tiers to recover 13 function entries, growing
+the recognized set from 4,220 to 4,233 and reducing unresolved direct calls
+in **currently decoded code** from six to zero. The remaining orphan bytes,
+indirect calls, X-32 register ABI and data types are still open questions.
+
 ## Export selected functions
 
 ```sh

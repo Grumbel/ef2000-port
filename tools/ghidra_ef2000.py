@@ -242,6 +242,38 @@ def recover_orphans(args):
           f'matches, {created} created, {failed} failed; output: {output}')
 
 
+def recover_calls(args):
+    """Audit or narrowly disassemble missing direct CALL targets."""
+    if args.max and not args.apply:
+        raise ValueError('--max requires --apply')
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'call-targets.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous_time = output.stat().st_mtime_ns if output.exists() else -1
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis',
+        *([] if args.apply else ['-readOnly']),
+        '-postScript', 'EF2000RecoverCalls.java', str(output),
+        'apply' if args.apply else 'report', str(args.max), args.tier,
+    ]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
+        raise ValueError('Ghidra returned without a fresh direct-call recovery report')
+    with output.open(newline='') as stream:
+        reader = csv.DictReader(stream, delimiter='\t')
+        columns = set(reader.fieldnames or ())
+        rows = list(reader)
+    if not {'entry', 'call_sites', 'confidence', 'result'} <= columns:
+        raise ValueError('Ghidra returned an invalid direct-call recovery report')
+    candidates = sum(row['confidence'] in ('call_padding_and_prologue',
+                                         'call_ret_and_prologue') for row in rows)
+    created = sum(row['result'] == 'created' for row in rows)
+    failed = sum(row['result'] in ('disassemble_failed', 'create_failed') for row in rows)
+    print(f'Ghidra direct-call recovery: {len(rows)} unresolved targets, '
+          f'{candidates} guarded candidates, {created} created, '
+          f'{failed} failed; output: {output}')
+
+
 def callback_tables(args):
     """Extract only name tables backed by the Ghidra function inventory."""
     workspace = validated_workspace(args.workspace)
@@ -324,7 +356,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest='command', required=True)
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
-                 'recover-orphans', 'callback-tables', 'name-callbacks'):
+                 'recover-orphans', 'recover-calls', 'callback-tables', 'name-callbacks'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=ROOT / 'local/ghidra',
                          help='ignored Ghidra project and image workspace')
@@ -360,6 +392,15 @@ def main(argv=None):
                           help='maximum promotions per run (0 means all; only for --apply)')
     recovery.add_argument('--tier', choices=('strict', 'table'), default='strict',
                           help='strict saved-register prologues or opt-in aligned-table volatile-register pushes')
+    direct = subparsers.choices['recover-calls']
+    direct.add_argument('--output', type=Path,
+                        help='TSV report (default: workspace/call-targets.tsv)')
+    direct.add_argument('--apply', action='store_true',
+                        help='disassemble and create guarded direct-call targets on this project')
+    direct.add_argument('--max', type=nonnegative_int, default=0,
+                        help='maximum function creations (0 means all; only with --apply)')
+    direct.add_argument('--tier', choices=('padding', 'adjacent-ret'), default='padding',
+                        help='strong alignment-padding evidence, or opt-in immediate preceding RET byte')
     callback = subparsers.choices['callback-tables']
     callback.add_argument('--functions', type=Path,
                           help='Ghidra functions.tsv (default: workspace/full-export/functions.tsv)')
@@ -382,7 +423,8 @@ def main(argv=None):
     try:
         {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,
          'inventory': export_all, 'export-all': export_all,
-         'recover-orphans': recover_orphans, 'callback-tables': callback_tables,
+         'recover-orphans': recover_orphans, 'recover-calls': recover_calls,
+         'callback-tables': callback_tables,
          'name-callbacks': name_callbacks}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'ghidra_ef2000: {error}\n')

@@ -327,6 +327,90 @@ class GhidraWorkflowTests(unittest.TestCase):
                 ghidra.recover_orphans(args)
             run.assert_called_once()
 
+    def test_recover_calls_is_read_only_by_default(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False, max=0, tier='padding')
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-noanalysis', command)
+            self.assertIn('-readOnly', command)
+            self.assertEqual(command[-4:], [str(self.workspace / 'call-targets.tsv'),
+                                            'report', '0', 'padding'])
+            self.assertIn('EF2000RecoverCalls.java', command)
+            (self.workspace / 'call-targets.tsv').write_text(
+                'entry\tcall_sites\tconfidence\tresult\n'
+                '0x000045a4\t0x000047da\tcall_padding_and_prologue\tproposed\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.recover_calls(args)
+
+    def test_recover_calls_requires_apply_for_bounded_changes(self):
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False, max=2, tier='padding')
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, '--max requires --apply'):
+                ghidra.recover_calls(args)
+            run.assert_not_called()
+
+    def test_recover_calls_apply_and_fresh_report(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=True, max=2, tier='adjacent-ret')
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertNotIn('-readOnly', command)
+            self.assertEqual(command[-4:], [str(self.workspace / 'call-targets.tsv'),
+                                            'apply', '2', 'adjacent-ret'])
+            (self.workspace / 'call-targets.tsv').write_text(
+                'entry\tcall_sites\tconfidence\tresult\n'
+                '0x000045a4\t0x000047da\tcall_ret_and_prologue\tcreated\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.recover_calls(args)
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'without a fresh direct-call recovery report'):
+                ghidra.recover_calls(args)
+            run.assert_called_once()
+
+    def test_recover_calls_rejects_invalid_report(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=True, max=0, tier='padding')
+
+        def fake_ghidra(command, check):
+            (self.workspace / 'call-targets.tsv').write_text('bad\tcolumns\nfoo\tbar\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            with self.assertRaisesRegex(ValueError, 'invalid direct-call recovery report'):
+                ghidra.recover_calls(args)
+
+    def test_recover_calls_accepts_fully_resolved_call_graph(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False, max=0, tier='padding')
+
+        def fake_ghidra(command, check):
+            (self.workspace / 'call-targets.tsv').write_text(
+                'entry\tcall_sites\tconfidence\tresult\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.recover_calls(args)
+
     def test_callback_tables_requires_inventory_and_writes_verified_names(self):
         (self.workspace / 'projects').mkdir(parents=True)
         (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')

@@ -487,3 +487,60 @@ known functions; they originate in the recovered bodies at `0x4738`,
 next recovery queue. The fact that newly decoded instructions can reveal
 yet more callees is precisely why complete *recognized-function* pseudo-C
 coverage is not the same as full original-program decompilation.
+
+## Chasing newly exposed direct calls (bundle #048)
+
+The six calls uncovered in #047 led to five previously undecoded routines.
+Every target was four-byte aligned, started with a saved-register `PUSH`,
+and followed an explicit Watcom-style alignment instruction. The new
+`recover-calls` command independently verifies the original `E8 rel32`
+displacement and Ghidra CALL reference from an already recognized caller,
+and refuses to disassemble arbitrary unreachable bytes. A read-only audit
+found exactly these five guarded targets; a capped trial promoted two,
+followed by the remaining three on the same disposable project.
+
+One of the new functions, `0x9ab30`, is a seven-call dispatcher. Its previously
+unknown callees exposed a second recovery wave:
+
+| Recovery tier | Newly recognized entries | Evidence |
+| --- | --- | --- |
+| Default alignment-padding tier | `0x45a4`, `0xc964`, `0x45694`, `0x9ab30`, `0xb0404` | Five direct-call targets from #047 |
+| Default alignment-padding tier | `0xca5c`, `0x9ab6c`, `0x9b04c` | Three calls exposed inside `0x9ab30` |
+| Opt-in adjacent-`RET` tier | `0x9a544`, `0x9ac84`, `0x9ae44`, `0x9b2a4` | Four aligned PUSH prologues immediately after `C3` bytes |
+| Default alignment-padding tier | `0xc1ba8` | Call exposed by new function `0x9b2a4` |
+
+The second tier was intentionally kept opt-in. A preceding `C3` is an
+additional byte-level clue, not proof of a source-level function boundary;
+it must be combined with an exact call reference and a plausible prologue.
+For each promotion Ghidra disassembled at most 1 KiB from the seed, avoiding
+known instructions/defined data and rolling back on failure. All thirteen
+creations succeeded on the disposable copy of the #047 project; the original
+project was preserved.
+
+| Static-analysis measurement | After #047 | After #048 |
+| --- | ---: | ---: |
+| Recognized functions | 4,220 | **4,233** |
+| Exportable pseudo-C functions | 4,220 | **4,233** |
+| Disassembled instruction bytes | 935,854 | **939,953** |
+| Disassembled bytes outside recognized functions | 44,763 | **44,763** |
+| Unresolved direct in-image calls in decoded code | 6 | **0** |
+| Indirect or externally targeted CALL sites | 555 | **556** |
+
+The newly discovered chain passes through arcade/menu state handling,
+configuration/UI dispatch, and small linked-structure helper routines;
+those semantic descriptions are hypotheses from pseudo-C, not validated
+game-runtime behavior. `0x9ab30` itself now decompiles as an ordered sequence
+of eight calls, seven of which were unknown before the pass. The Ghidra
+pseudo-C corpus was regenerated to incorporate updated callee names and
+signatures, rather than leaving stale cached output.
+
+**Zero unresolved direct calls applies only to currently disassembled
+instructions.** There are still 44,763 already decoded bytes outside
+recognized functions, large areas of undecoded image bytes, and more than
+five hundred indirect/external CALL sites. Some function bodies may be
+truncated by preexisting mistaken instruction boundaries; for example the
+new `0x45a4` boundary stops near an orphan instruction at `0x45d3` despite
+plausible continuing code. We therefore have better coverage and a cleaner
+static call graph, **not a complete or verified recompilable decompile**.
+The next priorities are auditing instruction conflicts at the new entries
+and resolving indirect dispatch tables before trusting the high-level C.
