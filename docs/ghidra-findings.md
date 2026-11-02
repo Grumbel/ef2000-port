@@ -275,3 +275,75 @@ the unresolved ranges, eight assembly fallbacks, indirect calls, data types,
 and Watcom register ABI need further work. The local generated C and Ghidra
 database are ignored; only the tools, tests and analysis documentation are
 included in the cumulative git bundle.
+
+## Disassembled callback entries and decompiler limitations (bundle #044)
+
+The four corroborated callback tables from #043 still contained unrecognized
+unique-name handler slots. A Ghidra audit revealed that many were *already
+disassembled* and directly referenced by a table slot; their function entries
+were simply not created because they began with a register move, comparison,
+arithmetic operation, or a jump into a separately unassigned routine, rather
+than a conventional function prologue.
+
+An additional opt-in `name-callbacks --apply --promote-entries` pass requires
+**all** of the following before creating a function:
+
+1. The named table entry is unambiguous, and its slot and string agree with
+   the pinned imported image.
+2. The guest handler offset is four-byte aligned, with a Ghidra DATA reference
+   from precisely that table slot.
+3. Ghidra has already disassembled an instruction starting at that offset.
+4. No existing recognized function contains that address.
+
+The script never disassembles arbitrary bytes or splits an existing function.
+A capped trial created ten functions; all ten decompiled into valid Ghidra
+pseudo-C. For example, `gnNewChannel` at `0x344a0` toggles a network-setting
+flag, and `onopenCredits` at `0x37260` dispatches GUI state changes.
+On the same disposable Ghidra 11.4.2 project, an unrestricted second pass
+promoted another 40 named callbacks. Ghidra additionally created 14 ordinary
+functions at previously unrecognized jump destinations, so the final gain
+was **64** recognized functions, **50** newly verified original callback names,
+and **2,436** fewer instruction bytes outside recognized functions.
+
+| Static-analysis measurement | After #043 | After #044 |
+| --- | ---: | ---: |
+| Recognized functions | 4,139 | **4,203** |
+| Exported pseudo-C functions | 4,131 | **4,195** |
+| Assembly-only fallback functions | 8 | **8** |
+| Disassembled instruction bytes outside functions | 47,320 | **44,884** |
+| Separate unassigned instruction ranges | 378 | **320** |
+| Candidate entries in remaining ranges | 713 | **645** |
+
+Across the four embedded tables, **266 distinct original callback names**
+are now applied in the recovery project. Sixteen unique-name entries still
+do not identify a separate function: some are not disassembled at all,
+while others fall inside a recognized function body or overlap existing
+control flow. Shared aliases remain ambiguous. These require case-by-case
+examination, not automatic function creation.
+
+The same eight decompilation failures persist at `0x2a8ac`, `0x440f4`,
+`0x87db8`, `0xb3084`, `0xb3168`, `0xb59a8`, `0xb8510`, and `0xca620`.
+Ghidra's `decompile`, `normalize`, and `paramid` analysis styles all fail
+on their input-variable overlaps; `register` and `firstpass` process the
+functions but yield no high-level C. For example, the assembly at `0x2a8ac`
+reads a dword from `[ESP+2]` and also manipulates the high and low halves of
+registers, a pattern incompatible with generic x86 argument assumptions.
+These are **not** fixed by simply relabeling entry points, and the assembly
+fallbacks are preserved. Correctly modeling Watcom X-32's register and
+stack conventions is a prerequisite for reliable source reconstruction.
+
+An additional **non-mutating, opt-in** decompiler retry using Ghidra's
+`__fastcall` *parameter-evaluation* model did recover pseudo-C for three of
+those eight entries: `0x2a8ac`, `0x440f4`, and `0x87db8`. This is not evidence
+that the original game uses Microsoft `__fastcall`; it is an experimental
+way to avoid some incompatible register/stack input overlaps. Ghidra's
+`__cdecl`, `__stdcall`, `__thiscall`, and combined prototype models did not
+recover additional unique entries in this trial. The generated C carries a
+warning and the `functions.tsv` status `written_fastcall_fallback`, making
+these three distinguishable from ordinary decompilations.
+
+With `export-all --overwrite --fastcall-fallback` the final result is
+**4,198 pseudo-C files** and **five current assembly fallbacks** out of 4,203
+recognized functions. The five unresolved entries are `0xb3084`, `0xb3168`,
+`0xb59a8`, `0xb8510`, and `0xca620`. Their instruction-level disassembly
+remains available for manual recovery.

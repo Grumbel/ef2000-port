@@ -54,6 +54,9 @@ python3 tools/ghidra_ef2000.py export-all
 python3 tools/ghidra_ef2000.py export-all --limit 20
 # Refresh generated C after changing names/types in the Ghidra project:
 python3 tools/ghidra_ef2000.py export-all --overwrite
+# Optional: retry low-level decompiler failures with a __fastcall prototype
+# *evaluation model*. This is not the proven Watcom calling convention.
+python3 tools/ghidra_ef2000.py export-all --overwrite --fastcall-fallback
 ```
 
 Both operations reuse the imported project with `-noanalysis`; they do not
@@ -76,6 +79,14 @@ per-function decompiler failures without aborting the entire corpus. Use
 `--overwrite` when edited signatures, renamed symbols or improved Ghidra
 analysis should appear in previously exported code. The `--limit` option is
 for diagnostics; `0` (the default) processes all recognized functions.
+`--fastcall-fallback` allocates a separate Ghidra decompiler with an alternate
+parameter-evaluation model and retries **only** entries that fail the normal
+pass; successful alternative output is labeled `written_fastcall_fallback`
+in `functions.tsv` and prominently warned in its C header. Neither existing
+Ghidra symbols nor calling conventions are mutated. The `report.json` field
+`fastcall_fallback_decompilations` counts newly exported non-default C outputs.
+This mode is purely exploratory: `__fastcall` is not the Watcom X-32 ABI, and
+register/stack parameter recovery needs manual checking.
 If Ghidra is upgraded, make a copy of your project before opening it with
 the newer release, since Ghidra can migrate the project database.
 
@@ -189,17 +200,31 @@ python3 tools/ghidra_ef2000.py name-callbacks \
 # existing function bodies. Requires explicit opt-in to create functions.
 python3 tools/ghidra_ef2000.py name-callbacks \
   --workspace local/ghidra-recovery --apply --promote-thunks
+# Broader, still opt-in recovery of already-disassembled named entries:
+python3 tools/ghidra_ef2000.py name-callbacks \
+  --workspace local/ghidra-recovery --apply --promote-entries --max 10
+# Review the generated report and the new pseudo-C before continuing:
+python3 tools/ghidra_ef2000.py name-callbacks \
+  --workspace local/ghidra-recovery --apply --promote-entries
 python3 tools/ghidra_ef2000.py export-all \
   --workspace local/ghidra-recovery --overwrite
 ```
 
 The name script skips handlers shared by different names, names shared by
 different handlers, missing function entries, and previously assigned manual
-names. It creates **no functions** unless `--promote-thunks` is specified.
+names. It creates **no functions** unless a promotion mode is specified.
 That optional tier accepts only an unassigned five-byte `JMP rel32` entry
 whose destination already lies inside a recognized function. Neither names
 nor exported pseudo-C are original source code: Watcom calling conventions,
 aliasing, data types and control flow still require manual verification.
+
+`--promote-entries` is broader: it also accepts aligned guest addresses
+pointing to instructions Ghidra has **already disassembled**, provided that
+Ghidra has a DATA reference from the *exact* verified callback-table slot.
+It refuses to split existing recognized function bodies or disassemble
+unknown bytes. `--max N` caps function creation in either promotion mode;
+the modes are mutually exclusive and require `--apply`. Review each batch
+before an unrestricted pass.
 
 Ghidra 11.4.2 analysis of a copied 4,111-function project identified four
 corroborated callback tables with **308 named slots**. Without thunk creation,
@@ -209,6 +234,13 @@ the original manual names were retained. The optional guarded thunk tier
 created another 28 functions and assigned 28 further names (216 names in
 total). The final re-export found **4,139 functions, 4,131 pseudo-C files**
 and the same eight assembly fallbacks. See [the findings](ghidra-findings.md).
+
+An additional independent recovery pass on a copied #043 project promoted
+50 already-disassembled, reference-backed callbacks. Ghidra recognized 14
+additional functions at their direct-jump destinations. The inventory rose
+to **4,203 functions**, without changing game bytes.
+The opt-in `--fastcall-fallback` export produced 4,198 pseudo-C files and
+five remaining assembly-only bodies; see the findings for caveats.
 
 ## Export selected functions
 

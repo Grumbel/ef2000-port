@@ -156,9 +156,9 @@ class GhidraWorkflowTests(unittest.TestCase):
         def fake_ghidra(command, check):
             self.assertTrue(check)
             self.assertIn('-noanalysis', command)
-            self.assertEqual(command[-5:], ['EF2000ExportAll.java',
+            self.assertEqual(command[-6:], ['EF2000ExportAll.java',
                                             str(self.workspace / 'full-export'),
-                                            'inventory', '0', 'resume'])
+                                            'inventory', '0', 'resume', 'none'])
             output = self.workspace / 'full-export'
             (output / 'functions.tsv').write_text('entry\tname\n')
             (output / 'calls.tsv').write_text('caller_entry\tcall_site\n')
@@ -182,11 +182,11 @@ class GhidraWorkflowTests(unittest.TestCase):
         (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
         args = argparse.Namespace(command='export-all', workspace=self.workspace,
                                   analyze_headless=self.launcher, output=None,
-                                  limit=12, overwrite=True)
+                                  limit=12, overwrite=True, fastcall_fallback=True)
 
         def fake_ghidra(command, check):
             self.assertTrue(check)
-            self.assertEqual(command[-3:], ['decompile', '12', 'overwrite'])
+            self.assertEqual(command[-4:], ['decompile', '12', 'overwrite', 'fastcall'])
             output = self.workspace / 'full-export'
             (output / 'report.json').write_text(json.dumps({
                 'initialized_image_bytes': ghidra.IMAGE_SIZE,
@@ -314,12 +314,13 @@ class GhidraWorkflowTests(unittest.TestCase):
         self.workspace.joinpath('manifest.json').write_text(json.dumps(self.manifest))
         (self.workspace / 'callback-tables.tsv').write_text('test evidence')
         args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
-                                  output=None, apply=False, promote_thunks=False)
+                                  output=None, apply=False, promote_thunks=False,
+                                  promote_entries=False, max=0)
 
         def fake_ghidra(command, check):
             self.assertTrue(check)
             self.assertIn('EF2000NameCallbacks.java', command)
-            self.assertEqual(command[-2:], ['report', 'names'])
+            self.assertEqual(command[-3:], ['report', 'names', '0'])
             (self.workspace / 'callback-names.tsv').write_text(
                 'handler\tname\tresult\n0x00003000\tClickStart\tproposed\n')
 
@@ -329,15 +330,44 @@ class GhidraWorkflowTests(unittest.TestCase):
         with patch.object(ghidra.subprocess, 'run') as run:
             with self.assertRaisesRegex(ValueError, 'without a fresh callback-naming report'):
                 ghidra.name_callbacks(args)
-            self.assertEqual(run.call_args.args[0][-2:], ['apply', 'names'])
+            self.assertEqual(run.call_args.args[0][-3:], ['apply', 'names', '0'])
 
     def test_name_callbacks_requires_apply_to_create_jump_stubs(self):
         args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
-                                  output=None, apply=False, promote_thunks=True)
+                                  output=None, apply=False, promote_thunks=True,
+                                  promote_entries=False, max=0)
         with patch.object(ghidra.subprocess, 'run') as run:
             with self.assertRaisesRegex(ValueError, '--promote-thunks requires --apply'):
                 ghidra.name_callbacks(args)
             run.assert_not_called()
+
+    def test_name_callbacks_requires_apply_to_promote_entries_and_bounds(self):
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False, promote_thunks=False,
+                                  promote_entries=True, max=10)
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, '--promote-entries requires --apply'):
+                ghidra.name_callbacks(args)
+            run.assert_not_called()
+        args.apply = True
+        args.promote_thunks = True
+        with self.assertRaisesRegex(ValueError, 'choose only one'):
+            ghidra.name_callbacks(args)
+        args.promote_thunks = False
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        self.workspace.joinpath('payload.bin').write_bytes(self.image)
+        self.workspace.joinpath('manifest.json').write_text(json.dumps(self.manifest))
+        (self.workspace / 'callback-tables.tsv').write_text('test evidence')
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertEqual(command[-3:], ['apply', 'entries', '10'])
+            (self.workspace / 'callback-names.tsv').write_text(
+                'handler\tname\tresult\n0x00003000\tClickStart\tcreated_named_entry\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.name_callbacks(args)
 
     def test_guest_offsets_are_within_initialized_image(self):
         self.assertEqual(ghidra.guest_offset('0xe9a24'), 0xe9a24)

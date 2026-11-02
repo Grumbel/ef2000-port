@@ -183,6 +183,7 @@ def export_all(args):
         '-postScript', 'EF2000ExportAll.java', str(output), mode,
         str(getattr(args, 'limit', 0)),
         'overwrite' if getattr(args, 'overwrite', False) else 'resume',
+        'fastcall' if getattr(args, 'fastcall_fallback', False) else 'none',
     ]
     subprocess.run(command, check=True)
     for name in files:
@@ -259,6 +260,12 @@ def name_callbacks(args):
     """Audit or explicitly apply unique callback names to existing functions."""
     if args.promote_thunks and not args.apply:
         raise ValueError('--promote-thunks requires --apply')
+    if args.promote_entries and not args.apply:
+        raise ValueError('--promote-entries requires --apply')
+    if args.promote_entries and args.promote_thunks:
+        raise ValueError('choose only one callback promotion mode')
+    if args.max and not (args.apply and (args.promote_thunks or args.promote_entries)):
+        raise ValueError('--max requires --apply and a callback promotion mode')
     workspace = validated_workspace(args.workspace)
     input_path = (workspace / 'callback-tables.tsv').resolve()
     output = (args.output or workspace / 'callback-names.tsv').resolve()
@@ -272,7 +279,8 @@ def name_callbacks(args):
         '-process', IMAGE_NAME, '-noanalysis',
         '-postScript', 'EF2000NameCallbacks.java', str(input_path), str(output),
         'apply' if args.apply else 'report',
-        'thunks' if args.promote_thunks else 'names',
+        'entries' if args.promote_entries else 'thunks' if args.promote_thunks else 'names',
+        str(args.max),
     ]
     subprocess.run(command, check=True)
     if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
@@ -281,11 +289,13 @@ def name_callbacks(args):
         rows = list(csv.DictReader(stream, delimiter='\t'))
     if not rows or not {'handler', 'name', 'result'} <= set(rows[0]):
         raise ValueError('Ghidra returned an invalid callback-naming report')
-    changed = sum(row['result'] in ('renamed', 'created_named_thunk') for row in rows)
-    created = sum(row['result'] in ('created_named_thunk', 'created_unnamed_thunk')
+    changed = sum(row['result'] in ('renamed', 'created_named_thunk', 'created_named_entry')
+                  for row in rows)
+    created = sum(row['result'] in ('created_named_thunk', 'created_unnamed_thunk',
+                                   'created_named_entry', 'created_unnamed_entry')
                   for row in rows)
     print(f'Ghidra named callbacks: {len(rows)} slots, {changed} names applied, '
-          f'{created} new thunks; output: {output}')
+          f'{created} new functions; output: {output}')
 
 
 def main(argv=None):
@@ -313,6 +323,8 @@ def main(argv=None):
                             help='export at most N discovered functions (0 means all)')
     all_export.add_argument('--overwrite', action='store_true',
                             help='regenerate cached pseudo-C after changing Ghidra annotations')
+    all_export.add_argument('--fastcall-fallback', action='store_true',
+                            help='optionally retry failed pseudo-C with an unverified __fastcall evaluation model')
     recovery = subparsers.choices['recover-orphans']
     recovery.add_argument('--output', type=Path,
                           help='TSV report (default: workspace/recovery-candidates.tsv)')
@@ -334,6 +346,10 @@ def main(argv=None):
                        help='rename existing unambiguous auto-named functions')
     names.add_argument('--promote-thunks', action='store_true',
                        help='with --apply, also create missing 5-byte direct-JMP callback stubs')
+    names.add_argument('--promote-entries', action='store_true',
+                       help='with --apply, also recover aligned disassembled table-backed entries')
+    names.add_argument('--max', type=nonnegative_int, default=0,
+                       help='maximum function creations (0 means all; only with an applying promotion mode)')
     args = parser.parse_args(argv)
     try:
         {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,

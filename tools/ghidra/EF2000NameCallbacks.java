@@ -5,6 +5,7 @@
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Instruction;
+import ghidra.program.model.symbol.Reference;
 import ghidra.program.model.symbol.SourceType;
 
 import java.nio.charset.StandardCharsets;
@@ -25,11 +26,12 @@ public class EF2000NameCallbacks extends GhidraScript {
     @Override
     protected void run() throws Exception {
         String[] args = getScriptArgs();
-        if (args.length != 4 || (!args[2].equals("report") && !args[2].equals("apply")) ||
-                (!args[3].equals("names") && !args[3].equals("thunks")) ||
-                (args[2].equals("report") && args[3].equals("thunks"))) {
+        if (args.length != 5 || (!args[2].equals("report") && !args[2].equals("apply")) ||
+                (!args[3].equals("names") && !args[3].equals("thunks") &&
+                 !args[3].equals("entries")) ||
+                (args[2].equals("report") && !args[3].equals("names"))) {
             throw new IllegalArgumentException(
-                "expected callback-tables.tsv, report.tsv, report|apply, names|thunks");
+                "expected callback-tables.tsv, report.tsv, report|apply, names|thunks|entries, max");
         }
         if (!currentProgram.getLanguageID().toString().equals("x86:LE:32:default") ||
                 currentProgram.getMemory().getBlock(toAddr(IMAGE_END - 1)) == null) {
@@ -37,6 +39,11 @@ public class EF2000NameCallbacks extends GhidraScript {
         }
         boolean apply = args[2].equals("apply");
         boolean promoteThunks = args[3].equals("thunks");
+        boolean promoteEntries = args[3].equals("entries");
+        int maximum = Integer.parseInt(args[4]);
+        if (maximum < 0 || (maximum > 0 && !promoteThunks && !promoteEntries)) {
+            throw new IllegalArgumentException("invalid maximum promotions");
+        }
         Path output = Paths.get(args[1]);
         List<String> lines = Files.readAllLines(Paths.get(args[0]), StandardCharsets.UTF_8);
         if (lines.isEmpty() || !lines.get(0).equals(
@@ -85,37 +92,45 @@ public class EF2000NameCallbacks extends GhidraScript {
                 result = "ambiguous_alias";
             } else {
                 boolean created = false;
-                if (function == null && promoteThunks && isSafeDirectJumpStub(row.handler)) {
-                    try {
-                        function = createFunction(toAddr(row.handler),
-                            String.format("candidate_callback_thunk_%08x", row.handler));
-                        if (function != null) {
-                            created = true;
-                            ++promoted;
+                boolean limited = false;
+                if (function == null && ((promoteThunks && isSafeDirectJumpStub(row.handler)) ||
+                        (promoteEntries && isSafeReferencedEntry(row.handler, row.slot)))) {
+                    if (maximum > 0 && promoted >= maximum) {
+                        limited = true;
+                    } else {
+                        try {
+                            function = createFunction(toAddr(row.handler),
+                                String.format("candidate_callback_%08x", row.handler));
+                            if (function != null) {
+                                created = true;
+                                ++promoted;
+                            }
+                        } catch (Exception error) {
+                            // Preserve unrelated annotations if creation fails.
                         }
-                    } catch (Exception error) {
-                        // Preserve the original project state on failed creation.
                     }
                 }
                 if (function == null) {
-                    result = "no_function_at_handler";
+                    result = limited ? "promotion_limited" : "no_function_at_handler";
                 } else {
                     currentName = function.getName();
                     if (currentName.equals(row.name)) {
                         result = "already_named";
                     } else if (!currentName.matches(
                             "(thunk_)?FUN_[0-9a-fA-F]+|(thunk_)?candidate_orphan_[0-9a-fA-F]+|"
-                            + "candidate_callback_thunk_[0-9a-fA-F]+")) {
+                            + "(thunk_)?candidate_callback_(thunk_)?[0-9a-fA-F]+")) {
                         result = "preserved_existing_name";
                     } else if (!apply) {
                         result = "proposed";
                     } else {
                         try {
                             function.setName(row.name, SourceType.USER_DEFINED);
-                            result = created ? "created_named_thunk" : "renamed";
+                            result = created ? (promoteEntries ? "created_named_entry" :
+                                                "created_named_thunk") : "renamed";
                             ++renamed;
                         } catch (Exception error) {
-                            result = created ? "created_unnamed_thunk" : "rename_failed";
+                            result = created ? (promoteEntries ? "created_unnamed_entry" :
+                                                "created_unnamed_thunk") : "rename_failed";
                         }
                     }
                 }
@@ -126,7 +141,20 @@ public class EF2000NameCallbacks extends GhidraScript {
         Files.createDirectories(output.getParent());
         Files.writeString(output, String.join("\n", report) + "\n", StandardCharsets.UTF_8);
         println("EF2000: " + rows.size() + " callback table slots, " + renamed +
-                " functions named, " + promoted + " safe jump stubs promoted; wrote " + output);
+                " functions named, " + promoted + " functions promoted; wrote " + output);
+    }
+
+    private boolean isSafeReferencedEntry(long entry, long slot) {
+        // A table pointer alone can be data. Require Ghidra to have already
+        // decoded an instruction at the exact aligned address, with an exact
+        // DATA xref from the independently verified name-table slot.
+        if ((entry & 3) != 0 || getFunctionContaining(toAddr(entry)) != null ||
+                getInstructionAt(toAddr(entry)) == null) return false;
+        for (Reference reference : getReferencesTo(toAddr(entry))) {
+            if (reference.getFromAddress().getOffset() == slot &&
+                    reference.getReferenceType().isData()) return true;
+        }
+        return false;
     }
 
     private boolean isSafeDirectJumpStub(long entry) throws Exception {

@@ -3,6 +3,7 @@
 // @category EF2000
 
 import ghidra.app.decompiler.DecompInterface;
+import ghidra.app.decompiler.DecompileOptions;
 import ghidra.app.decompiler.DecompileResults;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.Address;
@@ -26,9 +27,9 @@ public class EF2000ExportAll extends GhidraScript {
     @Override
     protected void run() throws Exception {
         String[] args = getScriptArgs();
-        if (args.length != 4) {
+        if (args.length != 5) {
             throw new IllegalArgumentException(
-                "expected output directory, inventory|decompile, maximum functions (0=all), resume|overwrite");
+                "expected output directory, inventory|decompile, maximum functions (0=all), resume|overwrite, none|fastcall");
         }
         if (!currentProgram.getLanguageID().toString().equals("x86:LE:32:default") ||
                 currentProgram.getMemory().getBlock(toAddr(0)) == null ||
@@ -46,6 +47,10 @@ public class EF2000ExportAll extends GhidraScript {
         boolean overwrite = args[3].equals("overwrite");
         if (!overwrite && !args[3].equals("resume")) {
             throw new IllegalArgumentException("expected resume or overwrite");
+        }
+        boolean fastcallFallback = args[4].equals("fastcall");
+        if (!fastcallFallback && !args[4].equals("none")) {
+            throw new IllegalArgumentException("expected none or fastcall fallback");
         }
 
         List<Function> functions = new ArrayList<>();
@@ -135,14 +140,25 @@ public class EF2000ExportAll extends GhidraScript {
         }
 
         DecompInterface decompiler = null;
+        DecompInterface fastcall = null;
         if (export) {
             decompiler = new DecompInterface();
             if (!decompiler.openProgram(currentProgram)) {
                 throw new IllegalStateException("cannot initialize Ghidra decompiler");
             }
+            if (fastcallFallback) {
+                fastcall = new DecompInterface();
+                DecompileOptions options = new DecompileOptions();
+                options.setProtoEvalModel("__fastcall");
+                fastcall.setOptions(options);
+                if (!fastcall.openProgram(currentProgram)) {
+                    throw new IllegalStateException("cannot initialize fastcall fallback decompiler");
+                }
+            }
         }
         long functionBytes = 0;
         int written = 0, reused = 0, failed = 0, limited = 0, assemblyFallbacks = 0;
+        int fastcallWritten = 0;
         List<String> index = new ArrayList<>();
         index.add("entry\tname\tbody_bytes\tstatus\tfile\terror");
         try {
@@ -164,6 +180,16 @@ public class EF2000ExportAll extends GhidraScript {
                     } else {
                         try {
                             DecompileResults result = decompiler.decompileFunction(function, 30, monitor);
+                            boolean usedFastcall = false;
+                            if ((!result.decompileCompleted() || result.getDecompiledFunction() == null) &&
+                                    fastcall != null) {
+                                DecompileResults alternative = fastcall.decompileFunction(function, 30, monitor);
+                                if (alternative.decompileCompleted() &&
+                                        alternative.getDecompiledFunction() != null) {
+                                    result = alternative;
+                                    usedFastcall = true;
+                                }
+                            }
                             if (!result.decompileCompleted() || result.getDecompiledFunction() == null) {
                                 status = "failed";
                                 error = result.getErrorMessage();
@@ -172,11 +198,16 @@ public class EF2000ExportAll extends GhidraScript {
                                 String header = String.format(
                                     "/* Ghidra pseudo-C, not original EF2000 source.\n" +
                                     " * Guest entry 0x%08x; %s; generic x86 ABI, not Watcom X-32.\n" +
+                                    (usedFastcall ?
+                                     " * WARNING: default decompilation failed; C uses __fastcall parameter\n" +
+                                     " * evaluation as an unverified workaround, NOT a proven calling convention.\n" :
+                                     "") +
                                     " */\n\n", offset, function.getName());
                                 Files.createDirectories(file.getParent());
                                 Files.writeString(file, header + result.getDecompiledFunction().getC(),
                                                   StandardCharsets.UTF_8);
-                                status = "written";
+                                status = usedFastcall ? "written_fastcall_fallback" : "written";
+                                if (usedFastcall) ++fastcallWritten;
                                 ++written;
                             }
                         } catch (Exception exception) {
@@ -208,6 +239,7 @@ public class EF2000ExportAll extends GhidraScript {
             }
         } finally {
             if (decompiler != null) decompiler.dispose();
+            if (fastcall != null) fastcall.dispose();
         }
         Files.writeString(output.resolve("functions.tsv"), String.join("\n", index) + "\n",
                           StandardCharsets.UTF_8);
@@ -227,18 +259,21 @@ public class EF2000ExportAll extends GhidraScript {
             "  \"call_sites\": %d,\n  \"direct_call_edges\": %d,\n" +
             "  \"unresolved_direct_call_edges\": %d,\n" +
             "  \"indirect_or_external_call_sites\": %d,\n" +
-            "  \"decompilations_written\": %d,\n  \"decompilations_reused\": %d,\n" +
+            "  \"decompilations_written\": %d,\n  \"fastcall_fallback_decompilations\": %d,\n" +
+            "  \"decompilations_reused\": %d,\n" +
             "  \"decompilations_failed\": %d,\n  \"assembly_fallbacks\": %d,\n" +
             "  \"orphan_instruction_ranges\": %d,\n" +
             "  \"candidate_entries\": %d,\n  \"decompilations_limited\": %d\n}\n",
             IMAGE_END, functions.size(), functionBytes, instructionCount, instructionBytes,
             orphanInstructionBytes, callSites, directCalls, unresolvedDirectCalls,
-            indirectCalls, written, reused, failed, assemblyFallbacks, orphanRanges.size() - 1,
+            indirectCalls, written, fastcallWritten, reused, failed, assemblyFallbacks,
+            orphanRanges.size() - 1,
             candidateEntries.size() - 1, limited);
         Files.writeString(output.resolve("report.json"), report, StandardCharsets.UTF_8);
         println("EF2000: inventoried " + functions.size() + " functions, " +
                 instructionBytes + " instruction bytes, " + unresolvedDirectCalls +
-                " unresolved direct calls; wrote " + written + ", reused " + reused +
+                " unresolved direct calls; wrote " + written + " (" + fastcallWritten +
+                " fastcall fallbacks), reused " + reused +
                 ", failed " + failed + ", limited " + limited + " exports to " + output);
     }
 
