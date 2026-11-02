@@ -22,5 +22,9 @@ int main() {
     assert(!ef2000::menu_font_glyph(widths, 255).available);
     assert(ef2000::menu_font_atlas_width == 128);
     assert(ef2000::menu_font_atlas_height == 72);
+    assert(ef2000::menu_font_text_width(widths, "A M") == 6 + 5 + 9);
+    assert(ef2000::menu_font_fitting_chars(widths, "A M", 11) == 2);
+    assert(ef2000::menu_font_fitting_chars(widths, "A M", 20) == 3);
+    assert(ef2000::menu_font_fitting_chars(widths, "ABC", 0) == 0);
     std::cout << "menu-font: atlas cells, proportional widths and fallback passed\n";
 }

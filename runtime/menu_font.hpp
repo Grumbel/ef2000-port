@@ -5,6 +5,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <string_view>
 
 namespace ef2000 {
 
@@ -32,6 +33,26 @@ inline MenuFontGlyph menu_font_glyph(const MenuFontWidths& widths, unsigned char
     return {index % menu_font_columns * menu_font_cell_width,
             index / menu_font_columns * menu_font_cell_height,
             width, menu_font_cell_height, width + 2, true};
+}
+
+inline int menu_font_text_width(const MenuFontWidths& widths, std::string_view text) {
+    int width = 0;
+    for (const unsigned char code : text)
+        width += menu_font_glyph(widths, code).advance;
+    return width;
+}
+
+inline std::size_t menu_font_fitting_chars(const MenuFontWidths& widths,
+                                          std::string_view text, int pixels) {
+    int width = 0;
+    std::size_t count = 0;
+    for (const unsigned char code : text) {
+        const int advance = menu_font_glyph(widths, code).advance;
+        if (width + advance > pixels) break;
+        width += advance;
+        ++count;
+    }
+    return count;
 }
 
 } // namespace ef2000

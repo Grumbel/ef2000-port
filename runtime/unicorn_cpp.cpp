@@ -217,6 +217,11 @@ public:
             };
             overlay_title_texture_ = load_skin("skin-title.bmp");
             overlay_panel_texture_ = load_skin("skin-panel.bmp");
+            // The skin extractor also provides the original font specimen.
+            // An explicitly selected --overlay-font-bmp always takes priority.
+            const auto font = fs::path(options_.overlay_skin_dir) / "menu-font.bmp";
+            if (options_.overlay_font_bmp.empty() && fs::is_regular_file(font))
+                options_.overlay_font_bmp = font.string();
             std::cerr << "overlay: original screen-coordinate title and panel textures loaded\n";
         }
         if (!options_.overlay_frame_bmp.empty()) {
@@ -815,18 +820,17 @@ private:
             !SDL_RenderFillRect(renderer_, &area))
             throw std::runtime_error(std::string("SDL3 overlay panel: ") + SDL_GetError());
     }
-    void overlay_text(float x, float y, std::string value, int max_chars,
+    void overlay_text(float x, float y, std::string value, int max_pixels,
                       uint8_t red = 230, uint8_t green = 232, uint8_t blue = 222) {
-        if (max_chars <= 0) return;
-        if (value.size() > size_t(max_chars)) value.resize(size_t(max_chars));
+        if (max_pixels <= 0) return;
         if (overlay_font_texture_) {
+            value.resize(ef2000::menu_font_fitting_chars(overlay_font_widths_,
+                                                        value, max_pixels));
             if (!SDL_SetTextureColorMod(overlay_font_texture_, red, green, blue))
                 throw std::runtime_error(std::string("SDL3 overlay font tint: ") + SDL_GetError());
             float offset = 0;
-            const float limit = float(max_chars * 8);
             for (unsigned char code : value) {
                 const auto glyph = ef2000::menu_font_glyph(overlay_font_widths_, code);
-                if (offset + glyph.advance > limit) break;
                 if (glyph.available && glyph.width > 0) {
                     const SDL_FRect source{float(glyph.x), float(glyph.y),
                                            float(glyph.width), float(glyph.height)};
@@ -843,6 +847,7 @@ private:
             }
             return;
         }
+        if (value.size() > size_t(max_pixels / 8)) value.resize(size_t(max_pixels / 8));
         if (!SDL_SetRenderDrawColor(renderer_, red, green, blue, 255) ||
             !SDL_RenderDebugText(renderer_, x, y, value.c_str()))
             throw std::runtime_error(std::string("SDL3 overlay text: ") + SDL_GetError());
@@ -857,6 +862,37 @@ private:
         const SDL_FRect target{patch.target.x, patch.target.y, patch.target.w, patch.target.h};
         if (!SDL_RenderTexture(renderer_, texture, &source, &target))
             throw std::runtime_error(std::string("SDL3 overlay skin draw: ") + SDL_GetError());
+    }
+    void overlay_chrome_button(float x, float y, int kind, bool toggled) {
+        // Original-style shallow silver bevel and black shadow; glyphs are
+        // drawn as one-pixel strokes rather than font letters.
+        overlay_fill(x + 1, y + 1, 15, 15, 18, 18, 23);
+        overlay_fill(x, y, 14, 14, 172, 174, 191);
+        overlay_fill(x + 1, y + 1, 12, 12, 100, 102, 121);
+        overlay_fill(x + 2, y + 2, 10, 10, 138, 141, 160);
+        overlay_fill(x + 12, y + 1, 1, 12, 49, 52, 64);
+        overlay_fill(x + 1, y + 12, 12, 1, 49, 52, 64);
+        const uint8_t fg = 19;
+        if (kind == 0) {
+            overlay_fill(x + 4, y + 10, 7, 2, fg, fg, fg);
+        } else if (kind == 1) {
+            if (toggled) {
+                overlay_fill(x + 5, y + 3, 6, 1, fg, fg, fg);
+                overlay_fill(x + 5, y + 3, 1, 6, fg, fg, fg);
+                overlay_fill(x + 3, y + 5, 6, 1, fg, fg, fg);
+                overlay_fill(x + 3, y + 5, 1, 6, fg, fg, fg);
+            } else {
+                overlay_fill(x + 3, y + 3, 8, 1, fg, fg, fg);
+                overlay_fill(x + 3, y + 3, 1, 8, fg, fg, fg);
+                overlay_fill(x + 10, y + 3, 1, 8, fg, fg, fg);
+                overlay_fill(x + 3, y + 10, 8, 1, fg, fg, fg);
+            }
+        } else {
+            for (int step = 0; step < 8; ++step) {
+                overlay_fill(x + 3 + step, y + 3 + step, 1, 1, fg, fg, fg);
+                overlay_fill(x + 10 - step, y + 3 + step, 1, 1, fg, fg, fg);
+            }
+        }
     }
     void overlay_frame(const ef2000::OverlayPanel& panel) {
         if (!overlay_frame_texture_) {
@@ -905,7 +941,10 @@ private:
             overlay_fill(panel.x + 4, panel.y + 4, panel.w, panel.h, 0, 0, 0);
             overlay_frame(panel);
             const std::string title = index == 0 ? "FLIGHT CONTROLS" : "SYSTEM MONITOR";
-            const float tab_width = std::min(panel.w - 32, float(title.size() * 8 + 20));
+            const float title_width = overlay_font_texture_ ?
+                float(ef2000::menu_font_text_width(overlay_font_widths_, title)) :
+                float(title.size() * 8);
+            const float tab_width = std::min(panel.w - 67, title_width + 20);
             // Small stepped upper-right edge rather than a modern full-width
             // titlebar. Keep mouse-drag hit testing in OverlayWindows intact.
             overlay_skin_fill(overlay_title_texture_, panel.x + 5, panel.y + 5, tab_width - 9, 17,
@@ -916,20 +955,20 @@ private:
             overlay_fill(panel.x + 5 + tab_width - 12, panel.y + 5, 5, 1, 173, 185, 159);
             overlay_fill(panel.x + 5 + tab_width - 7, panel.y + 6, 4, 1, 173, 185, 159);
             overlay_text(panel.x + 10, panel.y + 9, title,
-                         int((tab_width - 10) / 8), 255, 255, 255);
-            // Host close and resize affordances reuse the original square
-            // checkbox motif rather than prominent red/gold widgets.
-            overlay_fill(panel.x + panel.w - 19, panel.y + 6, 14, 14, 32, 32, 32);
-            overlay_fill(panel.x + panel.w - 18, panel.y + 7, 12, 12, 131, 131, 135);
+                         int(tab_width - 10), 255, 255, 255);
+            // Match the original three square titlebar controls: minimize,
+            // maximize/restore, and close, all with actionable hit targets.
+            overlay_chrome_button(panel.x + panel.w - 55, panel.y + 6, 0, panel.minimized);
+            overlay_chrome_button(panel.x + panel.w - 37, panel.y + 6, 1, panel.maximized);
+            overlay_chrome_button(panel.x + panel.w - 19, panel.y + 6, 2, false);
             if (overlay_symbols_texture_) {
                 // Cell (4, 1) is the 16x16 dark cross from the specimen.
                 const SDL_FRect source{64, 16, 16, 16};
                 const SDL_FRect target{panel.x + panel.w - 20, panel.y + 5, 16, 16};
                 if (!SDL_RenderTexture(renderer_, overlay_symbols_texture_, &source, &target))
                     throw std::runtime_error(std::string("SDL3 overlay close symbol: ") + SDL_GetError());
-            } else {
-                overlay_text(panel.x + panel.w - 16, panel.y + 9, "X", 1, 27, 27, 27);
             }
+            if (panel.minimized) continue;
             overlay_fill(panel.x + panel.w - 13, panel.y + panel.h - 7, 8, 1, 159, 159, 175);
             overlay_fill(panel.x + panel.w - 7, panel.y + panel.h - 13, 1, 8, 159, 159, 175);
 
@@ -951,23 +990,23 @@ private:
             const int scroll = overlay_.panels()[index].scroll;
             const float content_inset = overlay_frame_texture_ ?
                 std::max(10.0f, float(options_.overlay_frame_border) + 2) : 10.0f;
-            const int max_chars = std::max(1, int((panel.w - content_inset - 10) / 8));
+            const int max_pixels = std::max(1, int(panel.w - content_inset - 10));
             for (int line = scroll; line < int(lines.size()) && line < scroll + rows; ++line) {
                 const std::string& value = lines[size_t(line)];
                 const bool heading = value == "HOST CONTROLS" || value == "GAMEPAD FLIGHT (EXPERIMENTAL)" ||
                     value == "EF2000 KEYBOARD - MAIN FLIGHT" || value == "VIEWS" ||
                     value == "OTHER USEFUL SHORTCUTS" || value == "VIDEO / EMULATION";
                 overlay_text(panel.x + content_inset, panel.y + 31 + float(line - scroll) * 13,
-                             value, max_chars,
+                             value, max_pixels,
                              heading ? 218 : 242, heading ? 226 : 242, heading ? 204 : 242);
             }
             overlay_text(panel.x + content_inset, panel.y + panel.h - 15,
                          index == 0 ? "SCROLL: WHEEL / UP-DOWN" : "LIVE GUEST DISPLAY",
-                         max_chars, 210, 218, 204);
+                         max_pixels, 210, 218, 204);
         }
         overlay_fill(0, 458, 640, 22, 39, 43, 23);
         overlay_text(8, 465, "F12 CLOSE  F11 / ALT+ENTER FULLSCREEN  TAB FOCUS  H HELP  D STATS",
-                     78, 255, 255, 255);
+                     624, 255, 255, 255);
     }
     SDL_AudioStream* audio_stream_{};
     SDL_AudioStream* cd_audio_stream_{};

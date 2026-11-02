@@ -37,7 +37,16 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 
 The extractor produces named PNGs, 640×400 BMP textures for the host overlay,
 an RGBA `skin-units.png`, a magenta-keyed `skin-units.bmp`, and a `skin.json`
-provenance manifest. **The red sprite sheet's background is palette index 0**;
+provenance manifest. The `skin` command also runs the font-specimen extractor,
+writing `menu-font.bmp` and `menu-font.widths` into the same directory. The
+overlay automatically loads those proportional glyphs when using
+`--overlay-skin-dir`, unless `--overlay-font-bmp` explicitly overrides them.
+The font renderer measures glyph advances in pixels for titlebar sizing and
+content clipping (rather than truncating by a guessed eight-pixel width).
+The beveled titlebar buttons now provide minimize, maximize/restore and close
+actions, following the original screenshot's three-control layout.
+
+**The red sprite sheet's background is palette index 0**;
 actual red foreground pixels use other indices, so keying by RGB color would
 erase valid red aircraft. The runtime option applies the original title and
 panel textures only; tactical icons and map remain analysis assets for future

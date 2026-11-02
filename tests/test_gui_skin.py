@@ -84,3 +84,15 @@ class OriginalGuiSkinTests(unittest.TestCase):
                                     for row in range(y, y + height)), name)
             with self.assertRaises(FileExistsError):
                 rip_skin(Path(os.environ['EF2000_DATA_DIR']), directory)
+
+    def test_skin_cli_includes_original_font_for_runtime(self):
+        from contextlib import redirect_stdout
+        from io import StringIO
+        from tools.ef2000_gui_assets import main
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'skin'
+            with redirect_stdout(StringIO()):
+                main(['skin', os.environ['EF2000_DATA_DIR'], '--out', str(output)])
+            self.assertEqual((output / 'menu-font.bmp').read_bytes()[:2], b'BM')
+            self.assertEqual(len((output / 'menu-font.widths').read_text().split()), 95)
+            self.assertTrue((output / 'skin-title.bmp').is_file())

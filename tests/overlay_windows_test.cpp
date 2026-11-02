@@ -59,5 +59,28 @@ int main() {
 
     windows.open_panel(OverlayPanel::Kind::Controls);
     assert(windows.focused_panel() == 0);
+    // Original titlebars also have working minimize and maximize controls.
+    auto decorated = windows.panels()[0];
+    windows.button(decorated.x + decorated.w - 46, decorated.y + 12, true, true);
+    assert(windows.panels()[0].minimized);
+    assert(windows.panels()[0].h == ef2000::OverlayWindows::title_height);
+    assert(windows.button(decorated.x + 20, decorated.y + 60, true, true));
+    assert(windows.panels()[0].minimized); // collapsed body is not interactive
+    windows.button(decorated.x + decorated.w - 46, decorated.y + 12, true, true);
+    assert(!windows.panels()[0].minimized);
+    assert(windows.panels()[0].h == decorated.h);
+    windows.button(decorated.x + decorated.w - 28, decorated.y + 12, true, true);
+    assert(windows.panels()[0].maximized);
+    assert(windows.panels()[0].w == 640 && windows.panels()[0].x == 0);
+    assert(windows.panels()[0].h == 457);
+    // Maximized windows cannot be accidentally dragged or resized.
+    windows.button(50, 10, true, true);
+    windows.motion(200, 200);
+    windows.button(200, 200, false, true);
+    assert(windows.panels()[0].x == 0 && windows.panels()[0].y == 0);
+    windows.button(612, 12, true, true);
+    assert(!windows.panels()[0].maximized);
+    assert(windows.panels()[0].x == decorated.x &&
+           windows.panels()[0].h == decorated.h);
     std::cout << "overlay-windows: modal input, move, resize, scroll, focus, close/reopen passed\n";
 }

@@ -16,6 +16,7 @@ struct OverlayPanel {
     float x{}, y{}, w{}, h{};
     int scroll{};
     bool open{true};
+    bool minimized{}, maximized{};
 };
 
 class OverlayWindows {
@@ -52,19 +53,30 @@ public:
             auto& panel = panels_[index];
             if (!panel.open || !contains(panel, x, y)) continue;
             focus(index);
-            if (x >= panel.x + panel.w - 20 && y < panel.y + title_height) {
-                panel.open = false;
-                grab_ = Grab::None;
-                if (panels_[1 - index].open) focus(1 - index);
-                return true;
+            if (y >= panel.y + 5 && y < panel.y + title_height - 2) {
+                if (x >= panel.x + panel.w - 20) {
+                    panel.open = false;
+                    grab_ = Grab::None;
+                    if (panels_[1 - index].open) focus(1 - index);
+                    return true;
+                }
+                if (x >= panel.x + panel.w - 38) {
+                    maximize(index);
+                    return true;
+                }
+                if (x >= panel.x + panel.w - 56) {
+                    minimize(index);
+                    return true;
+                }
             }
             start_x_ = x;
             start_y_ = y;
             initial_ = panel;
-            if (x >= panel.x + panel.w - resize_size &&
+            if (!panel.maximized && !panel.minimized &&
+                x >= panel.x + panel.w - resize_size &&
                 y >= panel.y + panel.h - resize_size)
                 grab_ = Grab::Resize;
-            else if (y < panel.y + title_height)
+            else if (!panel.maximized && y < panel.y + title_height)
                 grab_ = Grab::Move;
             return true;
         }
@@ -94,6 +106,7 @@ public:
     void wheel(int lines, int max_scroll) {
         if (!visible_ || !panels_[focused_].open) return;
         auto& panel = panels_[focused_];
+        if (panel.minimized) return;
         panel.scroll = std::clamp(panel.scroll - lines, 0, std::max(0, max_scroll));
     }
 
@@ -108,6 +121,7 @@ public:
     void open_panel(OverlayPanel::Kind kind) {
         const int index = kind == OverlayPanel::Kind::Controls ? 0 : 1;
         panels_[index].open = true;
+        if (panels_[index].minimized) minimize(index);
         focus(index);
     }
 
@@ -127,6 +141,35 @@ private:
     Grab grab_{Grab::None};
     float start_x_{}, start_y_{};
     OverlayPanel initial_{};
+    std::array<OverlayPanel, 2> maximize_restore_{};
+    std::array<float, 2> minimize_restore_height_{};
+
+    void minimize(int index) {
+        auto& panel = panels_[index];
+        if (panel.maximized) panel = maximize_restore_[index];
+        if (panel.minimized) {
+            panel.h = minimize_restore_height_[index];
+            panel.minimized = false;
+        } else {
+            minimize_restore_height_[index] = panel.h;
+            panel.h = title_height;
+            panel.minimized = true;
+        }
+    }
+    void maximize(int index) {
+        auto& panel = panels_[index];
+        if (panel.maximized) {
+            panel = maximize_restore_[index];
+            return;
+        }
+        maximize_restore_[index] = panel;
+        panel.x = 0;
+        panel.y = 0;
+        panel.w = canvas_width;
+        panel.h = canvas_height - title_height;
+        panel.minimized = false;
+        panel.maximized = true;
+    }
 
     static bool contains(const OverlayPanel& p, float x, float y) {
         return x >= p.x && x < p.x + p.w && y >= p.y && y < p.y + p.h;

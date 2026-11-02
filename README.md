@@ -385,7 +385,11 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 ```
 
 The extractor additionally saves original terrain and a colored unit/flag
-atlas for further research. See [GUI resource research](docs/gui-assets.md)
+atlas for further research. It also recovers the proportional menu font into
+the same directory; `--overlay-skin-dir` automatically uses it unless an
+explicit `--overlay-font-bmp` is provided. The F12 overlay now has working
+minimize, maximize/restore and close titlebar buttons, styled after the
+original game. See [GUI resource research](docs/gui-assets.md)
 for exact archive hashes and the transparency index caveat.
 
 ```sh
