@@ -29,12 +29,26 @@ class GhidraWorkflowTests(unittest.TestCase):
                 'payload_sha256': hashlib.sha256(self.image).hexdigest(),
             }
         }
-        self.launcher = '/bin/true'
+        # A Nix build sandbox does not provide /bin/true. The launcher is
+        # mocked at subprocess.run, but the path still has to pass validation.
+        launcher = Path(self.temp.name) / 'analyzeHeadless'
+        launcher.write_text('#!/bin/sh\nexit 0\n')
+        launcher.chmod(0o755)
+        self.launcher = str(launcher)
 
     def import_args(self):
         return argparse.Namespace(executable=self.executable,
                                   workspace=self.workspace,
                                   analyze_headless=self.launcher)
+
+    def test_environment_workspace_default_for_nix_workflow(self):
+        with patch.dict(ghidra.os.environ, {'EF2000_GHIDRA_WORKSPACE': str(self.workspace)}), \
+                patch.object(ghidra, 'audit_flow_gaps') as audit:
+            ghidra.main(['audit-flow-gaps'])
+            self.assertEqual(audit.call_args.args[0].workspace, self.workspace)
+            explicit = self.workspace / 'other'
+            ghidra.main(['audit-flow-gaps', '--workspace', str(explicit)])
+            self.assertEqual(audit.call_args.args[0].workspace, explicit)
 
     def test_import_uses_protected_image_and_pinned_offsets(self):
         def fake_ghidra(command, check):

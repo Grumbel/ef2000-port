@@ -13,19 +13,38 @@ pseudo-C remain in the ignored `local/` directory by default.
 
 ## Initialize once
 
-`nix develop` includes Ghidra and sets `GHIDRA_HOME` to the Nix store's
-`lib/ghidra` installation. Run from the EF2000 repository root:
+`nix develop` includes Ghidra, sets `GHIDRA_HOME` to the Nix store's
+`lib/ghidra` installation, and adds `ef2000-ghidra` to `PATH`.
+Run from the EF2000 repository root:
 
 ```sh
 nix develop
-python3 tools/ghidra_ef2000.py import \
+ef2000-ghidra import \
   ../EF2000/c/EF2000/_EF2000.EXE
 ```
 
 Outside the development shell, `nix run .#ghidra` opens the GUI and
-`nix run .#ghidra-headless -- ...` runs the headless analyzer. With a separate
-Ghidra installation, set `GHIDRA_HOME=/path/to/ghidra`, or supply
-`--analyze-headless /path/to/ghidra/support/analyzeHeadless` to the Python tool.
+`nix run .#ghidra-headless -- ...` runs the headless analyzer. The full
+EF2000 import/recovery/decompilation tool is also available outside the
+development shell, without making Ghidra a game-runtime dependency:
+
+```sh
+nix run .#ghidra-ef2000 -- import ../EF2000/c/EF2000/_EF2000.EXE
+nix run .#ghidra-ef2000 -- inventory
+nix run .#ghidra-ef2000 -- audit-flow-gaps
+nix run .#ghidra-ef2000 -- repair-boundaries # report only unless --apply
+nix run .#ghidra-ef2000 -- export-all --custom-storage-fallback
+```
+
+The Nix wrapper writes to **the current directory's `local/ghidra`**, even
+though the scripts themselves reside in the read-only Nix store. Override
+that default with `EF2000_GHIDRA_WORKSPACE` or per-command `--workspace`;
+it is important to use the same workspace across commands. Direct Python
+invocations from the repository retain the original source-tree
+`local/ghidra` default. With a separate Ghidra installation, set
+`GHIDRA_HOME=/path/to/ghidra` or supply
+`--analyze-headless /path/to/ghidra/support/analyzeHeadless`.
+
 The command verifies the executable SHA-256,
 exports `payload.bin` and `manifest.json`, and imports the binary to the
 `local/ghidra/projects/EF2000` project using Ghidra's `BinaryLoader`,
@@ -40,6 +59,9 @@ Once imported, open the project through Ghidra's GUI to explore cross-references
 rename functions and apply verified types. The importer refuses to overwrite an
 existing project. Reuse the same project with `decompile`; preserve your manual
 Ghidra annotations in the local project directory or export them separately.
+The asset-free Ghidra CLI tests run under `nix flake check` via the main
+package and a separate `ghidra-workflow` check; no original DOS image is
+needed by those tests.
 
 ## Export the entire discovered-function corpus
 

@@ -203,11 +203,25 @@
         (devCommand "ef2000-run" ./dev/run.sh)
         (devCommand "ef2000-run-gdb" ./dev/run-gdb.sh)
       ];
+      # The headless workflow is a separate tool: keep Ghidra's large runtime
+      # out of the main game package closure. Its scripts are read from the
+      # Nix source tree, while projects/exports default to the caller's cwd.
+      ghidraWorkflow = pkgs.writeShellScriptBin "ef2000-ghidra" ''
+        set -euo pipefail
+        if [ -z "''${GHIDRA_HOME:-}" ]; then
+          export GHIDRA_HOME=${lib.escapeShellArg ghidraHome}
+        fi
+        if [ -z "''${EF2000_GHIDRA_WORKSPACE:-}" ]; then
+          export EF2000_GHIDRA_WORKSPACE="$PWD/local/ghidra"
+        fi
+        exec ${pkgs.python3}/bin/python3 ${source}/tools/ghidra_ef2000.py "$@"
+      '';
     in {
       packages.${system} = {
         default = package;
         ef2000 = package;
         ef2000-startup = package;
+        ef2000-ghidra = ghidraWorkflow;
         ef2000-win64 = win64.dist;
         ef2000-win64-zip = win64.zip;
         ef2000-win32 = win32.dist;
@@ -238,6 +252,11 @@
            inherit unicorn;
            inherit unicorn-cpp;
            inherit ghidra;
+           ghidra-ef2000 = {
+             type = "app";
+             program = "${ghidraWorkflow}/bin/ef2000-ghidra";
+             meta.description = "Import, audit, repair, and export the EF2000 Ghidra project";
+           };
            ghidra-headless = {
              type = "app";
              program = "${ghidraHome}/support/analyzeHeadless";
@@ -264,6 +283,17 @@
           ${package}/bin/ef2000-unicorn-cpp --help > "$out"
           test -s "$out"
           ${package}/bin/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
+        '';
+        ghidra-workflow = pkgs.runCommand "ef2000-ghidra-workflow-check" {
+          nativeBuildInputs = [ pkgs.python3 ];
+        } ''
+          ${ghidraWorkflow}/bin/ef2000-ghidra --help > "$out"
+          grep -q 'audit-flow-gaps' "$out"
+          grep -q 'repair-boundaries' "$out"
+          grep -q 'export-all' "$out"
+          cd ${source}
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests \
+            -p test_ghidra_ef2000.py -q
         '';
         windows-layout = pkgs.runCommand "ef2000-windows-layout-check" {
           nativeBuildInputs = [ pkgs.file ];
@@ -317,7 +347,7 @@
       };
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
-        packages = [ python pkgs.ghidra ] ++ devCommands ++ (with pkgs; [
+        packages = [ python pkgs.ghidra ghidraWorkflow ] ++ devCommands ++ (with pkgs; [
           gcc binutils qemu-user dosbox-x cmake ninja gdb ccache
         ]);
         GHIDRA_HOME = ghidraHome;
@@ -349,10 +379,18 @@
           printf '  python tools/unicorn_backend.py /path/to/_EF2000.EXE --windowed\n'
           printf '                                  Direct Unicorn backend for development\n\n'
           printf 'Ghidra reverse engineering (original executable stays external):\n'
-          printf '  python3 tools/ghidra_ef2000.py import /path/to/_EF2000.EXE\n'
+          printf '  ef2000-ghidra import /path/to/_EF2000.EXE\n'
           printf '                                  Import SHA-pinned X-32 image once\n'
-          printf '  python3 tools/ghidra_ef2000.py decompile 0xe9a24 0x8b274\n'
+          printf '  ef2000-ghidra decompile 0xe9a24 0x8b274\n'
           printf '                                  Export targeted pseudo-C and incoming references\n'
+          printf '  ef2000-ghidra export-all --custom-storage-fallback\n'
+          printf '                                  Export all recognized functions to pseudo-C\n'
+          printf '  ef2000-ghidra audit-flow-gaps\n'
+          printf '                                  Audit suspicious fall-through decoding gaps\n'
+          printf '  ef2000-ghidra repair-boundaries\n'
+          printf '                                  Audit five pinned function-body repairs (read-only)\n'
+          printf '  nix run .#ghidra-ef2000 -- --help\n'
+          printf '                                  Same workflow without entering the dev shell\n'
           printf '  ghidra                          Open Ghidra GUI\n\n'
           printf 'Examples:\n'
           printf '  ef2000-run --data-dir /path/to/EF2000 --windowed\n'

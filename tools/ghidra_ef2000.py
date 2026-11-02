@@ -440,12 +440,17 @@ def name_callbacks(args):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest='command', required=True)
+    # The Nix workflow wrapper runs from a read-only store source tree, so
+    # it supplies a writable default under the caller's current directory.
+    # Direct source-tree invocations retain the original ignored local/ path.
+    default_workspace = Path(os.environ.get('EF2000_GHIDRA_WORKSPACE',
+                                            str(ROOT / 'local/ghidra'))).expanduser()
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
                  'recover-orphans', 'recover-calls', 'repair-boundaries', 'audit-flow-gaps',
                  'callback-tables', 'name-callbacks'):
         sub = subparsers.add_parser(name)
-        sub.add_argument('--workspace', type=Path, default=ROOT / 'local/ghidra',
-                         help='ignored Ghidra project and image workspace')
+        sub.add_argument('--workspace', type=Path, default=default_workspace,
+                         help='Ghidra project and image workspace (default: EF2000_GHIDRA_WORKSPACE or source local/ghidra)')
         sub.add_argument('--analyze-headless', help='Ghidra launcher or installation directory')
     imp = subparsers.choices['import']
     imp.add_argument('executable', type=Path, help='SHA-pinned original _EF2000.EXE')

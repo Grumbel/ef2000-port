@@ -44,15 +44,26 @@ ef2000-run-gdb /path/to/_EF2000.EXE    # build then debug native startup.elf in 
 nix develop -c ef2000-build            # also works without an interactive shell
 nix build .#ef2000-win64-zip           # Windows x64 archive (C++ Unicorn/SDL3)
 nix build .#ef2000-win32-zip           # Windows x86 archive
-python3 tools/ghidra_ef2000.py import /path/to/_EF2000.EXE
-python3 tools/ghidra_ef2000.py decompile 0xe9a24 0x8b274
-python3 tools/ghidra_ef2000.py inventory       # all discovered functions and code gaps
-python3 tools/ghidra_ef2000.py export-all      # full discovered-function pseudo-C corpus
-python3 tools/ghidra_ef2000.py recover-orphans # review referenced missing functions (dry run)
-python3 tools/ghidra_ef2000.py callback-tables # extract verified named dispatch tables
-python3 tools/ghidra_ef2000.py name-callbacks  # audit names (dry run)
+ef2000-ghidra import /path/to/_EF2000.EXE
+ef2000-ghidra decompile 0xe9a24 0x8b274
+ef2000-ghidra inventory               # all discovered functions and code gaps
+ef2000-ghidra export-all --custom-storage-fallback # full pseudo-C corpus
+ef2000-ghidra recover-orphans         # review referenced missing functions (dry run)
+ef2000-ghidra callback-tables         # extract verified named dispatch tables
+ef2000-ghidra name-callbacks          # audit names (dry run)
+ef2000-ghidra audit-flow-gaps         # inspect truncated function bodies
+ef2000-ghidra repair-boundaries       # audit five guarded recipes (dry run)
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
+
+Without entering the shell, use
+`nix run .#ghidra-ef2000 -- import /path/to/_EF2000.EXE`
+(or another subcommand). These Nix wrappers default
+to the writable `./local/ghidra` directory and keep Ghidra outside the
+main game package. Set `EF2000_GHIDRA_WORKSPACE` or pass `--workspace`
+to choose a different project. `nix flake check` also runs the asset-free
+Ghidra workflow tests; the original executable is never included in Nix
+builds.
 
 `EF2000_SOURCE` defaults to the directory from which `nix develop` was entered;
 `EF2000_BUILD_DIR` defaults to `/tmp/ef2000-build` and can be overridden.
