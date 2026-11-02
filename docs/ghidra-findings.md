@@ -605,3 +605,60 @@ Watcom argument uncertainties remain. The two-pass exporter now uses a
 **fresh temporary corpus** under `--overwrite` and publishes it after both
 passes complete, ensuring all eight marked storage-fallback files are
 newly regenerated rather than silently reused from an earlier analysis.
+
+## #050: Four more reconstructed function tails
+
+Continuing from the corrected #049 project, the expanded read-only
+`audit-flow-gaps` report now includes nearby orphan instruction boundaries
+and the source/type of inbound references. Manual disassembly of the
+original pinned image, plus comparison with the existing Ghidra Listing,
+confirmed four additional incorrectly truncated routines. Each verified
+guest continuation was guarded with a **separate fixed repair recipe**
+in `EF2000RepairBoundaries.java`, including exact original bytes,
+instruction lengths, existing function body and next entry, expected
+re-synchronization point, verified terminating `RET`, and a check for
+user-defined, default-data or flow references at the cleared addresses.
+
+| Function | Incorrect decoding / missing listing | Body before | Body after |
+| --- | --- | ---: | ---: |
+| `0x4050` | A bogus `RET 0x30be` at `0x4079` masked the remaining setup loop | 34 | **138** |
+| `0x4738` | False `ROR`, `ADD`, `XOR` sequence at `0x4800`–`0x480d` | 199 | **321** |
+| `0x4bf8` | False `SAR` at `0x4c35` inside the `XOR EDX,EDX` / `MOV EAX,...` sequence | 60 | **87** |
+| `0x4e14` | False `ADD`, `ROR`, `OR` sequence at `0x4f01`–`0x4f0b` | 233 | **260** |
+
+The `0x4050` case was the most consequential: after an actual `CALL` at
+`0x4072` the Listing had no instructions at all beyond the spurious
+`RET 0x30be` to the next function. The original bytes instead decode
+into a coherent loop, with the final `RET` at `0x40d9`, Watcom padding
+at `0x40da` and a separate prologue at `0x40dc`. Its end byte was
+verified directly because Ghidra had not previously disassembled it.
+
+The `0x4738`, `0x4bf8` and `0x4e14` cases each reconnect to existing,
+coherently decoded orphan instructions. All four transactions were
+successfully applied on the disposable #050 project and extended the
+corresponding existing functions by a combined **280 bytes**. The fifth
+recipe, `0x45a4` from #049, was already repaired and left unchanged.
+The `0xbfcc` gap remains deliberately **unrepaired**: the disputed
+`0xc302` decode has a DEFAULT-source DATA reference from `0x128148`,
+so the automatic repair safety policy correctly excludes it. The
+remaining gap list is for individual investigation, not bulk clearing.
+
+| Ghidra 11.4.2 measurement | #049 | #050 |
+| --- | ---: | ---: |
+| Recognized functions | 4,233 | 4,233 |
+| Summed function body bytes | 895,546 | **895,826** |
+| Disassembled instructions | 283,570 | **283,602** |
+| Disassembled instruction bytes | 939,955 | **940,057** |
+| Instruction bytes outside functions | 44,409 | **44,231** |
+| Orphan instruction ranges | 318 | **314** |
+| Short flow-gap audit candidates | 16 | **12** |
+| Direct-call edges | 18,785 | **18,790** |
+| Unresolved direct-call edges | 0 | **0** |
+
+The full #050 export after repair still produced **4,233/4,233**
+pseudo-C functions with **eight freshly regenerated custom-storage
+fallbacks**, no failed decompilations, and no unresolved direct calls.
+All five recipes were re-audited as `already_repaired` (idempotent).
+This improves Listing ownership and control-flow recovery; it does not
+make the Ghidra pseudo-C a source-equivalent, compilable reimplementation
+of the game, nor does it resolve uncertain Watcom calling conventions.

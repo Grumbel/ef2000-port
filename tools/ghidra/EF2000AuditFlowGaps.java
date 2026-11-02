@@ -7,6 +7,7 @@ import ghidra.program.model.address.Address;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.InstructionIterator;
+import ghidra.program.model.symbol.Reference;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,7 +33,7 @@ public class EF2000AuditFlowGaps extends GhidraScript {
         }
 
         List<String> report = new ArrayList<>();
-        report.add("function_entry\tsite\tfallthrough\tnext_orphan\tgap_bytes\tfirst_byte\tprevious_instruction\tnext_instruction");
+        report.add("function_entry\tsite\tfallthrough\tnext_orphan\tgap_bytes\tfirst_byte\tprevious_instruction\tnext_instruction\torphan_window\torphan_references");
         InstructionIterator instructions = currentProgram.getListing().getInstructions(true);
         while (instructions.hasNext()) {
             monitor.checkCancelled();
@@ -52,10 +53,11 @@ public class EF2000AuditFlowGaps extends GhidraScript {
             long gap = next.getAddress().getOffset() - fallthrough.getOffset();
             if (gap < 1 || gap > MAX_GAP) continue;
             int opcode = currentProgram.getMemory().getByte(fallthrough) & 0xff;
-            report.add(String.format("0x%08x\t0x%08x\t0x%08x\t0x%08x\t%d\t0x%02x\t%s\t%s",
+            report.add(String.format("0x%08x\t0x%08x\t0x%08x\t0x%08x\t%d\t0x%02x\t%s\t%s\t%s\t%s",
                 function.getEntryPoint().getOffset(), site.getOffset(),
                 fallthrough.getOffset(), next.getAddress().getOffset(),
-                gap, opcode, clean(instruction.toString()), clean(next.toString())));
+                gap, opcode, clean(instruction.toString()), clean(next.toString()),
+                orphanWindow(next), orphanReferences(next)));
         }
         Path output = Paths.get(args[0]);
         Files.createDirectories(output.getParent());
@@ -70,5 +72,30 @@ public class EF2000AuditFlowGaps extends GhidraScript {
 
     private String clean(String text) {
         return text.replace('\t', ' ').replace('\r', ' ').replace('\n', ' ');
+    }
+
+    private String orphanWindow(Instruction start) {
+        List<String> items = new ArrayList<>();
+        Instruction instruction = start;
+        for (int i = 0; i < 16 && instruction != null; i++) {
+            if (getFunctionContaining(instruction.getAddress()) != null ||
+                    instruction.getAddress().getOffset() > start.getAddress().getOffset() + 96) break;
+            items.add(String.format("0x%x(+%d):%s", instruction.getAddress().getOffset(),
+                                    instruction.getLength(), clean(instruction.toString())));
+            instruction = getInstructionAfter(instruction.getAddress());
+        }
+        return String.join(" | ", items);
+    }
+
+    private String orphanReferences(Instruction start) {
+        List<String> refs = new ArrayList<>();
+        for (long offset = start.getAddress().getOffset();
+                offset < start.getAddress().getOffset() + 48; offset++) {
+            for (Reference ref : getReferencesTo(toAddr(offset))) {
+                refs.add(String.format("0x%x<-0x%x:%s:%s", offset,
+                    ref.getFromAddress().getOffset(), ref.getReferenceType(), ref.getSource()));
+            }
+        }
+        return String.join(" | ", refs);
     }
 }

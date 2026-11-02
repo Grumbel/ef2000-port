@@ -324,14 +324,17 @@ def repair_boundaries(args):
                 set(reader.fieldnames or ()):
             raise ValueError('Ghidra returned an invalid boundary-repair report')
         rows = list(reader)
-    if len(rows) != 1:
+    if len(rows) != 5 or {row['entry'] for row in rows} != {
+            '0x00004050', '0x000045a4', '0x00004738', '0x00004bf8', '0x00004e14'}:
         raise ValueError('Ghidra returned an unexpected number of boundary-repair rows')
-    row = rows[0]
-    if row['result'] == 'repair_failed':
-        raise ValueError(f'Ghidra boundary repair failed: {row.get("error", "unknown error")}')
-    print(f'Ghidra boundary repair: {row["result"]}; '
-          f'body bytes {row["body_bytes_before"]} -> {row["body_bytes_after"]}; '
-          f'output: {output}')
+    failed = [row for row in rows if row['result'] == 'repair_failed']
+    if failed:
+        raise ValueError('Ghidra boundary repair failed: ' + '; '.join(
+            f'{row["entry"]}: {row.get("error", "unknown error")}' for row in failed))
+    print('Ghidra boundary repair: ' + ', '.join(
+        f'{row["entry"]} {row["result"]} '
+        f'({row["body_bytes_before"]} -> {row["body_bytes_after"]} bytes)'
+        for row in rows) + f'; output: {output}')
 
 
 def audit_flow_gaps(args):
@@ -488,7 +491,7 @@ def main(argv=None):
     boundaries.add_argument('--output', type=Path,
                             help='TSV audit (default: workspace/boundary-repairs.tsv)')
     boundaries.add_argument('--apply', action='store_true',
-                            help='repair only the verified arcade overlap at 0x45d3 on a disposable project')
+                            help='repair only five pinned, byte-verified boundary recipes on a disposable project')
     gaps = subparsers.choices['audit-flow-gaps']
     gaps.add_argument('--output', type=Path,
                       help='TSV audit (default: workspace/flow-gaps.tsv)')

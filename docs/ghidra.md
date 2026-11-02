@@ -447,33 +447,41 @@ the recognized set from 4,220 to 4,233 and reducing unresolved direct calls
 in **currently decoded code** from six to zero. The remaining orphan bytes,
 indirect calls, X-32 register ABI and data types are still open questions.
 
-### Audit truncated function bodies and repair one verified overlap
+### Audit truncated function bodies and repair byte-verified overlaps
 
 Ghidra can decompile a function whose stored Listing body is incomplete:
 it may decode bytes as alternative instructions while following the
 decompiler's control flow. The read-only `audit-flow-gaps` command finds
 short gaps between a known function's fall-through address and the next
 already-decoded *orphan* instruction. Each row records the two addresses,
-the preceding instruction, the first missing byte, and the next orphan
-instruction. **This is a triage list, not a proof that every gap is code.**
+the preceding instruction, the first missing byte, an extended window of
+orphan instructions, and incoming reference types around that window.
+**This is a triage list, not a proof that every gap is code.**
 
-The separate `repair-boundaries` command currently has one pinned, guarded
-repair recipe: function `0x45a4`, whose Ghidra body stopped at `0x45d0`
-while a bogus `POP EAX` at `0x45d3` and `ADC` at `0x45d4` overlapped the
-true five-byte `MOV EDX,0x125828` at `0x45d1`. The routine runs to the
-`RET` at `0x4734`, followed by Watcom padding and the independently
-recognized function at `0x4738`.
+The separate `repair-boundaries` command has **five pinned, guarded recipes**:
+
+| Function | Incorrect orphan instructions | True continuation | Verified end |
+| --- | --- | --- | --- |
+| `0x4050` | `0x4074`–`0x407b` | `CALL 0x9c960` at `0x4072` | `RET` `0x40d9` |
+| `0x45a4` | `0x45d3`–`0x45d5` | `MOV EDX,0x125828` at `0x45d1` | `RET` `0x4734` |
+| `0x4738` | `0x4800`–`0x480d` | `XOR EDX,EDX` at `0x47ff` | `RET` `0x4878` |
+| `0x4bf8` | `0x4c35`–`0x4c3a` | `XOR EDX,EDX` at `0x4c34` | `RET` `0x4c4e` |
+| `0x4e14` | `0x4f01`–`0x4f0b` | `CALL 0x7c4fc` at `0x4efd` | `RET` `0x4f17` |
+
+The first `0x4050` repair also disassembles a previously **undefined**
+continuation; its final `RET` byte is checked against the original image.
+All other verified ends were already decoded as orphan instructions.
 
 ```sh
-# Start with a disposable copy of a #048 recovered project.
-cp -a /path/to/recovered-048-workspace local/ghidra-boundaries
+# Start with a disposable copy of a recovered project, never the only copy.
+cp -a /path/to/recovered-workspace local/ghidra-boundaries
 
 python3 tools/ghidra_ef2000.py audit-flow-gaps \
   --workspace local/ghidra-boundaries
 python3 tools/ghidra_ef2000.py repair-boundaries \
   --workspace local/ghidra-boundaries
 
-# After checking the report, opt in to the specific verified repair:
+# After checking the report, opt in to the pinned repairs:
 python3 tools/ghidra_ef2000.py repair-boundaries \
   --workspace local/ghidra-boundaries --apply
 
@@ -487,21 +495,27 @@ python3 tools/ghidra_ef2000.py export-all \
   --overwrite --custom-storage-fallback
 ```
 
-The applying repair verifies the old function body, exact original bytes,
+The applying repair verifies each old function body, exact original bytes,
 bad instruction lengths, adjacent function entry, absence of other function
-bodies or typed data, and no user annotations or flow references at the
-discarded instructions. A stale analysis-generated DATA pointer into the
-middle of the MOV immediate is tolerated. It clears **only those two
-instructions**, disassembles the bounded continuation, verifies every byte
-up to the expected `RET`, then updates the original function's body. A
-per-repair transaction rolls back if any check fails. It cannot be used
-to clear arbitrary instructions or mass-repair uncertain regions.
+bodies or typed data, and no user annotations, default-source DATA pointers,
+or flow references at the discarded instructions. Only stale
+analysis-generated DATA pointers are tolerated. It clears **only the
+enumerated erroneous instruction spans**, disassembles the bounded
+continuation, verifies every byte up to the expected `RET`, then updates
+the original function's body. Each repair has its own rollback transaction;
+failed recipes are reported explicitly. It cannot be used to clear arbitrary
+instructions or mass-repair uncertain regions.
 
 On the #048 disposable project, Ghidra 11.4.2 / JDK 21 grew the verified
 `0x45a4` function body **45 → 401 bytes** and reduced orphan instruction
-bytes **44,763 → 44,409**. The generic audit initially found 17 short
-flow gaps and found 16 afterward. Those 16 require case-by-case review;
-none were automatically changed.
+bytes **44,763 → 44,409**. On a #049 project copy, the four additional
+repairs changed `0x4050` **34 → 138**, `0x4738` **199 → 321**,
+`0x4bf8` **60 → 87**, and `0x4e14` **233 → 260**, recovering 280 more
+function-body bytes. The generic flow-gap audit reported **17** before
+the first repair, **16** after #049, and **12** after all five recipes.
+Other candidates require case-by-case review: for example, `0xbfcc`
+has a DEFAULT-source data pointer into disputed code at `0xc302`, which
+must not be silently discarded.
 
 ## Export selected functions
 
