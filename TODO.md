@@ -125,7 +125,10 @@ Implemented and verified:
   reusable skin/texture atlas for the host-side SDL3 windows. The initial
   asset-free window manager now supports **drag, resize, focus/Z-order,
   close/reopen and scroll**, with F12 controls and diagnostics panels;
-  original skin textures, finer widgets and gamepad window navigation remain.
+  optional caller-cropped BMP frame skins can be applied as nine-slice
+  textures with `--overlay-frame-bmp`. **Automatic identification of the
+  correct original frame/font/button art**, texture atlas generation,
+  finer widgets and gamepad window navigation remain.
   Keep the native UI separate from guest framebuffer emulation so menus can
   coexist with the cockpit and eventually replace original hardcoded GUI
   callbacks. Compare extracted textures and layout with `docs/gui-assets.md`;

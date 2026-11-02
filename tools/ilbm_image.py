@@ -153,3 +153,34 @@ def encode_png(image):
     return (b'\x89PNG\r\n\x1a\n' +
             chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, colour_type, 0, 0, 0)) +
             payload + chunk(b'IDAT', zlib.compress(scanlines)) + chunk(b'IEND', b''))
+
+
+def encode_bmp(image):
+    """Export a Windows-compatible 24-bit BI_RGB bitmap for SDL_LoadBMP.
+
+    Unlike PNG, BMP is only an interchange format for the optional host UI
+    skin. A masked IFF pixel is flattened onto black; use PNG if its original
+    palette indices or alpha need to be retained for archival work.
+    """
+    width, height = image.width, image.height
+    if not 0 < width <= 4096 or not 0 < height <= 4096:
+        raise ValueError('invalid BMP image dimensions')
+    if len(image.indexed) != width * height or len(image.palette) != 768:
+        raise ValueError('invalid BMP source image')
+    if image.alpha is not None and len(image.alpha) != len(image.indexed):
+        raise ValueError('invalid BMP source mask')
+    stride = (width * 3 + 3) & ~3
+    pixels = bytearray(stride * height)
+    for y in range(height):
+        dest = (height - y - 1) * stride
+        for x in range(width):
+            offset = y * width + x
+            colour = image.indexed[offset] * 3
+            alpha = image.alpha[offset] if image.alpha is not None else 255
+            for channel in range(3):
+                value = image.palette[colour + (2 - channel)]
+                pixels[dest + x * 3 + channel] = (value * alpha + 127) // 255
+    size = 54 + len(pixels)
+    return (struct.pack('<2sIHHI', b'BM', size, 0, 0, 54) +
+            struct.pack('<IiiHHIIiiII', 40, width, height, 1, 24, 0,
+                        len(pixels), 2835, 2835, 0, 0) + bytes(pixels))

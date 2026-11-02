@@ -8,6 +8,7 @@
 #include "bios_disk.hpp"
 #include "gamepad_profile.hpp"
 #include "host_shortcuts.hpp"
+#include "nine_slice.hpp"
 #include "overlay_windows.hpp"
 #include "cd_audio.hpp"
 #include "pcm_audio.hpp"
@@ -131,6 +132,8 @@ struct WindowOptions {
     bool enabled{}, fullscreen{}, smooth_scaling{};
     bool profile_video_frames{};
     bool show_fps{true}, gamepad_flight_profile{true};
+    std::string overlay_frame_bmp;
+    int overlay_frame_border{12};
     int width = 1280, height = 960;
     std::string aspect_ratio = "4:3";
     int joystick_index{}; // -1 disables the physical controller.
@@ -190,6 +193,27 @@ public:
                 options_.aspect_ratio == "stretch" ? SDL_LOGICAL_PRESENTATION_STRETCH :
                                                       SDL_LOGICAL_PRESENTATION_LETTERBOX))
             throw std::runtime_error(std::string("SDL_SetRenderLogicalPresentation: ") + SDL_GetError());
+        if (!options_.overlay_frame_bmp.empty()) {
+            SDL_Surface* surface = SDL_LoadBMP(options_.overlay_frame_bmp.c_str());
+            if (!surface)
+                throw std::runtime_error("cannot load overlay frame BMP: " + options_.overlay_frame_bmp +
+                                         ": " + SDL_GetError());
+            overlay_frame_width_ = surface->w;
+            overlay_frame_height_ = surface->h;
+            const int border = options_.overlay_frame_border;
+            if (overlay_frame_width_ <= border * 2 || overlay_frame_height_ <= border * 2) {
+                SDL_DestroySurface(surface);
+                throw std::runtime_error("overlay frame BMP must be larger than twice its border");
+            }
+            overlay_frame_texture_ = SDL_CreateTextureFromSurface(renderer_, surface);
+            SDL_DestroySurface(surface);
+            if (!overlay_frame_texture_ ||
+                !SDL_SetTextureScaleMode(overlay_frame_texture_, SDL_SCALEMODE_NEAREST))
+                throw std::runtime_error(std::string("SDL3 overlay frame texture: ") + SDL_GetError());
+            std::cerr << "overlay: loaded 9-slice frame " << options_.overlay_frame_bmp
+                      << " (" << overlay_frame_width_ << "x" << overlay_frame_height_
+                      << ", border=" << border << ")\n";
+        }
         probe_joystick(true);
 #else
         throw std::runtime_error("this binary was built without SDL3; remove --windowed");
@@ -202,6 +226,7 @@ public:
         if (audio_device_) SDL_CloseAudioDevice(audio_device_);
         if (audio_initialized_) SDL_QuitSubSystem(SDL_INIT_AUDIO);
         close_joystick();
+        if (overlay_frame_texture_) SDL_DestroyTexture(overlay_frame_texture_);
         if (texture_) SDL_DestroyTexture(texture_);
         if (renderer_) SDL_DestroyRenderer(renderer_);
         if (window_) SDL_DestroyWindow(window_);
@@ -711,6 +736,30 @@ private:
             !SDL_RenderDebugText(renderer_, x, y, value.c_str()))
             throw std::runtime_error(std::string("SDL3 overlay text: ") + SDL_GetError());
     }
+    void overlay_frame(const ef2000::OverlayPanel& panel) {
+        if (!overlay_frame_texture_) {
+            overlay_fill(panel.x, panel.y, panel.w, panel.h, 168, 137, 69);
+            overlay_fill(panel.x + 2, panel.y + 2, panel.w - 4, panel.h - 4, 17, 30, 47);
+            return;
+        }
+        const auto patches = ef2000::nine_slice(float(overlay_frame_width_),
+            float(overlay_frame_height_), float(options_.overlay_frame_border),
+            {panel.x, panel.y, panel.w, panel.h});
+        for (const auto& patch : patches) {
+            if (patch.target.w <= 0 || patch.target.h <= 0) continue;
+            const SDL_FRect source{patch.source.x, patch.source.y, patch.source.w, patch.source.h};
+            const SDL_FRect destination{patch.target.x, patch.target.y,
+                                        patch.target.w, patch.target.h};
+            if (!SDL_RenderTexture(renderer_, overlay_frame_texture_, &source, &destination))
+                throw std::runtime_error(std::string("SDL3 overlay frame draw: ") + SDL_GetError());
+        }
+        // Keep help readable across arbitrary user-cropped frame artworks.
+        const float border = float(options_.overlay_frame_border);
+        overlay_fill(panel.x + border, panel.y + ef2000::OverlayWindows::title_height + 1,
+                     panel.w - 2 * border,
+                     panel.h - ef2000::OverlayWindows::title_height - border - 2,
+                     17, 30, 47);
+    }
     void draw_overlay(uint64_t instructions, uint64_t interrupts, const std::string& status,
                       int width, int height) {
         const auto sampled = std::chrono::steady_clock::now();
@@ -724,8 +773,7 @@ private:
             if (!panel.open) continue;
             const bool focused = overlay_.focused_panel() == index;
             overlay_fill(panel.x + 3, panel.y + 3, panel.w, panel.h, 3, 9, 17);
-            overlay_fill(panel.x, panel.y, panel.w, panel.h, 168, 137, 69);
-            overlay_fill(panel.x + 2, panel.y + 2, panel.w - 4, panel.h - 4, 17, 30, 47);
+            overlay_frame(panel);
             overlay_fill(panel.x + 3, panel.y + 3, panel.w - 6,
                          ef2000::OverlayWindows::title_height - 2,
                          focused ? 52 : 34, focused ? 83 : 57, focused ? 114 : 81);
@@ -754,17 +802,19 @@ private:
             const int rows = std::max(1, int((panel.h - ef2000::OverlayWindows::title_height - 35) / 13));
             overlay_.clamp_scroll(index, std::max(0, int(lines.size()) - rows));
             const int scroll = overlay_.panels()[index].scroll;
-            const int max_chars = std::max(1, int((panel.w - 20) / 8));
+            const float content_inset = overlay_frame_texture_ ?
+                std::max(10.0f, float(options_.overlay_frame_border) + 2) : 10.0f;
+            const int max_chars = std::max(1, int((panel.w - content_inset - 10) / 8));
             for (int line = scroll; line < int(lines.size()) && line < scroll + rows; ++line) {
                 const std::string& value = lines[size_t(line)];
                 const bool heading = value == "HOST CONTROLS" || value == "GAMEPAD FLIGHT (EXPERIMENTAL)" ||
                     value == "EF2000 KEYBOARD - MAIN FLIGHT" || value == "VIEWS" ||
                     value == "OTHER USEFUL SHORTCUTS" || value == "VIDEO / EMULATION";
-                overlay_text(panel.x + 10, panel.y + 31 + float(line - scroll) * 13,
+                overlay_text(panel.x + content_inset, panel.y + 31 + float(line - scroll) * 13,
                              value, max_chars,
                              heading ? 247 : 212, heading ? 201 : 219, heading ? 122 : 228);
             }
-            overlay_text(panel.x + 10, panel.y + panel.h - 15,
+            overlay_text(panel.x + content_inset, panel.y + panel.h - 15,
                          index == 0 ? "SCROLL: WHEEL / UP-DOWN" : "LIVE GUEST DISPLAY",
                          max_chars, 143, 174, 189);
         }
@@ -787,6 +837,8 @@ private:
     SDL_Window* window_{};
     SDL_Renderer* renderer_{};
     SDL_Texture* texture_{};
+    SDL_Texture* overlay_frame_texture_{};
+    int overlay_frame_width_{}, overlay_frame_height_{};
     SDL_Joystick* joystick_{};
     SDL_Gamepad* gamepad_{};
     JoystickSnapshot last_joystick_sample_{};
@@ -2558,6 +2610,7 @@ void usage(const char* program) {
               << "       [--profile-copy-callers] (rank copy callers by bytes and count)\n"
               << "       [--profile-video-frames] (count changed displayed images, requires SDL3 window)\n"
               << "       [--no-fps] (hide the SDL presentation and changed-frame HUD)\n"
+              << "       [--overlay-frame-bmp FILE] [--overlay-frame-border N] (1..32)\n"
               << "       [--fast-copy] (experimental host acceleration of large guest copies)\n"
               << "       [--fast-copy-vga] (also accelerate copies into the banked VGA RAM window)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
@@ -2655,6 +2708,15 @@ int main(int argc, char** argv) {
                 window.profile_video_frames = true;
             } else if (!std::strcmp(argv[i], "--no-fps")) {
                 window.show_fps = false;
+            } else if (!std::strcmp(argv[i], "--overlay-frame-bmp") && i + 1 < argc) {
+                window.overlay_frame_bmp = argv[++i];
+            } else if (!std::strcmp(argv[i], "--overlay-frame-border") && i + 1 < argc) {
+                const std::string value = argv[++i];
+                size_t parsed{};
+                const auto number = std::stoul(value, &parsed);
+                if (parsed != value.size() || number < 1 || number > 32)
+                    throw std::runtime_error("--overlay-frame-border expects 1..32 pixels");
+                window.overlay_frame_border = int(number);
             } else if (!std::strcmp(argv[i], "--fast-copy")) {
                 performance.fast_copy = true;
             } else if (!std::strcmp(argv[i], "--fast-copy-vga")) {
@@ -2795,6 +2857,8 @@ int main(int argc, char** argv) {
         }
         if (window.profile_video_frames && !window.enabled)
             throw std::runtime_error("--profile-video-frames requires --windowed or --fullscreen");
+        if (!window.overlay_frame_bmp.empty() && !window.enabled)
+            throw std::runtime_error("--overlay-frame-bmp requires --windowed or --fullscreen");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace || self_test_fast_copy) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
                 int(self_test_retrace) + int(self_test_fast_copy) != 1)

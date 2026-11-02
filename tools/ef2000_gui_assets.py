@@ -15,12 +15,12 @@ from pathlib import Path
 
 try:
     from .did_archive import DIDArchive
-    from .ilbm_image import decode, encode_png
+    from .ilbm_image import decode, encode_png, encode_bmp
     from .pcx_image import decode as decode_pcx, is_pcx
     from .spr_image import decode as decode_spr
 except ImportError:
     from did_archive import DIDArchive
-    from ilbm_image import decode, encode_png
+    from ilbm_image import decode, encode_png, encode_bmp
     from pcx_image import decode as decode_pcx, is_pcx
     from spr_image import decode as decode_spr
 
@@ -111,7 +111,7 @@ def safe_relative(name):
     return relative
 
 
-def extract(game_dir, output_dir, paths, all_images=False):
+def extract(game_dir, output_dir, paths, all_images=False, bmp=False):
     if not paths and not all_images:
         raise ValueError('provide one or more guest paths or --all-images')
     manifest = []
@@ -146,11 +146,15 @@ def extract(game_dir, output_dir, paths, all_images=False):
             if content.startswith(b'FORM') and content[8:12] in (b'ILBM', b'PBM '):
                 image = decode(content)
                 write_new(base.with_suffix('.png'), encode_png(image))
+                if bmp:
+                    write_new(base.with_suffix('.bmp'), encode_bmp(image))
                 info.update({'kind': 'image', 'width': image.width,
                              'height': image.height, 'palette_colors': len(image.palette) // 3})
             elif is_pcx(content):
                 image = decode_pcx(content)
                 write_new(base.with_suffix('.png'), encode_png(image))
+                if bmp:
+                    write_new(base.with_suffix('.bmp'), encode_bmp(image))
                 info.update({'kind': 'image', 'width': image.width,
                              'height': image.height, 'palette_colors': 256})
             elif relative.suffix.lower() == '.gui':
@@ -179,6 +183,8 @@ def extract(game_dir, output_dir, paths, all_images=False):
             image = decode(path.read_bytes())
             relative = path.relative_to(game_dir)
             write_new((output_dir / 'LOOSE' / relative).with_suffix('.png'), encode_png(image))
+            if bmp:
+                write_new((output_dir / 'LOOSE' / relative).with_suffix('.bmp'), encode_bmp(image))
             manifest.append({'source': 'LOOSE', 'name': relative.as_posix(),
                              'kind': 'image', 'width': image.width, 'height': image.height})
     if not manifest:
@@ -199,6 +205,7 @@ def main(argv=None):
     unpack.add_argument('paths', nargs='*', help='e.g. gui/mainmenu.gui iff/256/newgui03.lbm')
     unpack.add_argument('--out', type=Path, required=True, help='new output directory (no overwrite)')
     unpack.add_argument('--all-images', action='store_true', help='recover every archive ILBM/PBM, named by hash')
+    unpack.add_argument('--bmp', action='store_true', help='also export 24-bit BMP for SDL3 host overlays')
     args = parser.parse_args(argv)
     try:
         if args.action == 'inventory':
@@ -207,7 +214,7 @@ def main(argv=None):
             if args.json:
                 write_new(args.json, (json.dumps(report, indent=2) + '\n').encode('utf-8'))
         else:
-            result = extract(args.game_dir, args.out, args.paths, args.all_images)
+            result = extract(args.game_dir, args.out, args.paths, args.all_images, args.bmp)
             print(f'extracted {len(result)} GUI assets into {args.out}')
             if args.all_images:
                 for name, count in sorted(Counter(item['source'] for item in result).items()):

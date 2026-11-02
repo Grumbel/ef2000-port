@@ -117,6 +117,9 @@
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/host_shortcuts_test.cpp \
             -o objects/ef2000-host-shortcuts-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/nine_slice_test.cpp \
+            -o objects/ef2000-nine-slice-test
           runHook postBuild
         '';
 
@@ -156,6 +159,7 @@
           objects/ef2000-gamepad-profile-test
           objects/ef2000-overlay-windows-test
           objects/ef2000-host-shortcuts-test
+          objects/ef2000-nine-slice-test
           runHook postCheck
         '';
 

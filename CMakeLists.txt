@@ -218,3 +218,9 @@ add_executable(ef2000-host-shortcuts-test tests/host_shortcuts_test.cpp)
 target_compile_features(ef2000-host-shortcuts-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-host-shortcuts-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME host-shortcuts COMMAND ef2000-host-shortcuts-test)
+
+# Optional EF2000 frame texture geometry; no SDL dependency or original data.
+add_executable(ef2000-nine-slice-test tests/nine_slice_test.cpp)
+target_compile_features(ef2000-nine-slice-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-nine-slice-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME nine-slice COMMAND ef2000-nine-slice-test)

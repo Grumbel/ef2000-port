@@ -14,7 +14,7 @@ import zlib
 
 from tools.did_archive import DIDArchive, hash_path
 from tools.ef2000_gui_assets import extract, inspect_script, inventory, safe_relative
-from tools.ilbm_image import byterun_row, chunks, decode, encode_png
+from tools.ilbm_image import Image, byterun_row, chunks, decode, encode_png, encode_bmp
 from tools.pcx_image import decode as decode_pcx, is_pcx
 from tools.ra_decode import decompress
 from tools.spr_image import decode as decode_spr
@@ -138,6 +138,22 @@ class IFFTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'invalid PCX run'):
             decode_pcx(bytes(head) + b'\xc2' + b'\x0c' + bytes(range(256)) * 3)
 
+    def test_bmp_export_preserves_palette_colours_and_row_padding(self):
+        bitmap = decode(image_fixture())
+        bmp = encode_bmp(bitmap)
+        self.assertEqual(bmp[:2], b'BM')
+        self.assertEqual(struct.unpack_from('<I', bmp, 2)[0], len(bmp))
+        self.assertEqual(struct.unpack_from('<iiHH', bmp, 18), (2, 1, 1, 24))
+        self.assertEqual(bmp[54:], b'\0\0\0\x40\x80\xff\0\0')
+        transparent = decode(image_fixture(transparent=0))
+        self.assertEqual(encode_bmp(transparent)[54:], bmp[54:])
+        # BMP stores rows bottom-up, with padding and BGR channel ordering.
+        two_rows = Image(1, 2, b'\x01\x00', bitmap.palette, b'\xff\x00')
+        self.assertEqual(encode_bmp(two_rows)[54:],
+                         b'\x00\x00\x00\x00\x40\x80\xff\x00')
+        with self.assertRaisesRegex(ValueError, 'source mask'):
+            encode_bmp(Image(2, 1, b'\0\1', bitmap.palette, b'\0'))
+
     def test_indexed_sprite_catalog_preserves_16_bit_pixels(self):
         data = (b'\x02' + struct.pack('<2H', 5, 11) +
                 struct.pack('<BBHH', 2, 1, 0, 107) +
@@ -182,9 +198,10 @@ class GUIInventoryTests(unittest.TestCase):
             self.assertEqual(report['archives'][0]['members'], 2)
             self.assertEqual(report['loose_lbm'], ['SCRN0.LBM'])
             target = root / 'out'
-            found = extract(game, target, ['gui/mainmenu.gui', 'iff/256/image.lbm'])
+            found = extract(game, target, ['gui/mainmenu.gui', 'iff/256/image.lbm'], bmp=True)
             self.assertEqual(len(found), 2)
             self.assertTrue((target / 'DID1ST/iff/256/image.png').is_file())
+            self.assertEqual((target / 'DID1ST/iff/256/image.bmp').read_bytes()[:2], b'BM')
             parsed = json.loads((target / 'DID1ST/gui/mainmenu.json').read_text())
             self.assertEqual(parsed['windows'][0]['icons'][0]['name'], 'start')
             with self.assertRaises(FileExistsError):

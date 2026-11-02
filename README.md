@@ -365,6 +365,26 @@ hidden, and reopen from the overlay's keyboard commands. The initial skin
 uses a procedural EF2000-inspired blue/gold palette; identifying/loading
 the **original** archived font, frame and icon art remains separate work.
 
+To start applying locally extracted GUI artwork as a window border, the
+`gui-assets` extractor can additionally export uncompressed BMPs that SDL3
+loads without SDL_image. Crop a **single framed window** (with four corners
+and all edges) from the original artwork and provide it as a nine-slice panel
+texture:
+
+```sh
+nix run .#gui-assets -- extract /path/to/EF2000 \
+  iff/256/newgui03.lbm --bmp --out local/gui-art
+# Inspect the BMP and crop a suitable frame into local/ef2000-frame.bmp.
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --overlay-frame-bmp local/ef2000-frame.bmp --overlay-frame-border 12
+```
+
+The runtime preserves bitmap corners while stretching edges and centre to
+each movable window. The frame crop and border thickness must match the
+original artwork; an entire background is not a suitable nine-slice frame.
+Neither the BMP nor any derived crop is included in Git or a Nix package.
+Without an external frame bitmap, the procedural fallback remains available.
+
 Host shortcuts in the C++ SDL3 frontend:
 
 | Shortcut | Action |

@@ -110,6 +110,9 @@ resources with the same virtual name in both archives. It writes original
 `.gui` scripts and a sibling JSON representation of windows, icons and
 directives. For IFF/PBM images it writes PNG with exact indexed pixels and
 the image's palette. The same path handles 8-bit, 256-colour PCX images. An
+optional `--bmp` additionally exports 24-bit BMP copies for SDL3's built-in
+bitmap loader. Masked pixels are flattened onto black in BMPs; the normal
+PNG retains palette indices and transparency for archival use. An
 extracted `.spr` collection is retained verbatim and also exported as an
 index-preserving JSON sprite catalog. An output `manifest.json` records source archive, hash,
 original and decoded sizes, and identified format. The image decoder uses
@@ -140,6 +143,15 @@ an asset-free test. The first visual treatment is a procedural blue/gold
 placeholder: the **actual EF2000 bitmap frames, typography and icons have not
 yet been identified and loaded into the runtime**. Later bind reconstructed
 menu callbacks to native actions and replace individual original GUI screens.
+
+`--overlay-frame-bmp FILE` and optional `--overlay-frame-border N` (1..32)
+now let the runtime draw a **caller-selected BMP crop** using nine-slice
+geometry, preserving corners while resizing each window. The shared geometry
+is tested independently in `runtime/nine_slice.hpp`. This is not automatic
+frame discovery: a full `newgui03.lbm` background is unsuitable as a window
+frame without first selecting and cropping an appropriate decorative region.
+Use `ef2000-gui-assets extract ... --bmp --out local/gui-art` to prepare
+candidate images and keep all derived artwork outside the repository.
 
 Convert local PNG/JSON extractor output into a texture atlas plus skin
 manifest under the user's asset directory; **do not commit or ship the
