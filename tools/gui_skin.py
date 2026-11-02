@@ -32,6 +32,20 @@ SKIN_IMAGES = {
     'units': (0xade5ec9a, (640, 480)),
 }
 
+# Visually identified source rectangles (x, y, width, height), still drawn
+# from a single palette-indexed sheet. Aircraft colors indicate game state;
+# the red command/aircraft marker was matched at multiple positions in the
+# German TACTCOM screenshot, with its gray bar dynamically recolored.
+UNIT_SYMBOLS = {
+    'aircraft_outline_red': (543, 1, 15, 17),
+    'aircraft_outline_green': (563, 1, 15, 17),
+    'aircraft_outline_blue': (583, 1, 15, 17),
+    'map_aircraft_red': (601, 1, 19, 17),
+    'map_aircraft_green': (621, 1, 19, 17),
+    'flag_russia_flat': (46, 170, 11, 12),
+    'flag_russia_waving': (42, 185, 13, 12),
+}
+
 
 def keyed_units(image):
     """Preserve foreground red while masking only source palette index 0."""
@@ -102,6 +116,16 @@ def skin_exports(images):
             transparent, keyed = keyed_units(image)
             files['skin-units.png'] = encode_png(transparent)
             files['skin-units.bmp'] = encode_bmp(keyed)
+            for symbol, (x, y, width, height) in UNIT_SYMBOLS.items():
+                if (x < 0 or y < 0 or x + width > image.width or
+                        y + height > image.height or width < 1 or height < 1):
+                    raise ValueError(f'invalid tactical symbol rectangle: {symbol}')
+            files['skin-units-symbols.json'] = (json.dumps({
+                'source_hash': f'{image_hash:08x}',
+                'source_dimensions': [image.width, image.height],
+                'symbols': {name: list(rect) for name, rect in UNIT_SYMBOLS.items()},
+                'note': 'Source rectangles only; runtime can recolor aircraft bars and flags',
+            }, indent=2) + '\n').encode('utf-8')
             files['skin-units-candidates.json'] = (json.dumps({
                 'source_hash': f'{image_hash:08x}',
                 'note': 'Unlabeled row/column spans, not verified individual sprites',

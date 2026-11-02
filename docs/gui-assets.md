@@ -51,6 +51,28 @@ intended for locating candidate graphics quickly, **not** a final sprite
 format: disconnected flag stripes and adjacent graphics can require manual
 grouping. All rectangles are in source 640×480 coordinates.
 
+### Confirmed tactical icon coordinates
+
+`skin-units-symbols.json` includes a small named subset of the original atlas:
+
+| Name | Rectangle `(x,y,w,h)` | Evidence |
+| --- | --- | --- |
+| `map_aircraft_red` | `(601,1,19,17)` | Shape and red/white/black pixel pattern repeat at numerous map locations in the user's TACTCOM screenshot |
+| `map_aircraft_green` | `(621,1,19,17)` | Same atlas family, alternate green coloring |
+| `aircraft_outline_red` | `(543,1,15,17)` | Red outline airframe glyph |
+| `aircraft_outline_green` | `(563,1,15,17)` | Green outline airframe glyph |
+| `aircraft_outline_blue` | `(583,1,15,17)` | Blue outline airframe glyph |
+| `flag_russia_flat` | `(46,170,11,12)` | White/navy/red flat flag in atlas |
+| `flag_russia_waving` | `(42,185,13,12)` | White/navy/red shaded flag in atlas |
+
+The red aircraft icon is especially important because its gray bar is
+**not** a simple invariant texture when presented in the game: matching
+screenshot instances retain the same original red/white/black pixels but use
+a different gray/purple shading for that bar. Treat the atlas as source
+artwork with possible runtime palette substitution. The Russian flag
+identification is visual; the map's exact flag rendering/composition and the
+original GUI drawing routine remain to be recovered.
+
 The game's menu is **not only hard-coded in the executable**. Its layout and
 interactions are described in plain-text `.gui` resources inside the original
 `DID.DAT` and `DID1ST.DAT` archives. Its background images are standard IFF

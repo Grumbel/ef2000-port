@@ -9,7 +9,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.gui_skin import SKIN_IMAGES, keyed_units, rip_skin, skin_exports, unit_candidates
+from tools.gui_skin import (SKIN_IMAGES, UNIT_SYMBOLS, keyed_units,
+                            rip_skin, skin_exports, unit_candidates)
 from tools.ilbm_image import Image
 
 
@@ -52,6 +53,9 @@ class GuiSkinTests(unittest.TestCase):
         self.assertEqual(json.loads(files['skin.json']), manifest)
         self.assertEqual(json.loads(files['skin-units-candidates.json'])['candidates'],
                          [{'row': 0, 'rect': [1, 0, 2, 1]}])
+        symbols = json.loads(files['skin-units-symbols.json'])['symbols']
+        self.assertEqual(symbols['map_aircraft_red'], [601, 1, 19, 17])
+        self.assertEqual(symbols['flag_russia_waving'], [42, 185, 13, 12])
         with self.assertRaisesRegex(ValueError, 'missing original skin image'):
             skin_exports({})
 
@@ -70,5 +74,13 @@ class OriginalGuiSkinTests(unittest.TestCase):
             self.assertEqual(json.loads((Path(directory) / 'skin.json').read_text()), manifest)
             candidates = json.loads((Path(directory) / 'skin-units-candidates.json').read_text())
             self.assertGreater(len(candidates['candidates']), 100)
+            from tools.did_archive import DIDArchive
+            from tools.ilbm_image import decode
+            archive = DIDArchive.from_path(Path(os.environ['EF2000_DATA_DIR']) / 'DID1ST.DAT')
+            image = decode(archive.member(archive.by_hash[SKIN_IMAGES['units'][0]]))
+            for name, (x, y, width, height) in UNIT_SYMBOLS.items():
+                self.assertTrue(any(any(image.indexed[row * image.width + x:
+                                                      row * image.width + x + width])
+                                    for row in range(y, y + height)), name)
             with self.assertRaises(FileExistsError):
                 rip_skin(Path(os.environ['EF2000_DATA_DIR']), directory)
