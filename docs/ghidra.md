@@ -86,3 +86,7 @@ stack behavior.
 
 See [loader.md](loader.md), [startup-symbols.md](startup-symbols.md), and
 [execution-probes.md](execution-probes.md) for the address model and evidence.
+
+The first successful end-to-end import and decompilation is documented in
+[ghidra-findings.md](ghidra-findings.md), with cross-checked guest offsets,
+resource-loader callsites, and ABI caveats.
