@@ -48,6 +48,9 @@ SDL3 GPU/OpenGL/Vulkan renderer may then be possible, while preserving the
 software path as a correctness reference. Full Voodoo hardware emulation is
 another option, but has different complexity/performance trade-offs. Neither
 route has been implemented or benchmarked in this project.
+The [GFX+ patch investigation](gfxplus-rendering.md) now records the
+archived Windows updater's fingerprint and Glide/3Dfx string addresses,
+without claiming to have extracted or run a patched EF2000 executable.
 
 The [Reloaded discussion linked by the user](https://simhq.net/forum/ubbthreads.php/ubb/printthread/Board/215/main/377763/type/thread)
 and [SimHQ announcement](https://simhq.net/forum/ubbthreads.php/topics/3830314/all/EF2000_Reloaded)

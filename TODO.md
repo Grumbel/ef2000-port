@@ -133,7 +133,9 @@ Implemented and verified:
   database and trace its static Glide / low-level Voodoo interface under
   hardware emulation. Determine a stable polygon/texture/API boundary before
   promising an SDL3 GPU implementation. See
-  `docs/existing-tools-and-releases.md`.
+  `docs/gfxplus-rendering.md`. The archived `Tactpat.exe` updater has been
+  fingerprinted and scanned for embedded Glide 2.1/Voodoo strings, but the
+  **actual installed 3Dfx game executable is still missing**.
 
 ## Reproduce
 

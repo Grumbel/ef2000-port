@@ -61,6 +61,7 @@ ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300
 ef2000-gui-assets inventory /path/to/EF2000
 ef2000-gui-assets extract /path/to/EF2000 gui/mainmenu.gui \
   iff/256/newgui03.lbm spr/pitfont.spr --out local/gui-assets
+python3 tools/gfxplus_probe.py /path/to/Tactpat.exe # examine GFX+ updater (read-only)
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
 
@@ -94,6 +95,10 @@ only synthetic fixtures. See [GUI resource research](docs/gui-assets.md).
 
 For historical EF2000 variants and prior art, see
 [existing tools, mission files and 3Dfx release research](docs/existing-tools-and-releases.md).
+The focused [GFX+ / 3Dfx interface investigation](docs/gfxplus-rendering.md)
+fingerprints the historical patch updater, maps embedded Glide diagnostic
+anchors and provides a synthetic-tested read-only binary probe. No patched
+3Dfx game executable or accelerated renderer is part of the port yet.
 In particular:
 
 | Reference | Why it matters |
@@ -608,6 +613,7 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [Original keyboard chart and host input interception reference](docs/keyboard-reference.md)
 - [Research and evidence conventions](docs/research.md)
 - [Existing modding tools, mission file formats, release variants and 3Dfx research](docs/existing-tools-and-releases.md)
+- [GFX+ 3Dfx patch and rendering interface investigation](docs/gfxplus-rendering.md)
 
 The mouse starts free and is captured only by a left-click inside the game
 image. That first click captures the pointer without activating a game button.
