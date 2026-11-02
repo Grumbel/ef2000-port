@@ -115,6 +115,18 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
            --self-test-retrace --profile)
   set_tests_properties(unicorn-cpp-profile PROPERTIES
                        PASS_REGULAR_EXPRESSION "profile: blocks=[0-9]+.*vga_reads=[1-9]")
+  add_test(NAME unicorn-cpp-fast-copy COMMAND ef2000-unicorn-cpp
+           --self-test-fast-copy)
+  set_tests_properties(unicorn-cpp-fast-copy PROPERTIES
+                       PASS_REGULAR_EXPRESSION "fast_copy: calls=1 bytes=1024 fallback_calls=0")
+  add_test(NAME unicorn-cpp-hot-blocks COMMAND ef2000-unicorn-cpp
+           --self-test-clock --wall-seconds 0.1 --profile-hot-blocks)
+  set_tests_properties(unicorn-cpp-hot-blocks PROPERTIES
+                       PASS_REGULAR_EXPRESSION "hot_blocks: samples=[1-9]")
+  add_test(NAME unicorn-cpp-tcg-cache COMMAND ef2000-unicorn-cpp
+           --self-test-clock --tcg-cache-mib 128)
+  set_tests_properties(unicorn-cpp-tcg-cache PROPERTIES
+                       PASS_REGULAR_EXPRESSION "status=wall_time_limit")
   add_executable(ef2000-real-mode-test tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp
                                      runtime/sb16_probe.cpp runtime/sound_blaster.cpp
                                      runtime/isa_audio.cpp)

@@ -204,6 +204,8 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --sound sb16-probe \
   --instruction-limit 100000000
 # Experimental DMA/PIC/IRQ emulation with SDL3 PCM output in windowed runs
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma
+# Optional original-game memory-copy acceleration (experimental)
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed --sound sb16-dma --fast-copy
 # Real-time PIT scheduler (automatically selected for unlimited windowed runs)
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
   --instruction-limit 0 --timing realtime
@@ -315,6 +317,21 @@ guest execution, VGA polling, background audio and window updates. The
 repeatable asset-free CPU sample is `--self-test-clock --wall-seconds 5 --profile`.
 These options do not eliminate the remaining Unicorn block callback overhead;
 actual in-game frame pacing must still be compared on hardware.
+
+For deeper diagnosis, `--profile-hot-blocks` samples the 16 hottest guest
+basic-block addresses and `--profile-copy` counts call sizes at the original
+guest memory-copy routine. In a sound-enabled startup replay that routine
+accounted for roughly 23% of sampled block executions and copied hundreds of
+megabytes. `--fast-copy` is an **opt-in experiment** that handles only large,
+non-overlapping copies into guest data memory in C++; the native guest routine
+continues handling smaller or potentially sensitive copies. A 75-second
+headless original-game replay with the option enabled reached the 320×200
+cockpit while SB16 and CD playback remained active, but gameplay correctness
+and speed on Windows still need testing. `--self-test-fast-copy` verifies the
+host fast path with an original-asset-free synthetic program. A separate
+`--tcg-cache-mib N` option allows testing smaller Unicorn translated-code
+caches (32..1024 MiB), especially for 32-bit Windows; size alone did not
+produce a repeatable speed improvement on the Linux reference host.
 
 DOS writes in windowed mode default to
 `$XDG_STATE_HOME/ef2000/unicorn/drive` (or

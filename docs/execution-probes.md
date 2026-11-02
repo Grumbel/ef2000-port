@@ -631,3 +631,49 @@ The new run sampled the VGA clock only 47–56K times despite 1.50–1.80M port
 `3DAh` reads. Background DMA audio service consumed 52–72 ms of each 10-second
 run, including copying approximately 67 MiB of guest memory in each direction.
 These runs had no SDL3 display or CD image and do not measure in-flight FPS.
+
+#### Profiling and accelerating the original memory-copy hotspot
+
+The earlier block hook remains necessary: a bare 10 ms Unicorn timeout
+passed short asset-free tests and a 15-second game startup, but the full
+sound/CD/mouse replay failed after roughly 71 seconds with an invalid guest
+read (`ip=0xFA121`, `address=0x46C14037`). Calling `uc_emu_stop()` from a
+separate host thread also lacks a safe thread-synchronization guarantee in
+current Unicorn sources. The production real-time scheduler therefore retains
+the proven block-boundary stop. A smaller Unicorn TCG cache (32–256 MiB versus
+its 1024 MiB default) was tested; startup throughput varied within run-to-run
+noise, without a stable performance gain. The size is available as
+`--tcg-cache-mib N` for constrained 32-bit address spaces.
+
+`--profile-hot-blocks` samples one out of 4096 translated basic blocks and
+reports the hottest guest IPs. In a ten-second original-game sound-enabled
+startup replay, 4649 of 19930 samples (23.3%) hit address `0xE9A3A`.
+Disassembling the pinned original payload shows that this is the unrolled
+32-byte inner loop of a near-call memory-copy routine beginning at `0xE9A24`.
+`--profile-copy` counted 115129 calls and 668149354 copied bytes during a
+separate ten-second interval; many calls were small, but 10372 were at least
+4096 bytes long. This is a game-code hotspot, not C++ display/audio overhead.
+
+An in-memory `REP MOVSB` replacement was tested but discarded: Unicorn
+executed about one translated block per copied byte, and original-game
+progress was slower. The retained **opt-in** `--fast-copy` instead catches
+large (at least 1024 bytes), non-overlapping copies into the main guest data
+region, checks the original routine's flat DS selector and arguments, reads
+and writes the guest buffers through Unicorn, and returns with the same
+ESP/EAX/EDX results as the original `RET 0Ch` routine. Small, overlapping,
+non-flat or code-section copies are left to the original guest routine.
+`--self-test-fast-copy` embeds an original-asset-free caller and a deliberately
+invalid guest copy function, verifying that the fast path intercepts at an
+instruction boundary, transfers the first and last words and preserves the
+callee-saved GPRs/stack cleanup.
+
+Two ten-second original-game replay comparisons with SB16 DMA showed roughly
+8–13% more DOS/X-32 interrupts per wall-clock interval when the fast path
+was enabled, while initial sound DMA activity matched; interrupt count is
+only a *progress proxy*, not an FPS benchmark. A 75-second replay with CD
+audio, scripted mouse clicks and `--fast-copy` reached the actual 320×200
+cockpit: 8933 PIT ticks, 7456 IRQ0 deliveries, 329 modeled SB16 DMA blocks,
+580 CD PCM blocks and no unsupported interface or memory fault. It processed
+6038 large copies totaling 385961440 bytes, while leaving 1241062 smaller or
+ineligible calls on Unicorn's original path. The Windows windowed/gamepad
+behavior and comparative in-flight FPS are not yet verified.

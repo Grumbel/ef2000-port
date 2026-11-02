@@ -40,9 +40,11 @@
 #include <iterator>
 #include <memory>
 #include <map>
+#include <optional>
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -56,6 +58,7 @@ constexpr uint32_t PSP_BASE = 0x05200000;
 constexpr uint32_t ENV_BASE = PSP_BASE + 0x1000;
 constexpr uint32_t EXTENDER_BASE = PSP_BASE + 0x2000;
 constexpr uint32_t TABLE_BASE = IMAGE_SIZE + 0x1000;
+constexpr uint32_t COPY_ENTRY = 0xe9a24;
 constexpr char SOURCE_SHA256[] = "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd";
 
 uint16_t le16(const std::vector<uint8_t>& data, size_t pos) {
@@ -96,12 +99,20 @@ enum class ExecutionTiming { Auto, Instruction, Realtime };
 struct PerformanceOptions {
     unsigned block_clock_check = 256;
     unsigned vga_clock_check = 32;
+    uint32_t tcg_buffer_mib{}; // 0 keeps Unicorn's current default.
     bool profile{};
+    bool hot_blocks{};
+    bool profile_copy{};
+    bool fast_copy{};
+    bool clock_loop_benchmark{};
 };
 struct PerformanceStats {
     uint64_t block_clock_checks{}, port_ins{}, port_outs{};
     uint64_t vga_reads{}, vga_clock_checks{}, audio_reads{}, audio_writes{};
     std::chrono::steady_clock::duration guest_time{}, audio_time{}, cd_time{}, display_time{};
+};
+struct PendingCopy {
+    uint32_t stack{}, return_ip{}, source{}, destination{}, bytes{};
 };
 struct WindowOptions {
     bool enabled{}, fullscreen{}, smooth_scaling{};
@@ -608,6 +619,9 @@ public:
             bool realtime = false, double wall_seconds = 0,
             PerformanceOptions performance = {}) {
         performance_ = performance;
+        if (performance_.tcg_buffer_mib)
+            check(uc_ctl_set_tcg_buffer_size(cpu_, performance_.tcg_buffer_mib << 20),
+                  "set Unicorn translated-code cache");
         const bool trace_joystick = window_options.trace_joystick;
         if (!wav_directory.empty())
             wav_capture_ = std::make_unique<ef2000::WavCapture>(wav_directory);
@@ -682,6 +696,7 @@ public:
                 check(uc_emu_start(cpu_, ip, 0, 0, amount), "instruction-counted guest execution");
                 completed += amount;
             }
+            if (pending_copy_) finish_fast_copy();
             if (performance_.profile)
                 perf_stats_.guest_time += std::chrono::steady_clock::now() - guest_started;
             if (status_ != "instruction_limit") break;
@@ -759,6 +774,8 @@ public:
             std::cout << " sdl_polls=" << window.input_polls()
                       << " rendered_frames=" << window.frames_presented();
         std::cout << '\n';
+        if (performance_.clock_loop_benchmark)
+            std::cout << "benchmark: clock_loop_iterations=" << regs.dx << '\n';
         if (performance_.profile) {
             const auto milliseconds = [](std::chrono::steady_clock::duration time) {
                 return std::chrono::duration<double, std::milli>(time).count();
@@ -778,6 +795,30 @@ public:
             std::cout << "profile_audio_bytes: read=" << perf_stats_.audio_reads
                       << " write=" << perf_stats_.audio_writes << '\n';
         }
+        if (performance_.hot_blocks) {
+            std::vector<std::pair<uint64_t, uint64_t>> hottest(hot_block_samples_.begin(),
+                                                               hot_block_samples_.end());
+            std::sort(hottest.begin(), hottest.end(), [](const auto& lhs, const auto& rhs) {
+                if (lhs.second != rhs.second) return lhs.second > rhs.second;
+                return lhs.first < rhs.first;
+            });
+            std::cout << "hot_blocks: samples=" << hot_block_total_
+                      << " unique=" << hottest.size() << '\n';
+            for (size_t i = 0; i < std::min<size_t>(hottest.size(), 16); ++i)
+                std::cout << "hot_block: ip=0x" << std::hex << hottest[i].first << std::dec
+                          << " samples=" << hottest[i].second << '\n';
+        }
+        if (performance_.profile_copy) {
+            std::cout << "copy_calls: count=" << copy_calls_
+                      << " bytes=" << copy_bytes_ << " max=" << copy_max_ << '\n';
+            for (size_t i = 0; i < copy_size_buckets_.size(); ++i)
+                std::cout << "copy_bucket: range=" << i << " calls=" << copy_size_buckets_[i]
+                          << '\n';
+        }
+        if (performance_.fast_copy)
+            std::cout << "fast_copy: calls=" << fast_copy_calls_
+                      << " bytes=" << fast_copy_bytes_
+                      << " fallback_calls=" << fast_copy_skipped_ << '\n';
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
         std::cout.flush();
         if (window.enabled()) {
@@ -799,6 +840,14 @@ private:
     PerformanceOptions performance_{};
     PerformanceStats perf_stats_{};
     uint64_t realtime_blocks_{};
+    uint64_t hot_block_total_{};
+    std::unordered_map<uint64_t, uint64_t> hot_block_samples_;
+    uint64_t copy_calls_{}, copy_bytes_{};
+    uint32_t copy_max_{};
+    std::array<uint64_t, 8> copy_size_buckets_{};
+    std::optional<PendingCopy> pending_copy_;
+    uint64_t fast_copy_calls_{}, fast_copy_bytes_{}, fast_copy_skipped_{};
+    std::vector<uint8_t> fast_copy_buffer_;
     unsigned vga_reads_until_check_{1};
     uint32_t vga_status_{};
     StartupWindow* active_window_{};
@@ -900,13 +949,16 @@ private:
                 std::copy_n(vram_.data() + start + row * video_pitch_, frame.width,
                             indices.data() + row * frame.width);
         }
-        frame.rgba.reserve(indices.size() * 4);
+        // Fill the texture buffer directly: push_back() four times per pixel
+        // performs needless vector-capacity checks in the 30 Hz video path.
+        frame.rgba.resize(indices.size() * 4);
+        uint8_t* output = frame.rgba.data();
         for (uint8_t index : indices) {
             const size_t pos = size_t(index) * 3;
-            frame.rgba.push_back(palette[pos] << 2);
-            frame.rgba.push_back(palette[pos + 1] << 2);
-            frame.rgba.push_back(palette[pos + 2] << 2);
-            frame.rgba.push_back(255);
+            *output++ = uint8_t(palette[pos] << 2);
+            *output++ = uint8_t(palette[pos + 1] << 2);
+            *output++ = uint8_t(palette[pos + 2] << 2);
+            *output++ = 255;
         }
         return frame;
     }
@@ -1905,12 +1957,78 @@ private:
     static void on_port_out(uc_engine*, uint32_t port, int, uint32_t value, void* user) {
         static_cast<Machine*>(user)->port_out(port, value);
     }
-    static void on_realtime_block(uc_engine* cpu, uint64_t, uint32_t, void* user) {
+    void copy_entry(uc_engine* cpu) {
+        uint32_t stack{};
+        uint32_t ds{};
+        if (uc_reg_read(cpu, UC_X86_REG_ESP, &stack) != UC_ERR_OK ||
+            uint64_t(stack) + 16 > IMAGE_SIZE)
+            return;
+        std::array<uint32_t, 4> args{};
+        if (uc_mem_read(cpu, stack, args.data(), sizeof(args)) != UC_ERR_OK) return;
+        const auto [return_ip, bytes, source, destination] = args;
+        if (performance_.profile_copy) {
+            ++copy_calls_;
+            copy_bytes_ += bytes;
+            copy_max_ = std::max(copy_max_, bytes);
+            const size_t bucket = bytes < 32 ? 0 : bytes < 64 ? 1 : bytes < 128 ? 2 :
+                bytes < 256 ? 3 : bytes < 512 ? 4 : bytes < 1024 ? 5 :
+                bytes < 4096 ? 6 : 7;
+            ++copy_size_buckets_[bucket];
+        }
+        if (!performance_.fast_copy) return;
+        // This exact routine is only present in the SHA-pinned original image.
+        // A conservative threshold leaves short or overlapping copies and
+        // writes into the original code section to Unicorn's normal executor.
+        const uint64_t src_end = uint64_t(source) + bytes;
+        const uint64_t dst_end = uint64_t(destination) + bytes;
+        if (bytes < 1024 || bytes > 1024 * 1024 || source < 0x1000 ||
+            destination < image_size_ || src_end > IMAGE_SIZE || dst_end > IMAGE_SIZE ||
+            return_ip < ENTRY || return_ip >= image_size_ ||
+            (source < dst_end && destination < src_end) ||
+            uc_reg_read(cpu, UC_X86_REG_DS, &ds) != UC_ERR_OK || ds != 7) {
+            ++fast_copy_skipped_;
+            return;
+        }
+        pending_copy_ = PendingCopy{stack, return_ip, source, destination, bytes};
+        if (uc_emu_stop(cpu) != UC_ERR_OK) {
+            pending_copy_.reset();
+            fail("could not stop at fast-copy entry");
+        }
+    }
+    void finish_fast_copy() {
+        const PendingCopy copy = *pending_copy_;
+        pending_copy_.reset();
+        const uint32_t ip = ip_at_cpu();
+        if (ip != COPY_ENTRY)
+            throw std::runtime_error("fast-copy entry did not stop at instruction boundary");
+        fast_copy_buffer_.resize(copy.bytes);
+        check(uc_mem_read(cpu_, copy.source, fast_copy_buffer_.data(), copy.bytes),
+              "fast-copy guest source");
+        check(uc_mem_write(cpu_, copy.destination, fast_copy_buffer_.data(), copy.bytes),
+              "fast-copy guest destination");
+        // The original function returns with RET 0Ch and EAX/EDX pointing
+        // just past their buffers. EBX, ESI, EDI and EBP are callee-saved.
+        reg(UC_X86_REG_EAX, copy.destination + copy.bytes);
+        reg(UC_X86_REG_EDX, copy.source + copy.bytes);
+        reg(UC_X86_REG_ESP, copy.stack + 16);
+        reg(UC_X86_REG_EIP, copy.return_ip);
+        ++fast_copy_calls_;
+        fast_copy_bytes_ += copy.bytes;
+    }
+    static void on_realtime_block(uc_engine* cpu, uint64_t address, uint32_t, void* user) {
         auto* machine = static_cast<Machine*>(user);
+        if ((machine->performance_.profile_copy || machine->performance_.fast_copy) &&
+            address == COPY_ENTRY)
+            machine->copy_entry(cpu);
         // A clock syscall on *every* translated block is expensive on both
         // Linux and Windows. The callback is still needed for safe block-
         // boundary stops; sample the deadline once per N blocks instead.
-        if ((++machine->realtime_blocks_ & (machine->performance_.block_clock_check - 1)) == 0) {
+        ++machine->realtime_blocks_;
+        if (machine->performance_.hot_blocks && (machine->realtime_blocks_ & 4095) == 0) {
+            ++machine->hot_block_samples_[address];
+            ++machine->hot_block_total_;
+        }
+        if ((machine->realtime_blocks_ & (machine->performance_.block_clock_check - 1)) == 0) {
             if (machine->performance_.profile) ++machine->perf_stats_.block_clock_checks;
             if (std::chrono::steady_clock::now() >= machine->slice_deadline_)
                 uc_emu_stop(cpu);
@@ -2004,7 +2122,11 @@ void usage(const char* program) {
               << "       [--timing auto|instruction|realtime] (auto uses real-time for unlimited windowed runs)\n"
               << "       [--wall-seconds N] (bounded real-time/headless diagnostic)\n"
               << "       [--block-clock-check N] [--vga-clock-check N] (powers of two, 1..4096)\n"
+              << "       [--tcg-cache-mib N] (32..1024 MiB; default Unicorn cache size)\n"
               << "       [--profile] (print callback counts and host time by subsystem)\n"
+              << "       [--profile-hot-blocks] (sample and list 16 hottest guest blocks)\n"
+              << "       [--profile-copy] (count calls to the original fast-copy routine)\n"
+              << "       [--fast-copy] (experimental host acceleration of large guest copies)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
               << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
               << "       --instruction-limit 0 means unlimited (window default)\n"
@@ -2024,7 +2146,7 @@ void usage(const char* program) {
               << "       Windows default: %LOCALAPPDATA%\\ef2000\\state\\unicorn\\drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
-              << "       " << program << " --self-test | --self-test-bda | --self-test-clock | --self-test-retrace\n";
+              << "       " << program << " --self-test | --self-test-bda | --self-test-clock | --self-test-retrace | --self-test-fast-copy\n";
 }
 } // namespace
 
@@ -2042,7 +2164,7 @@ int main(int argc, char** argv) {
         ef2000::SoundMode sound_mode = ef2000::SoundMode::Off;
         ControlSelection controls = ControlSelection::Auto;
         bool self_test = false, self_test_bda = false, self_test_clock = false;
-        bool self_test_retrace = false;
+        bool self_test_retrace = false, self_test_fast_copy = false;
         bool trace_interrupts = false;
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
@@ -2080,8 +2202,19 @@ int main(int argc, char** argv) {
                 performance.block_clock_check = parse_clock_check(argv[++i], "--block-clock-check");
             } else if (!std::strcmp(argv[i], "--vga-clock-check") && i + 1 < argc) {
                 performance.vga_clock_check = parse_clock_check(argv[++i], "--vga-clock-check");
+            } else if (!std::strcmp(argv[i], "--tcg-cache-mib") && i + 1 < argc) {
+                const auto size = parse_clock_check(argv[++i], "--tcg-cache-mib");
+                if (size < 32 || size > 1024)
+                    throw std::runtime_error("--tcg-cache-mib expects a power of two (32..1024)");
+                performance.tcg_buffer_mib = size;
             } else if (!std::strcmp(argv[i], "--profile")) {
                 performance.profile = true;
+            } else if (!std::strcmp(argv[i], "--profile-hot-blocks")) {
+                performance.profile = performance.hot_blocks = true;
+            } else if (!std::strcmp(argv[i], "--profile-copy")) {
+                performance.profile = performance.profile_copy = true;
+            } else if (!std::strcmp(argv[i], "--fast-copy")) {
+                performance.fast_copy = true;
             } else if (!std::strcmp(argv[i], "--game-dir") && i + 1 < argc) {
                 game_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--cd-dir") && i + 1 < argc) {
@@ -2146,6 +2279,8 @@ int main(int argc, char** argv) {
                 self_test_clock = true;
             } else if (!std::strcmp(argv[i], "--self-test-retrace")) {
                 self_test_retrace = true;
+            } else if (!std::strcmp(argv[i], "--self-test-fast-copy")) {
+                self_test_fast_copy = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
                 framebuffer = argv[++i];
             } else if (!std::strcmp(argv[i], "--wav-capture") && i + 1 < argc) {
@@ -2210,14 +2345,14 @@ int main(int argc, char** argv) {
             } else if (argv[i][0] != '-' && path.empty()) path = argv[i];
             else throw std::runtime_error("unrecognized option: " + std::string(argv[i]));
         }
-        if (self_test || self_test_bda || self_test_clock || self_test_retrace) {
+        if (self_test || self_test_bda || self_test_clock || self_test_retrace || self_test_fast_copy) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
-                int(self_test_retrace) != 1)
+                int(self_test_retrace) + int(self_test_fast_copy) != 1)
                 throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
             if (!cd_cue.empty()) throw std::runtime_error("self-test does not take a CD image");
-            std::vector<uint8_t> image(0x1000);
+            std::vector<uint8_t> image(self_test_fast_copy ? COPY_ENTRY + 5 : 0x1000);
             // DOS query, ISA gameport charge/read, then DOS exit. The same
             // synthetic payload works without any proprietary game files.
             constexpr uint8_t gameport_guest[] = {
@@ -2243,11 +2378,13 @@ int main(int argc, char** argv) {
                 0x3d, 0xd4, 0x03, 0x00, 0x00, 0x74, 0x02, 0xcd, 0x82,
                 0x66, 0xbb, 0x07, 0x00, 0x66, 0x8e, 0xdb,
                 0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
-            // Repeat a multi-byte instruction indefinitely to exercise
-            // translation-block resume boundaries without game assets.
+            // Repeat a multi-byte instruction and count completed loop
+            // iterations for an asset-free execution-speed benchmark.
             constexpr uint8_t clock_guest[] = {
                 0xb8, 0x78, 0x56, 0x34, 0x12,  // mov eax,0x12345678
-                0xeb, 0xf9};                  // jmp back seven bytes
+                0xba, 0x00, 0x00, 0x00, 0x00,  // mov edx,0
+                0x42,                          // inc edx
+                0xeb, 0xfd};                   // jmp back to inc
             // Wait for the end of a retrace pulse and then the next pulse.
             // This detects a stale 3DAh value that would hang game/driver
             // loops when port reads are sampled instead of clocked individually.
@@ -2256,17 +2393,62 @@ int main(int argc, char** argv) {
                 0xec, 0xa8, 0x08, 0x75, 0xfb, // wait until bit 3 is clear
                 0xec, 0xa8, 0x08, 0x74, 0xfb, // wait until bit 3 is set
                 0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21}; // DOS exit
+            // The 32-bit guest calls a deliberately invalid replacement
+            // function at the original memcpy entry address. Passing this
+            // test proves the fast path stopped *before* executing the body,
+            // returned through RET 0Ch, and copied both ends of the buffer.
+            std::vector<uint8_t> copy_guest = {
+                0xbe, 0x78, 0x56, 0x34, 0x12,       // mov esi,0x12345678
+                0xbf, 0x68, 0x24, 0x57, 0x13,       // mov edi,0x13572468
+                0xbd, 0x01, 0xef, 0xcd, 0xab,       // mov ebp,0xabcdef01
+                0x89, 0xe3,                         // mov ebx,esp (callee preserves EBX)
+                0x68, 0x00, 0x00, 0x20, 0x00,       // push 0x200000 (destination)
+                0x68, 0x00, 0x20, 0x00, 0x00,       // push 0x2000 (source)
+                0x68, 0x00, 0x04, 0x00, 0x00,       // push 1024
+                0xe8, 0x00, 0x00, 0x00, 0x00,       // call 0xe9a24
+                0x3d, 0x00, 0x04, 0x20, 0x00,       // cmp eax,0x200400
+                0x74, 0x02, 0xcd, 0x82,            // je success (else INT 82h)
+                0x81, 0xfa, 0x00, 0x24, 0x00, 0x00, // cmp edx,0x2400
+                0x74, 0x02, 0xcd, 0x82,
+                0x39, 0xe3,                         // cmp ebx,esp
+                0x74, 0x02, 0xcd, 0x82,
+                0x81, 0xfe, 0x78, 0x56, 0x34, 0x12, // cmp esi,0x12345678
+                0x74, 0x02, 0xcd, 0x82,
+                0x81, 0xff, 0x68, 0x24, 0x57, 0x13, // cmp edi,0x13572468
+                0x74, 0x02, 0xcd, 0x82,
+                0x81, 0xfd, 0x01, 0xef, 0xcd, 0xab, // cmp ebp,0xabcdef01
+                0x74, 0x02, 0xcd, 0x82,
+                0xa1, 0x00, 0x00, 0x20, 0x00,       // mov eax,[0x200000]
+                0x3d, 0x12, 0x34, 0x56, 0x78,
+                0x74, 0x02, 0xcd, 0x82,
+                0xa1, 0xfc, 0x03, 0x20, 0x00,       // mov eax,[0x2003fc]
+                0x3d, 0xdf, 0x9b, 0x57, 0x13,
+                0x74, 0x02, 0xcd, 0x82,
+                0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
+            constexpr uint32_t copy_call_offset = 32;
+            put32(copy_guest, copy_call_offset + 1,
+                  COPY_ENTRY - (ENTRY + copy_call_offset + 5));
             if (self_test_bda)
                 std::copy(std::begin(bda_guest), std::end(bda_guest), image.begin() + ENTRY);
             else if (self_test_clock)
                 std::copy(std::begin(clock_guest), std::end(clock_guest), image.begin() + ENTRY);
             else if (self_test_retrace)
                 std::copy(std::begin(retrace_guest), std::end(retrace_guest), image.begin() + ENTRY);
+            else if (self_test_fast_copy) {
+                std::fill(image.begin() + 0x2000, image.begin() + 0x2400, 0x5a);
+                put32(image, 0x2000, 0x78563412);
+                put32(image, 0x23fc, 0x13579bdf);
+                image[COPY_ENTRY] = 0xcd; // INT 82h traps if the host fast path fails.
+                image[COPY_ENTRY + 1] = 0x82;
+                std::copy(copy_guest.begin(), copy_guest.end(), image.begin() + ENTRY);
+                performance.fast_copy = true;
+            }
             else
                 std::copy(std::begin(gameport_guest), std::end(gameport_guest), image.begin() + ENTRY);
             Machine machine(image, {}, {}, {}, ef2000::SoundMode::Off, false,
                             {}, {}, std::move(joystick_events), controls);
-            const bool realtime_test = self_test_clock || self_test_retrace;
+            const bool realtime_test = self_test_clock || self_test_retrace || self_test_fast_copy;
+            performance.clock_loop_benchmark = self_test_clock;
             return machine.run(realtime_test ? 0 : 10000, window, 250000, "", "",
                                realtime_test,
                                realtime_test ? (wall_seconds > 0 ? wall_seconds : 0.25) : 0,
@@ -2282,6 +2464,10 @@ int main(int argc, char** argv) {
              (window.enabled || wall_seconds > 0));
         if (realtime && limit)
             throw std::runtime_error("real-time timing requires --instruction-limit 0");
+        if (performance.fast_copy && !realtime)
+            throw std::runtime_error("--fast-copy requires real-time timing");
+        if ((performance.hot_blocks || performance.profile_copy) && !realtime)
+            throw std::runtime_error("guest block profiling requires real-time timing");
         if (wall_seconds > 0 && !realtime)
             throw std::runtime_error("--wall-seconds requires real-time timing");
         if (window.enabled && overlay_dir.empty()) {

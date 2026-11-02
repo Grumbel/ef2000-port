@@ -32,6 +32,7 @@ PowerShell (or `cmd.exe`):
 .\ef2000-unicorn-cpp.exe --self-test-bda
 .\ef2000-unicorn-cpp.exe --self-test-clock
 .\ef2000-unicorn-cpp.exe --self-test-retrace
+.\ef2000-unicorn-cpp.exe --self-test-fast-copy
 ```
 
 Then point the executable at an original EF2000 installation:
@@ -85,6 +86,26 @@ instructions. The game runs with `--profile` as well; use a fixed
 `--wall-seconds N` and repeat comparisons at the same in-game stage. The
 display itself is capped near 30 presentations per second, so the reported
 `rendered_frames` alone is not a gameplay speed benchmark.
+
+`--profile-hot-blocks` samples the guest basic-block addresses and reports
+the 16 most frequently executed ones. `--profile-copy` counts calls, bytes
+and size buckets for the original game's 32-byte-at-a-time memory copier.
+The optional `--tcg-cache-mib N` controls Unicorn's translated-code cache
+(powers of two from 32 to 1024 MiB). The tested Unicorn 2.1.4 build defaults
+to a 1024 MiB code cache; a smaller cache may help constrained 32-bit address
+spaces, but the Linux tests did not show a reliable speed improvement.
+
+`--fast-copy` is an **experimental** optimization for the original game:
+it handles large, non-overlapping flat-memory copies in C++ and leaves other
+calls on Unicorn's original x86 path. This is optional because the complete
+Windows graphics/audio/gamepad path needs hardware validation. The synthetic
+`--self-test-fast-copy` checks the return address, stack cleanup, EAX/EDX,
+callee-saved registers and copied data without original game files.
+Try it on a normal game run with:
+
+```powershell
+.\ef2000-unicorn-cpp.exe "C:\Games\EF2000\_EF2000.EXE" --windowed --sound sb16-dma --fast-copy
+```
 
 The MinGW build is checked for PE executables and bundled DLLs by the flake,
 but the actual GUI, joystick, sound and startup paths still require validation

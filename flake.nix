@@ -114,6 +114,9 @@
           objects/ef2000-unicorn-cpp --self-test-retrace | grep -q 'status=guest_exit'
           objects/ef2000-unicorn-cpp --self-test-retrace --vga-clock-check 1 --block-clock-check 1 | grep -q 'status=guest_exit'
           objects/ef2000-unicorn-cpp --self-test-retrace --profile | grep -Eq 'profile: blocks=[0-9]+.*vga_reads=[1-9]'
+          objects/ef2000-unicorn-cpp --self-test-fast-copy | grep -q 'fast_copy: calls=1 bytes=1024 fallback_calls=0'
+          objects/ef2000-unicorn-cpp --self-test-clock --wall-seconds 0.1 --profile-hot-blocks | grep -Eq 'hot_blocks: samples=[1-9]'
+          objects/ef2000-unicorn-cpp --self-test-clock --tcg-cache-mib 128 | grep -q 'status=wall_time_limit'
           objects/ef2000-dos-drive-test
           objects/ef2000-real-mode-test
           objects/ef2000-original-sb16-test
