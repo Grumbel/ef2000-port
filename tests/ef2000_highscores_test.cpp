@@ -40,6 +40,30 @@ State example_table() {
     return table;
 }
 
+class RecordingDisplay final : public DisplaySink {
+public:
+    struct Event {
+        DisplayColumn column;
+        std::size_t index;
+        std::string text;
+    };
+
+    std::array<std::size_t, 3> lengths{};
+    std::vector<Event> events;
+    std::vector<std::pair<std::size_t, std::uint8_t>> errors;
+
+    std::size_t length(DisplayColumn column) const override {
+        return lengths[static_cast<std::size_t>(column)];
+    }
+    void set_text(DisplayColumn column, std::size_t index,
+                  std::string_view text) override {
+        events.push_back({column, index, std::string(text)});
+    }
+    void invalid_difficulty(std::size_t index, std::uint8_t value) override {
+        errors.emplace_back(index, value);
+    }
+};
+
 void test_wire_layout_and_signed_scores() {
     static_assert(sizeof(Record) == 25);
     static_assert(sizeof(State) == 254);
@@ -199,6 +223,83 @@ void test_guest_file_checksum_is_only_first_byte() {
     assert(!decode_file(loaded, nullptr, file.size()));
 }
 
+void test_display_three_independent_linked_columns() {
+    const auto table = example_table();
+    RecordingDisplay sink;
+    sink.lengths = {12, 4, 2};
+    auto result = refresh_display(table, sink, true, false);
+    assert(result.status == DisplayStatus::Updated);
+    assert((result.changed == std::array<std::size_t, 3>{10, 4, 2}));
+    assert(result.invalid_names == 0 && result.invalid_difficulties == 0);
+    assert(sink.events.size() == 16);
+    for (std::size_t i = 0; i < 10; ++i) {
+        assert(sink.events[i].column == DisplayColumn::Names);
+        assert(sink.events[i].index == i);
+        assert(sink.events[i].text == "Player" + std::to_string(i));
+    }
+    for (std::size_t i = 0; i < 4; ++i) {
+        assert(sink.events[10 + i].column == DisplayColumn::Difficulty);
+        assert(sink.events[10 + i].index == i);
+    }
+    assert(sink.events[10].text == "Rookie");
+    assert(sink.events[11].text == "Profi");
+    assert(sink.events[12].text == "Topgun");
+    assert(sink.events[14].column == DisplayColumn::Score);
+    assert(sink.events[14].text == "p1000");
+    assert(sink.events[15].text == "p900");
+}
+
+void test_hidden_window_force_and_bad_guest_data() {
+    State table = example_table();
+    RecordingDisplay sink;
+    sink.lengths = {10, 10, 10};
+    const auto hidden = refresh_display(table, sink, false, false);
+    assert(hidden.status == DisplayStatus::Hidden);
+    assert(sink.events.empty());
+    const auto missing_forced = refresh_display(table, sink, false, true);
+    assert(missing_forced.status == DisplayStatus::MissingForcedWindow);
+    assert(sink.events.empty());
+
+    table.records[0].name.fill('Q'); // guest would read past its name slot
+    table.records[1].difficulty = 0; // original invalid-difficulty callback
+    table.records[4].difficulty = 4;
+    sink.lengths = {2, 5, 1};
+    const auto old_bytes = encode_file(table);
+    const auto result = refresh_display(table, sink, true, true);
+    assert(result.status == DisplayStatus::Updated);
+    assert(result.invalid_names == 1);
+    assert(result.invalid_difficulties == 2);
+    assert((result.changed == std::array<std::size_t, 3>{1, 3, 1}));
+    assert(sink.events.size() == 5);
+    assert(sink.events[0].text == "Player1");
+    assert(sink.errors.size() == 2);
+    assert(sink.errors[0] == std::make_pair(std::size_t{1}, std::uint8_t{0}));
+    assert(sink.errors[1] == std::make_pair(std::size_t{4}, std::uint8_t{4}));
+    assert(encode_file(table) == old_bytes); // display code never edits guest table
+}
+
+void test_arcade_name_acceptance_and_empty_fallback() {
+    State table = example_table();
+    table.records[2].name[15] = 0x5a;
+    assert(accept_arcade_name(table, 2, name_of("New Pilot")) == RenameResult::Updated);
+    assert(name_text(table.records[2].name) == "New Pilot");
+    assert(table.records[2].name[15] == 0x5a); // guest strcpy leaves padding
+
+    assert(accept_arcade_name(table, 2, name_of("")) == RenameResult::Updated);
+    assert(name_text(table.records[2].name) == "Jemand");
+    assert(table.records[2].name[15] == 0x5a);
+    assert(accept_arcade_name(table, 2, name_of(" ")) == RenameResult::Updated);
+    assert(name_text(table.records[2].name) == " "); // strlen, no whitespace trim
+
+    const auto before = encode_file(table);
+    assert(accept_arcade_name(table, -1, name_of("Ignore")) == RenameResult::InvalidSlot);
+    assert(accept_arcade_name(table, 10, name_of("Ignore")) == RenameResult::InvalidSlot);
+    Name invalid{};
+    invalid.fill('X');
+    assert(accept_arcade_name(table, 2, invalid) == RenameResult::UnterminatedName);
+    assert(encode_file(table) == before);
+}
+
 } // namespace
 
 int main() {
@@ -209,5 +310,8 @@ int main() {
     test_host_guards_reject_unsafe_guest_strings();
     test_default_names_difficulty_and_template_scores();
     test_guest_file_checksum_is_only_first_byte();
+    test_display_three_independent_linked_columns();
+    test_hidden_window_force_and_bad_guest_data();
+    test_arcade_name_acceptance_and_empty_fallback();
     std::cout << "ef2000-highscores: layout, insertion, defaults and guest checksum passed\n";
 }

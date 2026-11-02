@@ -1,4 +1,4 @@
-# EF2000 native high-score reconstruction (bundle #058)
+# EF2000 native high-score reconstruction (bundles #058–#059)
 
 This is the first **typed original-game logic module** from the Ghidra corpus
 and x86 instruction stream: `runtime/ef2000_highscores.hpp/.cpp`, tested by
@@ -40,6 +40,37 @@ checks sizes/offsets. `State` is 254 bytes: the current score followed by the
 - **`0x41fc`, `0x42a4`** read and write the high-score file: 4-byte LE
   checksum followed by the 250 record bytes. The current score is not stored.
 
+## #059: Display lists and arcade name acceptance
+
+The display routine `0x40dc` has three complete, independent passes over
+GUI icon lists. Each list links to its next icon through a 32-bit pointer at
+object offset **`+0x21`**; traversal ends after ten rows or a null pointer.
+The window is named `hiscores`. The exact pointers identify these icon IDs:
+
+| Pass | Icon ID (guest string pointer) | Original value assigned |
+| --- | --- | --- |
+| Player | `name1` (`0x17f654`) | Record `+0` NUL-terminated name |
+| Difficulty | `level1` (`0x17f65c`) | `Rookie`, `Profi`, `Topgun` (level 1, 2, 3) |
+| Score | `score1` (`0x17f688`) | `p%d` formatted signed score (`0x17f690`) |
+
+The code first checks whether the `hiscores` window exists **only when input
+register EAX is zero**. If absent, it returns without touching icons;
+nonzero EAX bypasses that check. A difficulty outside 1..3 invokes an error
+callback rather than silently choosing a label. The native `refresh_display`
+models the three lists through a GUI-independent `DisplaySink`, preserving
+traversal order, independent short-list termination, guarded missing-window
+behavior and invalid-difficulty diagnostics. It does not implement guest GUI
+objects or their allocation.
+
+The named `InitArcade` callback at `0x4c50` gets an edit-field string, copies
+it into the record at `0x1970a4 + selected_slot * 25`, and uses guest `strlen`
+at `0xb1b8b` to check for an empty result. Empty names are replaced by
+`Jemand` (`0x130be8`, German for “someone”), without trimming whitespace.
+It then saves through `0x42a4`, refreshes through `0x40dc`, and invokes a
+menu helper at `0xac7a8`. The native `accept_arcade_name` models only the
+record update and fallback; save, refresh and menu effects remain explicit
+outside this helper.
+
 ### Confirmed original checksum bug
 
 Both the load loop (`0x426d..0x427a`) and save loop (`0x42d4..0x42e1`)
@@ -61,10 +92,12 @@ copied the table, matching the guest loader before its default fallback.
 The native insert function safely rejects malformed, unterminated 20-byte
 names with host-only `-2` instead of allowing the guest `strcpy` to overrun
 memory. Truncated file inputs are also rejected without modifying the table,
-unlike the DOS code's unchecked short reads. The original file-open error
-paths, high-score display synchronization (`0x40dc`), RNG seed management,
-and menu callbacks are not reconstructed yet. The Watcom calling convention
-and runtime integration still require guest-trace verification.
+unlike the DOS code's unchecked short reads. The `0x40dc` model reports
+invalid names and difficulty levels instead of performing unbounded memory
+reads or invoking the potentially fatal guest diagnostic. The original
+file-open error paths, GUI object internals, RNG seed management and other
+menu callbacks are not reconstructed yet. The Watcom calling convention and
+runtime integration still require guest-trace verification.
 
 ## Tests
 
@@ -72,6 +105,9 @@ The asset-free C++ suite checks structure packing, signed score and byte
 order, ranking and equal scores, shift and padding semantics, full-table
 failure, `INT_MIN` wraparound, defaults with an injected RNG, and the weak
 checksum—including corruption which goes undetected and truncated input.
+The #059 tests additionally cover all three independent GUI lists, update
+ordering, missing-window cases, bad difficulty values, and arcade name
+acceptance including the original empty-name fallback.
 
 ```sh
 g++ -std=c++17 -O2 -Wall -Wextra -Werror \
@@ -83,5 +119,5 @@ g++ -std=c++17 -O2 -Wall -Wextra -Werror \
 Also included in CMake/CTest and the main `nix flake check` package tests.
 For a quick Nix-only check without building the Unicorn/SDL3 game, use
 `nix build .#checks.x86_64-linux.highscores-reconstruction`.
-Next is to recover the `0x40dc` UI/file callbacks and validate actual
-guest-vs-native state transitions before replacing the guest subsystem.
+Next is to verify guest-vs-native UI state traces, finish the file-open
+branches and GUI object interfaces, and then replace a bounded guest path.

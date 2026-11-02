@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <string>
 
 namespace ef2000::highscores {
 namespace {
@@ -116,6 +117,65 @@ bool decode_file(State& state, const std::uint8_t* data, std::size_t size) {
     const auto saved_checksum = read_u32(data);
     std::memcpy(state.records.data(), data + 4, kTableBytes);
     return saved_checksum == original_checksum(state);
+}
+
+DisplayResult refresh_display(const State& state, DisplaySink& sink,
+                              bool window_present, bool force) {
+    DisplayResult result{};
+    if (!window_present) {
+        result.status = force ? DisplayStatus::MissingForcedWindow : DisplayStatus::Hidden;
+        return result;
+    }
+    // Each traversal in the guest starts from an independent first icon.
+    // In memory, each next icon pointer is a 32-bit dword at object +0x21.
+    const auto name_count = std::min(kRecordCount, sink.length(DisplayColumn::Names));
+    for (std::size_t index = 0; index < name_count; ++index) {
+        const auto& raw = state.records[index].name;
+        const auto end = std::find(raw.begin(), raw.end(), std::uint8_t{0});
+        if (end == raw.end()) {
+            ++result.invalid_names; // host guard against guest unbounded text read
+            continue;
+        }
+        const auto text = std::string(raw.begin(), end);
+        sink.set_text(DisplayColumn::Names, index, text);
+        ++result.changed[0];
+    }
+    constexpr std::array<std::string_view, 3> kDifficultyText = {
+        "Rookie", "Profi", "Topgun",
+    };
+    const auto difficulty_count = std::min(kRecordCount, sink.length(DisplayColumn::Difficulty));
+    for (std::size_t index = 0; index < difficulty_count; ++index) {
+        const auto level = state.records[index].difficulty;
+        if (level < 1 || level > 3) {
+            sink.invalid_difficulty(index, level);
+            ++result.invalid_difficulties;
+            continue;
+        }
+        sink.set_text(DisplayColumn::Difficulty, index, kDifficultyText[level - 1]);
+        ++result.changed[1];
+    }
+    const auto score_count = std::min(kRecordCount, sink.length(DisplayColumn::Score));
+    for (std::size_t index = 0; index < score_count; ++index) {
+        // The original format string at 0x17f690 is literally "p%d".
+        const auto text = "p" + std::to_string(score(state.records[index]));
+        sink.set_text(DisplayColumn::Score, index, text);
+        ++result.changed[2];
+    }
+    return result;
+}
+
+RenameResult accept_arcade_name(State& state, int selected_slot, const Name& edit_text) {
+    if (selected_slot < 0 || selected_slot >= static_cast<int>(kRecordCount)) {
+        return RenameResult::InvalidSlot;
+    }
+    if (!terminated(edit_text)) return RenameResult::UnterminatedName;
+    auto& name = state.records[static_cast<std::size_t>(selected_slot)].name;
+    copy_name(name, edit_text);
+    if (name[0] == 0) {
+        constexpr Name kFallbackName = {'J', 'e', 'm', 'a', 'n', 'd', 0};
+        copy_name(name, kFallbackName);
+    }
+    return RenameResult::Updated;
 }
 
 } // namespace ef2000::highscores

@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <string_view>
 
 namespace ef2000::highscores {
 
@@ -81,5 +82,42 @@ std::array<std::uint8_t, kFileBytes> encode_file(const State& state);
 // buffer is rejected without mutation (unlike the DOS read API's unchecked
 // short reads, which need separate emulation if required).
 bool decode_file(State& state, const std::uint8_t* data, std::size_t size);
+
+// 0x40dc updates three GUI icon chains under the "hiscores" window. Actual
+// GUI objects use a guest-specific +0x21 next pointer and remain outside this
+// model. A host view implements independent chain lengths and text updates.
+enum class DisplayColumn { Names, Difficulty, Score };
+enum class DisplayStatus { Updated, Hidden, MissingForcedWindow };
+
+class DisplaySink {
+public:
+    virtual ~DisplaySink() = default;
+    virtual std::size_t length(DisplayColumn column) const = 0;
+    // The supplied view is valid for this call only; a GUI must copy it.
+    virtual void set_text(DisplayColumn column, std::size_t index,
+                          std::string_view text) = 0;
+    virtual void invalid_difficulty(std::size_t index, std::uint8_t value) = 0;
+};
+
+struct DisplayResult {
+    DisplayStatus status = DisplayStatus::Updated;
+    std::array<std::size_t, 3> changed{};
+    std::size_t invalid_names = 0;
+    std::size_t invalid_difficulties = 0;
+};
+
+// 0x40dc skips the work if the highscores window isn't present and EAX is
+// zero. A nonzero EAX bypasses that initial check; missing forced windows
+// reach a guest GUI error, which the host model reports without dereferencing.
+// Original bad-difficulty logging may itself be fatal; here it is a callback.
+DisplayResult refresh_display(const State& state, DisplaySink& sink,
+                              bool window_present, bool force);
+
+// In the callback named InitArcade at 0x4c50, the selected slot's name is
+// copied from the GUI edit field, then checked by strlen at 0xb1b8b.
+// Empty input is replaced by the literal "Jemand" at 0x130be8. Save/refresh
+// and menu-close effects happen afterwards and are not part of this helper.
+enum class RenameResult { Updated, InvalidSlot, UnterminatedName };
+RenameResult accept_arcade_name(State& state, int selected_slot, const Name& edit_text);
 
 } // namespace ef2000::highscores

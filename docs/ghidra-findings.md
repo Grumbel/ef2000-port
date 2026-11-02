@@ -927,3 +927,37 @@ file contents are checked in. The C++ model is **not connected to the
 emulator or running game yet** and is not a claim of a complete subsystem
 replacement. It has dedicated asset-free tests, integrated into CMake/CTest
 and `nix flake check`. See [high-score reconstruction](highscores-reconstruction.md).
+
+## #059: High-score GUI list update and name-accept callback
+
+The entire `0x40dc..0x41fb` routine is a three-pass GUI refresh rather than
+a general game-logic function. It locates the `hiscores` window and then
+traverses independent linked icon lists for `name1`, `level1`, and `score1`,
+following each icon's next pointer at object offset `+0x21`. Each traversal
+stops at a null link or ten records. The passes copy names, translate
+difficulty bytes 1..3 to `Rookie`/`Profi`/`Topgun`, and format signed scores
+with the exact `p%d` format string, respectively. An invalid difficulty
+invokes an error callback, and a zero EAX input makes the whole update
+conditional on the `hiscores` window being present.
+
+The code's string pointers deliberately start *within* adjacent string-data
+regions: `0x17f654` is `name1`, `0x17f65c` is `level1`, and `0x17f688` is
+`score1` (the preceding bytes are not part of the actual identifiers).
+The resulting native `DisplaySink` models list length, text updates and
+bad-difficulty diagnostics without coupling the high-score state to an SDL
+or original GUI object implementation.
+
+A second assembly walk establishes that the named `InitArcade` routine
+at `0x4c50` commits a user-entered name to the selected high-score slot,
+tests its length using `strlen` at `0xb1b8b`, and uses the literal `Jemand`
+at `0x130be8` as the fallback when empty. It then calls save (`0x42a4`),
+refresh (`0x40dc`), and a menu helper (`0xac7a8`). The new native
+`accept_arcade_name` function represents the bounded, observable memory
+transition. Its error guards intentionally avoid guest buffer overflows;
+the outer GUI and DOS effects are not yet replaced.
+
+The C++ tests now verify all three icon-list passes, call ordering,
+different list lengths, missing windows, invalid difficulty, unchanged
+state on display refresh, normal name edits, the empty-name fallback,
+and non-trimming of whitespace. The existing standalone Nix high-score
+check exercises this expanded module.
