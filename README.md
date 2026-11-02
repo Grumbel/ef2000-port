@@ -515,6 +515,7 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [Port architecture and milestones](docs/port-plan.md)
 - [Executable and startup findings](docs/executable.md)
 - [Recovered loader and image layout](docs/loader.md)
+- [Headless Ghidra import and decompilation workflow](docs/ghidra.md)
 - [Startup symbols and interface worklist](docs/startup-symbols.md)
 - [Execution probes and reference experiments](docs/execution-probes.md)
 - [Native startup harness and validation](docs/startup-runtime.md)
