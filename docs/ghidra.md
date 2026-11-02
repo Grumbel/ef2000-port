@@ -490,7 +490,7 @@ Use `audit-body-holes 0x9820` to focus on one function, or omit the argument
 to inspect all multi-span functions. A hole containing another function is
 **not** an instruction-boundary repair candidate by default.
 
-The separate `repair-boundaries` command has **eight pinned, guarded recipes**:
+The separate `repair-boundaries` command has **nine pinned, guarded recipes**:
 
 | Function | Incorrect orphan instructions | True continuation | Verified end |
 | --- | --- | --- | --- |
@@ -498,6 +498,7 @@ The separate `repair-boundaries` command has **eight pinned, guarded recipes**:
 | `0x433c` | `0x4349`–`0x434a` | `MOV EBP,[0x1970a0]` at `0x4345` | `RET` `0x442d` |
 | `0x45a4` | `0x45d3`–`0x45d5` | `MOV EDX,0x125828` at `0x45d1` | `RET` `0x4734` |
 | `0x4738` | `0x4800`–`0x480d` | `XOR EDX,EDX` at `0x47ff` | `RET` `0x4878` |
+| `0x4aa0` | `0x4b32`–`0x4b34` | `CALL 0xa4342` at `0x4b30` | `RET` `0x4bf4` |
 | `0x4bf8` | `0x4c35`–`0x4c3a` | `XOR EDX,EDX` at `0x4c34` | `RET` `0x4c4e` |
 | `0x4e14` | `0x4f01`–`0x4f0b` | `CALL 0x7c4fc` at `0x4efd` | `RET` `0x4f17` |
 | `0x9820` | `0x9c24`–`0x9c2d` and auto-data at `0x9bbc` | `MOV EDX,[0x137958]` at `0x9c1f`; branch at `0x9bbb` | `RET` `0x9e37` |
@@ -517,6 +518,12 @@ Only that exact auto-analyzed island and two exact false orphan instructions
 are cleared, with other function ownership, user symbols, comments and
 non-analysis references blocking the repair. The 539 recovered bytes include
 two previously disconnected sections of one routine.
+The `0x4aa0` recipe is deliberately **non-contiguous**: it attaches the
+verified ranges `0x4aa0..0x4b50` and `0x4b7b..0x4bf4`, but preserves the
+independent 39-byte `kotsInitKOTS` function at `0x4b54..0x4b7a` and the
+three alignment bytes preceding it. The recipe explicitly checks that
+neighbor's identity, body size and span, and uses a disassembly address set
+that excludes it. It must not claim the entire `0x4aa0..0x4bf4` interval.
 
 ```sh
 # Start with a disposable copy of a recovered project, never the only copy.
@@ -559,10 +566,13 @@ repairs changed `0x4050` **34 → 138**, `0x4738` **199 → 321**,
 `0x4bf8` **60 → 87**, and `0x4e14` **233 → 260**, recovering 280 more
 function-body bytes. The generic flow-gap audit reported **17** before
 the first repair, **16** after #049, **12** after #050, and **10** after
-all seven recipes in #054, then **9** after the #055 `0x9820` repair.
+all seven recipes in #054, **9** after the #055 `0x9820` repair, and
+**8** after the #056 `0x4aa0` repair.
 The #054 repairs grew `0x433c` **9 → 242** and `0xfecc` **217 → 231**
 (247 bytes); the #055 repair grew `0x9820` **1,021 → 1,560**
-(539 additional function-body bytes).
+(539 additional function-body bytes). The #056 `0x4aa0` repair grew its
+body **144 → 299**, adding 155 owned code bytes without crossing into
+`kotsInitKOTS`.
 Other candidates require case-by-case review: for example, `0xbfcc`
 has a DEFAULT-source data pointer into disputed code at `0xc302`, which
 must not be silently discarded.

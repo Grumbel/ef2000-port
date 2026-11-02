@@ -53,7 +53,7 @@ ef2000-ghidra callback-tables         # extract verified named dispatch tables
 ef2000-ghidra name-callbacks          # audit names (dry run)
 ef2000-ghidra audit-flow-gaps         # inspect truncated function bodies
 ef2000-ghidra audit-body-holes 0x9820 # inspect multi-span function holes
-ef2000-ghidra repair-boundaries       # audit eight guarded recipes (dry run)
+ef2000-ghidra repair-boundaries       # audit nine guarded recipes (dry run)
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
 

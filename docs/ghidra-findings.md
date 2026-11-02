@@ -783,3 +783,60 @@ instruction boundaries must still be checked individually.
 The two-pass #055 export still produced **4,233/4,233 pseudo-C files**, with
 eight temporary-storage fallbacks and zero failures. No executable, loaded
 image, Ghidra project, or generated pseudo-C is committed to this repo.
+
+## #056: Recovering a caller around a separate KOTS callback
+
+The next short fall-through gap was at `0x4b30`, in `FUN_00004aa0`.
+The true instruction is `CALL 0xa4342` (`e8 0d f8 09 00`), interrupted by
+false orphan decodes `CLC` at `0x4b32` and `OR` at `0x4b33`.
+The Listing resynchronizes at `MOV AX,[0x121e44]` at `0x4b35`. The next
+branch ladder tests values 1, 2, and 3 and chooses one of three arcade
+text-file paths (`arcroo.txt`, `arcpro.txt`, `arctop.txt`), confirmed by
+the original initialized image and the static copy-source addresses.
+
+It would be wrong to extend `FUN_00004aa0` into one contiguous function:
+the distinct, previously named `kotsInitKOTS` function occupies
+`0x4b54..0x4b7a`, preceded by three bytes of alignment at `0x4b51`.
+The corrected `FUN_00004aa0` body instead consists of **two ranges**:
+
+| Ownership | Address range | Size |
+| --- | --- | ---: |
+| `FUN_00004aa0` | `0x4aa0..0x4b50` | 177 |
+| Alignment (not claimed) | `0x4b51..0x4b53` | 3 |
+| `kotsInitKOTS` (preserved) | `0x4b54..0x4b7a` | 39 |
+| `FUN_00004aa0` | `0x4b7b..0x4bf4` | 122 |
+
+The new pinned recipe verifies the original 144-byte prefix, the exact
+false orphan instructions and true continuation, the neighbor's name and
+39-byte body, both new body ranges, the `RET` at `0x4bf4`, following
+three-byte alignment and the independent prologue at `0x4bf8`. Ghidra
+11.4.2 applied it to an isolated #055 project copy and repeated auditing
+returned `already_repaired`. The parent body grew **144 → 299 bytes**
+without overlapping the callback.
+
+This also strengthens the earlier high-score reverse engineering:
+the independently identified `kotsInitKOTS` callback calls
+`FUN_0000433c` (the #054 high-score insertion routine), checks its
+returned slot for failure, uses the record's 25-byte stride, and invokes
+other save/update helpers. The layout at `0x1970a4` is therefore used
+by a real original-game callback, not just an isolated inferred table.
+
+| Ghidra 11.4.2 measurement | #055 | #056 |
+| --- | ---: | ---: |
+| Recognized functions | 4,233 | 4,233 |
+| Summed function body bytes | 896,612 | **896,767** |
+| Disassembled instruction bytes | 940,080 | **940,082** |
+| Instruction bytes outside functions | 43,468 | **43,315** |
+| Orphan instruction ranges | 311 | **309** |
+| Short flow-gap audit candidates | 9 | **8** |
+| Unresolved direct-call edges | 0 | **0** |
+
+The regenerated #056 pseudo-C file for `0x4aa0` is byte-for-byte identical
+to #055: the decompiler had already followed this control flow, although
+the Listing had not assigned those blocks to their correct function.
+This is an ownership and instruction-boundary recovery, not a new native
+replacement. The entire **4,233/4,233** corpus exported again with eight
+temporary-storage fallbacks and zero failures.
+The general body-hole audit now reports **46** intervals rather than 45:
+the newly recognized split body of `0x4aa0` correctly exposes the
+intervening `kotsInitKOTS` function as a hole instead of hiding it.

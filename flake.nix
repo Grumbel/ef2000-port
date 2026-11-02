@@ -403,7 +403,7 @@
           printf '  ef2000-ghidra audit-body-holes 0x9820\n'
           printf '                                  Inspect disconnected function-body spans\n'
           printf '  ef2000-ghidra repair-boundaries\n'
-          printf '                                  Audit eight pinned function-body repairs (read-only)\n'
+          printf '                                  Audit nine pinned function-body repairs (read-only)\n'
           printf '  nix run .#ghidra-ef2000 -- --help\n'
           printf '                                  Same workflow without entering the dev shell\n'
           printf '  ghidra                          Open Ghidra GUI\n\n'

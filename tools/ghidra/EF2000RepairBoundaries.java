@@ -60,6 +60,7 @@ public class EF2000RepairBoundaries extends GhidraScript {
         final int[] gapBytes, padding;
         final BadInstruction[] bad;
         final long[][] oldBodyRanges;
+        final long[][] targetBodyRanges;
         final BranchIsland branchIsland;
 
         Recipe(long entry, String name, long gap, long predecessor,
@@ -75,24 +76,9 @@ public class EF2000RepairBoundaries extends GhidraScript {
                 String precedingMnemonic, int precedingLength, long end, long nextEntry,
                 int nextEntryByte, long sync, String syncMnemonic, int previousBodyLength,
                 int[] gapBytes, int[] padding, BadInstruction[] bad, long bodyResume) {
-            this.entry = entry;
-            this.name = name;
-            this.gap = gap;
-            this.predecessor = predecessor;
-            this.precedingMnemonic = precedingMnemonic;
-            this.precedingLength = precedingLength;
-            this.end = end;
-            this.nextEntry = nextEntry;
-            this.nextEntryByte = nextEntryByte;
-            this.sync = sync;
-            this.syncMnemonic = syncMnemonic;
-            this.previousBodyLength = previousBodyLength;
-            this.gapBytes = gapBytes;
-            this.padding = padding;
-            this.bad = bad;
-            this.bodyResume = bodyResume;
-            this.oldBodyRanges = null;
-            this.branchIsland = null;
+            this(entry, name, gap, predecessor, precedingMnemonic, precedingLength,
+                end, nextEntry, nextEntryByte, sync, syncMnemonic, previousBodyLength,
+                gapBytes, padding, bad, bodyResume, null, null, null);
         }
 
         Recipe(long entry, String name, long gap, long predecessor,
@@ -100,6 +86,16 @@ public class EF2000RepairBoundaries extends GhidraScript {
                 int nextEntryByte, long sync, String syncMnemonic, int previousBodyLength,
                 int[] gapBytes, int[] padding, BadInstruction[] bad, long bodyResume,
                 long[][] oldBodyRanges, BranchIsland branchIsland) {
+            this(entry, name, gap, predecessor, precedingMnemonic, precedingLength,
+                end, nextEntry, nextEntryByte, sync, syncMnemonic, previousBodyLength,
+                gapBytes, padding, bad, bodyResume, oldBodyRanges, branchIsland, null);
+        }
+
+        Recipe(long entry, String name, long gap, long predecessor,
+                String precedingMnemonic, int precedingLength, long end, long nextEntry,
+                int nextEntryByte, long sync, String syncMnemonic, int previousBodyLength,
+                int[] gapBytes, int[] padding, BadInstruction[] bad, long bodyResume,
+                long[][] oldBodyRanges, BranchIsland branchIsland, long[][] targetBodyRanges) {
             this.entry = entry;
             this.name = name;
             this.gap = gap;
@@ -118,6 +114,7 @@ public class EF2000RepairBoundaries extends GhidraScript {
             this.bodyResume = bodyResume;
             this.oldBodyRanges = oldBodyRanges;
             this.branchIsland = branchIsland;
+            this.targetBodyRanges = targetBodyRanges;
         }
 
         long badEnd() {
@@ -155,6 +152,13 @@ public class EF2000RepairBoundaries extends GhidraScript {
             new BadInstruction[]{new BadInstruction(0x4800, 6, "ROR"),
                                  new BadInstruction(0x4806, 3, "ADD"),
                                  new BadInstruction(0x4809, 5, "XOR")}),
+        new Recipe(0x4aa0, "FUN_00004aa0", 0x4b30,
+            0x4b2f, "PUSH", 1, 0x4bf4, 0x4bf8, 0x52, 0x4b35, "MOV", 144,
+            new int[]{0xe8, 0x0d, 0xf8, 0x09, 0x00},
+            new int[]{0x8d, 0x40, 0x00},
+            new BadInstruction[]{new BadInstruction(0x4b32, 1, "CLC"),
+                                 new BadInstruction(0x4b33, 2, "OR")}, 0,
+            null, null, new long[][]{{0x4aa0, 0x4b50}, {0x4b7b, 0x4bf4}}),
         new Recipe(0x4bf8, "candidate_callback_target_00004bf8", 0x4c34,
             0x4c2f, "CALL", 5, 0x4c4e, 0x4c50, 0x53, 0x4c3b, "MOV", 60,
             new int[]{0x31, 0xd2},
@@ -228,8 +232,11 @@ public class EF2000RepairBoundaries extends GhidraScript {
                                 throw new IllegalStateException("verified branch island did not disassemble");
                             }
                         }
+                        AddressSet permitted = recipe.targetBodyRanges == null ?
+                            new AddressSet(toAddr(recipe.gap), toAddr(recipe.end)) :
+                            bodyAddressSet(recipe.targetBodyRanges);
                         DisassembleCommand command = new DisassembleCommand(toAddr(recipe.gap),
-                            new AddressSet(toAddr(recipe.gap), toAddr(recipe.end)), true);
+                            permitted, true);
                         boolean disassembled = command.applyTo(currentProgram, monitor);
                         String issue = linearIssue(recipe);
                         if (!disassembled || !expectedGap(recipe) || issue != null) {
@@ -237,7 +244,9 @@ public class EF2000RepairBoundaries extends GhidraScript {
                                 "verified linear disassembly did not form (command=%s gap=%s issue=%s)",
                                 disassembled, expectedGap(recipe), issue));
                         }
-                        function.setBody(new AddressSet(toAddr(recipe.entry), toAddr(recipe.end)));
+                        function.setBody(recipe.targetBodyRanges == null ?
+                            new AddressSet(toAddr(recipe.entry), toAddr(recipe.end)) :
+                            bodyAddressSet(recipe.targetBodyRanges));
                         if (!isLinearBody(function, recipe)) {
                             throw new IllegalStateException("function body did not extend to RET");
                         }
@@ -294,9 +303,12 @@ public class EF2000RepairBoundaries extends GhidraScript {
         if (!bytesMatch(recipe.gap, recipe.gapBytes) ||
                 !bytesMatch(recipe.end + 1, recipe.padding) ||
                 readByte(recipe.nextEntry) != recipe.nextEntryByte) return false;
+        if (recipe.targetBodyRanges != null && !safeExcludedNeighbor(recipe)) return false;
         if (recipe.branchIsland != null && !safeBranchIsland(recipe.branchIsland)) return false;
         for (long offset = recipe.gap; offset <= recipe.end; offset++) {
             monitor.checkCancelled();
+            if (recipe.targetBodyRanges != null &&
+                    !inBodyRanges(recipe.targetBodyRanges, offset)) continue;
             Function owner = getFunctionContaining(toAddr(offset));
             if ((owner != null && (owner != function ||
                     recipe.bodyResume == 0 || offset < recipe.bodyResume)) ||
@@ -360,6 +372,35 @@ public class EF2000RepairBoundaries extends GhidraScript {
             if (function.getBody().contains(toAddr(offset)) != shouldOwn) return false;
         }
         return true;
+    }
+
+    private boolean safeExcludedNeighbor(Recipe recipe) throws Exception {
+        // 0x4b54 is a separate table-backed callback reached from elsewhere.
+        // Its 39 bytes and the preceding 3-byte alignment must remain outside
+        // the 0x4aa0 function, despite physically occupying its branch shadow.
+        if (recipe.entry != 0x4aa0 || recipe.targetBodyRanges.length != 2 ||
+                !inBodyRanges(recipe.targetBodyRanges, recipe.entry) ||
+                inBodyRanges(recipe.targetBodyRanges, 0x4b54) ||
+                !bytesMatch(0x4b51, new int[]{0x8d, 0x40, 0x00})) return false;
+        Function other = getFunctionAt(toAddr(0x4b54));
+        return other != null && other.getName().equals("kotsInitKOTS") &&
+               other.getBody().getNumAddressRanges() == 1 &&
+               other.getBody().getNumAddresses() == 39 &&
+               other.getBody().getMinAddress().getOffset() == 0x4b54 &&
+               other.getBody().getMaxAddress().getOffset() == 0x4b7a;
+    }
+
+    private boolean inBodyRanges(long[][] ranges, long offset) {
+        for (long[] span : ranges) {
+            if (offset >= span[0] && offset <= span[1]) return true;
+        }
+        return false;
+    }
+
+    private AddressSet bodyAddressSet(long[][] ranges) {
+        AddressSet body = new AddressSet();
+        for (long[] span : ranges) body.addRange(toAddr(span[0]), toAddr(span[1]));
+        return body;
     }
 
     private boolean safeBranchIsland(BranchIsland island) throws Exception {
@@ -433,22 +474,35 @@ public class EF2000RepairBoundaries extends GhidraScript {
     }
 
     private String linearIssue(Recipe recipe) {
-        long offset = recipe.entry;
-        while (offset <= recipe.end) {
-            Instruction instruction = getInstructionAt(toAddr(offset));
-            if (instruction == null) return String.format("no instruction at 0x%x", offset);
-            if (instruction.getLength() <= 0 ||
-                    offset + instruction.getLength() - 1 > recipe.end) {
-                return String.format("bad instruction at 0x%x: %s", offset, instruction);
+        long[][] ranges = recipe.targetBodyRanges == null ?
+            new long[][]{{recipe.entry, recipe.end}} : recipe.targetBodyRanges;
+        for (long[] span : ranges) {
+            long offset = span[0];
+            while (offset <= span[1]) {
+                Instruction instruction = getInstructionAt(toAddr(offset));
+                if (instruction == null) return String.format("no instruction at 0x%x", offset);
+                if (instruction.getLength() <= 0 ||
+                        offset + instruction.getLength() - 1 > span[1]) {
+                    return String.format("bad instruction at 0x%x: %s", offset, instruction);
+                }
+                offset += instruction.getLength();
             }
-            offset += instruction.getLength();
         }
-        return offset == recipe.end + 1 &&
-               getInstructionAt(toAddr(recipe.end)).getMnemonicString().equals("RET") ?
+        return getInstructionAt(toAddr(recipe.end)).getMnemonicString().equals("RET") ?
                null : "no terminating RET";
     }
 
     private boolean isLinearBody(Function function, Recipe recipe) {
+        if (recipe.targetBodyRanges != null) {
+            if (function.getBody().getNumAddressRanges() != recipe.targetBodyRanges.length) return false;
+            var iter = function.getBody().getAddressRanges();
+            for (long[] span : recipe.targetBodyRanges) {
+                var range = iter.next();
+                if (range.getMinAddress().getOffset() != span[0] ||
+                        range.getMaxAddress().getOffset() != span[1]) return false;
+            }
+            return isLinearCode(recipe);
+        }
         return function.getBody().getNumAddresses() == recipe.end - recipe.entry + 1 &&
                function.getBody().contains(toAddr(recipe.end)) && isLinearCode(recipe);
     }
