@@ -109,6 +109,7 @@
         checkPhase = ''
           runHook preCheck
           unset EF2000_EXE
+          unset EF2000_DATA_DIR
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
           objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
           objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
@@ -234,6 +235,12 @@
         exec ${python}/bin/python3 ${source}/tools/highscores_differential.py \
           --compiler ${pkgs.stdenv.cc}/bin/g++ "$@"
       '';
+      # Asset decoding is pure Python; users supply DID archives and select a
+      # writable output directory. Nothing proprietary enters the Nix store.
+      guiAssetsWorkflow = pkgs.writeShellScriptBin "ef2000-gui-assets" ''
+        set -euo pipefail
+        exec ${pkgs.python3}/bin/python3 ${source}/tools/ef2000_gui_assets.py "$@"
+      '';
     in {
       packages.${system} = {
         default = package;
@@ -241,6 +248,7 @@
         ef2000-startup = package;
         ef2000-ghidra = ghidraWorkflow;
         ef2000-highscores-differential = highscoresDifferential;
+        ef2000-gui-assets = guiAssetsWorkflow;
         ef2000-win64 = win64.dist;
         ef2000-win64-zip = win64.zip;
         ef2000-win32 = win32.dist;
@@ -280,6 +288,11 @@
              type = "app";
              program = "${highscoresDifferential}/bin/ef2000-highscores-differential";
              meta.description = "Compare original high-score guest routines with native C++ reconstruction";
+           };
+           gui-assets = {
+             type = "app";
+             program = "${guiAssetsWorkflow}/bin/ef2000-gui-assets";
+             meta.description = "Inventory and extract original EF2000 menu artwork and GUI scripts";
            };
            ghidra-headless = {
              type = "app";
@@ -341,6 +354,16 @@
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest \
             tests.test_highscores_differential -q
         '';
+        gui-assets = pkgs.runCommand "ef2000-gui-assets-check" {
+          nativeBuildInputs = [ pkgs.python3 ];
+        } ''
+          ${guiAssetsWorkflow}/bin/ef2000-gui-assets --help > "$out"
+          grep -q 'inventory' "$out"
+          grep -q 'extract' "$out"
+          cd ${source}
+          unset EF2000_DATA_DIR
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_gui_assets -q
+        '';
         windows-layout = pkgs.runCommand "ef2000-windows-layout-check" {
           nativeBuildInputs = [ pkgs.file ];
         } ''
@@ -400,7 +423,7 @@
       };
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
-        packages = [ python pkgs.ghidra ghidraWorkflow highscoresDifferential ] ++ devCommands ++ (with pkgs; [
+        packages = [ python pkgs.ghidra ghidraWorkflow highscoresDifferential guiAssetsWorkflow ] ++ devCommands ++ (with pkgs; [
           gcc binutils qemu-user dosbox-x cmake ninja gdb ccache
         ]);
         GHIDRA_HOME = ghidraHome;
@@ -455,6 +478,10 @@
           printf '  ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300\n'
           printf '                                  Compare guest routines to reconstructed C++\n'
           printf '  nix run .#highscores-differential -- /path/to/_EF2000.EXE\n\n'
+          printf 'GUI archaeology (requires original DID archives):\n'
+          printf '  ef2000-gui-assets inventory /path/to/EF2000\n'
+          printf '  ef2000-gui-assets extract /path/to/EF2000 gui/mainmenu.gui iff/256/newgui03.lbm --out local/gui-assets\n'
+          printf '                                  Export menu scripts, structured JSON and PNGs\n\n'
           printf 'Examples:\n'
           printf '  ef2000-run --data-dir /path/to/EF2000 --windowed\n'
           printf '  ef2000-run-gdb --data-dir /path/to/EF2000 --verbose\n'

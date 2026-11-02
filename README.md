@@ -58,6 +58,9 @@ ef2000-ghidra audit-body-holes 0x9820 # inspect multi-span function holes
 ef2000-ghidra repair-boundaries       # audit nine guarded recipes (dry run)
 ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300
                                        # original Unicorn guest versus native C++
+ef2000-gui-assets inventory /path/to/EF2000
+ef2000-gui-assets extract /path/to/EF2000 gui/mainmenu.gui \
+  iff/256/newgui03.lbm spr/pitfont.spr --out local/gui-assets
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
 
@@ -78,6 +81,14 @@ typed native C++ reconstruction. This workflow requires the caller's original
 executable; the asset-free fixture checks run under `nix flake check`.
 See [high-score reconstruction](docs/highscores-reconstruction.md) for verified
 addresses, behavior and remaining decompilation work.
+
+The original menus also have extractable artwork and declarative layouts:
+`DID.DAT` and `DID1ST.DAT` contain hashed game resources, including ILBM/PBM
+and PCX graphics, `.gui` window/icon scripts, and sprites. Run
+`nix run .#gui-assets -- inventory /path/to/EF2000` to inspect an installation
+or `nix run .#gui-assets -- extract ...` to export PNGs and JSON menu
+structures. The original files stay untouched, and `nix flake check` uses
+only synthetic fixtures. See [GUI resource research](docs/gui-assets.md).
 
 `EF2000_SOURCE` defaults to the directory from which `nix develop` was entered;
 `EF2000_BUILD_DIR` defaults to `/tmp/ef2000-build` and can be overridden.

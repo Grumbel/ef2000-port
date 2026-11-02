@@ -982,3 +982,34 @@ integration test, nor a substitution in the running game. The save routine's
 failed-open branch and the load routine's checksum regeneration were also
 exercised. See [the reconstruction report](highscores-reconstruction.md) for
 replay commands, verified boundaries and remaining work.
+
+## #061: Native UI-asset archaeology from DID archives
+
+The menu is specified in declarative `.gui` scripts as well as x86 callback
+code. Both original archives expose a hashed-entry directory: `DID1ST.DAT`
+contains 580 members, `DID.DAT` 8,416; each entry is a signed pathname hash,
+data offset and length. A compact Python reader now validates both index
+variants, computes original EF2000/Tactcom name hashes and decodes RA archive
+compression. Its output is bounded and retains source provenance.
+
+The original `gui/mainmenu.gui` in `DID1ST.DAT` declares 15 windows and 58
+icons, the `picture newgui03` background, localized labels, event actions,
+screen transitions and named native callbacks, including `gpwClickCampaign`.
+That directly connects the data-driven menu structure with the previously
+recovered GUI callback function graph. The same virtual script path also
+resolves to a separate, older resource in `DID.DAT`.
+
+IFF/ILBM/PBM decoding (ByteRun1, indexed palettes and transparency) recovers
+the original menu bitmaps. Direct conversion of the RA-compressed
+`iff/256/mainselc.lbm` demonstrates that the archive is a source of menu
+artwork, not just 3D shape files. The verified exhaustive run recovered 517
+images (including three PCX) from the two archives and loose assets.
+A first font lead, `spr/pitfont.spr`, yields 45
+offset-indexed 4×5 sprites with 16-bit pixel values; character mapping and
+the actual GUI font remain unverified.
+
+All original sprites, imagery, script text, and decoded research outputs
+remain outside Git and Nix source inputs. The new asset-free tests validate
+path hashing, archive bounds, synthetic images, sprite indexing and GUI
+directives; a separate opt-in test reads the user's own installation.
+See [GUI resource research](gui-assets.md) for commands and limitations.
