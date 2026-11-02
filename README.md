@@ -457,6 +457,15 @@ native C++ IRQ7/DMA self-test, including DSP 4.5 and DMA1/5 detection, and
 the sound-enabled cockpit replay. The smaller reduced testing fixture alone
 was missing that file. Real-device SDL3 audio playback remains untested here.
 
+The native C++ BIOS bridge now responds to real-mode `INT 13h` disk probes:
+there is **no BIOS sector device** behind the DOS-file virtual drive, so
+requests return carry set with AH=`01h` (invalid function or drive)
+instead of aborting emulation. The first request logs its function (`AH`)
+and drive (`DL`) to stderr. No host disk or original game file is exposed
+for raw sector I/O; a BIOS disk-image backend remains future work. This
+fallback is covered by the asset-free `bios-disk-no-media` check, but the
+original long-running gameplay path still needs a fresh integration run.
+
 This is still an **experimental migration**, not yet a drop-in replacement
 for the Python app. Real SDL3 window/gamepad operation has not been exercised
 in this build environment, and real-device sound playback, original-driver

@@ -71,6 +71,9 @@
             tests/dos_drive_test.cpp runtime/dos_drive.cpp \
             -o objects/ef2000-dos-drive-test
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/bios_disk_test.cpp \
+            -o objects/ef2000-bios-disk-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp \
             runtime/sound_blaster.cpp runtime/isa_audio.cpp \
             -lunicorn \
@@ -130,6 +133,7 @@
           objects/ef2000-unicorn-cpp --self-test-clock --wall-seconds 0.1 --profile-hot-blocks | grep -Eq 'hot_blocks: samples=[1-9]'
           objects/ef2000-unicorn-cpp --self-test-clock --tcg-cache-mib 128 | grep -q 'status=wall_time_limit'
           objects/ef2000-dos-drive-test
+          objects/ef2000-bios-disk-test
           objects/ef2000-real-mode-test
           objects/ef2000-original-sb16-test
           objects/ef2000-cd-audio-test

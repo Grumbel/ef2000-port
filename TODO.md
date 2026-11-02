@@ -131,13 +131,14 @@ Implemented and verified:
   their child calls, the lexical helpers and waypoint-count/last-index
   validation are now identified in `docs/mission-readers.md`; next recover
   typed structs, enum *usage* and callsite-to-filename mapping. A read-only
-  pinned-payload probe now extracts the reader's 310 table labels and eight
+  pinned-payload probe now extracts the reader's 313 table labels and eight
   mobile-class aliases in `tools/mission_enum_probe.py`. A first native C++
-  guest layout model now captures mission/group/base and navigation records,
+  guest layout model now captures mission/group/base, navigation, target
+  members, pilot records, and nested attack-pattern/route/node structures,
   along with waypoint height normalization and navigation coordinate clamping
   (`runtime/ef2000_mission_layout.*`, `docs/mission-layout.md`). Still to
-  reconstruct: attack/target structures, pointer lifetimes, the remaining
-  pilot fields and measured runtime comparisons before replacing guest code.
+  reconstruct: pointer lifetimes, the meaning and usage of remaining pilot/
+  attack fields, and measured runtime comparisons before replacing guest code.
 - [ ] **Version-aware reference/decompilation:** fingerprint the candidate
   `rdeprera/EF2000` v2.0 DOS executable separately; verify its actual
   language, patch level and code/data differences from the German reference.
@@ -214,6 +215,10 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
   keyboard controller/gameport, with headless scripted input options.
 - [x] Add a separately rooted C++ DOS copy-on-write overlay for file create,
   open, read, write, seek, flush and close; reject writes without an overlay.
+- [x] Return a BIOS disk failure for `INT 13h` without exposing host sectors;
+  test the status/CF result in the asset-free C++ suite. Follow up with a
+  long-running original-asset replay and the emitted AH/DL diagnostic. A
+  virtual DOS file drive does **not** imply a BIOS raw-sector device.
 - [x] Add an independent C++ Unicorn real-mode CPU with bounded driver calls,
   shared DOS memory/register exchange and opt-in SB16 discovery ports; validate
   synthetic guest IN/OUT and interrupt/timeout failures.

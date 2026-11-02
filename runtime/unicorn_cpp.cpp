@@ -5,6 +5,7 @@
 // calls stop explicitly; the proprietary executable is only read at runtime
 // and is never linked into the program.
 #include "dos_drive.hpp"
+#include "bios_disk.hpp"
 #include "cd_audio.hpp"
 #include "pcm_audio.hpp"
 #include "real_mode_cpu.hpp"
@@ -955,6 +956,7 @@ private:
     std::string status_ = "instruction_limit";
     std::string detail_;
     bool trace_interrupts_{};
+    bool reported_missing_bios_disk_{};
     uint32_t heap_end_ = 0x4df000;
     uint32_t stack_end_ = (0x3fff000 - 0x126a) & 0xfffff000;
     uint32_t free_bytes_ = stack_end_ - 0x4e1000;
@@ -1447,7 +1449,20 @@ private:
     }
     bool bios(uint16_t vector, Registers& values) {
         const uint16_t ax = values.ax & 0xffff;
-        if (vector == 0x33) {
+        if (vector == 0x13) {
+            // There is no emulated sector device behind the DOS file drive.
+            // BIOS callers must observe a standard failure, not a fabricated
+            // successful read/geometry response or access to host disks.
+            if (!reported_missing_bios_disk_) {
+                std::cerr << "bios-disk: INT 13h AH=0x" << std::hex << (ax >> 8)
+                          << " DL=0x" << (values.dx & 0xff) << std::dec
+                          << " (no BIOS sector device; returning CF=1 AH=01)\n";
+                reported_missing_bios_disk_ = true;
+            }
+            const auto result = ef2000::absent_bios_disk(values.ax, values.flags);
+            values.ax = result.ax;
+            values.flags = result.flags;
+        } else if (vector == 0x33) {
             if (ax == 0) {
                 values.ax = low16(values.ax, 0xffff);
                 values.bx = low16(values.bx, 2);
