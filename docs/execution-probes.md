@@ -677,3 +677,41 @@ cockpit: 8933 PIT ticks, 7456 IRQ0 deliveries, 329 modeled SB16 DMA blocks,
 6038 large copies totaling 385961440 bytes, while leaving 1241062 smaller or
 ineligible calls on Unicorn's original path. The Windows windowed/gamepad
 behavior and comparative in-flight FPS are not yet verified.
+
+#### Measuring visible image updates instead of SDL presentations
+
+`rendered_frames` counts successful SDL3 presents, including repeats of the
+same game image and startup diagnostic screens. It is capped by the frontend's
+approximately 30 Hz presentation loop, so it **cannot** establish guest FPS.
+The new opt-in `--profile-video-frames` hashes the complete guest RGBA image
+at each SDL3 presentation and reports `image_presentations`, `changed_images`
+and `changed_hz`. The last value counts changes after the first nonblack image,
+divided by the interval between the first and last sampled game images.
+Palette changes are included; identical consecutive images are not counted.
+The additional hashing overhead is absent without this option. It requires
+`--windowed` or `--fullscreen` and an SDL3-enabled build.
+
+For a repeatable menu comparison, run the same wall-time interval twice and
+compare the `video_frames:` output:
+
+```sh
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+  --windowed --joystick off --sound off --timing realtime \
+  --wall-seconds 10 --profile-video-frames --fast-copy
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+  --windowed --joystick off --sound off --timing realtime \
+  --wall-seconds 10 --profile-video-frames --fast-copy-vga
+```
+
+On the November 2026 test host, both paths ran against the original game files
+with SDL3 3.4.18's **dummy video driver and software renderer**, not a real
+display. The `--fast-copy` run made 271 SDL presentations, 228 nonblack game
+image presentations and 93 changed images (`changed_hz=11.34`); it accelerated
+4,915 memory copies totaling 315 MB. With `--fast-copy-vga`, the run made 284
+SDL presentations, 244 nonblack image presentations and again 93 changed
+images (`changed_hz=11.10`), despite accelerating 554,838 copies totaling
+35.5 GB (303,964 of them banked VGA copies). Both reached the TACTCOM startup
+sequence without a guest fault. These results are specific to the **startup
+menu**, and only show that increasing guest copy throughput did not increase
+the number of visible image changes there. An SDL window on a real desktop,
+in-flight cockpit replay, frame pacing and audio still need validation.

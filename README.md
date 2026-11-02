@@ -339,7 +339,15 @@ VGA RAM window, which accounts for much of the remaining startup copy traffic;
 `--self-test-fast-copy --fast-copy-vga` checks the expanded destination and
 register/stack behavior. A matching original-game headless test rendered the
 same 640×400 menu as the old path, but in-flight FPS, timing and Windows SDL3
-behavior have not been verified. See [Ghidra findings](docs/ghidra-findings.md).
+behavior have not been verified. With `--windowed --profile-video-frames`,
+the frontend also reports `image_presentations`, `changed_images` and
+`changed_hz` by fingerprinting the actual displayed pixels. This separates
+identical repeated SDL presentations from visible guest updates; it is an
+opt-in diagnostic, **not** simulation FPS. A controlled SDL3 dummy-driver
+startup comparison saw 93 changed images in ten seconds with either copy
+path despite much higher guest-copy throughput with `--fast-copy-vga`.
+See [Ghidra findings](docs/ghidra-findings.md) and
+[execution probes](docs/execution-probes.md).
 A separate `--tcg-cache-mib N` option allows testing smaller Unicorn translated-code
 caches (32..1024 MiB), especially for 32-bit Windows; size alone did not
 produce a repeatable speed improvement on the Linux reference host.

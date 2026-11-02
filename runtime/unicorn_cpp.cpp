@@ -125,6 +125,7 @@ struct CopyCallerStats {
 };
 struct WindowOptions {
     bool enabled{}, fullscreen{}, smooth_scaling{};
+    bool profile_video_frames{};
     int width = 1280, height = 960;
     std::string aspect_ratio = "4:3";
     int joystick_index{}; // -1 disables the physical controller.
@@ -221,6 +222,13 @@ public:
     }
     uint64_t input_polls() const { return input_polls_; }
     uint64_t frames_presented() const { return frames_presented_; }
+    uint64_t image_frames() const { return image_frames_; }
+    uint64_t changed_image_frames() const { return changed_image_frames_; }
+    double image_change_hz() const {
+        if (image_frames_ < 2 || last_image_time_ <= first_image_time_) return 0;
+        return double(changed_image_frames_ - 1) /
+               std::chrono::duration<double>(last_image_time_ - first_image_time_).count();
+    }
     void play_audio(const ef2000::AudioBlock& block, bool cd = false) {
 #ifdef EF_UNICORN_SDL3
         if (!enabled() || audio_disabled_) return;
@@ -392,6 +400,27 @@ public:
             }
         }
         if (has_image) {
+            if (options_.profile_video_frames) {
+                // A present is not necessarily a new game frame. Fingerprint
+                // the actual RGBA pixels, including palette changes, to
+                // distinguish repeated images from visible updates. This is
+                // intentionally opt-in because hashing costs CPU time.
+                uint64_t hash = UINT64_C(14695981039346656037);
+                for (uint8_t byte : *frame) {
+                    hash ^= byte;
+                    hash *= UINT64_C(1099511628211);
+                }
+                const bool changed = !image_frames_ || hash != last_image_hash_ ||
+                                     width != last_image_width_ || height != last_image_height_;
+                if (changed) ++changed_image_frames_;
+                last_image_hash_ = hash;
+                last_image_width_ = width;
+                last_image_height_ = height;
+                const auto sampled = std::chrono::steady_clock::now();
+                if (!image_frames_) first_image_time_ = sampled;
+                last_image_time_ = sampled;
+                ++image_frames_;
+            }
             if (!texture_ || width != texture_width_ || height != texture_height_) {
                 if (texture_) SDL_DestroyTexture(texture_);
                 texture_ = SDL_CreateTexture(renderer_, SDL_PIXELFORMAT_RGBA32,
@@ -440,6 +469,9 @@ private:
     std::chrono::steady_clock::time_point last_present_{};
     std::chrono::steady_clock::time_point last_poll_{};
     uint64_t input_polls_{}, frames_presented_{};
+    uint64_t image_frames_{}, changed_image_frames_{}, last_image_hash_{};
+    int last_image_width_{}, last_image_height_{};
+    std::chrono::steady_clock::time_point first_image_time_{}, last_image_time_{};
 #ifdef EF_UNICORN_SDL3
     SDL_AudioStream* audio_stream_{};
     SDL_AudioStream* cd_audio_stream_{};
@@ -634,6 +666,7 @@ public:
             check(uc_ctl_set_tcg_buffer_size(cpu_, performance_.tcg_buffer_mib << 20),
                   "set Unicorn translated-code cache");
         const bool trace_joystick = window_options.trace_joystick;
+        const bool profile_video_frames = window_options.profile_video_frames;
         if (!wav_directory.empty())
             wav_capture_ = std::make_unique<ef2000::WavCapture>(wav_directory);
         if (!wav_directory.empty() && cd_audio_)
@@ -785,6 +818,13 @@ public:
             std::cout << " sdl_polls=" << window.input_polls()
                       << " rendered_frames=" << window.frames_presented();
         std::cout << '\n';
+        if (profile_video_frames) {
+            std::cout << "video_frames: image_presentations=" << window.image_frames()
+                      << " changed_images=" << window.changed_image_frames()
+                      << " changed_hz=" << std::fixed << std::setprecision(2)
+                      << window.image_change_hz() << std::defaultfloat
+                      << " (sampled visible changes; not simulation FPS)\n";
+        }
         if (performance_.clock_loop_benchmark)
             std::cout << "benchmark: clock_loop_iterations=" << regs.dx << '\n';
         if (performance_.profile) {
@@ -2198,6 +2238,7 @@ void usage(const char* program) {
               << "       [--profile-hot-blocks] (sample and list 16 hottest guest blocks)\n"
               << "       [--profile-copy] (count calls to the original fast-copy routine)\n"
               << "       [--profile-copy-callers] (rank copy callers by bytes and count)\n"
+              << "       [--profile-video-frames] (count changed displayed images, requires SDL3 window)\n"
               << "       [--fast-copy] (experimental host acceleration of large guest copies)\n"
               << "       [--fast-copy-vga] (also accelerate copies into the banked VGA RAM window)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
@@ -2288,6 +2329,8 @@ int main(int argc, char** argv) {
                 performance.profile = performance.profile_copy = true;
             } else if (!std::strcmp(argv[i], "--profile-copy-callers")) {
                 performance.profile = performance.profile_copy = performance.profile_copy_callers = true;
+            } else if (!std::strcmp(argv[i], "--profile-video-frames")) {
+                window.profile_video_frames = true;
             } else if (!std::strcmp(argv[i], "--fast-copy")) {
                 performance.fast_copy = true;
             } else if (!std::strcmp(argv[i], "--fast-copy-vga")) {
@@ -2422,6 +2465,8 @@ int main(int argc, char** argv) {
             } else if (argv[i][0] != '-' && path.empty()) path = argv[i];
             else throw std::runtime_error("unrecognized option: " + std::string(argv[i]));
         }
+        if (window.profile_video_frames && !window.enabled)
+            throw std::runtime_error("--profile-video-frames requires --windowed or --fullscreen");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace || self_test_fast_copy) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
                 int(self_test_retrace) + int(self_test_fast_copy) != 1)
