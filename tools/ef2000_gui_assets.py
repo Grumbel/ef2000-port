@@ -270,7 +270,7 @@ def main(argv=None):
     unpack.add_argument('--gallery', action='store_true', help='also generate a standalone offline image gallery')
     display = modes.add_parser('gallery', help='make an offline HTML contact gallery of extracted PNGs')
     display.add_argument('extraction_dir', type=Path, help='directory containing manifest.json')
-    font = modes.add_parser('font', help='recover original menu glyphs from supplied options screenshots')
+    font = modes.add_parser('font', help='recover proportional glyphs from original DID1ST font specimen')
     font.add_argument('game_dir', type=Path, help='original game installation with DID1ST.DAT')
     font.add_argument('--out', type=Path, required=True, help='new local font output directory')
     args = parser.parse_args(argv)

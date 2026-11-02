@@ -2,12 +2,13 @@
 # SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Recover menu glyph bitmaps from supplied, already-rasterized EF2000 art.
+"""Recover a proportional font from the original TACTCOM font specimen.
 
-The original 640x400 option screens contain clean, non-antialiased white text.
-Each non-space glyph occupies contiguous lit columns; letters have two blank
-columns between them. These measured line rectangles are for the German
-TACTCOM DID1ST.DAT revision. No original image or font data lives in Git.
+DID1ST.DAT hash 0x33773001 contains a 320x200 font specimen with consecutive
+ASCII characters ! through z, followed by accented glyphs whose character
+mapping remains to be established. Most game menu text is baked into images;
+this font is useful for the few dynamic labels and for the native overlay.
+No original image or font data lives in Git.
 """
 
 from dataclasses import dataclass
@@ -29,6 +30,7 @@ CELL_HEIGHT = 12
 ASCII_START = 32
 ASCII_END = 126
 WHITE_THRESHOLD = 185
+FONT_SHEET_HASH = 0x33773001
 
 
 @dataclass(frozen=True)
@@ -36,11 +38,24 @@ class Sample:
     image_hash: int
     bounds: tuple[int, int, int, int]  # left, top, right, bottom, exclusive
     text: str
+    merge_groups: tuple[int, ...] = ()  # index of first group to merge with next
 
 
-# Frame labels can be read unambiguously, including all 26 Latin capitals.
-# The body labels additionally supply J/K/Q/W/Y/Z and some lowercase forms.
-# See docs/gui-assets.md for the independent screenshot references.
+# The first specimen row contains ASCII 33..76, the second 77..119, and
+# the third starts with 120..122 before switching to accented characters.
+# The double quote has two disconnected vertical strokes, separated by one
+# blank column, so its two bright-column groups must be joined explicitly.
+SHEET_SAMPLES = (
+    Sample(FONT_SHEET_HASH, (0, 32, 256, 44),
+           ''.join(map(chr, range(33, 77))), merge_groups=(1,)),
+    Sample(FONT_SHEET_HASH, (0, 46, 256, 58),
+           ''.join(map(chr, range(77, 120)))),
+    Sample(FONT_SHEET_HASH, (0, 60, 16, 72), 'xyz'),
+)
+
+
+# Earlier work also measured already-rendered option-screen labels. Retain
+# these independent comparison points; they are NOT the primary font source.
 ORIGINAL_SAMPLES = (
     Sample(0x94eb76bc, (14, 8, 101, 18), 'IN GAME OPTIONS'),
     Sample(0x94eb76bc, (332, 33, 411, 43), 'REALISM MENU'),
@@ -70,7 +85,7 @@ def bright(image, x, y):
     return min(rgb) > WHITE_THRESHOLD
 
 
-def sample_glyphs(image, bounds, text):
+def sample_glyphs(image, bounds, text, merge_groups=()):
     """Segment one labeled text line by fully empty columns.
 
     A mismatch is an error rather than guessing a glyph-to-character map.
@@ -87,6 +102,13 @@ def sample_glyphs(image, bounds, text):
             groups.append([x, x])
         else:
             groups[-1][1] = x
+    for index in sorted(merge_groups, reverse=True):
+        if not 0 <= index < len(groups) - 1:
+            raise ValueError('invalid font sample group merge index')
+        if groups[index + 1][0] - groups[index][1] != 2:
+            raise ValueError('font sample merge must bridge one blank column')
+        groups[index][1] = groups[index + 1][1]
+        del groups[index + 1]
     expected = text.replace(' ', '')
     if len(groups) != len(expected):
         raise ValueError(f'font sample {text!r}: {len(groups)} groups for '
@@ -109,7 +131,8 @@ def collect_glyphs(images, samples, required=string.ascii_uppercase):
             image = images[sample.image_hash]
         except KeyError as error:
             raise ValueError(f'missing font reference image {sample.image_hash:08x}') from error
-        for char, glyph in sample_glyphs(image, sample.bounds, sample.text):
+        for char, glyph in sample_glyphs(image, sample.bounds, sample.text,
+                                        sample.merge_groups):
             variants[char].append(glyph)
     # Background/palette differences sometimes change one bright edge pixel.
     # Keep the most commonly observed raster for each letter and record every
@@ -157,13 +180,15 @@ def render_atlas(glyphs):
 
 def rip_font(game_dir, out_dir):
     archive = DIDArchive.from_path(Path(game_dir) / 'DID1ST.DAT')
-    images = {}
-    for key in {sample.image_hash for sample in ORIGINAL_SAMPLES}:
-        entry = archive.by_hash.get(key)
-        if not entry:
-            raise ValueError(f'DID1ST.DAT is missing screenshot {key:08x}')
-        images[key] = decode(archive.member(entry))
-    glyphs, conflicts = collect_glyphs(images, ORIGINAL_SAMPLES)
+    entry = archive.by_hash.get(FONT_SHEET_HASH)
+    if not entry:
+        raise ValueError(f'DID1ST.DAT is missing font specimen {FONT_SHEET_HASH:08x}')
+    image = decode(archive.member(entry))
+    if (image.width, image.height) != (320, 200):
+        raise ValueError('unexpected TACTCOM font specimen dimensions')
+    required = ''.join(map(chr, range(33, 123)))
+    glyphs, conflicts = collect_glyphs({FONT_SHEET_HASH: image}, SHEET_SAMPLES,
+                                       required=required)
     atlas, widths = render_atlas(glyphs)
     output = Path(out_dir)
     files = {
@@ -172,11 +197,14 @@ def rip_font(game_dir, out_dir):
         'menu-font.widths': (' '.join(map(str, widths)) + '\n').encode('ascii'),
         'menu-font.json': (json.dumps({
             'source': 'DID1ST.DAT',
+            'source_hash': f'{FONT_SHEET_HASH:08x}',
+            'source_description': '320x200 original font specimen',
             'character_range': 'ASCII 32..126',
+            'unmapped_ascii': '{|}~',
             'cell_size': [CELL_WIDTH, CELL_HEIGHT],
             'recovered_characters': ''.join(sorted(ch for ch in glyphs if ch in string.printable)),
             'conflicting_samples': conflicts,
-            'sample_count': len(ORIGINAL_SAMPLES),
+            'sample_count': len(SHEET_SAMPLES),
         }, indent=2, ensure_ascii=False) + '\n').encode('utf-8'),
     }
     output.mkdir(parents=True, exist_ok=True)

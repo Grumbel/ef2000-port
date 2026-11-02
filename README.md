@@ -371,7 +371,8 @@ reconstruction, not a direct rendering of the original GUI code.
 
 The `gui-assets` extractor can generate a self-contained, offline HTML
 gallery of all recovered images. This is a useful way to find and compare
-original menu artwork (some images already contain fully rasterized menus):
+original menu artwork. Most of the original GUI's text is baked into these
+bitmaps; only some text is generated dynamically:
 
 ```sh
 nix run .#gui-assets -- extract /path/to/EF2000 \
@@ -379,10 +380,12 @@ nix run .#gui-assets -- extract /path/to/EF2000 \
 # Open local/gui-art/gallery.html in a browser (no JavaScript or network).
 ```
 
-The same original options images contain enough crisp, un-antialiased text
-to recover **all 26 Latin uppercase characters** and 15 further lowercase
-or punctuation glyphs. To generate a proportional, native-resolution font
-atlas privately from your original archives:
+The original `DID1ST.DAT` also contains a **320×200 font specimen**, identified
+as `hash_33773001.png` by the extractor. It includes glyphs in character
+order: the full ASCII range `!` through `z` (90 characters), including
+digits, uppercase and lowercase letters, followed by accented characters.
+To generate a proportional, native-resolution font atlas privately from your
+original archives:
 
 ```sh
 nix run .#gui-assets -- font /path/to/EF2000 --out local/menu-font
@@ -392,10 +395,10 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 
 The SDL3 overlay reads the adjacent `menu-font.widths` file and uses the
 original glyph widths and two-pixel letter spacing. Unsupported characters
-(including most digits) fall back to SDL3's built-in debugging font. Repeated
-archive glyphs differ slightly in a few cases; the extractor records those
-variants and selects the most common raster. This is **screen-ripped glyph
-art**, not a claim to have found the original standalone font resource.
+(`{|}~` have not been identified) fall back to SDL3's built-in debugging font.
+The font is recovered directly from the **rendered original specimen**, not
+from the menu screenshots, but its underlying binary glyph format remains
+unidentified. The extractor records the source hash and coverage in JSON.
 Neither the bitmap nor its derived widths are committed to Git.
 
 If you can isolate a clean, reusable **frame** region, the extractor can

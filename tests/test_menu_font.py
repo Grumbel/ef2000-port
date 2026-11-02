@@ -12,7 +12,7 @@ import unittest
 
 from tools.ilbm_image import Image
 from tools.menu_font import (ASCII_END, ASCII_START, CELL_HEIGHT, CELL_WIDTH,
-                             Glyph, Sample, collect_glyphs, render_atlas,
+                             FONT_SHEET_HASH, Glyph, Sample, collect_glyphs, render_atlas,
                              rip_font, sample_glyphs)
 
 
@@ -58,6 +58,16 @@ class MenuFontTests(unittest.TestCase):
         self.assertEqual(conflicts, ['A'])
         self.assertEqual(result['A'], sample_glyphs(original, (0, 0, 10, 10), 'AB')[0][1])
 
+    def test_disconnected_strokes_are_merged_only_when_declared(self):
+        image = Image(6, 3, bytes([0, 1, 0, 1, 0, 0] * 3),
+                      b'\x00\x00\x00\xff\xff\xff' + bytes(762))
+        with self.assertRaisesRegex(ValueError, '2 groups for 1 characters'):
+            sample_glyphs(image, (0, 0, 6, 3), '"')
+        glyphs = sample_glyphs(image, (0, 0, 6, 3), '"', merge_groups=(0,))
+        self.assertEqual(glyphs[0], ('"', Glyph(3, 3, b'\x01\x00\x01' * 3)))
+        with self.assertRaisesRegex(ValueError, 'merge index'):
+            sample_glyphs(image, (0, 0, 6, 3), '"', merge_groups=(2,))
+
     def test_atlas_layout_and_missing_widths(self):
         glyphs = {'A': Glyph(3, 2, b'\x01\x00\x01\x00\x01\x00'),
                   'M': Glyph(7, 1, b'\x01' * 7)}
@@ -78,20 +88,28 @@ class MenuFontTests(unittest.TestCase):
 @unittest.skipUnless(os.environ.get('EF2000_DATA_DIR'),
                      'set EF2000_DATA_DIR to rip supplied TACTCOM menu font')
 class OriginalMenuFontTests(unittest.TestCase):
-    def test_original_options_images_recover_entire_latin_alphabet(self):
+    def test_original_font_specimen_recovers_digits_lowercase_and_uppercase(self):
         with tempfile.TemporaryDirectory() as directory:
             glyphs, conflicts = rip_font(Path(os.environ['EF2000_DATA_DIR']),
                                         Path(directory))
-            self.assertEqual(len(glyphs), 41)
-            self.assertTrue(set(string.ascii_uppercase).issubset(glyphs))
-            self.assertIn('N', conflicts)  # captured raster variants
+            self.assertEqual(len(glyphs), 90)
+            self.assertTrue(set(string.ascii_letters + string.digits).issubset(glyphs))
+            self.assertEqual(conflicts, [])  # direct font specimen, not screen variants
             widths = [int(value) for value in
                       (Path(directory) / 'menu-font.widths').read_text().split()]
             self.assertEqual(len(widths), 95)
             self.assertEqual(widths[ord('M') - 32], 7)
+            self.assertEqual(widths[ord('"') - 32], 3)
+            self.assertEqual(widths[ord('0') - 32], 4)
+            self.assertEqual(widths[ord('z') - 32], 3)
+            self.assertEqual(widths[ord('~') - 32], -1)
+            self.assertEqual(widths[ord('{') - 32], -1)
             self.assertTrue((Path(directory) / 'menu-font.bmp').read_bytes().startswith(b'BM'))
             manifest = json.loads((Path(directory) / 'menu-font.json').read_text())
             self.assertEqual(manifest['cell_size'], [8, 12])
+            self.assertEqual(manifest['source_hash'], f'{FONT_SHEET_HASH:08x}')
+            self.assertEqual(manifest['unmapped_ascii'], '{|}~')
+            self.assertEqual(manifest['sample_count'], 3)
             with self.assertRaises(FileExistsError):
                 rip_font(Path(os.environ['EF2000_DATA_DIR']), Path(directory))
 

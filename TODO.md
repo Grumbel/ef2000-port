@@ -130,11 +130,13 @@ Implemented and verified:
   offline `--gallery` view, and full-screen English/German original option
   images provide concrete gray/silver/olive frame references. The procedural
   host overlay follows those observed colors/title tabs; `newgui03` is only
-  a textured background. The new `gui-assets font` path can rip all 26
-  uppercase glyphs and 15 further characters from original options images;
-  the optional SDL3 atlas is **not a complete font** (digits and most lowercase
-  characters still fall back). **Reverse-engineer the procedural `box`/`bkd`
-  renderer and the actual menu font storage and metrics**, then add remaining
+  a textured background. **Most original GUI text is baked into its bitmap
+  art**; preserve that distinction when interpreting the `.gui` scripts.
+  The `gui-assets font` extractor now recovers **90 ASCII glyphs including
+  digits and lowercase** from the original `DID1ST` font specimen
+  `hash_33773001` (the four characters `{|}~` and accented-glyph mappings
+  remain unresolved). **Reverse-engineer the procedural `box`/`bkd`
+  renderer and the underlying glyph storage/metrics**, then map remaining
   glyphs and verify against original screenshots. Finer widgets and gamepad
   window navigation remain open tasks.
   Keep the native UI separate from guest framebuffer emulation so menus can

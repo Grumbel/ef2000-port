@@ -78,7 +78,11 @@ reproducible image identifiers (not recovered filenames):
 These are exceptionally useful **visual references** for the original
 widget treatment: single-pixel silver edges, black offset shadows, stepped
 olive-green title tabs, gray interiors, compact white bitmap text and tiny
-square selection controls. The rasterized screen bitmaps are **not proof**
+square selection controls. **Most original menu text is baked into the
+images**, with a smaller number of dynamic text exceptions. Consequently,
+importing `.gui` layout descriptions alone will not yield a fully localized,
+editable menu: its button art/text must also be identified and, if desired,
+separated or redrawn. The rasterized screen bitmaps are **not proof**
 that the runtime draws windows by blitting a matching frame sprite; the
 `.gui` scripts include `box`, `bkd`, `boxs`, `bkds`, and `line` attributes
 that likely drive a procedural renderer. In particular,
@@ -112,21 +116,33 @@ and 45 little-endian 16-bit sprite offsets. Each sprite record contains an
 pixel/index values. `tools/spr_image.py` preserves those indices exactly in
 JSON without inventing a font character map or colour palette.
 
-### Menu typography reconstructed from the original screen bitmaps
+### Original font specimen: `DID1ST/hash_33773001.png`
 
-The 640×400 English and German options images provide a second, stronger
-font lead. Their white labels are made of crisp 1-bit strokes: uppercase
-letters are generally **10 pixels tall and 1–4 pixels wide**, with 7-pixel
-`M`/`W`, two blank columns between letters and a wider word-space. The
-descender of uppercase `Q` reaches 11 pixels. This describes the observed
-**rasterized text**, not a recovered in-memory font definition.
+The original archive also contains a **320×200 font specimen image** at
+`DID1ST.DAT` hash **`0x33773001`**, identified from the user's extracted
+`DID1ST/hash_33773001.png`. Unlike the earlier options-screen reconstruction,
+it shows glyphs **in character order**, with white proportional strokes on a
+blue background. The first row runs ASCII `!` through `L` (33..76), the
+second `M` through `w` (77..119), and the third begins with `xyz` (120..122)
+before switching to accented glyphs. The mapping for the remaining accented
+symbols and ASCII `{|}~` is **not established**; do not assign characters to
+them by position alone.
 
-`tools/menu_font.py` captures manually verified line rectangles from
-`hash_94eb76bc` and `hash_950b6052` and matches groups of lit columns to
-known transcribed letters. It recovers **all A–Z** by combining titles with
-capital initials from *Joystick*, *Keyboard*, *World Detail*, *Yes*, *Quit*
-and *Zurück*. It also recovers 15 additional letters/punctuation, for 41
-distinct glyphs altogether. To use this as an optional SDL3 overlay font:
+`tools/menu_font.py` now takes three line rectangles directly from this
+specimen, using empty columns and known sequential character codes to
+recover **90 distinct printable glyphs** (ASCII 33..122, including all
+digits, A–Z and a–z). A double quote consists of two disconnected strokes;
+the extractor explicitly merges those two columns rather than treating them
+as independent characters. Typical glyph widths range from one to seven
+pixels, with two blank columns between characters. The older 640×400 options
+screen samples are retained as independent references for later comparison,
+but they are no longer the extraction source. All 41 glyphs shared with those
+earlier options-screen samples have matching widths; the masks are **not all
+pixel-identical** (only 12 match after ignoring blank rows). The specimen
+therefore establishes a real font style, but not necessarily every menu
+label's exact rendered raster.
+
+To use the recovered font as an optional SDL3 overlay font:
 
 ```sh
 ef2000-gui-assets font /path/to/EF2000 --out local/menu-font
@@ -138,13 +154,12 @@ The extractor writes a magenta-keyed 128×72 bitmap containing 8×12 cells
 for ASCII 32..126, an identical PNG for inspection, a plain text `.widths`
 table (95 values), and an evidence/coverage JSON. The SDL3 overlay loads
 the bitmap and corresponding widths table, preserves proportional letter
-spacing and falls back to debug text for missing glyphs (notably **digits**).
-All derived pixels remain outside Git and the Nix output. Some repeated
-samples differ by one or more pixels (`N`, `S`, `U` and several lowercase
-forms); the tool reports these discrepancies and selects the most commonly
-observed variant, without pretending the font is completely reconstructed.
+spacing and falls back to debug text for the four unmapped ASCII characters
+`{|}~` (space has width zero). The JSON records source hash, coverage and
+sample count. All derived pixels remain outside Git and the Nix output.
 
-The actual menu font storage and rendering routine are still unknown; a
+The specimen is a **rendered image**, not proof of a standalone binary font
+format. The underlying glyph storage and rendering routine are still unknown; a
 Ghidra analysis of the GUI text blitter would establish glyph metrics,
 available character sets, shadowing and color/palette behavior.
 
@@ -203,7 +218,7 @@ There is already enough material to prototype a host-side EF2000 skin
 without first implementing the whole DOS menu interpreter. The 517 extracted
 images and `mainmenu.gui` window/icon geometry give us the visual and
 structural starting point, but **not a complete widget theme**. We still
-need to identify menu fonts, sprite/button states, reusable frame borders,
+need to identify the source binary font format, sprite/button states, reusable frame borders,
 cursor imagery and palette rules against actual menu screenshots.
 
 The host-side overlay now draws after the guest image and before presentation,
@@ -212,8 +227,9 @@ and scroll. The first two panels contain keyboard/gamepad help and a live
 performance monitor; F12 toggles them while F11/Alt+Enter changes fullscreen
 state. The interaction model lives in `runtime/overlay_windows.hpp` and has
 an asset-free test. The procedural default now follows the observed
-gray/silver/olive colors and stepped title tabs: the **actual EF2000 bitmap
-fonts and icons have not yet been identified or loaded into the runtime**.
+gray/silver/olive colors and stepped title tabs: the recovered **EF2000
+font specimen can now be loaded via `--overlay-font-bmp`**, while original
+icon artwork still has to be identified and mapped.
 Later bind reconstructed
 menu callbacks to native actions and replace individual original GUI screens.
 
@@ -238,12 +254,11 @@ alignment, palette fidelity and scale against the existing guest renderer.
 - **Font internals:** The inspected `.gui` scripts specify text and titles but not a
   separate font file. The directory tables contain bitmap/sprite-like
   extensions such as `.bbm`, `.abm`, `.pmi`, `.pmm` and `.spr`, not a
-  conventional `.fnt` extension. Beyond the recovered `pitfont.spr`, we
-  have **not yet identified** which glyph data the menu renders, whether
-  it is embedded in the executable or another bitmap member, or the complete
-  metrics/kerning behavior. The screenshot-ripped A–Z alphabet above is a
-  usable approximation, not evidence of an original font resource. The
-  tfx3view HUD font is not a valid substitute without further verification.
+  conventional `.fnt` extension. The `hash_33773001` rendered specimen does
+  provide 90 glyph shapes and observed widths, but **not their underlying
+  binary storage, complete accented-character mapping, or original glyph
+  rendering routines**. The tfx3view HUD font is not a valid substitute
+  without further verification.
 - **Widgets:** The scripts describe interaction/layout, but the exact bitmap
   motifs for frame borders, buttons, icons, cursors, and palettes still need
   to be linked to archive resources and GUI renderer routines.
