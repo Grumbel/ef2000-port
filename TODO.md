@@ -66,6 +66,12 @@ Implemented and verified:
    Keep unknown interfaces and model exhaustion as explicit stops.
 6. Document data/mission discoveries separately under `docs/`, with fingerprints,
    offsets, reproducers, and observed/inferred status.
+   The supplied `MISSION.CFG` is already a text file with 746 mission records;
+   `NAVIG.NAV` has 1,118 navigation records. Defer a read-only typed
+   mission/navigation parser and archive/campaign correlation until the
+   current decompilation priorities are complete; do **not** begin a mission
+   editor or write-back workflow yet. See
+   `docs/existing-tools-and-releases.md`.
 7. Validate **portable Unicorn flight controls and longer gameplay**. The
    flake exposes `nix run .#unicorn` as a separate experimental windowed
    launcher with standard game-data discovery and a writable state overlay;
@@ -105,6 +111,30 @@ Implemented and verified:
    C++ Unicorn launcher on Windows or Wine. SDL3 window behavior is currently checked with an injected
    display; real GUI tests must run in a private Xvfb instance.
 
+### Deferred decompilation and data-format work
+
+- [ ] **Return to full native GUI interpretation:** extend the current
+  `gui/*.gui` window/icon/directive extraction into a tested interpreter for
+  layout, lifecycle, input hit-testing, state, screen transitions and named
+  callbacks. Locate the real menu fonts, cursor/button art and palette use;
+  reconcile the scripts with Ghidra call targets and live Unicorn traces.
+  This is deliberately parked for now; see `docs/gui-assets.md`.
+- [ ] **Mission/navigation read-only reconstruction:** parse loose text
+  `MISSION.CFG`, `NAVIG.NAV`, `CAMPAIGN.CG` and briefing records with explicit
+  typed fields, cross-references and count checks. Compare generated missions
+  with the built-in TACTCOM editor and historical Strategic Commander output.
+  Extract/export for analysis before considering a full editor or modding UI.
+- [ ] **Version-aware reference/decompilation:** fingerprint the candidate
+  `rdeprera/EF2000` v2.0 DOS executable separately; verify its actual
+  language, patch level and code/data differences from the German reference.
+  Do not apply the current executable's fixed offsets or hash to it.
+- [ ] **GFX+ as a 3D acceleration reference:** acquire a properly licensed
+  TACTCOM/Evolution 3Dfx GFX+ executable, compare it in a separate Ghidra
+  database and trace its static Glide / low-level Voodoo interface under
+  hardware emulation. Determine a stable polygon/texture/API boundary before
+  promising an SDL3 GPU implementation. See
+  `docs/existing-tools-and-releases.md`.
+
 ## Reproduce
 
 ```sh
@@ -135,7 +165,7 @@ is a playable Linux application. R36S, Android, and other platform ports are
 outside current scope. The source license does not license original game data.
 
 Keep commits on one history. For the current numbered bundle handoff, the
-agreed prerequisite is `4d521589e693f769f2018bd5fb2f5c65ac0c3a44`.
+agreed prerequisite is `63eaca4faf8ba9a268e931170a3c47591777372d`.
 Create each cumulative bundle from that base to the new tip, including **all**
 agent commits from previous bundles; verify it with `git bundle verify`.
 Each numbered bundle replaces the previous download, never creates a parallel

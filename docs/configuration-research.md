@@ -30,7 +30,8 @@ Tactcom files; other EF2000 releases or patches may differ.
 | `EF2000.BAT` | Sets the same environment and runs `_EF2000.EXE gui` |
 | `EF2000.CFG` | Primary human-readable game preferences and joystick calibration |
 | `DIG.INI`, `MDI.INI` | Miles digital-effects and MIDI driver selection/hardware parameters |
-| `MISSION.CFG`, `CFG/COL` | Separate binary/installation data, **not** equivalent to `EF2000.CFG` |
+| `MISSION.CFG` | Separate, human-readable Conflict generator mission records (`NUM_MISSIONS`, `MISSION`, `GROUP`, `WAYPOINT`), **not** an EF2000 preference file; see [mission research](existing-tools-and-releases.md) |
+| `CFG/COL` | Separate installation/asset data, not an EF2000 preference file |
 
 The setup UI's embedded labels explicitly offer **320×200 and 640×400** for
 resolution (`Auflösung`), and **Low, Medium, High** (`Niedrig`, `Mittel`, `Hoch`)

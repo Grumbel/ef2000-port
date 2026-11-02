@@ -90,6 +90,25 @@ or `nix run .#gui-assets -- extract ...` to export PNGs and JSON menu
 structures. The original files stay untouched, and `nix flake check` uses
 only synthetic fixtures. See [GUI resource research](docs/gui-assets.md).
 
+### Related releases, editors and modding research
+
+For historical EF2000 variants and prior art, see
+[existing tools, mission files and 3Dfx release research](docs/existing-tools-and-releases.md).
+In particular:
+
+| Reference | Why it matters |
+| --- | --- |
+| [tfx3view / tfxdat](https://github.com/Grumbel/tfx3view) | Existing DID archive extraction and 3D geometry viewer; distinct from the menu/mission scripts. |
+| [EFUTIL discussion](https://simhq.net/forum/ubbthreads.php/topics/3835020/re-ef2000-reloaded), [ReViVe](https://www.combatsim.com/memb123/archive/htm/htm_arc2/evolute.htm), [Strategic Commander](https://simhq.net/forum/ubbthreads.php/topics/3458818/3) | Legacy campaign aircraft-swapping, restoration and scenario editing tools. **EFUTIL is not a mission extractor.** |
+| [EF2000 Reloaded](https://simhq.net/forum/ubbthreads.php/topics/3830314/all/EF2000_Reloaded) and [3Dfx installation notes](https://www.tales-from-darkenedroom.com/post/ef2000-updated-part-3-ef2000-reloaded-dosbox) | Specialized DOSBox Voodoo emulation for DOS **GFX+**; the statically linked graphics library prevents straightforward Glide-wrapper interception. |
+| [rdeprera/EF2000](https://github.com/rdeprera/EF2000) | Another DOS v2.0 TACTCOM installation to compare, **not yet confirmed to be English**; its executable and some archive members differ from our German reference. |
+
+Our German installation already includes **plain-text** `MISSION.CFG`
+(746 mission blocks), `NAVIG.NAV` (1,118 navigation records), and campaign
+files. Reading and validating those records is a promising future
+reconstruction task; a general mission editor is not necessary yet. The
+original game files remain external to the port and its Nix build.
+
 `EF2000_SOURCE` defaults to the directory from which `nix develop` was entered;
 `EF2000_BUILD_DIR` defaults to `/tmp/ef2000-build` and can be overridden.
 `CMAKE_BUILD_TYPE` defaults to `Debug`; the regular Nix package remains optimized.
@@ -588,6 +607,7 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [Original setup programs, CFG/INI formats and host configuration options](docs/configuration-research.md)
 - [Original keyboard chart and host input interception reference](docs/keyboard-reference.md)
 - [Research and evidence conventions](docs/research.md)
+- [Existing modding tools, mission file formats, release variants and 3Dfx research](docs/existing-tools-and-releases.md)
 
 The mouse starts free and is captured only by a left-click inside the game
 image. That first click captures the pointer without activating a game button.
