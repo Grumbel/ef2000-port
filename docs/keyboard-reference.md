@@ -151,12 +151,16 @@ dispatch. These remain a specific reverse-engineering task.
   `tools/real_mode.py` handles BIOS INT 16h functions 00h/01h/02h/10h/11h.
   This is **transport**: none of the in-game flight commands above are
   individually reimplemented as host shortcuts.
-- **F10 is intercepted by the host** to open/close the debug overlay: the
-  original game's F10 padlock-view action cannot receive it.
-- **F11 is intercepted by the host** for fullscreen. The chart shows no F11
-  flight action, but mods or other versions might use it.
-- While the overlay is open, it consumes all keyboard input; arrows move the
-  selection, Enter/Space activate, Escape backs out, and F10 closes it.
+- The **original native/Python debug overlay** used F10 and prevented its
+  padlock-view action from reaching the game. The **C++ SDL3 frontend leaves
+  F10 alone** so the original padlock views remain accessible.
+- The C++ SDL3 frontend reserves **F11 and Alt+Enter** for fullscreen and
+  **F12** for its independent movable-window overlay. Gamepad Back also
+  toggles it when the standardized flight profile is active.
+- While the C++ overlay is open, guest keyboard and mouse input are suppressed
+  (and held guest keyboard/mouse inputs are released); Tab focuses windows,
+  H/D reopens help/diagnostics, arrows/PageUp/PageDown scroll the keyboard
+  help, and Escape/F12 closes the overlay.
 - Escape outside the overlay is passed to the original game; holding it for
   three seconds also releases host mouse capture. The chart's eject sequence
   is Shift+Escape, not an ordinary press of Escape.

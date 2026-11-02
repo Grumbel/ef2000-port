@@ -207,3 +207,14 @@ add_executable(ef2000-gamepad-profile-test tests/gamepad_profile_test.cpp)
 target_compile_features(ef2000-gamepad-profile-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-gamepad-profile-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME gamepad-profile COMMAND ef2000-gamepad-profile-test)
+
+# Host overlay move/resize/focus behavior, independent of SDL and DOS assets.
+add_executable(ef2000-overlay-windows-test tests/overlay_windows_test.cpp)
+target_compile_features(ef2000-overlay-windows-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-overlay-windows-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME overlay-windows COMMAND ef2000-overlay-windows-test)
+
+add_executable(ef2000-host-shortcuts-test tests/host_shortcuts_test.cpp)
+target_compile_features(ef2000-host-shortcuts-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-host-shortcuts-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME host-shortcuts COMMAND ef2000-host-shortcuts-test)

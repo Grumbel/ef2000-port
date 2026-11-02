@@ -351,8 +351,31 @@ Holding **LB** while pressing A/B/X/Y synthesizes keyboard **G** (gear),
 **C** (next target), **Enter** (air weapon), **Backspace** (ground weapon),
 **F4** (external view). Unmodified face buttons remain DOS gameport buttons;
 LB wins if both shoulders are held. Hold and release events are sent as
-real guest keyboard make/break transitions. **Back** on the controller or
-**F12** toggles the in-game controls guide; it does *not* pause the guest.
+real guest keyboard make/break transitions. **Back** on a standardized
+gamepad or **F12** toggles the native overlay; it does *not* pause the guest.
+
+The SDL3 overlay now contains two host-side windows: **Flight Controls**
+(scrollable keyboard/gamepad command reference) and **System Monitor**
+(live SDL/changed-image FPS and guest activity). Drag their titlebars,
+resize at the bottom-right gold corner, click `X` to close, or click a window
+to bring it forward. While the overlay is open, mouse/keyboard input is
+consumed by it instead of the DOS game, and the physical gamepad is held
+neutral. The windows can overlap, remember their position and size while
+hidden, and reopen from the overlay's keyboard commands. The initial skin
+uses a procedural EF2000-inspired blue/gold palette; identifying/loading
+the **original** archived font, frame and icon art remains separate work.
+
+Host shortcuts in the C++ SDL3 frontend:
+
+| Shortcut | Action |
+| --- | --- |
+| **F12** / gamepad Back | Show/hide the movable overlay |
+| **F11** / **Alt+Enter** | Toggle fullscreen/windowed mode |
+| **Tab** (overlay open) | Focus next window |
+| **H / D** (overlay open) | Reopen help or diagnostics panel |
+| **Up/Down, PageUp/PageDown, mouse wheel** | Scroll the focused help panel |
+| **Escape** (overlay open) | Close overlay |
+| **F10** | **Passed through to EF2000 while overlay is closed**, preserving padlock views |
 
 Raw joysticks keep raw axes and buttons. `--gamepad-raw` restores the previous
 direct SDL gamepad mapping and disables the modifier layers. Passing

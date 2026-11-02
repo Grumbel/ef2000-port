@@ -122,8 +122,10 @@ Implemented and verified:
 - [ ] **EF2000-style movable-window overlay:** inventory/rip the original
   menu fonts, frames, icons, backgrounds, buttons, cursor and palette from
   locally supplied DID/assets (do not commit copyrighted art). Build a
-  reusable skin/texture atlas and a host-side SDL3 window manager with
-  dragging, focus, resize, Z-order and modern mouse/gamepad navigation.
+  reusable skin/texture atlas for the host-side SDL3 windows. The initial
+  asset-free window manager now supports **drag, resize, focus/Z-order,
+  close/reopen and scroll**, with F12 controls and diagnostics panels;
+  original skin textures, finer widgets and gamepad window navigation remain.
   Keep the native UI separate from guest framebuffer emulation so menus can
   coexist with the cockpit and eventually replace original hardcoded GUI
   callbacks. Compare extracted textures and layout with `docs/gui-assets.md`;

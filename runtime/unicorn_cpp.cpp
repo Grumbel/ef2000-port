@@ -7,6 +7,8 @@
 #include "dos_drive.hpp"
 #include "bios_disk.hpp"
 #include "gamepad_profile.hpp"
+#include "host_shortcuts.hpp"
+#include "overlay_windows.hpp"
 #include "cd_audio.hpp"
 #include "pcm_audio.hpp"
 #include "real_mode_cpu.hpp"
@@ -312,10 +314,10 @@ public:
                 SDL_GAMEPAD_BUTTON_WEST, SDL_GAMEPAD_BUTTON_NORTH};
             if (gamepad_ && options_.gamepad_flight_profile) {
                 const bool back = focused && SDL_GetGamepadButton(gamepad_, SDL_GAMEPAD_BUTTON_BACK);
-                if (back && !last_help_button_) show_controls_ = !show_controls_;
+                if (back && !last_help_button_) toggle_overlay();
                 last_help_button_ = back;
                 ef2000::GamepadFlightInput input;
-                if (focused && !show_controls_) {
+                if (focused && !overlay_.visible()) {
                     input.left_x = SDL_GetGamepadAxis(gamepad_, SDL_GAMEPAD_AXIS_LEFTX);
                     input.left_y = SDL_GetGamepadAxis(gamepad_, SDL_GAMEPAD_AXIS_LEFTY);
                     input.right_x = SDL_GetGamepadAxis(gamepad_, SDL_GAMEPAD_AXIS_RIGHTX);
@@ -347,11 +349,12 @@ public:
                     if (binding.index >= raw_axes ||
                         (gamepad_ && binding.index >= 4)) break;
                     int axis = 0;
-                    if (focused) axis = gamepad_ ? SDL_GetGamepadAxis(gamepad_, gamepad_axes[binding.index]) :
-                                                   SDL_GetJoystickAxis(joystick_, binding.index);
+                    if (focused && !overlay_.visible())
+                        axis = gamepad_ ? SDL_GetGamepadAxis(gamepad_, gamepad_axes[binding.index]) :
+                                          SDL_GetJoystickAxis(joystick_, binding.index);
                     value.axes[value.count++] = std::clamp(axis * binding.direction, -32768, 32767);
                 }
-                if (focused) {
+                if (focused && !overlay_.visible()) {
                     const unsigned raw_buttons = joystick_ ?
                         unsigned(std::max(0, SDL_GetNumJoystickButtons(joystick_))) : 4u;
                     for (unsigned i = 0; i < 4; ++i) {
@@ -397,13 +400,45 @@ public:
                 event.type == SDL_EVENT_JOYSTICK_REMOVED)
                 next_joystick_probe_ = {};
             if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) {
-                if (event.key.scancode == SDL_SCANCODE_F12) {
-                    if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
-                        show_controls_ = !show_controls_;
-                } else {
-                    pending_keys_.push_back({int(event.key.scancode), int(event.key.key),
-                                             event.type == SDL_EVENT_KEY_DOWN, bool(event.key.repeat)});
+                const bool down = event.type == SDL_EVENT_KEY_DOWN;
+                const int scan = int(event.key.scancode);
+                const auto shortcut = host_shortcuts_.key(scan, (event.key.mod & SDL_KMOD_ALT) != 0,
+                                                          down, bool(event.key.repeat));
+                if (shortcut != ef2000::HostShortcuts::Action::Guest) {
+                    if (shortcut == ef2000::HostShortcuts::Action::ToggleFullscreen)
+                        toggle_fullscreen();
+                    else if (shortcut == ef2000::HostShortcuts::Action::ToggleOverlay)
+                        toggle_overlay();
+                    continue;
                 }
+                if (overlay_.visible()) {
+                    if (down && !event.key.repeat) {
+                        if (scan == SDL_SCANCODE_ESCAPE) toggle_overlay();
+                        else if (scan == SDL_SCANCODE_TAB) overlay_.focus_next();
+                        else if (scan == SDL_SCANCODE_H)
+                            overlay_.open_panel(ef2000::OverlayPanel::Kind::Controls);
+                        else if (scan == SDL_SCANCODE_D)
+                            overlay_.open_panel(ef2000::OverlayPanel::Kind::Diagnostics);
+                        else if (scan == SDL_SCANCODE_DOWN || scan == SDL_SCANCODE_PAGEDOWN)
+                            overlay_.wheel(scan == SDL_SCANCODE_DOWN ? -1 : -8,
+                                           overlay_max_scroll());
+                        else if (scan == SDL_SCANCODE_UP || scan == SDL_SCANCODE_PAGEUP)
+                            overlay_.wheel(scan == SDL_SCANCODE_UP ? 1 : 8,
+                                           overlay_max_scroll());
+                    }
+                    continue;
+                }
+                if (down) forwarded_keys_.insert(scan);
+                else if (!forwarded_keys_.erase(scan)) continue;
+                pending_keys_.push_back({scan, int(event.key.key), down, bool(event.key.repeat)});
+            }
+            if (event.type == SDL_EVENT_MOUSE_WHEEL && overlay_.visible()) {
+                const float amount = event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED ?
+                    -event.wheel.y : event.wheel.y;
+                const int ticks = amount > 0 ? std::max(1, int(std::lround(amount))) :
+                                  amount < 0 ? std::min(-1, int(std::lround(amount))) : 0;
+                overlay_.wheel(ticks * 3, overlay_max_scroll());
+                continue;
             }
             if (event.type == SDL_EVENT_MOUSE_MOTION ||
                 event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
@@ -414,6 +449,12 @@ public:
                 const bool motion = event.type == SDL_EVENT_MOUSE_MOTION;
                 const float x = motion ? event.motion.x : event.button.x;
                 const float y = motion ? event.motion.y : event.button.y;
+                if (overlay_.visible()) {
+                    if (motion) overlay_.motion(x, y);
+                    else overlay_.button(x, y, event.type == SDL_EVENT_MOUSE_BUTTON_DOWN,
+                                         event.button.button == SDL_BUTTON_LEFT);
+                    continue;
+                }
                 const int guest_width = width ? width : 640;
                 const int guest_height = height ? height : 400;
                 const SDL_FRect target = viewport(guest_width, guest_height);
@@ -421,6 +462,8 @@ public:
                                                0, guest_width - 1);
                 const int mouse_y = std::clamp(int((y - target.y) * guest_height / target.h),
                                                0, guest_height - 1);
+                last_guest_mouse_x_ = mouse_x;
+                last_guest_mouse_y_ = mouse_y;
                 if (!motion) {
                     const unsigned bit = event.button.button == SDL_BUTTON_LEFT ? 1u :
                                          event.button.button == SDL_BUTTON_RIGHT ? 2u :
@@ -447,7 +490,7 @@ public:
             }
         }
         if (has_image) {
-            if (options_.profile_video_frames || options_.show_fps) {
+            if (options_.profile_video_frames || options_.show_fps || overlay_.visible()) {
                 // A present is not necessarily a new game frame. Fingerprint
                 // the actual RGBA pixels, including palette changes, to
                 // distinguish repeated images from visible updates. The HUD
@@ -464,7 +507,8 @@ public:
                 last_image_width_ = width;
                 last_image_height_ = height;
                 const auto sampled = std::chrono::steady_clock::now();
-                if (changed && options_.show_fps) changed_frame_times_.push_back(sampled);
+                if (changed && (options_.show_fps || overlay_.visible()))
+                    changed_frame_times_.push_back(sampled);
                 if (!image_frames_) first_image_time_ = sampled;
                 last_image_time_ = sampled;
                 ++image_frames_;
@@ -498,7 +542,7 @@ public:
                 !SDL_RenderDebugText(renderer_, 30, 145, events.c_str()))
                 throw std::runtime_error(std::string("SDL3 text draw failed: ") + SDL_GetError());
         }
-        if (options_.show_fps || show_controls_) {
+        if (options_.show_fps || overlay_.visible()) {
             const auto sampled = std::chrono::steady_clock::now();
             present_times_.push_back(sampled);
             const auto oldest = sampled - std::chrono::seconds(1);
@@ -516,7 +560,7 @@ public:
                     !SDL_RenderDebugText(renderer_, 10, 11, label.c_str()))
                     throw std::runtime_error(std::string("SDL3 FPS HUD: ") + SDL_GetError());
             }
-            if (show_controls_) draw_controls_help();
+            if (overlay_.visible()) draw_overlay(instructions, interrupts, status, width, height);
         }
         if (!SDL_RenderPresent(renderer_))
             throw std::runtime_error(std::string("SDL3 present failed: ") + SDL_GetError());
@@ -535,7 +579,11 @@ private:
     std::vector<MouseEvent> pending_mouse_;
     std::vector<KeyEvent> pending_keys_;
     ef2000::GamepadFlightProfile gamepad_flight_{};
-    bool show_controls_{}, last_help_button_{};
+    ef2000::HostShortcuts host_shortcuts_{};
+    ef2000::OverlayWindows overlay_{};
+    bool last_help_button_{};
+    std::set<int> forwarded_keys_;
+    int last_guest_mouse_x_{}, last_guest_mouse_y_{};
     std::chrono::steady_clock::time_point last_flight_sample_{};
     std::deque<std::chrono::steady_clock::time_point> present_times_, changed_frame_times_;
     std::chrono::steady_clock::time_point last_present_{};
@@ -545,35 +593,184 @@ private:
     int last_image_width_{}, last_image_height_{};
     std::chrono::steady_clock::time_point first_image_time_{}, last_image_time_{};
 #ifdef EF_UNICORN_SDL3
-    void draw_controls_help() {
-        const SDL_FRect panel{65, 62, 510, 355};
-        if (!SDL_SetRenderDrawColor(renderer_, 12, 20, 36, 255) ||
-            !SDL_RenderFillRect(renderer_, &panel) ||
-            !SDL_SetRenderDrawColor(renderer_, 245, 229, 170, 255))
-            throw std::runtime_error(std::string("SDL3 controller help: ") + SDL_GetError());
-        static constexpr const char* lines[] = {
-            "EF2000 GAMEPAD / KEYBOARD GUIDE",
+    static const std::vector<std::string>& controls_help_lines() {
+        static const std::vector<std::string> lines{
+            "HOST CONTROLS",
+            "F12 / GAMEPAD BACK  TOGGLE OVERLAY",
+            "F11 / ALT+ENTER    FULLSCREEN",
+            "F10                PADLOCK (CLOSE HELP)",
+            "ESC                CLOSE OVERLAY",
+            "TAB                NEXT WINDOW",
+            "H / D              OPEN HELP / STATS",
+            "UP/DOWN, PAGEUP/DOWN  SCROLL HELP",
             "",
-            "LEFT STICK: ROLL / PITCH",
-            "RIGHT X: RUDDER (4TH GAMEPORT AXIS)",
-            "RIGHT Y: THROTTLE RATE (LATCHES ON RELEASE)",
+            "GAMEPAD FLIGHT (EXPERIMENTAL)",
+            "LEFT STICK         ROLL / PITCH",
+            "RIGHT X            RUDDER AXIS 4",
+            "RIGHT Y            LATCHED THROTTLE",
+            "A / B / X / Y      GAMEPORT BUTTONS",
+            "LB + A/B/X/Y       GEAR/BRAKE/ECM/RADAR",
+            "RB + A/B/X/Y       TARGET/AIR/AG/VIEW",
+            "--GAMEPAD-RAW      ORIGINAL MAPPING",
             "",
-            "A / B / X / Y: ORIGINAL GAMEPORT BUTTONS",
+            "EF2000 KEYBOARD - MAIN FLIGHT",
+            "P                  PAUSE",
+            "A                  AUTOPILOT",
+            "L                  AUTO LEVEL",
+            "G                  LANDING GEAR",
+            "B                  AIR BRAKE",
+            "W                  WHEEL BRAKE",
+            "E                  ECM",
+            "R                  RADAR",
+            "T                  TIALD",
+            "I                  ILS",
+            "D                  DASS",
+            "J                  JTIDS",
+            "U                  HUD BRIGHTNESS",
+            "V                  NIGHT VISION",
+            "M                  MAP",
+            "Q                  WINGMAN COMMANDS",
+            "1-9 / 0            WINGMAN MENU / BACK",
+            "Y / N              YES / NO",
+            "C                  NEXT TARGET",
+            "ENTER              NEXT AIR WEAPON",
+            "BACKSPACE          NEXT GROUND WEAPON",
+            "SPACE              FIRE WEAPON",
+            "- / =              THROTTLE DOWN / UP",
+            ", / .              RUDDER LEFT / RIGHT",
+            "[ / ]              ENGINE LEFT / RIGHT",
+            "`                  SETUP MENU",
             "",
-            "HOLD LB: A=GEAR  B=BRAKE  X=ECM  Y=RADAR",
-            "HOLD RB: A=TARGET B=AIR  X=GROUND Y=VIEW",
+            "VIEWS",
+            "F1                 HUD VIEWS",
+            "F2                 WIDE COCKPIT",
+            "F3                 REAR VIEW",
+            "F4                 PLAYER EXTERNAL",
+            "F5                 WINGMAN EXTERNAL",
+            "F6                 FLY-BY",
+            "F7                 TARGET VIEW",
+            "F8                 WEAPON VIEW",
+            "F9                 BROWSE AIRCRAFT",
+            "F10                PADLOCK VIEWS",
             "",
-            "LB+RB: LB TAKES PRIORITY",
-            "BACK OR F12: TOGGLE THIS GUIDE",
+            "OTHER USEFUL SHORTCUTS",
+            "SHIFT+ESC          EJECT",
+            "SHIFT+Q            QUIT TO DOS",
+            "SHIFT+W            NEXT WAYPOINT",
+            "ALT+W              PREVIOUS WAYPOINT",
+            "ALT+R              VIDEO MODE",
+            "ALT+D              GRAPHICS DETAIL",
+            "INSERT / DELETE    CHAFF / FLARES",
+            "KP / / *           AB OFF / ON",
+            "KP - / +           THROTTLE DOWN / UP",
+            "KP 1/2/3           MFD 1/2/3",
+            "KP 0               BRIEFING",
             "",
-            "EXPERIMENTAL 4-AXIS FLIGHT PROFILE",
-            "USE --GAMEPAD-RAW FOR LEGACY MAPPING",
-            "",
-            "THE GUIDE DOES NOT PAUSE THE GAME"
+            "BASED ON ORIGINAL KEYBOARD CHART",
+            "CONTROL DETAILS MAY VARY BY VERSION"
         };
-        for (size_t i = 0; i < std::size(lines); ++i)
-            if (!SDL_RenderDebugText(renderer_, 80, 75 + float(i) * 18, lines[i]))
-                throw std::runtime_error(std::string("SDL3 controller help text: ") + SDL_GetError());
+        return lines;
+    }
+    int overlay_max_scroll() const {
+        if (overlay_.focused_panel() != 0) return 0;
+        const auto& panel = overlay_.panels()[0];
+        const int rows = std::max(1, int((panel.h - ef2000::OverlayWindows::title_height - 35) / 13));
+        return std::max(0, int(controls_help_lines().size()) - rows);
+    }
+    void toggle_overlay() {
+        const bool opening = !overlay_.visible();
+        overlay_.toggle();
+        if (!opening) return;
+        // Host-owned windows must not leave a guest key or mouse button
+        // latched when they take focus. Gamepad chords release on resampling.
+        for (const int scan : forwarded_keys_)
+            pending_keys_.push_back({scan, 0, false, false});
+        forwarded_keys_.clear();
+        if (mouse_buttons_) {
+            mouse_buttons_ = 0;
+            pending_mouse_.push_back({0, last_guest_mouse_x_, last_guest_mouse_y_, 0});
+        }
+    }
+    void toggle_fullscreen() {
+        const bool fullscreen = (SDL_GetWindowFlags(window_) & SDL_WINDOW_FULLSCREEN) != 0;
+        if (!SDL_SetWindowFullscreen(window_, !fullscreen))
+            throw std::runtime_error(std::string("SDL3 fullscreen: ") + SDL_GetError());
+    }
+    void overlay_fill(float x, float y, float w, float h,
+                      uint8_t red, uint8_t green, uint8_t blue) {
+        const SDL_FRect area{x, y, w, h};
+        if (!SDL_SetRenderDrawColor(renderer_, red, green, blue, 255) ||
+            !SDL_RenderFillRect(renderer_, &area))
+            throw std::runtime_error(std::string("SDL3 overlay panel: ") + SDL_GetError());
+    }
+    void overlay_text(float x, float y, std::string value, int max_chars,
+                      uint8_t red = 230, uint8_t green = 232, uint8_t blue = 222) {
+        if (max_chars <= 0) return;
+        if (value.size() > size_t(max_chars)) value.resize(size_t(max_chars));
+        if (!SDL_SetRenderDrawColor(renderer_, red, green, blue, 255) ||
+            !SDL_RenderDebugText(renderer_, x, y, value.c_str()))
+            throw std::runtime_error(std::string("SDL3 overlay text: ") + SDL_GetError());
+    }
+    void draw_overlay(uint64_t instructions, uint64_t interrupts, const std::string& status,
+                      int width, int height) {
+        const auto sampled = std::chrono::steady_clock::now();
+        const auto oldest = sampled - std::chrono::seconds(1);
+        while (!present_times_.empty() && present_times_.front() < oldest)
+            present_times_.pop_front();
+        while (!changed_frame_times_.empty() && changed_frame_times_.front() < oldest)
+            changed_frame_times_.pop_front();
+        for (const int index : overlay_.order()) {
+            const auto& panel = overlay_.panels()[index];
+            if (!panel.open) continue;
+            const bool focused = overlay_.focused_panel() == index;
+            overlay_fill(panel.x + 3, panel.y + 3, panel.w, panel.h, 3, 9, 17);
+            overlay_fill(panel.x, panel.y, panel.w, panel.h, 168, 137, 69);
+            overlay_fill(panel.x + 2, panel.y + 2, panel.w - 4, panel.h - 4, 17, 30, 47);
+            overlay_fill(panel.x + 3, panel.y + 3, panel.w - 6,
+                         ef2000::OverlayWindows::title_height - 2,
+                         focused ? 52 : 34, focused ? 83 : 57, focused ? 114 : 81);
+            overlay_text(panel.x + 10, panel.y + 9,
+                         index == 0 ? "FLIGHT CONTROLS" : "SYSTEM MONITOR",
+                         int((panel.w - 35) / 8), 250, 227, 154);
+            overlay_fill(panel.x + panel.w - 19, panel.y + 5, 14, 14, 119, 58, 50);
+            overlay_text(panel.x + panel.w - 16, panel.y + 7, "X", 1, 250, 232, 212);
+            // Original-style gold resize grip, visible even without assets.
+            overlay_fill(panel.x + panel.w - 13, panel.y + panel.h - 7, 8, 2, 181, 151, 81);
+            overlay_fill(panel.x + panel.w - 7, panel.y + panel.h - 13, 2, 8, 181, 151, 81);
+
+            const std::vector<std::string> diagnostics{
+                "VIDEO / EMULATION",
+                "SDL FPS: " + std::to_string(present_times_.size()),
+                "CHANGED: " + std::to_string(changed_frame_times_.size()),
+                "VIDEO: " + std::to_string(width) + "X" + std::to_string(height),
+                "GUEST: " + std::to_string(instructions),
+                "IRQ: " + std::to_string(interrupts),
+                "",
+                "PROFILE: " + std::to_string(gamepad_flight_.throttle_percent()) + "% THR",
+                "RUNS WHILE OVERLAY OPEN",
+                status
+            };
+            const auto& lines = index == 0 ? controls_help_lines() : diagnostics;
+            const int rows = std::max(1, int((panel.h - ef2000::OverlayWindows::title_height - 35) / 13));
+            overlay_.clamp_scroll(index, std::max(0, int(lines.size()) - rows));
+            const int scroll = overlay_.panels()[index].scroll;
+            const int max_chars = std::max(1, int((panel.w - 20) / 8));
+            for (int line = scroll; line < int(lines.size()) && line < scroll + rows; ++line) {
+                const std::string& value = lines[size_t(line)];
+                const bool heading = value == "HOST CONTROLS" || value == "GAMEPAD FLIGHT (EXPERIMENTAL)" ||
+                    value == "EF2000 KEYBOARD - MAIN FLIGHT" || value == "VIEWS" ||
+                    value == "OTHER USEFUL SHORTCUTS" || value == "VIDEO / EMULATION";
+                overlay_text(panel.x + 10, panel.y + 31 + float(line - scroll) * 13,
+                             value, max_chars,
+                             heading ? 247 : 212, heading ? 201 : 219, heading ? 122 : 228);
+            }
+            overlay_text(panel.x + 10, panel.y + panel.h - 15,
+                         index == 0 ? "SCROLL: WHEEL / UP-DOWN" : "LIVE GUEST DISPLAY",
+                         max_chars, 143, 174, 189);
+        }
+        overlay_fill(0, 458, 640, 22, 9, 20, 35);
+        overlay_text(8, 465, "F12 CLOSE  F11 / ALT+ENTER FULLSCREEN  TAB FOCUS  H HELP  D STATS",
+                     78, 249, 225, 156);
     }
     SDL_AudioStream* audio_stream_{};
     SDL_AudioStream* cd_audio_stream_{};
@@ -629,7 +826,7 @@ private:
                           << "; mapped DOS gameport axes=" << (gamepad_ && options_.gamepad_flight_profile ?
                                                                   4 : options_.joystick_axes.size())
                           << (gamepad_ && options_.gamepad_flight_profile ?
-                              " (latched throttle + LB/RB layers, Back/F12 help)" : " (raw)")
+                              " (latched throttle + LB/RB layers, Back/F12 overlay)" : " (raw)")
                           << " (use --trace-joystick for input samples)\n";
             } else {
                 std::cerr << "input: joystick " << options_.joystick_index
@@ -2371,7 +2568,8 @@ void usage(const char* program) {
               << "       [--joystick-event TICK:X:Y[:Z:W]:BUTTONS] (2/4 axes)\n"
               << "       [--joystick auto|off|INDEX] [--joystick-axes 0,1[,2,3]]\n"
               << "       [--gamepad-raw] (disable latched throttle and LB/RB keyboard layers)\n"
-              << "       [F12 or gamepad Back: flight-control help overlay]\n"
+              << "       [F12 or gamepad Back: movable controls/diagnostics overlay]\n"
+              << "       [F11 or Alt+Enter: toggle fullscreen; F10 remains a guest key]\n"
               << "       [--controls auto|keyboard|joystick] (virtual EF2000.CFG)\n"
               << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"

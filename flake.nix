@@ -111,6 +111,12 @@
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/gamepad_profile_test.cpp \
             -o objects/ef2000-gamepad-profile-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/overlay_windows_test.cpp \
+            -o objects/ef2000-overlay-windows-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/host_shortcuts_test.cpp \
+            -o objects/ef2000-host-shortcuts-test
           runHook postBuild
         '';
 
@@ -148,6 +154,8 @@
           objects/ef2000-highscores-test
           objects/ef2000-mission-layout-test
           objects/ef2000-gamepad-profile-test
+          objects/ef2000-overlay-windows-test
+          objects/ef2000-host-shortcuts-test
           runHook postCheck
         '';
 
