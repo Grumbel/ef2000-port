@@ -326,7 +326,7 @@
         '';
         layout = pkgs.runCommand "ef2000-layout-check" {} ''
           for path in bin/ef2000 share/ef2000 share/applications/ef2000.desktop \
-            share/metainfo/io.github.grumbel.ef2000.metainfo.xml share/man/man6/ef2000.6 \
+            share/metainfo/io.github.grumbel.ef2000.metainfo.xml share/man/man6/ef2000.6.gz \
             share/icons/hicolor/48x48/apps/ef2000.png; do
             if [ ! -e "${package}/$path" ]; then
               echo "Missing installed EF2000 path: $path" >&2
@@ -343,8 +343,11 @@
             ${package}/share/metainfo/io.github.grumbel.ef2000.metainfo.xml
           touch "$out"
         '';
-        man = pkgs.runCommand "ef2000-man-check" { nativeBuildInputs = [ pkgs.mandoc ]; } ''
-          mandoc -T lint ${package}/share/man/man6/ef2000.6
+        man = pkgs.runCommand "ef2000-man-check" {
+          nativeBuildInputs = [ pkgs.gzip pkgs.mandoc ];
+        } ''
+          set -o pipefail
+          gzip -cd ${package}/share/man/man6/ef2000.6.gz | mandoc -T lint
           touch "$out"
         '';
         reuse = pkgs.runCommand "ef2000-reuse-check" {
