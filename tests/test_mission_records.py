@@ -122,11 +122,30 @@ class MissionRecordsTests(unittest.TestCase):
         self.assertEqual(report['waypoint_index_details'][0]['actual_index'], 9)
         self.assertEqual(records[-1].raw, 'WAYPOINT 9')
 
+    def test_original_loader_rejects_zero_route_and_invalid_last_waypoint(self):
+        # Constraints recovered from guest 0x0000f314; the payload reader
+        # explicitly tests the route count and its last-waypoint index.
+        zero, _ = inspect_bytes(b'NUM_MISSIONS 0\nWP_ROUTE 0 0 0\n')
+        self.assertTrue(any('at least one waypoint' in item
+                            for item in zero['problems']))
+        beyond, _ = inspect_bytes(
+            b'NUM_MISSIONS 0\nWP_ROUTE 2 0 2\nWAYPOINT 0\nWAYPOINT 1\n')
+        self.assertTrue(any('last waypoint 2 outside' in item
+                            for item in beyond['problems']))
+        valid, _ = inspect_bytes(
+            b'NUM_MISSIONS 0\nWP_ROUTE 2 0 1\nWAYPOINT 0\nWAYPOINT 1\n')
+        self.assertEqual(valid['problems'], [])
+
     def test_truncated_quoted_field_and_bad_counts_fail(self):
         with self.assertRaisesRegex(ValueError, 'line 1'):
             parse_text('MOB "unterminated')
         with self.assertRaisesRegex(ValueError, 'noninteger'):
             inspect_records([Record(1, 'NUM_MISSIONS', ('n/a',), 'NUM_MISSIONS n/a')])
+
+    def test_inline_semicolon_is_not_a_comment_in_original_line_reader(self):
+        records = parse_text('; whole-line comment\nDIRECTIVE value ;extra\n')
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0].args, ('value', ';extra'))
 
 
 if __name__ == '__main__':

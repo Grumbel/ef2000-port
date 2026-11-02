@@ -127,7 +127,12 @@ Implemented and verified:
   The **syntactic inventory, block export, route/count validation and 20-pylon
   flight relationship** are now recovered in `tools/mission_records.py` and
   `docs/mission-records.md`. Remaining: field units, enum meanings, cross-file
-  references, briefing parsing and original guest reader callsites.
+  references and briefing parsing. Original **reader** entry points,
+  their child calls, the lexical helpers and waypoint-count/last-index
+  validation are now identified in `docs/mission-readers.md`; next recover
+  typed structs, enum *usage* and callsite-to-filename mapping. A read-only
+  pinned-payload probe now extracts the reader's 310 table labels and eight
+  mobile-class aliases in `tools/mission_enum_probe.py`.
 - [ ] **Version-aware reference/decompilation:** fingerprint the candidate
   `rdeprera/EF2000` v2.0 DOS executable separately; verify its actual
   language, patch level and code/data differences from the German reference.

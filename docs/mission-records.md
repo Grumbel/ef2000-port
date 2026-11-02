@@ -89,8 +89,8 @@ and its neighbors. Ghidra currently uses a **generic x86 ABI**, so these are
 candidate signatures and structure hints, not yet validated source-level
 types. The relationship between 20 `PYLON` rows and the original writer's
 20-iteration loop is particularly useful. The actual **read/parse** routines
-still need to be isolated; finding a string reference that writes a field
-does not establish the function that reads it.
+were subsequently isolated; see [the original reader call map](mission-readers.md)
+for independent evidence.
 
 Provisional storage anchors for the next typed decompilation pass: the
 `0x000b2560` output loop indexes a weapon selector from the flight object's
@@ -114,7 +114,8 @@ preserved but not interpreted.
 The **structural** relationships above were cross-checked across all records.
 They are reported as observational `block_checks`, rather than asserted as
 compatibility rules for every edition. `--strict` currently rejects mismatched
-*explicit declarations and route lengths*, not inferred relationships or
+*explicit declarations, route lengths and original-verified `WP_ROUTE`
+count/last-index constraints*, not inferred relationships or
 the single original waypoint-index irregularity.
 
 ## Reproduce or export a specific original record
@@ -146,10 +147,10 @@ files are rewritten, and no editor/modding UI is planned yet.
 
 ## Follow-up reverse engineering
 
-1. Find game code that reads the header declarations (`NUM_MISSIONS`,
-   `NAVIG_ROUTE`, `NUM_MOBILES`) using the existing Ghidra string references
-   and file-open call traces. Identify its tokenizer, record dispatch and
-   in-memory allocation/copy patterns, then name the routines.
+1. Continue from the [recovered reader roots and dispatch](mission-readers.md)
+   to establish the exact enum lookup tables, allocation sizes and struct
+   layouts with instruction and runtime validation; generic-ABI Ghidra
+   types and floating-point guesses remain untrusted.
 2. Recover the **coordinates, route units, waypoint action enum, mission
    status flags, target references and aircraft/pylon enum** by comparing
    original reader code, live mission selection and controlled files on a

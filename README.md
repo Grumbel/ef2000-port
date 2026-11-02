@@ -618,6 +618,13 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [Existing modding tools, mission file formats, release variants and 3Dfx research](docs/existing-tools-and-releases.md)
 - [GFX+ 3Dfx patch and rendering interface investigation](docs/gfxplus-rendering.md)
 - [Mission, navigation and campaign text-format reconstruction](docs/mission-records.md)
+- [Original mission, navigation and campaign reader call map](docs/mission-readers.md)
+
+The read-only `tools/mission_enum_probe.py` additionally exports the
+original X-32 reader's indexed names for waypoint actions, weapons,
+aircraft, ground units, roles and status codes from a SHA-pinned
+`payload.bin` (see the reader map for commands). The game binary remains
+external to this repository.
 
 The mouse starts free and is captured only by a left-click inside the game
 image. That first click captures the pointer without activating a game button.

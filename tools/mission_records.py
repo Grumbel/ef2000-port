@@ -58,7 +58,9 @@ def parse_text(contents):
             continue
         lexer = shlex.shlex(raw, posix=True)
         lexer.whitespace_split = True
-        lexer.commenters = ';'
+        # The original line reader (guest 0x0000e810) skips whole lines
+        # beginning with ';'; its token reader does not discard inline text.
+        lexer.commenters = ''
         try:
             tokens = list(lexer)
         except ValueError as error:
@@ -109,6 +111,16 @@ def inspect_records(records):
             continue
         children = ROUTES[record.keyword]
         expected = integer(record, 0, record.keyword)
+        if record.keyword == 'WP_ROUTE':
+            # The original reader at 0x0000f314 explicitly aborts for a
+            # zero-point route or a last-waypoint index >= the route length.
+            # The third field is the stored last-waypoint index (not a count).
+            last = integer(record, 2, 'WP_ROUTE last waypoint')
+            if expected == 0:
+                problems.append(f'line {record.line}: WP_ROUTE must have at least one waypoint')
+            elif last >= expected:
+                problems.append(f'line {record.line}: WP_ROUTE last waypoint {last} '
+                                f'outside its {expected}-point route')
         found = 0
         while (index + found + 1 < len(records) and
                records[index + found + 1].keyword == children):
@@ -262,7 +274,7 @@ def main():
     parser.add_argument('--block', metavar='KIND:INDEX',
                         help='emit one grouped record, e.g. MISSION:516 or BASE_NAVIGATION:4')
     parser.add_argument('--strict', action='store_true',
-                        help='fail if declared counts or route lengths disagree')
+                        help='fail on declared counts, route lengths or original WP_ROUTE bounds')
     args = parser.parse_args()
     try:
         if args.file.stat().st_size > MAX_INPUT_BYTES:
