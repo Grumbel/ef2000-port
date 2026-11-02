@@ -148,11 +148,17 @@
           cp LICENSES/GPL-3.0-or-later.txt "$out/share/licenses/ef2000/"
           cp LICENSES/CC0-1.0.txt "$out/share/licenses/ef2000/"
           cp data/ef2000.desktop "$out/share/applications/ef2000.desktop"
-          cp data/ef2000.metainfo.xml "$out/share/metainfo/ef2000.metainfo.xml"
+          cp data/io.github.grumbel.ef2000.metainfo.xml \
+            "$out/share/metainfo/io.github.grumbel.ef2000.metainfo.xml"
           cp data/ef2000.6 "$out/share/man/man6/ef2000.6"
           cp data/icons/ef2000.svg "$out/share/icons/hicolor/scalable/apps/ef2000.svg"
           cp data/icons/ef2000.bmp "$out/share/ef2000/ef2000.bmp"
-          cp -r data/icons/hicolor/* "$out/share/icons/hicolor/"
+          # Install each expected size explicitly so the layout check validates
+          # the same paths the package promises to ship.
+          for size in 16x16 32x32 48x48 64x64 128x128 256x256; do
+            install -Dm644 "data/icons/hicolor/$size/apps/ef2000.png" \
+              "$out/share/icons/hicolor/$size/apps/ef2000.png"
+          done
 
           makeWrapper ${python}/bin/python3 "$out/bin/ef2000" \
             --add-flags "$out/libexec/ef2000/tools/run_startup.py" \
@@ -320,9 +326,12 @@
         '';
         layout = pkgs.runCommand "ef2000-layout-check" {} ''
           for path in bin/ef2000 share/ef2000 share/applications/ef2000.desktop \
-            share/metainfo/ef2000.metainfo.xml share/man/man6/ef2000.6 \
+            share/metainfo/io.github.grumbel.ef2000.metainfo.xml share/man/man6/ef2000.6 \
             share/icons/hicolor/48x48/apps/ef2000.png; do
-            test -e "${package}/$path"
+            if [ ! -e "${package}/$path" ]; then
+              echo "Missing installed EF2000 path: $path" >&2
+              exit 1
+            fi
           done
           touch "$out"
         '';
@@ -330,7 +339,8 @@
           nativeBuildInputs = [ pkgs.desktop-file-utils pkgs.appstream ];
         } ''
           desktop-file-validate ${package}/share/applications/ef2000.desktop
-          appstreamcli validate --no-net ${package}/share/metainfo/ef2000.metainfo.xml
+          appstreamcli validate --no-net \
+            ${package}/share/metainfo/io.github.grumbel.ef2000.metainfo.xml
           touch "$out"
         '';
         man = pkgs.runCommand "ef2000-man-check" { nativeBuildInputs = [ pkgs.mandoc ]; } ''

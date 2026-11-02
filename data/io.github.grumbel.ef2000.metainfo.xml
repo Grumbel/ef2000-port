@@ -2,9 +2,12 @@
 <!-- SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com> -->
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 <component type="desktop-application">
-  <id>ef2000</id>
+  <id>io.github.grumbel.ef2000</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
+  <developer id="io.github.grumbel">
+    <name>EF2000 Port contributors</name>
+  </developer>
   <name>EF2000</name>
   <summary>Native Linux host for the original EF2000 flight simulator</summary>
   <description>
