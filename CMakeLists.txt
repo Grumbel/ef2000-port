@@ -225,6 +225,11 @@ target_compile_features(ef2000-nine-slice-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-nine-slice-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME nine-slice COMMAND ef2000-nine-slice-test)
 
+add_executable(ef2000-overlay-skin-test tests/overlay_skin_test.cpp)
+target_compile_features(ef2000-overlay-skin-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-overlay-skin-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME overlay-skin COMMAND ef2000-overlay-skin-test)
+
 # Original menu font atlas layout with no SDL or proprietary assets.
 add_executable(ef2000-menu-font-test tests/menu_font_test.cpp)
 target_compile_features(ef2000-menu-font-test PRIVATE cxx_std_17)

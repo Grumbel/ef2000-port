@@ -5,8 +5,9 @@
 The German TACTCOM screenshot provides pixel-level identification of five
 `DID1ST.DAT` images. The first three are **full-screen textures**, not
 pre-cut window widgets. Sample a title/panel pixel at its destination's
-absolute logical screen coordinates (640×400); do not stretch the image to
-fit the window. The screenshot's slightly darker colors are consistent with
+absolute screen position after mapping the original 640×400 source onto the
+host's square-pixel 640×480 canvas. Do not restart the texture at the window's
+local origin. The screenshot's slightly darker colors are consistent with
 the palette conversion (an RGB difference of −3 in the compared regions).
 
 | Archive member hash | Dimensions | Role |
@@ -40,8 +41,15 @@ provenance manifest. **The red sprite sheet's background is palette index 0**;
 actual red foreground pixels use other indices, so keying by RGB color would
 erase valid red aircraft. The runtime option applies the original title and
 panel textures only; tactical icons and map remain analysis assets for future
-widget reconstruction. Outside the source's 640×400 screen region the overlay
-uses its procedural fallback. No original images enter Git or Nix outputs.
+widget reconstruction. Source y=400 now maps to overlay y=480, so the source
+no longer ends prematurely when a movable window reaches the bottom. No
+original images enter Git or Nix outputs.
+
+`skin-units-candidates.json` adds a coordinate inventory of the tactical
+atlas, grouping foreground runs by occupied row bands and columns. This is
+intended for locating candidate graphics quickly, **not** a final sprite
+format: disconnected flag stripes and adjacent graphics can require manual
+grouping. All rectangles are in source 640×480 coordinates.
 
 The game's menu is **not only hard-coded in the executable**. Its layout and
 interactions are described in plain-text `.gui` resources inside the original

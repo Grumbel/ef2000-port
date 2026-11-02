@@ -46,6 +46,41 @@ def keyed_units(image):
             Image(image.width, image.height, image.indexed, keyed_palette))
 
 
+def unit_candidates(image):
+    """Unlabeled row/column spans; candidates, not verified sprite boundaries.
+
+    Adjacent artwork can share a column or have disconnected parts, so the
+    output is an exploratory index rather than a semantic sprite definition.
+    All coordinates refer to the untouched 640x480 original atlas.
+    """
+    if (image.width, image.height) != SKIN_IMAGES['units'][1]:
+        raise ValueError('unexpected tactical unit sprite sheet dimensions')
+    if len(image.indexed) != image.width * image.height:
+        raise ValueError('invalid unit sprite sheet pixel count')
+    rows = []
+    for y in range(image.height):
+        line = image.indexed[y * image.width:(y + 1) * image.width]
+        if any(line):
+            if rows and rows[-1][1] == y:
+                rows[-1] = (rows[-1][0], y + 1)
+            else:
+                rows.append((y, y + 1))
+    candidates = []
+    for row_id, (top, bottom) in enumerate(rows):
+        occupied = [any(image.indexed[y * image.width + x]
+                        for y in range(top, bottom)) for x in range(image.width)]
+        start = None
+        for x in range(image.width + 1):
+            present = x < image.width and occupied[x]
+            if present and start is None:
+                start = x
+            elif not present and start is not None:
+                candidates.append({'row': row_id,
+                                   'rect': [start, top, x - start, bottom - top]})
+                start = None
+    return candidates
+
+
 def skin_exports(images):
     """Build PNG/BMP files and provenance manifest from decoded images."""
     files = {}
@@ -67,6 +102,11 @@ def skin_exports(images):
             transparent, keyed = keyed_units(image)
             files['skin-units.png'] = encode_png(transparent)
             files['skin-units.bmp'] = encode_bmp(keyed)
+            files['skin-units-candidates.json'] = (json.dumps({
+                'source_hash': f'{image_hash:08x}',
+                'note': 'Unlabeled row/column spans, not verified individual sprites',
+                'candidates': unit_candidates(image),
+            }, indent=2) + '\n').encode('utf-8')
         else:
             files[f'skin-{name}.png'] = encode_png(image)
             if name != 'map':

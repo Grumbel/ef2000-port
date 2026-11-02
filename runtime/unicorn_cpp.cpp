@@ -10,6 +10,7 @@
 #include "host_shortcuts.hpp"
 #include "menu_font.hpp"
 #include "nine_slice.hpp"
+#include "overlay_skin.hpp"
 #include "overlay_windows.hpp"
 #include "cd_audio.hpp"
 #include "pcm_audio.hpp"
@@ -850,11 +851,11 @@ private:
                            uint8_t red, uint8_t green, uint8_t blue) {
         overlay_fill(x, y, w, h, red, green, blue);
         if (!texture) return;
-        const float left = std::max(0.0f, x), top = std::max(0.0f, y);
-        const float right = std::min(640.0f, x + w), bottom = std::min(400.0f, y + h);
-        if (right <= left || bottom <= top) return;
-        const SDL_FRect rectangle{left, top, right - left, bottom - top};
-        if (!SDL_RenderTexture(renderer_, texture, &rectangle, &rectangle))
+        const auto patch = ef2000::overlay_skin_patch(x, y, w, h);
+        if (patch.target.w <= 0 || patch.target.h <= 0) return;
+        const SDL_FRect source{patch.source.x, patch.source.y, patch.source.w, patch.source.h};
+        const SDL_FRect target{patch.target.x, patch.target.y, patch.target.w, patch.target.h};
+        if (!SDL_RenderTexture(renderer_, texture, &source, &target))
             throw std::runtime_error(std::string("SDL3 overlay skin draw: ") + SDL_GetError());
     }
     void overlay_frame(const ef2000::OverlayPanel& panel) {

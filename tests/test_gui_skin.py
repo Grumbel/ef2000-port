@@ -9,7 +9,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.gui_skin import SKIN_IMAGES, keyed_units, rip_skin, skin_exports
+from tools.gui_skin import SKIN_IMAGES, keyed_units, rip_skin, skin_exports, unit_candidates
 from tools.ilbm_image import Image
 
 
@@ -33,6 +33,8 @@ class GuiSkinTests(unittest.TestCase):
         self.assertEqual(bmp.palette[:3], b'\xff\x00\xff')
         self.assertEqual(bmp.palette[3:6], b'\xff\x00\x00')
         self.assertEqual(png.palette[3:6], b'\xff\x00\x00')
+        self.assertEqual(unit_candidates(image),
+                         [{'row': 0, 'rect': [1, 0, 2, 1]}])
         with self.assertRaisesRegex(ValueError, 'dimensions'):
             keyed_units(sample_image(320, 200))
 
@@ -48,6 +50,8 @@ class GuiSkinTests(unittest.TestCase):
         self.assertEqual(files['skin-title.bmp'][:2], b'BM')
         self.assertNotIn('skin-map.bmp', files)
         self.assertEqual(json.loads(files['skin.json']), manifest)
+        self.assertEqual(json.loads(files['skin-units-candidates.json'])['candidates'],
+                         [{'row': 0, 'rect': [1, 0, 2, 1]}])
         with self.assertRaisesRegex(ValueError, 'missing original skin image'):
             skin_exports({})
 
@@ -64,5 +68,7 @@ class OriginalGuiSkinTests(unittest.TestCase):
             self.assertEqual((Path(directory) / 'skin-units.png').read_bytes()[:8],
                              b'\x89PNG\r\n\x1a\n')
             self.assertEqual(json.loads((Path(directory) / 'skin.json').read_text()), manifest)
+            candidates = json.loads((Path(directory) / 'skin-units-candidates.json').read_text())
+            self.assertGreater(len(candidates['candidates']), 100)
             with self.assertRaises(FileExistsError):
                 rip_skin(Path(os.environ['EF2000_DATA_DIR']), directory)
