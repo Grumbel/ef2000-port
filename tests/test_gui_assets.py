@@ -19,6 +19,7 @@ from tools.pcx_image import decode as decode_pcx, is_pcx
 from tools.bmp_image import decode as decode_bmp, is_bmp
 from tools.ra_decode import decompress
 from tools.resolve_archive_trace import parse_request, normalize_path, resolve_request
+from tools.probe_did_grids import GRID_BYTES, GRID_PREFIX, audit as grid_audit, grid_candidate, preview_png
 from tools.spr_image import decode as decode_spr
 
 
@@ -76,6 +77,22 @@ def archive_fixture(members):
 
 
 class DIDArchiveTests(unittest.TestCase):
+    def test_provisional_raw_grid_families(self):
+        pixels = bytes(range(256)) * 156 + bytes(range(64))
+        self.assertEqual(len(pixels), GRID_BYTES)
+        self.assertEqual(grid_candidate(pixels), ('bare-40000', pixels))
+        self.assertEqual(grid_candidate(GRID_PREFIX + pixels),
+                         ('prefix-01030064c8', pixels))
+        self.assertIsNone(grid_candidate(b'other' + pixels))
+        self.assertEqual(struct.unpack_from('>II', preview_png(pixels, width=100), 16),
+                         (100, 400))
+        with self.assertRaisesRegex(ValueError, 'divide'):
+            preview_png(pixels, width=201)
+        fixture = archive_fixture({'iff/256/a.lbm': pixels,
+                                   'iff/256/b.lbm': GRID_PREFIX + pixels})
+        families, _ = grid_audit(DIDArchive(fixture))
+        self.assertEqual(dict(families), {'bare-40000': 1, 'prefix-01030064c8': 1})
+
     def test_guest_lookup_trace_resolution(self):
         archive = DIDArchive(archive_fixture({
             'iff/256/image.lbm': image_fixture(),

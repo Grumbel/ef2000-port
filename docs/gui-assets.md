@@ -450,6 +450,35 @@ to them. Note that the EXE and archives contain no known literal `.bbm`,
 `.abm`, `.pmi` or `.pmm` source filename; the registry alone is not a list
 of extant resources.
 
+### Reproducible unidentified raw-grid families
+
+Scanning **all 8,996 decoded DID archive members** found no literal
+`.bbm`, `.abm`, `.pmi`, `.pmm`, or `.pmmt` references in any payload, even
+after RA decompression. The `DID.DAT` payload-size and prefix audit identified
+two recurring groups:
+
+| Candidate family | Count | Exact decoded layout | Observed appearance |
+| --- | ---: | --- | --- |
+| `bare-40000` | 82 | 40,000 bytes without a header | Some yield coherent 200×200 terrain/map grids |
+| `prefix-01030064c8` | 24 | `01 03 00 64 c8` then 40,000 bytes | Repetitive/tiled raster-like patterns |
+
+These are **raw members whose original extensions remain unknown**; their
+sizes and imagery do not establish whether they are `.bbm`, `.abm`, `.pmi`,
+`.pmm`, or something else. The default grayscale preview is an 8-bit
+interpretation of the bytes, *not* a recovered original palette or a decoded
+image specification. Blank and constant-valued grids also exist.
+
+To reproduce the inventory and inspect a candidate by its real archive hash:
+
+```sh
+python3 tools/probe_did_grids.py /path/to/EF2000/DID.DAT
+python3 tools/probe_did_grids.py /path/to/EF2000/DID.DAT \
+  --hash 8526d152 --png /tmp/ef2000-grid-8526d152.png
+```
+
+The probe never exports these candidates in the normal `--all-images` pass,
+does not store game bytes in Git, and refuses to overwrite a preview file.
+
 For direct archive diagnostics without GUI conversion, run
 `python3 tools/did_archive.py /path/to/DID1ST.DAT gui/mainmenu.gui`.
 No original files are modified; the default `nix flake check` exercises only
