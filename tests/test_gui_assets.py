@@ -18,6 +18,7 @@ from tools.ilbm_image import Image, byterun_row, chunks, decode, encode_png, enc
 from tools.pcx_image import decode as decode_pcx, is_pcx
 from tools.bmp_image import decode as decode_bmp, is_bmp
 from tools.ra_decode import decompress
+from tools.resolve_archive_trace import parse_request, normalize_path, resolve_request
 from tools.spr_image import decode as decode_spr
 
 
@@ -75,6 +76,18 @@ def archive_fixture(members):
 
 
 class DIDArchiveTests(unittest.TestCase):
+    def test_guest_lookup_trace_resolution(self):
+        archive = DIDArchive(archive_fixture({
+            'iff/256/image.lbm': image_fixture(),
+        }))
+        self.assertEqual(parse_request('archive-lookup: archive=DID.DAT path=".\\\\IFF\\\\256\\\\image.lbm"'),
+                         ('DID.DAT', '.\\IFF\\256\\image.lbm'))
+        self.assertEqual(normalize_path('.\\IFF\\256\\image.lbm'),
+                         'IFF\\256\\image.lbm')
+        self.assertIn('found hash=', resolve_request(archive, '.\\IFF\\256\\image.lbm'))
+        self.assertEqual(resolve_request(archive, '.\\IFF\\256\\absent.lbm'), 'missing')
+        self.assertIsNone(parse_request('status=wall_time_limit'))
+
     def test_known_original_archive_hash_vectors(self):
         # Independent fixed guest resource indices from EF2000's two DATs.
         self.assertEqual(hash_path(b'AmainmenuA'), 0xac04eb66)

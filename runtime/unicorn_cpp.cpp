@@ -1251,6 +1251,12 @@ public:
     Machine& operator=(const Machine&) = delete;
     ~Machine() { if (cpu_) uc_close(cpu_); }
 
+    void enable_archive_lookup_trace() {
+        check(uc_hook_add(cpu_, &archive_lookup_hook_, UC_HOOK_CODE,
+                          (void*)on_archive_lookup, this, 0xeb520, 0xeb520),
+              "install archive-lookup trace hook");
+    }
+
     int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
             const std::string& framebuffer, const std::string& wav_directory,
             bool realtime = false, double wall_seconds = 0,
@@ -1510,6 +1516,8 @@ public:
 private:
     std::string invalid_memory_;
     uc_hook slice_hook_{};
+    uc_hook archive_lookup_hook_{};
+    std::set<std::pair<std::string, std::string>> archive_lookups_seen_;
     std::chrono::steady_clock::time_point slice_deadline_{};
     PerformanceOptions performance_{};
     PerformanceStats perf_stats_{};
@@ -2419,6 +2427,46 @@ private:
             }
         }
     }
+    static void on_archive_lookup(uc_engine*, uint64_t, uint32_t, void* user) {
+        static_cast<Machine*>(user)->trace_archive_lookup();
+    }
+    void trace_archive_lookup() {
+        // The original guest routine at 0xeb520 receives the ASCII pathname
+        // in EAX and the archive descriptor in EDX (Watcom register ABI).
+        uint32_t pathname{}, archive{}, first{}, second{};
+        if (uc_reg_read(cpu_, UC_X86_REG_EAX, &pathname) != UC_ERR_OK ||
+            uc_reg_read(cpu_, UC_X86_REG_EDX, &archive) != UC_ERR_OK)
+            return;
+        const bool first_valid = uc_mem_read(cpu_, 0x40d1f0, &first, sizeof(first)) == UC_ERR_OK;
+        const bool second_valid = uc_mem_read(cpu_, 0x40d1f4, &second, sizeof(second)) == UC_ERR_OK;
+        const std::string source = first_valid && first && archive == first ? "DID1ST.DAT" :
+                                   second_valid && second && archive == second ? "DID.DAT" :
+                                   "unknown";
+        std::string filename;
+        bool terminated = false;
+        for (uint32_t index = 0; index < 255; ++index) {
+            uint8_t value{};
+            if (pathname > UINT32_MAX - index ||
+                uc_mem_read(cpu_, pathname + index, &value, 1) != UC_ERR_OK)
+                return;
+            if (!value) { terminated = true; break; }
+            if (value == '\\') {
+                filename += "\\\\";
+            } else if (value == '"') {
+                filename += "\\\"";
+            } else if (value < 0x20 || value >= 0x7f) {
+                char escaped[5]{};
+                std::snprintf(escaped, sizeof(escaped), "\\x%02x", value);
+                filename += escaped;
+            } else {
+                filename += char(value);
+            }
+        }
+        if (!terminated) filename += "...";
+        if (archive_lookups_seen_.emplace(source, filename).second)
+            std::cerr << "archive-lookup: archive=" << source
+                      << " path=\"" << filename << "\"\n";
+    }
     static void on_interrupt(uc_engine*, uint32_t vector, void* user) {
         static_cast<Machine*>(user)->interrupt(vector);
     }
@@ -2869,6 +2917,7 @@ void usage(const char* program) {
               << "       [--controls auto|keyboard|joystick] (virtual EF2000.CFG)\n"
               << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
+              << "       [--trace-archive-lookups] (unique DID pathname requests on stderr)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
               << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
               << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
@@ -2878,7 +2927,7 @@ void usage(const char* program) {
               << "       Windows default: %LOCALAPPDATA%\\ef2000\\state\\unicorn\\drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
-              << "       " << program << " --self-test | --self-test-bda | --self-test-clock | --self-test-retrace | --self-test-fast-copy\n";
+              << "       " << program << " --self-test | --self-test-bda | --self-test-clock | --self-test-retrace | --self-test-fast-copy | --self-test-archive-lookup\n";
 }
 } // namespace
 
@@ -2897,7 +2946,8 @@ int main(int argc, char** argv) {
         ControlSelection controls = ControlSelection::Auto;
         bool self_test = false, self_test_bda = false, self_test_clock = false;
         bool self_test_retrace = false, self_test_fast_copy = false;
-        bool trace_interrupts = false;
+        bool self_test_archive_lookup = false;
+        bool trace_interrupts = false, trace_archive_lookups = false;
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
         std::vector<JoystickEvent> joystick_events;
@@ -3040,12 +3090,16 @@ int main(int argc, char** argv) {
                 self_test_retrace = true;
             } else if (!std::strcmp(argv[i], "--self-test-fast-copy")) {
                 self_test_fast_copy = true;
+            } else if (!std::strcmp(argv[i], "--self-test-archive-lookup")) {
+                self_test_archive_lookup = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
                 framebuffer = argv[++i];
             } else if (!std::strcmp(argv[i], "--wav-capture") && i + 1 < argc) {
                 wav_directory = argv[++i];
             } else if (!std::strcmp(argv[i], "--trace-interrupts")) {
                 trace_interrupts = true;
+            } else if (!std::strcmp(argv[i], "--trace-archive-lookups")) {
+                trace_archive_lookups = true;
             } else if (!std::strcmp(argv[i], "--mouse-event") && i + 1 < argc) {
                 MouseEvent event;
                 unsigned long long tick{};
@@ -3114,14 +3168,17 @@ int main(int argc, char** argv) {
             throw std::runtime_error("--overlay-symbols-bmp requires --windowed or --fullscreen");
         if (!window.overlay_skin_dir.empty() && !window.enabled)
             throw std::runtime_error("--overlay-skin-dir requires --windowed or --fullscreen");
-        if (self_test || self_test_bda || self_test_clock || self_test_retrace || self_test_fast_copy) {
+        if (self_test || self_test_bda || self_test_clock || self_test_retrace ||
+            self_test_fast_copy || self_test_archive_lookup) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
-                int(self_test_retrace) + int(self_test_fast_copy) != 1)
+                int(self_test_retrace) + int(self_test_fast_copy) +
+                int(self_test_archive_lookup) != 1)
                 throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
             if (!cd_cue.empty()) throw std::runtime_error("self-test does not take a CD image");
-            std::vector<uint8_t> image(self_test_fast_copy ? COPY_ENTRY + 5 : 0x1000);
+            std::vector<uint8_t> image(self_test_fast_copy ? COPY_ENTRY + 5 :
+                                       self_test_archive_lookup ? 0xeb521 : 0x1000);
             // DOS query, ISA gameport charge/read, then DOS exit. The same
             // synthetic payload works without any proprietary game files.
             constexpr uint8_t gameport_guest[] = {
@@ -3162,6 +3219,11 @@ int main(int argc, char** argv) {
                 0xec, 0xa8, 0x08, 0x75, 0xfb, // wait until bit 3 is clear
                 0xec, 0xa8, 0x08, 0x74, 0xfb, // wait until bit 3 is set
                 0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21}; // DOS exit
+            constexpr uint8_t archive_guest[] = {
+                0xb8, 0x00, 0x20, 0x00, 0x00, // mov eax,0x2000: test filename
+                0xba, 0x00, 0x30, 0x00, 0x00, // mov edx,0x3000: archive handle
+                0xe8, 0x00, 0x00, 0x00, 0x00, // call 0xeb520: test tracepoint
+                0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
             // The 32-bit guest calls a deliberately invalid replacement
             // function at the original memcpy entry address. Passing this
             // test proves the fast path stopped *before* executing the body,
@@ -3219,11 +3281,18 @@ int main(int argc, char** argv) {
                 image[COPY_ENTRY + 1] = 0x82;
                 std::copy(copy_guest.begin(), copy_guest.end(), image.begin() + ENTRY);
                 performance.fast_copy = true;
+            } else if (self_test_archive_lookup) {
+                std::copy(std::begin(archive_guest), std::end(archive_guest), image.begin() + ENTRY);
+                put32(image, ENTRY + 11, 0xeb520 - (ENTRY + 15));
+                image[0xeb520] = 0xc3; // test routine returns without touching registers
+                constexpr char pathname[] = "test.bbm";
+                std::copy(std::begin(pathname), std::end(pathname), image.begin() + 0x2000);
             }
             else
                 std::copy(std::begin(gameport_guest), std::end(gameport_guest), image.begin() + ENTRY);
             Machine machine(image, {}, {}, {}, ef2000::SoundMode::Off, false,
                             {}, {}, std::move(joystick_events), controls);
+            if (self_test_archive_lookup) machine.enable_archive_lookup_trace();
             const bool realtime_test = self_test_clock || self_test_retrace || self_test_fast_copy;
             performance.clock_loop_benchmark = self_test_clock;
             return machine.run(realtime_test ? 0 : 10000, window, 250000, "", "",
@@ -3272,6 +3341,7 @@ int main(int argc, char** argv) {
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
                         controls, cd_cue);
+        if (trace_archive_lookups) machine.enable_archive_lookup_trace();
         return machine.run(limit, window, timer_interval, framebuffer, wav_directory,
                            realtime, wall_seconds, performance);
     } catch (const std::exception& error) {

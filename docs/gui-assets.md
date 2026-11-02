@@ -404,6 +404,52 @@ original screenshot shows a recessed rectangular glyph on the leftmost
 titlebar button, not an underscore. A GUI renderer/code trace is needed to
 distinguish procedural effects from still-unidentified binary resources.
 
+### Trace original resource names before hashing
+
+The SHA-pinned `_EF2000.EXE` resolves archive paths at guest `0xeb520`:
+**EAX** points to the source pathname and **EDX** to the archive object.
+The original hash routine at `0xebfd0` matches `tools/did_archive.py`,
+including its 15-byte path limit and directory/extension substitutions.
+`--trace-archive-lookups` installs a narrowly scoped Unicorn code hook at
+`0xeb520`. It prints each distinct `(archive, requested pathname)` pair to
+stderr; the prefix `archive-lookup:` distinguishes these lines from normal
+DOS file diagnostics. Searches can fail in one archive and succeed in the
+other, so **a trace line proves a request, not the presence of the file**.
+
+For example, with original EF2000 data files available locally:
+
+```sh
+ef2000-unicorn-cpp /path/to/_EF2000.EXE \
+  --game-dir /path/to/EF2000 --trace-archive-lookups \
+  --overlay-dir /tmp/ef2000-trace-state --windowed \
+  2> /tmp/ef2000-resource-requests.log
+python3 tools/resolve_archive_trace.py \
+  --game-dir /path/to/EF2000 /tmp/ef2000-resource-requests.log
+# Limit the report to the four unclassified extension candidates:
+python3 tools/resolve_archive_trace.py \
+  --game-dir /path/to/EF2000 \
+  --ext .bbm --ext .abm --ext .pmi --ext .pmm \
+  /tmp/ef2000-resource-requests.log
+```
+
+This probes the executable's real filename requests without modifying the
+archives or attempting to guess unknown hashes. The report resolves each
+request against the actual index, including normal misses while the engine
+tries alternate localizations and directories; for hits it prints the resource
+hash, stored size, RA/raw encoding, and first eight decoded bytes. An idle
+startup trace validated three IFF menu backgrounds against DID1ST.DAT;
+several earlier alternate-path attempts were expected misses.
+
+The archive extension tables
+confirm `.bbm` (`DID1ST.DAT`, `DID.DAT`) and `.abm`, `.pmi`, `.pmm` (only
+`DID.DAT`); neither lists `.pmmt`. The initial menu/startup trace requested
+`.lbm`, `.gui`, `.tm`, `.col`, `.fad`, `.par`, `.fn`, `.lab`, `.dat`, `.256`,
+`.txt`, `.cd` and `.cfg`, but not any of these four candidate image formats.
+Further menu/gameplay paths must be exercised before attributing a member
+to them. Note that the EXE and archives contain no known literal `.bbm`,
+`.abm`, `.pmi` or `.pmm` source filename; the registry alone is not a list
+of extant resources.
+
 For direct archive diagnostics without GUI conversion, run
 `python3 tools/did_archive.py /path/to/DID1ST.DAT gui/mainmenu.gui`.
 No original files are modified; the default `nix flake check` exercises only

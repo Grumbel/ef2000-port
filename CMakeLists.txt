@@ -119,6 +119,10 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
            --self-test-fast-copy)
   set_tests_properties(unicorn-cpp-fast-copy PROPERTIES
                        PASS_REGULAR_EXPRESSION "fast_copy: calls=1 bytes=1024 fallback_calls=0")
+  add_test(NAME unicorn-cpp-archive-lookup COMMAND ef2000-unicorn-cpp
+           --self-test-archive-lookup)
+  set_tests_properties(unicorn-cpp-archive-lookup PROPERTIES
+                       PASS_REGULAR_EXPRESSION "archive-lookup: archive=unknown path=\"test.bbm\"")
   add_test(NAME unicorn-cpp-hot-blocks COMMAND ef2000-unicorn-cpp
            --self-test-clock --wall-seconds 0.1 --profile-hot-blocks)
   set_tests_properties(unicorn-cpp-hot-blocks PROPERTIES
