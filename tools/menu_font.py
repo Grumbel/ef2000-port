@@ -146,6 +146,11 @@ UNMAPPED_BANDS = (
     ((0, 74, 44, 86), 6),
 )
 
+# Independently confirmed by pixel-perfect comparison against the original
+# German TACTCOM title "Einsatzübersicht" at screenshot coordinate (104,160).
+# Do not extrapolate the neighboring codepage positions from this one match.
+KNOWN_EXTENDED_GLYPHS = {16: 'ü'}
+
 
 def collect_unmapped_glyphs(image):
     found = []
@@ -272,10 +277,10 @@ def rip_font(game_dir, out_dir):
         'source': 'DID1ST.DAT',
         'source_hash': f'{FONT_SHEET_HASH:08x}',
         'cell_size': [CELL_WIDTH, CELL_HEIGHT],
-        'notes': 'Sequential source positions only; no Unicode/CP437 assignments',
+        'notes': 'Source order retained; only screenshot-verified Unicode glyphs are assigned',
         'glyphs': [
             {'index': index, 'bounds': list(item.bounds),
-             'width': item.glyph.width, 'unicode': None}
+             'width': item.glyph.width, 'unicode': KNOWN_EXTENDED_GLYPHS.get(index)}
             for index, item in enumerate(unmapped)
         ],
     }
@@ -285,6 +290,7 @@ def rip_font(game_dir, out_dir):
         'menu-font.png': encode_png(atlas),
         'menu-font.widths': (' '.join(map(str, widths)) + '\n').encode('ascii'),
         'menu-font-extended.png': encode_png(extended_atlas),
+        'menu-font-extended.bmp': encode_bmp(extended_atlas),
         'menu-font-extended.json': (json.dumps(extended_manifest, indent=2) + '\n').encode('utf-8'),
         'menu-font-extended.html': unmapped_gallery(unmapped).encode('utf-8'),
         'menu-font.json': (json.dumps({

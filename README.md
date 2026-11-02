@@ -389,7 +389,10 @@ atlas for further research. It also recovers the proportional menu font into
 the same directory; `--overlay-skin-dir` automatically uses it unless an
 explicit `--overlay-font-bmp` is provided. The F12 overlay now has working
 minimize, maximize/restore and close titlebar buttons, styled after the
-original game. See [GUI resource research](docs/gui-assets.md)
+original game. The original skin gives windows full-width green TACTCOM
+titlebars and renders the specimen font with its original one-pixel black
+shadow and vertically corrected VGA aspect ratio. See
+[GUI resource research](docs/gui-assets.md)
 for exact archive hashes and the transparency index caveat.
 
 ```sh
@@ -421,7 +424,9 @@ It additionally writes `menu-font-extended.png`,
 `menu-font-extended.json` and a JavaScript-free
 `menu-font-extended.html` gallery for the **48 remaining accented glyphs**.
 They are numbered by source position, **not assigned speculative Unicode
-values**. Open the HTML locally to identify characters for a later extended
+values**; the one verified exception is `ü` at glyph index 16, matched
+pixel-for-pixel against the German TACTCOM screenshot. Open the HTML locally
+to identify characters for a later extended
 font mapping. Neither the bitmaps nor their derived widths are committed to Git.
 
 The same original font specimen contains small **directional and window-like

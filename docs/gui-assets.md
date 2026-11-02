@@ -46,6 +46,23 @@ content clipping (rather than truncating by a guessed eight-pixel width).
 The beveled titlebar buttons now provide minimize, maximize/restore and close
 actions, following the original screenshot's three-control layout.
 
+Pixel comparison against the 640×400 German TACTCOM screenshot confirms the
+font rather than merely its style: the word **Karte** rendered from the font
+specimen reproduces **all 81 white pixels** of the screenshot title exactly
+when placed at source coordinate `(222,44)`. Of the 71 non-overlapping glyph
+pixels expected at a `(1,1)` black-shadow offset, 63 are black in the screenshot.
+The host renderer now draws that second shadow pass and vertically maps each
+original 12-pixel font cell to **14.4 square pixels** in its 640×480 canvas;
+line spacing rises to 16 pixels so the taller type remains legible.
+
+The TACTCOM screenshot also establishes a distinction from the recovered
+options-menu art. Its **map window's green titlebar is full-width**, with a
+silver top hairline and dark bottom separator. With `--overlay-skin-dir`, the
+host now uses that screen-anchored full-width title treatment; without an
+original skin it retains the short stepped tab inferred from the options
+screens. The three chrome buttons are spaced at the right edge and taller
+vertically to reflect the original VGA pixel aspect ratio.
+
 **The red sprite sheet's background is palette index 0**;
 actual red foreground pixels use other indices, so keying by RGB color would
 erase valid red aircraft. The runtime option applies the original title and
@@ -275,12 +292,16 @@ The remaining specimen rows visually contain **48 additional accented
 glyphs** after `xyz`, in 42 + 6 segmented columns. Their codepoint order is
 not yet established, so the normal runtime atlas keeps these separate from the
 verified ASCII mapping. The `font` extractor now writes a **128×36 extended
-contact atlas** (`menu-font-extended.png`), a 48-entry JSON file recording
-exact source pixel bounds and `unicode: null`, and a JavaScript-free
+contact atlas** (`menu-font-extended.png`, with a companion BMP), a 48-entry
+JSON file recording exact source pixel bounds and verified Unicode where
+known, and a JavaScript-free
 `menu-font-extended.html` gallery with fourfold nearest-neighbor glyphs and
-stable indices `#00`–`#47`. No codepage is assumed; font graphics remain
-external to the repository. Resolving at least the German `äöüÄÖÜß` set
-against the screenshot or guest code is a useful follow-up before adding
+stable indices `#00`–`#47`. **Index #16 is now verified as lowercase `ü`**:
+its complete white pixel mask matches the `ü` in the supplied screenshot's
+"Einsatzübersicht" title at `(104,160)`. The other 47 positions remain
+unassigned; no codepage is inferred from a single match. Font graphics remain
+external to the repository. Resolving the remaining German `äöÄÖÜß` set
+against screenshots or guest code is a useful follow-up before adding
 native localized overlay labels.
 
 ## Extractor

@@ -791,7 +791,8 @@ private:
     int overlay_max_scroll() const {
         if (overlay_.focused_panel() != 0) return 0;
         const auto& panel = overlay_.panels()[0];
-        const int rows = std::max(1, int((panel.h - ef2000::OverlayWindows::title_height - 35) / 13));
+        const int rows = std::max(1, int((panel.h - ef2000::OverlayWindows::title_height - 35) /
+                                         ef2000::OverlayWindows::line_height));
         return std::max(0, int(controls_help_lines().size()) - rows);
     }
     void toggle_overlay() {
@@ -826,25 +827,32 @@ private:
         if (overlay_font_texture_) {
             value.resize(ef2000::menu_font_fitting_chars(overlay_font_widths_,
                                                         value, max_pixels));
-            if (!SDL_SetTextureColorMod(overlay_font_texture_, red, green, blue))
-                throw std::runtime_error(std::string("SDL3 overlay font tint: ") + SDL_GetError());
-            float offset = 0;
-            for (unsigned char code : value) {
-                const auto glyph = ef2000::menu_font_glyph(overlay_font_widths_, code);
-                if (glyph.available && glyph.width > 0) {
-                    const SDL_FRect source{float(glyph.x), float(glyph.y),
-                                           float(glyph.width), float(glyph.height)};
-                    const SDL_FRect target{x + offset, y, float(glyph.width), float(glyph.height)};
-                    if (!SDL_RenderTexture(renderer_, overlay_font_texture_, &source, &target))
-                        throw std::runtime_error(std::string("SDL3 menu font render: ") + SDL_GetError());
-                } else if (!glyph.available) {
-                    const char fallback[]{char(code), '\0'};
-                    if (!SDL_SetRenderDrawColor(renderer_, red, green, blue, 255) ||
-                        !SDL_RenderDebugText(renderer_, x + offset, y, fallback))
-                        throw std::runtime_error(std::string("SDL3 menu font fallback: ") + SDL_GetError());
+            const auto pass = [&](float dx, float dy, uint8_t r, uint8_t g, uint8_t b) {
+                if (!SDL_SetTextureColorMod(overlay_font_texture_, r, g, b))
+                    throw std::runtime_error(std::string("SDL3 overlay font tint: ") + SDL_GetError());
+                float offset = 0;
+                for (unsigned char code : value) {
+                    const auto glyph = ef2000::menu_font_glyph(overlay_font_widths_, code);
+                    if (glyph.available && glyph.width > 0) {
+                        const SDL_FRect source{float(glyph.x), float(glyph.y),
+                                               float(glyph.width), float(glyph.height)};
+                        const SDL_FRect target{x + offset + dx, y + dy,
+                            float(glyph.width), float(glyph.height) * ef2000::menu_font_pixel_aspect};
+                        if (!SDL_RenderTexture(renderer_, overlay_font_texture_, &source, &target))
+                            throw std::runtime_error(std::string("SDL3 menu font render: ") + SDL_GetError());
+                    } else if (!glyph.available) {
+                        const char fallback[]{char(code), '\0'};
+                        if (!SDL_SetRenderDrawColor(renderer_, r, g, b, 255) ||
+                            !SDL_RenderDebugText(renderer_, x + offset + dx, y + dy, fallback))
+                            throw std::runtime_error(std::string("SDL3 menu font fallback: ") + SDL_GetError());
+                    }
+                    offset += float(glyph.advance);
                 }
-                offset += float(glyph.advance);
-            }
+            };
+            // The DOS text blitter offsets black shadow pixels behind the
+            // white glyphs; the original font sheet stores just the mask.
+            pass(1.0f, ef2000::menu_font_pixel_aspect, 0, 0, 0);
+            pass(0, 0, red, green, blue);
             return;
         }
         if (value.size() > size_t(max_pixels / 8)) value.resize(size_t(max_pixels / 8));
@@ -866,15 +874,15 @@ private:
     void overlay_chrome_button(float x, float y, int kind, bool toggled) {
         // Original-style shallow silver bevel and black shadow; glyphs are
         // drawn as one-pixel strokes rather than font letters.
-        overlay_fill(x + 1, y + 1, 15, 15, 18, 18, 23);
-        overlay_fill(x, y, 14, 14, 172, 174, 191);
-        overlay_fill(x + 1, y + 1, 12, 12, 100, 102, 121);
-        overlay_fill(x + 2, y + 2, 10, 10, 138, 141, 160);
-        overlay_fill(x + 12, y + 1, 1, 12, 49, 52, 64);
-        overlay_fill(x + 1, y + 12, 12, 1, 49, 52, 64);
+        overlay_fill(x + 1, y + 1, 15, 17, 18, 18, 23);
+        overlay_fill(x, y, 14, 16, 172, 174, 191);
+        overlay_fill(x + 1, y + 1, 12, 14, 100, 102, 121);
+        overlay_fill(x + 2, y + 2, 10, 12, 138, 141, 160);
+        overlay_fill(x + 12, y + 1, 1, 14, 49, 52, 64);
+        overlay_fill(x + 1, y + 14, 12, 1, 49, 52, 64);
         const uint8_t fg = 19;
         if (kind == 0) {
-            overlay_fill(x + 4, y + 10, 7, 2, fg, fg, fg);
+            overlay_fill(x + 4, y + 12, 7, 2, fg, fg, fg);
         } else if (kind == 1) {
             if (toggled) {
                 overlay_fill(x + 5, y + 3, 6, 1, fg, fg, fg);
@@ -945,26 +953,41 @@ private:
                 float(ef2000::menu_font_text_width(overlay_font_widths_, title)) :
                 float(title.size() * 8);
             const float tab_width = std::min(panel.w - 67, title_width + 20);
-            // Small stepped upper-right edge rather than a modern full-width
-            // titlebar. Keep mouse-drag hit testing in OverlayWindows intact.
-            overlay_skin_fill(overlay_title_texture_, panel.x + 5, panel.y + 5, tab_width - 9, 17,
-                         focused ? 62 : 46, focused ? 69 : 51, focused ? 42 : 31);
-            overlay_skin_fill(overlay_title_texture_, panel.x + 5 + tab_width - 9, panel.y + 8, 9, 14,
-                         focused ? 62 : 46, focused ? 69 : 51, focused ? 42 : 31);
-            overlay_fill(panel.x + 5, panel.y + 4, tab_width - 12, 1, 173, 185, 159);
-            overlay_fill(panel.x + 5 + tab_width - 12, panel.y + 5, 5, 1, 173, 185, 159);
-            overlay_fill(panel.x + 5 + tab_width - 7, panel.y + 6, 4, 1, 173, 185, 159);
-            overlay_text(panel.x + 10, panel.y + 9, title,
-                         int(tab_width - 10), 255, 255, 255);
+            if (overlay_title_texture_) {
+                // TACTCOM's title texture runs across the full window width;
+                // only the older options menu has stepped short title tabs.
+                overlay_skin_fill(overlay_title_texture_, panel.x + 3, panel.y + 1,
+                                  panel.w - 6, ef2000::OverlayWindows::title_height - 3,
+                                  45, 59, 35);
+                overlay_fill(panel.x + 3, panel.y, panel.w - 6, 1, 159, 159, 175);
+                overlay_fill(panel.x + 3,
+                             panel.y + ef2000::OverlayWindows::title_height - 2,
+                             panel.w - 6, 2, 40, 40, 52);
+                overlay_text(panel.x + 13, panel.y + 6, title,
+                             int(panel.w - 68), 255, 255, 255);
+            } else {
+                // The old options menu instead has a stepped short title tab.
+                overlay_skin_fill(overlay_title_texture_, panel.x + 5, panel.y + 5,
+                                  tab_width - 9, 17, focused ? 62 : 46,
+                                  focused ? 69 : 51, focused ? 42 : 31);
+                overlay_skin_fill(overlay_title_texture_, panel.x + 5 + tab_width - 9,
+                                  panel.y + 8, 9, 14, focused ? 62 : 46,
+                                  focused ? 69 : 51, focused ? 42 : 31);
+                overlay_fill(panel.x + 5, panel.y + 4, tab_width - 12, 1, 173, 185, 159);
+                overlay_fill(panel.x + 5 + tab_width - 12, panel.y + 5, 5, 1, 173, 185, 159);
+                overlay_fill(panel.x + 5 + tab_width - 7, panel.y + 6, 4, 1, 173, 185, 159);
+                overlay_text(panel.x + 10, panel.y + 9, title,
+                             int(tab_width - 10), 255, 255, 255);
+            }
             // Match the original three square titlebar controls: minimize,
             // maximize/restore, and close, all with actionable hit targets.
-            overlay_chrome_button(panel.x + panel.w - 55, panel.y + 6, 0, panel.minimized);
-            overlay_chrome_button(panel.x + panel.w - 37, panel.y + 6, 1, panel.maximized);
-            overlay_chrome_button(panel.x + panel.w - 19, panel.y + 6, 2, false);
+            overlay_chrome_button(panel.x + panel.w - 47, panel.y + 4, 0, panel.minimized);
+            overlay_chrome_button(panel.x + panel.w - 32, panel.y + 4, 1, panel.maximized);
+            overlay_chrome_button(panel.x + panel.w - 17, panel.y + 4, 2, false);
             if (overlay_symbols_texture_) {
                 // Cell (4, 1) is the 16x16 dark cross from the specimen.
                 const SDL_FRect source{64, 16, 16, 16};
-                const SDL_FRect target{panel.x + panel.w - 20, panel.y + 5, 16, 16};
+                const SDL_FRect target{panel.x + panel.w - 18, panel.y + 4, 16, 16};
                 if (!SDL_RenderTexture(renderer_, overlay_symbols_texture_, &source, &target))
                     throw std::runtime_error(std::string("SDL3 overlay close symbol: ") + SDL_GetError());
             }
@@ -985,7 +1008,8 @@ private:
                 status
             };
             const auto& lines = index == 0 ? controls_help_lines() : diagnostics;
-            const int rows = std::max(1, int((panel.h - ef2000::OverlayWindows::title_height - 35) / 13));
+            const int rows = std::max(1, int((panel.h - ef2000::OverlayWindows::title_height - 35) /
+                                             ef2000::OverlayWindows::line_height));
             overlay_.clamp_scroll(index, std::max(0, int(lines.size()) - rows));
             const int scroll = overlay_.panels()[index].scroll;
             const float content_inset = overlay_frame_texture_ ?
@@ -996,7 +1020,8 @@ private:
                 const bool heading = value == "HOST CONTROLS" || value == "GAMEPAD FLIGHT (EXPERIMENTAL)" ||
                     value == "EF2000 KEYBOARD - MAIN FLIGHT" || value == "VIEWS" ||
                     value == "OTHER USEFUL SHORTCUTS" || value == "VIDEO / EMULATION";
-                overlay_text(panel.x + content_inset, panel.y + 31 + float(line - scroll) * 13,
+                overlay_text(panel.x + content_inset,
+                             panel.y + 31 + float(line - scroll) * ef2000::OverlayWindows::line_height,
                              value, max_pixels,
                              heading ? 218 : 242, heading ? 226 : 242, heading ? 204 : 242);
             }

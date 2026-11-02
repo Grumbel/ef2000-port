@@ -22,6 +22,7 @@ int main() {
     assert(!ef2000::menu_font_glyph(widths, 255).available);
     assert(ef2000::menu_font_atlas_width == 128);
     assert(ef2000::menu_font_atlas_height == 72);
+    assert(ef2000::menu_font_pixel_aspect * 10.0f == 12.0f);
     assert(ef2000::menu_font_text_width(widths, "A M") == 6 + 5 + 9);
     assert(ef2000::menu_font_fitting_chars(widths, "A M", 11) == 2);
     assert(ef2000::menu_font_fitting_chars(widths, "A M", 20) == 3);

@@ -107,6 +107,8 @@ class MenuFontTests(unittest.TestCase):
         html = unmapped_gallery(unmapped)
         self.assertEqual(html.count('<figure>'), 48)
         self.assertIn('Index is not a character code', html)
+        from tools.menu_font import KNOWN_EXTENDED_GLYPHS
+        self.assertEqual(KNOWN_EXTENDED_GLYPHS, {16: 'ü'})
         damaged = bytearray(pixels)
         damaged[60 * 320 + 17] = 0
         with self.assertRaisesRegex(ValueError, '41 groups for 42 expected'):
@@ -143,9 +145,12 @@ class OriginalMenuFontTests(unittest.TestCase):
             self.assertEqual(len(extended['glyphs']), 48)
             self.assertEqual(extended['glyphs'][0]['bounds'], [17, 60, 21, 72])
             self.assertEqual(extended['glyphs'][-1]['bounds'], [40, 74, 44, 86])
-            self.assertTrue(all(item['unicode'] is None for item in extended['glyphs']))
+            self.assertEqual(extended['glyphs'][16]['unicode'], 'ü')
+            self.assertTrue(all(item['unicode'] is None
+                                for idx, item in enumerate(extended['glyphs']) if idx != 16))
             self.assertTrue((Path(directory) / 'menu-font-extended.png').read_bytes().startswith(
                 b'\x89PNG\r\n\x1a\n'))
+            self.assertTrue((Path(directory) / 'menu-font-extended.bmp').read_bytes().startswith(b'BM'))
             with self.assertRaises(FileExistsError):
                 rip_font(Path(os.environ['EF2000_DATA_DIR']), Path(directory))
 

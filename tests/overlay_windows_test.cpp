@@ -72,7 +72,7 @@ int main() {
     windows.button(decorated.x + decorated.w - 28, decorated.y + 12, true, true);
     assert(windows.panels()[0].maximized);
     assert(windows.panels()[0].w == 640 && windows.panels()[0].x == 0);
-    assert(windows.panels()[0].h == 457);
+    assert(windows.panels()[0].h == 456);
     // Maximized windows cannot be accidentally dragged or resized.
     windows.button(50, 10, true, true);
     windows.motion(200, 200);

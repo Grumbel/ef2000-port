@@ -22,7 +22,7 @@ struct OverlayPanel {
 class OverlayWindows {
 public:
     static constexpr float canvas_width = 640, canvas_height = 480;
-    static constexpr float title_height = 23, resize_size = 16;
+    static constexpr float title_height = 24, resize_size = 16, line_height = 16;
 
     bool visible() const { return visible_; }
     const std::array<OverlayPanel, 2>& panels() const { return panels_; }
@@ -53,18 +53,18 @@ public:
             auto& panel = panels_[index];
             if (!panel.open || !contains(panel, x, y)) continue;
             focus(index);
-            if (y >= panel.y + 5 && y < panel.y + title_height - 2) {
-                if (x >= panel.x + panel.w - 20) {
+            if (y >= panel.y + 4 && y < panel.y + title_height - 2) {
+                if (x >= panel.x + panel.w - 18) {
                     panel.open = false;
                     grab_ = Grab::None;
                     if (panels_[1 - index].open) focus(1 - index);
                     return true;
                 }
-                if (x >= panel.x + panel.w - 38) {
+                if (x >= panel.x + panel.w - 33) {
                     maximize(index);
                     return true;
                 }
-                if (x >= panel.x + panel.w - 56) {
+                if (x >= panel.x + panel.w - 48) {
                     minimize(index);
                     return true;
                 }

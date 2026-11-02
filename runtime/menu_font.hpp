@@ -12,6 +12,7 @@ namespace ef2000 {
 // Layout of the caller-extracted menu-font.bmp (no copyrighted pixels here).
 constexpr int menu_font_first = 32, menu_font_last = 126;
 constexpr int menu_font_cell_width = 8, menu_font_cell_height = 12;
+constexpr float menu_font_pixel_aspect = 6.0f / 5.0f;
 constexpr int menu_font_columns = 16;
 constexpr int menu_font_atlas_width = menu_font_cell_width * menu_font_columns;
 constexpr int menu_font_atlas_height = menu_font_cell_height * 6;
