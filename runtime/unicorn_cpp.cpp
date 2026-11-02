@@ -59,6 +59,8 @@ constexpr uint32_t ENV_BASE = PSP_BASE + 0x1000;
 constexpr uint32_t EXTENDER_BASE = PSP_BASE + 0x2000;
 constexpr uint32_t TABLE_BASE = IMAGE_SIZE + 0x1000;
 constexpr uint32_t COPY_ENTRY = 0xe9a24;
+constexpr uint32_t VGA_COPY_BASE = DOS_BASE + 0xa0000;
+constexpr uint32_t VGA_COPY_END = VGA_COPY_BASE + 0x10000;
 constexpr char SOURCE_SHA256[] = "f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd";
 
 uint16_t le16(const std::vector<uint8_t>& data, size_t pos) {
@@ -103,7 +105,9 @@ struct PerformanceOptions {
     bool profile{};
     bool hot_blocks{};
     bool profile_copy{};
+    bool profile_copy_callers{};
     bool fast_copy{};
+    bool fast_copy_vga{};
     bool clock_loop_benchmark{};
 };
 struct PerformanceStats {
@@ -113,6 +117,11 @@ struct PerformanceStats {
 };
 struct PendingCopy {
     uint32_t stack{}, return_ip{}, source{}, destination{}, bytes{};
+};
+struct CopyCallerStats {
+    uint64_t calls{}, bytes{}, ge1024{}, ge4096{}, vga_calls{}, vga_bytes{};
+    uint64_t accelerated_calls{}, accelerated_bytes{};
+    uint32_t max_bytes{};
 };
 struct WindowOptions {
     bool enabled{}, fullscreen{}, smooth_scaling{};
@@ -563,7 +572,9 @@ struct Registers {
     uint32_t ax{}, bx{}, cx{}, dx{}, si{}, di{}, bp{}, sp{}, ip{}, flags{};
     uint32_t ds{}, es{}, ss{};
 };
-constexpr int REG_IDS[] = {UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
+// Unicorn 2.1.3's batch API takes int* (newer headers may accept const int*).
+// Keep the stable register ID list writable to compile against both variants.
+int REG_IDS[] = {UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
     UC_X86_REG_EDX, UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EBP,
     UC_X86_REG_ESP, UC_X86_REG_EIP, UC_X86_REG_EFLAGS,
     UC_X86_REG_DS, UC_X86_REG_ES, UC_X86_REG_SS};
@@ -815,10 +826,39 @@ public:
                 std::cout << "copy_bucket: range=" << i << " calls=" << copy_size_buckets_[i]
                           << '\n';
         }
+        if (performance_.profile_copy_callers) {
+            std::vector<std::pair<uint32_t, CopyCallerStats>> callers(copy_callers_.begin(),
+                                                                       copy_callers_.end());
+            std::sort(callers.begin(), callers.end(), [](const auto& lhs, const auto& rhs) {
+                if (lhs.second.bytes != rhs.second.bytes)
+                    return lhs.second.bytes > rhs.second.bytes;
+                if (lhs.second.calls != rhs.second.calls)
+                    return lhs.second.calls > rhs.second.calls;
+                return lhs.first < rhs.first;
+            });
+            constexpr size_t max_reported = 64;
+            std::cout << "copy_callers: unique=" << callers.size()
+                      << " shown=" << std::min(callers.size(), max_reported) << '\n';
+            for (size_t i = 0; i < std::min(callers.size(), max_reported); ++i) {
+                const auto& [return_ip, stats] = callers[i];
+                std::cout << "copy_caller: ret=0x" << std::hex << return_ip << std::dec
+                          << " calls=" << stats.calls << " bytes=" << stats.bytes
+                          << " max=" << stats.max_bytes
+                          << " ge1024=" << stats.ge1024
+                          << " ge4096=" << stats.ge4096
+                          << " vga_calls=" << stats.vga_calls
+                          << " vga_bytes=" << stats.vga_bytes
+                          << " accelerated=" << stats.accelerated_calls
+                          << " accelerated_bytes=" << stats.accelerated_bytes << '\n';
+            }
+        }
         if (performance_.fast_copy)
             std::cout << "fast_copy: calls=" << fast_copy_calls_
                       << " bytes=" << fast_copy_bytes_
                       << " fallback_calls=" << fast_copy_skipped_ << '\n';
+        if (performance_.fast_copy_vga)
+            std::cout << "fast_copy_vga: calls=" << fast_copy_vga_calls_
+                      << " bytes=" << fast_copy_vga_bytes_ << '\n';
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
         std::cout.flush();
         if (window.enabled()) {
@@ -845,8 +885,10 @@ private:
     uint64_t copy_calls_{}, copy_bytes_{};
     uint32_t copy_max_{};
     std::array<uint64_t, 8> copy_size_buckets_{};
+    std::unordered_map<uint32_t, CopyCallerStats> copy_callers_;
     std::optional<PendingCopy> pending_copy_;
     uint64_t fast_copy_calls_{}, fast_copy_bytes_{}, fast_copy_skipped_{};
+    uint64_t fast_copy_vga_calls_{}, fast_copy_vga_bytes_{};
     std::vector<uint8_t> fast_copy_buffer_;
     unsigned vga_reads_until_check_{1};
     uint32_t vga_status_{};
@@ -1974,6 +2016,19 @@ private:
                 bytes < 256 ? 3 : bytes < 512 ? 4 : bytes < 1024 ? 5 :
                 bytes < 4096 ? 6 : 7;
             ++copy_size_buckets_[bucket];
+            if (performance_.profile_copy_callers) {
+                auto& stats = copy_callers_[return_ip];
+                ++stats.calls;
+                stats.bytes += bytes;
+                stats.max_bytes = std::max(stats.max_bytes, bytes);
+                if (bytes >= 1024) ++stats.ge1024;
+                if (bytes >= 4096) ++stats.ge4096;
+                if (destination >= VGA_COPY_BASE &&
+                    uint64_t(destination) + bytes <= VGA_COPY_END) {
+                    ++stats.vga_calls;
+                    stats.vga_bytes += bytes;
+                }
+            }
         }
         if (!performance_.fast_copy) return;
         // This exact routine is only present in the SHA-pinned original image.
@@ -1981,8 +2036,14 @@ private:
         // writes into the original code section to Unicorn's normal executor.
         const uint64_t src_end = uint64_t(source) + bytes;
         const uint64_t dst_end = uint64_t(destination) + bytes;
+        const bool guest_data = destination >= image_size_ && dst_end <= IMAGE_SIZE;
+        // This region is an ordinary mapped RAM bank. The VBE model captures
+        // it via uc_mem_read; there are no MMIO write hooks to preserve.
+        // Restrict the experimental extension to the exact 64 KiB VGA window.
+        const bool vga_bank = performance_.fast_copy_vga &&
+            destination >= VGA_COPY_BASE && dst_end <= VGA_COPY_END;
         if (bytes < 1024 || bytes > 1024 * 1024 || source < 0x1000 ||
-            destination < image_size_ || src_end > IMAGE_SIZE || dst_end > IMAGE_SIZE ||
+            src_end > IMAGE_SIZE || (!guest_data && !vga_bank) ||
             return_ip < ENTRY || return_ip >= image_size_ ||
             (source < dst_end && destination < src_end) ||
             uc_reg_read(cpu, UC_X86_REG_DS, &ds) != UC_ERR_OK || ds != 7) {
@@ -2014,6 +2075,16 @@ private:
         reg(UC_X86_REG_EIP, copy.return_ip);
         ++fast_copy_calls_;
         fast_copy_bytes_ += copy.bytes;
+        if (performance_.profile_copy_callers) {
+            auto& stats = copy_callers_[copy.return_ip];
+            ++stats.accelerated_calls;
+            stats.accelerated_bytes += copy.bytes;
+        }
+        if (copy.destination >= VGA_COPY_BASE &&
+            uint64_t(copy.destination) + copy.bytes <= VGA_COPY_END) {
+            ++fast_copy_vga_calls_;
+            fast_copy_vga_bytes_ += copy.bytes;
+        }
     }
     static void on_realtime_block(uc_engine* cpu, uint64_t address, uint32_t, void* user) {
         auto* machine = static_cast<Machine*>(user);
@@ -2126,7 +2197,9 @@ void usage(const char* program) {
               << "       [--profile] (print callback counts and host time by subsystem)\n"
               << "       [--profile-hot-blocks] (sample and list 16 hottest guest blocks)\n"
               << "       [--profile-copy] (count calls to the original fast-copy routine)\n"
+              << "       [--profile-copy-callers] (rank copy callers by bytes and count)\n"
               << "       [--fast-copy] (experimental host acceleration of large guest copies)\n"
+              << "       [--fast-copy-vga] (also accelerate copies into the banked VGA RAM window)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
               << " [--aspect-ratio 4:3|native|stretch] [--smooth-scaling]\n"
               << "       --instruction-limit 0 means unlimited (window default)\n"
@@ -2213,8 +2286,12 @@ int main(int argc, char** argv) {
                 performance.profile = performance.hot_blocks = true;
             } else if (!std::strcmp(argv[i], "--profile-copy")) {
                 performance.profile = performance.profile_copy = true;
+            } else if (!std::strcmp(argv[i], "--profile-copy-callers")) {
+                performance.profile = performance.profile_copy = performance.profile_copy_callers = true;
             } else if (!std::strcmp(argv[i], "--fast-copy")) {
                 performance.fast_copy = true;
+            } else if (!std::strcmp(argv[i], "--fast-copy-vga")) {
+                performance.fast_copy = performance.fast_copy_vga = true;
             } else if (!std::strcmp(argv[i], "--game-dir") && i + 1 < argc) {
                 game_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--cd-dir") && i + 1 < argc) {
@@ -2428,6 +2505,14 @@ int main(int argc, char** argv) {
             constexpr uint32_t copy_call_offset = 32;
             put32(copy_guest, copy_call_offset + 1,
                   COPY_ENTRY - (ENTRY + copy_call_offset + 5));
+            if (performance.fast_copy_vga) {
+                // Retarget the same guest ABI and first/last-byte assertions
+                // to the 64 KiB banked VGA RAM window rather than guest data.
+                put32(copy_guest, 18, VGA_COPY_BASE);
+                put32(copy_guest, 38, VGA_COPY_BASE + 1024);
+                put32(copy_guest, 93, VGA_COPY_BASE);
+                put32(copy_guest, 107, VGA_COPY_BASE + 1020);
+            }
             if (self_test_bda)
                 std::copy(std::begin(bda_guest), std::end(bda_guest), image.begin() + ENTRY);
             else if (self_test_clock)

@@ -69,6 +69,20 @@ The original memory-copy routine starts at `0xe9a24`. The existing
 case for checking decompiler output against observed EAX/EDX, RET `0Ch`, and
 stack behavior.
 
+To correlate individual copy callers with the C++ backend's
+`--profile-copy-callers` output, run:
+
+```sh
+python3 tools/ghidra_ef2000.py copy-callers
+```
+
+This writes `local/ghidra/copy-callers.tsv`, with each call instruction's
+guest offset, its post-CALL **return IP**, and Ghidra's containing function.
+Join `copy_caller: ret=0x...` with the `return_ip` column. The map includes
+direct calls to `0xe9a24` and *candidate* indirect calls through the graphics
+copy-function slot at `0x41f3d0`; the latter are not proven to call memcpy
+without matching runtime samples. Ghidra may omit further indirect calls.
+
 ## Interpretation limits
 
 - The initialized payload mixes code and data; static function recovery can

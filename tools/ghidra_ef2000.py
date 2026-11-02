@@ -134,10 +134,36 @@ def decompile(args):
     print(f'Decompilation: {output}')
 
 
+def copy_callers(args):
+    """Export direct copy callsites with their post-CALL guest return IPs."""
+    workspace = args.workspace.resolve()
+    image_path = workspace / IMAGE_NAME
+    manifest_path = workspace / 'manifest.json'
+    project_path = workspace / 'projects' / (PROJECT_NAME + '.gpr')
+    if not image_path.is_file() or not manifest_path.is_file() or not project_path.is_file():
+        raise ValueError('no imported project; run the import command first')
+    manifest = json.loads(manifest_path.read_text())
+    if (manifest['protected_image']['initialized_range'] != [0, IMAGE_SIZE] or
+            manifest['protected_image']['payload_sha256'] !=
+            hashlib.sha256(image_path.read_bytes()).hexdigest()):
+        raise ValueError('imported image does not match its extraction manifest')
+    output = (args.output or workspace / 'copy-callers.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous_time = output.stat().st_mtime_ns if output.exists() else -1
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis',
+        '-postScript', 'EF2000CopyCallers.java', str(output),
+    ]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
+        raise ValueError('Ghidra returned without a fresh copy-caller map')
+    print(f'Copy callers: {output}')
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest='command', required=True)
-    for name in ('import', 'decompile'):
+    for name in ('import', 'decompile', 'copy-callers'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=ROOT / 'local/ghidra',
                          help='ignored Ghidra project and image workspace')
@@ -147,9 +173,11 @@ def main(argv=None):
     dec = subparsers.choices['decompile']
     dec.add_argument('offsets', nargs='+', type=guest_offset, help='guest offsets, e.g. 0xe9a24')
     dec.add_argument('--output', type=Path, help='decompiled C files (default: workspace/decompiled)')
+    callers = subparsers.choices['copy-callers']
+    callers.add_argument('--output', type=Path, help='TSV output (default: workspace/copy-callers.tsv)')
     args = parser.parse_args(argv)
     try:
-        (import_image if args.command == 'import' else decompile)(args)
+        {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'ghidra_ef2000: {error}\n')
 

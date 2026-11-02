@@ -115,6 +115,35 @@ class GhidraWorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'without fresh decompilation'):
                 ghidra.decompile(args)
 
+    def test_copy_callers_uses_the_imported_project(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-noanalysis', command)
+            self.assertIn('EF2000CopyCallers.java', command)
+            (self.workspace / 'copy-callers.tsv').write_text('call_site\treturn_ip\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.copy_callers(args)
+
+    def test_copy_callers_refuses_modified_image(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(b'invalid')
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None)
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'does not match'):
+                ghidra.copy_callers(args)
+            run.assert_not_called()
+
     def test_guest_offsets_are_within_initialized_image(self):
         self.assertEqual(ghidra.guest_offset('0xe9a24'), 0xe9a24)
         for text in ('-1', '0x195fb0', 'not-an-address'):

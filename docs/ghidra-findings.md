@@ -64,9 +64,50 @@ then 8-byte and byte tails. Direct disassembly verifies:
 
 Ghidra found **23 direct call references** to `0xe9a24` in this static image;
 the list is incomplete for indirect calls and is *not* a frequency profile.
+The copy-caller map additionally finds two callsites using the writable
+graphics dispatch slot at `0x41f3d0`: `0xc3dc0` and `0xc3f38`. A live guest
+profile verifies that both dispatched to the memcpy routine in the observed
+startup run; their respective return IPs are `0xc3dc6` and `0xc3f3e`.
 The earlier Unicorn sampling put 23.3% of sampled blocks at `0xe9a3a` during
 one startup run. This supports studying the callers' byte counts and buffers,
 but does not establish a sustained FPS improvement from `--fast-copy`.
+
+### Real-game per-caller measurements
+
+The C++ headless backend was built against Unicorn 2.1.3 and run for 12 wall
+seconds with the supplied original game installation, SB16 DMA enabled,
+`--profile-copy-callers`, and `--profile-hot-blocks`. Without either copy
+acceleration option, it counted **154,811** memcpy calls moving **816,738,410**
+bytes. The three leading callsites accounted for **99.35%** of those bytes:
+
+| Guest return IP | Calls | Bytes | Interpretation |
+| --- | ---: | ---: | --- |
+| `0xc3dc6` | 6,072 | 388,614,144 | Indirect chunked transfer into the banked VGA memory window |
+| `0xc3f3e` | 3,304 | 211,456,000 | Indirect transfer of a 64,000-byte frame into VGA memory |
+| `0xc3886` | 3,299 | 211,328,000 | Direct copy of the main graphics buffer |
+
+The first two are invisible to a search for direct calls to `0xe9a24`.
+They call through `[0x41f3d0]`, as verified by disassembly. The previously
+implemented `--fast-copy` handles the third site, but its conservative data
+range excludes destination addresses in DOS/VGA RAM.
+
+This led to a separate, **opt-in** `--fast-copy-vga` extension. It permits a
+host copy only when the entire destination lies inside the mapped VGA
+`[DOS_BASE+0xa0000, DOS_BASE+0xb0000)` bank and all other existing fast-copy
+guards (source range, minimum size, flat DS, non-overlap, return address)
+hold. It implies `--fast-copy`; the existing flag alone keeps its former
+eligibility rules. There is no memory-mapped I/O write callback for that bank:
+the VBE implementation captures its contents via `uc_mem_read`.
+
+In a second 12-second run with `--fast-copy-vga`, **460,911** VGA-window
+copies totaling **29,498,305,536** bytes took the new path, while **344,325**
+ordinary large copies also took the previous path. The workload subsequently
+spent many more iterations drawing; raw interrupt and byte totals are thus
+**not comparable as FPS measurements**. Both the original `--fast-copy` and
+new VGA mode produced byte-identical **640×400** menu-frame captures in
+separate eight-second SB16 runs (PPM SHA-256
+`fef5340cabcbe7356bb52225fa4508e9cd12d0f49f480d6fd646e6b78d4f9d73`).
+That verifies one rendered menu state, not game-wide correctness or frame pacing.
 
 ## Reproduce and extend
 
@@ -78,11 +119,11 @@ python3 tools/ghidra_ef2000.py decompile \
   0xe9a24 0x8b274 0x9d524 0x8b39c 0xea270 0xaaee8
 ```
 
-Next useful investigations are (1) classifying the 23 direct copy callsites
-by sizes and runtime frequency, (2) tracing which clump files and records
-feed the cockpit/loading path, and (3) matching `0xaaee8`'s repeating calls
-with menu and in-flight traces. Treat every unverified Ghidra function
-signature as a hypothesis until checked against the Watcom register ABI.
+Next useful investigations are (1) checking the VGA fast path in actual
+windowed gameplay and measuring FPS/frame pacing, (2) tracing which clump
+files and records feed the cockpit/loading path, and (3) matching `0xaaee8`'s
+repeating calls with menu and in-flight traces. Treat every unverified Ghidra
+function signature as a hypothesis until checked against the Watcom register ABI.
 
 See [ghidra.md](ghidra.md), [startup-symbols.md](startup-symbols.md), and
 [execution-probes.md](execution-probes.md) for workflow and earlier evidence.
