@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import struct
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -221,13 +222,13 @@ class GhidraWorkflowTests(unittest.TestCase):
         (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
         args = argparse.Namespace(workspace=self.workspace,
                                   analyze_headless=self.launcher, output=None,
-                                  apply=False, max=0)
+                                  apply=False, max=0, tier='strict')
 
         def fake_ghidra(command, check):
             self.assertTrue(check)
             self.assertIn('-noanalysis', command)
-            self.assertEqual(command[-3:], [str(self.workspace / 'recovery-candidates.tsv'),
-                                            'report', '0'])
+            self.assertEqual(command[-4:], [str(self.workspace / 'recovery-candidates.tsv'),
+                                            'report', '0', 'strict'])
             (self.workspace / 'recovery-candidates.tsv').write_text(
                 'entry\treason\tfirst_instruction\tjump_refs\tcall_refs\tdata_refs\t'
                 'confidence\tresult\n'
@@ -240,7 +241,7 @@ class GhidraWorkflowTests(unittest.TestCase):
     def test_recover_orphans_requires_explicit_apply_for_mutation(self):
         args = argparse.Namespace(workspace=self.workspace,
                                   analyze_headless=self.launcher, output=None,
-                                  apply=False, max=25)
+                                  apply=False, max=25, tier='strict')
         with patch.object(ghidra.subprocess, 'run') as run:
             with self.assertRaisesRegex(ValueError, '--max requires --apply'):
                 ghidra.recover_orphans(args)
@@ -253,12 +254,12 @@ class GhidraWorkflowTests(unittest.TestCase):
         (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
         args = argparse.Namespace(workspace=self.workspace,
                                   analyze_headless=self.launcher, output=None,
-                                  apply=True, max=25)
+                                  apply=True, max=25, tier='table')
 
         def fake_ghidra(command, check):
             self.assertTrue(check)
-            self.assertEqual(command[-3:], [str(self.workspace / 'recovery-candidates.tsv'),
-                                            'apply', '25'])
+            self.assertEqual(command[-4:], [str(self.workspace / 'recovery-candidates.tsv'),
+                                            'apply', '25', 'table'])
             (self.workspace / 'recovery-candidates.tsv').write_text(
                 'entry\treason\tfirst_instruction\tjump_refs\tcall_refs\tdata_refs\t'
                 'confidence\tresult\n'
@@ -275,11 +276,68 @@ class GhidraWorkflowTests(unittest.TestCase):
         (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
         args = argparse.Namespace(workspace=self.workspace,
                                   analyze_headless=self.launcher, output=None,
-                                  apply=True, max=10)
+                                  apply=True, max=10, tier='strict')
         with patch.object(ghidra.subprocess, 'run') as run:
             with self.assertRaisesRegex(ValueError, 'without a fresh orphan-recovery report'):
                 ghidra.recover_orphans(args)
             run.assert_called_once()
+
+    def test_callback_tables_requires_inventory_and_writes_verified_names(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        self.workspace.joinpath('payload.bin').write_bytes(self.image)
+        self.workspace.joinpath('manifest.json').write_text(json.dumps(self.manifest))
+        export = self.workspace / 'full-export'
+        export.mkdir()
+        (export / 'functions.tsv').write_text('entry\tname\n0x00003000\tFUN_00003000\n'
+                                              '0x00003020\tFUN_00003020\n')
+        # Unlike the real image, our synthetic fixture needs a string area.
+        image = bytearray(self.image)
+        for index, name in enumerate(('ClickStart', 'ClickStop', 'ClickPause', 'ClickNext')):
+            address = 0x170100 + index * 24
+            image[address:address + len(name) + 1] = name.encode() + b'\0'
+            struct.pack_into('<II', image, 0x120100 + index * 8,
+                             0x3000 + index * 0x20, address)
+        self.workspace.joinpath('payload.bin').write_bytes(image)
+        self.manifest['protected_image']['payload_sha256'] = hashlib.sha256(image).hexdigest()
+        self.workspace.joinpath('manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, functions=None, output=None)
+        ghidra.callback_tables(args)
+        output = self.workspace.joinpath('callback-tables.tsv').read_text()
+        self.assertIn('ClickStart\tyes', output)
+        self.assertIn('ClickNext\tno', output)
+
+    def test_name_callbacks_reports_by_default_and_checks_fresh_output(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        self.workspace.joinpath('payload.bin').write_bytes(self.image)
+        self.workspace.joinpath('manifest.json').write_text(json.dumps(self.manifest))
+        (self.workspace / 'callback-tables.tsv').write_text('test evidence')
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False, promote_thunks=False)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('EF2000NameCallbacks.java', command)
+            self.assertEqual(command[-2:], ['report', 'names'])
+            (self.workspace / 'callback-names.tsv').write_text(
+                'handler\tname\tresult\n0x00003000\tClickStart\tproposed\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.name_callbacks(args)
+        args.apply = True
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'without a fresh callback-naming report'):
+                ghidra.name_callbacks(args)
+            self.assertEqual(run.call_args.args[0][-2:], ['apply', 'names'])
+
+    def test_name_callbacks_requires_apply_to_create_jump_stubs(self):
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False, promote_thunks=True)
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, '--promote-thunks requires --apply'):
+                ghidra.name_callbacks(args)
+            run.assert_not_called()
 
     def test_guest_offsets_are_within_initialized_image(self):
         self.assertEqual(ghidra.guest_offset('0xe9a24'), 0xe9a24)

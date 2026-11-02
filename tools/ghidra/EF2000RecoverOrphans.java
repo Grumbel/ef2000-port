@@ -23,8 +23,9 @@ public class EF2000RecoverOrphans extends GhidraScript {
     @Override
     protected void run() throws Exception {
         String[] args = getScriptArgs();
-        if (args.length != 3) {
-            throw new IllegalArgumentException("expected report path, report|apply, max promotions (0=all)");
+        if (args.length != 4) {
+            throw new IllegalArgumentException(
+                "expected report path, report|apply, max promotions (0=all), strict|table");
         }
         if (!currentProgram.getLanguageID().toString().equals("x86:LE:32:default") ||
                 currentProgram.getMemory().getBlock(toAddr(IMAGE_END - 1)) == null) {
@@ -36,6 +37,10 @@ public class EF2000RecoverOrphans extends GhidraScript {
         }
         int maximum = Integer.parseInt(args[2]);
         if (maximum < 0) throw new IllegalArgumentException("negative max promotions");
+        String tier = args[3];
+        if (!tier.equals("strict") && !tier.equals("table")) {
+            throw new IllegalArgumentException("expected strict or table tier");
+        }
         Path output = Paths.get(args[0]);
         Files.createDirectories(output.getParent());
 
@@ -58,11 +63,19 @@ public class EF2000RecoverOrphans extends GhidraScript {
                 previous.getAddress().getOffset() + previous.getLength() == address.getOffset();
             if (rangeStart || afterReturn) {
                 int jumps = 0, calls = 0, data = 0;
+                boolean alignedTableRef = false;
                 StringBuilder examples = new StringBuilder();
                 for (Reference reference : getReferencesTo(address)) {
                     if (reference.getReferenceType().isJump()) ++jumps;
                     else if (reference.getReferenceType().isCall()) ++calls;
-                    else ++data;
+                    else {
+                        ++data;
+                        long from = reference.getFromAddress().getOffset();
+                        if (reference.getReferenceType().isData() && inImage(reference.getFromAddress()) &&
+                                from >= 0x110000 && (from & 3) == 0) {
+                            alignedTableRef = true;
+                        }
+                    }
                     if (examples.length() < 200) {
                         if (examples.length() > 0) examples.append(",");
                         examples.append(String.format("0x%08x:%s", reference.getFromAddress().getOffset(),
@@ -70,10 +83,20 @@ public class EF2000RecoverOrphans extends GhidraScript {
                     }
                 }
                 boolean prologue = isPrologue(instruction);
-                boolean strong = prologue && (jumps > 0 || calls > 0 || data > 0);
+                String confidence = prologue && (jumps > 0 || calls > 0 || data > 0) ?
+                    "strong_reference_and_prologue" : "weak";
+                if (confidence.equals("weak") && tier.equals("table") && alignedTableRef &&
+                        (address.getOffset() & 3) == 0 && isVolatilePush(instruction)) {
+                    // Watcom can use EDX/ECX/EAX as register parameters, so
+                    // these may be callback entry points even though the
+                    // first PUSH is not a conventional saved-register prologue.
+                    // Require an aligned source inside the initialized data
+                    // area to avoid arbitrary branch labels and bad disassembly.
+                    confidence = "aligned_table_reference_and_push";
+                }
                 candidates.add(new Candidate(address, rangeStart ? "range_start" : "after_return",
                                              instruction.toString(), jumps, calls, data,
-                                             examples.toString(), strong));
+                                             examples.toString(), confidence));
             }
             orphanEnd = unassigned ? address.getOffset() + instruction.getLength() : -1;
             previous = instruction;
@@ -84,9 +107,9 @@ public class EF2000RecoverOrphans extends GhidraScript {
         rows.add("entry\treason\tfirst_instruction\tjump_refs\tcall_refs\tdata_refs\tconfidence\tresult\txref_examples");
         for (Candidate candidate : candidates) {
             monitor.checkCancelled();
-            if (candidate.strong) ++strongCount;
+            if (!candidate.confidence.equals("weak")) ++strongCount;
             String result = "not_selected";
-            if (candidate.strong) {
+            if (!candidate.confidence.equals("weak")) {
                 result = "proposed";
                 if (apply) {
                     if (maximum > 0 && promoted >= maximum) {
@@ -117,7 +140,7 @@ public class EF2000RecoverOrphans extends GhidraScript {
             rows.add(String.format("0x%08x\t%s\t%s\t%d\t%d\t%d\t%s\t%s\t%s",
                 candidate.address.getOffset(), candidate.reason, clean(candidate.firstInstruction),
                 candidate.jumps, candidate.calls, candidate.data,
-                candidate.strong ? "strong_reference_and_prologue" : "weak", result,
+                candidate.confidence, result,
                 candidate.xrefs));
         }
         Files.writeString(output, String.join("\n", rows) + "\n", StandardCharsets.UTF_8);
@@ -138,18 +161,22 @@ public class EF2000RecoverOrphans extends GhidraScript {
                text.startsWith("SUB ESP,") || text.startsWith("ENTER ");
     }
 
+    private boolean isVolatilePush(Instruction instruction) {
+        String text = instruction.toString();
+        return text.equals("PUSH EAX") || text.equals("PUSH ECX") || text.equals("PUSH EDX");
+    }
+
     private String clean(String text) {
         return text.replace('\t', ' ').replace('\n', ' ').replace('\r', ' ');
     }
 
     private static class Candidate {
         final Address address;
-        final String reason, firstInstruction, xrefs;
+        final String reason, firstInstruction, xrefs, confidence;
         final int jumps, calls, data;
-        final boolean strong;
 
         Candidate(Address address, String reason, String firstInstruction,
-                  int jumps, int calls, int data, String xrefs, boolean strong) {
+                  int jumps, int calls, int data, String xrefs, String confidence) {
             this.address = address;
             this.reason = reason;
             this.firstInstruction = firstInstruction;
@@ -157,7 +184,7 @@ public class EF2000RecoverOrphans extends GhidraScript {
             this.calls = calls;
             this.data = data;
             this.xrefs = xrefs;
-            this.strong = strong;
+            this.confidence = confidence;
         }
     }
 }

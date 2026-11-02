@@ -216,3 +216,62 @@ parameter/return types are still common under the generic x86 calling
 convention. The next round should examine the remaining 437 orphan ranges,
 recover additional indirect dispatch tables, and start applying verified
 Watcom calling conventions and meaningful subsystem names.
+
+## Callback-table recovery and original names (bundle #043)
+
+The remaining orphan candidates included functions with volatile-register
+entry sequences, such as `PUSH EDX`, referenced through aligned tables in
+initialized memory. A second, opt-in `recover-orphans --tier table` Ghidra pass
+promoted 34 additional functions on a disposable recovery-project copy. All
+34 decompiled into pseudo-C. The default saved-register tier was left intact.
+
+Further byte-level examination revealed a dense GUI callback table starting
+at guest offset `0x12b4c8`. Each eight-byte record holds a handler address
+and a pointer to its name in the payload's string section. For example:
+
+| Table slot | Handler | Embedded name |
+| --- | --- | --- |
+| `0x12b4d0` | `0x84afc` | `guiClosedownHelp` |
+| `0x12b4d8` | `0x84b04` | `UpdateMagnify` |
+| `0x12b900` | `0xbe48` | `gpwClickPilot2` |
+| `0x12b918` | `0xbf24` | `gpwSaveConflict` |
+
+The same eight-byte pattern occurs in unrelated tables, including pilot
+callsigns and enum strings; **most matching byte patterns are not callback
+tables**. The new extractor corroborates the contents against Ghidra's
+existing exact function entries. Four tables pass this check, together
+containing 308 name slots. Of those, 188 distinct names could be safely
+applied to already discovered auto-named functions. Repeated names, handlers
+used by multiple names, and unrecognized function entries are reported and
+left unchanged by the initial pass.
+
+Of the remaining handler addresses, some are unassigned five-byte `JMP rel32`
+stubs that transfer control to recognized functions. An **explicit optional**
+`name-callbacks --apply --promote-thunks` pass promoted 28 of these in the
+same disposable Ghidra project and assigned their names, yielding 216 distinct
+original callback names in total. For example, `0x84bd4` is now identified as
+the `InitCampaign` callback thunk into the previously recovered `0x5630`
+routine. Its decompilation shows the underlying campaign-configuration
+logic. Targets inside existing bodies are never promoted merely because
+they appear in the table; the script requires a decoded standalone direct
+jump and an existing destination function.
+
+The final full decompilation in Ghidra 11.4.2 / JDK 21 yielded:
+
+| Measurement | After #042 | After #043 |
+| --- | ---: | ---: |
+| Recognized functions | 4,077 | **4,139** |
+| Exported pseudo-C functions | 4,069 | **4,131** |
+| Assembly-only fallback functions | 8 | **8** |
+| Disassembled instruction bytes outside functions | 49,313 | **47,320** |
+| Separate unassigned ranges | 437 | **378** |
+| Candidate entries in remaining ranges | 785 | **713** |
+
+The new boundaries represent 1,993 bytes of previously unassigned
+instructions. Named thunks can share underlying decompiled logic with their
+targets and must not be counted as independent recovered source routines.
+**This is still not a complete or verified original-source reconstruction**:
+the unresolved ranges, eight assembly fallbacks, indirect calls, data types,
+and Watcom register ABI need further work. The local generated C and Ghidra
+database are ignored; only the tools, tests and analysis documentation are
+included in the cumulative git bundle.

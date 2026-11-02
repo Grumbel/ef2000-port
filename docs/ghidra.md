@@ -137,6 +137,79 @@ failures. The disassembled bytes outside recognized functions fell from
 all remaining bytes are executable code or that every recovered boundary is
 correct. See [the findings](ghidra-findings.md) for examples.
 
+### Optional aligned callback-table recovery
+
+Some real callback entries start with `PUSH EDX`/`PUSH ECX` instead of a
+conventional saved-register prologue. `--tier table` extends the candidate
+check only for a four-byte-aligned entry pointed to from an aligned data-table
+slot in the higher initialized image. The default **remains `strict`**.
+
+```sh
+python3 tools/ghidra_ef2000.py recover-orphans --tier table
+# Inspect the generated TSV; on a disposable workspace only:
+python3 tools/ghidra_ef2000.py recover-orphans \
+  --workspace local/ghidra-recovery --tier table --apply
+```
+
+On the existing 4,077-function recovery project, this optional rule recovered
+34 more functions and exported pseudo-C for each. The 4,111-function result
+still has eight decompiler failures and 47,460 disassembled instruction bytes
+outside recognized functions. Promotion does not imply verified function
+types, entry boundaries or ABI semantics.
+
+## Recover original callback names from dispatch tables
+
+The game embeds data records consisting of a 32-bit guest handler address
+followed by a pointer to its zero-terminated name. Some other tables have the
+*same layout*, but contain enum or pilot-name data instead of function
+pointers. To avoid mistaking those records for callback evidence, first
+generate Ghidra's function inventory and require substantial exact function
+entry matches in each candidate table:
+
+```sh
+python3 tools/ghidra_ef2000.py inventory
+python3 tools/ghidra_ef2000.py callback-tables
+python3 tools/ghidra_ef2000.py name-callbacks
+```
+
+`callback-tables.tsv` lists each table offset, slot, handler address, string
+pointer, callback name and whether Ghidra already recognizes the entry as a
+function. `name-callbacks` is **report-only by default**, writing
+`callback-names.tsv` with the result for each slot. Both files stay under the
+ignored Ghidra workspace. The importer SHA-checks the initialized image;
+the naming Ghidra script independently verifies every referenced pointer and
+name against that image before applying anything.
+
+Once reviewed, on a **disposable copy** of the project:
+
+```sh
+python3 tools/ghidra_ef2000.py name-callbacks \
+  --workspace local/ghidra-recovery --apply
+# Experimental: also promote only E9 rel32 callback trampolines to verified
+# existing function bodies. Requires explicit opt-in to create functions.
+python3 tools/ghidra_ef2000.py name-callbacks \
+  --workspace local/ghidra-recovery --apply --promote-thunks
+python3 tools/ghidra_ef2000.py export-all \
+  --workspace local/ghidra-recovery --overwrite
+```
+
+The name script skips handlers shared by different names, names shared by
+different handlers, missing function entries, and previously assigned manual
+names. It creates **no functions** unless `--promote-thunks` is specified.
+That optional tier accepts only an unassigned five-byte `JMP rel32` entry
+whose destination already lies inside a recognized function. Neither names
+nor exported pseudo-C are original source code: Watcom calling conventions,
+aliasing, data types and control flow still require manual verification.
+
+Ghidra 11.4.2 analysis of a copied 4,111-function project identified four
+corroborated callback tables with **308 named slots**. Without thunk creation,
+188 distinct names were assigned to existing auto-named functions. The
+remaining entries included shared aliases and orphan/jump-table targets;
+the original manual names were retained. The optional guarded thunk tier
+created another 28 functions and assigned 28 further names (216 names in
+total). The final re-export found **4,139 functions, 4,131 pseudo-C files**
+and the same eight assembly fallbacks. See [the findings](ghidra-findings.md).
+
 ## Export selected functions
 
 ```sh

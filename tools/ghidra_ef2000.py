@@ -19,8 +19,10 @@ import subprocess
 
 try:
     from .extract_image import extract
+    from .ef2000_callbacks import find_tables, select_function_tables
 except ImportError:
     from extract_image import extract
+    from ef2000_callbacks import find_tables, select_function_tables
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -208,7 +210,7 @@ def recover_orphans(args):
     command = project_args(workspace, headless_path(args.analyze_headless)) + [
         '-process', IMAGE_NAME, '-noanalysis',
         '-postScript', 'EF2000RecoverOrphans.java', str(output),
-        'apply' if args.apply else 'report', str(args.max),
+        'apply' if args.apply else 'report', str(args.max), args.tier,
     ]
     subprocess.run(command, check=True)
     if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
@@ -217,18 +219,80 @@ def recover_orphans(args):
         rows = list(csv.DictReader(stream, delimiter='\t'))
     if not rows or not {'entry', 'confidence', 'result'} <= set(rows[0]):
         raise ValueError('Ghidra returned an invalid orphan-recovery report')
-    strong = sum(row['confidence'] == 'strong_reference_and_prologue' for row in rows)
+    strong = sum(row['confidence'] in ('strong_reference_and_prologue',
+                                     'aligned_table_reference_and_push') for row in rows)
     created = sum(row['result'] == 'created' for row in rows)
     failed = sum(row['result'] == 'create_failed' for row in rows)
     print(f'Ghidra orphan recovery: {len(rows)} candidates, {strong} reference/prologue '
           f'matches, {created} created, {failed} failed; output: {output}')
 
 
+def callback_tables(args):
+    """Extract only name tables backed by the Ghidra function inventory."""
+    workspace = validated_workspace(args.workspace)
+    functions_path = (args.functions or workspace / 'full-export/functions.tsv').resolve()
+    with functions_path.open(newline='') as stream:
+        inventory = list(csv.DictReader(stream, delimiter='\t'))
+    if not inventory or not {'entry', 'name'} <= set(inventory[0]):
+        raise ValueError('expected Ghidra functions.tsv; run inventory first')
+    function_entries = {int(row['entry'], 16) for row in inventory}
+    tables = select_function_tables(find_tables((workspace / IMAGE_NAME).read_bytes()),
+                                    function_entries)
+    if not tables:
+        raise ValueError('no callback tables corroborated by the supplied function inventory')
+    output = (args.output or workspace / 'callback-tables.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with output.open('w', newline='') as stream:
+        writer = csv.writer(stream, delimiter='\t', lineterminator='\n')
+        writer.writerow(('table_start', 'slot', 'handler', 'string_ptr', 'name', 'known_function'))
+        for start, rows in tables:
+            for slot, handler, string_ptr, name in rows:
+                writer.writerow((f'0x{start:08x}', f'0x{slot:08x}', f'0x{handler:08x}',
+                                 f'0x{string_ptr:08x}', name,
+                                 'yes' if handler in function_entries else 'no'))
+    count = sum(len(rows) for _, rows in tables)
+    print(f'Named callback tables: {len(tables)} corroborated tables, {count} named slots; '
+          f'output: {output}')
+
+
+def name_callbacks(args):
+    """Audit or explicitly apply unique callback names to existing functions."""
+    if args.promote_thunks and not args.apply:
+        raise ValueError('--promote-thunks requires --apply')
+    workspace = validated_workspace(args.workspace)
+    input_path = (workspace / 'callback-tables.tsv').resolve()
+    output = (args.output or workspace / 'callback-names.tsv').resolve()
+    if not input_path.is_file():
+        raise ValueError('no callback-tables.tsv; run callback-tables first')
+    # The Ghidra script independently checks every pointer and name against
+    # the pinned imported image before applying symbols.
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous_time = output.stat().st_mtime_ns if output.exists() else -1
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis',
+        '-postScript', 'EF2000NameCallbacks.java', str(input_path), str(output),
+        'apply' if args.apply else 'report',
+        'thunks' if args.promote_thunks else 'names',
+    ]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
+        raise ValueError('Ghidra returned without a fresh callback-naming report')
+    with output.open(newline='') as stream:
+        rows = list(csv.DictReader(stream, delimiter='\t'))
+    if not rows or not {'handler', 'name', 'result'} <= set(rows[0]):
+        raise ValueError('Ghidra returned an invalid callback-naming report')
+    changed = sum(row['result'] in ('renamed', 'created_named_thunk') for row in rows)
+    created = sum(row['result'] in ('created_named_thunk', 'created_unnamed_thunk')
+                  for row in rows)
+    print(f'Ghidra named callbacks: {len(rows)} slots, {changed} names applied, '
+          f'{created} new thunks; output: {output}')
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest='command', required=True)
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
-                 'recover-orphans'):
+                 'recover-orphans', 'callback-tables', 'name-callbacks'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=ROOT / 'local/ghidra',
                          help='ignored Ghidra project and image workspace')
@@ -256,11 +320,26 @@ def main(argv=None):
                           help='modify the Ghidra project; default only reports candidates')
     recovery.add_argument('--max', type=nonnegative_int, default=0,
                           help='maximum promotions per run (0 means all; only for --apply)')
+    recovery.add_argument('--tier', choices=('strict', 'table'), default='strict',
+                          help='strict saved-register prologues or opt-in aligned-table volatile-register pushes')
+    callback = subparsers.choices['callback-tables']
+    callback.add_argument('--functions', type=Path,
+                          help='Ghidra functions.tsv (default: workspace/full-export/functions.tsv)')
+    callback.add_argument('--output', type=Path,
+                          help='output TSV (default: workspace/callback-tables.tsv)')
+    names = subparsers.choices['name-callbacks']
+    names.add_argument('--output', type=Path,
+                       help='audit TSV (default: workspace/callback-names.tsv)')
+    names.add_argument('--apply', action='store_true',
+                       help='rename existing unambiguous auto-named functions')
+    names.add_argument('--promote-thunks', action='store_true',
+                       help='with --apply, also create missing 5-byte direct-JMP callback stubs')
     args = parser.parse_args(argv)
     try:
         {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,
          'inventory': export_all, 'export-all': export_all,
-         'recover-orphans': recover_orphans}[args.command](args)
+         'recover-orphans': recover_orphans, 'callback-tables': callback_tables,
+         'name-callbacks': name_callbacks}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'ghidra_ef2000: {error}\n')
 
