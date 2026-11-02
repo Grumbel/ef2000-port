@@ -99,6 +99,9 @@
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/wav_capture_test.cpp runtime/wav_capture.cpp \
             -o objects/ef2000-wav-capture-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/ef2000_highscores_test.cpp runtime/ef2000_highscores.cpp \
+            -o objects/ef2000-highscores-test
           runHook postBuild
         '';
 
@@ -131,6 +134,7 @@
           objects/ef2000-sound-blaster-test
           objects/ef2000-pcm-audio-test
           objects/ef2000-wav-capture-test
+          objects/ef2000-highscores-test
           runHook postCheck
         '';
 
@@ -302,6 +306,16 @@
           cd ${source}
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests \
             -p 'test_ghidra*.py' -q
+        '';
+        highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {
+          nativeBuildInputs = [ pkgs.stdenv.cc ];
+        } ''
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            ${source}/tests/ef2000_highscores_test.cpp \
+            ${source}/runtime/ef2000_highscores.cpp \
+            -o ef2000-highscores-test
+          ./ef2000-highscores-test
+          touch "$out"
         '';
         windows-layout = pkgs.runCommand "ef2000-windows-layout-check" {
           nativeBuildInputs = [ pkgs.file ];

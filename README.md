@@ -367,6 +367,8 @@ startup comparison saw 93 changed images in ten seconds with either copy
 path despite much higher guest-copy throughput with `--fast-copy-vga`.
 See [Ghidra findings](docs/ghidra-findings.md) and
 [execution probes](docs/execution-probes.md).
+The first standalone typed original-game C++ model now covers
+[high-score records, insertion, defaults and file checksums](docs/highscores-reconstruction.md).
 A separate `--tcg-cache-mib N` option allows testing smaller Unicorn translated-code
 caches (32..1024 MiB), especially for 32-bit Windows; size alone did not
 produce a repeatable speed improvement on the Linux reference host.

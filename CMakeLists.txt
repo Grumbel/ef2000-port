@@ -181,3 +181,11 @@ add_executable(ef2000-wav-capture-test tests/wav_capture_test.cpp runtime/wav_ca
 target_compile_features(ef2000-wav-capture-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-wav-capture-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME wav-capture COMMAND ef2000-wav-capture-test)
+
+# First typed original-game logic reconstruction; deliberately asset-free and
+# independent of the Unicorn and SDL runtimes.
+add_executable(ef2000-highscores-test tests/ef2000_highscores_test.cpp
+                                    runtime/ef2000_highscores.cpp)
+target_compile_features(ef2000-highscores-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-highscores-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME highscores-reconstruction COMMAND ef2000-highscores-test)

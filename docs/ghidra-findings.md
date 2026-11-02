@@ -879,7 +879,7 @@ The first four seed neighborhoods yielded actionable high-score/arcade leads:
 
 | Seed | Closely related original routines | Independent evidence |
 | --- | --- | --- |
-| `0x4050` (score lookup) | `0x40dc`, `0x433c` (score insertion) | Shared exact references to `0x1970a4`, `0x1970b8`, `0x1970b9` |
+| `0x4050` (default score generation) | `0x40dc`, `0x433c` (score insertion) | Shared exact references to `0x1970a4`, `0x1970b8`, `0x1970b9` |
 | `0x433c` (insertion) | `0x487c`, `0x40dc`, `0x432c` | Exact score-table globals and a direct CALL from `0x487c` |
 | `0x4aa0` (arcade/save path) | `gpwAcceptHiscore` (`0x4d4c`), `gpwMissionSelected` (`0x7c328`), `gpwChangeDifficulty` (`0x4cf4`) | Shared UI/save-state globals, including `0x121e44` and `0x1f8fc8` |
 | `kotsInitKOTS` (`0x4b54`) | `InitArcade` (`0x4c50`), `0x487c` | Shared callees and an actual conditional JUMP at `0x4b6b` into `0x487c` |
@@ -895,3 +895,35 @@ Regenerate the local reports with `ef2000-ghidra function-facts` followed by
 inventory). See [the workflow](ghidra.md) for file formats, scoring limitations
 and command options. All four fact TSVs, group reports, original executable,
 Ghidra project and pseudo-C remain local ignored research data.
+
+## #058: First typed native high-score logic reconstruction
+
+Following the high-score neighborhood identified by #057, the instructions
+at `0x4050`, `0x41fc`, `0x42a4`, `0x432c`, `0x433c` and `0x9d749` have
+been translated into an asset-free C++17 state model. It uses the actual
+packed structure: ten 25-byte score records (20-byte name, one-byte
+difficulty, four-byte LE score) starting at `0x1970a4`, preceded by the
+current-score dword at `0x1970a0`.
+
+The comparison at `0x432c` is strictly greater than the tenth entry's
+score, but insertion at `0x433c` admits ties. The guest `strcpy` used when
+shifting names only copies through the NUL, leaving destination padding
+untouched. The signed `DEC`/`JLE` comparison also has a defined 32-bit
+wraparound edge when the stored score equals `INT_MIN`; the native model
+preserves it.
+
+The save (`0x42a4`) and load (`0x41fc`) checksum loops expose a previously
+unnoticed original bug: the byte pointer in `EBX` never increments. Both
+loops visit the **first** table byte 250 times. The four-byte checksum
+depends only on the first character of the first player name, so corruption
+elsewhere passes this check. The native serializer/deserializer deliberately
+preserve that behavior.
+
+The module includes deterministic default-generation from injected original
+template scores, a selectable 48-name pool, and a 16-bit random-number source.
+Original RNG seeding, DOS file-open behavior and `0x40dc` presentation logic
+remain outside this source translation. No original asset, generated C or
+file contents are checked in. The C++ model is **not connected to the
+emulator or running game yet** and is not a claim of a complete subsystem
+replacement. It has dedicated asset-free tests, integrated into CMake/CTest
+and `nix flake check`. See [high-score reconstruction](highscores-reconstruction.md).
