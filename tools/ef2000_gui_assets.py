@@ -22,6 +22,7 @@ try:
     from .spr_image import decode as decode_spr
     from .menu_font import rip_font
     from .menu_symbols import rip_symbols
+    from .gui_skin import rip_skin
 except ImportError:
     from did_archive import DIDArchive
     from ilbm_image import decode, encode_png, encode_bmp
@@ -29,6 +30,7 @@ except ImportError:
     from spr_image import decode as decode_spr
     from menu_font import rip_font
     from menu_symbols import rip_symbols
+    from gui_skin import rip_skin
 
 
 ARCHIVES = ('DID1ST.DAT', 'DID.DAT')
@@ -278,6 +280,9 @@ def main(argv=None):
     symbols = modes.add_parser('symbols', help='extract two-row symbol strip from original DID1ST specimen')
     symbols.add_argument('game_dir', type=Path, help='original game installation with DID1ST.DAT')
     symbols.add_argument('--out', type=Path, required=True, help='new local symbol output directory')
+    skin = modes.add_parser('skin', help='export original full-screen GUI textures and tactical icon sheet')
+    skin.add_argument('game_dir', type=Path, help='original installation with DID1ST.DAT')
+    skin.add_argument('--out', type=Path, required=True, help='new local skin output directory')
     args = parser.parse_args(argv)
     try:
         if args.action == 'inventory':
@@ -296,6 +301,9 @@ def main(argv=None):
         elif args.action == 'symbols':
             metadata = rip_symbols(args.game_dir, args.out)
             print(f'extracted {len(metadata["cells"])} specimen symbols into {args.out}')
+        elif args.action == 'skin':
+            metadata = rip_skin(args.game_dir, args.out)
+            print(f'extracted {len(metadata["textures"])} original GUI textures into {args.out}')
         else:
             result = extract(args.game_dir, args.out, args.paths, args.all_images, args.bmp)
             print(f'extracted {len(result)} GUI assets into {args.out}')

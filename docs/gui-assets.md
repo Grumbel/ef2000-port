@@ -1,5 +1,48 @@
 # EF2000 GUI resources and asset extraction (bundle #061)
 
+## Original movable-window skin and tactical map artwork (#077)
+
+The German TACTCOM screenshot provides pixel-level identification of five
+`DID1ST.DAT` images. The first three are **full-screen textures**, not
+pre-cut window widgets. Sample a title/panel pixel at its destination's
+absolute logical screen coordinates (640×400); do not stretch the image to
+fit the window. The screenshot's slightly darker colors are consistent with
+the palette conversion (an RGB difference of −3 in the compared regions).
+
+| Archive member hash | Dimensions | Role |
+| --- | --- | --- |
+| `ab1e4e53` | 640×400 | Dark diagonal menu background (`iff/256/newgui03.lbm`) |
+| `ad224253` | 640×400 | Green streaked titlebar texture |
+| `ac204053` | 640×400 | Gray diagonally textured panel interiors |
+| `7a08862b` | 400×400 | Grayscale tactical map terrain |
+| `ade5ec9a` | 640×480 | Colored tactical aircraft, unit and flag symbol atlas |
+
+For example, a 155×13 screenshot title region matches the green texture at
+the **same** x/y position. A 41×18 interior patch similarly matches the gray
+texture without rescaling, while the map matches with the expected offset
+within the 400×400 bitmap. Window bevels, scrollbar tracks, arrows and
+control layout still need more reverse engineering; these are not all
+independent images. The map's colored aircraft and flags can be sourced from
+the symbol atlas, although their individual sprite rectangles are not yet
+identified.
+
+Extract the original textures from a local copy of the DOS game:
+
+```sh
+nix run .#gui-assets -- skin /path/to/EF2000 --out local/gui-skin
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --overlay-skin-dir local/gui-skin
+```
+
+The extractor produces named PNGs, 640×400 BMP textures for the host overlay,
+an RGBA `skin-units.png`, a magenta-keyed `skin-units.bmp`, and a `skin.json`
+provenance manifest. **The red sprite sheet's background is palette index 0**;
+actual red foreground pixels use other indices, so keying by RGB color would
+erase valid red aircraft. The runtime option applies the original title and
+panel textures only; tactical icons and map remain analysis assets for future
+widget reconstruction. Outside the source's 640×400 screen region the overlay
+uses its procedural fallback. No original images enter Git or Nix outputs.
+
 The game's menu is **not only hard-coded in the executable**. Its layout and
 interactions are described in plain-text `.gui` resources inside the original
 `DID.DAT` and `DID1ST.DAT` archives. Its background images are standard IFF

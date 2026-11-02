@@ -136,6 +136,7 @@ struct WindowOptions {
     std::string overlay_frame_bmp;
     std::string overlay_font_bmp;
     std::string overlay_symbols_bmp;
+    std::string overlay_skin_dir;
     int overlay_frame_border{12};
     int width = 1280, height = 960;
     std::string aspect_ratio = "4:3";
@@ -196,6 +197,27 @@ public:
                 options_.aspect_ratio == "stretch" ? SDL_LOGICAL_PRESENTATION_STRETCH :
                                                       SDL_LOGICAL_PRESENTATION_LETTERBOX))
             throw std::runtime_error(std::string("SDL_SetRenderLogicalPresentation: ") + SDL_GetError());
+        if (!options_.overlay_skin_dir.empty()) {
+            auto load_skin = [&](const char* name) {
+                const auto filename = (fs::path(options_.overlay_skin_dir) / name).string();
+                SDL_Surface* surface = SDL_LoadBMP(filename.c_str());
+                if (!surface)
+                    throw std::runtime_error("cannot load overlay skin BMP: " + filename +
+                                             ": " + SDL_GetError());
+                if (surface->w != 640 || surface->h != 400) {
+                    SDL_DestroySurface(surface);
+                    throw std::runtime_error("overlay skin BMP must be 640x400: " + filename);
+                }
+                SDL_Texture* loaded = SDL_CreateTextureFromSurface(renderer_, surface);
+                SDL_DestroySurface(surface);
+                if (!loaded || !SDL_SetTextureScaleMode(loaded, SDL_SCALEMODE_NEAREST))
+                    throw std::runtime_error("cannot initialize overlay skin texture: " + filename);
+                return loaded;
+            };
+            overlay_title_texture_ = load_skin("skin-title.bmp");
+            overlay_panel_texture_ = load_skin("skin-panel.bmp");
+            std::cerr << "overlay: original screen-coordinate title and panel textures loaded\n";
+        }
         if (!options_.overlay_frame_bmp.empty()) {
             SDL_Surface* surface = SDL_LoadBMP(options_.overlay_frame_bmp.c_str());
             if (!surface)
@@ -289,6 +311,8 @@ public:
         if (overlay_frame_texture_) SDL_DestroyTexture(overlay_frame_texture_);
         if (overlay_font_texture_) SDL_DestroyTexture(overlay_font_texture_);
         if (overlay_symbols_texture_) SDL_DestroyTexture(overlay_symbols_texture_);
+        if (overlay_title_texture_) SDL_DestroyTexture(overlay_title_texture_);
+        if (overlay_panel_texture_) SDL_DestroyTexture(overlay_panel_texture_);
         if (texture_) SDL_DestroyTexture(texture_);
         if (renderer_) SDL_DestroyRenderer(renderer_);
         if (window_) SDL_DestroyWindow(window_);
@@ -822,6 +846,17 @@ private:
             !SDL_RenderDebugText(renderer_, x, y, value.c_str()))
             throw std::runtime_error(std::string("SDL3 overlay text: ") + SDL_GetError());
     }
+    void overlay_skin_fill(SDL_Texture* texture, float x, float y, float w, float h,
+                           uint8_t red, uint8_t green, uint8_t blue) {
+        overlay_fill(x, y, w, h, red, green, blue);
+        if (!texture) return;
+        const float left = std::max(0.0f, x), top = std::max(0.0f, y);
+        const float right = std::min(640.0f, x + w), bottom = std::min(400.0f, y + h);
+        if (right <= left || bottom <= top) return;
+        const SDL_FRect rectangle{left, top, right - left, bottom - top};
+        if (!SDL_RenderTexture(renderer_, texture, &rectangle, &rectangle))
+            throw std::runtime_error(std::string("SDL3 overlay skin draw: ") + SDL_GetError());
+    }
     void overlay_frame(const ef2000::OverlayPanel& panel) {
         if (!overlay_frame_texture_) {
             // Reconstruct the drawn GUI chrome seen in the original 640x400
@@ -830,7 +865,8 @@ private:
             // the separate newgui03 bitmap is only the menu backdrop.
             overlay_fill(panel.x, panel.y, panel.w, panel.h, 159, 159, 175);
             overlay_fill(panel.x + 1, panel.y + 1, panel.w - 2, panel.h - 2, 79, 79, 79);
-            overlay_fill(panel.x + 3, panel.y + 3, panel.w - 5, panel.h - 5, 115, 115, 115);
+            overlay_skin_fill(overlay_panel_texture_, panel.x + 3, panel.y + 3,
+                              panel.w - 5, panel.h - 5, 115, 115, 115);
             overlay_fill(panel.x + 3, panel.y + 3, 2, panel.h - 3, 0, 0, 0);
             overlay_fill(panel.x + 3, panel.y + panel.h - 5, panel.w - 3, 2, 0, 0, 0);
             return;
@@ -871,9 +907,9 @@ private:
             const float tab_width = std::min(panel.w - 32, float(title.size() * 8 + 20));
             // Small stepped upper-right edge rather than a modern full-width
             // titlebar. Keep mouse-drag hit testing in OverlayWindows intact.
-            overlay_fill(panel.x + 5, panel.y + 5, tab_width - 9, 17,
+            overlay_skin_fill(overlay_title_texture_, panel.x + 5, panel.y + 5, tab_width - 9, 17,
                          focused ? 62 : 46, focused ? 69 : 51, focused ? 42 : 31);
-            overlay_fill(panel.x + 5 + tab_width - 9, panel.y + 8, 9, 14,
+            overlay_skin_fill(overlay_title_texture_, panel.x + 5 + tab_width - 9, panel.y + 8, 9, 14,
                          focused ? 62 : 46, focused ? 69 : 51, focused ? 42 : 31);
             overlay_fill(panel.x + 5, panel.y + 4, tab_width - 12, 1, 173, 185, 159);
             overlay_fill(panel.x + 5 + tab_width - 12, panel.y + 5, 5, 1, 173, 185, 159);
@@ -950,6 +986,8 @@ private:
     SDL_Texture* overlay_frame_texture_{};
     SDL_Texture* overlay_font_texture_{};
     SDL_Texture* overlay_symbols_texture_{};
+    SDL_Texture* overlay_title_texture_{};
+    SDL_Texture* overlay_panel_texture_{};
     ef2000::MenuFontWidths overlay_font_widths_{};
     int overlay_frame_width_{}, overlay_frame_height_{};
     SDL_Joystick* joystick_{};
@@ -2726,6 +2764,7 @@ void usage(const char* program) {
               << "       [--overlay-frame-bmp FILE] [--overlay-frame-border N] (1..32)\n"
               << "       [--overlay-font-bmp FILE] (extracted menu-font.bmp and .widths)\n"
               << "       [--overlay-symbols-bmp FILE] (extracted menu-symbols.bmp)\n"
+              << "       [--overlay-skin-dir DIR] (extracted original title/panel textures)\n"
               << "       [--fast-copy] (experimental host acceleration of large guest copies)\n"
               << "       [--fast-copy-vga] (also accelerate copies into the banked VGA RAM window)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
@@ -2829,6 +2868,8 @@ int main(int argc, char** argv) {
                 window.overlay_font_bmp = argv[++i];
             } else if (!std::strcmp(argv[i], "--overlay-symbols-bmp") && i + 1 < argc) {
                 window.overlay_symbols_bmp = argv[++i];
+            } else if (!std::strcmp(argv[i], "--overlay-skin-dir") && i + 1 < argc) {
+                window.overlay_skin_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--overlay-frame-border") && i + 1 < argc) {
                 const std::string value = argv[++i];
                 size_t parsed{};
@@ -2982,6 +3023,8 @@ int main(int argc, char** argv) {
             throw std::runtime_error("--overlay-font-bmp requires --windowed or --fullscreen");
         if (!window.overlay_symbols_bmp.empty() && !window.enabled)
             throw std::runtime_error("--overlay-symbols-bmp requires --windowed or --fullscreen");
+        if (!window.overlay_skin_dir.empty() && !window.enabled)
+            throw std::runtime_error("--overlay-skin-dir requires --windowed or --fullscreen");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace || self_test_fast_copy) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
                 int(self_test_retrace) + int(self_test_fast_copy) != 1)

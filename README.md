@@ -374,6 +374,20 @@ gallery of all recovered images. This is a useful way to find and compare
 original menu artwork. Most of the original GUI's text is baked into these
 bitmaps; only some text is generated dynamically:
 
+The original green title bars and gray panel interiors have also been
+identified as **screen-coordinate crops** of full-screen textures. To use
+these in the movable F12 overlay, keeping original copyrighted assets local:
+
+```sh
+nix run .#gui-assets -- skin /path/to/EF2000 --out local/gui-skin
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --overlay-skin-dir local/gui-skin
+```
+
+The extractor additionally saves original terrain and a colored unit/flag
+atlas for further research. See [GUI resource research](docs/gui-assets.md)
+for exact archive hashes and the transparency index caveat.
+
 ```sh
 nix run .#gui-assets -- extract /path/to/EF2000 \
   --all-images --gallery --out local/gui-art
