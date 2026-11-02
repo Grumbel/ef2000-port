@@ -191,9 +191,15 @@ bytes and their converted output are **never included in Git or Nix**.
 
 The remaining specimen rows visually contain **48 additional accented
 glyphs** after `xyz`, in 42 + 6 segmented columns. Their codepoint order is
-not yet established, so the current atlas keeps these separate from the
-verified ASCII mapping. Resolving at least the German `äöüÄÖÜß` set is a
-useful follow-up before adding native localized overlay labels.
+not yet established, so the normal runtime atlas keeps these separate from the
+verified ASCII mapping. The `font` extractor now writes a **128×36 extended
+contact atlas** (`menu-font-extended.png`), a 48-entry JSON file recording
+exact source pixel bounds and `unicode: null`, and a JavaScript-free
+`menu-font-extended.html` gallery with fourfold nearest-neighbor glyphs and
+stable indices `#00`–`#47`. No codepage is assumed; font graphics remain
+external to the repository. Resolving at least the German `äöüÄÖÜß` set
+against the screenshot or guest code is a useful follow-up before adding
+native localized overlay labels.
 
 ## Extractor
 

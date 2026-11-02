@@ -399,7 +399,12 @@ original glyph widths and two-pixel letter spacing. Unsupported characters
 The font is recovered directly from the **rendered original specimen**, not
 from the menu screenshots, but its underlying binary glyph format remains
 unidentified. The extractor records the source hash and coverage in JSON.
-Neither the bitmap nor its derived widths are committed to Git.
+It additionally writes `menu-font-extended.png`,
+`menu-font-extended.json` and a JavaScript-free
+`menu-font-extended.html` gallery for the **48 remaining accented glyphs**.
+They are numbered by source position, **not assigned speculative Unicode
+values**. Open the HTML locally to identify characters for a later extended
+font mapping. Neither the bitmaps nor their derived widths are committed to Git.
 
 The same original font specimen contains small **directional and window-like
 symbols** in light/dark variants. An extractor recovers the 14 neatly

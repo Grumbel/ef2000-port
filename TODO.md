@@ -143,7 +143,9 @@ Implemented and verified:
   `gui-assets symbols`; optionally use its dark cross in the SDL3 close
   button with `--overlay-symbols-bmp`. **Trace these symbols back to their
   original GUI use before treating them as genuine menu button art.** The
-  other 48 visible accented glyphs still need codepoint labels.
+  other 48 visible accented glyphs now have a reproducible numbered PNG/HTML
+  gallery and coordinate JSON from `gui-assets font`; **match the German
+  accented glyphs to actual Unicode/guest character codes** before use.
   Keep the native UI separate from guest framebuffer emulation so menus can
   coexist with the cockpit and eventually replace original hardcoded GUI
   callbacks. Compare extracted textures and layout with `docs/gui-assets.md`;

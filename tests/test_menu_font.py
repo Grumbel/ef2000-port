@@ -12,8 +12,10 @@ import unittest
 
 from tools.ilbm_image import Image
 from tools.menu_font import (ASCII_END, ASCII_START, CELL_HEIGHT, CELL_WIDTH,
-                             FONT_SHEET_HASH, Glyph, Sample, collect_glyphs, render_atlas,
-                             rip_font, sample_glyphs)
+                             FONT_SHEET_HASH, Glyph, Sample, collect_glyphs,
+                             collect_unmapped_glyphs, render_atlas,
+                             render_unmapped_atlas, rip_font, sample_glyphs,
+                             unmapped_gallery)
 
 
 def synthetic_image():
@@ -84,6 +86,32 @@ class MenuFontTests(unittest.TestCase):
         self.assertEqual(atlas.indexed[top * atlas.width + left + 1], 0)
         self.assertEqual(atlas.palette[:6], b'\xff\x00\xff\xff\xff\xff')
 
+    def test_unmapped_glyphs_are_numbered_without_guessing_codepoints(self):
+        pixels = bytearray(320 * 200)
+        for x in range(17, 17 + 42 * 5, 5):
+            pixels[60 * 320 + x] = 1
+        for x in range(0, 6 * 5, 5):
+            pixels[74 * 320 + x] = 1
+        palette = b'\x00\x00\x00\xff\xff\xff' + bytes(762)
+        image = Image(320, 200, bytes(pixels), palette)
+        unmapped = collect_unmapped_glyphs(image)
+        self.assertEqual(len(unmapped), 48)
+        self.assertEqual(unmapped[0].bounds, (17, 60, 18, 72))
+        self.assertEqual(unmapped[41].bounds, (222, 60, 223, 72))
+        self.assertEqual(unmapped[42].bounds, (0, 74, 1, 86))
+        self.assertEqual(unmapped[47].bounds, (25, 74, 26, 86))
+        atlas = render_unmapped_atlas(unmapped)
+        self.assertEqual((atlas.width, atlas.height), (128, 36))
+        self.assertEqual(atlas.indexed[0], 1)
+        self.assertEqual(atlas.indexed[12 * atlas.width], 1)
+        html = unmapped_gallery(unmapped)
+        self.assertEqual(html.count('<figure>'), 48)
+        self.assertIn('Index is not a character code', html)
+        damaged = bytearray(pixels)
+        damaged[60 * 320 + 17] = 0
+        with self.assertRaisesRegex(ValueError, '41 groups for 42 expected'):
+            collect_unmapped_glyphs(Image(320, 200, bytes(damaged), palette))
+
 
 @unittest.skipUnless(os.environ.get('EF2000_DATA_DIR'),
                      'set EF2000_DATA_DIR to rip supplied TACTCOM menu font')
@@ -110,6 +138,14 @@ class OriginalMenuFontTests(unittest.TestCase):
             self.assertEqual(manifest['source_hash'], f'{FONT_SHEET_HASH:08x}')
             self.assertEqual(manifest['unmapped_ascii'], '{|}~')
             self.assertEqual(manifest['sample_count'], 3)
+            self.assertEqual(manifest['unmapped_extended_glyphs'], 48)
+            extended = json.loads((Path(directory) / 'menu-font-extended.json').read_text())
+            self.assertEqual(len(extended['glyphs']), 48)
+            self.assertEqual(extended['glyphs'][0]['bounds'], [17, 60, 21, 72])
+            self.assertEqual(extended['glyphs'][-1]['bounds'], [40, 74, 44, 86])
+            self.assertTrue(all(item['unicode'] is None for item in extended['glyphs']))
+            self.assertTrue((Path(directory) / 'menu-font-extended.png').read_bytes().startswith(
+                b'\x89PNG\r\n\x1a\n'))
             with self.assertRaises(FileExistsError):
                 rip_font(Path(os.environ['EF2000_DATA_DIR']), Path(directory))
 

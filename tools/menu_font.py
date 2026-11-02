@@ -79,17 +79,20 @@ class Glyph:
     mask: bytes
 
 
+@dataclass(frozen=True)
+class UnmappedGlyph:
+    bounds: tuple[int, int, int, int]
+    glyph: Glyph
+
+
 def bright(image, x, y):
     color_index = image.indexed[y * image.width + x]
     rgb = image.palette[color_index * 3:color_index * 3 + 3]
     return min(rgb) > WHITE_THRESHOLD
 
 
-def sample_glyphs(image, bounds, text, merge_groups=()):
-    """Segment one labeled text line by fully empty columns.
-
-    A mismatch is an error rather than guessing a glyph-to-character map.
-    """
+def lit_column_groups(image, bounds):
+    """Return inclusive bright-column spans within a bounded source line."""
     left, top, right, bottom = bounds
     if not (0 <= left < right <= image.width and
             0 <= top < bottom <= image.height and bottom - top <= CELL_HEIGHT):
@@ -102,6 +105,22 @@ def sample_glyphs(image, bounds, text, merge_groups=()):
             groups.append([x, x])
         else:
             groups[-1][1] = x
+    return groups
+
+
+def glyph_from_span(image, top, bottom, start, end):
+    width, height = end - start + 1, bottom - top
+    if width > CELL_WIDTH:
+        raise ValueError('font glyph wider than atlas cell')
+    return Glyph(width, height, bytes(int(bright(image, x, y))
+                                     for y in range(top, bottom)
+                                     for x in range(start, end + 1)))
+
+
+def sample_glyphs(image, bounds, text, merge_groups=()):
+    """Segment one labeled line, rejecting speculative glyph mappings."""
+    _, top, _, bottom = bounds
+    groups = lit_column_groups(image, bounds)
     for index in sorted(merge_groups, reverse=True):
         if not 0 <= index < len(groups) - 1:
             raise ValueError('invalid font sample group merge index')
@@ -115,13 +134,70 @@ def sample_glyphs(image, bounds, text, merge_groups=()):
                          f'{len(expected)} characters')
     found = []
     for char, (start, end) in zip(expected, groups):
-        width, height = end - start + 1, bottom - top
-        if width > CELL_WIDTH:
-            raise ValueError(f'font glyph {char!r} wider than atlas cell')
-        mask = bytes(int(bright(image, x, y))
-                     for y in range(top, bottom) for x in range(start, end + 1))
-        found.append((char, Glyph(width, height, mask)))
+        found.append((char, glyph_from_span(image, top, bottom, start, end)))
     return found
+
+
+# The rest of the third text row and fourth row contain 42 + 6 visually
+# distinct accented symbols. We have NOT established their Unicode/CP437
+# values. The extraction preserves order and image coordinates only.
+UNMAPPED_BANDS = (
+    ((17, 60, 250, 72), 42),
+    ((0, 74, 44, 86), 6),
+)
+
+
+def collect_unmapped_glyphs(image):
+    found = []
+    for bounds, expected in UNMAPPED_BANDS:
+        _, top, _, bottom = bounds
+        groups = lit_column_groups(image, bounds)
+        if len(groups) != expected:
+            raise ValueError(f'unmapped font band {top}: {len(groups)} groups '
+                             f'for {expected} expected characters')
+        for start, end in groups:
+            found.append(UnmappedGlyph((start, top, end + 1, bottom),
+                                       glyph_from_span(image, top, bottom, start, end)))
+    return found
+
+
+def render_unmapped_atlas(unmapped):
+    columns = 16
+    width = columns * CELL_WIDTH
+    height = ((len(unmapped) + columns - 1) // columns) * CELL_HEIGHT
+    indexed = bytearray(width * height)
+    for index, item in enumerate(unmapped):
+        glyph = item.glyph
+        if glyph.height > CELL_HEIGHT or glyph.width > CELL_WIDTH:
+            raise ValueError('unmapped font glyph does not fit atlas cell')
+        x0 = (index % columns) * CELL_WIDTH
+        y0 = (index // columns) * CELL_HEIGHT
+        for y in range(glyph.height):
+            for x in range(glyph.width):
+                indexed[(y0 + y) * width + x0 + x] = glyph.mask[y * glyph.width + x]
+    palette = b'\xff\x00\xff\xff\xff\xff' + bytes(768 - 6)
+    return Image(width, height, bytes(indexed), palette)
+
+
+def unmapped_gallery(unmapped):
+    """JavaScript-free, nearest-neighbor 4x gallery with source positions."""
+    cards = []
+    for index, item in enumerate(unmapped):
+        left, top, right, bottom = item.bounds
+        x, y = (index % 16) * 32, (index // 16) * 48
+        cards.append(f'<figure><div class="glyph" style="background-position:-{x}px -{y}px"></div>'
+                     f'<figcaption>#{index:02d} ({left},{top})–({right},{bottom})</figcaption>'
+                     '</figure>')
+    return ('<!doctype html><html lang="en"><meta charset="utf-8">'
+            '<title>EF2000 unmapped font specimen glyphs</title><style>'
+            'body{font:14px sans-serif;background:#1c222a;color:#eee;margin:2em}'
+            'main{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}'
+            'figure{margin:0;padding:12px;background:#303842;border:1px solid #666}'
+            '.glyph{width:32px;height:48px;background-image:url(menu-font-extended.png);'
+            'background-size:512px 144px;image-rendering:pixelated;background-repeat:no-repeat}'
+            'figcaption{font:12px monospace;margin-top:8px}</style><h1>Unmapped glyphs</h1>'
+            '<p>Source DID1ST 0x33773001. Index is not a character code;'
+            ' no Unicode mapping is asserted.</p><main>' + ''.join(cards) + '</main></html>\n')
 
 
 def collect_glyphs(images, samples, required=string.ascii_uppercase):
@@ -190,11 +266,27 @@ def rip_font(game_dir, out_dir):
     glyphs, conflicts = collect_glyphs({FONT_SHEET_HASH: image}, SHEET_SAMPLES,
                                        required=required)
     atlas, widths = render_atlas(glyphs)
+    unmapped = collect_unmapped_glyphs(image)
+    extended_atlas = render_unmapped_atlas(unmapped)
+    extended_manifest = {
+        'source': 'DID1ST.DAT',
+        'source_hash': f'{FONT_SHEET_HASH:08x}',
+        'cell_size': [CELL_WIDTH, CELL_HEIGHT],
+        'notes': 'Sequential source positions only; no Unicode/CP437 assignments',
+        'glyphs': [
+            {'index': index, 'bounds': list(item.bounds),
+             'width': item.glyph.width, 'unicode': None}
+            for index, item in enumerate(unmapped)
+        ],
+    }
     output = Path(out_dir)
     files = {
         'menu-font.bmp': encode_bmp(atlas),
         'menu-font.png': encode_png(atlas),
         'menu-font.widths': (' '.join(map(str, widths)) + '\n').encode('ascii'),
+        'menu-font-extended.png': encode_png(extended_atlas),
+        'menu-font-extended.json': (json.dumps(extended_manifest, indent=2) + '\n').encode('utf-8'),
+        'menu-font-extended.html': unmapped_gallery(unmapped).encode('utf-8'),
         'menu-font.json': (json.dumps({
             'source': 'DID1ST.DAT',
             'source_hash': f'{FONT_SHEET_HASH:08x}',
@@ -205,6 +297,7 @@ def rip_font(game_dir, out_dir):
             'recovered_characters': ''.join(sorted(ch for ch in glyphs if ch in string.printable)),
             'conflicting_samples': conflicts,
             'sample_count': len(SHEET_SAMPLES),
+            'unmapped_extended_glyphs': len(unmapped),
         }, indent=2, ensure_ascii=False) + '\n').encode('utf-8'),
     }
     output.mkdir(parents=True, exist_ok=True)
