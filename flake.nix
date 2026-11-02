@@ -108,6 +108,9 @@
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/ef2000_mission_layout_test.cpp runtime/ef2000_mission_layout.cpp \
             -o objects/ef2000-mission-layout-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/gamepad_profile_test.cpp \
+            -o objects/ef2000-gamepad-profile-test
           runHook postBuild
         '';
 
@@ -144,6 +147,7 @@
           objects/ef2000-wav-capture-test
           objects/ef2000-highscores-test
           objects/ef2000-mission-layout-test
+          objects/ef2000-gamepad-profile-test
           runHook postCheck
         '';
 

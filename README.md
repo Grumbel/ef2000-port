@@ -336,19 +336,41 @@ including when `--sound off`. See [CD audio](docs/cd-audio.md) for request
 details and known limitations. Actual original-disc playback on C++ SDL3 still
 needs a listening test; the emulator path has synthetic protocol/PCM tests.
 
-The C++ SDL3 frontend now maps recognized gamepads through SDL's standardized
-left/right stick axes and south/east/west/north buttons, avoiding the raw
-trigger-axis ordering seen on some controllers. Plain joysticks retain raw
-axes. `--joystick auto|off|N` chooses the SDL device, and
-`--joystick-axes 0,1[,2,3]` selects two or four axes; negative indices invert
-an axis, as with the Python frontend. Devices are re-enumerated after a
+The C++ SDL3 frontend recognizes standardized gamepads, avoiding the raw
+trigger-axis ordering seen on some controllers. The experimental **flight
+profile** maps left stick to roll/pitch, right stick X to the fourth DOS
+gameport axis (expected rudder) and right stick Y to a **latched, rate-driven
+throttle** on the third DOS axis: push up/down to change thrust; returning
+to center keeps its setting, initially 50%. The third/fourth-axis assignments
+still need an original-game flight test: they are **not yet proven** to drive
+throttle and rudder in every EF2000 control mode. The first two axes and all
+four gameport buttons retain their original semantics.
+
+Holding **LB** while pressing A/B/X/Y synthesizes keyboard **G** (gear),
+**B** (air brake), **E** (ECM), **R** (radar). Holding **RB** maps A/B/X/Y to
+**C** (next target), **Enter** (air weapon), **Backspace** (ground weapon),
+**F4** (external view). Unmodified face buttons remain DOS gameport buttons;
+LB wins if both shoulders are held. Hold and release events are sent as
+real guest keyboard make/break transitions. **Back** on the controller or
+**F12** toggles the in-game controls guide; it does *not* pause the guest.
+
+Raw joysticks keep raw axes and buttons. `--gamepad-raw` restores the previous
+direct SDL gamepad mapping and disables the modifier layers. Passing
+`--joystick-axes 0,1[,2,3]` also opts out of the new profile, with optional
+negative indices to invert axes, as with the Python frontend.
+`--joystick auto|off|N` chooses the SDL device. Devices are re-enumerated after a
 disconnect/reconnect. `--controls auto|keyboard|joystick` selects the virtual
 `EF2000.CFG` flight controls; forcing `joystick` maintains a centered two-axis
 gameport even if a physical controller is connected after startup.
 `--trace-joystick` reports the selected device, changing axis/button samples
 and the number of guest port `201h` reads and writes. The console also reports
 guest instructions per wall-clock second plus SDL polling/render counts at
-exit, so performance can be compared on the actual target machine.
+exit, so performance can be compared on the actual target machine. A small
+windowed **SDL FPS / CHANGED FPS** HUD now shows the trailing one-second
+SDL-presentation rate and the rate of actually changed guest framebuffer
+images. The distinction matters when Unicorn repeatedly presents the same
+image. Neither number measures the game's internal simulation ticks. Use
+`--no-fps` to hide it.
 
 The C++ core is still Unicorn-emulated rather than natively executing the
 game. A headless 100M-instruction sound-enabled replay measured about 45M
@@ -411,7 +433,7 @@ behavior have not been verified. With `--windowed --profile-video-frames`,
 the frontend also reports `image_presentations`, `changed_images` and
 `changed_hz` by fingerprinting the actual displayed pixels. This separates
 identical repeated SDL presentations from visible guest updates; it is an
-opt-in diagnostic, **not** simulation FPS. A controlled SDL3 dummy-driver
+optional accumulated diagnostic, **not** simulation FPS. A controlled SDL3 dummy-driver
 startup comparison saw 93 changed images in ten seconds with either copy
 path despite much higher guest-copy throughput with `--fast-copy-vga`.
 See [Ghidra findings](docs/ghidra-findings.md) and

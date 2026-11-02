@@ -119,6 +119,21 @@ Implemented and verified:
   callbacks. Locate the real menu fonts, cursor/button art and palette use;
   reconcile the scripts with Ghidra call targets and live Unicorn traces.
   This is deliberately parked for now; see `docs/gui-assets.md`.
+- [ ] **EF2000-style movable-window overlay:** inventory/rip the original
+  menu fonts, frames, icons, backgrounds, buttons, cursor and palette from
+  locally supplied DID/assets (do not commit copyrighted art). Build a
+  reusable skin/texture atlas and a host-side SDL3 window manager with
+  dragging, focus, resize, Z-order and modern mouse/gamepad navigation.
+  Keep the native UI separate from guest framebuffer emulation so menus can
+  coexist with the cockpit and eventually replace original hardcoded GUI
+  callbacks. Compare extracted textures and layout with `docs/gui-assets.md`;
+  preserve the original aesthetic without binding new layout to DOS pixels.
+- [ ] **Validate physical gamepad flight:** confirm third-axis throttle and
+  fourth-axis rudder in the original aircraft (including calibration,
+  reversal, flight response and auto-centering); tune the new latched
+  throttle and rudder dead zone with a real controller. The SDL-independent
+  mapping tests prove host behavior only. Evaluate keyboard fallbacks if the
+  guest flight code ignores the auxiliary gameport axes.
 - [ ] **Mission/navigation read-only reconstruction:** parse loose text
   `MISSION.CFG`, `NAVIG.NAV`, `CAMPAIGN.CG` and briefing records with explicit
   typed fields, cross-references and count checks. Compare generated missions

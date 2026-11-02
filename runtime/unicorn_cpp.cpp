@@ -6,6 +6,7 @@
 // and is never linked into the program.
 #include "dos_drive.hpp"
 #include "bios_disk.hpp"
+#include "gamepad_profile.hpp"
 #include "cd_audio.hpp"
 #include "pcm_audio.hpp"
 #include "real_mode_cpu.hpp"
@@ -127,6 +128,7 @@ struct CopyCallerStats {
 struct WindowOptions {
     bool enabled{}, fullscreen{}, smooth_scaling{};
     bool profile_video_frames{};
+    bool show_fps{true}, gamepad_flight_profile{true};
     int width = 1280, height = 960;
     std::string aspect_ratio = "4:3";
     int joystick_index{}; // -1 disables the physical controller.
@@ -308,25 +310,63 @@ public:
             static constexpr SDL_GamepadButton gamepad_buttons[] = {
                 SDL_GAMEPAD_BUTTON_SOUTH, SDL_GAMEPAD_BUTTON_EAST,
                 SDL_GAMEPAD_BUTTON_WEST, SDL_GAMEPAD_BUTTON_NORTH};
-            const unsigned raw_axes = joystick_ ?
-                unsigned(std::max(0, SDL_GetNumJoystickAxes(joystick_))) : 4u;
-            for (const auto& binding : options_.joystick_axes) {
-                if (binding.index >= raw_axes ||
-                    (gamepad_ && binding.index >= 4)) break;
-                int axis = 0;
-                if (focused) axis = gamepad_ ? SDL_GetGamepadAxis(gamepad_, gamepad_axes[binding.index]) :
-                                               SDL_GetJoystickAxis(joystick_, binding.index);
-                value.axes[value.count++] = std::clamp(axis * binding.direction, -32768, 32767);
-            }
-            if (focused) {
-                const unsigned raw_buttons = joystick_ ?
-                    unsigned(std::max(0, SDL_GetNumJoystickButtons(joystick_))) : 4u;
-                for (unsigned i = 0; i < 4; ++i) {
-                    const bool pressed = gamepad_ ? SDL_GetGamepadButton(gamepad_, gamepad_buttons[i]) :
-                        (i < raw_buttons && SDL_GetJoystickButton(joystick_, i));
-                    if (pressed) value.buttons |= 1u << i;
+            if (gamepad_ && options_.gamepad_flight_profile) {
+                const bool back = focused && SDL_GetGamepadButton(gamepad_, SDL_GAMEPAD_BUTTON_BACK);
+                if (back && !last_help_button_) show_controls_ = !show_controls_;
+                last_help_button_ = back;
+                ef2000::GamepadFlightInput input;
+                if (focused && !show_controls_) {
+                    input.left_x = SDL_GetGamepadAxis(gamepad_, SDL_GAMEPAD_AXIS_LEFTX);
+                    input.left_y = SDL_GetGamepadAxis(gamepad_, SDL_GAMEPAD_AXIS_LEFTY);
+                    input.right_x = SDL_GetGamepadAxis(gamepad_, SDL_GAMEPAD_AXIS_RIGHTX);
+                    input.right_y = SDL_GetGamepadAxis(gamepad_, SDL_GAMEPAD_AXIS_RIGHTY);
+                    for (size_t i = 0; i < 4; ++i)
+                        input.face[i] = SDL_GetGamepadButton(gamepad_, gamepad_buttons[i]);
+                    input.left_shoulder = SDL_GetGamepadButton(gamepad_, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER);
+                    input.right_shoulder = SDL_GetGamepadButton(gamepad_, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER);
+                }
+                const auto now = std::chrono::steady_clock::now();
+                const double dt = last_flight_sample_.time_since_epoch().count() ?
+                    std::chrono::duration<double>(now - last_flight_sample_).count() : 0;
+                last_flight_sample_ = now;
+                auto mapped = gamepad_flight_.sample(input, dt);
+                value.axes = mapped.axes;
+                value.count = 4;
+                value.buttons = mapped.buttons;
+                for (const auto& change : mapped.keys) {
+                    const int ascii = change.sdl_scan == 10 ? 'g' :
+                        change.sdl_scan == 5 ? 'b' : change.sdl_scan == 8 ? 'e' :
+                        change.sdl_scan == 21 ? 'r' : change.sdl_scan == 6 ? 'c' :
+                        change.sdl_scan == 40 ? '\r' : change.sdl_scan == 42 ? '\b' : 0;
+                    pending_keys_.push_back({change.sdl_scan, ascii, change.down, false});
+                }
+            } else {
+                const unsigned raw_axes = joystick_ ?
+                    unsigned(std::max(0, SDL_GetNumJoystickAxes(joystick_))) : 4u;
+                for (const auto& binding : options_.joystick_axes) {
+                    if (binding.index >= raw_axes ||
+                        (gamepad_ && binding.index >= 4)) break;
+                    int axis = 0;
+                    if (focused) axis = gamepad_ ? SDL_GetGamepadAxis(gamepad_, gamepad_axes[binding.index]) :
+                                                   SDL_GetJoystickAxis(joystick_, binding.index);
+                    value.axes[value.count++] = std::clamp(axis * binding.direction, -32768, 32767);
+                }
+                if (focused) {
+                    const unsigned raw_buttons = joystick_ ?
+                        unsigned(std::max(0, SDL_GetNumJoystickButtons(joystick_))) : 4u;
+                    for (unsigned i = 0; i < 4; ++i) {
+                        const bool pressed = gamepad_ ? SDL_GetGamepadButton(gamepad_, gamepad_buttons[i]) :
+                            (i < raw_buttons && SDL_GetJoystickButton(joystick_, i));
+                        if (pressed) value.buttons |= 1u << i;
+                    }
                 }
             }
+        } else if (options_.gamepad_flight_profile) {
+            // Disconnect must release every shoulder-generated keyboard key.
+            for (const auto& change : gamepad_flight_.sample({}, 0).keys)
+                pending_keys_.push_back({change.sdl_scan, 0, change.down, false});
+            last_flight_sample_ = {};
+            last_help_button_ = false;
         }
         const auto now = std::chrono::steady_clock::now();
         if (options_.trace_joystick && now >= next_joystick_trace_ &&
@@ -356,9 +396,15 @@ public:
             if (event.type == SDL_EVENT_JOYSTICK_ADDED ||
                 event.type == SDL_EVENT_JOYSTICK_REMOVED)
                 next_joystick_probe_ = {};
-            if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP)
-                pending_keys_.push_back({int(event.key.scancode), int(event.key.key),
-                                         event.type == SDL_EVENT_KEY_DOWN, bool(event.key.repeat)});
+            if (event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP) {
+                if (event.key.scancode == SDL_SCANCODE_F12) {
+                    if (event.type == SDL_EVENT_KEY_DOWN && !event.key.repeat)
+                        show_controls_ = !show_controls_;
+                } else {
+                    pending_keys_.push_back({int(event.key.scancode), int(event.key.key),
+                                             event.type == SDL_EVENT_KEY_DOWN, bool(event.key.repeat)});
+                }
+            }
             if (event.type == SDL_EVENT_MOUSE_MOTION ||
                 event.type == SDL_EVENT_MOUSE_BUTTON_DOWN ||
                 event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
@@ -401,11 +447,11 @@ public:
             }
         }
         if (has_image) {
-            if (options_.profile_video_frames) {
+            if (options_.profile_video_frames || options_.show_fps) {
                 // A present is not necessarily a new game frame. Fingerprint
                 // the actual RGBA pixels, including palette changes, to
-                // distinguish repeated images from visible updates. This is
-                // intentionally opt-in because hashing costs CPU time.
+                // distinguish repeated images from visible updates. The HUD
+                // enables hashing as well as --profile-video-frames.
                 uint64_t hash = UINT64_C(14695981039346656037);
                 for (uint8_t byte : *frame) {
                     hash ^= byte;
@@ -418,6 +464,7 @@ public:
                 last_image_width_ = width;
                 last_image_height_ = height;
                 const auto sampled = std::chrono::steady_clock::now();
+                if (changed && options_.show_fps) changed_frame_times_.push_back(sampled);
                 if (!image_frames_) first_image_time_ = sampled;
                 last_image_time_ = sampled;
                 ++image_frames_;
@@ -451,6 +498,26 @@ public:
                 !SDL_RenderDebugText(renderer_, 30, 145, events.c_str()))
                 throw std::runtime_error(std::string("SDL3 text draw failed: ") + SDL_GetError());
         }
+        if (options_.show_fps || show_controls_) {
+            const auto sampled = std::chrono::steady_clock::now();
+            present_times_.push_back(sampled);
+            const auto oldest = sampled - std::chrono::seconds(1);
+            while (!present_times_.empty() && present_times_.front() < oldest)
+                present_times_.pop_front();
+            while (!changed_frame_times_.empty() && changed_frame_times_.front() < oldest)
+                changed_frame_times_.pop_front();
+            if (options_.show_fps) {
+                const SDL_FRect background{5, 5, 240, 20};
+                const std::string label = "SDL FPS " + std::to_string(present_times_.size()) +
+                    "   CHANGED FPS " + std::to_string(changed_frame_times_.size());
+                if (!SDL_SetRenderDrawColor(renderer_, 0, 0, 0, 255) ||
+                    !SDL_RenderFillRect(renderer_, &background) ||
+                    !SDL_SetRenderDrawColor(renderer_, 255, 255, 255, 255) ||
+                    !SDL_RenderDebugText(renderer_, 10, 11, label.c_str()))
+                    throw std::runtime_error(std::string("SDL3 FPS HUD: ") + SDL_GetError());
+            }
+            if (show_controls_) draw_controls_help();
+        }
         if (!SDL_RenderPresent(renderer_))
             throw std::runtime_error(std::string("SDL3 present failed: ") + SDL_GetError());
         ++frames_presented_;
@@ -467,6 +534,10 @@ private:
     unsigned mouse_buttons_{};
     std::vector<MouseEvent> pending_mouse_;
     std::vector<KeyEvent> pending_keys_;
+    ef2000::GamepadFlightProfile gamepad_flight_{};
+    bool show_controls_{}, last_help_button_{};
+    std::chrono::steady_clock::time_point last_flight_sample_{};
+    std::deque<std::chrono::steady_clock::time_point> present_times_, changed_frame_times_;
     std::chrono::steady_clock::time_point last_present_{};
     std::chrono::steady_clock::time_point last_poll_{};
     uint64_t input_polls_{}, frames_presented_{};
@@ -474,6 +545,36 @@ private:
     int last_image_width_{}, last_image_height_{};
     std::chrono::steady_clock::time_point first_image_time_{}, last_image_time_{};
 #ifdef EF_UNICORN_SDL3
+    void draw_controls_help() {
+        const SDL_FRect panel{65, 62, 510, 355};
+        if (!SDL_SetRenderDrawColor(renderer_, 12, 20, 36, 255) ||
+            !SDL_RenderFillRect(renderer_, &panel) ||
+            !SDL_SetRenderDrawColor(renderer_, 245, 229, 170, 255))
+            throw std::runtime_error(std::string("SDL3 controller help: ") + SDL_GetError());
+        static constexpr const char* lines[] = {
+            "EF2000 GAMEPAD / KEYBOARD GUIDE",
+            "",
+            "LEFT STICK: ROLL / PITCH",
+            "RIGHT X: RUDDER (4TH GAMEPORT AXIS)",
+            "RIGHT Y: THROTTLE RATE (LATCHES ON RELEASE)",
+            "",
+            "A / B / X / Y: ORIGINAL GAMEPORT BUTTONS",
+            "",
+            "HOLD LB: A=GEAR  B=BRAKE  X=ECM  Y=RADAR",
+            "HOLD RB: A=TARGET B=AIR  X=GROUND Y=VIEW",
+            "",
+            "LB+RB: LB TAKES PRIORITY",
+            "BACK OR F12: TOGGLE THIS GUIDE",
+            "",
+            "EXPERIMENTAL 4-AXIS FLIGHT PROFILE",
+            "USE --GAMEPAD-RAW FOR LEGACY MAPPING",
+            "",
+            "THE GUIDE DOES NOT PAUSE THE GAME"
+        };
+        for (size_t i = 0; i < std::size(lines); ++i)
+            if (!SDL_RenderDebugText(renderer_, 80, 75 + float(i) * 18, lines[i]))
+                throw std::runtime_error(std::string("SDL3 controller help text: ") + SDL_GetError());
+    }
     SDL_AudioStream* audio_stream_{};
     SDL_AudioStream* cd_audio_stream_{};
     SDL_AudioDeviceID audio_device_{};
@@ -525,7 +626,10 @@ private:
                                               SDL_GetJoystickName(joystick_);
                 std::cerr << "input: SDL3 " << (gamepad_ ? "gamepad " : "joystick ")
                           << options_.joystick_index << ": " << (name ? name : "unknown")
-                          << "; mapped DOS gameport axes=" << options_.joystick_axes.size()
+                          << "; mapped DOS gameport axes=" << (gamepad_ && options_.gamepad_flight_profile ?
+                                                                  4 : options_.joystick_axes.size())
+                          << (gamepad_ && options_.gamepad_flight_profile ?
+                              " (latched throttle + LB/RB layers, Back/F12 help)" : " (raw)")
                           << " (use --trace-joystick for input samples)\n";
             } else {
                 std::cerr << "input: joystick " << options_.joystick_index
@@ -1068,9 +1172,11 @@ private:
                                             frame.width, frame.height);
         for (const MouseEvent& event : window.take_mouse_events())
             set_mouse(event.x, event.y, event.buttons);
+        const auto joystick = window.joystick_state();
+        // The SDL gamepad profile also synthesizes keyboard transitions.
+        // Sample it before draining the same frame's keyboard queue.
         for (const KeyEvent& event : window.take_key_events())
             key_event(event.scan, event.key, event.down, event.repeat);
-        const auto joystick = window.joystick_state();
         // Also clear a disconnected controller; otherwise the old axes and
         // buttons remain latched forever. Explicit scripts take precedence
         // when no physical device is attached.
@@ -2254,6 +2360,7 @@ void usage(const char* program) {
               << "       [--profile-copy] (count calls to the original fast-copy routine)\n"
               << "       [--profile-copy-callers] (rank copy callers by bytes and count)\n"
               << "       [--profile-video-frames] (count changed displayed images, requires SDL3 window)\n"
+              << "       [--no-fps] (hide the SDL presentation and changed-frame HUD)\n"
               << "       [--fast-copy] (experimental host acceleration of large guest copies)\n"
               << "       [--fast-copy-vga] (also accelerate copies into the banked VGA RAM window)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
@@ -2263,6 +2370,8 @@ void usage(const char* program) {
               << "       [--key-event TICK:SDL_SCAN:ASCII:DOWN] (repeat for guest keys)\n"
               << "       [--joystick-event TICK:X:Y[:Z:W]:BUTTONS] (2/4 axes)\n"
               << "       [--joystick auto|off|INDEX] [--joystick-axes 0,1[,2,3]]\n"
+              << "       [--gamepad-raw] (disable latched throttle and LB/RB keyboard layers)\n"
+              << "       [F12 or gamepad Back: flight-control help overlay]\n"
               << "       [--controls auto|keyboard|joystick] (virtual EF2000.CFG)\n"
               << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
@@ -2346,6 +2455,8 @@ int main(int argc, char** argv) {
                 performance.profile = performance.profile_copy = performance.profile_copy_callers = true;
             } else if (!std::strcmp(argv[i], "--profile-video-frames")) {
                 window.profile_video_frames = true;
+            } else if (!std::strcmp(argv[i], "--no-fps")) {
+                window.show_fps = false;
             } else if (!std::strcmp(argv[i], "--fast-copy")) {
                 performance.fast_copy = true;
             } else if (!std::strcmp(argv[i], "--fast-copy-vga")) {
@@ -2402,8 +2513,12 @@ int main(int argc, char** argv) {
                 else throw std::runtime_error("--controls expects auto, keyboard or joystick");
             } else if (!std::strcmp(argv[i], "--joystick-axes") && i + 1 < argc) {
                 window.joystick_axes = parse_joystick_axes(argv[++i]);
+                window.gamepad_flight_profile = false;
             } else if (!std::strncmp(argv[i], "--joystick-axes=", 16)) {
                 window.joystick_axes = parse_joystick_axes(argv[i] + 16);
+                window.gamepad_flight_profile = false;
+            } else if (!std::strcmp(argv[i], "--gamepad-raw")) {
+                window.gamepad_flight_profile = false;
             } else if (!std::strcmp(argv[i], "--trace-joystick")) {
                 window.trace_joystick = true;
             } else if (!std::strcmp(argv[i], "--self-test")) {

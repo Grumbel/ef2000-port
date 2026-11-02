@@ -122,6 +122,28 @@ No original files are modified; the default `nix flake check` exercises only
 synthetic test fixtures. The separate Nix check is
 `nix build .#checks.x86_64-linux.gui-assets`.
 
+## Native overlay using EF2000's visual style (planned)
+
+There is already enough material to prototype a host-side EF2000 skin
+without first implementing the whole DOS menu interpreter. The 517 extracted
+images and `mainmenu.gui` window/icon geometry give us the visual and
+structural starting point, but **not a complete widget theme**. We still
+need to identify menu fonts, sprite/button states, reusable frame borders,
+cursor imagery and palette rules against actual menu screenshots.
+
+The proposed UI is a separate SDL3 compositor drawn after the guest image
+and before presentation. It retains EF2000's bitmap frames, typography,
+colours and icons, but provides **movable, overlapping and resizable windows**,
+focus/Z-order, scrolling and gamepad navigation. First build an optional
+diagnostic/settings panel without changing DOS state; later bind reconstructed
+menu callbacks to native actions and replace individual guest menu screens.
+
+Convert local PNG/JSON extractor output into a texture atlas plus skin
+manifest under the user's asset directory; **do not commit or ship the
+original artwork**. A procedural fallback skin enables testing without
+original assets. With local assets available, golden screenshots can check
+alignment, palette fidelity and scale against the existing guest renderer.
+
 ## Open questions
 
 - **Fonts:** The inspected `.gui` scripts specify text and titles but not a

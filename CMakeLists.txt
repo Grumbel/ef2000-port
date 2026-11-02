@@ -201,3 +201,9 @@ add_executable(ef2000-mission-layout-test tests/ef2000_mission_layout_test.cpp
 target_compile_features(ef2000-mission-layout-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-mission-layout-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME mission-layout-reconstruction COMMAND ef2000-mission-layout-test)
+
+# SDL-independent standardized gamepad profile; can run without original assets.
+add_executable(ef2000-gamepad-profile-test tests/gamepad_profile_test.cpp)
+target_compile_features(ef2000-gamepad-profile-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-gamepad-profile-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME gamepad-profile COMMAND ef2000-gamepad-profile-test)
