@@ -138,7 +138,12 @@ Implemented and verified:
   remain unresolved). **Reverse-engineer the procedural `box`/`bkd`
   renderer and the underlying glyph storage/metrics**, then map remaining
   glyphs and verify against original screenshots. Finer widgets and gamepad
-  window navigation remain open tasks.
+  window navigation remain open tasks. The same specimen also yields 14
+  verified light/dark directional and window-like symbols via
+  `gui-assets symbols`; optionally use its dark cross in the SDL3 close
+  button with `--overlay-symbols-bmp`. **Trace these symbols back to their
+  original GUI use before treating them as genuine menu button art.** The
+  other 48 visible accented glyphs still need codepoint labels.
   Keep the native UI separate from guest framebuffer emulation so menus can
   coexist with the cockpit and eventually replace original hardcoded GUI
   callbacks. Compare extracted textures and layout with `docs/gui-assets.md`;

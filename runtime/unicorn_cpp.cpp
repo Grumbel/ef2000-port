@@ -135,6 +135,7 @@ struct WindowOptions {
     bool show_fps{true}, gamepad_flight_profile{true};
     std::string overlay_frame_bmp;
     std::string overlay_font_bmp;
+    std::string overlay_symbols_bmp;
     int overlay_frame_border{12};
     int width = 1280, height = 960;
     std::string aspect_ratio = "4:3";
@@ -251,6 +252,28 @@ public:
             std::cerr << "overlay: loaded original menu glyph atlas "
                       << options_.overlay_font_bmp << "\n";
         }
+        if (!options_.overlay_symbols_bmp.empty()) {
+            SDL_Surface* surface = SDL_LoadBMP(options_.overlay_symbols_bmp.c_str());
+            if (!surface)
+                throw std::runtime_error("cannot load overlay symbols BMP: " +
+                                         options_.overlay_symbols_bmp + ": " + SDL_GetError());
+            if (surface->w != 112 || surface->h != 32) {
+                SDL_DestroySurface(surface);
+                throw std::runtime_error("overlay symbol atlas must be 112x32 pixels");
+            }
+            if (!SDL_SetSurfaceColorKey(surface, true, SDL_MapSurfaceRGB(surface, 255, 0, 255))) {
+                SDL_DestroySurface(surface);
+                throw std::runtime_error(std::string("overlay symbol color key: ") + SDL_GetError());
+            }
+            overlay_symbols_texture_ = SDL_CreateTextureFromSurface(renderer_, surface);
+            SDL_DestroySurface(surface);
+            if (!overlay_symbols_texture_ ||
+                !SDL_SetTextureScaleMode(overlay_symbols_texture_, SDL_SCALEMODE_NEAREST) ||
+                !SDL_SetTextureBlendMode(overlay_symbols_texture_, SDL_BLENDMODE_BLEND))
+                throw std::runtime_error(std::string("SDL3 overlay symbol texture: ") + SDL_GetError());
+            std::cerr << "overlay: loaded original specimen symbols "
+                      << options_.overlay_symbols_bmp << "\n";
+        }
         probe_joystick(true);
 #else
         throw std::runtime_error("this binary was built without SDL3; remove --windowed");
@@ -265,6 +288,7 @@ public:
         close_joystick();
         if (overlay_frame_texture_) SDL_DestroyTexture(overlay_frame_texture_);
         if (overlay_font_texture_) SDL_DestroyTexture(overlay_font_texture_);
+        if (overlay_symbols_texture_) SDL_DestroyTexture(overlay_symbols_texture_);
         if (texture_) SDL_DestroyTexture(texture_);
         if (renderer_) SDL_DestroyRenderer(renderer_);
         if (window_) SDL_DestroyWindow(window_);
@@ -860,7 +884,15 @@ private:
             // checkbox motif rather than prominent red/gold widgets.
             overlay_fill(panel.x + panel.w - 19, panel.y + 6, 14, 14, 32, 32, 32);
             overlay_fill(panel.x + panel.w - 18, panel.y + 7, 12, 12, 131, 131, 135);
-            overlay_text(panel.x + panel.w - 16, panel.y + 9, "X", 1, 27, 27, 27);
+            if (overlay_symbols_texture_) {
+                // Cell (4, 1) is the 16x16 dark cross from the specimen.
+                const SDL_FRect source{64, 16, 16, 16};
+                const SDL_FRect target{panel.x + panel.w - 20, panel.y + 5, 16, 16};
+                if (!SDL_RenderTexture(renderer_, overlay_symbols_texture_, &source, &target))
+                    throw std::runtime_error(std::string("SDL3 overlay close symbol: ") + SDL_GetError());
+            } else {
+                overlay_text(panel.x + panel.w - 16, panel.y + 9, "X", 1, 27, 27, 27);
+            }
             overlay_fill(panel.x + panel.w - 13, panel.y + panel.h - 7, 8, 1, 159, 159, 175);
             overlay_fill(panel.x + panel.w - 7, panel.y + panel.h - 13, 1, 8, 159, 159, 175);
 
@@ -917,6 +949,7 @@ private:
     SDL_Texture* texture_{};
     SDL_Texture* overlay_frame_texture_{};
     SDL_Texture* overlay_font_texture_{};
+    SDL_Texture* overlay_symbols_texture_{};
     ef2000::MenuFontWidths overlay_font_widths_{};
     int overlay_frame_width_{}, overlay_frame_height_{};
     SDL_Joystick* joystick_{};
@@ -2692,6 +2725,7 @@ void usage(const char* program) {
               << "       [--no-fps] (hide the SDL presentation and changed-frame HUD)\n"
               << "       [--overlay-frame-bmp FILE] [--overlay-frame-border N] (1..32)\n"
               << "       [--overlay-font-bmp FILE] (extracted menu-font.bmp and .widths)\n"
+              << "       [--overlay-symbols-bmp FILE] (extracted menu-symbols.bmp)\n"
               << "       [--fast-copy] (experimental host acceleration of large guest copies)\n"
               << "       [--fast-copy-vga] (also accelerate copies into the banked VGA RAM window)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
@@ -2793,6 +2827,8 @@ int main(int argc, char** argv) {
                 window.overlay_frame_bmp = argv[++i];
             } else if (!std::strcmp(argv[i], "--overlay-font-bmp") && i + 1 < argc) {
                 window.overlay_font_bmp = argv[++i];
+            } else if (!std::strcmp(argv[i], "--overlay-symbols-bmp") && i + 1 < argc) {
+                window.overlay_symbols_bmp = argv[++i];
             } else if (!std::strcmp(argv[i], "--overlay-frame-border") && i + 1 < argc) {
                 const std::string value = argv[++i];
                 size_t parsed{};
@@ -2944,6 +2980,8 @@ int main(int argc, char** argv) {
             throw std::runtime_error("--overlay-frame-bmp requires --windowed or --fullscreen");
         if (!window.overlay_font_bmp.empty() && !window.enabled)
             throw std::runtime_error("--overlay-font-bmp requires --windowed or --fullscreen");
+        if (!window.overlay_symbols_bmp.empty() && !window.enabled)
+            throw std::runtime_error("--overlay-symbols-bmp requires --windowed or --fullscreen");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace || self_test_fast_copy) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
                 int(self_test_retrace) + int(self_test_fast_copy) != 1)

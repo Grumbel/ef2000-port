@@ -21,12 +21,14 @@ try:
     from .pcx_image import decode as decode_pcx, is_pcx
     from .spr_image import decode as decode_spr
     from .menu_font import rip_font
+    from .menu_symbols import rip_symbols
 except ImportError:
     from did_archive import DIDArchive
     from ilbm_image import decode, encode_png, encode_bmp
     from pcx_image import decode as decode_pcx, is_pcx
     from spr_image import decode as decode_spr
     from menu_font import rip_font
+    from menu_symbols import rip_symbols
 
 
 ARCHIVES = ('DID1ST.DAT', 'DID.DAT')
@@ -273,6 +275,9 @@ def main(argv=None):
     font = modes.add_parser('font', help='recover proportional glyphs from original DID1ST font specimen')
     font.add_argument('game_dir', type=Path, help='original game installation with DID1ST.DAT')
     font.add_argument('--out', type=Path, required=True, help='new local font output directory')
+    symbols = modes.add_parser('symbols', help='extract two-row symbol strip from original DID1ST specimen')
+    symbols.add_argument('game_dir', type=Path, help='original game installation with DID1ST.DAT')
+    symbols.add_argument('--out', type=Path, required=True, help='new local symbol output directory')
     args = parser.parse_args(argv)
     try:
         if args.action == 'inventory':
@@ -288,6 +293,9 @@ def main(argv=None):
             print(f'recovered {len(glyphs)} menu glyphs into {args.out}')
             if conflicts:
                 print(f'  non-identical repeated samples: {", ".join(conflicts)}')
+        elif args.action == 'symbols':
+            metadata = rip_symbols(args.game_dir, args.out)
+            print(f'extracted {len(metadata["cells"])} specimen symbols into {args.out}')
         else:
             result = extract(args.game_dir, args.out, args.paths, args.all_images, args.bmp)
             print(f'extracted {len(result)} GUI assets into {args.out}')

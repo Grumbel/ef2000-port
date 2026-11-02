@@ -163,6 +163,38 @@ format. The underlying glyph storage and rendering routine are still unknown; a
 Ghidra analysis of the GUI text blitter would establish glyph metrics,
 available character sets, shadowing and color/palette behavior.
 
+### Symbols from the same specimen
+
+This 320×200 test screen also carries **two rows of seven 16×16 symbols**:
+up/down/left/right arrows, a cross, overlapping rectangles and corner marks.
+The upper row uses light strokes; the lower uses dark ones. A pointer-like
+drawing straddles the right-hand cell boundary, and the bottom of the image
+contains three small aircraft and another sprite. The latter artwork is
+**not evidence of menu cursor art** and is not presently extracted as GUI
+controls. Similarly, the two-row symbols have not yet been traced to a GUI
+callback or button definition; the command below records only the actual
+pixels, plausible visual names, and coordinates.
+
+```sh
+nix run .#gui-assets -- symbols /path/to/EF2000 --out local/menu-symbols
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --overlay-symbols-bmp local/menu-symbols/menu-symbols.bmp
+```
+
+`tools/menu_symbols.py` exports a 112×32 BMP with a magenta transparency key,
+an RGBA PNG and JSON cell coordinates. It preserves original palette colors
+for the 14 grid cells and omits the overlapping pointer rather than slicing
+it into misleading fragments. The optional SDL3 overlay uses the dark cross
+as its window-close icon, without changing click hit-testing; the ordinary
+text `X` remains the default when the BMP is not supplied. Original graphic
+bytes and their converted output are **never included in Git or Nix**.
+
+The remaining specimen rows visually contain **48 additional accented
+glyphs** after `xyz`, in 42 + 6 segmented columns. Their codepoint order is
+not yet established, so the current atlas keeps these separate from the
+verified ASCII mapping. Resolving at least the German `äöüÄÖÜß` set is a
+useful follow-up before adding native localized overlay labels.
+
 ## Extractor
 
 All tools require original game data supplied by the caller; no images, GUI

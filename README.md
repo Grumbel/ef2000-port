@@ -401,6 +401,21 @@ from the menu screenshots, but its underlying binary glyph format remains
 unidentified. The extractor records the source hash and coverage in JSON.
 Neither the bitmap nor its derived widths are committed to Git.
 
+The same original font specimen contains small **directional and window-like
+symbols** in light/dark variants. An extractor recovers the 14 neatly
+aligned cells (without guessing the identity of overlapping drawings) as an
+RGBA PNG, a magenta-keyed BMP and a JSON cell catalog. To use the original
+dark cross in the movable overlay's window-close buttons:
+
+```sh
+nix run .#gui-assets -- symbols /path/to/EF2000 --out local/menu-symbols
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --overlay-symbols-bmp local/menu-symbols/menu-symbols.bmp
+```
+
+This is verified specimen artwork, but its role in the DOS GUI has not yet
+been established. No copyrighted image bytes are distributed with the port.
+
 If you can isolate a clean, reusable **frame** region, the extractor can
 additionally export BMPs for SDL3 (with `--bmp`). A carefully cropped BMP
 can be supplied as a nine-slice texture:
