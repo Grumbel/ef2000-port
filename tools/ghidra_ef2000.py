@@ -170,6 +170,8 @@ def copy_callers(args):
 
 def export_all(args):
     """Inventory all recovered functions or export their complete pseudo-C corpus."""
+    if getattr(args, 'fastcall_fallback', False) and getattr(args, 'watcom_fallback', False):
+        raise ValueError('choose only one decompiler fallback model')
     workspace = validated_workspace(args.workspace)
     output = (args.output or workspace / 'full-export').resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -183,6 +185,7 @@ def export_all(args):
         '-postScript', 'EF2000ExportAll.java', str(output), mode,
         str(getattr(args, 'limit', 0)),
         'overwrite' if getattr(args, 'overwrite', False) else 'resume',
+        'watcom' if getattr(args, 'watcom_fallback', False) else
         'fastcall' if getattr(args, 'fastcall_fallback', False) else 'none',
     ]
     subprocess.run(command, check=True)
@@ -325,6 +328,8 @@ def main(argv=None):
                             help='regenerate cached pseudo-C after changing Ghidra annotations')
     all_export.add_argument('--fastcall-fallback', action='store_true',
                             help='optionally retry failed pseudo-C with an unverified __fastcall evaluation model')
+    all_export.add_argument('--watcom-fallback', action='store_true',
+                            help='retry failed pseudo-C using the optional experimental EAX/EDX/EBX/ECX model')
     recovery = subparsers.choices['recover-orphans']
     recovery.add_argument('--output', type=Path,
                           help='TSV report (default: workspace/recovery-candidates.tsv)')

@@ -347,3 +347,43 @@ With `export-all --overwrite --fastcall-fallback` the final result is
 recognized functions. The five unresolved entries are `0xb3084`, `0xb3168`,
 `0xb59a8`, `0xb8510`, and `0xca620`. Their instruction-level disassembly
 remains available for manual recovery.
+
+## Experimental Watcom register model (bundle #045)
+
+The official [Open Watcom C/C++ User's Guide](https://open-watcom.github.io/open-watcom-v2-wikidocs/cguide.html)
+describes the 32-bit `__watcall` register set as `EAX`, `EBX`, `ECX`, `EDX`,
+with register sets determining *priority* rather than a guaranteed register
+selection order, caller-preserved state dependent on the call, stack cleanup,
+and possible `EDX:EAX` 64-bit returns. X-32 game code has its own low-level
+register/stack patterns, so this does **not** uniquely determine the ABI of
+every recovered function.
+
+To explore those assumptions without modifying the installed Ghidra or any
+existing projects, a standalone tool now creates a disposable Ghidra copy
+with a named experimental calling-convention model `__ef2000_aedb` in its
+x86 Windows compiler spec. The model tries integer arguments in `EAX`,
+`EDX`, `EBX`, `ECX` order, followed by the stack, with an `EDX:EAX` return
+option. The original Ghidra models remain unchanged, and this one is used
+**only to retry already-failing decompilations**, not to rewrite thousands
+of existing inferred function signatures.
+
+Two register orders were tested on a disposable copy of the #044 project
+in Ghidra 11.4.2 / JDK 21. The `EAX, EBX, ECX, EDX` prioritization yielded
+the same three new C functions as the earlier generic `__fastcall` fallback.
+The `EAX, EDX, EBX, ECX` prioritization also decompiled **`0xca620`**,
+previously an assembly-only function. Its C output suggests GUI coordinate
+clipping and redraw logic, but it still contains suspicious inferred
+`in_stack_00000002` arguments; no source-level correctness is claimed.
+
+| Corpus measure | Default decompiler | `__fastcall` fallback | Experimental Watcom-style fallback |
+| --- | ---: | ---: | ---: |
+| Recognized functions | 4,203 | 4,203 | 4,203 |
+| Pseudo-C exports | 4,195 | 4,198 | **4,199** |
+| Assembly-only fallbacks | 8 | 5 | **4** |
+| Non-default pseudo-C outputs | 0 | 3 | **4** |
+
+The remaining four low-level failures are `0xb3084`, `0xb3168`, `0xb59a8`,
+and `0xb8510`. Their decompiler errors are unchanged under both register
+priorities. The custom spec is a **reproducible experiment**, not the complete
+Watcom ABI, and should remain opt-in until its register and stack semantics
+are corroborated against many concrete callers and return sites.

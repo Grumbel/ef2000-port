@@ -215,6 +215,16 @@ class GhidraWorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'without a fresh report.json'):
                 ghidra.export_all(args)
 
+    def test_full_export_rejects_conflicting_decompiler_models(self):
+        args = argparse.Namespace(command='export-all', workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  limit=0, overwrite=True,
+                                  fastcall_fallback=True, watcom_fallback=True)
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'only one decompiler fallback'):
+                ghidra.export_all(args)
+            run.assert_not_called()
+
     def test_recover_orphans_defaults_to_report_only(self):
         (self.workspace / 'projects').mkdir(parents=True)
         (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')

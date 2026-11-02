@@ -87,6 +87,48 @@ Ghidra symbols nor calling conventions are mutated. The `report.json` field
 `fastcall_fallback_decompilations` counts newly exported non-default C outputs.
 This mode is purely exploratory: `__fastcall` is not the Watcom X-32 ABI, and
 register/stack parameter recovery needs manual checking.
+
+### Experimental Watcom-style register model
+
+The [Open Watcom C/C++ User's Guide](https://open-watcom.github.io/open-watcom-v2-wikidocs/cguide.html)
+documents the 32-bit `__watcall` convention, including its integer argument
+register set and stack cleanup. EF2000's actual X-32 code also uses customized
+register-passing sequences. The order of registers within the compiler's
+default register set is not necessarily the source order. Thus we cannot
+assume a single reconstructed calling convention applies to every function.
+
+For an opt-in decompiler experiment, `tools/ghidra_watcom.py` creates a
+**new private copy** of Ghidra, adding the narrowly named model
+`__ef2000_aedb` to its x86 Windows compiler specification. It preserves the
+original Ghidra installation (including a read-only Nix store) and all
+existing projects:
+
+```sh
+# In nix develop, GHIDRA_HOME is already set. This copies Ghidra (~hundreds
+# of MiB); refuse to overwrite an existing target.
+python3 tools/ghidra_watcom.py \
+  --destination local/ghidra-watcom-install
+# Use a separate export directory so the ordinary corpus is preserved.
+python3 tools/ghidra_ef2000.py export-all \
+  --workspace local/ghidra-entries-recovery \
+  --output local/ghidra-entries-recovery/watcom-export \
+  --watcom-fallback \
+  --analyze-headless local/ghidra-watcom-install/support/analyzeHeadless
+```
+
+The experimental model prioritizes 32-bit arguments in `EAX`, `EDX`, `EBX`,
+`ECX` before the stack, and models a possible 64-bit `EDX:EAX` return. This
+is a working hypothesis informed by original code, **not an ABI proof**.
+It affects only retry decompilations that already failed with Ghidra's
+default model; neither Ghidra function signatures nor the binary are edited.
+The `functions.tsv` status `written_watcom_fallback`, a C-header warning, and
+the `watcom_fallback_decompilations` report field identify those results.
+`--watcom-fallback` and `--fastcall-fallback` are mutually exclusive.
+If the experimental compiler specification is missing, the tool fails with
+an explanatory error rather than silently substituting another model.
+On the #044 recovery corpus, this optional mode produced **4,199 pseudo-C
+files and four remaining assembly fallbacks** (one more C function than the
+generic `__fastcall` retry), with no change to discovered function count.
 If Ghidra is upgraded, make a copy of your project before opening it with
 the newer release, since Ghidra can migrate the project database.
 
