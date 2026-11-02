@@ -7,13 +7,16 @@
 
 - Commit verified work in small, incremental pieces as it becomes ready. Do not
   accumulate hours of unrelated changes before committing.
-- Every new commit must include a `Co-authored-by:` trailer naming the exact
-  model that made the commit, using `codex@openai.com` as the attribution address.
-- Obtain the exact model identifier from authoritative session metadata or the
+- Every new commit must include a `Co-authored-by:` trailer, using
+  `codex@openai.com` as the attribution address.
+- Prefer the exact model identifier from authoritative session metadata or the
   user. Do not infer it from a model family, repository configuration, or another
   agent's model. If unavailable, ask while continuing implementation and checks.
-- For this session, the user confirmed `/model` reports `6.1 Sol`. Use
-  `Co-authored-by: 6.1 Sol <codex@openai.com>`. Recheck the model in future sessions.
+- For ChatGPT Chat sessions that disclose only a reasoning setting (such as
+  "High"), the user approved a descriptive fallback. Use
+  `Co-authored-by: ChatGPT (High) <codex@openai.com>` for ChatGPT High when the
+  exact model cannot be established. Record an actual model identifier instead
+  whenever one is available; do not reuse attribution across different sessions.
 - Keep commit descriptions focused on the behavior changed and relevant evidence.
 
 ## UI verification
