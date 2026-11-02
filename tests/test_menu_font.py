@@ -1,0 +1,100 @@
+# SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+"""Menu font segmentation, atlas layout and original-asset opt-in replay."""
+
+import json
+import os
+from pathlib import Path
+import string
+import tempfile
+import unittest
+
+from tools.ilbm_image import Image
+from tools.menu_font import (ASCII_END, ASCII_START, CELL_HEIGHT, CELL_WIDTH,
+                             Glyph, Sample, collect_glyphs, render_atlas,
+                             rip_font, sample_glyphs)
+
+
+def synthetic_image():
+    # Two three-pixel-wide letters separated by exactly two empty columns.
+    width, height = 10, 10
+    pixels = bytearray(width * height)
+    for y in range(height):
+        for x in (1, 3, 6, 8):
+            pixels[y * width + x] = 1
+    pixels[1 * width + 2] = 1
+    pixels[1 * width + 7] = 1
+    return Image(width, height, bytes(pixels),
+                 b'\x00\x00\x00\xff\xff\xff' + bytes(762))
+
+
+class MenuFontTests(unittest.TestCase):
+    def test_labeled_column_segmentation_and_unknown_glyph_rejection(self):
+        image = synthetic_image()
+        entries = sample_glyphs(image, (0, 0, 10, 10), 'A B')
+        self.assertEqual([char for char, _ in entries], ['A', 'B'])
+        self.assertEqual([glyph.width for _, glyph in entries], [3, 3])
+        self.assertEqual(entries[0][1].mask[:3], b'\x01\x00\x01')
+        with self.assertRaisesRegex(ValueError, 'groups for 3 characters'):
+            sample_glyphs(image, (0, 0, 10, 10), 'ABC')
+        with self.assertRaisesRegex(ValueError, 'rectangle'):
+            sample_glyphs(image, (0, 0, 10, 13), 'AB')
+        sample = Sample(1234, (0, 0, 10, 10), 'AB')
+        glyphs, conflicts = collect_glyphs({1234: image}, [sample], required='AB')
+        self.assertEqual(set(glyphs), {'A', 'B'})
+        self.assertEqual(conflicts, [])
+        with self.assertRaisesRegex(ValueError, 'missing required font letters'):
+            collect_glyphs({1234: image}, [sample], required='ABC')
+
+    def test_conflicting_rasters_use_majority_without_merging(self):
+        original = synthetic_image()
+        modified = bytearray(original.indexed)
+        modified[2 * original.width + 2] = 1
+        images = {1: original, 2: Image(original.width, original.height,
+                                        bytes(modified), original.palette)}
+        samples = [Sample(key, (0, 0, 10, 10), 'AB') for key in (1, 2, 1)]
+        result, conflicts = collect_glyphs(images, samples, required='AB')
+        self.assertEqual(conflicts, ['A'])
+        self.assertEqual(result['A'], sample_glyphs(original, (0, 0, 10, 10), 'AB')[0][1])
+
+    def test_atlas_layout_and_missing_widths(self):
+        glyphs = {'A': Glyph(3, 2, b'\x01\x00\x01\x00\x01\x00'),
+                  'M': Glyph(7, 1, b'\x01' * 7)}
+        atlas, widths = render_atlas(glyphs)
+        self.assertEqual((atlas.width, atlas.height), (128, 72))
+        self.assertEqual(len(widths), ASCII_END - ASCII_START + 1)
+        self.assertEqual(widths[ord(' ') - ASCII_START], 0)
+        self.assertEqual(widths[ord('A') - ASCII_START], 3)
+        self.assertEqual(widths[ord('M') - ASCII_START], 7)
+        self.assertEqual(widths[ord('C') - ASCII_START], -1)
+        left = (ord('A') - ASCII_START) % 16 * CELL_WIDTH
+        top = (ord('A') - ASCII_START) // 16 * CELL_HEIGHT
+        self.assertEqual(atlas.indexed[top * atlas.width + left], 1)
+        self.assertEqual(atlas.indexed[top * atlas.width + left + 1], 0)
+        self.assertEqual(atlas.palette[:6], b'\xff\x00\xff\xff\xff\xff')
+
+
+@unittest.skipUnless(os.environ.get('EF2000_DATA_DIR'),
+                     'set EF2000_DATA_DIR to rip supplied TACTCOM menu font')
+class OriginalMenuFontTests(unittest.TestCase):
+    def test_original_options_images_recover_entire_latin_alphabet(self):
+        with tempfile.TemporaryDirectory() as directory:
+            glyphs, conflicts = rip_font(Path(os.environ['EF2000_DATA_DIR']),
+                                        Path(directory))
+            self.assertEqual(len(glyphs), 41)
+            self.assertTrue(set(string.ascii_uppercase).issubset(glyphs))
+            self.assertIn('N', conflicts)  # captured raster variants
+            widths = [int(value) for value in
+                      (Path(directory) / 'menu-font.widths').read_text().split()]
+            self.assertEqual(len(widths), 95)
+            self.assertEqual(widths[ord('M') - 32], 7)
+            self.assertTrue((Path(directory) / 'menu-font.bmp').read_bytes().startswith(b'BM'))
+            manifest = json.loads((Path(directory) / 'menu-font.json').read_text())
+            self.assertEqual(manifest['cell_size'], [8, 12])
+            with self.assertRaises(FileExistsError):
+                rip_font(Path(os.environ['EF2000_DATA_DIR']), Path(directory))
+
+
+if __name__ == '__main__':
+    unittest.main()

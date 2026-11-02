@@ -20,11 +20,13 @@ try:
     from .ilbm_image import decode, encode_png, encode_bmp
     from .pcx_image import decode as decode_pcx, is_pcx
     from .spr_image import decode as decode_spr
+    from .menu_font import rip_font
 except ImportError:
     from did_archive import DIDArchive
     from ilbm_image import decode, encode_png, encode_bmp
     from pcx_image import decode as decode_pcx, is_pcx
     from spr_image import decode as decode_spr
+    from menu_font import rip_font
 
 
 ARCHIVES = ('DID1ST.DAT', 'DID.DAT')
@@ -268,6 +270,9 @@ def main(argv=None):
     unpack.add_argument('--gallery', action='store_true', help='also generate a standalone offline image gallery')
     display = modes.add_parser('gallery', help='make an offline HTML contact gallery of extracted PNGs')
     display.add_argument('extraction_dir', type=Path, help='directory containing manifest.json')
+    font = modes.add_parser('font', help='recover original menu glyphs from supplied options screenshots')
+    font.add_argument('game_dir', type=Path, help='original game installation with DID1ST.DAT')
+    font.add_argument('--out', type=Path, required=True, help='new local font output directory')
     args = parser.parse_args(argv)
     try:
         if args.action == 'inventory':
@@ -278,6 +283,11 @@ def main(argv=None):
         elif args.action == 'gallery':
             count = gallery(args.extraction_dir)
             print(f'indexed {count} images in {args.extraction_dir / "gallery.html"}')
+        elif args.action == 'font':
+            glyphs, conflicts = rip_font(args.game_dir, args.out)
+            print(f'recovered {len(glyphs)} menu glyphs into {args.out}')
+            if conflicts:
+                print(f'  non-identical repeated samples: {", ".join(conflicts)}')
         else:
             result = extract(args.game_dir, args.out, args.paths, args.all_images, args.bmp)
             print(f'extracted {len(result)} GUI assets into {args.out}')

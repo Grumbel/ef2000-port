@@ -112,6 +112,42 @@ and 45 little-endian 16-bit sprite offsets. Each sprite record contains an
 pixel/index values. `tools/spr_image.py` preserves those indices exactly in
 JSON without inventing a font character map or colour palette.
 
+### Menu typography reconstructed from the original screen bitmaps
+
+The 640×400 English and German options images provide a second, stronger
+font lead. Their white labels are made of crisp 1-bit strokes: uppercase
+letters are generally **10 pixels tall and 1–4 pixels wide**, with 7-pixel
+`M`/`W`, two blank columns between letters and a wider word-space. The
+descender of uppercase `Q` reaches 11 pixels. This describes the observed
+**rasterized text**, not a recovered in-memory font definition.
+
+`tools/menu_font.py` captures manually verified line rectangles from
+`hash_94eb76bc` and `hash_950b6052` and matches groups of lit columns to
+known transcribed letters. It recovers **all A–Z** by combining titles with
+capital initials from *Joystick*, *Keyboard*, *World Detail*, *Yes*, *Quit*
+and *Zurück*. It also recovers 15 additional letters/punctuation, for 41
+distinct glyphs altogether. To use this as an optional SDL3 overlay font:
+
+```sh
+ef2000-gui-assets font /path/to/EF2000 --out local/menu-font
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --overlay-font-bmp local/menu-font/menu-font.bmp
+```
+
+The extractor writes a magenta-keyed 128×72 bitmap containing 8×12 cells
+for ASCII 32..126, an identical PNG for inspection, a plain text `.widths`
+table (95 values), and an evidence/coverage JSON. The SDL3 overlay loads
+the bitmap and corresponding widths table, preserves proportional letter
+spacing and falls back to debug text for missing glyphs (notably **digits**).
+All derived pixels remain outside Git and the Nix output. Some repeated
+samples differ by one or more pixels (`N`, `S`, `U` and several lowercase
+forms); the tool reports these discrepancies and selects the most commonly
+observed variant, without pretending the font is completely reconstructed.
+
+The actual menu font storage and rendering routine are still unknown; a
+Ghidra analysis of the GUI text blitter would establish glyph metrics,
+available character sets, shadowing and color/palette behavior.
+
 ## Extractor
 
 All tools require original game data supplied by the caller; no images, GUI
@@ -199,14 +235,15 @@ alignment, palette fidelity and scale against the existing guest renderer.
 
 ## Open questions
 
-- **Fonts:** The inspected `.gui` scripts specify text and titles but not a
+- **Font internals:** The inspected `.gui` scripts specify text and titles but not a
   separate font file. The directory tables contain bitmap/sprite-like
   extensions such as `.bbm`, `.abm`, `.pmi`, `.pmm` and `.spr`, not a
   conventional `.fnt` extension. Beyond the recovered `pitfont.spr`, we
   have **not yet identified** which glyph data the menu renders, whether
-  it is embedded in the executable or another bitmap member,
-  or the metrics/kerning behavior. The tfx3view HUD font is not a valid
-  substitute without further verification.
+  it is embedded in the executable or another bitmap member, or the complete
+  metrics/kerning behavior. The screenshot-ripped A–Z alphabet above is a
+  usable approximation, not evidence of an original font resource. The
+  tfx3view HUD font is not a valid substitute without further verification.
 - **Widgets:** The scripts describe interaction/layout, but the exact bitmap
   motifs for frame borders, buttons, icons, cursors, and palettes still need
   to be linked to archive resources and GUI renderer routines.

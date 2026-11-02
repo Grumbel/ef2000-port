@@ -63,6 +63,7 @@ ef2000-gui-assets extract /path/to/EF2000 gui/mainmenu.gui \
   iff/256/newgui03.lbm spr/pitfont.spr --out local/gui-assets
 ef2000-gui-assets extract /path/to/EF2000 --all-images --gallery \
   --out local/gui-contact-gallery # open gallery.html locally
+ef2000-gui-assets font /path/to/EF2000 --out local/ef2000-menu-font
 python3 tools/gfxplus_probe.py /path/to/Tactpat.exe # examine GFX+ updater (read-only)
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
@@ -366,7 +367,7 @@ neutral. The windows can overlap, remember their position and size while
 hidden, and reopen from the overlay's keyboard commands. The procedural
 gray/silver frame and stepped olive title tabs are based on actual **English
 and German EF2000 menu bitmaps** recovered from `DID1ST.DAT`; this is a
-reconstruction, not a direct rendering of the original UI code or font.
+reconstruction, not a direct rendering of the original GUI code.
 
 The `gui-assets` extractor can generate a self-contained, offline HTML
 gallery of all recovered images. This is a useful way to find and compare
@@ -377,6 +378,25 @@ nix run .#gui-assets -- extract /path/to/EF2000 \
   --all-images --gallery --out local/gui-art
 # Open local/gui-art/gallery.html in a browser (no JavaScript or network).
 ```
+
+The same original options images contain enough crisp, un-antialiased text
+to recover **all 26 Latin uppercase characters** and 15 further lowercase
+or punctuation glyphs. To generate a proportional, native-resolution font
+atlas privately from your original archives:
+
+```sh
+nix run .#gui-assets -- font /path/to/EF2000 --out local/menu-font
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
+  --overlay-font-bmp local/menu-font/menu-font.bmp
+```
+
+The SDL3 overlay reads the adjacent `menu-font.widths` file and uses the
+original glyph widths and two-pixel letter spacing. Unsupported characters
+(including most digits) fall back to SDL3's built-in debugging font. Repeated
+archive glyphs differ slightly in a few cases; the extractor records those
+variants and selects the most common raster. This is **screen-ripped glyph
+art**, not a claim to have found the original standalone font resource.
+Neither the bitmap nor its derived widths are committed to Git.
 
 If you can isolate a clean, reusable **frame** region, the extractor can
 additionally export BMPs for SDL3 (with `--bmp`). A carefully cropped BMP

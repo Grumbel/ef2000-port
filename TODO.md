@@ -130,10 +130,13 @@ Implemented and verified:
   offline `--gallery` view, and full-screen English/German original option
   images provide concrete gray/silver/olive frame references. The procedural
   host overlay follows those observed colors/title tabs; `newgui03` is only
-  a textured background. **Reverse-engineer the procedural `box`/`bkd`
-  renderer and identify the original menu font/button art**, then add an
-  optional texture atlas and verify against original screenshots. Finer
-  widgets and gamepad window navigation remain open tasks.
+  a textured background. The new `gui-assets font` path can rip all 26
+  uppercase glyphs and 15 further characters from original options images;
+  the optional SDL3 atlas is **not a complete font** (digits and most lowercase
+  characters still fall back). **Reverse-engineer the procedural `box`/`bkd`
+  renderer and the actual menu font storage and metrics**, then add remaining
+  glyphs and verify against original screenshots. Finer widgets and gamepad
+  window navigation remain open tasks.
   Keep the native UI separate from guest framebuffer emulation so menus can
   coexist with the cockpit and eventually replace original hardcoded GUI
   callbacks. Compare extracted textures and layout with `docs/gui-assets.md`;

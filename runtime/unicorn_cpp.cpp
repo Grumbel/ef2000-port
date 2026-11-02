@@ -8,6 +8,7 @@
 #include "bios_disk.hpp"
 #include "gamepad_profile.hpp"
 #include "host_shortcuts.hpp"
+#include "menu_font.hpp"
 #include "nine_slice.hpp"
 #include "overlay_windows.hpp"
 #include "cd_audio.hpp"
@@ -133,6 +134,7 @@ struct WindowOptions {
     bool profile_video_frames{};
     bool show_fps{true}, gamepad_flight_profile{true};
     std::string overlay_frame_bmp;
+    std::string overlay_font_bmp;
     int overlay_frame_border{12};
     int width = 1280, height = 960;
     std::string aspect_ratio = "4:3";
@@ -214,6 +216,41 @@ public:
                       << " (" << overlay_frame_width_ << "x" << overlay_frame_height_
                       << ", border=" << border << ")\n";
         }
+        if (!options_.overlay_font_bmp.empty()) {
+            fs::path widths_path = options_.overlay_font_bmp;
+            widths_path.replace_extension(".widths");
+            std::ifstream widths_stream(widths_path);
+            if (!widths_stream)
+                throw std::runtime_error("cannot read overlay font widths: " + widths_path.string());
+            for (int& width : overlay_font_widths_) {
+                if (!(widths_stream >> width) || width < -1 || width > ef2000::menu_font_cell_width)
+                    throw std::runtime_error("invalid overlay font width table: " + widths_path.string());
+            }
+            std::string trailing;
+            if (widths_stream >> trailing)
+                throw std::runtime_error("overlay font width table has extra data: " + widths_path.string());
+            SDL_Surface* surface = SDL_LoadBMP(options_.overlay_font_bmp.c_str());
+            if (!surface)
+                throw std::runtime_error("cannot load overlay font BMP: " + options_.overlay_font_bmp +
+                                         ": " + SDL_GetError());
+            if (surface->w != ef2000::menu_font_atlas_width ||
+                surface->h != ef2000::menu_font_atlas_height) {
+                SDL_DestroySurface(surface);
+                throw std::runtime_error("overlay font atlas must be 128x72 pixels");
+            }
+            if (!SDL_SetSurfaceColorKey(surface, true, SDL_MapSurfaceRGB(surface, 255, 0, 255))) {
+                SDL_DestroySurface(surface);
+                throw std::runtime_error(std::string("overlay font color key: ") + SDL_GetError());
+            }
+            overlay_font_texture_ = SDL_CreateTextureFromSurface(renderer_, surface);
+            SDL_DestroySurface(surface);
+            if (!overlay_font_texture_ ||
+                !SDL_SetTextureScaleMode(overlay_font_texture_, SDL_SCALEMODE_NEAREST) ||
+                !SDL_SetTextureBlendMode(overlay_font_texture_, SDL_BLENDMODE_BLEND))
+                throw std::runtime_error(std::string("SDL3 overlay font texture: ") + SDL_GetError());
+            std::cerr << "overlay: loaded original menu glyph atlas "
+                      << options_.overlay_font_bmp << "\n";
+        }
         probe_joystick(true);
 #else
         throw std::runtime_error("this binary was built without SDL3; remove --windowed");
@@ -227,6 +264,7 @@ public:
         if (audio_initialized_) SDL_QuitSubSystem(SDL_INIT_AUDIO);
         close_joystick();
         if (overlay_frame_texture_) SDL_DestroyTexture(overlay_frame_texture_);
+        if (overlay_font_texture_) SDL_DestroyTexture(overlay_font_texture_);
         if (texture_) SDL_DestroyTexture(texture_);
         if (renderer_) SDL_DestroyRenderer(renderer_);
         if (window_) SDL_DestroyWindow(window_);
@@ -732,6 +770,30 @@ private:
                       uint8_t red = 230, uint8_t green = 232, uint8_t blue = 222) {
         if (max_chars <= 0) return;
         if (value.size() > size_t(max_chars)) value.resize(size_t(max_chars));
+        if (overlay_font_texture_) {
+            if (!SDL_SetTextureColorMod(overlay_font_texture_, red, green, blue))
+                throw std::runtime_error(std::string("SDL3 overlay font tint: ") + SDL_GetError());
+            float offset = 0;
+            const float limit = float(max_chars * 8);
+            for (unsigned char code : value) {
+                const auto glyph = ef2000::menu_font_glyph(overlay_font_widths_, code);
+                if (offset + glyph.advance > limit) break;
+                if (glyph.available && glyph.width > 0) {
+                    const SDL_FRect source{float(glyph.x), float(glyph.y),
+                                           float(glyph.width), float(glyph.height)};
+                    const SDL_FRect target{x + offset, y, float(glyph.width), float(glyph.height)};
+                    if (!SDL_RenderTexture(renderer_, overlay_font_texture_, &source, &target))
+                        throw std::runtime_error(std::string("SDL3 menu font render: ") + SDL_GetError());
+                } else if (!glyph.available) {
+                    const char fallback[]{char(code), '\0'};
+                    if (!SDL_SetRenderDrawColor(renderer_, red, green, blue, 255) ||
+                        !SDL_RenderDebugText(renderer_, x + offset, y, fallback))
+                        throw std::runtime_error(std::string("SDL3 menu font fallback: ") + SDL_GetError());
+                }
+                offset += float(glyph.advance);
+            }
+            return;
+        }
         if (!SDL_SetRenderDrawColor(renderer_, red, green, blue, 255) ||
             !SDL_RenderDebugText(renderer_, x, y, value.c_str()))
             throw std::runtime_error(std::string("SDL3 overlay text: ") + SDL_GetError());
@@ -854,6 +916,8 @@ private:
     SDL_Renderer* renderer_{};
     SDL_Texture* texture_{};
     SDL_Texture* overlay_frame_texture_{};
+    SDL_Texture* overlay_font_texture_{};
+    ef2000::MenuFontWidths overlay_font_widths_{};
     int overlay_frame_width_{}, overlay_frame_height_{};
     SDL_Joystick* joystick_{};
     SDL_Gamepad* gamepad_{};
@@ -2627,6 +2691,7 @@ void usage(const char* program) {
               << "       [--profile-video-frames] (count changed displayed images, requires SDL3 window)\n"
               << "       [--no-fps] (hide the SDL presentation and changed-frame HUD)\n"
               << "       [--overlay-frame-bmp FILE] [--overlay-frame-border N] (1..32)\n"
+              << "       [--overlay-font-bmp FILE] (extracted menu-font.bmp and .widths)\n"
               << "       [--fast-copy] (experimental host acceleration of large guest copies)\n"
               << "       [--fast-copy-vga] (also accelerate copies into the banked VGA RAM window)\n"
               << "       [--fullscreen] [--geometry WIDTHxHEIGHT]"
@@ -2726,6 +2791,8 @@ int main(int argc, char** argv) {
                 window.show_fps = false;
             } else if (!std::strcmp(argv[i], "--overlay-frame-bmp") && i + 1 < argc) {
                 window.overlay_frame_bmp = argv[++i];
+            } else if (!std::strcmp(argv[i], "--overlay-font-bmp") && i + 1 < argc) {
+                window.overlay_font_bmp = argv[++i];
             } else if (!std::strcmp(argv[i], "--overlay-frame-border") && i + 1 < argc) {
                 const std::string value = argv[++i];
                 size_t parsed{};
@@ -2875,6 +2942,8 @@ int main(int argc, char** argv) {
             throw std::runtime_error("--profile-video-frames requires --windowed or --fullscreen");
         if (!window.overlay_frame_bmp.empty() && !window.enabled)
             throw std::runtime_error("--overlay-frame-bmp requires --windowed or --fullscreen");
+        if (!window.overlay_font_bmp.empty() && !window.enabled)
+            throw std::runtime_error("--overlay-font-bmp requires --windowed or --fullscreen");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace || self_test_fast_copy) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
                 int(self_test_retrace) + int(self_test_fast_copy) != 1)

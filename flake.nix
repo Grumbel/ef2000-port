@@ -120,6 +120,9 @@
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/nine_slice_test.cpp \
             -o objects/ef2000-nine-slice-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/menu_font_test.cpp \
+            -o objects/ef2000-menu-font-test
           runHook postBuild
         '';
 
@@ -160,6 +163,7 @@
           objects/ef2000-overlay-windows-test
           objects/ef2000-host-shortcuts-test
           objects/ef2000-nine-slice-test
+          objects/ef2000-menu-font-test
           runHook postCheck
         '';
 
