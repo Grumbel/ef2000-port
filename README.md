@@ -31,7 +31,7 @@ On x86-64 Linux, build and run with Nix:
 nix build -L .                 # Precompile the native and QEMU harness objects
 nix flake check                # Unit tests, app/help/version checks, REUSE
 nix run . -- ../EF2000/c/EF2000/_EF2000.EXE --output local/nix-startup
-nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB
+nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
 
 Inside `nix develop`, the following development commands are available:
@@ -44,6 +44,9 @@ ef2000-run-gdb /path/to/_EF2000.EXE    # build then debug native startup.elf in 
 nix develop -c ef2000-build            # also works without an interactive shell
 nix build .#ef2000-win64-zip           # Windows x64 archive (C++ Unicorn/SDL3)
 nix build .#ef2000-win32-zip           # Windows x86 archive
+python3 tools/ghidra_ef2000.py import /path/to/_EF2000.EXE
+python3 tools/ghidra_ef2000.py decompile 0xe9a24 0x8b274
+ghidra                                  # GUI (also: nix run .#ghidra)
 ```
 
 `EF2000_SOURCE` defaults to the directory from which `nix develop` was entered;

@@ -12,6 +12,7 @@
       pkgs = import nixpkgs { inherit system; };
       inherit (pkgs) lib;
       python = pkgs.python3.withPackages (p: [ p.unicorn ]);
+      ghidraHome = "${pkgs.ghidra}/lib/ghidra";
       versionBase = lib.fileContents ./VERSION;
       gitRev = self.shortRev or self.dirtyShortRev or "dirty";
       version =
@@ -224,9 +225,20 @@
           program = "${package}/bin/ef2000-unicorn-cpp";
           meta.description = "Experiment with original EF2000 menu and flight in native C++ Unicorn/SDL3";
         };
+        ghidra = {
+          type = "app";
+          program = "${pkgs.ghidra}/bin/ghidra";
+          meta.description = "Open Ghidra to inspect the extracted EF2000 X-32 image";
+        };
       in { default = native; ef2000 = native;
            inherit unicorn;
            inherit unicorn-cpp;
+           inherit ghidra;
+           ghidra-headless = {
+             type = "app";
+             program = "${ghidraHome}/support/analyzeHeadless";
+             meta.description = "Run the Ghidra headless analyzer";
+           };
            ef2000-unicorn = unicorn;
            unicorn-probe = {
              type = "app";
@@ -301,9 +313,10 @@
       };
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
-        packages = [ python ] ++ devCommands ++ (with pkgs; [
+        packages = [ python pkgs.ghidra ] ++ devCommands ++ (with pkgs; [
           gcc binutils qemu-user dosbox-x cmake ninja gdb ccache
         ]);
+        GHIDRA_HOME = ghidraHome;
         EF2000_SDL_LIBRARY = "${pkgs.sdl3}/lib/libSDL3.so";
         EF2000_VERSION = version;
         shellHook = ''
@@ -331,6 +344,12 @@
           printf '  nix build .#ef2000-win32-zip    Windows x86 executable plus SDL3/Unicorn DLLs\n\n'
           printf '  python tools/unicorn_backend.py /path/to/_EF2000.EXE --windowed\n'
           printf '                                  Direct Unicorn backend for development\n\n'
+          printf 'Ghidra reverse engineering (original executable stays external):\n'
+          printf '  python3 tools/ghidra_ef2000.py import /path/to/_EF2000.EXE\n'
+          printf '                                  Import SHA-pinned X-32 image once\n'
+          printf '  python3 tools/ghidra_ef2000.py decompile 0xe9a24 0x8b274\n'
+          printf '                                  Export targeted pseudo-C and incoming references\n'
+          printf '  ghidra                          Open Ghidra GUI\n\n'
           printf 'Examples:\n'
           printf '  ef2000-run --data-dir /path/to/EF2000 --windowed\n'
           printf '  ef2000-run-gdb --data-dir /path/to/EF2000 --verbose\n'

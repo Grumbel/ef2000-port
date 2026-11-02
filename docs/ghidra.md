@@ -13,16 +13,20 @@ pseudo-C remain in the ignored `local/` directory by default.
 
 ## Initialize once
 
-Install Ghidra separately, then run from the EF2000 repository root:
+`nix develop` includes Ghidra and sets `GHIDRA_HOME` to the Nix store's
+`lib/ghidra` installation. Run from the EF2000 repository root:
 
 ```sh
-export GHIDRA_HOME=/path/to/ghidra
+nix develop
 python3 tools/ghidra_ef2000.py import \
   ../EF2000/c/EF2000/_EF2000.EXE
 ```
 
-You can also supply `--analyze-headless /path/to/ghidra/support/analyzeHeadless`
-instead of setting `GHIDRA_HOME`. The command verifies the executable SHA-256,
+Outside the development shell, `nix run .#ghidra` opens the GUI and
+`nix run .#ghidra-headless -- ...` runs the headless analyzer. With a separate
+Ghidra installation, set `GHIDRA_HOME=/path/to/ghidra`, or supply
+`--analyze-headless /path/to/ghidra/support/analyzeHeadless` to the Python tool.
+The command verifies the executable SHA-256,
 exports `payload.bin` and `manifest.json`, and imports the binary to the
 `local/ghidra/projects/EF2000` project using Ghidra's `BinaryLoader`,
 `x86:LE:32:default`, and load base **0**.

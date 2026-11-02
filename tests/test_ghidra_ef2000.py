@@ -121,6 +121,14 @@ class GhidraWorkflowTests(unittest.TestCase):
             with self.assertRaises(argparse.ArgumentTypeError):
                 ghidra.guest_offset(text)
 
+    def test_nix_ghidra_home_finds_headless_launcher(self):
+        home = Path(self.temp.name) / 'nix-store-ghidra/lib/ghidra'
+        launcher = home / 'support/analyzeHeadless'
+        launcher.parent.mkdir(parents=True)
+        launcher.write_text('#!/bin/sh\n')
+        with patch.dict(ghidra.os.environ, {'GHIDRA_HOME': str(home)}):
+            self.assertEqual(ghidra.headless_path(None), str(launcher))
+
 
 if __name__ == '__main__':
     unittest.main()
