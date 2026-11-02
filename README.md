@@ -48,6 +48,8 @@ ef2000-ghidra import /path/to/_EF2000.EXE
 ef2000-ghidra decompile 0xe9a24 0x8b274
 ef2000-ghidra inventory               # all discovered functions and code gaps
 ef2000-ghidra export-all --custom-storage-fallback # full pseudo-C corpus
+ef2000-ghidra function-facts          # export guest data references and jumps
+ef2000-ghidra subsystem-map --seed 0x4aa0 # rank related routines (read-only)
 ef2000-ghidra recover-orphans         # review referenced missing functions (dry run)
 ef2000-ghidra callback-tables         # extract verified named dispatch tables
 ef2000-ghidra name-callbacks          # audit names (dry run)

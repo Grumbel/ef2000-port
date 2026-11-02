@@ -815,11 +815,14 @@ returned `already_repaired`. The parent body grew **144 → 299 bytes**
 without overlapping the callback.
 
 This also strengthens the earlier high-score reverse engineering:
-the independently identified `kotsInitKOTS` callback calls
-`FUN_0000433c` (the #054 high-score insertion routine), checks its
-returned slot for failure, uses the record's 25-byte stride, and invokes
-other save/update helpers. The layout at `0x1970a4` is therefore used
-by a real original-game callback, not just an isolated inferred table.
+the independently identified `kotsInitKOTS` callback reaches the
+`FUN_0000433c` high-score insertion routine through a conditional jump into
+shared code at `0x487c`, which calls `0x433c`. The decompiler incorporates
+that shared control flow into the callback's pseudo-C, but **the callback
+does not directly CALL `0x433c`**. That path checks the returned slot for
+failure, uses the record's 25-byte stride, and invokes save/update helpers.
+The layout at `0x1970a4` is therefore used by a real original-game callback,
+not just an isolated inferred table.
 
 | Ghidra 11.4.2 measurement | #055 | #056 |
 | --- | ---: | ---: |
@@ -840,3 +843,55 @@ temporary-storage fallbacks and zero failures.
 The general body-hole audit now reports **46** intervals rather than 45:
 the newly recognized split body of `0x4aa0` correctly exposes the
 intervening `kotsInitKOTS` function as a hole instead of hiding it.
+
+## #057: Whole-program static reference and subsystem-affinity inventory
+
+The boundary-by-boundary recovery approach has diminishing returns for a
+**complete source reconstruction**. This pass adds an independent, read-only
+`function-facts` Ghidra script and an offline `subsystem-map` pass to build a
+whole-program investigation queue without rerunning the decompiler for every
+question. The source remains 4,233 recognized functions and 4,233 exported
+pseudo-C bodies from #056; this pass does not claim a native replacement.
+
+On the recovered #056 Ghidra 11.4.2 project, the new fact export measured:
+
+| Static inventory | Observed |
+| --- | ---: |
+| Recognized functions | **4,233** |
+| Explicit Listing DATA references to guest memory | **39,642** |
+| Operand address candidates in the global-address window | **6,038** |
+| Function-owned cross-boundary JUMP instructions | **159** |
+| Distinct direct-CALL function pairs from `calls.tsv` | **11,370** |
+| Distinct cross-boundary JUMP function pairs | **133** |
+| Functions with at least one explicit data reference | **3,163** |
+| Functions with at least one address candidate | **1,311** |
+| Complete-linkage candidate groups (threshold 8, max 16 functions) | **562** |
+
+Literal operands and Ghidra's established DATA references have different
+provenance and are not merged into an asserted xref. Coarse shared address
+regions and shared callees receive lower weights than exact addresses; common
+tokens are discarded. Candidate groups require a qualifying affinity between
+**every pair** of members, specifically to avoid a spurious giant component
+joined through weak chains. Neither groups nor scores establish program
+semantics, pointer types or Watcom X-32 parameter conventions.
+
+The first four seed neighborhoods yielded actionable high-score/arcade leads:
+
+| Seed | Closely related original routines | Independent evidence |
+| --- | --- | --- |
+| `0x4050` (score lookup) | `0x40dc`, `0x433c` (score insertion) | Shared exact references to `0x1970a4`, `0x1970b8`, `0x1970b9` |
+| `0x433c` (insertion) | `0x487c`, `0x40dc`, `0x432c` | Exact score-table globals and a direct CALL from `0x487c` |
+| `0x4aa0` (arcade/save path) | `gpwAcceptHiscore` (`0x4d4c`), `gpwMissionSelected` (`0x7c328`), `gpwChangeDifficulty` (`0x4cf4`) | Shared UI/save-state globals, including `0x121e44` and `0x1f8fc8` |
+| `kotsInitKOTS` (`0x4b54`) | `InitArcade` (`0x4c50`), `0x487c` | Shared callees and an actual conditional JUMP at `0x4b6b` into `0x487c` |
+
+The cross-function control-flow inventory resolves an ambiguity in the #056
+decompiler output: `kotsInitKOTS` branches to `0x487c` at `0x4b6b`; code at
+`0x487c` calls `0x433c`. The pseudo-C follows this shared path, but the
+original `kotsInitKOTS` instruction body contains **no direct CALL** to
+`0x433c`. Both edges are now represented explicitly without conflating them.
+
+Regenerate the local reports with `ef2000-ghidra function-facts` followed by
+`ef2000-ghidra subsystem-map --seed 0x4aa0` (after a complete `export-all`
+inventory). See [the workflow](ghidra.md) for file formats, scoring limitations
+and command options. All four fact TSVs, group reports, original executable,
+Ghidra project and pseudo-C remain local ignored research data.

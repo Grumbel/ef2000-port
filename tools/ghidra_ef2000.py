@@ -21,9 +21,11 @@ import tempfile
 try:
     from .extract_image import extract
     from .ef2000_callbacks import find_tables, select_function_tables
+    from . import ghidra_subsystems
 except ImportError:
     from extract_image import extract
     from ef2000_callbacks import find_tables, select_function_tables
+    import ghidra_subsystems
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -384,6 +386,57 @@ def audit_body_holes(args):
     print(f'Ghidra body-hole audit: {len(rows)} holes; output: {output}')
 
 
+def function_facts(args):
+    """Export read-only instruction-level facts for cross-subsystem analysis."""
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'subsystem-facts').resolve()
+    output.mkdir(parents=True, exist_ok=True)
+    required = {
+        'function-facts.tsv': ghidra_subsystems.FACT_COLUMNS,
+        'data-references.tsv': ghidra_subsystems.REF_COLUMNS,
+        'address-candidates.tsv': ghidra_subsystems.CANDIDATE_COLUMNS,
+        'cross-function-branches.tsv': ghidra_subsystems.BRANCH_COLUMNS,
+    }
+    previous_times = {name: (output / name).stat().st_mtime_ns
+                      if (output / name).exists() else -1 for name in required}
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis', '-readOnly',
+        '-postScript', 'EF2000FunctionFacts.java', str(output),
+    ]
+    subprocess.run(command, check=True)
+    counts = {}
+    for name, columns in required.items():
+        path = output / name
+        if not path.is_file() or path.stat().st_mtime_ns <= previous_times[name]:
+            raise ValueError(f'Ghidra returned without a fresh {name}')
+        counts[name] = sum(1 for _ in ghidra_subsystems.rows(path, columns))
+    if not counts['function-facts.tsv']:
+        raise ValueError('Ghidra returned no function facts')
+    report = workspace / 'full-export/report.json'
+    if report.is_file():
+        expected = json.loads(report.read_text())['discovered_functions']
+        if counts['function-facts.tsv'] != expected:
+            raise ValueError(f'Ghidra returned facts for {counts["function-facts.tsv"]} '
+                             f'of {expected} recognized functions')
+    print(f'Ghidra function facts: {counts["function-facts.tsv"]} functions, '
+          f'{counts["data-references.tsv"]} data references, '
+          f'{counts["address-candidates.tsv"]} literal address candidates, '
+          f'{counts["cross-function-branches.tsv"]} cross-function branches; '
+          f'output: {output}')
+
+
+def subsystem_map(args):
+    """Rank affinity hypotheses from cached facts, without starting Ghidra."""
+    workspace = validated_workspace(args.workspace)
+    if args.top < 1 or not 0 < args.group_score < float('inf'):
+        raise ValueError('--top and --group-score must be positive and finite')
+    output = (args.output or workspace / 'subsystem-map').resolve()
+    count, groups = ghidra_subsystems.write_report(
+        workspace, output, args.seed, args.top, args.group_score)
+    print(f'EF2000 subsystem affinity: {count} functions, {groups} candidate groups; '
+          f'output: {output}')
+
+
 def callback_tables(args):
     """Extract only name tables backed by the Ghidra function inventory."""
     workspace = validated_workspace(args.workspace)
@@ -472,7 +525,7 @@ def main(argv=None):
                                             str(ROOT / 'local/ghidra'))).expanduser()
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
                  'recover-orphans', 'recover-calls', 'repair-boundaries', 'audit-flow-gaps',
-                 'audit-body-holes',
+                 'audit-body-holes', 'function-facts', 'subsystem-map',
                  'callback-tables', 'name-callbacks'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=default_workspace,
@@ -531,6 +584,19 @@ def main(argv=None):
                        help='optional function entries, e.g. 0x9820 (default: all multi-span functions)')
     holes.add_argument('--output', type=Path,
                        help='TSV audit (default: workspace/body-holes.tsv)')
+    facts = subparsers.choices['function-facts']
+    facts.add_argument('--output', type=Path,
+                       help='TSV directory (default: workspace/subsystem-facts)')
+    subsystem = subparsers.choices['subsystem-map']
+    subsystem.add_argument('--output', type=Path,
+                           help='ranked reports (default: workspace/subsystem-map)')
+    subsystem.add_argument('--seed', type=ghidra_subsystems.guest_address,
+                           action='append', default=[],
+                           help='repeat for selected guest functions')
+    subsystem.add_argument('--top', type=int, default=12,
+                           help='maximum ranked neighbors per function (default: 12)')
+    subsystem.add_argument('--group-score', type=float, default=8.0,
+                           help='minimum pairwise score for candidate groups (default: 8)')
     callback = subparsers.choices['callback-tables']
     callback.add_argument('--functions', type=Path,
                           help='Ghidra functions.tsv (default: workspace/full-export/functions.tsv)')
@@ -557,6 +623,7 @@ def main(argv=None):
          'repair-boundaries': repair_boundaries,
          'audit-flow-gaps': audit_flow_gaps,
          'audit-body-holes': audit_body_holes,
+         'function-facts': function_facts, 'subsystem-map': subsystem_map,
          'callback-tables': callback_tables,
          'name-callbacks': name_callbacks}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:

@@ -297,9 +297,11 @@
           grep -q 'audit-flow-gaps' "$out"
           grep -q 'repair-boundaries' "$out"
           grep -q 'export-all' "$out"
+          grep -q 'function-facts' "$out"
+          grep -q 'subsystem-map' "$out"
           cd ${source}
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests \
-            -p test_ghidra_ef2000.py -q
+            -p 'test_ghidra*.py' -q
         '';
         windows-layout = pkgs.runCommand "ef2000-windows-layout-check" {
           nativeBuildInputs = [ pkgs.file ];
@@ -398,6 +400,10 @@
           printf '                                  Export targeted pseudo-C and incoming references\n'
           printf '  ef2000-ghidra export-all --custom-storage-fallback\n'
           printf '                                  Export all recognized functions to pseudo-C\n'
+          printf '  ef2000-ghidra function-facts\n'
+          printf '                                  Export read-only per-function references and branches\n'
+          printf '  ef2000-ghidra subsystem-map --seed 0x4aa0\n'
+          printf '                                  Rank possible subsystem neighbors without rerunning Ghidra\n'
           printf '  ef2000-ghidra audit-flow-gaps\n'
           printf '                                  Audit suspicious fall-through decoding gaps\n'
           printf '  ef2000-ghidra audit-body-holes 0x9820\n'

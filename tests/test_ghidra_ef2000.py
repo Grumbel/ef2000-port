@@ -557,6 +557,56 @@ class GhidraWorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'invalid body-hole report'):
                 ghidra.audit_body_holes(args)
 
+    def test_function_facts_read_only_and_checks_all_four_reports(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-readOnly', command)
+            self.assertIn('-noanalysis', command)
+            self.assertEqual(command[-2:], ['EF2000FunctionFacts.java',
+                             str(self.workspace / 'subsystem-facts')])
+            output = self.workspace / 'subsystem-facts'
+            output.mkdir(exist_ok=True)
+            for name, columns in (
+                ('function-facts.tsv', ghidra.ghidra_subsystems.FACT_COLUMNS),
+                ('data-references.tsv', ghidra.ghidra_subsystems.REF_COLUMNS),
+                ('address-candidates.tsv', ghidra.ghidra_subsystems.CANDIDATE_COLUMNS),
+                ('cross-function-branches.tsv', ghidra.ghidra_subsystems.BRANCH_COLUMNS),
+            ):
+                header = sorted(columns)
+                values = {column: '0' for column in columns}
+                values.update(entry='0x00001000', name='fixture')
+                rows = ['\t'.join(header)]
+                if name == 'function-facts.tsv':
+                    rows.append('\t'.join(values[column] for column in header))
+                (output / name).write_text('\n'.join(rows) + '\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.function_facts(args)
+        (self.workspace / 'subsystem-facts/address-candidates.tsv').unlink()
+        with patch.object(ghidra.subprocess, 'run'):
+            with self.assertRaisesRegex(ValueError, 'without a fresh function-facts.tsv'):
+                ghidra.function_facts(args)
+
+    def test_function_facts_rejects_invalid_schema(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None)
+        output = self.workspace / 'subsystem-facts'
+        with patch.object(ghidra.subprocess, 'run', side_effect=lambda command, check: (
+                output / 'function-facts.tsv').write_text('incorrect\tcolumns\n')):
+            with self.assertRaisesRegex(ValueError, 'invalid columns'):
+                ghidra.function_facts(args)
+
     def test_repair_boundaries_is_read_only_by_default(self):
         (self.workspace / 'projects').mkdir(parents=True)
         (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')

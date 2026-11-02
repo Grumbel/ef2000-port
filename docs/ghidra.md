@@ -96,6 +96,54 @@ discard manually assigned Ghidra names or types. By default, the output is
 | `orphan-instructions.asm` | Disassembly of those unassigned instructions |
 | `candidate-entries.tsv` | Tentative function entries at unassigned range starts and after `RET` |
 
+## Rank candidate subsystems across the entire decompilation
+
+The complete pseudo-C corpus is a starting point, not a compilable source port.
+To move from isolated function-boundary fixes to subsystem-sized work, export
+instruction-level Ghidra facts and build a ranked static relationship index:
+
+```sh
+ef2000-ghidra export-all --custom-storage-fallback
+ef2000-ghidra function-facts
+ef2000-ghidra subsystem-map --seed 0x4050 --seed 0x433c \
+  --seed 0x4aa0 --seed 0x4b54
+```
+
+`function-facts` runs read-only with `-noanalysis`. It writes four files under
+`local/ghidra/subsystem-facts/` (or the selected workspace):
+
+| File | Evidence exported |
+| --- | --- |
+| `function-facts.tsv` | Function body size, instruction/branch/call counts and instruction-level P-code load/store counts |
+| `data-references.tsv` | Explicit Ghidra Listing DATA references, including target kind and symbol when known |
+| `address-candidates.tsv` | Address or scalar operands in the probable global-address window (`0x110000..0x4de2ef`), with initialized vs runtime classification |
+| `cross-function-branches.tsv` | Explicit JUMP references whose target Listing instruction belongs to another function |
+
+Explicit DATA references and plausible literal-address operands are **separate
+evidence types**. Ghidra sometimes treats an absolute address embedded in a
+`MOV` instruction as a scalar rather than a reference; including it as a
+*candidate* recovers useful shared-state leads without asserting a proven xref.
+The address window is a heuristic and can miss or include non-global values.
+Likewise, an instruction-level `PcodeOp.LOAD` does not establish a verified
+C-level object type or argument convention.
+
+`subsystem-map` is a fast, offline Python pass over those TSVs and
+`full-export/calls.tsv`: it does **not** launch Ghidra or modify the project.
+It produces `subsystem-map/function-affinities.tsv` with the strongest ranked
+neighbors, `candidate-groups.tsv` with conservative complete-linkage groups,
+`seed-neighborhoods.md`, and `summary.json`. The scoring downweights shared
+callees and coarse 64-byte regions, filters common tokens, and keeps direct
+CALL and cross-function JUMP edges distinguishable. Each member of a group
+must have a qualifying pairwise score with every other member, and groups are
+bounded at 16 to avoid spurious giant connected components.
+
+These are **review queues**, not authoritative subsystem labels or inferred
+source-level types. Use shared global accesses, control flow, and the original
+instructions to validate a candidate before translating routines into C++.
+Re-run `function-facts` after Ghidra function-boundary or naming changes, and
+`subsystem-map` whenever the cached facts or calls inventory changes. Both
+commands support `--workspace` and `--output`.
+
 The exporter resumes from existing `.c` files on repeat runs, and records
 per-function decompiler failures without aborting the entire corpus. Use
 `--overwrite` when edited signatures, renamed symbols or improved Ghidra
