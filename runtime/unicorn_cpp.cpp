@@ -222,6 +222,9 @@ public:
             const auto font = fs::path(options_.overlay_skin_dir) / "menu-font.bmp";
             if (options_.overlay_font_bmp.empty() && fs::is_regular_file(font))
                 options_.overlay_font_bmp = font.string();
+            const auto symbols = fs::path(options_.overlay_skin_dir) / "menu-symbols.bmp";
+            if (options_.overlay_symbols_bmp.empty() && fs::is_regular_file(symbols))
+                options_.overlay_symbols_bmp = symbols.string();
             std::cerr << "overlay: original screen-coordinate title and panel textures loaded\n";
         }
         if (!options_.overlay_frame_bmp.empty()) {
@@ -880,6 +883,18 @@ private:
         overlay_fill(x + 2, y + 2, 10, 12, 138, 141, 160);
         overlay_fill(x + 12, y + 1, 1, 14, 49, 52, 64);
         overlay_fill(x + 1, y + 14, 12, 1, 49, 52, 64);
+        if (overlay_symbols_texture_ && (kind == 1 || kind == 2)) {
+            // The specimen's window and X drawings cross the nominal 16px
+            // grid: the window motif starts at x=76, not at cell x=80.
+            // Clip both to their original glyph bounds so adjacent shapes
+            // are never rendered in the titlebar buttons.
+            const SDL_FRect source{kind == 1 ? 76.0f : 64.0f, 16,
+                                   kind == 1 ? 16.0f : 12.0f, 14};
+            const SDL_FRect destination{x + 1, y + 1, 12, 14};
+            if (!SDL_RenderTexture(renderer_, overlay_symbols_texture_, &source, &destination))
+                throw std::runtime_error(std::string("SDL3 original button symbol: ") + SDL_GetError());
+            return;
+        }
         const uint8_t fg = 19;
         if (kind == 0) {
             overlay_fill(x + 4, y + 12, 7, 2, fg, fg, fg);
@@ -904,16 +919,19 @@ private:
     }
     void overlay_frame(const ef2000::OverlayPanel& panel) {
         if (!overlay_frame_texture_) {
-            // Reconstruct the drawn GUI chrome seen in the original 640x400
-            // option screens. Their DID1ST screenshots show a gray panel,
-            // silver one-pixel edging, black depth and a stepped olive tab;
-            // the separate newgui03 bitmap is only the menu backdrop.
-            overlay_fill(panel.x, panel.y, panel.w, panel.h, 159, 159, 175);
-            overlay_fill(panel.x + 1, panel.y + 1, panel.w - 2, panel.h - 2, 79, 79, 79);
-            overlay_skin_fill(overlay_panel_texture_, panel.x + 3, panel.y + 3,
-                              panel.w - 5, panel.h - 5, 115, 115, 115);
-            overlay_fill(panel.x + 3, panel.y + 3, 2, panel.h - 3, 0, 0, 0);
-            overlay_fill(panel.x + 3, panel.y + panel.h - 5, panel.w - 3, 2, 0, 0, 0);
+            // TACTCOM's narrow chrome: one dark left/bottom edge, silver top
+            // and right hairlines, and an interior texture beginning directly
+            // beneath the full-width title. Avoid nesting several thick
+            // inner frames, which obscures the original panel pixels.
+            overlay_fill(panel.x, panel.y, panel.w, panel.h, 40, 40, 52);
+            if (panel.h > ef2000::OverlayWindows::title_height + 1)
+                overlay_skin_fill(overlay_panel_texture_, panel.x + 1,
+                                  panel.y + ef2000::OverlayWindows::title_height,
+                                  panel.w - 2,
+                                  panel.h - ef2000::OverlayWindows::title_height - 1,
+                                  115, 115, 115);
+            overlay_fill(panel.x, panel.y, panel.w, 1, 159, 159, 175);
+            overlay_fill(panel.x + panel.w - 1, panel.y, 1, panel.h, 159, 159, 175);
             return;
         }
         const auto patches = ef2000::nine_slice(float(overlay_frame_width_),
@@ -929,10 +947,11 @@ private:
         }
         // Keep help readable across arbitrary user-cropped frame artworks.
         const float border = float(options_.overlay_frame_border);
-        overlay_fill(panel.x + border, panel.y + ef2000::OverlayWindows::title_height + 1,
-                     panel.w - 2 * border,
-                     panel.h - ef2000::OverlayWindows::title_height - border - 2,
-                     91, 91, 91);
+        if (panel.h > ef2000::OverlayWindows::title_height + border + 2)
+            overlay_fill(panel.x + border, panel.y + ef2000::OverlayWindows::title_height + 1,
+                         panel.w - 2 * border,
+                         panel.h - ef2000::OverlayWindows::title_height - border - 2,
+                         91, 91, 91);
     }
     void draw_overlay(uint64_t instructions, uint64_t interrupts, const std::string& status,
                       int width, int height) {
@@ -946,7 +965,9 @@ private:
             const auto& panel = overlay_.panels()[index];
             if (!panel.open) continue;
             const bool focused = overlay_.focused_panel() == index;
-            overlay_fill(panel.x + 4, panel.y + 4, panel.w, panel.h, 0, 0, 0);
+            // Original windows cast their solid offset shadow to the LEFT,
+            // visible as a three-pixel black strip outside the left frame.
+            overlay_fill(panel.x - 4, panel.y + 4, panel.w, panel.h, 0, 0, 0);
             overlay_frame(panel);
             const std::string title = index == 0 ? "FLIGHT CONTROLS" : "SYSTEM MONITOR";
             const float title_width = overlay_font_texture_ ?
@@ -956,13 +977,13 @@ private:
             if (overlay_title_texture_) {
                 // TACTCOM's title texture runs across the full window width;
                 // only the older options menu has stepped short title tabs.
-                overlay_skin_fill(overlay_title_texture_, panel.x + 3, panel.y + 1,
-                                  panel.w - 6, ef2000::OverlayWindows::title_height - 3,
+                overlay_skin_fill(overlay_title_texture_, panel.x + 1, panel.y + 1,
+                                  panel.w - 2, ef2000::OverlayWindows::title_height - 3,
                                   45, 59, 35);
-                overlay_fill(panel.x + 3, panel.y, panel.w - 6, 1, 159, 159, 175);
-                overlay_fill(panel.x + 3,
+                overlay_fill(panel.x + 1, panel.y, panel.w - 2, 1, 159, 159, 175);
+                overlay_fill(panel.x + 1,
                              panel.y + ef2000::OverlayWindows::title_height - 2,
-                             panel.w - 6, 2, 40, 40, 52);
+                             panel.w - 2, 2, 40, 40, 52);
                 overlay_text(panel.x + 13, panel.y + 6, title,
                              int(panel.w - 68), 255, 255, 255);
             } else {
@@ -984,13 +1005,6 @@ private:
             overlay_chrome_button(panel.x + panel.w - 47, panel.y + 4, 0, panel.minimized);
             overlay_chrome_button(panel.x + panel.w - 32, panel.y + 4, 1, panel.maximized);
             overlay_chrome_button(panel.x + panel.w - 17, panel.y + 4, 2, false);
-            if (overlay_symbols_texture_) {
-                // Cell (4, 1) is the 16x16 dark cross from the specimen.
-                const SDL_FRect source{64, 16, 16, 16};
-                const SDL_FRect target{panel.x + panel.w - 18, panel.y + 4, 16, 16};
-                if (!SDL_RenderTexture(renderer_, overlay_symbols_texture_, &source, &target))
-                    throw std::runtime_error(std::string("SDL3 overlay close symbol: ") + SDL_GetError());
-            }
             if (panel.minimized) continue;
             overlay_fill(panel.x + panel.w - 13, panel.y + panel.h - 7, 8, 1, 159, 159, 175);
             overlay_fill(panel.x + panel.w - 7, panel.y + panel.h - 13, 1, 8, 159, 159, 175);

@@ -4,11 +4,11 @@
 
 """Extract the small two-row symbol strip from TACTCOM's font specimen.
 
-The 320x200 image at DID1ST hash 0x33773001 places seven 16x16 symbol
-cells in each of two rows. Preserve their colours and masks verbatim;
+The 320x200 image at DID1ST hash 0x33773001 contains two rows of
+window-like symbols. Preserve their colours and masks verbatim;
 the symbols are *not yet proven* to be the actual GUI button artwork.
-The adjacent pointer-like drawing is deliberately excluded because it
-overlaps the cell grid.
+The regular 16x16 grid is convenient for inspection but the cross and
+overlapping-window shapes have variable-width bounds crossing that grid.
 """
 
 import json
@@ -30,6 +30,10 @@ SYMBOL_NAMES = ('arrow_up', 'arrow_down', 'arrow_left', 'arrow_right',
 ROW_NAMES = ('light', 'dark')
 ATLAS_WIDTH = CELL_SIZE * len(SYMBOL_NAMES)
 ATLAS_HEIGHT = CELL_SIZE * len(ROW_NAMES)
+# Exact local bounds inside the source strip, excluding neighboring symbols.
+# The cross and overlapping-window drawings touch at x=76, not at the
+# nominal 16-pixel cell boundary x=80.
+BUTTON_SHAPES = {'close': (64, 0, 12, 14), 'maximize': (76, 0, 16, 14)}
 
 
 def symbol_atlases(image):
@@ -61,7 +65,8 @@ def rip_symbols(game_dir, out_dir):
         'source_hash': f'{FONT_SHEET_HASH:08x}',
         'cell_size': CELL_SIZE,
         'size': [ATLAS_WIDTH, ATLAS_HEIGHT],
-        'notes': 'Original specimen symbols; menu button use is unverified',
+        'notes': 'Original specimen symbols; menu button use is unverified. '
+                 'The regular cells are not exact shape bounds.',
         'cells': [
             {'name': f'{name}_{variant}',
              'x': column * CELL_SIZE, 'y': row * CELL_SIZE,
@@ -69,6 +74,11 @@ def rip_symbols(game_dir, out_dir):
             for row, variant in enumerate(ROW_NAMES)
             for column, name in enumerate(SYMBOL_NAMES)
         ],
+        'candidate_button_shapes': {
+            f'{name}_{variant}': [x, y + row * CELL_SIZE, width, height]
+            for row, variant in enumerate(ROW_NAMES)
+            for name, (x, y, width, height) in BUTTON_SHAPES.items()
+        },
     }
     files = {
         'menu-symbols.bmp': encode_bmp(keyed),

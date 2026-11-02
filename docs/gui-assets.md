@@ -37,10 +37,11 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 
 The extractor produces named PNGs, 640×400 BMP textures for the host overlay,
 an RGBA `skin-units.png`, a magenta-keyed `skin-units.bmp`, and a `skin.json`
-provenance manifest. The `skin` command also runs the font-specimen extractor,
-writing `menu-font.bmp` and `menu-font.widths` into the same directory. The
-overlay automatically loads those proportional glyphs when using
-`--overlay-skin-dir`, unless `--overlay-font-bmp` explicitly overrides them.
+provenance manifest. The `skin` command also runs the font- and symbol-specimen
+extractors, writing `menu-font.bmp`, `menu-font.widths` and `menu-symbols.bmp`
+into the same directory. The overlay automatically loads those files when
+using `--overlay-skin-dir`, unless `--overlay-font-bmp` or
+`--overlay-symbols-bmp` explicitly overrides them.
 The font renderer measures glyph advances in pixels for titlebar sizing and
 content clipping (rather than truncating by a guessed eight-pixel width).
 The beveled titlebar buttons now provide minimize, maximize/restore and close
@@ -62,6 +63,15 @@ host now uses that screen-anchored full-width title treatment; without an
 original skin it retains the short stepped tab inferred from the options
 screens. The three chrome buttons are spaced at the right edge and taller
 vertically to reflect the original VGA pixel aspect ratio.
+
+Comparison of the original map window and host System Monitor against the
+user's 1280×960 TACTCOM screenshot corrected the host's frame construction:
+the original has a **one-pixel** silver top/right hairline and a narrow dark
+left/bottom edge, without the host's former nested gray/black inner frames.
+The solid black window shadow falls **left and down** from the frame (the
+map's upper-left corner has a black strip just outside the left frame).
+The host uses that offset for movable windows. Minimized panels also omit
+the absent content area instead of passing a negative height to SDL.
 
 **The red sprite sheet's background is palette index 0**;
 actual red foreground pixels use other indices, so keying by RGB color would
@@ -264,10 +274,14 @@ available character sets, shadowing and color/palette behavior.
 
 ### Symbols from the same specimen
 
-This 320×200 test screen also carries **two rows of seven 16×16 symbols**:
+This 320×200 test screen also carries **two rows of window-like symbols**:
 up/down/left/right arrows, a cross, overlapping rectangles and corner marks.
-The upper row uses light strokes; the lower uses dark ones. A pointer-like
-drawing straddles the right-hand cell boundary, and the bottom of the image
+The upper row uses light strokes; the lower uses dark ones. The original
+symbols do not occupy a uniform 16×16 glyph grid: the cross at x=64 is
+12 pixels wide, and the overlapping rectangles start at x=76 with a 16-pixel
+width. Extracting a nominal 16-pixel cell from x=80 loses part of the drawing
+and picks up neighboring pixels. A pointer-like drawing is farther to the
+right, and the bottom of the image
 contains three small aircraft and another sprite. The latter artwork is
 **not evidence of menu cursor art** and is not presently extracted as GUI
 controls. Similarly, the two-row symbols have not yet been traced to a GUI
@@ -281,11 +295,13 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 ```
 
 `tools/menu_symbols.py` exports a 112×32 BMP with a magenta transparency key,
-an RGBA PNG and JSON cell coordinates. It preserves original palette colors
-for the 14 grid cells and omits the overlapping pointer rather than slicing
-it into misleading fragments. The optional SDL3 overlay uses the dark cross
-as its window-close icon, without changing click hit-testing; the ordinary
-text `X` remains the default when the BMP is not supplied. Original graphic
+an RGBA PNG and JSON grid coordinates **plus exact candidate button-shape
+rectangles**. It preserves original palette colors; the nominal 16×16 grid
+should not be used blindly as individual symbol bounds. The SDL3 overlay
+uses the dark cross and overlapping-window specimens as the close/maximize
+icons, without changing click hit-testing; procedural marks remain the
+fallback when the BMP is not supplied. The `skin` command now exports and
+automatically selects this symbol bitmap as well. Original graphic
 bytes and their converted output are **never included in Git or Nix**.
 
 The remaining specimen rows visually contain **48 additional accented

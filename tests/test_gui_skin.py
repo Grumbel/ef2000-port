@@ -94,5 +94,6 @@ class OriginalGuiSkinTests(unittest.TestCase):
             with redirect_stdout(StringIO()):
                 main(['skin', os.environ['EF2000_DATA_DIR'], '--out', str(output)])
             self.assertEqual((output / 'menu-font.bmp').read_bytes()[:2], b'BM')
+            self.assertEqual((output / 'menu-symbols.bmp').read_bytes()[:2], b'BM')
             self.assertEqual(len((output / 'menu-font.widths').read_text().split()), 95)
             self.assertTrue((output / 'skin-title.bmp').is_file())

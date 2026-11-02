@@ -385,13 +385,18 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 ```
 
 The extractor additionally saves original terrain and a colored unit/flag
-atlas for further research. It also recovers the proportional menu font into
-the same directory; `--overlay-skin-dir` automatically uses it unless an
-explicit `--overlay-font-bmp` is provided. The F12 overlay now has working
+atlas for further research. It also recovers the proportional menu font and
+the two-row symbol specimen into the same directory; `--overlay-skin-dir`
+automatically uses both unless an explicit `--overlay-font-bmp` or
+`--overlay-symbols-bmp` is provided. The F12 overlay now has working
 minimize, maximize/restore and close titlebar buttons, styled after the
-original game. The original skin gives windows full-width green TACTCOM
+original game. The X and overlapping-window icons are cropped at their
+actual variable-width positions from the specimen. The original skin gives
+windows full-width green TACTCOM
 titlebars and renders the specimen font with its original one-pixel black
-shadow and vertically corrected VGA aspect ratio. See
+shadow and vertically corrected VGA aspect ratio. The reconstructed frame
+uses a dark left/bottom edge, a silver top/right hairline and a black drop
+shadow shifted left/down, matching the captured TACTCOM windows. See
 [GUI resource research](docs/gui-assets.md)
 for exact archive hashes and the transparency index caveat.
 
@@ -430,10 +435,12 @@ to identify characters for a later extended
 font mapping. Neither the bitmaps nor their derived widths are committed to Git.
 
 The same original font specimen contains small **directional and window-like
-symbols** in light/dark variants. An extractor recovers the 14 neatly
-aligned cells (without guessing the identity of overlapping drawings) as an
-RGBA PNG, a magenta-keyed BMP and a JSON cell catalog. To use the original
-dark cross in the movable overlay's window-close buttons:
+symbols** in light/dark variants. An extractor recovers the two 112×16 strips
+as an RGBA PNG, a magenta-keyed BMP and a JSON catalog. It also records
+corrected source rectangles: the cross ends at x=76, where the
+overlapping-window glyph starts, instead of at the 16-pixel cell boundary.
+To use these original shapes in the movable overlay's window buttons without
+the complete skin:
 
 ```sh
 nix run .#gui-assets -- symbols /path/to/EF2000 --out local/menu-symbols
@@ -442,7 +449,8 @@ nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
 ```
 
 This is verified specimen artwork, but its role in the DOS GUI has not yet
-been established. No copyrighted image bytes are distributed with the port.
+been established; the button bevel and minimization mark remain reconstructed.
+No copyrighted image bytes are distributed with the port.
 
 If you can isolate a clean, reusable **frame** region, the extractor can
 additionally export BMPs for SDL3 (with `--bmp`). A carefully cropped BMP

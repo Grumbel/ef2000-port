@@ -304,8 +304,10 @@ def main(argv=None):
         elif args.action == 'skin':
             metadata = rip_skin(args.game_dir, args.out)
             glyphs, _ = rip_font(args.game_dir, args.out)
+            symbols = rip_symbols(args.game_dir, args.out)
             print(f'extracted {len(metadata["textures"])} original GUI textures and '
-                  f'{len(glyphs)} menu glyphs into {args.out}')
+                  f'{len(glyphs)} menu glyphs and {len(symbols["cells"])} '
+                  f'specimen symbols into {args.out}')
         else:
             result = extract(args.game_dir, args.out, args.paths, args.all_images, args.bmp)
             print(f'extracted {len(result)} GUI assets into {args.out}')
