@@ -190,7 +190,10 @@ class GhidraWorkflowTests(unittest.TestCase):
             self.assertTrue(check)
             self.assertIn('-readOnly', command)
             calls.append(command[-5:])
-            output = self.workspace / 'full-export'
+            output = Path(command[-6])
+            output.mkdir(parents=True, exist_ok=True)
+            (output / 'functions').mkdir(exist_ok=True)
+            (output / 'functions/0x00000086.c').write_text('staged C')
             (output / 'report.json').write_text(json.dumps({
                 'initialized_image_bytes': ghidra.IMAGE_SIZE,
                 'discovered_functions': 4203, 'decompilations_written': 4,
@@ -206,9 +209,66 @@ class GhidraWorkflowTests(unittest.TestCase):
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
             ghidra.export_all(args)
         self.assertEqual(calls, [
-            ['decompile', '4', 'overwrite', 'watcom', 'none'],
+            ['decompile', '4', 'resume', 'watcom', 'none'],
             ['decompile', '4', 'resume', 'watcom', 'storage'],
         ])
+        self.assertEqual((self.workspace / 'full-export/functions/0x00000086.c').read_text(),
+                         'staged C')
+
+    def test_overwrite_storage_retry_publishes_only_fresh_staged_c(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(command='export-all', workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  limit=0, overwrite=True, custom_storage_fallback=True)
+        output = self.workspace / 'full-export'
+        failed_file = output / 'functions/000b/0x000b3084.c'
+        good_file = output / 'functions/0000/0x000045a4.c'
+        failed_file.parent.mkdir(parents=True)
+        good_file.parent.mkdir(parents=True)
+        failed_file.write_text('OLD custom signature C')
+        good_file.write_text('keep this newly exported C')
+        calls = []
+
+        def fake_ghidra(command, check):
+            calls.append(command[-2:])
+            staged = Path(command[-6])
+            self.assertNotEqual(staged, output)
+            staged.mkdir(parents=True, exist_ok=True)
+            (staged / 'functions/0000').mkdir(parents=True, exist_ok=True)
+            (staged / 'functions/000b').mkdir(parents=True, exist_ok=True)
+            if len(calls) == 1:
+                self.assertEqual(command[-3], 'resume')
+                self.assertEqual(failed_file.read_text(), 'OLD custom signature C')
+                (staged / 'functions/0000/0x000045a4.c').write_text('NEW ordinary C')
+                (staged / 'functions.tsv').write_text(
+                    'entry\tstatus\n0x000045a4\twritten\n0x000b3084\tfailed\n')
+            else:
+                self.assertEqual(command[-3], 'resume')
+                self.assertFalse((staged / 'functions/000b/0x000b3084.c').exists())
+                self.assertEqual(good_file.read_text(), 'keep this newly exported C')
+                (staged / 'functions/000b/0x000b3084.c').write_text('FRESH storage C')
+                (staged / 'functions.tsv').write_text(
+                    'entry\tstatus\n0x000045a4\treused\n'
+                    '0x000b3084\twritten_storage_fallback\n')
+            (staged / 'calls.tsv').write_text('caller_entry\tcall_site\n')
+            (staged / 'candidate-entries.tsv').write_text('entry\treason\n')
+            (staged / 'orphan-ranges.tsv').write_text('start\tend_exclusive\n')
+            (staged / 'orphan-instructions.asm').write_text('; no orphan bytes\n')
+            (staged / 'report.json').write_text(json.dumps({
+                'initialized_image_bytes': ghidra.IMAGE_SIZE,
+                'discovered_functions': 2, 'decompilations_written': 1,
+                'decompilations_reused': 1, 'decompilations_failed': 0,
+                'decompilations_limited': 0,
+            }))
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.export_all(args)
+        self.assertEqual(len(calls), 2)
+        self.assertEqual(failed_file.read_text(), 'FRESH storage C')
+        self.assertEqual(good_file.read_text(), 'NEW ordinary C')
 
     def test_full_export_passes_limit_and_overwrite_to_ghidra(self):
         (self.workspace / 'projects').mkdir(parents=True)
@@ -410,6 +470,90 @@ class GhidraWorkflowTests(unittest.TestCase):
 
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
             ghidra.recover_calls(args)
+
+    def test_audit_flow_gaps_is_read_only_and_accepts_no_candidates(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-noanalysis', command)
+            self.assertIn('-readOnly', command)
+            self.assertEqual(command[-2:], ['EF2000AuditFlowGaps.java',
+                                            str(self.workspace / 'flow-gaps.tsv')])
+            (self.workspace / 'flow-gaps.tsv').write_text(
+                'function_entry\tfallthrough\tnext_orphan\tgap_bytes\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.audit_flow_gaps(args)
+
+    def test_audit_flow_gaps_requires_fresh_valid_report(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None)
+        with patch.object(ghidra.subprocess, 'run'):
+            with self.assertRaisesRegex(ValueError, 'without a fresh flow-gap report'):
+                ghidra.audit_flow_gaps(args)
+        with patch.object(ghidra.subprocess, 'run',
+                          side_effect=lambda command, check: (self.workspace / 'flow-gaps.tsv')
+                              .write_text('bad\tcolumns\n')):
+            with self.assertRaisesRegex(ValueError, 'invalid flow-gap report'):
+                ghidra.audit_flow_gaps(args)
+
+    def test_repair_boundaries_is_read_only_by_default(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None, apply=False)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-readOnly', command)
+            self.assertEqual(command[-3:], ['EF2000RepairBoundaries.java',
+                                            str(self.workspace / 'boundary-repairs.tsv'), 'report'])
+            (self.workspace / 'boundary-repairs.tsv').write_text(
+                'entry\tbody_bytes_before\tbody_bytes_after\tresult\n'
+                '0x000045a4\t45\t45\tproposed\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.repair_boundaries(args)
+
+    def test_repair_boundaries_applies_explicitly_and_reports_failure(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None, apply=True)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertNotIn('-readOnly', command)
+            self.assertEqual(command[-1], 'apply')
+            (self.workspace / 'boundary-repairs.tsv').write_text(
+                'entry\tbody_bytes_before\tbody_bytes_after\tresult\terror\n'
+                '0x000045a4\t45\t401\trepaired\t\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.repair_boundaries(args)
+
+        def failed_ghidra(command, check):
+            (self.workspace / 'boundary-repairs.tsv').write_text(
+                'entry\tbody_bytes_before\tbody_bytes_after\tresult\terror\n'
+                '0x000045a4\t45\t45\trepair_failed\tconflicting code\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=failed_ghidra):
+            with self.assertRaisesRegex(ValueError, 'conflicting code'):
+                ghidra.repair_boundaries(args)
 
     def test_callback_tables_requires_inventory_and_writes_verified_names(self):
         (self.workspace / 'projects').mkdir(parents=True)

@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import tempfile
 
 try:
     from .extract_image import extract
@@ -177,6 +178,34 @@ def export_all(args):
     output.mkdir(parents=True, exist_ok=True)
     files = ['report.json', 'functions.tsv', 'calls.tsv', 'candidate-entries.tsv',
              'orphan-ranges.tsv', 'orphan-instructions.asm']
+    if getattr(args, 'custom_storage_fallback', False) and getattr(args, 'overwrite', False):
+        # Run BOTH passes in an empty directory. Reusing the old export tree
+        # can resurrect stale custom-storage C, making a "complete" corpus
+        # silently mix old and new decompilations. Publish only once the
+        # isolated export has passed its ordinary completeness checks.
+        with tempfile.TemporaryDirectory(prefix='ef2000-ghidra-overwrite-') as temporary:
+            staged_output = Path(temporary) / 'full-export'
+            staged_args = argparse.Namespace(**vars(args))
+            staged_args.output = staged_output
+            staged_args.overwrite = False
+            export_all(staged_args)
+            shutil.copytree(staged_output / 'functions', output / 'functions',
+                            dirs_exist_ok=True)
+            for name in files:
+                shutil.copy2(staged_output / name, output / name)
+            # A failed fresh decompilation must not leave an older C file
+            # masquerading as current output. The .asm remains available.
+            with (staged_output / 'functions.tsv').open(newline='') as stream:
+                for row in csv.DictReader(stream, delimiter='\t'):
+                    if row['status'] != 'failed':
+                        continue
+                    entry = int(row['entry'], 0)
+                    if not 0 <= entry < IMAGE_SIZE:
+                        raise ValueError(f'invalid failed function entry: {row["entry"]}')
+                    stale = output / 'functions' / f'{entry >> 16:04x}' / f'0x{entry:08x}.c'
+                    stale.unlink(missing_ok=True)
+        print(f'Ghidra overwrite: published fresh two-pass corpus to {output}')
+        return
     previous_times = {name: (output / name).stat().st_mtime_ns
                       if (output / name).exists() else -1 for name in files}
     mode = 'inventory' if args.command == 'inventory' else 'decompile'
@@ -274,6 +303,59 @@ def recover_calls(args):
           f'{failed} failed; output: {output}')
 
 
+def repair_boundaries(args):
+    """Audit or explicitly repair known instruction overlaps blocking a function body."""
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'boundary-repairs.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous_time = output.stat().st_mtime_ns if output.exists() else -1
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis',
+        *([] if args.apply else ['-readOnly']),
+        '-postScript', 'EF2000RepairBoundaries.java', str(output),
+        'apply' if args.apply else 'report',
+    ]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
+        raise ValueError('Ghidra returned without a fresh boundary-repair report')
+    with output.open(newline='') as stream:
+        reader = csv.DictReader(stream, delimiter='\t')
+        if not {'entry', 'body_bytes_before', 'body_bytes_after', 'result'} <= \
+                set(reader.fieldnames or ()):
+            raise ValueError('Ghidra returned an invalid boundary-repair report')
+        rows = list(reader)
+    if len(rows) != 1:
+        raise ValueError('Ghidra returned an unexpected number of boundary-repair rows')
+    row = rows[0]
+    if row['result'] == 'repair_failed':
+        raise ValueError(f'Ghidra boundary repair failed: {row.get("error", "unknown error")}')
+    print(f'Ghidra boundary repair: {row["result"]}; '
+          f'body bytes {row["body_bytes_before"]} -> {row["body_bytes_after"]}; '
+          f'output: {output}')
+
+
+def audit_flow_gaps(args):
+    """Report short unresolved fall-through gaps without editing the Ghidra project."""
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'flow-gaps.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous_time = output.stat().st_mtime_ns if output.exists() else -1
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis', '-readOnly',
+        '-postScript', 'EF2000AuditFlowGaps.java', str(output),
+    ]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
+        raise ValueError('Ghidra returned without a fresh flow-gap report')
+    with output.open(newline='') as stream:
+        reader = csv.DictReader(stream, delimiter='\t')
+        if not {'function_entry', 'fallthrough', 'next_orphan', 'gap_bytes'} <= \
+                set(reader.fieldnames or ()):
+            raise ValueError('Ghidra returned an invalid flow-gap report')
+        rows = list(reader)
+    print(f'Ghidra flow-gap audit: {len(rows)} candidates; output: {output}')
+
+
 def callback_tables(args):
     """Extract only name tables backed by the Ghidra function inventory."""
     workspace = validated_workspace(args.workspace)
@@ -356,7 +438,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest='command', required=True)
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
-                 'recover-orphans', 'recover-calls', 'callback-tables', 'name-callbacks'):
+                 'recover-orphans', 'recover-calls', 'repair-boundaries', 'audit-flow-gaps',
+                 'callback-tables', 'name-callbacks'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=ROOT / 'local/ghidra',
                          help='ignored Ghidra project and image workspace')
@@ -401,6 +484,14 @@ def main(argv=None):
                         help='maximum function creations (0 means all; only with --apply)')
     direct.add_argument('--tier', choices=('padding', 'adjacent-ret'), default='padding',
                         help='strong alignment-padding evidence, or opt-in immediate preceding RET byte')
+    boundaries = subparsers.choices['repair-boundaries']
+    boundaries.add_argument('--output', type=Path,
+                            help='TSV audit (default: workspace/boundary-repairs.tsv)')
+    boundaries.add_argument('--apply', action='store_true',
+                            help='repair only the verified arcade overlap at 0x45d3 on a disposable project')
+    gaps = subparsers.choices['audit-flow-gaps']
+    gaps.add_argument('--output', type=Path,
+                      help='TSV audit (default: workspace/flow-gaps.tsv)')
     callback = subparsers.choices['callback-tables']
     callback.add_argument('--functions', type=Path,
                           help='Ghidra functions.tsv (default: workspace/full-export/functions.tsv)')
@@ -424,6 +515,8 @@ def main(argv=None):
         {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,
          'inventory': export_all, 'export-all': export_all,
          'recover-orphans': recover_orphans, 'recover-calls': recover_calls,
+         'repair-boundaries': repair_boundaries,
+         'audit-flow-gaps': audit_flow_gaps,
          'callback-tables': callback_tables,
          'name-callbacks': name_callbacks}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:

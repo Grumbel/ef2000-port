@@ -544,3 +544,64 @@ plausible continuing code. We therefore have better coverage and a cleaner
 static call graph, **not a complete or verified recompilable decompile**.
 The next priorities are auditing instruction conflicts at the new entries
 and resolving indirect dispatch tables before trusting the high-level C.
+
+## Repairing an overlapping Ghidra decode (bundle #049)
+
+The newly recovered `0x45a4` routine exposed a discrepancy: Ghidra
+decompiled high-level arcade state logic far beyond the **45-byte** body
+recorded in its function manager. Manual `objdump -b binary -m i386`
+inspection of the pinned original image showed that the direct call at
+`0x45cc` returns to `0x45d1`, where the bytes are:
+
+```asm
+0x45cc  CALL 0x9ca57
+0x45d1  MOV EDX,0x125828
+0x45d6  MOV EAX,ESP
+0x45d8  LEA ECX,[ESP+0x6c]
+0x45dc  CALL 0x9ca57
+```
+
+But the old Ghidra listing started its orphan region with `POP EAX` at
+`0x45d3` and `ADC AL,[EAX]` at `0x45d4`. Both are false instructions
+inside the five-byte `MOV` immediate. The coherent continuation ends in
+`RET` at `0x4734`, then three bytes of Watcom alignment padding before the
+already recognized `0x4738` routine. A Ghidra auto-analysis DATA reference
+from `0xd8f00` happens to point at the mistaken `0x45d3` decode; it is
+not independent evidence of a callable function entry.
+
+The new `repair-boundaries` script has **one explicit, pinned recipe** for
+this case. It is read-only by default and requires `--apply` before any
+changes. It checks the existing function and following entry, exact bytes
+and old instruction lengths, absence of typed data or other function
+bodies, and absence of user comments, user labels or incoming flow
+references at the bad instructions. The stale analysis-generated data
+reference is permitted. Under a transaction, the script clears only those
+two incorrect code units, decodes the bounded continuation, and requires
+the whole linear span through `RET` to exist before extending the original
+function body. Any failure rolls back; repeat audits report
+`already_repaired` without modifying the project.
+
+| Ghidra 11.4.2 measurement | Before | After |
+| --- | ---: | ---: |
+| `0x45a4` recognized body bytes | 45 | **401** |
+| Total recognized functions | 4,233 | 4,233 |
+| Disassembled bytes | 939,953 | **939,955** |
+| Instruction bytes outside functions | 44,763 | **44,409** |
+| Orphan instruction ranges | 319 | **318** |
+| Unresolved direct calls in disassembled code | 0 | 0 |
+
+A second new command, `audit-flow-gaps`, performs an entirely read-only
+search for short gaps between fall-through addresses inside recognized
+functions and the next orphan instruction. On the #048 project it found
+**17 possible gaps**, including the repaired one. A repeated scan of the
+corrected #049 project reported **16 remaining leads**. These are *not*
+auto-repaired: several resemble the same mistaken-decoding pattern in
+callbacks recovered during #047 (`0x4738`, `0x4bf8`, `0xbfcc` among them),
+but some may be legitimate undecoded
+data or broken flow. Each requires byte-level confirmation before any
+clearing of existing Ghidra instructions. The corrected project was
+re-exported in full with the optional storage fallback; the existing
+Watcom argument uncertainties remain. The two-pass exporter now uses a
+**fresh temporary corpus** under `--overwrite` and publishes it after both
+passes complete, ensuring all eight marked storage-fallback files are
+newly regenerated rather than silently reused from an earlier analysis.

@@ -150,6 +150,12 @@ report usually counts ordinary C files as `decompilations_reused`, not
 retained beside successfully recovered `.c` files for cross-checking; an
 `assembly_fallbacks` count of zero means no recognized function is *only*
 available as assembly.
+With `--overwrite`, the wrapper builds both passes in a **fresh temporary
+export directory** and publishes the complete generated results only after
+validation. This prevents a stale custom-storage result from being counted
+as reused during a full refresh. Failed entries cannot retain an older C
+file in the published `functions/` tree. This does not affect ordinary
+resume runs or files outside the generated export tree.
 
 This workaround requires **no modified Ghidra distribution**; it works with
 the ordinary Ghidra installation in `nix develop`:
@@ -440,6 +446,62 @@ disposable project used both tiers to recover 13 function entries, growing
 the recognized set from 4,220 to 4,233 and reducing unresolved direct calls
 in **currently decoded code** from six to zero. The remaining orphan bytes,
 indirect calls, X-32 register ABI and data types are still open questions.
+
+### Audit truncated function bodies and repair one verified overlap
+
+Ghidra can decompile a function whose stored Listing body is incomplete:
+it may decode bytes as alternative instructions while following the
+decompiler's control flow. The read-only `audit-flow-gaps` command finds
+short gaps between a known function's fall-through address and the next
+already-decoded *orphan* instruction. Each row records the two addresses,
+the preceding instruction, the first missing byte, and the next orphan
+instruction. **This is a triage list, not a proof that every gap is code.**
+
+The separate `repair-boundaries` command currently has one pinned, guarded
+repair recipe: function `0x45a4`, whose Ghidra body stopped at `0x45d0`
+while a bogus `POP EAX` at `0x45d3` and `ADC` at `0x45d4` overlapped the
+true five-byte `MOV EDX,0x125828` at `0x45d1`. The routine runs to the
+`RET` at `0x4734`, followed by Watcom padding and the independently
+recognized function at `0x4738`.
+
+```sh
+# Start with a disposable copy of a #048 recovered project.
+cp -a /path/to/recovered-048-workspace local/ghidra-boundaries
+
+python3 tools/ghidra_ef2000.py audit-flow-gaps \
+  --workspace local/ghidra-boundaries
+python3 tools/ghidra_ef2000.py repair-boundaries \
+  --workspace local/ghidra-boundaries
+
+# After checking the report, opt in to the specific verified repair:
+python3 tools/ghidra_ef2000.py repair-boundaries \
+  --workspace local/ghidra-boundaries --apply
+
+# Confirm idempotence and review remaining candidates:
+python3 tools/ghidra_ef2000.py repair-boundaries \
+  --workspace local/ghidra-boundaries
+python3 tools/ghidra_ef2000.py audit-flow-gaps \
+  --workspace local/ghidra-boundaries
+python3 tools/ghidra_ef2000.py export-all \
+  --workspace local/ghidra-boundaries \
+  --overwrite --custom-storage-fallback
+```
+
+The applying repair verifies the old function body, exact original bytes,
+bad instruction lengths, adjacent function entry, absence of other function
+bodies or typed data, and no user annotations or flow references at the
+discarded instructions. A stale analysis-generated DATA pointer into the
+middle of the MOV immediate is tolerated. It clears **only those two
+instructions**, disassembles the bounded continuation, verifies every byte
+up to the expected `RET`, then updates the original function's body. A
+per-repair transaction rolls back if any check fails. It cannot be used
+to clear arbitrary instructions or mass-repair uncertain regions.
+
+On the #048 disposable project, Ghidra 11.4.2 / JDK 21 grew the verified
+`0x45a4` function body **45 → 401 bytes** and reduced orphan instruction
+bytes **44,763 → 44,409**. The generic audit initially found 17 short
+flow gaps and found 16 afterward. Those 16 require case-by-case review;
+none were automatically changed.
 
 ## Export selected functions
 
