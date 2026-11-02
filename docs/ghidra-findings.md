@@ -423,3 +423,67 @@ warnings. These are **readable reverse-engineering aids**, not proven C
 implementations. The status `4,203/4,203` measures only functions already
 recognized by this particular analysis project; the 44,884 bytes of
 disassembled instructions outside recognized functions remain unclassified.
+
+## Newly decoded, table-backed functions (bundle #047)
+
+The remaining named callback slots from #044 were inspected directly in
+Ghidra 11.4.2. Of sixteen unique-name handlers without an independent
+function entry, **five** point inside existing functions (four at `RET`
+instructions and one at a shared interior `MOV` instruction). These were
+deliberately left alone. Eleven others have neither a decoded instruction
+nor an enclosing function, despite valid pointers from the independently
+verified in-game callback tables.
+
+An additional opt-in `name-callbacks --apply --promote-undisassembled`
+tier now requires the exact name-table DATA reference, aligned handler
+addresses, no preexisting code/defined data, and a small allowlist of
+observed Watcom-style entry instructions. For an `E9 rel32` thunk, the
+destination must be an aligned, already decoded address or an untouched
+address beginning with a saved-register `PUSH`. Both the thunk and a
+previously undecoded destination are disassembled under tight per-seed
+limits before Ghidra creates their function boundaries. The destination
+gets a provisional name, not the callback's original name. The handler
+thunk inherits that provisional name until explicitly renamed from its
+verified table slot.
+
+The eleven recovered original callback names are:
+
+| Handler | Original callback name | Observed role |
+| --- | --- | --- |
+| `0x84bac` → `0x4738` | `gpwContinueArcade` | Arcade continuation thunk |
+| `0x84bb4` → `0x4bf8` | `InitArcade2` | Arcade initialization thunk |
+| `0x4d4c` | `gpwAcceptHiscore` | High-score acceptance and file selection |
+| `0x84bc4` → `0x4e14` | `arcNextDifficulty` | Difficulty selection thunk |
+| `0x4a90` | `arcEndgameAccept` | Endgame acceptance and score handling |
+| `0x84bcc` → `0x4f18` | `kotsClickTeam` | Team-selection thunk |
+| `0x522c` | `kotsAccept` | Team acceptance and slot state |
+| `0x84bdc` → `0xbfcc` | `gpwLoadSaveCampaign` | Campaign load/save thunk |
+| `0x84c04` → `0xd550` | `gpwCloseDebrief` | Debrief close thunk |
+| `0x4dae8` | `mpClearWPRoute` | Clears a planned route |
+| `0x4fe50` | `mpClickCampaign` | Campaign map interaction |
+
+These semantic roles are provisional interpretations of the new pseudo-C;
+the function boundaries and call signatures still require checking against
+actual game execution. A capped trial created three named entries, followed
+by a clean, uncapped run on another disposable copy of the #046 project.
+The latter recovered **eleven named handlers and six additional target
+routines**, all producing pseudo-C with the optional two-pass storage
+fallback. Ghidra's original project was not modified.
+
+| Static-analysis measurement | After #046 | After #047 |
+| --- | ---: | ---: |
+| Recognized functions | 4,203 | **4,220** |
+| Pseudo-C function exports | 4,203 | **4,220** |
+| Named distinct callbacks applied | 266 | **277** |
+| Disassembled instruction bytes | 933,013 | **935,854** |
+| Disassembled instruction bytes outside functions | 44,884 | **44,763** |
+| Orphan instruction ranges | 320 | **319** |
+| Unresolved direct in-image call edges | 0 | **6** |
+
+The six newly exposed unresolved calls are not regressions in previously
+known functions; they originate in the recovered bodies at `0x4738`,
+`0x4bf8` and `0xbfcc`. Their five distinct target addresses are `0x45a4`,
+`0x9ab30`, `0xb0404`, `0x45694` and `0xc964`. They form a strong, bounded
+next recovery queue. The fact that newly decoded instructions can reveal
+yet more callees is precisely why complete *recognized-function* pseudo-C
+coverage is not the same as full original-program decompilation.

@@ -414,6 +414,35 @@ class GhidraWorkflowTests(unittest.TestCase):
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
             ghidra.name_callbacks(args)
 
+    def test_name_callbacks_guards_undisassembled_callback_recovery(self):
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False, promote_thunks=False,
+                                  promote_entries=False, promote_undisassembled=True, max=3)
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, '--promote-undisassembled requires --apply'):
+                ghidra.name_callbacks(args)
+            run.assert_not_called()
+        args.apply = True
+        args.promote_entries = True
+        with self.assertRaisesRegex(ValueError, 'choose only one'):
+            ghidra.name_callbacks(args)
+        args.promote_entries = False
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        (self.workspace / 'callback-tables.tsv').write_text('test evidence')
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertEqual(command[-3:], ['apply', 'undisassembled', '3'])
+            (self.workspace / 'callback-names.tsv').write_text(
+                'handler\tname\tresult\n'
+                '0x00004d4c\tgpwAcceptHiscore\tcreated_named_undisassembled\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.name_callbacks(args)
+
     def test_guest_offsets_are_within_initialized_image(self):
         self.assertEqual(ghidra.guest_offset('0xe9a24'), 0xe9a24)
         for text in ('-1', '0x195fb0', 'not-an-address'):

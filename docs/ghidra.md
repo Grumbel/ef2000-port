@@ -333,6 +333,49 @@ to **4,203 functions**, without changing game bytes.
 The opt-in `--fastcall-fallback` export produced 4,198 pseudo-C files and
 five remaining assembly-only bodies; see the findings for caveats.
 
+### Guarded disassembly of named callback targets
+
+The remaining callback audit exposed another class of missing functions:
+some verified, named table slots point to **undisassembled bytes**, not just
+instructions lacking function boundaries. Ghidra must explicitly decode
+those bytes before it can define a function. To avoid treating data as code,
+`--promote-undisassembled` is a separate, **applying-only** tier:
+
+```sh
+# First make a disposable copy of the current analyzed workspace.
+cp -a local/ghidra local/ghidra-undisassembled
+python3 tools/ghidra_ef2000.py name-callbacks \
+  --workspace local/ghidra-undisassembled \
+  --apply --promote-undisassembled --max 3
+# Inspect the report before continuing:
+python3 tools/ghidra_ef2000.py name-callbacks \
+  --workspace local/ghidra-undisassembled \
+  --apply --promote-undisassembled
+python3 tools/ghidra_ef2000.py export-all \
+  --workspace local/ghidra-undisassembled \
+  --custom-storage-fallback
+```
+
+Each target must have a unique verified callback name and the exact Ghidra
+DATA reference from its original name-table slot. The entry must be
+four-byte aligned, outside all existing functions/instructions and defined
+data, and start with an observed Watcom-style `PUSH`/`MOV` instruction or
+an `E9` direct jump. The latter must target an aligned, independently
+plausible saved-register entry (or an already decoded instruction). The
+disassembler is capped at 1 KiB and stops before the next existing
+instruction; Ghidra's function finder may still follow branches beyond
+that range. Both the original table pointer/name and initial code bytes
+are validated before changing anything. Existing function interiors and
+ambiguous aliases are never split or renamed.
+
+On a disposable copy of the recovered #046 project, this tier promoted
+**11 named handlers plus six previously undecoded jump destinations**:
+4,203 → **4,220 recognized functions**. Five other named entries were
+left unmodified because they lie inside existing function bodies. These
+are still heuristic code boundaries, not proven original Watcom signatures.
+The `--max` cap counts named handler promotions; a verified `E9` handler
+may additionally create its previously absent destination function.
+
 ## Export selected functions
 
 ```sh

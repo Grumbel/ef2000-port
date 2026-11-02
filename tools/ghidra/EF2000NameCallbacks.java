@@ -3,6 +3,8 @@
 // @category EF2000
 
 import ghidra.app.script.GhidraScript;
+import ghidra.app.cmd.disassemble.DisassembleCommand;
+import ghidra.program.model.address.AddressSet;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.symbol.Reference;
@@ -28,10 +30,10 @@ public class EF2000NameCallbacks extends GhidraScript {
         String[] args = getScriptArgs();
         if (args.length != 5 || (!args[2].equals("report") && !args[2].equals("apply")) ||
                 (!args[3].equals("names") && !args[3].equals("thunks") &&
-                 !args[3].equals("entries")) ||
+                 !args[3].equals("entries") && !args[3].equals("undisassembled")) ||
                 (args[2].equals("report") && !args[3].equals("names"))) {
             throw new IllegalArgumentException(
-                "expected callback-tables.tsv, report.tsv, report|apply, names|thunks|entries, max");
+                "expected callback-tables.tsv, report.tsv, report|apply, names|thunks|entries|undisassembled, max");
         }
         if (!currentProgram.getLanguageID().toString().equals("x86:LE:32:default") ||
                 currentProgram.getMemory().getBlock(toAddr(IMAGE_END - 1)) == null) {
@@ -40,8 +42,10 @@ public class EF2000NameCallbacks extends GhidraScript {
         boolean apply = args[2].equals("apply");
         boolean promoteThunks = args[3].equals("thunks");
         boolean promoteEntries = args[3].equals("entries");
+        boolean promoteUndisassembled = args[3].equals("undisassembled");
         int maximum = Integer.parseInt(args[4]);
-        if (maximum < 0 || (maximum > 0 && !promoteThunks && !promoteEntries)) {
+        if (maximum < 0 || (maximum > 0 && !promoteThunks && !promoteEntries &&
+                !promoteUndisassembled)) {
             throw new IllegalArgumentException("invalid maximum promotions");
         }
         Path output = Paths.get(args[1]);
@@ -94,13 +98,18 @@ public class EF2000NameCallbacks extends GhidraScript {
                 boolean created = false;
                 boolean limited = false;
                 if (function == null && ((promoteThunks && isSafeDirectJumpStub(row.handler)) ||
-                        (promoteEntries && isSafeReferencedEntry(row.handler, row.slot)))) {
+                        (promoteEntries && isSafeReferencedEntry(row.handler, row.slot)) ||
+                        (promoteUndisassembled && isSafeUndisassembledEntry(row.handler, row.slot)))) {
                     if (maximum > 0 && promoted >= maximum) {
                         limited = true;
                     } else {
                         try {
-                            function = createFunction(toAddr(row.handler),
-                                String.format("candidate_callback_%08x", row.handler));
+                            boolean disassembled = !promoteUndisassembled ||
+                                disassembleCallback(row.handler);
+                            if (disassembled) {
+                                function = createFunction(toAddr(row.handler),
+                                    String.format("candidate_callback_%08x", row.handler));
+                            }
                             if (function != null) {
                                 created = true;
                                 ++promoted;
@@ -118,18 +127,22 @@ public class EF2000NameCallbacks extends GhidraScript {
                         result = "already_named";
                     } else if (!currentName.matches(
                             "(thunk_)?FUN_[0-9a-fA-F]+|(thunk_)?candidate_orphan_[0-9a-fA-F]+|"
-                            + "(thunk_)?candidate_callback_(thunk_)?[0-9a-fA-F]+")) {
+                            + "(thunk_)?candidate_callback_(thunk_)?[0-9a-fA-F]+") &&
+                            !(promoteUndisassembled && function.isThunk() &&
+                              currentName.matches("candidate_callback_target_[0-9a-fA-F]+"))) {
                         result = "preserved_existing_name";
                     } else if (!apply) {
                         result = "proposed";
                     } else {
                         try {
                             function.setName(row.name, SourceType.USER_DEFINED);
-                            result = created ? (promoteEntries ? "created_named_entry" :
+                            result = created ? (promoteUndisassembled ? "created_named_undisassembled" :
+                                                promoteEntries ? "created_named_entry" :
                                                 "created_named_thunk") : "renamed";
                             ++renamed;
                         } catch (Exception error) {
-                            result = created ? (promoteEntries ? "created_unnamed_entry" :
+                            result = created ? (promoteUndisassembled ? "created_unnamed_undisassembled" :
+                                                promoteEntries ? "created_unnamed_entry" :
                                                 "created_unnamed_thunk") : "rename_failed";
                         }
                     }
@@ -150,11 +163,76 @@ public class EF2000NameCallbacks extends GhidraScript {
         // DATA xref from the independently verified name-table slot.
         if ((entry & 3) != 0 || getFunctionContaining(toAddr(entry)) != null ||
                 getInstructionAt(toAddr(entry)) == null) return false;
+        return hasExactDataReference(entry, slot);
+    }
+
+    private boolean hasExactDataReference(long entry, long slot) {
         for (Reference reference : getReferencesTo(toAddr(entry))) {
             if (reference.getFromAddress().getOffset() == slot &&
                     reference.getReferenceType().isData()) return true;
         }
         return false;
+    }
+
+    private boolean isSafeUndisassembledEntry(long entry, long slot) throws Exception {
+        // This is deliberately narrower than disassembly of arbitrary data:
+        // the named callback table was independently verified against the
+        // pinned executable AND Ghidra must reference precisely this slot.
+        // No existing code or typed data may be split/overwritten.
+        if ((entry & 3) != 0 || entry < 0x100 || entry + 5 >= 0x110000 ||
+                getFunctionContaining(toAddr(entry)) != null ||
+                getInstructionContaining(toAddr(entry)) != null ||
+                currentProgram.getListing().getDefinedDataContaining(toAddr(entry)) != null ||
+                !hasExactDataReference(entry, slot)) return false;
+        int opcode = currentProgram.getMemory().getByte(toAddr(entry)) & 0xff;
+        if (opcode == 0xe9) {
+            long destination = entry + 5 + currentProgram.getMemory().getInt(toAddr(entry + 1));
+            if (destination < 0x100 || destination >= 0x110000 ||
+                    (destination & 3) != 0) return false;
+            if (getInstructionAt(toAddr(destination)) != null) return true;
+            // Some real thunks point to *another* unclassified routine. In
+            // this tier only decode that target if it is aligned, untouched,
+            // and begins with a Watcom-style saved-register prologue.
+            return getInstructionContaining(toAddr(destination)) == null &&
+                   getFunctionContaining(toAddr(destination)) == null &&
+                   currentProgram.getListing().getDefinedDataContaining(toAddr(destination)) == null &&
+                   isSavedRegisterStart(destination);
+        }
+        // These are the observed Watcom-style entries, not a general x86
+        // entry detector: PUSH EBX, PUSH EDX, MOV r32,r/m32.
+        return opcode == 0x53 || opcode == 0x52 || opcode == 0x8b;
+    }
+
+    private boolean disassembleCallback(long entry) throws Exception {
+        if ((currentProgram.getMemory().getByte(toAddr(entry)) & 0xff) == 0xe9) {
+            long destination = entry + 5 + currentProgram.getMemory().getInt(toAddr(entry + 1));
+            if (getInstructionAt(toAddr(destination)) == null &&
+                    !disassembleBounded(destination)) return false;
+            if (getFunctionContaining(toAddr(destination)) == null) {
+                Function target = createFunction(toAddr(destination),
+                    String.format("candidate_callback_target_%08x", destination));
+                if (target == null) return false;
+            }
+        }
+        return disassembleBounded(entry);
+    }
+
+    private boolean isSavedRegisterStart(long entry) throws Exception {
+        int opcode = currentProgram.getMemory().getByte(toAddr(entry)) & 0xff;
+        return opcode == 0x53 || opcode == 0x52 || opcode == 0x55 ||
+               opcode == 0x56 || opcode == 0x57;
+    }
+
+    private boolean disassembleBounded(long entry) throws Exception {
+        // Stop before the next already-decoded instruction. An explicit cap
+        // prevents accidentally walking large data areas on a wrong entry.
+        Instruction next = getInstructionAfter(toAddr(entry));
+        long end = Math.min(IMAGE_END, entry + 1024);
+        if (next != null) end = Math.min(end, next.getAddress().getOffset());
+        if (end <= entry) return false;
+        DisassembleCommand command = new DisassembleCommand(toAddr(entry),
+            new AddressSet(toAddr(entry), toAddr(end - 1)), true);
+        return command.applyTo(currentProgram, monitor) && getInstructionAt(toAddr(entry)) != null;
     }
 
     private boolean isSafeDirectJumpStub(long entry) throws Exception {

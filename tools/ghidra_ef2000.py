@@ -272,13 +272,17 @@ def callback_tables(args):
 
 def name_callbacks(args):
     """Audit or explicitly apply unique callback names to existing functions."""
+    promote_undisassembled = getattr(args, 'promote_undisassembled', False)
     if args.promote_thunks and not args.apply:
         raise ValueError('--promote-thunks requires --apply')
     if args.promote_entries and not args.apply:
         raise ValueError('--promote-entries requires --apply')
-    if args.promote_entries and args.promote_thunks:
+    if promote_undisassembled and not args.apply:
+        raise ValueError('--promote-undisassembled requires --apply')
+    if sum((args.promote_entries, args.promote_thunks, promote_undisassembled)) > 1:
         raise ValueError('choose only one callback promotion mode')
-    if args.max and not (args.apply and (args.promote_thunks or args.promote_entries)):
+    if args.max and not (args.apply and (args.promote_thunks or args.promote_entries or
+                                    promote_undisassembled)):
         raise ValueError('--max requires --apply and a callback promotion mode')
     workspace = validated_workspace(args.workspace)
     input_path = (workspace / 'callback-tables.tsv').resolve()
@@ -293,6 +297,7 @@ def name_callbacks(args):
         '-process', IMAGE_NAME, '-noanalysis',
         '-postScript', 'EF2000NameCallbacks.java', str(input_path), str(output),
         'apply' if args.apply else 'report',
+        'undisassembled' if promote_undisassembled else
         'entries' if args.promote_entries else 'thunks' if args.promote_thunks else 'names',
         str(args.max),
     ]
@@ -303,10 +308,13 @@ def name_callbacks(args):
         rows = list(csv.DictReader(stream, delimiter='\t'))
     if not rows or not {'handler', 'name', 'result'} <= set(rows[0]):
         raise ValueError('Ghidra returned an invalid callback-naming report')
-    changed = sum(row['result'] in ('renamed', 'created_named_thunk', 'created_named_entry')
+    changed = sum(row['result'] in ('renamed', 'created_named_thunk', 'created_named_entry',
+                                  'created_named_undisassembled')
                   for row in rows)
     created = sum(row['result'] in ('created_named_thunk', 'created_unnamed_thunk',
-                                   'created_named_entry', 'created_unnamed_entry')
+                                   'created_named_entry', 'created_unnamed_entry',
+                                   'created_named_undisassembled',
+                                   'created_unnamed_undisassembled')
                   for row in rows)
     print(f'Ghidra named callbacks: {len(rows)} slots, {changed} names applied, '
           f'{created} new functions; output: {output}')
@@ -366,6 +374,8 @@ def main(argv=None):
                        help='with --apply, also create missing 5-byte direct-JMP callback stubs')
     names.add_argument('--promote-entries', action='store_true',
                        help='with --apply, also recover aligned disassembled table-backed entries')
+    names.add_argument('--promote-undisassembled', action='store_true',
+                       help='with --apply, narrowly decode named table-backed entries lacking instructions')
     names.add_argument('--max', type=nonnegative_int, default=0,
                        help='maximum function creations (0 means all; only with an applying promotion mode)')
     args = parser.parse_args(argv)
