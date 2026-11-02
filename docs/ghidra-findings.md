@@ -172,3 +172,47 @@ functions**, but not a full semantic decompilation of EF2000. The next phase
 is systematic function-boundary recovery in the 646 orphan ranges, then
 annotation of dispatch tables, Watcom register calling conventions and data
 structures. This is independent of Unicorn performance optimization.
+
+## Reference-backed recovery of orphan routines (bundle #042)
+
+A second Ghidra pass classified the 1,080 unassigned candidate entries by
+their first instruction and references. **235** had both a plausible register
+save/stack prologue and at least one direct jump, call or data reference.
+Of those, 211 had data references, 24 jump references and one call reference
+(some candidates had more than one kind). Data-referenced routines appear in
+tables the initial auto-analysis did not elevate to functions.
+
+The recovery script leaves the project untouched unless explicitly invoked
+with `--apply`. On a **disposable copy** of the analyzed project, a capped
+first pass promoted 25 candidates, and a second pass promoted the remaining
+210. No creation failed. A fresh full-export yielded:
+
+| Measurement | Before | After |
+| --- | ---: | ---: |
+| Recognized functions | 3,842 | **4,077** |
+| Functions with pseudo-C | 3,834 | **4,069** |
+| Assembly-only decompiler failures | 8 | 8 |
+| Disassembled bytes outside functions | 107,887 | **49,313** |
+| Separate unassigned ranges | 646 | **437** |
+| Candidate entries in remaining ranges | 1,080 | **785** |
+| Unresolved direct in-image CALL edges | 1 | **0** |
+
+The new functions account for 58,574 bytes of previously unassigned
+instructions, a reduction of about 54% of that particular uncertainty. The
+total number of disassembled instructions remains unchanged: this operation
+creates function boundaries around existing code; it does not discover more
+machine-code bytes.
+
+Two recovered functions illustrate why reference evidence matters:
+
+- `0x5630` is reached by an unconditional jump at `0x84bd4`. Its recovered
+  pseudo-C writes a `custom.cfg` file with mission and aircraft information,
+  using embedded error and format strings as independent evidence.
+- `0xdc0` is reached through a data pointer at `0x114d44`. Its pseudo-C
+  invokes an X-32 fault-information formatter and an error-reporting callback.
+
+The names remain provisional (`candidate_orphan_XXXXXXXX`), and incorrect
+parameter/return types are still common under the generic x86 calling
+convention. The next round should examine the remaining 437 orphan ranges,
+recover additional indirect dispatch tables, and start applying verified
+Watcom calling conventions and meaningful subsystem names.

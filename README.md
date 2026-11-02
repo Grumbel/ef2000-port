@@ -48,6 +48,7 @@ python3 tools/ghidra_ef2000.py import /path/to/_EF2000.EXE
 python3 tools/ghidra_ef2000.py decompile 0xe9a24 0x8b274
 python3 tools/ghidra_ef2000.py inventory       # all discovered functions and code gaps
 python3 tools/ghidra_ef2000.py export-all      # full discovered-function pseudo-C corpus
+python3 tools/ghidra_ef2000.py recover-orphans # review referenced missing functions (dry run)
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
 

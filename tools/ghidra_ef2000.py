@@ -9,6 +9,7 @@ directory by default. Ghidra is supplied by the user, not vendored here.
 """
 
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -196,10 +197,38 @@ def export_all(args):
           f'{report["decompilations_limited"]} limited; output: {output}')
 
 
+def recover_orphans(args):
+    """Review or explicitly promote referenced orphan prologues to functions."""
+    if args.max and not args.apply:
+        raise ValueError('--max requires --apply')
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'recovery-candidates.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous_time = output.stat().st_mtime_ns if output.exists() else -1
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis',
+        '-postScript', 'EF2000RecoverOrphans.java', str(output),
+        'apply' if args.apply else 'report', str(args.max),
+    ]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
+        raise ValueError('Ghidra returned without a fresh orphan-recovery report')
+    with output.open(newline='') as stream:
+        rows = list(csv.DictReader(stream, delimiter='\t'))
+    if not rows or not {'entry', 'confidence', 'result'} <= set(rows[0]):
+        raise ValueError('Ghidra returned an invalid orphan-recovery report')
+    strong = sum(row['confidence'] == 'strong_reference_and_prologue' for row in rows)
+    created = sum(row['result'] == 'created' for row in rows)
+    failed = sum(row['result'] == 'create_failed' for row in rows)
+    print(f'Ghidra orphan recovery: {len(rows)} candidates, {strong} reference/prologue '
+          f'matches, {created} created, {failed} failed; output: {output}')
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest='command', required=True)
-    for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all'):
+    for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
+                 'recover-orphans'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=ROOT / 'local/ghidra',
                          help='ignored Ghidra project and image workspace')
@@ -220,10 +249,18 @@ def main(argv=None):
                             help='export at most N discovered functions (0 means all)')
     all_export.add_argument('--overwrite', action='store_true',
                             help='regenerate cached pseudo-C after changing Ghidra annotations')
+    recovery = subparsers.choices['recover-orphans']
+    recovery.add_argument('--output', type=Path,
+                          help='TSV report (default: workspace/recovery-candidates.tsv)')
+    recovery.add_argument('--apply', action='store_true',
+                          help='modify the Ghidra project; default only reports candidates')
+    recovery.add_argument('--max', type=nonnegative_int, default=0,
+                          help='maximum promotions per run (0 means all; only for --apply)')
     args = parser.parse_args(argv)
     try:
         {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,
-         'inventory': export_all, 'export-all': export_all}[args.command](args)
+         'inventory': export_all, 'export-all': export_all,
+         'recover-orphans': recover_orphans}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'ghidra_ef2000: {error}\n')
 

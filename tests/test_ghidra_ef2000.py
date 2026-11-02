@@ -214,6 +214,73 @@ class GhidraWorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'without a fresh report.json'):
                 ghidra.export_all(args)
 
+    def test_recover_orphans_defaults_to_report_only(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  apply=False, max=0)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-noanalysis', command)
+            self.assertEqual(command[-3:], [str(self.workspace / 'recovery-candidates.tsv'),
+                                            'report', '0'])
+            (self.workspace / 'recovery-candidates.tsv').write_text(
+                'entry\treason\tfirst_instruction\tjump_refs\tcall_refs\tdata_refs\t'
+                'confidence\tresult\n'
+                '0x00005630\trange_start\tPUSH EBX\t1\t0\t0\t'
+                'strong_reference_and_prologue\tproposed\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.recover_orphans(args)
+
+    def test_recover_orphans_requires_explicit_apply_for_mutation(self):
+        args = argparse.Namespace(workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  apply=False, max=25)
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, '--max requires --apply'):
+                ghidra.recover_orphans(args)
+            run.assert_not_called()
+
+    def test_recover_orphans_apply_is_explicit_and_bounded(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  apply=True, max=25)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertEqual(command[-3:], [str(self.workspace / 'recovery-candidates.tsv'),
+                                            'apply', '25'])
+            (self.workspace / 'recovery-candidates.tsv').write_text(
+                'entry\treason\tfirst_instruction\tjump_refs\tcall_refs\tdata_refs\t'
+                'confidence\tresult\n'
+                '0x00005630\trange_start\tPUSH EBX\t1\t0\t0\t'
+                'strong_reference_and_prologue\tcreated\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.recover_orphans(args)
+
+    def test_recover_orphans_rejects_missing_report(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  apply=True, max=10)
+        with patch.object(ghidra.subprocess, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'without a fresh orphan-recovery report'):
+                ghidra.recover_orphans(args)
+            run.assert_called_once()
+
     def test_guest_offsets_are_within_initialized_image(self):
         self.assertEqual(ghidra.guest_offset('0xe9a24'), 0xe9a24)
         for text in ('-1', '0x195fb0', 'not-an-address'):

@@ -88,6 +88,55 @@ inline block, a jump-table landing zone or a false disassembly of data.
 The exporter does **not** automatically create functions at candidates or
 rename them, and nothing in this pipeline produces compilable original C++.
 
+## Conservative recovery of missing functions
+
+The `recover-orphans` command analyzes the unassigned instruction regions.
+It considers candidate entries at the beginning of an unassigned range or
+immediately following a `RET`, then identifies a *strong candidate* when
+both conditions hold:
+
+1. The first instruction resembles a saved-register/stack prologue (`PUSH`
+   of a callee-saved register, `SUB ESP`, or `ENTER`).
+2. At least one Ghidra reference targets that address (CALL, JMP or data
+   pointer). The TSV includes example reference sources to aid validation.
+
+By default **nothing is modified**:
+
+```sh
+python3 tools/ghidra_ef2000.py recover-orphans
+```
+
+To experiment with function creation, first make a separate copy of your
+Ghidra workspace so manually annotated code is preserved. For a new
+destination, from the repository root:
+
+```sh
+cp -a local/ghidra local/ghidra-recovery
+python3 tools/ghidra_ef2000.py recover-orphans \
+  --workspace local/ghidra-recovery --apply --max 25
+python3 tools/ghidra_ef2000.py recover-orphans \
+  --workspace local/ghidra-recovery --apply
+python3 tools/ghidra_ef2000.py export-all \
+  --workspace local/ghidra-recovery
+```
+
+The first applying pass is capped at 25 promotions for inspection; subsequent
+passes are allowed to promote all remaining strong candidates. Each created
+function gets the explicitly provisional name `candidate_orphan_XXXXXXXX`.
+The script checks whether a preceding promotion already covers an address
+before creating another function. All promotions use Ghidra's ordinary
+function creation and are saved to the selected project. They are **heuristic
+recoveries**, not confirmed original function boundaries; review callsites,
+control flow and string/data references before assigning semantic names.
+
+The test run using a copied Ghidra 11.4.2 project promoted 235 candidates
+without creation failures. Full re-export then found 4,077 functions (previously
+3,842), with 4,069 successful pseudo-C files and eight unchanged decompiler
+failures. The disassembled bytes outside recognized functions fell from
+107,887 to 49,313. These improvements must not be interpreted as proof that
+all remaining bytes are executable code or that every recovered boundary is
+correct. See [the findings](ghidra-findings.md) for examples.
+
 ## Export selected functions
 
 ```sh
