@@ -324,9 +324,9 @@ def repair_boundaries(args):
                 set(reader.fieldnames or ()):
             raise ValueError('Ghidra returned an invalid boundary-repair report')
         rows = list(reader)
-    if len(rows) != 7 or {row['entry'] for row in rows} != {
+    if len(rows) != 8 or {row['entry'] for row in rows} != {
             '0x00004050', '0x0000433c', '0x000045a4', '0x00004738',
-            '0x00004bf8', '0x00004e14', '0x0000fecc'}:
+            '0x00004bf8', '0x00004e14', '0x00009820', '0x0000fecc'}:
         raise ValueError('Ghidra returned an unexpected number of boundary-repair rows')
     failed = [row for row in rows if row['result'] == 'repair_failed']
     if failed:
@@ -358,6 +358,29 @@ def audit_flow_gaps(args):
             raise ValueError('Ghidra returned an invalid flow-gap report')
         rows = list(reader)
     print(f'Ghidra flow-gap audit: {len(rows)} candidates; output: {output}')
+
+
+def audit_body_holes(args):
+    """Inventory unowned ranges within multi-span functions, including data and references."""
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'body-holes.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous_time = output.stat().st_mtime_ns if output.exists() else -1
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis', '-readOnly',
+        '-postScript', 'EF2000AuditBodyHoles.java', str(output),
+        *(f'{offset:x}' for offset in args.offsets),
+    ]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous_time:
+        raise ValueError('Ghidra returned without a fresh body-hole report')
+    with output.open(newline='') as stream:
+        reader = csv.DictReader(stream, delimiter='\t')
+        if not {'entry', 'from', 'through', 'undefined_bytes', 'data_bytes',
+                'other_function_bytes', 'references'} <= set(reader.fieldnames or ()):
+            raise ValueError('Ghidra returned an invalid body-hole report')
+        rows = list(reader)
+    print(f'Ghidra body-hole audit: {len(rows)} holes; output: {output}')
 
 
 def callback_tables(args):
@@ -448,6 +471,7 @@ def main(argv=None):
                                             str(ROOT / 'local/ghidra'))).expanduser()
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
                  'recover-orphans', 'recover-calls', 'repair-boundaries', 'audit-flow-gaps',
+                 'audit-body-holes',
                  'callback-tables', 'name-callbacks'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=default_workspace,
@@ -497,10 +521,15 @@ def main(argv=None):
     boundaries.add_argument('--output', type=Path,
                             help='TSV audit (default: workspace/boundary-repairs.tsv)')
     boundaries.add_argument('--apply', action='store_true',
-                            help='repair only seven pinned, byte-verified boundary recipes on a disposable project')
+                            help='repair only eight pinned, byte-verified boundary recipes on a disposable project')
     gaps = subparsers.choices['audit-flow-gaps']
     gaps.add_argument('--output', type=Path,
                       help='TSV audit (default: workspace/flow-gaps.tsv)')
+    holes = subparsers.choices['audit-body-holes']
+    holes.add_argument('offsets', nargs='*', type=guest_offset,
+                       help='optional function entries, e.g. 0x9820 (default: all multi-span functions)')
+    holes.add_argument('--output', type=Path,
+                       help='TSV audit (default: workspace/body-holes.tsv)')
     callback = subparsers.choices['callback-tables']
     callback.add_argument('--functions', type=Path,
                           help='Ghidra functions.tsv (default: workspace/full-export/functions.tsv)')
@@ -526,6 +555,7 @@ def main(argv=None):
          'recover-orphans': recover_orphans, 'recover-calls': recover_calls,
          'repair-boundaries': repair_boundaries,
          'audit-flow-gaps': audit_flow_gaps,
+         'audit-body-holes': audit_body_holes,
          'callback-tables': callback_tables,
          'name-callbacks': name_callbacks}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:

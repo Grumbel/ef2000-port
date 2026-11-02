@@ -723,3 +723,63 @@ remaining 10 gaps include multi-span functions with nontrivial, larger
 disputed regions; none was bulk-repaired. For example, `0x9820` already
 owns three disconnected code ranges, and the gap near `0xbfcc` has an
 external DEFAULT-source data reference into its suspect decode.
+
+## #055: Rejoining a three-span routine without losing its branch target
+
+The `0x9820` function initially owned three disconnected Listing ranges:
+`0x9820..0x9bba`, `0x9bc7..0x9c1e`, and `0x9e2e..0x9e37`.
+The first missing interval (`0x9bbb..0x9bc6`) was a **real conditional
+branch path**, not unrelated data. Its first instruction is
+`MOV EDX,0x12f6ab` at `0x9bbb`, reached by the default conditional jump
+at `0x9ba9`; the jump at `0x9bb9` reaches `0x9bc0`. Ghidra had defined
+the four immediate bytes at `0x9bbc..0x9bbf` as an automatic `pointer`
+datum, preventing the branch path from being disassembled.
+
+The second hole (`0x9c1f..0x9e2d`) began with the real six-byte
+`MOV EDX,[0x137958]` at `0x9c1f`. Orphan decodes `ADD` at `0x9c24`
+and `CMP` at `0x9c2a` consumed bytes from the true `MOV`, `MOV`, `XOR`,
+`CMP` sequence. The correct stream resynchronizes at the previously
+decoded `JLE` at `0x9c2e`, and terminates at the already-owned
+`RET` at `0x9e37`, immediately before the `0x9e38` function prologue.
+
+The eighth pinned repair requires all three **exact old body ranges**,
+both original branch references, the byte pattern and type of the sole
+false pointer datum, all wrong instruction lengths, the resynchronization
+instruction, the final `RET`, and the following prologue. It rejects other
+function ownership, user symbols/comments and non-analysis references
+in the cleared spans. It disassembles both holes and extends only the
+original function's body in a transaction; a repeat reports
+`already_repaired`. The body is now one linear **1,560-byte** interval,
+up from 1,021 bytes. This restores **539 code bytes** to their owner.
+
+The recovered path participates in a routine that traverses linked
+records and 124-byte (`0x7c`) subrecords, calls formatting/output helpers,
+and handles several status flags. It is not yet a validated named native
+routine: the refreshed pseudo-C for `0x9820` is byte-for-byte identical
+to the previous export despite the improved Listing ownership.
+
+### General multi-span audit
+
+The new **read-only** `audit-body-holes` tool reports all intervals between
+disconnected function body ranges, including instruction windows,
+undefined/defined data counts, references, and ownership by other functions.
+On the repaired #055 project it found **45 holes** across the remaining
+multi-span functions. **18** contain bytes owned by other functions and
+**4** contain defined data (all four also overlap other functions); **27**
+have neither of those two obstructions. This is a triage aid, not license
+to join the 27 remaining intervals: actual control flow, references and
+instruction boundaries must still be checked individually.
+
+| Ghidra 11.4.2 measurement | #054 | #055 |
+| --- | ---: | ---: |
+| Recognized functions | 4,233 | 4,233 |
+| Summed function body bytes | 896,073 | **896,612** |
+| Disassembled instruction bytes | 940,063 | **940,080** |
+| Instruction bytes outside functions | 43,990 | **43,468** |
+| Orphan instruction ranges | 312 | **311** |
+| Short flow-gap audit candidates | 10 | **9** |
+| Unresolved direct-call edges | 0 | **0** |
+
+The two-pass #055 export still produced **4,233/4,233 pseudo-C files**, with
+eight temporary-storage fallbacks and zero failures. No executable, loaded
+image, Ghidra project, or generated pseudo-C is committed to this repo.

@@ -482,7 +482,15 @@ report also includes the owning function's full existing address ranges,
 making internal body holes distinguishable from truncated tails.
 **This is a triage list, not a proof that every gap is code.**
 
-The separate `repair-boundaries` command has **seven pinned, guarded recipes**:
+The `audit-body-holes` command provides a complementary, read-only inventory
+of *every unowned interval between body ranges*, not just short fall-through
+gaps. It counts decoded instructions, undefined bytes, defined data, bytes owned
+by other functions, references, and the first instructions/data definitions.
+Use `audit-body-holes 0x9820` to focus on one function, or omit the argument
+to inspect all multi-span functions. A hole containing another function is
+**not** an instruction-boundary repair candidate by default.
+
+The separate `repair-boundaries` command has **eight pinned, guarded recipes**:
 
 | Function | Incorrect orphan instructions | True continuation | Verified end |
 | --- | --- | --- | --- |
@@ -492,6 +500,7 @@ The separate `repair-boundaries` command has **seven pinned, guarded recipes**:
 | `0x4738` | `0x4800`–`0x480d` | `XOR EDX,EDX` at `0x47ff` | `RET` `0x4878` |
 | `0x4bf8` | `0x4c35`–`0x4c3a` | `XOR EDX,EDX` at `0x4c34` | `RET` `0x4c4e` |
 | `0x4e14` | `0x4f01`–`0x4f0b` | `CALL 0x7c4fc` at `0x4efd` | `RET` `0x4f17` |
+| `0x9820` | `0x9c24`–`0x9c2d` and auto-data at `0x9bbc` | `MOV EDX,[0x137958]` at `0x9c1f`; branch at `0x9bbb` | `RET` `0x9e37` |
 | `0xfecc` | `0xff00`–`0xff08` | `PUSH 0x181174` at `0xfefe` | `RET` `0xffb2` |
 
 The first `0x4050` repair also disassembles a previously **undefined**
@@ -501,6 +510,13 @@ All other verified ends were already decoded. The `0xfecc` repair is an
 `ff0c..ffb2`, while false orphan code blocks only the 14-byte hole between
 them. Its recipe requires those exact original ranges before merging them;
 it does not erase the already-owned second part.
+The `0x9820` recipe verifies three original body ranges and the branch edges
+into `0x9bbb` and `0x9bc0`. Ghidra's analysis had treated the four-byte
+immediate of `MOV EDX,0x12f6ab` as a `pointer` data definition at `0x9bbc`.
+Only that exact auto-analyzed island and two exact false orphan instructions
+are cleared, with other function ownership, user symbols, comments and
+non-analysis references blocking the repair. The 539 recovered bytes include
+two previously disconnected sections of one routine.
 
 ```sh
 # Start with a disposable copy of a recovered project, never the only copy.
@@ -543,8 +559,10 @@ repairs changed `0x4050` **34 → 138**, `0x4738` **199 → 321**,
 `0x4bf8` **60 → 87**, and `0x4e14` **233 → 260**, recovering 280 more
 function-body bytes. The generic flow-gap audit reported **17** before
 the first repair, **16** after #049, **12** after #050, and **10** after
-all seven recipes in #054. The #054 repairs grew `0x433c` **9 → 242** and
-`0xfecc` **217 → 231** (247 more function-body bytes).
+all seven recipes in #054, then **9** after the #055 `0x9820` repair.
+The #054 repairs grew `0x433c` **9 → 242** and `0xfecc` **217 → 231**
+(247 bytes); the #055 repair grew `0x9820` **1,021 → 1,560**
+(539 additional function-body bytes).
 Other candidates require case-by-case review: for example, `0xbfcc`
 has a DEFAULT-source data pointer into disputed code at `0xc302`, which
 must not be silently discarded.

@@ -6,6 +6,7 @@ import ghidra.app.script.GhidraScript;
 import ghidra.app.cmd.disassemble.DisassembleCommand;
 import ghidra.program.model.address.AddressSet;
 import ghidra.program.model.listing.CodeUnit;
+import ghidra.program.model.listing.Data;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.symbol.Reference;
@@ -35,12 +36,31 @@ public class EF2000RepairBoundaries extends GhidraScript {
         }
     }
 
+    private static class BranchIsland {
+        final long start, pointer, firstBranch, secondBranch, secondTarget;
+        final int[] bytes;
+
+        BranchIsland(long start, long pointer, long firstBranch, long secondBranch,
+                     long secondTarget, int[] bytes) {
+            this.start = start;
+            this.pointer = pointer;
+            this.firstBranch = firstBranch;
+            this.secondBranch = secondBranch;
+            this.secondTarget = secondTarget;
+            this.bytes = bytes;
+        }
+
+        long end() { return start + bytes.length - 1; }
+    }
+
     private static class Recipe {
         final long entry, gap, predecessor, end, nextEntry, sync, bodyResume;
         final String name, precedingMnemonic, syncMnemonic;
         final int precedingLength, previousBodyLength, nextEntryByte;
         final int[] gapBytes, padding;
         final BadInstruction[] bad;
+        final long[][] oldBodyRanges;
+        final BranchIsland branchIsland;
 
         Recipe(long entry, String name, long gap, long predecessor,
                 String precedingMnemonic, int precedingLength, long end, long nextEntry,
@@ -71,6 +91,33 @@ public class EF2000RepairBoundaries extends GhidraScript {
             this.padding = padding;
             this.bad = bad;
             this.bodyResume = bodyResume;
+            this.oldBodyRanges = null;
+            this.branchIsland = null;
+        }
+
+        Recipe(long entry, String name, long gap, long predecessor,
+                String precedingMnemonic, int precedingLength, long end, long nextEntry,
+                int nextEntryByte, long sync, String syncMnemonic, int previousBodyLength,
+                int[] gapBytes, int[] padding, BadInstruction[] bad, long bodyResume,
+                long[][] oldBodyRanges, BranchIsland branchIsland) {
+            this.entry = entry;
+            this.name = name;
+            this.gap = gap;
+            this.predecessor = predecessor;
+            this.precedingMnemonic = precedingMnemonic;
+            this.precedingLength = precedingLength;
+            this.end = end;
+            this.nextEntry = nextEntry;
+            this.nextEntryByte = nextEntryByte;
+            this.sync = sync;
+            this.syncMnemonic = syncMnemonic;
+            this.previousBodyLength = previousBodyLength;
+            this.gapBytes = gapBytes;
+            this.padding = padding;
+            this.bad = bad;
+            this.bodyResume = bodyResume;
+            this.oldBodyRanges = oldBodyRanges;
+            this.branchIsland = branchIsland;
         }
 
         long badEnd() {
@@ -120,6 +167,16 @@ public class EF2000RepairBoundaries extends GhidraScript {
             new BadInstruction[]{new BadInstruction(0x4f01, 2, "ADD"),
                                  new BadInstruction(0x4f03, 7, "ROR"),
                                  new BadInstruction(0x4f0a, 2, "OR")}),
+        new Recipe(0x9820, "FUN_00009820", 0x9c1f,
+            0x9c1a, "CALL", 5, 0x9e37, 0x9e38, 0x56, 0x9c2e, "JLE", 1021,
+            new int[]{0x8b, 0x15, 0x58, 0x79, 0x13, 0x00},
+            new int[]{},
+            new BadInstruction[]{new BadInstruction(0x9c24, 6, "ADD"),
+                                 new BadInstruction(0x9c2a, 4, "CMP")}, 0x9e2e,
+            new long[][]{{0x9820, 0x9bba}, {0x9bc7, 0x9c1e}, {0x9e2e, 0x9e37}},
+            new BranchIsland(0x9bbb, 0x9bbc, 0x9ba9, 0x9bb9, 0x9bc0,
+                new int[]{0xba, 0xab, 0xf6, 0x12, 0x00, 0x89, 0xf0,
+                          0xe8, 0xc1, 0xd9, 0x09, 0x00})),
         new Recipe(0xfecc, "FUN_0000fecc", 0xfefe,
             0xfefd, "PUSH", 1, 0xffb2, 0xffb4, 0x53, 0xff09, "ADD", 217,
             new int[]{0x68, 0x74, 0x11, 0x18, 0x00},
@@ -161,6 +218,16 @@ public class EF2000RepairBoundaries extends GhidraScript {
                         // never erase a discovered function or arbitrary code.
                         currentProgram.getListing().clearCodeUnits(
                             toAddr(recipe.bad[0].offset), toAddr(recipe.badEnd()), false);
+                        if (recipe.branchIsland != null) {
+                            BranchIsland island = recipe.branchIsland;
+                            currentProgram.getListing().clearCodeUnits(
+                                toAddr(island.pointer), toAddr(island.pointer + 3), false);
+                            DisassembleCommand branch = new DisassembleCommand(toAddr(island.start),
+                                new AddressSet(toAddr(island.start), toAddr(island.end())), true);
+                            if (!branch.applyTo(currentProgram, monitor)) {
+                                throw new IllegalStateException("verified branch island did not disassemble");
+                            }
+                        }
                         DisassembleCommand command = new DisassembleCommand(toAddr(recipe.gap),
                             new AddressSet(toAddr(recipe.gap), toAddr(recipe.end)), true);
                         boolean disassembled = command.applyTo(currentProgram, monitor);
@@ -227,6 +294,7 @@ public class EF2000RepairBoundaries extends GhidraScript {
         if (!bytesMatch(recipe.gap, recipe.gapBytes) ||
                 !bytesMatch(recipe.end + 1, recipe.padding) ||
                 readByte(recipe.nextEntry) != recipe.nextEntryByte) return false;
+        if (recipe.branchIsland != null && !safeBranchIsland(recipe.branchIsland)) return false;
         for (long offset = recipe.gap; offset <= recipe.end; offset++) {
             monitor.checkCancelled();
             Function owner = getFunctionContaining(toAddr(offset));
@@ -268,6 +336,16 @@ public class EF2000RepairBoundaries extends GhidraScript {
     }
 
     private boolean matchesOldBody(Function function, Recipe recipe) {
+        if (recipe.oldBodyRanges != null) {
+            if (function.getBody().getNumAddressRanges() != recipe.oldBodyRanges.length) return false;
+            var ranges = function.getBody().getAddressRanges();
+            for (long[] span : recipe.oldBodyRanges) {
+                var range = ranges.next();
+                if (range.getMinAddress().getOffset() != span[0] ||
+                        range.getMaxAddress().getOffset() != span[1]) return false;
+            }
+            return true;
+        }
         if (recipe.bodyResume == 0) {
             return function.getBody().getMaxAddress().getOffset() == recipe.gap - 1 &&
                    function.getBody().getNumAddressRanges() == 1;
@@ -282,6 +360,51 @@ public class EF2000RepairBoundaries extends GhidraScript {
             if (function.getBody().contains(toAddr(offset)) != shouldOwn) return false;
         }
         return true;
+    }
+
+    private boolean safeBranchIsland(BranchIsland island) throws Exception {
+        if (!bytesMatch(island.start, island.bytes)) return false;
+        Data pointer = currentProgram.getListing().getDefinedDataAt(toAddr(island.pointer));
+        if (pointer == null || pointer.getLength() != 4 ||
+                !pointer.getDataType().getName().equals("pointer")) return false;
+        for (long offset = island.start; offset <= island.end(); offset++) {
+            monitor.checkCancelled();
+            if (getInstructionContaining(toAddr(offset)) != null ||
+                    getFunctionContaining(toAddr(offset)) != null) return false;
+            Data data = currentProgram.getListing().getDefinedDataContaining(toAddr(offset));
+            if (data != null && data.getAddress().getOffset() != island.pointer) return false;
+            if (data != null && (offset < island.pointer || offset >= island.pointer + 4)) return false;
+            CodeUnit unit = currentProgram.getListing().getCodeUnitContaining(toAddr(offset));
+            if (unit != null && unit.getAddress().getOffset() == offset) {
+                for (int type : new int[]{CodeUnit.EOL_COMMENT, CodeUnit.PRE_COMMENT,
+                                          CodeUnit.POST_COMMENT, CodeUnit.PLATE_COMMENT,
+                                          CodeUnit.REPEATABLE_COMMENT}) {
+                    if (unit.getComment(type) != null) return false;
+                }
+            }
+            for (Reference reference : getReferencesTo(toAddr(offset))) {
+                boolean verifiedBranch = (offset == island.start &&
+                    reference.getFromAddress().getOffset() == island.firstBranch) ||
+                    (offset == island.secondTarget &&
+                    reference.getFromAddress().getOffset() == island.secondBranch);
+                if (!verifiedBranch && (!reference.getReferenceType().isData() ||
+                        reference.getSource() != SourceType.ANALYSIS)) return false;
+            }
+            for (Symbol symbol : currentProgram.getSymbolTable().getSymbols(toAddr(offset))) {
+                if (symbol.getSource() == SourceType.USER_DEFINED) return false;
+            }
+        }
+        return hasBranchReference(island.start, island.firstBranch) &&
+               hasBranchReference(island.secondTarget, island.secondBranch);
+    }
+
+    private boolean hasBranchReference(long target, long source) {
+        for (Reference reference : getReferencesTo(toAddr(target))) {
+            if (reference.getFromAddress().getOffset() == source &&
+                    reference.getReferenceType().isJump() &&
+                    reference.getSource() == SourceType.DEFAULT) return true;
+        }
+        return false;
     }
 
     private boolean bytesMatch(long start, int[] bytes) throws Exception {

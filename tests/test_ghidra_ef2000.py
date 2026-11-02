@@ -521,6 +521,42 @@ class GhidraWorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'invalid flow-gap report'):
                 ghidra.audit_flow_gaps(args)
 
+    def test_audit_body_holes_is_read_only_and_accepts_empty_report(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, offsets=[0x9820])
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-readOnly', command)
+            self.assertEqual(command[-3:], ['EF2000AuditBodyHoles.java',
+                                            str(self.workspace / 'body-holes.tsv'), '9820'])
+            (self.workspace / 'body-holes.tsv').write_text(
+                'entry\tfrom\tthrough\tundefined_bytes\tdata_bytes\t'
+                'other_function_bytes\treferences\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.audit_body_holes(args)
+
+    def test_audit_body_holes_requires_fresh_valid_report(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, offsets=[])
+        with patch.object(ghidra.subprocess, 'run'):
+            with self.assertRaisesRegex(ValueError, 'without a fresh body-hole report'):
+                ghidra.audit_body_holes(args)
+        with patch.object(ghidra.subprocess, 'run',
+                          side_effect=lambda command, check: (self.workspace / 'body-holes.tsv')
+                              .write_text('bad\tcolumns\n')):
+            with self.assertRaisesRegex(ValueError, 'invalid body-hole report'):
+                ghidra.audit_body_holes(args)
+
     def test_repair_boundaries_is_read_only_by_default(self):
         (self.workspace / 'projects').mkdir(parents=True)
         (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
@@ -542,6 +578,7 @@ class GhidraWorkflowTests(unittest.TestCase):
                 '0x00004738\t199\t199\tproposed\n'
                 '0x00004bf8\t60\t60\tproposed\n'
                 '0x00004e14\t233\t233\tproposed\n'
+                '0x00009820\t1021\t1021\tproposed\n'
                 '0x0000fecc\t217\t217\tproposed\n')
 
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
@@ -567,6 +604,7 @@ class GhidraWorkflowTests(unittest.TestCase):
                 '0x00004738\t199\t321\trepaired\t\n'
                 '0x00004bf8\t60\t87\trepaired\t\n'
                 '0x00004e14\t233\t260\trepaired\t\n'
+                '0x00009820\t1021\t1560\trepaired\t\n'
                 '0x0000fecc\t217\t231\trepaired\t\n')
 
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
@@ -581,6 +619,7 @@ class GhidraWorkflowTests(unittest.TestCase):
                 '0x00004738\t199\t199\tproposed\t\n'
                 '0x00004bf8\t60\t60\tproposed\t\n'
                 '0x00004e14\t233\t233\tproposed\t\n'
+                '0x00009820\t1021\t1021\tproposed\t\n'
                 '0x0000fecc\t217\t217\tproposed\t\n')
 
         with patch.object(ghidra.subprocess, 'run', side_effect=failed_ghidra):
