@@ -36,16 +36,25 @@ public class EF2000RepairBoundaries extends GhidraScript {
     }
 
     private static class Recipe {
-        final long entry, gap, predecessor, end, nextEntry, sync;
+        final long entry, gap, predecessor, end, nextEntry, sync, bodyResume;
         final String name, precedingMnemonic, syncMnemonic;
-        final int precedingLength, previousBodyLength;
+        final int precedingLength, previousBodyLength, nextEntryByte;
         final int[] gapBytes, padding;
         final BadInstruction[] bad;
 
         Recipe(long entry, String name, long gap, long predecessor,
                 String precedingMnemonic, int precedingLength, long end, long nextEntry,
-                long sync, String syncMnemonic, int previousBodyLength,
+                int nextEntryByte, long sync, String syncMnemonic, int previousBodyLength,
                 int[] gapBytes, int[] padding, BadInstruction[] bad) {
+            this(entry, name, gap, predecessor, precedingMnemonic, precedingLength,
+                end, nextEntry, nextEntryByte, sync, syncMnemonic, previousBodyLength,
+                gapBytes, padding, bad, 0);
+        }
+
+        Recipe(long entry, String name, long gap, long predecessor,
+                String precedingMnemonic, int precedingLength, long end, long nextEntry,
+                int nextEntryByte, long sync, String syncMnemonic, int previousBodyLength,
+                int[] gapBytes, int[] padding, BadInstruction[] bad, long bodyResume) {
             this.entry = entry;
             this.name = name;
             this.gap = gap;
@@ -54,12 +63,14 @@ public class EF2000RepairBoundaries extends GhidraScript {
             this.precedingLength = precedingLength;
             this.end = end;
             this.nextEntry = nextEntry;
+            this.nextEntryByte = nextEntryByte;
             this.sync = sync;
             this.syncMnemonic = syncMnemonic;
             this.previousBodyLength = previousBodyLength;
             this.gapBytes = gapBytes;
             this.padding = padding;
             this.bad = bad;
+            this.bodyResume = bodyResume;
         }
 
         long badEnd() {
@@ -73,37 +84,49 @@ public class EF2000RepairBoundaries extends GhidraScript {
     // Do not add a candidate without manually checking its refs and decoding.
     private static final Recipe[] RECIPES = {
         new Recipe(0x4050, "FUN_00004050", 0x4072,
-            0x4070, "XOR", 2, 0x40d9, 0x40dc, 0x407c, null, 34,
+            0x4070, "XOR", 2, 0x40d9, 0x40dc, 0x53, 0x407c, null, 34,
             new int[]{0xe8, 0xe9, 0x88, 0x09, 0x00},
             new int[]{0x8b, 0xc0},
             new BadInstruction[]{new BadInstruction(0x4074, 2, "MOV"),
                                  new BadInstruction(0x4076, 3, "ADD"),
                                  new BadInstruction(0x4079, 3, "RET")}),
+        new Recipe(0x433c, "FUN_0000433c", 0x4345,
+            0x4342, "SUB", 3, 0x442d, 0x4430, 0x56, 0x434b, "MOV", 9,
+            new int[]{0x8b, 0x2d, 0xa0, 0x70, 0x19, 0x00},
+            new int[]{0x8b, 0xc0},
+            new BadInstruction[]{new BadInstruction(0x4349, 2, "SBB")}),
         new Recipe(0x45a4, "candidate_direct_call_000045a4", 0x45d1,
-            0x45cc, "CALL", 5, 0x4734, 0x4738, 0x45d6, "MOV", 45,
+            0x45cc, "CALL", 5, 0x4734, 0x4738, 0x53, 0x45d6, "MOV", 45,
             new int[]{0xba, 0x28, 0x58, 0x12, 0x00},
             new int[]{0x8d, 0x40, 0x00},
             new BadInstruction[]{new BadInstruction(0x45d3, 1, "POP"),
                                  new BadInstruction(0x45d4, 2, "ADC")}),
         new Recipe(0x4738, "candidate_callback_target_00004738", 0x47ff,
-            0x47fa, "CALL", 5, 0x4878, 0x487c, 0x480e, "MOV", 199,
+            0x47fa, "CALL", 5, 0x4878, 0x487c, 0x53, 0x480e, "MOV", 199,
             new int[]{0x31, 0xd2},
             new int[]{0x8d, 0x40, 0x00},
             new BadInstruction[]{new BadInstruction(0x4800, 6, "ROR"),
                                  new BadInstruction(0x4806, 3, "ADD"),
                                  new BadInstruction(0x4809, 5, "XOR")}),
         new Recipe(0x4bf8, "candidate_callback_target_00004bf8", 0x4c34,
-            0x4c2f, "CALL", 5, 0x4c4e, 0x4c50, 0x4c3b, "MOV", 60,
+            0x4c2f, "CALL", 5, 0x4c4e, 0x4c50, 0x53, 0x4c3b, "MOV", 60,
             new int[]{0x31, 0xd2},
             new int[]{0x90},
             new BadInstruction[]{new BadInstruction(0x4c35, 6, "SAR")}),
         new Recipe(0x4e14, "candidate_callback_target_00004e14", 0x4efd,
-            0x4efa, "ADD", 3, 0x4f17, 0x4f18, 0x4f0c, "XOR", 233,
+            0x4efa, "ADD", 3, 0x4f17, 0x4f18, 0x53, 0x4f0c, "XOR", 233,
             new int[]{0xe8, 0xfa, 0x75, 0x07, 0x00},
             new int[]{},
             new BadInstruction[]{new BadInstruction(0x4f01, 2, "ADD"),
                                  new BadInstruction(0x4f03, 7, "ROR"),
                                  new BadInstruction(0x4f0a, 2, "OR")}),
+        new Recipe(0xfecc, "FUN_0000fecc", 0xfefe,
+            0xfefd, "PUSH", 1, 0xffb2, 0xffb4, 0x53, 0xff09, "ADD", 217,
+            new int[]{0x68, 0x74, 0x11, 0x18, 0x00},
+            new int[]{0x90},
+            new BadInstruction[]{new BadInstruction(0xff00, 2, "ADC"),
+                                 new BadInstruction(0xff02, 2, "ADD"),
+                                 new BadInstruction(0xff04, 5, "ADC")}, 0xff0c),
     };
 
     @Override
@@ -180,7 +203,7 @@ public class EF2000RepairBoundaries extends GhidraScript {
         if (function == null || function.isThunk() ||
                 !function.getName().equals(recipe.name) ||
                 function.getBody().getNumAddresses() != recipe.previousBodyLength ||
-                function.getBody().getMaxAddress().getOffset() != recipe.gap - 1 ||
+                !matchesOldBody(function, recipe) ||
                 getFunctionAt(toAddr(recipe.nextEntry)) == null ||
                 getInstructionAt(toAddr(recipe.gap)) != null) return false;
         Instruction predecessor = getInstructionAt(toAddr(recipe.predecessor));
@@ -203,10 +226,12 @@ public class EF2000RepairBoundaries extends GhidraScript {
                 recipe.badEnd() + 1 != recipe.sync) return false;
         if (!bytesMatch(recipe.gap, recipe.gapBytes) ||
                 !bytesMatch(recipe.end + 1, recipe.padding) ||
-                readByte(recipe.nextEntry) != 0x53) return false;
+                readByte(recipe.nextEntry) != recipe.nextEntryByte) return false;
         for (long offset = recipe.gap; offset <= recipe.end; offset++) {
             monitor.checkCancelled();
-            if (getFunctionContaining(toAddr(offset)) != null ||
+            Function owner = getFunctionContaining(toAddr(offset));
+            if ((owner != null && (owner != function ||
+                    recipe.bodyResume == 0 || offset < recipe.bodyResume)) ||
                     currentProgram.getListing().getDefinedDataContaining(toAddr(offset)) != null) return false;
         }
         // Entire cleared span must be *exactly* the audited orphan instructions.
@@ -242,6 +267,23 @@ public class EF2000RepairBoundaries extends GhidraScript {
         return currentProgram.getMemory().getByte(toAddr(offset)) & 0xff;
     }
 
+    private boolean matchesOldBody(Function function, Recipe recipe) {
+        if (recipe.bodyResume == 0) {
+            return function.getBody().getMaxAddress().getOffset() == recipe.gap - 1 &&
+                   function.getBody().getNumAddressRanges() == 1;
+        }
+        // Exactly two old ranges, separated by the single verified bad
+        // decode. Existing owned instructions after the hole must be kept.
+        if (function.getBody().getNumAddressRanges() != 2 ||
+                function.getBody().getMaxAddress().getOffset() != recipe.end ||
+                recipe.bodyResume <= recipe.gap) return false;
+        for (long offset = recipe.entry; offset <= recipe.end; offset++) {
+            boolean shouldOwn = offset < recipe.gap || offset >= recipe.bodyResume;
+            if (function.getBody().contains(toAddr(offset)) != shouldOwn) return false;
+        }
+        return true;
+    }
+
     private boolean bytesMatch(long start, int[] bytes) throws Exception {
         for (int i = 0; i < bytes.length; i++) {
             if (readByte(start + i) != bytes[i]) return false;
@@ -255,6 +297,8 @@ public class EF2000RepairBoundaries extends GhidraScript {
             case 0xba -> "MOV";
             case 0x31 -> "XOR";
             case 0xe8 -> "CALL";
+            case 0x8b -> "MOV";
+            case 0x68 -> "PUSH";
             default -> "UNEXPECTED";
         };
         return instruction != null && instruction.getLength() == recipe.gapBytes.length &&

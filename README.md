@@ -52,7 +52,7 @@ ef2000-ghidra recover-orphans         # review referenced missing functions (dry
 ef2000-ghidra callback-tables         # extract verified named dispatch tables
 ef2000-ghidra name-callbacks          # audit names (dry run)
 ef2000-ghidra audit-flow-gaps         # inspect truncated function bodies
-ef2000-ghidra repair-boundaries       # audit five guarded recipes (dry run)
+ef2000-ghidra repair-boundaries       # audit seven guarded recipes (dry run)
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
 

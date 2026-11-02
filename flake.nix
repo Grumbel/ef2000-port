@@ -401,7 +401,7 @@
           printf '  ef2000-ghidra audit-flow-gaps\n'
           printf '                                  Audit suspicious fall-through decoding gaps\n'
           printf '  ef2000-ghidra repair-boundaries\n'
-          printf '                                  Audit five pinned function-body repairs (read-only)\n'
+          printf '                                  Audit seven pinned function-body repairs (read-only)\n'
           printf '  nix run .#ghidra-ef2000 -- --help\n'
           printf '                                  Same workflow without entering the dev shell\n'
           printf '  ghidra                          Open Ghidra GUI\n\n'

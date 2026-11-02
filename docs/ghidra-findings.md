@@ -662,3 +662,64 @@ All five recipes were re-audited as `already_repaired` (idempotent).
 This improves Listing ownership and control-flow recovery; it does not
 make the Ghidra pseudo-C a source-equivalent, compilable reimplementation
 of the game, nor does it resolve uncertain Watcom calling conventions.
+
+## #054: High-score insertion and an internal function-body hole
+
+The short flow-gap audit now includes the owner's **actual body spans**.
+This distinction matters: a function can be truncated at its tail, or it
+can already own disconnected blocks past a misdecoded instruction. The
+second case must preserve those existing blocks. A new pinned `0x433c`
+recipe and a separate two-span `0xfecc` recipe have been checked against
+the original X-32 bytes and applied to a disposable #050 project copy.
+
+| Function | Original Listing ranges | Restored body | Correction |
+| --- | --- | --- | --- |
+| `0x433c` | `0x433c..0x4344` (9 bytes) | `0x433c..0x442d` (242 bytes) | Wrong `SBB` at `0x4349` overlapped the immediate of `MOV EBP,[0x1970a0]` at `0x4345` |
+| `0xfecc` | `0xfecc..0xfefd`, `0xff0c..0xffb2` (217 bytes) | `0xfecc..0xffb2` (231 bytes) | Wrong `ADC`, `ADD`, `ADC` at `0xff00..0xff08` split a real `PUSH 0x181174` and an indirect `CALL` |
+
+The `0xfecc` recipe verifies every byte of the **two previously owned
+ranges**, the 14-byte hole, the original `RET` at `0xffb2`, and the
+independent prologue at `0xffb4`. It only clears the enumerated orphan
+instructions; the existing second half of the function is retained and
+rejoined transactionally. Both new recipes and the five previous ones
+then reported `already_repaired` in a repeated audit.
+
+### Recovered high-score data layout
+
+The fully decoded `0x433c` routine is an apparent high-score insertion
+function. It compares a current score against ten existing records,
+shifts lower-scoring records down by one 25-byte slot, inserts a new
+name/type/score record, and returns an insertion slot or a no-slot
+sentinel. The separately repaired `0x4050` routine initializes this same
+table from fixed-width seed names and starting values. The record
+boundaries are corroborated by literal 20-byte-spaced, NUL-terminated
+names in the initialized image at `0x121292` (not copied into the repo).
+
+| Guest address | Offset | Size | Inferred field |
+| --- | ---: | ---: | --- |
+| `0x1970a4 + 25*i` | `+0x00` | 20 | NUL-terminated pilot/name storage |
+| `0x1970b8 + 25*i` | `+0x14` | 1 | Mode/category byte (initial values 1–3; exact meaning unknown) |
+| `0x1970b9 + 25*i` | `+0x15` | 4 | Little-endian score value |
+| `0x1970a0` | outside record | 4 | Current score used in insertion comparison |
+
+This is a **provisional structural inference**, not a validated C++ ABI.
+In particular, the guest's packed 25-byte stride, register arguments,
+and its string-copy behavior need explicit modeling before implementing
+a native replacement.
+
+| Ghidra 11.4.2 measurement | #050 | #054 |
+| --- | ---: | ---: |
+| Recognized functions | 4,233 | 4,233 |
+| Summed function body bytes | 895,826 | **896,073** |
+| Disassembled instruction bytes | 940,057 | **940,063** |
+| Instruction bytes outside functions | 44,231 | **43,990** |
+| Orphan instruction ranges | 314 | **312** |
+| Short flow-gap audit candidates | 12 | **10** |
+| Unresolved direct-call edges | 0 | **0** |
+
+The refreshed #054 corpus still has **4,233/4,233 pseudo-C exports**, eight
+newly generated storage-fallback files and zero export failures. The
+remaining 10 gaps include multi-span functions with nontrivial, larger
+disputed regions; none was bulk-repaired. For example, `0x9820` already
+owns three disconnected code ranges, and the gap near `0xbfcc` has an
+external DEFAULT-source data reference into its suspect decode.

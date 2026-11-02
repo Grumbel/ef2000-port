@@ -477,22 +477,30 @@ decompiler's control flow. The read-only `audit-flow-gaps` command finds
 short gaps between a known function's fall-through address and the next
 already-decoded *orphan* instruction. Each row records the two addresses,
 the preceding instruction, the first missing byte, an extended window of
-orphan instructions, and incoming reference types around that window.
+orphan instructions, and incoming reference types around that window. The
+report also includes the owning function's full existing address ranges,
+making internal body holes distinguishable from truncated tails.
 **This is a triage list, not a proof that every gap is code.**
 
-The separate `repair-boundaries` command has **five pinned, guarded recipes**:
+The separate `repair-boundaries` command has **seven pinned, guarded recipes**:
 
 | Function | Incorrect orphan instructions | True continuation | Verified end |
 | --- | --- | --- | --- |
 | `0x4050` | `0x4074`–`0x407b` | `CALL 0x9c960` at `0x4072` | `RET` `0x40d9` |
+| `0x433c` | `0x4349`–`0x434a` | `MOV EBP,[0x1970a0]` at `0x4345` | `RET` `0x442d` |
 | `0x45a4` | `0x45d3`–`0x45d5` | `MOV EDX,0x125828` at `0x45d1` | `RET` `0x4734` |
 | `0x4738` | `0x4800`–`0x480d` | `XOR EDX,EDX` at `0x47ff` | `RET` `0x4878` |
 | `0x4bf8` | `0x4c35`–`0x4c3a` | `XOR EDX,EDX` at `0x4c34` | `RET` `0x4c4e` |
 | `0x4e14` | `0x4f01`–`0x4f0b` | `CALL 0x7c4fc` at `0x4efd` | `RET` `0x4f17` |
+| `0xfecc` | `0xff00`–`0xff08` | `PUSH 0x181174` at `0xfefe` | `RET` `0xffb2` |
 
 The first `0x4050` repair also disassembles a previously **undefined**
 continuation; its final `RET` byte is checked against the original image.
-All other verified ends were already decoded as orphan instructions.
+All other verified ends were already decoded. The `0xfecc` repair is an
+*internal gap*: the existing function owns two ranges, `0xfecc..fefd` and
+`ff0c..ffb2`, while false orphan code blocks only the 14-byte hole between
+them. Its recipe requires those exact original ranges before merging them;
+it does not erase the already-owned second part.
 
 ```sh
 # Start with a disposable copy of a recovered project, never the only copy.
@@ -534,7 +542,9 @@ bytes **44,763 → 44,409**. On a #049 project copy, the four additional
 repairs changed `0x4050` **34 → 138**, `0x4738` **199 → 321**,
 `0x4bf8` **60 → 87**, and `0x4e14` **233 → 260**, recovering 280 more
 function-body bytes. The generic flow-gap audit reported **17** before
-the first repair, **16** after #049, and **12** after all five recipes.
+the first repair, **16** after #049, **12** after #050, and **10** after
+all seven recipes in #054. The #054 repairs grew `0x433c` **9 → 242** and
+`0xfecc` **217 → 231** (247 more function-body bytes).
 Other candidates require case-by-case review: for example, `0xbfcc`
 has a DEFAULT-source data pointer into disputed code at `0xc302`, which
 must not be silently discarded.

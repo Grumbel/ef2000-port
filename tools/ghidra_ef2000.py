@@ -324,8 +324,9 @@ def repair_boundaries(args):
                 set(reader.fieldnames or ()):
             raise ValueError('Ghidra returned an invalid boundary-repair report')
         rows = list(reader)
-    if len(rows) != 5 or {row['entry'] for row in rows} != {
-            '0x00004050', '0x000045a4', '0x00004738', '0x00004bf8', '0x00004e14'}:
+    if len(rows) != 7 or {row['entry'] for row in rows} != {
+            '0x00004050', '0x0000433c', '0x000045a4', '0x00004738',
+            '0x00004bf8', '0x00004e14', '0x0000fecc'}:
         raise ValueError('Ghidra returned an unexpected number of boundary-repair rows')
     failed = [row for row in rows if row['result'] == 'repair_failed']
     if failed:
@@ -496,7 +497,7 @@ def main(argv=None):
     boundaries.add_argument('--output', type=Path,
                             help='TSV audit (default: workspace/boundary-repairs.tsv)')
     boundaries.add_argument('--apply', action='store_true',
-                            help='repair only five pinned, byte-verified boundary recipes on a disposable project')
+                            help='repair only seven pinned, byte-verified boundary recipes on a disposable project')
     gaps = subparsers.choices['audit-flow-gaps']
     gaps.add_argument('--output', type=Path,
                       help='TSV audit (default: workspace/flow-gaps.tsv)')

@@ -537,10 +537,12 @@ class GhidraWorkflowTests(unittest.TestCase):
             (self.workspace / 'boundary-repairs.tsv').write_text(
                 'entry\tbody_bytes_before\tbody_bytes_after\tresult\n'
                 '0x00004050\t34\t34\tproposed\n'
+                '0x0000433c\t9\t9\tproposed\n'
                 '0x000045a4\t401\t401\talready_repaired\n'
                 '0x00004738\t199\t199\tproposed\n'
                 '0x00004bf8\t60\t60\tproposed\n'
-                '0x00004e14\t233\t233\tproposed\n')
+                '0x00004e14\t233\t233\tproposed\n'
+                '0x0000fecc\t217\t217\tproposed\n')
 
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
             ghidra.repair_boundaries(args)
@@ -560,10 +562,12 @@ class GhidraWorkflowTests(unittest.TestCase):
             (self.workspace / 'boundary-repairs.tsv').write_text(
                 'entry\tbody_bytes_before\tbody_bytes_after\tresult\terror\n'
                 '0x00004050\t34\t138\trepaired\t\n'
+                '0x0000433c\t9\t242\trepaired\t\n'
                 '0x000045a4\t401\t401\talready_repaired\t\n'
                 '0x00004738\t199\t321\trepaired\t\n'
                 '0x00004bf8\t60\t87\trepaired\t\n'
-                '0x00004e14\t233\t260\trepaired\t\n')
+                '0x00004e14\t233\t260\trepaired\t\n'
+                '0x0000fecc\t217\t231\trepaired\t\n')
 
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
             ghidra.repair_boundaries(args)
@@ -572,10 +576,12 @@ class GhidraWorkflowTests(unittest.TestCase):
             (self.workspace / 'boundary-repairs.tsv').write_text(
                 'entry\tbody_bytes_before\tbody_bytes_after\tresult\terror\n'
                 '0x00004050\t34\t34\trepair_failed\tconflicting code\n'
+                '0x0000433c\t9\t9\tproposed\t\n'
                 '0x000045a4\t401\t401\talready_repaired\t\n'
                 '0x00004738\t199\t199\tproposed\t\n'
                 '0x00004bf8\t60\t60\tproposed\t\n'
-                '0x00004e14\t233\t233\tproposed\t\n')
+                '0x00004e14\t233\t233\tproposed\t\n'
+                '0x0000fecc\t217\t217\tproposed\t\n')
 
         with patch.object(ghidra.subprocess, 'run', side_effect=failed_ghidra):
             with self.assertRaisesRegex(ValueError, 'conflicting code'):

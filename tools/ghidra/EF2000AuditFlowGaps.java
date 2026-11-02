@@ -4,6 +4,9 @@
 
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.Address;
+import ghidra.program.model.address.AddressRange;
+import ghidra.program.model.address.AddressRangeIterator;
+import ghidra.program.model.address.AddressSetView;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.InstructionIterator;
@@ -33,7 +36,7 @@ public class EF2000AuditFlowGaps extends GhidraScript {
         }
 
         List<String> report = new ArrayList<>();
-        report.add("function_entry\tsite\tfallthrough\tnext_orphan\tgap_bytes\tfirst_byte\tprevious_instruction\tnext_instruction\torphan_window\torphan_references");
+        report.add("function_entry\tsite\tfallthrough\tnext_orphan\tgap_bytes\tfirst_byte\tprevious_instruction\tnext_instruction\torphan_window\torphan_references\tfunction_body_bytes\tfunction_body_max\tfunction_body_ranges\tbody_spans");
         InstructionIterator instructions = currentProgram.getListing().getInstructions(true);
         while (instructions.hasNext()) {
             monitor.checkCancelled();
@@ -53,11 +56,14 @@ public class EF2000AuditFlowGaps extends GhidraScript {
             long gap = next.getAddress().getOffset() - fallthrough.getOffset();
             if (gap < 1 || gap > MAX_GAP) continue;
             int opcode = currentProgram.getMemory().getByte(fallthrough) & 0xff;
-            report.add(String.format("0x%08x\t0x%08x\t0x%08x\t0x%08x\t%d\t0x%02x\t%s\t%s\t%s\t%s",
+            report.add(String.format("0x%08x\t0x%08x\t0x%08x\t0x%08x\t%d\t0x%02x\t%s\t%s\t%s\t%s\t%d\t0x%08x\t%d\t%s",
                 function.getEntryPoint().getOffset(), site.getOffset(),
                 fallthrough.getOffset(), next.getAddress().getOffset(),
                 gap, opcode, clean(instruction.toString()), clean(next.toString()),
-                orphanWindow(next), orphanReferences(next)));
+                orphanWindow(next), orphanReferences(next),
+                function.getBody().getNumAddresses(),
+                function.getBody().getMaxAddress().getOffset(),
+                function.getBody().getNumAddressRanges(), bodySpans(function.getBody())));
         }
         Path output = Paths.get(args[0]);
         Files.createDirectories(output.getParent());
@@ -72,6 +78,17 @@ public class EF2000AuditFlowGaps extends GhidraScript {
 
     private String clean(String text) {
         return text.replace('\t', ' ').replace('\r', ' ').replace('\n', ' ');
+    }
+
+    private String bodySpans(AddressSetView body) {
+        List<String> spans = new ArrayList<>();
+        AddressRangeIterator ranges = body.getAddressRanges();
+        while (ranges.hasNext()) {
+            AddressRange range = ranges.next();
+            spans.add(String.format("0x%x..0x%x", range.getMinAddress().getOffset(),
+                range.getMaxAddress().getOffset()));
+        }
+        return String.join(" | ", spans);
     }
 
     private String orphanWindow(Instruction start) {
