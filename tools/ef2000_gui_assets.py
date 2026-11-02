@@ -19,6 +19,7 @@ try:
     from .did_archive import DIDArchive
     from .ilbm_image import decode, encode_png, encode_bmp
     from .pcx_image import decode as decode_pcx, is_pcx
+    from .bmp_image import decode as decode_bmp, is_bmp
     from .spr_image import decode as decode_spr
     from .menu_font import rip_font
     from .menu_symbols import rip_symbols
@@ -27,6 +28,7 @@ except ImportError:
     from did_archive import DIDArchive
     from ilbm_image import decode, encode_png, encode_bmp
     from pcx_image import decode as decode_pcx, is_pcx
+    from bmp_image import decode as decode_bmp, is_bmp
     from spr_image import decode as decode_spr
     from menu_font import rip_font
     from menu_symbols import rip_symbols
@@ -92,19 +94,38 @@ def format_kind(blob):
         return blob[8:12].decode('ascii').strip()
     if is_pcx(blob):
         return 'PCX'
+    if is_bmp(blob):
+        return 'BMP'
     return 'other'
+
+
+def image_suffix(archive, entry):
+    """Detect supported pictures by decoded signature, not hidden hash/extension."""
+    head = archive.member_head(entry)
+    if head.startswith(b'FORM') and head[8:12] in (b'ILBM', b'PBM '):
+        return '.lbm'
+    if (head[:1] == b'\x0a' and head[2:4] == b'\x01\x08' and
+            is_pcx(archive.member(entry))):
+        return '.pcx'
+    if head.startswith(b'BM') and is_bmp(archive.member(entry)):
+        return '.bmp'
+    return None
 
 
 def inventory(game_dir):
     report = {'archives': [], 'loose_lbm': []}
     for filename, archive in archives_from(game_dir):
         kinds = Counter(format_kind(archive.raw_member(entry)) for entry in archive.entries)
+        images = Counter(suffix for entry in archive.entries
+                         if (suffix := image_suffix(archive, entry)))
         report['archives'].append({
             'file': filename,
             'members': len(archive.entries),
             'directories': list(archive.directories),
             'extensions': list(archive.extensions),
             'stored_types': dict(sorted(kinds.items())),
+            'recognized_pictures': dict(sorted(images.items())),
+            'unrecognized_members': len(archive.entries) - sum(images.values()),
         })
     for path in sorted(game_dir.rglob('*')):
         if path.is_file() and path.suffix.lower() == '.lbm':
@@ -137,14 +158,10 @@ def extract(game_dir, output_dir, paths, all_images=False, bmp=False):
                 selected.append((relative, entry))
         if all_images:
             for entry in archive.entries:
-                head = archive.member_head(entry)
                 # Only decompress full RA payloads after identifying their
                 # leading image signature; thousands of 3D members are skipped.
-                if head.startswith(b'FORM') and head[8:12] in (b'ILBM', b'PBM '):
-                    selected.append((Path(f'hash_{entry.hash:08x}.lbm'), entry))
-                elif (head[:1] == b'\x0a' and head[2:4] == b'\x01\x08'
-                      and is_pcx(archive.member(entry))):
-                    selected.append((Path(f'hash_{entry.hash:08x}.pcx'), entry))
+                if suffix := image_suffix(archive, entry):
+                    selected.append((Path(f'hash_{entry.hash:08x}{suffix}'), entry))
         for relative, entry in selected:
             content = archive.member(entry)
             base = output_dir / archive_name.removesuffix('.DAT') / relative
@@ -160,6 +177,13 @@ def extract(game_dir, output_dir, paths, all_images=False, bmp=False):
                              'height': image.height, 'palette_colors': len(image.palette) // 3})
             elif is_pcx(content):
                 image = decode_pcx(content)
+                write_new(base.with_suffix('.png'), encode_png(image))
+                if bmp:
+                    write_new(base.with_suffix('.bmp'), encode_bmp(image))
+                info.update({'kind': 'image', 'width': image.width,
+                             'height': image.height, 'palette_colors': 256})
+            elif is_bmp(content):
+                image = decode_bmp(content)
                 write_new(base.with_suffix('.png'), encode_png(image))
                 if bmp:
                     write_new(base.with_suffix('.bmp'), encode_bmp(image))
@@ -269,7 +293,7 @@ def main(argv=None):
     unpack.add_argument('game_dir', type=Path)
     unpack.add_argument('paths', nargs='*', help='e.g. gui/mainmenu.gui iff/256/newgui03.lbm')
     unpack.add_argument('--out', type=Path, required=True, help='new output directory (no overwrite)')
-    unpack.add_argument('--all-images', action='store_true', help='recover every archive ILBM/PBM, named by hash')
+    unpack.add_argument('--all-images', action='store_true', help='recover IFF/PCX/BMP images, named by hash')
     unpack.add_argument('--bmp', action='store_true', help='also export 24-bit BMP for SDL3 host overlays')
     unpack.add_argument('--gallery', action='store_true', help='also generate a standalone offline image gallery')
     display = modes.add_parser('gallery', help='make an offline HTML contact gallery of extracted PNGs')

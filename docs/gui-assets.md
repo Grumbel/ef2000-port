@@ -349,7 +349,8 @@ The extractor creates separate `DID1ST/` and `DID/` subtrees to preserve
 resources with the same virtual name in both archives. It writes original
 `.gui` scripts and a sibling JSON representation of windows, icons and
 directives. For IFF/PBM images it writes PNG with exact indexed pixels and
-the image's palette. The same path handles 8-bit, 256-colour PCX images. An
+the image's palette. The same path handles 8-bit, 256-colour PCX images and
+uncompressed indexed 8-bit Windows BMPs (including row padding and order). An
 optional `--bmp` additionally exports 24-bit BMP copies for SDL3's built-in
 bitmap loader. Masked pixels are flattened onto black in BMPs; the normal
 PNG retains palette indices and transparency for archival use. An
@@ -357,11 +358,51 @@ extracted `.spr` collection is retained verbatim and also exported as an
 index-preserving JSON sprite catalog. An output `manifest.json` records source archive, hash,
 original and decoded sizes, and identified format. The image decoder uses
 only the Python standard library: `BMHD`, `CMAP`, ByteRun1 `BODY`, 1–8
-bitplanes, planar ILBM and 8-bit chunky PBM, plus transparency and PCX RLE.
+bitplanes, planar ILBM and 8-bit chunky PBM, plus transparency, PCX RLE, and
+uncompressed 8-bit Windows BMP.
 The offline `gallery.html` lists decoded images smallest-first with image
 sizes, archive sources, and original virtual paths or hashes. It uses PNG
 thumbnails with links to the full images, without JavaScript or network
 access; as with the other exports, an existing gallery is never overwritten.
+
+### What the 2026-11-02 archive coverage audit found
+
+The local EF2000 installation supplied for analysis contains **580 members**
+in `DID1ST.DAT` and **8,416** in `DID.DAT`. The image-signature scan finds:
+
+| Archive | IFF ILBM/PBM | PCX | Indexed BMP | Total decoded images |
+| --- | ---: | ---: | ---: | ---: |
+| `DID1ST.DAT` | 56 | 3 | 0 | 59 |
+| `DID.DAT` | 448 | 0 | 1 | 449 |
+| **Both** | **504** | **3** | **1** | **508** |
+
+The newly recognized BMP is `DID.DAT` hash **`82cc4961`**, a 320×200,
+8-bit image that was missing from `--all-images` solely because that option
+did not recognize Windows BMP signatures. It depicts a dim, industrial
+hangar/door scene, **not** titlebar buttons. All 508 recognized images have
+dimensions of at least 77×77; there are no independent tiny button bitmaps
+among the recognized standard image files. This does not rule out sprite
+sheets or proprietary raw bitmaps.
+
+The remaining archive entries include scripts, audio, 3D assets, palettes,
+indexed `.spr` collections, and still-unclassified binary formats. Their
+original names and extensions generally cannot be inferred from the hashes
+alone. In particular, the game advertises `.bbm`, `.abm`, `.pmi` and `.pmm`
+extensions whose internals are not yet understood. `--all-images` means
+**all *recognized* IFF/PCX/BMP pictures**, not every possible graphic.
+The `inventory` command reports `recognized_pictures` counts by signature
+and `unrecognized_members` counts separately, so decoder additions can be
+measured without exporting image files.
+
+The original `.gui` scripts frequently specify numeric `box`, `boxs`, `bkd`,
+`bkds` and `line` attributes, and no separate small titlebar-control files
+have yet been found. These are evidence that widget frames, bevels and
+button motifs may be **procedurally drawn**. The font specimen's X and
+overlapping-window drawings provide candidate glyphs, but do not establish
+their exact placement, background bevel or role in the actual GUI. The
+original screenshot shows a recessed rectangular glyph on the leftmost
+titlebar button, not an underscore. A GUI renderer/code trace is needed to
+distinguish procedural effects from still-unidentified binary resources.
 
 For direct archive diagnostics without GUI conversion, run
 `python3 tools/did_archive.py /path/to/DID1ST.DAT gui/mainmenu.gui`.

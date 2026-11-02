@@ -715,79 +715,79 @@ private:
 #ifdef EF_UNICORN_SDL3
     static const std::vector<std::string>& controls_help_lines() {
         static const std::vector<std::string> lines{
-            "HOST CONTROLS",
-            "F12 / GAMEPAD BACK  TOGGLE OVERLAY",
-            "F11 / ALT+ENTER    FULLSCREEN",
-            "F10                PADLOCK (CLOSE HELP)",
-            "ESC                CLOSE OVERLAY",
-            "TAB                NEXT WINDOW",
-            "H / D              OPEN HELP / STATS",
-            "UP/DOWN, PAGEUP/DOWN  SCROLL HELP",
+            "Host controls",
+            "F12 / Gamepad Back  Toggle overlay",
+            "F11 / Alt+Enter    Fullscreen",
+            "F10                Padlock (close help)",
+            "Esc                Close overlay",
+            "Tab                Next window",
+            "H / D              Open help / stats",
+            "Up/Down, PgUp/PgDn Scroll help",
             "",
-            "GAMEPAD FLIGHT (EXPERIMENTAL)",
-            "LEFT STICK         ROLL / PITCH",
-            "RIGHT X            RUDDER AXIS 4",
-            "RIGHT Y            LATCHED THROTTLE",
-            "A / B / X / Y      GAMEPORT BUTTONS",
-            "LB + A/B/X/Y       GEAR/BRAKE/ECM/RADAR",
-            "RB + A/B/X/Y       TARGET/AIR/AG/VIEW",
-            "--GAMEPAD-RAW      ORIGINAL MAPPING",
+            "Gamepad flight (experimental)",
+            "Left stick         Roll / pitch",
+            "Right X            Rudder axis 4",
+            "Right Y            Latched throttle",
+            "A / B / X / Y      Gameport buttons",
+            "LB + A/B/X/Y       Gear/brake/ECM/radar",
+            "RB + A/B/X/Y       Target/air/AG/view",
+            "--gamepad-raw      Original mapping",
             "",
-            "EF2000 KEYBOARD - MAIN FLIGHT",
-            "P                  PAUSE",
-            "A                  AUTOPILOT",
-            "L                  AUTO LEVEL",
-            "G                  LANDING GEAR",
-            "B                  AIR BRAKE",
-            "W                  WHEEL BRAKE",
+            "EF2000 keyboard - main flight",
+            "P                  Pause",
+            "A                  Autopilot",
+            "L                  Auto level",
+            "G                  Landing gear",
+            "B                  Air brake",
+            "W                  Wheel brake",
             "E                  ECM",
-            "R                  RADAR",
+            "R                  Radar",
             "T                  TIALD",
             "I                  ILS",
             "D                  DASS",
             "J                  JTIDS",
-            "U                  HUD BRIGHTNESS",
-            "V                  NIGHT VISION",
-            "M                  MAP",
-            "Q                  WINGMAN COMMANDS",
-            "1-9 / 0            WINGMAN MENU / BACK",
-            "Y / N              YES / NO",
-            "C                  NEXT TARGET",
-            "ENTER              NEXT AIR WEAPON",
-            "BACKSPACE          NEXT GROUND WEAPON",
-            "SPACE              FIRE WEAPON",
-            "- / =              THROTTLE DOWN / UP",
-            ", / .              RUDDER LEFT / RIGHT",
-            "[ / ]              ENGINE LEFT / RIGHT",
-            "`                  SETUP MENU",
+            "U                  HUD brightness",
+            "V                  Night vision",
+            "M                  Map",
+            "Q                  Wingman commands",
+            "1-9 / 0            Wingman menu / back",
+            "Y / N              Yes / no",
+            "C                  Next target",
+            "Enter              Next air weapon",
+            "Backspace          Next ground weapon",
+            "Space              Fire weapon",
+            "- / =              Throttle down / up",
+            ", / .              Rudder left / right",
+            "[ / ]              Engine left / right",
+            "`                  Setup menu",
             "",
-            "VIEWS",
-            "F1                 HUD VIEWS",
-            "F2                 WIDE COCKPIT",
-            "F3                 REAR VIEW",
-            "F4                 PLAYER EXTERNAL",
-            "F5                 WINGMAN EXTERNAL",
-            "F6                 FLY-BY",
-            "F7                 TARGET VIEW",
-            "F8                 WEAPON VIEW",
-            "F9                 BROWSE AIRCRAFT",
-            "F10                PADLOCK VIEWS",
+            "Views",
+            "F1                 HUD views",
+            "F2                 Wide cockpit",
+            "F3                 Rear view",
+            "F4                 Player external",
+            "F5                 Wingman external",
+            "F6                 Fly-by",
+            "F7                 Target view",
+            "F8                 Weapon view",
+            "F9                 Browse aircraft",
+            "F10                Padlock views",
             "",
-            "OTHER USEFUL SHORTCUTS",
-            "SHIFT+ESC          EJECT",
-            "SHIFT+Q            QUIT TO DOS",
-            "SHIFT+W            NEXT WAYPOINT",
-            "ALT+W              PREVIOUS WAYPOINT",
-            "ALT+R              VIDEO MODE",
-            "ALT+D              GRAPHICS DETAIL",
-            "INSERT / DELETE    CHAFF / FLARES",
-            "KP / / *           AB OFF / ON",
-            "KP - / +           THROTTLE DOWN / UP",
+            "Other useful shortcuts",
+            "Shift+Esc          Eject",
+            "Shift+Q            Quit to DOS",
+            "Shift+W            Next waypoint",
+            "Alt+W              Previous waypoint",
+            "Alt+R              Video mode",
+            "Alt+D              Graphics detail",
+            "Insert / Delete    Chaff / flares",
+            "KP / / *           AB off / on",
+            "KP - / +           Throttle down / up",
             "KP 1/2/3           MFD 1/2/3",
-            "KP 0               BRIEFING",
+            "KP 0               Briefing",
             "",
-            "BASED ON ORIGINAL KEYBOARD CHART",
-            "CONTROL DETAILS MAY VARY BY VERSION"
+            "Based on original keyboard chart",
+            "Control details may vary by version"
         };
         return lines;
     }
@@ -890,14 +890,24 @@ private:
             // are never rendered in the titlebar buttons.
             const SDL_FRect source{kind == 1 ? 76.0f : 64.0f, 16,
                                    kind == 1 ? 16.0f : 12.0f, 14};
-            const SDL_FRect destination{x + 1, y + 1, 12, 14};
+            // The original maximize motif is compact within the bevel; the
+            // X is almost full height. Keep each symbol's own proportions.
+            const SDL_FRect destination = kind == 1 ?
+                SDL_FRect{x + 3, y + 3, 9, 10} :
+                SDL_FRect{x + 1, y + 1, 12, 14};
             if (!SDL_RenderTexture(renderer_, overlay_symbols_texture_, &source, &destination))
                 throw std::runtime_error(std::string("SDL3 original button symbol: ") + SDL_GetError());
             return;
         }
         const uint8_t fg = 19;
         if (kind == 0) {
-            overlay_fill(x + 4, y + 12, 7, 2, fg, fg, fg);
+            // TACTCOM depicts the leftmost control as a recessed *window*,
+            // not the modern underscore/minimize glyph. Keep its behavior.
+            overlay_fill(x + 3, y + 3, 9, 11, 31, 33, 40);
+            overlay_fill(x + 4, y + 4, 7, 9, 97, 100, 116);
+            overlay_fill(x + 4, y + 3, 7, 1, 185, 189, 204);
+            overlay_fill(x + 11, y + 3, 1, 10, 185, 189, 204);
+            overlay_fill(x + 4, y + 13, 8, 1, 47, 49, 59);
         } else if (kind == 1) {
             if (toggled) {
                 overlay_fill(x + 5, y + 3, 6, 1, fg, fg, fg);
@@ -969,7 +979,7 @@ private:
             // visible as a three-pixel black strip outside the left frame.
             overlay_fill(panel.x - 4, panel.y + 4, panel.w, panel.h, 0, 0, 0);
             overlay_frame(panel);
-            const std::string title = index == 0 ? "FLIGHT CONTROLS" : "SYSTEM MONITOR";
+            const std::string title = index == 0 ? "Flight Controls" : "System Monitor";
             const float title_width = overlay_font_texture_ ?
                 float(ef2000::menu_font_text_width(overlay_font_widths_, title)) :
                 float(title.size() * 8);
@@ -1010,15 +1020,15 @@ private:
             overlay_fill(panel.x + panel.w - 7, panel.y + panel.h - 13, 1, 8, 159, 159, 175);
 
             const std::vector<std::string> diagnostics{
-                "VIDEO / EMULATION",
+                "Video / Emulation",
                 "SDL FPS: " + std::to_string(present_times_.size()),
-                "CHANGED: " + std::to_string(changed_frame_times_.size()),
-                "VIDEO: " + std::to_string(width) + "X" + std::to_string(height),
-                "GUEST: " + std::to_string(instructions),
+                "Changed: " + std::to_string(changed_frame_times_.size()),
+                "Video: " + std::to_string(width) + "x" + std::to_string(height),
+                "Guest: " + std::to_string(instructions),
                 "IRQ: " + std::to_string(interrupts),
                 "",
-                "PROFILE: " + std::to_string(gamepad_flight_.throttle_percent()) + "% THR",
-                "RUNS WHILE OVERLAY OPEN",
+                "Profile: " + std::to_string(gamepad_flight_.throttle_percent()) + "% throttle",
+                "Runs while overlay open",
                 status
             };
             const auto& lines = index == 0 ? controls_help_lines() : diagnostics;
@@ -1031,20 +1041,20 @@ private:
             const int max_pixels = std::max(1, int(panel.w - content_inset - 10));
             for (int line = scroll; line < int(lines.size()) && line < scroll + rows; ++line) {
                 const std::string& value = lines[size_t(line)];
-                const bool heading = value == "HOST CONTROLS" || value == "GAMEPAD FLIGHT (EXPERIMENTAL)" ||
-                    value == "EF2000 KEYBOARD - MAIN FLIGHT" || value == "VIEWS" ||
-                    value == "OTHER USEFUL SHORTCUTS" || value == "VIDEO / EMULATION";
+                const bool heading = value == "Host controls" || value == "Gamepad flight (experimental)" ||
+                    value == "EF2000 keyboard - main flight" || value == "Views" ||
+                    value == "Other useful shortcuts" || value == "Video / Emulation";
                 overlay_text(panel.x + content_inset,
                              panel.y + 31 + float(line - scroll) * ef2000::OverlayWindows::line_height,
                              value, max_pixels,
                              heading ? 218 : 242, heading ? 226 : 242, heading ? 204 : 242);
             }
             overlay_text(panel.x + content_inset, panel.y + panel.h - 15,
-                         index == 0 ? "SCROLL: WHEEL / UP-DOWN" : "LIVE GUEST DISPLAY",
+                         index == 0 ? "Scroll: wheel / Up-Down" : "Live guest display",
                          max_pixels, 210, 218, 204);
         }
         overlay_fill(0, 458, 640, 22, 39, 43, 23);
-        overlay_text(8, 465, "F12 CLOSE  F11 / ALT+ENTER FULLSCREEN  TAB FOCUS  H HELP  D STATS",
+        overlay_text(8, 465, "F12 Close  F11 / Alt+Enter Fullscreen  Tab Focus  H Help  D Stats",
                      624, 255, 255, 255);
     }
     SDL_AudioStream* audio_stream_{};

@@ -87,8 +87,8 @@ See [high-score reconstruction](docs/highscores-reconstruction.md) for verified
 addresses, behavior and remaining decompilation work.
 
 The original menus also have extractable artwork and declarative layouts:
-`DID.DAT` and `DID1ST.DAT` contain hashed game resources, including ILBM/PBM
-and PCX graphics, `.gui` window/icon scripts, and sprites. Run
+`DID.DAT` and `DID1ST.DAT` contain hashed game resources, including ILBM/PBM,
+PCX and indexed BMP graphics, `.gui` window/icon scripts, and sprites. Run
 `nix run .#gui-assets -- inventory /path/to/EF2000` to inspect an installation
 or `nix run .#gui-assets -- extract ...` to export PNGs and JSON menu
 structures. The original files stay untouched, and `nix flake check` uses
@@ -390,9 +390,10 @@ the two-row symbol specimen into the same directory; `--overlay-skin-dir`
 automatically uses both unless an explicit `--overlay-font-bmp` or
 `--overlay-symbols-bmp` is provided. The F12 overlay now has working
 minimize, maximize/restore and close titlebar buttons, styled after the
-original game. The X and overlapping-window icons are cropped at their
-actual variable-width positions from the specimen. The original skin gives
-windows full-width green TACTCOM
+original game. The leftmost control uses the original screenshot's
+recessed-window motif instead of a modern underscore. The X and compact
+overlapping-window icons are cropped at their variable-width positions from
+the specimen. The original skin gives windows full-width green TACTCOM
 titlebars and renders the specimen font with its original one-pixel black
 shadow and vertically corrected VGA aspect ratio. The reconstructed frame
 uses a dark left/bottom edge, a silver top/right hairline and a black drop

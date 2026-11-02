@@ -16,6 +16,7 @@ from tools.did_archive import DIDArchive, hash_path
 from tools.ef2000_gui_assets import extract, gallery, inspect_script, inventory, safe_relative
 from tools.ilbm_image import Image, byterun_row, chunks, decode, encode_png, encode_bmp
 from tools.pcx_image import decode as decode_pcx, is_pcx
+from tools.bmp_image import decode as decode_bmp, is_bmp
 from tools.ra_decode import decompress
 from tools.spr_image import decode as decode_spr
 
@@ -35,9 +36,22 @@ def image_fixture(*, pixels=(0, 1), form=b'ILBM', compressed=True, transparent=N
     return b'FORM' + struct.pack('>I', len(contents)) + contents
 
 
+def bmp_fixture(*, top_down=False):
+    """A 3x2, 8-bit BMP with an intentionally padded bottom-up pixel array."""
+    width, height = 3, -2 if top_down else 2
+    palette = b'\x00\x00\x00\x00' + b'\x40\x80\xff\x00'  # black and RGB ff8040
+    top = b'\x00\x01\x00\x00'
+    bottom = b'\x01\x00\x01\x00'
+    data = top + bottom if top_down else bottom + top
+    offset = 14 + 40 + len(palette)
+    return (struct.pack('<2sIHHI', b'BM', offset + len(data), 0, 0, offset) +
+            struct.pack('<IiiHHIIiiII', 40, width, height, 1, 8, 0,
+                        len(data), 0, 0, 2, 0) + palette + data)
+
+
 def archive_fixture(members):
     directories = ['iff\\256\\', 'gui\\']
-    extensions = ['.gui', '.lbm', '.pcx']
+    extensions = ['.gui', '.lbm', '.pcx', '.bmp']
     file_body = bytearray(b'\0' * 4)
     entries = []
     for filename, data in members.items():
@@ -124,6 +138,43 @@ class IFFTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'FORM'):
             chunks(b'not an IFF image')
 
+
+class BMPTests(unittest.TestCase):
+    def test_indexed_palette_padding_and_orientation(self):
+        for reverse in (False, True):
+            source = bmp_fixture(top_down=reverse)
+            self.assertTrue(is_bmp(source))
+            bitmap = decode_bmp(source)
+            self.assertEqual((bitmap.width, bitmap.height), (3, 2))
+            self.assertEqual(bitmap.indexed, b'\x00\x01\x00\x01\x00\x01')
+            self.assertEqual(bitmap.palette[3:6], b'\xff\x80\x40')
+            self.assertEqual(encode_png(bitmap)[25], 3)
+        with self.assertRaisesRegex(ValueError, 'truncated BMP pixels'):
+            decode_bmp(bmp_fixture()[:-2])
+        with self.assertRaisesRegex(ValueError, 'unsupported BMP planes'):
+            source = bytearray(bmp_fixture())
+            struct.pack_into('<H', source, 28, 24)
+            decode_bmp(bytes(source))
+
+    def test_all_images_includes_native_bmp_from_archive(self):
+        with tempfile.TemporaryDirectory() as directory:
+            game = Path(directory) / 'game'
+            game.mkdir()
+            (game / 'DID1ST.DAT').write_bytes(archive_fixture({
+                'iff/256/controls.bmp': bmp_fixture()}))
+            report = inventory(game)
+            self.assertEqual(report['archives'][0]['recognized_pictures'], {'.bmp': 1})
+            self.assertEqual(report['archives'][0]['unrecognized_members'], 0)
+            manifest = extract(game, Path(directory) / 'out', [], all_images=True)
+            self.assertEqual(len(manifest), 1)
+            self.assertEqual(manifest[0]['kind'], 'image')
+            self.assertEqual((manifest[0]['width'], manifest[0]['height']), (3, 2))
+            expected = Path(directory) / 'out' / 'DID1ST' / (
+                'hash_' + manifest[0]['hash'] + '.png')
+            self.assertTrue(expected.is_file())
+
+
+class OtherImageFormatTests(unittest.TestCase):
     def test_indexed_pcx_with_palette(self):
         head = bytearray(128)
         head[:4] = b'\x0a\x05\x01\x08'
@@ -196,6 +247,8 @@ class GUIInventoryTests(unittest.TestCase):
             loose.write_bytes(image_fixture())
             report = inventory(game)
             self.assertEqual(report['archives'][0]['members'], 2)
+            self.assertEqual(report['archives'][0]['recognized_pictures'], {'.lbm': 1})
+            self.assertEqual(report['archives'][0]['unrecognized_members'], 1)
             self.assertEqual(report['loose_lbm'], ['SCRN0.LBM'])
             target = root / 'out'
             found = extract(game, target, ['gui/mainmenu.gui', 'iff/256/image.lbm'], bmp=True)
@@ -240,6 +293,15 @@ class GUIInventoryTests(unittest.TestCase):
 @unittest.skipUnless(os.environ.get('EF2000_DATA_DIR'),
                      'set EF2000_DATA_DIR to run original DID archive and GUI replay checks')
 class OriginalGUIAssetTests(unittest.TestCase):
+    def test_original_indexed_bmp_missing_from_older_all_images_scan(self):
+        archive = DIDArchive.from_path(Path(os.environ['EF2000_DATA_DIR']) / 'DID.DAT')
+        original = archive.member(archive.by_hash[0x82cc4961])
+        self.assertTrue(is_bmp(original))
+        image = decode_bmp(original)
+        self.assertEqual((image.width, image.height), (320, 200))
+        self.assertEqual(len(image.indexed), 64_000)
+        self.assertEqual(len(image.palette), 768)
+
     def test_original_gui_scripts_and_compressed_menu_images(self):
         game = Path(os.environ['EF2000_DATA_DIR'])
         first = DIDArchive.from_path(game / 'DID1ST.DAT')
