@@ -144,11 +144,88 @@ class GhidraWorkflowTests(unittest.TestCase):
                 ghidra.copy_callers(args)
             run.assert_not_called()
 
+    def test_inventory_produces_full_program_index_and_calls(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(command='inventory', workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertIn('-noanalysis', command)
+            self.assertEqual(command[-5:], ['EF2000ExportAll.java',
+                                            str(self.workspace / 'full-export'),
+                                            'inventory', '0', 'resume'])
+            output = self.workspace / 'full-export'
+            (output / 'functions.tsv').write_text('entry\tname\n')
+            (output / 'calls.tsv').write_text('caller_entry\tcall_site\n')
+            (output / 'candidate-entries.tsv').write_text('entry\treason\n')
+            (output / 'orphan-ranges.tsv').write_text('start\tend_exclusive\n')
+            (output / 'orphan-instructions.asm').write_text('; nothing unassigned\n')
+            (output / 'report.json').write_text(json.dumps({
+                'initialized_image_bytes': ghidra.IMAGE_SIZE,
+                'discovered_functions': 42, 'decompilations_written': 0,
+                'decompilations_reused': 0, 'decompilations_failed': 0,
+                'decompilations_limited': 0,
+            }))
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.export_all(args)
+
+    def test_full_export_passes_limit_and_overwrite_to_ghidra(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(command='export-all', workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  limit=12, overwrite=True)
+
+        def fake_ghidra(command, check):
+            self.assertTrue(check)
+            self.assertEqual(command[-3:], ['decompile', '12', 'overwrite'])
+            output = self.workspace / 'full-export'
+            (output / 'report.json').write_text(json.dumps({
+                'initialized_image_bytes': ghidra.IMAGE_SIZE,
+                'discovered_functions': 20, 'decompilations_written': 12,
+                'decompilations_reused': 0, 'decompilations_failed': 0,
+                'decompilations_limited': 8,
+            }))
+            (output / 'functions.tsv').write_text('entry\tstatus\n')
+            (output / 'calls.tsv').write_text('call_site\ttarget\n')
+            (output / 'candidate-entries.tsv').write_text('entry\treason\n')
+            (output / 'orphan-ranges.tsv').write_text('start\tend_exclusive\n')
+            (output / 'orphan-instructions.asm').write_text('; nothing unassigned\n')
+
+        with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
+            ghidra.export_all(args)
+
+    def test_full_export_rejects_missing_report_even_if_process_succeeds(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(command='export-all', workspace=self.workspace,
+                                  analyze_headless=self.launcher, output=None,
+                                  limit=0, overwrite=False)
+        with patch.object(ghidra.subprocess, 'run'):
+            with self.assertRaisesRegex(ValueError, 'without a fresh report.json'):
+                ghidra.export_all(args)
+
     def test_guest_offsets_are_within_initialized_image(self):
         self.assertEqual(ghidra.guest_offset('0xe9a24'), 0xe9a24)
         for text in ('-1', '0x195fb0', 'not-an-address'):
             with self.assertRaises(argparse.ArgumentTypeError):
                 ghidra.guest_offset(text)
+
+    def test_export_limit_is_nonnegative(self):
+        self.assertEqual(ghidra.nonnegative_int('0'), 0)
+        self.assertEqual(ghidra.nonnegative_int('42'), 42)
+        for text in ('-1', 'ten'):
+            with self.assertRaises(argparse.ArgumentTypeError):
+                ghidra.nonnegative_int(text)
 
     def test_nix_ghidra_home_finds_headless_launcher(self):
         home = Path(self.temp.name) / 'nix-store-ghidra/lib/ghidra'

@@ -41,6 +41,53 @@ rename functions and apply verified types. The importer refuses to overwrite an
 existing project. Reuse the same project with `decompile`; preserve your manual
 Ghidra annotations in the local project directory or export them separately.
 
+## Export the entire discovered-function corpus
+
+The original `decompile` command only exports selected addresses. For a
+whole-program reverse-engineering pass, first inventory Ghidra's existing
+analysis, then export **every function Ghidra currently recognizes**:
+
+```sh
+python3 tools/ghidra_ef2000.py inventory
+python3 tools/ghidra_ef2000.py export-all
+# Short smoke test before a full run:
+python3 tools/ghidra_ef2000.py export-all --limit 20
+# Refresh generated C after changing names/types in the Ghidra project:
+python3 tools/ghidra_ef2000.py export-all --overwrite
+```
+
+Both operations reuse the imported project with `-noanalysis`; they do not
+discard manually assigned Ghidra names or types. By default, the output is
+`local/ghidra/full-export/`, which is Git-ignored. A completed export contains:
+
+| File | Meaning |
+| --- | --- |
+| `report.json` | Function, instruction, callsite and decompilation counts |
+| `functions.tsv` | Function entries, names, body lengths, export status and relative filenames |
+| `functions/NNNN/0xXXXXXXXX.c` | One decompiled pseudo-C body per successful function, grouped by address |
+| `functions/NNNN/0xXXXXXXXX.asm` | Disassembly fallback if Ghidra cannot produce pseudo-C |
+| `calls.tsv` | Statically resolved CALL edges and unresolved/indirect callsites |
+| `orphan-ranges.tsv` | Contiguous disassembled instruction ranges outside recognized functions |
+| `orphan-instructions.asm` | Disassembly of those unassigned instructions |
+| `candidate-entries.tsv` | Tentative function entries at unassigned range starts and after `RET` |
+
+The exporter resumes from existing `.c` files on repeat runs, and records
+per-function decompiler failures without aborting the entire corpus. Use
+`--overwrite` when edited signatures, renamed symbols or improved Ghidra
+analysis should appear in previously exported code. The `--limit` option is
+for diagnostics; `0` (the default) processes all recognized functions.
+If Ghidra is upgraded, make a copy of your project before opening it with
+the newer release, since Ghidra can migrate the project database.
+
+**Inventory is not proof of completeness.** EF2000 contains embedded data,
+indirect calls, dynamically populated dispatch tables and X-32 runtime
+conventions that generic x86 analysis does not fully understand. In
+particular, an unassigned instruction range may be a missed routine, an
+inline block, a jump-table landing zone or a false disassembly of data.
+`candidate-entries.tsv` is a review queue, not a verified function list.
+The exporter does **not** automatically create functions at candidates or
+rename them, and nothing in this pipeline produces compilable original C++.
+
 ## Export selected functions
 
 ```sh
@@ -96,7 +143,7 @@ without matching runtime samples. Ghidra may omit further indirect calls.
   copyrighted binary bytes or bulk decompiled game code; retain small
   evidence-backed annotations and behavioral models in the source repository.
 - This integration's Python command tests can run without Ghidra or game data.
-  An end-to-end import and decompilation still require both locally.
+  A new import or full export still requires both locally.
 
 See [loader.md](loader.md), [startup-symbols.md](startup-symbols.md), and
 [execution-probes.md](execution-probes.md) for the address model and evidence.

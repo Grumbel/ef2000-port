@@ -127,3 +127,48 @@ function signature as a hypothesis until checked against the Watcom register ABI
 
 See [ghidra.md](ghidra.md), [startup-symbols.md](startup-symbols.md), and
 [execution-probes.md](execution-probes.md) for workflow and earlier evidence.
+
+## Whole-program inventory and decompilation (bundle #041)
+
+To move beyond hand-picked hotspots, the new `inventory` and `export-all`
+commands walk the complete Ghidra function manager and create a reproducible
+index, call-edge map, per-function pseudo-C and explicit disassembly fallbacks.
+An independent copy of the imported project was analyzed with **Ghidra
+11.4.2 / JDK 21**, preserving the original Ghidra 11.1.2 project. The export
+finished on the SHA-pinned original payload with the following results:
+
+| Static-analysis measurement | Count |
+| --- | ---: |
+| Ghidra-recognized functions | 3,842 |
+| Functions with exported pseudo-C | 3,834 |
+| Decompiler failures with assembly fallback | 8 |
+| Disassembled instructions | 281,521 |
+| Instruction bytes | 933,013 |
+| Disassembled bytes outside recognized functions | 107,887 |
+| Separate unassigned instruction ranges | 646 |
+| Provisional candidate entries (range starts/after `RET`) | 1,080 |
+| CALL instruction sites | 19,079 |
+| Resolved in-image CALL edges | 18,527 |
+| Unresolved direct in-image CALL edges | 1 |
+| Indirect or externally targeted CALL sites | 555 |
+
+The eight high-level decompiler errors report overlapping or unadjustable
+input varnodes (not missing bytes). Their guest entries are `0x2a8ac`,
+`0x440f4`, `0x87db8`, `0xb3084`, `0xb3168`, `0xb59a8`, `0xb8510`, and
+`0xca620`. Each has a full Ghidra disassembly fallback under the corresponding
+`functions/` subdirectory. Some other pseudo-C may still have incorrect ABI
+assumptions despite decompiling successfully.
+
+The unassigned-instruction report is the most important next lead for a more
+complete reconstruction. For example, the region beginning at `0x5630` has
+a plausible saved-register function prologue, and an orphan thunk at
+`0x84bd4` jumps there. Likewise `0x7d2f8` starts with a saved-register
+prologue and is the destination of a thunk at `0x84b94`. They are **good
+investigation candidates**, not automatically promoted symbols: many other
+orphan ranges clearly include stray data interpreted as instructions.
+
+Thus we now have a high-level decompilation of **99.8% of discovered
+functions**, but not a full semantic decompilation of EF2000. The next phase
+is systematic function-boundary recovery in the 646 orphan ranges, then
+annotation of dispatch tables, Watcom register calling conventions and data
+structures. This is independent of Unicorn performance optimization.

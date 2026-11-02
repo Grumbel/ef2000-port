@@ -46,6 +46,8 @@ nix build .#ef2000-win64-zip           # Windows x64 archive (C++ Unicorn/SDL3)
 nix build .#ef2000-win32-zip           # Windows x86 archive
 python3 tools/ghidra_ef2000.py import /path/to/_EF2000.EXE
 python3 tools/ghidra_ef2000.py decompile 0xe9a24 0x8b274
+python3 tools/ghidra_ef2000.py inventory       # all discovered functions and code gaps
+python3 tools/ghidra_ef2000.py export-all      # full discovered-function pseudo-C corpus
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
 

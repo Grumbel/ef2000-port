@@ -56,6 +56,16 @@ def guest_offset(text):
     return value
 
 
+def nonnegative_int(text):
+    try:
+        value = int(text)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError('expected a nonnegative function count') from error
+    if value < 0:
+        raise argparse.ArgumentTypeError('expected a nonnegative function count')
+    return value
+
+
 def project_args(workspace, launcher):
     return [launcher, str(workspace / 'projects'), PROJECT_NAME,
             '-scriptPath', str(SCRIPTS)]
@@ -100,17 +110,7 @@ def import_image(args):
 
 
 def decompile(args):
-    workspace = args.workspace.resolve()
-    manifest_path = workspace / 'manifest.json'
-    image_path = workspace / IMAGE_NAME
-    project_path = workspace / 'projects' / (PROJECT_NAME + '.gpr')
-    if not manifest_path.is_file() or not image_path.is_file() or not project_path.is_file():
-        raise ValueError('no imported project; run the import command first')
-    manifest = json.loads(manifest_path.read_text())
-    if (manifest['protected_image']['initialized_range'] != [0, IMAGE_SIZE] or
-            manifest['protected_image']['payload_sha256'] !=
-            hashlib.sha256(image_path.read_bytes()).hexdigest()):
-        raise ValueError('imported image does not match its extraction manifest')
+    workspace = validated_workspace(args.workspace)
     launcher = headless_path(args.analyze_headless)
     output = (args.output or workspace / 'decompiled').resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -134,19 +134,24 @@ def decompile(args):
     print(f'Decompilation: {output}')
 
 
-def copy_callers(args):
-    """Export direct copy callsites with their post-CALL guest return IPs."""
-    workspace = args.workspace.resolve()
-    image_path = workspace / IMAGE_NAME
+def validated_workspace(path):
+    workspace = path.resolve()
     manifest_path = workspace / 'manifest.json'
+    image_path = workspace / IMAGE_NAME
     project_path = workspace / 'projects' / (PROJECT_NAME + '.gpr')
-    if not image_path.is_file() or not manifest_path.is_file() or not project_path.is_file():
+    if not manifest_path.is_file() or not image_path.is_file() or not project_path.is_file():
         raise ValueError('no imported project; run the import command first')
     manifest = json.loads(manifest_path.read_text())
     if (manifest['protected_image']['initialized_range'] != [0, IMAGE_SIZE] or
             manifest['protected_image']['payload_sha256'] !=
             hashlib.sha256(image_path.read_bytes()).hexdigest()):
         raise ValueError('imported image does not match its extraction manifest')
+    return workspace
+
+
+def copy_callers(args):
+    """Export direct copy callsites with their post-CALL guest return IPs."""
+    workspace = validated_workspace(args.workspace)
     output = (args.output or workspace / 'copy-callers.tsv').resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     previous_time = output.stat().st_mtime_ns if output.exists() else -1
@@ -160,10 +165,41 @@ def copy_callers(args):
     print(f'Copy callers: {output}')
 
 
+def export_all(args):
+    """Inventory all recovered functions or export their complete pseudo-C corpus."""
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'full-export').resolve()
+    output.mkdir(parents=True, exist_ok=True)
+    files = ['report.json', 'functions.tsv', 'calls.tsv', 'candidate-entries.tsv',
+             'orphan-ranges.tsv', 'orphan-instructions.asm']
+    previous_times = {name: (output / name).stat().st_mtime_ns
+                      if (output / name).exists() else -1 for name in files}
+    mode = 'inventory' if args.command == 'inventory' else 'decompile'
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis',
+        '-postScript', 'EF2000ExportAll.java', str(output), mode,
+        str(getattr(args, 'limit', 0)),
+        'overwrite' if getattr(args, 'overwrite', False) else 'resume',
+    ]
+    subprocess.run(command, check=True)
+    for name in files:
+        file = output / name
+        if not file.is_file() or file.stat().st_mtime_ns <= previous_times[name]:
+            raise ValueError(f'Ghidra returned without a fresh {name}')
+    report = json.loads((output / 'report.json').read_text())
+    if report['initialized_image_bytes'] != IMAGE_SIZE or report['discovered_functions'] < 1:
+        raise ValueError('Ghidra returned an invalid full-program report')
+    print(f'Ghidra {mode}: {report["discovered_functions"]} functions; '
+          f'{report["decompilations_written"]} written, '
+          f'{report["decompilations_reused"]} reused, '
+          f'{report["decompilations_failed"]} failed, '
+          f'{report["decompilations_limited"]} limited; output: {output}')
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest='command', required=True)
-    for name in ('import', 'decompile', 'copy-callers'):
+    for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=ROOT / 'local/ghidra',
                          help='ignored Ghidra project and image workspace')
@@ -175,9 +211,19 @@ def main(argv=None):
     dec.add_argument('--output', type=Path, help='decompiled C files (default: workspace/decompiled)')
     callers = subparsers.choices['copy-callers']
     callers.add_argument('--output', type=Path, help='TSV output (default: workspace/copy-callers.tsv)')
+    for name in ('inventory', 'export-all'):
+        command = subparsers.choices[name]
+        command.add_argument('--output', type=Path,
+                             help='output directory (default: workspace/full-export)')
+    all_export = subparsers.choices['export-all']
+    all_export.add_argument('--limit', type=nonnegative_int, default=0,
+                            help='export at most N discovered functions (0 means all)')
+    all_export.add_argument('--overwrite', action='store_true',
+                            help='regenerate cached pseudo-C after changing Ghidra annotations')
     args = parser.parse_args(argv)
     try:
-        {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers}[args.command](args)
+        {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,
+         'inventory': export_all, 'export-all': export_all}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'ghidra_ef2000: {error}\n')
 
