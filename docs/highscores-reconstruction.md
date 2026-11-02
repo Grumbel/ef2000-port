@@ -1,4 +1,4 @@
-# EF2000 native high-score reconstruction (bundles #058–#059)
+# EF2000 native high-score reconstruction (bundles #058–#060)
 
 This is the first **typed original-game logic module** from the Ghidra corpus
 and x86 instruction stream: `runtime/ef2000_highscores.hpp/.cpp`, tested by
@@ -119,5 +119,66 @@ g++ -std=c++17 -O2 -Wall -Wextra -Werror \
 Also included in CMake/CTest and the main `nix flake check` package tests.
 For a quick Nix-only check without building the Unicorn/SDL3 game, use
 `nix build .#checks.x86_64-linux.highscores-reconstruction`.
-Next is to verify guest-vs-native UI state traces, finish the file-open
-branches and GUI object interfaces, and then replace a bounded guest path.
+
+## #060: Byte-for-byte original/native differential replay
+
+`tools/highscores_differential.py` runs five **real original x86 functions**
+in an isolated 32-bit Unicorn guest, alongside a temporary shared library
+built from `runtime/ef2000_highscores.cpp` and the test-only C ABI at
+`tests/highscores_reference_abi.cpp`. It requires either the original
+`_EF2000.EXE` or a locally extracted matching `payload.bin`; the extracted
+image must match the recorded SHA-256. The executable, extracted image,
+Ghidra output and generated native library remain outside Git and Nix store
+source inputs.
+
+| Original routine | Compared effects | Controlled external calls |
+| --- | --- | --- |
+| `0x433c` insert | All 254 state bytes; returned 16-bit slot | None; original `strcpy` executes |
+| `0x432c` threshold | State unchanged; returned low byte | None |
+| `0x4050` defaults | All 254 bytes with 20 injected RNG values | Time, RNG seed and 15-bit random output |
+| `0x42a4` save | Exact 4+250 file bytes; state; return byte; failed-open path | DOS create/write/close |
+| `0x41fc` load | Valid-file state, bad-checksum/default regeneration and return byte | DOS preflight/open/read/close; GUI refresh |
+
+The runner uses real original code from address zero through its 32-bit
+machine, with a bounded instruction count and mapped guest stack. It does
+**not** emulate the whole DOS operating system, file system, GUI or original
+RNG implementation. Those interfaces are explicitly controlled; regular
+`strcpy` and all reconstructed guest arithmetic remain real instructions.
+Native code is not injected into the original process.
+
+With the pinned original image, **308 insertions, 308 threshold checks, six
+default generations, and six complete save/valid-load/corrupt-checksum
+fallback cycles** passed, comparing the state after every operation and the
+precise saved bytes. Fixed edge cases include score ties, lower-than-last
+scores, signed negative scores, `INT_MIN` wraparound, maximum valid name
+length and differing record-name padding. Randomized cases use a fixed seed
+by default for reproducibility. The write-open failure returns zero without
+touching the state or producing file bytes. Corrupt-checksum loads reset the
+table through the original `0x4050` path and match native reinitialization.
+
+Run the optional guest replay when you have the game installed:
+
+```sh
+nix run .#highscores-differential -- /path/to/_EF2000.EXE --random-cases 300
+# Or from nix develop:
+ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300
+```
+
+For already-extracted local research input,
+`--payload local/ghidra-entries-056/payload.bin` skips DOS extraction but enforces
+the same payload SHA. `tests/test_highscores_differential.py` checks fixture
+shape and hash rejection without any original asset. Its full guest replay
+test runs only when `EF2000_EXE` is set and Unicorn plus a C++ compiler are
+available; normal `nix flake check` does **not** require proprietary files.
+The separate fast check is
+`nix build .#checks.x86_64-linux.highscores-differential`.
+
+These comparisons establish equivalence for specific bounded routines and
+inputs, **not** a complete gameplay decompilation or replacement. Remaining
+work includes GUI object and callback reconstruction, original RNG seeding,
+other DOS open/read failure branches, and integration of typed code into a
+native runtime backend.
+
+Next is to verify guest-vs-native UI state traces, finish the remaining DOS
+file-open/read branches and GUI object interfaces, and then replace a bounded
+guest path.

@@ -961,3 +961,24 @@ different list lengths, missing windows, invalid difficulty, unchanged
 state on display refresh, normal name edits, the empty-name fallback,
 and non-trimming of whitespace. The existing standalone Nix high-score
 check exercises this expanded module.
+
+## #060: Original instruction execution versus typed C++ semantics
+
+The independent, SHA-pinned original image now runs in a bounded Unicorn
+guest for five high-score functions: defaults (`0x4050`), load (`0x41fc`),
+save (`0x42a4`), threshold (`0x432c`) and insertion (`0x433c`). A test-only
+C ABI exposes the native high-score model to a Python differential driver.
+This closes a verification gap left by the earlier static disassembly and
+asset-free tests: with a fixed original payload, 308 insertion and threshold
+cases, six default-table generations, and six save/load/corrupt-checksum
+fallback cycles produced identical guest/native 254-byte states, exact
+254-byte file encodings and matching observed return values.
+
+The guest executes the original `strcpy` and score loops without substitution.
+Only unavailable services are intercepted: DOS file routines, a load
+preflight callback, post-load GUI refresh, and the default-generator's
+time/seed/random helpers. This is differential execution, not a full DOS
+integration test, nor a substitution in the running game. The save routine's
+failed-open branch and the load routine's checksum regeneration were also
+exercised. See [the reconstruction report](highscores-reconstruction.md) for
+replay commands, verified boundaries and remaining work.

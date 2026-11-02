@@ -56,6 +56,8 @@ ef2000-ghidra name-callbacks          # audit names (dry run)
 ef2000-ghidra audit-flow-gaps         # inspect truncated function bodies
 ef2000-ghidra audit-body-holes 0x9820 # inspect multi-span function holes
 ef2000-ghidra repair-boundaries       # audit nine guarded recipes (dry run)
+ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300
+                                       # original Unicorn guest versus native C++
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
 
@@ -67,6 +69,15 @@ main game package. Set `EF2000_GHIDRA_WORKSPACE` or pass `--workspace`
 to choose a different project. `nix flake check` also runs the asset-free
 Ghidra workflow tests; the original executable is never included in Nix
 builds.
+
+High-score differential replay is also available without the shell via
+`nix run .#highscores-differential -- /path/to/_EF2000.EXE`. It runs selected
+original routines in isolated Unicorn guest memory with controlled file and
+random-number services, comparing their state and file bytes against the
+typed native C++ reconstruction. This workflow requires the caller's original
+executable; the asset-free fixture checks run under `nix flake check`.
+See [high-score reconstruction](docs/highscores-reconstruction.md) for verified
+addresses, behavior and remaining decompilation work.
 
 `EF2000_SOURCE` defaults to the directory from which `nix develop` was entered;
 `EF2000_BUILD_DIR` defaults to `/tmp/ef2000-build` and can be overridden.
@@ -369,6 +380,8 @@ See [Ghidra findings](docs/ghidra-findings.md) and
 [execution probes](docs/execution-probes.md).
 The first standalone typed original-game C++ model now covers
 [high-score records, insertion, defaults and file checksums](docs/highscores-reconstruction.md).
+An opt-in differential harness also checks those reconstructed operations
+against original x86 guest execution, including checksum-failure fallback.
 A separate `--tcg-cache-mib N` option allows testing smaller Unicorn translated-code
 caches (32..1024 MiB), especially for 32-bit Windows; size alone did not
 produce a repeatable speed improvement on the Linux reference host.

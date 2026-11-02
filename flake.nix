@@ -226,12 +226,21 @@
         fi
         exec ${pkgs.python3}/bin/python3 ${source}/tools/ghidra_ef2000.py "$@"
       '';
+      # The original executable is supplied by the caller, never fetched or
+      # included in Nix inputs. The replay compiles the test-only native ABI
+      # into a temporary directory and runs original guest code in Unicorn.
+      highscoresDifferential = pkgs.writeShellScriptBin "ef2000-highscores-differential" ''
+        set -euo pipefail
+        exec ${python}/bin/python3 ${source}/tools/highscores_differential.py \
+          --compiler ${pkgs.stdenv.cc}/bin/g++ "$@"
+      '';
     in {
       packages.${system} = {
         default = package;
         ef2000 = package;
         ef2000-startup = package;
         ef2000-ghidra = ghidraWorkflow;
+        ef2000-highscores-differential = highscoresDifferential;
         ef2000-win64 = win64.dist;
         ef2000-win64-zip = win64.zip;
         ef2000-win32 = win32.dist;
@@ -266,6 +275,11 @@
              type = "app";
              program = "${ghidraWorkflow}/bin/ef2000-ghidra";
              meta.description = "Import, audit, repair, and export the EF2000 Ghidra project";
+           };
+           highscores-differential = {
+             type = "app";
+             program = "${highscoresDifferential}/bin/ef2000-highscores-differential";
+             meta.description = "Compare original high-score guest routines with native C++ reconstruction";
            };
            ghidra-headless = {
              type = "app";
@@ -316,6 +330,16 @@
             -o ef2000-highscores-test
           ./ef2000-highscores-test
           touch "$out"
+        '';
+        highscores-differential = pkgs.runCommand "ef2000-highscores-differential-check" {
+          nativeBuildInputs = [ pkgs.python3 ];
+        } ''
+          ${highscoresDifferential}/bin/ef2000-highscores-differential --help > "$out"
+          grep -q -- '--random-cases' "$out"
+          cd ${source}
+          unset EF2000_EXE
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest \
+            tests.test_highscores_differential -q
         '';
         windows-layout = pkgs.runCommand "ef2000-windows-layout-check" {
           nativeBuildInputs = [ pkgs.file ];
@@ -376,7 +400,7 @@
       };
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
-        packages = [ python pkgs.ghidra ghidraWorkflow ] ++ devCommands ++ (with pkgs; [
+        packages = [ python pkgs.ghidra ghidraWorkflow highscoresDifferential ] ++ devCommands ++ (with pkgs; [
           gcc binutils qemu-user dosbox-x cmake ninja gdb ccache
         ]);
         GHIDRA_HOME = ghidraHome;
@@ -427,6 +451,10 @@
           printf '  nix run .#ghidra-ef2000 -- --help\n'
           printf '                                  Same workflow without entering the dev shell\n'
           printf '  ghidra                          Open Ghidra GUI\n\n'
+          printf 'Original/native high-score differential replay (requires your EF2000.EXE):\n'
+          printf '  ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300\n'
+          printf '                                  Compare guest routines to reconstructed C++\n'
+          printf '  nix run .#highscores-differential -- /path/to/_EF2000.EXE\n\n'
           printf 'Examples:\n'
           printf '  ef2000-run --data-dir /path/to/EF2000 --windowed\n'
           printf '  ef2000-run-gdb --data-dir /path/to/EF2000 --verbose\n'
