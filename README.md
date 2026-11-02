@@ -619,6 +619,7 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 - [GFX+ 3Dfx patch and rendering interface investigation](docs/gfxplus-rendering.md)
 - [Mission, navigation and campaign text-format reconstruction](docs/mission-records.md)
 - [Original mission, navigation and campaign reader call map](docs/mission-readers.md)
+- [Recovered native C++ mission/waypoint memory layouts](docs/mission-layout.md)
 
 The read-only `tools/mission_enum_probe.py` additionally exports the
 original X-32 reader's indexed names for waypoint actions, weapons,

@@ -132,7 +132,12 @@ Implemented and verified:
   validation are now identified in `docs/mission-readers.md`; next recover
   typed structs, enum *usage* and callsite-to-filename mapping. A read-only
   pinned-payload probe now extracts the reader's 310 table labels and eight
-  mobile-class aliases in `tools/mission_enum_probe.py`.
+  mobile-class aliases in `tools/mission_enum_probe.py`. A first native C++
+  guest layout model now captures mission/group/base and navigation records,
+  along with waypoint height normalization and navigation coordinate clamping
+  (`runtime/ef2000_mission_layout.*`, `docs/mission-layout.md`). Still to
+  reconstruct: attack/target structures, pointer lifetimes, the remaining
+  pilot fields and measured runtime comparisons before replacing guest code.
 - [ ] **Version-aware reference/decompilation:** fingerprint the candidate
   `rdeprera/EF2000` v2.0 DOS executable separately; verify its actual
   language, patch level and code/data differences from the German reference.

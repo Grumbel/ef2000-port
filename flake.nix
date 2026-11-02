@@ -102,6 +102,9 @@
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/ef2000_highscores_test.cpp runtime/ef2000_highscores.cpp \
             -o objects/ef2000-highscores-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/ef2000_mission_layout_test.cpp runtime/ef2000_mission_layout.cpp \
+            -o objects/ef2000-mission-layout-test
           runHook postBuild
         '';
 
@@ -136,6 +139,7 @@
           objects/ef2000-pcm-audio-test
           objects/ef2000-wav-capture-test
           objects/ef2000-highscores-test
+          objects/ef2000-mission-layout-test
           runHook postCheck
         '';
 

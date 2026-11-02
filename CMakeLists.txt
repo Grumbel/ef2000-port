@@ -189,3 +189,11 @@ add_executable(ef2000-highscores-test tests/ef2000_highscores_test.cpp
 target_compile_features(ef2000-highscores-test PRIVATE cxx_std_17)
 target_compile_options(ef2000-highscores-test PRIVATE -Wall -Wextra -Werror)
 add_test(NAME highscores-reconstruction COMMAND ef2000-highscores-test)
+
+# Additional asset-free guest layout reconstruction from the original
+# mission/navigation readers; no Unicorn dependency or DOS game assets.
+add_executable(ef2000-mission-layout-test tests/ef2000_mission_layout_test.cpp
+                                          runtime/ef2000_mission_layout.cpp)
+target_compile_features(ef2000-mission-layout-test PRIVATE cxx_std_17)
+target_compile_options(ef2000-mission-layout-test PRIVATE -Wall -Wextra -Werror)
+add_test(NAME mission-layout-reconstruction COMMAND ef2000-mission-layout-test)

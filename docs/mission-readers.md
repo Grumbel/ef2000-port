@@ -1,5 +1,8 @@
 # Original mission/navigation/campaign readers (bundle #065)
 
+The subsequent [native C++ mission layout reconstruction](mission-layout.md)
+adds byte-exact guest structs and two verified waypoint transformations.
+
 This pass identifies **actual input routines** in the German `_EF2000.EXE`
 X-32 image, rather than inferring the input grammar from text-file examples
 or from the already-identified output serializers. The guest addresses below
