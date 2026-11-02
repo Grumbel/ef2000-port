@@ -738,8 +738,15 @@ private:
     }
     void overlay_frame(const ef2000::OverlayPanel& panel) {
         if (!overlay_frame_texture_) {
-            overlay_fill(panel.x, panel.y, panel.w, panel.h, 168, 137, 69);
-            overlay_fill(panel.x + 2, panel.y + 2, panel.w - 4, panel.h - 4, 17, 30, 47);
+            // Reconstruct the drawn GUI chrome seen in the original 640x400
+            // option screens. Their DID1ST screenshots show a gray panel,
+            // silver one-pixel edging, black depth and a stepped olive tab;
+            // the separate newgui03 bitmap is only the menu backdrop.
+            overlay_fill(panel.x, panel.y, panel.w, panel.h, 159, 159, 175);
+            overlay_fill(panel.x + 1, panel.y + 1, panel.w - 2, panel.h - 2, 79, 79, 79);
+            overlay_fill(panel.x + 3, panel.y + 3, panel.w - 5, panel.h - 5, 115, 115, 115);
+            overlay_fill(panel.x + 3, panel.y + 3, 2, panel.h - 3, 0, 0, 0);
+            overlay_fill(panel.x + 3, panel.y + panel.h - 5, panel.w - 3, 2, 0, 0, 0);
             return;
         }
         const auto patches = ef2000::nine_slice(float(overlay_frame_width_),
@@ -758,7 +765,7 @@ private:
         overlay_fill(panel.x + border, panel.y + ef2000::OverlayWindows::title_height + 1,
                      panel.w - 2 * border,
                      panel.h - ef2000::OverlayWindows::title_height - border - 2,
-                     17, 30, 47);
+                     91, 91, 91);
     }
     void draw_overlay(uint64_t instructions, uint64_t interrupts, const std::string& status,
                       int width, int height) {
@@ -772,19 +779,28 @@ private:
             const auto& panel = overlay_.panels()[index];
             if (!panel.open) continue;
             const bool focused = overlay_.focused_panel() == index;
-            overlay_fill(panel.x + 3, panel.y + 3, panel.w, panel.h, 3, 9, 17);
+            overlay_fill(panel.x + 4, panel.y + 4, panel.w, panel.h, 0, 0, 0);
             overlay_frame(panel);
-            overlay_fill(panel.x + 3, panel.y + 3, panel.w - 6,
-                         ef2000::OverlayWindows::title_height - 2,
-                         focused ? 52 : 34, focused ? 83 : 57, focused ? 114 : 81);
-            overlay_text(panel.x + 10, panel.y + 9,
-                         index == 0 ? "FLIGHT CONTROLS" : "SYSTEM MONITOR",
-                         int((panel.w - 35) / 8), 250, 227, 154);
-            overlay_fill(panel.x + panel.w - 19, panel.y + 5, 14, 14, 119, 58, 50);
-            overlay_text(panel.x + panel.w - 16, panel.y + 7, "X", 1, 250, 232, 212);
-            // Original-style gold resize grip, visible even without assets.
-            overlay_fill(panel.x + panel.w - 13, panel.y + panel.h - 7, 8, 2, 181, 151, 81);
-            overlay_fill(panel.x + panel.w - 7, panel.y + panel.h - 13, 2, 8, 181, 151, 81);
+            const std::string title = index == 0 ? "FLIGHT CONTROLS" : "SYSTEM MONITOR";
+            const float tab_width = std::min(panel.w - 32, float(title.size() * 8 + 20));
+            // Small stepped upper-right edge rather than a modern full-width
+            // titlebar. Keep mouse-drag hit testing in OverlayWindows intact.
+            overlay_fill(panel.x + 5, panel.y + 5, tab_width - 9, 17,
+                         focused ? 62 : 46, focused ? 69 : 51, focused ? 42 : 31);
+            overlay_fill(panel.x + 5 + tab_width - 9, panel.y + 8, 9, 14,
+                         focused ? 62 : 46, focused ? 69 : 51, focused ? 42 : 31);
+            overlay_fill(panel.x + 5, panel.y + 4, tab_width - 12, 1, 173, 185, 159);
+            overlay_fill(panel.x + 5 + tab_width - 12, panel.y + 5, 5, 1, 173, 185, 159);
+            overlay_fill(panel.x + 5 + tab_width - 7, panel.y + 6, 4, 1, 173, 185, 159);
+            overlay_text(panel.x + 10, panel.y + 9, title,
+                         int((tab_width - 10) / 8), 255, 255, 255);
+            // Host close and resize affordances reuse the original square
+            // checkbox motif rather than prominent red/gold widgets.
+            overlay_fill(panel.x + panel.w - 19, panel.y + 6, 14, 14, 32, 32, 32);
+            overlay_fill(panel.x + panel.w - 18, panel.y + 7, 12, 12, 131, 131, 135);
+            overlay_text(panel.x + panel.w - 16, panel.y + 9, "X", 1, 27, 27, 27);
+            overlay_fill(panel.x + panel.w - 13, panel.y + panel.h - 7, 8, 1, 159, 159, 175);
+            overlay_fill(panel.x + panel.w - 7, panel.y + panel.h - 13, 1, 8, 159, 159, 175);
 
             const std::vector<std::string> diagnostics{
                 "VIDEO / EMULATION",
@@ -812,15 +828,15 @@ private:
                     value == "OTHER USEFUL SHORTCUTS" || value == "VIDEO / EMULATION";
                 overlay_text(panel.x + content_inset, panel.y + 31 + float(line - scroll) * 13,
                              value, max_chars,
-                             heading ? 247 : 212, heading ? 201 : 219, heading ? 122 : 228);
+                             heading ? 218 : 242, heading ? 226 : 242, heading ? 204 : 242);
             }
             overlay_text(panel.x + content_inset, panel.y + panel.h - 15,
                          index == 0 ? "SCROLL: WHEEL / UP-DOWN" : "LIVE GUEST DISPLAY",
-                         max_chars, 143, 174, 189);
+                         max_chars, 210, 218, 204);
         }
-        overlay_fill(0, 458, 640, 22, 9, 20, 35);
+        overlay_fill(0, 458, 640, 22, 39, 43, 23);
         overlay_text(8, 465, "F12 CLOSE  F11 / ALT+ENTER FULLSCREEN  TAB FOCUS  H HELP  D STATS",
-                     78, 249, 225, 156);
+                     78, 255, 255, 255);
     }
     SDL_AudioStream* audio_stream_{};
     SDL_AudioStream* cd_audio_stream_{};

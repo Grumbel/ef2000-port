@@ -61,6 +61,8 @@ ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300
 ef2000-gui-assets inventory /path/to/EF2000
 ef2000-gui-assets extract /path/to/EF2000 gui/mainmenu.gui \
   iff/256/newgui03.lbm spr/pitfont.spr --out local/gui-assets
+ef2000-gui-assets extract /path/to/EF2000 --all-images --gallery \
+  --out local/gui-contact-gallery # open gallery.html locally
 python3 tools/gfxplus_probe.py /path/to/Tactpat.exe # examine GFX+ updater (read-only)
 ghidra                                  # GUI (also: nix run .#ghidra)
 ```
@@ -357,31 +359,39 @@ gamepad or **F12** toggles the native overlay; it does *not* pause the guest.
 The SDL3 overlay now contains two host-side windows: **Flight Controls**
 (scrollable keyboard/gamepad command reference) and **System Monitor**
 (live SDL/changed-image FPS and guest activity). Drag their titlebars,
-resize at the bottom-right gold corner, click `X` to close, or click a window
+resize at the bottom-right corner, click `X` to close, or click a window
 to bring it forward. While the overlay is open, mouse/keyboard input is
 consumed by it instead of the DOS game, and the physical gamepad is held
 neutral. The windows can overlap, remember their position and size while
-hidden, and reopen from the overlay's keyboard commands. The initial skin
-uses a procedural EF2000-inspired blue/gold palette; identifying/loading
-the **original** archived font, frame and icon art remains separate work.
+hidden, and reopen from the overlay's keyboard commands. The procedural
+gray/silver frame and stepped olive title tabs are based on actual **English
+and German EF2000 menu bitmaps** recovered from `DID1ST.DAT`; this is a
+reconstruction, not a direct rendering of the original UI code or font.
 
-To start applying locally extracted GUI artwork as a window border, the
-`gui-assets` extractor can additionally export uncompressed BMPs that SDL3
-loads without SDL_image. Crop a **single framed window** (with four corners
-and all edges) from the original artwork and provide it as a nine-slice panel
-texture:
+The `gui-assets` extractor can generate a self-contained, offline HTML
+gallery of all recovered images. This is a useful way to find and compare
+original menu artwork (some images already contain fully rasterized menus):
 
 ```sh
 nix run .#gui-assets -- extract /path/to/EF2000 \
-  iff/256/newgui03.lbm --bmp --out local/gui-art
-# Inspect the BMP and crop a suitable frame into local/ef2000-frame.bmp.
+  --all-images --gallery --out local/gui-art
+# Open local/gui-art/gallery.html in a browser (no JavaScript or network).
+```
+
+If you can isolate a clean, reusable **frame** region, the extractor can
+additionally export BMPs for SDL3 (with `--bmp`). A carefully cropped BMP
+can be supplied as a nine-slice texture:
+
+```sh
 nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed \
   --overlay-frame-bmp local/ef2000-frame.bmp --overlay-frame-border 12
 ```
 
 The runtime preserves bitmap corners while stretching edges and centre to
 each movable window. The frame crop and border thickness must match the
-original artwork; an entire background is not a suitable nine-slice frame.
+original artwork; `newgui03.lbm` is a full-screen textured background,
+**not** a window-frame source. The original game's frame edges may be drawn
+procedurally rather than stored as independent bitmaps.
 Neither the BMP nor any derived crop is included in Git or a Nix package.
 Without an external frame bitmap, the procedural fallback remains available.
 

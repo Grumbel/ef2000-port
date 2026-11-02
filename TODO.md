@@ -126,9 +126,14 @@ Implemented and verified:
   asset-free window manager now supports **drag, resize, focus/Z-order,
   close/reopen and scroll**, with F12 controls and diagnostics panels;
   optional caller-cropped BMP frame skins can be applied as nine-slice
-  textures with `--overlay-frame-bmp`. **Automatic identification of the
-  correct original frame/font/button art**, texture atlas generation,
-  finer widgets and gamepad window navigation remain.
+  textures with `--overlay-frame-bmp`. The `gui-assets` extractor now has an
+  offline `--gallery` view, and full-screen English/German original option
+  images provide concrete gray/silver/olive frame references. The procedural
+  host overlay follows those observed colors/title tabs; `newgui03` is only
+  a textured background. **Reverse-engineer the procedural `box`/`bkd`
+  renderer and identify the original menu font/button art**, then add an
+  optional texture atlas and verify against original screenshots. Finer
+  widgets and gamepad window navigation remain open tasks.
   Keep the native UI separate from guest framebuffer emulation so menus can
   coexist with the cockpit and eventually replace original hardcoded GUI
   callbacks. Compare extracted textures and layout with `docs/gui-assets.md`;

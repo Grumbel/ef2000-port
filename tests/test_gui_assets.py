@@ -13,7 +13,7 @@ import unittest
 import zlib
 
 from tools.did_archive import DIDArchive, hash_path
-from tools.ef2000_gui_assets import extract, inspect_script, inventory, safe_relative
+from tools.ef2000_gui_assets import extract, gallery, inspect_script, inventory, safe_relative
 from tools.ilbm_image import Image, byterun_row, chunks, decode, encode_png, encode_bmp
 from tools.pcx_image import decode as decode_pcx, is_pcx
 from tools.ra_decode import decompress
@@ -209,8 +209,32 @@ class GUIInventoryTests(unittest.TestCase):
             everything = extract(game, root / 'all', [], all_images=True)
             self.assertEqual(len(everything), 2)
             self.assertTrue((root / 'all/LOOSE/SCRN0.png').is_file())
+            self.assertEqual(gallery(root / 'all'), 2)
+            html = (root / 'all/gallery.html').read_text(encoding='utf-8')
+            self.assertIn('DID1ST/hash_', html)
+            self.assertIn('LOOSE/SCRN0.png', html)
+            self.assertIn('2 × 1', html)
+            with self.assertRaises(FileExistsError):
+                gallery(root / 'all')
         with self.assertRaisesRegex(ValueError, 'unsafe'):
             safe_relative('../escape.lbm')
+
+    def test_gallery_validates_manifest_paths_and_missing_images(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = [{'kind': 'image', 'source': 'DID1ST.DAT',
+                         'name': '../escape.lbm', 'width': 2, 'height': 1}]
+            (root / 'manifest.json').write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, 'unsafe'):
+                gallery(root)
+            manifest[0]['name'] = 'image.lbm'
+            (root / 'manifest.json').write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, 'missing extracted image'):
+                gallery(root)
+            manifest[0]['source'] = '../../foreign'
+            (root / 'manifest.json').write_text(json.dumps(manifest))
+            with self.assertRaisesRegex(ValueError, 'unsupported gallery source'):
+                gallery(root)
 
 
 @unittest.skipUnless(os.environ.get('EF2000_DATA_DIR'),
@@ -228,6 +252,13 @@ class OriginalGUIAssetTests(unittest.TestCase):
         self.assertEqual(model['globals'][1]['value'], 'newgui03')
         background = decode(first.member(first.lookup('iff/256/newgui03.lbm')))
         self.assertEqual((background.width, background.height), (640, 400))
+        # Full options screens are useful original-style reference bitmaps,
+        # although the menu's box/bkd directives imply runtime GUI drawing.
+        screenshots = (0x94eb76bc, 0x9dac76bc, 0x950b6052)
+        first_by_hash = {entry.hash: entry for entry in first.entries}
+        for key in screenshots:
+            bitmap = decode(first.member(first_by_hash[key]))
+            self.assertEqual((bitmap.width, bitmap.height), (640, 400))
         compressed = main.lookup('iff/256/mainselc.lbm')
         self.assertTrue(main.raw_member(compressed).startswith(b'RA'))
         decoded = main.member(compressed)

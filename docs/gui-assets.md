@@ -63,6 +63,33 @@ members are returned verbatim.
 | `DID.DAT` | `iff/256/mainselc.lbm` | 59,063-byte RA member, decodes to 66,378-byte 320×200 ILBM |
 | `DID.DAT` | `spr/pitfont.spr` | 385-byte RA member; 45 indexed 4×5 sprites with 16-bit pixel values |
 
+### Recovered full-screen menu references
+
+The original German installation also contains **already-rasterized menu
+screens** among the 59 `DID1ST.DAT` images. The hashed members below are
+reproducible image identifiers (not recovered filenames):
+
+| Member | Resolution | Visible content |
+| --- | --- | --- |
+| `hash_94eb76bc.lbm` | 640×400 | English *In Game Options*, *Realism Menu*, *Fine Tune Options*, *Exit Options* |
+| `hash_9dac76bc.lbm` | 640×400 | German *Spieloptionen*, *Realismus-Menü*, *Optionen zur Feineinstellung*, *Optionen verlassen* |
+| `hash_950b6052.lbm` | 640×400 | German options and a *Bildschirm-Ausschnitt* window |
+
+These are exceptionally useful **visual references** for the original
+widget treatment: single-pixel silver edges, black offset shadows, stepped
+olive-green title tabs, gray interiors, compact white bitmap text and tiny
+square selection controls. The rasterized screen bitmaps are **not proof**
+that the runtime draws windows by blitting a matching frame sprite; the
+`.gui` scripts include `box`, `bkd`, `boxs`, `bkds`, and `line` attributes
+that likely drive a procedural renderer. In particular,
+`iff/256/newgui03.lbm` is just the diagonal-textured background with a
+diffuse highlight, **not a reusable window border**.
+
+This pass used the English/German image pair to replace the host overlay's
+blue/gold placeholder with asset-free gray/silver window chrome and olive
+title tabs. It intentionally does **not** claim pixel-perfect fonts, menu
+geometry or widget semantics. Original artwork is not committed or shipped.
+
 The `gui/mainmenu.gui` script supplies the startup routine and main menu
 background, then declares windows and icons by name. The declarative commands
 include `window`, `icon`, `xpos`, `ypos`, `xsize`, `ysize`, localized `title`
@@ -103,6 +130,11 @@ nix run .#gui-assets -- extract /path/to/EF2000 \
 
 # Exhaustive image search, including unnamed hashed images (potentially large):
 ef2000-gui-assets extract /path/to/EF2000 --all-images --out local/all-menu-images
+# Or create a JavaScript-free contact gallery at extraction time:
+ef2000-gui-assets extract /path/to/EF2000 --all-images --gallery \
+  --out local/gui-gallery
+# For an extraction already on disk:
+ef2000-gui-assets gallery local/all-menu-images
 ```
 
 The extractor creates separate `DID1ST/` and `DID/` subtrees to preserve
@@ -118,6 +150,10 @@ index-preserving JSON sprite catalog. An output `manifest.json` records source a
 original and decoded sizes, and identified format. The image decoder uses
 only the Python standard library: `BMHD`, `CMAP`, ByteRun1 `BODY`, 1–8
 bitplanes, planar ILBM and 8-bit chunky PBM, plus transparency and PCX RLE.
+The offline `gallery.html` lists decoded images smallest-first with image
+sizes, archive sources, and original virtual paths or hashes. It uses PNG
+thumbnails with links to the full images, without JavaScript or network
+access; as with the other exports, an existing gallery is never overwritten.
 
 For direct archive diagnostics without GUI conversion, run
 `python3 tools/did_archive.py /path/to/DID1ST.DAT gui/mainmenu.gui`.
@@ -139,23 +175,25 @@ with **movable, overlapping, resizable windows**, focus/Z-order, close/reopen
 and scroll. The first two panels contain keyboard/gamepad help and a live
 performance monitor; F12 toggles them while F11/Alt+Enter changes fullscreen
 state. The interaction model lives in `runtime/overlay_windows.hpp` and has
-an asset-free test. The first visual treatment is a procedural blue/gold
-placeholder: the **actual EF2000 bitmap frames, typography and icons have not
-yet been identified and loaded into the runtime**. Later bind reconstructed
+an asset-free test. The procedural default now follows the observed
+gray/silver/olive colors and stepped title tabs: the **actual EF2000 bitmap
+fonts and icons have not yet been identified or loaded into the runtime**.
+Later bind reconstructed
 menu callbacks to native actions and replace individual original GUI screens.
 
 `--overlay-frame-bmp FILE` and optional `--overlay-frame-border N` (1..32)
 now let the runtime draw a **caller-selected BMP crop** using nine-slice
 geometry, preserving corners while resizing each window. The shared geometry
 is tested independently in `runtime/nine_slice.hpp`. This is not automatic
-frame discovery: a full `newgui03.lbm` background is unsuitable as a window
-frame without first selecting and cropping an appropriate decorative region.
+frame discovery: `newgui03.lbm` is a background only, and a clean independent
+frame texture has not yet been identified. The original frames may be drawn
+by the engine from the `.gui` box and background directives.
 Use `ef2000-gui-assets extract ... --bmp --out local/gui-art` to prepare
 candidate images and keep all derived artwork outside the repository.
 
 Convert local PNG/JSON extractor output into a texture atlas plus skin
 manifest under the user's asset directory; **do not commit or ship the
-original artwork**. A procedural fallback skin enables testing without
+original artwork**. A screenshot-informed procedural fallback skin enables testing without
 original assets. With local assets available, golden screenshots can check
 alignment, palette fidelity and scale against the existing guest renderer.
 

@@ -10,8 +10,10 @@ All extracted game data stays in a caller-chosen output directory, never Git.
 
 import argparse
 from collections import Counter
+import html
 import json
 from pathlib import Path
+from urllib.parse import quote
 
 try:
     from .did_archive import DIDArchive
@@ -194,6 +196,63 @@ def extract(game_dir, output_dir, paths, all_images=False, bmp=False):
     return manifest
 
 
+def gallery(output_dir):
+    """Build an offline, original-asset-local contact gallery from an extraction.
+
+    A browser can display hundreds of hashed members without installing an
+    image viewer or any Python graphics dependencies. All links stay inside
+    the extraction directory; the gallery never embeds proprietary pixels.
+    """
+    manifest = json.loads((output_dir / 'manifest.json').read_text(encoding='utf-8'))
+    images = []
+    for entry in manifest:
+        if entry.get('kind') != 'image':
+            continue
+        source = entry['source']
+        if source not in ('DID1ST.DAT', 'DID.DAT', 'LOOSE'):
+            raise ValueError(f'unsupported gallery source: {source}')
+        name = safe_relative(entry['name'])
+        relative = (Path(source.removesuffix('.DAT')) / name).with_suffix('.png')
+        if not (output_dir / relative).is_file():
+            raise ValueError(f'missing extracted image: {relative}')
+        images.append((entry, relative))
+    if not images:
+        raise ValueError('manifest contains no extracted images')
+
+    # Small images are the likeliest window controls or button art; lead with
+    # those while retaining full-size backgrounds later in the same index.
+    images.sort(key=lambda item: (item[0]['width'] * item[0]['height'],
+                                  item[0]['source'], item[0]['name']))
+    tiles = []
+    for entry, path in images:
+        name = html.escape(entry['name'], quote=True)
+        source = html.escape(entry['source'], quote=True)
+        url = quote(path.as_posix(), safe='/')
+        dimensions = f"{entry['width']} × {entry['height']}"
+        tiles.append(
+            f'<figure><a href="{url}"><img src="{url}" loading="lazy" '
+            f'alt="{name}" width="256" height="160"></a>'
+            f'<figcaption><b>{name}</b><small>{source} · {dimensions}'
+            f'</small></figcaption></figure>')
+    markup = ('''<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EF2000 extracted art gallery</title>
+<style>
+:root { color-scheme: dark; font: 14px system-ui, sans-serif; background: #152031; color: #dbe3ec; }
+body { margin: 24px; } h1 { margin-bottom: 0; } p { color: #afbed1; }
+main { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 14px; }
+figure { margin: 0; background: #25364a; border: 1px solid #61768f; min-width: 0; }
+a { display: flex; height: 176px; padding: 8px; align-items: center; justify-content: center; }
+img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; image-rendering: pixelated; }
+figcaption { padding: 9px; overflow-wrap: anywhere; } small { display: block; color: #bacadd; margin-top: 4px; }
+</style></head><body><h1>EF2000 original image inventory</h1>
+<p>Smallest first · Select a thumbnail to see its full-size PNG · Local files only.</p>
+<main>''' + '\n'.join(tiles) + '</main></body></html>\n')
+    write_new(output_dir / 'gallery.html', markup.encode('utf-8'))
+    return len(images)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     modes = parser.add_subparsers(dest='action', required=True)
@@ -206,6 +265,9 @@ def main(argv=None):
     unpack.add_argument('--out', type=Path, required=True, help='new output directory (no overwrite)')
     unpack.add_argument('--all-images', action='store_true', help='recover every archive ILBM/PBM, named by hash')
     unpack.add_argument('--bmp', action='store_true', help='also export 24-bit BMP for SDL3 host overlays')
+    unpack.add_argument('--gallery', action='store_true', help='also generate a standalone offline image gallery')
+    display = modes.add_parser('gallery', help='make an offline HTML contact gallery of extracted PNGs')
+    display.add_argument('extraction_dir', type=Path, help='directory containing manifest.json')
     args = parser.parse_args(argv)
     try:
         if args.action == 'inventory':
@@ -213,9 +275,14 @@ def main(argv=None):
             print(json.dumps(report, indent=2))
             if args.json:
                 write_new(args.json, (json.dumps(report, indent=2) + '\n').encode('utf-8'))
+        elif args.action == 'gallery':
+            count = gallery(args.extraction_dir)
+            print(f'indexed {count} images in {args.extraction_dir / "gallery.html"}')
         else:
             result = extract(args.game_dir, args.out, args.paths, args.all_images, args.bmp)
             print(f'extracted {len(result)} GUI assets into {args.out}')
+            if args.gallery:
+                print(f'indexed {gallery(args.out)} images in {args.out / "gallery.html"}')
             if args.all_images:
                 for name, count in sorted(Counter(item['source'] for item in result).items()):
                     print(f'  {name}: {count} images/resources')
