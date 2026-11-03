@@ -1319,4 +1319,32 @@ uint32_t guest_fn_d6f88(void); /* 0xd6f88 */
 void guest_fn_d7158(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xd7158 */
 uint32_t guest_fn_d75fc(uint32_t a); /* 0xd75fc */
 
+/* camera_helpers.c */
+void toggle_flag_8dcf4(int16_t unit);
+void update_ticker_90828(void);
+void init_entries_90a70(void);
+void update_viewpoint_92f98(void);
+void step_list_92ffc(void);
+void update_camera_94484(void);
+void look_at_unit_947c4(int16_t unit);
+void look_from_player_94830(int16_t unit);
+void look_at_target_94a1c(int16_t unit);
+void update_progress_985f4(uint8_t channel, int32_t value);
+void clear_tables_9a4d8(void);
+void guest_fn_38284(int32_t a); /* 0x38284 */
+void guest_fn_84678(void); /* 0x84678 */
+uint32_t guest_fn_9125c(int32_t a); /* 0x9125c */
+void guest_fn_91c48(uint32_t a); /* 0x91c48 */
+void guest_fn_92070(void); /* 0x92070 */
+void guest_fn_9457c(ef_addr32 a, ef_addr32 b); /* 0x9457c */
+void guest_fn_95018(void); /* 0x95018 */
+void guest_fn_98658(uint32_t a); /* 0x98658 */
+void guest_fn_9a348(void); /* 0x9a348 */
+uint32_t guest_fn_9c960(void); /* 0x9c960 */
+void guest_fn_9e3f8(int32_t a); /* 0x9e3f8 */
+void guest_fn_d099c(ef_addr32 a, ef_addr32 b); /* 0xd099c */
+uint32_t guest_fn_d0b68(ef_addr32 a, uint32_t b); /* 0xd0b68 */
+void guest_fn_d0ebc(ef_addr32 a, uint32_t b); /* 0xd0ebc */
+uint32_t guest_fn_d13dc(ef_addr32 a, uint32_t b); /* 0xd13dc */
+
 #endif

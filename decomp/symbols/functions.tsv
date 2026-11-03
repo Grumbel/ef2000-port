@@ -1823,7 +1823,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008dbe0	95	toggle_flag_8dbe0	unit_flags	compiles	game	confirmed	decomp/tests/0x0008dbe0.json	docs/compiler-abi.md; Copy flag bit 8 of word +0x24 into bit 9.; callers 8d59c@8da27; guest pending
 0x0008dc40	82	toggle_flag_8dc40	unit_flags	compiles	game	confirmed	decomp/tests/0x0008dc40.json	docs/compiler-abi.md; Copy flag bit 0 of word +0x24 into bit 5.; callers 8d59c@8d9be; guest pending
 0x0008dc94	95	toggle_flag_8dc94	unit_flags	compiles	game	confirmed	decomp/tests/0x0008dc94.json	docs/compiler-abi.md; Copy flag bit 12 of word +0x24 into bit 14.; callers 8d59c@8da49; guest pending
-0x0008dcf4	83			unknown	unclassified	unverified		
+0x0008dcf4	83	toggle_flag_8dcf4	camera_helpers	compiles	game	confirmed	decomp/tests/0x0008dcf4.json	docs/compiler-abi.md; Copy flag bit 15 of word +0x24 into bit 0 of word +0x26.; callers 8d59c@8da67; guest pending
 0x0008dd48	339			unknown	unclassified	unverified		
 0x0008de9c	596			unknown	unclassified	unverified		
 0x0008e494	132			unknown	unclassified	unverified		
@@ -1868,11 +1868,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000906b4	78	scene_node_has_active_children	scene_nodes	compiles	game	confirmed	decomp/tests/0x000906b4.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0009075c	148			unknown	unclassified	unverified		
 0x000907f0	53	next_scene_node_with_active_children	scene_nodes	compiles	game	confirmed	decomp/tests/0x000907f0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
-0x00090828	88			unknown	unclassified	unverified		
+0x00090828	88	update_ticker_90828	camera_helpers	compiles	game	confirmed	decomp/tests/0x00090828.json	docs/compiler-abi.md; ; callers 8bb50@8bb5d; guest pending
 0x00090880	161			unknown	unclassified	unverified		
 0x00090924	26	clear_matching_link_b	misc_state	compiles	game	confirmed	decomp/tests/0x00090924.json	docs/compiler-abi.md; if 0x90050(record,value) and value==record+0x1c then clear it; callers 8be54@8be63; guest pending
 0x00090940	297			unknown	unclassified	unverified		
-0x00090a70	84			unknown	unclassified	unverified		
+0x00090a70	84	init_entries_90a70	camera_helpers	compiles	game	confirmed	decomp/tests/0x00090a70.json	docs/compiler-abi.md; Initialise the forty 0x30-byte entries at 0x211b00.; callers 3cfc0@3d2d3; guest pending
 0x00090ac4	357			unknown	unclassified	unverified		
 0x00090c2c	64			unknown	unclassified	unverified		
 0x00090c6c	739			unknown	unclassified	unverified		
@@ -1907,8 +1907,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00092c28	520			unknown	unclassified	unverified		
 0x00092e30	222			unknown	unclassified	unverified		
 0x00092f10	135			unknown	unclassified	unverified		
-0x00092f98	98			unknown	unclassified	unverified		
-0x00092ffc	99			unknown	unclassified	unverified		
+0x00092f98	98	update_viewpoint_92f98	camera_helpers	compiles	game	confirmed	decomp/tests/0x00092f98.json	docs/compiler-abi.md; ; callers 95e58@96cf0; guest pending
+0x00092ffc	99	step_list_92ffc	camera_helpers	compiles	game	confirmed	decomp/tests/0x00092ffc.json	docs/compiler-abi.md; Step byte 0x12dc34 through the list of words at +0x50 of the current record, skipping the player.; callers 93060@93098; guest pending
 0x00093060	269			unknown	unclassified	unverified		
 0x00093170	1036			unknown	unclassified	unverified		
 0x0009357c	1293			unknown	unclassified	unverified		
@@ -1922,16 +1922,16 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000941e4	229			unknown	unclassified	unverified		
 0x000942cc	162			unknown	unclassified	unverified		
 0x00094370	162			unknown	unclassified	unverified		
-0x00094484	109			unknown	unclassified	unverified		
+0x00094484	109	update_camera_94484	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094484.json	docs/compiler-abi.md; ; callers 95e58@9619b; guest pending
 0x000944f4	135			unknown	unclassified	unverified		
 0x0009457c	583			unknown	unclassified	unverified		
-0x000947c4	108			unknown	unclassified	unverified		
-0x00094830	78			unknown	unclassified	unverified		
+0x000947c4	108	look_at_unit_947c4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000947c4.json	docs/compiler-abi.md; ; callers 95e58@9693f; guest pending
+0x00094830	78	look_from_player_94830	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094830.json	docs/compiler-abi.md; ; callers 95e58@968fa; guest pending
 0x00094880	68			unknown	unclassified	unverified		
 0x000948c4	132			unknown	unclassified	unverified		
 0x00094948	11	forward_record_field_30	misc_state	compiles	game	confirmed	decomp/tests/0x00094948.json	docs/compiler-abi.md; 0x9457c(record, dword record+0x30); callers 95e58@96552; guest pending
 0x00094954	198			unknown	unclassified	unverified		
-0x00094a1c	87			unknown	unclassified	unverified		
+0x00094a1c	87	look_at_target_94a1c	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094a1c.json	docs/compiler-abi.md; Unit 0xff means the record at dword 0x1a821c.; callers 95e58@969df; guest pending
 0x00094a74	628			unknown	unclassified	unverified		
 0x00094ce8	31	reset_scene_words_and_update	misc_state	compiles	game	confirmed	decomp/tests/0x00094ce8.json	docs/compiler-abi.md; clear words 0x12dba2/a4/a6 then 0x94a74; callers 95e58@96cc3; guest pending
 0x00094d08	756			unknown	unclassified	unverified		
@@ -1981,7 +1981,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009854c	11			unknown	unclassified	unverified		
 0x00098558	27	install_allocator_hooks	misc_state	compiles	game	confirmed	decomp/tests/0x00098558.json	docs/compiler-abi.md; dword 0x12dd9c=0x9850c, 0x408580=0x1f4000; callers 49228@494ef; guest pending
 0x000985b0	66			unknown	unclassified	unverified		
-0x000985f4	97			unknown	unclassified	unverified		
+0x000985f4	97	update_progress_985f4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000985f4.json	docs/compiler-abi.md; Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change.; callers 49228@49753,7a844@7a89a,7e8c0@7eac1; guest pending
 0x00098658	1126			unknown	unclassified	unverified		
 0x00098ac0	166			unknown	unclassified	unverified		
 0x00098b68	104			unknown	unclassified	unverified		
@@ -1996,7 +1996,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009a0dc	251			unknown	unclassified	unverified		
 0x0009a1d8	251			unknown	unclassified	unverified		
 0x0009a348	400			unknown	unclassified	unverified		
-0x0009a4d8	108			unknown	unclassified	unverified		
+0x0009a4d8	108	clear_tables_9a4d8	camera_helpers	compiles	game	confirmed	decomp/tests/0x0009a4d8.json	docs/compiler-abi.md; ; callers 98bec@98bec; guest pending
 0x0009a544	221			unknown	unclassified	unverified		
 0x0009a624	213			unknown	unclassified	unverified		
 0x0009a6fc	440			unknown	unclassified	unverified		

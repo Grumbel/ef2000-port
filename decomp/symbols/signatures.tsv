@@ -783,3 +783,14 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0008dbe0	toggle_flag_8dbe0	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008dbe0 (95 bytes); Copy flag bit 8 of word +0x24 into bit 9.; callers 8d59c@8da27; docs/compiler-abi.md
 0x0008dc40	toggle_flag_8dc40	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008dc40 (82 bytes); Copy flag bit 0 of word +0x24 into bit 5.; callers 8d59c@8d9be; docs/compiler-abi.md
 0x0008dc94	toggle_flag_8dc94	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008dc94 (95 bytes); Copy flag bit 12 of word +0x24 into bit 14.; callers 8d59c@8da49; docs/compiler-abi.md
+0x0008dcf4	toggle_flag_8dcf4	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008dcf4 (83 bytes); Copy flag bit 15 of word +0x24 into bit 0 of word +0x26.; callers 8d59c@8da67; docs/compiler-abi.md
+0x00090828	update_ticker_90828			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00090828 (88 bytes); ; callers 8bb50@8bb5d; docs/compiler-abi.md
+0x00090a70	init_entries_90a70			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00090a70 (84 bytes); Initialise the forty 0x30-byte entries at 0x211b00.; callers 3cfc0@3d2d3; docs/compiler-abi.md
+0x00092f98	update_viewpoint_92f98			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00092f98 (98 bytes); ; callers 95e58@96cf0; docs/compiler-abi.md
+0x00092ffc	step_list_92ffc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00092ffc (99 bytes); Step byte 0x12dc34 through the list of words at +0x50 of the current record, skipping the player.; callers 93060@93098; docs/compiler-abi.md
+0x00094484	update_camera_94484			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094484 (109 bytes); ; callers 95e58@9619b; docs/compiler-abi.md
+0x000947c4	look_at_unit_947c4	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000947c4 (108 bytes); ; callers 95e58@9693f; docs/compiler-abi.md
+0x00094830	look_from_player_94830	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094830 (78 bytes); ; callers 95e58@968fa; docs/compiler-abi.md
+0x00094a1c	look_at_target_94a1c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094a1c (87 bytes); Unit 0xff means the record at dword 0x1a821c.; callers 95e58@969df; docs/compiler-abi.md
+0x000985f4	update_progress_985f4	AL:uint8_t,EDX:int32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000985f4 (97 bytes); Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change.; callers 49228@49753,7a844@7a89a,7e8c0@7eac1; docs/compiler-abi.md
+0x0009a4d8	clear_tables_9a4d8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009a4d8 (108 bytes); ; callers 98bec@98bec; docs/compiler-abi.md

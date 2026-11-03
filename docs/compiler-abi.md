@@ -2174,3 +2174,19 @@ in EAX, format string address, one value).
 | `0x8dbe0` | AX:int16_t | none | 8d59c@8da27 | Copy flag bit 8 of word +0x24 into bit 9. |
 | `0x8dc40` | AX:int16_t | none | 8d59c@8d9be | Copy flag bit 0 of word +0x24 into bit 5. |
 | `0x8dc94` | AX:int16_t | none | 8d59c@8da49 | Copy flag bit 12 of word +0x24 into bit 14. |
+
+## camera_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8dcf4` | AX:int16_t | none | 8d59c@8da67 | Copy flag bit 15 of word +0x24 into bit 0 of word +0x26. |
+| `0x90828` | none | none | 8bb50@8bb5d |  |
+| `0x90a70` | none | none | 3cfc0@3d2d3 | Initialise the forty 0x30-byte entries at 0x211b00. |
+| `0x92f98` | none | none | 95e58@96cf0 |  |
+| `0x92ffc` | none | none | 93060@93098 | Step byte 0x12dc34 through the list of words at +0x50 of the current record, skipping the player. |
+| `0x94484` | none | none | 95e58@9619b |  |
+| `0x947c4` | AX:int16_t | none | 95e58@9693f |  |
+| `0x94830` | AX:int16_t | none | 95e58@968fa |  |
+| `0x94a1c` | AX:int16_t | none | 95e58@969df | Unit 0xff means the record at dword 0x1a821c. |
+| `0x985f4` | AL:uint8_t,EDX:int32_t | none | 49228@49753,7a844@7a89a,7e8c0@7eac1 | Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change. |
+| `0x9a4d8` | none | none | 98bec@98bec |  |
