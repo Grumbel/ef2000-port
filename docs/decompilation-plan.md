@@ -1028,6 +1028,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  16    Drafted eight runtime-word and record-lookup helpers (236 total): paired acquire/set on object 0x1a7c30, halfword loads, 0xe5-byte record lookup and mode test, quotient table lookup and a pair reset. Host test passes; guest verification unavailable.
 2026-11-03  17    Drafted ten status-formatter and state helpers (246 total): seven 0xa4342 value formatters, a pending-mode setter, a halfword load and a pointer release. Host test passes; guest verification unavailable.
 2026-11-03  18    Built the OpenWatcom wrapper from the flake (needs NIXPKGS_ALLOW_UNFREE=1 --impure) and compiled every decomp/src module: 13 modules failed under C89 (loop-scoped declarations, mixed declarations, non-constant initializers); added -za99 to the canonical flags and rewrote two aggregate initializers. All 246 drafted functions now compile with 0 warnings, 0 errors and are marked compiles; splice and differential evidence still pending.
+2026-11-03  19  Drafted and Watcom-compiled 19 more functions in misc_state (265 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---

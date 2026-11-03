@@ -1591,3 +1591,27 @@ in EAX, format string address, one value).
 | `0x845a4` | word `0x12b4a6=2`, byte `0x1fcc43=1`, AL=0 (AH=1 left set) |
 | `0x81794` | word `0x1fcaec` from `0xde864(0x1889d4)` |
 | `0x7a434` | release pointer `0x12afc4` through `0xc3f80` when nonzero, then clear it |
+
+## misc_state (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x85400` | AX:int16_t | none | 857bc@85954,857bc@8599a | row[0x8e]=row[0x8f]-1 for grid row AX |
+| `0x8828c` | none | none | 8846c@8846f | clear bytes 0x12d7aa..ac and word 0x20f196 |
+| `0x89140` | EAX:ef_addr32 | none | 86968@86a6d | record+0x26 = trunc(dword + double 0x18a4e0) then 0x89924 |
+| `0x8ba78` | none | none | 8bd58@8bdb7 | dword 0x12db5c=0 |
+| `0x8bdd4` | none | none | 3ea0c@3eec5 | dword 0x132ad4=dword 0x20f420 |
+| `0x8f5d8` | EAX:ef_addr32,EDX:uint32_t | none | 8be54@8be5a | if 0x8c09c(record,value) and value==record+0x1c then clear it |
+| `0x90924` | EAX:ef_addr32,EDX:uint32_t | none | 8be54@8be63 | if 0x90050(record,value) and value==record+0x1c then clear it |
+| `0x91238` | none | none | 92c28@92ceb,92c28@92daf | byte 0x12db9e=0x35, word 0x21449c=1, 0xd0b68(0x12dbec) |
+| `0x919b8` | none | none | none direct | if byte 0x12db9e==0x36 call 0xdc334(1,1) |
+| `0x91c00` | AX:int16_t,DX:int16_t,BX:int16_t | EAX:uint32_t | 95e58@97009 | 0xe2b60(x*x+y*y+z*z) |
+| `0x91c34` | none | AL:uint8_t | 1c780@1cb47,1c780@1cc61 | word 0x2144ae != word 0x2144ac |
+| `0x94948` | EAX:ef_addr32 | EAX:uint32_t | 95e58@96552 | 0x9457c(record, dword record+0x30) |
+| `0x94ce8` | none | none | 95e58@96cc3 | clear words 0x12dba2/a4/a6 then 0x94a74 |
+| `0x94ffc` | none | none | 95e58@96320 | filtered lookup of high word 0x21449e; if found store 0x214458 and 0x94d08; falls into 0x95018 |
+| `0x9783c` | EAX:ef_addr32,EDX:uint32_t | none | 9775c@9782c,97860@978bd | word+6=0 word+8=EDX-1 tail 0x975f0 |
+| `0x97dc0` | none | EAX:uint32_t | 97dcc@97edb,97dcc@97f27 | 0x10640 then return dword 0x197c14 |
+| `0x97f70` | none | EAX:uint32_t | 3ea0c@3ed91,3ea0c@3ed9f | 0x9c858 result or 0x18acb0 |
+| `0x98000` | none | none | 8b39c@8b4bf | if byte 0x420a72 tail 0xd5f0c(dword 0x12dd98) |
+| `0x98558` | none | none | 49228@494ef | dword 0x12dd9c=0x9850c, 0x408580=0x1f4000 |

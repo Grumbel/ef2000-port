@@ -472,4 +472,37 @@ void format_ui_status_value(ef_addr32 destination, ef_addr32 format, uint32_t va
 uint32_t guest_query_status_value(ef_addr32 destination); /* 0x810ec EAX -> EAX */
 void guest_release_block(ef_addr32 block); /* 0xc3f80 EAX */
 
+/* misc_state.c: small state helpers. */
+void decrement_grid_row_link(int16_t cell); /* 0x85400 AX */
+void clear_input_state_block(void); /* 0x8828c */
+void adjust_record_scalar(ef_addr32 record); /* 0x89140 EAX */
+void clear_dword_12db5c(void); /* 0x8ba78 */
+void copy_dword_20f420_to_132ad4(void); /* 0x8bdd4 */
+void clear_matching_link_a(ef_addr32 record, uint32_t value); /* 0x8f5d8 EAX/EDX */
+void clear_matching_link_b(ef_addr32 record, uint32_t value); /* 0x90924 EAX/EDX */
+void begin_mode_35(void); /* 0x91238 */
+void end_mode_36(void); /* 0x919b8 */
+uint32_t length_squared_word_triple(int16_t x, int16_t y, int16_t z); /* 0x91c00 AX/DX/BX -> EAX */
+uint8_t scene_words_differ(void); /* 0x91c34 -> AL */
+uint32_t forward_record_field_30(ef_addr32 record); /* 0x94948 EAX -> EAX */
+void reset_scene_words_and_update(void); /* 0x94ce8 */
+void select_scene_object(void); /* 0x94ffc */
+void reset_record_range(ef_addr32 record, uint32_t count); /* 0x9783c EAX/EDX */
+uint32_t sample_tick_counter(void); /* 0x97dc0 -> EAX */
+uint32_t pointer_or_default(void); /* 0x97f70 -> EAX */
+void forward_if_enabled(void); /* 0x98000 */
+void install_allocator_hooks(void); /* 0x98558 */
+void guest_after_scalar_adjust(ef_addr32 record); /* 0x89924 EAX */
+uint8_t guest_link_check_a(ef_addr32 record, uint32_t value); /* 0x8c09c EAX/EDX -> AL */
+uint8_t guest_link_check_b(ef_addr32 record, uint32_t value); /* 0x90050 EAX/EDX -> AL */
+void guest_mode_36_hook(uint32_t first, uint32_t second); /* 0xdc334 stack, callee cleanup */
+uint32_t guest_square_root_of(int32_t value); /* 0xe2b60 EAX -> EAX */
+uint32_t guest_record_field_30(ef_addr32 record, uint32_t field); /* 0x9457c EAX/EDX -> EAX */
+void guest_scene_update(void); /* 0x94a74 */
+void guest_scene_apply(void); /* 0x94d08 */
+void guest_record_tail(ef_addr32 record); /* 0x975f0 EAX */
+void guest_tick_sample(void); /* 0x10640 */
+uint32_t guest_current_pointer(void); /* 0x9c858 -> EAX */
+void guest_forward_value(uint32_t value); /* 0xd5f0c EAX */
+
 #endif

@@ -275,3 +275,22 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000845a4	set_pending_mode_two		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x845a4 (25 bytes); Word 0x12b4a6=2, byte 0x1fcc43=1, AL=0 (AH=1); caller 84678@846ab; docs/compiler-abi.md
 0x00081794	load_halfword_1fcaec			ebx,ecx,edx,esi,edi,ebp	0	Original 0x81794 (17 bytes); Word 0x1fcaec from 0xde864(0x1889d4); caller 3cfc0@3d13a; docs/compiler-abi.md
 0x0007a434	release_block_12afc4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x7a434 (30 bytes); Release pointer 0x12afc4 via 0xc3f80 if nonzero then clear; caller 7ab00@7ac5c; docs/compiler-abi.md
+0x00085400	decrement_grid_row_link	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00085400 (31 bytes); row[0x8e]=row[0x8f]-1 for grid row AX; callers 857bc@85954,857bc@8599a; docs/compiler-abi.md
+0x0008828c	clear_input_state_block			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008828c (34 bytes); clear bytes 0x12d7aa..ac and word 0x20f196; callers 8846c@8846f; docs/compiler-abi.md
+0x00089140	adjust_record_scalar	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00089140 (33 bytes); record+0x26 = trunc(dword + double 0x18a4e0) then 0x89924; callers 86968@86a6d; docs/compiler-abi.md
+0x0008ba78	clear_dword_12db5c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008ba78 (11 bytes); dword 0x12db5c=0; callers 8bd58@8bdb7; docs/compiler-abi.md
+0x0008bdd4	copy_dword_20f420_to_132ad4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008bdd4 (11 bytes); dword 0x132ad4=dword 0x20f420; callers 3ea0c@3eec5; docs/compiler-abi.md
+0x0008f5d8	clear_matching_link_a	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008f5d8 (26 bytes); if 0x8c09c(record,value) and value==record+0x1c then clear it; callers 8be54@8be5a; docs/compiler-abi.md
+0x00090924	clear_matching_link_b	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00090924 (26 bytes); if 0x90050(record,value) and value==record+0x1c then clear it; callers 8be54@8be63; docs/compiler-abi.md
+0x00091238	begin_mode_35			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00091238 (33 bytes); byte 0x12db9e=0x35, word 0x21449c=1, 0xd0b68(0x12dbec); callers 92c28@92ceb,92c28@92daf; docs/compiler-abi.md
+0x000919b8	end_mode_36			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000919b8 (25 bytes); if byte 0x12db9e==0x36 call 0xdc334(1,1); callers none direct; docs/compiler-abi.md
+0x00091c00	length_squared_word_triple	AX:int16_t,DX:int16_t,BX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00091c00 (30 bytes); 0xe2b60(x*x+y*y+z*z); callers 95e58@97009; docs/compiler-abi.md
+0x00091c34	scene_words_differ		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00091c34 (17 bytes); word 0x2144ae != word 0x2144ac; callers 1c780@1cb47,1c780@1cc61; docs/compiler-abi.md
+0x00094948	forward_record_field_30	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094948 (11 bytes); 0x9457c(record, dword record+0x30); callers 95e58@96552; docs/compiler-abi.md
+0x00094ce8	reset_scene_words_and_update			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094ce8 (31 bytes); clear words 0x12dba2/a4/a6 then 0x94a74; callers 95e58@96cc3; docs/compiler-abi.md
+0x00094ffc	select_scene_object			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094ffc (28 bytes); filtered lookup of high word 0x21449e; if found store 0x214458 and 0x94d08; falls into 0x95018; callers 95e58@96320; docs/compiler-abi.md
+0x0009783c	reset_record_range	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009783c (16 bytes); word+6=0 word+8=EDX-1 tail 0x975f0; callers 9775c@9782c,97860@978bd; docs/compiler-abi.md
+0x00097dc0	sample_tick_counter		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00097dc0 (11 bytes); 0x10640 then return dword 0x197c14; callers 97dcc@97edb,97dcc@97f27; docs/compiler-abi.md
+0x00097f70	pointer_or_default		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00097f70 (21 bytes); 0x9c858 result or 0x18acb0; callers 3ea0c@3ed91,3ea0c@3ed9f; docs/compiler-abi.md
+0x00098000	forward_if_enabled			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00098000 (19 bytes); if byte 0x420a72 tail 0xd5f0c(dword 0x12dd98); callers 8b39c@8b4bf; docs/compiler-abi.md
+0x00098558	install_allocator_hooks			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00098558 (27 bytes); dword 0x12dd9c=0x9850c, 0x408580=0x1f4000; callers 49228@494ef; docs/compiler-abi.md
