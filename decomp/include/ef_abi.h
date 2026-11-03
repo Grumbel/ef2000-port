@@ -1489,4 +1489,29 @@ void guest_fn_e1110(uint32_t a); /* 0xe1110 */
 void guest_fn_e115c(uint32_t a); /* 0xe115c */
 void guest_fn_eb698(uint32_t a, ef_addr32 object); /* 0xeb698 */
 
+/* runtime_helpers3.c */
+ef_addr32 insert_heap_block_10d5c7(ef_addr32 block);
+ef_addr32 alloc_stream_buffer_10f071(ef_addr32 stream);
+uint32_t midi_data_length_111d98(uint32_t status);
+uint32_t byte_swap_111f50(uint32_t value);
+void strip_extension_113c24(ef_addr32 path);
+void set_owner_slot_114994(ef_addr32 owner, uint32_t slot, uint32_t index);
+void clear_buffered_record_117ea8(ef_addr32 record);
+uint32_t alloc_serial_state_117f14(ef_addr32 record);
+int32_t ring_pop_1184c4(ef_addr32 record);
+void serial_reset_1185ec(ef_addr32 record);
+void serial_set_flow_118664(ef_addr32 record, uint32_t enable);
+void serial_set_dtr_118694(ef_addr32 record, uint32_t enable);
+void serial_set_rts_1186cc(ef_addr32 record, uint32_t enable);
+void alloc_records_11c020(uint32_t count);
+void free_records_11c06c(void);
+int32_t trig_lookup_11f308(int32_t x);
+int32_t trig_lookup_11f460(int32_t x);
+int32_t trig_full_circle_11f4d8(int32_t angle);
+uint32_t guest_fn_9c430(uint32_t port); /* 0x9c430 EAX -> AL, inb */
+void guest_fn_117b0c(uint32_t port, uint32_t value); /* 0x117b0c EAX/EDX, outb */
+void guest_fn_11f2d3(void); /* 0x11f2d3 */
+void guest_fn_11f2d5(void); /* 0x11f2d5 */
+ef_addr32 guest_fn_e8733(uint32_t count, uint32_t size); /* 0xe8733 EAX/EDX -> EAX */
+
 #endif

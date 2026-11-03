@@ -2286,3 +2286,26 @@ in EAX, format string address, one value).
 | `0xfc08c` | AL:uint8_t,DX:uint16_t | EAX:uint32_t | fc0ec@fc167 | Map a mode code (and a flag word) to a table index. |
 | `0xfc478` | EAX:uint32_t | AL:uint8_t | fc4e4@fc502,fc600@fc605 | VESA call 0x4f01 for mode ECX; true when the BIOS answers 0x4f. |
 | `0xfc4e4` | none | EAX:uint32_t | fc534@fc5da | Find the first VESA mode in the list whose info has bit 7 set; returns dword +0x28 of its info. |
+
+## runtime_helpers3 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10d5c7` | EAX:ef_addr32 | EAX:ef_addr32 | 10d4c4@10d568,10d75c@10d7db,10d80b@10d91c | Insert a heap block into the address-sorted list at 0x16464c and reset it. |
+| `0x10f071` | EAX:ef_addr32 | EAX:ef_addr32 | f1d90@f1dd0,f1f5a@f1f95,f22af@f230d | Allocate the buffer of a stream record. |
+| `0x111d98` | EAX:uint32_t | EAX:uint32_t | 111e40@111e4b,112c10@113021 | Number of data bytes of a MIDI status byte (cdecl). |
+| `0x111f50` | EAX:uint32_t | EAX:uint32_t | 111f84@111fc4,111f84@112031,113d10@113d60 | Byte-swap a dword (cdecl). |
+| `0x113c24` | EAX:ef_addr32 | none | 103504@103527 | Copy a path to 0x17e1d8 and cut the extension (cdecl). |
+| `0x114994` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 103b90@103bc0 | Record slot b of owner a as value c-1 (cdecl). |
+| `0x117ea8` | EAX:ef_addr32 | none | 118290@118384,118290@1183a5 | Free the buffer of a record and clear the record. |
+| `0x117f14` | EAX:ef_addr32 | EAX:uint32_t | 117f68@11800a | Allocate the 0x1a-byte state block of a serial record. |
+| `0x1184c4` | EAX:ef_addr32 | EAX:int32_t | 106cb0@106cd7,106d34@106d6b,106dc4@106de0 | Pop one byte from the ring buffer of a serial record, -1 if empty. |
+| `0x1185ec` | EAX:ef_addr32 | none | 106d34@106d46,107070@10708e,107070@107119 | Reset both ring buffers of a serial record and quiesce the port. |
+| `0x118664` | EAX:ef_addr32,EDX:uint32_t | none | 106f10@106fee | Set or clear the hardware-flow flag of a serial record. |
+| `0x118694` | EAX:ef_addr32,EDX:uint32_t | none | 106f10@106fd9,117f68@11827f | Set or clear bit 0 of the modem control register. |
+| `0x1186cc` | EAX:ef_addr32,EDX:uint32_t | none | 106f10@106fe5,117f68@118273 | Set or clear bit 1 of the modem control register. |
+| `0x11c020` | EAX:uint32_t | none | 10a580@10a8ac,10c1b0@10c4d8 | Allocate and clear n records of 0xd5 bytes at 0x4ddee0. |
+| `0x11c06c` | none | none | 11c020@11c02d | Free the five records at 0x4ddee0 and their 0x69 sub-buffers. |
+| `0x11f308` | EAX:int32_t | EAX:int32_t | 11f368@11f3c0,11f368@11f3d9,11f368@11f3f7 | Interpolated table lookup (6-bit fraction, 0x17ea2c table), result >> 14. |
+| `0x11f460` | EAX:int32_t | EAX:int32_t | 11f4d8@11f4f6,11f4d8@11f50d,11f4d8@11f52c | Table lookup of x * 2^14 / 0x6487 (0x17e628 table), result >> 14. |
+| `0x11f4d8` | EAX:int32_t | EAX:int32_t | 11f538@11f53d,11f538@11f54a | Full-circle (0x1921f units) wrapper around trig_lookup_11f460. |

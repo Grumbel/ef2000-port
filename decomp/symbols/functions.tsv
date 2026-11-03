@@ -3979,7 +3979,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010d427	63	unlink_node_10d427	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010d427.json	docs/compiler-abi.md; Unlink a node from the doubly linked list with heads at dwords 0x164650 and 0x16464c.; callers 10d466@10d48f,10d4c4@10d4fc; guest pending
 0x0010d466	94			unknown	unclassified	unverified		
 0x0010d4c4	259			unknown	unclassified	unverified		
-0x0010d5c7	116			unknown	unclassified	unverified		
+0x0010d5c7	116	insert_heap_block_10d5c7	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0010d5c7.json	docs/compiler-abi.md; Insert a heap block into the address-sorted list at 0x16464c and reset it.; callers 10d4c4@10d568,10d75c@10d7db,10d80b@10d91c; guest pending
 0x0010d63b	78			unknown	unclassified	unverified		
 0x0010d689	211			unknown	unclassified	unverified		
 0x0010d75c	175			unknown	unclassified	unverified		
@@ -4022,7 +4022,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010edb4	38	parse_decimal	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010edb4.json	docs/compiler-abi.md; Parse decimal digits at EAX into *EDX; returns the pointer after them.; callers 10edda@10ee89,10edda@10ee9e,10edda@10eeb0; guest pending
 0x0010edda	278			unknown	unclassified	unverified		
 0x0010eef0	242			unknown	unclassified	unverified		
-0x0010f071	119			unknown	unclassified	unverified		
+0x0010f071	119	alloc_stream_buffer_10f071	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0010f071.json	docs/compiler-abi.md; Allocate the buffer of a stream record.; callers f1d90@f1dd0,f1f5a@f1f95,f22af@f230d; guest pending
 0x0010f0e8	31			unknown	unclassified	unverified		
 0x0010f107	137			unknown	unclassified	unverified		
 0x0010f190	47	stream_getc	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f190.json	docs/compiler-abi.md; Read one byte from a counted buffer stream; -1 at the end.; callers 10f107@10f13a,10f107@10f165; guest pending
@@ -4087,12 +4087,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001115f0	10			unknown	unclassified	unverified		
 0x001115fc	54			unknown	unclassified	unverified		
 0x00111c90	262			unknown	unclassified	unverified		
-0x00111d98	88			unknown	unclassified	unverified		
+0x00111d98	88	midi_data_length_111d98	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00111d98.json	docs/compiler-abi.md; Number of data bytes of a MIDI status byte (cdecl).; callers 111e40@111e4b,112c10@113021; guest pending
 0x00111df0	77			unknown	unclassified	unverified		
 0x00111e40	146			unknown	unclassified	unverified		
 0x00111ed4	76			unknown	unclassified	unverified		
 0x00111f20	45			unknown	unclassified	unverified		
-0x00111f50	52			unknown	unclassified	unverified		
+0x00111f50	52	byte_swap_111f50	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00111f50.json	docs/compiler-abi.md; Byte-swap a dword (cdecl).; callers 111f84@111fc4,111f84@112031,113d10@113d60; guest pending
 0x00111f84	196			unknown	unclassified	unverified		
 0x00112048	408			unknown	unclassified	unverified		
 0x001121e0	449			unknown	unclassified	unverified		
@@ -4110,7 +4110,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00113a40	115			unknown	unclassified	unverified		
 0x00113af0	117			unknown	unclassified	unverified		
 0x00113b78	169			unknown	unclassified	unverified		
-0x00113c24	86			unknown	unclassified	unverified		
+0x00113c24	86	strip_extension_113c24	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00113c24.json	docs/compiler-abi.md; Copy a path to 0x17e1d8 and cut the extension (cdecl).; callers 103504@103527; guest pending
 0x00113c7c	120			unknown	unclassified	unverified		
 0x00113cf4	27			unknown	unclassified	unverified		
 0x00113d10	794			unknown	unclassified	unverified		
@@ -4124,7 +4124,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011458c	138			unknown	unclassified	unverified		
 0x001146ec	394			unknown	unclassified	unverified		
 0x00114878	284			unknown	unclassified	unverified		
-0x00114994	52			unknown	unclassified	unverified		
+0x00114994	52	set_owner_slot_114994	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00114994.json	docs/compiler-abi.md; Record slot b of owner a as value c-1 (cdecl).; callers 103b90@103bc0; guest pending
 0x001149e0	178			unknown	unclassified	unverified		
 0x00114ad8	244			unknown	unclassified	unverified		
 0x0011580e	99			unknown	unclassified	unverified		
@@ -4141,18 +4141,18 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00117bfc	314			unknown	unclassified	unverified		
 0x00117dd8	50			unknown	unclassified	unverified		
 0x00117e0c	153			unknown	unclassified	unverified		
-0x00117ea8	44			unknown	unclassified	unverified		
+0x00117ea8	44	clear_buffered_record_117ea8	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00117ea8.json	docs/compiler-abi.md; Free the buffer of a record and clear the record.; callers 118290@118384,118290@1183a5; guest pending
 0x00117ed4	62			unknown	unclassified	unverified		
-0x00117f14	82			unknown	unclassified	unverified		
+0x00117f14	82	alloc_serial_state_117f14	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00117f14.json	docs/compiler-abi.md; Allocate the 0x1a-byte state block of a serial record.; callers 117f68@11800a; guest pending
 0x00117f68	807			unknown	unclassified	unverified		
 0x00118290	408			unknown	unclassified	unverified		
 0x00118428	98			unknown	unclassified	unverified		
-0x001184c4	92			unknown	unclassified	unverified		
+0x001184c4	92	ring_pop_1184c4	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x001184c4.json	docs/compiler-abi.md; Pop one byte from the ring buffer of a serial record, -1 if empty.; callers 106cb0@106cd7,106d34@106d6b,106dc4@106de0; guest pending
 0x00118520	29			unknown	unclassified	unverified		
-0x001185ec	117			unknown	unclassified	unverified		
-0x00118664	47			unknown	unclassified	unverified		
-0x00118694	53			unknown	unclassified	unverified		
-0x001186cc	53			unknown	unclassified	unverified		
+0x001185ec	117	serial_reset_1185ec	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x001185ec.json	docs/compiler-abi.md; Reset both ring buffers of a serial record and quiesce the port.; callers 106d34@106d46,107070@10708e,107070@107119; guest pending
+0x00118664	47	serial_set_flow_118664	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00118664.json	docs/compiler-abi.md; Set or clear the hardware-flow flag of a serial record.; callers 106f10@106fee; guest pending
+0x00118694	53	serial_set_dtr_118694	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00118694.json	docs/compiler-abi.md; Set or clear bit 0 of the modem control register.; callers 106f10@106fd9,117f68@11827f; guest pending
+0x001186cc	53	serial_set_rts_1186cc	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x001186cc.json	docs/compiler-abi.md; Set or clear bit 1 of the modem control register.; callers 106f10@106fe5,117f68@118273; guest pending
 0x00118770	277			unknown	unclassified	unverified		
 0x00118910	368			unknown	unclassified	unverified		
 0x00118b10	76			unknown	unclassified	unverified		
@@ -4213,8 +4213,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011bf28	78			unknown	unclassified	unverified		
 0x0011bf78	77			unknown	unclassified	unverified		
 0x0011bfc8	74			unknown	unclassified	unverified		
-0x0011c020	76			unknown	unclassified	unverified		
-0x0011c06c	56			unknown	unclassified	unverified		
+0x0011c020	76	alloc_records_11c020	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011c020.json	docs/compiler-abi.md; Allocate and clear n records of 0xd5 bytes at 0x4ddee0.; callers 10a580@10a8ac,10c1b0@10c4d8; guest pending
+0x0011c06c	56	free_records_11c06c	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011c06c.json	docs/compiler-abi.md; Free the five records at 0x4ddee0 and their 0x69 sub-buffers.; callers 11c020@11c02d; guest pending
 0x0011c0a4	13			unknown	unclassified	unverified		
 0x0011c0b4	342	initialize_packed_vector_record	unk_geometry	typed	game	confirmed		ABI only; EAX/EDX pointers; 0xd5-byte record, x87 initialization
 0x0011c20c	323			unknown	unclassified	unverified		
@@ -4239,10 +4239,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011f287	76			unknown	unclassified	unverified		
 0x0011f2d3	2			unknown	unclassified	unverified		
 0x0011f2d5	2			unknown	unclassified	unverified		
-0x0011f308	79			unknown	unclassified	unverified		
+0x0011f308	79	trig_lookup_11f308	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011f308.json	docs/compiler-abi.md; Interpolated table lookup (6-bit fraction, 0x17ea2c table), result >> 14.; callers 11f368@11f3c0,11f368@11f3d9,11f368@11f3f7; guest pending
 0x0011f368	248			unknown	unclassified	unverified		
-0x0011f460	117			unknown	unclassified	unverified		
-0x0011f4d8	94			unknown	unclassified	unverified		
+0x0011f460	117	trig_lookup_11f460	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011f460.json	docs/compiler-abi.md; Table lookup of x * 2^14 / 0x6487 (0x17e628 table), result >> 14.; callers 11f4d8@11f4f6,11f4d8@11f50d,11f4d8@11f52c; guest pending
+0x0011f4d8	94	trig_full_circle_11f4d8	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011f4d8.json	docs/compiler-abi.md; Full-circle (0x1921f units) wrapper around trig_lookup_11f460.; callers 11f538@11f53d,11f538@11f54a; guest pending
 0x0011f538	28			unknown	unclassified	unverified		
 0x0011f6d8	279			unknown	unclassified	unverified		
 0x0011f7ef	10			unknown	unclassified	unverified		
