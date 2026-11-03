@@ -1141,3 +1141,12 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00055f0c	send_object_words_55f0c	AX:int16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055f0c (69 bytes); Send an object's parameters with four caller words (command 0x27).; callers 90124@901e0; docs/compiler-abi.md
 0x00056f6c	send_triple_56f6c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00056f6c (58 bytes); Send the three words at 0x12583c (command 0x34).; callers 3dd30@3e2e7; docs/compiler-abi.md
 0x000570c8	send_player_57_570c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000570c8 (51 bytes); ; callers 581b0@58507; docs/compiler-abi.md
+0x0009ddfc	call_9de08_9ddfc	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009ddfc (10 bytes); Call 0x9de08 with a zero second argument.; callers 9820@9ace,2a720@2a76e,2a7ac@2a7d1; docs/compiler-abi.md
+0x000a28f2	abs_a28f2	EAX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a28f2 (7 bytes); Absolute value.; callers 20ec@2128,20ec@2142,20ec@215a; docs/compiler-abi.md
+0x000ab838	set_global_ab838	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ab838 (6 bytes); ; callers 84d94@84db1; docs/compiler-abi.md
+0x000b3d60	get_global_b3d60		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b3d60 (6 bytes); ; callers 3d4b0@3d72f; docs/compiler-abi.md
+0x000b3f48	get_global_b3f48		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b3f48 (6 bytes); ; callers a7b8c@a7b8c,a992c@a9988,a9e70@a9e74; docs/compiler-abi.md
+0x000b3f50	get_global_b3f50		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b3f50 (6 bytes); ; callers a7bb0@a7bb0,a9990@a99ba,a9e70@aa02d; docs/compiler-abi.md
+0x000c3824	get_global_c3824		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c3824 (6 bytes); ; callers eac48@eaca8; docs/compiler-abi.md
+0x000c382c	get_global_c382c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c382c (6 bytes); ; callers ab8b0@ab8b3,c9fc4@ca07c,c9fc4@ca142; docs/compiler-abi.md
+0x000b55a4	random_modulo_b55a4	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b55a4 (34 bytes); Random number modulo the signed high word at +0x2 of the record.; callers b7d4c@b7da2,b7d4c@b7dbf,b8510@b85c5; docs/compiler-abi.md

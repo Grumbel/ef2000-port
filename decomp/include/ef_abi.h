@@ -1893,4 +1893,16 @@ void send_triple_56f6c(void);
 void send_player_57_570c8(void);
 void guest_fn_78aa8(ef_addr32 text); /* 0x78aa8 EAX */
 
+/* runtime_helpers6.c */
+uint32_t call_9de08_9ddfc(ef_addr32 text);
+uint32_t abs_a28f2(int32_t value);
+void set_global_ab838(uint32_t value);
+uint32_t get_global_b3d60(void);
+uint32_t get_global_b3f48(void);
+uint32_t get_global_b3f50(void);
+uint32_t get_global_c3824(void);
+uint32_t get_global_c382c(void);
+int32_t random_modulo_b55a4(ef_addr32 record);
+uint32_t guest_fn_9de08(ef_addr32 text, uint32_t flag); /* 0x9de08 EAX/EDX */
+
 #endif

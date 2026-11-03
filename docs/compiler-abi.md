@@ -2647,3 +2647,17 @@ in EAX, format string address, one value).
 | `0x55f0c` | AX:int16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t | none | 90124@901e0 | Send an object's parameters with four caller words (command 0x27). |
 | `0x56f6c` | none | none | 3dd30@3e2e7 | Send the three words at 0x12583c (command 0x34). |
 | `0x570c8` | none | none | 581b0@58507 |  |
+
+## runtime_helpers6 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9ddfc` | EAX:ef_addr32 | EAX:uint32_t | 9820@9ace,2a720@2a76e,2a7ac@2a7d1 | Call 0x9de08 with a zero second argument. |
+| `0xa28f2` | EAX:int32_t | EAX:uint32_t | 20ec@2128,20ec@2142,20ec@215a | Absolute value. |
+| `0xab838` | EAX:uint32_t | none | 84d94@84db1 |  |
+| `0xb3d60` | none | EAX:uint32_t | 3d4b0@3d72f |  |
+| `0xb3f48` | none | EAX:uint32_t | a7b8c@a7b8c,a992c@a9988,a9e70@a9e74 |  |
+| `0xb3f50` | none | EAX:uint32_t | a7bb0@a7bb0,a9990@a99ba,a9e70@aa02d |  |
+| `0xc3824` | none | EAX:uint32_t | eac48@eaca8 |  |
+| `0xc382c` | none | EAX:uint32_t | ab8b0@ab8b3,c9fc4@ca07c,c9fc4@ca142 |  |
+| `0xb55a4` | EAX:ef_addr32 | EAX:int32_t | b7d4c@b7da2,b7d4c@b7dbf,b8510@b85c5 | Random number modulo the signed high word at +0x2 of the record. |
