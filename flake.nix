@@ -538,6 +538,16 @@
           grep -qi 'lookup_scene_node' work/scene_indexed.asm
           grep -qi 'clear_paired_object_marks' work/scene_indexed.asm
           ! grep -qi '__CHK' work/scene_indexed.asm
+          for module in buffer_cursor plane_sources object_table_queries scene_ui_flag; do
+            ${watcomWorkflow}/bin/ef2000-wcc \
+              ${source}/decomp/src/$module.c --output "$PWD/work/$module.obj"
+            ${watcom}/bin/wdis work/$module.obj -l=work/$module.asm
+            ! grep -qi '__CHK' work/$module.asm
+          done
+          grep -qi 'buffer_read_word' work/buffer_cursor.asm
+          grep -qi 'read_plane_cell' work/plane_sources.asm
+          grep -qi 'indexed_object_is_canonical' work/object_table_queries.asm
+          grep -qi 'request_scene_refresh' work/scene_ui_flag.asm
           $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
             ${source}/tests/decomp_object_control_test.c \
@@ -596,6 +606,16 @@
             ${source}/decomp/src/scene_indexed.c \
             -o work/scene_indexed_host_test
           work/scene_indexed_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_buffer_plane_test.c \
+            ${source}/decomp/src/buffer_cursor.c \
+            ${source}/decomp/src/plane_sources.c \
+            ${source}/decomp/src/object_table_queries.c \
+            ${source}/decomp/src/scene_ui_flag.c \
+            ${source}/decomp/src/indexed_objects.c \
+            -o work/buffer_plane_host_test
+          work/buffer_plane_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

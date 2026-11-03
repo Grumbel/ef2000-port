@@ -1,0 +1,39 @@
+{
+  "address": "0x0007a584",
+  "function_size": 27,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "write_signed",
+      "registers": {
+        "eax": "0xffff8001"
+      },
+      "memory": [
+        {
+          "address": "0x1f8e90",
+          "hex": "00002000"
+        },
+        {
+          "address": "0x1f8e94",
+          "hex": "00002000"
+        }
+      ]
+    },
+    {
+      "name": "boundary_crossing",
+      "registers": {
+        "eax": "0x00001234"
+      },
+      "memory": [
+        {
+          "address": "0x1f8e90",
+          "hex": "00002000"
+        },
+        {
+          "address": "0x1f8e94",
+          "hex": "00402000"
+        }
+      ]
+    }
+  ]
+}

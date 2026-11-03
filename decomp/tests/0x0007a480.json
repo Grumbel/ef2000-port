@@ -1,0 +1,35 @@
+{
+  "address": "0x0007a480",
+  "function_size": 33,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "below_limit",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x1f8e90",
+          "hex": "00001000"
+        },
+        {
+          "address": "0x1f8e94",
+          "hex": "00101000"
+        }
+      ]
+    },
+    {
+      "name": "over_limit",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x1f8e90",
+          "hex": "00001000"
+        },
+        {
+          "address": "0x1f8e94",
+          "hex": "02401000"
+        }
+      ]
+    }
+  ]
+}

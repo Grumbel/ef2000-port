@@ -1,0 +1,63 @@
+{
+  "address": "0x0007b2f4",
+  "function_size": 63,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "same_mode_cell",
+      "registers": {
+        "eax": "0x00000001",
+        "edx": "0x00000000",
+        "ebx": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x12afc0",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x1f8eb4",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x1f8eb8",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x002a018f",
+          "hex": "ab"
+        },
+        {
+          "address": "0x002b018f",
+          "hex": "cd"
+        }
+      ]
+    },
+    {
+      "name": "new_mode_cell",
+      "registers": {
+        "eax": "0x00000000",
+        "edx": "0x00000000",
+        "ebx": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x12afc0",
+          "hex": "ffffffff"
+        },
+        {
+          "address": "0x1f8e00",
+          "hex": "00002a0000002b0000002c00"
+        },
+        {
+          "address": "0x002a018f",
+          "hex": "12"
+        },
+        {
+          "address": "0x002b018f",
+          "hex": "34"
+        }
+      ]
+    }
+  ]
+}

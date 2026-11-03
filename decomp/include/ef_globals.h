@@ -11,6 +11,7 @@
 #include "ef_structs/object_helpers.h"
 #include "ef_structs/scene_state.h"
 #include "ef_structs/object_links.h"
+#include "ef_structs/buffer_state.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -78,5 +79,13 @@ extern ef_navigation_record g_navigation_record; /* 0x001f8d00 */
 extern ef_object_pair_mark g_object_pair_marks[]; /* 0x001f6ef4, 3-byte rows */
 extern int16_t g_object_paired_index_words[]; /* 0x001282e2, high word of 32-bit at 2*index */
 extern int32_t g_object_pair_root_packed; /* 0x001282da */
+extern ef_addr32 g_buffer_start; /* 0x001f8e90 */
+extern ef_addr32 g_buffer_cursor; /* 0x001f8e94 */
+extern int32_t g_plane_selected_mode; /* 0x0012afc0 */
+extern ef_plane_source g_plane_source_table[]; /* 0x001f8e00, stride 12 */
+extern ef_addr32 g_active_plane_high; /* 0x001f8eb4 */
+extern ef_addr32 g_active_plane_low; /* 0x001f8eb8 */
+extern ef_addr32 g_active_plane_aux; /* 0x001f8ea4 */
+extern uint8_t g_scene_refresh_pending; /* 0x0012dbc4 */
 
 #endif

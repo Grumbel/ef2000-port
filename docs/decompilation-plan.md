@@ -1006,6 +1006,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  4     Drafted seven scene-node list, child flag and event helpers (48 total) with two distinct callers each; retained 0x907f0 shared-epilogue splice warning and seven pending guest plans. Host tests pass; original-object dispatch and x87 still unverified.
 2026-11-03  4     Drafted eight more scene-state/event helpers (56 total): packed triple mirrors, full-EAX named lookup, 0xfffffffe metric offset, angle dispatch, pair probe and signed event-count history. Host tests and per-address guest plans; no Watcom/splice differential yet.
 2026-11-03  4     Drafted eight indexed-scene/object helpers (64 total): 58-caller scene node lookup, percentage grading, secondary-grid membership, record reset/child slots, navigation marker, grid-link queries and paired-object references. Host tests, byte-offset asserts and 8 guest plans; no Watcom/splice differential yet.
+2026-11-03  4     Drafted eight buffer/planar/object-table helpers (72 total): cursor bound diagnostics, signed word I/O, 12-byte plane-source selection, two-byte planar fetch, canonical object-pointer test, unguarded table slot and scene refresh latch. C host assertions and 8 guest plans; original-game differential pending.
 ```
 
 ---

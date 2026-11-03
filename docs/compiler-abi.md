@@ -1011,6 +1011,34 @@ checked by the original. Each of these eight helpers has at least two
 distinct original callers; guest-only dependencies remain mocked and
 verification is still pending.
 
+### Buffer cursor, planar scene and object identity helpers
+
+Eight more leaf-sized functions have multiple distinct original callers.
+`0x7a480` computes a **signed, wrapping** 32-bit difference of the pointers
+at `0x1f8e94` and `0x1f8e90`, reporting only when greater than `0x4000`
+through the original indirect diagnostic at `0x132a74`. `0x7a584`
+stores signed AX and advances by two *before* that capacity check;
+`0x7a5a0` reads and sign-extends the word, advances by two and checks.
+These routines lack a pre-access bounds check; host tests preserve that
+ordering, and the diagnostic remains a guest-only dependency.
+
+`0x7aac0` selects a planar data source from twelve-byte records at
+`0x1f8e00`, keyed by full EAX and cached at `0x12afc0`. On a mode change,
+it copies the record's +8/+4/+0 pointers to `0x1f8ea4`/`0x1f8eb8`/
+`0x1f8eb4` respectively, leaving EAX equal to the last source pointer;
+on the unchanged branch EAX remains the mode. `0x7b2f4` then reads a byte
+from each selected plane at `(row*400 + 399 - column)` and combines them
+as high and low bytes of a word. Its original instructions clear **AH
+only** after reading the low byte, so an out-of-range column may leak the
+high word of `399-column` into EAX; the drafted model deliberately keeps it.
+
+`0x8c09c` tests whether a guest object pointer equals the indexed object
+lookup for the signed high word at object +`0x14`. `0x8c0bc` sign-extends
+AX and performs an **unguarded** four-byte pointer-table fetch from
+`0x20f550`; unlike the earlier guarded `0x6a1b4`, it never checks count or
+zero. `0x95018` simply sets the byte latch at `0x12dbc4` to one. All
+eight are synthetic host models with pending original-game checks.
+
 ## Comparing assembly
 
 ```sh

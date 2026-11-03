@@ -1,0 +1,31 @@
+{
+  "address": "0x0008c0bc",
+  "function_size": 9,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "slot_zero",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x20f550",
+          "hex": "00002a00"
+        }
+      ]
+    },
+    {
+      "name": "slot_three_high_bits",
+      "registers": {
+        "eax": "0x12340003"
+      },
+      "memory": [
+        {
+          "address": "0x20f55c",
+          "hex": "00002b00"
+        }
+      ]
+    }
+  ]
+}

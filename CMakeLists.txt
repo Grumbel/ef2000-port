@@ -101,6 +101,15 @@ target_compile_options(ef2000-decomp-scene-indexed-test PRIVATE -Wall -Wextra -W
 target_compile_definitions(ef2000-decomp-scene-indexed-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-scene-indexed-test PRIVATE decomp/include)
 add_test(NAME decomp-scene-indexed-host-model COMMAND ef2000-decomp-scene-indexed-test)
+add_executable(ef2000-decomp-buffer-plane-test
+  tests/decomp_buffer_plane_test.c decomp/src/buffer_cursor.c
+  decomp/src/plane_sources.c decomp/src/object_table_queries.c
+  decomp/src/scene_ui_flag.c decomp/src/indexed_objects.c)
+target_compile_features(ef2000-decomp-buffer-plane-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-buffer-plane-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-buffer-plane-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-buffer-plane-test PRIVATE decomp/include)
+add_test(NAME decomp-buffer-plane-host-model COMMAND ef2000-decomp-buffer-plane-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

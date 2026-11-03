@@ -144,6 +144,17 @@ int16_t check_special_object_grid_link(int16_t index); /* 0x6aa70, AX -> AX */
 uint8_t dispatch_object_grid_link(int16_t index, int16_t linked); /* 0x6abac, AX/EDX -> AL */
 void clear_object_pair_reference(int16_t root, int16_t other, int32_t sentinel); /* 0xe7c50, EAX/EBX/EDX */
 
+/* Buffer cursor / planar lookup and indexed-object identity helpers. */
+void check_buffer_capacity(void); /* 0x7a480, no inputs */
+void buffer_write_word(int16_t value); /* 0x7a584, AX */
+int32_t buffer_read_word(void); /* 0x7a5a0, EAX signed */
+ef_addr32 select_plane_source(int32_t mode); /* 0x7aac0, EAX */
+uint32_t read_plane_cell(int32_t mode, int32_t row, int32_t column); /* 0x7b2f4, EAX/EDX/EBX -> EAX */
+uint8_t indexed_object_is_canonical(ef_addr32 object); /* 0x8c09c, EAX -> AL */
+ef_addr32 indexed_object_direct_slot(int16_t slot); /* 0x8c0bc, AX -> EAX; unguarded */
+void request_scene_refresh(void); /* 0x95018 */
+void report_buffer_capacity_exceeded(ef_addr32 message); /* original indirect call via 0x132a74 */
+
 /* Original dependencies at 0x2dc84/0x2dbf8; no separately confirmed ABIs. */
 uint8_t grid_reference_distance_matches(int16_t cell); /* 0x0002dc84 */
 uint8_t grid_external_distance_matches(int16_t cell, uint8_t probe); /* 0x0002dbf8 */

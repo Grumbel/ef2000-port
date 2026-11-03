@@ -1,0 +1,27 @@
+{
+  "address": "0x00095018",
+  "function_size": 8,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "clear_latch",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x12dbc4",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "already_set",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x12dbc4",
+          "hex": "01"
+        }
+      ]
+    }
+  ]
+}

@@ -61,3 +61,11 @@ addr	size	type	name	evidence	notes
 0x001f6ef4	3 * count	ef_object_pair_mark[]	g_object_pair_marks	0x68c3a/0x68c4b/0x68c53/0x68c5c writes	3-byte rows: state byte, 16-bit option
 0x001282e2	2 * count	int16_t[]	g_object_paired_index_words	0x68c2f and 0x68c7a load high half from +2*index	Overlapping dword high word represented as words[index+1]
 0x001282da	4	int32_t	g_object_pair_root_packed	0x68c63/0x68c80 high signed word read	Root index passed to 0xe7c50 in EAX
+0x001f8e90	4	ef_addr32	g_buffer_start	0x7a480 signed subtraction	Start of mutable serialization cursor buffer
+0x001f8e94	4	ef_addr32	g_buffer_cursor	0x7a480/0x7a584/0x7a5a0 read/write	Cursor moves by exactly two bytes before overflow checks
+0x0012afc0	4	int32_t	g_plane_selected_mode	0x7aac0 equality/read/write	Full EAX mode, no bounds guard
+0x001f8e00	12 * count	ef_plane_source[]	g_plane_source_table	0x7aac0 indexed loads	Mode records: high, low and auxiliary pointers
+0x001f8eb4	4	ef_addr32	g_active_plane_high	0x7aac0 writes/0x7b2f4 reads	High-plane bytes of 400-byte rows
+0x001f8eb8	4	ef_addr32	g_active_plane_low	0x7aac0 writes/0x7b2f4 reads	Low-plane bytes of 400-byte rows
+0x001f8ea4	4	ef_addr32	g_active_plane_aux	0x7aac0 writes	Extra selected field not read by 0x7b2f4
+0x0012dbc4	1	uint8_t	g_scene_refresh_pending	0x95018 writes	Unconditional refresh latch set to one

@@ -1,0 +1,39 @@
+{
+  "address": "0x0008c09c",
+  "function_size": 32,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "null_object",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x2119f4",
+          "hex": "0400"
+        }
+      ]
+    },
+    {
+      "name": "registered_object",
+      "registers": {
+        "eax": "0x002a0000"
+      },
+      "memory": [
+        {
+          "address": "0x2119f4",
+          "hex": "0400"
+        },
+        {
+          "address": "0x002a0014",
+          "hex": "00000200"
+        },
+        {
+          "address": "0x20f558",
+          "hex": "00002a00"
+        }
+      ]
+    }
+  ]
+}
