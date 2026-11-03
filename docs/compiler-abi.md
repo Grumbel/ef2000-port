@@ -971,6 +971,46 @@ original callback `0x86920` always fires. All side-effect callees remain
 unrecovered dependencies, with host mocks only; no compiled guest
 replacement has been spliced or verified.
 
+### Indexed scene and object-link helpers (0x68c18–0x8ffe8)
+
+The scene-node lookup `0x8ffe8` has **58 distinct original callers**. It
+subtracts `0x2001` from EAX, tests only the resulting signed AX against zero
+and the signed count at `0x211ae0`, and returns the pointer stored in the
+four-byte array pointed to by `0x211ad0`. Its shared epilogue at `0x9000a`
+is also an explicit *cross-function* branch target of `0x907f0`. Either
+function's individual replacement requires special care to preserve both
+entry paths; normal in-place splicing cannot assume the body is isolated.
+
+`0x75620` grades unsigned AL as 0→6, 1–49→4, 50–74→3, 75–99→2 and
+100–255→1, writing a full EAX category. `0x7574c` requires the filtered
+index lookup to succeed, then recognizes the signed high word of the
+selector at `0x1f71c8` or (when alternate grid mode is active) one of the
+`0x1b`-byte external probes beginning at `0x1a5c2e`. `0x75c84` clears a
+dword at `0x128550` and the adjacent words `0x1f88ee`/`f0`.
+
+`0x76b30` uses the byte at parent object +`0x187` to select a 25-byte
+link-table row pointed to by `0x1f8918`, writes BX into word slot
+`3 + 2*DL`, then, if BX resolves to a valid filtered child, stores DL to
+child +`0x18c`, zeros +`0x18a`, and copies the parent word +`0x16` to
+child +`0x188`. It has no slot bounds check. `0x78aa8` copies a source
+record to guest address `0x1f8d00` via original callback `0x9d749`, then
+sets the word at +`0x56` to `0x118`.
+
+`0x6ae30` uses the signed high word at object +`0x26` as a `0xca`-byte
+grid-row index. When row +`0x1b` is `0xb`, it returns whether the **full
+AX** returned by `0x6aa70` is nonzero. Otherwise the high signed word at
+row +`0xb7` selects a linked index, with exactly `0xff` as a rejection
+sentinel; on success it marks row +`0xbb` before calling `0x6abac`.
+`0x68c18` clears the 3-byte marks of an object and its paired index,
+the latter taken from the *high word* at `0x1282e2 + 2*index`, i.e.
+`g_object_paired_index_words[index+1]`. It calls original `0xe7c50` twice
+with a root high word in EAX, the current index in EBX, and EDX=-1. The
+second call reloads both global values after the first callback, which the
+host test explicitly exercises. Negative or out-of-range indexes are not
+checked by the original. Each of these eight helpers has at least two
+distinct original callers; guest-only dependencies remain mocked and
+verification is still pending.
+
 ## Comparing assembly
 
 ```sh

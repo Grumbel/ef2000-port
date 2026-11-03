@@ -1,0 +1,26 @@
+{
+  "address": "0x00078aa8",
+  "function_size": 24,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_source",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "record_source",
+      "registers": {
+        "eax": "0x002b0000"
+      },
+      "memory": [
+        {
+          "address": "0x002b0000",
+          "hex": "78563412"
+        }
+      ]
+    }
+  ]
+}

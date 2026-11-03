@@ -42,7 +42,8 @@ typedef struct EF_PACKED ef_world_grid_cell {
     uint32_t retained_b;              /* +0x95 */
     uint32_t pending_a;               /* +0x99 */
     uint32_t pending_b;               /* +0x9d */
-    uint8_t unknown_a1[0x1a];
+    uint8_t unknown_a1[0x16];
+    int32_t row_link_packed;          /* +0xb7, high signed word */
     uint8_t link_pending_marker;      /* +0xbb, mode-dependent sentinel */
     uint8_t category_code;            /* +0xbc, selected object feature */
     uint8_t unknown_bd[0x0d];
@@ -73,6 +74,7 @@ EF_STATIC_ASSERT(ef_grid_retained_a_off, offsetof(ef_world_grid_cell, retained_a
 EF_STATIC_ASSERT(ef_grid_retained_b_off, offsetof(ef_world_grid_cell, retained_b) == 0x95);
 EF_STATIC_ASSERT(ef_grid_pending_a_off, offsetof(ef_world_grid_cell, pending_a) == 0x99);
 EF_STATIC_ASSERT(ef_grid_pending_b_off, offsetof(ef_world_grid_cell, pending_b) == 0x9d);
+EF_STATIC_ASSERT(ef_grid_row_link_off, offsetof(ef_world_grid_cell, row_link_packed) == 0xb7);
 EF_STATIC_ASSERT(ef_grid_link_pending_off, offsetof(ef_world_grid_cell, link_pending_marker) == 0xbb);
 EF_STATIC_ASSERT(ef_grid_category_off, offsetof(ef_world_grid_cell, category_code) == 0xbc);
 

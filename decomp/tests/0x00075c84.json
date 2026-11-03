@@ -1,0 +1,35 @@
+{
+  "address": "0x00075c84",
+  "function_size": 27,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "nonzero_controls",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x128550",
+          "hex": "78563412"
+        },
+        {
+          "address": "0x1f88ee",
+          "hex": "02000400"
+        }
+      ]
+    },
+    {
+      "name": "alternate_controls",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x128550",
+          "hex": "ffffffff"
+        },
+        {
+          "address": "0x1f88ee",
+          "hex": "ffff8000"
+        }
+      ]
+    }
+  ]
+}

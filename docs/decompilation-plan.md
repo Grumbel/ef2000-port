@@ -1005,6 +1005,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  4     Drafted eight 2D geometry, object limit and motion helpers (41 total) with ABI evidence, packed offsets, two-dimensional-only distance quirks and eight guest plans; host tests pass, Watcom/guest checks pending.
 2026-11-03  4     Drafted seven scene-node list, child flag and event helpers (48 total) with two distinct callers each; retained 0x907f0 shared-epilogue splice warning and seven pending guest plans. Host tests pass; original-object dispatch and x87 still unverified.
 2026-11-03  4     Drafted eight more scene-state/event helpers (56 total): packed triple mirrors, full-EAX named lookup, 0xfffffffe metric offset, angle dispatch, pair probe and signed event-count history. Host tests and per-address guest plans; no Watcom/splice differential yet.
+2026-11-03  4     Drafted eight indexed-scene/object helpers (64 total): 58-caller scene node lookup, percentage grading, secondary-grid membership, record reset/child slots, navigation marker, grid-link queries and paired-object references. Host tests, byte-offset asserts and 8 guest plans; no Watcom/splice differential yet.
 ```
 
 ---

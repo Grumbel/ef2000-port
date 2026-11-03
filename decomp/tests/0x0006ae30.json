@@ -1,0 +1,51 @@
+{
+  "address": "0x0006ae30",
+  "function_size": 130,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "missing_index",
+      "registers": {
+        "eax": "0x00000003"
+      },
+      "memory": [
+        {
+          "address": "0x2119f4",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "linked_row_sentinel",
+      "registers": {
+        "eax": "0x00000003"
+      },
+      "memory": [
+        {
+          "address": "0x2119f4",
+          "hex": "0400"
+        },
+        {
+          "address": "0x20f55c",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x002b0026",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x19bb58",
+          "hex": "00002c00"
+        },
+        {
+          "address": "0x002c001b",
+          "hex": "00"
+        },
+        {
+          "address": "0x002c00b7",
+          "hex": "0000ff00"
+        }
+      ]
+    }
+  ]
+}

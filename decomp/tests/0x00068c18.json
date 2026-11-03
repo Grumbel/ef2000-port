@@ -1,0 +1,39 @@
+{
+  "address": "0x00068c18",
+  "function_size": 124,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "paired_zero",
+      "registers": {
+        "eax": "0x00000001"
+      },
+      "memory": [
+        {
+          "address": "0x1282e4",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x1282da",
+          "hex": "00000400"
+        }
+      ]
+    },
+    {
+      "name": "paired_secondary",
+      "registers": {
+        "eax": "0x00000002"
+      },
+      "memory": [
+        {
+          "address": "0x1282e6",
+          "hex": "00000500"
+        },
+        {
+          "address": "0x1282da",
+          "hex": "00000900"
+        }
+      ]
+    }
+  ]
+}

@@ -1230,7 +1230,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00068a2c	52			unknown	unclassified	unverified		
 0x00068a60	401			unknown	unclassified	unverified		
 0x00068bf4	33			unknown	unclassified	unverified		
-0x00068c18	124			unknown	unclassified	unverified		
+0x00068c18	124	clear_paired_object_marks	scene_indexed	drafted	game	confirmed	decomp/tests/0x00068c18.json	docs/compiler-abi.md
 0x00068ccc	439	test_indexed_object_bit	unk_geometry	typed	game	confirmed		ABI only; AX signed slot, DX 0..12 bit, AL 0xff/0; CS jump table
 0x00068e84	120			unknown	unclassified	unverified		
 0x00068efc	66			unknown	unclassified	unverified		
@@ -1281,7 +1281,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a8fc	369			unknown	unclassified	unverified		
 0x0006aa70	316			unknown	unclassified	unverified		
 0x0006abac	331			unknown	unclassified	unverified		
-0x0006ae30	130			unknown	unclassified	unverified		
+0x0006ae30	130	indexed_object_has_grid_link	scene_indexed	drafted	game	confirmed	decomp/tests/0x0006ae30.json	docs/compiler-abi.md
 0x0006aeb4	1165			unknown	unclassified	unverified		
 0x0006b344	137			unknown	unclassified	unverified		
 0x0006b3d0	79	object_kind_is_eligible	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b3d0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
@@ -1375,14 +1375,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007548c	221			unknown	unclassified	unverified		
 0x0007556c	90			unknown	unclassified	unverified		
 0x000755c8	85			unknown	unclassified	unverified		
-0x00075620	86			unknown	unclassified	unverified		
-0x0007574c	87			unknown	unclassified	unverified		
+0x00075620	86	classify_object_percentage	scene_indexed	drafted	game	confirmed	decomp/tests/0x00075620.json	docs/compiler-abi.md
+0x0007574c	87	object_uses_secondary_grid	scene_indexed	drafted	game	confirmed	decomp/tests/0x0007574c.json	docs/compiler-abi.md
 0x000757b0	10			unknown	unclassified	unverified		
 0x000757bc	260			unknown	unclassified	unverified		
 0x000758c0	186			unknown	unclassified	unverified		
 0x0007597c	58			unknown	unclassified	unverified		
 0x000759b8	714			unknown	unclassified	unverified		
-0x00075c84	27			unknown	unclassified	unverified		
+0x00075c84	27	reset_object_link_controls	scene_indexed	drafted	game	confirmed	decomp/tests/0x00075c84.json	docs/compiler-abi.md
 0x00075ca0	608			unknown	unclassified	unverified		
 0x00075f00	1065			unknown	unclassified	unverified		
 0x0007632c	68			unknown	unclassified	unverified		
@@ -1394,7 +1394,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00076944	1			unknown	unclassified	unverified		
 0x00076948	213			unknown	unclassified	unverified		
 0x00076b10	32			unknown	unclassified	unverified		
-0x00076b30	79			unknown	unclassified	unverified		
+0x00076b30	79	attach_object_link_child	scene_indexed	drafted	game	confirmed	decomp/tests/0x00076b30.json	docs/compiler-abi.md
 0x00076b80	321			unknown	unclassified	unverified		
 0x00076cc4	358			unknown	unclassified	unverified		
 0x00076e2c	297			unknown	unclassified	unverified		
@@ -1426,7 +1426,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00078934	153			unknown	unclassified	unverified		
 0x000789d0	58			unknown	unclassified	unverified		
 0x00078a0c	155			unknown	unclassified	unverified		
-0x00078aa8	24			unknown	unclassified	unverified		
+0x00078aa8	24	configure_navigation_record	scene_indexed	drafted	game	confirmed	decomp/tests/0x00078aa8.json	docs/compiler-abi.md
 0x00078ac0	139			unknown	unclassified	unverified		
 0x00078b4c	717			unknown	unclassified	unverified		
 0x00078e1c	288			unknown	unclassified	unverified		
@@ -1855,7 +1855,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008fee0	64			unknown	unclassified	unverified		
 0x0008ff20	40			unknown	unclassified	unverified		
 0x0008ff48	159			unknown	unclassified	unverified		
-0x0008ffe8	38			unknown	unclassified	unverified		
+0x0008ffe8	38	lookup_scene_node	scene_indexed	drafted	game	confirmed	decomp/tests/0x0008ffe8.json	docs/compiler-abi.md
 0x00090050	34	scene_node_is_registered	scene_nodes	drafted	game	confirmed	decomp/tests/0x00090050.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x00090074	74	clear_scene_node_children	scene_nodes	drafted	game	confirmed	decomp/tests/0x00090074.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x000900c0	97	dispatch_scene_node_event	scene_nodes	drafted	game	confirmed	decomp/tests/0x000900c0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending

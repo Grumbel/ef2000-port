@@ -1,0 +1,21 @@
+{
+  "address": "0x00075620",
+  "function_size": 86,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_category",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "high_category",
+      "registers": {
+        "eax": "0xabcd00ff"
+      },
+      "memory": []
+    }
+  ]
+}

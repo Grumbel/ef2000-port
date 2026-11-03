@@ -1,0 +1,43 @@
+{
+  "address": "0x0007574c",
+  "function_size": 87,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "unregistered_index",
+      "registers": {
+        "eax": "0x00000005"
+      },
+      "memory": [
+        {
+          "address": "0x2119f4",
+          "hex": "0000"
+        },
+        {
+          "address": "0x1f71ca",
+          "hex": "0500"
+        }
+      ]
+    },
+    {
+      "name": "registered_selector",
+      "registers": {
+        "eax": "0x00000005"
+      },
+      "memory": [
+        {
+          "address": "0x2119f4",
+          "hex": "0600"
+        },
+        {
+          "address": "0x20f564",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x1f71ca",
+          "hex": "0500"
+        }
+      ]
+    }
+  ]
+}

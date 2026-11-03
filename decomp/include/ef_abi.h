@@ -102,8 +102,8 @@ ef_addr32 next_scene_node(ef_addr32 node); /* 0x9065c, EAX -> EAX */
 uint8_t scene_node_has_active_children(int16_t index); /* 0x906b4, AX -> AL */
 ef_addr32 next_scene_node_with_active_children(ef_addr32 node); /* 0x907f0, EAX -> EAX */
 
-/* Original dependencies, no independent ABI claims for implementations. */
-ef_addr32 lookup_scene_node(int16_t index); /* 0x8ffe8, signed AX */
+/* 0x8ffe8: signed AX scene-node slot, recovered in scene_indexed.c. */
+ef_addr32 lookup_scene_node(int16_t index);
 void notify_scene_owner(int16_t index); /* 0x3739c, signed AX */
 void dispatch_scene_node_direct(int16_t index, int16_t event, uint8_t code); /* 0x90124 */
 void dispatch_scene_node_external(int16_t index, int16_t event, uint8_t code); /* 0x55e1c */
@@ -128,6 +128,21 @@ void configure_scene_angles(int16_t z, int16_t y, int16_t x); /* 0xc4654, stack 
 uint8_t probe_scene_pair_state(int32_t base, int32_t kind, int32_t left, int32_t right); /* 0x913dc, EAX/EDX/EBX/ECX */
 void perform_scene_pair_request(int16_t left, int16_t right); /* 0x91afc, AX/DX */
 void scene_event_callback(void); /* 0x86920, original side effects */
+
+/* Indexed scene / object-link queries and mutations. */
+uint32_t classify_object_percentage(uint8_t percentage); /* 0x75620, AL -> full EAX */
+uint8_t object_uses_secondary_grid(int16_t index); /* 0x7574c, AX -> AL */
+void reset_object_link_controls(void); /* 0x75c84 */
+void attach_object_link_child(ef_addr32 parent, int16_t child, uint8_t slot); /* 0x76b30, EAX/BX/DL */
+void configure_navigation_record(ef_addr32 source); /* 0x78aa8, EAX */
+uint8_t indexed_object_has_grid_link(int16_t index); /* 0x6ae30, AX -> AL */
+void clear_paired_object_marks(int16_t index); /* 0x68c18, AX */
+
+/* Guest-only dependencies of the above helpers, not recovered C functions. */
+void copy_navigation_record(ef_addr32 target, ef_addr32 source); /* 0x9d749, EAX/EDX */
+int16_t check_special_object_grid_link(int16_t index); /* 0x6aa70, AX -> AX */
+uint8_t dispatch_object_grid_link(int16_t index, int16_t linked); /* 0x6abac, AX/EDX -> AL */
+void clear_object_pair_reference(int16_t root, int16_t other, int32_t sentinel); /* 0xe7c50, EAX/EBX/EDX */
 
 /* Original dependencies at 0x2dc84/0x2dbf8; no separately confirmed ABIs. */
 uint8_t grid_reference_distance_matches(int16_t cell); /* 0x0002dc84 */

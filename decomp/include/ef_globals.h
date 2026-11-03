@@ -10,6 +10,7 @@
 #include "ef_structs/world_grid.h"
 #include "ef_structs/object_helpers.h"
 #include "ef_structs/scene_state.h"
+#include "ef_structs/object_links.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -68,5 +69,14 @@ extern ef_scene_event_counter g_scene_event_counters; /* 0x002144aa */
 extern int16_t g_scene_event_history[]; /* 0x00214428 */
 extern int16_t g_scene_event_armed; /* 0x00214492 */
 extern uint8_t g_scene_control_code; /* 0x0012db9e */
+extern ef_addr32 g_scene_node_table; /* 0x00211ad0, index table pointer */
+extern int16_t g_scene_node_count; /* 0x00211ae0, signed count */
+extern int32_t g_object_control_reset_word; /* 0x00128550 */
+extern int16_t g_object_link_reset_fields[2]; /* 0x001f88ee, 0x1f88f0 */
+extern ef_addr32 g_object_link_record_base; /* 0x001f8918, 25-byte rows */
+extern ef_navigation_record g_navigation_record; /* 0x001f8d00 */
+extern ef_object_pair_mark g_object_pair_marks[]; /* 0x001f6ef4, 3-byte rows */
+extern int16_t g_object_paired_index_words[]; /* 0x001282e2, high word of 32-bit at 2*index */
+extern int32_t g_object_pair_root_packed; /* 0x001282da */
 
 #endif
