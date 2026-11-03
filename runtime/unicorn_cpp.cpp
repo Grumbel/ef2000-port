@@ -1424,6 +1424,16 @@ public:
             std::cout << " sdl_polls=" << window.input_polls()
                       << " rendered_frames=" << window.frames_presented();
         std::cout << '\n';
+        // X-32's allocator owns the guest heap/stack boundary. These are
+        // observed allocation watermarks, NOT proof that unallocated guest
+        // addresses can safely host executable patch code.
+        std::cout << "x32_memory: heap_peak=0x" << std::hex << heap_peak_
+                  << " stack_low=0x" << stack_low_
+                  << " heap_end=0x" << heap_end_
+                  << " stack_end=0x" << stack_end_ << std::dec
+                  << " free_bytes=" << free_bytes_
+                  << " heap_calls=" << heap_calls_
+                  << " stack_calls=" << stack_calls_ << '\n';
         if (profile_video_frames) {
             std::cout << "video_frames: image_presentations=" << window.image_frames()
                       << " changed_images=" << window.changed_image_frames()
@@ -1567,6 +1577,8 @@ private:
     uint32_t heap_end_ = 0x4df000;
     uint32_t stack_end_ = (0x3fff000 - 0x126a) & 0xfffff000;
     uint32_t free_bytes_ = stack_end_ - 0x4e1000;
+    uint32_t heap_peak_ = heap_end_, stack_low_ = stack_end_;
+    uint64_t heap_calls_{}, stack_calls_{};
     uint32_t conventional_end_ = 0x10000;
     struct Selector { bool active{}; uint32_t base{}, limit{0xffffffff}; };
     std::array<Selector, 16> selectors_{};
@@ -2504,6 +2516,8 @@ private:
                 return fail("stack reserve exhausted");
             free_bytes_ -= stack_end_ - boundary;
             stack_end_ = boundary;
+            ++stack_calls_;
+            stack_low_ = std::min(stack_low_, stack_end_);
             const uint32_t old = boundary - free_bytes_;
             after.dx = old - 1;
             after.flags = dec_flags(old, after.dx, before.flags);
@@ -2512,6 +2526,8 @@ private:
             if (rounded >= IMAGE_SIZE || (rounded > heap_end_ && rounded - heap_end_ > free_bytes_))
                 return fail("heap growth exhausted");
             if (rounded > heap_end_) { free_bytes_ -= rounded - heap_end_; heap_end_ = rounded; }
+            ++heap_calls_;
+            heap_peak_ = std::max(heap_peak_, heap_end_);
             const uint32_t floor = stack_end_ - free_bytes_;
             after.ax = std::max(floor, 0x4e1000u);
             after.cx = heap_end_;

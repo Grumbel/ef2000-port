@@ -81,6 +81,9 @@ extern void signal_entry(void);
 #endif
 static u8 signal_stack[32768];
 static struct x32_allocation allocation;
+/* Monotone process-local watermarks; deliberately not part of guest state.
+ * Loading a guest checkpoint must not erase allocation history of this run. */
+static u32 heap_peak, stack_low, heap_calls, stack_calls;
 /* Synthetic vector tables. Default protected handlers stop explicitly if used;
  * the original X-32 default handler lives in the extender, outside the payload.
  */
@@ -131,8 +134,19 @@ static int syscall4(uptr number, uptr a, uptr b, uptr c, uptr d) {
     return result;
 }
 
+static void text(char const *message, u32 length);
+static void field(char const *name, u32 value);
 __attribute__((noreturn)) static void finish(u32 code) {
     if (runtime_ready) {
+        text("MEMORY ", 7);
+        field("HEAP_PEAK", heap_peak);
+        field("STACK_LOW", stack_low);
+        field("HEAP_END", allocation.heap_end);
+        field("STACK_END", allocation.stack_end);
+        field("FREE_BYTES", allocation.free_bytes);
+        field("HEAP_CALLS", heap_calls);
+        field("STACK_CALLS", stack_calls);
+        text("\n", 1);
         int fd = syscall4(NR_OPENAT, (uptr)-100, (uptr)"dos-memory.bin", 0x241, 0600);
         if (fd >= 0) {
             syscall4(NR_WRITE, fd, DOS_BASE, 0x100000, 0);
@@ -726,6 +740,8 @@ static void guest_fault(u32 signal, struct context *r) {
             text("ALLOCATION unsupported-or-exhausted\n", 36);
             finish(25);
         }
+        ++stack_calls;
+        if (allocation.stack_end < stack_low) stack_low = allocation.stack_end;
         r->dx = result.low_limit;
         r->flags = result.flags;
         text("ALLOCATION ", 11);
@@ -736,6 +752,8 @@ static void guest_fault(u32 signal, struct context *r) {
     } else if (r->ip == 0x245 && (r->ax & 0xffff) == 0x3508) {
         struct x32_heap_result result;
         if (!x32_heap_grow(&allocation, r->cx, r->flags, &result)) finish(25);
+        ++heap_calls;
+        if (allocation.heap_end > heap_peak) heap_peak = allocation.heap_end;
         r->ax = result.stack_low;
         r->cx = result.heap_end;
         r->flags = result.flags;
@@ -1111,6 +1129,8 @@ void setup(uptr *initial_stack) {
     allocation.minimum_stack = allocation.heap_end + 0x2000;
     allocation.free_bytes = allocation.stack_end - allocation.minimum_stack;
     allocation.heap_ceiling = IMAGE_SIZE;
+    heap_peak = allocation.heap_end;
+    stack_low = allocation.stack_end;
     /* Prove that ORIGINAL startup clears BSS rather than relying on ELF zeros. */
     for (u32 address = 0x195fb0; address < 0x4de2f0; ++address)
         *(volatile u8 *)guest(address) = 0xa5;

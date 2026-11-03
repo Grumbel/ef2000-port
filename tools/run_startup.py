@@ -40,6 +40,7 @@ def analyze_calls(log):
     guest_exits = []
     checkpoint = None
     allocation = None
+    memory_watermark = None
     for line in log.splitlines():
         values = {key: int(value, 16) for key, value in re.findall(r'(\w+)=([0-9a-f]{8})', line)}
         if line.startswith('CALL '):
@@ -68,6 +69,8 @@ def analyze_calls(log):
             checkpoint = values
         elif line.startswith('ALLOCATION '):
             allocation = values
+        elif line.startswith('MEMORY '):
+            memory_watermark = values
     sequence = [(item.get('IP'), item.get('AX')) for item in calls]
     verified = (sequence[:3] == [(0x93, 0x3505), (0xa0, 0x3005), (0x19a, 0x3509)] and
                 len(returns) >= 3 and
@@ -85,7 +88,9 @@ def analyze_calls(log):
             'file_requests': file_requests, 'console': console, 'port_io': port_io, 'pit': pit,
             'real_mode_requests': real_mode_requests,
             'guest_exits': guest_exits,
-            'checkpoint': checkpoint, 'allocation': allocation, 'startup_checkpoint_verified': verified}
+            'checkpoint': checkpoint, 'allocation': allocation,
+            'memory_watermark': memory_watermark,
+            'startup_checkpoint_verified': verified}
 
 
 def gdb_command(inferior):
