@@ -1739,4 +1739,44 @@ void guest_fn_65030(uint32_t a, int32_t b, uint32_t c); /* 0x65030 EAX/EDX/EBX *
 void guest_fn_e7c50(int32_t a, int32_t b, uint32_t c); /* 0xe7c50 EAX/EDX/EBX */
 uint32_t guest_fn_631bc(void); /* 0x631bc -> AX */
 
+/* game_helpers6.c */
+void refresh_all_624f4(void);
+uint32_t unit_slot_value_7556c(int16_t unit_id);
+void expand_table_7632c(void);
+void pool_append_7a51c(ef_addr32 text);
+ef_addr32 pool_take_7a54c(void);
+void flush_pool_7a5bc(void);
+void alloc_buffers_7b3c8(void);
+void reset_menu_7eec4(void);
+void show_menu_item_802e0(int16_t item);
+void show_menu_item_80314(void);
+ef_addr32 find_entry_815b4(ef_addr32 key);
+uint8_t advance_state_8461c(void);
+uint8_t unit_has_slot_84a80(int16_t unit_id);
+void reset_flags_85b70(void);
+void process_ring_880c8(void);
+void activate_8965c(ef_addr32 object);
+void activate_89990(ef_addr32 object);
+uint8_t table_contains_8c064(uint32_t value);
+void maybe_retarget_8d554(int16_t unit_id);
+void update_view_94880(ef_addr32 argument);
+void reset_mode_98280(void);
+void select_handlers_982a0(void);
+ef_addr32 alloc_zeroed_984f0(uint32_t size);
+void shift_tables_9bb64(ef_addr32 record);
+void guest_fn_6454c(void); /* 0x6454c */
+void guest_fn_62edc(void); /* 0x62edc */
+void guest_fn_62b84(void); /* 0x62b84 */
+void guest_fn_7a480(void); /* 0x7a480 */
+void guest_fn_7a3b0(ef_addr32 text, uint32_t start, uint32_t length); /* 0x7a3b0 EAX/EDX/EBX */
+void guest_fn_b3d00(void); /* 0xb3d00 */
+void guest_fn_d76f4(uint32_t value, uint32_t flags); /* 0xd76f4 EAX/EDX */
+void guest_fn_802ac(uint32_t value); /* 0x802ac EAX */
+uint32_t guest_fn_d771c(uint32_t value); /* 0xd771c EAX -> EAX */
+void guest_fn_7fbec(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x7fbec EAX/EDX/EBX/ECX */
+void guest_fn_878c8(ef_addr32 node); /* 0x878c8 EAX */
+void guest_fn_725dc(int32_t unit); /* 0x725dc EAX */
+void guest_fn_980e8(uint32_t value); /* 0x980e8 EAX */
+uint32_t guest_fn_ddbe0(void); /* 0xddbe0 -> AL */
+
 #endif

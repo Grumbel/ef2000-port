@@ -2516,3 +2516,32 @@ in EAX, format string address, one value).
 | `0x73d1c` | AX:int16_t | none | 6c8e0@6c920,72944@72c4d | Clear a unit flag one time in five. |
 | `0x7597c` | none | none | 3dd30@3dd65 |  |
 | `0x77be0` | none | none | 3dd30@3ddd2 |  |
+
+## game_helpers6 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x624f4` | none | none | 601c@607d |  |
+| `0x7556c` | AX:int16_t | EAX:uint32_t | 77c90@77e79 | Return the pointer or value associated with the unit's slot. |
+| `0x7632c` | none | none | 767f4@76871 | Copy the 3-byte payloads of the 4-byte entries at 0x421750 until 0xff. |
+| `0x7a51c` | EAX:ef_addr32 | none | 7a66c@7a6ef | Append a string to the string pool at 0x1f8e94. |
+| `0x7a54c` | none | EAX:ef_addr32 | 7a66c@7a6cc | Copy the pool string into 0x1f8f14 and advance the pool. |
+| `0x7a5bc` | none | none | 7a738@7a816 |  |
+| `0x7b3c8` | none | none | 3ea0c@3ee55 | Allocate the two 0x27100-byte buffers once. |
+| `0x7eec4` | none | none | 17f10@17f85,8d11c@8d218 |  |
+| `0x802e0` | AX:int16_t | none | 7ef14@7f445 |  |
+| `0x80314` | none | none | 87a20@87d40 |  |
+| `0x815b4` | EAX:ef_addr32 | EAX:ef_addr32 | 8748@878a | Find the 8-byte entry whose two words match those at pointer. |
+| `0x8461c` | none | AL:uint8_t | 84678@846b2 |  |
+| `0x84a80` | AX:int16_t | AL:uint8_t | 848e0@848ef | Does the unit own a slot of kind 0x21 or 0x22? |
+| `0x85b70` | none | none | 49228@4960b |  |
+| `0x880c8` | none | none | 3dd30@3e7f4 | Run 878c8 for every ring node of kind 1. |
+| `0x8965c` | EAX:ef_addr32 | none | none direct |  |
+| `0x89990` | EAX:ef_addr32 | none | 8935c@89428,8935c@89469 |  |
+| `0x8c064` | EAX:uint32_t | AL:uint8_t | 9596c@95a0d | Is value present in the 0x898-entry table at 0x20f550? |
+| `0x8d554` | AX:int16_t | none | 8dd48@8de76 |  |
+| `0x94880` | EAX:ef_addr32 | none | 95e58@96887,95e58@9689f |  |
+| `0x98280` | none | none | 3ea0c@3eede |  |
+| `0x982a0` | none | none | 8b39c@8b4b5 |  |
+| `0x984f0` | EAX:uint32_t | EAX:ef_addr32 | 6df0@6e03,7780@7794,2aef8@2af0b | Allocate size bytes and clear them. |
+| `0x9bb64` | EAX:ef_addr32 | none | 9b8a0@9b8c0,9b8a0@9b8e0,9b8a0@9b900 | Shift the three 20-entry word tables of a record down by one. |

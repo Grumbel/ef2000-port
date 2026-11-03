@@ -1045,3 +1045,27 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00073d1c	clear_unit_flag_73d1c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00073d1c (52 bytes); Clear a unit flag one time in five.; callers 6c8e0@6c920,72944@72c4d; docs/compiler-abi.md
 0x0007597c	reset_selection_7597c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007597c (58 bytes); ; callers 3dd30@3dd65; docs/compiler-abi.md
 0x00077be0	reset_slots_77be0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00077be0 (54 bytes); ; callers 3dd30@3ddd2; docs/compiler-abi.md
+0x000624f4	refresh_all_624f4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000624f4 (16 bytes); ; callers 601c@607d; docs/compiler-abi.md
+0x0007556c	unit_slot_value_7556c	AX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007556c (90 bytes); Return the pointer or value associated with the unit's slot.; callers 77c90@77e79; docs/compiler-abi.md
+0x0007632c	expand_table_7632c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007632c (68 bytes); Copy the 3-byte payloads of the 4-byte entries at 0x421750 until 0xff.; callers 767f4@76871; docs/compiler-abi.md
+0x0007a51c	pool_append_7a51c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007a51c (46 bytes); Append a string to the string pool at 0x1f8e94.; callers 7a66c@7a6ef; docs/compiler-abi.md
+0x0007a54c	pool_take_7a54c		EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007a54c (54 bytes); Copy the pool string into 0x1f8f14 and advance the pool.; callers 7a66c@7a6cc; docs/compiler-abi.md
+0x0007a5bc	flush_pool_7a5bc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007a5bc (50 bytes); ; callers 7a738@7a816; docs/compiler-abi.md
+0x0007b3c8	alloc_buffers_7b3c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007b3c8 (49 bytes); Allocate the two 0x27100-byte buffers once.; callers 3ea0c@3ee55; docs/compiler-abi.md
+0x0007eec4	reset_menu_7eec4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007eec4 (50 bytes); ; callers 17f10@17f85,8d11c@8d218; docs/compiler-abi.md
+0x000802e0	show_menu_item_802e0	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000802e0 (52 bytes); ; callers 7ef14@7f445; docs/compiler-abi.md
+0x00080314	show_menu_item_80314			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00080314 (62 bytes); ; callers 87a20@87d40; docs/compiler-abi.md
+0x000815b4	find_entry_815b4	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000815b4 (64 bytes); Find the 8-byte entry whose two words match those at pointer.; callers 8748@878a; docs/compiler-abi.md
+0x0008461c	advance_state_8461c		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008461c (52 bytes); ; callers 84678@846b2; docs/compiler-abi.md
+0x00084a80	unit_has_slot_84a80	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00084a80 (60 bytes); Does the unit own a slot of kind 0x21 or 0x22?; callers 848e0@848ef; docs/compiler-abi.md
+0x00085b70	reset_flags_85b70			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00085b70 (63 bytes); ; callers 49228@4960b; docs/compiler-abi.md
+0x000880c8	process_ring_880c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000880c8 (53 bytes); Run 878c8 for every ring node of kind 1.; callers 3dd30@3e7f4; docs/compiler-abi.md
+0x0008965c	activate_8965c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008965c (59 bytes); ; callers none direct; docs/compiler-abi.md
+0x00089990	activate_89990	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00089990 (69 bytes); ; callers 8935c@89428,8935c@89469; docs/compiler-abi.md
+0x0008c064	table_contains_8c064	EAX:uint32_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008c064 (55 bytes); Is value present in the 0x898-entry table at 0x20f550?; callers 9596c@95a0d; docs/compiler-abi.md
+0x0008d554	maybe_retarget_8d554	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008d554 (70 bytes); ; callers 8dd48@8de76; docs/compiler-abi.md
+0x00094880	update_view_94880	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094880 (68 bytes); ; callers 95e58@96887,95e58@9689f; docs/compiler-abi.md
+0x00098280	reset_mode_98280			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00098280 (31 bytes); ; callers 3ea0c@3eede; docs/compiler-abi.md
+0x000982a0	select_handlers_982a0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000982a0 (50 bytes); ; callers 8b39c@8b4b5; docs/compiler-abi.md
+0x000984f0	alloc_zeroed_984f0	EAX:uint32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000984f0 (25 bytes); Allocate size bytes and clear them.; callers 6df0@6e03,7780@7794,2aef8@2af0b; docs/compiler-abi.md
+0x0009bb64	shift_tables_9bb64	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009bb64 (64 bytes); Shift the three 20-entry word tables of a record down by one.; callers 9b8a0@9b8c0,9b8a0@9b8e0,9b8a0@9b900; docs/compiler-abi.md
