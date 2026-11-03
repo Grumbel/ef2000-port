@@ -1575,3 +1575,19 @@ Eight more original functions; host drafts only, unverified at the guest/Watcom 
 | `0x6b420` | AL | AL = 1 iff byte `0x128568 + 0xe5*AL` is 4 (2, 3 and the rest return 0) |
 | `0x77afc` | none | `0xa45b3` returns AX; EAX = dword `0x12a760[AX/0x230]` |
 | `0x7772c` | none | words `0x1f891e=0xffff`, `0x1f891c=0` |
+
+## Status value formatters and small state helpers (2026-11-03)
+
+Ten more original functions; host drafts only, unverified at the guest/Watcom level.
+The seven formatters follow the existing `0xa4342` cdecl convention (destination
+in EAX, format string address, one value).
+
+| Entry | Observed effect |
+| --- | --- |
+| `0x82720`, `0x8273c`, `0x82774`, `0x82bf0` | format byte `0x1fcb30` / `0x1a5c0d` / `0x15b7e4` / `0x15bdd0` with `0x188b24` / `0x188b34` / `0x188b4c` / `0x188c10` |
+| `0x82758` | format signed high word of dword `0x12b364` with `0x188b40` |
+| `0x827b4` | format the EAX result of `0x810ec(dest)` with `0x188b68` |
+| `0x827f4` | format dword `0x122dc4` with `0x188b84` |
+| `0x845a4` | word `0x12b4a6=2`, byte `0x1fcc43=1`, AL=0 (AH=1 left set) |
+| `0x81794` | word `0x1fcaec` from `0xde864(0x1889d4)` |
+| `0x7a434` | release pointer `0x12afc4` through `0xc3f80` when nonzero, then clear it |

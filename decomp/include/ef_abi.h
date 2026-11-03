@@ -457,4 +457,19 @@ uint16_t guest_load_halfword(ef_addr32 source); /* 0xde864 EAX -> AX */
 uint32_t guest_lookup_value(ef_addr32 source); /* 0x9ddfc EAX -> EAX */
 uint16_t guest_read_selector_word(void); /* 0xa45b3 -> AX */
 
+/* Status value formatters and small state helpers. */
+void write_status_byte_1fcb30(ef_addr32 destination); /* 0x82720 EAX */
+void write_status_byte_1a5c0d(ef_addr32 destination); /* 0x8273c EAX */
+void write_status_high_word(ef_addr32 destination); /* 0x82758 EAX */
+void write_status_byte_15b7e4(ef_addr32 destination); /* 0x82774 EAX */
+void write_status_queried_value(ef_addr32 destination); /* 0x827b4 EAX */
+void write_status_dword_122dc4(ef_addr32 destination); /* 0x827f4 EAX */
+void write_status_byte_15bdd0(ef_addr32 destination); /* 0x82bf0 EAX */
+uint8_t set_pending_mode_two(void); /* 0x845a4 -> AL */
+void load_halfword_1fcaec(void); /* 0x81794 */
+void release_block_12afc4(void); /* 0x7a434 */
+void format_ui_status_value(ef_addr32 destination, ef_addr32 format, uint32_t value); /* 0xa4342 */
+uint32_t guest_query_status_value(ef_addr32 destination); /* 0x810ec EAX -> EAX */
+void guest_release_block(ef_addr32 block); /* 0xc3f80 EAX */
+
 #endif

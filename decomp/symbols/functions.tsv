@@ -1445,7 +1445,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a3b0	54	build_status_description	record_transitions	drafted	game	confirmed	decomp/tests/0x0007a3b0.json	docs/compiler-abi.md; host model; guest differential pending
 0x0007a3e8	64			unknown	unclassified	unverified		
 0x0007a428	11	copy_active_buffer_pointer	runtime_control	drafted	game	confirmed	decomp/tests/0x0007a428.json	docs/compiler-abi.md; Copies full dword 0x12afc4 to 0x1f8e9c; EAX holds source value; original guest replacement unverified
-0x0007a434	30			unknown	unclassified	unverified		
+0x0007a434	30	release_block_12afc4	status_values	drafted	game	confirmed	decomp/tests/0x0007a434.json	docs/compiler-abi.md; Release pointer 0x12afc4 via 0xc3f80 if nonzero then clear; sole direct caller 7ab00@7ac5c; guest pending
 0x0007a454	44			unknown	unclassified	unverified		
 0x0007a480	33	check_buffer_capacity	buffer_cursor	drafted	game	confirmed	decomp/tests/0x0007a480.json	docs/compiler-abi.md
 0x0007a4a4	106			unknown	unclassified	unverified		
@@ -1559,7 +1559,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000815f4	22			unknown	unclassified	unverified		
 0x0008160c	111			unknown	unclassified	unverified		
 0x00081680	273			unknown	unclassified	unverified		
-0x00081794	17			unknown	unclassified	unverified		
+0x00081794	17	load_halfword_1fcaec	status_values	drafted	game	confirmed	decomp/tests/0x00081794.json	docs/compiler-abi.md; Word 0x1fcaec from 0xde864(0x1889d4); sole direct caller 3cfc0@3d13a; guest pending
 0x000817a8	188			unknown	unclassified	unverified		
 0x00081864	1			unknown	unclassified	unverified		
 0x00081868	62			unknown	unclassified	unverified		
@@ -1571,17 +1571,17 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082168	142			unknown	unclassified	unverified		
 0x000821f8	70			unknown	unclassified	unverified		
 0x00082478	628			unknown	unclassified	unverified		
-0x00082720	26			unknown	unclassified	unverified		
-0x0008273c	26			unknown	unclassified	unverified		
-0x00082758	27			unknown	unclassified	unverified		
-0x00082774	26			unknown	unclassified	unverified		
+0x00082720	26	write_status_byte_1fcb30	status_values	drafted	game	confirmed	decomp/tests/0x00082720.json	docs/compiler-abi.md; sprintf-style 0xa4342(dest, fmt 0x188b24, byte 0x1fcb30); sole direct caller 82e40@82f78; guest pending
+0x0008273c	26	write_status_byte_1a5c0d	status_values	drafted	game	confirmed	decomp/tests/0x0008273c.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188b34, byte 0x1a5c0d); sole direct caller 82e40@82f57; guest pending
+0x00082758	27	write_status_high_word	status_values	drafted	game	confirmed	decomp/tests/0x00082758.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188b40, signed high word of dword 0x12b364); sole direct caller 82e40@82f36; guest pending
+0x00082774	26	write_status_byte_15b7e4	status_values	drafted	game	confirmed	decomp/tests/0x00082774.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188b4c, byte 0x15b7e4); sole direct caller 82e40@82ef4; guest pending
 0x00082790	35	write_ui_status_flags_a	packet_status	drafted	game	confirmed	decomp/tests/0x00082790.json	docs/compiler-abi.md; host model; guest differential pending
-0x000827b4	25			unknown	unclassified	unverified		
+0x000827b4	25	write_status_queried_value	status_values	drafted	game	confirmed	decomp/tests/0x000827b4.json	docs/compiler-abi.md; 0x810ec(dest) result formatted with fmt 0x188b68; sole direct caller 82e40@82fba; guest pending
 0x000827d0	35	write_ui_status_flags_b	packet_status	drafted	game	confirmed	decomp/tests/0x000827d0.json	docs/compiler-abi.md; host model; guest differential pending
-0x000827f4	24			unknown	unclassified	unverified		
+0x000827f4	24	write_status_dword_122dc4	status_values	drafted	game	confirmed	decomp/tests/0x000827f4.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188b84, dword 0x122dc4); sole direct caller 82e40@82ffc; guest pending
 0x00082b6c	80			unknown	unclassified	unverified		
 0x00082bd4	27	write_ui_status_float	packet_status	drafted	game	confirmed	decomp/tests/0x00082bd4.json	docs/compiler-abi.md; host model; guest differential pending
-0x00082bf0	26			unknown	unclassified	unverified		
+0x00082bf0	26	write_status_byte_15bdd0	status_values	drafted	game	confirmed	decomp/tests/0x00082bf0.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188c10, byte 0x15bdd0); sole direct caller 82e40@82eb2; guest pending
 0x00082cec	183			unknown	unclassified	unverified		
 0x00082da4	43	next_ui_fragment	ui_secondary	drafted	game	confirmed	decomp/tests/0x00082da4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082dd0	45	compact_ui_fragment	ui_operations	drafted	game	confirmed	decomp/tests/0x00082dd0.json	docs/compiler-abi.md; host model; guest differential pending
@@ -1607,7 +1607,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000844e4	47			unknown	unclassified	unverified		
 0x00084514	47	initialize_ui_component	ui_secondary	drafted	game	confirmed	decomp/tests/0x00084514.json	docs/compiler-abi.md; host model; guest differential pending
 0x00084544	93			unknown	unclassified	unverified		
-0x000845a4	25			unknown	unclassified	unverified		
+0x000845a4	25	set_pending_mode_two	status_values	drafted	game	confirmed	decomp/tests/0x000845a4.json	docs/compiler-abi.md; Word 0x12b4a6=2, byte 0x1fcc43=1, AL=0 (AH=1); sole direct caller 84678@846ab; guest pending
 0x000845c0	91			unknown	unclassified	unverified		
 0x0008461c	52			unknown	unclassified	unverified		
 0x00084650	17			unknown	unclassified	unverified		

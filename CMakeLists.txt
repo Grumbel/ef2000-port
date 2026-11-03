@@ -480,3 +480,10 @@ target_compile_options(ef2000-decomp-marker-packets-test PRIVATE -Wall -Wextra -
 target_compile_definitions(ef2000-decomp-marker-packets-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-marker-packets-test PRIVATE decomp/include)
 add_test(NAME decomp-marker-packets-host-model COMMAND ef2000-decomp-marker-packets-test)
+add_executable(ef2000-decomp-status-values-test
+  tests/decomp_status_values_test.c decomp/src/status_values.c)
+target_compile_features(ef2000-decomp-status-values-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-status-values-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-status-values-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-status-values-test PRIVATE decomp/include)
+add_test(NAME decomp-status-values-host-model COMMAND ef2000-decomp-status-values-test)

@@ -265,3 +265,13 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0006b420	record_mode_is_four	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x6b420 (35 bytes); AL=1 iff byte 0x128568+0xe5*AL equals 4; caller 6d948@6dae4,6d948@6dbf1,6d948@6de22; docs/compiler-abi.md
 0x00077afc	lookup_table_by_quotient		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x77afc (36 bytes); EAX = dword table 0x12a760[0xa45b3() word / 0x230]; caller 779f4@77a35; docs/compiler-abi.md
 0x0007772c	reset_pair_counter			ebx,ecx,edx,esi,edi,ebp	0	Original 0x7772c (26 bytes); Words 0x1f891e=0xffff and 0x1f891c=0; caller 49228@49248; docs/compiler-abi.md
+0x00082720	write_status_byte_1fcb30	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x82720 (26 bytes); sprintf-style 0xa4342(dest, fmt 0x188b24, byte 0x1fcb30); caller 82e40@82f78; docs/compiler-abi.md
+0x0008273c	write_status_byte_1a5c0d	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x8273c (26 bytes); 0xa4342(dest, fmt 0x188b34, byte 0x1a5c0d); caller 82e40@82f57; docs/compiler-abi.md
+0x00082758	write_status_high_word	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x82758 (27 bytes); 0xa4342(dest, fmt 0x188b40, signed high word of dword 0x12b364); caller 82e40@82f36; docs/compiler-abi.md
+0x00082774	write_status_byte_15b7e4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x82774 (26 bytes); 0xa4342(dest, fmt 0x188b4c, byte 0x15b7e4); caller 82e40@82ef4; docs/compiler-abi.md
+0x000827b4	write_status_queried_value	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x827b4 (25 bytes); 0x810ec(dest) result formatted with fmt 0x188b68; caller 82e40@82fba; docs/compiler-abi.md
+0x000827f4	write_status_dword_122dc4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x827f4 (24 bytes); 0xa4342(dest, fmt 0x188b84, dword 0x122dc4); caller 82e40@82ffc; docs/compiler-abi.md
+0x00082bf0	write_status_byte_15bdd0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x82bf0 (26 bytes); 0xa4342(dest, fmt 0x188c10, byte 0x15bdd0); caller 82e40@82eb2; docs/compiler-abi.md
+0x000845a4	set_pending_mode_two		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x845a4 (25 bytes); Word 0x12b4a6=2, byte 0x1fcc43=1, AL=0 (AH=1); caller 84678@846ab; docs/compiler-abi.md
+0x00081794	load_halfword_1fcaec			ebx,ecx,edx,esi,edi,ebp	0	Original 0x81794 (17 bytes); Word 0x1fcaec from 0xde864(0x1889d4); caller 3cfc0@3d13a; docs/compiler-abi.md
+0x0007a434	release_block_12afc4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x7a434 (30 bytes); Release pointer 0x12afc4 via 0xc3f80 if nonzero then clear; caller 7ab00@7ac5c; docs/compiler-abi.md
