@@ -867,11 +867,15 @@ class GhidraWorkflowTests(unittest.TestCase):
         def fake_facts(args):
             log.append('facts')
 
+        def fake_apply_symbols(args):
+            log.append('apply-symbols')
+
         patches = [patch.object(ghidra, name, fake) for name, fake in (
             ('import_image', fake_import), ('export_all', fake_export),
             ('recover_orphans', fake_orphans), ('callback_tables', fake_tables),
             ('name_callbacks', fake_names), ('recover_calls', fake_calls),
-            ('repair_boundaries', fake_repair), ('function_facts', fake_facts))]
+            ('repair_boundaries', fake_repair), ('function_facts', fake_facts),
+            ('apply_symbols', fake_apply_symbols))]
         for item in patches:
             item.start()
             self.addCleanup(item.stop)
@@ -892,7 +896,7 @@ class GhidraWorkflowTests(unittest.TestCase):
             'callback-tables', 'names entries', 'callback-tables', 'names undisassembled',
             'calls padding 2', 'calls padding 0', 'calls adjacent-ret 1',
             'calls adjacent-ret 0', 'calls padding 0',
-            'repair apply', 'repair audit', 'export-all storage', 'facts'])
+            'repair apply', 'repair audit', 'apply-symbols', 'export-all storage', 'facts'])
         report = json.loads((self.workspace / 'rebuild-report.json').read_text())
         self.assertEqual(report['functions'], 3900 + 20 + 3)
         self.assertEqual(report['stages'][0], {'stage': 'import', 'functions': 3900})
@@ -904,6 +908,7 @@ class GhidraWorkflowTests(unittest.TestCase):
         ghidra.rebuild(self.rebuild_args(skip_export=True))
         self.assertNotIn('export-all storage', log)
         self.assertNotIn('facts', log)
+        self.assertIn('apply-symbols', log)
 
     def test_rebuild_refuses_existing_project(self):
         (self.workspace / 'projects').mkdir(parents=True)

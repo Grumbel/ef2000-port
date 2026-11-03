@@ -155,6 +155,58 @@ def validated_workspace(path):
     return workspace
 
 
+def symbol_paths(args):
+    """Resolve canonical, reviewed tables independently of generated exports."""
+    source = (getattr(args, 'symbols', None) or ROOT / 'decomp/symbols').resolve()
+    files = [source / name for name in ('functions.tsv', 'globals.tsv', 'signatures.tsv')]
+    if any(not file.is_file() for file in files):
+        raise ValueError(f'missing symbol tracker files under {source}')
+    return files
+
+
+def apply_symbols(args):
+    workspace = validated_workspace(args.workspace)
+    functions, globals_, signatures = symbol_paths(args)
+    headers = (getattr(args, 'headers', None) or ROOT / 'decomp/include').resolve()
+    if not headers.is_dir():
+        raise ValueError(f'missing C include directory: {headers}')
+    # Headless Ghidra can exit 0 after Java compilation/script failures.
+    # Require a success marker written only after the entire script succeeds.
+    with tempfile.TemporaryDirectory(prefix='ef2000-apply-symbols-') as temp:
+        marker = Path(temp) / 'success'
+        command = project_args(workspace, headless_path(args.analyze_headless)) + [
+            '-process', IMAGE_NAME, '-noanalysis', '-postScript', 'EF2000ApplySymbols.java',
+            str(functions), str(globals_), str(signatures), str(headers), str(marker),
+        ]
+        subprocess.run(command, check=True)
+        if not marker.is_file() or marker.read_text() != 'applied\n':
+            raise ValueError('Ghidra did not complete the symbol application script')
+    print(f'Applied reviewed symbol tables from {functions.parent}')
+
+
+def export_symbols(args):
+    workspace = validated_workspace(args.workspace)
+    functions, globals_, signatures = symbol_paths(args)
+    output = (args.output or workspace / 'symbol-review').resolve()
+    if output == functions.parent or output in (functions.parent.parents):
+        raise ValueError('refusing to overwrite the reviewed symbol tracker')
+    output.mkdir(parents=True, exist_ok=True)
+    names = ('functions.tsv', 'globals.tsv', 'signatures.tsv')
+    # An old report must not be mistaken for a successful new Ghidra export.
+    before = {name: (output / name).stat().st_mtime_ns
+              if (output / name).is_file() else -1 for name in names}
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis', '-readOnly', '-postScript',
+        'EF2000ExportSymbols.java', str(functions), str(globals_), str(signatures),
+        str(output),
+    ]
+    subprocess.run(command, check=True)
+    if any(not (output / name).is_file() or (output / name).stat().st_mtime_ns <= before[name]
+           for name in names):
+        raise ValueError('Ghidra returned without fresh symbol review tables')
+    print(f'GUI symbol candidates for manual merge: {output}')
+
+
 def copy_callers(args):
     """Export direct copy callsites with their post-CALL guest return IPs."""
     workspace = validated_workspace(args.workspace)
@@ -595,6 +647,11 @@ def rebuild(args):
         {key: row[key] for key in ('entry', 'result', 'body_bytes_before', 'body_bytes_after')}
         for row in repairs], 'documented_functions': DOCUMENTED_FUNCTIONS,
         'functions': final['discovered_functions']}
+    # Step 3.3: names, typed globals and confirmed ABI annotations are part
+    # of reproducible project construction, not a local GUI-only afterthought.
+    apply_symbols(argparse.Namespace(workspace=workspace,
+                                     analyze_headless=args.analyze_headless,
+                                     symbols=None, headers=None))
     if not args.skip_export:
         exported = export_all(namespace('export-all', apply=False, limit=0, overwrite=False,
                                         fastcall_fallback=False, watcom_fallback=False,
@@ -619,7 +676,8 @@ def main(argv=None):
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
                  'recover-orphans', 'recover-calls', 'repair-boundaries', 'audit-flow-gaps',
                  'audit-body-holes', 'function-facts', 'subsystem-map',
-                 'callback-tables', 'name-callbacks', 'rebuild'):
+                 'callback-tables', 'name-callbacks', 'rebuild',
+                 'apply-symbols', 'export-symbols'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=default_workspace,
                          help='Ghidra project and image workspace (default: EF2000_GHIDRA_WORKSPACE or source local/ghidra)')
@@ -712,6 +770,14 @@ def main(argv=None):
     rebuild_parser.add_argument('executable', type=Path, help='SHA-pinned original _EF2000.EXE')
     rebuild_parser.add_argument('--skip-export', action='store_true',
                                 help='stop after boundary repair; skip pseudo-C and facts export')
+    for command_name in ('apply-symbols', 'export-symbols'):
+        command = subparsers.choices[command_name]
+        command.add_argument('--symbols', type=Path,
+                             help='reviewed source TSV directory (default: decomp/symbols)')
+    subparsers.choices['apply-symbols'].add_argument('--headers', type=Path,
+                                                      help='C headers (default: decomp/include)')
+    subparsers.choices['export-symbols'].add_argument('--output', type=Path,
+                                                       help='review directory (default: workspace/symbol-review)')
     args = parser.parse_args(argv)
     try:
         {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,
@@ -722,7 +788,8 @@ def main(argv=None):
          'audit-body-holes': audit_body_holes,
          'function-facts': function_facts, 'subsystem-map': subsystem_map,
          'callback-tables': callback_tables,
-         'name-callbacks': name_callbacks, 'rebuild': rebuild}[args.command](args)
+         'name-callbacks': name_callbacks, 'rebuild': rebuild,
+         'apply-symbols': apply_symbols, 'export-symbols': export_symbols}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'ghidra_ef2000: {error}\n')
 

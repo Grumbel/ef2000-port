@@ -718,3 +718,41 @@ See [loader.md](loader.md), [startup-symbols.md](startup-symbols.md), and
 The first successful end-to-end import and decompilation is documented in
 [ghidra-findings.md](ghidra-findings.md), with cross-checked guest offsets,
 resource-loader callsites, and ABI caveats.
+
+# Reproducible reviewed annotations (decompilation plan §3.3)
+
+After rebuilding or opening the pinned Ghidra workspace, restore reviewed
+names and global types with:
+
+```sh
+ef2000-ghidra apply-symbols
+ef2000-ghidra export-all --overwrite --custom-storage-fallback
+```
+
+The importer reads `decomp/symbols/{functions,globals,signatures}.tsv` and
+`decomp/include/**/*.h`. It uses Ghidra's `CParser` for declarative struct
+headers, and applies only explicitly tracked function names and confirmed
+custom-storage signatures. ABI register inputs/outputs use `REG:type` pairs
+(comma-separated inputs); currently only zero stack cleanup and a single
+register return are supported, and unsupported conventions are rejected.
+The known but not yet reconstructed 250-byte high-score table remains a raw
+byte array until its struct header is confirmed. Overlapping globals retain
+both labels but only one data definition.
+
+Export GUI changes for manual merge, without modifying canonical tables:
+
+```sh
+ef2000-ghidra export-symbols
+# Review local/ghidra/symbol-review/*.tsv against decomp/symbols/*.tsv
+```
+
+Function names, typed global labels and GUI custom-storage signatures appear
+in review TSVs. New signatures have blank stack-cleanup fields and an explicit
+"GUI candidate" evidence marker; they must not be applied as confirmed before
+checking disassembly and callers (§4). Review all candidate names, types and
+signatures before merging; an apparent GUI name is not proof of identity.
+
+The asset-free command tests run with
+`python3 -m unittest discover -s tests -p 'test_ghidra_annotations.py'`.
+Set `GHIDRA_HOME` and a suitable `JAVA_HOME`
+to additionally run a real synthetic x86 Ghidra import/apply/export round trip.

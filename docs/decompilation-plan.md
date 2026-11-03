@@ -279,7 +279,7 @@ addr  size  name  module  state  kind  sig_status  test  notes
   not an incomplete acceptance criterion). Re-seeded against the independent
   12.1.4 rebuild on 2026-11-03: 0 added, 0 changed.
 
-### 3.3 [ ] Reproducible Ghidra annotations
+### 3.3 [x] Reproducible Ghidra annotations
 
 Right now names/types live only in the local Ghidra project. Make them
 reproducible from git:
@@ -293,6 +293,18 @@ reproducible from git:
 - Wire as `ef2000-ghidra apply-symbols` / `export-symbols`. Re-run
   `export-all --overwrite` after applying, so pseudo-C uses recovered names.
 - Test: synthetic-binary test like existing `tests/test_ghidra_ef2000.py`.
+
+Done 2026-11-03: `apply-symbols` reads the three reviewed TSVs and parses
+struct headers with Ghidra `CParser`; applies names, typed globals and
+explicit register-storage signatures. `export-symbols` writes review-only
+TSVs, marking GUI-derived ABI candidates as unverified. `rebuild` applies
+symbols before exporting pseudo-C. Asset-free CLI tests plus a live synthetic
+Ghidra round trip verify that names, custom storage, global types and parsed
+structs persist; applying twice is idempotent. On the real 12.1.4 project,
+the second import made zero changes and full re-export completed with 4,277
+functions and zero decompiler failures. Known unconfirmed layouts remain raw
+bytes; conventions outside the current register/zero-cleanup schema are
+rejected pending §3.5.
 
 ### 3.4 [ ] OpenWatcom in the flake
 
@@ -740,6 +752,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.2   Tracker tool and seeded functions.tsv (4,277 rows, 294 named); globals.tsv seeded.
 2026-11-03  3.1   Done: derived-source legal note, C headers, module/test directories, ignored build output.
 2026-11-03  3.2   Done: re-seed from fresh 12.1.4 Ghidra inventory is identical (4,277 rows); tracker check and tests pass.
+2026-11-03  3.3   Done: reproducible apply/export symbols; live synthetic persistence/idempotence test and 4,277-function refresh pass.
 ```
 
 ---
