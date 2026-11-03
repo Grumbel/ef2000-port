@@ -1,0 +1,12 @@
+addr	size	type	name	evidence	notes
+0x00121e44	1	uint8_t	g_difficulty	0x43dd reads it on high-score insertion	active difficulty 1..3; see docs/highscores-reconstruction.md
+0x00132a28	4	uint32_t	__x32_stack_size	startup loads it before AX=0x3509	docs/startup-symbols.md
+0x00132a2c	4	uint32_t	_dynend	source-matched startup sequence	docs/startup-symbols.md
+0x00132a30	4	uint32_t	_curbrk	source-matched startup sequence	docs/startup-symbols.md
+0x00132a34	4	char *	_LpCmdLine	startup copies command buffer address	docs/startup-symbols.md
+0x00132a38	4	char *	_LpPgmName	startup copies program-name address	docs/startup-symbols.md
+0x00132a3c	2	uint16_t	_psp	receives FS at entry	docs/startup-symbols.md
+0x00132a61	6	fword	_Envptr	LDS before environment scan	overlaps _Envseg; docs/startup-symbols.md
+0x00132a65	2	uint16_t	_Envseg	receives GS at entry	docs/startup-symbols.md
+0x001970a0	4	int32_t	g_hiscore_current	0x432c 0x433c	current signed score
+0x001970a4	250	struct hiscore_entry[10]	g_hiscore_table	0x4050 0x41fc 0x42a4 0x433c	packed 25-byte records; docs/highscores-reconstruction.md

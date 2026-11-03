@@ -23,4 +23,13 @@ Rules:
   by the `decomp/**` annotation in `REUSE.toml`).
 - Do not move recovered game logic out of this directory into GPL code.
 
-Layout, build commands and status follow plan §3.1 once Phase 1 begins.
+Contents so far:
+
+- `symbols/functions.tsv`: every original function (address, size, name,
+  module, recovery state). Maintain with `tools/decomp_status.py`
+  (`summary`, `next`, `check`, `seed`).
+- `symbols/globals.tsv`: named global data with evidence.
+- `symbols/signatures.tsv`: confirmed calling conventions (empty so far).
+
+These files hold facts about the original program, never its code bytes.
+Further layout follows plan §3.1.

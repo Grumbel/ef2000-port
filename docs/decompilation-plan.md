@@ -21,7 +21,7 @@ Do not re-derive these facts; they are established and documented.
 | Image layout | Guest offset 0 = payload start; BSS `[0x195fb0, 0x4de2f0)`; entry `0x86`; C entry `0x9bd20`; candidate `main` `0x8b274` | `docs/loader.md`, `docs/startup-symbols.md` |
 | Execution | **native64**: original code runs natively in an x86-64 Linux process (LDT, compatibility mode, base `0x10000000`), menu + flight work, full speed. **Unicorn C++/Python**: portable, slower, reaches flight. | `docs/startup-runtime.md`, `README.md` |
 | Devices | DOS file/memory, PIT, PIC, keyboard, mouse, gameport, VGA/VBE, SB16 DMA, MSCDEX CD audio, save states | `TODO.md`, `docs/*.md` |
-| Ghidra | Reproducible headless import; **4,233 functions recognized, 4,233 with pseudo-C**; ~45 KB of instructions outside functions; call graph, data refs, subsystem affinity groups | `docs/ghidra.md`, `docs/ghidra-findings.md` |
+| Ghidra | One-command rebuild (`ef2000-ghidra rebuild`, ~4 min); with Ghidra 12.1.4: **4,277 functions, 4,277 with pseudo-C**, ~35 KB of instructions outside functions; call graph, data refs, subsystem affinity groups (11.4.2 had 4,233) | `docs/ghidra.md`, `docs/ghidra-findings.md` #062 |
 | Typed reconstruction | One module: high scores (`runtime/ef2000_highscores.*`), verified by **differential execution** (original code in Unicorn vs. native C++) | `docs/highscores-reconstruction.md` |
 | Data formats | DID archives (hash index, RA compression), ILBM/PBM/PCX/BMP, `.gui` scripts, sprites, fonts, `MISSION.CFG`/`NAVIG.NAV` text, mission guest struct layouts, terrain grid probe | `docs/gui-assets.md`, `docs/mission-*.md` |
 | 3D shapes/world | Understood in the sibling `../tfx3view` (libTFX: `.3` shape bytecode, supershapes, target lists, EF2000 world) — **not yet integrated here** | `../tfx3view/libTFX/` |
@@ -172,7 +172,7 @@ quirk explicitly in `decomp/compat/`.
 Goal: after this phase, recovering a function is a mechanical loop (§4).
 Do the steps in order. Each step is one or a few commits.
 
-### 3.0 [ ] Rebuild the Ghidra workspace reproducibly (do this first)
+### 3.0 [x] Rebuild the Ghidra workspace reproducibly (do this first)
 
 `local/` is git-ignored, so a fresh checkout has **no Ghidra project**. The
 4,233-function state described in `docs/ghidra-findings.md` was reached
@@ -189,16 +189,21 @@ through many separate passes (bundles #041–#056), several of them run with
    (`local/ghidra` by default), then `inventory`, `export-all
    --custom-storage-fallback` and `function-facts`. Refuse to run on an
    existing project unless `--force` is given.
-3. Acceptance: the rebuilt project reports **4,233** recognized functions
-   and 4,233 pseudo-C exports, and the nine `repair-boundaries` recipes report
-   as applied. If counts differ, record the difference and its cause in
-   `docs/ghidra-findings.md` before continuing; do not paper over it.
+3. Acceptance: the rebuilt project reports the recognized-function count
+   recorded for the flake's Ghidra release (**4,277** with Ghidra 12.1.4;
+   4,233 with 11.4.2), the same number of pseudo-C exports, and the nine
+   `repair-boundaries` recipes report as applied. If counts differ, record
+   the difference and its cause in `docs/ghidra-findings.md` before
+   continuing; do not paper over it.
 4. Add an asset-free test for the pass ordering (like the existing
    `tests/test_ghidra_ef2000.py`).
 5. Later, step 3.3 (`apply-symbols`) becomes the last stage of `rebuild`.
 
-Runtime: expect tens of minutes for import and a full export; run long
-commands in the background and do not re-run them unnecessarily.
+Done 2026-11-03: `ef2000-ghidra rebuild EXE` (see `docs/ghidra.md`) runs the
+full sequence in about four minutes; results in `docs/ghidra-findings.md`
+#062. It never overwrites an existing project; use `--workspace` for a new
+one. Re-run it after a Ghidra upgrade and update the expected count
+(`DOCUMENTED_FUNCTIONS` in `tools/ghidra_ef2000.py`) with evidence.
 
 ### 3.1 [ ] Repository layout and licensing scaffolding
 
@@ -236,7 +241,7 @@ decomp/
   function's evidence links it to that string. Otherwise use
   `src/unk_<subsystem>.c` and rename later.
 
-### 3.2 [ ] Function tracker (`decomp/symbols/functions.tsv`)
+### 3.2 [~] Function tracker (`decomp/symbols/functions.tsv`)
 
 Columns (tab-separated, header row, sorted by address):
 
@@ -247,8 +252,10 @@ addr  size  name  module  state  kind  sig_status  test  notes
 - `state`: `unknown` → `named` → `typed` → `drafted` → `compiles` →
   `spliced` → `verified`. Also `blocked`, `library`,
   `data` (misidentified), `dead` (unreferenced and unreachable, proven).
-- `kind`: `game`, `clib`, `x32`, `ail`, `vbe`, `thunk`, `asm` (hand-written
-  assembly in original; keep as `.asm` source assembled by `wasm`).
+- `kind`: `unclassified` (default until step 3.6 runs), `game`, `clib`,
+  `x32`, `ail`, `vbe`, `thunk`, `asm` (hand-written assembly in original).
+- `sig_status`: `unverified` or `confirmed`. `typed`, `compiles`, `spliced`
+  and `verified` require `confirmed` (with the row in `signatures.tsv`).
 - Seed it from the Ghidra inventory (`ef2000-ghidra inventory` →
   `functions.tsv`). Addresses and sizes are facts and may be committed;
   pseudo-C is not.
@@ -260,6 +267,15 @@ addr  size  name  module  state  kind  sig_status  test  notes
   - `check` — validates the TSV (sorted, no overlaps, states legal, every
     `verified` row has a test file, every `compiles`+ row has a source).
   - Add `check` to `nix flake check` (asset-free).
+
+  Done 2026-11-03: `tools/decomp_status.py` (`seed`, `summary`, `next`,
+  `check`) with `tests/test_decomp_status.py`; the committed tracker is
+  validated by that test under `nix flake check`. Seeded with all 4,277
+  functions; 294 carry evidence-backed names (original callback names and
+  the documented high-score/startup routines, module `hiscore` for the
+  former). `decomp/symbols/globals.tsv` holds the 11 documented globals;
+  `signatures.tsv` is empty because no ABI has been confirmed yet.
+  Remaining: re-seed after every Ghidra boundary change.
 
 ### 3.3 [ ] Reproducible Ghidra annotations
 
@@ -718,6 +734,8 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  2.2   Owner decision: functional decompilation; RAM state must match, binaries need not.
 2026-11-03  3.1   Licensing in place: LicenseRef-EF2000-Derived for decomp/, GPL linking exception elsewhere.
 2026-11-03  3.0   Added: no Ghidra workspace exists on the handoff machine; rebuild step required.
+2026-11-03  3.0   Done: ef2000-ghidra rebuild; Ghidra 12.1.4 gives 4,277 functions, 4,277 pseudo-C, 0 failures.
+2026-11-03  3.2   Tracker tool and seeded functions.tsv (4,277 rows, 294 named); globals.tsv seeded.
 ```
 
 ---
