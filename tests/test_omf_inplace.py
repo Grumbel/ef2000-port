@@ -72,6 +72,13 @@ class InPlacePatchTests(unittest.TestCase):
         with self.assertRaisesRegex(efpatch.PatchError, 'arena/redirected'):
             omf_inplace.build(omf_object(long_code), original, functions, globals_, {0x20})
 
+    def test_noncontiguous_ghidra_body_is_not_an_inplace_capacity(self):
+        original, functions, globals_ = inputs()
+        unsafe = [dict(row, notes='Noncontiguous 7+9 bytes; shared epilogue')
+                  for row in functions]
+        with self.assertRaisesRegex(OMFError, 'noncontiguous function body'):
+            omf_inplace.build(omf_object(), original, unsafe, globals_, {0x20})
+
     @unittest.skipUnless(importlib.util.find_spec('unicorn'), 'requires Python Unicorn')
     def test_isolated_original_vs_relocated_patch_execution(self):
         original, functions, globals_ = inputs()

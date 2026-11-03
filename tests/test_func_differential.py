@@ -57,6 +57,11 @@ class FunctionDifferentialTests(unittest.TestCase):
             0x263e0: (12, 5),
             0x263ec: (55, 5),
             0x6a1b4: (26, 10),
+            0x6a354: (34, 4),
+            0x6a378: (27, 4),
+            0x6a394: (57, 5),
+            0x6a3d0: (18, 4),
+            0x7489c: (93, 9),
         }
         for address, (expected_size, expected_cases) in candidates.items():
             with self.subTest(address=f'0x{address:x}'):
@@ -70,6 +75,8 @@ class FunctionDifferentialTests(unittest.TestCase):
         self.assertIn('edx', differential.read_signature(signatures, 0x263e0).preserved)
         self.assertNotIn('edx', differential.read_signature(signatures, 0x263ec).preserved)
         self.assertEqual(differential.read_signature(signatures, 0x6a1b4).outputs,
+                         ('EAX',))
+        self.assertEqual(differential.read_signature(signatures, 0x7489c).outputs,
                          ('EAX',))
 
     def test_reviewed_signatures_and_subregisters(self):

@@ -437,6 +437,19 @@
           ${watcom}/bin/wdis work/indexed_objects.obj -l=work/indexed_objects.asm
           grep -qi 'lookup_indexed_object' work/indexed_objects.asm
           ! grep -qi '__CHK' work/indexed_objects.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/object_lookup.c --output "$PWD/work/object_lookup.obj"
+          ${watcom}/bin/wdis work/object_lookup.obj -l=work/object_lookup.asm
+          grep -qi 'lookup_filtered_indexed_object' work/object_lookup.asm
+          ! grep -qi '__CHK' work/object_lookup.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/object_state.c --output "$PWD/work/object_state.obj"
+          ${watcom}/bin/wdis work/object_state.obj -l=work/object_state.asm
+          grep -qi 'set_indexed_object_activation' work/object_state.asm
+          grep -qi 'clear_indexed_object_activation' work/object_state.asm
+          grep -qi 'set_indexed_object_state' work/object_state.asm
+          grep -qi 'clear_indexed_object_state' work/object_state.asm
+          ! grep -qi '__CHK' work/object_state.asm
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

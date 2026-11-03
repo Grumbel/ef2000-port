@@ -276,6 +276,11 @@ def plan_patch(module, image, functions, globals_, arena_base, reviewed):
     row = rows[0]
     address = int(row['addr'], 16)
     old_size = int(row['size'])
+    # Ghidra body_bytes can count disjoint blocks reached by tail branches.
+    # Such a total is not a safe contiguous overwrite capacity. The tracker
+    # must flag these until a separately proved contiguous extent exists.
+    if 'noncontiguous' in row.get('notes', '').lower():
+        raise OMFError('noncontiguous function body: reviewed contiguous overwrite extent required')
     if row['state'] not in ('compiles', 'spliced', 'verified') or row['sig_status'] != 'confirmed':
         raise OMFError('code public must have a confirmed ABI and compiles+ state')
     if address not in reviewed:

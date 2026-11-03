@@ -1,0 +1,29 @@
+{
+  "address": "0x0006a3d0",
+  "function_size": 18,
+  "max_instructions": 256,
+  "cases": [
+    {"name": "clears_state_byte", "registers": {"eax": "0x12340000"},
+     "memory": [{"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x20f550", "hex": "00002a00"},
+                {"address": "0x2a012a", "hex": "51"},
+                {"address": "0x1a3580", "hex": "00000000"}]},
+    {"name": "disabled_record_also_clears", "registers": {"eax": "0xabcd0000"},
+     "memory": [{"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x20f550", "hex": "00002a00"},
+                {"address": "0x2a0140", "hex": "00"},
+                {"address": "0x2a012a", "hex": "ff"},
+                {"address": "0x1a3580", "hex": "00000000"}]},
+    {"name": "null_entry", "registers": {"eax": "0x00000000"},
+     "memory": [{"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x20f550", "hex": "00000000"},
+                {"address": "0x1a3580", "hex": "00000000"}]},
+    {"name": "index_out_of_range", "registers": {"eax": "0x00000004"},
+     "memory": [{"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x1a3580", "hex": "00000000"}]}
+  ]
+}

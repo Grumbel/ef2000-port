@@ -590,6 +590,25 @@ remain `drafted`; a local host build or inspected disassembly is **not** an Open
 differential or full-game replay. The `watcom-omf` Nix check now compiles and
 disassembles the three additional candidates in the owner's environment.
 
+Filtered object-state batch (2026-11-03): five more C drafts cover the
+`0x7489c` guarded pointer lookup and four byte-flag wrappers (`0x6a354`,
+`0x6a378`, `0x6a394`, `0x6a3d0`), each with at least two confirmed direct
+callers and ABI signatures. Recovered separate record flags at `0x128636`
+with a `0xe5` stride, an excluded index at `0x1f71d0`, and the diagnostic
+counter at `0x1a3580`. Host-model tests and isolated guest specs exercise
+sentinels, signed bounds, disabled records and counter wraparound. The lookup
+original crosses into a **shared epilogue at `0x6a1ac`**: its Ghidra body
+size is noncontiguous and must not be treated as an in-place overwrite length.
+All five remain `drafted`; the matching Watcom objects and guest verification
+are still outstanding. The current workspace has no
+`local/ghidra/full-export/calls.tsv`, so `decomp_status.py next` could not
+rank these candidates; selection and caller checks used direct disassembly
+of the pinned executable. Reacquire the Ghidra pseudo-C review before any
+splice approval.
+The existing in-place OMF converter also accepts only one code public per
+object; this cluster's multi-function `object_state.c` requires function-wise
+object extraction or isolated compilation before actual splice testing.
+
 ### 3.11 [ ] Phase-1 exit criteria
 
 - `nix flake check` passes with all new asset-free tests.
@@ -924,6 +943,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Drafted first recovered game C function (0x432c signed high-score qualification), with packed-layout asserts, native host test and ten differential boundary fixtures; guest verification pending.
 2026-11-03  3.7   Added SHA-pinned direct OMF-to-EFPATCH1 path for reviewed in-place-only functions and synthetic full-chain relocation tests; first real OpenWatcom object still pending.
 2026-11-03  4     SHA-pinned original image audited against C drafts at 0x432c/0x263e0/0x6a1b4; spatial append 0x263ec recovered from four direct callers, three new drafted functions with signed/packed guest specs.
+2026-11-03  4     Drafted 0x7489c filtered object lookup plus four 0x6a3xx state wrappers; five new ABI-reviewed C functions and differential plans, with shared-epilogue splice hazard documented.
 ```
 
 ---

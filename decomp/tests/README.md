@@ -21,3 +21,10 @@ its signature deliberately does not assert preservation of that register.
 `0x0006a1b4.json` covers ten signed AX bounds, nonzero and zero guest-pointer
 entries, and high EAX bits that must not affect AX indexing. None of these
 specifications claim an executed OpenWatcom guest differential yet.
+
+`0x0007489c.json` covers nine filtered-lookup conditions and observable
+diagnostic-counter side effects; its function-body size is noncontiguous.
+`0x0006a354.json`, `0x0006a378.json`, `0x0006a394.json` and
+`0x0006a3d0.json` exercise four linked state wrappers, including object
+record flag guards, `0xe5` type-stride lookups, rejection sentinels and
+preserved global state. All remain execution *plans*, not verified results.

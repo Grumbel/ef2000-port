@@ -249,6 +249,44 @@ stack-cleanup contract as `0x6a354`. Both wrappers have ordinary DS-based
 memory accesses. Their lookup callee also increments a fixed diagnostic
 counter at `0x1a3580`; do not remove that observable side effect when porting.
 
+### Filtered object lookup and four short state wrappers (C drafts)
+
+The filtered lookup `0x7489c` is distinct from the simple table accessor
+`0x6a1b4`. Its callers at `0x23811` (tests EAX) and `0x2b858` (tests EAX before
+storing DL to the returned record) confirm signed AX input and EAX 32-bit
+pointer/zero output; it preserves EBX/ECX/EDX/ESI/EDI/EBP, with no stack
+parameters. Its first operation increments the diagnostic dword at
+`0x1a3580` regardless of lookup success. It rejects negative indices,
+indices at/above signed count `0x2119f4`, special index `0xff`, the 16-bit
+excluded index at `0x1f71d0`, and table entries equal to 32-bit `0xff`.
+Null entries return null without a separate test.
+
+**Important noncontiguous body:** original code occupies `0x7489c..0x748f3`
+(88 bytes), but rejection paths branch to the five-byte epilogue at
+`0x6a1ac..0x6a1b0` shared with another function. Ghidra therefore reports
+93 *body bytes*, not 93 writable contiguous bytes at `0x7489c`. An in-place
+replacement must use a validated **88-byte** capacity or a separately
+reviewed patch plan; do not use the tracker size as an overwrite extent.
+The OMF splice planner now refuses tracker rows marked `noncontiguous` in
+their notes, even if their state is later advanced to `compiles`.
+
+Two more short wrappers were verified against both callee bodies and their
+direct callers: `clear_indexed_object_activation` (`0x6a378`) from
+`0x2b9e9`/`0x47394`, and `clear_indexed_object_state` (`0x6a3d0`) from
+`0x2b8e5`/`0x46ffd`. Both accept signed AX only, preserve
+EBX/ECX/EDX/ESI/EDI/EBP via the lookup helper, and have no register output
+observed by callers. The first requires nonzero object byte `+0x140` and
+sets `+0x141` to zero; the second unconditionally clears `+0x12a` when a
+record exists. Together with confirmed `0x6a354` and `0x6a394`, these form
+a four-wrapper state cluster. `0x6a394` selects a `0xe5`-stride flag using
+the kind byte at `+0xe9` and modifies bytes `+0x12a`, `+0x13d`, `+0x13e`
+only if the flag is nonzero. All four use `0x7489c`, so the diagnostic
+lookup count changes even when no record is updated.
+
+`decomp/src/object_lookup.c` and `object_state.c` now model these cases in C
+with a host-only guest-pointer adapter. Their calling conventions and source
+are *drafts*, not evidence of Watcom compilation or a passing guest replay.
+
 The x87 functions at `0x6a4c4` and `0x6a538` share the signed BX object
 index and use `0x6a1b4` to obtain the same record. There are **three
 register inputs**, all backed by distinct callers, no stack arguments,
