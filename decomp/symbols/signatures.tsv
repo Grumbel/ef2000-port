@@ -231,3 +231,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0001d5cc	dispatch_two_object_events	EAX:ef_addr32,DX:int16_t		ebx,ecx	0	Original 0x1d5cc (38 bytes); optional then unconditional dispatch; callers 1e0ec@1e126/394e0@3953f; docs/compiler-abi.md
 0x0004f314	update_dialog_bindings	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x4f314 (88 bytes); two child bindings and guest close; callers 4b6a0@4b761/4ca90@4cad5; docs/compiler-abi.md
 0x0004f6bc	flush_active_dialog_slots			ebx,edx	0	Original 0x4f6bc (74 bytes); BL byte index may wrap; callers 4f3e0@4f48b/4f494@4f53f; docs/compiler-abi.md
+0x000545e4	send_command_1d			ebx,ecx,edx,esi,edi,ebp	0	Original 0x545e4 (26 bytes); one stack byte 1d, call 0xa3f74 size 1; caller 7e758@7e7b8; docs/compiler-abi.md
+0x00054600	send_marker_packet_26			ebx,ecx,edx,esi,edi,ebp	0	Original 0x54600 (34 bytes); stack bytes 26 marker, size 2; caller 557e8@55855; docs/compiler-abi.md
+0x00054624	send_marker_packet_1e			ebx,ecx,edx,esi,edi,ebp	0	Original 0x54624 (34 bytes); stack bytes 1e marker, size 2; caller 558b0@5591e; docs/compiler-abi.md
+0x00054648	send_command_1f			ebx,ecx,edx,esi,edi,ebp	0	Original 0x54648 (26 bytes); one stack byte 1f, size 1; caller 7eccc@7ed37; docs/compiler-abi.md
+0x00054664	send_word_byte_packet_24	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	Original 0x54664 (33 bytes); stack bytes 24 AXlow AXhigh DL, size 4; caller 54f4c@54f95; docs/compiler-abi.md
+0x00054e5c	send_marker_packet_1b			ebx,ecx,edx,esi,edi,ebp	0	Original 0x54e5c (34 bytes); stack bytes 1b marker, size 2; caller 54e9c@54ea4; docs/compiler-abi.md
+0x00054e9c	commit_marker_selection	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x54e9c (21 bytes); byte record+1 to 0x12583b, call 0x54e5c, byte 0x1a5d1c=1; caller 581b0@583d4; docs/compiler-abi.md
+0x000550b0	apply_marker_to_grid_row	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x550b0 (39 bytes); compare 0x1a666b with record+3, movsx word record+1 times 0xca from 0x19bb58; caller 581b0@582dc; docs/compiler-abi.md

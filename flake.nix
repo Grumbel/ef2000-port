@@ -726,6 +726,12 @@
             ${source}/decomp/src/event_wrappers.c \
             -o work/event_wrappers_host_test
           work/event_wrappers_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_marker_packets_test.c \
+            ${source}/decomp/src/marker_packets.c \
+            -o work/marker_packets_host_test
+          work/marker_packets_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

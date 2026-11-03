@@ -1508,3 +1508,23 @@ noncontiguous: the window is a diagnostic aid, not an exact body export.
 4. When differential replay becomes available, evaluate `-5r` and stronger
    optimizations on equivalent RAM traces. The selected 2.0 flags above are
    suitable for the first C/OMF experiments, not final proof of correctness.
+
+## Marker packet wrappers and grid-row store (2026-11-03)
+
+Eight further original functions. Each has one direct caller in the Ghidra
+call table; indirect callers are not excluded. The host drafts remain
+unverified at the guest/Watcom level.
+
+| Entry | Inputs and output | Caller instruction | Observed effect |
+| --- | --- | --- | --- |
+| `0x545e4` | none; void | `0x7e7b8` | send one-byte packet `1d` through `0xa3f74` |
+| `0x54600` | none; void | `0x55855` | send `26, byte 0x1a666b` (two bytes) |
+| `0x54624` | none; void | `0x5591e` | send `1e, byte 0x1a666b` (two bytes) |
+| `0x54648` | none; void | `0x7ed37` | send one-byte packet `1f` |
+| `0x54664` | signed AX, DL byte; void | `0x54f95` | send `24, AXlow, AXhigh, DL` (four bytes) |
+| `0x54e5c` | none; void | `0x54ea4` | send `1b, byte 0x1a666b` (two bytes) |
+| `0x54e9c` | EAX record pointer; void | `0x583d4` | copy record `+1` to `0x12583b`, call `0x54e5c`, set `0x1a5d1c=1` |
+| `0x550b0` | EAX record pointer; void | `0x582dc` | if marker `0x1a666b` equals record `+3`, store it at byte 0 of grid row `movsx(word record+1)*0xca` from `0x19bb58` |
+
+Registers: the packet wrappers push and pop EDX (or, for `0x54664`, take DL)
+and only clobber EAX; the packet helper `0xa3f74` is a guest dependency.

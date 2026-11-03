@@ -409,4 +409,14 @@ void send_grid_marker_short_packet(int16_t index); /* 0x546c0, AX */
 uint8_t grid_reference_distance_matches(int16_t cell); /* 0x0002dc84 */
 uint8_t grid_external_distance_matches(int16_t cell, uint8_t probe); /* 0x0002dbf8 */
 
+/* Marker packet wrappers and grid-row marker store. */
+void send_command_1d(void); /* 0x545e4 */
+void send_marker_packet_26(void); /* 0x54600 */
+void send_marker_packet_1e(void); /* 0x54624 */
+void send_command_1f(void); /* 0x54648 */
+void send_word_byte_packet_24(int16_t value, uint8_t flag); /* 0x54664 AX/DL */
+void send_marker_packet_1b(void); /* 0x54e5c */
+void commit_marker_selection(ef_addr32 record); /* 0x54e9c EAX */
+void apply_marker_to_grid_row(ef_addr32 record); /* 0x550b0 EAX */
+
 #endif

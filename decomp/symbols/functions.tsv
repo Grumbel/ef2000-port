@@ -980,11 +980,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000544c0	53	count_external_grid_markers	runtime_predicates	drafted	game	confirmed	decomp/tests/0x000544c0.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x000544f8	170			unknown	unclassified	unverified		
 0x000545b8	42	send_grid_marker_packet	command_packets	drafted	game	confirmed	decomp/tests/0x000545b8.json	docs/compiler-abi.md; Five-byte opcode 0x0c packet AX little-endian, marker 0x1a666b then DL; original call 0xa3f74; guest dispatch unverified
-0x000545e4	26			unknown	unclassified	unverified		
-0x00054600	34			unknown	unclassified	unverified		
-0x00054624	34			unknown	unclassified	unverified		
-0x00054648	26			unknown	unclassified	unverified		
-0x00054664	33			unknown	unclassified	unverified		
+0x000545e4	26	send_command_1d	marker_packets	drafted	game	confirmed	decomp/tests/0x000545e4.json	docs/compiler-abi.md; One-byte packet 0x1d via 0xa3f74; sole direct caller 7e758@7e7b8; guest pending
+0x00054600	34	send_marker_packet_26	marker_packets	drafted	game	confirmed	decomp/tests/0x00054600.json	docs/compiler-abi.md; Packet 0x26 plus marker 0x1a666b via 0xa3f74; sole direct caller 557e8@55855; guest pending
+0x00054624	34	send_marker_packet_1e	marker_packets	drafted	game	confirmed	decomp/tests/0x00054624.json	docs/compiler-abi.md; Packet 0x1e plus marker 0x1a666b via 0xa3f74; sole direct caller 558b0@5591e; guest pending
+0x00054648	26	send_command_1f	marker_packets	drafted	game	confirmed	decomp/tests/0x00054648.json	docs/compiler-abi.md; One-byte packet 0x1f via 0xa3f74; sole direct caller 7eccc@7ed37; guest pending
+0x00054664	33	send_word_byte_packet_24	marker_packets	drafted	game	confirmed	decomp/tests/0x00054664.json	docs/compiler-abi.md; Four-byte packet 0x24, AX little-endian, DL; sole direct caller 54f4c@54f95; guest pending
 0x00054688	53			unknown	unclassified	unverified		
 0x000546c0	40	send_grid_marker_short_packet	command_packets	drafted	game	confirmed	decomp/tests/0x000546c0.json	docs/compiler-abi.md; Four-byte opcode 0x16 packet AX little-endian and marker 0x1a666b; original call 0xa3f74; guest dispatch unverified
 0x000546e8	56			unknown	unclassified	unverified		
@@ -996,9 +996,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00054b9c	1			unknown	unclassified	unverified		
 0x00054ba0	109			unknown	unclassified	unverified		
 0x00054c10	426			unknown	unclassified	unverified		
-0x00054e5c	34			unknown	unclassified	unverified		
+0x00054e5c	34	send_marker_packet_1b	marker_packets	drafted	game	confirmed	decomp/tests/0x00054e5c.json	docs/compiler-abi.md; Packet 0x1b plus marker 0x1a666b via 0xa3f74; sole direct caller 54e9c@54ea4; guest pending
 0x00054e80	26			unknown	unclassified	unverified		
-0x00054e9c	21			unknown	unclassified	unverified		
+0x00054e9c	21	commit_marker_selection	marker_packets	drafted	game	confirmed	decomp/tests/0x00054e9c.json	docs/compiler-abi.md; Copy record+1 to 0x12583b, send 0x1b packet, set latch 0x1a5d1c; sole direct caller 581b0@583d4; guest pending
 0x00054eb4	69			unknown	unclassified	unverified		
 0x00054efc	8			unknown	unclassified	unverified		
 0x00054f04	69			unknown	unclassified	unverified		
@@ -1006,7 +1006,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00054ff4	91			unknown	unclassified	unverified		
 0x00055050	52			unknown	unclassified	unverified		
 0x00055084	43			unknown	unclassified	unverified		
-0x000550b0	39			unknown	unclassified	unverified		
+0x000550b0	39	apply_marker_to_grid_row	marker_packets	drafted	game	confirmed	decomp/tests/0x000550b0.json	docs/compiler-abi.md; If record+3==marker store marker at grid row (signed word +1)*0xca byte 0; sole direct caller 581b0@582dc; guest pending
 0x000550d8	67			unknown	unclassified	unverified		
 0x0005511c	38			unknown	unclassified	unverified		
 0x00055144	875			unknown	unclassified	unverified		

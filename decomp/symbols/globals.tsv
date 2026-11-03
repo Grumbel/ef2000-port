@@ -227,3 +227,5 @@ addr	size	type	name	evidence	notes
 0x001357b0	2	int16_t	g_dialog_active_index_count	0x4f6f5 reads	Signed bound for byte-index slot scan
 0x001a5510	variable	uint8_t[]	g_dialog_slot_indices	0x4f6c6 reads	Mapping loop byte index to active dialog slot
 0x001a553b	variable	uint8_t[]	g_dialog_slot_flags	0x4f6d1 reads 0x4f6dc clears	Per-slot active flag byte
+0x0012583b	1	uint8_t	g_marker_selection_value	0x54e9f writes	Byte copied from record+1 before packet 0x1b
+0x001a5d1c	1	uint8_t	g_marker_selection_pending	0x54ea9 writes	Latch set to 1 after packet 0x1b
