@@ -119,3 +119,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0007eea0	set_control_mode_a	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	If byte 0x15bac6 is nonzero select AL, else zero; store 0x12b070, return zero-extended; callers 0x3dd30@0x3dd98/0x7feb0@0x7fee9; docs/compiler-abi.md
 0x000810d0	set_control_mode_b	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	If byte 0x15bac7 is nonzero select AL, else zero; store 0x12b104; callers 0x3dd30@0x3dd9f/0x81110@0x8114c; docs/compiler-abi.md
 0x000810f4	set_control_mode_c	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Same gate as 0x810d0, distinct output at 0x12b105; callers 0x3dd30@0x3ddb9/0x81110@0x81153; docs/compiler-abi.md
+0x000545b8	send_grid_marker_packet	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	Stack bytes 0c AXlow AXhigh 0x1a666b DL then call 0xa3f74 size 5; callers 0x7e670@0x7e6f2/0x8f644@0x8f72f; docs/compiler-abi.md
+0x000546c0	send_grid_marker_short_packet	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 16 AXlow AXhigh 0x1a666b then call 0xa3f74 size 4; callers 0x2e740@0x2e817/0x7e5a0@0x7e60a; docs/compiler-abi.md
+0x00056f0c	send_object_state_packet	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	Stack bytes 32 AXlow AXhigh DL, call 0xa3f74 size 4; callers 0x16c7c@0x16d2a/0x16d60@0x16ddf; docs/compiler-abi.md
+0x00057140	send_object_code_39	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 39 AXlow AXhigh, call 0xa3f74 size 3; callers 0x6d38c@0x6d451/0x712e8@0x7155d; docs/compiler-abi.md
+0x00057198	send_object_code_3a	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 3a AXlow AXhigh, call 0xa3f74 size 3; callers 0x6d38c@0x6d54e/0x7156c@0x718f7; docs/compiler-abi.md
+0x00057684	send_object_code_4a	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 4a AXlow AXhigh, call 0xa3f74 size 3; callers 0x298f0@0x29acc/0x86110@0x864ad; docs/compiler-abi.md
+0x000576b4	send_object_code_4b	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 4b AXlow AXhigh, call 0xa3f74 size 3; callers 0x294ec@0x29776/0x86110@0x86574; docs/compiler-abi.md
+0x000576e4	send_object_code_4c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 4c AXlow AXhigh, call 0xa3f74 size 3; callers 0x294ec@0x29824/0x86110@0x86624; docs/compiler-abi.md

@@ -1,0 +1,23 @@
+{
+  "address": "0x00056f0c",
+  "function_size": 33,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_value",
+      "registers": {
+        "eax": "0x00000000",
+        "edx": "0x00000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "signed_index_and_value",
+      "registers": {
+        "eax": "0x12348001",
+        "edx": "0x567800e2"
+      },
+      "memory": []
+    }
+  ]
+}

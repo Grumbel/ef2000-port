@@ -1,0 +1,33 @@
+{
+  "address": "0x000545b8",
+  "function_size": 42,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_grid_packet",
+      "registers": {
+        "eax": "0x00000000",
+        "edx": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x001a666b",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "signed_index_and_marker",
+      "registers": {
+        "eax": "0x12348001",
+        "edx": "0x567800e2"
+      },
+      "memory": [
+        {
+          "address": "0x001a666b",
+          "hex": "9b"
+        }
+      ]
+    }
+  ]
+}

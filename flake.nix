@@ -623,6 +623,19 @@
             ${source}/decomp/src/vector_math.c \
             -lm -o work/scene_controls_vectors_host_test
           work/scene_controls_vectors_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_runtime_link_controls_test.c \
+            ${source}/decomp/src/link_resolution.c \
+            ${source}/decomp/src/runtime_control.c \
+            -o work/runtime_link_controls_host_test
+          work/runtime_link_controls_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_command_packets_test.c \
+            ${source}/decomp/src/command_packets.c \
+            -o work/command_packets_host_test
+          work/command_packets_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

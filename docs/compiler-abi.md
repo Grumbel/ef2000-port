@@ -1120,6 +1120,34 @@ boundary differential fixtures, but no patched guest confirmation.
   `0x12b105`. They return the selected value in **full zero-extended EAX**
   and preserve EDX with push/pop.
 
+### Binary command-packet wrappers (eight C drafts)
+
+The next eight original bodies use the same direct-call dependency at
+`0xa3f74` with EAX=pointer to a short **stack-local byte packet** and
+EDX=length. Every packet wrapper has two distinct direct callers. The
+packet dispatch implementation is not yet recovered; the C model provides
+an explicitly unresolved `emit_command_packet()` dependency. Host tests
+mock this dependency synchronously to observe exact bytes and lengths.
+
+| Original address | Opcode | Packet bytes in order | Length |
+| --- | --- | --- | ---: |
+| `0x56f0c` | `0x32` | opcode, AX low, AX high, DL | 4 |
+| `0x57140` | `0x39` | opcode, AX low, AX high | 3 |
+| `0x57198` | `0x3a` | opcode, AX low, AX high | 3 |
+| `0x57684` | `0x4a` | opcode, AX low, AX high | 3 |
+| `0x576b4` | `0x4b` | opcode, AX low, AX high | 3 |
+| `0x576e4` | `0x4c` | opcode, AX low, AX high | 3 |
+| `0x545b8` | `0x0c` | opcode, AX low, AX high, byte at `0x1a666b`, DL | 5 |
+| `0x546c0` | `0x16` | opcode, AX low, AX high, byte at `0x1a666b` | 4 |
+
+`0x56f0c` and `0x545b8` clobber EDX before dispatch; other wrappers
+restore EDX with push/pop. The packet objects are local stack bytes: the
+original dependency must consume or copy them during the call, not retain
+the pointer for asynchronous use. C `uint8_t` arrays model the **payload**
+but not the original stack layout or guest callback side effects.
+OpenWatcom register assignment, real `0xa3f74` behavior and live guest
+packet ordering must be validated before marking these verified.
+
 ## Comparing assembly
 
 ```sh
