@@ -745,8 +745,11 @@ Session start checklist:
 1. `git status` is clean and `git log -3` matches what you expect.
 2. Read §1 and §4 of this file, plus `AGENTS.md`.
 3. Confirm game data is present: `../EF2000/c/EF2000/_EF2000.EXE` with the
-   SHA-256 in `docs/executable.md`. Without it only asset-free work is
-   possible; say so instead of guessing.
+   SHA-256 in `docs/executable.md`. In web chat sessions the data arrives as
+   a `.zip`: extract it outside the repository (or under `local/`), verify
+   the SHA-256 and pass its path via `EF2000_EXE` / `--data-dir`. Without the
+   data only asset-free work is possible; say so instead of guessing.
+   Web chat sessions deliver their commits as a Git bundle (`TODO.md`).
 4. Confirm `local/ghidra` exists; if not, run step 3.0 first.
 5. Find the first unchecked step in §3 (or the current wave in §6) and
    continue there. Do not start a later phase early.

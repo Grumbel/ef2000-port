@@ -228,12 +228,15 @@ handoff. Desktop integration and broader runtime conventions follow when there
 is a playable Linux application. R36S, Android, and other platform ports are
 outside current scope. The source license does not license original game data.
 
-Keep commits on one history. For the current numbered bundle handoff, the
-agreed prerequisite is `0ea7b71392e2f24ba7bca4f749dceda997b16047`.
-Create each cumulative bundle from that base to the new tip, including **all**
-agent commits from previous bundles; verify it with `git bundle verify`.
-Each numbered bundle replaces the previous download, never creates a parallel
-workline, and is the only delivery artifact (no patch files).
+Keep commits on one history. Codex and Claude Code sessions commit directly
+in the repository. Web chat sessions deliver numbered Git bundles instead;
+the agreed prerequisite (after the 2026-11-03 author rewrite) is
+`0ea7b71392e2f24ba7bca4f749dceda997b16047`. Create each cumulative bundle
+from that base to the new tip, including **all** agent commits from previous
+bundles; verify it with `git bundle verify`. Each numbered bundle replaces
+the previous download, never creates a parallel workline, and is the only
+delivery artifact (no patch files). Commits in bundles use the owner as
+author and the agent as `Co-authored-by:` (see `AGENTS.md`).
 
 
 Input support is implemented and verified with an SDL virtual joystick.

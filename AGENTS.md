@@ -8,20 +8,29 @@
 - Commit verified work in small, incremental pieces as it becomes ready. Do not
   accumulate hours of unrelated changes before committing.
 - Every new commit must include a `Co-authored-by:` trailer naming the AI
-  model that actually made the changes in that commit, with its vendor's
-  attribution address. Examples:
+  that actually made the changes in that session, with its vendor's
+  attribution address. Never copy attribution from earlier commits.
+- Use a specific model name when the session metadata or the user states
+  one; otherwise use a generic name. Do not guess a version and do not stop
+  to ask. Examples:
   `Co-authored-by: Claude Opus 5.5 <noreply@anthropic.com>`,
-  `Co-authored-by: <exact OpenAI model name> <codex@openai.com>`.
-- Use the exact model identifier from authoritative session metadata or the
-  user. Do not infer it from a model family, repository configuration, earlier
-  commits, or another agent's model. If unavailable, ask while continuing
-  implementation and checks. Never copy attribution from previous commits;
-  each session attributes itself.
-- For ChatGPT Chat sessions that disclose only a reasoning setting (such as
-  "High"), the user approved a descriptive fallback:
-  `Co-authored-by: ChatGPT (High) <codex@openai.com>`. Record an actual model
-  identifier instead whenever one is available.
+  `Co-authored-by: Claude <noreply@anthropic.com>`,
+  `Co-authored-by: Codex <codex@openai.com>`,
+  `Co-authored-by: ChatGPT (High) <codex@openai.com>`.
+- The commit author is always the repository owner
+  (`Ingo Ruhnke <grumbel@gmail.com>`), never the AI.
 - Keep commit descriptions focused on the behavior changed and relevant evidence.
+
+## Delivery
+
+- Agents with direct repository access (Codex, Claude Code) commit
+  directly on `master`.
+- Web chat sessions without repository access deliver a Git bundle; see the
+  handoff section in `TODO.md`.
+- Original game data may arrive as a `.zip`. Extract it outside the
+  repository (or under the ignored `local/`), verify the `_EF2000.EXE`
+  SHA-256 from `docs/executable.md`, and point tools at it with
+  `EF2000_EXE` / `--data-dir`. Never commit the archive or its contents.
 
 ## Decompilation work
 
