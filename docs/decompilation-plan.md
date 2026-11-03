@@ -323,7 +323,7 @@ Bootstrap flags are provisional until §3.5. Python wrapper tests and C89
 fixture syntax checks pass locally. Nix/OpenWatcom execution needs validation
 on the owner's NixOS machine before marking this step complete.
 
-### 3.5 [ ] Determine the ABI conventions and canonical compiler flags
+### 3.5 [~] Determine the ABI conventions and canonical compiler flags
 
 Binaries do not need to match (§2.2), so this step is about **ABI and data
 layout**, not code generation. Do it before writing real game code.
@@ -352,6 +352,11 @@ layout**, not code generation. Do it before writing real game code.
    register use, `rep movsd` blocks, self-modifying code, `in/out`). Mark
    `kind=asm`. Prefer rewriting them in C when the observable behavior
    (§2.2) can be reproduced; otherwise keep them as `wasm` assembly.
+
+In progress 2026-11-03: `docs/compiler-abi.md` records initial high-score
+instruction evidence and provisional flags; `tools/asm_diff.py` provides
+side-by-side original/OMF listings with asset-free tests. No ABI signature
+has been marked confirmed; the ~40-function cross-region audit remains.
 
 ### 3.6 [ ] Library identification
 
@@ -761,6 +766,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.2   Done: re-seed from fresh 12.1.4 Ghidra inventory is identical (4,277 rows); tracker check and tests pass.
 2026-11-03  3.3   Done: reproducible apply/export symbols; live synthetic persistence/idempotence test and 4,277-function refresh pass.
 2026-11-03  3.4   In progress: flake packages, ef2000-wcc, and OMF smoke check implemented; awaiting Nix execution feedback.
+2026-11-03  3.5   In progress: initial high-score ABI instruction audit and OMF disassembly helper.
 ```
 
 ---
