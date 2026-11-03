@@ -1,0 +1,23 @@
+{
+  "address": "0x00082e00",
+  "function_size": 61,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "matching_second_fragment",
+      "registers": {"eax": "0x002a0000", "edx": "0x002a1000"},
+      "memory": [
+        {"address": "0x002a0000", "hex": "616c7068617c627261766f7c636861726c69657c00"},
+        {"address": "0x002a1000", "hex": "627261766f00"}
+      ]
+    },
+    {
+      "name": "missing_fragment",
+      "registers": {"eax": "0x002a0000", "edx": "0x002a1000"},
+      "memory": [
+        {"address": "0x002a0000", "hex": "616c7068617c627261766f7c00"},
+        {"address": "0x002a1000", "hex": "6d697373696e6700"}
+      ]
+    }
+  ]
+}

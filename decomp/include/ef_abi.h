@@ -85,6 +85,30 @@ void rotate_ui_record_ring(void); /* 0x879c4 */
 void initialize_ui_record_ring(ef_addr32 head); /* 0x878c8 EAX */
 void reset_ui_record_pool(void); /* 0x8f5f4 */
 
+/* UI string, tactical and record caller wrappers. Guest sinks are original. */
+void send_packet_2c(uint8_t a, uint8_t d, uint8_t b, uint8_t c,
+                    uint8_t stack_code); /* 0x577ac AL/DL/BL/CL, ret 4 */
+void guest_packet_after_send(const uint8_t *packet); /* 0x57820 EAX */
+void draw_tactical_cross(int16_t x, int16_t y); /* 0x5dbc8 AX/DX */
+void draw_tactical_line(int32_t y1, int32_t x1, int32_t y2,
+                        int32_t x2, uint32_t marker); /* 0xc8ccc cdecl */
+void update_ui_record_from_template(int16_t index, ef_addr32 record); /* 0x80d40 AX/EDX */
+ef_addr32 lookup_ui_record_template(ef_addr32 table, int32_t index); /* 0x80d20 EAX/EDX */
+void update_ui_composite(void); /* 0x84370 */
+void guest_ui_composite_sink(ef_addr32 base, uint32_t d,
+                             uint32_t b, uint32_t c); /* 0x83708 */
+uint32_t ui_record_current_is_active(ef_addr32 record); /* 0x866e0 EAX */
+void ui_report_missing_record(ef_addr32 message); /* indirect 0x132a74 */
+void update_object_with_link(ef_addr32 object, ef_addr32 link); /* 0x8be54 EAX/EDX */
+void guest_object_unlink_if_current(ef_addr32 object, ef_addr32 link); /* 0x8f5d8 */
+void guest_object_install_link(ef_addr32 object, ef_addr32 link); /* 0x90924 */
+void compact_ui_fragment(ef_addr32 string); /* 0x82dd0 EAX */
+ef_addr32 find_matching_ui_fragment(ef_addr32 list, ef_addr32 needle); /* 0x82e00 EAX/EDX */
+ef_addr32 next_ui_fragment(ef_addr32 string); /* 0x82da4 EAX */
+uint32_t guest_string_length(ef_addr32 string); /* 0xb1b8b EAX */
+int32_t guest_prefix_compare(ef_addr32 a, ef_addr32 b,
+                             uint32_t length); /* 0xe5c03 EAX/EDX/EBX */
+
 /* Short clock, tactical state and coordinate helpers (host drafts). */
 uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */
 uint32_t command_code_is_group_1b(uint8_t code); /* 0x41da4 AL -> EAX */

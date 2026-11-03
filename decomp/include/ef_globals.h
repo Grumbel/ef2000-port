@@ -208,5 +208,9 @@ extern ef_addr32 g_ui_record_end; /* 0x0020f164 */
 extern ef_addr32 g_ui_record_cursor; /* 0x0020f168 */
 extern uint16_t g_ui_record_pool_count; /* 0x002119f4 */
 extern uint32_t g_ui_record_pool_pointer; /* 0x002119e8 */
+extern uint16_t g_tactical_cross_radius; /* 0x001a6ce2 */
+extern uint32_t g_ui_composite_arg_d; /* 0x001fcc2c */
+extern uint32_t g_ui_composite_arg_b; /* 0x001fcc30 */
+extern uint32_t g_ui_composite_arg_c; /* 0x001fcc34 */
 
 #endif

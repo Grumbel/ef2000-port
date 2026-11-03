@@ -1309,6 +1309,26 @@ must not manufacture recovery behavior for corrupt pointers. Fixture schemas
 validate, but no guest differential comparison has yet been performed, and
 the original guest callbacks are deliberately represented as typed sinks.
 
+### UI fragments, record templates and tactical cross (eight-function wave)
+
+| Address | Draft | ABI and side effects | Two independent callers |
+| --- | --- | --- | --- |
+| `0x577ac` | `send_packet_2c` | AL/DL/BL/CL and one stack byte; `ret 4`, send six-byte `0x2c` packet then pass original buffer to `0x57820` | `0x9114@0x9254`, `0x10a9c@0x10ceb` |
+| `0x5dbc8` | `draw_tactical_cross` | AX/DX coordinates; signed word radius `(offset+2)<<mode`, two five-argument line draw calls | `0x59fa4@0x5a201`, `0x5a220@0x5a2bf` |
+| `0x80d40` | `update_ui_record_from_template` | AX signed lookup index, EDX output record; copy four words, sign-extending three, or write sentinel `0xcc` and clear fields | `0x55928@0x55a8d`, `0x87a20@0x87d10` |
+| `0x82dd0` | `compact_ui_fragment` | EAX mutable string; use delimiter helper `0x82da4` to compact suffix in place | `0x82e40@0x82fec`, `0x830b8@0x8315c` |
+| `0x82e00` | `find_matching_ui_fragment` | EAX list, EDX search string; length `0xb1b8b`, prefix compare `0xe5c03`, delimiter advance `0x82da4` | `0x82e40@0x82fe7`, `0x830b8@0x83157` |
+| `0x84370` | `update_ui_composite` | No args; fixed EAX record and three dwords in EDX/EBX/ECX forwarded to `0x83708` | `0x843b0@0x844a3`, `0x844b0@0x844da` |
+| `0x866e0` | `ui_record_current_is_active` | EAX record; linear search of four-byte pointer array at `0x12d7b4` for record+`0x3c`, report missing with `0x18a3b8` | `0x86f7c@0x870d7`, `0x873a4@0x874d0` |
+| `0x8be54` | `update_object_with_link` | EAX object, EDX link; original unlink-if-current then install-link guest calls | `0x878c8@0x878f3`, `0x8873c@0x887aa` |
+
+These drafts preserve the original packet and callback ordering, word-sized
+arithmetic, in-place string writes, signed record fields and sentinel-based
+table traversal. The individual helpers use typed callback dependencies where
+native guest routines are not yet recovered. Host tests exercise both branches
+and ordering; fixture schemas validate, but the runtime guest differential
+tests and OMF splices remain pending.
+
 ## Comparing assembly
 
 ```sh

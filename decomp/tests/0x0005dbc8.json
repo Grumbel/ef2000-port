@@ -1,0 +1,25 @@
+{
+  "address": "0x0005dbc8",
+  "function_size": 87,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "double_scaled_cross",
+      "registers": {"eax": 12, "edx": "0xfff7"},
+      "memory": [
+        {"address": "0x001a6ce2", "hex": "0300"},
+        {"address": "0x0012b369", "hex": "01"},
+        {"address": "0x00128148", "hex": "e1"}
+      ]
+    },
+    {
+      "name": "single_scaled_cross",
+      "registers": {"eax": 12, "edx": "0xfff7"},
+      "memory": [
+        {"address": "0x001a6ce2", "hex": "0300"},
+        {"address": "0x0012b369", "hex": "00"},
+        {"address": "0x00128148", "hex": "e1"}
+      ]
+    }
+  ]
+}

@@ -183,3 +183,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00087970	refresh_record_selection	EAX:ef_addr32		ebx,edx	0	Original 0x87970 (81 bytes); six-byte selection record and optional signed index increment; callers 87a20@87bcc/89164@89177; docs/compiler-abi.md
 0x000879c4	rotate_ui_record_ring			ebx,edx	0	Original 0x879c4 (89 bytes); cursor selection and splice after anchor; callers 55928@55958/87db8@87dbd; docs/compiler-abi.md
 0x0008f5f4	reset_ui_record_pool			ebx,edx	0	Original 0x8f5f4 (41 bytes); 0x2260-byte clear and two state resets; callers 3cfc0@3cff7/8bd58@8bdb2; docs/compiler-abi.md
+0x000577ac	send_packet_2c	AL:uint8_t,DL:uint8_t,BL:uint8_t,CL:uint8_t,stack_code:uint32_t		eax,edx	4	Original 0x577ac (57 bytes); six-byte packet, then callback 57820; callers 9114@9254/10a9c@10ceb; docs/compiler-abi.md
+0x0005dbc8	draw_tactical_cross	AX:int16_t,DX:int16_t		eax,ecx,esi,edi,ebp	0	Original 0x5dbc8 (87 bytes); doubled offset shift and two c8ccc line calls; callers 59fa4@5a201/5a220@5a2bf; docs/compiler-abi.md
+0x00080d40	update_ui_record_from_template	AX:int16_t,EDX:ef_addr32		eax,edx	0	Original 0x80d40 (72 bytes); four template words copied to +0e/+16/+1a/+1e; callers 55928@55a8d/87a20@87d10; docs/compiler-abi.md
+0x00082dd0	compact_ui_fragment	EAX:ef_addr32		ebx,ecx,edx	0	Original 0x82dd0 (45 bytes); compact fragment in-place from 82da4 offset; callers 82e40@82fec/830b8@8315c; docs/compiler-abi.md
+0x00082e00	find_matching_ui_fragment	EAX:ef_addr32,EDX:ef_addr32	EAX:ef_addr32	ebx,ecx,esi,edi	0	Original 0x82e00 (61 bytes); length and prefix compare over delimited list; callers 82e40@82fe7/830b8@83157; docs/compiler-abi.md
+0x00084370	update_ui_composite			ebx,ecx,edx	0	Original 0x84370 (35 bytes); constant EAX with three global args to 83708; callers 843b0@844a3/844b0@844da; docs/compiler-abi.md
+0x000866e0	ui_record_current_is_active	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx	0	Original 0x866e0 (64 bytes); linear scan zero-terminated pointer table; callers 86f7c@870d7/873a4@874d0; docs/compiler-abi.md
+0x0008be54	update_object_with_link	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx	0	Original 0x8be54 (23 bytes); calls 8f5d8 then 90924 with original args; callers 878c8@878f3/8873c@887aa; docs/compiler-abi.md

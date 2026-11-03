@@ -1,0 +1,17 @@
+{
+  "address": "0x000577ac",
+  "function_size": 57,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "five_payload_bytes",
+      "registers": {"eax": "0x1234", "edx": "0x56", "ebx": "0x78", "ecx": "0x9a"},
+      "stack_args": ["0x000000bc"]
+    },
+    {
+      "name": "all_zero_bytes",
+      "registers": {"eax": 0, "edx": 0, "ebx": 0, "ecx": 0},
+      "stack_args": [0]
+    }
+  ]
+}

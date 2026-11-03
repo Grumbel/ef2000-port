@@ -1,0 +1,18 @@
+{
+  "address": "0x00082dd0",
+  "function_size": 45,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "compact_nonempty_string",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x002a0000", "hex": "7072656669787c73756666697800"}]
+    },
+    {
+      "name": "empty_string",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x002a0000", "hex": "00"}]
+    },
+    {"name": "null_input", "registers": {"eax": 0}}
+  ]
+}

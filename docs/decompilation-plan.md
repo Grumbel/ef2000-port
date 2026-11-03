@@ -1016,6 +1016,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  4     Drafted eight UI dispatch and release controls (138 total): gates, initial-state latch, fourteen-item callback loops, ten-entry button-code matching, signed indexed control dispatch, conditional panel reset, and message selection. Eight fixture plans, two original callsites per function, and a standalone passing host test; original guest dispatcher tests still pending.
 2026-11-03  5     Drafted eight packet/status/tactical wrapper functions (146 total): exact 18/9/10-byte outbound packets, two status-flag formatters, float32-to-double formatting, tactical display-mode inversion, and callback-first byte latch. Two original callsites each, eight fixture plans and a passing host test; guest differential still pending.
 2026-11-03  6     Drafted eight record/tactical transitions (154 total): doubled screen coordinates, signed metrics, overlapping position-bin word, conditional action reports, string assembly, six-byte selection lookup, doubly linked ring rotation and pool reset. Two callsites each, eight fixture plans, standalone host test passes; guest differential still pending.
+2026-11-03  7     Drafted eight UI/tactical helpers (162 total): packet 2c and post-send callback, tactical cross drawing, indexed template loading, UI fragment compaction and search, composite dispatch, record-table membership, and unlink-then-install. Eight replay fixtures validate, two original callsites per helper, host tests pass; guest verification pending.
 ```
 
 ---

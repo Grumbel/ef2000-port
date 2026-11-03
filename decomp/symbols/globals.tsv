@@ -176,3 +176,8 @@ addr	size	type	name	evidence	notes
 0x0020f168	4	ef_addr32	g_ui_record_cursor	0x879c6 read 0x879e1 write	Rotating selection cursor
 0x002119f4	2	uint16_t	g_ui_record_pool_count	0x8f602 writes	Reset to zero
 0x002119e8	4	uint32_t	g_ui_record_pool_pointer	0x8f612 writes	Reset to zero
+0x001a6ce2	2	uint16_t	g_tactical_cross_radius	0x5dbcd reads	Radius pre-shifted by display mode
+0x0012d7b4	variable	ef_addr32[]	g_ui_active_record_slots	0x866ed reads	Null-terminated pointer array
+0x001fcc2c	4	uint32_t	g_ui_composite_arg_d	0x84384 reads	Forwarded via EDX to 83708
+0x001fcc30	4	uint32_t	g_ui_composite_arg_b	0x8437e reads	Forwarded via EBX to 83708
+0x001fcc34	4	uint32_t	g_ui_composite_arg_c	0x84378 reads	Forwarded via ECX to 83708

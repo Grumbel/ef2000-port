@@ -1,0 +1,16 @@
+{
+  "address": "0x00080d40",
+  "function_size": 72,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "indexed_template",
+      "registers": {"eax": "0xfffffffd", "edx": "0x002a0000"},
+      "memory": [{"address": "0x002a000e", "hex": "ffff"}]
+    },
+    {
+      "name": "zero_index",
+      "registers": {"eax": 0, "edx": "0x002a0000"}
+    }
+  ]
+}

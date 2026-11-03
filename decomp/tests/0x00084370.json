@@ -1,0 +1,12 @@
+{
+  "address": "0x00084370",
+  "function_size": 35,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "nonzero_composite_state",
+      "memory": [{"address": "0x001fcc2c", "hex": "7856341298badcfe31040000"}]
+    },
+    {"name": "zero_composite_state"}
+  ]
+}
