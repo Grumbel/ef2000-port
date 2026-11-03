@@ -1023,4 +1023,67 @@ uint32_t guest_fn_1101be(uint32_t handle); /* 0x1101be EAX */
 void guest_fn_fba6c(uint32_t first, uint32_t second); /* 0xfba6c EAX/EDX */
 void guest_fn_c24(int32_t high, uint32_t address); /* 0xc24 EAX/EDX */
 
+/* runtime_helpers.c */
+void trace_call_103244(uint32_t a, uint32_t b);
+void trace_call_1033c8(uint32_t a, uint32_t b);
+void trace_call_103504(uint32_t a);
+void trace_call_1037e0(uint32_t a, uint32_t b);
+void trace_call_103b5c(uint32_t a, uint32_t b);
+void trace_call_103b90(uint32_t a, uint32_t b, uint32_t c);
+void shutdown_103d48(void);
+uint32_t exchange_slot_1041e4(uint32_t index, uint32_t value);
+void shutdown_104694(void);
+uint32_t allocate_and_init_1047a4(uint32_t size);
+void free_block_1047c4(uint32_t block, uint32_t size);
+void stack_range_104908(uint32_t base, uint32_t length);
+void stack_range_104920(uint32_t base, uint32_t length);
+void stop_object_105334(ef_addr32 object);
+void set_state_1_106634(ef_addr32 object);
+uint32_t get_state_106708(ef_addr32 object);
+void set_range_106718(ef_addr32 object, uint32_t first, uint32_t second);
+void set_pair_106740(ef_addr32 object, uint32_t first, uint32_t second);
+void set_field_10677c(ef_addr32 object, uint32_t value);
+void set_field_10679c(ef_addr32 object, uint32_t value);
+void set_field_1067cc(ef_addr32 object, uint32_t value);
+void set_field_10682c(ef_addr32 object, uint32_t value);
+void stop_selected_10683c(ef_addr32 object);
+void pause_object_10687c(ef_addr32 object);
+void resume_object_106894(ef_addr32 object);
+uint32_t exchange_callback_106938(ef_addr32 object, uint32_t value);
+void set_and_notify_106988(ef_addr32 object, uint32_t value);
+int32_t times_100(int32_t value);
+int32_t times_100_div_10(int32_t value);
+uint8_t elapsed_at_least(int32_t start, int32_t duration);
+void release_object_10703c(ef_addr32 slot);
+void send_command_107060(ef_addr32 slot);
+ef_addr32 build_char_set(ef_addr32 text, ef_addr32 set);
+int32_t hex_digit_value(int32_t c);
+ef_addr32 strip_cr_inplace(ef_addr32 text);
+ef_addr32 copy_line(ef_addr32 destination, ef_addr32 source);
+void skip_class_chars(ef_addr32 pointer);
+ef_addr32 copy_padded(ef_addr32 destination, ef_addr32 source, uint32_t count);
+ef_addr32 find_last_char(ef_addr32 text, uint8_t ch);
+void unlink_node_10d427(ef_addr32 node);
+int32_t count_matching_streams(uint32_t mask);
+uint32_t field_10dfe0(void);
+void guest_fn_1141a0(uint32_t a, uint32_t b); /* 0x1141a0 cdecl */
+void guest_fn_1142cc(uint32_t a, uint32_t b); /* 0x1142cc cdecl */
+void guest_fn_113c24(uint32_t a); /* 0x113c24 cdecl */
+void guest_fn_11458c(uint32_t a, uint32_t b); /* 0x11458c cdecl */
+void guest_fn_114878(uint32_t a, uint32_t b); /* 0x114878 cdecl */
+void guest_fn_114994(uint32_t a, uint32_t b, uint32_t c); /* 0x114994 cdecl */
+void guest_fn_1048b4(uint32_t first, uint32_t last); /* 0x1048b4 cdecl */
+void guest_fn_104840(uint32_t first, uint32_t last); /* 0x104840 cdecl */
+void guest_fn_1023b0(void); /* 0x1023b0 */
+void guest_fn_1110c5(void); /* 0x1110c5 */
+uint32_t guest_fn_c3f70(uint32_t size); /* 0xc3f70 EAX */
+void guest_fn_101f88(uint32_t handle, uint32_t message, uint32_t a, uint32_t b); /* 0x101f88 cdecl */
+void guest_fn_10535c(ef_addr32 object); /* 0x10535c cdecl */
+void guest_fn_1052f0(uint32_t handle); /* 0x1052f0 cdecl */
+uint32_t guest_fn_f8248(void); /* 0xf8248 */
+void guest_fn_118290(uint32_t object); /* 0x118290 EAX */
+void guest_fn_fa9d2(uint32_t object); /* 0xfa9d2 EAX */
+void guest_fn_118428(uint32_t object, uint32_t command); /* 0x118428 EAX/EDX */
+void guest_fn_fa8a0(ef_addr32 stream); /* 0xfa8a0 EAX */
+
 #endif

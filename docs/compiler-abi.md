@@ -1993,3 +1993,50 @@ in EAX, format string address, one value).
 | `0x10288c` | EAX:uint32_t,EDX:uint32_t | none | none direct | Trace wrapper for 0x1067cc. |
 | `0x1028c0` | EAX:uint32_t,EDX:uint32_t | none | d7158@d7273 | Trace wrapper for 0x10682c. |
 | `0x102a98` | EAX:uint32_t,EDX:uint32_t | none | d6e58@d6f32 | Trace wrapper for 0x106988. |
+
+## runtime_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x103244` | EAX:uint32_t,EDX:uint32_t | none | d5e0c@d5e96 | Trace wrapper for 0x1141a0. |
+| `0x1033c8` | EAX:uint32_t,EDX:uint32_t | none | d5fc8@d5fe5 | Trace wrapper for 0x1142cc. |
+| `0x103504` | EAX:uint32_t | none | d5d18@d5d31 | Trace wrapper for 0x113c24. |
+| `0x1037e0` | EAX:uint32_t,EDX:uint32_t | none | 1123a4@1126c1 | Trace wrapper for 0x11458c. |
+| `0x103b5c` | EAX:uint32_t,EDX:uint32_t | none | 1123a4@112761,114058@1140ea | Trace wrapper for 0x114878. |
+| `0x103b90` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 1123a4@112725,1123a4@11276c | Trace wrapper for 0x114994. |
+| `0x103d48` | none | none | none direct | If dword 0x17d2cc is set, run 0x1048b4(0x101a90, 0x103d48) and clear it. |
+| `0x1041e4` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 101e14@101e40 | Exchange dword 0x4dd7cc[index] with value; return the old one. |
+| `0x104694` | none | none | 101ddc@101df9 | Call 0x102488 on each non-null dword 0x4dd670[0..15], then 0x1023b0 and 0x1110c5. |
+| `0x1047a4` | EAX:uint32_t | EAX:uint32_t | 104200@104209,105e38@105e48,105e38@106209 | Allocate with 0xc3f70(size) and, if successful, run 0x104908(block, size). |
+| `0x1047c4` | EAX:uint32_t,EDX:uint32_t | none | 104200@104267,104200@1042e4,104200@10434c | For a non-null block run 0x104920(block, size) then free it with 0xc3f80. |
+| `0x104908` | EAX:uint32_t,EDX:uint32_t | none | d5e0c@d5e5e,d6df0@d6e03,d6df0@d6e15 | 0x104840(base, base + length). |
+| `0x104920` | EAX:uint32_t,EDX:uint32_t | none | d5ec0@d5ee7,d6ffc@d701d,d710c@d7123 | 0x1048b4(base, base + length). |
+| `0x105334` | EAX:ef_addr32 | none | 105648@105803,10585c@1058aa,105da0@105dae | If dword +0x54 is set, send message 0x402 through 0x101f88 and clear it. |
+| `0x106634` | EAX:ef_addr32 | none | 102644@102667 | Dword +4 = 1. |
+| `0x106708` | EAX:ef_addr32 | EAX:uint32_t | 1028f4@102919 | Dword +4, or 0 for null. |
+| `0x106718` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 1026fc@10272c | Reset +0xc and +0x14, set +8 and +0x10. |
+| `0x106740` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 102738@102768 | Update +0x34 / +0x38 and notify through 0x10535c when they change. |
+| `0x10677c` | EAX:ef_addr32,EDX:uint32_t | none | 102824@10284e | Dword +0x3c = value. |
+| `0x10679c` | EAX:ef_addr32,EDX:uint32_t | none | 102858@102882 | Update +0x40 and notify when it changes. |
+| `0x1067cc` | EAX:ef_addr32,EDX:uint32_t | none | d710c@d712e,10288c@1028b6 | As 0x10679c for +0x44. |
+| `0x10682c` | EAX:ef_addr32,EDX:uint32_t | none | 1028c0@1028ea | Dword +0x30 = value. |
+| `0x10683c` | EAX:ef_addr32 | none | 102774@102797 |  |
+| `0x10687c` | EAX:ef_addr32 | none | 1027a0@1027c3 | State 4 becomes 8. |
+| `0x106894` | EAX:ef_addr32 | none | 1027cc@1027ef | State 8 becomes 4 and 0x1052f0 runs. |
+| `0x106938` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | 102dbc@102de8 | Exchange dword +0x850; null object returns 0. |
+| `0x106988` | EAX:ef_addr32,EDX:uint32_t | none | 102a98@102ac2 | Store dword +0x68 and notify each of the +0x60 entries (0x894 bytes each) whose state is not 1. |
+| `0x106be8` | EAX:int32_t | EAX:int32_t | d9c30@d9c45,d9c30@d9c7e,d9cb4@d9cd5 | value * 100. |
+| `0x106bfc` | EAX:int32_t | EAX:int32_t | d9cb4@d9cf4,d9dc0@d9de6,106d34@106d9c | value * 100 / 10. |
+| `0x106c3c` | EAX:int32_t,EDX:int32_t | AL:uint8_t | 106cb0@106cec,106d34@106da5,106d34@106db2 | 0xf8248() - EAX >= EDX (signed). |
+| `0x10703c` | EAX:ef_addr32 | none | d9c30@d9c69,d9c30@d9c9d,106f10@106f22 | Release the object stored at *slot. |
+| `0x107060` | EAX:ef_addr32 | none | d9cb4@d9d1a,d9dc0@d9e01 | 0x118428(*EAX, 0x53). |
+| `0x1089d4` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 108a17@108a3e | Build a 256-bit set at EDX from the bytes of the string at EAX up to ']'. |
+| `0x108fd3` | EAX:int32_t | EAX:int32_t | 108ddb@108ef6,108ddb@108f32 | Hex digit value of a character, or 0x10. |
+| `0x1091e0` | EAX:ef_addr32 | EAX:ef_addr32 | 1093d8@1093ea | Remove carriage returns in place; returns the end pointer. |
+| `0x1091fc` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 1093d8@109405 | Copy one line from EDX to EAX, consuming the newline; returns the source after it. |
+| `0x109284` | EAX:ef_addr32 | none | e3e50@e3e88,1092b0@1092bf,1092b0@109314 | Advance *pointer over characters whose class-table entry (0x195af0[c+1]) has bit 2. |
+| `0x10d1b5` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | e7fc0@e8009,104504@104542,1133f8@113507 | strncpy with NUL padding; returns the destination. |
+| `0x10d1da` | EAX:ef_addr32,DL:uint8_t | EAX:ef_addr32 | e7fc0@e8028,e7fc0@e8075,eb520@eb60a | strrchr: last occurrence of the byte in the string including the terminator, or 0. |
+| `0x10d427` | EAX:ef_addr32 | none | 10d466@10d48f,10d4c4@10d4fc | Unlink a node from the doubly linked list with heads at dwords 0x164650 and 0x16464c. |
+| `0x10ddfc` | EAX:uint32_t | EAX:int32_t | 10f1bf@10f1e2 | Count list entries (list at dword 0x485f9f) whose flags in +0xc match the mask; flush those with bit 0x10 in +0xd via 0x |
+| `0x10dfe0` | none | EAX:uint32_t | eab44@eab47,eac48@eadfa | Dword +0x46c of the object pointed to by dword 0x120cc6. |
