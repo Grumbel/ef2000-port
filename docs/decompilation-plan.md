@@ -241,7 +241,7 @@ decomp/
   function's evidence links it to that string. Otherwise use
   `src/unk_<subsystem>.c` and rename later.
 
-### 3.2 [~] Function tracker (`decomp/symbols/functions.tsv`)
+### 3.2 [x] Function tracker (`decomp/symbols/functions.tsv`)
 
 Columns (tab-separated, header row, sorted by address):
 
@@ -275,7 +275,9 @@ addr  size  name  module  state  kind  sig_status  test  notes
   the documented high-score/startup routines, module `hiscore` for the
   former). `decomp/symbols/globals.tsv` holds the 11 documented globals;
   `signatures.tsv` is empty because no ABI has been confirmed yet.
-  Remaining: re-seed after every Ghidra boundary change.
+  Re-seed after every future Ghidra boundary change (recurring maintenance,
+  not an incomplete acceptance criterion). Re-seeded against the independent
+  12.1.4 rebuild on 2026-11-03: 0 added, 0 changed.
 
 ### 3.3 [ ] Reproducible Ghidra annotations
 
@@ -737,6 +739,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.0   Done: ef2000-ghidra rebuild; Ghidra 12.1.4 gives 4,277 functions, 4,277 pseudo-C, 0 failures.
 2026-11-03  3.2   Tracker tool and seeded functions.tsv (4,277 rows, 294 named); globals.tsv seeded.
 2026-11-03  3.1   Done: derived-source legal note, C headers, module/test directories, ignored build output.
+2026-11-03  3.2   Done: re-seed from fresh 12.1.4 Ghidra inventory is identical (4,277 rows); tracker check and tests pass.
 ```
 
 ---
