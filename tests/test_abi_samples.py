@@ -25,6 +25,16 @@ class AbiSamplesTests(unittest.TestCase):
                          sorted(x['entry'] for x in chosen))
         self.assertEqual({x['region'] for x in chosen}, set(map(str, range(5))))
 
+    def test_prefers_two_known_callers(self):
+        image = b'\x90' * 10000
+        rows = [dict(entry=f'0x{entry:x}', body_bytes='12', instructions='5',
+                     direct_calls='0', indirect_calls='0', conditional_branches='0',
+                     pcode_loads='0', pcode_stores='0')
+                for entry in range(100, 9100, 50)]
+        counts = {entry: 2 for entry in range(100, 9100, 100)}
+        chosen = sample(rows, image, caller_counts=counts)
+        self.assertTrue(all(int(row['direct_callers']) >= 2 for row in chosen))
+
     def test_refuses_inadequate_inventory(self):
         with self.assertRaisesRegex(ValueError, 'at least 40'):
             sample([], b'\x90' * 500)

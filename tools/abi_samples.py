@@ -10,15 +10,17 @@ No game bytes, pseudo-C or disassembly are written to the TSV.
 """
 
 import argparse
+import collections
 import csv
 from pathlib import Path
 
 
 FIELDS = ('entry', 'region', 'shape', 'body_bytes', 'instructions', 'direct_calls',
-          'indirect_calls', 'conditional_branches', 'status')
+          'indirect_calls', 'conditional_branches', 'direct_callers', 'status')
 
 
-def sample(rows, image, count=40):
+def sample(rows, image, count=40, caller_counts=None):
+    caller_counts = caller_counts or {}
     items = []
     for row in rows:
         entry = int(row['entry'], 0)
@@ -43,6 +45,12 @@ def sample(rows, image, count=40):
         options = [item for item in items if start <= item[0] < end]
         if not options:
             raise ValueError(f'no candidates in region {region}')
+        # An ABI inference needs at least two callers. Favor functions with
+        # two known direct callers, without silently dropping shapes for
+        # which only indirect or single call sites are currently identified.
+        preferred = [item for item in options if caller_counts.get(item[0], 0) >= 2]
+        if preferred:
+            options = preferred
         center = (start + end) // 2
         def qualifies(item, shape):
             entry, size, row = item
@@ -82,6 +90,7 @@ def sample(rows, image, count=40):
                 shape=label, body_bytes=str(size), instructions=row['instructions'],
                 direct_calls=row['direct_calls'], indirect_calls=row['indirect_calls'],
                 conditional_branches=row['conditional_branches'],
+                direct_callers=str(caller_counts.get(entry, 0)),
                 status='unreviewed'))
     if len(selected) != count or len(used) != count:
         raise ValueError('unexpected ABI sample size')
@@ -92,11 +101,20 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('facts', type=Path)
     parser.add_argument('image', type=Path)
+    parser.add_argument('--calls', type=Path,
+                        help='Ghidra full-export/calls.tsv for two-caller preference')
     parser.add_argument('--output', type=Path, help='optional review TSV destination')
     args = parser.parse_args(argv)
     with args.facts.open(newline='') as file:
         rows = list(csv.DictReader(file, delimiter='\t'))
-    report = sample(rows, args.image.read_bytes())
+    caller_sets = collections.defaultdict(set)
+    if args.calls:
+        with args.calls.open(newline='') as file:
+            for row in csv.DictReader(file, delimiter='\t'):
+                if row['kind'] == 'direct' and row['callee_entry'] and row['caller_entry']:
+                    caller_sets[int(row['callee_entry'], 0)].add(int(row['caller_entry'], 0))
+    counts = {entry: len(callers) for entry, callers in caller_sets.items()}
+    report = sample(rows, args.image.read_bytes(), caller_counts=counts)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         stream = args.output.open('w', newline='')

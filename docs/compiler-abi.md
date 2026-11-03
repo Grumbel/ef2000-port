@@ -27,10 +27,20 @@ the 1.9 compatibility compiler is also in the development shell.
 | `0x41fc` high-score load | Saves EBX, ECX, EDX, ESI; reserves four stack bytes; passes EAX=`0x17f694` and EDX=0 to indirect call `[0x132ab4]` | Target ABI, stack cleanup, outputs |
 | `0x432c` score threshold | Loads score in EAX, compares against last record, executes `setg al`, then `ret` | Whether callers consume only AL; upper EAX bits retain score bytes |
 | `0x433c` high-score insert | Saves EBX, ECX, EDX, ESI, EDI, EBP and reserves eight stack bytes | Input ABI and full return behavior |
+| `0x24480` x87 spatial comparison | Inputs from EAX (sign-extended AX) and EDX (pointer to three qwords); reads an eight-byte stack argument; saves/restores EBX, ECX, ESI, EDI; returns with `ret 8`, low-byte result in AL | Exact semantic types, other caller-visible clobbers, x87 control/status requirements |
 
 Evidence: `objdump -b binary -m i386 -M intel -D --start-address=...`
 against `local/ghidra/payload.bin`, and `docs/highscores-reconstruction.md`.
 These are not complete signatures; no row has been promoted to `confirmed`.
+
+For `0x24480`, two different caller functions show the same argument setup:
+`0x2479c` at callsite `0x248b9` and `0x6aeb4` at `0x6b1aa` both store a
+computed x87 value as a qword on the stack, put a scalar/index into EAX and
+a pointer into EDX, then call `0x24480`. The second caller consumes AL with
+`test al,al` at `0x6b1af`. The callee epilogue at `0x2460d` writes AL,
+restores registers, and executes `ret 8` at `0x24616`. This establishes
+stack ownership and a register+stack calling *pattern*, but still needs a
+fully typed signature and x87 differential evidence.
 
 Packing evidence: the high-score record occupies 25 bytes with a signed
 32-bit score at unaligned offset `+21`. The GUI icon `next` pointer at `+0x21`
@@ -58,6 +68,12 @@ noncontiguous: the window is a diagnostic aid, not an exact body export.
    heuristic match, so its row is explicitly labeled fallback. The byte
    heuristics can match data/immediates: confirm instructions with disassembly
    before classifying actual x87, strings, switches, or assembly stubs.
+   `decomp/symbols/abi-audit.tsv` now records disassembly summaries and two
+   callsite addresses for each sample. All 40 have at least two **distinct**
+   direct callers; nine show actual x87 instructions and four show REP
+   instructions in the inspected linear windows. Six show immediate `ret N`.
+   These mechanical facts are reproducible with `tools/abi_audit.py`; neither
+   file contains original instruction bytes or decompiler text.
 2. Confirm inputs, outputs, preserved registers, stack cleanup, x87 state
    and segment assumptions from disassembly and at least two callers each.
 3. Record confirmed signatures in `decomp/symbols/signatures.tsv`, adding

@@ -358,7 +358,9 @@ instruction evidence and provisional flags; `tools/asm_diff.py` provides
 side-by-side original/OMF listings with asset-free tests. No ABI signature
 has been marked confirmed. `decomp/symbols/abi-samples.tsv` now holds 40
 reproducible cross-region candidates; their individual caller/ABI audits
-remain.
+remain. `abi-audit.tsv` records two distinct caller sites and linear
+instruction summaries for each candidate; the unusual `0x24480` x87/`ret 8`
+case was checked against both callers and documented in `compiler-abi.md`.
 
 ### 3.6 [ ] Library identification
 
@@ -770,6 +772,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.4   In progress: flake packages, ef2000-wcc, and OMF smoke check implemented; awaiting Nix execution feedback.
 2026-11-03  3.5   In progress: initial high-score ABI instruction audit and OMF disassembly helper.
 2026-11-03  3.5   Sampled 40 candidates across five code regions for manual calling-convention review.
+2026-11-03  3.5   Collected 40 disassembly summaries and two distinct callers each; examined mixed EAX/EDX/stack ABI at 0x24480.
 ```
 
 ---

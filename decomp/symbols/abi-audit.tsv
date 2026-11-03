@@ -1,0 +1,41 @@
+entry	shape	distinct_callers	caller_a	caller_b	linear_instructions	ret_forms	push_regs	pop_regs	x87_instructions	rep_instructions	segment_or_io	status
+0x00012d90	indirect	4	0x00006460@0x00006575	0x00013950@0x0001396a	38	ret	ebx,ecx,esi	ebx,ecx,esi	0	0	no	needs_manual_abi_review
+0x00023760	few_calls	6	0x00006924@0x000069de	0x00092668@0x00092751	20	ret	ebx,ecx,edx,esi	ebx,ecx,edx,esi	0	0	no	needs_manual_abi_review
+0x00023800	branch_heavy	4	0x000257d0@0x00025945	0x00025c98@0x00025e8e	64	ret	ebx,ecx,edx	ebx,ecx,edx	0	0	no	needs_manual_abi_review
+0x000238a0	fallback_for_rep_candidate	2	0x000257d0@0x00025aa0	0x00025c98@0x00026000	9	ret	edx	edx	0	0	no	needs_manual_abi_review
+0x000243ac	memory_heavy	2	0x00024074@0x000240aa	0x0006c710@0x0006c741	64	ret	ebx,ecx,edx,esi	ebx,ecx,edx,esi	7	0	no	needs_manual_abi_review
+0x00024480	x87_candidate	2	0x0002479c@0x000248b9	0x0006aeb4@0x0006b1aa	121	ret 0x8	ebx,ecx,edi,edx,esi	ebx,ecx,edi,esi	51	0	no	needs_manual_abi_review
+0x0002461c	large	4	0x0002479c@0x00024982	0x00024480@0x00024557	111	ret	eax,ebp,ebx,ecx,edi,edx,esi	ebp,ebx,ecx,edi,esi	35	0	no	needs_manual_abi_review
+0x000263e0	leaf	2	0x0001f0fc@0x0001f624	0x0003a3a8@0x0003ab19	5	ret	edx	edx	0	0	no	needs_manual_abi_review
+0x00068ccc	large	3	0x00069374@0x0006945c	0x00068e84@0x00068ebc	112	ret			0	0	no	needs_manual_abi_review
+0x0006a1b4	leaf	17	0x00024074@0x00024087	0x0002479c@0x000247af	9	ret			0	0	no	needs_manual_abi_review
+0x0006a1d0	branch_heavy	24	0x00046454@0x000466b5	0x00072944@0x00072cc4	114	ret	ebx,ecx,edi,esi	ebx,ecx,edi,esi	0	0	no	needs_manual_abi_review
+0x0006a354	few_calls	2	0x0002ba14@0x0002ba3f	0x00046454@0x000473cc	9	ret			0	0	no	needs_manual_abi_review
+0x0006a394	fallback_for_rep_candidate	3	0x0006a1d0@0x0006a24c	0x0002b95c@0x0002b995	15	ret	edx	edx	0	0	no	needs_manual_abi_review
+0x0006a4c4	memory_heavy	2	0x000772d0@0x000773d2	0x000725dc@0x00072761	35	ret	ecx	ecx	27	0	no	needs_manual_abi_review
+0x0006a538	x87_candidate	4	0x00074d98@0x00074de9	0x0002461c@0x00024663	35	ret	ecx	ecx	27	0	no	needs_manual_abi_review
+0x00086f7c	indirect	2	0x0005c518@0x0005c7b9	0x0005ca60@0x0005ca6e	237	ret	eax,ebp,ebx,ecx,edi,esi	ebp,ecx,edi,esi	0	0	no	needs_manual_abi_review
+0x000abec4	indirect	2	0x000ac408@0x000ac429	0x000ac780@0x000ac78c	29	ret	ebx,ecx,edx	ebx,ecx,edx	0	0	no	needs_manual_abi_review
+0x000b0018	branch_heavy	3	0x0000b1e0@0x0000b28c	0x0000ba5c@0x0000bb5e	70	ret	eax,ebp,ebx,ecx,esi	ebp,ebx,ecx,esi	0	0	no	needs_manual_abi_review
+0x000b00d0	few_calls	2	0x0000ba5c@0x0000bb7c	0x0000bfcc@0x0000c4c8	42	ret	eax,ebp,ebx,ecx,esi	ebp,ebx,ecx,esi	0	0	no	needs_manual_abi_review
+0x000b0208	leaf	2	0x000b0238@0x000b0258	0x000c1438@0x000c149d	22	ret	ecx	ecx	0	0	no	needs_manual_abi_review
+0x000b0850	memory_heavy	2	0x000b0c34@0x000b0c46	0x000b0c9c@0x000b0cae	104	ret	ecx,edi,esi	ecx,edi,esi	0	0	no	needs_manual_abi_review
+0x000b0954	large	2	0x000b0c9c@0x000b0cbe	0x000cb6fc@0x000cb78f	140	ret	ecx,edi,esi	ecx,edi,esi	0	0	no	needs_manual_abi_review
+0x000b0f5c	x87_candidate	2	0x0000ba5c@0x0000bab4	0x0000bfcc@0x0000c0f6	216		eax,ebp,ebx,ecx,edi,edx,esi		0	0	no	needs_manual_abi_review
+0x000b1b8b	rep_candidate	70	0x00082e40@0x00082eab	0x000e882c@0x000e896b	17	ret	ecx,edi	ecx,edi	0	1	no	needs_manual_abi_review
+0x000ee43c	rep_candidate	3	0x000efbd9@0x000efbfc	0x000effb4@0x000effeb	34	ret	ecx,edi,esi	ecx,edi,esi	0	2	no	needs_manual_abi_review
+0x000f3b78	memory_heavy	2	0x000f3f84@0x000f40a3	0x000f4178@0x000f41a0	178	ret	ebx,ecx,edx	ebx,ecx,edx	0	0	no	needs_manual_abi_review
+0x000f46cc	branch_heavy	12	0x000f5484@0x000f548d	0x000f4a88@0x000f4b1c	64	ret	ebx,edx,esi	ebx,edx,esi	0	0	no	needs_manual_abi_review
+0x000f6124	few_calls	3	0x000f7518@0x000f7527	0x000f79b0@0x000f79bf	12	ret	eax,edx	edx	0	0	no	needs_manual_abi_review
+0x000f8248	leaf	3	0x000ac5f8@0x000ac681	0x000e3120@0x000e3124	1				0	0	no	needs_manual_abi_review
+0x000f8250	x87_candidate	2	0x000f8278@0x000f8285	0x000f8298@0x000f82a5	4	ret 0x8			3	0	no	needs_manual_abi_review
+0x000f9ee0	large	4	0x000b3c04@0x000b3c8e	0x000eab44@0x000eab7c	141	ret 0x8	ebp,ebx,edi,esi	ebp,ebx,edi,esi	0	2	no	needs_manual_abi_review
+0x000fa02c	indirect	2	0x000b3c04@0x000b3cc2	0x000eba64@0x000ebadf	88	ret 0x8	ebp,edi,esi	edi,esi	0	1	no	needs_manual_abi_review
+0x0011c0b4	large	2	0x0010a580@0x0010a8bb	0x0010c1b0@0x0010c4e7	82	ret	ebx	ebx	26	0	no	needs_manual_abi_review
+0x00120451	indirect	2	0x0011d01c@0x0011d0e6	0x0011d135@0x0011d1ff	23	ret	ebx,ecx	ebx,ecx	0	0	no	needs_manual_abi_review
+0x001204dc	x87_candidate	2	0x0011d3f0@0x0011d40c	0x00120560@0x0012058c	43	ret 0xc	ebx,edx	ebx,edx	0	0	no	needs_manual_abi_review
+0x00120800	fallback_for_branch_heavy	2	0x00120485@0x001204ae	0x00120746@0x00120798	8	ret			4	0	no	needs_manual_abi_review
+0x00120a52	leaf	2	0x00120928@0x0012097d	0x001209b5@0x001209dc	6	ret			2	0	no	needs_manual_abi_review
+0x0015be10	memory_heavy	3	0x000288c8@0x00028968	0x00081680@0x0008177d	46	ret	ebp,edi,esi	ebp,edi,edx,esi	0	0	no	needs_manual_abi_review
+0x0015c071	fallback_for_rep_candidate	2	0x0015c0c4@0x0015c0df	0x0015c0ea@0x0015c105	28	ret			0	0	no	needs_manual_abi_review
+0x0015c0c4	few_calls	11	0x0005f220@0x0005f3bb	0x0003d4b0@0x0003d5f1	16	ret 0x10	ebp,edi,esi	ebp,edi,esi	0	0	no	needs_manual_abi_review
