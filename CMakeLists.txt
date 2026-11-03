@@ -9,6 +9,11 @@ add_executable(ef2000-efpatch-test tests/efpatch_test.cpp)
 target_compile_features(ef2000-efpatch-test PRIVATE cxx_std_17)
 target_include_directories(ef2000-efpatch-test PRIVATE runtime)
 add_test(NAME efpatch-format COMMAND ef2000-efpatch-test)
+add_executable(ef2000-call-capture-test tests/call_capture_test.cpp)
+target_compile_features(ef2000-call-capture-test PRIVATE cxx_std_17)
+target_include_directories(ef2000-call-capture-test PRIVATE runtime)
+add_test(NAME call-capture-format COMMAND ef2000-call-capture-test
+  "${CMAKE_CURRENT_BINARY_DIR}/call-capture-fixture.efcap")
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

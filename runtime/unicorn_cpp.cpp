@@ -17,6 +17,7 @@
 #include "real_mode_cpu.hpp"
 #include "wav_capture.hpp"
 #include "efpatch.hpp"
+#include "call_capture.hpp"
 #include <unicorn/unicorn.h>
 #include <unicorn/x86.h>
 #ifdef _WIN32
@@ -50,6 +51,7 @@
 #include <map>
 #include <optional>
 #include <set>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
@@ -1263,6 +1265,25 @@ public:
               "install archive-lookup trace hook");
     }
 
+    void enable_call_capture(const std::vector<std::pair<uint32_t, unsigned>>& targets,
+                             const fs::path& directory,
+                             const std::array<uint8_t, 32>& original_sha) {
+        if (targets.empty()) return;
+        fs::create_directories(directory);
+        capture_dir_ = directory;
+        capture_source_sha_ = original_sha;
+        for (const auto& [address, limit] : targets) {
+            if (address >= image_size_ || !limit || limit > 4 ||
+                capture_remaining_.count(address))
+                throw std::runtime_error("invalid or duplicated --capture-calls address");
+            capture_remaining_.emplace(address, limit);
+            uc_hook hook{};
+            check(uc_hook_add(cpu_, &hook, UC_HOOK_CODE, (void*)on_capture_call,
+                              this, address, address), "install function-entry capture hook");
+            capture_hooks_.push_back(hook);
+        }
+    }
+
     int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
             const std::string& framebuffer, const std::string& wav_directory,
             bool realtime = false, double wall_seconds = 0,
@@ -1323,6 +1344,7 @@ public:
                 slice_deadline_ = std::chrono::steady_clock::now() +
                                   std::chrono::milliseconds(10);
                 const uc_err result = uc_emu_start(cpu_, ip, 0, 0, 0);
+                if (!capture_error_.empty()) throw std::runtime_error(capture_error_);
                 if (result != UC_ERR_OK) {
                     const auto regs = read_regs();
                     std::ostringstream message;
@@ -1343,7 +1365,9 @@ public:
                 constexpr uint64_t quantum = 1000;
                 uint64_t amount = std::min<uint64_t>(quantum, limit ? limit - completed : quantum);
                 amount = std::min(amount, timer_interval - completed % timer_interval);
-                check(uc_emu_start(cpu_, ip, 0, 0, amount), "instruction-counted guest execution");
+                const uc_err result = uc_emu_start(cpu_, ip, 0, 0, amount);
+                if (!capture_error_.empty()) throw std::runtime_error(capture_error_);
+                check(result, "instruction-counted guest execution");
                 completed += amount;
             }
             if (pending_copy_) finish_fast_copy();
@@ -1570,6 +1594,11 @@ private:
     uint32_t vga_dac_cursor_{};
     uint32_t irq_return_sp_{}, irq_resume_ip_{};
     uc_hook eoi_hook_{};
+    std::vector<uc_hook> capture_hooks_;
+    std::unordered_map<uint32_t, unsigned> capture_remaining_, capture_sequence_;
+    std::filesystem::path capture_dir_;
+    std::array<uint8_t, 32> capture_source_sha_{};
+    std::string capture_error_;
     std::string status_ = "instruction_limit";
     std::string detail_;
     bool trace_interrupts_{};
@@ -2448,6 +2477,41 @@ private:
     static void on_archive_lookup(uc_engine*, uint64_t, uint32_t, void* user) {
         static_cast<Machine*>(user)->trace_archive_lookup();
     }
+    static void on_capture_call(uc_engine*, uint64_t address, uint32_t, void* user) {
+        auto* machine = static_cast<Machine*>(user);
+        try {
+            machine->capture_call(static_cast<uint32_t>(address));
+        } catch (const std::exception& error) {
+            // A Unicorn C callback must never leak a C++ exception.
+            machine->capture_error_ = error.what();
+            uc_emu_stop(machine->cpu_);
+        }
+    }
+    void capture_call(uint32_t address) {
+        const auto found = capture_remaining_.find(address);
+        if (found == capture_remaining_.end() || !found->second) return;
+        const uint32_t index = capture_sequence_[address]++;
+        --found->second;
+        ef2000::CapturedCall capture;
+        capture.address = address;
+        capture.sequence = index;
+        capture.original_image_sha = capture_source_sha_;
+        capture.guest_ram.resize(IMAGE_SIZE);
+        check(uc_mem_read(cpu_, 0, capture.guest_ram.data(), capture.guest_ram.size()),
+              "snapshot function-entry RAM");
+        const auto regs = read_regs();
+        capture.registers = {regs.ax, regs.bx, regs.cx, regs.dx, regs.si,
+                             regs.di, regs.bp, regs.sp, regs.ip, regs.flags,
+                             regs.ds, regs.es, regs.ss};
+        std::ostringstream name;
+        name << "0x" << std::hex << std::setw(7) << std::setfill('0') << address
+             << '-' << std::dec << std::setw(4) << std::setfill('0') << index
+             << ".efcap";
+        const auto path = capture_dir_ / name.str();
+        ef2000::write_call_capture(path, capture);
+        std::cout << "capture_call: addr=0x" << std::hex << address << std::dec
+                  << " index=" << index << " file=" << path.string() << '\n';
+    }
     void trace_archive_lookup() {
         // The original guest routine at 0xeb520 receives the ASCII pathname
         // in EAX and the archive descriptor in EDX (Watcom register ABI).
@@ -2943,6 +3007,7 @@ void usage(const char* program) {
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
               << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
               << "       [--patch FILE] (repeatable in-place EFPATCH1, no patch arenas yet)\n"
+              << "       [--capture-calls ADDR[:N] --capture-dir DIR] (up to 4 guest-RAM call snapshots)\n"
               << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
               << "       --cd-dir DIR provides DOS disc files only; it does not enable music\n"
               << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
@@ -2975,6 +3040,8 @@ int main(int argc, char** argv) {
         std::vector<TimedKeyEvent> key_events;
         std::vector<JoystickEvent> joystick_events;
         std::vector<std::string> patch_paths;
+        std::vector<std::pair<uint32_t, unsigned>> capture_targets;
+        fs::path capture_dir;
         std::string framebuffer, wav_directory;
         for (int i = 1; i < argc; ++i) {
             if (!std::strcmp(argv[i], "--help") || !std::strcmp(argv[i], "-h")) {
@@ -2988,6 +3055,24 @@ int main(int argc, char** argv) {
                 explicit_limit = true;
             } else if (!std::strcmp(argv[i], "--patch") && i + 1 < argc) {
                 patch_paths.emplace_back(argv[++i]);
+            } else if (!std::strcmp(argv[i], "--capture-calls") && i + 1 < argc) {
+                const std::string value = argv[++i];
+                const size_t separator = value.find(':');
+                size_t end{};
+                const auto address = std::stoull(value.substr(0, separator), &end, 0);
+                if (end != value.substr(0, separator).size() || address >= IMAGE_SIZE)
+                    throw std::runtime_error("--capture-calls expects a guest function address");
+                unsigned count = 1;
+                if (separator != std::string::npos) {
+                    const std::string amount = value.substr(separator + 1);
+                    const auto parsed = std::stoull(amount, &end, 10);
+                    if (end != amount.size() || parsed < 1 || parsed > 4)
+                        throw std::runtime_error("--capture-calls count must be 1..4");
+                    count = static_cast<unsigned>(parsed);
+                }
+                capture_targets.emplace_back(static_cast<uint32_t>(address), count);
+            } else if (!std::strcmp(argv[i], "--capture-dir") && i + 1 < argc) {
+                capture_dir = argv[++i];
             } else if (!std::strcmp(argv[i], "--timer-instructions") && i + 1 < argc) {
                 size_t end{};
                 const std::string value = argv[++i];
@@ -3194,6 +3279,19 @@ int main(int argc, char** argv) {
             throw std::runtime_error("--overlay-symbols-bmp requires --windowed or --fullscreen");
         if (!window.overlay_skin_dir.empty() && !window.enabled)
             throw std::runtime_error("--overlay-skin-dir requires --windowed or --fullscreen");
+        if (capture_targets.empty() != capture_dir.empty())
+            throw std::runtime_error("--capture-calls and --capture-dir must be specified together");
+        unsigned captures = 0;
+        std::set<uint32_t> captured_addresses;
+        for (const auto& [address, count] : capture_targets) {
+            captures += count;
+            if (!captured_addresses.insert(address).second)
+                throw std::runtime_error("duplicate --capture-calls address");
+        }
+        if (captures > 4)
+            throw std::runtime_error("--capture-calls supports at most four snapshots per run");
+        if (!capture_targets.empty() && !patch_paths.empty())
+            throw std::runtime_error("capture original calls in an unpatched run");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace ||
             self_test_fast_copy || self_test_archive_lookup) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
@@ -3319,6 +3417,8 @@ int main(int argc, char** argv) {
                 std::copy(std::begin(gameport_guest), std::end(gameport_guest), image.begin() + ENTRY);
             Machine machine(image, {}, {}, {}, ef2000::SoundMode::Off, false,
                             {}, {}, std::move(joystick_events), controls);
+            if (!capture_targets.empty())
+                machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));
             if (self_test_archive_lookup) machine.enable_archive_lookup_trace();
             const bool realtime_test = self_test_clock || self_test_retrace || self_test_fast_copy;
             performance.clock_loop_benchmark = self_test_clock;
@@ -3383,6 +3483,8 @@ int main(int argc, char** argv) {
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
                         controls, cd_cue);
+        if (!capture_targets.empty())
+            machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));
         if (trace_archive_lookups) machine.enable_archive_lookup_trace();
         return machine.run(limit, window, timer_interval, framebuffer, wav_directory,
                            realtime, wall_seconds, performance);
