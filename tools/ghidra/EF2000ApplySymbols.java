@@ -48,6 +48,7 @@ public class EF2000ApplySymbols extends GhidraScript {
             case "uint16_t": return WordDataType.dataType;
             case "int16_t": return SignedWordDataType.dataType;
             case "uint32_t": return DWordDataType.dataType;
+            case "ef_addr32": return DWordDataType.dataType;
             case "int32_t": return SignedDWordDataType.dataType;
             case "void": return VoidDataType.dataType;
             case "fword": return new ArrayDataType(ByteDataType.dataType, 6, 1);

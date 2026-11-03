@@ -1263,7 +1263,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a090	90			unknown	unclassified	unverified		
 0x0006a0f8	22			unknown	unclassified	unverified		
 0x0006a148	100			unknown	unclassified	unverified		
-0x0006a1b4	26			unknown	unclassified	unverified		
+0x0006a1b4	26	lookup_indexed_object	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; signed AX index; 32-bit table lookup at 0x20f550
 0x0006a1d0	388			unknown	unclassified	unverified		
 0x0006a354	34			unknown	unclassified	unverified		
 0x0006a378	27			unknown	unclassified	unverified		
@@ -2446,7 +2446,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b0018	184			unknown	unclassified	unverified		
 0x000b00d0	103			unknown	unclassified	unverified		
 0x000b0138	208			unknown	unclassified	unverified		
-0x000b0208	47			unknown	unclassified	unverified		
+0x000b0208	47	list_has_matching_node	unk_records	typed	game	confirmed		docs/compiler-abi.md; EAX head-pointer address; BL/DL predicates; EAX Boolean result
 0x000b0238	110			unknown	unclassified	unverified		
 0x000b038c	92			unknown	unclassified	unverified		
 0x000b03e8	26			unknown	unclassified	unverified		

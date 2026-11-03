@@ -84,7 +84,7 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
                 '0x00000020\t4\tuint32_t\tfixture_value\tsynthetic fixture\t\n')
             (symbols / 'signatures.tsv').write_text(
                 'addr\tname\tinputs\toutputs\tpreserved\tstack_bytes\tevidence\n'
-                '0x00000000\tfixture_recovered\tEAX:uint32_t\tEAX:uint32_t\t\t0\tsynthetic fixture\n')
+                '0x00000000\tfixture_recovered\tEAX:ef_addr32\tEAX:uint32_t\t\t0\tsynthetic fixture\n')
             headers = root / 'include'
             headers.mkdir()
             (headers / 'fixture.h').write_text('struct fixture_record { unsigned int value; };\n')

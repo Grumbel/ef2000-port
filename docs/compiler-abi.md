@@ -73,6 +73,42 @@ every structure in the original program was packed to one byte.
 This confirms the ABI row, **not** a recovered C implementation. No spliced
 function or differential replay is being claimed.
 
+### Confirmed signatures: two register-passing examples
+
+`lookup_indexed_object` (`0x6a1b4`):
+
+- The full callee tests signed AX against zero and the 16-bit count at
+  `0x2119f4`. A valid index selects a 32-bit pointer from the table at
+  `0x20f550` and returns it in EAX; invalid indices return zero. It changes
+  no other general-purpose registers, has no stack arguments and uses DS.
+- At `0x24087`, caller `0x24074` sets EAX from its sign-extended input,
+  consumes the returned EAX in ECX/EBX, then calls again at `0x24097`.
+  At `0x247af`, distinct caller `0x2479c` sign-extends AX, then consumes
+  returned EAX in ESI/ECX. These establish signed AX input and 32-bit EAX
+  output, not an assumed 32-bit input argument.
+- Signature: `ef_addr32 lookup_indexed_object(int16_t index)`; the table's
+  record type and logical subsystem remain unidentified (`unk_geometry`).
+
+`list_has_matching_node` (`0xb0208`):
+
+- The callee reads a linked-list head pointer through EAX. It compares
+  node bytes `+0x0b` and `+0x0a` to DL and BL respectively and accepts a
+  match only when byte `+0x0c` is not 1; follows the 32-bit next pointer
+  at `+0x04`. It returns EAX=0 or 1. ECX is saved/restored; EDX may be
+  overwritten, while EBX/ESI/EDI/EBP are untouched. No stack args/cleanup.
+- At `0xb0258`, caller `0xb0238` sets EAX from its list pointer, EDX from
+  its loop index, EBX=15; it stores the returned EAX in ESI. At `0xc149d`,
+  caller `0xc1438` sets EAX from a saved list pointer, EDX=0, EBX=15 and
+  stores AX in a record. Both caller paths also supply BL/DL as predicates.
+- Signature: `uint32_t list_has_matching_node(ef_addr32 list_head_addr,
+  uint8_t key_dl, uint8_t key_bl)` with EAX/DL/BL input storage. The name
+  describes the observed structure, not a proven original symbol or a
+  completed recovered source function.
+
+Both signatures were determined from the full callee bodies and two distinct
+callers each. Their `typed` tracker states assert **ABI only**, never patch or
+replay verification.
+
 ## Comparing assembly
 
 ```sh
