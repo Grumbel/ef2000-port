@@ -1539,4 +1539,20 @@ void apply_operation_a983c(ef_addr32 op);
 void guest_fn_a66cc(ef_addr32 widget, uint32_t mode); /* 0xa66cc EAX/EDX */
 void guest_fn_a6808(ef_addr32 widget); /* 0xa6808 EAX */
 
+/* list_helpers.c */
+void append_node_aa1e4(ef_addr32 node);
+void append_child_aa228(ef_addr32 node);
+void append_node_aa270(ef_addr32 node);
+void resolve_child_aa2b4(ef_addr32 node);
+void advance_counters_b0404(void);
+void free_entry_array_b16c0(ef_addr32 record);
+void free_entry_array_b1700(ef_addr32 record);
+void free_object_array_b17d4(ef_addr32 record);
+void update_ring_b3d74(void);
+void fill_level_table_ba40c(ef_addr32 table, uint8_t mode);
+void unlink_node_bc594(ef_addr32 node, ef_addr32 head_a, ef_addr32 head_b);
+uint32_t is_kind_bcbc0(uint32_t kind);
+uint32_t find_kind10_bd344(ef_addr32 ref, ef_addr32 list);
+uint32_t is_active_bec84(ef_addr32 object);
+
 #endif

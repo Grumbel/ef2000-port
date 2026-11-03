@@ -904,3 +904,17 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000a7e4c	save_table_a7e4c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7e4c (60 bytes); Copy table 0x418708 to 0x418690 for unlocked entries.; callers a9d48@a9d9c; docs/compiler-abi.md
 0x000a7e88	restore_table_a7e88			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7e88 (60 bytes); Copy table 0x418690 back to 0x418708 for unlocked entries.; callers a9d48@a9dfa; docs/compiler-abi.md
 0x000a983c	apply_operation_a983c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a983c (60 bytes); Apply a set/add/subtract operation to a guest value.; callers a9e70@a9fba; docs/compiler-abi.md
+0x000aa1e4	append_node_aa1e4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000aa1e4 (66 bytes); ; callers aa5c4@aa612; docs/compiler-abi.md
+0x000aa228	append_child_aa228	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000aa228 (69 bytes); Append a child (links at +1/+5) to the list of the current owner.; callers aa5c4@aa9c9,aaa50@aad3e; docs/compiler-abi.md
+0x000aa270	append_node_aa270	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000aa270 (66 bytes); ; callers aa5c4@aa696,aaa50@aab14; docs/compiler-abi.md
+0x000aa2b4	resolve_child_aa2b4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000aa2b4 (68 bytes); Resolve the (parent index, child index) pair of node to the child pointer.; callers aa350@aa395; docs/compiler-abi.md
+0x000b0404	advance_counters_b0404			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b0404 (68 bytes); Advance the 16-bit counters at 0x13799c..0x1379a2.; callers bfcc@c0c6; docs/compiler-abi.md
+0x000b16c0	free_entry_array_b16c0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b16c0 (64 bytes); Free a record with 10-byte entries (count at +5, array at +6).; callers bed1c@bee8f,bf444@bf7f7,bf81c@bf963; docs/compiler-abi.md
+0x000b1700	free_entry_array_b1700	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b1700 (64 bytes); As above with count at +4 and array at +5.; callers f9448@f956f; docs/compiler-abi.md
+0x000b17d4	free_object_array_b17d4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b17d4 (61 bytes); Free a record with 0x7c-byte objects (count at +0x12, array at +0x13).; callers b1814@b1825,cb9f4@cba6f,cb9f4@cbb8b; docs/compiler-abi.md
+0x000b3d74	update_ring_b3d74			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b3d74 (57 bytes); ; callers e4264@e42a9; docs/compiler-abi.md
+0x000ba40c	fill_level_table_ba40c	EAX:ef_addr32,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ba40c (56 bytes); Fill an 8-byte table depending on mode (3 selects the flat variant).; callers bb324@bb47d; docs/compiler-abi.md
+0x000bc594	unlink_node_bc594	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bc594 (59 bytes); Unlink node from a list whose head slot is *head_a (edx) / *head_b (ebx).; callers ca838@ca85c,cb9f4@cba68,cb9f4@cbb84; docs/compiler-abi.md
+0x000bcbc0	is_kind_bcbc0	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bcbc0 (54 bytes); Is the kind one of 8, 0xe, 0xf, 0x11, 0x13, 0x16, 0x17, 0x1a?; callers be438@be462,fba6c@fbaae; docs/compiler-abi.md
+0x000bd344	find_kind10_bd344	EAX:ef_addr32,EDX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bd344 (61 bytes); Is there a kind-0x10 entry in the list matching the id at ref+9?; callers bd39c@bd438; docs/compiler-abi.md
+0x000bec84	is_active_bec84	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bec84 (59 bytes); ; callers becc0@becde,faafc@fab1a,fabf0@fac0e; docs/compiler-abi.md

@@ -2335,3 +2335,22 @@ in EAX, format string address, one value).
 | `0xa7e4c` | none | none | a9d48@a9d9c | Copy table 0x418708 to 0x418690 for unlocked entries. |
 | `0xa7e88` | none | none | a9d48@a9dfa | Copy table 0x418690 back to 0x418708 for unlocked entries. |
 | `0xa983c` | EAX:ef_addr32 | none | a9e70@a9fba | Apply a set/add/subtract operation to a guest value. |
+
+## list_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xaa1e4` | EAX:ef_addr32 | none | aa5c4@aa612 |  |
+| `0xaa228` | EAX:ef_addr32 | none | aa5c4@aa9c9,aaa50@aad3e | Append a child (links at +1/+5) to the list of the current owner. |
+| `0xaa270` | EAX:ef_addr32 | none | aa5c4@aa696,aaa50@aab14 |  |
+| `0xaa2b4` | EAX:ef_addr32 | none | aa350@aa395 | Resolve the (parent index, child index) pair of node to the child pointer. |
+| `0xb0404` | none | none | bfcc@c0c6 | Advance the 16-bit counters at 0x13799c..0x1379a2. |
+| `0xb16c0` | EAX:ef_addr32 | none | bed1c@bee8f,bf444@bf7f7,bf81c@bf963 | Free a record with 10-byte entries (count at +5, array at +6). |
+| `0xb1700` | EAX:ef_addr32 | none | f9448@f956f | As above with count at +4 and array at +5. |
+| `0xb17d4` | EAX:ef_addr32 | none | b1814@b1825,cb9f4@cba6f,cb9f4@cbb8b | Free a record with 0x7c-byte objects (count at +0x12, array at +0x13). |
+| `0xb3d74` | none | none | e4264@e42a9 |  |
+| `0xba40c` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill an 8-byte table depending on mode (3 selects the flat variant). |
+| `0xbc594` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | ca838@ca85c,cb9f4@cba68,cb9f4@cbb84 | Unlink node from a list whose head slot is *head_a (edx) / *head_b (ebx). |
+| `0xbcbc0` | EAX:uint32_t | EAX:uint32_t | be438@be462,fba6c@fbaae | Is the kind one of 8, 0xe, 0xf, 0x11, 0x13, 0x16, 0x17, 0x1a? |
+| `0xbd344` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | bd39c@bd438 | Is there a kind-0x10 entry in the list matching the id at ref+9? |
+| `0xbec84` | EAX:ef_addr32 | EAX:uint32_t | becc0@becde,faafc@fab1a,fabf0@fac0e |  |
