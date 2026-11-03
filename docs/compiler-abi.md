@@ -50,8 +50,14 @@ noncontiguous: the window is a diagnostic aid, not an exact body export.
 
 ## Remaining work
 
-1. Collect roughly 40 functions spanning address regions: leaves, 1–3
-   direct calls, x87, switch tables, structs, string/REP loops and asm stubs.
+1. Review the 40-entry worksheet at `decomp/symbols/abi-samples.tsv`,
+   deterministically generated from Ghidra function facts and the original
+   image by `tools/abi_samples.py`. It covers five address regions, with
+   leaf, direct-call, indirect-call, branch-heavy, memory-heavy, large,
+   x87-*candidate* and REP-*candidate* selections. One region has no REP
+   heuristic match, so its row is explicitly labeled fallback. The byte
+   heuristics can match data/immediates: confirm instructions with disassembly
+   before classifying actual x87, strings, switches, or assembly stubs.
 2. Confirm inputs, outputs, preserved registers, stack cleanup, x87 state
    and segment assumptions from disassembly and at least two callers each.
 3. Record confirmed signatures in `decomp/symbols/signatures.tsv`, adding

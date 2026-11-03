@@ -356,7 +356,9 @@ layout**, not code generation. Do it before writing real game code.
 In progress 2026-11-03: `docs/compiler-abi.md` records initial high-score
 instruction evidence and provisional flags; `tools/asm_diff.py` provides
 side-by-side original/OMF listings with asset-free tests. No ABI signature
-has been marked confirmed; the ~40-function cross-region audit remains.
+has been marked confirmed. `decomp/symbols/abi-samples.tsv` now holds 40
+reproducible cross-region candidates; their individual caller/ABI audits
+remain.
 
 ### 3.6 [ ] Library identification
 
@@ -767,6 +769,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.3   Done: reproducible apply/export symbols; live synthetic persistence/idempotence test and 4,277-function refresh pass.
 2026-11-03  3.4   In progress: flake packages, ef2000-wcc, and OMF smoke check implemented; awaiting Nix execution feedback.
 2026-11-03  3.5   In progress: initial high-score ABI instruction audit and OMF disassembly helper.
+2026-11-03  3.5   Sampled 40 candidates across five code regions for manual calling-convention review.
 ```
 
 ---
