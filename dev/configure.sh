@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
+# SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 set -euo pipefail
 : "${EF2000_SOURCE:?EF2000_SOURCE is unset; enter the shell with: nix develop}"

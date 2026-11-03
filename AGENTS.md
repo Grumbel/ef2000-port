@@ -19,6 +19,8 @@
   `Co-authored-by: ChatGPT (High) <codex@openai.com>`.
 - The commit author is always the repository owner
   (`Ingo Ruhnke <grumbel@gmail.com>`), never the AI.
+- New files use `SPDX-FileCopyrightText: <year> Ingo Ruhnke <grumbel@gmail.com>`;
+  never name an AI or its vendor as copyright holder.
 - Keep commit descriptions focused on the behavior changed and relevant evidence.
 
 ## Delivery
