@@ -521,7 +521,7 @@ def name_callbacks(args):
 
 
 # Recorded with Ghidra 11.4.2 across bundles #041-#056; see docs/ghidra.md.
-DOCUMENTED_FUNCTIONS = 4233
+DOCUMENTED_FUNCTIONS = 4277
 # Upper bound for repeated direct-call recovery; each pass exposes only the
 # calls inside functions created by the previous one.
 MAX_CALL_PASSES = 10
