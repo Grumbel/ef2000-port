@@ -1013,3 +1013,44 @@ remain outside Git and Nix source inputs. The new asset-free tests validate
 path hashing, archive bounds, synthetic images, sprite indexing and GUI
 directives; a separate opt-in test reads the user's own installation.
 See [GUI resource research](gui-assets.md) for commands and limitations.
+
+## #062: Single-command rebuild with Ghidra 12.1.4
+
+The flake now provides **Ghidra 12.1.4**. A fresh `ef2000-ghidra rebuild`
+of the SHA-pinned executable ran every applying pass from #041–#056 in one
+workspace. A hand-driven run of the same passes, and a second run of the
+`rebuild` command itself, produced identical counts at every stage
+(2026-11-03):
+
+| Stage | Created | Functions (12.1.4) | Documented (11.4.2) |
+| --- | ---: | ---: | ---: |
+| Import with auto-analysis | — | 3,899 | 3,842 |
+| `recover-orphans` (strict) | 234 | 4,133 | 4,077 |
+| `recover-orphans --tier table` | 35 | 4,168 | 4,111 |
+| `name-callbacks --apply` (308 slots, 188 names) | 0 | 4,168 | 4,111 |
+| `--promote-thunks` | 29 | 4,197 | 4,139 |
+| `--promote-entries` | 50 | 4,261 | 4,203 |
+| `--promote-undisassembled` | 10 | 4,276 | 4,220 |
+| `recover-calls` (padding, then adjacent-RET, then padding) | 1 | **4,277** | 4,233 |
+| Nine `repair-boundaries` recipes | — | 4,277 | 4,233 |
+
+All nine boundary recipes applied with exactly the documented body sizes
+(for example `0x4050` 34 → 138, `0x45a4` 45 → 401, `0x9820` 1,021 → 1,560)
+and re-audit as `already_repaired`. The final export wrote pseudo-C for
+**4,277 / 4,277** functions (two via the custom-storage retry, none
+failed), with zero unresolved direct CALL edges, 552 indirect call sites,
+34,980 instruction bytes outside functions (43,990 documented), 266 orphan
+instruction ranges and 491 candidate entries. `function-facts` exported
+39,897 DATA references, 5,979 literal address candidates and 172
+cross-function branches.
+
+The extra 44 functions come from Ghidra 12's initial analysis (57 more
+functions at import); later passes then find slightly fewer candidates,
+for example 10 instead of 17 undisassembled callbacks, because 12.1.4
+had already decoded some of them. The new functions have not been reviewed
+individually; treat their boundaries with the same caution as earlier
+heuristic recoveries.
+
+The function inventory seeds the decompilation tracker
+`decomp/symbols/functions.tsv` (`tools/decomp_status.py seed`), which
+holds only addresses, sizes, names and recovery states.

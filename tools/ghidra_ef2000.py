@@ -243,6 +243,7 @@ def export_all(args):
           f'{report["decompilations_reused"]} reused, '
           f'{report["decompilations_failed"]} failed, '
           f'{report["decompilations_limited"]} limited; output: {output}')
+    return report
 
 
 def recover_orphans(args):
@@ -271,6 +272,7 @@ def recover_orphans(args):
     failed = sum(row['result'] == 'create_failed' for row in rows)
     print(f'Ghidra orphan recovery: {len(rows)} candidates, {strong} reference/prologue '
           f'matches, {created} created, {failed} failed; output: {output}')
+    return created
 
 
 def recover_calls(args):
@@ -303,6 +305,7 @@ def recover_calls(args):
     print(f'Ghidra direct-call recovery: {len(rows)} unresolved targets, '
           f'{candidates} guarded candidates, {created} created, '
           f'{failed} failed; output: {output}')
+    return created
 
 
 def repair_boundaries(args):
@@ -339,6 +342,7 @@ def repair_boundaries(args):
         f'{row["entry"]} {row["result"]} '
         f'({row["body_bytes_before"]} -> {row["body_bytes_after"]} bytes)'
         for row in rows) + f'; output: {output}')
+    return rows
 
 
 def audit_flow_gaps(args):
@@ -513,6 +517,95 @@ def name_callbacks(args):
                   for row in rows)
     print(f'Ghidra named callbacks: {len(rows)} slots, {changed} names applied, '
           f'{created} new functions; output: {output}')
+    return created
+
+
+# Recorded with Ghidra 11.4.2 across bundles #041-#056; see docs/ghidra.md.
+DOCUMENTED_FUNCTIONS = 4233
+# Upper bound for repeated direct-call recovery; each pass exposes only the
+# calls inside functions created by the previous one.
+MAX_CALL_PASSES = 10
+
+
+def rebuild(args):
+    """Recreate the complete recovered Ghidra project in one workspace.
+
+    Runs, in their documented order, every applying recovery pass that
+    produced the bundle #056 project. Records counts after every stage in
+    workspace/rebuild-report.json. Never touches an existing project.
+    """
+    workspace = args.workspace.resolve()
+    if (workspace / 'projects' / (PROJECT_NAME + '.gpr')).exists():
+        raise ValueError(f'a Ghidra project already exists in {workspace}; choose a new '
+                         '--workspace (or delete the old one yourself after checking it)')
+
+    def namespace(command, **values):
+        base = dict(workspace=workspace, analyze_headless=args.analyze_headless,
+                    command=command, output=None, apply=True, max=0)
+        base.update(values)
+        return argparse.Namespace(**base)
+
+    stages = []
+    report_path = workspace / 'rebuild-report.json'
+
+    def record(label, created=None):
+        report = export_all(namespace('inventory', apply=False))
+        stage = {'stage': label, 'functions': report['discovered_functions']}
+        if created is not None:
+            stage['created'] = created
+        stages.append(stage)
+        report_path.write_text(json.dumps({'stages': stages}, indent=2) + '\n')
+        print(f'rebuild: {label}: {stage["functions"]} functions'
+              + (f' ({created} created)' if created is not None else ''))
+        return report
+
+    import_image(argparse.Namespace(workspace=workspace, executable=args.executable,
+                                    analyze_headless=args.analyze_headless))
+    record('import')
+    record('orphans-strict', recover_orphans(namespace('recover-orphans', tier='strict')))
+    record('orphans-table', recover_orphans(namespace('recover-orphans', tier='table')))
+    # Callback tables are corroborated by the current inventory, so refresh
+    # them before each naming pass.
+    for label, mode in (('callback-names', None), ('callback-thunks', 'promote_thunks'),
+                        ('callback-entries', 'promote_entries'),
+                        ('callback-undisassembled', 'promote_undisassembled')):
+        callback_tables(namespace('callback-tables', functions=None, apply=False))
+        flags = dict(promote_thunks=False, promote_entries=False,
+                     promote_undisassembled=False)
+        if mode:
+            flags[mode] = True
+        record(label, name_callbacks(namespace('name-callbacks', **flags)))
+    # The adjacent-RET tier is weaker evidence; use it only once the
+    # padding tier has converged, then let padding pick up exposed calls.
+    for tier in ('padding', 'adjacent-ret', 'padding'):
+        for number in range(1, MAX_CALL_PASSES + 1):
+            created = recover_calls(namespace('recover-calls', tier=tier))
+            record(f'calls-{tier}-{number}', created)
+            if not created:
+                break
+        else:
+            raise ValueError(f'direct-call recovery ({tier}) did not converge')
+    repairs = repair_boundaries(namespace('repair-boundaries'))
+    final = record('repair-boundaries')
+    audit = repair_boundaries(namespace('repair-boundaries', apply=False))
+    if any(row['result'] != 'already_repaired' for row in audit):
+        raise ValueError('boundary recipes are not all applied: ' + ', '.join(
+            f'{row["entry"]} {row["result"]}' for row in audit))
+    summary = {'stages': stages, 'boundary_repairs': [
+        {key: row[key] for key in ('entry', 'result', 'body_bytes_before', 'body_bytes_after')}
+        for row in repairs], 'documented_functions': DOCUMENTED_FUNCTIONS,
+        'functions': final['discovered_functions']}
+    if not args.skip_export:
+        exported = export_all(namespace('export-all', apply=False, limit=0, overwrite=False,
+                                        fastcall_fallback=False, watcom_fallback=False,
+                                        custom_storage_fallback=True))
+        summary['decompilations_failed'] = exported['decompilations_failed']
+        function_facts(namespace('function-facts', apply=False))
+    report_path.write_text(json.dumps(summary, indent=2) + '\n')
+    difference = final['discovered_functions'] - DOCUMENTED_FUNCTIONS
+    print(f'rebuild: {final["discovered_functions"]} functions '
+          f'({difference:+d} against the documented {DOCUMENTED_FUNCTIONS}); '
+          f'report: {report_path}')
 
 
 def main(argv=None):
@@ -526,7 +619,7 @@ def main(argv=None):
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
                  'recover-orphans', 'recover-calls', 'repair-boundaries', 'audit-flow-gaps',
                  'audit-body-holes', 'function-facts', 'subsystem-map',
-                 'callback-tables', 'name-callbacks'):
+                 'callback-tables', 'name-callbacks', 'rebuild'):
         sub = subparsers.add_parser(name)
         sub.add_argument('--workspace', type=Path, default=default_workspace,
                          help='Ghidra project and image workspace (default: EF2000_GHIDRA_WORKSPACE or source local/ghidra)')
@@ -615,6 +708,10 @@ def main(argv=None):
                        help='with --apply, narrowly decode named table-backed entries lacking instructions')
     names.add_argument('--max', type=nonnegative_int, default=0,
                        help='maximum function creations (0 means all; only with an applying promotion mode)')
+    rebuild_parser = subparsers.choices['rebuild']
+    rebuild_parser.add_argument('executable', type=Path, help='SHA-pinned original _EF2000.EXE')
+    rebuild_parser.add_argument('--skip-export', action='store_true',
+                                help='stop after boundary repair; skip pseudo-C and facts export')
     args = parser.parse_args(argv)
     try:
         {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,
@@ -625,7 +722,7 @@ def main(argv=None):
          'audit-body-holes': audit_body_holes,
          'function-facts': function_facts, 'subsystem-map': subsystem_map,
          'callback-tables': callback_tables,
-         'name-callbacks': name_callbacks}[args.command](args)
+         'name-callbacks': name_callbacks, 'rebuild': rebuild}[args.command](args)
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'ghidra_ef2000: {error}\n')
 

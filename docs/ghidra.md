@@ -63,6 +63,36 @@ The asset-free Ghidra CLI tests run under `nix flake check` via the main
 package and a separate `ghidra-workflow` check; no original DOS image is
 needed by those tests.
 
+## Rebuild the complete recovered project (start here)
+
+`local/` is not in Git, so a fresh checkout has no Ghidra project. One
+command reproduces the whole recovered state, running every applying pass
+described below in its documented order in a single workspace:
+
+```sh
+nix develop -c ef2000-ghidra rebuild ../EF2000/c/EF2000/_EF2000.EXE
+# Faster, without the pseudo-C/facts export at the end:
+nix develop -c ef2000-ghidra rebuild --skip-export ../EF2000/c/EF2000/_EF2000.EXE
+```
+
+Stages: import → strict orphans → table orphans → callback names →
+callback thunks → callback entries → undisassembled callbacks (callback
+tables are re-derived from the current inventory before each naming pass)
+→ direct-call recovery, padding tier until nothing is created, then the
+adjacent-RET tier, then padding again → the nine boundary repairs, then a
+read-only check that all nine report `already_repaired` → two-pass
+`export-all --custom-storage-fallback` → `function-facts`.
+
+It refuses to run when the workspace already holds a project; nothing is
+ever deleted. Function counts after each stage are written to
+`WORKSPACE/rebuild-report.json`. The complete run, including the export,
+took about four minutes on a 12-core desktop (2026-11-03).
+
+Function counts depend on the Ghidra release. The figures in the rest of
+this document and in `ghidra-findings.md` up to #061 were measured with
+Ghidra 11.4.2; the flake now provides **Ghidra 12.1.4**, whose stage counts
+are listed under #062 in [the findings](ghidra-findings.md).
+
 ## Export the entire discovered-function corpus
 
 The original `decompile` command only exports selected addresses. For a

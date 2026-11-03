@@ -825,6 +825,106 @@ class GhidraWorkflowTests(unittest.TestCase):
         with patch.dict(ghidra.os.environ, {'GHIDRA_HOME': str(home)}):
             self.assertEqual(ghidra.headless_path(None), str(launcher))
 
+    def rebuild_fakes(self, calls_created=(2, 0, 1, 0, 0), audit='already_repaired'):
+        """Replace every pass with a recorder; return the shared call log."""
+        log = []
+        functions = [3900]
+        created_calls = list(calls_created)
+
+        def fake_import(args):
+            log.append('import')
+
+        def fake_export(args):
+            log.append(args.command if args.command == 'inventory' else
+                       'export-all storage' if args.custom_storage_fallback else 'export-all')
+            return {'discovered_functions': functions[0], 'decompilations_failed': 0}
+
+        def fake_orphans(args):
+            log.append(f'orphans {args.tier}')
+            functions[0] += 10
+            return 10
+
+        def fake_tables(args):
+            log.append('callback-tables')
+
+        def fake_names(args):
+            mode = ('thunks' if args.promote_thunks else 'entries' if args.promote_entries
+                    else 'undisassembled' if args.promote_undisassembled else 'names')
+            log.append(f'names {mode}')
+            return 0
+
+        def fake_calls(args):
+            created = created_calls.pop(0)
+            log.append(f'calls {args.tier} {created}')
+            functions[0] += created
+            return created
+
+        def fake_repair(args):
+            log.append('repair apply' if args.apply else 'repair audit')
+            return [{'entry': '0x00004050', 'result': 'repaired' if args.apply else audit,
+                     'body_bytes_before': '34', 'body_bytes_after': '138'}]
+
+        def fake_facts(args):
+            log.append('facts')
+
+        patches = [patch.object(ghidra, name, fake) for name, fake in (
+            ('import_image', fake_import), ('export_all', fake_export),
+            ('recover_orphans', fake_orphans), ('callback_tables', fake_tables),
+            ('name_callbacks', fake_names), ('recover_calls', fake_calls),
+            ('repair_boundaries', fake_repair), ('function_facts', fake_facts))]
+        for item in patches:
+            item.start()
+            self.addCleanup(item.stop)
+        return log
+
+    def rebuild_args(self, skip_export=False):
+        return argparse.Namespace(workspace=self.workspace, executable=self.executable,
+                                  analyze_headless=self.launcher, skip_export=skip_export)
+
+    def test_rebuild_runs_documented_passes_in_order(self):
+        self.workspace.mkdir(parents=True)
+        log = self.rebuild_fakes()
+        ghidra.rebuild(self.rebuild_args())
+        passes = [entry for entry in log if entry != 'inventory']
+        self.assertEqual(passes, [
+            'import', 'orphans strict', 'orphans table',
+            'callback-tables', 'names names', 'callback-tables', 'names thunks',
+            'callback-tables', 'names entries', 'callback-tables', 'names undisassembled',
+            'calls padding 2', 'calls padding 0', 'calls adjacent-ret 1',
+            'calls adjacent-ret 0', 'calls padding 0',
+            'repair apply', 'repair audit', 'export-all storage', 'facts'])
+        report = json.loads((self.workspace / 'rebuild-report.json').read_text())
+        self.assertEqual(report['functions'], 3900 + 20 + 3)
+        self.assertEqual(report['stages'][0], {'stage': 'import', 'functions': 3900})
+        self.assertEqual(report['documented_functions'], ghidra.DOCUMENTED_FUNCTIONS)
+
+    def test_rebuild_skip_export_stops_after_repairs(self):
+        self.workspace.mkdir(parents=True)
+        log = self.rebuild_fakes()
+        ghidra.rebuild(self.rebuild_args(skip_export=True))
+        self.assertNotIn('export-all storage', log)
+        self.assertNotIn('facts', log)
+
+    def test_rebuild_refuses_existing_project(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects' / 'EF2000.gpr').write_text('')
+        log = self.rebuild_fakes()
+        with self.assertRaisesRegex(ValueError, 'already exists'):
+            ghidra.rebuild(self.rebuild_args())
+        self.assertEqual(log, [])
+
+    def test_rebuild_requires_every_boundary_recipe(self):
+        self.workspace.mkdir(parents=True)
+        self.rebuild_fakes(audit='not_applicable')
+        with self.assertRaisesRegex(ValueError, 'not all applied'):
+            ghidra.rebuild(self.rebuild_args())
+
+    def test_rebuild_stops_if_call_recovery_never_converges(self):
+        self.workspace.mkdir(parents=True)
+        self.rebuild_fakes(calls_created=[1] * (ghidra.MAX_CALL_PASSES + 1))
+        with self.assertRaisesRegex(ValueError, 'did not converge'):
+            ghidra.rebuild(self.rebuild_args())
+
 
 if __name__ == '__main__':
     unittest.main()
