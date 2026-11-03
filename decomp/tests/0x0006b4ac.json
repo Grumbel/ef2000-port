@@ -1,0 +1,71 @@
+{
+  "address": "0x0006b4ac",
+  "function_size": 159,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "all_limit_terms",
+      "registers": {
+        "eax": "0x002b0000"
+      },
+      "memory": [
+        {
+          "address": "0x002b00e9",
+          "hex": "03"
+        },
+        {
+          "address": "0x002b0014",
+          "hex": "00000500"
+        },
+        {
+          "address": "0x2119f4",
+          "hex": "0a00"
+        },
+        {
+          "address": "0x20f564",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x128884",
+          "hex": "0000000000002440000000000000084000000000000014400000000000001c40"
+        },
+        {
+          "address": "0x002b019b",
+          "hex": "1e01001d0100"
+        }
+      ]
+    },
+    {
+      "name": "no_extra_term",
+      "registers": {
+        "eax": "0x002b0000"
+      },
+      "memory": [
+        {
+          "address": "0x002b00e9",
+          "hex": "03"
+        },
+        {
+          "address": "0x002b0014",
+          "hex": "00000500"
+        },
+        {
+          "address": "0x2119f4",
+          "hex": "0a00"
+        },
+        {
+          "address": "0x20f564",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x128884",
+          "hex": "0000000000002440000000000000084000000000000014400000000000001c40"
+        },
+        {
+          "address": "0x002b019b",
+          "hex": "1e0100"
+        }
+      ]
+    }
+  ]
+}

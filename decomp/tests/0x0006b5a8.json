@@ -1,0 +1,51 @@
+{
+  "address": "0x0006b5a8",
+  "function_size": 93,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "two_seconds",
+      "registers": {
+        "eax": "0x002b0000",
+        "edx": "0x002b0100",
+        "ebx": "0x002b0200"
+      },
+      "memory": [
+        {
+          "address": "0x12583c",
+          "hex": "0c0000000200"
+        },
+        {
+          "address": "0x002b0200",
+          "hex": "0c0000000000"
+        },
+        {
+          "address": "0x002b0000",
+          "hex": "00000000000000000000000000000000"
+        },
+        {
+          "address": "0x002b0100",
+          "hex": "00000000000008400000000000001040"
+        }
+      ]
+    },
+    {
+      "name": "clamp_negative_seconds",
+      "registers": {
+        "eax": "0x002b0000",
+        "edx": "0x002b0100",
+        "ebx": "0x002b0200"
+      },
+      "memory": [
+        {
+          "address": "0x12583c",
+          "hex": "0c0000000000"
+        },
+        {
+          "address": "0x002b0200",
+          "hex": "0c0000000500"
+        }
+      ]
+    }
+  ]
+}

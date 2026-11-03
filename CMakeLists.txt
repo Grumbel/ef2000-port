@@ -71,6 +71,15 @@ target_compile_definitions(ef2000-decomp-world-grid-relations-test PRIVATE EF_DE
 target_include_directories(ef2000-decomp-world-grid-relations-test PRIVATE decomp/include)
 target_link_libraries(ef2000-decomp-world-grid-relations-test PRIVATE m)
 add_test(NAME decomp-world-grid-relations-host-model COMMAND ef2000-decomp-world-grid-relations-test)
+add_executable(ef2000-decomp-object-geometry-test
+  tests/decomp_object_geometry_test.c decomp/src/object_geometry.c
+  decomp/src/grid_point_distances.c)
+target_compile_features(ef2000-decomp-object-geometry-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-object-geometry-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-object-geometry-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-object-geometry-test PRIVATE decomp/include)
+target_link_libraries(ef2000-decomp-object-geometry-test PRIVATE m)
+add_test(NAME decomp-object-geometry-host-model COMMAND ef2000-decomp-object-geometry-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

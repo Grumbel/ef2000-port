@@ -1,0 +1,71 @@
+{
+  "address": "0x0006b54c",
+  "function_size": 61,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "limit_is_smaller",
+      "registers": {
+        "eax": "0x002b0000"
+      },
+      "memory": [
+        {
+          "address": "0x002b0177",
+          "hex": "0000000000005940"
+        },
+        {
+          "address": "0x002b00e9",
+          "hex": "03"
+        },
+        {
+          "address": "0x002b0014",
+          "hex": "00000500"
+        },
+        {
+          "address": "0x2119f4",
+          "hex": "0a00"
+        },
+        {
+          "address": "0x20f564",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x128884",
+          "hex": "0000000000002440"
+        }
+      ]
+    },
+    {
+      "name": "limit_is_equal",
+      "registers": {
+        "eax": "0x002b0000"
+      },
+      "memory": [
+        {
+          "address": "0x002b0177",
+          "hex": "0000000000000000"
+        },
+        {
+          "address": "0x002b00e9",
+          "hex": "03"
+        },
+        {
+          "address": "0x002b0014",
+          "hex": "00000500"
+        },
+        {
+          "address": "0x2119f4",
+          "hex": "0a00"
+        },
+        {
+          "address": "0x20f564",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x128884",
+          "hex": "0000000000002440"
+        }
+      ]
+    }
+  ]
+}

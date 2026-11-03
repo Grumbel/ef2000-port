@@ -1,0 +1,31 @@
+{
+  "address": "0x0006b3d0",
+  "function_size": 79,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "kind3_rejected",
+      "registers": {
+        "eax": "0x00000003"
+      },
+      "memory": [
+        {
+          "address": "0x128817",
+          "hex": "03"
+        }
+      ]
+    },
+    {
+      "name": "kind2_special",
+      "registers": {
+        "eax": "0x00000012"
+      },
+      "memory": [
+        {
+          "address": "0x129582",
+          "hex": "02"
+        }
+      ]
+    }
+  ]
+}

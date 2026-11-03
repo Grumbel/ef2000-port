@@ -462,8 +462,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002b910	75	set_grid_slot_event	world_grid	drafted	game	confirmed	decomp/tests/0x0002b910.json	AX/DL event 0x58+value; calls 0x46168 ret4 before +0x90 store
 0x0002b95c	100	enable_grid_slot_state	world_grid	drafted	game	confirmed	decomp/tests/0x0002b95c.json	conditional type-stride gate, state wrapper and event 7; host model passes
 0x0002ba14	86	enable_grid_slot_activation	world_grid	drafted	game	confirmed	decomp/tests/0x0002ba14.json	conditional activation wrapper and event 8; host model passes
-0x0002bab0	48			unknown	unclassified	unverified		
-0x0002bae0	91			unknown	unclassified	unverified		
+0x0002bab0	48	grid_distance_to_point	world_grid	drafted	game	confirmed	decomp/tests/0x0002bab0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
+0x0002bae0	91	scaled_grid_distance_to_point	world_grid	drafted	game	confirmed	decomp/tests/0x0002bae0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0002bb3c	40	grid_cell_distance	world_grid_neighbors	drafted	game	confirmed	decomp/tests/0x0002bb3c.json	AX/DX grid pair to ST0 distance; original runtime 0xb415c x87 rounding pending
 0x0002bb64	108			unknown	unclassified	unverified		
 0x0002bbd0	108	find_grid_neighbor_with_detail	world_grid_neighbors	drafted	game	confirmed	decomp/tests/0x0002bbd0.json	AX row to AX signed neighbor; eight 17-byte adjacency entries
@@ -1273,7 +1273,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a4c4	115	mul_object_matrix_vector	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX output vector EDX input vector BX signed object index
 0x0006a538	115	mul_object_matrix_transpose_vector	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX input vector EDX output vector BX signed object index
 0x0006a5ac	66			unknown	unclassified	unverified		
-0x0006a5f0	121			unknown	unclassified	unverified		
+0x0006a5f0	121	indexed_object_distance	object_geometry	drafted	game	confirmed	decomp/tests/0x0006a5f0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0006a66c	121			unknown	unclassified	unverified		
 0x0006a6e8	117			unknown	unclassified	unverified		
 0x0006a760	202			unknown	unclassified	unverified		
@@ -1284,13 +1284,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006ae30	130			unknown	unclassified	unverified		
 0x0006aeb4	1165			unknown	unclassified	unverified		
 0x0006b344	137			unknown	unclassified	unverified		
-0x0006b3d0	79			unknown	unclassified	unverified		
+0x0006b3d0	79	object_kind_is_eligible	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b3d0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0006b420	35			unknown	unclassified	unverified		
 0x0006b444	104			unknown	unclassified	unverified		
-0x0006b4ac	159			unknown	unclassified	unverified		
-0x0006b54c	61			unknown	unclassified	unverified		
-0x0006b58c	26			unknown	unclassified	unverified		
-0x0006b5a8	93			unknown	unclassified	unverified		
+0x0006b4ac	159	object_type_limit	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b4ac.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
+0x0006b54c	61	lower_object_limit	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b54c.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
+0x0006b58c	26	reset_object_limit	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b58c.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
+0x0006b5a8	93	object_speed_from_clock	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b5a8.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0006b608	24			unknown	unclassified	unverified		
 0x0006b620	196			unknown	unclassified	unverified		
 0x0006b6c8	1472			unknown	unclassified	unverified		

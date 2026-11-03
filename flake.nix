@@ -508,6 +508,18 @@
           grep -qi 'refresh_grid_category' work/world_grid_category.asm
           grep -qi 'grid_is_visible_from_reference' work/world_grid_category.asm
           ! grep -qi '__CHK' work/world_grid_category.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/object_geometry.c --output "$PWD/work/object_geometry.obj"
+          ${watcom}/bin/wdis work/object_geometry.obj -l=work/object_geometry.asm
+          grep -qi 'object_type_limit' work/object_geometry.asm
+          grep -qi 'object_speed_from_clock' work/object_geometry.asm
+          ! grep -qi '__CHK' work/object_geometry.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/grid_point_distances.c --output "$PWD/work/grid_point_distances.obj"
+          ${watcom}/bin/wdis work/grid_point_distances.obj -l=work/grid_point_distances.asm
+          grep -qi 'grid_distance_to_point' work/grid_point_distances.asm
+          grep -qi 'scaled_grid_distance_to_point' work/grid_point_distances.asm
+          ! grep -qi '__CHK' work/grid_point_distances.asm
           $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
             ${source}/tests/decomp_object_control_test.c \
@@ -541,6 +553,13 @@
             ${source}/decomp/src/world_grid_category.c \
             -lm -o work/world_grid_relations_host_test
           work/world_grid_relations_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_object_geometry_test.c \
+            ${source}/decomp/src/object_geometry.c \
+            ${source}/decomp/src/grid_point_distances.c \
+            -lm -o work/object_geometry_host_test
+          work/object_geometry_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

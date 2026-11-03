@@ -8,6 +8,7 @@
 #include "ef_structs/hiscore.h"
 #include "ef_structs/spatial.h"
 #include "ef_structs/world_grid.h"
+#include "ef_structs/object_helpers.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -51,5 +52,10 @@ extern ef_grid_category_type g_grid_category_types[]; /* 0x0012bc94, stride 0x91
 extern ef_grid_external_probe g_grid_external_probes[]; /* 0x001a5c2e, stride 0x1b */
 extern double g_grid_reference_position[2]; /* 0x001a3020 */
 extern double g_grid_visibility_distance; /* 0x001252a4 */
+extern double g_grid_distance_scale; /* 0x0018251a, 2D distance conversion */
+extern uint8_t g_object_kind_modes[]; /* 0x00128568, stride 0xe5 */
+extern uint8_t g_reference_clock[6]; /* 0x0012583c, three packed signed words */
+extern ef_addr32 g_scene_head; /* 0x00211ad4, singly linked scene nodes */
+extern uint8_t g_scene_kind_child_counts[]; /* 0x00123819, stride 0xa4 */
 
 #endif

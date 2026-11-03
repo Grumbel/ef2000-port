@@ -37,3 +37,8 @@ addr	size	type	name	evidence	notes
 0x001fcb40	4	ef_addr32	g_grid_adjacency_base	0x2bbdd reads via EDI	pointer to 17-byte adjacency lists indexed by row +0x1c
 0x0020f550	4 * count	uint32_t[]	g_indexed_object_table	0x6a1c3 indexed read	32-bit guest pointer entries; bounds stored at 0x2119f4
 0x002119f4	2	int16_t	g_indexed_object_count	0x6a1b4 signed comparison	signed bound for the pointer table at 0x20f550
+0x00123819	256 * 0xa4	uint8_t[]	g_scene_kind_child_counts	0x900a7/0x906f4 loop bounds	first byte in each 0xa4-byte scene kind descriptor
+0x0012583c	6	uint16_t[3]	g_reference_clock	0x6b5af passes immediate to 0x40774	signed words at offsets 0/2/4 interpreted as hours/minutes/seconds
+0x00128568	256 * 0xe5	uint8_t[]	g_object_kind_modes	0x6b3dc reads 0xe5-strided byte	mode codes 2/3/4 special-case object kinds
+0x0018251a	8	double	g_grid_distance_scale	0x2baec FLD, six scaled components	separate from external scale at 0x182512
+0x00211ad4	4	ef_addr32	g_scene_head	0x901ed/0x90664/0x907f9 reads	head of singly linked scene node list; link at +0x50

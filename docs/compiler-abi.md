@@ -879,6 +879,66 @@ at `0x2dbf8` when enabled, and finally suppresses the result if row +0x1a
 is zero. Those two predicate callees are explicitly unrecovered because
 their independently confirmed caller/ABI evidence is incomplete.
 
+## Object geometry and indexed scene nodes — 15-function batch
+
+The original image has eight additional, independently called object/point
+helpers. `0x2bab0` and `0x2bae0` take an EAX pointer to two or three doubles
+plus a **signed DX grid index** and return a double in x87 ST0. The former
+subtracts the two unscaled coordinates and passes two stack doubles to the
+runtime hypot helper `0xb4620`, whose epilogue is `ret 16`. The latter first
+multiplies *each* of the three input and three grid components by the double
+at `0x18251a`; its callee `0xb415c` consumes the first two components only.
+Both have five or more independent original caller functions.
+
+`0x6a5f0` accepts two signed indexed-object numbers in AX and DX, resolves
+both using `0x6a1b4`, returns zero if either lookup fails, and otherwise
+subtracts all three position doubles at +0x49/+0x51/+0x59. Again only the
+first two differences enter `0xb415c`, so a large Z difference must not
+affect the distance. `0x6b3d0` takes the byte in AL and reads a code in a
+0xe5-stride table at `0x128568`: code 2 accepts only kinds 0x12/0x16;
+code 3 rejects all; code 4 rejects kinds 0x1d/0x1e; other codes accept.
+
+`0x6b4ac` takes an object guest pointer in EAX, reads its type at +0xe9,
+and forms an x87 limit using the four unaligned doubles in the corresponding
+0xe5-byte record at `0x1285d5`. It conditionally adds term 2 if the object's
+feature-0x1e lookup is not sentinel 0x14, and terms 3 and 4 if its
+feature-0x1d lookup is not 0x14. `0x6b54c` takes that same EAX pointer and
+replaces the double at +0x177 only when the old limit is **strictly greater**;
+it returns the update flag in AL. `0x6b58c` takes a signed AX index, performs
+one filtered object lookup and unconditionally stores the computed limit if
+found. `0x6b5a8` accepts two double-array pointers in EAX/EDX and a packed
+three-word time pointer in EBX; `0x40774` converts the clock to seconds,
+`max(1, reference_time - old_time)` divides the 2D displacement, and the
+result remains in ST0. The host C models use 64/80-bit intermediates as an
+approximation only; runtime hypot, NaN behavior, and exact x87 rounding still
+need guest differential proof. All eight have two or more distinct callers.
+
+Seven more functions operate on the scene-node list headed at `0x211ad4`.
+The node's +0x14 high word is an index in `0x8ffe8`, and +0x50 is the next
+pointer. `0x90050` tests whether a nonzero node resolves to itself;
+`0x90074` sets +0x30 bits 0 and 1, clears bit 2 of each 0x44-byte child
+slot's +0x16 byte (count at `0x123819 + kind*0xa4`), and notifies the
+owner. `0x900c0` dispatches according to global alternate-mode and the
+node's +0x18 marker; only the direct branch writes the +0x22 word to five.
+`0x901ec` walks the list and dispatches by kind below/above 0x1b, re-reading
+the next link *after* each callback. `0x9065c` returns head for null input,
+otherwise the successor. `0x906b4` looks up the scene node by AX and returns
+AL=1 if any child slot's +0x40 signed-high-word index resolves via the
+filtered indexed-object lookup. `0x907f0` finds the next such node, starting
+at the successor of an EAX pointer or the global head for EAX=0. It has an
+**out-of-body branch into the `0x8ffe8` shared epilogue at `0x9000a`**.
+This candidate must not be independently spliced without resolving that
+tail. These seven also have at least two distinct original caller functions;
+the related original dispatch/lookup callees are typed **dependencies**, not
+additional recovered implementations.
+
+All fifteen functions are **drafted host models**, not ABI-safe replacement
+objects. The two host suites exercise signed modes, disabled feature branches,
+strict limit comparisons, time clamping, ignored Z, scene child flags, event
+dispatch and callback mutation of a next pointer. Per-function guest fixtures
+remain plans; no native guest differential or Watcom recompilation succeeded
+in this environment.
+
 ## Comparing assembly
 
 ```sh

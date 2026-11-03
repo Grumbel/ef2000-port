@@ -80,6 +80,36 @@ uint8_t grid_has_cross_object_relation(int16_t cell); /* 0x0002c0ec, AX -> AL */
 void refresh_grid_category(int16_t cell); /* 0x0002da54, AX */
 uint8_t grid_is_visible_from_reference(int16_t cell); /* 0x0002dce0, AX -> AL */
 
+/* Object geometry and limit helpers (drafted, not guest-spliced). */
+uint8_t object_kind_is_eligible(uint8_t kind); /* 0x6b3d0, AL -> AL */
+double object_type_limit(ef_addr32 object); /* 0x6b4ac, EAX -> ST0 */
+uint8_t lower_object_limit(ef_addr32 object); /* 0x6b54c, EAX -> AL */
+void reset_object_limit(int16_t object); /* 0x6b58c, AX */
+double object_speed_from_clock(ef_addr32 a, ef_addr32 b, ef_addr32 clock); /* 0x6b5a8, EAX/EDX/EBX -> ST0 */
+double indexed_object_distance(int16_t a, int16_t b); /* 0x6a5f0, AX/DX -> ST0 */
+double grid_distance_to_point(ef_addr32 point, int16_t cell); /* 0x2bab0, EAX/DX -> ST0 */
+double scaled_grid_distance_to_point(ef_addr32 point, int16_t cell); /* 0x2bae0, EAX/DX -> ST0 */
+
+/* Original helper at 0x2949c: AX indexed object, DL feature, AL slot/20. */
+uint8_t query_indexed_object_feature(int16_t object, uint8_t code);
+
+/* Linked scene-node helpers (0x90000 region). */
+uint8_t scene_node_is_registered(ef_addr32 node); /* 0x90050, EAX -> AL */
+void clear_scene_node_children(int16_t index); /* 0x90074, AX */
+void dispatch_scene_node_event(int16_t index, int16_t event, uint8_t code); /* 0x900c0, AX/BX/DL */
+void visit_all_scene_nodes(void); /* 0x901ec, no arguments */
+ef_addr32 next_scene_node(ef_addr32 node); /* 0x9065c, EAX -> EAX */
+uint8_t scene_node_has_active_children(int16_t index); /* 0x906b4, AX -> AL */
+ef_addr32 next_scene_node_with_active_children(ef_addr32 node); /* 0x907f0, EAX -> EAX */
+
+/* Original dependencies, no independent ABI claims for implementations. */
+ef_addr32 lookup_scene_node(int16_t index); /* 0x8ffe8, signed AX */
+void notify_scene_owner(int16_t index); /* 0x3739c, signed AX */
+void dispatch_scene_node_direct(int16_t index, int16_t event, uint8_t code); /* 0x90124 */
+void dispatch_scene_node_external(int16_t index, int16_t event, uint8_t code); /* 0x55e1c */
+void visit_scene_node_standard(ef_addr32 node); /* 0x9021c */
+void visit_scene_node_extended(ef_addr32 node); /* 0x90378 */
+
 /* Original dependencies at 0x2dc84/0x2dbf8; no separately confirmed ABIs. */
 uint8_t grid_reference_distance_matches(int16_t cell); /* 0x0002dc84 */
 uint8_t grid_external_distance_matches(int16_t cell, uint8_t probe); /* 0x0002dbf8 */

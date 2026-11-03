@@ -136,11 +136,13 @@ typedef struct EF_PACKED ef_grid_type_record {
     double limit_a;
     double limit_b;
     double limit_multiplier;
-    uint8_t unknown_18[0xcd];
+    double limit_extra;             /* +0x18, fourth limit term */
+    uint8_t unknown_20[0xc5];
 } ef_grid_type_record;
 EF_STATIC_ASSERT(ef_grid_type_record_size, sizeof(ef_grid_type_record) == 0xe5);
 EF_STATIC_ASSERT(ef_grid_type_limit_a_off, offsetof(ef_grid_type_record, limit_a) == 0x00);
 EF_STATIC_ASSERT(ef_grid_type_limit_b_off, offsetof(ef_grid_type_record, limit_b) == 0x08);
 EF_STATIC_ASSERT(ef_grid_type_multiplier_off, offsetof(ef_grid_type_record, limit_multiplier) == 0x10);
+EF_STATIC_ASSERT(ef_grid_type_extra_off, offsetof(ef_grid_type_record, limit_extra) == 0x18);
 
 #endif
