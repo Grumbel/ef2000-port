@@ -1696,3 +1696,55 @@ in EAX, format string address, one value).
 | `0x7e89c` | none | AL:uint8_t | 7e8c0@7e953,7e8c0@7eb1d | slot=high word 0x19bb5c; valid unless 0xff and 0x2c358 nonzero |
 | `0x7f6ac` | EAX:ef_addr32 | EAX:uint32_t | 7f6d8@7f744 | 0 when high word +0x16 > 7 or word +0x18 equals marker |
 | `0x803e8` | none | none | a8bd4@a8e5c | poll 0xd7594(0) until nonzero low byte when byte 0x15bac6 |
+
+## scene_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x815f4` | AL:uint8_t | EAX:uint32_t | 81448@815a2 | tail 0xd72b4(AL) when byte 0x12b104 set else 0 |
+| `0x83734` | EAX:ef_addr32 | none | 83a40@83a78 | 0xe99b8 then three dwords >>= 16 (arithmetic) |
+| `0x84394` | EAX:ef_addr32 | none | 845c0@845df,845c0@84611 | 0x83708(0x1fcc3e, dwords 0/4/8) |
+| `0x844e4` | none | AL:uint8_t | 84678@8469d | word 0x12b4a6=1, 0xdc832, byte 0x1fcc43=0, AL=0 |
+| `0x88548` | none | none | 8846c@88474 | dwords 0x20f14c=0x7fffffff 0x20f154=0 0x20f150=filtered lookup |
+| `0x88d08` | EAX:ef_addr32,EDX:ef_addr32 | none | 8a1dc@8a2e9,8a1dc@8a2f7 | copy six dwords EDX to EAX |
+| `0x89960` | EAX:ef_addr32 | none | none direct | byte 0x12d7b3=0; if byte 0x125847 0x9e508(high word +0x2c,4); 0x8a318 |
+| `0x8b530` | none | none | 8bb50@8bb53 | copy 0x8e dwords of filtered object to 0x2117b0 |
+| `0x8cd48` | none | none | 49228@4970e | word 0x12db60=1; 0x8c0f0(0); store signed word at 0x1f71d0 and obj+0x16 unless -1 |
+| `0x8fe30` | none | none | 8fe58@8fe5e | 0xb3fb0(0x211ac8,0,4) and (0x211a00,0,0xc8) |
+| `0x94194` | none | none | 95e58@961d5,95e58@96217 | clear words 0x12dba0/a6; 0x91df4 0x9202c 0x93a8c; scene refresh |
+| `0x941bc` | none | none | 95e58@96240 | identical body to 0x94194 |
+| `0x978e8` | EAX:ef_addr32 | none | 97464@974a0 | if word +0xa: high word +6 <= 2 -> 0x979c8,0x97914; then 0x97950 |
+| `0x97d90` | AX:int16_t,DX:int16_t,EBX:uint32_t | none | 97dcc@97f1d | 0xe30e0(0,x+1,y+1,EBX) and (6,x,y,EBX) |
+| `0x984b4` | none | none | 19a80@19ad6,3ea0c@3eed9 | 0xde4b0 if byte 0x420a72==2; dword 0x12dcfc=-1; byte 0x12dd00=1 |
+| `0x982d4` | none | none | 3dd30@3dfc7 | tail 0xde3b4(high word 0x12dcf6) when sound flags set |
+| `0xa0e98` | AX:int16_t | AL:uint8_t | 3d950@3d97d,3da24@3da52 | bit 4 of byte +0xa of 0xb3f58 record |
+| `0xa0ea8` | AX:int16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t | none | 1d474@1d4fe,2f740@2f7a8,777f4@778a7 | words +2 +4 +6 of 0xb3f58 record |
+| `0xa1858` | AX:int16_t | AL:uint8_t | 10f70@10faf,11014@11038,1e214@1e22b | bits 5-6 of byte +0xa |
+| `0xa1a10` | AX:int16_t | EAX:ef_addr32 | cd150@cd193,e8484@e84e6 | table 0x40d200[word record] entry+0xa+6*byte +9 |
+| `0xa2e4c` | AX:uint16_t | none | a2e6c@a2e7b | 0xb3fb0(dword 0x1368bc[AX],0,0x21) |
+| `0xa2e6c` | none | none | a3c18@a3cc5,a3da0@a3de4 | 0xa2e4c for 0..7 |
+| `0xa2e90` | AX:uint16_t | none | a2f70@a303a,a3c18@a3ce4 | 0xe9a24(0x21,0x135840,dword 0x1368bc[AX]) |
+| `0xa3108` | AX:uint16_t,DX:uint16_t | EAX:uint32_t | a312c@a3186 | tail 0xec0ec when byte 0x13579a clear else 0 |
+| `0xa38c8` | none | none | a3c18@a3d81 | clear 8 words 0x1357d8, 8 words 0x13580a, 8 dwords 0x1357e8 |
+| `0xa3a10` | EAX:ef_addr32 | AL:uint8_t | 34844@34858 | nonempty string with 0xb1b8b result <= 0x10 |
+| `0xa3b48` | none | none | a3c18@a3c5a | 0xdeb87(0x136dd8,-1,8) |
+| `0xa3bfc` | none | none | a3c18@a3c5f | dwords 0x1368bc[i]=0x136dfc+0x21*i for i<8 |
+| `0xa4318` | none | none | 3dd30@3de2d | clear dwords 0x135820 0x135824 0x135828 |
+| `0xa4421` | EAX:ef_addr32 | EAX:ef_addr32 | 3b58@3be9,3b58@3c3e,2aa34@2aab1 | uppercase a..z in place, return pointer |
+| `0xa4b5c` | EAX:ef_addr32 | none | f1c58@f1d1f | when byte +0x11 clear: 0xa4a94 0xa4a20 on byte +0x10, 0xa6038 |
+| `0xa4c84` | none | none | 4738@4847,494c@4a16,494c@4a52 | 0xa4b80(i) for i=1..word 0x41eed8 |
+| `0xa4e98` | none | none | ac16c@ac1a5 | clear dwords 0x41edfc..0x41ee9c (41 entries) |
+| `0xa4ec0` | EAX:ef_addr32 | none | a59d8@a5a01 | words +0x5f=4 +0x63=2 +0x61=4 +0x5d=2 or 0x14 with flag |
+| `0xa51dc` | EAX:ef_addr32 | none | a520c@a530a,a5484@a54e6,a59d8@a5a4e | child word +4 = word +0x45 (-0x44 with flag 0x40) |
+| `0xa54f0` | EAX:ef_addr32 | none | a59d8@a5a1d | 0xa5484(widget, high words +0x3f,+0x41) |
+| `0xa56f8` | EAX:ef_addr32 | none | ba5c@bba1,bfcc@c4a0,a570c@a575a | words +0x69 +0x6b = 0; tail 0xf13ac |
+| `0xa5980` | none | none | ac2e4@ac3d7 | 0xa5764(dword 0x41edfc[i]) for i=1..word 0x41eed8 |
+| `0xa59ac` | EAX:ef_addr32 | none | a59d8@a5a47 | clear child words +0xe +0x10 +0x12 unless flag 2 |
+| `0xa66a0` | EAX:ef_addr32 | none | a520c@a5318,a59d8@a5a2b,f13ac@f13b6 | children with low five bits of +0x8c: 0xa6438 |
+| `0xa6a64` | EAX:ef_addr32 | none | a59d8@a5a39 | children without those bits: 0xa69d0 |
+| `0xa7380` | EAX:ef_addr32 | none | bfcc@c2c8,bfcc@c2f2,bfcc@c31c | clear bit 0 of +0x1d and 0xa6d00 |
+| `0xa739c` | EAX:ef_addr32,DL:uint8_t | none | 4f18@4fdb,4f18@4fe4,4f18@4fed | bit 6 of +0x1d = DL&1; 0xa5ef8(byte +0x50) unless byte 0x41f2e5 |
+| `0xa7408` | EAX:ef_addr32,DL:uint8_t | none | 34a98@34abb | apply 0xa739c to children without the low five bits |
+| `0xa7434` | EAX:ef_addr32 | none | 35e68@35e7b,35e90@35ea3,362c4@36313 | 0xa7380 on children with bit 0 of +0x1d |
+| `0xa7b80` | none | EAX:uint32_t | a99c0@a99e2,a99c0@a99ec,aad7c@aadb4 | tail 0x9c858 with EAX=0x18d57c |
+| `0xa7b8c` | none | none | a9bfc@a9c9d | dword 0x4191c8 = 0xb3f48() |

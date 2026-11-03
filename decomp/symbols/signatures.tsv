@@ -365,3 +365,50 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0007e89c	scene_slot_valid		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007e89c (33 bytes); slot=high word 0x19bb5c; valid unless 0xff and 0x2c358 nonzero; callers 7e8c0@7e953,7e8c0@7eb1d; docs/compiler-abi.md
 0x0007f6ac	record_mismatches_marker	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007f6ac (43 bytes); 0 when high word +0x16 > 7 or word +0x18 equals marker; callers 7f6d8@7f744; docs/compiler-abi.md
 0x000803e8	wait_for_event_803e8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000803e8 (21 bytes); poll 0xd7594(0) until nonzero low byte when byte 0x15bac6; callers a8bd4@a8e5c; docs/compiler-abi.md
+0x000815f4	forward_if_flag_12b104	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000815f4 (22 bytes); tail 0xd72b4(AL) when byte 0x12b104 set else 0; callers 81448@815a2; docs/compiler-abi.md
+0x00083734	scale_vector_down_16	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00083734 (35 bytes); 0xe99b8 then three dwords >>= 16 (arithmetic); callers 83a40@83a78; docs/compiler-abi.md
+0x00084394	forward_vector_to_83708	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00084394 (25 bytes); 0x83708(0x1fcc3e, dwords 0/4/8); callers 845c0@845df,845c0@84611; docs/compiler-abi.md
+0x000844e4	reset_pending_mode_844e4		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000844e4 (47 bytes); word 0x12b4a6=1, 0xdc832, byte 0x1fcc43=0, AL=0; callers 84678@8469d; docs/compiler-abi.md
+0x00088548	reset_target_search			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00088548 (42 bytes); dwords 0x20f14c=0x7fffffff 0x20f154=0 0x20f150=filtered lookup; callers 8846c@88474; docs/compiler-abi.md
+0x00088d08	copy_24_bytes	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00088d08 (37 bytes); copy six dwords EDX to EAX; callers 8a1dc@8a2e9,8a1dc@8a2f7; docs/compiler-abi.md
+0x00089960	finish_record_89960	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00089960 (48 bytes); byte 0x12d7b3=0; if byte 0x125847 0x9e508(high word +0x2c,4); 0x8a318; callers none direct; docs/compiler-abi.md
+0x0008b530	copy_selected_object			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008b530 (38 bytes); copy 0x8e dwords of filtered object to 0x2117b0; callers 8bb50@8bb53; docs/compiler-abi.md
+0x0008cd48	select_object_8cd48			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008cd48 (46 bytes); word 0x12db60=1; 0x8c0f0(0); store signed word at 0x1f71d0 and obj+0x16 unless -1; callers 49228@4970e; docs/compiler-abi.md
+0x0008fe30	clear_blocks_8fe30			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008fe30 (39 bytes); 0xb3fb0(0x211ac8,0,4) and (0x211a00,0,0xc8); callers 8fe58@8fe5e; docs/compiler-abi.md
+0x00094194	reset_scene_update_94194			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094194 (39 bytes); clear words 0x12dba0/a6; 0x91df4 0x9202c 0x93a8c; scene refresh; callers 95e58@961d5,95e58@96217; docs/compiler-abi.md
+0x000941bc	reset_scene_update_941bc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000941bc (39 bytes); identical body to 0x94194; callers 95e58@96240; docs/compiler-abi.md
+0x000978e8	update_record_978e8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000978e8 (44 bytes); if word +0xa: high word +6 <= 2 -> 0x979c8,0x97914; then 0x97950; callers 97464@974a0; docs/compiler-abi.md
+0x00097d90	draw_pair_97d90	AX:int16_t,DX:int16_t,EBX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00097d90 (48 bytes); 0xe30e0(0,x+1,y+1,EBX) and (6,x,y,EBX); callers 97dcc@97f1d; docs/compiler-abi.md
+0x000984b4	reset_sound_state_984b4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000984b4 (39 bytes); 0xde4b0 if byte 0x420a72==2; dword 0x12dcfc=-1; byte 0x12dd00=1; callers 19a80@19ad6,3ea0c@3eed9; docs/compiler-abi.md
+0x000982d4	forward_sound_state_982d4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000982d4 (43 bytes); tail 0xde3b4(high word 0x12dcf6) when sound flags set; callers 3dd30@3dfc7; docs/compiler-abi.md
+0x000a0e98	record_flag_bit4	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a0e98 (16 bytes); bit 4 of byte +0xa of 0xb3f58 record; callers 3d950@3d97d,3da24@3da52; docs/compiler-abi.md
+0x000a0ea8	set_record_words	AX:int16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a0ea8 (19 bytes); words +2 +4 +6 of 0xb3f58 record; callers 1d474@1d4fe,2f740@2f7a8,777f4@778a7; docs/compiler-abi.md
+0x000a1858	record_flag_bits56	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a1858 (17 bytes); bits 5-6 of byte +0xa; callers 10f70@10faf,11014@11038,1e214@1e22b; docs/compiler-abi.md
+0x000a1a10	record_entry_address	AX:int16_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a1a10 (47 bytes); table 0x40d200[word record] entry+0xa+6*byte +9; callers cd150@cd193,e8484@e84e6; docs/compiler-abi.md
+0x000a2e4c	clear_entry_a2e4c	AX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a2e4c (29 bytes); 0xb3fb0(dword 0x1368bc[AX],0,0x21); callers a2e6c@a2e7b; docs/compiler-abi.md
+0x000a2e6c	clear_all_entries_a2e6c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a2e6c (33 bytes); 0xa2e4c for 0..7; callers a3c18@a3cc5,a3da0@a3de4; docs/compiler-abi.md
+0x000a2e90	format_entry_a2e90	AX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a2e90 (32 bytes); 0xe9a24(0x21,0x135840,dword 0x1368bc[AX]); callers a2f70@a303a,a3c18@a3ce4; docs/compiler-abi.md
+0x000a3108	forward_if_clear_a3108	AX:uint16_t,DX:uint16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a3108 (33 bytes); tail 0xec0ec when byte 0x13579a clear else 0; callers a312c@a3186; docs/compiler-abi.md
+0x000a38c8	clear_tables_a38c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a38c8 (48 bytes); clear 8 words 0x1357d8, 8 words 0x13580a, 8 dwords 0x1357e8; callers a3c18@a3d81; docs/compiler-abi.md
+0x000a3a10	string_short_enough	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a3a10 (24 bytes); nonempty string with 0xb1b8b result <= 0x10; callers 34844@34858; docs/compiler-abi.md
+0x000a3b48	fill_block_a3b48			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a3b48 (25 bytes); 0xdeb87(0x136dd8,-1,8); callers a3c18@a3c5a; docs/compiler-abi.md
+0x000a3bfc	init_entry_table_a3bfc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a3bfc (27 bytes); dwords 0x1368bc[i]=0x136dfc+0x21*i for i<8; callers a3c18@a3c5f; docs/compiler-abi.md
+0x000a4318	clear_dwords_135820			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a4318 (23 bytes); clear dwords 0x135820 0x135824 0x135828; callers 3dd30@3de2d; docs/compiler-abi.md
+0x000a4421	uppercase_string	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a4421 (31 bytes); uppercase a..z in place, return pointer; callers 3b58@3be9,3b58@3c3e,2aa34@2aab1; docs/compiler-abi.md
+0x000a4b5c	refresh_widget_a4b5c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a4b5c (36 bytes); when byte +0x11 clear: 0xa4a94 0xa4a20 on byte +0x10, 0xa6038; callers f1c58@f1d1f; docs/compiler-abi.md
+0x000a4c84	refresh_all_widgets_a4c84			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a4c84 (45 bytes); 0xa4b80(i) for i=1..word 0x41eed8; callers 4738@4847,494c@4a16,494c@4a52; docs/compiler-abi.md
+0x000a4e98	clear_widget_table_a4e98			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a4e98 (40 bytes); clear dwords 0x41edfc..0x41ee9c (41 entries); callers ac16c@ac1a5; docs/compiler-abi.md
+0x000a4ec0	init_widget_margins	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a4ec0 (43 bytes); words +0x5f=4 +0x63=2 +0x61=4 +0x5d=2 or 0x14 with flag; callers a59d8@a5a01; docs/compiler-abi.md
+0x000a51dc	update_widget_child_a51dc	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a51dc (48 bytes); child word +4 = word +0x45 (-0x44 with flag 0x40); callers a520c@a530a,a5484@a54e6,a59d8@a5a4e; docs/compiler-abi.md
+0x000a54f0	forward_widget_position	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a54f0 (22 bytes); 0xa5484(widget, high words +0x3f,+0x41); callers a59d8@a5a1d; docs/compiler-abi.md
+0x000a56f8	clear_widget_words_a56f8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a56f8 (17 bytes); words +0x69 +0x6b = 0; tail 0xf13ac; callers ba5c@bba1,bfcc@c4a0,a570c@a575a; docs/compiler-abi.md
+0x000a5980	update_all_widgets_a5980			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a5980 (44 bytes); 0xa5764(dword 0x41edfc[i]) for i=1..word 0x41eed8; callers ac2e4@ac3d7; docs/compiler-abi.md
+0x000a59ac	clear_child_words_a59ac	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a59ac (41 bytes); clear child words +0xe +0x10 +0x12 unless flag 2; callers a59d8@a5a47; docs/compiler-abi.md
+0x000a66a0	walk_children_a66a0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a66a0 (44 bytes); children with low five bits of +0x8c: 0xa6438; callers a520c@a5318,a59d8@a5a2b,f13ac@f13b6; docs/compiler-abi.md
+0x000a6a64	walk_children_a6a64	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a6a64 (44 bytes); children without those bits: 0xa69d0; callers a59d8@a5a39; docs/compiler-abi.md
+0x000a7380	clear_widget_dirty	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7380 (28 bytes); clear bit 0 of +0x1d and 0xa6d00; callers bfcc@c2c8,bfcc@c2f2,bfcc@c31c; docs/compiler-abi.md
+0x000a739c	set_widget_bit6	EAX:ef_addr32,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a739c (48 bytes); bit 6 of +0x1d = DL&1; 0xa5ef8(byte +0x50) unless byte 0x41f2e5; callers 4f18@4fdb,4f18@4fe4,4f18@4fed; docs/compiler-abi.md
+0x000a7408	set_children_bit6	EAX:ef_addr32,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7408 (44 bytes); apply 0xa739c to children without the low five bits; callers 34a98@34abb; docs/compiler-abi.md
+0x000a7434	clear_children_dirty	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7434 (37 bytes); 0xa7380 on children with bit 0 of +0x1d; callers 35e68@35e7b,35e90@35ea3,362c4@36313; docs/compiler-abi.md
+0x000a7b80	call_9c858_18d57c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7b80 (10 bytes); tail 0x9c858 with EAX=0x18d57c; callers a99c0@a99e2,a99c0@a99ec,aad7c@aadb4; docs/compiler-abi.md
+0x000a7b8c	latch_b3f48			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7b8c (11 bytes); dword 0x4191c8 = 0xb3f48(); callers a9bfc@a9c9d; docs/compiler-abi.md
