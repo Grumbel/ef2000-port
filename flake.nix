@@ -462,6 +462,20 @@
           grep -qi 'set_indexed_object_mode' work/object_control.asm
           grep -qi 'sync_current_object_slot' work/object_control.asm
           ! grep -qi '__CHK' work/object_control.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/world_grid_queries.c --output "$PWD/work/world_grid_queries.obj"
+          ${watcom}/bin/wdis work/world_grid_queries.obj -l=work/world_grid_queries.asm
+          grep -qi 'grid_has_active_link' work/world_grid_queries.asm
+          grep -qi 'grid_has_object_mode' work/world_grid_queries.asm
+          grep -qi 'grid_is_current_or_external' work/world_grid_queries.asm
+          grep -qi 'grid_event_matches' work/world_grid_queries.asm
+          ! grep -qi '__CHK' work/world_grid_queries.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/world_grid_control.c --output "$PWD/work/world_grid_control.obj"
+          ${watcom}/bin/wdis work/world_grid_control.obj -l=work/world_grid_control.asm
+          grep -qi 'link_grid_cell' work/world_grid_control.asm
+          grep -qi 'reset_grid_cell_state' work/world_grid_control.asm
+          ! grep -qi '__CHK' work/world_grid_control.asm
           $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
             ${source}/tests/decomp_object_control_test.c \
@@ -471,6 +485,14 @@
             ${source}/decomp/src/object_control.c \
             -o work/object_control_host_test
           work/object_control_host_test
+          $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_world_grid_batch_test.c \
+            ${source}/decomp/src/object_lookup.c \
+            ${source}/decomp/src/world_grid_queries.c \
+            ${source}/decomp/src/world_grid_control.c \
+            -o work/world_grid_batch_host_test
+          work/world_grid_batch_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

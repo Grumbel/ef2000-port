@@ -1,0 +1,15 @@
+{
+  "address": "0x0002e030",
+  "function_size": 90,
+  "max_instructions": 4000,
+  "cases": [
+    {"name": "skip_ff_sentinel", "registers": {"eax": "0xcafe00ff"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x127da9", "hex": "01"}]},
+    {"name": "reset_and_copy_pending_values", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x127da9", "hex": "00"},
+                {"address": "0x2b00ea", "hex": "7f"},
+                {"address": "0x2b0163", "hex": "0102030405060708"}]}
+  ]
+}

@@ -765,6 +765,30 @@ and do not use EAX afterward. The call's actual return/clobber convention
 depends on the unresolved indirect target, so only the four temporary
 **outgoing** stack arguments are established, not inherited caller arguments.
 
+## Second world-grid link/query/control cluster (drafted)
+
+The following six routines have original instruction-level checks and at
+least **two distinct caller functions** each. Their C representations and
+synthetic host tests do not establish an OpenWatcom binary replacement or
+guest-differential equivalence. All use zero outgoing stack bytes and the
+existing 202-byte (`0xca`) grid-record stride.
+
+| Original | Recovered routine | Observed ABI and independent caller evidence |
+| --- | --- | --- |
+| `0x2b558` | `link_grid_cell` | Signed AX cell, signed DX neighbor, no consumed return; caller `0x2b508` at `0x2b546` and `0x46454` at `0x46ea8`; saves EBX/ECX, EDX scratch. Mutates +0x24 and +0x26, optionally neighbor +0x22, then invokes unrecovered `0x2b1f4` and `0x2b634`. |
+| `0x2beb0` | `grid_has_active_link` | Signed AX cell, AL Boolean; callers `0x8cc4` at `0x8f2a` and `0x2c778` at `0x2ca1d`. Saves EBX/ECX/EDX/ESI. Checks all seven attached object indices, including after a match. |
+| `0x2bf08` | `grid_has_object_mode` | Signed AX cell, DL mode, AL Boolean; separate callers near `0x8e1e` and `0x2cb52`. Saves EBX/ECX/ESI; EDX scratch. Iterates a byte count at grid row +0x4f, ignoring objects with bit `0x08` at object +0x24, checking mode at +0x16c. |
+| `0x2dba4` | `grid_is_current_or_external` | Signed AX cell, AL Boolean; callers `0x90c0` at `0x90c5` and one near `0x17475`. Saves EBX/ECX/EDX. Rejects `0xff`, compares global active index, then conditionally scans an external-index list using unrecovered `0x2db64`. |
+| `0x2e030` | `reset_grid_cell_state` | Signed AX cell, no consumed return; caller `0x2e740` at `0x2e87c` and `0x7e8c0` at `0x7ea0d`. Saves EBX/ECX/EDX. Skips `0xff`, clears row +0x20, calls `0x2e08c`, reloads grid base, copies dwords +0x99/+0x9d into +0x91/+0x95, conditionally calls `0x54c10`. |
+| `0x2e910` | `grid_event_matches` | AL event code, DL mode, AL Boolean; callers `0x270d0` at `0x27206` and one at `0x65da1`. AH/EDX may be modified. Cases are `(code=0, mode=1)`, `(code=1, mode=0)`, `(code=2, mode!=2)`, otherwise false. |
+
+Both attached-object scans invoke `lookup_filtered_indexed_object` once per
+entry, even when an earlier entry already satisfied the predicate. Its
+global lookup counter is observable and must match the original. The source
+files preserve unresolved grid callbacks as typed external dependencies.
+Guest fixtures are explicitly pending execution, including paths that need
+real callback captures; the host test uses stubs only for those dependencies.
+
 ## Comparing assembly
 
 ```sh

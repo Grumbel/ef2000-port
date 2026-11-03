@@ -1,0 +1,23 @@
+{
+  "address": "0x0002b558",
+  "function_size": 101,
+  "max_instructions": 4000,
+  "cases": [
+    {"name": "link_neighbor_when_mode_is_zero", "registers": {"eax": "0xabba0001", "edx": "0xabba0002"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x127da9", "hex": "00"},
+                {"address": "0x1a666b", "hex": "4a"},
+                {"address": "0x2b00ee", "hex": "0100000000"},
+                {"address": "0x2b0194", "hex": "07"}]},
+    {"name": "link_neighbor_with_nonmatching_marker", "registers": {"eax": "0x00000001", "edx": "0x00000002"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x127da9", "hex": "01"},
+                {"address": "0x1a666b", "hex": "4a"},
+                {"address": "0x2b0194", "hex": "07"}]},
+    {"name": "link_neighbor_with_matching_marker", "registers": {"eax": "0xffff0001", "edx": "0xffff0002"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x127da9", "hex": "01"},
+                {"address": "0x1a666b", "hex": "4a"},
+                {"address": "0x2b0194", "hex": "4a"}]}
+  ]
+}

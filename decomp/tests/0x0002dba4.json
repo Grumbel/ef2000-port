@@ -1,0 +1,20 @@
+{
+  "address": "0x0002dba4",
+  "function_size": 82,
+  "max_instructions": 3000,
+  "cases": [
+    {"name": "reject_ff_sentinel", "registers": {"eax": "0xffff00ff"},
+     "memory": [{"address": "0x19bb5e", "hex": "ff00"},
+                {"address": "0x127da9", "hex": "01"}]},
+    {"name": "matches_current", "registers": {"eax": "0x10000003"},
+     "memory": [{"address": "0x19bb5e", "hex": "0300"},
+                {"address": "0x127da9", "hex": "00"}]},
+    {"name": "not_current_with_external_disabled", "registers": {"eax": "0x00000003"},
+     "memory": [{"address": "0x19bb5e", "hex": "0400"},
+                {"address": "0x127da9", "hex": "00"}]},
+    {"name": "not_current_with_empty_external_list", "registers": {"eax": "0x00000003"},
+     "memory": [{"address": "0x19bb5e", "hex": "0400"},
+                {"address": "0x127da9", "hex": "01"},
+                {"address": "0x12583a", "hex": "00"}]}
+  ]
+}

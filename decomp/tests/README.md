@@ -36,3 +36,13 @@ The six object/grid plans `0x000238a0.json`, `0x0002541c.json`,
 guards. Some safe early-rejection cases avoid invoking the still-unrecovered
 original event dispatcher at `0x46168`. The event-heavy paths additionally
 require live original call captures and a full guest memory oracle.
+
+The subsequent six plans, `0x0002b558.json`, `0x0002beb0.json`,
+`0x0002bf08.json`, `0x0002dba4.json`, `0x0002e030.json` and
+`0x0002e910.json`, cover link/back-link selection, seven-lookups-without-
+short-circuit, byte-count object-mode scans, current/external index checks,
+copying a pair of pending 32-bit values and the AL/DL event truth table.
+The external/link/reset helpers are unresolved in the original; the plans
+are **not** evidence those guest cases can yet complete without real call
+captures and guest helper state. The C host test substitutes only those
+dependencies and exhaustively checks all 65,536 event-code byte pairs.

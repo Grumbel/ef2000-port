@@ -10,6 +10,12 @@ tests and original-disassembly/caller evidence. The `object_lookup.c`
 `world_grid.c` (`0x2b884`, `0x2b910`, `0x2b95c`, `0x2ba14`) recovers
 four 202-byte world-grid operations; `object_control.c` (`0x2541c`,
 `0x238a0`) adds object mode and relation synchronization wrappers.
+`world_grid_queries.c` (`0x2beb0`, `0x2bf08`, `0x2dba4`, `0x2e910`)
+contains two attached-object scans, a current/external-cell query and an
+event-code relation predicate; `world_grid_control.c` (`0x2b558`, `0x2e030`)
+connects cell links and resets two retained dwords from pending state.
+The query scans deliberately preserve all filtered object lookups and their
+diagnostic counter effects, including visits following a successful match.
 OpenWatcom code size, guest
 differential and replay verification are still pending for each. No game
 functions have yet been verified as replacements.

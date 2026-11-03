@@ -1,0 +1,29 @@
+{
+  "address": "0x0002beb0",
+  "function_size": 85,
+  "max_instructions": 6000,
+  "cases": [
+    {"name": "seven_unmatched_indices", "registers": {"eax": "0x7fff0001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b011a", "hex": "ffffffffffffffffffffffffffff"},
+                {"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x1a3580", "hex": "00000000"}]},
+    {"name": "active_object_does_not_short_circuit", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b011a", "hex": "0200ffffffffffffffffffffffff"},
+                {"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x20f558", "hex": "00002a00"},
+                {"address": "0x2a018d", "hex": "01"},
+                {"address": "0x1a3580", "hex": "00000000"}]},
+    {"name": "inactive_object", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b011a", "hex": "0200ffffffffffffffffffffffff"},
+                {"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x20f558", "hex": "00002a00"},
+                {"address": "0x2a018d", "hex": "00"},
+                {"address": "0x1a3580", "hex": "00000000"}]}
+  ]
+}

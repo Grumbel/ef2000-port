@@ -1,0 +1,15 @@
+{
+  "address": "0x0002e910",
+  "function_size": 57,
+  "max_instructions": 256,
+  "cases": [
+    {"name": "code_zero_mode_one_true", "registers": {"eax": "0x12340000", "edx": "0x87650001"}},
+    {"name": "code_zero_mode_zero_false", "registers": {"eax": "0xff000000", "edx": "0x00000000"}},
+    {"name": "code_one_mode_zero_true", "registers": {"eax": "0x00000001", "edx": "0x00000000"}},
+    {"name": "code_one_mode_one_false", "registers": {"eax": "0x00000001", "edx": "0x00000001"}},
+    {"name": "code_two_mode_zero_true", "registers": {"eax": "0x00000002", "edx": "0x00000000"}},
+    {"name": "code_two_mode_two_false", "registers": {"eax": "0x00000002", "edx": "0x00000002"}},
+    {"name": "other_code_false", "registers": {"eax": "0x00000003", "edx": "0x00000002"}},
+    {"name": "high_byte_values", "registers": {"eax": "0xabcd00ff", "edx": "0xffff00ff"}}
+  ]
+}

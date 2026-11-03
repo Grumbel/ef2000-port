@@ -45,6 +45,14 @@ target_compile_options(ef2000-decomp-object-control-test PRIVATE -Wall -Wextra -
 target_compile_definitions(ef2000-decomp-object-control-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-object-control-test PRIVATE decomp/include)
 add_test(NAME decomp-object-control-host-model COMMAND ef2000-decomp-object-control-test)
+add_executable(ef2000-decomp-world-grid-batch-test
+  tests/decomp_world_grid_batch_test.c decomp/src/object_lookup.c
+  decomp/src/world_grid_queries.c decomp/src/world_grid_control.c)
+target_compile_features(ef2000-decomp-world-grid-batch-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-world-grid-batch-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-world-grid-batch-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-world-grid-batch-test PRIVATE decomp/include)
+add_test(NAME decomp-world-grid-batch-host-model COMMAND ef2000-decomp-world-grid-batch-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

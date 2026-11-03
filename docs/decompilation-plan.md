@@ -622,6 +622,21 @@ OpenWatcom compilation, safe splicing nor original-game replay was possible
 in this chat sandbox, so all six remain **drafted**. The missing Ghidra
 pseudo-C export must be restored before splice approval.
 
+Second world-grid batch (2026-11-03): another six drafted functions
+(`0x2b558`, `0x2beb0`, `0x2bf08`, `0x2dba4`, `0x2e030`, `0x2e910`)
+recover forward/reverse cell links, full seven-slot attached-object scans,
+mode-filtered variable-count scans, current/external selection, two-dword
+state reset and an AL/DL event-code predicate. Original call sites come
+from at least two distinct caller functions per routine. The adjacent
+grid-row fields +0x13/+0x19/+0x20/+0x22/+0x24/+0x26 and +0x91..+0xa0
+have provisional layout names and static offset assertions. A new synthetic
+host C test covers all 65,536 predicate inputs and verifies that successful
+object matches do **not** skip later filtered lookup/counter side effects.
+The five delegated grid helpers remain explicitly unresolved; OpenWatcom
+OMF, live guest differential and full replay are still pending. Six new
+guest fixtures and flake smoke-check hooks are test **plans** only, so the
+new functions remain `drafted`, never `compiles` or `verified`.
+
 ### 3.11 [ ] Phase-1 exit criteria
 
 - `nix flake check` passes with all new asset-free tests.
@@ -958,6 +973,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.7   Added SHA-pinned direct OMF-to-EFPATCH1 path for reviewed in-place-only functions and synthetic full-chain relocation tests; first real OpenWatcom object still pending.
 2026-11-03  4     SHA-pinned original image audited against C drafts at 0x432c/0x263e0/0x6a1b4; spatial append 0x263ec recovered from four direct callers, three new drafted functions with signed/packed guest specs.
 2026-11-03  4     Drafted 0x7489c filtered object lookup plus four 0x6a3xx state wrappers; five new ABI-reviewed C functions and differential plans, with shared-epilogue splice hazard documented.
+2026-11-03  4     Drafted six more world-grid link/query/control functions (21 total) with ABI/caller evidence, row-offset asserts, 65,536-case host predicate check and six pending guest plans.
 ```
 
 ---

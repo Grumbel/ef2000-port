@@ -49,4 +49,19 @@ void process_object_state_29(ef_addr32 object); /* 0x0002a168 */
 void process_object_state_30(ef_addr32 object); /* 0x0002a1c4 */
 void sync_current_object_slot(void); /* 0x000238a0 */
 
+/* Second world-grid batch: signed AX row inputs unless stated otherwise. */
+void link_grid_cell(int16_t cell, int16_t neighbor); /* 0x0002b558: AX,DX */
+uint8_t grid_has_active_link(int16_t cell); /* 0x0002beb0: AL result */
+uint8_t grid_has_object_mode(int16_t cell, uint8_t mode); /* 0x0002bf08: AX,DL; AL */
+uint8_t grid_is_current_or_external(int16_t cell); /* 0x0002dba4: AL */
+void reset_grid_cell_state(int16_t cell); /* 0x0002e030 */
+uint8_t grid_event_matches(uint8_t code, uint8_t mode); /* 0x0002e910: AL,DL; AL */
+
+/* Unrecovered original dependencies, typed at these particular call sites. */
+void set_grid_link_state(int16_t cell, int16_t mode); /* 0x0002b1f4 */
+void copy_grid_link_position(int16_t cell); /* 0x0002b634 */
+uint8_t external_grid_link_matches(int16_t cell, uint8_t external_index); /* 0x0002db64 */
+void reset_grid_cell_derived(int16_t cell); /* 0x0002e08c */
+void update_grid_visual_state(int16_t cell); /* 0x00054c10 */
+
 #endif
