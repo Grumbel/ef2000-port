@@ -2762,7 +2762,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c3f80	5			unknown	unclassified	unverified		
 0x000c3fd4	200			unknown	unclassified	unverified		
 0x000c409c	103			unknown	unclassified	unverified		
-0x000c4105	98			unknown	unclassified	unverified		
+0x000c4105	98	reset_view_c4105	engine_helpers	compiles	game	confirmed	decomp/tests/0x000c4105.json	docs/compiler-abi.md; ; callers b69c@b6c0,39744@3979d,3dd30@3e01f; guest pending
 0x000c4167	73			unknown	unclassified	unverified		
 0x000c41b0	131			unknown	unclassified	unverified		
 0x000c425a	17			unknown	unclassified	unverified		
@@ -2856,14 +2856,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c9ecc	92			unknown	unclassified	unverified		
 0x000c9f28	153			unknown	unclassified	unverified		
 0x000c9fc4	439			unknown	unclassified	unverified		
-0x000ca17c	74			unknown	unclassified	unverified		
+0x000ca17c	74	redraw_ca17c	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ca17c.json	docs/compiler-abi.md; ; callers ac5f8@ac621,ac780@ac7a0; guest pending
 0x000ca1c8	53			unknown	unclassified	unverified		
 0x000ca200	142			unknown	unclassified	unverified		
 0x000ca290	474			unknown	unclassified	unverified		
 0x000ca5e4	60			unknown	unclassified	unverified		
 0x000ca620	349			unknown	unclassified	unverified		
 0x000ca780	85			unknown	unclassified	unverified		
-0x000ca7e0	88			unknown	unclassified	unverified		
+0x000ca7e0	88	rebuild_tables_ca7e0	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ca7e0.json	docs/compiler-abi.md; ; callers ba5c@baaf,bfcc@c0c1; guest pending
 0x000ca838	58			unknown	unclassified	unverified		
 0x000ca874	391			unknown	unclassified	unverified		
 0x000ca9fc	43	grid_index_ca9fc	list_lookup	compiles	game	confirmed	decomp/tests/0x000ca9fc.json	docs/compiler-abi.md; EAX / 40 + 10 * (EDX / 40), signed.; callers b0554@b0564,b8510@b8534,caa28@caace; guest pending
@@ -2901,7 +2901,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc26c	25	find_node_by_byte_b	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc26c.json	docs/compiler-abi.md; Node in the list at *EDX whose byte +0xb equals AL.; callers b059c@b05c3,bed1c@bed3a; guest pending
 0x000cc468	74			unknown	unclassified	unverified		
 0x000cc51c	103			unknown	unclassified	unverified		
-0x000cc584	119			unknown	unclassified	unverified		
+0x000cc584	119	code_in_set_cc584	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc584.json	docs/compiler-abi.md; ; callers d68c@df3a,d68c@e07c,d68c@e187; guest pending
 0x000cc5fc	44	code_is_10_to_15	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc5fc.json	docs/compiler-abi.md; AL is 0x10..0x15.; callers d68c@df63,d68c@e0a8,d68c@e1b3; guest pending
 0x000cc628	44	code_is_18_to_1b_1d_1e	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc628.json	docs/compiler-abi.md; AL is 0x18, 0x19, 0x1a, 0x1b, 0x1d or 0x1e.; callers d68c@df8c,d68c@e0d4,d68c@e1df; guest pending
 0x000cc654	39	code_is_18_or_1c_to_1f	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc654.json	docs/compiler-abi.md; AL is 0x18 or 0x1c..0x1f.; callers d68c@dfb5,d68c@e100,d68c@e20a; guest pending
@@ -2911,17 +2911,17 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc6c0	132			unknown	unclassified	unverified		
 0x000cc744	34			unknown	unclassified	unverified		
 0x000cc768	5			unknown	unclassified	unverified		
-0x000cc76d	87			unknown	unclassified	unverified		
+0x000cc76d	87	parse_int_cc76d	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc76d.json	docs/compiler-abi.md; Same as 0x9d4cd.; callers e980@e98a,f3b58@f3b6f; guest pending
 0x000cc7d0	23			unknown	unclassified	unverified		
 0x000cc7e8	52	pair_matches_cc7e8	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc7e8.json	docs/compiler-abi.md; DL in {0x16, 0x17, 0x0e, 0x11, 0x13} and AL is 2.; callers bdeec@be17c,cc90c@cca5f,ccdbc@cce56; guest pending
 0x000cc81c	34	pair_matches_cc81c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc81c.json	docs/compiler-abi.md; DL is 8 or 0x1a and AL is 2.; callers f918@f946,f918@f9a7,b31f0@b321a; guest pending
 0x000cc840	83			unknown	unclassified	unverified		
-0x000cc894	74			unknown	unclassified	unverified		
+0x000cc894	74	pick_variant_cc894	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc894.json	docs/compiler-abi.md; ; callers afc5c@afca9; guest pending
 0x000cc8e0	3			unknown	unclassified	unverified		
 0x000cc90c	1199			unknown	unclassified	unverified		
 0x000ccdbc	882			unknown	unclassified	unverified		
 0x000cd12e	34			unknown	unclassified	unverified		
-0x000cd150	113			unknown	unclassified	unverified		
+0x000cd150	113	open_entry_cd150	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cd150.json	docs/compiler-abi.md; ; callers 1e214@1e220,1e28c@1e2c6,1e3c4@1e3f3; guest pending
 0x000cd20c	63			unknown	unclassified	unverified		
 0x000cd24c	10	cursor_word_at_2	code_predicates	compiles	game	confirmed	decomp/tests/0x000cd24c.json	docs/compiler-abi.md; Word at +2 of the structure at dword 0x15b628.; callers 1df90@1e04d,56084@5614a,69374@69437; guest pending
 0x000cd258	24	cursor_table_word	code_predicates	compiles	game	confirmed	decomp/tests/0x000cd258.json	docs/compiler-abi.md; Word table 0x41f700 indexed by the signed high word of * the cursor's dword +2.; callers 1e28c@1e33d,1e3c4@1e43b,5674c@56797; guest pending
@@ -2932,7 +2932,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cd390	34	advance_cursor	code_predicates	compiles	game	confirmed	decomp/tests/0x000cd390.json	docs/compiler-abi.md; Advance dword 0x15b628 by twice its signed word at +0; * return whether the word at the new position is nonzero.; callers 1e214@1e27a,d0470@d0768; guest pending
 0x000cd3c0	83			unknown	unclassified	unverified		
 0x000cd414	27			unknown	unclassified	unverified		
-0x000cd430	161			unknown	unclassified	unverified		
+0x000cd430	161	init_keys_cd430	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cd430.json	docs/compiler-abi.md; Clear the key state tables and set the default scan codes.; callers cd4d4@cd4ea; guest pending
 0x000cd4d4	125			unknown	unclassified	unverified		
 0x000cd554	146			unknown	unclassified	unverified		
 0x000cd5f4	69			unknown	unclassified	unverified		
@@ -3024,7 +3024,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d1da8	61			unknown	unclassified	unverified		
 0x000d1de8	82			unknown	unclassified	unverified		
 0x000d1e50	187			unknown	unclassified	unverified		
-0x000d1f10	73			unknown	unclassified	unverified		
+0x000d1f10	73	install_handlers_d1f10	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d1f10.json	docs/compiler-abi.md; Install the four handler pairs.; callers 69fac@69fbd; guest pending
 0x000d1f5c	41	copy_four_dwords_15b87c	code_predicates	compiles	game	confirmed	decomp/tests/0x000d1f5c.json	docs/compiler-abi.md; Copy dwords 0x15b88c..98 to 0x15b87c..88.; callers none direct; guest pending
 0x000d1f88	53			unknown	unclassified	unverified		
 0x000d1fc0	127			unknown	unclassified	unverified		
@@ -3044,7 +3044,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d2d7c	267			unknown	unclassified	unverified		
 0x000d35b0	276			unknown	unclassified	unverified		
 0x000d36c4	302			unknown	unclassified	unverified		
-0x000d37f4	80			unknown	unclassified	unverified		
+0x000d37f4	80	count_hit_d37f4	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d37f4.json	docs/compiler-abi.md; Count a hit when the cell under the object equals dword 0x159144 + 0xe0.; callers none direct; guest pending
 0x000d3844	178			unknown	unclassified	unverified		
 0x000d3900	839			unknown	unclassified	unverified		
 0x000d3c50	84			unknown	unclassified	unverified		
@@ -3119,12 +3119,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d7800	4			unknown	unclassified	unverified		
 0x000d7b6c	129			unknown	unclassified	unverified		
 0x000d7bf0	77			unknown	unclassified	unverified		
-0x000d7c40	118			unknown	unclassified	unverified		
+0x000d7c40	118	copy_block_d7c40	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d7c40.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000d7cb8	474			unknown	unclassified	unverified		
-0x000d7e94	118			unknown	unclassified	unverified		
+0x000d7e94	118	permute_block_d7e94	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d7e94.json	docs/compiler-abi.md; ; callers d86e0@d8993,d86e0@d89cb,d86e0@d8cd2; guest pending
 0x000d7f0c	604			unknown	unclassified	unverified		
 0x000d8170	329			unknown	unclassified	unverified		
-0x000d8358	96			unknown	unclassified	unverified		
+0x000d8358	96	advance_position_d8358	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d8358.json	docs/compiler-abi.md; Advance the wrapping position at word 0x15bb3c by delta/4.; callers 95e58@97033; guest pending
 0x000d8528	231			unknown	unclassified	unverified		
 0x000d8610	140			unknown	unclassified	unverified		
 0x000d86e0	2296			unknown	unclassified	unverified		
@@ -3214,7 +3214,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc314	32	update_view_scale_dc314	math_string	compiles	game	confirmed	decomp/tests/0x000dc314.json	docs/compiler-abi.md; Unless both dwords 0x15bdd4 and 0x15bdd8 equal 0x100, * run 0xdc3d5 and 0xce354.; callers 3dd30@3e044,3dd30@3e054,63d5c@64057; guest pending
 0x000dc334	26			unknown	unclassified	unverified		
 0x000dc34e	135			unknown	unclassified	unverified		
-0x000dc3d5	91			unknown	unclassified	unverified		
+0x000dc3d5	91	reset_scale_dc3d5	engine_helpers	compiles	game	confirmed	decomp/tests/0x000dc3d5.json	docs/compiler-abi.md; Reset the scale factors and the patched shift counts to 8.; callers dc314@dc329; guest pending
 0x000dc43e	219			unknown	unclassified	unverified		
 0x000dc519	126			unknown	unclassified	unverified		
 0x000dc5a9	158			unknown	unclassified	unverified		
@@ -3259,14 +3259,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ddae0	232			unknown	unclassified	unverified		
 0x000ddbc8	14	to_upper_ascii	math_string	compiles	game	confirmed	decomp/tests/0x000ddbc8.json	docs/compiler-abi.md; Signed 'a'..'z' to uppercase.; callers 27fec@28121,a82f0@a8374,a9130@a9355; guest pending
 0x000ddbe0	168			unknown	unclassified	unverified		
-0x000ddc88	96			unknown	unclassified	unverified		
+0x000ddc88	96	query_mouse_ddc88	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ddc88.json	docs/compiler-abi.md; ; callers ddbe0@ddc69; guest pending
 0x000ddce8	115			unknown	unclassified	unverified		
 0x000ddd48	288			unknown	unclassified	unverified		
 0x000dde80	231			unknown	unclassified	unverified		
-0x000de12c	141			unknown	unclassified	unverified		
-0x000de2d8	153			unknown	unclassified	unverified		
+0x000de12c	141	mouse_request_de12c	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de12c.json	docs/compiler-abi.md; ; callers ddce8@ddce8; guest pending
+0x000de2d8	153	mouse_request_de2d8	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de2d8.json	docs/compiler-abi.md; ; callers a9cd0@a9ce4; guest pending
 0x000de3b4	251			unknown	unclassified	unverified		
-0x000de4b0	125			unknown	unclassified	unverified		
+0x000de4b0	125	mouse_request_de4b0	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de4b0.json	docs/compiler-abi.md; ; callers 984b4@984c1,a9aa8@a9b91,a9d48@a9daf; guest pending
 0x000de580	113			unknown	unclassified	unverified		
 0x000de5f4	84			unknown	unclassified	unverified		
 0x000de648	121			unknown	unclassified	unverified		

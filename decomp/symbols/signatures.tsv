@@ -831,3 +831,21 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000bd6d8	count_slots_bd6d8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bd6d8 (78 bytes); Count the present slots and total their counts.; callers bdbf8@bdc84,bdbf8@bdc99,bdbf8@bdcce; docs/compiler-abi.md
 0x000bf980	records_differ_bf980	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bf980 (82 bytes); Do the records at +0x33 and +0x37 differ in the bytes at +0x20 or +0x21?; callers bf81c@bf889; docs/compiler-abi.md
 0x000bf9d4	records_differ_bf9d4	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bf9d4 (82 bytes); As 0xbf980 for the bytes at +0x23 and +0x24.; callers bf81c@bf8a2; docs/compiler-abi.md
+0x000c4105	reset_view_c4105			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c4105 (98 bytes); ; callers b69c@b6c0,39744@3979d,3dd30@3e01f; docs/compiler-abi.md
+0x000ca17c	redraw_ca17c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ca17c (74 bytes); ; callers ac5f8@ac621,ac780@ac7a0; docs/compiler-abi.md
+0x000ca7e0	rebuild_tables_ca7e0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ca7e0 (88 bytes); ; callers ba5c@baaf,bfcc@c0c1; docs/compiler-abi.md
+0x000cc584	code_in_set_cc584	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cc584 (119 bytes); ; callers d68c@df3a,d68c@e07c,d68c@e187; docs/compiler-abi.md
+0x000cc76d	parse_int_cc76d	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cc76d (87 bytes); Same as 0x9d4cd.; callers e980@e98a,f3b58@f3b6f; docs/compiler-abi.md
+0x000cc894	pick_variant_cc894	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cc894 (74 bytes); ; callers afc5c@afca9; docs/compiler-abi.md
+0x000cd150	open_entry_cd150	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cd150 (113 bytes); ; callers 1e214@1e220,1e28c@1e2c6,1e3c4@1e3f3; docs/compiler-abi.md
+0x000cd430	init_keys_cd430			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cd430 (161 bytes); Clear the key state tables and set the default scan codes.; callers cd4d4@cd4ea; docs/compiler-abi.md
+0x000d1f10	install_handlers_d1f10			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d1f10 (73 bytes); Install the four handler pairs.; callers 69fac@69fbd; docs/compiler-abi.md
+0x000d37f4	count_hit_d37f4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d37f4 (80 bytes); Count a hit when the cell under the object equals dword 0x159144 + 0xe0.; callers none direct; docs/compiler-abi.md
+0x000d7c40	copy_block_d7c40			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7c40 (118 bytes); ; callers none direct; docs/compiler-abi.md
+0x000d7e94	permute_block_d7e94		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7e94 (118 bytes); ; callers d86e0@d8993,d86e0@d89cb,d86e0@d8cd2; docs/compiler-abi.md
+0x000d8358	advance_position_d8358	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d8358 (96 bytes); Advance the wrapping position at word 0x15bb3c by delta/4.; callers 95e58@97033; docs/compiler-abi.md
+0x000dc3d5	reset_scale_dc3d5			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000dc3d5 (91 bytes); Reset the scale factors and the patched shift counts to 8.; callers dc314@dc329; docs/compiler-abi.md
+0x000ddc88	query_mouse_ddc88		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ddc88 (96 bytes); ; callers ddbe0@ddc69; docs/compiler-abi.md
+0x000de12c	mouse_request_de12c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000de12c (141 bytes); ; callers ddce8@ddce8; docs/compiler-abi.md
+0x000de2d8	mouse_request_de2d8		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000de2d8 (153 bytes); ; callers a9cd0@a9ce4; docs/compiler-abi.md
+0x000de4b0	mouse_request_de4b0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000de4b0 (125 bytes); ; callers 984b4@984c1,a9aa8@a9b91,a9d48@a9daf; docs/compiler-abi.md

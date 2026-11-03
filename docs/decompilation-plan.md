@@ -1047,6 +1047,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  35  Drafted and Watcom-compiled 8 more functions in line_of_sight (773 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  36  Drafted and Watcom-compiled 15 more functions in entity_helpers (788 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  37  Drafted and Watcom-compiled 14 more functions in entity_helpers2 (802 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  38  Drafted and Watcom-compiled 18 more functions in engine_helpers (820 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---

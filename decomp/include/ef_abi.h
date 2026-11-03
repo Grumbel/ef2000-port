@@ -1428,4 +1428,38 @@ void guest_fn_cbf00(void); /* 0xcbf00 */
 uint32_t guest_fn_cf94a(uint32_t v); /* 0xcf94a */
 void guest_fn_f8f8(void); /* 0xf8f8 */
 
+/* engine_helpers.c */
+void reset_view_c4105(void);
+void redraw_ca17c(void);
+void rebuild_tables_ca7e0(void);
+uint32_t code_in_set_cc584(uint8_t code);
+int32_t parse_int_cc76d(ef_addr32 text);
+uint32_t pick_variant_cc894(uint8_t code);
+uint8_t open_entry_cd150(int16_t number);
+void init_keys_cd430(void);
+void install_handlers_d1f10(void);
+void count_hit_d37f4(ef_addr32 object);
+void copy_block_d7c40(void);
+uint32_t permute_block_d7e94(void);
+void advance_position_d8358(int16_t delta);
+void reset_scale_dc3d5(void);
+uint32_t query_mouse_ddc88(void);
+void mouse_request_de12c(void);
+uint32_t mouse_request_de2d8(void);
+void mouse_request_de4b0(void);
+void guest_fn_8b8(uint32_t code, ef_addr32 block); /* 0x8b8 */
+uint32_t guest_fn_a0de0(int32_t n, uint32_t v); /* 0xa0de0 */
+uint32_t guest_fn_a1a10(int32_t n); /* 0xa1a10 */
+uint32_t guest_fn_a45b3(void); /* 0xa45b3 */
+void guest_fn_abde4(void); /* 0xabde4 */
+uint32_t guest_fn_c3f50(int32_t x, int32_t y); /* 0xc3f50 */
+void guest_fn_c4a50(ef_addr32 a); /* 0xc4a50 */
+void guest_fn_c9fc4(void); /* 0xc9fc4 */
+void guest_fn_ca874(ef_addr32 a, ef_addr32 b); /* 0xca874 */
+void guest_fn_cb9f4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0xcb9f4 */
+void guest_fn_d663c(ef_addr32 a); /* 0xd663c */
+void guest_fn_d7bf0(void); /* 0xd7bf0 */
+uint32_t guest_fn_d8170(ef_addr32 a); /* 0xd8170 */
+void guest_fn_dc2c0(void); /* 0xdc2c0 */
+
 #endif

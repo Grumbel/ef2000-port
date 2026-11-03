@@ -2242,3 +2242,26 @@ in EAX, format string address, one value).
 | `0xbd6d8` | EAX:ef_addr32 | none | bdbf8@bdc84,bdbf8@bdc99,bdbf8@bdcce | Count the present slots and total their counts. |
 | `0xbf980` | EAX:ef_addr32 | EAX:uint32_t | bf81c@bf889 | Do the records at +0x33 and +0x37 differ in the bytes at +0x20 or +0x21? |
 | `0xbf9d4` | EAX:ef_addr32 | EAX:uint32_t | bf81c@bf8a2 | As 0xbf980 for the bytes at +0x23 and +0x24. |
+
+## engine_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc4105` | none | none | b69c@b6c0,39744@3979d,3dd30@3e01f |  |
+| `0xca17c` | none | none | ac5f8@ac621,ac780@ac7a0 |  |
+| `0xca7e0` | none | none | ba5c@baaf,bfcc@c0c1 |  |
+| `0xcc584` | AL:uint8_t | EAX:uint32_t | d68c@df3a,d68c@e07c,d68c@e187 |  |
+| `0xcc76d` | EAX:ef_addr32 | EAX:int32_t | e980@e98a,f3b58@f3b6f | Same as 0x9d4cd. |
+| `0xcc894` | AL:uint8_t | EAX:uint32_t | afc5c@afca9 |  |
+| `0xcd150` | AX:int16_t | AL:uint8_t | 1e214@1e220,1e28c@1e2c6,1e3c4@1e3f3 |  |
+| `0xcd430` | none | none | cd4d4@cd4ea | Clear the key state tables and set the default scan codes. |
+| `0xd1f10` | none | none | 69fac@69fbd | Install the four handler pairs. |
+| `0xd37f4` | EAX:ef_addr32 | none | none direct | Count a hit when the cell under the object equals dword 0x159144 + 0xe0. |
+| `0xd7c40` | none | none | none direct |  |
+| `0xd7e94` | none | EAX:uint32_t | d86e0@d8993,d86e0@d89cb,d86e0@d8cd2 |  |
+| `0xd8358` | AX:int16_t | none | 95e58@97033 | Advance the wrapping position at word 0x15bb3c by delta/4. |
+| `0xdc3d5` | none | none | dc314@dc329 | Reset the scale factors and the patched shift counts to 8. |
+| `0xddc88` | none | EAX:uint32_t | ddbe0@ddc69 |  |
+| `0xde12c` | none | none | ddce8@ddce8 |  |
+| `0xde2d8` | none | EAX:uint32_t | a9cd0@a9ce4 |  |
+| `0xde4b0` | none | none | 984b4@984c1,a9aa8@a9b91,a9d48@a9daf |  |
