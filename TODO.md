@@ -224,7 +224,7 @@ is a playable Linux application. R36S, Android, and other platform ports are
 outside current scope. The source license does not license original game data.
 
 Keep commits on one history. For the current numbered bundle handoff, the
-agreed prerequisite is `63eaca4faf8ba9a268e931170a3c47591777372d`.
+agreed prerequisite is `0ea7b71392e2f24ba7bca4f749dceda997b16047`.
 Create each cumulative bundle from that base to the new tip, including **all**
 agent commits from previous bundles; verify it with `git bundle verify`.
 Each numbered bundle replaces the previous download, never creates a parallel
