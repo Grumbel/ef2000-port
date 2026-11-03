@@ -418,7 +418,7 @@ with their uncertainty recorded in `docs/library-identification.md`; these
 are **not** OMF fingerprint matches. Automated library identification remains
 unverified against real extracted library objects.
 
-### 3.7 [ ] OMF splicer (`tools/omf_splice.py`)
+### 3.7 [~] OMF splicer (`tools/omf_splice.py`)
 
 Turns OpenWatcom object files into patches against the guest image.
 
@@ -443,6 +443,18 @@ Turns OpenWatcom object files into patches against the guest image.
   shares the code is replaced together.
 - Asset-free tests with synthetic images and synthetic OMF created by
   compiling fixtures with `wcc386` in the flake check.
+
+First stage (2026-11-03): `tools/omf_splice.py` inspects 32-bit OMF and
+can produce a **non-runnable offline `.efpatch` plan** for a narrow, explicitly
+reviewed, single-function object with 32-bit relocations. It computes
+self-relative and segment-relative fixups and lays out inline or redirected
+code and private data, but deliberately refuses unsupported relocations,
+unconfirmed ABIs and functions without a reviewed body/edge boundary.
+Seven asset-free synthetic tests cover the parser, relocation resolution,
+patch plans, rejection rules and CLI. See `docs/omf-splicer.md` for scope;
+real compiler-object coverage, multi-object linking, arena verification and
+emulator integration are still pending. The current output is **not** ready
+to apply to a guest.
 
 ### 3.8 [ ] Harness support for patches
 
@@ -831,6 +843,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Representative ABI audit closed at 35 confirmed and five explicitly bounded, ineligible-for-automatic-splice callback/segment exceptions (40/40 reviewed).
 2026-11-03  3.6   Began library identification: relocation-masked OMF public-function fingerprint tool and proposal-only matcher, with three synthetic tests; real Watcom library evidence pending.
 2026-11-03  3.6   Classified three source-matched Watcom/X-32 startup routines as library code; not fingerprint-derived and not counted as verified function replacements.
+2026-11-03  3.7   Added a strict offline OMF splice planner, 32-bit relocation/layout proof cases, and seven synthetic tests; patch loading and real compiler-object validation remain outstanding.
 ```
 
 ---
