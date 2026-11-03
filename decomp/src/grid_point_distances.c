@@ -36,7 +36,10 @@ double scaled_grid_distance_to_point(ef_addr32 point, int16_t cell)
     double a[3];
     double b[3];
     unsigned i;
-    const double grid_xyz[3] = {row->position_a, row->position_b, row->position_c};
+    double grid_xyz[3];
+    grid_xyz[0] = row->position_a;
+    grid_xyz[1] = row->position_b;
+    grid_xyz[2] = row->position_c;
     for (i = 0; i < 3; ++i) {
         a[i] = (double)((long double)p[i] * g_grid_distance_scale);
         b[i] = (double)((long double)grid_xyz[i] * g_grid_distance_scale);

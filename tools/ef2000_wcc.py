@@ -20,7 +20,7 @@ SOURCE = ROOT / 'decomp/src'
 # the original runtime symbols, generated game code must not add one.
 # Initial functional-compatibility profile, not a claim about the game's
 # original compiler switches. Avoid numerically unstable FP optimizations.
-FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-fp3', '-ob', '-ot', '-s', '-wx')
+FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-fp3', '-ob', '-ot', '-s', '-wx', '-za99')
 
 
 def compile_module(source, *, compiler='wcc386', output=None, execute=subprocess.run):

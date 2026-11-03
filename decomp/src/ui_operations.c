@@ -35,7 +35,13 @@ static void store32(ef_addr32 address, uint32_t value)
 void send_packet_2c(uint8_t a, uint8_t d, uint8_t b, uint8_t c,
                     uint8_t stack_code)
 {
-    uint8_t packet[6] = {0x2c, a, d, b, c, stack_code};
+    uint8_t packet[6];
+    packet[0] = 0x2c;
+    packet[1] = a;
+    packet[2] = d;
+    packet[3] = b;
+    packet[4] = c;
+    packet[5] = stack_code;
     emit_command_packet(packet, sizeof(packet));
     guest_packet_after_send(packet);
 }
