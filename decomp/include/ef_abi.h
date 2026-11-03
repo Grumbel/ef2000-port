@@ -1879,4 +1879,18 @@ ef_addr32 guest_fn_3c994(ef_addr32 text); /* 0x3c994 EAX -> EAX */
 void guest_fn_50ca4(void); /* 0x50ca4 */
 void guest_fn_50d9c(void); /* 0x50d9c */
 
+/* game_helpers12.c */
+void send_unit_pending_54688(int16_t unit_id, uint8_t value);
+void send_owner_pending_546e8(int16_t owner, uint8_t value);
+void send_object_block_54720(int16_t object_id);
+void send_object_part_54784(int16_t object_id, int16_t part);
+void send_vector_55dac(ef_addr32 vector, uint16_t value);
+void send_record_word_55dec(ef_addr32 record);
+void send_object_params_55e1c(int16_t object_id, uint8_t kind, uint16_t extra);
+void send_unit_params_55e94(int16_t unit_id, uint8_t kind);
+void send_object_words_55f0c(int16_t object_id, uint16_t b, uint16_t c, uint16_t d);
+void send_triple_56f6c(void);
+void send_player_57_570c8(void);
+void guest_fn_78aa8(ef_addr32 text); /* 0x78aa8 EAX */
+
 #endif

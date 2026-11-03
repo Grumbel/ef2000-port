@@ -1,0 +1,1 @@
+{"address":"0x00055dac","function_size":62,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000"},"memory":[]}]}

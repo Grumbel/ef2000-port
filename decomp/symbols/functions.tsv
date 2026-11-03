@@ -985,11 +985,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00054624	34	send_marker_packet_1e	marker_packets	compiles	game	confirmed	decomp/tests/0x00054624.json	docs/compiler-abi.md; Packet 0x1e plus marker 0x1a666b via 0xa3f74; sole direct caller 558b0@5591e; guest pending
 0x00054648	26	send_command_1f	marker_packets	compiles	game	confirmed	decomp/tests/0x00054648.json	docs/compiler-abi.md; One-byte packet 0x1f via 0xa3f74; sole direct caller 7eccc@7ed37; guest pending
 0x00054664	33	send_word_byte_packet_24	marker_packets	compiles	game	confirmed	decomp/tests/0x00054664.json	docs/compiler-abi.md; Four-byte packet 0x24, AX little-endian, DL; sole direct caller 54f4c@54f95; guest pending
-0x00054688	53			unknown	unclassified	unverified		
+0x00054688	53	send_unit_pending_54688	game_helpers12	compiles	game	confirmed	decomp/tests/0x00054688.json	docs/compiler-abi.md; Mark the unit as pending (0xfe) and send command 0x0d.; callers 54f4c@54fe9; guest pending
 0x000546c0	40	send_grid_marker_short_packet	command_packets	compiles	game	confirmed	decomp/tests/0x000546c0.json	docs/compiler-abi.md; Four-byte opcode 0x16 packet AX little-endian and marker 0x1a666b; original call 0xa3f74; guest dispatch unverified
-0x000546e8	56			unknown	unclassified	unverified		
-0x00054720	100			unknown	unclassified	unverified		
-0x00054784	125			unknown	unclassified	unverified		
+0x000546e8	56	send_owner_pending_546e8	game_helpers12	compiles	game	confirmed	decomp/tests/0x000546e8.json	docs/compiler-abi.md; Mark the owner record as pending (0xfe) and send command 0x17.; callers 54ff4@55047; guest pending
+0x00054720	100	send_object_block_54720	game_helpers12	compiles	game	confirmed	decomp/tests/0x00054720.json	docs/compiler-abi.md; Send the position block of object id (command 0x21).; callers 37934@37b1d,38284@3855c; guest pending
+0x00054784	125	send_object_part_54784	game_helpers12	compiles	game	confirmed	decomp/tests/0x00054784.json	docs/compiler-abi.md; Send one 0x44-byte sub-record of the object (command 0x22).; callers 26b60@270bc; guest pending
 0x00054804	159			unknown	unclassified	unverified		
 0x000548a4	60	send_packet_15	packet_status	compiles	game	confirmed	decomp/tests/0x000548a4.json	docs/compiler-abi.md; host model; guest differential pending
 0x000548e0	700			unknown	unclassified	unverified		
@@ -1023,11 +1023,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00055b80	79	apply_action_55b80	game_helpers8	compiles	game	confirmed	decomp/tests/0x00055b80.json	docs/compiler-abi.md; ; callers 581b0@5859b; guest pending
 0x00055bd0	38	send_two_word_byte_packet_42	marker_packets	compiles	game	confirmed	decomp/tests/0x00055bd0.json	docs/compiler-abi.md; Packet 42 AX DX BL size 6; BH overwritten with opcode; sole direct caller 8516c@851e7; guest pending
 0x00055bf8	433			unknown	unclassified	unverified		
-0x00055dac	62			unknown	unclassified	unverified		
-0x00055dec	45			unknown	unclassified	unverified		
-0x00055e1c	120			unknown	unclassified	unverified		
-0x00055e94	119			unknown	unclassified	unverified		
-0x00055f0c	69			unknown	unclassified	unverified		
+0x00055dac	62	send_vector_55dac	game_helpers12	compiles	game	confirmed	decomp/tests/0x00055dac.json	docs/compiler-abi.md; Send a position vector and a word (command 0x0f).; callers 1d5cc@1d5e0; guest pending
+0x00055dec	45	send_record_word_55dec	game_helpers12	compiles	game	confirmed	decomp/tests/0x00055dec.json	docs/compiler-abi.md; Send the word at +0x54 of the record (command 0x10).; callers 888cc@88c33; guest pending
+0x00055e1c	120	send_object_params_55e1c	game_helpers12	compiles	game	confirmed	decomp/tests/0x00055e1c.json	docs/compiler-abi.md; Send the parameter block for an object (command 0x28).; callers 900c0@900fb; guest pending
+0x00055e94	119	send_unit_params_55e94	game_helpers12	compiles	game	confirmed	decomp/tests/0x00055e94.json	docs/compiler-abi.md; Send the parameter block for a unit (command 0x23).; callers 748f4@7493f; guest pending
+0x00055f0c	69	send_object_words_55f0c	game_helpers12	compiles	game	confirmed	decomp/tests/0x00055f0c.json	docs/compiler-abi.md; Send an object's parameters with four caller words (command 0x27).; callers 90124@901e0; guest pending
 0x00055f54	174			unknown	unclassified	unverified		
 0x00056004	19	clear_scene_word_latches	marker_packets	compiles	game	confirmed	decomp/tests/0x00056004.json	docs/compiler-abi.md; Clear words 0x1a6630 and 0x127dae; sole direct caller 58028@58042; guest pending
 0x00056018	106	remember_value_56018	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00056018.json	docs/compiler-abi.md; Record a value in the history of twenty dwords at 0x1a5d70; returns 1 if already present.; callers 56084@560b9; guest pending
@@ -1064,12 +1064,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00056efc	15			unknown	unclassified	unverified		
 0x00056f0c	33	send_object_state_packet	command_packets	compiles	game	confirmed	decomp/tests/0x00056f0c.json	docs/compiler-abi.md; Four-byte opcode 0x32 packet AX little-endian and incoming DL; original call 0xa3f74; guest dispatch unverified
 0x00056f30	60			unknown	unclassified	unverified		
-0x00056f6c	58			unknown	unclassified	unverified		
+0x00056f6c	58	send_triple_56f6c	game_helpers12	compiles	game	confirmed	decomp/tests/0x00056f6c.json	docs/compiler-abi.md; Send the three words at 0x12583c (command 0x34).; callers 3dd30@3e2e7; guest pending
 0x00056fa8	35	copy_record_words_12583c	mid_helpers	compiles	game	confirmed	decomp/tests/0x00056fa8.json	docs/compiler-abi.md; words +1,+3,+5 to 0x12583c/3e/40; callers 581b0@584eb; guest pending
 0x00056fe8	17	flag_marker_zero	mid_helpers	compiles	game	confirmed	decomp/tests/0x00056fe8.json	docs/compiler-abi.md; byte 0x1264e1=1 when marker is 0; callers 581b0@584fa; guest pending
 0x00056ffc	52			unknown	unclassified	unverified		
 0x00057030	152			unknown	unclassified	unverified		
-0x000570c8	51			unknown	unclassified	unverified		
+0x000570c8	51	send_player_57_570c8	game_helpers12	compiles	game	confirmed	decomp/tests/0x000570c8.json	docs/compiler-abi.md; ; callers 581b0@58507; guest pending
 0x000570fc	19			unknown	unclassified	unverified		
 0x00057134	9			unknown	unclassified	unverified		
 0x00057140	31	send_object_code_39	command_packets	compiles	game	confirmed	decomp/tests/0x00057140.json	docs/compiler-abi.md; Three-byte opcode 0x39 packet AX little-endian; original call 0xa3f74; guest dispatch unverified

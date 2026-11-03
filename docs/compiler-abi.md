@@ -2631,3 +2631,19 @@ in EAX, format string address, one value).
 | `0x540d0` | none | none | 3dd30@3de01 |  |
 | `0x54e80` | EAX:uint32_t | none | 581b0@583c2 |  |
 | `0x77034` | AX:int16_t,DX:int16_t,BL:uint8_t | none | 77088@770c0 | Send command 0x44/0x45/0x43 for kind 0/1/2. |
+
+## game_helpers12 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x54688` | AX:int16_t,DL:uint8_t | none | 54f4c@54fe9 | Mark the unit as pending (0xfe) and send command 0x0d. |
+| `0x546e8` | AX:int16_t,DL:uint8_t | none | 54ff4@55047 | Mark the owner record as pending (0xfe) and send command 0x17. |
+| `0x54720` | AX:int16_t | none | 37934@37b1d,38284@3855c | Send the position block of object id (command 0x21). |
+| `0x54784` | AX:int16_t,DX:int16_t | none | 26b60@270bc | Send one 0x44-byte sub-record of the object (command 0x22). |
+| `0x55dac` | EAX:ef_addr32,DX:uint16_t | none | 1d5cc@1d5e0 | Send a position vector and a word (command 0x0f). |
+| `0x55dec` | EAX:ef_addr32 | none | 888cc@88c33 | Send the word at +0x54 of the record (command 0x10). |
+| `0x55e1c` | AX:int16_t,DL:uint8_t,BX:uint16_t | none | 900c0@900fb | Send the parameter block for an object (command 0x28). |
+| `0x55e94` | AX:int16_t,DL:uint8_t | none | 748f4@7493f | Send the parameter block for a unit (command 0x23). |
+| `0x55f0c` | AX:int16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t | none | 90124@901e0 | Send an object's parameters with four caller words (command 0x27). |
+| `0x56f6c` | none | none | 3dd30@3e2e7 | Send the three words at 0x12583c (command 0x34). |
+| `0x570c8` | none | none | 581b0@58507 |  |

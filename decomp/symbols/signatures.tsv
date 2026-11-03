@@ -1130,3 +1130,14 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000540d0	reset_selection_540d0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000540d0 (64 bytes); ; callers 3dd30@3de01; docs/compiler-abi.md
 0x00054e80	request_name_54e80	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054e80 (26 bytes); ; callers 581b0@583c2; docs/compiler-abi.md
 0x00077034	send_slot_command_77034	AX:int16_t,DX:int16_t,BL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00077034 (81 bytes); Send command 0x44/0x45/0x43 for kind 0/1/2.; callers 77088@770c0; docs/compiler-abi.md
+0x00054688	send_unit_pending_54688	AX:int16_t,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054688 (53 bytes); Mark the unit as pending (0xfe) and send command 0x0d.; callers 54f4c@54fe9; docs/compiler-abi.md
+0x000546e8	send_owner_pending_546e8	AX:int16_t,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000546e8 (56 bytes); Mark the owner record as pending (0xfe) and send command 0x17.; callers 54ff4@55047; docs/compiler-abi.md
+0x00054720	send_object_block_54720	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054720 (100 bytes); Send the position block of object id (command 0x21).; callers 37934@37b1d,38284@3855c; docs/compiler-abi.md
+0x00054784	send_object_part_54784	AX:int16_t,DX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054784 (125 bytes); Send one 0x44-byte sub-record of the object (command 0x22).; callers 26b60@270bc; docs/compiler-abi.md
+0x00055dac	send_vector_55dac	EAX:ef_addr32,DX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055dac (62 bytes); Send a position vector and a word (command 0x0f).; callers 1d5cc@1d5e0; docs/compiler-abi.md
+0x00055dec	send_record_word_55dec	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055dec (45 bytes); Send the word at +0x54 of the record (command 0x10).; callers 888cc@88c33; docs/compiler-abi.md
+0x00055e1c	send_object_params_55e1c	AX:int16_t,DL:uint8_t,BX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055e1c (120 bytes); Send the parameter block for an object (command 0x28).; callers 900c0@900fb; docs/compiler-abi.md
+0x00055e94	send_unit_params_55e94	AX:int16_t,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055e94 (119 bytes); Send the parameter block for a unit (command 0x23).; callers 748f4@7493f; docs/compiler-abi.md
+0x00055f0c	send_object_words_55f0c	AX:int16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055f0c (69 bytes); Send an object's parameters with four caller words (command 0x27).; callers 90124@901e0; docs/compiler-abi.md
+0x00056f6c	send_triple_56f6c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00056f6c (58 bytes); Send the three words at 0x12583c (command 0x34).; callers 3dd30@3e2e7; docs/compiler-abi.md
+0x000570c8	send_player_57_570c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000570c8 (51 bytes); ; callers 581b0@58507; docs/compiler-abi.md
