@@ -1,0 +1,41 @@
+{
+  "address": "0x0007fe4c",
+  "function_size": 62,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "disable_panel",
+      "memory": [
+        {
+          "address": "0x0015bac6",
+          "hex": "01"
+        },
+        {
+          "address": "0x0012b070",
+          "hex": "00"
+        },
+        {
+          "address": "0x001f9095",
+          "hex": "01"
+        }
+      ]
+    },
+    {
+      "name": "not_initialized",
+      "memory": [
+        {
+          "address": "0x0015bac6",
+          "hex": "01"
+        },
+        {
+          "address": "0x0012b070",
+          "hex": "01"
+        },
+        {
+          "address": "0x001f9095",
+          "hex": "00"
+        }
+      ]
+    }
+  ]
+}

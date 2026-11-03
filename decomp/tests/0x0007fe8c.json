@@ -1,0 +1,25 @@
+{
+  "address": "0x0007fe8c",
+  "function_size": 34,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "gate_off",
+      "memory": [
+        {
+          "address": "0x0015bac6",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "release_indices",
+      "memory": [
+        {
+          "address": "0x0015bac6",
+          "hex": "01"
+        }
+      ]
+    }
+  ]
+}

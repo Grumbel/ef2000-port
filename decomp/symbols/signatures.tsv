@@ -159,3 +159,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00088100	refresh_object_child_slot	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x88100 (50 bytes); Child pointer +0x30 and +0x56 slot sentinel; callers 87db8@87e5b/883cc@8840d; docs/compiler-abi.md
 0x00088c80	transform_child_coordinates	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x88c80 (80 bytes); Three doubled scaled outputs from child +8/+0/+4; callers 89060@89095/8935c@893a4; docs/compiler-abi.md
 0x00088d4c	transform_signed_angle_pair	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32		eax,ebx,ecx,edx,esi,edi,ebp	0	Original 0x88d4c (55 bytes); Signed high word +0xc negated; +0xe second value; callers 89060@890a0/899d8@89a1d; docs/compiler-abi.md
+0x00042548	ui_emit_selected_message				0	Original 0x42548 (29 bytes); Message string selected by byte at 1a53dc, tailcall a6018; callers a5d8@a697/a6fc@a867; docs/compiler-abi.md
+0x0007fbec	ui_dispatch_indexed_control	AL:uint8_t,EBX:int32_t,EDX:int32_t,ECX:int32_t		esi,edi,ebp	0	Original 0x7fbec (71 bytes); Signed bound, pointer table and d7158 dispatch; callers 7fcdc@7fdf6/8018c@801d9; docs/compiler-abi.md
+0x0007fe18	ui_initialize_releases			edx	0	Original 0x7fe18 (51 bytes); Guarded 14-control activation and one-byte latch; callers 19a80@19a81/3dd30@3deba; docs/compiler-abi.md
+0x0007fe4c	ui_finalize_releases			ebx,edx	0	Original 0x7fe4c (62 bytes); Guarded 14-control deactivation and latch clear; callers 19a80@19aa2/3dd30@3decd; docs/compiler-abi.md
+0x0007fe8c	ui_release_all_controls			edx	0	Original 0x7fe8c (34 bytes); Unconditional release 0..13 when input enabled; callers 19a80@19ad1/80120@80180; docs/compiler-abi.md
+0x000802ac	ui_release_matching_control	AX:uint16_t		ebx,ecx,edx	0	Original 0x802ac (49 bytes); Copy AX to CX then compare against ten zero-extended bytes, call d74d0; callers 775f0@776c3/7eec4@7eeef; docs/compiler-abi.md
+0x000803c4	ui_reset_active_panel			ebx,ecx,edx	0	Original 0x803c4 (36 bytes); Gated d7158 call with fixed registers; callers a8a38@a8b25/a8bd4@a8d85; docs/compiler-abi.md
+0x00080400	ui_reset_panel_and_release				0	Original 0x80400 (15 bytes); Call 7fe8c then tail-jump d6ffc; callers a8a38@a8bc5/a8bd4@a8f46; docs/compiler-abi.md

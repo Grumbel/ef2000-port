@@ -1,0 +1,33 @@
+{
+  "address": "0x0007fe18",
+  "function_size": 51,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "input_off",
+      "memory": [
+        {
+          "address": "0x0015bac6",
+          "hex": "00"
+        },
+        {
+          "address": "0x001f9095",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "already_initialized",
+      "memory": [
+        {
+          "address": "0x0015bac6",
+          "hex": "01"
+        },
+        {
+          "address": "0x001f9095",
+          "hex": "01"
+        }
+      ]
+    }
+  ]
+}

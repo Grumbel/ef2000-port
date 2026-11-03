@@ -767,7 +767,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00041f64	96	append_tactical_ring_event	tactical_io	drafted	game	confirmed	decomp/tests/0x00041f64.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00042004	317			unknown	unclassified	unverified		
 0x000421c0	904			unknown	unclassified	unverified		
-0x00042548	29			unknown	unclassified	unverified		
+0x00042548	29	ui_emit_selected_message	ui_dispatch	drafted	game	confirmed	decomp/tests/0x00042548.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00042568	314			unknown	unclassified	unverified		
 0x000426a4	477	gpwUpdateMap		named	unclassified	unverified		
 0x00042a98	107	gpwMapModeSelected		named	unclassified	unverified		
@@ -1518,25 +1518,25 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007f850	401			unknown	unclassified	unverified		
 0x0007f9e4	440			unknown	unclassified	unverified		
 0x0007fb9c	77			unknown	unclassified	unverified		
-0x0007fbec	71			unknown	unclassified	unverified		
+0x0007fbec	71	ui_dispatch_indexed_control	ui_dispatch	drafted	game	confirmed	decomp/tests/0x0007fbec.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fc34	166			unknown	unclassified	unverified		
 0x0007fcdc	313			unknown	unclassified	unverified		
-0x0007fe18	51			unknown	unclassified	unverified		
-0x0007fe4c	62			unknown	unclassified	unverified		
-0x0007fe8c	34			unknown	unclassified	unverified		
+0x0007fe18	51	ui_initialize_releases	ui_dispatch	drafted	game	confirmed	decomp/tests/0x0007fe18.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
+0x0007fe4c	62	ui_finalize_releases	ui_dispatch	drafted	game	confirmed	decomp/tests/0x0007fe4c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
+0x0007fe8c	34	ui_release_all_controls	ui_dispatch	drafted	game	confirmed	decomp/tests/0x0007fe8c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007feb0	69			unknown	unclassified	unverified		
 0x0007ff0c	84			unknown	unclassified	unverified		
 0x00080058	192			unknown	unclassified	unverified		
 0x00080120	105			unknown	unclassified	unverified		
 0x0008018c	87			unknown	unclassified	unverified		
 0x000801e4	198			unknown	unclassified	unverified		
-0x000802ac	49			unknown	unclassified	unverified		
+0x000802ac	49	ui_release_matching_control	ui_dispatch	drafted	game	confirmed	decomp/tests/0x000802ac.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000802e0	52			unknown	unclassified	unverified		
 0x00080314	62			unknown	unclassified	unverified		
 0x00080374	80			unknown	unclassified	unverified		
-0x000803c4	36			unknown	unclassified	unverified		
+0x000803c4	36	ui_reset_active_panel	ui_dispatch	drafted	game	confirmed	decomp/tests/0x000803c4.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000803e8	21			unknown	unclassified	unverified		
-0x00080400	15			unknown	unclassified	unverified		
+0x00080400	15	ui_reset_panel_and_release	ui_dispatch	drafted	game	confirmed	decomp/tests/0x00080400.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000809bc	89	clear_panel_strip	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x000809bc.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00080a18	162			unknown	unclassified	unverified		
 0x00080abc	87	advance_panel_strip	record_callers	drafted	game	confirmed	decomp/tests/0x00080abc.json	docs/compiler-abi.md; host model; Watcom and guest differential pending

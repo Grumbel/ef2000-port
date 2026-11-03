@@ -1,0 +1,25 @@
+{
+  "address": "0x00042548",
+  "function_size": 29,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "main_message",
+      "memory": [
+        {
+          "address": "0x001a53dc",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "alternate_message",
+      "memory": [
+        {
+          "address": "0x001a53dc",
+          "hex": "01"
+        }
+      ]
+    }
+  ]
+}

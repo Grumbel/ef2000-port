@@ -1247,6 +1247,25 @@ current `func_differential.py` validator rejects ST0 signatures. The other
 seven fixture schemas validate; all eight remain `drafted` until guest and
 Watcom comparisons run.
 
+### UI release and indexed control dispatch (eight-function wave)
+
+| Address | Draft | ABI and side effects | Two independent callers |
+| --- | --- | --- | --- |
+| `0x42548` | `ui_emit_selected_message` | No args, boolean at `0x1a53dc` selects constant `0x1843f0/0x1843f4`; tailcall `0xa6018` | `0xa5d8@0xa697`, `0xa6fc@0xa867` |
+| `0x7fbec` | `ui_dispatch_indexed_control` | AL code, EBX signed table index, EDX/ECX forwarded; signed limit and enable gate; `0xd7158` or error handler | `0x7fcdc@0x7fdf6`, `0x8018c@0x801d9` |
+| `0x7fe18` | `ui_initialize_releases` | Global input gate; call `0xd7490` with indices 0..13 only when latch clear | `0x19a80@0x19a81`, `0x3dd30@0x3deba` |
+| `0x7fe4c` | `ui_finalize_releases` | Two gates plus initialized latch; `0xd7530` for 0..13, then clear latch | `0x19a80@0x19aa2`, `0x3dd30@0x3decd` |
+| `0x7fe8c` | `ui_release_all_controls` | Input gate alone; `0xd74d0` for 0..13 | `0x19a80@0x19ad1`, `0x80120@0x80180` |
+| `0x802ac` | `ui_release_matching_control` | AX word compared against ten zero-extended table bytes; multiple matching release callbacks | `0x775f0@0x776c3`, `0x7eec4@0x7eeef` |
+| `0x803c4` | `ui_reset_active_panel` | Output gate, call `0xd7158` with EAX=0, EDX=1, EBX=word-address contents at `0x1f9020`, ECX=0 | `0xa8a38@0xa8b25`, `0xa8bd4@0xa8d85` |
+| `0x80400` | `ui_reset_panel_and_release` | Call `0x7fe8c` then tailcall `0xd6ffc` with EAX=address `0x1f9020` | `0xa8a38@0xa8bc5`, `0xa8bd4@0xa8f46` |
+
+The `0x7fbec` equality case is deliberately inert, and a negative index is
+not checked before pointer-table address calculation. These eight functions
+have independent source disassembly, typed state and two original caller
+functions each; dispatcher callees remain original guest dependencies with
+host sink stubs. The host tests are *not* guest differential or splice proof.
+
 ## Comparing assembly
 
 ```sh

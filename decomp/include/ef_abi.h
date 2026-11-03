@@ -26,6 +26,27 @@ void transform_child_coordinates(ef_addr32 object, ef_addr32 output); /* 0x88c80
 void transform_signed_angle_pair(ef_addr32 object, ef_addr32 output_a,
                                  ef_addr32 output_b); /* 0x88d4c EAX/EDX/EBX */
 
+/* UI dispatcher cluster, original entry points 0x7fbec..0x80400. */
+void ui_dispatch_indexed_control(uint8_t code, int32_t index,
+                                  int32_t value, int32_t extra); /* 0x7fbec */
+void ui_initialize_releases(void); /* 0x7fe18 */
+void ui_finalize_releases(void); /* 0x7fe4c */
+void ui_release_all_controls(void); /* 0x7fe8c */
+void ui_release_matching_control(uint16_t code); /* 0x802ac */
+void ui_reset_active_panel(void); /* 0x803c4 */
+void ui_reset_panel_and_release(void); /* 0x80400 */
+void ui_emit_selected_message(void); /* 0x42548 */
+
+/* Original helper call interfaces, retained as guest dependencies. */
+void ui_control_activate(uint32_t index); /* 0xd7490, EAX */
+void ui_control_release(uint32_t index); /* 0xd74d0, EAX */
+void ui_control_deactivate(uint32_t index); /* 0xd7530, EAX */
+void ui_control_update(uint32_t arg_a, uint32_t arg_d,
+                       uint32_t arg_b, uint32_t arg_c); /* 0xd7158, EAX/EDX/EBX/ECX */
+void ui_reset_panel_memory(ef_addr32 address); /* 0xd6ffc, EAX */
+void ui_report_out_of_range(int32_t index); /* 0x132a74 indirect call */
+void ui_show_message(ef_addr32 address); /* 0xa6018, tailcall */
+
 /* Short clock, tactical state and coordinate helpers (host drafts). */
 uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */
 uint32_t command_code_is_group_1b(uint8_t code); /* 0x41da4 AL -> EAX */

@@ -1,0 +1,43 @@
+{
+  "address": "0x0007fbec",
+  "function_size": 71,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "gated_off",
+      "registers": {
+        "eax": "0x55",
+        "ebx": "0x00000002",
+        "edx": "0x4",
+        "ecx": "0x11"
+      },
+      "memory": [
+        {
+          "address": "0x0012b0b4",
+          "hex": "04000000"
+        },
+        {
+          "address": "0x0012b070",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "equal_limit",
+      "registers": {
+        "eax": "0x55",
+        "ebx": "0x00000004"
+      },
+      "memory": [
+        {
+          "address": "0x0012b0b4",
+          "hex": "04000000"
+        },
+        {
+          "address": "0x0012b070",
+          "hex": "01"
+        }
+      ]
+    }
+  ]
+}

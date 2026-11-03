@@ -1,0 +1,25 @@
+{
+  "address": "0x00080400",
+  "function_size": 15,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "input_disabled",
+      "memory": [
+        {
+          "address": "0x0015bac6",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "input_enabled",
+      "memory": [
+        {
+          "address": "0x0015bac6",
+          "hex": "01"
+        }
+      ]
+    }
+  ]
+}

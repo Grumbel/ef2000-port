@@ -161,6 +161,13 @@ target_compile_options(ef2000-decomp-record-callers-test PRIVATE -Wall -Wextra -
 target_compile_definitions(ef2000-decomp-record-callers-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-record-callers-test PRIVATE decomp/include)
 add_test(NAME decomp-record-callers-host-model COMMAND ef2000-decomp-record-callers-test)
+add_executable(ef2000-decomp-ui-dispatch-test
+  tests/decomp_ui_dispatch_test.c decomp/src/ui_dispatch.c)
+target_compile_features(ef2000-decomp-ui-dispatch-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-ui-dispatch-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-ui-dispatch-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-ui-dispatch-test PRIVATE decomp/include)
+add_test(NAME decomp-ui-dispatch-host-model COMMAND ef2000-decomp-ui-dispatch-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

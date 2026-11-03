@@ -179,4 +179,12 @@ extern double g_transform_scale_b; /* 0x0018a480 */
 extern double g_transform_scale_c; /* 0x0018a488 */
 extern double g_transform_scale_d; /* 0x0018a490 */
 
+/* UI control table and release-button bookkeeping. */
+extern int32_t g_ui_control_limit; /* 0x0012b0b4 */
+extern ef_addr32 g_ui_control_table; /* 0x001f9078 */
+extern uint8_t g_ui_button_code_table[10]; /* 0x001f9088 */
+extern uint8_t g_ui_control_initialized; /* 0x001f9095 */
+extern ef_addr32 g_ui_panel_config_ptr; /* 0x001f9020 */
+extern uint8_t g_ui_alternate_message; /* 0x001a53dc */
+
 #endif

@@ -1,0 +1,29 @@
+{
+  "address": "0x000803c4",
+  "function_size": 36,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "gate_off",
+      "memory": [
+        {
+          "address": "0x0012b070",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "dispatch_active",
+      "memory": [
+        {
+          "address": "0x0012b070",
+          "hex": "01"
+        },
+        {
+          "address": "0x001f9020",
+          "hex": "00102a00"
+        }
+      ]
+    }
+  ]
+}
