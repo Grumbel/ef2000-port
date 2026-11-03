@@ -646,10 +646,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00037fe4	441			unknown	unclassified	unverified		
 0x000381a0	225			unknown	unclassified	unverified		
 0x00038284	743			unknown	unclassified	unverified		
-0x0003856c	23			unknown	unclassified	unverified		
+0x0003856c	23	refresh_link_pointer	link_resolution	drafted	game	confirmed	decomp/tests/0x0003856c.json	docs/compiler-abi.md; Record guest pointer EAX; signed word +0x16 and pointer +0x18; invokes 0x38658 and stores EAX; original guest replacement unverified
 0x00038584	71			unknown	unclassified	unverified		
 0x000385cc	140			unknown	unclassified	unverified		
-0x00038658	26			unknown	unclassified	unverified		
+0x00038658	26	resolve_link_pointer	link_resolution	drafted	game	confirmed	decomp/tests/0x00038658.json	docs/compiler-abi.md; AX signed table index and EDX candidate pointer; prefer candidate +0x15 alternate else fixed four-byte table; original guest replacement unverified
 0x00038674	97			unknown	unclassified	unverified		
 0x000386f8	80			unknown	unclassified	unverified		
 0x00038750	144			unknown	unclassified	unverified		
@@ -702,7 +702,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003ccec	47			unknown	unclassified	unverified		
 0x0003cd24	26			unknown	unclassified	unverified		
 0x0003cd40	31			unknown	unclassified	unverified		
-0x0003cd64	6			unknown	unclassified	unverified		
+0x0003cd64	6	store_runtime_control_word	runtime_control	drafted	game	confirmed	decomp/tests/0x0003cd64.json	docs/compiler-abi.md; Full EAX stored to dword 0x1a35bc, no original bounds condition; original guest replacement unverified
 0x0003cd6c	45			unknown	unclassified	unverified		
 0x0003cd9c	101			unknown	unclassified	unverified		
 0x0003ce04	37			unknown	unclassified	unverified		
@@ -721,7 +721,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003db9c	84			unknown	unclassified	unverified		
 0x0003dbf0	189			unknown	unclassified	unverified		
 0x0003dcb0	15			unknown	unclassified	unverified		
-0x0003dcc0	10			unknown	unclassified	unverified		
+0x0003dcc0	10	set_runtime_phase_five	runtime_control	drafted	game	confirmed	decomp/tests/0x0003dcc0.json	docs/compiler-abi.md; Literal five written to word 0x1a35ec; original guest replacement unverified
 0x0003dccc	56			unknown	unclassified	unverified		
 0x0003dd30	2924			unknown	unclassified	unverified		
 0x0003ea0c	1425			unknown	unclassified	unverified		
@@ -1105,7 +1105,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00058714	610			unknown	unclassified	unverified		
 0x000589c0	741			unknown	unclassified	unverified		
 0x00058d04	29			unknown	unclassified	unverified		
-0x00058d24	29			unknown	unclassified	unverified		
+0x00058d24	29	initialize_mode_limits	runtime_control	drafted	game	confirmed	decomp/tests/0x00058d24.json	docs/compiler-abi.md; Literal 8/10 stored to words 0x1a6ce2/0x1a6ce8; original guest replacement unverified
 0x00058d44	29			unknown	unclassified	unverified		
 0x00058d64	437			unknown	unclassified	unverified		
 0x00059334	234			unknown	unclassified	unverified		
@@ -1159,7 +1159,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005e1b0	106			unknown	unclassified	unverified		
 0x0005e21c	677			unknown	unclassified	unverified		
 0x0005e4c4	403			unknown	unclassified	unverified		
-0x0005e658	12			unknown	unclassified	unverified		
+0x0005e658	12	reset_unit_counter	runtime_control	drafted	game	confirmed	decomp/tests/0x0005e658.json	docs/compiler-abi.md; Clears word 0x12814e, preserves EDX; original guest replacement unverified
 0x0005e664	535			unknown	unclassified	unverified		
 0x0005e87c	485			unknown	unclassified	unverified		
 0x0005ea64	62			unknown	unclassified	unverified		
@@ -1444,7 +1444,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a38c	24			unknown	unclassified	unverified		
 0x0007a3b0	54			unknown	unclassified	unverified		
 0x0007a3e8	64			unknown	unclassified	unverified		
-0x0007a428	11			unknown	unclassified	unverified		
+0x0007a428	11	copy_active_buffer_pointer	runtime_control	drafted	game	confirmed	decomp/tests/0x0007a428.json	docs/compiler-abi.md; Copies full dword 0x12afc4 to 0x1f8e9c; EAX holds source value; original guest replacement unverified
 0x0007a434	30			unknown	unclassified	unverified		
 0x0007a454	44			unknown	unclassified	unverified		
 0x0007a480	33	check_buffer_capacity	buffer_cursor	drafted	game	confirmed	decomp/tests/0x0007a480.json	docs/compiler-abi.md
@@ -1508,7 +1508,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007e8c0	1035			unknown	unclassified	unverified		
 0x0007eccc	216			unknown	unclassified	unverified		
 0x0007eda4	246			unknown	unclassified	unverified		
-0x0007eea0	25			unknown	unclassified	unverified		
+0x0007eea0	25	set_control_mode_a	runtime_control	drafted	game	confirmed	decomp/tests/0x0007eea0.json	docs/compiler-abi.md; AL gate at 0x15bac6; selected zero or AL stored 0x12b070, returned zero-extended EAX; original guest replacement unverified
 0x0007eebc	8			unknown	unclassified	unverified		
 0x0007eec4	50			unknown	unclassified	unverified		
 0x0007ef14	1944			unknown	unclassified	unverified		
@@ -1546,9 +1546,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00080d40	72			unknown	unclassified	unverified		
 0x00080d88	1			unknown	unclassified	unverified		
 0x00080d8c	107			unknown	unclassified	unverified		
-0x000810d0	25			unknown	unclassified	unverified		
+0x000810d0	25	set_control_mode_b	runtime_control	drafted	game	confirmed	decomp/tests/0x000810d0.json	docs/compiler-abi.md; AL gate at 0x15bac7; selected zero or AL stored 0x12b104, returned zero-extended EAX; original guest replacement unverified
 0x000810ec	8			unknown	unclassified	unverified		
-0x000810f4	25			unknown	unclassified	unverified		
+0x000810f4	25	set_control_mode_c	runtime_control	drafted	game	confirmed	decomp/tests/0x000810f4.json	docs/compiler-abi.md; AL gate at 0x15bac7; selected zero or AL stored 0x12b105, returned zero-extended EAX; original guest replacement unverified
 0x00081110	74			unknown	unclassified	unverified		
 0x00081230	214			unknown	unclassified	unverified		
 0x00081308	74			unknown	unclassified	unverified		

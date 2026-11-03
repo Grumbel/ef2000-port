@@ -173,6 +173,29 @@ void convert_scene_scalar(ef_addr32 source, ef_addr32 output); /* 0x88d84, EAX/E
 void convert_scene_vector(ef_addr32 source, ef_addr32 output); /* 0x88c54, EAX/EDX */
 void convert_navigation_vector(ef_addr32 source, ef_addr32 output); /* 0x8fa58, EAX/EDX */
 
+/* Link resolution and short state-setting functions. */
+ef_addr32 resolve_link_pointer(int16_t index, ef_addr32 candidate); /* 0x38658, AX/EDX -> EAX */
+ef_addr32 refresh_link_pointer(ef_addr32 reference); /* 0x3856c, EAX -> EAX */
+void store_runtime_control_word(uint32_t value); /* 0x3cd64, EAX */
+void set_runtime_phase_five(void); /* 0x3dcc0 */
+void initialize_mode_limits(void); /* 0x58d24 */
+void reset_unit_counter(void); /* 0x5e658 */
+uint32_t copy_active_buffer_pointer(void); /* 0x7a428, EAX */
+uint8_t set_control_mode_a(uint8_t value); /* 0x7eea0, AL -> EAX zero-extended */
+uint8_t set_control_mode_b(uint8_t value); /* 0x810d0, AL -> EAX zero-extended */
+uint8_t set_control_mode_c(uint8_t value); /* 0x810f4, AL -> EAX zero-extended */
+
+/* Binary command-packet emission through guest helper 0xa3f74. */
+void emit_command_packet(const uint8_t *bytes, uint32_t size); /* guest-only 0xa3f74, EAX/EDX */
+void send_object_state_packet(int16_t index, uint8_t value); /* 0x56f0c, AX/DL */
+void send_object_code_39(int16_t index); /* 0x57140, AX */
+void send_object_code_3a(int16_t index); /* 0x57198, AX */
+void send_object_code_4a(int16_t index); /* 0x57684, AX */
+void send_object_code_4b(int16_t index); /* 0x576b4, AX */
+void send_object_code_4c(int16_t index); /* 0x576e4, AX */
+void send_grid_marker_packet(int16_t index, uint8_t value); /* 0x545b8, AX/DL */
+void send_grid_marker_short_packet(int16_t index); /* 0x546c0, AX */
+
 /* Original dependencies at 0x2dc84/0x2dbf8; no separately confirmed ABIs. */
 uint8_t grid_reference_distance_matches(int16_t cell); /* 0x0002dc84 */
 uint8_t grid_external_distance_matches(int16_t cell, uint8_t probe); /* 0x0002dbf8 */

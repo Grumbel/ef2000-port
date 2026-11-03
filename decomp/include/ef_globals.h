@@ -12,6 +12,7 @@
 #include "ef_structs/scene_state.h"
 #include "ef_structs/object_links.h"
 #include "ef_structs/buffer_state.h"
+#include "ef_structs/link_resolution.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -101,5 +102,20 @@ extern double g_scene_vector_scale_b; /* 0x0018a470 */
 extern double g_scene_scalar_scale; /* 0x0018a498 */
 extern double g_navigation_vector_scale_a; /* 0x0018aa0b, unaligned */
 extern double g_navigation_vector_scale_b; /* 0x0018aa13, unaligned */
+
+/* 0x3856c/0x38658 link resolution and short state-control cluster. */
+extern ef_addr32 g_link_pointer_table[]; /* 0x0019f5b0, raw 4-byte slots */
+extern uint32_t g_runtime_control_word; /* 0x001a35bc */
+extern int16_t g_runtime_phase_word; /* 0x001a35ec */
+extern int16_t g_mode_limit_first; /* 0x001a6ce2 */
+extern int16_t g_mode_limit_second; /* 0x001a6ce8 */
+extern int16_t g_unit_counter; /* 0x0012814e */
+extern uint32_t g_buffer_pointer_source; /* 0x0012afc4 */
+extern uint32_t g_buffer_pointer_copy; /* 0x001f8e9c */
+extern uint8_t g_mode_input_enabled_a; /* 0x0015bac6 */
+extern uint8_t g_mode_input_enabled_b; /* 0x0015bac7 */
+extern uint8_t g_mode_output_a; /* 0x0012b070 */
+extern uint8_t g_mode_output_b; /* 0x0012b104 */
+extern uint8_t g_mode_output_c; /* 0x0012b105 */
 
 #endif

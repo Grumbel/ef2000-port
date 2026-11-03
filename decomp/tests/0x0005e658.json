@@ -1,0 +1,27 @@
+{
+  "address": "0x0005e658",
+  "function_size": 12,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_count",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x0012814e",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "negative_count",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x0012814e",
+          "hex": "00fc"
+        }
+      ]
+    }
+  ]
+}

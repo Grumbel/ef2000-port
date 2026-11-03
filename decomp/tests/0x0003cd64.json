@@ -1,0 +1,31 @@
+{
+  "address": "0x0003cd64",
+  "function_size": 6,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_value",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x001a35bc",
+          "hex": "ffffffff"
+        }
+      ]
+    },
+    {
+      "name": "all_bits_value",
+      "registers": {
+        "eax": "0xfedcba98"
+      },
+      "memory": [
+        {
+          "address": "0x001a35bc",
+          "hex": "00000000"
+        }
+      ]
+    }
+  ]
+}

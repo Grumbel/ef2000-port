@@ -1008,6 +1008,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  4     Drafted eight indexed-scene/object helpers (64 total): 58-caller scene node lookup, percentage grading, secondary-grid membership, record reset/child slots, navigation marker, grid-link queries and paired-object references. Host tests, byte-offset asserts and 8 guest plans; no Watcom/splice differential yet.
 2026-11-03  4     Drafted eight buffer/planar/object-table helpers (72 total): cursor bound diagnostics, signed word I/O, 12-byte plane-source selection, two-byte planar fetch, canonical object-pointer test, unguarded table slot and scene refresh latch. C host assertions and 8 guest plans; original-game differential pending.
 2026-11-03  4     Drafted eight scene control and x87 vector helpers (80 total): feature word stores, secondary-grid object byte, signed direction-switching scene gate, four-callback angle triplet, vector subtraction and three scaled conversions. 8 new guest fixtures, host tests and two-callsite ABI evidence; x87/Watcom/replay verification outstanding.
+2026-11-03  4     Drafted ten linked-record and runtime-control helpers (90 total): preferred candidate pointer at +0x15 versus signed indexed-table fallback, in-place reference refresh, four state word setters, pointer copy, and three gated byte latches. Original instructions and two independent callsites each, ten guest fixture plans and host tests; Watcom/guest evidence pending.
 ```
 
 ---

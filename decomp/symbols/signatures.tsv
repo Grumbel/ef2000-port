@@ -109,3 +109,13 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00088d84	convert_scene_scalar	EAX:ef_addr32,EDX:ef_addr32		eax,ebx,ecx,edx,esi,edi,ebp	0	FILD int32 at EAX+0x26, FMUL double at 0x18a498, store qword EDX; callers 0x89c64@0x89d88/0x89e08@0x89ec0; docs/compiler-abi.md
 0x00088c54	convert_scene_vector	EAX:ef_addr32,EDX:ef_addr32		eax,ebx,ecx,edx,esi,edi,ebp	0	FILD input [8/0/4], FMUL 0x18a468/0x18a470, qword output [0/8/16]; callers 0x29b14@0x29c42/0x88134@0x881d0; docs/compiler-abi.md
 0x0008fa58	convert_navigation_vector	EAX:ef_addr32,EDX:ef_addr32		eax,ebx,ecx,edx,esi,edi,ebp	0	FILD input [8/0/4], FMUL unaligned 0x18aa0b/0x18aa13, output [0/8/16]; callers 0x29b14@0x29c32/0x899d8@0x89a12; docs/compiler-abi.md
+0x0003856c	refresh_link_pointer	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Read ref index +0x16 and current +0x18 then call 0x38658 and replace current; callers 0x37fe4@0x3818c/0x381a0@0x38276; docs/compiler-abi.md
+0x00038658	resolve_link_pointer	AX:int16_t,EDX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Optional pointer at EDX+0x15 wins; signed AX table fallback 0x19f5b0; callers 0x37498@0x374ed/0x3856c@0x38578; docs/compiler-abi.md
+0x0003cd64	store_runtime_control_word	EAX:uint32_t		eax,ebx,ecx,edx,esi,edi,ebp	0	Six-byte dword store 0x1a35bc, EAX unchanged; callers 0xc630@0xc660/0x3cfc0@0x3d003; docs/compiler-abi.md
+0x0003dcc0	set_runtime_phase_five			eax,ebx,ecx,edx,esi,edi,ebp	0	Store word 5 at 0x1a35ec; callers 0x3dd30@0x3ddbe/0x8d11c@0x8d15d; docs/compiler-abi.md
+0x00058d24	initialize_mode_limits			eax,ebx,ecx,edx,esi,edi,ebp	0	Store word 8 at 0x1a6ce2 and word 10 at 0x1a6ce8; callers 0x58d64@0x58efc/0x597d8@0x598a6; docs/compiler-abi.md
+0x0005e658	reset_unit_counter			eax,ebx,ecx,edx,esi,edi,ebp	0	Clear word 0x12814e; callers 0x598e8@0x5993c/0x5e664@0x5e86c; docs/compiler-abi.md
+0x0007a428	copy_active_buffer_pointer		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Copy dword 0x12afc4 to 0x1f8e9c and return the value in EAX; callers 0x7a738@0x7a744/0x7a844@0x7a911; docs/compiler-abi.md
+0x0007eea0	set_control_mode_a	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	If byte 0x15bac6 is nonzero select AL, else zero; store 0x12b070, return zero-extended; callers 0x3dd30@0x3dd98/0x7feb0@0x7fee9; docs/compiler-abi.md
+0x000810d0	set_control_mode_b	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	If byte 0x15bac7 is nonzero select AL, else zero; store 0x12b104; callers 0x3dd30@0x3dd9f/0x81110@0x8114c; docs/compiler-abi.md
+0x000810f4	set_control_mode_c	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Same gate as 0x810d0, distinct output at 0x12b105; callers 0x3dd30@0x3ddb9/0x81110@0x81153; docs/compiler-abi.md

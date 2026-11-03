@@ -1,0 +1,27 @@
+{
+  "address": "0x0003dcc0",
+  "function_size": 10,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "from_zero",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x001a35ec",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "from_negative",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x001a35ec",
+          "hex": "ffff"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "address": "0x0003856c",
+  "function_size": 23,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "table_fallback",
+      "registers": {
+        "eax": "0x002a0000"
+      },
+      "memory": [
+        {
+          "address": "0x002a0016",
+          "hex": "0200"
+        },
+        {
+          "address": "0x002a0018",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x0019f5b8",
+          "hex": "00102a00"
+        }
+      ]
+    },
+    {
+      "name": "candidate_override",
+      "registers": {
+        "eax": "0x002a0000"
+      },
+      "memory": [
+        {
+          "address": "0x002a0016",
+          "hex": "0200"
+        },
+        {
+          "address": "0x002a0018",
+          "hex": "00022a00"
+        },
+        {
+          "address": "0x002a0215",
+          "hex": "00112a00"
+        },
+        {
+          "address": "0x0019f5b8",
+          "hex": "00102a00"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "address": "0x00058d24",
+  "function_size": 29,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "empty_words",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x001a6ce2",
+          "hex": "0000"
+        },
+        {
+          "address": "0x001a6ce8",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "existing_limits",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x001a6ce2",
+          "hex": "f4ff"
+        },
+        {
+          "address": "0x001a6ce8",
+          "hex": "2c01"
+        }
+      ]
+    }
+  ]
+}

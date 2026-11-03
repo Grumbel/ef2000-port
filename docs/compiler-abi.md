@@ -1089,6 +1089,37 @@ between individual float operations remain unverified**. Treat these as
 drafts, not drop-in replacements, until Watcom compilation and guest oracle
 traces demonstrate equivalent RAM and state changes.
 
+### Linked-record resolution and short runtime latches
+
+Ten further functions were inspected directly in the pinned original
+executable with two **distinct original caller functions each**, recorded
+in `decomp/symbols/signatures.tsv`. Their C drafts in
+`link_resolution.c` and `runtime_control.c` have host-only tests and
+boundary differential fixtures, but no patched guest confirmation.
+
+- `0x38658` accepts signed low AX as an unguarded index into the pointer
+  table at `0x19f5b0`, and EDX as an optional guest candidate record. If
+  candidate+`0x15` contains a nonzero dword, that value overrides the
+  table. EDX is preserved, as is EBX; the selected guest address is EAX.
+- `0x3856c` accepts a guest record in EAX, reads its signed word at
+  `+0x16` and old pointer at `+0x18`, calls `0x38658`, then replaces only
+  the pointer at `+0x18`. EAX is also left with the new pointer. Both
+  record shapes are packed: the candidate field at `+0x15` is unaligned.
+  Neither route has an original index bounds check.
+- `0x3cd64` stores the full incoming EAX dword at `0x1a35bc`;
+  `0x3dcc0` stores the word 5 at `0x1a35ec`; `0x58d24` writes words
+  8 and 10 to `0x1a6ce2` and `0x1a6ce8`; `0x5e658` zeros a word at
+  `0x12814e`. These have no callback dependencies.
+- `0x7a428` copies the dword at `0x12afc4` to `0x1f8e9c`, leaving the
+  copied value in EAX. Both callers subsequently replace EAX, but the
+  full register result is retained in the signature.
+- `0x7eea0`, `0x810d0` and `0x810f4` accept low AL. If their input
+  enable byte is zero, they select zero; otherwise they select AL. The
+  first uses gate `0x15bac6` and output latch `0x12b070`; the other
+  two share gate `0x15bac7`, with separate latches `0x12b104` and
+  `0x12b105`. They return the selected value in **full zero-extended EAX**
+  and preserve EDX with push/pop.
+
 ## Comparing assembly
 
 ```sh

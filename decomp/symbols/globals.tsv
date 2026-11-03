@@ -83,3 +83,16 @@ addr	size	type	name	evidence	notes
 0x0018a498	8	double	g_scene_scalar_scale	0x88d87 multiplies	Signed scalar conversion
 0x0018aa0b	8	double	g_navigation_vector_scale_a	0x8fa58 loads	Unaligned x87 navigation scale A
 0x0018aa13	8	double	g_navigation_vector_scale_b	0x8fa63 loads	Unaligned x87 navigation scale B
+0x0019f5b0	4 * count	ef_addr32[]	g_link_pointer_table	0x38669 reads signed AX table slot	No original bounds check; raw indexed guest pointers
+0x001a35bc	4	uint32_t	g_runtime_control_word	0x3cd64 stores full EAX	Short runtime control setter
+0x001a35ec	2	int16_t	g_runtime_phase_word	0x3dcc0 stores literal five	Phase state word
+0x001a6ce2	2	int16_t	g_mode_limit_first	0x58d30 stores eight	First mode limit
+0x001a6ce8	2	int16_t	g_mode_limit_second	0x58d37 stores ten	Second mode limit
+0x0012814e	2	int16_t	g_unit_counter	0x5e65b clears	Unit word count
+0x0012afc4	4	uint32_t	g_buffer_pointer_source	0x7a428 reads	Copied without bounds checks
+0x001f8e9c	4	uint32_t	g_buffer_pointer_copy	0x7a42d writes	Cached buffer pointer
+0x0015bac6	1	uint8_t	g_mode_input_enabled_a	0x7eea1 tests	Gate for mode A
+0x0015bac7	1	uint8_t	g_mode_input_enabled_b	0x810d1/0x810f5 tests	Shared gate for modes B/C
+0x0012b070	1	uint8_t	g_mode_output_a	0x7eeb1 writes	Mode A latch
+0x0012b104	1	uint8_t	g_mode_output_b	0x810e1 writes	Mode B latch
+0x0012b105	1	uint8_t	g_mode_output_c	0x81105 writes	Mode C latch

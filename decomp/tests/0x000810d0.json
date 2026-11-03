@@ -1,0 +1,39 @@
+{
+  "address": "0x000810d0",
+  "function_size": 25,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "input_disabled",
+      "registers": {
+        "eax": "0xffff00e9"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac7",
+          "hex": "00"
+        },
+        {
+          "address": "0x0012b104",
+          "hex": "ff"
+        }
+      ]
+    },
+    {
+      "name": "input_enabled",
+      "registers": {
+        "eax": "0xffff00e9"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac7",
+          "hex": "01"
+        },
+        {
+          "address": "0x0012b104",
+          "hex": "00"
+        }
+      ]
+    }
+  ]
+}
