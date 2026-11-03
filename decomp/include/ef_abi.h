@@ -1958,4 +1958,15 @@ uint8_t slot_matches_unit_7b38(uint8_t group, uint8_t slot, int16_t unit_id);
 uint32_t guest_fn_3aa8(uint32_t value); /* 0x3aa8 EAX -> AL */
 uint32_t guest_fn_3b1c(uint32_t value); /* 0x3b1c EAX -> AL */
 
+/* game_helpers14.c */
+void sort_pairs_946c(void);
+uint8_t find_kind8_entry_9e38(ef_addr32 object, ef_addr32 out_a, ef_addr32 out_b, ef_addr32 out_c);
+uint32_t read_record_ed80(ef_addr32 dest);
+uint32_t text_width_159a0(ef_addr32 text);
+void guest_fn_e810(void); /* 0xe810 */
+void guest_fn_e89c(void); /* 0xe89c */
+uint32_t guest_fn_e980(void); /* 0xe980 */
+uint32_t guest_fn_e95c(void); /* 0xe95c */
+uint32_t guest_fn_ed30(void); /* 0xed30 AL */
+
 #endif

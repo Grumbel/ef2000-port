@@ -130,10 +130,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00009114	461			unknown	unclassified	unverified		
 0x000092f0	69			unknown	unclassified	unverified		
 0x00009338	306			unknown	unclassified	unverified		
-0x0000946c	142			unknown	unclassified	unverified		
+0x0000946c	142	sort_pairs_946c	game_helpers14	compiles	game	confirmed	decomp/tests/0x0000946c.json	docs/compiler-abi.md; Bubble-sort the (key, value) word pairs at 0x197370 by key.; callers 94fc@97ab; guest pending
 0x000094fc	801			unknown	unclassified	unverified		
 0x00009820	1560			unknown	unclassified	unverified		
-0x00009e38	103			unknown	unclassified	unverified		
+0x00009e38	103	find_kind8_entry_9e38	game_helpers14	compiles	game	confirmed	decomp/tests/0x00009e38.json	docs/compiler-abi.md; Find the 25-byte entry of kind 8 (the last one) and copy its fields out.; callers 9ea0@a228,357ec@3599c; guest pending
 0x00009ea0	1337			unknown	unclassified	unverified		
 0x0000a3dc	477			unknown	unclassified	unverified		
 0x0000a5bc	28			unknown	unclassified	unverified		
@@ -199,7 +199,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000ec8c	82	read_parser_enum_106_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000ec8c.json	106 names, table 132fb4; callers eefc@ef0e/f260@f27a; guest pending
 0x0000ece0	79	read_parser_enum_10_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000ece0.json	10 names, table 13336c; callers f314@f3c7/f604@f644; guest pending
 0x0000ed30	79	read_parser_enum_19_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000ed30.json	19 names, table 132c2c; callers ed80@edbe/ee0c@ee30; guest pending
-0x0000ed80	137			unknown	unclassified	unverified		
+0x0000ed80	137	read_record_ed80	game_helpers14	compiles	game	confirmed	decomp/tests/0x0000ed80.json	docs/compiler-abi.md; Read one record from the input stream into the 0x1c-byte record at dest.; callers f314@f483,fb10@fb76; guest pending
 0x0000ee0c	77	read_record_ee0c	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000ee0c.json	docs/compiler-abi.md; Read a record through the 0xe95c byte/word readers.; callers f260@f2f6; guest pending
 0x0000ee5c	65	read_parser_six_field_record	parser_records	compiles	game	confirmed	decomp/tests/0x000ee5c.json	Original 0xee5c; three dword values followed by three truncated words; docs/compiler-abi.md; guest replay pending
 0x0000eea0	92			unknown	unclassified	unverified		
@@ -264,7 +264,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000151a0	36	reset_dialog_latches	low_helpers	compiles	game	confirmed	decomp/tests/0x000151a0.json	docs/compiler-abi.md; bytes 0x12289e=1 0x12289f=0 0x1228a0=0 and 0x197c50=byte 0x181730; callers 58d64@58d69; guest pending
 0x000151c4	1			unknown	unclassified	unverified		
 0x000151c8	8			unknown	unclassified	unverified		
-0x000159a0	115			unknown	unclassified	unverified		
+0x000159a0	115	text_width_159a0	game_helpers14	compiles	game	confirmed	decomp/tests/0x000159a0.json	docs/compiler-abi.md; Pixel width of a string: 3 for a space, glyph width + 1 otherwise.; callers 48c34@48c6b,48d5c@48d89,48da0@48dcd; guest pending
 0x00015a14	216			unknown	unclassified	unverified		
 0x00015af0	140			unknown	unclassified	unverified		
 0x00015b7c	1206			unknown	unclassified	unverified		

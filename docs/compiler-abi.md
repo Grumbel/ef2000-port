@@ -2704,3 +2704,12 @@ in EAX, format string address, one value).
 | `0x2d78` | AL:uint8_t,DL:uint8_t,BX:int16_t,ECX:uint32_t | AL:uint8_t | 20ec@24d9,20ec@24fd,20ec@2521 | True when both owner bytes of the 62-byte record match and the time is in range. |
 | `0x3d74` | none | AL:uint8_t | 1cd8@1e92 | Refresh the selected state byte from the owner and report a change. |
 | `0x7b38` | AL:uint8_t,DL:uint8_t,BX:int16_t | AL:uint8_t | 7bc0@7c00,7bc0@7c4c | True when the unit's slot entry matches its type and refers to it (or to anyone). |
+
+## game_helpers14 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x946c` | none | none | 94fc@97ab | Bubble-sort the (key, value) word pairs at 0x197370 by key. |
+| `0x9e38` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32 | AL:uint8_t | 9ea0@a228,357ec@3599c | Find the 25-byte entry of kind 8 (the last one) and copy its fields out. |
+| `0xed80` | EAX:ef_addr32 | EAX:uint32_t | f314@f483,fb10@fb76 | Read one record from the input stream into the 0x1c-byte record at dest. |
+| `0x159a0` | EAX:ef_addr32 | EAX:uint32_t | 48c34@48c6b,48d5c@48d89,48da0@48dcd | Pixel width of a string: 3 for a space, glyph width + 1 otherwise. |
