@@ -1,0 +1,53 @@
+{
+  "address": "0x00079524",
+  "function_size": 87,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "clear_ff",
+      "memory": [
+        {
+          "address": "0x004338d9",
+          "hex": "ff"
+        },
+        {
+          "address": "0x00433281",
+          "hex": "ff"
+        },
+        {
+          "address": "0x004338da",
+          "hex": "ff"
+        },
+        {
+          "address": "0x0043328a",
+          "hex": "ff"
+        },
+        {
+          "address": "0x00433861",
+          "hex": "ffffffffffffffff"
+        },
+        {
+          "address": "0x0043328b",
+          "hex": "ffffffffffffffff"
+        },
+        {
+          "address": "0x00433919",
+          "hex": "ffffffffffffffff"
+        }
+      ]
+    },
+    {
+      "name": "clear_mixed",
+      "memory": [
+        {
+          "address": "0x004338d9",
+          "hex": "11"
+        },
+        {
+          "address": "0x00433861",
+          "hex": "1234567890abcdef"
+        }
+      ]
+    }
+  ]
+}

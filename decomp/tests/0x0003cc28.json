@@ -1,0 +1,31 @@
+{
+  "address": "0x0003cc28",
+  "function_size": 105,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "cr_and_semicolon",
+      "registers": {
+        "eax": "0x002a0000"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "616c7068610d0a3b2069676e6f7265640d0a626574610a00"
+        }
+      ]
+    },
+    {
+      "name": "double_lf",
+      "registers": {
+        "eax": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0100",
+          "hex": "3b636f6d6d656e740a0a0a68656c6c6f0a00"
+        }
+      ]
+    }
+  ]
+}

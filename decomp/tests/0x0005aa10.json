@@ -1,0 +1,35 @@
+{
+  "address": "0x0005aa10",
+  "function_size": 82,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "two_matching",
+      "registers": {
+        "eax": "0x002a0000"
+      },
+      "memory": [
+        {
+          "address": "0x002a019b",
+          "hex": "0e02000000000000000000000e010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x002a01d7",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "none_active",
+      "registers": {
+        "eax": "0x002a1000"
+      },
+      "memory": [
+        {
+          "address": "0x002a11d7",
+          "hex": "00"
+        }
+      ]
+    }
+  ]
+}

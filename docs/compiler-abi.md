@@ -1189,6 +1189,32 @@ or patched native64 replay in the current environment. All functions remain
 `drafted`; the two-callsite ABI records and per-function guest fixtures are
 research inputs for those checks.
 
+### Parser, tactical ring and activity-state batch (eight functions)
+
+Each address below is a bounded contiguous function in the original payload.
+Independent direct caller functions were inspected to establish the calling
+convention; the packed records in `ef_structs/tactical_records.h` are based on
+original byte accesses, not a guessed high-level class hierarchy.
+
+| Address | Draft | Inputs / effects | Two caller functions (call instructions) |
+| --- | --- | --- | --- |
+| `0x37294` | `mirror_reference_state` | No args; mode byte `1` copies word and two marker-selected bytes; EAX has low-byte result | `0x35590` (`0x35637`), `0x357ec` (`0x35805`) |
+| `0x3cc28` | `normalize_script_line_endings` | EAX mutable guest string; three passes remove CR, comments after `;` through LF, repeated LF | `0x3cb2c` (`0x3cb36`), `0x3cc94` (`0x3cc9d`) |
+| `0x41f64` | `append_tactical_ring_event` | AX signed X, DX signed Y, BL kind; packed seven-byte entry at signed 16-bit cursor, wrap at 20 | `0x10750` (`0x10787`), `0x110ec` (`0x11136`) |
+| `0x50ca4` | `copy_next_text_line` | Global pointer; skip horizontal leading whitespace; copy LF to destination and append NUL; increment byte line counter | `0x50e84` (`0x50e84`), `0x50fcc` (`0x50fe9`) |
+| `0x5aa10` | `count_matching_activity_slots` | EAX object pointer; count nonzero signed-strength entries with code equal to signed selected-category slot | `0x59998` (`0x59a97`), `0x5aa64` (`0x5ab05`) |
+| `0x62548` | `active_unit_record_contains` | AX signed index; reverse scan of active 23-byte records, **AL-only** Boolean | `0x5d1c4` (`0x5d44c`), `0x65a88` (`0x65b9f`) |
+| `0x631bc` | `next_round_robin_record` | No args; advance 16-bit cursor, signed count bound, **AX-only** record/sentinel | `0x65d18` (`0x65d18`), `0x66548` (`0x66785`) |
+| `0x79524` | `clear_runtime_transient_counters` | No args; four bytes and six unaligned 32-bit counters reset | `0x3dd30` (`0x3ddcd`), `0x52f38` (`0x53141`) |
+
+`0x3cc28` has a real source-level hazard: a semicolon comment without LF
+keeps advancing through memory even after NUL. `0x50ca4` likewise searches
+for LF without checking NUL; the host cases provide valid terminated lines.
+`0x37294` does not bound the byte selector and may alias unrelated globals.
+`0x62548` and `0x631bc` expose only AL/AX in their confirmed callsites;
+the remainder of EAX is not claimed. These are host-tested models with two
+guest fixture plans per address, not yet Watcom/splice-verified equivalents.
+
 ## Comparing assembly
 
 ```sh

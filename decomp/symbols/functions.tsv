@@ -627,7 +627,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000371b0	161	oncloseCredits		named	unclassified	unverified		
 0x00037254	12	gnNewSocket		named	unclassified	unverified		
 0x00037260	83	onopenCredits		named	unclassified	unverified		
-0x00037294	57			unknown	unclassified	unverified		
+0x00037294	57	mirror_reference_state	tactical_io	drafted	game	confirmed	decomp/tests/0x00037294.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000372d4	53			unknown	unclassified	unverified		
 0x0003730c	141			unknown	unclassified	unverified		
 0x0003739c	250			unknown	unclassified	unverified		
@@ -697,7 +697,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003c94c	69			unknown	unclassified	unverified		
 0x0003c994	407			unknown	unclassified	unverified		
 0x0003cb2c	250			unknown	unclassified	unverified		
-0x0003cc28	105			unknown	unclassified	unverified		
+0x0003cc28	105	normalize_script_line_endings	tactical_io	drafted	game	confirmed	decomp/tests/0x0003cc28.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0003cc94	85			unknown	unclassified	unverified		
 0x0003ccec	47			unknown	unclassified	unverified		
 0x0003cd24	26			unknown	unclassified	unverified		
@@ -764,7 +764,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00041ec8	54			unknown	unclassified	unverified		
 0x00041f00	34			unknown	unclassified	unverified		
 0x00041f24	63			unknown	unclassified	unverified		
-0x00041f64	96			unknown	unclassified	unverified		
+0x00041f64	96	append_tactical_ring_event	tactical_io	drafted	game	confirmed	decomp/tests/0x00041f64.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00042004	317			unknown	unclassified	unverified		
 0x000421c0	904			unknown	unclassified	unverified		
 0x00042548	29			unknown	unclassified	unverified		
@@ -942,7 +942,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00050c2c	18	mpChangeMode		named	unclassified	unverified		
 0x00050c40	43	mpRedrawTargetView		named	unclassified	unverified		
 0x00050c70	51			unknown	unclassified	unverified		
-0x00050ca4	95			unknown	unclassified	unverified		
+0x00050ca4	95	copy_next_text_line	tactical_io	drafted	game	confirmed	decomp/tests/0x00050ca4.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00050d04	152			unknown	unclassified	unverified		
 0x00050d9c	41			unknown	unclassified	unverified		
 0x00050dc8	31			unknown	unclassified	unverified		
@@ -1122,7 +1122,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005a468	1127			unknown	unclassified	unverified		
 0x0005a8d0	197			unknown	unclassified	unverified		
 0x0005a998	117			unknown	unclassified	unverified		
-0x0005aa10	82			unknown	unclassified	unverified		
+0x0005aa10	82	count_matching_activity_slots	tactical_io	drafted	game	confirmed	decomp/tests/0x0005aa10.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0005aa64	651			unknown	unclassified	unverified		
 0x0005acf0	384			unknown	unclassified	unverified		
 0x0005ae70	221			unknown	unclassified	unverified		
@@ -1179,12 +1179,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00062454	160			unknown	unclassified	unverified		
 0x000624f4	16			unknown	unclassified	unverified		
 0x00062504	67			unknown	unclassified	unverified		
-0x00062548	61			unknown	unclassified	unverified		
+0x00062548	61	active_unit_record_contains	tactical_io	drafted	game	confirmed	decomp/tests/0x00062548.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000625d8	1449			unknown	unclassified	unverified		
 0x00062b84	853			unknown	unclassified	unverified		
 0x00062edc	702			unknown	unclassified	unverified		
 0x0006319c	32			unknown	unclassified	unverified		
-0x000631bc	61			unknown	unclassified	unverified		
+0x000631bc	61	next_round_robin_record	tactical_io	drafted	game	confirmed	decomp/tests/0x000631bc.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000631fc	45			unknown	unclassified	unverified		
 0x0006322c	206			unknown	unclassified	unverified		
 0x000633ac	528			unknown	unclassified	unverified		
@@ -1433,7 +1433,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00078f3c	489			unknown	unclassified	unverified		
 0x00079128	169			unknown	unclassified	unverified		
 0x000791e0	835			unknown	unclassified	unverified		
-0x00079524	87			unknown	unclassified	unverified		
+0x00079524	87	clear_runtime_transient_counters	tactical_io	drafted	game	confirmed	decomp/tests/0x00079524.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007957c	1111			unknown	unclassified	unverified		
 0x000799d4	835			unknown	unclassified	unverified		
 0x00079d18	719			unknown	unclassified	unverified		

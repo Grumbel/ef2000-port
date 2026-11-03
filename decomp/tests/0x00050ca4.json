@@ -1,0 +1,33 @@
+{
+  "address": "0x00050ca4",
+  "function_size": 95,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "leading_spaces",
+      "memory": [
+        {
+          "address": "0x001a58ac",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x002a0000",
+          "hex": "20200966697273740a00"
+        }
+      ]
+    },
+    {
+      "name": "leading_tabs",
+      "memory": [
+        {
+          "address": "0x001a58ac",
+          "hex": "00012a00"
+        },
+        {
+          "address": "0x002a0100",
+          "hex": "09097365636f6e640a00"
+        }
+      ]
+    }
+  ]
+}

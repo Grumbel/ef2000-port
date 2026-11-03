@@ -143,3 +143,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00086920	reset_ui_panel_selection		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x86920 (71 bytes); callers 17f10@1800f/5f634@5f68d; Four word resets and five default-one selectors; docs/compiler-abi.md
 0x00087f9c	find_ui_linked_tag	AL:uint8_t,DX:int16_t	EAX:ef_addr32	ebx,ecx,esi,edi,ebp	0	Original 0x87f9c (71 bytes); callers 55928@55944/55b80@55ba8; List scan uses sentinel and +0x34 link; docs/compiler-abi.md
 0x0008d0e0	mark_ui_links_by_slot	AX:int16_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x8d0e0 (57 bytes); callers 8d11c@8d1f7/8d330@8d36e; Mark +0x42 when word +0x56 matches, return sentinel; docs/compiler-abi.md
+0x00037294	mirror_reference_state		EAX:uint32_t	edx	0	Original 0x37294 (57 bytes); Mode-gated word and indexed-byte copy; callers 35590@35637/357ec@35805; docs/compiler-abi.md
+0x0003cc28	normalize_script_line_endings	EAX:ef_addr32		ebx,ecx,edx	0	Original 0x3cc28 (105 bytes); Three in-place passes remove CR/comments/duplicate LF; callers 3cb2c@3cb36/3cc94@3cc9d; docs/compiler-abi.md
+0x00041f64	append_tactical_ring_event	AX:int16_t,DX:int16_t,BL:uint8_t		ecx,esi,edi	0	Original 0x41f64 (96 bytes); 20 seven-byte event ring; callers 10750@10787/110ec@11136; docs/compiler-abi.md
+0x00050ca4	copy_next_text_line			ebx,ecx,edx	0	Original 0x50ca4 (95 bytes); Skip leading space/tabs and retain LF; callers 50e84@50e84/50fcc@50fe9; docs/compiler-abi.md
+0x0005aa10	count_matching_activity_slots	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi	0	Original 0x5aa10 (82 bytes); 20 3-byte slots, signed category code comparison; callers 59998@59a97/5aa64@5ab05; docs/compiler-abi.md
+0x00062548	active_unit_record_contains	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi	0	Original 0x62548 (61 bytes); Reverse scan of 23-byte active records; callers 5d1c4@5d44c/65a88@65b9f; docs/compiler-abi.md
+0x000631bc	next_round_robin_record		AX:uint16_t	ebx,edx	0	Original 0x631bc (61 bytes); 16-bit wrap and ffff sentinel; callers 65d18@65d18/66548@66785; docs/compiler-abi.md
+0x00079524	clear_runtime_transient_counters			ebx,ecx,edx,esi,edi,ebp	0	Original 0x79524 (87 bytes); Four byte flags plus six dword counters; callers 3dd30@3ddcd/52f38@53141; docs/compiler-abi.md

@@ -1,0 +1,35 @@
+{
+  "address": "0x00041f64",
+  "function_size": 96,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "first_event",
+      "registers": {
+        "eax": "0x0000ff85",
+        "edx": "0x000001c8",
+        "ebx": "0x000000c3"
+      },
+      "memory": [
+        {
+          "address": "0x001a4b9a",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "wrap_last_event",
+      "registers": {
+        "eax": "0x00000007",
+        "edx": "0x0000fff7",
+        "ebx": "0x0000000c"
+      },
+      "memory": [
+        {
+          "address": "0x001a4b9a",
+          "hex": "1300"
+        }
+      ]
+    }
+  ]
+}

@@ -13,6 +13,7 @@
 #include "ef_structs/object_links.h"
 #include "ef_structs/buffer_state.h"
 #include "ef_structs/link_resolution.h"
+#include "ef_structs/tactical_records.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -143,5 +144,30 @@ extern uint16_t g_ui_panel_zero_a[2]; /* 0x0020f18e */
 extern uint16_t g_ui_panel_zero_b[2]; /* 0x0020f19a */
 extern ef_addr32 g_ui_linked_list_head; /* 0x0020f160 */
 extern ef_addr32 g_ui_linked_list_sentinel; /* 0x0020f164 */
+
+/* Parser, tactical event and activity-array helpers. */
+extern uint8_t g_reference_copy_mode; /* 0x00125849 */
+extern uint16_t g_reference_source_word; /* 0x0019bbf0 */
+extern uint8_t g_reference_source_a[8]; /* 0x0019bbf2 */
+extern uint8_t g_reference_source_b[8]; /* 0x0019bbfa */
+extern uint8_t g_reference_mirror[4]; /* 0x00125835, word + two bytes */
+extern ef_tactical_ring_entry g_tactical_ring[20]; /* 0x001a4a0c */
+extern int16_t g_tactical_ring_cursor; /* 0x001a4b9a */
+extern ef_addr32 g_text_scan_cursor; /* 0x001a58ac */
+extern uint8_t g_text_line_buffer[]; /* 0x001a5986 */
+extern uint16_t g_text_line_column; /* 0x00127ce2 */
+extern uint8_t g_text_line_count; /* 0x00127ce4 */
+extern int16_t g_active_unit_record_count; /* 0x001a81c2 */
+extern ef_unit_scan_record g_active_unit_records[]; /* 0x001a7d33 */
+extern uint16_t g_round_robin_cursor; /* 0x001282ac */
+extern int16_t g_round_robin_count; /* 0x001a81b0 */
+extern uint16_t g_round_robin_ids[]; /* 0x001a78e0 */
+extern uint8_t g_reset_flag_a; /* 0x004338d9 */
+extern uint8_t g_reset_flag_b; /* 0x00433281 */
+extern uint8_t g_reset_flag_c; /* 0x004338da */
+extern uint8_t g_reset_flag_d; /* 0x0043328a */
+extern uint32_t g_reset_accumulator_a[2]; /* 0x00433861 */
+extern uint32_t g_reset_accumulator_b[2]; /* 0x0043328b */
+extern uint32_t g_reset_accumulator_c[2]; /* 0x00433919 */
 
 #endif

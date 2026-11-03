@@ -147,6 +147,13 @@ target_compile_options(ef2000-decomp-ui-grid-helpers-test PRIVATE -Wall -Wextra 
 target_compile_definitions(ef2000-decomp-ui-grid-helpers-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-ui-grid-helpers-test PRIVATE decomp/include)
 add_test(NAME decomp-ui-grid-helpers-host-model COMMAND ef2000-decomp-ui-grid-helpers-test)
+add_executable(ef2000-decomp-tactical-io-test
+  tests/decomp_tactical_io_test.c decomp/src/tactical_io.c)
+target_compile_features(ef2000-decomp-tactical-io-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-tactical-io-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-tactical-io-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-tactical-io-test PRIVATE decomp/include)
+add_test(NAME decomp-tactical-io-host-model COMMAND ef2000-decomp-tactical-io-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

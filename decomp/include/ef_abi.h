@@ -6,6 +6,16 @@
 
 #include "ef_types.h"
 
+/* Parser and tactical-activity helpers, host drafts pending guest proof. */
+uint32_t mirror_reference_state(void); /* 0x37294 */
+void normalize_script_line_endings(ef_addr32 text); /* 0x3cc28 */
+void append_tactical_ring_event(int16_t x, int16_t y, uint8_t code); /* 0x41f64 AX/DX/BL */
+void copy_next_text_line(void); /* 0x50ca4 */
+uint32_t count_matching_activity_slots(ef_addr32 object); /* 0x5aa10 EAX */
+uint8_t active_unit_record_contains(int16_t index); /* 0x62548 AX -> AL */
+uint16_t next_round_robin_record(void); /* 0x631bc -> AX */
+void clear_runtime_transient_counters(void); /* 0x79524 */
+
 /* Short clock, tactical state and coordinate helpers (host drafts). */
 uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */
 uint32_t command_code_is_group_1b(uint8_t code); /* 0x41da4 AL -> EAX */

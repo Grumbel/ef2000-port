@@ -1,0 +1,37 @@
+{
+  "address": "0x000631bc",
+  "function_size": 61,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "increment_to_second",
+      "memory": [
+        {
+          "address": "0x001282ac",
+          "hex": "0000"
+        },
+        {
+          "address": "0x001a81b0",
+          "hex": "0300"
+        },
+        {
+          "address": "0x001a78e0",
+          "hex": "470048004900"
+        }
+      ]
+    },
+    {
+      "name": "no_records",
+      "memory": [
+        {
+          "address": "0x001282ac",
+          "hex": "0000"
+        },
+        {
+          "address": "0x001a81b0",
+          "hex": "0000"
+        }
+      ]
+    }
+  ]
+}
