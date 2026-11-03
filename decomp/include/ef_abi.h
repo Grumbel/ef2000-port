@@ -1248,4 +1248,44 @@ uint32_t guest_fn_de864(ef_addr32 text); /* 0xde864 */
 void guest_fn_e1730(void); /* 0xe1730 */
 void guest_fn_e1e6c(ef_addr32 text, uint32_t flag); /* 0xe1e6c */
 
+/* game_state_helpers3.c */
+void run_timed_events_3cf08(void);
+void run_timed_events_3db9c(void);
+uint32_t code_in_set_41e24(uint32_t code);
+void set_unit_mode_488f8(int16_t unit, uint8_t mode);
+void update_marker_4bc80(ef_addr32 object);
+void clear_pending_4ca90(void);
+void draw_sprite_4d114(void);
+void draw_sprite_4d180(void);
+void set_ranges_4d5f0(void);
+void step_sequence_54328(void);
+void copy_message_54ba0(ef_addr32 message);
+void handle_message_54ff4(ef_addr32 message);
+void update_view_557e8(void);
+uint8_t remember_value_56018(uint32_t value);
+void adjust_level_5c07c(void);
+void set_indicator_5f8d4(uint8_t mode);
+void init_free_list_64fa4(void);
+void release_entry_65360(uint8_t type, uint16_t id);
+void check_range_65748(ef_addr32 object);
+void check_range_657c4(ef_addr32 object);
+uint8_t any_special_slot_6a090(void);
+void notify_unit_6b444(int16_t unit);
+void guest_fn_151c4(uint32_t a); /* 0x151c4 */
+void guest_fn_46168(int32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0x46168 */
+void guest_fn_4c78c(ef_addr32 a, ef_addr32 b); /* 0x4c78c */
+void guest_fn_4c900(ef_addr32 a, ef_addr32 b); /* 0x4c900 */
+void guest_fn_4f314(ef_addr32 a, ef_addr32 b); /* 0x4f314 */
+void guest_fn_4f7d0(void); /* 0x4f7d0 */
+void guest_fn_544c0(void); /* 0x544c0 */
+void guest_fn_54600(void); /* 0x54600 */
+void guest_fn_546e8(int32_t unit, uint32_t v); /* 0x546e8 */
+void guest_fn_54c10(int32_t unit); /* 0x54c10 */
+ef_addr32 guest_fn_7489c(int32_t unit); /* 0x7489c */
+void guest_fn_759c(int32_t v); /* 0x759c */
+ef_addr32 guest_fn_87f9c(uint32_t a, uint32_t b); /* 0x87f9c */
+void guest_fn_8f644(uint32_t v); /* 0x8f644 */
+void guest_fn_9e0c4(int32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x9e0c4 */
+void guest_fn_ca620(int32_t address, int32_t y, int32_t x, uint32_t a, uint32_t b, uint32_t c); /* 0xca620 */
+
 #endif

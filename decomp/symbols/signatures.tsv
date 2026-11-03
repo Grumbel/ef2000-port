@@ -743,3 +743,25 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00039204	redraw_screen_39204			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00039204 (78 bytes); ; callers 39254@392f4; docs/compiler-abi.md
 0x000394e0	apply_pending_394e0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000394e0 (104 bytes); Consume the pending request at 0x1a3608 and apply it through 0x1d5cc.; callers 3dcb0@3dcb0; docs/compiler-abi.md
 0x00039dc4	reset_table_39dc4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00039dc4 (72 bytes); Reset the ten-entry table at dword 0x1a1860.; callers 49228@495b7; docs/compiler-abi.md
+0x0003cf08	run_timed_events_3cf08			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003cf08 (137 bytes); Fire due timed events from the 11-byte table at 0x1a57d0.; callers 3dd30@3e36c; docs/compiler-abi.md
+0x0003db9c	run_timed_events_3db9c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003db9c (84 bytes); Fire due events from the 9-byte table at 0x1a5a28.; callers 3dd30@3dfa9; docs/compiler-abi.md
+0x00041e24	code_in_set_41e24	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00041e24 (93 bytes); ; callers 9a998@9a9c2; docs/compiler-abi.md
+0x000488f8	set_unit_mode_488f8	AX:int16_t,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000488f8 (99 bytes); Store a mode byte in unit AX and send the matching request.; callers 857bc@85933; docs/compiler-abi.md
+0x0004bc80	update_marker_4bc80	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004bc80 (82 bytes); ; callers 4bc40@4bc51; docs/compiler-abi.md
+0x0004ca90	clear_pending_4ca90			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004ca90 (82 bytes); Clear the pending (==1) entries of the list at 0x1a5510 and refresh if any.; callers 4c900@4ca72; docs/compiler-abi.md
+0x0004d114	draw_sprite_4d114			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004d114 (107 bytes); Draw the sprite described at 0x1a54f6.; callers 4bf1c@4c112; docs/compiler-abi.md
+0x0004d180	draw_sprite_4d180			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004d180 (107 bytes); As 0x4d114 for the sprite at 0x1a54fa.; callers 4bf1c@4c117; docs/compiler-abi.md
+0x0004d5f0	set_ranges_4d5f0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004d5f0 (100 bytes); ; callers 4d2fc@4d505; docs/compiler-abi.md
+0x00054328	step_sequence_54328			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054328 (82 bytes); ; callers 54110@5413c; docs/compiler-abi.md
+0x00054ba0	copy_message_54ba0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054ba0 (109 bytes); Copy three dwords and a byte from a message into record +7/+0xb/+0xf/+0x13.; callers 581b0@582fa; docs/compiler-abi.md
+0x00054ff4	handle_message_54ff4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054ff4 (91 bytes); ; callers 581b0@58309; docs/compiler-abi.md
+0x000557e8	update_view_557e8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000557e8 (117 bytes); ; callers 581b0@5840e; docs/compiler-abi.md
+0x00056018	remember_value_56018	EAX:uint32_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00056018 (106 bytes); Record a value in the history of twenty dwords at 0x1a5d70; returns 1 if already present.; callers 56084@560b9; docs/compiler-abi.md
+0x0005c07c	adjust_level_5c07c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0005c07c (77 bytes); Move word 0x1281f6 towards 0 or 100 by word 0x127d92.; callers 601c@60af; docs/compiler-abi.md
+0x0005f8d4	set_indicator_5f8d4	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0005f8d4 (106 bytes); Switch indicator 0x1a6d18 on (mode 1) or off.; callers 5f60@5fa5,5fd8@5ff4,601c@60c5; docs/compiler-abi.md
+0x00064fa4	init_free_list_64fa4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00064fa4 (107 bytes); Build the doubly linked free list of 100 entries (0x1c bytes) at 0x1a6d60.; callers 5f60@5f70; docs/compiler-abi.md
+0x00065360	release_entry_65360	AL:uint8_t,DX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00065360 (118 bytes); Find the active entry with type AL and id DX, unlink it and return it to the free list.; callers 654b8@6554b,73924@73948; docs/compiler-abi.md
+0x00065748	check_range_65748	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00065748 (124 bytes); Flag 4 or 1 in byte 0x1a81de when the object is within range of the viewpoint (positions scaled by 256).; callers 654b8@654f4; docs/compiler-abi.md
+0x000657c4	check_range_657c4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000657c4 (120 bytes); As 0x65748 without the second shift, flags in byte 0x1a81dd.; callers 654b8@654fd; docs/compiler-abi.md
+0x0006a090	any_special_slot_6a090		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006a090 (90 bytes); True when any of the twenty slots refers to a record whose type byte is 10 or 11.; callers 68a60@68a76,68a60@68ad3; docs/compiler-abi.md
+0x0006b444	notify_unit_6b444	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006b444 (104 bytes); ; callers 242b8@2439d; docs/compiler-abi.md

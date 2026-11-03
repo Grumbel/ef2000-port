@@ -2124,3 +2124,30 @@ in EAX, format string address, one value).
 | `0x39204` | none | none | 39254@392f4 |  |
 | `0x394e0` | none | none | 3dcb0@3dcb0 | Consume the pending request at 0x1a3608 and apply it through 0x1d5cc. |
 | `0x39dc4` | none | none | 49228@495b7 | Reset the ten-entry table at dword 0x1a1860. |
+
+## game_state_helpers3 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3cf08` | none | none | 3dd30@3e36c | Fire due timed events from the 11-byte table at 0x1a57d0. |
+| `0x3db9c` | none | none | 3dd30@3dfa9 | Fire due events from the 9-byte table at 0x1a5a28. |
+| `0x41e24` | EAX:uint32_t | EAX:uint32_t | 9a998@9a9c2 |  |
+| `0x488f8` | AX:int16_t,DL:uint8_t | none | 857bc@85933 | Store a mode byte in unit AX and send the matching request. |
+| `0x4bc80` | EAX:ef_addr32 | none | 4bc40@4bc51 |  |
+| `0x4ca90` | none | none | 4c900@4ca72 | Clear the pending (==1) entries of the list at 0x1a5510 and refresh if any. |
+| `0x4d114` | none | none | 4bf1c@4c112 | Draw the sprite described at 0x1a54f6. |
+| `0x4d180` | none | none | 4bf1c@4c117 | As 0x4d114 for the sprite at 0x1a54fa. |
+| `0x4d5f0` | none | none | 4d2fc@4d505 |  |
+| `0x54328` | none | none | 54110@5413c |  |
+| `0x54ba0` | EAX:ef_addr32 | none | 581b0@582fa | Copy three dwords and a byte from a message into record +7/+0xb/+0xf/+0x13. |
+| `0x54ff4` | EAX:ef_addr32 | none | 581b0@58309 |  |
+| `0x557e8` | none | none | 581b0@5840e |  |
+| `0x56018` | EAX:uint32_t | AL:uint8_t | 56084@560b9 | Record a value in the history of twenty dwords at 0x1a5d70; returns 1 if already present. |
+| `0x5c07c` | none | none | 601c@60af | Move word 0x1281f6 towards 0 or 100 by word 0x127d92. |
+| `0x5f8d4` | AL:uint8_t | none | 5f60@5fa5,5fd8@5ff4,601c@60c5 | Switch indicator 0x1a6d18 on (mode 1) or off. |
+| `0x64fa4` | none | none | 5f60@5f70 | Build the doubly linked free list of 100 entries (0x1c bytes) at 0x1a6d60. |
+| `0x65360` | AL:uint8_t,DX:uint16_t | none | 654b8@6554b,73924@73948 | Find the active entry with type AL and id DX, unlink it and return it to the free list. |
+| `0x65748` | EAX:ef_addr32 | none | 654b8@654f4 | Flag 4 or 1 in byte 0x1a81de when the object is within range of the viewpoint (positions scaled by 256). |
+| `0x657c4` | EAX:ef_addr32 | none | 654b8@654fd | As 0x65748 without the second shift, flags in byte 0x1a81dd. |
+| `0x6a090` | none | AL:uint8_t | 68a60@68a76,68a60@68ad3 | True when any of the twenty slots refers to a record whose type byte is 10 or 11. |
+| `0x6b444` | AX:int16_t | none | 242b8@2439d |  |
