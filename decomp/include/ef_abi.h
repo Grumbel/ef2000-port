@@ -1288,4 +1288,35 @@ void guest_fn_8f644(uint32_t v); /* 0x8f644 */
 void guest_fn_9e0c4(int32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x9e0c4 */
 void guest_fn_ca620(int32_t address, int32_t y, int32_t x, uint32_t a, uint32_t b, uint32_t c); /* 0xca620 */
 
+/* unit_flags.c */
+void notify_player_unit_6c3d0(void);
+void refresh_player_6c8e0(void);
+void advance_state_7104c(void);
+void adjust_zoom_7baa4(void);
+uint8_t object_glyph_7fb9c(ef_addr32 object);
+void reset_menu_80120(void);
+uint32_t prepare_block_81308(void);
+void trigger_sound_8160c(uint16_t index);
+void select_object_895bc(ef_addr32 object);
+void select_object_8960c(ef_addr32 object);
+void force_select_898d4(ef_addr32 object);
+uint32_t find_cell_8b9e8(int16_t x, int16_t z);
+void toggle_flag_8daa0(int16_t unit);
+void toggle_flag_8db20(int16_t unit);
+void toggle_flag_8db80(int16_t unit);
+void toggle_flag_8dbe0(int16_t unit);
+void toggle_flag_8dc40(int16_t unit);
+void toggle_flag_8dc94(int16_t unit);
+void guest_fn_6a1d0(int32_t a, uint32_t b); /* 0x6a1d0 */
+void guest_fn_710a4(void); /* 0x710a4 */
+void guest_fn_73500(int32_t a); /* 0x73500 */
+void guest_fn_73c38(int32_t a); /* 0x73c38 */
+void guest_fn_73d1c(int32_t a); /* 0x73d1c */
+void guest_fn_7bc0(int32_t a, uint32_t b); /* 0x7bc0 */
+void guest_fn_7fe8c(void); /* 0x7fe8c */
+void guest_fn_87970(ef_addr32 o); /* 0x87970 */
+uint32_t guest_fn_d6f88(void); /* 0xd6f88 */
+void guest_fn_d7158(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xd7158 */
+uint32_t guest_fn_d75fc(uint32_t a); /* 0xd75fc */
+
 #endif

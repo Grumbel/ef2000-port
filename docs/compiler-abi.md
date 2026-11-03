@@ -2151,3 +2151,26 @@ in EAX, format string address, one value).
 | `0x657c4` | EAX:ef_addr32 | none | 654b8@654fd | As 0x65748 without the second shift, flags in byte 0x1a81dd. |
 | `0x6a090` | none | AL:uint8_t | 68a60@68a76,68a60@68ad3 | True when any of the twenty slots refers to a record whose type byte is 10 or 11. |
 | `0x6b444` | AX:int16_t | none | 242b8@2439d |  |
+
+## unit_flags (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6c3d0` | none | none | 6b6c8@6bbbd |  |
+| `0x6c8e0` | none | none | 6c488@6c520 |  |
+| `0x7104c` | none | none | 6c488@6c500,6c488@6c5b3 | Advance the state byte +0x16e of the player record. |
+| `0x7baa4` | none | none | 3dd30@3e255 |  |
+| `0x7fb9c` | EAX:ef_addr32 | AL:uint8_t | 7ef14@7f0f5,7ef14@7f122,7ef14@7f1b0 | Character code for an object. |
+| `0x80120` | none | none | 3dd30@3e881,3ea0c@3eed4,7feb0@7feee |  |
+| `0x81308` | none | EAX:uint32_t | 77c90@77e39 | Prepare the 0x28-byte block at 0x1fc980; returns its descriptor or 0. |
+| `0x8160c` | AX:uint16_t | none | 29b14@29bc5,29dd0@29e26,589c0@58a9b |  |
+| `0x895bc` | EAX:ef_addr32 | none | none direct |  |
+| `0x8960c` | EAX:ef_addr32 | none | none direct |  |
+| `0x898d4` | EAX:ef_addr32 | none | 8935c@8936e,8935c@89410,8935c@89451 |  |
+| `0x8b9e8` | AX:int16_t,DX:int16_t | EAX:uint32_t | 3ce70@3cea4 | Find the list node (list dword 0x12db5c, next at +0x1d) whose coordinates match; returns its word +0x1b or -1. |
+| `0x8daa0` | AX:int16_t | none | 8d59c@8da8a | Copy flag bit 2 of word +0x26 into bit 3 and announce it. |
+| `0x8db20` | AX:int16_t | none | 8d59c@8d9e1 | Copy flag bit 6 of word +0x24 into bit 7. |
+| `0x8db80` | AX:int16_t | none | 8d59c@8da04 | Copy flag bit 10 of word +0x24 into bit 11. |
+| `0x8dbe0` | AX:int16_t | none | 8d59c@8da27 | Copy flag bit 8 of word +0x24 into bit 9. |
+| `0x8dc40` | AX:int16_t | none | 8d59c@8d9be | Copy flag bit 0 of word +0x24 into bit 5. |
+| `0x8dc94` | AX:int16_t | none | 8d59c@8da49 | Copy flag bit 12 of word +0x24 into bit 14. |
