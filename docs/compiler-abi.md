@@ -1886,3 +1886,49 @@ in EAX, format string address, one value).
 | `0xd7594` | AL:uint8_t | AL:uint8_t | 77c90@77dbe,801e4@80248,80314@8032e | With byte 0x15bac4 set, 0x1028f4(dword 0x420dd0[AL]) equals 2. |
 | `0xd75fc` | AL:uint8_t | AL:uint8_t | 47fbc@47fc3,77c90@77ddb,81308@81318 | As 0xd7594, comparing with 4. |
 | `0xd7724` | EAX:ef_addr32,DX:uint16_t | EAX:int32_t | 7ef14@7f33d | Word +0x11 += DX; return the signed high word of dword +0xf. |
+
+## math_string (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdc2c0` | none | none | 1e480@1e51c,1e480@1e58f,1e480@1e636 | 0xb3fb0(dword 0x15b754, 0, dword 0x164600). |
+| `0xdc314` | none | none | 3dd30@3e044,3dd30@3e054,63d5c@64057 | Unless both dwords 0x15bdd4 and 0x15bdd8 equal 0x100, * run 0xdc3d5 and 0xce354. |
+| `0xdc860` | EAX:ef_addr32,EDX:ef_addr32 | none | dc8d8@dc906 | Halve the dwords at EAX and EDX until both fit in a signed 16-bit range. |
+| `0xddbc8` | EAX:int32_t | EAX:int32_t | 27fec@28121,a82f0@a8374,a9130@a9355 | Signed 'a'..'z' to uppercase. |
+| `0xe7835` | EAX:int32_t | EAX:int32_t | 50d9c@50db5,a80b0@a80fe,bc1d3@bc1e1 | Signed 'A'..'Z' to lowercase. |
+| `0xdec00` | AL:uint8_t,EDX:uint32_t,EBX:uint32_t | none | none direct | Byte at dword 0x15b754 + EDX + dword 0x163200[EBX] = AL. |
+| `0xdec18` | AL:uint8_t,EDX:int32_t,EBX:int32_t | none | 39a0c@39a69,39a0c@39b47,3a3a8@3b84b | As 0xdec00 but only inside the signed clip rectangle * 0x15bdc0..c4 (x) and 0x15bdc8..cc (y). |
+| `0xdec90` | AX:int16_t,DX:int16_t,BX:int16_t | EAX:uint32_t | 9e0c4@9e195,a0aa0@a0b49,a2500@a2580 | 0xe2b60 of the sum of squares of three signed words. |
+| `0xdecb0` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | 2f740@2f786,dc91c@dc99b,dcaa4@dcb36 | Low word of 0xe2b60(EAX^2 + EDX^2). |
+| `0xdecc4` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:uint32_t | 30214@311ed,31514@31588,83a40@83adb | Low word of 0xe2b60(EAX^2 + EDX^2 + EBX^2). |
+| `0xe2b60` | EAX:uint32_t | EAX:uint32_t | 39cb4@39d4b,91c00@91c17,d13ac@d13c1 | Bitwise unsigned integer square root. |
+| `0xe2fdb` | none | EAX:uint32_t | 3ce04@3ce07 | Linear congruential generator on the seed at the * pointer returned by 0xe2fd5: seed = seed*0x41c64e6d + 0x3039, result  |
+| `0xdf2e4` | none | none | 3361c@33626 | Byte 0x15f07d = (byte + 1) & 7. |
+| `0xe10e0` | none | none | e0b88@e0b8b,e1194@e11a8 | Byte 0x15f685 = 0, fill 0x80 bytes at 0x15f5fd with 0xff, * byte 0x15f684 = 0, byte 0x15f685 = 1. |
+| `0xe1540` | AL:uint8_t | AL:uint8_t | 337c4@337d0 | Next index after AL (mod 5) whose byte at 0x15f708+index is nonzero. |
+| `0xe17a0` | none | none | abf8c@abfcd | Clear 0x5000 bytes at 0x4198d0. |
+| `0xe192c` | AL:uint8_t | AL:uint8_t | a63c0@a63f0 | Byte at 0x1378d8 + 10*AL. |
+| `0xe2988` | EAX:int32_t | none | 357ec@35aa8,56bdc@56c5f,57030@570bc | Store EAX in dword 0x15f748 and, if positive, wait for * an interrupt handler to bring it to zero or below. |
+| `0xe2a1c` | none | none | e29a0@e29e1,e4264@e42a4 | Clear dwords 0x15f764/68, dword 0x15f758 = dword * 0x15f760, dword 0x15f754 = dword 0x15f75c, then clear that buffer. |
+| `0xe4304` | none | AL:uint8_t | ac0e0@ac0e1 | Byte 0x15f930 equals 1. |
+| `0xe599c` | EAX:ef_addr32 | none | a5ef8@a5fc6,e5870@e5873 | Copy words +0x41..+0x47 to 0x41ec08..0e. |
+| `0xe5870` | EAX:ef_addr32 | none | a5ef8@a5f6e | 0xe599c(record), then 0xe52a4(byte +0x10, 1). |
+| `0xe588c` | EAX:ef_addr32 | none | a60a8@a60bd | As 0xe5870 through 0xe5960. |
+| `0xe6800` | EAX:ef_addr32,DX:int16_t,BX:int16_t,CX:int16_t | EAX:ef_addr32 | e6818@e6834 | 0xe67a0(EAX, signed DX, signed BX+DX, signed CX); returns EAX. |
+| `0xe6818` | EAX:ef_addr32 | none | 49228@493ab,b0f5c@b1034,b0f5c@b1234 | For each node of the list at *EAX call 0xe6800 on its * dword +0x2c with (0, word +0x2a minus 1, 1). |
+| `0xe7fa4` | EAX:uint32_t | none | 7a38c@7a397 | Dword 0x464360 = EAX, dword 0x15b268 = 0xe7f60. |
+| `0xe8348` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e8368@e83c1 | 0xe81b0 on (A,B), (B,C), (C,A) for EAX, EDX, EBX. |
+| `0xe85e4` | AL:uint8_t,DL:uint8_t | none | 7b3fc@7b499,7b3fc@7b4b8 | Byte 0x46437e = AL, byte 0x46437d = DL. |
+| `0xe8733` | EAX:uint32_t,EDX:uint32_t | EAX:ef_addr32 | 106f10@106f64,117ed4@117ee9,117f14@117f23 | Allocate EAX*EDX bytes through 0xfc795 and clear them. |
+| `0xe874b` | EAX:ef_addr32,EDX:uint32_t | EAX:ef_addr32 | aaee8@aaf06,e7fc0@e7fec,e7fc0@e803a | strchr: first occurrence of byte EDX in the string at EAX * (including the terminator), or 0. |
+| `0xea130` | EAX:ef_addr32 | EAX:uint32_t | ea270@ea2d5 | Remove carriage returns in place; returns the number removed. |
+| `0xea154` | EAX:ef_addr32 | EAX:ef_addr32 | ea270@ea2fb | Advance to the next newline, replace it with NUL and * return the pointer after it (or the end of string). |
+| `0xea1e8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:int32_t | none direct | Signed compare of the dwords at EAX and EDX: -1, 0 or 1. |
+| `0xea240` | EAX:ef_addr32 | none | ea270@ea281 | If dword +0xc is set, release dwords +0x14 and +0x10 * through 0xc3f80 and clear +0xc, +0x10 and +0x14. |
+| `0xea84c` | EAX:ef_addr32 | none | 9fea8@9ffb4,9fea8@9ffbc | Clear three dwords. |
+| `0xea870` | EAX:ef_addr32,EDX:ef_addr32 | none | 97914@97929,97950@97968,97950@9798c | Copy three dwords from EDX to EAX. |
+| `0xea958` | EAX:ef_addr32,EDX:ef_addr32 | none | 97914@97944,97950@97983,97950@979a0 | Add three dwords of EDX to those at EAX. |
+| `0xea9a0` | EAX:ef_addr32,DX:int16_t,BX:int16_t,CX:int16_t | none | 9ffc8@9fffe | Dwords at EAX = sign-extended DX, BX, CX. |
+| `0xea9b8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:int32_t | 97534@975a2 | Fixed-point (16.16) dot product of two dword triples. |
+| `0xeb478` | EAX:ef_addr32 | EAX:ef_addr32 | 9c980@9c9b6,9c9c0@9ca0d,a7ec4@a7ec9 | Lowercase ASCII 'A'..'Z' in place; returns the pointer. |
+| `0xeb4c0` | EAX:ef_addr32 | none | ebcd8@ebceb | Release the pointer stored at EAX through 0xc3f80 and clear it. |

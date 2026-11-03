@@ -857,4 +857,55 @@ void guest_fn_103778(uint32_t a, uint32_t b, uint32_t c); /* 0x103778 cdecl */
 void guest_fn_d6fa8(uint32_t text); /* 0xd6fa8 EAX */
 uint32_t guest_fn_1028f4(uint32_t handle); /* 0x1028f4 cdecl -> EAX */
 
+/* math_string.c */
+void clear_buffer_dc2c0(void);
+void update_view_scale_dc314(void);
+void halve_pair_to_fit16(ef_addr32 first, ef_addr32 second);
+int32_t to_upper_ascii(int32_t c);
+int32_t to_lower_ascii(int32_t c);
+void plot_byte(uint8_t value, uint32_t x, uint32_t y);
+void plot_byte_clipped(uint8_t value, int32_t x, int32_t y);
+uint32_t length_squared_dec90(int16_t x, int16_t y, int16_t z);
+uint32_t length_2d_decb0(int32_t x, int32_t y);
+uint32_t length_3d_decc4(int32_t x, int32_t y, int32_t z);
+uint32_t integer_sqrt(uint32_t value);
+uint32_t random_lcg(void);
+void advance_counter_15f07d(void);
+void reset_table_15f5fd(void);
+uint8_t next_enabled_index(uint8_t index);
+void clear_block_e17a0(void);
+uint8_t read_table_e192c(uint8_t index);
+void wait_for_counter_15f748(int32_t count);
+void reset_buffer_e2a1c(void);
+uint8_t flag_is_one_15f930(void);
+void copy_record_words_e599c(ef_addr32 record);
+void apply_record_e5870(ef_addr32 record);
+void apply_record_e588c(ef_addr32 record);
+ef_addr32 call_e67a0(ef_addr32 object, int16_t x, int16_t y, int16_t z);
+void adjust_list_e6818(ef_addr32 head);
+void install_handler_e7fa4(uint32_t value);
+void rotate_calls_e8348(uint32_t a, uint32_t b, uint32_t c);
+void store_bytes_46437d(uint8_t first, uint8_t second);
+ef_addr32 allocate_cleared(uint32_t count, uint32_t size);
+ef_addr32 find_char(ef_addr32 text, uint32_t ch);
+uint32_t strip_carriage_returns(ef_addr32 text);
+ef_addr32 split_line(ef_addr32 text);
+int32_t compare_dwords(ef_addr32 first, ef_addr32 second);
+void release_record_ea240(ef_addr32 record);
+void clear_vector3(ef_addr32 vector);
+void copy_vector3(ef_addr32 destination, ef_addr32 source);
+void add_vector3(ef_addr32 destination, ef_addr32 source);
+void set_vector3_from_words(ef_addr32 vector, int16_t x, int16_t y, int16_t z);
+int32_t dot_product_fixed(ef_addr32 first, ef_addr32 second);
+ef_addr32 lowercase_string(ef_addr32 text);
+void release_pointer_eb4c0(ef_addr32 slot);
+void guest_fn_dc3d5(void); /* 0xdc3d5 */
+void guest_fn_ce354(void); /* 0xce354 */
+ef_addr32 guest_fn_e2fd5(void); /* 0xe2fd5 -> EAX */
+void guest_fn_e52a4(uint32_t value, uint32_t mode); /* 0xe52a4 EAX/EDX */
+void guest_fn_e5960(ef_addr32 record); /* 0xe5960 EAX */
+void guest_fn_e67a0(ef_addr32 object, int32_t x, int32_t y, int32_t z); /* 0xe67a0 EAX/EDX/EBX/ECX */
+void guest_fn_e81b0(uint32_t a, uint32_t b); /* 0xe81b0 EAX/EDX */
+ef_addr32 guest_fn_fc795(uint32_t size); /* 0xfc795 EAX -> EAX */
+
 #endif
