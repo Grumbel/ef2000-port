@@ -1399,4 +1399,33 @@ uint32_t guest_fn_b3b90(uint32_t a); /* 0xb3b90 */
 void guest_fn_dc2e0(void); /* 0xdc2e0 */
 uint32_t guest_fn_eb9f8(uint32_t a, uint32_t b); /* 0xeb9f8 */
 
+/* entity_helpers2.c */
+void randomize_orientation_b038c(void);
+void perturb_orientation_b0448(void);
+void free_object_b1740(ef_addr32 object);
+void reset_view_tables_b1b10(void);
+int32_t approx_length_b3988(uint32_t first, uint32_t second);
+int32_t angle_of_b3b1c(int32_t x, int32_t y);
+uint32_t code_in_set_bcb50(uint32_t code);
+uint32_t code_pair_matches_bcec0(uint8_t value, uint8_t code);
+uint32_t slot_type_is_special_bd490(uint8_t type, uint8_t flag);
+uint32_t slot_usable_bd5a8(ef_addr32 object, int16_t slot);
+void reset_slots_bd688(ef_addr32 object);
+void count_slots_bd6d8(ef_addr32 object);
+uint32_t records_differ_bf980(ef_addr32 object);
+uint32_t records_differ_bf9d4(ef_addr32 object);
+void guest_fn_b1814(ef_addr32 a, ef_addr32 b); /* 0xb1814 */
+void guest_fn_b188c(ef_addr32 a, ef_addr32 b); /* 0xb188c */
+void guest_fn_b18b8(ef_addr32 a, ef_addr32 b); /* 0xb18b8 */
+void guest_fn_b1974(ef_addr32 a, ef_addr32 b); /* 0xb1974 */
+void guest_fn_b19e4(ef_addr32 a, ef_addr32 b); /* 0xb19e4 */
+void guest_fn_b1a3c(ef_addr32 a); /* 0xb1a3c */
+void guest_fn_b1ae4(ef_addr32 a, ef_addr32 b); /* 0xb1ae4 */
+uint32_t guest_fn_b3ae0(int32_t x, int32_t y); /* 0xb3ae0 */
+uint32_t guest_fn_bd508(ef_addr32 o); /* 0xbd508 */
+uint32_t guest_fn_bd554(ef_addr32 o); /* 0xbd554 */
+void guest_fn_cbf00(void); /* 0xcbf00 */
+uint32_t guest_fn_cf94a(uint32_t v); /* 0xcf94a */
+void guest_fn_f8f8(void); /* 0xf8f8 */
+
 #endif

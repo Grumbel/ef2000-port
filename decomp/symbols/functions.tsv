@@ -2448,10 +2448,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b0138	208			unknown	unclassified	unverified		
 0x000b0208	47	list_has_matching_node	unk_records	typed	game	confirmed		docs/compiler-abi.md; EAX head-pointer address; BL/DL predicates; EAX Boolean result
 0x000b0238	110			unknown	unclassified	unverified		
-0x000b038c	92			unknown	unclassified	unverified		
+0x000b038c	92	randomize_orientation_b038c	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b038c.json	docs/compiler-abi.md; Random orientation words at 0x41f32e (mod 3), 0x41f32c (mod 360) and 0x41f32a (mod 46).; callers b0f5c@b107d; guest pending
 0x000b03e8	26	clear_words_13799e	list_helpers	compiles	game	confirmed	decomp/tests/0x000b03e8.json	docs/compiler-abi.md; Clear three words 0x13799e, 0x1379a0 and 0x1379a2.; callers b0f5c@b1078; guest pending
 0x000b0404	68			unknown	unclassified	unverified		
-0x000b0448	136			unknown	unclassified	unverified		
+0x000b0448	136	perturb_orientation_b0448	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b0448.json	docs/compiler-abi.md; As 0xb038c but offset by the previous values (high words of the neighbouring dwords).; callers ca7e0@ca82f; guest pending
 0x000b04e8	107			unknown	unclassified	unverified		
 0x000b0554	69			unknown	unclassified	unverified		
 0x000b059c	236			unknown	unclassified	unverified		
@@ -2467,7 +2467,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b0f5c	1888	initialize_global_node_state	unk_nodes	typed	game	confirmed		docs/compiler-abi.md; zero inputs, all GPRs except EAX preserved, EAX=0, DS-to-ES movsd; callers 0xbab4/0xc0f6
 0x000b16c0	64			unknown	unclassified	unverified		
 0x000b1700	64			unknown	unclassified	unverified		
-0x000b1740	146			unknown	unclassified	unverified		
+0x000b1740	146	free_object_b1740	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b1740.json	docs/compiler-abi.md; Free the sub-allocations of an object.; callers b17d4@b17e9,cb9f4@cbbe7; guest pending
 0x000b17d4	61			unknown	unclassified	unverified		
 0x000b1814	41	free_list_b1814	list_helpers	compiles	game	confirmed	decomp/tests/0x000b1814.json	docs/compiler-abi.md; Free each node of the list at *head via 0xb17d4, then clear *head and *tail.; callers b1b10@b1b1b; guest pending
 0x000b1840	76			unknown	unclassified	unverified		
@@ -2481,7 +2481,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1a3c	42	release_pointer_b1a3c	list_helpers	compiles	game	confirmed	decomp/tests/0x000b1a3c.json	docs/compiler-abi.md; As 0xb1a10 with dwords 0x1379ac and 0x1379b4.; callers ba5c@bb72,bfcc@c4be,b1b10@b1b7a; guest pending
 0x000b1a68	121			unknown	unclassified	unverified		
 0x000b1ae4	41	free_list_b1ae4	list_helpers	compiles	game	confirmed	decomp/tests/0x000b1ae4.json	docs/compiler-abi.md; As 0xb1814 through 0xb1a68.; callers b1b10@b1b57; guest pending
-0x000b1b10	123			unknown	unclassified	unverified		
+0x000b1b10	123	reset_view_tables_b1b10	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b1b10.json	docs/compiler-abi.md; ; callers c594@c608; guest pending
 0x000b1b8b	25	strlen_ds	unk_runtime	typed	unclassified	confirmed		docs/compiler-abi.md; repnz scasb uses ES=DS and assumes DF clear; classification deferred to 3.6
 0x000b1bb0	70			unknown	unclassified	unverified		
 0x000b1bf8	57			unknown	unclassified	unverified		
@@ -2513,10 +2513,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b3580	96			unknown	unclassified	unverified		
 0x000b3648	486			unknown	unclassified	unverified		
 0x000b3830	343			unknown	unclassified	unverified		
-0x000b3988	100			unknown	unclassified	unverified		
+0x000b3988	100	approx_length_b3988	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b3988.json	docs/compiler-abi.md; Approximate length from two components: max - max/32 - max/128 + 3/8 min + 3/128 min...; callers 67d4@687c,21654@21955,21654@219f0; guest pending
 0x000b39ec	235			unknown	unclassified	unverified		
 0x000b3ae0	57			unknown	unclassified	unverified		
-0x000b3b1c	90			unknown	unclassified	unverified		
+0x000b3b1c	90	angle_of_b3b1c	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b3b1c.json	docs/compiler-abi.md; Quadrant-aware wrapper around 0xb3ae0 (angle of the vector EAX/EDX, 16-bit angle units).; callers 66fc@67c0,26744@268ab,26744@268bc; guest pending
 0x000b3b90	114			unknown	unclassified	unverified		
 0x000b3c04	252			unknown	unclassified	unverified		
 0x000b3d00	96			unknown	unclassified	unverified		
@@ -2646,28 +2646,28 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bc7ec	711			unknown	unclassified	unverified		
 0x000bcb08	28	record_is_strong	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcb08.json	docs/compiler-abi.md; Byte +5 at least 0x32 (signed) and byte +6 nonzero.; callers bcc2c@bcc85,bcc2c@bccd4,bcc2c@bcd44; guest pending
 0x000bcb24	43	record_is_elite	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcb24.json	docs/compiler-abi.md; Byte +6 at least 0x55 and byte +0 not 0xff or 0xfe.; callers cac4c@cacc2,faafc@fab29; guest pending
-0x000bcb50	111			unknown	unclassified	unverified		
+0x000bcb50	111	code_in_set_bcb50	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bcb50.json	docs/compiler-abi.md; ; callers faafc@fab3e,fabf0@fac23; guest pending
 0x000bcbc0	54			unknown	unclassified	unverified		
 0x000bcc04	38	map_code_bcc04	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcc04.json	docs/compiler-abi.md; Map code: 0x31 -> 0x37, 0x49 -> 0x4b, 0x0b/0x56 -> 0x0c, else 0.; callers bcc2c@bcd1b,bcda0@bce49; guest pending
 0x000bcc2c	332			unknown	unclassified	unverified		
 0x000bcd78	38	map_code_bcd78	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcd78.json	docs/compiler-abi.md; Map code: 0x31 -> 0x27, 0x49 -> 0x12, 0x0b/0x56 -> 0x1b, else 0.; callers bcf44@bcfe7; guest pending
 0x000bcda0	246			unknown	unclassified	unverified		
 0x000bce98	38	map_code_bce98	list_lookup	compiles	game	confirmed	decomp/tests/0x000bce98.json	docs/compiler-abi.md; Map code: 0x31 -> 2, 0x49 -> 0x3c, 0x0b/0x56 -> 0x0c, else 0.; callers bcf44@bd1a6; guest pending
-0x000bcec0	87			unknown	unclassified	unverified		
+0x000bcec0	87	code_pair_matches_bcec0	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bcec0.json	docs/compiler-abi.md; ; callers bcf44@bd0c6,f90ac@f9234; guest pending
 0x000bcf18	13	record_flag_clear_d	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcf18.json	docs/compiler-abi.md; Byte +0xd is zero.; callers bcf44@bd0e4,bfb2c@bfb52,f90ac@f9252; guest pending
 0x000bcf28	28	records_share_position	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcf28.json	docs/compiler-abi.md; Dwords +0x11/+0x15 equal the other record's +0x3b/+0x3f.; callers bcf44@bd0d8,be3f4@be413,f90ac@f9246; guest pending
 0x000bcf44	943			unknown	unclassified	unverified		
 0x000bd2f4	79			unknown	unclassified	unverified		
 0x000bd344	61			unknown	unclassified	unverified		
 0x000bd39c	243			unknown	unclassified	unverified		
-0x000bd490	78			unknown	unclassified	unverified		
+0x000bd490	78	slot_type_is_special_bd490	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd490.json	docs/compiler-abi.md; ; callers bd508@bd52b,bd554@bd581,bd5a8@bd5ca; guest pending
 0x000bd4e0	39	code_is_2_3_4_9_0c	list_lookup	compiles	game	confirmed	decomp/tests/0x000bd4e0.json	docs/compiler-abi.md; AL is 2, 3, 4, 9 or 0x0c.; callers f88a0@f88bb,f89e0@f8a08,f8a30@f8a4e; guest pending
 0x000bd508	75			unknown	unclassified	unverified		
 0x000bd554	82			unknown	unclassified	unverified		
-0x000bd5a8	78			unknown	unclassified	unverified		
+0x000bd5a8	78	slot_usable_bd5a8	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd5a8.json	docs/compiler-abi.md; ; callers bd5f8@bd655; guest pending
 0x000bd5f8	144			unknown	unclassified	unverified		
-0x000bd688	80			unknown	unclassified	unverified		
-0x000bd6d8	78			unknown	unclassified	unverified		
+0x000bd688	80	reset_slots_bd688	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd688.json	docs/compiler-abi.md; Mark all slots (10 bytes each) present and total their counts.; callers bdbf8@bdc0c,bf444@bf718; guest pending
+0x000bd6d8	78	count_slots_bd6d8	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd6d8.json	docs/compiler-abi.md; Count the present slots and total their counts.; callers bdbf8@bdc84,bdbf8@bdc99,bdbf8@bdcce; guest pending
 0x000bd728	20	value_below_word_23	list_lookup	compiles	game	confirmed	decomp/tests/0x000bd728.json	docs/compiler-abi.md; DL (as a signed word) is below the signed word +0x23.; callers bdbf8@bdc65,f8b14@f8bb0; guest pending
 0x000bd73c	94			unknown	unclassified	unverified		
 0x000bd7cc	157			unknown	unclassified	unverified		
@@ -2697,8 +2697,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000befb8	1145			unknown	unclassified	unverified		
 0x000bf444	984			unknown	unclassified	unverified		
 0x000bf81c	356			unknown	unclassified	unverified		
-0x000bf980	82			unknown	unclassified	unverified		
-0x000bf9d4	82			unknown	unclassified	unverified		
+0x000bf980	82	records_differ_bf980	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bf980.json	docs/compiler-abi.md; Do the records at +0x33 and +0x37 differ in the bytes at +0x20 or +0x21?; callers bf81c@bf889; guest pending
+0x000bf9d4	82	records_differ_bf9d4	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bf9d4.json	docs/compiler-abi.md; As 0xbf980 for the bytes at +0x23 and +0x24.; callers bf81c@bf8a2; guest pending
 0x000bfa28	48	linked_records_differ	list_lookup	compiles	game	confirmed	decomp/tests/0x000bfa28.json	docs/compiler-abi.md; Byte +0x22 of the records at dwords +0x33 and +0x37 * differ and the first is nonzero.; callers bf81c@bf8b6; guest pending
 0x000bfa58	212			unknown	unclassified	unverified		
 0x000bfb2c	91			unknown	unclassified	unverified		

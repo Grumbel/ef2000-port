@@ -2223,3 +2223,22 @@ in EAX, format string address, one value).
 | `0xa8fcc` | EAX:ef_addr32 | none | a9130@a91b3 | Branch when the variable differs. |
 | `0xa9014` | EAX:ef_addr32 | none | a9130@a91da | Branch when the variable is not greater than the operand. |
 | `0xacb68` | EAX:ef_addr32 | none | ac5f8@ac67c | Latch "previous" copies of the fields and shift flag bits 0..2 to 3..5 of byte +0x1e. |
+
+## entity_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb038c` | none | none | b0f5c@b107d | Random orientation words at 0x41f32e (mod 3), 0x41f32c (mod 360) and 0x41f32a (mod 46). |
+| `0xb0448` | none | none | ca7e0@ca82f | As 0xb038c but offset by the previous values (high words of the neighbouring dwords). |
+| `0xb1740` | EAX:ef_addr32 | none | b17d4@b17e9,cb9f4@cbbe7 | Free the sub-allocations of an object. |
+| `0xb1b10` | none | none | c594@c608 |  |
+| `0xb3988` | EAX:uint32_t,EDX:uint32_t | EAX:int32_t | 67d4@687c,21654@21955,21654@219f0 | Approximate length from two components: max - max/32 - max/128 + 3/8 min + 3/128 min... |
+| `0xb3b1c` | EAX:int32_t,EDX:int32_t | EAX:int32_t | 66fc@67c0,26744@268ab,26744@268bc | Quadrant-aware wrapper around 0xb3ae0 (angle of the vector EAX/EDX, 16-bit angle units). |
+| `0xbcb50` | EAX:uint32_t | EAX:uint32_t | faafc@fab3e,fabf0@fac23 |  |
+| `0xbcec0` | AL:uint8_t,DL:uint8_t | EAX:uint32_t | bcf44@bd0c6,f90ac@f9234 |  |
+| `0xbd490` | AL:uint8_t,DL:uint8_t | EAX:uint32_t | bd508@bd52b,bd554@bd581,bd5a8@bd5ca |  |
+| `0xbd5a8` | EAX:ef_addr32,DX:int16_t | EAX:uint32_t | bd5f8@bd655 |  |
+| `0xbd688` | EAX:ef_addr32 | none | bdbf8@bdc0c,bf444@bf718 | Mark all slots (10 bytes each) present and total their counts. |
+| `0xbd6d8` | EAX:ef_addr32 | none | bdbf8@bdc84,bdbf8@bdc99,bdbf8@bdcce | Count the present slots and total their counts. |
+| `0xbf980` | EAX:ef_addr32 | EAX:uint32_t | bf81c@bf889 | Do the records at +0x33 and +0x37 differ in the bytes at +0x20 or +0x21? |
+| `0xbf9d4` | EAX:ef_addr32 | EAX:uint32_t | bf81c@bf8a2 | As 0xbf980 for the bytes at +0x23 and +0x24. |
