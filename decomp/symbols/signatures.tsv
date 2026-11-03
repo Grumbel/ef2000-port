@@ -1221,3 +1221,58 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0003bc60	draw_cross_3bc60	EAX:uint32_t,EDX:int32_t,EBX:int32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003bc60 (47 bytes); Draw a small cross of arm length 3 at (x, y).; callers 3a3a8@3b038; docs/compiler-abi.md
 0x0003bc90	draw_box_3bc90	AX:int16_t,EDX:int32_t,EBX:int32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003bc90 (47 bytes); Draw a small box around (x, y); half-size 2 in mode 3, otherwise 1.; callers 3bcc0@3bd18; docs/compiler-abi.md
 0x0004d1ec	blit_cursor_4d1ec	EAX:int32_t,EDX:int32_t,EBX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004d1ec (94 bytes); Blit the cursor image for the current screen (when the page matches key).; callers 441fc@44368; docs/compiler-abi.md
+0x000106a8	nop_106a8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000106a8 (1 bytes); Empty stub (single ret).; callers none direct; docs/compiler-abi.md
+0x000151c4	nop_151c4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000151c4 (1 bytes); Empty stub (single ret).; callers 3ce30@3ce4f,3d950@3d9c3,3db9c@3dbd4; docs/compiler-abi.md
+0x000392fc	nop_392fc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000392fc (1 bytes); Empty stub (single ret).; callers db114@db157; docs/compiler-abi.md
+0x0003930c	nop_3930c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003930c (1 bytes); Empty stub (single ret).; callers db1c4@db207; docs/compiler-abi.md
+0x00054b9c	nop_54b9c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054b9c (1 bytes); Empty stub (single ret).; callers 37eac@37fd4; docs/compiler-abi.md
+0x00068a28	nop_68a28			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00068a28 (1 bytes); Empty stub (single ret).; callers 39254@392e6; docs/compiler-abi.md
+0x00076944	nop_76944			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00076944 (1 bytes); Empty stub (single ret).; callers 76704@767e6; docs/compiler-abi.md
+0x00080d88	nop_80d88			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00080d88 (1 bytes); Empty stub (single ret).; callers 3cfc0@3d1ca; docs/compiler-abi.md
+0x00081864	nop_81864			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00081864 (1 bytes); Empty stub (single ret).; callers 3dd30@3e38e; docs/compiler-abi.md
+0x000866d4	nop_866d4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000866d4 (1 bytes); Empty stub (single ret).; callers 87fe4@88038; docs/compiler-abi.md
+0x0009be0c	nop_9be0c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009be0c (1 bytes); Empty stub (single ret).; callers ee43c@ee463; docs/compiler-abi.md
+0x000e7a30	nop_e7a30			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e7a30 (1 bytes); Empty stub (single ret).; callers 581b0@581d1,581b0@5862c,581b0@58651; docs/compiler-abi.md
+0x000eb259	nop_eb259			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb259 (1 bytes); Empty stub (single ret).; callers eb25a@eb25d,eb25a@eb263,eb272@eb275; docs/compiler-abi.md
+0x000fc8c0	nop_fc8c0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc8c0 (1 bytes); Empty stub (single ret).; callers c4167@c41a7; docs/compiler-abi.md
+0x000fd162	nop_fd162			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fd162 (1 bytes); Empty stub (single ret).; callers none direct; docs/compiler-abi.md
+0x0010483c	nop_10483c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010483c (1 bytes); Empty stub (single ret).; callers 104200@1042d9,104200@104341,104200@104416; docs/compiler-abi.md
+0x000d7760	nop_d7760			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7760 (1 bytes); Empty stub (single ret).; callers 81448@8147e,81448@81565,81448@8158a; docs/compiler-abi.md
+0x0009d770	nop_9d770			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009d770 (1 bytes); Empty stub (single ret).; callers 9e0c4@9e285,9f940@9faf0,9fc00@9fdc5; docs/compiler-abi.md
+0x00054008	nop_54008			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054008 (5 bytes); Tail jump to the empty stub 0x106a8.; callers 3ea0c@3eecf; docs/compiler-abi.md
+0x0009d774	nop_9d774	[ESP+4]:uint32_t,[ESP+8]:uint32_t		ebx,ecx,edx,esi,edi,ebp	8	Original 0x0009d774 (3 bytes); Empty stub that pops two stack arguments (ret 8).; callers a0a2c@a0a6d; docs/compiler-abi.md
+0x000151c8	set_flag_151c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000151c8 (8 bytes); ; callers none direct; docs/compiler-abi.md
+0x00017474	call_2dba4_17474	AX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00017474 (9 bytes); ; callers 15b7c@15d6e,161d4@1626e,16588@165ed; docs/compiler-abi.md
+0x00039310	set_global_39310	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00039310 (7 bytes); ; callers 3dd30@3e17c,3dd30@3e188; docs/compiler-abi.md
+0x0003ce2c	return_true_3ce2c		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003ce2c (3 bytes); ; callers a9bfc@a9ca2; docs/compiler-abi.md
+0x0003efa0	get_byte_3efa0		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003efa0 (6 bytes); ; callers f3f84@f40bd; docs/compiler-abi.md
+0x0004904c	get_byte_4904c		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004904c (6 bytes); ; callers 1cde8@1ce2f,1cde8@1cef7; docs/compiler-abi.md
+0x0004b188	return_false_4b188		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004b188 (3 bytes); ; callers 4a210@4a990; docs/compiler-abi.md
+0x00054efc	set_flag_54efc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054efc (8 bytes); ; callers 581b0@583f2; docs/compiler-abi.md
+0x00057134	copy_byte_57134	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00057134 (9 bytes); Copy the byte at +1 of the record to 0x1a3649.; callers 581b0@58523; docs/compiler-abi.md
+0x0007eebc	get_flag_7eebc		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007eebc (8 bytes); ; callers 3dd30@3dd88; docs/compiler-abi.md
+0x000810ec	get_flag_810ec		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000810ec (8 bytes); ; callers 827b4@827b7; docs/compiler-abi.md
+0x00085cf8	set_mode_85cf8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00085cf8 (8 bytes); ; callers 3ea0c@3ee3c; docs/compiler-abi.md
+0x0008bde0	set_global_8bde0	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008bde0 (6 bytes); ; callers 888cc@889eb,888cc@88a70; docs/compiler-abi.md
+0x0008f3c0	return_zero_8f3c0		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008f3c0 (3 bytes); ; callers 3f7fc@3f91c; docs/compiler-abi.md
+0x000cc8e0	return_esc_cc8e0		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cc8e0 (3 bytes); Returns the ESC scan code.; callers bcf44@bcff2; docs/compiler-abi.md
+0x000ce08c	get_global_ce08c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ce08c (6 bytes); ; callers 8b39c@8b481,ac854@ac8aa; docs/compiler-abi.md
+0x000cf94a	abs_cf94a	EAX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cf94a (7 bytes); Absolute value.; callers 15b7c@15c23,15b7c@15c48,15b7c@15cf2; docs/compiler-abi.md
+0x000d76f4	set_word_d76f4	EAX:ef_addr32,DX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d76f4 (5 bytes); ; callers 7eec4@7eee5,7ef14@7f42e,7ef14@7f48e; docs/compiler-abi.md
+0x000d76fc	get_word_d76fc	EAX:ef_addr32	AX:uint16_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d76fc (5 bytes); ; callers 7ef14@7f2c3,7ef14@7f369,7ef14@7f416; docs/compiler-abi.md
+0x000d7714	set_word_d7714	EAX:ef_addr32,DX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7714 (5 bytes); ; callers 7ef14@7f3fd,7ef14@7f46e,7f850@7f901; docs/compiler-abi.md
+0x000d771c	get_high_word_d771c	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d771c (7 bytes); High word of the dword at +0xf, sign-extended.; callers 7ef14@7f264,7ef14@7f282,7ef14@7f3e8; docs/compiler-abi.md
+0x000d7730	get_dword_d7730	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7730 (4 bytes); ; callers 7fc34@7fc48,7fc34@7fc6f,7fc34@7fc92; docs/compiler-abi.md
+0x000d7754	get_dword_d7754	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7754 (4 bytes); ; callers 81394@813e0,81448@8152f,81448@8154c; docs/compiler-abi.md
+0x000d7758	set_dword_d7758	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7758 (4 bytes); ; callers 81230@812e3,81448@814c8; docs/compiler-abi.md
+0x000d775c	get_dword_d775c	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d775c (4 bytes); ; callers 81448@814dc,81448@81512; docs/compiler-abi.md
+0x000d7800	set_dword_d7800	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7800 (4 bytes); ; callers 7fcdc@7fe05; docs/compiler-abi.md
+0x000e2b54	get_global_e2b54		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e2b54 (6 bytes); ; callers c32dc@c32e0; docs/compiler-abi.md
+0x000e2fd5	get_address_e2fd5		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e2fd5 (6 bytes); ; callers e2fdb@e2fdc; docs/compiler-abi.md
+0x000ebd30	get_address_ebd30		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ebd30 (6 bytes); ; callers ebe6d@ebe70,f4db8@f4ddf,f4db8@f4df6; docs/compiler-abi.md
+0x000ebd36	get_address_ebd36		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ebd36 (6 bytes); ; callers ebe90@ebe93; docs/compiler-abi.md
+0x000fa89a	get_global_fa89a		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fa89a (6 bytes); ; callers bc471@bc479; docs/compiler-abi.md
+0x000fddb0	muldiv_fddb0	EAX:int32_t,EDX:int32_t,EBX:int32_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fddb0 (7 bytes); (a * b) / c with a 64-bit intermediate; EDX is preserved.; callers ce5f8@ce74e,ce5f8@ce766,ce5f8@ce77e; docs/compiler-abi.md
+0x00109e6c	return_zero_109e6c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00109e6c (3 bytes); ; callers none direct; docs/compiler-abi.md
+0x0010d9e0	return_zero_10d9e0		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010d9e0 (3 bytes); ; callers e9ac0@e9b0d; docs/compiler-abi.md
+0x0010d1f4	block_start_10d1f4	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010d1f4 (9 bytes); ; callers e8651@e867d; docs/compiler-abi.md

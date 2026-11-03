@@ -2055,4 +2055,62 @@ void draw_box_3bc90(int16_t colour, int32_t x, int32_t y);
 void blit_cursor_4d1ec(int32_t x, int32_t y, uint32_t key);
 void guest_fn_cec00(int32_t colour, int32_t x1, int32_t y1, int32_t x2, int32_t y2); /* 0xcec00 EAX/EDX/EBX/ECX/stack, ret 4 */
 
+/* tiny_helpers2.c */
+void nop_106a8(void);
+void nop_151c4(void);
+void nop_392fc(void);
+void nop_3930c(void);
+void nop_54b9c(void);
+void nop_68a28(void);
+void nop_76944(void);
+void nop_80d88(void);
+void nop_81864(void);
+void nop_866d4(void);
+void nop_9be0c(void);
+void nop_e7a30(void);
+void nop_eb259(void);
+void nop_fc8c0(void);
+void nop_fd162(void);
+void nop_10483c(void);
+void nop_d7760(void);
+void nop_9d770(void);
+void nop_54008(void);
+void nop_9d774(uint32_t stack_a, uint32_t stack_b);
+void set_flag_151c8(void);
+uint32_t call_2dba4_17474(int16_t index);
+void set_global_39310(int16_t value);
+uint8_t return_true_3ce2c(void);
+uint8_t get_byte_3efa0(void);
+uint8_t get_byte_4904c(void);
+uint8_t return_false_4b188(void);
+void set_flag_54efc(void);
+void copy_byte_57134(ef_addr32 record);
+uint32_t get_flag_7eebc(void);
+uint32_t get_flag_810ec(void);
+void set_mode_85cf8(void);
+void set_global_8bde0(uint32_t value);
+uint32_t return_zero_8f3c0(void);
+uint8_t return_esc_cc8e0(void);
+uint32_t get_global_ce08c(void);
+uint32_t abs_cf94a(int32_t value);
+void set_word_d76f4(ef_addr32 record, uint16_t value);
+uint16_t get_word_d76fc(ef_addr32 record);
+void set_word_d7714(ef_addr32 record, uint16_t value);
+int32_t get_high_word_d771c(ef_addr32 record);
+uint32_t get_dword_d7730(ef_addr32 record);
+uint32_t get_dword_d7754(ef_addr32 record);
+void set_dword_d7758(ef_addr32 record, uint32_t value);
+uint32_t get_dword_d775c(ef_addr32 record);
+void set_dword_d7800(ef_addr32 record, uint32_t value);
+uint32_t get_global_e2b54(void);
+uint32_t get_address_e2fd5(void);
+uint32_t get_address_ebd30(void);
+uint32_t get_address_ebd36(void);
+uint32_t get_global_fa89a(void);
+int32_t muldiv_fddb0(int32_t a, int32_t b, int32_t c);
+uint32_t return_zero_109e6c(void);
+uint32_t return_zero_10d9e0(void);
+uint32_t block_start_10d1f4(ef_addr32 block);
+
+
 #endif

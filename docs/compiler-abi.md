@@ -2802,3 +2802,63 @@ in EAX, format string address, one value).
 | `0x3bc60` | EAX:uint32_t,EDX:int32_t,EBX:int32_t | none | 3a3a8@3b038 | Draw a small cross of arm length 3 at (x, y). |
 | `0x3bc90` | AX:int16_t,EDX:int32_t,EBX:int32_t | none | 3bcc0@3bd18 | Draw a small box around (x, y); half-size 2 in mode 3, otherwise 1. |
 | `0x4d1ec` | EAX:int32_t,EDX:int32_t,EBX:uint32_t | none | 441fc@44368 | Blit the cursor image for the current screen (when the page matches key). |
+
+## tiny_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x106a8` | none | none | none direct | Empty stub (single ret). |
+| `0x151c4` | none | none | 3ce30@3ce4f,3d950@3d9c3,3db9c@3dbd4 | Empty stub (single ret). |
+| `0x392fc` | none | none | db114@db157 | Empty stub (single ret). |
+| `0x3930c` | none | none | db1c4@db207 | Empty stub (single ret). |
+| `0x54b9c` | none | none | 37eac@37fd4 | Empty stub (single ret). |
+| `0x68a28` | none | none | 39254@392e6 | Empty stub (single ret). |
+| `0x76944` | none | none | 76704@767e6 | Empty stub (single ret). |
+| `0x80d88` | none | none | 3cfc0@3d1ca | Empty stub (single ret). |
+| `0x81864` | none | none | 3dd30@3e38e | Empty stub (single ret). |
+| `0x866d4` | none | none | 87fe4@88038 | Empty stub (single ret). |
+| `0x9be0c` | none | none | ee43c@ee463 | Empty stub (single ret). |
+| `0xe7a30` | none | none | 581b0@581d1,581b0@5862c,581b0@58651 | Empty stub (single ret). |
+| `0xeb259` | none | none | eb25a@eb25d,eb25a@eb263,eb272@eb275 | Empty stub (single ret). |
+| `0xfc8c0` | none | none | c4167@c41a7 | Empty stub (single ret). |
+| `0xfd162` | none | none | none direct | Empty stub (single ret). |
+| `0x10483c` | none | none | 104200@1042d9,104200@104341,104200@104416 | Empty stub (single ret). |
+| `0xd7760` | none | none | 81448@8147e,81448@81565,81448@8158a | Empty stub (single ret). |
+| `0x9d770` | none | none | 9e0c4@9e285,9f940@9faf0,9fc00@9fdc5 | Empty stub (single ret). |
+| `0x54008` | none | none | 3ea0c@3eecf | Tail jump to the empty stub 0x106a8. |
+| `0x9d774` | [ESP+4]:uint32_t,[ESP+8]:uint32_t | none | a0a2c@a0a6d | Empty stub that pops two stack arguments (ret 8). |
+| `0x151c8` | none | none | none direct |  |
+| `0x17474` | AX:int16_t | EAX:uint32_t | 15b7c@15d6e,161d4@1626e,16588@165ed |  |
+| `0x39310` | AX:int16_t | none | 3dd30@3e17c,3dd30@3e188 |  |
+| `0x3ce2c` | none | AL:uint8_t | a9bfc@a9ca2 |  |
+| `0x3efa0` | none | AL:uint8_t | f3f84@f40bd |  |
+| `0x4904c` | none | AL:uint8_t | 1cde8@1ce2f,1cde8@1cef7 |  |
+| `0x4b188` | none | AL:uint8_t | 4a210@4a990 |  |
+| `0x54efc` | none | none | 581b0@583f2 |  |
+| `0x57134` | EAX:ef_addr32 | none | 581b0@58523 | Copy the byte at +1 of the record to 0x1a3649. |
+| `0x7eebc` | none | EAX:uint32_t | 3dd30@3dd88 |  |
+| `0x810ec` | none | EAX:uint32_t | 827b4@827b7 |  |
+| `0x85cf8` | none | none | 3ea0c@3ee3c |  |
+| `0x8bde0` | EAX:uint32_t | none | 888cc@889eb,888cc@88a70 |  |
+| `0x8f3c0` | none | EAX:uint32_t | 3f7fc@3f91c |  |
+| `0xcc8e0` | none | AL:uint8_t | bcf44@bcff2 | Returns the ESC scan code. |
+| `0xce08c` | none | EAX:uint32_t | 8b39c@8b481,ac854@ac8aa |  |
+| `0xcf94a` | EAX:int32_t | EAX:uint32_t | 15b7c@15c23,15b7c@15c48,15b7c@15cf2 | Absolute value. |
+| `0xd76f4` | EAX:ef_addr32,DX:uint16_t | none | 7eec4@7eee5,7ef14@7f42e,7ef14@7f48e |  |
+| `0xd76fc` | EAX:ef_addr32 | AX:uint16_t | 7ef14@7f2c3,7ef14@7f369,7ef14@7f416 |  |
+| `0xd7714` | EAX:ef_addr32,DX:uint16_t | none | 7ef14@7f3fd,7ef14@7f46e,7f850@7f901 |  |
+| `0xd771c` | EAX:ef_addr32 | EAX:int32_t | 7ef14@7f264,7ef14@7f282,7ef14@7f3e8 | High word of the dword at +0xf, sign-extended. |
+| `0xd7730` | EAX:ef_addr32 | EAX:uint32_t | 7fc34@7fc48,7fc34@7fc6f,7fc34@7fc92 |  |
+| `0xd7754` | EAX:ef_addr32 | EAX:uint32_t | 81394@813e0,81448@8152f,81448@8154c |  |
+| `0xd7758` | EAX:ef_addr32,EDX:uint32_t | none | 81230@812e3,81448@814c8 |  |
+| `0xd775c` | EAX:ef_addr32 | EAX:uint32_t | 81448@814dc,81448@81512 |  |
+| `0xd7800` | EAX:ef_addr32,EDX:uint32_t | none | 7fcdc@7fe05 |  |
+| `0xe2b54` | none | EAX:uint32_t | c32dc@c32e0 |  |
+| `0xe2fd5` | none | EAX:uint32_t | e2fdb@e2fdc |  |
+| `0xebd30` | none | EAX:uint32_t | ebe6d@ebe70,f4db8@f4ddf,f4db8@f4df6 |  |
+| `0xebd36` | none | EAX:uint32_t | ebe90@ebe93 |  |
+| `0xfa89a` | none | EAX:uint32_t | bc471@bc479 |  |
+| `0xfddb0` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | ce5f8@ce74e,ce5f8@ce766,ce5f8@ce77e | (a * b) / c with a 64-bit intermediate; EDX is preserved. |
+| `0x109e6c` | none | EAX:uint32_t | none direct |  |
+| `0x10d9e0` | none | EAX:uint32_t | e9ac0@e9b0d |  |
+| `0x10d1f4` | EAX:ef_addr32 | EAX:uint32_t | e8651@e867d |  |
