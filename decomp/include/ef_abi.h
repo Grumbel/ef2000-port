@@ -1832,4 +1832,26 @@ ef_addr32 guest_fn_bfcfc(ef_addr32 a, ef_addr32 b); /* 0xbfcfc EAX/EDX -> EAX */
 void guest_fn_2b708(int32_t unit); /* 0x2b708 EAX */
 void guest_fn_8873c(int32_t a, ef_addr32 unit, uint32_t c, ef_addr32 target); /* 0x8873c EAX/EDX/EBX/ECX */
 
+/* game_helpers9.c */
+void handle_owner_message_57218(ef_addr32 message);
+void clear_owner_slot_5736c(ef_addr32 message);
+void rebuild_slot_mask_58028(void);
+ef_addr32 find_node_653d8(uint32_t kind, uint32_t id);
+void fill_random_table_685ac(void);
+void reset_view_6900c(void);
+uint32_t find_named_record_699f4(ef_addr32 text);
+uint32_t next_unit_6a148(uint32_t start);
+void load_waypoint_752d0(int16_t unit_id);
+uint32_t sum_slot_weights_755c8(int16_t unit_id, uint8_t filter);
+void assign_slot_77088(ef_addr32 unit, uint8_t slot);
+uint32_t map_value_7ae0c(int32_t a, int32_t b);
+uint32_t squared_distance_7f7dc(ef_addr32 vector);
+void show_menu_value_8018c(int16_t item, uint32_t value);
+void guest_fn_56004(void); /* 0x56004 */
+void guest_fn_56208(void); /* 0x56208 */
+uint32_t guest_fn_9d524(ef_addr32 a, ef_addr32 b); /* 0x9d524 EAX/EDX */
+void guest_fn_77034(int32_t a, int32_t b); /* 0x77034 EAX/EDX */
+void guest_fn_76f58(ef_addr32 unit, ef_addr32 record); /* 0x76f58 EAX/EDX */
+uint32_t guest_fn_d70a0(uint32_t value); /* 0xd70a0 AL -> AL */
+
 #endif

@@ -2588,3 +2588,22 @@ in EAX, format string address, one value).
 | `0x55784` | EAX:ef_addr32 | none | 581b0@58602 | Release a unit's slot if it still refers to the unit's target. |
 | `0x55b80` | EAX:ef_addr32 | none | 581b0@5859b |  |
 | `0x562d8` | EAX:uint32_t,DX:int16_t | none | 561e4@56200 | Bump the per-slot counter of the first record whose key equals value. |
+
+## game_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x57218` | EAX:ef_addr32 | none | 581b0@58550 |  |
+| `0x5736c` | EAX:ef_addr32 | none | 581b0@5856e | Clear slot message[3] of the owner's table. |
+| `0x58028` | none | none | 3ea0c@3ee41 | Rebuild the bit mask of the slots 1..count-1. |
+| `0x653d8` | EAX:uint32_t,EDX:uint32_t | EAX:ef_addr32 | 6563c@65681 | Find the node with this kind and id in the list at 0x1a7c54. |
+| `0x685ac` | none | none | 3cfc0@3d1ac,3cfc0@3d1b6 | Fill 300 entries of three words with sums of two random values. |
+| `0x6900c` | none | none | 69fac@69fcf |  |
+| `0x699f4` | EAX:ef_addr32 | EAX:uint32_t | 69bdc@69bfd | Index of the 0x91-byte record whose name equals text, or 0. |
+| `0x6a148` | EAX:uint32_t | EAX:uint32_t | 73500@7355a | Next unit after start that belongs to a record of kind 1, or 0xff. |
+| `0x752d0` | AX:int16_t | none | 6a1d0@6a2c9,6a1d0@6a2d5 | Copy the waypoint selected by the unit's index into the unit. |
+| `0x755c8` | AX:int16_t,DL:uint8_t | EAX:uint32_t | 2af78@2afb0 | Sum the weights of the unit's slots whose class equals filter. |
+| `0x77088` | EAX:ef_addr32,DL:uint8_t | none | 770d4@772a7 |  |
+| `0x7ae0c` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | 7bb00@7bb2c | Read the 16-bit value at wrapped (a, b) of the 0x190x0x190 two-plane map. |
+| `0x7f7dc` | EAX:ef_addr32 | EAX:uint32_t | 7ef14@7f103,7ef14@7f1bc | Squared distance between a vector (>>8, 16-bit) and the origin at 0x21444c. |
+| `0x8018c` | AX:int16_t,EDX:uint32_t | none | 3122c@314fe,94d08@94f51 |  |

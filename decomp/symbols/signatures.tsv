@@ -1102,3 +1102,17 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00055784	release_slot_55784	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055784 (97 bytes); Release a unit's slot if it still refers to the unit's target.; callers 581b0@58602; docs/compiler-abi.md
 0x00055b80	apply_action_55b80	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055b80 (79 bytes); ; callers 581b0@5859b; docs/compiler-abi.md
 0x000562d8	bump_counter_562d8	EAX:uint32_t,DX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000562d8 (61 bytes); Bump the per-slot counter of the first record whose key equals value.; callers 561e4@56200; docs/compiler-abi.md
+0x00057218	handle_owner_message_57218	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00057218 (116 bytes); ; callers 581b0@58550; docs/compiler-abi.md
+0x0005736c	clear_owner_slot_5736c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0005736c (100 bytes); Clear slot message[3] of the owner's table.; callers 581b0@5856e; docs/compiler-abi.md
+0x00058028	rebuild_slot_mask_58028			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00058028 (107 bytes); Rebuild the bit mask of the slots 1..count-1.; callers 3ea0c@3ee41; docs/compiler-abi.md
+0x000653d8	find_node_653d8	EAX:uint32_t,EDX:uint32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000653d8 (53 bytes); Find the node with this kind and id in the list at 0x1a7c54.; callers 6563c@65681; docs/compiler-abi.md
+0x000685ac	fill_random_table_685ac			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000685ac (107 bytes); Fill 300 entries of three words with sums of two random values.; callers 3cfc0@3d1ac,3cfc0@3d1b6; docs/compiler-abi.md
+0x0006900c	reset_view_6900c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006900c (115 bytes); ; callers 69fac@69fcf; docs/compiler-abi.md
+0x000699f4	find_named_record_699f4	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000699f4 (73 bytes); Index of the 0x91-byte record whose name equals text, or 0.; callers 69bdc@69bfd; docs/compiler-abi.md
+0x0006a148	next_unit_6a148	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006a148 (100 bytes); Next unit after start that belongs to a record of kind 1, or 0xff.; callers 73500@7355a; docs/compiler-abi.md
+0x000752d0	load_waypoint_752d0	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000752d0 (113 bytes); Copy the waypoint selected by the unit's index into the unit.; callers 6a1d0@6a2c9,6a1d0@6a2d5; docs/compiler-abi.md
+0x000755c8	sum_slot_weights_755c8	AX:int16_t,DL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000755c8 (85 bytes); Sum the weights of the unit's slots whose class equals filter.; callers 2af78@2afb0; docs/compiler-abi.md
+0x00077088	assign_slot_77088	EAX:ef_addr32,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00077088 (74 bytes); ; callers 770d4@772a7; docs/compiler-abi.md
+0x0007ae0c	map_value_7ae0c	EAX:int32_t,EDX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007ae0c (123 bytes); Read the 16-bit value at wrapped (a, b) of the 0x190x0x190 two-plane map.; callers 7bb00@7bb2c; docs/compiler-abi.md
+0x0007f7dc	squared_distance_7f7dc	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007f7dc (115 bytes); Squared distance between a vector (>>8, 16-bit) and the origin at 0x21444c.; callers 7ef14@7f103,7ef14@7f1bc; docs/compiler-abi.md
+0x0008018c	show_menu_value_8018c	AX:int16_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008018c (87 bytes); ; callers 3122c@314fe,94d08@94f51; docs/compiler-abi.md
