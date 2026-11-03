@@ -383,7 +383,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00025c98	1156			unknown	unclassified	unverified		
 0x0002611c	512			unknown	unclassified	unverified		
 0x0002631c	182			unknown	unclassified	unverified		
-0x000263e0	12			unknown	unclassified	unverified		
+0x000263e0	12	reset_spatial_slot_count	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; clears high word at 0x19b376 without register inputs/outputs
 0x000263ec	55			unknown	unclassified	unverified		
 0x00026424	586			unknown	unclassified	unverified		
 0x00026670	133			unknown	unclassified	unverified		
@@ -4253,7 +4253,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001204dc	132			unknown	unclassified	unverified		
 0x00120560	486			unknown	unclassified	unverified		
 0x00120746	93			unknown	unclassified	unverified		
-0x00120800	21			unknown	unclassified	unverified		
+0x00120800	21	x87_unmask_exceptions	unk_fp_runtime	typed	asm	confirmed		docs/compiler-abi.md; CW &= 0xfff2; no GPR/stack args or outputs; FP state side effect
 0x00120928	141			unknown	unclassified	unverified		
 0x001209b5	82			unknown	unclassified	unverified		
 0x00120a07	38			unknown	unclassified	unverified		

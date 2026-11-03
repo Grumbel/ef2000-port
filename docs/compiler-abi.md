@@ -109,6 +109,67 @@ Both signatures were determined from the full callee bodies and two distinct
 callers each. Their `typed` tracker states assert **ABI only**, never patch or
 replay verification.
 
+### Confirmed void ABIs and a non-GPR side effect
+
+`reset_spatial_slot_count` (`0x263e0`) has no arguments or register return.
+It zeros a 16-bit word at `0x19b376` (the upper half of the dword at
+`0x19b374`), saving/restoring EDX while leaving all other general registers
+untouched. Callers `0x1f0fc` at `0x1f624` and `0x3a3a8` at `0x3ab19`
+neither set arguments nor consume any return. Its name is descriptive and
+provisional; the surrounding spatial counter structure needs type recovery.
+
+`x87_unmask_exceptions` (`0x120800`) is a small x87 control-word helper.
+It saves the current CW to a four-byte temporary stack slot, clears bits
+0, 2 and 3 with `AND 0xfff2` (unmasking invalid-operation, divide-by-zero,
+and overflow exceptions), loads the modified CW and restores ESP. It
+preserves every general register; **modifying x87 state is its result**.
+Caller `0x120485` invokes it at `0x1204ae`, after installing the FPU handler;
+caller `0x120746` invokes it at `0x120798`, after restoring DS from the
+handler. Neither supplies arguments or consumes GPR results. Marked
+`kind=asm` based on its explicit FPU control instructions; §3.6 may later
+identify it as part of a linked runtime library.
+
+The annotation importer maps empty outputs in `signatures.tsv` to `void`
+instead of preserving Ghidra's guessed integer return. Both void signatures
+still need original guest-state replay evidence before any C replacement.
+
+### Floating-point and segment exceptions under review
+
+The initialized image contains the 16-bit word `0x127f` at `0x17d500`.
+`0xedbe1` loads it with `fldcw`, while `0xf1072` reads it before a call to
+`0x10e810` (which later restores the caller's CW). Its precision field
+(bits 9:8 = `10`) selects **53-bit significand precision**, and rounding
+bits 11:10 = `00` select round-to-nearest. This is a runtime *path*, not a
+global claim: other functions temporarily change the control word, and we
+have not captured the live CW at gameplay checkpoints. The compiler flag
+`-fpi87` generates x87 instructions but does not establish the run-time CW.
+
+`0xf8250`: the full callee reads one 8-byte floating stack argument from
+`[esp+4]`, multiplies it by two fixed double globals and leaves the result
+at ST(0), returning with `ret 8`. Distinct callers `0xf8278` (`0xf8285`)
+and `0xf8298` (`0xf82a5`) each push two 32-bit words, call it, and pass
+the resulting x87 value to a following FP routine. This establishes a
+**stack-argument / ST(0)-return convention**, not a standard GPR return.
+It is intentionally not marked `sig_status=confirmed` until the Ghidra
+symbol importer supports this storage and the wider FP call contract.
+
+`0x120a52`: reads BL bit 2 to choose between `fst qword ptr ES:[EDI]`
+and `fst dword ptr ES:[EDI]`, without popping ST(0). Callers `0x120928`
+at `0x12097d` and `0x1209b5` at `0x1209dc` share the same BL/EDI/ST(0)
+environment. This routine depends on **ES**, which cannot silently be
+replaced with the usual DS-based flat-memory pointer when ported. Its
+unusual x87/segment contract is documented but not yet represented as a
+Ghidra custom storage signature; likely assembler or FP runtime code.
+
+`0x15c0c4`: an argument adapter starts with `enter 0,0`, reads three
+32-bit stack arguments from `[ebp+8,+12,+16]`, invokes `0xc474c`, then
+loads a fourth argument from `[ebp+20]` and calls `0x15c071`. It finishes
+with `ret 16`, so the **callee cleans up four stack arguments**. Distinct
+callers `0x5f220` at `0x5f3bb` and `0x3d4b0` at `0x3d5f1` each push four
+values, call it and test EAX for zero. The sibling `0x15c0ea` uses the
+same stack-argument wrapper pattern. Detailed type and clobber recovery is
+still pending; a default Watcom-register signature would be wrong here.
+
 ## Comparing assembly
 
 ```sh

@@ -1,4 +1,6 @@
 addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000432c	hiscore_qualifies		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x432c..0x433a; callers 0x49b2/0x4b64 test AL; docs/compiler-abi.md
+0x000263e0	reset_spatial_slot_count			eax,ebx,ecx,edx,esi,edi,ebp	0	0x263e0..0x263eb; callers 0x1f624/0x3ab19; docs/compiler-abi.md
 0x0006a1b4	lookup_indexed_object	AX:int16_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	0x6a1b4..0x6a1cd; callers 0x24087/0x247af consume EAX; docs/compiler-abi.md
 0x000b0208	list_has_matching_node	EAX:ef_addr32,DL:uint8_t,BL:uint8_t	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	0xb0208..0xb0236; callers 0xb0258/0xc149d; docs/compiler-abi.md
+0x00120800	x87_unmask_exceptions			eax,ebx,ecx,edx,esi,edi,ebp	0	0x120800..0x120814; callers 0x1204ae/0x120798; CW side effect; docs/compiler-abi.md

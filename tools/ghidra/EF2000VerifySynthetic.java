@@ -6,6 +6,7 @@ import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Data;
 import ghidra.program.model.data.DataType;
+import ghidra.program.model.data.VoidDataType;
 import ghidra.program.model.symbol.Symbol;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -21,6 +22,11 @@ public class EF2000VerifySynthetic extends GhidraScript {
                 !function.hasCustomVariableStorage() || function.getParameterCount() != 1 ||
                 !function.getReturn().getVariableStorage().toString().contains("EAX"))
             throw new IllegalStateException("function name/storage did not survive reload");
+        Function voidFunction = getFunctionAt(toAddr(0x10));
+        if (voidFunction == null || !voidFunction.getName().equals("fixture_void") ||
+                voidFunction.getParameterCount() != 0 ||
+                !voidFunction.getReturnType().isEquivalent(VoidDataType.dataType))
+            throw new IllegalStateException("void function signature did not survive reload");
         Symbol global = currentProgram.getSymbolTable().getGlobalSymbol("fixture_value", toAddr(0x20));
         Data data = getDataAt(toAddr(0x20));
         if (global == null || data == null || data.getLength() != 4 || !data.isDefined())

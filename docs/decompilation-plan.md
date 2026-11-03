@@ -365,8 +365,10 @@ remain. `abi-audit.tsv` records two distinct caller sites and linear
 instruction summaries for each candidate; the unusual `0x24480` x87/`ret 8`
 case was checked against both callers and documented in `compiler-abi.md`.
 `0x432c` has a confirmed byte-sized AL return and no arguments; within the
-worksheet, `0x6a1b4` and `0xb0208` now have confirmed register signatures
-from full callee bodies and two distinct callers each.
+worksheet, `0x6a1b4` and `0xb0208` have confirmed register signatures,
+and `0x263e0` / `0x120800` have confirmed void signatures. Documented
+ABI exceptions include ST(0) return with `ret 8` (`0xf8250`), ES:[EDI]
+memory writes (`0x120a52`), and stack-based `ret 16` (`0x15c0c4`).
 
 ### 3.6 [ ] Library identification
 
@@ -782,6 +784,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Owner's OMF fixture exposed __CHK stack probe; add -s and forbid that new unresolved dependency in flake smoke check.
 2026-11-03  3.5   Confirmed hiscore_qualifies (0x432c) signature from full callee and both callers, recording AL-only output.
 2026-11-03  3.5   Confirmed ABI at 0x6a1b4 (signed AX to EAX pointer) and 0xb0208 (EAX,DL,BL inputs; EAX Boolean).
+2026-11-03  3.5   Confirmed void ABIs 0x263e0/0x120800; documented x87 precision source 0x17d500 and three exceptional conventions.
 ```
 
 ---

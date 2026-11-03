@@ -5,7 +5,7 @@
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.listing.Function;
 
-/** Asset-free fixture: entry at zero, global data at 0x20. */
+/** Asset-free fixture: entries at zero and 0x10, global data at 0x20. */
 public class EF2000SyntheticSeed extends GhidraScript {
     @Override protected void run() throws Exception {
         if (getInstructionAt(toAddr(0)) == null && !disassemble(toAddr(0)))
@@ -13,5 +13,10 @@ public class EF2000SyntheticSeed extends GhidraScript {
         Function function = getFunctionAt(toAddr(0));
         if (function == null) function = createFunction(toAddr(0), "fixture_original");
         if (function == null) throw new IllegalStateException("cannot create fixture function");
+        if (getInstructionAt(toAddr(0x10)) == null && !disassemble(toAddr(0x10)))
+            throw new IllegalStateException("cannot disassemble void fixture");
+        Function voidFunction = getFunctionAt(toAddr(0x10));
+        if (voidFunction == null) voidFunction = createFunction(toAddr(0x10), "fixture_void_old");
+        if (voidFunction == null) throw new IllegalStateException("cannot create void function");
     }
 }

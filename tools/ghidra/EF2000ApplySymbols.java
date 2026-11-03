@@ -167,6 +167,11 @@ public class EF2000ApplySymbols extends GhidraScript {
                 if (register == null) throw new IllegalArgumentException("output register");
                 function.setReturn(type(output[1]), new VariableStorage(currentProgram, register),
                     SourceType.USER_DEFINED);
+            } else {
+                // No ABI return value means void; retaining the decompiler's
+                // guessed integer return would misrepresent this signature.
+                function.setReturn(VoidDataType.dataType, VariableStorage.VOID_STORAGE,
+                    SourceType.USER_DEFINED);
             }
             signatures++;
         }

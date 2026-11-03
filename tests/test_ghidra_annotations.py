@@ -61,7 +61,8 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='ef2000-ghidra-symbol-test-') as temp:
             root = Path(temp)
             image = root / 'synthetic.bin'
-            image.write_bytes(b'\xb8\x07\x00\x00\x00\xc3' + b'\x90' * 26 + b'\0' * 64)
+            image.write_bytes(b'\xb8\x07\x00\x00\x00\xc3' + b'\x90' * 10 +
+                              b'\xc3' + b'\x90' * 15 + b'\0' * 64)
             script_path = ghidra.SCRIPTS
             launcher = str(Path(os.environ['GHIDRA_HOME']) / 'support/analyzeHeadless')
             project = root / 'project'
@@ -78,13 +79,15 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
             symbols.mkdir()
             (symbols / 'functions.tsv').write_text(
                 'addr\tsize\tname\tmodule\tstate\tkind\tsig_status\ttest\tnotes\n'
-                '0x00000000\t6\tfixture_recovered\tfixture\ttyped\tgame\tconfirmed\t\t\n')
+                '0x00000000\t6\tfixture_recovered\tfixture\ttyped\tgame\tconfirmed\t\t\n'
+                '0x00000010\t1\tfixture_void\tfixture\ttyped\tgame\tconfirmed\t\t\n')
             (symbols / 'globals.tsv').write_text(
                 'addr\tsize\ttype\tname\tevidence\tnotes\n'
                 '0x00000020\t4\tuint32_t\tfixture_value\tsynthetic fixture\t\n')
             (symbols / 'signatures.tsv').write_text(
                 'addr\tname\tinputs\toutputs\tpreserved\tstack_bytes\tevidence\n'
-                '0x00000000\tfixture_recovered\tEAX:ef_addr32\tEAX:uint32_t\t\t0\tsynthetic fixture\n')
+                '0x00000000\tfixture_recovered\tEAX:ef_addr32\tEAX:uint32_t\t\t0\tsynthetic fixture\n'
+                '0x00000010\tfixture_void\t\t\t\t0\tvoid fixture\n')
             headers = root / 'include'
             headers.mkdir()
             (headers / 'fixture.h').write_text('struct fixture_record { unsigned int value; };\n')
