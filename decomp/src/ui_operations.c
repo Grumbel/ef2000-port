@@ -76,8 +76,8 @@ void update_ui_record_from_template(int16_t index, ef_addr32 record)
  * EDX/EBX/ECX; EAX names one fixed composite state record. */
 void update_ui_composite(void)
 {
-    guest_ui_composite_sink(0x001fcc3e, g_ui_composite_arg_d,
-                            g_ui_composite_arg_b, g_ui_composite_arg_c);
+    compose_ui_relative_vector(0x001fcc3e, g_ui_composite_arg_d,
+                               g_ui_composite_arg_b, g_ui_composite_arg_c);
 }
 
 /* 0x866e0, 64 bytes. Scan the original null-terminated array of

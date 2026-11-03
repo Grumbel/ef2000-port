@@ -1,0 +1,19 @@
+{
+  "address": "0x00083708",
+  "function_size": 42,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "subtract_two_offsets",
+      "registers": {"eax": "0x001fcc3e", "edx": 11, "ebx": 22, "ecx": 33},
+      "memory": [
+        {"address": "0x001fcc3e", "hex": "7b00c801"},
+        {"address": "0x001fcc44", "hex": "0b001100"}
+      ]
+    },
+    {
+      "name": "zero_offsets",
+      "registers": {"eax": "0x001fcc3e", "edx": 0, "ebx": 0, "ecx": 0}
+    }
+  ]
+}

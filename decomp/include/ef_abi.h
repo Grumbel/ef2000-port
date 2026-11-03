@@ -95,8 +95,8 @@ void draw_tactical_line(int32_t y1, int32_t x1, int32_t y2,
 void update_ui_record_from_template(int16_t index, ef_addr32 record); /* 0x80d40 AX/EDX */
 ef_addr32 lookup_ui_record_template(ef_addr32 table, int32_t index); /* 0x80d20 EAX/EDX */
 void update_ui_composite(void); /* 0x84370 */
-void guest_ui_composite_sink(ef_addr32 base, uint32_t d,
-                             uint32_t b, uint32_t c); /* 0x83708 */
+void compose_ui_relative_vector(ef_addr32 base, uint32_t d,
+                                uint32_t b, uint32_t c); /* 0x83708 */
 uint32_t ui_record_current_is_active(ef_addr32 record); /* 0x866e0 EAX */
 void ui_report_missing_record(ef_addr32 message); /* indirect 0x132a74 */
 void update_object_with_link(ef_addr32 object, ef_addr32 link); /* 0x8be54 EAX/EDX */
@@ -108,6 +108,27 @@ ef_addr32 next_ui_fragment(ef_addr32 string); /* 0x82da4 EAX */
 uint32_t guest_string_length(ef_addr32 string); /* 0xb1b8b EAX */
 int32_t guest_prefix_compare(ef_addr32 a, ef_addr32 b,
                              uint32_t length); /* 0xe5c03 EAX/EDX/EBX */
+
+/* Further small UI and object-state functions and their original sinks. */
+uint8_t ui_point_near_reference(int32_t x, int32_t y); /* 0x83294 EAX/EDX */
+int32_t guest_ui_distance_metric(int32_t dx, int32_t dy); /* 0xb3988 EAX/EDX */
+void guest_prepare_ui_vector(ef_addr32 base, uint32_t d,
+                             uint32_t b, uint32_t c); /* 0x83200 */
+uint8_t initialize_ui_component(void); /* 0x84514 -> AL=0 */
+void guest_copy_ui_component(ef_addr32 dest, ef_addr32 src,
+                             uint32_t length); /* 0xdc832 EAX/EDX/EBX */
+void recalculate_object_temporarily(ef_addr32 object); /* 0x89924 EAX */
+void guest_recalculate_object(ef_addr32 object); /* 0x8a318 EAX */
+void update_object_remove_link(ef_addr32 object, ef_addr32 link); /* 0x8be3c EAX/EDX */
+void guest_object_prepare_unlink(ef_addr32 object, ef_addr32 link); /* 0x8f3f4 */
+void guest_object_apply_unlink(ef_addr32 object, ef_addr32 link); /* 0x90880 */
+ef_addr32 select_validated_ui_record(ef_addr32 owner); /* 0x8b650 EAX */
+ef_addr32 guest_read_candidate_record(void); /* indirect 0x132ab4 */
+ef_addr32 guest_convert_candidate_record(ef_addr32 source); /* 0xe29e8 EAX */
+uint8_t guest_validate_candidate_record(ef_addr32 owner, ef_addr32 candidate); /* 0x132ab8 */
+void prepare_navigation_component(ef_addr32 object, ef_addr32 predicate); /* 0x92254 EAX/EDX */
+void guest_prepare_navigation_component(ef_addr32 buffer, ef_addr32 predicate,
+                                       ef_addr32 object); /* 0xdc91c EAX/EDX/EBX */
 
 /* Short clock, tactical state and coordinate helpers (host drafts). */
 uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */

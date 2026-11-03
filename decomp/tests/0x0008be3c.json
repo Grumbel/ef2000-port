@@ -1,0 +1,15 @@
+{
+  "address": "0x0008be3c",
+  "function_size": 23,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "remove_nonempty_link",
+      "registers": {"eax": "0x002a0000", "edx": "0x002a1000"}
+    },
+    {
+      "name": "remove_null_link",
+      "registers": {"eax": "0x002a0000", "edx": 0}
+    }
+  ]
+}

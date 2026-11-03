@@ -1329,6 +1329,27 @@ native guest routines are not yet recovered. Host tests exercise both branches
 and ordering; fixture schemas validate, but the runtime guest differential
 tests and OMF splices remain pending.
 
+### Line scanning and callback-driven UI state (eight-function wave)
+
+| Address | Draft | ABI and original side effects | Two independent callers |
+| --- | --- | --- | --- |
+| `0x82da4` | `next_ui_fragment` | EAX guest string; skip to CR/LF/NUL and consume any CR/LF sequence | `0x82dd0@0x82de0`, `0x82e00@0x82e29` |
+| `0x83294` | `ui_point_near_reference` | EAX/EDX coordinates minus globals `0x1fcc14/1fcc1c`, call `0xb3988`, return AL=1 on signed result ≤ `0x3b4c00` | `0x834e8@0x835eb`, `0x843b0@0x84479` |
+| `0x83708` | `compose_ui_relative_vector` | EAX buffer, EDX/EBX/ECX forwarded to `0x83200`; then subtract word offsets at `0x1fcc44/46` | `0x84370@0x8438a`, `0x84394@0x843a4` |
+| `0x84514` | `initialize_ui_component` | No arguments, set status word=1, copy 12 bytes via `0xdc832`, clear byte latch, return AL=0 | `0x84678@0x846a4`, `0x848e0@0x8499b` |
+| `0x89924` | `recalculate_object_temporarily` | EAX object, save byte +0x5a, set to 1, clear global marker, conditionally notify action 4, recalculate and restore byte | `0x86968@0x86a79`, `0x89140@0x89158` |
+| `0x8b650` | `select_validated_ui_record` | EAX owner; indirect candidate retrieval, conversion through `0xe29e8`, indirect validation, returning validated pointer or zero | `0x8b7e8@0x8b860`, `0x8bad4@0x8bb04` |
+| `0x8be3c` | `update_object_remove_link` | EAX/EDX record/link, sequence of guest callbacks `0x8f3f4` then `0x90880` | `0x87a20@0x87d02`, `0x88134@0x881a4` |
+| `0x92254` | `prepare_navigation_component` | EAX object and EDX nonzero gate, prepare `0x2143e4` through `0xdc91c`, complement both words and subtract `0x400` from first | `0x9457c@0x945be`, `0x94954@0x94a07` |
+
+Recovering `0x82da4` resolves the original delimiter syntax for the prior
+`0x82dd0` and `0x82e00` drafts: these are **CR/LF-separated lines**, not
+arbitrary token separators. The corresponding host fixtures now exercise both
+line-feed and CR/LF advancement. `0x83708` is also the direct target of the
+previous `0x84370` dispatcher, giving a recoverable two-function UI state
+path. Host behavior is tested, but the indirect guest callbacks and their
+clobbers still require differential replay.
+
 ## Comparing assembly
 
 ```sh

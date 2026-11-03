@@ -212,5 +212,12 @@ extern uint16_t g_tactical_cross_radius; /* 0x001a6ce2 */
 extern uint32_t g_ui_composite_arg_d; /* 0x001fcc2c */
 extern uint32_t g_ui_composite_arg_b; /* 0x001fcc30 */
 extern uint32_t g_ui_composite_arg_c; /* 0x001fcc34 */
+extern uint32_t g_ui_reference_x; /* 0x001fcc14 */
+extern uint32_t g_ui_reference_y; /* 0x001fcc1c */
+extern uint16_t g_ui_composite_offset_x; /* 0x001fcc44 */
+extern uint16_t g_ui_composite_offset_y; /* 0x001fcc46 */
+extern uint16_t g_ui_component_enabled; /* 0x0012b4a6 */
+extern uint8_t g_ui_component_latch; /* 0x001fcc43 */
+extern uint8_t g_ui_active_record_scan_latch; /* 0x0012d7b3 */
 
 #endif

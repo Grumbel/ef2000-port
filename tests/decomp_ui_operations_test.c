@@ -81,8 +81,8 @@ ef_addr32 lookup_ui_record_template(ef_addr32 table, int32_t index)
     return template_result;
 }
 
-void guest_ui_composite_sink(ef_addr32 base, uint32_t d,
-                             uint32_t b, uint32_t c)
+void compose_ui_relative_vector(ef_addr32 base, uint32_t d,
+                                uint32_t b, uint32_t c)
 {
     ++composites;
     last_record = base;
@@ -115,8 +115,9 @@ void guest_object_install_link(ef_addr32 object, ef_addr32 link)
 ef_addr32 next_ui_fragment(ef_addr32 string)
 {
     ++fragment_calls;
-    while (memory[string] && memory[string] != '|') { ++string; }
-    return string + (memory[string] == '|');
+    while (memory[string] && memory[string] != '\r' && memory[string] != '\n') { ++string; }
+    while (memory[string] == '\r' || memory[string] == '\n') { ++string; }
+    return string;
 }
 
 uint32_t guest_string_length(ef_addr32 string)
@@ -206,7 +207,7 @@ static void test_link(void)
 static void test_ui_fragments(void)
 {
     ef_addr32 string = 0x40000;
-    strcpy((char *)(memory + string), "prefix|suffix");
+    strcpy((char *)(memory + string), "prefix\nsuffix");
     compact_ui_fragment(string);
     assert(strcmp((const char *)(memory + string), "suffix") == 0);
     assert(fragment_calls == 1);
@@ -216,7 +217,7 @@ static void test_ui_fragments(void)
     compact_ui_fragment(string);
     assert(fragment_calls == 1);
 
-    strcpy((char *)(memory + string), "alpha|bravo|charlie|");
+    strcpy((char *)(memory + string), "alpha\nbravo\ncharlie\n");
     strcpy((char *)(memory + 0x41000), "bravo");
     assert(find_matching_ui_fragment(string, 0x41000) == string + 6);
     assert(length_calls == 1 && compare_calls == 2);

@@ -1,0 +1,25 @@
+{
+  "address": "0x00089924",
+  "function_size": 60,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "event_gate_disabled",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x00125847", "hex": "00"},
+        {"address": "0x002a005a", "hex": "43"},
+        {"address": "0x0012d7b3", "hex": "01"}
+      ]
+    },
+    {
+      "name": "event_gate_enabled",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x00125847", "hex": "01"},
+        {"address": "0x002a002c", "hex": "0000f7ff"},
+        {"address": "0x002a005a", "hex": "43"}
+      ]
+    }
+  ]
+}

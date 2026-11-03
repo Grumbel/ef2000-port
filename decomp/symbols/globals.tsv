@@ -181,3 +181,10 @@ addr	size	type	name	evidence	notes
 0x001fcc2c	4	uint32_t	g_ui_composite_arg_d	0x84384 reads	Forwarded via EDX to 83708
 0x001fcc30	4	uint32_t	g_ui_composite_arg_b	0x8437e reads	Forwarded via EBX to 83708
 0x001fcc34	4	uint32_t	g_ui_composite_arg_c	0x84378 reads	Forwarded via ECX to 83708
+0x001fcc14	4	uint32_t	g_ui_reference_x	0x8329c reads	Metric x reference
+0x001fcc1c	4	uint32_t	g_ui_reference_y	0x83296 reads	Metric y reference
+0x001fcc44	2	uint16_t	g_ui_composite_offset_x	0x83710 reads	Offset after preparation callback
+0x001fcc46	2	uint16_t	g_ui_composite_offset_y	0x83720 reads	Offset after preparation callback
+0x0012b4a6	2	uint16_t	g_ui_component_enabled	0x84525 writes	Set to one on initialization
+0x001fcc43	1	uint8_t	g_ui_component_latch	0x84538 writes	Cleared after 12-byte copy
+0x0012d7b3	1	uint8_t	g_ui_active_record_scan_latch	0x89938 writes	Cleared during object recompute

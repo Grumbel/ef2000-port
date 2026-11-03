@@ -1,0 +1,23 @@
+{
+  "address": "0x00083294",
+  "function_size": 34,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "near_reference",
+      "registers": {"eax": 55, "edx": 190},
+      "memory": [
+        {"address": "0x001fcc14", "hex": "32000000"},
+        {"address": "0x001fcc1c", "hex": "c8000000"}
+      ]
+    },
+    {
+      "name": "far_reference",
+      "registers": {"eax": "0x7fffffff", "edx": "0x80000000"},
+      "memory": [
+        {"address": "0x001fcc14", "hex": "32000000"},
+        {"address": "0x001fcc1c", "hex": "c8000000"}
+      ]
+    }
+  ]
+}

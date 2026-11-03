@@ -1583,19 +1583,19 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082bd4	27	write_ui_status_float	packet_status	drafted	game	confirmed	decomp/tests/0x00082bd4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082bf0	26			unknown	unclassified	unverified		
 0x00082cec	183			unknown	unclassified	unverified		
-0x00082da4	43			unknown	unclassified	unverified		
+0x00082da4	43	next_ui_fragment	ui_secondary	drafted	game	confirmed	decomp/tests/0x00082da4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082dd0	45	compact_ui_fragment	ui_operations	drafted	game	confirmed	decomp/tests/0x00082dd0.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082e00	61	find_matching_ui_fragment	ui_operations	drafted	game	confirmed	decomp/tests/0x00082e00.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082e40	483			unknown	unclassified	unverified		
 0x000830b8	219			unknown	unclassified	unverified		
 0x000831a4	89			unknown	unclassified	unverified		
 0x00083200	145			unknown	unclassified	unverified		
-0x00083294	34			unknown	unclassified	unverified		
+0x00083294	34	ui_point_near_reference	ui_secondary	drafted	game	confirmed	decomp/tests/0x00083294.json	docs/compiler-abi.md; host model; guest differential pending
 0x000832b8	232			unknown	unclassified	unverified		
 0x000833a0	131			unknown	unclassified	unverified		
 0x00083424	194			unknown	unclassified	unverified		
 0x000834e8	541			unknown	unclassified	unverified		
-0x00083708	42			unknown	unclassified	unverified		
+0x00083708	42	compose_ui_relative_vector	ui_secondary	drafted	game	confirmed	decomp/tests/0x00083708.json	docs/compiler-abi.md; host model; guest differential pending
 0x00083734	35			unknown	unclassified	unverified		
 0x00083a40	245			unknown	unclassified	unverified		
 0x00083b50	73			unknown	unclassified	unverified		
@@ -1605,7 +1605,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000843b0	255			unknown	unclassified	unverified		
 0x000844b0	51			unknown	unclassified	unverified		
 0x000844e4	47			unknown	unclassified	unverified		
-0x00084514	47			unknown	unclassified	unverified		
+0x00084514	47	initialize_ui_component	ui_secondary	drafted	game	confirmed	decomp/tests/0x00084514.json	docs/compiler-abi.md; host model; guest differential pending
 0x00084544	93			unknown	unclassified	unverified		
 0x000845a4	25			unknown	unclassified	unverified		
 0x000845c0	91			unknown	unclassified	unverified		
@@ -1750,7 +1750,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00089698	300			unknown	unclassified	unverified		
 0x000897c4	270			unknown	unclassified	unverified		
 0x000898d4	80			unknown	unclassified	unverified		
-0x00089924	60			unknown	unclassified	unverified		
+0x00089924	60	recalculate_object_temporarily	ui_secondary	drafted	game	confirmed	decomp/tests/0x00089924.json	docs/compiler-abi.md; host model; guest differential pending
 0x00089960	48			unknown	unclassified	unverified		
 0x00089990	69			unknown	unclassified	unverified		
 0x000899d8	231			unknown	unclassified	unverified		
@@ -1773,7 +1773,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008b39c	402	tactcom_init		named	unclassified	unverified		TACTCOM init diagnostic string; docs/ghidra-findings.md
 0x0008b530	38			unknown	unclassified	unverified		
 0x0008b5f0	38			unknown	unclassified	unverified		
-0x0008b650	50			unknown	unclassified	unverified		
+0x0008b650	50	select_validated_ui_record	ui_secondary	drafted	game	confirmed	decomp/tests/0x0008b650.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008b684	89			unknown	unclassified	unverified		
 0x0008b6e0	262			unknown	unclassified	unverified		
 0x0008b7e8	317			unknown	unclassified	unverified		
@@ -1789,7 +1789,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008bdd4	11			unknown	unclassified	unverified		
 0x0008bde0	6			unknown	unclassified	unverified		
 0x0008bde8	83			unknown	unclassified	unverified		
-0x0008be3c	23			unknown	unclassified	unverified		
+0x0008be3c	23	update_object_remove_link	ui_secondary	drafted	game	confirmed	decomp/tests/0x0008be3c.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008be54	23	update_object_with_link	ui_operations	drafted	game	confirmed	decomp/tests/0x0008be54.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008bf00	28	set_secondary_object_byte	scene_controls	drafted	game	confirmed	decomp/tests/0x0008bf00.json	docs/compiler-abi.md; Filtered lookup from signed high selector 0x1f71c8; set object+0x1d7 to incoming AL; awaiting OMF guest differential
 0x0008bf1c	57	scene_gate_allows	scene_controls	drafted	game	confirmed	decomp/tests/0x0008bf1c.json	docs/compiler-abi.md; Optional signed EAX>>8 threshold with direction switch at 0x214448; AL Boolean; awaiting OMF guest differential
@@ -1900,7 +1900,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091f30	249			unknown	unclassified	unverified		
 0x0009202c	65			unknown	unclassified	unverified		
 0x00092070	169			unknown	unclassified	unverified		
-0x00092254	59			unknown	unclassified	unverified		
+0x00092254	59	prepare_navigation_component	ui_secondary	drafted	game	confirmed	decomp/tests/0x00092254.json	docs/compiler-abi.md; host model; guest differential pending
 0x00092290	928			unknown	unclassified	unverified		
 0x00092668	793			unknown	unclassified	unverified		
 0x00092984	633			unknown	unclassified	unverified		

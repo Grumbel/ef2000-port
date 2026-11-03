@@ -1,0 +1,15 @@
+{
+  "address": "0x00084514",
+  "function_size": 47,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "initialize_component",
+      "memory": [
+        {"address": "0x001fcbb0", "hex": "0102030405060708090a0b0c"},
+        {"address": "0x0012b4a6", "hex": "0000"},
+        {"address": "0x001fcc43", "hex": "09"}
+      ]
+    }
+  ]
+}

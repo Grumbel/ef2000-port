@@ -191,3 +191,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00084370	update_ui_composite			ebx,ecx,edx	0	Original 0x84370 (35 bytes); constant EAX with three global args to 83708; callers 843b0@844a3/844b0@844da; docs/compiler-abi.md
 0x000866e0	ui_record_current_is_active	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx	0	Original 0x866e0 (64 bytes); linear scan zero-terminated pointer table; callers 86f7c@870d7/873a4@874d0; docs/compiler-abi.md
 0x0008be54	update_object_with_link	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx	0	Original 0x8be54 (23 bytes); calls 8f5d8 then 90924 with original args; callers 878c8@878f3/8873c@887aa; docs/compiler-abi.md
+0x00082da4	next_ui_fragment	EAX:ef_addr32	EAX:ef_addr32	edx	0	Original 0x82da4 (43 bytes); skip to next CR/LF-delimited fragment; callers 82dd0@82de0/82e00@82e29; docs/compiler-abi.md
+0x00083294	ui_point_near_reference	EAX:int32_t,EDX:int32_t	AL:uint8_t	ebx,ecx	0	Original 0x83294 (34 bytes); signed compare of distance metric against 3b4c00; callers 834e8@835eb/843b0@84479; docs/compiler-abi.md
+0x00083708	compose_ui_relative_vector	EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t		esi	0	Original 0x83708 (42 bytes); call 83200 before signed word offset subtraction; callers 84370@8438a/84394@843a4; docs/compiler-abi.md
+0x00084514	initialize_ui_component		AL:uint8_t	ebx,edx	0	Original 0x84514 (47 bytes); state word=1 then 12-byte copy, latch=0; callers 84678@846a4/848e0@8499b; docs/compiler-abi.md
+0x00089924	recalculate_object_temporarily	EAX:ef_addr32		ebx,ecx,edx	0	Original 0x89924 (60 bytes); temporary object flag, gated notification, callback, flag restore; callers 86968@86a79/89140@89158; docs/compiler-abi.md
+0x0008b650	select_validated_ui_record	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx	0	Original 0x8b650 (50 bytes); callback candidate read, conversion, validation; callers 8b7e8@8b860/8bad4@8bb04; docs/compiler-abi.md
+0x0008be3c	update_object_remove_link	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx	0	Original 0x8be3c (23 bytes); call 8f3f4 then 90880 with original args; callers 87a20@87d02/88134@881a4; docs/compiler-abi.md
+0x00092254	prepare_navigation_component	EAX:ef_addr32,EDX:ef_addr32		ebx	0	Original 0x92254 (59 bytes); nonzero gates, callback then NOT words and subtract 400; callers 9457c@945be/94954@94a07; docs/compiler-abi.md

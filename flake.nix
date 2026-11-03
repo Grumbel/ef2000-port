@@ -684,6 +684,12 @@
             ${source}/decomp/src/ui_operations.c \
             -o work/ui_operations_host_test
           work/ui_operations_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_ui_secondary_test.c \
+            ${source}/decomp/src/ui_secondary.c \
+            -o work/ui_secondary_host_test
+          work/ui_secondary_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

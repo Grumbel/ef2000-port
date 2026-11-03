@@ -1,0 +1,16 @@
+{
+  "address": "0x00092254",
+  "function_size": 59,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "no_object",
+      "registers": {"eax": 0, "edx": "0x002a1000"}
+    },
+    {
+      "name": "both_inputs_valid",
+      "registers": {"eax": "0x002a0000", "edx": "0x002a1000"},
+      "memory": [{"address": "0x002143e4", "hex": "23013412"}]
+    }
+  ]
+}

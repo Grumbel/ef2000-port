@@ -1,0 +1,15 @@
+{
+  "address": "0x0008b650",
+  "function_size": 50,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "null_candidate_callback",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x00132ab4", "hex": "00202a00"},
+        {"address": "0x002a2000", "hex": "31c0c3"}
+      ]
+    }
+  ]
+}

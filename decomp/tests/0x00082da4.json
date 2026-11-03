@@ -1,0 +1,17 @@
+{
+  "address": "0x00082da4",
+  "function_size": 43,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "skip_cr_lf_run",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x002a0000", "hex": "66697273740d0a0a7365636f6e6400"}]
+    },
+    {
+      "name": "already_at_end",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x002a0000", "hex": "00"}]
+    }
+  ]
+}
