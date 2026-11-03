@@ -198,3 +198,10 @@ addr	size	type	name	evidence	notes
 0x001976b0	variable	char[]	g_parser_input_text	0xe8ab reads	Command input buffer including whitespace and quote bytes
 0x00197abe	81	char[81]	g_parser_token_text	0xe8f2 writes	Eighty payload bytes plus trailing NUL
 0x00180c08	1	uint8_t	g_parser_initializer_byte	0xe7de reads	Initialization byte for input and token buffers
+0x00132e6c	120	ef_addr32[30]	g_parser_enum_names_30	0xeb09 reads	Thirty-name command enum dictionary
+0x00132d34	156	ef_addr32[39]	g_parser_enum_names_39	0xeb59 reads	Thirty-nine-name command enum dictionary
+0x001333f8	72	ef_addr32[18]	g_parser_enum_names_18	0xebad reads	Eighteen-name command enum dictionary
+0x00133488	108	ef_addr32[27]	g_parser_enum_names_27	0xebfd reads	Twenty-seven-name command enum dictionary
+0x00132fb4	424	ef_addr32[106]	g_parser_enum_names_106	0xec9d reads	One-hundred-six-name command enum dictionary
+0x0013336c	40	ef_addr32[10]	g_parser_enum_names_10	0xecf1 reads	Ten-name command enum dictionary
+0x00132c2c	76	ef_addr32[19]	g_parser_enum_names_19	0xed41 reads	Nineteen-name command enum dictionary

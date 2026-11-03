@@ -140,6 +140,14 @@ int32_t read_parser_integer(void); /* 0xe95c -> EAX or -1 for empty */
 ef_addr32 duplicate_parser_token(void); /* 0xe990 -> EAX allocated text */
 uint32_t read_parser_enum(void); /* 0xe9bc -> EAX enum index */
 uint32_t read_parser_six_field_record(ef_addr32 destination); /* 0xee5c EAX -> EAX=1 */
+uint32_t read_parser_enum_two_families(void); /* 0xea0c -> EAX 0..3 */
+uint32_t read_parser_enum_30_names(void); /* 0xeaf8 -> EAX index */
+uint32_t read_parser_enum_39_names(void); /* 0xeb48 -> EAX index */
+uint32_t read_parser_enum_18_names(void); /* 0xeb9c -> EAX index */
+uint32_t read_parser_enum_27_names(void); /* 0xebec -> EAX index */
+uint32_t read_parser_enum_106_names(void); /* 0xec8c -> EAX index */
+uint32_t read_parser_enum_10_names(void); /* 0xece0 -> EAX index */
+uint32_t read_parser_enum_19_names(void); /* 0xed30 -> EAX index */
 
 /* Unrecovered original conversion/allocation/diagnostic interfaces. */
 void guest_release_parser_buffer(ef_addr32 buffer); /* 0xcc768 EAX */

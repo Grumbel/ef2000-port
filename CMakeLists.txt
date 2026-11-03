@@ -203,6 +203,13 @@ target_compile_options(ef2000-decomp-parser-records-test PRIVATE -Wall -Wextra -
 target_compile_definitions(ef2000-decomp-parser-records-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-parser-records-test PRIVATE decomp/include)
 add_test(NAME decomp-parser-records-host-model COMMAND ef2000-decomp-parser-records-test)
+add_executable(ef2000-decomp-parser-enums-test
+  tests/decomp_parser_enums_test.c decomp/src/parser_enums.c)
+target_compile_features(ef2000-decomp-parser-enums-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-parser-enums-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-parser-enums-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-parser-enums-test PRIVATE decomp/include)
+add_test(NAME decomp-parser-enums-host-model COMMAND ef2000-decomp-parser-enums-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

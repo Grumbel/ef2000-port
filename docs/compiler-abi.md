@@ -1382,6 +1382,33 @@ and whole-game replay remain outstanding. In particular, the indirect
 allocator and error reporter are modeled with host stubs; the fixture for
 the former supplies a synthetic guest allocator return.
 
+## Seven dictionary enums and two literal families (2026-11-03)
+
+Eight nearby original parsing functions share the `0xe89c` tokenizer
+and `0xa4380` zero-on-match string comparison. The following signatures
+have two independently identified callers each:
+
+| Entry | Enum source | Distinct caller instructions | Failure format |
+| --- | --- | --- | --- |
+| `0xea0c` | literal addresses `0x180c84/88/8c/90`, `0x180c94/9c/a4/ac` | `0xf614`, `0xfd02` | `0x180cb4` |
+| `0xeaf8` | 30 pointers at `0x132e6c` | `0xee38`, `0xf62f` | `0x180cf0` |
+| `0xeb48` | 39 pointers at `0x132d34` | `0xf360`, `0xfd1a` | `0x180d2c` |
+| `0xeb9c` | 18 pointers at `0x1333f8` | `0xf37e`, `0xfd24` | `0x180d68` |
+| `0xebec` | 27 pointers at `0x133488` | `0xf39c`, `0xfd2e` | `0x180da0` |
+| `0xec8c` | 106 pointers at `0x132fb4` | `0xef0e`, `0xf27a` | `0x180e18` |
+| `0xece0` | 10 pointers at `0x13336c` | `0xf3c7`, `0xf644` | `0x180e54` |
+| `0xed30` | 19 pointers at `0x132c2c` | `0xedbe`, `0xee30` | `0x180e8c` |
+
+All eight return a full EAX zero-based index, with zero also serving
+as the failure return after an indirect diagnostic at `[0x132a74]`.
+The two-family parser maps both groups to values 0, 1, 2, 3, and does
+not report an error when the zero-value guard string matches.
+The seven tables use dword byte offsets with strict less-than
+comparisons, never a NULL-pointer sentinel. The new C drafts
+share a helper but retain the per-entry table bounds and diagnostics.
+Host tests check first and last dictionary matches and all not-found
+paths; guest fixtures are structural plans only.
+
 ## Comparing assembly
 
 ```sh

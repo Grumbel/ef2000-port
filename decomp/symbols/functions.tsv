@@ -190,15 +190,15 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000e980	15	read_parser_decimal	parser_records	drafted	game	confirmed	decomp/tests/0x000e980.json	Original 0xe980; token then conversion tail jump; docs/compiler-abi.md; guest replay pending
 0x0000e990	41	duplicate_parser_token	parser_records	drafted	game	confirmed	decomp/tests/0x000e990.json	Original 0xe990; strlen plus one, indirect guest allocation, guest string copy; docs/compiler-abi.md; guest replay pending
 0x0000e9bc	79	read_parser_enum	parser_records	drafted	game	confirmed	decomp/tests/0x000e9bc.json	Original 0xe9bc; 11-name match and indirect error callback; docs/compiler-abi.md; guest replay pending
-0x0000ea0c	234			unknown	unclassified	unverified		
-0x0000eaf8	79			unknown	unclassified	unverified		
-0x0000eb48	82			unknown	unclassified	unverified		
-0x0000eb9c	79			unknown	unclassified	unverified		
-0x0000ebec	79			unknown	unclassified	unverified		
+0x0000ea0c	234	read_parser_enum_two_families	parser_enums	drafted	game	confirmed	decomp/tests/0x000ea0c.json	Two grouped literal families, each maps to 0..3; callers f604@f614/fcf4@fd02; guest pending
+0x0000eaf8	79	read_parser_enum_30_names	parser_enums	drafted	game	confirmed	decomp/tests/0x000eaf8.json	30 names, table 132e6c; callers ee0c@ee38/f604@f62f; guest pending
+0x0000eb48	82	read_parser_enum_39_names	parser_enums	drafted	game	confirmed	decomp/tests/0x000eb48.json	39 names, table 132d34; callers f314@f360/fcf4@fd1a; guest pending
+0x0000eb9c	79	read_parser_enum_18_names	parser_enums	drafted	game	confirmed	decomp/tests/0x000eb9c.json	18 names, table 1333f8; callers f314@f37e/fcf4@fd24; guest pending
+0x0000ebec	79	read_parser_enum_27_names	parser_enums	drafted	game	confirmed	decomp/tests/0x000ebec.json	27 names, table 133488; callers f314@f39c/fcf4@fd2e; guest pending
 0x0000ec3c	79			unknown	unclassified	unverified		
-0x0000ec8c	82			unknown	unclassified	unverified		
-0x0000ece0	79			unknown	unclassified	unverified		
-0x0000ed30	79			unknown	unclassified	unverified		
+0x0000ec8c	82	read_parser_enum_106_names	parser_enums	drafted	game	confirmed	decomp/tests/0x000ec8c.json	106 names, table 132fb4; callers eefc@ef0e/f260@f27a; guest pending
+0x0000ece0	79	read_parser_enum_10_names	parser_enums	drafted	game	confirmed	decomp/tests/0x000ece0.json	10 names, table 13336c; callers f314@f3c7/f604@f644; guest pending
+0x0000ed30	79	read_parser_enum_19_names	parser_enums	drafted	game	confirmed	decomp/tests/0x000ed30.json	19 names, table 132c2c; callers ed80@edbe/ee0c@ee30; guest pending
 0x0000ed80	137			unknown	unclassified	unverified		
 0x0000ee0c	77			unknown	unclassified	unverified		
 0x0000ee5c	65	read_parser_six_field_record	parser_records	drafted	game	confirmed	decomp/tests/0x000ee5c.json	Original 0xee5c; three dword values followed by three truncated words; docs/compiler-abi.md; guest replay pending

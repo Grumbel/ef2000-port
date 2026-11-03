@@ -207,3 +207,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000e990	duplicate_parser_token		EAX:ef_addr32	ebx,edx	0	Original 0xe990 (41 bytes); indirect allocator and guest copy; callers eefc@ef15/f260@f282; docs/compiler-abi.md
 0x0000e9bc	read_parser_enum		EAX:uint32_t	ebx,ecx,edx	0	Original 0xe9bc (79 bytes); 11-slot linear match plus indirect reporter; callers f260@f272/f604@f627; docs/compiler-abi.md
 0x0000ee5c	read_parser_six_field_record	EAX:ef_addr32	EAX:uint32_t	edx	0	Original 0xee5c (65 bytes); 3 dwords and 3 low words, returns 1; callers f260@f2ba/f314@f509; docs/compiler-abi.md
+0x0000ea0c	read_parser_enum_two_families		EAX:uint32_t	edx	0	Original 0xea0c (234 bytes); two literal groups 0..3, callers f604@f614/fcf4@fd02; docs/compiler-abi.md
+0x0000eaf8	read_parser_enum_30_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xeaf8 (79 bytes); 30 names, callers ee0c@ee38/f604@f62f; docs/compiler-abi.md
+0x0000eb48	read_parser_enum_39_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xeb48 (82 bytes); 39 names, callers f314@f360/fcf4@fd1a; docs/compiler-abi.md
+0x0000eb9c	read_parser_enum_18_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xeb9c (79 bytes); 18 names, callers f314@f37e/fcf4@fd24; docs/compiler-abi.md
+0x0000ebec	read_parser_enum_27_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xebec (79 bytes); 27 names, callers f314@f39c/fcf4@fd2e; docs/compiler-abi.md
+0x0000ec8c	read_parser_enum_106_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xec8c (82 bytes); 106 names, callers eefc@ef0e/f260@f27a; docs/compiler-abi.md
+0x0000ece0	read_parser_enum_10_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xece0 (79 bytes); 10 names, callers f314@f3c7/f604@f644; docs/compiler-abi.md
+0x0000ed30	read_parser_enum_19_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xed30 (79 bytes); 19 names, callers ed80@edbe/ee0c@ee30; docs/compiler-abi.md
