@@ -20,6 +20,11 @@ class WatcomWrapperTests(unittest.TestCase):
                 for flag in ef2000_wcc.FLAGS:
                     self.assertIn(flag, argv)
                 self.assertIn('-s', argv)  # No unresolved __CHK dependency.
+                self.assertIn('-3r', argv)
+                self.assertIn('-fpi87', argv)
+                self.assertIn('-fp3', argv)
+                self.assertIn('-zp1', argv)
+                self.assertNotIn('-on', argv)  # No numerically unstable math.
                 self.assertIn('-fo=' + str(output), argv)
                 output.write_bytes(b'fictional OMF fixture')
             result = ef2000_wcc.compile_module(

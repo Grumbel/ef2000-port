@@ -18,7 +18,9 @@ ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'decomp/src'
 # -s suppresses the default __CHK stack-probe call. Until we can resolve
 # the original runtime symbols, generated game code must not add one.
-FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-s', '-wx')
+# Initial functional-compatibility profile, not a claim about the game's
+# original compiler switches. Avoid numerically unstable FP optimizations.
+FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-fp3', '-ob', '-ot', '-s', '-wx')
 
 
 def compile_module(source, *, compiler='wcc386', output=None, execute=subprocess.run):

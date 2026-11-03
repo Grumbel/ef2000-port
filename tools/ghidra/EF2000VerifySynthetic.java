@@ -35,6 +35,12 @@ public class EF2000VerifySynthetic extends GhidraScript {
         currentProgram.getDataTypeManager().findDataTypes("fixture_record", types);
         if (types.isEmpty() || types.stream().noneMatch(t -> t.getLength() == 4))
             throw new IllegalStateException("CParser struct was not retained");
+        types.clear();
+        currentProgram.getDataTypeManager().findDataTypes("fixture_packed", types);
+        if (types.stream().noneMatch(t -> t instanceof ghidra.program.model.data.Structure &&
+                t.getLength() == 9 &&
+                ((ghidra.program.model.data.Structure) t).getComponent(1).getOffset() == 5))
+            throw new IllegalStateException("packed struct layout did not survive reload");
         Files.writeString(Paths.get(args[0]), "verified\n", StandardCharsets.UTF_8);
     }
 }

@@ -7,13 +7,32 @@ This is a working evidence log, **not** a verified global calling convention.
 The image is the SHA-pinned German TACTCOM X-32 payload. Ground signatures
 in original disassembly and caller behavior, not in Ghidra's guesses.
 
-## Provisional compiler flags
+## Canonical first-pass compiler flags
 
-`ef2000-wcc` currently uses `-bt=dos -3r -zp1 -fpi87 -s -wx`. These are
-bootstrap flags for producing OMF, **not evidence** that the original binary
-used these switches. Step 3.5 must establish the actual register ABI, x87
-precision/control word, struct packing and optimizer constraints before
-compiling recovered game logic. Binary matching is not a goal.
+`ef2000-wcc` currently uses
+`-bt=dos -3r -zp1 -fpi87 -fp3 -ob -ot -s -wx`. These are the chosen
+**functional first-pass profile**, not evidence that the original binary
+used these switches. Binary matching is not a goal; guest RAM and observable
+behavior are. Compare any revised flags against the original with §3.10
+differential testing before treating recovered C functions as verified.
+
+- OpenWatcom **2.0** is the selected compiler; 1.9 remains in the shell for
+  library fingerprint comparison. The owner has verified the 2.0 OMF check.
+- `-3r` selects 386-targeted register argument passing. This is a portable
+  conservative baseline, not a claim that the game was built for a 386.
+  Calls with stack parameters or x87 returns require explicit treatment.
+- `-zp1` matches the confirmed 25-byte packed high-score record with score
+  at `+21`. The host C type is also explicitly packed; do not infer all
+  unknown game structures have one-byte alignment.
+- `-fpi87 -fp3` generates inline 387-compatible x87 instructions. The guest
+  execution context supplies the live FP control word; neither switch fixes
+  it. Avoid `-on` (numerically unstable), `-op` (forces intermediate spills),
+  `-om` (math intrinsic replacement) and aggressive `-ox` until differential
+  evidence supports them.
+- `-ob -ot` requests branch/time-oriented optimizations without enabling
+  numerical rearrangement. `-s` omits runtime stack probes, and `-wx`
+  requests maximal warnings. Compiler and patch results must still be
+  tested function by function.
 
 The Nixpkgs wrapped compiler supplies `WATCOM`, `INCLUDE` and the host
 `binl64`/`binl` search path. The v2 wrapper is explicitly selected even when
@@ -55,6 +74,13 @@ Packing evidence: the high-score record occupies 25 bytes with a signed
 32-bit score at unaligned offset `+21`. The GUI icon `next` pointer at `+0x21`
 is another candidate for packed layout. These observations do not prove
 every structure in the original program was packed to one byte.
+
+`decomp/include/ef_structs/hiscore.h` now declares the 25-byte record with
+explicit packing on native compilers and the Watcom `-zp1` profile.
+`decomp/tests/fixture.c` uses C89 compile-time assertions for the record
+size and each field offset (0, 20, 21). The Watcom OMF smoke check compiles
+these assertions, so it also guards the guest layout. The Ghidra symbol
+importer retains one-byte packing for structures marked `EF_PACKED`.
 
 ### Confirmed signature: `hiscore_qualifies` (`0x432c`)
 
@@ -201,5 +227,6 @@ noncontiguous: the window is a diagnostic aid, not an exact body export.
    and segment assumptions from disassembly and at least two callers each.
 3. Record confirmed signatures in `decomp/symbols/signatures.tsv`, adding
    `#pragma aux` declarations only when justified by evidence.
-4. Compare `-3r`/`-5r`, packing, optimizer and FP options, then update
-   `ef2000-wcc` and this document. No game C replacement is verified yet.
+4. When differential replay becomes available, evaluate `-5r` and stronger
+   optimizations on equivalent RAM traces. The selected 2.0 flags above are
+   suitable for the first C/OMF experiments, not final proof of correctness.

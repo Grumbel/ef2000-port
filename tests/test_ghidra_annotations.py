@@ -90,7 +90,11 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
                 '0x00000010\tfixture_void\t\t\t\t0\tvoid fixture\n')
             headers = root / 'include'
             headers.mkdir()
-            (headers / 'fixture.h').write_text('struct fixture_record { unsigned int value; };\n')
+            (headers / 'fixture.h').write_text(
+                'struct fixture_record { unsigned int value; };\n'
+                'typedef struct EF_PACKED fixture_packed {\n'
+                '  char name[5]; unsigned int value;\n'
+                '} fixture_packed;\n')
             marker = root / 'done'
             args = [str(symbols / name) for name in
                     ('functions.tsv', 'globals.tsv', 'signatures.tsv')]

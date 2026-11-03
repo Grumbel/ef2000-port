@@ -73,6 +73,12 @@ public class EF2000ApplySymbols extends GhidraScript {
             for (Path header : (Iterable<Path>) files.filter(p -> p.toString().endsWith(".h"))
                     .sorted()::iterator) {
                 String source = Files.readString(header);
+                // EF_PACKED is empty for Watcom (-zp1) and GCC's attribute
+                // for native code. Preserve its intent in the Ghidra DTM.
+                Set<String> packedNames = new HashSet<>();
+                java.util.regex.Matcher packed = java.util.regex.Pattern.compile(
+                    "\\bstruct\\s+EF_PACKED\\s+([A-Za-z_]\\w*)").matcher(source);
+                while (packed.find()) packedNames.add(packed.group(1));
                 source = source.replaceAll("(?m)^\\s*#.*$", "");
                 source = source.replace("EF_PACKED", "");
                 // ef_globals.h contains extern declarations with overlaps;
@@ -85,6 +91,9 @@ public class EF2000ApplySymbols extends GhidraScript {
                     // CParser's dictionary is transient unless its recovered
                     // composites are explicitly installed in the program DTM.
                     for (DataType dataType : parser.getComposites().values()) {
+                        if (packedNames.contains(dataType.getName()) &&
+                                dataType instanceof Composite)
+                            ((Composite) dataType).setExplicitPackingValue(1);
                         currentProgram.getDataTypeManager().addDataType(dataType,
                             DataTypeConflictHandler.DEFAULT_HANDLER);
                     }
