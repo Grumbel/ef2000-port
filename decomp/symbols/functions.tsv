@@ -499,7 +499,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002e494	681			unknown	unclassified	unverified		
 0x0002e740	461			unknown	unclassified	unverified		
 0x0002e910	57	grid_event_matches	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002e910.json	AL/DL truth table tested across all 65536 byte pairs
-0x0002f740	160			unknown	unclassified	unverified		
+0x0002f740	160	draw_markers_2f740	game_helpers17	compiles	game	confirmed	decomp/tests/0x0002f740.json	docs/compiler-abi.md; Draw every marker of the 16-byte table that is in range.; callers 3dd30@3e1e4; guest pending
 0x0002fbc4	895			unknown	unclassified	unverified		
 0x0002ff44	720			unknown	unclassified	unverified		
 0x00030214	4119			unknown	unclassified	unverified		
@@ -633,7 +633,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003739c	250			unknown	unclassified	unverified		
 0x00037498	1180			unknown	unclassified	unverified		
 0x00037934	525			unknown	unclassified	unverified		
-0x00037b44	129			unknown	unclassified	unverified		
+0x00037b44	129	find_record_at_cell_37b44	game_helpers17	compiles	game	confirmed	decomp/tests/0x00037b44.json	docs/compiler-abi.md; Index of the last 0x45-byte record whose position cell is (x, y), or 0xff.; callers 8748@87dc; guest pending
 0x00037bc8	66			unknown	unclassified	unverified		
 0x00037c0c	86			unknown	unclassified	unverified		
 0x00037c64	117			unknown	unclassified	unverified		
@@ -652,7 +652,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00038658	26	resolve_link_pointer	link_resolution	compiles	game	confirmed	decomp/tests/0x00038658.json	docs/compiler-abi.md; AX signed table index and EDX candidate pointer; prefer candidate +0x15 alternate else fixed four-byte table; original guest replacement unverified
 0x00038674	97	count_live_38674	game_helpers7	compiles	game	confirmed	decomp/tests/0x00038674.json	docs/compiler-abi.md; Number of live, non-flagged objects in the ten word slots of entry index.; callers 15b7c@15c97,15b7c@15cc4,15b7c@15da6; guest pending
 0x000386f8	80	node_position_386f8	game_helpers7	compiles	game	confirmed	decomp/tests/0x000386f8.json	docs/compiler-abi.md; Position of the entry's node in its list.; callers d290@d4ca; guest pending
-0x00038750	144			unknown	unclassified	unverified		
+0x00038750	144	set_scaled_table_38750	game_helpers17	compiles	game	confirmed	decomp/tests/0x00038750.json	docs/compiler-abi.md; Store a scaled set of 18 percentages, or mark the slot unused.; callers 22f28@22f8d; guest pending
 0x000387e0	1030			unknown	unclassified	unverified		
 0x00038be8	251			unknown	unclassified	unverified		
 0x00039180	5			unknown	unclassified	unverified		
@@ -668,7 +668,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00039548	507			unknown	unclassified	unverified		
 0x00039744	303			unknown	unclassified	unverified		
 0x00039874	227			unknown	unclassified	unverified		
-0x00039960	170			unknown	unclassified	unverified		
+0x00039960	170	build_circle_39960	game_helpers17	compiles	game	confirmed	decomp/tests/0x00039960.json	docs/compiler-abi.md; Build the 0x1a17c0/0x1a1810 ellipse tables (radii 10 and 8).; callers 39a0c@39a1f; guest pending
 0x00039a0c	677			unknown	unclassified	unverified		
 0x00039cb4	238			unknown	unclassified	unverified		
 0x00039db0	20			unknown	unclassified	unverified		
@@ -730,7 +730,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003f370	1126			unknown	unclassified	unverified		
 0x0003f7fc	2477			unknown	unclassified	unverified		
 0x000401ac	634			unknown	unclassified	unverified		
-0x00040428	145			unknown	unclassified	unverified		
+0x00040428	145	refresh_selected_unit_40428	game_helpers17	compiles	game	confirmed	decomp/tests/0x00040428.json	docs/compiler-abi.md; Clear the 320x200 view and refresh the unit selected by the current key.; callers 3dd30@3e435; guest pending
 0x000404bc	358			unknown	unclassified	unverified		
 0x00040624	125			unknown	unclassified	unverified		
 0x00040774	54	clock_words_to_seconds	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00040774.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
@@ -828,7 +828,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00048798	175			unknown	unclassified	unverified		
 0x00048848	175			unknown	unclassified	unverified		
 0x000488f8	99	set_unit_mode_488f8	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x000488f8.json	docs/compiler-abi.md; Store a mode byte in unit AX and send the matching request.; callers 857bc@85933; guest pending
-0x00048ae8	140			unknown	unclassified	unverified		
+0x00048ae8	140	classify_entry_48ae8	game_helpers17	compiles	game	confirmed	decomp/tests/0x00048ae8.json	docs/compiler-abi.md; Classify an entry: 0/1 for ordinary, 2 for kind 2, logs unknown kinds.; callers 77c90@77dff; guest pending
 0x00048bb0	131			unknown	unclassified	unverified		
 0x00048c34	91			unknown	unclassified	unverified		
 0x00048c90	201			unknown	unclassified	unverified		

@@ -2731,3 +2731,14 @@ in EAX, format string address, one value).
 | `0x2b3b0` | AX:int16_t,DL:uint8_t | none | 2b0b4@2b125,2b0b4@2b14a | Send a command to each of the owner's seven linked units that accept it. |
 | `0x2b444` | AX:int16_t,DL:uint8_t | none | 2b1f4@2b253,2b1f4@2b2ce,2b1f4@2b319 | Send a command to a unit, then pair it with each accepting unit of its owner. |
 | `0x2c6dc` | AX:int16_t | AL:uint8_t | 2c778@2cbd7 | Nonzero (1) when the owner fails the check selected by its record type. |
+
+## game_helpers17 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2f740` | none | none | 3dd30@3e1e4 | Draw every marker of the 16-byte table that is in range. |
+| `0x37b44` | AX:int16_t,DX:int16_t | EAX:uint32_t | 8748@87dc | Index of the last 0x45-byte record whose position cell is (x, y), or 0xff. |
+| `0x38750` | AX:uint16_t,DX:uint16_t,BX:uint16_t,CL:uint8_t,[ESP+4]:uint8_t,[ESP+8]:uint8_t,[ESP+12]:uint8_t | none | 22f28@22f8d | Store a scaled set of 18 percentages, or mark the slot unused. |
+| `0x39960` | none | none | 39a0c@39a1f | Build the 0x1a17c0/0x1a1810 ellipse tables (radii 10 and 8). |
+| `0x40428` | none | none | 3dd30@3e435 | Clear the 320x200 view and refresh the unit selected by the current key. |
+| `0x48ae8` | AX:int16_t,DX:int16_t | EAX:uint32_t | 77c90@77dff | Classify an entry: 0/1 for ordinary, 2 for kind 2, logs unknown kinds. |

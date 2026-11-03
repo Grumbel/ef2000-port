@@ -1991,4 +1991,16 @@ uint32_t guest_fn_2bbd0(int32_t a); /* 0x2bbd0 EAX -> AX */
 uint32_t guest_fn_2bfcc(int32_t a); /* 0x2bfcc EAX -> AL */
 uint32_t guest_fn_2c17c(int32_t a); /* 0x2c17c EAX -> AL */
 
+/* game_helpers17.c */
+void draw_markers_2f740(void);
+uint32_t find_record_at_cell_37b44(int16_t x, int16_t y);
+void set_scaled_table_38750(uint16_t a, uint16_t b, uint16_t scale, uint8_t d, uint8_t stack_e, uint8_t stack_f, uint8_t stack_g);
+void build_circle_39960(void);
+void refresh_selected_unit_40428(void);
+uint32_t classify_entry_48ae8(int16_t unit_id, int16_t entry);
+void guest_fn_a0ea8(int32_t a, uint32_t b, int32_t c, uint32_t d); /* 0xa0ea8 EAX/EDX/EBX/ECX */
+uint32_t guest_fn_cd7f0(int32_t value); /* 0xcd7f0 EAX -> EAX */
+void guest_fn_401ac(int32_t owner, uint32_t b, uint32_t c); /* 0x401ac EAX/EDX/EBX */
+void guest_fn_cd12e(ef_addr32 format, uint32_t a, uint32_t b); /* 0xcd12e cdecl */
+
 #endif
