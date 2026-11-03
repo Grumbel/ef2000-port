@@ -1,0 +1,43 @@
+{
+  "address": "0x0008bf00",
+  "function_size": 28,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "missing_object",
+      "registers": {
+        "eax": "0x0000005a"
+      },
+      "memory": [
+        {
+          "address": "0x001f71c8",
+          "hex": "0000ff7f"
+        },
+        {
+          "address": "0x002119f4",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "selected_object",
+      "registers": {
+        "eax": "0xabcdef5a"
+      },
+      "memory": [
+        {
+          "address": "0x001f71c8",
+          "hex": "00000200"
+        },
+        {
+          "address": "0x002119f4",
+          "hex": "08000000"
+        },
+        {
+          "address": "0x0020f558",
+          "hex": "00002a00"
+        }
+      ]
+    }
+  ]
+}

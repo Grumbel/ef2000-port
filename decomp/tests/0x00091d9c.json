@@ -1,0 +1,25 @@
+{
+  "address": "0x00091d9c",
+  "function_size": 85,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_angles",
+      "registers": {
+        "eax": "0x00000000",
+        "edx": "0x00000000",
+        "ebx": "0x00000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "signed_mixed_angles",
+      "registers": {
+        "eax": "0x1234fffe",
+        "edx": "0x56781234",
+        "ebx": "0x98768001"
+      },
+      "memory": []
+    }
+  ]
+}

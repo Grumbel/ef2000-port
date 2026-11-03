@@ -1,0 +1,57 @@
+{
+  "address": "0x00088c54",
+  "function_size": 43,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "unit_scales",
+      "registers": {
+        "eax": "0x002a0000",
+        "edx": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "0c000000"
+        },
+        {
+          "address": "0x0018a468",
+          "hex": "000000000000f03f"
+        },
+        {
+          "address": "0x0018a470",
+          "hex": "000000000000f03f"
+        }
+      ]
+    },
+    {
+      "name": "signed_axis_input",
+      "registers": {
+        "eax": "0x002a0000",
+        "edx": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "feffffff"
+        },
+        {
+          "address": "0x002a0004",
+          "hex": "11000000"
+        },
+        {
+          "address": "0x002a0008",
+          "hex": "f7ffffff"
+        },
+        {
+          "address": "0x0018a468",
+          "hex": "000000000000e03f"
+        },
+        {
+          "address": "0x0018a470",
+          "hex": "0000000000000040"
+        }
+      ]
+    }
+  ]
+}

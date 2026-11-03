@@ -1,0 +1,43 @@
+{
+  "address": "0x00088d30",
+  "function_size": 25,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_vectors",
+      "registers": {
+        "eax": "0x002a0200",
+        "edx": "0x002a0000",
+        "ebx": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "0000000000000000"
+        },
+        {
+          "address": "0x002a0100",
+          "hex": "0000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "signed_components",
+      "registers": {
+        "eax": "0x002a0200",
+        "edx": "0x002a0000",
+        "ebx": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "000000000000f03f"
+        },
+        {
+          "address": "0x002a0100",
+          "hex": "00000000000000c0"
+        }
+      ]
+    }
+  ]
+}

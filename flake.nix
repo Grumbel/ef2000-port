@@ -616,6 +616,13 @@
             ${source}/decomp/src/indexed_objects.c \
             -o work/buffer_plane_host_test
           work/buffer_plane_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_scene_controls_vectors_test.c \
+            ${source}/decomp/src/scene_controls.c \
+            ${source}/decomp/src/vector_math.c \
+            -lm -o work/scene_controls_vectors_host_test
+          work/scene_controls_vectors_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

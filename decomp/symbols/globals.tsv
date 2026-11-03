@@ -69,3 +69,17 @@ addr	size	type	name	evidence	notes
 0x001f8eb8	4	ef_addr32	g_active_plane_low	0x7aac0 writes/0x7b2f4 reads	Low-plane bytes of 400-byte rows
 0x001f8ea4	4	ef_addr32	g_active_plane_aux	0x7aac0 writes	Extra selected field not read by 0x7b2f4
 0x0012dbc4	1	uint8_t	g_scene_refresh_pending	0x95018 writes	Unconditional refresh latch set to one
+0x00198442	2	int16_t	g_render_feature_index	0x8f62c writes	Signed low AX configuration selector
+0x0019842e	2	int16_t	g_render_feature_limit	0x8f632 writes	Literal 50 stored as word
+0x00198444	2	int16_t	g_render_feature_enabled	0x8f639 writes	Literal 1 stored as word
+0x00425bc8	2	int16_t	g_scene_gate_enabled	0x8bf21 reads	Zero bypasses scene gate
+0x00425bce	4	int32_t	g_scene_gate_target_packed	0x8bf2f reads	Signed high-word target threshold
+0x00214448	4	int32_t	g_scene_gate_limit	0x8bf35 reads	Selects lower or upper bound mode
+0x002144b6	2	uint16_t	g_scene_angle_saved_first	0x91dd9 writes	Original CX low word from EAX first input
+0x002144b4	2	uint16_t	g_scene_angle_saved_second	0x91de0 writes	Original SI low word from EDX second input
+0x002144b0	2	uint16_t	g_scene_angle_saved_third	0x91de7 writes	Original BX low word third input
+0x0018a468	8	double	g_scene_vector_scale_a	0x88c54 loads	First x87 vector scale
+0x0018a470	8	double	g_scene_vector_scale_b	0x88c5f loads	Second x87 vector scale
+0x0018a498	8	double	g_scene_scalar_scale	0x88d87 multiplies	Signed scalar conversion
+0x0018aa0b	8	double	g_navigation_vector_scale_a	0x8fa58 loads	Unaligned x87 navigation scale A
+0x0018aa13	8	double	g_navigation_vector_scale_b	0x8fa63 loads	Unaligned x87 navigation scale B

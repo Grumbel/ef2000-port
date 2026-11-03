@@ -1,0 +1,41 @@
+{
+  "address": "0x00088d84",
+  "function_size": 12,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_scalar",
+      "registers": {
+        "eax": "0x002a0000",
+        "edx": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0026",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x0018a498",
+          "hex": "000000000000f03f"
+        }
+      ]
+    },
+    {
+      "name": "negative_scalar",
+      "registers": {
+        "eax": "0x002a0000",
+        "edx": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0026",
+          "hex": "f2ffffff"
+        },
+        {
+          "address": "0x0018a498",
+          "hex": "000000000000e03f"
+        }
+      ]
+    }
+  ]
+}

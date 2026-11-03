@@ -87,5 +87,19 @@ extern ef_addr32 g_active_plane_high; /* 0x001f8eb4 */
 extern ef_addr32 g_active_plane_low; /* 0x001f8eb8 */
 extern ef_addr32 g_active_plane_aux; /* 0x001f8ea4 */
 extern uint8_t g_scene_refresh_pending; /* 0x0012dbc4 */
+extern int16_t g_render_feature_index; /* 0x00198442 */
+extern int16_t g_render_feature_limit; /* 0x0019842e */
+extern int16_t g_render_feature_enabled; /* 0x00198444 */
+extern int16_t g_scene_gate_enabled; /* 0x00425bc8 */
+extern int32_t g_scene_gate_target_packed; /* 0x00425bce, signed high word */
+extern int32_t g_scene_gate_limit; /* 0x00214448 */
+extern uint16_t g_scene_angle_saved_first; /* 0x002144b6 */
+extern uint16_t g_scene_angle_saved_second; /* 0x002144b4 */
+extern uint16_t g_scene_angle_saved_third; /* 0x002144b0 */
+extern double g_scene_vector_scale_a; /* 0x0018a468 */
+extern double g_scene_vector_scale_b; /* 0x0018a470 */
+extern double g_scene_scalar_scale; /* 0x0018a498 */
+extern double g_navigation_vector_scale_a; /* 0x0018aa0b, unaligned */
+extern double g_navigation_vector_scale_b; /* 0x0018aa13, unaligned */
 
 #endif

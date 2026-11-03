@@ -1039,6 +1039,56 @@ AX and performs an **unguarded** four-byte pointer-table fetch from
 zero. `0x95018` simply sets the byte latch at `0x12dbc4` to one. All
 eight are synthetic host models with pending original-game checks.
 
+### Scene controls and x87 vector conversion batch (16-function wave, second half)
+
+The next eight bodies were checked against the original SHA-pinned image,
+with at least two **distinct caller functions** recorded in
+`decomp/symbols/signatures.tsv`. Their compact host C models are in
+`decomp/src/scene_controls.c` and `decomp/src/vector_math.c`, with boundary
+tests and eight additional pending guest differential plans.
+
+Four non-floating routines:
+
+- `0x8f620` takes signed AX, then stores three **words**: AX at `0x198442`,
+  50 at `0x19842e` and 1 at `0x198444`.
+- `0x8bf00` retains incoming AL in DL while passing the **signed high word**
+  of `0x1f71c8` to original `0x7489c`; on success it writes DL at returned
+  object offset `+0x1d7`. A missing object causes no store.
+- `0x8bf1c` initially sets AL=1. With signed word `0x425bc8` nonzero, it
+  compares signed arithmetic `EAX >> 8` against signed high word of
+  `0x425bce`. If that target is below signed dword `0x214448`, only values
+  **at least** the target pass; otherwise only values **at most** it pass.
+  Equality succeeds in both branches. The remaining EAX bits are not a
+  32-bit Boolean contract.
+- `0x91d9c` initializes original record `0x214404` through guest-only
+  `0xd0b68`, then invokes `0xd0ebc`, `0xd0dbc`, `0xd0fb8` in that order,
+  passing the unsigned low words of original **EDX, EAX, EBX** respectively
+  with DX's high half zeroed. Finally it stores those original low words
+  at `0x2144b4`, `0x2144b6`, and `0x2144b0`, respectively. The record
+  callbacks are still guest-only dependencies; their effects and register
+  preservation need differential confirmation.
+
+Four x87 routines share strict ABI restrictions: they return via memory,
+not ST0, do not alter general registers or the stack, and rely on the guest
+DS for **possibly unaligned double loads**. All eight have more than one
+original caller, but no OpenWatcom object or patched replay has been tested.
+
+- `0x88d30` loads a three-double vector from EBX, subtracts the matching
+  values at EDX, and writes to EAX. Load/subtract/store is interleaved for
+  each field, so the order matters with aliased buffers.
+- `0x88d84` uses `FILD` on signed dword at EAX+`0x26`, multiplies by
+  double at `0x18a498`, stores one double to EDX.
+- `0x88c54` and `0x8fa58` load signed dwords at EAX+`[8,0,4]`, multiply
+  each first by scale A and then scale B, store double at EDX+`[0,8,16]`.
+  The first uses scales `0x18a468` and `0x18a470`; the second uses the
+  deliberately unaligned doubles `0x18aa0b` and `0x18aa13`.
+
+The host model uses ordinary C `double`; **x87 extended intermediate
+precision, rounding modes, FPU exceptions, and aliased source/destination
+between individual float operations remain unverified**. Treat these as
+drafts, not drop-in replacements, until Watcom compilation and guest oracle
+traces demonstrate equivalent RAM and state changes.
+
 ## Comparing assembly
 
 ```sh

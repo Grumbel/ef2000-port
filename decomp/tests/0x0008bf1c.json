@@ -1,0 +1,39 @@
+{
+  "address": "0x0008bf1c",
+  "function_size": 57,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "disabled_gate",
+      "registers": {
+        "eax": "0xfffff800"
+      },
+      "memory": [
+        {
+          "address": "0x00425bc8",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "enabled_upper_boundary",
+      "registers": {
+        "eax": "0x00006400"
+      },
+      "memory": [
+        {
+          "address": "0x00425bc8",
+          "hex": "0100"
+        },
+        {
+          "address": "0x00425bce",
+          "hex": "00006400"
+        },
+        {
+          "address": "0x00214448",
+          "hex": "78000000"
+        }
+      ]
+    }
+  ]
+}

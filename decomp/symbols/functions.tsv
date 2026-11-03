@@ -1725,13 +1725,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000887d0	107			unknown	unclassified	unverified		
 0x0008883c	142			unknown	unclassified	unverified		
 0x000888cc	903			unknown	unclassified	unverified		
-0x00088c54	43			unknown	unclassified	unverified		
+0x00088c54	43	convert_scene_vector	vector_math	drafted	game	confirmed	decomp/tests/0x00088c54.json	docs/compiler-abi.md; Int32[8,0,4] to double[0,8,16] with 0x18a468/70 scales; x87 precision pending; awaiting OMF guest differential
 0x00088c80	80			unknown	unclassified	unverified		
 0x00088cd0	53			unknown	unclassified	unverified		
 0x00088d08	37			unknown	unclassified	unverified		
-0x00088d30	25			unknown	unclassified	unverified		
+0x00088d30	25	subtract_scene_vectors	vector_math	drafted	game	confirmed	decomp/tests/0x00088d30.json	docs/compiler-abi.md; Three pairwise qword differences EBX-EDX written EAX, interleaved stores; x87 precision pending; awaiting OMF guest differential
 0x00088d4c	55			unknown	unclassified	unverified		
-0x00088d84	12			unknown	unclassified	unverified		
+0x00088d84	12	convert_scene_scalar	vector_math	drafted	game	confirmed	decomp/tests/0x00088d84.json	docs/compiler-abi.md; Signed dword at EAX+0x26 times double 0x18a498, stored to EDX; x87 precision pending; awaiting OMF guest differential
 0x00088d90	74			unknown	unclassified	unverified		
 0x00088ddc	115			unknown	unclassified	unverified		
 0x00088e50	71			unknown	unclassified	unverified		
@@ -1791,8 +1791,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008bde8	83			unknown	unclassified	unverified		
 0x0008be3c	23			unknown	unclassified	unverified		
 0x0008be54	23			unknown	unclassified	unverified		
-0x0008bf00	28			unknown	unclassified	unverified		
-0x0008bf1c	57			unknown	unclassified	unverified		
+0x0008bf00	28	set_secondary_object_byte	scene_controls	drafted	game	confirmed	decomp/tests/0x0008bf00.json	docs/compiler-abi.md; Filtered lookup from signed high selector 0x1f71c8; set object+0x1d7 to incoming AL; awaiting OMF guest differential
+0x0008bf1c	57	scene_gate_allows	scene_controls	drafted	game	confirmed	decomp/tests/0x0008bf1c.json	docs/compiler-abi.md; Optional signed EAX>>8 threshold with direction switch at 0x214448; AL Boolean; awaiting OMF guest differential
 0x0008bf58	91			unknown	unclassified	unverified		
 0x0008c064	55			unknown	unclassified	unverified		
 0x0008c09c	32	indexed_object_is_canonical	object_table_queries	drafted	game	confirmed	decomp/tests/0x0008c09c.json	docs/compiler-abi.md
@@ -1838,11 +1838,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008f3f4	218			unknown	unclassified	unverified		
 0x0008f5d8	26			unknown	unclassified	unverified		
 0x0008f5f4	41			unknown	unclassified	unverified		
-0x0008f620	35			unknown	unclassified	unverified		
+0x0008f620	35	configure_scene_feature	scene_controls	drafted	game	confirmed	decomp/tests/0x0008f620.json	docs/compiler-abi.md; Three original 16-bit stores at 0x198442/0x19842e/0x198444; awaiting OMF guest differential
 0x0008f644	747			unknown	unclassified	unverified		
 0x0008f930	181			unknown	unclassified	unverified		
 0x0008f9e8	111			unknown	unclassified	unverified		
-0x0008fa58	43			unknown	unclassified	unverified		
+0x0008fa58	43	convert_navigation_vector	vector_math	drafted	game	confirmed	decomp/tests/0x0008fa58.json	docs/compiler-abi.md; Int32[8,0,4] to double[0,8,16] with unaligned 0x18aa0b/13 scales; x87 precision pending; awaiting OMF guest differential
 0x0008fa84	60			unknown	unclassified	unverified		
 0x0008fbc8	91			unknown	unclassified	unverified		
 0x0008fc24	180			unknown	unclassified	unverified		
@@ -1895,7 +1895,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091c34	17			unknown	unclassified	unverified		
 0x00091c48	80	record_scene_event	scene_state	drafted	game	confirmed	decomp/tests/0x00091c48.json	docs/compiler-abi.md
 0x00091c98	257			unknown	unclassified	unverified		
-0x00091d9c	85			unknown	unclassified	unverified		
+0x00091d9c	85	configure_scene_angle_triplet	scene_controls	drafted	game	confirmed	decomp/tests/0x00091d9c.json	docs/compiler-abi.md; Init 0x214404 then callbacks for DX/AX/BX low words; mirror at 0x2144b6/b4/b0; awaiting OMF guest differential
 0x00091df4	314			unknown	unclassified	unverified		
 0x00091f30	249			unknown	unclassified	unverified		
 0x0009202c	65			unknown	unclassified	unverified		

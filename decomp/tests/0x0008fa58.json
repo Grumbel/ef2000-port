@@ -1,0 +1,65 @@
+{
+  "address": "0x0008fa58",
+  "function_size": 43,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "unit_navigation",
+      "registers": {
+        "eax": "0x002a0000",
+        "edx": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "04000000"
+        },
+        {
+          "address": "0x002a0004",
+          "hex": "07000000"
+        },
+        {
+          "address": "0x002a0008",
+          "hex": "09000000"
+        },
+        {
+          "address": "0x0018aa0b",
+          "hex": "000000000000f03f"
+        },
+        {
+          "address": "0x0018aa13",
+          "hex": "000000000000f03f"
+        }
+      ]
+    },
+    {
+      "name": "scaled_signed_navigation",
+      "registers": {
+        "eax": "0x002a0000",
+        "edx": "0x002a0100"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "fbffffff"
+        },
+        {
+          "address": "0x002a0004",
+          "hex": "0a000000"
+        },
+        {
+          "address": "0x002a0008",
+          "hex": "f8ffffff"
+        },
+        {
+          "address": "0x0018aa0b",
+          "hex": "00000000000000c0"
+        },
+        {
+          "address": "0x0018aa13",
+          "hex": "000000000000e03f"
+        }
+      ]
+    }
+  ]
+}

@@ -155,6 +155,24 @@ ef_addr32 indexed_object_direct_slot(int16_t slot); /* 0x8c0bc, AX -> EAX; ungua
 void request_scene_refresh(void); /* 0x95018 */
 void report_buffer_capacity_exceeded(ef_addr32 message); /* original indirect call via 0x132a74 */
 
+/* Scene controls, selectors and packed angle record. */
+void configure_scene_feature(int16_t index); /* 0x8f620, AX */
+void set_secondary_object_byte(uint8_t value); /* 0x8bf00, AL */
+uint8_t scene_gate_allows(int32_t value); /* 0x8bf1c, EAX -> AL */
+void configure_scene_angle_triplet(int16_t first, int16_t second, int16_t third); /* 0x91d9c, AX/DX/BX */
+/* Calls made by 0x91d9c; original implementations remain guest-only. */
+void initialize_scene_angle_record(ef_addr32 record); /* 0xd0b68 */
+void update_scene_angle_first(ef_addr32 record, uint16_t value); /* 0xd0ebc */
+void update_scene_angle_second(ef_addr32 record, uint16_t value); /* 0xd0dbc */
+void update_scene_angle_third(ef_addr32 record, uint16_t value); /* 0xd0fb8 */
+
+/* Three-component x87 helpers: signed dwords, double-precision guest RAM.
+ * Host C results are provisional until x87 extended-precision replay. */
+void subtract_scene_vectors(ef_addr32 output, ef_addr32 subtract, ef_addr32 from); /* 0x88d30, EAX/EDX/EBX */
+void convert_scene_scalar(ef_addr32 source, ef_addr32 output); /* 0x88d84, EAX/EDX */
+void convert_scene_vector(ef_addr32 source, ef_addr32 output); /* 0x88c54, EAX/EDX */
+void convert_navigation_vector(ef_addr32 source, ef_addr32 output); /* 0x8fa58, EAX/EDX */
+
 /* Original dependencies at 0x2dc84/0x2dbf8; no separately confirmed ABIs. */
 uint8_t grid_reference_distance_matches(int16_t cell); /* 0x0002dc84 */
 uint8_t grid_external_distance_matches(int16_t cell, uint8_t probe); /* 0x0002dbf8 */
