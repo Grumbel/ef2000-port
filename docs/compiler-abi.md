@@ -424,7 +424,7 @@ not EAX. This confirms a **state-transition ABI** but does not assert a
 complete enum meaning for the requested state values or verify gameplay
 equivalence.
 
-### Floating-point and segment exceptions under review
+### Floating-point, stack, and segment calling conventions
 
 The initialized image contains the 16-bit word `0x127f` at `0x17d500`.
 `0xedbe1` loads it with `fldcw`, while `0xf1072` reads it before a call to
@@ -452,14 +452,18 @@ replaced with the usual DS-based flat-memory pointer when ported. Its
 unusual x87/segment contract is documented but not yet represented as a
 Ghidra custom storage signature; likely assembler or FP runtime code.
 
-`0x15c0c4`: an argument adapter starts with `enter 0,0`, reads three
+`project_fixedpoint_pair_from_stack` (`0x15c0c4`) starts with `enter 0,0`, reads three
 32-bit stack arguments from `[ebp+8,+12,+16]`, invokes `0xc474c`, then
 loads a fourth argument from `[ebp+20]` and calls `0x15c071`. It finishes
 with `ret 16`, so the **callee cleans up four stack arguments**. Distinct
 callers `0x5f220` at `0x5f3bb` and `0x3d4b0` at `0x3d5f1` each push four
 values, call it and test EAX for zero. The sibling `0x15c0ea` uses the
-same stack-argument wrapper pattern. Detailed type and clobber recovery is
-still pending; a default Watcom-register signature would be wrong here.
+same stack-argument wrapper pattern. The first three dwords are signed
+fixed-point inputs; the fourth is a writable pointer to two 16-bit results.
+The wrapper preserves ESI/EDI/EBP and returns the Boolean from `0x15c071`
+in EAX; EBX/ECX/EDX are scratch. The Ghidra importer now supports the
+four `[ESP+N]` locations and 16-byte purge. `kind=asm` describes its
+unusual EBP intermediate/restore sequence, not a verified C replacement.
 
 `decompress_bitstream_backrefs` (`0xf9ee0`) is an assembler-like
 bitstream decoder with a two-pointer **stack convention**. The original
@@ -476,9 +480,22 @@ eight bytes of **caller arguments**. Distinct caller `0xb3c04` at
 `0xb3c8e` pushes EBP as source then EDI as destination; caller `0xeab44`
 at `0xeab7c` pushes `0x474360` as source then `0x464580` as destination.
 They do not use a return value. This is ABI evidence, not yet a guessed
-compression-format specification or recovered decompressor. It remains
-`exception_reviewed` because the Ghidra signature importer currently
-rejects nonzero callee cleanup and stack-argument storage.
+compression-format specification or recovered decompressor. The confirmed
+custom-storage signature records the two stack pointers and eight-byte
+callee cleanup; this is **ABI-only** typing.
+
+`decompress_ra_stream` (`0xfa02c`) is a different `ret 8` bitstream decoder.
+It uses `pushad`/`popad` to preserve all GPRs except its EAX return, clears
+DF, takes the **source** from `[ebp+8]` and **destination** from `[ebp+12]`,
+then invokes internal helpers at `0xfa31b`, `0xfa251`, `0xfa1d4`, and others.
+It writes literal bytes with `movsb` and back-references with `rep movsb`
+through DS:ES. Success returns EAX=1; failure executes **INT3** *before*
+its zero-EAX return if execution resumes. The trap is observable and must
+not be silently removed in a C replacement. Caller `0xb3c04` at `0xb3cc2`
+pushes EDI (destination) followed by ESI (source); distinct caller
+`0xeba64` at `0xebadf` pushes a destination then a compressed-source
+pointer. Neither performs caller stack cleanup or consumes the status.
+This is an assembler-like compression ABI, not yet a recovered RA codec.
 
 `clear_registered_callbacks` (`0xabec4`) walks a table of `0x15`-byte
 records anchored at `0x41e971`, bounded by the word count at `0x41eecc`.
@@ -510,9 +527,9 @@ and reloads EAX from its preserved input. Interrupt-side clobbers and
 descriptor semantics still need explicit verification before assigning a
 full signature or porting it to host C.
 
-`0x1204dc` uses a **three-dword stack-argument** contract with `ret 12`,
+`format_nonfinite_double` (`0x1204dc`) uses a **three-dword stack-argument** contract with `ret 12`,
 not Watcom register passing. With its prologue saves and eight-byte local
-area included, the source 64-bit floating bit-pattern is at `[esp+0x14]
+area included, the source 64-bit floating bit-pattern is at `[esp+0x14]`
 and `[esp+0x18]`, and a destination pointer is at `[esp+0x1c]`. The
 routine tests a double exponent for the all-one pattern, writes a selected
 fixed message (optionally prefixed by `-`) to that destination, and returns
@@ -521,10 +538,12 @@ EAX=1 if handled, EAX=0 otherwise. Callers `0x11d3f0` at `0x11d40c` and
 success without further stack adjustment. EBX/EDX are explicitly saved;
 the remaining GPRs are untouched. The 64-bit source is passed as **two
 stack dwords**, not as ST(0), so the x87-candidate label was only a
-sampling heuristic. Pending stack-location support in the annotation
-importer and a justified Watcom `#pragma aux` declaration.
+sampling heuristic. The custom-storage signature now records both stack
+words, the output pointer, the EAX Boolean and the 12-byte purge. A
+Watcom `#pragma aux` declaration remains to be supplied with the future
+recovered C caller, not presumed by ABI annotation alone.
 
-`0x15c071` receives an output pointer in EBX, an integer denominator from
+`write_projected_fixedpoint_pair` (`0x15c071`) receives an output pointer in EBX, an integer denominator from
 the **signed upper word** of ECX, and fixed-point coordinate values from
 ESI and EDI. It writes two 16-bit coordinates to `[EBX]` and `[EBX+2]`
 and returns EAX=1 only if the denominator is between 16 and 20,000;
@@ -536,8 +555,9 @@ EBP into ECX before restoring their frame pointer and set EBX from the
 fourth stack argument. Therefore **ECX is not simply the original first
 stack argument**, and treating this routine as ordinary `__watcall` would
 lose a nonstandard return convention. No inner stack arguments or cleanup;
-EAX/ECX/EDX clobbered, EBX/ESI/EDI/EBP preserved. Reviewed as an ABI
-exception pending an explicit compiler declaration and adapter model.
+EAX/ECX/EDX clobbered, EBX/ESI/EDI/EBP preserved. Its unusual four-register
+contract is now recorded as a confirmed custom-storage signature; matching
+Watcom `#pragma aux` is still needed if recovered C directly calls it.
 
 `0x12d90` is an indirect callback dispatcher with register input AX and DX.
 It derives a signed 16-bit record index from AX plus a table selected by

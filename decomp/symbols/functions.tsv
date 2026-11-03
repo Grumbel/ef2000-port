@@ -3702,8 +3702,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f9dcb	233			unknown	unclassified	unverified		
 0x000f9ecd	5			unknown	unclassified	unverified		
 0x000f9ed2	13			unknown	unclassified	unverified		
-0x000f9ee0	331	decompress_bitstream_backrefs	unk_runtime	named	asm	unverified		ABI reviewed; 2 stack pointers and ret 8, pending Ghidra stack storage support
-0x000fa02c	310			unknown	unclassified	unverified		
+0x000f9ee0	331	decompress_bitstream_backrefs	unk_runtime	typed	asm	confirmed		ABI only; dest/source stack pointers, ret 8, ES output and DF clear
+0x000fa02c	310	decompress_ra_stream	unk_runtime	typed	asm	confirmed		ABI only; source/dest stack pointers, EAX Boolean, ret 8, INT3 on failure
 0x000fa16e	102			unknown	unclassified	unverified		
 0x000fa1d4	44			unknown	unclassified	unverified		
 0x000fa200	81			unknown	unclassified	unverified		
@@ -4250,7 +4250,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00120451	52			unknown	unclassified	unverified		
 0x00120485	49			unknown	unclassified	unverified		
 0x001204b6	21			unknown	unclassified	unverified		
-0x001204dc	132			unknown	unclassified	unverified		
+0x001204dc	132	format_nonfinite_double	unk_runtime	typed	unclassified	confirmed		ABI only; two stack dwords of FP bits plus dest pointer, EAX Boolean, ret 12
 0x00120560	486			unknown	unclassified	unverified		
 0x00120746	93			unknown	unclassified	unverified		
 0x00120800	21	x87_unmask_exceptions	unk_fp_runtime	typed	asm	confirmed		docs/compiler-abi.md; CW &= 0xfff2; no GPR/stack args or outputs; FP state side effect
@@ -4265,8 +4265,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00120c06	62			unknown	unclassified	unverified		
 0x00120c5e	88			unknown	unclassified	unverified		
 0x0015be10	179	append_projected_global_record	unk_geometry	typed	asm	confirmed		ABI only; global inputs, EAX Boolean, nonstandard EBP restoration
-0x0015c071	83			unknown	unclassified	unverified		
-0x0015c0c4	38			unknown	unclassified	unverified		
+0x0015c071	83	write_projected_fixedpoint_pair	unk_geometry	typed	game	confirmed		ABI only; EBX output pointer, ECX/ESI/EDI fixed-point input, EAX Boolean
+0x0015c0c4	38	project_fixedpoint_pair_from_stack	unk_geometry	typed	asm	confirmed		ABI only; four stack args, EAX Boolean, ret 16, EBP intermediate adapter
 0x0015c0ea	38			unknown	unclassified	unverified		
 0x0016000c	80			unknown	unclassified	unverified		
 0x001600c4	74			unknown	unclassified	unverified		

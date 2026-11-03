@@ -23,3 +23,8 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b0850	count_filtered_node_matches	AL:uint8_t,EBX:ef_addr32,EDX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	0xb0850..0xb0953; callers 0xb0c46/0xb0cae use EAX/AX; docs/compiler-abi.md
 0x0006a1d0	transition_indexed_object_state	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x6a1d0..0x6a353; callers 0x466b5/0x72cc4 ignore return; docs/compiler-abi.md
 0x000b0954	count_positive_filtered_node_matches	AL:uint8_t,EBX:ef_addr32,EDX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	0xb0954..0xb0afe; callers 0xb0cbe/0xcb78f use EAX/AX; docs/compiler-abi.md
+0x000f9ee0	decompress_bitstream_backrefs	[ESP+4]:ef_addr32,[ESP+8]:ef_addr32		ebx,edx,esi,edi,ebp	8	0xf9ee0..0xfa02a; caller sites 0xb3c8e/0xeab7c; DS input ES output, CLD; docs/compiler-abi.md
+0x000fa02c	decompress_ra_stream	[ESP+4]:ef_addr32,[ESP+8]:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	8	0xfa02c..0xfa16b; caller sites 0xb3cc2/0xebadf; PUSHA/POPA and INT3 failure; docs/compiler-abi.md
+0x001204dc	format_nonfinite_double	[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	12	0x1204dc..0x12055d; caller sites 0x11d40c/0x12058c test EAX; docs/compiler-abi.md
+0x0015c071	write_projected_fixedpoint_pair	EBX:ef_addr32,ECX:int32_t,ESI:int32_t,EDI:int32_t	EAX:uint32_t	ebx,esi,edi,ebp	0	0x15c071..0x15c0c3; callers 0x15c0df/0x15c105; docs/compiler-abi.md
+0x0015c0c4	project_fixedpoint_pair_from_stack	[ESP+4]:int32_t,[ESP+8]:int32_t,[ESP+12]:int32_t,[ESP+16]:ef_addr32	EAX:uint32_t	esi,edi,ebp	16	0x15c0c4..0x15c0e9; caller sites 0x5f3bb/0x3d5f1 test EAX; docs/compiler-abi.md

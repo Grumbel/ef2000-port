@@ -383,10 +383,14 @@ filtered linked-list counter (`0xb0850`) brings the worksheet to twenty-one
 confirmed; callback-list teardown (`0xabec4`) is reviewed with unresolved
 indirect callee clobbers. The branch-heavy object state transition
 (`0x6a1d0`) and positive filtered-node counter (`0xb0954`) bring it to
-twenty-three of forty. Documented ABI exceptions include
+twenty-three of forty. Stack custom storage and `ret N` purge support now
+allow the two decompressors (`0xf9ee0`, `0xfa02c`), nonfinite-double
+formatter (`0x1204dc`), and fixed-point projection pair (`0x15c0c4`,
+`0x15c071`) to be confirmed: twenty-eight of forty ABI samples. The
+remaining documented exceptions include
 ST(0) return with `ret 8` (`0xf8250`), ES:[EDI] memory writes (`0x120a52`),
-stack-based `ret 16` (`0x15c0c4`), stack-based `ret 12` (`0x1204dc`), and
-segment/interrupt bridges (`0xee43c`, `0x120451`).
+register-plus-stack floating argument (`0x24480`), and segment/interrupt
+bridges (`0xee43c`, `0x120451`).
 
 ### 3.6 [ ] Library identification
 
@@ -815,6 +819,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Confirmed 0x6a1d0 signed AX/DL object-state dispatch with 24 callers (22/40 ABI samples).
 2026-11-03  3.5   Confirmed 0xb0954 positive filtered-node count as companion to 0xb0850 (23/40 ABI samples).
 2026-11-03  3.5   Ghidra 12.1.4 reviewed-signature importer now supports [ESP+N] stack parameters and ret N purge; asset-free synthetic save/reload test passes.
+2026-11-03  3.5   Confirmed five nonstandard stack/register ABIs: LZ/RA decompressors, ret 12 nonfinite formatter, ret 16 projection adapter and its register helper (28/40 samples).
 ```
 
 ---
