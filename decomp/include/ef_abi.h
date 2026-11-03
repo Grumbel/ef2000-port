@@ -1347,4 +1347,24 @@ uint32_t guest_fn_d0b68(ef_addr32 a, uint32_t b); /* 0xd0b68 */
 void guest_fn_d0ebc(ef_addr32 a, uint32_t b); /* 0xd0ebc */
 uint32_t guest_fn_d13dc(ef_addr32 a, uint32_t b); /* 0xd13dc */
 
+/* line_of_sight.c */
+void scale_words_1c60c(void);
+uint8_t can_support_238c0(int32_t unit);
+void latch_vectors_327e0(void);
+void setup_dialog_41028(void);
+void submit_view_5a8d0(void);
+uint8_t request_los_66bf4(ef_addr32 object);
+uint8_t request_los_66cd4(int16_t unit, ef_addr32 object);
+uint8_t request_los_66d80(ef_addr32 object);
+void guest_fn_5aa64(uint32_t a); /* 0x5aa64 */
+void guest_fn_5af50(uint32_t a); /* 0x5af50 */
+uint32_t guest_fn_7574c(int32_t a); /* 0x7574c */
+uint32_t guest_fn_7b7d8(void); /* 0x7b7d8 */
+ef_addr32 guest_fn_8ffe8(int32_t a); /* 0x8ffe8 */
+void guest_fn_a4db0(ef_addr32 a); /* 0xa4db0 */
+void guest_fn_a73cc(ef_addr32 a, ef_addr32 b, uint32_t c); /* 0xa73cc */
+void guest_fn_abe44(ef_addr32 a); /* 0xabe44 */
+void guest_fn_cf78c(void); /* 0xcf78c */
+uint32_t guest_fn_d6694(void); /* 0xd6694 */
+
 #endif

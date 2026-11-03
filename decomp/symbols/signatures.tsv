@@ -794,3 +794,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00094a1c	look_at_target_94a1c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00094a1c (87 bytes); Unit 0xff means the record at dword 0x1a821c.; callers 95e58@969df; docs/compiler-abi.md
 0x000985f4	update_progress_985f4	AL:uint8_t,EDX:int32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000985f4 (97 bytes); Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change.; callers 49228@49753,7a844@7a89a,7e8c0@7eac1; docs/compiler-abi.md
 0x0009a4d8	clear_tables_9a4d8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009a4d8 (108 bytes); ; callers 98bec@98bec; docs/compiler-abi.md
+0x0001c60c	scale_words_1c60c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001c60c (210 bytes); Scale six signed words by the percentage in dword 0x122dc4.; callers 8b39c@8b51e; docs/compiler-abi.md
+0x000238c0	can_support_238c0	EAX:int32_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000238c0 (161 bytes); Can unit AX attack the target of its own target?; callers 242b8@24376; docs/compiler-abi.md
+0x000327e0	latch_vectors_327e0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000327e0 (156 bytes); Latch the position and target vectors.; callers 3122c@31246; docs/compiler-abi.md
+0x00041028	setup_dialog_41028			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00041028 (167 bytes); ; callers none direct; docs/compiler-abi.md
+0x0005a8d0	submit_view_5a8d0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0005a8d0 (197 bytes); ; callers none direct; docs/compiler-abi.md
+0x00066bf4	request_los_66bf4	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00066bf4 (224 bytes); Line-of-sight request from the viewpoint at 0x1a5bec to the object.; callers 65a88@65bcd,65d24@65de3,65e10@65e93; docs/compiler-abi.md
+0x00066cd4	request_los_66cd4	AX:int16_t,EDX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00066cd4 (169 bytes); Line-of-sight request from `object` to unit AX.; callers 291fc@29220,298f0@29942; docs/compiler-abi.md
+0x00066d80	request_los_66d80	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00066d80 (165 bytes); As 0x66bf4 from the point at 0x21444c.; callers 62edc@63099; docs/compiler-abi.md

@@ -1044,6 +1044,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  32  Drafted and Watcom-compiled 22 more functions in game_state_helpers3 (736 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  33  Drafted and Watcom-compiled 18 more functions in unit_flags (754 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  34  Drafted and Watcom-compiled 11 more functions in camera_helpers (765 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  35  Drafted and Watcom-compiled 8 more functions in line_of_sight (773 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---

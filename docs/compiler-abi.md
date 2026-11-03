@@ -2190,3 +2190,16 @@ in EAX, format string address, one value).
 | `0x94a1c` | AX:int16_t | none | 95e58@969df | Unit 0xff means the record at dword 0x1a821c. |
 | `0x985f4` | AL:uint8_t,EDX:int32_t | none | 49228@49753,7a844@7a89a,7e8c0@7eac1 | Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change. |
 | `0x9a4d8` | none | none | 98bec@98bec |  |
+
+## line_of_sight (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1c60c` | none | none | 8b39c@8b51e | Scale six signed words by the percentage in dword 0x122dc4. |
+| `0x238c0` | EAX:int32_t | AL:uint8_t | 242b8@24376 | Can unit AX attack the target of its own target? |
+| `0x327e0` | none | none | 3122c@31246 | Latch the position and target vectors. |
+| `0x41028` | none | none | none direct |  |
+| `0x5a8d0` | none | none | none direct |  |
+| `0x66bf4` | EAX:ef_addr32 | AL:uint8_t | 65a88@65bcd,65d24@65de3,65e10@65e93 | Line-of-sight request from the viewpoint at 0x1a5bec to the object. |
+| `0x66cd4` | AX:int16_t,EDX:ef_addr32 | AL:uint8_t | 291fc@29220,298f0@29942 | Line-of-sight request from `object` to unit AX. |
+| `0x66d80` | EAX:ef_addr32 | AL:uint8_t | 62edc@63099 | As 0x66bf4 from the point at 0x21444c. |
