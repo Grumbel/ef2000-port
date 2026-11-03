@@ -772,6 +772,29 @@ Session start checklist:
 5. Find the first unchecked step in §3 (or the current wave in §6) and
    continue there. Do not start a later phase early.
 
+### Regenerating `local/`
+
+`local/` is git-ignored and never delivered. Nothing in the repository
+needs an existing `local/`; every input that matters is regenerated:
+
+| What | Needed for | How to recreate |
+| --- | --- | --- |
+| `local/ghidra` (project, pseudo-C, inventory, facts) | All decompilation work | `python3 tools/ghidra_ef2000.py rebuild --analyze-headless $GHIDRA_HOME EXE` (Nix: `ef2000-ghidra rebuild EXE`); ~4 min on a desktop |
+| GUI skin/font/symbol extracts | Optional SDL3 overlay skin | `python3 tools/ef2000_gui_assets.py skin DATA_DIR --out local/gui-skin` |
+| Golden replay hashes (§3.9) | Splice validation | `tools/replay_suite.py record` once written |
+| Run directories (`startup-*`, `cd-*`, `*-reference-*`, …) | Nothing; historical captures | Not needed. Findings are already in `docs/` and `docs/*-reference.json` |
+
+Web chat sessions (no Nix): the Ghidra tools are plain Python 3 standard
+library plus a Ghidra installation. Point `--analyze-headless` (or
+`GHIDRA_HOME`) at it. **Expected function counts depend on the Ghidra
+release**: 4,233 with 11.4.2, 4,277 with 12.1.4 (`docs/ghidra-findings.md`
+#062). Report the release used in every commit that cites counts. A project
+created by a newer Ghidra cannot be opened by an older one, so do not reuse
+a `local/ghidra` copied from another machine unless the versions match.
+Steps that need Nix-only tools (OpenWatcom wrapper, native64 harness with
+`modify_ldt`, Xvfb) may be unavailable in a sandbox; say so in the session
+report and pick asset-free or Python-only work instead of faking results.
+
 ```sh
 nix develop                                      # tools: Ghidra, OpenWatcom, Unicorn, DOSBox-X
 python3 tools/decomp_status.py summary           # where are we
