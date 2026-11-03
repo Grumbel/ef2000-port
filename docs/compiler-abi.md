@@ -2354,3 +2354,30 @@ in EAX, format string address, one value).
 | `0xbcbc0` | EAX:uint32_t | EAX:uint32_t | be438@be462,fba6c@fbaae | Is the kind one of 8, 0xe, 0xf, 0x11, 0x13, 0x16, 0x17, 0x1a? |
 | `0xbd344` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | bd39c@bd438 | Is there a kind-0x10 entry in the list matching the id at ref+9? |
 | `0xbec84` | EAX:ef_addr32 | EAX:uint32_t | becc0@becde,faafc@fab1a,fabf0@fac0e |  |
+
+## engine_helpers3 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9c980` | EAX:ef_addr32 | none | f80@1120,45a4@45ae,2ff44@2ff7d | Build the default path string in buffer. |
+| `0xc3328` | none | none | c34cc@c3501,c36b4@c3709,c3714@c375c | Release the buffer at 0x41f3bc according to its mode byte. |
+| `0xc37ec` | none | none | cdc38@cdc3a,d1d40@d1d84 | Free the two buffers at 0x146e40/0x146e44. |
+| `0xca5e4` | none | none | ac16c@ac177 | Clear the flag bytes of records from the start index upward. |
+| `0xcc1ac` | AL:uint8_t,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | d68c@db4b,d68c@e069,d68c@e393 | Is the flag byte for index negative? |
+| `0xcc1ec` | AL:uint8_t,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | d68c@dd04,433fc@434b0,4357c@4361d | Is the flag byte for index zero? |
+| `0xcc22c` | AL:uint8_t,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | d68c@d993,d68c@df24,d68c@e333 | Is the flag byte for index positive? |
+| `0xcd20c` | EAX:uint32_t | EAX:uint32_t | 57480@575f3,8d11c@8d18c,8d330@8d39f | Store value into the output table and step the script cursor. |
+| `0xcd5f4` | none | EAX:int32_t | 48e7c@48fe3 | Pop the first byte of the 20-byte queue at 0x41f810, -1 if empty. |
+| `0xcdf60` | none | EAX:uint32_t | 3ea0c@3edf6,aaee8@aaf5f,abf8c@abfb9 | Query the mouse driver once and cache the button count. |
+| `0xce02c` | EAX:ef_addr32,EDX:ef_addr32 | none | 121f0@121fa,ac16c@ac1ce,ac854@ac87e | Mouse function 0xb: read motion counters into two outputs. |
+| `0xce064` | none | EAX:uint32_t | 278c0@27b32,278c0@27bc8,27d18@27eb6 | Mouse function 3: button state. |
+| `0xce328` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 1e480@1e4a7,1e7c0@1e8d5,1f0fc@1f1de | Latch four values and the current pair at 0x15b744/0x15b748. |
+| `0xce944` | EAX:ef_addr32 | EAX:ef_addr32 | d23d8@d2411 | Apply pending event bits of an object through the 5-entry table at 0x15b798. |
+| `0xcf78c` | none | none | 14d58@14e3c,14d58@14e74,14d58@14ea5 | Forward the five words of the record at 0x4208e4 to cf3a4. |
+| `0xd0858` | EAX:ef_addr32,EDX:ef_addr32 | none | 91c98@91d77,91df4@91e81,91df4@91ee6 | Copy a 9-dword record. |
+| `0xd0b68` | EAX:ef_addr32 | none | 1b4a4@1b5e3,26b60@26f51,27348@27355 | Reset a 9-dword bounds record (0x7fff limits). |
+| `0xd65a8` | EAX:ef_addr32,EDX:ef_addr32 | none | d660c@d6620,d663c@d664b | Remap a 256-entry RGB palette through three 64-byte tables. |
+| `0xd6dc4` | none | none | d5d18@d5d39,d6e58@d6e9e,e28e8@e28ff | One-time module init; registers the exit handler at 0xd6da0. |
+| `0xd7040` | EAX:ef_addr32,EDX:ef_addr32 | none | d7070@d7078 | Build "<default path><first><second>" with a fixed separator. |
+| `0xdcc10` | none | none | a9e70@a9e8d | Reset the 320x200 clip state. |
+| `0xdcc54` | none | none | a9e70@a9eb7 | Same as dcc10 with the stores in a different order. |

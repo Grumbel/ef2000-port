@@ -1555,4 +1555,34 @@ uint32_t is_kind_bcbc0(uint32_t kind);
 uint32_t find_kind10_bd344(ef_addr32 ref, ef_addr32 list);
 uint32_t is_active_bec84(ef_addr32 object);
 
+/* engine_helpers3.c */
+void build_default_path_9c980(ef_addr32 buffer);
+void release_mode_buffer_c3328(void);
+void free_buffers_c37ec(void);
+void clear_record_flags_ca5e4(void);
+uint32_t group_flag_negative_cc1ac(uint8_t group, uint32_t index, ef_addr32 head_addr);
+uint32_t group_flag_zero_cc1ec(uint8_t group, uint32_t index, ef_addr32 head_addr);
+uint32_t group_flag_positive_cc22c(uint8_t group, uint32_t index, ef_addr32 head_addr);
+uint32_t script_store_step_cd20c(uint32_t value);
+int32_t queue_pop_cd5f4(void);
+uint32_t mouse_button_count_cdf60(void);
+void mouse_read_motion_ce02c(ef_addr32 out_x, ef_addr32 out_y);
+uint32_t mouse_read_buttons_ce064(void);
+void latch_values_ce328(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+ef_addr32 apply_pending_events_ce944(ef_addr32 object);
+void forward_record_cf78c(void);
+void copy_record9_d0858(ef_addr32 destination, ef_addr32 source);
+void init_bounds_d0b68(ef_addr32 record);
+void remap_palette_d65a8(ef_addr32 destination, ef_addr32 source);
+void init_module_d6dc4(void);
+void build_path_d7040(ef_addr32 buffer, ef_addr32 second);
+void reset_clip_dcc10(void);
+void reset_clip_dcc54(void);
+void guest_fn_eb478(ef_addr32 text); /* 0xeb478 EAX */
+void guest_fn_ce830(ef_addr32 object, uint32_t value); /* 0xce830 EAX/EDX */
+void guest_fn_cf3a4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0xcf3a4 EAX/EDX/EBX/ECX/stack */
+void guest_fn_101c54(void); /* 0x101c54 */
+void guest_fn_d6df0(void); /* 0xd6df0 */
+void guest_fn_cdf48(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcdf48 EAX/EDX/EBX/ECX */
+
 #endif
