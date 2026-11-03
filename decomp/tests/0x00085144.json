@@ -1,0 +1,31 @@
+{
+  "address": "0x00085144",
+  "function_size": 37,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "all_sentinel",
+      "registers": {
+        "eax": "0x002a0000"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "ffffffffffff"
+        }
+      ]
+    },
+    {
+      "name": "last_word_present",
+      "registers": {
+        "eax": "0x002a0000"
+      },
+      "memory": [
+        {
+          "address": "0x002a0000",
+          "hex": "ffffffff0000"
+        }
+      ]
+    }
+  ]
+}

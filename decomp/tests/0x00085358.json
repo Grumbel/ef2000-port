@@ -1,0 +1,39 @@
+{
+  "address": "0x00085358",
+  "function_size": 38,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "already_zero",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x0019bb58",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x002a008e",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "decrement_one",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x0019bb58",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x002a008e",
+          "hex": "02"
+        }
+      ]
+    }
+  ]
+}

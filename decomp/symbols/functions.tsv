@@ -733,7 +733,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00040428	145			unknown	unclassified	unverified		
 0x000404bc	358			unknown	unclassified	unverified		
 0x00040624	125			unknown	unclassified	unverified		
-0x00040774	54			unknown	unclassified	unverified		
+0x00040774	54	clock_words_to_seconds	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x00040774.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x000407c4	94			unknown	unclassified	unverified		
 0x00040820	78	reference_clock_reaches	runtime_predicates	drafted	game	confirmed	decomp/tests/0x00040820.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00040870	77			unknown	unclassified	unverified		
@@ -937,7 +937,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000508fc	96	mpType3Click		named	unclassified	unverified		
 0x0005095c	96	mpType4Click		named	unclassified	unverified		
 0x000509bc	96			unknown	unclassified	unverified		
-0x00050a1c	54			unknown	unclassified	unverified		
+0x00050a1c	54	tactical_lookup_contains	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x00050a1c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00050b68	193			unknown	unclassified	unverified		
 0x00050c2c	18	mpChangeMode		named	unclassified	unverified		
 0x00050c40	43	mpRedrawTargetView		named	unclassified	unverified		
@@ -1537,7 +1537,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000803c4	36			unknown	unclassified	unverified		
 0x000803e8	21			unknown	unclassified	unverified		
 0x00080400	15			unknown	unclassified	unverified		
-0x000809bc	89			unknown	unclassified	unverified		
+0x000809bc	89	clear_panel_strip	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x000809bc.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00080a18	162			unknown	unclassified	unverified		
 0x00080abc	87			unknown	unclassified	unverified		
 0x00080b14	293			unknown	unclassified	unverified		
@@ -1674,9 +1674,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00084f60	144			unknown	unclassified	unverified		
 0x00084ff0	180			unknown	unclassified	unverified		
 0x000850a4	157			unknown	unclassified	unverified		
-0x00085144	37			unknown	unclassified	unverified		
+0x00085144	37	clock_triplet_is_present	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x00085144.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0008516c	489			unknown	unclassified	unverified		
-0x00085358	38			unknown	unclassified	unverified		
+0x00085358	38	decrement_grid_activity	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x00085358.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00085380	104			unknown	unclassified	unverified		
 0x00085400	31			unknown	unclassified	unverified		
 0x00085420	292			unknown	unclassified	unverified		
@@ -1696,7 +1696,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000866d4	1			unknown	unclassified	unverified		
 0x000866e0	64			unknown	unclassified	unverified		
 0x00086720	146			unknown	unclassified	unverified		
-0x00086920	71			unknown	unclassified	unverified		
+0x00086920	71	reset_ui_panel_selection	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x00086920.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00086968	886			unknown	unclassified	unverified		
 0x00086e44	309			unknown	unclassified	unverified		
 0x00086f7c	843	query_projected_object_position	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX selector, EDX output pair pointer, BX iteration count; returns signed EAX; caller sites 0x5c7b9/0x5ca6e; indirect callback effects remain replay concern
@@ -1708,7 +1708,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000879c4	89			unknown	unclassified	unverified		
 0x00087a20	821			unknown	unclassified	unverified		
 0x00087db8	196			unknown	unclassified	unverified		
-0x00087f9c	71			unknown	unclassified	unverified		
+0x00087f9c	71	find_ui_linked_tag	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x00087f9c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00087fe4	227			unknown	unclassified	unverified		
 0x000880c8	53			unknown	unclassified	unverified		
 0x00088100	50			unknown	unclassified	unverified		
@@ -1811,7 +1811,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008cd78	406			unknown	unclassified	unverified		
 0x0008cf10	287			unknown	unclassified	unverified		
 0x0008d030	176			unknown	unclassified	unverified		
-0x0008d0e0	57			unknown	unclassified	unverified		
+0x0008d0e0	57	mark_ui_links_by_slot	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x0008d0e0.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0008d11c	531			unknown	unclassified	unverified		
 0x0008d330	161			unknown	unclassified	unverified		
 0x0008d3d4	384			unknown	unclassified	unverified		

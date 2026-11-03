@@ -36,7 +36,9 @@ typedef struct EF_PACKED ef_world_grid_cell {
     double position_a;               /* +0x61 */
     double position_b;               /* +0x69 */
     double position_c;               /* +0x71 */
-    uint8_t unknown_79[0x17];
+    uint8_t unknown_79[0x15];
+    uint8_t activity_countdown;       /* +0x8e: decremented only if positive */
+    uint8_t unknown_8f;
     uint8_t event_value;              /* +0x90 */
     uint32_t retained_a;              /* +0x91 */
     uint32_t retained_b;              /* +0x95 */
@@ -70,6 +72,7 @@ EF_STATIC_ASSERT(ef_grid_position_a_off, offsetof(ef_world_grid_cell, position_a
 EF_STATIC_ASSERT(ef_grid_position_b_off, offsetof(ef_world_grid_cell, position_b) == 0x69);
 EF_STATIC_ASSERT(ef_grid_position_c_off, offsetof(ef_world_grid_cell, position_c) == 0x71);
 EF_STATIC_ASSERT(ef_grid_event_off, offsetof(ef_world_grid_cell, event_value) == 0x90);
+EF_STATIC_ASSERT(ef_grid_countdown_off, offsetof(ef_world_grid_cell, activity_countdown) == 0x8e);
 EF_STATIC_ASSERT(ef_grid_retained_a_off, offsetof(ef_world_grid_cell, retained_a) == 0x91);
 EF_STATIC_ASSERT(ef_grid_retained_b_off, offsetof(ef_world_grid_cell, retained_b) == 0x95);
 EF_STATIC_ASSERT(ef_grid_pending_a_off, offsetof(ef_world_grid_cell, pending_a) == 0x99);

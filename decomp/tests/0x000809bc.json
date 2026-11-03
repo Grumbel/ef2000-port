@@ -1,0 +1,21 @@
+{
+  "address": "0x000809bc",
+  "function_size": 89,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "positive_band",
+      "registers": {
+        "eax": "0x00000011"
+      },
+      "memory": []
+    },
+    {
+      "name": "negative_band",
+      "registers": {
+        "eax": "0x0000ffff"
+      },
+      "memory": []
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "address": "0x00086920",
+  "function_size": 71,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "initial_reset",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x0020f182",
+          "hex": "05000500050005000500"
+        },
+        {
+          "address": "0x0020f18e",
+          "hex": "ffffffff"
+        },
+        {
+          "address": "0x0020f19a",
+          "hex": "ffffffff"
+        }
+      ]
+    },
+    {
+      "name": "idempotent",
+      "registers": {},
+      "memory": []
+    }
+  ]
+}

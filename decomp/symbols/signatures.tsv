@@ -135,3 +135,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000544c0	count_external_grid_markers			ebx,ecx,edx,esi,edi,ebp	0	Original 0x544c0 (53 bytes); callers 557e8@55850/55860@5587c; Count probe byte at +4 and store 8-bit result; docs/compiler-abi.md
 0x0005cb9c	position_within_tactical_bounds	AX:int16_t,DX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x5cb9c (42 bytes); callers 59fa4@5a062/5cbc8@5cd00; Inclusive signed AX DX ranges, AL-only result; docs/compiler-abi.md
 0x0005f1ec	sample_active_coordinates	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x5f1ec (52 bytes); callers 66fc@672d/67d4@6810; Guest packed dwords +8/+12 scaled and biased; docs/compiler-abi.md
+0x00040774	clock_words_to_seconds	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x40774 (54 bytes); callers c630@c63a/40870@40880; Signed 3-word clock a*3600+b*60+c; docs/compiler-abi.md
+0x00050a1c	tactical_lookup_contains	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x50a1c (54 bytes); callers 5086c@508c9/508fc@50929; Signed limit, byte index wrapping; AH scratch; docs/compiler-abi.md
+0x000809bc	clear_panel_strip	AX:int16_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x809bc (89 bytes); callers 80abc@80ae0/878c8@87963; Signed IDIV 16 remainder; clear 16 + metadata; docs/compiler-abi.md
+0x00085144	clock_triplet_is_present	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x85144 (37 bytes); callers 8516c@8531e/857bc@85858; All three signed words -1 gives AL zero; docs/compiler-abi.md
+0x00085358	decrement_grid_activity	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x85358 (38 bytes); callers 2bcb8@2bd18/85380@853cf; 0xca-row byte +0x8e saturating decrement; docs/compiler-abi.md
+0x00086920	reset_ui_panel_selection		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x86920 (71 bytes); callers 17f10@1800f/5f634@5f68d; Four word resets and five default-one selectors; docs/compiler-abi.md
+0x00087f9c	find_ui_linked_tag	AL:uint8_t,DX:int16_t	EAX:ef_addr32	ebx,ecx,esi,edi,ebp	0	Original 0x87f9c (71 bytes); callers 55928@55944/55b80@55ba8; List scan uses sentinel and +0x34 link; docs/compiler-abi.md
+0x0008d0e0	mark_ui_links_by_slot	AX:int16_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x8d0e0 (57 bytes); callers 8d11c@8d1f7/8d330@8d36e; Mark +0x42 when word +0x56 matches, return sentinel; docs/compiler-abi.md

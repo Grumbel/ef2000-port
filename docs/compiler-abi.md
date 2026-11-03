@@ -1148,6 +1148,47 @@ but not the original stack layout or guest callback side effects.
 OpenWatcom register assignment, real `0xa3f74` behavior and live guest
 packet ordering must be validated before marking these verified.
 
+## Short clock, tactical-state, grid and UI-list routines (#077)
+
+Sixteen additional draft functions come from direct inspection of the
+SHA-pinned guest payload, with two independent caller functions per entry.
+The paired host tests run without original data. They **do not** establish
+OpenWatcom register assignment, splice safety or guest RAM equivalence.
+
+| Address | C draft | Original ABI/effect | Caller functions (call site) |
+| --- | --- | --- | --- |
+| `0x40774` | `clock_words_to_seconds` | EAX pointer to three signed words; EAX seconds, wrap at 32 bits | `0xc630` (`0xc63a`), `0x40870` (`0x40880`) |
+| `0x40820` | `reference_clock_reaches` | EAX pointer; lexicographic signed-word `reference >= argument`; **AL only** | `0x5437c` (`0x543bb`), `0x855c8` (`0x855f9`) |
+| `0x41da4` | `command_code_is_group_1b` | AL code, full EAX 0/1 for `0x1b..0x27` | `0xd290` (`0xd43a`), `0x10a9c` (`0x10b51`) |
+| `0x49054` | `clear_tactical_accumulators` | No inputs; clears seven separate typed state fields | `0x3dd30` (`0x3ddc8`), `0x48e7c` (`0x4902a`) |
+| `0x4d8f4` | `reset_tactical_slots` | No inputs; sixteen `0xff` stores, conditional byte clear | `0x4c78c` (`0x4c8e0`), `0x4c900` (`0x4ca68`) |
+| `0x4dc98` | `advance_first_tactical_status` | No inputs; first matching byte at indices **1..24** only | `0x4c78c` (`0x4c8db`), `0x4c900` (`0x4ca63`) |
+| `0x50a1c` | `tactical_lookup_contains` | AL needle, **AL only** result; signed 16-bit count and wrapped 8-bit index | `0x5086c` (`0x508c9`), `0x508fc` (`0x50929`) |
+| `0x544c0` | `count_external_grid_markers` | No inputs; count nonzero bytes at +4 in 27-byte rows, store one byte | `0x557e8` (`0x55850`), `0x55860` (`0x5587c`) |
+| `0x5cb9c` | `position_within_tactical_bounds` | AX/DX signed XY; **AL only** result | `0x59fa4` (`0x5a062`), `0x5cbc8` (`0x5cd00`) |
+| `0x5f1ec` | `sample_active_coordinates` | EAX output guest pointer; optional source +8/+12 dwords scaled by 2048 and biased by 1024 | `0x66fc` (`0x672d`), `0x67d4` (`0x6810`) |
+| `0x809bc` | `clear_panel_strip` | AX signed, remainder after `IDIV 16`; clear indices 1..16; EAX 3×remainder | `0x80abc` (`0x80ae0`), `0x878c8` (`0x87963`) |
+| `0x85144` | `clock_triplet_is_present` | EAX pointer to three words; **AL only** false for three `-1` words | `0x8516c` (`0x8531e`), `0x857bc` (`0x85858`) |
+| `0x85358` | `decrement_grid_activity` | AX signed grid index, byte +0x8e decremented if nonzero | `0x2bcb8` (`0x2bd18`), `0x85380` (`0x853cf`) |
+| `0x86920` | `reset_ui_panel_selection` | No inputs; five 1-valued indices and four zeroed words, EAX=5 | `0x17f10` (`0x1800f`), `0x5f634` (`0x5f68d`) |
+| `0x87f9c` | `find_ui_linked_tag` | AL tag, DX signed value; EAX node or zero, EDX scratch | `0x55928` (`0x55944`), `0x55b80` (`0x55ba8`) |
+| `0x8d0e0` | `mark_ui_links_by_slot` | AX signed slot; set node byte +0x42 on matches; EAX sentinel | `0x8d11c` (`0x8d1f7`), `0x8d330` (`0x8d36e`) |
+
+The `0x40820`, `0x50a1c`, `0x5cb9c` and `0x85144` original routines
+write only AL. Higher EAX bytes may remain stale or become scratch values,
+so a C `uint8_t` return is **not yet a proven machine-register match**. Their
+callers inspect only the low byte at the cited sites. `0x50a1c` has a latent
+nontermination if its signed table count exceeds 255 and the entry is absent;
+its C loop retains the byte-index wrap. `0x809bc` uses a signed remainder,
+including negative-band writes before the nominal table base. Both the
+circular UI list's sentinel and its header pointer at +0x34 are respected;
+no implicit null termination was invented.
+
+This batch could not run OpenWatcom, Ghidra project export, Unicorn differential,
+or patched native64 replay in the current environment. All functions remain
+`drafted`; the two-callsite ABI records and per-function guest fixtures are
+research inputs for those checks.
+
 ## Comparing assembly
 
 ```sh

@@ -642,6 +642,12 @@
             ${source}/decomp/src/runtime_predicates.c \
             -o work/runtime_predicates_host_test
           work/runtime_predicates_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_ui_grid_helpers_test.c \
+            ${source}/decomp/src/ui_grid_helpers.c \
+            -o work/ui_grid_helpers_host_test
+          work/ui_grid_helpers_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

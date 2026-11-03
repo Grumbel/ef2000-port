@@ -1,0 +1,59 @@
+{
+  "address": "0x0008d0e0",
+  "function_size": 57,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "no_nodes",
+      "registers": {
+        "eax": "0x00000012"
+      },
+      "memory": [
+        {
+          "address": "0x0020f160",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x0020f164",
+          "hex": "00032a00"
+        },
+        {
+          "address": "0x002a0034",
+          "hex": "00032a00"
+        }
+      ]
+    },
+    {
+      "name": "mark_matching_first",
+      "registers": {
+        "eax": "0x00000012"
+      },
+      "memory": [
+        {
+          "address": "0x0020f160",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x0020f164",
+          "hex": "00032a00"
+        },
+        {
+          "address": "0x002a0034",
+          "hex": "00012a00"
+        },
+        {
+          "address": "0x002a0134",
+          "hex": "00032a00"
+        },
+        {
+          "address": "0x002a0156",
+          "hex": "1200"
+        },
+        {
+          "address": "0x002a0142",
+          "hex": "00"
+        }
+      ]
+    }
+  ]
+}

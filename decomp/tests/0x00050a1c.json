@@ -1,0 +1,35 @@
+{
+  "address": "0x00050a1c",
+  "function_size": 54,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "empty_lookup",
+      "registers": {
+        "eax": "0x00000007"
+      },
+      "memory": [
+        {
+          "address": "0x001357b0",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "found_second",
+      "registers": {
+        "eax": "0x00000009"
+      },
+      "memory": [
+        {
+          "address": "0x001357b0",
+          "hex": "0300"
+        },
+        {
+          "address": "0x001a5510",
+          "hex": "040908"
+        }
+      ]
+    }
+  ]
+}
