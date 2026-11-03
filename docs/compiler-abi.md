@@ -389,6 +389,41 @@ Caller `0xb0c34` at `0xb0c46` supplies AL/EBX/EDX and stores EAX as a
 roles and stores the resulting AX. This is a *counting contract*, not a
 fully recovered data schema for the node's odd field offsets.
 
+`count_positive_filtered_node_matches` (`0xb0954`) is a companion to
+`0xb0850` with the **same AL/EBX/EDX inputs and full-EAX count output**.
+It calls `0xcc22c` instead of `0xcc1ac`, testing for a positive rather than
+negative signed byte in the filter node's per-key payload. Both mode 0 and
+mode 1 count their usual signed high-word type sets, additionally admitting
+certain type IDs when word `+0x09` in the source node is nonzero. The
+function preserves ECX/ESI/EDI/EBP and has no stack arguments/cleanup;
+EBX/EDX are scratch. Caller `0xb0c9c` at `0xb0cbe` passes the same argument
+roles after counting negative matches; distinct caller `0xcb6fc` at
+`0xcb78f` supplies AL=0, EBX from EDI, EDX from ECX and consumes the
+returned low AX after `cwde` to compare it with seven. Both positive and
+negative variants operate on packed linked records and need memory
+equivalence tests before C replacement.
+
+`transition_indexed_object_state` (`0x6a1d0`) accepts a signed object index
+in AX and a requested state byte in DL. The full callee saves EBX/ECX/ESI/
+EDI, looks up AX through `0x7489c`, and exits without side effects if no
+object exists. Otherwise it clears flag bits of record byte `+0x25`, then
+dispatches on DL values `2`, `5`, `6`, `9`, `0x0e`, `0x10`, and a general
+fallback. Case 2 can invoke the already-typed `set_indexed_object_state`
+(`0x6a394`) and a relation predicate; cases 5 and 6 invoke `0x752d0` and
+`0x75344`; case 9 invokes the record-event helper `0x46168` with its own
+temporary stack argument. All paths update object state bytes (notably
+`+0x16c`, `+0x25`, `+0x26`) or deliberately leave them untouched. There
+is no caller-visible register result; EAX/EDX are scratch. EBX/ECX/ESI/
+EDI/EBP are preserved, and the outer callee has no stack parameters or
+cleanup (the inner `0x46168` call handles its own argument).
+
+Distinct caller `0x46454` at `0x466b5` passes AX from DI and DL from a
+stack byte; caller `0x72944` at `0x72cc4` sign-extends AX from the global
+at `0x1f71c8` and sets DL to `0x0b`. Both continue using memory state,
+not EAX. This confirms a **state-transition ABI** but does not assert a
+complete enum meaning for the requested state values or verify gameplay
+equivalence.
+
 ### Floating-point and segment exceptions under review
 
 The initialized image contains the 16-bit word `0x127f` at `0x17d500`.

@@ -381,7 +381,9 @@ the stack-based `ret 8` bitstream decompressor (`0xf9ee0`) is additionally
 reviewed but cannot yet be entered as a custom-storage signature. The
 filtered linked-list counter (`0xb0850`) brings the worksheet to twenty-one
 confirmed; callback-list teardown (`0xabec4`) is reviewed with unresolved
-indirect callee clobbers. Documented ABI exceptions include
+indirect callee clobbers. The branch-heavy object state transition
+(`0x6a1d0`) and positive filtered-node counter (`0xb0954`) bring it to
+twenty-three of forty. Documented ABI exceptions include
 ST(0) return with `ret 8` (`0xf8250`), ES:[EDI] memory writes (`0x120a52`),
 stack-based `ret 16` (`0x15c0c4`), stack-based `ret 12` (`0x1204dc`), and
 segment/interrupt bridges (`0xee43c`, `0x120451`).
@@ -810,6 +812,8 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Confirmed 0x11c0b4 EAX/EDX-to-packed-213-byte x87 record, 0x68ccc CS jump-table AL bit probe, and 0x15be10 global-input fixed-point writer (19/40 ABI samples).
 2026-11-03  3.5   Confirmed 0x243ac AX-indexed x87 relation update (20/40); reviewed 0xf9ee0 stack-based LZ-style REP decoder with ret 8, pending Ghidra stack storage support.
 2026-11-03  3.5   Confirmed 0xb0850 AL/EBX/EDX linked-list counter (21/40); reviewed 0xabec4 callback table with unresolved indirect-callee clobbers.
+2026-11-03  3.5   Confirmed 0x6a1d0 signed AX/DL object-state dispatch with 24 callers (22/40 ABI samples).
+2026-11-03  3.5   Confirmed 0xb0954 positive filtered-node count as companion to 0xb0850 (23/40 ABI samples).
 ```
 
 ---

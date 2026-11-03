@@ -9,7 +9,7 @@ entry	region	shape	body_bytes	instructions	direct_calls	indirect_calls	condition
 0x000263e0	0	leaf	12	5	0	0	0	2	confirmed
 0x00068ccc	1	large	439	112	0	0	2	3	confirmed
 0x0006a1b4	1	leaf	26	9	0	0	2	17	confirmed
-0x0006a1d0	1	branch_heavy	388	114	10	0	17	24	unreviewed
+0x0006a1d0	1	branch_heavy	388	114	10	0	17	24	confirmed
 0x0006a354	1	few_calls	34	9	1	0	2	2	confirmed
 0x0006a394	1	fallback_for_rep_candidate	57	15	1	0	2	3	confirmed
 0x0006a4c4	1	memory_heavy	115	35	1	0	1	2	confirmed
@@ -20,7 +20,7 @@ entry	region	shape	body_bytes	instructions	direct_calls	indirect_calls	condition
 0x000b00d0	2	few_calls	103	42	1	0	4	2	confirmed
 0x000b0208	2	leaf	47	22	0	0	5	2	confirmed
 0x000b0850	2	memory_heavy	260	104	2	0	28	2	confirmed
-0x000b0954	2	large	427	140	2	0	41	2	unreviewed
+0x000b0954	2	large	427	140	2	0	41	2	confirmed
 0x000b0f5c	2	x87_candidate	1888	423	64	0	9	2	unreviewed
 0x000b1b8b	2	rep_candidate	25	17	0	0	0	70	confirmed
 0x000ee43c	3	rep_candidate	78	34	1	0	1	3	exception_reviewed
