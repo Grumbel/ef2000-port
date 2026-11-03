@@ -2792,3 +2792,13 @@ in EAX, format string address, one value).
 | `0x8fd70` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32 | none | 8fe58@8fe71 | Build a path from the default directory and three parts. |
 | `0x97464` | none | none | 3dd30@3e14f | Walk the 0x4e-byte chain of records from 0x12dc74 and draw those of depth >= 2. |
 | `0x97a4c` | none | none | 3dd30@3de0b | Load two string handles and reset the chain head. |
+
+## game_helpers23 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2a1c4` | EAX:ef_addr32 | none | 2541c@25457 | Re-evaluate a record's state byte and refresh the object. |
+| `0x2af78` | AX:int16_t,DL:uint8_t | EAX:uint32_t | 8557c@855ad | Sum the weights of the six linked units of an owner. |
+| `0x3bc60` | EAX:uint32_t,EDX:int32_t,EBX:int32_t | none | 3a3a8@3b038 | Draw a small cross of arm length 3 at (x, y). |
+| `0x3bc90` | AX:int16_t,EDX:int32_t,EBX:int32_t | none | 3bcc0@3bd18 | Draw a small box around (x, y); half-size 2 in mode 3, otherwise 1. |
+| `0x4d1ec` | EAX:int32_t,EDX:int32_t,EBX:uint32_t | none | 441fc@44368 | Blit the cursor image for the current screen (when the page matches key). |

@@ -2047,4 +2047,12 @@ void init_chain_97a4c(void);
 void guest_fn_978e8(ef_addr32 record); /* 0x978e8 EAX */
 void guest_fn_974b8(void); /* 0x974b8 */
 
+/* game_helpers23.c */
+void refresh_record_2a1c4(ef_addr32 record);
+uint32_t sum_owner_weights_2af78(int16_t owner, uint8_t filter);
+void draw_cross_3bc60(uint32_t marker, int32_t x, int32_t y);
+void draw_box_3bc90(int16_t colour, int32_t x, int32_t y);
+void blit_cursor_4d1ec(int32_t x, int32_t y, uint32_t key);
+void guest_fn_cec00(int32_t colour, int32_t x1, int32_t y1, int32_t x2, int32_t y2); /* 0xcec00 EAX/EDX/EBX/ECX/stack, ret 4 */
+
 #endif
