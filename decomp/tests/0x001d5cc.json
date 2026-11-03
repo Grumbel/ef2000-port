@@ -1,0 +1,1 @@
+{"address":"0x0001d5cc","function_size":38,"max_instructions":180000,"cases":[{"name":"required_dispatch_only","registers":{"eax":"0x002a0000","edx":"0x0000fff9"},"memory":[{"address":"0x00127da9","hex":"00"},{"address":"0x0001d5f4","hex":"c3"}]}]}

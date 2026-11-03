@@ -11,7 +11,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000003f8	140			unknown	unclassified	unverified		
 0x00000484	140			unknown	unclassified	unverified		
 0x00000510	113			unknown	unclassified	unverified		
-0x00000604	36			unknown	unclassified	unverified		
+0x00000604	36	encode_runtime_segment_offset	runtime_indexed	drafted	game	confirmed	decomp/tests/0x0000604.json	Base-relative real-mode-style segment/offset result; callers b04@b1f/ddd48@ddd8e; guest pending
 0x00000628	144			unknown	unclassified	unverified		
 0x000006b8	124			unknown	unclassified	unverified		
 0x00000734	120			unknown	unclassified	unverified		
@@ -249,9 +249,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00011de0	155			unknown	unclassified	unverified		
 0x00011e7c	706			unknown	unclassified	unverified		
 0x00012140	29			unknown	unclassified	unverified		
-0x00012160	84			unknown	unclassified	unverified		
-0x000121cc	33			unknown	unclassified	unverified		
-0x000121f0	29			unknown	unclassified	unverified		
+0x00012160	84	reinitialize_runtime_slots	runtime_indexed	drafted	game	confirmed	decomp/tests/0x0012160.json	54 entries stride29, callback or clear, refresh each; callers 5f60@5f6b/5fd8@5fde; guest pending
+0x000121cc	33	read_runtime_slot_flag	runtime_indexed	drafted	game	confirmed	decomp/tests/0x00121cc.json	Signed DX offset to overlapping high-word base then AX slot; callers 6460@65a6/1f878@1f8a8; guest pending
+0x000121f0	29	initialize_runtime_probe_latch	runtime_indexed	drafted	game	confirmed	decomp/tests/0x00121f0.json	Query two discarded local stack values then set latch 0x96; callers 5f60@5f66/5fd8@5fd9; guest pending
 0x00012210	142			unknown	unclassified	unverified		
 0x00012d90	126	dispatch_record_callback	unk_runtime	named	game	unverified		docs/compiler-abi.md; AX/DX indexed record, handler at +0xcd invoked indirectly; clobbers unresolved, do not splice automatically
 0x00012ec8	80			unknown	unclassified	unverified		
@@ -259,7 +259,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00014c5c	224			unknown	unclassified	unverified		
 0x00014d3c	26			unknown	unclassified	unverified		
 0x00014d58	409			unknown	unclassified	unverified		
-0x00014ef4	29			unknown	unclassified	unverified		
+0x00014ef4	29	refresh_all_event_slots	event_wrappers	drafted	game	confirmed	decomp/tests/0x0014ef4.json	Iterate signed index 0..33 through 0x14d58; callers 5f60@5fbf/5fd8@6008; guest pending
 0x000150d4	196			unknown	unclassified	unverified		
 0x000151a0	36			unknown	unclassified	unverified		
 0x000151c4	1			unknown	unclassified	unverified		
@@ -318,7 +318,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001d3c4	79			unknown	unclassified	unverified		
 0x0001d420	11			unknown	unclassified	unverified		
 0x0001d474	343			unknown	unclassified	unverified		
-0x0001d5cc	38			unknown	unclassified	unverified		
+0x0001d5cc	38	dispatch_two_object_events	event_wrappers	drafted	game	confirmed	decomp/tests/0x001d5cc.json	Optional event by 127da9 then always required; callers 1e0ec@1e126/394e0@3953f; guest pending
 0x0001d5f4	266			unknown	unclassified	unverified		
 0x0001d700	120			unknown	unclassified	unverified		
 0x0001d778	42			unknown	unclassified	unverified		
@@ -908,14 +908,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004eec0	532	mpToggleIcons		named	unclassified	unverified		
 0x0004f0d4	547			unknown	unclassified	unverified		
 0x0004f2f8	28	mpClickV8Okay		named	unclassified	unverified		
-0x0004f314	88			unknown	unclassified	unverified		
+0x0004f314	88	update_dialog_bindings	event_wrappers	drafted	game	confirmed	decomp/tests/0x004f314.json	Open, find two named widgets, bind, emit flag and destroy; callers 4b6a0@4b761/4ca90@4cad5; guest pending
 0x0004f36c	28	mpWarningOkClick		named	unclassified	unverified		
 0x0004f388	88			unknown	unclassified	unverified		
 0x0004f3e0	180	mpMission2Click		named	unclassified	unverified		
 0x0004f494	180	mpMission3Click		named	unclassified	unverified		
 0x0004f548	192	mpMission4Click		named	unclassified	unverified		
 0x0004f608	180	mpClickATC		named	unclassified	unverified		
-0x0004f6bc	74			unknown	unclassified	unverified		
+0x0004f6bc	74	flush_active_dialog_slots	event_wrappers	drafted	game	confirmed	decomp/tests/0x004f6bc.json	BL-index loop over mapped active slots, clear and update dialog; callers 4f3e0@4f48b/4f494@4f53f; guest pending
 0x0004f718	183			unknown	unclassified	unverified		
 0x0004f7d0	215			unknown	unclassified	unverified		
 0x0004f8a8	236			unknown	unclassified	unverified		

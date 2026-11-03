@@ -224,6 +224,20 @@ target_compile_options(ef2000-decomp-runtime-small-ops-test PRIVATE -Wall -Wextr
 target_compile_definitions(ef2000-decomp-runtime-small-ops-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-runtime-small-ops-test PRIVATE decomp/include)
 add_test(NAME decomp-runtime-small-ops-host-model COMMAND ef2000-decomp-runtime-small-ops-test)
+add_executable(ef2000-decomp-runtime-indexed-test
+  tests/decomp_runtime_indexed_test.c decomp/src/runtime_indexed.c)
+target_compile_features(ef2000-decomp-runtime-indexed-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-runtime-indexed-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-runtime-indexed-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-runtime-indexed-test PRIVATE decomp/include)
+add_test(NAME decomp-runtime-indexed-host-model COMMAND ef2000-decomp-runtime-indexed-test)
+add_executable(ef2000-decomp-event-wrappers-test
+  tests/decomp_event_wrappers_test.c decomp/src/event_wrappers.c)
+target_compile_features(ef2000-decomp-event-wrappers-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-event-wrappers-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-event-wrappers-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-event-wrappers-test PRIVATE decomp/include)
+add_test(NAME decomp-event-wrappers-host-model COMMAND ef2000-decomp-event-wrappers-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

@@ -217,4 +217,13 @@ addr	size	type	name	evidence	notes
 0x00197c2a	2	int16_t	g_runtime_coarse_x	0x106bb writes	Signed x >>11
 0x00197c2c	2	int16_t	g_runtime_coarse_y	0x106c8 writes	Signed y >>11
 0x00197c2e	1	uint8_t	g_runtime_coordinate_code	0x10706 writes	Caller stack-byte code
-0x00121ec6	1	uint8_t	g_runtime_coordinate_latch	0x106f5 clears	Cleared by packing position
+0x00121ec6	1	uint8_t	g_runtime_coordinate_latch	0x106f5 clears; 0x121cf overlaps dword	First byte of indexed overlapping packed dword table at 0x121ec6
+0x00120cc6	4	ef_addr32	g_runtime_segment_base	0x606 reads	X-32 pointer conversion base
+0x00121fb4	1566	uint8_t[54][29]	g_runtime_slot_records	0x12178/0x12192 reads/writes	54 runtime callback rows at 29-byte stride; callback at +25
+0x00122880	2	uint16_t	g_runtime_active_slot_index	0x12181 writes	Current callback index
+0x00122882	1	uint8_t	g_runtime_reinitializing_slots	0x12166/0x121ab writes	Global active-iteration gate
+0x0012288a	2	uint16_t	g_runtime_slot_generation	0x1216c resets	Generation counter cleared before slot iteration
+0x00121ed0	2	uint16_t	g_runtime_probe_latch	0x121ff writes	Constant 0x96 after guest pair query
+0x001357b0	2	int16_t	g_dialog_active_index_count	0x4f6f5 reads	Signed bound for byte-index slot scan
+0x001a5510	variable	uint8_t[]	g_dialog_slot_indices	0x4f6c6 reads	Mapping loop byte index to active dialog slot
+0x001a553b	variable	uint8_t[]	g_dialog_slot_flags	0x4f6d1 reads 0x4f6dc clears	Per-slot active flag byte

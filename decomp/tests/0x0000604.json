@@ -1,0 +1,1 @@
+{"address":"0x00000604","function_size":36,"max_instructions":180000,"cases":[{"name":"segment_offset_relative_to_guest_base","registers":{"eax":"0x0002012f"},"memory":[{"address":"0x00120cc6","hex":"00000200"}]}]}

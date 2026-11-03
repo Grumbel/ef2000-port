@@ -1435,6 +1435,33 @@ The fixture for the parser line supplies a synthetic immediate EOF reader;
 the tick fixtures supply an indirect-call stub. Real file callbacks and
 timer state need original guest replay before any equivalence claim.
 
+## Indexed callbacks, dialog state and segmented addresses (2026-11-03)
+
+Eight further original functions have two identified direct callers each.
+The host drafts remain unverified at the guest/Watcom level.
+
+| Entry | Inputs and output | Caller instructions | Observed effect |
+| --- | --- | --- | --- |
+| `0x604` | EAX guest pointer to full EAX packed result | `0xb1f`, `0xddd8e` | subtract global pointer base `0x120cc6`, encode 16-bit `(delta>>4)` above 4-bit `(delta&15)` |
+| `0x12160` | no inputs; void | `0x5f6b`, `0x5fde` | mark mode active, reset two state fields, visit 54 records at 29-byte stride, invoke callback at `+25` or clear record flag, refresh every slot, clear mode |
+| `0x121cc` | signed AX subindex and DX group; AL flag | `0x65a6`, `0x1f8a8` | index overlapping dwords at `0x121ec6 + DX*2`, sign-extend high word, add AX, select byte at `0x121fb4 + 29*index` |
+| `0x121f0` | no inputs; void | `0x5f66`, `0x5fd9` | guest query `0xce02c` receives two stack scratch dword pointers; discard outputs then set word `0x121ed0=150` |
+| `0x14ef4` | no inputs; void | `0x5fbf`, `0x6008` | invoke `0x14d58` exactly 34 times, EAX 0 through 33 |
+| `0x1d5cc` | EAX object pointer, signed DX index; void | `0x1e126`, `0x3953f` | optional `0x55dac` when byte `0x127da9` nonzero, then unconditional `0x1d5f4` |
+| `0x4f314` | EAX/EDX widget values; void | `0x4b761`, `0x4cad5` | open named dialog, select two child widgets, bind each value, emit dialog byte `+16`, destroy dialog |
+| `0x4f6bc` | no inputs; void | `0x4f48b`, `0x4f53f` | scan signed count `0x1357b0` with a BL byte index, map through `0x1a5510`, clear nonzero flags at `0x1a553b` and call `0x4f314` |
+
+The original `0x4f6bc` uses an eight-bit `BL` counter but compares the
+zero-extended 16-bit AX against a signed 16-bit limit. A positive limit
+above 255 will repeatedly wrap through the same slots (**ORIGINAL BUG**).
+The C draft preserves that behavior. The `0x121cc` packed dword starts at
+the same address as the previously identified `0x121ec6` coordinate latch;
+the overlap is intentional and must remain in the memory layout.
+
+The dialog callback sequence, and the liveness of registers across
+indirect calls, still need actual original-versus-replacement execution.
+The table above records direct call sites and a host semantic model only.
+
 ## Comparing assembly
 
 ```sh

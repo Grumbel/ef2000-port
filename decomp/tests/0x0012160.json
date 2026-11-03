@@ -1,0 +1,1 @@
+{"address":"0x00012160","function_size":84,"max_instructions":180000,"cases":[{"name":"no_registered_callbacks","memory":[{"address":"0x00011e7c","hex":"c3"},{"address":"0x00122882","hex":"ee"},{"address":"0x0012288a","hex":"ffff"}]}]}

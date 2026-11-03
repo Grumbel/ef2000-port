@@ -223,3 +223,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0001065c	advance_runtime_tick		EAX:int32_t	ebx,edx	0	Original 0x1065c (42 bytes); signed time delta floor two; callers 3dd30@3ddea/f3d54@f3d61; docs/compiler-abi.md
 0x000106b0	pack_runtime_position	AX:int16_t,EDX:int32_t,ECX:int32_t,stack_code:uint32_t			4	Original 0x106b0 (94 bytes); >>11, center residuals, EBX clobbered; callers 9114@92a6/15b7c@15fbc; docs/compiler-abi.md
 0x00010f28	transform_runtime_word_pair	AX:uint16_t,EDX:ef_addr32,EBX:ef_addr32		ecx,edi	0	Original 0x10f28 (71 bytes); four-mode 16-bit pair transform; callers 10f70@10fb5/11014@11092; docs/compiler-abi.md
+0x00000604	encode_runtime_segment_offset	EAX:ef_addr32	EAX:uint32_t	ebx,edx	0	Original 0x604 (36 bytes); segment = low16(diff>>4), offset = low4(diff); callers b04@b1f/ddd48@ddd8e; docs/compiler-abi.md
+0x00012160	reinitialize_runtime_slots			ebx,edx	0	Original 0x12160 (84 bytes); 54 indexed callbacks and flags; callers 5f60@5f6b/5fd8@5fde; docs/compiler-abi.md
+0x000121cc	read_runtime_slot_flag	AX:int16_t,DX:int16_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	Original 0x121cc (33 bytes); overlapping dword high-word index, 29-byte rows; callers 6460@65a6/1f878@1f8a8; docs/compiler-abi.md
+0x000121f0	initialize_runtime_probe_latch			edx	0	Original 0x121f0 (29 bytes); call with two local output addresses, then latch=0x96; callers 5f60@5f66/5fd8@5fd9; docs/compiler-abi.md
+0x00014ef4	refresh_all_event_slots			edx	0	Original 0x14ef4 (29 bytes); 34 signed-index events; callers 5f60@5fbf/5fd8@6008; docs/compiler-abi.md
+0x0001d5cc	dispatch_two_object_events	EAX:ef_addr32,DX:int16_t		ebx,ecx	0	Original 0x1d5cc (38 bytes); optional then unconditional dispatch; callers 1e0ec@1e126/394e0@3953f; docs/compiler-abi.md
+0x0004f314	update_dialog_bindings	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x4f314 (88 bytes); two child bindings and guest close; callers 4b6a0@4b761/4ca90@4cad5; docs/compiler-abi.md
+0x0004f6bc	flush_active_dialog_slots			ebx,edx	0	Original 0x4f6bc (74 bytes); BL byte index may wrap; callers 4f3e0@4f48b/4f494@4f53f; docs/compiler-abi.md

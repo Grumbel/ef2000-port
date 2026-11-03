@@ -1,0 +1,1 @@
+{"address":"0x000121cc","function_size":33,"max_instructions":180000,"cases":[{"name":"signed_index_addition","registers":{"eax":"0x00000002","edx":"0x00000000"},"memory":[{"address":"0x00121ec6","hex":"00000300"},{"address":"0x00122045","hex":"a7"}]}]}

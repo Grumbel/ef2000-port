@@ -165,6 +165,27 @@ void pack_runtime_position(int16_t heading, int32_t x,
 void transform_runtime_word_pair(uint16_t mode, ef_addr32 a,
                                  ef_addr32 b); /* 0x10f28 AX/EDX/EBX */
 
+/* Indexed control and event/dialog wrappers. */
+uint32_t encode_runtime_segment_offset(ef_addr32 pointer); /* 0x604 EAX -> EAX */
+void reinitialize_runtime_slots(void); /* 0x12160 */
+uint8_t read_runtime_slot_flag(int16_t subindex, int16_t group); /* 0x121cc AX/DX -> AL */
+void initialize_runtime_probe_latch(void); /* 0x121f0 */
+void guest_invoke_runtime_slot(ef_addr32 callback); /* indirect record+25 */
+void guest_refresh_runtime_slot(int16_t index); /* 0x11e7c EAX */
+void guest_query_runtime_pair(uint32_t *first, uint32_t *second); /* 0xce02c EAX/EDX */
+void refresh_all_event_slots(void); /* 0x14ef4 */
+void guest_refresh_event_slot(int16_t index); /* 0x14d58 EAX */
+void dispatch_two_object_events(ef_addr32 object, int16_t index); /* 0x1d5cc EAX/DX */
+void guest_dispatch_object_event_optional(ef_addr32 object, int16_t index); /* 0x55dac */
+void guest_dispatch_object_event_required(ef_addr32 object, int16_t index); /* 0x1d5f4 */
+void update_dialog_bindings(ef_addr32 first, ef_addr32 second); /* 0x4f314 EAX/EDX */
+void flush_active_dialog_slots(void); /* 0x4f6bc */
+ef_addr32 guest_open_named_dialog(ef_addr32 name, ef_addr32 root); /* 0xa46cc */
+ef_addr32 guest_select_dialog_widget(ef_addr32 root, ef_addr32 name); /* 0xa78bc */
+void guest_bind_dialog_widget(ef_addr32 widget, ef_addr32 source); /* 0xa7588 */
+void guest_emit_dialog_flag(uint8_t flag); /* 0xa4cb4 AL */
+void guest_destroy_named_dialog(ef_addr32 dialog); /* 0xac9a0 */
+
 /* Unrecovered original conversion/allocation/diagnostic interfaces. */
 void guest_release_parser_buffer(ef_addr32 buffer); /* 0xcc768 EAX */
 uint32_t guest_convert_parser_decimal(ef_addr32 text); /* 0xcc76d EAX */

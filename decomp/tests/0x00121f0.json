@@ -1,0 +1,1 @@
+{"address":"0x000121f0","function_size":29,"max_instructions":180000,"cases":[{"name":"set_probe_latch_after_stub","memory":[{"address":"0x000ce02c","hex":"c3"},{"address":"0x00121ed0","hex":"0000"}]}]}
