@@ -2444,3 +2444,13 @@ in EAX, format string address, one value).
 | `0xe4264` | none | none | 3ea0c@3edc9,3ea0c@3ee1d,3ea0c@3ef59 | Reset the engine state unless already in state 0 or 2. |
 | `0xf8010` | none | none | none direct | Merge the two 2-bit fields of the mask at 0x46438c into the object flag bytes. |
 | `0xfc600` | EAX:uint32_t | EAX:uint32_t | d1da8@d1db2,d1da8@d1dbd,d1de8@d1e16 | Set a VESA mode, with the linear-framebuffer bit first if supported. |
+
+## ui_state_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa4030` | none | none | 34e18@34e53,34f94@34ff1,357a4@357ba | Recompute the total size at 0x135838 from the two index lists. |
+| `0xa7be8` | AL:uint8_t | EAX:uint32_t | a8958@a89d7,a8a38@a8b8c,a8bd4@a8e4a | Handle the current key code at 0x41f833; returns 1 if consumed. |
+| `0xa9d48` | none | none | a9e70@a9f23,a9e70@aa13e | Toggle between the live view state and the saved copy at 0x4195b0.. |
+| `0xe65d8` | EAX:ef_addr32,EDX:ef_addr32 | none | e6684@e66ea,e6684@e6746,e6684@e6782 | Exchange the fields of two 0x15-byte records. |
+| `0xfaa30` | AL:uint8_t | AL:uint8_t | fbad8@fbc5b | Map a scan code to a key class, 0 if unmapped. |

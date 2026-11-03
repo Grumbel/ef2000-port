@@ -2203,7 +2203,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a3f30	67			unknown	unclassified	unverified		
 0x000a3f74	105			unknown	unclassified	unverified		
 0x000a3fe0	78			unknown	unclassified	unverified		
-0x000a4030	211			unknown	unclassified	unverified		
+0x000a4030	211	recompute_total_a4030	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000a4030.json	docs/compiler-abi.md; Recompute the total size at 0x135838 from the two index lists.; callers 34e18@34e53,34f94@34ff1,357a4@357ba; guest pending
 0x000a4104	8			unknown	unclassified	unverified		
 0x000a410c	107			unknown	unclassified	unverified		
 0x000a4138	101			unknown	unclassified	unverified		
@@ -2323,7 +2323,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a7bb0	11	latch_b3f50	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7bb0.json	docs/compiler-abi.md; Dword 0x4191c4 = 0xb3f50().; callers a98d0@a98d0; guest pending
 0x000a7bbc	21	add_to_counter_4191c4	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7bbc.json	docs/compiler-abi.md; Dword 0x4191c4 += EAX.; callers aaa50@aaada,aaa50@aab28,aaa50@aab59; guest pending
 0x000a7bd4	19	set_latches_1371fc	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7bd4.json	docs/compiler-abi.md; Byte 0x1371fc = 1, byte 0x1371ee = 0.; callers 19a80@19aff,f2ac0@f2b49; guest pending
-0x000a7be8	237			unknown	unclassified	unverified		
+0x000a7be8	237	handle_key_a7be8	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000a7be8.json	docs/compiler-abi.md; Handle the current key code at 0x41f833; returns 1 if consumed.; callers a8958@a89d7,a8a38@a8b8c,a8bd4@a8e4a; guest pending
 0x000a7d34	12			unknown	unclassified	unverified		
 0x000a7d40	65			unknown	unclassified	unverified		
 0x000a7dac	70			unknown	unclassified	unverified		
@@ -2371,7 +2371,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a9bfc	209			unknown	unclassified	unverified		
 0x000a9cd0	58			unknown	unclassified	unverified		
 0x000a9d0c	60			unknown	unclassified	unverified		
-0x000a9d48	231			unknown	unclassified	unverified		
+0x000a9d48	231	toggle_view_state_a9d48	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000a9d48.json	docs/compiler-abi.md; Toggle between the live view state and the saved copy at 0x4195b0..; callers a9e70@a9f23,a9e70@aa13e; guest pending
 0x000a9e70	768			unknown	unclassified	unverified		
 0x000aa198	39	resolve_link_at_1	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa198.json	docs/compiler-abi.md; Follow the singly linked list from dword 0x4191fc as * many steps as the dword at +1 says (at least none) and store the ; callers aa350@aa39d; guest pending
 0x000aa1c0	36	resolve_link_at_0	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa1c0.json	docs/compiler-abi.md; As 0xaa198 for the dword at +0.; callers aa350@aa3ac; guest pending
@@ -3402,7 +3402,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e605c	188			unknown	unclassified	unverified		
 0x000e6120	35			unknown	unclassified	unverified		
 0x000e6144	700			unknown	unclassified	unverified		
-0x000e65d8	169			unknown	unclassified	unverified		
+0x000e65d8	169	swap_records_e65d8	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000e65d8.json	docs/compiler-abi.md; Exchange the fields of two 0x15-byte records.; callers e6684@e66ea,e6684@e6746,e6684@e6782; guest pending
 0x000e6684	281			unknown	unclassified	unverified		
 0x000e67a0	93			unknown	unclassified	unverified		
 0x000e6800	23	call_e67a0	math_string	compiles	game	confirmed	decomp/tests/0x000e6800.json	docs/compiler-abi.md; 0xe67a0(EAX, signed DX, signed BX+DX, signed CX); returns EAX.; callers e6818@e6834; guest pending
@@ -3725,7 +3725,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa95f	65			unknown	unclassified	unverified		
 0x000fa9a0	50			unknown	unclassified	unverified		
 0x000fa9d2	94			unknown	unclassified	unverified		
-0x000faa30	202			unknown	unclassified	unverified		
+0x000faa30	202	scan_code_class_faa30	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000faa30.json	docs/compiler-abi.md; Map a scan code to a key class, 0 if unmapped.; callers fbad8@fbc5b; guest pending
 0x000faafc	130			unknown	unclassified	unverified		
 0x000fab80	112			unknown	unclassified	unverified		
 0x000fabf0	87			unknown	unclassified	unverified		

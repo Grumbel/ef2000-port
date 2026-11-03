@@ -1655,4 +1655,17 @@ void guest_fn_d175c(uint32_t value); /* 0xd175c EAX */
 void guest_fn_d1860(uint32_t value); /* 0xd1860 EAX */
 void guest_fn_cd7a0(void); /* 0xcd7a0 */
 
+/* ui_state_helpers.c */
+void recompute_total_a4030(void);
+uint32_t handle_key_a7be8(uint8_t modifier);
+void toggle_view_state_a9d48(void);
+void swap_records_e65d8(ef_addr32 a, ef_addr32 b);
+uint8_t scan_code_class_faa30(uint8_t code);
+void guest_fn_a3fe0(void); /* 0xa3fe0 */
+void guest_fn_a410c(void); /* 0xa410c */
+void guest_fn_a3da0(void); /* 0xa3da0 */
+void guest_fn_a7df4(void); /* 0xa7df4 */
+void guest_fn_a7e20(void); /* 0xa7e20 */
+void guest_fn_f41c4(void); /* 0xf41c4 */
+
 #endif
