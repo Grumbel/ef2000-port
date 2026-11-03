@@ -476,6 +476,19 @@
           grep -qi 'link_grid_cell' work/world_grid_control.asm
           grep -qi 'reset_grid_cell_state' work/world_grid_control.asm
           ! grep -qi '__CHK' work/world_grid_control.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/world_grid_links.c --output "$PWD/work/world_grid_links.obj"
+          ${watcom}/bin/wdis work/world_grid_links.obj -l=work/world_grid_links.asm
+          grep -qi 'detach_grid_link_on_mode_change' work/world_grid_links.asm
+          grep -qi 'link_external_grid_cell' work/world_grid_links.asm
+          grep -qi 'copy_grid_link_position' work/world_grid_links.asm
+          grep -qi 'refresh_external_grid_position' work/world_grid_links.asm
+          ! grep -qi '__CHK' work/world_grid_links.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/world_grid_limits.c --output "$PWD/work/world_grid_limits.obj"
+          ${watcom}/bin/wdis work/world_grid_limits.obj -l=work/world_grid_limits.asm
+          grep -qi 'recompute_grid_limit' work/world_grid_limits.asm
+          ! grep -qi '__CHK' work/world_grid_limits.asm
           $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
             ${source}/tests/decomp_object_control_test.c \
@@ -493,6 +506,14 @@
             ${source}/decomp/src/world_grid_control.c \
             -o work/world_grid_batch_host_test
           work/world_grid_batch_host_test
+          $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_grid_helpers_test.c \
+            ${source}/decomp/src/object_lookup.c \
+            ${source}/decomp/src/world_grid_links.c \
+            ${source}/decomp/src/world_grid_limits.c \
+            -o work/grid_helpers_host_test
+          work/grid_helpers_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

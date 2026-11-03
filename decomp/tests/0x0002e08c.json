@@ -1,0 +1,29 @@
+{
+  "address": "0x0002e08c",
+  "function_size": 201,
+  "max_instructions": 6000,
+  "cases": [
+    {"name": "skip_ff_sentinel", "registers": {"eax": "0x000000ff"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"}]},
+    {"name": "type_only_limit", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b00e3", "hex": "02"},
+                {"address": "0x12879f", "hex": "000000000000594000000000000044400000000000000040"},
+                {"address": "0x182605", "hex": "0000000000002440"},
+                {"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x2b011a", "hex": "ffffffffffffffffffffffffffff"},
+                {"address": "0x1a3580", "hex": "00000000"}]},
+    {"name": "object_lowers_limit", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b00e3", "hex": "02"},
+                {"address": "0x12879f", "hex": "000000000000594000000000000044400000000000000040"},
+                {"address": "0x182605", "hex": "0000000000002440"},
+                {"address": "0x2119f4", "hex": "0400"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x2b011a", "hex": "0200ffffffffffffffffffffffff"},
+                {"address": "0x20f558", "hex": "00002a00"},
+                {"address": "0x2a0177", "hex": "0000000000805140"},
+                {"address": "0x1a3580", "hex": "00000000"}]}
+  ]
+}

@@ -14,6 +14,11 @@ four 202-byte world-grid operations; `object_control.c` (`0x2541c`,
 contains two attached-object scans, a current/external-cell query and an
 event-code relation predicate; `world_grid_control.c` (`0x2b558`, `0x2e030`)
 connects cell links and resets two retained dwords from pending state.
+`world_grid_links.c` (`0x2afcc`, `0x2b5c0`, `0x2b634`, `0x2b690`)
+models link cleanup, an external-node back-reference and two ways of filling
+the three inherited coordinate doubles. `world_grid_limits.c` (`0x2e08c`)
+calculates a per-type bound and visits seven attached object limits, preserving
+the filtered-lookup side effects and x87-style selection of unordered values.
 The query scans deliberately preserve all filtered object lookups and their
 diagnostic counter effects, including visits following a successful match.
 OpenWatcom code size, guest

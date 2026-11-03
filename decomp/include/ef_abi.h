@@ -59,9 +59,15 @@ uint8_t grid_event_matches(uint8_t code, uint8_t mode); /* 0x0002e910: AL,DL; AL
 
 /* Unrecovered original dependencies, typed at these particular call sites. */
 void set_grid_link_state(int16_t cell, int16_t mode); /* 0x0002b1f4 */
-void copy_grid_link_position(int16_t cell); /* 0x0002b634 */
 uint8_t external_grid_link_matches(int16_t cell, uint8_t external_index); /* 0x0002db64 */
 void reset_grid_cell_derived(int16_t cell); /* 0x0002e08c */
 void update_grid_visual_state(int16_t cell); /* 0x00054c10 */
+
+/* Grid helper cluster: signed AX row inputs; DX or DL as noted. */
+void detach_grid_link_on_mode_change(int16_t cell, uint8_t next_mode); /* 0x0002afcc AX,DL */
+void link_external_grid_cell(int16_t cell, int16_t node); /* 0x0002b5c0 AX,DX */
+void copy_grid_link_position(int16_t cell); /* 0x0002b634, now recovered */
+void refresh_external_grid_position(int16_t cell); /* 0x0002b690 */
+void recompute_grid_limit(int16_t cell); /* 0x0002e08c */
 
 #endif

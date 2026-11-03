@@ -42,7 +42,16 @@ The subsequent six plans, `0x0002b558.json`, `0x0002beb0.json`,
 `0x0002e910.json`, cover link/back-link selection, seven-lookups-without-
 short-circuit, byte-count object-mode scans, current/external index checks,
 copying a pair of pending 32-bit values and the AL/DL event truth table.
-The external/link/reset helpers are unresolved in the original; the plans
+Some external, dispatcher and reset helpers remain unresolved; the plans
 are **not** evidence those guest cases can yet complete without real call
 captures and guest helper state. The C host test substitutes only those
 dependencies and exhaustively checks all 65,536 event-code byte pairs.
+
+The five additional plans `0x0002afcc.json`, `0x0002b5c0.json`,
+`0x0002b634.json`, `0x0002b690.json` and `0x0002e08c.json` capture link
+cleanup sentinels, 69-byte external-node linkage, three inherited doubles,
+integer-coordinate scaling and per-type threshold/minimum selection. The
+stateful mode dispatcher `0x2b1f4` still prevents isolated replay of
+`0x2b5c0` without original call-state captures. Extended-precision x87 and
+exception behavior is also pending. All five specifications are *planned*
+guest differentials; their independent host tests do not prove matching RAM.

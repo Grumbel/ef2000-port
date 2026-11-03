@@ -1,0 +1,19 @@
+{
+  "address": "0x0002b690",
+  "function_size": 118,
+  "max_instructions": 1024,
+  "cases": [
+    {"name": "signed_external_coordinates", "registers": {"eax": "0x12340001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x1a14f8", "hex": "00002c00"},
+                {"address": "0x2b00ee", "hex": "0200"},
+                {"address": "0x2c0091", "hex": "0a000000ecffffff32000000"},
+                {"address": "0x182512", "hex": "000000000000f43f"}]},
+    {"name": "zero_scale", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x1a14f8", "hex": "00002c00"},
+                {"address": "0x2b00ee", "hex": "0200"},
+                {"address": "0x2c0091", "hex": "010000000200000003000000"},
+                {"address": "0x182512", "hex": "0000000000000000"}]}
+  ]
+}

@@ -637,6 +637,20 @@ OMF, live guest differential and full replay are still pending. Six new
 guest fixtures and flake smoke-check hooks are test **plans** only, so the
 new functions remain `drafted`, never `compiles` or `verified`.
 
+World-grid dependency batch (2026-11-03): five more drafted functions
+(`0x2afcc`, `0x2b5c0`, `0x2b634`, `0x2b690`, `0x2e08c`) recover a 171-byte
+link-cleanup state machine, 69-byte external-node linkage, coordinate copying,
+integer-to-double scaling, and the original seven-object limit scan. Each
+has two independently identified caller functions; the external predicate
+`0x2db64` has only one direct caller and was **not** promoted to a confirmed
+signature. The packed world grid now names positions at +0x27..+0x3e and
++0x61..+0x78; external-node offsets +0x01/+0x07/+0x0b/+0x0f/+0x44, type
+limit doubles and scaling globals have static layout checks/explicit addresses.
+Synthetic host tests cover link cleanup/back-reference, coordinate transfers,
+seven filtered lookups even after matches, and unordered floating comparison.
+Real x87 extended precision, original dispatcher `0x2b1f4`, OpenWatcom OMF,
+safe splice and golden replay remain pending. All five are `drafted` only.
+
 ### 3.11 [ ] Phase-1 exit criteria
 
 - `nix flake check` passes with all new asset-free tests.
@@ -974,6 +988,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  4     SHA-pinned original image audited against C drafts at 0x432c/0x263e0/0x6a1b4; spatial append 0x263ec recovered from four direct callers, three new drafted functions with signed/packed guest specs.
 2026-11-03  4     Drafted 0x7489c filtered object lookup plus four 0x6a3xx state wrappers; five new ABI-reviewed C functions and differential plans, with shared-epilogue splice hazard documented.
 2026-11-03  4     Drafted six more world-grid link/query/control functions (21 total) with ABI/caller evidence, row-offset asserts, 65,536-case host predicate check and six pending guest plans.
+2026-11-03  4     Drafted five more world-grid link/position/limit helpers (26 total); two independent callers each, seven-filtered-lookup host model, five guest plans, Watcom hooks pending execution.
 ```
 
 ---

@@ -38,5 +38,9 @@ extern uint8_t g_world_grid_mode; /* 0x00127da9, gates alternate grid lookup */
 extern uint8_t g_world_grid_marker; /* 0x001a666b, compares neighboring rows */
 extern uint8_t g_external_grid_count; /* 0x0012583a, number of external rows */
 extern int16_t g_active_grid_index; /* 0x0019bb5e, current selected grid row */
+extern ef_addr32 g_external_grid_base; /* 0x001a14f8, pointer to 0x45-byte nodes */
+extern double g_external_grid_scale; /* 0x00182512, integer-to-world conversion */
+extern ef_grid_type_record g_grid_type_records[]; /* 0x001285d5, stride 0xe5 */
+extern double g_grid_limit_scale; /* 0x00182605, type-adjusted limit factor */
 
 #endif

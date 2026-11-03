@@ -789,6 +789,46 @@ files preserve unresolved grid callbacks as typed external dependencies.
 Guest fixtures are explicitly pending execution, including paths that need
 real callback captures; the host test uses stubs only for those dependencies.
 
+## World-grid dependency follow-up (five C drafts)
+
+The original direct-call scan was checked against function boundaries, not
+just raw call-site counts: the five functions below each have at least two
+**different** caller functions. Their C models remain drafted; none has yet
+passed the full guest differential or OpenWatcom splice.
+
+| Target | Inputs / observed return | Callee preservation and independent callers |
+| --- | --- | --- |
+| `0x2afcc` `detach_grid_link_on_mode_change` | AX signed cell, DL next mode, no return consumed | EBX/ECX saved; EDX scratch. Called by `0x2b0b4` at `0x2b0c8` and `0x2b1f4` at `0x2b20b`. |
+| `0x2b5c0` `link_external_grid_cell` | AX signed cell, DX signed node, no return consumed | EBX/ECX saved; EDX scratch. Called by `0x46454` at `0x46f69` and `0x47764` at `0x479cb`. |
+| `0x2b634` `copy_grid_link_position` | AX signed cell, no return consumed | EBX/ECX/EDX saved. Called by `0x71fc` at `0x72fd` and `0x2b558` at `0x2b5b5`. |
+| `0x2b690` `refresh_external_grid_position` | AX signed cell, no return consumed | EBX/ECX/EDX saved. Called by `0x2b5c0` at `0x2b62c` and `0x46454` at `0x468b0`. |
+| `0x2e08c` `recompute_grid_limit` | AX signed cell, no return consumed | EBX/ECX/EDX/ESI saved. Called by `0x2ce18` at `0x2ce6c` and `0x2e030` at `0x2e050`, also by `0x85420`. |
+
+At `0x2afcc`, only the literal `0x00ff` is an absent link. For mode 3 with
+an unset link state, a two-way linked pair is broken when the requested new
+mode differs from 3; mode 6 sets grid +0xbb only when its detail byte is 6/7
+and the cell is not active. At `0x2b5c0`, the neighboring index refers to a
+**different 69-byte array** via global pointer `0x1a14f8`: the external
+back-reference stores AX's low byte; mode + marker determine whether it is
+written. It invokes unresolved state dispatcher `0x2b1f4` before refreshing
+the position. `0x2b634` inherits three 64-bit positions from the indexed
+world-grid row; `0x2b690` instead multiplies signed external integers at
++0x0f/+0x07/+0x0b by the double at `0x182512`.
+
+At `0x2e08c`, a threshold starts with three doubles from a `0xe5`-byte type
+record at `0x1285d5` (offsets 0/8/16), the last multiplied by the double at
+`0x182605`. All seven filtered object lookups execute, even after finding a
+lower limit; an object double is read at +0x177. The original x87 `fcomp`
+and `jae` update the threshold for strictly smaller **or unordered** object
+values. The C model retains that decision (`!(value >= threshold)`) and uses
+`long double` for the initial calculation, but 80-bit precision, NaN payload
+canonicalization, status flags and exception behavior require original guest
+comparison before considering the replacement verified.
+
+`0x2db64` (external-grid membership predicate) was intentionally omitted:
+although readable and only 63 bytes long, its single known direct caller is
+`0x2dba4`. An ABI signature would violate the two-distinct-caller rule.
+
 ## Comparing assembly
 
 ```sh

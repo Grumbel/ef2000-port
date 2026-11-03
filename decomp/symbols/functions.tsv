@@ -447,16 +447,16 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002af20	65			unknown	unclassified	unverified		
 0x0002af64	17			unknown	unclassified	unverified		
 0x0002af78	81			unknown	unclassified	unverified		
-0x0002afcc	171			unknown	unclassified	unverified		
+0x0002afcc	171	detach_grid_link_on_mode_change	world_grid_links	drafted	game	confirmed	decomp/tests/0x0002afcc.json	AX/DL grid link cleanup; sentinel 0xff; host tested only
 0x0002b0b4	259			unknown	unclassified	unverified		
 0x0002b1f4	443			unknown	unclassified	unverified		
 0x0002b3b0	147			unknown	unclassified	unverified		
 0x0002b444	194			unknown	unclassified	unverified		
 0x0002b508	79			unknown	unclassified	unverified		
 0x0002b558	101	link_grid_cell	world_grid_control	drafted	game	confirmed	decomp/tests/0x0002b558.json	AX/DX row links; two original callers; derived link helpers unresolved; no guest splice
-0x0002b5c0	116			unknown	unclassified	unverified		
-0x0002b634	91			unknown	unclassified	unverified		
-0x0002b690	118			unknown	unclassified	unverified		
+0x0002b5c0	116	link_external_grid_cell	world_grid_links	drafted	game	confirmed	decomp/tests/0x0002b5c0.json	AX/DX link to external 0x45-byte node; dispatcher unrecovered
+0x0002b634	91	copy_grid_link_position	world_grid_links	drafted	game	confirmed	decomp/tests/0x0002b634.json	copy three 64-bit grid positions from forward link
+0x0002b690	118	refresh_external_grid_position	world_grid_links	drafted	game	confirmed	decomp/tests/0x0002b690.json	scale three signed external-node integers to row doubles; x87 precision pending
 0x0002b708	379			unknown	unclassified	unverified		
 0x0002b884	58	grid_slot_matches_object	world_grid	drafted	game	confirmed	decomp/tests/0x0002b884.json	filtered object lookup and +0xca grid row identity; guest verification pending
 0x0002b910	75	set_grid_slot_event	world_grid	drafted	game	confirmed	decomp/tests/0x0002b910.json	AX/DL event 0x58+value; calls 0x46168 ret4 before +0x90 store
@@ -494,7 +494,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002dce0	120			unknown	unclassified	unverified		
 0x0002dee4	239			unknown	unclassified	unverified		
 0x0002e030	90	reset_grid_cell_state	world_grid_control	drafted	game	confirmed	decomp/tests/0x0002e030.json	reset and copy pending dwords; original derived update unresolved
-0x0002e08c	201			unknown	unclassified	unverified		
+0x0002e08c	201	recompute_grid_limit	world_grid_limits	drafted	game	confirmed	decomp/tests/0x0002e08c.json	x87 per-type threshold and seven filtered-object lookups; NaN host cases only
 0x0002e184	783			unknown	unclassified	unverified		
 0x0002e494	681			unknown	unclassified	unverified		
 0x0002e740	461			unknown	unclassified	unverified		

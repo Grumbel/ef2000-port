@@ -1,0 +1,16 @@
+{
+  "address": "0x0002b634",
+  "function_size": 91,
+  "max_instructions": 512,
+  "cases": [
+    {"name": "copy_three_doubles", "registers": {"eax": "0xabcd0001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b00ee", "hex": "0200"},
+                {"address": "0x2b01f5", "hex": "000000000000f03f00000000000000c00000000000000840"}]},
+    {"name": "zero_values_do_not_touch_other_fields", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b00ee", "hex": "0200"},
+                {"address": "0x2b01f5", "hex": "000000000000000000000000000000000000000000000000"},
+                {"address": "0x2b00f1", "hex": "ffffffffffffffffffffffffffffffffffffffffffffffff"}]}
+  ]
+}
