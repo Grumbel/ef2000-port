@@ -1116,3 +1116,10 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0007ae0c	map_value_7ae0c	EAX:int32_t,EDX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007ae0c (123 bytes); Read the 16-bit value at wrapped (a, b) of the 0x190x0x190 two-plane map.; callers 7bb00@7bb2c; docs/compiler-abi.md
 0x0007f7dc	squared_distance_7f7dc	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007f7dc (115 bytes); Squared distance between a vector (>>8, 16-bit) and the origin at 0x21444c.; callers 7ef14@7f103,7ef14@7f1bc; docs/compiler-abi.md
 0x0008018c	show_menu_value_8018c	AX:int16_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008018c (87 bytes); ; callers 3122c@314fe,94d08@94f51; docs/compiler-abi.md
+0x0001f0c8	load_resource_1f0c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001f0c8 (52 bytes); ; callers 5f60@5f84; docs/compiler-abi.md
+0x0002d894	set_owner_pair_2d894	AX:int16_t,EDX:uint32_t,EBX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002d894 (54 bytes); Store two words in the owner record and refresh it.; callers 2b1f4@2b2fe,2b1f4@2b358; docs/compiler-abi.md
+0x00034a04	show_status_34a04			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00034a04 (52 bytes); ; callers 33630@33e6c; docs/compiler-abi.md
+0x00034a38	show_status_34a38			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00034a38 (45 bytes); ; callers 35590@35605; docs/compiler-abi.md
+0x00034a68	show_status_34a68			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00034a68 (45 bytes); ; callers 35cfc@35d19; docs/compiler-abi.md
+0x000391d0	init_list_391d0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000391d0 (52 bytes); ; callers 39204@39249; docs/compiler-abi.md
+0x00007ae4	send_unit_command_7ae4	AX:int16_t,DL:uint8_t,BL:uint8_t,CL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00007ae4 (81 bytes); Forward a command for a unit; kind 10 uses 0xff in place of its byte.; callers 46454@469fe,7156c@71a1c; docs/compiler-abi.md

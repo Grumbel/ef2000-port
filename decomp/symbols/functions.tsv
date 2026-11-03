@@ -104,7 +104,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00007780	40			unknown	unclassified	unverified		
 0x000077a8	280			unknown	unclassified	unverified		
 0x000078c0	465			unknown	unclassified	unverified		
-0x00007ae4	81			unknown	unclassified	unverified		
+0x00007ae4	81	send_unit_command_7ae4	game_helpers10	compiles	game	confirmed	decomp/tests/0x00007ae4.json	docs/compiler-abi.md; Forward a command for a unit; kind 10 uses 0xff in place of its byte.; callers 46454@469fe,7156c@71a1c; guest pending
 0x00007b38	134			unknown	unclassified	unverified		
 0x00007bc0	231			unknown	unclassified	unverified		
 0x00007ca8	120			unknown	unclassified	unverified		
@@ -341,7 +341,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001e684	107	age_timers_1e684	game_helpers7	compiles	game	confirmed	decomp/tests/0x0001e684.json	docs/compiler-abi.md; Age the twelve timers; those in state 0xe expire back to state 2.; callers 3dd30@3dfb8; guest pending
 0x0001e6f0	207			unknown	unclassified	unverified		
 0x0001e7c0	1070			unknown	unclassified	unverified		
-0x0001f0c8	52			unknown	unclassified	unverified		
+0x0001f0c8	52	load_resource_1f0c8	game_helpers10	compiles	game	confirmed	decomp/tests/0x0001f0c8.json	docs/compiler-abi.md; ; callers 5f60@5f84; guest pending
 0x0001f0fc	1751			unknown	unclassified	unverified		
 0x0001f7d4	102			unknown	unclassified	unverified		
 0x0001f878	74	push_event_1f878	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0001f878.json	docs/compiler-abi.md; Push an entry onto the ten-entry stack at 0x19b0d0 and request an event.; callers 14c5c@14d33,1a3cc@1a448,1a3cc@1a466; guest pending
@@ -484,7 +484,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002ce18	127			unknown	unclassified	unverified		
 0x0002ced4	1387			unknown	unclassified	unverified		
 0x0002d488	1036			unknown	unclassified	unverified		
-0x0002d894	54			unknown	unclassified	unverified		
+0x0002d894	54	set_owner_pair_2d894	game_helpers10	compiles	game	confirmed	decomp/tests/0x0002d894.json	docs/compiler-abi.md; Store two words in the owner record and refresh it.; callers 2b1f4@2b2fe,2b1f4@2b358; guest pending
 0x0002d9a4	176			unknown	unclassified	unverified		
 0x0002da54	269	refresh_grid_category	world_grid_category	compiles	game	confirmed	decomp/tests/0x0002da54.json	20 three-byte object features select lowest priority into row +0xbc
 0x0002db64	63	unit_has_id_2db64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0002db64.json	docs/compiler-abi.md; Does the unit named by table entry slot carry id?; callers 2dba4@2dbd4; guest pending
@@ -572,9 +572,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00034844	160	onopenNetMission		named	unclassified	unverified		
 0x000348e4	264			unknown	unclassified	unverified		
 0x000349ec	23	gnMainLoop		named	unclassified	unverified		
-0x00034a04	52			unknown	unclassified	unverified		
-0x00034a38	45			unknown	unclassified	unverified		
-0x00034a68	45			unknown	unclassified	unverified		
+0x00034a04	52	show_status_34a04	game_helpers10	compiles	game	confirmed	decomp/tests/0x00034a04.json	docs/compiler-abi.md; ; callers 33630@33e6c; guest pending
+0x00034a38	45	show_status_34a38	game_helpers10	compiles	game	confirmed	decomp/tests/0x00034a38.json	docs/compiler-abi.md; ; callers 35590@35605; guest pending
+0x00034a68	45	show_status_34a68	game_helpers10	compiles	game	confirmed	decomp/tests/0x00034a68.json	docs/compiler-abi.md; ; callers 35cfc@35d19; guest pending
 0x00034a98	76			unknown	unclassified	unverified		
 0x00034b2c	158			unknown	unclassified	unverified		
 0x00034bcc	215	gnInitialiseAbort		named	unclassified	unverified		
@@ -657,7 +657,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00038be8	251			unknown	unclassified	unverified		
 0x00039180	5			unknown	unclassified	unverified		
 0x0003918c	22	install_callback_53ecc	low_helpers	compiles	game	confirmed	decomp/tests/0x0003918c.json	docs/compiler-abi.md; dword 0x1a1780=0x53ecc and byte 0x1a363a=0; callers 3ea0c@3ee50; guest pending
-0x000391d0	52			unknown	unclassified	unverified		
+0x000391d0	52	init_list_391d0	game_helpers10	compiles	game	confirmed	decomp/tests/0x000391d0.json	docs/compiler-abi.md; ; callers 39204@39249; guest pending
 0x00039204	78	redraw_screen_39204	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00039204.json	docs/compiler-abi.md; ; callers 39254@392f4; guest pending
 0x00039254	168			unknown	unclassified	unverified		
 0x000392fc	1			unknown	unclassified	unverified		

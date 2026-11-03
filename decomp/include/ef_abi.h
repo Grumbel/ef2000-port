@@ -1854,4 +1854,17 @@ void guest_fn_77034(int32_t a, int32_t b); /* 0x77034 EAX/EDX */
 void guest_fn_76f58(ef_addr32 unit, ef_addr32 record); /* 0x76f58 EAX/EDX */
 uint32_t guest_fn_d70a0(uint32_t value); /* 0xd70a0 AL -> AL */
 
+/* game_helpers10.c */
+void load_resource_1f0c8(void);
+void set_owner_pair_2d894(int16_t owner, uint32_t first, uint32_t second);
+void show_status_34a04(void);
+void show_status_34a38(void);
+void show_status_34a68(void);
+void init_list_391d0(void);
+void send_unit_command_7ae4(int16_t unit_id, uint8_t a, uint8_t b, uint8_t kind);
+uint32_t guest_fn_c3670(ef_addr32 a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0xc3670 EAX/EDX/EBX/ECX/stack, ret 4 */
+void guest_fn_2da54(int32_t owner); /* 0x2da54 EAX */
+void guest_fn_c36b4(ef_addr32 a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0xc36b4 EAX/EDX/EBX/ECX/stack, ret 8 */
+void guest_fn_740e4(int32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0x740e4 EAX/EDX/EBX/ECX/stack, ret 4 */
+
 #endif

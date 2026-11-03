@@ -2607,3 +2607,15 @@ in EAX, format string address, one value).
 | `0x7ae0c` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | 7bb00@7bb2c | Read the 16-bit value at wrapped (a, b) of the 0x190x0x190 two-plane map. |
 | `0x7f7dc` | EAX:ef_addr32 | EAX:uint32_t | 7ef14@7f103,7ef14@7f1bc | Squared distance between a vector (>>8, 16-bit) and the origin at 0x21444c. |
 | `0x8018c` | AX:int16_t,EDX:uint32_t | none | 3122c@314fe,94d08@94f51 |  |
+
+## game_helpers10 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1f0c8` | none | none | 5f60@5f84 |  |
+| `0x2d894` | AX:int16_t,EDX:uint32_t,EBX:uint32_t | none | 2b1f4@2b2fe,2b1f4@2b358 | Store two words in the owner record and refresh it. |
+| `0x34a04` | none | none | 33630@33e6c |  |
+| `0x34a38` | none | none | 35590@35605 |  |
+| `0x34a68` | none | none | 35cfc@35d19 |  |
+| `0x391d0` | none | none | 39204@39249 |  |
+| `0x7ae4` | AX:int16_t,DL:uint8_t,BL:uint8_t,CL:uint8_t | none | 46454@469fe,7156c@71a1c | Forward a command for a unit; kind 10 uses 0xff in place of its byte. |
