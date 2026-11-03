@@ -215,3 +215,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000ec8c	read_parser_enum_106_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xec8c (82 bytes); 106 names, callers eefc@ef0e/f260@f27a; docs/compiler-abi.md
 0x0000ece0	read_parser_enum_10_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xece0 (79 bytes); 10 names, callers f314@f3c7/f604@f644; docs/compiler-abi.md
 0x0000ed30	read_parser_enum_19_names		EAX:uint32_t	ebx,ecx,edx	0	Original 0xed30 (79 bytes); 19 names, callers ed80@edbe/ee0c@ee30; docs/compiler-abi.md
+0x0000d530	copy_runtime_input_state	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32		ecx	0	Original 0xd530 (29 bytes); three independent stores; callers 418c4@418dd/45a54@45a79; docs/compiler-abi.md
+0x0000e810	read_parser_line		EAX:uint8_t	ebx,ecx,edx	0	Original 0xe810 (138 bytes); comment/blank filtering, 1024 warning; callers ed80@ed85/ee0c@ee0f; docs/compiler-abi.md
+0x0000f8f8	release_secondary_parser_text			ebx,edx	0	Original 0xf8f8 (30 bytes); release optional buffer; callers b1b10@b1b7f/ca7e0@ca7e3; docs/compiler-abi.md
+0x0000fe4c	read_parser_text_record	EAX:ef_addr32	EAX:uint32_t	edx	0	Original 0xfe4c (125 bytes); string plus byte and word fields; callers f314@f5d3/fcf4@fe36; docs/compiler-abi.md
+0x00010640	sample_runtime_tick		EAX:uint32_t		0	Original 0x10640 (12 bytes); indirect timer then store, callback clobbers not yet audited; callers 1064c@1064c/1065c@1065e; docs/compiler-abi.md
+0x0001065c	advance_runtime_tick		EAX:int32_t	ebx,edx	0	Original 0x1065c (42 bytes); signed time delta floor two; callers 3dd30@3ddea/f3d54@f3d61; docs/compiler-abi.md
+0x000106b0	pack_runtime_position	AX:int16_t,EDX:int32_t,ECX:int32_t,stack_code:uint32_t			4	Original 0x106b0 (94 bytes); >>11, center residuals, EBX clobbered; callers 9114@92a6/15b7c@15fbc; docs/compiler-abi.md
+0x00010f28	transform_runtime_word_pair	AX:uint16_t,EDX:ef_addr32,EBX:ef_addr32		ecx,edi	0	Original 0x10f28 (71 bytes); four-mode 16-bit pair transform; callers 10f70@10fb5/11014@11092; docs/compiler-abi.md

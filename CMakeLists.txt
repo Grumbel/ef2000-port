@@ -210,6 +210,20 @@ target_compile_options(ef2000-decomp-parser-enums-test PRIVATE -Wall -Wextra -We
 target_compile_definitions(ef2000-decomp-parser-enums-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-parser-enums-test PRIVATE decomp/include)
 add_test(NAME decomp-parser-enums-host-model COMMAND ef2000-decomp-parser-enums-test)
+add_executable(ef2000-decomp-parser-line-records-test
+  tests/decomp_parser_line_records_test.c decomp/src/parser_line_records.c)
+target_compile_features(ef2000-decomp-parser-line-records-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-parser-line-records-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-parser-line-records-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-parser-line-records-test PRIVATE decomp/include)
+add_test(NAME decomp-parser-line-records-host-model COMMAND ef2000-decomp-parser-line-records-test)
+add_executable(ef2000-decomp-runtime-small-ops-test
+  tests/decomp_runtime_small_ops_test.c decomp/src/runtime_small_ops.c)
+target_compile_features(ef2000-decomp-runtime-small-ops-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-runtime-small-ops-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-runtime-small-ops-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-runtime-small-ops-test PRIVATE decomp/include)
+add_test(NAME decomp-runtime-small-ops-host-model COMMAND ef2000-decomp-runtime-small-ops-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

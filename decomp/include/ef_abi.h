@@ -148,6 +148,22 @@ uint32_t read_parser_enum_27_names(void); /* 0xebec -> EAX index */
 uint32_t read_parser_enum_106_names(void); /* 0xec8c -> EAX index */
 uint32_t read_parser_enum_10_names(void); /* 0xece0 -> EAX index */
 uint32_t read_parser_enum_19_names(void); /* 0xed30 -> EAX index */
+uint8_t read_parser_line(void); /* 0xe810 -> AL first byte of line */
+void release_secondary_parser_text(void); /* 0xf8f8 */
+uint32_t read_parser_text_record(ef_addr32 record); /* 0xfe4c EAX -> EAX=1 */
+uint8_t guest_parser_next_character(void); /* 0xe774 -> AL */
+void guest_parser_line_overflow(ef_addr32 message); /* [0x132a74], one stack arg */
+
+/* Small runtime state, clock, packed-coordinate and word-pair helpers. */
+void copy_runtime_input_state(ef_addr32 word_a, ef_addr32 word_b,
+                              ef_addr32 byte_c); /* 0xd530 EAX/EDX/EBX */
+uint32_t sample_runtime_tick(void); /* 0x10640 -> EAX */
+int32_t advance_runtime_tick(void); /* 0x1065c -> EAX >=2 */
+uint32_t guest_read_runtime_tick(void); /* [0x15b620] -> EAX */
+void pack_runtime_position(int16_t heading, int32_t x,
+                           int32_t y, uint8_t code); /* 0x106b0 AX/EDX/ECX/stack, ret4 */
+void transform_runtime_word_pair(uint16_t mode, ef_addr32 a,
+                                 ef_addr32 b); /* 0x10f28 AX/EDX/EBX */
 
 /* Unrecovered original conversion/allocation/diagnostic interfaces. */
 void guest_release_parser_buffer(ef_addr32 buffer); /* 0xcc768 EAX */

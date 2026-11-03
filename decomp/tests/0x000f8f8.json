@@ -1,0 +1,1 @@
+{"address":"0x0000f8f8","function_size":30,"max_instructions":180000,"cases":[{"name":"nothing_owned","memory":[{"address":"0x001a5904","hex":"00000000"}]}]}

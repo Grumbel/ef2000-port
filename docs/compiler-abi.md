@@ -1409,6 +1409,32 @@ share a helper but retain the per-entry table bounds and diagnostics.
 Host tests check first and last dictionary matches and all not-found
 paths; guest fixtures are structural plans only.
 
+## Parser lines, timing and packed runtime coordinates (2026-11-03)
+
+Eight additional original bodies were examined, with two distinct direct
+callers per function. These are host-tested **drafts**, not completed splices.
+
+| Entry | Inputs and outputs | Independent caller instructions | Key behavior |
+| --- | --- | --- | --- |
+| `0xd530` | EAX/EDX/EBX guest output pointers; no consumed return | `0x418dd`, `0x45a79` | copies word globals `0x197696`, `0x19bb5e` and byte `0x121e8c` in that order |
+| `0xe810` | no input; AL is first byte of accepted line | `0xed85`, `0xee0f` | token cursor reset; read source via `0xe774`; strip leading spaces/tabs; skip semicolon and blank lines; increment line count `0x121eac` |
+| `0xf8f8` | no input; no consumed return | `0xb1b7f`, `0xca7e3` | free optional buffer `0x1a5904` through guest `0xcc768`, then clear the pointer |
+| `0xfe4c` | EAX record pointer; EAX=1 | `0xf5d3`, `0xfe36` | read line, skip a token, allocate next token; store pointer `+0x00`, five bytes `+0x05..09`, six signed words `+0x0a..14` |
+| `0x10640` | no input; EAX tick sample | `0x1064c`, `0x1065e` | call `[0x15b620]`, store resulting EAX at `0x197c14`; callback clobber contract still open |
+| `0x1065c` | no input; signed EAX delta clamped to at least 2 | `0x3ddea`, `0xf3d61` | call `0x10640`, subtract prior tick `0x197c10` with dword wrap, update prior tick |
+| `0x106b0` | AX heading, EDX/ECX signed coordinates, one stack dword carrying a byte; `ret 4` | `0x92a6`, `0x15fbc` | arithmetic shift 11, two signed residuals centered at 1024, clear latch, store code; EBX clobbered |
+| `0x10f28` | AX unsigned mode 0..3, EDX/EBX pointers; no consumed return | `0x10fb5`, `0x11092` | mode 1 swaps with one negation; mode 2 negates both; mode 3 swaps with other negation; all other modes unchanged |
+
+The original `0xe810` reports input lines of length at least 1024 but
+continues writing past that bound afterward: **ORIGINAL BUG**, preserved
+in the draft. The `0x106b0` signed right-shift is floor division by 2048,
+not C truncation toward zero, and only 16-bit residuals are stored. The
+delta at `0x1065c` is compared as signed after wraparound.
+
+The fixture for the parser line supplies a synthetic immediate EOF reader;
+the tick fixtures supply an indirect-call stub. Real file callbacks and
+timer state need original guest replay before any equivalence claim.
+
 ## Comparing assembly
 
 ```sh

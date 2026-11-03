@@ -205,3 +205,16 @@ addr	size	type	name	evidence	notes
 0x00132fb4	424	ef_addr32[106]	g_parser_enum_names_106	0xec9d reads	One-hundred-six-name command enum dictionary
 0x0013336c	40	ef_addr32[10]	g_parser_enum_names_10	0xecf1 reads	Ten-name command enum dictionary
 0x00132c2c	76	ef_addr32[19]	g_parser_enum_names_19	0xed41 reads	Nineteen-name command enum dictionary
+0x00197696	2	uint16_t	g_runtime_input_word_a	0xd531 reads	Copied to caller word A
+0x0019bb5e	2	uint16_t	g_runtime_input_word_b	0xd53b reads	Copied to caller word B, aliases grid index
+0x00121e8c	1	uint8_t	g_runtime_input_byte_c	0xd544 reads	Copied to caller byte C
+0x001a5904	4	ef_addr32	g_secondary_parser_text	0xf8fa reads 0xf90d clears	Optional allocated parser text
+0x00197c10	4	uint32_t	g_runtime_previous_tick	0x10669 reads 0x10673 writes	Wrapped millisecond tick
+0x00197c14	4	uint32_t	g_runtime_current_tick	0x10646 writes	Indirect tick result
+0x00197c24	2	int16_t	g_runtime_residual_x	0x106e4 writes	Position x modulo 2048 centered -1024
+0x00197c26	2	int16_t	g_runtime_residual_y	0x106ff writes	Position y modulo 2048 centered -1024
+0x00197c28	2	int16_t	g_runtime_heading	0x106b0 writes	Heading passed in AX
+0x00197c2a	2	int16_t	g_runtime_coarse_x	0x106bb writes	Signed x >>11
+0x00197c2c	2	int16_t	g_runtime_coarse_y	0x106c8 writes	Signed y >>11
+0x00197c2e	1	uint8_t	g_runtime_coordinate_code	0x10706 writes	Caller stack-byte code
+0x00121ec6	1	uint8_t	g_runtime_coordinate_latch	0x106f5 clears	Cleared by packing position

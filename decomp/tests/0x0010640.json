@@ -1,0 +1,1 @@
+{"address":"0x00010640","function_size":12,"max_instructions":180000,"cases":[{"name":"tick_sample","memory":[{"address":"0x0015b620","hex":"00002a00"},{"address":"0x002a0000","hex":"b878563412c3"}]}]}

@@ -702,6 +702,18 @@
             ${source}/decomp/src/parser_enums.c \
             -o work/parser_enums_host_test
           work/parser_enums_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_parser_line_records_test.c \
+            ${source}/decomp/src/parser_line_records.c \
+            -o work/parser_line_records_host_test
+          work/parser_line_records_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_runtime_small_ops_test.c \
+            ${source}/decomp/src/runtime_small_ops.c \
+            -o work/runtime_small_ops_host_test
+          work/runtime_small_ops_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

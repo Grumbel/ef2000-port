@@ -1,0 +1,1 @@
+{"address":"0x00010f28","function_size":71,"max_instructions":180000,"cases":[{"name":"rotate_mode_1","registers":{"eax":"0x00000001","edx":"0x002a0000","ebx":"0x002a0002"},"memory":[{"address":"0x002a0000","hex":"07000b00"}]},{"name":"negate_mode_2","registers":{"eax":"0x00000002","edx":"0x002a0000","ebx":"0x002a0002"},"memory":[{"address":"0x002a0000","hex":"07000b00"}]}]}

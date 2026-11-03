@@ -174,7 +174,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000ca5c	573			unknown	unclassified	unverified		
 0x0000cccc	1475	gpwRedrawRoute		named	unclassified	unverified		
 0x0000d290	671			unknown	unclassified	unverified		
-0x0000d530	29			unknown	unclassified	unverified		
+0x0000d530	29	copy_runtime_input_state	runtime_small_ops	drafted	game	confirmed	decomp/tests/0x000d530.json	Three independent packed input fields; callers 418c4@418dd/45a54@45a79; guest pending
 0x0000d550	216			unknown	unclassified	unverified		
 0x0000d628	99			unknown	unclassified	unverified		
 0x0000d68c	3585			unknown	unclassified	unverified		
@@ -184,7 +184,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000e764	15			unknown	unclassified	unverified		
 0x0000e774	104			unknown	unclassified	unverified		
 0x0000e7dc	51	initialize_parser_records	parser_records	drafted	game	confirmed	decomp/tests/0x000e7dc.json	Original 0xe7dc; copy default byte then clear stream counters and index; docs/compiler-abi.md; guest replay pending
-0x0000e810	138			unknown	unclassified	unverified		
+0x0000e810	138	read_parser_line	parser_line_records	drafted	game	confirmed	decomp/tests/0x000e810.json	Semicolon comments and empty lines skipped; 1024-byte warning without bounded write; callers ed80@ed85/ee0c@ee0f; guest pending
 0x0000e89c	190	read_parser_token	parser_records	drafted	game	confirmed	decomp/tests/0x000e89c.json	Original 0xe89c; quoted/unquoted tokenizer, 80-byte cap and signed-16 index; docs/compiler-abi.md; guest replay pending
 0x0000e95c	35	read_parser_integer	parser_records	drafted	game	confirmed	decomp/tests/0x000e95c.json	Original 0xe95c; empty -1 or tail integer conversion; docs/compiler-abi.md; guest replay pending
 0x0000e980	15	read_parser_decimal	parser_records	drafted	game	confirmed	decomp/tests/0x000e980.json	Original 0xe980; token then conversion tail jump; docs/compiler-abi.md; guest replay pending
@@ -216,27 +216,27 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000f314	749			unknown	unclassified	unverified		
 0x0000f604	163			unknown	unclassified	unverified		
 0x0000f6a8	591			unknown	unclassified	unverified		
-0x0000f8f8	30			unknown	unclassified	unverified		
+0x0000f8f8	30	release_secondary_parser_text	parser_line_records	drafted	game	confirmed	decomp/tests/0x000f8f8.json	Release optional text buffer and null it; callers b1b10@b1b7f/ca7e0@ca7e3; guest pending
 0x0000f918	504			unknown	unclassified	unverified		
 0x0000fb10	187			unknown	unclassified	unverified		
 0x0000fbcc	136			unknown	unclassified	unverified		
 0x0000fc54	159			unknown	unclassified	unverified		
 0x0000fcf4	343			unknown	unclassified	unverified		
-0x0000fe4c	125			unknown	unclassified	unverified		
+0x0000fe4c	125	read_parser_text_record	parser_line_records	drafted	game	confirmed	decomp/tests/0x000fe4c.json	Parser line then two token advances, string plus 5 bytes and 6 words; callers f314@f5d3/fcf4@fe36; guest pending
 0x0000fecc	231			unknown	unclassified	unverified		
 0x0000ffb4	103			unknown	unclassified	unverified		
 0x0001001c	1414			unknown	unclassified	unverified		
 0x000105a4	141			unknown	unclassified	unverified		
-0x00010640	12			unknown	unclassified	unverified		
+0x00010640	12	sample_runtime_tick	runtime_small_ops	drafted	game	confirmed	decomp/tests/0x0010640.json	Indirect tick callback and global storage; callers 1064c@1064c/1065c@1065e; guest pending
 0x0001064c	16			unknown	unclassified	unverified		
-0x0001065c	42			unknown	unclassified	unverified		
+0x0001065c	42	advance_runtime_tick	runtime_small_ops	drafted	game	confirmed	decomp/tests/0x001065c.json	Tick delta signed clamp 2 and previous tick store; callers 3dd30@3ddea/f3d54@f3d61; guest pending
 0x00010688	32			unknown	unclassified	unverified		
 0x000106a8	1			unknown	unclassified	unverified		
-0x000106b0	94			unknown	unclassified	unverified		
+0x000106b0	94	pack_runtime_position	runtime_small_ops	drafted	game	confirmed	decomp/tests/0x00106b0.json	Floor /2048 and signed 16-bit centered residuals, stack byte; callers 9114@92a6/15b7c@15fbc; guest pending
 0x00010710	61			unknown	unclassified	unverified		
 0x00010750	843			unknown	unclassified	unverified		
 0x00010a9c	1163			unknown	unclassified	unverified		
-0x00010f28	71			unknown	unclassified	unverified		
+0x00010f28	71	transform_runtime_word_pair	runtime_small_ops	drafted	game	confirmed	decomp/tests/0x0010f28.json	AX mode 1/2/3 rotates and negates two words; callers 10f70@10fb5/11014@11092; guest pending
 0x00010f70	164			unknown	unclassified	unverified		
 0x00011014	216			unknown	unclassified	unverified		
 0x000110ec	1140			unknown	unclassified	unverified		

@@ -1,0 +1,1 @@
+{"address":"0x0001065c","function_size":42,"max_instructions":180000,"cases":[{"name":"clamped_tick_delta","memory":[{"address":"0x0015b620","hex":"00002a00"},{"address":"0x002a0000","hex":"b805000000c3"},{"address":"0x00197c10","hex":"0a000000"}]}]}

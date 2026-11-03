@@ -1,0 +1,1 @@
+{"address":"0x000106b0","function_size":94,"max_instructions":180000,"cases":[{"name":"negative_world_coordinate","registers":{"eax":"0x0000fff9","edx":"0x00000c00","ecx":"0xffffffff"},"stack_args":["0x000000e3"]}]}
