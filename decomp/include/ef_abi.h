@@ -1905,4 +1905,17 @@ uint32_t get_global_c382c(void);
 int32_t random_modulo_b55a4(ef_addr32 record);
 uint32_t guest_fn_9de08(ef_addr32 text, uint32_t flag); /* 0x9de08 EAX/EDX */
 
+/* runtime_helpers7.c */
+void build_path_9c9c0(ef_addr32 buffer, ef_addr32 name);
+void set_clip_9d7d4(int32_t x, int32_t y);
+void append_base_name_9dc88(ef_addr32 scratch, ef_addr32 path, ef_addr32 name);
+void clear_page_slot_9f7d0(int16_t index, uint32_t value);
+void set_page_slot_9f808(int16_t index, uint32_t value, uint8_t flags, uint32_t position);
+void copy_page_words_a0d58(int16_t offset, uint16_t count, ef_addr32 source);
+int32_t find_chain_entry_a0018(uint16_t key_high, uint16_t key_low);
+uint32_t find_page_pair_a1a90(int16_t page, int32_t key);
+void set_page_entry_a2634(int16_t index, int16_t entry, uint32_t value);
+uint32_t guest_fn_9c858(ef_addr32 text); /* 0x9c858 EAX -> EAX */
+void guest_fn_a207c(ef_addr32 target, ef_addr32 slot); /* 0xa207c EAX/EDX */
+
 #endif

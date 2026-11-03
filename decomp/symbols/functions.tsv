@@ -2043,7 +2043,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009c8b4	84			unknown	unclassified	unverified		
 0x0009c960	19	half_word_9c960	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c960.json	docs/compiler-abi.md; ; callers f60@f6a,2e04@334f,2e04@337c; guest pending
 0x0009c980	63	build_default_path_9c980	engine_helpers3	compiles	game	confirmed	decomp/tests/0x0009c980.json	docs/compiler-abi.md; Build the default path string in buffer.; callers f80@1120,45a4@45ae,2ff44@2ff7d; guest pending
-0x0009c9c0	86			unknown	unclassified	unverified		
+0x0009c9c0	86	build_path_9c9c0	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009c9c0.json	docs/compiler-abi.md; Build a search path: default directory + separator + name.; callers 371b0@371c2,abaf0@abaf6,c8e58@c8e75; guest pending
 0x0009ca57	55			unknown	unclassified	unverified		
 0x0009cb20	78	find_in_archives_9cb20	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009cb20.json	docs/compiler-abi.md; Try the two open archives, then fall back to 0xb3b90.; callers 41fc@420d,6b50@6bb9,f6a8@f700; guest pending
 0x0009cb70	84	lookup_in_archives_9cb70	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009cb70.json	docs/compiler-abi.md; As 0x9cb20 with 0xeba4c and 0xa7b3c; -1 becomes 0.; callers 9cc28@9cc81,ea270@ea30d; guest pending
@@ -2072,7 +2072,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d780	20	copy_head_9d780	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009d780.json	docs/compiler-abi.md; Copy the first and third dword of a record and clear the second.; callers a00a4@a00c5,a08c8@a0931; guest pending
 0x0009d794	23	set_axis_9d794	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009d794.json	docs/compiler-abi.md; ; callers 9f664@9f697,9f710@9f720,9f850@9f885; guest pending
 0x0009d7ac	39	set_axis_9d7ac	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d7ac.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x0009d7d4	54			unknown	unclassified	unverified		
+0x0009d7d4	54	set_clip_9d7d4	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009d7d4.json	docs/compiler-abi.md; Reset the clip words; the first stores are overwritten in the original.; callers none direct; guest pending
 0x0009d80c	37	set_axis_9d80c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d80c.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0009d834	258			unknown	unclassified	unverified		
 0x0009d938	41	reset_parser_state_9d938	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d938.json	docs/compiler-abi.md; ; callers e4264@e429f; guest pending
@@ -2081,7 +2081,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009da50	47	skip_line_9da50	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009da50.json	docs/compiler-abi.md; Skip to the end of the current line and past the line break.; callers 9da80@9db09,9da80@9dbc8; guest pending
 0x0009da80	365			unknown	unclassified	unverified		
 0x0009dbf0	149			unknown	unclassified	unverified		
-0x0009dc88	110			unknown	unclassified	unverified		
+0x0009dc88	110	append_base_name_9dc88	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009dc88.json	docs/compiler-abi.md; Lower-case the name part (at most 8 chars) of a file name and append it to a path.; callers 9de08@9de22; guest pending
 0x0009dcf8	228			unknown	unclassified	unverified		
 0x0009dddc	1			unknown	unclassified	unverified		
 0x0009dde0	27	store_table_entry_9dde0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009dde0.json	docs/compiler-abi.md; Store the converted table entry index into the 16-bit slot at destination.; callers 9e7bc@9f5d5,9f7d0@9f7f7,9f808@9f83d; guest pending
@@ -2096,8 +2096,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009e7bc	3752			unknown	unclassified	unverified		
 0x0009f664	170			unknown	unclassified	unverified		
 0x0009f710	189			unknown	unclassified	unverified		
-0x0009f7d0	55			unknown	unclassified	unverified		
-0x0009f808	69			unknown	unclassified	unverified		
+0x0009f7d0	55	clear_page_slot_9f7d0	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009f7d0.json	docs/compiler-abi.md; Clear the flag byte of a page slot and mark the page dirty.; callers 9e7bc@9e80d; guest pending
+0x0009f808	69	set_page_slot_9f808	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009f808.json	docs/compiler-abi.md; Set flags and a relative word offset in a page slot and mark the page dirty.; callers 9e7bc@9e832; guest pending
 0x0009f850	240			unknown	unclassified	unverified		
 0x0009f940	446			unknown	unclassified	unverified		
 0x0009fb00	254			unknown	unclassified	unverified		
@@ -2106,7 +2106,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009fe1c	139			unknown	unclassified	unverified		
 0x0009fea8	288			unknown	unclassified	unverified		
 0x0009ffc8	80			unknown	unclassified	unverified		
-0x000a0018	69			unknown	unclassified	unverified		
+0x000a0018	69	find_chain_entry_a0018	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a0018.json	docs/compiler-abi.md; Find the entry in the 0x4e-byte chain whose two keys match, or -1.; callers a0228@a0240; guest pending
 0x000a0060	65			unknown	unclassified	unverified		
 0x000a00a4	67			unknown	unclassified	unverified		
 0x000a00e8	137			unknown	unclassified	unverified		
@@ -2120,7 +2120,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a0aa0	186			unknown	unclassified	unverified		
 0x000a0b98	73			unknown	unclassified	unverified		
 0x000a0c04	340			unknown	unclassified	unverified		
-0x000a0d58	80			unknown	unclassified	unverified		
+0x000a0d58	80	copy_page_words_a0d58	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a0d58.json	docs/compiler-abi.md; Copy count words into the current page from source.; callers 9e7bc@9e916,9e7bc@9e937,9e7bc@9e94c; guest pending
 0x000a0da8	54	page_slot_a0da8	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a0da8.json	docs/compiler-abi.md; Address of 16-bit slot index in the current page record.; callers 9e7bc@9f124,9e7bc@9f36d,9e7bc@9f5df; guest pending
 0x000a0de0	68	select_page_slot_a0de0	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a0de0.json	docs/compiler-abi.md; Select page record and return the address of slot index.; callers 8c930@8c957,cd150@cd187,e3c6c@e3c9c; guest pending
 0x000a0e98	16	record_flag_bit4	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a0e98.json	docs/compiler-abi.md; bit 4 of byte +0xa of 0xb3f58 record; callers 3d950@3d97d,3da24@3da52; guest pending
@@ -2138,7 +2138,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a1858	17	record_flag_bits56	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a1858.json	docs/compiler-abi.md; bits 5-6 of byte +0xa; callers 10f70@10faf,11014@11038,1e214@1e22b; guest pending
 0x000a1a10	47	record_entry_address	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a1a10.json	docs/compiler-abi.md; table 0x40d200[word record] entry+0xa+6*byte +9; callers cd150@cd193,e8484@e84e6; guest pending
 0x000a1a40	77			unknown	unclassified	unverified		
-0x000a1a90	83			unknown	unclassified	unverified		
+0x000a1a90	83	find_page_pair_a1a90	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a1a90.json	docs/compiler-abi.md; Look up key in the (key, offset) pair table of a page; return the address or 0.; callers 2fbc4@2fc8b,3c730@3c744,74228@74267; guest pending
 0x000a1afc	41			unknown	unclassified	unverified		
 0x000a1b28	41			unknown	unclassified	unverified		
 0x000a1b54	157			unknown	unclassified	unverified		
@@ -2153,7 +2153,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a2334	254			unknown	unclassified	unverified		
 0x000a2434	203			unknown	unclassified	unverified		
 0x000a2500	308			unknown	unclassified	unverified		
-0x000a2634	100			unknown	unclassified	unverified		
+0x000a2634	100	set_page_entry_a2634	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a2634.json	docs/compiler-abi.md; Fill one entry of the current page and refresh the page slot.; callers 9e7bc@9f498; guest pending
 0x000a2698	141			unknown	unclassified	unverified		
 0x000a2728	399			unknown	unclassified	unverified		
 0x000a28f2	7	abs_a28f2	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000a28f2.json	docs/compiler-abi.md; Absolute value.; callers 20ec@2128,20ec@2142,20ec@215a; guest pending

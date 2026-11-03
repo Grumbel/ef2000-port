@@ -2661,3 +2661,17 @@ in EAX, format string address, one value).
 | `0xc3824` | none | EAX:uint32_t | eac48@eaca8 |  |
 | `0xc382c` | none | EAX:uint32_t | ab8b0@ab8b3,c9fc4@ca07c,c9fc4@ca142 |  |
 | `0xb55a4` | EAX:ef_addr32 | EAX:int32_t | b7d4c@b7da2,b7d4c@b7dbf,b8510@b85c5 | Random number modulo the signed high word at +0x2 of the record. |
+
+## runtime_helpers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9c9c0` | EAX:ef_addr32,EDX:ef_addr32 | none | 371b0@371c2,abaf0@abaf6,c8e58@c8e75 | Build a search path: default directory + separator + name. |
+| `0x9d7d4` | EAX:int32_t,EDX:int32_t | none | none direct | Reset the clip words; the first stores are overwritten in the original. |
+| `0x9dc88` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 9de08@9de22 | Lower-case the name part (at most 8 chars) of a file name and append it to a path. |
+| `0x9f7d0` | AX:int16_t,EDX:uint32_t | none | 9e7bc@9e80d | Clear the flag byte of a page slot and mark the page dirty. |
+| `0x9f808` | AX:int16_t,EDX:uint32_t,BL:uint8_t,ECX:uint32_t | none | 9e7bc@9e832 | Set flags and a relative word offset in a page slot and mark the page dirty. |
+| `0xa0d58` | AX:int16_t,DX:uint16_t,EBX:ef_addr32 | none | 9e7bc@9e916,9e7bc@9e937,9e7bc@9e94c | Copy count words into the current page from source. |
+| `0xa0018` | AX:uint16_t,DX:uint16_t | EAX:int32_t | a0228@a0240 | Find the entry in the 0x4e-byte chain whose two keys match, or -1. |
+| `0xa1a90` | AX:int16_t,EDX:int32_t | EAX:uint32_t | 2fbc4@2fc8b,3c730@3c744,74228@74267 | Look up key in the (key, offset) pair table of a page; return the address or 0. |
+| `0xa2634` | AX:int16_t,DX:int16_t,EBX:uint32_t | none | 9e7bc@9f498 | Fill one entry of the current page and refresh the page slot. |
