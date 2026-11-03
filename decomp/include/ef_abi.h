@@ -1514,4 +1514,29 @@ void guest_fn_11f2d3(void); /* 0x11f2d3 */
 void guest_fn_11f2d5(void); /* 0x11f2d5 */
 ef_addr32 guest_fn_e8733(uint32_t count, uint32_t size); /* 0xe8733 EAX/EDX -> EAX */
 
+/* ui_widget_helpers.c */
+int32_t push_handler_9c3cf(uint32_t handler);
+void copy_string_9d749(ef_addr32 destination, ef_addr32 source);
+void set_axis_9d7ac(uint32_t a, uint32_t b);
+void set_axis_9d80c(uint32_t a, uint32_t b);
+void reset_parser_state_9d938(void);
+uint32_t parse_decimal_9d964(ef_addr32 text);
+ef_addr32 skip_line_9da50(ef_addr32 text);
+ef_addr32 page_slot_a0da8(int16_t index);
+ef_addr32 select_page_slot_a0de0(int16_t page_id, int16_t index);
+void clear_page_slot_a0f4c(int16_t index);
+void flag_page_slot_a14c8(int16_t index);
+int32_t record_type_value_a17e8(int16_t id);
+void copy_record_header_a1824(ef_addr32 destination, int16_t id);
+void refresh_children_a6998(ef_addr32 widget);
+void redraw_children_a7104(ef_addr32 widget);
+void redraw_all_children_a7260(ef_addr32 widget);
+void notify_group_a729c(ef_addr32 widget, ef_addr32 other);
+void enable_widget_a72d8(ef_addr32 widget);
+void save_table_a7e4c(void);
+void restore_table_a7e88(void);
+void apply_operation_a983c(ef_addr32 op);
+void guest_fn_a66cc(ef_addr32 widget, uint32_t mode); /* 0xa66cc EAX/EDX */
+void guest_fn_a6808(ef_addr32 widget); /* 0xa6808 EAX */
+
 #endif

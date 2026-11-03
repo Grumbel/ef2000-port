@@ -2309,3 +2309,29 @@ in EAX, format string address, one value).
 | `0x11f308` | EAX:int32_t | EAX:int32_t | 11f368@11f3c0,11f368@11f3d9,11f368@11f3f7 | Interpolated table lookup (6-bit fraction, 0x17ea2c table), result >> 14. |
 | `0x11f460` | EAX:int32_t | EAX:int32_t | 11f4d8@11f4f6,11f4d8@11f50d,11f4d8@11f52c | Table lookup of x * 2^14 / 0x6487 (0x17e628 table), result >> 14. |
 | `0x11f4d8` | EAX:int32_t | EAX:int32_t | 11f538@11f53d,11f538@11f54a | Full-circle (0x1921f units) wrapper around trig_lookup_11f460. |
+
+## ui_widget_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9c3cf` | EAX:uint32_t | EAX:int32_t | 81c@875,b04@b44,80058@8010a | Push a handler on the 32-entry stack at 0x40d030; -1 if full. |
+| `0x9d749` | EAX:ef_addr32,EDX:ef_addr32 | none | f80@15a5,f80@1a32,20ec@2646 | strcpy. |
+| `0x9d7ac` | EAX:uint32_t,EDX:uint32_t | none | none direct |  |
+| `0x9d80c` | EAX:uint32_t,EDX:uint32_t | none | none direct |  |
+| `0x9d938` | none | none | e4264@e429f |  |
+| `0x9d964` | EAX:ef_addr32 | EAX:uint32_t | 9d990@9d9f1,9da80@9db84 | Parse the decimal digits at text. |
+| `0x9da50` | EAX:ef_addr32 | EAX:ef_addr32 | 9da80@9db09,9da80@9dbc8 | Skip to the end of the current line and past the line break. |
+| `0xa0da8` | AX:int16_t | EAX:ef_addr32 | 9e7bc@9f124,9e7bc@9f36d,9e7bc@9f5df | Address of 16-bit slot index in the current page record. |
+| `0xa0de0` | AX:int16_t,DX:int16_t | EAX:ef_addr32 | 8c930@8c957,cd150@cd187,e3c6c@e3c9c | Select page record and return the address of slot index. |
+| `0xa0f4c` | AX:int16_t | none | 9e7bc@9f0dc | Clear slot index of the current page. |
+| `0xa14c8` | AX:int16_t | none | 9e7bc@9eabd | Set the high flag of slot index of the current page. |
+| `0xa17e8` | AX:int16_t | EAX:int32_t | 3cd9c@3cde9,53c80@53cf8 | Value of the type byte (bits 2..7) if bit 1 is set, else -1. |
+| `0xa1824` | EAX:ef_addr32,DX:int16_t | none | d0470@d04d3 | Copy the header fields of record id into dest. |
+| `0xa6998` | EAX:ef_addr32 | none | a59d8@a5a32 | Refresh every child of a widget that is not of kind 9. |
+| `0xa7104` | EAX:ef_addr32 | none | a6d00@a70f3 | Redraw the kind 1..3 children of a widget, stopping at the first kind 0. |
+| `0xa7260` | EAX:ef_addr32 | none | a5ef8@a5fbf | Redraw all children of a widget (both original branches are identical). |
+| `0xa729c` | EAX:ef_addr32,EDX:ef_addr32 | none | a72d8@a72fd,a7328@a7364 | Call a7380 on enabled siblings of the same group as other. |
+| `0xa72d8` | EAX:ef_addr32 | none | 487c@490d,4e14@4eb6,4e14@4ecf | Enable a widget, notifying its group. |
+| `0xa7e4c` | none | none | a9d48@a9d9c | Copy table 0x418708 to 0x418690 for unlocked entries. |
+| `0xa7e88` | none | none | a9d48@a9dfa | Copy table 0x418690 back to 0x418708 for unlocked entries. |
+| `0xa983c` | EAX:ef_addr32 | none | a9e70@a9fba | Apply a set/add/subtract operation to a guest value. |
