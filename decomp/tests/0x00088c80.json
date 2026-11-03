@@ -1,0 +1,49 @@
+{
+  "address": "0x00088c80",
+  "function_size": 80,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "child_three_doubles",
+      "registers": {
+        "eax": "0x002b1000",
+        "edx": "0x002b2000"
+      },
+      "memory": [
+        {
+          "address": "0x002b1030",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x002a0000",
+          "hex": "0a000000000000801e000000"
+        },
+        {
+          "address": "0x0018a478",
+          "hex": "000000000000e03f"
+        },
+        {
+          "address": "0x0018a480",
+          "hex": "0000000000000040"
+        }
+      ]
+    },
+    {
+      "name": "missing_child",
+      "registers": {
+        "eax": "0x002b1000",
+        "edx": "0x002b2000"
+      },
+      "memory": [
+        {
+          "address": "0x002b1030",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x002b2000",
+          "hex": "deadbeefdeadbeef"
+        }
+      ]
+    }
+  ]
+}

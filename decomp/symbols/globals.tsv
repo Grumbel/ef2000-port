@@ -131,7 +131,7 @@ addr	size	type	name	evidence	notes
 0x001a5986	variable	uint8_t[]	g_text_line_buffer	0x50cca writes	Retained LF then NUL
 0x00127ce2	2	uint16_t	g_text_line_column	0x50cec writes	Zero after line
 0x00127ce4	1	uint8_t	g_text_line_count	0x50cf3 increments	Byte counter wraps
-0x001a81c2	2	int16_t	g_active_unit_record_count	0x6254d reads	Signed number of 23-byte records
+0x001a81c2	2	uint16_t	g_active_unit_record_count	0x6254e reads	Zero-tested 16-bit number of 23-byte records
 0x001a7d33	variable	ef_unit_scan_record[]	g_active_unit_records	0x6256d reads	23-byte records, active byte and signed index
 0x001282ac	2	uint16_t	g_round_robin_cursor	0x631bc reads/writes	Increment and signed bound reset
 0x001a81b0	2	int16_t	g_round_robin_count	0x631da reads	Signed limit
@@ -143,3 +143,10 @@ addr	size	type	name	evidence	notes
 0x00433861	8	uint32_t[2]	g_reset_accumulator_a	0x7954c writes	Two dwords cleared
 0x0043328b	8	uint32_t[2]	g_reset_accumulator_b	0x7955e writes	Two dwords cleared
 0x00433919	8	uint32_t[2]	g_reset_accumulator_c	0x79570 writes	Two dwords cleared
+0x00185b50	4	float	g_short_to_float_scale	0x53311 FMUL	Signed AX converts to x87 ST0
+0x001fc96c	2	uint16_t	g_panel_sequence_cursor	0x80abf reads 0x80ad9 writes	16-bit sequence and signed modulo 16
+0x0020f148	4	ef_addr32	g_last_transform_child	0x88c8c writes 0x88c9e reads	Child pointer latch
+0x0018a478	8	double	g_transform_scale_a	0x88ca3 FLD	First coordinate conversion factor
+0x0018a480	8	double	g_transform_scale_b	0x88cae FLD	Second coordinate conversion factor
+0x0018a488	8	double	g_transform_scale_c	0x88d5e FLD	First angle conversion factor
+0x0018a490	8	double	g_transform_scale_d	0x88d69 FLD	Second angle conversion factor

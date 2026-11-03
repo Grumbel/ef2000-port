@@ -154,6 +154,13 @@ target_compile_options(ef2000-decomp-tactical-io-test PRIVATE -Wall -Wextra -Wer
 target_compile_definitions(ef2000-decomp-tactical-io-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-tactical-io-test PRIVATE decomp/include)
 add_test(NAME decomp-tactical-io-host-model COMMAND ef2000-decomp-tactical-io-test)
+add_executable(ef2000-decomp-record-callers-test
+  tests/decomp_record_callers_test.c decomp/src/record_callers.c)
+target_compile_features(ef2000-decomp-record-callers-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-record-callers-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-record-callers-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-record-callers-test PRIVATE decomp/include)
+add_test(NAME decomp-record-callers-host-model COMMAND ef2000-decomp-record-callers-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

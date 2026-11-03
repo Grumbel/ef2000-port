@@ -16,6 +16,16 @@ uint8_t active_unit_record_contains(int16_t index); /* 0x62548 AX -> AL */
 uint16_t next_round_robin_record(void); /* 0x631bc -> AX */
 void clear_runtime_transient_counters(void); /* 0x79524 */
 
+/* Caller-side state and coordinate wrappers; all remain host drafts. */
+double convert_signed_short_scale(int16_t value); /* 0x53308 AX -> ST0 */
+uint8_t grid_clock_reaches_reference(int32_t row); /* 0x855c8 full EAX -> AL */
+void refresh_object_child_slot(ef_addr32 object); /* 0x88100 EAX */
+uint8_t first_nonignored_activity_slot(int16_t object); /* 0x860c0 AX -> AL */
+uint16_t advance_panel_strip(void); /* 0x80abc -> AX */
+void transform_child_coordinates(ef_addr32 object, ef_addr32 output); /* 0x88c80 EAX/EDX */
+void transform_signed_angle_pair(ef_addr32 object, ef_addr32 output_a,
+                                 ef_addr32 output_b); /* 0x88d4c EAX/EDX/EBX */
+
 /* Short clock, tactical state and coordinate helpers (host drafts). */
 uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */
 uint32_t command_code_is_group_1b(uint8_t code); /* 0x41da4 AL -> EAX */
@@ -120,7 +130,7 @@ double indexed_object_distance(int16_t a, int16_t b); /* 0x6a5f0, AX/DX -> ST0 *
 double grid_distance_to_point(ef_addr32 point, int16_t cell); /* 0x2bab0, EAX/DX -> ST0 */
 double scaled_grid_distance_to_point(ef_addr32 point, int16_t cell); /* 0x2bae0, EAX/DX -> ST0 */
 
-/* Original helper at 0x2949c: AX indexed object, DL feature, AL slot/20. */
+/* Drafted 0x2949c: AX object, DL feature, AL slot/20; signed-code quirk. */
 uint8_t query_indexed_object_feature(int16_t object, uint8_t code);
 
 /* Linked scene-node helpers (0x90000 region). */

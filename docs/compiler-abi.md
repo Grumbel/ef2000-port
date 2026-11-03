@@ -1215,6 +1215,38 @@ for LF without checking NUL; the host cases provide valid terminated lines.
 the remainder of EAX is not claimed. These are host-tested models with two
 guest fixture plans per address, not yet Watcom/splice-verified equivalents.
 
+### Caller-side clock, object-slot and transform batch (eight functions)
+
+This set uses existing drafted helpers `reference_clock_reaches`,
+`lookup_filtered_indexed_object` and `clear_panel_strip`. The C host harness
+stubs these dependencies and verifies the passed addresses/indices as well as
+the outer function's effects. It does **not** prove their integration in the
+guest until an original-object splice can be replayed.
+
+| Address | Draft | Original arguments / effects | Two caller functions (call instructions) |
+| --- | --- | --- | --- |
+| `0x2949c` | `query_indexed_object_feature` | Signed AX object, DL code; 20 activity slots; **AL-only** index/20 | `0x298f0` (`0x29968`), `0x2a168` (`0x2a178`) |
+| `0x53308` | `convert_signed_short_scale` | Signed AX loaded by FILD word, float32 multiply, **ST0** output | `0x53350` (`0x533c6`), `0x53618` (`0x53633`) |
+| `0x80abc` | `advance_panel_strip` | Global 16-bit cursor, signed `IDIV 16` then clear strip, cursor stored into 12-byte band; **AX-only** result | `0x55928` (`0x55a92`), `0x87db8` (`0x87e50`) |
+| `0x855c8` | `grid_clock_reaches_reference` | **Full EAX** row times 0xca; grid cell +0x8a clock base and unsigned countdown +0x8e; **AL-only** | `0x2d488` (`0x2d635`), `0x857bc` (`0x85863`) |
+| `0x860c0` | `first_nonignored_activity_slot` | Signed AX object; first nonzero-strength slot whose code is not 0x21/0x22; EAX index/20 | `0x8c49c` (`0x8c8a1`), `0x8cb60` (`0x8cbac`) |
+| `0x88100` | `refresh_object_child_slot` | EAX optional parent; invalidate +0x56 to **0x00ff**, then write child +0x16 index only if filtered lookup returns the *same* pointer | `0x87db8` (`0x87e5b`), `0x883cc` (`0x8840d`) |
+| `0x88c80` | `transform_child_coordinates` | EAX parent, EDX output; child pointer +0x30, flag when child +4 is 0x80000000; scaled doubles from +8/+0/+4 | `0x89060` (`0x89095`), `0x8935c` (`0x893a4`) |
+| `0x88d4c` | `transform_signed_angle_pair` | EAX object, EDX/EBX double destinations; signed word +0xc negated, signed word +0xe retained; double x87 scales | `0x89060` (`0x890a0`), `0x899d8` (`0x89a1d`) |
+
+The `0x2949c` comparison is deliberately asymmetric. The slot code is
+`SAR 24` of the 32-bit word at slot offset +0x198, and thus sign-extended;
+the input DL is zero-extended. Codes at or above 0x80 cannot match, even if
+their underlying eight-bit representations are equal. By contrast,
+`0x860c0` compares against positive constants 0x21/0x22.
+
+`0x53308`, `0x88c80`, and `0x88d4c` have x87 semantics; the host model uses
+`double` and preserves operation order, but does not establish 80-bit
+intermediate rounding. The guest fixture for `0x53308` is recorded but the
+current `func_differential.py` validator rejects ST0 signatures. The other
+seven fixture schemas validate; all eight remain `drafted` until guest and
+Watcom comparisons run.
+
 ## Comparing assembly
 
 ```sh

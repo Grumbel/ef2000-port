@@ -157,7 +157,7 @@ extern ef_addr32 g_text_scan_cursor; /* 0x001a58ac */
 extern uint8_t g_text_line_buffer[]; /* 0x001a5986 */
 extern uint16_t g_text_line_column; /* 0x00127ce2 */
 extern uint8_t g_text_line_count; /* 0x00127ce4 */
-extern int16_t g_active_unit_record_count; /* 0x001a81c2 */
+extern uint16_t g_active_unit_record_count; /* 0x001a81c2, zero-tested 16-bit count */
 extern ef_unit_scan_record g_active_unit_records[]; /* 0x001a7d33 */
 extern uint16_t g_round_robin_cursor; /* 0x001282ac */
 extern int16_t g_round_robin_count; /* 0x001a81b0 */
@@ -169,5 +169,14 @@ extern uint8_t g_reset_flag_d; /* 0x0043328a */
 extern uint32_t g_reset_accumulator_a[2]; /* 0x00433861 */
 extern uint32_t g_reset_accumulator_b[2]; /* 0x0043328b */
 extern uint32_t g_reset_accumulator_c[2]; /* 0x00433919 */
+
+/* Callers of existing clock/object/strip helpers and coordinate transforms. */
+extern float g_short_to_float_scale; /* 0x00185b50 */
+extern uint16_t g_panel_sequence_cursor; /* 0x001fc96c */
+extern ef_addr32 g_last_transform_child; /* 0x0020f148 */
+extern double g_transform_scale_a; /* 0x0018a478 */
+extern double g_transform_scale_b; /* 0x0018a480 */
+extern double g_transform_scale_c; /* 0x0018a488 */
+extern double g_transform_scale_d; /* 0x0018a490 */
 
 #endif

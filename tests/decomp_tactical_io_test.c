@@ -18,7 +18,7 @@ ef_addr32 g_text_scan_cursor;
 uint8_t g_text_line_buffer[256];
 uint16_t g_text_line_column;
 uint8_t g_text_line_count;
-int16_t g_active_unit_record_count;
+uint16_t g_active_unit_record_count;
 ef_unit_scan_record g_active_unit_records[24];
 uint16_t g_round_robin_cursor;
 int16_t g_round_robin_count;

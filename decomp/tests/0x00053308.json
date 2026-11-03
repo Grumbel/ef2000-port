@@ -1,0 +1,31 @@
+{
+  "address": "0x00053308",
+  "function_size": 19,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "positive_signed_short",
+      "registers": {
+        "eax": "0x00000064"
+      },
+      "memory": [
+        {
+          "address": "0x00185b50",
+          "hex": "0000803e"
+        }
+      ]
+    },
+    {
+      "name": "negative_signed_short",
+      "registers": {
+        "eax": "0x0000ff9c"
+      },
+      "memory": [
+        {
+          "address": "0x00185b50",
+          "hex": "0000803e"
+        }
+      ]
+    }
+  ]
+}

@@ -111,7 +111,8 @@ uint32_t count_matching_activity_slots(ef_addr32 object)
     return count;
 }
 
-/* 0x62548, 61 bytes. Search records from the final active index backward. */
+/* 0x62548, 61 bytes. Count is zero-tested in AX, not signed-compared:
+ * even high-bit counts scan backwards. */
 uint8_t active_unit_record_contains(int16_t index)
 {
     int32_t i;

@@ -421,7 +421,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00028ed8	803			unknown	unclassified	unverified		
 0x000291fc	435			unknown	unclassified	unverified		
 0x000293b0	236			unknown	unclassified	unverified		
-0x0002949c	79			unknown	unclassified	unverified		
+0x0002949c	79	query_indexed_object_feature	record_callers	drafted	game	confirmed	decomp/tests/0x0002949c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000294ec	1025			unknown	unclassified	unverified		
 0x000298f0	491			unknown	unclassified	unverified		
 0x00029adc	55			unknown	unclassified	unverified		
@@ -955,7 +955,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00052eb0	13			unknown	unclassified	unverified		
 0x00052f38	781			unknown	unclassified	unverified		
 0x00053270	149			unknown	unclassified	unverified		
-0x00053308	19			unknown	unclassified	unverified		
+0x00053308	19	convert_signed_short_scale	record_callers	drafted	game	confirmed	decomp/tests/0x00053308.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0005331c	17			unknown	unclassified	unverified		
 0x00053330	32			unknown	unclassified	unverified		
 0x00053350	709			unknown	unclassified	unverified		
@@ -1539,7 +1539,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00080400	15			unknown	unclassified	unverified		
 0x000809bc	89	clear_panel_strip	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x000809bc.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00080a18	162			unknown	unclassified	unverified		
-0x00080abc	87			unknown	unclassified	unverified		
+0x00080abc	87	advance_panel_strip	record_callers	drafted	game	confirmed	decomp/tests/0x00080abc.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00080b14	293			unknown	unclassified	unverified		
 0x00080c3c	226			unknown	unclassified	unverified		
 0x00080d20	30			unknown	unclassified	unverified		
@@ -1681,7 +1681,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00085400	31			unknown	unclassified	unverified		
 0x00085420	292			unknown	unclassified	unverified		
 0x0008557c	73			unknown	unclassified	unverified		
-0x000855c8	57			unknown	unclassified	unverified		
+0x000855c8	57	grid_clock_reaches_reference	record_callers	drafted	game	confirmed	decomp/tests/0x000855c8.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00085604	410			unknown	unclassified	unverified		
 0x000857bc	615			unknown	unclassified	unverified		
 0x00085b70	63			unknown	unclassified	unverified		
@@ -1691,7 +1691,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00085d00	369			unknown	unclassified	unverified		
 0x00085f78	148			unknown	unclassified	unverified		
 0x0008600c	179			unknown	unclassified	unverified		
-0x000860c0	80			unknown	unclassified	unverified		
+0x000860c0	80	first_nonignored_activity_slot	record_callers	drafted	game	confirmed	decomp/tests/0x000860c0.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00086110	1476			unknown	unclassified	unverified		
 0x000866d4	1			unknown	unclassified	unverified		
 0x000866e0	64			unknown	unclassified	unverified		
@@ -1711,7 +1711,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00087f9c	71	find_ui_linked_tag	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x00087f9c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00087fe4	227			unknown	unclassified	unverified		
 0x000880c8	53			unknown	unclassified	unverified		
-0x00088100	50			unknown	unclassified	unverified		
+0x00088100	50	refresh_object_child_slot	record_callers	drafted	game	confirmed	decomp/tests/0x00088100.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00088134	344			unknown	unclassified	unverified		
 0x0008828c	34			unknown	unclassified	unverified		
 0x000882b0	282			unknown	unclassified	unverified		
@@ -1726,11 +1726,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008883c	142			unknown	unclassified	unverified		
 0x000888cc	903			unknown	unclassified	unverified		
 0x00088c54	43	convert_scene_vector	vector_math	drafted	game	confirmed	decomp/tests/0x00088c54.json	docs/compiler-abi.md; Int32[8,0,4] to double[0,8,16] with 0x18a468/70 scales; x87 precision pending; awaiting OMF guest differential
-0x00088c80	80			unknown	unclassified	unverified		
+0x00088c80	80	transform_child_coordinates	record_callers	drafted	game	confirmed	decomp/tests/0x00088c80.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00088cd0	53			unknown	unclassified	unverified		
 0x00088d08	37			unknown	unclassified	unverified		
 0x00088d30	25	subtract_scene_vectors	vector_math	drafted	game	confirmed	decomp/tests/0x00088d30.json	docs/compiler-abi.md; Three pairwise qword differences EBX-EDX written EAX, interleaved stores; x87 precision pending; awaiting OMF guest differential
-0x00088d4c	55			unknown	unclassified	unverified		
+0x00088d4c	55	transform_signed_angle_pair	record_callers	drafted	game	confirmed	decomp/tests/0x00088d4c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00088d84	12	convert_scene_scalar	vector_math	drafted	game	confirmed	decomp/tests/0x00088d84.json	docs/compiler-abi.md; Signed dword at EAX+0x26 times double 0x18a498, stored to EDX; x87 precision pending; awaiting OMF guest differential
 0x00088d90	74			unknown	unclassified	unverified		
 0x00088ddc	115			unknown	unclassified	unverified		

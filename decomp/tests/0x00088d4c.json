@@ -1,0 +1,51 @@
+{
+  "address": "0x00088d4c",
+  "function_size": 55,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "negative_and_positive",
+      "registers": {
+        "eax": "0x002a0000",
+        "edx": "0x002b2000",
+        "ebx": "0x002b2010"
+      },
+      "memory": [
+        {
+          "address": "0x002a000c",
+          "hex": "80ff2c01"
+        },
+        {
+          "address": "0x0018a488",
+          "hex": "000000000000d03f"
+        },
+        {
+          "address": "0x0018a490",
+          "hex": "0000000000001040"
+        }
+      ]
+    },
+    {
+      "name": "positive_and_negative",
+      "registers": {
+        "eax": "0x002a0000",
+        "edx": "0x002b2000",
+        "ebx": "0x002b2010"
+      },
+      "memory": [
+        {
+          "address": "0x002a000c",
+          "hex": "1800feff"
+        },
+        {
+          "address": "0x0018a488",
+          "hex": "000000000000d03f"
+        },
+        {
+          "address": "0x0018a490",
+          "hex": "0000000000001040"
+        }
+      ]
+    }
+  ]
+}

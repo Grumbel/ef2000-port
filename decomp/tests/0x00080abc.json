@@ -1,0 +1,25 @@
+{
+  "address": "0x00080abc",
+  "function_size": 87,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "advance_low_band",
+      "memory": [
+        {
+          "address": "0x001fc96c",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "wrap_signed_band",
+      "memory": [
+        {
+          "address": "0x001fc96c",
+          "hex": "feff"
+        }
+      ]
+    }
+  ]
+}

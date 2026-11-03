@@ -654,6 +654,12 @@
             ${source}/decomp/src/tactical_io.c \
             -o work/tactical_io_host_test
           work/tactical_io_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_record_callers_test.c \
+            ${source}/decomp/src/record_callers.c \
+            -o work/record_callers_host_test
+          work/record_callers_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {
