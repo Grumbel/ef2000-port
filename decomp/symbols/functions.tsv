@@ -366,7 +366,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000239ac	1128			unknown	unclassified	unverified		
 0x00024074	577			unknown	unclassified	unverified		
 0x000242b8	243			unknown	unclassified	unverified		
-0x000243ac	211			unknown	unclassified	unverified		
+0x000243ac	211	update_indexed_object_relation	unk_geometry	typed	game	confirmed		ABI only; AX signed index, void memory mutation, x87 compare
 0x00024480	409			unknown	unclassified	unverified		
 0x0002461c	381			unknown	unclassified	unverified		
 0x0002479c	1187			unknown	unclassified	unverified		
@@ -2415,7 +2415,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000abde4	61			unknown	unclassified	unverified		
 0x000abe24	31			unknown	unclassified	unverified		
 0x000abe44	127			unknown	unclassified	unverified		
-0x000abec4	84			unknown	unclassified	unverified		
+0x000abec4	84	clear_registered_callbacks	unk_runtime	named	game	unverified		Partial ABI: indirect callback clobbers unresolved; register setup and table stride audited
 0x000abf24	45			unknown	unclassified	unverified		
 0x000abf8c	338			unknown	unclassified	unverified		
 0x000ac0e0	139			unknown	unclassified	unverified		
@@ -2457,7 +2457,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b059c	236			unknown	unclassified	unverified		
 0x000b0718	156			unknown	unclassified	unverified		
 0x000b07b4	156			unknown	unclassified	unverified		
-0x000b0850	260			unknown	unclassified	unverified		
+0x000b0850	260	count_filtered_node_matches	unk_records	typed	game	confirmed		ABI only; AL mode, EBX list head, EDX filter list, EAX count
 0x000b0954	427			unknown	unclassified	unverified		
 0x000b0b00	306			unknown	unclassified	unverified		
 0x000b0c34	102			unknown	unclassified	unverified		
@@ -3702,7 +3702,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f9dcb	233			unknown	unclassified	unverified		
 0x000f9ecd	5			unknown	unclassified	unverified		
 0x000f9ed2	13			unknown	unclassified	unverified		
-0x000f9ee0	331			unknown	unclassified	unverified		
+0x000f9ee0	331	decompress_bitstream_backrefs	unk_runtime	named	asm	unverified		ABI reviewed; 2 stack pointers and ret 8, pending Ghidra stack storage support
 0x000fa02c	310			unknown	unclassified	unverified		
 0x000fa16e	102			unknown	unclassified	unverified		
 0x000fa1d4	44			unknown	unclassified	unverified		

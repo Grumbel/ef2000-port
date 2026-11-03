@@ -353,6 +353,42 @@ and do not consume EAX. The explicit zero/one on both callee paths is
 nevertheless recorded as a 32-bit EAX result. Register-intermediate and
 array semantics still need state-level differential verification.
 
+### Confirmed object-relation mutation contract
+
+`update_indexed_object_relation` (`0x243ac`) takes a signed 16-bit object
+index in AX and has a void return contract. It sign-extends AX for lookup
+through `0x7489c` and, when the record exists, loads another indexed object
+from its signed field `+0x144`, then tests `check_current_object_relation`
+(`0x23800`). Depending on that predicate, comparisons of the record's
+double at `+0x150`, the fixed double at `0x181c98` and the current object's
+double at `+0x15a`, it updates 16-bit relation fields at `+0x146` and
+`+0x158` and may zero the current object's double at `+0x15a`.
+
+Caller `0x24074` at `0x240aa` supplies EAX from EBP and immediately tests
+DI, not EAX; distinct caller `0x6c710` at `0x6c741` sign-extends the word
+at `0x1f71c6` into EAX and then reloads EDX from a global, ignoring EAX.
+EBX/ECX/EDX/ESI are pushed/popped across the callee and its lookups,
+EDI/EBP are untouched, and there is neither a stack argument nor callee
+cleanup. The x87 comparisons balance their stack but use `fnstsw`/`sahf`
+to drive branching; a future C translation must preserve comparison and
+NaN/exception behavior, not simply rely on optimized host comparisons.
+
+`count_filtered_node_matches` (`0xb0850`) counts linked-list records. The
+inputs are AL (mode 0 or 1), EBX (address of a list-head pointer) and EDX
+(address of a second, filter list-head pointer). The function walks the
+first list through each node's `+0x04` next pointer. For each node it calls
+`0xcc1ac` with its mode in AL, the node key from `+0x0b` in DL, and EBX
+pointing to the filter list head. After that predicate accepts a node, the
+signed high word of its dword at `+0x07` is tested against one of two
+mode-specific sets (mode 0: `1..6,8,9,11..14`; mode 1:
+`17..22,24..26`). Unsupported modes yield zero. The full 32-bit count is
+returned in EAX; EBX and EDX are scratch, while ECX/ESI/EDI are saved and
+restored and EBP is untouched. No stack arguments or callee cleanup.
+Caller `0xb0c34` at `0xb0c46` supplies AL/EBX/EDX and stores EAX as a
+32-bit count; distinct caller `0xb0c9c` at `0xb0cae` supplies the same
+roles and stores the resulting AX. This is a *counting contract*, not a
+fully recovered data schema for the node's odd field offsets.
+
 ### Floating-point and segment exceptions under review
 
 The initialized image contains the 16-bit word `0x127f` at `0x17d500`.
@@ -389,6 +425,37 @@ callers `0x5f220` at `0x5f3bb` and `0x3d4b0` at `0x3d5f1` each push four
 values, call it and test EAX for zero. The sibling `0x15c0ea` uses the
 same stack-argument wrapper pattern. Detailed type and clobber recovery is
 still pending; a default Watcom-register signature would be wrong here.
+
+`decompress_bitstream_backrefs` (`0xf9ee0`) is an assembler-like
+bitstream decoder with a two-pointer **stack convention**. The original
+begins with `enter 0,0`, saves ESI/EDI/EBX/EBP, executes `cld`, takes the
+destination pointer from `[ebp+8]` and the source pointer from `[ebp+12]`,
+then starts reading the stream eight bytes after the source address. Its
+bit-carry state machine emits literals with `movsb`, repeated words with
+`rep movsw`, and overlapping LZ-style back-references with `rep movsb`.
+Source is read through DS:ESI, destination written through **ES:EDI**;
+there is no incoming EAX/EDX register argument or register return. EAX/ECX
+are scratch; EBX/EDX/ESI/EDI/EBP are preserved; `cld` leaves DF clear.
+All normal exits run `leave; ret 8` at `0xfa027`, so the callee removes
+eight bytes of **caller arguments**. Distinct caller `0xb3c04` at
+`0xb3c8e` pushes EBP as source then EDI as destination; caller `0xeab44`
+at `0xeab7c` pushes `0x474360` as source then `0x464580` as destination.
+They do not use a return value. This is ABI evidence, not yet a guessed
+compression-format specification or recovered decompressor. It remains
+`exception_reviewed` because the Ghidra signature importer currently
+rejects nonzero callee cleanup and stack-argument storage.
+
+`clear_registered_callbacks` (`0xabec4`) walks a table of `0x15`-byte
+records anchored at `0x41e971`, bounded by the word count at `0x41eecc`.
+For a nonzero callback pointer in each entry it sets EAX=0, sets ECX to
+the record's byte displacement (not an absolute pointer), then invokes the
+callback indirectly. It clears the count and calls `0xb3fb0` on the base
+`0x41e960` with EBX=`0x150`. Caller `0xac408` at `0xac429` and distinct
+caller `0xac780` at `0xac78c` provide no register/stack arguments and ignore
+EAX. EBX/ECX/EDX are saved by this wrapper, but the callback's possible
+ESI/EDI/EBP side effects and GPR return contract remain unknown. Marked
+`exception_reviewed`, not `confirmed`; labeling it a safe void register
+contract before resolving callback targets would conceal that uncertainty.
 
 `0xee43c` is a likely hand-written segment-sensitive callback bridge. Its
 caller `0xefbd9` at `0xefbfc` and distinct caller `0xeffb4` at `0xeffeb`

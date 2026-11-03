@@ -376,7 +376,12 @@ worksheet to fifteen of forty confirmed, plus a timing thunk at `0xf8248`
 for sixteen confirmed in total. A packed 213-byte x87 record initializer
 (`0x11c0b4`), 13-way bit-probe switch (`0x68ccc`) and global-input
 projection adapter (`0x15be10`) bring the worksheet to nineteen confirmed.
-Documented ABI exceptions include
+The current-object relation mutator (`0x243ac`) makes twenty confirmed;
+the stack-based `ret 8` bitstream decompressor (`0xf9ee0`) is additionally
+reviewed but cannot yet be entered as a custom-storage signature. The
+filtered linked-list counter (`0xb0850`) brings the worksheet to twenty-one
+confirmed; callback-list teardown (`0xabec4`) is reviewed with unresolved
+indirect callee clobbers. Documented ABI exceptions include
 ST(0) return with `ret 8` (`0xf8250`), ES:[EDI] memory writes (`0x120a52`),
 stack-based `ret 16` (`0x15c0c4`), stack-based `ret 12` (`0x1204dc`), and
 segment/interrupt bridges (`0xee43c`, `0x120451`).
@@ -803,6 +808,8 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Confirmed 0xb0018/0xb00d0 EAX/EDX pointer-to-list/count allocators and 0x36-byte table stride; audited nonstandard ret 12 formatter 0x1204dc and EBX/ECX/ESI/EDI projection helper 0x15c071.
 2026-11-03  3.5   Confirmed elapsed-centisecond thunk at 0xf8248; recorded partial ABI of indirect output 0xf6124 and callback dispatch 0x12d90.
 2026-11-03  3.5   Confirmed 0x11c0b4 EAX/EDX-to-packed-213-byte x87 record, 0x68ccc CS jump-table AL bit probe, and 0x15be10 global-input fixed-point writer (19/40 ABI samples).
+2026-11-03  3.5   Confirmed 0x243ac AX-indexed x87 relation update (20/40); reviewed 0xf9ee0 stack-based LZ-style REP decoder with ret 8, pending Ghidra stack storage support.
+2026-11-03  3.5   Confirmed 0xb0850 AL/EBX/EDX linked-list counter (21/40); reviewed 0xabec4 callback table with unresolved indirect-callee clobbers.
 ```
 
 ---
