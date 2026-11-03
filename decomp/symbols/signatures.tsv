@@ -239,3 +239,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00054e5c	send_marker_packet_1b			ebx,ecx,edx,esi,edi,ebp	0	Original 0x54e5c (34 bytes); stack bytes 1b marker, size 2; caller 54e9c@54ea4; docs/compiler-abi.md
 0x00054e9c	commit_marker_selection	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x54e9c (21 bytes); byte record+1 to 0x12583b, call 0x54e5c, byte 0x1a5d1c=1; caller 581b0@583d4; docs/compiler-abi.md
 0x000550b0	apply_marker_to_grid_row	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x550b0 (39 bytes); compare 0x1a666b with record+3, movsx word record+1 times 0xca from 0x19bb58; caller 581b0@582dc; docs/compiler-abi.md
+0x00055760	send_two_word_packet_4f	AX:uint16_t,DX:uint16_t		ebx,ecx,esi,edi,ebp	0	Original 0x55760 (36 bytes); Packet 4f AX DX little-endian size 5; caller 8d59c@8d7ae; docs/compiler-abi.md
+0x00055860	clear_activity_record_flag	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x55860 (35 bytes); Clear byte at 0x1a5c32+23*record[1] then call 0x544c0; caller 581b0@58437; docs/compiler-abi.md
+0x00055bd0	send_two_word_byte_packet_42	AX:uint16_t,DX:uint16_t,BL:uint8_t		ecx,esi,edi,ebp	0	Original 0x55bd0 (38 bytes); Packet 42 AX DX BL size 6; BH overwritten with opcode; caller 8516c@851e7; docs/compiler-abi.md
+0x00056004	clear_scene_word_latches			ebx,ecx,edx,esi,edi,ebp	0	Original 0x56004 (19 bytes); Clear words 0x1a6630 and 0x127dae; caller 58028@58042; docs/compiler-abi.md
+0x000561bc	send_dword_marker_packet_2a	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x561bc (39 bytes); Packet 2a EAX little-endian then marker, size 6; caller 56084@561ab; docs/compiler-abi.md
+0x000561e4	forward_marker_matched_record	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x561e4 (36 bytes); If dword record+1 low nibble equals marker call 0x562d8 with dword and byte +5; caller 581b0@58455; docs/compiler-abi.md
+0x00056954	notify_if_scene_pair	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x56954 (31 bytes); Query 0x87f9c with byte +0xd and signed high word of +0xc; nonzero calls 0x878c8; caller 581b0@58359; docs/compiler-abi.md
+0x00056d40	send_marker_word_packet_30			ebx,ecx,edx,esi,edi,ebp	0	Original 0x56d40 (37 bytes); Packet 30 with marker zero-extended word size 3; caller 56d18@56d1b; docs/compiler-abi.md

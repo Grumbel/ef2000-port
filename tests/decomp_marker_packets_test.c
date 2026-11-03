@@ -34,6 +34,26 @@ static void expect(unsigned slot, const uint8_t *bytes, uint32_t size)
     assert(memcmp(seen[slot].bytes, bytes, size) == 0);
 }
 
+static unsigned refreshed, applied, notified, queried;
+static uint32_t applied_value, query_result;
+static uint8_t applied_flag, query_selector;
+static int32_t query_high;
+void guest_refresh_activity_records(void) { ++refreshed; }
+void guest_apply_marker_update(uint32_t value, uint8_t flag)
+{
+    ++applied;
+    applied_value = value;
+    applied_flag = flag;
+}
+uint32_t guest_query_scene_pair(uint8_t selector, int32_t high)
+{
+    ++queried;
+    query_selector = selector;
+    query_high = high;
+    return query_result;
+}
+void guest_notify_scene_pair(void) { ++notified; }
+
 int main(void)
 {
     const uint8_t p1d[1] = {0x1d}, p1f[1] = {0x1f};
@@ -80,5 +100,54 @@ int main(void)
     mem[0x2001] = 5;
     apply_marker_to_grid_row(0x2000);
     assert(mem[0x180000 + 5 * 0xca] == 0);
+
+    /* second batch */
+    {
+        const uint8_t a4f[5] = {0x4f, 0x34, 0x12, 0xff, 0x80};
+        const uint8_t a42[6] = {0x42, 0x01, 0x00, 0xfe, 0xff, 0x7a};
+        const uint8_t a2a[6] = {0x2a, 0x78, 0x56, 0x34, 0x92, 0x9c};
+        const uint8_t a30[3] = {0x30, 0x9c, 0x00};
+        unsigned base = count;
+        send_two_word_packet_4f(0x1234, 0x80ff);
+        send_two_word_byte_packet_42(1, 0xfffe, 0x7a);
+        send_dword_marker_packet_2a(0x92345678u);
+        send_marker_word_packet_30();
+        expect(base, a4f, 5);
+        expect(base + 1, a42, 6);
+        expect(base + 2, a2a, 6);
+        expect(base + 3, a30, 3);
+    }
+    mem[0x1a6630] = mem[0x1a6631] = mem[0x127dae] = mem[0x127daf] = 0xff;
+    clear_scene_word_latches();
+    assert(!mem[0x1a6630] && !mem[0x1a6631] && !mem[0x127dae] && !mem[0x127daf]);
+
+    mem[0x3000] = 9;
+    mem[0x3001] = 2;
+    mem[0x1a5c32 + 46] = 0xff;
+    clear_activity_record_flag(0x3000);
+    assert(mem[0x1a5c32 + 46] == 0 && refreshed == 1);
+    mem[0x3001] = 0xff; /* index is unsigned: 255 * 23 */
+    mem[0x1a5c32 + 255 * 23] = 1;
+    clear_activity_record_flag(0x3000);
+    assert(mem[0x1a5c32 + 255 * 23] == 0 && refreshed == 2);
+
+    /* forward_marker_matched_record: low nibble compares with the marker. */
+    g_world_grid_marker = 0x05;
+    mem[0x3101] = 0xf5; mem[0x3102] = 0x12; mem[0x3103] = 0x34; mem[0x3104] = 0x56;
+    mem[0x3105] = 0xc3;
+    forward_marker_matched_record(0x3100);
+    assert(applied == 1 && applied_value == 0x563412f5u && applied_flag == 0xc3);
+    g_world_grid_marker = 0x06;
+    forward_marker_matched_record(0x3100);
+    assert(applied == 1);
+
+    /* notify_if_scene_pair: byte +0xd, signed high word of dword +0xc. */
+    mem[0x320c] = 0; mem[0x320d] = 0x42; mem[0x320e] = 0xfe; mem[0x320f] = 0xff;
+    query_result = 0;
+    notify_if_scene_pair(0x3200);
+    assert(queried == 1 && query_selector == 0x42 && query_high == -2 && notified == 0);
+    query_result = 0x10000;
+    notify_if_scene_pair(0x3200);
+    assert(notified == 1);
     return 0;
 }

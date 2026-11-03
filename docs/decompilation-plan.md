@@ -1023,6 +1023,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  11    Drafted eight parser-line/runtime helpers (194 total): semicolon/empty-line skipping, buffer release, text record with 5 byte and 6 word fields, three packed input-copy fields, callback-backed time samples and signed delta clamping, 11-bit packed coordinates and four-way signed pair transforms. Two original caller sites each, 8 guest plans, two passing host suites; OpenWatcom and original guest verification remain unavailable.
 2026-11-03  12    Drafted eight indexed runtime and event/dialog helpers (202 total): pointer segment/offset encoding, 54-entry callback reset, overlapping packed-word slot indexing, latch initialization, 34-event scan, optional object dispatch, two-widget bind and dialog slot flush. Two independent callsites each, eight pending guest plans, two standalone host suites; original guest differential still unavailable.
 2026-11-03  13    Drafted eight marker-packet and grid-row helpers (210 total): one- and two-byte packets 1d/1e/1f/26/1b with grid marker, a four-byte AX/DL packet 24, a record-to-latch commit and a conditional marker store into the 0xca-byte grid row. One direct caller each; host test passes; guest differential and replay unavailable.
+2026-11-03  14    Drafted eight more packet and scene-latch helpers (218 total): packets 4f/42/2a/30, activity-record flag clear, two latch words, marker-matched forwarding and a scene-pair notify. One direct caller each; host test passes; guest verification unavailable.
 ```
 
 ---

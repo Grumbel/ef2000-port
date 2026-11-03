@@ -229,3 +229,6 @@ addr	size	type	name	evidence	notes
 0x001a553b	variable	uint8_t[]	g_dialog_slot_flags	0x4f6d1 reads 0x4f6dc clears	Per-slot active flag byte
 0x0012583b	1	uint8_t	g_marker_selection_value	0x54e9f writes	Byte copied from record+1 before packet 0x1b
 0x001a5d1c	1	uint8_t	g_marker_selection_pending	0x54ea9 writes	Latch set to 1 after packet 0x1b
+0x001a6630	2	uint16_t	g_scene_latch_a	0x56007 clears	Cleared together with 0x127dae
+0x00127dae	2	uint16_t	g_scene_latch_b	0x5600e clears	Cleared together with 0x1a6630
+0x001a5c32	1	uint8_t[23*]	g_activity_records	0x55876 clears byte 0	23-byte records indexed by unsigned byte

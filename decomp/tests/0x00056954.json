@@ -1,0 +1,1 @@
+{"address":"0x00056954","function_size":31,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[{"address":"0x0000100c","hex":"0042feff"},{"address":"0x00087f9c","hex":"31c0c3"},{"address":"0x000878c8","hex":"c3"}]}]}

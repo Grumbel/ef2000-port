@@ -419,4 +419,17 @@ void send_marker_packet_1b(void); /* 0x54e5c */
 void commit_marker_selection(ef_addr32 record); /* 0x54e9c EAX */
 void apply_marker_to_grid_row(ef_addr32 record); /* 0x550b0 EAX */
 
+void send_two_word_packet_4f(uint16_t first, uint16_t second); /* 0x55760 AX/DX */
+void send_two_word_byte_packet_42(uint16_t first, uint16_t second, uint8_t flag); /* 0x55bd0 AX/DX/BL */
+void clear_scene_word_latches(void); /* 0x56004 */
+void send_dword_marker_packet_2a(uint32_t value); /* 0x561bc EAX */
+void send_marker_word_packet_30(void); /* 0x56d40 */
+void clear_activity_record_flag(ef_addr32 record); /* 0x55860 EAX */
+void forward_marker_matched_record(ef_addr32 record); /* 0x561e4 EAX */
+void notify_if_scene_pair(ef_addr32 record); /* 0x56954 EAX */
+void guest_refresh_activity_records(void); /* 0x544c0 */
+void guest_apply_marker_update(uint32_t value, uint8_t flag); /* 0x562d8 EAX/DL */
+uint32_t guest_query_scene_pair(uint8_t selector, int32_t high); /* 0x87f9c EAX/EDX */
+void guest_notify_scene_pair(void); /* 0x878c8 */
+
 #endif

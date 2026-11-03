@@ -1528,3 +1528,19 @@ unverified at the guest/Watcom level.
 
 Registers: the packet wrappers push and pop EDX (or, for `0x54664`, take DL)
 and only clobber EAX; the packet helper `0xa3f74` is a guest dependency.
+
+## More packet wrappers and scene latches (2026-11-03)
+
+Eight further original functions, each with a single direct caller. The host
+drafts remain unverified at the guest/Watcom level.
+
+| Entry | Inputs | Caller | Observed effect |
+| --- | --- | --- | --- |
+| `0x55760` | AX, DX words | `0x8d7ae` | send `4f, AX, DX` (five bytes) |
+| `0x55860` | EAX record | `0x58437` | clear byte at `0x1a5c32 + 23*record[1]` (unsigned), then call `0x544c0` |
+| `0x55bd0` | AX, DX words, BL | `0x851e7` | send `42, AX, DX, BL` (six bytes); BH is overwritten by the opcode |
+| `0x56004` | none | `0x58042` | clear words `0x1a6630` and `0x127dae` |
+| `0x561bc` | EAX dword | `0x561ab` | send `2a, EAX, marker` (six bytes) |
+| `0x561e4` | EAX record | `0x58455` | if `dword[+1] & 15 == marker`, call `0x562d8` with the dword and byte `+5` |
+| `0x56954` | EAX record | `0x58359` | call `0x87f9c` with byte `+0xd` and signed high word of `+0xc`; nonzero result calls `0x878c8` |
+| `0x56d40` | none | `0x56d1b` | send `30, marker, 0` (three bytes) |

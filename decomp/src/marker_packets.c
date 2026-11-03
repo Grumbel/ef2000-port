@@ -81,3 +81,91 @@ void apply_marker_to_grid_row(ef_addr32 record)
         *(uint8_t *)ef_guest_memory_ptr(row) = g_world_grid_marker;
     }
 }
+
+/* 0x55760, 36 bytes. Five-byte packet 0x4f: AX then DX, little-endian. */
+void send_two_word_packet_4f(uint16_t first, uint16_t second)
+{
+    uint8_t bytes[5];
+    bytes[0] = 0x4f;
+    bytes[1] = (uint8_t)first;
+    bytes[2] = (uint8_t)(first >> 8);
+    bytes[3] = (uint8_t)second;
+    bytes[4] = (uint8_t)(second >> 8);
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+/* 0x55bd0, 38 bytes. Six-byte packet 0x42: AX, DX, then BL. The original
+ * loads the opcode through BH and so leaves EBX bits 8..15 changed. */
+void send_two_word_byte_packet_42(uint16_t first, uint16_t second, uint8_t flag)
+{
+    uint8_t bytes[6];
+    bytes[0] = 0x42;
+    bytes[1] = (uint8_t)first;
+    bytes[2] = (uint8_t)(first >> 8);
+    bytes[3] = (uint8_t)second;
+    bytes[4] = (uint8_t)(second >> 8);
+    bytes[5] = flag;
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+/* 0x56004, 19 bytes. Clear two word latches. */
+void clear_scene_word_latches(void)
+{
+    *(uint16_t *)ef_guest_memory_ptr(0x001a6630u) = 0;
+    *(uint16_t *)ef_guest_memory_ptr(0x00127daeu) = 0;
+}
+
+/* 0x561bc, 39 bytes. Six-byte packet 0x2a: EAX little-endian, grid marker. */
+void send_dword_marker_packet_2a(uint32_t value)
+{
+    uint8_t bytes[6];
+    bytes[0] = 0x2a;
+    bytes[1] = (uint8_t)value;
+    bytes[2] = (uint8_t)(value >> 8);
+    bytes[3] = (uint8_t)(value >> 16);
+    bytes[4] = (uint8_t)(value >> 24);
+    bytes[5] = g_world_grid_marker;
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+/* 0x56d40, 37 bytes. Three-byte packet 0x30 carrying the marker as a
+ * zero-extended word. */
+void send_marker_word_packet_30(void)
+{
+    uint8_t bytes[3];
+    bytes[0] = 0x30;
+    bytes[1] = g_world_grid_marker;
+    bytes[2] = 0;
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+/* 0x55860, 35 bytes. Clear byte 0 of the 23-byte activity record selected by
+ * record byte +1, then refresh through the guest routine 0x544c0. */
+void clear_activity_record_flag(ef_addr32 record)
+{
+    uint32_t index = *(const uint8_t *)ef_guest_memory_ptr(record + 1u);
+    *(uint8_t *)ef_guest_memory_ptr(0x001a5c32u + index * 23u) = 0;
+    guest_refresh_activity_records();
+}
+
+/* 0x561e4, 36 bytes. If the low nibble of the dword at +1 equals the grid
+ * marker, forward that dword and the byte at +5 to guest routine 0x562d8. */
+void forward_marker_matched_record(ef_addr32 record)
+{
+    const uint8_t *p = (const uint8_t *)ef_guest_memory_ptr(record);
+    uint32_t value = (uint32_t)p[1] | (uint32_t)p[2] << 8 |
+                     (uint32_t)p[3] << 16 | (uint32_t)p[4] << 24;
+    if ((value & 0xfu) == (uint32_t)g_world_grid_marker)
+        guest_apply_marker_update(value, p[5]);
+}
+
+/* 0x56954, 31 bytes. Query with the byte at +0xd and signed high word of
+ * the dword at +0xc; any nonzero EAX result triggers 0x878c8. */
+void notify_if_scene_pair(ef_addr32 record)
+{
+    const uint8_t *p = (const uint8_t *)ef_guest_memory_ptr(record + 0xcu);
+    int32_t dword = (int32_t)((uint32_t)p[0] | (uint32_t)p[1] << 8 |
+                              (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24);
+    if (guest_query_scene_pair(p[1], dword >> 16) != 0)
+        guest_notify_scene_pair();
+}

@@ -1011,17 +1011,17 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005511c	38			unknown	unclassified	unverified		
 0x00055144	875			unknown	unclassified	unverified		
 0x000554b0	687			unknown	unclassified	unverified		
-0x00055760	36			unknown	unclassified	unverified		
+0x00055760	36	send_two_word_packet_4f	marker_packets	drafted	game	confirmed	decomp/tests/0x00055760.json	docs/compiler-abi.md; Packet 4f AX DX little-endian size 5; sole direct caller 8d59c@8d7ae; guest pending
 0x00055784	97			unknown	unclassified	unverified		
 0x000557e8	117			unknown	unclassified	unverified		
-0x00055860	35			unknown	unclassified	unverified		
+0x00055860	35	clear_activity_record_flag	marker_packets	drafted	game	confirmed	decomp/tests/0x00055860.json	docs/compiler-abi.md; Clear byte at 0x1a5c32+23*record[1] then call 0x544c0; sole direct caller 581b0@58437; guest pending
 0x00055884	43			unknown	unclassified	unverified		
 0x000558b0	117			unknown	unclassified	unverified		
 0x00055928	385			unknown	unclassified	unverified		
 0x00055aac	152			unknown	unclassified	unverified		
 0x00055b44	58	send_packet_41	packet_status	drafted	game	confirmed	decomp/tests/0x00055b44.json	docs/compiler-abi.md; host model; guest differential pending
 0x00055b80	79			unknown	unclassified	unverified		
-0x00055bd0	38			unknown	unclassified	unverified		
+0x00055bd0	38	send_two_word_byte_packet_42	marker_packets	drafted	game	confirmed	decomp/tests/0x00055bd0.json	docs/compiler-abi.md; Packet 42 AX DX BL size 6; BH overwritten with opcode; sole direct caller 8516c@851e7; guest pending
 0x00055bf8	433			unknown	unclassified	unverified		
 0x00055dac	62			unknown	unclassified	unverified		
 0x00055dec	45			unknown	unclassified	unverified		
@@ -1029,11 +1029,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00055e94	119			unknown	unclassified	unverified		
 0x00055f0c	69			unknown	unclassified	unverified		
 0x00055f54	174			unknown	unclassified	unverified		
-0x00056004	19			unknown	unclassified	unverified		
+0x00056004	19	clear_scene_word_latches	marker_packets	drafted	game	confirmed	decomp/tests/0x00056004.json	docs/compiler-abi.md; Clear words 0x1a6630 and 0x127dae; sole direct caller 58028@58042; guest pending
 0x00056018	106			unknown	unclassified	unverified		
 0x00056084	310			unknown	unclassified	unverified		
-0x000561bc	39			unknown	unclassified	unverified		
-0x000561e4	36			unknown	unclassified	unverified		
+0x000561bc	39	send_dword_marker_packet_2a	marker_packets	drafted	game	confirmed	decomp/tests/0x000561bc.json	docs/compiler-abi.md; Packet 2a EAX little-endian then marker, size 6; sole direct caller 56084@561ab; guest pending
+0x000561e4	36	forward_marker_matched_record	marker_packets	drafted	game	confirmed	decomp/tests/0x000561e4.json	docs/compiler-abi.md; If dword record+1 low nibble equals marker call 0x562d8 with dword and byte +5; sole direct caller 581b0@58455; guest pending
 0x00056208	94			unknown	unclassified	unverified		
 0x00056268	109			unknown	unclassified	unverified		
 0x000562d8	61			unknown	unclassified	unverified		
@@ -1044,7 +1044,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005674c	321			unknown	unclassified	unverified		
 0x00056890	152			unknown	unclassified	unverified		
 0x00056928	44			unknown	unclassified	unverified		
-0x00056954	31			unknown	unclassified	unverified		
+0x00056954	31	notify_if_scene_pair	marker_packets	drafted	game	confirmed	decomp/tests/0x00056954.json	docs/compiler-abi.md; Query 0x87f9c with byte +0xd and signed high word of +0xc; nonzero calls 0x878c8; sole direct caller 581b0@58359; guest pending
 0x00056974	61	send_packet_2b	packet_status	drafted	game	confirmed	decomp/tests/0x00056974.json	docs/compiler-abi.md; host model; guest differential pending
 0x000569b4	96			unknown	unclassified	unverified		
 0x00056a44	6			unknown	unclassified	unverified		
@@ -1057,7 +1057,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00056cbc	15			unknown	unclassified	unverified		
 0x00056ccc	73			unknown	unclassified	unverified		
 0x00056d18	40			unknown	unclassified	unverified		
-0x00056d40	37			unknown	unclassified	unverified		
+0x00056d40	37	send_marker_word_packet_30	marker_packets	drafted	game	confirmed	decomp/tests/0x00056d40.json	docs/compiler-abi.md; Packet 30 with marker zero-extended word size 3; sole direct caller 56d18@56d1b; guest pending
 0x00056d68	42			unknown	unclassified	unverified		
 0x00056e94	59			unknown	unclassified	unverified		
 0x00056ed0	42			unknown	unclassified	unverified		
