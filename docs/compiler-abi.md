@@ -2713,3 +2713,12 @@ in EAX, format string address, one value).
 | `0x9e38` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32 | AL:uint8_t | 9ea0@a228,357ec@3599c | Find the 25-byte entry of kind 8 (the last one) and copy its fields out. |
 | `0xed80` | EAX:ef_addr32 | EAX:uint32_t | f314@f483,fb10@fb76 | Read one record from the input stream into the 0x1c-byte record at dest. |
 | `0x159a0` | EAX:ef_addr32 | EAX:uint32_t | 48c34@48c6b,48d5c@48d89,48da0@48dcd | Pixel width of a string: 3 for a space, glyph width + 1 otherwise. |
+
+## game_helpers15 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x173c4` | AX:int16_t | EAX:uint32_t | 16a74@16a9d | Scan the owner's linked units for a slot code of 6 or 0x15. |
+| `0x1d318` | none | none | 3ea0c@3ee4b | Reset the game-loop state and run ten warm-up ticks. |
+| `0x1fd88` | none | none | 2065c@2067b | Build the 0x19b030/0x19b080 circle tables (full turn is 0xc000 steps). |
+| `0x1fe4c` | none | none | 1ff0c@1ff6b | Build the 0x19afe0/0x19af90 circle tables from the two radius bytes. |

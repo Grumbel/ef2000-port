@@ -1969,4 +1969,13 @@ uint32_t guest_fn_e980(void); /* 0xe980 */
 uint32_t guest_fn_e95c(void); /* 0xe95c */
 uint32_t guest_fn_ed30(void); /* 0xed30 AL */
 
+/* game_helpers15.c */
+uint32_t find_special_slot_173c4(int16_t owner);
+void reset_loop_state_1d318(void);
+void build_circle_1fd88(void);
+void build_circle_1fe4c(void);
+void guest_fn_1a580(void); /* 0x1a580 */
+void guest_fn_18a68(void); /* 0x18a68 */
+void guest_fn_5331c(void); /* 0x5331c */
+
 #endif

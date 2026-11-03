@@ -286,7 +286,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000172b4	211			unknown	unclassified	unverified		
 0x00017388	25	flag_object_and_forward	low_helpers	compiles	game	confirmed	decomp/tests/0x00017388.json	docs/compiler-abi.md; 0x8ffe8 lookup; or 3 into +0x30; tail 0x3739c(high word +0x36); callers 16588@167ed; guest pending
 0x000173a4	30	decrement_grid_row_link_wide	low_helpers	compiles	game	confirmed	decomp/tests/0x000173a4.json	docs/compiler-abi.md; row[0x8e]=row[0x8f]-1 with 32-bit row index; callers 168d8@1696a; guest pending
-0x000173c4	112			unknown	unclassified	unverified		
+0x000173c4	112	find_special_slot_173c4	game_helpers15	compiles	game	confirmed	decomp/tests/0x000173c4.json	docs/compiler-abi.md; Scan the owner's linked units for a slot code of 6 or 0x15.; callers 16a74@16a9d; guest pending
 0x00017434	63	find_slot_kind_17434	game_helpers4	compiles	game	confirmed	decomp/tests/0x00017434.json	docs/compiler-abi.md; Search the 20 three-byte slots of a unit for kind 6 or 0x15.; callers 15b7c@15ded; guest pending
 0x00017474	9			unknown	unclassified	unverified		
 0x00017480	71	cell_blocked_17480	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00017480.json	docs/compiler-abi.md; ; callers 15b7c@15c87; guest pending
@@ -314,7 +314,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001cd90	85	adjust_level_1cd90	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0001cd90.json	docs/compiler-abi.md; Adjust word 0x12b366 by the key flags and clamp it to 0x5a..0x7f.; callers 1cde8@1cfd0; guest pending
 0x0001cde8	496			unknown	unclassified	unverified		
 0x0001cfd8	829			unknown	unclassified	unverified		
-0x0001d318	149			unknown	unclassified	unverified		
+0x0001d318	149	reset_loop_state_1d318	game_helpers15	compiles	game	confirmed	decomp/tests/0x0001d318.json	docs/compiler-abi.md; Reset the game-loop state and run ten warm-up ticks.; callers 3ea0c@3ee4b; guest pending
 0x0001d3c4	79	select_tables_1d3c4	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0001d3c4.json	docs/compiler-abi.md; ; callers 8b39c@8b519; guest pending
 0x0001d420	11			unknown	unclassified	unverified		
 0x0001d474	343			unknown	unclassified	unverified		
@@ -348,8 +348,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001f8c4	75	queue_pop_1f8c4	game_helpers7	compiles	game	confirmed	decomp/tests/0x0001f8c4.json	docs/compiler-abi.md; Pop the head of the queue at 0x19b0d0.; callers 1f994@1fd73; guest pending
 0x0001f960	50			unknown	unclassified	unverified		
 0x0001f994	1011			unknown	unclassified	unverified		
-0x0001fd88	195			unknown	unclassified	unverified		
-0x0001fe4c	192			unknown	unclassified	unverified		
+0x0001fd88	195	build_circle_1fd88	game_helpers15	compiles	game	confirmed	decomp/tests/0x0001fd88.json	docs/compiler-abi.md; Build the 0x19b030/0x19b080 circle tables (full turn is 0xc000 steps).; callers 2065c@2067b; guest pending
+0x0001fe4c	192	build_circle_1fe4c	game_helpers15	compiles	game	confirmed	decomp/tests/0x0001fe4c.json	docs/compiler-abi.md; Build the 0x19afe0/0x19af90 circle tables from the two radius bytes.; callers 1ff0c@1ff6b; guest pending
 0x0001ff0c	1871			unknown	unclassified	unverified		
 0x0002065c	1182			unknown	unclassified	unverified		
 0x00020b10	2881			unknown	unclassified	unverified		
