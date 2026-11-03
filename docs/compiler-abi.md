@@ -2381,3 +2381,19 @@ in EAX, format string address, one value).
 | `0xd7040` | EAX:ef_addr32,EDX:ef_addr32 | none | d7070@d7078 | Build "<default path><first><second>" with a fixed separator. |
 | `0xdcc10` | none | none | a9e70@a9e8d | Reset the 320x200 clip state. |
 | `0xdcc54` | none | none | a9e70@a9eb7 | Same as dcc10 with the stores in a different order. |
+
+## runtime_helpers4 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe0b88` | EAX:ef_addr32 | EAX:uint32_t | e0b6c@e0b71,e0bcc@e0c37,e1194@e11c6 | Open the device selected by value and report success. |
+| `0xe5830` | EAX:ef_addr32 | none | a6d00@a6d44 |  |
+| `0xe5960` | EAX:ef_addr32 | none | a5ef8@a5f95,e588c@e588f | Compute the rectangle of a record into 0x41ec08..0x41ec0e. |
+| `0xe5c03` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:int32_t | 81354@81369,82e00@82e17,c3430@c3495 | strncmp. |
+| `0xeb448` | EAX:uint32_t | none | ea50c@ea5e7,eb2c0@eb315 |  |
+| `0xeff7f` | EAX:uint32_t,EDX:ef_addr32 | none | ee22c@eed2d | Convert an unsigned 32-bit integer to an 80-bit extended value at dest. |
+| `0xf79b0` | none | none | none direct | OR the mask at 0x46438c into the flag words. |
+| `0xf88a0` | EAX:ef_addr32,DX:int16_t | EAX:uint32_t | f8988@f89b3 |  |
+| `0xfa77b` | EAX:ef_addr32 | none | bc287@bc311,bc450@bc45c | Move the node owning object from the list at 0x485f9c to the free list. |
+| `0xfc050` | AL:uint8_t | AL:uint8_t | fc0ec@fc119,fc1e8@fc21a | Classify a kind into 1, 2 or 3. |
+| `0xfc6c8` | EAX:uint32_t | none | d1d40@d1d58 | Query the video driver and clamp the width field. |

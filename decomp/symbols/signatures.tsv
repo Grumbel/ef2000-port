@@ -940,3 +940,14 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000d7040	build_path_d7040	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d7040 (47 bytes); Build "<default path><first><second>" with a fixed separator.; callers d7070@d7078; docs/compiler-abi.md
 0x000dcc10	reset_clip_dcc10			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000dcc10 (67 bytes); Reset the 320x200 clip state.; callers a9e70@a9e8d; docs/compiler-abi.md
 0x000dcc54	reset_clip_dcc54			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000dcc54 (67 bytes); Same as dcc10 with the stores in a different order.; callers a9e70@a9eb7; docs/compiler-abi.md
+0x000e0b88	open_device_e0b88	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e0b88 (65 bytes); Open the device selected by value and report success.; callers e0b6c@e0b71,e0bcc@e0c37,e1194@e11c6; docs/compiler-abi.md
+0x000e5830	refresh_slot_e5830	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e5830 (62 bytes); ; callers a6d00@a6d44; docs/compiler-abi.md
+0x000e5960	compute_rect_e5960	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e5960 (58 bytes); Compute the rectangle of a record into 0x41ec08..0x41ec0e.; callers a5ef8@a5f95,e588c@e588f; docs/compiler-abi.md
+0x000e5c03	compare_strings_e5c03	EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e5c03 (41 bytes); strncmp.; callers 81354@81369,82e00@82e17,c3430@c3495; docs/compiler-abi.md
+0x000eb448	enter_handler_eb448	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb448 (48 bytes); ; callers ea50c@ea5e7,eb2c0@eb315; docs/compiler-abi.md
+0x000eff7f	uint_to_extended_eff7f	EAX:uint32_t,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eff7f (53 bytes); Convert an unsigned 32-bit integer to an 80-bit extended value at dest.; callers ee22c@eed2d; docs/compiler-abi.md
+0x000f79b0	or_flag_mask_f79b0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f79b0 (62 bytes); OR the mask at 0x46438c into the flag words.; callers none direct; docs/compiler-abi.md
+0x000f88a0	check_entry_f88a0	EAX:ef_addr32,DX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f88a0 (69 bytes); ; callers f8988@f89b3; docs/compiler-abi.md
+0x000fa77b	release_list_node_fa77b	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fa77b (57 bytes); Move the node owning object from the list at 0x485f9c to the free list.; callers bc287@bc311,bc450@bc45c; docs/compiler-abi.md
+0x000fc050	classify_kind_fc050	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc050 (57 bytes); Classify a kind into 1, 2 or 3.; callers fc0ec@fc119,fc1e8@fc21a; docs/compiler-abi.md
+0x000fc6c8	query_video_fc6c8	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc6c8 (92 bytes); Query the video driver and clamp the width field.; callers d1d40@d1d58; docs/compiler-abi.md

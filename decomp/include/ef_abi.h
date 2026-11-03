@@ -1585,4 +1585,24 @@ void guest_fn_101c54(void); /* 0x101c54 */
 void guest_fn_d6df0(void); /* 0xd6df0 */
 void guest_fn_cdf48(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcdf48 EAX/EDX/EBX/ECX */
 
+/* runtime_helpers4.c */
+uint32_t open_device_e0b88(ef_addr32 value);
+void refresh_slot_e5830(ef_addr32 object);
+void compute_rect_e5960(ef_addr32 record);
+int32_t compare_strings_e5c03(ef_addr32 a, ef_addr32 b, uint32_t count);
+void enter_handler_eb448(uint32_t value);
+void uint_to_extended_eff7f(uint32_t value, ef_addr32 destination);
+void or_flag_mask_f79b0(void);
+uint32_t check_entry_f88a0(ef_addr32 object, int16_t index);
+void release_list_node_fa77b(ef_addr32 object);
+uint8_t classify_kind_fc050(uint8_t kind);
+void query_video_fc6c8(uint32_t value);
+void guest_fn_e10e0(void); /* 0xe10e0 */
+void guest_fn_e59cc(ef_addr32 target, ef_addr32 source); /* 0xe59cc EAX/EDX */
+void guest_fn_eb25a(uint32_t value); /* 0xeb25a EAX */
+void guest_fn_f6124(void); /* 0xf6124 */
+uint32_t guest_fn_bd4e0(uint32_t value); /* 0xbd4e0 EAX -> AX */
+uint32_t guest_fn_f8a30(ef_addr32 object); /* 0xf8a30 EAX -> AX */
+uint32_t guest_fn_f89e0(ef_addr32 object); /* 0xf89e0 EAX -> AX */
+
 #endif
