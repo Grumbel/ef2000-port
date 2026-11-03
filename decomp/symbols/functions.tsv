@@ -1109,9 +1109,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00058d44	29			unknown	unclassified	unverified		
 0x00058d64	437			unknown	unclassified	unverified		
 0x00059334	234			unknown	unclassified	unverified		
-0x00059420	99			unknown	unclassified	unverified		
+0x00059420	99	draw_tactical_coordinates	record_transitions	drafted	game	confirmed	decomp/tests/0x00059420.json	docs/compiler-abi.md; host model; guest differential pending
 0x00059484	30	draw_tactical_item_mode	packet_status	drafted	game	confirmed	decomp/tests/0x00059484.json	docs/compiler-abi.md; host model; guest differential pending
-0x000594a4	41			unknown	unclassified	unverified		
+0x000594a4	41	draw_tactical_item_metric	record_transitions	drafted	game	confirmed	decomp/tests/0x000594a4.json	docs/compiler-abi.md; host model; guest differential pending
 0x000597d8	237			unknown	unclassified	unverified		
 0x000598e8	175			unknown	unclassified	unverified		
 0x00059998	321			unknown	unclassified	unverified		
@@ -1219,7 +1219,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000663a4	186			unknown	unclassified	unverified		
 0x00066548	1075			unknown	unclassified	unverified		
 0x0006697c	330			unknown	unclassified	unverified		
-0x00066ac8	38			unknown	unclassified	unverified		
+0x00066ac8	38	update_position_bin	record_transitions	drafted	game	confirmed	decomp/tests/0x00066ac8.json	docs/compiler-abi.md; host model; guest differential pending
 0x00066b74	126			unknown	unclassified	unverified		
 0x00066bf4	224			unknown	unclassified	unverified		
 0x00066cd4	169			unknown	unclassified	unverified		
@@ -1358,7 +1358,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00073d50	397			unknown	unclassified	unverified		
 0x00073ee0	513			unknown	unclassified	unverified		
 0x000740e4	267			unknown	unclassified	unverified		
-0x000741f0	53			unknown	unclassified	unverified		
+0x000741f0	53	report_tactical_object_action	record_transitions	drafted	game	confirmed	decomp/tests/0x000741f0.json	docs/compiler-abi.md; host model; guest differential pending
 0x00074228	393			unknown	unclassified	unverified		
 0x00074448	53			unknown	unclassified	unverified		
 0x00074480	259			unknown	unclassified	unverified		
@@ -1442,7 +1442,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a290	8			unknown	unclassified	unverified		
 0x0007a298	10			unknown	unclassified	unverified		
 0x0007a38c	24			unknown	unclassified	unverified		
-0x0007a3b0	54			unknown	unclassified	unverified		
+0x0007a3b0	54	build_status_description	record_transitions	drafted	game	confirmed	decomp/tests/0x0007a3b0.json	docs/compiler-abi.md; host model; guest differential pending
 0x0007a3e8	64			unknown	unclassified	unverified		
 0x0007a428	11	copy_active_buffer_pointer	runtime_control	drafted	game	confirmed	decomp/tests/0x0007a428.json	docs/compiler-abi.md; Copies full dword 0x12afc4 to 0x1f8e9c; EAX holds source value; original guest replacement unverified
 0x0007a434	30			unknown	unclassified	unverified		
@@ -1704,8 +1704,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000873a4	432			unknown	unclassified	unverified		
 0x00087700	454			unknown	unclassified	unverified		
 0x000878c8	165			unknown	unclassified	unverified		
-0x00087970	81			unknown	unclassified	unverified		
-0x000879c4	89			unknown	unclassified	unverified		
+0x00087970	81	refresh_record_selection	record_transitions	drafted	game	confirmed	decomp/tests/0x00087970.json	docs/compiler-abi.md; host model; guest differential pending
+0x000879c4	89	rotate_ui_record_ring	record_transitions	drafted	game	confirmed	decomp/tests/0x000879c4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00087a20	821			unknown	unclassified	unverified		
 0x00087db8	196			unknown	unclassified	unverified		
 0x00087f9c	71	find_ui_linked_tag	ui_grid_helpers	drafted	game	confirmed	decomp/tests/0x00087f9c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
@@ -1837,7 +1837,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008f3c0	3			unknown	unclassified	unverified		
 0x0008f3f4	218			unknown	unclassified	unverified		
 0x0008f5d8	26			unknown	unclassified	unverified		
-0x0008f5f4	41			unknown	unclassified	unverified		
+0x0008f5f4	41	reset_ui_record_pool	record_transitions	drafted	game	confirmed	decomp/tests/0x0008f5f4.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008f620	35	configure_scene_feature	scene_controls	drafted	game	confirmed	decomp/tests/0x0008f620.json	docs/compiler-abi.md; Three original 16-bit stores at 0x198442/0x19842e/0x198444; awaiting OMF guest differential
 0x0008f644	747			unknown	unclassified	unverified		
 0x0008f930	181			unknown	unclassified	unverified		

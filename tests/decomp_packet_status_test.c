@@ -50,11 +50,12 @@ void format_ui_status_float(ef_addr32 destination, ef_addr32 format, double valu
     ++format_float_count;
 }
 
-void draw_tactical_mode_item(uint32_t mode, ef_addr32 item)
+int32_t draw_tactical_mode_item(uint32_t mode, ef_addr32 item)
 {
     last_mode = mode;
     last_item = item;
     ++draw_count;
+    return 0;
 }
 
 void read_tactical_indicator_callback(void)

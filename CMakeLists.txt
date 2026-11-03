@@ -175,6 +175,13 @@ target_compile_options(ef2000-decomp-packet-status-test PRIVATE -Wall -Wextra -W
 target_compile_definitions(ef2000-decomp-packet-status-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-packet-status-test PRIVATE decomp/include)
 add_test(NAME decomp-packet-status-host-model COMMAND ef2000-decomp-packet-status-test)
+add_executable(ef2000-decomp-record-transitions-test
+  tests/decomp_record_transitions_test.c decomp/src/record_transitions.c)
+target_compile_features(ef2000-decomp-record-transitions-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-record-transitions-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-record-transitions-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-record-transitions-test PRIVATE decomp/include)
+add_test(NAME decomp-record-transitions-host-model COMMAND ef2000-decomp-record-transitions-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

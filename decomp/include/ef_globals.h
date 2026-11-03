@@ -197,5 +197,16 @@ extern float g_ui_status_scalar; /* 0x0015babc */
 extern uint8_t g_tactical_display_mode; /* 0x0012b369 */
 extern uint8_t g_tactical_indicator_source; /* 0x001a5c0b */
 extern uint8_t g_tactical_indicator_latch; /* 0x00127d9d */
+extern int16_t g_tactical_coordinate_offset_y; /* 0x001a6cfa */
+extern int16_t g_tactical_coordinate_offset_x; /* 0x001a6cfc */
+extern uint8_t g_tactical_marker_code; /* 0x00128148 */
+extern uint32_t g_position_bin_packed; /* 0x001a823a, high word rewritten */
+extern uint8_t g_tactical_action_enabled; /* 0x00125847 */
+extern ef_addr32 g_ui_record_head; /* 0x0020f158 */
+extern ef_addr32 g_ui_record_anchor; /* 0x0020f160 */
+extern ef_addr32 g_ui_record_end; /* 0x0020f164 */
+extern ef_addr32 g_ui_record_cursor; /* 0x0020f168 */
+extern uint16_t g_ui_record_pool_count; /* 0x002119f4 */
+extern uint32_t g_ui_record_pool_pointer; /* 0x002119e8 */
 
 #endif

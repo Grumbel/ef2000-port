@@ -1,0 +1,21 @@
+{
+  "address": "0x0007a3b0",
+  "function_size": 54,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "append_suffix",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x001f8d60", "hex": "48454144455200"},
+        {"address": "0x00187b74", "hex": "3a2000"},
+        {"address": "0x002a0000", "hex": "5441494c00"}
+      ]
+    },
+    {
+      "name": "empty_suffix",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x002a0000", "hex": "00"}]
+    }
+  ]
+}

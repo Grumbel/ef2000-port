@@ -1,0 +1,25 @@
+{
+  "address": "0x00059420",
+  "function_size": 99,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "double_scaled_mode",
+      "registers": {"eax": "0xfffffffd", "edx": 4, "ebx": "0x11223344"},
+      "memory": [
+        {"address": "0x0012b369", "hex": "01"},
+        {"address": "0x001a6cfa", "hex": "fcff0700"},
+        {"address": "0x00128148", "hex": "31"}
+      ]
+    },
+    {
+      "name": "single_scaled_mode",
+      "registers": {"eax": "0xfffffffd", "edx": 4, "ebx": "0x8899"},
+      "memory": [
+        {"address": "0x0012b369", "hex": "07"},
+        {"address": "0x001a6cfa", "hex": "fcff0700"},
+        {"address": "0x00128148", "hex": "31"}
+      ]
+    }
+  ]
+}

@@ -175,3 +175,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00082bd4	write_ui_status_float	EAX:ef_addr32		eax,ecx,edx	0	Original 0x82bd4 (27 bytes); float32 promoted to double for formatter; callers 82e40@82f15/830b8@8312a; docs/compiler-abi.md
 0x00059484	draw_tactical_item_mode	EAX:ef_addr32		eax,ecx,edx	0	Original 0x59484 (30 bytes); toggled mode pushed with item; callers 5c0cc@5c14e/5e21c@5e2d2; docs/compiler-abi.md
 0x0005331c	refresh_tactical_indicator		AL:uint8_t	eax	0	Original 0x5331c (17 bytes); indirect callback before copying source byte to latch; callers 1cde8@1cf73/1d318@1d370; docs/compiler-abi.md
+0x00059420	draw_tactical_coordinates	AX:int16_t,DX:int16_t,EBX:uint32_t		eax,edx,ebx	0	Original 0x59420 (99 bytes); mode-specific coordinate scale then 48bb0 five-arg draw; callers 59998@59ac5/59adc@59f93; docs/compiler-abi.md
+0x000594a4	draw_tactical_item_metric	EAX:ef_addr32	EAX:int32_t	edx	0	Original 0x594a4 (41 bytes); mode1 sign-extends AX then SAR1, other mode returns full callee EAX; callers 59998@59a22/59adc@59f7f; docs/compiler-abi.md
+0x00066ac8	update_position_bin		AX:uint16_t	edx	0	Original 0x66ac8 (38 bytes); SAR upper position word, convert, clamp signed negative to ffff; callers 1b4a4@1b4d4/95e58@96a3f; docs/compiler-abi.md
+0x000741f0	report_tactical_object_action	EAX:ef_addr32		edx	0	Original 0x741f0 (53 bytes); conditional emit action 26/12 using signed high index word; callers 172b4@1732a/74584@746c2; docs/compiler-abi.md
+0x0007a3b0	build_status_description	EAX:ef_addr32	EAX:ef_addr32	ebx,edx	0	Original 0x7a3b0 (54 bytes); copy and two appends to shared buffer then return destination; callers 7a4a4@7a4b5/7a5bc@7a5e1; docs/compiler-abi.md
+0x00087970	refresh_record_selection	EAX:ef_addr32		ebx,edx	0	Original 0x87970 (81 bytes); six-byte selection record and optional signed index increment; callers 87a20@87bcc/89164@89177; docs/compiler-abi.md
+0x000879c4	rotate_ui_record_ring			ebx,edx	0	Original 0x879c4 (89 bytes); cursor selection and splice after anchor; callers 55928@55958/87db8@87dbd; docs/compiler-abi.md
+0x0008f5f4	reset_ui_record_pool			ebx,edx	0	Original 0x8f5f4 (41 bytes); 0x2260-byte clear and two state resets; callers 3cfc0@3cff7/8bd58@8bdb2; docs/compiler-abi.md

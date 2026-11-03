@@ -1,0 +1,15 @@
+{
+  "address": "0x00066ac8",
+  "function_size": 38,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "negative_coordinate",
+      "memory": [{"address": "0x001a823a", "hex": "3412fcff"}]
+    },
+    {
+      "name": "positive_coordinate",
+      "memory": [{"address": "0x001a823a", "hex": "34120300"}]
+    }
+  ]
+}

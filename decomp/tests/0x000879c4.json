@@ -1,0 +1,18 @@
+{
+  "address": "0x000879c4",
+  "function_size": 89,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "rotate_nonempty_ring",
+      "memory": [
+        {"address": "0x0020f158", "hex": "00300300"},
+        {"address": "0x0020f160", "hex": "000003000003030000010300"},
+        {"address": "0x00030134", "hex": "00020300"},
+        {"address": "0x00030034", "hex": "00030300"},
+        {"address": "0x00030338", "hex": "00000300"},
+        {"address": "0x00030154", "hex": "c3a2"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "address": "0x0008f5f4",
+  "function_size": 41,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "clear_populated_pool",
+      "memory": [
+        {"address": "0x0020f550", "hex": "ffffffffffffffffffffffffffffffff"},
+        {"address": "0x002119f4", "hex": "1100"},
+        {"address": "0x002119e8", "hex": "00102a00"}
+      ]
+    },
+    {
+      "name": "clear_empty_pool"
+    }
+  ]
+}

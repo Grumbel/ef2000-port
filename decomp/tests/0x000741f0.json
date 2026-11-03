@@ -1,0 +1,30 @@
+{
+  "address": "0x000741f0",
+  "function_size": 53,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "event_gate_disabled",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x00125847", "hex": "00"}]
+    },
+    {
+      "name": "unlinked_object_event",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x00125847", "hex": "01"},
+        {"address": "0x002a0012", "hex": "00000000"},
+        {"address": "0x002a001e", "hex": "0000ffff"}
+      ]
+    },
+    {
+      "name": "linked_object_event",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x00125847", "hex": "01"},
+        {"address": "0x002a0012", "hex": "00102a00"},
+        {"address": "0x002a001e", "hex": "00000300"}
+      ]
+    }
+  ]
+}

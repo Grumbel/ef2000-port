@@ -165,3 +165,14 @@ addr	size	type	name	evidence	notes
 0x0012b369	1	uint8_t	g_tactical_display_mode	0x59485 reads	Mode 1 selects zero, other values select one
 0x001a5c0b	1	uint8_t	g_tactical_indicator_source	0x53322 reads	Sampled after indirect callback
 0x00127d9d	1	uint8_t	g_tactical_indicator_latch	0x53327 writes	Callback result copied here
+0x001a6cfa	2	int16_t	g_tactical_coordinate_offset_y	0x5942e/0x59454 reads	Mode-specific y offset
+0x001a6cfc	2	int16_t	g_tactical_coordinate_offset_x	0x59435/0x5945b reads	Mode-specific x offset
+0x00128148	1	uint8_t	g_tactical_marker_code	0x59470 reads	Passed as first stack argument to 48bb0
+0x001a823a	4	uint32_t	g_position_bin_packed	0x66ac9 reads 0x66ad8 writes upper word	Overlapping word/dword pair
+0x00125847	1	uint8_t	g_tactical_action_enabled	0x741f7/0x7420a reads	Gates tactical action reporting
+0x0020f158	4	ef_addr32	g_ui_record_head	0x879cf read 0x879f8 write	List selection head
+0x0020f160	4	ef_addr32	g_ui_record_anchor	0x879e7/0x879fd reads	List splice anchor
+0x0020f164	4	ef_addr32	g_ui_record_end	0x879ed reads	List end sentinel
+0x0020f168	4	ef_addr32	g_ui_record_cursor	0x879c6 read 0x879e1 write	Rotating selection cursor
+0x002119f4	2	uint16_t	g_ui_record_pool_count	0x8f602 writes	Reset to zero
+0x002119e8	4	uint32_t	g_ui_record_pool_pointer	0x8f612 writes	Reset to zero

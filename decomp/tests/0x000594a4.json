@@ -1,0 +1,20 @@
+{
+  "address": "0x000594a4",
+  "function_size": 41,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "half_signed_metric",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x0012b369", "hex": "01"},
+        {"address": "0x002a0000", "hex": "00000000000000000000000000000000"}
+      ]
+    },
+    {
+      "name": "full_metric",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x0012b369", "hex": "02"}]
+    }
+  ]
+}

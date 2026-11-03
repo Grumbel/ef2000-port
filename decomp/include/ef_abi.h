@@ -64,8 +64,26 @@ void format_ui_status_pair(ef_addr32 destination, ef_addr32 format,
                            uint32_t first, uint32_t second); /* 0xa4342 */
 void format_ui_status_float(ef_addr32 destination, ef_addr32 format,
                             double value); /* 0xa4342 */
-void draw_tactical_mode_item(uint32_t mode, ef_addr32 item); /* 0x48c34 */
+int32_t draw_tactical_mode_item(uint32_t mode, ef_addr32 item); /* 0x48c34 */
 void read_tactical_indicator_callback(void); /* indirect 0x15bab8 */
+
+/* Runtime record and tactical display operations, separate original sinks. */
+void draw_tactical_coordinate_marker(uint8_t mark, uint32_t mode,
+                                     int32_t x, int32_t y, uint32_t aux); /* 0x48bb0 */
+int32_t draw_tactical_item_metric(ef_addr32 item); /* 0x594a4 EAX */
+void draw_tactical_coordinates(int16_t x, int16_t y, uint32_t aux); /* 0x59420 AX/DX/EBX */
+void update_position_bin(void); /* 0x66ac8 */
+uint16_t bin_coordinate_to_slot(int32_t coordinate); /* 0x663a4 EAX, EDX=0 */
+void report_tactical_object_action(ef_addr32 object); /* 0x741f0 EAX */
+void notify_tactical_action(int32_t index, uint32_t action); /* 0x9e508 EAX/EDX */
+ef_addr32 build_status_description(ef_addr32 suffix); /* 0x7a3b0 EAX */
+void guest_string_copy(ef_addr32 dest, ef_addr32 src); /* 0x9d749 EAX/EDX */
+void guest_string_append(ef_addr32 dest, ef_addr32 src); /* 0x9ca57 EAX/EDX */
+void refresh_record_selection(ef_addr32 record); /* 0x87970 EAX */
+uint32_t original_record_selection_check(ef_addr32 record); /* 0x866e0 EAX */
+void rotate_ui_record_ring(void); /* 0x879c4 */
+void initialize_ui_record_ring(ef_addr32 head); /* 0x878c8 EAX */
+void reset_ui_record_pool(void); /* 0x8f5f4 */
 
 /* Short clock, tactical state and coordinate helpers (host drafts). */
 uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */

@@ -1287,6 +1287,28 @@ The eight guest replay specifications are syntactically validated but no guest
 differential results are claimed. In particular, host packet tests do not prove
 that the original I/O sink accepts packets in the same runtime state.
 
+### Record and tactical-state transitions (eight-function wave)
+
+| Address | Draft | ABI and original side effects | Two independent callers |
+| --- | --- | --- | --- |
+| `0x59420` | `draw_tactical_coordinates` | AX/DX low signed coordinates, EBX additional argument; double scale in display mode 1, add signed word offsets and call `0x48bb0` with five stack args | `0x59998@0x59ac5`, `0x59adc@0x59f93` |
+| `0x594a4` | `draw_tactical_item_metric` | EAX item pointer; mode 1 sign-extends returned AX of `0x48c34` and shifts by one, other mode returns full EAX | `0x59998@0x59a22`, `0x59adc@0x59f7f` |
+| `0x66ac8` | `update_position_bin` | Signed upper word at `0x1a823a`, call `0x663a4` with EDX=0, replace overlapping upper word with result or `0xffff` on negative AX | `0x1b4a4@0x1b4d4`, `0x95e58@0x96a3f` |
+| `0x741f0` | `report_tactical_object_action` | EAX object; optional signed high-word index, action `0x26` for null link at +0x12, otherwise `0x12` | `0x172b4@0x1732a`, `0x74584@0x746c2` |
+| `0x7a3b0` | `build_status_description` | EAX suffix; copy fixed prefix to `0x1f8ec4`, append constant separator, append suffix; return shared buffer address | `0x7a4a4@0x7a4b5`, `0x7a5bc@0x7a5e1` |
+| `0x87970` | `refresh_record_selection` | EAX record; signed high-word index from +0x14 selects six-byte entry; copy entry pointer/word, optionally increment index word at +0x16 | `0x87a20@0x87bcc`, `0x89164@0x89177` |
+| `0x879c4` | `rotate_ui_record_ring` | Cursor/anchor/head global pointers; initialize missing cursor through `0x878c8`, rotate one doubly linked node, copy unaligned word +0x54 to +0x51 | `0x55928@0x55958`, `0x87db8@0x87dbd` |
+| `0x8f5f4` | `reset_ui_record_pool` | Reset 16-bit count, fill `0x2260` bytes with zero at `0x20f550` through `0xb3fb0`, clear pointer | `0x3cfc0@0x3cff7`, `0x8bd58@0x8bdb2` |
+
+These eight functions each have two independent original callsites and separate
+host-model assertions for byte layouts, signed word arithmetic, gate behavior,
+caller ordering, list links and the pool clear length. `0x1a823a` and
+`0x1a823c` are overlapping views of one four-byte state value; the draft
+models this explicitly. The ring rotation assumes a valid original ring; it
+must not manufacture recovery behavior for corrupt pointers. Fixture schemas
+validate, but no guest differential comparison has yet been performed, and
+the original guest callbacks are deliberately represented as typed sinks.
+
 ## Comparing assembly
 
 ```sh

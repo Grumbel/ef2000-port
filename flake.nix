@@ -672,6 +672,12 @@
             ${source}/decomp/src/packet_status.c \
             -o work/packet_status_host_test
           work/packet_status_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_record_transitions_test.c \
+            ${source}/decomp/src/record_transitions.c \
+            -o work/record_transitions_host_test
+          work/record_transitions_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {
