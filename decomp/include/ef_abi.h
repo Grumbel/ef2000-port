@@ -1850,7 +1850,6 @@ void show_menu_value_8018c(int16_t item, uint32_t value);
 void guest_fn_56004(void); /* 0x56004 */
 void guest_fn_56208(void); /* 0x56208 */
 uint32_t guest_fn_9d524(ef_addr32 a, ef_addr32 b); /* 0x9d524 EAX/EDX */
-void guest_fn_77034(int32_t a, int32_t b); /* 0x77034 EAX/EDX */
 void guest_fn_76f58(ef_addr32 unit, ef_addr32 record); /* 0x76f58 EAX/EDX */
 uint32_t guest_fn_d70a0(uint32_t value); /* 0xd70a0 AL -> AL */
 
@@ -1866,5 +1865,18 @@ uint32_t guest_fn_c3670(ef_addr32 a, uint32_t b, uint32_t c, uint32_t d, uint32_
 void guest_fn_2da54(int32_t owner); /* 0x2da54 EAX */
 void guest_fn_c36b4(ef_addr32 a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0xc36b4 EAX/EDX/EBX/ECX/stack, ret 8 */
 void guest_fn_740e4(int32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0x740e4 EAX/EDX/EBX/ECX/stack, ret 4 */
+
+/* game_helpers11.c */
+void plot_trail_3cc94(ef_addr32 start);
+void init_screen_413b0(void);
+void refresh_widget_507dc(void);
+uint32_t wait_command_50e84(void);
+void reset_selection_540d0(void);
+void request_name_54e80(uint32_t value);
+void send_slot_command_77034(int16_t unit_id, int16_t value, uint8_t kind);
+void guest_fn_3cc28(ef_addr32 text); /* 0x3cc28 EAX */
+ef_addr32 guest_fn_3c994(ef_addr32 text); /* 0x3c994 EAX -> EAX */
+void guest_fn_50ca4(void); /* 0x50ca4 */
+void guest_fn_50d9c(void); /* 0x50d9c */
 
 #endif

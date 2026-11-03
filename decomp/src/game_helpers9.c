@@ -203,7 +203,7 @@ void assign_slot_77088(ef_addr32 unit, uint8_t slot)
     int16_t value = EF_S16(record + 3u);
 
     EF_U16(record + (uint32_t)slot * 2u + 0x13u) = (uint16_t)value;
-    guest_fn_77034(EF_S16(unit + 0x16u), value);
+    guest_fn_77034(EF_S16(unit + 0x16u), value, slot);
     guest_fn_76f58(unit, record);
 }
 

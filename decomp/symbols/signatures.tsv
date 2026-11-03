@@ -1123,3 +1123,10 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00034a68	show_status_34a68			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00034a68 (45 bytes); ; callers 35cfc@35d19; docs/compiler-abi.md
 0x000391d0	init_list_391d0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000391d0 (52 bytes); ; callers 39204@39249; docs/compiler-abi.md
 0x00007ae4	send_unit_command_7ae4	AX:int16_t,DL:uint8_t,BL:uint8_t,CL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00007ae4 (81 bytes); Forward a command for a unit; kind 10 uses 0xff in place of its byte.; callers 46454@469fe,7156c@71a1c; docs/compiler-abi.md
+0x0003cc94	plot_trail_3cc94	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003cc94 (85 bytes); Plot a pixel for each step of the string walker.; callers 3cd24@3cd30; docs/compiler-abi.md
+0x000413b0	init_screen_413b0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000413b0 (68 bytes); ; callers bfcc@c110,41f24@41f5b; docs/compiler-abi.md
+0x000507dc	refresh_widget_507dc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000507dc (23 bytes); ; callers ba5c@bbef,bfcc@c4f8,d628@d64e; docs/compiler-abi.md
+0x00050e84	wait_command_50e84		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00050e84 (69 bytes); Wait for a key other than 0x3b with a long enough name, then handle it.; callers 52164@522bb; docs/compiler-abi.md
+0x000540d0	reset_selection_540d0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000540d0 (64 bytes); ; callers 3dd30@3de01; docs/compiler-abi.md
+0x00054e80	request_name_54e80	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054e80 (26 bytes); ; callers 581b0@583c2; docs/compiler-abi.md
+0x00077034	send_slot_command_77034	AX:int16_t,DX:int16_t,BL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00077034 (81 bytes); Send command 0x44/0x45/0x43 for kind 0/1/2.; callers 77088@770c0; docs/compiler-abi.md

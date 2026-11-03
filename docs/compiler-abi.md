@@ -2619,3 +2619,15 @@ in EAX, format string address, one value).
 | `0x34a68` | none | none | 35cfc@35d19 |  |
 | `0x391d0` | none | none | 39204@39249 |  |
 | `0x7ae4` | AX:int16_t,DL:uint8_t,BL:uint8_t,CL:uint8_t | none | 46454@469fe,7156c@71a1c | Forward a command for a unit; kind 10 uses 0xff in place of its byte. |
+
+## game_helpers11 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3cc94` | EAX:ef_addr32 | none | 3cd24@3cd30 | Plot a pixel for each step of the string walker. |
+| `0x413b0` | none | none | bfcc@c110,41f24@41f5b |  |
+| `0x507dc` | none | none | ba5c@bbef,bfcc@c4f8,d628@d64e |  |
+| `0x50e84` | none | EAX:uint32_t | 52164@522bb | Wait for a key other than 0x3b with a long enough name, then handle it. |
+| `0x540d0` | none | none | 3dd30@3de01 |  |
+| `0x54e80` | EAX:uint32_t | none | 581b0@583c2 |  |
+| `0x77034` | AX:int16_t,DX:int16_t,BL:uint8_t | none | 77088@770c0 | Send command 0x44/0x45/0x43 for kind 0/1/2. |
