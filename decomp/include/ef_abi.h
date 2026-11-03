@@ -2018,4 +2018,13 @@ void forward_command_message_572b4(ef_addr32 message);
 void send_table_entry_573d0(int16_t index, uint8_t value);
 void guest_fn_900c0(int32_t id, uint32_t a, int32_t b); /* 0x900c0 EAX/EDX/EBX */
 
+/* game_helpers20.c */
+ef_addr32 find_named_entry_81354(ef_addr32 key);
+uint8_t find_row_slot_821f8(uint16_t value, int16_t row);
+void store_scaled_vector_831a4(ef_addr32 out, int32_t x, int32_t y, int32_t z);
+uint32_t page_row_85c90(int16_t index);
+void flag_first_hit_887d0(void);
+uint32_t guest_fn_a1a40_key(ef_addr32 key); /* 0xa1a40 EAX -> EAX (older no-argument guest_fn_a1a40 omits the EAX input) */
+uint32_t guest_fn_d0470(int32_t a, int32_t x, int32_t y, int32_t z); /* 0xd0470 EAX/EDX/EBX/ECX -> EAX */
+
 #endif

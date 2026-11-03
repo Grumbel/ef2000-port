@@ -2761,3 +2761,13 @@ in EAX, format string address, one value).
 | `0x566b4` | EAX:ef_addr32 | none | 581b0@583a4 | Load the parameter block from a message and apply it for the local player. |
 | `0x572b4` | EAX:ef_addr32 | none | 581b0@5855f | Forward a command message as packet 0x48/0x49/0x47 plus a closing 0x4a. |
 | `0x573d0` | AX:int16_t,DL:uint8_t | none | 90ac4@90c0e,90c6c@90f36 | Send entry idx of the 48-byte table at 0x211af0 (command 0x3f). |
+
+## game_helpers20 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x81354` | EAX:ef_addr32 | EAX:ef_addr32 | 8c49c@8c50b,8fcec@8fd50 | Find the 8-byte table entry whose name equals key; return its payload address or 0. |
+| `0x821f8` | AX:uint16_t,DX:int16_t | AL:uint8_t | 426a4@42758 | Index of the last 16-bit slot of row b (17 bytes per row) equal to a. |
+| `0x831a4` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | 83a40@83aac | Store a vector, halved until every component fits in 16 bits. |
+| `0x85c90` | AX:int16_t | EAX:uint32_t | 2a1fc@2a27b,86110@86188,86968@86a06 | Address of row `index` (6 bytes) in the selected unit's page table, or the default table. |
+| `0x887d0` | none | none | 888cc@889e3 | Flag the first kind-0x1f/0x20 record of the ring at 0x20f160 that passes the hit test. |

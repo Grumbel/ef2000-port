@@ -1552,7 +1552,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00081110	74			unknown	unclassified	unverified		
 0x00081230	214			unknown	unclassified	unverified		
 0x00081308	74	prepare_block_81308	unit_flags	compiles	game	confirmed	decomp/tests/0x00081308.json	docs/compiler-abi.md; Prepare the 0x28-byte block at 0x1fc980; returns its descriptor or 0.; callers 77c90@77e39; guest pending
-0x00081354	63			unknown	unclassified	unverified		
+0x00081354	63	find_named_entry_81354	game_helpers20	compiles	game	confirmed	decomp/tests/0x00081354.json	docs/compiler-abi.md; Find the 8-byte table entry whose name equals key; return its payload address or 0.; callers 8c49c@8c50b,8fcec@8fd50; guest pending
 0x00081394	179			unknown	unclassified	unverified		
 0x00081448	361			unknown	unclassified	unverified		
 0x000815b4	64	find_entry_815b4	game_helpers6	compiles	game	confirmed	decomp/tests/0x000815b4.json	docs/compiler-abi.md; Find the 8-byte entry whose two words match those at pointer.; callers 8748@878a; guest pending
@@ -1569,7 +1569,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008204c	18			unknown	unclassified	unverified		
 0x00082060	125			unknown	unclassified	unverified		
 0x00082168	142			unknown	unclassified	unverified		
-0x000821f8	70			unknown	unclassified	unverified		
+0x000821f8	70	find_row_slot_821f8	game_helpers20	compiles	game	confirmed	decomp/tests/0x000821f8.json	docs/compiler-abi.md; Index of the last 16-bit slot of row b (17 bytes per row) equal to a.; callers 426a4@42758; guest pending
 0x00082478	628			unknown	unclassified	unverified		
 0x00082720	26	write_status_byte_1fcb30	status_values	compiles	game	confirmed	decomp/tests/0x00082720.json	docs/compiler-abi.md; sprintf-style 0xa4342(dest, fmt 0x188b24, byte 0x1fcb30); sole direct caller 82e40@82f78; guest pending
 0x0008273c	26	write_status_byte_1a5c0d	status_values	compiles	game	confirmed	decomp/tests/0x0008273c.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188b34, byte 0x1a5c0d); sole direct caller 82e40@82f57; guest pending
@@ -1588,7 +1588,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082e00	61	find_matching_ui_fragment	ui_operations	compiles	game	confirmed	decomp/tests/0x00082e00.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082e40	483			unknown	unclassified	unverified		
 0x000830b8	219			unknown	unclassified	unverified		
-0x000831a4	89			unknown	unclassified	unverified		
+0x000831a4	89	store_scaled_vector_831a4	game_helpers20	compiles	game	confirmed	decomp/tests/0x000831a4.json	docs/compiler-abi.md; Store a vector, halved until every component fits in 16 bits.; callers 83a40@83aac; guest pending
 0x00083200	145			unknown	unclassified	unverified		
 0x00083294	34	ui_point_near_reference	ui_secondary	compiles	game	confirmed	decomp/tests/0x00083294.json	docs/compiler-abi.md; host model; guest differential pending
 0x000832b8	232			unknown	unclassified	unverified		
@@ -1686,7 +1686,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000857bc	615			unknown	unclassified	unverified		
 0x00085b70	63	reset_flags_85b70	game_helpers6	compiles	game	confirmed	decomp/tests/0x00085b70.json	docs/compiler-abi.md; ; callers 49228@4960b; guest pending
 0x00085bc8	168			unknown	unclassified	unverified		
-0x00085c90	104			unknown	unclassified	unverified		
+0x00085c90	104	page_row_85c90	game_helpers20	compiles	game	confirmed	decomp/tests/0x00085c90.json	docs/compiler-abi.md; Address of row `index` (6 bytes) in the selected unit's page table, or the default table.; callers 2a1fc@2a27b,86110@86188,86968@86a06; guest pending
 0x00085cf8	8			unknown	unclassified	unverified		
 0x00085d00	369			unknown	unclassified	unverified		
 0x00085f78	148			unknown	unclassified	unverified		
@@ -1722,7 +1722,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00088664	106			unknown	unclassified	unverified		
 0x000886d0	106			unknown	unclassified	unverified		
 0x0008873c	148			unknown	unclassified	unverified		
-0x000887d0	107			unknown	unclassified	unverified		
+0x000887d0	107	flag_first_hit_887d0	game_helpers20	compiles	game	confirmed	decomp/tests/0x000887d0.json	docs/compiler-abi.md; Flag the first kind-0x1f/0x20 record of the ring at 0x20f160 that passes the hit test.; callers 888cc@889e3; guest pending
 0x0008883c	142			unknown	unclassified	unverified		
 0x000888cc	903			unknown	unclassified	unverified		
 0x00088c54	43	convert_scene_vector	vector_math	compiles	game	confirmed	decomp/tests/0x00088c54.json	docs/compiler-abi.md; Int32[8,0,4] to double[0,8,16] with 0x18a468/70 scales; x87 precision pending; awaiting OMF guest differential
