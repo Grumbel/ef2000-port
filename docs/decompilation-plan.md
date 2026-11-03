@@ -560,6 +560,14 @@ Synthetic C++/Python wire-format tests pass; actual capture/replay against
 the pinned executable, x87/segment descriptors, hardware side effects,
 callee stubs and static block coverage remain outstanding.
 
+First C candidate (2026-11-03): `decomp/src/hiscore.c` implements the
+already-confirmed `hiscore_qualifies` at `0x432c` with signed 32-bit score
+comparison and a byte return. `decomp/tests/0x000432c.json` supplies ten
+boundary states; the host-model C test and spec validation pass. The tracker
+marks this function `drafted`, **not** `compiles` or `verified`: OpenWatcom
+object inspection, a safe splice and live guest differential/replay are still
+required. The `watcom-omf` check will compile the candidate when next run.
+
 ### 3.11 [ ] Phase-1 exit criteria
 
 - `nix flake check` passes with all new asset-free tests.
@@ -891,6 +899,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.8   Added X-32 allocator process watermarks in both runners and native report parsing; highwater evidence from sustained gameplay and mapping audit still required before patch arena.
 2026-11-03  3.10  Began ABI-aware isolated original-versus-patched Unicorn function differential tests, with strict fixture validation and dynamic original block counts; no real recovered replacement verified yet.
 2026-11-03  3.10  Added bounded original call-entry RAM/register capture to C++ Unicorn, and SHA-bound captured-state replay in the isolated differential tool; asset-free capture format tests pass, but live-game proof is pending.
+2026-11-03  3.5   Drafted first recovered game C function (0x432c signed high-score qualification), with packed-layout asserts, native host test and ten differential boundary fixtures; guest verification pending.
 ```
 
 ---

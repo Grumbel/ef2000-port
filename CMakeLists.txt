@@ -14,6 +14,11 @@ target_compile_features(ef2000-call-capture-test PRIVATE cxx_std_17)
 target_include_directories(ef2000-call-capture-test PRIVATE runtime)
 add_test(NAME call-capture-format COMMAND ef2000-call-capture-test
   "${CMAKE_CURRENT_BINARY_DIR}/call-capture-fixture.efcap")
+add_executable(ef2000-decomp-hiscore-test
+  tests/decomp_hiscore_test.c decomp/src/hiscore.c)
+target_compile_features(ef2000-decomp-hiscore-test PRIVATE c_std_11)
+target_include_directories(ef2000-decomp-hiscore-test PRIVATE decomp/include)
+add_test(NAME decomp-hiscore-host-model COMMAND ef2000-decomp-hiscore-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

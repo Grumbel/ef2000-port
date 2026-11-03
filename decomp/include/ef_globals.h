@@ -5,6 +5,7 @@
 #define EF_GLOBALS_H
 
 #include "ef_types.h"
+#include "ef_structs/hiscore.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -19,6 +20,6 @@ extern uint16_t _psp;                 /* 0x00132a3c */
 extern uint8_t _Envptr[6];           /* 0x00132a61, overlaps _Envseg */
 extern uint16_t _Envseg;              /* 0x00132a65 */
 extern int32_t g_hiscore_current;     /* 0x001970a0 */
-extern uint8_t g_hiscore_table[250]; /* 0x001970a4, 10 packed records */
+extern ef_hiscore_entry g_hiscore_table[10]; /* 0x001970a4, 10 packed records */
 
 #endif

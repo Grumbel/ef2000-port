@@ -16,8 +16,9 @@ nix run -L .#func-differential -- 0x0000432c \
 ~~~
 
 This is an **example of the eventual command**, not a presently passing
-game-function test: the recovered source, compiled OMF object, validated
-patch, and representative high-score inputs are still to be provided.
+game-function test: `decomp/src/hiscore.c` now has a native-tested C candidate
+and `0x000432c.json` has ten signed boundary cases, but a compiled OpenWatcom
+OMF object, validated patch, and real guest replay are still outstanding.
 
 Each test spec lives in `decomp/tests/0x<seven-hex-digits>.json` (derived
 work, not GPL). Example schema (numbers accept integers or hexadecimal

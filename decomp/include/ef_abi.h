@@ -10,4 +10,7 @@
  * must be confirmed from callers before adding #pragma aux definitions here.
  * See symbols/signatures.tsv and docs/decompilation-plan.md §3.5. */
 
+/* 0x000432c: no arguments, only AL observed as output (two callers). */
+uint8_t hiscore_qualifies(void);
+
 #endif

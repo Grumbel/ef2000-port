@@ -132,6 +132,9 @@
             tests/efpatch_test.cpp -o objects/ef2000-efpatch-test
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror -Iruntime \
             tests/call_capture_test.cpp -o objects/ef2000-call-capture-test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -Idecomp/include \
+            tests/decomp_hiscore_test.c decomp/src/hiscore.c \
+            -o objects/ef2000-decomp-hiscore-test
           runHook postBuild
         '';
 
@@ -144,6 +147,7 @@
           objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
           objects/ef2000-efpatch-test
           objects/ef2000-call-capture-test call-capture-fixture.efcap
+          objects/ef2000-decomp-hiscore-test
           objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
             --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
           objects/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'
@@ -407,6 +411,11 @@
           test -s work/fixture.asm
           grep -qi 'ef_omf_fixture' work/fixture.asm
           ! grep -qi '__CHK' work/fixture.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/hiscore.c --output "$PWD/work/hiscore.obj"
+          ${watcom}/bin/wdis work/hiscore.obj -l=work/hiscore.asm
+          grep -qi 'hiscore_qualifies' work/hiscore.asm
+          ! grep -qi '__CHK' work/hiscore.asm
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

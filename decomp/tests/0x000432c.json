@@ -1,0 +1,79 @@
+{
+  "address": "0x0000432c",
+  "function_size": 15,
+  "max_instructions": 128,
+  "cases": [
+    {
+      "name": "zero_tie_rejected",
+      "memory": [
+        {"address": "0x1970a0", "hex": "00000000"},
+        {"address": "0x19719a", "hex": "00000000"}
+      ]
+    },
+    {
+      "name": "positive_greater_qualifies",
+      "memory": [
+        {"address": "0x1970a0", "hex": "65000000"},
+        {"address": "0x19719a", "hex": "64000000"}
+      ]
+    },
+    {
+      "name": "positive_less_rejected",
+      "memory": [
+        {"address": "0x1970a0", "hex": "64000000"},
+        {"address": "0x19719a", "hex": "65000000"}
+      ]
+    },
+    {
+      "name": "negative_tie_rejected",
+      "memory": [
+        {"address": "0x1970a0", "hex": "ffffffff"},
+        {"address": "0x19719a", "hex": "ffffffff"}
+      ]
+    },
+    {
+      "name": "negative_greater_qualifies",
+      "memory": [
+        {"address": "0x1970a0", "hex": "feffffff"},
+        {"address": "0x19719a", "hex": "fdffffff"}
+      ]
+    },
+    {
+      "name": "negative_less_rejected",
+      "memory": [
+        {"address": "0x1970a0", "hex": "fdffffff"},
+        {"address": "0x19719a", "hex": "feffffff"}
+      ]
+    },
+    {
+      "name": "signed_min_vs_max_rejected",
+      "registers": {"ebx": "0xdeadbeef", "esi": "0xffffffff"},
+      "memory": [
+        {"address": "0x1970a0", "hex": "00000080"},
+        {"address": "0x19719a", "hex": "ffffff7f"}
+      ]
+    },
+    {
+      "name": "signed_max_vs_min_qualifies",
+      "registers": {"edx": "0xa5a5a5a5", "ebp": "0x80000000"},
+      "memory": [
+        {"address": "0x1970a0", "hex": "ffffff7f"},
+        {"address": "0x19719a", "hex": "00000080"}
+      ]
+    },
+    {
+      "name": "minus_one_vs_zero_rejected",
+      "memory": [
+        {"address": "0x1970a0", "hex": "ffffffff"},
+        {"address": "0x19719a", "hex": "00000000"}
+      ]
+    },
+    {
+      "name": "zero_vs_minus_one_qualifies",
+      "memory": [
+        {"address": "0x1970a0", "hex": "00000000"},
+        {"address": "0x19719a", "hex": "ffffffff"}
+      ]
+    }
+  ]
+}

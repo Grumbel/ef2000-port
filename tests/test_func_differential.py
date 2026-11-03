@@ -4,7 +4,9 @@
 """Asset-free ABI/test-spec checks; execute synthetic code if Unicorn exists."""
 
 import importlib.util
+import json
 from pathlib import Path
+import struct
 import tempfile
 import unittest
 
@@ -34,6 +36,21 @@ def fixture():
 
 
 class FunctionDifferentialTests(unittest.TestCase):
+    def test_hiscore_candidate_spec_covers_signed_boundaries(self):
+        path = ROOT / 'decomp/tests/0x000432c.json'
+        signature = differential.read_signature(ROOT / 'decomp/symbols/signatures.tsv',
+                                                 0x432c)
+        spec = json.loads(path.read_text())
+        _, _, _, _, _, size, cases = differential.validate_spec(spec, signature, 1662896)
+        self.assertEqual(size, 15)
+        self.assertEqual(len(cases), 10)
+        outcomes = set()
+        for _, _, _, memory in cases:
+            self.assertEqual([address for address, _ in memory], [0x1970a0, 0x19719a])
+            current, tenth = [struct.unpack('<i', data)[0] for _, data in memory]
+            outcomes.add(current > tenth)
+        self.assertEqual(outcomes, {True, False})
+
     def test_reviewed_signatures_and_subregisters(self):
         path = ROOT / 'decomp/symbols/signatures.tsv'
         signature = differential.read_signature(path, 0x432c)
