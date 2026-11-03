@@ -697,4 +697,67 @@ void guest_fn_a5ef8(uint32_t value); /* 0xa5ef8 EAX */
 uint32_t guest_fn_9c858_arg(uint32_t value); /* 0x9c858 EAX tail */
 uint32_t guest_fn_b3f48(void); /* 0xb3f48 -> EAX */
 
+/* list_helpers.c */
+void add_to_counter_4191c8(uint32_t delta);
+void latch_b3f50(void);
+void add_to_counter_4191c4(uint32_t delta);
+void set_latches_1371fc(void);
+void save_table_418e38(void);
+void restore_table_418e38(void);
+void clamp_word_425fa6(void);
+void pop_table_entry_4191dc(void);
+int32_t random_scaled(int16_t scale);
+void save_state_a98d0(void);
+void restore_state_a9900(void);
+uint32_t restore_state_a9990(void);
+void clear_latch_if_idle(void);
+void request_by_state(void);
+void clear_latch_and_notify(void);
+void resolve_link_at_1(ef_addr32 record);
+void resolve_link_at_0(ef_addr32 record);
+ef_addr32 walk_chain_from_8(int16_t steps, ef_addr32 record);
+void emit_record_pair_ab0b0(ef_addr32 target, ef_addr32 record);
+void emit_record_pair_ab260(ef_addr32 target, ef_addr32 record);
+void latch_c382c(void);
+void clear_pool_ab8c4(void);
+void init_pool_ab8e0(uint32_t size);
+void clear_block_abe24(void);
+void set_eight_pointers(uint32_t value);
+void set_view_words_and_update(uint16_t a, uint16_t b, uint16_t c, uint16_t d);
+void reset_view_ac9e8(void);
+void clear_word_41eeda(void);
+void set_word_41eeda(void);
+void clear_words_13799e(void);
+void free_list_b1814(ef_addr32 head, ef_addr32 tail);
+void free_list_b188c(ef_addr32 head, ef_addr32 tail);
+void free_list_b1974(ef_addr32 head, ef_addr32 tail);
+void free_list_b19e4(ef_addr32 head, ef_addr32 tail);
+void free_list_b1ae4(ef_addr32 head, ef_addr32 tail);
+void release_pointer_b1a10(ef_addr32 slot);
+void release_pointer_b1a3c(ef_addr32 slot);
+uint32_t count_active_entries(ef_addr32 record);
+uint32_t latch_and_forward_b33ac(void);
+int32_t find_free_entry(int16_t start, ef_addr32 record);
+int32_t divisor_for_rate(int16_t rate);
+int32_t random_modulo_high_word(ef_addr32 record);
+void cross_product_doubles(ef_addr32 out, ef_addr32 a, ef_addr32 b);
+void add_vectors_doubles(ef_addr32 out, ef_addr32 a, ef_addr32 b);
+void sub_vectors_doubles(ef_addr32 out, ef_addr32 a, ef_addr32 b);
+uint32_t guest_fn_b3f50(void); /* 0xb3f50 -> EAX */
+void guest_fn_f41dc(void); /* 0xf41dc */
+void guest_fn_a7a1c(uint32_t a, uint32_t b, uint32_t c); /* 0xa7a1c stack, callee cleanup */
+void guest_fn_a79d4(uint32_t a, uint32_t b, uint32_t c); /* 0xa79d4 stack, callee cleanup */
+uint32_t guest_fn_c382c(void); /* 0xc382c -> EAX */
+uint32_t guest_fn_e29e8(uint32_t size); /* 0xe29e8 EAX -> EAX */
+void guest_fn_ac7f0(void); /* 0xac7f0 tail */
+void guest_fn_aca14(void); /* 0xaca14 */
+void guest_fn_b17d4(ef_addr32 node); /* 0xb17d4 EAX */
+void guest_fn_b1840(ef_addr32 node); /* 0xb1840 EAX */
+void guest_fn_b1918(ef_addr32 node); /* 0xb1918 EAX */
+void guest_fn_b19a0(ef_addr32 node); /* 0xb19a0 EAX */
+void guest_fn_b1a68(ef_addr32 node); /* 0xb1a68 EAX */
+void guest_fn_cc768(ef_addr32 pointer); /* 0xcc768 EAX */
+uint32_t guest_fn_a4574(uint32_t value); /* 0xa4574 EAX -> EAX */
+uint32_t guest_fn_f9ecd(uint32_t value); /* 0xf9ecd EAX tail */
+
 #endif

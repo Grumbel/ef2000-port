@@ -1748,3 +1748,53 @@ in EAX, format string address, one value).
 | `0xa7434` | EAX:ef_addr32 | none | 35e68@35e7b,35e90@35ea3,362c4@36313 | 0xa7380 on children with bit 0 of +0x1d |
 | `0xa7b80` | none | EAX:uint32_t | a99c0@a99e2,a99c0@a99ec,aad7c@aadb4 | tail 0x9c858 with EAX=0x18d57c |
 | `0xa7b8c` | none | none | a9bfc@a9c9d | dword 0x4191c8 = 0xb3f48() |
+
+## list_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa7b98` | EAX:uint32_t | none | aa5c4@aa5f2,aa5c4@aa65c,aa5c4@aa6af | Dword 0x4191c8 += EAX. |
+| `0xa7bb0` | none | none | a98d0@a98d0 | Dword 0x4191c4 = 0xb3f50(). |
+| `0xa7bbc` | EAX:uint32_t | none | aaa50@aaada,aaa50@aab28,aaa50@aab59 | Dword 0x4191c4 += EAX. |
+| `0xa7bd4` | none | none | 19a80@19aff,f2ac0@f2b49 | Byte 0x1371fc = 1, byte 0x1371ee = 0. |
+| `0xa7df4` | none | none | a9d48@a9da1 | Copy 100 dwords from 0x418e38 to 0x418fc8. |
+| `0xa7e20` | none | none | a9d48@a9dff | Copy 100 dwords from 0x418fc8 back to 0x418e38. |
+| `0xa86e4` | none | none | a8718@a87b8 | When byte 0x41f833 is 0x39 and signed word 0x425fa6 is * below signed word 0x4194ae, copy the latter over it and clear t |
+| `0xa944c` | none | none | a9e70@a9f80 | Decrement word 0x4194ac; dword 0x4191dc = table * 0x418e38[signed high word of dword 0x4194aa]. |
+| `0xa9468` | AX:int16_t | EAX:int32_t | a94e4@a95cf | Random 16-bit value times signed SI, divided by 65536 * rounding toward zero (the SBB sequence). |
+| `0xa98d0` | none | none | a99c0@a9a2b | Latch several words and dwords after 0xa7bb0. |
+| `0xa9900` | none | none | a9e70@aa095,a9e70@aa0ee | Reverse of 0xa98d0 (without the 0xa7bb0 call). |
+| `0xa9990` | none | EAX:uint32_t | a9e70@aa01a | Load the live words from a second saved set, then * tail-call 0xb3f50. |
+| `0xa9bbc` | none | none | a9e70@a9fd2 | When byte 0x1371ff is zero clear byte 0x1371ee. |
+| `0xa9bd0` | none | none | a9e70@a9fcb | Byte 0x137200 = 1 when 0x1371ff is set, else byte 0x1371f8 = 1. |
+| `0xa9bec` | none | none | a9e70@a9f97 | Clear byte 0x1371ee, then call 0xf41dc. |
+| `0xaa198` | EAX:ef_addr32 | none | aa350@aa39d | Follow the singly linked list from dword 0x4191fc as * many steps as the dword at +1 says (at least none) and store the  |
+| `0xaa1c0` | EAX:ef_addr32 | none | aa350@aa3ac | As 0xaa198 for the dword at +0. |
+| `0xaa4b8` | AX:int16_t,EDX:ef_addr32 | EAX:ef_addr32 | aa4d4@aa50b,aa4d4@aa524,aa4d4@aa53d | Step AX (signed word) times along the chain starting at * dword +8 of EDX (next pointer at +1); returns the node reached |
+| `0xab0b0` | EAX:ef_addr32,EDX:ef_addr32 | none | ab0dc@ab12a,ab0dc@ab138,ab0dc@ab148 | Two 0xa7a1c(EAX, ...) stack calls with record fields. |
+| `0xab260` | EAX:ef_addr32,EDX:ef_addr32 | none | ab28c@ab2da,ab28c@ab2e8,ab28c@ab2f8 | As 0xab0b0 through 0xa79d4. |
+| `0xab8b0` | none | none | ac0e0@ac0fe | Dword 0x41ec14 = 0xc382c(). |
+| `0xab8c4` | none | none | ab8e0@ab8ff,ac16c@ac170 | Dword 0x137270 = dword 0x13726c; 0xb3fb0(that, 0, dword 0x41ecd4). |
+| `0xab8e0` | EAX:uint32_t | none | ac0e0@ac0f9 | Allocate EAX bytes via 0xe29e8; record base, cursor, * size and end; then clear the pool. |
+| `0xabe24` | none | none | abe44@abe4b,abf8c@abfe4,ac408@ac491 | Clear 0x150 bytes at 0x41eab0 and word 0x41eeca. |
+| `0xabf24` | EAX:uint32_t | none | abf8c@abfb4 | When non-null store EAX into eight dwords spaced 0x12 apart from 0x1621be. |
+| `0xac980` | AX:uint16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t | none | ac9a0@ac9ca,ac9e8@aca01 | Words 0x137950..56 = AX, DX, BX, CX; tail-call 0xac7f0. |
+| `0xac9e8` | none | none | 34f94@350f1,4f2f8@4f30f,4f36c@4f383 | 0xac980(0, 0, high word 0x15b742, high word 0x15b746); dword 0x41ec18 = 0. |
+| `0xaca88` | none | none | 4738@484c,4bf8@4c48,b1e0@b296 | Word 0x41eeda = 0. |
+| `0xaca94` | none | none | bfcc@c4af,bfcc@c4d2,345e8@346bc | Word 0x41eeda = 1; when word 0x41eedc is zero, clear * word 0x41eede and run 0xaca14. |
+| `0xb03e8` | none | none | b0f5c@b1078 | Clear three words 0x13799e, 0x1379a0 and 0x1379a2. |
+| `0xb1814` | EAX:ef_addr32,EDX:ef_addr32 | none | b1b10@b1b1b | Free each node of the list at *head via 0xb17d4, then clear *head and *tail. |
+| `0xb188c` | EAX:ef_addr32,EDX:ef_addr32 | none | b1b10@b1b66 | As 0xb1814 through 0xb1840. |
+| `0xb1974` | EAX:ef_addr32,EDX:ef_addr32 | none | b0f5c@b13b4,b1b10@b1b2a | As 0xb1814 through 0xb1918. |
+| `0xb19e4` | EAX:ef_addr32,EDX:ef_addr32 | none | b1b10@b1b48 | As 0xb1814 through 0xb19a0. |
+| `0xb1ae4` | EAX:ef_addr32,EDX:ef_addr32 | none | b1b10@b1b57 | As 0xb1814 through 0xb1a68. |
+| `0xb1a10` | EAX:ef_addr32 | none | 494c@4a46,494c@4a66,494c@4a83 | Release *EAX via 0xcc768 when set, clear it and dwords 0x1379a8/0x1379b0. |
+| `0xb1a3c` | EAX:ef_addr32 | none | ba5c@bb72,bfcc@c4be,b1b10@b1b7a | As 0xb1a10 with dwords 0x1379ac and 0x1379b4. |
+| `0xb2e64` | EAX:ef_addr32 | EAX:uint32_t | b2e98@b2ef5 | Count the 9-byte entries (pointer +0x4a, count word * +0x48) whose byte +3 is nonzero. |
+| `0xb33ac` | none | EAX:uint32_t | b3374@b337d | Dword 0x41f354 = 0xa4574(0); tail-call 0xf9ecd(0x41f354). |
+| `0xb4e48` | AX:int16_t,EDX:ef_addr32 | EAX:int32_t | b914c@b91c1 | First index >= AX with a zero byte +3 in the 9-byte * entry table of EDX, or -1. |
+| `0xb549c` | AX:int16_t | EAX:int32_t | b54d0@b54e1,b56d0@b56dc,b5fe8@b64e8 | q = AX / 8 truncated; 60 when q <= 0 else 60 / q. |
+| `0xb5580` | EAX:ef_addr32 | EAX:int32_t | b7d4c@b7d75,b7d4c@b7d83,b8510@b858d | Random 16-bit value modulo the signed high word of dword +0x1c. |
+| `0xb43f4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 74d98@74e03,89fbc@89fe2,89fbc@8a005 | Cross product EDX x EBX into EAX (three doubles each). |
+| `0xb44d0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 11c350@11c395,11c584@11c623 | out = a + b for three doubles (EDX + EBX into EAX). |
+| `0xb44ec` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 8e940@8e9f6,e6990@e69a9 | out = a - b for three doubles (EDX - EBX into EAX). |
