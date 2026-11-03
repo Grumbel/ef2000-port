@@ -13,6 +13,8 @@
       inherit (pkgs) lib;
       python = pkgs.python3.withPackages (p: [ p.unicorn ]);
       ghidraHome = "${pkgs.ghidra}/lib/ghidra";
+      watcom = pkgs.open-watcom-v2;
+      watcomCompat = pkgs.open-watcom-bin;
       versionBase = lib.fileContents ./VERSION;
       gitRev = self.shortRev or self.dirtyShortRev or "dirty";
       version =
@@ -260,6 +262,14 @@
         fi
         exec ${pkgs.python3}/bin/python3 ${source}/tools/ghidra_ef2000.py "$@"
       '';
+      # The wrapped Nixpkgs wcc386 supplies WATCOM, INCLUDE, and the
+      # binl64/binl search path internally. Keep v2 explicit even when the
+      # 1.9 compatibility package also exists in the development shell.
+      watcomWorkflow = pkgs.writeShellScriptBin "ef2000-wcc" ''
+        set -euo pipefail
+        exec ${pkgs.python3}/bin/python3 ${source}/tools/ef2000_wcc.py \
+          --compiler ${watcom}/bin/wcc386 "$@"
+      '';
       # The original executable is supplied by the caller, never fetched or
       # included in Nix inputs. The replay compiles the test-only native ABI
       # into a temporary directory and runs original guest code in Unicorn.
@@ -280,6 +290,7 @@
         ef2000 = package;
         ef2000-startup = package;
         ef2000-ghidra = ghidraWorkflow;
+        ef2000-wcc = watcomWorkflow;
         ef2000-highscores-differential = highscoresDifferential;
         ef2000-gui-assets = guiAssetsWorkflow;
         ef2000-win64 = win64.dist;
@@ -366,6 +377,20 @@
           cd ${source}
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests \
             -p 'test_ghidra*.py' -q
+        '';
+        watcom-omf = pkgs.runCommand "ef2000-watcom-omf-check" {
+          nativeBuildInputs = [ watcom pkgs.file pkgs.python3 ];
+        } ''
+          (cd ${source} && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_ef2000_wcc -q)
+          mkdir -p work
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/tests/fixture.c --output "$PWD/work/fixture.obj"
+          test -s work/fixture.obj
+          # wdis reads OMF records, unlike an ELF disassembler.
+          ${watcom}/bin/wdis work/fixture.obj -l=work/fixture.asm
+          test -s work/fixture.asm
+          grep -qi 'ef_omf_fixture' work/fixture.asm
+          cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {
           nativeBuildInputs = [ pkgs.stdenv.cc ];
@@ -456,10 +481,12 @@
       };
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
-        packages = [ python pkgs.ghidra ghidraWorkflow highscoresDifferential guiAssetsWorkflow ] ++ devCommands ++ (with pkgs; [
+        packages = [ python pkgs.ghidra ghidraWorkflow watcom watcomCompat watcomWorkflow highscoresDifferential guiAssetsWorkflow ] ++ devCommands ++ (with pkgs; [
           gcc binutils qemu-user dosbox-x cmake ninja gdb ccache
         ]);
         GHIDRA_HOME = ghidraHome;
+        WATCOM = "${watcom.unwrapped}";
+        INCLUDE = "${watcom.unwrapped}/h:${watcom.unwrapped}/lh";
         EF2000_SDL_LIBRARY = "${pkgs.sdl3}/lib/libSDL3.so";
         EF2000_VERSION = version;
         shellHook = ''
@@ -507,6 +534,9 @@
           printf '  nix run .#ghidra-ef2000 -- --help\n'
           printf '                                  Same workflow without entering the dev shell\n'
           printf '  ghidra                          Open Ghidra GUI\n\n'
+          printf 'OpenWatcom (v2 default, 1.9 available for comparison):\n'
+          printf '  ef2000-wcc decomp/src/MODULE.c  Compile recovered C to decomp/build/MODULE.obj\n'
+          printf '  wdis decomp/build/MODULE.obj    Disassemble OpenWatcom OMF\n\n'
           printf 'Original/native high-score differential replay (requires your EF2000.EXE):\n'
           printf '  ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300\n'
           printf '                                  Compare guest routines to reconstructed C++\n'

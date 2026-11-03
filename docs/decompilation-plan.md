@@ -306,7 +306,7 @@ functions and zero decompiler failures. Known unconfirmed layouts remain raw
 bytes; conventions outside the current register/zero-cleanup schema are
 rejected pending §3.5.
 
-### 3.4 [ ] OpenWatcom in the flake
+### 3.4 [~] OpenWatcom in the flake
 
 - Add `open-watcom-v2` (and `open-watcom-bin` 1.9 for comparison) to the dev
   shell. Export `WATCOM`, `INCLUDE`, `PATH` correctly (OpenWatcom needs
@@ -315,6 +315,13 @@ rejected pending §3.5.
   project's canonical flags into `decomp/build/<name>.obj`.
 - Smoke check in `nix flake check`: compile a trivial `decomp/tests/fixture.c`
   and inspect the OMF with `wdis`.
+
+Implementation prepared 2026-11-03: the flake includes wrapped OpenWatcom v2
+and 1.9, an `ef2000-wcc` compiler wrapper, and a `watcom-omf` check that runs
+`wcc386` on `decomp/tests/fixture.c` and disassembles the object with `wdis`.
+Bootstrap flags are provisional until §3.5. Python wrapper tests and C89
+fixture syntax checks pass locally. Nix/OpenWatcom execution needs validation
+on the owner's NixOS machine before marking this step complete.
 
 ### 3.5 [ ] Determine the ABI conventions and canonical compiler flags
 
@@ -753,6 +760,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.1   Done: derived-source legal note, C headers, module/test directories, ignored build output.
 2026-11-03  3.2   Done: re-seed from fresh 12.1.4 Ghidra inventory is identical (4,277 rows); tracker check and tests pass.
 2026-11-03  3.3   Done: reproducible apply/export symbols; live synthetic persistence/idempotence test and 4,277-function refresh pass.
+2026-11-03  3.4   In progress: flake packages, ef2000-wcc, and OMF smoke check implemented; awaiting Nix execution feedback.
 ```
 
 ---
