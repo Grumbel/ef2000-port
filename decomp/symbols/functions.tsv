@@ -956,7 +956,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00052f38	781			unknown	unclassified	unverified		
 0x00053270	149			unknown	unclassified	unverified		
 0x00053308	19	convert_signed_short_scale	record_callers	drafted	game	confirmed	decomp/tests/0x00053308.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
-0x0005331c	17			unknown	unclassified	unverified		
+0x0005331c	17	refresh_tactical_indicator	packet_status	drafted	game	confirmed	decomp/tests/0x0005331c.json	docs/compiler-abi.md; host model; guest differential pending
 0x00053330	32			unknown	unclassified	unverified		
 0x00053350	709			unknown	unclassified	unverified		
 0x00053618	322			unknown	unclassified	unverified		
@@ -991,7 +991,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00054720	100			unknown	unclassified	unverified		
 0x00054784	125			unknown	unclassified	unverified		
 0x00054804	159			unknown	unclassified	unverified		
-0x000548a4	60			unknown	unclassified	unverified		
+0x000548a4	60	send_packet_15	packet_status	drafted	game	confirmed	decomp/tests/0x000548a4.json	docs/compiler-abi.md; host model; guest differential pending
 0x000548e0	700			unknown	unclassified	unverified		
 0x00054b9c	1			unknown	unclassified	unverified		
 0x00054ba0	109			unknown	unclassified	unverified		
@@ -1019,7 +1019,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000558b0	117			unknown	unclassified	unverified		
 0x00055928	385			unknown	unclassified	unverified		
 0x00055aac	152			unknown	unclassified	unverified		
-0x00055b44	58			unknown	unclassified	unverified		
+0x00055b44	58	send_packet_41	packet_status	drafted	game	confirmed	decomp/tests/0x00055b44.json	docs/compiler-abi.md; host model; guest differential pending
 0x00055b80	79			unknown	unclassified	unverified		
 0x00055bd0	38			unknown	unclassified	unverified		
 0x00055bf8	433			unknown	unclassified	unverified		
@@ -1045,7 +1045,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00056890	152			unknown	unclassified	unverified		
 0x00056928	44			unknown	unclassified	unverified		
 0x00056954	31			unknown	unclassified	unverified		
-0x00056974	61			unknown	unclassified	unverified		
+0x00056974	61	send_packet_2b	packet_status	drafted	game	confirmed	decomp/tests/0x00056974.json	docs/compiler-abi.md; host model; guest differential pending
 0x000569b4	96			unknown	unclassified	unverified		
 0x00056a44	6			unknown	unclassified	unverified		
 0x00056a4c	166			unknown	unclassified	unverified		
@@ -1110,7 +1110,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00058d64	437			unknown	unclassified	unverified		
 0x00059334	234			unknown	unclassified	unverified		
 0x00059420	99			unknown	unclassified	unverified		
-0x00059484	30			unknown	unclassified	unverified		
+0x00059484	30	draw_tactical_item_mode	packet_status	drafted	game	confirmed	decomp/tests/0x00059484.json	docs/compiler-abi.md; host model; guest differential pending
 0x000594a4	41			unknown	unclassified	unverified		
 0x000597d8	237			unknown	unclassified	unverified		
 0x000598e8	175			unknown	unclassified	unverified		
@@ -1575,12 +1575,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008273c	26			unknown	unclassified	unverified		
 0x00082758	27			unknown	unclassified	unverified		
 0x00082774	26			unknown	unclassified	unverified		
-0x00082790	35			unknown	unclassified	unverified		
+0x00082790	35	write_ui_status_flags_a	packet_status	drafted	game	confirmed	decomp/tests/0x00082790.json	docs/compiler-abi.md; host model; guest differential pending
 0x000827b4	25			unknown	unclassified	unverified		
-0x000827d0	35			unknown	unclassified	unverified		
+0x000827d0	35	write_ui_status_flags_b	packet_status	drafted	game	confirmed	decomp/tests/0x000827d0.json	docs/compiler-abi.md; host model; guest differential pending
 0x000827f4	24			unknown	unclassified	unverified		
 0x00082b6c	80			unknown	unclassified	unverified		
-0x00082bd4	27			unknown	unclassified	unverified		
+0x00082bd4	27	write_ui_status_float	packet_status	drafted	game	confirmed	decomp/tests/0x00082bd4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082bf0	26			unknown	unclassified	unverified		
 0x00082cec	183			unknown	unclassified	unverified		
 0x00082da4	43			unknown	unclassified	unverified		

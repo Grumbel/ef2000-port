@@ -168,6 +168,13 @@ target_compile_options(ef2000-decomp-ui-dispatch-test PRIVATE -Wall -Wextra -Wer
 target_compile_definitions(ef2000-decomp-ui-dispatch-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-ui-dispatch-test PRIVATE decomp/include)
 add_test(NAME decomp-ui-dispatch-host-model COMMAND ef2000-decomp-ui-dispatch-test)
+add_executable(ef2000-decomp-packet-status-test
+  tests/decomp_packet_status_test.c decomp/src/packet_status.c)
+target_compile_features(ef2000-decomp-packet-status-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-packet-status-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-packet-status-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-packet-status-test PRIVATE decomp/include)
+add_test(NAME decomp-packet-status-host-model COMMAND ef2000-decomp-packet-status-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

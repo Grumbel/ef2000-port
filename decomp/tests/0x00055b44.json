@@ -1,0 +1,19 @@
+{
+  "address": "0x00055b44",
+  "function_size": 58,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "world_marker_91",
+      "registers": {"edx": "0x0000ba98", "ebx": "0x1357", "ecx": "0x24"},
+      "stack_args": ["0xabcdface"],
+      "memory": [{"address": "0x001a666b", "hex": "91"}]
+    },
+    {
+      "name": "empty_marker",
+      "registers": {"edx": 0, "ebx": 0, "ecx": 0},
+      "stack_args": [0],
+      "memory": [{"address": "0x001a666b", "hex": "00"}]
+    }
+  ]
+}

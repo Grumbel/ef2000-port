@@ -1,0 +1,19 @@
+{
+  "address": "0x00056974",
+  "function_size": 61,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "mixed_three_words",
+      "registers": {"eax": "0x1234", "edx": "0xcdef", "ebx": "0x2468"},
+      "memory": [
+        {"address": "0x00197c28", "hex": "2579"},
+        {"address": "0x00197c2e", "hex": "86"}
+      ]
+    },
+    {
+      "name": "zero_state",
+      "registers": {"eax": 0, "edx": 0, "ebx": 0}
+    }
+  ]
+}

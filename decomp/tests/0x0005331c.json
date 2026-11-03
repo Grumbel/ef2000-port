@@ -1,0 +1,15 @@
+{
+  "address": "0x0005331c",
+  "function_size": 17,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "callback_before_copy",
+      "memory": [
+        {"address": "0x0015bab8", "hex": "2c330500"},
+        {"address": "0x001a5c0b", "hex": "57"},
+        {"address": "0x00127d9d", "hex": "00"}
+      ]
+    }
+  ]
+}

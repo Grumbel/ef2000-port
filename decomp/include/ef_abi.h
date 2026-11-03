@@ -47,6 +47,26 @@ void ui_reset_panel_memory(ef_addr32 address); /* 0xd6ffc, EAX */
 void ui_report_out_of_range(int32_t index); /* 0x132a74 indirect call */
 void ui_show_message(ef_addr32 address); /* 0xa6018, tailcall */
 
+/* Packet writers, two status formatters and guest-side panel refresh. */
+void send_packet_15(int16_t ax, int16_t dx, uint8_t tag, uint32_t value,
+                    uint32_t stack_a, uint32_t stack_b); /* 0x548a4, ret 8 */
+void send_packet_41(int16_t dx, int16_t bx, uint8_t code,
+                    uint16_t stack_index); /* 0x55b44, ret 4 */
+void send_packet_2b(int16_t ax, int16_t dx, int16_t bx); /* 0x56974 */
+void write_ui_status_flags_a(ef_addr32 destination); /* 0x82790 EAX */
+void write_ui_status_flags_b(ef_addr32 destination); /* 0x827d0 EAX */
+void write_ui_status_float(ef_addr32 destination); /* 0x82bd4 EAX */
+void draw_tactical_item_mode(ef_addr32 item); /* 0x59484 EAX */
+void refresh_tactical_indicator(void); /* 0x5331c */
+
+/* Original guest sinks for status formatting and tactical drawing. */
+void format_ui_status_pair(ef_addr32 destination, ef_addr32 format,
+                           uint32_t first, uint32_t second); /* 0xa4342 */
+void format_ui_status_float(ef_addr32 destination, ef_addr32 format,
+                            double value); /* 0xa4342 */
+void draw_tactical_mode_item(uint32_t mode, ef_addr32 item); /* 0x48c34 */
+void read_tactical_indicator_callback(void); /* indirect 0x15bab8 */
+
 /* Short clock, tactical state and coordinate helpers (host drafts). */
 uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */
 uint32_t command_code_is_group_1b(uint8_t code); /* 0x41da4 AL -> EAX */

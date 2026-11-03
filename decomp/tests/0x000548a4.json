@@ -1,0 +1,17 @@
+{
+  "address": "0x000548a4",
+  "function_size": 60,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "mixed_packet_values",
+      "registers": {"eax": "0x1234", "edx": "0xfffe", "ebx": "0x67", "ecx": "0x89abcdef"},
+      "stack_args": ["0x01020304", "0x11223344"]
+    },
+    {
+      "name": "all_zeroes",
+      "registers": {"eax": 0, "edx": 0, "ebx": 0, "ecx": 0},
+      "stack_args": [0, 0]
+    }
+  ]
+}

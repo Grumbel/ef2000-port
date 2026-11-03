@@ -187,4 +187,15 @@ extern uint8_t g_ui_control_initialized; /* 0x001f9095 */
 extern ef_addr32 g_ui_panel_config_ptr; /* 0x001f9020 */
 extern uint8_t g_ui_alternate_message; /* 0x001a53dc */
 
+/* Packed message command and status-output operands. */
+extern uint16_t g_packet_2b_word; /* 0x00197c28 */
+extern uint8_t g_packet_2b_byte; /* 0x00197c2e */
+extern uint8_t g_ui_status_flag_a; /* 0x00420e10 */
+extern uint8_t g_ui_status_flag_b; /* 0x00420a71 */
+extern uint8_t g_ui_status_flag_c; /* 0x00420a72 */
+extern float g_ui_status_scalar; /* 0x0015babc */
+extern uint8_t g_tactical_display_mode; /* 0x0012b369 */
+extern uint8_t g_tactical_indicator_source; /* 0x001a5c0b */
+extern uint8_t g_tactical_indicator_latch; /* 0x00127d9d */
+
 #endif

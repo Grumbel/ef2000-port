@@ -1,0 +1,17 @@
+{
+  "address": "0x00059484",
+  "function_size": 30,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "mode_one",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x0012b369", "hex": "01"}]
+    },
+    {
+      "name": "mode_other",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x0012b369", "hex": "02"}]
+    }
+  ]
+}

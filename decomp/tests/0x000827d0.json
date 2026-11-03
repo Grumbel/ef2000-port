@@ -1,0 +1,21 @@
+{
+  "address": "0x000827d0",
+  "function_size": 35,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "unequal_flags",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x002a0000", "hex": "00000000000000000000000000000000"},
+        {"address": "0x00420a71", "hex": "09"},
+        {"address": "0x00420a72", "hex": "02"}
+      ]
+    },
+    {
+      "name": "empty_flags",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x002a0000", "hex": "00000000000000000000000000000000"}]
+    }
+  ]
+}

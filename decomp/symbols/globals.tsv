@@ -156,3 +156,12 @@ addr	size	type	name	evidence	notes
 0x001f9095	1	uint8_t	g_ui_control_initialized	0x7fe22/0x7fe60	Release initialization latch
 0x001f9020	4	ef_addr32	g_ui_panel_config_ptr	0x803d5 reads	Passed to 0xd7158 in EBX
 0x001a53dc	1	uint8_t	g_ui_alternate_message	0x42548 reads	Selects two constant text messages
+0x00197c28	2	uint16_t	g_packet_2b_word	0x56984 reads	Packet 2b word at offset 7
+0x00197c2e	1	uint8_t	g_packet_2b_byte	0x56994 reads	Packet 2b byte at offset 9
+0x00420e10	1	uint8_t	g_ui_status_flag_a	0x82793 reads	First status formatter second argument
+0x00420a71	1	uint8_t	g_ui_status_flag_b	0x827d3 reads	Second status formatter second argument
+0x00420a72	1	uint8_t	g_ui_status_flag_c	0x827dc reads	Second status formatter first argument
+0x0015babc	4	float	g_ui_status_scalar	0x82bd7 reads	Promoted from float to double
+0x0012b369	1	uint8_t	g_tactical_display_mode	0x59485 reads	Mode 1 selects zero, other values select one
+0x001a5c0b	1	uint8_t	g_tactical_indicator_source	0x53322 reads	Sampled after indirect callback
+0x00127d9d	1	uint8_t	g_tactical_indicator_latch	0x53327 writes	Callback result copied here

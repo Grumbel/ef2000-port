@@ -1266,6 +1266,27 @@ have independent source disassembly, typed state and two original caller
 functions each; dispatcher callees remain original guest dependencies with
 host sink stubs. The host tests are *not* guest differential or splice proof.
 
+### Command packet, status formatting and tactical display (eight-function wave)
+
+| Address | Draft | Register/stack contract and original effects | Two independent callers |
+| --- | --- | --- | --- |
+| `0x548a4` | `send_packet_15` | AX/DX words, BL byte, ECX dword, two stack dwords; `ret 8`; emit 18-byte `0x15` packet | `0x46254@0x4641f`, `0x572b4@0x57327` |
+| `0x55b44` | `send_packet_41` | DX/BX words, CL byte, one stack dword (low word), grid marker byte; `ret 4`; emit 9-byte `0x41` packet | `0x88664@0x886af`, `0x886d0@0x8871b` |
+| `0x56974` | `send_packet_2b` | AX/BX/DX words, word at `0x197c28`, byte at `0x197c2e`; emit 10-byte `0x2b` packet | `0x15b7c@0x15fea`, `0x16e60@0x171eb` |
+| `0x82790` | `write_ui_status_flags_a` | EAX destination, two zero-extended status bytes, format `0x188b58` via `0xa4342` | `0x82e40@0x82f99`, `0x830b8@0x8314b` |
+| `0x827d0` | `write_ui_status_flags_b` | EAX destination, reversed adjacent status bytes, format `0x188b74` via `0xa4342` | `0x82e40@0x82fdb`, `0x830b8@0x8316c` |
+| `0x82bd4` | `write_ui_status_float` | EAX destination; promote `float32` to `double`, pass format `0x188bfc` via `0xa4342` | `0x82e40@0x82f15`, `0x830b8@0x8312a` |
+| `0x59484` | `draw_tactical_item_mode` | EAX item; global mode byte exactly 1 selects callback mode 0, all others 1 | `0x5c0cc@0x5c14e`, `0x5e21c@0x5e2d2` |
+| `0x5331c` | `refresh_tactical_indicator` | Indirect call through `0x15bab8` *before* copying byte `0x1a5c0b` to `0x127d9d` | `0x1cde8@0x1cf73`, `0x1d318@0x1d370` |
+
+All offsets, packet lengths, register order, caller stack cleanup and callback
+ordering were checked against original binary disassembly. `packet_status.c`
+uses typed original-sink dependencies; host tests exercise complete packet
+bytes, status argument order, floating-point promotion and callback ordering.
+The eight guest replay specifications are syntactically validated but no guest
+differential results are claimed. In particular, host packet tests do not prove
+that the original I/O sink accepts packets in the same runtime state.
+
 ## Comparing assembly
 
 ```sh

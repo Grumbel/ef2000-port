@@ -1,0 +1,21 @@
+{
+  "address": "0x00082790",
+  "function_size": 35,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "enabled_status",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x002a0000", "hex": "00000000000000000000000000000000"},
+        {"address": "0x0015bac6", "hex": "01"},
+        {"address": "0x00420e10", "hex": "07"}
+      ]
+    },
+    {
+      "name": "disabled_status",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [{"address": "0x002a0000", "hex": "00000000000000000000000000000000"}]
+    }
+  ]
+}

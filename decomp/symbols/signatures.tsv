@@ -167,3 +167,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000802ac	ui_release_matching_control	AX:uint16_t		ebx,ecx,edx	0	Original 0x802ac (49 bytes); Copy AX to CX then compare against ten zero-extended bytes, call d74d0; callers 775f0@776c3/7eec4@7eeef; docs/compiler-abi.md
 0x000803c4	ui_reset_active_panel			ebx,ecx,edx	0	Original 0x803c4 (36 bytes); Gated d7158 call with fixed registers; callers a8a38@a8b25/a8bd4@a8d85; docs/compiler-abi.md
 0x00080400	ui_reset_panel_and_release				0	Original 0x80400 (15 bytes); Call 7fe8c then tail-jump d6ffc; callers a8a38@a8bc5/a8bd4@a8f46; docs/compiler-abi.md
+0x000548a4	send_packet_15	AX:int16_t,DX:int16_t,BL:uint8_t,ECX:uint32_t,stack_a:uint32_t,stack_b:uint32_t		eax,edx,ebx,ecx	8	Original 0x548a4 (60 bytes); 18-byte packet opcode 15; callers 46254@4641f/572b4@57327; docs/compiler-abi.md
+0x00055b44	send_packet_41	DX:int16_t,BX:int16_t,CL:uint8_t,stack_index:uint32_t		eax,edx	4	Original 0x55b44 (58 bytes); 9-byte packet opcode 41; callers 88664@886af/886d0@8871b; docs/compiler-abi.md
+0x00056974	send_packet_2b	AX:int16_t,DX:int16_t,BX:int16_t		eax,edx	0	Original 0x56974 (61 bytes); 10-byte packet opcode 2b; callers 15b7c@15fea/16e60@171eb; docs/compiler-abi.md
+0x00082790	write_ui_status_flags_a	EAX:ef_addr32		edx	0	Original 0x82790 (35 bytes); a4342 formatter with flag inputs; callers 82e40@82f99/830b8@8314b; docs/compiler-abi.md
+0x000827d0	write_ui_status_flags_b	EAX:ef_addr32		edx	0	Original 0x827d0 (35 bytes); a4342 formatter with flag inputs; callers 82e40@82fdb/830b8@8316c; docs/compiler-abi.md
+0x00082bd4	write_ui_status_float	EAX:ef_addr32		eax,ecx,edx	0	Original 0x82bd4 (27 bytes); float32 promoted to double for formatter; callers 82e40@82f15/830b8@8312a; docs/compiler-abi.md
+0x00059484	draw_tactical_item_mode	EAX:ef_addr32		eax,ecx,edx	0	Original 0x59484 (30 bytes); toggled mode pushed with item; callers 5c0cc@5c14e/5e21c@5e2d2; docs/compiler-abi.md
+0x0005331c	refresh_tactical_indicator		AL:uint8_t	eax	0	Original 0x5331c (17 bytes); indirect callback before copying source byte to latch; callers 1cde8@1cf73/1d318@1d370; docs/compiler-abi.md

@@ -1,0 +1,23 @@
+{
+  "address": "0x00082bd4",
+  "function_size": 27,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "positive_scalar",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x002a0000", "hex": "00000000000000000000000000000000"},
+        {"address": "0x0015babc", "hex": "0000a03f"}
+      ]
+    },
+    {
+      "name": "negative_scalar",
+      "registers": {"eax": "0x002a0000"},
+      "memory": [
+        {"address": "0x002a0000", "hex": "00000000000000000000000000000000"},
+        {"address": "0x0015babc", "hex": "000020c0"}
+      ]
+    }
+  ]
+}
