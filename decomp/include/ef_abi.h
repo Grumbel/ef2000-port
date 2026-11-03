@@ -1645,4 +1645,14 @@ uint32_t guest_fn_bc4da(ef_addr32 key); /* 0xbc4da EAX -> EAX */
 void guest_fn_cbcc5(uint32_t value, ef_addr32 buffer, uint32_t base); /* 0xcbcc5 EAX/EDX/EBX */
 void guest_fn_d16d0(uint32_t value, uint32_t mode); /* 0xd16d0 EAX/EDX */
 
+/* runtime_helpers5.c */
+void emit_display_list_d17d0(void);
+void reset_engine_e4264(void);
+void merge_flag_fields_f8010(void);
+uint32_t set_video_mode_fc600(uint32_t mode);
+void guest_fn_d170c(uint32_t value); /* 0xd170c EAX */
+void guest_fn_d175c(uint32_t value); /* 0xd175c EAX */
+void guest_fn_d1860(uint32_t value); /* 0xd1860 EAX */
+void guest_fn_cd7a0(void); /* 0xcd7a0 */
+
 #endif

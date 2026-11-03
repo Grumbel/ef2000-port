@@ -3012,7 +3012,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d175c	24			unknown	unclassified	unverified		
 0x000d1774	72			unknown	unclassified	unverified		
 0x000d17bc	19	call_a7990_420944	code_predicates	compiles	game	confirmed	decomp/tests/0x000d17bc.json	docs/compiler-abi.md; 0xa7990(dword 0x420944), callee pops 4.; callers d1c54@d1c92; guest pending
-0x000d17d0	144			unknown	unclassified	unverified		
+0x000d17d0	144	emit_display_list_d17d0	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000d17d0.json	docs/compiler-abi.md; Emit the fixed command sequence of the 0x18f6e4 display list.; callers d1c54@d1c7c; guest pending
 0x000d1860	52			unknown	unclassified	unverified		
 0x000d1894	142			unknown	unclassified	unverified		
 0x000d1924	197			unknown	unclassified	unverified		
@@ -3375,7 +3375,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e4010	211			unknown	unclassified	unverified		
 0x000e40e4	161			unknown	unclassified	unverified		
 0x000e4188	220			unknown	unclassified	unverified		
-0x000e4264	116			unknown	unclassified	unverified		
+0x000e4264	116	reset_engine_e4264	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000e4264.json	docs/compiler-abi.md; Reset the engine state unless already in state 0 or 2.; callers 3ea0c@3edc9,3ea0c@3ee1d,3ea0c@3ef59; guest pending
 0x000e4304	14	flag_is_one_15f930	math_string	compiles	game	confirmed	decomp/tests/0x000e4304.json	docs/compiler-abi.md; Byte 0x15f930 equals 1.; callers ac0e0@ac0e1; guest pending
 0x000e4340	1034			unknown	unclassified	unverified		
 0x000e474c	56			unknown	unclassified	unverified		
@@ -3673,7 +3673,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f7518	98			unknown	unclassified	unverified		
 0x000f75e0	119			unknown	unclassified	unverified		
 0x000f79b0	62	or_flag_mask_f79b0	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000f79b0.json	docs/compiler-abi.md; OR the mask at 0x46438c into the flag words.; callers none direct; guest pending
-0x000f8010	132			unknown	unclassified	unverified		
+0x000f8010	132	merge_flag_fields_f8010	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000f8010.json	docs/compiler-abi.md; Merge the two 2-bit fields of the mask at 0x46438c into the object flag bytes.; callers none direct; guest pending
 0x000f819c	171			unknown	unclassified	unverified		
 0x000f8248	5	elapsed_centiseconds	unk_time	typed	thunk	confirmed		docs/compiler-abi.md; tail jump 0x1100b1; elapsed centiseconds modulo day
 0x000f8250	19	scale_double_to_st0	unk_fp_runtime	typed	game	confirmed		docs/compiler-abi.md; qword argument at [ESP+4], ST0 float10 return, ret 8; callers 0xf8285/0xf82a5
@@ -3750,7 +3750,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fc478	106	query_video_mode_fc478	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc478.json	docs/compiler-abi.md; VESA call 0x4f01 for mode ECX; true when the BIOS answers 0x4f.; callers fc4e4@fc502,fc600@fc605; guest pending
 0x000fc4e4	80	find_linear_mode_fc4e4	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc4e4.json	docs/compiler-abi.md; Find the first VESA mode in the list whose info has bit 7 set; returns dword +0x28 of its info.; callers fc534@fc5da; guest pending
 0x000fc534	204			unknown	unclassified	unverified		
-0x000fc600	155			unknown	unclassified	unverified		
+0x000fc600	155	set_video_mode_fc600	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000fc600.json	docs/compiler-abi.md; Set a VESA mode, with the linear-framebuffer bit first if supported.; callers d1da8@d1db2,d1da8@d1dbd,d1de8@d1e16; guest pending
 0x000fc6c8	92	query_video_fc6c8	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000fc6c8.json	docs/compiler-abi.md; Query the video driver and clamp the width field.; callers d1d40@d1d58; guest pending
 0x000fc795	227			unknown	unclassified	unverified		
 0x000fc8c0	1			unknown	unclassified	unverified		

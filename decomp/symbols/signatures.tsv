@@ -984,3 +984,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000ea414	read_link_ea414		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ea414 (9 bytes); ; callers 9dcf8@9dd0f,de864@de985; docs/compiler-abi.md
 0x000ea864	store_triple_ea864	EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ea864 (9 bytes); Store three dwords.; callers 97534@97578,97534@9758a,975f0@97674; docs/compiler-abi.md
 0x000f13ac	refresh_object_f13ac	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f13ac (27 bytes); ; callers a56f8@a5704; docs/compiler-abi.md
+0x000d17d0	emit_display_list_d17d0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d17d0 (144 bytes); Emit the fixed command sequence of the 0x18f6e4 display list.; callers d1c54@d1c7c; docs/compiler-abi.md
+0x000e4264	reset_engine_e4264			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e4264 (116 bytes); Reset the engine state unless already in state 0 or 2.; callers 3ea0c@3edc9,3ea0c@3ee1d,3ea0c@3ef59; docs/compiler-abi.md
+0x000f8010	merge_flag_fields_f8010			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f8010 (132 bytes); Merge the two 2-bit fields of the mask at 0x46438c into the object flag bytes.; callers none direct; docs/compiler-abi.md
+0x000fc600	set_video_mode_fc600	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc600 (155 bytes); Set a VESA mode, with the linear-framebuffer bit first if supported.; callers d1da8@d1db2,d1da8@d1dbd,d1de8@d1e16; docs/compiler-abi.md

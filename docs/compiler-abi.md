@@ -2435,3 +2435,12 @@ in EAX, format string address, one value).
 | `0xea414` | none | EAX:uint32_t | 9dcf8@9dd0f,de864@de985 |  |
 | `0xea864` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 97534@97578,97534@9758a,975f0@97674 | Store three dwords. |
 | `0xf13ac` | EAX:ef_addr32 | none | a56f8@a5704 |  |
+
+## runtime_helpers5 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd17d0` | none | none | d1c54@d1c7c | Emit the fixed command sequence of the 0x18f6e4 display list. |
+| `0xe4264` | none | none | 3ea0c@3edc9,3ea0c@3ee1d,3ea0c@3ef59 | Reset the engine state unless already in state 0 or 2. |
+| `0xf8010` | none | none | none direct | Merge the two 2-bit fields of the mask at 0x46438c into the object flag bytes. |
+| `0xfc600` | EAX:uint32_t | EAX:uint32_t | d1da8@d1db2,d1da8@d1dbd,d1de8@d1e16 | Set a VESA mode, with the linear-framebuffer bit first if supported. |
