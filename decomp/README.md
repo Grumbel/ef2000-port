@@ -32,4 +32,20 @@ Contents so far:
 - `symbols/signatures.tsv`: confirmed calling conventions (empty so far).
 
 These files hold facts about the original program, never its code bytes.
-Further layout follows plan §3.1.
+
+Layout:
+
+- `include/`: fixed-width guest types, ABI declarations and recovered layouts.
+- `src/`: recovered C, grouped by documented original module when known.
+- `compat/`: reproductions of original library behavior where required.
+- `tests/`: per-function differential test specifications.
+- `build/`: ignored OpenWatcom object files and other generated outputs.
+
+There is no standalone game build yet. The intended workflow is to compile
+individual functions with OpenWatcom, splice them into the original guest
+image, and compare behavior against the unmodified executable (plan §4).
+The host-side emulator remains the validation oracle. See
+`LICENSE-NOTE.md` before distributing any recovered source.
+
+Status (2026-11-03): 4,277 inventoried functions, none verified as a
+compiled-and-spliced C replacement. The tracker is the authoritative status.

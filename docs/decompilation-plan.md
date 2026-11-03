@@ -205,7 +205,7 @@ full sequence in about four minutes; results in `docs/ghidra-findings.md`
 one. Re-run it after a Ghidra upgrade and update the expected count
 (`DOCUMENTED_FUNCTIONS` in `tools/ghidra_ef2000.py`) with evidence.
 
-### 3.1 [ ] Repository layout and licensing scaffolding
+### 3.1 [x] Repository layout and licensing scaffolding
 
 Create:
 
@@ -736,6 +736,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.0   Added: no Ghidra workspace exists on the handoff machine; rebuild step required.
 2026-11-03  3.0   Done: ef2000-ghidra rebuild; Ghidra 12.1.4 gives 4,277 functions, 4,277 pseudo-C, 0 failures.
 2026-11-03  3.2   Tracker tool and seeded functions.tsv (4,277 rows, 294 named); globals.tsv seeded.
+2026-11-03  3.1   Done: derived-source legal note, C headers, module/test directories, ignored build output.
 ```
 
 ---
