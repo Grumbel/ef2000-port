@@ -259,6 +259,19 @@ Its EAX result is recorded because the original callee consistently leaves
 the count there, not because a caller necessarily depends on it. No stack
 arguments or cleanup; ordinary DS for its global accesses.
 
+`elapsed_centiseconds` (`0xf8248`) is a five-byte **tail-jump thunk** to
+`0x1100b1`, not an empty body. The target calls `0x11004b`, which requests
+DOS time through `0x11f287` (function `0x2c`), combines hours/minutes/seconds/
+hundredths into centiseconds, and subtracts a startup baseline at `0x4dd984`
+with day wrap (`0x83d600` centiseconds). Distinct callers `0xac5f8` at
+`0xac681` store EAX to a timing global, `0xe3120` at `0xe3124` converts
+EAX to floating point, and `0x106c3c` at `0x106c3f` subtracts EAX from a
+prior tick. Neither thunk nor target accepts register/stack arguments;
+EBX/ECX/EDX/ESI/EDI/EBP are saved by the runtime call path or never
+changed. EAX is the 32-bit elapsed centisecond count; no stack cleanup.
+Keep `kind=thunk` here, without preempting §3.6's classification of the
+underlying DOS runtime code.
+
 ### Confirmed void ABIs and a non-GPR side effect
 
 `reset_spatial_slot_count` (`0x263e0`) has no arguments or register return.
@@ -367,6 +380,25 @@ lose a nonstandard return convention. No inner stack arguments or cleanup;
 EAX/ECX/EDX clobbered, EBX/ESI/EDI/EBP preserved. Reviewed as an ABI
 exception pending an explicit compiler declaration and adapter model.
 
+`0x12d90` is an indirect callback dispatcher with register input AX and DX.
+It derives a signed 16-bit record index from AX plus a table selected by
+signed DX, checks record flags, invokes direct record handlers at `0x11e7c`
+and `0x12210`, and optionally calls the 32-bit function pointer at record
+offset `+0xcd`. Callers `0x6460` at `0x6575` (EAX=7, EDX=0) and `0x13950`
+at `0x1396a` (EAX=3, EDX=1) demonstrate the input register halves; neither
+inspects return registers. The indirect handler's register and segment
+effects have not been bounded, so preservation and return storage remain
+unconfirmed. The record stride visible in the routine is `0x1d` bytes.
+
+`0xf6124` wraps an indirect formatted-output call through `[0x132a74]`.
+It pushes four dwords onto the stack (format address `0x192c4c`, global
+`0x464390`, a zero-extended 16-bit global at `0x16007c`, and address
+`0x464396`), then reclaims 16 bytes and restores EDX. Distinct callers
+`0xf7518` at `0xf7527` and `0xf79b0` at `0xf79bf` make no argument setup
+and do not use EAX afterward. The call's actual return/clobber convention
+depends on the unresolved indirect target, so only the four temporary
+**outgoing** stack arguments are established, not inherited caller arguments.
+
 ## Comparing assembly
 
 ```sh
@@ -402,10 +434,11 @@ noncontiguous: the window is a diagnostic aid, not an exact body export.
    statuses for matching entry/shape rows; `--reset-status` clears them.
 2. Confirm inputs, outputs, preserved registers, stack cleanup, x87 state
    and segment assumptions from disassembly and at least two callers each.
-   Fifteen of the forty candidates now have confirmed ABI rows (four object
+   Sixteen of the forty candidates now have confirmed ABI rows (four object
    routines, two void helpers, a pointer lookup, a linked-list search,
    a scalar metric wrapper, a string scan, a command token parser, plus
-   the current-object relation/slot pair and two linked-list allocators);
+   the current-object relation/slot pair, two linked-list allocators and a
+   timing thunk);
    exceptions and partial reviews remain separate from complete signatures.
 3. Record confirmed signatures in `decomp/symbols/signatures.tsv`, adding
    `#pragma aux` declarations only when justified by evidence.

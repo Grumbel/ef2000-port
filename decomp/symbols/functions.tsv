@@ -3675,7 +3675,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f79b0	62			unknown	unclassified	unverified		
 0x000f8010	132			unknown	unclassified	unverified		
 0x000f819c	171			unknown	unclassified	unverified		
-0x000f8248	5			unknown	unclassified	unverified		
+0x000f8248	5	elapsed_centiseconds	unk_time	typed	thunk	confirmed		docs/compiler-abi.md; tail jump 0x1100b1; elapsed centiseconds modulo day
 0x000f8250	19			unknown	unclassified	unverified		
 0x000f8278	29			unknown	unclassified	unverified		
 0x000f8298	29			unknown	unclassified	unverified		
