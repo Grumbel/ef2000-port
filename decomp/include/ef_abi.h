@@ -1605,4 +1605,44 @@ uint32_t guest_fn_bd4e0(uint32_t value); /* 0xbd4e0 EAX -> AX */
 uint32_t guest_fn_f8a30(ef_addr32 object); /* 0xf8a30 EAX -> AX */
 uint32_t guest_fn_f89e0(ef_addr32 object); /* 0xf89e0 EAX -> AX */
 
+/* tiny_helpers.c */
+uint32_t far_to_linear_9c024(uint32_t value);
+uint32_t high_word_9c1a1(uint32_t value);
+uint32_t identity_9c1b1(uint32_t value);
+uint32_t half_word_9c960(void);
+void copy_head_9d780(ef_addr32 destination, ef_addr32 source);
+void set_axis_9d794(uint32_t a, uint32_t b);
+uint16_t store_table_entry_9dde0(ef_addr32 destination, uint32_t index);
+void set_flag_a41c8(void);
+void clear_flag_a41d0(void);
+void call_edd49_a455b(void);
+ef_addr32 apply_a4cb4_a4d90(ef_addr32 key);
+ef_addr32 apply_a4b80_a4db0(ef_addr32 key);
+ef_addr32 apply_a5ef8_a6018(ef_addr32 key);
+ef_addr32 enable_found_widget_a7318(ef_addr32 key);
+uint32_t first_link_a75fc(ef_addr32 object);
+ef_addr32 default_path_a7b70(void);
+uint32_t read_counter_b3d68(void);
+void clear_pair_baf24(ef_addr32 pair);
+uint32_t release_by_key_bc450(ef_addr32 key);
+void clear_byte_c8e38(void);
+void clear_byte_c8fdc(void);
+void clear_byte_c90c0(void);
+ef_addr32 signed_to_digits_cbd0f(int32_t value, ef_addr32 buffer, uint32_t base);
+ef_addr32 script_cursor_data_cd29c(void);
+void call_d16d0_d16fc(uint32_t value);
+uint32_t read_byte_d6f88(void);
+ef_addr32 build_path_d7070(ef_addr32 second);
+uint32_t read_field_d7738(ef_addr32 record);
+uint32_t read_field_d7748(ef_addr32 record);
+void append_two_e7cd0(ef_addr32 first, ef_addr32 second);
+uint32_t read_link_ea414(void);
+void store_triple_ea864(ef_addr32 destination, uint32_t a, uint32_t b, uint32_t c);
+void refresh_object_f13ac(ef_addr32 object);
+void guest_fn_edd49(void); /* 0xedd49 */
+ef_addr32 guest_fn_a78bc(ef_addr32 key); /* 0xa78bc EAX -> EAX */
+uint32_t guest_fn_bc4da(ef_addr32 key); /* 0xbc4da EAX -> EAX */
+void guest_fn_cbcc5(uint32_t value, ef_addr32 buffer, uint32_t base); /* 0xcbcc5 EAX/EDX/EBX */
+void guest_fn_d16d0(uint32_t value, uint32_t mode); /* 0xd16d0 EAX/EDX */
+
 #endif

@@ -2397,3 +2397,41 @@ in EAX, format string address, one value).
 | `0xfa77b` | EAX:ef_addr32 | none | bc287@bc311,bc450@bc45c | Move the node owning object from the list at 0x485f9c to the free list. |
 | `0xfc050` | AL:uint8_t | AL:uint8_t | fc0ec@fc119,fc1e8@fc21a | Classify a kind into 1, 2 or 3. |
 | `0xfc6c8` | EAX:uint32_t | none | d1d40@d1d58 | Query the video driver and clamp the width field. |
+
+## tiny_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9c024` | EAX:uint32_t | EAX:uint32_t | none direct | Real-mode segment:offset style conversion of a dword (cdecl). |
+| `0x9c1a1` | EAX:uint32_t | EAX:uint32_t | none direct | High word of a dword (cdecl). |
+| `0x9c1b1` | EAX:uint32_t | EAX:uint32_t | none direct | Identity (cdecl). |
+| `0x9c960` | none | EAX:uint32_t | f60@f6a,2e04@334f,2e04@337c |  |
+| `0x9d780` | EAX:ef_addr32,EDX:ef_addr32 | none | a00a4@a00c5,a08c8@a0931 | Copy the first and third dword of a record and clear the second. |
+| `0x9d794` | EAX:uint32_t,EDX:uint32_t | none | 9f664@9f697,9f710@9f720,9f850@9f885 |  |
+| `0x9dde0` | EAX:ef_addr32,EDX:uint32_t | AX:uint16_t | 9e7bc@9f5d5,9f7d0@9f7f7,9f808@9f83d | Store the converted table entry index into the 16-bit slot at destination. |
+| `0xa41c8` | none | none | 33750@33759,34e18@34e20 |  |
+| `0xa41d0` | none | none | 34ca4@34d34 |  |
+| `0xa455b` | none | none | 9bdbb@9bdfd | Run edd49 with the byte at 0x132a60 cleared, then restore the dword. |
+| `0xa4d90` | EAX:ef_addr32 | EAX:ef_addr32 | 4738@4856,487c@48d7,487c@48e1 |  |
+| `0xa4db0` | EAX:ef_addr32 | EAX:ef_addr32 | 487c@4917,487c@4921,494c@49e8 |  |
+| `0xa6018` | EAX:ef_addr32 | EAX:ef_addr32 | 5110@51c6,ba5c@bbab,bfcc@c4aa |  |
+| `0xa7318` | EAX:ef_addr32 | EAX:ef_addr32 | 362c4@362f4,362c4@36300,362c4@3630c |  |
+| `0xa75fc` | EAX:ef_addr32 | EAX:uint32_t | 4c50@4c66 |  |
+| `0xa7b70` | none | EAX:ef_addr32 | a81e4@a8243,a9878@a9882,a99c0@a99f2 |  |
+| `0xb3d68` | none | EAX:uint32_t | 3d4b0@3d729 |  |
+| `0xbaf24` | EAX:ef_addr32 | none | bb324@bb47d |  |
+| `0xbc450` | EAX:ef_addr32 | EAX:uint32_t | bc421@bc448 |  |
+| `0xc8e38` | none | none | ac408@ac438 |  |
+| `0xc8fdc` | none | none | ac408@ac42e |  |
+| `0xc90c0` | none | none | ac408@ac433 |  |
+| `0xcbd0f` | EAX:int32_t,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | c768@c79e,c768@c7db,4d668@4d78e | Signed decimal prefix, then the digit conversion. |
+| `0xcd29c` | none | EAX:ef_addr32 | 10f70@10fba,11014@11042,1e214@1e263 |  |
+| `0xd16fc` | EAX:uint32_t | none | d170c@d1750,d1774@d179e,d1774@d17b2 |  |
+| `0xd6f88` | none | EAX:uint32_t | 80120@80177 |  |
+| `0xd7070` | EAX:ef_addr32 | EAX:ef_addr32 | d6fa8@d6fb4 |  |
+| `0xd7738` | EAX:ef_addr32 | EAX:uint32_t | 7fcdc@7fdca,8018c@801a7,801e4@8027a |  |
+| `0xd7748` | EAX:ef_addr32 | EAX:uint32_t | 801e4@8022c |  |
+| `0xe7cd0` | EAX:ef_addr32,EDX:ef_addr32 | none | e7cec@e7d1f | Append a fixed string and then second to first. |
+| `0xea414` | none | EAX:uint32_t | 9dcf8@9dd0f,de864@de985 |  |
+| `0xea864` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 97534@97578,97534@9758a,975f0@97674 | Store three dwords. |
+| `0xf13ac` | EAX:ef_addr32 | none | a56f8@a5704 |  |
