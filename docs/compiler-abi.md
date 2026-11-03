@@ -1798,3 +1798,51 @@ in EAX, format string address, one value).
 | `0xb43f4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 74d98@74e03,89fbc@89fe2,89fbc@8a005 | Cross product EDX x EBX into EAX (three doubles each). |
 | `0xb44d0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 11c350@11c395,11c584@11c623 | out = a + b for three doubles (EDX + EBX into EAX). |
 | `0xb44ec` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 8e940@8e9f6,e6990@e69a9 | out = a - b for three doubles (EDX - EBX into EAX). |
+
+## list_lookup (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb55c8` | EAX:ef_addr32,EDX:ef_addr32,BX:uint16_t,CL:uint8_t | EAX:ef_addr32 | b7d4c@b7d6b,b80ac@b80cc,b8510@b857a | Walk the list at *head (next at +4) for a node whose * dwords +9/+0xd equal the record's +0x11/+0x15, word +0x1c equals  |
+| `0xba3bc` | EAX:ef_addr32 | none | bb324@bb47d | Fill bytes 0..9 with 4. |
+| `0xba3e4` | EAX:ef_addr32 | none | bb324@bb47d | Fill bytes 0..9 with 0x0d. |
+| `0xbae34` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Bytes 0 and 1 = 0x12 when DL is 1, else 0x11. |
+| `0xbae4c` | EAX:ef_addr32 | none | bb324@bb47d | Bytes 0..3 = 2, 2, 3, 3. |
+| `0xbc34f` | EAX:ef_addr32 | none | bc36a@bc36d | When 0xfa6d3(0) returns nonzero, run 0xbc287(EAX). |
+| `0xbc36a` | EAX:ef_addr32 | none | 9ea0@9fa4,a3dc@a3f7,357ec@3589f | Run 0xbc34f with EBX preserved as zero. |
+| `0xbc465` | EAX:int32_t | EAX:int32_t | bc471@bc491,bc471@bc4ac,bc471@bc4b9 | Digit character for a value: +0x30, then +0x27 past '9'. |
+| `0xbc570` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | f6a8@f810,f6a8@f86b,fecc@ff7f | Insert EAX at the head of the doubly linked list whose * head pointer is EBX and tail pointer EDX (previous at +0, next  |
+| `0xbc5d0` | EAX:ef_addr32 | EAX:uint32_t | 49228@494f9,49228@49509,b0f5c@b1505 | Count nodes of the list at *EAX (next at +4). |
+| `0xbc5e8` | EAX:ef_addr32,EDX:uint32_t | EAX:ef_addr32 | a3dc@a418,ab74@abc9,ab74@af46 | Node number EDX of the list at *EAX, or 0. |
+| `0xbcb08` | EAX:ef_addr32 | EAX:uint32_t | bcc2c@bcc85,bcc2c@bccd4,bcc2c@bcd44 | Byte +5 at least 0x32 (signed) and byte +6 nonzero. |
+| `0xbcb24` | EAX:ef_addr32 | EAX:uint32_t | cac4c@cacc2,faafc@fab29 | Byte +6 at least 0x55 and byte +0 not 0xff or 0xfe. |
+| `0xbcc04` | AL:uint8_t | AL:uint8_t | bcc2c@bcd1b,bcda0@bce49 | Map code: 0x31 -> 0x37, 0x49 -> 0x4b, 0x0b/0x56 -> 0x0c, else 0. |
+| `0xbcd78` | AL:uint8_t | AL:uint8_t | bcf44@bcfe7 | Map code: 0x31 -> 0x27, 0x49 -> 0x12, 0x0b/0x56 -> 0x1b, else 0. |
+| `0xbce98` | AL:uint8_t | AL:uint8_t | bcf44@bd1a6 | Map code: 0x31 -> 2, 0x49 -> 0x3c, 0x0b/0x56 -> 0x0c, else 0. |
+| `0xbcf18` | EAX:ef_addr32 | EAX:uint32_t | bcf44@bd0e4,bfb2c@bfb52,f90ac@f9252 | Byte +0xd is zero. |
+| `0xbcf28` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | bcf44@bd0d8,be3f4@be413,f90ac@f9246 | Dwords +0x11/+0x15 equal the other record's +0x3b/+0x3f. |
+| `0xbd4e0` | AL:uint8_t | EAX:uint32_t | f88a0@f88bb,f89e0@f8a08,f8a30@f8a4e | AL is 2, 3, 4, 9 or 0x0c. |
+| `0xbd728` | EAX:ef_addr32,DL:uint8_t | EAX:uint32_t | bdbf8@bdc65,f8b14@f8bb0 | DL (as a signed word) is below the signed word +0x23. |
+| `0xbdbc8` | EAX:ef_addr32 | EAX:uint32_t | bd5f8@bd618,be59c@be5af,be59c@be605 | Count the 10-byte entries (pointer +6, count byte +5) * whose first word is nonzero. |
+| `0xbecf8` | EAX:ef_addr32 | EAX:uint32_t | bed1c@bed72 | 1 when 0xbc7ec(record) is zero and 0xbecc0(record) is nonzero. |
+| `0xbef90` | AX:int16_t,DX:int16_t,EBX:ef_addr32 | EAX:ef_addr32 | befb8@bf1f2 | Find the node in the list at *EBX with dword +0x16 == * signed AX and dword +0x1a == signed DX. |
+| `0xbfa28` | EAX:ef_addr32 | EAX:uint32_t | bf81c@bf8b6 | Byte +0x22 of the records at dwords +0x33 and +0x37 * differ and the first is nonzero. |
+| `0xbfcd8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | b0b00@b0b3d,b0b00@b0bcd,c0b04@c0f1d | Node in the list at *EDX with dwords +0x16/+0x1a equal * to the record's +0x11/+0x15. |
+| `0xbfcfc` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 4ce4c@4cf86,50770@507ae,b47e4@b4970 | Node in the list at *EAX with dwords +0x11/+0x15 equal * to the record's +0x16/+0x1a. |
+| `0xc1b8c` | AX:uint16_t,EDX:ef_addr32 | EAX:ef_addr32 | 9a8b4@9a8c4,9a998@9a9a7,9b2a4@9b391 | Node in the list at *EDX whose word +0x13 equals AX. |
+| `0xcb5f8` | AX:uint16_t,EDX:ef_addr32 | EAX:ef_addr32 | cb800@cb876,cb800@cb897 | Identical body to 0xc1b8c. |
+| `0xc1ba8` | AX:uint16_t,EDX:ef_addr32 | EAX:ef_addr32 | 9b2a4@9b4ae | Node number AX of the list at *EDX (16-bit compare), or 0. |
+| `0xc3834` | none | none | 283c8@283f1,f3f84@f4137 | 0xe9a24(dword 0x164600, dword 0x15b754, dword 0x146e40). |
+| `0xc3850` | none | none | 3dd30@3e278 | 0xe9a24(dword 0x164600, dword 0x15b754, dword 0x146e44). |
+| `0xc386c` | none | none | 278c0@27932,27fec@2800c,27fec@2815d | 0xe9a24(dword 0x164600, dword 0x146e40, dword 0x15b754). |
+| `0xc3888` | none | none | 27d18@27d8c,283c8@283ec,284ec@2850b | 0xe9a24(dword 0x164600, dword 0x146e44, dword 0x15b754). |
+| `0xc38a4` | none | none | eac48@eacb2 | Tail-call 0xb3fb0(dword 0x146e40, 0, dword 0x164600). |
+| `0xc3974` | none | none | ab74@ae67,278c0@27900,27fec@281db | Dword 0x15b754 = dword 0x146e40. |
+| `0xc3980` | none | none | 284ec@284f7,f53bc@f546c | Dword 0x15b754 = dword 0x146e44. |
+| `0xc3990` | none | none | 278c0@27b21,27d18@27e9d,39204@39216 | Dword 0x15b754 = dword 0x15b758. |
+| `0xc399c` | none | none | cdb20@cdc1e,d1d40@d1d90,dc250@dc277 | Dwords 0x15b754 and 0x146e4c = dword 0x15b758. |
+| `0xc3a28` | none | none | c3f1c@c3f47 | When dword 0x146e40 is set, replace it with dword * 0x15b758 and store the old value at 0x15b758. |
+| `0xc3a48` | none | none | c3ae8@c3c11 | When dword 0x15b758 is set and byte 0x146e4a clear, * release it through 0xc3f80 and clear it. |
+| `0xc3f50` | EAX:uint32_t,EDX:uint32_t | AL:uint8_t | afbc@b0b2,afbc@b0c1,afbc@b0d4 | Byte at dword 0x15b754 + EAX + dword 0x163200[EDX]. |
+| `0xc4389` | none | none | c5261@c5283 | Run 0xe3c20. |
+| `0xca9fc` | EAX:int32_t,EDX:int32_t | EAX:int32_t | b0554@b0564,b8510@b8534,caa28@caace | EAX / 40 + 10 * (EDX / 40), signed. |

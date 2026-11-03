@@ -760,4 +760,55 @@ void guest_fn_cc768(ef_addr32 pointer); /* 0xcc768 EAX */
 uint32_t guest_fn_a4574(uint32_t value); /* 0xa4574 EAX -> EAX */
 uint32_t guest_fn_f9ecd(uint32_t value); /* 0xf9ecd EAX tail */
 
+/* list_lookup.c */
+ef_addr32 find_node_by_key(ef_addr32 head, ef_addr32 record, uint16_t word, uint8_t byte);
+void fill_ten_bytes_04(ef_addr32 destination);
+void fill_ten_bytes_0d(ef_addr32 destination);
+void fill_pair_by_flag(ef_addr32 destination, uint8_t flag);
+void fill_four_bytes_2233(ef_addr32 destination);
+void run_if_available_bc34f(ef_addr32 argument);
+void run_if_available_bc36a(ef_addr32 argument);
+int32_t digit_character(int32_t value);
+void list_insert_head(ef_addr32 node, ef_addr32 head, ef_addr32 tail);
+uint32_t list_count(ef_addr32 head);
+ef_addr32 list_nth(ef_addr32 head, uint32_t index);
+uint32_t record_is_strong(ef_addr32 record);
+uint32_t record_is_elite(ef_addr32 record);
+uint8_t map_code_bcc04(uint8_t code);
+uint8_t map_code_bcd78(uint8_t code);
+uint8_t map_code_bce98(uint8_t code);
+uint32_t record_flag_clear_d(ef_addr32 record);
+uint32_t records_share_position(ef_addr32 first, ef_addr32 second);
+uint32_t code_is_2_3_4_9_0c(uint8_t code);
+uint32_t value_below_word_23(ef_addr32 record, uint8_t value);
+uint32_t count_nonzero_entries(ef_addr32 record);
+uint32_t record_pending_becf8(ef_addr32 record);
+ef_addr32 find_node_by_pair(int16_t first, int16_t second, ef_addr32 head);
+uint32_t linked_records_differ(ef_addr32 record);
+ef_addr32 find_node_by_record_a(ef_addr32 record, ef_addr32 head);
+ef_addr32 find_node_by_record_b(ef_addr32 head, ef_addr32 record);
+ef_addr32 find_node_by_word_c1b8c(uint16_t key, ef_addr32 head);
+ef_addr32 find_node_by_word_cb5f8(uint16_t key, ef_addr32 head);
+ef_addr32 list_nth_word(uint16_t index, ef_addr32 head);
+void call_e9a24_c3834(void);
+void call_e9a24_c3850(void);
+void call_e9a24_c386c(void);
+void call_e9a24_c3888(void);
+void clear_buffer_c38a4(void);
+void select_buffer_146e40(void);
+void select_buffer_146e44(void);
+void select_buffer_15b758(void);
+void select_buffer_15b758_both(void);
+void swap_buffers_c3a28(void);
+void release_buffer_c3a48(void);
+uint8_t read_buffer_byte(uint32_t offset, uint32_t row);
+void run_e3c20(void);
+int32_t grid_index_ca9fc(int32_t x, int32_t y);
+uint32_t guest_fn_fa6d3(uint32_t value); /* 0xfa6d3 EAX -> EAX */
+void guest_fn_bc287(ef_addr32 argument); /* 0xbc287 EAX */
+uint32_t guest_fn_bc7ec(ef_addr32 record); /* 0xbc7ec EAX -> AX */
+uint32_t guest_fn_becc0(ef_addr32 record); /* 0xbecc0 EAX -> AX */
+void guest_fn_c3f80(uint32_t buffer); /* 0xc3f80 EAX */
+void guest_fn_e3c20(void); /* 0xe3c20 */
+
 #endif
