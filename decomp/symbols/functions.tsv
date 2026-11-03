@@ -367,8 +367,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00024074	577			unknown	unclassified	unverified		
 0x000242b8	243			unknown	unclassified	unverified		
 0x000243ac	211	update_indexed_object_relation	unk_geometry	typed	game	confirmed		ABI only; AX signed index, void memory mutation, x87 compare
-0x00024480	409			unknown	unclassified	unverified		
-0x0002461c	381			unknown	unclassified	unverified		
+0x00024480	409	test_indexed_spatial_overlap	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index, EDX triple-double pointer, qword threshold on stack, AL result, ret 8; caller sites 0x248b9/0x6b1aa
+0x0002461c	381	update_indexed_projection_globals	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index and EDX triple-double pointer, x87 global outputs; caller sites 0x24557/0x24982
 0x0002479c	1187			unknown	unclassified	unverified		
 0x00024c40	533			unknown	unclassified	unverified		
 0x00024e58	175			unknown	unclassified	unverified		
@@ -1699,7 +1699,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00086920	71			unknown	unclassified	unverified		
 0x00086968	886			unknown	unclassified	unverified		
 0x00086e44	309			unknown	unclassified	unverified		
-0x00086f7c	843			unknown	unclassified	unverified		
+0x00086f7c	843	query_projected_object_position	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX selector, EDX output pair pointer, BX iteration count; returns signed EAX; caller sites 0x5c7b9/0x5ca6e; indirect callback effects remain replay concern
 0x000872c8	217			unknown	unclassified	unverified		
 0x000873a4	432			unknown	unclassified	unverified		
 0x00087700	454			unknown	unclassified	unverified		
@@ -2464,7 +2464,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b0c9c	95			unknown	unclassified	unverified		
 0x000b0cfc	245			unknown	unclassified	unverified		
 0x000b0df4	359			unknown	unclassified	unverified		
-0x000b0f5c	1888			unknown	unclassified	unverified		
+0x000b0f5c	1888	initialize_global_node_state	unk_nodes	typed	game	confirmed		docs/compiler-abi.md; zero inputs, all GPRs except EAX preserved, EAX=0, DS-to-ES movsd; callers 0xbab4/0xc0f6
 0x000b16c0	64			unknown	unclassified	unverified		
 0x000b1700	64			unknown	unclassified	unverified		
 0x000b1740	146			unknown	unclassified	unverified		
@@ -3642,7 +3642,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f3b1c	33			unknown	unclassified	unverified		
 0x000f3b40	22			unknown	unclassified	unverified		
 0x000f3b58	32			unknown	unclassified	unverified		
-0x000f3b78	476			unknown	unclassified	unverified		
+0x000f3b78	476	process_command_dispatch_loop	unk_parser	typed	game	confirmed		docs/compiler-abi.md; zero inputs, side effects on command globals, EBX/ECX/EDX saved; caller sites 0xf40a3/0xf41a0; indirect formatting through a helper
 0x000f3d54	560			unknown	unclassified	unverified		
 0x000f3f84	497			unknown	unclassified	unverified		
 0x000f4178	47			unknown	unclassified	unverified		

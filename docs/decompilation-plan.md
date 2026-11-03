@@ -357,40 +357,22 @@ layout**, not code generation. Do it before writing real game code.
    `kind=asm`. Prefer rewriting them in C when the observable behavior
    (§2.2) can be reproduced; otherwise keep them as `wasm` assembly.
 
-In progress 2026-11-03: `docs/compiler-abi.md` records initial high-score
-instruction evidence and provisional flags; `tools/asm_diff.py` provides
-side-by-side original/OMF listings with asset-free tests. `decomp/symbols/abi-samples.tsv` now holds 40
-reproducible cross-region candidates; their individual caller/ABI audits
-remain. `abi-audit.tsv` records two distinct caller sites and linear
-instruction summaries for each candidate; the unusual `0x24480` x87/`ret 8`
-case was checked against both callers and documented in `compiler-abi.md`.
-`0x432c` has a confirmed byte-sized AL return and no arguments; within the
-worksheet, `0x6a1b4` and `0xb0208` have confirmed register signatures,
-`0x263e0` / `0x120800` have confirmed void signatures, and four additional
-object/matrix routines (`0x6a354`, `0x6a394`, `0x6a4c4`, `0x6a538`) have
-reviewed register/memory-only signatures. Three more cross-region routines
-(`0x23760`, `0xb1b8b`, `0xf46cc`) have confirmed scalar/string/command-token
-ABIs; the current-object relation/slot pair at `0x23800` and `0x238a0`
-and the linked-list allocation pair (`0xb0018`, `0xb00d0`) bring the
-worksheet to fifteen of forty confirmed, plus a timing thunk at `0xf8248`
-for sixteen confirmed in total. A packed 213-byte x87 record initializer
-(`0x11c0b4`), 13-way bit-probe switch (`0x68ccc`) and global-input
-projection adapter (`0x15be10`) bring the worksheet to nineteen confirmed.
-The current-object relation mutator (`0x243ac`) makes twenty confirmed;
-the stack-based `ret 8` bitstream decompressor (`0xf9ee0`) is additionally
-reviewed but cannot yet be entered as a custom-storage signature. The
-filtered linked-list counter (`0xb0850`) brings the worksheet to twenty-one
-confirmed; callback-list teardown (`0xabec4`) is reviewed with unresolved
-indirect callee clobbers. The branch-heavy object state transition
-(`0x6a1d0`) and positive filtered-node counter (`0xb0954`) bring it to
-twenty-three of forty. Stack custom storage and `ret N` purge support now
-allow the two decompressors (`0xf9ee0`, `0xfa02c`), nonfinite-double
-formatter (`0x1204dc`), and fixed-point projection pair (`0x15c0c4`,
-`0x15c071`) to be confirmed: twenty-eight of forty ABI samples. The
-remaining documented exceptions include
-ST(0) return with `ret 8` (`0xf8250`), ES:[EDI] memory writes (`0x120a52`),
-register-plus-stack floating argument (`0x24480`), and segment/interrupt
-bridges (`0xee43c`, `0x120451`).
+In progress 2026-11-03: the 40-candidate cross-region worksheet and
+two-caller instruction audit live in `decomp/symbols/abi-samples.tsv` and
+`abi-audit.tsv`; reviewed evidence and canonical OpenWatcom 2.0 flags are
+recorded in `docs/compiler-abi.md`. The `-3r -zp1 -fpi87 -fp3 -ob -ot -s`
+first-pass profile and its OMF fixture are in the flake. The Ghidra 12.1.4
+symbol importer supports custom register/stack storage and callee `ret N`
+purge. **33 of 40** sampled ABIs are confirmed (but not C-recovered or
+replay-verified), including the large indexed projection/global update
+(`0x2461c`), signed projected-position query (`0x86f7c`), node initializer
+(`0xb0f5c`), command-dispatch loop (`0xf3b78`) and register-plus-qword-stack
+x87 overlap check (`0x24480`). The other seven samples have been explicitly
+reviewed as exceptions or partial ABIs; they involve indirect callback or
+formatted-output clobbers (`0x12d90`, `0xabec4`, `0xf6124`), x87 ST(0)
+return (`0xf8250`), an ES-specific store (`0x120a52`), and DOS segment or
+interrupt bridges (`0xee43c`, `0x120451`). Resolve them before full native
+replacement or explicitly isolate them as assembly/platform shims.
 
 ### 3.6 [ ] Library identification
 
@@ -820,6 +802,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Confirmed 0xb0954 positive filtered-node count as companion to 0xb0850 (23/40 ABI samples).
 2026-11-03  3.5   Ghidra 12.1.4 reviewed-signature importer now supports [ESP+N] stack parameters and ret N purge; asset-free synthetic save/reload test passes.
 2026-11-03  3.5   Confirmed five nonstandard stack/register ABIs: LZ/RA decompressors, ret 12 nonfinite formatter, ret 16 projection adapter and its register helper (28/40 samples).
+2026-11-03  3.5   Confirmed five remaining long/mixed ABIs: x87 ret 8 overlap, indexed global projection, callback-backed projection query, global-node initialization and command dispatch (33/40 samples; seven reviewed exceptions remain).
 ```
 
 ---

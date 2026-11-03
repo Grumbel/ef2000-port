@@ -20,9 +20,14 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0015be10	append_projected_global_record		EAX:uint32_t	esi,edi,ebp	0	0x15be10..0x15bec2; callers 0x28968/0x8177d/0x81836 set globals, ignore EAX; docs/compiler-abi.md
 0x00068ccc	test_indexed_object_bit	AX:int16_t,DX:uint16_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	0x68ccc..0x68e82; callers 0x6945c/0x68ebc test AL; CS jump table; docs/compiler-abi.md
 0x000243ac	update_indexed_object_relation	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x243ac..0x2447e; callers 0x240aa/0x6c741 ignore EAX; x87 comparison; docs/compiler-abi.md
+0x00024480	test_indexed_spatial_overlap	AX:int16_t,EDX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	8	0x24480..0x24618; caller sites 0x248b9/0x6b1aa pass qword limit; x87 comparisons and helper writes; docs/compiler-abi.md
+0x0002461c	update_indexed_projection_globals	AX:int16_t,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	0x2461c..0x24798; callers 0x24557/0x24982; 3-qword input and multiple global x87 outputs; docs/compiler-abi.md
+0x00086f7c	query_projected_object_position	AX:int16_t,EDX:ef_addr32,BX:int16_t	EAX:int32_t	ecx,esi,edi,ebp	0	0x86f7c..0x872c6; caller sites 0x5c7b9/0x5ca6e test signed EAX, EDX points to 2-word result; docs/compiler-abi.md
 0x000b0850	count_filtered_node_matches	AL:uint8_t,EBX:ef_addr32,EDX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	0xb0850..0xb0953; callers 0xb0c46/0xb0cae use EAX/AX; docs/compiler-abi.md
 0x0006a1d0	transition_indexed_object_state	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x6a1d0..0x6a353; callers 0x466b5/0x72cc4 ignore return; docs/compiler-abi.md
 0x000b0954	count_positive_filtered_node_matches	AL:uint8_t,EBX:ef_addr32,EDX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	0xb0954..0xb0afe; callers 0xb0cbe/0xcb78f use EAX/AX; docs/compiler-abi.md
+0x000b0f5c	initialize_global_node_state		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	0xb0f5c..0xb16bb; callers 0xbab4/0xc0f6 use globals, EAX cleared on exit; DS/ES movsd; docs/compiler-abi.md
+0x000f3b78	process_command_dispatch_loop			ebx,ecx,edx	0	0xf3b78..0xf3d53; callers 0xf40a3/0xf41a0 ignore return; command-buffer dispatch loop; docs/compiler-abi.md
 0x000f9ee0	decompress_bitstream_backrefs	[ESP+4]:ef_addr32,[ESP+8]:ef_addr32		ebx,edx,esi,edi,ebp	8	0xf9ee0..0xfa02a; caller sites 0xb3c8e/0xeab7c; DS input ES output, CLD; docs/compiler-abi.md
 0x000fa02c	decompress_ra_stream	[ESP+4]:ef_addr32,[ESP+8]:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	8	0xfa02c..0xfa16b; caller sites 0xb3cc2/0xebadf; PUSHA/POPA and INT3 failure; docs/compiler-abi.md
 0x001204dc	format_nonfinite_double	[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	12	0x1204dc..0x12055d; caller sites 0x11d40c/0x12058c test EAX; docs/compiler-abi.md

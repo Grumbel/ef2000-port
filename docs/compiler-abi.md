@@ -54,12 +54,12 @@ functions. The `watcom-omf` Nix check now rejects `__CHK` in its OMF listing.
 | `0x41fc` high-score load | Saves EBX, ECX, EDX, ESI; reserves four stack bytes; passes EAX=`0x17f694` and EDX=0 to indirect call `[0x132ab4]` | Target ABI, stack cleanup, outputs |
 | `0x432c` score threshold | Loads score in EAX, compares against last record, executes `setg al`, then `ret` | Confirmed: no register/stack inputs; returns AL, stack cleanup zero. Upper EAX bytes are not a return value. |
 | `0x433c` high-score insert | Saves EBX, ECX, EDX, ESI, EDI, EBP and reserves eight stack bytes | Input ABI and full return behavior |
-| `0x24480` x87 spatial comparison | Inputs from EAX (sign-extended AX) and EDX (pointer to three qwords); reads an eight-byte stack argument; saves/restores EBX, ECX, ESI, EDI; returns with `ret 8`, low-byte result in AL | Exact semantic types, other caller-visible clobbers, x87 control/status requirements |
+| `0x24480` x87 spatial comparison | AX index, EDX pointer to three qwords, stack qword limit, AL predicate; saves/restores EBX/ECX/ESI/EDI, `ret 8` | Native FP behavioral equivalence, especially status/control word and exceptional values; see confirmed ABI below |
 
 Evidence: `objdump -b binary -m i386 -M intel -D --start-address=...`
 against `local/ghidra/payload.bin`, and `docs/highscores-reconstruction.md`.
-Except for the separate `0x432c` row below, these observations are not
-complete signatures and remain unverified.
+The `0x432c` and `0x24480` rows now have independently confirmed calling
+conventions below; the other rows are still observations, not signatures.
 
 For `0x24480`, two different caller functions show the same argument setup:
 `0x2479c` at callsite `0x248b9` and `0x6aeb4` at `0x6b1aa` both store a
@@ -67,8 +67,99 @@ computed x87 value as a qword on the stack, put a scalar/index into EAX and
 a pointer into EDX, then call `0x24480`. The second caller consumes AL with
 `test al,al` at `0x6b1af`. The callee epilogue at `0x2460d` writes AL,
 restores registers, and executes `ret 8` at `0x24616`. This establishes
-stack ownership and a register+stack calling *pattern*, but still needs a
-fully typed signature and x87 differential evidence.
+stack ownership and a register+stack calling *pattern*. The storage is now
+confirmed; numerical/x87 equivalence remains unverified.
+
+### Confirmed ABI: spatial overlap predicate and shared projection globals
+
+`test_indexed_spatial_overlap` (`0x24480`) receives AX as a signed 16-bit
+object index and EDX as the address of **three consecutive qwords**. Its
+third argument is one eight-byte floating-point limit passed on the stack,
+represented in `signatures.tsv` by the two machine words at `[ESP+4]` and
+`[ESP+8]` (little-endian bits of the same double). It returns **AL only**:
+zero rejects the object or its spatial comparison, nonzero accepts it.
+EBX/ECX/ESI/EDI are saved/restored, EBP is not changed, EAX/EDX are
+scratch, and the callee removes exactly eight bytes via `ret 8`.
+
+The whole routine is `0x24480..0x24618`. It resolves the AX index through
+`0x7489c`, subtracts object position qwords `+0x49/+0x51/+0x59` from the
+EDX vector, rounds each coordinate via `0x9d72c` and compares an integer
+derived magnitude to the stack limit. It also calls `0x2461c` and computes
+a later x87 bound using per-type data at `0x12861d` and nearby offsets.
+Caller `0x2479c` at `0x248b9` supplies EAX from sign-extended DI, EDX
+pointing to `[EBX+0x49]`, and a freshly stored double from ST(0). Distinct
+caller `0x6aeb4` at `0x6b1aa` uses signed word `[ECX+0x14]`, EDX
+`[EBX+0x49]`, and another computed stack double; it immediately checks AL.
+These establish the mixed-register/stack ABI, **not** equivalence of the
+rounding rules, floating-point exceptions, comparison flags, or global
+side effects in a future C replacement.
+
+`update_indexed_projection_globals` (`0x2461c..0x24798`) takes AX as a signed
+object index and EDX as three qwords of world position; there is no stack
+argument, and callers do not consume any return register. It looks up the
+object with `0x6a1b4`, subtracts its stored position and calls the separately
+typed `mul_object_matrix_transpose_vector` (`0x6a538`) with the same index
+in BX. The resulting vector occupies globals `0x19b290..0x19b2a7`.
+Multiple x87 square-root/distance helpers then write qwords at `0x19b2a8`,
+`0x19b2b0`, `0x1f70e8`, `0x1f7008`, and `0x1f7018`. An invalid index skips
+these writes. EBX/ECX/ESI/EDI/EBP are restored; EAX/EDX are scratch. Both
+`0x24480` at `0x24557` and **distinct** `0x2479c` at `0x24982` supply AX/EDX
+and use the global results, not an EAX return. X87 stack depth is balanced
+throughout the calls, but status/precision and memory write order still
+require replay verification.
+
+### Confirmed ABI: projected-position query
+
+`query_projected_object_position` (`0x86f7c..0x872c6`) accepts AX as a
+signed selector, EDX as an output pointer to **two signed 16-bit coordinates**,
+and BX as a signed 16-bit iteration count. The callee initially writes
+`-100` to both output words and sets its eventual result to `-1`. It looks
+up the current object index from `0x1f71c8` with `0x7489c`, constructs
+fixed-point camera/world coordinates from `0x1a5be8..0x1a5bf0`, invokes
+`0xe9b38`/`0x87a20`, and may invoke the function pointer at `0x20f1dc`.
+If projection succeeds it calls the confirmed four-stack-argument adapter
+`0x15c0c4` to update the output pair. It computes a signed 32-bit distance
+or scale in EAX, with `-1` as the no-object/no-result sentinel; do not
+restrict the return to AX. ECX/ESI/EDI/EBP are saved/restored, EBX/EDX
+are scratch, and there is no stack argument or callee cleanup.
+
+Caller `0x5c7ab` at `0x5c7b9` uses AX=1, EDX pointing to a local pair,
+BX=4, stores the returned **AX**, then branches on signed AX. Separate
+caller `0x5ca60` at `0x5ca6e` passes AX=9, EDX pointing to its local pair,
+BX=9, and branches on full signed EAX before using that EAX as an index.
+The callback's effects on global projection state and all integer overflow
+edges still need differential testing.
+
+### Confirmed ABIs: zero-argument node initialization and command loop
+
+`initialize_global_node_state` (`0xb0f5c..0xb16bb`) takes no caller-provided
+register or stack arguments. Its first call allocates 120 bytes with
+`0xcc6c0` using two temporary **outgoing** stack arguments. It zeros or
+reinitializes node globals around `0x137958..0x1379c8`, selects separate
+paths based on word `0x137992`, and calls the list and table workers in the
+`0xb0xxx`, `0xcaxxx` and `0xcbxxx` regions. The early copy at `0xb100e`
+uses three `movsd` instructions with **DS source and ES destination** and
+assumes the ambient direction flag is clear. All paths converge on the
+epilogue at `0xb16ae`: EAX is cleared and all six other GPRs are restored;
+the routine uses a plain `ret` and no caller-stack cleanup. Its first
+caller is `0xbab4`, followed by a test of global word `0x137998`; its
+second is `0xc0f6`, followed by writes to global flags. Neither prepares
+parameters or consumes EAX. The initialized records and allocation
+semantics are not yet recovered as source.
+
+`process_command_dispatch_loop` (`0xf3b78..0xf3d53`) also accepts no
+arguments. It initializes ECX to command buffer `0x48592c`, BH to 1 and
+BL to 0, repeatedly reads input via `0xf2d74`, then compares the buffer
+against literal command strings at `0x1919f8..0x191a74` with `0xa4380`.
+Each match dispatches a command handler or updates bytes `0x4859db` through
+`0x4859dd`. Its loop stops when the internal BL flag becomes nonzero.
+EBX/ECX/EDX are saved/restored on **every** return path, with no caller
+stack cleanup. The other GPRs are not promised by this ABI: the dispatched
+helpers may themselves invoke indirect handlers. Caller `0xf4078` at
+`0xf40a3` proceeds to test global flags; caller `0xf4178` at `0xf41a0`
+restores EBX and returns. Neither passes arguments or consumes an EAX
+result. There is no ST(0) return; callback and buffer side effects remain
+observable and must survive replacement.
 
 Packing evidence: the high-score record occupies 25 bytes with a signed
 32-bit score at unaligned offset `+21`. The GUI icon `next` pointer at `+0x21`
