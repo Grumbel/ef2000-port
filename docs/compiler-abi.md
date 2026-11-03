@@ -2069,3 +2069,29 @@ in EAX, format string address, one value).
 | `0x1114a3` | none | none | none direct | As 0x1113fb for 0x102330. |
 | `0x1114f7` | EAX:uint32_t,EDX:uint32_t | none | 101c54@101d8c,102228@102252 | 0x1021f4(a, 1000000 / b) under the lock. |
 | `0x111527` | EAX:uint32_t,EDX:uint32_t | none | 10225c@102286 | 0x1021f4(a, b == 0 ? 0xd68d : 10000 * b / 0x2e9c) under the lock. |
+
+## game_state_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb04` | none | none | e20@e2a |  |
+| `0xd08` | EAX:int32_t | EAX:ef_addr32 | d68@e00 | Select a record address by kind. |
+| `0x1ef8` | none | none | 1cd8@1ec6 | Every second call pick a byte from tables 0x1961f8 (stride 51) or 0x196191 (stride 52) * and store 0xf60 of it in byte 0 |
+| `0x3cf0` | none | none | 1b70@1c5d,1cd8@1eea,3ea8@3f64 | Reset the selection state from the record at dword 0x197061. |
+| `0x4bf8` | none | none | none direct |  |
+| `0x5f60` | none | none | 3dd30@3de06 | Initialisation sequence. |
+| `0x6acc` | EAX:ef_addr32 | AL:uint8_t | 6924@6996,625d8@62b2a,65c1c@65c7d | Category of an object from the byte at +0xe9: 1 (<=0xf), 2 (0x10..0x15), 3 (0x20..0x21), 4 (0x22..0x24). |
+| `0x6e18` | none | none | 49228@495bc |  |
+| `0x90c0` | AX:int16_t | none | 2d488@2d645 |  |
+| `0xe774` | none | AL:uint8_t | e810@e81e,e810@e835,e810@e866 | Read one character from the 0x100-byte buffer at 0x197b0f; 0x1a becomes 0. |
+| `0xee0c` | EAX:ef_addr32 | EAX:uint32_t | f260@f2f6 | Read a record through the 0xe95c byte/word readers. |
+| `0xeefc` | EAX:ef_addr32 | EAX:uint32_t | f314@f540 |  |
+| `0xefe8` | EAX:ef_addr32 | EAX:uint32_t | f038@f078 |  |
+| `0xf13c` | EAX:ef_addr32 | none | f198@f247 |  |
+| `0x117d4` | none | AL:uint8_t | 7bc40@7bd94 | Is there an entry (0x2c bytes each, count word +4, array dword +0xa) with byte 0 clear * and byte +0x2b not 100? |
+| `0x12ec8` | none | none | 12160@12188 | Mirror byte 0x123790 with the flag at 0x121fb4 + 29*index. |
+| `0x169b4` | EAX:int32_t | EAX:uint32_t | 15af0@15b33,16034@16055 |  |
+| `0x16ab4` | EAX:uint32_t | EAX:uint32_t | 15b7c@15c5d | Active record whose kind byte +0x1c is one of a fixed set. |
+| `0x17480` | EAX:uint32_t,EDX:int32_t | EAX:uint32_t | 15b7c@15c87 |  |
+| `0x1cd90` | none | none | 1cde8@1cfd0 | Adjust word 0x12b366 by the key flags and clamp it to 0x5a..0x7f. |
+| `0x1d3c4` | AX:uint16_t | none | 8b39c@8b519 |  |

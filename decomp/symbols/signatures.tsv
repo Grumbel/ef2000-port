@@ -698,3 +698,24 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x001114a3	for_each_slot_1114a3			ebx,ecx,edx,esi,edi,ebp	0	Original 0x001114a3 (36 bytes); As 0x1113fb for 0x102330.; callers none direct; docs/compiler-abi.md
 0x001114f7	set_rate_1114f7	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001114f7 (48 bytes); 0x1021f4(a, 1000000 / b) under the lock.; callers 101c54@101d8c,102228@102252; docs/compiler-abi.md
 0x00111527	set_period_111527	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00111527 (66 bytes); 0x1021f4(a, b == 0 ? 0xd68d : 10000 * b / 0x2e9c) under the lock.; callers 10225c@102286; docs/compiler-abi.md
+0x00000b04	init_far_stub_b04			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00000b04 (72 bytes); ; callers e20@e2a; docs/compiler-abi.md
+0x00000d08	record_for_kind	EAX:int32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00000d08 (93 bytes); Select a record address by kind.; callers d68@e00; docs/compiler-abi.md
+0x00001ef8	tick_selector_1ef8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00001ef8 (108 bytes); Every second call pick a byte from tables 0x1961f8 (stride 51) or 0x196191 (stride 52) * and store 0xf60 of it in byte 0; callers 1cd8@1ec6; docs/compiler-abi.md
+0x00003cf0	reset_selection_3cf0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00003cf0 (129 bytes); Reset the selection state from the record at dword 0x197061.; callers 1b70@1c5d,1cd8@1eea,3ea8@3f64; docs/compiler-abi.md
+0x00004bf8	select_entry_4bf8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00004bf8 (87 bytes); ; callers none direct; docs/compiler-abi.md
+0x00005f60	init_sequence_5f60			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00005f60 (120 bytes); Initialisation sequence.; callers 3dd30@3de06; docs/compiler-abi.md
+0x00006acc	object_category	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00006acc (78 bytes); Category of an object from the byte at +0xe9: 1 (<=0xf), 2 (0x10..0x15), 3 (0x20..0x21), 4 (0x22..0x24).; callers 6924@6996,625d8@62b2a,65c1c@65c7d; docs/compiler-abi.md
+0x00006e18	reset_slots_6e18			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00006e18 (89 bytes); ; callers 49228@495bc; docs/compiler-abi.md
+0x000090c0	update_unit_90c0	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000090c0 (83 bytes); ; callers 2d488@2d645; docs/compiler-abi.md
+0x0000e774	read_buffered_char		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000e774 (104 bytes); Read one character from the 0x100-byte buffer at 0x197b0f; 0x1a becomes 0.; callers e810@e81e,e810@e835,e810@e866; docs/compiler-abi.md
+0x0000ee0c	read_record_ee0c	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000ee0c (77 bytes); Read a record through the 0xe95c byte/word readers.; callers f260@f2f6; docs/compiler-abi.md
+0x0000eefc	read_record_eefc	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000eefc (94 bytes); ; callers f314@f540; docs/compiler-abi.md
+0x0000efe8	read_record_efe8	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000efe8 (79 bytes); ; callers f038@f078; docs/compiler-abi.md
+0x0000f13c	read_record_f13c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000f13c (91 bytes); ; callers f198@f247; docs/compiler-abi.md
+0x000117d4	has_free_entry_117d4		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000117d4 (75 bytes); Is there an entry (0x2c bytes each, count word +4, array dword +0xa) with byte 0 clear * and byte +0x2b not 100?; callers 7bc40@7bd94; docs/compiler-abi.md
+0x00012ec8	sync_flag_12ec8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00012ec8 (80 bytes); Mirror byte 0x123790 with the flag at 0x121fb4 + 29*index.; callers 12160@12188; docs/compiler-abi.md
+0x000169b4	unit_in_state_169b4	EAX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000169b4 (79 bytes); ; callers 15af0@15b33,16034@16055; docs/compiler-abi.md
+0x00016ab4	record_kind_matches_16ab4	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00016ab4 (87 bytes); Active record whose kind byte +0x1c is one of a fixed set.; callers 15b7c@15c5d; docs/compiler-abi.md
+0x00017480	cell_blocked_17480	EAX:uint32_t,EDX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00017480 (71 bytes); ; callers 15b7c@15c87; docs/compiler-abi.md
+0x0001cd90	adjust_level_1cd90			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001cd90 (85 bytes); Adjust word 0x12b366 by the key flags and clamp it to 0x5a..0x7f.; callers 1cde8@1cfd0; docs/compiler-abi.md
+0x0001d3c4	select_tables_1d3c4	AX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001d3c4 (79 bytes); ; callers 8b39c@8b519; docs/compiler-abi.md
