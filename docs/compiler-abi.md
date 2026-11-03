@@ -1657,3 +1657,42 @@ in EAX, format string address, one value).
 | `0x41df4` | AL:uint8_t | EAX:uint32_t | 9a998@9aa20 | AL is 0x0b or 0x0c |
 | `0x41e0c` | AL:uint8_t | EAX:uint32_t | 41b98@41c78 | AL is 0x26 or 0x27 |
 | `0x41e84` | AL:uint8_t | EAX:uint32_t | 9a998@9aa5c | AL is 0, 0x16 or 2 |
+
+## mid_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x41ea0` | AL:uint8_t | EAX:uint32_t | 9a998@9a9fe | AL in {0,1,5,6,7} |
+| `0x41f00` | AL:uint8_t | EAX:uint32_t | 9a998@9a9e0 | AL in {2,3,0x18,0x19} |
+| `0x47ee4` | none | none | 47f48@47f93 | byte 0x126654=0, dword 0x126688=0x12665c |
+| `0x47f9c` | none | none | 47fbc@48015,77c18@77c22 | 0x46070; clear byte 0x126655 when high word of 0x12668e is 0xff |
+| `0x50d9c` | none | none | 50e84@50ebe | map bytes of 0x1a5968 through 0xe7835 until zero |
+| `0x55084` | EAX:ef_addr32 | none | 581b0@582b8 | filtered object word+0x18 = marker when record+3 equals marker |
+| `0x5511c` | EAX:ef_addr32 | none | 581b0@58336 | marshal record fields to 0x46454 (4 regs + 2 stack dwords) |
+| `0x55884` | EAX:ef_addr32 | none | 581b0@58428 | byte 0x1a5c32+23*record[1]=1 unless byte 0x1f9012; always 0x544c0 |
+| `0x56928` | EAX:ef_addr32 | none | 581b0@58368 | copy 3 dwords, 0x1d5f4(triple, high word +0xd) |
+| `0x56c90` | none | none | 56c7c@56c82 | packet 4e marker word then 0xa3f30 |
+| `0x56ed0` | none | none | 56e94@56ec7 | packet 33 marker word then 0xa3f30 |
+| `0x56d68` | EAX:ef_addr32 | none | 581b0@584af | when byte 0x1357c8 clear bit record[1] of word 0x1a662e |
+| `0x56fa8` | EAX:ef_addr32 | none | 581b0@584eb | words +1,+3,+5 to 0x12583c/3e/40 |
+| `0x56fe8` | none | none | 581b0@584fa | byte 0x1264e1=1 when marker is 0 |
+| `0x57670` | EAX:ef_addr32 | EAX:uint32_t | 581b0@58491 | filtered lookup word+1; tail 0x741f0 |
+| `0x5f8a8` | none | none | 5f60@5f89 | 0x9e508(high word obj+0x1e,0x24) for object from 0x1f71c8; clear byte 0x1a6d18 |
+| `0x65498` | EAX:ef_addr32 | EAX:uint32_t | 646d4@64d88 | dword +0x16 or dword 0x1a7c54 when null |
+| `0x70418` | none | EAX:uint32_t | 6c488@6c5cf | 0x6e390(byte obj+0x18c +2, 3) with obj dword 0x1f71bc |
+| `0x757b0` | EAX:uint32_t | EAX:uint32_t | 759b8@75bbf | zero becomes 1 |
+| `0x77950` | DX:uint16_t | EAX:uint32_t | 8748@8823,8748@8855,8748@88ec | 0xa1a90(sx DX, 0xa1a40()) unless null, 0 or 0xffff |
+| `0x80d20` | DX:int16_t | EAX:uint32_t | 80d40@80d4b | 0xa1a90(sx DX, 0xa1a40()) or 0 |
+| `0x77b20` | none | EAX:uint32_t | 779f4@77a1c | dword table 0x12a934[selector word / 0x666] |
+| `0x77b44` | none | EAX:uint32_t | 779f4@77a51 | dword table 0x12a9d4[selector word / 0x333] |
+| `0x77b68` | none | EAX:uint32_t | 779f4@77a60 | dword table 0x12ab14[selector word / 0x1c3] |
+| `0x77b8c` | none | EAX:uint32_t | 779f4@77a43 | dword table 0x12ad58[selector word / 0x1745] |
+| `0x77bb0` | none | EAX:uint32_t | 779f4@77a2a | dword table 0x12ad84[selector word / 0x3fff] |
+| `0x77c18` | none | none | 77c90@77ce7,77c90@77d02,77c90@77d2b | dword 0x12adf8=dword 0x126694 then 0x47f9c |
+| `0x7a298` | none | EAX:uint32_t | 3dd30@3e877 | tail 0x79ff0 with EAX=0x12af60 |
+| `0x7a454` | none | none | 3ea0c@3eeca | 0x7a9bc if dword 0x12afd0; clear 0x1f8ea0,0x12afd0; 0x12afc0=-1 |
+| `0x7a510` | none | EAX:uint32_t | 7a738@7a832 | tail 0xe2af4(dword 0x1f8e90) |
+| `0x7ccd0` | none | EAX:uint32_t | none direct | tail 0xb1a10 with EAX=0x1379bc |
+| `0x7e89c` | none | AL:uint8_t | 7e8c0@7e953,7e8c0@7eb1d | slot=high word 0x19bb5c; valid unless 0xff and 0x2c358 nonzero |
+| `0x7f6ac` | EAX:ef_addr32 | EAX:uint32_t | 7f6d8@7f744 | 0 when high word +0x16 > 7 or word +0x18 equals marker |
+| `0x803e8` | none | none | a8bd4@a8e5c | poll 0xd7594(0) until nonzero low byte when byte 0x15bac6 |

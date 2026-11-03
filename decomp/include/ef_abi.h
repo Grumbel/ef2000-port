@@ -561,4 +561,55 @@ void guest_fn_53270(void); /* 0x53270 */
 void guest_fn_8bd58(ef_addr32 first, ef_addr32 second); /* 0x8bd58 EAX/EDX */
 void guest_fn_49228(void); /* 0x49228 */
 
+/* mid_helpers.c */
+uint32_t code_is_0_1_5_6_7(uint8_t code); /* 0x41ea0 AL -> EAX */
+uint32_t code_is_2_3_18_19(uint8_t code); /* 0x41f00 AL -> EAX */
+void reset_pointer_126688(void); /* 0x47ee4 */
+void sync_scene_marker(void); /* 0x47f9c */
+void transform_string_1a5968(void); /* 0x50d9c */
+void mark_filtered_object(ef_addr32 record); /* 0x55084 EAX */
+void forward_record_to_46454(ef_addr32 record); /* 0x5511c EAX */
+void set_activity_record_flag(ef_addr32 record); /* 0x55884 EAX */
+void dispatch_event_triple(ef_addr32 record); /* 0x56928 EAX */
+void send_marker_word_packet_4e(void); /* 0x56c90 */
+void send_marker_word_packet_33(void); /* 0x56ed0 */
+void clear_flag_bit_1a662e(ef_addr32 record); /* 0x56d68 EAX */
+void copy_record_words_12583c(ef_addr32 record); /* 0x56fa8 EAX */
+void flag_marker_zero(void); /* 0x56fe8 */
+uint32_t forward_filtered_object(ef_addr32 record); /* 0x57670 EAX */
+void notify_selected_object(void); /* 0x5f8a8 */
+uint32_t record_field_16_or_default(ef_addr32 record); /* 0x65498 EAX */
+uint32_t forward_object_level(void); /* 0x70418 */
+uint32_t nonzero_or_one(uint32_t value); /* 0x757b0 EAX */
+uint32_t lookup_by_word_checked(uint16_t word); /* 0x77950 DX */
+uint32_t lookup_by_word(int16_t word); /* 0x80d20 DX */
+uint32_t random_table_77b20(void); /* 0x77b20 */
+uint32_t random_table_77b44(void); /* 0x77b44 */
+uint32_t random_table_77b68(void); /* 0x77b68 */
+uint32_t random_table_77b8c(void); /* 0x77b8c */
+uint32_t random_table_77bb0(void); /* 0x77bb0 */
+void copy_and_sync_scene_marker(void); /* 0x77c18 */
+uint32_t call_79ff0_12af60(void); /* 0x7a298 */
+void reset_sound_state_7a454(void); /* 0x7a454 */
+uint32_t forward_value_1f8e90(void); /* 0x7a510 */
+uint32_t call_b1a10_1379bc(void); /* 0x7ccd0 */
+uint8_t scene_slot_valid(void); /* 0x7e89c -> AL */
+uint32_t record_mismatches_marker(ef_addr32 record); /* 0x7f6ac EAX */
+void wait_for_event_803e8(void); /* 0x803e8 */
+void guest_fn_46070(void); /* 0x46070 */
+uint32_t guest_fn_e7835(uint32_t value); /* 0xe7835 EAX */
+void guest_fn_46454(int32_t a, int32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0x46454 EAX/EDX/EBX/ECX + 2 stack, callee cleanup */
+void guest_dispatch_event_triple(const uint32_t *triple, int32_t high_word); /* 0x1d5f4 EAX/EDX */
+void guest_fn_a3f30(void); /* 0xa3f30 */
+uint32_t guest_fn_741f0(ef_addr32 object); /* 0x741f0 EAX tail */
+void guest_fn_9e508(int32_t value, uint32_t selector); /* 0x9e508 EAX/EDX */
+uint32_t guest_fn_6e390(uint32_t level, uint32_t mode); /* 0x6e390 EAX/EDX */
+uint32_t guest_fn_a1a40(void); /* 0xa1a40 -> EAX */
+uint32_t guest_fn_a1a90(int32_t word, uint32_t base); /* 0xa1a90 EAX/EDX */
+uint32_t guest_fn_79ff0(uint32_t value); /* 0x79ff0 EAX tail */
+void guest_fn_7a9bc(void); /* 0x7a9bc */
+uint32_t guest_fn_b1a10(uint32_t value); /* 0xb1a10 EAX tail */
+uint32_t guest_fn_2c358(int32_t slot); /* 0x2c358 EAX -> AL */
+uint32_t guest_fn_d7594(uint32_t value); /* 0xd7594 EAX -> AL */
+
 #endif
