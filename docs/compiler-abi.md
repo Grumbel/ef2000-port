@@ -2613,7 +2613,7 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1f0c8` | none | none | 5f60@5f84 |  |
-| `0x2d894` | AX:int16_t,EDX:uint32_t,EBX:uint32_t | none | 2b1f4@2b2fe,2b1f4@2b358 | Store two words in the owner record and refresh it. |
+| `0x2d894` | AX:int16_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 2b1f4@2b2fe,2b1f4@2b358 | Store two words in the owner record and refresh it. |
 | `0x34a04` | none | none | 33630@33e6c |  |
 | `0x34a38` | none | none | 35590@35605 |  |
 | `0x34a68` | none | none | 35cfc@35d19 |  |
@@ -2687,3 +2687,11 @@ in EAX, format string address, one value).
 | `0xa4dd0` | EAX:ef_addr32 | EAX:ef_addr32 | 345e8@34739,34a98@34ad9 | Run a widget modally until its flag 4 is cleared. |
 | `0xa5484` | EAX:ef_addr32,DX:int16_t,BX:int16_t | none | a520c@a52cf,a520c@a5303,a54f0@a54fe | Move a widget, clamped to the screen unless flag 0x10 is set. |
 | `0xa570c` | EAX:ef_addr32,DL:uint8_t | none | 340a4@34132,34298@34319,34298@34343 | Toggle the child controls of kinds 5, 6, 0xd, 0xe and 0xf. |
+
+## runtime_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10710` | AX:uint16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t,[ESP+4]:uint16_t,[ESP+8]:uint8_t | none | 882b0@8833e | Store six parameters in the 0x197c24 block and mark it valid. |
+| `0xa5b1c` | EAX:ef_addr32,EDX:uint32_t,BX:uint16_t,CX:uint16_t,[ESP+4]:uint16_t | none | 41314@413a5,4b1f0@4b2ce,69bdc@69c7c | Store four parameters in a widget and redraw it when visible. |
+| `0xd9ba0` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | EAX:uint32_t | 93e58@93e89,94000@94031 | Mouse-style call 0x33 (entry value ORed with 0x70); results through four pointers. |

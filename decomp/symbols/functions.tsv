@@ -233,7 +233,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00010688	32	elapsed_ticks	low_helpers	compiles	game	confirmed	decomp/tests/0x00010688.json	docs/compiler-abi.md; 0x10640; return 0x197c14 - 0x197c10 and latch; callers 53270@5327c; guest pending
 0x000106a8	1			unknown	unclassified	unverified		
 0x000106b0	94	pack_runtime_position	runtime_small_ops	compiles	game	confirmed	decomp/tests/0x00106b0.json	Floor /2048 and signed 16-bit centered residuals, stack byte; callers 9114@92a6/15b7c@15fbc; guest pending
-0x00010710	61			unknown	unclassified	unverified		
+0x00010710	61	store_params_10710	runtime_helpers9	compiles	game	confirmed	decomp/tests/0x00010710.json	docs/compiler-abi.md; Store six parameters in the 0x197c24 block and mark it valid.; callers 882b0@8833e; guest pending
 0x00010750	843			unknown	unclassified	unverified		
 0x00010a9c	1163			unknown	unclassified	unverified		
 0x00010f28	71	transform_runtime_word_pair	runtime_small_ops	compiles	game	confirmed	decomp/tests/0x0010f28.json	AX mode 1/2/3 rotates and negates two words; callers 10f70@10fb5/11014@11092; guest pending
@@ -2266,7 +2266,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a59d8	144	init_entities_a59d8	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a59d8.json	docs/compiler-abi.md; Run the per-object initialisation steps once for every entity (1..word 0x41eed8).; callers f819c@f8239; guest pending
 0x000a5a68	84	update_entities_a5a68	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a5a68.json	docs/compiler-abi.md; ; callers a499c@a4a13; guest pending
 0x000a5abc	95			unknown	unclassified	unverified		
-0x000a5b1c	60			unknown	unclassified	unverified		
+0x000a5b1c	60	set_widget_params_a5b1c	runtime_helpers9	compiles	game	confirmed	decomp/tests/0x000a5b1c.json	docs/compiler-abi.md; Store four parameters in a widget and redraw it when visible.; callers 41314@413a5,4b1f0@4b2ce,69bdc@69c7c; guest pending
 0x000a5b70	306			unknown	unclassified	unverified		
 0x000a5ca4	596			unknown	unclassified	unverified		
 0x000a5ef8	285			unknown	unclassified	unverified		
@@ -3130,7 +3130,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d86e0	2296			unknown	unclassified	unverified		
 0x000d8fd8	1243			unknown	unclassified	unverified		
 0x000d9b30	112			unknown	unclassified	unverified		
-0x000d9ba0	106			unknown	unclassified	unverified		
+0x000d9ba0	106	query_device_d9ba0	runtime_helpers9	compiles	game	confirmed	decomp/tests/0x000d9ba0.json	docs/compiler-abi.md; Mouse-style call 0x33 (entry value ORed with 0x70); results through four pointers.; callers 93e58@93e89,94000@94031; guest pending
 0x000d9c30	129			unknown	unclassified	unverified		
 0x000d9cb4	256			unknown	unclassified	unverified		
 0x000d9dc0	139			unknown	unclassified	unverified		

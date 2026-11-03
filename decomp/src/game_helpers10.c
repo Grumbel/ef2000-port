@@ -16,15 +16,15 @@ void load_resource_1f0c8(void)
 }
 
 /* 0x2d894, 54 bytes. Store two words in the owner record and refresh it. */
-void set_owner_pair_2d894(int16_t owner, uint32_t first, uint32_t second)
+void set_owner_pair_2d894(int16_t owner, uint32_t stack_first, uint32_t stack_second)
 {
     ef_addr32 record;
 
     if ((int32_t)owner == 0xff)
         return;
     record = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)owner * 0xca);
-    EF_U32(record + 0xc1u) = first;
-    EF_U32(record + 0xc5u) = second;
+    EF_U32(record + 0xc1u) = stack_first;
+    EF_U32(record + 0xc5u) = stack_second;
     guest_fn_2da54((int32_t)owner);
 }
 

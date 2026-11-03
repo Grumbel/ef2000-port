@@ -1855,7 +1855,7 @@ uint32_t guest_fn_d70a0(uint32_t value); /* 0xd70a0 AL -> AL */
 
 /* game_helpers10.c */
 void load_resource_1f0c8(void);
-void set_owner_pair_2d894(int16_t owner, uint32_t first, uint32_t second);
+void set_owner_pair_2d894(int16_t owner, uint32_t stack_first, uint32_t stack_second);
 void show_status_34a04(void);
 void show_status_34a38(void);
 void show_status_34a68(void);
@@ -1926,6 +1926,20 @@ ef_addr32 find_registered_a4678(ef_addr32 key);
 ef_addr32 run_widget_a4dd0(ef_addr32 widget);
 void move_widget_a5484(ef_addr32 widget, int16_t x, int16_t y);
 void toggle_children_a570c(ef_addr32 widget, uint8_t state);
+void guest_fn_a32e8(uint32_t entry); /* 0xa32e8 EAX */
+void guest_fn_a334c(uint32_t entry); /* 0xa334c EAX */
+void guest_fn_a3824(uint32_t entry); /* 0xa3824 EAX */
+void guest_fn_ac5f8(uint32_t value); /* 0xac5f8 EAX */
+void guest_fn_ac9e8(void); /* 0xac9e8 */
+void guest_fn_a51dc(ef_addr32 widget); /* 0xa51dc EAX */
+void guest_fn_a739c(ef_addr32 widget, uint32_t state); /* 0xa739c EAX/EDX */
+void guest_fn_a56f8(ef_addr32 widget); /* 0xa56f8 EAX */
+void guest_fn_a6038(void); /* 0xa6038 */
+
+/* runtime_helpers9.c */
+void store_params_10710(uint16_t a, uint16_t b, uint16_t c, uint16_t d, uint16_t stack_e, uint8_t stack_f);
+void set_widget_params_a5b1c(ef_addr32 widget, uint32_t a, uint16_t b, uint16_t c, uint16_t stack_d);
+uint32_t query_device_d9ba0(uint32_t code, uint32_t arg, ef_addr32 out_a, ef_addr32 out_b, ef_addr32 stack_out_c, ef_addr32 stack_out_d);
 void guest_fn_a32e8(uint32_t entry); /* 0xa32e8 EAX */
 void guest_fn_a334c(uint32_t entry); /* 0xa334c EAX */
 void guest_fn_a3824(uint32_t entry); /* 0xa3824 EAX */
