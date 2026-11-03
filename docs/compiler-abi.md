@@ -2783,3 +2783,12 @@ in EAX, format string address, one value).
 | `0x8c930` | AX:int16_t | EAX:uint32_t | 8c49c@8c919 | Select the page slot for a page id, or 0 when the page table lacks it. |
 | `0x8e5f0` | EAX:ef_addr32 | none | 8e664@8e909 | Draw a record: low records use the primary routine, deeper ones the offset one. |
 | `0x8f9e8` | none | none | 3ea0c@3ee32 | Install the table of nine handler addresses at 0x158f4c. |
+
+## game_helpers22 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8fa84` | none | none | 3dd30@3de15 | Clear ten 24-byte menu entries and load their string handles. |
+| `0x8fd70` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32 | none | 8fe58@8fe71 | Build a path from the default directory and three parts. |
+| `0x97464` | none | none | 3dd30@3e14f | Walk the 0x4e-byte chain of records from 0x12dc74 and draw those of depth >= 2. |
+| `0x97a4c` | none | none | 3dd30@3de0b | Load two string handles and reset the chain head. |

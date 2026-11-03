@@ -2039,4 +2039,12 @@ uint32_t guest_fn_8fdf0(int32_t value); /* 0x8fdf0 EAX -> EAX */
 void guest_fn_8e664(uint32_t x, uint32_t y, uint32_t z); /* 0x8e664 EAX/EDX/EBX */
 void guest_fn_9e094(int32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0x9e094 EAX/EDX/EBX/ECX/stack, ret 4 */
 
+/* game_helpers22.c */
+void init_menu_entries_8fa84(void);
+void build_path_8fd70(ef_addr32 buffer, ef_addr32 first, ef_addr32 second, ef_addr32 third);
+void draw_chain_97464(void);
+void init_chain_97a4c(void);
+void guest_fn_978e8(ef_addr32 record); /* 0x978e8 EAX */
+void guest_fn_974b8(void); /* 0x974b8 */
+
 #endif

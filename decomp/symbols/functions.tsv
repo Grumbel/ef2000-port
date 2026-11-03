@@ -1843,11 +1843,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008f930	181			unknown	unclassified	unverified		
 0x0008f9e8	111	install_handlers_8f9e8	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008f9e8.json	docs/compiler-abi.md; Install the table of nine handler addresses at 0x158f4c.; callers 3ea0c@3ee32; guest pending
 0x0008fa58	43	convert_navigation_vector	vector_math	compiles	game	confirmed	decomp/tests/0x0008fa58.json	docs/compiler-abi.md; Int32[8,0,4] to double[0,8,16] with unaligned 0x18aa0b/13 scales; x87 precision pending; awaiting OMF guest differential
-0x0008fa84	60			unknown	unclassified	unverified		
+0x0008fa84	60	init_menu_entries_8fa84	game_helpers22	compiles	game	confirmed	decomp/tests/0x0008fa84.json	docs/compiler-abi.md; Clear ten 24-byte menu entries and load their string handles.; callers 3dd30@3de15; guest pending
 0x0008fbc8	91			unknown	unclassified	unverified		
 0x0008fc24	180			unknown	unclassified	unverified		
 0x0008fcec	130			unknown	unclassified	unverified		
-0x0008fd70	55			unknown	unclassified	unverified		
+0x0008fd70	55	build_path_8fd70	game_helpers22	compiles	game	confirmed	decomp/tests/0x0008fd70.json	docs/compiler-abi.md; Build a path from the default directory and three parts.; callers 8fe58@8fe71; guest pending
 0x0008fdb8	56			unknown	unclassified	unverified		
 0x0008fdf0	64			unknown	unclassified	unverified		
 0x0008fe30	39	clear_blocks_8fe30	scene_helpers	compiles	game	confirmed	decomp/tests/0x0008fe30.json	docs/compiler-abi.md; 0xb3fb0(0x211ac8,0,4) and (0x211a00,0,0xc8); callers 8fe58@8fe5e; guest pending
@@ -1948,7 +1948,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00095bf4	313			unknown	unclassified	unverified		
 0x00095e58	4618			unknown	unclassified	unverified		
 0x00097064	620			unknown	unclassified	unverified		
-0x00097464	81			unknown	unclassified	unverified		
+0x00097464	81	draw_chain_97464	game_helpers22	compiles	game	confirmed	decomp/tests/0x00097464.json	docs/compiler-abi.md; Walk the 0x4e-byte chain of records from 0x12dc74 and draw those of depth >= 2.; callers 3dd30@3e14f; guest pending
 0x000974b8	121			unknown	unclassified	unverified		
 0x00097534	163			unknown	unclassified	unverified		
 0x000975f0	363			unknown	unclassified	unverified		
@@ -1959,7 +1959,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00097914	59			unknown	unclassified	unverified		
 0x00097950	118			unknown	unclassified	unverified		
 0x000979c8	129			unknown	unclassified	unverified		
-0x00097a4c	69			unknown	unclassified	unverified		
+0x00097a4c	69	init_chain_97a4c	game_helpers22	compiles	game	confirmed	decomp/tests/0x00097a4c.json	docs/compiler-abi.md; Load two string handles and reset the chain head.; callers 3dd30@3de0b; guest pending
 0x00097a94	131			unknown	unclassified	unverified		
 0x00097b18	71			unknown	unclassified	unverified		
 0x00097ca8	102			unknown	unclassified	unverified		

@@ -1212,3 +1212,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0008c930	select_slot_8c930	AX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008c930 (52 bytes); Select the page slot for a page id, or 0 when the page table lacks it.; callers 8c49c@8c919; docs/compiler-abi.md
 0x0008e5f0	draw_record_8e5f0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008e5f0 (115 bytes); Draw a record: low records use the primary routine, deeper ones the offset one.; callers 8e664@8e909; docs/compiler-abi.md
 0x0008f9e8	install_handlers_8f9e8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008f9e8 (111 bytes); Install the table of nine handler addresses at 0x158f4c.; callers 3ea0c@3ee32; docs/compiler-abi.md
+0x0008fa84	init_menu_entries_8fa84			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008fa84 (60 bytes); Clear ten 24-byte menu entries and load their string handles.; callers 3dd30@3de15; docs/compiler-abi.md
+0x0008fd70	build_path_8fd70	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008fd70 (55 bytes); Build a path from the default directory and three parts.; callers 8fe58@8fe71; docs/compiler-abi.md
+0x00097464	draw_chain_97464			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00097464 (81 bytes); Walk the 0x4e-byte chain of records from 0x12dc74 and draw those of depth >= 2.; callers 3dd30@3e14f; docs/compiler-abi.md
+0x00097a4c	init_chain_97a4c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00097a4c (69 bytes); Load two string handles and reset the chain head.; callers 3dd30@3de0b; docs/compiler-abi.md
