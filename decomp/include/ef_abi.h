@@ -1814,4 +1814,22 @@ void guest_fn_2b558(int32_t unit); /* 0x2b558 EAX */
 void guest_fn_33630(void); /* 0x33630 */
 void guest_fn_a520c(ef_addr32 button, int32_t value, uint32_t mode, uint32_t flag); /* 0xa520c EAX/EDX/EBX/ECX */
 
+/* game_helpers8.c */
+void read_line_3c558(void);
+void store_plane_pixel_3c94c(int16_t row, int16_t column, int16_t value);
+void draw_grid_3d904(void);
+uint8_t all_entries_ready_3da24(void);
+void reset_words_45694(void);
+void reset_tables_45ba0(void);
+void retire_entries_46128(ef_addr32 object);
+int32_t max_difference_50770(void);
+void release_slot_55784(ef_addr32 message);
+void apply_action_55b80(ef_addr32 message);
+void bump_counter_562d8(uint32_t key, int16_t slot);
+void guest_fn_ceccc(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e); /* 0xceccc EAX/EDX/EBX/ECX/stack */
+uint32_t guest_fn_a0e98(int32_t id); /* 0xa0e98 EAX -> AL */
+ef_addr32 guest_fn_bfcfc(ef_addr32 a, ef_addr32 b); /* 0xbfcfc EAX/EDX -> EAX */
+void guest_fn_2b708(int32_t unit); /* 0x2b708 EAX */
+void guest_fn_8873c(int32_t a, ef_addr32 unit, uint32_t c, ef_addr32 target); /* 0x8873c EAX/EDX/EBX/ECX */
+
 #endif

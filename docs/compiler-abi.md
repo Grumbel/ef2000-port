@@ -2572,3 +2572,19 @@ in EAX, format string address, one value).
 | `0x369ac` | none | none | 36ad8@36ce1 |  |
 | `0x38674` | AX:int16_t | EAX:int32_t | 15b7c@15c97,15b7c@15cc4,15b7c@15da6 | Number of live, non-flagged objects in the ten word slots of entry index. |
 | `0x386f8` | AX:int16_t | EAX:uint32_t | d290@d4ca | Position of the entry's node in its list. |
+
+## game_helpers8 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3c558` | none | none | 3c5b8@3c5bd,3c5b8@3c5f9,3c5b8@3c611 | Copy the next CR-terminated line from the input buffer to 0x1a2df0. |
+| `0x3c94c` | AX:int16_t,DX:int16_t,BX:int16_t | none | 3cc94@3ccd9 | Store a 16-bit value split over two byte planes at (row, 0x18f - column). |
+| `0x3d904` | none | none | 3dd30@3e458 | Draw the 16x16 grid of 10x10 cells. |
+| `0x3da24` | none | AL:uint8_t | none direct | Are all entries of the table at 0x12b268 satisfied? |
+| `0x45694` | none | none | bfcc@c0cd |  |
+| `0x45ba0` | none | none | 3dd30@3ddd7,46038@46039 | Reset the 10-entry id table and the four 0x190-byte pages. |
+| `0x46128` | EAX:ef_addr32 | none | 8d59c@8d708 | Retire the entries of the 9-slot table that belong to object. |
+| `0x50770` | none | EAX:int32_t | ba5c@bbe1,bfcc@c4ea,d628@d640 | Largest (second - first) byte difference over the list at 0x137988. |
+| `0x55784` | EAX:ef_addr32 | none | 581b0@58602 | Release a unit's slot if it still refers to the unit's target. |
+| `0x55b80` | EAX:ef_addr32 | none | 581b0@5859b |  |
+| `0x562d8` | EAX:uint32_t,DX:int16_t | none | 561e4@56200 | Bump the per-slot counter of the first record whose key equals value. |

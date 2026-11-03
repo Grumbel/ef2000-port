@@ -1091,3 +1091,14 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000369ac	set_buttons_369ac			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000369ac (77 bytes); ; callers 36ad8@36ce1; docs/compiler-abi.md
 0x00038674	count_live_38674	AX:int16_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00038674 (97 bytes); Number of live, non-flagged objects in the ten word slots of entry index.; callers 15b7c@15c97,15b7c@15cc4,15b7c@15da6; docs/compiler-abi.md
 0x000386f8	node_position_386f8	AX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000386f8 (80 bytes); Position of the entry's node in its list.; callers d290@d4ca; docs/compiler-abi.md
+0x0003c558	read_line_3c558			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003c558 (93 bytes); Copy the next CR-terminated line from the input buffer to 0x1a2df0.; callers 3c5b8@3c5bd,3c5b8@3c5f9,3c5b8@3c611; docs/compiler-abi.md
+0x0003c94c	store_plane_pixel_3c94c	AX:int16_t,DX:int16_t,BX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003c94c (69 bytes); Store a 16-bit value split over two byte planes at (row, 0x18f - column).; callers 3cc94@3ccd9; docs/compiler-abi.md
+0x0003d904	draw_grid_3d904			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003d904 (73 bytes); Draw the 16x16 grid of 10x10 cells.; callers 3dd30@3e458; docs/compiler-abi.md
+0x0003da24	all_entries_ready_3da24		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003da24 (92 bytes); Are all entries of the table at 0x12b268 satisfied?; callers none direct; docs/compiler-abi.md
+0x00045694	reset_words_45694			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00045694 (82 bytes); ; callers bfcc@c0cd; docs/compiler-abi.md
+0x00045ba0	reset_tables_45ba0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00045ba0 (91 bytes); Reset the 10-entry id table and the four 0x190-byte pages.; callers 3dd30@3ddd7,46038@46039; docs/compiler-abi.md
+0x00046128	retire_entries_46128	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00046128 (64 bytes); Retire the entries of the 9-slot table that belong to object.; callers 8d59c@8d708; docs/compiler-abi.md
+0x00050770	max_difference_50770		EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00050770 (106 bytes); Largest (second - first) byte difference over the list at 0x137988.; callers ba5c@bbe1,bfcc@c4ea,d628@d640; docs/compiler-abi.md
+0x00055784	release_slot_55784	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055784 (97 bytes); Release a unit's slot if it still refers to the unit's target.; callers 581b0@58602; docs/compiler-abi.md
+0x00055b80	apply_action_55b80	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055b80 (79 bytes); ; callers 581b0@5859b; docs/compiler-abi.md
+0x000562d8	bump_counter_562d8	EAX:uint32_t,DX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000562d8 (61 bytes); Bump the per-slot counter of the first record whose key equals value.; callers 561e4@56200; docs/compiler-abi.md
