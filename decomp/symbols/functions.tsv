@@ -360,8 +360,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000233c4	920			unknown	unclassified	unverified		
 0x00023760	48	position_delta_metric	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX pointer to 3 dwords produces signed metric
 0x000237c8	48			unknown	unclassified	unverified		
-0x00023800	160			unknown	unclassified	unverified		
-0x000238a0	31			unknown	unclassified	unverified		
+0x00023800	160	check_current_object_relation	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AL-only predicate on global object slot and linked records
+0x000238a0	31	sync_current_object_slot	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; conditionally copies current object word +0x158 to +0x146
 0x000238c0	161			unknown	unclassified	unverified		
 0x000239ac	1128			unknown	unclassified	unverified		
 0x00024074	577			unknown	unclassified	unverified		
@@ -2443,8 +2443,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000acfb8	1158			unknown	unclassified	unverified		
 0x000ad440	81			unknown	unclassified	unverified		
 0x000afc5c	902			unknown	unclassified	unverified		
-0x000b0018	184			unknown	unclassified	unverified		
-0x000b00d0	103			unknown	unclassified	unverified		
+0x000b0018	184	allocate_weighted_node_records	unk_records	typed	game	confirmed		docs/compiler-abi.md; linked node +0x4f weights, 0x36-byte allocation elements
+0x000b00d0	103	allocate_tagged_node_records	unk_records	typed	game	confirmed		docs/compiler-abi.md; linked node +0x09/+0x12 tags, 0x36-byte allocation elements
 0x000b0138	208			unknown	unclassified	unverified		
 0x000b0208	47	list_has_matching_node	unk_records	typed	game	confirmed		docs/compiler-abi.md; EAX head-pointer address; BL/DL predicates; EAX Boolean result
 0x000b0238	110			unknown	unclassified	unverified		

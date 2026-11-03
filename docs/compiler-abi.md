@@ -195,6 +195,47 @@ signed EAX to `0x5000`. The exact numerical metric is not named as Euclidean
 distance: its `0xb39ec` implementation uses integer arithmetic and still
 needs a differential test.
 
+`check_current_object_relation` (`0x23800`) is a zero-argument predicate
+over the record addressed by global `0x1f71bc`. It resolves a 16-bit index
+from record offset `+0x156` through `0x7489c`, compares an object field
+`+0x146` with a global index at `0x1f71c6`, and compares signed indices
+into the `0xca`-byte-stride table at `0x19bb58`. Its final acceptance test
+uses flags `0x02`, `0x04`, `0x08` at object `+0x24` and may call `0x7574c`.
+Every exit sets AL to 0 or 1; the other bytes of EAX are not a Boolean
+result. Distinct callers `0x257d0` at `0x25a97` and `0x25c98` at
+`0x25e8e` branch on `test al,al` and pass no arguments. All other GPRs
+are preserved; no stack arguments, callee cleanup or segment overrides.
+
+`sync_current_object_slot` (`0x238a0`) calls that predicate. On success it
+copies the word at `+0x158` to `+0x146` in the record pointed to by
+`0x1f71bc`. Callers `0x257d0` at `0x25aa0` and `0x25c98` at `0x26000`
+ignore its EAX scratch result, so its *contract* is void. It saves EDX;
+the called predicate preserves the remaining GPRs other than EAX. No
+stack/segment special case. These two signatures are ABI-only: the indirect
+object and table data layouts still require reconstruction.
+
+`allocate_weighted_node_records` (`0xb0018`) takes EAX pointing to a
+linked-list head pointer and EDX pointing to a writable 32-bit record count.
+It traverses `next` at node `+0x04`, accumulating half the signed high word
+of a dword at `+0x4f`; a zero count is replaced with 2,000. It allocates
+storage for records of stride `0x36`, initializes their three terminal
+16-bit fields (`+0x30`, `+0x32`, `+0x34`) to `0xffff`, and returns the
+allocation in EAX, or zero if there is no positive count. Distinct callers
+`0xb1e0` at `0xb28c` and `0xba5c` at `0xbb5e` store EAX as the new table
+pointer. EBX/ECX/ESI/EDI/EBP are preserved across the full call chain;
+EDX is scratch. The calls to `0xcc6c0` and `0xb3fb0` pass their own
+arguments, not arguments inherited from this function's stack.
+
+`allocate_tagged_node_records` (`0xb00d0`) takes the same EAX/EDX
+pointer roles, traverses `next` at `+0x04`, and sums byte `+0x12` only
+for nodes whose byte `+0x09` is zero or one. It adds 50 records, allocates
+another `0x36`-byte-stride table, stores the total at the pointer in EDX,
+zeros global `0x1379b4`, and returns the allocation in EAX. Distinct
+callers `0xba5c` at `0xbb7c` and `0xbfcc` at `0xc4c8` store returned EAX
+to `0x1379c0`. EBX/ECX/ESI/EDI/EBP preserved, EDX not promised;
+no stack arguments or callee cleanup. These are **allocation contracts**,
+not a proof that the `0x36`-byte record has natural or one-byte alignment.
+
 `strlen_ds` (`0xb1b8b`) implements a NUL-terminated byte scan: it accepts
 EAX as the string address and returns the length in EAX, with no stack
 arguments. It preserves ECX/EDI, other general registers, and the original
@@ -297,6 +338,35 @@ and reloads EAX from its preserved input. Interrupt-side clobbers and
 descriptor semantics still need explicit verification before assigning a
 full signature or porting it to host C.
 
+`0x1204dc` uses a **three-dword stack-argument** contract with `ret 12`,
+not Watcom register passing. With its prologue saves and eight-byte local
+area included, the source 64-bit floating bit-pattern is at `[esp+0x14]
+and `[esp+0x18]`, and a destination pointer is at `[esp+0x1c]`. The
+routine tests a double exponent for the all-one pattern, writes a selected
+fixed message (optionally prefixed by `-`) to that destination, and returns
+EAX=1 if handled, EAX=0 otherwise. Callers `0x11d3f0` at `0x11d40c` and
+`0x120560` at `0x12058c` push precisely three dwords and test EAX for
+success without further stack adjustment. EBX/EDX are explicitly saved;
+the remaining GPRs are untouched. The 64-bit source is passed as **two
+stack dwords**, not as ST(0), so the x87-candidate label was only a
+sampling heuristic. Pending stack-location support in the annotation
+importer and a justified Watcom `#pragma aux` declaration.
+
+`0x15c071` receives an output pointer in EBX, an integer denominator from
+the **signed upper word** of ECX, and fixed-point coordinate values from
+ESI and EDI. It writes two 16-bit coordinates to `[EBX]` and `[EBX+2]`
+and returns EAX=1 only if the denominator is between 16 and 20,000;
+otherwise it writes `0xffffffff` and returns EAX=0. Its two distinct
+callers are the stack adapters `0x15c0c4` at `0x15c0df` and `0x15c0ea`
+at `0x15c105`. Both adapters first invoke arithmetic at `0xc474c` or
+`0xc4755`, which supplies EBP/ESI/EDI intermediate results; they move
+EBP into ECX before restoring their frame pointer and set EBX from the
+fourth stack argument. Therefore **ECX is not simply the original first
+stack argument**, and treating this routine as ordinary `__watcall` would
+lose a nonstandard return convention. No inner stack arguments or cleanup;
+EAX/ECX/EDX clobbered, EBX/ESI/EDI/EBP preserved. Reviewed as an ABI
+exception pending an explicit compiler declaration and adapter model.
+
 ## Comparing assembly
 
 ```sh
@@ -332,9 +402,10 @@ noncontiguous: the window is a diagnostic aid, not an exact body export.
    statuses for matching entry/shape rows; `--reset-status` clears them.
 2. Confirm inputs, outputs, preserved registers, stack cleanup, x87 state
    and segment assumptions from disassembly and at least two callers each.
-   Eleven of the forty candidates now have confirmed ABI rows (four object
+   Fifteen of the forty candidates now have confirmed ABI rows (four object
    routines, two void helpers, a pointer lookup, a linked-list search,
-   a scalar metric wrapper, a string scan and a command token parser);
+   a scalar metric wrapper, a string scan, a command token parser, plus
+   the current-object relation/slot pair and two linked-list allocators);
    exceptions and partial reviews remain separate from complete signatures.
 3. Record confirmed signatures in `decomp/symbols/signatures.tsv`, adding
    `#pragma aux` declarations only when justified by evidence.

@@ -370,10 +370,12 @@ worksheet, `0x6a1b4` and `0xb0208` have confirmed register signatures,
 object/matrix routines (`0x6a354`, `0x6a394`, `0x6a4c4`, `0x6a538`) have
 reviewed register/memory-only signatures. Three more cross-region routines
 (`0x23760`, `0xb1b8b`, `0xf46cc`) have confirmed scalar/string/command-token
-ABIs; eleven of forty sampled functions are confirmed. Documented
-ABI exceptions include ST(0) return with `ret 8` (`0xf8250`), ES:[EDI]
-memory writes (`0x120a52`), stack-based `ret 16` (`0x15c0c4`), and segment/
-interrupt bridges (`0xee43c`, `0x120451`).
+ABIs; the current-object relation/slot pair at `0x23800` and `0x238a0`
+and the linked-list allocation pair (`0xb0018`, `0xb00d0`) bring the
+worksheet to fifteen of forty confirmed. Documented ABI exceptions include
+ST(0) return with `ret 8` (`0xf8250`), ES:[EDI] memory writes (`0x120a52`),
+stack-based `ret 16` (`0x15c0c4`), stack-based `ret 12` (`0x1204dc`), and
+segment/interrupt bridges (`0xee43c`, `0x120451`).
 
 ### 3.6 [ ] Library identification
 
@@ -793,6 +795,8 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Chose OW 2.0 first-pass flags (-3r/-zp1/-fpi87/-fp3/-ob/-ot/-s); high-score packed record and Ghidra packing checks added.
 2026-11-03  3.5   Confirmed four object helpers: AX-only flag mutations at 0x6a354/0x6a394 and BX-indexed x87 matrix/transpose vector writes at 0x6a4c4/0x6a538.
 2026-11-03  3.5   Confirmed EAX-pointer metric 0x23760, DS-to-ES strlen 0xb1b8b (requires DF clear), and global token parser 0xf46cc; reviewed two segment/interrupt exceptions.
+2026-11-03  3.5   Confirmed AL-only global object relation predicate 0x23800 and void slot-sync wrapper 0x238a0, with two distinct callers apiece.
+2026-11-03  3.5   Confirmed 0xb0018/0xb00d0 EAX/EDX pointer-to-list/count allocators and 0x36-byte table stride; audited nonstandard ret 12 formatter 0x1204dc and EBX/ECX/ESI/EDI projection helper 0x15c071.
 ```
 
 ---
