@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 {
   description = "EF2000 Linux original-code main-menu port and reverse-engineering tools";
@@ -22,7 +22,7 @@
       source = lib.fileset.toSource {
         root = ./.;
         fileset = lib.fileset.unions [
-          ./runtime ./tools ./tests ./probes ./docs ./data ./dev ./CMakeLists.txt ./README.md
+          ./runtime ./tools ./tests ./probes ./docs ./data ./dev ./decomp ./CMakeLists.txt ./README.md
           ./VERSION ./LICENSES ./REUSE.toml ./TODO.md ./.gitignore ./flake.nix ./flake.lock
         ];
       };
@@ -183,6 +183,7 @@
           cp VERSION "$out/libexec/ef2000/"
           cp -r docs README.md TODO.md VERSION "$out/share/doc/ef2000/"
           cp LICENSES/GPL-3.0-or-later.txt "$out/share/licenses/ef2000/"
+          cp LICENSES/GPL-3.0-linking-exception.txt "$out/share/licenses/ef2000/"
           cp LICENSES/CC0-1.0.txt "$out/share/licenses/ef2000/"
           cp data/ef2000.desktop "$out/share/applications/ef2000.desktop"
           cp data/io.github.grumbel.ef2000.metainfo.xml \

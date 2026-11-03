@@ -1,5 +1,5 @@
 <!-- SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com> -->
-<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception -->
 <!-- Experimental guest-specific model: EAX, EDX, EBX, ECX argument priority. -->
 <!-- Not an authoritative model of every Open Watcom X-32 routine. -->
 <prototype name="__ef2000_aedb" extrapop="unknown" stackshift="4">

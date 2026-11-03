@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 """Import the pinned EF2000 X-32 image into Ghidra and decompile guest offsets.
 

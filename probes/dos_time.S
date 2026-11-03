@@ -1,5 +1,5 @@
 /* SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
  */
 
 /* Disposable-copy entry hook. Four AH=2Ch samples with sentinel registers and

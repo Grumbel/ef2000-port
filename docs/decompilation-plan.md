@@ -196,11 +196,14 @@ decomp/
   build/               # (ignored) OpenWatcom outputs
 ```
 
-- Add a REUSE annotation for `decomp/**` with a `LicenseRef-EF2000-Derived`
-  identifier and a `LICENSES/LicenseRef-EF2000-Derived.txt` explaining the
-  status. **Ask the repository owner** to confirm before the first commit of
-  recovered code; until confirmed, keep `decomp/src/` content uncommitted in a
-  local branch.
+- Licensing is in place (2026-11-03): `decomp/**` is annotated in
+  `REUSE.toml` as `LicenseRef-EF2000-Derived`
+  (`LICENSES/LicenseRef-EF2000-Derived.txt`), and all GPL code carries
+  `GPL-3.0-or-later WITH GPL-3.0-linking-exception`, which permits combining
+  it with `decomp/`. Give every new file in `decomp/` the
+  `LicenseRef-EF2000-Derived` header and every new host-side file the GPL
+  expression with the exception. Do not publish or push `decomp/` content
+  anywhere on your own initiative; pushing is the owner's decision.
 - Module naming: use original file names from assert/error strings when the
   function's evidence links it to that string. Otherwise use
   `src/unk_<subsystem>.c` and rename later.

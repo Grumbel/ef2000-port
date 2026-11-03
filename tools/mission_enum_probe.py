@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 """Recover EF2000 mission token-to-enum tables from the pinned X-32 payload.
 

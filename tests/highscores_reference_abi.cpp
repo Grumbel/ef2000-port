@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 // Test-only C ABI for byte-identical guest/native differential comparisons.
 // Never exposed as a game runtime or stored as part of the shipped package.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 """Read EF2000 DOS DID.DAT / DID1ST.DAT hashed archive indices.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 """Extract the small two-row symbol strip from TACTCOM's font specimen.
 

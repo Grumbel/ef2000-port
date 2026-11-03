@@ -754,15 +754,27 @@ assets; original-file integration tests run explicitly outside the Nix build.
 
 ## License and continuity
 
-New port code and documentation are GPL-3.0-or-later; see
-[LICENSES/GPL-3.0-or-later.txt](LICENSES/GPL-3.0-or-later.txt) and `REUSE.toml`.
-Original game executables and data remain external and retain their own rights.
+The project has three licensing layers, tracked per file with REUSE
+(`REUSE.toml` and SPDX headers):
+
+| Part | License |
+| --- | --- |
+| Port, harness, tools, tests and documentation | GPL-3.0-or-later **with a linking exception** ([GPL text](LICENSES/GPL-3.0-or-later.txt), [exception](LICENSES/GPL-3.0-linking-exception.txt)) |
+| Recovered game source in `decomp/` | [EF2000-Derived Source Notice](LICENSES/LicenseRef-EF2000-Derived.txt): **not GPL**; derived from the original program, whose rights stay with its holders; no license to the original is granted |
+| Original game executables, data, art, sound and music | Not part of this repository; they keep their own rights and must come from your own copy of EF2000 |
+
+The GPL section 7 exception allows the GPL code to be linked or combined with
+the `decomp/` sources and the result to be conveyed, provided the
+`decomp/` source accompanies it. It grants nothing for the original game.
+Never commit original assets, executable bytes or Ghidra pseudo-C; see
+[the decompilation plan](docs/decompilation-plan.md).
 Read [TODO.md](TODO.md) for the current stopping point, validation limits, next
 steps, and the incremental adoption of the gamepkgstd Linux conventions.
 
 ## Documentation
 
 - [Port architecture and milestones](docs/port-plan.md)
+- [Decompilation and modernization plan](docs/decompilation-plan.md)
 - [Executable and startup findings](docs/executable.md)
 - [Recovered loader and image layout](docs/loader.md)
 - [Headless Ghidra import and decompilation workflow](docs/ghidra.md)

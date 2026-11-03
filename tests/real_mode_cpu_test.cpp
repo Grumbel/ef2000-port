@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 #include "../runtime/real_mode_cpu.hpp"
 

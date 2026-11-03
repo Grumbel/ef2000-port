@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 # Cross-compile the C++ Unicorn/SDL3 runner, not the Linux-only native64/QEMU
 # harness or the Python probes. No original EF2000 data is redistributed.
@@ -105,6 +105,7 @@ let
     done
 
     cp ${../LICENSES/GPL-3.0-or-later.txt} "$d/LICENSE.txt"
+    cp ${../LICENSES/GPL-3.0-linking-exception.txt} "$d/LICENSE-EXCEPTION.txt"
     cp ${pkgs.unicorn.src}/COPYING "$d/LICENSE-unicorn.txt"
     cp ${pkgs.sdl3.src}/LICENSE.txt "$d/LICENSE-SDL3.txt"
     cp ${../README.md} "$d/README.md"

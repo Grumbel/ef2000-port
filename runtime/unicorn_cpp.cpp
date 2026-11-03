@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2026 OpenAI <codex@openai.com>
-// SPDX-License-Identifier: GPL-3.0-or-later
+// SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
 // Portable C++ Unicorn/X-32 runner for Linux and Windows. Unsupported guest
 // calls stop explicitly; the proprietary executable is only read at runtime
