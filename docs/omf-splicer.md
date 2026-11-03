@@ -23,6 +23,41 @@ Inspection reports segment sizes, initialized ranges, code/data publics,
 external names, 32-bit relocation locations and their thread-expanded target
 methods. It is useful even before a function has a confirmed ABI.
 
+## Build an in-place-only patch in one step
+
+Once the OpenWatcom object has actually compiled and been inspected, the
+function tracker has reached `state=compiles`, and its flow boundary has been
+independently reviewed, the guarded wrapper can construct the complete
+SHA-bound `EFPATCH1` file directly:
+
+~~~sh
+ef2000-wcc decomp/src/hiscore.c
+nix run -L .#omf-inplace -- decomp/build/hiscore.obj \
+  --executable ../EF2000/c/EF2000/_EF2000.EXE \
+  --reviewed-flow 0x432c \
+  -o local/patches/0x000432c.efpatch
+~~~
+
+The `0x432c` source is presently **drafted**, not compiled or verified, so
+this is a **next-stage command**, not yet a proven successful patch. The
+`--reviewed-flow` argument asserts an external review; it does not perform
+Ghidra's flow/body-hole audit itself. Do not advance the tracker based only
+on the native host-model test.
+
+`tools/omf_inplace.py` requires the supported SHA-pinned original payload,
+a single canonical public function with a confirmed ABI and compiled tracker
+state, and fully resolved relocations. It refuses any code growth beyond
+the original function, private initialized data, patch arena or redirect.
+It rejects unknown or ambiguous globals, writes **only** the patch file,
+and refuses to overwrite an existing output. With an accepted object, test
+it using `nix run -L .#func-differential -- 0x432c --executable ...
+--patch local/patches/0x000432c.efpatch` before attempting a game replay.
+
+Synthetic tests exercise the complete OMF → relocated in-place code →
+EFPATCH1 conversion, including its external data fixup and rejection rules;
+an optional Unicorn test executes both sides when Python Unicorn is present.
+The original executable and a real OpenWatcom object remain the final gate.
+
 ## Produce an offline patch plan (not ready to run)
 
 The following example is **illustrative**: replace both the object path and

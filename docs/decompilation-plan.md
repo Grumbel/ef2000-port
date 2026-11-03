@@ -456,6 +456,14 @@ real compiler-object coverage, multi-object linking, arena verification and
 emulator integration are still pending. The current output is **not** ready
 to apply to a guest.
 
+In-place-only packaging stage (2026-11-03): `tools/omf_inplace.py` takes a
+compiled, explicitly reviewed single-function OMF plus the SHA-pinned
+original executable, resolves the object and emits `EFPATCH1` directly.
+It refuses all arena/redirect/data writes, ambiguous externals, unconfirmed
+ABI or a tracker below `compiles`. Synthetic full-chain tests cover relocation
+through binary patch decoding, and optional Python Unicorn guest comparison.
+The draft `0x432c` still needs actual OpenWatcom object and game evidence.
+
 ### 3.8 [~] Harness support for patches
 
 - Native64 (`tools/run_startup.py` / `runtime/startup.c`) and the C++ Unicorn
@@ -900,6 +908,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.10  Began ABI-aware isolated original-versus-patched Unicorn function differential tests, with strict fixture validation and dynamic original block counts; no real recovered replacement verified yet.
 2026-11-03  3.10  Added bounded original call-entry RAM/register capture to C++ Unicorn, and SHA-bound captured-state replay in the isolated differential tool; asset-free capture format tests pass, but live-game proof is pending.
 2026-11-03  3.5   Drafted first recovered game C function (0x432c signed high-score qualification), with packed-layout asserts, native host test and ten differential boundary fixtures; guest verification pending.
+2026-11-03  3.7   Added SHA-pinned direct OMF-to-EFPATCH1 path for reviewed in-place-only functions and synthetic full-chain relocation tests; first real OpenWatcom object still pending.
 ```
 
 ---

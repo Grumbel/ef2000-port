@@ -292,6 +292,10 @@
         set -euo pipefail
         exec ${python}/bin/python3 ${source}/tools/func_differential.py "$@"
       '';
+      omfInplace = pkgs.writeShellScriptBin "ef2000-omf-inplace" ''
+        set -euo pipefail
+        exec ${pkgs.python3}/bin/python3 ${source}/tools/omf_inplace.py "$@"
+      '';
       # Asset decoding is pure Python; users supply DID archives and select a
       # writable output directory. Nothing proprietary enters the Nix store.
       guiAssetsWorkflow = pkgs.writeShellScriptBin "ef2000-gui-assets" ''
@@ -307,6 +311,7 @@
         ef2000-wcc = watcomWorkflow;
         ef2000-highscores-differential = highscoresDifferential;
         ef2000-func-differential = funcDifferential;
+        ef2000-omf-inplace = omfInplace;
         ef2000-gui-assets = guiAssetsWorkflow;
         ef2000-win64 = win64.dist;
         ef2000-win64-zip = win64.zip;
@@ -352,6 +357,11 @@
              type = "app";
              program = "${funcDifferential}/bin/ef2000-func-differential";
              meta.description = "Compare an original EF2000 function with its in-place EFPATCH1 replacement";
+           };
+           omf-inplace = {
+             type = "app";
+             program = "${omfInplace}/bin/ef2000-omf-inplace";
+             meta.description = "Build a reviewed in-place EFPATCH1 from a compiled OpenWatcom OMF object";
            };
            gui-assets = {
              type = "app";
@@ -516,7 +526,7 @@
         '';
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
-        packages = [ python pkgs.ghidra ghidraWorkflow watcom watcomCompat watcomWorkflow highscoresDifferential guiAssetsWorkflow ] ++ devCommands ++ (with pkgs; [
+        packages = [ python pkgs.ghidra ghidraWorkflow watcom watcomCompat watcomWorkflow highscoresDifferential omfInplace guiAssetsWorkflow ] ++ devCommands ++ (with pkgs; [
           gcc binutils qemu-user dosbox-x cmake ninja gdb ccache
         ]);
         GHIDRA_HOME = ghidraHome;
@@ -572,6 +582,7 @@
           printf 'OpenWatcom (v2 default, 1.9 available for comparison):\n'
           printf '  ef2000-wcc decomp/src/MODULE.c  Compile recovered C to decomp/build/MODULE.obj\n'
           printf '  wdis decomp/build/MODULE.obj    Disassemble OpenWatcom OMF\n\n'
+          printf '  ef2000-omf-inplace --help       Pack a reviewed, in-place-only OMF patch\n\n'
           printf 'Original/native high-score differential replay (requires your EF2000.EXE):\n'
           printf '  ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300\n'
           printf '                                  Compare guest routines to reconstructed C++\n'
