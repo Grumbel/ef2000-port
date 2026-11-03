@@ -296,6 +296,63 @@ The annotation importer maps empty outputs in `signatures.tsv` to `void`
 instead of preserving Ghidra's guessed integer return. Both void signatures
 still need original guest-state replay evidence before any C replacement.
 
+### Confirmed packed floating-point record and jump-table flag probe
+
+`initialize_packed_vector_record` (`0x11c0b4`) accepts an EAX destination
+pointer and EDX source pointer, without stack arguments or cleanup. Its eight
+`fld`/`fsub`/`fstp` sequences initialize destination qwords `+0x00..+0x38`
+from source qwords `+0x00..+0x38`. The first three subtract each value from
+itself (do **not** replace that with integer zero without accounting for NaNs
+and x87 exception behavior); the next five subtract a source component.
+The routine copies source doubles at `+0x10`, `+0x00`, `+0x08` to destination
+`+0x40`, `+0x48`, `+0x50`, then clears several trailing fields up through
+the dword at `+0xd1`. An explicit byte zero at `+0x68` is followed by
+**unaligned** dword zeros at `+0x69`, `+0x6d`, etc. The surrounding callers
+step the output pointer by `0xd5` (213) bytes. These offsets prove a packed
+layout *for this record*, but not the names or types of its remaining fields.
+
+Caller `0x10a580` at `0x10a8bb` and distinct caller `0x10c1b0` at
+`0x10c4e7` both pass EAX=`[0x4ddee0]` and EDX=`0x433768`; after the call
+both reload the destination pointer and add `0xd5` for the next record.
+The callee preserves EAX, EDX and all other GPRs (EBX is explicitly saved),
+balances its x87 stack and has a void register-result contract. Reproduce
+the order and floating-point flags before considering a C replacement.
+
+`test_indexed_object_bit` (`0x68ccc`) is a 13-case **CS-relative jump-table**
+switch at `0x68c98`. AX is a signed slot index; zero short-circuits to a
+false AL, and DX is an unsigned selector restricted to 0..12. Each case
+reads the word at `0x12bc95 + 0x91 * (int16_t)AX`, shifts its selected bit
+into the sign position of AX and executes `sar ax,15`. Therefore AL is
+`0xff` for a set bit and zero for a clear bit, **not** a normalized 1.
+Distinct caller `0x69374` at `0x6945c` sign-extends its two 16-bit inputs
+then tests AL; caller `0x68e84` at `0x68ebc` does the same and tests AL.
+Only EAX and EDX may be clobbered; EBX/ECX/ESI/EDI/EBP are preserved.
+All case exits use plain `ret` and zero callee stack cleanup; no x87 use.
+The jump targets live in CS while the data word uses DS. The switch looks
+compiler generated; there is not enough evidence to mark it hand-written.
+
+### Confirmed global-input projection and assembler-like return convention
+
+`append_projected_global_record` (`0x15be10`) has **no incoming register or
+stack arguments**. It reads globals `0x15bde8/0x15bdec/0x15bdf0`, calls
+`0xc474c` to compute fixed-point outputs, and calls `0xc473c` with the
+global at `0x15be0c` as a limit. The latter uses a four-word stack call to
+`0xceb40`, which cleans up its own 16 bytes. A carry-set result skips the
+write and returns EAX=0. On success the routine updates byte/word/dword
+arrays keyed by `0x146e52`, calls `0xb3f58` and `0xc41b0`, and returns
+EAX=1. The callee's own stack cleanup is zero; it preserves ESI/EDI/EBP,
+but not EBX/ECX/EDX. It saves original EBP on entry, **pops it into EDX**
+after successful projection, then uses `xchg ebp,edx` to restore EBP while
+retaining the projected value for later stores. This unusual contract
+justifies provisional `kind=asm`, without asserting the whole function is
+necessarily handwritten.
+
+Distinct callers `0x288c8` at `0x28968`, `0x81680` at `0x8177d`, and
+`0x817a8` at `0x81836` populate the globals immediately before calling
+and do not consume EAX. The explicit zero/one on both callee paths is
+nevertheless recorded as a 32-bit EAX result. Register-intermediate and
+array semantics still need state-level differential verification.
+
 ### Floating-point and segment exceptions under review
 
 The initialized image contains the 16-bit word `0x127f` at `0x17d500`.

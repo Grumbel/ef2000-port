@@ -1231,7 +1231,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00068a60	401			unknown	unclassified	unverified		
 0x00068bf4	33			unknown	unclassified	unverified		
 0x00068c18	124			unknown	unclassified	unverified		
-0x00068ccc	439			unknown	unclassified	unverified		
+0x00068ccc	439	test_indexed_object_bit	unk_geometry	typed	game	confirmed		ABI only; AX signed slot, DX 0..12 bit, AL 0xff/0; CS jump table
 0x00068e84	120			unknown	unclassified	unverified		
 0x00068efc	66			unknown	unclassified	unverified		
 0x00068f40	43	gpwPlaneSideOn		named	unclassified	unverified		
@@ -4216,7 +4216,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011c020	76			unknown	unclassified	unverified		
 0x0011c06c	56			unknown	unclassified	unverified		
 0x0011c0a4	13			unknown	unclassified	unverified		
-0x0011c0b4	342			unknown	unclassified	unverified		
+0x0011c0b4	342	initialize_packed_vector_record	unk_geometry	typed	game	confirmed		ABI only; EAX/EDX pointers; 0xd5-byte record, x87 initialization
 0x0011c20c	323			unknown	unclassified	unverified		
 0x0011c350	305			unknown	unclassified	unverified		
 0x0011c484	101			unknown	unclassified	unverified		
@@ -4264,7 +4264,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00120bc0	45			unknown	unclassified	unverified		
 0x00120c06	62			unknown	unclassified	unverified		
 0x00120c5e	88			unknown	unclassified	unverified		
-0x0015be10	179			unknown	unclassified	unverified		
+0x0015be10	179	append_projected_global_record	unk_geometry	typed	asm	confirmed		ABI only; global inputs, EAX Boolean, nonstandard EBP restoration
 0x0015c071	83			unknown	unclassified	unverified		
 0x0015c0c4	38			unknown	unclassified	unverified		
 0x0015c0ea	38			unknown	unclassified	unverified		

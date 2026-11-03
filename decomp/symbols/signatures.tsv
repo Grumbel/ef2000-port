@@ -16,3 +16,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000f46cc	read_next_command_token		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	0xf46cc..0xf4789; callers 0xf4b1c/0xf4bf8 use global buffer; docs/compiler-abi.md
 0x000f8248	elapsed_centiseconds		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	0xf8248 tail jump to 0x1100b1; callers 0xac681/0xe3124/0x106c3f consume EAX; docs/compiler-abi.md
 0x00120800	x87_unmask_exceptions			eax,ebx,ecx,edx,esi,edi,ebp	0	0x120800..0x120814; callers 0x1204ae/0x120798; CW side effect; docs/compiler-abi.md
+0x0011c0b4	initialize_packed_vector_record	EAX:ef_addr32,EDX:ef_addr32		eax,ebx,ecx,edx,esi,edi,ebp	0	0x11c0b4..0x11c209; callers 0x10a8bb/0x10c4e7; 0xd5-byte stride; docs/compiler-abi.md
+0x0015be10	append_projected_global_record		EAX:uint32_t	esi,edi,ebp	0	0x15be10..0x15bec2; callers 0x28968/0x8177d/0x81836 set globals, ignore EAX; docs/compiler-abi.md
+0x00068ccc	test_indexed_object_bit	AX:int16_t,DX:uint16_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	0x68ccc..0x68e82; callers 0x6945c/0x68ebc test AL; CS jump table; docs/compiler-abi.md
