@@ -2473,3 +2473,46 @@ in EAX, format string address, one value).
 | `0x174c8` | EAX:uint32_t,EDX:int32_t | EAX:uint32_t | 15b7c@15cb4 | Does the unit's target differ from value and the unit's kind allow it? |
 | `0x174f8` | EAX:uint32_t | EAX:uint32_t | 16034@16069,16034@16158,16034@16170 | Is the unit's kind not one of 0, 7, 9, 0xa, 0xb, 0xc? |
 | `0x1b52c` | none | EAX:uint32_t | 1b4a4@1b4ca,1b4a4@1b4d9 |  |
+
+## game_helpers5 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe744` | EAX:uint32_t | EAX:ef_addr32 | e990@e9a7,f038@f05b,f08c@f0b9 | Allocate-and-clear: allocate count bytes via b3db0/b3f58 and zero them. |
+| `0x1d778` | EAX:ef_addr32 | none | 1d700@1d74d,1d700@1d768 |  |
+| `0x1d8a8` | EAX:ef_addr32 | EAX:uint32_t | 1d700@1d73f,1d700@1d75d | Advance the stage counter for some stage kinds; returns 1 if advanced by 0x1d8e8. |
+| `0x1e130` | AX:int16_t | none | 5437c@543eb | Forget the cached record pointer if it equals record index. |
+| `0x28a34` | none | none | 288c8@28988 | Move the head of the used list to the free list. |
+| `0x2af20` | none | none | 2af64@2af67 | Set three flag byte ranges at 0x19bb60.. to 1. |
+| `0x2af64` | none | none | 49228@49606 |  |
+| `0x2db64` | AX:int16_t,EDX:uint32_t | EAX:uint32_t | 2dba4@2dbd4 | Does the unit named by table entry slot carry id? |
+| `0x35528` | none | none | 36ad8@36b47,36ad8@36bb4 |  |
+| `0x357a4` | none | none | none direct |  |
+| `0x35cc8` | none | none | 36438@36472,36438@3657e,36438@3669d |  |
+| `0x3cd6c` | none | EAX:ef_addr32 | 3dd30@3e393 | Find the node with tag 0x2117b0 in the ring starting after the head. |
+| `0x3ce30` | none | none | 3dd30@3e37a | Count down the timer at 0x1a35ac, firing 151c4 when it runs out. |
+| `0x41ec8` | EAX:uint32_t | EAX:uint32_t | 9a998@9aa3e | Is the kind in 3..10? |
+| `0x41f24` | none | none | 43020@430ea | Clear the 20 seven-byte slots and rebuild the screen buffer. |
+| `0x46038` | none | none | 49228@49610,7e8c0@7ea1f |  |
+| `0x48020` | none | none | 77c90@77dc7 | Advance the tick counter at 0x126658 by the frame time (a third in slow mode). |
+| `0x4be88` | EAX:ef_addr32 | none | 4bc40@4bc64 |  |
+| `0x50c70` | none | none | 510d0@51175 |  |
+| `0x50dc8` | none | EAX:uint32_t | 50e84@50eb1 | Does the text at 0x1a5968 end in ':'? |
+| `0x52128` | none | none | 50f54@50fae |  |
+| `0x54eb4` | EAX:ef_addr32 | none | 581b0@583e3 | Mark slot b[ptr+1] in table 0x1a5d10 if the sender matches. |
+| `0x54f04` | EAX:ef_addr32 | none | 581b0@583ff | As above for table 0x1a5d08 / counter 0x1a5d1e. |
+| `0x55050` | EAX:ef_addr32 | none | 581b0@582c4 |  |
+| `0x550d8` | EAX:ef_addr32 | none | 581b0@58318 | Copy the 0x19-byte payload of a message into object message[1]. |
+| `0x56d18` | EAX:uint32_t | none | 581b0@584a0 |  |
+| `0x56e94` | EAX:ef_addr32 | none | 581b0@584be |  |
+| `0x57160` | EAX:ef_addr32 | none | 581b0@58532 |  |
+| `0x571b8` | EAX:ef_addr32 | none | 581b0@58541 |  |
+| `0x57620` | EAX:ef_addr32 | none | 581b0@5858c |  |
+| `0x5ea64` | none | none | 5f634@5f688 |  |
+| `0x62504` | none | none | 62454@624eb | Process every entry of the 0x17-byte table at 0x1a7d32. |
+| `0x65d18` | none | none | 65a50@65a6d |  |
+| `0x689f0` | none | none | 69fac@6a086,84b64@84b64 | Copy the 20 three-byte entries of table 0x1f6eac to 0x1f6ef4. |
+| `0x68a2c` | none | none | 68a60@68b69 |  |
+| `0x73d1c` | AX:int16_t | none | 6c8e0@6c920,72944@72c4d | Clear a unit flag one time in five. |
+| `0x7597c` | none | none | 3dd30@3dd65 |  |
+| `0x77be0` | none | none | 3dd30@3ddd2 |  |

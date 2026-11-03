@@ -1685,4 +1685,58 @@ uint32_t unit_kind_allows_174f8(uint32_t index);
 uint32_t selected_unit_visible_1b52c(void);
 uint32_t guest_fn_173c4(uint32_t index); /* 0x173c4 EAX -> AX */
 
+/* game_helpers5.c */
+ef_addr32 alloc_cleared_e744(uint32_t count);
+void select_stage_byte_1d778(ef_addr32 object);
+uint32_t advance_stage_1d8a8(ef_addr32 object);
+void forget_record_1e130(int16_t index);
+void free_list_node_28a34(void);
+void set_flag_ranges_2af20(void);
+void reset_flag_ranges_2af64(void);
+uint32_t unit_has_id_2db64(int16_t id, uint32_t slot);
+void reset_state_35528(void);
+void start_screen_357a4(void);
+void mark_slot_35cc8(void);
+ef_addr32 find_tagged_node_3cd6c(void);
+void tick_timer_3ce30(void);
+uint32_t is_kind_3_to_10_41ec8(uint32_t kind);
+void clear_slots_41f24(void);
+void reset_queue_46038(void);
+void advance_ticks_48020(void);
+void check_flags_4be88(ef_addr32 object);
+void reset_text_50c70(void);
+uint32_t text_ends_with_colon_50dc8(void);
+void note_extension_52128(void);
+void mark_slot_54eb4(ef_addr32 message);
+void mark_slot_54f04(ef_addr32 message);
+void clear_pending_55050(ef_addr32 message);
+void copy_payload_550d8(ef_addr32 message);
+void set_name_56d18(uint32_t value);
+void handle_message_56e94(ef_addr32 message);
+void notify_unit_57160(ef_addr32 message);
+void notify_unit_571b8(ef_addr32 message);
+void handle_entry_57620(ef_addr32 message);
+void reset_range_5ea64(void);
+void process_entries_62504(void);
+void store_631bc_65d18(void);
+void copy_table_689f0(void);
+void request_68a2c(void);
+void clear_unit_flag_73d1c(int16_t unit_id);
+void reset_selection_7597c(void);
+void reset_slots_77be0(void);
+uint32_t guest_fn_1d8e8(ef_addr32 object); /* 0x1d8e8 EAX -> AL */
+void guest_fn_a42f4(void); /* 0xa42f4 */
+void guest_fn_b1e0(void); /* 0xb1e0 */
+void guest_fn_413b0(void); /* 0x413b0 */
+void guest_fn_45ba0(void); /* 0x45ba0 */
+void guest_fn_4ce4c(uint32_t a, uint32_t b); /* 0x4ce4c EAX/EDX */
+void guest_fn_50d04(void); /* 0x50d04 */
+void guest_fn_56d40(uint32_t value); /* 0x56d40 EAX */
+void guest_fn_789d0(uint32_t a, ef_addr32 b); /* 0x789d0 EAX/EDX */
+void guest_fn_56ed0(void); /* 0x56ed0 */
+void guest_fn_cd2e8(int32_t value); /* 0xcd2e8 EAX */
+void guest_fn_65030(uint32_t a, int32_t b, uint32_t c); /* 0x65030 EAX/EDX/EBX */
+void guest_fn_e7c50(int32_t a, int32_t b, uint32_t c); /* 0xe7c50 EAX/EDX/EBX */
+uint32_t guest_fn_631bc(void); /* 0x631bc -> AX */
+
 #endif

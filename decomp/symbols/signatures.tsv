@@ -1007,3 +1007,41 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000174c8	unit_target_differs_174c8	EAX:uint32_t,EDX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000174c8 (47 bytes); Does the unit's target differ from value and the unit's kind allow it?; callers 15b7c@15cb4; docs/compiler-abi.md
 0x000174f8	unit_kind_allows_174f8	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000174f8 (62 bytes); Is the unit's kind not one of 0, 7, 9, 0xa, 0xb, 0xc?; callers 16034@16069,16034@16158,16034@16170; docs/compiler-abi.md
 0x0001b52c	selected_unit_visible_1b52c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001b52c (42 bytes); ; callers 1b4a4@1b4ca,1b4a4@1b4d9; docs/compiler-abi.md
+0x0000e744	alloc_cleared_e744	EAX:uint32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000e744 (31 bytes); Allocate-and-clear: allocate count bytes via b3db0/b3f58 and zero them.; callers e990@e9a7,f038@f05b,f08c@f0b9; docs/compiler-abi.md
+0x0001d778	select_stage_byte_1d778	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001d778 (42 bytes); ; callers 1d700@1d74d,1d700@1d768; docs/compiler-abi.md
+0x0001d8a8	advance_stage_1d8a8	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001d8a8 (63 bytes); Advance the stage counter for some stage kinds; returns 1 if advanced by 0x1d8e8.; callers 1d700@1d73f,1d700@1d75d; docs/compiler-abi.md
+0x0001e130	forget_record_1e130	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001e130 (53 bytes); Forget the cached record pointer if it equals record index.; callers 5437c@543eb; docs/compiler-abi.md
+0x00028a34	free_list_node_28a34			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00028a34 (57 bytes); Move the head of the used list to the free list.; callers 288c8@28988; docs/compiler-abi.md
+0x0002af20	set_flag_ranges_2af20			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002af20 (65 bytes); Set three flag byte ranges at 0x19bb60.. to 1.; callers 2af64@2af67; docs/compiler-abi.md
+0x0002af64	reset_flag_ranges_2af64			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002af64 (17 bytes); ; callers 49228@49606; docs/compiler-abi.md
+0x0002db64	unit_has_id_2db64	AX:int16_t,EDX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002db64 (63 bytes); Does the unit named by table entry slot carry id?; callers 2dba4@2dbd4; docs/compiler-abi.md
+0x00035528	reset_state_35528			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00035528 (59 bytes); ; callers 36ad8@36b47,36ad8@36bb4; docs/compiler-abi.md
+0x000357a4	start_screen_357a4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000357a4 (70 bytes); ; callers none direct; docs/compiler-abi.md
+0x00035cc8	mark_slot_35cc8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00035cc8 (49 bytes); ; callers 36438@36472,36438@3657e,36438@3669d; docs/compiler-abi.md
+0x0003cd6c	find_tagged_node_3cd6c		EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003cd6c (45 bytes); Find the node with tag 0x2117b0 in the ring starting after the head.; callers 3dd30@3e393; docs/compiler-abi.md
+0x0003ce30	tick_timer_3ce30			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003ce30 (61 bytes); Count down the timer at 0x1a35ac, firing 151c4 when it runs out.; callers 3dd30@3e37a; docs/compiler-abi.md
+0x00041ec8	is_kind_3_to_10_41ec8	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00041ec8 (54 bytes); Is the kind in 3..10?; callers 9a998@9aa3e; docs/compiler-abi.md
+0x00041f24	clear_slots_41f24			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00041f24 (63 bytes); Clear the 20 seven-byte slots and rebuild the screen buffer.; callers 43020@430ea; docs/compiler-abi.md
+0x00046038	reset_queue_46038			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00046038 (56 bytes); ; callers 49228@49610,7e8c0@7ea1f; docs/compiler-abi.md
+0x00048020	advance_ticks_48020			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00048020 (68 bytes); Advance the tick counter at 0x126658 by the frame time (a third in slow mode).; callers 77c90@77dc7; docs/compiler-abi.md
+0x0004be88	check_flags_4be88	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004be88 (56 bytes); ; callers 4bc40@4bc64; docs/compiler-abi.md
+0x00050c70	reset_text_50c70			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00050c70 (51 bytes); ; callers 510d0@51175; docs/compiler-abi.md
+0x00050dc8	text_ends_with_colon_50dc8		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00050dc8 (31 bytes); Does the text at 0x1a5968 end in ':'?; callers 50e84@50eb1; docs/compiler-abi.md
+0x00052128	note_extension_52128			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00052128 (57 bytes); ; callers 50f54@50fae; docs/compiler-abi.md
+0x00054eb4	mark_slot_54eb4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054eb4 (69 bytes); Mark slot b[ptr+1] in table 0x1a5d10 if the sender matches.; callers 581b0@583e3; docs/compiler-abi.md
+0x00054f04	mark_slot_54f04	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00054f04 (69 bytes); As above for table 0x1a5d08 / counter 0x1a5d1e.; callers 581b0@583ff; docs/compiler-abi.md
+0x00055050	clear_pending_55050	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00055050 (52 bytes); ; callers 581b0@582c4; docs/compiler-abi.md
+0x000550d8	copy_payload_550d8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000550d8 (67 bytes); Copy the 0x19-byte payload of a message into object message[1].; callers 581b0@58318; docs/compiler-abi.md
+0x00056d18	set_name_56d18	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00056d18 (40 bytes); ; callers 581b0@584a0; docs/compiler-abi.md
+0x00056e94	handle_message_56e94	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00056e94 (59 bytes); ; callers 581b0@584be; docs/compiler-abi.md
+0x00057160	notify_unit_57160	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00057160 (55 bytes); ; callers 581b0@58532; docs/compiler-abi.md
+0x000571b8	notify_unit_571b8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000571b8 (55 bytes); ; callers 581b0@58541; docs/compiler-abi.md
+0x00057620	handle_entry_57620	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00057620 (48 bytes); ; callers 581b0@5858c; docs/compiler-abi.md
+0x0005ea64	reset_range_5ea64			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0005ea64 (62 bytes); ; callers 5f634@5f688; docs/compiler-abi.md
+0x00062504	process_entries_62504			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00062504 (67 bytes); Process every entry of the 0x17-byte table at 0x1a7d32.; callers 62454@624eb; docs/compiler-abi.md
+0x00065d18	store_631bc_65d18			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00065d18 (12 bytes); ; callers 65a50@65a6d; docs/compiler-abi.md
+0x000689f0	copy_table_689f0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000689f0 (56 bytes); Copy the 20 three-byte entries of table 0x1f6eac to 0x1f6ef4.; callers 69fac@6a086,84b64@84b64; docs/compiler-abi.md
+0x00068a2c	request_68a2c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00068a2c (52 bytes); ; callers 68a60@68b69; docs/compiler-abi.md
+0x00073d1c	clear_unit_flag_73d1c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00073d1c (52 bytes); Clear a unit flag one time in five.; callers 6c8e0@6c920,72944@72c4d; docs/compiler-abi.md
+0x0007597c	reset_selection_7597c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007597c (58 bytes); ; callers 3dd30@3dd65; docs/compiler-abi.md
+0x00077be0	reset_slots_77be0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00077be0 (54 bytes); ; callers 3dd30@3ddd2; docs/compiler-abi.md
