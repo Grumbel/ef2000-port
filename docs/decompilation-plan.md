@@ -306,7 +306,7 @@ functions and zero decompiler failures. Known unconfirmed layouts remain raw
 bytes; conventions outside the current register/zero-cleanup schema are
 rejected pending §3.5.
 
-### 3.4 [~] OpenWatcom in the flake
+### 3.4 [x] OpenWatcom in the flake
 
 - Add `open-watcom-v2` (and `open-watcom-bin` 1.9 for comparison) to the dev
   shell. Export `WATCOM`, `INCLUDE`, `PATH` correctly (OpenWatcom needs
@@ -320,8 +320,12 @@ Implementation prepared 2026-11-03: the flake includes wrapped OpenWatcom v2
 and 1.9, an `ef2000-wcc` compiler wrapper, and a `watcom-omf` check that runs
 `wcc386` on `decomp/tests/fixture.c` and disassembles the object with `wdis`.
 Bootstrap flags are provisional until §3.5. Python wrapper tests and C89
-fixture syntax checks pass locally. Nix/OpenWatcom execution needs validation
-on the owner's NixOS machine before marking this step complete.
+fixture syntax checks pass locally. The owner verified on NixOS that
+`NIXPKGS_ALLOW_UNFREE=1 nix build --impure .#checks.x86_64-linux.watcom-omf -L`
+passes and `ef2000-wcc decomp/tests/fixture.c` emits a 12-byte OMF function
+disassembled successfully by `wdis` (2026-11-03). The emitted `__CHK` call
+is a compiler runtime dependency to address under §3.5; it does not invalidate
+the toolchain smoke check.
 
 ### 3.5 [~] Determine the ABI conventions and canonical compiler flags
 
@@ -769,7 +773,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.1   Done: derived-source legal note, C headers, module/test directories, ignored build output.
 2026-11-03  3.2   Done: re-seed from fresh 12.1.4 Ghidra inventory is identical (4,277 rows); tracker check and tests pass.
 2026-11-03  3.3   Done: reproducible apply/export symbols; live synthetic persistence/idempotence test and 4,277-function refresh pass.
-2026-11-03  3.4   In progress: flake packages, ef2000-wcc, and OMF smoke check implemented; awaiting Nix execution feedback.
+2026-11-03  3.4   Done: owner ran Nix watcom-omf check and ef2000-wcc fixture; wdis decoded OMF (12-byte code, __CHK dependency noted).
 2026-11-03  3.5   In progress: initial high-score ABI instruction audit and OMF disassembly helper.
 2026-11-03  3.5   Sampled 40 candidates across five code regions for manual calling-convention review.
 2026-11-03  3.5   Collected 40 disassembly summaries and two distinct callers each; examined mixed EAX/EDX/stack ABI at 0x24480.
