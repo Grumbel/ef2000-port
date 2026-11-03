@@ -1367,4 +1367,36 @@ void guest_fn_abe44(ef_addr32 a); /* 0xabe44 */
 void guest_fn_cf78c(void); /* 0xcf78c */
 uint32_t guest_fn_d6694(void); /* 0xd6694 */
 
+/* entity_helpers.c */
+uint32_t find_in_archives_9cb20(uint32_t key);
+uint32_t lookup_in_archives_9cb70(uint32_t key);
+void close_request_9ce84(uint32_t flags);
+int32_t parse_int(ef_addr32 text);
+int32_t guest_strcmp(ef_addr32 first, ef_addr32 second);
+void clamp_extents_a5000(ef_addr32 object);
+void init_entities_a59d8(void);
+void update_entities_a5a68(void);
+void init_timers_a6940(ef_addr32 object);
+void toggle_active_a7328(ef_addr32 object);
+void wait_for_key_a89f0(void);
+void script_if_equal_a8f80(ef_addr32 op);
+void script_if_not_equal_a8fcc(ef_addr32 op);
+void script_if_not_greater_a9014(ef_addr32 op);
+void latch_previous_acb68(ef_addr32 record);
+void guest_fn_a499c(uint32_t i); /* 0xa499c */
+void guest_fn_a4ec0(ef_addr32 object); /* 0xa4ec0 */
+void guest_fn_a4eec(ef_addr32 object); /* 0xa4eec */
+void guest_fn_a5070(ef_addr32 object); /* 0xa5070 */
+void guest_fn_a51dc(ef_addr32 object); /* 0xa51dc */
+void guest_fn_a54f0(ef_addr32 object); /* 0xa54f0 */
+void guest_fn_a59ac(ef_addr32 object); /* 0xa59ac */
+void guest_fn_a66a0(ef_addr32 object); /* 0xa66a0 */
+void guest_fn_a6998(ef_addr32 object); /* 0xa6998 */
+void guest_fn_a6a64(ef_addr32 object); /* 0xa6a64 */
+void guest_fn_a729c(ef_addr32 first, ef_addr32 second); /* 0xa729c */
+uint32_t guest_fn_a7b3c(uint32_t a); /* 0xa7b3c */
+uint32_t guest_fn_b3b90(uint32_t a); /* 0xb3b90 */
+void guest_fn_dc2e0(void); /* 0xdc2e0 */
+uint32_t guest_fn_eb9f8(uint32_t a, uint32_t b); /* 0xeb9f8 */
+
 #endif

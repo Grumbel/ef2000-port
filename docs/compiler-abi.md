@@ -2203,3 +2203,23 @@ in EAX, format string address, one value).
 | `0x66bf4` | EAX:ef_addr32 | AL:uint8_t | 65a88@65bcd,65d24@65de3,65e10@65e93 | Line-of-sight request from the viewpoint at 0x1a5bec to the object. |
 | `0x66cd4` | AX:int16_t,EDX:ef_addr32 | AL:uint8_t | 291fc@29220,298f0@29942 | Line-of-sight request from `object` to unit AX. |
 | `0x66d80` | EAX:ef_addr32 | AL:uint8_t | 62edc@63099 | As 0x66bf4 from the point at 0x21444c. |
+
+## entity_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9cb20` | EAX:uint32_t | EAX:uint32_t | 41fc@420d,6b50@6bb9,f6a8@f700 | Try the two open archives, then fall back to 0xb3b90. |
+| `0x9cb70` | EAX:uint32_t | EAX:uint32_t | 9cc28@9cc81,ea270@ea30d | As 0x9cb20 with 0xeba4c and 0xa7b3c; -1 becomes 0. |
+| `0x9ce84` | EAX:uint32_t | none | f80@1ac1,f6a8@f8e4,fecc@ffa1 | Dispatch a close request by flag bits 0x10000/0x20000/0x40000. |
+| `0x9d4cd` | EAX:ef_addr32 | EAX:int32_t | f80@1196,f80@11e0,4cf4@4cf9 | atoi: skip class-2 characters, optional sign, class-0x20 digits. |
+| `0xa4380` | EAX:ef_addr32,EDX:ef_addr32 | EAX:int32_t | 20ec@2d06,4d4c@4d5b,4d4c@4d83 | strcmp: 0, -1 or 1. |
+| `0xa5000` | EAX:ef_addr32 | none | a59d8@a5a0f | Clamp two word fields so that they fit inside the extents at +0x43 / +0x45. |
+| `0xa59d8` | none | none | f819c@f8239 | Run the per-object initialisation steps once for every entity (1..word 0x41eed8). |
+| `0xa5a68` | none | none | a499c@a4a13 |  |
+| `0xa6940` | EAX:ef_addr32 | none | a59d8@a5a40 | Walk the child list at +0x91 (next at +0x21) and default the timers at +0x14 / +0x16. |
+| `0xa7328` | EAX:ef_addr32 | none | acfb8@ad385,acfb8@ad3ce | Toggle flag bit 0 at +0x1d and propagate it. |
+| `0xa89f0` | none | none | a8a38@a8b95,a8bd4@a8e57,a8bd4@a8f10 | Wait up to 600 polls for key 0x19. |
+| `0xa8f80` | EAX:ef_addr32 | none | a9130@a918c | Branch when the variable equals the operand. |
+| `0xa8fcc` | EAX:ef_addr32 | none | a9130@a91b3 | Branch when the variable differs. |
+| `0xa9014` | EAX:ef_addr32 | none | a9130@a91da | Branch when the variable is not greater than the operand. |
+| `0xacb68` | EAX:ef_addr32 | none | ac5f8@ac67c | Latch "previous" copies of the fields and shift flag bits 0..2 to 3..5 of byte +0x1e. |
