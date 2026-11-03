@@ -3,6 +3,8 @@
 ## Current state
 
 Read `README.md`, then `docs/startup-runtime.md` and `docs/x32-services.md`.
+The long-term decompilation/modernization roadmap is
+`docs/decompilation-plan.md`; follow its ground rules and operating loop.
 The current tip is reported by `git log -1`; this repository began without any
 commits. Original game binaries/data stay outside Git and the Nix package.
 
