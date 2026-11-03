@@ -281,6 +281,10 @@
         exec ${python}/bin/python3 ${source}/tools/highscores_differential.py \
           --compiler ${pkgs.stdenv.cc}/bin/g++ "$@"
       '';
+      funcDifferential = pkgs.writeShellScriptBin "ef2000-func-differential" ''
+        set -euo pipefail
+        exec ${python}/bin/python3 ${source}/tools/func_differential.py "$@"
+      '';
       # Asset decoding is pure Python; users supply DID archives and select a
       # writable output directory. Nothing proprietary enters the Nix store.
       guiAssetsWorkflow = pkgs.writeShellScriptBin "ef2000-gui-assets" ''
@@ -295,6 +299,7 @@
         ef2000-ghidra = ghidraWorkflow;
         ef2000-wcc = watcomWorkflow;
         ef2000-highscores-differential = highscoresDifferential;
+        ef2000-func-differential = funcDifferential;
         ef2000-gui-assets = guiAssetsWorkflow;
         ef2000-win64 = win64.dist;
         ef2000-win64-zip = win64.zip;
@@ -335,6 +340,11 @@
              type = "app";
              program = "${highscoresDifferential}/bin/ef2000-highscores-differential";
              meta.description = "Compare original high-score guest routines with native C++ reconstruction";
+           };
+           func-differential = {
+             type = "app";
+             program = "${funcDifferential}/bin/ef2000-func-differential";
+             meta.description = "Compare an original EF2000 function with its in-place EFPATCH1 replacement";
            };
            gui-assets = {
              type = "app";
@@ -483,6 +493,15 @@
           touch "$out"
         '';
       };
+        func-differential = pkgs.runCommand "ef2000-func-differential-check" {
+          nativeBuildInputs = [ python ];
+        } ''
+          ${funcDifferential}/bin/ef2000-func-differential --help > "$out"
+          grep -q -- '--patch' "$out"
+          cd ${source}
+          PYTHONDONTWRITEBYTECODE=1 ${python}/bin/python3 -m unittest \
+            tests.test_func_differential -q
+        '';
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];
         packages = [ python pkgs.ghidra ghidraWorkflow watcom watcomCompat watcomWorkflow highscoresDifferential guiAssetsWorkflow ] ++ devCommands ++ (with pkgs; [

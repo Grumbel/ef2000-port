@@ -480,6 +480,15 @@ unpatched identities. Four Python and one C++ asset-free tests cover format
 validation, bounds, overlap and digest rejection. See `docs/omf-splicer.md`.
 No game-function differential or end-to-end patched run has yet been made.
 
+Allocation-watermark instrumentation (2026-11-03): C++ Unicorn reports
+`x32_memory` at exit; native64/QEMU writes `MEMORY` to `calls.log` and
+`memory_watermark` to the launcher report. Both track `3508h` heap growth,
+`3509h` stack reserve and call counts, without changing the 64 MiB layout.
+They are observations, not yet proof of a safe arena. The owner confirmed
+the unpatched `nix run .#unicorn-cpp -L ...` startup reaches its 30M
+instruction limit (42.3M guest instructions/s on that run); no real patch
+has been executed. See `docs/function-differential.md`.
+
 ### 3.9 [ ] Golden replay suite
 
 - Define 6–10 deterministic scenarios as files in `tests/replays/*.json`
@@ -504,7 +513,7 @@ No game-function differential or end-to-end patched run has yet been made.
   Any nondeterminism (host time, wall clock pacing, uninitialized host data)
   must be eliminated or documented before this suite becomes a gate.
 
-### 3.10 [ ] Generalized differential function tester
+### 3.10 [~] Generalized differential function tester
 
 Generalize `tools/highscores_differential.py` into
 `tools/func_differential.py`:
@@ -526,6 +535,18 @@ Generalize `tools/highscores_differential.py` into
   reached in a replay.
 - Reports coverage: which basic blocks of the original function were hit
   (Unicorn block hook). Target ≥ 90 % block coverage or document why not.
+
+First isolated-call stage (2026-11-03): `tools/func_differential.py` reads
+the confirmed ABI tracker and SHA-pinned payload, runs spec-defined calls
+with an in-place EFPATCH1 replacement on identical 32-bit Unicorn machines,
+and checks ABI outputs, preserved registers, stack cleanup and the union
+of runtime-written guest RAM (excluding dead callee scratch). It records
+original function dynamic block entries, not a speculative static coverage
+percentage. A synthetic code-pair differential test is wired into the
+dedicated Nix check; on the minimal local host it skips execution because
+Python Unicorn is absent. x87, live-call capture, guest hardware services,
+stubbed callees, real compiled functions and golden replays remain missing.
+See `docs/function-differential.md`.
 
 ### 3.11 [ ] Phase-1 exit criteria
 
@@ -855,6 +876,8 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.6   Classified three source-matched Watcom/X-32 startup routines as library code; not fingerprint-derived and not counted as verified function replacements.
 2026-11-03  3.7   Added a strict offline OMF splice planner, 32-bit relocation/layout proof cases, and seven synthetic tests; patch loading and real compiler-object validation remain outstanding.
 2026-11-03  3.8   Implemented SHA-bound in-place EFPATCH1 loading in native64/QEMU and C++ Unicorn, with save-state patch identity and asset-free format tests; guest arena mapping remains blocked on high-water evidence.
+2026-11-03  3.8   Added X-32 allocator process watermarks in both runners and native report parsing; highwater evidence from sustained gameplay and mapping audit still required before patch arena.
+2026-11-03  3.10  Began ABI-aware isolated original-versus-patched Unicorn function differential tests, with strict fixture validation and dynamic original block counts; no real recovered replacement verified yet.
 ```
 
 ---
