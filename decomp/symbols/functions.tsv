@@ -397,7 +397,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00027544	96			unknown	unclassified	unverified		
 0x000275a4	60			unknown	unclassified	unverified		
 0x000275e0	502			unknown	unclassified	unverified		
-0x000277d8	127			unknown	unclassified	unverified		
+0x000277d8	127	confirm_dialog_277d8	game_helpers16	compiles	game	confirmed	decomp/tests/0x000277d8.json	docs/compiler-abi.md; Show the confirm dialog; Enter (0x15) marks the slot record.; callers 278c0@27aca; guest pending
 0x00027858	104	confirm_dialog_27858	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00027858.json	docs/compiler-abi.md; Show two panels and wait for key 0x15 or 0x31; true for 0x15.; callers 278c0@27adb; guest pending
 0x000278c0	1112			unknown	unclassified	unverified		
 0x00027d18	721			unknown	unclassified	unverified		
@@ -450,8 +450,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002afcc	171	detach_grid_link_on_mode_change	world_grid_links	compiles	game	confirmed	decomp/tests/0x0002afcc.json	AX/DL grid link cleanup; sentinel 0xff; host tested only
 0x0002b0b4	259			unknown	unclassified	unverified		
 0x0002b1f4	443			unknown	unclassified	unverified		
-0x0002b3b0	147			unknown	unclassified	unverified		
-0x0002b444	194			unknown	unclassified	unverified		
+0x0002b3b0	147	command_linked_units_2b3b0	game_helpers16	compiles	game	confirmed	decomp/tests/0x0002b3b0.json	docs/compiler-abi.md; Send a command to each of the owner's seven linked units that accept it.; callers 2b0b4@2b125,2b0b4@2b14a; guest pending
+0x0002b444	194	command_unit_and_peers_2b444	game_helpers16	compiles	game	confirmed	decomp/tests/0x0002b444.json	docs/compiler-abi.md; Send a command to a unit, then pair it with each accepting unit of its owner.; callers 2b1f4@2b253,2b1f4@2b2ce,2b1f4@2b319; guest pending
 0x0002b508	79	try_assign_2b508	game_helpers7	compiles	game	confirmed	decomp/tests/0x0002b508.json	docs/compiler-abi.md; ; callers 857bc@8598f,857bc@859a8; guest pending
 0x0002b558	101	link_grid_cell	world_grid_control	compiles	game	confirmed	decomp/tests/0x0002b558.json	AX/DX row links; two original callers; derived link helpers unresolved; no guest splice
 0x0002b5c0	116	link_external_grid_cell	world_grid_links	compiles	game	confirmed	decomp/tests/0x0002b5c0.json	AX/DX link to external 0x45-byte node; dispatcher unrecovered
@@ -478,7 +478,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002c358	251			unknown	unclassified	unverified		
 0x0002c454	220			unknown	unclassified	unverified		
 0x0002c600	218			unknown	unclassified	unverified		
-0x0002c6dc	127			unknown	unclassified	unverified		
+0x0002c6dc	127	owner_check_fails_2c6dc	game_helpers16	compiles	game	confirmed	decomp/tests/0x0002c6dc.json	docs/compiler-abi.md; Nonzero (1) when the owner fails the check selected by its record type.; callers 2c778@2cbd7; guest pending
 0x0002c778	1398			unknown	unclassified	unverified		
 0x0002ccf0	293			unknown	unclassified	unverified		
 0x0002ce18	127			unknown	unclassified	unverified		

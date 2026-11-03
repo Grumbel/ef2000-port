@@ -1978,4 +1978,17 @@ void guest_fn_1a580(void); /* 0x1a580 */
 void guest_fn_18a68(void); /* 0x18a68 */
 void guest_fn_5331c(void); /* 0x5331c */
 
+/* game_helpers16.c */
+void confirm_dialog_277d8(int16_t slot);
+void command_linked_units_2b3b0(int16_t owner, uint8_t kind);
+void command_unit_and_peers_2b444(int16_t unit_id, uint8_t kind);
+uint8_t owner_check_fails_2c6dc(int16_t owner);
+void guest_fn_dd370(uint32_t a, uint32_t b, uint32_t c, ef_addr32 d); /* 0xdd370 EAX/EDX/EBX/ECX */
+void guest_fn_dc250(void); /* 0xdc250 */
+void guest_fn_474b8(int32_t a, int32_t b, uint32_t c); /* 0x474b8 EAX/EDX/EBX */
+uint32_t guest_fn_2c0ec(int32_t a); /* 0x2c0ec EAX -> AL */
+uint32_t guest_fn_2bbd0(int32_t a); /* 0x2bbd0 EAX -> AX */
+uint32_t guest_fn_2bfcc(int32_t a); /* 0x2bfcc EAX -> AL */
+uint32_t guest_fn_2c17c(int32_t a); /* 0x2c17c EAX -> AL */
+
 #endif

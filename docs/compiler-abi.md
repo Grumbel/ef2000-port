@@ -2722,3 +2722,12 @@ in EAX, format string address, one value).
 | `0x1d318` | none | none | 3ea0c@3ee4b | Reset the game-loop state and run ten warm-up ticks. |
 | `0x1fd88` | none | none | 2065c@2067b | Build the 0x19b030/0x19b080 circle tables (full turn is 0xc000 steps). |
 | `0x1fe4c` | none | none | 1ff0c@1ff6b | Build the 0x19afe0/0x19af90 circle tables from the two radius bytes. |
+
+## game_helpers16 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x277d8` | AX:int16_t | none | 278c0@27aca | Show the confirm dialog; Enter (0x15) marks the slot record. |
+| `0x2b3b0` | AX:int16_t,DL:uint8_t | none | 2b0b4@2b125,2b0b4@2b14a | Send a command to each of the owner's seven linked units that accept it. |
+| `0x2b444` | AX:int16_t,DL:uint8_t | none | 2b1f4@2b253,2b1f4@2b2ce,2b1f4@2b319 | Send a command to a unit, then pair it with each accepting unit of its owner. |
+| `0x2c6dc` | AX:int16_t | AL:uint8_t | 2c778@2cbd7 | Nonzero (1) when the owner fails the check selected by its record type. |
