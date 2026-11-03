@@ -9,7 +9,7 @@ in original disassembly and caller behavior, not in Ghidra's guesses.
 
 ## Provisional compiler flags
 
-`ef2000-wcc` currently uses `-bt=dos -3r -zp1 -fpi87 -wx`. These are
+`ef2000-wcc` currently uses `-bt=dos -3r -zp1 -fpi87 -s -wx`. These are
 bootstrap flags for producing OMF, **not evidence** that the original binary
 used these switches. Step 3.5 must establish the actual register ABI, x87
 precision/control word, struct packing and optimizer constraints before
@@ -18,6 +18,14 @@ compiling recovered game logic. Binary matching is not a goal.
 The Nixpkgs wrapped compiler supplies `WATCOM`, `INCLUDE` and the host
 `binl64`/`binl` search path. The v2 wrapper is explicitly selected even when
 the 1.9 compatibility compiler is also in the development shell.
+
+The owner's first native OpenWatcom v2 fixture compiled with the provisional
+flags produced a 12-byte function: `push 4; call __CHK; inc eax; ret`. Open
+Watcom's documented `-s` switch suppresses stack overflow checks (and their
+implicit runtime call), so the wrapper now adds it. This **does not** establish
+that EF2000 was compiled with `-s`; it prevents the patch workflow from
+introducing an unresolved `__CHK` dependency for otherwise self-contained
+functions. The `watcom-omf` Nix check now rejects `__CHK` in its OMF listing.
 
 ## Confirmed local instruction observations
 

@@ -390,6 +390,7 @@
           ${watcom}/bin/wdis work/fixture.obj -l=work/fixture.asm
           test -s work/fixture.asm
           grep -qi 'ef_omf_fixture' work/fixture.asm
+          ! grep -qi '__CHK' work/fixture.asm
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

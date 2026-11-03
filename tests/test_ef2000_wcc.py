@@ -19,6 +19,7 @@ class WatcomWrapperTests(unittest.TestCase):
                 self.assertEqual(argv[0], '/example/wcc386')
                 for flag in ef2000_wcc.FLAGS:
                     self.assertIn(flag, argv)
+                self.assertIn('-s', argv)  # No unresolved __CHK dependency.
                 self.assertIn('-fo=' + str(output), argv)
                 output.write_bytes(b'fictional OMF fixture')
             result = ef2000_wcc.compile_module(

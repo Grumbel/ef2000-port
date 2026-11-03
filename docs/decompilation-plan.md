@@ -777,6 +777,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   In progress: initial high-score ABI instruction audit and OMF disassembly helper.
 2026-11-03  3.5   Sampled 40 candidates across five code regions for manual calling-convention review.
 2026-11-03  3.5   Collected 40 disassembly summaries and two distinct callers each; examined mixed EAX/EDX/stack ABI at 0x24480.
+2026-11-03  3.5   Owner's OMF fixture exposed __CHK stack probe; add -s and forbid that new unresolved dependency in flake smoke check.
 ```
 
 ---

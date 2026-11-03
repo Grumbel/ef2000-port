@@ -16,7 +16,9 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'decomp/src'
-FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-wx')
+# -s suppresses the default __CHK stack-probe call. Until we can resolve
+# the original runtime symbols, generated game code must not add one.
+FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-s', '-wx')
 
 
 def compile_module(source, *, compiler='wcc386', output=None, execute=subprocess.run):
