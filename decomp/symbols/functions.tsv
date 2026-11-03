@@ -1040,7 +1040,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00056318	298			unknown	unclassified	unverified		
 0x00056444	175	send_unit_options_56444	game_helpers18	compiles	game	confirmed	decomp/tests/0x00056444.json	docs/compiler-abi.md; Send the unit's twelve option bytes and flag bits (command 0x11).; callers 172b4@17344,74970@74d7b,74fb4@75296; guest pending
 0x000564f4	446			unknown	unclassified	unverified		
-0x000566b4	136			unknown	unclassified	unverified		
+0x000566b4	136	apply_params_message_566b4	game_helpers19	compiles	game	confirmed	decomp/tests/0x000566b4.json	docs/compiler-abi.md; Load the parameter block from a message and apply it for the local player.; callers 581b0@583a4; guest pending
 0x0005674c	321			unknown	unclassified	unverified		
 0x00056890	152			unknown	unclassified	unverified		
 0x00056928	44	dispatch_event_triple	mid_helpers	compiles	game	confirmed	decomp/tests/0x00056928.json	docs/compiler-abi.md; copy 3 dwords, 0x1d5f4(triple, high word +0xd); callers 581b0@58368; guest pending
@@ -1079,10 +1079,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000571f0	37	send_byte_word_byte_packet_3e	marker_packets	compiles	game	confirmed	decomp/tests/0x000571f0.json	docs/compiler-abi.md; Packet 3e AL DX BL size 5; sole direct caller 74480@74545; guest pending
 0x00057218	116	handle_owner_message_57218	game_helpers9	compiles	game	confirmed	decomp/tests/0x00057218.json	docs/compiler-abi.md; ; callers 581b0@58550; guest pending
 0x0005728c	38	send_two_word_byte_packet_3b	marker_packets	compiles	game	confirmed	decomp/tests/0x0005728c.json	docs/compiler-abi.md; Packet 3b AX DX BL size 6; BH overwritten with opcode; sole direct caller 772d0@774ab; guest pending
-0x000572b4	148			unknown	unclassified	unverified		
+0x000572b4	148	forward_command_message_572b4	game_helpers19	compiles	game	confirmed	decomp/tests/0x000572b4.json	docs/compiler-abi.md; Forward a command message as packet 0x48/0x49/0x47 plus a closing 0x4a.; callers 581b0@5855f; guest pending
 0x00057348	33	send_word_byte_packet_3d	marker_packets	compiles	game	confirmed	decomp/tests/0x00057348.json	docs/compiler-abi.md; Packet 3d AX DL size 4; sole direct caller 775f0@7771e; guest pending
 0x0005736c	100	clear_owner_slot_5736c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0005736c.json	docs/compiler-abi.md; Clear slot message[3] of the owner's table.; callers 581b0@5856e; guest pending
-0x000573d0	176			unknown	unclassified	unverified		
+0x000573d0	176	send_table_entry_573d0	game_helpers19	compiles	game	confirmed	decomp/tests/0x000573d0.json	docs/compiler-abi.md; Send entry idx of the 48-byte table at 0x211af0 (command 0x3f).; callers 90ac4@90c0e,90c6c@90f36; guest pending
 0x00057480	380			unknown	unclassified	unverified		
 0x000575fc	36	send_two_word_packet_40	marker_packets	compiles	game	confirmed	decomp/tests/0x000575fc.json	docs/compiler-abi.md; Packet 40 AX DX size 5; sole direct caller 910f4@911e5; guest pending
 0x00057620	48	handle_entry_57620	game_helpers5	compiles	game	confirmed	decomp/tests/0x00057620.json	docs/compiler-abi.md; ; callers 581b0@5858c; guest pending

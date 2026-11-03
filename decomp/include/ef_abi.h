@@ -2012,4 +2012,10 @@ void send_record_state_55aac(ef_addr32 record);
 void send_unit_options_56444(int16_t unit_id, uint16_t word_a, uint16_t word_b);
 void guest_fn_548e0(int32_t unit); /* 0x548e0 EAX */
 
+/* game_helpers19.c */
+void apply_params_message_566b4(ef_addr32 message);
+void forward_command_message_572b4(ef_addr32 message);
+void send_table_entry_573d0(int16_t index, uint8_t value);
+void guest_fn_900c0(int32_t id, uint32_t a, int32_t b); /* 0x900c0 EAX/EDX/EBX */
+
 #endif

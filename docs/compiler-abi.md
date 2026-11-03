@@ -2753,3 +2753,11 @@ in EAX, format string address, one value).
 | `0x54f4c` | EAX:ef_addr32 | none | 581b0@582d0 | Apply a unit-state message when it concerns the local player or is open. |
 | `0x55aac` | EAX:ef_addr32 | none | 87db8@87e71,883cc@88423 | Send the full state of a record (command 0x0e). |
 | `0x56444` | AX:int16_t,DX:uint16_t,BX:uint16_t | none | 172b4@17344,74970@74d7b,74fb4@75296 | Send the unit's twelve option bytes and flag bits (command 0x11). |
+
+## game_helpers19 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x566b4` | EAX:ef_addr32 | none | 581b0@583a4 | Load the parameter block from a message and apply it for the local player. |
+| `0x572b4` | EAX:ef_addr32 | none | 581b0@5855f | Forward a command message as packet 0x48/0x49/0x47 plus a closing 0x4a. |
+| `0x573d0` | AX:int16_t,DL:uint8_t | none | 90ac4@90c0e,90c6c@90f36 | Send entry idx of the 48-byte table at 0x211af0 (command 0x3f). |
