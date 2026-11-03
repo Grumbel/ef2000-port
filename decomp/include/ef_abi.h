@@ -1918,4 +1918,22 @@ void set_page_entry_a2634(int16_t index, int16_t entry, uint32_t value);
 uint32_t guest_fn_9c858(ef_addr32 text); /* 0x9c858 EAX -> EAX */
 void guest_fn_a207c(ef_addr32 target, ef_addr32 slot); /* 0xa207c EAX/EDX */
 
+/* runtime_helpers8.c */
+void install_handlers_a3acc(void);
+void dispatch_entry_a33a4(uint32_t entry);
+void dispatch_all_a33f0(void);
+ef_addr32 find_registered_a4678(ef_addr32 key);
+ef_addr32 run_widget_a4dd0(ef_addr32 widget);
+void move_widget_a5484(ef_addr32 widget, int16_t x, int16_t y);
+void toggle_children_a570c(ef_addr32 widget, uint8_t state);
+void guest_fn_a32e8(uint32_t entry); /* 0xa32e8 EAX */
+void guest_fn_a334c(uint32_t entry); /* 0xa334c EAX */
+void guest_fn_a3824(uint32_t entry); /* 0xa3824 EAX */
+void guest_fn_ac5f8(uint32_t value); /* 0xac5f8 EAX */
+void guest_fn_ac9e8(void); /* 0xac9e8 */
+void guest_fn_a51dc(ef_addr32 widget); /* 0xa51dc EAX */
+void guest_fn_a739c(ef_addr32 widget, uint32_t state); /* 0xa739c EAX/EDX */
+void guest_fn_a56f8(ef_addr32 widget); /* 0xa56f8 EAX */
+void guest_fn_a6038(void); /* 0xa6038 */
+
 #endif

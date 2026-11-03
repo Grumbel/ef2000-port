@@ -2175,8 +2175,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a32c8	30			unknown	unclassified	unverified		
 0x000a32e8	98			unknown	unclassified	unverified		
 0x000a334c	86			unknown	unclassified	unverified		
-0x000a33a4	74			unknown	unclassified	unverified		
-0x000a33f0	52			unknown	unclassified	unverified		
+0x000a33a4	74	dispatch_entry_a33a4	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a33a4.json	docs/compiler-abi.md; Dispatch on the low nibble of the entry's kind byte.; callers a33f0@a3404; guest pending
+0x000a33f0	52	dispatch_all_a33f0	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a33f0.json	docs/compiler-abi.md; Dispatch every entry of the list at 0x136b84.; callers a410c@a4119; guest pending
 0x000a3424	73			unknown	unclassified	unverified		
 0x000a348c	247			unknown	unclassified	unverified		
 0x000a35bc	242			unknown	unclassified	unverified		
@@ -2190,7 +2190,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a38f8	225			unknown	unclassified	unverified		
 0x000a39ec	36			unknown	unclassified	unverified		
 0x000a3a10	24	string_short_enough	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3a10.json	docs/compiler-abi.md; nonempty string with 0xb1b8b result <= 0x10; callers 34844@34858; guest pending
-0x000a3acc	122			unknown	unclassified	unverified		
+0x000a3acc	122	install_handlers_a3acc	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a3acc.json	docs/compiler-abi.md; Install the table of ten handler addresses.; callers a3c18@a3c90; guest pending
 0x000a3b48	25	fill_block_a3b48	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3b48.json	docs/compiler-abi.md; 0xdeb87(0x136dd8,-1,8); callers a3c18@a3c5a; guest pending
 0x000a3bdc	31			unknown	unclassified	unverified		
 0x000a3bfc	27	init_entry_table_a3bfc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3bfc.json	docs/compiler-abi.md; dwords 0x1368bc[i]=0x136dfc+0x21*i for i<8; callers a3c18@a3c5f; guest pending
@@ -2226,7 +2226,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a45b3	49			unknown	unclassified	unverified		
 0x000a45e4	16			unknown	unclassified	unverified		
 0x000a4640	53			unknown	unclassified	unverified		
-0x000a4678	82			unknown	unclassified	unverified		
+0x000a4678	82	find_registered_a4678	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a4678.json	docs/compiler-abi.md; Find the registered entry whose name equals key, or 0.; callers a46cc@a46d0; guest pending
 0x000a46cc	35			unknown	unclassified	unverified		
 0x000a46f0	38			unknown	unclassified	unverified		
 0x000a4718	129			unknown	unclassified	unverified		
@@ -2243,7 +2243,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a4cb4	217			unknown	unclassified	unverified		
 0x000a4d90	29	apply_a4cb4_a4d90	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a4d90.json	docs/compiler-abi.md; ; callers 4738@4856,487c@48d7,487c@48e1; guest pending
 0x000a4db0	29	apply_a4b80_a4db0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a4db0.json	docs/compiler-abi.md; ; callers 487c@4917,487c@4921,494c@49e8; guest pending
-0x000a4dd0	65			unknown	unclassified	unverified		
+0x000a4dd0	65	run_widget_a4dd0	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a4dd0.json	docs/compiler-abi.md; Run a widget modally until its flag 4 is cleared.; callers 345e8@34739,34a98@34ad9; guest pending
 0x000a4e14	86			unknown	unclassified	unverified		
 0x000a4e6c	41			unknown	unclassified	unverified		
 0x000a4e98	40	clear_widget_table_a4e98	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4e98.json	docs/compiler-abi.md; clear dwords 0x41edfc..0x41ee9c (41 entries); callers ac16c@ac1a5; guest pending
@@ -2253,13 +2253,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a5070	361			unknown	unclassified	unverified		
 0x000a51dc	48	update_widget_child_a51dc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a51dc.json	docs/compiler-abi.md; child word +4 = word +0x45 (-0x44 with flag 0x40); callers a520c@a530a,a5484@a54e6,a59d8@a5a4e; guest pending
 0x000a520c	281			unknown	unclassified	unverified		
-0x000a5484	106			unknown	unclassified	unverified		
+0x000a5484	106	move_widget_a5484	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a5484.json	docs/compiler-abi.md; Move a widget, clamped to the screen unless flag 0x10 is set.; callers a520c@a52cf,a520c@a5303,a54f0@a54fe; guest pending
 0x000a54f0	22	forward_widget_position	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a54f0.json	docs/compiler-abi.md; 0xa5484(widget, high words +0x3f,+0x41); callers a59d8@a5a1d; guest pending
 0x000a5508	132			unknown	unclassified	unverified		
 0x000a558c	292			unknown	unclassified	unverified		
 0x000a56b0	69			unknown	unclassified	unverified		
 0x000a56f8	17	clear_widget_words_a56f8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a56f8.json	docs/compiler-abi.md; words +0x69 +0x6b = 0; tail 0xf13ac; callers ba5c@bba1,bfcc@c4a0,a570c@a575a; guest pending
-0x000a570c	87			unknown	unclassified	unverified		
+0x000a570c	87	toggle_children_a570c	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a570c.json	docs/compiler-abi.md; Toggle the child controls of kinds 5, 6, 0xd, 0xe and 0xf.; callers 340a4@34132,34298@34319,34298@34343; guest pending
 0x000a5764	539			unknown	unclassified	unverified		
 0x000a5980	44	update_all_widgets_a5980	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a5980.json	docs/compiler-abi.md; 0xa5764(dword 0x41edfc[i]) for i=1..word 0x41eed8; callers ac2e4@ac3d7; guest pending
 0x000a59ac	41	clear_child_words_a59ac	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a59ac.json	docs/compiler-abi.md; clear child words +0xe +0x10 +0x12 unless flag 2; callers a59d8@a5a47; guest pending

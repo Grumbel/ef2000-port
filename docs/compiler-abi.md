@@ -2675,3 +2675,15 @@ in EAX, format string address, one value).
 | `0xa0018` | AX:uint16_t,DX:uint16_t | EAX:int32_t | a0228@a0240 | Find the entry in the 0x4e-byte chain whose two keys match, or -1. |
 | `0xa1a90` | AX:int16_t,EDX:int32_t | EAX:uint32_t | 2fbc4@2fc8b,3c730@3c744,74228@74267 | Look up key in the (key, offset) pair table of a page; return the address or 0. |
 | `0xa2634` | AX:int16_t,DX:int16_t,EBX:uint32_t | none | 9e7bc@9f498 | Fill one entry of the current page and refresh the page slot. |
+
+## runtime_helpers8 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa3acc` | none | none | a3c18@a3c90 | Install the table of ten handler addresses. |
+| `0xa33a4` | EAX:uint32_t | none | a33f0@a3404 | Dispatch on the low nibble of the entry's kind byte. |
+| `0xa33f0` | none | none | a410c@a4119 | Dispatch every entry of the list at 0x136b84. |
+| `0xa4678` | EAX:ef_addr32 | EAX:ef_addr32 | a46cc@a46d0 | Find the registered entry whose name equals key, or 0. |
+| `0xa4dd0` | EAX:ef_addr32 | EAX:ef_addr32 | 345e8@34739,34a98@34ad9 | Run a widget modally until its flag 4 is cleared. |
+| `0xa5484` | EAX:ef_addr32,DX:int16_t,BX:int16_t | none | a520c@a52cf,a520c@a5303,a54f0@a54fe | Move a widget, clamped to the screen unless flag 0x10 is set. |
+| `0xa570c` | EAX:ef_addr32,DL:uint8_t | none | 340a4@34132,34298@34319,34298@34343 | Toggle the child controls of kinds 5, 6, 0xd, 0xe and 0xf. |
