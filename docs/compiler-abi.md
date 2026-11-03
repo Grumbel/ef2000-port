@@ -2771,3 +2771,15 @@ in EAX, format string address, one value).
 | `0x831a4` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | 83a40@83aac | Store a vector, halved until every component fits in 16 bits. |
 | `0x85c90` | AX:int16_t | EAX:uint32_t | 2a1fc@2a27b,86110@86188,86968@86a06 | Address of row `index` (6 bytes) in the selected unit's page table, or the default table. |
 | `0x887d0` | none | none | 888cc@889e3 | Flag the first kind-0x1f/0x20 record of the ring at 0x20f160 that passes the hit test. |
+
+## game_helpers21 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x89bf0` | none | AL:uint8_t | 89ac0@89af4 | True when a random value modulo the configured period is within the tick budget. |
+| `0x8b988` | EAX:int32_t,EDX:int32_t | none | 8bb18@8bb44 | Draw every effect of the ring at 0x12db5c that is close to (x, y). |
+| `0x8ba30` | EAX:ef_addr32 | none | 8ba98@8babf | Allocate the sprite for an effect and link it at the head of the ring. |
+| `0x8bb18` | none | none | 3dd30@3e1da | Draw the effects around the camera position. |
+| `0x8c930` | AX:int16_t | EAX:uint32_t | 8c49c@8c919 | Select the page slot for a page id, or 0 when the page table lacks it. |
+| `0x8e5f0` | EAX:ef_addr32 | none | 8e664@8e909 | Draw a record: low records use the primary routine, deeper ones the offset one. |
+| `0x8f9e8` | none | none | 3ea0c@3ee32 | Install the table of nine handler addresses at 0x158f4c. |

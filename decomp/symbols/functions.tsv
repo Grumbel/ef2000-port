@@ -1756,7 +1756,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000899d8	231			unknown	unclassified	unverified		
 0x00089ac0	151			unknown	unclassified	unverified		
 0x00089b58	151			unknown	unclassified	unverified		
-0x00089bf0	115			unknown	unclassified	unverified		
+0x00089bf0	115	period_elapsed_89bf0	game_helpers21	compiles	game	confirmed	decomp/tests/0x00089bf0.json	docs/compiler-abi.md; True when a random value modulo the configured period is within the tick budget.; callers 89ac0@89af4; guest pending
 0x00089c64	418			unknown	unclassified	unverified		
 0x00089e08	325			unknown	unclassified	unverified		
 0x00089f50	105			unknown	unclassified	unverified		
@@ -1777,13 +1777,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008b684	89			unknown	unclassified	unverified		
 0x0008b6e0	262			unknown	unclassified	unverified		
 0x0008b7e8	317			unknown	unclassified	unverified		
-0x0008b988	95			unknown	unclassified	unverified		
+0x0008b988	95	draw_nearby_effects_8b988	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008b988.json	docs/compiler-abi.md; Draw every effect of the ring at 0x12db5c that is close to (x, y).; callers 8bb18@8bb44; guest pending
 0x0008b9e8	71	find_cell_8b9e8	unit_flags	compiles	game	confirmed	decomp/tests/0x0008b9e8.json	docs/compiler-abi.md; Find the list node (list dword 0x12db5c, next at +0x1d) whose coordinates match; returns its word +0x1b or -1.; callers 3ce70@3cea4; guest pending
-0x0008ba30	70			unknown	unclassified	unverified		
+0x0008ba30	70	link_effect_8ba30	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008ba30.json	docs/compiler-abi.md; Allocate the sprite for an effect and link it at the head of the ring.; callers 8ba98@8babf; guest pending
 0x0008ba78	11	clear_dword_12db5c	misc_state	compiles	game	confirmed	decomp/tests/0x0008ba78.json	docs/compiler-abi.md; dword 0x12db5c=0; callers 8bd58@8bdb7; guest pending
 0x0008ba98	60			unknown	unclassified	unverified		
 0x0008bad4	68			unknown	unclassified	unverified		
-0x0008bb18	54			unknown	unclassified	unverified		
+0x0008bb18	54	draw_effects_at_camera_8bb18	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008bb18.json	docs/compiler-abi.md; Draw the effects around the camera position.; callers 3dd30@3e1da; guest pending
 0x0008bb50	288			unknown	unclassified	unverified		
 0x0008bd58	121			unknown	unclassified	unverified		
 0x0008bdd4	11	copy_dword_20f420_to_132ad4	misc_state	compiles	game	confirmed	decomp/tests/0x0008bdd4.json	docs/compiler-abi.md; dword 0x132ad4=dword 0x20f420; callers 3ea0c@3eec5; guest pending
@@ -1800,7 +1800,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008c0c8	37			unknown	unclassified	unverified		
 0x0008c0f0	940			unknown	unclassified	unverified		
 0x0008c49c	1169			unknown	unclassified	unverified		
-0x0008c930	52			unknown	unclassified	unverified		
+0x0008c930	52	select_slot_8c930	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008c930.json	docs/compiler-abi.md; Select the page slot for a page id, or 0 when the page table lacks it.; callers 8c49c@8c919; guest pending
 0x0008c988	103			unknown	unclassified	unverified		
 0x0008ca24	194			unknown	unclassified	unverified		
 0x0008cae8	120			unknown	unclassified	unverified		
@@ -1827,7 +1827,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008dd48	339			unknown	unclassified	unverified		
 0x0008de9c	596			unknown	unclassified	unverified		
 0x0008e494	132			unknown	unclassified	unverified		
-0x0008e5f0	115			unknown	unclassified	unverified		
+0x0008e5f0	115	draw_record_8e5f0	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008e5f0.json	docs/compiler-abi.md; Draw a record: low records use the primary routine, deeper ones the offset one.; callers 8e664@8e909; guest pending
 0x0008e664	729			unknown	unclassified	unverified		
 0x0008e940	924			unknown	unclassified	unverified		
 0x0008ecdc	604			unknown	unclassified	unverified		
@@ -1841,7 +1841,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008f620	35	configure_scene_feature	scene_controls	compiles	game	confirmed	decomp/tests/0x0008f620.json	docs/compiler-abi.md; Three original 16-bit stores at 0x198442/0x19842e/0x198444; awaiting OMF guest differential
 0x0008f644	747			unknown	unclassified	unverified		
 0x0008f930	181			unknown	unclassified	unverified		
-0x0008f9e8	111			unknown	unclassified	unverified		
+0x0008f9e8	111	install_handlers_8f9e8	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008f9e8.json	docs/compiler-abi.md; Install the table of nine handler addresses at 0x158f4c.; callers 3ea0c@3ee32; guest pending
 0x0008fa58	43	convert_navigation_vector	vector_math	compiles	game	confirmed	decomp/tests/0x0008fa58.json	docs/compiler-abi.md; Int32[8,0,4] to double[0,8,16] with unaligned 0x18aa0b/13 scales; x87 precision pending; awaiting OMF guest differential
 0x0008fa84	60			unknown	unclassified	unverified		
 0x0008fbc8	91			unknown	unclassified	unverified		

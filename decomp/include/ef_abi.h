@@ -2027,4 +2027,16 @@ void flag_first_hit_887d0(void);
 uint32_t guest_fn_a1a40_key(ef_addr32 key); /* 0xa1a40 EAX -> EAX (older no-argument guest_fn_a1a40 omits the EAX input) */
 uint32_t guest_fn_d0470(int32_t a, int32_t x, int32_t y, int32_t z); /* 0xd0470 EAX/EDX/EBX/ECX -> EAX */
 
+/* game_helpers21.c */
+uint8_t period_elapsed_89bf0(void);
+void draw_nearby_effects_8b988(int32_t x, int32_t y);
+void link_effect_8ba30(ef_addr32 effect);
+void draw_effects_at_camera_8bb18(void);
+uint32_t select_slot_8c930(int16_t page_id);
+void draw_record_8e5f0(ef_addr32 record);
+void install_handlers_8f9e8(void);
+uint32_t guest_fn_8fdf0(int32_t value); /* 0x8fdf0 EAX -> EAX */
+void guest_fn_8e664(uint32_t x, uint32_t y, uint32_t z); /* 0x8e664 EAX/EDX/EBX */
+void guest_fn_9e094(int32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0x9e094 EAX/EDX/EBX/ECX/stack, ret 4 */
+
 #endif
