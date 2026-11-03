@@ -2040,3 +2040,32 @@ in EAX, format string address, one value).
 | `0x10d427` | EAX:ef_addr32 | none | 10d466@10d48f,10d4c4@10d4fc | Unlink a node from the doubly linked list with heads at dwords 0x164650 and 0x16464c. |
 | `0x10ddfc` | EAX:uint32_t | EAX:int32_t | 10f1bf@10f1e2 | Count list entries (list at dword 0x485f9f) whose flags in +0xc match the mask; flush those with bit 0x10 in +0xd via 0x |
 | `0x10dfe0` | none | EAX:uint32_t | eab44@eab47,eac48@eadfa | Dword +0x46c of the object pointed to by dword 0x120cc6. |
+
+## runtime_libc (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10e438` | none | none | ed6c5@ed6c5,108afd@108d4e | 0x11d258(0x195168, 1). |
+| `0x10e46f` | EAX:uint32_t,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | ed6cc@ed989,10e4b8@10e4ca | Convert EAX to text in radix EBX at EDX using the digit table at 0x10e44a; * returns the destination start. |
+| `0x10e4b8` | EAX:int32_t,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | ed6cc@ed855,ed6cc@ed88f | Signed conversion: radix 10 negatives get a leading '-'. |
+| `0x10e837` | EAX:int32_t | EAX:uint32_t | f118d@f11e6,10e872@10e88d,10e97f@10e9d6 | Gregorian leap year. |
+| `0x10e957` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 10e97f@10e9a8 | 0x10e872(a, c) > 0x10e872(b, c). |
+| `0x10ec32` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | 10e97f@10eb13,10e97f@10ec0e | Three-dword signed lexicographic less-than (most significant dword at +8). |
+| `0x10edb4` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 10edda@10ee89,10edda@10ee9e,10edda@10eeb0 | Parse decimal digits at EAX into *EDX; returns the pointer after them. |
+| `0x10f190` | EAX:ef_addr32 | EAX:int32_t | 10f107@10f13a,10f107@10f165 | Read one byte from a counted buffer stream; -1 at the end. |
+| `0x10f4df` | EAX:uint32_t | EAX:uint32_t | f2183@f2227,f227f@f2287 | 0xfa95f(EAX, 0, 1). |
+| `0x1100b1` | none | EAX:uint32_t | none direct | Elapsed value of 0x11004b relative to dword 0x4dd984, wrapping at 0x83d600. |
+| `0x110123` | EAX:uint32_t | EAX:uint32_t | f9ecd@f9ecd,101c54@101ce1 | 0x1100d2(EAX, 0x4dd988). |
+| `0x1102a3` | EAX:uint32_t,EDX:uint32_t | none | fa4a9@fa65e,fa9a0@fa9b6 | Store value / 0x4000 in dword table 0x17d614[index]. |
+| `0x11024e` | EAX:int32_t | EAX:uint32_t | fa4a9@fa5fa,10f26a@10f276,110393@1103a1 | Look up dword table 0x17d614[index], marking the first six slots as seen. |
+| `0x110dcc` | none | none | 101ba8@101bb1 |  |
+| `0x110dd9` | none | none | 101ba8@101bd1 |  |
+| `0x110f3c` | EAX:uint32_t | EAX:uint32_t | 110f6f@110fb1 | 0x110f0c(value < 0xd68d ? value * 10000 / 0x20bc : 0). |
+| `0x111359` | none | EAX:uint32_t | none direct |  |
+| `0x111569` | none | EAX:uint32_t | none direct |  |
+| `0x1113ac` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 102198@1021c4 | Exchange dword 0x17d764[index] under the lock 0x101e70/0x101e78. |
+| `0x1113fb` | none | none | 1023b0@1023d1 | Call trace_call_102384 for the slots 0x38 down to 0. |
+| `0x11144f` | none | none | none direct | As 0x1113fb for 0x1022dc. |
+| `0x1114a3` | none | none | none direct | As 0x1113fb for 0x102330. |
+| `0x1114f7` | EAX:uint32_t,EDX:uint32_t | none | 101c54@101d8c,102228@102252 | 0x1021f4(a, 1000000 / b) under the lock. |
+| `0x111527` | EAX:uint32_t,EDX:uint32_t | none | 10225c@102286 | 0x1021f4(a, b == 0 ? 0xd68d : 10000 * b / 0x2e9c) under the lock. |

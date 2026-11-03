@@ -1086,4 +1086,39 @@ void guest_fn_fa9d2(uint32_t object); /* 0xfa9d2 EAX */
 void guest_fn_118428(uint32_t object, uint32_t command); /* 0x118428 EAX/EDX */
 void guest_fn_fa8a0(ef_addr32 stream); /* 0xfa8a0 EAX */
 
+/* runtime_libc.c */
+void call_11d258_default(void);
+ef_addr32 unsigned_to_text(uint32_t value, ef_addr32 destination, uint32_t radix);
+ef_addr32 signed_to_text(int32_t value, ef_addr32 destination, uint32_t radix);
+uint32_t is_leap_year(int32_t year);
+uint32_t compare_dates_10e957(uint32_t first, uint32_t second, uint32_t third);
+uint32_t triple_less_than(ef_addr32 first, ef_addr32 second);
+ef_addr32 parse_decimal(ef_addr32 text, ef_addr32 result);
+int32_t stream_getc(ef_addr32 stream);
+uint32_t call_fa95f_from_start(uint32_t handle);
+uint32_t elapsed_since_start(void);
+uint32_t call_1100d2_default(uint32_t value);
+void store_flagged_value(uint32_t index, uint32_t value);
+uint32_t lookup_slot_11024e(int32_t index);
+void increment_17d7ba(void);
+void decrement_17d7ba(void);
+uint32_t scale_110f3c(uint32_t value);
+uint32_t value_17d7b6(void);
+uint32_t value_17d7ae(void);
+uint32_t exchange_slot_1113ac(uint32_t index, uint32_t value);
+void for_each_slot_1113fb(void);
+void for_each_slot_11144f(void);
+void for_each_slot_1114a3(void);
+void set_rate_1114f7(uint32_t slot, uint32_t divisor);
+void set_period_111527(uint32_t slot, uint32_t value);
+void guest_fn_11d258(uint32_t a, uint32_t b); /* 0x11d258 EAX/EDX */
+uint32_t guest_fn_10e872(uint32_t a, uint32_t b); /* 0x10e872 EAX/EDX */
+uint32_t guest_fn_10f1bf(ef_addr32 stream); /* 0x10f1bf EAX */
+uint32_t guest_fn_fa95f(uint32_t handle, uint32_t a, uint32_t b); /* 0xfa95f EAX/EDX/EBX */
+uint32_t guest_fn_11004b(void); /* 0x11004b */
+uint32_t guest_fn_1100d2(uint32_t value, ef_addr32 buffer); /* 0x1100d2 EAX/EDX */
+uint32_t guest_fn_110f0c(uint32_t value); /* 0x110f0c cdecl */
+uint32_t guest_fn_101e70(void); /* 0x101e70 */
+void guest_fn_101e78(void); /* 0x101e78 */
+
 #endif
