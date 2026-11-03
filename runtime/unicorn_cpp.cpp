@@ -16,6 +16,7 @@
 #include "pcm_audio.hpp"
 #include "real_mode_cpu.hpp"
 #include "wav_capture.hpp"
+#include "efpatch.hpp"
 #include <unicorn/unicorn.h>
 #include <unicorn/x86.h>
 #ifdef _WIN32
@@ -1141,13 +1142,7 @@ void put32(std::vector<uint8_t>& data, size_t pos, uint32_t value) {
     put16(data, pos + 2, value >> 16);
 }
 
-std::vector<uint8_t> payload_from_executable(const std::string& path) {
-    std::ifstream file(path, std::ios::binary);
-    if (!file) throw std::runtime_error("cannot open original executable: " + path);
-    const std::vector<uint8_t> data((std::istreambuf_iterator<char>(file)), {});
-    if (data.size() < 0x80 || le16(data, 0) != 0x5a4d ||
-        std::memcmp(data.data() + 0x28, "B23X", 4) != 0)
-        throw std::runtime_error("not a supported EF2000 X-32 executable");
+std::array<uint8_t, 32> sha256_bytes(const std::vector<uint8_t>& data) {
 #ifdef _WIN32
     // Windows has SHA-256 in CryptoAPI; no OpenSSL DLL is needed in the
     // distributable, and the original DOS executable remains untouched.
@@ -1169,6 +1164,17 @@ std::vector<uint8_t> payload_from_executable(const std::string& path) {
     std::array<uint8_t, 32> digest{};
     SHA256(data.data(), data.size(), digest.data());
 #endif
+    return digest;
+}
+
+std::vector<uint8_t> payload_from_executable(const std::string& path) {
+    std::ifstream file(path, std::ios::binary);
+    if (!file) throw std::runtime_error("cannot open original executable: " + path);
+    const std::vector<uint8_t> data((std::istreambuf_iterator<char>(file)), {});
+    if (data.size() < 0x80 || le16(data, 0) != 0x5a4d ||
+        std::memcmp(data.data() + 0x28, "B23X", 4) != 0)
+        throw std::runtime_error("not a supported EF2000 X-32 executable");
+    const auto digest = sha256_bytes(data);
     char hex[65]{};
     for (size_t i = 0; i < digest.size(); ++i)
         std::snprintf(hex + 2 * i, 3, "%02x", digest[i]);
@@ -2920,6 +2926,7 @@ void usage(const char* program) {
               << "       [--trace-archive-lookups] (unique DID pathname requests on stderr)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
               << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
+              << "       [--patch FILE] (repeatable in-place EFPATCH1, no patch arenas yet)\n"
               << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
               << "       --cd-dir DIR provides DOS disc files only; it does not enable music\n"
               << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
@@ -2951,6 +2958,7 @@ int main(int argc, char** argv) {
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
         std::vector<JoystickEvent> joystick_events;
+        std::vector<std::string> patch_paths;
         std::string framebuffer, wav_directory;
         for (int i = 1; i < argc; ++i) {
             if (!std::strcmp(argv[i], "--help") || !std::strcmp(argv[i], "-h")) {
@@ -2962,6 +2970,8 @@ int main(int argc, char** argv) {
                 limit = std::stoull(value, &end);
                 if (end != value.size()) throw std::runtime_error("invalid instruction limit");
                 explicit_limit = true;
+            } else if (!std::strcmp(argv[i], "--patch") && i + 1 < argc) {
+                patch_paths.emplace_back(argv[++i]);
             } else if (!std::strcmp(argv[i], "--timer-instructions") && i + 1 < argc) {
                 size_t end{};
                 const std::string value = argv[++i];
@@ -3175,6 +3185,7 @@ int main(int argc, char** argv) {
                 int(self_test_archive_lookup) != 1)
                 throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
+            if (!patch_paths.empty()) throw std::runtime_error("self-test does not accept patches");
             if (!wav_directory.empty()) throw std::runtime_error("self-test does not capture audio");
             if (!cd_cue.empty()) throw std::runtime_error("self-test does not take a CD image");
             std::vector<uint8_t> image(self_test_fast_copy ? COPY_ENTRY + 5 :
@@ -3335,7 +3346,22 @@ int main(int argc, char** argv) {
                          [](const TimedKeyEvent& a, const TimedKeyEvent& b) { return a.tick < b.tick; });
         std::stable_sort(joystick_events.begin(), joystick_events.end(),
                          [](const JoystickEvent& a, const JoystickEvent& b) { return a.tick < b.tick; });
-        const auto image = payload_from_executable(path);
+        auto image = payload_from_executable(path);
+        if (!patch_paths.empty()) {
+            const auto original_digest = sha256_bytes(image);
+            std::vector<ef2000::PatchWrite> writes;
+            for (const auto& patch_path : patch_paths) {
+                const auto batch = ef2000::load_efpatch(patch_path, original_digest, image.size());
+                writes.insert(writes.end(), batch.begin(), batch.end());
+            }
+            ef2000::validate_patch_writes(writes, image.size());
+            for (const auto& write : writes)
+                std::cout << "patch: addr=0x" << std::hex << write.offset << std::dec
+                          << " bytes=" << write.bytes.size() << '\n';
+            ef2000::apply_efpatches(image, writes);
+            std::cout << "patches: applied " << patch_paths.size()
+                      << " in-place EFPATCH1 file(s), " << writes.size() << " writes\n";
+        }
         if (game_dir.empty()) game_dir = fs::path(path).parent_path().string();
         if (cd_dir.empty()) cd_dir = game_dir;
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,

@@ -3,12 +3,13 @@
 
 # OpenWatcom OMF splice planner (Phase 1, §3.7)
 
-The first stage of `tools/omf_splice.py` is an **offline inspector and patch
-planner only**. It does not modify the EF2000 image and **no emulator knows
-how to load `.efpatch` yet**. The first real splice must wait for §3.8 arena
-reservation, an audited control-flow boundary, and an independent function
-differential/replay. Do not run a planned patch in the game by manually
-writing its bytes into the executable.
+`tools/omf_splice.py` inspects OpenWatcom OMF and creates a reviewable JSON
+patch plan. `tools/efpatch.py` can pack **in-place-only** plans into the
+binary `EFPATCH1` format. The native64 harness and C++ Unicorn runner accept
+this restricted format via repeatable `--patch FILE` arguments, applying it
+to a disposable copy of the extracted guest image. Original executable and
+game assets are never modified. No replacement is considered verified without
+the differential and full-game replay stages.
 
 ## Inspect a compiler object
 
@@ -38,7 +39,7 @@ python3 tools/omf_splice.py decomp/build/recovered.obj \
   --globals decomp/symbols/globals.tsv \
   --reviewed-flow 0xADDRESS \
   --arena-base 0xARENA_BASE \
-  -o local/patches/recovered.efpatch
+  -o local/patches/recovered.efpatch.json
 ~~~
 
 `--arena-base` must be a **real independently validated** unused guest range
@@ -51,8 +52,38 @@ The emitted JSON carries its source image's SHA-256 digest and a list of
 hex-encoded memory writes. Code that fits the original function is relocated
 to the original entry and its remainder padded with `INT3`; larger code is
 placed in an arena and the original entry becomes a `JMP rel32`. Data
-segments also live in the arena. Neither layout is yet guaranteed usable by
-the runtime.
+segments also live in the arena. **Only the first case, with zero arena
+writes, can currently be packed and run.**
+
+~~~sh
+python3 tools/efpatch.py local/patches/recovered.efpatch.json \
+  --image local/ghidra/payload.bin \
+  -o local/patches/recovered.efpatch
+
+# C++ Unicorn backend:
+nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+  --patch local/patches/recovered.efpatch --windowed
+
+# Native64 backend:
+python3 tools/run_startup.py /path/to/_EF2000.EXE \
+  --patch local/patches/recovered.efpatch --output local/startup-patched
+~~~
+
+`EFPATCH1` is a compact little-endian binary: 8-byte `EF2000P1` magic,
+32-byte SHA-256 of the **original initialized payload**, 32-bit write count,
+then repeated 32-bit address, length, and data. Both runners verify digest,
+bounds, count, total size and nonoverlap (including across multiple patches)
+before applying any write. The native save-state identity includes the
+ordered patch file digests, preventing a patched run from accepting an
+unpatched or differently patched save state. Unpatched identity remains
+unchanged for compatibility. The native harness logs the patch identifiers
+in its run report; C++ Unicorn prints the applied patch count on startup.
+
+The original memory size remains 64 MiB. All patch writes must fit within
+the original *initialized payload*; arena/redirected plans fail during
+packing, and malformed binary writes are rejected by both runners. This
+scope deliberately avoids guessing a safe guest arena or allocator high-water
+mark and does not yet support injected constants or enlarged functions.
 
 Current fail-closed restrictions:
 
@@ -67,16 +98,19 @@ Current fail-closed restrictions:
 - Frame methods F4/F5 only in generated patches. Other group/frame methods,
   short/selector/far relocations, LIDATA, COMDAT, BAKPAT, unsupported record
   forms and overlapping data/fixups stop the entire module. No guessing.
-- One source object per plan, no multi-object linker, no actual arena
-  reservation, no guest loading, no save-state patch-set binding, and no
-  differential/replay verification. Those are subsequent steps.
+- One source object per plan; no multi-object linker, no actual arena
+  reservation, and no differential/replay verification. Those are subsequent
+  steps. Only explicitly reviewed *in-place* patches reach the guest.
 
 The implementation is exercised with *synthetic OMF records* in
 `tests/test_omf_splice.py`: external near-call relocations, internal absolute
 data references, inline and redirected placement, fixup threads, malformed
 references, and CLI inspect/build. It has **not** yet passed an end-to-end
 test using a real OpenWatcom-emitted `.obj`; unsupported structures can be
-discovered once that fixture is available in the test environment.
+discovered once that fixture is available in the test environment. Four
+additional asset-free tests validate binary packing, digest binding,
+corruption detection and cross-patch overlaps; an independent C++ test
+exercises the same wire layout.
 
 OMF record interpretation follows the
 [TIS OMF specification](https://openwatcom.org/ftp/devel/docs/omf.pdf),

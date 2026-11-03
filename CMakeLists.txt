@@ -5,6 +5,11 @@ cmake_minimum_required(VERSION 3.20)
 project(ef2000 LANGUAGES C CXX ASM)
 enable_testing()
 
+add_executable(ef2000-efpatch-test tests/efpatch_test.cpp)
+target_compile_features(ef2000-efpatch-test PRIVATE cxx_std_17)
+target_include_directories(ef2000-efpatch-test PRIVATE runtime)
+add_test(NAME efpatch-format COMMAND ef2000-efpatch-test)
+
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.
 if(NOT CMAKE_BUILD_TYPE)

@@ -128,6 +128,8 @@
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/menu_font_test.cpp \
             -o objects/ef2000-menu-font-test
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -Iruntime \
+            tests/efpatch_test.cpp -o objects/ef2000-efpatch-test
           runHook postBuild
         '';
 
@@ -138,6 +140,7 @@
           unset EF2000_DATA_DIR
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
           objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
+          objects/ef2000-efpatch-test
           objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
             --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
           objects/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'

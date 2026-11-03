@@ -456,7 +456,7 @@ real compiler-object coverage, multi-object linking, arena verification and
 emulator integration are still pending. The current output is **not** ready
 to apply to a guest.
 
-### 3.8 [ ] Harness support for patches
+### 3.8 [~] Harness support for patches
 
 - Native64 (`tools/run_startup.py` / `runtime/startup.c`) and the C++ Unicorn
   runner get `--patch FILE` (repeatable). Apply after loading and relocating
@@ -469,6 +469,16 @@ to apply to a guest.
 - Log every applied patch (function name, address, size) to the run directory.
 - Save states must record the applied patch set and refuse to load into a
   run with a different set.
+
+First stage (2026-11-03): `tools/efpatch.py` turns reviewed *in-place only*
+OMF JSON plans into SHA-bound binary `EFPATCH1` writes. Native64/QEMU and C++
+Unicorn accept repeatable `--patch` and validate the complete patch set
+before altering a private guest image; arena/redirected plans are refused
+until memory high-water measurements make a reservation defensible. Native
+save-state identity now incorporates the ordered patch set, preserving prior
+unpatched identities. Four Python and one C++ asset-free tests cover format
+validation, bounds, overlap and digest rejection. See `docs/omf-splicer.md`.
+No game-function differential or end-to-end patched run has yet been made.
 
 ### 3.9 [ ] Golden replay suite
 
@@ -844,6 +854,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.6   Began library identification: relocation-masked OMF public-function fingerprint tool and proposal-only matcher, with three synthetic tests; real Watcom library evidence pending.
 2026-11-03  3.6   Classified three source-matched Watcom/X-32 startup routines as library code; not fingerprint-derived and not counted as verified function replacements.
 2026-11-03  3.7   Added a strict offline OMF splice planner, 32-bit relocation/layout proof cases, and seven synthetic tests; patch loading and real compiler-object validation remain outstanding.
+2026-11-03  3.8   Implemented SHA-bound in-place EFPATCH1 loading in native64/QEMU and C++ Unicorn, with save-state patch identity and asset-free format tests; guest arena mapping remains blocked on high-water evidence.
 ```
 
 ---

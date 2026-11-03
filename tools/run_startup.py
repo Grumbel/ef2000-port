@@ -153,6 +153,8 @@ def main():
     parser.add_argument('--gdb', action='store_true',
                         help='debug the native original-code ELF under GDB; Python serves guest hardware requests')
     parser.add_argument('--load-state', type=Path, metavar='FILE', help='restore a native save-state bundle at startup')
+    parser.add_argument('--patch', action='append', type=Path, default=[], metavar='FILE',
+                        help='apply a verified in-place EFPATCH1 binary to the disposable guest image; repeatable')
     parser.add_argument('--data-dir', type=Path, metavar='DIR', help='directory containing original EF2000 game data')
     parser.add_argument('--config-dir', type=Path, metavar='DIR', help='user configuration directory')
     parser.add_argument('--state-dir', type=Path, metavar='DIR', help='save states (default: XDG_STATE_HOME/ef2000)')
@@ -243,7 +245,21 @@ def main():
         print(f'paths: output={output}; writable overlay={output / "drive"}', flush=True)
         print(f'config: sound={args.sound}; controls={args.controls}; joystick={args.joystick}; vr={args.vr}', flush=True)
         manifest, images = extract(args.executable.read_bytes())
+        try:
+            from .efpatch import apply_patches, decode
+        except ImportError:
+            from efpatch import apply_patches, decode
+        original_image = images['payload.bin']
+        images['payload.bin'], patch_hashes = apply_patches(original_image, args.patch)
+        patch_report = [{'file': str(path.resolve()), 'sha256': sha,
+                         'writes': [{'offset': address, 'bytes': len(data)}
+                                    for address, data in decode(path.read_bytes(), original_image)]}
+                        for path, sha in zip(args.patch, patch_hashes)]
+        if patch_hashes:
+            print(f'patches: {len(patch_hashes)} in-place EFPATCH1 file(s)', flush=True)
         output.mkdir(parents=True, exist_ok=False)
+        if patch_report:
+            (output / 'patches.json').write_text(json.dumps(patch_report, indent=2) + '\n')
         overlay = output / 'drive' / 'EF2000'
         overlay.mkdir(parents=True)
         # Keep configuration changes in the local overlay.
@@ -332,6 +348,8 @@ def main():
                             'host': hashlib.sha256(b''.join((Path(__file__).parent / name).read_bytes()
                                       for name in ('real_mode.py', 'input_devices.py', 'save_states.py',
                                                    'sound_blaster.py', 'isa_audio.py', 'cd_audio.py'))).hexdigest()}
+                if patch_hashes:
+                    identity['patches'] = patch_hashes
                 from_path = paths['state'][0]
                 states = (SaveStates(from_path, output, identity,
                                      legacy=legacy_directory() if not args.state_dir and not args.portable else None)
@@ -355,6 +373,8 @@ def main():
                                      timeout=args.seconds or None, check=False)
         report = {
             'source_sha256': manifest['source_sha256'],
+            'patch_sha256': patch_hashes,
+            'patch_writes': patch_report,
             'backend': args.backend,
             'host': platform.platform(),
             'runtime_source_hashes': {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
