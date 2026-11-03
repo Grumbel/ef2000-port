@@ -1265,13 +1265,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a148	100			unknown	unclassified	unverified		
 0x0006a1b4	26	lookup_indexed_object	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; signed AX index; 32-bit table lookup at 0x20f550
 0x0006a1d0	388			unknown	unclassified	unverified		
-0x0006a354	34			unknown	unclassified	unverified		
+0x0006a354	34	set_indexed_object_activation	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index; optional byte updates at +0x141/+0x142
 0x0006a378	27			unknown	unclassified	unverified		
-0x0006a394	57			unknown	unclassified	unverified		
+0x0006a394	57	set_indexed_object_state	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index; updates bytes +0x12a/+0x13d/+0x13e
 0x0006a3d0	18			unknown	unclassified	unverified		
 0x0006a3e4	223			unknown	unclassified	unverified		
-0x0006a4c4	115			unknown	unclassified	unverified		
-0x0006a538	115			unknown	unclassified	unverified		
+0x0006a4c4	115	mul_object_matrix_vector	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX output vector EDX input vector BX signed object index
+0x0006a538	115	mul_object_matrix_transpose_vector	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX input vector EDX output vector BX signed object index
 0x0006a5ac	66			unknown	unclassified	unverified		
 0x0006a5f0	121			unknown	unclassified	unverified		
 0x0006a66c	121			unknown	unclassified	unverified		

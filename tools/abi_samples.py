@@ -17,6 +17,22 @@ from pathlib import Path
 
 FIELDS = ('entry', 'region', 'shape', 'body_bytes', 'instructions', 'direct_calls',
           'indirect_calls', 'conditional_branches', 'direct_callers', 'status')
+REVIEW_STATUSES = ('unreviewed', 'confirmed', 'partial_abi', 'exception_reviewed')
+
+
+def preserve_review_status(samples, previous):
+    """Do not overwrite manual evidence status when regenerating a worksheet.
+
+    Keep status only if the function and sampling shape still match; a new
+    candidate is intentionally unreviewed. All measured fields stay fresh.
+    """
+    statuses = {(row['entry'], row['shape']): row['status'] for row in previous}
+    for row in samples:
+        old = statuses.get((row['entry'], row['shape']), 'unreviewed')
+        if old not in REVIEW_STATUSES:
+            raise ValueError(f"unexpected ABI review status {old!r}: {row['entry']}")
+        row['status'] = old
+    return samples
 
 
 def sample(rows, image, count=40, caller_counts=None):
@@ -104,6 +120,8 @@ def main(argv=None):
     parser.add_argument('--calls', type=Path,
                         help='Ghidra full-export/calls.tsv for two-caller preference')
     parser.add_argument('--output', type=Path, help='optional review TSV destination')
+    parser.add_argument('--reset-status', action='store_true',
+                        help='discard existing manual review marks')
     args = parser.parse_args(argv)
     with args.facts.open(newline='') as file:
         rows = list(csv.DictReader(file, delimiter='\t'))
@@ -116,6 +134,12 @@ def main(argv=None):
     counts = {entry: len(callers) for entry, callers in caller_sets.items()}
     report = sample(rows, args.image.read_bytes(), caller_counts=counts)
     if args.output:
+        if args.output.exists() and not args.reset_status:
+            with args.output.open(newline='') as previous_file:
+                reader = csv.DictReader(previous_file, delimiter='\t')
+                if tuple(reader.fieldnames or ()) != FIELDS:
+                    raise ValueError('unexpected ABI worksheet columns')
+                report = preserve_review_status(report, list(reader))
         args.output.parent.mkdir(parents=True, exist_ok=True)
         stream = args.output.open('w', newline='')
     else:

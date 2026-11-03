@@ -366,7 +366,9 @@ instruction summaries for each candidate; the unusual `0x24480` x87/`ret 8`
 case was checked against both callers and documented in `compiler-abi.md`.
 `0x432c` has a confirmed byte-sized AL return and no arguments; within the
 worksheet, `0x6a1b4` and `0xb0208` have confirmed register signatures,
-and `0x263e0` / `0x120800` have confirmed void signatures. Documented
+`0x263e0` / `0x120800` have confirmed void signatures, and four additional
+object/matrix routines (`0x6a354`, `0x6a394`, `0x6a4c4`, `0x6a538`) have
+reviewed register/memory-only signatures. Documented
 ABI exceptions include ST(0) return with `ret 8` (`0xf8250`), ES:[EDI]
 memory writes (`0x120a52`), and stack-based `ret 16` (`0x15c0c4`).
 
@@ -786,6 +788,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Confirmed ABI at 0x6a1b4 (signed AX to EAX pointer) and 0xb0208 (EAX,DL,BL inputs; EAX Boolean).
 2026-11-03  3.5   Confirmed void ABIs 0x263e0/0x120800; documented x87 precision source 0x17d500 and three exceptional conventions.
 2026-11-03  3.5   Chose OW 2.0 first-pass flags (-3r/-zp1/-fpi87/-fp3/-ob/-ot/-s); high-score packed record and Ghidra packing checks added.
+2026-11-03  3.5   Confirmed four object helpers: AX-only flag mutations at 0x6a354/0x6a394 and BX-indexed x87 matrix/transpose vector writes at 0x6a4c4/0x6a538.
 ```
 
 ---

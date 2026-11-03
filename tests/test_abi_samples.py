@@ -3,7 +3,7 @@
 
 import unittest
 
-from tools.abi_samples import sample
+from tools.abi_samples import preserve_review_status, sample
 
 
 class AbiSamplesTests(unittest.TestCase):
@@ -38,6 +38,14 @@ class AbiSamplesTests(unittest.TestCase):
     def test_refuses_inadequate_inventory(self):
         with self.assertRaisesRegex(ValueError, 'at least 40'):
             sample([], b'\x90' * 500)
+
+    def test_preserves_review_only_for_same_candidate_and_shape(self):
+        rows = [dict(entry='0x00000010', shape='leaf', status='unreviewed'),
+                dict(entry='0x00000020', shape='few_calls', status='unreviewed')]
+        previous = [dict(entry='0x00000010', shape='leaf', status='confirmed'),
+                    dict(entry='0x00000020', shape='leaf', status='partial_abi')]
+        self.assertEqual([row['status'] for row in preserve_review_status(rows, previous)],
+                         ['confirmed', 'unreviewed'])
 
 
 if __name__ == '__main__':

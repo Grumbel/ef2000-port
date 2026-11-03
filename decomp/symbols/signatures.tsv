@@ -2,5 +2,9 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000432c	hiscore_qualifies		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x432c..0x433a; callers 0x49b2/0x4b64 test AL; docs/compiler-abi.md
 0x000263e0	reset_spatial_slot_count			eax,ebx,ecx,edx,esi,edi,ebp	0	0x263e0..0x263eb; callers 0x1f624/0x3ab19; docs/compiler-abi.md
 0x0006a1b4	lookup_indexed_object	AX:int16_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	0x6a1b4..0x6a1cd; callers 0x24087/0x247af consume EAX; docs/compiler-abi.md
+0x0006a354	set_indexed_object_activation	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x6a354..0x6a375; callers 0x2ba3f/0x473cc ignore EAX; docs/compiler-abi.md
+0x0006a394	set_indexed_object_state	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x6a394..0x6a3cc; callers 0x2b995/0x46fc1 ignore EAX; docs/compiler-abi.md
+0x0006a4c4	mul_object_matrix_vector	EAX:ef_addr32,EDX:ef_addr32,BX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x6a4c4..0x6a536; callers 0x773d2/0x72761; 3 qword output stores; docs/compiler-abi.md
+0x0006a538	mul_object_matrix_transpose_vector	EAX:ef_addr32,EDX:ef_addr32,BX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x6a538..0x6a5aa; callers 0x74de9/0x24663; 3 qword output stores; docs/compiler-abi.md
 0x000b0208	list_has_matching_node	EAX:ef_addr32,DL:uint8_t,BL:uint8_t	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	0xb0208..0xb0236; callers 0xb0258/0xc149d; docs/compiler-abi.md
 0x00120800	x87_unmask_exceptions			eax,ebx,ecx,edx,esi,edi,ebp	0	0x120800..0x120814; callers 0x1204ae/0x120798; CW side effect; docs/compiler-abi.md

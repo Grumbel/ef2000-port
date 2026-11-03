@@ -135,6 +135,53 @@ Both signatures were determined from the full callee bodies and two distinct
 callers each. Their `typed` tracker states assert **ABI only**, never patch or
 replay verification.
 
+### Confirmed object-state wrappers and x87 matrix pair
+
+`set_indexed_object_activation` (`0x6a354`) sign-extends input AX and calls
+`0x7489c` to resolve an object pointer. If the pointer is nonzero and the byte
+at `+0x140` is enabled, it sets bytes `+0x141` to 1 and `+0x142` to 0.
+Callers `0x2ba14` at `0x2ba3f` and `0x46454` at `0x473cc` both pass a signed
+object index in AX and **ignore** the value left in EAX. The latter uses EDX
+afterward; `0x7489c` saves/restores EDX. The wrapper has no stack arguments,
+does not pop argument bytes, and preserves EBX/ECX/EDX/ESI/EDI/EBP. Its
+recorded signature therefore has a void *contract*, not a claim that the
+actual EAX register remains unchanged.
+
+`set_indexed_object_state` (`0x6a394`) likewise resolves the AX index. If a
+record is found, its byte `+0xe9` selects an entry at stride `0xe5` in a
+table with byte flags at `0x128636`; a nonzero flag causes writes of 1, 3,
+and 8 to record offsets `+0x12a`, `+0x13d`, and `+0x13e`. The full routine
+pushes/pops EDX, and the lookup preserves EBX/EDX. Distinct callers
+`0x2b95c` at `0x2b995` and `0x46454` at `0x46fc1` pass AX and do not consume
+EAX. Its recorded output is void, with the same GPR-preservation and zero
+stack-cleanup contract as `0x6a354`. Both wrappers have ordinary DS-based
+memory accesses. Their lookup callee also increments a fixed diagnostic
+counter at `0x1a3580`; do not remove that observable side effect when porting.
+
+The x87 functions at `0x6a4c4` and `0x6a538` share the signed BX object
+index and use `0x6a1b4` to obtain the same record. There are **three
+register inputs**, all backed by distinct callers, no stack arguments,
+and a memory result of three contiguous 64-bit floating-point values:
+
+| Function | Input storage | Memory result | Distinct caller evidence |
+| --- | --- | --- | --- |
+| `mul_object_matrix_vector` (`0x6a4c4`) | BX index, EDX pointer to 3 doubles | EAX points to the 3-double destination | `0x772d0` at `0x773d2`; `0x725dc` at `0x72761` |
+| `mul_object_matrix_transpose_vector` (`0x6a538`) | BX index, EAX pointer to 3 doubles | EDX points to the 3-double destination | `0x74d98` at `0x74de9`; `0x2461c` at `0x24663` |
+
+The source object holds nine unaligned qword coefficients, from offsets
+`+0xa1` through `+0xe1` in steps of eight. Their matrix, in row-major
+mathematical notation, is `[[a1,a9,b1],[b9,c1,c9],[d1,d9,e1]]` where each
+item denotes its hexadecimal byte offset. `0x6a4c4` applies that matrix;
+`0x6a538` applies its transpose. Each destination entry is evaluated via
+three `fld`/`fmul` and `faddp` operations then `fstp`, preserving the x87
+**stack depth**, but not promising unchanged status flags or exception state.
+An invalid object index leaves the destination untouched. ECX is saved and
+restored, EBX/EDX/ESI/EDI/EBP are not clobbered, and EAX is a scratch
+result of the lookup (ignored by callers). There is no live ST(0) return or
+callee stack cleanup. These are confirmed call contracts, **not** verified
+native vector math: operation order, object packing, precision and x87
+exception behavior must still survive differential/replay tests in §3.10.
+
 ### Confirmed void ABIs and a non-GPR side effect
 
 `reset_spatial_slot_count` (`0x263e0`) has no arguments or register return.
@@ -223,8 +270,17 @@ noncontiguous: the window is a diagnostic aid, not an exact body export.
    instructions in the inspected linear windows. Six show immediate `ret N`.
    These mechanical facts are reproducible with `tools/abi_audit.py`; neither
    file contains original instruction bytes or decompiler text.
+   The worksheet status field is manually reviewed: `confirmed` means an
+   address also has a signature in `signatures.tsv`, `partial_abi` is
+   incomplete contract analysis, and `exception_reviewed` has a documented
+   unusual convention that the Ghidra importer cannot yet express.
+   Regenerating with `tools/abi_samples.py --output` retains existing review
+   statuses for matching entry/shape rows; `--reset-status` clears them.
 2. Confirm inputs, outputs, preserved registers, stack cleanup, x87 state
    and segment assumptions from disassembly and at least two callers each.
+   Eight of the forty candidates now have confirmed ABI rows (four object
+   routines, two void helpers, one pointer lookup, one linked-list search);
+   exceptions and partial reviews remain separate from complete signatures.
 3. Record confirmed signatures in `decomp/symbols/signatures.tsv`, adding
    `#pragma aux` declarations only when justified by evidence.
 4. When differential replay becomes available, evaluate `-5r` and stronger
