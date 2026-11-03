@@ -2742,3 +2742,14 @@ in EAX, format string address, one value).
 | `0x39960` | none | none | 39a0c@39a1f | Build the 0x1a17c0/0x1a1810 ellipse tables (radii 10 and 8). |
 | `0x40428` | none | none | 3dd30@3e435 | Clear the 320x200 view and refresh the unit selected by the current key. |
 | `0x48ae8` | AX:int16_t,DX:int16_t | EAX:uint32_t | 77c90@77dff | Classify an entry: 0/1 for ordinary, 2 for kind 2, logs unknown kinds. |
+
+## game_helpers18 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x50d04` | none | none | 50e84@50ea4,50fcc@51006,50fcc@5104f | Copy the next token of the command line (0x1a5986) to 0x1a5968. |
+| `0x544f8` | none | none | 7e8c0@7ebed | Copy six owner words into each 0x1b-byte entry of the table at 0x1a5c2e. |
+| `0x54804` | EAX:ef_addr32 | none | 581b0@58327 | Apply a part-update message to the object. |
+| `0x54f4c` | EAX:ef_addr32 | none | 581b0@582d0 | Apply a unit-state message when it concerns the local player or is open. |
+| `0x55aac` | EAX:ef_addr32 | none | 87db8@87e71,883cc@88423 | Send the full state of a record (command 0x0e). |
+| `0x56444` | AX:int16_t,DX:uint16_t,BX:uint16_t | none | 172b4@17344,74970@74d7b,74fb4@75296 | Send the unit's twelve option bytes and flag bits (command 0x11). |

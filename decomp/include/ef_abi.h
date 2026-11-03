@@ -2003,4 +2003,13 @@ uint32_t guest_fn_cd7f0(int32_t value); /* 0xcd7f0 EAX -> EAX */
 void guest_fn_401ac(int32_t owner, uint32_t b, uint32_t c); /* 0x401ac EAX/EDX/EBX */
 void guest_fn_cd12e(ef_addr32 format, uint32_t a, uint32_t b); /* 0xcd12e cdecl */
 
+/* game_helpers18.c */
+void next_token_50d04(void);
+void refresh_owner_entries_544f8(void);
+void apply_part_message_54804(ef_addr32 message);
+void apply_unit_message_54f4c(ef_addr32 message);
+void send_record_state_55aac(ef_addr32 record);
+void send_unit_options_56444(int16_t unit_id, uint16_t word_a, uint16_t word_b);
+void guest_fn_548e0(int32_t unit); /* 0x548e0 EAX */
+
 #endif
