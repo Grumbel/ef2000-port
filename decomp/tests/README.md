@@ -28,3 +28,11 @@ diagnostic-counter side effects; its function-body size is noncontiguous.
 `0x0006a3d0.json` exercise four linked state wrappers, including object
 record flag guards, `0xe5` type-stride lookups, rejection sentinels and
 preserved global state. All remain execution *plans*, not verified results.
+
+The six object/grid plans `0x000238a0.json`, `0x0002541c.json`,
+`0x0002b884.json`, `0x0002b910.json`, `0x0002b95c.json` and
+`0x0002ba14.json` cover a conditional slot copy, kind-2 mode updates,
+202-byte grid record identity checks, event propagation, state and activation
+guards. Some safe early-rejection cases avoid invoking the still-unrecovered
+original event dispatcher at `0x46168`. The event-heavy paths additionally
+require live original call captures and a full guest memory oracle.

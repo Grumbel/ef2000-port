@@ -7,6 +7,7 @@
 #include "ef_types.h"
 #include "ef_structs/hiscore.h"
 #include "ef_structs/spatial.h"
+#include "ef_structs/world_grid.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -31,5 +32,7 @@ extern int16_t g_indexed_object_count; /* 0x002119f4, signed 16-bit bound */
 extern uint32_t g_filtered_object_lookup_calls; /* 0x001a3580 */
 extern int16_t g_excluded_object_index; /* 0x001f71d0 */
 extern uint8_t g_object_type_flags[]; /* 0x00128636, 0xe5-byte stride */
+extern ef_addr32 g_world_grid_base; /* 0x0019bb58, pointer to 0xca-byte records */
+extern ef_addr32 g_current_object; /* 0x001f71bc, pointer to active object */
 
 #endif

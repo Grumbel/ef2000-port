@@ -1,0 +1,24 @@
+{
+  "address": "0x0002541c",
+  "function_size": 77,
+  "max_instructions": 3000,
+  "cases": [
+    {"name": "mode_zero_sets_deferred_flag", "registers": {"eax": "0xdead0001", "edx": "0xdead0000"},
+     "memory": [{"address": "0x2119f4", "hex": "0300"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x20f554", "hex": "00002a00"},
+                {"address": "0x2a016c", "hex": "02"},
+                {"address": "0x2a016d", "hex": "aa55"},
+                {"address": "0x1a3580", "hex": "00000000"}]},
+    {"name": "wrong_kind", "registers": {"eax": "0x00000001", "edx": "0x00000003"},
+     "memory": [{"address": "0x2119f4", "hex": "0300"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x20f554", "hex": "00002a00"},
+                {"address": "0x2a016c", "hex": "01"},
+                {"address": "0x2a016d", "hex": "aa55"}]},
+    {"name": "invalid_index", "registers": {"eax": "0x0000ffff", "edx": "0x00000001"},
+     "memory": [{"address": "0x2119f4", "hex": "0300"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x1a3580", "hex": "00000000"}]}
+  ]
+}

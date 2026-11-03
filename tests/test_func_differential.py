@@ -62,6 +62,12 @@ class FunctionDifferentialTests(unittest.TestCase):
             0x6a394: (57, 5),
             0x6a3d0: (18, 4),
             0x7489c: (93, 9),
+            0x238a0: (31, 1),
+            0x2541c: (77, 3),
+            0x2b884: (58, 3),
+            0x2b910: (75, 2),
+            0x2b95c: (100, 3),
+            0x2ba14: (86, 3),
         }
         for address, (expected_size, expected_cases) in candidates.items():
             with self.subTest(address=f'0x{address:x}'):

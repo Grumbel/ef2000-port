@@ -361,7 +361,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00023760	48	position_delta_metric	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX pointer to 3 dwords produces signed metric
 0x000237c8	48			unknown	unclassified	unverified		
 0x00023800	160	check_current_object_relation	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AL-only predicate on global object slot and linked records
-0x000238a0	31	sync_current_object_slot	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; conditionally copies current object word +0x158 to +0x146
+0x000238a0	31	sync_current_object_slot	object_control	drafted	game	confirmed	decomp/tests/0x000238a0.json	conditional copy; host model passes; guest compile/splice/replay outstanding
 0x000238c0	161			unknown	unclassified	unverified		
 0x000239ac	1128			unknown	unclassified	unverified		
 0x00024074	577			unknown	unclassified	unverified		
@@ -375,7 +375,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00024f08	634			unknown	unclassified	unverified		
 0x00024f24	79			unknown	unclassified	unverified		
 0x00024f94	1159			unknown	unclassified	unverified		
-0x0002541c	77			unknown	unclassified	unverified		
+0x0002541c	77	set_indexed_object_mode	object_control	drafted	game	confirmed	decomp/tests/0x0002541c.json	AX/DL; kind 2 mode dispatch; host model passes; guest verification pending
 0x0002546c	118			unknown	unclassified	unverified		
 0x000254e4	268			unknown	unclassified	unverified		
 0x000255f0	461			unknown	unclassified	unverified		
@@ -458,10 +458,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002b634	91			unknown	unclassified	unverified		
 0x0002b690	118			unknown	unclassified	unverified		
 0x0002b708	379			unknown	unclassified	unverified		
-0x0002b884	58			unknown	unclassified	unverified		
-0x0002b910	75			unknown	unclassified	unverified		
-0x0002b95c	100			unknown	unclassified	unverified		
-0x0002ba14	86			unknown	unclassified	unverified		
+0x0002b884	58	grid_slot_matches_object	world_grid	drafted	game	confirmed	decomp/tests/0x0002b884.json	filtered object lookup and +0xca grid row identity; guest verification pending
+0x0002b910	75	set_grid_slot_event	world_grid	drafted	game	confirmed	decomp/tests/0x0002b910.json	AX/DL event 0x58+value; calls 0x46168 ret4 before +0x90 store
+0x0002b95c	100	enable_grid_slot_state	world_grid	drafted	game	confirmed	decomp/tests/0x0002b95c.json	conditional type-stride gate, state wrapper and event 7; host model passes
+0x0002ba14	86	enable_grid_slot_activation	world_grid	drafted	game	confirmed	decomp/tests/0x0002ba14.json	conditional activation wrapper and event 8; host model passes
 0x0002bab0	48			unknown	unclassified	unverified		
 0x0002bae0	91			unknown	unclassified	unverified		
 0x0002bb3c	40			unknown	unclassified	unverified		

@@ -3,6 +3,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00023760	position_delta_metric	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	0x23760..0x2378f; callers 0x69de/0x92751 use EAX; docs/compiler-abi.md
 0x00023800	check_current_object_relation		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x23800..0x2389f; callers 0x25a97/0x25e8e test AL; docs/compiler-abi.md
 0x000238a0	sync_current_object_slot			ebx,ecx,edx,esi,edi,ebp	0	0x238a0..0x238be; callers 0x25aa0/0x26000 ignore return; docs/compiler-abi.md
+0x0002541c	set_indexed_object_mode	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x2541c..0x25468; caller 0x23a36 EAX sign extended/DL=8, 0x23bb9 EAX sign extended/DL=7; EDX scratch; docs/compiler-abi.md
+0x0002b884	grid_slot_matches_object	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x2b884..0x2b8bd; callers 0x46b82/0x46f28 test AL; docs/compiler-abi.md
+0x0002b910	set_grid_slot_event	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x2b910..0x2b95a; callers 0x2ca13/0x2d572; calls 0x46168 ret4; docs/compiler-abi.md
+0x0002b95c	enable_grid_slot_state	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x2b95c..0x2b9bf; callers 0x2b131/0x470bb; calls 0x46168 ret4; docs/compiler-abi.md
+0x0002ba14	enable_grid_slot_activation	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x2ba14..0x2ba69; callers 0x46f17/0x470c6; calls 0x46168 ret4; docs/compiler-abi.md
 0x000263e0	reset_spatial_slot_count			eax,ebx,ecx,edx,esi,edi,ebp	0	0x263e0..0x263eb; callers 0x1f624/0x3ab19; docs/compiler-abi.md
 0x000263ec	append_spatial_slot	AX:int16_t,DX:int16_t,BL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x263ec..0x26422; callers 0x1f6ef/0x2ef50/0x2f0fa/0x3ac33; EDX clobbered on append; docs/compiler-abi.md
 0x0006a1b4	lookup_indexed_object	AX:int16_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	0x6a1b4..0x6a1cd; callers 0x24087/0x247af consume EAX; docs/compiler-abi.md

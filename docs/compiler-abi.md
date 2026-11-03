@@ -7,6 +7,34 @@ This is a working evidence log, **not** a verified global calling convention.
 The image is the SHA-pinned German TACTCOM X-32 payload. Ground signatures
 in original disassembly and caller behavior, not in Ghidra's guesses.
 
+## Object and world-grid control cluster (2026-11-03)
+
+Six object-control ABIs were checked at their complete entries, exits and
+distinct direct call sites. These are **signatures**, not guest-verified C.
+
+| Entry | Inputs / outputs | Independent call sites | Original effects |
+| --- | --- | --- | --- |
+| `0x238a0` | no input, no consumed return | `0x25aa0`, `0x26000` | calls `0x23800`; if AL true, copies current object word `+0x158` to `+0x146` |
+| `0x2541c` | signed AX index, DL mode; void | `0x23a36`, `0x23bb9` | filtered lookup; kind-2 byte `+0x16d`, mode-1/2 helpers `0x2a168`/`0x2a1c4`, or deferred flag `+0x16e` |
+| `0x2b884` | signed AX index; AL Boolean | `0x46b82`, `0x46f28` | filtered lookup; object high word `+0x26` chooses grid row; compares unsigned grid word `+0x50` to signed index |
+| `0x2b910` | signed AX grid row, DL byte; void | `0x2ca13`, `0x2d572` | dispatches event `0x58+DL` then writes grid byte `+0x90` |
+| `0x2b95c` | signed AX grid row; void | `0x2b131`, `0x470bb` | if `+0x49` clear and type gate enabled: calls `0x6a394`, dispatches event 7, sets `+0x49` |
+| `0x2ba14` | signed AX grid row; void | `0x46f17`, `0x470c6` | if `+0x4c` set and `+0x4a` clear: calls `0x6a354`, dispatches event 8, sets `+0x4a` |
+
+The grid pointer at `0x19bb58` is loaded as a guest address; records have
+stride `0xca`. The 32-bit dword at grid `+0x4e` is arithmetically shifted
+right by 16 to obtain a signed object index. The event dispatcher
+`0x46168` receives that index in EAX, the event in EDX, zero in EBX and
+ECX, and an additional zero stack dword; it ends with `ret 4`. The mode
+helpers `0x2a168` and `0x2a1c4` take an object pointer in EAX. Their
+callee implementations and complete ABI analyses remain outstanding.
+
+The grid control functions reload the base address and object index after
+calling other helpers; a C draft must preserve these reads rather than
+cache a value across calls that could change global state. All host-model
+tests use synthetic memory. Ghidra pseudo-C and dynamic original execution
+were unavailable; neither ABI table nor host success proves a splice.
+
 ## Canonical first-pass compiler flags
 
 `ef2000-wcc` currently uses

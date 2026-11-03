@@ -409,7 +409,7 @@
             -p 'test_ghidra*.py' -q
         '';
         watcom-omf = pkgs.runCommand "ef2000-watcom-omf-check" {
-          nativeBuildInputs = [ watcom pkgs.file pkgs.python3 ];
+          nativeBuildInputs = [ watcom pkgs.file pkgs.python3 pkgs.stdenv.cc ];
         } ''
           (cd ${source} && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_ef2000_wcc -q)
           mkdir -p work
@@ -450,6 +450,27 @@
           grep -qi 'set_indexed_object_state' work/object_state.asm
           grep -qi 'clear_indexed_object_state' work/object_state.asm
           ! grep -qi '__CHK' work/object_state.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/world_grid.c --output "$PWD/work/world_grid.obj"
+          ${watcom}/bin/wdis work/world_grid.obj -l=work/world_grid.asm
+          grep -qi 'grid_slot_matches_object' work/world_grid.asm
+          grep -qi 'enable_grid_slot_activation' work/world_grid.asm
+          ! grep -qi '__CHK' work/world_grid.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/object_control.c --output "$PWD/work/object_control.obj"
+          ${watcom}/bin/wdis work/object_control.obj -l=work/object_control.asm
+          grep -qi 'set_indexed_object_mode' work/object_control.asm
+          grep -qi 'sync_current_object_slot' work/object_control.asm
+          ! grep -qi '__CHK' work/object_control.asm
+          $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_object_control_test.c \
+            ${source}/decomp/src/object_lookup.c \
+            ${source}/decomp/src/object_state.c \
+            ${source}/decomp/src/world_grid.c \
+            ${source}/decomp/src/object_control.c \
+            -o work/object_control_host_test
+          work/object_control_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

@@ -1,0 +1,23 @@
+{
+  "address": "0x0002ba14",
+  "function_size": 86,
+  "max_instructions": 15000,
+  "cases": [
+    {"name": "activation_not_requested", "registers": {"eax": "0x00000000"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b004c", "hex": "00"},
+                {"address": "0x2b004a", "hex": "00"}]},
+    {"name": "already_active", "registers": {"eax": "0x00000000"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b004c", "hex": "01"},
+                {"address": "0x2b004a", "hex": "01"}]},
+    {"name": "activate_with_invalid_object", "registers": {"eax": "0x00000000"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b004c", "hex": "01"},
+                {"address": "0x2b004a", "hex": "00"},
+                {"address": "0x2b0050", "hex": "ffff"},
+                {"address": "0x2119f4", "hex": "0000"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x1a3580", "hex": "00000000"}]}
+  ]
+}

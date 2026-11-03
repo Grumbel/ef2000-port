@@ -1,0 +1,15 @@
+{
+  "address": "0x000238a0",
+  "function_size": 31,
+  "max_instructions": 8000,
+  "cases": [
+    {"name": "relation_rejected", "registers": {"eax": "0xaabbccdd"},
+     "memory": [{"address": "0x1f71bc", "hex": "00002a00"},
+                {"address": "0x2a0156", "hex": "ffff"},
+                {"address": "0x2a0146", "hex": "1234"},
+                {"address": "0x2a0158", "hex": "abcd"},
+                {"address": "0x2119f4", "hex": "0000"},
+                {"address": "0x1f71d0", "hex": "ffff"},
+                {"address": "0x1a3580", "hex": "00000000"}]}
+  ]
+}

@@ -609,6 +609,19 @@ The existing in-place OMF converter also accepts only one code public per
 object; this cluster's multi-function `object_state.c` requires function-wise
 object extraction or isolated compilation before actual splice testing.
 
+World-grid/object-control batch (2026-11-03): six more drafted functions
+(`0x2b884`, `0x2b910`, `0x2b95c`, `0x2ba14`, `0x2541c`, `0x238a0`) connect
+the previous object-state wrappers to 0xca-byte world-grid rows and guest
+event dispatch. All six have original instruction and at least two caller
+checks, per-function planned guest states and an asset-free combined C test.
+The signed high word at grid row offset `+0x4e` is an object index; event
+dispatch at `0x46168` takes four register arguments plus one outgoing stack
+word and returns with `ret 4`. Unrecovered event/mode/predicate callees are
+kept as explicit dependencies (stubbed only in the host test). Neither
+OpenWatcom compilation, safe splicing nor original-game replay was possible
+in this chat sandbox, so all six remain **drafted**. The missing Ghidra
+pseudo-C export must be restored before splice approval.
+
 ### 3.11 [ ] Phase-1 exit criteria
 
 - `nix flake check` passes with all new asset-free tests.
@@ -919,6 +932,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Confirmed void ABIs 0x263e0/0x120800; documented x87 precision source 0x17d500 and three exceptional conventions.
 2026-11-03  3.5   Chose OW 2.0 first-pass flags (-3r/-zp1/-fpi87/-fp3/-ob/-ot/-s); high-score packed record and Ghidra packing checks added.
 2026-11-03  3.5   Confirmed four object helpers: AX-only flag mutations at 0x6a354/0x6a394 and BX-indexed x87 matrix/transpose vector writes at 0x6a4c4/0x6a538.
+2026-11-03  3.5   Audited six object/grid control ABIs and 0xca-byte grid layout; drafted host-tested C for rows/state/mode/relation, no original-game verification.
 2026-11-03  3.5   Confirmed EAX-pointer metric 0x23760, DS-to-ES strlen 0xb1b8b (requires DF clear), and global token parser 0xf46cc; reviewed two segment/interrupt exceptions.
 2026-11-03  3.5   Confirmed AL-only global object relation predicate 0x23800 and void slot-sync wrapper 0x238a0, with two distinct callers apiece.
 2026-11-03  3.5   Confirmed 0xb0018/0xb00d0 EAX/EDX pointer-to-list/count allocators and 0x36-byte table stride; audited nonstandard ret 12 formatter 0x1204dc and EBX/ECX/ESI/EDI projection helper 0x15c071.
