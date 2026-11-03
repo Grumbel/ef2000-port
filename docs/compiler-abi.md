@@ -1932,3 +1932,64 @@ in EAX, format string address, one value).
 | `0xea9b8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:int32_t | 97534@975a2 | Fixed-point (16.16) dot product of two dword triples. |
 | `0xeb478` | EAX:ef_addr32 | EAX:ef_addr32 | 9c980@9c9b6,9c9c0@9ca0d,a7ec4@a7ec9 | Lowercase ASCII 'A'..'Z' in place; returns the pointer. |
 | `0xeb4c0` | EAX:ef_addr32 | none | ebcd8@ebceb | Release the pointer stored at EAX through 0xc3f80 and clear it. |
+
+## misc_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xeba4c` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 9cb70@9cb8a,9cb70@9cbaa | Zero when EDX is zero, else dword +8 of 0xeb520's result (or 0). |
+| `0xebcd8` | EAX:uint32_t,EDX:ef_addr32 | none | 9ce84@9cea5,9ce84@9ceb6 | Release the object's pointer at +0x154 for flag 0x80000, else defer to 0xa7990. |
+| `0xebcfc` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | 9cee8@9cf0a,9cee8@9cf1a | Advance the cursor at +0x158 by EAX and return the distance from +0x154. |
+| `0xebe6d` | EAX:uint32_t | none | bc1d3@bc1fa,ebe79@ebe7e,f1d90@f1da5 | Store EAX through the pointer returned by 0xebd30. |
+| `0xebe90` | EAX:uint32_t | none | 1101e8@1101f2 | As 0xebe6d with 0xebd36. |
+| `0xec0ec` | AX:uint16_t,DX:uint16_t | AL:uint8_t | a3108@a311e | Compare 6 bytes at dword 0x1368bc[AX]+0x15 with those at dword 0x135874[DX*32]+0x16. |
+| `0xece90` | none | none | a29f8@a2a3a | Clear 0x10 bytes at 0x13577c and byte 0x484665. |
+| `0xed115` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:int32_t | a2f70@a2fed,d660c@d662c,ec0ec@ec113 | memcmp of EBX bytes at EAX and EDX: 0, -1 or 1 (unsigned). |
+| `0xedb15` | EAX:ef_addr32 | none | ed6cc@ed99a,ed6cc@eda19 | Uppercase the string at EAX in place. |
+| `0xf17d8` | EAX:ef_addr32 | none | f18a4@f18fa,f18a4@f19a7,f1a70@f1b6f | Call 0xa4cb4 on up to five words starting at +0x59. |
+| `0xf180c` | EAX:ef_addr32 | none | f18a4@f18e2,f18a4@f197f,f1a70@f1b4d | As 0xf17d8 with words at +0x63 and 0xa4b80. |
+| `0xf227f` | EAX:ef_addr32 | EAX:int32_t | a7a64@a7aa9,bc4da@bc507 | Position from 0x10f4df(dword +0x10) combined with dword +4. |
+| `0xf23ac` | AL:uint8_t,EDX:int32_t,EBX:int32_t,ECX:ef_addr32 | none | a8578@a85b5,a9130@a938a,a9130@a93bd | For each byte of the string at ECX call 0xf2320(x, y, byte & 0x3f), x += 8. |
+| `0xf2800` | none | EAX:uint32_t | a8bd4@a8bf5 | 0xf2819(), then return byte 0x161156. |
+| `0xf2d54` | none | AL:uint8_t | f2d74@f2d99 | The string at 0x48592c ends with ':'. |
+| `0xf2dcc` | EAX:ef_addr32 | none | f2dfc@f2e15 | Truncate the string at the last '.'. |
+| `0xf2e54` | none | none | f3b78@f3bb3 | 0xf2cd0(), 0x9d749(0x485908, 0x48592c), byte 0x4859de = 1. |
+| `0xf3480` | none | none | f34cc@f35a8 |  |
+| `0xf34a0` | none | none | f3f84@f40b1 |  |
+| `0xf35d8` | none | none | f3b78@f3c2b | Word 0x161e1c = 0x9d4cd(0x48592c) after 0xf2cd0(). |
+| `0xf35f0` | none | none | f36a4@f36f2 |  |
+| `0xf3b1c` | none | none | f3b78@f3cd5 |  |
+| `0xf3b40` | none | none | f3b78@f3cf6 | As 0xf35d8, storing word 0x161e1e. |
+| `0xf3b58` | none | none | f3b78@f3d43 |  |
+| `0xf4178` | none | none | f41dc@f42af |  |
+| `0xf9ed2` | EAX:uint32_t | none | 101c54@101ce6 |  |
+| `0xf9d98` | EAX:int32_t,EDX:ef_addr32,EBX:int32_t | none | f9dcb@f9e23,f9dcb@f9e40,f9dcb@f9e53 | Store the two decimal digits of EAX at EBX+EDX. |
+| `0xfa7d2` | EAX:ef_addr32 | none | bc287@bc345,f22af@f22e5,10f071@10f075 |  |
+| `0xfba54` | EAX:uint32_t,EDX:ef_addr32 | none | fbad8@fbb2b,fbad8@fbc83 | 0xfba6c(dword +0x16, dword +0x1a) with EBX = EAX. |
+| `0xfddd2` | EAX:uint32_t | EAX:uint32_t | c4310@c433a | Map 0xfddb3 to 0xfddb7 and 0xfddc5 to 0xfddcc, else keep. |
+| `0xfef26` | none | none | d1d40@d1d75,d1e50@d1eb2 | Fill 192 dwords at 0x17cfc0 with -1. |
+| `0xfc9f8` | EAX:int32_t | none | c4a50@c4acd,c4aeb@c4b68,c4b95@c4c12 |  |
+| `0x101f44` | EAX:uint32_t | none | 104464@10449b,105e38@106237,105e38@1062cb | Trace wrapper for 0x1111ca. |
+| `0x101ff4` | EAX:uint32_t | none | 105da0@105dd7,112808@11287d,1133f8@113a06 | Trace wrapper for 0x1112ed. |
+| `0x1022dc` | EAX:uint32_t | none | e28e8@e297c,104200@104453,105e38@106424 | Trace wrapper for 0x11141f. |
+| `0x102330` | EAX:uint32_t | none | 1114a3@1114b1 | Trace wrapper for 0x111473. |
+| `0x102384` | EAX:uint32_t | none | 104464@104484,105da0@105de3,1113fb@111409 | Trace wrapper for 0x1113d4. |
+| `0x102488` | EAX:uint32_t | none | 104694@1046a5,106464@1064ca,113a40@113aa6 | Trace wrapper for 0x104464. |
+| `0x102644` | EAX:uint32_t | none | 1115fc@11161e | Trace wrapper for 0x106634. |
+| `0x102670` | EAX:uint32_t | none | d6e58@d6f6b,d72b4@d7323,1065c8@106620 | Trace wrapper for 0x106644. |
+| `0x102774` | EAX:uint32_t | none | d7158@d72a5,d72b4@d7398 | Trace wrapper for 0x10683c. |
+| `0x1027a0` | EAX:uint32_t | none | d7490@d74c1 | Trace wrapper for 0x10687c. |
+| `0x1027cc` | EAX:uint32_t | none | d7530@d7561 | Trace wrapper for 0x106894. |
+| `0x1027f8` | EAX:uint32_t | none | d74d0@d7501 | Trace wrapper for 0x1068b8. |
+| `0x10311c` | EAX:uint32_t | none | d5e0c@d5ea5 | Trace wrapper for 0x11402c. |
+| `0x103148` | EAX:uint32_t | none | 112c10@112e38,112c10@11308a,113cf4@113cfe | Trace wrapper for 0x114058. |
+| `0x1031a0` | EAX:uint32_t | none | d5ec0@d5ed6,113398@1133b1 | Trace wrapper for 0x114170. |
+| `0x101ed4` | EAX:uint32_t,EDX:uint32_t | none | 104200@104393,104200@104402,104464@1044be | Trace wrapper for 0x111142. |
+| `0x1021f4` | EAX:uint32_t,EDX:uint32_t | none | 110fd4@1110ab,1114f7@111515,111527@111557 | Trace wrapper for 0x1114c7. |
+| `0x102228` | EAX:uint32_t,EDX:uint32_t | none | e28e8@e2962,104200@104447,105e38@106418 | Trace wrapper for 0x1114f7. |
+| `0x10225c` | EAX:uint32_t,EDX:uint32_t | none | none direct | Trace wrapper for 0x111527. |
+| `0x102824` | EAX:uint32_t,EDX:uint32_t | none | d7158@d721e,d7158@d725f,d72b4@d734c | Trace wrapper for 0x10677c. |
+| `0x102858` | EAX:uint32_t,EDX:uint32_t | none | d7158@d7248,d72b4@d735e,d73b8@d73e4 | Trace wrapper for 0x10679c. |
+| `0x10288c` | EAX:uint32_t,EDX:uint32_t | none | none direct | Trace wrapper for 0x1067cc. |
+| `0x1028c0` | EAX:uint32_t,EDX:uint32_t | none | d7158@d7273 | Trace wrapper for 0x10682c. |
+| `0x102a98` | EAX:uint32_t,EDX:uint32_t | none | d6e58@d6f32 | Trace wrapper for 0x106988. |

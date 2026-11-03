@@ -908,4 +908,119 @@ void guest_fn_e67a0(ef_addr32 object, int32_t x, int32_t y, int32_t z); /* 0xe67
 void guest_fn_e81b0(uint32_t a, uint32_t b); /* 0xe81b0 EAX/EDX */
 ef_addr32 guest_fn_fc795(uint32_t size); /* 0xfc795 EAX -> EAX */
 
+/* misc_helpers2.c */
+uint32_t lookup_field_eba4c(uint32_t key, uint32_t index);
+void release_or_forward_ebcd8(uint32_t flags, ef_addr32 object);
+uint32_t advance_cursor_ebcfc(uint32_t amount, uint32_t flags, ef_addr32 object);
+void store_through_ebd30(uint32_t value);
+void store_through_ebd36(uint32_t value);
+uint8_t compare_names_ec0ec(uint16_t first, uint16_t second);
+void reset_table_ece90(void);
+int32_t guest_memcmp(ef_addr32 first, ef_addr32 second, uint32_t count);
+void uppercase_string_edb15(ef_addr32 text);
+void process_words_f17d8(ef_addr32 record);
+void process_words_f180c(ef_addr32 record);
+int32_t file_position_f227f(ef_addr32 file);
+void draw_text_f23ac(uint8_t color, int32_t x, int32_t y, ef_addr32 text);
+uint32_t result_f2800(void);
+uint8_t path_ends_with_colon(void);
+void strip_extension(ef_addr32 text);
+void copy_path_f2e54(void);
+void refresh_f3480(void);
+void refresh_f34a0(void);
+void load_path_value_f35d8(void);
+void refresh_f35f0(void);
+void load_path_f3b1c(void);
+void load_path_value_f3b40(void);
+void load_path_pointer_f3b58(void);
+void reset_flags_f4178(void);
+void call_f9dcb(uint32_t value);
+void store_two_digits(int32_t value, ef_addr32 base, int32_t offset);
+void update_flags_fa7d2(ef_addr32 file);
+void call_fba6c(uint32_t first, ef_addr32 record);
+uint32_t map_address_fddd2(uint32_t address);
+void fill_table_fef26(void);
+void update_fc9f8(int32_t value);
+void trace_call_101f44(uint32_t a);
+void trace_call_101ff4(uint32_t a);
+void trace_call_1022dc(uint32_t a);
+void trace_call_102330(uint32_t a);
+void trace_call_102384(uint32_t a);
+void trace_call_102488(uint32_t a);
+void trace_call_102644(uint32_t a);
+void trace_call_102670(uint32_t a);
+void trace_call_102774(uint32_t a);
+void trace_call_1027a0(uint32_t a);
+void trace_call_1027cc(uint32_t a);
+void trace_call_1027f8(uint32_t a);
+void trace_call_10311c(uint32_t a);
+void trace_call_103148(uint32_t a);
+void trace_call_1031a0(uint32_t a);
+void trace_call_101ed4(uint32_t a, uint32_t b);
+void trace_call_1021f4(uint32_t a, uint32_t b);
+void trace_call_102228(uint32_t a, uint32_t b);
+void trace_call_10225c(uint32_t a, uint32_t b);
+void trace_call_102824(uint32_t a, uint32_t b);
+void trace_call_102858(uint32_t a, uint32_t b);
+void trace_call_10288c(uint32_t a, uint32_t b);
+void trace_call_1028c0(uint32_t a, uint32_t b);
+void trace_call_102a98(uint32_t a, uint32_t b);
+void guest_fn_1111ca(uint32_t a); /* 0x1111ca cdecl */
+void guest_fn_1112ed(uint32_t a); /* 0x1112ed cdecl */
+void guest_fn_11141f(uint32_t a); /* 0x11141f cdecl */
+void guest_fn_111473(uint32_t a); /* 0x111473 cdecl */
+void guest_fn_1113d4(uint32_t a); /* 0x1113d4 cdecl */
+void guest_fn_104464(uint32_t a); /* 0x104464 cdecl */
+void guest_fn_106634(uint32_t a); /* 0x106634 cdecl */
+void guest_fn_106644(uint32_t a); /* 0x106644 cdecl */
+void guest_fn_10683c(uint32_t a); /* 0x10683c cdecl */
+void guest_fn_10687c(uint32_t a); /* 0x10687c cdecl */
+void guest_fn_106894(uint32_t a); /* 0x106894 cdecl */
+void guest_fn_1068b8(uint32_t a); /* 0x1068b8 cdecl */
+void guest_fn_11402c(uint32_t a); /* 0x11402c cdecl */
+void guest_fn_114058(uint32_t a); /* 0x114058 cdecl */
+void guest_fn_114170(uint32_t a); /* 0x114170 cdecl */
+void guest_fn_111142(uint32_t a, uint32_t b); /* 0x111142 cdecl */
+void guest_fn_1114c7(uint32_t a, uint32_t b); /* 0x1114c7 cdecl */
+void guest_fn_1114f7(uint32_t a, uint32_t b); /* 0x1114f7 cdecl */
+void guest_fn_111527(uint32_t a, uint32_t b); /* 0x111527 cdecl */
+void guest_fn_10677c(uint32_t a, uint32_t b); /* 0x10677c cdecl */
+void guest_fn_10679c(uint32_t a, uint32_t b); /* 0x10679c cdecl */
+void guest_fn_1067cc(uint32_t a, uint32_t b); /* 0x1067cc cdecl */
+void guest_fn_10682c(uint32_t a, uint32_t b); /* 0x10682c cdecl */
+void guest_fn_106988(uint32_t a, uint32_t b); /* 0x106988 cdecl */
+void guest_fn_bc400(uint32_t stream, uint32_t format, ...); /* 0xbc400 cdecl varargs */
+ef_addr32 guest_fn_eb520(uint32_t key, uint32_t index); /* 0xeb520 EAX/EDX */
+void guest_fn_a7990(uint32_t flags); /* 0xa7990 stack */
+uint32_t guest_fn_a7ac8(uint32_t amount, uint32_t flags); /* 0xa7ac8 stack */
+ef_addr32 guest_fn_ebd30(uint32_t value); /* 0xebd30 */
+ef_addr32 guest_fn_ebd36(uint32_t value); /* 0xebd36 */
+void guest_fn_a4cb4(uint32_t value); /* 0xa4cb4 EAX */
+void guest_fn_a4b80(uint32_t value); /* 0xa4b80 EAX */
+uint32_t guest_fn_10f4df(uint32_t handle); /* 0x10f4df EAX */
+void guest_fn_f2320(int32_t x, int32_t y, uint32_t ch); /* 0xf2320 EAX/EDX/EBX */
+uint32_t guest_fn_b1b8b(ef_addr32 text); /* 0xb1b8b EAX -> AX */
+void guest_fn_f2819(void); /* 0xf2819 */
+void guest_fn_f2cd0(void); /* 0xf2cd0 */
+void guest_fn_9d749(ef_addr32 destination, ef_addr32 source); /* 0x9d749 EAX/EDX */
+void guest_fn_dc250(void); /* 0xdc250 */
+void guest_fn_c386c(void); /* 0xc386c */
+void guest_fn_ddae0(void); /* 0xddae0 */
+void guest_fn_dd8dc(void); /* 0xdd8dc */
+void guest_fn_c3974(void); /* 0xc3974 */
+void guest_fn_eab44(void); /* 0xeab44 */
+void guest_fn_c39ac(void); /* 0xc39ac */
+void guest_fn_c3990(void); /* 0xc3990 */
+uint32_t guest_fn_9d4cd(ef_addr32 text); /* 0x9d4cd EAX */
+void guest_fn_9ca57(ef_addr32 first, ef_addr32 second); /* 0x9ca57 EAX/EDX */
+void guest_fn_f3a1c(ef_addr32 text); /* 0xf3a1c EAX */
+ef_addr32 guest_fn_a7ec4(ef_addr32 text); /* 0xa7ec4 EAX */
+uint32_t guest_fn_cc76d(ef_addr32 text); /* 0xcc76d EAX */
+void guest_fn_f2b7c(void); /* 0xf2b7c */
+void guest_fn_f3b78(void); /* 0xf3b78 */
+void guest_fn_f9dcb(uint32_t value, ef_addr32 buffer); /* 0xf9dcb EAX/EDX */
+uint32_t guest_fn_1101be(uint32_t handle); /* 0x1101be EAX */
+void guest_fn_fba6c(uint32_t first, uint32_t second); /* 0xfba6c EAX/EDX */
+void guest_fn_c24(int32_t high, uint32_t address); /* 0xc24 EAX/EDX */
+
 #endif

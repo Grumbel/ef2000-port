@@ -576,3 +576,59 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000ea9b8	dot_product_fixed	EAX:ef_addr32,EDX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ea9b8 (52 bytes); Fixed-point (16.16) dot product of two dword triples.; callers 97534@975a2; docs/compiler-abi.md
 0x000eb478	lowercase_string	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb478 (31 bytes); Lowercase ASCII 'A'..'Z' in place; returns the pointer.; callers 9c980@9c9b6,9c9c0@9ca0d,a7ec4@a7ec9; docs/compiler-abi.md
 0x000eb4c0	release_pointer_eb4c0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb4c0 (26 bytes); Release the pointer stored at EAX through 0xc3f80 and clear it.; callers ebcd8@ebceb; docs/compiler-abi.md
+0x000eba4c	lookup_field_eba4c	EAX:uint32_t,EDX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eba4c (21 bytes); Zero when EDX is zero, else dword +8 of 0xeb520's result (or 0).; callers 9cb70@9cb8a,9cb70@9cbaa; docs/compiler-abi.md
+0x000ebcd8	release_or_forward_ebcd8	EAX:uint32_t,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ebcd8 (36 bytes); Release the object's pointer at +0x154 for flag 0x80000, else defer to 0xa7990.; callers 9ce84@9cea5,9ce84@9ceb6; docs/compiler-abi.md
+0x000ebcfc	advance_cursor_ebcfc	EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ebcfc (52 bytes); Advance the cursor at +0x158 by EAX and return the distance from +0x154.; callers 9cee8@9cf0a,9cee8@9cf1a; docs/compiler-abi.md
+0x000ebe6d	store_through_ebd30	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ebe6d (12 bytes); Store EAX through the pointer returned by 0xebd30.; callers bc1d3@bc1fa,ebe79@ebe7e,f1d90@f1da5; docs/compiler-abi.md
+0x000ebe90	store_through_ebd36	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ebe90 (12 bytes); As 0xebe6d with 0xebd36.; callers 1101e8@1101f2; docs/compiler-abi.md
+0x000ec0ec	compare_names_ec0ec	AX:uint16_t,DX:uint16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ec0ec (51 bytes); Compare 6 bytes at dword 0x1368bc[AX]+0x15 with those at dword 0x135874[DX*32]+0x16.; callers a3108@a311e; docs/compiler-abi.md
+0x000ece90	reset_table_ece90			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ece90 (30 bytes); Clear 0x10 bytes at 0x13577c and byte 0x484665.; callers a29f8@a2a3a; docs/compiler-abi.md
+0x000ed115	guest_memcmp	EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ed115 (30 bytes); memcmp of EBX bytes at EAX and EDX: 0, -1 or 1 (unsigned).; callers a2f70@a2fed,d660c@d662c,ec0ec@ec113; docs/compiler-abi.md
+0x000edb15	uppercase_string_edb15	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000edb15 (24 bytes); Uppercase the string at EAX in place.; callers ed6cc@ed99a,ed6cc@eda19; docs/compiler-abi.md
+0x000f17d8	process_words_f17d8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f17d8 (51 bytes); Call 0xa4cb4 on up to five words starting at +0x59.; callers f18a4@f18fa,f18a4@f19a7,f1a70@f1b6f; docs/compiler-abi.md
+0x000f180c	process_words_f180c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f180c (51 bytes); As 0xf17d8 with words at +0x63 and 0xa4b80.; callers f18a4@f18e2,f18a4@f197f,f1a70@f1b4d; docs/compiler-abi.md
+0x000f227f	file_position_f227f	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f227f (48 bytes); Position from 0x10f4df(dword +0x10) combined with dword +4.; callers a7a64@a7aa9,bc4da@bc507; docs/compiler-abi.md
+0x000f23ac	draw_text_f23ac	AL:uint8_t,EDX:int32_t,EBX:int32_t,ECX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f23ac (49 bytes); For each byte of the string at ECX call 0xf2320(x, y, byte & 0x3f), x += 8.; callers a8578@a85b5,a9130@a938a,a9130@a93bd; docs/compiler-abi.md
+0x000f2800	result_f2800		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2800 (25 bytes); 0xf2819(), then return byte 0x161156.; callers a8bd4@a8bf5; docs/compiler-abi.md
+0x000f2d54	path_ends_with_colon		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2d54 (31 bytes); The string at 0x48592c ends with ':'.; callers f2d74@f2d99; docs/compiler-abi.md
+0x000f2dcc	strip_extension	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2dcc (46 bytes); Truncate the string at the last '.'.; callers f2dfc@f2e15; docs/compiler-abi.md
+0x000f2e54	copy_path_f2e54			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2e54 (30 bytes); 0xf2cd0(), 0x9d749(0x485908, 0x48592c), byte 0x4859de = 1.; callers f3b78@f3bb3; docs/compiler-abi.md
+0x000f3480	refresh_f3480			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f3480 (32 bytes); ; callers f34cc@f35a8; docs/compiler-abi.md
+0x000f34a0	refresh_f34a0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f34a0 (42 bytes); ; callers f3f84@f40b1; docs/compiler-abi.md
+0x000f35d8	load_path_value_f35d8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f35d8 (22 bytes); Word 0x161e1c = 0x9d4cd(0x48592c) after 0xf2cd0().; callers f3b78@f3c2b; docs/compiler-abi.md
+0x000f35f0	refresh_f35f0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f35f0 (32 bytes); ; callers f36a4@f36f2; docs/compiler-abi.md
+0x000f3b1c	load_path_f3b1c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f3b1c (33 bytes); ; callers f3b78@f3cd5; docs/compiler-abi.md
+0x000f3b40	load_path_value_f3b40			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f3b40 (22 bytes); As 0xf35d8, storing word 0x161e1e.; callers f3b78@f3cf6; docs/compiler-abi.md
+0x000f3b58	load_path_pointer_f3b58			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f3b58 (32 bytes); ; callers f3b78@f3d43; docs/compiler-abi.md
+0x000f4178	reset_flags_f4178			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f4178 (47 bytes); ; callers f41dc@f42af; docs/compiler-abi.md
+0x000f9ed2	call_f9dcb	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f9ed2 (13 bytes); ; callers 101c54@101ce6; docs/compiler-abi.md
+0x000f9d98	store_two_digits	EAX:int32_t,EDX:ef_addr32,EBX:int32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f9d98 (51 bytes); Store the two decimal digits of EAX at EBX+EDX.; callers f9dcb@f9e23,f9dcb@f9e40,f9dcb@f9e53; docs/compiler-abi.md
+0x000fa7d2	update_flags_fa7d2	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fa7d2 (49 bytes); ; callers bc287@bc345,f22af@f22e5,10f071@10f075; docs/compiler-abi.md
+0x000fba54	call_fba6c	EAX:uint32_t,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fba54 (24 bytes); 0xfba6c(dword +0x16, dword +0x1a) with EBX = EAX.; callers fbad8@fbb2b,fbad8@fbc83; docs/compiler-abi.md
+0x000fddd2	map_address_fddd2	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fddd2 (27 bytes); Map 0xfddb3 to 0xfddb7 and 0xfddc5 to 0xfddcc, else keep.; callers c4310@c433a; docs/compiler-abi.md
+0x000fef26	fill_table_fef26			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fef26 (27 bytes); Fill 192 dwords at 0x17cfc0 with -1.; callers d1d40@d1d75,d1e50@d1eb2; docs/compiler-abi.md
+0x000fc9f8	update_fc9f8	EAX:int32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc9f8 (37 bytes); ; callers c4a50@c4acd,c4aeb@c4b68,c4b95@c4c12; docs/compiler-abi.md
+0x00101f44	trace_call_101f44	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00101f44 (44 bytes); Trace wrapper for 0x1111ca.; callers 104464@10449b,105e38@106237,105e38@1062cb; docs/compiler-abi.md
+0x00101ff4	trace_call_101ff4	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00101ff4 (44 bytes); Trace wrapper for 0x1112ed.; callers 105da0@105dd7,112808@11287d,1133f8@113a06; docs/compiler-abi.md
+0x001022dc	trace_call_1022dc	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001022dc (44 bytes); Trace wrapper for 0x11141f.; callers e28e8@e297c,104200@104453,105e38@106424; docs/compiler-abi.md
+0x00102330	trace_call_102330	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102330 (44 bytes); Trace wrapper for 0x111473.; callers 1114a3@1114b1; docs/compiler-abi.md
+0x00102384	trace_call_102384	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102384 (44 bytes); Trace wrapper for 0x1113d4.; callers 104464@104484,105da0@105de3,1113fb@111409; docs/compiler-abi.md
+0x00102488	trace_call_102488	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102488 (44 bytes); Trace wrapper for 0x104464.; callers 104694@1046a5,106464@1064ca,113a40@113aa6; docs/compiler-abi.md
+0x00102644	trace_call_102644	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102644 (44 bytes); Trace wrapper for 0x106634.; callers 1115fc@11161e; docs/compiler-abi.md
+0x00102670	trace_call_102670	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102670 (44 bytes); Trace wrapper for 0x106644.; callers d6e58@d6f6b,d72b4@d7323,1065c8@106620; docs/compiler-abi.md
+0x00102774	trace_call_102774	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102774 (44 bytes); Trace wrapper for 0x10683c.; callers d7158@d72a5,d72b4@d7398; docs/compiler-abi.md
+0x001027a0	trace_call_1027a0	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027a0 (44 bytes); Trace wrapper for 0x10687c.; callers d7490@d74c1; docs/compiler-abi.md
+0x001027cc	trace_call_1027cc	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027cc (44 bytes); Trace wrapper for 0x106894.; callers d7530@d7561; docs/compiler-abi.md
+0x001027f8	trace_call_1027f8	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027f8 (44 bytes); Trace wrapper for 0x1068b8.; callers d74d0@d7501; docs/compiler-abi.md
+0x0010311c	trace_call_10311c	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010311c (44 bytes); Trace wrapper for 0x11402c.; callers d5e0c@d5ea5; docs/compiler-abi.md
+0x00103148	trace_call_103148	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00103148 (44 bytes); Trace wrapper for 0x114058.; callers 112c10@112e38,112c10@11308a,113cf4@113cfe; docs/compiler-abi.md
+0x001031a0	trace_call_1031a0	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001031a0 (44 bytes); Trace wrapper for 0x114170.; callers d5ec0@d5ed6,113398@1133b1; docs/compiler-abi.md
+0x00101ed4	trace_call_101ed4	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00101ed4 (52 bytes); Trace wrapper for 0x111142.; callers 104200@104393,104200@104402,104464@1044be; docs/compiler-abi.md
+0x001021f4	trace_call_1021f4	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001021f4 (52 bytes); Trace wrapper for 0x1114c7.; callers 110fd4@1110ab,1114f7@111515,111527@111557; docs/compiler-abi.md
+0x00102228	trace_call_102228	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102228 (52 bytes); Trace wrapper for 0x1114f7.; callers e28e8@e2962,104200@104447,105e38@106418; docs/compiler-abi.md
+0x0010225c	trace_call_10225c	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010225c (52 bytes); Trace wrapper for 0x111527.; callers none direct; docs/compiler-abi.md
+0x00102824	trace_call_102824	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102824 (52 bytes); Trace wrapper for 0x10677c.; callers d7158@d721e,d7158@d725f,d72b4@d734c; docs/compiler-abi.md
+0x00102858	trace_call_102858	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102858 (52 bytes); Trace wrapper for 0x10679c.; callers d7158@d7248,d72b4@d735e,d73b8@d73e4; docs/compiler-abi.md
+0x0010288c	trace_call_10288c	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010288c (52 bytes); Trace wrapper for 0x1067cc.; callers none direct; docs/compiler-abi.md
+0x001028c0	trace_call_1028c0	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001028c0 (52 bytes); Trace wrapper for 0x10682c.; callers d7158@d7273; docs/compiler-abi.md
+0x00102a98	trace_call_102a98	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102a98 (52 bytes); Trace wrapper for 0x106988.; callers d6e58@d6f32; docs/compiler-abi.md
