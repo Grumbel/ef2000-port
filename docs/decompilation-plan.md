@@ -529,8 +529,8 @@ Generalize `tools/highscores_differential.py` into
   none), every written memory byte, x87 stack/status if FP is involved,
   call sequence to stubs.
 - Also supports **trace-captured inputs**: run a golden replay, snapshot the
-  guest state at the first N calls of the function (`--capture-calls ADDR N`
-  in the harness), replay those exact states through both implementations.
+  guest state at the first N calls of the function (`--capture-calls ADDR[:N]
+  --capture-dir DIR` in the C++ harness), replay those states through both implementations.
   This is the most valuable input source; use it whenever the function is
   reached in a replay.
 - Reports coverage: which basic blocks of the original function were hit
@@ -544,9 +544,21 @@ of runtime-written guest RAM (excluding dead callee scratch). It records
 original function dynamic block entries, not a speculative static coverage
 percentage. A synthetic code-pair differential test is wired into the
 dedicated Nix check; on the minimal local host it skips execution because
-Python Unicorn is absent. x87, live-call capture, guest hardware services,
-stubbed callees, real compiled functions and golden replays remain missing.
+Python Unicorn is absent. x87, guest hardware services, stubbed callees,
+real compiled functions and golden replays remain missing. Live-call capture
+and its isolated replay were added in the stage documented below.
 See `docs/function-differential.md`.
+
+Live-call capture stage (2026-11-03): the C++ Unicorn runner accepts
+`--capture-calls ADDR[:N] --capture-dir DIR` and writes at most four
+`EFCAP001` original guest-entry snapshots per run. They retain 64 MiB
+guest RAM, original-image SHA and 13 register values (proprietary, local
+only), with fail-closed bounds and no replacement code active while recording.
+`tools/func_differential.py --captured FILE` restores the memory/register
+context and overlays only the exact patch writes in its second run.
+Synthetic C++/Python wire-format tests pass; actual capture/replay against
+the pinned executable, x87/segment descriptors, hardware side effects,
+callee stubs and static block coverage remain outstanding.
 
 ### 3.11 [ ] Phase-1 exit criteria
 
@@ -878,6 +890,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.8   Implemented SHA-bound in-place EFPATCH1 loading in native64/QEMU and C++ Unicorn, with save-state patch identity and asset-free format tests; guest arena mapping remains blocked on high-water evidence.
 2026-11-03  3.8   Added X-32 allocator process watermarks in both runners and native report parsing; highwater evidence from sustained gameplay and mapping audit still required before patch arena.
 2026-11-03  3.10  Began ABI-aware isolated original-versus-patched Unicorn function differential tests, with strict fixture validation and dynamic original block counts; no real recovered replacement verified yet.
+2026-11-03  3.10  Added bounded original call-entry RAM/register capture to C++ Unicorn, and SHA-bound captured-state replay in the isolated differential tool; asset-free capture format tests pass, but live-game proof is pending.
 ```
 
 ---

@@ -47,6 +47,53 @@ that function. It is unsafe to assume the tiny example represents a complete
 input state for 0x432c. `stack_args` contains 32-bit words in the order found
 at `[ESP+4]` onward; its length must equal the confirmed `stack_bytes` / 4.
 
+## Capture an actual caller state
+
+In an **unpatched** C++ Unicorn run, record function entry at the first two
+calls to `0x432c` (once it is actually reached):
+
+~~~sh
+nix run -L .#unicorn-cpp -- ../EF2000/c/EF2000/_EF2000.EXE \
+  --windowed --instruction-limit 0 \
+  --capture-calls 0x432c:2 \
+  --capture-dir local/function-captures
+~~~
+
+The runner writes `0x000432c-0000.efcap`, `0x000432c-0001.efcap`, ...
+only if those calls happen. The limit is **four snapshots total per run**
+to avoid unbounded storage. Existing snapshot filenames are never overwritten.
+Each raw snapshot contains the original initialized code and guest RAM
+(64 MiB), so **keep it under ignored `local/`, do not commit or distribute**.
+The source-image digest, function address, sequence number, 13 registers,
+and full original guest RAM are stored in a strictly validated versioned
+`EFCAP001` file. Snapshots are evidence, not portable save games.
+
+After a replacement has been compiled, reviewed and packed, replay the
+original call and patched equivalent from the same captured state:
+
+~~~sh
+nix run -L .#func-differential -- 0x432c \
+  --executable ../EF2000/c/EF2000/_EF2000.EXE \
+  --patch local/patches/hiscore.efpatch \
+  --captured local/function-captures/0x000432c-0000.efcap \
+  --captured local/function-captures/0x000432c-0001.efcap
+~~~
+
+`--captured` replaces the manually constructed spec cases; the runner
+verifies the original SHA, target address and complete 64 MiB length.
+Each original execution receives the captured full memory snapshot and
+input registers. The corresponding patched execution receives exactly the
+same memory and registers plus only the SHA-checked EFPATCH1 write ranges.
+The incoming return address is redirected to an isolated sentinel in both
+experiments; the original stack arguments remain in place.
+
+The isolated runner currently accepts captured `DS=ES=SS=7`, the ordinary
+flat-base game selector set, and executes with zero-base flat descriptors.
+Non-flat segment selectors are rejected; the capture records their original
+values but does **not** yet preserve descriptor tables, x87 state, DOS/X-32
+service semantics, interrupts or hardware state. Functions dependent on
+those facilities are still ineligible for a passing isolated comparison.
+
 The tool loads the canonical ABI contract from
 `decomp/symbols/signatures.tsv` (not Ghidra's unconfirmed ABI), uses a
 return sentinel at the top of the guest stack, and verifies both calls end
@@ -78,9 +125,9 @@ unmatched function return and instruction-budget exhaustion fail closed.
   than pretending that EAX/EDX represent an 80-bit result.
 - **No DOS, X-32, IRQ, selector or I/O simulation** in isolated calls. A
   call into one of those services faults instead of being silently stubbed.
-- **No trace-captured live call states** or callee-return stubs yet. Recorded
-  memory and registers are manually curated in JSON. Capture and replay is
-  the next required enhancement before broad game-function testing.
+- **Live-call capture is available for simple flat-selector GPR functions**,
+  but complex hardware/segment/x87 calls and callee-return stubs are not
+  yet supported. Not all captured snapshots can be replayed successfully.
 - Real OpenWatcom OMF and a safely packed replacement are not available in
   this checkout. The asset-free synthetic test executes two equivalent
   machine-code implementations when Python Unicorn is installed; the other

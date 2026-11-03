@@ -6,8 +6,8 @@
 
 This is an ABI/RAM-state oracle, not proof of full-game equivalence. It runs
 one bounded call in each fresh flat Unicorn guest. Functions depending on
-DOS services, custom segment descriptors, interrupt delivery, x87 ST0 or
-live game setup need their own captured-state/stub support before use.
+DOS services, custom segment descriptors, interrupt delivery or x87 ST0
+need their own platform/stub support before use.
 """
 
 import argparse
@@ -17,11 +17,13 @@ from pathlib import Path
 import struct
 
 try:
-    from .efpatch import apply_patches
+    from .efpatch import apply_patches, decode as decode_patch
     from .highscores_differential import load_image
+    from .call_capture import load as load_capture
 except ImportError:
-    from efpatch import apply_patches
+    from efpatch import apply_patches, decode as decode_patch
     from highscores_differential import load_image
+    from call_capture import load as load_capture
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -194,11 +196,12 @@ def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
     for address, data in memory:
         cpu.mem_write(address, data)
     cpu.mem_write(stack, struct.pack('<' + 'I' * (len(args) + 1), sentinel, *args))
-    registers = dict(INITIAL_REGS, **inputs)
+    registers = dict(INITIAL_REGS, **{key: value for key, value in inputs.items()
+                                      if key in INITIAL_REGS})
     registers['esp'] = stack
     for reg, value in registers.items():
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + reg.upper()), value)
-    cpu.reg_write(UC_X86_REG_EFLAGS, 0x202)
+    cpu.reg_write(UC_X86_REG_EFLAGS, inputs.get('eflags', 0x202))
 
     writes = []
     blocks = set()
@@ -231,12 +234,14 @@ def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
 
 
 def compare_case(original, patched, signature, scenario, guest_size, stack,
-                 sentinel, scratch, budget, function_size, flags_mask=0):
+                 sentinel, scratch, budget, function_size, flags_mask=0,
+                 patched_scenario=None):
     name = scenario[0]
     left, left_regs, left_writes, blocks = execute(
         original, signature, scenario, guest_size, stack, sentinel, budget, function_size)
     right, right_regs, right_writes, _ = execute(
-        patched, signature, scenario, guest_size, stack, sentinel, budget, function_size)
+        patched, signature, patched_scenario or scenario, guest_size, stack,
+        sentinel, budget, function_size)
     diffs = []
     expected_sp = stack + 4 + signature.stack_bytes
     if left_regs['esp'] != expected_sp or right_regs['esp'] != expected_sp:
@@ -260,6 +265,23 @@ def compare_case(original, patched, signature, scenario, guest_size, stack,
     return diffs, blocks, sum(b - a for a, b in outside_stack)
 
 
+def scenarios_from_capture(captured, patch_writes):
+    """Construct equal live states, changing only intended patch bytes.
+
+    Never copy the replacement's whole initialized image over live guest
+    RAM: that would wipe original game data and BSS modifications.
+    """
+    regs = captured.registers
+    if any(regs[name] != 7 for name in ('ds', 'es', 'ss')):
+        raise ValueError('captured function requires non-flat DS/ES/SS selector handling')
+    label = f'captured_{captured.sequence}'
+    inputs = {key: regs[key] for key in INITIAL_REGS}
+    inputs['eflags'] = regs['eflags']
+    left = (label, inputs, [], [(0, captured.guest_ram)])
+    right = (label, inputs, [], [(0, captured.guest_ram), *patch_writes])
+    return left, right
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('address', help='entry address, e.g. 0x432c')
@@ -269,6 +291,10 @@ def main():
     parser.add_argument('--patch', type=Path, action='append', required=True,
                         help='in-place EFPATCH1 replacement (repeatable)')
     parser.add_argument('--spec', type=Path, help='defaults to decomp/tests/0xADDRESS.json')
+    parser.add_argument('--captured', type=Path, action='append', default=[],
+                        help='EFCAP001 original call snapshot; repeatable, replaces spec cases')
+    parser.add_argument('--max-instructions', type=int, default=20000,
+                        help='per captured function call (default: 20000)')
     parser.add_argument('--signatures', type=Path, default=ROOT / 'decomp/symbols/signatures.tsv')
     parser.add_argument('--functions', type=Path, default=ROOT / 'decomp/symbols/functions.tsv')
     args = parser.parse_args()
@@ -276,22 +302,47 @@ def main():
         address = number(args.address, 'address')
         signature = read_signature(args.signatures, address)
         tracked_size = read_function_extent(args.functions, address)
-        spec_path = args.spec or ROOT / 'decomp/tests' / f'0x{address:07x}.json'
-        import json
-        spec = json.loads(spec_path.read_text())
+        if args.captured and args.spec:
+            raise ValueError('use either --captured inputs or an explicit --spec')
         original = load_image(executable=args.executable, payload_path=args.payload)
         patched, hashes = apply_patches(original, args.patch)
-        guest_size, stack, sentinel, scratch, budget, function_size, cases = validate_spec(
-            spec, signature, len(original))
-        if function_size != tracked_size:
-            raise ValueError('spec function extent differs from reviewed functions.tsv boundary')
-        flags_mask = number(spec.get('eflags_mask', 0), 'eflags mask')
+        if args.captured:
+            if args.max_instructions <= 0:
+                raise ValueError('captured-call instruction budget must be positive')
+            patch_writes = []
+            for path in args.patch:
+                patch_writes.extend(decode_patch(path.read_bytes(), original))
+            cases = []
+            for path in args.captured:
+                captured = load_capture(path, original, address)
+                if len(captured.guest_ram) != 0x4000000:
+                    raise ValueError('captured game calls require the complete 64 MiB guest RAM')
+                stack = captured.registers['esp']
+                if stack < 0x10100 or stack + 4 + signature.stack_bytes > 0x4000000:
+                    raise ValueError('captured stack outside replayable guest range')
+                left, right = scenarios_from_capture(captured, patch_writes)
+                cases.append((left, right, stack))
+            flags_mask, function_size = 0, tracked_size
+        else:
+            spec_path = args.spec or ROOT / 'decomp/tests' / f'0x{address:07x}.json'
+            import json
+            spec = json.loads(spec_path.read_text())
+            guest_size, stack, sentinel, scratch, budget, function_size, generated = validate_spec(
+                spec, signature, len(original))
+            if function_size != tracked_size:
+                raise ValueError('spec function extent differs from reviewed functions.tsv boundary')
+            flags_mask = number(spec.get('eflags_mask', 0), 'eflags mask')
+            cases = [(case, None, stack) for case in generated]
         failures = 0
         observed = set()
-        for scenario in cases:
+        for scenario, replacement, case_stack in cases:
+            if args.captured:
+                guest_size, sentinel, scratch, budget = (0x4000000, 0x3ffe000,
+                                                        0x10000, args.max_instructions)
             diffs, blocks, written = compare_case(original, patched, signature, scenario,
-                                                 guest_size, stack, sentinel, scratch,
-                                                 budget, function_size, flags_mask)
+                                                 guest_size, case_stack, sentinel, scratch,
+                                                 budget, function_size, flags_mask,
+                                                 patched_scenario=replacement)
             print(f'{scenario[0]}: {"FAIL" if diffs else "PASS"} '
                   f'original_blocks={len(blocks)} compared_ram_bytes={written}')
             for diff in diffs:
