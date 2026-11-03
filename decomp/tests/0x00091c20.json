@@ -1,0 +1,27 @@
+{
+  "address": "0x00091c20",
+  "function_size": 19,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "nonzero_both_counters",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x2144aa",
+          "hex": "cdab0700fdff"
+        }
+      ]
+    },
+    {
+      "name": "preserve_low_word",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x2144aa",
+          "hex": "ffff01000200"
+        }
+      ]
+    }
+  ]
+}

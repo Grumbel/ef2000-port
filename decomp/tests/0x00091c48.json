@@ -1,0 +1,47 @@
+{
+  "address": "0x00091c48",
+  "function_size": 80,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "append_at_nine",
+      "registers": {
+        "eax": "0x00001234"
+      },
+      "memory": [
+        {
+          "address": "0x12db9e",
+          "hex": "00"
+        },
+        {
+          "address": "0x2144aa",
+          "hex": "cdab09000000"
+        },
+        {
+          "address": "0x214428",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "restart_mode_15",
+      "registers": {
+        "eax": "0xffff8000"
+      },
+      "memory": [
+        {
+          "address": "0x12db9e",
+          "hex": "0f"
+        },
+        {
+          "address": "0x2144aa",
+          "hex": "cdab0a000500"
+        },
+        {
+          "address": "0x214492",
+          "hex": "0000"
+        }
+      ]
+    }
+  ]
+}

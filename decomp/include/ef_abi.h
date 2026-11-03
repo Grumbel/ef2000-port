@@ -110,6 +110,25 @@ void dispatch_scene_node_external(int16_t index, int16_t event, uint8_t code); /
 void visit_scene_node_standard(ef_addr32 node); /* 0x9021c */
 void visit_scene_node_extended(ef_addr32 node); /* 0x90378 */
 
+/* State/angle and query helpers surrounding 0x9125c..0x91c97. */
+int16_t scene_lookup_named_word(int32_t key); /* 0x9125c, full EAX then AX -> AX */
+int32_t scene_metric_remaining(void); /* 0x91298, no arguments, EAX */
+uint8_t scene_metric_reaches_threshold(int32_t ignored, int32_t threshold); /* 0x918f0, EAX/EDX -> AL */
+void set_scene_input_triplet(int32_t x, int32_t y, int32_t z); /* 0x91910, EAX/EDX/EBX */
+void set_scene_angles(int16_t x, int16_t y, int16_t z); /* 0x9195c, AX/DX/BX */
+void request_scene_pair(int32_t left, int32_t right); /* 0x91acc, EAX/EDX */
+void clear_scene_event_counters(void); /* 0x91c20 */
+void record_scene_event(int32_t packed_event); /* 0x91c48, EAX */
+
+/* Calls into original game/runtime; independent implementations not recovered. */
+ef_addr32 find_scene_named_group(ef_addr32 name, int32_t key); /* 0xa1a40, EAX/full EDX */
+ef_addr32 find_scene_named_entry(int16_t key, ef_addr32 group); /* 0xa1a90, EAX/EDX */
+int32_t evaluate_scene_metric(int32_t initial, ef_addr32 right, ef_addr32 left); /* 0x7b16c, EAX/EDX/EBX */
+void configure_scene_angles(int16_t z, int16_t y, int16_t x); /* 0xc4654, stack args */
+uint8_t probe_scene_pair_state(int32_t base, int32_t kind, int32_t left, int32_t right); /* 0x913dc, EAX/EDX/EBX/ECX */
+void perform_scene_pair_request(int16_t left, int16_t right); /* 0x91afc, AX/DX */
+void scene_event_callback(void); /* 0x86920, original side effects */
+
 /* Original dependencies at 0x2dc84/0x2dbf8; no separately confirmed ABIs. */
 uint8_t grid_reference_distance_matches(int16_t cell); /* 0x0002dc84 */
 uint8_t grid_external_distance_matches(int16_t cell, uint8_t probe); /* 0x0002dbf8 */

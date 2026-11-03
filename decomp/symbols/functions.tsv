@@ -1879,21 +1879,21 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00090f50	419			unknown	unclassified	unverified		
 0x000910f4	284			unknown	unclassified	unverified		
 0x00091238	33			unknown	unclassified	unverified		
-0x0009125c	60			unknown	unclassified	unverified		
-0x00091298	29			unknown	unclassified	unverified		
+0x0009125c	60	scene_lookup_named_word	scene_state	drafted	game	confirmed	decomp/tests/0x0009125c.json	docs/compiler-abi.md
+0x00091298	29	scene_metric_remaining	scene_state	drafted	game	confirmed	decomp/tests/0x00091298.json	docs/compiler-abi.md
 0x000912b8	79			unknown	unclassified	unverified		
 0x000913dc	1298			unknown	unclassified	unverified		
-0x000918f0	30			unknown	unclassified	unverified		
-0x00091910	73			unknown	unclassified	unverified		
-0x0009195c	63			unknown	unclassified	unverified		
+0x000918f0	30	scene_metric_reaches_threshold	scene_state	drafted	game	confirmed	decomp/tests/0x000918f0.json	docs/compiler-abi.md
+0x00091910	73	set_scene_input_triplet	scene_state	drafted	game	confirmed	decomp/tests/0x00091910.json	docs/compiler-abi.md
+0x0009195c	63	set_scene_angles	scene_state	drafted	game	confirmed	decomp/tests/0x0009195c.json	docs/compiler-abi.md
 0x000919b8	25			unknown	unclassified	unverified		
 0x000919d4	245			unknown	unclassified	unverified		
-0x00091acc	45			unknown	unclassified	unverified		
+0x00091acc	45	request_scene_pair	scene_state	drafted	game	confirmed	decomp/tests/0x00091acc.json	docs/compiler-abi.md
 0x00091afc	259			unknown	unclassified	unverified		
 0x00091c00	30			unknown	unclassified	unverified		
-0x00091c20	19			unknown	unclassified	unverified		
+0x00091c20	19	clear_scene_event_counters	scene_state	drafted	game	confirmed	decomp/tests/0x00091c20.json	docs/compiler-abi.md
 0x00091c34	17			unknown	unclassified	unverified		
-0x00091c48	80			unknown	unclassified	unverified		
+0x00091c48	80	record_scene_event	scene_state	drafted	game	confirmed	decomp/tests/0x00091c48.json	docs/compiler-abi.md
 0x00091c98	257			unknown	unclassified	unverified		
 0x00091d9c	85			unknown	unclassified	unverified		
 0x00091df4	314			unknown	unclassified	unverified		

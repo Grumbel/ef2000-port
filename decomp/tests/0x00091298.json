@@ -1,0 +1,35 @@
+{
+  "address": "0x00091298",
+  "function_size": 29,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "query_zero",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x21444c",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x214450",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "query_ids",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x21444c",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x214450",
+          "hex": "02000000"
+        }
+      ]
+    }
+  ]
+}

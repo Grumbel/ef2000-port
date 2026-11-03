@@ -1,0 +1,25 @@
+{
+  "address": "0x00091910",
+  "function_size": 73,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "positive_and_negative",
+      "registers": {
+        "eax": "0x12345678",
+        "edx": "0xabcdef01",
+        "ebx": "0xffffffff"
+      },
+      "memory": []
+    },
+    {
+      "name": "boundary_values",
+      "registers": {
+        "eax": "0x7fffffff",
+        "edx": "0x80000000",
+        "ebx": "0x00000000"
+      },
+      "memory": []
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "address": "0x00091acc",
+  "function_size": 45,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_pair",
+      "registers": {
+        "eax": "0x00000000",
+        "edx": "0x00000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "high_bits_truncated_later",
+      "registers": {
+        "eax": "0x12340001",
+        "edx": "0x56780002"
+      },
+      "memory": []
+    }
+  ]
+}

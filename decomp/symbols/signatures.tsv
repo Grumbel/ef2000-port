@@ -77,3 +77,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0009065c	next_scene_node	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	0x9065c..0x90669; callers 0x62edc/0x6abac/0x8be54; docs/compiler-abi.md
 0x000906b4	scene_node_has_active_children	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x906b4..0x90701; callers 0x65e10/0x89698/0x9075c/0x907f0; docs/compiler-abi.md
 0x000907f0	next_scene_node_with_active_children	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	0x907f0..0x90824; shared return at 0x9000a; callers 0x65d24/0x65e10; docs/compiler-abi.md
+0x0009125c	scene_lookup_named_word	EAX:int32_t	AX:int16_t	ebx,edx,esi,edi,ebp	0	Full EAX forwarded to group lookup, then DX sentinels 0/-1 and sign-extended key; callers 0x1abbc@0x1b1bd/0x1b52c@0x1b618; docs/compiler-abi.md
+0x00091298	scene_metric_remaining		EAX:int32_t	esi,edi,ebp	0	0xfffffffe minus 0x7b16c query result; callers 0x918f0@0x91901/0x92984@0x92b93; docs/compiler-abi.md
+0x000918f0	scene_metric_reaches_threshold	EAX:int32_t,EDX:int32_t	AL:uint8_t	ecx,esi,edi,ebp	0	EAX overwritten by 0x1a35f8 high word, then 0x91298 overwrites; signed >= EDX threshold; callers 0x92984@0x92b7c/0x93170@0x934a9; docs/compiler-abi.md
+0x00091910	set_scene_input_triplet	EAX:int32_t,EDX:int32_t,EBX:int32_t		eax,ebx,ecx,edx,esi,edi,ebp	0	Three 32-bit inputs packed at 0xc4756 and runtime 0x2143ec, signed high-word mirrors 0x159094; callers 0x3122c@0x3145c/0x8d11c@0x8d312; docs/compiler-abi.md
+0x0009195c	set_scene_angles	AX:int16_t,DX:int16_t,BX:int16_t		ecx,esi,edi,ebp	0	Calls 0xc4654 with signed z/y/x stack words; mirrors AX DX BX to 0x2144a4..a8; callers 0x3122c@0x3143d/0x91afc@0x91b83; docs/compiler-abi.md
+0x00091acc	request_scene_pair	EAX:int32_t,EDX:int32_t		ebx,ecx,esi,edi,ebp	0	Probes 0x913dc EAX=0xff EDX=2 EBX=left ECX=right; 0x91afc for AL below 2; callers 0x3122c@0x31419/0x32de8@0x32f6b; docs/compiler-abi.md
+0x00091c20	clear_scene_event_counters			eax,ebx,edx,esi,edi,ebp	0	Clears 0x2144ac/ae only, preserves overlapping low word at 0x2144aa; callers 0x91c48@0x91c65/0x94d08@0x94f6e; docs/compiler-abi.md
+0x00091c48	record_scene_event	EAX:int32_t		ebx,edx,esi,edi,ebp	0	Control15/16 reset, signed count bound <10, history low AX and callback 0x86920; callers 0x17538@0x1765d/0x18a68@0x19108; docs/compiler-abi.md

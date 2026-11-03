@@ -1,0 +1,31 @@
+{
+  "address": "0x0009125c",
+  "function_size": 60,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "missing_key",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x18ab30",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "minus_one",
+      "registers": {
+        "eax": "0xffffffff"
+      },
+      "memory": [
+        {
+          "address": "0x18ab30",
+          "hex": "00000000"
+        }
+      ]
+    }
+  ]
+}

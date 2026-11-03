@@ -9,6 +9,7 @@
 #include "ef_structs/spatial.h"
 #include "ef_structs/world_grid.h"
 #include "ef_structs/object_helpers.h"
+#include "ef_structs/scene_state.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -57,5 +58,15 @@ extern uint8_t g_object_kind_modes[]; /* 0x00128568, stride 0xe5 */
 extern uint8_t g_reference_clock[6]; /* 0x0012583c, three packed signed words */
 extern ef_addr32 g_scene_head; /* 0x00211ad4, singly linked scene nodes */
 extern uint8_t g_scene_kind_child_counts[]; /* 0x00123819, stride 0xa4 */
+extern ef_addr32 g_scene_query_pair[2]; /* 0x0021444c, 0x214450 */
+extern int32_t g_scene_metric_ref_packed; /* 0x001a35f8 */
+extern ef_scene_triplet_packed g_scene_input_triplet; /* 0x000c4756 */
+extern ef_scene_triplet_high g_scene_input_high; /* 0x00159094 */
+extern int32_t g_scene_runtime_triplet[3]; /* 0x002143ec, Z/Y/X order */
+extern int16_t g_scene_last_angles[3]; /* 0x002144a4, AX/DX/BX */
+extern ef_scene_event_counter g_scene_event_counters; /* 0x002144aa */
+extern int16_t g_scene_event_history[]; /* 0x00214428 */
+extern int16_t g_scene_event_armed; /* 0x00214492 */
+extern uint8_t g_scene_control_code; /* 0x0012db9e */
 
 #endif

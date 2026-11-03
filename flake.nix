@@ -526,6 +526,12 @@
           grep -qi 'scene_node_has_active_children' work/scene_nodes.asm
           grep -qi 'next_scene_node_with_active_children' work/scene_nodes.asm
           ! grep -qi '__CHK' work/scene_nodes.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/scene_state.c --output "$PWD/work/scene_state.obj"
+          ${watcom}/bin/wdis work/scene_state.obj -l=work/scene_state.asm
+          grep -qi 'scene_lookup_named_word' work/scene_state.asm
+          grep -qi 'record_scene_event' work/scene_state.asm
+          ! grep -qi '__CHK' work/scene_state.asm
           $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
             ${source}/tests/decomp_object_control_test.c \
@@ -572,6 +578,12 @@
             ${source}/decomp/src/scene_nodes.c \
             -o work/scene_nodes_host_test
           work/scene_nodes_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_scene_state_test.c \
+            ${source}/decomp/src/scene_state.c \
+            -o work/scene_state_host_test
+          work/scene_state_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

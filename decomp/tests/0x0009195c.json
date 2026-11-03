@@ -1,0 +1,25 @@
+{
+  "address": "0x0009195c",
+  "function_size": 63,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "orthogonal_angles",
+      "registers": {
+        "eax": "0x00000000",
+        "edx": "0x00004000",
+        "ebx": "0x00000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "signed_wrap",
+      "registers": {
+        "eax": "0xffffffff",
+        "edx": "0x00008000",
+        "ebx": "0x00007fff"
+      },
+      "memory": []
+    }
+  ]
+}

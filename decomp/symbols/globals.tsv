@@ -42,3 +42,13 @@ addr	size	type	name	evidence	notes
 0x00128568	256 * 0xe5	uint8_t[]	g_object_kind_modes	0x6b3dc reads 0xe5-strided byte	mode codes 2/3/4 special-case object kinds
 0x0018251a	8	double	g_grid_distance_scale	0x2baec FLD, six scaled components	separate from external scale at 0x182512
 0x00211ad4	4	ef_addr32	g_scene_head	0x901ed/0x90664/0x907f9 reads	head of singly linked scene node list; link at +0x50
+0x000c4756	16	ef_scene_triplet_packed	g_scene_input_triplet	0x91913/0x9191b/0x9192a write	Three dwords at +0/+6/+12 separated by preserved gaps
+0x00159094	10	ef_scene_triplet_high	g_scene_input_high	0x91921/0x91933/0x91950 write	Signed high words at +0/+4/+8 with two-byte gaps
+0x002143ec	12	int32_t[3]	g_scene_runtime_triplet	0x91933/0x91941/0x9194a write	Z/Y/X order, original inputs EBX/EDX/EAX
+0x002144a4	6	int16_t[3]	g_scene_last_angles	0x91980/0x91987/0x9198e write	Original AX/DX/BX low words in X/Y/Z order
+0x0021444c	8	ef_addr32[2]	g_scene_query_pair	0x91298 loads EDX/EBX	Original metric query pointers or IDs, guest meaning unresolved
+0x001a35f8	4	int32_t	g_scene_metric_ref_packed	0x918f4 high-signed-word read	Loaded for call to 0x91298, whose body ignores its input
+0x002144aa	6	ef_scene_event_counter	g_scene_event_counters	0x91c20/0x91c48 reads/writes	Low unknown word at +0, signed count at +2, secondary at +4
+0x00214428	2 * count	int16_t[]	g_scene_event_history	0x91c82 indexed write	Stores low AX of each event, no lower bound on signed index
+0x00214492	2	int16_t	g_scene_event_armed	0x91c5c writes one	Rearmed by scene control code 15 or 16
+0x0012db9e	1	uint8_t	g_scene_control_code	0x91c4c reads	Controls event history restart for modes 15/16

@@ -939,6 +939,38 @@ dispatch and callback mutation of a next pointer. Per-function guest fixtures
 remain plans; no native guest differential or Watcom recompilation succeeded
 in this environment.
 
+### Scene state, query, and event helpers (0x9125c–0x91c48)
+
+Eight adjacent helpers have at least two distinct original callers each.
+`0x9125c` takes full EAX and forwards it to `0xa1a40` as EDX with a fixed
+name pointer at `0x18ab30`; the later sentinel checks use DX only and the
+entry lookup takes a signed 16-bit key. The C return models AX only, not the
+unobserved high half of EAX on successful lookup. `0x91298` calls `0x7b16c`
+with EAX=0 and the two query globals as EDX/EBX, and returns a wrapping
+`0xfffffffe - query` value. `0x918f0` compares that result against a signed
+EDX threshold. It loads the high signed word of `0x1a35f8` before calling
+`0x91298`, but that callee immediately clears EAX; the load has no visible
+effect on its Boolean result.
+
+`0x91910` copies EAX/EDX/EBX to three dwords at `0xc4756`, `0xc475c`,
+`0xc4762` (two-byte gaps preserved), the signed high words to the three
+four-byte-spaced slots at `0x159094`, and the original dwords to
+`0x2143f4`, `0x2143f0`, `0x2143ec` in reverse memory order. `0x9195c`
+calls `0xc4654` with three sign-extended stack words in BX, DX, AX order,
+then stores original AX/DX/BX at `0x2144a4`/`a6`/`a8`. `0x91acc` invokes
+`0x913dc` with EAX=255, EDX=2, EBX/ECX as the original inputs; only AL=0/1
+triggers `0x91afc` with signed AX/DX values.
+
+`0x91c20` zeros the two 16-bit counters at `0x2144ac` and `0x2144ae`.
+`0x91c48` checks control code 15/16 at `0x12db9e`, arms and clears the
+history if selected, then appends the input low word at `0x214428 + 2*count`
+when the signed count is less than ten. The count is **the high word of a
+32-bit load at `0x2144aa`**; the C layout retains the overlapping unknown
+low word. There is no original lower-bound check on negative counts. The
+original callback `0x86920` always fires. All side-effect callees remain
+unrecovered dependencies, with host mocks only; no compiled guest
+replacement has been spliced or verified.
+
 ## Comparing assembly
 
 ```sh

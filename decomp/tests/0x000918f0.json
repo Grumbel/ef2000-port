@@ -1,0 +1,49 @@
+{
+  "address": "0x000918f0",
+  "function_size": 30,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_threshold",
+      "registers": {
+        "eax": "0x00000012",
+        "edx": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x1a35f8",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x21444c",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x214450",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "negative_threshold",
+      "registers": {
+        "eax": "0xffffffff",
+        "edx": "0xffffffff"
+      },
+      "memory": [
+        {
+          "address": "0x1a35f8",
+          "hex": "00001234"
+        },
+        {
+          "address": "0x21444c",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x214450",
+          "hex": "02000000"
+        }
+      ]
+    }
+  ]
+}
