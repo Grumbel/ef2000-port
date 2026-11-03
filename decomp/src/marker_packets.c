@@ -169,3 +169,102 @@ void notify_if_scene_pair(ef_addr32 record)
     if (guest_query_scene_pair(p[1], dword >> 16) != 0)
         guest_notify_scene_pair();
 }
+
+static void put_word(uint8_t *bytes, uint16_t value)
+{
+    bytes[0] = (uint8_t)value;
+    bytes[1] = (uint8_t)(value >> 8);
+}
+
+/* 0x571f0, 37 bytes. Five-byte packet 0x3e: AL, DX word, BL. */
+void send_byte_word_byte_packet_3e(uint8_t first, uint16_t second, uint8_t third)
+{
+    uint8_t bytes[5];
+    bytes[0] = 0x3e;
+    bytes[1] = first;
+    put_word(bytes + 2, second);
+    bytes[4] = third;
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+/* 0x5728c, 38 bytes. Six-byte packet 0x3b: AX, DX, BL; BH is clobbered. */
+void send_two_word_byte_packet_3b(uint16_t first, uint16_t second, uint8_t flag)
+{
+    uint8_t bytes[6];
+    bytes[0] = 0x3b;
+    put_word(bytes + 1, first);
+    put_word(bytes + 3, second);
+    bytes[5] = flag;
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+/* 0x57348, 33 bytes. Four-byte packet 0x3d: AX word, DL. */
+void send_word_byte_packet_3d(uint16_t value, uint8_t flag)
+{
+    uint8_t bytes[4];
+    bytes[0] = 0x3d;
+    put_word(bytes + 1, value);
+    bytes[3] = flag;
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+/* 0x575fc, 36 bytes. Five-byte packet 0x40: AX then DX words. */
+void send_two_word_packet_40(uint16_t first, uint16_t second)
+{
+    uint8_t bytes[5];
+    bytes[0] = 0x40;
+    put_word(bytes + 1, first);
+    put_word(bytes + 3, second);
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+/* 0x57650, 31 bytes. Three-byte packet 0x2e: AX word. */
+void send_word_packet_2e(uint16_t value)
+{
+    uint8_t bytes[3];
+    bytes[0] = 0x2e;
+    put_word(bytes + 1, value);
+    emit_command_packet(bytes, sizeof(bytes));
+}
+
+static void bump_counter(ef_addr32 record, ef_addr32 base)
+{
+    int32_t index = (int16_t)(*(const uint8_t *)ef_guest_memory_ptr(record + 1u) |
+                              (uint16_t)(*(const uint8_t *)ef_guest_memory_ptr(record + 2u) << 8));
+    /* ORIGINAL BUG: only the upper bound is checked; negative indexes
+     * write below the table. */
+    if (index < 4)
+        ++*(uint8_t *)ef_guest_memory_ptr(base + (ef_addr32)index);
+}
+
+/* 0x576a4, 16 bytes. Increment byte 0x19b960 + signed word record+1 if < 4. */
+void bump_counter_19b960(ef_addr32 record)
+{
+    bump_counter(record, 0x0019b960u);
+}
+
+/* 0x576d4, 16 bytes. Same shape on base 0x19b96c. */
+void bump_counter_19b96c(ef_addr32 record)
+{
+    bump_counter(record, 0x0019b96cu);
+}
+
+/* 0x57704, 16 bytes. Same shape on base 0x19b966. */
+void bump_counter_19b966(ef_addr32 record)
+{
+    bump_counter(record, 0x0019b966u);
+}
+
+/* 0x58d04, 29 bytes. Set the two mode limit words to 4 and 5. */
+void set_mode_limits_4_5(void)
+{
+    *(uint16_t *)ef_guest_memory_ptr(0x001a6ce2u) = 4;
+    *(uint16_t *)ef_guest_memory_ptr(0x001a6ce8u) = 5;
+}
+
+/* 0x58d44, 29 bytes. Set the two mode limit words to 8 and 10. */
+void set_mode_limits_8_10(void)
+{
+    *(uint16_t *)ef_guest_memory_ptr(0x001a6ce2u) = 8;
+    *(uint16_t *)ef_guest_memory_ptr(0x001a6ce8u) = 10;
+}

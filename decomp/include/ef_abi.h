@@ -432,4 +432,15 @@ void guest_apply_marker_update(uint32_t value, uint8_t flag); /* 0x562d8 EAX/DL 
 uint32_t guest_query_scene_pair(uint8_t selector, int32_t high); /* 0x87f9c EAX/EDX */
 void guest_notify_scene_pair(void); /* 0x878c8 */
 
+void send_byte_word_byte_packet_3e(uint8_t first, uint16_t second, uint8_t third); /* 0x571f0 AL/DX/BL */
+void send_two_word_byte_packet_3b(uint16_t first, uint16_t second, uint8_t flag); /* 0x5728c AX/DX/BL */
+void send_word_byte_packet_3d(uint16_t value, uint8_t flag); /* 0x57348 AX/DL */
+void send_two_word_packet_40(uint16_t first, uint16_t second); /* 0x575fc AX/DX */
+void send_word_packet_2e(uint16_t value); /* 0x57650 AX */
+void bump_counter_19b960(ef_addr32 record); /* 0x576a4 EAX */
+void bump_counter_19b96c(ef_addr32 record); /* 0x576d4 EAX */
+void bump_counter_19b966(ef_addr32 record); /* 0x57704 EAX */
+void set_mode_limits_4_5(void); /* 0x58d04 */
+void set_mode_limits_8_10(void); /* 0x58d44 */
+
 #endif

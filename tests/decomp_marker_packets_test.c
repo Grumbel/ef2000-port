@@ -149,5 +149,40 @@ int main(void)
     query_result = 0x10000;
     notify_if_scene_pair(0x3200);
     assert(notified == 1);
+
+    /* third batch */
+    {
+        unsigned base = count;
+        const uint8_t b3e[5] = {0x3e, 0x11, 0x34, 0x12, 0x77};
+        const uint8_t b3b[6] = {0x3b, 0x01, 0x80, 0xff, 0x7f, 0x55};
+        const uint8_t b3d[4] = {0x3d, 0xfe, 0xff, 0x09};
+        const uint8_t b40[5] = {0x40, 0x34, 0x12, 0x78, 0x56};
+        const uint8_t b2e[3] = {0x2e, 0x02, 0x81};
+        send_byte_word_byte_packet_3e(0x11, 0x1234, 0x77);
+        send_two_word_byte_packet_3b(0x8001, 0x7fff, 0x55);
+        send_word_byte_packet_3d(0xfffe, 9);
+        send_two_word_packet_40(0x1234, 0x5678);
+        send_word_packet_2e(0x8102);
+        expect(base, b3e, 5);
+        expect(base + 1, b3b, 6);
+        expect(base + 2, b3d, 4);
+        expect(base + 3, b40, 5);
+        expect(base + 4, b2e, 3);
+    }
+    mem[0x3400] = 0; mem[0x3401] = 3; mem[0x3402] = 0;
+    bump_counter_19b960(0x3400);
+    bump_counter_19b96c(0x3400);
+    bump_counter_19b966(0x3400);
+    assert(mem[0x19b963] == 1 && mem[0x19b96f] == 1 && mem[0x19b969] == 1);
+    mem[0x3401] = 4;
+    bump_counter_19b960(0x3400);
+    assert(mem[0x19b964] == 0);
+    mem[0x3401] = 0xff; mem[0x3402] = 0xff; /* -1 passes the < 4 test */
+    bump_counter_19b966(0x3400);
+    assert(mem[0x19b965] == 1);
+    set_mode_limits_4_5();
+    assert(mem[0x1a6ce2] == 4 && mem[0x1a6ce3] == 0 && mem[0x1a6ce8] == 5);
+    set_mode_limits_8_10();
+    assert(mem[0x1a6ce2] == 8 && mem[0x1a6ce8] == 10);
     return 0;
 }

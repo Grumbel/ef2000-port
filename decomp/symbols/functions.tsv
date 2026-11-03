@@ -1076,24 +1076,24 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00057160	55			unknown	unclassified	unverified		
 0x00057198	31	send_object_code_3a	command_packets	drafted	game	confirmed	decomp/tests/0x00057198.json	docs/compiler-abi.md; Three-byte opcode 0x3a packet AX little-endian; original call 0xa3f74; guest dispatch unverified
 0x000571b8	55			unknown	unclassified	unverified		
-0x000571f0	37			unknown	unclassified	unverified		
+0x000571f0	37	send_byte_word_byte_packet_3e	marker_packets	drafted	game	confirmed	decomp/tests/0x000571f0.json	docs/compiler-abi.md; Packet 3e AL DX BL size 5; sole direct caller 74480@74545; guest pending
 0x00057218	116			unknown	unclassified	unverified		
-0x0005728c	38			unknown	unclassified	unverified		
+0x0005728c	38	send_two_word_byte_packet_3b	marker_packets	drafted	game	confirmed	decomp/tests/0x0005728c.json	docs/compiler-abi.md; Packet 3b AX DX BL size 6; BH overwritten with opcode; sole direct caller 772d0@774ab; guest pending
 0x000572b4	148			unknown	unclassified	unverified		
-0x00057348	33			unknown	unclassified	unverified		
+0x00057348	33	send_word_byte_packet_3d	marker_packets	drafted	game	confirmed	decomp/tests/0x00057348.json	docs/compiler-abi.md; Packet 3d AX DL size 4; sole direct caller 775f0@7771e; guest pending
 0x0005736c	100			unknown	unclassified	unverified		
 0x000573d0	176			unknown	unclassified	unverified		
 0x00057480	380			unknown	unclassified	unverified		
-0x000575fc	36			unknown	unclassified	unverified		
+0x000575fc	36	send_two_word_packet_40	marker_packets	drafted	game	confirmed	decomp/tests/0x000575fc.json	docs/compiler-abi.md; Packet 40 AX DX size 5; sole direct caller 910f4@911e5; guest pending
 0x00057620	48			unknown	unclassified	unverified		
-0x00057650	31			unknown	unclassified	unverified		
+0x00057650	31	send_word_packet_2e	marker_packets	drafted	game	confirmed	decomp/tests/0x00057650.json	docs/compiler-abi.md; Packet 2e AX size 3; sole direct caller 74584@7469a; guest pending
 0x00057670	18			unknown	unclassified	unverified		
 0x00057684	31	send_object_code_4a	command_packets	drafted	game	confirmed	decomp/tests/0x00057684.json	docs/compiler-abi.md; Three-byte opcode 0x4a packet AX little-endian; original call 0xa3f74; guest dispatch unverified
-0x000576a4	16			unknown	unclassified	unverified		
+0x000576a4	16	bump_counter_19b960	marker_packets	drafted	game	confirmed	decomp/tests/0x000576a4.json	docs/compiler-abi.md; Increment byte 0x19b960+signed word record+1 when < 4 (no lower bound); sole direct caller 581b0@585b9; guest pending
 0x000576b4	31	send_object_code_4b	command_packets	drafted	game	confirmed	decomp/tests/0x000576b4.json	docs/compiler-abi.md; Three-byte opcode 0x4b packet AX little-endian; original call 0xa3f74; guest dispatch unverified
-0x000576d4	16			unknown	unclassified	unverified		
+0x000576d4	16	bump_counter_19b96c	marker_packets	drafted	game	confirmed	decomp/tests/0x000576d4.json	docs/compiler-abi.md; Same on base 0x19b96c; sole direct caller 581b0@585c8; guest pending
 0x000576e4	31	send_object_code_4c	command_packets	drafted	game	confirmed	decomp/tests/0x000576e4.json	docs/compiler-abi.md; Three-byte opcode 0x4c packet AX little-endian; original call 0xa3f74; guest dispatch unverified
-0x00057704	16			unknown	unclassified	unverified		
+0x00057704	16	bump_counter_19b966	marker_packets	drafted	game	confirmed	decomp/tests/0x00057704.json	docs/compiler-abi.md; Same on base 0x19b966; sole direct caller 581b0@585d7; guest pending
 0x00057714	150			unknown	unclassified	unverified		
 0x000577ac	57	send_packet_2c	ui_operations	drafted	game	confirmed	decomp/tests/0x000577ac.json	docs/compiler-abi.md; host model; guest differential pending
 0x000577e8	56			unknown	unclassified	unverified		
@@ -1104,9 +1104,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000581b0	1380			unknown	unclassified	unverified		
 0x00058714	610			unknown	unclassified	unverified		
 0x000589c0	741			unknown	unclassified	unverified		
-0x00058d04	29			unknown	unclassified	unverified		
+0x00058d04	29	set_mode_limits_4_5	marker_packets	drafted	game	confirmed	decomp/tests/0x00058d04.json	docs/compiler-abi.md; Words 0x1a6ce2=4 and 0x1a6ce8=5; sole direct caller 597d8@5986c,597d8@598b5; guest pending
 0x00058d24	29	initialize_mode_limits	runtime_control	drafted	game	confirmed	decomp/tests/0x00058d24.json	docs/compiler-abi.md; Literal 8/10 stored to words 0x1a6ce2/0x1a6ce8; original guest replacement unverified
-0x00058d44	29			unknown	unclassified	unverified		
+0x00058d44	29	set_mode_limits_8_10	marker_packets	drafted	game	confirmed	decomp/tests/0x00058d44.json	docs/compiler-abi.md; Words 0x1a6ce2=8 and 0x1a6ce8=10; sole direct caller 597d8@59895; guest pending
 0x00058d64	437			unknown	unclassified	unverified		
 0x00059334	234			unknown	unclassified	unverified		
 0x00059420	99	draw_tactical_coordinates	record_transitions	drafted	game	confirmed	decomp/tests/0x00059420.json	docs/compiler-abi.md; host model; guest differential pending

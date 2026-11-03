@@ -1544,3 +1544,19 @@ drafts remain unverified at the guest/Watcom level.
 | `0x561e4` | EAX record | `0x58455` | if `dword[+1] & 15 == marker`, call `0x562d8` with the dword and byte `+5` |
 | `0x56954` | EAX record | `0x58359` | call `0x87f9c` with byte `+0xd` and signed high word of `+0xc`; nonzero result calls `0x878c8` |
 | `0x56d40` | none | `0x56d1b` | send `30, marker, 0` (three bytes) |
+
+## Further packets, bounded counters and mode limits (2026-11-03)
+
+Ten more original functions, each with one or two direct callers; host drafts
+only, unverified at the guest/Watcom level.
+
+| Entry | Inputs | Observed effect |
+| --- | --- | --- |
+| `0x571f0` | AL, DX word, BL | send `3e, AL, DX, BL` (five bytes) |
+| `0x5728c` | AX, DX words, BL | send `3b, AX, DX, BL` (six bytes); BH overwritten |
+| `0x57348` | AX word, DL | send `3d, AX, DL` (four bytes) |
+| `0x575fc` | AX, DX words | send `40, AX, DX` (five bytes) |
+| `0x57650` | AX word | send `2e, AX` (three bytes) |
+| `0x576a4`, `0x576d4`, `0x57704` | EAX record | if signed word `+1` < 4, increment byte at `0x19b960`/`0x19b96c`/`0x19b966` plus that index; there is no lower bound (**ORIGINAL BUG** kept) |
+| `0x58d04` | none | words `0x1a6ce2=4`, `0x1a6ce8=5` |
+| `0x58d44` | none | words `0x1a6ce2=8`, `0x1a6ce8=10` |

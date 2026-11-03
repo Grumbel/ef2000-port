@@ -247,3 +247,13 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000561e4	forward_marker_matched_record	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x561e4 (36 bytes); If dword record+1 low nibble equals marker call 0x562d8 with dword and byte +5; caller 581b0@58455; docs/compiler-abi.md
 0x00056954	notify_if_scene_pair	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x56954 (31 bytes); Query 0x87f9c with byte +0xd and signed high word of +0xc; nonzero calls 0x878c8; caller 581b0@58359; docs/compiler-abi.md
 0x00056d40	send_marker_word_packet_30			ebx,ecx,edx,esi,edi,ebp	0	Original 0x56d40 (37 bytes); Packet 30 with marker zero-extended word size 3; caller 56d18@56d1b; docs/compiler-abi.md
+0x000571f0	send_byte_word_byte_packet_3e	AL:uint8_t,DX:uint16_t,BL:uint8_t		ebx,ecx,esi,edi,ebp	0	Original 0x571f0 (37 bytes); Packet 3e AL DX BL size 5; caller 74480@74545; docs/compiler-abi.md
+0x0005728c	send_two_word_byte_packet_3b	AX:uint16_t,DX:uint16_t,BL:uint8_t		ecx,esi,edi,ebp	0	Original 0x5728c (38 bytes); Packet 3b AX DX BL size 6; BH overwritten with opcode; caller 772d0@774ab; docs/compiler-abi.md
+0x00057348	send_word_byte_packet_3d	AX:uint16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	Original 0x57348 (33 bytes); Packet 3d AX DL size 4; caller 775f0@7771e; docs/compiler-abi.md
+0x000575fc	send_two_word_packet_40	AX:uint16_t,DX:uint16_t		ebx,ecx,esi,edi,ebp	0	Original 0x575fc (36 bytes); Packet 40 AX DX size 5; caller 910f4@911e5; docs/compiler-abi.md
+0x00057650	send_word_packet_2e	AX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x57650 (31 bytes); Packet 2e AX size 3; caller 74584@7469a; docs/compiler-abi.md
+0x000576a4	bump_counter_19b960	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x576a4 (16 bytes); Increment byte 0x19b960+signed word record+1 when < 4 (no lower bound); caller 581b0@585b9; docs/compiler-abi.md
+0x000576d4	bump_counter_19b96c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x576d4 (16 bytes); Same on base 0x19b96c; caller 581b0@585c8; docs/compiler-abi.md
+0x00057704	bump_counter_19b966	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x57704 (16 bytes); Same on base 0x19b966; caller 581b0@585d7; docs/compiler-abi.md
+0x00058d04	set_mode_limits_4_5			ebx,ecx,edx,esi,edi,ebp	0	Original 0x58d04 (29 bytes); Words 0x1a6ce2=4 and 0x1a6ce8=5; caller 597d8@5986c,597d8@598b5; docs/compiler-abi.md
+0x00058d44	set_mode_limits_8_10			ebx,ecx,edx,esi,edi,ebp	0	Original 0x58d44 (29 bytes); Words 0x1a6ce2=8 and 0x1a6ce8=10; caller 597d8@59895; docs/compiler-abi.md
