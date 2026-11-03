@@ -75,5 +75,22 @@ but **has not yet been tested against actual WLIB-extracted Watcom runtime
 objects** in this environment. No runtime library functions were
 automatically classified by this tool.
 
+## Independently recognized startup routines
+
+Three routines are already identified from the original application's
+disassembly and startup source/call-sequence comparison, *not* by OMF
+fingerprints:
+
+| Address | Tracker name | Kind | Evidence |
+| --- | --- | --- | --- |
+| `0x00000086` | `x386_startup` | `x32` | Entry sequence agrees with FlashTek's Watcom `cstrtx32.asm`; see `docs/loader.md` |
+| `0x0009bd20` | `watcom_cmain` | `clib` | Startup command-line/EAX and EBP setup before the candidate game `main`; see `docs/startup-symbols.md` |
+| `0x0009bd70` | `watcom_init_routines` | `clib` | Watcom initializer-table walk invoked with EAX=`0xff`; see `docs/startup-symbols.md` |
+
+These are marked `state=library` in `decomp/symbols/functions.tsv` with
+`sig_status=unverified`: the identities are strong, but they have not been
+cross-checked against a matching Watcom 10.x object library. Do not inflate
+the OMF matching statistics with these source-backed identifications.
+
 Format details: [TIS OMF Specification v1.1](https://openwatcom.org/ftp/devel/docs/omf.pdf)
 and [OpenWatcom WLIB manual](https://open-watcom.github.io/open-watcom-v2-wikidocs/ctools.html).

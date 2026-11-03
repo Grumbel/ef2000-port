@@ -1,5 +1,5 @@
 addr	size	name	module	state	kind	sig_status	test	notes
-0x00000086	355	x386_startup		named	unclassified	unverified		
+0x00000086	355	x386_startup		library	x32	unverified		docs/loader.md and docs/startup-symbols.md; code sequence matches FlashTek X-32 Watcom cstrtx32.asm, selector and startup setup
 0x000001e9	57			unknown	unclassified	unverified		
 0x00000222	9			unknown	unclassified	unverified		
 0x00000235	6			unknown	unclassified	unverified		
@@ -2015,8 +2015,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009bb64	64			unknown	unclassified	unverified		
 0x0009bba4	253			unknown	unclassified	unverified		
 0x0009bca4	83			unknown	unclassified	unverified		
-0x0009bd20	79	watcom_cmain		named	unclassified	unverified		Watcom C entry; docs/startup-symbols.md
-0x0009bd70	75	watcom_init_routines		named	unclassified	unverified		Watcom initializer dispatcher; docs/startup-symbols.md
+0x0009bd20	79	watcom_cmain		library	clib	unverified		Watcom C entry: startup command buffer and EBP initialization, calls candidate game main 0x8b274; docs/startup-symbols.md
+0x0009bd70	75	watcom_init_routines		library	clib	unverified		Watcom initializer dispatcher: called with EAX=0xff and walks init table; docs/startup-symbols.md
 0x0009bdbb	79			unknown	unclassified	unverified		
 0x0009be0c	1			unknown	unclassified	unverified		
 0x0009be0d	40			unknown	unclassified	unverified		

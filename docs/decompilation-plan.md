@@ -410,7 +410,13 @@ JSON proposal, never editing the canonical tracker. Three synthetic OMF
 unit tests cover 32-bit relocation masking, validation and the CLI; the
 workflows and limitations are in `docs/library-identification.md`. Actual
 OW 1.9/2.0 library extraction, empirical matches and independent 10.x
-verification remain to be done. No library classifications are claimed yet.
+verification remain to be done. No OMF-derived library classifications are
+claimed yet.
+Three startup/runtime entries (`0x86`, `0x9bd20`, `0x9bd70`) have since been
+classified from independent Watcom startup-source and call-path evidence,
+with their uncertainty recorded in `docs/library-identification.md`; these
+are **not** OMF fingerprint matches. Automated library identification remains
+unverified against real extracted library objects.
 
 ### 3.7 [ ] OMF splicer (`tools/omf_splice.py`)
 
@@ -824,6 +830,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Added 80-bit ST0 storage to the Ghidra symbol importer; confirmed ret 8 stack-double/ST0 return at 0xf8250 and ES:[EDI] non-popping ST0 store at 0x120a52 (35/40 samples; five indirect/segment exceptions).
 2026-11-03  3.5   Representative ABI audit closed at 35 confirmed and five explicitly bounded, ineligible-for-automatic-splice callback/segment exceptions (40/40 reviewed).
 2026-11-03  3.6   Began library identification: relocation-masked OMF public-function fingerprint tool and proposal-only matcher, with three synthetic tests; real Watcom library evidence pending.
+2026-11-03  3.6   Classified three source-matched Watcom/X-32 startup routines as library code; not fingerprint-derived and not counted as verified function replacements.
 ```
 
 ---
