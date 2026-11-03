@@ -849,3 +849,19 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000de12c	mouse_request_de12c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000de12c (141 bytes); ; callers ddce8@ddce8; docs/compiler-abi.md
 0x000de2d8	mouse_request_de2d8		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000de2d8 (153 bytes); ; callers a9cd0@a9ce4; docs/compiler-abi.md
 0x000de4b0	mouse_request_de4b0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000de4b0 (125 bytes); ; callers 984b4@984c1,a9aa8@a9b91,a9d48@a9daf; docs/compiler-abi.md
+0x000e0870	fill_channel_e0870			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e0870 (111 bytes); Fill the channel record selected by byte 0x15f07f.; callers e1194@e1194; docs/compiler-abi.md
+0x000e1194	setup_sound_e1194		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e1194 (101 bytes); ; callers none direct; docs/compiler-abi.md
+0x000e1260	any_device_e1260		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e1260 (87 bytes); Is any of the six devices present?; callers none direct; docs/compiler-abi.md
+0x000ea4c0	rewrite_template_ea4c0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ea4c0 (75 bytes); Rewrite a "$...:...$" template in place.; callers ea50c@ea56b; docs/compiler-abi.md
+0x000eb9f8	resolve_entry_eb9f8	EAX:uint32_t,EDX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb9f8 (84 bytes); ; callers 9cb20@9cb3a,9cb20@9cb5a; docs/compiler-abi.md
+0x000ed4e7	parse_format_flags	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ed4e7 (91 bytes); Parse printf flag characters into the spec at EDX (+0x14 flags, +0x16 fill).; callers ed3b4@ed3c3; docs/compiler-abi.md
+0x000f2c78	read_script_line_f2c78			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2c78 (87 bytes); Read the next script line (after leading blanks) from dword 0x485924 into 0x485956.; callers f2d74@f2d74,f3a1c@f3a36,f3a1c@f3a62; docs/compiler-abi.md
+0x000f2cd0	read_script_token_f2cd0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2cd0 (131 bytes); Copy the next token of the line at 0x485956 to 0x48592c.; callers f2d74@f2d94,f2dfc@f2e02,f2e54@f2e55; docs/compiler-abi.md
+0x000f45d8	read_buffered_char_f45d8		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f45d8 (104 bytes); Read one character from the buffer at 0x485e59 (see 0xe774).; callers f4640@f464e,f4640@f4665,f4640@f4696; docs/compiler-abi.md
+0x000f57d4	push_node_f57d4		EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f57d4 (78 bytes); Take a node from the free list at 0x485df8 (or allocate one) and push it on the list at 0x485df4.; callers f4a88@f4a8d; docs/compiler-abi.md
+0x000f88e8	count_slots_f88e8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f88e8 (78 bytes); As 0xbd6d8 for the layout with count byte +4 and array +5.; callers f8b14@f8bcf,f8b14@f8be4,f8b14@f8c19; docs/compiler-abi.md
+0x000f8938	reset_slots_f8938	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f8938 (80 bytes); As 0xbd688 for the layout with count byte +4 and array +5.; callers f8b14@f8b69; docs/compiler-abi.md
+0x000f8a78	decrement_f8a78	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f8a78 (81 bytes); Decrement byte +3 while it exceeds 2 (modes 0 and 2) or 3 (other modes).; callers f8acc@f8af2; docs/compiler-abi.md
+0x000fc08c	map_mode_fc08c	AL:uint8_t,DX:uint16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc08c (93 bytes); Map a mode code (and a flag word) to a table index.; callers fc0ec@fc167; docs/compiler-abi.md
+0x000fc478	query_video_mode_fc478	EAX:uint32_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc478 (106 bytes); VESA call 0x4f01 for mode ECX; true when the BIOS answers 0x4f.; callers fc4e4@fc502,fc600@fc605; docs/compiler-abi.md
+0x000fc4e4	find_linear_mode_fc4e4		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc4e4 (80 bytes); Find the first VESA mode in the list whose info has bit 7 set; returns dword +0x28 of its info.; callers fc534@fc5da; docs/compiler-abi.md

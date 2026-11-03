@@ -2265,3 +2265,24 @@ in EAX, format string address, one value).
 | `0xde12c` | none | none | ddce8@ddce8 |  |
 | `0xde2d8` | none | EAX:uint32_t | a9cd0@a9ce4 |  |
 | `0xde4b0` | none | none | 984b4@984c1,a9aa8@a9b91,a9d48@a9daf |  |
+
+## runtime_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe0870` | none | none | e1194@e1194 | Fill the channel record selected by byte 0x15f07f. |
+| `0xe1194` | none | AL:uint8_t | none direct |  |
+| `0xe1260` | none | AL:uint8_t | none direct | Is any of the six devices present? |
+| `0xea4c0` | none | none | ea50c@ea56b | Rewrite a "$...:...$" template in place. |
+| `0xeb9f8` | EAX:uint32_t,EDX:ef_addr32 | EAX:uint32_t | 9cb20@9cb3a,9cb20@9cb5a |  |
+| `0xed4e7` | EAX:ef_addr32,EDX:ef_addr32 | none | ed3b4@ed3c3 | Parse printf flag characters into the spec at EDX (+0x14 flags, +0x16 fill). |
+| `0xf2c78` | none | none | f2d74@f2d74,f3a1c@f3a36,f3a1c@f3a62 | Read the next script line (after leading blanks) from dword 0x485924 into 0x485956. |
+| `0xf2cd0` | none | none | f2d74@f2d94,f2dfc@f2e02,f2e54@f2e55 | Copy the next token of the line at 0x485956 to 0x48592c. |
+| `0xf45d8` | none | AL:uint8_t | f4640@f464e,f4640@f4665,f4640@f4696 | Read one character from the buffer at 0x485e59 (see 0xe774). |
+| `0xf57d4` | none | EAX:ef_addr32 | f4a88@f4a8d | Take a node from the free list at 0x485df8 (or allocate one) and push it on the list at 0x485df4. |
+| `0xf88e8` | EAX:ef_addr32 | none | f8b14@f8bcf,f8b14@f8be4,f8b14@f8c19 | As 0xbd6d8 for the layout with count byte +4 and array +5. |
+| `0xf8938` | EAX:ef_addr32 | none | f8b14@f8b69 | As 0xbd688 for the layout with count byte +4 and array +5. |
+| `0xf8a78` | EAX:ef_addr32 | EAX:uint32_t | f8acc@f8af2 | Decrement byte +3 while it exceeds 2 (modes 0 and 2) or 3 (other modes). |
+| `0xfc08c` | AL:uint8_t,DX:uint16_t | EAX:uint32_t | fc0ec@fc167 | Map a mode code (and a flag word) to a table index. |
+| `0xfc478` | EAX:uint32_t | AL:uint8_t | fc4e4@fc502,fc600@fc605 | VESA call 0x4f01 for mode ECX; true when the BIOS answers 0x4f. |
+| `0xfc4e4` | none | EAX:uint32_t | fc534@fc5da | Find the first VESA mode in the list whose info has bit 7 set; returns dword +0x28 of its info. |

@@ -3303,7 +3303,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dfeb8	145			unknown	unclassified	unverified		
 0x000dff4c	24			unknown	unclassified	unverified		
 0x000e06ac	77			unknown	unclassified	unverified		
-0x000e0870	111			unknown	unclassified	unverified		
+0x000e0870	111	fill_channel_e0870	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e0870.json	docs/compiler-abi.md; Fill the channel record selected by byte 0x15f07f.; callers e1194@e1194; guest pending
 0x000e0930	81			unknown	unclassified	unverified		
 0x000e0a90	116			unknown	unclassified	unverified		
 0x000e0b10	92			unknown	unclassified	unverified		
@@ -3315,8 +3315,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e1110	29			unknown	unclassified	unverified		
 0x000e1130	43			unknown	unclassified	unverified		
 0x000e115c	53			unknown	unclassified	unverified		
-0x000e1194	101			unknown	unclassified	unverified		
-0x000e1260	87			unknown	unclassified	unverified		
+0x000e1194	101	setup_sound_e1194	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e1194.json	docs/compiler-abi.md; ; callers none direct; guest pending
+0x000e1260	87	any_device_e1260	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e1260.json	docs/compiler-abi.md; Is any of the six devices present?; callers none direct; guest pending
 0x000e1540	38	next_enabled_index	math_string	compiles	game	confirmed	decomp/tests/0x000e1540.json	docs/compiler-abi.md; Next index after AL (mod 5) whose byte at 0x15f708+index is nonzero.; callers 337c4@337d0; guest pending
 0x000e1570	337			unknown	unclassified	unverified		
 0x000e1730	17			unknown	unclassified	unverified		
@@ -3477,7 +3477,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ea470	42			unknown	unclassified	unverified		
 0x000ea49a	13			unknown	unclassified	unverified		
 0x000ea4a7	16			unknown	unclassified	unverified		
-0x000ea4c0	75			unknown	unclassified	unverified		
+0x000ea4c0	75	rewrite_template_ea4c0	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000ea4c0.json	docs/compiler-abi.md; Rewrite a "$...:...$" template in place.; callers ea50c@ea56b; guest pending
 0x000ea50c	234			unknown	unclassified	unverified		
 0x000ea84c	21	clear_vector3	math_string	compiles	game	confirmed	decomp/tests/0x000ea84c.json	docs/compiler-abi.md; Clear three dwords.; callers 9fea8@9ffb4,9fea8@9ffbc; guest pending
 0x000ea864	9			unknown	unclassified	unverified		
@@ -3516,7 +3516,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb4dc	65			unknown	unclassified	unverified		
 0x000eb520	373			unknown	unclassified	unverified		
 0x000eb698	71			unknown	unclassified	unverified		
-0x000eb9f8	84			unknown	unclassified	unverified		
+0x000eb9f8	84	resolve_entry_eb9f8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000eb9f8.json	docs/compiler-abi.md; ; callers 9cb20@9cb3a,9cb20@9cb5a; guest pending
 0x000eba4c	21	lookup_field_eba4c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000eba4c.json	docs/compiler-abi.md; Zero when EDX is zero, else dword +8 of 0xeb520's result (or 0).; callers 9cb70@9cb8a,9cb70@9cbaa; guest pending
 0x000eba64	169			unknown	unclassified	unverified		
 0x000ebb10	69			unknown	unclassified	unverified		
@@ -3539,7 +3539,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ed115	30	guest_memcmp	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ed115.json	docs/compiler-abi.md; memcmp of EBX bytes at EAX and EDX: 0, -1 or 1 (unsigned).; callers a2f70@a2fed,d660c@d662c,ec0ec@ec113; guest pending
 0x000ed133	641			unknown	unclassified	unverified		
 0x000ed3b4	307			unknown	unclassified	unverified		
-0x000ed4e7	91			unknown	unclassified	unverified		
+0x000ed4e7	91	parse_format_flags	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000ed4e7.json	docs/compiler-abi.md; Parse printf flag characters into the spec at EDX (+0x14 flags, +0x16 fill).; callers ed3b4@ed3c3; guest pending
 0x000ed542	36			unknown	unclassified	unverified		
 0x000ed566	35			unknown	unclassified	unverified		
 0x000ed589	97			unknown	unclassified	unverified		
@@ -3616,8 +3616,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2a30	142			unknown	unclassified	unverified		
 0x000f2ac0	188			unknown	unclassified	unverified		
 0x000f2b7c	250			unknown	unclassified	unverified		
-0x000f2c78	87			unknown	unclassified	unverified		
-0x000f2cd0	131			unknown	unclassified	unverified		
+0x000f2c78	87	read_script_line_f2c78	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f2c78.json	docs/compiler-abi.md; Read the next script line (after leading blanks) from dword 0x485924 into 0x485956.; callers f2d74@f2d74,f3a1c@f3a36,f3a1c@f3a62; guest pending
+0x000f2cd0	131	read_script_token_f2cd0	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f2cd0.json	docs/compiler-abi.md; Copy the next token of the line at 0x485956 to 0x48592c.; callers f2d74@f2d94,f2dfc@f2e02,f2e54@f2e55; guest pending
 0x000f2d54	31	path_ends_with_colon	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2d54.json	docs/compiler-abi.md; The string at 0x48592c ends with ':'.; callers f2d74@f2d99; guest pending
 0x000f2d74	86			unknown	unclassified	unverified		
 0x000f2dcc	46	strip_extension	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2dcc.json	docs/compiler-abi.md; Truncate the string at the last '.'.; callers f2dfc@f2e15; guest pending
@@ -3651,7 +3651,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f41dc	236			unknown	unclassified	unverified		
 0x000f4347	367			unknown	unclassified	unverified		
 0x000f44b6	224			unknown	unclassified	unverified		
-0x000f45d8	104			unknown	unclassified	unverified		
+0x000f45d8	104	read_buffered_char_f45d8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f45d8.json	docs/compiler-abi.md; Read one character from the buffer at 0x485e59 (see 0xe774).; callers f4640@f464e,f4640@f4665,f4640@f4696; guest pending
 0x000f4640	138			unknown	unclassified	unverified		
 0x000f46cc	190	read_next_command_token	unk_cli	typed	game	confirmed		docs/compiler-abi.md; token into 0x485e08; 16-bit cursor at 0x161eac
 0x000f478c	100			unknown	unclassified	unverified		
@@ -3667,7 +3667,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f5214	423	GADGETRY		named	unclassified	unverified		
 0x000f53bc	200	NAME		named	unclassified	unverified		
 0x000f5484	531			unknown	unclassified	unverified		
-0x000f57d4	78			unknown	unclassified	unverified		
+0x000f57d4	78	push_node_f57d4	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f57d4.json	docs/compiler-abi.md; Take a node from the free list at 0x485df8 (or allocate one) and push it on the list at 0x485df4.; callers f4a88@f4a8d; guest pending
 0x000f5e6c	61			unknown	unclassified	unverified		
 0x000f6124	38	format_global_option_line	unk_parser	named	game	unverified		docs/compiler-abi.md; zero caller arguments, indirect format call [0x132a74], EDX saved; clobbers unresolved
 0x000f7518	98			unknown	unclassified	unverified		
@@ -3684,12 +3684,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f8600	35			unknown	unclassified	unverified		
 0x000f8624	633			unknown	unclassified	unverified		
 0x000f88a0	69			unknown	unclassified	unverified		
-0x000f88e8	78			unknown	unclassified	unverified		
-0x000f8938	80			unknown	unclassified	unverified		
+0x000f88e8	78	count_slots_f88e8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f88e8.json	docs/compiler-abi.md; As 0xbd6d8 for the layout with count byte +4 and array +5.; callers f8b14@f8bcf,f8b14@f8be4,f8b14@f8c19; guest pending
+0x000f8938	80	reset_slots_f8938	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f8938.json	docs/compiler-abi.md; As 0xbd688 for the layout with count byte +4 and array +5.; callers f8b14@f8b69; guest pending
 0x000f8988	85			unknown	unclassified	unverified		
 0x000f89e0	79			unknown	unclassified	unverified		
 0x000f8a30	69			unknown	unclassified	unverified		
-0x000f8a78	81			unknown	unclassified	unverified		
+0x000f8a78	81	decrement_f8a78	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f8a78.json	docs/compiler-abi.md; Decrement byte +3 while it exceeds 2 (modes 0 and 2) or 3 (other modes).; callers f8acc@f8af2; guest pending
 0x000f8acc	71			unknown	unclassified	unverified		
 0x000f8b14	387			unknown	unclassified	unverified		
 0x000f8c98	270			unknown	unclassified	unverified		
@@ -3742,13 +3742,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fba6c	105			unknown	unclassified	unverified		
 0x000fbad8	1392			unknown	unclassified	unverified		
 0x000fc050	57			unknown	unclassified	unverified		
-0x000fc08c	93			unknown	unclassified	unverified		
+0x000fc08c	93	map_mode_fc08c	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc08c.json	docs/compiler-abi.md; Map a mode code (and a flag word) to a table index.; callers fc0ec@fc167; guest pending
 0x000fc0ec	250			unknown	unclassified	unverified		
 0x000fc1e8	364			unknown	unclassified	unverified		
 0x000fc354	69			unknown	unclassified	unverified		
 0x000fc39c	48			unknown	unclassified	unverified		
-0x000fc478	106			unknown	unclassified	unverified		
-0x000fc4e4	80			unknown	unclassified	unverified		
+0x000fc478	106	query_video_mode_fc478	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc478.json	docs/compiler-abi.md; VESA call 0x4f01 for mode ECX; true when the BIOS answers 0x4f.; callers fc4e4@fc502,fc600@fc605; guest pending
+0x000fc4e4	80	find_linear_mode_fc4e4	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc4e4.json	docs/compiler-abi.md; Find the first VESA mode in the list whose info has bit 7 set; returns dword +0x28 of its info.; callers fc534@fc5da; guest pending
 0x000fc534	204			unknown	unclassified	unverified		
 0x000fc600	155			unknown	unclassified	unverified		
 0x000fc6c8	92			unknown	unclassified	unverified		

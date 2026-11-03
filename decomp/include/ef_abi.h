@@ -1462,4 +1462,31 @@ void guest_fn_d7bf0(void); /* 0xd7bf0 */
 uint32_t guest_fn_d8170(ef_addr32 a); /* 0xd8170 */
 void guest_fn_dc2c0(void); /* 0xdc2c0 */
 
+/* runtime_helpers2.c */
+void fill_channel_e0870(void);
+uint8_t setup_sound_e1194(void);
+uint8_t any_device_e1260(void);
+void rewrite_template_ea4c0(void);
+uint32_t resolve_entry_eb9f8(uint32_t key, ef_addr32 object);
+void parse_format_flags(ef_addr32 text, ef_addr32 spec);
+void read_script_line_f2c78(void);
+void read_script_token_f2cd0(void);
+uint8_t read_buffered_char_f45d8(void);
+ef_addr32 push_node_f57d4(void);
+void count_slots_f88e8(ef_addr32 object);
+void reset_slots_f8938(ef_addr32 object);
+uint32_t decrement_f8a78(ef_addr32 object);
+uint32_t map_mode_fc08c(uint8_t mode, uint16_t flag);
+uint8_t query_video_mode_fc478(uint32_t mode);
+uint32_t find_linear_mode_fc4e4(void);
+uint32_t guest_fn_b3db0(uint32_t a); /* 0xb3db0 */
+void guest_fn_e06ac(void); /* 0xe06ac */
+uint32_t guest_fn_e0b10(ef_addr32 a); /* 0xe0b10 */
+uint32_t guest_fn_e0b88(ef_addr32 a); /* 0xe0b88 */
+void guest_fn_e0bcc(void); /* 0xe0bcc */
+void guest_fn_e10a0(ef_addr32 a); /* 0xe10a0 */
+void guest_fn_e1110(uint32_t a); /* 0xe1110 */
+void guest_fn_e115c(uint32_t a); /* 0xe115c */
+void guest_fn_eb698(uint32_t a, ef_addr32 object); /* 0xeb698 */
+
 #endif
