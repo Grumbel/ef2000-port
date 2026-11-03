@@ -52,6 +52,9 @@ public class EF2000ApplySymbols extends GhidraScript {
             case "int32_t": return SignedDWordDataType.dataType;
             case "void": return VoidDataType.dataType;
             case "fword": return new ArrayDataType(ByteDataType.dataType, 6, 1);
+            // x87 ST(0) storage is a full 80-bit register even when callers
+            // pass only a 64-bit IEEE value via the ordinary stack.
+            case "float10": return Float10DataType.dataType;
             default:
                 // CParser supplies the same struct/type namespace as parsed headers.
                 DataType parsed = parser.parse(spec);

@@ -3676,7 +3676,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f8010	132			unknown	unclassified	unverified		
 0x000f819c	171			unknown	unclassified	unverified		
 0x000f8248	5	elapsed_centiseconds	unk_time	typed	thunk	confirmed		docs/compiler-abi.md; tail jump 0x1100b1; elapsed centiseconds modulo day
-0x000f8250	19			unknown	unclassified	unverified		
+0x000f8250	19	scale_double_to_st0	unk_fp_runtime	typed	game	confirmed		docs/compiler-abi.md; qword argument at [ESP+4], ST0 float10 return, ret 8; callers 0xf8285/0xf82a5
 0x000f8278	29			unknown	unclassified	unverified		
 0x000f8298	29			unknown	unclassified	unverified		
 0x000f8314	78			unknown	unclassified	unverified		
@@ -4258,7 +4258,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001209b5	82			unknown	unclassified	unverified		
 0x00120a07	38			unknown	unclassified	unverified		
 0x00120a2d	37			unknown	unclassified	unverified		
-0x00120a52	14			unknown	unclassified	unverified		
+0x00120a52	14	store_x87_st0_via_es	unk_fp_runtime	typed	asm	confirmed		docs/compiler-abi.md; BL bit 2 selects ES:[EDI] float32/64 FST without pop; ST0 live-in/live-out; caller sites 0x12097d/0x1209dc
 0x00120a60	111			unknown	unclassified	unverified		
 0x00120ad0	195			unknown	unclassified	unverified		
 0x00120bc0	45			unknown	unclassified	unverified		

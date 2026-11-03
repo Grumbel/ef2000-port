@@ -362,17 +362,18 @@ two-caller instruction audit live in `decomp/symbols/abi-samples.tsv` and
 `abi-audit.tsv`; reviewed evidence and canonical OpenWatcom 2.0 flags are
 recorded in `docs/compiler-abi.md`. The `-3r -zp1 -fpi87 -fp3 -ob -ot -s`
 first-pass profile and its OMF fixture are in the flake. The Ghidra 12.1.4
-symbol importer supports custom register/stack storage and callee `ret N`
-purge. **33 of 40** sampled ABIs are confirmed (but not C-recovered or
+symbol importer supports custom register/stack storage, 80-bit x87 ST(0)
+storage, and callee `ret N` purge. **35 of 40** sampled ABIs are confirmed (but not C-recovered or
 replay-verified), including the large indexed projection/global update
 (`0x2461c`), signed projected-position query (`0x86f7c`), node initializer
 (`0xb0f5c`), command-dispatch loop (`0xf3b78`) and register-plus-qword-stack
-x87 overlap check (`0x24480`). The other seven samples have been explicitly
-reviewed as exceptions or partial ABIs; they involve indirect callback or
-formatted-output clobbers (`0x12d90`, `0xabec4`, `0xf6124`), x87 ST(0)
-return (`0xf8250`), an ES-specific store (`0x120a52`), and DOS segment or
-interrupt bridges (`0xee43c`, `0x120451`). Resolve them before full native
-replacement or explicitly isolate them as assembly/platform shims.
+x87 overlap check (`0x24480`). The x87 ST(0)-return helper (`0xf8250`) and
+ES-specific non-popping ST(0) store (`0x120a52`) now have explicit 80-bit
+register contracts. The other five samples have been reviewed as exceptions
+or partial ABIs: indirect callback/formatted-output clobbers (`0x12d90`,
+`0xabec4`, `0xf6124`) and DOS segment/interrupt bridges (`0xee43c`,
+`0x120451`). Resolve them before full native replacement or explicitly
+isolate them as assembly/platform shims.
 
 ### 3.6 [ ] Library identification
 
@@ -803,6 +804,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Ghidra 12.1.4 reviewed-signature importer now supports [ESP+N] stack parameters and ret N purge; asset-free synthetic save/reload test passes.
 2026-11-03  3.5   Confirmed five nonstandard stack/register ABIs: LZ/RA decompressors, ret 12 nonfinite formatter, ret 16 projection adapter and its register helper (28/40 samples).
 2026-11-03  3.5   Confirmed five remaining long/mixed ABIs: x87 ret 8 overlap, indexed global projection, callback-backed projection query, global-node initialization and command dispatch (33/40 samples; seven reviewed exceptions remain).
+2026-11-03  3.5   Added 80-bit ST0 storage to the Ghidra symbol importer; confirmed ret 8 stack-double/ST0 return at 0xf8250 and ES:[EDI] non-popping ST0 store at 0x120a52 (35/40 samples; five indirect/segment exceptions).
 ```
 
 ---

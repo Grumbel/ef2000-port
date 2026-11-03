@@ -737,8 +737,13 @@ stack inputs use `[ESP+4]:type`, `[ESP+8]:type`, etc. (offsets relative to the
 function's incoming ESP, before its prologue), with comma-separated inputs.
 `stack_bytes` records the callee's `ret N` purge size, independent of whether
 the inputs are passed in registers or on the stack. Only single-register or
-void return storage is currently supported; x87 ST(0), multi-register and
-mixed memory returns still require further convention work.
+void return storage is currently supported, including `ST0:float10` for the
+full 80-bit x87 register. Register storage may also describe a live-through
+value (e.g. an ES-specific `fst` that keeps ST(0) intact). The synthetic
+Ghidra 12.1.4 round trip verifies that this output type and `ret 8`
+survive project save/reload. Multi-register and mixed memory returns still
+require further convention work; Ghidra annotation is not equivalent to
+OpenWatcom caller/callee code generation.
 The known but not yet reconstructed 250-byte high-score table remains a raw
 byte array until its struct header is confirmed. Overlapping globals retain
 both labels but only one data definition.

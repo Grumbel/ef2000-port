@@ -526,22 +526,32 @@ global claim: other functions temporarily change the control word, and we
 have not captured the live CW at gameplay checkpoints. The compiler flag
 `-fpi87` generates x87 instructions but does not establish the run-time CW.
 
-`0xf8250`: the full callee reads one 8-byte floating stack argument from
-`[esp+4]`, multiplies it by two fixed double globals and leaves the result
-at ST(0), returning with `ret 8`. Distinct callers `0xf8278` (`0xf8285`)
-and `0xf8298` (`0xf82a5`) each push two 32-bit words, call it, and pass
-the resulting x87 value to a following FP routine. This establishes a
-**stack-argument / ST(0)-return convention**, not a standard GPR return.
-It is intentionally not marked `sig_status=confirmed` until the Ghidra
-symbol importer supports this storage and the wider FP call contract.
+`scale_double_to_st0` (`0xf8250`): the full callee reads one 8-byte floating
+stack argument from `[esp+4]`, multiplies it by fixed doubles at `0x1932a4`
+and `0x1932ac` (in that order) and leaves the result at ST(0), returning
+with `ret 8`. Distinct callers `0xf8278` (`0xf8285`) and `0xf8298`
+(`0xf82a5`) each push two 32-bit words, call it, and pass the resulting
+x87 value directly into `0xb45ac` or `0xb45a2`, respectively. All GPRs
+are untouched; x87 status can change and stack depth **increases by one**.
+The confirmed custom-storage signature models the input as two 32-bit
+stack words and the output as `ST0:float10` (the full 80-bit x87 register),
+with eight-byte callee cleanup. It does **not** claim that the original
+input is two independent integer arguments or that an OpenWatcom C `double`
+return already reproduces the intermediate precision.
 
-`0x120a52`: reads BL bit 2 to choose between `fst qword ptr ES:[EDI]`
-and `fst dword ptr ES:[EDI]`, without popping ST(0). Callers `0x120928`
-at `0x12097d` and `0x1209b5` at `0x1209dc` share the same BL/EDI/ST(0)
-environment. This routine depends on **ES**, which cannot silently be
-replaced with the usual DS-based flat-memory pointer when ported. Its
-unusual x87/segment contract is documented but not yet represented as a
-Ghidra custom storage signature; likely assembler or FP runtime code.
+`store_x87_st0_via_es` (`0x120a52`) reads BL bit 2 to choose between
+`fst qword ptr ES:[EDI]` and `fst dword ptr ES:[EDI]`, without popping
+ST(0). Callers `0x120928` at `0x12097d` and `0x1209b5` at `0x1209dc`
+share the same BL/EDI/ST(0) environment; both may subsequently pop ST(0)
+based on a separate flag in BL. Every GPR is unchanged; the x87 stack
+register is *live-in and live-out*, represented by `ST0:float10` in both
+input and output storage, not by a newly computed floating return. There
+is no stack argument or callee cleanup. This is a confirmed **assembly
+boundary** (`kind=asm`), not a plain C function: the destination uses
+**ES**, which cannot silently be replaced with an ordinary DS pointer,
+and `fst` rounds to 32 or 64 bits only for the memory store while keeping
+the original ST(0) value and depth. FP exceptions/status and segment mapping
+still need state-level replay evidence.
 
 `project_fixedpoint_pair_from_stack` (`0x15c0c4`) starts with `enter 0,0`, reads three
 32-bit stack arguments from `[ebp+8,+12,+16]`, invokes `0xc474c`, then

@@ -61,10 +61,12 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='ef2000-ghidra-symbol-test-') as temp:
             root = Path(temp)
             image = root / 'synthetic.bin'
-            image.write_bytes(b'\xb8\x07\x00\x00\x00\xc3' + b'\x90' * 10 +
-                              b'\xc3' + b'\x90' * 15 + b'\0' * 32 +
-                              b'\x8b\x44\x24\x04\x8b\x4c\x24\x08\x01\xc8\xc2\x08\x00' +
-                              b'\0' * 32)
+            fixture = (b'\xb8\x07\x00\x00\x00\xc3' + b'\x90' * 10 +
+                       b'\xc3' + b'\x90' * 15 + b'\0' * 32 +
+                       b'\x8b\x44\x24\x04\x8b\x4c\x24\x08\x01\xc8\xc2\x08\x00')
+            # 0x80: fld qword [esp+4]; ret 8, returning a live 80-bit ST0.
+            image.write_bytes(fixture.ljust(0x80, b'\0') +
+                              b'\xdd\x44\x24\x04\xc2\x08\x00' + b'\0' * 16)
             script_path = ghidra.SCRIPTS
             launcher = str(Path(os.environ['GHIDRA_HOME']) / 'support/analyzeHeadless')
             project = root / 'project'
@@ -83,7 +85,8 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
                 'addr\tsize\tname\tmodule\tstate\tkind\tsig_status\ttest\tnotes\n'
                 '0x00000000\t6\tfixture_recovered\tfixture\ttyped\tgame\tconfirmed\t\t\n'
                 '0x00000010\t1\tfixture_void\tfixture\ttyped\tgame\tconfirmed\t\t\n'
-                '0x00000040\t13\tfixture_stack\tfixture\ttyped\tgame\tconfirmed\t\t\n')
+                '0x00000040\t13\tfixture_stack\tfixture\ttyped\tgame\tconfirmed\t\t\n'
+                '0x00000080\t7\tfixture_x87\tfixture\ttyped\tgame\tconfirmed\t\t\n')
             (symbols / 'globals.tsv').write_text(
                 'addr\tsize\ttype\tname\tevidence\tnotes\n'
                 '0x00000020\t4\tuint32_t\tfixture_value\tsynthetic fixture\t\n')
@@ -92,7 +95,9 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
                 '0x00000000\tfixture_recovered\tEAX:ef_addr32\tEAX:uint32_t\t\t0\tsynthetic fixture\n'
                 '0x00000010\tfixture_void\t\t\t\t0\tvoid fixture\n'
                 '0x00000040\tfixture_stack\t[ESP+4]:uint32_t,[ESP+8]:uint32_t\t'
-                'EAX:uint32_t\t\t8\tstack fixture\n')
+                'EAX:uint32_t\t\t8\tstack fixture\n'
+                '0x00000080\tfixture_x87\t[ESP+4]:uint32_t,[ESP+8]:uint32_t\t'
+                'ST0:float10\t\t8\tx87 fixture\n')
             headers = root / 'include'
             headers.mkdir()
             (headers / 'fixture.h').write_text(
