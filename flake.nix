@@ -520,6 +520,12 @@
           grep -qi 'grid_distance_to_point' work/grid_point_distances.asm
           grep -qi 'scaled_grid_distance_to_point' work/grid_point_distances.asm
           ! grep -qi '__CHK' work/grid_point_distances.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/scene_nodes.c --output "$PWD/work/scene_nodes.obj"
+          ${watcom}/bin/wdis work/scene_nodes.obj -l=work/scene_nodes.asm
+          grep -qi 'scene_node_has_active_children' work/scene_nodes.asm
+          grep -qi 'next_scene_node_with_active_children' work/scene_nodes.asm
+          ! grep -qi '__CHK' work/scene_nodes.asm
           $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
             ${source}/tests/decomp_object_control_test.c \
@@ -560,6 +566,12 @@
             ${source}/decomp/src/grid_point_distances.c \
             -lm -o work/object_geometry_host_test
           work/object_geometry_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_scene_nodes_test.c \
+            ${source}/decomp/src/scene_nodes.c \
+            -o work/scene_nodes_host_test
+          work/scene_nodes_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

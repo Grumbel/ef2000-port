@@ -1,0 +1,63 @@
+{
+  "address": "0x000907f0",
+  "function_size": 53,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "empty_scene",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x211ad4",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "no_active_child",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x211ad4",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x002b0014",
+          "hex": "00000120"
+        },
+        {
+          "address": "0x002b0050",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x211ae0",
+          "hex": "0000"
+        },
+        {
+          "address": "0x211ad0",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x211ae0",
+          "hex": "0100"
+        },
+        {
+          "address": "0x002a0000",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x002b003a",
+          "hex": "02"
+        },
+        {
+          "address": "0x123961",
+          "hex": "00"
+        }
+      ]
+    }
+  ]
+}

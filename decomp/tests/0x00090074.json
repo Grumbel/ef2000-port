@@ -1,0 +1,31 @@
+{
+  "address": "0x00090074",
+  "function_size": 74,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "invalid_index",
+      "registers": {
+        "eax": "0xffffffff"
+      },
+      "memory": [
+        {
+          "address": "0x211ae0",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "empty_index_table",
+      "registers": {
+        "eax": "0x00002001"
+      },
+      "memory": [
+        {
+          "address": "0x211ae0",
+          "hex": "0000"
+        }
+      ]
+    }
+  ]
+}

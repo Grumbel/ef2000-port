@@ -1,0 +1,30 @@
+{
+  "address": "0x00090050",
+  "function_size": 34,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "null_node",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "missing_table_index",
+      "registers": {
+        "eax": "0x002b0000"
+      },
+      "memory": [
+        {
+          "address": "0x002b0014",
+          "hex": "00000120"
+        },
+        {
+          "address": "0x211ae0",
+          "hex": "0000"
+        }
+      ]
+    }
+  ]
+}

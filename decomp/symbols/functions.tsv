@@ -1856,18 +1856,18 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008ff20	40			unknown	unclassified	unverified		
 0x0008ff48	159			unknown	unclassified	unverified		
 0x0008ffe8	38			unknown	unclassified	unverified		
-0x00090050	34			unknown	unclassified	unverified		
-0x00090074	74			unknown	unclassified	unverified		
-0x000900c0	97			unknown	unclassified	unverified		
+0x00090050	34	scene_node_is_registered	scene_nodes	drafted	game	confirmed	decomp/tests/0x00090050.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
+0x00090074	74	clear_scene_node_children	scene_nodes	drafted	game	confirmed	decomp/tests/0x00090074.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
+0x000900c0	97	dispatch_scene_node_event	scene_nodes	drafted	game	confirmed	decomp/tests/0x000900c0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x00090124	200			unknown	unclassified	unverified		
-0x000901ec	46			unknown	unclassified	unverified		
+0x000901ec	46	visit_all_scene_nodes	scene_nodes	drafted	game	confirmed	decomp/tests/0x000901ec.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0009021c	345			unknown	unclassified	unverified		
 0x00090378	189			unknown	unclassified	unverified		
 0x00090438	547			unknown	unclassified	unverified		
-0x0009065c	14			unknown	unclassified	unverified		
-0x000906b4	78			unknown	unclassified	unverified		
+0x0009065c	14	next_scene_node	scene_nodes	drafted	game	confirmed	decomp/tests/0x0009065c.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
+0x000906b4	78	scene_node_has_active_children	scene_nodes	drafted	game	confirmed	decomp/tests/0x000906b4.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0009075c	148			unknown	unclassified	unverified		
-0x000907f0	53			unknown	unclassified	unverified		
+0x000907f0	53	next_scene_node_with_active_children	scene_nodes	drafted	game	confirmed	decomp/tests/0x000907f0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x00090828	88			unknown	unclassified	unverified		
 0x00090880	161			unknown	unclassified	unverified		
 0x00090924	26			unknown	unclassified	unverified		

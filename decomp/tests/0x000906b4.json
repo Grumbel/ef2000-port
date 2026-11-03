@@ -1,0 +1,51 @@
+{
+  "address": "0x000906b4",
+  "function_size": 78,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "invalid_index",
+      "registers": {
+        "eax": "0xffffffff"
+      },
+      "memory": [
+        {
+          "address": "0x211ae0",
+          "hex": "0000"
+        }
+      ]
+    },
+    {
+      "name": "empty_children",
+      "registers": {
+        "eax": "0x00002001"
+      },
+      "memory": [
+        {
+          "address": "0x211ae0",
+          "hex": "0000"
+        },
+        {
+          "address": "0x211ad0",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x211ae0",
+          "hex": "0100"
+        },
+        {
+          "address": "0x002a0000",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x002b003a",
+          "hex": "02"
+        },
+        {
+          "address": "0x123961",
+          "hex": "00"
+        }
+      ]
+    }
+  ]
+}

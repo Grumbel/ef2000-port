@@ -1,0 +1,31 @@
+{
+  "address": "0x0009065c",
+  "function_size": 14,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "null_to_head",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x211ad4",
+          "hex": "00002b00"
+        }
+      ]
+    },
+    {
+      "name": "next_from_node",
+      "registers": {
+        "eax": "0x002b0000"
+      },
+      "memory": [
+        {
+          "address": "0x002b0050",
+          "hex": "00012b00"
+        }
+      ]
+    }
+  ]
+}

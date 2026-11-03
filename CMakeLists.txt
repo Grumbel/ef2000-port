@@ -80,6 +80,13 @@ target_compile_definitions(ef2000-decomp-object-geometry-test PRIVATE EF_DECOMP_
 target_include_directories(ef2000-decomp-object-geometry-test PRIVATE decomp/include)
 target_link_libraries(ef2000-decomp-object-geometry-test PRIVATE m)
 add_test(NAME decomp-object-geometry-host-model COMMAND ef2000-decomp-object-geometry-test)
+add_executable(ef2000-decomp-scene-nodes-test
+  tests/decomp_scene_nodes_test.c decomp/src/scene_nodes.c)
+target_compile_features(ef2000-decomp-scene-nodes-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-scene-nodes-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-scene-nodes-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-scene-nodes-test PRIVATE decomp/include)
+add_test(NAME decomp-scene-nodes-host-model COMMAND ef2000-decomp-scene-nodes-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.
