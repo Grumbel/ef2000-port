@@ -1186,4 +1186,66 @@ uint32_t guest_fn_f0ec(void); /* 0xf0ec */
 uint32_t guest_fn_16984(int32_t index); /* 0x16984 EAX -> AX */
 uint32_t guest_fn_174f8(uint32_t index); /* 0x174f8 EAX -> AL */
 
+/* game_state_helpers2.c */
+void update_record_1d700(int16_t index);
+void push_event_1f878(uint32_t entry);
+uint8_t confirm_dialog_27858(void);
+void init_chain_28830(void);
+void refresh_object_2a168(ef_addr32 object);
+void init_entries_2a720(void);
+void init_entries_2a7ac(ef_addr32 text, uint32_t slot);
+void advance_position_316b8(void);
+void advance_position_31aec(void);
+void update_angles_31d10(void);
+void save_position_32260(void);
+void show_notice_34390(void);
+uint8_t check_files_343dc(void);
+void compact_table_3458c(void);
+void scan_entries_34f30(void);
+void reset_flags_35144(void);
+void select_screen_35ab8(void);
+void copy_counts_35bb8(void);
+void sync_list_363c4(void);
+uint8_t any_accepts_37d3c(int16_t index);
+uint8_t all_accept_37e60(int16_t index);
+void redraw_screen_39204(void);
+void apply_pending_394e0(void);
+void reset_table_39dc4(void);
+uint32_t guest_fn_121cc(uint32_t a, uint32_t b); /* 0x121cc */
+void guest_fn_12d90(uint32_t a, uint32_t b); /* 0x12d90 */
+void guest_fn_1d5cc(ef_addr32 p, int32_t v); /* 0x1d5cc */
+void guest_fn_1d778(ef_addr32 record); /* 0x1d778 */
+void guest_fn_1d7a4(ef_addr32 record); /* 0x1d7a4 */
+uint32_t guest_fn_1d8a8(ef_addr32 record); /* 0x1d8a8 */
+void guest_fn_1d954(ef_addr32 record); /* 0x1d954 */
+uint32_t guest_fn_2949c(int32_t a, uint32_t b); /* 0x2949c */
+void guest_fn_2a1fc(int32_t a, uint32_t b); /* 0x2a1fc */
+void guest_fn_32414(uint32_t a, uint32_t b, uint32_t c); /* 0x32414 */
+void guest_fn_34d94(uint32_t value); /* 0x34d94 */
+void guest_fn_35218(void); /* 0x35218 */
+uint32_t guest_fn_37c64(int32_t index, uint32_t sub); /* 0x37c64 */
+uint32_t guest_fn_37cdc(int32_t index); /* 0x37cdc */
+uint32_t guest_fn_37d88(int32_t index, uint32_t sub); /* 0x37d88 */
+uint32_t guest_fn_37e00(int32_t index); /* 0x37e00 */
+void guest_fn_391d0(void); /* 0x391d0 */
+uint32_t guest_fn_39744(int32_t a, uint32_t b, int32_t c, uint32_t d); /* 0x39744 */
+void guest_fn_39db0(uint32_t v); /* 0x39db0 */
+void guest_fn_6b54c(ef_addr32 object); /* 0x6b54c */
+uint32_t guest_fn_9ddfc(ef_addr32 text, ef_addr32 entry); /* 0x9ddfc */
+uint32_t guest_fn_a4380(ef_addr32 a, ef_addr32 b); /* 0xa4380 */
+ef_addr32 guest_fn_a46cc(ef_addr32 text); /* 0xa46cc */
+void guest_fn_a4d90(ef_addr32 text); /* 0xa4d90 */
+void guest_fn_a72d8(ef_addr32 node); /* 0xa72d8 */
+void guest_fn_a7380(ef_addr32 node); /* 0xa7380 */
+void guest_fn_ac7a8(ef_addr32 text); /* 0xac7a8 */
+void guest_fn_ac9a0(ef_addr32 dialog); /* 0xac9a0 */
+void guest_fn_c34cc(ef_addr32 text); /* 0xc34cc */
+void guest_fn_d1e50(uint32_t v); /* 0xd1e50 */
+void guest_fn_d65e8(void); /* 0xd65e8 */
+void guest_fn_dd370(uint32_t a, uint32_t b, uint32_t c, ef_addr32 d); /* 0xdd370 */
+void guest_fn_de580(ef_addr32 p); /* 0xde580 */
+uint32_t guest_fn_de864(ef_addr32 text); /* 0xde864 */
+void guest_fn_e1730(void); /* 0xe1730 */
+void guest_fn_e1e6c(ef_addr32 text, uint32_t flag); /* 0xe1e6c */
+
 #endif

@@ -719,3 +719,27 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00017480	cell_blocked_17480	EAX:uint32_t,EDX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00017480 (71 bytes); ; callers 15b7c@15c87; docs/compiler-abi.md
 0x0001cd90	adjust_level_1cd90			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001cd90 (85 bytes); Adjust word 0x12b366 by the key flags and clamp it to 0x5a..0x7f.; callers 1cde8@1cfd0; docs/compiler-abi.md
 0x0001d3c4	select_tables_1d3c4	AX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001d3c4 (79 bytes); ; callers 8b39c@8b519; docs/compiler-abi.md
+0x0001d700	update_record_1d700	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001d700 (120 bytes); Dispatch on the kind byte +0x41 of the 0x171-byte record number AX.; callers 5437c@543d0; docs/compiler-abi.md
+0x0001f878	push_event_1f878	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001f878 (74 bytes); Push an entry onto the ten-entry stack at 0x19b0d0 and request an event.; callers 14c5c@14d33,1a3cc@1a448,1a3cc@1a466; docs/compiler-abi.md
+0x00027858	confirm_dialog_27858		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00027858 (104 bytes); Show two panels and wait for key 0x15 or 0x31; true for 0x15.; callers 278c0@27adb; docs/compiler-abi.md
+0x00028830	init_chain_28830			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00028830 (90 bytes); Reset the ten 14-byte entries at 0x19b8d0 and chain them.; callers 3cfc0@3d1bb; docs/compiler-abi.md
+0x0002a168	refresh_object_2a168	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002a168 (92 bytes); ; callers 2541c@25450; docs/compiler-abi.md
+0x0002a720	init_entries_2a720			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002a720 (113 bytes); Reset counters and link the twenty 22-byte entries at 0x19b980.; callers 3cfc0@3d1c5; docs/compiler-abi.md
+0x0002a7ac	init_entries_2a7ac	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002a7ac (74 bytes); As 0x2a720 but for string EAX into the word at +8+2*EDX.; callers db808@db882; docs/compiler-abi.md
+0x000316b8	advance_position_316b8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000316b8 (84 bytes); Run 0x32414 and add the three deltas at 0x19e560 to the position at 0x19e5c1.; callers 2fbc4@2ff14,3122c@3129c; docs/compiler-abi.md
+0x00031aec	advance_position_31aec			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00031aec (84 bytes); Identical to 0x316b8.; callers 3122c@312e7; docs/compiler-abi.md
+0x00031d10	update_angles_31d10			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00031d10 (108 bytes); Update the angle words from mode byte 0x19e55f.; callers 3122c@3128e,3122c@312fd; docs/compiler-abi.md
+0x00032260	save_position_32260			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00032260 (75 bytes); Save the current position and angles.; callers 3122c@3131d; docs/compiler-abi.md
+0x00034390	show_notice_34390			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00034390 (76 bytes); ; callers none direct; docs/compiler-abi.md
+0x000343dc	check_files_343dc		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000343dc (109 bytes); Check both data files; show an error dialog and return 0 on failure.; callers 34bcc@34be4; docs/compiler-abi.md
+0x0003458c	compact_table_3458c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003458c (71 bytes); Compact the four-entry dword table at 0x13577c: an empty entry shifts the later ones down.; callers 345e8@34695,345e8@346fc,34bcc@34c43; docs/compiler-abi.md
+0x00034f30	scan_entries_34f30			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00034f30 (97 bytes); ; callers 34f94@34ff6; docs/compiler-abi.md
+0x00035144	reset_flags_35144			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00035144 (85 bytes); ; callers none direct; docs/compiler-abi.md
+0x00035ab8	select_screen_35ab8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00035ab8 (113 bytes); ; callers none direct; docs/compiler-abi.md
+0x00035bb8	copy_counts_35bb8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00035bb8 (78 bytes); ; callers 35cfc@35d1e; docs/compiler-abi.md
+0x000363c4	sync_list_363c4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000363c4 (80 bytes); Walk the list from dword 0x19f320 (next at +0x21), toggling each node by the flag bytes at 0x19f318.; callers 36438@364f6,36438@3652a,36438@365e9; docs/compiler-abi.md
+0x00037d3c	any_accepts_37d3c	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00037d3c (76 bytes); True when 0x37cdc, or 0x37c64 for any subitem, accepts the index.; callers 37eac@37f7b; docs/compiler-abi.md
+0x00037e60	all_accept_37e60	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00037e60 (76 bytes); True when 0x37e00 and 0x37d88 for every subitem accept the index.; callers 37eac@37f52; docs/compiler-abi.md
+0x00039204	redraw_screen_39204			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00039204 (78 bytes); ; callers 39254@392f4; docs/compiler-abi.md
+0x000394e0	apply_pending_394e0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000394e0 (104 bytes); Consume the pending request at 0x1a3608 and apply it through 0x1d5cc.; callers 3dcb0@3dcb0; docs/compiler-abi.md
+0x00039dc4	reset_table_39dc4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00039dc4 (72 bytes); Reset the ten-entry table at dword 0x1a1860.; callers 49228@495b7; docs/compiler-abi.md

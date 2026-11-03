@@ -2095,3 +2095,32 @@ in EAX, format string address, one value).
 | `0x17480` | EAX:uint32_t,EDX:int32_t | EAX:uint32_t | 15b7c@15c87 |  |
 | `0x1cd90` | none | none | 1cde8@1cfd0 | Adjust word 0x12b366 by the key flags and clamp it to 0x5a..0x7f. |
 | `0x1d3c4` | AX:uint16_t | none | 8b39c@8b519 |  |
+
+## game_state_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1d700` | AX:int16_t | none | 5437c@543d0 | Dispatch on the kind byte +0x41 of the 0x171-byte record number AX. |
+| `0x1f878` | EAX:uint32_t | none | 14c5c@14d33,1a3cc@1a448,1a3cc@1a466 | Push an entry onto the ten-entry stack at 0x19b0d0 and request an event. |
+| `0x27858` | none | AL:uint8_t | 278c0@27adb | Show two panels and wait for key 0x15 or 0x31; true for 0x15. |
+| `0x28830` | none | none | 3cfc0@3d1bb | Reset the ten 14-byte entries at 0x19b8d0 and chain them. |
+| `0x2a168` | EAX:ef_addr32 | none | 2541c@25450 |  |
+| `0x2a720` | none | none | 3cfc0@3d1c5 | Reset counters and link the twenty 22-byte entries at 0x19b980. |
+| `0x2a7ac` | EAX:ef_addr32,EDX:uint32_t | none | db808@db882 | As 0x2a720 but for string EAX into the word at +8+2*EDX. |
+| `0x316b8` | none | none | 2fbc4@2ff14,3122c@3129c | Run 0x32414 and add the three deltas at 0x19e560 to the position at 0x19e5c1. |
+| `0x31aec` | none | none | 3122c@312e7 | Identical to 0x316b8. |
+| `0x31d10` | none | none | 3122c@3128e,3122c@312fd | Update the angle words from mode byte 0x19e55f. |
+| `0x32260` | none | none | 3122c@3131d | Save the current position and angles. |
+| `0x34390` | none | none | none direct |  |
+| `0x343dc` | none | AL:uint8_t | 34bcc@34be4 | Check both data files; show an error dialog and return 0 on failure. |
+| `0x3458c` | none | none | 345e8@34695,345e8@346fc,34bcc@34c43 | Compact the four-entry dword table at 0x13577c: an empty entry shifts the later ones down. |
+| `0x34f30` | none | none | 34f94@34ff6 |  |
+| `0x35144` | none | none | none direct |  |
+| `0x35ab8` | none | none | none direct |  |
+| `0x35bb8` | none | none | 35cfc@35d1e |  |
+| `0x363c4` | none | none | 36438@364f6,36438@3652a,36438@365e9 | Walk the list from dword 0x19f320 (next at +0x21), toggling each node by the flag bytes at 0x19f318. |
+| `0x37d3c` | AX:int16_t | AL:uint8_t | 37eac@37f7b | True when 0x37cdc, or 0x37c64 for any subitem, accepts the index. |
+| `0x37e60` | AX:int16_t | AL:uint8_t | 37eac@37f52 | True when 0x37e00 and 0x37d88 for every subitem accept the index. |
+| `0x39204` | none | none | 39254@392f4 |  |
+| `0x394e0` | none | none | 3dcb0@3dcb0 | Consume the pending request at 0x1a3608 and apply it through 0x1d5cc. |
+| `0x39dc4` | none | none | 49228@495b7 | Reset the ten-entry table at dword 0x1a1860. |
