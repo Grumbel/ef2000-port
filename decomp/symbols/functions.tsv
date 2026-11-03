@@ -78,7 +78,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00005488	389			unknown	unclassified	unverified		
 0x00005630	2338			unknown	unclassified	unverified		
 0x00005f60	120	init_sequence_5f60	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00005f60.json	docs/compiler-abi.md; Initialisation sequence.; callers 3dd30@3de06; guest pending
-0x00005fd8	67			unknown	unclassified	unverified		
+0x00005fd8	67	reinit_screens_5fd8	game_helpers4	compiles	game	confirmed	decomp/tests/0x00005fd8.json	docs/compiler-abi.md; Reinitialise the game screens.; callers 8d11c@8d275; guest pending
 0x0000601c	786			unknown	unclassified	unverified		
 0x00006330	81			unknown	unclassified	unverified		
 0x00006460	610			unknown	unclassified	unverified		
@@ -87,7 +87,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000067d4	315			unknown	unclassified	unverified		
 0x00006924	423			unknown	unclassified	unverified		
 0x00006acc	78	object_category	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00006acc.json	docs/compiler-abi.md; Category of an object from the byte at +0xe9: 1 (<=0xf), 2 (0x10..0x15), 3 (0x20..0x21), 4 (0x22..0x24).; callers 6924@6996,625d8@62b2a,65c1c@65c7d; guest pending
-0x00006b1c	50			unknown	unclassified	unverified		
+0x00006b1c	50	update_flag_6b1c	game_helpers4	compiles	game	confirmed	decomp/tests/0x00006b1c.json	docs/compiler-abi.md; ; callers 5f60@5fb5; guest pending
 0x00006b50	163			unknown	unclassified	unverified		
 0x00006bf4	40	clear_command_state_6bf4	low_helpers	compiles	game	confirmed	decomp/tests/0x00006bf4.json	docs/compiler-abi.md; clear words 0x197244/46/48 and bytes 0x197254, 0x121e4f; callers 5f60@5fb0,5fd8@6003; guest pending
 0x00006c1c	461			unknown	unclassified	unverified		
@@ -142,7 +142,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000a870	237	onopenHiscores		named	unclassified	unverified		
 0x0000a960	19	gcChangeMode		named	unclassified	unverified		
 0x0000a974	49	gcZoomMapInOut		named	unclassified	unverified		
-0x0000a9a8	67			unknown	unclassified	unverified		
+0x0000a9a8	67	pick_count_a9a8	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000a9a8.json	docs/compiler-abi.md; Smaller of (table byte + 1) and (random % 3 + 2).; callers ab74@ad1f,ab74@adfd,ab74@af5d; guest pending
 0x0000a9fc	69			unknown	unclassified	unverified		
 0x0000aa6c	85			unknown	unclassified	unverified		
 0x0000aaec	61			unknown	unclassified	unverified		
@@ -150,7 +150,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000ab74	1096			unknown	unclassified	unverified		
 0x0000afbc	546			unknown	unclassified	unverified		
 0x0000b1e0	866			unknown	unclassified	unverified		
-0x0000b544	46			unknown	unclassified	unverified		
+0x0000b544	46	apply_two_a4b80_b544	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000b544.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0000b574	89	gpwCloseTargetView		named	unclassified	unverified		
 0x0000b5d0	204	gpwRedrawTargetWindow		named	unclassified	unverified		
 0x0000b69c	959			unknown	unclassified	unverified		
@@ -204,7 +204,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000ee5c	65	read_parser_six_field_record	parser_records	compiles	game	confirmed	decomp/tests/0x000ee5c.json	Original 0xee5c; three dword values followed by three truncated words; docs/compiler-abi.md; guest replay pending
 0x0000eea0	92			unknown	unclassified	unverified		
 0x0000eefc	94	read_record_eefc	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000eefc.json	docs/compiler-abi.md; ; callers f314@f540; guest pending
-0x0000ef5c	58			unknown	unclassified	unverified		
+0x0000ef5c	58	fill_random_ef5c	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000ef5c.json	docs/compiler-abi.md; Fill four dwords with 21-bit values scaled by 2^11.; callers f6a8@f8cb; guest pending
 0x0000ef98	79			unknown	unclassified	unverified		
 0x0000efe8	79	read_record_efe8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000efe8.json	docs/compiler-abi.md; ; callers f038@f078; guest pending
 0x0000f038	83			unknown	unclassified	unverified		
@@ -255,7 +255,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00012210	142			unknown	unclassified	unverified		
 0x00012d90	126	dispatch_record_callback	unk_runtime	named	game	unverified		docs/compiler-abi.md; AX/DX indexed record, handler at +0xcd invoked indirectly; clobbers unresolved, do not splice automatically
 0x00012ec8	80	sync_flag_12ec8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00012ec8.json	docs/compiler-abi.md; Mirror byte 0x123790 with the flag at 0x121fb4 + 29*index.; callers 12160@12188; guest pending
-0x00013950	55			unknown	unclassified	unverified		
+0x00013950	55	run_12d90_pair_13950	game_helpers4	compiles	game	confirmed	decomp/tests/0x00013950.json	docs/compiler-abi.md; ; callers 848e0@849a0; guest pending
 0x00014c5c	224			unknown	unclassified	unverified		
 0x00014d3c	26	read_event_slot_byte	low_helpers	compiles	game	confirmed	decomp/tests/0x00014d3c.json	docs/compiler-abi.md; byte 0x1225d4+19*AX; callers 589c0@58c62; guest pending
 0x00014d58	409			unknown	unclassified	unverified		
@@ -272,11 +272,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000161d4	947			unknown	unclassified	unverified		
 0x00016588	846			unknown	unclassified	unverified		
 0x000168d8	169			unknown	unclassified	unverified		
-0x00016984	45			unknown	unclassified	unverified		
+0x00016984	45	unit_active_16984	game_helpers4	compiles	game	confirmed	decomp/tests/0x00016984.json	docs/compiler-abi.md; Is the unit alive and not of kind 0xc?; callers 169b4@169c6,16a04@16a07,16a3c@16a4e; guest pending
 0x000169b4	79	unit_in_state_169b4	game_state_helpers	compiles	game	confirmed	decomp/tests/0x000169b4.json	docs/compiler-abi.md; ; callers 15af0@15b33,16034@16055; guest pending
-0x00016a04	56			unknown	unclassified	unverified		
-0x00016a3c	55			unknown	unclassified	unverified		
-0x00016a74	64			unknown	unclassified	unverified		
+0x00016a04	56	unit_kind1_with_target_16a04	game_helpers4	compiles	game	confirmed	decomp/tests/0x00016a04.json	docs/compiler-abi.md; ; callers 15af0@15b4a; guest pending
+0x00016a3c	55	unit_kind_6_or_7_16a3c	game_helpers4	compiles	game	confirmed	decomp/tests/0x00016a3c.json	docs/compiler-abi.md; ; callers 15af0@15b61; guest pending
+0x00016a74	64	unit_kind_b_or_flag_16a74	game_helpers4	compiles	game	confirmed	decomp/tests/0x00016a74.json	docs/compiler-abi.md; ; callers 15b7c@15bf3; guest pending
 0x00016ab4	87	record_kind_matches_16ab4	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00016ab4.json	docs/compiler-abi.md; Active record whose kind byte +0x1c is one of a fixed set.; callers 15b7c@15c5d; guest pending
 0x00016b0c	159			unknown	unclassified	unverified		
 0x00016bac	205			unknown	unclassified	unverified		
@@ -287,11 +287,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00017388	25	flag_object_and_forward	low_helpers	compiles	game	confirmed	decomp/tests/0x00017388.json	docs/compiler-abi.md; 0x8ffe8 lookup; or 3 into +0x30; tail 0x3739c(high word +0x36); callers 16588@167ed; guest pending
 0x000173a4	30	decrement_grid_row_link_wide	low_helpers	compiles	game	confirmed	decomp/tests/0x000173a4.json	docs/compiler-abi.md; row[0x8e]=row[0x8f]-1 with 32-bit row index; callers 168d8@1696a; guest pending
 0x000173c4	112			unknown	unclassified	unverified		
-0x00017434	63			unknown	unclassified	unverified		
+0x00017434	63	find_slot_kind_17434	game_helpers4	compiles	game	confirmed	decomp/tests/0x00017434.json	docs/compiler-abi.md; Search the 20 three-byte slots of a unit for kind 6 or 0x15.; callers 15b7c@15ded; guest pending
 0x00017474	9			unknown	unclassified	unverified		
 0x00017480	71	cell_blocked_17480	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00017480.json	docs/compiler-abi.md; ; callers 15b7c@15c87; guest pending
-0x000174c8	47			unknown	unclassified	unverified		
-0x000174f8	62			unknown	unclassified	unverified		
+0x000174c8	47	unit_target_differs_174c8	game_helpers4	compiles	game	confirmed	decomp/tests/0x000174c8.json	docs/compiler-abi.md; Does the unit's target differ from value and the unit's kind allow it?; callers 15b7c@15cb4; guest pending
+0x000174f8	62	unit_kind_allows_174f8	game_helpers4	compiles	game	confirmed	decomp/tests/0x000174f8.json	docs/compiler-abi.md; Is the unit's kind not one of 0, 7, 9, 0xa, 0xb, 0xc?; callers 16034@16069,16034@16158,16034@16170; guest pending
 0x00017538	95			unknown	unclassified	unverified		
 0x00017754	517			unknown	unclassified	unverified		
 0x00017f10	289			unknown	unclassified	unverified		
@@ -306,7 +306,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001a580	1595			unknown	unclassified	unverified		
 0x0001abbc	195			unknown	unclassified	unverified		
 0x0001b4a4	441			unknown	unclassified	unverified		
-0x0001b52c	42			unknown	unclassified	unverified		
+0x0001b52c	42	selected_unit_visible_1b52c	game_helpers4	compiles	game	confirmed	decomp/tests/0x0001b52c.json	docs/compiler-abi.md; ; callers 1b4a4@1b4ca,1b4a4@1b4d9; guest pending
 0x0001c16c	609			unknown	unclassified	unverified		
 0x0001c3d0	361			unknown	unclassified	unverified		
 0x0001c60c	210	scale_words_1c60c	line_of_sight	compiles	game	confirmed	decomp/tests/0x0001c60c.json	docs/compiler-abi.md; Scale six signed words by the percentage in dword 0x122dc4.; callers 8b39c@8b51e; guest pending

@@ -1668,4 +1668,21 @@ void guest_fn_a7df4(void); /* 0xa7df4 */
 void guest_fn_a7e20(void); /* 0xa7e20 */
 void guest_fn_f41c4(void); /* 0xf41c4 */
 
+/* game_helpers4.c */
+void reinit_screens_5fd8(void);
+void update_flag_6b1c(void);
+int32_t pick_count_a9a8(void);
+void apply_two_a4b80_b544(void);
+uint32_t fill_random_ef5c(ef_addr32 destination);
+void run_12d90_pair_13950(void);
+uint32_t unit_active_16984(uint32_t index);
+uint32_t unit_kind1_with_target_16a04(uint32_t index);
+uint32_t unit_kind_6_or_7_16a3c(uint32_t index);
+uint32_t unit_kind_b_or_flag_16a74(uint32_t index);
+uint32_t find_slot_kind_17434(int16_t unit_id);
+uint32_t unit_target_differs_174c8(uint32_t index, int32_t value);
+uint32_t unit_kind_allows_174f8(uint32_t index);
+uint32_t selected_unit_visible_1b52c(void);
+uint32_t guest_fn_173c4(uint32_t index); /* 0x173c4 EAX -> AX */
+
 #endif

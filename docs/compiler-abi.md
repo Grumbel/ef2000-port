@@ -2454,3 +2454,22 @@ in EAX, format string address, one value).
 | `0xa9d48` | none | none | a9e70@a9f23,a9e70@aa13e | Toggle between the live view state and the saved copy at 0x4195b0.. |
 | `0xe65d8` | EAX:ef_addr32,EDX:ef_addr32 | none | e6684@e66ea,e6684@e6746,e6684@e6782 | Exchange the fields of two 0x15-byte records. |
 | `0xfaa30` | AL:uint8_t | AL:uint8_t | fbad8@fbc5b | Map a scan code to a key class, 0 if unmapped. |
+
+## game_helpers4 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5fd8` | none | none | 8d11c@8d275 | Reinitialise the game screens. |
+| `0x6b1c` | none | none | 5f60@5fb5 |  |
+| `0xa9a8` | none | EAX:int32_t | ab74@ad1f,ab74@adfd,ab74@af5d | Smaller of (table byte + 1) and (random % 3 + 2). |
+| `0xb544` | none | none | none direct |  |
+| `0xef5c` | EAX:ef_addr32 | EAX:uint32_t | f6a8@f8cb | Fill four dwords with 21-bit values scaled by 2^11. |
+| `0x13950` | none | none | 848e0@849a0 |  |
+| `0x16984` | EAX:uint32_t | EAX:uint32_t | 169b4@169c6,16a04@16a07,16a3c@16a4e | Is the unit alive and not of kind 0xc? |
+| `0x16a04` | EAX:uint32_t | EAX:uint32_t | 15af0@15b4a |  |
+| `0x16a3c` | EAX:uint32_t | EAX:uint32_t | 15af0@15b61 |  |
+| `0x16a74` | EAX:uint32_t | EAX:uint32_t | 15b7c@15bf3 |  |
+| `0x17434` | AX:int16_t | EAX:uint32_t | 15b7c@15ded | Search the 20 three-byte slots of a unit for kind 6 or 0x15. |
+| `0x174c8` | EAX:uint32_t,EDX:int32_t | EAX:uint32_t | 15b7c@15cb4 | Does the unit's target differ from value and the unit's kind allow it? |
+| `0x174f8` | EAX:uint32_t | EAX:uint32_t | 16034@16069,16034@16158,16034@16170 | Is the unit's kind not one of 0, 7, 9, 0xa, 0xb, 0xc? |
+| `0x1b52c` | none | EAX:uint32_t | 1b4a4@1b4ca,1b4a4@1b4d9 |  |

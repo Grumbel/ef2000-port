@@ -993,3 +993,17 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000a9d48	toggle_view_state_a9d48			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a9d48 (231 bytes); Toggle between the live view state and the saved copy at 0x4195b0..; callers a9e70@a9f23,a9e70@aa13e; docs/compiler-abi.md
 0x000e65d8	swap_records_e65d8	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e65d8 (169 bytes); Exchange the fields of two 0x15-byte records.; callers e6684@e66ea,e6684@e6746,e6684@e6782; docs/compiler-abi.md
 0x000faa30	scan_code_class_faa30	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000faa30 (202 bytes); Map a scan code to a key class, 0 if unmapped.; callers fbad8@fbc5b; docs/compiler-abi.md
+0x00005fd8	reinit_screens_5fd8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00005fd8 (67 bytes); Reinitialise the game screens.; callers 8d11c@8d275; docs/compiler-abi.md
+0x00006b1c	update_flag_6b1c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00006b1c (50 bytes); ; callers 5f60@5fb5; docs/compiler-abi.md
+0x0000a9a8	pick_count_a9a8		EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000a9a8 (67 bytes); Smaller of (table byte + 1) and (random % 3 + 2).; callers ab74@ad1f,ab74@adfd,ab74@af5d; docs/compiler-abi.md
+0x0000b544	apply_two_a4b80_b544			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000b544 (46 bytes); ; callers none direct; docs/compiler-abi.md
+0x0000ef5c	fill_random_ef5c	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000ef5c (58 bytes); Fill four dwords with 21-bit values scaled by 2^11.; callers f6a8@f8cb; docs/compiler-abi.md
+0x00013950	run_12d90_pair_13950			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00013950 (55 bytes); ; callers 848e0@849a0; docs/compiler-abi.md
+0x00016984	unit_active_16984	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00016984 (45 bytes); Is the unit alive and not of kind 0xc?; callers 169b4@169c6,16a04@16a07,16a3c@16a4e; docs/compiler-abi.md
+0x00016a04	unit_kind1_with_target_16a04	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00016a04 (56 bytes); ; callers 15af0@15b4a; docs/compiler-abi.md
+0x00016a3c	unit_kind_6_or_7_16a3c	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00016a3c (55 bytes); ; callers 15af0@15b61; docs/compiler-abi.md
+0x00016a74	unit_kind_b_or_flag_16a74	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00016a74 (64 bytes); ; callers 15b7c@15bf3; docs/compiler-abi.md
+0x00017434	find_slot_kind_17434	AX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00017434 (63 bytes); Search the 20 three-byte slots of a unit for kind 6 or 0x15.; callers 15b7c@15ded; docs/compiler-abi.md
+0x000174c8	unit_target_differs_174c8	EAX:uint32_t,EDX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000174c8 (47 bytes); Does the unit's target differ from value and the unit's kind allow it?; callers 15b7c@15cb4; docs/compiler-abi.md
+0x000174f8	unit_kind_allows_174f8	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000174f8 (62 bytes); Is the unit's kind not one of 0, 7, 9, 0xa, 0xb, 0xc?; callers 16034@16069,16034@16158,16034@16170; docs/compiler-abi.md
+0x0001b52c	selected_unit_visible_1b52c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001b52c (42 bytes); ; callers 1b4a4@1b4ca,1b4a4@1b4d9; docs/compiler-abi.md
