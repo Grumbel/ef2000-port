@@ -70,4 +70,18 @@ void copy_grid_link_position(int16_t cell); /* 0x0002b634, now recovered */
 void refresh_external_grid_position(int16_t cell); /* 0x0002b690 */
 void recompute_grid_limit(int16_t cell); /* 0x0002e08c */
 
+/* Grid adjacency, relationship, category and visibility helpers. The x87
+ * distance models still require guest differential precision checks. */
+void recycle_oldest_grid_node(void); /* 0x0002a934, no arguments */
+int16_t find_grid_neighbor_with_detail(int16_t cell); /* 0x0002bbd0, AX -> AX */
+double grid_cell_distance(int16_t first, int16_t second); /* 0x0002bb3c, AX/DX -> ST0 */
+double grid_neighbor_distance(int16_t cell); /* 0x0002bc3c, AX -> ST0 */
+uint8_t grid_has_cross_object_relation(int16_t cell); /* 0x0002c0ec, AX -> AL */
+void refresh_grid_category(int16_t cell); /* 0x0002da54, AX */
+uint8_t grid_is_visible_from_reference(int16_t cell); /* 0x0002dce0, AX -> AL */
+
+/* Original dependencies at 0x2dc84/0x2dbf8; no separately confirmed ABIs. */
+uint8_t grid_reference_distance_matches(int16_t cell); /* 0x0002dc84 */
+uint8_t grid_external_distance_matches(int16_t cell, uint8_t probe); /* 0x0002dbf8 */
+
 #endif

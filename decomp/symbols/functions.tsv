@@ -438,7 +438,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002a7ac	74			unknown	unclassified	unverified		
 0x0002a7f8	178			unknown	unclassified	unverified		
 0x0002a8ac	136			unknown	unclassified	unverified		
-0x0002a934	57			unknown	unclassified	unverified		
+0x0002a934	57	recycle_oldest_grid_node	grid_node_pool	drafted	game	confirmed	decomp/tests/0x0002a934.json	linked queue head to free list; original assumes nonempty
 0x0002a970	104			unknown	unclassified	unverified		
 0x0002aa08	42			unknown	unclassified	unverified		
 0x0002aa34	285			unknown	unclassified	unverified		
@@ -464,15 +464,15 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002ba14	86	enable_grid_slot_activation	world_grid	drafted	game	confirmed	decomp/tests/0x0002ba14.json	conditional activation wrapper and event 8; host model passes
 0x0002bab0	48			unknown	unclassified	unverified		
 0x0002bae0	91			unknown	unclassified	unverified		
-0x0002bb3c	40			unknown	unclassified	unverified		
+0x0002bb3c	40	grid_cell_distance	world_grid_neighbors	drafted	game	confirmed	decomp/tests/0x0002bb3c.json	AX/DX grid pair to ST0 distance; original runtime 0xb415c x87 rounding pending
 0x0002bb64	108			unknown	unclassified	unverified		
-0x0002bbd0	108			unknown	unclassified	unverified		
-0x0002bc3c	122			unknown	unclassified	unverified		
+0x0002bbd0	108	find_grid_neighbor_with_detail	world_grid_neighbors	drafted	game	confirmed	decomp/tests/0x0002bbd0.json	AX row to AX signed neighbor; eight 17-byte adjacency entries
+0x0002bc3c	122	grid_neighbor_distance	world_grid_neighbors	drafted	game	confirmed	decomp/tests/0x0002bc3c.json	AX row to ST0 distance; active-row group check and neighbor query
 0x0002bcb8	448			unknown	unclassified	unverified		
 0x0002beb0	85	grid_has_active_link	world_grid_queries	drafted	game	confirmed	decomp/tests/0x0002beb0.json	all seven filtered lookups must execute; C host test only
 0x0002bf08	95	grid_has_object_mode	world_grid_queries	drafted	game	confirmed	decomp/tests/0x0002bf08.json	byte-count attached-object scan; C host test only
 0x0002bfcc	287			unknown	unclassified	unverified		
-0x0002c0ec	143			unknown	unclassified	unverified		
+0x0002c0ec	143	grid_has_cross_object_relation	world_grid_neighbors	drafted	game	confirmed	decomp/tests/0x0002c0ec.json	AX row to AL; up to 14 filtered lookups and cross-row locator test
 0x0002c17c	165			unknown	unclassified	unverified		
 0x0002c224	308			unknown	unclassified	unverified		
 0x0002c358	251			unknown	unclassified	unverified		
@@ -486,12 +486,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002d488	1036			unknown	unclassified	unverified		
 0x0002d894	54			unknown	unclassified	unverified		
 0x0002d9a4	176			unknown	unclassified	unverified		
-0x0002da54	269			unknown	unclassified	unverified		
+0x0002da54	269	refresh_grid_category	world_grid_category	drafted	game	confirmed	decomp/tests/0x0002da54.json	20 three-byte object features select lowest priority into row +0xbc
 0x0002db64	63			unknown	unclassified	unverified		
 0x0002dba4	82	grid_is_current_or_external	world_grid_queries	drafted	game	confirmed	decomp/tests/0x0002dba4.json	sentinel and external-list predicate; original callee unresolved
 0x0002dbf8	137			unknown	unclassified	unverified		
 0x0002dc84	90			unknown	unclassified	unverified		
-0x0002dce0	120			unknown	unclassified	unverified		
+0x0002dce0	120	grid_is_visible_from_reference	world_grid_category	drafted	game	confirmed	decomp/tests/0x0002dce0.json	AX row to AL; reference then all external proximity checks; dependencies unrecovered
 0x0002dee4	239			unknown	unclassified	unverified		
 0x0002e030	90	reset_grid_cell_state	world_grid_control	drafted	game	confirmed	decomp/tests/0x0002e030.json	reset and copy pending dwords; original derived update unresolved
 0x0002e08c	201	recompute_grid_limit	world_grid_limits	drafted	game	confirmed	decomp/tests/0x0002e08c.json	x87 per-type threshold and seven filtered-object lookups; NaN host cases only

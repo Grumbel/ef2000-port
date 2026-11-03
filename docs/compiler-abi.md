@@ -829,6 +829,56 @@ comparison before considering the replacement verified.
 although readable and only 63 bytes long, its single known direct caller is
 `0x2dba4`. An ABI signature would violate the two-distinct-caller rule.
 
+## Grid neighbor, relation and category follow-up (seven C drafts)
+
+Seven more original functions were read from the SHA-pinned extracted payload
+and checked at two or more distinct **function** callers. The caller sites
+consume register results as documented, even when the original callee writes
+additional scratch registers; all remain source drafts without an OpenWatcom
+object or a guest differential comparison.
+
+| Original entry | ABI and two independently inspected original callers |
+| --- | --- |
+| `0x2a934` `recycle_oldest_grid_node` | No inputs/consumed return; saves EBX/EDX; callers `0x2a7f8:0x2a899` and `0x2a8ac:0x2a8b9`. |
+| `0x2bb3c` `grid_cell_distance` | Signed AX/DX row indices, ST0 distance; saves EBX; callers `0x71fc:0x724f` and `0x7308:0x7378` compare ST0 with x87 (`fcomp`); four more call sites. |
+| `0x2bbd0` `find_grid_neighbor_with_detail` | Signed AX cell, signed AX neighbor or `0x00ff`; saves EBX/ECX/EDX/ESI/EDI; callers `0x2bc3c:0x2bc79`, `0x2bcb8:0x2bcc5` and `0x2c6dc:0x2c71d` sign-extend AX. |
+| `0x2bc3c` `grid_neighbor_distance` | Signed AX cell, ST0 double; saves EBX/ECX/EDX; callers `0x2ced4:0x2d212` and `0x6e59c:0x6e6cf` both immediately compare ST0. |
+| `0x2c0ec` `grid_has_cross_object_relation` | Signed AX cell, Boolean AL; saves EBX/ECX/EDX/ESI; callers `0x2c6dc:0x2c710` and `0x77c90:0x7878a` both test AL. |
+| `0x2da54` `refresh_grid_category` | Signed AX cell, void; saves EBX/ECX/EDX/ESI/EDI; callers `0x161d4:0x164e8` and `0x16588:0x16769` use the written +0xbc category byte, plus caller `0x2d894`. |
+| `0x2dce0` `grid_is_visible_from_reference` | Signed AX cell, Boolean AL; saves EBX/ECX/EDX; callers `0x2e740:0x2e88e` and `0x7e8c0:0x7ec55` test AL. |
+
+`0x2bbd0` treats each adjacency list as 17 bytes (one unused byte and eight
+signed neighbor words) from `0x1fcb40`, indexed by the signed word at grid
+row +0x1c. It seeks the first non-self, non-0xff neighbor whose +0x1b
+detail mode is one. `0x2bc3c` returns zero unless the active row's +0x1c
+group equals the argument row, the helper finds a neighbor, and that
+neighbor's +0x1a current mode is nonzero. Then `0x2bb3c` passes the
+two rows' pairs of +0x61/+0x69 doubles to library routine `0xb415c`, which
+computes the two-dimensional Euclidean distance and leaves it in ST0.
+Exact x87 intermediate stores and square-root rounding still need tests.
+
+`0x2c0ec` iterates seven embedded object indices at row +0x50. Every
+successful `0x7489c` lookup is followed by a second filtered lookup using
+the signed high word at object +0x144; the objects' signed high words at
++0x26 identify grid rows. The first mismatch between those rows' +0x15
+locator high words returns AL=1. Other paths keep scanning, preserving the
+original filtered-lookup counter increments.
+
+`0x2da54` reads one of two embedded object indices at grid +0x50/+0x52,
+chosen by comparison with the high signed half of `0x1f71c8`. The selected
+object has up to 20 three-byte features at +0x19b; only a nonzero following
+word is considered, with a gate in the 0x91-byte type records at `0x12bc94`.
+Eligible codes 6/7/8/14/28 have priority one, 12/13 priority two, and
+9/15 priority three; only a strictly lower priority replaces the selected
+category written at grid +0xbc. The original checks all 20 entries even
+after finding a priority-one match. `0x2a934` moves the oldest node from
+the active 0x19bb3c/0x19bb38 queue to the 0x19bb40 free list, linking via
+node +0x12; no empty-queue guard exists. `0x2dce0` performs a mandatory
+reference-distance predicate at `0x2dc84`, then every external predicate
+at `0x2dbf8` when enabled, and finally suppresses the result if row +0x1a
+is zero. Those two predicate callees are explicitly unrecovered because
+their independently confirmed caller/ABI evidence is incomplete.
+
 ## Comparing assembly
 
 ```sh

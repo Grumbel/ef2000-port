@@ -42,5 +42,14 @@ extern ef_addr32 g_external_grid_base; /* 0x001a14f8, pointer to 0x45-byte nodes
 extern double g_external_grid_scale; /* 0x00182512, integer-to-world conversion */
 extern ef_grid_type_record g_grid_type_records[]; /* 0x001285d5, stride 0xe5 */
 extern double g_grid_limit_scale; /* 0x00182605, type-adjusted limit factor */
+extern ef_addr32 g_grid_node_tail; /* 0x0019bb38, linked pool queue tail */
+extern ef_addr32 g_grid_node_head; /* 0x0019bb3c, linked pool queue head */
+extern ef_addr32 g_grid_node_free; /* 0x0019bb40, linked free-node list */
+extern ef_addr32 g_grid_adjacency_base; /* 0x001fcb40, 17-byte lists */
+extern uint32_t g_grid_secondary_selector; /* 0x001f71c8, signed high index */
+extern ef_grid_category_type g_grid_category_types[]; /* 0x0012bc94, stride 0x91 */
+extern ef_grid_external_probe g_grid_external_probes[]; /* 0x001a5c2e, stride 0x1b */
+extern double g_grid_reference_position[2]; /* 0x001a3020 */
+extern double g_grid_visibility_distance; /* 0x001252a4 */
 
 #endif

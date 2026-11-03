@@ -1,0 +1,14 @@
+{
+  "address": "0x0002bb3c",
+  "function_size": 40,
+  "max_instructions": 8000,
+  "cases": [
+    {"name": "three_four_five", "registers": {"eax": "0x00000001", "edx": "0x00000002"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b012b", "hex": "00000000000008400000000000001040"},
+                {"address": "0x2b01f5", "hex": "00000000000000000000000000000000"}]},
+    {"name": "same_position", "registers": {"eax": "0xffff0002", "edx": "0x12340002"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x2b01f5", "hex": "00000000000014400000000000001840"}]}
+  ]
+}

@@ -15,7 +15,8 @@ typedef struct EF_PACKED ef_world_grid_cell {
     uint8_t object_type;              /* +0x19 */
     uint8_t current_mode;             /* +0x1a */
     uint8_t detail_mode;              /* +0x1b */
-    uint8_t unknown_1c[4];
+    int16_t adjacency_group;          /* +0x1c, selects 17-byte neighbor list */
+    uint8_t unknown_1e[2];
     uint8_t reset_state;              /* +0x20 */
     uint8_t unknown_21;
     int16_t reverse_link;             /* +0x22 */
@@ -43,13 +44,15 @@ typedef struct EF_PACKED ef_world_grid_cell {
     uint32_t pending_b;               /* +0x9d */
     uint8_t unknown_a1[0x1a];
     uint8_t link_pending_marker;      /* +0xbb, mode-dependent sentinel */
-    uint8_t unknown_bc[0x0e];
+    uint8_t category_code;            /* +0xbc, selected object feature */
+    uint8_t unknown_bd[0x0d];
 } ef_world_grid_cell;
 
 EF_STATIC_ASSERT(ef_grid_cell_size, sizeof(ef_world_grid_cell) == 0xca);
 EF_STATIC_ASSERT(ef_grid_type_off, offsetof(ef_world_grid_cell, object_type) == 0x19);
 EF_STATIC_ASSERT(ef_grid_mode_off, offsetof(ef_world_grid_cell, current_mode) == 0x1a);
 EF_STATIC_ASSERT(ef_grid_detail_off, offsetof(ef_world_grid_cell, detail_mode) == 0x1b);
+EF_STATIC_ASSERT(ef_grid_adjacency_off, offsetof(ef_world_grid_cell, adjacency_group) == 0x1c);
 EF_STATIC_ASSERT(ef_grid_locator_off, offsetof(ef_world_grid_cell, locator_packed) == 0x13);
 EF_STATIC_ASSERT(ef_grid_reset_off, offsetof(ef_world_grid_cell, reset_state) == 0x20);
 EF_STATIC_ASSERT(ef_grid_reverse_off, offsetof(ef_world_grid_cell, reverse_link) == 0x22);
@@ -71,6 +74,43 @@ EF_STATIC_ASSERT(ef_grid_retained_b_off, offsetof(ef_world_grid_cell, retained_b
 EF_STATIC_ASSERT(ef_grid_pending_a_off, offsetof(ef_world_grid_cell, pending_a) == 0x99);
 EF_STATIC_ASSERT(ef_grid_pending_b_off, offsetof(ef_world_grid_cell, pending_b) == 0x9d);
 EF_STATIC_ASSERT(ef_grid_link_pending_off, offsetof(ef_world_grid_cell, link_pending_marker) == 0xbb);
+EF_STATIC_ASSERT(ef_grid_category_off, offsetof(ef_world_grid_cell, category_code) == 0xbc);
+
+/* 0x1fcb40 points at 17-byte neighbor lists. The zeroth byte is not
+ * consulted by the 0x2bbd0 query. Each index is a signed word. */
+typedef struct EF_PACKED ef_grid_adjacency {
+    uint8_t unknown_00;
+    int16_t neighbors[8];
+} ef_grid_adjacency;
+EF_STATIC_ASSERT(ef_grid_adjacency_size, sizeof(ef_grid_adjacency) == 0x11);
+EF_STATIC_ASSERT(ef_grid_adjacency_neighbors_off, offsetof(ef_grid_adjacency, neighbors) == 1);
+
+/* 0x12bc94: only the first byte of each 0x91-byte category description is
+ * touched by the original 0x2da54 implementation. */
+typedef struct EF_PACKED ef_grid_category_type {
+    uint8_t allowed_kind;
+    uint8_t unknown_01[0x90];
+} ef_grid_category_type;
+EF_STATIC_ASSERT(ef_grid_category_type_size, sizeof(ef_grid_category_type) == 0x91);
+
+/* 0x1a5c2e: fixed external probes, 27 bytes each; the point at +5 has
+ * two doubles used by the 0x2dbf8 dependency. */
+typedef struct EF_PACKED ef_grid_external_probe {
+    uint32_t object_index_packed;
+    uint8_t unknown_04;
+    double position[2];
+    uint8_t unknown_15[6];
+} ef_grid_external_probe;
+EF_STATIC_ASSERT(ef_grid_external_probe_size, sizeof(ef_grid_external_probe) == 0x1b);
+EF_STATIC_ASSERT(ef_grid_external_probe_position_off, offsetof(ef_grid_external_probe, position) == 5);
+
+/* Node pool near 0x19bb38: original allocation nodes have a next pointer
+ * at +0x12. Only this field is recovered. */
+typedef struct EF_PACKED ef_grid_pool_node {
+    uint8_t unknown_00[0x12];
+    ef_addr32 next;
+} ef_grid_pool_node;
+EF_STATIC_ASSERT(ef_grid_pool_next_off, offsetof(ef_grid_pool_node, next) == 0x12);
 
 /* Non-grid pointer at 0x1a14f8: 69-byte external-position records. */
 typedef struct EF_PACKED ef_external_grid_node {

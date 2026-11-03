@@ -1,0 +1,13 @@
+{
+  "address": "0x0002a934",
+  "function_size": 57,
+  "max_instructions": 512,
+  "cases": [
+    {"name": "move_single_queue_node_to_existing_free_list",
+     "memory": [{"address": "0x19bb38", "hex": "00002d0000002d0000012d00"},
+                {"address": "0x2d0012", "hex": "00000000"}]},
+    {"name": "move_head_of_two_node_queue_to_empty_free_list",
+     "memory": [{"address": "0x19bb38", "hex": "00012d0000002d0000000000"},
+                {"address": "0x2d0012", "hex": "00012d00"}]}
+  ]
+}

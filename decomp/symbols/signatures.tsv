@@ -55,3 +55,10 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00120a52	store_x87_st0_via_es	BL:uint8_t,EDI:ef_addr32,ST0:float10	ST0:float10	eax,ebx,ecx,edx,esi,edi,ebp	0	0x120a52..0x120a5f; caller sites 0x12097d/0x1209dc, ES-specific FST without pop; docs/compiler-abi.md
 0x0015c071	write_projected_fixedpoint_pair	EBX:ef_addr32,ECX:int32_t,ESI:int32_t,EDI:int32_t	EAX:uint32_t	ebx,esi,edi,ebp	0	0x15c071..0x15c0c3; callers 0x15c0df/0x15c105; docs/compiler-abi.md
 0x0015c0c4	project_fixedpoint_pair_from_stack	[ESP+4]:int32_t,[ESP+8]:int32_t,[ESP+12]:int32_t,[ESP+16]:ef_addr32	EAX:uint32_t	esi,edi,ebp	16	0x15c0c4..0x15c0e9; caller sites 0x5f3bb/0x3d5f1 test EAX; docs/compiler-abi.md
+0x0002a934	recycle_oldest_grid_node			ebx,edx,esi,edi,ebp	0	0x2a934..0x2a96c; caller functions 0x2a7f8 and 0x2a8ac; pool globals 0x19bb38/3c/40; docs/compiler-abi.md
+0x0002bb3c	grid_cell_distance	AX:int16_t,DX:int16_t	ST0:float10	ebx,ecx,esi,edi,ebp	0	0x2bb3c..0x2bb63; callers 0x71fc/0x7308 read ST0; EAX/EDX scratch; docs/compiler-abi.md
+0x0002bbd0	find_grid_neighbor_with_detail	AX:int16_t	AX:int16_t	ebx,ecx,edx,esi,edi,ebp	0	0x2bbd0..0x2bc3b; callers 0x2bc3c/0x2bcb8/0x2c6dc test AX sentinel; docs/compiler-abi.md
+0x0002bc3c	grid_neighbor_distance	AX:int16_t	ST0:float10	ebx,ecx,edx,esi,edi,ebp	0	0x2bc3c..0x2bcb5; caller functions 0x2ced4 and 0x6e59c consume ST0; docs/compiler-abi.md
+0x0002c0ec	grid_has_cross_object_relation	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x2c0ec..0x2c17a; callers 0x2c6dc at 0x2c710/0x77c90 at 0x7878a test AL; docs/compiler-abi.md
+0x0002da54	refresh_grid_category	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x2da54..0x2db60; caller functions 0x161d4/0x16588/0x2d894 ignore return; docs/compiler-abi.md
+0x0002dce0	grid_is_visible_from_reference	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x2dce0..0x2dd57; callers 0x2e740 at 0x2e88e and 0x7e8c0 at 0x7ec55 test AL; docs/compiler-abi.md

@@ -1,0 +1,15 @@
+{
+  "address": "0x0002bc3c",
+  "function_size": 122,
+  "max_instructions": 10000,
+  "cases": [
+    {"name": "no_active_grid_row", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x19bb5e", "hex": "ff00"}]},
+    {"name": "adjacency_group_mismatch", "registers": {"eax": "0x11220001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x19bb5e", "hex": "0000"},
+                {"address": "0x2b001c", "hex": "0500"},
+                {"address": "0x2b00e6", "hex": "0600"}]}
+  ]
+}

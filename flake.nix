@@ -489,6 +489,25 @@
           ${watcom}/bin/wdis work/world_grid_limits.obj -l=work/world_grid_limits.asm
           grep -qi 'recompute_grid_limit' work/world_grid_limits.asm
           ! grep -qi '__CHK' work/world_grid_limits.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/grid_node_pool.c --output "$PWD/work/grid_node_pool.obj"
+          ${watcom}/bin/wdis work/grid_node_pool.obj -l=work/grid_node_pool.asm
+          grep -qi 'recycle_oldest_grid_node' work/grid_node_pool.asm
+          ! grep -qi '__CHK' work/grid_node_pool.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/world_grid_neighbors.c --output "$PWD/work/world_grid_neighbors.obj"
+          ${watcom}/bin/wdis work/world_grid_neighbors.obj -l=work/world_grid_neighbors.asm
+          grep -qi 'find_grid_neighbor_with_detail' work/world_grid_neighbors.asm
+          grep -qi 'grid_cell_distance' work/world_grid_neighbors.asm
+          grep -qi 'grid_neighbor_distance' work/world_grid_neighbors.asm
+          grep -qi 'grid_has_cross_object_relation' work/world_grid_neighbors.asm
+          ! grep -qi '__CHK' work/world_grid_neighbors.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/world_grid_category.c --output "$PWD/work/world_grid_category.obj"
+          ${watcom}/bin/wdis work/world_grid_category.obj -l=work/world_grid_category.asm
+          grep -qi 'refresh_grid_category' work/world_grid_category.asm
+          grep -qi 'grid_is_visible_from_reference' work/world_grid_category.asm
+          ! grep -qi '__CHK' work/world_grid_category.asm
           $CC -std=c11 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
             ${source}/tests/decomp_object_control_test.c \
@@ -514,6 +533,14 @@
             ${source}/decomp/src/world_grid_limits.c \
             -o work/grid_helpers_host_test
           work/grid_helpers_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_world_grid_relations_test.c \
+            ${source}/decomp/src/grid_node_pool.c \
+            ${source}/decomp/src/world_grid_neighbors.c \
+            ${source}/decomp/src/world_grid_category.c \
+            -lm -o work/world_grid_relations_host_test
+          work/world_grid_relations_host_test
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

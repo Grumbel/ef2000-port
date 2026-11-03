@@ -1,0 +1,18 @@
+{
+  "address": "0x0002bbd0",
+  "function_size": 108,
+  "max_instructions": 1600,
+  "cases": [
+    {"name": "find_neighbor_of_detail_one", "registers": {"eax": "0x12340001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x1fcb40", "hex": "00002c00"},
+                {"address": "0x2b00e6", "hex": "0000"},
+                {"address": "0x2c0000", "hex": "0001000200ffffffffffffffffffffffffffff"},
+                {"address": "0x2b01af", "hex": "01"}]},
+    {"name": "no_neighbor_matches", "registers": {"eax": "0x00000001"},
+     "memory": [{"address": "0x19bb58", "hex": "00002b00"},
+                {"address": "0x1fcb40", "hex": "00002c00"},
+                {"address": "0x2b00e6", "hex": "0000"},
+                {"address": "0x2c0000", "hex": "00ffffffffffffffffffffffffffffffff"}]}
+  ]
+}

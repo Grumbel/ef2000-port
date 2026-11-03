@@ -651,6 +651,18 @@ seven filtered lookups even after matches, and unordered floating comparison.
 Real x87 extended precision, original dispatcher `0x2b1f4`, OpenWatcom OMF,
 safe splice and golden replay remain pending. All five are `drafted` only.
 
+World-grid neighborhood/category batch (2026-11-03): seven more drafted
+functions (`0x2a934`, `0x2bb3c`, `0x2bbd0`, `0x2bc3c`, `0x2c0ec`,
+`0x2da54`, `0x2dce0`) cover linked-node recycling, 17-byte adjacency
+lists, two-dimensional distance, cross-object relationships, a 20-feature
+priority classifier and externally gated visibility. All seven have original
+disassembly and at least two distinct caller functions, explicit ABI rows,
+synthetic host assertions and per-function planned guest input states.
+`0x2dce0` still calls two unrecovered distance predicates; `0x2bb3c` and
+`0x2bc3c` have x87 ST0 outputs whose precision is untested. Missing Ghidra
+pseudo-C, OpenWatcom compilation and guest splicing prevent promotion beyond
+`drafted`; the original emulator is unchanged.
+
 ### 3.11 [ ] Phase-1 exit criteria
 
 - `nix flake check` passes with all new asset-free tests.
@@ -989,6 +1001,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  4     Drafted 0x7489c filtered object lookup plus four 0x6a3xx state wrappers; five new ABI-reviewed C functions and differential plans, with shared-epilogue splice hazard documented.
 2026-11-03  4     Drafted six more world-grid link/query/control functions (21 total) with ABI/caller evidence, row-offset asserts, 65,536-case host predicate check and six pending guest plans.
 2026-11-03  4     Drafted five more world-grid link/position/limit helpers (26 total); two independent callers each, seven-filtered-lookup host model, five guest plans, Watcom hooks pending execution.
+2026-11-03  4     Drafted seven grid adjacency/relation/category/visibility/pool helpers (33 total); 859 original bytes mapped in the new batch, host tests and seven guest plans; x87/Watcom and differential proof pending.
 ```
 
 ---
