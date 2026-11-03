@@ -172,6 +172,34 @@ quirk explicitly in `decomp/compat/`.
 Goal: after this phase, recovering a function is a mechanical loop (§4).
 Do the steps in order. Each step is one or a few commits.
 
+### 3.0 [ ] Rebuild the Ghidra workspace reproducibly (do this first)
+
+`local/` is git-ignored, so a fresh checkout has **no Ghidra project**. The
+4,233-function state described in `docs/ghidra-findings.md` was reached
+through many separate passes (bundles #041–#056), several of them run with
+`--apply` in different disposable workspaces (`local/ghidra-recovery`,
+`local/ghidra-entries-recovery`, `local/ghidra-undisassembled`,
+`local/ghidra-call-recovery`). There is no single command that reproduces it.
+
+1. Read `docs/ghidra.md` and the #041–#056 sections of
+   `docs/ghidra-findings.md`; list every `--apply` pass, its flags, its order
+   and the function count it reported.
+2. Add `ef2000-ghidra rebuild [--workspace DIR]`: import the SHA-pinned EXE,
+   then run all applying passes in that order in **one** workspace
+   (`local/ghidra` by default), then `inventory`, `export-all
+   --custom-storage-fallback` and `function-facts`. Refuse to run on an
+   existing project unless `--force` is given.
+3. Acceptance: the rebuilt project reports **4,233** recognized functions
+   and 4,233 pseudo-C exports, and the nine `repair-boundaries` recipes report
+   as applied. If counts differ, record the difference and its cause in
+   `docs/ghidra-findings.md` before continuing; do not paper over it.
+4. Add an asset-free test for the pass ordering (like the existing
+   `tests/test_ghidra_ef2000.py`).
+5. Later, step 3.3 (`apply-symbols`) becomes the last stage of `rebuild`.
+
+Runtime: expect tens of minutes for import and a full export; run long
+commands in the background and do not re-run them unnecessarily.
+
 ### 3.1 [ ] Repository layout and licensing scaffolding
 
 Create:
@@ -688,6 +716,8 @@ Append one line per completed step or every ~20 verified functions:
 ```
 2026-11-03  plan  Plan written; baseline in §0.
 2026-11-03  2.2   Owner decision: functional decompilation; RAM state must match, binaries need not.
+2026-11-03  3.1   Licensing in place: LicenseRef-EF2000-Derived for decomp/, GPL linking exception elsewhere.
+2026-11-03  3.0   Added: no Ghidra workspace exists on the handoff machine; rebuild step required.
 ```
 
 ---
@@ -709,6 +739,17 @@ Append one line per completed step or every ~20 verified functions:
 ---
 
 ## 11. Quick reference for a work session
+
+Session start checklist:
+
+1. `git status` is clean and `git log -3` matches what you expect.
+2. Read §1 and §4 of this file, plus `AGENTS.md`.
+3. Confirm game data is present: `../EF2000/c/EF2000/_EF2000.EXE` with the
+   SHA-256 in `docs/executable.md`. Without it only asset-free work is
+   possible; say so instead of guessing.
+4. Confirm `local/ghidra` exists; if not, run step 3.0 first.
+5. Find the first unchecked step in §3 (or the current wave in §6) and
+   continue there. Do not start a later phase early.
 
 ```sh
 nix develop                                      # tools: Ghidra, OpenWatcom, Unicorn, DOSBox-X

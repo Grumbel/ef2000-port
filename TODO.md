@@ -49,6 +49,11 @@ Implemented and verified:
 
 ## Next work
 
+**Priority order is set by `docs/decompilation-plan.md`.** The items below
+are emulator/runtime maintenance; do them only when the plan needs them (for
+example determinism fixes for the replay suite). Where an item conflicts with
+the plan (such as deferring the mission parser), the plan wins.
+
 1. Validate longer flight sessions, mission completion, and physical joystick
    hardware; keep automated UI tests on private Xvfb displays.
 2. Revalidate the physical Xbox 360 Wireless Controller after fixing the
