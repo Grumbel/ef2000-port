@@ -2695,3 +2695,12 @@ in EAX, format string address, one value).
 | `0x10710` | AX:uint16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t,[ESP+4]:uint16_t,[ESP+8]:uint8_t | none | 882b0@8833e | Store six parameters in the 0x197c24 block and mark it valid. |
 | `0xa5b1c` | EAX:ef_addr32,EDX:uint32_t,BX:uint16_t,CX:uint16_t,[ESP+4]:uint16_t | none | 41314@413a5,4b1f0@4b2ce,69bdc@69c7c | Store four parameters in a widget and redraw it when visible. |
 | `0xd9ba0` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | EAX:uint32_t | 93e58@93e89,94000@94031 | Mouse-style call 0x33 (entry value ORed with 0x70); results through four pointers. |
+
+## game_helpers13 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1ad8` | none | none | f80@1ac6 | Reset the selection state block at 0x196fe8. |
+| `0x2d78` | AL:uint8_t,DL:uint8_t,BX:int16_t,ECX:uint32_t | AL:uint8_t | 20ec@24d9,20ec@24fd,20ec@2521 | True when both owner bytes of the 62-byte record match and the time is in range. |
+| `0x3d74` | none | AL:uint8_t | 1cd8@1e92 | Refresh the selected state byte from the owner and report a change. |
+| `0x7b38` | AL:uint8_t,DL:uint8_t,BX:int16_t | AL:uint8_t | 7bc0@7c00,7bc0@7c4c | True when the unit's slot entry matches its type and refers to it (or to anyone). |

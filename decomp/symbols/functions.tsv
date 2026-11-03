@@ -32,13 +32,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00000f44	22			unknown	unclassified	unverified		
 0x00000f60	32	random_modulo	low_helpers	compiles	game	confirmed	decomp/tests/0x00000f60.json	docs/compiler-abi.md; zero divisor returns 0 else low-word random (0x9c960) modulo divisor; callers 1ef8@1f58,1f64@1f87,1f64@20a0; guest pending
 0x00000f80	2904			unknown	unclassified	unverified		
-0x00001ad8	150			unknown	unclassified	unverified		
+0x00001ad8	150	reset_selection_state_1ad8	game_helpers13	compiles	game	confirmed	decomp/tests/0x00001ad8.json	docs/compiler-abi.md; Reset the selection state block at 0x196fe8.; callers f80@1ac6; guest pending
 0x00001b70	359			unknown	unclassified	unverified		
 0x00001cd8	543			unknown	unclassified	unverified		
 0x00001ef8	108	tick_selector_1ef8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00001ef8.json	docs/compiler-abi.md; Every second call pick a byte from tables 0x1961f8 (stride 51) or 0x196191 (stride 52) * and store 0xf60 of it in byte 0; callers 1cd8@1ec6; guest pending
 0x00001f64	331			unknown	unclassified	unverified		
 0x000020ec	3211			unknown	unclassified	unverified		
-0x00002d78	117			unknown	unclassified	unverified		
+0x00002d78	117	schedule_allows_2d78	game_helpers13	compiles	game	confirmed	decomp/tests/0x00002d78.json	docs/compiler-abi.md; True when both owner bytes of the 62-byte record match and the time is in range.; callers 20ec@24d9,20ec@24fd,20ec@2521; guest pending
 0x00002e04	1456			unknown	unclassified	unverified		
 0x000033b4	689			unknown	unclassified	unverified		
 0x00003668	1022			unknown	unclassified	unverified		
@@ -48,7 +48,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00003c74	96			unknown	unclassified	unverified		
 0x00003cd4	27	max3_signed	low_helpers	compiles	game	confirmed	decomp/tests/0x00003cd4.json	docs/compiler-abi.md; signed maximum of three; callers 2e04@304c,2e04@30d9,2e04@31a3; guest pending
 0x00003cf0	129	reset_selection_3cf0	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00003cf0.json	docs/compiler-abi.md; Reset the selection state from the record at dword 0x197061.; callers 1b70@1c5d,1cd8@1eea,3ea8@3f64; guest pending
-0x00003d74	131			unknown	unclassified	unverified		
+0x00003d74	131	refresh_selection_3d74	game_helpers13	compiles	game	confirmed	decomp/tests/0x00003d74.json	docs/compiler-abi.md; Refresh the selected state byte from the owner and report a change.; callers 1cd8@1e92; guest pending
 0x00003df8	91			unknown	unclassified	unverified		
 0x00003ea8	360			unknown	unclassified	unverified		
 0x00004050	138	hiscore_generate_defaults	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; differential-tested C++ model in runtime/ef2000_highscores.cpp
@@ -105,7 +105,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000077a8	280			unknown	unclassified	unverified		
 0x000078c0	465			unknown	unclassified	unverified		
 0x00007ae4	81	send_unit_command_7ae4	game_helpers10	compiles	game	confirmed	decomp/tests/0x00007ae4.json	docs/compiler-abi.md; Forward a command for a unit; kind 10 uses 0xff in place of its byte.; callers 46454@469fe,7156c@71a1c; guest pending
-0x00007b38	134			unknown	unclassified	unverified		
+0x00007b38	134	slot_matches_unit_7b38	game_helpers13	compiles	game	confirmed	decomp/tests/0x00007b38.json	docs/compiler-abi.md; True when the unit's slot entry matches its type and refers to it (or to anyone).; callers 7bc0@7c00,7bc0@7c4c; guest pending
 0x00007bc0	231			unknown	unclassified	unverified		
 0x00007ca8	120			unknown	unclassified	unverified		
 0x00007d20	203			unknown	unclassified	unverified		

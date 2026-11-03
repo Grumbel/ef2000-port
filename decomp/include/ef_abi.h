@@ -1950,4 +1950,12 @@ void guest_fn_a739c(ef_addr32 widget, uint32_t state); /* 0xa739c EAX/EDX */
 void guest_fn_a56f8(ef_addr32 widget); /* 0xa56f8 EAX */
 void guest_fn_a6038(void); /* 0xa6038 */
 
+/* game_helpers13.c */
+void reset_selection_state_1ad8(void);
+uint8_t schedule_allows_2d78(uint8_t owner, uint8_t other, int16_t index, uint32_t time);
+uint8_t refresh_selection_3d74(void);
+uint8_t slot_matches_unit_7b38(uint8_t group, uint8_t slot, int16_t unit_id);
+uint32_t guest_fn_3aa8(uint32_t value); /* 0x3aa8 EAX -> AL */
+uint32_t guest_fn_3b1c(uint32_t value); /* 0x3b1c EAX -> AL */
+
 #endif
