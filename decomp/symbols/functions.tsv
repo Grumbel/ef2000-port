@@ -358,7 +358,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00022e98	142			unknown	unclassified	unverified		
 0x00022f28	241			unknown	unclassified	unverified		
 0x000233c4	920			unknown	unclassified	unverified		
-0x00023760	48			unknown	unclassified	unverified		
+0x00023760	48	position_delta_metric	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX pointer to 3 dwords produces signed metric
 0x000237c8	48			unknown	unclassified	unverified		
 0x00023800	160			unknown	unclassified	unverified		
 0x000238a0	31			unknown	unclassified	unverified		
@@ -2482,7 +2482,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1a68	121			unknown	unclassified	unverified		
 0x000b1ae4	41			unknown	unclassified	unverified		
 0x000b1b10	123			unknown	unclassified	unverified		
-0x000b1b8b	25			unknown	unclassified	unverified		
+0x000b1b8b	25	strlen_ds	unk_runtime	typed	unclassified	confirmed		docs/compiler-abi.md; repnz scasb uses ES=DS and assumes DF clear; classification deferred to 3.6
 0x000b1bb0	70			unknown	unclassified	unverified		
 0x000b1bf8	57			unknown	unclassified	unverified		
 0x000b1c34	77			unknown	unclassified	unverified		
@@ -3653,7 +3653,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f44b6	224			unknown	unclassified	unverified		
 0x000f45d8	104			unknown	unclassified	unverified		
 0x000f4640	138			unknown	unclassified	unverified		
-0x000f46cc	190			unknown	unclassified	unverified		
+0x000f46cc	190	read_next_command_token	unk_cli	typed	game	confirmed		docs/compiler-abi.md; token into 0x485e08; 16-bit cursor at 0x161eac
 0x000f478c	100			unknown	unclassified	unverified		
 0x000f4a88	337			unknown	unclassified	unverified		
 0x000f4bdc	131			unknown	unclassified	unverified		

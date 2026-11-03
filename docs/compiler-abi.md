@@ -182,6 +182,42 @@ callee stack cleanup. These are confirmed call contracts, **not** verified
 native vector math: operation order, object packing, precision and x87
 exception behavior must still survive differential/replay tests in §3.10.
 
+### Confirmed cross-region scalar, string and parser signatures
+
+`position_delta_metric` (`0x23760`) accepts EAX pointing to three signed
+32-bit coordinates at offsets 0, 4, 8. It subtracts three fixed reference
+values at `0x1a5bec`, `0x1a5bf0`, `0x1a5be8`, then calls `0xb39ec` with
+the resulting components in EAX/EDX/EBX. The callee returns its integer
+metric in EAX; `0x23760` restores EBX/ECX/EDX/ESI and leaves EDI/EBP
+untouched, with no stack arguments or cleanup. Caller `0x6924` at `0x69de`
+stores EAX to `0x197220`; distinct caller `0x92668` at `0x92751` compares
+signed EAX to `0x5000`. The exact numerical metric is not named as Euclidean
+distance: its `0xb39ec` implementation uses integer arithmetic and still
+needs a differential test.
+
+`strlen_ds` (`0xb1b8b`) implements a NUL-terminated byte scan: it accepts
+EAX as the string address and returns the length in EAX, with no stack
+arguments. It preserves ECX/EDI, other general registers, and the original
+ES segment by pushing it, loading ES from DS for `repnz scasb`, then restoring
+ES. **It does not execute `cld`: DF must already be clear.** Distinct
+callers `0x82e40` at `0x82eab` (uses returned EAX as an end offset, with
+EDX preserved) and `0xe882c` at `0xe896b` (tests the length) confirm the
+input and result. Its `kind` stays `unclassified`: matching it to a specific
+OpenWatcom library belongs to §3.6, not a premature guess in §3.5.
+
+`read_next_command_token` (`0xf46cc`) has no explicit argument registers.
+It scans a NUL-terminated global command string at `0x4859e0`, starting at
+the signed 16-bit cursor at `0x161eac`. It skips spaces/tabs, handles a
+leading double quote or a comma-delimited unquoted token, copies up to 80
+characters to the buffer at `0x485e08` with a NUL terminator, and updates
+the 16-bit cursor. EAX holds the 0..80 byte count on return; EBX/EDX/ESI
+are saved/restored and other GPRs are untouched. Callers `0xf4a88` at
+`0xf4b1c` and `0xf4bdc` at `0xf4bf8` both inspect the global token buffer
+instead of supplying register arguments, and neither requires the count.
+Its EAX result is recorded because the original callee consistently leaves
+the count there, not because a caller necessarily depends on it. No stack
+arguments or cleanup; ordinary DS for its global accesses.
+
 ### Confirmed void ABIs and a non-GPR side effect
 
 `reset_spatial_slot_count` (`0x263e0`) has no arguments or register return.
@@ -243,6 +279,24 @@ values, call it and test EAX for zero. The sibling `0x15c0ea` uses the
 same stack-argument wrapper pattern. Detailed type and clobber recovery is
 still pending; a default Watcom-register signature would be wrong here.
 
+`0xee43c` is a likely hand-written segment-sensitive callback bridge. Its
+caller `0xefbd9` at `0xefbfc` and distinct caller `0xeffb4` at `0xeffeb`
+both set AL=1, AH=0x81 before the call. The routine uses AL to modify a
+byte at DS:[EBP+4], conditionally copies 108 bytes from DS:EBP to SS:ESP
+with `rep movsd`, invokes an indirect external callback, then copies the
+result back under carefully reassigned DS/ES segments. It explicitly clears
+DF with `cld`; segment/flag behavior is therefore part of the contract.
+Its indirect callback's register effects are not established, so this is an
+**exception review**, not a confirmed GPR signature.
+
+`0x120451` wraps DOS `int 21h` and uses ES as a result. Callers `0x11d01c`
+at `0x11d0e6` and `0x11d135` at `0x11d1ff` pass an interrupt-vector number
+in EAX, then save the returned EAX and DX selector separately. The wrapper
+restores its original EBX/ECX and ES, puts ES into EDX before returning,
+and reloads EAX from its preserved input. Interrupt-side clobbers and
+descriptor semantics still need explicit verification before assigning a
+full signature or porting it to host C.
+
 ## Comparing assembly
 
 ```sh
@@ -278,8 +332,9 @@ noncontiguous: the window is a diagnostic aid, not an exact body export.
    statuses for matching entry/shape rows; `--reset-status` clears them.
 2. Confirm inputs, outputs, preserved registers, stack cleanup, x87 state
    and segment assumptions from disassembly and at least two callers each.
-   Eight of the forty candidates now have confirmed ABI rows (four object
-   routines, two void helpers, one pointer lookup, one linked-list search);
+   Eleven of the forty candidates now have confirmed ABI rows (four object
+   routines, two void helpers, a pointer lookup, a linked-list search,
+   a scalar metric wrapper, a string scan and a command token parser);
    exceptions and partial reviews remain separate from complete signatures.
 3. Record confirmed signatures in `decomp/symbols/signatures.tsv`, adding
    `#pragma aux` declarations only when justified by evidence.
