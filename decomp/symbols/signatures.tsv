@@ -1,1 +1,2 @@
 addr	name	inputs	outputs	preserved	stack_bytes	evidence
+0x0000432c	hiscore_qualifies		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x432c..0x433a; callers 0x49b2/0x4b64 test AL; docs/compiler-abi.md

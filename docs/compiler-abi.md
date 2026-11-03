@@ -33,13 +33,14 @@ functions. The `watcom-omf` Nix check now rejects `__CHK` in its OMF listing.
 | --- | --- | --- |
 | `0x4050` high-score defaults | Saves EBX, ECX, EDX, ESI; restores them before `ret` on both exits; calls `0x9c960` with EDX zeroed; uses a 25-byte record stride | Caller expectations, return/clobber registers, called runtime ABI |
 | `0x41fc` high-score load | Saves EBX, ECX, EDX, ESI; reserves four stack bytes; passes EAX=`0x17f694` and EDX=0 to indirect call `[0x132ab4]` | Target ABI, stack cleanup, outputs |
-| `0x432c` score threshold | Loads score in EAX, compares against last record, executes `setg al`, then `ret` | Whether callers consume only AL; upper EAX bits retain score bytes |
+| `0x432c` score threshold | Loads score in EAX, compares against last record, executes `setg al`, then `ret` | Confirmed: no register/stack inputs; returns AL, stack cleanup zero. Upper EAX bytes are not a return value. |
 | `0x433c` high-score insert | Saves EBX, ECX, EDX, ESI, EDI, EBP and reserves eight stack bytes | Input ABI and full return behavior |
 | `0x24480` x87 spatial comparison | Inputs from EAX (sign-extended AX) and EDX (pointer to three qwords); reads an eight-byte stack argument; saves/restores EBX, ECX, ESI, EDI; returns with `ret 8`, low-byte result in AL | Exact semantic types, other caller-visible clobbers, x87 control/status requirements |
 
 Evidence: `objdump -b binary -m i386 -M intel -D --start-address=...`
 against `local/ghidra/payload.bin`, and `docs/highscores-reconstruction.md`.
-These are not complete signatures; no row has been promoted to `confirmed`.
+Except for the separate `0x432c` row below, these observations are not
+complete signatures and remain unverified.
 
 For `0x24480`, two different caller functions show the same argument setup:
 `0x2479c` at callsite `0x248b9` and `0x6aeb4` at `0x6b1aa` both store a
@@ -54,6 +55,23 @@ Packing evidence: the high-score record occupies 25 bytes with a signed
 32-bit score at unaligned offset `+21`. The GUI icon `next` pointer at `+0x21`
 is another candidate for packed layout. These observations do not prove
 every structure in the original program was packed to one byte.
+
+### Confirmed signature: `hiscore_qualifies` (`0x432c`)
+
+- Callee instructions `0x432c..0x433a` read two fixed 32-bit score globals,
+  compare them as **signed** values (`setg al`), and return without touching
+  the stack, pointers, or any registers other than EAX. No implicit inputs.
+- Caller `0x494c`, at `0x49b2`, branches immediately on `test al,al`
+  (`0x49b7`) and never examines the upper three bytes of EAX.
+- Distinct caller `0x4b54`, at `0x4b64`, likewise branches on `test al,al`
+  (`0x4b69`); neither caller places an argument for this function.
+- Signature: `uint8_t hiscore_qualifies(void)` with AL as its sole output,
+  preserved EBX/ECX/EDX/ESI/EDI/EBP, callee stack cleanup 0, ordinary DS
+  for both global loads. EAX bits 8–31 are *not* promised preserved: they
+  reflect the loaded score and must not be modeled as a 32-bit Boolean.
+
+This confirms the ABI row, **not** a recovered C implementation. No spliced
+function or differential replay is being claimed.
 
 ## Comparing assembly
 

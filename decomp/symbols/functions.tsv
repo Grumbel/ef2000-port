@@ -56,7 +56,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000041fc	165	hiscore_load	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; differential-tested C++ model
 0x000042a4	114	hiscore_save	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; ORIGINAL BUG: checksum pointer never advances
 0x00004318	17	mdMainloop		named	unclassified	unverified		
-0x0000432c	15	hiscore_qualifies	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; strictly greater than slot 9
+0x0000432c	15	hiscore_qualifies	hiscore	typed	game	confirmed		docs/compiler-abi.md; two callers consume AL; no register inputs or stack args
 0x0000433c	242	hiscore_insert	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; ties admitted, INT_MIN wraparound
 0x00004430	369			unknown	unclassified	unverified		
 0x000045a4	401			unknown	unclassified	unverified		

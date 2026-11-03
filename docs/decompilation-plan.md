@@ -365,6 +365,8 @@ reproducible cross-region candidates; their individual caller/ABI audits
 remain. `abi-audit.tsv` records two distinct caller sites and linear
 instruction summaries for each candidate; the unusual `0x24480` x87/`ret 8`
 case was checked against both callers and documented in `compiler-abi.md`.
+Outside that 40-entry worksheet, `0x432c` has a confirmed byte-sized AL
+return and no arguments, as established by both direct callers.
 
 ### 3.6 [ ] Library identification
 
@@ -778,6 +780,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Sampled 40 candidates across five code regions for manual calling-convention review.
 2026-11-03  3.5   Collected 40 disassembly summaries and two distinct callers each; examined mixed EAX/EDX/stack ABI at 0x24480.
 2026-11-03  3.5   Owner's OMF fixture exposed __CHK stack probe; add -s and forbid that new unresolved dependency in flake smoke check.
+2026-11-03  3.5   Confirmed hiscore_qualifies (0x432c) signature from full callee and both callers, recording AL-only output.
 ```
 
 ---
