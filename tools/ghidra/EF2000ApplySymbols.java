@@ -108,10 +108,25 @@ public class EF2000ApplySymbols extends GhidraScript {
         for (String part : inputs.split(",")) {
             String[] fields = part.trim().split(":", -1);
             if (fields.length != 2) throw new IllegalArgumentException("input: " + part);
-            Register register = currentProgram.getLanguage().getRegister(fields[0]);
-            if (register == null) throw new IllegalArgumentException("unknown register: " + fields[0]);
-            parameters.add(new ParameterImpl("in_" + fields[0].toLowerCase(Locale.ROOT),
-                type(fields[1]), new VariableStorage(currentProgram, register), currentProgram));
+            DataType dataType = type(fields[1]);
+            java.util.regex.Matcher stack = java.util.regex.Pattern.compile(
+                "\\[ESP\\+(\\d+)\\]", java.util.regex.Pattern.CASE_INSENSITIVE)
+                .matcher(fields[0]);
+            if (stack.matches()) {
+                int offset = Integer.parseInt(stack.group(1));
+                if (offset < 4 || (offset % 4) != 0 || offset > 4096 ||
+                        dataType.getLength() <= 0)
+                    throw new IllegalArgumentException("invalid entry stack parameter: " + part);
+                parameters.add(new ParameterImpl("stack_" + offset, dataType,
+                    new VariableStorage(currentProgram, offset, dataType.getLength()),
+                    currentProgram));
+            } else {
+                Register register = currentProgram.getLanguage().getRegister(fields[0]);
+                if (register == null)
+                    throw new IllegalArgumentException("unknown register: " + fields[0]);
+                parameters.add(new ParameterImpl("in_" + fields[0].toLowerCase(Locale.ROOT),
+                    dataType, new VariableStorage(currentProgram, register), currentProgram));
+            }
         }
         return parameters.toArray(new Variable[0]);
     }
@@ -163,12 +178,16 @@ public class EF2000ApplySymbols extends GhidraScript {
             Function function = getFunctionAt(addr(row[0]));
             if (function == null || !function.getName().equals(row[1]))
                 throw new IllegalArgumentException("signature has no matching function: " + row[0]);
-            // Only confirmed signatures are placed in this table. Outputs
-            // beyond one register and stack cleanup need step 3.5 ABI work.
-            if (!row[5].equals("0")) throw new IllegalArgumentException("unsupported stack cleanup");
+            // Only confirmed signatures are placed in this table. The purge
+            // count is callee-owned bytes (ret N), independent of where
+            // parameters are stored; cdecl may have stack arguments and ret 0.
+            int purge = Integer.parseInt(row[5]);
+            if (purge < 0 || purge > 4096 || purge % 4 != 0)
+                throw new IllegalArgumentException("invalid callee stack cleanup: " + row[5]);
             Variable[] params = parameters(row[2]);
             function.updateFunction(null, null, FunctionUpdateType.CUSTOM_STORAGE,
                 true, SourceType.USER_DEFINED, params);
+            function.setStackPurgeSize(purge);
             if (!row[3].isBlank()) {
                 String[] output = row[3].split(":", -1);
                 if (output.length != 2) throw new IllegalArgumentException("output: " + row[3]);

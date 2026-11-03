@@ -37,7 +37,14 @@ public class EF2000ExportSymbols extends GhidraScript {
 
     private String storage(Variable variable) {
         Varnode[] nodes = variable.getVariableStorage().getVarnodes();
-        if (nodes.length != 1 || !nodes[0].isRegister()) return "";
+        if (nodes.length != 1) return "";
+        if (variable.getVariableStorage().hasStackStorage()) {
+            int offset = variable.getVariableStorage().getStackOffset();
+            if (offset >= 4)
+                return "[ESP+" + offset + "]:" + variable.getDataType().getName();
+            return "";
+        }
+        if (!nodes[0].isRegister()) return "";
         Register register = currentProgram.getRegister(nodes[0].getAddress(), nodes[0].getSize());
         if (register == null) return "";
         return register.getName() + ":" + variable.getDataType().getName();
@@ -115,7 +122,9 @@ public class EF2000ExportSymbols extends GhidraScript {
             String result = storage(function.getReturn());
             if (!supported) continue;
             signatures.add(new String[] {row[0], function.getName(),
-                String.join(",", inputs), result, "", "",
+                String.join(",", inputs), result, "",
+                function.isStackPurgeSizeValid() ?
+                    String.valueOf(function.getStackPurgeSize()) : "",
                 "GUI custom storage candidate; verify calling convention and callers"});
             signatureCandidates++;
         }

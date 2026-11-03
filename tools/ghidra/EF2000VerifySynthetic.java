@@ -27,6 +27,17 @@ public class EF2000VerifySynthetic extends GhidraScript {
                 voidFunction.getParameterCount() != 0 ||
                 !voidFunction.getReturnType().isEquivalent(VoidDataType.dataType))
             throw new IllegalStateException("void function signature did not survive reload");
+        Function stackFunction = getFunctionAt(toAddr(0x40));
+        if (stackFunction == null || !stackFunction.getName().equals("fixture_stack") ||
+                !stackFunction.hasCustomVariableStorage() ||
+                stackFunction.getParameterCount() != 2 ||
+                !stackFunction.getParameter(0).getVariableStorage().hasStackStorage() ||
+                stackFunction.getParameter(0).getVariableStorage().getStackOffset() != 4 ||
+                !stackFunction.getParameter(1).getVariableStorage().hasStackStorage() ||
+                stackFunction.getParameter(1).getVariableStorage().getStackOffset() != 8 ||
+                stackFunction.getStackPurgeSize() != 8 ||
+                !stackFunction.getReturn().getVariableStorage().toString().contains("EAX"))
+            throw new IllegalStateException("stack inputs / ret 8 did not survive reload");
         Symbol global = currentProgram.getSymbolTable().getGlobalSymbol("fixture_value", toAddr(0x20));
         Data data = getDataAt(toAddr(0x20));
         if (global == null || data == null || data.getLength() != 4 || !data.isDefined())

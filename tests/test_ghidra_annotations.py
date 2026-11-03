@@ -62,7 +62,9 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
             root = Path(temp)
             image = root / 'synthetic.bin'
             image.write_bytes(b'\xb8\x07\x00\x00\x00\xc3' + b'\x90' * 10 +
-                              b'\xc3' + b'\x90' * 15 + b'\0' * 64)
+                              b'\xc3' + b'\x90' * 15 + b'\0' * 32 +
+                              b'\x8b\x44\x24\x04\x8b\x4c\x24\x08\x01\xc8\xc2\x08\x00' +
+                              b'\0' * 32)
             script_path = ghidra.SCRIPTS
             launcher = str(Path(os.environ['GHIDRA_HOME']) / 'support/analyzeHeadless')
             project = root / 'project'
@@ -80,14 +82,17 @@ class SyntheticGhidraRoundtrip(unittest.TestCase):
             (symbols / 'functions.tsv').write_text(
                 'addr\tsize\tname\tmodule\tstate\tkind\tsig_status\ttest\tnotes\n'
                 '0x00000000\t6\tfixture_recovered\tfixture\ttyped\tgame\tconfirmed\t\t\n'
-                '0x00000010\t1\tfixture_void\tfixture\ttyped\tgame\tconfirmed\t\t\n')
+                '0x00000010\t1\tfixture_void\tfixture\ttyped\tgame\tconfirmed\t\t\n'
+                '0x00000040\t13\tfixture_stack\tfixture\ttyped\tgame\tconfirmed\t\t\n')
             (symbols / 'globals.tsv').write_text(
                 'addr\tsize\ttype\tname\tevidence\tnotes\n'
                 '0x00000020\t4\tuint32_t\tfixture_value\tsynthetic fixture\t\n')
             (symbols / 'signatures.tsv').write_text(
                 'addr\tname\tinputs\toutputs\tpreserved\tstack_bytes\tevidence\n'
                 '0x00000000\tfixture_recovered\tEAX:ef_addr32\tEAX:uint32_t\t\t0\tsynthetic fixture\n'
-                '0x00000010\tfixture_void\t\t\t\t0\tvoid fixture\n')
+                '0x00000010\tfixture_void\t\t\t\t0\tvoid fixture\n'
+                '0x00000040\tfixture_stack\t[ESP+4]:uint32_t,[ESP+8]:uint32_t\t'
+                'EAX:uint32_t\t\t8\tstack fixture\n')
             headers = root / 'include'
             headers.mkdir()
             (headers / 'fixture.h').write_text(

@@ -732,9 +732,13 @@ ef2000-ghidra export-all --overwrite --custom-storage-fallback
 The importer reads `decomp/symbols/{functions,globals,signatures}.tsv` and
 `decomp/include/**/*.h`. It uses Ghidra's `CParser` for declarative struct
 headers, and applies only explicitly tracked function names and confirmed
-custom-storage signatures. ABI register inputs/outputs use `REG:type` pairs
-(comma-separated inputs); currently only zero stack cleanup and a single
-register return are supported, and unsupported conventions are rejected.
+custom-storage signatures. ABI register inputs/outputs use `REG:type` pairs;
+stack inputs use `[ESP+4]:type`, `[ESP+8]:type`, etc. (offsets relative to the
+function's incoming ESP, before its prologue), with comma-separated inputs.
+`stack_bytes` records the callee's `ret N` purge size, independent of whether
+the inputs are passed in registers or on the stack. Only single-register or
+void return storage is currently supported; x87 ST(0), multi-register and
+mixed memory returns still require further convention work.
 The known but not yet reconstructed 250-byte high-score table remains a raw
 byte array until its struct header is confirmed. Overlapping globals retain
 both labels but only one data definition.
