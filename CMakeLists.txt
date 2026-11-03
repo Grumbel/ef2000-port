@@ -133,6 +133,13 @@ target_compile_options(ef2000-decomp-command-packets-test PRIVATE -Wall -Wextra 
 target_compile_definitions(ef2000-decomp-command-packets-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-command-packets-test PRIVATE decomp/include)
 add_test(NAME decomp-command-packets-host-model COMMAND ef2000-decomp-command-packets-test)
+add_executable(ef2000-decomp-runtime-predicates-test
+  tests/decomp_runtime_predicates_test.c decomp/src/runtime_predicates.c)
+target_compile_features(ef2000-decomp-runtime-predicates-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-runtime-predicates-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-runtime-predicates-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-runtime-predicates-test PRIVATE decomp/include)
+add_test(NAME decomp-runtime-predicates-host-model COMMAND ef2000-decomp-runtime-predicates-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

@@ -127,3 +127,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00057684	send_object_code_4a	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 4a AXlow AXhigh, call 0xa3f74 size 3; callers 0x298f0@0x29acc/0x86110@0x864ad; docs/compiler-abi.md
 0x000576b4	send_object_code_4b	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 4b AXlow AXhigh, call 0xa3f74 size 3; callers 0x294ec@0x29776/0x86110@0x86574; docs/compiler-abi.md
 0x000576e4	send_object_code_4c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Stack bytes 4c AXlow AXhigh, call 0xa3f74 size 3; callers 0x294ec@0x29824/0x86110@0x86624; docs/compiler-abi.md
+0x00040820	reference_clock_reaches	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x40820 (78 bytes); callers 5437c@543bb/855c8@855f9; Three signed words; lower EAX bytes retained, C AL host draft; docs/compiler-abi.md
+0x00041da4	command_code_is_group_1b	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x41da4 (79 bytes); callers d290@d43a/10a9c@10b51; Inclusive 0x1b..0x27 membership; docs/compiler-abi.md
+0x00049054	clear_tactical_accumulators			ebx,ecx,edx,esi,edi,ebp	0	Original 0x49054 (61 bytes); callers 3dd30@3ddc8/48e7c@4902a; Seven writes zero selected counters; docs/compiler-abi.md
+0x0004d8f4	reset_tactical_slots			ebx,ecx,edx,esi,edi,ebp	0	Original 0x4d8f4 (42 bytes); callers 4c78c@4c8e0/4c900@4ca68; Slots 0..15 set ff; conditional byte clear; docs/compiler-abi.md
+0x0004dc98	advance_first_tactical_status			ebx,ecx,edx,esi,edi,ebp	0	Original 0x4dc98 (61 bytes); callers 4c78c@4c8db/4c900@4ca63; First status 8 in indices 1..24 becomes 12; docs/compiler-abi.md
+0x000544c0	count_external_grid_markers			ebx,ecx,edx,esi,edi,ebp	0	Original 0x544c0 (53 bytes); callers 557e8@55850/55860@5587c; Count probe byte at +4 and store 8-bit result; docs/compiler-abi.md
+0x0005cb9c	position_within_tactical_bounds	AX:int16_t,DX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x5cb9c (42 bytes); callers 59fa4@5a062/5cbc8@5cd00; Inclusive signed AX DX ranges, AL-only result; docs/compiler-abi.md
+0x0005f1ec	sample_active_coordinates	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x5f1ec (52 bytes); callers 66fc@672d/67d4@6810; Guest packed dwords +8/+12 scaled and biased; docs/compiler-abi.md

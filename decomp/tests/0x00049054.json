@@ -1,0 +1,32 @@
+{
+  "address": "0x00049054",
+  "function_size": 61,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "reset_nonzero",
+      "registers": {
+        "eax": "0xabcd1234"
+      },
+      "memory": [
+        {
+          "address": "0x001a5240",
+          "hex": "112233445566778899aabbcc"
+        },
+        {
+          "address": "0x001a527a",
+          "hex": "0102030405"
+        },
+        {
+          "address": "0x00127b20",
+          "hex": "01000000"
+        }
+      ]
+    },
+    {
+      "name": "already_zero",
+      "registers": {},
+      "memory": []
+    }
+  ]
+}

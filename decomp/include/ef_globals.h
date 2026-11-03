@@ -118,4 +118,30 @@ extern uint8_t g_mode_output_a; /* 0x0012b070 */
 extern uint8_t g_mode_output_b; /* 0x0012b104 */
 extern uint8_t g_mode_output_c; /* 0x0012b105 */
 
+/* Short tactical-control, clock and coordinate helpers, 0x40820..0x5f1ec. */
+extern uint32_t g_tactical_accumulators[3]; /* 0x001a5240 */
+extern uint16_t g_tactical_status_words[2]; /* 0x001a527a */
+extern uint8_t g_tactical_status_byte; /* 0x001a527e */
+extern uint32_t g_tactical_runtime_count; /* 0x00127b20 */
+extern uint8_t g_tactical_slots[16]; /* 0x001a5544 */
+extern uint8_t g_tactical_reset_mode; /* 0x001a5532 */
+extern uint8_t g_tactical_low_flag; /* 0x001a5598 */
+extern uint8_t g_tactical_status_entries[25]; /* 0x001a5672, indices 1..24 */
+extern uint8_t g_tactical_status_changed; /* 0x001a5708 */
+extern uint8_t g_external_grid_marked_count; /* 0x00127da4 */
+extern int16_t g_tactical_min_x; /* 0x001a6cf2 */
+extern int16_t g_tactical_max_x; /* 0x001a6cf8 */
+extern int16_t g_tactical_min_y; /* 0x001a6cf0 */
+extern int16_t g_tactical_max_y; /* 0x001a6cf6 */
+extern ef_addr32 g_active_coordinate_source; /* 0x001a6b08 */
+
+/* Grid/list/query helpers, 0x40774 and 0x809bc..0x8d0e0. */
+extern int16_t g_tactical_lookup_count; /* 0x001357b0 */
+extern uint8_t g_tactical_lookup_codes[]; /* 0x001a5510 */
+extern uint16_t g_ui_panel_defaults[5]; /* 0x0020f182 */
+extern uint16_t g_ui_panel_zero_a[2]; /* 0x0020f18e */
+extern uint16_t g_ui_panel_zero_b[2]; /* 0x0020f19a */
+extern ef_addr32 g_ui_linked_list_head; /* 0x0020f160 */
+extern ef_addr32 g_ui_linked_list_sentinel; /* 0x0020f164 */
+
 #endif

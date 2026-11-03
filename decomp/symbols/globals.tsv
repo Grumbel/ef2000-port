@@ -96,3 +96,27 @@ addr	size	type	name	evidence	notes
 0x0012b070	1	uint8_t	g_mode_output_a	0x7eeb1 writes	Mode A latch
 0x0012b104	1	uint8_t	g_mode_output_b	0x810e1 writes	Mode B latch
 0x0012b105	1	uint8_t	g_mode_output_c	0x81105 writes	Mode C latch
+0x001a5240	12	uint32_t[3]	g_tactical_accumulators	0x4905f/0x49065/0x49071 writes	Reset only three consecutive words
+0x001a527a	4	uint16_t[2]	g_tactical_status_words	0x49077/0x49086 writes	Zero status pair
+0x001a527e	1	uint8_t	g_tactical_status_byte	0x4906b writes	Separate byte latch
+0x00127b20	4	uint32_t	g_tactical_runtime_count	0x49080 writes	Reset count
+0x001a5544	16	uint8_t[16]	g_tactical_slots	0x4d8fd writes	Indexes zero through fifteen
+0x001a5532	1	uint8_t	g_tactical_reset_mode	0x4d90b reads	Low-flag reset gate
+0x001a5598	1	uint8_t	g_tactical_low_flag	0x4d915 writes	Conditional clear
+0x001a5672	25	uint8_t[25]	g_tactical_status_entries	0x4dcac/0x4dcb7	1..24 byte status search
+0x001a5708	1	uint8_t	g_tactical_status_changed	0x4dcc0 writes	Clear on first conversion
+0x00127da4	1	uint8_t	g_external_grid_marked_count	0x544ed writes	8-bit count of probe +4 flags
+0x001a6cf0	2	int16_t	g_tactical_min_y	0x5cbae	Inclusive signed Y minimum
+0x001a6cf2	2	int16_t	g_tactical_min_x	0x5cb9c	Inclusive signed X minimum
+0x001a6cf6	2	int16_t	g_tactical_max_y	0x5cbb7	Inclusive signed Y maximum
+0x001a6cf8	2	int16_t	g_tactical_max_x	0x5cba5	Inclusive signed X maximum
+0x001a6b08	4	ef_addr32	g_active_coordinate_source	0x5f1ee reads	Record's signed/unsigned packed words at +8/+12
+0x001357b0	2	int16_t	g_tactical_lookup_count	0x50a1e reads and 0x50a48 writes unchanged	Signed table length
+0x001a5510	variable	uint8_t[]	g_tactical_lookup_codes	0x50a2f reads	Byte-code table; overlaps tactical slots when length too high
+0x0020f182	10	uint16_t[5]	g_ui_panel_defaults	0x86954 writes	Set 5 indices to one
+0x0020f18e	4	uint16_t[2]	g_ui_panel_zero_a	0x86939/0x86940 writes	Two zeroed panel words
+0x0020f19a	4	uint16_t[2]	g_ui_panel_zero_b	0x8692b/0x86932 writes	Two zeroed panel words
+0x0020f160	4	ef_addr32	g_ui_linked_list_head	0x87fa9/0x8d0ec reads	Head contains first node pointer at +0x34
+0x0020f164	4	ef_addr32	g_ui_linked_list_sentinel	0x87f9f/0x8d0e4 reads	Sentinel terminates circular list
+0x001f90a0	variable	uint8_t[]	g_panel_strip_flags	0x809e5 writes	One byte every 0x38 across signed 16-slot bands
+0x001fc8a2	variable	uint8_t[]	g_panel_strip_metadata	0x80a00/0x80a08 writes	12-byte bands, word +0 =ffff word +4=zero

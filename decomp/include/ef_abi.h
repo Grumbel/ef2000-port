@@ -6,6 +6,26 @@
 
 #include "ef_types.h"
 
+/* Short clock, tactical state and coordinate helpers (host drafts). */
+uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */
+uint32_t command_code_is_group_1b(uint8_t code); /* 0x41da4 AL -> EAX */
+void clear_tactical_accumulators(void); /* 0x49054 */
+void reset_tactical_slots(void); /* 0x4d8f4 */
+void advance_first_tactical_status(void); /* 0x4dc98 */
+void count_external_grid_markers(void); /* 0x544c0 */
+uint8_t position_within_tactical_bounds(int16_t x, int16_t y); /* 0x5cb9c AX/DX -> AL */
+void sample_active_coordinates(ef_addr32 destination); /* 0x5f1ec EAX */
+
+/* Arithmetic, grid, UI-list and strip helpers (host drafts). */
+int32_t clock_words_to_seconds(ef_addr32 clock); /* 0x40774 EAX -> EAX */
+uint8_t tactical_lookup_contains(uint8_t code); /* 0x50a1c AL -> AL */
+uint8_t clock_triplet_is_present(ef_addr32 clock); /* 0x85144 EAX -> AL */
+void decrement_grid_activity(int16_t row); /* 0x85358 AX */
+uint32_t reset_ui_panel_selection(void); /* 0x86920 returns EAX=5 */
+ef_addr32 find_ui_linked_tag(uint8_t tag, int16_t value); /* 0x87f9c AL/DX -> EAX */
+ef_addr32 mark_ui_links_by_slot(int16_t slot); /* 0x8d0e0 AX -> EAX */
+int32_t clear_panel_strip(int16_t slot); /* 0x809bc AX -> EAX */
+
 /* The game generally uses Watcom register calling, but individual signatures
  * must be confirmed from callers before adding #pragma aux definitions here.
  * See symbols/signatures.tsv and docs/decompilation-plan.md §3.5. */

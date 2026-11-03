@@ -735,7 +735,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00040624	125			unknown	unclassified	unverified		
 0x00040774	54			unknown	unclassified	unverified		
 0x000407c4	94			unknown	unclassified	unverified		
-0x00040820	78			unknown	unclassified	unverified		
+0x00040820	78	reference_clock_reaches	runtime_predicates	drafted	game	confirmed	decomp/tests/0x00040820.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00040870	77			unknown	unclassified	unverified		
 0x00040e20	47			unknown	unclassified	unverified		
 0x00040e50	107	gcSetDifficulty		named	unclassified	unverified		
@@ -755,7 +755,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000418c4	210			unknown	unclassified	unverified		
 0x00041998	509			unknown	unclassified	unverified		
 0x00041b98	443			unknown	unclassified	unverified		
-0x00041da4	79			unknown	unclassified	unverified		
+0x00041da4	79	command_code_is_group_1b	runtime_predicates	drafted	game	confirmed	decomp/tests/0x00041da4.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00041df4	24			unknown	unclassified	unverified		
 0x00041e0c	24			unknown	unclassified	unverified		
 0x00041e24	93			unknown	unclassified	unverified		
@@ -837,7 +837,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00048df8	132			unknown	unclassified	unverified		
 0x00048e7c	464			unknown	unclassified	unverified		
 0x0004904c	6			unknown	unclassified	unverified		
-0x00049054	61			unknown	unclassified	unverified		
+0x00049054	61	clear_tactical_accumulators	runtime_predicates	drafted	game	confirmed	decomp/tests/0x00049054.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00049144	156			unknown	unclassified	unverified		
 0x00049228	2484			unknown	unclassified	unverified		
 0x00049bdc	245			unknown	unclassified	unverified		
@@ -881,14 +881,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004d2fc	753	mpNextAssign		named	unclassified	unverified		
 0x0004d5f0	100			unknown	unclassified	unverified		
 0x0004d668	651			unknown	unclassified	unverified		
-0x0004d8f4	42			unknown	unclassified	unverified		
+0x0004d8f4	42	reset_tactical_slots	runtime_predicates	drafted	game	confirmed	decomp/tests/0x0004d8f4.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0004d920	169	mpSamCoverage		named	unclassified	unverified		
 0x0004d9cc	95	mpPrevAssign		named	unclassified	unverified		
 0x0004da2c	99	mpMakeAssign		named	unclassified	unverified		
 0x0004da90	85	mpViewAssign		named	unclassified	unverified		
 0x0004dae8	100	mpClearWPRoute		named	unclassified	unverified		
 0x0004db60	309			unknown	unclassified	unverified		
-0x0004dc98	61			unknown	unclassified	unverified		
+0x0004dc98	61	advance_first_tactical_status	runtime_predicates	drafted	game	confirmed	decomp/tests/0x0004dc98.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0004dcd8	520			unknown	unclassified	unverified		
 0x0004dee0	209			unknown	unclassified	unverified		
 0x0004dfb4	281			unknown	unclassified	unverified		
@@ -977,7 +977,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00054328	82			unknown	unclassified	unverified		
 0x0005437c	134			unknown	unclassified	unverified		
 0x00054410	174			unknown	unclassified	unverified		
-0x000544c0	53			unknown	unclassified	unverified		
+0x000544c0	53	count_external_grid_markers	runtime_predicates	drafted	game	confirmed	decomp/tests/0x000544c0.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x000544f8	170			unknown	unclassified	unverified		
 0x000545b8	42	send_grid_marker_packet	command_packets	drafted	game	confirmed	decomp/tests/0x000545b8.json	docs/compiler-abi.md; Five-byte opcode 0x0c packet AX little-endian, marker 0x1a666b then DL; original call 0xa3f74; guest dispatch unverified
 0x000545e4	26			unknown	unclassified	unverified		
@@ -1144,7 +1144,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005ca60	38			unknown	unclassified	unverified		
 0x0005ca88	146			unknown	unclassified	unverified		
 0x0005cb1c	126			unknown	unclassified	unverified		
-0x0005cb9c	42			unknown	unclassified	unverified		
+0x0005cb9c	42	position_within_tactical_bounds	runtime_predicates	drafted	game	confirmed	decomp/tests/0x0005cb9c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0005cbc8	1062			unknown	unclassified	unverified		
 0x0005cff0	141			unknown	unclassified	unverified		
 0x0005d080	321			unknown	unclassified	unverified		
@@ -1166,7 +1166,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005eaa4	276			unknown	unclassified	unverified		
 0x0005ebb8	711			unknown	unclassified	unverified		
 0x0005ee80	198			unknown	unclassified	unverified		
-0x0005f1ec	52			unknown	unclassified	unverified		
+0x0005f1ec	52	sample_active_coordinates	runtime_predicates	drafted	game	confirmed	decomp/tests/0x0005f1ec.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0005f220	871			unknown	unclassified	unverified		
 0x0005f588	172			unknown	unclassified	unverified		
 0x0005f634	98			unknown	unclassified	unverified		

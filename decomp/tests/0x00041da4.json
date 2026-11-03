@@ -1,0 +1,21 @@
+{
+  "address": "0x00041da4",
+  "function_size": 79,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "edge_inside",
+      "registers": {
+        "eax": "0xaa55001b"
+      },
+      "memory": []
+    },
+    {
+      "name": "edge_outside",
+      "registers": {
+        "eax": "0xffff0028"
+      },
+      "memory": []
+    }
+  ]
+}

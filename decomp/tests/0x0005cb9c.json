@@ -1,0 +1,33 @@
+{
+  "address": "0x0005cb9c",
+  "function_size": 42,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "at_inclusive_boundary",
+      "registers": {
+        "eax": "0x1234fffb",
+        "edx": "0x98760007"
+      },
+      "memory": [
+        {
+          "address": "0x001a6cf0",
+          "hex": "f6fffbff000007000500"
+        }
+      ]
+    },
+    {
+      "name": "outside_x",
+      "registers": {
+        "eax": "0x0000fffa",
+        "edx": "0x00000000"
+      },
+      "memory": [
+        {
+          "address": "0x001a6cf0",
+          "hex": "f6fffbff000007000500"
+        }
+      ]
+    }
+  ]
+}

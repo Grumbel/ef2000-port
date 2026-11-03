@@ -1,0 +1,35 @@
+{
+  "address": "0x0004d8f4",
+  "function_size": 42,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "reset_low_flag",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x001a5532",
+          "hex": "00"
+        },
+        {
+          "address": "0x001a5598",
+          "hex": "42"
+        }
+      ]
+    },
+    {
+      "name": "retain_low_flag",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x001a5532",
+          "hex": "01"
+        },
+        {
+          "address": "0x001a5598",
+          "hex": "42"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "address": "0x0004dc98",
+  "function_size": 61,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "first_matching_index",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x001a5672",
+          "hex": "0000080000"
+        },
+        {
+          "address": "0x001a5708",
+          "hex": "aa"
+        }
+      ]
+    },
+    {
+      "name": "no_matching_index",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x001a5672",
+          "hex": "0000000000"
+        },
+        {
+          "address": "0x001a5708",
+          "hex": "aa"
+        }
+      ]
+    }
+  ]
+}

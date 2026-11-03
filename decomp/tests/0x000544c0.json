@@ -1,0 +1,43 @@
+{
+  "address": "0x000544c0",
+  "function_size": 53,
+  "max_instructions": 180000,
+  "cases": [
+    {
+      "name": "zero_rows",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x0012583a",
+          "hex": "00"
+        },
+        {
+          "address": "0x00127da4",
+          "hex": "55"
+        }
+      ]
+    },
+    {
+      "name": "three_rows",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x0012583a",
+          "hex": "03"
+        },
+        {
+          "address": "0x001a5c32",
+          "hex": "01"
+        },
+        {
+          "address": "0x001a5c4d",
+          "hex": "00"
+        },
+        {
+          "address": "0x001a5c68",
+          "hex": "01"
+        }
+      ]
+    }
+  ]
+}
