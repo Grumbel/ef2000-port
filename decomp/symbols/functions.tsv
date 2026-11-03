@@ -253,7 +253,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000121cc	33			unknown	unclassified	unverified		
 0x000121f0	29			unknown	unclassified	unverified		
 0x00012210	142			unknown	unclassified	unverified		
-0x00012d90	126			unknown	unclassified	unverified		
+0x00012d90	126	dispatch_record_callback	unk_runtime	named	game	unverified		docs/compiler-abi.md; AX/DX indexed record, handler at +0xcd invoked indirectly; clobbers unresolved, do not splice automatically
 0x00012ec8	80			unknown	unclassified	unverified		
 0x00013950	55			unknown	unclassified	unverified		
 0x00014c5c	224			unknown	unclassified	unverified		
@@ -3554,7 +3554,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ee22c	3350			unknown	unclassified	unverified		
 0x000ee3ce	82			unknown	unclassified	unverified		
 0x000ee420	28			unknown	unclassified	unverified		
-0x000ee43c	78			unknown	unclassified	unverified		
+0x000ee43c	78	segmented_callback_bridge	unk_runtime	named	asm	unverified		docs/compiler-abi.md; manual DS/ES/SS copy and indirect callback, AL/AH live; do not splice automatically
 0x000ee589	31	caseD_0		named	unclassified	unverified		
 0x000eed92	21	caseD_40		named	unclassified	unverified		
 0x000ef41f	38			unknown	unclassified	unverified		
@@ -3669,7 +3669,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f5484	531			unknown	unclassified	unverified		
 0x000f57d4	78			unknown	unclassified	unverified		
 0x000f5e6c	61			unknown	unclassified	unverified		
-0x000f6124	38			unknown	unclassified	unverified		
+0x000f6124	38	format_global_option_line	unk_parser	named	game	unverified		docs/compiler-abi.md; zero caller arguments, indirect format call [0x132a74], EDX saved; clobbers unresolved
 0x000f7518	98			unknown	unclassified	unverified		
 0x000f75e0	119			unknown	unclassified	unverified		
 0x000f79b0	62			unknown	unclassified	unverified		
@@ -4247,7 +4247,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011f6d8	279			unknown	unclassified	unverified		
 0x0011f7ef	10			unknown	unclassified	unverified		
 0x0011fd90	1703			unknown	unclassified	unverified		
-0x00120451	52			unknown	unclassified	unverified		
+0x00120451	52	dos_int21_vector_bridge	unk_runtime	named	asm	unverified		docs/compiler-abi.md; AH=0x25/0x35 INT 21h, returns ES selector in DX and original EAX; interrupt clobbers unresolved
 0x00120485	49			unknown	unclassified	unverified		
 0x001204b6	21			unknown	unclassified	unverified		
 0x001204dc	132	format_nonfinite_double	unk_runtime	typed	unclassified	confirmed		ABI only; two stack dwords of FP bits plus dest pointer, EAX Boolean, ret 12

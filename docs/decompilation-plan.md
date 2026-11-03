@@ -327,7 +327,7 @@ disassembled successfully by `wdis` (2026-11-03). The emitted `__CHK` call
 is a compiler runtime dependency to address under §3.5; it does not invalidate
 the toolchain smoke check.
 
-### 3.5 [~] Determine the ABI conventions and canonical compiler flags
+### 3.5 [x] Determine the ABI conventions and canonical compiler flags
 
 Binaries do not need to match (§2.2), so this step is about **ABI and data
 layout**, not code generation. Do it before writing real game code.
@@ -375,7 +375,15 @@ or partial ABIs: indirect callback/formatted-output clobbers (`0x12d90`,
 `0x120451`). Resolve them before full native replacement or explicitly
 isolate them as assembly/platform shims.
 
-### 3.6 [ ] Library identification
+ABI sampling closed for this phase: **all 40 sampled functions were
+reviewed**; 35 have imported custom-storage signatures and five have
+bounded exception reports instead of a guessed ABI. Their explicit
+indirect/segment dependencies make them ineligible for automatic C
+replacement until platform shims or runtime evidence resolve the missing
+contracts. This completes the representative ABI survey, not the
+function-by-function ABI validation required by §1(4).
+
+### 3.6 [~] Library identification
 
 1. Build OW 1.9 and OW 2.0 `clib3r`/`clib3s`/`math387r` libraries' function
    bytes into signature files (first N bytes with relocations masked, plus
@@ -394,6 +402,15 @@ isolate them as assembly/platform shims.
 
 Expected outcome: 15–30 % of functions labeled as library code before any
 game code is written.
+
+In progress 2026-11-03: `tools/flirt_match.py` reads extracted OMF objects,
+tracks LEDATA/FIXUPP relocations and emits masked code-prefix fingerprints.
+It matches only inventoried function entry addresses and writes a review-only
+JSON proposal, never editing the canonical tracker. Three synthetic OMF
+unit tests cover 32-bit relocation masking, validation and the CLI; the
+workflows and limitations are in `docs/library-identification.md`. Actual
+OW 1.9/2.0 library extraction, empirical matches and independent 10.x
+verification remain to be done. No library classifications are claimed yet.
 
 ### 3.7 [ ] OMF splicer (`tools/omf_splice.py`)
 
@@ -805,6 +822,8 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.5   Confirmed five nonstandard stack/register ABIs: LZ/RA decompressors, ret 12 nonfinite formatter, ret 16 projection adapter and its register helper (28/40 samples).
 2026-11-03  3.5   Confirmed five remaining long/mixed ABIs: x87 ret 8 overlap, indexed global projection, callback-backed projection query, global-node initialization and command dispatch (33/40 samples; seven reviewed exceptions remain).
 2026-11-03  3.5   Added 80-bit ST0 storage to the Ghidra symbol importer; confirmed ret 8 stack-double/ST0 return at 0xf8250 and ES:[EDI] non-popping ST0 store at 0x120a52 (35/40 samples; five indirect/segment exceptions).
+2026-11-03  3.5   Representative ABI audit closed at 35 confirmed and five explicitly bounded, ineligible-for-automatic-splice callback/segment exceptions (40/40 reviewed).
+2026-11-03  3.6   Began library identification: relocation-masked OMF public-function fingerprint tool and proposal-only matcher, with three synthetic tests; real Watcom library evidence pending.
 ```
 
 ---
