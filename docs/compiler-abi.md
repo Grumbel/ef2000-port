@@ -1846,3 +1846,43 @@ in EAX, format string address, one value).
 | `0xc3f50` | EAX:uint32_t,EDX:uint32_t | AL:uint8_t | afbc@b0b2,afbc@b0c1,afbc@b0d4 | Byte at dword 0x15b754 + EAX + dword 0x163200[EDX]. |
 | `0xc4389` | none | none | c5261@c5283 | Run 0xe3c20. |
 | `0xca9fc` | EAX:int32_t,EDX:int32_t | EAX:int32_t | b0554@b0564,b8510@b8534,caa28@caace | EAX / 40 + 10 * (EDX / 40), signed. |
+
+## code_predicates (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcbef4` | AL:uint8_t | AL:uint8_t | cabb0@cabd0 | AL if it is 1..4, else 0. |
+| `0xcbf00` | none | none | b0f5c@b1684,b1b10@b1b84 | Release dword 0x1379c8 through 0xcc768 when set, then clear it. |
+| `0xcc164` | AL:uint8_t,DL:uint8_t,EBX:ef_addr32 | none | c0b04@c0eac,c0b04@c0ee1,cb6fc@cb7c2 | In list EBX node number AL, set byte [dword +0xc + DL] * to 0x9c and byte [dword +0x10 + DL] to 0x7f. |
+| `0xcc188` | AL:uint8_t,DL:uint8_t,EBX:ef_addr32 | none | c0b04@c0d0a,c0b04@c0d1d,c0b04@c0d52 | As 0xcc164 with the value 0x64. |
+| `0xcc26c` | AL:uint8_t,EDX:ef_addr32 | EAX:ef_addr32 | b059c@b05c3,bed1c@bed3a | Node in the list at *EDX whose byte +0xb equals AL. |
+| `0xcc5fc` | AL:uint8_t | EAX:uint32_t | d68c@df63,d68c@e0a8,d68c@e1b3 | AL is 0x10..0x15. |
+| `0xcc628` | AL:uint8_t | EAX:uint32_t | d68c@df8c,d68c@e0d4,d68c@e1df | AL is 0x18, 0x19, 0x1a, 0x1b, 0x1d or 0x1e. |
+| `0xcc654` | AL:uint8_t | EAX:uint32_t | d68c@dfb5,d68c@e100,d68c@e20a | AL is 0x18 or 0x1c..0x1f. |
+| `0xcc67c` | AL:uint8_t | EAX:uint32_t | d68c@dfe0,d68c@e12c,d68c@e236 | AL is 0x20 or 0x21. |
+| `0xcc694` | AL:uint8_t | EAX:uint32_t | d68c@e00b,d68c@e157,d68c@e25f | AL is 0x23 or 0x24. |
+| `0xcc6ac` | AL:uint8_t | EAX:uint32_t | d68c@e035,d68c@e288,9a8b4@9a97d | AL is 0x22. |
+| `0xcc7e8` | AL:uint8_t,DL:uint8_t | EAX:uint32_t | bdeec@be17c,cc90c@cca5f,ccdbc@cce56 | DL in {0x16, 0x17, 0x0e, 0x11, 0x13} and AL is 2. |
+| `0xcc81c` | AL:uint8_t,DL:uint8_t | EAX:uint32_t | f918@f946,f918@f9a7,b31f0@b321a | DL is 8 or 0x1a and AL is 2. |
+| `0xcd24c` | none | AX:uint16_t | 1df90@1e04d,56084@5614a,69374@69437 | Word at +2 of the structure at dword 0x15b628. |
+| `0xcd258` | none | AX:uint16_t | 1e28c@1e33d,1e3c4@1e43b,5674c@56797 | Word table 0x41f700 indexed by the signed high word of * the cursor's dword +2. |
+| `0xcd270` | none | EAX:int32_t | d0470@d0671 | Dword table 0x41f700 selects a signed high word; the * result is twice that plus dword 0x41f704. |
+| `0xcd390` | none | EAX:uint32_t | 1e214@1e27a,d0470@d0768 | Advance dword 0x15b628 by twice its signed word at +0; * return whether the word at the new position is nonzero. |
+| `0xcd6fc` | none | none | e4188@e422a | When byte 0x15b734 is set clear it and run 0x9c3cf(0xcd6cc); * dword 0x15b730 = 0. |
+| `0xcdf48` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 11e7c@11f78,11e7c@12059,1e7c0@1e8e4 | Dwords 0x17cf9c..a8 = EAX, EDX, EBX, ECX. |
+| `0xcdc38` | none | none | cdc64@cdc67,d1e50@d1ea8 | Run 0xc37ec, then release dword 0x15b758 as 0xc3a48 does. |
+| `0xce824` | EAX:ef_addr32,EDX:uint32_t | none | ce830@ce8c6,ce830@ce8dc,ce830@ce8f8 | Append EDX to the counted array at EAX (count dword at +0). |
+| `0xcff64` | EAX:ef_addr32 | EAX:int32_t | cff80@cffc4,cff80@cffce,cff80@d0057 | 0xb3830(signed word +0, high words of +2 and +6), as signed 16. |
+| `0xd13dc` | EAX:ef_addr32 | EAX:uint32_t | 31b40@31ccb,31d7c@31e17,53c80@53e1f | 0xb3b1c(dword +8, dword +0x20). |
+| `0xd13ac` | EAX:ef_addr32 | EAX:int32_t | 31b40@31cbe,31d7c@31e0a,53c80@53e0f | -0xb3b1c(-dword +0x14, low word of 0xe2b60(dword+8 squared + dword+0x20 squared)). |
+| `0xd13ec` | EAX:ef_addr32 | EAX:int32_t | 31b40@31c78,31b40@31cfc,53c80@53e2f | -0xb3b1c(dword +0xc, (dword+0 * dword+0x20 - dword+8 * dword+0x18) >> 15). |
+| `0xd17bc` | none | none | d1c54@d1c92 | 0xa7990(dword 0x420944), callee pops 4. |
+| `0xd1f5c` | none | none | none direct | Copy dwords 0x15b88c..98 to 0x15b87c..88. |
+| `0xd2110` | EAX:ef_addr32 | none | d23d8@d2437,d299c@d2a3f | 0xfc8cc(dword [p], p+4) for p = dword +0x4c; set bit 0 of byte +0x2c. |
+| `0xd5fa8` | EAX:uint32_t,EDX:uint32_t | none | 98198@981d0 | When byte 0x15b968 is set call cdecl 0x103778(dword 0x420a64, EAX, EDX). |
+| `0xd6410` | EAX:ef_addr32 | EAX:uint32_t | d6478@d64e0,d6478@d6532 | Sum of the first three bytes. |
+| `0xd6d5c` | EAX:ef_addr32 | AL:uint8_t | 1c780@1cb3a,3d37c@3d43b | When bit 1 of byte 0x15bac0 is set store dword 0x420da0 at EAX; return whether it was. |
+| `0xd6f90` | EAX:ef_addr32 | none | 80058@800fa,80374@803bb,81230@812b3 | For each pointer in the array at EAX whose string is nonempty run 0xd6fa8. |
+| `0xd7594` | AL:uint8_t | AL:uint8_t | 77c90@77dbe,801e4@80248,80314@8032e | With byte 0x15bac4 set, 0x1028f4(dword 0x420dd0[AL]) equals 2. |
+| `0xd75fc` | AL:uint8_t | AL:uint8_t | 47fbc@47fc3,77c90@77ddb,81308@81318 | As 0xd7594, comparing with 4. |
+| `0xd7724` | EAX:ef_addr32,DX:uint16_t | EAX:int32_t | 7ef14@7f33d | Word +0x11 += DX; return the signed high word of dword +0xf. |

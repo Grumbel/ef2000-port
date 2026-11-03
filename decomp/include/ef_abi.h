@@ -811,4 +811,50 @@ uint32_t guest_fn_becc0(ef_addr32 record); /* 0xbecc0 EAX -> AX */
 void guest_fn_c3f80(uint32_t buffer); /* 0xc3f80 EAX */
 void guest_fn_e3c20(void); /* 0xe3c20 */
 
+/* code_predicates.c */
+uint8_t code_if_one_to_four(uint8_t code);
+void release_pointer_1379c8(void);
+void mark_list_entry_9c(uint8_t node_index, uint8_t slot, ef_addr32 head);
+void mark_list_entry_64(uint8_t node_index, uint8_t slot, ef_addr32 head);
+ef_addr32 find_node_by_byte_b(uint8_t key, ef_addr32 head);
+uint32_t code_is_10_to_15(uint8_t code);
+uint32_t code_is_18_to_1b_1d_1e(uint8_t code);
+uint32_t code_is_18_or_1c_to_1f(uint8_t code);
+uint32_t code_is_20_or_21(uint8_t code);
+uint32_t code_is_23_or_24(uint8_t code);
+uint32_t code_is_22(uint8_t code);
+uint32_t pair_matches_cc7e8(uint8_t value, uint8_t kind);
+uint32_t pair_matches_cc81c(uint8_t value, uint8_t kind);
+uint16_t cursor_word_at_2(void);
+uint16_t cursor_table_word(void);
+int32_t cursor_table_address(void);
+uint32_t advance_cursor(void);
+void reset_handler_cd6fc(void);
+void store_four_dwords_17cf9c(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+void release_buffer_cdc38(void);
+void counted_array_append(ef_addr32 array, uint32_t value);
+int32_t forward_triple_cff64(ef_addr32 record);
+uint32_t forward_pair_d13dc(ef_addr32 record);
+int32_t angle_d13ac(ef_addr32 record);
+int32_t angle_d13ec(ef_addr32 record);
+void call_a7990_420944(void);
+void copy_four_dwords_15b87c(void);
+void forward_record_d2110(ef_addr32 record);
+void call_103778_if_enabled(uint32_t first, uint32_t second);
+uint32_t sum_three_bytes(ef_addr32 bytes);
+uint8_t store_handle_if_enabled(ef_addr32 destination);
+void process_string_list(ef_addr32 list);
+uint8_t device_state_is_2(uint8_t index);
+uint8_t device_state_is_4(uint8_t index);
+int32_t add_to_word_11(ef_addr32 record, uint16_t delta);
+void guest_fn_9c3cf(uint32_t handler); /* 0x9c3cf EAX */
+void guest_fn_c37ec(void); /* 0xc37ec */
+uint32_t guest_fn_b3830(int32_t a, int32_t b, int32_t c); /* 0xb3830 EAX/EDX/EBX -> AX */
+uint32_t guest_fn_b3b1c(uint32_t a, uint32_t b); /* 0xb3b1c EAX/EDX -> EAX */
+void guest_fn_a7990(uint32_t value); /* 0xa7990 stack, callee cleanup */
+void guest_fn_fc8cc(uint32_t first, uint32_t second); /* 0xfc8cc stack, callee cleanup */
+void guest_fn_103778(uint32_t a, uint32_t b, uint32_t c); /* 0x103778 cdecl */
+void guest_fn_d6fa8(uint32_t text); /* 0xd6fa8 EAX */
+uint32_t guest_fn_1028f4(uint32_t handle); /* 0x1028f4 cdecl -> EAX */
+
 #endif
