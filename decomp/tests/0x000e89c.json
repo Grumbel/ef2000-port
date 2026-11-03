@@ -1,0 +1,19 @@
+{
+  "address": "0x0000e89c",
+  "function_size": 190,
+  "max_instructions": 180000,
+  "cases": [
+    {"name": "quoted_token_with_spaces", "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "20202268656c6c6f20776f726c6422206e65787400"}
+    ]},
+    {"name": "comma_terminates_token", "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "46495253542c5345434f4e4400"}
+    ]},
+    {"name": "empty_token", "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "00"}
+    ]}
+  ]
+}

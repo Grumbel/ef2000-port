@@ -1,0 +1,13 @@
+{
+  "address": "0x0000e9bc",
+  "function_size": 79,
+  "max_instructions": 180000,
+  "cases": [
+    {"name": "first_enum_entry_matches", "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "414c50484100"},
+      {"address": "0x00132f5c", "hex": "00001c00"},
+      {"address": "0x001c0000", "hex": "414c50484100"}
+    ]}
+  ]
+}

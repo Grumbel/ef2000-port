@@ -1,0 +1,12 @@
+{
+  "address": "0x0000e7dc",
+  "function_size": 51,
+  "max_instructions": 180000,
+  "cases": [
+    {"name": "initialize_nonzero_byte", "memory": [
+      {"address": "0x00180c08", "hex": "7e"},
+      {"address": "0x00121ea8", "hex": "2a00"},
+      {"address": "0x00121eac", "hex": "12345678"}
+    ]}
+  ]
+}

@@ -199,3 +199,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0008b650	select_validated_ui_record	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx	0	Original 0x8b650 (50 bytes); callback candidate read, conversion, validation; callers 8b7e8@8b860/8bad4@8bb04; docs/compiler-abi.md
 0x0008be3c	update_object_remove_link	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx	0	Original 0x8be3c (23 bytes); call 8f3f4 then 90880 with original args; callers 87a20@87d02/88134@881a4; docs/compiler-abi.md
 0x00092254	prepare_navigation_component	EAX:ef_addr32,EDX:ef_addr32		ebx	0	Original 0x92254 (59 bytes); nonzero gates, callback then NOT words and subtract 400; callers 9457c@945be/94954@94a07; docs/compiler-abi.md
+0x0000e710	release_parser_buffers			ebx,ecx,edx	0	Original 0xe710 (51 bytes); root +0a free then root free; callers 4bf8@4bf9/4e14@4e34; docs/compiler-abi.md
+0x0000e7dc	initialize_parser_records			ecx,edx	0	Original 0xe7dc (51 bytes); initialize buffer byte and counters; callers f6a8@f739/fecc@ff2c; docs/compiler-abi.md
+0x0000e89c	read_parser_token		EAX:uint32_t	ebx,edx,esi	0	Original 0xe89c (190 bytes); 80-byte tokenizer and low16 cursor; callers e95c@e95c/e980@e980; docs/compiler-abi.md
+0x0000e980	read_parser_decimal		EAX:uint32_t	ebx,ecx,edx	0	Original 0xe980 (15 bytes), tail 0xcc76d; callers ed80@eda3/ee5c@ee73; docs/compiler-abi.md
+0x0000e95c	read_parser_integer		EAX:int32_t	ebx,ecx,edx	0	Original 0xe95c (35 bytes), tail 0x9d4cd; callers ed80@edd8/ee0c@ee49; docs/compiler-abi.md
+0x0000e990	duplicate_parser_token		EAX:ef_addr32	ebx,edx	0	Original 0xe990 (41 bytes); indirect allocator and guest copy; callers eefc@ef15/f260@f282; docs/compiler-abi.md
+0x0000e9bc	read_parser_enum		EAX:uint32_t	ebx,ecx,edx	0	Original 0xe9bc (79 bytes); 11-slot linear match plus indirect reporter; callers f260@f272/f604@f627; docs/compiler-abi.md
+0x0000ee5c	read_parser_six_field_record	EAX:ef_addr32	EAX:uint32_t	edx	0	Original 0xee5c (65 bytes); 3 dwords and 3 low words, returns 1; callers f260@f2ba/f314@f509; docs/compiler-abi.md

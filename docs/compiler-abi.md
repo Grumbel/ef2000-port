@@ -1350,6 +1350,38 @@ previous `0x84370` dispatcher, giving a recoverable two-function UI state
 path. Host behavior is tested, but the indirect guest callbacks and their
 clobbers still require differential replay.
 
+## Command-file parser, token lifetime and packed records (2026-11-03)
+
+Eight original helper bodies in the `0xe710..0xee9c` region were checked
+against two independent direct callers each. These are ABI-reviewed host
+**drafts**, not equivalent Watcom objects or guest-verified splices.
+
+| Entry | Interface / return | Independent caller instructions | Side effects and boundaries |
+| --- | --- | --- | --- |
+| `0xe710` | no register inputs or consumed return | `0x4bf9` (`0x4bf8`), `0x4e34` (`0x4e14`) | if `0x1379c4` is nonzero, release optional pointer at `root+0x0a` first, then *re-read* and release the root; zero global |
+| `0xe7dc` | no input; return ignored | `0xf739` (`0xf6a8`), `0xff2c` (`0xfecc`) | clear dwords at `0x121eb4`, `0x121eb0`, `0x121eac`; copy byte `0x180c08` to `0x1976b0` and `0x197abe`; clear cursor word `0x121ea8` |
+| `0xe89c` | no input, EAX token length | `0xe95c` (`0xe95c`), `0xe980` (`0xe980`) | skip spaces/tabs, optional double quotes, stop at whitespace/comma/NUL or closing quote; write at most 80 bytes, then NUL, and write 16-bit cursor |
+| `0xe980` | no input, EAX conversion result | `0xeda3` (`0xed80`), `0xee73` (`0xee5c`) | tokenize, tail jump to `0xcc76d` numeric decoder with guest token address in EAX |
+| `0xe95c` | no input, signed EAX or `-1` | `0xedd8` (`0xed80`), `0xee49` (`0xee0c`) | tokenize, check byte length at `0x197abe`, return `-1` for empty token or tail jump to `0x9d4cd` signed numeric decoder |
+| `0xe990` | no input, EAX allocated guest pointer | `0xef15` (`0xeefc`), `0xf282` (`0xf260`) | tokenize, indirect allocation via `[0x121ebc]` of token length plus NUL, copy via `0x9d749` |
+| `0xe9bc` | no input, EAX 0..10 (0 on failure) | `0xf272` (`0xf260`), `0xf627` (`0xf604`) | compare token to eleven guest pointers starting at `0x132f5c`; on failure call indirect reporter `[0x132a74]` with format `0x180c48`, token, and `0x121eac` context |
+| `0xee5c` | EAX destination; returns EAX=1 | `0xf2ba` (`0xf260`), `0xf509` (`0xf314`) | three `0xe980` dword numeric conversions, three `0xe95c` word conversions at destination `+0x0c/+0x0e/+0x10` |
+
+The original token scanner indexes source with `movsx` of the 16-bit
+cursor; after 80 copied bytes it leaves the cursor in the middle of an
+unconsumed token. The repeated empty token on comma is an original behavior,
+not an invented delimiter skip. The apparent decimal and signed integer
+decoders at `0xcc76d` and `0x9d4cd` have matching observed ASCII-decimal
+instruction patterns, but both remain separate original guest dependencies
+until their full contracts are independently audited. The record decoder
+depends directly on the new numeric-token wrappers, so the host test covers
+their composition as well as individual error and boundary paths.
+
+Live original guest tests, OMF compilation, callback clobber verification,
+and whole-game replay remain outstanding. In particular, the indirect
+allocator and error reporter are modeled with host stubs; the fixture for
+the former supplies a synthetic guest allocator return.
+
 ## Comparing assembly
 
 ```sh

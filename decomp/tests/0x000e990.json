@@ -1,0 +1,13 @@
+{
+  "address": "0x0000e990",
+  "function_size": 41,
+  "max_instructions": 180000,
+  "cases": [
+    {"name": "copy_named_text_with_stub_allocator", "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "6e616d656400"},
+      {"address": "0x00121ebc", "hex": "00002a00"},
+      {"address": "0x002a0000", "hex": "b800002b00c3"}
+    ]}
+  ]
+}

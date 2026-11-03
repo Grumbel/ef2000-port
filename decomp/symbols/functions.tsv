@@ -179,17 +179,17 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000d628	99			unknown	unclassified	unverified		
 0x0000d68c	3585			unknown	unclassified	unverified		
 0x0000e490	625			unknown	unclassified	unverified		
-0x0000e710	51			unknown	unclassified	unverified		
+0x0000e710	51	release_parser_buffers	parser_records	drafted	game	confirmed	decomp/tests/0x000e710.json	Original 0xe710; zero guard, child at +0a then current root released; docs/compiler-abi.md; guest replay pending
 0x0000e744	31			unknown	unclassified	unverified		
 0x0000e764	15			unknown	unclassified	unverified		
 0x0000e774	104			unknown	unclassified	unverified		
-0x0000e7dc	51			unknown	unclassified	unverified		
+0x0000e7dc	51	initialize_parser_records	parser_records	drafted	game	confirmed	decomp/tests/0x000e7dc.json	Original 0xe7dc; copy default byte then clear stream counters and index; docs/compiler-abi.md; guest replay pending
 0x0000e810	138			unknown	unclassified	unverified		
-0x0000e89c	190			unknown	unclassified	unverified		
-0x0000e95c	35			unknown	unclassified	unverified		
-0x0000e980	15			unknown	unclassified	unverified		
-0x0000e990	41			unknown	unclassified	unverified		
-0x0000e9bc	79			unknown	unclassified	unverified		
+0x0000e89c	190	read_parser_token	parser_records	drafted	game	confirmed	decomp/tests/0x000e89c.json	Original 0xe89c; quoted/unquoted tokenizer, 80-byte cap and signed-16 index; docs/compiler-abi.md; guest replay pending
+0x0000e95c	35	read_parser_integer	parser_records	drafted	game	confirmed	decomp/tests/0x000e95c.json	Original 0xe95c; empty -1 or tail integer conversion; docs/compiler-abi.md; guest replay pending
+0x0000e980	15	read_parser_decimal	parser_records	drafted	game	confirmed	decomp/tests/0x000e980.json	Original 0xe980; token then conversion tail jump; docs/compiler-abi.md; guest replay pending
+0x0000e990	41	duplicate_parser_token	parser_records	drafted	game	confirmed	decomp/tests/0x000e990.json	Original 0xe990; strlen plus one, indirect guest allocation, guest string copy; docs/compiler-abi.md; guest replay pending
+0x0000e9bc	79	read_parser_enum	parser_records	drafted	game	confirmed	decomp/tests/0x000e9bc.json	Original 0xe9bc; 11-name match and indirect error callback; docs/compiler-abi.md; guest replay pending
 0x0000ea0c	234			unknown	unclassified	unverified		
 0x0000eaf8	79			unknown	unclassified	unverified		
 0x0000eb48	82			unknown	unclassified	unverified		
@@ -201,7 +201,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000ed30	79			unknown	unclassified	unverified		
 0x0000ed80	137			unknown	unclassified	unverified		
 0x0000ee0c	77			unknown	unclassified	unverified		
-0x0000ee5c	65			unknown	unclassified	unverified		
+0x0000ee5c	65	read_parser_six_field_record	parser_records	drafted	game	confirmed	decomp/tests/0x000ee5c.json	Original 0xee5c; three dword values followed by three truncated words; docs/compiler-abi.md; guest replay pending
 0x0000eea0	92			unknown	unclassified	unverified		
 0x0000eefc	94			unknown	unclassified	unverified		
 0x0000ef5c	58			unknown	unclassified	unverified		

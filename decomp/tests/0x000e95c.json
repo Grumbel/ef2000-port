@@ -1,0 +1,15 @@
+{
+  "address": "0x0000e95c",
+  "function_size": 35,
+  "max_instructions": 180000,
+  "cases": [
+    {"name": "missing_value", "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "00"}
+    ]},
+    {"name": "signed_value", "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "2d32353500"}
+    ]}
+  ]
+}

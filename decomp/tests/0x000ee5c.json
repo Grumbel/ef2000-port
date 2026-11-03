@@ -1,0 +1,12 @@
+{
+  "address": "0x0000ee5c",
+  "function_size": 65,
+  "max_instructions": 180000,
+  "cases": [
+    {"name": "six_unsigned_and_signed_fields", "registers": {"eax": "0x002a0000"}, "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "3132202d3420362037202d3820363535333500"},
+      {"address": "0x002a0000", "hex": "000000000000000000000000000000000000"}
+    ]}
+  ]
+}

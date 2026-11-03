@@ -130,6 +130,26 @@ void prepare_navigation_component(ef_addr32 object, ef_addr32 predicate); /* 0x9
 void guest_prepare_navigation_component(ef_addr32 buffer, ef_addr32 predicate,
                                        ef_addr32 object); /* 0xdc91c EAX/EDX/EBX */
 
+/* Command-file parser and six-field record decoder; source is the game's
+ * global 0x1976b0 buffer, token scratch is 0x197abe (both guest RAM). */
+void release_parser_buffers(void); /* 0xe710 */
+void initialize_parser_records(void); /* 0xe7dc */
+uint32_t read_parser_token(void); /* 0xe89c -> EAX length */
+uint32_t read_parser_decimal(void); /* 0xe980 -> EAX guest conversion result */
+int32_t read_parser_integer(void); /* 0xe95c -> EAX or -1 for empty */
+ef_addr32 duplicate_parser_token(void); /* 0xe990 -> EAX allocated text */
+uint32_t read_parser_enum(void); /* 0xe9bc -> EAX enum index */
+uint32_t read_parser_six_field_record(ef_addr32 destination); /* 0xee5c EAX -> EAX=1 */
+
+/* Unrecovered original conversion/allocation/diagnostic interfaces. */
+void guest_release_parser_buffer(ef_addr32 buffer); /* 0xcc768 EAX */
+uint32_t guest_convert_parser_decimal(ef_addr32 text); /* 0xcc76d EAX */
+int32_t guest_convert_parser_integer(ef_addr32 text); /* 0x9d4cd EAX */
+ef_addr32 guest_allocate_parser_text(uint32_t bytes, ef_addr32 source); /* [0x121ebc] */
+int32_t guest_compare_parser_token(ef_addr32 token, ef_addr32 candidate); /* 0xa4380 */
+void guest_report_parser_enum_error(ef_addr32 format, ef_addr32 token,
+                                    uint32_t context); /* [0x132a74], cdecl */
+
 /* Short clock, tactical state and coordinate helpers (host drafts). */
 uint8_t reference_clock_reaches(ef_addr32 guest_clock); /* 0x40820 EAX -> AL */
 uint32_t command_code_is_group_1b(uint8_t code); /* 0x41da4 AL -> EAX */

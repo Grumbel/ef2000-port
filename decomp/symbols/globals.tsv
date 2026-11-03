@@ -188,3 +188,13 @@ addr	size	type	name	evidence	notes
 0x0012b4a6	2	uint16_t	g_ui_component_enabled	0x84525 writes	Set to one on initialization
 0x001fcc43	1	uint8_t	g_ui_component_latch	0x84538 writes	Cleared after 12-byte copy
 0x0012d7b3	1	uint8_t	g_ui_active_record_scan_latch	0x89938 writes	Cleared during object recompute
+0x00121ea8	2	uint16_t	g_parser_cursor	0xe89f reads 0xe94f writes	Signed-16-index token scanner cursor
+0x00121eac	4	uint32_t	g_parser_error_context	0xe7f3 clears 0xe9eb reads	Third argument of enum parse error
+0x00121eb0	4	uint32_t	g_parser_input_length	0xe7ed clears	Token stream cache limit
+0x00121eb4	4	uint32_t	g_parser_input_offset	0xe7e7 clears	Token stream cache cursor
+0x00121ebc	4	guest_function_ptr	g_parser_text_allocator	0xe9a7 indirect call	Allocates strlen plus one for parser token
+0x00132f5c	44	ef_addr32[11]	g_parser_enum_names	0xe9cd reads	Eleven candidate text pointers
+0x001379c4	4	ef_addr32	g_parser_active_buffer	0xe713 reads 0xe739 clears	Optional owned parser buffer with +0a child
+0x001976b0	variable	char[]	g_parser_input_text	0xe8ab reads	Command input buffer including whitespace and quote bytes
+0x00197abe	81	char[81]	g_parser_token_text	0xe8f2 writes	Eighty payload bytes plus trailing NUL
+0x00180c08	1	uint8_t	g_parser_initializer_byte	0xe7de reads	Initialization byte for input and token buffers

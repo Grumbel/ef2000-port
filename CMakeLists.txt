@@ -196,6 +196,13 @@ target_compile_options(ef2000-decomp-ui-secondary-test PRIVATE -Wall -Wextra -We
 target_compile_definitions(ef2000-decomp-ui-secondary-test PRIVATE EF_DECOMP_HOST_TEST=1)
 target_include_directories(ef2000-decomp-ui-secondary-test PRIVATE decomp/include)
 add_test(NAME decomp-ui-secondary-host-model COMMAND ef2000-decomp-ui-secondary-test)
+add_executable(ef2000-decomp-parser-records-test
+  tests/decomp_parser_records_test.c decomp/src/parser_records.c)
+target_compile_features(ef2000-decomp-parser-records-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-parser-records-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-parser-records-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-parser-records-test PRIVATE decomp/include)
+add_test(NAME decomp-parser-records-host-model COMMAND ef2000-decomp-parser-records-test)
 
 # Development-only harness objects consumed by run_startup.py --runtime-objects.
 # The proprietary game payload is linked by the runner, never by this project.

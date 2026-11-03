@@ -1,0 +1,11 @@
+{
+  "address": "0x0000e980",
+  "function_size": 15,
+  "max_instructions": 180000,
+  "cases": [
+    {"name": "signed_decimal", "memory": [
+      {"address": "0x00121ea8", "hex": "0000"},
+      {"address": "0x001976b0", "hex": "2d333100"}
+    ]}
+  ]
+}
