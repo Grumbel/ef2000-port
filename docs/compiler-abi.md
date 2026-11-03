@@ -1615,3 +1615,45 @@ in EAX, format string address, one value).
 | `0x97f70` | none | EAX:uint32_t | 3ea0c@3ed91,3ea0c@3ed9f | 0x9c858 result or 0x18acb0 |
 | `0x98000` | none | none | 8b39c@8b4bf | if byte 0x420a72 tail 0xd5f0c(dword 0x12dd98) |
 | `0x98558` | none | none | 49228@494ef | dword 0x12dd9c=0x9850c, 0x408580=0x1f4000 |
+
+## low_helpers (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf60` | EAX:int32_t | EAX:int32_t | 1ef8@1f58,1f64@1f87,1f64@20a0 | zero divisor returns 0 else low-word random (0x9c960) modulo divisor |
+| `0x3cd4` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | 2e04@304c,2e04@30d9,2e04@31a3 | signed maximum of three |
+| `0x6bf4` | none | none | 5f60@5fb0,5fd8@6003 | clear words 0x197244/46/48 and bytes 0x197254, 0x121e4f |
+| `0x73d4` | EDX:ef_addr32 | AL:uint8_t | 759c@7753 | !(double record+0x71 > double 0x1803c4) |
+| `0x1064c` | none | none | 52f38@52f94 | 0x10640 then dword 0x197c10 = dword 0x197c14 |
+| `0x10688` | none | EAX:uint32_t | 53270@5327c | 0x10640; return 0x197c14 - 0x197c10 and latch |
+| `0x11d20` | AX:int16_t,DL:uint8_t | none | 12210@12259,12210@12297 | byte 0x121fb4+29*AX = DL then 0x11e7c |
+| `0x12140` | none | none | 11d44@11dd1 | 0x11e7c for 0..53 |
+| `0x14d3c` | AX:int16_t | AL:uint8_t | 589c0@58c62 | byte 0x1225d4+19*AX |
+| `0x151a0` | none | none | 58d64@58d69 | bytes 0x12289e=1 0x12289f=0 0x1228a0=0 and 0x197c50=byte 0x181730 |
+| `0x17388` | AX:int16_t | EAX:uint32_t | 16588@167ed | 0x8ffe8 lookup; or 3 into +0x30; tail 0x3739c(high word +0x36) |
+| `0x173a4` | EAX:int32_t | none | 168d8@1696a | row[0x8e]=row[0x8f]-1 with 32-bit row index |
+| `0x27538` | EAX:uint32_t,EDX:uint32_t | none | 275a4@275c9 | dword 0x19b430=EDX 0x19b434=EAX |
+| `0x28a70` | AX:int16_t | AL:uint8_t | 28ed8@28f8a | filtered lookup; dword +0x1c nonzero |
+| `0x28a8c` | AX:int16_t | AL:uint8_t | 291fc@292e2,291fc@29347 | 0x8ffe8 lookup; dword +0x1c nonzero |
+| `0x2a4a0` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | AL:uint8_t | 2a4c8@2a57a | signed range check against 0x1a5bec and 0x1a5be8 |
+| `0x2a794` | none | none | db21c@db27b | clear dwords 0x19bb38/3c/40 |
+| `0x32b3c` | none | EAX:uint32_t | none direct | tail 0x32c04 with EAX=0x182ad8 |
+| `0x32b48` | none | EAX:uint32_t | none direct | tail 0x32c04 with EAX=0x182adc |
+| `0x32b54` | none | EAX:uint32_t | none direct | tail 0x32c04 with EAX=0x182ae0 |
+| `0x32b60` | none | EAX:uint32_t | none direct | tail 0x32c04 with EAX=0x182ae4 |
+| `0x32b6c` | none | EAX:uint32_t | none direct | tail 0x32c04 with EAX=0x182ae8 |
+| `0x32b9c` | none | EAX:uint32_t | 95e58@95ff3 | tail 0x32c04 with EAX=0x182af8 |
+| `0x32ba8` | none | EAX:uint32_t | 4d668@4d6e7 | tail 0x32c04 with EAX=0x182afc |
+| `0x33750` | none | none | none direct | tail 0xa41c8 when byte 0x1357c8 nonzero |
+| `0x3918c` | none | none | 3ea0c@3ee50 | dword 0x1a1780=0x53ecc and byte 0x1a363a=0 |
+| `0x3bd28` | AX:int16_t | AL:uint8_t | 3a3a8@3b443 | 0 when row byte +0x1a in 0x0a..0x0c else 1 |
+| `0x3c434` | none | EAX:uint32_t | 7ab00@7abbf | tail 0xe2af4(dword 0x1a2e78) |
+| `0x3c768` | AX:int16_t | none | 3cb2c@3cbf8 | copy byte +0 and word +2 of 0x3c730 entry into record 0x1264c8 at +0x0b/+0x2a |
+| `0x3cd24` | none | EAX:uint32_t | 7ab00@7ac44 | 0x3ccec object then 0x3cc94 and 0xe2af4 |
+| `0x3cd40` | none | EAX:uint32_t | ad440@ad475 | 0x3ccec object then 0x3cb2c, 0xe2af4; returns dword 0x1a2e98 |
+| `0x3ce04` | none | none | 3cfc0@3d2f0 | 258 dwords at 0x1a3150.. random(0x1ff)-0x100 |
+| `0x3dcb0` | none | none | 3dd30@3e015 | 0x394e0, 0x8846c, tail 0x888cc |
+| `0x410d0` | none | none | 43020@430ef | 0x53270, byte 0x125847=0, 0x8bd58(0x1a58b4,0x1a5a1c), 0x49228 |
+| `0x41df4` | AL:uint8_t | EAX:uint32_t | 9a998@9aa20 | AL is 0x0b or 0x0c |
+| `0x41e0c` | AL:uint8_t | EAX:uint32_t | 41b98@41c78 | AL is 0x26 or 0x27 |
+| `0x41e84` | AL:uint8_t | EAX:uint32_t | 9a998@9aa5c | AL is 0, 0x16 or 2 |

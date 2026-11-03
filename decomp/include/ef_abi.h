@@ -505,4 +505,60 @@ void guest_tick_sample(void); /* 0x10640 */
 uint32_t guest_current_pointer(void); /* 0x9c858 -> EAX */
 void guest_forward_value(uint32_t value); /* 0xd5f0c EAX */
 
+int32_t random_modulo(int32_t divisor); /* 0xf60 EAX -> EAX */
+int32_t max3_signed(int32_t a, int32_t b, int32_t c); /* 0x3cd4 EAX/EDX/EBX */
+void clear_command_state_6bf4(void); /* 0x6bf4 */
+uint8_t record_value_not_above_limit(ef_addr32 record); /* 0x73d4 EDX -> AL */
+void latch_tick_counter(void); /* 0x1064c */
+uint32_t elapsed_ticks(void); /* 0x10688 -> EAX */
+void set_runtime_slot_flag(int16_t index, uint8_t value); /* 0x11d20 AX/DL */
+void refresh_all_runtime_slots(void); /* 0x12140 */
+uint8_t read_event_slot_byte(int16_t index); /* 0x14d3c AX -> AL */
+void reset_dialog_latches(void); /* 0x151a0 */
+uint32_t flag_object_and_forward(int16_t index); /* 0x17388 AX */
+void decrement_grid_row_link_wide(int32_t cell); /* 0x173a4 EAX */
+void store_dword_pair_19b430(uint32_t first, uint32_t second); /* 0x27538 EAX/EDX */
+uint8_t filtered_object_has_link(int16_t index); /* 0x28a70 AX -> AL */
+uint8_t object_has_link(int16_t index); /* 0x28a8c AX -> AL */
+uint8_t point_range_contains_limits(int32_t low_x, int32_t low_y, int32_t high_x, int32_t high_y); /* 0x2a4a0 EAX/EDX/EBX/ECX */
+void clear_dwords_19bb38(void); /* 0x2a794 */
+uint32_t call_32c04_182ad8(void); /* 0x32b3c */
+uint32_t call_32c04_182adc(void); /* 0x32b48 */
+uint32_t call_32c04_182ae0(void); /* 0x32b54 */
+uint32_t call_32c04_182ae4(void); /* 0x32b60 */
+uint32_t call_32c04_182ae8(void); /* 0x32b6c */
+uint32_t call_32c04_182af8(void); /* 0x32b9c */
+uint32_t call_32c04_182afc(void); /* 0x32ba8 */
+void forward_if_flag_1357c8(void); /* 0x33750 */
+void install_callback_53ecc(void); /* 0x3918c */
+uint8_t grid_row_state_allowed(int16_t cell); /* 0x3bd28 AX -> AL */
+uint32_t forward_value_1a2e78(void); /* 0x3c434 */
+void copy_table_entry_to_record(int16_t index); /* 0x3c768 AX */
+uint32_t activate_object_3cc94(void); /* 0x3cd24 */
+uint32_t activate_object_3cb2c(void); /* 0x3cd40 */
+void fill_random_offsets(void); /* 0x3ce04 */
+void run_reset_sequence_3dcb0(void); /* 0x3dcb0 */
+void reset_world_state_410d0(void); /* 0x410d0 */
+uint32_t code_is_0b_or_0c(uint8_t code); /* 0x41df4 AL -> EAX */
+uint32_t code_is_26_or_27(uint8_t code); /* 0x41e0c AL -> EAX */
+uint32_t code_is_0_16_or_2(uint8_t code); /* 0x41e84 AL -> EAX */
+/* Guest dependencies for low_helpers.c. */
+uint32_t guest_random_word(void); /* 0x9c960 -> EAX */
+ef_addr32 guest_lookup_object_8ffe8(int32_t index); /* 0x8ffe8 EAX -> EAX */
+uint32_t guest_forward_high_word(int32_t value); /* 0x3739c EAX tail */
+uint32_t guest_fn_32c04(uint32_t table); /* 0x32c04 EAX tail */
+void guest_fn_a41c8(void); /* 0xa41c8 */
+uint32_t guest_fn_e2af4(uint32_t value); /* 0xe2af4 EAX */
+ef_addr32 guest_table_entry_3c730(ef_addr32 table, int32_t index); /* 0x3c730 EAX/EDX -> EAX */
+uint32_t guest_fn_3ccec(void); /* 0x3ccec -> EAX */
+void guest_fn_3cc94(void); /* 0x3cc94 */
+void guest_fn_3cb2c(void); /* 0x3cb2c */
+uint32_t guest_fn_e2fdb(void); /* 0xe2fdb -> EAX */
+void guest_fn_394e0(void); /* 0x394e0 */
+void guest_fn_8846c(void); /* 0x8846c */
+void guest_fn_888cc(void); /* 0x888cc tail */
+void guest_fn_53270(void); /* 0x53270 */
+void guest_fn_8bd58(ef_addr32 first, ef_addr32 second); /* 0x8bd58 EAX/EDX */
+void guest_fn_49228(void); /* 0x49228 */
+
 #endif
