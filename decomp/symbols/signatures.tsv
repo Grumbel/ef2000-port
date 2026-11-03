@@ -1069,3 +1069,25 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000982a0	select_handlers_982a0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000982a0 (50 bytes); ; callers 8b39c@8b4b5; docs/compiler-abi.md
 0x000984f0	alloc_zeroed_984f0	EAX:uint32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000984f0 (25 bytes); Allocate size bytes and clear them.; callers 6df0@6e03,7780@7794,2aef8@2af0b; docs/compiler-abi.md
 0x0009bb64	shift_tables_9bb64	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009bb64 (64 bytes); Shift the three 20-entry word tables of a record down by one.; callers 9b8a0@9b8c0,9b8a0@9b8e0,9b8a0@9b900; docs/compiler-abi.md
+0x00007dec	apply_slot_7dec	AX:int16_t,DL:uint8_t,BL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00007dec (85 bytes); ; callers 2c778@2cae2,70a58@70b7e; docs/compiler-abi.md
+0x0000825c	find_free_slot_825c	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000825c (92 bytes); Find the first free slot of table al (0xfe if all are used, 0xff if none usable).; callers 84b8@8546,8fe4@8ff6,2ab54@2acfb; docs/compiler-abi.md
+0x00008f4c	update_table_slots_8f4c	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00008f4c (77 bytes); ; callers c630@c6f9,54210@5426a,7e8c0@7ebb6; docs/compiler-abi.md
+0x00008f9c	run_unit_slots_8f9c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00008f9c (69 bytes); Run 46254 for each of the seven word slots of a unit.; callers 90c0@90fa; docs/compiler-abi.md
+0x0000ab2c	random_clamped_ab2c	AX:int16_t,DX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000ab2c (72 bytes); Random value in [a - b, a + b], clamped to 10..0x186.; callers ab74@acf2,ab74@ad08,ab74@add0; docs/compiler-abi.md
+0x00011770	find_entry_11770	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00011770 (100 bytes); Is there an entry with these three words and kind 1?; callers 494c@4990; docs/compiler-abi.md
+0x00017538	take_charge_17538	AX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00017538 (95 bytes); Take one charge from the first of the ten word slots that has one.; callers 15b7c@15ff6; docs/compiler-abi.md
+0x0001e1c0	point_in_box_1e1c0	EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001e1c0 (68 bytes); Is the point inside the 16-bit box at box?; callers 1e214@1e268; docs/compiler-abi.md
+0x0001e684	age_timers_1e684			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001e684 (107 bytes); Age the twelve timers; those in state 0xe expire back to state 2.; callers 3dd30@3dfb8; docs/compiler-abi.md
+0x0001f8c4	queue_pop_1f8c4		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001f8c4 (75 bytes); Pop the head of the queue at 0x19b0d0.; callers 1f994@1fd73; docs/compiler-abi.md
+0x000237c8	translate_and_call_237c8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000237c8 (48 bytes); Translate a vector by the origin at 0x21444c.. and pass it to b39ec.; callers 8846c@884f1; docs/compiler-abi.md
+0x000266f8	clear_part_flags_266f8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000266f8 (74 bytes); ; callers 26670@266ee; docs/compiler-abi.md
+0x0002888c	max_magnitude_2888c	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002888c (60 bytes); Largest of three magnitudes (via cf94a).; callers 288c8@28917; docs/compiler-abi.md
+0x0002b508	try_assign_2b508	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002b508 (79 bytes); ; callers 857bc@8598f,857bc@859a8; docs/compiler-abi.md
+0x0002bb64	find_linked_unit_2bb64	AX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0002bb64 (108 bytes); Find the unit linked to unit_id whose kind is 0xb, or 0xff.; callers 73964@73a44,73964@73ba6; docs/compiler-abi.md
+0x00033e78	update_buttons_33e78			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00033e78 (109 bytes); ; callers 34b2c@34b49; docs/compiler-abi.md
+0x00035fbc	set_buttons_35fbc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00035fbc (71 bytes); ; callers 36054@36076; docs/compiler-abi.md
+0x00036004	set_buttons_36004			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00036004 (77 bytes); ; callers 36438@367a1; docs/compiler-abi.md
+0x00036964	set_buttons_36964			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00036964 (71 bytes); ; callers 369fc@36a17; docs/compiler-abi.md
+0x000369ac	set_buttons_369ac			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000369ac (77 bytes); ; callers 36ad8@36ce1; docs/compiler-abi.md
+0x00038674	count_live_38674	AX:int16_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00038674 (97 bytes); Number of live, non-flagged objects in the ten word slots of entry index.; callers 15b7c@15c97,15b7c@15cc4,15b7c@15da6; docs/compiler-abi.md
+0x000386f8	node_position_386f8	AX:int16_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000386f8 (80 bytes); Position of the entry's node in its list.; callers d290@d4ca; docs/compiler-abi.md

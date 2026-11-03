@@ -2545,3 +2545,30 @@ in EAX, format string address, one value).
 | `0x982a0` | none | none | 8b39c@8b4b5 |  |
 | `0x984f0` | EAX:uint32_t | EAX:ef_addr32 | 6df0@6e03,7780@7794,2aef8@2af0b | Allocate size bytes and clear them. |
 | `0x9bb64` | EAX:ef_addr32 | none | 9b8a0@9b8c0,9b8a0@9b8e0,9b8a0@9b900 | Shift the three 20-entry word tables of a record down by one. |
+
+## game_helpers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7dec` | AX:int16_t,DL:uint8_t,BL:uint8_t | EAX:uint32_t | 2c778@2cae2,70a58@70b7e |  |
+| `0x825c` | AL:uint8_t | AL:uint8_t | 84b8@8546,8fe4@8ff6,2ab54@2acfb | Find the first free slot of table al (0xfe if all are used, 0xff if none usable). |
+| `0x8f4c` | AL:uint8_t | none | c630@c6f9,54210@5426a,7e8c0@7ebb6 |  |
+| `0x8f9c` | AX:int16_t | none | 90c0@90fa | Run 46254 for each of the seven word slots of a unit. |
+| `0xab2c` | AX:int16_t,DX:int16_t | EAX:uint32_t | ab74@acf2,ab74@ad08,ab74@add0 | Random value in [a - b, a + b], clamped to 10..0x186. |
+| `0x11770` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 494c@4990 | Is there an entry with these three words and kind 1? |
+| `0x17538` | AX:int16_t | EAX:uint32_t | 15b7c@15ff6 | Take one charge from the first of the ten word slots that has one. |
+| `0x1e1c0` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | EAX:uint32_t | 1e214@1e268 | Is the point inside the 16-bit box at box? |
+| `0x1e684` | none | none | 3dd30@3dfb8 | Age the twelve timers; those in state 0xe expire back to state 2. |
+| `0x1f8c4` | none | EAX:uint32_t | 1f994@1fd73 | Pop the head of the queue at 0x19b0d0. |
+| `0x237c8` | EAX:ef_addr32 | none | 8846c@884f1 | Translate a vector by the origin at 0x21444c.. and pass it to b39ec. |
+| `0x266f8` | EAX:ef_addr32 | none | 26670@266ee |  |
+| `0x2888c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 288c8@28917 | Largest of three magnitudes (via cf94a). |
+| `0x2b508` | AX:int16_t | AL:uint8_t | 857bc@8598f,857bc@859a8 |  |
+| `0x2bb64` | AX:int16_t | EAX:uint32_t | 73964@73a44,73964@73ba6 | Find the unit linked to unit_id whose kind is 0xb, or 0xff. |
+| `0x33e78` | none | none | 34b2c@34b49 |  |
+| `0x35fbc` | none | none | 36054@36076 |  |
+| `0x36004` | none | none | 36438@367a1 |  |
+| `0x36964` | none | none | 369fc@36a17 |  |
+| `0x369ac` | none | none | 36ad8@36ce1 |  |
+| `0x38674` | AX:int16_t | EAX:int32_t | 15b7c@15c97,15b7c@15cc4,15b7c@15da6 | Number of live, non-flagged objects in the ten word slots of entry index. |
+| `0x386f8` | AX:int16_t | EAX:uint32_t | d290@d4ca | Position of the entry's node in its list. |

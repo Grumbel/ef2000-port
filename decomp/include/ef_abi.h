@@ -1779,4 +1779,39 @@ void guest_fn_725dc(int32_t unit); /* 0x725dc EAX */
 void guest_fn_980e8(uint32_t value); /* 0x980e8 EAX */
 uint32_t guest_fn_ddbe0(void); /* 0xddbe0 -> AL */
 
+/* game_helpers7.c */
+uint32_t apply_slot_7dec(int16_t unit_id, uint8_t table, uint8_t index);
+uint8_t find_free_slot_825c(uint8_t table);
+void update_table_slots_8f4c(uint8_t table);
+void run_unit_slots_8f9c(int16_t unit_id);
+uint32_t random_clamped_ab2c(int16_t center, int16_t spread);
+uint32_t find_entry_11770(uint32_t a, uint32_t b, uint32_t c);
+uint32_t take_charge_17538(int16_t index);
+uint32_t point_in_box_1e1c0(ef_addr32 box, int32_t x, int32_t y, int32_t z);
+void age_timers_1e684(void);
+uint32_t queue_pop_1f8c4(void);
+void translate_and_call_237c8(ef_addr32 vector);
+void clear_part_flags_266f8(ef_addr32 object);
+uint32_t max_magnitude_2888c(uint32_t a, uint32_t b, uint32_t c);
+uint8_t try_assign_2b508(int16_t unit_id);
+uint32_t find_linked_unit_2bb64(int16_t unit_id);
+void update_buttons_33e78(void);
+void set_buttons_35fbc(void);
+void set_buttons_36004(void);
+void set_buttons_36964(void);
+void set_buttons_369ac(void);
+int32_t count_live_38674(int16_t index);
+uint32_t node_position_386f8(int16_t index);
+uint32_t guest_fn_7d20(ef_addr32 a, ef_addr32 b); /* 0x7d20 EAX/EDX -> AL */
+void guest_fn_8cc4(uint32_t a, uint32_t b); /* 0x8cc4 EAX/EDX */
+void guest_fn_46254(uint32_t a, int32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0x46254 EAX/EDX/EBX/ECX/stack */
+void guest_fn_b39ec(uint32_t a, uint32_t b, uint32_t c); /* 0xb39ec EAX/EDX/EBX */
+void guest_fn_26744(ef_addr32 object); /* 0x26744 EAX */
+void guest_fn_26960(ef_addr32 object); /* 0x26960 EAX */
+void guest_fn_26b60(int32_t value); /* 0x26b60 EAX */
+uint32_t guest_fn_2c454(ef_addr32 a, int32_t b, uint32_t c, uint32_t d); /* 0x2c454 EAX/EDX/EBX/ECX -> AX */
+void guest_fn_2b558(int32_t unit); /* 0x2b558 EAX */
+void guest_fn_33630(void); /* 0x33630 */
+void guest_fn_a520c(ef_addr32 button, int32_t value, uint32_t mode, uint32_t flag); /* 0xa520c EAX/EDX/EBX/ECX */
+
 #endif
