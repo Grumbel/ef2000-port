@@ -1560,3 +1560,18 @@ only, unverified at the guest/Watcom level.
 | `0x576a4`, `0x576d4`, `0x57704` | EAX record | if signed word `+1` < 4, increment byte at `0x19b960`/`0x19b96c`/`0x19b966` plus that index; there is no lower bound (**ORIGINAL BUG** kept) |
 | `0x58d04` | none | words `0x1a6ce2=4`, `0x1a6ce8=5` |
 | `0x58d44` | none | words `0x1a6ce2=8`, `0x1a6ce8=10` |
+
+## Runtime word, record lookup and counter helpers (2026-11-03)
+
+Eight more original functions; host drafts only, unverified at the guest/Watcom level.
+
+| Entry | Inputs | Observed effect |
+| --- | --- | --- |
+| `0x6454c` | none | call `0xd0b68`, then `0xd0ebc` on object `0x1a7c30` with zero-extended word `0x127d3e` (only direct caller is the function at `0x624f4`) |
+| `0x64524` | none | same, with the word negated modulo 16 bits |
+| `0x68bf4` | none | words `0x1f6f38`, `0x1f6f42` from `0xde864` on `0x186268`, `0x186270` |
+| `0x69080` | none | word `0x1282dc` from low word of `0x9ddfc(0x186278)` |
+| `0x6a0f8` | AL | tail call `0x9ddfc` with dword at `0x128564 + 0xe5*AL` |
+| `0x6b420` | AL | AL = 1 iff byte `0x128568 + 0xe5*AL` is 4 (2, 3 and the rest return 0) |
+| `0x77afc` | none | `0xa45b3` returns AX; EAX = dword `0x12a760[AX/0x230]` |
+| `0x7772c` | none | words `0x1f891e=0xffff`, `0x1f891c=0` |

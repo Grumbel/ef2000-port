@@ -443,4 +443,18 @@ void bump_counter_19b966(ef_addr32 record); /* 0x57704 EAX */
 void set_mode_limits_4_5(void); /* 0x58d04 */
 void set_mode_limits_8_10(void); /* 0x58d44 */
 
+void apply_runtime_word_forward(void); /* 0x6454c */
+void apply_runtime_word_negated(void); /* 0x64524 */
+void load_halfword_pair(void); /* 0x68bf4 */
+void load_word_0x1282dc(void); /* 0x69080 */
+uint32_t lookup_record_value(uint8_t index); /* 0x6a0f8 AL -> EAX */
+uint8_t record_mode_is_four(uint8_t index); /* 0x6b420 AL -> AL */
+uint32_t lookup_table_by_quotient(void); /* 0x77afc -> EAX */
+void reset_pair_counter(void); /* 0x7772c */
+void guest_runtime_acquire(ef_addr32 object); /* 0xd0b68 EAX */
+void guest_runtime_set(ef_addr32 object, uint32_t value); /* 0xd0ebc EAX/EDX */
+uint16_t guest_load_halfword(ef_addr32 source); /* 0xde864 EAX -> AX */
+uint32_t guest_lookup_value(ef_addr32 source); /* 0x9ddfc EAX -> EAX */
+uint16_t guest_read_selector_word(void); /* 0xa45b3 -> AX */
+
 #endif

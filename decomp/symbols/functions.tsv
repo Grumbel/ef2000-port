@@ -1191,8 +1191,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00063d5c	820			unknown	unclassified	unverified		
 0x000640b8	388			unknown	unclassified	unverified		
 0x00064498	140			unknown	unclassified	unverified		
-0x00064524	38			unknown	unclassified	unverified		
-0x0006454c	32			unknown	unclassified	unverified		
+0x00064524	38	apply_runtime_word_negated	marker_packets	drafted	game	confirmed	decomp/tests/0x00064524.json	docs/compiler-abi.md; Acquire 0x1a7c30 via 0xd0b68, set via 0xd0ebc with 16-bit negation of word 0x127d3e; sole direct caller 646d4@64d7b; guest pending
+0x0006454c	32	apply_runtime_word_forward	marker_packets	drafted	game	confirmed	decomp/tests/0x0006454c.json	docs/compiler-abi.md; Acquire 0x1a7c30, set via 0xd0ebc with word 0x127d3e; sole direct caller 624f4@624f4; guest pending
 0x0006456c	171			unknown	unclassified	unverified		
 0x00064618	171			unknown	unclassified	unverified		
 0x000646d4	2254			unknown	unclassified	unverified		
@@ -1229,7 +1229,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00068a28	1			unknown	unclassified	unverified		
 0x00068a2c	52			unknown	unclassified	unverified		
 0x00068a60	401			unknown	unclassified	unverified		
-0x00068bf4	33			unknown	unclassified	unverified		
+0x00068bf4	33	load_halfword_pair	marker_packets	drafted	game	confirmed	decomp/tests/0x00068bf4.json	docs/compiler-abi.md; Words 0x1f6f38/0x1f6f42 from 0xde864 on 0x186268/0x186270; sole direct caller 69fac@69fd9; guest pending
 0x00068c18	124	clear_paired_object_marks	scene_indexed	drafted	game	confirmed	decomp/tests/0x00068c18.json	docs/compiler-abi.md
 0x00068ccc	439	test_indexed_object_bit	unk_geometry	typed	game	confirmed		ABI only; AX signed slot, DX 0..12 bit, AL 0xff/0; CS jump table
 0x00068e84	120			unknown	unclassified	unverified		
@@ -1240,7 +1240,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00068fbc	36	gpwUseDefaults		named	unclassified	unverified		
 0x00068fe0	43	gpwPlaceMissile		named	unclassified	unverified		
 0x0006900c	115			unknown	unclassified	unverified		
-0x00069080	17			unknown	unclassified	unverified		
+0x00069080	17	load_word_0x1282dc	marker_packets	drafted	game	confirmed	decomp/tests/0x00069080.json	docs/compiler-abi.md; Word 0x1282dc from low word of 0x9ddfc(0x186278); sole direct caller 69fac@69fd4; guest pending
 0x00069094	645			unknown	unclassified	unverified		
 0x0006931c	26	gpwSetClearMissile		named	unclassified	unverified		
 0x00069338	26	gpwSetClearAllMissiles		named	unclassified	unverified		
@@ -1261,7 +1261,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00069f1c	141	gpwRedrawPlaneWindow		named	unclassified	unverified		
 0x00069fac	227			unknown	unclassified	unverified		
 0x0006a090	90			unknown	unclassified	unverified		
-0x0006a0f8	22			unknown	unclassified	unverified		
+0x0006a0f8	22	lookup_record_value	marker_packets	drafted	game	confirmed	decomp/tests/0x0006a0f8.json	docs/compiler-abi.md; Tail call 0x9ddfc with dword at 0x128564+0xe5*AL; sole direct caller 8c49c@8c54c; guest pending
 0x0006a148	100			unknown	unclassified	unverified		
 0x0006a1b4	26	lookup_indexed_object	indexed_objects	drafted	game	confirmed	decomp/tests/0x0006a1b4.json	docs/compiler-abi.md; C draft and host-model test; waiting for Watcom compile, splice and guest differential
 0x0006a1d0	388	transition_indexed_object_state	unk_geometry	typed	game	confirmed		ABI only; signed AX object index, DL requested state; void memory side effects
@@ -1285,7 +1285,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006aeb4	1165			unknown	unclassified	unverified		
 0x0006b344	137			unknown	unclassified	unverified		
 0x0006b3d0	79	object_kind_is_eligible	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b3d0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
-0x0006b420	35			unknown	unclassified	unverified		
+0x0006b420	35	record_mode_is_four	marker_packets	drafted	game	confirmed	decomp/tests/0x0006b420.json	docs/compiler-abi.md; AL=1 iff byte 0x128568+0xe5*AL equals 4; sole direct caller 6d948@6dae4,6d948@6dbf1,6d948@6de22; guest pending
 0x0006b444	104			unknown	unclassified	unverified		
 0x0006b4ac	159	object_type_limit	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b4ac.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0006b54c	61	lower_object_limit	object_geometry	drafted	game	confirmed	decomp/tests/0x0006b54c.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
@@ -1405,13 +1405,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000772d0	610			unknown	unclassified	unverified		
 0x00077534	187			unknown	unclassified	unverified		
 0x000775f0	315			unknown	unclassified	unverified		
-0x0007772c	26			unknown	unclassified	unverified		
+0x0007772c	26	reset_pair_counter	marker_packets	drafted	game	confirmed	decomp/tests/0x0007772c.json	docs/compiler-abi.md; Words 0x1f891e=0xffff and 0x1f891c=0; sole direct caller 49228@49248; guest pending
 0x00077748	18			unknown	unclassified	unverified		
 0x0007775c	152			unknown	unclassified	unverified		
 0x000777f4	339			unknown	unclassified	unverified		
 0x00077950	41			unknown	unclassified	unverified		
 0x000779f4	264			unknown	unclassified	unverified		
-0x00077afc	36			unknown	unclassified	unverified		
+0x00077afc	36	lookup_table_by_quotient	marker_packets	drafted	game	confirmed	decomp/tests/0x00077afc.json	docs/compiler-abi.md; EAX = dword table 0x12a760[0xa45b3() word / 0x230]; sole direct caller 779f4@77a35; guest pending
 0x00077b20	36			unknown	unclassified	unverified		
 0x00077b44	36			unknown	unclassified	unverified		
 0x00077b68	36			unknown	unclassified	unverified		

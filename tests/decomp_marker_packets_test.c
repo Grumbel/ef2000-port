@@ -10,7 +10,7 @@
 uint8_t g_world_grid_marker;
 ef_addr32 g_world_grid_base;
 
-static uint8_t mem[0x1b0000];
+static uint8_t mem[0x200000];
 static struct { uint8_t bytes[8]; uint32_t size; } seen[16];
 static unsigned count;
 
@@ -53,6 +53,15 @@ uint32_t guest_query_scene_pair(uint8_t selector, int32_t high)
     return query_result;
 }
 void guest_notify_scene_pair(void) { ++notified; }
+
+static unsigned acquired;
+static uint32_t set_object, set_value, lookup_arg;
+void guest_runtime_acquire(ef_addr32 object) { ++acquired; set_object = object; }
+void guest_runtime_set(ef_addr32 object, uint32_t value) { assert(object == set_object); set_value = value; }
+uint16_t guest_load_halfword(ef_addr32 source) { return (uint16_t)(source & 0xffffu); }
+uint32_t guest_lookup_value(ef_addr32 source) { lookup_arg = source; return source ^ 0x55u; }
+static uint16_t selector_word;
+uint16_t guest_read_selector_word(void) { return selector_word; }
 
 int main(void)
 {
@@ -184,5 +193,35 @@ int main(void)
     assert(mem[0x1a6ce2] == 4 && mem[0x1a6ce3] == 0 && mem[0x1a6ce8] == 5);
     set_mode_limits_8_10();
     assert(mem[0x1a6ce2] == 8 && mem[0x1a6ce8] == 10);
+
+    /* fourth batch */
+    mem[0x127d3e] = 0x34; mem[0x127d3f] = 0x12;
+    apply_runtime_word_forward();
+    assert(acquired == 1 && set_object == 0x1a7c30 && set_value == 0x1234);
+    apply_runtime_word_negated();
+    assert(acquired == 2 && set_value == 0xedcc);
+    mem[0x127d3e] = 0; mem[0x127d3f] = 0;
+    apply_runtime_word_negated();
+    assert(set_value == 0);
+    load_halfword_pair();
+    assert(mem[0x1f6f38] == 0x68 && mem[0x1f6f39] == 0x62 && mem[0x1f6f42] == 0x70);
+    load_word_0x1282dc();
+    assert(mem[0x1282dc] == (uint8_t)(0x186278 ^ 0x55) && mem[0x1282dd] == 0x62);
+    mem[0x128564 + 2 * 0xe5] = 0x10; mem[0x128564 + 2 * 0xe5 + 1] = 0x20;
+    assert(lookup_record_value(2) == (0x2010u ^ 0x55u) && lookup_arg == 0x2010);
+    mem[0x128568] = 4; assert(record_mode_is_four(0) == 1);
+    for (unsigned m = 0; m < 256; ++m) {
+        mem[0x128568 + 0xe5] = (uint8_t)m;
+        assert(record_mode_is_four(1) == (m == 4));
+    }
+    selector_word = 0x230 * 3 + 5;
+    mem[0x12a760 + 12] = 0xaa; mem[0x12a760 + 13] = 0xbb;
+    assert(lookup_table_by_quotient() == 0xbbaau);
+    selector_word = 0xffff;
+    (void)0;
+    mem[0x12a760 + (0xffff / 0x230) * 4] = 0x42;
+    assert(lookup_table_by_quotient() == 0x42);
+    reset_pair_counter();
+    assert(mem[0x1f891e] == 0xff && mem[0x1f891f] == 0xff && mem[0x1f891c] == 0);
     return 0;
 }

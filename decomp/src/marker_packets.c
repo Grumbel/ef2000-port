@@ -268,3 +268,83 @@ void set_mode_limits_8_10(void)
     *(uint16_t *)ef_guest_memory_ptr(0x001a6ce2u) = 8;
     *(uint16_t *)ef_guest_memory_ptr(0x001a6ce8u) = 10;
 }
+
+static uint16_t read_word(ef_addr32 address)
+{
+    const uint8_t *p = (const uint8_t *)ef_guest_memory_ptr(address);
+    return (uint16_t)(p[0] | (uint16_t)(p[1] << 8));
+}
+
+static uint32_t read_dword(ef_addr32 address)
+{
+    return (uint32_t)read_word(address) | (uint32_t)read_word(address + 2u) << 16;
+}
+
+static void write_word(ef_addr32 address, uint16_t value)
+{
+    uint8_t *p = (uint8_t *)ef_guest_memory_ptr(address);
+    p[0] = (uint8_t)value;
+    p[1] = (uint8_t)(value >> 8);
+}
+
+/* 0x6454c, 32 bytes. Acquire object 0x1a7c30 then set it to word 0x127d3e.
+ * Its only direct caller is the function entered at 0x624f4. */
+void apply_runtime_word_forward(void)
+{
+    guest_runtime_acquire(0x001a7c30u);
+    guest_runtime_set(0x001a7c30u, read_word(0x00127d3eu));
+}
+
+/* 0x64524, 38 bytes. As 0x6454c, but with the 16-bit negation of the word. */
+void apply_runtime_word_negated(void)
+{
+    guest_runtime_acquire(0x001a7c30u);
+    guest_runtime_set(0x001a7c30u, (uint16_t)(0u - read_word(0x00127d3eu)));
+}
+
+/* 0x68bf4, 33 bytes. Load two halfwords from guest routine 0xde864. */
+void load_halfword_pair(void)
+{
+    write_word(0x001f6f38u, guest_load_halfword(0x00186268u));
+    write_word(0x001f6f42u, guest_load_halfword(0x00186270u));
+}
+
+/* 0x69080, 17 bytes. Store the low word returned by 0x9ddfc(0x186278). */
+void load_word_0x1282dc(void)
+{
+    write_word(0x001282dcu, (uint16_t)guest_lookup_value(0x00186278u));
+}
+
+/* 0x6a0f8, 22 bytes. Tail-call 0x9ddfc with the dword at +0 of the
+ * 0xe5-byte record selected by AL, rooted at 0x128564. */
+uint32_t lookup_record_value(uint8_t index)
+{
+    return guest_lookup_value(read_dword(0x00128564u + (uint32_t)index * 0xe5u));
+}
+
+/* 0x6b420, 35 bytes. True only for mode code 4 (codes 2 and 3 fall
+ * through the same false path as the original). */
+uint8_t record_mode_is_four(uint8_t index)
+{
+    uint8_t mode = *(const uint8_t *)ef_guest_memory_ptr(0x00128568u + (uint32_t)index * 0xe5u);
+    if (mode < 2)
+        return 0;
+    if (mode <= 3)
+        return 0;
+    return mode == 4;
+}
+
+/* 0x77afc, 36 bytes. AX from 0xa45b3, unsigned divided by 0x230, selects
+ * a dword in the table at 0x12a760. */
+uint32_t lookup_table_by_quotient(void)
+{
+    uint32_t value = guest_read_selector_word();
+    return read_dword(0x0012a760u + (value / 0x230u) * 4u);
+}
+
+/* 0x7772c, 26 bytes. Set word 0x1f891e to 0xffff and word 0x1f891c to 0. */
+void reset_pair_counter(void)
+{
+    write_word(0x001f891eu, 0xffffu);
+    write_word(0x001f891cu, 0);
+}

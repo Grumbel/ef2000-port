@@ -257,3 +257,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00057704	bump_counter_19b966	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x57704 (16 bytes); Same on base 0x19b966; caller 581b0@585d7; docs/compiler-abi.md
 0x00058d04	set_mode_limits_4_5			ebx,ecx,edx,esi,edi,ebp	0	Original 0x58d04 (29 bytes); Words 0x1a6ce2=4 and 0x1a6ce8=5; caller 597d8@5986c,597d8@598b5; docs/compiler-abi.md
 0x00058d44	set_mode_limits_8_10			ebx,ecx,edx,esi,edi,ebp	0	Original 0x58d44 (29 bytes); Words 0x1a6ce2=8 and 0x1a6ce8=10; caller 597d8@59895; docs/compiler-abi.md
+0x00064524	apply_runtime_word_negated			ebx,ecx,edx,esi,edi,ebp	0	Original 0x64524 (38 bytes); Acquire 0x1a7c30 via 0xd0b68, set via 0xd0ebc with 16-bit negation of word 0x127d3e; caller 646d4@64d7b; docs/compiler-abi.md
+0x0006454c	apply_runtime_word_forward			ebx,ecx,edx,esi,edi,ebp	0	Original 0x6454c (32 bytes); Acquire 0x1a7c30, set via 0xd0ebc with word 0x127d3e; caller 624f4@624f4; docs/compiler-abi.md
+0x00068bf4	load_halfword_pair			ebx,ecx,edx,esi,edi,ebp	0	Original 0x68bf4 (33 bytes); Words 0x1f6f38/0x1f6f42 from 0xde864 on 0x186268/0x186270; caller 69fac@69fd9; docs/compiler-abi.md
+0x00069080	load_word_0x1282dc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x69080 (17 bytes); Word 0x1282dc from low word of 0x9ddfc(0x186278); caller 69fac@69fd4; docs/compiler-abi.md
+0x0006a0f8	lookup_record_value	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x6a0f8 (22 bytes); Tail call 0x9ddfc with dword at 0x128564+0xe5*AL; caller 8c49c@8c54c; docs/compiler-abi.md
+0x0006b420	record_mode_is_four	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x6b420 (35 bytes); AL=1 iff byte 0x128568+0xe5*AL equals 4; caller 6d948@6dae4,6d948@6dbf1,6d948@6de22; docs/compiler-abi.md
+0x00077afc	lookup_table_by_quotient		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x77afc (36 bytes); EAX = dword table 0x12a760[0xa45b3() word / 0x230]; caller 779f4@77a35; docs/compiler-abi.md
+0x0007772c	reset_pair_counter			ebx,ecx,edx,esi,edi,ebp	0	Original 0x7772c (26 bytes); Words 0x1f891e=0xffff and 0x1f891c=0; caller 49228@49248; docs/compiler-abi.md

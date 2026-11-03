@@ -1025,6 +1025,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  13    Drafted eight marker-packet and grid-row helpers (210 total): one- and two-byte packets 1d/1e/1f/26/1b with grid marker, a four-byte AX/DL packet 24, a record-to-latch commit and a conditional marker store into the 0xca-byte grid row. One direct caller each; host test passes; guest differential and replay unavailable.
 2026-11-03  14    Drafted eight more packet and scene-latch helpers (218 total): packets 4f/42/2a/30, activity-record flag clear, two latch words, marker-matched forwarding and a scene-pair notify. One direct caller each; host test passes; guest verification unavailable.
 2026-11-03  15    Drafted ten more packet, counter and mode-limit helpers (228 total): packets 3e/3b/3d/40/2e, three upper-bounded byte counters (no lower bound kept) and two limit setters. Host test passes; guest verification unavailable.
+2026-11-03  16    Drafted eight runtime-word and record-lookup helpers (236 total): paired acquire/set on object 0x1a7c30, halfword loads, 0xe5-byte record lookup and mode test, quotient table lookup and a pair reset. Host test passes; guest verification unavailable.
 ```
 
 ---
