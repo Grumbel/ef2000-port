@@ -29,7 +29,8 @@ Contents so far:
   module, recovery state). Maintain with `tools/decomp_status.py`
   (`summary`, `next`, `check`, `seed`).
 - `symbols/globals.tsv`: named global data with evidence.
-- `symbols/signatures.tsv`: confirmed calling conventions (empty so far).
+- `symbols/signatures.tsv`: calling conventions confirmed from original code
+  and at least two distinct callers (which does not imply C verification).
 
 These files hold facts about the original program, never its code bytes.
 

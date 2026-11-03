@@ -426,6 +426,17 @@
           ${watcom}/bin/wdis work/hiscore.obj -l=work/hiscore.asm
           grep -qi 'hiscore_qualifies' work/hiscore.asm
           ! grep -qi '__CHK' work/hiscore.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/spatial.c --output "$PWD/work/spatial.obj"
+          ${watcom}/bin/wdis work/spatial.obj -l=work/spatial.asm
+          grep -qi 'reset_spatial_slot_count' work/spatial.asm
+          grep -qi 'append_spatial_slot' work/spatial.asm
+          ! grep -qi '__CHK' work/spatial.asm
+          ${watcomWorkflow}/bin/ef2000-wcc \
+            ${source}/decomp/src/indexed_objects.c --output "$PWD/work/indexed_objects.obj"
+          ${watcom}/bin/wdis work/indexed_objects.obj -l=work/indexed_objects.asm
+          grep -qi 'lookup_indexed_object' work/indexed_objects.asm
+          ! grep -qi '__CHK' work/indexed_objects.asm
           cp work/fixture.asm "$out"
         '';
         highscores-reconstruction = pkgs.runCommand "ef2000-highscores-check" {

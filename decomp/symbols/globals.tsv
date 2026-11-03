@@ -10,3 +10,8 @@ addr	size	type	name	evidence	notes
 0x00132a65	2	uint16_t	_Envseg	receives GS at entry	docs/startup-symbols.md
 0x001970a0	4	int32_t	g_hiscore_current	0x432c 0x433c	current signed score
 0x001970a4	250	struct hiscore_entry[10]	g_hiscore_table	0x4050 0x41fc 0x42a4 0x433c	packed 25-byte records; docs/highscores-reconstruction.md
+0x0019b2e0	116	struct spatial_slot[29]	g_spatial_slots	0x263ec stores AX and DX	4-byte record; word offsets 0 and 2, slots 0..28
+0x0019b358	29	uint8_t[29]	g_spatial_slot_tags	0x263ec stores BL	last tag at 0x19b374, directly before count high word
+0x0019b376	2	int16_t	g_spatial_slot_count	0x263e0 store; 0x263ec read/increment	provisional semantic name; signed upper word of dword at 0x19b374
+0x0020f550	4 * count	uint32_t[]	g_indexed_object_table	0x6a1c3 indexed read	32-bit guest pointer entries; bounds stored at 0x2119f4
+0x002119f4	2	int16_t	g_indexed_object_count	0x6a1b4 signed comparison	signed bound for the pointer table at 0x20f550

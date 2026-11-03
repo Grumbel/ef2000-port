@@ -1,0 +1,14 @@
+{
+  "address": "0x000263e0",
+  "function_size": 12,
+  "max_instructions": 128,
+  "cases": [
+    {"name": "already_zero", "memory": [{"address": "0x19b374", "hex": "34120000"}]},
+    {"name": "one", "memory": [{"address": "0x19b374", "hex": "78560100"}]},
+    {"name": "large_positive", "memory": [{"address": "0x19b374", "hex": "feff7f7f"}]},
+    {"name": "upper_sign_bit", "registers": {"edx": "0xdeadbeef"},
+     "memory": [{"address": "0x19b374", "hex": "cdab0080"}]},
+    {"name": "all_ones", "registers": {"eax": "0x80000001", "edx": "0xa5a5a5a5"},
+     "memory": [{"address": "0x19b374", "hex": "ffffffff"}]}
+  ]
+}

@@ -4,6 +4,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00023800	check_current_object_relation		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x23800..0x2389f; callers 0x25a97/0x25e8e test AL; docs/compiler-abi.md
 0x000238a0	sync_current_object_slot			ebx,ecx,edx,esi,edi,ebp	0	0x238a0..0x238be; callers 0x25aa0/0x26000 ignore return; docs/compiler-abi.md
 0x000263e0	reset_spatial_slot_count			eax,ebx,ecx,edx,esi,edi,ebp	0	0x263e0..0x263eb; callers 0x1f624/0x3ab19; docs/compiler-abi.md
+0x000263ec	append_spatial_slot	AX:int16_t,DX:int16_t,BL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x263ec..0x26422; callers 0x1f6ef/0x2ef50/0x2f0fa/0x3ac33; EDX clobbered on append; docs/compiler-abi.md
 0x0006a1b4	lookup_indexed_object	AX:int16_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	0x6a1b4..0x6a1cd; callers 0x24087/0x247af consume EAX; docs/compiler-abi.md
 0x0006a354	set_indexed_object_activation	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x6a354..0x6a375; callers 0x2ba3f/0x473cc ignore EAX; docs/compiler-abi.md
 0x0006a394	set_indexed_object_state	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x6a394..0x6a3cc; callers 0x2b995/0x46fc1 ignore EAX; docs/compiler-abi.md

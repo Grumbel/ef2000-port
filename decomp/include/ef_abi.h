@@ -13,4 +13,13 @@
 /* 0x000432c: no arguments, only AL observed as output (two callers). */
 uint8_t hiscore_qualifies(void);
 
+/* 0x000263e0: no arguments or register return; preserves all GPRs. */
+void reset_spatial_slot_count(void);
+
+/* 0x000263ec: inputs AX/DX/BL; no observed register return. */
+void append_spatial_slot(int16_t x, int16_t y, uint8_t tag);
+
+/* 0x0006a1b4: input AX (signed), output full EAX guest address. */
+ef_addr32 lookup_indexed_object(int16_t index);
+
 #endif

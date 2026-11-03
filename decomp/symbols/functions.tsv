@@ -383,8 +383,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00025c98	1156			unknown	unclassified	unverified		
 0x0002611c	512			unknown	unclassified	unverified		
 0x0002631c	182			unknown	unclassified	unverified		
-0x000263e0	12	reset_spatial_slot_count	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; clears high word at 0x19b376 without register inputs/outputs
-0x000263ec	55			unknown	unclassified	unverified		
+0x000263e0	12	reset_spatial_slot_count	spatial	drafted	game	confirmed	decomp/tests/0x000263e0.json	docs/compiler-abi.md; C draft and host-model test; waiting for Watcom compile, splice and guest differential
+0x000263ec	55	append_spatial_slot	spatial	drafted	game	confirmed	decomp/tests/0x000263ec.json	Original body and four direct callers audited; 29-entry C model and host test; awaiting Watcom guest differential
 0x00026424	586			unknown	unclassified	unverified		
 0x00026670	133			unknown	unclassified	unverified		
 0x000266f8	74			unknown	unclassified	unverified		
@@ -1263,7 +1263,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a090	90			unknown	unclassified	unverified		
 0x0006a0f8	22			unknown	unclassified	unverified		
 0x0006a148	100			unknown	unclassified	unverified		
-0x0006a1b4	26	lookup_indexed_object	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; signed AX index; 32-bit table lookup at 0x20f550
+0x0006a1b4	26	lookup_indexed_object	indexed_objects	drafted	game	confirmed	decomp/tests/0x0006a1b4.json	docs/compiler-abi.md; C draft and host-model test; waiting for Watcom compile, splice and guest differential
 0x0006a1d0	388	transition_indexed_object_state	unk_geometry	typed	game	confirmed		ABI only; signed AX object index, DL requested state; void memory side effects
 0x0006a354	34	set_indexed_object_activation	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index; optional byte updates at +0x141/+0x142
 0x0006a378	27			unknown	unclassified	unverified		

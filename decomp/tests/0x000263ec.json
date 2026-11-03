@@ -1,0 +1,32 @@
+{
+  "address": "0x000263ec",
+  "function_size": 55,
+  "max_instructions": 128,
+  "cases": [
+    {"name": "first_with_signed_coordinates_and_tag", "registers": {
+       "eax": "0x1234fffe", "edx": "0x12348000", "ebx": "0xfeedbeef"},
+     "memory": [{"address": "0x19b2e0", "hex": "aaaaaaaa"},
+                {"address": "0x19b358", "hex": "5a"},
+                {"address": "0x19b376", "hex": "0000"}]},
+    {"name": "second_stride", "registers": {
+       "eax": "0xffff0034", "edx": "0xabcdfff0", "ebx": "0x99887712"},
+     "memory": [{"address": "0x19b2e4", "hex": "ffffffff"},
+                {"address": "0x19b359", "hex": "00"},
+                {"address": "0x19b376", "hex": "0100"}]},
+    {"name": "last_slot_28_overlaps_count_low_word", "registers": {
+       "eax": "0x00007fff", "edx": "0xffff8000", "ebx": "0x999999a5"},
+     "memory": [{"address": "0x19b350", "hex": "cccccccc"},
+                {"address": "0x19b374", "hex": "5a7a"},
+                {"address": "0x19b376", "hex": "1c00"}]},
+    {"name": "full_29_no_write", "registers": {
+       "eax": "0x00000123", "edx": "0x00000456", "ebx": "0x00000078"},
+     "memory": [{"address": "0x19b350", "hex": "cccccccc"},
+                {"address": "0x19b374", "hex": "5a7a"},
+                {"address": "0x19b376", "hex": "1d00"}]},
+    {"name": "overfull_30_no_write", "registers": {
+       "eax": "0xffffffff", "edx": "0xabcdef00", "ebx": "0x12345678"},
+     "memory": [{"address": "0x19b2e0", "hex": "11223344"},
+                {"address": "0x19b358", "hex": "aa"},
+                {"address": "0x19b376", "hex": "1e00"}]}
+  ]
+}

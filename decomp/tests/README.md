@@ -8,3 +8,16 @@ spliced and compared against the original executable.
 `0x000432c.json` covers ten signed 32-bit score boundaries (including ties,
 negative values, and `INT32_MIN`/`INT32_MAX`), with both global score addresses
 initialized independently. It is a test *plan*, not a passing differential.
+
+`0x000263e0.json` covers five old count values and checks the original
+four-byte enclosing word: clearing the high 16 bits must not disturb the low
+16 bits. EDX preservation is part of its confirmed ABI.
+
+`0x000263ec.json` tests the paired append routine at counts 0, 1, 28, 29,
+and 30, including the last tag adjacent to the count word, signed AX/DX
+coordinates, and BL tags. The original clobbers EDX on successful append;
+its signature deliberately does not assert preservation of that register.
+
+`0x0006a1b4.json` covers ten signed AX bounds, nonzero and zero guest-pointer
+entries, and high EAX bits that must not affect AX indexing. None of these
+specifications claim an executed OpenWatcom guest differential yet.

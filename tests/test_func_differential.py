@@ -51,6 +51,27 @@ class FunctionDifferentialTests(unittest.TestCase):
             outcomes.add(current > tenth)
         self.assertEqual(outcomes, {True, False})
 
+    def test_spatial_and_indexed_candidates_have_reviewed_guest_specs(self):
+        signatures = ROOT / 'decomp/symbols/signatures.tsv'
+        candidates = {
+            0x263e0: (12, 5),
+            0x263ec: (55, 5),
+            0x6a1b4: (26, 10),
+        }
+        for address, (expected_size, expected_cases) in candidates.items():
+            with self.subTest(address=f'0x{address:x}'):
+                signature = differential.read_signature(signatures, address)
+                spec = json.loads((ROOT / f'decomp/tests/0x{address:08x}.json').read_text())
+                validated = differential.validate_spec(spec, signature, 1662896)
+                self.assertEqual(validated[5], expected_size)
+                self.assertEqual(len(validated[6]), expected_cases)
+                self.assertEqual(len({case[0] for case in validated[6]}), expected_cases)
+
+        self.assertIn('edx', differential.read_signature(signatures, 0x263e0).preserved)
+        self.assertNotIn('edx', differential.read_signature(signatures, 0x263ec).preserved)
+        self.assertEqual(differential.read_signature(signatures, 0x6a1b4).outputs,
+                         ('EAX',))
+
     def test_reviewed_signatures_and_subregisters(self):
         path = ROOT / 'decomp/symbols/signatures.tsv'
         signature = differential.read_signature(path, 0x432c)

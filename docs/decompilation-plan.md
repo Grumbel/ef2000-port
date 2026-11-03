@@ -576,6 +576,20 @@ marks this function `drafted`, **not** `compiles` or `verified`: OpenWatcom
 object inspection, a safe splice and live guest differential/replay are still
 required. The `watcom-omf` check will compile the candidate when next run.
 
+Original-binary audit and second C batch (2026-11-03): restored the owner's
+SHA-pinned `_EF2000.EXE` to an ignored `local/` path, extracted its code, and
+checked the complete `0x432c`, `0x263e0`, `0x263ec` and `0x6a1b4` bodies
+against the ABI notes. The spatial reset has callers `0x1f624`/`0x3ab19`;
+the adjacent 29-entry spatial append has **four** distinct callers, a newly
+confirmed AX/DX/BL ABI and matching record layout. The indexed-object
+lookup has callers `0x24087`/`0x247af`. The three additional C drafts live
+in `decomp/src/spatial.c` and `decomp/src/indexed_objects.c`. Each has native
+C tests and multiple guest differential input states covering memory
+adjacency, capacity limits, signed AX bounds and junk high EAX bits. All four
+remain `drafted`; a local host build or inspected disassembly is **not** an OpenWatcom replacement
+differential or full-game replay. The `watcom-omf` Nix check now compiles and
+disassembles the three additional candidates in the owner's environment.
+
 ### 3.11 [ ] Phase-1 exit criteria
 
 - `nix flake check` passes with all new asset-free tests.
@@ -909,6 +923,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  3.10  Added bounded original call-entry RAM/register capture to C++ Unicorn, and SHA-bound captured-state replay in the isolated differential tool; asset-free capture format tests pass, but live-game proof is pending.
 2026-11-03  3.5   Drafted first recovered game C function (0x432c signed high-score qualification), with packed-layout asserts, native host test and ten differential boundary fixtures; guest verification pending.
 2026-11-03  3.7   Added SHA-pinned direct OMF-to-EFPATCH1 path for reviewed in-place-only functions and synthetic full-chain relocation tests; first real OpenWatcom object still pending.
+2026-11-03  4     SHA-pinned original image audited against C drafts at 0x432c/0x263e0/0x6a1b4; spatial append 0x263ec recovered from four direct callers, three new drafted functions with signed/packed guest specs.
 ```
 
 ---

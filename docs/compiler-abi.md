@@ -372,6 +372,26 @@ untouched. Callers `0x1f0fc` at `0x1f624` and `0x3a3a8` at `0x3ab19`
 neither set arguments nor consume any return. Its name is descriptive and
 provisional; the surrounding spatial counter structure needs type recovery.
 
+Direct original-image audit (SHA-256 `f21a72d8...`, pinned in
+`docs/executable.md`): the complete twelve-byte body saves EDX, zeroes EDX,
+stores DX at `0x19b376`, restores EDX and returns. The C draft uses a 16-bit
+store, with a differential fixture deliberately initializing the adjacent
+low word to nonzero values; a 32-bit store would be incorrect.
+
+The adjacent `append_spatial_slot` (`0x263ec`) is a 55-byte leaf with four
+direct callers (`0x1f6ef`, `0x2ef50`, `0x2f0fa`, `0x3ac33`). Each supplies
+coordinate X in AX, Y in DX, and a one-byte tag in BL; no caller consumes a
+return. The callee saves/restores ECX and does not change EBX/ESI/EDI/EBP;
+**EDX is clobbered** on a successful append because DX is reused for the
+updated count. EAX also changes, so neither belongs in `preserved` or in
+`outputs`. The signed upper word of `0x19b374` indexes 29 four-byte records
+at `0x19b2e0`: X and Y occupy offsets 0 and 2. Tags are separate bytes at
+`0x19b358..0x19b374`; the last tag shares the low word of the dword
+containing the high-word count. If signed count is below 29, the callee
+stores both coordinates and tag and increments the count; otherwise it
+returns without modifying memory. An anomalous negative count would index
+before the table (an original-game hazard, not covered by host tests).
+
 `x87_unmask_exceptions` (`0x120800`) is a small x87 control-word helper.
 It saves the current CW to a four-byte temporary stack slot, clears bits
 0, 2 and 3 with `AND 0xfff2` (unmasking invalid-operation, divide-by-zero,

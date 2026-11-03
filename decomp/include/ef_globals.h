@@ -6,6 +6,7 @@
 
 #include "ef_types.h"
 #include "ef_structs/hiscore.h"
+#include "ef_structs/spatial.h"
 
 /* These describe guest addresses, not linked host storage. The patch linker
  * must resolve each symbol to its original address (symbols/globals.tsv).
@@ -21,5 +22,11 @@ extern uint8_t _Envptr[6];           /* 0x00132a61, overlaps _Envseg */
 extern uint16_t _Envseg;              /* 0x00132a65 */
 extern int32_t g_hiscore_current;     /* 0x001970a0 */
 extern ef_hiscore_entry g_hiscore_table[10]; /* 0x001970a4, 10 packed records */
+/* Provisional names; original DS locations established from code reads/writes. */
+extern ef_spatial_slot g_spatial_slots[29]; /* 0x0019b2e0 */
+extern uint8_t g_spatial_slot_tags[29]; /* 0x0019b358..0x0019b374 */
+extern int16_t g_spatial_slot_count; /* 0x0019b376, high word of 0x0019b374 */
+extern ef_addr32 g_indexed_object_table[]; /* 0x0020f550, 4-byte guest pointers */
+extern int16_t g_indexed_object_count; /* 0x002119f4, signed 16-bit bound */
 
 #endif
