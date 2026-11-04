@@ -9621,3 +9621,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x95bf4` | none | none | 92c28@92e12,92e30@92e8e,93170@931b2 | Rotates a small vector by the object's angles and adds the result to the camera position words. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x775f0` | EAX:uint32_t,EDX:uint32_t | none | 72944@72ea7,770d4@77296 | Clears the state of a unit slot and refreshes related UI/network state. |

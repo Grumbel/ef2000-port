@@ -24058,3 +24058,42 @@ void apply_rotated_offset_95bf4(void)
 	EF_S32(0x214470) += (m[3] * x + m[4] * y + m[5] * z) / 0x6900;
 	EF_S32(0x214474) += (m[6] * x + m[7] * y + m[8] * z) / 0x6900;
 }
+
+/* 0x775f0, 315 bytes. Clears the state of a unit slot and refreshes related UI/network state. */
+void reset_unit_slot_775f0(uint32_t eax, uint32_t edx)
+{
+	int16_t a = (int16_t)eax;
+	int16_t b = (int16_t)edx;
+	ef_addr32 ua = guest_fn_7489c(a);
+	ef_addr32 ub;
+	ef_addr32 table;
+	uint8_t idx;
+
+	if (ua == 0) {
+		return;
+	}
+	ub = guest_fn_7489c(b);
+	if (ub == 0) {
+		return;
+	}
+	table = EF_U32(0x1f8918) + (uint32_t)EF_U8(ua + 0x187) * 0x19;
+	idx = EF_U8(ub + 0x18b);
+	EF_U8(ub + 0x25) &= 0xfb;
+	EF_U8(ub + 0x18a) = 0;
+	EF_U16(table + 0x13 + (uint32_t)idx * 2) = 0xff;
+	guest_fn_6a1d0(b, 1);
+	if (EF_U8(0x125847) != 0) {
+		guest_fn_9e508((int16_t)EF_S16(ub + 0x20), 0xe);
+		guest_fn_9e508((int16_t)EF_S16(ub + 0x20), 0x17);
+	}
+	if ((uint16_t)b == EF_U16(0x1f71ca)) {
+		claim_ui_slot_801e4(1, 1, 1);
+		ui_release_matching_control(0x2f);
+		EF_U8(0x1a362c) = 0;
+		guest_fn_9e508((int16_t)EF_S16(ua + 0x20), 0xe);
+		guest_fn_9e508((int16_t)EF_S16(ua + 0x20), 0x10);
+	}
+	if ((uint16_t)EF_U8(0x1a666b) != EF_U16(ua + 0x18) && EF_S16(ua + 0x18) != 0xff && EF_U8(0x127da9) != 0) {
+		send_word_byte_packet_3d((uint16_t)a, idx);
+	}
+}

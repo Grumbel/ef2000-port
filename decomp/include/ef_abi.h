@@ -6570,4 +6570,7 @@ void update_best_direction_8a1dc(ef_addr32 obj); /* 0x8a1dc */
 void apply_rotated_offset_95bf4(void);
 void apply_rotated_offset_95bf4(void); /* 0x95bf4 */
 
+void reset_unit_slot_775f0(uint32_t eax, uint32_t edx);
+void reset_unit_slot_775f0(uint32_t eax, uint32_t edx); /* 0x775f0 */
+
 #endif

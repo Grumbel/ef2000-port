@@ -1404,7 +1404,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000770d4	505			unknown	unclassified	unverified		
 0x000772d0	610			unknown	unclassified	unverified		
 0x00077534	187	trigger_linked_event_77534	game_helpers39	compiles	game	confirmed	decomp/tests/0x00077534.json	docs/compiler-abi.md; Trigger the linked-unit event for a unit and notify the matching display slots.; callers 46454@46795; guest pending
-0x000775f0	315			unknown	unclassified	unverified		
+0x000775f0	315	reset_unit_slot_775f0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000775f0.json	docs/compiler-abi.md; Clears the state of a unit slot and refreshes related UI/network state.; callers 72944@72ea7,770d4@77296; guest pending
 0x0007772c	26	reset_pair_counter	marker_packets	compiles	game	confirmed	decomp/tests/0x0007772c.json	docs/compiler-abi.md; Words 0x1f891e=0xffff and 0x1f891c=0; sole direct caller 49228@49248; guest pending
 0x00077748	18	count_pending_77748	game_helpers28	compiles	game	confirmed	decomp/tests/0x00077748.json	docs/compiler-abi.md; Count a pending frame while the marker word is -1.; callers 8c49c@8c56d; guest pending
 0x0007775c	152	collect_marked_objects_7775c	game_helpers33	compiles	game	confirmed	decomp/tests/0x0007775c.json	docs/compiler-abi.md; Collect the level-0x20 objects into a new table when the marker word is -1.; callers 49228@49b48; guest pending
