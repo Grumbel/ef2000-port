@@ -4218,4 +4218,6 @@ void guest_fn_dd8c0_x(void); /* 0xdd8c0 no arguments */
 /* page_rotate1.c */
 void rotate_page_entries_e8368(uint32_t page, uint32_t p0, uint32_t p1, uint32_t p2);
 
+void rebuild_remap_table_e7e30(uint32_t a, uint32_t b, uint32_t c);
+
 #endif

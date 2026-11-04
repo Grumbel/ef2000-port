@@ -4863,3 +4863,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe8368` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 7b3fc@7b4a9 | Look up a page's vertex group and rotate each 0x4a-byte entry's three points, storing the rotation parameters at 0x46437 |
+
+## page_rotate1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe7e30` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 759b8@75c6c,c8e58@c8f0d,c8f38@c8fc4 | Rebuild the 0x8000-byte remap table at [0x164604] by looking each byte of its upper half up in the 0x433f34 tables, unle |

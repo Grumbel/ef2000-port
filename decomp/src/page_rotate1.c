@@ -30,3 +30,17 @@ void rotate_page_entries_e8368(uint32_t page, uint32_t p0, uint32_t p1, uint32_t
         rec += 0x4au;
     }
 }
+
+/* 0xe7e30, 113 bytes. Rebuild the 0x8000-byte remap table at [0x164604] by looking each byte of its upper half up in the 0x433f34 tables, unless (a, b) is the pair already built. */
+void rebuild_remap_table_e7e30(uint32_t a, uint32_t b, uint32_t c)
+{
+    uint32_t tbl, i, base;
+    if (a == EF_U32(0x00160004u) && b == EF_U32(0x00160008u))
+        return;
+    tbl = EF_U32(0x00164604u);
+    EF_U32(0x00160004u) = a;
+    EF_U32(0x00160008u) = b;
+    base = ((b << 12) + b) * 4u + (a << 8) + (c << 13);
+    for (i = 0; i < 0x8000u; i++)
+        EF_U8(tbl + i) = EF_U8(0x00433f34u + EF_U8(tbl + 0x8000u + i) + base);
+}

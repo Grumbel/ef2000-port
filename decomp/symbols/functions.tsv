@@ -3427,7 +3427,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e7cec	59	build_path_with_name_e7cec	game_helpers91	compiles	game	confirmed	decomp/tests/0x000e7cec.json	docs/compiler-abi.md; Build a path from the default directory plus two parts, appending the third part unless it equals the string at 0x190c50; callers 69094@691c8,8b2d8@8b2f9,d9e50@d9fad; guest pending
 0x000e7d27	194			unknown	unclassified	unverified		
 0x000e7df4	36			unknown	unclassified	unverified		
-0x000e7e30	113			unknown	unclassified	unverified		
+0x000e7e30	113	rebuild_remap_table_e7e30	page_rotate1	compiles	game	confirmed	decomp/tests/0x000e7e30.json	docs/compiler-abi.md; Rebuild the 0x8000-byte remap table at [0x164604] by looking each byte of its upper half up in the 0x433f34 tables, unle; callers 759b8@75c6c,c8e58@c8f0d,c8f38@c8fc4; guest pending
 0x000e7ea4	177			unknown	unclassified	unverified		
 0x000e7fa4	19	install_handler_e7fa4	math_string	compiles	game	confirmed	decomp/tests/0x000e7fa4.json	docs/compiler-abi.md; Dword 0x464360 = EAX, dword 0x15b268 = 0xe7f60.; callers 7a38c@7a397; guest pending
 0x000e7fc0	263	split_path_e7fc0	game_helpers96	compiles	game	confirmed	decomp/tests/0x000e7fc0.json	docs/compiler-abi.md; _splitpath: normalise '/' to '\\' in place and split into drive, directory, name and extension (each output optional).; callers 7ab00@7ab5c,de864@de907,de864@de940; guest pending
