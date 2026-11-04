@@ -3746,7 +3746,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fc0ec	250			unknown	unclassified	unverified		
 0x000fc1e8	364			unknown	unclassified	unverified		
 0x000fc354	69			unknown	unclassified	unverified		
-0x000fc39c	48			unknown	unclassified	unverified		
+0x000fc39c	48	build_row_table_fc39c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fc39c.json	docs/compiler-abi.md; Stack (ret 8): fill the row-offset table at 0x163200 with COUNT dwords 0, STEP, 2*STEP, ...; store COUNT*STEP in 0x16460; callers c39ac@c39ea,c39f0@c3a1f,cdb20@cdbcb; guest pending
 0x000fc478	106	query_video_mode_fc478	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc478.json	docs/compiler-abi.md; VESA call 0x4f01 for mode ECX; true when the BIOS answers 0x4f.; callers fc4e4@fc502,fc600@fc605; guest pending
 0x000fc4e4	80	find_linear_mode_fc4e4	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc4e4.json	docs/compiler-abi.md; Find the first VESA mode in the list whose info has bit 7 set; returns dword +0x28 of its info.; callers fc534@fc5da; guest pending
 0x000fc534	204			unknown	unclassified	unverified		
@@ -4139,7 +4139,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00117b0c	10	outp_117b0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117b0c.json	docs/compiler-abi.md; outp: write the byte VALUE to the I/O port PORT.; callers 117b18@117bc4,117bfc@117d2a,117e0c@117e67; guest pending
 0x00117b18	198			unknown	unclassified	unverified		
 0x00117bfc	314	serial_interrupt_117bfc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117bfc.json	docs/compiler-abi.md; Serial port interrupt service for the channel record REC (port base at +0x1c, state block at +0x2c, receive ring descrip; callers none direct; guest pending
-0x00117dd8	50			unknown	unclassified	unverified		
+0x00117dd8	50	handler_address_117dd8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117dd8.json	docs/compiler-abi.md; Return the code address (EAX; EDX is set to the code segment) of the INDEX-th (0..3) handler 0x117d38, 0x117d5c, 0x117d8; callers 117f68@118196; guest pending
 0x00117e0c	153	set_serial_rate_117e0c	runtime_helpers37	compiles	game	confirmed	decomp/tests/0x00117e0c.json	docs/compiler-abi.md; Program the serial port at obj+0x1c with a divisor derived from the rate (clamped 300..115200); returns the actual rate,; callers 106f10@106fcd,118290@11836f; guest pending
 0x00117ea8	44	clear_buffered_record_117ea8	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00117ea8.json	docs/compiler-abi.md; Free the buffer of a record and clear the record.; callers 118290@118384,118290@1183a5; guest pending
 0x00117ed4	62	attach_buffer_117ed4	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x00117ed4.json	docs/compiler-abi.md; Attach an object to a holder, allocating the holder's block when missing, and reset the object's header words (last word; callers 117f68@11801d,117f68@118031; guest pending

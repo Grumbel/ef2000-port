@@ -5195,4 +5195,7 @@ void send_guarded_message_103e0c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
 uint32_t checksum_bytes_10dc1d(uint32_t p, uint32_t count);
 void swap_buffers_ded60(uint32_t a, uint32_t b, uint32_t count);
 
+void build_row_table_fc39c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t count, uint32_t step);
+uint32_t handler_address_117dd8(uint32_t index);
+
 #endif

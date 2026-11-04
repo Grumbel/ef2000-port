@@ -8346,3 +8346,27 @@ void swap_buffers_ded60(uint32_t a, uint32_t b, uint32_t count)
         EF_U8(a + n4 * 4u + i) = t;
     }
 }
+
+/* 0xfc39c, 48 bytes. Stack (ret 8): fill the row-offset table at 0x163200 with COUNT dwords 0, STEP, 2*STEP, ...; store COUNT*STEP in 0x164600 and STEP in 0x1631f4, then append two more dwords equal to (COUNT-1)*STEP after the table. ORIGINAL BUG: a count of 0 makes the LOOP run 2^32 times; not modelled. */
+void build_row_table_fc39c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t count, uint32_t step)
+{
+    uint32_t v = 0u, i, p = 0x00163200u;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    for (i = 0; i < count; i++) {
+        EF_U32(p) = v;
+        p += 4u;
+        v += step;
+    }
+    EF_U32(0x00164600u) = v;
+    EF_U32(0x001631f4u) = step;
+    v -= step;
+    EF_U32(p) = v;
+    EF_U32(p + 4u) = v;
+}
+
+/* 0x117dd8, 50 bytes. Return the code address (EAX; EDX is set to the code segment) of the INDEX-th (0..3) handler 0x117d38, 0x117d5c, 0x117d80, 0x117da4, or 0 for any larger index. */
+uint32_t handler_address_117dd8(uint32_t index)
+{
+    static const uint32_t tbl[4] = { 0x00117d38u, 0x00117d5cu, 0x00117d80u, 0x00117da4u };
+    return index > 3u ? 0u : tbl[index];
+}

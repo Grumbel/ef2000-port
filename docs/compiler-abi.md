@@ -6812,3 +6812,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x10dc1d` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 10da50@10daf0 | Implicit-register fragment (ESI = data pointer, ECX = byte count; params in that order): the two-byte running checksum u |
 | `0xded60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | dedde@dee7e,dedde@defce,dedde@df034 | Implicit-register fragment (ESI = first buffer, EDI = second buffer, ECX = byte count; params in that order): swap COUNT |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfc39c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | c39ac@c39ea,c39f0@c3a1f,cdb20@cdbcb | Stack (ret 8): fill the row-offset table at 0x163200 with COUNT dwords 0, STEP, 2*STEP, ...; store COUNT*STEP in 0x16460 |
+| `0x117dd8` | EAX:uint32_t | EAX:uint32_t | 117f68@118196 | Return the code address (EAX; EDX is set to the code segment) of the INDEX-th (0..3) handler 0x117d38, 0x117d5c, 0x117d8 |
