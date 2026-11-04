@@ -18130,3 +18130,43 @@ void select_list_entry_at_cursor_4ce4c(uint32_t a, ef_addr32 head)
 		node = EF_U32(node + 4u);
 	}
 }
+
+/* 0x4c78c, 371 bytes. Sibling of 0x4ce4c: hit-test the list at HEAD (EDX; link +4) for the group value A (EAX) and the kind in word 0x1a54f4 (byte +0xb) with a true negative or zero group flag (0xcc1ac, 0xcc1ec; index byte +9). When the cursor (words 0x41eef4, 0x41eef2) lies within the box centre (word +0x16, 400 - word +0x1a) +- (float 0x184c74 / float 0x1a53df) the entry is selected: byte 0x1a54f3 = 1, dword 0x1a54f6 = entry, byte 0x1a559c = 1 when the negative flag holds, else 2, words 0x1a54fe and 0x1a5500 = centre, dword 0x1a54fa = 0, dword 0x1a5502 = 500, byte 0x1a559a = byte 0x1a559b, and 0x4dc98, 0x4d8f4, 0x4cff4 run. */
+void select_list_entry_by_kind_4c78c(uint32_t a, ef_addr32 head)
+{
+	uint32_t node = EF_U32(head);
+	uint16_t xw, yw;
+	float r, num, den, xf, yf, cx, cy;
+
+	while (node != 0u) {
+		if ((uint16_t)EF_U8(node + 0xbu) == EF_U16(0x001a54f4u) &&
+		    ((uint16_t)group_flag_negative_cc1ac(0u, EF_U8(node + 9u), a) != 0u ||
+		     (uint16_t)group_flag_zero_cc1ec(0u, EF_U8(node + 9u), a) != 0u)) {
+			memcpy(&num, ef_guest_memory_ptr(0x00184c74u), 4);
+			memcpy(&den, ef_guest_memory_ptr(0x001a53dfu), 4);
+			r = (float)((double)num / (double)den);
+			xw = EF_U16(node + 0x16u);
+			yw = (uint16_t)(0x190u - EF_U16(node + 0x1au));
+			cx = (float)(int16_t)xw;
+			cy = (float)(int16_t)yw;
+			xf = (float)(int16_t)EF_U16(0x0041eef4u);
+			yf = (float)(int16_t)EF_U16(0x0041eef2u);
+			if ((double)cx + (double)r > (double)xf && (double)cx - (double)r < (double)xf &&
+			    (double)cy + (double)r > (double)yf && (double)cy - (double)r < (double)yf) {
+				EF_U8(0x001a54f3u) = 1u;
+				EF_U32(0x001a54f6u) = node;
+				EF_U8(0x001a559cu) = (uint8_t)(((uint16_t)group_flag_negative_cc1ac(0u, EF_U8(node + 9u), a) == 0u) + 1u);
+				EF_U16(0x001a54feu) = xw;
+				EF_U32(0x001a54fau) = 0u;
+				EF_U16(0x001a5500u) = yw;
+				EF_U8(0x001a559au) = EF_U8(0x001a559bu);
+				EF_U32(0x001a5502u) = 0x1f4u;
+				advance_first_tactical_status();
+				reset_tactical_slots();
+				fill_dialog_labels_4cff4();
+				return;
+			}
+		}
+		node = EF_U32(node + 4u);
+	}
+}

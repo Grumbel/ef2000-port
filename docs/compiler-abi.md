@@ -8540,3 +8540,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x4ce4c` | EAX:uint32_t,EDX:ef_addr32 | none | 4be88@4beb9 | Hit-test the list at HEAD (EDX; link +4) for the group value A (EAX): the first entry of kind 0x31 (byte +0xb) with a no |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4c78c` | EAX:uint32_t,EDX:ef_addr32 | none | 4bc80@4bcba | Sibling of 0x4ce4c: hit-test the list at HEAD (EDX; link +4) for the group value A (EAX) and the kind in word 0x1a54f4 ( |
