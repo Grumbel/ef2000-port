@@ -102,7 +102,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000073ec	430			unknown	unclassified	unverified		
 0x0000759c	469			unknown	unclassified	unverified		
 0x00007780	40	alloc_zero_product_7780	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00007780.json	docs/compiler-abi.md; Allocate and zero a block of the product of both sizes.; callers 77a8@77d1,8748@8841,8748@8904; guest pending
-0x000077a8	280			unknown	unclassified	unverified		
+0x000077a8	280	init_roster_state_77a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000077a8.json	docs/compiler-abi.md; Initialise the roster state for N units: word 0x1972e4 = N, the table 0x1972e0 from 0x7780(N, 0x22), the anchor/limit lo; callers 49228@495b2; guest pending
 0x000078c0	465			unknown	unclassified	unverified		
 0x00007ae4	81	send_unit_command_7ae4	game_helpers10	compiles	game	confirmed	decomp/tests/0x00007ae4.json	docs/compiler-abi.md; Forward a command for a unit; kind 10 uses 0xff in place of its byte.; callers 46454@469fe,7156c@71a1c; guest pending
 0x00007b38	134	slot_matches_unit_7b38	game_helpers13	compiles	game	confirmed	decomp/tests/0x00007b38.json	docs/compiler-abi.md; True when the unit's slot entry matches its type and refers to it (or to anyone).; callers 7bc0@7c00,7bc0@7c4c; guest pending

@@ -4890,4 +4890,7 @@ void guest_fn_fc39c_s(uint32_t a, uint32_t b); /* 0xfc39c 2 stack arguments, cal
 
 void dump_page_header_9ab6c(uint32_t stream);
 
+void init_roster_state_77a8(uint32_t n);
+uint32_t guest_fn_7780_x(uint32_t count, uint32_t size); /* 0x7780 EAX/EDX -> EAX */
+
 #endif

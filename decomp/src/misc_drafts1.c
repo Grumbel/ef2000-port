@@ -4950,3 +4950,37 @@ void dump_page_header_9ab6c(uint32_t stream)
     guest_fn_bc400(stream, 0x00131846u, (int32_t)(int16_t)EF_U16(0x0040d014u), (int32_t)(int16_t)EF_U16(0x0040d01cu), (int32_t)(int16_t)EF_U16(0x0040d024u));
     guest_fn_bc400(stream, 0x0018b128u);
 }
+
+/* 0x77a8, 280 bytes. Initialise the roster state for N units: word 0x1972e4 = N, the table 0x1972e0 from 0x7780(N, 0x22), the anchor/limit longs 0x197270..0x1972bc (0xc0200000, 0xc0240000, 0xc0490000, 0x40200000, 0xc04e0000, ... zeros elsewhere; 0x1972b4 and 0x1972bc are stored twice, the later values win) and the mode bytes 0x1972e8..ed (1, 1, 2, 2, 3, 3). */
+void init_roster_state_77a8(uint32_t n)
+{
+    EF_U16(0x001972e4u) = (uint16_t)(n & 0xffu);
+    EF_U32(0x001972e0u) = guest_fn_7780_x(n & 0xffu, 0x22u);
+    EF_U32(0x0019727cu) = 0xc0200000u;
+    EF_U32(0x00197284u) = 0xc0240000u;
+    EF_U32(0x00197290u) = 0u;
+    EF_U32(0x00197294u) = 0xc0490000u;
+    EF_U32(0x00197298u) = 0u;
+    EF_U32(0x0019729cu) = 0xc0200000u;
+    EF_U32(0x001972a0u) = 0u;
+    EF_U32(0x001972a8u) = 0u;
+    EF_U16(0x001972e6u) = 0u;
+    EF_U8(0x001972e8u) = 1u;
+    EF_U8(0x001972e9u) = 1u;
+    EF_U32(0x001972acu) = 0x40200000u;
+    EF_U32(0x001972b0u) = 0u;
+    EF_U32(0x001972b8u) = 0u;
+    EF_U32(0x00197270u) = 0u;
+    EF_U32(0x00197274u) = 0u;
+    EF_U32(0x00197278u) = 0u;
+    EF_U32(0x00197280u) = 0u;
+    EF_U32(0x00197288u) = 0u;
+    EF_U32(0x001972a4u) = 0xc04e0000u;
+    EF_U8(0x001972ecu) = 3u;
+    EF_U32(0x0019728cu) = 0x40200000u;
+    EF_U32(0x001972bcu) = 0x40200000u;
+    EF_U8(0x001972eau) = 2u;
+    EF_U8(0x001972ebu) = 2u;
+    EF_U32(0x001972b4u) = 0xc05b8000u;
+    EF_U8(0x001972edu) = 3u;
+}
