@@ -2575,4 +2575,32 @@ void guest_fn_a3fe0(void); /* 0xa3fe0 */
 uint32_t guest_fn_a292c(void); /* 0xa292c -> AL */
 ef_addr32 guest_fn_a4678(ef_addr32 name); /* 0xa4678 EAX -> EAX */
 
+/* runtime_helpers22.c */
+void set_object_name_a75cc(ef_addr32 object, ef_addr32 name);
+ef_addr32 find_widget_checked_a78bc(ef_addr32 root, ef_addr32 name);
+void close_handle_a7990(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_handle);
+uint32_t read_handle_a79d4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+                           uint32_t stack_handle, uint32_t stack_count, uint32_t stack_buffer);
+uint32_t write_handle_a7a1c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+                            uint32_t stack_handle, uint32_t stack_count, uint32_t stack_buffer);
+void seek_handle_a7a64(uint32_t first, uint32_t second, uint32_t handle);
+int32_t clock_delta_a7d40(void);
+void run_entry_callbacks_abde4(void);
+void report_fatal_ac7c8(uint32_t value);
+uint8_t write_whole_file_b3d00(ef_addr32 name, uint32_t buffer, uint32_t count);
+uint32_t lookup_id_b3f58(int16_t id);
+void alloc_work_block_c32dc(int32_t size);
+uint32_t start_driver_c34cc(uint32_t request);
+ef_addr32 guest_fn_a788c(ef_addr32 root, ef_addr32 name); /* 0xa788c EAX/EDX */
+void guest_fn_bc421(uint32_t a, uint32_t b, uint32_t c); /* 0xbc421 EAX/EDX/EBX */
+uint32_t guest_fn_f1d90(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xf1d90 EAX/EDX/EBX/ECX */
+uint32_t guest_fn_f1f5a(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xf1f5a EAX/EDX/EBX/ECX */
+void guest_fn_f2183(uint32_t a, uint32_t b, uint32_t c); /* 0xf2183 EAX/EDX/EBX */
+void guest_fn_f227f(uint32_t a); /* 0xf227f EAX */
+void guest_fn_de648(uint32_t a, uint32_t b); /* 0xde648 EAX/EDX */
+uint32_t guest_fn_a7948(ef_addr32 name); /* 0xa7948 cdecl */
+uint32_t guest_fn_e2b54(void); /* 0xe2b54 -> EAX */
+uint32_t guest_fn_c3430(uint32_t a); /* 0xc3430 EAX -> AL */
+void guest_fn_c3328(void); /* 0xc3328 */
+
 #endif

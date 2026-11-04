@@ -3285,3 +3285,21 @@ in EAX, format string address, one value).
 | `0xa42d0` | none | none | a41dc@a420c | Start the device through its callback if it is not yet started. |
 | `0xa42f4` | none | none | 357a4@357b5,3711c@37175,a3da0@a3db4 | Stop the device through its callback when running. |
 | `0xa46cc` | EAX:ef_addr32 | EAX:ef_addr32 | 40dc@40eb,40dc@4133,40dc@41ae | Look up a named object or abort. |
+
+## runtime_helpers22 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa75cc` | EAX:ef_addr32,EDX:ef_addr32 | none | 69b70@69bc2 | Copy a name of at most 16 characters into an object. |
+| `0xa78bc` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 40dc@40fd,40dc@4138,40dc@41b3 | Find a widget by name in a root or abort. |
+| `0xa7990` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 41fc@425f,42a4@4306,5630@5f2e | Close a handle (100..105) and clear its slot. |
+| `0xa79d4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | 41fc@4249,41fc@4259,28224@282be | Read from a handle (100..105). |
+| `0xa7a1c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | 42a4@42f0,42a4@4300,286c0@2872d | Write to a handle (100..105). |
+| `0xa7a64` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | a7ab4@a7abe,a7ac8@a7ad5,a7ae0@a7aed | Seek a handle (100..105) and flush it. |
+| `0xa7d40` | none | EAX:int32_t | a8718@a87bd | Clock ticks since the last call, clamped to 1..50. |
+| `0xabde4` | none | none | ac5f8@ac722,ca17c@ca1b8,e1958@e1b03 | Run the callback of every registered 21-byte entry. |
+| `0xac7c8` | EAX:uint32_t | none | 84aec@84af6,ac5f8@ac773 | Print a diagnostic and abort with the given argument. |
+| `0xb3d00` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | AL:uint8_t | 7a5bc@7a5e6,82e40@83014,830b8@83184 | Write a whole file; abort when it cannot be created or written. |
+| `0xb3f58` | AX:int16_t | EAX:uint32_t | 6b50@6b8e,6b50@6bd0,bc38@bc55 | Look up a 1-based id in the table at [0x41f370] or abort. |
+| `0xc32dc` | EAX:int32_t | none | c3430@c345c | Allocate the work block from either pool depending on its size. |
+| `0xc34cc` | EAX:uint32_t | EAX:uint32_t | ab74@ae62,278c0@2790a,284ec@28501 | Start the driver unless it is already busy; abort when it fails. |
