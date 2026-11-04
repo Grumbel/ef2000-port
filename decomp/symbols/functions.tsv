@@ -212,7 +212,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000f0ec	79	parse_enum_f0ec	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000f0ec.json	docs/compiler-abi.md; Parse a token and look it up in the 6-entry table at 0x132d1c.; callers f13c@f14b; guest pending
 0x0000f13c	91	read_record_f13c	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000f13c.json	docs/compiler-abi.md; ; callers f198@f247; guest pending
 0x0000f198	199	read_header_list_f198	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000f198.json	docs/compiler-abi.md; Read a 14-byte header and its list of 44-byte records.; callers f6a8@f7d9; guest pending
-0x0000f260	180			unknown	unclassified	unverified		
+0x0000f260	180	parse_record_f260	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000f260.json	docs/compiler-abi.md; Parse one record from the text parser into the record EAX: skip the line and token, byte +0xb from the enum reader (0xe9; callers f6a8@f85a; guest pending
 0x0000f314	749			unknown	unclassified	unverified		
 0x0000f604	163	read_record_header_f604	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000f604.json	docs/compiler-abi.md; Read a record header and its list of 124-byte sub-records.; callers f6a8@f7ff; guest pending
 0x0000f6a8	591			unknown	unclassified	unverified		

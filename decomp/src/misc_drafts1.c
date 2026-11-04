@@ -15189,3 +15189,33 @@ void show_text_ac408(ef_addr32 text)
 	while ((guest_fn_ce064_x() & 0xffffu) != 0u)
 		;
 }
+
+/* 0xf260, 180 bytes. Parse one record from the text parser into the record EAX: skip the line and token, byte +0xb from the enum reader (0xe9bc), byte +0xc from the 106-name enum reader (0xec8c), dword +0xd a duplicated token, words +0x9 and +0x23 and the double +0x27 (converted from the decimal reader) and byte +0x2f from integers, then the six-field record at +0x11 after a new line; after another line and token read the entry count into word +0x48, allocate nine bytes per entry through the allocation hook at 0x121ebc into dword +0x4a and read each nine-byte entry (0xee0c). Returns 1. */
+uint32_t parse_record_f260(ef_addr32 rec)
+{
+	double d;
+	int32_t n, i;
+	uint32_t base;
+
+	read_parser_line();
+	read_parser_token();
+	EF_U8(rec + 0xbu) = (uint8_t)read_parser_enum();
+	EF_U8(rec + 0xcu) = (uint8_t)read_parser_enum_106_names();
+	EF_U32(rec + 0xdu) = duplicate_parser_token();
+	EF_U16(rec + 0x9u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x23u) = (uint16_t)read_parser_integer();
+	d = (double)(int32_t)read_parser_decimal();
+	memcpy(ef_guest_memory_ptr(rec + 0x27u), &d, sizeof d);
+	EF_U8(rec + 0x2fu) = (uint8_t)read_parser_integer();
+	read_parser_line();
+	read_parser_six_field_record(rec + 0x11u);
+	read_parser_line();
+	read_parser_token();
+	EF_U16(rec + 0x48u) = (uint16_t)read_parser_integer();
+	n = (int32_t)EF_U32(rec + 0x46u) >> 16;
+	EF_U32(rec + 0x4au) = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), (uint32_t)(n * 9));
+	base = 0u;
+	for (i = 0; i < ((int32_t)EF_U32(rec + 0x46u) >> 16); i++, base += 9u)
+		read_record_ee0c(EF_U32(rec + 0x4au) + base);
+	return 1u;
+}

@@ -5789,4 +5789,6 @@ void guest_fn_ac9e8_x(void); /* 0xac9e8 */
 void guest_fn_abc98_x(void); /* 0xabc98 */
 uint32_t guest_fn_ce064_x(void); /* 0xce064 -> AX */
 
+uint32_t parse_record_f260(ef_addr32 rec);
+
 #endif

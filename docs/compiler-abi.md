@@ -8150,3 +8150,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xac408` | EAX:ef_addr32 | none | 84c84@84ca0,84c84@84ccd,ac780@ac79b | Show the text EAX in the front-end: error hook 0x18dc14 when byte 0x137254 is clear, then reset the display state (0xabe |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf260` | EAX:ef_addr32 | EAX:uint32_t | f6a8@f85a | Parse one record from the text parser into the record EAX: skip the line and token, byte +0xb from the enum reader (0xe9 |
