@@ -772,7 +772,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000426a4	477	gpwUpdateMap		named	unclassified	unverified		
 0x00042a98	107	gpwMapModeSelected		named	unclassified	unverified		
 0x00042b04	131	WarWonLostStartup		named	unclassified	unverified		
-0x00042e8c	238			unknown	unclassified	unverified		
+0x00042e8c	238	update_panel_pages_42e8c	game_helpers54	compiles	game	confirmed	decomp/tests/0x00042e8c.json	docs/compiler-abi.md; Switch the panel pages or finish the pending camera move.; callers none direct; guest pending
 0x00042f7c	163	bind_page_widgets_42f7c	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x00042f7c.json	docs/compiler-abi.md; Point the page widgets at the current selection.; callers none direct; guest pending
 0x00043020	386	gpwClosePilots		named	unclassified	unverified		
 0x000431a4	597	gpwOnOpenTargetWindow		named	unclassified	unverified		
@@ -1591,7 +1591,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000831a4	89	store_scaled_vector_831a4	game_helpers20	compiles	game	confirmed	decomp/tests/0x000831a4.json	docs/compiler-abi.md; Store a vector, halved until every component fits in 16 bits.; callers 83a40@83aac; guest pending
 0x00083200	145			unknown	unclassified	unverified		
 0x00083294	34	ui_point_near_reference	ui_secondary	compiles	game	confirmed	decomp/tests/0x00083294.json	docs/compiler-abi.md; host model; guest differential pending
-0x000832b8	232			unknown	unclassified	unverified		
+0x000832b8	232	box_outside_bounds_832b8	game_helpers54	compiles	game	confirmed	decomp/tests/0x000832b8.json	docs/compiler-abi.md; Latch the scaled box corner and test it against the current volume bounds.; callers 834e8@835ff,848e0@8498b; guest pending
 0x000833a0	131	muldiv_saturate_833a0	game_helpers27	compiles	game	confirmed	decomp/tests/0x000833a0.json	docs/compiler-abi.md; Compute a*b/c, saturating to +/-0x7fffffff-ish when the product overflows.; callers 83424@834c3,83424@834d0,834e8@83527; guest pending
 0x00083424	194	project_point_83424	game_helpers46	compiles	game	confirmed	decomp/tests/0x00083424.json	docs/compiler-abi.md; Project a point through the view matrix; false when it is behind the viewer.; callers 834e8@8357c,834e8@835b4; guest pending
 0x000834e8	541			unknown	unclassified	unverified		
@@ -1887,7 +1887,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091910	73	set_scene_input_triplet	scene_state	compiles	game	confirmed	decomp/tests/0x00091910.json	docs/compiler-abi.md
 0x0009195c	63	set_scene_angles	scene_state	compiles	game	confirmed	decomp/tests/0x0009195c.json	docs/compiler-abi.md
 0x000919b8	25	end_mode_36	misc_state	compiles	game	confirmed	decomp/tests/0x000919b8.json	docs/compiler-abi.md; if byte 0x12db9e==0x36 call 0xdc334(1,1); callers none direct; guest pending
-0x000919d4	245			unknown	unclassified	unverified		
+0x000919d4	245	reset_scene_angle_state_919d4	game_helpers54	compiles	game	confirmed	decomp/tests/0x000919d4.json	docs/compiler-abi.md; Reset the scene angle state and install the default handlers.; callers 3cfc0@3d1cf; guest pending
 0x00091acc	45	request_scene_pair	scene_state	compiles	game	confirmed	decomp/tests/0x00091acc.json	docs/compiler-abi.md
 0x00091afc	259			unknown	unclassified	unverified		
 0x00091c00	30	length_squared_word_triple	misc_state	compiles	game	confirmed	decomp/tests/0x00091c00.json	docs/compiler-abi.md; 0xe2b60(x*x+y*y+z*z); callers 95e58@97009; guest pending
@@ -1897,7 +1897,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091c98	257			unknown	unclassified	unverified		
 0x00091d9c	85	configure_scene_angle_triplet	scene_controls	compiles	game	confirmed	decomp/tests/0x00091d9c.json	docs/compiler-abi.md; Init 0x214404 then callbacks for DX/AX/BX low words; mirror at 0x2144b6/b4/b0; awaiting OMF guest differential
 0x00091df4	314			unknown	unclassified	unverified		
-0x00091f30	249			unknown	unclassified	unverified		
+0x00091f30	249	apply_orientation_input_91f30	game_helpers54	compiles	game	confirmed	decomp/tests/0x00091f30.json	docs/compiler-abi.md; Apply the pending yaw and roll input to the scene orientation.; callers 9357c@935c6,9357c@935de; guest pending
 0x0009202c	65	recompute_scene_extents_9202c	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x0009202c.json	docs/compiler-abi.md; Recompute the two scene extents.; callers 94194@941aa,941bc@941d2; guest pending
 0x00092070	169	classify_angle_92070	game_helpers36	compiles	game	confirmed	decomp/tests/0x00092070.json	docs/compiler-abi.md; Classify the signed angle word into a -2..1 step (kept when out of range).; callers 942cc@942f4,94370@94398,94484@944a9; guest pending
 0x00092254	59	prepare_navigation_component	ui_secondary	compiles	game	confirmed	decomp/tests/0x00092254.json	docs/compiler-abi.md; host model; guest differential pending
@@ -1913,7 +1913,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00093170	1036			unknown	unclassified	unverified		
 0x0009357c	1293			unknown	unclassified	unverified		
 0x00093a8c	972			unknown	unclassified	unverified		
-0x00093e58	234			unknown	unclassified	unverified		
+0x00093e58	234	init_scene_angles_93e58	game_helpers54	compiles	game	confirmed	decomp/tests/0x00093e58.json	docs/compiler-abi.md; Compute the scene angles from the stored vector (variant with heading latch).; callers 95e58@960f5; guest pending
 0x00093f44	185	reset_angle_limits_93f44	game_helpers50	compiles	game	confirmed	decomp/tests/0x00093f44.json	docs/compiler-abi.md; Reset the angle record from the current limits and flag out-of-range limits.; callers 95e58@96106; guest pending
 0x00094000	222	init_scene_angles_94000	game_helpers53	compiles	game	confirmed	decomp/tests/0x00094000.json	docs/compiler-abi.md; Compute the scene angles from the stored vector and flag out-of-range input.; callers 95e58@96117; guest pending
 0x000940e0	8			unknown	unclassified	unverified		

@@ -3811,3 +3811,13 @@ in EAX, format string address, one value).
 | `0x94000` | none | none | 95e58@96117 | Compute the scene angles from the stored vector and flag out-of-range input. |
 | `0x9a8b4` | EAX:ef_addr32,EDX:uint32_t | none | 9a624@9a66e | Count a destroyed ground object in the statistics table by its class. |
 | `0x9a998` | EAX:ef_addr32 | none | 9a624@9a677 | Count a destroyed air object in the statistics table by its class. |
+
+## game_helpers54 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x42e8c` | none | none | none direct | Switch the panel pages or finish the pending camera move. |
+| `0x832b8` | EAX:int32_t,EDX:int32_t,EBX:int32_t | AL:uint8_t | 834e8@835ff,848e0@8498b | Latch the scaled box corner and test it against the current volume bounds. |
+| `0x919d4` | none | none | 3cfc0@3d1cf | Reset the scene angle state and install the default handlers. |
+| `0x93e58` | none | none | 95e58@960f5 | Compute the scene angles from the stored vector (variant with heading latch). |
+| `0x91f30` | none | none | 9357c@935c6,9357c@935de | Apply the pending yaw and roll input to the scene orientation. |

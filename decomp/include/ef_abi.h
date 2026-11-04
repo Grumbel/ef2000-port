@@ -3371,4 +3371,23 @@ uint32_t guest_fn_41df4_w(uint32_t a); /* 0x41df4 EAX -> EAX */
 uint32_t guest_fn_41ec8_w(uint32_t a); /* 0x41ec8 EAX -> EAX */
 uint32_t guest_fn_41e84_w(uint32_t a); /* 0x41e84 EAX -> EAX */
 
+/* game_helpers54.c */
+void update_panel_pages_42e8c(void);
+uint8_t box_outside_bounds_832b8(int32_t a, int32_t b, int32_t c);
+void reset_scene_angle_state_919d4(void);
+void init_scene_angles_93e58(void);
+void apply_orientation_input_91f30(void);
+void guest_fn_a4c84_w(void); /* 0xa4c84 */
+void guest_fn_cbc9b_w(uint32_t a); /* 0xcbc9b EAX */
+void guest_fn_ac7a8_w(uint32_t a); /* 0xac7a8 EAX */
+void guest_fn_421c0_w(void); /* 0x421c0 */
+void guest_fn_aca88_w(void); /* 0xaca88 */
+void guest_fn_d290_w(void); /* 0xd290 */
+void guest_fn_ba5c_w(void); /* 0xba5c */
+void guest_fn_a6018_w(uint32_t a); /* 0xa6018 EAX */
+void guest_fn_aca94_w(void); /* 0xaca94 */
+void guest_fn_a4d90_w(uint32_t a); /* 0xa4d90 EAX */
+uint32_t guest_fn_7b7d8_w(void); /* 0x7b7d8 -> EAX */
+uint64_t guest_fn_d9b30_w(void); /* 0xd9b30 -> EDX:EAX */
+
 #endif
