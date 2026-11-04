@@ -4235,4 +4235,9 @@ void run_text_on_page_9e494(uint32_t page, ef_addr32 text);
 void guest_fn_a48ac_x(uint32_t index); /* 0xa48ac EAX */
 void guest_fn_9e7bc_x(ef_addr32 text); /* 0x9e7bc EAX, preserves EBX/ECX/ESI/EDI */
 
+/* probe_helpers1.c */
+uint32_t probe_service_d9b30(void);
+uint32_t run_probe_e9ac0(void);
+void guest_callptr2_x(ef_addr32 fn, uint32_t a, uint32_t b); /* indirect cdecl call with two stack arguments, caller cleanup */
+
 #endif

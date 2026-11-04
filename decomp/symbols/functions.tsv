@@ -3129,7 +3129,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d8610	140			unknown	unclassified	unverified		
 0x000d86e0	2296			unknown	unclassified	unverified		
 0x000d8fd8	1243			unknown	unclassified	unverified		
-0x000d9b30	112			unknown	unclassified	unverified		
+0x000d9b30	112	probe_service_d9b30	probe_helpers1	compiles	game	confirmed	decomp/tests/0x000d9b30.json	docs/compiler-abi.md; Probe base values 0x6000 + n*0x100 (n = 0..16) with the 0x8b8 service 0x33 and return the first value whose reply echoes; callers 919d4@91a87,e9ac0@e9ad9; guest pending
 0x000d9ba0	106	query_device_d9ba0	runtime_helpers9	compiles	game	confirmed	decomp/tests/0x000d9ba0.json	docs/compiler-abi.md; Mouse-style call 0x33 (entry value ORed with 0x70); results through four pointers.; callers 93e58@93e89,94000@94031; guest pending
 0x000d9c30	129	open_stream_formats_d9c30	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000d9c30.json	docs/compiler-abi.md; Open the stream in either format; 0 on success, 1 on failure.; callers e9ac0@e9af3; guest pending
 0x000d9cb4	256			unknown	unclassified	unverified		
@@ -3454,7 +3454,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e994c	106	build_rotation_e994c	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000e994c.json	docs/compiler-abi.md; Build a rotation matrix and optionally mirror it.; callers 80b14@80b95,83a40@83a66,a04b4@a0511; guest pending
 0x000e99b8	106	transform_vector_e99b8	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000e99b8.json	docs/compiler-abi.md; Transform a vector by the current matrix (result doubled).; callers 80b14@80ba5,83734@83737,a04b4@a0526; guest pending
 0x000e9a24	132	original_memcpy		named	unclassified	unverified		RET 0Ch, EAX/EDX advance; docs/ghidra-findings.md
-0x000e9ac0	117			unknown	unclassified	unverified		
+0x000e9ac0	117	run_probe_e9ac0	probe_helpers1	compiles	game	confirmed	decomp/tests/0x000e9ac0.json	docs/compiler-abi.md; Run the probe selected by the state word at 0x464472 (1, 2 or 3), print a message when it reports failure, and return th; callers 8b39c@8b4c9; guest pending
 0x000e9b38	188			unknown	unclassified	unverified		
 0x000e9c00	214			unknown	unclassified	unverified		
 0x000e9cd8	243			unknown	unclassified	unverified		
