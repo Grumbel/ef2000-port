@@ -4057,3 +4057,32 @@ int32_t classify_object_b4ee0(uint32_t obj)
     }
     return -1;
 }
+
+/* 0x15a14, 216 bytes. Draw STR in colour COLOR with the proportional bitmap font at (X, Y): a space advances 3, characters with bit 7 set use the glyph map 0x122b08 (index = c & 0x1f, drawn 2 pixels higher), others the map 0x122ac8 (index = c & 0x3f); an index of -1 draws nothing and does not advance. Each drawn glyph (0xcf7c4 with the bitmap pointer from 0x122b64) advances by its width byte 0x122b28[index] + 1. */
+void draw_prop_text_15a14(uint32_t color, int32_t x, int32_t y, uint32_t str)
+{
+    int16_t px = (int16_t)x;
+    int16_t i;
+    for (i = 0;; i++) {
+        uint32_t c = EF_U8(str + (uint32_t)(int32_t)i);
+        int32_t idx;
+        if (c == 0u)
+            break;
+        if (c == 0x20u) {
+            px = (int16_t)(px + 3);
+            continue;
+        }
+        if ((c & 0x80u) != 0u) {
+            idx = (int8_t)EF_U8(0x00122b08u + (c & 0x1fu));
+            if (idx == -1)
+                continue;
+            guest_fn_cf7c4_x(EF_U32(0x00122b64u + (uint32_t)idx * 4u), (uint32_t)((int32_t)(int16_t)y - 2), (uint32_t)(int32_t)px, color & 0xffu);
+        } else {
+            idx = (int8_t)EF_U8(0x00122ac8u + (c & 0x3fu));
+            if (idx == -1)
+                continue;
+            guest_fn_cf7c4_x(EF_U32(0x00122b64u + (uint32_t)idx * 4u), (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)px, color & 0xffu);
+        }
+        px = (int16_t)(px + EF_U8(0x00122b28u + (uint32_t)idx) + 1);
+    }
+}

@@ -4814,4 +4814,6 @@ void draw_clipped_text_e5db4(uint32_t color, int32_t x, int32_t y, uint32_t str)
 
 int32_t classify_object_b4ee0(uint32_t obj);
 
+void draw_prop_text_15a14(uint32_t color, int32_t x, int32_t y, uint32_t str);
+
 #endif
