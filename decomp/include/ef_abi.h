@@ -2682,4 +2682,27 @@ void guest_fn_f2dcc(ef_addr32 path); /* 0xf2dcc EAX */
 uint32_t guest_fn_c34cc_ret(uint32_t request); /* 0xc34cc EAX -> EAX */
 void guest_fn_c3f80(uint32_t block); /* 0xc3f80 EAX */
 
+/* runtime_helpers27.c */
+uint32_t alloc_aligned_510(uint32_t size);
+uint32_t start_request_628(uint32_t first, uint32_t second, int32_t third);
+void finish_request_6b8(uint32_t index);
+uint32_t start_timer_734(uint32_t source, uint32_t unused_dx, uint32_t flags);
+void copy_pending_name_6b50(void);
+uint32_t read_header_list_f198(void);
+uint32_t read_record_header_f604(ef_addr32 record);
+uint32_t read_point_list_fb10(ef_addr32 list);
+uint32_t read_polyline_list_fbcc(ef_addr32 record);
+uint32_t read_group_header_fc54(ef_addr32 group);
+ef_addr32 find_unique_node_ffb4(ef_addr32 name, ef_addr32 head);
+uint32_t guest_fn_9be38(uint32_t size); /* 0x9be38 cdecl */
+uint32_t guest_fn_9c220(uint32_t a, uint32_t b, uint32_t c); /* 0x9c220 cdecl */
+uint32_t guest_fn_9c23d(uint32_t a, uint32_t b, uint32_t c); /* 0x9c23d cdecl */
+uint32_t guest_fn_324(uint32_t a); /* 0x324 EAX */
+uint64_t guest_fn_348(uint32_t a); /* 0x348 EAX -> EDX:EAX */
+void guest_fn_484(uint32_t a, uint32_t b, uint32_t c); /* 0x484 EAX/EDX/EBX */
+void guest_fn_b3c04(uint32_t a, uint32_t b); /* 0xb3c04 EAX/EDX */
+void guest_fn_f13c(ef_addr32 entry); /* 0xf13c EAX */
+void guest_fn_f314(ef_addr32 entry, uint32_t value); /* 0xf314 EAX/EDX */
+void guest_fn_ed80(ef_addr32 point); /* 0xed80 EAX */
+
 #endif

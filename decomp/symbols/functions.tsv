@@ -10,11 +10,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000003d0	37			unknown	unclassified	unverified		
 0x000003f8	140			unknown	unclassified	unverified		
 0x00000484	140			unknown	unclassified	unverified		
-0x00000510	113			unknown	unclassified	unverified		
+0x00000510	113	alloc_aligned_510	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x00000510.json	docs/compiler-abi.md; Allocate a paragraph-aligned block and register it in the 12-entry pool.; callers b04@b15,ddbe0@ddc02,ddbe0@ddc11; guest pending
 0x00000604	36	encode_runtime_segment_offset	runtime_indexed	compiles	game	confirmed	decomp/tests/0x0000604.json	Base-relative real-mode-style segment/offset result; callers b04@b1f/ddd48@ddd8e; guest pending
-0x00000628	144			unknown	unclassified	unverified		
-0x000006b8	124			unknown	unclassified	unverified		
-0x00000734	120			unknown	unclassified	unverified		
+0x00000628	144	start_request_628	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x00000628.json	docs/compiler-abi.md; Take a free 10-byte request slot, fill it and start the request.; callers e20@e73,e20@e84,e20@e95; guest pending
+0x000006b8	124	finish_request_6b8	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x000006b8.json	docs/compiler-abi.md; Finish a request slot and return it to the free list.; callers cd554@cd5a1,cd554@cd5ab,118290@1182bd; guest pending
+0x00000734	120	start_timer_734	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x00000734.json	docs/compiler-abi.md; Take a free 14-byte timer slot, fill it from the source and start it.; callers 81c@866,cd4d4@cd529,117f68@1181a4; guest pending
 0x000007b4	104			unknown	unclassified	unverified		
 0x0000081c	98			unknown	unclassified	unverified		
 0x00000880	53	dos_call_350b_880	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000880.json	docs/compiler-abi.md; Issue DOS service 0x350b and return the result register.; callers 8b39c@8b3a6; guest pending
@@ -88,7 +88,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00006924	423			unknown	unclassified	unverified		
 0x00006acc	78	object_category	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00006acc.json	docs/compiler-abi.md; Category of an object from the byte at +0xe9: 1 (<=0xf), 2 (0x10..0x15), 3 (0x20..0x21), 4 (0x22..0x24).; callers 6924@6996,625d8@62b2a,65c1c@65c7d; guest pending
 0x00006b1c	50	update_flag_6b1c	game_helpers4	compiles	game	confirmed	decomp/tests/0x00006b1c.json	docs/compiler-abi.md; ; callers 5f60@5fb5; guest pending
-0x00006b50	163			unknown	unclassified	unverified		
+0x00006b50	163	copy_pending_name_6b50	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x00006b50.json	docs/compiler-abi.md; Copy the pending name into a fresh string slot according to the mode.; callers 5f60@5fba,56d18@56d39; guest pending
 0x00006bf4	40	clear_command_state_6bf4	low_helpers	compiles	game	confirmed	decomp/tests/0x00006bf4.json	docs/compiler-abi.md; clear words 0x197244/46/48 and bytes 0x197254, 0x121e4f; callers 5f60@5fb0,5fd8@6003; guest pending
 0x00006c1c	461			unknown	unclassified	unverified		
 0x00006df0	38	alloc_zero_5x_6df0	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00006df0.json	docs/compiler-abi.md; Allocate and zero five bytes per unit.; callers 6e18@6e35; guest pending
@@ -211,20 +211,20 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000f08c	95	read_group_list_f08c	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000f08c.json	docs/compiler-abi.md; Read a count and that many 6-byte groups of 17-byte parser records.; callers f314@f588; guest pending
 0x0000f0ec	79	parse_enum_f0ec	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000f0ec.json	docs/compiler-abi.md; Parse a token and look it up in the 6-entry table at 0x132d1c.; callers f13c@f14b; guest pending
 0x0000f13c	91	read_record_f13c	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000f13c.json	docs/compiler-abi.md; ; callers f198@f247; guest pending
-0x0000f198	199			unknown	unclassified	unverified		
+0x0000f198	199	read_header_list_f198	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000f198.json	docs/compiler-abi.md; Read a 14-byte header and its list of 44-byte records.; callers f6a8@f7d9; guest pending
 0x0000f260	180			unknown	unclassified	unverified		
 0x0000f314	749			unknown	unclassified	unverified		
-0x0000f604	163			unknown	unclassified	unverified		
+0x0000f604	163	read_record_header_f604	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000f604.json	docs/compiler-abi.md; Read a record header and its list of 124-byte sub-records.; callers f6a8@f7ff; guest pending
 0x0000f6a8	591			unknown	unclassified	unverified		
 0x0000f8f8	30	release_secondary_parser_text	parser_line_records	compiles	game	confirmed	decomp/tests/0x000f8f8.json	Release optional text buffer and null it; callers b1b10@b1b7f/ca7e0@ca7e3; guest pending
 0x0000f918	504			unknown	unclassified	unverified		
-0x0000fb10	187			unknown	unclassified	unverified		
-0x0000fbcc	136			unknown	unclassified	unverified		
-0x0000fc54	159			unknown	unclassified	unverified		
+0x0000fb10	187	read_point_list_fb10	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000fb10.json	docs/compiler-abi.md; Read a list of 25-byte points and clamp the inner ones into 12..387.; callers fbcc@fc39; guest pending
+0x0000fbcc	136	read_polyline_list_fbcc	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000fbcc.json	docs/compiler-abi.md; Read a header and its list of point lists.; callers fc54@fcd8; guest pending
+0x0000fc54	159	read_group_header_fc54	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000fc54.json	docs/compiler-abi.md; Read a group header and its list of 10-byte polyline records.; callers fecc@ff70; guest pending
 0x0000fcf4	343			unknown	unclassified	unverified		
 0x0000fe4c	125	read_parser_text_record	parser_line_records	compiles	game	confirmed	decomp/tests/0x000fe4c.json	Parser line then two token advances, string plus 5 bytes and 6 words; callers f314@f5d3/fcf4@fe36; guest pending
 0x0000fecc	231			unknown	unclassified	unverified		
-0x0000ffb4	103			unknown	unclassified	unverified		
+0x0000ffb4	103	find_unique_node_ffb4	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000ffb4.json	docs/compiler-abi.md; Find the node whose name matches; abort unless exactly one matches.; callers 1001c@1022b; guest pending
 0x0001001c	1414			unknown	unclassified	unverified		
 0x000105a4	141			unknown	unclassified	unverified		
 0x00010640	12	sample_runtime_tick	runtime_small_ops	compiles	game	confirmed	decomp/tests/0x0010640.json	Indirect tick callback and global storage; callers 1064c@1064c/1065c@1065e; guest pending

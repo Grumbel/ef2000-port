@@ -3367,3 +3367,19 @@ in EAX, format string address, one value).
 | `0xeb4a0` | EAX:uint32_t | EAX:uint32_t | ebb58@ebbe0 | Allocate a block or abort. |
 | `0xf1850` | EAX:ef_addr32 | none | f18a4@f1912,f18a4@f1a13,f1a70@f1b94 | Copy an entry's name when its kind is 1 and publish the kind. |
 | `0xf2dfc` | none | none | f3b78@f3b99 | Save the current path, restart the driver and abort when it fails. |
+
+## runtime_helpers27 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x510` | EAX:uint32_t | EAX:uint32_t | b04@b15,ddbe0@ddc02,ddbe0@ddc11 | Allocate a paragraph-aligned block and register it in the 12-entry pool. |
+| `0x628` | EAX:uint32_t,EDX:uint32_t,EBX:int32_t | EAX:uint32_t | e20@e73,e20@e84,e20@e95 | Take a free 10-byte request slot, fill it and start the request. |
+| `0x6b8` | EAX:uint32_t | none | cd554@cd5a1,cd554@cd5ab,118290@1182bd | Finish a request slot and return it to the free list. |
+| `0x734` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 81c@866,cd4d4@cd529,117f68@1181a4 | Take a free 14-byte timer slot, fill it from the source and start it. |
+| `0x6b50` | none | none | 5f60@5fba,56d18@56d39 | Copy the pending name into a fresh string slot according to the mode. |
+| `0xf198` | none | EAX:uint32_t | f6a8@f7d9 | Read a 14-byte header and its list of 44-byte records. |
+| `0xf604` | EAX:ef_addr32 | EAX:uint32_t | f6a8@f7ff | Read a record header and its list of 124-byte sub-records. |
+| `0xfb10` | EAX:ef_addr32 | EAX:uint32_t | fbcc@fc39 | Read a list of 25-byte points and clamp the inner ones into 12..387. |
+| `0xfbcc` | EAX:ef_addr32 | EAX:uint32_t | fc54@fcd8 | Read a header and its list of point lists. |
+| `0xfc54` | EAX:ef_addr32 | EAX:uint32_t | fecc@ff70 | Read a group header and its list of 10-byte polyline records. |
+| `0xffb4` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 1001c@1022b | Find the node whose name matches; abort unless exactly one matches. |
