@@ -2714,7 +2714,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c09e4	202			unknown	unclassified	unverified		
 0x000c0b04	1326			unknown	unclassified	unverified		
 0x000c1034	142			unknown	unclassified	unverified		
-0x000c10c4	181			unknown	unclassified	unverified		
+0x000c10c4	181	reactivate_records_at_cell_c10c4	game_helpers94	compiles	game	confirmed	decomp/tests/0x000c10c4.json	docs/compiler-abi.md; Reactivate up to count disabled (state 7) records at the given cell whose code passes the group and set tests; returns h; callers c117c@c11ce; guest pending
 0x000c117c	124			unknown	unclassified	unverified		
 0x000c1210	550			unknown	unclassified	unverified		
 0x000c1438	1284			unknown	unclassified	unverified		

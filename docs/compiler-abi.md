@@ -4236,3 +4236,9 @@ in EAX, format string address, one value).
 | `0xd0ebc` | EAX:ef_addr32,DX:uint16_t | none | 1b4a4@1b5ed,26b60@26f5e,27348@27362 | Rotate the matrix's first and third columns by an angle. |
 | `0xd0dbc` | EAX:ef_addr32,DX:uint16_t | none | 1b4a4@1b5fc,26b60@26f6b,27348@2736f | Rotate the matrix's second and third columns by an angle. |
 | `0xd0fb8` | EAX:ef_addr32,DX:uint16_t | none | 26b60@26f78,27348@2737c,2a1fc@2a2b9 | Rotate the matrix's first and second columns by an angle. |
+
+## game_helpers94 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc10c4` | AX:int16_t,DX:int16_t,EBX:uint32_t,CL:uint8_t,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | EAX:uint32_t | c117c@c11ce | Reactivate up to count disabled (state 7) records at the given cell whose code passes the group and set tests; returns h |
