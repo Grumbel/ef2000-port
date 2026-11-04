@@ -9505,3 +9505,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x118770` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:int32_t,[ESP+8]:ef_addr32,[ESP+12]:ef_addr32,[ESP+16]:ef_addr32 | none | 107070@107149 | Convert the two angle values D and E (x 0xc90f in 14-bit fixed point) through 0x11f538 into sine/cosine style pairs, com |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10edda` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:ef_addr32 | 10eda1@10effa,10eda1@10f030 | Parse a "[:]text[+-]H:M:S" time string: copies the leading text (max 30 chars) to buf and stores the signed seconds to * |

@@ -6509,4 +6509,7 @@ void rotate_view_pair_119acc(void); /* 0x119acc */
 void angles_from_vector_118770(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, ef_addr32 out1, ef_addr32 out2, ef_addr32 out3);
 void angles_from_vector_118770(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, ef_addr32 out1, ef_addr32 out2, ef_addr32 out3); /* 0x118770 */
 
+ef_addr32 parse_time_string_10edda(ef_addr32 str, ef_addr32 buf, ef_addr32 out);
+ef_addr32 parse_time_string_10edda(ef_addr32 str, ef_addr32 buf, ef_addr32 out); /* 0x10edda */
+
 #endif

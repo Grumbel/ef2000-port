@@ -23335,3 +23335,63 @@ void angles_from_vector_118770(int32_t a, int32_t b, int32_t c, int32_t d, int32
 	EF_U32(out2) = (uint32_t)md_fx14(ca, 0xe52ee);
 	EF_U32(out3) = (uint32_t)md_fx14(cb, 0xe52ee);
 }
+
+/* 0x10edda, 278 bytes. Parse a "[:]text[+-]H:M:S" time string: copies the leading text (max 30 chars) to buf and stores the signed seconds to *out. Returns the end pointer. */
+ef_addr32 parse_time_string_10edda(ef_addr32 str, ef_addr32 buf, ef_addr32 out)
+{
+	ef_addr32 p = str;
+	ef_addr32 start;
+	uint8_t term;
+	int32_t len;
+	int32_t neg = 0;
+	int32_t slot[3];
+
+	if (EF_U8(p) == 0x3a) {
+		p++;
+	}
+	start = p;
+	for (;;) {
+		term = EF_U8(p);
+		if (term == 0 || term == 0x2c || term == 0x2d || term == 0x2b) {
+			break;
+		}
+		if (term >= 0x30 && term <= 0x39) {
+			break;
+		}
+		p++;
+	}
+	len = (int32_t)(p - start);
+	if (len > 0x1e) {
+		len = 0x1e;
+	}
+	memcpy(ef_guest_memory_ptr(buf), ef_guest_memory_ptr(start), (size_t)len);
+	EF_U8(buf + (uint32_t)len) = 0;
+	if (term == 0x2d) {
+		neg = 1;
+		p++;
+	} else if (term == 0x2b) {
+		p++;
+	}
+	if (EF_U8(p) >= 0x30 && EF_U8(p) <= 0x39) {
+		uint8_t sep;
+		int32_t v;
+
+		slot[0] = 0;
+		slot[1] = 0;
+		slot[2] = 0;
+		p = parse_decimal(p, (ef_addr32)(uintptr_t)&slot[2]);
+		sep = EF_U8(p);
+		if (sep == 0x3a) {
+			p = parse_decimal(p + 1, (ef_addr32)(uintptr_t)&slot[1]);
+			if (EF_U8(p) == sep) {
+				p = parse_decimal(p + 1, (ef_addr32)(uintptr_t)&slot[0]);
+			}
+		}
+		v = (slot[1] + slot[2] * 60) * 60 + slot[0];
+		EF_S32(out) = v;
+		if (neg) {
+			EF_S32(out) = -v;
+		}
+	}
+	return p;
+}
