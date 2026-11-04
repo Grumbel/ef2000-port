@@ -7735,3 +7735,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x538e4` | none | none | 53c80@53ca9 | Integrate the floating drift state for one frame of DT = word 0x127d92 ticks: the positions 0x1a5c00, 0x1a5bb8 and 0x1a5 |

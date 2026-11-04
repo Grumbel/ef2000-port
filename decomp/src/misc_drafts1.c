@@ -12905,3 +12905,32 @@ void draw_roster_list_7eda4(void)
     }
     guest_fn_dc250();
 }
+
+/* 0x538e4, 252 bytes. Integrate the floating drift state for one frame of DT = word 0x127d92 ticks: the positions 0x1a5c00, 0x1a5bb8 and 0x1a5bbc (floats) advance by the velocities 0x1a5ba0, 0x1a5ba4 and 0x1a5ba8 times DT, and every velocity decays by itself * DT * the float 0x185b6c. Then 0x1a5ba4 gains scale(10.0) * DT * (float 0x185b70)^2 and, when scale(5.0) * float 0x185b70 is below it, byte 0x1a364e is incremented and dword 0x1a5b5c cleared. */
+void integrate_drift_538e4(void)
+{
+    float *v0 = (float *)ef_guest_memory_ptr(0x001a5ba0u);
+    float *v1 = (float *)ef_guest_memory_ptr(0x001a5ba4u);
+    float *v2 = (float *)ef_guest_memory_ptr(0x001a5ba8u);
+    float *p0 = (float *)ef_guest_memory_ptr(0x001a5c00u);
+    float *p1 = (float *)ef_guest_memory_ptr(0x001a5bb8u);
+    float *p2 = (float *)ef_guest_memory_ptr(0x001a5bbcu);
+    float k = *(float *)ef_guest_memory_ptr(0x00185b6cu);
+    float k2 = *(float *)ef_guest_memory_ptr(0x00185b70u);
+    double dt = (double)EF_U16(0x00127d92u);
+    double r;
+    *p0 = (float)((double)*v0 * dt + (double)*p0);
+    *p1 = (float)((double)*v1 * dt + (double)*p1);
+    *p2 = (float)((double)*v2 * dt + (double)*p2);
+    *v0 = (float)((double)*v0 - (double)*v0 * (double)k * dt);
+    *v1 = (float)((double)*v1 - (double)*v1 * (double)k * dt);
+    *v2 = (float)((double)*v2 - dt * ((double)k * (double)*v2));
+    r = scale_float_52eb0(10.0f);
+    dt = (double)EF_U16(0x00127d92u);
+    *v1 = (float)(r * dt * (double)k2 * (double)k2 + (double)*v1);
+    r = scale_float_52eb0(5.0f);
+    if (!(r * (double)k2 >= (double)*v1)) {
+        EF_U8(0x001a364eu) = (uint8_t)(EF_U8(0x001a364eu) + 1u);
+        EF_U32(0x001a5b5cu) = 0u;
+    }
+}

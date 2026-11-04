@@ -5610,4 +5610,6 @@ void draw_roster_list_7eda4(void);
 
 
 
+void integrate_drift_538e4(void);
+
 #endif
