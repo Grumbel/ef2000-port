@@ -3969,3 +3969,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7f9e4` | EAX:ef_addr32 | AL:uint8_t | 7ef14@7efeb,7ef14@7f02c,7ef14@7f09a | Pick the icon code for a unit record (0x47 for none). |
+
+## game_helpers71 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcbd30` | AL:uint8_t | AL:uint8_t | caa28@cab5f | Weight for a scan code (0 when unmapped); the original is a binary decision tree. |
+| `0xe34e8` | none | AL:uint8_t | 3dd30@3e216 | Read back the saved table blocks through the indirect readers; returns whether a record id is set. |
