@@ -8487,3 +8487,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x724a8` | EAX:uint32_t,EDX:uint32_t | none | 55144@552ee,8d3d4@8d470 | Advance the position of unit object OBJ (EDX; NULL or byte 0x122c5c set: nothing) by its velocity for the time since the |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x89478` | none | none | 8a318@8a42e | Per-frame damping of the heading double at 0x1fd020 (X) by mode byte 0x12d7b2 (1..4; the mode is rewritten unchanged). M |

@@ -17768,3 +17768,36 @@ void advance_object_position_724a8(uint32_t index, uint32_t obj)
 	}
 	guest_fn_73d50_w((int32_t)(int16_t)index);
 }
+
+/* 0x89478, 321 bytes. Per-frame damping of the heading double at 0x1fd020 (X) by mode byte 0x12d7b2 (1..4; the mode is rewritten unchanged). Mode 1: X above -0.7453981634000001 or below -0.8253981634 becomes X - (X + 0.7853981634) * 0.16 * 0.3183098861827565. Mode 2: the double 0x1fcf98 gets -2200.0 added and, when X < -0.1745329252, X becomes X - X * 0.135 * 0.3183098861827565. Mode 3: like mode 1 with the bounds -0.2455993321454546 / -0.3255993321454546 and the offset 0.2855993321454546. Mode 4: 0x1fcf98 gets -10.0 added and, when X < -0.1745329252, X becomes X - X * 0.225 * 0.3183098861827565. */
+void damp_heading_89478(void)
+{
+	uint8_t mode = EF_U8(0x0012d7b2u);
+	double x, y;
+
+	memcpy(&x, ef_guest_memory_ptr(0x001fd020u), 8);
+	if (mode == 1u) {
+		if (x > -0.7453981634000001 || x < -0.8253981634)
+			x = x - (x + 0.7853981634) * 0.16 * 0.3183098861827565;
+	}
+	if (mode == 2u) {
+		memcpy(&y, ef_guest_memory_ptr(0x001fcf98u), 8);
+		y = y + -2200.0;
+		memcpy(ef_guest_memory_ptr(0x001fcf98u), &y, 8);
+		if (x < -0.1745329252)
+			x = x - x * 0.135 * 0.3183098861827565;
+	}
+	if (mode == 3u) {
+		if (x > -0.2455993321454546 || x < -0.3255993321454546)
+			x = x - (x + 0.2855993321454546) * 0.16 * 0.3183098861827565;
+	}
+	if (mode == 4u) {
+		memcpy(&y, ef_guest_memory_ptr(0x001fcf98u), 8);
+		y = y + -10.0;
+		memcpy(ef_guest_memory_ptr(0x001fcf98u), &y, 8);
+		if (x < -0.1745329252)
+			x = x - x * 0.225 * 0.3183098861827565;
+	}
+	memcpy(ef_guest_memory_ptr(0x001fd020u), &x, 8);
+	EF_U8(0x0012d7b2u) = mode;
+}
