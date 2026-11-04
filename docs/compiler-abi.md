@@ -6212,3 +6212,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x57820` | EAX:uint32_t | none | 577ac@577da,577e8@57818 | Build the status message for the event record REC (bytes: +1 first slot, +2 second slot, signed, -1 = none; +3/+4/+5 sel |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x319ac` | none | none | 3122c@312ee | Update the camera position (dwords 0x19e5c1/5c5/5c9): rotate the offset (0, 0, -dword 0x19e597) by the angle pair at wor |

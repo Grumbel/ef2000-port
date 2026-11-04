@@ -509,7 +509,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003170c	103	place_rotated_vector_3170c	search_helpers1	compiles	game	confirmed	decomp/tests/0x0003170c.json	docs/compiler-abi.md; Rotate the vector at 0x19e57e by zero angles into 0x19e5c1 and add the offset triple at 0x19e560.; callers 3122c@312ad; guest pending
 0x00031774	161			unknown	unclassified	unverified		
 0x00031818	402			unknown	unclassified	unverified		
-0x000319ac	318			unknown	unclassified	unverified		
+0x000319ac	318	update_camera_position_319ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000319ac.json	docs/compiler-abi.md; Update the camera position (dwords 0x19e5c1/5c5/5c9): rotate the offset (0, 0, -dword 0x19e597) by the angle pair at wor; callers 3122c@312ee; guest pending
 0x00031aec	84	advance_position_31aec	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00031aec.json	docs/compiler-abi.md; Identical to 0x316b8.; callers 3122c@312e7; guest pending
 0x00031b40	462			unknown	unclassified	unverified		
 0x00031d10	108	update_angles_31d10	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00031d10.json	docs/compiler-abi.md; Update the angle words from mode byte 0x19e55f.; callers 3122c@3128e,3122c@312fd; guest pending

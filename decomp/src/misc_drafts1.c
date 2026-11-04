@@ -5596,3 +5596,34 @@ void format_event_message_57820(uint32_t rec)
     EF_U16(0x00127dacu) = 0x12cu;
     EF_U16(0x001a662cu) = 0xc8u;
 }
+
+/* 0x319ac, 318 bytes. Update the camera position (dwords 0x19e5c1/5c5/5c9): rotate the offset (0, 0, -dword 0x19e597) by the angle pair at words 0x19e5a5/5a7 into the position, then, when byte 0x19e558 is 2, rotate the offset (0x19e58b/58f/593 + position) by the angles at words 0x19e56c/56e/570 and add the velocity dwords 0x19e560/564/568 to the result; otherwise just add the velocity to the position. */
+void update_camera_position_319ac(void)
+{
+    uint16_t angles[4];
+    int32_t vec[3];
+    int32_t out[3];
+    angles[0] = EF_U16(0x0019e5a5u);
+    angles[1] = EF_U16(0x0019e5a7u);
+    angles[2] = 0u;
+    vec[0] = 0;
+    vec[1] = 0;
+    vec[2] = -(int32_t)EF_U32(0x0019e597u);
+    rotate_vector_by_angles_32414((uint32_t)(uintptr_t)angles, (uint32_t)(uintptr_t)vec, 0x0019e5c1u);
+    if (EF_U8(0x0019e558u) == 2u) {
+        angles[0] = EF_U16(0x0019e56cu);
+        angles[1] = EF_U16(0x0019e56eu);
+        angles[2] = EF_U16(0x0019e570u);
+        vec[0] = (int32_t)(EF_U32(0x0019e58bu) + EF_U32(0x0019e5c1u));
+        vec[1] = (int32_t)(EF_U32(0x0019e58fu) + EF_U32(0x0019e5c5u));
+        vec[2] = (int32_t)(EF_U32(0x0019e593u) + EF_U32(0x0019e5c9u));
+        rotate_vector_by_angles_32414((uint32_t)(uintptr_t)angles, (uint32_t)(uintptr_t)vec, (uint32_t)(uintptr_t)out);
+        EF_U32(0x0019e5c1u) = EF_U32(0x0019e560u) + (uint32_t)out[0];
+        EF_U32(0x0019e5c5u) = EF_U32(0x0019e564u) + (uint32_t)out[1];
+        EF_U32(0x0019e5c9u) = EF_U32(0x0019e568u) + (uint32_t)out[2];
+    } else {
+        EF_U32(0x0019e5c1u) += EF_U32(0x0019e560u);
+        EF_U32(0x0019e5c5u) += EF_U32(0x0019e564u);
+        EF_U32(0x0019e5c9u) += EF_U32(0x0019e568u);
+    }
+}

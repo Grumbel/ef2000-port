@@ -4963,4 +4963,6 @@ void guest_fn_117b18_x(uint32_t rec); /* 0x117b18 EAX */
 
 void format_event_message_57820(uint32_t rec);
 
+void update_camera_position_319ac(void);
+
 #endif
