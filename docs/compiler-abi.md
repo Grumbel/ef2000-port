@@ -7801,3 +7801,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x3c5b8` | none | none | 3c6c0@3c711 | Parse a table from the text reader: the first line (read_line_3c558 into 0x1a2df0, format 0x18365c) gives the entry coun |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf3378` | none | none | f34cc@f34f6 | Draw the outlined polygons of the overlay list: when word 0x1616e8 and byte 0x4859dc are both set run 0xf3214 first; the |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

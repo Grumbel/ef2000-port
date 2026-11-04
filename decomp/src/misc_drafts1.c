@@ -13207,3 +13207,30 @@ void load_table_3c5b8(void)
         EF_U8(e + 0x48u) = (uint8_t)v[0];
     }
 }
+
+/* 0xf3378, 263 bytes. Draw the outlined polygons of the overlay list: when word 0x1616e8 and byte 0x4859dc are both set run 0xf3214 first; then, between 0xc3974 and 0xc39ac, for each of the word 0x1616e6 entries (0x16 bytes each at 0x4853fe) draw four edges between the corner words at +0 (A), +2 (B), +4 (C) and +6 (D), each >> 16, with 0xc8ccc in the colour from the high half of 0x161e1a */
+void draw_overlay_polys_f3378(void)
+{
+    int16_t i;
+    int16_t n;
+    if (EF_U16(0x001616e8u) != 0u && EF_U8(0x004859dcu) != 0u)
+        guest_fn_f3214_x();
+    guest_fn_c3974();
+    n = (int16_t)EF_U16(0x001616e6u);
+    for (i = 0; n > 0 && i < (int16_t)EF_U16(0x001616e6u); i++) {
+        ef_addr32 p = 0x004853feu + (uint32_t)((int32_t)i * 0x16);
+        uint32_t col = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
+        uint32_t a = (uint32_t)((int32_t)EF_U32(p) >> 16);
+        uint32_t b = (uint32_t)((int32_t)EF_U32(p + 2u) >> 16);
+        uint32_t c = (uint32_t)((int32_t)EF_U32(p + 4u) >> 16);
+        uint32_t d = (uint32_t)((int32_t)EF_U32(p + 6u) >> 16);
+        guest_fn_c8ccc_x(b, c, b, a, col);
+        col = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
+        guest_fn_c8ccc_x(d, c, b, c, col);
+        col = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
+        guest_fn_c8ccc_x(d, a, d, c, col);
+        col = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
+        guest_fn_c8ccc_x(b, a, d, a, col);
+    }
+    guest_fn_c39ac();
+}

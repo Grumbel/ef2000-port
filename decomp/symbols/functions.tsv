@@ -3627,7 +3627,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2fbc	399	read_entry_f2fbc	game_helpers61	compiles	game	confirmed	decomp/tests/0x000f2fbc.json	docs/compiler-abi.md; Read an entry record, with a trailing value unless the plain flag is set.; callers f3b78@f3bed; guest pending
 0x000f314c	200	read_pair_list_f314c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f314c.json	docs/compiler-abi.md; Read a list of number pairs from the script into the table entry [0x1616e8]: each pair (two parsed integers, stored as w; callers f3b78@f3c0a; guest pending
 0x000f3214	355			unknown	unclassified	unverified		
-0x000f3378	263			unknown	unclassified	unverified		
+0x000f3378	263	draw_overlay_polys_f3378	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f3378.json	docs/compiler-abi.md; Draw the outlined polygons of the overlay list: when word 0x1616e8 and byte 0x4859dc are both set run 0xf3214 first; the; callers f34cc@f34f6; guest pending
 0x000f3480	32	refresh_f3480	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3480.json	docs/compiler-abi.md; ; callers f34cc@f35a8; guest pending
 0x000f34a0	42	refresh_f34a0	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f34a0.json	docs/compiler-abi.md; ; callers f3f84@f40b1; guest pending
 0x000f34cc	266			unknown	unclassified	unverified		
