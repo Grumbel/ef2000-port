@@ -3378,3 +3378,82 @@ void draw_text_by_font_a8578(int32_t x, int32_t y, uint32_t colour, uint32_t tex
     default: break;
     }
 }
+
+/* 0x9ca57, 55 bytes. strcat: append the string SRC to DST; returns DST. */
+ef_addr32 strcat_9ca57(ef_addr32 dst, ef_addr32 src)
+{
+    uint32_t d = dst;
+    uint8_t c;
+    while (EF_U8(d) != 0u)
+        d++;
+    do {
+        c = EF_U8(src);
+        EF_U8(d) = c;
+        src++;
+        d++;
+    } while (c != 0u);
+    return dst;
+}
+
+/* 0x117b0c, 10 bytes. outp: write the byte VALUE to the I/O port PORT. */
+void outp_117b0c(uint32_t port, uint32_t value)
+{
+    guest_outp_x(port, value & 0xffu);
+}
+
+/* 0x9c430, 8 bytes. inp: read a byte from the I/O port PORT. */
+uint32_t inp_9c430(uint32_t port)
+{
+    return guest_inp_x(port) & 0xffu;
+}
+
+/* 0xdc832, 37 bytes. memcpy: copy COUNT bytes from SRC to DST (dwords first, then the tail bytes); returns DST. */
+ef_addr32 memcpy_dc832(ef_addr32 dst, ef_addr32 src, uint32_t count)
+{
+    uint32_t i;
+    uint32_t n = count >> 2;
+    uint32_t d = dst;
+    for (i = 0u; i < n; i++) {
+        EF_U32(d) = EF_U32(src);
+        d += 4u;
+        src += 4u;
+    }
+    for (i = 0u; i < (count & 3u); i++) {
+        EF_U8(d) = EF_U8(src);
+        d++;
+        src++;
+    }
+    return dst;
+}
+
+/* 0x9c858, 90 bytes. getenv: search the environment table at [0x160a18] (null terminated array of "NAME=value" strings) for NAME, ignoring case; returns the address of the value or 0. */
+ef_addr32 getenv_9c858(ef_addr32 name)
+{
+    uint32_t env = EF_U32(0x00160a18u);
+    uint32_t len = 0u;
+    uint32_t entry;
+    if (env == 0u || name == 0u)
+        return 0u;
+    while (EF_U8(name + len) != 0u)
+        len++;
+    for (entry = EF_U32(env); entry != 0u; entry = EF_U32(env)) {
+        if (compare_nocase_eb374(entry, name, (int32_t)len) == 0 && EF_U8(entry + len) == 0x3du)
+            return entry + len + 1u;
+        env += 4u;
+    }
+    return 0u;
+}
+
+/* 0xd099c, 66 bytes. Transpose the 3x3 matrix of dwords at SRC into DST. */
+void transpose_matrix3_d099c(ef_addr32 dst, ef_addr32 src)
+{
+    uint32_t t[9];
+    int32_t i;
+    for (i = 0; i < 3; i++) {
+        t[i] = EF_U32(src + (uint32_t)i * 12u);
+        t[i + 3] = EF_U32(src + (uint32_t)i * 12u + 4u);
+        t[i + 6] = EF_U32(src + (uint32_t)i * 12u + 8u);
+    }
+    for (i = 0; i < 9; i++)
+        EF_U32(dst + (uint32_t)i * 4u) = t[i];
+}

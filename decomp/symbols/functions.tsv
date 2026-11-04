@@ -2034,17 +2034,17 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009c2bb	24			unknown	unclassified	unverified		
 0x0009c2d3	61			unknown	unclassified	unverified		
 0x0009c3cf	60	push_handler_9c3cf	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009c3cf.json	docs/compiler-abi.md; Push a handler on the 32-entry stack at 0x40d030; -1 if full.; callers 81c@875,b04@b44,80058@8010a; guest pending
-0x0009c430	8			unknown	unclassified	unverified		
+0x0009c430	8	inp_9c430	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c430.json	docs/compiler-abi.md; inp: read a byte from the I/O port PORT.; callers 117b18@117b38,117b18@117b67,117bfc@117c39; guest pending
 0x0009c446	27	int386_9c446	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c446.json	docs/compiler-abi.md; int386: int386x with a freshly read segment block.; callers 1047e4@104803; guest pending
 0x0009c461	25	int386x_9c461	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c461.json	docs/compiler-abi.md; int386x: perform software interrupt INTNO with the register blocks IN/OUT and the segment block SREGS; returns the EAX t; callers 9c446@9c457,104840@10489a; guest pending
 0x0009c47a	56	int386x_core_9c47a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c47a.json	docs/compiler-abi.md; The software interrupt dispatcher behind int386x (registers ESI = interrupt number, EDI = input register block, EDX = ou; callers 9c461@9c46e; guest pending
 0x0009c4b2	37			unknown	unclassified	unverified		
-0x0009c858	90			unknown	unclassified	unverified		
+0x0009c858	90	getenv_9c858	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c858.json	docs/compiler-abi.md; getenv: search the environment table at [0x160a18] (null terminated array of "NAME=value" strings) for NAME, ignoring ca; callers e20@f2a,28224@28259,283c8@28473; guest pending
 0x0009c8b4	84			unknown	unclassified	unverified		
 0x0009c960	19	half_word_9c960	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c960.json	docs/compiler-abi.md; ; callers f60@f6a,2e04@334f,2e04@337c; guest pending
 0x0009c980	63	build_default_path_9c980	engine_helpers3	compiles	game	confirmed	decomp/tests/0x0009c980.json	docs/compiler-abi.md; Build the default path string in buffer.; callers f80@1120,45a4@45ae,2ff44@2ff7d; guest pending
 0x0009c9c0	86	build_path_9c9c0	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009c9c0.json	docs/compiler-abi.md; Build a search path: default directory + separator + name.; callers 371b0@371c2,abaf0@abaf6,c8e58@c8e75; guest pending
-0x0009ca57	55			unknown	unclassified	unverified		
+0x0009ca57	55	strcat_9ca57	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009ca57.json	docs/compiler-abi.md; strcat: append the string SRC to DST; returns DST.; callers f80@1127,45a4@45cc,45a4@45dc; guest pending
 0x0009cb20	78	find_in_archives_9cb20	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009cb20.json	docs/compiler-abi.md; Try the two open archives, then fall back to 0xb3b90.; callers 41fc@420d,6b50@6bb9,f6a8@f700; guest pending
 0x0009cb70	84	lookup_in_archives_9cb70	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009cb70.json	docs/compiler-abi.md; As 0x9cb20 with 0xeba4c and 0xa7b3c; -1 becomes 0.; callers 9cc28@9cc81,ea270@ea30d; guest pending
 0x0009cbc4	98	try_handlers_9cbc4	script_helpers1	compiles	game	confirmed	decomp/tests/0x0009cbc4.json	docs/compiler-abi.md; Try the two optional handlers (0x40d1f0 gated by bit 0 and 0x40d1f4 gated by bit 1 of 0x132ab0); return 1 if one accepts; callers 6b50@6be1,371b0@37216,3c6c0@3c705; guest pending
@@ -2998,7 +2998,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d0470	780			unknown	unclassified	unverified		
 0x000d0858	55	copy_record9_d0858	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d0858.json	docs/compiler-abi.md; Copy a 9-dword record.; callers 91c98@91d77,91df4@91e81,91df4@91ee6; guest pending
 0x000d08fc	160			unknown	unclassified	unverified		
-0x000d099c	66			unknown	unclassified	unverified		
+0x000d099c	66	transpose_matrix3_d099c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d099c.json	docs/compiler-abi.md; Transpose the 3x3 matrix of dwords at SRC into DST.; callers 91df4@91e04,91df4@91e75,91f30@91f3c; guest pending
 0x000d0b68	63	init_bounds_d0b68	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d0b68.json	docs/compiler-abi.md; Reset a 9-dword bounds record (0x7fff limits).; callers 1b4a4@1b5e3,26b60@26f51,27348@27355; guest pending
 0x000d0dbc	254	update_scene_angle_second	game_helpers93	compiles	game	confirmed	decomp/tests/0x000d0dbc.json	docs/compiler-abi.md; Rotate the matrix's second and third columns by an angle.; callers 1b4a4@1b5fc,26b60@26f6b,27348@2736f; guest pending
 0x000d0ebc	251	update_scene_angle_first	game_helpers93	compiles	game	confirmed	decomp/tests/0x000d0ebc.json	docs/compiler-abi.md; Rotate the matrix's first and third columns by an angle.; callers 1b4a4@1b5ed,26b60@26f5e,27348@27362; guest pending
@@ -3221,7 +3221,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc71b	73			unknown	unclassified	unverified		
 0x000dc7bc	40	load_sincos_dc7bc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000dc7bc.json	docs/compiler-abi.md; Load a sine/cosine word pair for an angle (8 angle units per table step).; callers 1f0fc@1f2a2,1f0fc@1f609,2a4c8@2a5e4; guest pending
 0x000dc7e4	78	rotate_point_dc7e4	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc7e4.json	docs/compiler-abi.md; Rotate (b, a) by the sine/cosine pair at 0x425f90 and store two words.; callers 1f0fc@1f2c3,1f0fc@1f2df,1f0fc@1f302; guest pending
-0x000dc832	37			unknown	unclassified	unverified		
+0x000dc832	37	memcpy_dc832	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dc832.json	docs/compiler-abi.md; memcpy: copy COUNT bytes from SRC to DST (dwords first, then the tail bytes); returns DST.; callers 1f994@1fbc8,233c4@235f1,233c4@2364f; guest pending
 0x000dc860	47	halve_pair_to_fit16	math_string	compiles	game	confirmed	decomp/tests/0x000dc860.json	docs/compiler-abi.md; Halve the dwords at EAX and EDX until both fit in a signed 16-bit range.; callers dc8d8@dc906; guest pending
 0x000dc890	69	halve_triple_to_fit16_dc890	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc890.json	docs/compiler-abi.md; Halve three dwords until all fit in a signed 16-bit range.; callers dc91c@dc98f,dcaa4@dcb2a; guest pending
 0x000dc8d8	67	angle_of_fitted_pair_dc8d8	game_helpers120	compiles	game	confirmed	decomp/tests/0x000dc8d8.json	docs/compiler-abi.md; Angle of the vector (x, y) after halving it until both components fit in 16 bits.; callers dc91c@dc9a9,dc91c@dc9bf; guest pending
@@ -4136,7 +4136,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00117a0f	147			unknown	unclassified	unverified		
 0x00117aa2	44	clear_buffer_117aa2	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00117aa2.json	docs/compiler-abi.md; Zero the buffer at +0x50 (length at +0x4c) of a record (cdecl, record on the stack).; callers 105648@105713,10585c@1058b3,10585c@105c60; guest pending
 0x00117ace	47			unknown	unclassified	unverified		
-0x00117b0c	10			unknown	unclassified	unverified		
+0x00117b0c	10	outp_117b0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117b0c.json	docs/compiler-abi.md; outp: write the byte VALUE to the I/O port PORT.; callers 117b18@117bc4,117bfc@117d2a,117e0c@117e67; guest pending
 0x00117b18	198			unknown	unclassified	unverified		
 0x00117bfc	314			unknown	unclassified	unverified		
 0x00117dd8	50			unknown	unclassified	unverified		

@@ -4751,4 +4751,13 @@ void draw_text_by_font_a8578(int32_t x, int32_t y, uint32_t colour, uint32_t tex
 
 
 
+ef_addr32 strcat_9ca57(ef_addr32 dst, ef_addr32 src);
+void outp_117b0c(uint32_t port, uint32_t value);
+uint32_t inp_9c430(uint32_t port);
+ef_addr32 memcpy_dc832(ef_addr32 dst, ef_addr32 src, uint32_t count);
+ef_addr32 getenv_9c858(ef_addr32 name);
+void transpose_matrix3_d099c(ef_addr32 dst, ef_addr32 src);
+void guest_outp_x(uint32_t port, uint32_t value); /* OUT DX, AL */
+uint32_t guest_inp_x(uint32_t port); /* IN AL, DX */
+
 #endif

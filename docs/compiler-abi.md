@@ -5806,3 +5806,14 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9ca57` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | f80@1127,45a4@45cc,45a4@45dc | strcat: append the string SRC to DST; returns DST. |
+| `0x117b0c` | EAX:uint32_t,EDX:uint32_t | none | 117b18@117bc4,117bfc@117d2a,117e0c@117e67 | outp: write the byte VALUE to the I/O port PORT. |
+| `0x9c430` | EAX:uint32_t | EAX:uint32_t | 117b18@117b38,117b18@117b67,117bfc@117c39 | inp: read a byte from the I/O port PORT. |
+| `0xdc832` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | 1f994@1fbc8,233c4@235f1,233c4@2364f | memcpy: copy COUNT bytes from SRC to DST (dwords first, then the tail bytes); returns DST. |
+| `0x9c858` | EAX:ef_addr32 | EAX:ef_addr32 | e20@f2a,28224@28259,283c8@28473 | getenv: search the environment table at [0x160a18] (null terminated array of "NAME=value" strings) for NAME, ignoring ca |
+| `0xd099c` | EAX:ef_addr32,EDX:ef_addr32 | none | 91df4@91e04,91df4@91e75,91f30@91f3c | Transpose the 3x3 matrix of dwords at SRC into DST. |
