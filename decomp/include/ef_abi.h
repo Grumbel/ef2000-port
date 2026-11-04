@@ -4533,4 +4533,9 @@ void guest_fn_975f0_x(ef_addr32 record); /* 0x975f0 EAX */
 uint32_t guest_fn_9783c_ret_x(ef_addr32 record, uint32_t count); /* 0x9783c EAX/EDX -> EAX */
 uint32_t guest_fn_9775c_x(ef_addr32 record); /* 0x9775c EAX -> EAX */
 
+void draw_glyph_6x5_eaf80(uint32_t colour, uint32_t x, uint32_t y, uint32_t glyph);
+void draw_glyph_6x6_f2960(uint32_t colour, uint32_t x, uint32_t y, uint32_t glyph);
+void unpack_planes_c38cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t src);
+void reset_colour_tables_767f4(void);
+
 #endif

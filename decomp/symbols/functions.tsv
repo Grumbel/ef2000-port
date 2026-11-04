@@ -1389,7 +1389,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00076370	688			unknown	unclassified	unverified		
 0x00076620	228			unknown	unclassified	unverified		
 0x00076704	239			unknown	unclassified	unverified		
-0x000767f4	136			unknown	unclassified	unverified		
+0x000767f4	136	reset_colour_tables_767f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000767f4.json	docs/compiler-abi.md; Reset the 256-entry colour tables: fill 0x1f71e0 with (0x3f, 0, 0x3f), zero the first entry at 0x464060, copy the 256 tr; callers 58d64@58d73; guest pending
 0x000768fc	10	set_limit_768fc	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000768fc.json	docs/compiler-abi.md; Set the 4000 limit word.; callers 58d64@58d78; guest pending
 0x00076944	1	nop_76944	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00076944.json	docs/compiler-abi.md; Empty stub (single ret).; callers 76704@767e6; guest pending
 0x00076948	213	fade_palette_76948	game_helpers40	compiles	game	confirmed	decomp/tests/0x00076948.json	docs/compiler-abi.md; Fade the 256-entry palette towards white by the fade counter.; callers 76370@765d8; guest pending
@@ -2744,7 +2744,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c386c	27	call_e9a24_c386c	list_lookup	compiles	game	confirmed	decomp/tests/0x000c386c.json	docs/compiler-abi.md; 0xe9a24(dword 0x164600, dword 0x146e40, dword 0x15b754).; callers 278c0@27932,27fec@2800c,27fec@2815d; guest pending
 0x000c3888	27	call_e9a24_c3888	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3888.json	docs/compiler-abi.md; 0xe9a24(dword 0x164600, dword 0x146e44, dword 0x15b754).; callers 27d18@27d8c,283c8@283ec,284ec@2850b; guest pending
 0x000c38a4	18	clear_buffer_c38a4	list_lookup	compiles	game	confirmed	decomp/tests/0x000c38a4.json	docs/compiler-abi.md; Tail-call 0xb3fb0(dword 0x146e40, 0, dword 0x164600).; callers eac48@eacb2; guest pending
-0x000c38cc	137			unknown	unclassified	unverified		
+0x000c38cc	137	unpack_planes_c38cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c38cc.json	docs/compiler-abi.md; Copy a planar (4 interleaved planes) image into the screen buffer at 0x146e40: for each plane, every row, every fourth p; callers eac48@ead00; guest pending
 0x000c3974	11	select_buffer_146e40	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3974.json	docs/compiler-abi.md; Dword 0x15b754 = dword 0x146e40.; callers ab74@ae67,278c0@27900,27fec@281db; guest pending
 0x000c3980	11	select_buffer_146e44	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3980.json	docs/compiler-abi.md; Dword 0x15b754 = dword 0x146e44.; callers 284ec@284f7,f53bc@f546c; guest pending
 0x000c3990	11	select_buffer_15b758	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3990.json	docs/compiler-abi.md; Dword 0x15b754 = dword 0x15b758.; callers 278c0@27b21,27d18@27e9d,39204@39216; guest pending
@@ -3494,7 +3494,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eabe8	93	build_data_path_eabe8	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000eabe8.json	docs/compiler-abi.md; Build the data file path from the default path, a name and a suffix.; callers eac48@eac7e; guest pending
 0x000eac48	453			unknown	unclassified	unverified		
 0x000eae10	54	release_pending_handle_eae10	game_helpers57	compiles	game	confirmed	decomp/tests/0x000eae10.json	docs/compiler-abi.md; Release the pending handle and the status message.; callers 97dcc@97e45,97dcc@97e89,a8bd4@a8e61; guest pending
-0x000eaf80	136			unknown	unclassified	unverified		
+0x000eaf80	136	draw_glyph_6x5_eaf80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eaf80.json	docs/compiler-abi.md; Draw a 6x5 glyph (index ecx, 5 mask bytes at 0x160648) in colour al at (x = edx, y row = ebx).; callers eb008@eb030; guest pending
 0x000eb008	61	draw_glyph_string_eb008	game_helpers91	compiles	game	confirmed	decomp/tests/0x000eb008.json	docs/compiler-abi.md; Draw a NUL-terminated string glyph by glyph (6 pixels apart, 6-bit codes).; callers 98658@986b1,98658@9884d,98658@988da; guest pending
 0x000eb050	94	put_screen_rows_eb050	small_wrappers5	compiles	game	confirmed	decomp/tests/0x000eb050.json	docs/compiler-abi.md; Copy a packed buffer of rows to the framebuffer at (x, y).; callers 98658@986e3,98658@98877,98658@9890c; guest pending
 0x000eb0b0	89	copy_rows_to_screen_eb0b0	small_wrappers4	compiles	game	confirmed	decomp/tests/0x000eb0b0.json	docs/compiler-abi.md; Copy rows of bytes into the framebuffer at (x, y), advancing the destination by the row stride at 0x1631f4.; callers e4c9c@e4f79; guest pending
@@ -3611,7 +3611,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2660	264			unknown	unclassified	unverified		
 0x000f2800	25	result_f2800	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2800.json	docs/compiler-abi.md; 0xf2819(), then return byte 0x161156.; callers a8bd4@a8bf5; guest pending
 0x000f2819	185			unknown	unclassified	unverified		
-0x000f2960	138			unknown	unclassified	unverified		
+0x000f2960	138	draw_glyph_6x6_f2960	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2960.json	docs/compiler-abi.md; Draw a 6x6 glyph (index ecx, 6 mask bytes at 0x16116c) in colour al at (x = edx, y row = ebx).; callers f29ec@f2a10; guest pending
 0x000f29ec	57	draw_text_f29ec	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f29ec.json	docs/compiler-abi.md; Draw a string with 6-pixel spacing, glyphs offset from the blank.; callers a9130@a9374; guest pending
 0x000f2a30	142			unknown	unclassified	unverified		
 0x000f2ac0	188			unknown	unclassified	unverified		

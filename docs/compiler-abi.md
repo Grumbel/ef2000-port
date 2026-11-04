@@ -5406,3 +5406,12 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x97860` | EAX:uint32_t | EAX:uint32_t | 974b8@9750c | Step the animation record: bump its frame word (+6), restart it through 0x975f0 when the frame reaches the limit table e |
 | `0x1046c4` | none | none | none direct | When 0x17d2d4 is set, run 0x1048b4 over the range (0x103d80, 0x1046c4), release the six runtime buffers (0x4dd670, 0x4dd |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xeaf80` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | eb008@eb030 | Draw a 6x5 glyph (index ecx, 5 mask bytes at 0x160648) in colour al at (x = edx, y row = ebx). |
+| `0xf2960` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | f29ec@f2a10 | Draw a 6x6 glyph (index ecx, 6 mask bytes at 0x16116c) in colour al at (x = edx, y row = ebx). |
+| `0xc38cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | eac48@ead00 | Copy a planar (4 interleaved planes) image into the screen buffer at 0x146e40: for each plane, every row, every fourth p |
+| `0x767f4` | none | none | 58d64@58d73 | Reset the 256-entry colour tables: fill 0x1f71e0 with (0x3f, 0, 0x3f), zero the first entry at 0x464060, copy the 256 tr |

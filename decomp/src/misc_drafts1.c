@@ -972,3 +972,81 @@ void release_runtime_buffers_1046c4(void)
     guest_fn_104920(0x004dd7c8u, 4u);
     EF_U32(0x0017d2d4u) = 0u;
 }
+
+/* Draw a glyph bitmap: rows of mask bytes starting at tbl, one pixel per set bit (starting at bit first, going down), written as colour to the row start addresses of the screen buffer. */
+static void draw_glyph_rows(uint32_t colour, uint32_t x, uint32_t y, uint32_t tbl, uint32_t rows, uint32_t width, uint32_t first_bit)
+{
+    uint32_t stride = EF_U32(0x001631f4u);
+    uint32_t p = EF_U32(0x0015b754u) + EF_U32(0x00163200u + y * 4u) + x;
+    uint32_t r;
+    uint32_t b;
+    for (r = 0u; r < rows; r++) {
+        uint8_t mask = EF_U8(tbl++);
+        for (b = 0u; b < width; b++) {
+            if (mask & (first_bit >> b))
+                EF_U8(p + b) = (uint8_t)colour;
+        }
+        p += stride;
+    }
+    EF_U32(0x001631f4u) = stride;
+}
+
+/* 0xeaf80, 136 bytes. Draw a 6x5 glyph (index ecx, 5 mask bytes at 0x160648) in colour al at (x = edx, y row = ebx). */
+void draw_glyph_6x5_eaf80(uint32_t colour, uint32_t x, uint32_t y, uint32_t glyph)
+{
+    draw_glyph_rows(colour, x, y, 0x00160648u + glyph * 5u, 5u, 6u, 0x20u);
+}
+
+/* 0xf2960, 138 bytes. Draw a 6x6 glyph (index ecx, 6 mask bytes at 0x16116c) in colour al at (x = edx, y row = ebx). */
+void draw_glyph_6x6_f2960(uint32_t colour, uint32_t x, uint32_t y, uint32_t glyph)
+{
+    draw_glyph_rows(colour, x, y, 0x0016116cu + glyph * 6u, 6u, 6u, 0x80u);
+}
+
+/* 0xc38cc, 137 bytes. Copy a planar (4 interleaved planes) image into the screen buffer at 0x146e40: for each plane, every row, every fourth pixel starting at the plane number. */
+void unpack_planes_c38cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t src)
+{
+    int32_t w = EF_S32(0x0015b744u);
+    int32_t plane;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    for (plane = 0; plane < 4; plane++) {
+        int32_t row;
+        if (EF_S32(0x0015b748u) <= 0)
+            continue;
+        row = 0;
+        do {
+            int32_t x = plane;
+            if (w > x) {
+                do {
+                    EF_U8(EF_U32(0x00146e40u) + EF_U32(0x00163200u + (uint32_t)row * 4u) + (uint32_t)x) = EF_U8(src++);
+                    x += 4;
+                } while (x < w);
+            }
+            row++;
+        } while (row < EF_S32(0x0015b748u));
+    }
+    EF_S32(0x0015b744u) = w;
+}
+
+/* 0x767f4, 136 bytes. Reset the 256-entry colour tables: fill 0x1f71e0 with (0x3f, 0, 0x3f), zero the first entry at 0x464060, copy the 256 triples at 0x464060 to 0x1f74e0, set 0x1f88fa to 0x32, 0x425b9c to 0x425b90 - 0x425b94, then expand the table. */
+void reset_colour_tables_767f4(void)
+{
+    int16_t i;
+    EF_U8(0x001f88fau) = 0x32u;
+    EF_S32(0x00425b9cu) = EF_S32(0x00425b90u) - EF_S32(0x00425b94u);
+    EF_U8(0x00464060u) = 0u;
+    EF_U8(0x00464061u) = 0u;
+    EF_U8(0x00464062u) = 0u;
+    for (i = 0; i < 0x100; i++) {
+        uint32_t o = (uint32_t)i * 3u;
+        EF_U8(0x001f71e0u + o) = 0x3fu;
+        EF_U8(0x001f71e1u + o) = 0u;
+        EF_U8(0x001f71e2u + o) = 0x3fu;
+    }
+    for (i = 0; i < 0x100; i++) {
+        uint32_t o = (uint32_t)i * 3u;
+        EF_U16(0x001f74e0u + o) = EF_U16(0x00464060u + o);
+        EF_U8(0x001f74e2u + o) = EF_U8(0x00464062u + o);
+    }
+    expand_table_7632c();
+}
