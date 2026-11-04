@@ -3763,3 +3763,18 @@ in EAX, format string address, one value).
 | `0xabce8` | none | none | none direct | Refresh the named widget's page and draw its label. |
 | `0xdeb50` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 2af20@2af31,2af20@2af45,2af20@2af59 | Fill a block with a repeating four-byte pattern. |
 | `0xe474c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 53ecc@53f95,53ecc@53fdd | Store two arguments and run the shutdown call chain. |
+
+## leaf_helpers4 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5f634` | none | none | 5f60@5f7a,5fd8@5fe8 | Reset the page state and rebuild the menu. |
+| `0x6e390` | AL:uint8_t,DL:uint8_t | AL:uint8_t | 6e59c@6e825,6f2bc@6f348,6f3e0@6f47c | Apply the standard step when the request is accepted. |
+| `0x81110` | none | none | 8b39c@8b49d | Select the page handler or fall back to the default screens. |
+| `0x83b50` | none | none | 84678@84678 | Advance the page counter by 3 or 1 depending on a flag bit. |
+| `0x84544` | none | AL:uint8_t | none direct | Refresh the view, re-centre if the cursor left it, and redraw the panel. |
+| `0x84c84` | none | none | none direct | Play the queued message strings, then wait for a key. |
+| `0xa3280` | AX:uint16_t | none | a32e8@a3327 | Request a status string for an index and restore the frame delta. |
+| `0xa334c` | AX:uint16_t | none | a33a4@a33da | Request the details of an entry when its table flag is set. |
+| `0xa5abc` | none | none | ac240@ac2cb | Run and clear the pending callbacks of every registered widget. |
+| `0xa9490` | EAX:ef_addr32,DX:int16_t | none | a94e4@a9505,a94e4@a9530,a94e4@a959a | Step a list cursor n rows forward and latch the result. |

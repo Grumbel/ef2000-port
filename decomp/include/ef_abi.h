@@ -3268,4 +3268,35 @@ void guest_fn_109b20_w(void); /* 0x109b20 */
 void guest_fn_d6090_w(void); /* 0xd6090 */
 void guest_fn_e4340_w(void); /* 0xe4340 */
 
+/* leaf_helpers4.c */
+void reset_menu_page_5f634(void);
+uint8_t apply_step_6e390(uint8_t a, uint8_t b);
+void select_page_handler_81110(void);
+void advance_page_counter_83b50(void);
+uint8_t refresh_panel_84544(void);
+void play_queued_messages_84c84(void);
+void request_status_string_a3280(uint16_t index);
+void request_entry_details_a334c(uint16_t index);
+void run_pending_callbacks_a5abc(void);
+void step_list_cursor_a9490(ef_addr32 list, int16_t n);
+void guest_fn_5e658_w(void); /* 0x5e658 */
+void guest_fn_5e4c4_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0x5e4c4 EAX/EDX/EBX/ECX/stack */
+void guest_fn_5ea64_w(void); /* 0x5ea64 */
+void guest_fn_86920_w(void); /* 0x86920 */
+uint8_t guest_fn_6e320_w(uint32_t a, uint32_t b); /* 0x6e320 EAX/EDX -> AL */
+void guest_fn_6e3e0_w(double first, double second); /* 0x6e3e0 stack */
+uint32_t guest_fn_d6e58_w(void); /* 0xd6e58 -> EAX */
+void guest_fn_82e40_w(void); /* 0x82e40 */
+void guest_fn_7fe8c_w(void); /* 0x7fe8c */
+void guest_fn_810d0_w(uint32_t a); /* 0x810d0 EAX */
+void guest_fn_810f4_w(uint32_t a); /* 0x810f4 EAX */
+void guest_fn_dc334_w(void); /* 0xdc334 */
+uint8_t guest_fn_834e8_w(int32_t a, int32_t b); /* 0x834e8 EAX/EDX -> AL */
+void guest_fn_dc832_w(uint32_t a, uint32_t b, uint32_t c); /* 0xdc832 EAX/EDX/EBX */
+void guest_fn_ac7c0_w(void); /* 0xac7c0 */
+void guest_fn_ac0e0_w(void); /* 0xac0e0 */
+void guest_fn_ac408_w(uint32_t text); /* 0xac408 EAX */
+uint32_t guest_fn_ac5f8_w(uint32_t a); /* 0xac5f8 EAX -> EAX */
+void guest_fn_e9a24_w(uint32_t a, uint32_t b); /* 0xe9a24 cdecl */
+
 #endif
