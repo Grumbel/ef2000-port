@@ -5977,3 +5977,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x39cb4` | EAX:uint32_t,EDX:uint32_t | none | 5c518@5c5ca | Distance between the player unit (word 0x1f71ca) and the unit named by 0x1a823e, from the position longs (+0, +4, +8) sc |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa35bc` | none | none | a410c@a411e | Fold the per-slot samples into running statistics: for each entry of the id list 0x136b74 (count byte at *0x136b78) take |

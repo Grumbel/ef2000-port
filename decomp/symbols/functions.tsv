@@ -2179,7 +2179,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a33f0	52	dispatch_all_a33f0	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a33f0.json	docs/compiler-abi.md; Dispatch every entry of the list at 0x136b84.; callers a410c@a4119; guest pending
 0x000a3424	73	copy_name_and_flag_a3424	game_helpers121	compiles	game	confirmed	decomp/tests/0x000a3424.json	docs/compiler-abi.md; Copy the 0x21-byte name of table entry (index << 5) at 0x13587c into the buffer of the slot it names and flag that slot ; callers a348c@a34c4; guest pending
 0x000a348c	247			unknown	unclassified	unverified		
-0x000a35bc	242			unknown	unclassified	unverified		
+0x000a35bc	242	accumulate_samples_a35bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a35bc.json	docs/compiler-abi.md; Fold the per-slot samples into running statistics: for each entry of the id list 0x136b74 (count byte at *0x136b78) take; callers a410c@a411e; guest pending
 0x000a36b0	156	accumulate_offsets_a36b0	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a36b0.json	docs/compiler-abi.md; Accumulate clamped timing offsets of the listed entries.; callers a410c@a39de; guest pending
 0x000a374c	118	flush_pending_a374c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a374c.json	docs/compiler-abi.md; When at least 8 bytes are pending (0x1357da), send a 13-byte request built from 0x1357ae, 7 bytes of the template at [0x; callers a348c@a34f0; guest pending
 0x000a37c4	31	send_byte_request_8_a37c4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a37c4.json	docs/compiler-abi.md; Send a one-byte request with code 8.; callers a3824@a389d; guest pending

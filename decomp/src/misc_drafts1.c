@@ -4334,3 +4334,38 @@ void compute_unit_distance_39cb4(uint32_t out, uint32_t out_pct)
         EF_U16(out + 2u) = 0xffffu;
     }
 }
+
+/* 0xa35bc, 242 bytes. Fold the per-slot samples into running statistics: for each entry of the id list 0x136b74 (count byte at *0x136b78) take the table record 0x135878[id * 32], the clamped (-100..100) difference of the clock word 0x1357d6 and the record's stamp (+0xb), and add it to the per-kind sum (0x1357ec) and count (0x1357da). Once more than 500 + kind ticks have passed since the kind's last report (0x13580c) the packed 7-byte report (kind, count, sum) is sent with 0xa3e50 (code 0xd, length 6) and the kind's counters are reset. */
+void accumulate_samples_a35bc(void)
+{
+    int32_t i;
+    for (i = 0; i < (int32_t)EF_U8(EF_U32(0x00136b78u)); i++) {
+        uint32_t id = EF_U8(EF_U32(0x00136b74u) + (uint32_t)i);
+        uint32_t rec = EF_U32(0x00135878u + id * 32u);
+        int16_t diff = (int16_t)(EF_U16(0x001357d6u) - EF_U16(rec + 0xbu));
+        uint32_t kind = EF_U8(rec + 6u);
+        uint32_t sum;
+        if (diff > 100)
+            diff = 100;
+        if (diff < -100)
+            diff = -100;
+        EF_U16(0x001357dau + kind * 2u)++;
+        sum = EF_U32(0x001357ecu + kind * 4u) + (uint32_t)(int32_t)diff;
+        EF_U32(0x001357ecu + kind * 4u) = sum;
+        if ((uint32_t)(uint16_t)(EF_U16(0x001357d6u) - EF_U16(0x0013580cu + kind * 2u)) > kind + 0x1f4u) {
+            uint8_t pkt[8];
+            uint16_t n = EF_U16(0x001357dau + kind * 2u);
+            pkt[0] = (uint8_t)kind;
+            pkt[1] = (uint8_t)n;
+            pkt[2] = (uint8_t)(n >> 8);
+            pkt[3] = (uint8_t)sum;
+            pkt[4] = (uint8_t)(sum >> 8);
+            pkt[5] = (uint8_t)(sum >> 16);
+            pkt[6] = (uint8_t)(sum >> 24);
+            guest_fn_a3e50_x((uint32_t)(uintptr_t)pkt, 0xdu, 6u);
+            EF_U16(0x001357dau + kind * 2u) = 0u;
+            EF_U32(0x001357ecu + kind * 4u) = 0u;
+            EF_U16(0x0013580cu + kind * 2u) = EF_U16(0x001357d6u);
+        }
+    }
+}
