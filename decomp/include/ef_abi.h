@@ -4836,4 +4836,7 @@ void draw_entry_list_78848(void);
 
 void insert_ordered_id_a48ac(uint32_t id, uint32_t after);
 
+void compute_unit_distance_39cb4(uint32_t out, uint32_t out_pct);
+uint32_t guest_fn_86968_x(uint32_t value, uint32_t out); /* 0x86968 EAX/EDX -> AL */
+
 #endif

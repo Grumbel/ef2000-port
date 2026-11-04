@@ -4303,3 +4303,34 @@ void insert_ordered_id_a48ac(uint32_t id, uint32_t after)
     }
     EF_U16(0x0041eda8u + (uint32_t)i * 2u) = id16;
 }
+
+/* 0x39cb4, 238 bytes. Distance between the player unit (word 0x1f71ca) and the unit named by 0x1a823e, from the position longs (+0, +4, +8) scaled by >> 8; any axis difference above 0x444 (or a negative sum) saturates the squared distance at 0x123210. Stores 100 * sqrt / 0x444 as a word at OUT_PCT and asks 0x86968 to fill the two-word result at OUT; when it declines both words become 0xffff. */
+void compute_unit_distance_39cb4(uint32_t out, uint32_t out_pct)
+{
+    uint32_t a = guest_fn_7489c((int16_t)EF_U16(0x001f71cau));
+    uint32_t b = guest_fn_7489c((int16_t)EF_U16(0x001a823eu));
+    int32_t dx;
+    int32_t dy;
+    int32_t dz;
+    int32_t d2;
+    int32_t root;
+    if (a == 0u || b == 0u)
+        return;
+    dx = (int32_t)(EF_U32(a) - EF_U32(b)) >> 8;
+    dy = (int32_t)(EF_U32(a + 8u) - EF_U32(b + 8u)) >> 8;
+    dz = (int32_t)(EF_U32(a + 4u) - EF_U32(b + 4u)) >> 8;
+    if (dx > 0x444 || dy > 0x444 || dz > 0x444)
+        d2 = 0x123210;
+    else
+        d2 = dy * dy + dx * dx + dz * dz;
+    if (d2 > 0x123210 || d2 < 0)
+        d2 = 0x123210;
+    root = (int32_t)(uint16_t)guest_square_root_of(d2);
+    EF_U16(out_pct) = (uint16_t)((root * 100) / 0x444);
+    if (d2 > 0x123210 || d2 < 0)
+        d2 = 0x123210;
+    if ((guest_fn_86968_x((uint32_t)d2, out) & 0xffu) == 0u) {
+        EF_U16(out) = 0xffffu;
+        EF_U16(out + 2u) = 0xffffu;
+    }
+}

@@ -670,7 +670,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00039874	227			unknown	unclassified	unverified		
 0x00039960	170	build_circle_39960	game_helpers17	compiles	game	confirmed	decomp/tests/0x00039960.json	docs/compiler-abi.md; Build the 0x1a17c0/0x1a1810 ellipse tables (radii 10 and 8).; callers 39a0c@39a1f; guest pending
 0x00039a0c	677			unknown	unclassified	unverified		
-0x00039cb4	238			unknown	unclassified	unverified		
+0x00039cb4	238	compute_unit_distance_39cb4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00039cb4.json	docs/compiler-abi.md; Distance between the player unit (word 0x1f71ca) and the unit named by 0x1a823e, from the position longs (+0, +4, +8) sc; callers 5c518@5c5ca; guest pending
 0x00039db0	20	alloc_slot_table_39db0	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x00039db0.json	docs/compiler-abi.md; Allocate the four-byte slot table of the given length.; callers 39dc4@39dd4; guest pending
 0x00039dc4	72	reset_table_39dc4	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00039dc4.json	docs/compiler-abi.md; Reset the ten-entry table at dword 0x1a1860.; callers 49228@495b7; guest pending
 0x00039e0c	208	claim_unit_slot_39e0c	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00039e0c.json	docs/compiler-abi.md; Claim a free slot in the 4-byte slot table for a unit and mark its owner.; callers 8c49c@8c85f; guest pending
