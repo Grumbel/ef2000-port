@@ -23829,3 +23829,33 @@ void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
 	else
 		EF_U32(0x0015f90cu) = blk;
 }
+
+/* 0x105070, 183 bytes. Load a whole file into a caller buffer (or a newly allocated one); returns the buffer or 0 with the error code at 0x17d2d8 set. */
+uint32_t load_file_105070(ef_addr32 name, ef_addr32 buffer)
+{
+	uint32_t size, buf, handle;
+	EF_U32(0x0017d2d8u) = 0;
+	size = file_size_by_name_105024(0, 0, 0, 0, name);
+	if (size == 0xffffffffu) {
+		EF_U32(0x0017d2d8u) = 3;
+		return 0;
+	}
+	buf = buffer != 0 ? buffer : tail_jump_c3f70(size);
+	if (buf == 0) {
+		EF_U32(0x0017d2d8u) = 2;
+		return 0;
+	}
+	handle = (uint32_t)open_file_fa485(name, 0x200u);
+	if (handle == 0xffffffffu) {
+		tail_jump_c3f80(buf);
+		EF_U32(0x0017d2d8u) = 3;
+		return 0;
+	}
+	if (dos_read_115871(handle, buf, size) != size) {
+		tail_jump_c3f80(buf);
+		EF_U32(0x0017d2d8u) = 5;
+		return 0;
+	}
+	tail_jump_115984(handle);
+	return buf;
+}

@@ -9579,3 +9579,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe3cac` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | c4db4@c4def | Load a named resource into the cached list and fill the request record. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x105070` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | 106464@10646d,113a40@113a49 | Load a whole file into a caller buffer (or a newly allocated one); returns the buffer or 0 with the error code at 0x17d2 |

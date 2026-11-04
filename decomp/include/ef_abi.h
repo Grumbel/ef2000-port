@@ -6549,4 +6549,7 @@ void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 p);
 void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 p); /* 0xe3cac */
 
+uint32_t load_file_105070(ef_addr32 name, ef_addr32 buffer);
+uint32_t load_file_105070(ef_addr32 name, ef_addr32 buffer); /* 0x105070 */
+
 #endif
