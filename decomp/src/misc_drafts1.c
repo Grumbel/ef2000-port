@@ -24023,3 +24023,38 @@ void update_best_direction_8a1dc(ef_addr32 obj)
 		md_wr_f64(0x1fcc98u, limit);
 	}
 }
+
+/* 0x95bf4, 313 bytes. Rotates a small vector by the object's angles and adds the result to the camera position words. */
+void apply_rotated_offset_95bf4(void)
+{
+	int32_t m[9];
+	int32_t x, y, z;
+	ef_addr32 rec = EF_U32(0x214458);
+	ef_addr32 vec = 0x12dcb0;
+	uint32_t key;
+	uint32_t found = 0;
+
+	if (rec == 0) {
+		return;
+	}
+	key = (uint32_t)lookup_name_value_a1a40(0x18abe8);
+	if (key == 0) {
+		return;
+	}
+	if (EF_U16(rec + 0x20) != 0 && EF_U16(rec + 0x20) != 0xffff) {
+		found = find_page_pair_a1a90((int16_t)EF_S16(rec + 0x20), (int32_t)key);
+	}
+	if (found != 0) {
+		vec = found;
+	}
+	x = EF_S16(vec);
+	y = EF_S16(vec + 2);
+	z = EF_S16(vec + 4);
+	init_bounds_d0b68((ef_addr32)(uintptr_t)m);
+	guest_fn_d0ebc((ef_addr32)(uintptr_t)m, EF_U16(rec + 0xe));
+	guest_fn_d0dbc((ef_addr32)(uintptr_t)m, EF_U16(rec + 0xc), vec);
+	guest_fn_d0fb8((ef_addr32)(uintptr_t)m, EF_U16(rec + 0x10), rec);
+	EF_S32(0x21446c) += (m[1] * y + m[0] * x + m[2] * z) / 0x6900;
+	EF_S32(0x214470) += (m[3] * x + m[4] * y + m[5] * z) / 0x6900;
+	EF_S32(0x214474) += (m[6] * x + m[7] * y + m[8] * z) / 0x6900;
+}

@@ -6567,4 +6567,7 @@ uint32_t start_positional_sound_7fcdc(uint32_t eax, ef_addr32 edx); /* 0x7fcdc *
 void update_best_direction_8a1dc(ef_addr32 obj);
 void update_best_direction_8a1dc(ef_addr32 obj); /* 0x8a1dc */
 
+void apply_rotated_offset_95bf4(void);
+void apply_rotated_offset_95bf4(void); /* 0x95bf4 */
+
 #endif

@@ -1945,7 +1945,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009586c	256	update_chase_distance_9586c	game_helpers74	compiles	game	confirmed	decomp/tests/0x0009586c.json	docs/compiler-abi.md; Chase-camera distance control driven by the speed input bits.; callers 95e58@96d0e; guest pending
 0x0009596c	370			unknown	unclassified	unverified		
 0x00095ae0	276	setup_scene_camera_95ae0	game_helpers59	compiles	game	confirmed	decomp/tests/0x00095ae0.json	docs/compiler-abi.md; Set up the scene camera from the pending target record, or a default view.; callers 95e58@96717; guest pending
-0x00095bf4	313			unknown	unclassified	unverified		
+0x00095bf4	313	apply_rotated_offset_95bf4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00095bf4.json	docs/compiler-abi.md; Rotates a small vector by the object's angles and adds the result to the camera position words.; callers 92c28@92e12,92e30@92e8e,93170@931b2; guest pending
 0x00095e58	4618			unknown	unclassified	unverified		
 0x00097064	620			unknown	unclassified	unverified		
 0x00097464	81	draw_chain_97464	game_helpers22	compiles	game	confirmed	decomp/tests/0x00097464.json	docs/compiler-abi.md; Walk the 0x4e-byte chain of records from 0x12dc74 and draw those of depth >= 2.; callers 3dd30@3e14f; guest pending

@@ -9615,3 +9615,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8a1dc` | EAX:ef_addr32 | none | 8a318@8a5ad | Updates the best (smallest-angle) target direction for * an object that has a detail block, using its three detail field |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x95bf4` | none | none | 92c28@92e12,92e30@92e8e,93170@931b2 | Rotates a small vector by the object's angles and adds the result to the camera position words. |
