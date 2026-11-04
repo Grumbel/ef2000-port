@@ -8338,3 +8338,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x68a60` | EAX:int32_t,EDX:int32_t | none | 69374@694bd,69374@694f2 | Assign slot EAX (signed) of the three-byte slot table at 0x1f6ef1 (kind byte +3, word +4) to the mode byte of word 0x1f6 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6b620` | EAX:uint32_t | none | 6b6c8@6bc73 | Copy the pending view state into unit AX (signed): dwords 0x1f71b0/0x1f71b4 to +0x91/+0x95, 0x12850c/0x128510 to +0x16f/ |

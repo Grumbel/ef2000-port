@@ -16642,3 +16642,29 @@ void assign_slot_68a60(int32_t slot, int32_t value)
 	if (EF_U8(0x0012bc97u + (uint32_t)(((int32_t)EF_U32(0x001f6f48u) >> 16) * 145)) == 3u)
 		request_68a2c();
 }
+
+/* 0x6b620, 196 bytes. Copy the pending view state into unit AX (signed): dwords 0x1f71b0/0x1f71b4 to +0x91/+0x95, 0x12850c/0x128510 to +0x16f/+0x173, the double at 0x1284cc to +0x79, dwords 0x1284c4/0x1284c8 to +0x81/+0x85 and 0x1f71a8/0x1f71ac to +0x89/+0x8d (after normalising the angles with 0x6bca8). Bit 0 of byte +0x24 is set when the double at 0x1f6f50 is nonzero (ignoring its sign) and cleared otherwise; dwords 0x1f7018/0x1f701c are stored at +0x148/+0x14c. Nothing happens for a missing unit. */
+void copy_view_state_6b620(uint32_t ax)
+{
+	uint32_t unit = guest_fn_7489c((int32_t)(int16_t)ax);
+
+	if (unit == 0u)
+		return;
+	EF_U32(unit + 0x91u) = EF_U32(0x001f71b0u);
+	EF_U32(unit + 0x95u) = EF_U32(0x001f71b4u);
+	EF_U32(unit + 0x16fu) = EF_U32(0x0012850cu);
+	EF_U32(unit + 0x173u) = EF_U32(0x00128510u);
+	normalise_angles_6bca8();
+	EF_U32(unit + 0x79u) = EF_U32(0x001284ccu);
+	EF_U32(unit + 0x7du) = EF_U32(0x001284d0u);
+	EF_U32(unit + 0x81u) = EF_U32(0x001284c4u);
+	EF_U32(unit + 0x85u) = EF_U32(0x001284c8u);
+	EF_U32(unit + 0x89u) = EF_U32(0x001f71a8u);
+	EF_U32(unit + 0x8du) = EF_U32(0x001f71acu);
+	if ((EF_U32(0x001f6f54u) & 0x7fffffffu) != 0u || EF_U32(0x001f6f50u) != 0u)
+		EF_U8(unit + 0x24u) |= 1u;
+	else
+		EF_U8(unit + 0x24u) &= 0xfeu;
+	EF_U32(unit + 0x148u) = EF_U32(0x001f7018u);
+	EF_U32(unit + 0x14cu) = EF_U32(0x001f701cu);
+}

@@ -5875,4 +5875,6 @@ void guest_fn_b3168_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s
 
 void assign_slot_68a60(int32_t slot, int32_t value);
 
+void copy_view_state_6b620(uint32_t ax);
+
 #endif
