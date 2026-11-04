@@ -18989,3 +18989,24 @@ void build_rotation_matrix_fcd20(uint32_t ebx, uint32_t esi, uint32_t edi)
 	EF_U32(0x00159100u) = (uint32_t)p0;
 	EF_U32(0x00159104u) = (uint32_t)((c0 + c1) >> 1);
 }
+
+/* 0xe9e7c, 264 bytes. Build a 3x3 double rotation matrix at OUT (EAX) from the three Euler angles X, Y, Z (stack doubles in this order, ret 0x18). Row-major entries at +0x00..+0x40 (nine doubles). */
+void euler_to_matrix_e9e7c(ef_addr32 out, double x, double y, double z)
+{
+	double sz = sin_b45ac(z), cz = cos_b45a2(z);
+	double cy = cos_b45a2(y), sy = sin_b45ac(y);
+	double sx = sin_b45ac(x), cx = cos_b45a2(x);
+	double a = sz * cy;
+	double m[9];
+
+	m[0] = cz * cx - a * sx;
+	m[1] = -cz * sx - a * cx;
+	m[2] = sz * sy;
+	m[3] = cz * cy * sx + sz * cx;
+	m[4] = cz * cy * cx - sz * sx;
+	m[5] = -cz * sy;
+	m[6] = sx * sy;
+	m[7] = sy * cx;
+	m[8] = cy;
+	memcpy(ef_guest_memory_ptr(out), m, sizeof m);
+}

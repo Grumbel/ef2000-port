@@ -8663,3 +8663,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfcd20` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | c5cd3@c5ce6,e9b38@e9b47 | Variant of 0xe7a7c (angles in EBX, ESI, EDI) that stops after the nine matrix entries, written to 0x1590e4..0x159104, wi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe9e7c` | EAX:ef_addr32,EDX:double,EBX:double,ECX:double | none | e9c00@e9c40 | Build a 3x3 double rotation matrix at OUT (EAX) from the three Euler angles X, Y, Z (stack doubles in this order, ret 0x |
