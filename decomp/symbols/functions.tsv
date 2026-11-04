@@ -3036,7 +3036,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d23d8	162	process_render_object_d23d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d23d8.json	docs/compiler-abi.md; Process a render object: count it (0x4209c8), prepare it with 0xd2130 unless 0x158ed8 is set, and when the object is act; callers d2500@d2576,d2584@d2626,d2634@d26f3; guest pending
 0x000d2500	129			unknown	unclassified	unverified		
 0x000d2584	176	build_render_object_d2584	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2584.json	docs/compiler-abi.md; Build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit ESI; COUNT in ECX): set dword; callers c49c4@c4a3a; guest pending
-0x000d2634	205			unknown	unclassified	unverified		
+0x000d2634	205	build_textured_object_d2634	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2634.json	docs/compiler-abi.md; Textured variant of 0xd2584: build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit ; callers c4a50@c4adf; guest pending
 0x000d2704	191			unknown	unclassified	unverified		
 0x000d299c	223			unknown	unclassified	unverified		
 0x000d2a7c	518			unknown	unclassified	unverified		

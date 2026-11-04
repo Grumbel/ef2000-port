@@ -7186,3 +7186,28 @@ void project_vertices_fc8cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
         }
     } while (--n != 0u);
 }
+
+/* 0xd2634, 205 bytes. Textured variant of 0xd2584: build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit ESI; count in ECX; parameters in the order LIST, COUNT) with the span routine 0xd3cb0 when dword 0x158f0c is set, else 0xff3bc (stored at object +0x24); every vertex gets its texture coordinates (+0x24 / +0x28 = word pair 0x15997c[i] << 9), flag 2 set and flag 4 cleared, and the clip mask is ANDed with the vertex flags. Finishes with 0xd23d8. */
+void build_textured_object_d2634(ef_addr32 list, uint32_t count)
+{
+    uint32_t obj = 0x00420970u;
+    uint32_t slot = 0x004209d0u;
+    int32_t i;
+    EF_U32(0x0042099cu) = 1u;
+    EF_U32(0x00420974u) = 0u;
+    EF_U32(0x004209bcu) = slot;
+    EF_U32(0x004209d0u) = count;
+    EF_U32(0x00420990u) = 0x001016e0u;
+    EF_U32(obj + 0x24u) = EF_U32(0x00158f0cu) != 0u ? 0x000d3cb0u : 0x000ff3bcu;
+    for (i = 0; i < (int32_t)count; i++) {
+        uint32_t v = EF_U32(0x0017bf70u) + EF_U16(list);
+        EF_U32(v + 0x24u) = (uint32_t)EF_U16(0x0015997cu + (uint32_t)i * 4u) << 9;
+        EF_U32(v + 0x28u) = (uint32_t)EF_U16(0x0015997eu + (uint32_t)i * 4u) << 9;
+        EF_U8(v + 0x20u) = (uint8_t)((EF_U8(v + 0x20u) | 2u) & 0xfbu);
+        EF_U32(obj + 0x2cu) = EF_U32(obj + 0x2cu) & EF_U32(v + 0x20u);
+        list += 2u;
+        EF_U32(slot + 4u) = v;
+        slot += 4u;
+    }
+    process_render_object_d23d8(obj);
+}

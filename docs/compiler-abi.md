@@ -6569,3 +6569,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfc8cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | c46f8@c4720,d2110@d2120 | Cdecl-style (COUNT, LIST; ret 8): project COUNT (byte) vertex records whose pointers are listed at LIST: skip those alre |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd2634` | EAX:ef_addr32,EDX:uint32_t | none | c4a50@c4adf | Textured variant of 0xd2584: build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit  |
