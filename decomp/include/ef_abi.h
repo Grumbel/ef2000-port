@@ -3899,4 +3899,9 @@ void deactivate_records_at_object_c07a0(ef_addr32 object, ef_addr32 list);
 void put_two_digits_f9d98(int32_t value, uint32_t pos, ef_addr32 buffer);
 ef_addr32 format_time_f9dcb(ef_addr32 tm, ef_addr32 out);
 
+/* runtime_helpers35.c */
+void write_log_dword_swapped_d170c(uint32_t value);
+uint32_t attach_buffer_117ed4(ef_addr32 obj, ef_addr32 holder, uint16_t size);
+void refresh_player_channels_1142cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 player, uint32_t value);
+
 #endif

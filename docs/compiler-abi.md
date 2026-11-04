@@ -4422,3 +4422,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc07a0` | EAX:ef_addr32,EDX:ef_addr32 | none | c0b04@c0f32,c0b04@c0fa0,c0b04@c0fe1 | Disable (state 7) every record at the object's position with the object's type, decrementing the object's counters. |
+
+## runtime_helpers35 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd170c` | EAX:uint32_t | none | d1774@d17a8,d17d0@d17df,d1894@d18b5 | Reverse the byte order of a dword and pass it to d16fc. |
+| `0x117ed4` | EAX:ef_addr32,EDX:ef_addr32,BX:uint16_t | EAX:uint32_t | 117f68@11801d,117f68@118031 | Attach an object to a holder, allocating the holder's block when missing, and reset the object's header words (last word |
+| `0x1142cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t | none | 1033c8@1033f2 | When the value at the argument changes, resend the channel volumes of every active (state 4) channel of the player. |

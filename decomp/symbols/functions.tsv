@@ -3008,7 +3008,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d13ec	39	angle_d13ec	code_predicates	compiles	game	confirmed	decomp/tests/0x000d13ec.json	docs/compiler-abi.md; -0xb3b1c(dword +0xc, (dword+0 * dword+0x20 - dword+8 * dword+0x18) >> 15).; callers 31b40@31c78,31b40@31cfc,53c80@53e2f; guest pending
 0x000d16d0	41	write_log_d16d0	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d16d0.json	docs/compiler-abi.md; Write to the log file and abort if the count is short.; callers d16fc@d1702,d175c@d176a,d1860@d188a; guest pending
 0x000d16fc	13	call_d16d0_d16fc	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000d16fc.json	docs/compiler-abi.md; ; callers d170c@d1750,d1774@d179e,d1774@d17b2; guest pending
-0x000d170c	80			unknown	unclassified	unverified		
+0x000d170c	80	write_log_dword_swapped_d170c	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000d170c.json	docs/compiler-abi.md; Reverse the byte order of a dword and pass it to d16fc.; callers d1774@d17a8,d17d0@d17df,d1894@d18b5; guest pending
 0x000d175c	24	log_value_d175c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000d175c.json	docs/compiler-abi.md; Log a single value through the 0xd16d0 helper.; callers d17d0@d1811,d17d0@d1818,d17d0@d1822; guest pending
 0x000d1774	72	open_log_d1774	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d1774.json	docs/compiler-abi.md; Open the log file and write its header.; callers d1c54@d1c77; guest pending
 0x000d17bc	19	call_a7990_420944	code_predicates	compiles	game	confirmed	decomp/tests/0x000d17bc.json	docs/compiler-abi.md; 0xa7990(dword 0x420944), callee pops 4.; callers d1c54@d1c92; guest pending
@@ -4119,7 +4119,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00114170	47			unknown	unclassified	unverified		
 0x001141a0	16	set_record_field_1141a0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001141a0.json	docs/compiler-abi.md; Store a value at +0x2c of a record when the record exists.; callers 103244@10326e; guest pending
 0x001141b0	95	start_value_ramp_1141b0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x001141b0.json	docs/compiler-abi.md; Start a ramp of the value at +0x48 to a target over time; sets the per-step delta at +0x54.; callers 1031cc@1031fc; guest pending
-0x001142cc	75			unknown	unclassified	unverified		
+0x001142cc	75	refresh_player_channels_1142cc	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x001142cc.json	docs/compiler-abi.md; When the value at the argument changes, resend the channel volumes of every active (state 4) channel of the player.; callers 1033c8@1033f2; guest pending
 0x0011451c	110			unknown	unclassified	unverified		
 0x0011458c	138			unknown	unclassified	unverified		
 0x001146ec	394			unknown	unclassified	unverified		
@@ -4142,7 +4142,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00117dd8	50			unknown	unclassified	unverified		
 0x00117e0c	153			unknown	unclassified	unverified		
 0x00117ea8	44	clear_buffered_record_117ea8	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00117ea8.json	docs/compiler-abi.md; Free the buffer of a record and clear the record.; callers 118290@118384,118290@1183a5; guest pending
-0x00117ed4	62			unknown	unclassified	unverified		
+0x00117ed4	62	attach_buffer_117ed4	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x00117ed4.json	docs/compiler-abi.md; Attach an object to a holder, allocating the holder's block when missing, and reset the object's header words (last word; callers 117f68@11801d,117f68@118031; guest pending
 0x00117f14	82	alloc_serial_state_117f14	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00117f14.json	docs/compiler-abi.md; Allocate the 0x1a-byte state block of a serial record.; callers 117f68@11800a; guest pending
 0x00117f68	807			unknown	unclassified	unverified		
 0x00118290	408			unknown	unclassified	unverified		
