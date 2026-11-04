@@ -11137,3 +11137,19 @@ void set_timer_divisor_110f0c(uint32_t divisor)
     guest_fn_117b0c(0x40u, divisor & 0xffu);
     guest_fn_117b0c(0x40u, (divisor >> 8) & 0xffu);
 }
+
+/* 0xe10a0, 63 bytes. Send the text at TEXT (EAX) to the serial port at base dword 0x15eed0: remember the pointer in dword 0x15f690, set byte 0x15f694 = 1 and, while characters remain, wait for the line status register (base + 5) to show the transmitter ready (bit 0x20) and write the next character. The text pointer variable itself is not advanced. */
+void send_serial_text_e10a0(ef_addr32 text)
+{
+    ef_addr32 p = text;
+    EF_U32(0x0015f690u) = text;
+    EF_U8(0x0015f694u) = 1u;
+    if (EF_U8(p) == 0u)
+        return;
+    do {
+        while ((guest_fn_9c430(EF_U32(0x0015eed0u) + 5u) & 0x20u) == 0u)
+            ;
+        guest_fn_117b0c(EF_U32(0x0015eed0u), EF_U8(p));
+        p++;
+    } while (EF_U8(p) != 0u);
+}

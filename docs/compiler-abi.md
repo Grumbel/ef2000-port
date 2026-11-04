@@ -7342,3 +7342,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfa9a0` | EAX:uint32_t | EAX:uint32_t | bc4da@bc524 | close: close the DOS handle HANDLE (EAX, int 21h AH = 0x3e); on success clear its table entry (0x1102a3 with 0) and retu |
 | `0x110f0c` | EAX:uint32_t | none | 110f3c@110f62,1110c5@1110cc | cdecl: program the system timer with the reload value DIVISOR (channel 0, mode 3: command 0x36 to port 0x43, low then hi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe10a0` | EAX:ef_addr32 | none | e0b88@e0b92,e0b88@e0b9c,e0bcc@e0c23 | Send the text at TEXT (EAX) to the serial port at base dword 0x15eed0: remember the pointer in dword 0x15f690, set byte  |

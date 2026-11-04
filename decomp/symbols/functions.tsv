@@ -3310,7 +3310,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e0b6c	28			unknown	unclassified	unverified		
 0x000e0b88	65	open_device_e0b88	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000e0b88.json	docs/compiler-abi.md; Open the device selected by value and report success.; callers e0b6c@e0b71,e0bcc@e0c37,e1194@e11c6; guest pending
 0x000e0bcc	114			unknown	unclassified	unverified		
-0x000e10a0	63			unknown	unclassified	unverified		
+0x000e10a0	63	send_serial_text_e10a0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e10a0.json	docs/compiler-abi.md; Send the text at TEXT (EAX) to the serial port at base dword 0x15eed0: remember the pointer in dword 0x15f690, set byte ; callers e0b88@e0b92,e0b88@e0b9c,e0bcc@e0c23; guest pending
 0x000e10e0	48	reset_table_15f5fd	math_string	compiles	game	confirmed	decomp/tests/0x000e10e0.json	docs/compiler-abi.md; Byte 0x15f685 = 0, fill 0x80 bytes at 0x15f5fd with 0xff, * byte 0x15f684 = 0, byte 0x15f685 = 1.; callers e0b88@e0b8b,e1194@e11a8; guest pending
 0x000e1110	29	wait_ticks_e1110	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1110.json	docs/compiler-abi.md; Busy-wait for the given number of clock ticks.; callers e0b88@e0bb3,e0bcc@e0bfa,e0bcc@e0c2d; guest pending
 0x000e1130	43	wait_ticks_or_key_e1130	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e1130.json	docs/compiler-abi.md; Wait for the given ticks or until the abort bit 0x80 is set.; callers none direct; guest pending

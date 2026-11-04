@@ -5394,4 +5394,6 @@ void register_locked_ranges_117ace(void);
 uint32_t close_handle_fa9a0(uint32_t handle);
 void set_timer_divisor_110f0c(uint32_t divisor);
 
+void send_serial_text_e10a0(ef_addr32 text);
+
 #endif
