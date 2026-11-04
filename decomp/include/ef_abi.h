@@ -5762,4 +5762,8 @@ void clear_state_block_9a348(void);
 
 void transform_by_attitude_74228(ef_addr32 rec);
 
+void draw_node_markers_44aec(uint32_t group, ef_addr32 head_addr);
+
+
+
 #endif

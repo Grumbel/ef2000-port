@@ -8109,3 +8109,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x74228` | EAX:ef_addr32 | none | 74584@746f2 | Transform the origin of record EAX by an attitude from the scene table. The attitude is five words found through the sce |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x44aec` | EAX:uint32_t,EDX:ef_addr32 | none | 45574@455f4,45574@4565a,4bf1c@4bfa1 | Draw the markers for every node of the list whose head pointer sits at EDX (next link at +4). Nodes with byte +0xb nonze |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

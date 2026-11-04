@@ -790,7 +790,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000443fc	1007			unknown	unclassified	unverified		
 0x000447ec	382	draw_hotspots_447ec	hotspot_draw	compiles	game	confirmed	decomp/tests/0x000447ec.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x1d.; callers 45574@455aa,4bf1c@4bf78; guest pending
 0x0004496c	382	draw_hotspots_4496c	hotspot_draw	compiles	game	confirmed	decomp/tests/0x0004496c.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x13.; callers 45574@455fd,4bf1c@4bfb7; guest pending
-0x00044aec	379			unknown	unclassified	unverified		
+0x00044aec	379	draw_node_markers_44aec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00044aec.json	docs/compiler-abi.md; Draw the markers for every node of the list whose head pointer sits at EDX (next link at +4). Nodes with byte +0xb nonze; callers 45574@455f4,45574@4565a,4bf1c@4bfa1; guest pending
 0x00044c68	382	draw_hotspots_44c68	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00044c68.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x2b.; callers 45574@455b3; guest pending
 0x00044de8	382	draw_hotspots_44de8	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00044de8.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x26.; callers 45574@45610,4bf1c@4bfcd; guest pending
 0x00044f68	396			unknown	unclassified	unverified		

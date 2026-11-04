@@ -14942,3 +14942,42 @@ void transform_by_attitude_74228(ef_addr32 rec)
 	EF_U32(0x00214440u) = (uint32_t)((m[3] * w0 + m[4] * w1 + m[5] * w2) / 0x6900 + (int32_t)EF_U32(rec + 4u));
 	EF_U32(0x00214444u) = (uint32_t)((m[6] * w0 + m[7] * w1 + m[8] * w2) / 0x6900 + (int32_t)EF_U32(rec + 8u));
 }
+
+/* 0x44aec, 379 bytes. Draw the markers for every node of the list whose head pointer sits at EDX (next link at +4). Nodes with byte +0xb nonzero are skipped. A marker position (a screen address, 0x126570 + row * 0x280 + column) is taken from the screen-position pairs at 0x134443/0x134445, 0x13443a/0x13443c or 0x13444c/0x13444e when the group flag tests 0xcc22c, 0xcc1ac or 0xcc1ec of the node's byte +9 (against EAX) hold and the matching enable word (0x126554, 0x126556, 0x126558) is nonzero; the pair at 0x134740/0x134742 is used as well when 0xbc7ec accepts the node. With a position the frame is drawn at (word +0x16 - 10, 0x190 - word +0x1a - 10) with 0xca620 and, when word 0x12656a is nonzero, the node's byte +9 sprite is drawn through 0x440f4. */
+void draw_node_markers_44aec(uint32_t group, ef_addr32 head_addr)
+{
+	uint32_t node, pos = 0u;
+	int32_t x, y;
+	int have;
+
+	for (node = EF_U32(head_addr); node != 0u; node = EF_U32(node + 4u)) {
+		if (EF_U8(node + 0xbu) != 0u)
+			continue;
+		have = 0;
+		if ((guest_fn_cc22c(0u, EF_U8(node + 9u), group) & 0xffffu) != 0u && EF_U16(0x00126554u) != 0u) {
+			pos = EF_U32(0x00126570u) + (uint32_t)(((int32_t)EF_U32(0x00134445u) >> 16) * 0x280)
+				+ (uint32_t)((int32_t)EF_U32(0x00134443u) >> 16);
+			have = 1;
+		} else if ((guest_fn_cc1ac(0u, EF_U8(node + 9u), group) & 0xffffu) != 0u && EF_U16(0x00126556u) != 0u) {
+			pos = EF_U32(0x00126570u) + (uint32_t)(((int32_t)EF_U32(0x0013443cu) >> 16) * 0x280)
+				+ (uint32_t)((int32_t)EF_U32(0x0013443au) >> 16);
+			have = 1;
+		} else if ((guest_fn_cc1ec_x(0u, EF_U8(node + 9u), group) & 0xffffu) != 0u && EF_U16(0x00126558u) != 0u) {
+			pos = EF_U32(0x00126570u) + (uint32_t)(((int32_t)EF_U32(0x0013444eu) >> 16) * 0x280)
+				+ (uint32_t)((int32_t)EF_U32(0x0013444cu) >> 16);
+			have = 1;
+		}
+		if ((guest_fn_bc7ec(node) & 0xffffu) != 0u) {
+			pos = EF_U32(0x00126570u) + (uint32_t)(((int32_t)EF_U32(0x00134742u) >> 16) * 0x280)
+				+ (uint32_t)((int32_t)EF_U32(0x00134740u) >> 16);
+			have = 1;
+		}
+		if (!have)
+			continue;
+		y = (int16_t)(0x190 - EF_U16(node + 0x1au) - 10);
+		x = (int16_t)EF_U16(node + 0x16u) - 10;
+		guest_fn_ca620((int32_t)pos, x, y, 0x14u, 0x14u, 0x280u);
+		if (EF_U16(0x0012656au) != 0u)
+			guest_fn_440f4_x(EF_U8(node + 9u), x, y, 0x14u, 0x1au, 0x280u);
+	}
+}
