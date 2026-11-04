@@ -5233,3 +5233,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf8da8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t | none | f8e44@f8f2a | Fill a 0x72-byte record from two source records and an optional third: bytes from src1 (+8, +3, +9), 18 bytes from src2  |
+
+## trace_loaders1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1065c8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 102590@1025b5 | Find the first type-1 0x894-byte entry in the list of an object (array pointer +0x5c, count +0x60); if none is type 1 in |

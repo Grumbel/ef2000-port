@@ -4424,4 +4424,8 @@ ef_addr32 claim_page_slot_a1770(uint32_t page, uint32_t idx);
 
 void fill_record_f8da8(ef_addr32 dst, ef_addr32 src1, ef_addr32 src2, ef_addr32 owner, uint32_t extra);
 
+uint32_t find_open_entry_1065c8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj);
+
+
+
 #endif

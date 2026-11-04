@@ -3891,7 +3891,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00105e38	1580			unknown	unclassified	unverified		
 0x00106464	115	load_resource_106464	trace_loaders1	compiles	game	confirmed	decomp/tests/0x00106464.json	docs/compiler-abi.md; Load and parse a resource by name; on a missing file install the 23-byte default block at 0x194a04.; callers 102508@102534; guest pending
 0x00106514	117			unknown	unclassified	unverified		
-0x001065c8	106			unknown	unclassified	unverified		
+0x001065c8	106	find_open_entry_1065c8	trace_loaders1	compiles	game	confirmed	decomp/tests/0x001065c8.json	docs/compiler-abi.md; Find the first type-1 0x894-byte entry in the list of an object (array pointer +0x5c, count +0x60); if none is type 1 in; callers 102590@1025b5; guest pending
 0x00106634	16	set_state_1_106634	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106634.json	docs/compiler-abi.md; Dword +4 = 1.; callers 102644@102667; guest pending
 0x00106644	196			unknown	unclassified	unverified		
 0x00106708	13	get_state_106708	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106708.json	docs/compiler-abi.md; Dword +4, or 0 for null.; callers 1028f4@102919; guest pending
