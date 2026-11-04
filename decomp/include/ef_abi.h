@@ -5915,4 +5915,6 @@ void handle_unit_state_packet_564f4(ef_addr32 rec);
 
 void load_placement_list_3c790(uint32_t ax);
 
+void apply_total_adjustment_4430(uint32_t sel, uint32_t id, uint32_t level, uint32_t mode);
+
 #endif

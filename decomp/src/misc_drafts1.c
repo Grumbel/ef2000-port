@@ -17483,3 +17483,48 @@ void load_placement_list_3c790(uint32_t ax)
 			EF_U16(dest + 0x11u) = (uint16_t)(EF_U16(dest + 0x11u) - 0x168u);
 	}
 }
+
+/* 0x4430, 369 bytes. Apply price/score adjustments to dword 0x1970a0. SEL (AX) 0: find every entry of the 26-byte table at 0x121654 (37 entries; word +0 equal to ID, EDX) and add its dword (+2) times (2 - LEVEL, BL) to the total (negated when MODE, ECX, is 1), reporting each with the text 0x130b9d (name from the table at 0x132dd0, amount) through 0x78aa8. SEL 2: the same with the 40-entry table 0x121a18 and the names 0x1334f4 (index < 27) or 0x1333d4. SEL 3: add (2 - byte 0x197c2f) * 1000. */
+void apply_total_adjustment_4430(uint32_t sel, uint32_t id, uint32_t level, uint32_t mode)
+{
+	uint8_t buf[0x50];
+	ef_addr32 bufp = (ef_addr32)(uintptr_t)buf;
+	int32_t i, v;
+	uint16_t sid = (uint16_t)id;
+	uint8_t lvl = (uint8_t)level;
+
+	switch ((uint16_t)sel) {
+	case 0:
+		for (i = 0; i < 0x25; i++) {
+			uint32_t row = 0x00121654u + (uint32_t)(i * 0x1a);
+			if (EF_U16(row) != sid)
+				continue;
+			v = (int32_t)EF_U32(row + 2u) * (2 - (int32_t)lvl);
+			if ((int16_t)mode == 1)
+				v = -v;
+			EF_U32(0x001970a0u) = EF_U32(0x001970a0u) + (uint32_t)v;
+			guest_fn_a4342_va(bufp, 0x00130b9du, EF_U32(0x00132dd0u + (uint32_t)(i * 4)), (uint32_t)v);
+			guest_fn_78aa8(bufp);
+		}
+		break;
+	case 2:
+		for (i = 0; i < 0x28; i++) {
+			uint32_t row = 0x00121a18u + (uint32_t)(i * 0x1a);
+			if (EF_U16(row) != sid)
+				continue;
+			v = (int32_t)EF_U32(row + 2u) * (2 - (int32_t)lvl);
+			if ((int16_t)mode == 1)
+				v = -v;
+			EF_U32(0x001970a0u) = EF_U32(0x001970a0u) + (uint32_t)v;
+			guest_fn_a4342_va(bufp, 0x00130b9du,
+			    EF_U32((i < 0x1b ? 0x001334f4u : 0x001333d4u) + (uint32_t)(i * 4)), (uint32_t)v);
+			guest_fn_78aa8(bufp);
+		}
+		break;
+	case 3:
+		EF_U32(0x001970a0u) = EF_U32(0x001970a0u) + (uint32_t)((2 - (int32_t)EF_U8(0x00197c2fu)) * 1000);
+		break;
+	default:
+		break;
+	}
+}

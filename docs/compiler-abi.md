@@ -8445,3 +8445,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x3c790` | EAX:uint32_t | none | 3cb2c@3cc05 | Load the placement list of page AX (signed 16-bit) from the table at 0x1836d8 (0x3c730): allocate (0xcc6c0, tag 0x1836e0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4430` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 10750@10a66,10a9c@10ef2,110ec@1152d | Apply price/score adjustments to dword 0x1970a0. SEL (AX) 0: find every entry of the 26-byte table at 0x121654 (37 entri |
