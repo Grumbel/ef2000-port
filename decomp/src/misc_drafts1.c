@@ -14883,3 +14883,23 @@ void unit_damage_tick_29dd0(uint32_t ax)
     unit_event_88664(unit, (uint32_t)(uint16_t)level);
     EF_U16(unit + 0x1d8u) = (uint16_t)(EF_U16(unit + 0x1d8u) - 1u);
 }
+
+/* 0x9a348, 400 bytes. Clear the 0x40d00x state block: words 0x40d008, 0x40d00a and 0x40d00c, 24 bytes at 0x40d00e, nineteen 6-byte records between 0x40cf90 and 0x40d002, then words 0x40d02c, 0x40d026, 0x40d02a and 0x40d02e. */
+void clear_state_block_9a348(void)
+{
+	static const uint32_t rec[19] = {
+		0x0040cfb4u, 0x0040cfbau, 0x0040cfc0u, 0x0040cfc6u, 0x0040cfccu, 0x0040cfd2u, 0x0040cf90u, 0x0040cf96u, 0x0040cf9cu, 0x0040cfa2u, 0x0040cfa8u, 0x0040cfaeu, 0x0040cfdeu, 0x0040cfe4u, 0x0040cfeau, 0x0040cff0u, 0x0040cff6u, 0x0040cffcu, 0x0040d002u
+	};
+	int i;
+
+	EF_U16(0x0040d008u) = 0u;
+	EF_U16(0x0040d00au) = 0u;
+	EF_U16(0x0040d00cu) = 0u;
+	fill_bytes_b3fb0(0x0040d00eu, 0u, 24u);
+	for (i = 0; i < 19; i++)
+		fill_bytes_b3fb0(rec[i], 0u, 6u);
+	EF_U16(0x0040d02cu) = 0u;
+	EF_U16(0x0040d026u) = 0u;
+	EF_U16(0x0040d02au) = 0u;
+	EF_U16(0x0040d02eu) = 0u;
+}

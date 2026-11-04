@@ -8097,3 +8097,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x29dd0` | EAX:uint32_t | none | 29f54@2a159,6583c@6588c | Per-unit damage tick for unit AX (signed). Does nothing for a missing unit. A unit without a target (+0x1c) with a nonze |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9a348` | none | none | 9a4d8@9a53c | Clear the 0x40d00x state block: words 0x40d008, 0x40d00a and 0x40d00c, 24 bytes at 0x40d00e, nineteen 6-byte records bet |
