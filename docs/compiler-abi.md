@@ -8433,3 +8433,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x90f50` | none | none | 3dd30@3e1df | When byte 0x125847 is set, walk the 40 effect entries of 0x30 bytes at 0x211af0 (skipping entries with flag 2 in byte +0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x564f4` | EAX:ef_addr32 | none | 581b0@58386 | Handle an incoming unit state packet REC (EAX; signed unit id word +1, kind byte +3, reply code byte +4, words +5, +7, + |

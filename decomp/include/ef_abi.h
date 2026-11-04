@@ -5911,4 +5911,6 @@ void draw_unit_icons_44f68(uint32_t a, ef_addr32 head);
 
 void update_effect_entries_90f50(void);
 
+void handle_unit_state_packet_564f4(ef_addr32 rec);
+
 #endif

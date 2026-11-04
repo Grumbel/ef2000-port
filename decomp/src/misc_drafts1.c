@@ -17379,3 +17379,54 @@ void update_effect_entries_90f50(void)
 		guest_fn_9e0c4((int32_t)EF_U32(e + 0x1eu) >> 16, EF_U32(e) << 8, EF_U32(e + 4u) << 8, EF_U32(e + 8u) << 8);
 	}
 }
+
+/* 0x564f4, 446 bytes. Handle an incoming unit state packet REC (EAX; signed unit id word +1, kind byte +3, reply code byte +4, words +5, +7, +9, +0xb, +0xd, byte +0xf). Ignored when the unit is missing, or when it is the selected unit (word 0x1f71ca), flag 0x127da8 is set and word 0x127dae is non-zero. Otherwise the packet words are copied to 0x197c28, 0x197c2a, 0x197c2c, 0x197c24, 0x197c26 and byte 0x121ec6 and the unit is updated with 0x74970. With flag 0x127da8 set, when byte 0x1a666b equals the unit's word +0x18 and the unit's bit 2 of word +0x24 differs from its value before the update, a reply is sent (0x577ac): -1 for another unit; for the selected unit code 0 when byte 0x12584b is 1 or when the unit named by word 0x197c28 is on another side, otherwise the score word 0x1a6398[owner of that unit] is reduced by 5. The player's counter word 0x1a6378[0x1a666b] is then incremented and word 0x127dae is set to 1500. */
+void handle_unit_state_packet_564f4(ef_addr32 rec)
+{
+	int32_t id = (int32_t)(int16_t)EF_U16(rec + 1u);
+	uint32_t unit = guest_fn_7489c(id);
+	uint32_t other, rowa, rowb, rows;
+	uint8_t before;
+	uint32_t player;
+
+	if (unit == 0u)
+		return;
+	if (EF_U16(0x001f71cau) == EF_U16(unit + 0x16u) && EF_U8(0x00127da8u) != 0u && EF_U16(0x00127daeu) != 0u)
+		return;
+	before = (uint8_t)((EF_U16(unit + 0x24u) >> 2) & 1u);
+	EF_U16(0x00197c28u) = EF_U16(rec + 5u);
+	EF_U16(0x00197c2au) = EF_U16(rec + 7u);
+	EF_U16(0x00197c2cu) = EF_U16(rec + 9u);
+	EF_U16(0x00197c24u) = EF_U16(rec + 0xbu);
+	EF_U16(0x00197c26u) = EF_U16(rec + 0xdu);
+	EF_U8(0x00121ec6u) = EF_U8(rec + 0xfu);
+	guest_fn_74970(id, 0u, 0u, EF_U8(rec + 3u));
+	if (EF_U8(0x00127da8u) == 0u)
+		return;
+	if (EF_U8(0x001a666bu) != EF_U16(unit + 0x18u))
+		return;
+	if ((uint32_t)((EF_U16(unit + 0x24u) >> 2) & 1u) == before)
+		return;
+	if (EF_U16(0x001f71cau) != EF_U16(rec + 1u)) {
+		send_packet_2c(EF_U8(rec + 4u), 0xffu, 0u, 0u, 0u);
+		return;
+	}
+	player = EF_U8(0x001a666bu);
+	if (EF_U8(0x0012584bu) == 1u) {
+		send_packet_2c(EF_U8(rec + 4u), (uint8_t)player, 0u, 0u, 0u);
+	} else {
+		other = guest_fn_7489c((int32_t)EF_U32(0x00197c26u) >> 16);
+		if (other != 0u) {
+			rows = EF_U32(0x0019bb58u);
+			rowa = rows + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+			rowb = rows + (uint32_t)(((int32_t)EF_U32(other + 0x26u) >> 16) * 0xca);
+			if (EF_U16(rowa + 0x15u) != EF_U16(rowb + 0x15u))
+				send_packet_2c(EF_U8(rec + 4u), (uint8_t)player, 0u, 0u, 0u);
+			else
+				EF_U16(0x001a6398u + (uint32_t)(((int32_t)EF_U32(other + 0x16u) >> 16) * 2)) =
+				    (uint16_t)(EF_U16(0x001a6398u + (uint32_t)(((int32_t)EF_U32(other + 0x16u) >> 16) * 2)) - 5u);
+		}
+	}
+	EF_U16(0x001a6378u + player * 2u) = (uint16_t)(EF_U16(0x001a6378u + player * 2u) + 1u);
+	EF_U16(0x00127daeu) = 0x5dcu;
+}
