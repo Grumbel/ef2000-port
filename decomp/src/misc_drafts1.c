@@ -20758,3 +20758,22 @@ uint32_t extender_range_9c2d3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 		return 0xffffffffu;
 	return base + EF_U32(0x00120cc6u);
 }
+
+/* 0xedb2d, 123 bytes. Math error dispatcher (ret 12): X is the offending double, CODE the error kind. CODE 1..3 reports with flags 0x2040|CODE; CODE 4 with X < 0 returns 0.0 without a report; any other case (including CODE 0 and CODE > 4) reports with flags 0x8100|CODE, or 0x1106 when CODE is 6 and X < 0. The report is 0x10e4dd on (X, X) and its result is returned. X is passed to the callee by address of a local copy. */
+double math_error_edb2d(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, uint32_t code)
+{
+	double v = x;
+	uint32_t c = code & 0xffu;
+	uint32_t flags;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	if (c >= 1u && c <= 3u) {
+		flags = 0x2000u | 0x40u | c;
+	} else if (c == 4u && 0.0 > x) {
+		return 0.0;
+	} else {
+		flags = 0x8100u | c;
+		if (c == 6u && 0.0 > x)
+			flags = 0x1106u;
+	}
+	return eval_binary_record_10e4dd(flags, (uint32_t)(uintptr_t)&v, (uint32_t)(uintptr_t)&v);
+}

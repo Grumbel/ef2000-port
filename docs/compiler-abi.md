@@ -9035,3 +9035,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9c2d3` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | cac@cb0 | cdecl (BASE, LENGTH): returns BASE + the dword at 0x120cc6 when BASE+LENGTH stays within 1 MiB; above 1 MiB (BASE itself |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xedb2d` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:uint32_t | EAX:double | a4472@a4496,dcb96@dcbbd | Math error dispatcher (ret 12): X is the offending double, CODE the error kind. CODE 1..3 reports with flags 0x2040/CODE |

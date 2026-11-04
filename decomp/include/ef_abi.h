@@ -6200,4 +6200,7 @@ double ratio_sum_11ba7c(uint32_t ref, uint32_t obj, uint32_t obj2, uint32_t u3, 
 uint32_t extender_range_9c2d3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t base, uint32_t length);
 uint32_t extender_range_9c2d3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t base, uint32_t length); /* 0x9c2d3 */
 
+double math_error_edb2d(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, uint32_t code);
+double math_error_edb2d(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, uint32_t code); /* 0xedb2d */
+
 #endif
