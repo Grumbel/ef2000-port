@@ -2818,4 +2818,15 @@ void guest_fn_8fd70(ef_addr32 buffer, ef_addr32 a, ef_addr32 b); /* 0x8fd70 EAX/
 uint32_t guest_fn_8fdb8(ef_addr32 record); /* 0x8fdb8 EAX -> AX */
 uint32_t guest_fn_81354(ef_addr32 text); /* 0x81354 EAX */
 
+/* game_helpers50.c */
+uint16_t create_effect_record_8ff48(void);
+void apply_slot_result_90124(int16_t slot, int16_t kind, uint16_t extra);
+void drop_object_near_camera_90378(ef_addr32 object);
+void reset_angle_limits_93f44(void);
+void update_navigation_target_94954(int16_t unit_id);
+uint32_t guest_fn_cd2e8_ret(int32_t value); /* 0xcd2e8 EAX -> EAX */
+void guest_fn_10a9c(int32_t a, int32_t b); /* 0x10a9c EAX/EDX */
+void guest_fn_55f0c(int32_t a, int32_t b, int32_t c, int32_t d); /* 0x55f0c EAX/EDX/EBX/ECX */
+void guest_fn_d9cb4(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xd9cb4 EAX/EDX/EBX */
+
 #endif

@@ -3470,3 +3470,13 @@ in EAX, format string address, one value).
 | `0x8fc24` | none | none | 3dd30@3e1f8 | Fade the ten 24-byte effect slots and relink their records. |
 | `0x8fcec` | AX:int16_t | none | 4a210@4a806 | Name the units of a player's formation from the name table. |
 | `0x8fe58` | none | none | 8bd58@8bd70 | Load the table resource and index its 50 records. |
+
+## game_helpers50 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8ff48` | none | AX:uint16_t | 37498@375af | Create an effect record, link it at the head of the list and number it. |
+| `0x90124` | AX:int16_t,DX:int16_t,BX:uint16_t | none | 15b7c@15e7e,16588@167e1,900c0@90111 | Apply a result to an object slot, optionally computing the response value. |
+| `0x90378` | EAX:ef_addr32 | none | 901ec@9020c | Drop an object near the camera onto the terrain and register its move. |
+| `0x93f44` | none | none | 95e58@96106 | Reset the angle record from the current limits and flag out-of-range limits. |
+| `0x94954` | AX:int16_t | none | 95e58@969b0,95e58@96ac9 | Update the navigation target of a unit from its linked object. |

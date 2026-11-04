@@ -1854,15 +1854,15 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008fe58	135	load_record_table_8fe58	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fe58.json	docs/compiler-abi.md; Load the table resource and index its 50 records.; callers 8bd58@8bd70; guest pending
 0x0008fee0	64	init_buffer_8fee0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008fee0.json	docs/compiler-abi.md; Reset the 0x5dc0-byte buffer state and allocate the buffer.; callers 49228@4962e; guest pending
 0x0008ff20	40	alloc_zero_68_8ff20	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008ff20.json	docs/compiler-abi.md; Allocate and zero a table of count 68-byte records.; callers 37498@37780; guest pending
-0x0008ff48	159			unknown	unclassified	unverified		
+0x0008ff48	159	create_effect_record_8ff48	game_helpers50	compiles	game	confirmed	decomp/tests/0x0008ff48.json	docs/compiler-abi.md; Create an effect record, link it at the head of the list and number it.; callers 37498@375af; guest pending
 0x0008ffe8	38	lookup_scene_node	scene_indexed	compiles	game	confirmed	decomp/tests/0x0008ffe8.json	docs/compiler-abi.md
 0x00090050	34	scene_node_is_registered	scene_nodes	compiles	game	confirmed	decomp/tests/0x00090050.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x00090074	74	clear_scene_node_children	scene_nodes	compiles	game	confirmed	decomp/tests/0x00090074.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x000900c0	97	dispatch_scene_node_event	scene_nodes	compiles	game	confirmed	decomp/tests/0x000900c0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
-0x00090124	200			unknown	unclassified	unverified		
+0x00090124	200	apply_slot_result_90124	game_helpers50	compiles	game	confirmed	decomp/tests/0x00090124.json	docs/compiler-abi.md; Apply a result to an object slot, optionally computing the response value.; callers 15b7c@15e7e,16588@167e1,900c0@90111; guest pending
 0x000901ec	46	visit_all_scene_nodes	scene_nodes	compiles	game	confirmed	decomp/tests/0x000901ec.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0009021c	345			unknown	unclassified	unverified		
-0x00090378	189			unknown	unclassified	unverified		
+0x00090378	189	drop_object_near_camera_90378	game_helpers50	compiles	game	confirmed	decomp/tests/0x00090378.json	docs/compiler-abi.md; Drop an object near the camera onto the terrain and register its move.; callers 901ec@9020c; guest pending
 0x00090438	547			unknown	unclassified	unverified		
 0x0009065c	14	next_scene_node	scene_nodes	compiles	game	confirmed	decomp/tests/0x0009065c.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x000906b4	78	scene_node_has_active_children	scene_nodes	compiles	game	confirmed	decomp/tests/0x000906b4.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
@@ -1914,7 +1914,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009357c	1293			unknown	unclassified	unverified		
 0x00093a8c	972			unknown	unclassified	unverified		
 0x00093e58	234			unknown	unclassified	unverified		
-0x00093f44	185			unknown	unclassified	unverified		
+0x00093f44	185	reset_angle_limits_93f44	game_helpers50	compiles	game	confirmed	decomp/tests/0x00093f44.json	docs/compiler-abi.md; Reset the angle record from the current limits and flag out-of-range limits.; callers 95e58@96106; guest pending
 0x00094000	222			unknown	unclassified	unverified		
 0x000940e0	8			unknown	unclassified	unverified		
 0x00094194	39	reset_scene_update_94194	scene_helpers	compiles	game	confirmed	decomp/tests/0x00094194.json	docs/compiler-abi.md; clear words 0x12dba0/a6; 0x91df4 0x9202c 0x93a8c; scene refresh; callers 95e58@961d5,95e58@96217; guest pending
@@ -1930,7 +1930,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00094880	68	update_view_94880	game_helpers6	compiles	game	confirmed	decomp/tests/0x00094880.json	docs/compiler-abi.md; ; callers 95e58@96887,95e58@9689f; guest pending
 0x000948c4	132	pair_with_target_948c4	game_helpers32	compiles	game	confirmed	decomp/tests/0x000948c4.json	docs/compiler-abi.md; Pair the current unit with a target unit, or reset the target state.; callers 95e58@96874,95e58@96af7; guest pending
 0x00094948	11	forward_record_field_30	misc_state	compiles	game	confirmed	decomp/tests/0x00094948.json	docs/compiler-abi.md; 0x9457c(record, dword record+0x30); callers 95e58@96552; guest pending
-0x00094954	198			unknown	unclassified	unverified		
+0x00094954	198	update_navigation_target_94954	game_helpers50	compiles	game	confirmed	decomp/tests/0x00094954.json	docs/compiler-abi.md; Update the navigation target of a unit from its linked object.; callers 95e58@969b0,95e58@96ac9; guest pending
 0x00094a1c	87	look_at_target_94a1c	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094a1c.json	docs/compiler-abi.md; Unit 0xff means the record at dword 0x1a821c.; callers 95e58@969df; guest pending
 0x00094a74	628			unknown	unclassified	unverified		
 0x00094ce8	31	reset_scene_words_and_update	misc_state	compiles	game	confirmed	decomp/tests/0x00094ce8.json	docs/compiler-abi.md; clear words 0x12dba2/a4/a6 then 0x94a74; callers 95e58@96cc3; guest pending
