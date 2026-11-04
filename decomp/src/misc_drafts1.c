@@ -5752,3 +5752,45 @@ void sort_nodes_by_order_e6848(uint32_t order, uint32_t count, uint32_t head_ptr
             break;
     }
 }
+
+/* 0xcde00, 327 bytes. Draw sprite number IDX from the sprite table TABLE (byte count, then word offsets from the table) centred at (X, Y): the sprite header holds half-width byte and height byte; reject it when entirely outside the clip rectangle (dwords 0x17cf9c/a0/a4/a8 = xmin/xmax/ymin/ymax), compute the destination (row table 0x163200 or negative rows by stride 0x1631f4 on frame base 0x15b754), and either blit it whole (0xcdc90, sprite width/4 and height in 0x4201a0/a4) when it is fully inside, or call the clipping blitter 0xcdd18 with the clip bounds relative to the sprite. Stack-only (ret 0x10): Y, X, IDX, TABLE. */
+void draw_table_sprite_cde00(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t y, uint32_t x, uint32_t idx, uint32_t table)
+{
+    uint32_t src, dst, w, h;
+    int32_t sx = (int32_t)x, sy = (int32_t)y;
+    uint16_t rx0, rx1, ry0, ry1;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (idx >= EF_U8(table))
+        return;
+    src = table + EF_U16(table + idx * 2u + 1u);
+    w = EF_U8(src) * 2u;
+    h = EF_U8(src + 1u);
+    sx -= (int32_t)(w >> 1);
+    sy -= (int32_t)(h >> 1);
+    src += 2u;
+    if (sx + (int32_t)w < (int32_t)EF_U32(0x0017cf9cu))
+        return;
+    if (sy + (int32_t)h < (int32_t)EF_U32(0x0017cfa4u))
+        return;
+    if (sx > (int32_t)EF_U32(0x0017cfa0u))
+        return;
+    if (sy > (int32_t)EF_U32(0x0017cfa8u))
+        return;
+    rx0 = (uint16_t)(EF_U16(0x0017cf9cu) - (uint32_t)sx);
+    rx1 = (uint16_t)(EF_U16(0x0017cfa0u) - (uint32_t)sx);
+    ry0 = (uint16_t)(EF_U16(0x0017cfa4u) - (uint32_t)sy);
+    ry1 = (uint16_t)(EF_U16(0x0017cfa8u) - (uint32_t)sy);
+    if (sy >= 0)
+        dst = EF_U32(0x00163200u + (uint32_t)sy * 4u);
+    else
+        dst = (uint32_t)sy * EF_U32(0x001631f4u);
+    dst += EF_U32(0x0015b754u) + (uint32_t)sx;
+    EF_U32(0x004201a0u) = (uint32_t)((int32_t)w >> 2);
+    EF_U32(0x004201a4u) = h;
+    if ((int16_t)rx0 < 0 && (int16_t)rx1 > (int32_t)w && (int16_t)ry0 < 0 && (int16_t)ry1 > (int32_t)h) {
+        interleave_planes_cdc90(dst, src);
+    } else {
+        draw_planar_sprite_cdd18(dst, src, (uint32_t)(int32_t)(int16_t)rx0, (uint32_t)(int32_t)(int16_t)rx1,
+                                 (uint32_t)(int32_t)(int16_t)ry0, (uint32_t)(int32_t)(int16_t)ry1);
+    }
+}

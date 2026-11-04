@@ -4973,4 +4973,6 @@ void advance_playlist_a94e4(uint32_t list);
 
 void sort_nodes_by_order_e6848(uint32_t order, uint32_t count, uint32_t head_ptr, uint32_t key);
 
+void draw_table_sprite_cde00(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t y, uint32_t x, uint32_t idx, uint32_t table);
+
 #endif
