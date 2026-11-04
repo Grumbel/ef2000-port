@@ -1396,7 +1396,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00076b10	32	alloc_table_25_76b10	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00076b10.json	docs/compiler-abi.md; Allocate a table of count 25-byte records.; callers 76cc4@76cd7; guest pending
 0x00076b30	79	attach_object_link_child	scene_indexed	compiles	game	confirmed	decomp/tests/0x00076b30.json	docs/compiler-abi.md
 0x00076b80	321	bind_unit_entry_76b80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00076b80.json	docs/compiler-abi.md; Bind unit ID (16-bit) to the first free 25-byte entry (word +1 == 0xff) of the table at dword 0x1f8918 (count in byte 0x; callers 8c49c@8c833; guest pending
-0x00076cc4	358			unknown	unclassified	unverified		
+0x00076cc4	358	init_slot_table_76cc4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00076cc4.json	docs/compiler-abi.md; Initialise the table of 30 (0x1e) 25 byte slots with 0x76b10 (count byte 0x1f8920), set the word at +1 of every slot to ; callers 49228@495c1; guest pending
 0x00076e2c	297	refresh_unit_roster_76e2c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00076e2c.json	docs/compiler-abi.md; Refresh the roster of unit B (DX, signed) for class A (AX, signed): look the unit up (0x7489c) and take its roster table; callers 46454@4707f; guest pending
 0x00076f58	218	report_formation_76f58	game_helpers40	compiles	game	confirmed	decomp/tests/0x00076f58.json	docs/compiler-abi.md; Report the formation members and leader to the roster function 0x76b30.; callers 77088@770c9; guest pending
 0x00077034	81	send_slot_command_77034	game_helpers11	compiles	game	confirmed	decomp/tests/0x00077034.json	docs/compiler-abi.md; Send command 0x44/0x45/0x43 for kind 0/1/2.; callers 77088@770c0; guest pending

@@ -14008,3 +14008,53 @@ void start_mission_step_1b70(void)
     guest_fn_2fbc4(0x0017f5c4u);
     EF_U8(0x0012db9eu) = 0x49u;
 }
+
+/* 0x76cc4, 358 bytes. Initialise the table of 30 (0x1e) 25 byte slots with 0x76b10 (count byte 0x1f8920), set the word at +1 of every slot to 0xff and fill the constant block at 0x12a6cc.. (type byte 2, then pairs of IEEE doubles; byte 0x12a715 = 3) used by the table's model parameters. */
+void init_slot_table_76cc4(void)
+{
+    uint8_t n;
+    uint8_t i;
+    EF_U8(0x001f8920u) = 0x1eu;
+    alloc_table_25_76b10(0x1eu);
+    n = EF_U8(0x001f8920u);
+    if (n != 0u) {
+        i = 0u;
+        do {
+            EF_U16(EF_U32(0x001f8918u) + (uint32_t)i * 0x19u + 1u) = 0xffu;
+            i++;
+        } while (i < n);
+    }
+    EF_U8(0x0012a6ccu) = 2u;
+    EF_U32(0x0012a6cdu) = 0xcccccccdu;
+    EF_U32(0x0012a6d1u) = 0xc0430cccu;
+    EF_U32(0x0012a6d5u) = 0x9fbe76c9u;
+    EF_U32(0x0012a6d9u) = 0xc0339f1au;
+    EF_U32(0x0012a6ddu) = 0x6a7ef9dbu;
+    EF_U32(0x0012a6e5u) = 0xcccccccdu;
+    EF_U32(0x0012a6e9u) = 0xc0430cccu;
+    EF_U32(0x0012a6edu) = 0x9fbe76c9u;
+    EF_U32(0x0012a6f5u) = 0x6a7ef9dbu;
+    EF_U32(0x0012a6e1u) = 0x401cf4bcu;
+    EF_U32(0x0012a6f1u) = 0x40339f1au;
+    EF_U32(0x0012a6f9u) = 0x401cf4bcu;
+    EF_U32(0x0012a74au) = 0xc04b6e97u;
+    EF_U32(0x0012a74eu) = 0x00000000u;
+    EF_U32(0x0012a752u) = 0x00000000u;
+    EF_U32(0x0012a756u) = 0xcc81e6d8u;
+    EF_U32(0x0012a746u) = 0x8d4fdf3bu;
+    EF_U32(0x0012a75au) = 0x3ffbde0fu;
+    EF_U32(0x0012a732u) = 0xc0447713u;
+    EF_U32(0x0012a736u) = 0x602393a2u;
+    EF_U32(0x0012a73au) = 0x40313e33u;
+    EF_U32(0x0012a73eu) = 0xd6ce5247u;
+    EF_U32(0x0012a71au) = 0xc0447713u;
+    EF_U32(0x0012a71eu) = 0x602393a2u;
+    EF_U32(0x0012a726u) = 0xd6ce5247u;
+    EF_U32(0x0012a72eu) = 0x9a2f6587u;
+    EF_U32(0x0012a742u) = 0x40064b3fu;
+    EF_U32(0x0012a716u) = 0x9a2f6587u;
+    EF_U32(0x0012a722u) = 0xc0313e33u;
+    EF_U32(0x0012a72au) = 0x40064b3fu;
+    EF_U8(0x0012a715u) = 3u;
+    EF_U8(0x001f8920u) = n;
+}

@@ -5706,4 +5706,6 @@ void start_mission_step_1b70(void);
 void guest_fn_2e04_x(void); /* 0x2e04 */
 void guest_fn_20ec_x(void); /* 0x20ec */
 
+void init_slot_table_76cc4(void);
+
 #endif
