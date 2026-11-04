@@ -20251,3 +20251,22 @@ void call_hook_159158_c6800(uint32_t eax, uint32_t edx, uint32_t ebx)
 {
 	guest_callptr4_x(EF_U32(0x159158u), eax, edx, ebx, 1u);
 }
+
+/* 0xc6428, 15 bytes. Implicit-register fragment (ESI is an in/out pointer; result in AL): load the word at ESI (advancing ESI by 2), add the byte 0x159140 to its low byte and translate it through the shade table whose base is dword 0x159084. */
+uint8_t shade_lookup_c6428(uint32_t *esi)
+{
+	uint8_t al = (uint8_t)EF_U16(*esi);
+	*esi += 2u;
+	al = (uint8_t)(al + EF_U8(0x159140u));
+	return EF_U8(EF_U32(0x159084u) + al);
+}
+
+/* 0xc64d0, 20 bytes. Implicit-register fragment (ESI is an in/out pointer; result in AL): like 0xc6428 but also stores the loaded low byte to byte 0x15913c first. */
+uint8_t shade_lookup_store_c64d0(uint32_t *esi)
+{
+	uint8_t al = (uint8_t)EF_U16(*esi);
+	*esi += 2u;
+	EF_U8(0x15913cu) = al;
+	al = (uint8_t)(al + EF_U8(0x159140u));
+	return EF_U8(EF_U32(0x159084u) + al);
+}

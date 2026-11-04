@@ -8899,3 +8899,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc6800` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | none direct | Implicit-register fragment (EAX, EDX, EBX pass through unchanged to the callee): call the function pointer at 0x159158 w |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc6428` | EAX:uint32_t | AL:uint8_t | c6370@c6370 | Implicit-register fragment (ESI is an in/out pointer; result in AL): load the word at ESI (advancing ESI by 2), add the  |
+| `0xc64d0` | EAX:uint32_t | AL:uint8_t | c6800@c6805,c71dc@c71e1,c75d4@c75d9 | Implicit-register fragment (ESI is an in/out pointer; result in AL): like 0xc6428 but also stores the loaded low byte to |
