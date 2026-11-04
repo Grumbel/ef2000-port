@@ -4882,3 +4882,19 @@ void assign_roster_slot_740e4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, ui
     EF_U8(rec + 0x20bu) = (uint8_t)slot;
     EF_U8(rec + 0x16du) = (uint8_t)d;
 }
+
+/* 0x104580, 273 bytes. Reset the 19 runtime settings (via 0x101e14: index, value) to their defaults after 0x103d80, clear the 16 dwords at 0x4dd670..0x4dd6ac and the byte 0x4dd6b0, and continue into 0x110fd4 (tail jump). */
+void reset_settings_104580(void)
+{
+    static const uint16_t defaults[19] = {
+        0xc8, 1, 0x8000, 0x64, 0x10, 0x64, 0x28f, 0, 0, 1, 0, 0x78, 8, 0x7f, 1, 0, 2, 1, 1
+    };
+    uint32_t i;
+    init_locked_ranges_103d80();
+    for (i = 0; i < 19u; i++)
+        trace_call_101e14(0u, 0u, 0u, 0u, i, defaults[i]);
+    for (i = 4u; i != 0x44u; i += 4u)
+        EF_U32(0x004dd66cu + i) = 0u;
+    EF_U8(0x004dd6b0u) = 0u;
+    guest_fn_110fd4_x();
+}

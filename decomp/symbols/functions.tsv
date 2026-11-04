@@ -3867,7 +3867,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00104200	609			unknown	unclassified	unverified		
 0x00104464	158	destroy_record_104464	runtime_helpers37	compiles	game	confirmed	decomp/tests/0x00104464.json	docs/compiler-abi.md; Destroy a record: run its field 0x24 callback with field 0x28, trace-call fields 0x20 and 0x1c, send message 0x306, free; callers 102488@1024ab; guest pending
 0x00104504	121			unknown	unclassified	unverified		
-0x00104580	273			unknown	unclassified	unverified		
+0x00104580	273	reset_settings_104580	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00104580.json	docs/compiler-abi.md; Reset the 19 runtime settings (via 0x101e14: index, value) to their defaults after 0x103d80, clear the 16 dwords at 0x4d; callers 101c54@101c7d,101c54@101cb4,101c54@101d58; guest pending
 0x00104694	45	shutdown_104694	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00104694.json	docs/compiler-abi.md; Call 0x102488 on each non-null dword 0x4dd670[0..15], then 0x1023b0 and 0x1110c5.; callers 101ddc@101df9; guest pending
 0x001046c4	135	release_runtime_buffers_1046c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001046c4.json	docs/compiler-abi.md; When 0x17d2d4 is set, run 0x1048b4 over the range (0x103d80, 0x1046c4), release the six runtime buffers (0x4dd670, 0x4dd; callers none direct; guest pending
 0x001047a4	32	allocate_and_init_1047a4	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001047a4.json	docs/compiler-abi.md; Allocate with 0xc3f70(size) and, if successful, run 0x104908(block, size).; callers 104200@104209,105e38@105e48,105e38@106209; guest pending
