@@ -5634,4 +5634,6 @@ uint8_t wander_view_point_843b0(void);
 void init_runtime_globals_9d834(void);
 void guest_fn_9da80_x(void); /* 0x9da80 */
 
+uint32_t camera_distance_sq_7f6d8(ef_addr32 rec);
+
 #endif

@@ -13143,3 +13143,34 @@ void init_runtime_globals_9d834(void)
         EF_U8(0x00132b12u) = 1u;
     }
 }
+
+/* 0x7f6d8, 260 bytes. Squared distance from the camera (words 0x21444c, 0x214448, 0x214450) to the position at REC (three 8.8-ish coordinates, bits 8..23 of each dword); 0 gives 0. For the tracked record 0x12b0c8 in play mode (byte 0x127da9, record_mismatches_marker nonzero) the result is cached in 0x12b0c0 with the z delta in word 0x12b0c4: a cache hit with a z delta too far from the stored one (|abs(word 0x12b0c2 >> 16) - abs(dz)| > 0x1f4) returns the cached value, and byte 0x1a3647 forces the constant 0x40. A different record just becomes the tracked one. */
+uint32_t camera_distance_sq_7f6d8(ef_addr32 rec)
+{
+    int32_t dx, dy, dz;
+    int32_t sx, sy, sz;
+    if (rec == 0u)
+        return 0u;
+    dx = (int32_t)((EF_U32(0x0021444cu) & 0xffffu) - ((EF_U32(rec) >> 8) & 0xffffu));
+    dy = (int32_t)((EF_U32(0x00214448u) & 0xffffu) - ((EF_U32(rec + 4u) >> 8) & 0xffffu));
+    dz = (int32_t)((EF_U32(0x00214450u) & 0xffffu) - ((EF_U32(rec + 8u) >> 8) & 0xffffu));
+    sx = (int16_t)dx;
+    sy = (int16_t)dy;
+    sz = (int16_t)dz;
+    if (EF_U8(0x00127da9u) != 0u && record_mismatches_marker(rec) != 0u) {
+        if (rec == EF_U32(0x0012b0c8u)) {
+            if (EF_U8(0x001a3647u) != 0u)
+                return 0x40u;
+            {
+                int32_t diff = (int32_t)abs_a28f2((int32_t)EF_U32(0x0012b0c2u) >> 16) - (int32_t)abs_a28f2(sz);
+                if ((int32_t)abs_a28f2(diff) > 0x1f4)
+                    return EF_U32(0x0012b0c0u);
+            }
+            EF_U16(0x0012b0c4u) = (uint16_t)dz;
+            EF_U32(0x0012b0c0u) = (uint32_t)(sz * sz + sx * sx + sy * sy);
+        } else {
+            EF_U32(0x0012b0c8u) = rec;
+        }
+    }
+    return (uint32_t)(sx * sx + sy * sy + sz * sz);
+}

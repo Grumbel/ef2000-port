@@ -1513,7 +1513,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007eec4	50	reset_menu_7eec4	game_helpers6	compiles	game	confirmed	decomp/tests/0x0007eec4.json	docs/compiler-abi.md; ; callers 17f10@17f85,8d11c@8d218; guest pending
 0x0007ef14	1944			unknown	unclassified	unverified		
 0x0007f6ac	43	record_mismatches_marker	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007f6ac.json	docs/compiler-abi.md; 0 when high word +0x16 > 7 or word +0x18 equals marker; callers 7f6d8@7f744; guest pending
-0x0007f6d8	260			unknown	unclassified	unverified		
+0x0007f6d8	260	camera_distance_sq_7f6d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007f6d8.json	docs/compiler-abi.md; Squared distance from the camera (words 0x21444c, 0x214448, 0x214450) to the position at REC (three 8.8-ish coordinates,; callers 7ef14@7eff4,7ef14@7f035,7ef14@7f0a3; guest pending
 0x0007f7dc	115	squared_distance_7f7dc	game_helpers9	compiles	game	confirmed	decomp/tests/0x0007f7dc.json	docs/compiler-abi.md; Squared distance between a vector (>>8, 16-bit) and the origin at 0x21444c.; callers 7ef14@7f103,7ef14@7f1bc; guest pending
 0x0007f850	401			unknown	unclassified	unverified		
 0x0007f9e4	440	select_contact_icon_7f9e4	game_helpers70	compiles	game	confirmed	decomp/tests/0x0007f9e4.json	docs/compiler-abi.md; Pick the icon code for a unit record (0x47 for none).; callers 7ef14@7efeb,7ef14@7f02c,7ef14@7f09a; guest pending

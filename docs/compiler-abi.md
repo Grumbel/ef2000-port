@@ -7789,3 +7789,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9d834` | none | none | e4188@e421a | Initialise the C-runtime style globals: zero 0x132b08/0x132b0c and byte 0x132ac2, point 0x411080 at 0x18b22c, set -1 int |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7f6d8` | EAX:ef_addr32 | EAX:uint32_t | 7ef14@7eff4,7ef14@7f035,7ef14@7f0a3 | Squared distance from the camera (words 0x21444c, 0x214448, 0x214450) to the position at REC (three 8.8-ish coordinates, |
