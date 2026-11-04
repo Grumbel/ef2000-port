@@ -6296,4 +6296,17 @@ void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out); /* 0xe
 void run_handler_stack_c425a(void); /* 0xc425a */
 uint32_t poll_device_ready_a42c4(void); /* 0xa42c4 */
 
+uint32_t compare_word_235(uint32_t value);
+uint32_t find_next_decfb(uint32_t dta);
+uint32_t find_first_decde(uint32_t name, uint32_t attr, uint32_t dta);
+uint32_t swap_word_c5372(uint32_t *ebx);
+void scale_entry_c552e(uint32_t index);
+void scale_entry_c565e(uint32_t index);
+uint32_t compare_word_235(uint32_t value); /* 0x235 */
+uint32_t find_next_decfb(uint32_t dta); /* 0xdecfb */
+uint32_t find_first_decde(uint32_t name, uint32_t attr, uint32_t dta); /* 0xdecde */
+uint32_t swap_word_c5372(uint32_t *ebx); /* 0xc5372 */
+void scale_entry_c552e(uint32_t index); /* 0xc552e */
+void scale_entry_c565e(uint32_t index); /* 0xc565e */
+
 #endif

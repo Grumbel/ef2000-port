@@ -21252,3 +21252,75 @@ uint32_t translate_key_masked_1084c0(uint32_t value, uint32_t carry)
 	guest_fn_1101e8_x(value);
 	return value;
 }
+
+/* 0x235, 6 bytes. Implicit-register fragment: compare EAX with the dword at 0x120cd0; returns 1 when they are equal (ZF), else 0. */
+uint32_t compare_word_235(uint32_t value)
+{
+	return value == EF_U32(0x120cd0u) ? 1u : 0u;
+}
+
+/* 0xdecfb, 28 bytes. DOS find next (int 21h, AH = 0x4f): set the DTA to DTA (EAX), load the search state from it, step the search, translate the result (0x1084c0) and copy the DTA back out. Returns the translated result. */
+uint32_t find_next_decfb(uint32_t dta)
+{
+	uint32_t out[7];
+	uint32_t result;
+
+	run_dos_int_ex(0x21u, 0x1a00u, 0u, 0u, dta, out);
+	copy_dta_in_ded3d(0u, dta);
+	run_dos_int_ex(0x21u, 0x4f00u, 0u, 0u, 0u, out);
+	result = translate_key_masked_1084c0(out[0], out[6]);
+	copy_dta_out_ded1a(0u, dta);
+	return result;
+}
+
+/* 0xdecde, 29 bytes. DOS find first (int 21h, AH = 0x4e): set the DTA to DTA (EBX), search for NAME (EAX) with attributes ATTR (EDX), translate the result (0x1084c0) and copy the DTA out. Returns the translated result. */
+uint32_t find_first_decde(uint32_t name, uint32_t attr, uint32_t dta)
+{
+	uint32_t out[7];
+	uint32_t result;
+
+	run_dos_int_ex(0x21u, 0x1a00u, 0u, 0u, dta, out);
+	run_dos_int_ex(0x21u, 0x4e00u, 0u, attr, name, out);
+	result = translate_key_masked_1084c0(out[0], out[6]);
+	copy_dta_out_ded1a(0u, dta);
+	return result;
+}
+
+/* 0xc5372, 27 bytes. Implicit-register fragment (EBX is an in/out pointer): byte-swap the word at EBX. Returns 1 when the swapped word is 0xc0 (the original then jumps back and stores nothing), otherwise stores it, advances EBX by 2 and returns 0. */
+uint32_t swap_word_c5372(uint32_t *ebx)
+{
+	uint32_t v = EF_U16(*ebx);
+
+	v = ((v & 0xffu) << 8) | (v >> 8);
+	if (v == 0xc0u)
+		return 1u;
+	EF_U16(*ebx) = (uint16_t)v;
+	*ebx += 2u;
+	return 0u;
+}
+
+/* 0xc552e, 35 bytes. Implicit-register fragment (ESI = index): scale the table entries at INDEX by the signed byte at 0x149e58 + INDEX; 1 and -1 do nothing, positive values divide, negative ones multiply by the negated value (nothing further happens when the negation overflows). */
+void scale_entry_c552e(uint32_t index)
+{
+	int8_t s = (int8_t)EF_U8(0x149e58u + index);
+
+	if (s == 1 || s == -1)
+		return;
+	if (s > 0)
+		divide_table_entries_c5409((uint32_t)s, index);
+	else
+		multiply_table_entries_c5441((uint8_t)-s, index);
+}
+
+/* 0xc565e, 35 bytes. Implicit-register fragment (ESI = index): identical to 0xc552e, the second copy of the scaling step. */
+void scale_entry_c565e(uint32_t index)
+{
+	int8_t s = (int8_t)EF_U8(0x149e58u + index);
+
+	if (s == 1 || s == -1)
+		return;
+	if (s > 0)
+		divide_table_entries_c5409((uint32_t)s, index);
+	else
+		multiply_table_entries_c5441((uint8_t)-s, index);
+}

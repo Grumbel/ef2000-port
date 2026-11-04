@@ -9152,3 +9152,14 @@ in EAX, format string address, one value).
 | `0xef942` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | ee22c@ee615,ee22c@ee634,ee22c@ee7e3 | At the entry (the routine continues into 0xef957). Implicit-register fragment (EAX = record A, EDX = record B, EBX = out |
 | `0xc425a` | none | none | c4167@c41a2 | At the entry (the loop at 0xc4281 follows). Implicit-register fragment: walk the word stack at 0x147e56 from the top (wo |
 | `0xa42c4` | none | EAX:uint32_t | 34f94@34fd7,35cfc@35d23,49228@49b56 | At the entry. Implicit-register fragment: poll the device-ready check 0xa292c and return its AL result (the original loo |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x235` | EAX:uint32_t | EAX:uint32_t | 10d80b@10d89d | Implicit-register fragment: compare EAX with the dword at 0x120cd0; returns 1 when they are equal (ZF), else 0. |
+| `0xdecfb` | EAX:uint32_t | EAX:uint32_t | 32de8@32e38,8b684@8b6b2 | DOS find next (int 21h, AH = 0x4f): set the DTA to DTA (EAX), load the search state from it, step the search, translate  |
+| `0xdecde` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 32de8@32e0c,8b684@8b6a6 | DOS find first (int 21h, AH = 0x4e): set the DTA to DTA (EBX), search for NAME (EAX) with attributes ATTR (EDX), transla |
+| `0xc5372` | EAX:uint32_t | EAX:uint32_t | none direct | Implicit-register fragment (EBX is an in/out pointer): byte-swap the word at EBX. Returns 1 when the swapped word is 0xc |
+| `0xc552e` | EAX:uint32_t | none | 16018a@16024f | Implicit-register fragment (ESI = index): scale the table entries at INDEX by the signed byte at 0x149e58 + INDEX; 1 and |
+| `0xc565e` | EAX:uint32_t | none | 16018a@16024f | Implicit-register fragment (ESI = index): identical to 0xc552e, the second copy of the scaling step. |

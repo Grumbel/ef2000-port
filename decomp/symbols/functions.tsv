@@ -2,7 +2,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00000086	355	x386_startup		library	x32	unverified		docs/loader.md and docs/startup-symbols.md; code sequence matches FlashTek X-32 Watcom cstrtx32.asm, selector and startup setup
 0x000001e9	57	fatal_exit_1e9	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000001e9.json	docs/compiler-abi.md; Fatal exit with a message: STRING (EDX, zero-terminated) is written to the file opened by name 0x120d1b (INT 21h AX=3D01; callers 11d258@11d26d; guest pending
 0x00000222	9	load_ds_from_120cd4_222	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000222.json	docs/compiler-abi.md; Load the data segment register from the word at code-segment offset 0x120cd4. Segments are flat in this port, so there i; callers ee22c@ee28d,ee22c@ee318; guest pending
-0x00000235	6			unknown	unclassified	unverified		
+0x00000235	6	compare_word_235	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000235.json	docs/compiler-abi.md; Implicit-register fragment: compare EAX with the dword at 0x120cd0; returns 1 when they are equal (ZF), else 0.; callers 10d80b@10d89d; guest pending
 0x0000023b	44			unknown	unclassified	unverified		
 0x000002b0	116	intdos_2b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000002b0.json	docs/compiler-abi.md; intdos: run DOS interrupt 0x21 with the registers from the block IN (EAX, EBX, ECX, EDX, ESI, EDI at +0..+0x14) and the ; callers 324@33b,3d0@3ee,880@892; guest pending
 0x00000324	35	dos_call_2503_324	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x00000324.json	docs/compiler-abi.md; DOS call 0x2503 with one argument; returns the result word.; callers 734@77a; guest pending
@@ -2791,7 +2791,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c4db4	135			unknown	unclassified	unverified		
 0x000c4e3b	39			unknown	unclassified	unverified		
 0x000c5261	120			unknown	unclassified	unverified		
-0x000c5372	27			unknown	unclassified	unverified		
+0x000c5372	27	swap_word_c5372	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5372.json	docs/compiler-abi.md; Implicit-register fragment (EBX is an in/out pointer): byte-swap the word at EBX. Returns 1 when the swapped word is 0xc; callers none direct; guest pending
 0x000c5390	12	swap_word_c5390	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c5390.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
 0x000c539c	12	swap_word_c539c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c539c.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
 0x000c53a8	12	swap_word_c53a8	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c53a8.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
@@ -2799,9 +2799,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c5409	56	divide_table_entries_c5409	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5409.json	docs/compiler-abi.md; Divide the three table entries at index ESI (dword arrays 0x150e58, 0x152e58 and 0x154e58) by the signed byte DIV (AL); ; callers c552e@c5540,c565e@c5670; guest pending
 0x000c5441	62	multiply_table_entries_c5441	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5441.json	docs/compiler-abi.md; Multiply the three table entries at index ESI (arrays 0x150e58, 0x152e58, 0x154e58) by the signed byte MUL (AL, sign ext; callers c552e@c5549,c565e@c5679; guest pending
 0x000c54ef	41	fetch_scaled_value_c54ef	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c54ef.json	docs/compiler-abi.md; Fetch the scaled value for table index EDI (implicit register): clear byte 0x158ed8, take the signed word 0x14fe58[index; callers c5551@c5562,c5681@c5692; guest pending
-0x000c552e	35			unknown	unclassified	unverified		
+0x000c552e	35	scale_entry_c552e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c552e.json	docs/compiler-abi.md; Implicit-register fragment (ESI = index): scale the table entries at INDEX by the signed byte at 0x149e58 + INDEX; 1 and; callers 16018a@16024f; guest pending
 0x000c5551	59			unknown	unclassified	unverified		
-0x000c565e	35			unknown	unclassified	unverified		
+0x000c565e	35	scale_entry_c565e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c565e.json	docs/compiler-abi.md; Implicit-register fragment (ESI = index): identical to 0xc552e, the second copy of the scaling step.; callers 16018a@16024f; guest pending
 0x000c5681	59			unknown	unclassified	unverified		
 0x000c58cc	38	reset_clip_bounds_c58cc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000c58cc.json	docs/compiler-abi.md; Reset three clip bounds; both stack arguments are ignored.; callers none direct; guest pending
 0x000c59b7	35	shift_triples_c59b7	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c59b7.json	docs/compiler-abi.md; Shift three consecutive dword triples left by SHIFT (CL) with implicit registers (ESI = source, EDI = destination): the ; callers c4680@c4690; guest pending
@@ -3283,8 +3283,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dec90	30	length_squared_dec90	math_string	compiles	game	confirmed	decomp/tests/0x000dec90.json	docs/compiler-abi.md; 0xe2b60 of the sum of squares of three signed words.; callers 9e0c4@9e195,a0aa0@a0b49,a2500@a2580; guest pending
 0x000decb0	19	length_2d_decb0	math_string	compiles	game	confirmed	decomp/tests/0x000decb0.json	docs/compiler-abi.md; Low word of 0xe2b60(EAX^2 + EDX^2).; callers 2f740@2f786,dc91c@dc99b,dcaa4@dcb36; guest pending
 0x000decc4	26	length_3d_decc4	math_string	compiles	game	confirmed	decomp/tests/0x000decc4.json	docs/compiler-abi.md; Low word of 0xe2b60(EAX^2 + EDX^2 + EBX^2).; callers 30214@311ed,31514@31588,83a40@83adb; guest pending
-0x000decde	29			unknown	unclassified	unverified		
-0x000decfb	28			unknown	unclassified	unverified		
+0x000decde	29	find_first_decde	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000decde.json	docs/compiler-abi.md; DOS find first (int 21h, AH = 0x4e): set the DTA to DTA (EBX), search for NAME (EAX) with attributes ATTR (EDX), transla; callers 32de8@32e0c,8b684@8b6a6; guest pending
+0x000decfb	28	find_next_decfb	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000decfb.json	docs/compiler-abi.md; DOS find next (int 21h, AH = 0x4f): set the DTA to DTA (EAX), load the search state from it, step the search, translate ; callers 32de8@32e38,8b684@8b6b2; guest pending
 0x000ded1a	35	copy_dta_out_ded1a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded1a.json	docs/compiler-abi.md; When the file-search mode byte 0x132a5e is 9, copy the 0x2b-byte DOS DTA (address from int 21h, AH = 0x2f) to the buffer; callers decde@decf4,decfb@ded10; guest pending
 0x000ded3d	35	copy_dta_in_ded3d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded3d.json	docs/compiler-abi.md; The reverse of 0xded1a: copy the 0x2b bytes at SRC into the DOS DTA.; callers decfb@ded02; guest pending
 0x000ded60	38	swap_buffers_ded60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded60.json	docs/compiler-abi.md; Implicit-register fragment (ESI = first buffer, EDI = second buffer, ECX = byte count; params in that order): swap COUNT; callers dedde@dee7e,dedde@defce,dedde@df034; guest pending
