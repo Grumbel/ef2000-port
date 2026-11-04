@@ -1128,3 +1128,33 @@ uint8_t step_timer_entry_a1500(uint32_t idx)
     EF_U8(p + 5u) = 0u;
     return 0u;
 }
+
+/* 0xb5640, 142 bytes. (ret 4) Fill the sub-record at [obj+0x20] from the object in edx: find a free slot run (0xb58a8 with start bx and count s0), store the run at +0xe, compute the extent with 0xb54d0, then set the byte +0x18 (cl), clear words +0x16 and +0xc and copy +0x11/+0x15/+0x1d/+0x1f of the object into +0, +4, +8, +0xa. */
+void init_slot_record_b5640(uint32_t obj, uint32_t src, uint32_t ecx, uint32_t ebx, uint32_t need)
+{
+    uint32_t rec;
+    uint8_t flag = (uint8_t)ecx;
+    EF_U16(EF_U32(obj + 0x20u) + 0xeu) = (uint16_t)find_free_slot_run_b58a8(src, (int16_t)ebx, (int16_t)need);
+    rec = EF_U32(obj + 0x20u);
+    guest_fn_b54d0_x(rec + 0x10u, rec + 0x12u, rec + 0x14u, (uint32_t)(int32_t)(int16_t)EF_U16(rec + 0xeu), (uint32_t)(int32_t)(int16_t)EF_U16(src + 0x48u));
+    EF_U8(EF_U32(obj + 0x20u) + 0x18u) = flag;
+    EF_U16(EF_U32(obj + 0x20u) + 0x16u) = 0u;
+    EF_U16(EF_U32(obj + 0x20u) + 0xcu) = 0u;
+    EF_U32(EF_U32(obj + 0x20u)) = EF_U32(src + 0x11u);
+    EF_U32(EF_U32(obj + 0x20u) + 4u) = EF_U32(src + 0x15u);
+    EF_U16(EF_U32(obj + 0x20u) + 8u) = EF_U16(src + 0x1du);
+    EF_U16(EF_U32(obj + 0x20u) + 0xau) = EF_U16(src + 0x1fu);
+}
+
+/* 0xf2a30, 142 bytes. Apply the palette at 0x425c8c, decrement the word 0x1616ee and send the parameter block built from 0x485920/0x48591c and the words at 0x48594a..0x485954 to 0xdd9e4; when 0x161e18 and 0x161e16 are clear and 0x1616ed is set, set 0x161e18 to 0xffff. */
+void send_param_block_f2a30(void)
+{
+    guest_fn_d663c(0x00425c8cu);
+    EF_U16(0x001616eeu) = (uint16_t)(EF_U16(0x001616eeu) - 1u);
+    set_param_block_dd9e4(EF_U32(0x00485920u), EF_U32(0x0048591cu),
+                          (uint32_t)(int32_t)EF_S16(0x0048594eu), (uint32_t)(int32_t)EF_S16(0x0048594au),
+                          (uint32_t)(int32_t)EF_S16(0x00485954u), (uint32_t)(int32_t)EF_S16(0x00485952u),
+                          (uint32_t)(int32_t)EF_S16(0x00485950u), (uint32_t)(int32_t)EF_S16(0x0048594cu));
+    if (EF_U16(0x00161e18u) == 0u && EF_U16(0x00161e16u) == 0u && EF_U8(0x001616edu) != 0u)
+        EF_U16(0x00161e18u) = 0xffffu;
+}

@@ -2573,7 +2573,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b55a4	34	random_modulo_b55a4	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000b55a4.json	docs/compiler-abi.md; Random number modulo the signed high word at +0x2 of the record.; callers b7d4c@b7da2,b7d4c@b7dbf,b8510@b85c5; guest pending
 0x000b55c8	47	find_node_by_key	list_lookup	compiles	game	confirmed	decomp/tests/0x000b55c8.json	docs/compiler-abi.md; Walk the list at *head (next at +4) for a node whose * dwords +9/+0xd equal the record's +0x11/+0x15, word +0x1c equals ; callers b7d4c@b7d6b,b80ac@b80cc,b8510@b857a; guest pending
 0x000b55f8	69	find_node_b55f8	runtime_helpers11	compiles	game	confirmed	decomp/tests/0x000b55f8.json	docs/compiler-abi.md; Find the list node matching two key pairs and a kind byte.; callers b97a4@b97c0,b9aa4@b9abc,f8b14@f8b8f; guest pending
-0x000b5640	142			unknown	unclassified	unverified		
+0x000b5640	142	init_slot_record_b5640	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b5640.json	docs/compiler-abi.md; (ret 4) Fill the sub-record at [obj+0x20] from the object in edx: find a free slot run (0xb58a8 with start bx and count ; callers b5fe8@b64d9,b69e4@b7a3b,b7d4c@b7ed1; guest pending
 0x000b56d0	57	frame_index_b56d0	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000b56d0.json	docs/compiler-abi.md; Frame index scaled by the per-row count: (column * 60 + row) / divisor.; callers b5800@b5831; guest pending
 0x000b570c	242	fill_current_table_entry_b570c	game_helpers100	compiles	game	confirmed	decomp/tests/0x000b570c.json	docs/compiler-abi.md; Fill the current (last added) 0x19-byte table entry of an object from a source record and a flag byte.; callers b7d4c@b7f8f,b80ac@b8167,b80ac@b842c; guest pending
 0x000b5800	165	update_frame_slot_b5800	game_helpers123	compiles	game	confirmed	decomp/tests/0x000b5800.json	docs/compiler-abi.md; Recompute the frame index of the current 25-byte slot (object+0x20 table, 1-based index at +0x1c) and then find a free s; callers b7d4c@b800e,b80ac@b81be,b80ac@b8487; guest pending
@@ -3613,7 +3613,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2819	185			unknown	unclassified	unverified		
 0x000f2960	138	draw_glyph_6x6_f2960	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2960.json	docs/compiler-abi.md; Draw a 6x6 glyph (index ecx, 6 mask bytes at 0x16116c) in colour al at (x = edx, y row = ebx).; callers f29ec@f2a10; guest pending
 0x000f29ec	57	draw_text_f29ec	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f29ec.json	docs/compiler-abi.md; Draw a string with 6-pixel spacing, glyphs offset from the blank.; callers a9130@a9374; guest pending
-0x000f2a30	142			unknown	unclassified	unverified		
+0x000f2a30	142	send_param_block_f2a30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2a30.json	docs/compiler-abi.md; Apply the palette at 0x425c8c, decrement the word 0x1616ee and send the parameter block built from 0x485920/0x48591c and; callers f2ac0@f2b32; guest pending
 0x000f2ac0	188			unknown	unclassified	unverified		
 0x000f2b7c	250			unknown	unclassified	unverified		
 0x000f2c78	87	read_script_line_f2c78	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f2c78.json	docs/compiler-abi.md; Read the next script line (after leading blanks) from dword 0x485924 into 0x485956.; callers f2d74@f2d74,f3a1c@f3a36,f3a1c@f3a62; guest pending

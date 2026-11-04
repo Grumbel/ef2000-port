@@ -4543,4 +4543,8 @@ void rescale_window_d8610(void);
 
 uint8_t step_timer_entry_a1500(uint32_t idx);
 
+void init_slot_record_b5640(uint32_t obj, uint32_t src, uint32_t ecx, uint32_t ebx, uint32_t need);
+void send_param_block_f2a30(void);
+void guest_fn_b54d0_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0xb54d0 EAX/EDX/EBX/ECX + one stack argument, callee cleanup */
+
 #endif
