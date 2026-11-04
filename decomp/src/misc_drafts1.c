@@ -19170,3 +19170,40 @@ void destroy_unit_8cf10(int32_t unit)
 	if (EF_U8(u + 0x22fu) != 0u)
 		clear_panel_strip((int16_t)((int32_t)EF_U32(u + 0x20bu) >> 16));
 }
+
+/* 0x8935c, 283 bytes. Choose how to treat scene object OBJ (EAX) from its distance to the viewer. An object with +0x5a set is force-selected. One whose range word (+0x3e high) exceeds 0x5b4f is activated. Otherwise the object and its parent are converted into scene vectors (0x1fcf58, 0x1fcf88), their difference goes to 0x1fcfa0, and the flat distance and height (double at 0x1fcf68) pick the mode stored in 0x12d7b2: below 9000 units 3 (force-select) when the height is under -100 else 4 (activate); at 9000 or more 1 (force-select) when under -2700 else 2 (activate). */
+void classify_scene_object_8935c(ef_addr32 obj)
+{
+	double dx, dy, dist, z;
+
+	if (EF_U8(obj + 0x5au) != 0u) {
+		force_select_898d4(obj);
+		return;
+	}
+	if (((int32_t)EF_U32(obj + 0x3eu) >> 16) > 0x5b4f) {
+		activate_89990(obj);
+		return;
+	}
+	convert_scene_vector(obj, 0x001fcf58u);
+	transform_child_coordinates(obj, 0x001fcf88u);
+	subtract_scene_vectors(0x001fcfa0u, 0x001fcf58u, 0x001fcf88u);
+	memcpy(&dx, ef_guest_memory_ptr(0x001fcfa0u), 8);
+	memcpy(&dy, ef_guest_memory_ptr(0x001fcfa8u), 8);
+	dist = guest_fn_a4470(square_double_b3fd0(dy) + square_double_b3fd0(dx));
+	memcpy(&z, ef_guest_memory_ptr(0x001fcf68u), 8);
+	if (dist >= 9000.0) {
+		if (z < -2700.0) {
+			EF_U8(0x0012d7b2u) = 1u;
+			force_select_898d4(obj);
+		} else {
+			EF_U8(0x0012d7b2u) = 2u;
+			activate_89990(obj);
+		}
+	} else if (z < -100.0) {
+		EF_U8(0x0012d7b2u) = 3u;
+		force_select_898d4(obj);
+	} else {
+		EF_U8(0x0012d7b2u) = 4u;
+		activate_89990(obj);
+	}
+}

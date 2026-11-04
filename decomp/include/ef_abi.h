@@ -6009,4 +6009,6 @@ void guest_fn_3ea0c_x(uint32_t argc, ef_addr32 argv); /* 0x3ea0c EAX=argc, EDX=a
 void destroy_unit_8cf10(int32_t unit);
 void guest_fn_7ef14_x(void); /* 0x7ef14 */
 
+void classify_scene_object_8935c(ef_addr32 obj);
+
 #endif

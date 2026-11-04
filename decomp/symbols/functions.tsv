@@ -1742,7 +1742,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00089060	221	can_reach_target_89060	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089060.json	docs/compiler-abi.md; Test whether the unit record R (EAX) can reach the point: store the target dword T (EDX, when nonzero and R's class byte; callers 89698@89784; guest pending
 0x00089140	33	adjust_record_scalar	misc_state	compiles	game	confirmed	decomp/tests/0x00089140.json	docs/compiler-abi.md; record+0x26 = trunc(dword + double 0x18a4e0) then 0x89924; callers 86968@86a6d; guest pending
 0x00089164	473			unknown	unclassified	unverified		
-0x0008935c	283			unknown	unclassified	unverified		
+0x0008935c	283	classify_scene_object_8935c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008935c.json	docs/compiler-abi.md; Choose how to treat scene object OBJ (EAX) from its distance to the viewer. An object with +0x5a set is force-selected. ; callers none direct; guest pending
 0x00089478	321	damp_heading_89478	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089478.json	docs/compiler-abi.md; Per-frame damping of the heading double at 0x1fd020 (X) by mode byte 0x12d7b2 (1..4; the mode is rewritten unchanged). M; callers 8a318@8a42e; guest pending
 0x000895bc	77	select_object_895bc	unit_flags	compiles	game	confirmed	decomp/tests/0x000895bc.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0008960c	79	select_object_8960c	unit_flags	compiles	game	confirmed	decomp/tests/0x0008960c.json	docs/compiler-abi.md; ; callers none direct; guest pending
