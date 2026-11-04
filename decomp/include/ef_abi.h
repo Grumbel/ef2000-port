@@ -5496,4 +5496,6 @@ uint32_t clip_segment_ce9a4(ef_addr32 r);
 uint32_t guest_callptr4_ret_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* indirect call: EAX/EDX/EBX/ECX register arguments, result in EAX */
 ef_addr32 guest_fn_ce5f8_x(ef_addr32 plane, ef_addr32 inside, ef_addr32 outside); /* 0xce5f8 EAX/EDX/EBX -> EAX */
 
+void draw_scaled_rect_c95ac(uint32_t colour, uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2);
+
 #endif

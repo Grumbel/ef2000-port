@@ -7516,3 +7516,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xce9a4` | EAX:ef_addr32 | EAX:uint32_t | d299c@d2a31 | Clip the segment stored in the record R (EAX; segment record at +0x4c with its two end points at +4 and +8) against the  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc95ac` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 4161c@416a1,42568@42607,42568@42621 | Draw a rectangle in colour COLOUR (EAX, byte) given in viewport units: the signed words X1 (EDX), Y1 (EBX), X2 (ECX) and |

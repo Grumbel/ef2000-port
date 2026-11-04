@@ -11829,3 +11829,26 @@ uint32_t clip_segment_ce9a4(ef_addr32 r)
     EF_U32(EF_U32(r + 0x4cu) + 8u) = p1;
     return 1u;
 }
+
+/* 0xc95ac, 212 bytes. Draw a rectangle in colour COLOUR (EAX, byte) given in viewport units: the signed words X1 (EDX), Y1 (EBX), X2 (ECX) and Y2 (stack, ret 4) are scaled by the double at viewport+0x9f of the record at [0x41eea0] (nothing when NULL), offset by the viewport words (x: +0x41 + +0x71 - +0x69, y: +0x43 + +0x73 - +0x6b), rounded with 0x9d72c and drawn with 0xc8ccc(y2, x2, y1, x1, colour). */
+void draw_scaled_rect_c95ac(uint32_t colour, uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2)
+{
+    ef_addr32 vp = EF_U32(0x0041eea0u);
+    double scale;
+    double ox;
+    double oy;
+    int32_t r1;
+    int32_t r2;
+    int32_t r3;
+    int32_t r4;
+    if (vp == 0u)
+        return;
+    memcpy(&scale, ef_guest_memory_ptr(vp + 0x9fu), sizeof scale);
+    ox = (double)(int16_t)EF_U16(vp + 0x41u);
+    r1 = (int32_t)truncate_9d72c((double)(int16_t)x1 * scale + ox + (double)(int16_t)EF_U16(vp + 0x71u) - (double)(int16_t)EF_U16(vp + 0x69u));
+    oy = (double)(int16_t)EF_U16(vp + 0x43u);
+    r2 = (int32_t)truncate_9d72c((double)(int16_t)y1 * scale + oy + (double)(int16_t)EF_U16(vp + 0x73u) - (double)(int16_t)EF_U16(vp + 0x6bu));
+    r3 = (int32_t)truncate_9d72c((double)(int16_t)x2 * scale + ox + (double)(int16_t)EF_U16(vp + 0x71u) - (double)(int16_t)EF_U16(vp + 0x69u));
+    r4 = (int32_t)truncate_9d72c((double)(int16_t)y2 * scale + oy + (double)(int16_t)EF_U16(vp + 0x73u) - (double)(int16_t)EF_U16(vp + 0x6bu));
+    guest_fn_c8ccc_x((uint32_t)r4, (uint32_t)r3, (uint32_t)r2, (uint32_t)r1, colour & 0xffu);
+}
