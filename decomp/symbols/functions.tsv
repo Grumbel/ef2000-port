@@ -1545,7 +1545,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00080d20	30	lookup_by_word	mid_helpers	compiles	game	confirmed	decomp/tests/0x00080d20.json	docs/compiler-abi.md; 0xa1a90(sx DX, 0xa1a40()) or 0; callers 80d40@80d4b; guest pending
 0x00080d40	72	update_ui_record_from_template	ui_operations	compiles	game	confirmed	decomp/tests/0x00080d40.json	docs/compiler-abi.md; host model; guest differential pending
 0x00080d88	1	nop_80d88	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00080d88.json	docs/compiler-abi.md; Empty stub (single ret).; callers 3cfc0@3d1ca; guest pending
-0x00080d8c	107			unknown	unclassified	unverified		
+0x00080d8c	107	init_record_pool_80d8c	init_tables1	compiles	game	confirmed	decomp/tests/0x00080d8c.json	docs/compiler-abi.md; Allocate the 0xaf0-byte record pool, fill the 16-bit slot of each of its 200 14-byte records from a lookup on text, and ; callers db0b4@db0f9; guest pending
 0x000810d0	25	set_control_mode_b	runtime_control	compiles	game	confirmed	decomp/tests/0x000810d0.json	docs/compiler-abi.md; AL gate at 0x15bac7; selected zero or AL stored 0x12b104, returned zero-extended EAX; original guest replacement unverified
 0x000810ec	8	get_flag_810ec	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000810ec.json	docs/compiler-abi.md; ; callers 827b4@827b7; guest pending
 0x000810f4	25	set_control_mode_c	runtime_control	compiles	game	confirmed	decomp/tests/0x000810f4.json	docs/compiler-abi.md; AL gate at 0x15bac7; selected zero or AL stored 0x12b105, returned zero-extended EAX; original guest replacement unverified

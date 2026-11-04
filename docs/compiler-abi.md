@@ -4838,3 +4838,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x88664` | EAX:ef_addr32,EDX:uint32_t | none | 29dd0@29e00,29dd0@29e84,29dd0@29f3c | Raise unit event 0x20 (code 2) for a unit record. |
 | `0x886d0` | EAX:ef_addr32,EDX:uint32_t | none | 29b14@29c1a,29b14@29db6 | Raise unit event 0x1f (code 1) for a unit record. |
+
+## init_tables1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x80d8c` | EAX:ef_addr32 | none | db0b4@db0f9 | Allocate the 0xaf0-byte record pool, fill the 16-bit slot of each of its 200 14-byte records from a lookup on text, and  |

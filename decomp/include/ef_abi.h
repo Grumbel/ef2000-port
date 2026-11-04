@@ -4204,4 +4204,7 @@ void unit_event_88664(ef_addr32 unit, uint32_t arg);
 void unit_event_886d0(ef_addr32 unit, uint32_t arg);
 void guest_fn_87db8_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0x87db8 EAX/EDX/EBX/ECX + 6 stack, callee cleanup */
 
+/* init_tables1.c */
+void init_record_pool_80d8c(ef_addr32 text);
+
 #endif
