@@ -5426,3 +5426,40 @@ void load_object_geometry_a6808(uint32_t rec)
         EF_U16(rec + 0x35u) = (uint16_t)(EF_U16(rec + 6u) - EF_U16(rec + 0x39u));
     }
 }
+
+/* 0x4db60, 309 bytes. Fill two text widgets of the dialog named at 0x184b0c (widgets 0x184cf8 and 0x184d38, or 0x184d30 for the second when byte 0x1a5532 is 0). Otherwise the first gets the 17-byte name entry selected by byte 0x1a5598 (table 0x1a53e3) and the second a description: "none" string 0x1323a3 when the selected slot byte (0x1a5544[sel]) is 0xff, the 21-byte-record type name via table 0x13315c when the object at 0x1a54f6 exists, else a string chosen by byte 0x1a559a (1 -> 0x13058d, 2 -> 0x13059e, 3 -> 0x1323c8, 4 -> 0x1323b4). */
+void fill_selection_dialog_4db60(void)
+{
+    uint32_t root = find_named_or_abort_a46cc(0x00184b0cu);
+    uint32_t w;
+    uint32_t sel, slot, obj;
+    if (EF_U8(0x001a5532u) == 0u) {
+        w = find_widget_checked_a78bc(root, 0x00184cf8u);
+        guest_bind_dialog_widget(w, 0x00184d30u);
+        w = find_widget_checked_a78bc(root, 0x00184d38u);
+        guest_bind_dialog_widget(w, 0x00184d30u);
+        return;
+    }
+    sel = EF_U8(0x001a5598u);
+    w = find_widget_checked_a78bc(root, 0x00184cf8u);
+    guest_bind_dialog_widget(w, 0x001a53e3u + sel * 17u);
+    w = find_widget_checked_a78bc(root, 0x00184d38u);
+    slot = EF_U8(0x001a5544u + EF_U8(0x001a5598u));
+    if (slot == 0xffu) {
+        guest_bind_dialog_widget(w, 0x001323a3u);
+        return;
+    }
+    obj = EF_U32(0x001a54f6u);
+    if (obj != 0u) {
+        int32_t i = (int32_t)(int16_t)slot;
+        guest_bind_dialog_widget(w, EF_U32(0x0013315cu + EF_U8(EF_U32(obj + 0x2cu) + (uint32_t)(i * 21)) * 4u));
+        return;
+    }
+    switch ((uint8_t)(EF_U8(0x001a559au) - 1u)) {
+    case 0: guest_bind_dialog_widget(w, 0x0013058du); break;
+    case 1: guest_bind_dialog_widget(w, 0x0013059eu); break;
+    case 2: guest_bind_dialog_widget(w, 0x001323c8u); break;
+    case 3: guest_bind_dialog_widget(w, 0x001323b4u); break;
+    default: break;
+    }
+}

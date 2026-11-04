@@ -4954,4 +4954,6 @@ void skip_to_section_f3a1c(uint32_t name);
 
 void load_object_geometry_a6808(uint32_t rec);
 
+void fill_selection_dialog_4db60(void);
+
 #endif

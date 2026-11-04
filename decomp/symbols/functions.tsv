@@ -887,7 +887,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004da2c	99	mpMakeAssign		named	unclassified	unverified		
 0x0004da90	85	mpViewAssign		named	unclassified	unverified		
 0x0004dae8	100	mpClearWPRoute		named	unclassified	unverified		
-0x0004db60	309			unknown	unclassified	unverified		
+0x0004db60	309	fill_selection_dialog_4db60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004db60.json	docs/compiler-abi.md; Fill two text widgets of the dialog named at 0x184b0c (widgets 0x184cf8 and 0x184d38, or 0x184d30 for the second when by; callers 4b6a0@4bb11,4d9cc@4da23,4da2c@4da88; guest pending
 0x0004dc98	61	advance_first_tactical_status	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0004dc98.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0004dcd8	520			unknown	unclassified	unverified		
 0x0004dee0	209			unknown	unclassified	unverified		
