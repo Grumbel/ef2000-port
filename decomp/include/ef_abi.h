@@ -5714,4 +5714,6 @@ void play_queued_effects_1d474(void);
 
 void detach_parts_27348(ef_addr32 u);
 
+void build_unit_from_record_55928(ef_addr32 r, uint32_t type);
+
 #endif

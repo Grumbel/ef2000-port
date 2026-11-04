@@ -14172,3 +14172,61 @@ void detach_parts_27348(ef_addr32 u)
         EF_U8(r + 0x16u) = (uint8_t)(EF_U8(r + 0x16u) & 0xfbu);
     }
 }
+
+/* 0x55928, 385 bytes. Build (or refresh) the unit described by the mission record R (EAX) of type TYPE (DL): look for an existing unit with the tag byte +0x13 / word +0x14 (0x87f9c) or take a fresh one (0x879c4) whose +0x50 comes from the type table 0x135878 (entry + 6) and +0x51 from R+0x14. Copy class (+0x18 -> +0x18, with its word from the 145 byte table at 0x12bc8c into +0x2e), position (+1, +5, +9), heading words (+0xd, +0xf, +0x11), clear +0x53, +0x42, +0x19, mark +0x47/+0x49 as 0x1234; classes 0x1f and 0x20 get +0x56 = 0xff and the unit of the dword +0x14 >> 16 as +0x4b, others take +0x56 from R+0x16. A valid word in +0x54 >> 16 links that unit back (+0x30, its +0x1c). Then copy +0x14 to +0x51, +0x19 to +0x26, +0x1d to +0x58, give the type's word +0xb to +0x8b (+0x8d = 0) and, for a new class-1 unit (table byte 0x12bca7), refresh its +0x68 strip word via 0x80d40/0x80abc. Finishes with 0x89e08. */
+void build_unit_from_record_55928(ef_addr32 r, uint32_t type)
+{
+    uint8_t created = 0u;
+    uint8_t t = (uint8_t)type;
+    ef_addr32 u = find_ui_linked_tag(EF_U8(r + 0x13u), (int16_t)((int32_t)EF_U32(r + 0x12u) >> 16));
+    uint32_t cls;
+    ef_addr32 ti;
+    if (u == 0u) {
+        u = guest_fn_879c4_x();
+        ti = EF_U32(0x00135878u + (uint32_t)t * 32u);
+        EF_U8(u + 0x50u) = EF_U8(ti + 6u);
+        EF_U16(u + 0x51u) = EF_U16(r + 0x14u);
+        created = 1u;
+    }
+    cls = EF_U8(r + 0x18u);
+    EF_U8(u + 0x18u) = (uint8_t)cls;
+    EF_U16(u + 0x2eu) = EF_U16(0x0012bc8cu + cls * 145u);
+    EF_U32(u) = EF_U32(r + 1u);
+    EF_U32(u + 4u) = EF_U32(r + 5u);
+    EF_U32(u + 8u) = EF_U32(r + 9u);
+    EF_U16(u + 0xcu) = EF_U16(r + 0xdu);
+    EF_U16(u + 0xeu) = EF_U16(r + 0xfu);
+    EF_U8(u + 0x53u) = 0u;
+    EF_U16(u + 0x47u) = 0x1234u;
+    EF_U16(u + 0x49u) = 0x1234u;
+    EF_U8(u + 0x42u) = 0u;
+    EF_U8(u + 0x19u) = 0u;
+    EF_U16(u + 0x10u) = EF_U16(r + 0x11u);
+    if (EF_U8(r + 0x18u) == 0x20u || EF_U8(r + 0x18u) == 0x1fu) {
+        EF_U16(u + 0x56u) = 0xffu;
+        EF_U32(u + 0x4bu) = guest_fn_7489c((int32_t)EF_U32(r + 0x14u) >> 16);
+    } else {
+        EF_U16(u + 0x56u) = EF_U16(r + 0x16u);
+    }
+    {
+        int32_t link = (int32_t)EF_U32(u + 0x54u) >> 16;
+        if (link != 0xff) {
+            ef_addr32 other = guest_fn_7489c(link);
+            if (other != 0u) {
+                EF_U32(u + 0x30u) = other;
+                EF_U32(other + 0x1cu) = u;
+            }
+        }
+    }
+    EF_U16(u + 0x51u) = EF_U16(r + 0x14u);
+    EF_U32(u + 0x26u) = EF_U32(r + 0x19u);
+    ti = EF_U32(0x00135878u + (uint32_t)t * 32u);
+    EF_U16(u + 0x8du) = 0u;
+    EF_U16(u + 0x8bu) = EF_U16(ti + 0xbu);
+    EF_U8(u + 0x58u) = EF_U8(r + 0x1du);
+    if (created != 0u && EF_U8(0x0012bca7u + (uint32_t)EF_U8(u + 0x18u) * 145u) == 1u) {
+        update_ui_record_from_template((int16_t)((int32_t)EF_U32(u + 0x2cu) >> 16), u + 0x68u);
+        EF_U16(u + 0x68u) = (uint16_t)guest_fn_80abc_x();
+    }
+    guest_fn_89e08(u);
+}

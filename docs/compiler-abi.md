@@ -7984,3 +7984,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x27348` | EAX:ef_addr32 | none | 38284@382be | Release the parts of the unit U (EAX) that are marked as detached (bit 4 of byte +0x16 in the 0x44 byte part records at  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x55928` | EAX:ef_addr32,EDX:uint32_t | none | 581b0@5834a | Build (or refresh) the unit described by the mission record R (EAX) of type TYPE (DL): look for an existing unit with th |

@@ -1017,7 +1017,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00055860	35	clear_activity_record_flag	marker_packets	compiles	game	confirmed	decomp/tests/0x00055860.json	docs/compiler-abi.md; Clear byte at 0x1a5c32+23*record[1] then call 0x544c0; sole direct caller 581b0@58437; guest pending
 0x00055884	43	set_activity_record_flag	mid_helpers	compiles	game	confirmed	decomp/tests/0x00055884.json	docs/compiler-abi.md; byte 0x1a5c32+23*record[1]=1 unless byte 0x1f9012; always 0x544c0; callers 581b0@58428; guest pending
 0x000558b0	117	finish_marker_round_558b0	game_helpers45	compiles	game	confirmed	decomp/tests/0x000558b0.json	docs/compiler-abi.md; Finish the pending marker round: mark this player ready and update the scene.; callers 581b0@5841b; guest pending
-0x00055928	385			unknown	unclassified	unverified		
+0x00055928	385	build_unit_from_record_55928	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00055928.json	docs/compiler-abi.md; Build (or refresh) the unit described by the mission record R (EAX) of type TYPE (DL): look for an existing unit with th; callers 581b0@5834a; guest pending
 0x00055aac	152	send_record_state_55aac	game_helpers18	compiles	game	confirmed	decomp/tests/0x00055aac.json	docs/compiler-abi.md; Send the full state of a record (command 0x0e).; callers 87db8@87e71,883cc@88423; guest pending
 0x00055b44	58	send_packet_41	packet_status	compiles	game	confirmed	decomp/tests/0x00055b44.json	docs/compiler-abi.md; host model; guest differential pending
 0x00055b80	79	apply_action_55b80	game_helpers8	compiles	game	confirmed	decomp/tests/0x00055b80.json	docs/compiler-abi.md; ; callers 581b0@5859b; guest pending
