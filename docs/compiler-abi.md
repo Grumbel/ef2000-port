@@ -9469,3 +9469,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd6340` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | 1a358@1a37b,1a390@1a3b6 | Fill three 64-entry byte tables (0x15b96c, 0x15b9ac, 0x15b9ec) with a rational response curve x / (1 + (1/k + c) * (1 -  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7215c` | EAX:int32_t | none | 6d38c@6d683,71cb8@7214a,725dc@727e5 | For the unit record found by 0x7489c (index in AX, sign-extended), build the 3x3 rotation matrix from the angles at +0x6 |

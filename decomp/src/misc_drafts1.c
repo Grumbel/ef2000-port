@@ -23170,3 +23170,28 @@ void build_curve_tables_d6340(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 		}
 	}
 }
+
+/* 0x7215c, 205 bytes. For the unit record found by 0x7489c (index in AX, sign-extended), build the 3x3 rotation matrix from the angles at +0x61 (A), +0x69 (C) and +0x71 (B) and store its nine doubles at +0xa1..+0xe1. Does nothing when no record is found. */
+void unit_rotation_matrix_7215c(int32_t unit)
+{
+	ef_addr32 p = guest_fn_7489c((int32_t)(int16_t)unit);
+	double cA, sA, cB, sB, cC, sC, t;
+	if (p == 0)
+		return;
+	cA = cos_b45a2(md_rd_f64(p + 0x61u));
+	sA = sin_b45ac(md_rd_f64(p + 0x61u));
+	cB = cos_b45a2(md_rd_f64(p + 0x71u));
+	sB = sin_b45ac(md_rd_f64(p + 0x71u));
+	cC = cos_b45a2(md_rd_f64(p + 0x69u));
+	sC = sin_b45ac(md_rd_f64(p + 0x69u));
+	t = cA * sC;
+	*(double *)ef_guest_memory_ptr(p + 0xa1u) = cA * cC;
+	*(double *)ef_guest_memory_ptr(p + 0xa9u) = t * sB - sA * cB;
+	*(double *)ef_guest_memory_ptr(p + 0xb1u) = t * cB + sA * sB;
+	*(double *)ef_guest_memory_ptr(p + 0xb9u) = sA * cC;
+	*(double *)ef_guest_memory_ptr(p + 0xc1u) = sA * sC * sB + cA * cB;
+	*(double *)ef_guest_memory_ptr(p + 0xc9u) = sA * sC * cB - cA * sB;
+	*(double *)ef_guest_memory_ptr(p + 0xd1u) = -sC;
+	*(double *)ef_guest_memory_ptr(p + 0xd9u) = sB * cC;
+	*(double *)ef_guest_memory_ptr(p + 0xe1u) = cB * cC;
+}

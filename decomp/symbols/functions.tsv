@@ -1339,7 +1339,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000712e8	641			unknown	unclassified	unverified		
 0x0007156c	1864			unknown	unclassified	unverified		
 0x00071cb8	1188			unknown	unclassified	unverified		
-0x0007215c	205			unknown	unclassified	unverified		
+0x0007215c	205	unit_rotation_matrix_7215c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007215c.json	docs/compiler-abi.md; For the unit record found by 0x7489c (index in AX, sign-extended), build the 3x3 rotation matrix from the angles at +0x6; callers 6d38c@6d683,71cb8@7214a,725dc@727e5; guest pending
 0x0007222c	354	snapshot_unit_state_7222c	game_helpers67	compiles	game	confirmed	decomp/tests/0x0007222c.json	docs/compiler-abi.md; Copy the player's tracked state block into a unit record and refresh it.; callers 8d3d4@8d420; guest pending
 0x00072390	277	move_unit_72390	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00072390.json	docs/compiler-abi.md; Move unit ID (AX) one tick: dt = word 0x127d92 * double 0x186a69 (stored at 0x1f7188); the velocity (doubles +0xa1, +0xb; callers 8d3d4@8d464; guest pending
 0x000724a8	305	advance_object_position_724a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000724a8.json	docs/compiler-abi.md; Advance the position of unit object OBJ (EDX; NULL or byte 0x122c5c set: nothing) by its velocity for the time since the; callers 55144@552ee,8d3d4@8d470; guest pending

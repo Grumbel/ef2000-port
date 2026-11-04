@@ -6491,4 +6491,7 @@ void rotate_add_words_e9b38(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
 void build_curve_tables_d6340(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t k0_bits, uint32_t k1_bits, uint32_t k2_bits);
 void build_curve_tables_d6340(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t k0_bits, uint32_t k1_bits, uint32_t k2_bits); /* 0xd6340 */
 
+void unit_rotation_matrix_7215c(int32_t unit);
+void unit_rotation_matrix_7215c(int32_t unit); /* 0x7215c */
+
 #endif
