@@ -18079,3 +18079,54 @@ void load_flight_model_89c64(ef_addr32 rec)
 		EF_U32(0x001fcf14u) = 0u;
 	}
 }
+
+/* 0x4ce4c, 422 bytes. Hit-test the list at HEAD (EDX; link +4) for the group value A (EAX): the first entry of kind 0x31 (byte +0xb) with a non-zero word +0x36 and a true positive group flag (0xcc22c with index byte +9) whose box centre (word +0x16, 400 - word +0x1a; half size = float 0x184cf2 / float 0x1a53df) contains the cursor (words 0x41eef4 and 0x41eef2) is selected: the tactical slot state is set (bytes 0x1a54f3 = 1, 0x1a5672 = 1, 0x1a568b = 2, 0x1a559f = 1, the box words 0x1a55a2/0x1a55d4 and 0x1a55d6/0x1a5608, the entry in dword 0x1a5506), the record from 0xbfcfc(0x137958, entry) is stored in 0x1a550a with its byte (dword +0x33) in 0x1a5530 and the difference to the byte at dword +0x37 (capped at 16) in 0x1a5531, word 0x1a550e = lookup (0x9ddfc) of the entry's dword +0x10, and the slots are reset and the dialog refreshed (0x4d8f4, 0x4f8a8). */
+void select_list_entry_at_cursor_4ce4c(uint32_t a, ef_addr32 head)
+{
+	uint32_t node = EF_U32(head);
+	uint32_t rec, p1, p2;
+	uint16_t xw, yw;
+	float r, num, den, xf, yf, cx, cy;
+	uint32_t d;
+
+	while (node != 0u) {
+		if (EF_U8(node + 0xbu) == 0x31u && EF_U16(node + 0x36u) != 0u &&
+		    (uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 9u), a) != 0u) {
+			memcpy(&num, ef_guest_memory_ptr(0x00184cf2u), 4);
+			memcpy(&den, ef_guest_memory_ptr(0x001a53dfu), 4);
+			r = (float)((double)num / (double)den);
+			xw = EF_U16(node + 0x16u);
+			yw = (uint16_t)(0x190u - EF_U16(node + 0x1au));
+			cx = (float)(int16_t)xw;
+			cy = (float)(int16_t)yw;
+			xf = (float)(int16_t)EF_U16(0x0041eef4u);
+			yf = (float)(int16_t)EF_U16(0x0041eef2u);
+			if ((double)cx + (double)r > (double)xf && (double)cx - (double)r < (double)xf &&
+			    (double)cy + (double)r > (double)yf && (double)cy - (double)r < (double)yf) {
+				EF_U8(0x001a54f3u) = 1u;
+				EF_U8(0x001a5672u) = 1u;
+				EF_U16(0x001a55a2u) = xw;
+				EF_U8(0x001a568bu) = 2u;
+				EF_U16(0x001a55d6u) = yw;
+				EF_U8(0x001a559fu) = 1u;
+				EF_U16(0x001a55d4u) = xw;
+				EF_U16(0x001a5608u) = yw;
+				EF_U32(0x001a5506u) = node;
+				rec = guest_fn_bfcfc(0x00137958u, node);
+				p1 = EF_U32(rec + 0x33u);
+				EF_U8(0x001a5530u) = EF_U8(p1);
+				p2 = EF_U32(rec + 0x37u);
+				EF_U32(0x001a550au) = rec;
+				d = (uint32_t)(uint8_t)(EF_U8(p1) - EF_U8(p2));
+				EF_U8(0x001a5531u) = (uint8_t)d;
+				if (d > 0x10u)
+					EF_U8(0x001a5531u) = 0x10u;
+				EF_U16(0x001a550eu) = (uint16_t)guest_lookup_value(EF_U32(EF_U32(0x001a5506u) + 0x10u));
+				reset_tactical_slots();
+				refresh_button_dialog_4f8a8();
+				return;
+			}
+		}
+		node = EF_U32(node + 4u);
+	}
+}

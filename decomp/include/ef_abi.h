@@ -5949,4 +5949,6 @@ void guest_fn_857bc_x(int32_t id); /* 0x857bc EAX */
 
 void load_flight_model_89c64(ef_addr32 rec);
 
+void select_list_entry_at_cursor_4ce4c(uint32_t a, ef_addr32 head);
+
 #endif

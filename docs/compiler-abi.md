@@ -8534,3 +8534,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x89c64` | EAX:ef_addr32 | none | 8a318@8a370 | Load the flight model of aircraft record REC (EAX; type byte +0x18 selects the 145-byte row at 0x12bc99 + 145 * type): d |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4ce4c` | EAX:uint32_t,EDX:ef_addr32 | none | 4be88@4beb9 | Hit-test the list at HEAD (EDX; link +4) for the group value A (EAX): the first entry of kind 0x31 (byte +0xb) with a no |

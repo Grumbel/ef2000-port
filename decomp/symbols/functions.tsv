@@ -872,7 +872,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004c78c	371			unknown	unclassified	unverified		
 0x0004c900	397			unknown	unclassified	unverified		
 0x0004ca90	82	clear_pending_4ca90	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0004ca90.json	docs/compiler-abi.md; Clear the pending (==1) entries of the list at 0x1a5510 and refresh if any.; callers 4c900@4ca72; guest pending
-0x0004ce4c	422			unknown	unclassified	unverified		
+0x0004ce4c	422	select_list_entry_at_cursor_4ce4c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004ce4c.json	docs/compiler-abi.md; Hit-test the list at HEAD (EDX; link +4) for the group value A (EAX): the first entry of kind 0x31 (byte +0xb) with a no; callers 4be88@4beb9; guest pending
 0x0004cff4	285	fill_dialog_labels_4cff4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004cff4.json	docs/compiler-abi.md; Fill in the labels of the dialog 0x184a58. Without a current entry (dword 0x1a54f6 zero) set the first label (0x184cf8) ; callers 4c78c@4c8e5,4c900@4ca6d; guest pending
 0x0004d114	107	draw_sprite_4d114	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0004d114.json	docs/compiler-abi.md; Draw the sprite described at 0x1a54f6.; callers 4bf1c@4c112; guest pending
 0x0004d180	107	draw_sprite_4d180	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0004d180.json	docs/compiler-abi.md; As 0x4d114 for the sprite at 0x1a54fa.; callers 4bf1c@4c117; guest pending
