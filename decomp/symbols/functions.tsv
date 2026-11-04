@@ -570,7 +570,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000347ac	13	onopenLoops		named	unclassified	unverified		
 0x000347bc	136	gnNewName		named	unclassified	unverified		
 0x00034844	160	onopenNetMission		named	unclassified	unverified		
-0x000348e4	264			unknown	unclassified	unverified		
+0x000348e4	264	refresh_list_widget_348e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000348e4.json	docs/compiler-abi.md; Refresh the 8-row list widget (when byte 0x13578c is set): walk the two parallel widget chains (found under 0xa46cc with; callers 349ec@349fc; guest pending
 0x000349ec	23	gnMainLoop		named	unclassified	unverified		
 0x00034a04	52	show_status_34a04	game_helpers10	compiles	game	confirmed	decomp/tests/0x00034a04.json	docs/compiler-abi.md; ; callers 33630@33e6c; guest pending
 0x00034a38	45	show_status_34a38	game_helpers10	compiles	game	confirmed	decomp/tests/0x00034a38.json	docs/compiler-abi.md; ; callers 35590@35605; guest pending

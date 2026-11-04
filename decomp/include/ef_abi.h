@@ -5244,4 +5244,7 @@ void advance_view_queue_91c98(void);
 
 void queue_message_47764(uint32_t di, uint32_t si, uint32_t ebx, uint32_t ecx, uint32_t s0);
 
+void refresh_list_widget_348e4(void);
+void guest_fn_a7588_x(ef_addr32 a, ef_addr32 b); /* 0xa7588 EAX/EDX */
+
 #endif

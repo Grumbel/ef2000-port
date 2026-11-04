@@ -8884,3 +8884,37 @@ void queue_message_47764(uint32_t di, uint32_t si, uint32_t ebx, uint32_t ecx, u
         }
     }
 }
+
+/* 0x348e4, 264 bytes. Refresh the 8-row list widget (when byte 0x13578c is set): walk the two parallel widget chains (found under 0xa46cc with the names 0x182e5c / 0x182e60; link dword +0x21) over the 8 entries of the table 0x1368bc; an entry with bit 0 of byte +0x1c set is shown (0xa7588) and both rows are activated with state 0 (counted), the others get state 1. Then resize the list button when its height (signed word +0x47) is below 18 * word 0x1357b0 + 0x1e, and remember the selection (byte 0x1357b0 into 0x19f59b) when the number of active rows equals word 0x1357b0. */
+void refresh_list_widget_348e4(void)
+{
+    uint32_t root, a, b, item, i;
+    uint8_t active = 0u;
+    int32_t limit;
+    if (EF_U8(0x0013578cu) == 0u)
+        return;
+    root = guest_fn_a46cc(0x00182d48u);
+    a = find_widget_checked_a78bc(root, 0x00182e5cu);
+    b = find_widget_checked_a78bc(root, 0x00182e60u);
+    for (i = 0; i < 8u; i++) {
+        item = EF_U32(0x001368bcu + i * 4u);
+        if (EF_U8(item + 0x1cu) & 1u) {
+            guest_fn_a7588_x(a, item);
+            guest_fn_a739c(a, 0u);
+            guest_fn_a739c(b, 0u);
+            active++;
+        } else {
+            guest_fn_a739c(a, 1u);
+            guest_fn_a739c(b, 1u);
+        }
+        a = EF_U32(a + 0x21u);
+        b = EF_U32(b + 0x21u);
+    }
+    limit = (int32_t)(int16_t)EF_U16(0x001357b0u) * 18 + 0x1e;
+    if (((int32_t)EF_U32(root + 0x45u) >> 16) < limit) {
+        int16_t h = (int16_t)((int16_t)EF_U16(0x001357b0u) * 0x12 + 0x1e);
+        guest_fn_a520c(root, (int32_t)EF_U32(root + 0x43u) >> 16, (uint32_t)(int32_t)h, 1u);
+    }
+    if ((uint16_t)active == EF_U16(0x001357b0u))
+        EF_U8(0x0019f59bu) = EF_U8(0x001357b0u);
+}
