@@ -13898,3 +13898,36 @@ void update_view_target_817a8(void)
     if (EF_U16(0x001a5a8eu) != 0u)
         guest_fn_2a4c8_x();
 }
+
+/* 0x381a0, 225 bytes. Update the follower record INDEX (AX; 69 byte records at 0x1a14f8): fetch the scene object of the word +0x26 >> 16 (0x8ffe8), copy its position >> 8 into +7, +0xb, +0xf and, if the record has a link (+0x18) with the position at its +0, +4, +8, measure the squared distance (saturated to 0x7fffffff when any axis differs by 0x8000 or more). Within 0x800 the link is refreshed with 0x3856c, except that a link of kind 1 (+0xc) is skipped when its stamp +0xd is -1 or above the clock 0x1a14f0. */
+void update_follower_381a0(uint32_t index)
+{
+    ef_addr32 rec = EF_U32(0x001a14f8u) + (uint32_t)((int32_t)(int16_t)index * 69);
+    ef_addr32 u = guest_lookup_object_8ffe8((int32_t)EF_U32(rec + 0x26u) >> 16);
+    ef_addr32 link;
+    int32_t dx, dy, dz, d2;
+    if (u == 0u)
+        return;
+    EF_U32(rec + 7u) = (uint32_t)((int32_t)EF_U32(u) >> 8);
+    EF_U32(rec + 0xbu) = (uint32_t)((int32_t)EF_U32(u + 4u) >> 8);
+    EF_U32(rec + 0xfu) = (uint32_t)((int32_t)EF_U32(u + 8u) >> 8);
+    link = EF_U32(rec + 0x18u);
+    if (link == 0u)
+        return;
+    dx = ((int32_t)EF_U32(u) >> 8) - (int32_t)EF_U32(link);
+    dy = ((int32_t)EF_U32(u + 4u) >> 8) - (int32_t)EF_U32(link + 4u);
+    dz = ((int32_t)EF_U32(u + 8u) >> 8) - (int32_t)EF_U32(link + 8u);
+    if ((int32_t)abs_a28f2(dx) < 0x8000 && (int32_t)abs_a28f2(dy) < 0x8000 && (int32_t)abs_a28f2(dz) < 0x8000)
+        d2 = dx * dx + dy * dy + dz * dz;
+    else
+        d2 = 0x7fffffff;
+    if (d2 > 0x800)
+        return;
+    link = EF_U32(rec + 0x18u);
+    if (EF_U8(link + 0xcu) == 1u) {
+        int32_t stamp = (int32_t)EF_U32(link + 0xdu);
+        if (stamp == -1 || stamp > (int32_t)EF_U32(0x001a14f0u))
+            return;
+    }
+    refresh_link_pointer(rec);
+}

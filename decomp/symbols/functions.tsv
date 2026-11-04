@@ -644,7 +644,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00037e60	76	all_accept_37e60	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00037e60.json	docs/compiler-abi.md; True when 0x37e00 and 0x37d88 for every subitem accept the index.; callers 37eac@37f52; guest pending
 0x00037eac	309			unknown	unclassified	unverified		
 0x00037fe4	441			unknown	unclassified	unverified		
-0x000381a0	225			unknown	unclassified	unverified		
+0x000381a0	225	update_follower_381a0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000381a0.json	docs/compiler-abi.md; Update the follower record INDEX (AX; 69 byte records at 0x1a14f8): fetch the scene object of the word +0x26 >> 16 (0x8f; callers 37eac@37f4b; guest pending
 0x00038284	743			unknown	unclassified	unverified		
 0x0003856c	23	refresh_link_pointer	link_resolution	compiles	game	confirmed	decomp/tests/0x0003856c.json	docs/compiler-abi.md; Record guest pointer EAX; signed word +0x16 and pointer +0x18; invokes 0x38658 and stores EAX; original guest replacement unverified
 0x00038584	71	take_free_slot_38584	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00038584.json	docs/compiler-abi.md; Take the next free slot index of the 2000-slot table.; callers 4aa4c@4ac7f; guest pending

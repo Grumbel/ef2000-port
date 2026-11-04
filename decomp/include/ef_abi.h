@@ -5697,4 +5697,6 @@ void guest_fn_15be10_x(void); /* 0x15be10, works on globals 0x15bddc.. */
 void guest_fn_81680_x(void); /* 0x81680 */
 void guest_fn_2a4c8_x(void); /* 0x2a4c8 */
 
+void update_follower_381a0(uint32_t index);
+
 #endif
