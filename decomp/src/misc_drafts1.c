@@ -12483,3 +12483,41 @@ void next_target_65d24(void)
     if (found == 0u)
         EF_U32(0x001a820cu) = saved;
 }
+
+/* 0x597d8, 237 bytes. Refresh the weapon readout for the selected object (high word of 0x1f71c8, 0x7489c; nothing if missing): take its current slot (signed byte at +0x1d4 >> 24, 0x14 means none), the slot's type byte (signed word, 0 for none) and the word at the high half of the class dword at class*0x91 + 0x12bc9f (stored to 0x197240), store the rounded value of 0x8a6d4 times the double 0x185e80 in 0x197234, and then: byte 0x12814c == 6 only runs 0x58d04; otherwise type 4 or 0x12 runs 0x58d24 (mode 1), type 5 runs 0x58d04 (mode 2) and anything else 0x58d44 (mode 0), recording the mode in byte 0x1a6d1c. */
+void refresh_weapon_readout_597d8(void)
+{
+    ef_addr32 obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    int32_t slot;
+    int16_t type;
+    int32_t cls;
+    double v;
+    double k;
+    if (obj == 0u)
+        return;
+    slot = (int32_t)EF_U32(obj + 0x1d4u) >> 24;
+    if (slot != 0x14)
+        type = (int16_t)(int8_t)EF_U8(obj + (uint32_t)slot * 3u + 0x19bu);
+    else
+        type = 0;
+    slot = (int32_t)EF_U32(obj + 0x1d4u) >> 24;
+    cls = (int32_t)EF_U32(obj + (uint32_t)slot * 3u + 0x198u) >> 24;
+    EF_U32(0x00197240u) = (uint32_t)((int32_t)EF_U32((uint32_t)cls * 0x91u + 0x0012bc9fu) >> 16);
+    v = guest_fn_8a6d4_x();
+    memcpy(&k, ef_guest_memory_ptr(0x00185e80u), sizeof k);
+    EF_U32(0x00197234u) = (uint32_t)(int32_t)truncate_9d72c(v * k);
+    if (EF_U8(0x0012814cu) == 6u) {
+        guest_fn_58d04_x();
+        return;
+    }
+    if ((uint16_t)type == 4u || (uint16_t)type == 0x12u) {
+        guest_fn_58d24_x();
+        EF_U8(0x001a6d1cu) = 1u;
+    } else if ((uint16_t)type == 5u) {
+        guest_fn_58d04_x();
+        EF_U8(0x001a6d1cu) = 2u;
+    } else {
+        guest_fn_58d44_x();
+        EF_U8(0x001a6d1cu) = 0u;
+    }
+}

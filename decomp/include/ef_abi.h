@@ -5569,4 +5569,10 @@ uint32_t guest_fn_2e910_x(uint32_t a, uint32_t b); /* 0x2e910 EAX/EDX -> AL */
 
 
 
+void refresh_weapon_readout_597d8(void);
+double guest_fn_8a6d4_x(void); /* 0x8a6d4 -> ST0 */
+void guest_fn_58d04_x(void); /* 0x58d04 */
+void guest_fn_58d24_x(void); /* 0x58d24 */
+void guest_fn_58d44_x(void); /* 0x58d44 */
+
 #endif

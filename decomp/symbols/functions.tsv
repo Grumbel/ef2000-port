@@ -1112,7 +1112,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00059420	99	draw_tactical_coordinates	record_transitions	compiles	game	confirmed	decomp/tests/0x00059420.json	docs/compiler-abi.md; host model; guest differential pending
 0x00059484	30	draw_tactical_item_mode	packet_status	compiles	game	confirmed	decomp/tests/0x00059484.json	docs/compiler-abi.md; host model; guest differential pending
 0x000594a4	41	draw_tactical_item_metric	record_transitions	compiles	game	confirmed	decomp/tests/0x000594a4.json	docs/compiler-abi.md; host model; guest differential pending
-0x000597d8	237			unknown	unclassified	unverified		
+0x000597d8	237	refresh_weapon_readout_597d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000597d8.json	docs/compiler-abi.md; Refresh the weapon readout for the selected object (high word of 0x1f71c8, 0x7489c; nothing if missing): take its curren; callers 601c@60b9; guest pending
 0x000598e8	175	refresh_current_object_598e8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000598e8.json	docs/compiler-abi.md; Per-mode refresh of the current object (selected by the signed word at 0x1f71ca; nothing happens when it does not exist); callers none direct; guest pending
 0x00059998	321			unknown	unclassified	unverified		
 0x00059adc	1222			unknown	unclassified	unverified		

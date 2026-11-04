@@ -7652,3 +7652,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x597d8` | none | none | 601c@60b9 | Refresh the weapon readout for the selected object (high word of 0x1f71c8, 0x7489c; nothing if missing): take its curren |
