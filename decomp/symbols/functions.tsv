@@ -17,15 +17,15 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00000734	120			unknown	unclassified	unverified		
 0x000007b4	104			unknown	unclassified	unverified		
 0x0000081c	98			unknown	unclassified	unverified		
-0x00000880	53			unknown	unclassified	unverified		
+0x00000880	53	dos_call_350b_880	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000880.json	docs/compiler-abi.md; Issue DOS service 0x350b and return the result register.; callers 8b39c@8b3a6; guest pending
 0x000008b8	327			unknown	unclassified	unverified		
 0x00000a00	95	request_returns_cf_a00	game_helpers31	compiles	game	confirmed	decomp/tests/0x00000a00.json	docs/compiler-abi.md; Issue request 0x2503 and report whether the returned code byte is 0xcf.; callers a60@a68,a60@a81; guest pending
 0x00000a60	57			unknown	unclassified	unverified		
-0x00000a9c	60			unknown	unclassified	unverified		
+0x00000a9c	60	dos_call_2505_a9c	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000a9c.json	docs/compiler-abi.md; Issue DOS service 0x2505 with two register values.; callers b04@b2e; guest pending
 0x00000b04	72	init_far_stub_b04	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00000b04.json	docs/compiler-abi.md; ; callers e20@e2a; guest pending
 0x00000c24	38			unknown	unclassified	unverified		
-0x00000c74	55			unknown	unclassified	unverified		
-0x00000cac	38			unknown	unclassified	unverified		
+0x00000c74	55	dos_call_3502_c74	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000c74.json	docs/compiler-abi.md; Issue DOS service 0x3502 with a sign-extended 16-bit argument.; callers none direct; guest pending
+0x00000cac	38	open_checked_cac	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000cac.json	docs/compiler-abi.md; Open a file through 0x9c2d3 and abort when it fails.; callers fc534@fc5e8; guest pending
 0x00000d08	93	record_for_kind	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00000d08.json	docs/compiler-abi.md; Select a record address by kind.; callers d68@e00; guest pending
 0x00000d68	183			unknown	unclassified	unverified		
 0x00000e20	292			unknown	unclassified	unverified		
@@ -91,7 +91,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00006b50	163			unknown	unclassified	unverified		
 0x00006bf4	40	clear_command_state_6bf4	low_helpers	compiles	game	confirmed	decomp/tests/0x00006bf4.json	docs/compiler-abi.md; clear words 0x197244/46/48 and bytes 0x197254, 0x121e4f; callers 5f60@5fb0,5fd8@6003; guest pending
 0x00006c1c	461			unknown	unclassified	unverified		
-0x00006df0	38			unknown	unclassified	unverified		
+0x00006df0	38	alloc_zero_5x_6df0	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00006df0.json	docs/compiler-abi.md; Allocate and zero five bytes per unit.; callers 6e18@6e35; guest pending
 0x00006e18	89	reset_slots_6e18	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00006e18.json	docs/compiler-abi.md; ; callers 49228@495bc; guest pending
 0x00006e74	211			unknown	unclassified	unverified		
 0x00006f48	229			unknown	unclassified	unverified		
@@ -101,7 +101,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000073d4	23	record_value_not_above_limit	low_helpers	compiles	game	confirmed	decomp/tests/0x000073d4.json	docs/compiler-abi.md; !(double record+0x71 > double 0x1803c4); callers 759c@7753; guest pending
 0x000073ec	430			unknown	unclassified	unverified		
 0x0000759c	469			unknown	unclassified	unverified		
-0x00007780	40			unknown	unclassified	unverified		
+0x00007780	40	alloc_zero_product_7780	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00007780.json	docs/compiler-abi.md; Allocate and zero a block of the product of both sizes.; callers 77a8@77d1,8748@8841,8748@8904; guest pending
 0x000077a8	280			unknown	unclassified	unverified		
 0x000078c0	465			unknown	unclassified	unverified		
 0x00007ae4	81	send_unit_command_7ae4	game_helpers10	compiles	game	confirmed	decomp/tests/0x00007ae4.json	docs/compiler-abi.md; Forward a command for a unit; kind 10 uses 0xff in place of its byte.; callers 46454@469fe,7156c@71a1c; guest pending
@@ -195,21 +195,21 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000eb48	82	read_parser_enum_39_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000eb48.json	39 names, table 132d34; callers f314@f360/fcf4@fd1a; guest pending
 0x0000eb9c	79	read_parser_enum_18_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000eb9c.json	18 names, table 1333f8; callers f314@f37e/fcf4@fd24; guest pending
 0x0000ebec	79	read_parser_enum_27_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000ebec.json	27 names, table 133488; callers f314@f39c/fcf4@fd2e; guest pending
-0x0000ec3c	79			unknown	unclassified	unverified		
+0x0000ec3c	79	parse_enum_ec3c	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000ec3c.json	docs/compiler-abi.md; Parse a token and look it up in the 13-entry table at 0x133304.; callers f314@f3bf; guest pending
 0x0000ec8c	82	read_parser_enum_106_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000ec8c.json	106 names, table 132fb4; callers eefc@ef0e/f260@f27a; guest pending
 0x0000ece0	79	read_parser_enum_10_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000ece0.json	10 names, table 13336c; callers f314@f3c7/f604@f644; guest pending
 0x0000ed30	79	read_parser_enum_19_names	parser_enums	compiles	game	confirmed	decomp/tests/0x000ed30.json	19 names, table 132c2c; callers ed80@edbe/ee0c@ee30; guest pending
 0x0000ed80	137	read_record_ed80	game_helpers14	compiles	game	confirmed	decomp/tests/0x0000ed80.json	docs/compiler-abi.md; Read one record from the input stream into the 0x1c-byte record at dest.; callers f314@f483,fb10@fb76; guest pending
 0x0000ee0c	77	read_record_ee0c	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000ee0c.json	docs/compiler-abi.md; Read a record through the 0xe95c byte/word readers.; callers f260@f2f6; guest pending
 0x0000ee5c	65	read_parser_six_field_record	parser_records	compiles	game	confirmed	decomp/tests/0x000ee5c.json	Original 0xee5c; three dword values followed by three truncated words; docs/compiler-abi.md; guest replay pending
-0x0000eea0	92			unknown	unclassified	unverified		
+0x0000eea0	92	parse_enum_eea0	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000eea0.json	docs/compiler-abi.md; Skip three tokens and look the fourth up in the 37-entry table at 0x1335a0.; callers f314@f3e1; guest pending
 0x0000eefc	94	read_record_eefc	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000eefc.json	docs/compiler-abi.md; ; callers f314@f540; guest pending
 0x0000ef5c	58	fill_random_ef5c	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000ef5c.json	docs/compiler-abi.md; Fill four dwords with 21-bit values scaled by 2^11.; callers f6a8@f8cb; guest pending
-0x0000ef98	79			unknown	unclassified	unverified		
+0x0000ef98	79	parse_enum_ef98	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000ef98.json	docs/compiler-abi.md; Parse a token and look it up in the 3-entry table at 0x132cc4.; callers efe8@f028; guest pending
 0x0000efe8	79	read_record_efe8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000efe8.json	docs/compiler-abi.md; ; callers f038@f078; guest pending
-0x0000f038	83			unknown	unclassified	unverified		
-0x0000f08c	95			unknown	unclassified	unverified		
-0x0000f0ec	79			unknown	unclassified	unverified		
+0x0000f038	83	read_record_list_f038	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000f038.json	docs/compiler-abi.md; Read a count and that many 17-byte parser records.; callers f08c@f0d7; guest pending
+0x0000f08c	95	read_group_list_f08c	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000f08c.json	docs/compiler-abi.md; Read a count and that many 6-byte groups of 17-byte parser records.; callers f314@f588; guest pending
+0x0000f0ec	79	parse_enum_f0ec	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x0000f0ec.json	docs/compiler-abi.md; Parse a token and look it up in the 6-entry table at 0x132d1c.; callers f13c@f14b; guest pending
 0x0000f13c	91	read_record_f13c	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0000f13c.json	docs/compiler-abi.md; ; callers f198@f247; guest pending
 0x0000f198	199			unknown	unclassified	unverified		
 0x0000f260	180			unknown	unclassified	unverified		

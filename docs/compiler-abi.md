@@ -3223,3 +3223,20 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x283c8` | none | none | 284ec@28553,284ec@28578 | Draw the splash buttons and probe the data file for its magic word. |
 | `0x404bc` | none | none | 3dd30@3e466 | Draw seven debug counters, one per text row. |
+
+## runtime_helpers19 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x880` | none | EAX:uint32_t | 8b39c@8b3a6 | Issue DOS service 0x350b and return the result register. |
+| `0xa9c` | EAX:uint32_t,EDX:uint32_t | none | b04@b2e | Issue DOS service 0x2505 with two register values. |
+| `0xc74` | AX:int16_t | none | none direct | Issue DOS service 0x3502 with a sign-extended 16-bit argument. |
+| `0xcac` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | fc534@fc5e8 | Open a file through 0x9c2d3 and abort when it fails. |
+| `0x6df0` | AL:uint8_t | none | 6e18@6e35 | Allocate and zero five bytes per unit. |
+| `0x7780` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | 77a8@77d1,8748@8841,8748@8904 | Allocate and zero a block of the product of both sizes. |
+| `0xec3c` | none | EAX:uint32_t | f314@f3bf | Parse a token and look it up in the 13-entry table at 0x133304. |
+| `0xeea0` | none | EAX:uint32_t | f314@f3e1 | Skip three tokens and look the fourth up in the 37-entry table at 0x1335a0. |
+| `0xef98` | none | EAX:uint32_t | efe8@f028 | Parse a token and look it up in the 3-entry table at 0x132cc4. |
+| `0xf0ec` | none | EAX:uint32_t | f13c@f14b | Parse a token and look it up in the 6-entry table at 0x132d1c. |
+| `0xf038` | EAX:ef_addr32 | EAX:uint32_t | f08c@f0d7 | Read a count and that many 17-byte parser records. |
+| `0xf08c` | EAX:ef_addr32 | EAX:uint32_t | f314@f588 | Read a count and that many 6-byte groups of 17-byte parser records. |

@@ -2508,4 +2508,20 @@ void guest_fn_a4342_plain(ef_addr32 destination, ef_addr32 format); /* 0xa4342 c
 uint32_t guest_fn_a7900(ef_addr32 name); /* 0xa7900 cdecl */
 void guest_fn_48c90(uint32_t row, uint32_t col, uint32_t y, ef_addr32 text); /* 0x48c90 cdecl */
 
+/* runtime_helpers19.c */
+uint32_t dos_call_350b_880(void);
+void dos_call_2505_a9c(uint32_t first, uint32_t second);
+void dos_call_3502_c74(int16_t value);
+uint32_t open_checked_cac(uint32_t name, uint32_t mode);
+void alloc_zero_5x_6df0(uint8_t count);
+uint32_t alloc_zero_product_7780(int32_t count, int32_t size);
+uint32_t parse_enum_ec3c(void);
+uint32_t parse_enum_eea0(void);
+uint32_t parse_enum_ef98(void);
+uint32_t parse_enum_f0ec(void);
+uint32_t read_record_list_f038(ef_addr32 list);
+uint32_t read_group_list_f08c(ef_addr32 list);
+uint32_t guest_fn_9c2d3(uint32_t name, uint32_t mode); /* 0x9c2d3 cdecl */
+void guest_fn_efe8(ef_addr32 entry); /* 0xefe8 EAX */
+
 #endif
