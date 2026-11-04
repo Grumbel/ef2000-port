@@ -4384,4 +4384,7 @@ void lookup_entry_957c8(ef_addr32 name);
 void guest_fn_955c0_x(int32_t a, int32_t b, int32_t c, int32_t d, int32_t s0); /* 0x955c0 EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
 void guest_fn_95704_x(int32_t a, int32_t b, int32_t c, int32_t d, int32_t s0); /* 0x95704 EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
 
+void draw_glyph_e5c30(uint32_t x, uint32_t y, uint32_t glyph);
+void draw_glyph_f2320(uint32_t x, uint32_t y, uint32_t glyph);
+
 #endif

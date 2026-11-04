@@ -35,3 +35,35 @@ void restore_rect_list_e516c(void)
                             (uint32_t)(int32_t)EF_S16(e + 6u), (int32_t)EF_S16(e + 8u));
     }
 }
+
+/* Draw a glyph from a font of 7-byte rows: each row byte's high seven bits select pixels set to the colour. */
+static void blit_glyph_common(uint32_t x, uint32_t y, uint32_t glyph, uint32_t font, uint32_t rows, uint32_t colour_addr)
+{
+    uint8_t colour = EF_U8(colour_addr);
+    uint32_t stride = EF_U32(0x001631f4u);
+    uint32_t dst = x + EF_U32(0x0015b754u) + EF_U32(0x00163200u + y * 4u);
+    uint32_t src = font + glyph * 7u;
+    uint32_t row, bit;
+    for (row = 0; row < rows; row++) {
+        uint8_t bits = EF_U8(src++);
+        for (bit = 0; bit < 7u; bit++) {
+            if (bits & (0x80u >> bit))
+                EF_U8(dst + bit) = colour;
+        }
+        dst += stride;
+    }
+    EF_U32(0x001631f4u) = stride;
+    EF_U8(colour_addr) = colour;
+}
+
+/* 0xe5c30, 138 bytes. Draw a 7x7 glyph at (x, y). */
+void draw_glyph_e5c30(uint32_t x, uint32_t y, uint32_t glyph)
+{
+    blit_glyph_common(x, y, glyph, 0x0015fab0u, 7u, 0x00433eb0u);
+}
+
+/* 0xf2320, 138 bytes. Draw a 7x6 glyph from the second font at (x, y). */
+void draw_glyph_f2320(uint32_t x, uint32_t y, uint32_t glyph)
+{
+    blit_glyph_common(x, y, glyph, 0x00160b04u, 6u, 0x00484680u);
+}

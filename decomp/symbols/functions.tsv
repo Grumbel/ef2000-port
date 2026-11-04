@@ -3394,7 +3394,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e59cc	562			unknown	unclassified	unverified		
 0x000e5bfe	5	tail_jump_e5bfe	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000e5bfe.json	docs/compiler-abi.md; tail jump. Forward to 0x109e6c.; callers 45b60@45b65; guest pending
 0x000e5c03	41	compare_strings_e5c03	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000e5c03.json	docs/compiler-abi.md; strncmp.; callers 81354@81369,82e00@82e17,c3430@c3495; guest pending
-0x000e5c30	138			unknown	unclassified	unverified		
+0x000e5c30	138	draw_glyph_e5c30	copy_rects1	compiles	game	confirmed	decomp/tests/0x000e5c30.json	docs/compiler-abi.md; Draw a 7x7 glyph at (x, y).; callers e5db4@e5e4a; guest pending
 0x000e5cf0	196			unknown	unclassified	unverified		
 0x000e5db4	207			unknown	unclassified	unverified		
 0x000e5e90	159			unknown	unclassified	unverified		
@@ -3604,7 +3604,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2183	252			unknown	unclassified	unverified		
 0x000f227f	48	file_position_f227f	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f227f.json	docs/compiler-abi.md; Position from 0x10f4df(dword +0x10) combined with dword +4.; callers a7a64@a7aa9,bc4da@bc507; guest pending
 0x000f22af	103	set_file_buffer_f22af	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000f22af.json	docs/compiler-abi.md; Set a file's buffer (setvbuf).; callers 11159a@1115af; guest pending
-0x000f2320	138			unknown	unclassified	unverified		
+0x000f2320	138	draw_glyph_f2320	copy_rects1	compiles	game	confirmed	decomp/tests/0x000f2320.json	docs/compiler-abi.md; Draw a 7x6 glyph from the second font at (x, y).; callers f23ac@f23cc; guest pending
 0x000f23ac	49	draw_text_f23ac	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f23ac.json	docs/compiler-abi.md; For each byte of the string at ECX call 0xf2320(x, y, byte & 0x3f), x += 8.; callers a8578@a85b5,a9130@a938a,a9130@a93bd; guest pending
 0x000f25b0	107	draw_glyph_f25b0	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000f25b0.json	docs/compiler-abi.md; Draw a 3-column by 6-row glyph into the frame buffer.; callers f261c@f2644; guest pending
 0x000f261c	61	draw_text_f261c	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f261c.json	docs/compiler-abi.md; Draw a string with 4-pixel glyph spacing.; callers a8578@a85c9; guest pending

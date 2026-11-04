@@ -5161,3 +5161,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x95660` | EAX:ef_addr32 | none | 9596c@959e6,95e58@96d77,95e58@96de3 | Look up a named entry for the object at 0x214458 and pass it to 0x955c0. |
 | `0x957c8` | EAX:ef_addr32 | none | 95ae0@95be5 | Same for the object at 0x20f15c (page word at +0x2e), passing the entry to 0x95704. |
+
+## copy_rects1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe5c30` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e5db4@e5e4a | Draw a 7x7 glyph at (x, y). |
+| `0xf2320` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | f23ac@f23cc | Draw a 7x6 glyph from the second font at (x, y). |
