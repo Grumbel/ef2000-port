@@ -682,7 +682,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003a3a8	6328			unknown	unclassified	unverified		
 0x0003bc60	47	draw_cross_3bc60	game_helpers23	compiles	game	confirmed	decomp/tests/0x0003bc60.json	docs/compiler-abi.md; Draw a small cross of arm length 3 at (x, y).; callers 3a3a8@3b038; guest pending
 0x0003bc90	47	draw_box_3bc90	game_helpers23	compiles	game	confirmed	decomp/tests/0x0003bc90.json	docs/compiler-abi.md; Draw a small box around (x, y); half-size 2 in mode 3, otherwise 1.; callers 3bcc0@3bd18; guest pending
-0x0003bcc0	101			unknown	unclassified	unverified		
+0x0003bcc0	101	draw_marked_box_3bcc0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003bcc0.json	docs/compiler-abi.md; Optionally (when the last stack argument is 1) draw through 0xc8ccc with the first and second words of PTR added to B an; callers 3a3a8@3b49f,3a3a8@3b509,3a3a8@3b564; guest pending
 0x0003bd28	34	grid_row_state_allowed	low_helpers	compiles	game	confirmed	decomp/tests/0x0003bd28.json	docs/compiler-abi.md; 0 when row byte +0x1a in 0x0a..0x0c else 1; callers 3a3a8@3b443; guest pending
 0x0003bd50	498			unknown	unclassified	unverified		
 0x0003bf44	780			unknown	unclassified	unverified		
@@ -1156,7 +1156,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005dc20	497			unknown	unclassified	unverified		
 0x0005de14	243			unknown	unclassified	unverified		
 0x0005df08	678			unknown	unclassified	unverified		
-0x0005e1b0	106			unknown	unclassified	unverified		
+0x0005e1b0	106	draw_cell_text_5e1b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005e1b0.json	docs/compiler-abi.md; Draw the format string FMT at cell (A, B) (scaled by the shift at 0x12b369, offset by 0x1a6cfc/0x1a6cfa) and continue wi; callers 5bd8c@5beca; guest pending
 0x0005e21c	677			unknown	unclassified	unverified		
 0x0005e4c4	403			unknown	unclassified	unverified		
 0x0005e658	12	reset_unit_counter	runtime_control	compiles	game	confirmed	decomp/tests/0x0005e658.json	docs/compiler-abi.md; Clears word 0x12814e, preserves EDX; original guest replacement unverified
@@ -1984,7 +1984,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000985f4	97	update_progress_985f4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000985f4.json	docs/compiler-abi.md; Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change.; callers 49228@49753,7a844@7a89a,7e8c0@7eac1; guest pending
 0x00098658	1126			unknown	unclassified	unverified		
 0x00098ac0	166	restore_strip_98ac0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00098ac0.json	docs/compiler-abi.md; Restore the screen strip saved at 0x40cd72/0x40cd74: when a saved position exists, put the 0x23x0x1e strip at 0x12dda4 b; callers 98658@98666; guest pending
-0x00098b68	104			unknown	unclassified	unverified		
+0x00098b68	104	save_and_draw_strip_98b68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00098b68.json	docs/compiler-abi.md; Save the 0x23x0x1e screen strip at (X, Y) (negative values clamp to 0) into 0x12dda4, remember the position at 0x40cd74/; callers 98658@987f2,98658@98a19; guest pending
 0x00098bec	160			unknown	unclassified	unverified		
 0x00098c1c	654	sumgengraph		named	unclassified	unverified		
 0x00098eac	878	sumairbar		named	unclassified	unverified		
@@ -2945,7 +2945,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cd7f0	42	get_text_slot_cd7f0	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000cd7f0.json	docs/compiler-abi.md; Return the text block of a slot (0..599).; callers 11e7c@11ec3,11e7c@11eda,14d58@14da5; guest pending
 0x000cd81c	15	forward_word_cd81c	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cd81c.json	docs/compiler-abi.md; Forward the stack word to 0xcd7f0.; callers none direct; guest pending
 0x000cd82c	105			unknown	unclassified	unverified		
-0x000cd957	79			unknown	unclassified	unverified		
+0x000cd957	79	blit_transparent_cd957	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cd957.json	docs/compiler-abi.md; Copy a SRC block of ROWS rows of WIDTH bytes to the frame buffer at (X, Y), skipping zero (transparent) source bytes; SK; callers 98b68@98bc2; guest pending
 0x000cd9a6	368			unknown	unclassified	unverified		
 0x000cdb20	277			unknown	unclassified	unverified		
 0x000cdc38	44	release_buffer_cdc38	code_predicates	compiles	game	confirmed	decomp/tests/0x000cdc38.json	docs/compiler-abi.md; Run 0xc37ec, then release dword 0x15b758 as 0xc3a48 does.; callers cdc64@cdc67,d1e50@d1ea8; guest pending
@@ -3018,7 +3018,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d1924	197			unknown	unclassified	unverified		
 0x000d19ec	272			unknown	unclassified	unverified		
 0x000d1afc	237			unknown	unclassified	unverified		
-0x000d1bec	104			unknown	unclassified	unverified		
+0x000d1bec	104	finish_log_d1bec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d1bec.json	docs/compiler-abi.md; Finish the log file at handle 0x420944: write the sizes into the header (offsets 4 and 0x334, size 0x330 rounded up to e; callers d1c54@d1c8d; guest pending
 0x000d1c54	70			unknown	unclassified	unverified		
 0x000d1d40	102	init_video_d1d40	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000d1d40.json	docs/compiler-abi.md; Set the screen size and run the video start-up sequence.; callers d1da8@d1dde,d1de8@d1e31; guest pending
 0x000d1da8	61	set_mode_640x400_d1da8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d1da8.json	docs/compiler-abi.md; Pick the 640x400 video mode if either mode is available.; callers d1e50@d1ecd,d1e50@d1ede; guest pending

@@ -5598,3 +5598,13 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x101a90` | none | none | 101c54@101c5a | One-time runtime init guarded by the flag at 0x17d2cc: register the exit handler pair (0x101a90, 0x103d48) and mark eigh |
 | `0xfa6d3` | none | EAX:ef_addr32 | bc34f@bc355 | Allocate a stream slot (26 bytes): reuse a node from the free list at 0x4644e0 (keeping its 0x4000 flag), else take an u |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcd957` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:int32_t,[ESP+20]:int32_t,[ESP+24]:ef_addr32 | none | 98b68@98bc2 | Copy a SRC block of ROWS rows of WIDTH bytes to the frame buffer at (X, Y), skipping zero (transparent) source bytes; SK |
+| `0x98b68` | EAX:uint32_t,EDX:uint32_t | none | 98658@987f2,98658@98a19 | Save the 0x23x0x1e screen strip at (X, Y) (negative values clamp to 0) into 0x12dda4, remember the position at 0x40cd74/ |
+| `0xd1bec` | none | none | d1c54@d1c8d | Finish the log file at handle 0x420944: write the sizes into the header (offsets 4 and 0x334, size 0x330 rounded up to e |
+| `0x5e1b0` | EAX:int32_t,EDX:int32_t,EBX:ef_addr32,ECX:int32_t | none | 5bd8c@5beca | Draw the format string FMT at cell (A, B) (scaled by the shift at 0x12b369, offset by 0x1a6cfc/0x1a6cfa) and continue wi |
+| `0x3bcc0` | EAX:int32_t,EDX:int32_t,EBX:ef_addr32,ECX:int32_t,[ESP+4]:uint32_t | none | 3a3a8@3b49f,3a3a8@3b509,3a3a8@3b564 | Optionally (when the last stack argument is 1) draw through 0xc8ccc with the first and second words of PTR added to B an |

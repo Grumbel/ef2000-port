@@ -4629,4 +4629,12 @@ void guest_fn_ddce8_x(void); /* 0xddce8 unknown, no arguments */
 void init_once_101a90(void);
 ef_addr32 alloc_stream_slot_fa6d3(void);
 
+void blit_transparent_cd957(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t skip, uint32_t rows, uint32_t width, int32_t y, int32_t x, ef_addr32 src);
+void save_and_draw_strip_98b68(uint32_t x, uint32_t y);
+void finish_log_d1bec(void);
+void draw_cell_text_5e1b0(int32_t a, int32_t b, ef_addr32 fmt, int32_t c);
+void draw_marked_box_3bcc0(int32_t a, int32_t b, ef_addr32 ptr, int32_t c, uint32_t mode);
+void guest_fn_5e21c_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x5e21c EAX/EDX/EBX/ECX */
+void guest_fn_c8ccc_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0xc8ccc 5 stack, callee cleanup */
+
 #endif

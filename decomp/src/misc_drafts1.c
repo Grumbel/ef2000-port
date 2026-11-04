@@ -1903,3 +1903,80 @@ ef_addr32 alloc_stream_slot_fa6d3(void)
     EF_U32(0x00485f9cu) = node;
     return slot;
 }
+
+/* 0xcd957, 79 bytes. Copy a SRC block of ROWS rows of WIDTH bytes to the frame buffer at (X, Y), skipping zero (transparent) source bytes; SKIP is added to the source pointer after each row (ret 24). */
+void blit_transparent_cd957(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t skip, uint32_t rows, uint32_t width, int32_t y, int32_t x, ef_addr32 src)
+{
+    uint32_t pitch = EF_U32(0x001631f4u);
+    uint32_t dst = EF_U32(0x00163200u + (uint32_t)y * 4u) + EF_U32(0x0015b754u) + (uint32_t)x;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    rows &= 0xffffu;
+    width &= 0xffffu;
+    do {
+        uint32_t n = width;
+        uint32_t d = dst;
+        do {
+            uint8_t c = EF_U8(src);
+            if (c != 0u)
+                EF_U8(d) = c;
+            src++;
+            d++;
+            n--;
+        } while (n != 0u);
+        dst += pitch;
+        src += skip;
+        rows--;
+    } while (rows != 0u);
+}
+
+/* 0x98b68, 104 bytes. Save the 0x23x0x1e screen strip at (X, Y) (negative values clamp to 0) into 0x12dda4, remember the position at 0x40cd74/0x40cd72 and draw the 0x40c958 sprite over it. */
+void save_and_draw_strip_98b68(uint32_t x, uint32_t y)
+{
+    if ((int16_t)x < 0)
+        x = 0u;
+    if ((int16_t)y < 0)
+        y = 0u;
+    get_screen_rows_eb1f0(0u, 0u, 0u, 0u, (uint16_t)x, (uint16_t)y, 0x23u, 0x1eu, EF_U32(0x0012dda4u));
+    EF_U16(0x0040cd74u) = (uint16_t)x;
+    EF_U16(0x0040cd72u) = (uint16_t)y;
+    blit_transparent_cd957(0u, 0u, 0u, 0u, 0u, 0x1eu, 0x23u, (uint16_t)y, (uint16_t)x, 0x0040c958u);
+}
+
+/* 0xd1bec, 104 bytes. Finish the log file at handle 0x420944: write the sizes into the header (offsets 4 and 0x334, size 0x330 rounded up to even) and seek to the end. */
+void finish_log_d1bec(void)
+{
+    uint32_t v;
+    if (EF_U8(0x00420940u) & 1u)
+        log_value_d175c(0u);
+    seek_start_a7ab4(0u, 0u, 0u, 0u, EF_U32(0x00420944u), 4u);
+    v = EF_U32(0x00420940u);
+    write_log_dword_swapped_d170c(v + 0x330u + (v & 1u));
+    seek_start_a7ab4(0u, 0u, 0u, 0u, EF_U32(0x00420944u), 0x334u);
+    write_log_dword_swapped_d170c(EF_U32(0x00420940u));
+    seek_end_a7ae0(0u, 0u, 0u, 0u, EF_U32(0x00420944u), 0u);
+}
+
+/* 0x5e1b0, 106 bytes. Draw the format string FMT at cell (A, B) (scaled by the shift at 0x12b369, offset by 0x1a6cfc/0x1a6cfa) and continue with 0x5e21c at the column after the text. */
+void draw_cell_text_5e1b0(int32_t a, int32_t b, ef_addr32 fmt, int32_t c)
+{
+    uint8_t s = EF_U8(0x0012b369u);
+    uint32_t w;
+    int32_t px = (int16_t)(((uint32_t)a << s) + EF_U16(0x001a6cfcu));
+    int32_t py = (int16_t)(((uint32_t)b << s) + EF_U16(0x001a6cfau));
+    draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), (uint8_t)(1u - EF_U8(0x0012b369u)), px, py, fmt);
+    w = formatted_width_48d5c(fmt);
+    a += (int32_t)w + 1;
+    guest_fn_5e21c_x((int16_t)a, (int16_t)b, (uint32_t)c, 0u);
+}
+
+/* 0x3bcc0, 101 bytes. Optionally (when the last stack argument is 1) draw through 0xc8ccc with the first and second words of PTR added to B and A (doubled in video mode 3), then draw a box of colour C at (A, B) (ret 4). */
+void draw_marked_box_3bcc0(int32_t a, int32_t b, ef_addr32 ptr, int32_t c, uint32_t mode)
+{
+    if ((mode & 0xffu) == 1u) {
+        if (EF_U8(0x0012635fu) == 3u)
+            guest_fn_c8ccc_x((uint32_t)((int32_t)(int16_t)EF_U16(ptr + 2u) * 2 + b), (uint32_t)((int32_t)(int16_t)EF_U16(ptr) * 2 + a), (uint32_t)b, (uint32_t)a, (uint32_t)c);
+        else
+            guest_fn_c8ccc_x((uint32_t)((int32_t)(int16_t)EF_U16(ptr + 2u) + b), (uint32_t)((int32_t)(int16_t)EF_U16(ptr) + a), (uint32_t)b, (uint32_t)a, (uint32_t)c);
+    }
+    draw_box_3bc90((int16_t)c, a, b);
+}
