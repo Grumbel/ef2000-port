@@ -7852,3 +7852,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x897c4` | EAX:ef_addr32 | none | 8a318@8a41f | Per-frame step of the approach controller of unit U (EAX) driven by the phase byte 0x20f22f. Phase 1: while the double 0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb04e8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | b059c@b0627 | Is record B (EDX) within the range limit of record A (EAX)? Distance of the integer coordinates at +0x11/+0x15 (0xf83d0) |
+| `0x5c2d8` | none | none | none direct | Show the scaled value (double 0x1a2ef0 * 0x185f9a * 0x185fa2, rounded to float): format it into a 16 byte buffer with 0x |

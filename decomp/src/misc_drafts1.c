@@ -13426,3 +13426,41 @@ void step_approach_897c4(ef_addr32 u)
         }
     }
 }
+
+/* 0xb04e8, 107 bytes. Is record B (EDX) within the range limit of record A (EAX)? Distance of the integer coordinates at +0x11/+0x15 (0xf83d0) is compared with a double picked by A's kind byte +0xb: kinds 0, 2 and 5 use 0x18dddf, kinds 1, 3 and 4 use 0x18ddd7, other kinds always fail. Returns 1 when the distance is below the limit. */
+uint32_t in_kind_range_b04e8(ef_addr32 a, ef_addr32 b)
+{
+    double d = int_distance_2d_f83d0((int32_t)EF_U32(a + 0x11u), (int32_t)EF_U32(b + 0x11u), (int32_t)EF_U32(a + 0x15u), (int32_t)EF_U32(b + 0x15u));
+    double lim;
+    switch (EF_U8(a + 0xbu)) {
+    case 0: case 2: case 5:
+        memcpy(&lim, ef_guest_memory_ptr(0x0018dddfu), sizeof lim);
+        return d < lim ? 1u : 0u;
+    case 1: case 3: case 4:
+        memcpy(&lim, ef_guest_memory_ptr(0x0018ddd7u), sizeof lim);
+        return d < lim ? 1u : 0u;
+    default:
+        return 0u;
+    }
+}
+
+/* 0x5c2d8, 123 bytes. Show the scaled value (double 0x1a2ef0 * 0x185f9a * 0x185fa2, rounded to float): format it into a 16 byte buffer with 0x185f8c when it is negative or 0x185f94 otherwise, and display the text through 0x5e21c using the word at 0x128170 + 15 * the byte 0x1a6d1b. */
+void show_scaled_value_5c2d8(void)
+{
+    char buf[16];
+    double a, b, c, z;
+    float f;
+    uint16_t id;
+    uint32_t idx = EF_U8(0x001a6d1bu);
+    memcpy(&a, ef_guest_memory_ptr(0x001a2ef0u), sizeof a);
+    memcpy(&b, ef_guest_memory_ptr(0x00185f9au), sizeof b);
+    memcpy(&c, ef_guest_memory_ptr(0x00185fa2u), sizeof c);
+    f = (float)(a * b * c);
+    id = EF_U16(0x00128170u + idx * 15u);
+    z = 0.0;
+    if (z > (double)f)
+        guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185f8cu, (double)f);
+    else
+        guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185f94u, (double)f);
+    guest_fn_5e21c_x((uint32_t)(int32_t)(int16_t)id, 0u, (uint32_t)(uintptr_t)buf, 0u);
+}

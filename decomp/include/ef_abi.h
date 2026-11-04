@@ -5660,4 +5660,7 @@ uint8_t read_axis_d6b80(ef_addr32 out);
 
 void step_approach_897c4(ef_addr32 u);
 
+uint32_t in_kind_range_b04e8(ef_addr32 a, ef_addr32 b);
+void show_scaled_value_5c2d8(void);
+
 #endif
