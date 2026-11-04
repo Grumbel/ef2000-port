@@ -5140,3 +5140,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xf4c60` | none | none | none direct | Run the mode-1 script section, complaining about each missing part (flags 0x485f72, 0x485f6f, 0x485f73). |
 | `0xf4d0c` | none | none | none direct | Run the mode-2 script section (flags 0x485f6d, 0x485f6c, 0x485f6e). |
+
+## script_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfac78` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb1cb | Slot count for a selector with a cap of 4. |
+| `0xfad54` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb1e2 | Same as 0xfac78 with a cap of 6. |
