@@ -4360,4 +4360,9 @@ void restore_saved_block_dd870(void);
 
 uint32_t random_code_aa6c(void);
 
+/* copy_rects1.c */
+void copy_rows_from_screen_109e08(uint32_t x, uint32_t idx, uint32_t len, int32_t count);
+void save_rect_list_e5114(void);
+void restore_rect_list_e516c(void);
+
 #endif

@@ -3381,8 +3381,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e474c	56	store_args_and_shutdown_e474c	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x000e474c.json	docs/compiler-abi.md; Store two arguments and run the shutdown call chain.; callers 53ecc@53f95,53ecc@53fdd; guest pending
 0x000e4c9c	1002			unknown	unclassified	unverified		
 0x000e5088	139	draw_active_marker_e5088	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000e5088.json	docs/compiler-abi.md; Draw the active unit's marker, then flag it as refreshed.; callers 42b04@42b1c,4bec0@4bed6,4e80c@4e815; guest pending
-0x000e5114	88			unknown	unclassified	unverified		
-0x000e516c	88			unknown	unclassified	unverified		
+0x000e5114	88	save_rect_list_e5114	copy_rects1	compiles	game	confirmed	decomp/tests/0x000e5114.json	docs/compiler-abi.md; Copy every rectangle of the list at 0x43399e (8-byte entries, count in the word at 0x433eac) from the screen into the ba; callers a5ef8@a5f81,a60a8@a60da,a6d00@a6d69; guest pending
+0x000e516c	88	restore_rect_list_e516c	copy_rects1	compiles	game	confirmed	decomp/tests/0x000e516c.json	docs/compiler-abi.md; Copy every rectangle of the list at 0x43399e from the backing buffer back to the screen.; callers a5ef8@a6003,a60a8@a61a1,a6d00@a70d6; guest pending
 0x000e51c4	224			unknown	unclassified	unverified		
 0x000e52a4	1417			unknown	unclassified	unverified		
 0x000e5830	62	refresh_slot_e5830	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000e5830.json	docs/compiler-abi.md; ; callers a6d00@a6d44; guest pending
@@ -3955,7 +3955,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00109a80	151			unknown	unclassified	unverified		
 0x00109b20	685			unknown	unclassified	unverified		
 0x00109dd0	53	copy_rows_109dd0	game_helpers131	compiles	game	confirmed	decomp/tests/0x00109dd0.json	docs/compiler-abi.md; Copy count rows of len bytes from src to dst, advancing both by the row pitch at 0x1631f4.; callers 109e08@109e33,109e40@109e63; guest pending
-0x00109e08	55			unknown	unclassified	unverified		
+0x00109e08	55	copy_rows_from_screen_109e08	copy_rects1	compiles	game	confirmed	decomp/tests/0x00109e08.json	docs/compiler-abi.md; Copy count rows of len bytes at row offset table[idx] + x from the screen (0x15b754) into the buffer returned by 0xc382c; callers e5114@e5159; guest pending
 0x00109e40	44	copy_rows_at_109e40	game_helpers131	compiles	game	confirmed	decomp/tests/0x00109e40.json	docs/compiler-abi.md; Copy count rows of len bytes at row offset table[idx] + x, from the buffer returned by 0xc382c into the one at 0x15b754.; callers e516c@e51b1; guest pending
 0x00109e6c	3	return_zero_109e6c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00109e6c.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x00109e6f	76	guest_memmove_109e6f	game_helpers129	compiles	game	confirmed	decomp/tests/0x00109e6f.json	docs/compiler-abi.md; memmove: copy n bytes from src to dst, copying backwards when the ranges overlap with dst above src.; callers e6144@e639c,f4347@f4469,f44b6@f454a; guest pending

@@ -5125,3 +5125,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xaa6c` | none | EAX:uint32_t | ab74@ad0f,ab74@aded,ab74@af4d | Pick a code (9..14) from a random number modulo 10. |
+
+## copy_rects1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x109e08` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:int32_t | none | e5114@e5159 | Copy count rows of len bytes at row offset table[idx] + x from the screen (0x15b754) into the buffer returned by 0xc382c |
+| `0xe5114` | none | none | a5ef8@a5f81,a60a8@a60da,a6d00@a6d69 | Copy every rectangle of the list at 0x43399e (8-byte entries, count in the word at 0x433eac) from the screen into the ba |
+| `0xe516c` | none | none | a5ef8@a6003,a60a8@a61a1,a6d00@a70d6 | Copy every rectangle of the list at 0x43399e from the backing buffer back to the screen. |
