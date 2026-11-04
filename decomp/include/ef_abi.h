@@ -6343,4 +6343,9 @@ uint32_t alloc_picture_c3670(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t 
 void mix_samples_1177ad(uint32_t *esi, uint32_t *ecx, uint32_t edx, uint32_t *edi);
 void mix_samples_1177ad(uint32_t *esi, uint32_t *ecx, uint32_t edx, uint32_t *edi); /* 0x1177ad */
 
+void vector_length_1600c4(uint32_t *esi, uint32_t edi, uint32_t *ebp);
+void decode_pair_table_10dbc1(uint32_t *esi, uint32_t *eax, uint32_t *edx, uint32_t *edi, uint32_t ebp);
+void vector_length_1600c4(uint32_t *esi, uint32_t edi, uint32_t *ebp); /* 0x1600c4 */
+void decode_pair_table_10dbc1(uint32_t *esi, uint32_t *eax, uint32_t *edx, uint32_t *edi, uint32_t ebp); /* 0x10dbc1 */
+
 #endif

@@ -21565,3 +21565,64 @@ void mix_samples_1177ad(uint32_t *esi, uint32_t *ecx, uint32_t edx, uint32_t *ed
 			return;
 	}
 }
+
+/* 0x1600c4, 74 bytes. Implicit-register fragment (ESI, EDI, EBP = signed 16.16 vector components; ESI and EBP are updated through the pointers): length of the vector. Each component is made absolute, rounded to an integer part (+0x8000 >> 16) and squared; the integer square root of the sum is stored in ESI, and in EBP with the sign of the original EBP. */
+void vector_length_1600c4(uint32_t *esi, uint32_t edi, uint32_t *ebp)
+{
+	uint32_t sum;
+	uint32_t v;
+	uint32_t sgn;
+	uint32_t r;
+
+	v = *esi;
+	sgn = (uint32_t)((int32_t)v >> 31);
+	v = (v ^ sgn) - sgn;
+	v = (uint32_t)((int32_t)(v + 0x8000u) >> 16);
+	sum = v * v;
+	v = edi;
+	sgn = (uint32_t)((int32_t)v >> 31);
+	v = (v ^ sgn) - sgn;
+	v = (uint32_t)((int32_t)(v + 0x8000u) >> 16);
+	sum += v * v;
+	v = *ebp;
+	sgn = (uint32_t)((int32_t)v >> 31);
+	v = (v ^ sgn) - sgn;
+	v = (uint32_t)((int32_t)(v + 0x8000u) >> 16);
+	sum += v * v;
+	r = integer_sqrt(sum);
+	*ebp = (r ^ sgn) - sgn;
+	*esi = r;
+}
+
+/* 0x10dbc1, 76 bytes. Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EDX and EDI = output pointers in/out, EBP = frame whose dword at EBP-0x854 is used as the loop counter): read a byte N, then two 3-bit widths (+1 each, BH for the plain case and BL for the escape case) and decode 2*N entries: a set flag bit reads a BL-wide value into [EDX] and stores 0 to [EDI], a clear flag bit reads a BH-wide value into [EDI]. */
+void decode_pair_table_10dbc1(uint32_t *esi, uint32_t *eax, uint32_t *edx, uint32_t *edi, uint32_t ebp)
+{
+	uint8_t al;
+	uint8_t bh;
+	uint8_t bl;
+	uint8_t ah;
+
+	EF_U32(ebp - 0x854u) = (uint32_t)EF_U8(*esi) * 2u;
+	*esi += 1u;
+	al = (uint8_t)*eax;
+	bh = (uint8_t)(bitstream_read_bits_10dc0d(3u, &al, esi) + 1u);
+	bl = (uint8_t)(bitstream_read_bits_10dc0d(3u, &al, esi) + 1u);
+	*eax = (*eax & 0xffffff00u) | al;
+	do {
+		if (next_bit_10db7e(esi, eax) != 0u) {
+			al = (uint8_t)*eax;
+			ah = bitstream_read_bits_10dc0d(bl, &al, esi);
+			*eax = (*eax & 0xffffff00u) | al;
+			EF_U8(*edx) = ah;
+			ah = 0;
+		} else {
+			al = (uint8_t)*eax;
+			ah = bitstream_read_bits_10dc0d(bh, &al, esi);
+			*eax = (*eax & 0xffffff00u) | al;
+		}
+		EF_U8(*edi) = ah;
+		*edi += 1u;
+		*edx += 1u;
+		EF_U32(ebp - 0x854u) -= 1u;
+	} while (EF_U32(ebp - 0x854u) != 0u);
+}
