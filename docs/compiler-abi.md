@@ -8008,3 +8008,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7a844` | none | EAX:uint32_t | 7ab00@7ac24 | Populate the 400 x 400 scenery map: for every cell whose id (hi byte plane 0x1f8eb4, lo byte plane 0x1f8eb8) is not 0xff |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x45bfc` | EAX:uint32_t | none | 77c90@77e19 | Select the language tables for LANGUAGE (AL): store the byte in dword 0x1a51f0 and point the ten table slots 0x1a5218, 0 |

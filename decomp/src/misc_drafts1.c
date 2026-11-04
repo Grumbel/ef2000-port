@@ -14346,3 +14346,26 @@ uint32_t build_scenery_map_7a844(void)
     nop_9dddc();
     return 0u;
 }
+
+/* 0x45bfc, 412 bytes. Select the language tables for LANGUAGE (AL): store the byte in dword 0x1a51f0 and point the ten table slots 0x1a5218, 0x1a51f4, 0x1a5204, 0x1a520c, 0x1a5208, 0x1a51f8, 0x1a51fc, 0x1a5214, 0x1a5210, 0x1a5200 at the set for language 0, 1 or 2; any other value reports 0x184688 through the error hook. */
+void select_language_tables_45bfc(uint32_t language)
+{
+    static const uint32_t sets[3][10] = {
+        { 0x126e06u, 0x1268c0u, 0x126960u, 0x126a2cu, 0x126a38u, 0x12b12cu, 0x12b150u, 0x12b120u, 0x12b138u, 0x12b15cu },
+        { 0x127236u, 0x126910u, 0x126988u, 0x126a30u, 0x126a3cu, 0x12b130u, 0x12b154u, 0x12b124u, 0x12b13cu, 0x12b160u },
+        { 0x127666u, 0x1269b0u, 0x126a00u, 0x126a34u, 0x126a40u, 0x12b134u, 0x12b158u, 0x12b128u, 0x12b140u, 0u }
+    };
+    static const uint32_t slots[10] = {
+        0x001a5218u, 0x001a51f4u, 0x001a5204u, 0x001a520cu, 0x001a5208u,
+        0x001a51f8u, 0x001a51fcu, 0x001a5214u, 0x001a5210u, 0x001a5200u
+    };
+    uint32_t lang = language & 0xffu;
+    uint32_t i;
+    EF_U32(0x001a51f0u) = lang;
+    if (lang > 2u) {
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00184688u);
+        return;
+    }
+    for (i = 0u; i < 10u; i++)
+        EF_U32(slots[i]) = sets[lang][i];
+}
