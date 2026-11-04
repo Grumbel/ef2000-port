@@ -5615,3 +5615,12 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x10e28a` | EAX:ef_addr32 | none | ebea3@ebece | Convert the positive double at P in place to a 64-bit integer: restore the hidden mantissa bit, shift left for large exp |
 | `0x7cc5c` | none | none | none direct | Show the main widget set: release the parser buffers, activate the widget stored at "0x187f74" when the mode byte at 0x1 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd1c54` | EAX:ef_addr32,EDX:ef_addr32,EBX:int32_t | none | ac57c@ac5eb | Start a log: remember [0x15b744] / 8 at 0x15b7cc, open the log file NAME, emit the display list, log the palette SRC (mo |
+| `0x110130` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | fa362@fa380 | Wrapper for 0x10e4dd on the double (S0, S1): control word (S2 & 0x1f) with 0x1080 when S2 is not 8 and the value is +/-0 |
+| `0xf017a` | EAX:uint32_t,EDX:ef_addr32 | none | ee589@ee58f,ee22c@ee5ae,ee22c@ee5cd | Convert the single precision float BITS to an 80-bit extended value at OUT (mantissa at +0/+4, sign and exponent at +8). |
+| `0xebdcc` | EAX:ef_addr32,EDX:ef_addr32 | none | 9d55d@9d6a5 | Convert the decimal digit string TEXT (digit characters only, low nibble used) to a double stored at OUT: the digits are |

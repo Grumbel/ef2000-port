@@ -3019,7 +3019,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d19ec	272			unknown	unclassified	unverified		
 0x000d1afc	237			unknown	unclassified	unverified		
 0x000d1bec	104	finish_log_d1bec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d1bec.json	docs/compiler-abi.md; Finish the log file at handle 0x420944: write the sizes into the header (offsets 4 and 0x334, size 0x330 rounded up to e; callers d1c54@d1c8d; guest pending
-0x000d1c54	70			unknown	unclassified	unverified		
+0x000d1c54	70	write_log_d1c54	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d1c54.json	docs/compiler-abi.md; Start a log: remember [0x15b744] / 8 at 0x15b7cc, open the log file NAME, emit the display list, log the palette SRC (mo; callers ac57c@ac5eb; guest pending
 0x000d1d40	102	init_video_d1d40	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000d1d40.json	docs/compiler-abi.md; Set the screen size and run the video start-up sequence.; callers d1da8@d1dde,d1de8@d1e31; guest pending
 0x000d1da8	61	set_mode_640x400_d1da8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d1da8.json	docs/compiler-abi.md; Pick the 640x400 video mode if either mode is available.; callers d1e50@d1ecd,d1e50@d1ede; guest pending
 0x000d1de8	82	set_video_mode_d1de8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d1de8.json	docs/compiler-abi.md; Set up the 640x480 video mode; other modes abort but continue.; callers d1e50@d1ee7; guest pending
@@ -3526,7 +3526,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ebcfc	52	advance_cursor_ebcfc	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebcfc.json	docs/compiler-abi.md; Advance the cursor at +0x158 by EAX and return the distance from +0x154.; callers 9cee8@9cf0a,9cee8@9cf1a; guest pending
 0x000ebd30	6	get_address_ebd30	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000ebd30.json	docs/compiler-abi.md; ; callers ebe6d@ebe70,f4db8@f4ddf,f4db8@f4df6; guest pending
 0x000ebd36	6	get_address_ebd36	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000ebd36.json	docs/compiler-abi.md; ; callers ebe90@ebe93; guest pending
-0x000ebdcc	75			unknown	unclassified	unverified		
+0x000ebdcc	75	decimal_string_to_double_ebdcc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ebdcc.json	docs/compiler-abi.md; Convert the decimal digit string TEXT (digit characters only, low nibble used) to a double stored at OUT: the digits are; callers 9d55d@9d6a5; guest pending
 0x000ebe17	81			unknown	unclassified	unverified		
 0x000ebe6d	12	store_through_ebd30	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebe6d.json	docs/compiler-abi.md; Store EAX through the pointer returned by 0xebd30.; callers bc1d3@bc1fa,ebe79@ebe7e,f1d90@f1da5; guest pending
 0x000ebe79	7	report_error_14_ebe79	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000ebe79.json	docs/compiler-abi.md; Report error code 14.; callers 9d55d@9d6b8,9d55d@9d6ea; guest pending
@@ -3574,7 +3574,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000effb4	128			unknown	unclassified	unverified		
 0x000f0034	127			unknown	unclassified	unverified		
 0x000f00b3	199			unknown	unclassified	unverified		
-0x000f017a	69			unknown	unclassified	unverified		
+0x000f017a	69	float_to_extended_f017a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f017a.json	docs/compiler-abi.md; Convert the single precision float BITS to an 80-bit extended value at OUT (mantissa at +0/+4, sign and exponent at +8).; callers ee589@ee58f,ee22c@ee5ae,ee22c@ee5cd; guest pending
 0x000f023f	307			unknown	unclassified	unverified		
 0x000f03cc	182			unknown	unclassified	unverified		
 0x000f0482	355			unknown	unclassified	unverified		
@@ -4034,7 +4034,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001100b1	33	elapsed_since_start	runtime_libc	compiles	game	confirmed	decomp/tests/0x001100b1.json	docs/compiler-abi.md; Elapsed value of 0x11004b relative to dword 0x4dd984, wrapping at 0x83d600.; callers none direct; guest pending
 0x001100d2	81			unknown	unclassified	unverified		
 0x00110123	13	call_1100d2_default	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110123.json	docs/compiler-abi.md; 0x1100d2(EAX, 0x4dd988).; callers f9ecd@f9ecd,101c54@101ce1; guest pending
-0x00110130	60			unknown	unclassified	unverified		
+0x00110130	60	classify_double_110130	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110130.json	docs/compiler-abi.md; Wrapper for 0x10e4dd on the double (S0, S1): control word (S2 & 0x1f) with 0x1080 when S2 is not 8 and the value is +/-0; callers fa362@fa380; guest pending
 0x0011016c	82	fdiv_bug_probe_11016c	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011016c.json	docs/compiler-abi.md; Pentium FDIV bug probe: when the CPU level 0x13719d is at least 3, compute 4195835 - (4195835 / 3145727) * 3145727 and s; callers none direct; guest pending
 0x001101be	30			unknown	unclassified	unverified		
 0x001101e3	5			unknown	unclassified	unverified		

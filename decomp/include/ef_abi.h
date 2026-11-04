@@ -4641,4 +4641,10 @@ void round_double_to_int64_10e28a(ef_addr32 p);
 void show_main_widgets_7cc5c(void);
 void guest_fn_7bee8_x(uint32_t a); /* 0x7bee8 EAX */
 
+void write_log_d1c54(ef_addr32 name, ef_addr32 src, int32_t mode);
+void classify_double_110130(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2);
+void float_to_extended_f017a(uint32_t bits, ef_addr32 out);
+void decimal_string_to_double_ebdcc(ef_addr32 text, ef_addr32 out);
+void guest_fn_d1afc_x(void); /* 0xd1afc unknown, no arguments */
+
 #endif

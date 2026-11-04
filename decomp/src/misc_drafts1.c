@@ -2038,3 +2038,99 @@ void show_main_widgets_7cc5c(void)
     guest_fn_a520c(w, (int16_t)EF_U16(w + 0x45u), (uint32_t)(int16_t)(EF_U16(0x0012b056u) * 0x14u + 0x18u), 0u);
     update_widget_chain_7ca78();
 }
+
+/* 0xd1c54, 70 bytes. Start a log: remember [0x15b744] / 8 at 0x15b7cc, open the log file NAME, emit the display list, log the palette SRC (mode MODE), run 0xd1afc, finish the log and close the file. */
+void write_log_d1c54(ef_addr32 name, ef_addr32 src, int32_t mode)
+{
+    EF_U32(0x0015b7ccu) = (uint32_t)((int32_t)EF_U32(0x0015b744u) / 8);
+    open_log_d1774(name);
+    emit_display_list_d17d0();
+    log_palette_d1894(src, (int16_t)mode);
+    guest_fn_d1afc_x();
+    finish_log_d1bec();
+    call_a7990_420944();
+}
+
+/* 0x110130, 60 bytes. Wrapper for 0x10e4dd on the double (S0, S1): control word (S2 & 0x1f) with 0x1080 when S2 is not 8 and the value is +/-0, otherwise 0x1040 (ret 12). */
+void classify_double_110130(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2)
+{
+    uint32_t v[2];
+    uint32_t w = s2 & 0x1fu;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    v[0] = s0;
+    v[1] = s1;
+    if (w != 8u && (s1 & 0x7fffffffu) == 0u && s0 == 0u)
+        w |= 0x1080u;
+    else
+        w |= 0x1040u;
+    run_with_ebx_10e4d3(w, (uint32_t)(uintptr_t)v);
+}
+
+/* 0xf017a, 69 bytes. Convert the single precision float BITS to an 80-bit extended value at OUT (mantissa at +0/+4, sign and exponent at +8). ORIGINAL BUG: zero and denormal inputs store the raw float bits in the mantissa high word and a zero exponent, and a NaN whose only fraction bit is the top one becomes an infinity. */
+void float_to_extended_f017a(uint32_t bits, ef_addr32 out)
+{
+    uint32_t e = (bits >> 23) & 0xffu;
+    uint32_t lo = 0u;
+    uint32_t hi = bits;
+    uint32_t ex = 0u;
+    if (e != 0u) {
+        hi = bits << 8;
+        if (e == 0xffu) {
+            ex = 0x7fffu;
+            hi &= 0x7fffffffu;
+            if (hi != 0u)
+                hi |= 0x40000000u;
+        } else {
+            ex = e + 0x3f80u;
+        }
+        ex = ((bits >> 31) << 15) | (ex & 0x7fffu);
+        hi |= 0x80000000u;
+    }
+    EF_U32(out) = lo;
+    EF_U32(out + 4u) = hi;
+    EF_U16(out + 8u) = (uint16_t)ex;
+}
+
+/* 0xebdcc, 75 bytes. Convert the decimal digit string TEXT (digit characters only, low nibble used) to a double stored at OUT: the digits are accumulated into a 64-bit integer which is normalised with the exponent word 0x43300000 (0xebe17) and rounded half up on the first dropped bit. */
+void decimal_string_to_double_ebdcc(ef_addr32 text, ef_addr32 out)
+{
+    uint32_t lo = 0u;
+    uint32_t hi = 0u;
+    uint32_t expo = 0x43300000u;
+    uint32_t c;
+    while ((c = EF_U8(text)) != 0u) {
+        uint32_t olo = lo;
+        uint32_t ohi = hi;
+        uint64_t v = ((uint64_t)ohi << 32) | olo;
+        v = v * 10u + (c & 0xfu);
+        lo = (uint32_t)v;
+        hi = (uint32_t)(v >> 32);
+        text++;
+    }
+    if ((lo | hi) != 0u) {
+        uint32_t guard = 0u;
+        if ((hi & 0xfff00000u) == 0u) {
+            do {
+                expo -= 0x100000u;
+                hi = (hi << 1) | (lo >> 31);
+                lo <<= 1;
+            } while ((hi & 0xfff00000u) == 0u);
+        } else if ((hi & 0xffe00000u) != 0u) {
+            uint32_t sticky = 0u;
+            do {
+                expo += 0x100000u;
+                sticky = (guard << 1) | 0u;
+                guard = lo & 1u;
+                lo = (lo >> 1) | (hi << 31);
+                hi >>= 1;
+            } while ((hi & 0xffe00000u) != 0u);
+            (void)sticky;
+            lo += guard;
+            if (lo == 0u && guard != 0u)
+                hi += 1u;
+        }
+        hi = (hi & 0xfffffu) | expo;
+    }
+    EF_U32(out + 4u) = hi;
+    EF_U32(out) = lo;
+}
