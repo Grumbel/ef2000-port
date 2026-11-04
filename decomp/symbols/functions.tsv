@@ -3420,7 +3420,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e78b4	366			unknown	unclassified	unverified		
 0x000e7a30	1	nop_e7a30	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000e7a30.json	docs/compiler-abi.md; Empty stub (single ret).; callers 581b0@581d1,581b0@5862c,581b0@58651; guest pending
 0x000e7a34	71			unknown	unclassified	unverified		
-0x000e7a7c	459			unknown	unclassified	unverified		
+0x000e7a7c	459	build_rotation_matrix_e7a7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e7a7c.json	docs/compiler-abi.md; Higher precision rotation matrix builder: the angles in EBX, ESI, EDI (halved and masked to table offsets, kept as words; callers c4654@c4675,c5261@c5277; guest pending
 0x000e7c50	63	set_page_word_e7c50	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c50.json	docs/compiler-abi.md; Store a word into the 0x190c3c page table entry.; callers 68a2c@68a58,68a60@68ace,68a60@68b3a; guest pending
 0x000e7c90	64	get_page_word_e7c90	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c90.json	docs/compiler-abi.md; Read a word from the 0x190c3c page table entry, or 0.; callers 68e84@68e9e; guest pending
 0x000e7cd0	28	append_two_e7cd0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000e7cd0.json	docs/compiler-abi.md; Append a fixed string and then second to first.; callers e7cec@e7d1f; guest pending

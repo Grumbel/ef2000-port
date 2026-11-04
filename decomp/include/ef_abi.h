@@ -5989,4 +5989,6 @@ void build_rotation_matrix_e95c0(uint32_t a, uint32_t b, uint32_t c);
 
 void build_rotation_matrix_e977c(uint32_t a, uint32_t b, uint32_t c);
 
+void build_rotation_matrix_e7a7c(uint32_t ebx, uint32_t esi, uint32_t edi);
+
 #endif

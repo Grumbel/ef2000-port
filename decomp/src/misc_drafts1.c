@@ -18863,3 +18863,58 @@ void build_rotation_matrix_e977c(uint32_t a, uint32_t b, uint32_t c)
 	EF_U32(0x0046445cu) = (uint32_t)(-p);
 	EF_U32(0x00464460u) = (uint32_t)((cos_tab_e95c0(a - b) + cos_tab_e95c0(a + b)) >> 1);
 }
+
+static int32_t sin32_e7a7c(uint32_t off)
+{
+	return (int32_t)EF_U32(0x00137e08u + (off & 0x7ffcu));
+}
+
+static int32_t cos32_e7a7c(uint32_t off)
+{
+	return (int32_t)EF_U32(0x00139e08u + (off & 0x7ffcu));
+}
+
+static int32_t mulshift24_e7a7c(int32_t a, int32_t b)
+{
+	return (int32_t)(((int64_t)a * (int64_t)b) >> 24);
+}
+
+/* 0xe7a7c, 459 bytes. Higher precision rotation matrix builder: the angles in EBX, ESI, EDI (halved and masked to table offsets, kept as words at 0x15ffd4/6/8) index the dword sine/cosine tables at 0x137e08/0x139e08; products use 64-bit multiplies shifted by 24. Nine entries go to 0x1590c0..0x1590e0, then three rows of three are shifted right by 9 into 0x15ffda/0x15ffde/0x15ffe2 (stride 12). */
+void build_rotation_matrix_e7a7c(uint32_t ebx, uint32_t esi, uint32_t edi)
+{
+	uint32_t x0 = (ebx >> 1) & 0x7ffcu, x1 = (esi >> 1) & 0x7ffcu, x2 = (edi >> 1) & 0x7ffcu;
+	int32_t p0, s, d, t0, t1, c0, c1;
+	uint32_t i;
+
+	EF_U16(0x0015ffd4u) = (uint16_t)x0;
+	EF_U16(0x0015ffd6u) = (uint16_t)x1;
+	EF_U16(0x0015ffd8u) = (uint16_t)x2;
+	p0 = sin32_e7a7c(x0);
+	EF_U32(0x0015ffd0u) = (uint32_t)p0;
+	s = sin32_e7a7c(x1 + x2);
+	d = sin32_e7a7c(x1 - x2);
+	EF_U32(0x001590ccu) = (uint32_t)(-((mulshift24_e7a7c(s + d, p0) + s - d) >> 1));
+	EF_U32(0x001590c8u) = (uint32_t)((mulshift24_e7a7c(s - d, p0) + s + d) >> 1);
+	s = cos32_e7a7c(x1 + x2);
+	d = cos32_e7a7c(x1 - x2);
+	EF_U32(0x001590d4u) = (uint32_t)((mulshift24_e7a7c(s + d, p0) + s - d) >> 1);
+	EF_U32(0x001590c0u) = (uint32_t)((-mulshift24_e7a7c(d - s, p0) + s + d) >> 1);
+	t0 = sin32_e7a7c(x0 - x2);
+	c0 = cos32_e7a7c(x0 - x2);
+	t1 = sin32_e7a7c(x0 + x2);
+	c1 = cos32_e7a7c(x0 + x2);
+	EF_U32(0x001590c4u) = (uint32_t)((t1 - t0) >> 1);
+	EF_U32(0x001590d0u) = (uint32_t)((c1 + c0) >> 1);
+	t0 = sin32_e7a7c(x0 - x1);
+	c0 = cos32_e7a7c(x0 - x1);
+	t1 = sin32_e7a7c(x0 + x1);
+	c1 = cos32_e7a7c(x0 + x1);
+	EF_U32(0x001590d8u) = (uint32_t)(-((t1 - t0) >> 1));
+	EF_U32(0x001590dcu) = (uint32_t)(-p0);
+	EF_U32(0x001590e0u) = (uint32_t)((c0 + c1) >> 1);
+	for (i = 0u; i < 36u; i += 12u) {
+		EF_U32(0x0015ffdau + i) = (uint32_t)((int32_t)EF_U32(0x001590c0u + i) >> 9);
+		EF_U32(0x0015ffdeu + i) = (uint32_t)((int32_t)EF_U32(0x001590c4u + i) >> 9);
+		EF_U32(0x0015ffe2u + i) = (uint32_t)((int32_t)EF_U32(0x001590c8u + i) >> 9);
+	}
+}

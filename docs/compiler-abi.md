@@ -8645,3 +8645,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe977c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e994c@e9965 | Sibling of 0xe95c0 with a different angle order: builds the rotation matrix for A (EAX), B (EDX), C (EBX) into dwords 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe7a7c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | c4654@c4675,c5261@c5277 | Higher precision rotation matrix builder: the angles in EBX, ESI, EDI (halved and masked to table offsets, kept as words |
