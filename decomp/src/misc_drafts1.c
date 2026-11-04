@@ -22818,3 +22818,27 @@ void decode_planes_10dfec(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef
 		}
 	}
 }
+
+/* 0x120a60, 111 bytes. C frexp(x, int *exp): for a non-zero value store (biased exponent - 0x3fe) to *EXP and return the value with its exponent field replaced by 0x3fe (mantissa in [0.5, 1)); for zero store 0 and return the value unchanged. */
+double frexp_120a60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, ef_addr32 exp_out)
+{
+	uint8_t b[8];
+	uint32_t lo;
+	uint32_t hi;
+	int32_t e = 0;
+	uint16_t w;
+
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	memcpy(b, &x, 8);
+	memcpy(&lo, b, 4);
+	memcpy(&hi, b + 4, 4);
+	if ((hi & 0x7fffffffu) != 0u || lo != 0u) {
+		memcpy(&w, b + 6, 2);
+		e = (int32_t)((w & 0x7ff0u) >> 4) - 0x3fe;
+		w = (uint16_t)((w & 0x800fu) | 0x3fe0u);
+		memcpy(b + 6, &w, 2);
+		memcpy(&x, b, 8);
+	}
+	EF_S32(exp_out) = e;
+	return x;
+}

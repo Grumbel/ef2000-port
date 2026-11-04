@@ -9415,3 +9415,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10dfec` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | none | eab44@eab8d,eac48@ead16 | Decode four byte planes from a run list: for each plane P (0..3, destination base DST + P) read a word run count, then p |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x120a60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:ef_addr32 | EAX:double | 120560@1205e8 | C frexp(x, int *exp): for a non-zero value store (biased exponent - 0x3fe) to *EXP and return the value with its exponen |
