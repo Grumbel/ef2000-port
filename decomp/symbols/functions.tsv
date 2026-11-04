@@ -630,7 +630,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00037294	57	mirror_reference_state	tactical_io	compiles	game	confirmed	decomp/tests/0x00037294.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000372d4	53	alloc_record_table_372d4	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x000372d4.json	docs/compiler-abi.md; Allocate and zero a table of count+1 records of 0x45 bytes.; callers 49228@49601; guest pending
 0x0003730c	141	take_table_record_3730c	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x0003730c.json	docs/compiler-abi.md; Take the next 69-byte record of the table, linking it to the previous one.; callers 37498@374b6; guest pending
-0x0003739c	250			unknown	unclassified	unverified		
+0x0003739c	250	compact_slots_3739c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003739c.json	docs/compiler-abi.md; Compact the nine slot words (+0x28, stride 0x45 per group in the table 0x1a14f8) of the group UNIT: a slot is kept when ; callers 17388@1739c,90074@900b5; guest pending
 0x00037498	1180			unknown	unclassified	unverified		
 0x00037934	525			unknown	unclassified	unverified		
 0x00037b44	129	find_record_at_cell_37b44	game_helpers17	compiles	game	confirmed	decomp/tests/0x00037b44.json	docs/compiler-abi.md; Index of the last 0x45-byte record whose position cell is (x, y), or 0xff.; callers 8748@87dc; guest pending

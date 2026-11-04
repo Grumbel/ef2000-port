@@ -4497,3 +4497,32 @@ void reset_remote_cursor_f2b7c(void)
         v = 0xc7;
     EF_U16(0x00425fc6u) = (uint16_t)v;
 }
+
+/* 0x3739c, 250 bytes. Compact the nine slot words (+0x28, stride 0x45 per group in the table 0x1a14f8) of the group UNIT: a slot is kept when it names a live record (0x8ffe8) without flag 2; an empty or dead slot is replaced by the next nonempty slot, whose record then gets the new slot index in byte +0x3b. */
+void compact_slots_3739c(int32_t unit)
+{
+    int16_t u = (int16_t)unit;
+    uint32_t tbl = EF_U32(0x001a14f8u);
+    int32_t k;
+    for (k = 0; k < 9; k++) {
+        uint32_t base = tbl + (uint32_t)((int32_t)u * 0x45);
+        uint16_t w = EF_U16(base + (uint32_t)k * 2u + 0x28u);
+        uint32_t rec;
+        int32_t j;
+        if (w != 0u) {
+            rec = guest_fn_8ffe8_x((uint32_t)(int32_t)(int16_t)w);
+            if (rec != 0u && (EF_U8(rec + 0x30u) & 2u) == 0u)
+                continue;
+        }
+        j = k + 1;
+        while (EF_U16(base + (uint32_t)j * 2u + 0x28u) == 0u && j * 2 < 0x12)
+            j++;
+        if (j < 9) {
+            EF_U16(base + (uint32_t)k * 2u + 0x28u) = EF_U16(base + (uint32_t)j * 2u + 0x28u);
+            rec = guest_fn_8ffe8_x((uint32_t)(int32_t)(int16_t)EF_U16(base + (uint32_t)k * 2u + 0x28u));
+            if (rec != 0u)
+                EF_U8(rec + 0x3bu) = (uint8_t)k;
+            EF_U16(base + (uint32_t)j * 2u + 0x28u) = 0u;
+        }
+    }
+}

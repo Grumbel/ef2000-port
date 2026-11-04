@@ -4850,4 +4850,7 @@ void tally_roster_kinds_50658(void);
 
 void reset_remote_cursor_f2b7c(void);
 
+void compact_slots_3739c(int32_t unit);
+uint32_t guest_fn_8ffe8_x(uint32_t id); /* 0x8ffe8 EAX -> EAX */
+
 #endif
