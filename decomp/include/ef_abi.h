@@ -6322,4 +6322,7 @@ uint32_t add_patched_offsets_c8c34(uint32_t *edi); /* 0xc8c34 */
 uint32_t set_view_shift_pair_c8720(uint32_t *esi);
 uint32_t set_view_shift_pair_c8720(uint32_t *esi); /* 0xc8720 */
 
+uint64_t probe_vectors_9c243(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
+uint64_t probe_vectors_9c243(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value); /* 0x9c243 */
+
 #endif

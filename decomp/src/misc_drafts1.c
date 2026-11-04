@@ -21422,3 +21422,24 @@ uint32_t set_view_shift_pair_c8720(uint32_t *esi)
 	*esi = p + 8u;
 	return EF_U32(0x15b270u + (uint32_t)op);
 }
+
+/* 0x9c243, 57 bytes. cdecl (VALUE), returns EDX:EAX: probe DOS interrupt vectors 1, 3 and 5 (int 21h, AX = 0x3501, 0x3503, 0x3505). When all succeed return EAX = 0 and EDX = the last returned BX. If the first call fails, or a later one does, query vector 2 (AX = 0x3502) and return EAX = VALUE (first failure) or 0xffffffff (later failure) with EDX = the word at 0x120cc4. */
+uint64_t probe_vectors_9c243(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value)
+{
+	uint32_t out[7];
+	uint32_t ecx = value;
+
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	run_dos_int_ex(0x21u, 0x3501u, 0u, ecx, 0u, out);
+	if (out[6] == 0u) {
+		run_dos_int_ex(0x21u, 0x3503u, 0u, ecx, 0u, out);
+		ecx = 0xffffffffu;
+		if (out[6] == 0u) {
+			run_dos_int_ex(0x21u, 0x3505u, 0u, ecx, 0u, out);
+			if (out[6] == 0u)
+				return (uint64_t)(out[1] & 0xffffu) << 32;
+		}
+		run_dos_int_ex(0x21u, 0x3502u, 0u, ecx, 0u, out);
+	}
+	return ((uint64_t)EF_U16(0x120cc4u) << 32) | ecx;
+}

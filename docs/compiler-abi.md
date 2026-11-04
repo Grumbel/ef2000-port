@@ -9183,3 +9183,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc8720` | EAX:uint32_t | EAX:uint32_t | none direct | Implicit-register fragment (ESI is an in/out stream pointer, advanced by 8; returns the handler address). Set the view s |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9c243` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint64_t | none direct | cdecl (VALUE), returns EDX:EAX: probe DOS interrupt vectors 1, 3 and 5 (int 21h, AX = 0x3501, 0x3503, 0x3505). When all  |
