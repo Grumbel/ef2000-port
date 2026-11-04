@@ -711,7 +711,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003ce70	149	resolve_entry_cells_3ce70	runtime_helpers29	compiles	game	confirmed	decomp/tests/0x0003ce70.json	docs/compiler-abi.md; Resolve the terrain cell of every 11-byte entry that has none yet.; callers 3cfc0@3d2e1; guest pending
 0x0003cf08	137	run_timed_events_3cf08	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0003cf08.json	docs/compiler-abi.md; Fire due timed events from the 11-byte table at 0x1a57d0.; callers 3dd30@3e36c; guest pending
 0x0003cfc0	840			unknown	unclassified	unverified		
-0x0003d308	97			unknown	unclassified	unverified		
+0x0003d308	97	draw_formatted_text_3d308	game_helpers131	compiles	game	confirmed	decomp/tests/0x0003d308.json	docs/compiler-abi.md; Draw a formatted string at character cell (col, row) with a one-pixel shadow: col * 8, row * 9 pixels (cdecl, variadic).; callers 3d4b0@3d55e,3d4b0@3d576,3d4b0@3d592; guest pending
 0x0003d37c	306			unknown	unclassified	unverified		
 0x0003d4b0	765			unknown	unclassified	unverified		
 0x0003d7b0	338			unknown	unclassified	unverified		
@@ -830,7 +830,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000488f8	99	set_unit_mode_488f8	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x000488f8.json	docs/compiler-abi.md; Store a mode byte in unit AX and send the matching request.; callers 857bc@85933; guest pending
 0x00048ae8	140	classify_entry_48ae8	game_helpers17	compiles	game	confirmed	decomp/tests/0x00048ae8.json	docs/compiler-abi.md; Classify an entry: 0/1 for ordinary, 2 for kind 2, logs unknown kinds.; callers 77c90@77dff; guest pending
 0x00048bb0	131			unknown	unclassified	unverified		
-0x00048c34	91			unknown	unclassified	unverified		
+0x00048c34	91	formatted_text_width_48c34	game_helpers131	compiles	game	confirmed	decomp/tests/0x00048c34.json	docs/compiler-abi.md; Width of a formatted string: mode 1 uses the proportional font width, mode 2 six pixels per character, anything else eig; callers 11e7c@11f84,11e7c@12067,150d4@1513c; guest pending
 0x00048c90	201			unknown	unclassified	unverified		
 0x00048d5c	68			unknown	unclassified	unverified		
 0x00048da0	68			unknown	unclassified	unverified		
@@ -2691,7 +2691,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000becc0	55	count_valid_entries_becc0	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000becc0.json	docs/compiler-abi.md; Count the 21-byte entries of the object that pass the check.; callers becf8@bed07,fac78@facb1,fac78@facd1; guest pending
 0x000becf8	36	record_pending_becf8	list_lookup	compiles	game	confirmed	decomp/tests/0x000becf8.json	docs/compiler-abi.md; 1 when 0xbc7ec(record) is zero and 0xbecc0(record) is nonzero.; callers bed1c@bed72; guest pending
 0x000bed1c	415			unknown	unclassified	unverified		
-0x000beebc	109			unknown	unclassified	unverified		
+0x000beebc	109	for_each_entry_beebc	game_helpers131	compiles	game	confirmed	decomp/tests/0x000beebc.json	docs/compiler-abi.md; Run 0xbed1c once for every entry of a list (count from 0xbc5d0), passing the index as a byte in EBX and forwarding the other arguments; returns the last result; callers bc610@bc793; guest pending
 0x000bef2c	99			unknown	unclassified	unverified		
 0x000bef90	40	find_node_by_pair	list_lookup	compiles	game	confirmed	decomp/tests/0x000bef90.json	docs/compiler-abi.md; Find the node in the list at *EBX with dword +0x16 == * signed AX and dword +0x1a == signed DX.; callers befb8@bf1f2; guest pending
 0x000befb8	1145			unknown	unclassified	unverified		
@@ -3519,7 +3519,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb9f8	84	resolve_entry_eb9f8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000eb9f8.json	docs/compiler-abi.md; ; callers 9cb20@9cb3a,9cb20@9cb5a; guest pending
 0x000eba4c	21	lookup_field_eba4c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000eba4c.json	docs/compiler-abi.md; Zero when EDX is zero, else dword +8 of 0xeb520's result (or 0).; callers 9cb70@9cb8a,9cb70@9cbaa; guest pending
 0x000eba64	169			unknown	unclassified	unverified		
-0x000ebb10	69			unknown	unclassified	unverified		
+0x000ebb10	69	read_entry_block_ebb10	game_helpers131	compiles	game	confirmed	decomp/tests/0x000ebb10.json	docs/compiler-abi.md; Read an entry's block: find the directory entry for the key in the context, seek the context's handle to the entry posit; callers 9cc28@9cc4a,9cc28@9cc6e; guest pending
 0x000ebb58	247			unknown	unclassified	unverified		
 0x000ebc50	133			unknown	unclassified	unverified		
 0x000ebcd8	36	release_or_forward_ebcd8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebcd8.json	docs/compiler-abi.md; Release the object's pointer at +0x154 for flag 0x80000, else defer to 0xa7990.; callers 9ce84@9cea5,9ce84@9ceb6; guest pending

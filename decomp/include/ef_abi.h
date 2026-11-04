@@ -4016,4 +4016,12 @@ int32_t guest_fn_fa4a9_x(ef_addr32 name, uint32_t oflag, uint32_t shflag, uint32
 void apply_palette_d663c(ef_addr32 palette);
 void finish_record_range_d710c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
 
+/* game_helpers131.c */
+int32_t formatted_text_width_48c34(uint32_t mode, ef_addr32 fmt, ...);
+void draw_formatted_text_3d308(int32_t col, int32_t row, ef_addr32 fmt, ...);
+uint8_t read_entry_block_ebb10(uint32_t key, ef_addr32 buffer, ef_addr32 ctx);
+uint32_t for_each_entry_beebc(ef_addr32 a, int16_t arg2, ef_addr32 list, ef_addr32 arg4, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
+ef_addr32 guest_fn_eb520_x(uint32_t key, ef_addr32 ctx); /* 0xeb520 EAX/EDX */
+uint32_t guest_fn_bed1c_x(ef_addr32 a, uint32_t arg2, uint32_t index, ef_addr32 list, ef_addr32 arg4, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0xbed1c EAX/EDX/EBX/ECX + 6 stack */
+
 #endif

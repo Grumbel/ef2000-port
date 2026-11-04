@@ -4609,3 +4609,12 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xd663c` | EAX:ef_addr32 | none | 1a358@1a385,1a390@1a3c0,1e480@1e4fc | Remap a 256-entry palette, upload it to the VGA DAC and keep a copy of the source at 0x420a90. |
 | `0xd710c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | If a record's mode (+0x30) is 1, register its stack range (+8, length +0x10 minus 1) and set its field to 0x40 (cdecl, r |
+
+## game_helpers131 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x48c34` | [ESP+4]:uint32_t,[ESP+8]:ef_addr32 | EAX:int32_t | 11e7c@11f84,11e7c@12067,150d4@1513c | Width of a formatted string: mode 1 uses the proportional font width, mode 2 six pixels per character, anything else eig |
+| `0x3d308` | [ESP+4]:int32_t,[ESP+8]:int32_t,[ESP+12]:ef_addr32 | none | 3d4b0@3d55e,3d4b0@3d576,3d4b0@3d592 | Draw a formatted string at character cell (col, row) with a one-pixel shadow: col * 8, row * 9 pixels (cdecl, variadic). |
+| `0xebb10` | EAX:uint32_t,EDX:ef_addr32,EBX:ef_addr32 | AL:uint8_t | 9cc28@9cc4a,9cc28@9cc6e | Read an entry's block: find the directory entry for the key in the context, seek the context's handle to the entry posit |
+| `0xbeebc` | EAX:ef_addr32,DX:int16_t,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t | EAX:uint32_t | bc610@bc793 | Run 0xbed1c once for every entry of a list (count from 0xbc5d0), passing the index as a byte in EBX and forwarding the other arguments; returns the last result|
