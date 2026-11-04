@@ -4551,4 +4551,7 @@ void draw_text_large_dd4c4(uint32_t colour, uint32_t x, uint32_t y, uint32_t str
 void draw_text_medium_dd5bc(uint32_t colour, uint32_t x, uint32_t y, uint32_t str);
 void draw_text_small_dd6a0(uint32_t colour, uint32_t x, uint32_t y, uint32_t str);
 
+uint32_t tree_find_or_insert_de7d0(uint32_t text);
+uint32_t tree_find_or_insert_9dbf0(uint32_t text);
+
 #endif

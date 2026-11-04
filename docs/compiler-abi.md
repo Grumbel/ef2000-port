@@ -5443,3 +5443,10 @@ in EAX, format string address, one value).
 | `0xdd4c4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | a8578@a862e | Draw a string with the large font (glyphs 0x15e61c, widths 0x15e27e, space 0x11, spacing 2). |
 | `0xdd5bc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | a8578@a8642 | Draw a string with the medium font (glyphs 0x15e6ac, widths 0x15e2a2, space 5, spacing 1). |
 | `0xdd6a0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 27d18@27dc1,27d18@27e77,27fec@281b6 | Draw a string with the small font (glyphs 0x15e73c, widths 0x15e2c6, space 5, spacing 1; 0xa5 is not remapped). |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xde7d0` | EAX:uint32_t | EAX:uint32_t | de864@de958 | Look up the hash of the name in the binary tree whose keys are at 0x426150 and child word pairs at 0x4270f0 (left/right  |
+| `0x9dbf0` | EAX:uint32_t | EAX:uint32_t | 9de08@9de29 | Same lookup/insert as 0xde7d0 over the tables at 0x412fc0 (keys), 0x40f140 (signed child words) and 0x411080 (payload, n |

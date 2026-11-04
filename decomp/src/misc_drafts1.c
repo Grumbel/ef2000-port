@@ -1199,3 +1199,55 @@ void draw_text_small_dd6a0(uint32_t colour, uint32_t x, uint32_t y, uint32_t str
 {
     draw_text_glyphs(colour, x, y, str, 0x0015e73cu, 0x0015e2c6u, 5u, 1u, 0);
 }
+
+/* 0xde7d0, 147 bytes. Look up the hash of the name in the binary tree whose keys are at 0x426150 and child word pairs at 0x4270f0 (left/right by the sign of the key difference); return the node index when found, otherwise insert a new node numbered by the word at 0x15eea0 under the last visited node and return -1. The new node's key is not stored here. */
+uint32_t tree_find_or_insert_de7d0(uint32_t text)
+{
+    uint32_t h = name_hash_ebfd0(text);
+    uint32_t cur = 0u;
+    uint32_t prev;
+    int32_t diff = 1;
+    uint32_t idx;
+    EF_U32(0x00426150u) = h;
+    do {
+        prev = cur;
+        cur = EF_U16(0x004270f0u + cur * 4u + (diff >= 0 ? 2u : 0u));
+        diff = (int32_t)(h - EF_U32(0x00426150u + cur * 4u));
+    } while (diff != 0);
+    if (cur != 0u)
+        return cur;
+    idx = (uint32_t)(int32_t)EF_S16(0x0015eea0u);
+    EF_U32(EF_U32(0x00428860u) + idx * 4u) = (uint32_t)diff;
+    EF_U16(0x004270f0u + idx * 4u) = 0u;
+    EF_U16(0x004270f2u + idx * 4u) = 0u;
+    diff = (int32_t)(h - EF_U32(0x00426150u + prev * 4u));
+    EF_U16(0x004270f0u + prev * 4u + (diff >= 0 ? 2u : 0u)) = (uint16_t)idx;
+    return 0xffffffffu;
+}
+
+/* 0x9dbf0, 149 bytes. Same lookup/insert as 0xde7d0 over the tables at 0x412fc0 (keys), 0x40f140 (signed child words) and 0x411080 (payload, node 0 receives the argument), new node numbers from the word at 0x132b10. */
+uint32_t tree_find_or_insert_9dbf0(uint32_t text)
+{
+    uint32_t h;
+    uint32_t cur = 0u;
+    uint32_t prev;
+    int32_t diff = 1;
+    uint32_t idx;
+    EF_U32(0x00411080u) = text;
+    h = name_hash_ebfd0(text);
+    EF_U32(0x00412fc0u) = h;
+    do {
+        prev = cur;
+        cur = (uint32_t)(int32_t)EF_S16(0x0040f140u + cur * 4u + (diff >= 0 ? 2u : 0u));
+        diff = (int32_t)(EF_U32(0x00412fc0u) - EF_U32(0x00412fc0u + cur * 4u));
+    } while (diff != 0);
+    if (cur != 0u)
+        return cur;
+    idx = (uint32_t)(int32_t)EF_S16(0x00132b10u);
+    EF_U32(0x00411080u + idx * 4u) = (uint32_t)diff;
+    EF_U16(0x0040f140u + idx * 4u) = 0u;
+    EF_U16(0x0040f142u + idx * 4u) = 0u;
+    diff = (int32_t)(EF_U32(0x00412fc0u) - EF_U32(0x00412fc0u + prev * 4u));
+    EF_U16(0x0040f140u + prev * 4u + (diff >= 0 ? 2u : 0u)) = (uint16_t)idx;
+    return 0xffffffffu;
+}

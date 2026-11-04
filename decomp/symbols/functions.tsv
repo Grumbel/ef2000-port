@@ -2080,7 +2080,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d990	191	load_string_table_9d990	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009d990.json	docs/compiler-abi.md; Load the quoted-string file into an arena block and index its strings.; callers 9da80@9da8d; guest pending
 0x0009da50	47	skip_line_9da50	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009da50.json	docs/compiler-abi.md; Skip to the end of the current line and past the line break.; callers 9da80@9db09,9da80@9dbc8; guest pending
 0x0009da80	365			unknown	unclassified	unverified		
-0x0009dbf0	149			unknown	unclassified	unverified		
+0x0009dbf0	149	tree_find_or_insert_9dbf0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009dbf0.json	docs/compiler-abi.md; Same lookup/insert as 0xde7d0 over the tables at 0x412fc0 (keys), 0x40f140 (signed child words) and 0x411080 (payload, n; callers 9de08@9de29; guest pending
 0x0009dc88	110	append_base_name_9dc88	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009dc88.json	docs/compiler-abi.md; Lower-case the name part (at most 8 chars) of a file name and append it to a path.; callers 9de08@9de22; guest pending
 0x0009dcf8	228			unknown	unclassified	unverified		
 0x0009dddc	1	nop_9dddc	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0009dddc.json	docs/compiler-abi.md; 1 byte. No-op.; callers 7a844@7a84d,7a844@7a9aa; guest pending
@@ -3271,7 +3271,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000de5f4	84	fade_palette_in_slow_de5f4	game_helpers91	compiles	game	confirmed	decomp/tests/0x000de5f4.json	docs/compiler-abi.md; Fade the palette in from black over 80 steps.; callers a8a38@a8afa,a8bd4@a8d6d; guest pending
 0x000de648	121	fade_palette_out_de648	game_helpers89	compiles	game	confirmed	decomp/tests/0x000de648.json	docs/compiler-abi.md; Fade the palette out to black over 40 steps, then clear and reset it.; callers 284ec@285ac,a8958@a89e5,a8a38@a8ba9; guest pending
 0x000de6c4	121	fade_palette_out_slow_de6c4	game_helpers89	compiles	game	confirmed	decomp/tests/0x000de6c4.json	docs/compiler-abi.md; Same as de648 but over 80 steps.; callers a8a38@a8bba,a8bd4@a8f3a; guest pending
-0x000de7d0	147			unknown	unclassified	unverified		
+0x000de7d0	147	tree_find_or_insert_de7d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000de7d0.json	docs/compiler-abi.md; Look up the hash of the name in the binary tree whose keys are at 0x426150 and child word pairs at 0x4270f0 (left/right ; callers de864@de958; guest pending
 0x000de864	620			unknown	unclassified	unverified		
 0x000dead0	74	find_table_entry_dead0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000dead0.json	docs/compiler-abi.md; Find a key in the 1-based id table (stack argument) or abort.; callers a1d50@a1e67,c5d8f@c5df0,c74bc@c7509; guest pending
 0x000deb1a	27			unknown	unclassified	unverified		
