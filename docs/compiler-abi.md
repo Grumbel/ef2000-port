@@ -3616,3 +3616,20 @@ in EAX, format string address, one value).
 | `0x53330` | EAX:float,EDX:float,EBX:float | EAX:double | 53350@53364,53350@534aa | Length of a vector of three floats. |
 | `0x54110` | none | none | 3dd30@3dfa4 | Store the scaled frame step and refresh the dependent tables. |
 | `0x5f944` | none | none | 5f60@5f61 | Fill a 90-entry scaled sine table. |
+
+## float_helpers3 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x80f4` | EAX:ef_addr32,EDX:uint32_t | EAX:double | 8184@81af,2d488@2d5be | Distance from a context to a table entry's centre, or a large sentinel. |
+| `0x8394` | AL:uint8_t,DL:uint8_t | none | 84b8@85df,8fe4@905d | Flag a sub-entry as ahead (1) or behind (0xff) from a direction test. |
+| `0x8424` | AL:uint8_t,DL:uint8_t | EAX:int32_t | 84b8@861a,8cc4@8dbc | Scaled heading of a sub-entry as an integer angle, wrapped positive. |
+| `0x18118` | none | none | 7957c@79654 | Toggle the autopilot hint flag when the player is in the right state. |
+| `0x1d7a4` | EAX:ef_addr32 | none | 1d700@1d746 | Initialise an autopilot context from its waypoint table. |
+| `0x6a5ac` | EAX:ef_addr32,DX:int16_t | EAX:double | 73820@738f8 | Helper result for the offset from a position to a unit, or 0.0. |
+| `0x6a66c` | AX:int16_t,DX:int16_t | EAX:double | 6a760@6a7c6 | Distance between two units, or 0.0 when either is missing. |
+| `0x6a6e8` | EAX:ef_addr32,DX:int16_t,BX:int16_t | none | 6a760@6a7bd | Difference of two units' weighted axes, stored as three doubles. |
+| `0x6bd88` | none | none | 6b6c8@6bbb8 | Copy the camera position and recompute the closing-speed state. |
+| `0x84f60` | AX:int16_t,DL:uint8_t | EAX:double | 49228@49b86,55bf8@55c73,55bf8@55ccb | Double stored in a unit's slot table, or 0.0 when the unit is missing. |
+| `0x86720` | none | none | 86110@866c6,8cb60@8cc35 | Sum the weighted entries of the player's slot list into two doubles. |
+| `0x88d90` | EAX:ef_addr32,EDX:ef_addr32 | none | 89e08@89f41,8a318@8a67d | Scale a three-double vector in place and store its truncated components. |

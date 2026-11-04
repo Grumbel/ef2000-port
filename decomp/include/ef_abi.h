@@ -2973,7 +2973,7 @@ int32_t current_object_metric_66c4(void);
 void scaled_entry_point_7ca8(ef_addr32 out, uint8_t index, uint8_t sub);
 uint8_t find_min_metric_index_8184(ef_addr32 context);
 double sub_entry_value_81ec(uint8_t index, uint8_t sub);
-void report_waypoint_offset_1d844(ef_addr32 context);
+double report_waypoint_offset_1d844(ef_addr32 context);
 uint8_t waypoint_near_1d8e8(ef_addr32 context);
 void scaled_rotation_29adc(ef_addr32 record, ef_addr32 out1, ef_addr32 out2);
 void unpack_pair_2aa08(ef_addr32 out, ef_addr32 in);
@@ -2984,12 +2984,12 @@ double guest_fn_6a760(int32_t a, int32_t b); /* 0x6a760 EAX/EDX -> ST0 */
 double guest_fn_b4230(int32_t value); /* 0xb4230 EAX -> ST0 */
 double guest_fn_80f4(ef_addr32 context, uint32_t index); /* 0x80f4 EAX/EDX -> ST0 */
 double guest_fn_b42f0(double value); /* 0xb42f0 stack -> ST0 */
-void guest_fn_b4620(double first, double second); /* 0xb4620 stack */
+double guest_fn_b4620(double first, double second); /* 0xb4620 stack -> ST0 */
 double guest_fn_b415c(ef_addr32 a, ef_addr32 b); /* 0xb415c EAX/EDX -> ST0 */
 
 /* float_helpers2.c */
 uint8_t record_near_unit_2dbf8(int16_t index, uint8_t unit);
-void report_point_offset_37c0c(ef_addr32 position, int16_t index);
+double report_point_offset_37c0c(ef_addr32 position, int16_t index);
 uint8_t point_near_unit_37c64(int16_t index, uint8_t unit);
 uint8_t point_near_player_37cdc(int16_t index);
 uint8_t point_not_far_from_unit_37d88(int16_t index, uint8_t unit);
@@ -3009,5 +3009,24 @@ void guest_fn_54274(void); /* 0x54274 */
 void guest_fn_54328(void); /* 0x54328 */
 void guest_fn_5437c(void); /* 0x5437c */
 double guest_fn_b45fa(double value); /* 0xb45fa ST0 -> ST0 */
+
+/* float_helpers3.c */
+double entry_distance_80f4(ef_addr32 context, uint32_t index);
+void flag_sub_entry_side_8394(uint8_t index, uint8_t sub);
+int32_t sub_entry_heading_8424(uint8_t index, uint8_t sub);
+void toggle_hint_flag_18118(void);
+void init_autopilot_context_1d7a4(ef_addr32 context);
+double unit_offset_value_6a5ac(ef_addr32 position, int16_t unit);
+double unit_distance_6a66c(int16_t first, int16_t second);
+void unit_axis_difference_6a6e8(ef_addr32 out, int16_t first, int16_t second);
+void update_camera_state_6bd88(void);
+double unit_slot_value_84f60(int16_t unit, uint8_t slot);
+void sum_slot_weights_86720(void);
+void scale_vector_to_ints_88d90(ef_addr32 out, ef_addr32 vec);
+ef_addr32 guest_fn_6a1b4(int32_t unit); /* 0x6a1b4 EAX */
+double guest_fn_b41bc(ef_addr32 a, ef_addr32 b); /* 0xb41bc EAX/EDX -> ST0 */
+void guest_fn_6c2a4(void); /* 0x6c2a4 */
+void guest_fn_6bee8(void); /* 0x6bee8 */
+void guest_fn_6be28(void); /* 0x6be28 */
 
 #endif

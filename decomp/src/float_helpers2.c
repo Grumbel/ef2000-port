@@ -27,15 +27,15 @@ uint8_t record_near_unit_2dbf8(int16_t index, uint8_t unit)
     return result;
 }
 
-/* 0x37c0c, 86 bytes. Report the offset between a table point and a position. */
-void report_point_offset_37c0c(ef_addr32 position, int16_t index)
+/* 0x37c0c, 86 bytes. Return the helper result for the offset between a table point and a position (ST0). */
+double report_point_offset_37c0c(ef_addr32 position, int16_t index)
 {
     ef_addr32 entry = EF_U32(0x001a14f8u) + (uint32_t)(int32_t)index * 69u;
     double scale = EF_F64(0x001833b0u);
     double a = (double)EF_S32(entry + 0xfu) * scale;
     double b = (double)EF_S32(entry + 7u) * scale;
 
-    guest_fn_b4620(b - EF_F64(position + 8u), a - EF_F64(position));
+    return guest_fn_b4620(b - EF_F64(position + 8u), a - EF_F64(position));
 }
 
 /* 0x37c64, 117 bytes. True when a table point is close to a unit's position. */

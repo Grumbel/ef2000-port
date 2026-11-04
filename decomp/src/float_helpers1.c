@@ -79,15 +79,15 @@ double sub_entry_value_81ec(uint8_t index, uint8_t sub)
     return guest_fn_b42f0(EF_F64(rec + 0x18u) + EF_F64(0x00180408u));
 }
 
-/* 0x1d844, 100 bytes. Pass the scaled offset of the current waypoint to a helper. */
-void report_waypoint_offset_1d844(ef_addr32 context)
+/* 0x1d844, 100 bytes. Return the helper result for the scaled offset of the current waypoint (ST0). */
+double report_waypoint_offset_1d844(ef_addr32 context)
 {
     ef_addr32 entry = EF_U32(context + 0xa1u) + (uint32_t)EF_U8(context + 0xa5u) * 25u;
     double scale = EF_F64(0x00181960u);
     double a = (double)EF_S32(entry + 4u) * scale - EF_F64(context + 0x51u);
     double b = (double)EF_S32(entry) * scale - EF_F64(context + 0x59u);
 
-    guest_fn_b4620(b, a);
+    return guest_fn_b4620(b, a);
 }
 
 /* 0x1d8e8, 106 bytes. True when the current waypoint is within the limit on either axis. */
