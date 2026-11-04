@@ -17301,3 +17301,41 @@ void draw_group_icons_433fc(uint32_t a, ef_addr32 head)
 		node = EF_U32(node + 4u);
 	}
 }
+
+/* 0x44f68, 396 bytes. Sibling of 0x433fc for entries of kind 0x44, 0x45 and 0x46 (byte +0xb; index byte +0x9): walk the list at HEAD (EDX; link +4) for the group value A (EAX); the positive, negative and zero group flags (0xcc22c, 0xcc1ac, 0xcc1ec; enabled by the words 0x126554, 0x126556 and again 0x126556 - ORIGINAL BUG: the zero case tests the negative-flag enable word) pick the destination offset 0x126570 + x + y * 640 from the word pairs 0x134496/0x134498 or 0x13448d/0x13448f, and a true 0xbc7ec test picks the pair 0x134742/0x134744. The icon (words +0x16 and +0x1a of the entry, 400 - h - 10) is blitted with 0xca620 and, when word 0x12656a is set, sprite 0x1a is drawn (0x440f4). */
+void draw_unit_icons_44f68(uint32_t a, ef_addr32 head)
+{
+	uint32_t node = EF_U32(head);
+	uint32_t ebp = 0u;
+	int32_t x, y;
+	uint8_t flag, kind;
+
+	while (node != 0u) {
+		kind = EF_U8(node + 0xbu);
+		if (kind == 0x44u || kind == 0x45u || kind == 0x46u) {
+			flag = 0u;
+			if ((uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 9u), a) != 0u && EF_U16(0x00126554u) != 0u) {
+				ebp = EF_U32(0x00126570u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x00134496u) + (int32_t)(int16_t)EF_U16(0x00134498u) * 0x280);
+				flag = 1u;
+			} else if ((uint16_t)group_flag_negative_cc1ac(0u, EF_U8(node + 9u), a) != 0u && EF_U16(0x00126556u) != 0u) {
+				ebp = EF_U32(0x00126570u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x0013448du) + (int32_t)(int16_t)EF_U16(0x0013448fu) * 0x280);
+				flag = 1u;
+			} else if ((uint16_t)group_flag_zero_cc1ec(0u, EF_U8(node + 9u), a) != 0u && EF_U16(0x00126556u) != 0u) {
+				ebp = EF_U32(0x00126570u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x0013448du) + (int32_t)(int16_t)EF_U16(0x0013448fu) * 0x280);
+				flag = 1u;
+			}
+			if ((uint16_t)guest_fn_bc7ec(node) != 0u) {
+				ebp = EF_U32(0x00126570u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x00134742u) + (int32_t)(int16_t)EF_U16(0x00134744u) * 0x280);
+				flag = 1u;
+			}
+			if (flag != 0u) {
+				y = (int32_t)(int16_t)(0x190u - EF_U16(node + 0x1au) - 10u);
+				x = (int32_t)(int16_t)(EF_U16(node + 0x16u) - 10u);
+				guest_fn_ca620((int32_t)ebp, x, y, 0x14u, 0x14u, 0x280u);
+				if (EF_U16(0x0012656au) != 0u)
+					guest_fn_440f4_x(EF_U8(node + 9u), x, y, 0x14u, 0x1au, 0x280u);
+			}
+		}
+		node = EF_U32(node + 4u);
+	}
+}

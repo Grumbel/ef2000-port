@@ -5907,4 +5907,6 @@ void draw_target_readout_5acf0(void);
 
 void draw_group_icons_433fc(uint32_t a, ef_addr32 head);
 
+void draw_unit_icons_44f68(uint32_t a, ef_addr32 head);
+
 #endif
