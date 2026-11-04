@@ -8144,3 +8144,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xac5f8` | EAX:uint32_t | EAX:uint32_t | 84c84@84ce0,a4dd0@a4df4 | Main frame step of the front-end state machine (AL = loop flag). Leaves a pending redraw state (byte 0x41f2e4), then rep |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xac408` | EAX:ef_addr32 | none | 84c84@84ca0,84c84@84ccd,ac780@ac79b | Show the text EAX in the front-end: error hook 0x18dc14 when byte 0x137254 is clear, then reset the display state (0xabe |

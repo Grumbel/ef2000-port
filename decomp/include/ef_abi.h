@@ -5780,4 +5780,13 @@ uint32_t guest_fn_f18a4_x(uint32_t a); /* 0xf18a4 EAX -> EAX */
 uint32_t guest_fn_f1a70_x(void); /* 0xf1a70 -> EAX */
 void guest_fn_ac780_x(void); /* 0xac780 */
 
+void show_text_ac408(ef_addr32 text);
+void guest_fn_c8f38_x(void); /* 0xc8f38 */
+void guest_fn_c90e0_x(void); /* 0xc90e0 */
+void guest_fn_c8e58_x(void); /* 0xc8e58 */
+void guest_fn_c9ecc_x(void); /* 0xc9ecc */
+void guest_fn_ac9e8_x(void); /* 0xac9e8 */
+void guest_fn_abc98_x(void); /* 0xabc98 */
+uint32_t guest_fn_ce064_x(void); /* 0xce064 -> AX */
+
 #endif

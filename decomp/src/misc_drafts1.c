@@ -15135,3 +15135,57 @@ uint32_t run_frame_step_ac5f8(uint32_t al)
 		report_fatal_ac7c8(0x0018dc54u);
 	return result;
 }
+
+/* 0xac408, 372 bytes. Show the text EAX in the front-end: error hook 0x18dc14 when byte 0x137254 is clear, then reset the display state (0xabec4, 0xc8fdc, 0xc90c0, 0xc8e38, 0xa4e6c), run the page callbacks for 0x18dc40 (0xac240) and 0xaca94. An empty text runs the callbacks for each of the up to sixteen 0x15-byte records at 0x41eab0 whose first byte is nonzero. Otherwise (clearing the block 0xabe24 first when byte 0x41f2e7 is set) the text is split into words at characters whose class byte (table 0x195af0 indexed by char + 1) has bit 1 set and every word is passed to the callbacks together with 0x41f2e7. Finally restore the display (0xc8f38, 0xc90e0, 0xc8e58), set byte 0x13727d, clear dword 0x41eea0 and the 0x59-byte record 0x41f284 and word 0x41eec2, then drain the event queue (0xce064) and clear the pending key bytes. ORIGINAL BUG: the word buffer is only 12 bytes; a longer word overruns it (a larger buffer is used here). */
+void show_text_ac408(ef_addr32 text)
+{
+	char word[256];
+	uint32_t i, n;
+	uint8_t c;
+
+	if (EF_U8(0x00137254u) == 0u)
+		guest_callptr1_x(EF_U32(0x00132a74u), 0x0018dc14u);
+	guest_tail_abec4(0u);
+	clear_byte_c8fdc();
+	clear_byte_c90c0();
+	clear_byte_c8e38();
+	clear_id_table_a4e6c();
+	run_page_callbacks_ac240(0x0018dc40u, 0u);
+	guest_fn_aca94_w();
+	if (EF_U8(text) == 0u) {
+		for (i = 0; i < 0x10u && EF_U8(0x0041eab0u + i * 0x15u) != 0u; i++)
+			run_page_callbacks_ac240(0x0041eab0u + i * 0x15u, 0u);
+	} else {
+		if (EF_U8(0x0041f2e7u) != 0u)
+			clear_block_abe24();
+		while (EF_U8(text) != 0u) {
+			n = 0u;
+			while ((c = EF_U8(text + n)) != 0u && (EF_U8(0x00195af0u + (uint8_t)(c + 1u)) & 2u) == 0u) {
+				if (n < sizeof word - 1u)
+					word[n] = (char)c;
+				n++;
+			}
+			word[n < sizeof word - 1u ? n : sizeof word - 1u] = 0;
+			run_page_callbacks_ac240((ef_addr32)(uintptr_t)word, EF_U8(0x0041f2e7u));
+			text += n;
+			while ((EF_U8(0x00195af0u + (uint8_t)(EF_U8(text) + 1u)) & 2u) != 0u)
+				text++;
+		}
+	}
+	guest_fn_c8f38_x();
+	guest_fn_c90e0_x();
+	guest_fn_c8e58_x();
+	EF_U8(0x0013727du) = 1u;
+	EF_U32(0x0041eea0u) = 0u;
+	guest_fn_c9ecc_x();
+	fill_bytes_b3fb0(0x0041f284u, 0u, 0x59u);
+	EF_U16(0x0041eec2u) = 0u;
+	guest_fn_ac9e8_x();
+	EF_U8(0x0041f2e0u) = 0u;
+	if (EF_U8(0x0041f2e3u) != 0u)
+		guest_fn_abc98_x();
+	EF_U8(0x0041f833u) = 0u;
+	EF_U8(0x0041f2e6u) = 0u;
+	while ((guest_fn_ce064_x() & 0xffffu) != 0u)
+		;
+}
