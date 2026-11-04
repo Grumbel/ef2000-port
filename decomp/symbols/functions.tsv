@@ -3482,7 +3482,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ea84c	21	clear_vector3	math_string	compiles	game	confirmed	decomp/tests/0x000ea84c.json	docs/compiler-abi.md; Clear three dwords.; callers 9fea8@9ffb4,9fea8@9ffbc; guest pending
 0x000ea864	9	store_triple_ea864	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000ea864.json	docs/compiler-abi.md; Store three dwords.; callers 97534@97578,97534@9758a,975f0@97674; guest pending
 0x000ea870	19	copy_vector3	math_string	compiles	game	confirmed	decomp/tests/0x000ea870.json	docs/compiler-abi.md; Copy three dwords from EDX to EAX.; callers 97914@97929,97950@97968,97950@9798c; guest pending
-0x000ea884	71			unknown	unclassified	unverified		
+0x000ea884	71	divide_by_scaled_word_f8314	float_helpers7	compiles	game	confirmed	decomp/tests/0x000ea884.json	docs/compiler-abi.md; Length of an integer 3D vector as a float, 0.0 for a negative sum. */ float int_vector_length_ea884(ef_addr32 vec) { int; callers 9775c@977d4,979c8@97a03; guest pending
 0x000ea8cc	66			unknown	unclassified	unverified		
 0x000ea958	33	add_vector3	math_string	compiles	game	confirmed	decomp/tests/0x000ea958.json	docs/compiler-abi.md; Add three dwords of EDX to those at EAX.; callers 97914@97944,97950@97983,97950@979a0; guest pending
 0x000ea9a0	22	set_vector3_from_words	math_string	compiles	game	confirmed	decomp/tests/0x000ea9a0.json	docs/compiler-abi.md; Dwords at EAX = sign-extended DX, BX, CX.; callers 9ffc8@9fffe; guest pending
@@ -3680,7 +3680,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f8278	29			unknown	unclassified	unverified		
 0x000f8298	29			unknown	unclassified	unverified		
 0x000f8314	78			unknown	unclassified	unverified		
-0x000f83d0	79			unknown	unclassified	unverified		
+0x000f83d0	79	int_distance_2d_f83d0	float_helpers7	compiles	game	confirmed	decomp/tests/0x000f83d0.json	docs/compiler-abi.md; Distance between two integer 2D points, 0.0 when coincident.; callers b04e8@b04fc,b52bc@b5332,b686c@b68c4; guest pending
 0x000f8600	35			unknown	unclassified	unverified		
 0x000f8624	633			unknown	unclassified	unverified		
 0x000f88a0	69	check_entry_f88a0	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000f88a0.json	docs/compiler-abi.md; ; callers f8988@f89b3; guest pending

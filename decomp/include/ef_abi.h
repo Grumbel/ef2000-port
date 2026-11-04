@@ -3429,4 +3429,8 @@ uint32_t guest_fn_bc36a_w(uint32_t a, uint32_t b); /* 0xbc36a EAX/EDX */
 /* game_helpers58.c */
 void reset_table_record_112b1c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 stack_rec);
 
+/* float_helpers7.c */
+double divide_by_scaled_word_f8314(int16_t n, uint32_t u1, uint32_t u2, uint32_t u3, double value);
+double int_distance_2d_f83d0(int32_t x1, int32_t x2, int32_t y1, int32_t y2);
+
 #endif

@@ -3852,3 +3852,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x112b1c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 112bbc@112bc2,113c7c@113cdb | Reset a table record: clear the slots, fill the index tables with -1 and set defaults. |
+
+## float_helpers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xea884` | AX:int16_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | EAX:double | 9775c@977d4,979c8@97a03 | Length of an integer 3D vector as a float, 0.0 for a negative sum. */ float int_vector_length_ea884(ef_addr32 vec) { int |
+| `0xf83d0` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | EAX:double | b04e8@b04fc,b52bc@b5332,b686c@b68c4 | Distance between two integer 2D points, 0.0 when coincident. |
