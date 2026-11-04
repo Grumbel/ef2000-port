@@ -4902,3 +4902,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xd9b30` | none | EAX:uint32_t | 919d4@91a87,e9ac0@e9ad9 | Probe base values 0x6000 + n*0x100 (n = 0..16) with the 0x8b8 service 0x33 and return the first value whose reply echoes |
 | `0xe9ac0` | none | EAX:uint32_t | 8b39c@8b4c9 | Run the probe selected by the state word at 0x464472 (1, 2 or 3), print a message when it reports failure, and return th |
+
+## probe_helpers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1e214` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | EAX:uint32_t | 1e28c@1e334,1e3c4@1e432 | For an open entry, rotate the query point (x, y, z) by the entry's orientation (0..3) and walk the script cursor until o |

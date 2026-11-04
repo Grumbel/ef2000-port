@@ -49,3 +49,24 @@ uint32_t run_probe_e9ac0(void)
     }
     return EF_U16(0x00464472u);
 }
+
+/* 0x1e214, 117 bytes. For an open entry, rotate the query point (x, y, z) by the entry's orientation (0..3) and walk the script cursor until one of its boxes contains the point (1) or the entries run out (0). */
+uint32_t point_in_entry_boxes_1e214(uint32_t entry, int32_t x, int32_t y, int32_t z)
+{
+    int32_t px, pz;
+    int16_t page = (int16_t)entry;
+    if (open_entry_cd150(page) == 0u)
+        return 0u;
+    switch (record_flag_bits56(page)) {
+    case 0: px = x; pz = z; break;
+    case 1: px = -z; pz = x; break;
+    case 2: px = -x; pz = -z; break;
+    case 3: px = z; pz = -x; break;
+    default: px = x; pz = z; break;
+    }
+    do {
+        if (point_in_box_1e1c0(script_cursor_data_cd29c(), px, y, pz) != 0u)
+            return 1u;
+    } while (advance_cursor() != 0u);
+    return 0u;
+}

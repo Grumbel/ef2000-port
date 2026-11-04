@@ -4240,4 +4240,6 @@ uint32_t probe_service_d9b30(void);
 uint32_t run_probe_e9ac0(void);
 void guest_callptr2_x(ef_addr32 fn, uint32_t a, uint32_t b); /* indirect cdecl call with two stack arguments, caller cleanup */
 
+uint32_t point_in_entry_boxes_1e214(uint32_t entry, int32_t x, int32_t y, int32_t z);
+
 #endif
