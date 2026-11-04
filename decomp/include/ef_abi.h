@@ -5069,4 +5069,6 @@ void unpack_settings_3519c(ef_addr32 src);
 
 void poll_modem_status_df738(void);
 
+void select_animation_11458c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t rec, uint32_t key);
+
 #endif

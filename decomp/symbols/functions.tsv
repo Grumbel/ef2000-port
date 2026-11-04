@@ -4121,7 +4121,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001141b0	95	start_value_ramp_1141b0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x001141b0.json	docs/compiler-abi.md; Start a ramp of the value at +0x48 to a target over time; sets the per-step delta at +0x54.; callers 1031cc@1031fc; guest pending
 0x001142cc	75	refresh_player_channels_1142cc	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x001142cc.json	docs/compiler-abi.md; When the value at the argument changes, resend the channel volumes of every active (state 4) channel of the player.; callers 1033c8@1033f2; guest pending
 0x0011451c	110	advance_text_cursor_11451c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011451c.json	docs/compiler-abi.md; Advance a (column, row) cursor of a text object by 0x4dd804 steps: each step adds +0x68 to the accumulator at +0x6c and ; callers 103778@1037aa; guest pending
-0x0011458c	138			unknown	unclassified	unverified		
+0x0011458c	138	select_animation_11458c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011458c.json	docs/compiler-abi.md; Cdecl (REC, KEY): look KEY up in the 6-byte entry table of the animation set at REC+0xc (count: signed word +8, entries ; callers 1037e0@10380a; guest pending
 0x001146ec	394			unknown	unclassified	unverified		
 0x00114878	284			unknown	unclassified	unverified		
 0x00114994	52	set_owner_slot_114994	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00114994.json	docs/compiler-abi.md; Record slot b of owner a as value c-1 (cdecl).; callers 103b90@103bc0; guest pending

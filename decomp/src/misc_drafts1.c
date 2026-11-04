@@ -6711,3 +6711,42 @@ void poll_modem_status_df738(void)
     if ((EF_U8(0x0015eed4u) & 0x80u) == 0u && EF_U8(0x0013578cu) != 0u)
         EF_U8(0x0013581eu) = 1u;
 }
+
+/* 0x11458c, 138 bytes. Cdecl (REC, KEY): look KEY up in the 6-byte entry table of the animation set at REC+0xc (count: signed word +8, entries from +0xa, key word first); when found, clear REC dword +0x30, set REC +0x14 to REC +0x10 + 8 + the entry's dword +2 and, unless dword 0x4dd808 is set, reset the four dwords at REC +0x84..+0x90 to -1. Does nothing when REC or its set is missing or KEY is not found. */
+void select_animation_11458c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t rec, uint32_t key)
+{
+    uint32_t set, ent, i;
+    int32_t n;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (rec == 0u)
+        return;
+    set = EF_U32(rec + 0xcu);
+    if (set == 0u)
+        return;
+    n = (int16_t)EF_U16(set + 8u);
+    ent = set + 0xau;
+    i = 0u;
+    if (n > 0) {
+        uint32_t e = ent;
+        do {
+            if (EF_U16(e) == key)
+                break;
+            i++;
+            e += 6u;
+        } while ((int32_t)i < n);
+    }
+    if ((int32_t)i == n)
+        return;
+    ent += i * 6u;
+    EF_U32(rec + 0x30u) = 0u;
+    EF_U32(rec + 0x14u) = EF_U32(rec + 0x10u) + 8u + EF_U32(ent + 2u);
+    if (EF_U32(0x004dd808u) == 0u) {
+        uint32_t p = rec + 4u;
+        for (;;) {
+            EF_U32(p + 0x80u) = 0xffffffffu;
+            if (p == rec + 0x10u)
+                break;
+            p += 4u;
+        }
+    }
+}
