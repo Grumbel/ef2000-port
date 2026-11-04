@@ -3198,4 +3198,41 @@ void guest_fn_118b60_s(void); /* 0x118b60 */
 void guest_fn_10e4dd_s(uint32_t a, uint32_t b, uint32_t c); /* 0x10e4dd EAX/EDX/EBX */
 ef_addr32 guest_fn_b3f58_id(uint32_t id); /* 0xb3f58 EAX */
 
+/* leaf_helpers2.c */
+uint32_t dos_call_2503_324(uint32_t a);
+void dos_call_2505_3d0(uint32_t a, uint32_t b);
+void dos_call_3503_c24(int16_t a, uint32_t b);
+void run_named_widget_a5bc(void);
+void run_named_widget_7cc38(void);
+void register_callback_84d94(void);
+void latch_decoded_key_a29cc(uint8_t key);
+void issue_state_request_a32c8(uint8_t value);
+void copy_constants_c469b(void);
+void restore_video_mode_cdc64(void);
+uint8_t refresh_cached_chunk_ea3ec(ef_addr32 descriptor);
+int32_t set_default_file_buffer_11159a(ef_addr32 file, ef_addr32 buffer);
+uint32_t entry_empty_118520(ef_addr32 record);
+void run_table_initialisers_1196a0(void);
+void store_derived_pair_11f538(ef_addr32 out, uint32_t value);
+void guest_fn_c868_w(ef_addr32 widget); /* 0xc868 EAX */
+void guest_fn_c768_w(uint32_t value); /* 0xc768 EAX */
+void guest_fn_7bc40_w(ef_addr32 widget); /* 0x7bc40 EAX */
+void guest_fn_abf8c_w(uint32_t a, uint32_t b, uint32_t c); /* 0xabf8c EAX/EDX/EBX */
+void guest_fn_ab838_w(uint32_t callback); /* 0xab838 EAX */
+void guest_fn_a29f8_w(uint32_t key); /* 0xa29f8 EAX */
+uint8_t guest_fn_a2948_w(uint32_t key, uint32_t flag); /* 0xa2948 EAX/EDX -> AL */
+void guest_fn_cdc38_w(void); /* 0xcdc38 */
+uint32_t guest_fn_fe700_w(void); /* 0xfe700 -> AX */
+void guest_fn_fe710_w(int32_t mode); /* 0xfe710 EAX */
+uint32_t guest_fn_ea20c_w(ef_addr32 descriptor); /* 0xea20c EAX -> EAX */
+void guest_fn_1196c8_w(void); /* 0x1196c8 */
+void guest_fn_119844_w(void); /* 0x119844 */
+void guest_fn_1198ec_w(void); /* 0x1198ec */
+void guest_fn_119938_w(void); /* 0x119938 */
+void guest_fn_1199c8_w(void); /* 0x1199c8 */
+void guest_fn_119a54_w(void); /* 0x119a54 */
+void guest_fn_119acc_w(void); /* 0x119acc */
+void guest_fn_11c20c_w(void); /* 0x11c20c */
+uint32_t guest_fn_11f4d8_w(uint32_t value); /* 0x11f4d8 EAX -> EAX */
+
 #endif

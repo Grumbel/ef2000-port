@@ -3728,3 +3728,23 @@ in EAX, format string address, one value).
 | `0x11f2d3` | none | none | 117e0c@117e57,117f68@1180b7,118290@1182a2 | Disable interrupts (no-op on the host). |
 | `0x11f2d5` | none | none | 117e0c@117e9a,117f68@11826c,118290@11841c | Enable interrupts (no-op on the host). |
 | `0x16010e` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 9fb00@9fbe8,9fc00@9fd8c,a0228@a046b | Signed word at +0x10 of the record found by id. |
+
+## leaf_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x324` | EAX:uint32_t | EAX:uint32_t | 734@77a | DOS call 0x2503 with one argument; returns the result word. |
+| `0x3d0` | EAX:uint32_t,EDX:uint32_t | none | 7b4@7db | DOS call 0x2505 with two arguments. |
+| `0xc24` | AX:int16_t,EDX:uint32_t | none | fc9f8@fca16 | DOS call 0x3503 with a signed word and a second argument. |
+| `0xa5bc` | none | none | ba5c@bb3b,bfcc@c284 | Find a named widget and hand it to 0xc868. |
+| `0x7cc38` | none | none | none direct | Reset via 0xc768, then run 0x7bc40 on a named widget. |
+| `0x84d94` | none | none | aaee8@aafaf | Register the 0x84dbc callback through 0xab838 after 0xabf8c. |
+| `0xa29cc` | AL:uint8_t | none | 34ca4@34cde,a3c18@a3c72 | Latch a decoded key into the state table. |
+| `0xa32c8` | AL:uint8_t | none | a32e8@a331d,a32e8@a3342 | Issue a request for one byte of state. |
+| `0xc469b` | none | none | 39744@3975c | Copy three constant dwords from the code area into the work area. |
+| `0xcdc64` | none | none | 8b2d8@8b31a,aaee8@aafdb | Re-apply the stored video mode if it differs from the current one. |
+| `0xea3ec` | EAX:ef_addr32 | AL:uint8_t | 9dcf8@9dd06,de864@de97c | Rebuild the cached chunk when the descriptor has one; true if present. |
+| `0x11159a` | EAX:ef_addr32,EDX:ef_addr32 | EAX:int32_t | 101c54@101cd3 | Set a file's buffer: fully buffered for a given buffer, else line buffered. |
+| `0x118520` | EAX:ef_addr32 | EAX:uint32_t | 106cb0@106cc8,106d34@106d60,106dc4@106dd5 | True when the record has no entry or its entry holds zero. |
+| `0x1196a0` | none | none | 1098f0@1098f0 | Run the seven table initialisers, then 0x11c20c. |
+| `0x11f538` | EAX:ef_addr32,EDX:uint32_t | none | 118770@1187aa,118770@1187b5 | Store two derived values for a number. |
