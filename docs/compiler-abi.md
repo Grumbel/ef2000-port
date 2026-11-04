@@ -5521,3 +5521,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xb3fec` | EAX:double,EDX:double | EAX:double | 16b0c@16b78,6cc5c@6cc81,6cf00@6cf27 | (ret 16) pow(x, y) for positive x via exp(y * ln x) (0xfa362 and 0xdcb96); 0.0 for x <= 0. When the product exceeds the  |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11bbdc` | EAX:double,EDX:double | EAX:double | 11bc40@11bc66 | (ret 16) Falloff curve: for a0 above the threshold at 0x19593c return (1 - pow(a0, 2.9) * k2) * k3 (constants 0x195944 a |
+| `0x11c484` | EAX:uint32_t,EDX:uint32_t | none | 11c20c@11c2b1,11c350@11c379 | Project the record at EDX into the coordinate triple at EAX: v = (s[0x50] - s[0x48] * tan(s[0x58])) / (1 + tan^2) - k80; |

@@ -4591,4 +4591,7 @@ void guest_callptr7_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t
 
 
 
+double falloff_11bbdc(double a0, double a1);
+void project_triple_11c484(uint32_t dst, uint32_t src);
+
 #endif

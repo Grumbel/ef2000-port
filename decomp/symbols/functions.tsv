@@ -4204,7 +4204,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011bab4	65			unknown	unclassified	unverified		
 0x0011baf8	135			unknown	unclassified	unverified		
 0x0011bb80	92			unknown	unclassified	unverified		
-0x0011bbdc	98			unknown	unclassified	unverified		
+0x0011bbdc	98	falloff_11bbdc	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bbdc.json	docs/compiler-abi.md; (ret 16) Falloff curve: for a0 above the threshold at 0x19593c return (1 - pow(a0, 2.9) * k2) * k3 (constants 0x195944 a; callers 11bc40@11bc66; guest pending
 0x0011bc40	130			unknown	unclassified	unverified		
 0x0011bcc4	252			unknown	unclassified	unverified		
 0x0011bdc0	133			unknown	unclassified	unverified		
@@ -4219,7 +4219,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011c0b4	342	initialize_packed_vector_record	unk_geometry	typed	game	confirmed		ABI only; EAX/EDX pointers; 0xd5-byte record, x87 initialization
 0x0011c20c	323			unknown	unclassified	unverified		
 0x0011c350	305			unknown	unclassified	unverified		
-0x0011c484	101			unknown	unclassified	unverified		
+0x0011c484	101	project_triple_11c484	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011c484.json	docs/compiler-abi.md; Project the record at EDX into the coordinate triple at EAX: v = (s[0x50] - s[0x48] * tan(s[0x58])) / (1 + tan^2) - k80;; callers 11c20c@11c2b1,11c350@11c379; guest pending
 0x0011c4ec	152			unknown	unclassified	unverified		
 0x0011c584	1391			unknown	unclassified	unverified		
 0x0011cda5	139			unknown	unclassified	unverified		

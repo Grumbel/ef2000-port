@@ -169,3 +169,22 @@ double pow_b3fec(double x, double y)
     }
     return guest_fn_dcb96_x(p);
 }
+
+/* 0x11bbdc, 98 bytes. (ret 16) Falloff curve: for a0 above the threshold at 0x19593c return (1 - pow(a0, 2.9) * k2) * k3 (constants 0x195944 and 0x19594c), otherwise -0.35. The second argument is unused. */
+double falloff_11bbdc(double a0, double a1)
+{
+    (void)a1;
+    if (a0 > EF_F64(0x0019593cu))
+        return (1.0 - pow_b3fec(a0, 2.9) * EF_F64(0x00195944u)) * EF_F64(0x0019594cu);
+    return -0.35;
+}
+
+/* 0x11c484, 101 bytes. Project the record at EDX into the coordinate triple at EAX: v = (s[0x50] - s[0x48] * tan(s[0x58])) / (1 + tan^2) - k80; dst[+0x10] = v, dst[+8] = -v * tan(s[0x58]) - k78, dst[+0] = s[0x40] - k70 (constants at 0x433080, 0x433078, 0x433070). */
+void project_triple_11c484(uint32_t dst, uint32_t src)
+{
+    double t = tan_b45fa(EF_F64(src + 0x58u));
+    double v = (EF_F64(src + 0x50u) - EF_F64(src + 0x48u) * t) / (1.0 + square_double_b3fd0(t)) - EF_F64(0x00433080u);
+    EF_F64(dst + 0x10u) = v;
+    EF_F64(dst + 8u) = (-v) * tan_b45fa(EF_F64(src + 0x58u)) - EF_F64(0x00433078u);
+    EF_F64(dst) = EF_F64(src + 0x40u) - EF_F64(0x00433070u);
+}
