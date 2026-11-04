@@ -9723,3 +9723,38 @@ void release_locked_ranges_114ad8(void)
         guest_fn_104920(cell[i], 4u);
     EF_U32(0x0017e25cu) = 0u;
 }
+
+/* 0xa4b80, 259 bytes. Close the widget ID (AX; valid 1..word 0x41eed8 in the pointer table 0x41edfc, only when flag 4 of its byte +0x3b is set): remove it with its children (0xa4a94), run its close hook (dword +0xbd, called with the widget in EAX and EDX), and for widgets whose byte +0xc1 is 1 find it in the open-stack words at 0x41ed84 (count word 0x41eed6), close every later entry and truncate the stack to it; an empty stack clears byte 0x41f2e0. Finally redraw (0xa6038). */
+void close_widget_a4b80(uint32_t id)
+{
+    uint32_t w = id & 0xffffu;
+    ef_addr32 obj;
+    int32_t idx;
+    int32_t k;
+    if (w == 0u || (uint16_t)w > EF_U16(0x0041eed8u))
+        return;
+    obj = EF_U32(0x0041edfcu + w * 4u);
+    if ((EF_U8(obj + 0x3bu) & 4u) == 0u)
+        return;
+    remove_entry_and_children_a4a94(w);
+    obj = EF_U32(0x0041edfcu + w * 4u);
+    if (EF_U32(obj + 0xbdu) != 0u)
+        guest_callptr_eaxedx_x(EF_U32(obj + 0xbdu), obj, obj);
+    if (EF_U8(EF_U32(0x0041edfcu + w * 4u) + 0xc1u) == 1u) {
+        idx = -1;
+        for (k = 0; k < (int32_t)EF_U16(0x0041eed6u) && idx == -1; k++) {
+            if ((uint16_t)w == EF_U16(0x0041ed84u + (uint32_t)k * 2u))
+                idx = k;
+        }
+        if (idx >= 0) {
+            if (idx < (int32_t)EF_U16(0x0041eed6u) - 1) {
+                for (k = idx + 1; k < (int32_t)EF_U16(0x0041eed6u); k++)
+                    remove_entry_and_children_a4a94(EF_U16(0x0041ed84u + (uint32_t)k * 2u));
+            }
+            EF_U16(0x0041eed6u) = (uint16_t)idx;
+        }
+        if (EF_U16(0x0041eed6u) == 0u)
+            EF_U8(0x0041f2e0u) = 0u;
+    }
+    redraw_entries_a6038();
+}
