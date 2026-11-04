@@ -11412,3 +11412,24 @@ void update_target_2631c(uint32_t flag)
     }
     guest_fn_24f24_x();
 }
+
+/* 0xc9680, 180 bytes. Draw a full circle of colour COLOUR (EAX, byte) in the viewport record at [0x41eea0] (nothing when NULL). D (EDX), B (EBX) and R (ECX) are signed words scaled by the double at viewport+0x9f; the circle centre is (cy = D*scale + (w41 + w71 - w69), cx = B*scale + (w43 + w73 - w6b)) with 16 bit offsets and the radius R*scale, each rounded with 0x9d72c; the arc runs from 0 to 0xffff via 0xfe49c. */
+void draw_circle_scaled_c9680(uint32_t colour, uint32_t d, uint32_t b, uint32_t r)
+{
+    ef_addr32 vp = EF_U32(0x0041eea0u);
+    double scale;
+    int32_t radius;
+    int32_t cx;
+    int32_t cy;
+    int16_t off_y;
+    int16_t off_x;
+    if (vp == 0u)
+        return;
+    memcpy(&scale, ef_guest_memory_ptr(vp + 0x9fu), sizeof scale);
+    off_y = (int16_t)(EF_U16(vp + 0x41u) + EF_U16(vp + 0x71u) - EF_U16(vp + 0x69u));
+    off_x = (int16_t)(EF_U16(vp + 0x43u) + EF_U16(vp + 0x73u) - EF_U16(vp + 0x6bu));
+    radius = (int32_t)truncate_9d72c((double)(int16_t)r * scale);
+    cx = (int32_t)truncate_9d72c((double)(int16_t)b * scale + (double)off_x);
+    cy = (int32_t)truncate_9d72c((double)(int16_t)d * scale + (double)off_y);
+    draw_arc_by_length_fe49c(colour & 0xffu, (uint32_t)cy, (uint32_t)cx, 0u, 0xffffu, (uint32_t)radius);
+}

@@ -2846,7 +2846,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c9360	404			unknown	unclassified	unverified		
 0x000c94f4	182	set_clip_rect_c94f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c94f4.json	docs/compiler-abi.md; Clip the rectangle (X0, Y0)-(X1, Y1) to the screen size 0x15b744 x 0x15b748 (ret 4, Y1 on the stack); a rectangle entire; callers a5ca4@a5cde,a5ca4@a5d17,a5ca4@a5d54; guest pending
 0x000c95ac	212			unknown	unclassified	unverified		
-0x000c9680	180			unknown	unclassified	unverified		
+0x000c9680	180	draw_circle_scaled_c9680	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c9680.json	docs/compiler-abi.md; Draw a full circle of colour COLOUR (EAX, byte) in the viewport record at [0x41eea0] (nothing when NULL). D (EDX), B (EB; callers 4c3bc@4c510; guest pending
 0x000c9734	409			unknown	unclassified	unverified		
 0x000c98f8	177			unknown	unclassified	unverified		
 0x000c99ac	235			unknown	unclassified	unverified		

@@ -5447,4 +5447,6 @@ void guest_fn_2611c_x(int32_t a); /* 0x2611c EAX */
 void guest_fn_24f24_x(void); /* 0x24f24 */
 void guest_fn_24c40_x(int32_t a); /* 0x24c40 EAX */
 
+void draw_circle_scaled_c9680(uint32_t colour, uint32_t d, uint32_t b, uint32_t r);
+
 #endif
