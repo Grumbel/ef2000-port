@@ -2922,3 +2922,13 @@ in EAX, format string address, one value).
 | `0xcabb0` | EAX:ef_addr32,EDX:ef_addr32 | none | 49228@494d5 | Translate 400 bytes through the lookup routine at 0xcbef4. |
 | `0xcabe8` | EAX:ef_addr32,EDX:ef_addr32 | none | b0f5c@b15d5 | Copy fields from the first node of list A into every matching node of list B. |
 | `0xcb688` | EAX:ef_addr32 | none | b0f5c@b136a | Count down the per-slot timers of every node and reload expired ones. |
+
+## runtime_helpers15 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcbc54` | EAX:ef_addr32,EDX:ef_addr32 | none | 49228@49417,b0df4@b0e82,b0f5c@b1149 | Look up each node's tile byte in a 40-wide grid from its position. |
+| `0xcc468` | AL:uint8_t,EDX:ef_addr32 | EAX:uint32_t | befb8@bf2cc,c0b04@c0b86,ccdbc@cd0e0 | True when the first node of this kind has a negative flag byte. |
+| `0xcc840` | EAX:ef_addr32 | EAX:uint32_t | afc5c@afc90,cc90c@cc944 | Count the 21-byte entries that are free (0xff) or reserved (0xfe) for other kinds. |
+| `0xcd7a0` | none | none | e4264@e42ae | Free the blocks in table slots 101..n and reset the count. |
+| `0xcd81c` | [ESP+4]:int16_t | EAX:uint32_t | none direct | Forward the stack word to 0xcd7f0. |

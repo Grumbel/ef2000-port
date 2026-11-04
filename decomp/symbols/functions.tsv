@@ -2883,7 +2883,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cb800	385			unknown	unclassified	unverified		
 0x000cb984	110			unknown	unclassified	unverified		
 0x000cb9f4	608			unknown	unclassified	unverified		
-0x000cbc54	71			unknown	unclassified	unverified		
+0x000cbc54	71	lookup_tiles_cbc54	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cbc54.json	docs/compiler-abi.md; Look up each node's tile byte in a 40-wide grid from its position.; callers 49228@49417,b0df4@b0e82,b0f5c@b1149; guest pending
 0x000cbc9b	5			unknown	unclassified	unverified		
 0x000cbcc5	74			unknown	unclassified	unverified		
 0x000cbd0f	27	signed_to_digits_cbd0f	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000cbd0f.json	docs/compiler-abi.md; Signed decimal prefix, then the digit conversion.; callers c768@c79e,c768@c7db,4d668@4d78e; guest pending
@@ -2899,7 +2899,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc1ec	61	group_flag_zero_cc1ec	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cc1ec.json	docs/compiler-abi.md; Is the flag byte for index zero?; callers d68c@dd04,433fc@434b0,4357c@4361d; guest pending
 0x000cc22c	61	group_flag_positive_cc22c	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cc22c.json	docs/compiler-abi.md; Is the flag byte for index positive?; callers d68c@d993,d68c@df24,d68c@e333; guest pending
 0x000cc26c	25	find_node_by_byte_b	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc26c.json	docs/compiler-abi.md; Node in the list at *EDX whose byte +0xb equals AL.; callers b059c@b05c3,bed1c@bed3a; guest pending
-0x000cc468	74			unknown	unclassified	unverified		
+0x000cc468	74	node_has_negative_flag_cc468	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cc468.json	docs/compiler-abi.md; True when the first node of this kind has a negative flag byte.; callers befb8@bf2cc,c0b04@c0b86,ccdbc@cd0e0; guest pending
 0x000cc51c	103			unknown	unclassified	unverified		
 0x000cc584	119	code_in_set_cc584	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc584.json	docs/compiler-abi.md; ; callers d68c@df3a,d68c@e07c,d68c@e187; guest pending
 0x000cc5fc	44	code_is_10_to_15	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc5fc.json	docs/compiler-abi.md; AL is 0x10..0x15.; callers d68c@df63,d68c@e0a8,d68c@e1b3; guest pending
@@ -2915,7 +2915,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc7d0	23			unknown	unclassified	unverified		
 0x000cc7e8	52	pair_matches_cc7e8	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc7e8.json	docs/compiler-abi.md; DL in {0x16, 0x17, 0x0e, 0x11, 0x13} and AL is 2.; callers bdeec@be17c,cc90c@cca5f,ccdbc@cce56; guest pending
 0x000cc81c	34	pair_matches_cc81c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc81c.json	docs/compiler-abi.md; DL is 8 or 0x1a and AL is 2.; callers f918@f946,f918@f9a7,b31f0@b321a; guest pending
-0x000cc840	83			unknown	unclassified	unverified		
+0x000cc840	83	count_open_entries_cc840	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cc840.json	docs/compiler-abi.md; Count the 21-byte entries that are free (0xff) or reserved (0xfe) for other kinds.; callers afc5c@afc90,cc90c@cc944; guest pending
 0x000cc894	74	pick_variant_cc894	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc894.json	docs/compiler-abi.md; ; callers afc5c@afca9; guest pending
 0x000cc8e0	3	return_esc_cc8e0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000cc8e0.json	docs/compiler-abi.md; Returns the ESC scan code.; callers bcf44@bcff2; guest pending
 0x000cc90c	1199			unknown	unclassified	unverified		
@@ -2941,9 +2941,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cd6fc	38	reset_handler_cd6fc	code_predicates	compiles	game	confirmed	decomp/tests/0x000cd6fc.json	docs/compiler-abi.md; When byte 0x15b734 is set clear it and run 0x9c3cf(0xcd6cc); * dword 0x15b730 = 0.; callers e4188@e422a; guest pending
 0x000cd724	47			unknown	unclassified	unverified		
 0x000cd754	73			unknown	unclassified	unverified		
-0x000cd7a0	77			unknown	unclassified	unverified		
+0x000cd7a0	77	free_table_blocks_cd7a0	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cd7a0.json	docs/compiler-abi.md; Free the blocks in table slots 101..n and reset the count.; callers e4264@e42ae; guest pending
 0x000cd7f0	42			unknown	unclassified	unverified		
-0x000cd81c	15			unknown	unclassified	unverified		
+0x000cd81c	15	forward_word_cd81c	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cd81c.json	docs/compiler-abi.md; Forward the stack word to 0xcd7f0.; callers none direct; guest pending
 0x000cd82c	105			unknown	unclassified	unverified		
 0x000cd957	79			unknown	unclassified	unverified		
 0x000cd9a6	368			unknown	unclassified	unverified		

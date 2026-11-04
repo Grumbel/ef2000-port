@@ -2170,4 +2170,12 @@ void copy_matching_fields_cabe8(ef_addr32 list_a, ef_addr32 list_b);
 void tick_slot_timers_cb688(ef_addr32 head);
 uint32_t guest_fn_cbef4(uint32_t value); /* 0xcbef4 EAX -> AL */
 
+/* runtime_helpers15.c */
+void lookup_tiles_cbc54(ef_addr32 grid, ef_addr32 list);
+uint32_t node_has_negative_flag_cc468(uint8_t kind, ef_addr32 list);
+uint32_t count_open_entries_cc840(ef_addr32 object);
+void free_table_blocks_cd7a0(void);
+uint32_t forward_word_cd81c(int16_t stack_value);
+
+
 #endif
