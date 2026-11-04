@@ -6147,4 +6147,9 @@ void render_vertex_list_c8c78(ef_addr32 src, uint32_t count);
 ef_addr32 strdup_fc354(ef_addr32 s);
 ef_addr32 strdup_fc354(ef_addr32 s);
 
+uint32_t project_point_15c071(uint32_t depth, int32_t x, int32_t y, ef_addr32 outp);
+uint32_t rotate_project_15c0ea(uint32_t a, uint32_t b, uint32_t c, ef_addr32 outp);
+uint32_t project_point_15c071(uint32_t depth, int32_t x, int32_t y, ef_addr32 outp);
+uint32_t rotate_project_15c0ea(uint32_t a, uint32_t b, uint32_t c, ef_addr32 outp);
+
 #endif

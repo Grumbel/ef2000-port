@@ -8951,3 +8951,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfc354` | EAX:ef_addr32 | EAX:ef_addr32 | c1438@c1668,c1438@c172b,c1438@c17cc | strdup: allocate strlen+1 bytes through 0xfc795 and copy the string including the NUL; returns 0 if allocation fails. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x15c0ea` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32 | EAX:uint32_t | 5c8e0@5c949,5f698@5f7a8,83200@83285 | Stack-argument wrapper (ret 0x10): rotate the vector (C, B, A) through 0xc4755 and project it with 0x15c071 into OUTP; r |

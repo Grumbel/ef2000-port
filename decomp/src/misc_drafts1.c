@@ -20411,3 +20411,29 @@ ef_addr32 strdup_fc354(ef_addr32 s)
     }
     return p;
 }
+
+/* 0x15c071, 83 bytes. Implicit-register fragment (in: ECX = depth (16.16), ESI = x, EDI = y, EBX = output address; out: EAX): perspective-project; if the depth is outside 16..20000 store -1 to *OUT and return 0, else store two words (screen x,y offset by 0x15bdb8/0x15bdbc) and return 1. */
+uint32_t project_point_15c071(uint32_t depth, int32_t x, int32_t y, ef_addr32 outp)
+{
+    int32_t d = (int32_t)depth >> 16;
+    int32_t q;
+    int64_t p;
+    if (d < 0x10 || d > 0x4e20) {
+        EF_U32(outp) = 0xffffffffu;
+        return 0;
+    }
+    q = (int32_t)((int64_t)0x100000000LL / d);
+    p = (int64_t)(x >> 8) * q;
+    EF_U16(outp) = (uint16_t)((uint32_t)(p >> 32) + (uint32_t)EF_U16(0x0015bdb8u));
+    p = (int64_t)(y >> 8) * q;
+    EF_U16(outp + 2u) = (uint16_t)((uint32_t)(p >> 32) + (uint32_t)EF_U16(0x0015bdbcu));
+    return 1;
+}
+
+/* 0x15c0ea, 38 bytes. Stack-argument wrapper (ret 0x10): rotate the vector (C, B, A) through 0xc4755 and project it with 0x15c071 into OUTP; returns the projection result. */
+uint32_t rotate_project_15c0ea(uint32_t a, uint32_t b, uint32_t c, ef_addr32 outp)
+{
+    int32_t r[3];
+    rotate_vector_c4755((int32_t)c, (int32_t)b, (int32_t)a, r);
+    return project_point_15c071((uint32_t)r[2], r[0], r[1], outp);
+}
