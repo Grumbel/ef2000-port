@@ -7936,3 +7936,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7b16c` | EAX:uint32_t,EDX:int32_t,EBX:int32_t | EAX:uint32_t | 6460@65d2,6924@69fd,1dc20@1dd1d | Look up the map cell under the point (X = EDX, Y = EBX, 11-bit cell size) for plane MODE (EAX, 0x7aac0): the cell column |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x817a8` | none | none | 3dd30@3e24b | Per-frame hook of the tracked view target (record at 0x425b*): when its mode word 0x425bc8 is clear, or the dword 0x425b |

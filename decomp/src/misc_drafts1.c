@@ -13872,3 +13872,29 @@ uint32_t cell_distance_at_7b16c(uint32_t mode, int32_t x, int32_t y)
                                       (uint32_t)(((y >> 11) * 2 + 1) << 10),
                                       (uint32_t)x, (uint32_t)y);
 }
+
+/* 0x817a8, 188 bytes. Per-frame hook of the tracked view target (record at 0x425b*): when its mode word 0x425bc8 is clear, or the dword 0x425bce >> 16 exceeds the dword 0x1a5bf0, and word 0x425bb8 is set, load the call block 0x15bddc.. (0x15bde0 = 0x425bb6 >> 16, 0x15bde8 = camera x 0x21444c, 0x15bdec = camera y 0x214448 - (0x425bb2 >> 16), 0x15bdf0 = camera z 0x214450 - (0x425bae >> 16), zeros in 0x15bddc/0x15bde4, 0xfa0 in 0x15be0c) and run 0x15be10. With the mode word set and within range, run 0x81680 when bit 0x80 of byte 0x425bc4 is set. Finally run 0x2a4c8 when word 0x1a5a8e is set. */
+void update_view_target_817a8(void)
+{
+    int taken = 0;
+    if (EF_U16(0x00425bc8u) != 0u && (int32_t)((int32_t)EF_U32(0x00425bceu) >> 16) > (int32_t)EF_U32(0x001a5bf0u))
+        taken = 1;
+    else if (EF_U16(0x00425bc8u) == 0u)
+        taken = 1;
+    if (taken) {
+        if (EF_U16(0x00425bb8u) != 0u) {
+            EF_U32(0x0015bde0u) = (uint32_t)((int32_t)EF_U32(0x00425bb6u) >> 16);
+            EF_U32(0x0015bde8u) = EF_U32(0x0021444cu);
+            EF_U32(0x0015bddcu) = 0u;
+            EF_U32(0x0015bdecu) = EF_U32(0x00214448u) - (uint32_t)((int32_t)EF_U32(0x00425bb2u) >> 16);
+            EF_U32(0x0015bde4u) = 0u;
+            EF_U32(0x0015bdf0u) = EF_U32(0x00214450u) - (uint32_t)((int32_t)EF_U32(0x00425baeu) >> 16);
+            EF_U32(0x0015be0cu) = 0xfa0u;
+            guest_fn_15be10_x();
+        }
+    } else if ((EF_U8(0x00425bc4u) & 0x80u) != 0u) {
+        guest_fn_81680_x();
+    }
+    if (EF_U16(0x001a5a8eu) != 0u)
+        guest_fn_2a4c8_x();
+}
