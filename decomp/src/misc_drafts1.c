@@ -19242,3 +19242,34 @@ void fire_object_effects_882b0(ef_addr32 obj, int32_t arg)
 			guest_fn_1d5cc(0x0020f16cu, r);
 	}
 }
+
+/* 0x9fea8, 288 bytes. Claim the lowest rated 78-byte slot of the table at 0x416e40 (0x9fdd4) for a new record: word +2 = A (EAX), +0 = word 0x41722a, +4 = previous word 0x132b26 (which then becomes the slot index), +6 = 10, +0x3c..+0x44 = dwords 0x132b28/2c/30. The vector at +0x18 is loaded from the three words of the entry B (EDX) of the table at pointer 0x41717c (entries of 6 bytes starting at +0xa) and scaled by 100.0f; the vector at +0x30 comes from entry C (BX, stack word) at offset +0xa/+0xc/+0xe and is scaled by 1000.0f; the vectors at +0x0c and +0x24 are cleared. */
+void init_record_slot_9fea8(uint32_t a, int32_t b, uint32_t c)
+{
+	int32_t idx = (int32_t)(int16_t)select_lowest_rated_entry_9fdd4();
+	ef_addr32 r = 0x00416e40u + (uint32_t)(idx * 78);
+	ef_addr32 ent;
+	uint16_t old;
+
+	EF_U16(r + 2u) = (uint16_t)a;
+	EF_U16(r) = EF_U16(0x0041722au);
+	old = EF_U16(0x00132b26u);
+	EF_U16(0x00132b26u) = (uint16_t)idx;
+	EF_U16(r + 4u) = old;
+	EF_U16(r + 6u) = 10u;
+	EF_U32(r + 0x3cu) = EF_U32(0x00132b28u);
+	EF_U32(r + 0x40u) = EF_U32(0x00132b2cu);
+	EF_U32(r + 0x44u) = EF_U32(0x00132b30u);
+	ent = EF_U32(0x0041717cu) + 0xau + (uint32_t)((int32_t)(int16_t)b * 6);
+	store_triple_ea864(r + 0x18u, (uint32_t)(int32_t)(int16_t)EF_U16(ent),
+	                   (uint32_t)(int32_t)(int16_t)EF_U16(ent + 2u),
+	                   (uint32_t)(int32_t)(int16_t)EF_U16(ent + 4u));
+	scale_vector3_ea8cc(r + 0x18u, (uint32_t)(int32_t)(int16_t)c, 0u, 0u, 0x42c80000u);
+	ent = EF_U32(0x0041717cu) + (uint32_t)((int32_t)(int16_t)c * 6);
+	store_triple_ea864(r + 0x30u, (uint32_t)(int32_t)(int16_t)EF_U16(ent + 0xau),
+	                   (uint32_t)(int32_t)(int16_t)EF_U16(ent + 0xcu),
+	                   (uint32_t)(int32_t)(int16_t)EF_U16(ent + 0xeu));
+	scale_vector3_ea8cc(r + 0x30u, 0u, 0u, 0u, 0x447a0000u);
+	clear_vector3(r + 0xcu);
+	clear_vector3(r + 0x24u);
+}

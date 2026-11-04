@@ -2104,7 +2104,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009fc00	467			unknown	unclassified	unverified		
 0x0009fdd4	72	select_lowest_rated_entry_9fdd4	game_helpers81	compiles	game	confirmed	decomp/tests/0x0009fdd4.json	docs/compiler-abi.md; Select the entry with the smallest rating below 10 and activate it; -1 slot ends early.; callers 9fea8@9feb6; guest pending
 0x0009fe1c	139	unlink_record_9fe1c	game_helpers34	compiles	game	confirmed	decomp/tests/0x0009fe1c.json	docs/compiler-abi.md; Unlink an id from the singly linked list of 78-byte records.; callers 9fdd4@9fe10; guest pending
-0x0009fea8	288			unknown	unclassified	unverified		
+0x0009fea8	288	init_record_slot_9fea8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009fea8.json	docs/compiler-abi.md; Claim the lowest rated 78-byte slot of the table at 0x416e40 (0x9fdd4) for a new record: word +2 = A (EAX), +0 = word 0x; callers 9e7bc@9e89c; guest pending
 0x0009ffc8	80	convert_entry_vector_9ffc8	float_helpers5	compiles	game	confirmed	decomp/tests/0x0009ffc8.json	docs/compiler-abi.md; Convert a table entry's vector and scale a word into a float.; callers 9e7bc@9e8b1; guest pending
 0x000a0018	69	find_chain_entry_a0018	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a0018.json	docs/compiler-abi.md; Find the entry in the 0x4e-byte chain whose two keys match, or -1.; callers a0228@a0240; guest pending
 0x000a0060	65	run_entry_chain_a0060	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000a0060.json	docs/compiler-abi.md; Reset the time scale at 0x132b20 and, if 0x137a00 is set, run 0xa0174 on every entry of the 0x4e-byte chain starting at ; callers 3dd30@3deec; guest pending

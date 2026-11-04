@@ -8705,3 +8705,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x882b0` | EAX:ef_addr32,EDX:int32_t | none | 888cc@88c1d | Fire the placement effects of object OBJ (EAX) with parameter ARG (DX, sign extended). The object position >> 8 is copie |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9fea8` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t | none | 9e7bc@9e89c | Claim the lowest rated 78-byte slot of the table at 0x416e40 (0x9fdd4) for a new record: word +2 = A (EAX), +0 = word 0x |
