@@ -6001,3 +6001,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x50658` | none | none | 4fa64@4fadc | Tally the roster kinds: for each of the 0x1a5531 entries (kind byte 0x1a5510[i], 1..4) count the kind in 0x1a5536[kind - |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf2b7c` | none | none | f4178@f419b | Reset the remote cursor state: run 0xcdf60, copy the buffer pointer 0x485928 to 0x485924, clear the words/bytes 0x1616ea |

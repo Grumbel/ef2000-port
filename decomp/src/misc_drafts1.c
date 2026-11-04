@@ -4465,3 +4465,35 @@ void tally_roster_kinds_50658(void)
     }
     EF_U8(0x001a5535u) = (uint8_t)(seen[0] + seen[1] + seen[2] + seen[3]);
 }
+
+/* 0xf2b7c, 250 bytes. Reset the remote cursor state: run 0xcdf60, copy the buffer pointer 0x485928 to 0x485924, clear the words/bytes 0x1616ea, 0x161e16..1a, 0x1616ec/ed, 0x1616e6/e8, copy the byte 0x1918fc to 0x485956 and 0x48592c, and clamp the cursor words 0x425fc8 (x) to 0..319 and 0x425fc6 (y) to 0..199. */
+void reset_remote_cursor_f2b7c(void)
+{
+    int32_t v;
+    uint8_t b;
+    mouse_button_count_cdf60();
+    EF_U32(0x00485924u) = EF_U32(0x00485928u);
+    EF_U16(0x001616eau) = 0u;
+    EF_U16(0x00161e16u) = 0u;
+    EF_U16(0x00161e18u) = 0u;
+    EF_U16(0x00161e1au) = 0u;
+    EF_U8(0x001616ecu) = 0u;
+    EF_U8(0x001616edu) = 0u;
+    b = EF_U8(0x001918fcu);
+    EF_U16(0x001616e6u) = 0u;
+    EF_U8(0x00485956u) = b;
+    EF_U8(0x0048592cu) = b;
+    EF_U16(0x001616e8u) = 0u;
+    v = (int16_t)EF_U16(0x00425fc8u);
+    if (v < 0)
+        v = 0;
+    if (v > 0x13f)
+        v = 0x13f;
+    EF_U16(0x00425fc8u) = (uint16_t)v;
+    v = (int16_t)EF_U16(0x00425fc6u);
+    if (v < 0)
+        v = 0;
+    if (v > 0xc7)
+        v = 0xc7;
+    EF_U16(0x00425fc6u) = (uint16_t)v;
+}
