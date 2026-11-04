@@ -3836,4 +3836,8 @@ uint32_t guest_fn_bcf18_x(ef_addr32 rec); /* 0xbcf18 EAX -> AX */
 int32_t approx_distance3_16_b3830(int16_t a, int16_t b, int16_t c);
 uint32_t object_has_ready_entry_bcc2c(ef_addr32 obj);
 
+/* game_helpers104.c */
+ef_addr32 parse_output_spec_ed3b4(ef_addr32 fmt, ef_addr32 va_ptr, ef_addr32 spec);
+ef_addr32 guest_fn_ed4e7_x(ef_addr32 fmt, ef_addr32 spec); /* 0xed4e7 EAX EDX -> EAX */
+
 #endif

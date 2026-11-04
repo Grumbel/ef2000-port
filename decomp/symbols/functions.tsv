@@ -3538,7 +3538,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ece90	30	reset_table_ece90	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ece90.json	docs/compiler-abi.md; Clear 0x10 bytes at 0x13577c and byte 0x484665.; callers a29f8@a2a3a; guest pending
 0x000ed115	30	guest_memcmp	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ed115.json	docs/compiler-abi.md; memcmp of EBX bytes at EAX and EDX: 0, -1 or 1 (unsigned).; callers a2f70@a2fed,d660c@d662c,ec0ec@ec113; guest pending
 0x000ed133	641			unknown	unclassified	unverified		
-0x000ed3b4	307			unknown	unclassified	unverified		
+0x000ed3b4	307	parse_output_spec_ed3b4	game_helpers104	compiles	game	confirmed	decomp/tests/0x000ed3b4.json	docs/compiler-abi.md; Parse flags (ed4e7), width ('*' or digits), precision ('.' then '*' or digits) and size modifier (N F L h l w) into the ; callers ed133@ed163; guest pending
 0x000ed4e7	91	parse_format_flags	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000ed4e7.json	docs/compiler-abi.md; Parse printf flag characters into the spec at EDX (+0x14 flags, +0x16 fill).; callers ed3b4@ed3c3; guest pending
 0x000ed542	36			unknown	unclassified	unverified		
 0x000ed566	35			unknown	unclassified	unverified		

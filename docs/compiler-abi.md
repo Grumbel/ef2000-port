@@ -4335,3 +4335,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb3830` | AX:int16_t,DX:int16_t,BX:int16_t | EAX:int32_t | cff64@cff75,cff80@d0209 | Approximate 3D distance from three 16-bit components: 15/16 of the largest absolute value plus 3/8 of the other two. |
 | `0xbcc2c` | EAX:ef_addr32 | EAX:uint32_t | bd2f4@bd30b | Check that an object has a ready sub-entry (matching its type's code) and set the flag at +0x36; returns 1 or 0. |
+
+## game_helpers104 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xed3b4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:ef_addr32 | ed133@ed163 | Parse flags (ed4e7), width ('*' or digits), precision ('.' then '*' or digits) and size modifier (N F L h l w) into the  |
