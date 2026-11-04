@@ -2151,4 +2151,14 @@ uint32_t guest_fn_b0208(ef_addr32 list, uint32_t column, uint32_t field); /* 0xb
 uint32_t guest_fn_cc1ac(uint32_t a, uint32_t b, uint32_t c); /* 0xcc1ac EAX/EDX/EBX -> AX */
 uint32_t guest_fn_b549c(int32_t value); /* 0xb549c EAX -> AX */
 
+/* runtime_helpers13.c */
+ef_addr32 find_child_b4cdc(ef_addr32 key, uint8_t kind, ef_addr32 list, uint32_t context);
+ef_addr32 find_sibling_b4d38(ef_addr32 key, uint8_t kind, ef_addr32 list, uint32_t context);
+uint32_t has_free_run_bd73c(ef_addr32 object, int16_t width);
+uint32_t record_has_valid_entry_bd86c(ef_addr32 record);
+uint32_t nth_match_exists_bd8c8(uint8_t kind, int16_t index, uint8_t sub, ef_addr32 target, ef_addr32 stack_list);
+uint32_t count_valid_entries_becc0(ef_addr32 object);
+uint32_t guest_fn_cc22c(uint32_t a, uint32_t b, uint32_t c); /* 0xcc22c EAX/EDX/EBX -> AX */
+uint32_t guest_fn_bd7cc(ef_addr32 entry, uint32_t kind); /* 0xbd7cc EAX/EDX -> AX */
+
 #endif

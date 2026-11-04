@@ -2901,3 +2901,14 @@ in EAX, format string address, one value).
 | `0xbd508` | EAX:ef_addr32 | EAX:uint32_t | bd5a8@bd5d6 | Count the 10-byte entries of the record that are special and non-empty. |
 | `0xbd554` | EAX:ef_addr32 | EAX:uint32_t | bd5a8@bd5df | Count the special entries of a kind-0x15 record, 1 for other kinds. |
 | `0xbe438` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:ef_addr32 | be480@be526,c1438@c1781 | Find the kind-2 node of the list whose target matches the two keys and is valid. |
+
+## runtime_helpers13 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb4cdc` | EAX:ef_addr32,DL:uint8_t,EBX:ef_addr32,ECX:uint32_t | EAX:ef_addr32 | 94fc@971f,c1210@c13b5,c1210@c13d7 | As find_child_b4c20 with the 0xcc22c check. |
+| `0xb4d38` | EAX:ef_addr32,DL:uint8_t,EBX:ef_addr32,ECX:uint32_t | EAX:ef_addr32 | c1210@c13fb,c1210@c141d | As find_sibling_b4c7c with the 0xcc22c check. |
+| `0xbd73c` | EAX:ef_addr32,DX:int16_t | EAX:uint32_t | bdbf8@bdcaf,f8b14@f8bfa | True when some window of (width) consecutive 9-byte entries are all unused. |
+| `0xbd86c` | EAX:ef_addr32 | EAX:uint32_t | bdbf8@bdc78,bdbf8@bdcc2,bdbf8@bdd11 | True when a non-kind-2 record has a filled entry (scanned from the end) that passes the check. |
+| `0xbd8c8` | AL:uint8_t,DX:int16_t,BL:uint8_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | EAX:uint32_t | bd92c@bda20 | True when the list's index-th node matching the criteria exists. |
+| `0xbecc0` | EAX:ef_addr32 | EAX:uint32_t | becf8@bed07,fac78@facb1,fac78@facd1 | Count the 21-byte entries of the object that pass the check. |
