@@ -3895,4 +3895,8 @@ void update_loadout_maxima_a4eec(ef_addr32 rec);
 /* game_helpers117.c */
 void deactivate_records_at_object_c07a0(ef_addr32 object, ef_addr32 list);
 
+/* runtime_helpers34.c */
+void put_two_digits_f9d98(int32_t value, uint32_t pos, ef_addr32 buffer);
+ef_addr32 format_time_f9dcb(ef_addr32 tm, ef_addr32 out);
+
 #endif
