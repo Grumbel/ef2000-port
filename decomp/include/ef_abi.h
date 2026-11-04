@@ -4242,4 +4242,12 @@ void guest_callptr2_x(ef_addr32 fn, uint32_t a, uint32_t b); /* indirect cdecl c
 
 uint32_t point_in_entry_boxes_1e214(uint32_t entry, int32_t x, int32_t y, int32_t z);
 
+/* screen_clip1.c */
+void init_work_buffers_c3770(void);
+uint32_t reset_ui_state_8bd58(uint32_t a, uint32_t b);
+void draw_clipped_c92e4(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
+void guest_fn_8b7e8_x(void); /* 0x8b7e8 no arguments */
+uint32_t guest_fn_8bad4_x(uint32_t a, uint32_t b); /* 0x8bad4 EAX/EDX, returns EAX */
+void guest_fn_eb174_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5, uint32_t a6, uint32_t a7); /* 0xeb174 cdecl, eight stack arguments */
+
 #endif
