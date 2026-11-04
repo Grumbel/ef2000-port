@@ -1669,3 +1669,155 @@ void finish_resource_file_e3444(void)
     close_handle_a7990(0u, 0u, 0u, 0u, EF_U32(0x0015f8f8u));
     EF_U32(0x0015f8f8u) = 0xffffffffu;
 }
+
+/* 0x98ac0, 166 bytes. Restore the screen strip saved at 0x40cd72/0x40cd74: when a saved position exists, put the 0x23x0x1e strip at 0x12dda4 back there; otherwise capture two strips (AL selects the left or right panel position) from the screen into 0x40c124 and redraw them from 0x408590. Marks the position as unset afterwards. */
+void restore_strip_98ac0(uint32_t a)
+{
+    if (EF_U16(0x0040cd74u) != 0xffffu) {
+        put_screen_rows_eb050(0u, 0u, 0u, 0u, EF_U16(0x0040cd74u), EF_U16(0x0040cd72u), 0x23u, 0x1eu, EF_U32(0x0012dda4u));
+    } else if ((a & 0xffu) == 0u) {
+        get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0xfu, 0xa0u, 0x23u, 0x1eu, 0x0040c124u);
+        get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0xfu, 0xa0u, 0xfdu, 0x1eu, 0x00408590u);
+    } else {
+        get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0x41u, 0x168u, 0x23u, 0x1eu, 0x0040c124u);
+        get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0x41u, 0x168u, 0x1fcu, 0x1eu, 0x00408590u);
+    }
+    EF_U16(0x0040cd74u) = 0xffffu;
+}
+
+/* 0x11d27b, 167 bytes. Format a signed value as a sign character plus zero padded decimal digits (at most 3 digits are produced; no terminator is written). OUT in EAX, VALUE in EDX, WIDTH in EBX (0 means 2, or 3 for values of 100 and up), buffer size in ECX. Nothing is written when WIDTH+1 exceeds the buffer size or the digits do not fit. Returns WIDTH+1. */
+uint32_t format_signed_11d27b(uint32_t out, int32_t value, int32_t width, int32_t room)
+{
+    uint8_t sign = '+';
+    int32_t digits;
+    int32_t div;
+    int32_t ret;
+    if (value < 0) {
+        sign = '-';
+        value = -value;
+    }
+    if (value >= 100) {
+        div = 100;
+        digits = 3;
+    } else if (value >= 10) {
+        div = 10;
+        digits = 2;
+    } else {
+        digits = 1;
+        div = 1;
+    }
+    if (width == 0) {
+        width = 2;
+        if (digits == 3)
+            width = digits;
+    }
+    ret = width + 1;
+    if (ret > room)
+        return (uint32_t)ret;
+    if (digits > width)
+        return (uint32_t)(digits + 1);
+    EF_U8(out) = sign;
+    out++;
+    while (width > digits) {
+        width--;
+        EF_U8(out) = '0';
+        out++;
+    }
+    do {
+        EF_U8(out) = (uint8_t)(value / div + 0x30);
+        value = value % div;
+        div = div / 10;
+        out++;
+    } while (div != 0);
+    return (uint32_t)ret;
+}
+
+/* 0xcd2e8, 166 bytes. Add DELTA to the 16-bit progress value of the current entry (clamped to 100, stored in the table at 0x41f700). When the value crosses a 25-step boundary, run the text for the new step on the page at 0x41f708. Returns 1 when the value reached 100 (or the entry at 0x15b628 is empty). */
+uint32_t add_progress_cd2e8(uint32_t delta)
+{
+    uint32_t p = EF_U32(0x0015b628u);
+    int32_t idx;
+    int32_t v;
+    int32_t before;
+    int32_t after;
+    uint32_t t;
+    if (EF_U16(p) == 0u)
+        return 1u;
+    idx = (int16_t)EF_U16(p + 4u);
+    v = (int16_t)EF_U16(EF_U32(0x0041f700u) + (uint32_t)idx * 2u);
+    before = v / 25;
+    v += (int16_t)delta;
+    if (v > 100)
+        v = 100;
+    after = v / 25;
+    p = EF_U32(0x0015b628u);
+    idx = (int16_t)EF_U16(p + 4u);
+    EF_U16(EF_U32(0x0041f700u) + (uint32_t)idx * 2u) = (uint16_t)v;
+    if (before != after) {
+        t = p + (uint32_t)(after * 2 + 4);
+        t += (uint32_t)((int32_t)(int16_t)EF_U16(t) * 2);
+        run_text_on_page_9e494((uint32_t)(int16_t)EF_U16(0x0041f708u), t);
+    }
+    return v == 100;
+}
+
+/* 0x103e5c, 166 bytes. Parse a number from the string STR in base BASE (digit characters are looked up case insensitively in the table at 0x1947e8; '-' flips the sign and characters flagged 2 in the table at 0x195af0 are skipped). Parsing stops at the first character that is not a digit. When ENDP is not null, stores the address of the stopping character there. (cdecl) */
+int32_t parse_number_103e5c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t str, int32_t base, uint32_t endp)
+{
+    int32_t result = 0;
+    int32_t sign = 1;
+    uint32_t i = 0u;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    while (i < guest_fn_b1b8b(str)) {
+        uint32_t c = EF_U8(str + i);
+        int32_t d;
+        if (c == 0x2du) {
+            sign = -sign;
+        } else if ((EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 2u) == 0u) {
+            d = 0;
+            if (base > 0) {
+                do {
+                    if ((uint32_t)to_upper_ascii((int32_t)c) == EF_U8(0x001947e8u + (uint32_t)d)) {
+                        result = result * base + d;
+                        break;
+                    }
+                    d++;
+                } while (d < base);
+            }
+            if (d == base)
+                break;
+        }
+        i++;
+    }
+    if (endp != 0u)
+        EF_U32(endp) = str + i;
+    return result * sign;
+}
+
+/* 0x85bc8, 168 bytes. Classify the map cell at POS (two 16-bit coordinates): look up the cell byte in the grid at 0x134d8a (rows of 40, 10 units per cell). When the mode byte at 0x125846 is 3 and 0x1a666b is clear, returns 0 if the cell is flagged negative, 1 if flagged positive, otherwise 2 (group lists at 0x137980). Otherwise maps the cell byte through a jump table: 0 and 5 give 1, 1 gives 0, 2..4 give 2, above 5 gives 4. */
+uint8_t classify_cell_85bc8(ef_addr32 pos)
+{
+    int32_t row = (400 - (int16_t)EF_U16(pos)) / 10;
+    int32_t col = (int16_t)EF_U16(pos + 2u) / 10;
+    uint8_t cell = EF_U8(0x00134d8au + (uint32_t)(row * 40 + col));
+    if (EF_U8(0x00125846u) == 3u && EF_U8(0x001a666bu) == 0u) {
+        if ((uint16_t)group_flag_negative_cc1ac(0u, cell, 0x00137980u) != 0u)
+            return 0u;
+        if ((uint16_t)group_flag_positive_cc22c(0u, cell, 0x00137980u) != 0u)
+            return 1u;
+        return 2u;
+    }
+    switch (cell) {
+    case 0:
+    case 5:
+        return 1u;
+    case 1:
+        return 0u;
+    case 2:
+    case 3:
+    case 4:
+        return 2u;
+    default:
+        return 4u;
+    }
+}

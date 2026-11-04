@@ -4617,4 +4617,10 @@ uint8_t class_selector_code_b9e9c(uint32_t obj, uint32_t sel);
 void finish_resource_file_e3444(void);
 void guest_fn_e36bc_x(void); /* 0xe36bc no arguments */
 
+void restore_strip_98ac0(uint32_t a);
+uint32_t format_signed_11d27b(uint32_t out, int32_t value, int32_t width, int32_t room);
+uint32_t add_progress_cd2e8(uint32_t delta);
+int32_t parse_number_103e5c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t str, int32_t base, uint32_t endp);
+uint8_t classify_cell_85bc8(ef_addr32 pos);
+
 #endif

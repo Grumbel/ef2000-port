@@ -1685,7 +1685,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00085604	410			unknown	unclassified	unverified		
 0x000857bc	615			unknown	unclassified	unverified		
 0x00085b70	63	reset_flags_85b70	game_helpers6	compiles	game	confirmed	decomp/tests/0x00085b70.json	docs/compiler-abi.md; ; callers 49228@4960b; guest pending
-0x00085bc8	168			unknown	unclassified	unverified		
+0x00085bc8	168	classify_cell_85bc8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00085bc8.json	docs/compiler-abi.md; Classify the map cell at POS (two 16-bit coordinates): look up the cell byte in the grid at 0x134d8a (rows of 40, 10 uni; callers 73ec@74eb,3a268@3a2af; guest pending
 0x00085c90	104	page_row_85c90	game_helpers20	compiles	game	confirmed	decomp/tests/0x00085c90.json	docs/compiler-abi.md; Address of row `index` (6 bytes) in the selected unit's page table, or the default table.; callers 2a1fc@2a27b,86110@86188,86968@86a06; guest pending
 0x00085cf8	8	set_mode_85cf8	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00085cf8.json	docs/compiler-abi.md; ; callers 3ea0c@3ee3c; guest pending
 0x00085d00	369			unknown	unclassified	unverified		
@@ -1983,7 +1983,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000985b0	66	start_transfer_985b0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000985b0.json	docs/compiler-abi.md; Store a range and start the transfer; abort when the range is negative.; callers 49228@49737,7a844@7a88c,7e8c0@7ea77; guest pending
 0x000985f4	97	update_progress_985f4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000985f4.json	docs/compiler-abi.md; Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change.; callers 49228@49753,7a844@7a89a,7e8c0@7eac1; guest pending
 0x00098658	1126			unknown	unclassified	unverified		
-0x00098ac0	166			unknown	unclassified	unverified		
+0x00098ac0	166	restore_strip_98ac0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00098ac0.json	docs/compiler-abi.md; Restore the screen strip saved at 0x40cd72/0x40cd74: when a saved position exists, put the 0x23x0x1e strip at 0x12dda4 b; callers 98658@98666; guest pending
 0x00098b68	104			unknown	unclassified	unverified		
 0x00098bec	160			unknown	unclassified	unverified		
 0x00098c1c	654	sumgengraph		named	unclassified	unverified		
@@ -2928,7 +2928,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cd270	42	cursor_table_address	code_predicates	compiles	game	confirmed	decomp/tests/0x000cd270.json	docs/compiler-abi.md; Dword table 0x41f700 selects a signed high word; the * result is twice that plus dword 0x41f704.; callers d0470@d0671; guest pending
 0x000cd29c	9	script_cursor_data_cd29c	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000cd29c.json	docs/compiler-abi.md; ; callers 10f70@10fba,11014@11042,1e214@1e263; guest pending
 0x000cd2a8	64	store_offset_cd2a8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000cd2a8.json	docs/compiler-abi.md; Store a half-word offset in the current table entry.; callers 9e7bc@9f5ff; guest pending
-0x000cd2e8	166			unknown	unclassified	unverified		
+0x000cd2e8	166	add_progress_cd2e8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cd2e8.json	docs/compiler-abi.md; Add DELTA to the 16-bit progress value of the current entry (clamped to 100, stored in the table at 0x41f700). When the ; callers 161d4@164bf,1e28c@1e383,56084@56196; guest pending
 0x000cd390	34	advance_cursor	code_predicates	compiles	game	confirmed	decomp/tests/0x000cd390.json	docs/compiler-abi.md; Advance dword 0x15b628 by twice its signed word at +0; * return whether the word at the new position is nonzero.; callers 1e214@1e27a,d0470@d0768; guest pending
 0x000cd3c0	83			unknown	unclassified	unverified		
 0x000cd414	27			unknown	unclassified	unverified		
@@ -3861,7 +3861,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00103d48	42	shutdown_103d48	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00103d48.json	docs/compiler-abi.md; If dword 0x17d2cc is set, run 0x1048b4(0x101a90, 0x103d48) and clear it.; callers none direct; guest pending
 0x00103d80	138	init_locked_ranges_103d80	state_reset1	compiles	game	confirmed	decomp/tests/0x00103d80.json	docs/compiler-abi.md; One-time setup of the runtime's locked ranges: register the code range 0x103d80..0x1046c4 and the six data ranges below,; callers 104580@104580; guest pending
 0x00103e0c	79			unknown	unclassified	unverified		
-0x00103e5c	166			unknown	unclassified	unverified		
+0x00103e5c	166	parse_number_103e5c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00103e5c.json	docs/compiler-abi.md; Parse a number from the string STR in base BASE (digit characters are looked up case insensitively in the table at 0x194; callers 103f04@1040e9,103f04@104117,103f04@104145; guest pending
 0x00103f04	733			unknown	unclassified	unverified		
 0x001041e4	25	exchange_slot_1041e4	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001041e4.json	docs/compiler-abi.md; Exchange dword 0x4dd7cc[index] with value; return the old one.; callers 101e14@101e40; guest pending
 0x00104200	609			unknown	unclassified	unverified		
@@ -4229,7 +4229,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011d135	281			unknown	unclassified	unverified		
 0x0011d24e	5	tail_jump_11d24e	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011d24e.json	docs/compiler-abi.md; tail jump. Forward to 0x120485.; callers 10dc7f@10dcef; guest pending
 0x0011d258	29			unknown	unclassified	unverified		
-0x0011d27b	167			unknown	unclassified	unverified		
+0x0011d27b	167	format_signed_11d27b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d27b.json	docs/compiler-abi.md; Format a signed value as a sign character plus zero padded decimal digits (at most 3 digits are produced; no terminator ; callers 11d3f0@11d5c3; guest pending
 0x0011d322	99	layout_digits_11d322	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d322.json	docs/compiler-abi.md; Lay out a decimal digit string as "intdigits.fracdigits" at out: copy up to intdigits digits from src, pad with zeros, a; callers 11d3f0@11d57f,11d3f0@11d5ec; guest pending
 0x0011d385	107	right_align_number_11d385	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d385.json	docs/compiler-abi.md; Right-align the len-byte text at buf inside width bytes: move it to the end, then fix a leading "." or sign+"." by inser; callers 11d3f0@11d606; guest pending
 0x0011d3f0	548			unknown	unclassified	unverified		

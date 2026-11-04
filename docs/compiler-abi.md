@@ -5575,3 +5575,13 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb9e9c` | EAX:uint32_t,EDX:uint32_t | AL:uint8_t | 9820@9bf9 | Map a (class, selector) pair to a code: the class byte comes from the record at [obj+0x51] through 0xba0e4 (4 when absen |
 | `0xe3444` | none | none | 3ea0c@3ef4d | Finish the open resource file 0x15f8f8 (when not -1): read two file positions around the call to 0xe36bc, append them (4 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x98ac0` | EAX:uint32_t | none | 98658@98666 | Restore the screen strip saved at 0x40cd72/0x40cd74: when a saved position exists, put the 0x23x0x1e strip at 0x12dda4 b |
+| `0x11d27b` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | EAX:uint32_t | 11d3f0@11d5c3 | Format a signed value as a sign character plus zero padded decimal digits (at most 3 digits are produced; no terminator  |
+| `0xcd2e8` | EAX:uint32_t | EAX:uint32_t | 161d4@164bf,1e28c@1e383,56084@56196 | Add DELTA to the 16-bit progress value of the current entry (clamped to 100, stored in the table at 0x41f700). When the  |
+| `0x103e5c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:int32_t,[ESP+12]:uint32_t | EAX:int32_t | 103f04@1040e9,103f04@104117,103f04@104145 | Parse a number from the string STR in base BASE (digit characters are looked up case insensitively in the table at 0x194 |
+| `0x85bc8` | EAX:ef_addr32 | AL:uint8_t | 73ec@74eb,3a268@3a2af | Classify the map cell at POS (two 16-bit coordinates): look up the cell byte in the grid at 0x134d8a (rows of 40, 10 uni |
