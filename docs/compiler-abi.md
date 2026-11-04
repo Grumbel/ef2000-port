@@ -3512,3 +3512,16 @@ in EAX, format string address, one value).
 | `0x9aa78` | EAX:ef_addr32,DX:int16_t | none | 9a624@9a683 | Count an event kind in the counter row of the current slot. |
 | `0x9d1e8` | EAX:ef_addr32 | none | f80@1158,f80@1171,f80@11b4 | Read the next non-comment text line of a stream into its buffer. |
 | `0x9d990` | none | none | 9da80@9da8d | Load the quoted-string file into an arena block and index its strings. |
+
+## game_helpers51 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa1b54` | EAX:ef_addr32,DX:uint16_t | none | 7a9bc@7a9db | Create the state file and write its 12-byte header. |
+| `0xa1bf4` | EAX:ef_addr32,DX:uint16_t | none | 7a844@7a871 | Open the state file and validate its 12-byte header. |
+| `0xa2188` | EAX:ef_addr32 | none | none direct | Blend two 3-word keys by a 14-bit weight (linear). |
+| `0xa2434` | EAX:ef_addr32 | none | none direct | Blend two 3-word keys by a 9-bit weight (quadratic). |
+| `0xa3f74` | EAX:ef_addr32,DX:uint16_t | none | 545b8@545d9,545e4@545f4,54600@54618 | Append a packet to the outgoing buffer, flushing first when it would overflow. |
+| `0xa4138` | none | none | 34f94@34f95,35590@355ac,36f84@36f94 | Update the frame delta (clamped to 100) and clear the frame counters. |
+| `0xa41dc` | none | AL:uint8_t | 34f94@34fa3 | Start the device; returns true when it is running. |
+| `0xa4cb4` | AX:uint16_t | none | 94fc@979a,9820@99aa,9820@99c1 | Activate widget slot idx: run its callback and queue it for redraw. |

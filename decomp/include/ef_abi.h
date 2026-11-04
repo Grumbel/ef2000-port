@@ -2867,4 +2867,17 @@ uint32_t guest_fn_9d964(ef_addr32 text); /* 0x9d964 EAX -> AX */
 void guest_fatal_arg0(ef_addr32 format); /* [0x132a74] cdecl, no extra argument */
 void count_event_9aa78(ef_addr32 record, int16_t kind);
 
+/* game_helpers51.c */
+void create_state_file_a1b54(ef_addr32 name, uint16_t version);
+void open_state_file_a1bf4(ef_addr32 name, uint16_t version);
+void blend_linear_a2188(ef_addr32 key);
+void blend_quadratic_a2434(ef_addr32 key);
+void append_packet_a3f74(ef_addr32 bytes, uint16_t size);
+void update_frame_delta_a4138(void);
+uint8_t start_device_a41dc(void);
+void activate_widget_a4cb4(uint16_t index);
+void guest_fn_a1cb4(void); /* 0xa1cb4 */
+void guest_fn_a4104(void); /* 0xa4104 */
+uint32_t guest_fn_a2f70(void); /* 0xa2f70 -> AL */
+
 #endif
