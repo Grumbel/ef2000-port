@@ -3858,4 +3858,10 @@ uint32_t dos_time_hundredths_11004b(void);
 uint32_t guest_fn_39548_x(ef_addr32 rec, uint32_t code, int32_t value); /* 0x39548 EAX EDX EBX -> AX */
 void guest_fn_11f287_x(ef_addr32 in_regs, ef_addr32 out_regs); /* 0x11f287 EAX EDX (DOS int call) */
 
+/* game_helpers108.c */
+ef_addr32 find_entry_at_point_cfa24(uint32_t count, ef_addr32 base, int32_t x, int32_t y);
+ef_addr32 flatten_record_blocks_cbf20(ef_addr32 out, ef_addr32 list);
+uint32_t guest_fn_cf960_x(ef_addr32 entry, int32_t x, int32_t y); /* 0xcf960 EAX EDX EBX -> EAX */
+uint32_t guest_fn_cc6c0_z(uint32_t size, ef_addr32 tag, uint32_t n); /* 0xcc6c0 cdecl, three stack args */
+
 #endif

@@ -2890,7 +2890,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cbd30	451	scan_code_weight_cbd30	game_helpers71	compiles	game	confirmed	decomp/tests/0x000cbd30.json	docs/compiler-abi.md; Weight for a scan code (0 when unmapped); the original is a binary decision tree.; callers caa28@cab5f; guest pending
 0x000cbef4	12	code_if_one_to_four	code_predicates	compiles	game	confirmed	decomp/tests/0x000cbef4.json	docs/compiler-abi.md; AL if it is 1..4, else 0.; callers cabb0@cabd0; guest pending
 0x000cbf00	30	release_pointer_1379c8	code_predicates	compiles	game	confirmed	decomp/tests/0x000cbf00.json	docs/compiler-abi.md; Release dword 0x1379c8 through 0xcc768 when set, then clear it.; callers b0f5c@b1684,b1b10@b1b84; guest pending
-0x000cbf20	126			unknown	unclassified	unverified		
+0x000cbf20	126	flatten_record_blocks_cbf20	game_helpers108	compiles	game	confirmed	decomp/tests/0x000cbf20.json	docs/compiler-abi.md; Concatenate the data blocks (length at +9, bytes at *(+0xc)) of a record list into one new buffer; the first block's len; callers b0f5c@b1693; guest pending
 0x000cbfa0	79	default_range_cbfa0	float_helpers6	compiles	game	confirmed	decomp/tests/0x000cbfa0.json	docs/compiler-abi.md; Default range of an object: 400 for kinds 1 and 3, else 300.; callers cbff0@cc091; guest pending
 0x000cbff0	370			unknown	unclassified	unverified		
 0x000cc164	36	mark_list_entry_9c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc164.json	docs/compiler-abi.md; In list EBX node number AL, set byte [dword +0xc + DL] * to 0x9c and byte [dword +0x10 + DL] to 0x7f.; callers c0b04@c0eac,c0b04@c0ee1,cb6fc@cb7c2; guest pending
@@ -2988,7 +2988,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cf83c	270			unknown	unclassified	unverified		
 0x000cf94a	7	abs_cf94a	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000cf94a.json	docs/compiler-abi.md; Absolute value.; callers 15b7c@15c23,15b7c@15c48,15b7c@15cf2; guest pending
 0x000cf960	194			unknown	unclassified	unverified		
-0x000cfa24	103			unknown	unclassified	unverified		
+0x000cfa24	103	find_entry_at_point_cfa24	game_helpers108	compiles	game	confirmed	decomp/tests/0x000cfa24.json	docs/compiler-abi.md; Return the first of count 0x4a-byte entries whose bounding box contains (x,y) and which passes the cf960 test, else 0.; callers cfa9c@cfb21,cfc68@cfd02; guest pending
 0x000cfa9c	204			unknown	unclassified	unverified		
 0x000cfc68	380			unknown	unclassified	unverified		
 0x000cfde4	381			unknown	unclassified	unverified		

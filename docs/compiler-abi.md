@@ -4357,3 +4357,10 @@ in EAX, format string address, one value).
 | `0x110b30` | EAX:ef_addr32,EDX:ef_addr32,BX:int16_t | none | none direct | Copy 200 lines of 0x140 bytes with the destination advancing by a 16-bit stride per line. |
 | `0x1e0ec` | EAX:ef_addr32,DX:int16_t | none | 1df90@1e0e1 | Look up an event code for a record (position >> 8 as a 3-vector) and dispatch it unless the lookup returns -1. |
 | `0x11004b` | none | EAX:uint32_t | 1100b1@1100b3 | DOS get-time call (int 21h, AH=2Ch) converted to hundredths of a second since midnight. |
+
+## game_helpers108 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcfa24` | EAX:uint32_t,EDX:ef_addr32,EBX:int32_t,ECX:int32_t | EAX:ef_addr32 | cfa9c@cfb21,cfc68@cfd02 | Return the first of count 0x4a-byte entries whose bounding box contains (x,y) and which passes the cf960 test, else 0. |
+| `0xcbf20` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | b0f5c@b1693 | Concatenate the data blocks (length at +9, bytes at *(+0xc)) of a record list into one new buffer; the first block's len |
