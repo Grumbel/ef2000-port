@@ -4997,3 +4997,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc9238` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | a6d00@a6f9a | Store a clip rectangle (a, b, c-1, d-1) at 0x15b60e..0x15b61c, build the two 64-entry shade tables at 0x41f3f0 on first  |
+
+## screen_clip1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdd8dc` | none | none | 278c0@27b26,27d18@27eaa,f3480@f3492 | Save the screen area under the parameter block at 0x15ee80 (size clamped against 0x425fc6/0x425fc8) into its buffer and  |

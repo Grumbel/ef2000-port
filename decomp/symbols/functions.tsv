@@ -3253,7 +3253,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd870	80			unknown	unclassified	unverified		
 0x000dd8c0	14			unknown	unclassified	unverified		
 0x000dd8d0	12	run_shutdown_pair_dd8d0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000dd8d0.json	docs/compiler-abi.md; Run the two shutdown helpers in order.; callers 278c0@27b2d,27d18@27eb1,f3f84@f40f8; guest pending
-0x000dd8dc	170			unknown	unclassified	unverified		
+0x000dd8dc	170	save_and_draw_block_dd8dc	screen_clip1	compiles	game	confirmed	decomp/tests/0x000dd8dc.json	docs/compiler-abi.md; Save the screen area under the parameter block at 0x15ee80 (size clamped against 0x425fc6/0x425fc8) into its buffer and ; callers 278c0@27b26,27d18@27eaa,f3480@f3492; guest pending
 0x000dd988	90	get_view_state_dd988	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd988.json	docs/compiler-abi.md; Copy the saved view state at 0x15ee80..0x15ee90 to eight output pointers.; callers f2ac0@f2b0e; guest pending
 0x000dd9e4	112	set_param_block_dd9e4	fill_rects2	compiles	game	confirmed	decomp/tests/0x000dd9e4.json	docs/compiler-abi.md; Store a parameter block at 0x15ee80, bracketing the writes with 0xdd870/0xdd8c0 unless 0x15ee94 is -1.; callers 278c0@2792d,27d18@27d50,f2a30@f2a8e; guest pending
 0x000ddae0	232			unknown	unclassified	unverified		

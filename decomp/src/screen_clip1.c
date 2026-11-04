@@ -75,3 +75,20 @@ void draw_page_entries_c8e8(void)
                          0x00197350u + (uint32_t)slot2);
     }
 }
+
+/* 0xdd8dc, 170 bytes. Save the screen area under the parameter block at 0x15ee80 (size clamped against 0x425fc6/0x425fc8) into its buffer and draw the block via 0xcde00. */
+void save_and_draw_block_dd8dc(void)
+{
+    int16_t w = (int16_t)(EF_U16(0x00425fc8u) - EF_U16(0x0015ee8cu));
+    int16_t h = (int16_t)(EF_U16(0x00425fc6u) - EF_U16(0x0015ee8eu));
+    if (w < 0)
+        w = 0;
+    if (h < 0)
+        h = 0;
+    get_screen_rows_eb1f0(0u, 0u, 0u, 0u, (uint16_t)w, (uint16_t)h, EF_U16(0x0015ee88u), EF_U16(0x0015ee8au), EF_U32(0x0015ee90u));
+    EF_U16(0x0015ee94u) = (uint16_t)w;
+    EF_U16(0x0015ee96u) = (uint16_t)h;
+    guest_fn_cde00_x((uint32_t)((int32_t)EF_S16(0x0015ee86u) + (int32_t)EF_S16(0x00425fc6u)),
+                     (uint32_t)((int32_t)EF_S16(0x0015ee84u) + (int32_t)EF_S16(0x00425fc8u)),
+                     0u, EF_U32(0x0015ee80u));
+}
