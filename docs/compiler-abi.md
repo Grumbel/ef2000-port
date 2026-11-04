@@ -8976,3 +8976,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfdf60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | c680b@c6841 | (ret 12; three stack arguments R, Y, X) Draw a filled disc of radius R-1 centred at (X, Y) (signed words) with colour by |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdc34e` | EAX:uint32_t,EDX:uint32_t | none | dc334@dc33f | Implicit-register fragment (AL = x shift, BL = y shift, both signed): patch the immediate bytes of the self-modifying co |

@@ -20525,3 +20525,38 @@ void draw_disc_fdf60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_
     circle_walk_up_fde20(0, s, err, 0, 0x000fddf0u, 0x00485ff4u);
     circle_walk_down_fdec0(s, 0, err, s, 0x000fddf0u, 0x00485ff4u);
 }
+
+/* 0xdc34e, 135 bytes. Implicit-register fragment (AL = x shift, BL = y shift, both signed): patch the immediate bytes of the self-modifying code at 0xc682c, 0xc5a77, 0xc5aa3, 0xc59fd, 0xc5a29, 0xdc5e8, 0xdc620, 0x164660, 0x164664, 0xc738b, 0xc73a0, 0x15c090 and 0x15c0a4 by AL/BL (add or sub as the original does), then shift the scale dwords 0x15bdd4 by AL and 0x15bdd8 by BL (left when positive, right when negative). */
+void patch_view_shift_dc34e(uint32_t al_in, uint32_t bl_in)
+{
+	uint8_t al = (uint8_t)al_in;
+	uint8_t bl = (uint8_t)bl_in;
+	int8_t n;
+
+	EF_U8(0x000c682cu) = (uint8_t)(EF_U8(0x000c682cu) + al);
+	EF_U8(0x000c5a77u) = (uint8_t)(EF_U8(0x000c5a77u) - al);
+	EF_U8(0x000c5aa3u) = (uint8_t)(EF_U8(0x000c5aa3u) - bl);
+	EF_U8(0x000c59fdu) = (uint8_t)(EF_U8(0x000c59fdu) - al);
+	EF_U8(0x000c5a29u) = (uint8_t)(EF_U8(0x000c5a29u) - bl);
+	EF_U8(0x000dc5e8u) = (uint8_t)(EF_U8(0x000dc5e8u) - al);
+	EF_U8(0x000dc620u) = (uint8_t)(EF_U8(0x000dc620u) - bl);
+	EF_U8(0x00164660u) = (uint8_t)(EF_U8(0x00164660u) + al);
+	EF_U8(0x00164664u) = (uint8_t)(EF_U8(0x00164664u) + bl);
+	EF_U8(0x000c738bu) = (uint8_t)(EF_U8(0x000c738bu) - al);
+	EF_U8(0x000c73a0u) = (uint8_t)(EF_U8(0x000c73a0u) - bl);
+	EF_U8(0x0015c090u) = (uint8_t)(EF_U8(0x0015c090u) - al);
+	EF_U8(0x0015c0a4u) = (uint8_t)(EF_U8(0x0015c0a4u) - bl);
+
+	n = (int8_t)al;
+	if (n < 0) {
+		while (n != 0) { EF_U32(0x0015bdd4u) >>= 1; n++; }
+	} else {
+		while (n != 0) { EF_U32(0x0015bdd4u) <<= 1; n--; }
+	}
+	n = (int8_t)bl;
+	if (n < 0) {
+		while (n != 0) { EF_U32(0x0015bdd8u) >>= 1; n++; }
+	} else {
+		while (n != 0) { EF_U32(0x0015bdd8u) <<= 1; n--; }
+	}
+}
