@@ -5171,4 +5171,6 @@ void fill_span_d4510(void);
 
 uint32_t dos_get_time_f10ca(uint32_t tm);
 
+uint32_t build_ramp_table_e7ea4(int32_t lo, int32_t hi);
+
 #endif

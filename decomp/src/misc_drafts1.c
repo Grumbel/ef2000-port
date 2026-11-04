@@ -8076,3 +8076,20 @@ uint32_t dos_get_time_f10ca(uint32_t tm)
     EF_U32(tm + 0x20u) = 0xffffffffu;
     return (t & 0xffu) * 10u;
 }
+
+/* 0xe7ea4, 177 bytes. Build the 256-entry brightness ramp at 0x463f60 for the range LO..HI (EAX, EDX; LO >= 0 and HI < 256, else return 0): entries 1..LO are 0, entries HI+1..0x100 are 0x3f, and entry LO+1+k (k = 0 .. HI-LO-1) is the truncation of k divided by the float (HI - LO) * double 0x190c54. Returns 1. */
+uint32_t build_ramp_table_e7ea4(int32_t lo, int32_t hi)
+{
+    float step;
+    int32_t i, k;
+    if (lo < 0 || hi >= 0x100)
+        return 0u;
+    step = (float)((double)(hi - lo) * *(double *)ef_guest_memory_ptr(0x00190c54u));
+    for (i = 1; lo > 0 && i <= lo; i++)
+        EF_U8(0x00463f5fu + (uint32_t)i) = 0u;
+    for (i = hi + 1; i <= 0x100; i++)
+        EF_U8(0x00463f5fu + (uint32_t)i) = 0x3fu;
+    for (k = 0, i = lo + 1; lo < hi && i <= hi; i++, k++)
+        EF_U8(0x00463f5fu + (uint32_t)i) = (uint8_t)(int32_t)truncate_9d72c((double)k / (double)step);
+    return 1u;
+}

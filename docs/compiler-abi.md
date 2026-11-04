@@ -6744,3 +6744,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf10ca` | EAX:uint32_t | EAX:uint32_t | a4574@a457d | Fill the broken-down time record TM (EAX) from DOS: dwords +0 seconds, +4 minutes, +8 hours, +0xc day, +0x10 month - 1,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe7ea4` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | da224@da284 | Build the 256-entry brightness ramp at 0x463f60 for the range LO..HI (EAX, EDX; LO >= 0 and HI < 256, else return 0): en |
