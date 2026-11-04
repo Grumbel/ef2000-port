@@ -2715,7 +2715,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c0b04	1326			unknown	unclassified	unverified		
 0x000c1034	142			unknown	unclassified	unverified		
 0x000c10c4	181	reactivate_records_at_cell_c10c4	game_helpers94	compiles	game	confirmed	decomp/tests/0x000c10c4.json	docs/compiler-abi.md; Reactivate up to count disabled (state 7) records at the given cell whose code passes the group and set tests; returns h; callers c117c@c11ce; guest pending
-0x000c117c	124			unknown	unclassified	unverified		
+0x000c117c	124	can_reactivate_c117c	game_helpers129	compiles	game	confirmed	decomp/tests/0x000c117c.json	docs/compiler-abi.md; Whether the record may be reactivated: its cell holds more than 12 records and reactivating at most 0x30 - count of them; callers c1210@c12a0; guest pending
 0x000c1210	550			unknown	unclassified	unverified		
 0x000c1438	1284			unknown	unclassified	unverified		
 0x000c193c	591			unknown	unclassified	unverified		
@@ -3225,7 +3225,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc860	47	halve_pair_to_fit16	math_string	compiles	game	confirmed	decomp/tests/0x000dc860.json	docs/compiler-abi.md; Halve the dwords at EAX and EDX until both fit in a signed 16-bit range.; callers dc8d8@dc906; guest pending
 0x000dc890	69	halve_triple_to_fit16_dc890	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc890.json	docs/compiler-abi.md; Halve three dwords until all fit in a signed 16-bit range.; callers dc91c@dc98f,dcaa4@dcb2a; guest pending
 0x000dc8d8	67	angle_of_fitted_pair_dc8d8	game_helpers120	compiles	game	confirmed	decomp/tests/0x000dc8d8.json	docs/compiler-abi.md; Angle of the vector (x, y) after halving it until both components fit in 16 bits.; callers dc91c@dc9a9,dc91c@dc9bf; guest pending
-0x000dc91c	180			unknown	unclassified	unverified		
+0x000dc91c	180	direction_angles_dc91c	game_helpers129	compiles	game	confirmed	decomp/tests/0x000dc91c.json	docs/compiler-abi.md; Store the elevation and heading angles of the vector from point b to point a (three dwords each) into two words at out: ; callers 26b60@26f1a,30214@3119b,3122c@314ad; guest pending
 0x000dcaa4	207	bearing_between_positions_dcaa4	game_helpers95	compiles	game	confirmed	decomp/tests/0x000dcaa4.json	docs/compiler-abi.md; Pitch and yaw angles of the vector from position b to position a, stored as two words at out.; callers 9f664@9f702; guest pending
 0x000dcb74	9	stack_used_dcb74	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000dcb74.json	docs/compiler-abi.md; Stack bytes in use relative to the recorded stack base.; callers 233c4@2341e,9bd20@9bd30,c3584@c35a8; guest pending
 0x000dcb96	100			unknown	unclassified	unverified		
@@ -3958,7 +3958,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00109e08	55			unknown	unclassified	unverified		
 0x00109e40	44			unknown	unclassified	unverified		
 0x00109e6c	3	return_zero_109e6c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00109e6c.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x00109e6f	76			unknown	unclassified	unverified		
+0x00109e6f	76	guest_memmove_109e6f	game_helpers129	compiles	game	confirmed	decomp/tests/0x00109e6f.json	docs/compiler-abi.md; memmove: copy n bytes from src to dst, copying backwards when the ranges overlap with dst above src.; callers e6144@e639c,f4347@f4469,f44b6@f454a; guest pending
 0x00109ec0	365			unknown	unclassified	unverified		
 0x0010a030	72			unknown	unclassified	unverified		
 0x0010a078	90			unknown	unclassified	unverified		
@@ -4089,8 +4089,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00111c90	262			unknown	unclassified	unverified		
 0x00111d98	88	midi_data_length_111d98	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00111d98.json	docs/compiler-abi.md; Number of data bytes of a MIDI status byte (cdecl).; callers 111e40@111e4b,112c10@113021; guest pending
 0x00111df0	77	send_pending_count_message_111df0	game_helpers125	compiles	game	confirmed	decomp/tests/0x00111df0.json	docs/compiler-abi.md; If a pending count is set at +0x1a8, send message 0x502 with it and clear the count and +0x1ac (cdecl, record on the sta; callers 111e40@111e65,111ed4@111eda,111ed4@111f16; guest pending
-0x00111e40	146			unknown	unclassified	unverified		
-0x00111ed4	76			unknown	unclassified	unverified		
+0x00111e40	146	append_midi_event_111e40	game_helpers129	compiles	game	confirmed	decomp/tests/0x00111e40.json	docs/compiler-abi.md; Append a MIDI event (status, data1 and, for three-byte events, data2) to the record's buffer at +8 (offset 0x100, fill c; callers 1123a4@1127f7,1133f8@113917,1133f8@113929; guest pending
+0x00111ed4	76	append_midi_block_111ed4	game_helpers129	compiles	game	confirmed	decomp/tests/0x00111ed4.json	docs/compiler-abi.md; Queue a raw MIDI block (at most 0x200 bytes) into the record's buffer, flushing before and after (cdecl: record, data, l; callers 112c10@112fa0; guest pending
 0x00111f20	45	read_varlen_111f20	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00111f20.json	docs/compiler-abi.md; Read a MIDI variable-length quantity (up to 4 bytes) and advance the cursor stored at the argument.; callers 112c10@112db4,112c10@112f7b,112c10@1130f0; guest pending
 0x00111f50	52	byte_swap_111f50	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00111f50.json	docs/compiler-abi.md; Byte-swap a dword (cdecl).; callers 111f84@111fc4,111f84@112031,113d10@113d60; guest pending
 0x00111f84	196			unknown	unclassified	unverified		

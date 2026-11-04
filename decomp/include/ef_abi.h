@@ -3973,4 +3973,11 @@ void dump_record_b23bc(ef_addr32 rec, int16_t index, uint32_t handle, int16_t fa
 void classify_entries_b059c(ef_addr32 list_holder, ef_addr32 head_a, ef_addr32 list_b);
 uint32_t guest_fn_b04e8_x(ef_addr32 a, ef_addr32 b); /* 0xb04e8 EAX/EDX -> AX (x87 distance test) */
 
+/* game_helpers129.c */
+void guest_memmove_109e6f(ef_addr32 dst, ef_addr32 src, uint32_t n);
+void append_midi_event_111e40(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec, uint32_t status, uint32_t data1, uint32_t data2);
+void append_midi_block_111ed4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec, ef_addr32 data, uint32_t length);
+void direction_angles_dc91c(ef_addr32 out, ef_addr32 a, ef_addr32 b);
+int32_t can_reactivate_c117c(ef_addr32 rec, ef_addr32 list_a, ef_addr32 list_b);
+
 #endif

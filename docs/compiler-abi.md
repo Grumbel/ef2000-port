@@ -4547,3 +4547,13 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb23bc` | EAX:ef_addr32,DX:int16_t,EBX:uint32_t,CX:int16_t | none | b2560@b26a9 | Dump one 0x13-byte record to a handle: an index or fallback value, its kind name, an optional dword and six signed words |
 | `0xb059c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | b0f5c@b11a0,b0f5c@b149f | Classify every entry of the list: entries of kind 0x31 whose type is 2 get state 2 if some other qualifying entry matche |
+
+## game_helpers129 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x109e6f` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | e6144@e639c,f4347@f4469,f44b6@f454a | memmove: copy n bytes from src to dst, copying backwards when the ranges overlap with dst above src. |
+| `0x111e40` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | 1123a4@1127f7,1133f8@113917,1133f8@113929 | Append a MIDI event (status, data1 and, for three-byte events, data2) to the record's buffer at +8 (offset 0x100, fill c |
+| `0x111ed4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32,[ESP+12]:uint32_t | none | 112c10@112fa0 | Queue a raw MIDI block (at most 0x200 bytes) into the record's buffer, flushing before and after (cdecl: record, data, l |
+| `0xdc91c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 26b60@26f1a,30214@3119b,3122c@314ad | Store the elevation and heading angles of the vector from point b to point a (three dwords each) into two words at out:  |
+| `0xc117c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:int32_t | c1210@c12a0 | Whether the record may be reactivated: its cell holds more than 12 records and reactivating at most 0x30 - count of them |
