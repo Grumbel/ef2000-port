@@ -5386,4 +5386,6 @@ uint32_t expand_placeholders_a80b0(ef_addr32 text);
 
 void send_packets_3617c(uint32_t total, uint32_t flag);
 
+uint32_t init_sound_driver_d6e58(void);
+
 #endif

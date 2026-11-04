@@ -7322,3 +7322,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x3617c` | EAX:uint32_t,EDX:uint32_t | none | 36438@3658e,36438@36684 | Send TOTAL (EAX) bytes from the buffer at dword 0x19f34c to the link in packets: set word 0x1357b2 = 2 and byte 0x19f5a6 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd6e58` | none | EAX:uint32_t | 7feb0@7febb,81110@8111b | Initialise the sound driver. When both configuration bytes 0x15bac6 and 0x15bac7 are zero clear the three state bytes (0 |

@@ -11063,3 +11063,39 @@ void send_packets_3617c(uint32_t total, uint32_t flag)
     run_idle_callback_a41a0();
     EF_U32(0x0019f338u) = ((uint32_t (*)(void))EF_U32(0x0015b620u))();
 }
+
+/* 0xd6e58, 303 bytes. Initialise the sound driver. When both configuration bytes 0x15bac6 and 0x15bac7 are zero clear the three state bytes (0x15bac4, 0x15bac6, 0x15bac7) and return -1. Otherwise, unless already initialised (byte 0x15bac4), initialise the module (0xd6dc4), program the driver settings (0x101e14: 1/0x5622, 0/0x64, 8/0, 7/1, 4/0xe), open the device description at 0x420e0c (0x1024b4; a failure shuts down 0x101ddc, clears the state bytes and reports 0x18f938 with dword 0x15bac8) and create, check (report 0x18f950 when missing) and reset the 14 voice handles in dword table 0x420dd0 (0x102a98, 0x102590, 0x102670), then set byte 0x15bac4. Returns 0 on success. */
+uint32_t init_sound_driver_d6e58(void)
+{
+    uint32_t i;
+    if (EF_U8(0x0015bac7u) == 0u && EF_U8(0x0015bac6u) == 0u) {
+        EF_U8(0x0015bac6u) = 0u;
+        EF_U8(0x0015bac4u) = 0u;
+        EF_U8(0x0015bac7u) = 0u;
+        return 0xffffffffu;
+    }
+    if (EF_U8(0x0015bac4u) != 0u)
+        return 0u;
+    init_module_d6dc4();
+    (void)trace_call_101e14(0u, 0u, 0u, 0u, 1u, 0x5622u);
+    (void)trace_call_101e14(0u, 0u, 0u, 0u, 0u, 0x64u);
+    (void)trace_call_101e14(0u, 0u, 0u, 0u, 8u, 0u);
+    (void)trace_call_101e14(0u, 0u, 0u, 0u, 7u, 1u);
+    (void)trace_call_101e14(0u, 0u, 0u, 0u, 4u, 0xeu);
+    if (trace_call_1024b4(0u, 0u, 0u, 0u, 0x00420e0cu) != 0u) {
+        (void)trace_call_101ddc();
+        EF_U8(0x0015bac4u) = 0u;
+        EF_U8(0x0015bac6u) = 0u;
+        EF_U8(0x0015bac7u) = 0u;
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018f938u, EF_U32(0x0015bac8u));
+    }
+    for (i = 0u; i != 0x38u; i += 4u) {
+        trace_call_102a98(EF_U32(0x00420e0cu), EF_U8(0x00420e10u));
+        EF_U32(0x00420dd0u + i) = trace_call_102590(0u, 0u, 0u, 0u, EF_U32(0x00420e0cu));
+        if (EF_U32(0x00420dd0u + i) == 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f950u);
+        trace_call_102670(EF_U32(0x00420dd0u + i));
+    }
+    EF_U8(0x0015bac4u) = 1u;
+    return 0u;
+}
