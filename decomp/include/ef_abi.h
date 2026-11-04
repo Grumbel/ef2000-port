@@ -5357,4 +5357,12 @@ uint32_t write_page_record_a1d50(void);
 void select_page_a1d00(uint32_t id);
 uint32_t guest_fn_3cd40_x(ef_addr32 name); /* 0x3cd40 EAX -> EAX */
 
+uint32_t mktime_f118d(ef_addr32 tm);
+uint32_t get_time_seconds_a4574(ef_addr32 out);
+void guest_fn_10eda1_x(void); /* 0x10eda1 */
+void guest_fn_10e97f_x(ef_addr32 tm); /* 0x10e97f EAX */
+uint32_t guest_fn_f118d_x(ef_addr32 tm); /* 0xf118d EAX -> EAX */
+
+
+
 #endif

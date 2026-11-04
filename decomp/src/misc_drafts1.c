@@ -10697,3 +10697,70 @@ void select_page_a1d00(uint32_t id)
     }
     EF_U32(0x00417160u) = EF_U32(0x00417160u) + 1u;
 }
+
+/* 0xf118d, 340 bytes. mktime: convert the broken-down time at TM (EAX; sec, min, hour, mday, mon, year since 1900 at +0..+0x14, isdst at +0x20) to seconds since 1970. The month is normalised into the year (tables 0x195cb0 and 0x195cca for leap years), the day count and the seconds of the day are built, the structure is normalised (0x10ec62), the zone offset dword 0x17d554 is added (0x10eda1 sets it up, 0x10e97f resolves a negative isdst) and the daylight saving shift dword 0x17d558 is removed when isdst is positive; returns -1 when the date is before the epoch or out of range. */
+uint32_t mktime_f118d(ef_addr32 tm)
+{
+    int32_t mon = (int32_t)EF_U32(tm + 0x10u);
+    int32_t year = (int32_t)EF_U32(tm + 0x14u);
+    int32_t r = mon % 12;
+    int32_t days;
+    int32_t secs;
+    uint32_t tbl = 0x00195cb0u;
+    int32_t y;
+    if (year < (int32_t)0xf4fb7ea1u)
+        return 0xffffffffu;
+    year += mon / 12;
+    while (r < 0) {
+        year--;
+        r += 12;
+    }
+    if (year < 0)
+        return 0xffffffffu;
+    if (is_leap_year(year + 0x76c) != 0u)
+        tbl = 0x00195ccau;
+    y = year;
+    days = (int32_t)EF_U32(tm + 0xcu) + (int32_t)(int16_t)EF_U16(tbl + (uint32_t)r * 2u) + 365 * y + ((y + 3) >> 2) - 1;
+    if (year != 0)
+        days--;
+    secs = (int32_t)EF_U32(tm) + ((int32_t)EF_U32(tm + 4u) + (int32_t)EF_U32(tm + 8u) * 60) * 60;
+    while (secs < 0) {
+        days--;
+        secs += 0x15180;
+    }
+    (void)break_down_time_10ec62((uint32_t)days, (uint32_t)secs, 0, tm);
+    guest_fn_10eda1_x();
+    secs += (int32_t)EF_U32(0x0017d554u);
+    if ((int32_t)EF_U32(tm + 0x20u) < 0)
+        guest_fn_10e97f_x(tm);
+    if ((int32_t)EF_U32(tm + 0x20u) > 0)
+        secs -= (int32_t)EF_U32(0x0017d558u);
+    while (secs < 0) {
+        days--;
+        secs += 0x15180;
+    }
+    if (days < 0x63de)
+        return 0xffffffffu;
+    if (days == 0x63de) {
+        secs -= 0x15180;
+        if ((int32_t)EF_U32(0x0017d554u) <= 0 || secs < 0)
+            return 0xffffffffu;
+        return (uint32_t)secs;
+    }
+    return (uint32_t)(secs + (days - 0x63df) * 0x15180);
+}
+
+/* 0xa4574, 45 bytes. Get the current time as seconds (0xf118d over the broken-down time from 0xf10ca, whose first field is bumped when the fraction returned is 500 or more) and store it at OUT (EDX) when non-null. */
+uint32_t get_time_seconds_a4574(ef_addr32 out)
+{
+    uint32_t tm[9];
+    uint32_t t = (uint32_t)(uintptr_t)tm;
+    uint32_t r;
+    memset(tm, 0, sizeof(tm));
+    if ((int32_t)dos_get_time_f10ca(t) >= 0x1f4)
+        tm[0]++;
+    r = mktime_f118d(t);
+    if (out != 0u)
+        EF_U32(out) = r;
+    return r;
+}

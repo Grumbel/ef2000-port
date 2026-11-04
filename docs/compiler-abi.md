@@ -7256,3 +7256,15 @@ in EAX, format string address, one value).
 | `0xad440` | EAX:ef_addr32,EDX:ef_addr32 | none | 49228@49390,b0f5c@b1011,b0f5c@b120c | Open the resource NAME (EAX) from the default directory plus the subdirectory 0x18dc8c: build the path (0x9c980, strcat  |
 | `0xa1d50` | none | EAX:uint32_t | a1d00@a1d3d | Write the current page record (pointer 0x417174, entry table 0x41717c) to the save stream with 0xa1b28: first the 13-byt |
 | `0xa1d00` | EAX:uint32_t | none | 7a9bc@7aa06 | Select the record ID (AX, signed) as the current page: store the id in word 0x41722a, look the record up (0xb3f58), set  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf118d` | EAX:ef_addr32 | EAX:uint32_t | a4574@a458e,10e872@10e8e9 | mktime: convert the broken-down time at TM (EAX; sec, min, hour, mday, mon, year since 1900 at +0..+0x14, isdst at +0x20 |
+| `0xa4574` | EAX:ef_addr32 | EAX:uint32_t | 4050@4056,bfcc@c0e4,b33ac@b33ae | Get the current time as seconds (0xf118d over the broken-down time from 0xf10ca, whose first field is bumped when the fr |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

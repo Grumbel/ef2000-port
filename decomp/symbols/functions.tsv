@@ -2221,7 +2221,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a4470	2	return_three_a4470	game_helpers119	compiles	game	confirmed	decomp/tests/0x000a4470.json	docs/compiler-abi.md; Return the constant 3.; callers 3c74@3cbb,601c@6148,1dc20@1de11; guest pending
 0x000a4472	53			unknown	unclassified	unverified		
 0x000a455b	25	call_edd49_a455b	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a455b.json	docs/compiler-abi.md; Run edd49 with the byte at 0x132a60 cleared, then restore the dword.; callers 9bdbb@9bdfd; guest pending
-0x000a4574	45			unknown	unclassified	unverified		
+0x000a4574	45	get_time_seconds_a4574	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a4574.json	docs/compiler-abi.md; Get the current time as seconds (0xf118d over the broken-down time from 0xf10ca, whose first field is bumped when the fr; callers 4050@4056,bfcc@c0e4,b33ac@b33ae; guest pending
 0x000a45a8	11	reseed_generator_a45a8	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000a45a8.json	docs/compiler-abi.md; Reseed the generator.; callers 3dd30@3dd60,3dd30@3de1f,7a844@7a876; guest pending
 0x000a45b3	49	step_generator_a45b3	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a45b3.json	docs/compiler-abi.md; Step a 32-bit generator held in two words; reseed when it reaches zero.; callers 6c1c@6cf3,6c1c@6d15,6c1c@6d2f; guest pending
 0x000a45e4	16	set_patch_dword_a45e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a45e4.json	docs/compiler-abi.md; Store the stack argument VALUE into the code-patch dword at 0xa45a4 (stdcall-style frame, ret 4).; callers 4050@405c,bfcc@c0f1,a9e70@a9e7e; guest pending
@@ -3589,7 +3589,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f0fac	82			unknown	unclassified	unverified		
 0x000f0ffe	72			unknown	unclassified	unverified		
 0x000f10ca	195	dos_get_time_f10ca	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f10ca.json	docs/compiler-abi.md; Fill the broken-down time record TM (EAX) from DOS: dwords +0 seconds, +4 minutes, +8 hours, +0xc day, +0x10 month - 1, ; callers a4574@a457d; guest pending
-0x000f118d	340			unknown	unclassified	unverified		
+0x000f118d	340	mktime_f118d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f118d.json	docs/compiler-abi.md; mktime: convert the broken-down time at TM (EAX; sec, min, hour, mday, mon, year since 1900 at +0..+0x14, isdst at +0x20; callers a4574@a458e,10e872@10e8e9; guest pending
 0x000f13ac	27	refresh_object_f13ac	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000f13ac.json	docs/compiler-abi.md; ; callers a56f8@a5704; guest pending
 0x000f17d8	51	process_words_f17d8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f17d8.json	docs/compiler-abi.md; Call 0xa4cb4 on up to five words starting at +0x59.; callers f18a4@f18fa,f18a4@f19a7,f1a70@f1b6f; guest pending
 0x000f180c	51	process_words_f180c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f180c.json	docs/compiler-abi.md; As 0xf17d8 with words at +0x63 and 0xa4b80.; callers f18a4@f18e2,f18a4@f197f,f1a70@f1b4d; guest pending
