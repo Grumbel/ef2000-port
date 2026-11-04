@@ -1050,3 +1050,81 @@ void reset_colour_tables_767f4(void)
     }
     expand_table_7632c();
 }
+
+/* 0x385cc, 140 bytes. (ret 8) Append a new 0x19-byte node to the list for slot idx (heads at 0x19f5b0, next at +0x15, previous at +0x11) and fill it from the arguments (+0 ebx, +4 ecx, +0xc byte edx, +8 and +0xd the two stack arguments). Reports an error through 0x132a74 when idx is not below 0x1a1504. */
+void append_list_node_385cc(uint32_t idx, uint32_t byte_val, uint32_t val0, uint32_t val4, uint32_t s0, uint32_t s1)
+{
+    uint32_t node;
+    uint32_t slot;
+    uint32_t head;
+    if ((int16_t)idx >= (int16_t)EF_U16(0x001a1504u)) {
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00183464u);
+        return;
+    }
+    node = guest_callptr_eax_ret_x(EF_U32(0x0012dd9cu), 0x19u);
+    slot = 0x0019f5b0u + (uint32_t)((int32_t)(int16_t)idx) * 4u;
+    head = EF_U32(slot);
+    if (head != 0u) {
+        uint32_t p = head;
+        while (EF_U32(p + 0x15u) != 0u)
+            p = EF_U32(p + 0x15u);
+        EF_U32(p + 0x15u) = node;
+        EF_U32(node + 0x11u) = p;
+    } else {
+        EF_U32(slot) = node;
+        EF_U32(node + 0x11u) = head;
+    }
+    EF_U32(node + 0x15u) = 0u;
+    EF_U32(node) = val0;
+    EF_U32(node + 4u) = val4;
+    EF_U8(node + 0xcu) = (uint8_t)byte_val;
+    EF_U32(node + 8u) = s0;
+    EF_U32(node + 0xdu) = s1;
+}
+
+/* 0xd8610, 140 bytes. Rescale the pair of words at 0x15baf2/0x15baf6: save the old values to 0x15bafe/0x15bafa, then recompute them from the ratio of the words at 0x420e7a, 0x420eaa and 0x420eac (and 0x420e78) with the extent 0x15bdcc. */
+void rescale_window_d8610(void)
+{
+    int32_t a = (int32_t)EF_S16(0x00420e7au);
+    int32_t b = (int32_t)EF_S16(0x00420eaau);
+    int32_t c = (int32_t)EF_S16(0x00420eacu);
+    int32_t d = (int32_t)EF_S16(0x00420e78u);
+    int32_t t;
+    int32_t margin;
+    int32_t ext;
+    int32_t y;
+    EF_U16(0x0015bafeu) = EF_U16(0x0015baf2u);
+    EF_U16(0x0015bafau) = EF_U16(0x0015baf6u);
+    t = d + (a * b) / c;
+    ext = (EF_S32(0x0015bdccu) + 1 - a) * b;
+    margin = (c * 5) >> 15;
+    EF_U16(0x0015baf2u) = (uint16_t)(t - margin);
+    y = d - ext / c - margin;
+    EF_U16(0x0015baf6u) = (uint16_t)y;
+}
+
+/* 0xa1500, 141 bytes. Step the timer word entry idx of the current page (entries are 2 bytes wide at 0x417174 + 0xb + 29 * [[0x41717c]+1]); the entry must be a type 0x0b word. Counts down byte +7 while byte +4 is below byte +2 and returns 1 when it reaches zero or below; otherwise resets bytes +4/+5 when the limit is exceeded. Returns 0 for locked entries. */
+uint8_t step_timer_entry_a1500(uint32_t idx)
+{
+    uint32_t kind = EF_U8(EF_U32(0x0041717cu) + 1u);
+    uint32_t p = EF_U32(0x00417174u) + 0xbu + kind * 29u + (uint32_t)((int32_t)(int16_t)idx) * 2u;
+    int8_t cur;
+    int8_t lim;
+    if ((EF_U16(p) & 0x7c00u) != 0x2c00u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018b318u);
+    if (EF_U8(p + 1u) & 0x80u)
+        return 0u;
+    if (EF_U8(0x00132ac3u) != 0u)
+        return 0u;
+    cur = (int8_t)EF_U8(p + 4u);
+    lim = (int8_t)EF_U8(p + 2u);
+    if (cur < lim) {
+        EF_U8(p + 7u) = (uint8_t)(EF_U8(p + 7u) - 1u);
+        return (int8_t)EF_U8(p + 7u) < 1 ? 1u : 0u;
+    }
+    if (lim > (int8_t)EF_U8(p + 5u))
+        return 0u;
+    EF_U8(p + 4u) = 0u;
+    EF_U8(p + 5u) = 0u;
+    return 0u;
+}

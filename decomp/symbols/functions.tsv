@@ -648,7 +648,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00038284	743			unknown	unclassified	unverified		
 0x0003856c	23	refresh_link_pointer	link_resolution	compiles	game	confirmed	decomp/tests/0x0003856c.json	docs/compiler-abi.md; Record guest pointer EAX; signed word +0x16 and pointer +0x18; invokes 0x38658 and stores EAX; original guest replacement unverified
 0x00038584	71	take_free_slot_38584	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00038584.json	docs/compiler-abi.md; Take the next free slot index of the 2000-slot table.; callers 4aa4c@4ac7f; guest pending
-0x000385cc	140			unknown	unclassified	unverified		
+0x000385cc	140	append_list_node_385cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000385cc.json	docs/compiler-abi.md; (ret 8) Append a new 0x19-byte node to the list for slot idx (heads at 0x19f5b0, next at +0x15, previous at +0x11) and f; callers 4aa4c@4ad93; guest pending
 0x00038658	26	resolve_link_pointer	link_resolution	compiles	game	confirmed	decomp/tests/0x00038658.json	docs/compiler-abi.md; AX signed table index and EDX candidate pointer; prefer candidate +0x15 alternate else fixed four-byte table; original guest replacement unverified
 0x00038674	97	count_live_38674	game_helpers7	compiles	game	confirmed	decomp/tests/0x00038674.json	docs/compiler-abi.md; Number of live, non-flagged objects in the ten word slots of entry index.; callers 15b7c@15c97,15b7c@15cc4,15b7c@15da6; guest pending
 0x000386f8	80	node_position_386f8	game_helpers7	compiles	game	confirmed	decomp/tests/0x000386f8.json	docs/compiler-abi.md; Position of the entry's node in its list.; callers d290@d4ca; guest pending
@@ -2130,7 +2130,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a0f84	1181			unknown	unclassified	unverified		
 0x000a1424	161	stamp_page_cell_a1424	game_helpers36	compiles	game	confirmed	decomp/tests/0x000a1424.json	docs/compiler-abi.md; Stamp a page cell with a scaled duration and a command code.; callers 9e7bc@9eab0; guest pending
 0x000a14c8	55	flag_page_slot_a14c8	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a14c8.json	docs/compiler-abi.md; Set the high flag of slot index of the current page.; callers 9e7bc@9eabd; guest pending
-0x000a1500	141			unknown	unclassified	unverified		
+0x000a1500	141	step_timer_entry_a1500	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a1500.json	docs/compiler-abi.md; Step the timer word entry idx of the current page (entries are 2 bytes wide at 0x417174 + 0xb + 29 * [[0x41717c]+1]); th; callers 9e7bc@9eb31,9e7bc@9ebba; guest pending
 0x000a1590	479			unknown	unclassified	unverified		
 0x000a1770	106	claim_page_slot_a1770	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000a1770.json	docs/compiler-abi.md; Return the address of slot idx (16-bit entries after the 29-byte sub-records) in a page object, checking that its type b; callers 878c8@878e9; guest pending
 0x000a17e8	58	record_type_value_a17e8	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a17e8.json	docs/compiler-abi.md; Value of the type byte (bits 2..7) if bit 1 is set, else -1.; callers 3cd9c@3cde9,53c80@53cf8; guest pending
@@ -3126,7 +3126,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d8170	329			unknown	unclassified	unverified		
 0x000d8358	96	advance_position_d8358	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d8358.json	docs/compiler-abi.md; Advance the wrapping position at word 0x15bb3c by delta/4.; callers 95e58@97033; guest pending
 0x000d8528	231			unknown	unclassified	unverified		
-0x000d8610	140			unknown	unclassified	unverified		
+0x000d8610	140	rescale_window_d8610	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d8610.json	docs/compiler-abi.md; Rescale the pair of words at 0x15baf2/0x15baf6: save the old values to 0x15bafe/0x15bafa, then recompute them from the r; callers d86e0@d898d,d86e0@d89c5,d86e0@d89f6; guest pending
 0x000d86e0	2296			unknown	unclassified	unverified		
 0x000d8fd8	1243			unknown	unclassified	unverified		
 0x000d9b30	112	probe_service_d9b30	probe_helpers1	compiles	game	confirmed	decomp/tests/0x000d9b30.json	docs/compiler-abi.md; Probe base values 0x6000 + n*0x100 (n = 0..16) with the 0x8b8 service 0x33 and return the first value whose reply echoes; callers 919d4@91a87,e9ac0@e9ad9; guest pending

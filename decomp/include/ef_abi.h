@@ -4538,4 +4538,9 @@ void draw_glyph_6x6_f2960(uint32_t colour, uint32_t x, uint32_t y, uint32_t glyp
 void unpack_planes_c38cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t src);
 void reset_colour_tables_767f4(void);
 
+void append_list_node_385cc(uint32_t idx, uint32_t byte_val, uint32_t val0, uint32_t val4, uint32_t s0, uint32_t s1);
+void rescale_window_d8610(void);
+
+uint8_t step_timer_entry_a1500(uint32_t idx);
+
 #endif

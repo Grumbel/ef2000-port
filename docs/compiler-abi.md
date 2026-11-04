@@ -5415,3 +5415,16 @@ in EAX, format string address, one value).
 | `0xf2960` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | f29ec@f2a10 | Draw a 6x6 glyph (index ecx, 6 mask bytes at 0x16116c) in colour al at (x = edx, y row = ebx). |
 | `0xc38cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | eac48@ead00 | Copy a planar (4 interleaved planes) image into the screen buffer at 0x146e40: for each plane, every row, every fourth p |
 | `0x767f4` | none | none | 58d64@58d73 | Reset the 256-entry colour tables: fill 0x1f71e0 with (0x3f, 0, 0x3f), zero the first entry at 0x464060, copy the 256 tr |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x385cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 4aa4c@4ad93 | (ret 8) Append a new 0x19-byte node to the list for slot idx (heads at 0x19f5b0, next at +0x15, previous at +0x11) and f |
+| `0xd8610` | none | none | d86e0@d898d,d86e0@d89c5,d86e0@d89f6 | Rescale the pair of words at 0x15baf2/0x15baf6: save the old values to 0x15bafe/0x15bafa, then recompute them from the r |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa1500` | EAX:uint32_t | AL:uint8_t | 9e7bc@9eb31,9e7bc@9ebba | Step the timer word entry idx of the current page (entries are 2 bytes wide at 0x417174 + 0xb + 29 * [[0x41717c]+1]); th |
