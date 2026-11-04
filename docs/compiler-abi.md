@@ -4448,3 +4448,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x112048` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | none direct | Read a stored MIDI channel value: program change (0xc0), pitch bend (0xe0, two 7-bit halves) or a controller (0xb0) from |
 | `0xf9dcb` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | f9ed2@f9ed8 | asctime: format a broken-down time record into "Www Mmm dd hh:mm:ss yyyy\n"; returns the buffer. |
+
+## game_helpers119 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa4470` | none | AL:uint8_t | 3c74@3cbb,601c@6148,1dc20@1de11 | Return the constant 3. |
+| `0x7aa2c` | none | none | 7ab00@7ab9a | Register the status description built for the string at 0x187c00. |
+| `0xd5c84` | EAX:int32_t | EAX:uint32_t | c4310@c4341 | Map an address inside the range 0xd3900..0xd5c84 to 0xc454a; any other value is returned unchanged. |

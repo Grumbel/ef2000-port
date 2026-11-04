@@ -3907,4 +3907,9 @@ void refresh_player_channels_1142cc(uint32_t u0, uint32_t u1, uint32_t u2, uint3
 /* game_helpers118.c */
 int32_t find_free_slot_run_b58a8(ef_addr32 obj, int16_t start, int16_t need);
 
+/* game_helpers119.c */
+uint8_t return_three_a4470(void);
+void register_status_description_7aa2c(void);
+uint32_t remap_address_d5c84(int32_t addr);
+
 #endif

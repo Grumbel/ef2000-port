@@ -1460,7 +1460,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a738	265			unknown	unclassified	unverified		
 0x0007a844	375			unknown	unclassified	unverified		
 0x0007a9bc	111	replay_plane_grid_7a9bc	game_helpers63	compiles	game	confirmed	decomp/tests/0x0007a9bc.json	docs/compiler-abi.md; Replay the 400x400 byte-pair grid through the plane source when it is enabled.; callers 7a454@7a45f; guest pending
-0x0007aa2c	15			unknown	unclassified	unverified		
+0x0007aa2c	15	register_status_description_7aa2c	game_helpers119	compiles	game	confirmed	decomp/tests/0x0007aa2c.json	docs/compiler-abi.md; Register the status description built for the string at 0x187c00.; callers 7ab00@7ab9a; guest pending
 0x0007aa3c	132	pick_random_pair_7aa3c	game_helpers27	compiles	game	confirmed	decomp/tests/0x0007aa3c.json	docs/compiler-abi.md; Pick two random table values for the current stream slot.; callers 7ab00@7abc4; guest pending
 0x0007aac0	61	select_plane_source	plane_sources	compiles	game	confirmed	decomp/tests/0x0007aac0.json	docs/compiler-abi.md
 0x0007ab00	369			unknown	unclassified	unverified		
@@ -2218,7 +2218,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a4342	48			unknown	unclassified	unverified		
 0x000a4380	161	guest_strcmp	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a4380.json	docs/compiler-abi.md; strcmp: 0, -1 or 1.; callers 20ec@2d06,4d4c@4d5b,4d4c@4d83; guest pending
 0x000a4421	31	uppercase_string	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4421.json	docs/compiler-abi.md; uppercase a..z in place, return pointer; callers 3b58@3be9,3b58@3c3e,2aa34@2aab1; guest pending
-0x000a4470	2			unknown	unclassified	unverified		
+0x000a4470	2	return_three_a4470	game_helpers119	compiles	game	confirmed	decomp/tests/0x000a4470.json	docs/compiler-abi.md; Return the constant 3.; callers 3c74@3cbb,601c@6148,1dc20@1de11; guest pending
 0x000a4472	53			unknown	unclassified	unverified		
 0x000a455b	25	call_edd49_a455b	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a455b.json	docs/compiler-abi.md; Run edd49 with the byte at 0x132a60 cleared, then restore the dword.; callers 9bdbb@9bdfd; guest pending
 0x000a4574	45			unknown	unclassified	unverified		
@@ -3057,7 +3057,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d4510	197			unknown	unclassified	unverified		
 0x000d53ff	1676			unknown	unclassified	unverified		
 0x000d5a90	271			unknown	unclassified	unverified		
-0x000d5c84	22			unknown	unclassified	unverified		
+0x000d5c84	22	remap_address_d5c84	game_helpers119	compiles	game	confirmed	decomp/tests/0x000d5c84.json	docs/compiler-abi.md; Map an address inside the range 0xd3900..0xd5c84 to 0xc454a; any other value is returned unchanged.; callers c4310@c4341; guest pending
 0x000d5d18	188			unknown	unclassified	unverified		
 0x000d5e0c	179			unknown	unclassified	unverified		
 0x000d5ec0	75			unknown	unclassified	unverified		
