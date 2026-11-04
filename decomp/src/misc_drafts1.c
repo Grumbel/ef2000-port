@@ -16172,3 +16172,25 @@ void report_fatal_text_a9aa8(ef_addr32 text)
 	guest_sprintf_a4342(0x00419160u, 0x0018d7e8u, text);
 	EF_U8(0x001371f8u) = 1u;
 }
+
+/* 0xed589, 97 bytes. Format EAX as hexadecimal text in the buffer EDX (0xcbd0f, base 16) and right-justify it to EBX characters with leading '0's; the text is terminated at offset EBX. ORIGINAL BUG: digits beyond the width are not handled (the copy then runs below the buffer start). */
+void format_hex_padded_ed589(int32_t value, ef_addr32 buf, uint32_t width)
+{
+	int32_t len = 0, src, dst, fill;
+
+	signed_to_digits_cbd0f(value, buf, 16u);
+	while (EF_U8(buf + (uint32_t)len) != 0u)
+		len++;
+	src = len;
+	dst = (int32_t)width - 1;
+	fill = dst;
+	while (src != 0) {
+		src--;
+		EF_U8(buf + (uint32_t)dst) = EF_U8(buf + (uint32_t)src);
+		dst--;
+		fill--;
+	}
+	for (; fill >= 0; fill--)
+		EF_U8(buf + (uint32_t)fill) = 0x30u;
+	EF_U8(buf + width) = 0u;
+}

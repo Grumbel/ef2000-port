@@ -3542,7 +3542,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ed4e7	91	parse_format_flags	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000ed4e7.json	docs/compiler-abi.md; Parse printf flag characters into the spec at EDX (+0x14 flags, +0x16 fill).; callers ed3b4@ed3c3; guest pending
 0x000ed542	36	strnlen_far_ed542	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ed542.json	docs/compiler-abi.md; Length of the string at SEG:OFFSET (the selector SEG is ignored in the flat model), limited to MAX: counts characters un; callers ed6cc@ed872,ed6cc@edaf2; guest pending
 0x000ed566	35			unknown	unclassified	unverified		
-0x000ed589	97			unknown	unclassified	unverified		
+0x000ed589	97	format_hex_padded_ed589	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ed589.json	docs/compiler-abi.md; Format EAX as hexadecimal text in the buffer EDX (0xcbd0f, base 16) and right-justify it to EBX characters with leading ; callers ed6cc@ed9ea,ed6cc@eda08; guest pending
 0x000ed5ea	219	format_fixed_ed5ea	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ed5ea.json	docs/compiler-abi.md; Format the 16.16 fixed-point VALUE as decimal text at BUF with the precision in dword +8 of the format record FMT (-1 se; callers ed6cc@ed817; guest pending
 0x000ed6c5	7	forward_callback_ed6c5	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000ed6c5.json	docs/compiler-abi.md; Forward to the callback at 0x17d498.; callers ed6cc@ed831; guest pending
 0x000ed6cc	1097			unknown	unclassified	unverified		
