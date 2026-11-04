@@ -14903,3 +14903,42 @@ void clear_state_block_9a348(void)
 	EF_U16(0x0040d02au) = 0u;
 	EF_U16(0x0040d02eu) = 0u;
 }
+
+/* 0x74228, 393 bytes. Transform the origin of record EAX by an attitude from the scene table. The attitude is five words found through the scene group named 0x186ba4 (or 0x186bb8 when dword +0x12 is nonzero) and the word key at +0x20 (0 or 0xffff means none); a missing entry falls back to the words at 0x12853c. With dword +0x12 equal to zero every word is halved. The words build a rotation matrix (0xd0b68 clears the 36-byte record, 0xd0ebc and 0xd0dbc apply words 4 and 3), the first three words form a vector that the 3x3 matrix maps, and each result is divided by 0x6900 and added to record dwords +0, +4 and +8; the sums go to 0x21443c, 0x214440 and 0x214444. */
+void transform_by_attitude_74228(ef_addr32 rec)
+{
+	uint32_t mat_u[12];
+	uint8_t *mat = (uint8_t *)mat_u;
+	int16_t w[5];
+	int32_t m[9];
+	int32_t w0, w1, w2;
+	uint32_t grp, ent;
+	uint16_t key;
+	int i;
+
+	grp = guest_fn_a1a40_key(EF_U32(rec + 0x12u) == 0u ? 0x00186ba4u : 0x00186bb8u);
+	ent = 0u;
+	if (grp != 0u) {
+		key = EF_U16(rec + 0x20u);
+		if (key != 0u && key != 0xffffu)
+			ent = find_scene_named_entry((int16_t)((int32_t)EF_U32(rec + 0x1eu) >> 16), grp);
+	}
+	if (ent == 0u)
+		ent = 0x0012853cu;
+	for (i = 0; i < 5; i++)
+		w[i] = (int16_t)EF_U16(ent + (uint32_t)i * 2u);
+	if (EF_U32(rec + 0x12u) == 0u) {
+		for (i = 0; i < 5; i++)
+			w[i] = (int16_t)(w[i] >> 1);
+	}
+	initialize_scene_angle_record((ef_addr32)(uintptr_t)mat);
+	update_scene_angle_first((ef_addr32)(uintptr_t)mat, (uint16_t)w[4]);
+	update_scene_angle_second((ef_addr32)(uintptr_t)mat, (uint16_t)w[3]);
+	memcpy(m, mat, sizeof m);
+	w0 = w[0];
+	w1 = w[1];
+	w2 = w[2];
+	EF_U32(0x0021443cu) = (uint32_t)((m[0] * w0 + m[1] * w1 + m[2] * w2) / 0x6900 + (int32_t)EF_U32(rec));
+	EF_U32(0x00214440u) = (uint32_t)((m[3] * w0 + m[4] * w1 + m[5] * w2) / 0x6900 + (int32_t)EF_U32(rec + 4u));
+	EF_U32(0x00214444u) = (uint32_t)((m[6] * w0 + m[7] * w1 + m[8] * w2) / 0x6900 + (int32_t)EF_U32(rec + 8u));
+}

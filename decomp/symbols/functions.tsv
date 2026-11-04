@@ -1359,7 +1359,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00073ee0	513			unknown	unclassified	unverified		
 0x000740e4	267	assign_roster_slot_740e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000740e4.json	docs/compiler-abi.md; Assign the unit A to the slot SLOT (stack byte, 0xff = none) of its owner's roster: the unit's previous slot (byte +0x20; callers 7ae4@7b21,7bc0@7c96,2ced4@2d0b7; guest pending
 0x000741f0	53	report_tactical_object_action	record_transitions	compiles	game	confirmed	decomp/tests/0x000741f0.json	docs/compiler-abi.md; host model; guest differential pending
-0x00074228	393			unknown	unclassified	unverified		
+0x00074228	393	transform_by_attitude_74228	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00074228.json	docs/compiler-abi.md; Transform the origin of record EAX by an attitude from the scene table. The attitude is five words found through the sce; callers 74584@746f2; guest pending
 0x00074448	53	map_code_74448	code_maps1	compiles	game	confirmed	decomp/tests/0x00074448.json	docs/compiler-abi.md; Map a code to a constant via a jump table (codes outside the range give 1).; callers 74718@74878; guest pending
 0x00074480	259	credit_hit_74480	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00074480.json	docs/compiler-abi.md; Credit a hit by the unit A on the unit named by the word 0x197c28 (ignored when either is 0xff/-1, missing, or flagged 4; callers 74970@74ad6,74970@74bc2; guest pending
 0x00074584	404			unknown	unclassified	unverified		

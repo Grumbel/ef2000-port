@@ -5760,4 +5760,6 @@ void unit_damage_tick_29dd0(uint32_t ax);
 
 void clear_state_block_9a348(void);
 
+void transform_by_attitude_74228(ef_addr32 rec);
+
 #endif

@@ -8103,3 +8103,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9a348` | none | none | 9a4d8@9a53c | Clear the 0x40d00x state block: words 0x40d008, 0x40d00a and 0x40d00c, 24 bytes at 0x40d00e, nineteen 6-byte records bet |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x74228` | EAX:ef_addr32 | none | 74584@746f2 | Transform the origin of record EAX by an attitude from the scene table. The attitude is five words found through the sce |
