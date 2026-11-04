@@ -4834,4 +4834,6 @@ void guest_fn_cc164_x(uint32_t a, uint32_t b, uint32_t c); /* 0xcc164 EAX/EDX/EB
 
 void draw_entry_list_78848(void);
 
+void insert_ordered_id_a48ac(uint32_t id, uint32_t after);
+
 #endif

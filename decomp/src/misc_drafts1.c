@@ -4267,3 +4267,39 @@ void draw_entry_list_78848(void)
         y += 10;
     }
 }
+
+/* 0xa48ac, 237 bytes. Mark the item ID (1..count in 0x41eed8, flag 8 set in byte +0x3b of its record in the table 0x41edfc) as ordered with flag 4. When ID is already in the id list 0x41eda8 only the flag is set; otherwise, if the list contains AFTER, ID is inserted behind it and the tail is shifted right by one word (the last entry drops out). */
+void insert_ordered_id_a48ac(uint32_t id, uint32_t after)
+{
+    uint16_t count = EF_U16(0x0041eed8u);
+    uint16_t i;
+    uint16_t j;
+    uint8_t found = 0u;
+    uint16_t id16 = (uint16_t)id;
+    if (id16 == 0u || id16 > count)
+        return;
+    if ((EF_U8(EF_U32(0x0041edfcu + (uint32_t)id16 * 4u) + 0x3bu) & 8u) == 0u)
+        return;
+    for (i = 0; i < count; i++) {
+        uint16_t e = EF_U16(0x0041eda8u + (uint32_t)i * 2u);
+        if (id16 == e) {
+            EF_U8(EF_U32(0x0041edfcu + (uint32_t)e * 4u) + 0x3bu) |= 4u;
+            return;
+        }
+    }
+    i = 0;
+    while (i < count && !found) {
+        if ((uint16_t)after == EF_U16(0x0041eda8u + (uint32_t)i * 2u))
+            found = 1u;
+        i++;
+    }
+    if (!found)
+        return;
+    EF_U8(EF_U32(0x0041edfcu + (uint32_t)id16 * 4u) + 0x3bu) |= 4u;
+    j = (uint16_t)(count - 1u);
+    while (j > i) {
+        EF_U16(0x0041eda8u + (uint32_t)j * 2u) = EF_U16(0x0041eda6u + (uint32_t)j * 2u);
+        j--;
+    }
+    EF_U16(0x0041eda8u + (uint32_t)i * 2u) = id16;
+}
