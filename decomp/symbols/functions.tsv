@@ -963,7 +963,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005375c	389			unknown	unclassified	unverified		
 0x000538e4	252	integrate_drift_538e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000538e4.json	docs/compiler-abi.md; Integrate the floating drift state for one frame of DT = word 0x127d92 ticks: the positions 0x1a5c00, 0x1a5bb8 and 0x1a5; callers 53c80@53ca9; guest pending
 0x000539e0	265	integrate_drift_539e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000539e0.json	docs/compiler-abi.md; Variant of 0x538e4 for the second drift mode: the tick counter 0x1a5b5c advances by DT (word 0x127d92), the positions an; callers 53c80@53cb0; guest pending
-0x00053aec	289			unknown	unclassified	unverified		
+0x00053aec	289	integrate_drift_53aec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00053aec.json	docs/compiler-abi.md; Third drift mode step. Convert the three signed words 0x1a5bda, 0x1a5bce, 0x1a5bc2 (high halves) with 0x53308, add the f; callers 53c80@53cb7; guest pending
 0x00053c10	69	accumulate_ticks_53c10	game_helpers56	compiles	game	confirmed	decomp/tests/0x00053c10.json	docs/compiler-abi.md; Accumulate the frame ticks and clear the idle flag once past the limit.; callers 53c80@53cbe; guest pending
 0x00053c80	446			unknown	unclassified	unverified		
 0x00053ecc	315			unknown	unclassified	unverified		

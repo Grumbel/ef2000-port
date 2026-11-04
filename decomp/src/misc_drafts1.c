@@ -14711,3 +14711,38 @@ void click_panel_slot_4e0d0(uint32_t x, uint32_t y)
     EF_U8(0x001a5672u + slot) = 8u;
     EF_U8(0x001a5708u) = 1u;
 }
+
+/* 0x53aec, 289 bytes. Third drift mode step. Convert the three signed words 0x1a5bda, 0x1a5bce, 0x1a5bc2 (high halves) with 0x53308, add the floats 0x1a5ba8, 0x1a5ba4, 0x1a5ba0 and pass the three sums to 0x53350. Then, with dt = word 0x127d92, advance the position floats 0x1a5c00, 0x1a5bb8, 0x1a5bbc by velocity * dt, damp the velocity floats 0x1a5ba0, 0x1a5ba4, 0x1a5ba8 by velocity * float 0x185b7c * dt and finally add the 0x52eb0(10.0) * dt * float 0x185b7c squared term to 0x1a5ba4. */
+void integrate_drift_53aec(void)
+{
+    float damp, t1, t2, t3, fv;
+    double v1, v2, v3, dt, r;
+    uint32_t b1, b3;
+    float *p0 = (float *)ef_guest_memory_ptr(0x001a5ba0u);
+    float *p1 = (float *)ef_guest_memory_ptr(0x001a5ba4u);
+    float *p2 = (float *)ef_guest_memory_ptr(0x001a5ba8u);
+    float *q0 = (float *)ef_guest_memory_ptr(0x001a5c00u);
+    float *q1 = (float *)ef_guest_memory_ptr(0x001a5bb8u);
+    float *q2 = (float *)ef_guest_memory_ptr(0x001a5bbcu);
+    v1 = convert_signed_short_scale((int16_t)((int32_t)EF_U32(0x001a5bdau) >> 16));
+    t1 = (float)(v1 + (double)*p2);
+    v2 = convert_signed_short_scale((int16_t)((int32_t)EF_U32(0x001a5bceu) >> 16));
+    t2 = (float)(v2 + (double)*p1);
+    v3 = convert_signed_short_scale((int16_t)((int32_t)EF_U32(0x001a5bc2u) >> 16));
+    t3 = (float)(v3 + (double)*p0);
+    memcpy(&b1, &t1, sizeof b1);
+    memcpy(&b3, &t3, sizeof b3);
+    guest_fn_53350_w(0u, 0u, 0u, 0u, b3, t2, b1);
+    dt = (double)(int32_t)EF_U16(0x00127d92u);
+    *q0 = (float)((double)*p0 * dt + (double)*q0);
+    *q1 = (float)((double)*p1 * dt + (double)*q1);
+    *q2 = (float)((double)*p2 * dt + (double)*q2);
+    memcpy(&damp, ef_guest_memory_ptr(0x00185b7cu), sizeof damp);
+    *p0 = (float)((double)*p0 - ((double)*p0 * (double)damp) * dt);
+    *p1 = (float)((double)*p1 - ((double)*p1 * (double)damp) * dt);
+    *p2 = (float)((double)*p2 - ((double)*p2 * (double)damp) * dt);
+    r = scale_float_52eb0(10.0f);
+    dt = (double)(int32_t)EF_U16(0x00127d92u);
+    fv = (float)(((r * dt) * (double)damp) * (double)damp + (double)*p1);
+    *p1 = fv;
+}

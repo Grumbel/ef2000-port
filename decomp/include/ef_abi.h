@@ -5748,4 +5748,8 @@ double guest_fn_ea884_x(ef_addr32 vec); /* 0xea884 EAX -> ST0, length of the int
 
 void click_panel_slot_4e0d0(uint32_t x, uint32_t y);
 
+void integrate_drift_53aec(void);
+
+
+
 #endif
