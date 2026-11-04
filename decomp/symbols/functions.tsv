@@ -2010,7 +2010,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009b04c	600			unknown	unclassified	unverified		
 0x0009b2a4	961			unknown	unclassified	unverified		
 0x0009b668	278	count_side_tallies_9b668	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009b668.json	docs/compiler-abi.md; Rebuild the per-side tallies: clear the two 0x18-byte tables at 0x40ce70 and 0x40cf78, then for every node of the list a; callers b1e0@b3d7; guest pending
-0x0009b780	287			unknown	unclassified	unverified		
+0x0009b780	287	uncount_side_tallies_9b780	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009b780.json	docs/compiler-abi.md; Remove the contribution of each active entry to the side tallies: for every 0x36-byte entry of the table at [0x1379bc] (; callers 9a624@9a6e9; guest pending
 0x0009b8a0	707			unknown	unclassified	unverified		
 0x0009bb64	64	shift_tables_9bb64	game_helpers6	compiles	game	confirmed	decomp/tests/0x0009bb64.json	docs/compiler-abi.md; Shift the three 20-entry word tables of a record down by one.; callers 9b8a0@9b8c0,9b8a0@9b8e0,9b8a0@9b900; guest pending
 0x0009bba4	253	draw_hud_frame_9bba4	game_helpers74	compiles	game	confirmed	decomp/tests/0x0009bba4.json	docs/compiler-abi.md; Draw the HUD frame: three vertical rails and four border lines.; callers none direct; guest pending

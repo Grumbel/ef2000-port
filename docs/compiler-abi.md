@@ -7116,3 +7116,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xb49b4` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:ef_addr32 | EAX:uint32_t | b47e4@b48f1 | Search two linked lists for a type-0x31 node of side GROUP (BL, 0..5) that is negative (0xcc1ac) in the list LIST (ECX), |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9b780` | none | none | 9a624@9a6e9 | Remove the contribution of each active entry to the side tallies: for every 0x36-byte entry of the table at [0x1379bc] ( |

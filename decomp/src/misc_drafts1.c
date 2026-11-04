@@ -9855,3 +9855,29 @@ uint32_t find_paired_node_b49b4(ef_addr32 a, ef_addr32 b, uint32_t group, ef_add
     }
     return 0u;
 }
+
+/* 0x9b780, 287 bytes. Remove the contribution of each active entry to the side tallies: for every 0x36-byte entry of the table at [0x1379bc] (count dword 0x1379b0) whose dword +0xa has high half 1, find the first node of the list 0x137970 whose word +0x13 equals the entry's word +0x1a and decrement the word (+0 positive, +4 negative or +2 zero, tested with 0xcc22c, 0xcc1ac, 0xcc1ec against 0x137980) of the 6-byte row at 0x40ce70 chosen by the high half of the entry's dword +0xe. */
+void uncount_side_tallies_9b780(void)
+{
+    int16_t k;
+    for (k = 0; (int32_t)k < (int32_t)EF_U32(0x001379b0u); k++) {
+        ef_addr32 rec = EF_U32(0x001379bcu) + (uint32_t)((int32_t)k * 0x36);
+        ef_addr32 node;
+        uint16_t found = 0u;
+        uint32_t row;
+        if (((int32_t)EF_U32(rec + 0xau) >> 16) != 1)
+            continue;
+        for (node = EF_U32(0x00137970u); node != 0u && found == 0u; node = EF_U32(node + 4u)) {
+            if (EF_U16(node + 0x13u) != EF_U16(rec + 0x1au))
+                continue;
+            found = 1u;
+            row = (uint32_t)(((int32_t)EF_U32(EF_U32(0x001379bcu) + (uint32_t)((int32_t)k * 0x36) + 0xeu) >> 16) * 6);
+            if ((uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 0xeu), 0x00137980u) != 0u)
+                EF_U16(0x0040ce70u + row) = (uint16_t)(EF_U16(0x0040ce70u + row) - 1u);
+            else if ((uint16_t)group_flag_negative_cc1ac(0u, EF_U8(node + 0xeu), 0x00137980u) != 0u)
+                EF_U16(0x0040ce74u + row) = (uint16_t)(EF_U16(0x0040ce74u + row) - 1u);
+            else if ((uint16_t)group_flag_zero_cc1ec(0u, EF_U8(node + 0xeu), 0x00137980u) != 0u)
+                EF_U16(0x0040ce72u + row) = (uint16_t)(EF_U16(0x0040ce72u + row) - 1u);
+        }
+    }
+}

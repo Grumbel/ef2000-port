@@ -5308,4 +5308,6 @@ void count_side_tallies_9b668(void);
 
 uint32_t find_paired_node_b49b4(ef_addr32 a, ef_addr32 b, uint32_t group, ef_addr32 list);
 
+void uncount_side_tallies_9b780(void);
+
 #endif
