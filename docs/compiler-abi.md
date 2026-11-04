@@ -9573,3 +9573,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x105c94` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | none | 105e38@105f61,105e38@105fae,105e38@106033 | Fill negative fields of a 24-byte block from defaults, store it, send message 0x304. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe3cac` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | c4db4@c4def | Load a named resource into the cached list and fill the request record. |

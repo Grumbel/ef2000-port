@@ -23770,3 +23770,62 @@ void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 	blk[1] = ((EF_U32(0x004dd7f0u) == 0 ? 1u : 3u) << 16) | (blk[1] & 0xffffu);
 	guest_fn_101f88(obj, 0x304u, (ef_addr32)(uintptr_t)blk, 0);
 }
+
+/* 0xe3cac, 396 bytes. Load a named resource into the cached list and fill the request record. */
+void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 p)
+{
+	uint8_t buf[0x90];
+	ef_addr32 b = (ef_addr32)(uintptr_t)buf;
+	ef_addr32 node, prev, blk;
+	uint32_t r, len;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	if (EF_U8(p + 8u) != 0x21u && EF_U32(0x001590a4u) == 0u) {
+		uint32_t sz = (uint32_t)EF_U16(0x001590a0u) * (uint32_t)EF_U16(0x001590a2u) + 5u;
+		EF_U32(0x001590a4u) = arena_take_e29e8(sz);
+		if (EF_U32(0x001590a4u) == 0u)
+			return;
+	}
+	prev = 0;
+	for (node = EF_U32(0x0015f90cu); node != 0; node = EF_U32(node)) {
+		if (guest_strcmp(node + 6u, p + 8u) == 0u) {
+			EF_U16(p + 6u) = 2;
+			EF_U16(p + 4u) = EF_U16(node + 4u);
+			return;
+		}
+		prev = node;
+	}
+	build_default_path_9c980(b);
+	if (EF_U8(p + 8u) == 0x21u) {
+		if (buf[0] != 0)
+			strcat_9ca57(b, 0x0015f910u);
+		strcat_9ca57(b, p + 9u);
+		strcat_9ca57(b, 0x00190a54u);
+	} else {
+		if (buf[0] != 0)
+			strcat_9ca57(b, 0x0015f920u);
+		strcat_9ca57(b, p + 8u);
+		strcat_9ca57(b, 0x00190a58u);
+	}
+	EF_U16(p + 6u) = 0;
+	r = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), b);
+	if (r == 0u)
+		guest_callptr2_x(EF_U32(0x00132a74u), 0x00190a60u, b);
+	if (EF_U8(p + 8u) == 0x21u) {
+		EF_U16(p + 4u) = (uint16_t)add_text_slot_cd754(b);
+	} else {
+		uint32_t id;
+		EF_U16(p + 4u) = (uint16_t)take_pool_block_b3db0(r);
+		id = lookup_id_b3f58((int16_t)(EF_S32(p + 2u) >> 16));
+		guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), b, id);
+	}
+	EF_U16(p + 6u) = 1;
+	len = guest_fn_b1b8b(p + 8u) + 7u;
+	blk = arena_take_e29e8(len);
+	EF_U32(blk) = 0;
+	EF_U16(blk + 4u) = EF_U16(p + 4u);
+	copy_string_9d749(blk + 6u, p + 8u);
+	if (prev != 0)
+		EF_U32(prev) = blk;
+	else
+		EF_U32(0x0015f90cu) = blk;
+}

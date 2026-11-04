@@ -6546,4 +6546,7 @@ double record_term_2ccf0(uint32_t sel, uint32_t idx, uint32_t u2, uint32_t u3, d
 void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 pobj, ef_addr32 src);
 void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 pobj, ef_addr32 src); /* 0x105c94 */
 
+void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 p);
+void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 p); /* 0xe3cac */
+
 #endif
