@@ -8132,3 +8132,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1c16c` | none | none | 1cde8@1ce41 | Pack the low bits of two groups of key-state bytes into the bit sets at 0x2144aa and 0x2144ab. Byte 0x2144aa takes bit 0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2aa34` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | 2ab54@2aeb6 | Populate the slots of class AX (signed). Clears byte +0x4f of the class record (0xca-byte rows at [0x19bb58]) and, for e |

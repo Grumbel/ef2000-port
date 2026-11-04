@@ -15036,3 +15036,39 @@ void pack_key_state_bits_1c16c(void)
 	}
 	EF_U8(0x002144abu) = v;
 }
+
+/* 0x2aa34, 285 bytes. Populate the slots of class AX (signed). Clears byte +0x4f of the class record (0xca-byte rows at [0x19bb58]) and, for each of DL slots, builds a name in a 40-byte buffer initialised from the data at 0x2a9e0 (for DL > 1: slot 0 gets the text 0x12f44d, the others the string at [0x12684c + 4 * slot]), upper-cases it and looks the slot value up as the word at [STACK + 2 * slot] (the slot number itself without a table). With a record array ECX the slot is passed to 0x8c49c with the record's fields (dword +0, high halves of +0xe and +0x10); otherwise two random values reduced modulo 5 are passed instead, together with the name buffer. BL is the byte passed on to every call. */
+void populate_slots_2aa34(uint32_t ax, uint32_t dl, uint32_t bl, ef_addr32 recs, ef_addr32 table)
+{
+	uint32_t buf_u[10];
+	uint8_t *buf = (uint8_t *)buf_u;
+	int16_t idx = (int16_t)ax;
+	int16_t si;
+	int16_t w;
+	uint32_t row, t, rem1, rem2;
+
+	memcpy(buf_u, ef_guest_memory_ptr(0x0002a9e0u), sizeof buf_u);
+	EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)idx * 0xca) + 0x4fu) = 0u;
+	for (si = 0; si < (int16_t)(dl & 0xffu); si++) {
+		if ((dl & 0xffu) > 1u) {
+			if (si == 0)
+				guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x0012f44du);
+			else
+				guest_fn_9d749((ef_addr32)(uintptr_t)buf, EF_U32(0x0012684cu + (uint32_t)si * 4u));
+		}
+		uppercase_string((ef_addr32)(uintptr_t)buf);
+		w = table != 0u ? (int16_t)EF_U16(table + (uint32_t)(int32_t)si * 2u) : si;
+		if (recs != 0u) {
+			row = recs + (uint32_t)((int32_t)si * 0x16);
+			guest_fn_8c49c_x((uint32_t)(int32_t)idx, EF_U32(row), bl & 0xffu,
+				(uint32_t)((int32_t)EF_U32(row + 0xeu) >> 16),
+				(uint32_t)((int32_t)EF_U32(row + 0x10u) >> 16), (uint32_t)(int32_t)w);
+		} else {
+			t = guest_random_word();
+			rem1 = (uint32_t)(int32_t)(int16_t)(t % 5u);
+			t = guest_random_word();
+			rem2 = (uint32_t)(int32_t)(int16_t)(t % 5u);
+			guest_fn_8c49c_x((uint32_t)(int32_t)idx, (uint32_t)(uintptr_t)buf, bl & 0xffu, rem2, rem1, (uint32_t)(int32_t)w);
+		}
+	}
+}

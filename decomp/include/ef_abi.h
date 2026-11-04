@@ -5770,4 +5770,7 @@ void read_button_selection_7cf64(void);
 
 void pack_key_state_bits_1c16c(void);
 
+void populate_slots_2aa34(uint32_t ax, uint32_t dl, uint32_t bl, ef_addr32 recs, ef_addr32 table);
+void guest_fn_8c49c_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1); /* 0x8c49c EAX/EDX/EBX/ECX + 2 stack */
+
 #endif

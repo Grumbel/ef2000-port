@@ -441,7 +441,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002a934	57	recycle_oldest_grid_node	grid_node_pool	compiles	game	confirmed	decomp/tests/0x0002a934.json	linked queue head to free list; original assumes nonempty
 0x0002a970	104	pop_triple_2a970	game_helpers31	compiles	game	confirmed	decomp/tests/0x0002a970.json	docs/compiler-abi.md; Pop one entry of the 6-byte stack at 0x125262 into the current triple.; callers 3dd30@3e250; guest pending
 0x0002aa08	42	unpack_pair_2aa08	float_helpers1	compiles	game	confirmed	decomp/tests/0x0002aa08.json	docs/compiler-abi.md; Convert a packed 16.16 pair to doubles and clear the third component.; callers 2b1f4@2b331; guest pending
-0x0002aa34	285			unknown	unclassified	unverified		
+0x0002aa34	285	populate_slots_2aa34	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002aa34.json	docs/compiler-abi.md; Populate the slots of class AX (signed). Clears byte +0x4f of the class record (0xca-byte rows at [0x19bb58]) and, for e; callers 2ab54@2aeb6; guest pending
 0x0002ab54	931			unknown	unclassified	unverified		
 0x0002aef8	38	alloc_unit_table_2aef8	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x0002aef8.json	docs/compiler-abi.md; Allocate and zero the unit table for count+1 records of 0xca bytes.; callers 49228@495f9; guest pending
 0x0002af20	65	set_flag_ranges_2af20	game_helpers5	compiles	game	confirmed	decomp/tests/0x0002af20.json	docs/compiler-abi.md; Set three flag byte ranges at 0x19bb60.. to 1.; callers 2af64@2af67; guest pending
