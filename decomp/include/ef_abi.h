@@ -5078,4 +5078,6 @@ void send_command_packet_55f54(uint32_t a, uint32_t b, uint32_t c, uint32_t d,
                                uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3,
                                uint32_t s4, uint32_t s5, uint32_t s6);
 
+void draw_count_icon_4d24c(uint32_t x, uint32_t y, uint32_t rec, uint32_t count);
+
 #endif

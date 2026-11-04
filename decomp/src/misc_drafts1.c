@@ -6816,3 +6816,27 @@ void send_command_packet_55f54(uint32_t a, uint32_t b, uint32_t c, uint32_t d,
     for (i = 0u; i < 0x2bu; i++)
         EF_U8(0x001a663cu + i) = p[i];
 }
+
+/* 0x4d24c, 176 bytes. Draw the stacked-count icon for the record REC at (X, Y) in game modes 1 and 2 (byte 0x1a53dc) when REC word +0x36 is set: the count COUNT is replaced by the difference of the two bytes referenced by the last list node (head dword 0x137958, link +4) whose dwords +0x11/+0x15 equal REC +0x16/+0x1a; a nonzero count is clamped to 16 and the icon from the table at 0x126570 + 0x23f00 (20 bytes per count) is drawn at (X - 10, Y + 3) with 0xca620. */
+void draw_count_icon_4d24c(uint32_t x, uint32_t y, uint32_t rec, uint32_t count)
+{
+    uint32_t mode = EF_U8(0x001a53dcu);
+    uint32_t node = EF_U32(0x00137958u);
+    int16_t cx;
+    if (mode != 2u && mode != 1u)
+        return;
+    if (EF_U16(rec + 0x36u) == 0u)
+        return;
+    while (node != 0u) {
+        if (EF_U32(node + 0x11u) == EF_U32(rec + 0x16u) && EF_U32(node + 0x15u) == EF_U32(rec + 0x1au))
+            count = (uint32_t)EF_U8(EF_U32(node + 0x33u)) - (uint32_t)EF_U8(EF_U32(node + 0x37u));
+        node = EF_U32(node + 4u);
+    }
+    cx = (int16_t)count;
+    if (cx == 0)
+        return;
+    if (cx > 0x10)
+        cx = 0x10;
+    guest_fn_ca620((int32_t)(EF_U32(0x00126570u) + 0x23f00u + (uint32_t)((int32_t)cx - 1) * 20u),
+                   (int16_t)(x - 10u), (int16_t)(y + 3u), 0x14u, 0xdu, 0x280u);
+}

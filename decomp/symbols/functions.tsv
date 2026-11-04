@@ -877,7 +877,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004d114	107	draw_sprite_4d114	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0004d114.json	docs/compiler-abi.md; Draw the sprite described at 0x1a54f6.; callers 4bf1c@4c112; guest pending
 0x0004d180	107	draw_sprite_4d180	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0004d180.json	docs/compiler-abi.md; As 0x4d114 for the sprite at 0x1a54fa.; callers 4bf1c@4c117; guest pending
 0x0004d1ec	94	blit_cursor_4d1ec	game_helpers23	compiles	game	confirmed	decomp/tests/0x0004d1ec.json	docs/compiler-abi.md; Blit the cursor image for the current screen (when the page matches key).; callers 441fc@44368; guest pending
-0x0004d24c	176			unknown	unclassified	unverified		
+0x0004d24c	176	draw_count_icon_4d24c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004d24c.json	docs/compiler-abi.md; Draw the stacked-count icon for the record REC at (X, Y) in game modes 1 and 2 (byte 0x1a53dc) when REC word +0x36 is se; callers 441fc@443a5; guest pending
 0x0004d2fc	753	mpNextAssign		named	unclassified	unverified		
 0x0004d5f0	100	set_ranges_4d5f0	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0004d5f0.json	docs/compiler-abi.md; ; callers 4d2fc@4d505; guest pending
 0x0004d668	651			unknown	unclassified	unverified		
