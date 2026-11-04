@@ -8378,3 +8378,10 @@ in EAX, format string address, one value).
 | `0x9ac84` | EAX:ef_addr32 | none | 9ab30@9ab3f | Debug dump (fprintf-style, 0xbc400) of the state block A: the high words of the dwords at 0x40cfb2..0x40cfd4 are printed |
 | `0x9ae44` | EAX:ef_addr32 | none | 9ab30@9ab46 | Debug dump (fprintf-style, 0xbc400) of the state block B: the high words of the dwords at 0x40cf8e..0x40cfb0 are printed |
 | `0x9b04c` | EAX:ef_addr32 | none | 9ab30@9ab4d | Debug dump (fprintf-style, 0xbc400) of the state block C: the high words of the dwords at 0x40cfdc..0x40d004 are printed |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa520c` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 94fc@976f,bfcc@c1f3,cccc@cd1e | Resize widget OBJ (EAX) to the given width DX and height BX (16-bit, negative values become 0; stored at +0x45 / +0x47), |
+| `0xded86` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | dedde@def70,dedde@def87,dedde@def9d | Median of three: return whichever of A (EAX), B (EDX) and C (EBX) lies between the other two according to the comparison |

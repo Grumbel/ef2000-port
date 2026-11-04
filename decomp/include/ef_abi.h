@@ -5892,4 +5892,7 @@ void dump_state_block_a_9ac84(ef_addr32 stream);
 void dump_state_block_b_9ae44(ef_addr32 stream);
 void dump_state_block_c_9b04c(ef_addr32 stream);
 
+void resize_widget_a520c(ef_addr32 obj, uint32_t dx, uint32_t bx, uint32_t cl);
+uint32_t median_of_three_ded86(uint32_t a, uint32_t b, uint32_t c, uint32_t cmp);
+
 #endif

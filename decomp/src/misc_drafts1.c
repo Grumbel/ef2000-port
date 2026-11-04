@@ -17031,3 +17031,59 @@ void dump_state_block_c_9b04c(ef_addr32 stream)
 	guest_fn_bc400(stream, 0x00131de5u, (uint32_t)((int32_t)EF_U32(0x0040d004u) >> 16));
 	guest_fn_bc400(stream, 0x0018b128u);
 }
+
+/* 0xa520c, 281 bytes. Resize widget OBJ (EAX) to the given width DX and height BX (16-bit, negative values become 0; stored at +0x45 / +0x47), refresh it (0xa5070, 0xa558c) and, unless flag bit 0x10 of byte +0x3a is set, clamp it to the screen limits (words 0x15b744 / 0x15b748; origin words +0x41 / +0x43): without CL the size is shortened to fit, with CL non-zero the widget is moved instead (0xa5484). Finally update children and redraw (0xa51dc, 0xa5764, 0xa66a0, 0xa6038). */
+void resize_widget_a520c(ef_addr32 obj, uint32_t dx, uint32_t bx, uint32_t cl)
+{
+	int16_t w = (int16_t)dx;
+	int16_t h = (int16_t)bx;
+	int32_t ox, oy, ow, oh;
+
+	EF_U16(obj + 0x45u) = (uint16_t)(w > 0 ? (int32_t)w : 0);
+	EF_U16(obj + 0x47u) = (uint16_t)(h > 0 ? (int32_t)h : 0);
+	guest_fn_a5070(obj);
+	guest_fn_a558c(obj);
+	if ((EF_U8(obj + 0x3au) & 0x10u) == 0u) {
+		if ((uint8_t)cl == 0u) {
+			ox = (int16_t)EF_U16(obj + 0x41u);
+			ow = (int16_t)EF_U16(obj + 0x45u);
+			if (ox + ow >= (int32_t)EF_U32(0x0015b744u))
+				EF_U16(obj + 0x45u) = (uint16_t)(EF_U16(0x0015b744u) - EF_U16(obj + 0x41u));
+			oy = (int16_t)EF_U16(obj + 0x43u);
+			oh = (int16_t)EF_U16(obj + 0x47u);
+			if (oy + oh >= (int32_t)EF_U32(0x0015b748u))
+				EF_U16(obj + 0x47u) = (uint16_t)(EF_U16(0x0015b748u) - EF_U16(obj + 0x43u));
+		} else {
+			ox = (int16_t)EF_U16(obj + 0x41u);
+			ow = (int16_t)EF_U16(obj + 0x45u);
+			if (ox + ow >= (int32_t)EF_U32(0x0015b744u))
+				move_widget_a5484(obj, (int16_t)(EF_U16(0x0015b744u) - EF_U16(obj + 0x45u)), (int16_t)EF_U16(obj + 0x43u));
+			oy = (int16_t)EF_U16(obj + 0x43u);
+			oh = (int16_t)EF_U16(obj + 0x47u);
+			if (oy + oh >= (int32_t)EF_U32(0x0015b748u))
+				move_widget_a5484(obj, (int16_t)EF_U16(obj + 0x41u), (int16_t)(EF_U16(0x0015b748u) - EF_U16(obj + 0x47u)));
+		}
+	}
+	guest_fn_a51dc(obj);
+	guest_fn_a5764(obj);
+	guest_fn_a66a0(obj);
+	guest_fn_a6038();
+}
+
+/* 0xded86, 88 bytes. Median of three: return whichever of A (EAX), B (EDX) and C (EBX) lies between the other two according to the comparison callback CMP (ECX; called with EAX/EDX, result > 0 when the first is larger). */
+uint32_t median_of_three_ded86(uint32_t a, uint32_t b, uint32_t c, uint32_t cmp)
+{
+	if ((int32_t)guest_callptr_eaxedx_ret_x(cmp, a, b) > 0) {
+		if ((int32_t)guest_callptr_eaxedx_ret_x(cmp, a, c) > 0) {
+			if ((int32_t)guest_callptr_eaxedx_ret_x(cmp, b, c) > 0)
+				return b;
+			return c;
+		}
+		return a;
+	}
+	if ((int32_t)guest_callptr_eaxedx_ret_x(cmp, a, c) >= 0)
+		return a;
+	if ((int32_t)guest_callptr_eaxedx_ret_x(cmp, b, c) > 0)
+		return c;
+	return b;
+}

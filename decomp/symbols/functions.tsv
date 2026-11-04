@@ -2252,7 +2252,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a5000	111	clamp_extents_a5000	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a5000.json	docs/compiler-abi.md; Clamp two word fields so that they fit inside the extents at +0x43 / +0x45.; callers a59d8@a5a0f; guest pending
 0x000a5070	361			unknown	unclassified	unverified		
 0x000a51dc	48	update_widget_child_a51dc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a51dc.json	docs/compiler-abi.md; child word +4 = word +0x45 (-0x44 with flag 0x40); callers a520c@a530a,a5484@a54e6,a59d8@a5a4e; guest pending
-0x000a520c	281			unknown	unclassified	unverified		
+0x000a520c	281	resize_widget_a520c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a520c.json	docs/compiler-abi.md; Resize widget OBJ (EAX) to the given width DX and height BX (16-bit, negative values become 0; stored at +0x45 / +0x47),; callers 94fc@976f,bfcc@c1f3,cccc@cd1e; guest pending
 0x000a5484	106	move_widget_a5484	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a5484.json	docs/compiler-abi.md; Move a widget, clamped to the screen unless flag 0x10 is set.; callers a520c@a52cf,a520c@a5303,a54f0@a54fe; guest pending
 0x000a54f0	22	forward_widget_position	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a54f0.json	docs/compiler-abi.md; 0xa5484(widget, high words +0x3f,+0x41); callers a59d8@a5a1d; guest pending
 0x000a5508	132	set_record_offsets_a5508	float_helpers5	compiles	game	confirmed	decomp/tests/0x000a5508.json	docs/compiler-abi.md; Set a record's offsets from two scaled values and refresh it.; callers a870@a901,4c6a0@4c6f2,4c718@4c766; guest pending
@@ -3288,7 +3288,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ded1a	35	copy_dta_out_ded1a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded1a.json	docs/compiler-abi.md; When the file-search mode byte 0x132a5e is 9, copy the 0x2b-byte DOS DTA (address from int 21h, AH = 0x2f) to the buffer; callers decde@decf4,decfb@ded10; guest pending
 0x000ded3d	35	copy_dta_in_ded3d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded3d.json	docs/compiler-abi.md; The reverse of 0xded1a: copy the 0x2b bytes at SRC into the DOS DTA.; callers decfb@ded02; guest pending
 0x000ded60	38	swap_buffers_ded60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded60.json	docs/compiler-abi.md; Implicit-register fragment (ESI = first buffer, EDI = second buffer, ECX = byte count; params in that order): swap COUNT; callers dedde@dee7e,dedde@defce,dedde@df034; guest pending
-0x000ded86	88			unknown	unclassified	unverified		
+0x000ded86	88	median_of_three_ded86	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded86.json	docs/compiler-abi.md; Median of three: return whichever of A (EAX), B (EDX) and C (EBX) lies between the other two according to the comparison; callers dedde@def70,dedde@def87,dedde@def9d; guest pending
 0x000dedde	1085			unknown	unclassified	unverified		
 0x000df21b	41	read_stream_byte_df21b	game_helpers25	compiles	game	confirmed	decomp/tests/0x000df21b.json	docs/compiler-abi.md; Read the next byte from a stream, or -1 (setting flag 2) at its end.; callers none direct; guest pending
 0x000df248	39			unknown	unclassified	unverified		
