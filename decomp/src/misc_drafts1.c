@@ -9021,3 +9021,21 @@ void redraw_widget_a60a8(uint32_t obj)
     if (mode == 1u)
         restore_rect_list_e516c();
 }
+
+/* 0x5de14, 243 bytes. Draw a small direction marker: with SIZE (EBX, signed word) the two points (0, 2 * SIZE) and (0, SIZE * 4 / 3) are rotated by the heading of the object ECX (word +0xe, plus 0x8000; sine/cosine via 0xdc7bc / 0xdc7e4), offset by the screen position (X = EAX, Y = EDX) and joined with a line in the colour byte 0x128148 (0xc8ccc, stack arguments y1, x1, y0, x0, colour). The scratch words 0x1281fa..0x128200 receive 0, 2 * SIZE, 0, SIZE * 4 / 3. */
+void draw_heading_marker_5de14(uint32_t x, uint32_t y, uint32_t size, uint32_t obj)
+{
+    int16_t p0[2], p1[2];
+    int32_t s = (int16_t)size;
+    EF_U16(0x001281fau) = 0u;
+    EF_U16(0x001281fcu) = (uint16_t)((s * 6) / 3);
+    EF_U16(0x001281feu) = 0u;
+    EF_U16(0x00128200u) = (uint16_t)((s * 4) / 3);
+    load_sincos_dc7bc((uint32_t)(uint16_t)(EF_U16(obj + 0xeu) + 0x8000u));
+    rotate_point_dc7e4((uint32_t)(uintptr_t)p0, (int16_t)EF_U16(0x001281fau), (int16_t)EF_U16(0x001281fcu));
+    rotate_point_dc7e4((uint32_t)(uintptr_t)p1, (int16_t)EF_U16(0x001281feu), (int16_t)EF_U16(0x00128200u));
+    guest_fn_c8ccc_x(0u, 0u, 0u, 0u,
+                     (uint32_t)(int32_t)(int16_t)(p1[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p1[0] + (int16_t)x),
+                     (uint32_t)(int32_t)(int16_t)(p0[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p0[0] + (int16_t)x),
+                     EF_U8(0x00128148u));
+}
