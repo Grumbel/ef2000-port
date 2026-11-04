@@ -2306,8 +2306,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a75fc	8	first_link_a75fc	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a75fc.json	docs/compiler-abi.md; ; callers 4c50@4c66; guest pending
 0x000a788c	45	find_child_by_name_a788c	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a788c.json	docs/compiler-abi.md; Find the child control of a widget whose name equals key.; callers a59ac@a59b8,a78bc@a78d9; guest pending
 0x000a78bc	61	find_widget_checked_a78bc	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000a78bc.json	docs/compiler-abi.md; Find a widget by name in a root or abort.; callers 40dc@40fd,40dc@4138,40dc@41b3; guest pending
-0x000a7900	72			unknown	unclassified	unverified		
-0x000a7948	72			unknown	unclassified	unverified		
+0x000a7900	72	open_slot_a7900	game_helpers57	compiles	game	confirmed	decomp/tests/0x000a7900.json	docs/compiler-abi.md; Open a resource through the first free one of five slots (name A).; callers 41fc@4228,28224@28290,283c8@284a2; guest pending
+0x000a7948	72	open_slot_a7948	game_helpers57	compiles	game	confirmed	decomp/tests/0x000a7948.json	docs/compiler-abi.md; Open a resource through the first free one of five slots (name B).; callers 42a4@42bb,5630@5692,285b8@28609; guest pending
 0x000a7990	65	close_handle_a7990	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000a7990.json	docs/compiler-abi.md; Close a handle (100..105) and clear its slot.; callers 41fc@425f,42a4@4306,5630@5f2e; guest pending
 0x000a79d4	69	read_handle_a79d4	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000a79d4.json	docs/compiler-abi.md; Read from a handle (100..105).; callers 41fc@4249,41fc@4259,28224@282be; guest pending
 0x000a7a1c	69	write_handle_a7a1c	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000a7a1c.json	docs/compiler-abi.md; Write to a handle (100..105).; callers 42a4@42f0,42a4@4300,286c0@2872d; guest pending
@@ -3493,7 +3493,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eab44	162			unknown	unclassified	unverified		
 0x000eabe8	93	build_data_path_eabe8	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000eabe8.json	docs/compiler-abi.md; Build the data file path from the default path, a name and a suffix.; callers eac48@eac7e; guest pending
 0x000eac48	453			unknown	unclassified	unverified		
-0x000eae10	54			unknown	unclassified	unverified		
+0x000eae10	54	release_pending_handle_eae10	game_helpers57	compiles	game	confirmed	decomp/tests/0x000eae10.json	docs/compiler-abi.md; Release the pending handle and the status message.; callers 97dcc@97e45,97dcc@97e89,a8bd4@a8e61; guest pending
 0x000eaf80	136			unknown	unclassified	unverified		
 0x000eb008	61			unknown	unclassified	unverified		
 0x000eb050	94			unknown	unclassified	unverified		
@@ -3597,7 +3597,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f18a4	457			unknown	unclassified	unverified		
 0x000f1a70	488			unknown	unclassified	unverified		
 0x000f1c58	249			unknown	unclassified	unverified		
-0x000f1d54	60			unknown	unclassified	unverified		
+0x000f1d54	60	apply_selection_f1d54	game_helpers57	compiles	game	confirmed	decomp/tests/0x000f1d54.json	docs/compiler-abi.md; Apply the stored selection when the pending-input bit is set.; callers ac5f8@ac6f8; guest pending
 0x000f1d90	458			unknown	unclassified	unverified		
 0x000f1f5a	487			unknown	unclassified	unverified		
 0x000f2141	66	advance_window_f2141	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f2141.json	docs/compiler-abi.md; Advance a window cursor by count; wrap and report 1 when out of range.; callers f2183@f2206,f2183@f2239; guest pending

@@ -3837,3 +3837,12 @@ in EAX, format string address, one value).
 | `0x7feb0` | none | none | 3dd30@3dd91,8b39c@8b48f | Start the page, or fall back to the default control mode. |
 | `0xc39ac` | none | none | ab74@af26,11e7c@12133,14d58@14ee3 | Latch the view scroll and leave the pending-scroll mode. |
 | `0xc39f0` | EAX:uint32_t | none | 11e7c@11ef1,14d58@14dbc,150d4@15134 | Enter the pending-scroll mode with the given latch value. |
+
+## game_helpers57 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa7900` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 41fc@4228,28224@28290,283c8@284a2 | Open a resource through the first free one of five slots (name A). |
+| `0xa7948` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 42a4@42bb,5630@5692,285b8@28609 | Open a resource through the first free one of five slots (name B). |
+| `0xeae10` | none | none | 97dcc@97e45,97dcc@97e89,a8bd4@a8e61 | Release the pending handle and the status message. |
+| `0xf1d54` | none | none | ac5f8@ac6f8 | Apply the stored selection when the pending-input bit is set. |
