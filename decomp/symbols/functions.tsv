@@ -2728,7 +2728,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c2f80	125	fill_bit_pattern_table_c2f80	game_helpers88	compiles	game	confirmed	decomp/tests/0x000c2f80.json	docs/compiler-abi.md; Fill a 512-byte table: for each of the 8 bit values and 16 nibble patterns write four bytes (the bit value where the pat; callers c3584@c3608; guest pending
 0x000c32dc	76	alloc_work_block_c32dc	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000c32dc.json	docs/compiler-abi.md; Allocate the work block from either pool depending on its size.; callers c3430@c345c; guest pending
 0x000c3328	58	release_mode_buffer_c3328	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000c3328.json	docs/compiler-abi.md; Release the buffer at 0x41f3bc according to its mode byte.; callers c34cc@c3501,c36b4@c3709,c3714@c375c; guest pending
-0x000c3364	203			unknown	unclassified	unverified		
+0x000c3364	203	find_data_size_c3364	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c3364.json	docs/compiler-abi.md; Find the size of the data file NAME (EDX) trying several locations; BUF (EAX) is the work buffer and the result is store; callers c3430@c343d; guest pending
 0x000c3430	154			unknown	unclassified	unverified		
 0x000c34cc	65	start_driver_c34cc	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000c34cc.json	docs/compiler-abi.md; Start the driver unless it is already busy; abort when it fails.; callers ab74@ae62,278c0@2790a,284ec@28501; guest pending
 0x000c3584	234			unknown	unclassified	unverified		

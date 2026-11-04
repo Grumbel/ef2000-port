@@ -6980,3 +6980,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x34298` | none | none | none direct | Update the item-list dialog: without a name match (0xa4380 of 0x125937 against 0x182b34) just activate and redraw the wi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc3364` | EAX:uint32_t,EDX:uint32_t | none | c3430@c343d | Find the size of the data file NAME (EDX) trying several locations; BUF (EAX) is the work buffer and the result is store |

@@ -9072,3 +9072,36 @@ void update_item_dialog_34298(void)
     }
     guest_fn_a4cb4(EF_U8(w + 0x10u));
 }
+
+/* 0xc3364, 194 bytes. Find the size of the data file NAME (EDX) trying several locations; BUF (EAX) is the work buffer and the result is stored in dword 0x41f3c8. The name is first lower-cased and checked for the substring 0x18ee2c (found: the last four characters of the buffer are cut off); then the hook at 0x132ab4 is tried on the plain name, on default path + 0x18ee34 + name, on default path + 0x18ee40 + name and finally on the plain name again, stopping at the first non-zero size. */
+void find_data_size_c3364(uint32_t buf, uint32_t name)
+{
+    uint32_t size;
+    copy_string_9d749(buf, name);
+    guest_fn_eb478(buf);
+    if (strstr_e7d27(buf, 0x0018ee2cu) != 0u)
+        EF_U8(buf + guest_fn_b1b8b(buf) - 4u) = 0u;
+    copy_string_9d749(buf, name);
+    size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), buf);
+    EF_U32(0x0041f3c8u) = size;
+    if (size != 0u)
+        return;
+    build_default_path_9c980(buf);
+    if (EF_U8(buf) != 0u)
+        strcat_9ca57(buf, 0x0018ee34u);
+    strcat_9ca57(buf, name);
+    size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), buf);
+    EF_U32(0x0041f3c8u) = size;
+    if (size != 0u)
+        return;
+    build_default_path_9c980(buf);
+    if (EF_U8(buf) != 0u)
+        strcat_9ca57(buf, 0x0018ee40u);
+    strcat_9ca57(buf, name);
+    size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), buf);
+    EF_U32(0x0041f3c8u) = size;
+    if (size != 0u)
+        return;
+    copy_string_9d749(buf, name);
+    EF_U32(0x0041f3c8u) = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), buf);
+}
