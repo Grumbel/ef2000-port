@@ -3844,4 +3844,11 @@ ef_addr32 guest_fn_ed4e7_x(ef_addr32 fmt, ef_addr32 spec); /* 0xed4e7 EAX EDX ->
 ef_addr32 parse_output_flags_ed4e7(ef_addr32 fmt, ef_addr32 spec);
 uint32_t get_channel_value_112048(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 player, uint32_t status, uint32_t controller);
 
+/* game_helpers106.c */
+void set_black_palette_d65e8(void);
+void forward_word_args_cc7d0(int16_t a, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1);
+void forward_word_args_f8600(int16_t a, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
+void guest_fn_cc90c_x(int32_t a, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1); /* 0xcc90c EAX + 2 stack, callee cleanup */
+void guest_fn_f9448_x(int32_t a, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3); /* 0xf9448 EAX + 4 stack, callee cleanup */
+
 #endif

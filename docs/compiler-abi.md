@@ -4341,3 +4341,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xed3b4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:ef_addr32 | ed133@ed163 | Parse flags (ed4e7), width ('*' or digits), precision ('.' then '*' or digits) and size modifier (N F L h l w) into the  |
+
+## game_helpers106 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd65e8` | none | none | 284ec@284f2,39204@39211,3dccc@3dccf | Upload an all-zero (black) 0x300-byte palette. |
+| `0xcc7d0` | AX:int16_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | b0f5c@b154b | Forward two stack arguments to cc90c with the 16-bit register argument sign-extended. |
+| `0xf8600` | AX:int16_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | b0f5c@b158e | Forward four stack arguments to f9448 with the 16-bit register argument sign-extended. |

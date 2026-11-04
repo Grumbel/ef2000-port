@@ -2912,7 +2912,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc744	34	alloc_checked_cc744	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000cc744.json	docs/compiler-abi.md; Allocate a block for a non-null request, aborting on failure.; callers 3cb2c@3cb84,3cb2c@3cb97,b3374@b339f; guest pending
 0x000cc768	5	tail_jump_cc768	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000cc768.json	docs/compiler-abi.md; tail jump. Forward to 0xc3f80.; callers e710@e728,e710@e734,f8f8@f906; guest pending
 0x000cc76d	87	parse_int_cc76d	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc76d.json	docs/compiler-abi.md; Same as 0x9d4cd.; callers e980@e98a,f3b58@f3b6f; guest pending
-0x000cc7d0	23			unknown	unclassified	unverified		
+0x000cc7d0	23	forward_word_args_cc7d0	game_helpers106	compiles	game	confirmed	decomp/tests/0x000cc7d0.json	docs/compiler-abi.md; Forward two stack arguments to cc90c with the 16-bit register argument sign-extended.; callers b0f5c@b154b; guest pending
 0x000cc7e8	52	pair_matches_cc7e8	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc7e8.json	docs/compiler-abi.md; DL in {0x16, 0x17, 0x0e, 0x11, 0x13} and AL is 2.; callers bdeec@be17c,cc90c@cca5f,ccdbc@cce56; guest pending
 0x000cc81c	34	pair_matches_cc81c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc81c.json	docs/compiler-abi.md; DL is 8 or 0x1a and AL is 2.; callers f918@f946,f918@f9a7,b31f0@b321a; guest pending
 0x000cc840	83	count_open_entries_cc840	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cc840.json	docs/compiler-abi.md; Count the 21-byte entries that are free (0xff) or reserved (0xfe) for other kinds.; callers afc5c@afc90,cc90c@cc944; guest pending
@@ -3072,7 +3072,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d642c	73	nearest_entry_index_d642c	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d642c.json	docs/compiler-abi.md; Index of the table entry closest to the given value (first minimum wins, limit 0x100).; callers d6478@d653d; guest pending
 0x000d6478	303			unknown	unclassified	unverified		
 0x000d65a8	62	remap_palette_d65a8	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d65a8.json	docs/compiler-abi.md; Remap a 256-entry RGB palette through three 64-byte tables.; callers d660c@d6620,d663c@d664b; guest pending
-0x000d65e8	34			unknown	unclassified	unverified		
+0x000d65e8	34	set_black_palette_d65e8	game_helpers106	compiles	game	confirmed	decomp/tests/0x000d65e8.json	docs/compiler-abi.md; Upload an all-zero (black) 0x300-byte palette.; callers 284ec@284f2,39204@39211,3dccc@3dccf; guest pending
 0x000d660c	46			unknown	unclassified	unverified		
 0x000d663c	53			unknown	unclassified	unverified		
 0x000d6694	46			unknown	unclassified	unverified		
@@ -3681,7 +3681,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f8298	29			unknown	unclassified	unverified		
 0x000f8314	78	divide_by_scaled_word_f8314	float_helpers7	compiles	game	confirmed	decomp/tests/0x000f8314.json	docs/compiler-abi.md; Divide a value by a word scaled with 0x1932cc, 0.0 when the divisor is zero.; callers b52bc@b5348; guest pending
 0x000f83d0	79	int_distance_2d_f83d0	float_helpers7	compiles	game	confirmed	decomp/tests/0x000f83d0.json	docs/compiler-abi.md; Distance between two integer 2D points, 0.0 when coincident.; callers b04e8@b04fc,b52bc@b5332,b686c@b68c4; guest pending
-0x000f8600	35			unknown	unclassified	unverified		
+0x000f8600	35	forward_word_args_f8600	game_helpers106	compiles	game	confirmed	decomp/tests/0x000f8600.json	docs/compiler-abi.md; Forward four stack arguments to f9448 with the 16-bit register argument sign-extended.; callers b0f5c@b158e; guest pending
 0x000f8624	633			unknown	unclassified	unverified		
 0x000f88a0	69	check_entry_f88a0	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000f88a0.json	docs/compiler-abi.md; ; callers f8988@f89b3; guest pending
 0x000f88e8	78	count_slots_f88e8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f88e8.json	docs/compiler-abi.md; As 0xbd6d8 for the layout with count byte +4 and array +5.; callers f8b14@f8bcf,f8b14@f8be4,f8b14@f8c19; guest pending
