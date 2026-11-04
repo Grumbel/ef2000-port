@@ -1520,7 +1520,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007fb9c	77	object_glyph_7fb9c	unit_flags	compiles	game	confirmed	decomp/tests/0x0007fb9c.json	docs/compiler-abi.md; Character code for an object.; callers 7ef14@7f0f5,7ef14@7f122,7ef14@7f1b0; guest pending
 0x0007fbec	71	ui_dispatch_indexed_control	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fbec.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fc34	166	remaining_share_7fc34	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007fc34.json	docs/compiler-abi.md; Remaining share of entry INDEX in the table at 0x1f9078: when the record's size (0xd7730) is 1 the value is the record's; callers 7ef14@7f21a,7fcdc@7fd79; guest pending
-0x0007fcdc	313			unknown	unclassified	unverified		
+0x0007fcdc	313	start_positional_sound_7fcdc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007fcdc.json	docs/compiler-abi.md; Starts positional sound effect INDEX if the source is * audible. ORIGINAL BUG: the source position pointer is whatever E; callers 74970@74b35; guest pending
 0x0007fe18	51	ui_initialize_releases	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe18.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fe4c	62	ui_finalize_releases	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe4c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fe8c	34	ui_release_all_controls	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe8c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending

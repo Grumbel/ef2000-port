@@ -23953,3 +23953,44 @@ void offset_project_86e44(ef_addr32 outp)
 	rotate_project_15c0ea((uint32_t)z << 8, (uint32_t)y << 8, (uint32_t)x << 8, outp);
 	EF_U16(0x20f194u) = 0;
 }
+
+/* 0x7fcdc, 313 bytes. Starts positional sound effect INDEX if the source is
+ * audible. ORIGINAL BUG: the source position pointer is whatever EDX held on
+ * entry (the d771c call does not set it); modelled as an input parameter. */
+uint32_t start_positional_sound_7fcdc(uint32_t eax, ef_addr32 edx)
+{
+	uint8_t bl = (uint8_t)eax;
+	uint32_t esi, ebp, record, res, slot;
+	int32_t dx, dy, dz, a, b, r16, sc;
+
+	if (bl > 0x47u)
+		guest_callptr2_x(EF_U32(0x132a74u), 0x18873cu, bl);
+	if (EF_U8(0x12b070u) == 0)
+		return 0;
+	if (bl > 0x47u)
+		guest_callptr2_x(EF_U32(0x132a74u), 0x188758u, bl);
+	esi = bl;
+	ebp = esi * 4u;
+	record = EF_U32(EF_U32(0x1f9078u) + ebp);
+	(void)get_high_word_d771c(record);
+	dx = (int16_t)(EF_U16(0x21444cu) - EF_U16(edx));
+	dy = (int16_t)(EF_U16(0x214448u) - EF_U16(edx + 2u));
+	dz = (int16_t)(EF_U16(0x214450u) - EF_U16(edx + 4u));
+	res = remaining_share_7fc34((uint32_t)(dx * dx + dy * dy + dz * dz), esi);
+	r16 = (int16_t)res;
+	if ((uint16_t)res == 0)
+		return 0;
+	a = (int32_t)(EF_S32(0x15fffau) * dx + EF_S32(0x15ffe2u) * dz) >> 15;
+	b = (int32_t)(EF_S32(0x15ffdau) * dz + dx * EF_S32(0x15fff2u)) >> 15;
+	sc = scale_by_magnitude_d77dc((int16_t)a, (int16_t)b);
+	record = EF_U32(EF_U32(0x1f9078u) + ebp);
+	slot = claim_device_slot_d70a0((uint8_t)(read_field_d7738(record) & 0xffu));
+	if ((uint8_t)slot == 0xe)
+		return 0;
+	slot &= 0xffu;
+	EF_U8(slot + 0x1f9088u) = bl;
+	guest_fn_7fbec(slot, 1, esi, (uint32_t)r16);
+	record = EF_U32(EF_U32(0x1f9078u) + ebp);
+	set_dword_d7800(record, (uint32_t)sc);
+	return 0;
+}

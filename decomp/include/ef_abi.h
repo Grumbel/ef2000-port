@@ -6561,4 +6561,7 @@ void midpoint_offset_a2500(ef_addr32 p); /* 0xa2500 */
 void offset_project_86e44(ef_addr32 outp);
 void offset_project_86e44(ef_addr32 outp); /* 0x86e44 */
 
+uint32_t start_positional_sound_7fcdc(uint32_t eax, ef_addr32 edx);
+uint32_t start_positional_sound_7fcdc(uint32_t eax, ef_addr32 edx); /* 0x7fcdc */
+
 #endif
