@@ -5208,4 +5208,6 @@ void guest_fn_e7a7c_x(void); /* 0xe7a7c */
 uint32_t view_volume_half_c473c(uint32_t margin, uint32_t x, uint32_t y, uint32_t z);
 void split_words_10e08d(uint32_t src, uint32_t dst, uint32_t count);
 
+void set_object_target_26670(uint32_t index, uint32_t x, uint32_t y, uint32_t z);
+
 #endif

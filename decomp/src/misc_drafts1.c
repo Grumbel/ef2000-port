@@ -8426,3 +8426,27 @@ void split_words_10e08d(uint32_t src, uint32_t dst, uint32_t count)
         EF_U8(dst + i * 8u + 4u) = EF_U8(src + i * 2u + 1u);
     }
 }
+
+/* 0x26670, 133 bytes. Set a target position (X = EDX, Y = EBX, Z = ECX) on the scene object INDEX (EAX, signed word, looked up with 0x8ffe8): remember it in dwords 0x19b388/0x19b38c/0x19b390 and in the object (+0x54, +0x58, +0x5c), store the offsets from the object position (X - dword +0, Z - dword +8) in 0x19b380/0x19b384 and, for objects whose byte +0x3b is clear, the heading data (dword +0x12 in 0x19b394, word +0xe in 0x19b39a and its sine/cosine table entries in 0x19b398/0x19b39c). Finally clear the part flags (0x266f8). */
+void set_object_target_26670(uint32_t index, uint32_t x, uint32_t y, uint32_t z)
+{
+    uint32_t obj = guest_fn_8ffe8((int32_t)(int16_t)index);
+    if (obj == 0u)
+        return;
+    EF_U32(0x0019b388u) = x;
+    EF_U32(0x0019b38cu) = y;
+    EF_U32(obj + 0x58u) = y;
+    EF_U32(0x0019b390u) = z;
+    EF_U32(obj + 0x5cu) = z;
+    EF_U32(obj + 0x54u) = x;
+    EF_U32(0x0019b380u) = x - EF_U32(obj);
+    EF_U32(0x0019b384u) = z - EF_U32(obj + 8u);
+    if (EF_U8(obj + 0x3bu) == 0u) {
+        uint32_t heading = EF_U16(obj + 0xeu);
+        EF_U32(0x0019b394u) = EF_U32(obj + 0x12u);
+        EF_U16(0x0019b39au) = (uint16_t)heading;
+        EF_U16(0x0019b398u) = EF_U16(0x00141e08u + (heading >> 3) * 2u);
+        EF_U16(0x0019b39cu) = EF_U16(0x00142e08u + (heading >> 3) * 2u);
+    }
+    clear_part_flags_266f8(obj);
+}

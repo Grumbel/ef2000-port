@@ -386,7 +386,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000263e0	12	reset_spatial_slot_count	spatial	compiles	game	confirmed	decomp/tests/0x000263e0.json	docs/compiler-abi.md; C draft and host-model test; waiting for Watcom compile, splice and guest differential
 0x000263ec	55	append_spatial_slot	spatial	compiles	game	confirmed	decomp/tests/0x000263ec.json	Original body and four direct callers audited; 29-entry C model and host test; awaiting Watcom guest differential
 0x00026424	586			unknown	unclassified	unverified		
-0x00026670	133			unknown	unclassified	unverified		
+0x00026670	133	set_object_target_26670	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00026670.json	docs/compiler-abi.md; Set a target position (X = EDX, Y = EBX, Z = ECX) on the scene object INDEX (EAX, signed word, looked up with 0x8ffe8): ; callers 38284@3852f; guest pending
 0x000266f8	74	clear_part_flags_266f8	game_helpers7	compiles	game	confirmed	decomp/tests/0x000266f8.json	docs/compiler-abi.md; ; callers 26670@266ee; guest pending
 0x00026744	539			unknown	unclassified	unverified		
 0x00026960	483			unknown	unclassified	unverified		

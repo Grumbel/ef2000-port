@@ -6840,3 +6840,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc473c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 15be10@15be2e,160122@160147,160156@16017b | Implicit-register fragment (EAX = MARGIN word, ESI = x, EDI = y, EBP = z; params in that order): run the view-volume tes |
 | `0x10e08d` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 10dfec@10e017,10dfec@10e039,10dfec@10e05b | Implicit-register fragment (ESI = source words, EDI = destination, ECX = count; params in that order): split each source |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x26670` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 38284@3852f | Set a target position (X = EDX, Y = EBX, Z = ECX) on the scene object INDEX (EAX, signed word, looked up with 0x8ffe8):  |
