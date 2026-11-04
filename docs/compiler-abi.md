@@ -5221,3 +5221,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xbbdc4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 8883c@8889b,8e940@8eb37,90438@90606 | Map an index through the mapper chosen by kind (0..3: 0xbbbe4, 0xbbb34, 0xbbae4, 0xbbd8c) and look the result up in the  |
+
+## small_wrappers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa1770` | EAX:uint32_t,EDX:uint32_t | EAX:ef_addr32 | 878c8@878e9 | Return the address of slot idx (16-bit entries after the 29-byte sub-records) in a page object, checking that its type b |

@@ -2132,7 +2132,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a14c8	55	flag_page_slot_a14c8	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a14c8.json	docs/compiler-abi.md; Set the high flag of slot index of the current page.; callers 9e7bc@9eabd; guest pending
 0x000a1500	141			unknown	unclassified	unverified		
 0x000a1590	479			unknown	unclassified	unverified		
-0x000a1770	106			unknown	unclassified	unverified		
+0x000a1770	106	claim_page_slot_a1770	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000a1770.json	docs/compiler-abi.md; Return the address of slot idx (16-bit entries after the 29-byte sub-records) in a page object, checking that its type b; callers 878c8@878e9; guest pending
 0x000a17e8	58	record_type_value_a17e8	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a17e8.json	docs/compiler-abi.md; Value of the type byte (bits 2..7) if bit 1 is set, else -1.; callers 3cd9c@3cde9,53c80@53cf8; guest pending
 0x000a1824	52	copy_record_header_a1824	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a1824.json	docs/compiler-abi.md; Copy the header fields of record id into dest.; callers d0470@d04d3; guest pending
 0x000a1858	17	record_flag_bits56	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a1858.json	docs/compiler-abi.md; bits 5-6 of byte +0xa; callers 10f70@10faf,11014@11038,1e214@1e22b; guest pending

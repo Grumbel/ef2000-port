@@ -196,3 +196,17 @@ uint32_t random_code_aa6c(void)
     default: return 0xeu;
     }
 }
+
+/* 0xa1770, 106 bytes. Return the address of slot idx (16-bit entries after the 29-byte sub-records) in a page object, checking that its type bits (0x7c00) are 0x2c00 (reporting otherwise) and bumping its use count (+5). */
+ef_addr32 claim_page_slot_a1770(uint32_t page, uint32_t idx)
+{
+    ef_addr32 obj = (uint32_t)guest_fn_b3f58((int32_t)(int16_t)page);
+    uint32_t type = EF_U32(0x0040d200u + (uint32_t)EF_U16(obj) * 4u);
+    uint32_t count = EF_U8(type + 1u);
+    int32_t i = (int16_t)idx;
+    ef_addr32 slot = obj + 0xbu + count * 29u + (uint32_t)(i * 2);
+    if ((int16_t)(EF_U16(slot) & 0x7c00u) != 0x2c00)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018b334u, (uint32_t)i);
+    EF_U8(slot + 5u) = (uint8_t)(EF_U8(slot + 5u) + 1u);
+    return slot;
+}

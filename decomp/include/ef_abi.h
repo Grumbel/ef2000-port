@@ -4420,4 +4420,6 @@ void drain_kind_two_chain_85380(uint32_t owner);
 
 uint32_t lookup_mapped_code_bbdc4(uint32_t kind, uint32_t index, uint32_t row);
 
+ef_addr32 claim_page_slot_a1770(uint32_t page, uint32_t idx);
+
 #endif
