@@ -16047,3 +16047,46 @@ uint32_t find_session_entry_a312c(uint32_t packet)
 	}
 	return 0xffffu;
 }
+
+/* 0xa2f70, 406 bytes. Client-side session discovery step. While byte 0x1357c9 is clear, scan the received packets (count: byte at [0x136b88], indices: bytes at [0x136b84]) and stop at the first announcement (descriptor byte +0xd & 0xf equal to 2) whose payload name at +0xa equals the text 0x13579b and whose first eight bytes equal those at 0x137158: take the descriptor word +0xb into word 0x1357d6, store the clock minus it in dword 0x136dd4, copy payload word +8 to word 0x1357ae, format that entry (0xa2e90), set byte 0x1357c9 and take descriptor byte +5 as word 0x1357b0; a packet of kind 0xb copies its first payload byte to byte 0x13583d. Then, every ten clock ticks (dword 0x136bcc), while no session was found a broadcast is sent (0xe9a24 with 0x21, 0x135840, 0x137136, then request 0x137130, code 0x27, flag 1 through 0xa3e50) and with byte 0x1357c9 equal to 1 the entry scan 0xa2ef4 runs and its result is returned; otherwise returns 0. */
+uint32_t discover_session_a2f70(void)
+{
+	uint32_t i, count, idx, desc, pay, now;
+	int found = 0;
+
+	if (EF_U8(0x001357c9u) == 0u) {
+		count = EF_U8(EF_U32(0x00136b88u));
+		for (i = 0; (i & 0xffffu) < count && !found; i++) {
+			idx = EF_U8(EF_U32(0x00136b84u) + (i & 0xffffu));
+			desc = EF_U32(0x00135878u + idx * 32u);
+			pay = EF_U32(0x0013587cu + idx * 32u);
+			if ((EF_U8(desc + 0xdu) & 0xfu) == 2u) {
+				if (guest_fn_a4380(pay + 0xau, 0x0013579bu) != 0u)
+					continue;
+				if (guest_memcmp(pay, 0x00137158u, 8u) != 0)
+					continue;
+				EF_U16(0x001357d6u) = EF_U16(desc + 0xbu);
+				EF_U32(0x00136dd4u) = guest_read_runtime_tick() - EF_U16(0x001357d6u);
+				EF_U16(0x001357aeu) = EF_U16(pay + 8u);
+				format_entry_a2e90(EF_U16(0x001357aeu));
+				EF_U8(0x001357c9u) = 1u;
+				found = 1;
+				EF_U16(0x001357b0u) = EF_U8(desc + 5u);
+			} else if ((EF_U8(desc + 0xdu) & 0xfu) == 0xbu) {
+				EF_U8(0x0013583du) = EF_U8(pay);
+			}
+		}
+	}
+	now = guest_read_runtime_tick();
+	if (now > EF_U32(0x00136bccu)) {
+		EF_U32(0x00136bccu) = guest_read_runtime_tick() + 10u;
+		if (EF_U8(0x001357c9u) == 0u) {
+			guest_fn_e9a24(0x21u, 0x00135840u, 0x00137136u);
+			issue_request_a3e50(0x00137130u, 0x27u, 1u);
+			return 0u;
+		}
+		if (EF_U8(0x001357c9u) == 1u)
+			return scan_entries_a2ef4() & 0xffu;
+	}
+	return 0u;
+}

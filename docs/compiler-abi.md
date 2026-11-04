@@ -8232,3 +8232,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa312c` | EAX:uint32_t | EAX:uint32_t | a32e8@a330e | Find or create the session entry for packet EAX (low word; descriptors at 0x135878/0x13587c, the sender name is at paylo |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa2f70` | none | EAX:uint32_t | a41dc@a4250 | Client-side session discovery step. While byte 0x1357c9 is clear, scan the received packets (count: byte at [0x136b88],  |
