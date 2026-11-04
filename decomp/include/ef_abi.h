@@ -5490,4 +5490,6 @@ int32_t guest_fn_df26f_x(ef_addr32 src, ef_addr32 fmt, ...); /* 0xdf26f cdecl, s
 
 void jitter_offset_322ac(void);
 
+void mirror_record_floats_1debc(ef_addr32 r);
+
 #endif

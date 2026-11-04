@@ -329,7 +329,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001d954	434			unknown	unclassified	unverified		
 0x0001db08	280			unknown	unclassified	unverified		
 0x0001dc20	666			unknown	unclassified	unverified		
-0x0001debc	209			unknown	unclassified	unverified		
+0x0001debc	209	mirror_record_floats_1debc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001debc.json	docs/compiler-abi.md; Convert the floating point state of the record R (EAX) into its integer mirror: save the dwords at +9, +0xd and +0x11 to; callers 1d954@1dadc; guest pending
 0x0001df90	348	projectile_ground_test_1df90	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001df90.json	docs/compiler-abi.md; Ground impact test for the projectile REC (owner byte +0x27 must match byte 0x1a666b and the done flag +0x47 must be cle; callers 1d954@1daf8; guest pending
 0x0001e0ec	68	dispatch_record_event_1e0ec	game_helpers107	compiles	game	confirmed	decomp/tests/0x0001e0ec.json	docs/compiler-abi.md; Look up an event code for a record (position >> 8 as a 3-vector) and dispatch it unless the lookup returns -1.; callers 1df90@1e0e1; guest pending
 0x0001e130	53	forget_record_1e130	game_helpers5	compiles	game	confirmed	decomp/tests/0x0001e130.json	docs/compiler-abi.md; Forget the cached record pointer if it equals record index.; callers 5437c@543eb; guest pending

@@ -11774,3 +11774,32 @@ void jitter_offset_322ac(void)
     half = (ws - (ws >> 31)) >> 1;
     EF_U16(0x0019e5cdu) = (uint16_t)(EF_U16(0x0019e5cdu) + (uint32_t)(r - half));
 }
+
+/* 0x1debc, 209 bytes. Convert the floating point state of the record R (EAX) into its integer mirror: save the dwords at +9, +0xd and +0x11 to +0x1b, +0x1f and +0x23, then store the doubles at +0x59, +0x61 and +0x51 scaled by 0x1819f8 * 0x181a00 (rounded by 0x9d72c) into +9, +0xd and +0x11, and the doubles at +0x99, +0x89 and +0x81 scaled by 0x181a08 * 0x181a10 (the first negated) as signed words into +0x15, +0x17 and +0x19. */
+void mirror_record_floats_1debc(ef_addr32 r)
+{
+    double c1, c2, c3, c4;
+    double a51, a59, a61, a81, a89, a99;
+    uint32_t old9 = EF_U32(r + 9u);
+    uint32_t oldd = EF_U32(r + 0xdu);
+    uint32_t old11 = EF_U32(r + 0x11u);
+    memcpy(&c1, ef_guest_memory_ptr(0x001819f8u), sizeof c1);
+    memcpy(&c2, ef_guest_memory_ptr(0x00181a00u), sizeof c2);
+    memcpy(&c3, ef_guest_memory_ptr(0x00181a08u), sizeof c3);
+    memcpy(&c4, ef_guest_memory_ptr(0x00181a10u), sizeof c4);
+    memcpy(&a51, ef_guest_memory_ptr(r + 0x51u), sizeof a51);
+    memcpy(&a59, ef_guest_memory_ptr(r + 0x59u), sizeof a59);
+    memcpy(&a61, ef_guest_memory_ptr(r + 0x61u), sizeof a61);
+    memcpy(&a81, ef_guest_memory_ptr(r + 0x81u), sizeof a81);
+    memcpy(&a89, ef_guest_memory_ptr(r + 0x89u), sizeof a89);
+    memcpy(&a99, ef_guest_memory_ptr(r + 0x99u), sizeof a99);
+    EF_U32(r + 0x1bu) = old9;
+    EF_U32(r + 0x1fu) = oldd;
+    EF_U32(r + 0x23u) = old11;
+    EF_U32(r + 9u) = (uint32_t)(int32_t)truncate_9d72c(a59 * c1 * c2);
+    EF_U32(r + 0xdu) = (uint32_t)(int32_t)truncate_9d72c(a61 * c1 * c2);
+    EF_U32(r + 0x11u) = (uint32_t)(int32_t)truncate_9d72c(a51 * c1 * c2);
+    EF_U16(r + 0x15u) = (uint16_t)(int32_t)truncate_9d72c(-(a99 * c3 * c4));
+    EF_U16(r + 0x17u) = (uint16_t)(int32_t)truncate_9d72c(a89 * c3 * c4);
+    EF_U16(r + 0x19u) = (uint16_t)(int32_t)truncate_9d72c(a81 * c3 * c4);
+}
