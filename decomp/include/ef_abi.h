@@ -5156,4 +5156,8 @@ void setup_viewport_window_76620(void);
 
 uint32_t register_resource_9dcf8(uint32_t name, uint32_t text);
 
+void append_table_entry_16018a(void);
+void guest_fn_c565e_x(uint32_t esi); /* 0xc565e ESI = slot index */
+void guest_fn_c552e_x(uint32_t esi); /* 0xc552e ESI = slot index */
+
 #endif

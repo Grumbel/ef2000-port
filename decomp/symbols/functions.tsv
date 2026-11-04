@@ -4273,6 +4273,6 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0016010e	20	record_word_16010e	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0016010e.json	docs/compiler-abi.md; Signed word at +0x10 of the record found by id.; callers 9fb00@9fbe8,9fc00@9fd8c,a0228@a046b; guest pending
 0x00160122	52			unknown	unclassified	unverified		
 0x00160156	52			unknown	unclassified	unverified		
-0x0016018a	203			unknown	unclassified	unverified		
+0x0016018a	203	append_table_entry_16018a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0016018a.json	docs/compiler-abi.md; Implicit-global fragment: append one entry to the table set indexed by word 0x146e52: bytes 0x149e58 (byte 0x1600b8), 0x; callers 9f850@9f935,9f940@9fac2; guest pending
 0x00160255	212			unknown	unclassified	unverified		
 0x00160329	200			unknown	unclassified	unverified		

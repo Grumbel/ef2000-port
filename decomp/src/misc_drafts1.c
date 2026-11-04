@@ -7885,3 +7885,31 @@ uint32_t register_resource_9dcf8(uint32_t name, uint32_t text)
         EF_U32(0x00414f00u + off) = size + data - 2u;
     return slot;
 }
+
+/* 0x16018a, 203 bytes. Implicit-global fragment: append one entry to the table set indexed by word 0x146e52: bytes 0x149e58 (byte 0x1600b8), 0x149658 (byte at pointer 0x1600ac), 0x14a658 (0); dwords 0x150e58/0x152e58/0x154e58 (the three dwords at pointer 0x1600b0), 0x156e58 (pointer 0x1600ac); words 0x14ae58 (low word of dword 0x1600a8), 0x14fe58 (absolute value of the high word of the third dword), 0x14be58/0x14ce58/0x14de58 (three words at pointer 0x1600b4) and 0x14ee58 (low word of dword 0x1600bc). Then run the insertion routine 0xc552e when all three words are zero, else 0xc565e, with ESI = the index. */
+void append_table_entry_16018a(void)
+{
+    uint32_t src = EF_U32(0x001600b0u);
+    uint32_t d0 = EF_U32(src), d1 = EF_U32(src + 4u), d2 = EF_U32(src + 8u);
+    uint32_t idx = EF_U16(0x00146e52u);
+    uint32_t wp = EF_U32(0x001600b4u);
+    uint16_t w0 = EF_U16(wp), w1 = EF_U16(wp + 2u), w2 = EF_U16(wp + 4u);
+    int16_t hi = (int16_t)(d2 >> 16);
+    EF_U8(0x00149e58u + idx) = EF_U8(0x001600b8u);
+    EF_U8(0x00149658u + idx) = EF_U8(EF_U32(0x001600acu));
+    EF_U8(0x0014a658u + idx) = 0u;
+    EF_U32(0x00150e58u + idx * 4u) = d0;
+    EF_U32(0x00152e58u + idx * 4u) = d1;
+    EF_U32(0x00154e58u + idx * 4u) = d2;
+    EF_U32(0x00156e58u + idx * 4u) = EF_U32(0x001600acu);
+    EF_U16(0x0014ae58u + idx * 2u) = (uint16_t)EF_U32(0x001600a8u);
+    EF_U16(0x0014fe58u + idx * 2u) = (uint16_t)(hi < 0 ? -hi : hi);
+    EF_U16(0x0014be58u + idx * 2u) = w0;
+    EF_U16(0x0014ce58u + idx * 2u) = w1;
+    EF_U16(0x0014de58u + idx * 2u) = w2;
+    EF_U16(0x0014ee58u + idx * 2u) = (uint16_t)EF_U32(0x001600bcu);
+    if ((uint16_t)(w0 | w1 | w2) == 0u)
+        guest_fn_c552e_x(EF_U16(0x00146e52u));
+    else
+        guest_fn_c565e_x(EF_U16(0x00146e52u));
+}
