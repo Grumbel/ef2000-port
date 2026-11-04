@@ -5583,4 +5583,7 @@ double guest_fn_2bab0_x(ef_addr32 p, int32_t aux); /* 0x2bab0 EAX/EDX -> ST0 */
 uint32_t run_unit_setup_7e670(void);
 void guest_fn_545b8_x(int32_t unit, uint32_t mode); /* 0x545b8 EAX/EDX */
 
+void update_sound_mode_98198(void);
+void guest_fn_d5fa8_x(ef_addr32 out_a, ef_addr32 out_b); /* 0xd5fa8 EAX/EDX */
+
 #endif

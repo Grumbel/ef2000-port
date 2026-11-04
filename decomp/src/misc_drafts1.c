@@ -12613,3 +12613,42 @@ uint32_t run_unit_setup_7e670(void)
         guest_callptr2_x(EF_U32(0x00132a74u), 0x0018866cu, (uint32_t)(int32_t)(int16_t)count);
     return 1u;
 }
+
+/* 0x98198, 230 bytes. Pick the music/sound mode for the selected object (high word of 0x1f71c8, 0x7489c) and switch to it: only while byte 0x420a72 is set and byte 0x420a70 is 1. The mode follows the object's state byte +0x16c minus one (0 for unknown states, 1 for 1/2/4/5/16, 3 for 8/13, 2 when there is no object or for 3/7/11/12/14, and for 0/6/9/10/15 1 + ... 2 when byte 0x12dd0e or word 0x1a81ce is set, else 0, clearing byte 0x12dd0e). Unless the mode equals byte 0x12dd0d: when the pair from 0xd5fa8 is (0, multiple of 8) or byte 0x12dd0c is clear, reset the old slot (0x980e8), select the new (0x98050) and remember it in 0x12dd0d with 0x12dd0c set. */
+void update_sound_mode_98198(void)
+{
+    static const uint8_t modes[17] = {4, 1, 1, 2, 1, 1, 4, 2, 3, 4, 4, 2, 2, 3, 2, 4, 1};
+    ef_addr32 obj;
+    uint32_t pair[2];
+    uint8_t mode;
+    if (EF_U8(0x00420a72u) == 0u || EF_U8(0x00420a70u) != 1u)
+        return;
+    obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    guest_fn_d5fa8_x((ef_addr32)(uintptr_t)&pair[1], (ef_addr32)(uintptr_t)&pair[0]);
+    if (obj == 0u) {
+        mode = 2u;
+    } else {
+        uint8_t k = (uint8_t)(EF_U8(obj + 0x16cu) - 1u);
+        if (k > 0x10u) {
+            mode = 0u;
+        } else {
+            switch (modes[k]) {
+            case 1: mode = 1u; break;
+            case 2: mode = 2u; break;
+            case 3: mode = 3u; break;
+            default:
+                mode = (EF_U8(0x0012dd0eu) != 0u || EF_U16(0x001a81ceu) != 0u) ? 2u : 0u;
+                EF_U8(0x0012dd0eu) = 0u;
+                break;
+            }
+        }
+    }
+    if (mode == EF_U8(0x0012dd0du))
+        return;
+    if (!(pair[1] == 0u && pair[0] != 0u && (int32_t)pair[0] % 8 == 0) && EF_U8(0x0012dd0cu) != 0u)
+        return;
+    reset_sound_slot_980e8(EF_U8(0x0012dd0du));
+    select_sound_slot_98050(mode);
+    EF_U8(0x0012dd0du) = mode;
+    EF_U8(0x0012dd0cu) = 1u;
+}

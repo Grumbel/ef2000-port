@@ -7676,3 +7676,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7e670` | none | EAX:uint32_t | 7e758@7e767 | Run the unit setup passes for up to 0x4074 clock ticks (clock hook 0x15b620): after 0xe2988(0x1e), repeat { for every un |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x98198` | none | none | 3dd30@3dfcc | Pick the music/sound mode for the selected object (high word of 0x1f71c8, 0x7489c) and switch to it: only while byte 0x4 |
