@@ -477,7 +477,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002c224	308			unknown	unclassified	unverified		
 0x0002c358	251			unknown	unclassified	unverified		
 0x0002c454	220			unknown	unclassified	unverified		
-0x0002c600	218			unknown	unclassified	unverified		
+0x0002c600	218	draw_linked_pages_2c600	draw_loops1	compiles	game	confirmed	decomp/tests/0x0002c600.json	docs/compiler-abi.md; For each of a page's eight linked pages (table at 0x1fcb40) other than itself, call 0x46254 with colour 0x3e; if none we; callers 46454@471bf,46454@47232; guest pending
 0x0002c6dc	127	owner_check_fails_2c6dc	game_helpers16	compiles	game	confirmed	decomp/tests/0x0002c6dc.json	docs/compiler-abi.md; Nonzero (1) when the owner fails the check selected by its record type.; callers 2c778@2cbd7; guest pending
 0x0002c778	1398			unknown	unclassified	unverified		
 0x0002ccf0	293			unknown	unclassified	unverified		

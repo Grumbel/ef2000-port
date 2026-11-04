@@ -5039,3 +5039,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x74ed8` | EAX:uint32_t,EDX:uint32_t | none | 2a4c8@2a669,74970@74d28 | Randomly raise the twelve 0..100 counters (+0x18e) of the object found for key by up to n, redrawing its entries first w |
+
+## draw_loops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2c600` | EAX:uint32_t,EDX:uint32_t | none | 46454@471bf,46454@47232 | For each of a page's eight linked pages (table at 0x1fcb40) other than itself, call 0x46254 with colour 0x3e; if none we |

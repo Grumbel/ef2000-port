@@ -35,3 +35,25 @@ void draw_object_entries_46168(uint32_t key, uint32_t b, uint32_t c, uint32_t d,
         }
     }
 }
+
+/* 0x2c600, 218 bytes. For each of a page's eight linked pages (table at 0x1fcb40) other than itself, call 0x46254 with colour 0x3e; if none were drawn and the page is the active one (0x1f71ca) with +0x15 set, fall back to 0x47764. */
+void draw_linked_pages_2c600(uint32_t page, uint32_t arg)
+{
+    int16_t p = (int16_t)page;
+    int16_t a = (int16_t)arg;
+    uint8_t found = 0u;
+    uint32_t rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)p * 0xca);
+    int16_t i;
+    for (i = 0; i < 8; i++) {
+        uint32_t list = EF_U32(0x001fcb40u) + (uint32_t)(EF_S16(rec + 0x1cu) * 0x11);
+        uint16_t other = EF_U16(list + (uint32_t)i * 2u + 1u);
+        if ((int16_t)other != 0xff && other != (uint16_t)p) {
+            guest_fn_46254((uint32_t)(int32_t)EF_S16(rec + 0x50u), (int32_t)EF_S16(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)other * 0xca) + 0x50u),
+                           0x3eu, (uint32_t)(int32_t)a, 0u, 0u);
+            found = 1u;
+        }
+    }
+    if (!found && EF_U16(rec + 0x15u) != 0u && EF_U16(rec + 0x50u) == (uint32_t)EF_S16(0x001f71cau)) {
+        guest_fn_47764_x((int32_t)EF_S16(rec + 0x50u), 0x3eu, (int32_t)a, 0u, 0u);
+    }
+}
