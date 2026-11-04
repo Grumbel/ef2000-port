@@ -3456,7 +3456,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e9a24	132	original_memcpy		named	unclassified	unverified		RET 0Ch, EAX/EDX advance; docs/ghidra-findings.md
 0x000e9ac0	117	run_probe_e9ac0	probe_helpers1	compiles	game	confirmed	decomp/tests/0x000e9ac0.json	docs/compiler-abi.md; Run the probe selected by the state word at 0x464472 (1, 2 or 3), print a message when it reports failure, and return th; callers 8b39c@8b4c9; guest pending
 0x000e9b38	188			unknown	unclassified	unverified		
-0x000e9c00	214			unknown	unclassified	unverified		
+0x000e9c00	214	update_mode_e9c00	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e9c00.json	docs/compiler-abi.md; Toggle the mode byte 0x43399d (hysteresis on a distance): in mode 1 run the first constraint solver 0xe9e7c on 0x464480 ; callers d6090@d6250,d6090@d632c,e740c@e74c4; guest pending
 0x000e9cd8	243			unknown	unclassified	unverified		
 0x000e9dcc	175			unknown	unclassified	unverified		
 0x000e9e7c	264			unknown	unclassified	unverified		

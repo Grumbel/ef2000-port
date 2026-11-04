@@ -5498,4 +5498,10 @@ ef_addr32 guest_fn_ce5f8_x(ef_addr32 plane, ef_addr32 inside, ef_addr32 outside)
 
 void draw_scaled_rect_c95ac(uint32_t colour, uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2);
 
+void update_mode_e9c00(void);
+void guest_fn_e9e7c_x(ef_addr32 obj, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xe9e7c EAX + 6 stack, ret 0x18 */
+void guest_fn_e9f84_x(void); /* 0xe9f84 */
+void guest_fn_e9cd8_x(ef_addr32 obj, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xe9cd8 EAX + 6 stack, ret 0x18 */
+void guest_fn_e9dcc_x(void); /* 0xe9dcc */
+
 #endif

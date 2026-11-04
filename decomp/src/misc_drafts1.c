@@ -11852,3 +11852,27 @@ void draw_scaled_rect_c95ac(uint32_t colour, uint32_t x1, uint32_t y1, uint32_t 
     r4 = (int32_t)truncate_9d72c((double)(int16_t)y2 * scale + oy + (double)(int16_t)EF_U16(vp + 0x73u) - (double)(int16_t)EF_U16(vp + 0x6bu));
     guest_fn_c8ccc_x((uint32_t)r4, (uint32_t)r3, (uint32_t)r2, (uint32_t)r1, colour & 0xffu);
 }
+
+/* 0xe9c00, 214 bytes. Toggle the mode byte 0x43399d (hysteresis on a distance): in mode 1 run the first constraint solver 0xe9e7c on 0x464480 (six dwords from 0x4321f0, 0x4321f4, 0x432288, 0x43228c, 0x432220, 0x432224) and 0xe9f84 and clear the mode when |double at 0x432298| drops below the double 0x191494; otherwise run 0xe9cd8 (0x432230, 0x432234, 0x432298, 0x43229c, 0x4321f8, 0x4321fc) and 0xe9dcc and set the mode when |double at 0x432298| exceeds the double 0x19148c. */
+void update_mode_e9c00(void)
+{
+    double d;
+    double limit;
+    if (EF_U8(0x0043399du) == 1u) {
+        guest_fn_e9e7c_x(0x00464480u, EF_U32(0x004321f0u), EF_U32(0x004321f4u), EF_U32(0x00432288u),
+                         EF_U32(0x0043228cu), EF_U32(0x00432220u), EF_U32(0x00432224u));
+        guest_fn_e9f84_x();
+        memcpy(&d, ef_guest_memory_ptr(0x00432298u), sizeof d);
+        memcpy(&limit, ef_guest_memory_ptr(0x00191494u), sizeof limit);
+        if (abs_double_b427c(d) < limit)
+            EF_U8(0x0043399du) = 0u;
+    } else {
+        guest_fn_e9cd8_x(0x00464480u, EF_U32(0x00432230u), EF_U32(0x00432234u), EF_U32(0x00432298u),
+                         EF_U32(0x0043229cu), EF_U32(0x004321f8u), EF_U32(0x004321fcu));
+        guest_fn_e9dcc_x();
+        memcpy(&d, ef_guest_memory_ptr(0x00432298u), sizeof d);
+        memcpy(&limit, ef_guest_memory_ptr(0x0019148cu), sizeof limit);
+        if (abs_double_b427c(d) > limit)
+            EF_U8(0x0043399du) = 1u;
+    }
+}

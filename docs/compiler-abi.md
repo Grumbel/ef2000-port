@@ -7522,3 +7522,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc95ac` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 4161c@416a1,42568@42607,42568@42621 | Draw a rectangle in colour COLOUR (EAX, byte) given in viewport units: the signed words X1 (EDX), Y1 (EBX), X2 (ECX) and |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe9c00` | none | none | d6090@d6250,d6090@d632c,e740c@e74c4 | Toggle the mode byte 0x43399d (hysteresis on a distance): in mode 1 run the first constraint solver 0xe9e7c on 0x464480  |
