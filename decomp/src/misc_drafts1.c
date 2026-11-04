@@ -7644,3 +7644,36 @@ void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
         EF_U32(desc + 0x1eu + i * 4u) = d[i];
     guest_fn_101f88(EF_U32(obj), 0x304u, 0u, 0u);
 }
+
+/* 0x18a68, 222 bytes. Advance the scene-node scan cursor (word 0x211ae2, starting at 0x2001) for the unit whose index is the signed word at 0x1f71ca: step through the nodes (0x8ffe8) until one has its position (three ints scaled by the double at 0x181830, taken from the 0x45-byte records at 0x1a14f8 indexed by the high word of node +0x36) within the distance (double 0x181838) of the unit's position at +0x49, or the node list runs out (cursor reset to 0x2001, at most twice). */
+void scan_nodes_near_unit_18a68(void)
+{
+    uint32_t unit = guest_fn_7489c((int32_t)(int16_t)EF_U16(0x001f71cau));
+    uint8_t left = 2u, found = 0u;
+    double pos[3];
+    if (unit == 0u)
+        return;
+    if (EF_U16(0x00211ae2u) == 0u)
+        EF_U16(0x00211ae2u) = 0x2001u;
+    else
+        EF_U16(0x00211ae2u) = (uint16_t)(EF_U16(0x00211ae2u) + 1u);
+    unit += 0x49u;
+    do {
+        uint32_t node = guest_fn_8ffe8((int32_t)(int16_t)EF_U16(0x00211ae2u));
+        if (node == 0u) {
+            left--;
+            EF_U16(0x00211ae2u) = 0x2001u;
+        } else {
+            uint32_t base = EF_U32(0x001a14f8u);
+            uint32_t rec = base + (uint32_t)((int32_t)(int16_t)EF_U16(node + 0x38u) * 0x45);
+            double k = *(double *)ef_guest_memory_ptr(0x00181830u);
+            pos[0] = (double)(int32_t)EF_U32(rec + 0xfu) * k;
+            pos[1] = (double)(int32_t)EF_U32(rec + 0x7u) * k;
+            pos[2] = (double)(int32_t)EF_U32(rec + 0xbu) * k;
+            if (distance_2d_b415c((uint32_t)(uintptr_t)pos, unit) < *(double *)ef_guest_memory_ptr(0x00181838u))
+                found = 1u;
+            else
+                EF_U16(0x00211ae2u) = (uint16_t)(EF_U16(0x00211ae2u) + 1u);
+        }
+    } while (!found && left != 0u);
+}

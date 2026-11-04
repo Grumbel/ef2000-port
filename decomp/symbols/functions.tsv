@@ -297,7 +297,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00017f10	289	switch_player_mode_17f10	game_helpers66	compiles	game	confirmed	decomp/tests/0x00017f10.json	docs/compiler-abi.md; Switch the player unit's mode when no blocking state is active.; callers 601c@60d3; guest pending
 0x00018118	154	toggle_hint_flag_18118	float_helpers3	compiles	game	confirmed	decomp/tests/0x00018118.json	docs/compiler-abi.md; Toggle the autopilot hint flag when the player is in the right state.; callers 7957c@79654; guest pending
 0x0001851c	96	fire_idle_action_1851c	game_helpers31	compiles	game	confirmed	decomp/tests/0x0001851c.json	docs/compiler-abi.md; Fire the one-shot action when the idle conditions hold.; callers 72944@72ce2,72944@72d3f; guest pending
-0x00018a68	222			unknown	unclassified	unverified		
+0x00018a68	222	scan_nodes_near_unit_18a68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00018a68.json	docs/compiler-abi.md; Advance the scene-node scan cursor (word 0x211ae2, starting at 0x2001) for the unit whose index is the signed word at 0x; callers 1d318@1d369,92f10@92f1b; guest pending
 0x00019a80	312			unknown	unclassified	unverified		
 0x0001a358	54	enter_mode_1a358	game_helpers78	compiles	game	confirmed	decomp/tests/0x0001a358.json	docs/compiler-abi.md; Enter the mode once: apply the argument to the driver and refresh its table.; callers 95e58@95f15; guest pending
 0x0001a390	57	leave_mode_1a390	game_helpers78	compiles	game	confirmed	decomp/tests/0x0001a390.json	docs/compiler-abi.md; Leave the mode: restore the saved driver parameters and refresh its table.; callers 95e58@95f1c; guest pending

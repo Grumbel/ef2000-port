@@ -5138,4 +5138,6 @@ void update_stock_e6d78(void);
 
 void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj, uint32_t rec);
 
+void scan_nodes_near_unit_18a68(void);
+
 #endif
