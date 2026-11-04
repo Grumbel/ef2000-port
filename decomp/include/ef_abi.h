@@ -2987,4 +2987,27 @@ double guest_fn_b42f0(double value); /* 0xb42f0 stack -> ST0 */
 void guest_fn_b4620(double first, double second); /* 0xb4620 stack */
 double guest_fn_b415c(ef_addr32 a, ef_addr32 b); /* 0xb415c EAX/EDX -> ST0 */
 
+/* float_helpers2.c */
+uint8_t record_near_unit_2dbf8(int16_t index, uint8_t unit);
+void report_point_offset_37c0c(ef_addr32 position, int16_t index);
+uint8_t point_near_unit_37c64(int16_t index, uint8_t unit);
+uint8_t point_near_player_37cdc(int16_t index);
+uint8_t point_not_far_from_unit_37d88(int16_t index, uint8_t unit);
+uint8_t point_not_far_from_player_37e00(int16_t index);
+double clock_rate_difference_40870(uint32_t a, ef_addr32 b, uint32_t c, double divisor);
+double object_double_value_45b60(ef_addr32 object);
+int32_t scale_to_angle_45fc4(double value);
+uint8_t scale_to_byte_4600c(double value);
+void add_float_time_4fdf4(ef_addr32 minutes, ef_addr32 seconds, float amount);
+double float_vector_length_53330(float x, float y, float z);
+void refresh_frame_tables_54110(void);
+void fill_sine_table_5f944(void);
+int32_t guest_fn_40774(uint32_t a, uint32_t b); /* 0x40774 EAX/EDX */
+void guest_fn_5414c(void); /* 0x5414c */
+void guest_fn_54210(void); /* 0x54210 */
+void guest_fn_54274(void); /* 0x54274 */
+void guest_fn_54328(void); /* 0x54328 */
+void guest_fn_5437c(void); /* 0x5437c */
+double guest_fn_b45fa(double value); /* 0xb45fa ST0 -> ST0 */
+
 #endif

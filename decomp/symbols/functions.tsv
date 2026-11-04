@@ -489,7 +489,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002da54	269	refresh_grid_category	world_grid_category	compiles	game	confirmed	decomp/tests/0x0002da54.json	20 three-byte object features select lowest priority into row +0xbc
 0x0002db64	63	unit_has_id_2db64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0002db64.json	docs/compiler-abi.md; Does the unit named by table entry slot carry id?; callers 2dba4@2dbd4; guest pending
 0x0002dba4	82	grid_is_current_or_external	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002dba4.json	sentinel and external-list predicate; original callee unresolved
-0x0002dbf8	137			unknown	unclassified	unverified		
+0x0002dbf8	137	record_near_unit_2dbf8	float_helpers2	compiles	game	confirmed	decomp/tests/0x0002dbf8.json	docs/compiler-abi.md; True when a record is near the unit entry and active.; callers 2dce0@2dd1a; guest pending
 0x0002dc84	90	record_close_and_active_2dc84	float_helpers1	compiles	game	confirmed	decomp/tests/0x0002dc84.json	docs/compiler-abi.md; True when a record is close enough and active.; callers 2dce0@2dcf6; guest pending
 0x0002dce0	120	grid_is_visible_from_reference	world_grid_category	compiles	game	confirmed	decomp/tests/0x0002dce0.json	AX row to AL; reference then all external proximity checks; dependencies unrecovered
 0x0002dee4	239			unknown	unclassified	unverified		
@@ -635,12 +635,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00037934	525			unknown	unclassified	unverified		
 0x00037b44	129	find_record_at_cell_37b44	game_helpers17	compiles	game	confirmed	decomp/tests/0x00037b44.json	docs/compiler-abi.md; Index of the last 0x45-byte record whose position cell is (x, y), or 0xff.; callers 8748@87dc; guest pending
 0x00037bc8	66	scaled_pair_distance_37bc8	float_helpers1	compiles	game	confirmed	decomp/tests/0x00037bc8.json	docs/compiler-abi.md; Distance helper over a scaled pair taken from a table entry.; callers 2d9a4@2d9f2,39edc@39fac,3a000@3a0e5; guest pending
-0x00037c0c	86			unknown	unclassified	unverified		
-0x00037c64	117			unknown	unclassified	unverified		
-0x00037cdc	96			unknown	unclassified	unverified		
+0x00037c0c	86	report_point_offset_37c0c	float_helpers2	compiles	game	confirmed	decomp/tests/0x00037c0c.json	docs/compiler-abi.md; Report the offset between a table point and a position.; callers 2b1f4@2b2e6,39edc@39f8e,3a000@3a0b3; guest pending
+0x00037c64	117	point_near_unit_37c64	float_helpers2	compiles	game	confirmed	decomp/tests/0x00037c64.json	docs/compiler-abi.md; True when a table point is close to a unit's position.; callers 37d3c@37d6b; guest pending
+0x00037cdc	96	point_near_player_37cdc	float_helpers2	compiles	game	confirmed	decomp/tests/0x00037cdc.json	docs/compiler-abi.md; True when a table point is close to the player.; callers 37d3c@37d42; guest pending
 0x00037d3c	76	any_accepts_37d3c	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00037d3c.json	docs/compiler-abi.md; True when 0x37cdc, or 0x37c64 for any subitem, accepts the index.; callers 37eac@37f7b; guest pending
-0x00037d88	117			unknown	unclassified	unverified		
-0x00037e00	96			unknown	unclassified	unverified		
+0x00037d88	117	point_not_far_from_unit_37d88	float_helpers2	compiles	game	confirmed	decomp/tests/0x00037d88.json	docs/compiler-abi.md; True unless a table point is far from a unit's position.; callers 37e60@37e8f; guest pending
+0x00037e00	96	point_not_far_from_player_37e00	float_helpers2	compiles	game	confirmed	decomp/tests/0x00037e00.json	docs/compiler-abi.md; True unless a table point is far from the player.; callers 37e60@37e68; guest pending
 0x00037e60	76	all_accept_37e60	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00037e60.json	docs/compiler-abi.md; True when 0x37e00 and 0x37d88 for every subitem accept the index.; callers 37eac@37f52; guest pending
 0x00037eac	309			unknown	unclassified	unverified		
 0x00037fe4	441			unknown	unclassified	unverified		
@@ -736,7 +736,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00040774	54	clock_words_to_seconds	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00040774.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x000407c4	94			unknown	unclassified	unverified		
 0x00040820	78	reference_clock_reaches	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00040820.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
-0x00040870	77			unknown	unclassified	unverified		
+0x00040870	77	clock_rate_difference_40870	float_helpers2	compiles	game	confirmed	decomp/tests/0x00040870.json	docs/compiler-abi.md; Rate between two clock readings and a distance, minus a divided distance.; callers 59adc@59d66; guest pending
 0x00040e20	47			unknown	unclassified	unverified		
 0x00040e50	107	gcSetDifficulty		named	unclassified	unverified		
 0x00040ebc	8	gcStartNewCampaign		named	unclassified	unverified		
@@ -802,12 +802,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000456e8	625			unknown	unclassified	unverified		
 0x0004595c	245	GenGUIHelp		named	unclassified	unverified		
 0x00045a54	265			unknown	unclassified	unverified		
-0x00045b60	50			unknown	unclassified	unverified		
+0x00045b60	50	object_double_value_45b60	float_helpers2	compiles	game	confirmed	decomp/tests/0x00045b60.json	docs/compiler-abi.md; Double value of an object, reporting an error when its check fails.; callers 10e4dd@10e5ac; guest pending
 0x00045ba0	91	reset_tables_45ba0	game_helpers8	compiles	game	confirmed	decomp/tests/0x00045ba0.json	docs/compiler-abi.md; Reset the 10-entry id table and the four 0x190-byte pages.; callers 3dd30@3ddd7,46038@46039; guest pending
 0x00045bfc	412			unknown	unclassified	unverified		
 0x00045dd4	358			unknown	unclassified	unverified		
-0x00045fc4	69			unknown	unclassified	unverified		
-0x0004600c	42			unknown	unclassified	unverified		
+0x00045fc4	69	scale_to_angle_45fc4	float_helpers2	compiles	game	confirmed	decomp/tests/0x00045fc4.json	docs/compiler-abi.md; Scale a double to an angle word, wrapping negatives.; callers 6f48@6fb3,7030@70e2,39edc@39f99; guest pending
+0x0004600c	42	scale_to_byte_4600c	float_helpers2	compiles	game	confirmed	decomp/tests/0x0004600c.json	docs/compiler-abi.md; Negated scaled double truncated to a byte.; callers 6f48@6fe4,7030@7115,474b8@47531; guest pending
 0x00046038	56	reset_queue_46038	game_helpers5	compiles	game	confirmed	decomp/tests/0x00046038.json	docs/compiler-abi.md; ; callers 49228@49610,7e8c0@7ea1f; guest pending
 0x00046070	183	shift_history_46070	game_helpers38	compiles	game	confirmed	decomp/tests/0x00046070.json	docs/compiler-abi.md; Shift the nine 20-byte history records down and reset the newest slots.; callers 47f9c@47f9c; guest pending
 0x00046128	64	retire_entries_46128	game_helpers8	compiles	game	confirmed	decomp/tests/0x00046128.json	docs/compiler-abi.md; Retire the entries of the 9-slot table that belong to object.; callers 8d59c@8d708; guest pending
@@ -921,7 +921,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004f8a8	236			unknown	unclassified	unverified		
 0x0004f994	206	mpFlyMission		named	unclassified	unverified		
 0x0004fa64	910			unknown	unclassified	unverified		
-0x0004fdf4	89			unknown	unclassified	unverified		
+0x0004fdf4	89	add_float_time_4fdf4	float_helpers2	compiles	game	confirmed	decomp/tests/0x0004fdf4.json	docs/compiler-abi.md; Add a float of minutes to a minutes/seconds pair, carrying seconds.; callers 4fa64@4fc46,4fa64@4fcda; guest pending
 0x0004fe50	546	mpClickCampaign		named	unclassified	unverified		
 0x000505e4	32	mpReturnToCampaign		named	unclassified	unverified		
 0x00050604	52	mpNoQuit		named	unclassified	unverified		
@@ -957,7 +957,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00053270	149			unknown	unclassified	unverified		
 0x00053308	19	convert_signed_short_scale	record_callers	compiles	game	confirmed	decomp/tests/0x00053308.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0005331c	17	refresh_tactical_indicator	packet_status	compiles	game	confirmed	decomp/tests/0x0005331c.json	docs/compiler-abi.md; host model; guest differential pending
-0x00053330	32			unknown	unclassified	unverified		
+0x00053330	32	float_vector_length_53330	float_helpers2	compiles	game	confirmed	decomp/tests/0x00053330.json	docs/compiler-abi.md; Length of a vector of three floats.; callers 53350@53364,53350@534aa; guest pending
 0x00053350	709			unknown	unclassified	unverified		
 0x00053618	322			unknown	unclassified	unverified		
 0x0005375c	389			unknown	unclassified	unverified		
@@ -970,7 +970,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00054008	5	nop_54008	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00054008.json	docs/compiler-abi.md; Tail jump to the empty stub 0x106a8.; callers 3ea0c@3eecf; guest pending
 0x00054010	191	reset_flight_state_54010	game_helpers38	compiles	game	confirmed	decomp/tests/0x00054010.json	docs/compiler-abi.md; Reset the flight-control state words and floats.; callers 3ea0c@3edba; guest pending
 0x000540d0	64	reset_selection_540d0	game_helpers11	compiles	game	confirmed	decomp/tests/0x000540d0.json	docs/compiler-abi.md; ; callers 3dd30@3de01; guest pending
-0x00054110	58			unknown	unclassified	unverified		
+0x00054110	58	refresh_frame_tables_54110	float_helpers2	compiles	game	confirmed	decomp/tests/0x00054110.json	docs/compiler-abi.md; Store the scaled frame step and refresh the dependent tables.; callers 3dd30@3dfa4; guest pending
 0x0005414c	195			unknown	unclassified	unverified		
 0x00054210	98	cycle_frame_54210	game_helpers31	compiles	game	confirmed	decomp/tests/0x00054210.json	docs/compiler-abi.md; Cycle a frame counter every other tick and pass the frame to 0x8f4c.; callers 54110@54132; guest pending
 0x00054274	180			unknown	unclassified	unverified		
@@ -1173,7 +1173,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005f698	528			unknown	unclassified	unverified		
 0x0005f8a8	44	notify_selected_object	mid_helpers	compiles	game	confirmed	decomp/tests/0x0005f8a8.json	docs/compiler-abi.md; 0x9e508(high word obj+0x1e,0x24) for object from 0x1f71c8; clear byte 0x1a6d18; callers 5f60@5f89; guest pending
 0x0005f8d4	106	set_indicator_5f8d4	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0005f8d4.json	docs/compiler-abi.md; Switch indicator 0x1a6d18 on (mode 1) or off.; callers 5f60@5fa5,5fd8@5ff4,601c@60c5; guest pending
-0x0005f944	88			unknown	unclassified	unverified		
+0x0005f944	88	fill_sine_table_5f944	float_helpers2	compiles	game	confirmed	decomp/tests/0x0005f944.json	docs/compiler-abi.md; Fill a 90-entry scaled sine table.; callers 5f60@5f61; guest pending
 0x0005fc80	168			unknown	unclassified	unverified		
 0x0005fefc	845			unknown	unclassified	unverified		
 0x00062454	160	update_flight_62454	game_helpers33	compiles	game	confirmed	decomp/tests/0x00062454.json	docs/compiler-abi.md; Refresh the flight timers and run the per-frame entry updates.; callers 601c@6076; guest pending

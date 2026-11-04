@@ -3597,3 +3597,22 @@ in EAX, format string address, one value).
 | `0x2aa08` | EAX:ef_addr32,EDX:ef_addr32 | none | 2b1f4@2b331 | Convert a packed 16.16 pair to doubles and clear the third component. |
 | `0x2dc84` | AX:int16_t | AL:uint8_t | 2dce0@2dcf6 | True when a record is close enough and active. |
 | `0x37bc8` | EAX:ef_addr32,DX:int16_t | EAX:double | 2d9a4@2d9f2,39edc@39fac,3a000@3a0e5 | Distance helper over a scaled pair taken from a table entry. |
+
+## float_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2dbf8` | AX:int16_t,DL:uint8_t | AL:uint8_t | 2dce0@2dd1a | True when a record is near the unit entry and active. |
+| `0x37c0c` | EAX:ef_addr32,DX:int16_t | none | 2b1f4@2b2e6,39edc@39f8e,3a000@3a0b3 | Report the offset between a table point and a position. |
+| `0x37c64` | AX:int16_t,DL:uint8_t | AL:uint8_t | 37d3c@37d6b | True when a table point is close to a unit's position. |
+| `0x37cdc` | AX:int16_t | AL:uint8_t | 37d3c@37d42 | True when a table point is close to the player. |
+| `0x37d88` | AX:int16_t,DL:uint8_t | AL:uint8_t | 37e60@37e8f | True unless a table point is far from a unit's position. |
+| `0x37e00` | AX:int16_t | AL:uint8_t | 37e60@37e68 | True unless a table point is far from the player. |
+| `0x40870` | EAX:uint32_t,EDX:ef_addr32,EBX:uint32_t,ECX:double | EAX:double | 59adc@59d66 | Rate between two clock readings and a distance, minus a divided distance. |
+| `0x45b60` | EAX:ef_addr32 | EAX:double | 10e4dd@10e5ac | Double value of an object, reporting an error when its check fails. |
+| `0x45fc4` | EAX:double | EAX:int32_t | 6f48@6fb3,7030@70e2,39edc@39f99 | Scale a double to an angle word, wrapping negatives. |
+| `0x4600c` | EAX:double | AL:uint8_t | 6f48@6fe4,7030@7115,474b8@47531 | Negated scaled double truncated to a byte. |
+| `0x4fdf4` | EAX:ef_addr32,EDX:ef_addr32,EBX:float | none | 4fa64@4fc46,4fa64@4fcda | Add a float of minutes to a minutes/seconds pair, carrying seconds. |
+| `0x53330` | EAX:float,EDX:float,EBX:float | EAX:double | 53350@53364,53350@534aa | Length of a vector of three floats. |
+| `0x54110` | none | none | 3dd30@3dfa4 | Store the scaled frame step and refresh the dependent tables. |
+| `0x5f944` | none | none | 5f60@5f61 | Fill a 90-entry scaled sine table. |
