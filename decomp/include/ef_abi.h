@@ -2437,4 +2437,15 @@ void guest_fn_a0c04(int32_t column, int32_t row); /* 0xa0c04 EAX/EDX */
 void guest_fn_ab0b0(uint32_t target, uint32_t link); /* 0xab0b0 EAX/EDX */
 void guest_fn_ab060(uint32_t target); /* 0xab060 EAX */
 
+/* game_helpers37.c */
+void draw_text_4_dccd8(uint8_t color, int32_t x, uint16_t y, ef_addr32 text);
+void draw_text_5_dd1b0(uint8_t color, int32_t x, uint16_t y, ef_addr32 text);
+uint32_t text_width_17_dd460(ef_addr32 text);
+uint32_t text_width_5_dd55c(ef_addr32 text);
+uint32_t text_width_6_dd728(ef_addr32 text);
+void init_time_constants_e7850(void);
+void interpolate_line_e85f0(ef_addr32 out_x, ef_addr32 out_y);
+uint32_t guest_fn_dcc98(uint32_t glyph, int32_t x, int32_t y, uint32_t color); /* 0xdcc98 AL/EDX/EBX/ECX -> AL */
+uint32_t guest_fn_dd164(uint32_t glyph, int32_t x, int32_t y, uint32_t color); /* 0xdd164 AL/EDX/EBX/ECX -> AL */
+
 #endif

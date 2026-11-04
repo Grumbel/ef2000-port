@@ -3142,3 +3142,15 @@ in EAX, format string address, one value).
 | `0xa1424` | AX:int16_t,DX:int16_t,EBX:uint32_t,CL:uint8_t | none | 9e7bc@9eab0 | Stamp a page cell with a scaled duration and a command code. |
 | `0xa905c` | EAX:ef_addr32 | none | a9e70@a9fc4,ab47c@ab5e9 | Latch the target of an incoming order message. |
 | `0xab0dc` | EAX:uint32_t | none | ab324@ab45e | Visit every kind-0xe node of every group and notify its three links. |
+
+## game_helpers37 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdccd8` | AL:uint8_t,EDX:int32_t,BX:uint16_t,ECX:ef_addr32 | none | a8578@a85dd | Draw a string in the 4-pixel-blank font, advancing by each glyph width. |
+| `0xdd1b0` | AL:uint8_t,EDX:int32_t,BX:uint16_t,ECX:ef_addr32 | none | a8578@a8605 | Draw a string in the 5-pixel-blank font, advancing by each glyph width. |
+| `0xdd460` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a84ed | Width of a string in the 17-pixel-blank font minus the trailing gap. |
+| `0xdd55c` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a84f4 | Width of a string in the 5-pixel-blank font minus the trailing gap. |
+| `0xdd728` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a8458 | Width of a string in the 6-pixel-blank font minus the trailing gap. |
+| `0xe7850` | none | none | e78b4@e7935 | Store the double constants used by the time conversion. |
+| `0xe85f0` | EAX:ef_addr32,EDX:ef_addr32 | none | 7b7d8@7b943 | Interpolate a point back along a slope defined by the line at 0x420904. |

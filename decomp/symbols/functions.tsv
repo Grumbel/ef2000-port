@@ -3232,23 +3232,23 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dcc10	67	reset_clip_dcc10	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000dcc10.json	docs/compiler-abi.md; Reset the 320x200 clip state.; callers a9e70@a9e8d; guest pending
 0x000dcc54	67	reset_clip_dcc54	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000dcc54.json	docs/compiler-abi.md; Same as dcc10 with the stores in a different order.; callers a9e70@a9eb7; guest pending
 0x000dcc98	61			unknown	unclassified	unverified		
-0x000dccd8	98			unknown	unclassified	unverified		
+0x000dccd8	98	draw_text_4_dccd8	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dccd8.json	docs/compiler-abi.md; Draw a string in the 4-pixel-blank font, advancing by each glyph width.; callers a8578@a85dd; guest pending
 0x000dced0	88	text_width_4_dced0	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dced0.json	docs/compiler-abi.md; Pixel width of a string in the font with 4-pixel blanks.; callers a82f0@a84d1; guest pending
 0x000dcf28	135			unknown	unclassified	unverified		
 0x000dd10c	87	text_width_5_dd10c	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd10c.json	docs/compiler-abi.md; Pixel width of a string in the font with 5-pixel blanks.; callers a82f0@a84df; guest pending
 0x000dd164	74			unknown	unclassified	unverified		
-0x000dd1b0	95			unknown	unclassified	unverified		
+0x000dd1b0	95	draw_text_5_dd1b0	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd1b0.json	docs/compiler-abi.md; Draw a string in the 5-pixel-blank font, advancing by each glyph width.; callers a8578@a8605; guest pending
 0x000dd210	89	text_width_6_dd210	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd210.json	docs/compiler-abi.md; Pixel width of a string in the font with 6-pixel blanks and 2-pixel gaps.; callers a82f0@a84d8; guest pending
 0x000dd26c	133			unknown	unclassified	unverified		
 0x000dd2f4	122			unknown	unclassified	unverified		
 0x000dd370	238			unknown	unclassified	unverified		
-0x000dd460	100			unknown	unclassified	unverified		
+0x000dd460	100	text_width_17_dd460	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd460.json	docs/compiler-abi.md; Width of a string in the 17-pixel-blank font minus the trailing gap.; callers a82f0@a84ed; guest pending
 0x000dd4c4	150			unknown	unclassified	unverified		
-0x000dd55c	94			unknown	unclassified	unverified		
+0x000dd55c	94	text_width_5_dd55c	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd55c.json	docs/compiler-abi.md; Width of a string in the 5-pixel-blank font minus the trailing gap.; callers a82f0@a84f4; guest pending
 0x000dd5bc	148			unknown	unclassified	unverified		
 0x000dd650	78	text_width_raw_dd650	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd650.json	docs/compiler-abi.md; Pixel width of a string; blanks are tested before masking.; callers 27d18@27d9a,27d18@27de7,27fec@28192; guest pending
 0x000dd6a0	134			unknown	unclassified	unverified		
-0x000dd728	94			unknown	unclassified	unverified		
+0x000dd728	94	text_width_6_dd728	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd728.json	docs/compiler-abi.md; Width of a string in the 6-pixel-blank font minus the trailing gap.; callers a82f0@a8458; guest pending
 0x000dd788	218			unknown	unclassified	unverified		
 0x000dd870	80			unknown	unclassified	unverified		
 0x000dd8c0	14			unknown	unclassified	unverified		
@@ -3416,7 +3416,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e740c	698			unknown	unclassified	unverified		
 0x000e76c8	365			unknown	unclassified	unverified		
 0x000e7835	14	to_lower_ascii	math_string	compiles	game	confirmed	decomp/tests/0x000e7835.json	docs/compiler-abi.md; Signed 'A'..'Z' to lowercase.; callers 50d9c@50db5,a80b0@a80fe,bc1d3@bc1e1; guest pending
-0x000e7850	97			unknown	unclassified	unverified		
+0x000e7850	97	init_time_constants_e7850	game_helpers37	compiles	game	confirmed	decomp/tests/0x000e7850.json	docs/compiler-abi.md; Store the double constants used by the time conversion.; callers e78b4@e7935; guest pending
 0x000e78b4	366			unknown	unclassified	unverified		
 0x000e7a30	1	nop_e7a30	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000e7a30.json	docs/compiler-abi.md; Empty stub (single ret).; callers 581b0@581d1,581b0@5862c,581b0@58651; guest pending
 0x000e7a34	71			unknown	unclassified	unverified		
@@ -3439,7 +3439,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e8484	159			unknown	unclassified	unverified		
 0x000e853c	167			unknown	unclassified	unverified		
 0x000e85e4	12	store_bytes_46437d	math_string	compiles	game	confirmed	decomp/tests/0x000e85e4.json	docs/compiler-abi.md; Byte 0x46437e = AL, byte 0x46437d = DL.; callers 7b3fc@7b499,7b3fc@7b4b8; guest pending
-0x000e85f0	97			unknown	unclassified	unverified		
+0x000e85f0	97	interpolate_line_e85f0	game_helpers37	compiles	game	confirmed	decomp/tests/0x000e85f0.json	docs/compiler-abi.md; Interpolate a point back along a slope defined by the line at 0x420904.; callers 7b7d8@7b943; guest pending
 0x000e8651	166			unknown	unclassified	unverified		
 0x000e86f7	60			unknown	unclassified	unverified		
 0x000e8733	24	allocate_cleared	math_string	compiles	game	confirmed	decomp/tests/0x000e8733.json	docs/compiler-abi.md; Allocate EAX*EDX bytes through 0xfc795 and clear them.; callers 106f10@106f64,117ed4@117ee9,117f14@117f23; guest pending
