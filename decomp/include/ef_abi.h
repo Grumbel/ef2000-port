@@ -3080,4 +3080,122 @@ uint32_t guest_fn_cc1ac(uint32_t a, uint32_t b, uint32_t c); /* 0xcc1ac EAX/EDX/
 uint32_t guest_fn_cc22c(uint32_t a, uint32_t b, uint32_t c); /* 0xcc22c EAX/EDX/EBX -> AX */
 double guest_fn_dc1e9(double a, double b); /* 0xdc1e9 ST1/ST0 -> ST0 */
 
+/* leaf_helpers1.c */
+void log_alloc_e764(uint32_t a);
+uint32_t constant_44_35218(void);
+void store_word_39300(void);
+double scale_float_52eb0(float value);
+void run_mode_one_56c7c(uint32_t a);
+uint8_t low_byte_7a290(void);
+void register_handler_7a38c(void);
+uint8_t return_zero_9d778(void);
+void nop_9d77c(void);
+void nop_9dddc(void);
+void poll_device_a4104(void);
+ef_addr32 apply_to_widget_a75b4(ef_addr32 root, ef_addr32 name, uint32_t value);
+uint32_t seek_start_a7ab4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_a, uint32_t stack_b);
+uint32_t seek_current_a7ac8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_a, uint32_t stack_b);
+uint32_t seek_end_a7ae0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_a, uint32_t stack_b);
+void build_default_path_abaf0(ef_addr32 buffer);
+void fill_bytes_b3fb0(ef_addr32 dst, uint8_t value, uint32_t count);
+double square_double_b3fd0(double x);
+double cube_double_b3fdc(double x);
+ef_addr32 swap_word_c5390(uint32_t u0, uint32_t u1, ef_addr32 ptr);
+ef_addr32 swap_word_c539c(uint32_t u0, uint32_t u1, ef_addr32 ptr);
+ef_addr32 swap_word_c53a8(uint32_t u0, uint32_t u1, ef_addr32 ptr);
+ef_addr32 swap_dword_c53df(uint32_t u0, uint32_t u1, ef_addr32 ptr);
+void log_value_d175c(uint32_t value);
+uint32_t stack_used_dcb74(void);
+void run_shutdown_pair_dd8d0(void);
+uint32_t format_to_buffer_e3022(ef_addr32 buffer, ef_addr32 format, ef_addr32 args);
+void set_scratch_name_e3ffc(ef_addr32 name);
+uint32_t forward_or_clear_ea4a7(uint32_t value);
+void report_error_14_ebe79(void);
+void call_110123_f9ecd(void);
+void reset_with_saved_byte_109070(void);
+void run_pair_109440(void);
+uint32_t return_minus_one_10ddf7(void);
+void run_with_ebx_10e4d3(uint32_t a, uint32_t b);
+uint32_t return_zero_1105c3(void);
+void discard_three_1105d0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_a, uint32_t stack_b,
+                          uint32_t stack_c);
+void discard_two_1105d4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_a, uint32_t stack_b);
+uint32_t dword_shr8_1115f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 stack_ptr);
+void set_record_field_1141a0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 stack_record,
+                             uint32_t stack_value);
+double box_width_11af88(ef_addr32 box);
+double box_extent_sum_11af9c(ef_addr32 box);
+double box_extent_ratio_11afe4(ef_addr32 box);
+double constant_double_11b3c0(void);
+double level_below_11b694(ef_addr32 box, double value);
+double level_above_11b6a8(ef_addr32 box, double value);
+void disable_interrupts_11f2d3(void);
+void enable_interrupts_11f2d5(void);
+int32_t record_word_16010e(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_id);
+uint32_t tail_jump_39180(uint32_t a);
+uint32_t tail_jump_56a44(uint32_t a);
+uint32_t tail_jump_58094(uint32_t a);
+uint32_t tail_jump_9d088(uint32_t a);
+uint32_t tail_jump_cc768(uint32_t a);
+uint32_t tail_jump_ab954(uint32_t a);
+uint32_t tail_jump_ac7c0(uint32_t a);
+uint32_t tail_jump_c3f70(uint32_t a);
+uint32_t tail_jump_c3f78(uint32_t a);
+uint32_t tail_jump_c3f80(uint32_t a);
+uint32_t tail_jump_cbc9b(uint32_t a);
+uint32_t tail_jump_11c0a4(uint32_t a);
+uint32_t tail_jump_e5bfe(uint32_t a);
+uint32_t tail_jump_101e70(uint32_t a);
+uint32_t tail_jump_101e78(uint32_t a);
+uint32_t tail_jump_101f70(uint32_t a);
+uint32_t tail_jump_102020(uint32_t a);
+uint32_t tail_jump_106be0(uint32_t a);
+uint32_t tail_jump_115984(uint32_t a);
+uint32_t tail_jump_11d24e(uint32_t a);
+void tail_jump_c9ec4(void);
+uint32_t tail_jump_9c23d(void);
+uint32_t guest_tail_109e6c(uint32_t a); /* 0x109e6c EAX */
+uint32_t guest_tail_110dcc(uint32_t a); /* 0x110dcc EAX */
+uint32_t guest_tail_110dd9(uint32_t a); /* 0x110dd9 EAX */
+uint32_t guest_tail_1111e1(uint32_t a); /* 0x1111e1 EAX */
+uint32_t guest_tail_111359(uint32_t a); /* 0x111359 EAX */
+uint32_t guest_tail_120485(uint32_t a); /* 0x120485 EAX */
+uint32_t guest_tail_7a290(uint32_t a); /* 0x7a290 EAX */
+uint32_t guest_tail_8fbc8(uint32_t a); /* 0x8fbc8 EAX */
+uint32_t guest_tail_9c224(uint32_t a); /* 0x9c224 EAX */
+uint32_t guest_tail_a3f30(uint32_t a); /* 0xa3f30 EAX */
+uint32_t guest_tail_abec4(uint32_t a); /* 0xabec4 EAX */
+uint32_t guest_tail_c3f70(uint32_t a); /* 0xc3f70 EAX */
+uint32_t guest_tail_c3f80(uint32_t a); /* 0xc3f80 EAX */
+uint32_t guest_tail_c9fc4(uint32_t a); /* 0xc9fc4 EAX */
+uint32_t guest_tail_f8248(uint32_t a); /* 0xf8248 EAX */
+uint32_t guest_tail_fa9a0(uint32_t a); /* 0xfa9a0 EAX */
+uint32_t guest_tail_fa9d2(uint32_t a); /* 0xfa9d2 EAX */
+uint32_t guest_tail_fc354(uint32_t a); /* 0xfc354 EAX */
+uint32_t guest_tail_fc795(uint32_t a); /* 0xfc795 EAX */
+uint32_t guest_tail_fe541(uint32_t a); /* 0xfe541 EAX */
+void guest_tail_dc2c0(void); /* 0xdc2c0 */
+void guest_fn_cc6c0_pair(uint32_t a, ef_addr32 format); /* 0xcc6c0 cdecl */
+uint32_t guest_fn_9ddfc_w(void); /* 0x9ddfc -> AX */
+void guest_fn_56c90_m(uint32_t a, uint32_t mode); /* 0x56c90 EAX/EDX */
+uint32_t guest_fn_7a194_r(void); /* 0x7a194 -> EAX */
+void guest_fn_e7fa4_h(uint32_t a, uint32_t b); /* 0xe7fa4 EAX/EDX */
+void guest_fn_a3fe0_p(void); /* 0xa3fe0 */
+void guest_fn_a7588_v(ef_addr32 widget, uint32_t value); /* 0xa7588 EAX/EDX */
+uint32_t guest_fn_a7a64_r(uint32_t handle, uint32_t mode, uint32_t offset); /* 0xa7a64 EAX/EDX/EBX -> EAX */
+void guest_fn_deb50_f(ef_addr32 dst, uint32_t value, uint32_t count); /* 0xdeb50 EAX/EDX/ECX */
+void guest_fn_dd870_s(void); /* 0xdd870 */
+void guest_fn_ddae0_s(void); /* 0xddae0 */
+uint32_t guest_fn_ed133_f(ef_addr32 buffer, ef_addr32 format, ef_addr32 args, uint32_t callback); /* 0xed133 EAX/EDX/EBX/ECX */
+void guest_fn_107310_s(void); /* 0x107310 */
+uint32_t guest_tail_fa8a0(uint32_t a); /* 0xfa8a0 EAX */
+void guest_fn_10ddf7_s(void); /* 0x10ddf7 */
+void guest_fn_110123_s(void); /* 0x110123 */
+void guest_fn_e6120_s(uint32_t a); /* 0xe6120 EAX */
+void guest_fn_e6144_s(uint32_t a); /* 0xe6144 EAX */
+void guest_fn_10944c_s(void); /* 0x10944c */
+void guest_fn_118b60_s(void); /* 0x118b60 */
+void guest_fn_10e4dd_s(uint32_t a, uint32_t b, uint32_t c); /* 0x10e4dd EAX/EDX/EBX */
+ef_addr32 guest_fn_b3f58_id(uint32_t id); /* 0xb3f58 EAX */
+
 #endif

@@ -3676,3 +3676,55 @@ in EAX, format string address, one value).
 | `0xcbfa0` | EAX:ef_addr32 | EAX:int32_t | cbff0@cc091 | Default range of an object: 400 for kinds 1 and 3, else 300. |
 | `0xce0b0` | EAX:float,EDX:float | EAX:double | ce268@ce27b,ce268@ce29e,ce268@ce2c2 | Scale a value relative to the horizontal viewport origin and size. |
 | `0xce0cc` | EAX:float,EDX:float | EAX:double | ce268@ce28c,ce268@ce2b0,ce268@ce2d9 | Scale a value relative to the vertical viewport origin and size. |
+
+## leaf_helpers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe764` | EAX:uint32_t | none | f918@f976,fecc@ff51,1001c@10316 | Format a string through the allocator log helper. |
+| `0x35218` | none | EAX:uint32_t | 34f30@34f70,3527c@352b6 | Constant 0x44. |
+| `0x39300` | none | none | db16c@db1af | Store the result of 0x9ddfc as a word. |
+| `0x52eb0` | EAX:float | EAX:double | 5375c@537cf,5375c@53816,5375c@5385d | Scale a float to double. |
+| `0x56c7c` | EAX:uint32_t | none | 581b0@585e6 | Run 0x56c90 with mode 1 and set the flag word. |
+| `0x7a290` | none | AL:uint8_t | 19a80@19a86 | Low byte of 0x7a194's result. |
+| `0x7a38c` | none | none | 3ea0c@3ee46 | Register the 0x7a2b0 handler and remember 0x7a338. |
+| `0x9d778` | none | AL:uint8_t | a1590@a175b | Return zero. |
+| `0xa4104` | none | none | a41dc@a421f | Poll the device. |
+| `0xa75b4` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | 345e8@34732,34bcc@34c79,35e68@35e74 | Look up a widget and, when found, apply a value to it. |
+| `0xa7ab4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | b3c04@b3c4e,d1bec@d1c08,d1bec@d1c33 | Seek a handle to its start. |
+| `0xa7ac8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 9ccb8@9cdd6,9cee8@9cf24,ebcfc@ebd29 | Seek a handle relative to the current position. |
+| `0xa7ae0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | a7b3c@a7b52,b3b90@b3bec,b3c04@b3c67 | Seek a handle to its end (returns the size). |
+| `0xabaf0` | EAX:ef_addr32 | none | ca200@ca20b,f819c@f81aa | Build the default path into a buffer. |
+| `0xb3fb0` | EAX:ef_addr32,DL:uint8_t,EBX:uint32_t | none | 6df0@6e0e,7780@779e,b1e0@b4de | Fill bytes of a block with one value. |
+| `0xb3fd0` | EAX:double | EAX:double | 1dc20@1ddf9,1dc20@1de08,2461c@24676 | Square of a double. |
+| `0xb3fdc` | EAX:double | EAX:double | 11b73c@11b7ec,11b73c@11b843,11b73c@11b893 | Cube of a double. |
+| `0xc5390` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:ef_addr32 | none direct | Byte-swap a word in place; returns the advanced pointer (EBX). |
+| `0xc539c` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:ef_addr32 | none direct | Byte-swap a word in place; returns the advanced pointer (EBX). |
+| `0xc53a8` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:ef_addr32 | none direct | Byte-swap a word in place; returns the advanced pointer (EBX). |
+| `0xc53df` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:ef_addr32 | none direct | Byte-swap a dword in place; returns the advanced pointer (EBX). |
+| `0xd175c` | EAX:uint32_t | none | d17d0@d1811,d17d0@d1818,d17d0@d1822 | Log a single value through the 0xd16d0 helper. |
+| `0xdcb74` | none | EAX:uint32_t | 233c4@2341e,9bd20@9bd30,c3584@c35a8 | Stack bytes in use relative to the recorded stack base. |
+| `0xdd8d0` | none | none | 278c0@27b2d,27d18@27eb1,f3f84@f40f8 | Run the two shutdown helpers in order. |
+| `0xe3022` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:uint32_t | 3d308@3d330,48bb0@48bd1,48c34@48c50 | Format into a buffer through 0xed133 and terminate the result. |
+| `0xe3ffc` | EAX:ef_addr32 | none | none direct | Copy a name to the scratch string and run 0x107310. |
+| `0xea4a7` | EAX:uint32_t | EAX:uint32_t | 8b39c@8b3dd | Forward a non-zero value to 0xfa8a0, else clear via 0x10ddf7. |
+| `0xebe79` | none | none | 9d55d@9d6b8,9d55d@9d6ea | Report error code 14. |
+| `0xf9ecd` | none | none | b33ac@b33bd | Call 0x110123. |
+| `0x109070` | none | none | e1958@e1b2d | Reset via 0xe6120 then continue with the saved byte. |
+| `0x109440` | none | none | e474c@e4763 | Run 0x10944c then 0x118b60. |
+| `0x10ddf7` | none | EAX:uint32_t | ea4a7@ea4af | Return -1. |
+| `0x10e4d3` | EAX:uint32_t,EDX:uint32_t | none | edb2d@edb92,110130@110160 | Run 0x10e4dd with the second argument also in EBX. |
+| `0x1105c3` | none | EAX:uint32_t | fc795@fc843 | Return zero. |
+| `0x1105d0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | none direct | Stub that discards three stack arguments. |
+| `0x1105d4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | none direct | Stub that discards two stack arguments. |
+| `0x1115f0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | none direct | Upper three bytes of a dword. |
+| `0x1141a0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t | none | 103244@10326e | Store a value at +0x2c of a record when the record exists. |
+| `0x11af88` | EAX:ef_addr32 | EAX:double | 10a0d4@10a0e4,11b040@11b0c3 | Absolute width of a bounding box. |
+| `0x11af9c` | EAX:ef_addr32 | EAX:double | 10a0d4@10a0ee,11afb4@11afca | Scaled sum of two extents. |
+| `0x11afe4` | EAX:ef_addr32 | EAX:double | 10a0d4@10a158 | Ratio of two extents. |
+| `0x11b3c0` | none | EAX:double | 11c584@11c6e4 | Constant double at 0x195864. |
+| `0x11b694` | EAX:ef_addr32,EDX:double | EAX:double | 10a220@10a31f,11c584@11c750 | Scaled distance below the reference level. |
+| `0x11b6a8` | EAX:ef_addr32,EDX:double | EAX:double | 11b6bc@11b6f8,11b6bc@11b729 | Scaled distance above the reference level. |
+| `0x11f2d3` | none | none | 117e0c@117e57,117f68@1180b7,118290@1182a2 | Disable interrupts (no-op on the host). |
+| `0x11f2d5` | none | none | 117e0c@117e9a,117f68@11826c,118290@11841c | Enable interrupts (no-op on the host). |
+| `0x16010e` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 9fb00@9fbe8,9fc00@9fd8c,a0228@a046b | Signed word at +0x10 of the record found by id. |
