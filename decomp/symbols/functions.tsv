@@ -3562,7 +3562,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ef950	42	combine_records_ef950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef950.json	docs/compiler-abi.md; Combine two 10-byte records (dword, dword, word) at eax and edx with the core routine 0xef9aa and store the 10-byte resu; callers ee589@ee59f,ee22c@ee76d,ee22c@ee8fd; guest pending
 0x000ef97a	48	combine_record_value_ef97a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef97a.json	docs/compiler-abi.md; (ret 12) Variant of 0xef950 whose second record comes by value on the stack (dword, dword, word).; callers f03cc@f045d,f03cc@f0479,f0482@f05b1; guest pending
 0x000ef9aa	364			unknown	unclassified	unverified		
-0x000efb16	153			unknown	unclassified	unverified		
+0x000efb16	153	compare_extended_efb16	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000efb16.json	docs/compiler-abi.md; Compare the 80-bit extended values at A (EAX) and B (EDX): 2 if either is a NaN, otherwise -1, 0 or 1 for A below, equal; callers ee22c@ee5d9,ee22c@ee5f5,ee22c@ee7a7; guest pending
 0x000efbaf	42	combine_records_efbaf	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000efbaf.json	docs/compiler-abi.md; Same wrapper as 0xef950 around the core routine 0xefbd9.; callers ee22c@ee653,ee22c@ee672,ee22c@ee821; guest pending
 0x000efbd9	427			unknown	unclassified	unverified		
 0x000efd84	42	combine_records_efd84	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000efd84.json	docs/compiler-abi.md; Same wrapper as 0xef950 around the core routine 0xefdae.; callers ee22c@ee5be,ee22c@ee78c,ee22c@ee920; guest pending

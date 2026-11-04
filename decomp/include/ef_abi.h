@@ -5279,4 +5279,6 @@ void show_splash_picture_f41dc(uint32_t name);
 void copy_last_token_abe44(ef_addr32 str);
 uint32_t extended_to_int_eff04(ef_addr32 p);
 
+uint32_t compare_extended_efb16(ef_addr32 a, ef_addr32 b);
+
 #endif

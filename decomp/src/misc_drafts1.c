@@ -9381,3 +9381,32 @@ uint32_t extended_to_int_eff04(ef_addr32 p)
         r = (uint32_t)(-(int32_t)r);
     return r;
 }
+
+/* 0xefb16, 153 bytes. Compare the 80-bit extended values at A (EAX) and B (EDX): 2 if either is a NaN, otherwise -1, 0 or 1 for A below, equal to or above B (+0 and -0 compare equal). */
+uint32_t compare_extended_efb16(ef_addr32 a, ef_addr32 b)
+{
+    uint16_t sa = EF_U16(a + 8u);
+    uint16_t sb = EF_U16(b + 8u);
+    uint32_t below;
+    if ((sa & 0x7fffu) == 0x7fffu && ((EF_U32(a + 4u) << 1) | EF_U32(a)) != 0u)
+        return 2u;
+    if ((sb & 0x7fffu) == 0x7fffu && ((EF_U32(b + 4u) << 1) | EF_U32(b)) != 0u)
+        return 2u;
+    if (((sa ^ sb) & 0x8000u) != 0u) {
+        uint32_t any = EF_U32(a) | EF_U32(b) | EF_U32(a + 4u) | EF_U32(b + 4u)
+                     | ((((uint32_t)sa << 16) | sb) & 0x7fff7fffu);
+        if (any == 0u)
+            return 0u;
+        return (sa & 0x8000u) != 0u ? 0xffffffffu : 1u;
+    }
+    if (sa != sb) {
+        below = sa < sb;
+    } else if (EF_U32(a + 4u) != EF_U32(b + 4u)) {
+        below = EF_U32(a + 4u) < EF_U32(b + 4u);
+    } else if (EF_U32(a) != EF_U32(b)) {
+        below = EF_U32(a) < EF_U32(b);
+    } else {
+        return 0u;
+    }
+    return (((sa >> 15) ^ below) & 1u) != 0u ? 0xffffffffu : 1u;
+}

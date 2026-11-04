@@ -7031,3 +7031,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xabe44` | EAX:ef_addr32 | none | 4738@47fa,5630@5652,b1e0@b2eb | Split the string at STR (EAX) into whitespace-separated tokens (character class table 0x195af0 indexed by c+1, flag 2 =  |
 | `0xeff04` | EAX:ef_addr32 | EAX:uint32_t | ee22c@eed53 | Convert the 80-bit extended value at P (EAX) to a truncated int32: exponents below 0.5 give 0, magnitudes of 2^32 and ab |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xefb16` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | ee22c@ee5d9,ee22c@ee5f5,ee22c@ee7a7 | Compare the 80-bit extended values at A (EAX) and B (EDX): 2 if either is a NaN, otherwise -1, 0 or 1 for A below, equal |
