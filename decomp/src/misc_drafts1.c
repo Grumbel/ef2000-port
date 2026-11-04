@@ -21937,3 +21937,247 @@ uint32_t scanf_set_108a17(uint32_t eax, uint32_t edx, uint32_t ebx)
         EF_U8(dest) = 0u;
     return count;
 }
+
+/* 0x108ddb, 504 bytes. scanf integer conversion: skip whitespace, read an optional sign (when ECX is non-zero), auto-detect the base when EBX is 0 (0x / 0 prefixes), accumulate digits (and ':'-separated groups when flag 0x80), store the value (16-bit with flag 0x10, else 32-bit) and return the number of characters consumed, or 0 when none. */
+int32_t scanf_integer_108ddb(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx)
+{
+    uint32_t obj = eax;
+    uint32_t base = ebx;
+    uint32_t allow_sign = ecx;
+    uint32_t sign = 0x2bu;
+    uint32_t value = 0u;
+    int32_t digits = 0;
+    uint32_t extra = 0u;
+    uint32_t c;
+    uint32_t w;
+    int32_t d;
+    int unget = 1;
+
+    for (;;) {
+        c = guest_callptr_eax_ret_x(EF_U32(obj), obj);
+        if ((EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 2u) == 0u)
+            break;
+        extra++;
+    }
+    if (EF_U8(obj + 0x10u) & 2u)
+        goto finish;
+    w = EF_U32(obj + 0xcu);
+    EF_U32(obj + 0xcu) = w - 1u;
+    if (w == 0u)
+        goto do_unget;
+    if (allow_sign != 0u && (c == 0x2bu || c == 0x2du)) {
+        sign = c;
+        extra++;
+        c = release_ref_108ffa(obj);
+        if (c == 0xffffffffu)
+            goto finish;
+    }
+    if (base == 0u) {
+        if (c == 0x30u) {
+            digits = 1;
+            c = release_ref_108ffa(obj);
+            if (c == 0xffffffffu)
+                goto finish;
+            if (c == 0x78u || c == 0x58u) {
+                extra += 2u;
+                c = release_ref_108ffa(obj);
+                digits = 0;
+                if (c == 0xffffffffu)
+                    goto finish;
+                base = 16u;
+            } else {
+                base = 8u;
+            }
+        } else {
+            base = 10u;
+        }
+    } else if (base == 16u && c == 0x30u) {
+        digits = 1;
+        c = release_ref_108ffa(obj);
+        if (c == 0xffffffffu)
+            goto finish;
+        if (c == 0x78u || c == 0x58u) {
+            extra += 2u;
+            c = release_ref_108ffa(obj);
+            digits = 0;
+            if (c == 0xffffffffu)
+                goto finish;
+        }
+    }
+    for (;;) {
+        d = hex_digit_value((int32_t)c);
+        if (d >= (int32_t)base)
+            break;
+        value = value * base + (uint32_t)d;
+        digits++;
+        c = release_ref_108ffa(obj);
+    }
+    if (c == 0x3au && (EF_U8(obj + 0x10u) & 0x80u)) {
+        for (;;) {
+            digits++;
+            c = release_ref_108ffa(obj);
+            if (c == 0xffffffffu)
+                goto finish;
+            d = hex_digit_value((int32_t)c);
+            if (d >= (int32_t)base)
+                break;
+            value = value * base + (uint32_t)d;
+        }
+    }
+do_unget:
+    guest_callptr_eaxedx_x(EF_U32(obj + 4u), c, obj);
+finish:
+    (void)unget;
+    if (sign == 0x2du)
+        value = 0u - value;
+    if (digits > 0) {
+        uint32_t flags = EF_U8(obj + 0x10u);
+        digits += (int32_t)extra;
+        if (flags & 1u) {
+            uint32_t dest = scanf_fetch_dest(flags, edx);
+            if (EF_U8(obj + 0x10u) & 0x10u)
+                EF_U16(dest) = (uint16_t)value;
+            else
+                EF_U32(dest) = value;
+        }
+    }
+    return digits;
+}
+
+/* 0x108afd, 734 bytes. scanf floating-point conversion: skip whitespace, collect sign, integer digits, '.' fraction and e/E exponent into a local text buffer, convert it with the atof routine at [0x17d49c] and store a float (default), double (flags 0x20/0x40) or, with flag 0x10, a 16.16 fixed-point value; returns the number of characters consumed, or 0. */
+int32_t scanf_float_108afd(uint32_t eax, uint32_t edx)
+{
+    uint32_t obj = eax;
+    uint32_t vap = edx;
+    uint8_t buf[0x50];
+    uint32_t dbl[2];
+    uint32_t fix = 0u;
+    uint32_t skipped = 0u;
+    int32_t count = 0;
+    uint32_t pos = 0u;
+    uint32_t c;
+    uint32_t w;
+    int had_int = 0;
+
+    for (;;) {
+        c = guest_callptr_eax_ret_x(EF_U32(obj), obj);
+        if ((EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 2u) == 0u)
+            break;
+        skipped++;
+    }
+    if (EF_U8(obj + 0x10u) & 2u)
+        goto finish;
+    w = EF_U32(obj + 0xcu);
+    EF_U32(obj + 0xcu) = w - 1u;
+    if (w == 0u)
+        goto do_unget;
+    if (c == 0x2bu || c == 0x2du) {
+        buf[pos++] = (uint8_t)c;
+        skipped++;
+        c = release_ref_108ffa(obj);
+        if (c == 0xffffffffu)
+            goto finish;
+    }
+    if ((EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 0x20u) == 0u && c != 0x2eu)
+        goto do_unget;
+    while (EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 0x20u) {
+        had_int = 1;
+        buf[pos++] = (uint8_t)c;
+        if (EF_U8(obj + 0x10u) & 0x10u)
+            fix = (fix & 0xffffu) | ((((fix >> 16) * 10u + c - 0x30u) & 0xffffu) << 16);
+        count++;
+        c = release_ref_108ffa(obj);
+        if (c == 0xffffffffu)
+            goto finish;
+    }
+    if (c == 0x2eu) {
+        buf[pos++] = (uint8_t)c;
+        c = release_ref_108ffa(obj);
+        if (c == 0xffffffffu)
+            goto finish;
+        if (!had_int && (EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 0x20u) == 0u)
+            goto do_unget;
+        count++;
+        while (EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 0x20u) {
+            count++;
+            buf[pos++] = (uint8_t)c;
+            c = release_ref_108ffa(obj);
+            if (c == 0xffffffffu)
+                break;
+        }
+        if (EF_U8(obj + 0x10u) & 0x10u) {
+            uint32_t frac = 0u;
+            uint32_t p = pos;
+            for (;;) {
+                p--;
+                if (buf[p] == 0x2eu)
+                    break;
+                /* ORIGINAL BUG: the digit is written to byte 2 of the accumulator
+                   instead of being added, so only the last digit scaled by
+                   65536 / 10 survives. */
+                frac = (frac & 0xff00ffffu) | ((uint32_t)(uint8_t)(buf[p] - 0x30u) << 16);
+                frac /= 10u;
+            }
+            fix = (fix & 0xffff0000u) | (frac & 0xffffu);
+        }
+        if (c == 0xffffffffu)
+            goto finish;
+    }
+    if (EF_U8(obj + 0x10u) & 0x10u)
+        goto do_unget;
+    if (c == 0x65u || c == 0x45u) {
+        count++;
+        buf[pos++] = (uint8_t)c;
+        c = release_ref_108ffa(obj);
+        if (c == 0xffffffffu)
+            goto finish;
+        if (c == 0x2bu || c == 0x2du) {
+            count++;
+            buf[pos++] = (uint8_t)c;
+            c = release_ref_108ffa(obj);
+            if (c == 0xffffffffu)
+                goto finish;
+        }
+        if ((EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 0x20u) == 0u) {
+            count = 0;
+            goto do_unget;
+        }
+        for (;;) {
+            count++;
+            buf[pos++] = (uint8_t)c;
+            c = release_ref_108ffa(obj);
+            if (c == 0xffffffffu)
+                goto finish;
+            if ((EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 0x20u) == 0u)
+                break;
+        }
+    }
+do_unget:
+    guest_callptr_eaxedx_x(EF_U32(obj + 4u), c, obj);
+finish:
+    if (count > 0) {
+        count += (int32_t)skipped;
+        if (EF_U8(obj + 0x10u) & 1u) {
+            uint32_t flags;
+            uint32_t dest;
+            buf[pos] = 0;
+            if (EF_U8(obj + 0x10u) & 0x10u) {
+                if (buf[0] == 0x2du)
+                    fix = 0u - fix;
+            } else {
+                guest_callptr_eaxedx_x(EF_U32(0x0017d49cu), (uint32_t)(uintptr_t)buf, (uint32_t)(uintptr_t)dbl);
+            }
+            flags = EF_U8(obj + 0x10u);
+            dest = scanf_fetch_dest(flags, vap);
+            if (flags & 0x10u) {
+                EF_U32(dest) = fix;
+            } else if (flags & 0x60u) {
+                EF_U32(dest) = dbl[0];
+                EF_U32(dest + 4u) = dbl[1];
+            } else {
+                EF_U32(dest) = double_bits_to_float_118b10(dbl[0], dbl[1]);
+            }
+        }
+    }
+    return count;
+}

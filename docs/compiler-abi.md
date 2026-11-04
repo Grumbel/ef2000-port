@@ -9264,3 +9264,15 @@ in EAX, format string address, one value).
 | `0x108802` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 1084d3@10866d | scanf %c: read up to width (default 1) characters through [obj], storing bytes (words with flag 0x20) at the destination |
 | `0x108888` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 1084d3@108655 | scanf %s: skip leading whitespace, then copy non-whitespace characters (bytes, or words with flag 0x20) and NUL-terminat |
 | `0x108a17` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 1084d3@108662 | scanf %[...]: EBX points at the format cursor just past '['; build the (optionally '^'-negated) set, then copy matching  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x108ddb` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:int32_t | 1084d3@108617 | scanf integer conversion: skip whitespace, read an optional sign (when ECX is non-zero), auto-detect the base when EBX i |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x108afd` | EAX:uint32_t,EDX:uint32_t | EAX:int32_t | 1084d3@10864a | scanf floating-point conversion: skip whitespace, collect sign, integer digits, '.' fraction and e/E exponent into a loc |

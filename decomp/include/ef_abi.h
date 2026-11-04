@@ -6376,4 +6376,10 @@ uint32_t scanf_char_108802(uint32_t eax, uint32_t edx); /* 0x108802 */
 uint32_t scanf_string_108888(uint32_t eax, uint32_t edx); /* 0x108888 */
 uint32_t scanf_set_108a17(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0x108a17 */
 
+int32_t scanf_integer_108ddb(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx);
+int32_t scanf_integer_108ddb(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx); /* 0x108ddb */
+
+int32_t scanf_float_108afd(uint32_t eax, uint32_t edx);
+int32_t scanf_float_108afd(uint32_t eax, uint32_t edx); /* 0x108afd */
+
 #endif
