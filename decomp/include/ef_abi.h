@@ -6251,4 +6251,9 @@ double profile_term_11b73c(uint32_t a, double p1, double p2); /* 0x11b73c */
 double profile_diff_11b8d8(uint32_t a, uint32_t d, double x, double y); /* 0x11b8d8 */
 double profile_diff_clamped_11b950(uint32_t a, uint32_t d, double x, double y); /* 0x11b950 */
 
+double profile_sum_11b6bc(uint32_t a, uint32_t d);
+double profile_mix_11b3c8(uint32_t a, uint32_t d, double x, double y);
+double profile_sum_11b6bc(uint32_t a, uint32_t d); /* 0x11b6bc */
+double profile_mix_11b3c8(uint32_t a, uint32_t d, double x, double y); /* 0x11b3c8 */
+
 #endif

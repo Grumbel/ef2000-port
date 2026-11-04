@@ -4184,7 +4184,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b134	122	ratio_formula_11b134	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b134.json	docs/compiler-abi.md; EAX = object pointer; stack: a double (the second 8 stack bytes are popped but unused). Computes q = tan(obj[0x30]) / he; callers 10a220@10a28f,11b1b0@11b1c8,11b3c8@11b43d; guest pending
 0x0011b1b0	36	forward_to_11b134_11b1b0	small_wrappers6	compiles	game	confirmed	decomp/tests/0x0011b1b0.json	docs/compiler-abi.md; Forward four stack arguments to 0x11b134.; callers 11b6bc@11b6eb,11b6bc@11b71c,11bb80@11bb9e; guest pending
 0x0011b3c0	7	constant_double_11b3c0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b3c0.json	docs/compiler-abi.md; Constant double at 0x195864.; callers 11c584@11c6e4; guest pending
-0x0011b3c8	149			unknown	unclassified	unverified		
+0x0011b3c8	149	profile_mix_11b3c8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b3c8.json	docs/compiler-abi.md; ; callers 10a220@10a2b8,11c584@11c6d9; guest pending
 0x0011b4bc	36	one_minus_pow_11b4bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b4bc.json	docs/compiler-abi.md; Returns 1 - pow(1 - ARG, 1.4) (ret 8, one stack double).; callers 11b5a8@11b5bc,11b5a8@11b5d0; guest pending
 0x0011b4e0	95	clamped_sin_acos_11b4e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b4e0.json	docs/compiler-abi.md; Returns -sin(acos_neg(T)) where T = 1 - ARG clamped to [-1, 1] (lower bound read from the double at 0x195894; ret 8, one; callers 11b5a8@11b5f0; guest pending
 0x0011b540	69	scaled_call_11b540	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b540.json	docs/compiler-abi.md; (ret 8) f(x * k4) * 0.53 with f = 0x11b3fec's sibling 0xb3fec; the intermediate x * k1 * k2 + k3 is computed and discard; callers 11b588@11b595; guest pending
@@ -4193,7 +4193,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b644	79	profile_ratio_11b644	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b644.json	docs/compiler-abi.md; (as 0x11bf78 but passes C and S to the term in swapped positions and divides by A[0x10]); callers 10a220@10a357; guest pending
 0x0011b694	19	level_below_11b694	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b694.json	docs/compiler-abi.md; Scaled distance below the reference level.; callers 10a220@10a31f,11c584@11c750; guest pending
 0x0011b6a8	19	level_above_11b6a8	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b6a8.json	docs/compiler-abi.md; Scaled distance above the reference level.; callers 11b6bc@11b6f8,11b6bc@11b729; guest pending
-0x0011b6bc	126			unknown	unclassified	unverified		
+0x0011b6bc	126	profile_sum_11b6bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b6bc.json	docs/compiler-abi.md; ; callers 10a220@10a301; guest pending
 0x0011b73c	411	profile_term_11b73c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b73c.json	docs/compiler-abi.md; Profile term of object a (doubles at +0x10, +0x18, * +0x38, +0x40) for the two scale doubles p1/p2; 0 when the sqrt argu; callers 11b8d8@11b93c,11c584@11c73b; guest pending
 0x0011b8d8	119	profile_diff_11b8d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b8d8.json	docs/compiler-abi.md; ; callers 11b950@11b995; guest pending
 0x0011b950	91	profile_diff_clamped_11b950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b950.json	docs/compiler-abi.md; ; callers 10a220@10a26a; guest pending

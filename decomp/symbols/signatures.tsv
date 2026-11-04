@@ -3164,3 +3164,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0011b73c	profile_term_11b73c	EAX:uint32_t,EDX:double,EBX:double	EAX:double	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0011b73c (411 bytes); Profile term of object a (doubles at +0x10, +0x18, * +0x38, +0x40) for the two scale doubles p1/p2; 0 when the sqrt argu; callers 11b8d8@11b93c,11c584@11c73b; docs/compiler-abi.md
 0x0011b8d8	profile_diff_11b8d8	EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double	EAX:double	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0011b8d8 (119 bytes); ; callers 11b950@11b995; docs/compiler-abi.md
 0x0011b950	profile_diff_clamped_11b950	EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double	EAX:double	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0011b950 (91 bytes); ; callers 10a220@10a26a; docs/compiler-abi.md
+0x0011b6bc	profile_sum_11b6bc	EAX:uint32_t,EDX:uint32_t	EAX:double	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0011b6bc (126 bytes); ; callers 10a220@10a301; docs/compiler-abi.md
+0x0011b3c8	profile_mix_11b3c8	EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double	EAX:double	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0011b3c8 (149 bytes); ; callers 10a220@10a2b8,11c584@11c6d9; docs/compiler-abi.md

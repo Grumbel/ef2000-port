@@ -9110,3 +9110,10 @@ in EAX, format string address, one value).
 | `0x11b73c` | EAX:uint32_t,EDX:double,EBX:double | EAX:double | 11b8d8@11b93c,11c584@11c73b | Profile term of object a (doubles at +0x10, +0x18, * +0x38, +0x40) for the two scale doubles p1/p2; 0 when the sqrt argu |
 | `0x11b8d8` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 11b950@11b995 |  |
 | `0x11b950` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 10a220@10a26a |  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11b6bc` | EAX:uint32_t,EDX:uint32_t | EAX:double | 10a220@10a301 |  |
+| `0x11b3c8` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 10a220@10a2b8,11c584@11c6d9 |  |

@@ -21032,3 +21032,28 @@ double profile_diff_clamped_11b950(uint32_t a, uint32_t d, double x, double y)
 	}
 	return profile_diff_11b8d8(a, d, 0.9, y);
 }
+
+/* 0x11b6bc, 126 bytes. */
+double profile_sum_11b6bc(uint32_t a, uint32_t d)
+{
+	double z = md_rd_f64(0x432ad8u);
+	double r = md_rd_f64(d) / md_rd_f64(a) * md_rd_f64(d + 0x10u) / md_rd_f64(a + 0x10u);
+	double g1 = level_above_11b6a8(d, ratio_formula_11b134(d, z, 6.0));
+	double g2;
+
+	g2 = level_above_11b6a8(a, ratio_formula_11b134(a, z, 6.0));
+	return g2 + g1 * r;
+}
+
+/* 0x11b3c8, 149 bytes. */
+double profile_mix_11b3c8(uint32_t a, uint32_t d, double x, double y)
+{
+	double h = sqrt_branch_11af14(x);
+	double ga = md_rd_f64(a + 0x18u);
+	double p = h * ga * md_rd_f64(0x19586cu) * (ga * md_rd_f64(0x195874u) * md_rd_f64(0x19587cu));
+	double q = p / -square_double_b3fd0(h);
+	double r = (md_rd_f64(a + 0x40u) * md_rd_f64(0x195884u))
+	           / (md_rd_f64(d + 0x18u) - md_rd_f64(d + 0x10u));
+
+	return ratio_formula_11b134(a, x, y) * r + q * md_rd_f64(0x19588cu);
+}
