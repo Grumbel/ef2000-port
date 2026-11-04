@@ -4193,4 +4193,7 @@ void guest_fn_3f8_x(uint32_t a, uint32_t unused_edx, uint32_t b, uint32_t c); /*
 
 uint32_t wait_ring_data_106dc4(ef_addr32 rec, uint32_t timeout);
 
+/* colour_tables3.c */
+void fill_colour_record_ba77c(ef_addr32 rec, uint32_t key);
+
 #endif

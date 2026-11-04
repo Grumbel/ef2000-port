@@ -4819,3 +4819,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x106dc4` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | 106e2c@106e38 | Wait on a ring record until its data arrives (0), the end marker 0x4f (0) or 0x45 (8) is popped, or the timeout expires  |
+
+## colour_tables3 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xba77c` | EAX:ef_addr32,EDX:uint32_t | none | bb324@bb47d | Fill a six-byte colour record chosen by a 1-based key: two leading bytes from the key, four trailing bytes of 4, except  |
