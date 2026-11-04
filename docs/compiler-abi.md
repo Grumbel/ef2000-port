@@ -9170,3 +9170,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc4e3b` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | c4db4@c4e15 | Implicit-register fragment (ESI = record, EBX is an out value): byte-swap the word at ESI+0x10, shift it left by two, st |
 | `0x23b` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 10e35f@10e3ba | Implicit-register fragment (EAX = new handler, SKIP = the condition flag of the preceding compare, CARRY is an out flag) |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc680b` | EAX:uint32_t | none | none direct | Implicit-register fragment (ESI = stream pointer, advanced by 4): read an object index and a word value; the record is 0 |
+| `0xc8c34` | EAX:uint32_t | EAX:uint32_t | none direct | Implicit-register fragment (EDI = output record pointer, advanced by 0x30): add three patched 32-bit immediates (at 0xc8 |

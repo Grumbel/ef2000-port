@@ -21361,3 +21361,47 @@ uint32_t set_timer_vector_23b(uint32_t handler, uint32_t skip, uint32_t *carry)
 	*carry = 0u;
 	return old;
 }
+
+/* 0xc680b, 60 bytes. Implicit-register fragment (ESI = stream pointer, advanced by 4): read an object index and a word value; the record is 0x17bf70[index]. When bit 0 of the record's word at +0x20 is clear, the record is first projected with project_if_outside_c46f8 (margin = the value) and the fragment ends if that reports zero. Then draw a disc with radius (int16 value << 8) / (2 * int16 at +0xa), centre (word +0x1a, word +0x1e). */
+void draw_object_disc_c680b(uint32_t *esi)
+{
+	uint32_t p = *esi;
+	uint32_t rec = (uint32_t)EF_U16(p) + EF_U32(0x0017bf70u);
+	uint32_t val = EF_U16(p + 2u);
+	int32_t den;
+
+	*esi = p + 4u;
+	if ((EF_U16(rec + 0x20u) & 1u) == 0u) {
+		if (project_if_outside_c46f8(val, rec) == 0u)
+			return;
+		rec = EF_U32(0x00158f40u);
+	}
+	den = 2 * (int32_t)(int16_t)EF_U16(rec + 0xau);
+	draw_disc_fdf60(0u, 0u, 0u, 0u,
+	                (uint32_t)(((int32_t)(int16_t)val << 8) / den),
+	                EF_U16(rec + 0x1eu), EF_U16(rec + 0x1au));
+}
+
+/* 0xc8c34, 60 bytes. Implicit-register fragment (EDI = output record pointer, advanced by 0x30): add three patched 32-bit immediates (at 0xc8c3f, 0xc8c4b and 0xc8c56, runtime-patched code operands) to the dwords at EDI+0xc, +0x10 and +0x14 and store them at EDI+0, +4 and +8, then clear the word at +0x20. Returns 0 when any addition overflows (the original then jumps to 0xc454a without storing) and 1 otherwise. */
+uint32_t add_patched_offsets_c8c34(uint32_t *edi)
+{
+	uint32_t r = *edi;
+	int32_t a = (int32_t)EF_U32(r + 0xcu);
+	int32_t b = (int32_t)EF_U32(r + 0x10u);
+	int32_t c = (int32_t)EF_U32(r + 0x14u);
+	int32_t ia = (int32_t)EF_U32(0xc8c3fu);
+	int32_t ib = (int32_t)EF_U32(0xc8c4bu);
+	int32_t ic = (int32_t)EF_U32(0xc8c56u);
+	int64_t sa = (int64_t)a + ia;
+	int64_t sb = (int64_t)b + ib;
+	int64_t sc = (int64_t)c + ic;
+
+	if (sa != (int32_t)sa || sb != (int32_t)sb || sc != (int32_t)sc)
+		return 0u;
+	EF_U32(r) = (uint32_t)sa;
+	EF_U32(r + 4u) = (uint32_t)sb;
+	EF_U32(r + 8u) = (uint32_t)sc;
+	EF_U16(r + 0x20u) = 0u;
+	*edi = r + 0x30u;
+	return 1u;
+}

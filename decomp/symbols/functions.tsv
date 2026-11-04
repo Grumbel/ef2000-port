@@ -2816,7 +2816,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c6428	15	shade_lookup_c6428	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c6428.json	docs/compiler-abi.md; Implicit-register fragment (ESI is an in/out pointer; result in AL): load the word at ESI (advancing ESI by 2), add the ; callers c6370@c6370; guest pending
 0x000c64d0	20	shade_lookup_store_c64d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c64d0.json	docs/compiler-abi.md; Implicit-register fragment (ESI is an in/out pointer; result in AL): like 0xc6428 but also stores the loaded low byte to; callers c6800@c6805,c71dc@c71e1,c75d4@c75d9; guest pending
 0x000c6800	11	call_hook_159158_c6800	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c6800.json	docs/compiler-abi.md; Implicit-register fragment (EAX, EDX, EBX pass through unchanged to the callee): call the function pointer at 0x159158 w; callers none direct; guest pending
-0x000c680b	60			unknown	unclassified	unverified		
+0x000c680b	60	draw_object_disc_c680b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c680b.json	docs/compiler-abi.md; Implicit-register fragment (ESI = stream pointer, advanced by 4): read an object index and a word value; the record is 0; callers none direct; guest pending
 0x000c6b80	357			unknown	unclassified	unverified		
 0x000c71dc	416			unknown	unclassified	unverified		
 0x000c737c	50	project_point_pair_c737c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c737c.json	docs/compiler-abi.md; Project the sum of two 3D points to a 2D screen point (implicit registers ESI = first point, EBX = second point, EDI = d; callers c71dc@c72c3,c71dc@c72d4,c71dc@c72e5; guest pending
@@ -2829,7 +2829,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c8820	428			unknown	unclassified	unverified		
 0x000c89cc	40	project_relative_point_c89cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89cc.json	docs/compiler-abi.md; Implicit-register fragment (params EBX = source point, ESI = output vector, EDI = screen destination): ESI = EBX - camer; callers c8820@c8931,c8820@c8946; guest pending
 0x000c89f4	40	project_offset_point_c89f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89f4.json	docs/compiler-abi.md; As 0xc89cc but ESI = EBX + camera position.; callers c8820@c8936,c8820@c8941; guest pending
-0x000c8c34	60			unknown	unclassified	unverified		
+0x000c8c34	60	add_patched_offsets_c8c34	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8c34.json	docs/compiler-abi.md; Implicit-register fragment (EDI = output record pointer, advanced by 0x30): add three patched 32-bit immediates (at 0xc8; callers none direct; guest pending
 0x000c8c78	63	render_vertex_list_c8c78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8c78.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source vertex words, ECX = count; params in that order): temporarily point the vertex-; callers c71dc@c7305,c8820@c8955,fd164@fd2a7; guest pending
 0x000c8ccc	58			unknown	unclassified	unverified		
 0x000c8d10	31	rotate_offset_shift_c8d10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8d10.json	docs/compiler-abi.md; (ret 8) Wrapper for 0xc8d30 that first shifts eax, edx and ebx left by 16.; callers b69c@b948; guest pending

@@ -6314,4 +6314,9 @@ uint32_t set_timer_vector_23b(uint32_t handler, uint32_t skip, uint32_t *carry);
 uint32_t dispatch_swapped_c4e3b(uint32_t esi, uint32_t *ebx); /* 0xc4e3b */
 uint32_t set_timer_vector_23b(uint32_t handler, uint32_t skip, uint32_t *carry); /* 0x23b */
 
+void draw_object_disc_c680b(uint32_t *esi);
+uint32_t add_patched_offsets_c8c34(uint32_t *edi);
+void draw_object_disc_c680b(uint32_t *esi); /* 0xc680b */
+uint32_t add_patched_offsets_c8c34(uint32_t *edi); /* 0xc8c34 */
+
 #endif
