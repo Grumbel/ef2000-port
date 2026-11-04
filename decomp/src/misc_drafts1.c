@@ -18841,3 +18841,25 @@ void build_rotation_matrix_e95c0(uint32_t a, uint32_t b, uint32_t c)
 	EF_U32(0x00464458u) = (uint32_t)((sin_tab_e95c0(a + b) - sin_tab_e95c0(a - b)) >> 1);
 	EF_U32(0x00464460u) = (uint32_t)((cos_tab_e95c0(a - b) + cos_tab_e95c0(a + b)) >> 1);
 }
+
+/* 0xe977c, 463 bytes. Sibling of 0xe95c0 with a different angle order: builds the rotation matrix for A (EAX), B (EDX), C (EBX) into dwords 0x464440..0x464460 (0x46445c holds -sin(A), 0x464458 is negated). */
+void build_rotation_matrix_e977c(uint32_t a, uint32_t b, uint32_t c)
+{
+	int32_t p, u0, u1, v, w;
+	uint32_t bc = b + c, bmc = b - c;
+
+	p = sin_tab_e95c0(a);
+	u1 = (sin_tab_e95c0(bc) + sin_tab_e95c0(bmc)) >> 1;
+	u0 = (sin_tab_e95c0(bc) - sin_tab_e95c0(bmc)) >> 1;
+	w = (cos_tab_e95c0(bc) + cos_tab_e95c0(bmc)) >> 1;
+	v = (cos_tab_e95c0(bmc) - cos_tab_e95c0(bc)) >> 1;
+	EF_U32(0x00464440u) = (uint32_t)(w - ((p * v) >> 15));
+	EF_U32(0x00464450u) = (uint32_t)((cos_tab_e95c0(a - c) + cos_tab_e95c0(a + c)) >> 1);
+	EF_U32(0x00464444u) = (uint32_t)((sin_tab_e95c0(a + c) - sin_tab_e95c0(a - c)) >> 1);
+	EF_U32(0x00464448u) = (uint32_t)(((u0 * p) >> 15) + u1);
+	EF_U32(0x00464454u) = (uint32_t)(((w * p) >> 15) - v);
+	EF_U32(0x0046444cu) = (uint32_t)(u0 - ((u1 * p) >> 15));
+	EF_U32(0x00464458u) = (uint32_t)(-((sin_tab_e95c0(a + b) - sin_tab_e95c0(a - b)) >> 1));
+	EF_U32(0x0046445cu) = (uint32_t)(-p);
+	EF_U32(0x00464460u) = (uint32_t)((cos_tab_e95c0(a - b) + cos_tab_e95c0(a + b)) >> 1);
+}

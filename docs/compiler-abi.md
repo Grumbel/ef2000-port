@@ -8639,3 +8639,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe95c0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e994c@e995e | Build the 3x3 rotation matrix for the angles A (EAX), B (EDX), C (EBX) from the sine/cosine tables at 0x141e06/0x142e06  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe977c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e994c@e9965 | Sibling of 0xe95c0 with a different angle order: builds the rotation matrix for A (EAX), B (EDX), C (EBX) into dwords 0x |
