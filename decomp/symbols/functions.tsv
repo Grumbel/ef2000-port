@@ -1117,7 +1117,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00059998	321			unknown	unclassified	unverified		
 0x00059adc	1222			unknown	unclassified	unverified		
 0x00059fa4	633			unknown	unclassified	unverified		
-0x0005a220	176			unknown	unclassified	unverified		
+0x0005a220	176	refresh_map_cursor_5a220	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005a220.json	docs/compiler-abi.md; Refresh the map cursor: latch (0xce328) and apply (0xcdf48) the four signed high words 0x1a6cf0, 0x1a6cee, 0x1a6cf6 and ; callers 598e8@59941; guest pending
 0x0005a2d0	405			unknown	unclassified	unverified		
 0x0005a468	1127			unknown	unclassified	unverified		
 0x0005a8d0	197	submit_view_5a8d0	line_of_sight	compiles	game	confirmed	decomp/tests/0x0005a8d0.json	docs/compiler-abi.md; ; callers none direct; guest pending

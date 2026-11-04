@@ -12024,3 +12024,26 @@ uint8_t can_reach_target_89060(ef_addr32 rec, uint32_t target)
     limit = limit * c1 * c2;
     return guest_fn_88ff8_x((ef_addr32)(uintptr_t)v30, (ef_addr32)(uintptr_t)v00) < limit ? 1u : 0u;
 }
+
+/* 0x5a220, 176 bytes. Refresh the map cursor: latch (0xce328) and apply (0xcdf48) the four signed high words 0x1a6cf0, 0x1a6cee, 0x1a6cf6 and 0x1a6cf4. When the selected node [0x1a821c] exists and projects (0x5ca88) to a point (two signed words), update it with 0x5d520 and, if it is also the current node [0x1a8210], run 0x5dbc8 on the point and 0x5df08. */
+void refresh_map_cursor_5a220(void)
+{
+    uint32_t a = (uint32_t)((int32_t)EF_U32(0x001a6cf0u) >> 16);
+    uint32_t b = (uint32_t)((int32_t)EF_U32(0x001a6cf6u) >> 16);
+    uint32_t c = (uint32_t)((int32_t)EF_U32(0x001a6ceeu) >> 16);
+    uint32_t d = (uint32_t)((int32_t)EF_U32(0x001a6cf4u) >> 16);
+    ef_addr32 node;
+    int16_t pt[2];
+    latch_values_ce328(a, b, c, d);
+    guest_fn_cdf48(a, b, c, d);
+    node = EF_U32(0x001a821cu);
+    if (node == 0u)
+        return;
+    if ((uint8_t)guest_fn_5ca88_ret_x(node, (ef_addr32)(uintptr_t)pt) == 0u)
+        return;
+    guest_fn_5d520_x(pt[0], pt[1], node);
+    if (EF_U32(0x001a8210u) == EF_U32(0x001a821cu)) {
+        guest_fn_5dbc8_x(pt[0], pt[1]);
+        guest_fn_5df08_x();
+    }
+}

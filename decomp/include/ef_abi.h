@@ -5523,4 +5523,10 @@ void guest_fn_88c80_x(ef_addr32 rec, ef_addr32 out, ef_addr32 out2); /* 0x88c80 
 void guest_fn_88d4c_x(ef_addr32 rec, ef_addr32 out); /* 0x88d4c EAX/EDX */
 double guest_fn_88ff8_x(ef_addr32 a, ef_addr32 b); /* 0x88ff8 EAX/EDX -> ST0 */
 
+void refresh_map_cursor_5a220(void);
+uint32_t guest_fn_5ca88_ret_x(ef_addr32 obj, ef_addr32 out); /* 0x5ca88 EAX/EDX -> AL */
+void guest_fn_5d520_x(int32_t a, int32_t b, ef_addr32 obj); /* 0x5d520 EAX/EDX/EBX */
+void guest_fn_5dbc8_x(int32_t a, int32_t b); /* 0x5dbc8 EAX/EDX */
+void guest_fn_5df08_x(void); /* 0x5df08 */
+
 #endif

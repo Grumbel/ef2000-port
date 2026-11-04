@@ -7563,3 +7563,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x89060` | EAX:ef_addr32,EDX:uint32_t | AL:uint8_t | 89698@89784 | Test whether the unit record R (EAX) can reach the point: store the target dword T (EDX, when nonzero and R's class byte |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5a220` | none | none | 598e8@59941 | Refresh the map cursor: latch (0xce328) and apply (0xcdf48) the four signed high words 0x1a6cf0, 0x1a6cee, 0x1a6cf6 and  |
