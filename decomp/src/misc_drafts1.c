@@ -17653,3 +17653,29 @@ void setup_renderer_tables_c4412(uint32_t value)
 	EF_U32(0x00159160u) = 0x000d2500u;
 	EF_U32(0x00159164u) = 0x000d2500u;
 }
+
+/* 0x53270, 149 bytes. Advance the smoothed frame time: the elapsed ticks (0x10688, low word as signed, at least 1) are stored in word 0x12afd4; above 10 the byte flag 0x127d9c is set and the step capped to 10, otherwise the flag is cleared. The double at 0x127d94 becomes (old * 3.0 + step) * 0.25 and the double 0x1a5b30 is set to step * 0.02. Finally word 0x127d92 receives the step (multiplied by 5 when byte 0x1a3647 is non-zero). */
+void update_frame_time_53270(void)
+{
+	int32_t step = (int32_t)(int16_t)elapsed_ticks();
+	double d, n, v;
+
+	if (step < 1)
+		step = 1;
+	EF_U16(0x0012afd4u) = (uint16_t)step;
+	if ((int32_t)(uint16_t)step > 10) {
+		EF_U8(0x00127d9cu) = 1u;
+		step = 10;
+	} else {
+		EF_U8(0x00127d9cu) = 0u;
+	}
+	n = (double)(int32_t)(uint16_t)step;
+	memcpy(&d, ef_guest_memory_ptr(0x00127d94u), 8);
+	v = (d * 3.0 + n) * 0.25;
+	memcpy(ef_guest_memory_ptr(0x00127d94u), &v, 8);
+	v = n * 0.02;
+	memcpy(ef_guest_memory_ptr(0x001a5b30u), &v, 8);
+	if (EF_U8(0x001a3647u) != 0u)
+		step *= 5;
+	EF_U16(0x00127d92u) = (uint16_t)step;
+}

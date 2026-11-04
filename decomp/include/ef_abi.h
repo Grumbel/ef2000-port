@@ -5923,4 +5923,6 @@ void reset_list_entries_ca874(ef_addr32 head1, ef_addr32 head2);
 
 void setup_renderer_tables_c4412(uint32_t value);
 
+void update_frame_time_53270(void);
+
 #endif

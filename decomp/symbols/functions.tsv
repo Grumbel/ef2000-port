@@ -954,7 +954,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00052164	611			unknown	unclassified	unverified		
 0x00052eb0	13	scale_float_52eb0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00052eb0.json	docs/compiler-abi.md; Scale a float to double.; callers 5375c@537cf,5375c@53816,5375c@5385d; guest pending
 0x00052f38	781			unknown	unclassified	unverified		
-0x00053270	149			unknown	unclassified	unverified		
+0x00053270	149	update_frame_time_53270	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00053270.json	docs/compiler-abi.md; Advance the smoothed frame time: the elapsed ticks (0x10688, low word as signed, at least 1) are stored in word 0x12afd4; callers 1cde8@1cf30,3dd30@3e119,410d0@410d1; guest pending
 0x00053308	19	convert_signed_short_scale	record_callers	compiles	game	confirmed	decomp/tests/0x00053308.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0005331c	17	refresh_tactical_indicator	packet_status	compiles	game	confirmed	decomp/tests/0x0005331c.json	docs/compiler-abi.md; host model; guest differential pending
 0x00053330	32	float_vector_length_53330	float_helpers2	compiles	game	confirmed	decomp/tests/0x00053330.json	docs/compiler-abi.md; Length of a vector of three floats.; callers 53350@53364,53350@534aa; guest pending

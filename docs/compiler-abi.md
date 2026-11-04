@@ -8469,3 +8469,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc4412` | EAX:uint32_t | none | none direct | Renderer setup (ret 4): VALUE (stack, byte) is stored in bytes 0x159138 and 0x15908a; the immediate operands of three se |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x53270` | none | none | 1cde8@1cf30,3dd30@3e119,410d0@410d1 | Advance the smoothed frame time: the elapsed ticks (0x10688, low word as signed, at least 1) are stored in word 0x12afd4 |
