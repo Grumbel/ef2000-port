@@ -2488,4 +2488,10 @@ void fade_palette_76948(void);
 void report_formation_76f58(uint32_t roster, ef_addr32 formation);
 void guest_fn_76b30(uint32_t roster, uint32_t slot, uint32_t value); /* 0x76b30 EAX/EDX/EBX */
 
+/* game_helpers41.c */
+void select_chord_mode_5488(void);
+void count_down_slots_16d60(ef_addr32 base, uint8_t kind, int16_t amount);
+void latch_input_state_1c3d0(void);
+ef_addr32 guest_fn_a7ec4_key(ef_addr32 text, uint32_t key); /* 0xa7ec4 EAX/EDX */
+
 #endif

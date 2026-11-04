@@ -3201,3 +3201,11 @@ in EAX, format string address, one value).
 | `0x6a82c` | AX:int16_t,DX:int16_t | AL:uint8_t | 6a8fc@6a95b,6aeb4@6af2b,6aeb4@6afa6 | True when the second unit is a valid hostile target for the first. |
 | `0x76948` | none | none | 76370@765d8 | Fade the 256-entry palette towards white by the fade counter. |
 | `0x76f58` | EAX:uint32_t,EDX:ef_addr32 | none | 77088@770c9 | Report the formation members and leader to the roster function 0x76b30. |
+
+## game_helpers41 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5488` | none | none | 5630@566e | Pick the mode value from which row/column button pair is pressed. |
+| `0x16d60` | EAX:ef_addr32,DL:uint8_t,BX:int16_t | none | 15b7c@15eab,16588@168a2,16e60@16f72 | Count down the 20 three-byte slots of the given kind by the given amount. |
+| `0x1c3d0` | none | none | 1cde8@1ce50 | Latch the raw input state, clearing it when a menu or pause is active. |
