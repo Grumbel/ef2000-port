@@ -4108,10 +4108,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00113398	96	release_record_array_113398	runtime_helpers36	compiles	game	confirmed	decomp/tests/0x00113398.json	docs/compiler-abi.md; Release a record container: trace each 0x718-byte element, trace field 0xc, free the element array and the 0x1d4-byte co; callers none direct; guest pending
 0x001133f8	1608			unknown	unclassified	unverified		
 0x00113a40	115	load_resource_113a40	trace_loaders1	compiles	game	confirmed	decomp/tests/0x00113a40.json	docs/compiler-abi.md; Same with parser 0x1133f8 and default block 0x1954bc.; callers 102fb4@102fe0; guest pending
-0x00113af0	117			unknown	unclassified	unverified		
+0x00113af0	117	lookup_pair_113af0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00113af0.json	docs/compiler-abi.md; Resolve a lookup; returns 1 if the first lookup fails (error text copied to 0x4dd6b0), 2 if the second yields 0, else 0;; callers 102f60@102f85; guest pending
 0x00113b78	169	classify_record_113b78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00113b78.json	docs/compiler-abi.md; Classify the record pair CTX (cdecl): returns 3 when the name of the first record (+0xba, only when its size at +8 is at; callers 1034b0@1034d5; guest pending
 0x00113c24	86	strip_extension_113c24	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00113c24.json	docs/compiler-abi.md; Copy a path to 0x17e1d8 and cut the extension (cdecl).; callers 103504@103527; guest pending
-0x00113c7c	120			unknown	unclassified	unverified		
+0x00113c7c	120	claim_slot_113c7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00113c7c.json	docs/compiler-abi.md; Under the lock, find the first 0x718-byte slot in obj[+0x18] (count at +0x1c) whose state [+4] is 1, mark it 2, reset it; callers 10303c@103061; guest pending
 0x00113cf4	27	trace_and_mark_113cf4	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00113cf4.json	docs/compiler-abi.md; Trace-call a non-null record and mark its field 4 as 1.; callers none direct; guest pending
 0x00113d10	794			unknown	unclassified	unverified		
 0x0011402c	42	start_record_11402c	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x0011402c.json	docs/compiler-abi.md; Start a record that is not yet state 1: trace-call it, reset its table record and link, and set state 4 (cdecl, record o; callers 10311c@10313f; guest pending

@@ -22415,3 +22415,47 @@ void combine_globals_119a54(void)
     *(double *)ef_guest_memory_ptr((ef_addr32)0x00432a48u) = m;
     *(double *)ef_guest_memory_ptr((ef_addr32)0x00432920u) = c * d * md_rd_f64(0x00432da0u) * g * md_rd_f64(0x00433058u) * m;
 }
+
+/* 0x113af0, 117 bytes. Resolve a lookup; returns 1 if the first lookup fails (error text copied to 0x4dd6b0), 2 if the second yields 0, else 0; the second result is stored through a0. */
+uint32_t lookup_pair_113af0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0)
+{
+    uint8_t b[0x118];
+    uint32_t r;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (traced_lookup_102028(0, 0, 0, 0, (uint32_t)(uintptr_t)&b[4], 0x001954d4u) == 0) {
+        memcpy(ef_guest_memory_ptr((ef_addr32)0x004dd6b0u), ef_guest_memory_ptr((ef_addr32)0x001954dcu), 29);
+        return 1;
+    }
+    r = trace_call_102fb4(0, 0, 0, 0, (uint32_t)(uintptr_t)&b[0x80], (uint32_t)(uintptr_t)&b[0x100]);
+    EF_U32(a0) = r;
+    return r == 0 ? 2u : 0u;
+}
+
+/* 0x113c7c, 120 bytes. Under the lock, find the first 0x718-byte slot in obj[+0x18] (count at +0x1c) whose state [+4] is 1, mark it 2, reset it and return it; 0 with error text copied to 0x4dd6b0 if none. */
+uint32_t claim_slot_113c7c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj)
+{
+    int32_t i = 0;
+    uint32_t slot;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    guest_fn_101e70();
+    if ((int32_t)EF_U32(obj + 0x1cu) > 0) {
+        uint32_t p = EF_U32(obj + 0x18u);
+        while (EF_U32(p + 4u) != 1u) {
+            i++;
+            p += 0x718u;
+            if (i >= (int32_t)EF_U32(obj + 0x1cu))
+                break;
+        }
+    }
+    if (i == (int32_t)EF_U32(obj + 0x1cu)) {
+        memcpy(ef_guest_memory_ptr((ef_addr32)0x004dd6b0u), ef_guest_memory_ptr((ef_addr32)0x00195538u), 25);
+        guest_fn_101e78();
+        return 0;
+    }
+    slot = EF_U32(obj + 0x18u) + (uint32_t)i * 0x718u;
+    EF_U32(slot + 4u) = 2;
+    reset_table_record_112b1c(0, 0, 0, 0, slot);
+    EF_U32(slot + 0x28u) = 0;
+    guest_fn_101e78();
+    return slot;
+}
