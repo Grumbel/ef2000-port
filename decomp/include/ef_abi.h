@@ -3506,4 +3506,9 @@ void switch_player_mode_17f10(void);
 void guest_fn_7eec4_w(void); /* 0x7eec4 */
 int32_t guest_fn_85d00_w(int32_t a); /* 0x85d00 EAX -> AX */
 
+/* game_helpers67.c */
+void snapshot_unit_state_7222c(int16_t unit);
+void select_cursor_mode_6697c(void);
+void guest_fn_73d50_w(int32_t a); /* 0x73d50 EAX */
+
 #endif

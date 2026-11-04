@@ -1218,7 +1218,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00065e10	673			unknown	unclassified	unverified		
 0x000663a4	186	find_next_unit_663a4	game_helpers39	compiles	game	confirmed	decomp/tests/0x000663a4.json	docs/compiler-abi.md; Find the next unit after an index that matches a team mode; return its id or -1.; callers 65a88@65aed,65a88@65b09,65c1c@65c59; guest pending
 0x00066548	1075			unknown	unclassified	unverified		
-0x0006697c	330			unknown	unclassified	unverified		
+0x0006697c	330	select_cursor_mode_6697c	game_helpers67	compiles	game	confirmed	decomp/tests/0x0006697c.json	docs/compiler-abi.md; Pick the cursor mode from the player's selected station kind and the panel mode.; callers 66548@665d7; guest pending
 0x00066ac8	38	update_position_bin	record_transitions	compiles	game	confirmed	decomp/tests/0x00066ac8.json	docs/compiler-abi.md; host model; guest differential pending
 0x00066b74	126			unknown	unclassified	unverified		
 0x00066bf4	224	request_los_66bf4	line_of_sight	compiles	game	confirmed	decomp/tests/0x00066bf4.json	docs/compiler-abi.md; Line-of-sight request from the viewpoint at 0x1a5bec to the object.; callers 65a88@65bcd,65d24@65de3,65e10@65e93; guest pending
@@ -1340,7 +1340,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007156c	1864			unknown	unclassified	unverified		
 0x00071cb8	1188			unknown	unclassified	unverified		
 0x0007215c	205			unknown	unclassified	unverified		
-0x0007222c	354			unknown	unclassified	unverified		
+0x0007222c	354	snapshot_unit_state_7222c	game_helpers67	compiles	game	confirmed	decomp/tests/0x0007222c.json	docs/compiler-abi.md; Copy the player's tracked state block into a unit record and refresh it.; callers 8d3d4@8d420; guest pending
 0x00072390	277			unknown	unclassified	unverified		
 0x000724a8	305			unknown	unclassified	unverified		
 0x000725dc	787			unknown	unclassified	unverified		

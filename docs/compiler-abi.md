@@ -3935,3 +3935,10 @@ in EAX, format string address, one value).
 | `0x69a40` | AX:int16_t | AL:uint8_t | 69b70@69ba4 | Test whether any of the low 13 flag bits of a weapon table entry is set. |
 | `0x8ef38` | EAX:ef_addr32 | none | 8c49c@8c8c1,8d11c@8d1a3,8d330@8d3b6 | Clear nine named object references for the object's id. |
 | `0x17f10` | none | none | 601c@60d3 | Switch the player unit's mode when no blocking state is active. |
+
+## game_helpers67 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7222c` | AX:int16_t | none | 8d3d4@8d420 | Copy the player's tracked state block into a unit record and refresh it. |
+| `0x6697c` | none | none | 66548@665d7 | Pick the cursor mode from the player's selected station kind and the panel mode. |

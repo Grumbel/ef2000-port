@@ -1929,3 +1929,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00069a40	weapon_flags_any_69a40	AX:int16_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00069a40 (301 bytes); Test whether any of the low 13 flag bits of a weapon table entry is set.; callers 69b70@69ba4; docs/compiler-abi.md
 0x0008ef38	clear_named_references_8ef38	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008ef38 (270 bytes); Clear nine named object references for the object's id.; callers 8c49c@8c8c1,8d11c@8d1a3,8d330@8d3b6; docs/compiler-abi.md
 0x00017f10	switch_player_mode_17f10			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00017f10 (289 bytes); Switch the player unit's mode when no blocking state is active.; callers 601c@60d3; docs/compiler-abi.md
+0x0007222c	snapshot_unit_state_7222c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007222c (354 bytes); Copy the player's tracked state block into a unit record and refresh it.; callers 8d3d4@8d420; docs/compiler-abi.md
+0x0006697c	select_cursor_mode_6697c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006697c (330 bytes); Pick the cursor mode from the player's selected station kind and the panel mode.; callers 66548@665d7; docs/compiler-abi.md
