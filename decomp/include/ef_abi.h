@@ -4000,4 +4000,9 @@ void guest_fn_112808_x(ef_addr32 rec); /* 0x112808 cdecl */
 uint32_t guest_fn_11d63f_x(void); /* 0x11d63f: console getch with pushback (DOS int 21h) */
 int32_t guest_fn_10f0e8_x(uint32_t handle, ef_addr32 buf, uint32_t count); /* 0x10f0e8 EAX/EDX/EBX: DOS read */
 
+/* runtime_helpers41.c */
+void dispatch_midi_event_1149e0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec, uint32_t port, uint32_t status, uint32_t data1, int32_t data2);
+uint32_t guest_callptr5_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* indirect cdecl call with five stack arguments */
+void guest_fn_1123a4_x(uint32_t port, uint32_t status, uint32_t data1, uint32_t data2, uint32_t zero); /* 0x1123a4 cdecl */
+
 #endif

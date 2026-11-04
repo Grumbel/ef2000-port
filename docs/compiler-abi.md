@@ -4586,3 +4586,9 @@ in EAX, format string address, one value).
 | `0x105da0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Destroy a sound object: if it was started, stop it, clear its buffer, run 0x117a0f twice, trace 0xa; then trace its fiel |
 | `0x114058` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 103148@10316b | Reset the controllers of a state-4 sound record: set state 8, run 0x112808, then for each of its 16 channels send contro |
 | `0x10f1bf` | EAX:ef_addr32 | EAX:int32_t | f1d90@f1ec2,f1d90@f1ee2,f1d90@f1f0f | Refill a stream buffer (_filbuf): allocate it if missing, flush stdout-style linked streams, then read from the handle ( |
+
+## runtime_helpers41 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1149e0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:int32_t | none | 103c28@103c6d | Dispatch a MIDI event for a sound record (cdecl: record, port, status, data1, data2): with a non-zero port forward it to |

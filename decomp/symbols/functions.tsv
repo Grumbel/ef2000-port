@@ -4125,7 +4125,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001146ec	394			unknown	unclassified	unverified		
 0x00114878	284			unknown	unclassified	unverified		
 0x00114994	52	set_owner_slot_114994	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00114994.json	docs/compiler-abi.md; Record slot b of owner a as value c-1 (cdecl).; callers 103b90@103bc0; guest pending
-0x001149e0	178			unknown	unclassified	unverified		
+0x001149e0	178	dispatch_midi_event_1149e0	runtime_helpers41	compiles	game	confirmed	decomp/tests/0x001149e0.json	docs/compiler-abi.md; Dispatch a MIDI event for a sound record (cdecl: record, port, status, data1, data2): with a non-zero port forward it to; callers 103c28@103c6d; guest pending
 0x00114ad8	244			unknown	unclassified	unverified		
 0x0011580e	99	stream_fgets_11580e	runtime_helpers36	compiles	game	confirmed	decomp/tests/0x0011580e.json	docs/compiler-abi.md; fgets: read at most n-1 characters up to and including a newline into buf from stream; returns buf, or 0 on end of file ; callers 103f04@103f5c; guest pending
 0x00115871	275			unknown	unclassified	unverified		
