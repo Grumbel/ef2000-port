@@ -15275,3 +15275,92 @@ uint32_t parse_record_fcf4(ef_addr32 rec)
 	read_parser_six_field_record(rec + 0x3bu);
 	return 1u;
 }
+
+/* 0xf314, 749 bytes. Parse one component record from the text parser into the record EAX (DL = parent kind byte). Byte +1 is the count; byte +0 is a name read with the 39-, 18- or 27-name reader according to the family word 0x197aba (0, 1, 2; the matching running total word 0x197ab4, 0x197ab8 or 0x197ab6 grows by the count; other families report through the error hook, format 0x180f74). Bytes +2 and +3 come from the enum readers 0xec3c and 0xece0. Family 0 reads twenty enum bytes into +0x55..+0x68 (0xeea0). Then the six-field record at +8, words +0x1c, +0x1a and +0x1e (the first must be nonzero, format 0x180fac, and the third below the first, format 0x180fd4), and word-count (+0x1c) 25-byte entries allocated through the hook at 0x121ebc into +0x20 (0xed80). After skipping tokens words +0x6e and +0x70 follow. Kinds 2, 10 and 4 with a parent of 6, 7 or 10 read byte +0x3a, a token copy in +0x3b, the six-field record at +0x3f and, except for kind 5, count entries of 21 bytes into +0x51 (0xeefc); otherwise +0x3b and +0x51 are cleared. Kinds 2, 10, 1 and 11 get a 7-byte group list in +0x74 (0xf08c). With family 0 and byte 0x121eb8 set, count 22-byte text records are read into +0x69 (0xfe4c). Dword +0x78 is cleared. Returns 1. */
+uint32_t parse_component_record_f314(ef_addr32 rec, uint32_t parent)
+{
+	uint32_t fam, kind, i, n, p;
+	int16_t cnt, lim;
+
+	read_parser_line();
+	read_parser_token();
+	EF_U8(rec + 1u) = (uint8_t)read_parser_integer();
+	fam = EF_U16(0x00197abau);
+	if (fam == 0u) {
+		EF_U16(0x00197ab4u) = (uint16_t)(EF_U16(0x00197ab4u) + EF_U8(rec + 1u));
+		EF_U8(rec) = (uint8_t)read_parser_enum_39_names();
+	} else if (fam == 1u) {
+		EF_U16(0x00197ab8u) = (uint16_t)(EF_U16(0x00197ab8u) + EF_U8(rec + 1u));
+		EF_U8(rec) = (uint8_t)read_parser_enum_18_names();
+	} else if (fam == 2u) {
+		EF_U16(0x00197ab6u) = (uint16_t)(EF_U16(0x00197ab6u) + EF_U8(rec + 1u));
+		EF_U8(rec) = (uint8_t)read_parser_enum_27_names();
+	} else {
+		guest_callptr3_x(EF_U32(0x00132a74u), 0x00180f74u, 0x00197abeu, EF_U32(0x00121eacu));
+	}
+	EF_U8(rec + 2u) = (uint8_t)parse_enum_ec3c();
+	EF_U8(rec + 3u) = (uint8_t)read_parser_enum_10_names();
+	if (EF_U16(0x00197abau) == 0u) {
+		for (p = rec + 1u; p != rec + 0x14u; ) {
+			p++;
+			EF_U8(p + 0x54u) = (uint8_t)parse_enum_eea0();
+		}
+	}
+	read_parser_line();
+	read_parser_six_field_record(rec + 8u);
+	read_parser_line();
+	read_parser_token();
+	EF_U16(rec + 0x1cu) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x1au) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x1eu) = (uint16_t)read_parser_integer();
+	if (EF_U16(rec + 0x1cu) == 0u)
+		guest_callptr2_x(EF_U32(0x00132a74u), 0x00180facu, EF_U32(0x00121eacu));
+	lim = (int16_t)EF_U16(rec + 0x1cu);
+	if ((int16_t)EF_U16(rec + 0x1eu) >= lim)
+		guest_callptr2_x(EF_U32(0x00132a74u), 0x00180fd4u, EF_U32(0x00121eacu));
+	cnt = (int16_t)EF_U16(rec + 0x1cu);
+	EF_U32(rec + 0x20u) = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), (uint32_t)((int32_t)cnt * 25));
+	for (i = 0, n = 0u; (int32_t)i < (int16_t)EF_U16(rec + 0x1cu); i++, n += 0x19u)
+		read_record_ed80(EF_U32(rec + 0x20u) + n);
+	read_parser_line();
+	read_parser_token();
+	read_parser_token();
+	EF_U16(rec + 0x6eu) = (uint16_t)read_parser_integer();
+	read_parser_token();
+	EF_U16(rec + 0x70u) = (uint16_t)read_parser_integer();
+	kind = EF_U8(rec + 2u);
+	if ((kind == 2u || kind == 10u || kind == 4u) && ((parent & 0xffu) == 6u || (parent & 0xffu) == 7u || (parent & 0xffu) == 10u)) {
+		read_parser_line();
+		read_parser_token();
+		EF_U8(rec + 0x3au) = (uint8_t)read_parser_enum_106_names();
+		EF_U32(rec + 0x3bu) = duplicate_parser_token();
+		read_parser_line();
+		read_parser_six_field_record(rec + 0x3fu);
+		if (EF_U8(rec + 2u) == 5u) {
+			EF_U32(rec + 0x51u) = 0u;
+		} else {
+			EF_U32(rec + 0x51u) = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), (uint32_t)EF_U8(rec + 1u) * 21u);
+			for (i = 0, n = 0u; i < EF_U8(rec + 1u); i++, n += 0x15u)
+				read_record_eefc(EF_U32(rec + 0x51u) + n);
+		}
+	} else {
+		EF_U32(rec + 0x3bu) = 0u;
+		EF_U32(rec + 0x51u) = 0u;
+	}
+	kind = EF_U8(rec + 2u);
+	if (kind == 2u || kind == 10u || kind == 1u || kind == 11u) {
+		EF_U32(rec + 0x74u) = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), 7u);
+		read_group_list_f08c(EF_U32(rec + 0x74u));
+	} else {
+		EF_U32(rec + 0x74u) = 0u;
+	}
+	if (EF_U16(0x00197abau) == 0u && EF_U8(0x00121eb8u) != 0u) {
+		EF_U32(rec + 0x69u) = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), (uint32_t)EF_U8(rec + 1u) * 22u);
+		for (i = 0, n = 0u; i < EF_U8(rec + 1u); i++, n += 0x16u)
+			read_parser_text_record(EF_U32(rec + 0x69u) + n);
+	} else {
+		EF_U32(rec + 0x69u) = 0u;
+	}
+	EF_U32(rec + 0x78u) = 0u;
+	return 1u;
+}

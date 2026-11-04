@@ -8162,3 +8162,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfcf4` | EAX:ef_addr32 | EAX:uint32_t | 1001c@1032e | Parse one record from the text parser into the record EAX: skip line and token, byte +0xb from the two-family enum reade |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf314` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | f604@f68c | Parse one component record from the text parser into the record EAX (DL = parent kind byte). Byte +1 is the count; byte  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

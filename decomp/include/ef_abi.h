@@ -5793,4 +5793,8 @@ uint32_t parse_record_f260(ef_addr32 rec);
 
 uint32_t parse_record_fcf4(ef_addr32 rec);
 
+uint32_t parse_component_record_f314(ef_addr32 rec, uint32_t parent);
+
+
+
 #endif
