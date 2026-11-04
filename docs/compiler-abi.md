@@ -9433,3 +9433,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1104b8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | fa9d2@faa03 | Free a heap block: coalesce with neighbouring free blocks and update the heap's free list and statistics. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfa9d2` | EAX:uint32_t | none | bc4da@bc534,e8651@e8671,e8651@e86db | Find the heap that owns the pointer, free it there and update the high-water mark. |

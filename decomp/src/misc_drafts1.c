@@ -22976,3 +22976,26 @@ link:
 		EF_U32(heap + 0x14) = ecx;
 	}
 }
+
+/* 0xfa9d2, 94 bytes. Find the heap that owns the pointer, free it there and update the high-water mark. */
+void heap_free_find_fa9d2(uint32_t ptr)
+{
+	uint32_t ecx = EF_U32(0x16464c);
+	for (;;) {
+		uint32_t edx = EF_U32(ecx + 8);
+		if (edx == 0) {
+			break;
+		}
+		if (!(ecx > ptr) && ptr < edx) {
+			break;
+		}
+		ecx = EF_U32(ecx + 8);
+	}
+	heap_free_1104b8(ptr, 0, ecx);
+	if (ecx != EF_U32(0x164650)) {
+		if (EF_U32(ecx + 0x14) > EF_U32(0x164654)) {
+			EF_U32(0x164654) = EF_U32(ecx + 0x14);
+		}
+	}
+	EF_U8(0x4dd8a1) = 0;
+}

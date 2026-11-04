@@ -6473,4 +6473,7 @@ void setup_rotation_args_16000c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
 void heap_free_1104b8(uint32_t ptr, uint32_t seg, uint32_t heap);
 void heap_free_1104b8(uint32_t ptr, uint32_t seg, uint32_t heap); /* 0x1104b8 */
 
+void heap_free_find_fa9d2(uint32_t ptr);
+void heap_free_find_fa9d2(uint32_t ptr); /* 0xfa9d2 */
+
 #endif
