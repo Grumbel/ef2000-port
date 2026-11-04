@@ -2319,3 +2319,75 @@ void refresh_current_object_598e8(void)
     }
     guest_fn_59998_x();
 }
+
+/* 0xa0174, 177 bytes. Advance the two vector pairs of the object OBJ: copy the vector at +0x3c to 0x132b28, then add the vector at +0x30 scaled by [0x132b20] to +0x24, the vector at +0x18 scaled by [0x132b20] to +0xc, and update +0x18 by (+0x18 scaled by [0x132b34]) + the vector at 0x132b28, scaled by [0x132b20] (all scaling truncates toward zero). */
+void advance_object_vectors_a0174(ef_addr32 obj)
+{
+    uint32_t tmp[3];
+    uint32_t t = (uint32_t)(uintptr_t)tmp;
+    EF_U32(0x00132b28u) = EF_U32(obj + 0x3cu);
+    EF_U32(0x00132b2cu) = EF_U32(obj + 0x40u);
+    EF_U32(0x00132b30u) = EF_U32(obj + 0x44u);
+    copy_vector3(t, obj + 0x30u);
+    scale_vector3_ea8cc(t, t, 0u, 0u, EF_U32(0x00132b20u));
+    add_vector3(obj + 0x24u, t);
+    copy_vector3(t, obj + 0x18u);
+    scale_vector3_ea8cc(t, t, 0u, 0u, EF_U32(0x00132b20u));
+    add_vector3(obj + 0xcu, t);
+    copy_vector3(t, obj + 0x18u);
+    scale_vector3_ea8cc(t, 0x00132b28u, 0u, 0u, EF_U32(0x00132b34u));
+    add_vector3(t, 0x00132b28u);
+    scale_vector3_ea8cc(t, t, 0u, 0u, EF_U32(0x00132b20u));
+    add_vector3(obj + 0x18u, t);
+}
+
+/* 0x1a3cc, 176 bytes. Step the demo script at 0x122c80: when the expected key code 0x41f833 matches the current script byte, clear it and advance the script position (word 0x122c7e); at the script end toggle the mode word 0x198438 and push the matching event (0x18188c or 0x18189c), otherwise a mismatch rewinds to the start. Only runs while 0x41f7c8 and 0x41f833 are non-zero. */
+void step_demo_script_1a3cc(void)
+{
+    if (EF_U8(0x0041f7c8u) == 0u || EF_U8(0x0041f833u) == 0u)
+        return;
+    if (EF_U8(0x0041f833u) == EF_U8(0x00122c80u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00122c7eu))) {
+        EF_U8(0x0041f833u) = 0u;
+        EF_U16(0x00122c7eu) = (uint16_t)(EF_U16(0x00122c7eu) + 1u);
+        if (EF_U8(0x00122c80u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00122c7eu)) != 0u)
+            return;
+        if ((int16_t)EF_U16(0x00198438u) != 1) {
+            EF_U16(0x00122c7eu) = 0u;
+            EF_U16(0x00198438u) = 1u;
+            push_event_1f878(0x0018188cu);
+        } else {
+            EF_U16(0x00198438u) = 0u;
+            EF_U16(0x00122c7eu) = 0u;
+            push_event_1f878(0x0018189cu);
+        }
+    } else {
+        EF_U16(0x00122c7eu) = 0u;
+    }
+}
+
+/* 0xaa3dc, 176 bytes. Walk the linked list at 0x4191fc for as many entries as the signed word at 0x4194c4 says: copy each entry's name (+9) into the 21-byte slots at 0x419218, record its flag byte (+8) at 0x41948e+index, and for flagged entries allocate a 21-byte block (stored at 0x418708 + 4 * index) preset with the 5 bytes from 0x18d8e4, for unflagged ones store 0. Reports errors through 0x132a74 when the list ends early or an allocation fails. */
+void load_list_names_aa3dc(void)
+{
+    uint32_t slot = 0x00419218u;
+    uint32_t node = EF_U32(0x004191fcu);
+    uint32_t idx = 0u;
+    while ((int32_t)(int16_t)EF_U16(0x004194c4u) > (int32_t)idx) {
+        uint32_t cell = 0x00418708u + idx * 4u;
+        if (node == 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x0018d8a8u);
+        copy_string_9d749(slot, node + 9u);
+        if (EF_U8(node + 8u) == 0u) {
+            EF_U32(cell) = 0u;
+        } else {
+            EF_U32(cell) = guest_fn_c3f70(0x15u);
+            if (EF_U32(cell) == 0u)
+                guest_callptr1_x(EF_U32(0x00132a74u), 0x0018d8c0u);
+            EF_U32(EF_U32(cell)) = EF_U32(0x0018d8e4u);
+            EF_U8(EF_U32(cell) + 4u) = EF_U8(0x0018d8e8u);
+        }
+        idx++;
+        slot += 0x15u;
+        EF_U8(0x0041948du + idx) = EF_U8(node + 8u);
+        node = EF_U32(node);
+    }
+}

@@ -5664,3 +5664,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb54d0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:int32_t,[ESP+4]:uint32_t | none | 4fa64@4fb36,b5640@b567f,b9c68@b9d98 | Compute the clock time that lies RATE steps (scaled by the divisor for the rate S0, ret 4) after the stored time hours a |
 | `0x598e8` | none | none | none direct | Per-mode refresh of the current object (selected by the signed word at 0x1f71ca; nothing happens when it does not exist) |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa0174` | EAX:ef_addr32 | none | a0060@a008c | Advance the two vector pairs of the object OBJ: copy the vector at +0x3c to 0x132b28, then add the vector at +0x30 scale |
+| `0x1a3cc` | none | none | 1cde8@1ce46 | Step the demo script at 0x122c80: when the expected key code 0x41f833 matches the current script byte, clear it and adva |
+| `0xaa3dc` | none | none | aad7c@aae38 | Walk the linked list at 0x4191fc for as many entries as the signed word at 0x4194c4 says: copy each entry's name (+9) in |

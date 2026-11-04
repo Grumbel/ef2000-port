@@ -4680,4 +4680,8 @@ void guest_fn_5c518_x(void); /* 0x5c518 unknown, no arguments */
 void guest_fn_59fa4_x(void); /* 0x59fa4 unknown, no arguments */
 void guest_fn_59998_x(void); /* 0x59998 unknown, no arguments */
 
+void advance_object_vectors_a0174(ef_addr32 obj);
+void step_demo_script_1a3cc(void);
+void load_list_names_aa3dc(void);
+
 #endif

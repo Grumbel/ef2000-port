@@ -301,7 +301,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00019a80	312			unknown	unclassified	unverified		
 0x0001a358	54	enter_mode_1a358	game_helpers78	compiles	game	confirmed	decomp/tests/0x0001a358.json	docs/compiler-abi.md; Enter the mode once: apply the argument to the driver and refresh its table.; callers 95e58@95f15; guest pending
 0x0001a390	57	leave_mode_1a390	game_helpers78	compiles	game	confirmed	decomp/tests/0x0001a390.json	docs/compiler-abi.md; Leave the mode: restore the saved driver parameters and refresh its table.; callers 95e58@95f1c; guest pending
-0x0001a3cc	176			unknown	unclassified	unverified		
+0x0001a3cc	176	step_demo_script_1a3cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001a3cc.json	docs/compiler-abi.md; Step the demo script at 0x122c80: when the expected key code 0x41f833 matches the current script byte, clear it and adva; callers 1cde8@1ce46; guest pending
 0x0001a47c	259			unknown	unclassified	unverified		
 0x0001a580	1595			unknown	unclassified	unverified		
 0x0001abbc	195	try_fire_selected_weapon_1abbc	game_helpers53	compiles	game	confirmed	decomp/tests/0x0001abbc.json	docs/compiler-abi.md; Run the fire action when the selected weapon kind allows it.; callers 1cde8@1cf13; guest pending
@@ -2110,7 +2110,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a0060	65	run_entry_chain_a0060	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000a0060.json	docs/compiler-abi.md; Reset the time scale at 0x132b20 and, if 0x137a00 is set, run 0xa0174 on every entry of the 0x4e-byte chain starting at ; callers 3dd30@3deec; guest pending
 0x000a00a4	67	countdown_record_a00a4	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a00a4.json	docs/compiler-abi.md; Count a record down; true while it is still live.; callers a00e8@a013d; guest pending
 0x000a00e8	137			unknown	unclassified	unverified		
-0x000a0174	177			unknown	unclassified	unverified		
+0x000a0174	177	advance_object_vectors_a0174	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a0174.json	docs/compiler-abi.md; Advance the two vector pairs of the object OBJ: copy the vector at +0x3c to 0x132b28, then add the vector at +0x30 scale; callers a0060@a008c; guest pending
 0x000a0228	651			unknown	unclassified	unverified		
 0x000a04b4	344			unknown	unclassified	unverified		
 0x000a060c	245			unknown	unclassified	unverified		
@@ -2381,7 +2381,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aa2b4	68	resolve_child_aa2b4	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa2b4.json	docs/compiler-abi.md; Resolve the (parent index, child index) pair of node to the child pointer.; callers aa350@aa395; guest pending
 0x000aa2f8	85	position_out_of_range_aa2f8	small_wrappers3	compiles	game	confirmed	decomp/tests/0x000aa2f8.json	docs/compiler-abi.md; Return 1 when the row (+0xb) or column (+0xc) bytes of a record fall outside the list limits, else 0.; callers aa350@aa375; guest pending
 0x000aa350	140	resolve_scene_groups_aa350	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000aa350.json	docs/compiler-abi.md; Walk every scene group and resolve its child nodes.; callers aad7c@aae42; guest pending
-0x000aa3dc	176			unknown	unclassified	unverified		
+0x000aa3dc	176	load_list_names_aa3dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000aa3dc.json	docs/compiler-abi.md; Walk the linked list at 0x4191fc for as many entries as the signed word at 0x4194c4 says: copy each entry's name (+9) in; callers aad7c@aae38; guest pending
 0x000aa4b8	26	walk_chain_from_8	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa4b8.json	docs/compiler-abi.md; Step AX (signed word) times along the chain starting at * dword +8 of EDX (next pointer at +1); returns the node reached; callers aa4d4@aa50b,aa4d4@aa524,aa4d4@aa53d; guest pending
 0x000aa4d4	175	patch_group_pointers_aa4d4	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000aa4d4.json	docs/compiler-abi.md; Rewrite the pointer fields of every type 0xe node in each group.; callers aad7c@aae3d; guest pending
 0x000aa5c4	1098			unknown	unclassified	unverified		
