@@ -4934,4 +4934,6 @@ uint32_t guest_fn_3a268_x(uint32_t v); /* 0x3a268 EAX -> AL */
 void guest_fn_39edc_x(uint32_t a, uint32_t v); /* 0x39edc EAX/EDX */
 void guest_fn_3a000_x(uint32_t a); /* 0x3a000 EAX */
 
+void add_recent_file_ac2e4(uint32_t name, uint32_t flag);
+
 #endif

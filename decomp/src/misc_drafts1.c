@@ -5195,3 +5195,35 @@ void advance_follow_slot_3a148(int32_t a)
         guest_fn_3a000_x((uint32_t)(int32_t)ia);
     }
 }
+
+/* 0xac2e4, 289 bytes. Register the text file NAME in the recent-file list (21-byte names at 0x41e960, count word 0x41eecc, limit 16 with error 0x18dbac; names above 8 characters give error 0x18dbe4): a name already present (0x9d524 == 0) ends the call; otherwise it is appended and, when FLAG is set, also stored in the first free slot of the second list at 0x41eab0. The file is then loaded (0xf819c), the widgets and id tables are rebuilt and the list-changed byte 0x137255 is set. */
+void add_recent_file_ac2e4(uint32_t name, uint32_t flag)
+{
+    uint16_t n = EF_U16(0x0041eeccu);
+    uint16_t i;
+    if (n >= 0x10u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018dbacu, 0x10u);
+    if (guest_string_length(name) > 8u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018dbe4u, 8u);
+    n = EF_U16(0x0041eeccu);
+    for (i = 0; i < n; i++) {
+        if (guest_fn_9d524(0x0041e960u + (uint32_t)i * 0x15u, name) == 0u)
+            return;
+        n = EF_U16(0x0041eeccu);
+    }
+    copy_string_9d749(0x0041e960u + (uint32_t)EF_U16(0x0041eeccu) * 0x15u, name);
+    if ((uint8_t)flag != 0u) {
+        uint32_t k = 0u;
+        while (EF_U8(0x0041eab0u + k * 0x15u) != 0u && k < 0x10u)
+            k++;
+        if (k < 0x10u)
+            copy_string_9d749(0x0041eab0u + k * 0x15u, name);
+    }
+    EF_U32(0x0041eea0u) = 0u;
+    reload_text_file_f819c(name);
+    update_all_widgets_a5980();
+    clear_id_table_a4e6c();
+    rebuild_id_table_a4e14();
+    EF_U8(0x00137255u) = 1u;
+    EF_U16(0x0041eeccu) = (uint16_t)(EF_U16(0x0041eeccu) + 1u);
+}

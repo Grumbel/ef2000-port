@@ -2421,7 +2421,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ac0e0	139	reset_ui_state_ac0e0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000ac0e0.json	docs/compiler-abi.md; Reset the UI after a mode change and centre the cursor.; callers 84c84@84c96,84c84@84cac; guest pending
 0x000ac16c	211	clear_ui_state_ac16c	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000ac16c.json	docs/compiler-abi.md; Clear the UI state tables and select the video mode.; callers ac0e0@ac158,ac780@ac791; guest pending
 0x000ac240	162	run_page_callbacks_ac240	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000ac240.json	docs/compiler-abi.md; Run the registered page callbacks, then wait for the mouse buttons to clear.; callers ac408@ac449,ac408@ac480,ac408@ac4dc; guest pending
-0x000ac2e4	289			unknown	unclassified	unverified		
+0x000ac2e4	289	add_recent_file_ac2e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ac2e4.json	docs/compiler-abi.md; Register the text file NAME in the recent-file list (21-byte names at 0x41e960, count word 0x41eecc, limit 16 with error; callers ac240@ac274,ac240@ac295; guest pending
 0x000ac408	372			unknown	unclassified	unverified		
 0x000ac57c	123	find_free_save_slot_ac57c	search_helpers1	compiles	game	confirmed	decomp/tests/0x000ac57c.json	docs/compiler-abi.md; Probe save files numbered from the counter at 0x13794e (name format 0x18dc48): close each one that exists and advance th; callers ac5f8@ac6d6; guest pending
 0x000ac5f8	391			unknown	unclassified	unverified		
