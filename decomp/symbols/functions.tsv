@@ -246,7 +246,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00011820	1265			unknown	unclassified	unverified		
 0x00011d20	35	set_runtime_slot_flag	low_helpers	compiles	game	confirmed	decomp/tests/0x00011d20.json	docs/compiler-abi.md; byte 0x121fb4+29*AX = DL then 0x11e7c; callers 12210@12259,12210@12297; guest pending
 0x00011d44	156	step_letter_table_11d44	game_helpers73	compiles	game	confirmed	decomp/tests/0x00011d44.json	docs/compiler-abi.md; Advance the letter table walk; emits up to 18 letters per step for the active mode.; callers 601c@60aa,11de0@11e70; guest pending
-0x00011de0	155			unknown	unclassified	unverified		
+0x00011de0	155	find_letter_entry_11de0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00011de0.json	docs/compiler-abi.md; Look the key KEY up in the letter table of the current mode (mode byte 0x122c53: 1, 2 and 4 select table 0, 1 and 2): sc; callers 1a47c@1a4e3; guest pending
 0x00011e7c	706			unknown	unclassified	unverified		
 0x00012140	29	refresh_all_runtime_slots	low_helpers	compiles	game	confirmed	decomp/tests/0x00012140.json	docs/compiler-abi.md; 0x11e7c for 0..53; callers 11d44@11dd1; guest pending
 0x00012160	84	reinitialize_runtime_slots	runtime_indexed	compiles	game	confirmed	decomp/tests/0x0012160.json	54 entries stride29, callback or clear, refresh each; callers 5f60@5f6b/5fd8@5fde; guest pending

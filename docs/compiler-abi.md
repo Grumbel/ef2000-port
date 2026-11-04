@@ -6038,3 +6038,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1a47c` | none | none | 1cde8@1ce4b | Dispatch the pending key byte 0x41f833: refresh the flag words 0x19843c (0x41f7ba / 0x41f7c6), 0x198420 (0x41f7c8) and 0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11de0` | EAX:uint32_t | none | 1a47c@1a4e3 | Look the key KEY up in the letter table of the current mode (mode byte 0x122c53: 1, 2 and 4 select table 0, 1 and 2): sc |

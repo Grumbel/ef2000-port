@@ -4646,3 +4646,34 @@ void dispatch_pending_key_1a47c(void)
     }
     EF_U8(0x0041f833u) = 0u;
 }
+
+/* 0x11de0, 155 bytes. Look the key KEY up in the letter table of the current mode (mode byte 0x122c53: 1, 2 and 4 select table 0, 1 and 2): scan up to 18 entries (stride 0x1d from 0x121fcc, starting at the table's base word 0x121ec8[table]) for a first byte equal to KEY, and on a hit call 0x12d90 with the entry and table numbers, set the word 0x12288a and step the letter table (0x11d44). */
+void find_letter_entry_11de0(uint32_t key)
+{
+    uint8_t mode = EF_U8(0x00122c53u);
+    int16_t table;
+    int16_t i = 0;
+    int found = 0;
+    if (mode == 1u)
+        table = 0;
+    else if (mode == 2u)
+        table = 1;
+    else if (mode == 4u)
+        table = 2;
+    else
+        table = -1;
+    if (table < 0 || table >= 3)
+        return;
+    while (i < 0x12 && !found) {
+        int32_t base = (int16_t)EF_U16(0x00121ec8u + (uint32_t)(int32_t)table * 2u);
+        if ((uint16_t)key == EF_U8(0x00121fccu + (uint32_t)((i + base) * 0x1d)))
+            found = 1;
+        else
+            i++;
+    }
+    if (!found)
+        return;
+    guest_fn_12d90((uint32_t)(int32_t)i, (uint32_t)(int32_t)table);
+    EF_U16(0x0012288au) = 1u;
+    step_letter_table_11d44();
+}
