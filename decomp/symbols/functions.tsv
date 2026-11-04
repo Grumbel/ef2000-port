@@ -1715,8 +1715,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00088134	344			unknown	unclassified	unverified		
 0x0008828c	34	clear_input_state_block	misc_state	compiles	game	confirmed	decomp/tests/0x0008828c.json	docs/compiler-abi.md; clear bytes 0x12d7aa..ac and word 0x20f196; callers 8846c@8846f; guest pending
 0x000882b0	282			unknown	unclassified	unverified		
-0x000883cc	157			unknown	unclassified	unverified		
-0x0008846c	217			unknown	unclassified	unverified		
+0x000883cc	157	step_object_883cc	game_helpers48	compiles	game	confirmed	decomp/tests/0x000883cc.json	docs/compiler-abi.md; Step one object: run its handler when it is alive and has one.; callers 8846c@884b3; guest pending
+0x0008846c	217	step_objects_8846c	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008846c.json	docs/compiler-abi.md; Step every object of the ring and publish the visible ones.; callers 3dcb0@3dcb5; guest pending
 0x00088548	42	reset_target_search	scene_helpers	compiles	game	confirmed	decomp/tests/0x00088548.json	docs/compiler-abi.md; dwords 0x20f14c=0x7fffffff 0x20f154=0 0x20f150=filtered lookup; callers 8846c@88474; guest pending
 0x00088574	239			unknown	unclassified	unverified		
 0x00088664	106			unknown	unclassified	unverified		
@@ -1805,12 +1805,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008ca24	194			unknown	unclassified	unverified		
 0x0008cae8	120	reset_slot_entries_8cae8	game_helpers32	compiles	game	confirmed	decomp/tests/0x0008cae8.json	docs/compiler-abi.md; Fill an object's 20 slot entries from the defaults table and reset its cursor.; callers 8cb60@8cb83; guest pending
 0x0008cb60	222			unknown	unclassified	unverified		
-0x0008cc40	171			unknown	unclassified	unverified		
+0x0008cc40	171	set_unit_speed_8cc40	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008cc40.json	docs/compiler-abi.md; Set a unit's base speed from its type and add 2 when the trigger fires.; callers 8c49c@8c807; guest pending
 0x0008ccec	90	reset_unit_links_8ccec	game_helpers30	compiles	game	confirmed	decomp/tests/0x0008ccec.json	docs/compiler-abi.md; Reset a unit's link slots to 0xff.; callers 8c49c@8c800; guest pending
 0x0008cd48	46	select_object_8cd48	scene_helpers	compiles	game	confirmed	decomp/tests/0x0008cd48.json	docs/compiler-abi.md; word 0x12db60=1; 0x8c0f0(0); store signed word at 0x1f71d0 and obj+0x16 unless -1; callers 49228@4970e; guest pending
 0x0008cd78	406			unknown	unclassified	unverified		
 0x0008cf10	287			unknown	unclassified	unverified		
-0x0008d030	176			unknown	unclassified	unverified		
+0x0008d030	176	check_cell_trigger_8d030	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008d030.json	docs/compiler-abi.md; Fire the cell trigger when the player's unit stands on a special terrain value.; callers 8dd48@8de90; guest pending
 0x0008d0e0	57	mark_ui_links_by_slot	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x0008d0e0.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0008d11c	531			unknown	unclassified	unverified		
 0x0008d330	161			unknown	unclassified	unverified		

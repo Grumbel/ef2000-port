@@ -2794,4 +2794,18 @@ void guest_fn_dc91c(ef_addr32 out, ef_addr32 a, ef_addr32 b); /* 0xdc91c EAX/EDX
 void guest_fn_91afc(int32_t a, uint32_t b); /* 0x91afc EAX/EDX */
 void guest_fn_c4654(uint32_t a, uint32_t b, uint32_t c); /* 0xc4654 cdecl */
 
+/* game_helpers48.c */
+void step_object_883cc(ef_addr32 object);
+void step_objects_8846c(void);
+void set_unit_speed_8cc40(int16_t unit_id);
+void check_cell_trigger_8d030(void);
+void guest_fn_55aac(ef_addr32 object); /* 0x55aac EAX */
+void guest_fn_89e08(ef_addr32 object); /* 0x89e08 EAX */
+void guest_fn_88134(ef_addr32 object); /* 0x88134 EAX */
+void guest_fn_88574(ef_addr32 object); /* 0x88574 EAX */
+uint32_t guest_fn_237c8(ef_addr32 point); /* 0x237c8 EAX */
+void guest_fn_80b14(ef_addr32 record); /* 0x80b14 EAX */
+uint32_t guest_fn_7b2f4_4(int32_t a, int32_t b, int32_t c, uint32_t d); /* 0x7b2f4 EAX/EDX/EBX/ECX */
+void guest_fn_8cd78(int32_t unit); /* 0x8cd78 EAX */
+
 #endif
