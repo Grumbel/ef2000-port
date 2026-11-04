@@ -2009,7 +2009,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009ae44	517			unknown	unclassified	unverified		
 0x0009b04c	600			unknown	unclassified	unverified		
 0x0009b2a4	961			unknown	unclassified	unverified		
-0x0009b668	278			unknown	unclassified	unverified		
+0x0009b668	278	count_side_tallies_9b668	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009b668.json	docs/compiler-abi.md; Rebuild the per-side tallies: clear the two 0x18-byte tables at 0x40ce70 and 0x40cf78, then for every node of the list a; callers b1e0@b3d7; guest pending
 0x0009b780	287			unknown	unclassified	unverified		
 0x0009b8a0	707			unknown	unclassified	unverified		
 0x0009bb64	64	shift_tables_9bb64	game_helpers6	compiles	game	confirmed	decomp/tests/0x0009bb64.json	docs/compiler-abi.md; Shift the three 20-entry word tables of a record down by one.; callers 9b8a0@9b8c0,9b8a0@9b8e0,9b8a0@9b900; guest pending

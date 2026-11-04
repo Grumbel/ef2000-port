@@ -7104,3 +7104,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7bc0` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 7e44@7e65,7104c@71089,7156c@719ce | Pick a roster slot for the unit UNIT (AX, signed) in group GROUP (DL): keep the unit's own slot (byte +0x20b) when it st |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9b668` | none | none | b1e0@b3d7 | Rebuild the per-side tallies: clear the two 0x18-byte tables at 0x40ce70 and 0x40cf78, then for every node of the list a |

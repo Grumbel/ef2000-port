@@ -9784,3 +9784,32 @@ uint32_t pick_roster_slot_7bc0(uint32_t unit, uint32_t group)
     assign_roster_slot_740e4((uint32_t)id, EF_U8(u + 0x209u), EF_U8(u + 0x20au), EF_U8(u + 0x16du), best);
     return best;
 }
+
+/* 0x9b668, 278 bytes. Rebuild the per-side tallies: clear the two 0x18-byte tables at 0x40ce70 and 0x40cf78, then for every node of the list at 0x137970 whose type byte +0xd is 0, 2, 3 or 4 test its entry byte +0xe against the list 0x137980 (positive 0xcc22c, else negative 0xcc1ac, else zero 0xcc1ec) and increment the matching word (+0, +4 or +2) of the 6-byte row selected by the node's side byte +0xb in both tables. */
+void count_side_tallies_9b668(void)
+{
+    ef_addr32 node;
+    uint32_t row;
+    uint32_t off;
+    uint32_t t;
+    uint32_t idx;
+    fill_bytes_b3fb0(0x0040ce70u, 0u, 0x18u);
+    fill_bytes_b3fb0(0x0040cf78u, 0u, 0x18u);
+    for (node = EF_U32(0x00137970u); node != 0u; node = EF_U32(node + 4u)) {
+        t = EF_U8(node + 0xdu);
+        if (!(t == 0u || t == 2u || t == 3u || t == 4u))
+            continue;
+        idx = EF_U8(node + 0xeu);
+        if ((uint16_t)group_flag_positive_cc22c(0u, idx, 0x00137980u) != 0u)
+            off = 0u;
+        else if ((uint16_t)group_flag_negative_cc1ac(0u, idx, 0x00137980u) != 0u)
+            off = 4u;
+        else if ((uint16_t)group_flag_zero_cc1ec(0u, idx, 0x00137980u) != 0u)
+            off = 2u;
+        else
+            continue;
+        row = (uint32_t)EF_U8(node + 0xbu) * 6u + off;
+        EF_U16(0x0040ce70u + row) = (uint16_t)(EF_U16(0x0040ce70u + row) + 1u);
+        EF_U16(0x0040cf78u + row) = (uint16_t)(EF_U16(0x0040cf78u + row) + 1u);
+    }
+}
