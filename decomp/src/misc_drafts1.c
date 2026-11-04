@@ -21540,3 +21540,28 @@ uint32_t alloc_picture_c3670(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t 
 	guest_fn_c36b4(eax, (uint32_t)(int32_t)(int16_t)edx, (uint32_t)(int32_t)(int16_t)ebx, (uint32_t)w, (uint32_t)s, blk);
 	return blk;
 }
+
+/* 0x1177ad, 71 bytes. Implicit-register fragment (ESI = source pointer, ECX = fractional step accumulator, EDX = gain table, EDI = destination pointer; ESI, ECX and EDI are updated through the pointers): mix stereo 16-bit samples into the dword buffer at EDI, scaling the second word by table[0] and the first by table[0x100] (>> 7). ESI advances by the dword at 0x17e288 + carry*4 where carry comes from adding the dword at 0x17e284 to ECX; stops at the source end (0x17e278) or the destination end (0x17e280). */
+void mix_samples_1177ad(uint32_t *esi, uint32_t *ecx, uint32_t edx, uint32_t *edi)
+{
+	for (;;) {
+		uint32_t bx, ax, sum, carry;
+		int32_t t;
+
+		if (*esi >= EF_U32(0x17e278u))
+			return;
+		bx = EF_U16(*esi);
+		ax = EF_U16(*esi + 2u);
+		sum = *ecx + EF_U32(0x17e284u);
+		carry = (sum < *ecx) ? 1u : 0u;
+		*ecx = sum;
+		*esi += EF_U32(0x17e288u + carry * 4u);
+		t = (int32_t)((int32_t)(int16_t)ax * EF_S32(edx)) >> 7;
+		EF_U32(*edi) += (uint32_t)t;
+		t = (int32_t)((int32_t)(int16_t)bx * EF_S32(edx + 0x400u)) >> 7;
+		EF_U32(*edi + 4u) += (uint32_t)t;
+		*edi += 8u;
+		if (*edi >= EF_U32(0x17e280u))
+			return;
+	}
+}

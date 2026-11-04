@@ -4131,7 +4131,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00115871	275			unknown	unclassified	unverified		
 0x00115984	5	tail_jump_115984	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00115984.json	docs/compiler-abi.md; tail jump. Forward to 0xfa9a0.; callers 105024@105068,105070@10511c; guest pending
 0x00115989	61	file_size_115989	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x00115989.json	docs/compiler-abi.md; Size of an open file: remember the position, seek to the end, seek back; -1 when the position query fails.; callers 105024@105050; guest pending
-0x001177ad	71			unknown	unclassified	unverified		
+0x001177ad	71	mix_samples_1177ad	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001177ad.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source pointer, ECX = fractional step accumulator, EDX = gain table, EDI = destination; callers 1177f4@117949; guest pending
 0x001177f4	539			unknown	unclassified	unverified		
 0x00117a0f	147			unknown	unclassified	unverified		
 0x00117aa2	44	clear_buffer_117aa2	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00117aa2.json	docs/compiler-abi.md; Zero the buffer at +0x50 (length at +0x4c) of a record (cdecl, record on the stack).; callers 105648@105713,10585c@1058b3,10585c@105c60; guest pending

@@ -9210,3 +9210,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x10db7e` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 10da50@10dad1 | Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = decoder table base, ECX preserved |
 | `0xc3670` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 1f0c8@1f0ee,4b1f0@4b2ae,69fac@6a02b | Stack (ret 4): allocate a pool block of (int16)cx * (int16)size bytes, look its id up and draw into it with 0xc36b4 (EAX |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1177ad` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 1177f4@117949 | Implicit-register fragment (ESI = source pointer, ECX = fractional step accumulator, EDX = gain table, EDI = destination |

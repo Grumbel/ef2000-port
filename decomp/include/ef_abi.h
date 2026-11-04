@@ -6340,4 +6340,7 @@ uint32_t alloc_picture_c3670(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t 
 uint32_t decode_distance_10db7e(uint32_t *esi, uint32_t *eax, uint32_t ebp, uint32_t ecx); /* 0x10db7e */
 uint32_t alloc_picture_c3670(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t size); /* 0xc3670 */
 
+void mix_samples_1177ad(uint32_t *esi, uint32_t *ecx, uint32_t edx, uint32_t *edi);
+void mix_samples_1177ad(uint32_t *esi, uint32_t *ecx, uint32_t edx, uint32_t *edi); /* 0x1177ad */
+
 #endif
