@@ -22842,3 +22842,21 @@ double frexp_120a60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x
 	EF_S32(exp_out) = e;
 	return x;
 }
+
+/* 0x16000c, 80 bytes. Store six words and two more into the rotation input block, then call setup_rotation_c4565. */
+void setup_rotation_args_16000c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+	uint32_t a8, uint32_t ac, uint32_t a10, uint32_t a14,
+	uint32_t a18, uint32_t a1c, uint32_t a20, uint32_t a24)
+{
+	uint32_t esi = 0x16005c;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	EF_U16(0x160062) = (uint16_t)a1c;
+	EF_U16(0x160064) = (uint16_t)a18;
+	EF_U16(0x160066) = (uint16_t)a14;
+	EF_U16(0x160068) = (uint16_t)a10;
+	EF_U16(0x16006a) = (uint16_t)ac;
+	EF_U16(0x16006c) = (uint16_t)a8;
+	EF_U16(0x160072) = (uint16_t)a24;
+	EF_U16(0x160070) = (uint16_t)a20;
+	setup_rotation_c4565(&esi);
+}

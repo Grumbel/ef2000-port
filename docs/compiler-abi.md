@@ -9421,3 +9421,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x120a60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:ef_addr32 | EAX:double | 120560@1205e8 | C frexp(x, int *exp): for a non-zero value store (biased exponent - 0x3fe) to *EXP and return the value with its exponen |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x16000c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:uint32_t,[ESP+28]:uint32_t,[ESP+32]:uint32_t | none | 7b3fc@7b559,7b3fc@7b5a3,7b7d8@7b88e | Store six words and two more into the rotation input block, then call setup_rotation_c4565. |

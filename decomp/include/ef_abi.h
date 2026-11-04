@@ -6465,4 +6465,9 @@ void decode_planes_10dfec(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef
 double frexp_120a60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, ef_addr32 exp_out);
 double frexp_120a60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, ef_addr32 exp_out); /* 0x120a60 */
 
+void setup_rotation_args_16000c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+	uint32_t a8, uint32_t ac, uint32_t a10, uint32_t a14,
+	uint32_t a18, uint32_t a1c, uint32_t a20, uint32_t a24);
+void setup_rotation_args_16000c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a8, uint32_t ac, uint32_t a10, uint32_t a14, uint32_t a18, uint32_t a1c, uint32_t a20, uint32_t a24); /* 0x16000c */
+
 #endif
