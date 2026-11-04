@@ -3548,4 +3548,11 @@ void guest_fn_7f850_x(uint32_t a); /* 0x7f850 EAX */
 uint8_t scan_code_weight_cbd30(uint8_t code);
 uint8_t read_saved_tables_e34e8(void);
 
+/* game_helpers72.c */
+uint8_t forward_cursor_vector_845c0(void);
+void latch_scene_camera_944f4(void);
+void guest_fn_842b4_x(void); /* 0x842b4 */
+void guest_fn_84394_x(uint32_t vec, uint32_t dx, uint32_t bx); /* 0x84394 EAX/EDX/EBX */
+void guest_fn_c8d30_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0xc8d30 EAX/EDX/EBX/ECX + stack */
+
 #endif

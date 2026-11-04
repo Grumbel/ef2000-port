@@ -3976,3 +3976,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xcbd30` | AL:uint8_t | AL:uint8_t | caa28@cab5f | Weight for a scan code (0 when unmapped); the original is a binary decision tree. |
 | `0xe34e8` | none | AL:uint8_t | 3dd30@3e216 | Read back the saved table blocks through the indirect readers; returns whether a record id is set. |
+
+## game_helpers72 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x845c0` | none | AL:uint8_t | none direct | Forward the cursor vector, redoing it once when the hit test accepts the position. |
+| `0x944f4` | none | none | 95e58@96bcb | Latch the camera position and place the scene with the negated view angles. |

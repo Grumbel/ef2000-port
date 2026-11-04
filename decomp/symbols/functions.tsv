@@ -1608,7 +1608,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00084514	47	initialize_ui_component	ui_secondary	compiles	game	confirmed	decomp/tests/0x00084514.json	docs/compiler-abi.md; host model; guest differential pending
 0x00084544	93	refresh_panel_84544	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x00084544.json	docs/compiler-abi.md; Refresh the view, re-centre if the cursor left it, and redraw the panel.; callers none direct; guest pending
 0x000845a4	25	set_pending_mode_two	status_values	compiles	game	confirmed	decomp/tests/0x000845a4.json	docs/compiler-abi.md; Word 0x12b4a6=2, byte 0x1fcc43=1, AL=0 (AH=1); sole direct caller 84678@846ab; guest pending
-0x000845c0	91			unknown	unclassified	unverified		
+0x000845c0	91	forward_cursor_vector_845c0	game_helpers72	compiles	game	confirmed	decomp/tests/0x000845c0.json	docs/compiler-abi.md; Forward the cursor vector, redoing it once when the hit test accepts the position.; callers none direct; guest pending
 0x0008461c	52	advance_state_8461c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0008461c.json	docs/compiler-abi.md; ; callers 84678@846b2; guest pending
 0x00084650	17	unsupported_84650	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x00084650.json	docs/compiler-abi.md; Unsupported feature: abort and report failure.; callers 84678@846bf; guest pending
 0x00084678	79			unknown	unclassified	unverified		
@@ -1923,7 +1923,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000942cc	162			unknown	unclassified	unverified		
 0x00094370	162			unknown	unclassified	unverified		
 0x00094484	109	update_camera_94484	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094484.json	docs/compiler-abi.md; ; callers 95e58@9619b; guest pending
-0x000944f4	135			unknown	unclassified	unverified		
+0x000944f4	135	latch_scene_camera_944f4	game_helpers72	compiles	game	confirmed	decomp/tests/0x000944f4.json	docs/compiler-abi.md; Latch the camera position and place the scene with the negated view angles.; callers 95e58@96bcb; guest pending
 0x0009457c	583			unknown	unclassified	unverified		
 0x000947c4	108	look_at_unit_947c4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000947c4.json	docs/compiler-abi.md; ; callers 95e58@9693f; guest pending
 0x00094830	78	look_from_player_94830	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094830.json	docs/compiler-abi.md; ; callers 95e58@968fa; guest pending
