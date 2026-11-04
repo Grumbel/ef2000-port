@@ -4010,7 +4010,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010e46f	73	unsigned_to_text	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e46f.json	docs/compiler-abi.md; Convert EAX to text in radix EBX at EDX using the digit table at 0x10e44a; * returns the destination start.; callers ed6cc@ed989,10e4b8@10e4ca; guest pending
 0x0010e4b8	27	signed_to_text	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e4b8.json	docs/compiler-abi.md; Signed conversion: radix 10 negatives get a leading '-'.; callers ed6cc@ed855,ed6cc@ed88f; guest pending
 0x0010e4d3	10	run_with_ebx_10e4d3	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0010e4d3.json	docs/compiler-abi.md; Run 0x10e4dd with the second argument also in EBX.; callers edb2d@edb92,110130@110160; guest pending
-0x0010e4dd	219			unknown	unclassified	unverified		
+0x0010e4dd	219	eval_binary_record_10e4dd	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e4dd.json	docs/compiler-abi.md; Evaluate a binary-operation record: FLAGS (EAX) selects the operation kind (bits 0x40, 0x80, then 0x100, 0x800, 0x200, 0; callers 10e4d3@10e4d6; guest pending
 0x0010e7b5	89			unknown	unclassified	unverified		
 0x0010e837	59	is_leap_year	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e837.json	docs/compiler-abi.md; Gregorian leap year.; callers f118d@f11e6,10e872@10e88d,10e97f@10e9d6; guest pending
 0x0010e872	229			unknown	unclassified	unverified		

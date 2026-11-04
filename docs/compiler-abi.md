@@ -6605,3 +6605,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xed5ea` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t | none | ed6cc@ed817 | Format the 16.16 fixed-point VALUE as decimal text at BUF with the precision in dword +8 of the format record FMT (-1 se |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10e4dd` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:double | 10e4d3@10e4d6 | Evaluate a binary-operation record: FLAGS (EAX) selects the operation kind (bits 0x40, 0x80, then 0x100, 0x800, 0x200, 0 |

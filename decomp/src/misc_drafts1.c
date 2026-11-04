@@ -7399,3 +7399,48 @@ void format_fixed_ed5ea(uint32_t buf, int32_t value, uint32_t fmt)
         }
     }
 }
+
+/* 0x10e4dd, 219 bytes. Evaluate a binary-operation record: FLAGS (EAX) selects the operation kind (bits 0x40, 0x80, then 0x100, 0x800, 0x200, 0x400 give kinds 1,2,3,4,6,5), the handler is the dword at 0x17d49c[FLAGS & 0x1f], and FLAGS bits 0x1000/0x2000/0x4000/0x8000 pick the result operand (-const at 0x195bf4, 0.0, 1.0, +const, else the double at B). A, B are 8-byte operands copied into the record; 0x45b60 evaluates it and its double result is returned. */
+double eval_binary_record_10e4dd(uint32_t flags, uint32_t a, uint32_t b)
+{
+    uint32_t rec[10];
+    uint32_t kind = 0u; /* ORIGINAL BUG: ESI is uninitialised when no kind bit is set */
+    uint32_t lo, hi;
+    rec[2] = EF_U32(a);
+    rec[3] = EF_U32(a + 4u);
+    rec[4] = EF_U32(b);
+    rec[5] = EF_U32(b + 4u);
+    if (flags & 0x40u)
+        kind = 1u;
+    else if (flags & 0x80u)
+        kind = 2u;
+    else if (flags & 0x100u)
+        kind = 3u;
+    else if (flags & 0x800u)
+        kind = 4u;
+    else if (flags & 0x200u)
+        kind = 6u;
+    else if (flags & 0x400u)
+        kind = 5u;
+    rec[0] = kind;
+    rec[1] = EF_U32(0x0017d49cu + (flags & 0x1fu) * 4u);
+    if (flags & 0x1000u) {
+        lo = EF_U32(0x00195bf4u);
+        hi = EF_U32(0x00195bf8u) ^ 0x80000000u;
+    } else if (flags & 0x2000u) {
+        lo = 0u;
+        hi = 0u;
+    } else if (flags & 0x4000u) {
+        lo = 0u;
+        hi = 0x3ff00000u;
+    } else if (flags & 0x8000u) {
+        lo = EF_U32(0x00195bf4u);
+        hi = EF_U32(0x00195bf8u);
+    } else {
+        lo = EF_U32(b);
+        hi = EF_U32(b + 4u);
+    }
+    rec[6] = lo;
+    rec[7] = hi;
+    return object_double_value_45b60((ef_addr32)(uintptr_t)rec);
+}

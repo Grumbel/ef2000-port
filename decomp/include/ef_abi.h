@@ -5122,4 +5122,6 @@ void build_rotation_words_dc43e(uint32_t ebx, uint32_t esi, uint32_t edi);
 
 void format_fixed_ed5ea(uint32_t buf, int32_t value, uint32_t fmt);
 
+double eval_binary_record_10e4dd(uint32_t flags, uint32_t a, uint32_t b);
+
 #endif
