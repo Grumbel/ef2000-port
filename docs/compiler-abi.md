@@ -3884,3 +3884,9 @@ in EAX, format string address, one value).
 | `0x8bb50` | none | none | 3dd30@3dff0 | Per-frame selection refresh; mirrors the saved camera into the unit table. |
 | `0x93060` | none | none | 95e58@96bb3 | Point the scene camera at the current weapon station's object. |
 | `0x95ae0` | none | none | 95e58@96717 | Set up the scene camera from the pending target record, or a default view. |
+
+## game_helpers60 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbeb20` | AL:uint8_t | EAX:uint32_t | bed1c@bed9a | Map a keyboard scan code to the 1..23 index of the matching function key, 0 for none. |

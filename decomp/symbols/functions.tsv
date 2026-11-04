@@ -2686,7 +2686,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000be59c	477			unknown	unclassified	unverified		
 0x000be77c	104			unknown	unclassified	unverified		
 0x000be7e4	827			unknown	unclassified	unverified		
-0x000beb20	353			unknown	unclassified	unverified		
+0x000beb20	353	scan_code_to_function_key_beb20	game_helpers60	compiles	game	confirmed	decomp/tests/0x000beb20.json	docs/compiler-abi.md; Map a keyboard scan code to the 1..23 index of the matching function key, 0 for none.; callers bed1c@bed9a; guest pending
 0x000bec84	59	is_active_bec84	list_helpers	compiles	game	confirmed	decomp/tests/0x000bec84.json	docs/compiler-abi.md; ; callers becc0@becde,faafc@fab1a,fabf0@fac0e; guest pending
 0x000becc0	55	count_valid_entries_becc0	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000becc0.json	docs/compiler-abi.md; Count the 21-byte entries of the object that pass the check.; callers becf8@bed07,fac78@facb1,fac78@facd1; guest pending
 0x000becf8	36	record_pending_becf8	list_lookup	compiles	game	confirmed	decomp/tests/0x000becf8.json	docs/compiler-abi.md; 1 when 0xbc7ec(record) is zero and 0xbecc0(record) is nonzero.; callers bed1c@bed72; guest pending

@@ -3457,4 +3457,10 @@ void guest_fn_7e7e0_w(uint32_t a, uint32_t b); /* 0x7e7e0 EAX/EDX */
 void guest_fn_92ffc_w(void); /* 0x92ffc */
 void guest_fn_957c8_w(uint32_t a); /* 0x957c8 EAX */
 
+/* game_helpers60.c */
+uint32_t scan_code_to_function_key_beb20(uint8_t code);
+
+/* game_helpers60.c */
+uint32_t scan_code_to_function_key_beb20(uint8_t code);
+
 #endif
