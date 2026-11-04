@@ -6213,4 +6213,9 @@ double acos_neg_e7df4(double x); /* 0xe7df4 */
 double one_minus_pow_11b4bc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg); /* 0x11b4bc */
 double clamped_sin_acos_11b4e0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg); /* 0x11b4e0 */
 
+double profile_term_11b5a8(uint32_t a, uint32_t d, uint32_t b, uint32_t c, double p, double q);
+double profile_term_ratio_11b9ac(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t e, double p, double q);
+double profile_term_11b5a8(uint32_t a, uint32_t d, uint32_t b, uint32_t c, double p, double q); /* 0x11b5a8 */
+double profile_term_ratio_11b9ac(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t e, double p, double q); /* 0x11b9ac */
+
 #endif

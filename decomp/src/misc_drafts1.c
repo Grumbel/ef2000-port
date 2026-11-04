@@ -20818,3 +20818,24 @@ double clamped_sin_acos_11b4e0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
 		t = -1.0;
 	return -sin_b45ac(acos_neg_e7df4(t));
 }
+
+/* 0x11b5a8, 156 bytes. EAX=A, EDX=D, EBX=B, ECX=C are guest pointers (A+0x20, B+0x00/0x10, D+0x18 and the double at C are read); stack: two doubles P, Q (ret 0x10). With d = (1-pow(1-B[0x10]/A[0x20],1.4)) - (1-pow(1-B[0]/A[0x20],1.4)), s = clamped_sin_acos(*C) and w = scaled_call_11b588(*C): u = 1 - D[0x18]*0.15/s and the result is ratio_formula_11b134(D, P, Q) * w / Q * u * d. */
+double profile_term_11b5a8(uint32_t a, uint32_t d, uint32_t b, uint32_t c, double p, double q)
+{
+	double r1 = one_minus_pow_11b4bc(0u, 0u, 0u, 0u, md_rd_f64(b + 0x10u) / md_rd_f64(a + 0x20u));
+	double r2 = one_minus_pow_11b4bc(0u, 0u, 0u, 0u, md_rd_f64(b) / md_rd_f64(a + 0x20u));
+	double diff = r1 - r2;
+	double cv = md_rd_f64(c);
+	double prod = md_rd_f64(d + 0x18u) * md_rd_f64(0x001958c4u);
+	double s = clamped_sin_acos_11b4e0(0u, 0u, 0u, 0u, cv);
+	double u = 1.0 - prod / s;
+	double w = scaled_call_11b588(cv);
+	return ratio_formula_11b134(d, p, q) * w / q * u * diff;
+}
+
+/* 0x11b9ac, 61 bytes. EAX=A, EDX=D, EBX=B, ECX=C pointers; stack: pointer E, then two doubles P, Q (ret 0x14). Returns (double at B / double at A) * profile_term_11b5a8(D, B, E, C, P, Q) (EAX, EDX, EBX, ECX of the callee in that order). */
+double profile_term_ratio_11b9ac(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t e, double p, double q)
+{
+	double ratio = md_rd_f64(b) / md_rd_f64(a);
+	return ratio * profile_term_11b5a8(d, b, e, c, p, q);
+}
