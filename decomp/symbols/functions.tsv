@@ -3344,7 +3344,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e2af4	95	arena_free_e2af4	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e2af4.json	docs/compiler-abi.md; Free a block of the arena; the arena resets when the last block is freed.; callers 36438@36611,3c434@3c439,3c6c0@3c718; guest pending
 0x000e2b54	6	get_global_e2b54	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000e2b54.json	docs/compiler-abi.md; ; callers c32dc@c32e0; guest pending
 0x000e2b60	38	integer_sqrt	math_string	compiles	game	confirmed	decomp/tests/0x000e2b60.json	docs/compiler-abi.md; Bitwise unsigned integer square root.; callers 39cb4@39d4b,91c00@91c17,d13ac@d13c1; guest pending
-0x000e2ba0	157			unknown	unclassified	unverified		
+0x000e2ba0	157	fill_diamond_e2ba0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e2ba0.json	docs/compiler-abi.md; Fill a diamond of colour COLOR (byte) into the 8-bit frame buffer: top row at Y - SIZE, starting 1 pixel wide at column ; callers e2c40@e2ceb; guest pending
 0x000e2c40	546			unknown	unclassified	unverified		
 0x000e2fd5	6	get_address_e2fd5	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000e2fd5.json	docs/compiler-abi.md; ; callers e2fdb@e2fdc; guest pending
 0x000e2fdb	36	random_lcg	math_string	compiles	game	confirmed	decomp/tests/0x000e2fdb.json	docs/compiler-abi.md; Linear congruential generator on the seed at the * pointer returned by 0xe2fd5: seed = seed*0x41c64e6d + 0x3039, result ; callers 3ce04@3ce07; guest pending
@@ -3363,7 +3363,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e393c	401	stream_saved_tables_e393c	game_helpers68	compiles	game	confirmed	decomp/tests/0x000e393c.json	docs/compiler-abi.md; Stream the saved table blocks (sizes scale with the count at 0x146e50).; callers e3ad0@e3add; guest pending
 0x000e3ad0	134	reload_halfword_table_e3ad0	game_helpers65	compiles	game	confirmed	decomp/tests/0x000e3ad0.json	docs/compiler-abi.md; Reload the halfword table one step at a time; returns whether more steps remain.; callers 97dcc@97ee7; guest pending
 0x000e3b58	34	release_saved_handle_e3b58	game_helpers29	compiles	game	confirmed	decomp/tests/0x000e3b58.json	docs/compiler-abi.md; Release the saved handle, if any.; callers 97dcc@97f4b; guest pending
-0x000e3b7c	158			unknown	unclassified	unverified		
+0x000e3b7c	158	check_data_file_e3b7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e3b7c.json	docs/compiler-abi.md; Check a data file: open NAME, read a 2-byte header into 0x15f900 and a 4-byte length, and succeed (1) only when the leng; callers 97dcc@97dd9; guest pending
 0x000e3c20	63	next_pool_record_e3c20	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e3c20.json	docs/compiler-abi.md; Take the next 36-byte record of the 1000-record pool.; callers c4389@c438b; guest pending
 0x000e3c60	11	set_pointer_e3c60	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000e3c60.json	docs/compiler-abi.md; Set the 0x159134 pointer to its default.; callers c8c34@c4550,e4188@e423e; guest pending
 0x000e3c6c	61	select_page_e3c6c	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e3c6c.json	docs/compiler-abi.md; Resolve a page slot from the 0x190a44 chain and store it in 0x159134.; callers none direct; guest pending

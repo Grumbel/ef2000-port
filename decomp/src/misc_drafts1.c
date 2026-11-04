@@ -3709,3 +3709,54 @@ void try_take_target_89ac0(uint32_t obj)
     EF_U16(obj + 0x56u) = EF_U16(tgt + 0x16u);
     EF_U32(tgt + 0x1cu) = obj;
 }
+
+/* 0xe3b7c, 158 bytes. Check a data file: open NAME, read a 2-byte header into 0x15f900 and a 4-byte length, and succeed (1) only when the length equals the file size (0xa7ae0) and the header word is nonzero. The handle is always closed. */
+uint8_t check_data_file_e3b7c(uint32_t name)
+{
+    int32_t h = open_slot_a7900(0u, 0u, 0u, 0u, name);
+    uint32_t len;
+    if (h == -1)
+        return 0u;
+    if (read_handle_a79d4(0u, 0u, 0u, 0u, (uint32_t)h, 2u, 0x0015f900u) != 2u) {
+        close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)h);
+        return 0u;
+    }
+    {
+        uint32_t tmp = 0u;
+        if (read_handle_a79d4(0u, 0u, 0u, 0u, (uint32_t)h, 4u, (uint32_t)(uintptr_t)&tmp) != 4u) {
+            close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)h);
+            return 0u;
+        }
+        len = tmp;
+    }
+    if (seek_end_a7ae0(0u, 0u, 0u, 0u, (uint32_t)h, 0u) != len) {
+        close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)h);
+        return 0u;
+    }
+    close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)h);
+    return EF_U16(0x0015f900u) != 0u ? 1u : 0u;
+}
+
+/* 0xe2ba0, 157 bytes. Fill a diamond of colour COLOR (byte) into the 8-bit frame buffer: top row at Y - SIZE, starting 1 pixel wide at column X and widening by two pixels per row (shifting one column left) until 2 * SIZE, then narrowing again. */
+void fill_diamond_e2ba0(uint32_t color, uint32_t x, uint32_t y, uint32_t size)
+{
+    uint32_t pitch = EF_U32(0x001631f4u);
+    int16_t cx = (int16_t)size;
+    int16_t row = (int16_t)(y - (uint32_t)(int32_t)cx);
+    uint32_t p = (uint32_t)(int32_t)(int16_t)x + EF_U32(0x0015b754u) + EF_U32(0x00163200u + (uint32_t)(int32_t)row * 4u);
+    int16_t w = 1;
+    int16_t n;
+    while ((int32_t)w < (int32_t)cx * 2) {
+        for (n = 0; n < w; n++)
+            EF_U8(p++) = (uint8_t)color;
+        p += pitch - (uint32_t)(int32_t)n - 1u;
+        w = (int16_t)(w + 2);
+    }
+    while (w > 0) {
+        for (n = 0; n < w; n++)
+            EF_U8(p++) = (uint8_t)color;
+        p += pitch - (uint32_t)(int32_t)n + 1u;
+        w = (int16_t)(w - 2);
+    }
+    EF_U32(0x001631f4u) = pitch;
+}

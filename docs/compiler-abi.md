@@ -5860,3 +5860,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x89ac0` | EAX:uint32_t | none | 8a318@8a54c | When the object's target record (object+0x30 -> +0x4b) is in range (0x89b58), may be swapped in as the object's own targ |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe3b7c` | EAX:uint32_t | AL:uint8_t | 97dcc@97dd9 | Check a data file: open NAME, read a 2-byte header into 0x15f900 and a 4-byte length, and succeed (1) only when the leng |
+| `0xe2ba0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | e2c40@e2ceb | Fill a diamond of colour COLOR (byte) into the 8-bit frame buffer: top row at Y - SIZE, starting 1 pixel wide at column  |

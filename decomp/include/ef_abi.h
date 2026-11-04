@@ -4788,4 +4788,7 @@ uint32_t find_node_b4db0(uint32_t head_a, uint32_t head_b, uint32_t kind, uint32
 void try_take_target_89ac0(uint32_t obj);
 uint32_t guest_fn_89b58_x(uint32_t obj); /* 0x89b58 EAX -> AL */
 
+uint8_t check_data_file_e3b7c(uint32_t name);
+void fill_diamond_e2ba0(uint32_t color, uint32_t x, uint32_t y, uint32_t size);
+
 #endif
