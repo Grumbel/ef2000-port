@@ -7895,3 +7895,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x72390` | EAX:uint32_t | none | 8d3d4@8d464 | Move unit ID (AX) one tick: dt = word 0x127d92 * double 0x186a69 (stored at 0x1f7188); the velocity (doubles +0xa1, +0xb |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x848e0` | EAX:ef_addr32,EDX:ef_addr32 | none | 601c@60a0 | Refresh the view cursor record REC (EDX) from the camera block SRC (EAX: 12 bytes copied to 0x1fcc14, 6 bytes from +0xc  |

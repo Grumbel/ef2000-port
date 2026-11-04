@@ -1614,7 +1614,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00084678	79	run_state_handler_84678	small_wrappers7	compiles	game	confirmed	decomp/tests/0x00084678.json	docs/compiler-abi.md; Advance the page counter, run the transition selected by bits 3..5 of the word at 0x1fcbe2 (1..4), then call the handler; callers 92f98@92faa; guest pending
 0x000846c8	190	reset_unit_view_846c8	game_helpers47	compiles	game	confirmed	decomp/tests/0x000846c8.json	docs/compiler-abi.md; Reset a unit record to its idle state and rebuild the draw defaults.; callers 848e0@84932; guest pending
 0x00084788	342	latch_control_bits_84788	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00084788.json	docs/compiler-abi.md; Latch the control bits of the flight record REC into the global control word 0x1fcbe2: clear bits 0 and 7 of its low byt; callers 848e0@84939; guest pending
-0x000848e0	280			unknown	unclassified	unverified		
+0x000848e0	280	refresh_view_cursor_848e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000848e0.json	docs/compiler-abi.md; Refresh the view cursor record REC (EDX) from the camera block SRC (EAX: 12 bytes copied to 0x1fcc14, 6 bytes from +0xc ; callers 601c@60a0; guest pending
 0x00084a80	60	unit_has_slot_84a80	game_helpers6	compiles	game	confirmed	decomp/tests/0x00084a80.json	docs/compiler-abi.md; Does the unit own a slot of kind 0x21 or 0x22?; callers 848e0@848ef; guest pending
 0x00084ac4	15	QuitEF2000Yes		named	unclassified	unverified		
 0x00084aec	15	QuitEF2000No		named	unclassified	unverified		

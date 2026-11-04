@@ -13665,3 +13665,40 @@ void move_unit_72390(uint32_t id)
     EF_U8(u + 0x26u) = (uint8_t)(EF_U8(u + 0x26u) & 0xefu);
     guest_fn_73d50_w((int16_t)id);
 }
+
+/* 0x848e0, 280 bytes. Refresh the view cursor record REC (EDX) from the camera block SRC (EAX: 12 bytes copied to 0x1fcc14, 6 bytes from +0xc to 0x1fcc20, dword 0x1fcc26 = SRC+0x12 >> 16). Does nothing unless the unit of word 0x1f71c8 has a slot (0x84a80). Resets the view when REC bit 0x10 of +0x23 is set, latches the control bits, runs 0x83a40 and clears the "placed" bits (0x1fcbe3 bit 0, REC+0x22 bit 0). When the pick point 0x1fcc2c.. is active (byte 0x1fcc43, words 0x1fcbd0/2 clear) and either bit 0x80 of 0x1fcbe2 is set or the point lies outside the bounds (0x832b8) it clears bits 0x38 of 0x1fcbe2 and re-initialises the UI. If bit 0x40 (and not 0x80) of 0x1fcbe2 is then set with the pick point active, mark it placed and copy the point into REC +0, +4, +8; otherwise invalidate REC+4 with 0x80000000. */
+void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec)
+{
+    uint8_t active;
+    uint8_t flags;
+    if (unit_has_slot_84a80((int16_t)((int32_t)EF_U32(0x001f71c8u) >> 16)) == 0u)
+        return;
+    memcpy_dc832(0x001fcc14u, src, 12u);
+    memcpy_dc832(0x001fcc20u, src + 0xcu, 6u);
+    EF_U32(0x001fcc26u) = (uint32_t)((int32_t)EF_U32(src + 0x12u) >> 16);
+    if ((EF_U8(rec + 0x23u) & 0x10u) != 0u)
+        reset_unit_view_846c8(rec);
+    latch_control_bits_84788(rec);
+    guest_fn_83a40_x();
+    EF_U8(0x001fcbe3u) = (uint8_t)(EF_U8(0x001fcbe3u) & 0xfeu);
+    active = EF_U8(0x001fcc43u);
+    EF_U8(rec + 0x22u) = (uint8_t)(EF_U8(rec + 0x22u) & 0xfeu);
+    if (active != 0u && EF_U16(0x001fcbd0u) == 0u && EF_U16(0x001fcbd2u) == 0u) {
+        if ((EF_U8(0x001fcbe2u) & 0x80u) != 0u
+            || box_outside_bounds_832b8((int32_t)EF_U32(0x001fcc2cu), (int32_t)EF_U32(0x001fcc30u), (int32_t)EF_U32(0x001fcc34u)) != 0u) {
+            EF_U8(0x001fcbe2u) = (uint8_t)(EF_U8(0x001fcbe2u) & 0xc7u);
+            initialize_ui_component();
+            run_12d90_pair_13950();
+        }
+    }
+    flags = EF_U8(0x001fcbe2u);
+    if ((flags & 0x40u) != 0u && (flags & 0x80u) == 0u && EF_U8(0x001fcc43u) != 0u) {
+        EF_U8(0x001fcbe3u) = (uint8_t)(EF_U8(0x001fcbe3u) | 1u);
+        EF_U8(rec + 0x22u) = (uint8_t)((EF_U8(rec + 0x22u) & 0xfeu) | 1u);
+        EF_U32(rec) = EF_U32(0x001fcc2cu);
+        EF_U32(rec + 4u) = EF_U32(0x001fcc30u);
+        EF_U32(rec + 8u) = EF_U32(0x001fcc34u);
+        return;
+    }
+    EF_U32(rec + 4u) = 0x80000000u;
+}

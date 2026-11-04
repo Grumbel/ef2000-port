@@ -5675,4 +5675,7 @@ uint8_t offset_in_unit_frame_6e0b0(ef_addr32 out, int32_t a_id, int32_t b_id, ui
 
 void move_unit_72390(uint32_t id);
 
+void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec);
+void guest_fn_83a40_x(void); /* 0x83a40 */
+
 #endif
