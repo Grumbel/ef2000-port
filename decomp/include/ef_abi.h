@@ -5028,4 +5028,7 @@ uint32_t strnlen_far_ed542(uint32_t offset, uint32_t seg, uint32_t max);
 void divmod_store_ea49a(int32_t dividend, int32_t divisor, ef_addr32 result);
 void put_pixel_fedcc(uint32_t row, uint32_t x, uint32_t colour);
 
+void put_block2_feddc(uint32_t row, uint32_t x, uint32_t colour);
+void shift_triples_c59b7(ef_addr32 src, ef_addr32 dst, uint32_t shift);
+
 #endif

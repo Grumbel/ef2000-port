@@ -2804,7 +2804,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c565e	35			unknown	unclassified	unverified		
 0x000c5681	59			unknown	unclassified	unverified		
 0x000c58cc	38	reset_clip_bounds_c58cc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000c58cc.json	docs/compiler-abi.md; Reset three clip bounds; both stack arguments are ignored.; callers none direct; guest pending
-0x000c59b7	35			unknown	unclassified	unverified		
+0x000c59b7	35	shift_triples_c59b7	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c59b7.json	docs/compiler-abi.md; Shift three consecutive dword triples left by SHIFT (CL) with implicit registers (ESI = source, EDI = destination): the ; callers c4680@c4690; guest pending
 0x000c5c24	175			unknown	unclassified	unverified		
 0x000c5cd3	139			unknown	unclassified	unverified		
 0x000c5d8f	115			unknown	unclassified	unverified		
@@ -3782,7 +3782,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fe710	31	set_and_check_video_mode_fe710	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe710.json	docs/compiler-abi.md; Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low; callers cdb20@cdbae,cdc64@cdc83; guest pending
 0x000fe730	666			unknown	unclassified	unverified		
 0x000fedcc	16	put_pixel_fedcc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fedcc.json	docs/compiler-abi.md; Plot one pixel with implicit registers (ESI = row, EBX = x offset, CH = colour): address = row table 0x163200[row] + X +; callers fdf60@fdff2; guest pending
-0x000feddc	29			unknown	unclassified	unverified		
+0x000feddc	29	put_block2_feddc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000feddc.json	docs/compiler-abi.md; Plot a two-pixel-wide, two-row block with implicit registers (ESI = row, EBX = x offset, CH = colour): both bytes of the; callers fdf60@fdfdb; guest pending
 0x000feec8	94	upload_vga_palette_feec8	game_helpers125	compiles	game	confirmed	decomp/tests/0x000feec8.json	docs/compiler-abi.md; Upload a 256-entry RGB palette to the VGA DAC (ports 0x3c8/0x3c9), sending only entries that differ from the shadow copy; callers d663c@d6652; guest pending
 0x000fef26	27	fill_table_fef26	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fef26.json	docs/compiler-abi.md; Fill 192 dwords at 0x17cfc0 with -1.; callers d1d40@d1d75,d1e50@d1eb2; guest pending
 0x000ff3bc	217			unknown	unclassified	unverified		

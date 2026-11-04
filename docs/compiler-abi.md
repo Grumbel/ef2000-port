@@ -6362,3 +6362,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xea49a` | EAX:int32_t,EDX:int32_t,EBX:ef_addr32 | none | 8b328@8b35c | Signed divide helper with implicit registers (EAX = dividend, EDX = divisor, ESI = result pointer): store the quotient a |
 | `0xfedcc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | fdf60@fdff2 | Plot one pixel with implicit registers (ESI = row, EBX = x offset, CH = colour): address = row table 0x163200[row] + X + |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfeddc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | fdf60@fdfdb | Plot a two-pixel-wide, two-row block with implicit registers (ESI = row, EBX = x offset, CH = colour): both bytes of the |
+| `0xc59b7` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | c4680@c4690 | Shift three consecutive dword triples left by SHIFT (CL) with implicit registers (ESI = source, EDI = destination): the  |

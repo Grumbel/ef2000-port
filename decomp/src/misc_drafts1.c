@@ -6403,3 +6403,25 @@ void put_pixel_fedcc(uint32_t row, uint32_t x, uint32_t colour)
 {
     EF_U8(x + EF_U32(0x00163200u + row * 4u) + EF_U32(0x0015b754u)) = (uint8_t)colour;
 }
+
+/* 0xfeddc, 29 bytes. Plot a two-pixel-wide, two-row block with implicit registers (ESI = row, EBX = x offset, CH = colour): both bytes of the word at the row address and at the next row (stride dword 0x1631f4) get the colour. Parameters are given in that register order. */
+void put_block2_feddc(uint32_t row, uint32_t x, uint32_t colour)
+{
+    uint32_t addr = x + EF_U32(0x00163200u + row * 4u) + EF_U32(0x0015b754u);
+    uint16_t w = (uint16_t)(((colour & 0xffu) << 8) | (colour & 0xffu));
+    EF_U16(addr) = w;
+    EF_U16(addr + EF_U32(0x001631f4u)) = w;
+}
+
+/* 0xc59b7, 35 bytes. Shift three consecutive dword triples left by SHIFT (CL) with implicit registers (ESI = source, EDI = destination): the three values of each triple go to destination offsets +0, +0xc and +0x18, the destination advancing by 4 and the source by 12 per triple. Parameters are given in the order source, destination, shift. */
+void shift_triples_c59b7(ef_addr32 src, ef_addr32 dst, uint32_t shift)
+{
+    uint32_t i;
+    for (i = 0u; i < 3u; i++) {
+        EF_U32(dst) = EF_U32(src) << (shift & 31u);
+        EF_U32(dst + 0xcu) = EF_U32(src + 4u) << (shift & 31u);
+        EF_U32(dst + 0x18u) = EF_U32(src + 8u) << (shift & 31u);
+        src += 0xcu;
+        dst += 4u;
+    }
+}
