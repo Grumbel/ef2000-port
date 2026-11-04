@@ -407,7 +407,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000284ec	204			unknown	unclassified	unverified		
 0x000285b8	132	write_save_header_285b8	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x000285b8.json	docs/compiler-abi.md; Write the save file header block for the current game file.; callers 3ea0c@3ec95; guest pending
 0x0002863c	130	read_save_header_2863c	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x0002863c.json	docs/compiler-abi.md; Read the save file header block of the current game file.; callers 3ea0c@3ecac; guest pending
-0x000286c0	131			unknown	unclassified	unverified		
+0x000286c0	131	write_marker_file_286c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000286c0.json	docs/compiler-abi.md; Sibling of 0x28744: build the file name (two formats chosen by 0x15ee9a), open it with 0xa7948, write the 2-byte value 0; callers 3ea0c@3ecda; guest pending
 0x00028744	119	open_named_file_28744	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00028744.json	docs/compiler-abi.md; Sibling of 0x287bc: build the same file name, open it with 0xa7948, run 0xab324 with mode 2 and close the handle.; callers 284ec@285a2,3ea0c@3ecc3,a9724@a9825; guest pending
 0x000287bc	114	open_named_file_287bc	list_ops1	compiles	game	confirmed	decomp/tests/0x000287bc.json	docs/compiler-abi.md; Build a file name from a format (one of two, chosen by 0x15ee9a), open it, and if that succeeds run 0xab47c and close th; callers 284ec@28571; guest pending
 0x00028830	90	init_chain_28830	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00028830.json	docs/compiler-abi.md; Reset the ten 14-byte entries at 0x19b8d0 and chain them.; callers 3cfc0@3d1bb; guest pending
@@ -613,7 +613,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00036100	124	queue_request_36100	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00036100.json	docs/compiler-abi.md; (ret 8) Store a request block (0x19f34c.., flag 0x19f5aa) and run 0x35de0; reports errors through the 0x132a74 handler i; callers 35c08@35cba,36f84@3700b; guest pending
 0x0003617c	303			unknown	unclassified	unverified		
 0x000362c4	86	enable_state_widget_362c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000362c4.json	docs/compiler-abi.md; Look up the widget named 0x1830f8 and enable it with a label chosen by the state byte 0x19f5aa (2..7); other states clea; callers 36438@367b2,36d30@36f45; guest pending
-0x00036340	132			unknown	unclassified	unverified		
+0x00036340	132	enable_state_widget_36340	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00036340.json	docs/compiler-abi.md; Enable the widget named 0x182fb0 with a label picked from the state byte 0x19f5a9 (2..10): 0x1831dc/0x1831e8 (by 0x19f59; callers 367f0@36955,36ad8@36cfd; guest pending
 0x000363c4	80	sync_list_363c4	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x000363c4.json	docs/compiler-abi.md; Walk the list from dword 0x19f320 (next at +0x21), toggling each node by the flag bytes at 0x19f318.; callers 36438@364f6,36438@3652a,36438@365e9; guest pending
 0x00036438	905			unknown	unclassified	unverified		
 0x000367f0	369			unknown	unclassified	unverified		
@@ -834,7 +834,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00048c90	201			unknown	unclassified	unverified		
 0x00048d5c	68	formatted_width_48d5c	text_metrics1	compiles	game	confirmed	decomp/tests/0x00048d5c.json	docs/compiler-abi.md; printf-format a string and return its width: the text width for zoom 0, else its length times 4. Variadic; all arguments; callers 3b58@3bf1,3b58@3c46,3ea8@3ebd; guest pending
 0x00048da0	68	formatted_width_48da0	text_metrics1	compiles	game	confirmed	decomp/tests/0x00048da0.json	docs/compiler-abi.md; Same with length times 8 for the nonzero zoom.; callers 48e7c@48f35,5c354@5c43d,5c518@5c64d; guest pending
-0x00048df8	132			unknown	unclassified	unverified		
+0x00048df8	132	draw_status_counter_48df8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00048df8.json	docs/compiler-abi.md; Clamp the counter 0x127b1c at zero; while it is non-zero draw the two status strings (0x1a524c) at (17, 17) with modes 0; callers 3dd30@3e759; guest pending
 0x00048e7c	464			unknown	unclassified	unverified		
 0x0004904c	6	get_byte_4904c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0004904c.json	docs/compiler-abi.md; ; callers 1cde8@1ce2f,1cde8@1cef7; guest pending
 0x00049054	61	clear_tactical_accumulators	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00049054.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
@@ -2233,7 +2233,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a479c	131	append_id_a479c	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a479c.json	docs/compiler-abi.md; Add a flagged object id to the first free slot of the id table.; callers a499c@a49cb; guest pending
 0x000a4820	137	push_front_id_a4820	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a4820.json	docs/compiler-abi.md; Push a flagged object id to the front of the id table.; callers a4a20@a4a4b; guest pending
 0x000a48ac	237			unknown	unclassified	unverified		
-0x000a499c	130			unknown	unclassified	unverified		
+0x000a499c	130	append_entry_and_children_a499c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a499c.json	docs/compiler-abi.md; Variant of 0xa4a94 that appends the entry (0xa479c) and rewrites every entry owned by id via 0xa48ac, then refreshes the; callers a4b08@a4b3e,a4cb4@a4d0e,a5a68@a5aa6; guest pending
 0x000a4a20	116	promote_entry_and_children_a4a20	list_ops1	compiles	game	confirmed	decomp/tests/0x000a4a20.json	docs/compiler-abi.md; Variant of 0xa4a94: if entry id has flag 8, push it to the front and rewrite every entry whose owner byte is id via 0xa4; callers a4b5c@a4b74; guest pending
 0x000a4a94	114	remove_entry_and_children_a4a94	list_ops1	compiles	game	confirmed	decomp/tests/0x000a4a94.json	docs/compiler-abi.md; If entry id has flag 8 set, remove it and every entry whose owner byte (+0x11) is id.; callers a4b08@a4b34,a4b5c@a4b6a,a4b80@a4bb8; guest pending
 0x000a4b08	66	refresh_flagged_object_a4b08	game_helpers29	compiles	game	confirmed	decomp/tests/0x000a4b08.json	docs/compiler-abi.md; Refresh the list for an object that is flagged and not owned.; callers b5d0@b66f,b5d0@b68c,bfcc@c20f; guest pending
@@ -3656,7 +3656,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f46cc	190	read_next_command_token	unk_cli	typed	game	confirmed		docs/compiler-abi.md; token into 0x485e08; 16-bit cursor at 0x161eac
 0x000f478c	100	run_matching_handler_f478c	runtime_helpers29	compiles	game	confirmed	decomp/tests/0x000f478c.json	docs/compiler-abi.md; Run the handler of the table entry whose name matches the current one.; callers f4a88@f4b2a,f4bdc@f4c06,f4c60@f4c91; guest pending
 0x000f4a88	337			unknown	unclassified	unverified		
-0x000f4bdc	131			unknown	unclassified	unverified		
+0x000f4bdc	131	run_command_loop_f4bdc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f4bdc.json	docs/compiler-abi.md; Reset the command parser state (0x485dfc = 3, 0x485f70/71 = 0), read tokens and run handlers until 0x485e08 clears, repo; callers none direct; guest pending
 0x000f4c60	169	run_section_one_f4c60	script_helpers2	compiles	game	confirmed	decomp/tests/0x000f4c60.json	docs/compiler-abi.md; Run the mode-1 script section, complaining about each missing part (flags 0x485f72, 0x485f6f, 0x485f73).; callers none direct; guest pending
 0x000f4d0c	169	run_section_two_f4d0c	script_helpers2	compiles	game	confirmed	decomp/tests/0x000f4d0c.json	docs/compiler-abi.md; Run the mode-2 script section (flags 0x485f6d, 0x485f6c, 0x485f6e).; callers none direct; guest pending
 0x000f4db8	281	SIZE		named	unclassified	unverified		

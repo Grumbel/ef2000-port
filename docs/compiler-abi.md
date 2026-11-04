@@ -5389,3 +5389,13 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x286c0` | none | none | 3ea0c@3ecda | Sibling of 0x28744: build the file name (two formats chosen by 0x15ee9a), open it with 0xa7948, write the 2-byte value 0 |
+| `0xa499c` | EAX:uint32_t | none | a4b08@a4b3e,a4cb4@a4d0e,a5a68@a5aa6 | Variant of 0xa4a94 that appends the entry (0xa479c) and rewrites every entry owned by id via 0xa48ac, then refreshes the |
+| `0xf4bdc` | none | none | none direct | Reset the command parser state (0x485dfc = 3, 0x485f70/71 = 0), read tokens and run handlers until 0x485e08 clears, repo |
+| `0x36340` | none | none | 367f0@36955,36ad8@36cfd | Enable the widget named 0x182fb0 with a label picked from the state byte 0x19f5a9 (2..10): 0x1831dc/0x1831e8 (by 0x19f59 |
+| `0x48df8` | none | none | 3dd30@3e759 | Clamp the counter 0x127b1c at zero; while it is non-zero draw the two status strings (0x1a524c) at (17, 17) with modes 0 |

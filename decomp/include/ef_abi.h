@@ -4521,4 +4521,10 @@ int32_t guest_fn_23760_x(ef_addr32 vec); /* 0x23760 EAX -> EAX */
 
 int32_t guest_fn_23760_x(ef_addr32 vec); /* 0x23760 EAX -> EAX */
 
+void write_marker_file_286c0(void);
+void append_entry_and_children_a499c(uint32_t id);
+void run_command_loop_f4bdc(void);
+void enable_state_widget_36340(void);
+void draw_status_counter_48df8(void);
+
 #endif

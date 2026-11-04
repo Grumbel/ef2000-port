@@ -827,3 +827,104 @@ void draw_ratio_text_40624(void)
     /* ORIGINAL BUG: prints the uninitialised buffer when 0x127d92 is zero. */
     guest_fn_48c90(12u, 10u, 0x1eu, (uint32_t)(uintptr_t)buf);
 }
+
+/* 0x286c0, 131 bytes. Sibling of 0x28744: build the file name (two formats chosen by 0x15ee9a), open it with 0xa7948, write the 2-byte value 0x1736 and close the handle. */
+void write_marker_file_286c0(void)
+{
+    uint8_t name[0x98];
+    uint32_t value = 0x1736u;
+    int32_t handle;
+    ef_addr32 buf = (uint32_t)(uintptr_t)name;
+    if (EF_U16(0x0015ee9au) == 0u)
+        guest_sprintf_a4342(buf, 0x00182344u, guest_fn_9c858(0x001822d8u));
+    else
+        guest_sprintf_a4342(buf, 0x00182350u);
+    handle = open_slot_a7948(0u, 0u, 0u, 0u, buf);
+    if (handle != -1) {
+        write_handle_a7a1c(0u, 0u, 0u, 0u, (uint32_t)handle, 2u, (uint32_t)(uintptr_t)&value);
+        close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
+    }
+}
+
+/* 0xa499c, 130 bytes. Variant of 0xa4a94 that appends the entry (0xa479c) and rewrites every entry owned by id via 0xa48ac, then refreshes the entities unless flag 2 is set. */
+void append_entry_and_children_a499c(uint32_t id)
+{
+    uint32_t i;
+    uint32_t rec;
+    id &= 0xffffu;
+    if (id == 0u || id > EF_U16(0x0041eed8u))
+        return;
+    rec = EF_U32(0x0041edfcu + id * 4u);
+    if (rec == 0u || (EF_U8(rec + 0x3bu) & 8u) == 0u)
+        return;
+    append_id_a479c((uint16_t)id);
+    for (i = 1u; (int32_t)i <= (int32_t)EF_U16(0x0041eed8u); i++) {
+        if (EF_U8(EF_U32(0x0041edfcu + i * 4u) + 0x11u) == id)
+            guest_fn_a48ac_x(i & 0xffffu);
+    }
+    if ((EF_U8(rec + 0x3bu) & 2u) == 0u)
+        update_entities_a5a68();
+}
+
+/* 0xf4bdc, 131 bytes. Reset the command parser state (0x485dfc = 3, 0x485f70/71 = 0), read tokens and run handlers until 0x485e08 clears, report errors for the two missing flags and set 0x485f75. */
+void run_command_loop_f4bdc(void)
+{
+    EF_U16(0x00485dfcu) = 3u;
+    EF_U8(0x00485f70u) = 0u;
+    EF_U8(0x00485f71u) = 0u;
+    guest_fn_f46cc();
+    if (EF_U8(0x00485e08u) != 0u) {
+        do {
+            run_matching_handler_f478c();
+            guest_fn_f46cc();
+        } while (EF_U8(0x00485e08u) != 0u);
+    }
+    if (EF_U8(0x00485f70u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00191f44u, EF_U32(0x00161ea8u));
+    if (EF_U8(0x00485f71u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00191f74u, EF_U32(0x00161ea8u));
+    EF_U8(0x00485f75u) = 1u;
+}
+
+/* 0x36340, 132 bytes. Enable the widget named 0x182fb0 with a label picked from the state byte 0x19f5a9 (2..10): 0x1831dc/0x1831e8 (by 0x19f598), 0x1831f4, or clear the children dirty flags. */
+void enable_state_widget_36340(void)
+{
+    ef_addr32 widget = find_named_or_abort_a46cc(0x00182fb0u);
+    uint8_t idx;
+    if (widget == 0u)
+        return;
+    idx = (uint8_t)(EF_U8(0x0019f5a9u) - 2u);
+    switch (idx <= 8u ? idx : 3u) {
+    case 0: case 2: case 4: case 6:
+        guest_fn_a7318_2_x(widget, EF_U8(0x0019f598u) != 0u ? 0x001831dcu : 0x001831e8u);
+        return;
+    case 1: case 5:
+        guest_fn_a7318_2_x(widget, 0x001831f4u);
+        return;
+    case 8:
+        if (EF_U8(0x0019f599u) != 0u) {
+            guest_fn_a7318_2_x(widget, 0x001831f4u);
+            return;
+        }
+        clear_children_dirty(widget);
+        return;
+    default:
+        clear_children_dirty(widget);
+        return;
+    }
+}
+
+/* 0x48df8, 132 bytes. Clamp the counter 0x127b1c at zero; while it is non-zero draw the two status strings (0x1a524c) at (17, 17) with modes 0 and 6 selected by the toggle 0x12b369, then subtract the step 0x127d92. */
+void draw_status_counter_48df8(void)
+{
+    uint8_t mode;
+    if ((int16_t)EF_U16(0x00127b1cu) < 0)
+        EF_U16(0x00127b1cu) = 0u;
+    if (EF_U16(0x00127b1cu) == 0u)
+        return;
+    mode = (uint8_t)(1u - EF_U8(0x0012b369u));
+    draw_formatted_text_mode_48bb0(0u, mode, 0x11, 0x11, EF_U32(0x001a524cu));
+    mode = (uint8_t)(1u - EF_U8(0x0012b369u));
+    draw_formatted_text_mode_48bb0(6u, mode, 0x11, 0x11, EF_U32(0x001a524cu));
+    EF_U16(0x00127b1cu) = (uint16_t)(EF_U16(0x00127b1cu) - EF_U16(0x00127d92u));
+}
