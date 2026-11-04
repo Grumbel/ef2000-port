@@ -7702,3 +7702,32 @@ void load_dataset_files_c8e58(void)
     }
     guest_fn_e9a24(0x2d0u, 0x00425cbcu, 0x00419600u);
 }
+
+/* 0xa81e4, 225 bytes. Open a named script/data file: take the first whitespace-delimited token of NAME (EAX), format "<fmt 0x18d668>" from the default path (0xa7b70), the string pointed to by table 0x1371c0[byte 0x1371ef] and the token, copy 0x18 bytes from SRC (EDX) to the record 0x418678, call the size hook at 0x132ab4 (word result to 0x41868a, complaining through 0x132a74 when zero), load the record with the hook at 0x132ab8 into 0x417278, store that buffer at 0x41868c, run the section parser 0xa82f0 on the record and set byte 0x1371fa to 1. */
+void open_named_data_a81e4(uint32_t name, uint32_t src)
+{
+    char tok[0x98];
+    int16_t n = 0;
+    uint8_t c;
+    for (;;) {
+        c = EF_U8(name + (uint32_t)(int32_t)n);
+        if (c == 0xau || c == 0xdu || c == 0x20u || c == 0x9u || c == 0u)
+            break;
+        tok[n] = (char)c;
+        n++;
+    }
+    tok[n] = 0;
+    {
+        char buf[0x98];
+        guest_sprintf_a4342((uint32_t)(uintptr_t)buf, 0x0018d668u, default_path_a7b70(),
+                            EF_U32(0x001371c0u + (uint32_t)EF_U8(0x001371efu) * 4u), (uint32_t)(uintptr_t)tok);
+        memcpy_dc832(0x00418678u, src, 0x18u);
+        EF_U16(0x0041868au) = (uint16_t)guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), (uint32_t)(uintptr_t)buf);
+        if (EF_U16(0x0041868au) == 0u)
+            guest_callptr2_x(EF_U32(0x00132a74u), 0x0018d670u, (uint32_t)(uintptr_t)buf);
+        guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), (uint32_t)(uintptr_t)buf, 0x00417278u);
+    }
+    EF_U32(0x0041868cu) = 0x00417278u;
+    guest_fn_a82f0_w(0x00418678u);
+    EF_U8(0x001371fau) = 1u;
+}
