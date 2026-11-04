@@ -2459,7 +2459,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b07b4	156	match_ratio_b07b4	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b07b4.json	docs/compiler-abi.md; Same ratio using the second matching predicate.; callers b0c9c@b0ccd; guest pending
 0x000b0850	260	count_filtered_node_matches	unk_records	typed	game	confirmed		ABI only; AL mode, EBX list head, EDX filter list, EAX count
 0x000b0954	427	count_positive_filtered_node_matches	unk_records	typed	game	confirmed		ABI only; AL mode, EBX source head, EDX filter head, EAX count
-0x000b0b00	306			unknown	unclassified	unverified		
+0x000b0b00	306	count_typed_nodes_b0b00	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b0b00.json	docs/compiler-abi.md; Count the nodes of the list whose head pointer is at HEAD (links +4) that are of type 0x31 (byte +0xc), pass the filter ; callers b0c34@b0c57; guest pending
 0x000b0c34	102			unknown	unclassified	unverified		
 0x000b0c9c	95			unknown	unclassified	unverified		
 0x000b0cfc	245	shuffle_words_b0cfc	game_helpers115	compiles	game	confirmed	decomp/tests/0x000b0cfc.json	docs/compiler-abi.md; Shuffle pass over a word array: for each iteration pick two random positions and swap them with the xor trick.; callers b0f5c@b12c2; guest pending

@@ -5342,3 +5342,28 @@ uint32_t open_resource_9ccb8(uint32_t name)
     EF_U32(0x0040d1e4u) = EF_U32(0x0040d1e8u) + size;
     return (uint32_t)h | 0x40000u;
 }
+
+/* 0xb0b00, 306 bytes. Count the nodes of the list whose head pointer is at HEAD (links +4) that are of type 0x31 (byte +0xc), pass the filter 0xbfcd8(node, ARG) -> 0xbc7ec, and whose type word (+9) is one of the kind's classes: KIND 0 counts the types 0x11..0x16, 0x18..0x1a, KIND 1 the types 1..6, 8, 9 and 0xb..0xe; any other KIND counts nothing. */
+uint32_t count_typed_nodes_b0b00(uint32_t kind, uint32_t head, uint32_t arg)
+{
+    uint32_t node = EF_U32(head);
+    uint32_t count = 0u;
+    uint8_t k = (uint8_t)kind;
+    while (node != 0u) {
+        if (k <= 1u && EF_U8(node + 0xcu) == 0x31u) {
+            uint32_t t;
+            if ((guest_fn_bc7ec(guest_fn_bfcd8_x(node, arg)) & 0xffffu) != 0u) {
+                t = EF_U16(node + 9u);
+                if (k == 0u) {
+                    if ((t >= 0x11u && t <= 0x16u) || (t >= 0x18u && t <= 0x1au))
+                        count++;
+                } else {
+                    if ((t >= 1u && t <= 6u) || t == 8u || t == 9u || (t >= 0xbu && t <= 0xeu))
+                        count++;
+                }
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+    return count;
+}

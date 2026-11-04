@@ -6170,3 +6170,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9ccb8` | EAX:uint32_t | EAX:uint32_t | f80@112e,f6a8@f71b,fecc@ff0e | Open the resource NAME: first through the archive handles 0x40d1f0 (option bit 1 of 0x132ab0, result / 0x10000) and 0x40 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb0b00` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | b0c34@b0c57 | Count the nodes of the list whose head pointer is at HEAD (links +4) that are of type 0x31 (byte +0xc), pass the filter  |
