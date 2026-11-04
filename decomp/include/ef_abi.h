@@ -5561,4 +5561,6 @@ void fill_scaled_rect_c99ac(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t 
 
 uint32_t pick_weapon_slot_293b0(uint32_t unit);
 
+uint32_t position_clear_2dee4(uint32_t id);
+
 #endif

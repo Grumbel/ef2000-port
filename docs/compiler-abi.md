@@ -7635,3 +7635,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x293b0` | EAX:uint32_t | EAX:uint32_t | 24f24@24f4a,294ec@295c9 | Choose which of the 19 three-byte slots (+0x198 of the unit UNIT, AX) to fire at the range D (double 0x1f7000): a slot q |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2dee4` | EAX:uint32_t | EAX:uint32_t | 2e740@2e871 | Is the record ID (AX; 0xca byte table at [0x19bb58]) clear of its neighbours? ID 0xff gives 1 and a record whose state b |

@@ -492,7 +492,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002dbf8	137	record_near_unit_2dbf8	float_helpers2	compiles	game	confirmed	decomp/tests/0x0002dbf8.json	docs/compiler-abi.md; True when a record is near the unit entry and active.; callers 2dce0@2dd1a; guest pending
 0x0002dc84	90	record_close_and_active_2dc84	float_helpers1	compiles	game	confirmed	decomp/tests/0x0002dc84.json	docs/compiler-abi.md; True when a record is close enough and active.; callers 2dce0@2dcf6; guest pending
 0x0002dce0	120	grid_is_visible_from_reference	world_grid_category	compiles	game	confirmed	decomp/tests/0x0002dce0.json	AX row to AL; reference then all external proximity checks; dependencies unrecovered
-0x0002dee4	239			unknown	unclassified	unverified		
+0x0002dee4	239	position_clear_2dee4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002dee4.json	docs/compiler-abi.md; Is the record ID (AX; 0xca byte table at [0x19bb58]) clear of its neighbours? ID 0xff gives 1 and a record whose state b; callers 2e740@2e871; guest pending
 0x0002e030	90	reset_grid_cell_state	world_grid_control	compiles	game	confirmed	decomp/tests/0x0002e030.json	reset and copy pending dwords; original derived update unresolved
 0x0002e08c	201	recompute_grid_limit	world_grid_limits	compiles	game	confirmed	decomp/tests/0x0002e08c.json	x87 per-type threshold and seven filtered-object lookups; NaN host cases only
 0x0002e184	783			unknown	unclassified	unverified		

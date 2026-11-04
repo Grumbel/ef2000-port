@@ -12413,3 +12413,39 @@ uint32_t pick_weapon_slot_293b0(uint32_t unit)
     memcpy(&c, ef_guest_memory_ptr(0x001f7018u), sizeof c);
     return square_double_b3fd0(20.0) > square_double_b3fd0(c) ? 0x13u : 0x14u;
 }
+
+/* 0x2dee4, 239 bytes. Is the record ID (AX; 0xca byte table at [0x19bb58]) clear of its neighbours? ID 0xff gives 1 and a record whose state byte +0x1a is 2 gives 0. Otherwise it fails (0) when its position (+0x61) is within double 0x1252a4 times double 0x1825fd (0xb415c distance) of the point at 0x1a3020 and, with byte 0x127da9 set, of any of the objects whose id words (high word at 0x1a5c2e + 0x1b * i, byte count 0x12583a) resolve with 0x7489c; an id word of 0xff ends the scan with 1. */
+uint32_t position_clear_2dee4(uint32_t id)
+{
+    int32_t sid = (int16_t)id;
+    ef_addr32 rec;
+    uint8_t ok = 1u;
+    double limit;
+    double k;
+    int16_t i;
+    if (sid == 0xff)
+        return 1u;
+    rec = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+    if (EF_U8(rec + 0x1au) == 2u)
+        return 0u;
+    memcpy(&limit, ef_guest_memory_ptr(0x001252a4u), sizeof limit);
+    memcpy(&k, ef_guest_memory_ptr(0x001825fdu), sizeof k);
+    limit *= k;
+    if (limit > distance_2d_b415c(0x001a3020u, rec + 0x61u))
+        ok = 0u;
+    if (EF_U8(0x00127da9u) == 0u)
+        return ok;
+    for (i = 0; i < (int32_t)EF_U8(0x0012583au); i++) {
+        int32_t oid = (int32_t)EF_U32((uint32_t)(int32_t)i * 0x1bu + 0x001a5c2eu) >> 16;
+        ef_addr32 obj;
+        if (oid == 0xff)
+            return 1u;
+        obj = guest_fn_7489c(oid);
+        if (obj != 0u) {
+            ef_addr32 r2 = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+            if (limit > distance_2d_b415c(r2 + 0x61u, obj + 0x49u))
+                ok = 0u;
+        }
+    }
+    return ok;
+}
