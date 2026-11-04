@@ -8546,3 +8546,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x4c78c` | EAX:uint32_t,EDX:ef_addr32 | none | 4bc80@4bcba | Sibling of 0x4ce4c: hit-test the list at HEAD (EDX; link +4) for the group value A (EAX) and the kind in word 0x1a54f4 ( |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2bcb8` | EAX:uint32_t | AL:uint8_t | 2ced4@2d228,2ced4@2d25f,6e59c@6e6ee | Compare class row AX (signed 16-bit) with its neighbour row N (0x2bbd0; 0xff or a row with byte +0x1a zero: result 0). T |

@@ -18170,3 +18170,59 @@ void select_list_entry_by_kind_4c78c(uint32_t a, ef_addr32 head)
 		node = EF_U32(node + 4u);
 	}
 }
+
+/* 0x2bcb8, 448 bytes. Compare class row AX (signed 16-bit) with its neighbour row N (0x2bbd0; 0xff or a row with byte +0x1a zero: result 0). The rows' current entries (byte +0x8e) are compared: if the row's is higher and its byte +0x1b is 2 the grid activity is decremented (0x85358) and 1 is returned; if lower and byte +0x1b is 2 the refresh 0x8516c runs and 0 is returned. With equal entries the distances (0xb415c) of both rows to their table points (dwords +0 and +4 of the 25-byte entries times 2.4384) decide: for byte +0x1b = 2 the result is 1 when the neighbour's distance - 3000.0 exceeds the row's distance, for 0xb when neighbour distance - 9000.0 exceeds it; otherwise 0. */
+uint8_t row_wins_over_neighbour_2bcb8(uint32_t ax)
+{
+	int32_t x = (int32_t)(int16_t)ax;
+	int32_t s = (int32_t)(int16_t)guest_fn_2bbd0(x);
+	uint32_t rows = EF_U32(0x0019bb58u);
+	uint32_t rx, rs, tab;
+	uint8_t cl, ch;
+	uint32_t k;
+	double pt[3], dx, ds;
+
+	if (s == 0xff)
+		return 0u;
+	rs = rows + (uint32_t)(s * 0xca);
+	if (EF_U8(rs + 0x1au) == 0u)
+		return 0u;
+	rx = rows + (uint32_t)(x * 0xca);
+	cl = EF_U8(rx + 0x8eu);
+	ch = EF_U8(rs + 0x8eu);
+	if (cl > ch) {
+		if (EF_U8(rx + 0x1bu) == 2u)
+			decrement_grid_activity((int16_t)x);
+		return 1u;
+	}
+	if (cl < ch) {
+		if (EF_U8(rx + 0x1bu) == 2u)
+			guest_fn_8516c_x(x);
+		return 0u;
+	}
+	k = cl;
+	tab = EF_U32(rx + 0x8au);
+	pt[0] = (double)(int32_t)EF_U32(tab + k * 25u) * 2.4384;
+	tab = EF_U32(rx + 0x8au);
+	pt[1] = (double)(int32_t)EF_U32(tab + k * 25u + 4u) * 2.4384;
+	pt[2] = 0.0;
+	dx = distance_2d_b415c(rx + 0x61u, (ef_addr32)(uintptr_t)pt);
+	rs = EF_U32(0x0019bb58u) + (uint32_t)(s * 0xca);
+	k = EF_U8(rs + 0x8eu);
+	tab = EF_U32(rs + 0x8au);
+	pt[0] = (double)(int32_t)EF_U32(tab + k * 25u) * 2.4384;
+	tab = EF_U32(rs + 0x8au);
+	pt[1] = (double)(int32_t)EF_U32(tab + k * 25u + 4u) * 2.4384;
+	pt[2] = 0.0;
+	ds = distance_2d_b415c(rs + 0x61u, (ef_addr32)(uintptr_t)pt);
+	if (EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(x * 0xca) + 0x1bu) == 2u) {
+		if (ds + -3000.0 > dx)
+			return 1u;
+		return 0u;
+	}
+	if (EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(x * 0xca) + 0x1bu) == 0xbu) {
+		if (ds + -9000.0 > dx)
+			return 1u;
+	}
+	return 0u;
+}

@@ -5953,4 +5953,7 @@ void select_list_entry_at_cursor_4ce4c(uint32_t a, ef_addr32 head);
 
 void select_list_entry_by_kind_4c78c(uint32_t a, ef_addr32 head);
 
+uint8_t row_wins_over_neighbour_2bcb8(uint32_t ax);
+void guest_fn_8516c_x(int32_t id); /* 0x8516c EAX */
+
 #endif

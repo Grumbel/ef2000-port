@@ -468,7 +468,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002bb64	108	find_linked_unit_2bb64	game_helpers7	compiles	game	confirmed	decomp/tests/0x0002bb64.json	docs/compiler-abi.md; Find the unit linked to unit_id whose kind is 0xb, or 0xff.; callers 73964@73a44,73964@73ba6; guest pending
 0x0002bbd0	108	find_grid_neighbor_with_detail	world_grid_neighbors	compiles	game	confirmed	decomp/tests/0x0002bbd0.json	AX row to AX signed neighbor; eight 17-byte adjacency entries
 0x0002bc3c	122	grid_neighbor_distance	world_grid_neighbors	compiles	game	confirmed	decomp/tests/0x0002bc3c.json	AX row to ST0 distance; active-row group check and neighbor query
-0x0002bcb8	448			unknown	unclassified	unverified		
+0x0002bcb8	448	row_wins_over_neighbour_2bcb8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002bcb8.json	docs/compiler-abi.md; Compare class row AX (signed 16-bit) with its neighbour row N (0x2bbd0; 0xff or a row with byte +0x1a zero: result 0). T; callers 2ced4@2d228,2ced4@2d25f,6e59c@6e6ee; guest pending
 0x0002beb0	85	grid_has_active_link	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002beb0.json	all seven filtered lookups must execute; C host test only
 0x0002bf08	95	grid_has_object_mode	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002bf08.json	byte-count attached-object scan; C host test only
 0x0002bfcc	287	row_has_active_unit_2bfcc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002bfcc.json	docs/compiler-abi.md; Scan the six unit entries (signed words at row+0x50) of class row AX (signed 16-bit; 0xff gives 0) and return 1 when any; callers 2c224@2c331,2c6dc@2c723,2c6dc@2c72e; guest pending
