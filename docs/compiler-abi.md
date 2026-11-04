@@ -4106,3 +4106,15 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf7518` | none | none | none direct | Merge the pending flag word into the second flag field, or clear it (mode 2 skips the refresh). |
+
+## game_helpers80 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x88cd0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32 | none | 8a1dc@8a20b | Copy three 8-byte fields of an object's detail block into caller buffers. |
+| `0x6e320` | AL:uint8_t,EDX:uint32_t | none | 6e390@6e39b | Gather six table dwords for a (kind, slot) pair and forward them. |
+| `0x68efc` | none | none | 69fac@69fde | Resolve the name of every populated weapon entry (from index 2) into its halfword id. |
+| `0x569b4` | EAX:ef_addr32 | none | 581b0@58464 | Apply a queued position record to its unit and forward the update. |
+| `0x4f388` | EAX:ef_addr32,EDX:ef_addr32 | none | 4b1a4@4b1b8,4b1a4@4b1d7 | Bind two values into the named dialog's widgets, then emit its flag and close it. |
+| `0x34a98` | EAX:ef_addr32 | EAX:ef_addr32 | 34b2c@34b55,34b2c@34b70,34b2c@34b7c | Rebuild the child dialog list with the given text and return the dialog. |
+| `0x32de8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:int32_t | 7a66c@7a68b | List the files matching a path and mask into the 13-byte name table; returns the count. |

@@ -3654,4 +3654,20 @@ void guest_fn_120800_x(void); /* 0x120800 */
 void merge_pending_flags2_f7518(void);
 void guest_fn_f6124_x(void); /* 0xf6124 */
 
+/* game_helpers80.c */
+void copy_detail_fields_88cd0(ef_addr32 object, ef_addr32 out_a, ef_addr32 out_b, ef_addr32 out_c);
+void forward_table_entry_6e320(uint8_t slot, uint32_t kind);
+void resolve_weapon_names_68efc(void);
+void apply_position_record_569b4(ef_addr32 rec);
+void bind_dialog_values_4f388(ef_addr32 first, ef_addr32 second);
+ef_addr32 rebuild_child_dialog_34a98(ef_addr32 text);
+int32_t list_directory_names_32de8(ef_addr32 path, ef_addr32 mask);
+void guest_fn_6e1c4_x(uint32_t a); /* 0x6e1c4 EAX */
+void guest_fn_106b0_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0x106b0 EAX/EDX/EBX/ECX + stack */
+void guest_fn_10750_x(int32_t a, int32_t b, int32_t c); /* 0x10750 EAX/EDX/EBX */
+void guest_fn_a4dd0_x(uint32_t a); /* 0xa4dd0 EAX */
+uint32_t guest_fn_decde_x(uint32_t a, uint32_t b, uint32_t c); /* 0xdecde EAX/EDX/EBX */
+uint32_t guest_fn_decfb_x(uint32_t a); /* 0xdecfb EAX */
+void guest_fn_dedde_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xdedde EAX/EDX/EBX/ECX */
+
 #endif
