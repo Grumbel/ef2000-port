@@ -2082,7 +2082,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009da80	365			unknown	unclassified	unverified		
 0x0009dbf0	149	tree_find_or_insert_9dbf0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009dbf0.json	docs/compiler-abi.md; Same lookup/insert as 0xde7d0 over the tables at 0x412fc0 (keys), 0x40f140 (signed child words) and 0x411080 (payload, n; callers 9de08@9de29; guest pending
 0x0009dc88	110	append_base_name_9dc88	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009dc88.json	docs/compiler-abi.md; Lower-case the name part (at most 8 chars) of a file name and append it to a path.; callers 9de08@9de22; guest pending
-0x0009dcf8	228			unknown	unclassified	unverified		
+0x0009dcf8	228	register_resource_9dcf8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009dcf8.json	docs/compiler-abi.md; Register the resource NAME (EAX) under the key string TEXT (EDX): obtain its data either from the cached chunk (0xea3ec ; callers 9de08@9de3b; guest pending
 0x0009dddc	1	nop_9dddc	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0009dddc.json	docs/compiler-abi.md; 1 byte. No-op.; callers 7a844@7a84d,7a844@7a9aa; guest pending
 0x0009dde0	27	store_table_entry_9dde0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009dde0.json	docs/compiler-abi.md; Store the converted table entry index into the 16-bit slot at destination.; callers 9e7bc@9f5d5,9f7d0@9f7f7,9f808@9f83d; guest pending
 0x0009ddfc	10	call_9de08_9ddfc	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x0009ddfc.json	docs/compiler-abi.md; Call 0x9de08 with a zero second argument.; callers 9820@9ace,2a720@2a76e,2a7ac@2a7d1; guest pending

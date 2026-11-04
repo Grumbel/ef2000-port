@@ -5154,4 +5154,6 @@ void draw_nearby_entries_87fe4(void);
 
 void setup_viewport_window_76620(void);
 
+uint32_t register_resource_9dcf8(uint32_t name, uint32_t text);
+
 #endif

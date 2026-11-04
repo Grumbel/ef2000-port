@@ -7854,3 +7854,34 @@ void setup_viewport_window_76620(void)
     latch_values_ce328(0u, EF_U32(0x0015b744u) - 1u, 0u, y);
     guest_fn_cdf48(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
 }
+
+/* 0x9dcf8, 228 bytes. Register the resource NAME (EAX) under the key string TEXT (EDX): obtain its data either from the cached chunk (0xea3ec on descriptor 0x16040c; size 0xea414, decode 0xea420) or by sizing it with the hook at 0x132ab4 (zero reports through 0x132a74) and loading it with 0x132ab8 into a fresh arena block; duplicate TEXT into an arena block, take the next slot (word 0x132b10, overflow at 0x7d0 reported), store the key hash (0xebfd0) at 0x412fc0, the key copy at 0x411080, the data at 0x40d200 and the end-of-data pointer (data + size - 2 when flag 2 of data byte +5 is set, else 0) at 0x414f00. Returns the slot number. */
+uint32_t register_resource_9dcf8(uint32_t name, uint32_t text)
+{
+    uint32_t size, data, key, slot, off;
+    if (refresh_cached_chunk_ea3ec(0x0016040cu) & 0xffu) {
+        size = read_link_ea414();
+        data = arena_take_e29e8(size);
+        decode_chunk_ea420(data);
+    } else {
+        size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), name);
+        if (size == 0u)
+            guest_callptr2_x(EF_U32(0x00132a74u), 0x0018b2a8u, name);
+        data = arena_take_e29e8(size);
+        guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), name, data);
+    }
+    key = arena_take_e29e8((uint32_t)((int32_t)(int16_t)guest_fn_b1b8b(text) + 1));
+    copy_string_9d749(key, text);
+    slot = EF_U16(0x00132b10u);
+    EF_U16(0x00132b10u) = (uint16_t)(slot + 1u);
+    if ((int32_t)EF_U32(0x00132b0eu) >> 16 == 0x7d0)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018b2c0u);
+    off = (uint32_t)(int32_t)(int16_t)slot << 2;
+    EF_U32(0x00412fc0u + off) = name_hash_ebfd0(key);
+    EF_U32(0x00411080u + off) = key;
+    EF_U32(0x0040d200u + off) = data;
+    EF_U32(0x00414f00u + off) = 0u;
+    if (EF_U8(data + 5u) & 2u)
+        EF_U32(0x00414f00u + off) = size + data - 2u;
+    return slot;
+}
