@@ -480,3 +480,74 @@ void write_node_position_ab060(uint32_t handle)
     write_handle_a7a1c(0u, 0u, 0u, 0u, handle, 2u, p + 4u);
     write_handle_a7a1c(0u, 0u, 0u, 0u, handle, 1u, 0x0041955fu);
 }
+
+/* 0x35220, 92 bytes. Build a 3-byte request (the key byte plus a word: 0x19f592 - 1 for key 0x48, else 0xffff), mirror the word to 0x19f58c, set 0x1357b2 to 3, send it with 0xa3eac (size 0x13) and set 0x19f599. */
+void send_key_request_35220(uint32_t key)
+{
+    uint8_t req[0x14];
+    uint16_t word;
+    EF_U16(0x001357b2u) = 3u;
+    if ((key & 0xffu) == 0x48u)
+        word = (uint16_t)(EF_U16(0x0019f592u) - 1u);
+    else
+        word = 0xffffu;
+    EF_U16(0x0019f58cu) = word;
+    req[0] = (uint8_t)key;
+    req[1] = (uint8_t)word;
+    req[2] = (uint8_t)(word >> 8);
+    issue_request_ready_a3eac((uint32_t)(uintptr_t)req, 0x13u);
+    EF_U8(0x0019f599u) = 1u;
+}
+
+/* 0x7ca78, 92 bytes. Walk the widget chain (next at +0x21) starting at the widget found under 0x187f38/0x187dfc; the first n entries (n = 0x12b054 >> 16) are shown with the 0x4c-byte record at 0x1f8f74 + 0x4c * i, the rest get state 1. */
+void update_widget_chain_7ca78(void)
+{
+    uint32_t node = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x00187f38u), 0x00187dfcu);
+    uint32_t i = 0u;
+    uint32_t off = 0u;
+    while (node != 0u) {
+        if ((int32_t)i < (EF_S32(0x0012b054u) >> 16))
+            guest_fn_a7588_v(node, EF_U32(0x001f8f74u) + off);
+        else
+            guest_fn_a739c(node, 1u);
+        off += 0x4cu;
+        node = EF_U32(node + 0x21u);
+        i++;
+    }
+}
+
+/* 0xc9ecc, 92 bytes. Set the view origin to the screen size (0x15b744 x 0x15b748) minus one with the half-size corner, and latch the full rectangle twice. */
+void init_view_corners_c9ecc(void)
+{
+    int32_t w = EF_S32(0x0015b744u);
+    int32_t h = EF_S32(0x0015b748u);
+    int32_t hx = w / 2 - 1;
+    int32_t hy = h / 2 - 1;
+    int32_t x = EF_S32(0x0015b744u) - 1;
+    int32_t y = EF_S32(0x0015b748u) - 1;
+    set_view_origin_dc21c((uint32_t)y, (uint32_t)x, (uint32_t)hy, (uint32_t)hx);
+    guest_fn_ce328_w(0, x, 0, y);
+    guest_fn_cdf48(0u, (uint32_t)x, 0u, (uint32_t)y);
+}
+
+/* 0x118428, 98 bytes. Queue byte ch into the ring buffer of an open device object (buffer at +4, head word at +2, tail word at +4 of the record at [obj], size word at +6): returns 1 on success or when the object is closed, 0 when full. */
+uint32_t queue_byte_118428(uint32_t obj, uint32_t ch)
+{
+    uint32_t q;
+    int16_t head;
+    if (EF_U32(obj + 0x1cu) == 0u)
+        return 1u;
+    q = EF_U32(obj);
+    if (EF_U16(q + 4u) == EF_U16(q + 6u))
+        return 0u;
+    disable_interrupts_11f2d3();
+    head = (int16_t)EF_U16(q + 2u);
+    EF_U16(q + 2u) = (uint16_t)(EF_U16(q + 2u) + 1u);
+    EF_U8(EF_U32(obj + 4u) + (uint32_t)(int32_t)head) = (uint8_t)ch;
+    if (EF_U16(q + 2u) == EF_U16(q + 6u))
+        EF_U16(q + 2u) = 0u;
+    EF_U16(q + 4u) = (uint16_t)(EF_U16(q + 4u) + 1u);
+    guest_fn_117b18_x(obj);
+    enable_interrupts_11f2d5();
+    return 1u;
+}

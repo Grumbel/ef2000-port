@@ -589,7 +589,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00035144	85	reset_flags_35144	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00035144.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0003519c	122			unknown	unclassified	unverified		
 0x00035218	8	constant_44_35218	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00035218.json	docs/compiler-abi.md; Constant 0x44.; callers 34f30@34f70,3527c@352b6; guest pending
-0x00035220	92			unknown	unclassified	unverified		
+0x00035220	92	send_key_request_35220	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035220.json	docs/compiler-abi.md; Build a 3-byte request (the key byte plus a word: 0x19f592 - 1 for key 0x48, else 0xffff), mirror the word to 0x19f58c, ; callers 367f0@3685d,367f0@368b0,367f0@36906; guest pending
 0x0003527c	682			unknown	unclassified	unverified		
 0x00035528	59	reset_state_35528	game_helpers5	compiles	game	confirmed	decomp/tests/0x00035528.json	docs/compiler-abi.md; ; callers 36ad8@36b47,36ad8@36bb4; guest pending
 0x00035590	438			unknown	unclassified	unverified		
@@ -1485,7 +1485,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007c4fc	119	set_session_text_7c4fc	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007c4fc.json	docs/compiler-abi.md; Build a path from a name, remember it and hand a copy to the loader.; callers 4aa0@4aee,4cf4@4d38,4d4c@4dfe; guest pending
 0x0007c574	506	gpwMissionAccepted		named	unclassified	unverified		
 0x0007c770	775			unknown	unclassified	unverified		
-0x0007ca78	92			unknown	unclassified	unverified		
+0x0007ca78	92	update_widget_chain_7ca78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007ca78.json	docs/compiler-abi.md; Walk the widget chain (next at +0x21) starting at the widget found under 0x187f38/0x187dfc; the first n entries (n = 0x1; callers 7cc5c@7ccc5; guest pending
 0x0007cad4	153	onopenCurrentMission		named	unclassified	unverified		
 0x0007cb70	199	gpwTurnXPlane		named	unclassified	unverified		
 0x0007cc38	35	run_named_widget_7cc38	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x0007cc38.json	docs/compiler-abi.md; Reset via 0xc768, then run 0x7bc40 on a named widget.; callers none direct; guest pending
@@ -2853,7 +2853,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c9a98	531			unknown	unclassified	unverified		
 0x000c9cac	536			unknown	unclassified	unverified		
 0x000c9ec4	5	tail_jump_c9ec4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c9ec4.json	docs/compiler-abi.md; tail jump. Forward to 0xdc2c0.; callers a6038@a606f,ac5f8@ac610; guest pending
-0x000c9ecc	92			unknown	unclassified	unverified		
+0x000c9ecc	92	init_view_corners_c9ecc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c9ecc.json	docs/compiler-abi.md; Set the view origin to the screen size (0x15b744 x 0x15b748) minus one with the half-size corner, and latch the full rec; callers a5b70@a5c97,a60a8@a6179,ac408@ac522; guest pending
 0x000c9f28	153			unknown	unclassified	unverified		
 0x000c9fc4	439			unknown	unclassified	unverified		
 0x000ca17c	74	redraw_ca17c	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ca17c.json	docs/compiler-abi.md; ; callers ac5f8@ac621,ac780@ac7a0; guest pending
@@ -4146,7 +4146,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00117f14	82	alloc_serial_state_117f14	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00117f14.json	docs/compiler-abi.md; Allocate the 0x1a-byte state block of a serial record.; callers 117f68@11800a; guest pending
 0x00117f68	807			unknown	unclassified	unverified		
 0x00118290	408			unknown	unclassified	unverified		
-0x00118428	98			unknown	unclassified	unverified		
+0x00118428	98	queue_byte_118428	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00118428.json	docs/compiler-abi.md; Queue byte ch into the ring buffer of an open device object (buffer at +4, head word at +2, tail word at +4 of the recor; callers 106d00@106d2a,107060@107068; guest pending
 0x001184c4	92	ring_pop_1184c4	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x001184c4.json	docs/compiler-abi.md; Pop one byte from the ring buffer of a serial record, -1 if empty.; callers 106cb0@106cd7,106d34@106d6b,106dc4@106de0; guest pending
 0x00118520	29	entry_empty_118520	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x00118520.json	docs/compiler-abi.md; True when the record has no entry or its entry holds zero.; callers 106cb0@106cc8,106d34@106d60,106dc4@106dd5; guest pending
 0x001185ec	117	serial_reset_1185ec	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x001185ec.json	docs/compiler-abi.md; Reset both ring buffers of a serial record and quiesce the port.; callers 106d34@106d46,107070@10708e,107070@107119; guest pending

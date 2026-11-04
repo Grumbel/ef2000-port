@@ -5344,3 +5344,12 @@ in EAX, format string address, one value).
 | `0x101688` | EAX:int32_t | none | 1016e0@101826 | Run a short hardware delay loop: n pulses of the two callbacks at 0x486da4/0x486da0, one for the low bit and two per rem |
 | `0x7ff0c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | none direct | (ret 12) Create an entry through 0xd7764 with the caller's EAX/EDX/EBX/ECX and three stack arguments and append it to th |
 | `0xab060` | EAX:uint32_t | none | ab0dc@ab162 | Find the node at 0x4191d4 in the group lists and write its two indices (words from a zeroed pair) plus one byte at 0x419 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x35220` | EAX:uint32_t | none | 367f0@3685d,367f0@368b0,367f0@36906 | Build a 3-byte request (the key byte plus a word: 0x19f592 - 1 for key 0x48, else 0xffff), mirror the word to 0x19f58c,  |
+| `0x7ca78` | none | none | 7cc5c@7ccc5 | Walk the widget chain (next at +0x21) starting at the widget found under 0x187f38/0x187dfc; the first n entries (n = 0x1 |
+| `0xc9ecc` | none | none | a5b70@a5c97,a60a8@a6179,ac408@ac522 | Set the view origin to the screen size (0x15b744 x 0x15b748) minus one with the half-size corner, and latch the full rec |
+| `0x118428` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 106d00@106d2a,107060@107068 | Queue byte ch into the ring buffer of an open device object (buffer at +4, head word at +2, tail word at +4 of the recor |

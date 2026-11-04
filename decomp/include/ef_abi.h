@@ -4493,4 +4493,13 @@ void guest_fn_a7318_2_x(uint32_t node, uint32_t key); /* 0xa7318 EAX/EDX */
 
 void guest_fn_a7318_2_x(uint32_t node, uint32_t key); /* 0xa7318 EAX/EDX */
 
+void send_key_request_35220(uint32_t key);
+void update_widget_chain_7ca78(void);
+void init_view_corners_c9ecc(void);
+uint32_t queue_byte_118428(uint32_t obj, uint32_t ch);
+void guest_fn_117b18_x(uint32_t obj); /* 0x117b18 EAX */
+
+
+void guest_fn_117b18_x(uint32_t obj); /* 0x117b18 EAX */
+
 #endif
