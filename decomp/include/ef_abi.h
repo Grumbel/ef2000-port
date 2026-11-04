@@ -6512,4 +6512,7 @@ void angles_from_vector_118770(int32_t a, int32_t b, int32_t c, int32_t d, int32
 ef_addr32 parse_time_string_10edda(ef_addr32 str, ef_addr32 buf, ef_addr32 out);
 ef_addr32 parse_time_string_10edda(ef_addr32 str, ef_addr32 buf, ef_addr32 out); /* 0x10edda */
 
+uint32_t shutdown_serial_port_e0a90(void);
+uint32_t shutdown_serial_port_e0a90(void); /* 0xe0a90 */
+
 #endif

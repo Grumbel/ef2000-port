@@ -23395,3 +23395,27 @@ ef_addr32 parse_time_string_10edda(ef_addr32 str, ef_addr32 buf, ef_addr32 out)
 	}
 	return p;
 }
+
+/* 0xe0a90, 116 bytes. Shut down the serial port: restore the interrupt mask, release the hook slot and re-init. Returns 1 in AL. */
+uint32_t shutdown_serial_port_e0a90(void)
+{
+	if (EF_U32(0x15eed0) == 0) {
+		return 1;
+	}
+	if (EF_U32(0x15eec0) != 0) {
+		if (EF_U8(0x15f0f6) == 0) {
+			uint32_t port = EF_U32(0x15eec4);
+			uint32_t v = guest_fn_9c430(port);
+
+			guest_fn_117b0c(port, (v & 0xff) | EF_U8(0x15eec8));
+		}
+		EF_U32(0x15eec0) = 0;
+	}
+	if (EF_U32(0x15eea8) != 0xffffffffu) {
+		release_hook_slot_7b4(EF_U32(0x15eea8));
+		EF_U32(0x15eea8) = 0xffffffffu;
+	}
+	init_serial_port_e0930();
+	EF_U32(0x15eed0) = 0;
+	return 1;
+}

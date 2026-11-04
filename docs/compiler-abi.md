@@ -9511,3 +9511,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10edda` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:ef_addr32 | 10eda1@10effa,10eda1@10f030 | Parse a "[:]text[+-]H:M:S" time string: copies the leading text (max 30 chars) to buf and stores the signed seconds to * |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe0a90` | none | EAX:uint32_t | none direct | Shut down the serial port: restore the interrupt mask, release the hook slot and re-init. Returns 1 in AL. |
