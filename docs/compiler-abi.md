@@ -7037,3 +7037,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xefb16` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | ee22c@ee5d9,ee22c@ee5f5,ee22c@ee7a7 | Compare the 80-bit extended values at A (EAX) and B (EDX): 2 if either is a NaN, otherwise -1, 0 or 1 for A below, equal |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xceda0` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | 95020@95093 | Move the 3-dword vector at VEC (EAX) along the direction given by the two angle words at ANG (EDX) by SCALE (EBX, low 16 |

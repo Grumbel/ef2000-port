@@ -9410,3 +9410,27 @@ uint32_t compare_extended_efb16(ef_addr32 a, ef_addr32 b)
     }
     return (((sa >> 15) ^ below) & 1u) != 0u ? 0xffffffffu : 1u;
 }
+
+/* 0xceda0, 231 bytes. Move the 3-dword vector at VEC (EAX) along the direction given by the two angle words at ANG (EDX) by SCALE (EBX, low 16 bits): the angles are negated and reduced to 13-bit indexes into the word tables at 0x141e08 and 0x142e08, x/y/z get 15-bit fixed-point products added, then y is clamped to the signed range [dword 0x15b7c0, dword 0x15b7c4]. */
+void offset_vector_by_angles_ceda0(ef_addr32 vec, ef_addr32 ang, uint32_t scale)
+{
+    uint32_t i0 = (uint32_t)(uint16_t)(0u - (uint32_t)EF_U16(ang)) >> 3;
+    uint32_t i1 = (uint32_t)(uint16_t)(0u - (uint32_t)EF_U16(ang + 2u)) >> 3;
+    uint16_t a0 = EF_U16(0x00141e08u + i0 * 2u);
+    int32_t b0 = (int16_t)EF_U16(0x00142e08u + i0 * 2u);
+    int32_t c1 = (int16_t)EF_U16(0x00141e08u + i1 * 2u);
+    int32_t d1 = (int16_t)EF_U16(0x00142e08u + i1 * 2u);
+    int32_t s = (int16_t)scale;
+    int32_t tx = (int16_t)(-((c1 * b0) >> 15));
+    int32_t ty = (int16_t)(0u - (uint32_t)a0);
+    int32_t tz = (int16_t)((b0 * d1) >> 15);
+    int32_t y;
+    EF_U32(vec) = EF_U32(vec) + (uint32_t)((s * tx) >> 15);
+    y = (int32_t)(EF_U32(vec + 4u) + (uint32_t)((s * ty) >> 15));
+    EF_U32(vec + 8u) = EF_U32(vec + 8u) + (uint32_t)((s * tz) >> 15);
+    EF_U32(vec + 4u) = (uint32_t)y;
+    if (y > (int32_t)EF_U32(0x0015b7c4u))
+        EF_U32(vec + 4u) = EF_U32(0x0015b7c4u);
+    if ((int32_t)EF_U32(0x0015b7c0u) > (int32_t)EF_U32(vec + 4u))
+        EF_U32(vec + 4u) = EF_U32(0x0015b7c0u);
+}
