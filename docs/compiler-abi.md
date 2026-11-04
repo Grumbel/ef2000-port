@@ -4474,3 +4474,10 @@ in EAX, format string address, one value).
 | `0x1068b8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 1027f8@10281b | Deactivate a record that is not yet state 1 or 2: set state 2, run the callbacks at 0x84c and 0x850 (cdecl, record on th |
 | `0xeb698` | EAX:ef_addr32,EDX:ef_addr32 | none | eb9f8@eba16,eba64@eba9c,ebb58@ebb92 | Seek the context's handle to the given position; on a position change first reread the 8-byte header into context+0x148  |
 | `0xa3424` | AX:uint16_t | none | a348c@a34c4 | Copy the 0x21-byte name of table entry (index << 5) at 0x13587c into the buffer of the slot it names and flag that slot  |
+
+## runtime_helpers36 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x113398` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Release a record container: trace each 0x718-byte element, trace field 0xc, free the element array and the 0x1d4-byte co |
+| `0x11580e` | EAX:ef_addr32,EDX:int32_t,EBX:ef_addr32 | EAX:ef_addr32 | 103f04@103f5c | fgets: read at most n-1 characters up to and including a newline into buf from stream; returns buf, or 0 on end of file  |

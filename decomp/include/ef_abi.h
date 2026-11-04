@@ -3925,4 +3925,8 @@ void deactivate_record_1068b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 void seek_record_eb698(ef_addr32 pos, ef_addr32 ctx);
 void copy_name_and_flag_a3424(uint16_t index);
 
+/* runtime_helpers36.c */
+void release_record_array_113398(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 ctx);
+ef_addr32 stream_fgets_11580e(ef_addr32 buf, int32_t n, ef_addr32 stream);
+
 #endif
