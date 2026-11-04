@@ -5373,4 +5373,6 @@ void guest_fn_cccc_x(ef_addr32 w); /* 0xcccc EAX */
 void apply_order_record_56890(ef_addr32 rec);
 void guest_fn_10a9c_x(int32_t a, int32_t b, int32_t c); /* 0x10a9c EAX/EDX/EBX */
 
+void define_text_slot_e3e50(ef_addr32 text);
+
 #endif

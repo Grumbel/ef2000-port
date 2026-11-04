@@ -3368,7 +3368,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e3c60	11	set_pointer_e3c60	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000e3c60.json	docs/compiler-abi.md; Set the 0x159134 pointer to its default.; callers c8c34@c4550,e4188@e423e; guest pending
 0x000e3c6c	61	select_page_e3c6c	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e3c6c.json	docs/compiler-abi.md; Resolve a page slot from the 0x190a44 chain and store it in 0x159134.; callers none direct; guest pending
 0x000e3cac	396			unknown	unclassified	unverified		
-0x000e3e50	153			unknown	unclassified	unverified		
+0x000e3e50	153	define_text_slot_e3e50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e3e50.json	docs/compiler-abi.md; Parse a text-slot definition "N=name" at TEXT (EAX): read the slot number N, expect '=' and skip blanks (a number below ; callers none direct; guest pending
 0x000e3f00	188			unknown	unclassified	unverified		
 0x000e3fbc	61	append_translated_e3fbc	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e3fbc.json	docs/compiler-abi.md; Translate a value and append the non-zero result to the 32-entry list.; callers none direct; guest pending
 0x000e3ffc	20	set_scratch_name_e3ffc	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000e3ffc.json	docs/compiler-abi.md; Copy a name to the scratch string and run 0x107310.; callers none direct; guest pending

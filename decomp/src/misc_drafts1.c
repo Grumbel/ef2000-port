@@ -10831,3 +10831,23 @@ void apply_order_record_56890(ef_addr32 rec)
                      EF_U8(rec + 0xcu));
     guest_fn_10a9c_x((int16_t)EF_U16(rec + 1u), (int32_t)EF_U32(rec + 6u) >> 16, (int32_t)EF_U32(rec + 4u) >> 16);
 }
+
+/* 0xe3e50, 153 bytes. Parse a text-slot definition "N=name" at TEXT (EAX): read the slot number N, expect '=' and skip blanks (a number below 1 is reported with 0x190a7c through 0x132a74), then build default path + 0x15f910 (when the path is non-empty) + the remaining text + 0x190a54 and store it as slot N - 1 (0xcd724). */
+void define_text_slot_e3e50(ef_addr32 text)
+{
+    char buf[0x90];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    ef_addr32 cur = text;
+    uint32_t c = (uint32_t)(uintptr_t)&cur;
+    uint32_t n = parse_decimal_1092b0(c);
+    expect_byte_109328(c, 0x3du);
+    skip_class_chars(c);
+    if ((int32_t)n < 1)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00190a7cu, n);
+    build_default_path_9c980(b);
+    if (buf[0] != 0)
+        (void)strcat_9ca57(b, 0x0015f910u);
+    (void)strcat_9ca57(b, cur);
+    (void)strcat_9ca57(b, 0x00190a54u);
+    set_text_slot_cd724((int16_t)(n - 1u), b);
+}

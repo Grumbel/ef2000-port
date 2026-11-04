@@ -7286,3 +7286,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x56890` | EAX:ef_addr32 | none | 581b0@58395 | Apply the order record REC (EAX; unit id word +1) to its unit (0x8ffe8) unless the unit's word +0x18 equals byte 0x1a666 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe3e50` | EAX:ef_addr32 | none | none direct | Parse a text-slot definition "N=name" at TEXT (EAX): read the slot number N, expect '=' and skip blanks (a number below  |
