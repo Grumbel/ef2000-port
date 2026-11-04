@@ -6065,3 +6065,45 @@ void start_sample_d7158(uint32_t chan, uint32_t pan, uint32_t rec, uint32_t vol)
     EF_U32(0x0015bad0u) = EF_U32(0x0015bad0u) + 1u;
     trace_call_102774(h);
 }
+
+/* 0x1df90, 348 bytes. Ground impact test for the projectile REC (owner byte +0x27 must match byte 0x1a666b and the done flag +0x47 must be clear): convert its position pairs (+0x1b/1f/23 and +9/0d/11, >> 8) into the scratch dwords 0x420904..0x42091c and the word copies 0x420930..0x42093a, look the cell up with 0x7ae88; on a hit mark the record done, store the current word (0xcd24c) in 0x1a6634, trigger the crater effect (0x106b0, kind 0x26) and the sound 0x110ec; then look the position up again with 0x7af60 and, if solid, optionally relocate the record to the point stored at 0x1f8ea8/ac/b0 (<< 8) when 0x7b7d8 agrees. When the record is done, clear byte +0x48 and dispatch the event (3 = hit, 2 = relocated) through 0x1e0ec. */
+void projectile_ground_test_1df90(uint32_t rec)
+{
+    uint32_t event = 0u;
+    if (EF_U8(rec + 0x27u) != EF_U8(0x001a666bu) || EF_U8(rec + 0x47u) != 0u)
+        return;
+    EF_U32(0x00420910u) = (uint32_t)((int32_t)EF_U32(rec + 0x1bu) >> 8);
+    EF_U32(0x00420904u) = (uint32_t)((int32_t)EF_U32(rec + 0x1fu) >> 8);
+    EF_U32(0x00420918u) = (uint32_t)((int32_t)EF_U32(rec + 0x23u) >> 8);
+    EF_U32(0x00420914u) = (uint32_t)((int32_t)EF_U32(rec + 9u) >> 8);
+    EF_U32(0x00420908u) = (uint32_t)((int32_t)EF_U32(rec + 0xdu) >> 8);
+    EF_U32(0x0042091cu) = (uint32_t)((int32_t)EF_U32(rec + 0x11u) >> 8);
+    EF_U16(0x00420930u) = (uint16_t)EF_U32(0x00420910u);
+    EF_U16(0x00420932u) = (uint16_t)EF_U32(0x00420904u);
+    EF_U16(0x00420936u) = (uint16_t)EF_U32(0x00420914u);
+    EF_U16(0x00420934u) = (uint16_t)EF_U32(0x00420918u);
+    EF_U16(0x00420938u) = (uint16_t)EF_U32(0x00420908u);
+    EF_U16(0x0042093au) = (uint16_t)EF_U32(0x0042091cu);
+    if (lookup_plane_cell_7ae88(0u, EF_U32(0x00420914u), 0u, EF_U32(0x0042091cu)) != 0u) {
+        EF_U8(rec + 0x47u) = 1u;
+        EF_U16(0x001a6634u) = cursor_word_at_2();
+        guest_fn_106b0_x(0xffffffffu, (uint32_t)((int32_t)EF_U32(rec + 9u) >> 8), 0u,
+                         (uint32_t)((int32_t)EF_U32(rec + 0x11u) >> 8), 0x26u);
+        guest_fn_110ec_x(1u, 0x64u);
+        event = 3u;
+    }
+    if (lookup_plane_cell_7af60(0u, (uint32_t)((int32_t)EF_U32(rec + 9u) >> 8), 0u,
+                                (uint32_t)((int32_t)EF_U32(rec + 0x11u) >> 8)) != 0u) {
+        if (guest_fn_7b7d8() != 0u) {
+            EF_U32(rec + 9u) = EF_U32(0x001f8eb0u) << 8;
+            EF_U32(rec + 0xdu) = EF_U32(0x001f8eacu) << 8;
+            EF_U32(rec + 0x11u) = EF_U32(0x001f8ea8u) << 8;
+        }
+        event = 2u;
+        EF_U8(rec + 0x47u) = 1u;
+    }
+    if (EF_U8(rec + 0x47u) != 0u) {
+        EF_U8(rec + 0x48u) = 0u;
+        dispatch_record_event_1e0ec(rec, (int16_t)event);
+    }
+}

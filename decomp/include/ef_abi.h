@@ -4992,4 +4992,9 @@ void draw_map_markers_436dc(uint32_t head, uint32_t list);
 
 void start_sample_d7158(uint32_t chan, uint32_t pan, uint32_t rec, uint32_t vol);
 
+void projectile_ground_test_1df90(uint32_t rec);
+void guest_fn_110ec_x(uint32_t a, uint32_t b); /* 0x110ec EAX/EDX */
+
+
+
 #endif
