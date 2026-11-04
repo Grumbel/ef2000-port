@@ -15638,3 +15638,72 @@ void step_setup_screen_36f84(void)
 		}
 	}
 }
+
+/* 0x35590, 438 bytes. Menu-screen state machine in byte 0x19f5a7, the client twin of 0x36f84. Stores word 0x1357ac - 3 in word 0x125900, updates the frame delta (0xa4138) and clears bytes 0x19f598 and 0x19f599, then runs 0x36ad8 when byte 0x19f5a1 is 1, the connection step 0x367f0 when it is 2 and otherwise steps the state: 0 -> 1 and shows the status (0x34a38); 1 arms timer 0x45 for 6 ticks with flag 2 (0x35748); 2 unpacks the settings at dword 0x19f340 (0x3519c), commits the mode selection (0x35b2c), mirrors the reference state (0x37294), sets byte 0x19f5ab and goes to 3 (byte 0x125846 equal to 3), 4 (name 0x125828 equals the text 0x182f7c) or 5; 3 opens stream 0x182f88 (mode 4) and 4 opens the stream named at 0x125828 (mode 5) with 0x369fc; 5 refreshes the widgets (0xaca88, 0xa4c84), applies the text 0x182f94 or 0x182fa0 (0xa4d90), sets byte 0x41f2e8 and runs 0xabe44 on 0x182f2c. When the state changed the label widget (key 0x182fa8 in the dialog named 0x182fb0) is bound to the state text (0x130f5c, 0x130f78, 0x131030, 0x130f92, 0x130fa8 for states 1..5). */
+void step_menu_screen_35590(void)
+{
+	uint8_t saved = EF_U8(0x0019f5a7u);
+	uint32_t dlg, widget, text;
+
+	EF_U16(0x00125900u) = (uint16_t)(EF_U16(0x001357acu) - 3u);
+	update_frame_delta_a4138();
+	EF_U8(0x0019f598u) = 0u;
+	EF_U8(0x0019f599u) = 0u;
+	if (EF_U8(0x0019f5a1u) == 1u) {
+		guest_fn_36ad8_x();
+	} else if (EF_U8(0x0019f5a1u) == 2u) {
+		step_connection_367f0();
+	} else {
+		switch (EF_U8(0x0019f5a7u)) {
+		case 0:
+			EF_U8(0x0019f5a7u) = 1u;
+			show_status_34a38();
+			break;
+		case 1:
+			arm_timer_record_35748(0x45u, 6u, 2u);
+			break;
+		case 2:
+			unpack_settings_3519c(EF_U32(0x0019f340u));
+			commit_mode_selection_35b2c();
+			mirror_reference_state();
+			EF_U8(0x0019f5abu) = 1u;
+			if (EF_U8(0x00125846u) == 3u)
+				EF_U8(0x0019f5a7u) = 3u;
+			else if (guest_fn_a4380(0x00125828u, 0x00182f7cu) == 0u)
+				EF_U8(0x0019f5a7u) = 4u;
+			else
+				EF_U8(0x0019f5a7u) = 5u;
+			break;
+		case 3:
+			open_stream_369fc(0x00182f88u, 4u);
+			break;
+		case 4:
+			open_stream_369fc(0x00125828u, 5u);
+			break;
+		case 5:
+			guest_fn_aca88_w();
+			refresh_all_widgets_a4c84();
+			guest_fn_a4d90(EF_U8(0x00125846u) == 3u ? 0x00182f94u : 0x00182fa0u);
+			EF_U8(0x0041f2e8u) = 1u;
+			guest_fn_abe44(0x00182f2cu);
+			break;
+		default:
+			break;
+		}
+	}
+	if (saved != EF_U8(0x0019f5a7u)) {
+		dlg = guest_fn_a46cc(0x00182fb0u);
+		widget = find_widget_checked_a78bc(dlg, 0x00182fa8u);
+		if (widget != 0u) {
+			switch (EF_U8(0x0019f5a7u)) {
+			case 1: text = 0x00130f5cu; break;
+			case 2: text = 0x00130f78u; break;
+			case 3: text = 0x00131030u; break;
+			case 4: text = 0x00130f92u; break;
+			case 5: text = 0x00130fa8u; break;
+			default: return;
+			}
+			guest_bind_dialog_widget(widget, text);
+		}
+	}
+}

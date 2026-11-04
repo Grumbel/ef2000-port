@@ -8202,3 +8202,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x36f84` | none | none | none direct | Setup-screen state machine in byte 0x19f5a8. Updates the frame delta (0xa4138), stores word 0x1357ac - 3 in word 0x12590 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x35590` | none | none | none direct | Menu-screen state machine in byte 0x19f5a7, the client twin of 0x36f84. Stores word 0x1357ac - 3 in word 0x125900, updat |

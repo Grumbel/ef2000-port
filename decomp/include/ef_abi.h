@@ -5810,4 +5810,7 @@ void step_setup_screen_36f84(void);
 void guest_fn_36438_x(void); /* 0x36438 */
 void guest_fn_36d30_x(void); /* 0x36d30 */
 
+void step_menu_screen_35590(void);
+void guest_fn_36ad8_x(void); /* 0x36ad8 */
+
 #endif

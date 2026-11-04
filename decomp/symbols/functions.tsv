@@ -592,7 +592,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00035220	92	send_key_request_35220	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035220.json	docs/compiler-abi.md; Build a 3-byte request (the key byte plus a word: 0x19f592 - 1 for key 0x48, else 0xffff), mirror the word to 0x19f58c, ; callers 367f0@3685d,367f0@368b0,367f0@36906; guest pending
 0x0003527c	682	process_packets_3527c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003527c.json	docs/compiler-abi.md; Process the received packet list: the byte at [0x136b78] gives the packet count and the bytes at [0x136b74] index 32-byt; callers 367f0@36833,367f0@36844,36ad8@36b12; guest pending
 0x00035528	59	reset_state_35528	game_helpers5	compiles	game	confirmed	decomp/tests/0x00035528.json	docs/compiler-abi.md; ; callers 36ad8@36b47,36ad8@36bb4; guest pending
-0x00035590	438			unknown	unclassified	unverified		
+0x00035590	438	step_menu_screen_35590	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035590.json	docs/compiler-abi.md; Menu-screen state machine in byte 0x19f5a7, the client twin of 0x36f84. Stores word 0x1357ac - 3 in word 0x125900, updat; callers none direct; guest pending
 0x00035748	90	arm_timer_record_35748	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00035748.json	docs/compiler-abi.md; Arm the timer record unless one is already active.; callers 35590@3561e; guest pending
 0x000357a4	70	start_screen_357a4	game_helpers5	compiles	game	confirmed	decomp/tests/0x000357a4.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000357ec	715			unknown	unclassified	unverified		
