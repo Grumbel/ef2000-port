@@ -3877,3 +3877,34 @@ void draw_clipped_text_e605c(uint32_t color, int32_t x, int32_t y, uint32_t str)
         str++;
     }
 }
+
+/* 0x106644, 196 bytes. Reset the stream control block P (cdecl): fixed defaults in the fields up to +0x40 (the clock word 0x4dd7e0 goes into +0x40, 0x2b11 into +0x3c), +0x44 is 0 when the owner's (+0) mode word at +0x18 is 0 or 1 and 0x40 otherwise, the buffer counters at +0x848/+0x84c/+0x850 are cleared, and the block is passed to 0x10535c. */
+void reset_stream_block_106644(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t p)
+{
+    uint32_t mode;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (p == 0u)
+        return;
+    EF_U32(p + 0x04u) = 2u;
+    EF_U32(p + 0x08u) = 0u;
+    EF_U32(p + 0x10u) = 0u;
+    EF_U32(p + 0x18u) = 0u;
+    EF_U32(p + 0x20u) = 0u;
+    EF_U32(p + 0x0cu) = 0u;
+    EF_U32(p + 0x14u) = 0u;
+    EF_U32(p + 0x1cu) = 0u;
+    EF_U32(p + 0x24u) = 1u;
+    EF_U32(p + 0x28u) = 0u;
+    EF_U32(p + 0x2cu) = 0xfffffffeu;
+    EF_U32(p + 0x30u) = 1u;
+    EF_U32(p + 0x34u) = 0u;
+    EF_U32(p + 0x38u) = 0u;
+    EF_U32(p + 0x40u) = EF_U32(0x004dd7e0u);
+    EF_U32(p + 0x3cu) = 0x2b11u;
+    mode = EF_U32(EF_U32(p) + 0x18u);
+    EF_U32(p + 0x44u) = (mode == 0u || mode == 1u) ? 0u : 0x40u;
+    EF_U32(p + 0x848u) = 0u;
+    EF_U32(p + 0x84cu) = 0u;
+    EF_U32(p + 0x850u) = 0u;
+    guest_fn_10535c(p);
+}

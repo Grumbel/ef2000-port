@@ -4803,4 +4803,6 @@ void guest_fn_10dfec_x(uint32_t a, uint32_t b); /* 0x10dfec 2 stack, callee clea
 void draw_clipped_text_e605c(uint32_t color, int32_t x, int32_t y, uint32_t str);
 void guest_fn_e5f64_x(uint32_t x, uint32_t y, uint32_t code); /* 0xe5f64 EAX/EDX/EBX */
 
+void reset_stream_block_106644(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t p);
+
 #endif

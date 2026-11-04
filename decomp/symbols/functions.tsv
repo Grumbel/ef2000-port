@@ -3893,7 +3893,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00106514	117			unknown	unclassified	unverified		
 0x001065c8	106	find_open_entry_1065c8	trace_loaders1	compiles	game	confirmed	decomp/tests/0x001065c8.json	docs/compiler-abi.md; Find the first type-1 0x894-byte entry in the list of an object (array pointer +0x5c, count +0x60); if none is type 1 in; callers 102590@1025b5; guest pending
 0x00106634	16	set_state_1_106634	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106634.json	docs/compiler-abi.md; Dword +4 = 1.; callers 102644@102667; guest pending
-0x00106644	196			unknown	unclassified	unverified		
+0x00106644	196	reset_stream_block_106644	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00106644.json	docs/compiler-abi.md; Reset the stream control block P (cdecl): fixed defaults in the fields up to +0x40 (the clock word 0x4dd7e0 goes into +0; callers 102670@102693; guest pending
 0x00106708	13	get_state_106708	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106708.json	docs/compiler-abi.md; Dword +4, or 0 for null.; callers 1028f4@102919; guest pending
 0x00106718	37	set_range_106718	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106718.json	docs/compiler-abi.md; Reset +0xc and +0x14, set +8 and +0x10.; callers 1026fc@10272c; guest pending
 0x00106740	42	set_pair_106740	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106740.json	docs/compiler-abi.md; Update +0x34 / +0x38 and notify through 0x10535c when they change.; callers 102738@102768; guest pending
