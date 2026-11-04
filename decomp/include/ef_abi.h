@@ -6531,4 +6531,7 @@ void draw_textured_span_ff3bc(void); /* 0xff3bc */
 uint32_t process_name_table_7a738(void);
 uint32_t process_name_table_7a738(void); /* 0x7a738 */
 
+uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count);
+uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count); /* 0x115871 */
+
 #endif

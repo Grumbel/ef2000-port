@@ -23566,3 +23566,60 @@ uint32_t process_name_table_7a738(void)
 	(void)forward_value_1f8e90();
 	return 0u;
 }
+
+/* 0x115871, 275 bytes. DOS read(handle, buffer, count). Binary handles (flag 0x40) read directly; text handles drop CR bytes and stop at Ctrl-Z by seeking back. Returns the byte count, or the translated DOS error. */
+uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count)
+{
+	uint32_t out[7];
+	uint32_t flags = lookup_slot_11024e((int32_t)handle);
+	uint32_t total;
+	uint32_t cursor;
+	if (flags == 0u) {
+		guest_fn_ebe6d(4u);
+		return 0xffffffffu;
+	}
+	if ((flags & 1u) == 0u) {
+		guest_fn_ebe6d(6u);
+		return 0xffffffffu;
+	}
+	if ((flags & 0x40u) != 0u) {
+		run_dos_int_ex(0x21u, 0x3f00u, handle, count, buffer, out);
+		if (out[6] != 0u)
+			return (uint32_t)translate_key_1101e8((int32_t)(out[0] & 0xffffu));
+		return out[0];
+	}
+	total = 0u;
+	cursor = buffer;
+	for (;;) {
+		uint32_t n;
+		uint32_t kept = 0u;
+		uint32_t idx = 0u;
+		uint32_t p;
+		uint32_t end;
+		run_dos_int_ex(0x21u, 0x3f00u, handle, count, cursor, out);
+		if (out[6] != 0u)
+			return (uint32_t)translate_key_1101e8((int32_t)(out[0] & 0xffffu));
+		n = out[0];
+		if (n == 0u)
+			return total;
+		end = cursor + n;
+		for (p = cursor; p < end; p++, idx++) {
+			uint8_t c = EF_U8(p);
+			if (c == 0x1au) {
+				guest_fn_fa95f(handle, idx - n + 1u, 1u);
+				return total;
+			}
+			if (c != 0x0du) {
+				EF_U8(cursor + kept) = c;
+				total++;
+				kept++;
+			}
+		}
+		count -= kept;
+		cursor += kept;
+		if ((flags & 0x2000u) != 0u)
+			return total;
+		if (count == 0u)
+			return total;
+	}
+}

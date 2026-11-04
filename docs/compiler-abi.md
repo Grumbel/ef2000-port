@@ -9543,3 +9543,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7a738` | none | EAX:uint32_t | 7ab00@7ab9f | Read or write the entry count of the 0x1a2e78 table, then for each entry record its word, format its 0x49-byte name (for |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x115871` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 105070@1050f9 | DOS read(handle, buffer, count). Binary handles (flag 0x40) read directly; text handles drop CR bytes and stop at Ctrl-Z |
