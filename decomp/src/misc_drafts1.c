@@ -1980,3 +1980,61 @@ void draw_marked_box_3bcc0(int32_t a, int32_t b, ef_addr32 ptr, int32_t c, uint3
     }
     draw_box_3bc90((int16_t)c, a, b);
 }
+
+/* 0x10e28a, 107 bytes. Convert the positive double at P in place to a 64-bit integer: restore the hidden mantissa bit, shift left for large exponents or right (round to nearest, ties to even) for small ones. The sign bit is not handled (it is treated as part of the exponent). */
+void round_double_to_int64_10e28a(ef_addr32 p)
+{
+    uint32_t lo = EF_U32(p);
+    uint32_t hi = EF_U32(p + 4u);
+    uint32_t e = hi & 0xfff00000u;
+    uint32_t ex = e >> 20;
+    uint32_t guard = 0u;
+    uint32_t sticky = 0u;
+    hi = (hi ^ e) ^ 0x100000u;
+    if (ex > 0x433u) {
+        uint32_t n = ex - 0x433u;
+        while (n != 0u) {
+            hi = (hi << 1) | (lo >> 31);
+            lo <<= 1;
+            n--;
+        }
+    } else if (ex < 0x433u) {
+        uint32_t n = 0x433u - ex;
+        while (n != 0u) {
+            uint32_t cb = hi & 1u;
+            uint32_t cc = lo & 1u;
+            uint32_t ca = guard & 1u;
+            hi >>= 1;
+            lo = (lo >> 1) | (cb << 31);
+            guard = (guard >> 1) | (cc << 31);
+            sticky = sticky * 2u + ca;
+            n--;
+        }
+        if (guard >= 0x80000000u) {
+            if (guard != 0x80000000u || sticky != 0u || (lo & 1u) != 0u) {
+                lo += 1u;
+                if (lo == 0u)
+                    hi += 1u;
+            }
+        }
+    }
+    EF_U32(p) = lo;
+    EF_U32(p + 4u) = hi;
+}
+
+/* 0x7cc5c, 114 bytes. Show the main widget set: release the parser buffers, activate the widget stored at "0x187f74" when the mode byte at 0x125839 is 1, run 0x7bee8 on 0x1f8f74, position the "0x187f38" widget at row 0x18 + 20 * [0x12b056] and refresh the widget chain. */
+void show_main_widgets_7cc5c(void)
+{
+    ef_addr32 w;
+    EF_U8(0x00137a00u) = 1u;
+    guest_fn_e710();
+    if (EF_U8(0x00125839u) == 1u) {
+        w = find_named_or_abort_a46cc(0x00187f74u);
+        activate_widget_a4cb4((uint16_t)EF_U8(w + 0x10u));
+    }
+    EF_U8(0x00125847u) = 1u;
+    guest_fn_7bee8_x(0x001f8f74u);
+    w = find_named_or_abort_a46cc(0x00187f38u);
+    guest_fn_a520c(w, (int16_t)EF_U16(w + 0x45u), (uint32_t)(int16_t)(EF_U16(0x0012b056u) * 0x14u + 0x18u), 0u);
+    update_widget_chain_7ca78();
+}

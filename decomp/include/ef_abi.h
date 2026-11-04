@@ -4637,4 +4637,8 @@ void draw_marked_box_3bcc0(int32_t a, int32_t b, ef_addr32 ptr, int32_t c, uint3
 void guest_fn_5e21c_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x5e21c EAX/EDX/EBX/ECX */
 void guest_fn_c8ccc_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0xc8ccc 5 stack, callee cleanup */
 
+void round_double_to_int64_10e28a(ef_addr32 p);
+void show_main_widgets_7cc5c(void);
+void guest_fn_7bee8_x(uint32_t a); /* 0x7bee8 EAX */
+
 #endif

@@ -1489,7 +1489,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007cad4	153	onopenCurrentMission		named	unclassified	unverified		
 0x0007cb70	199	gpwTurnXPlane		named	unclassified	unverified		
 0x0007cc38	35	run_named_widget_7cc38	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x0007cc38.json	docs/compiler-abi.md; Reset via 0xc768, then run 0x7bc40 on a named widget.; callers none direct; guest pending
-0x0007cc5c	114			unknown	unclassified	unverified		
+0x0007cc5c	114	show_main_widgets_7cc5c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007cc5c.json	docs/compiler-abi.md; Show the main widget set: release the parser buffers, activate the widget stored at "0x187f74" when the mode byte at 0x1; callers none direct; guest pending
 0x0007ccd0	10	call_b1a10_1379bc	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007ccd0.json	docs/compiler-abi.md; tail 0xb1a10 with EAX=0x1379bc; callers none direct; guest pending
 0x0007ccdc	648			unknown	unclassified	unverified		
 0x0007cf64	465			unknown	unclassified	unverified		
@@ -4002,7 +4002,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010dfec	161			unknown	unclassified	unverified		
 0x0010e08d	17			unknown	unclassified	unverified		
 0x0010e250	58			unknown	unclassified	unverified		
-0x0010e28a	107			unknown	unclassified	unverified		
+0x0010e28a	107	round_double_to_int64_10e28a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e28a.json	docs/compiler-abi.md; Convert the positive double at P in place to a 64-bit integer: restore the hidden mantissa bit, shift left for large exp; callers ebea3@ebece; guest pending
 0x0010e2f5	106			unknown	unclassified	unverified		
 0x0010e35f	167			unknown	unclassified	unverified		
 0x0010e414	2			unknown	unclassified	unverified		

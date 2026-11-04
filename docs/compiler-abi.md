@@ -5608,3 +5608,10 @@ in EAX, format string address, one value).
 | `0xd1bec` | none | none | d1c54@d1c8d | Finish the log file at handle 0x420944: write the sizes into the header (offsets 4 and 0x334, size 0x330 rounded up to e |
 | `0x5e1b0` | EAX:int32_t,EDX:int32_t,EBX:ef_addr32,ECX:int32_t | none | 5bd8c@5beca | Draw the format string FMT at cell (A, B) (scaled by the shift at 0x12b369, offset by 0x1a6cfc/0x1a6cfa) and continue wi |
 | `0x3bcc0` | EAX:int32_t,EDX:int32_t,EBX:ef_addr32,ECX:int32_t,[ESP+4]:uint32_t | none | 3a3a8@3b49f,3a3a8@3b509,3a3a8@3b564 | Optionally (when the last stack argument is 1) draw through 0xc8ccc with the first and second words of PTR added to B an |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10e28a` | EAX:ef_addr32 | none | ebea3@ebece | Convert the positive double at P in place to a 64-bit integer: restore the hidden mantissa bit, shift left for large exp |
+| `0x7cc5c` | none | none | none direct | Show the main widget set: release the parser buffers, activate the widget stored at "0x187f74" when the mode byte at 0x1 |
