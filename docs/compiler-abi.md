@@ -7012,3 +7012,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xddae0` | none | none | 27d18@27ef4,dd8d0@dd8d5,f3480@f348d | Poll the mouse: add the motion (0xce02c) to the pointer words 0x425fc8 (x) and 0x425fc6 (y), clamp x to the dword range  |
 | `0xea50c` | [ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t | none | 8b39c@8b469 | cdecl, variadic (FMT, ...): increment the nesting counter byte 0x160638; only when it becomes 1 format the message; when |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4f8a8` | none | none | 4ce4c@4cfd4 | Refresh the button dialog 0x184ae4: label the widgets 0x184e4c and 0x184e54 with the numbers of bytes 0x1a5530 and 0x1a5 |

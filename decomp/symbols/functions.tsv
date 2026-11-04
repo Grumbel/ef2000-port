@@ -918,7 +918,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004f6bc	74	flush_active_dialog_slots	event_wrappers	compiles	game	confirmed	decomp/tests/0x004f6bc.json	BL-index loop over mapped active slots, clear and update dialog; callers 4f3e0@4f48b/4f494@4f53f; guest pending
 0x0004f718	183	select_button_state_4f718	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004f718.json	docs/compiler-abi.md; Update a row of four button widgets of the group IDX under the root named at 0x184a8c: clear the dirty flag of widgets "; callers 4f3e0@4f481,4f494@4f535,4f548@4f5f5; guest pending
 0x0004f7d0	215	fill_button_widgets_4f7d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004f7d0.json	docs/compiler-abi.md; Fill the 16 button widgets "<n>" (format 0x184a9c) of the dialog 0x184a8c: the first byte 0x1a5531 buttons get the label; callers 4b6a0@4ba2c,4ca90@4cada,4f3e0@4f486; guest pending
-0x0004f8a8	236			unknown	unclassified	unverified		
+0x0004f8a8	236	refresh_button_dialog_4f8a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004f8a8.json	docs/compiler-abi.md; Refresh the button dialog 0x184ae4: label the widgets 0x184e4c and 0x184e54 with the numbers of bytes 0x1a5530 and 0x1a5; callers 4ce4c@4cfd4; guest pending
 0x0004f994	206	mpFlyMission		named	unclassified	unverified		
 0x0004fa64	910			unknown	unclassified	unverified		
 0x0004fdf4	89	add_float_time_4fdf4	float_helpers2	compiles	game	confirmed	decomp/tests/0x0004fdf4.json	docs/compiler-abi.md; Add a float of minutes to a minutes/seconds pair, carrying seconds.; callers 4fa64@4fc46,4fa64@4fcda; guest pending

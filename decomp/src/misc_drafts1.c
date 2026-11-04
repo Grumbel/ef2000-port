@@ -9272,3 +9272,32 @@ void log_message_ea50c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint3
     }
     enter_handler_eb448(m);
 }
+
+/* 0x4f8a8, 236 bytes. Refresh the button dialog 0x184ae4: label the widgets 0x184e4c and 0x184e54 with the numbers of bytes 0x1a5530 and 0x1a5531 (format 0x184c94), label the widget 0x184e60 with dword +0xc of the record at dword 0x1a5506, find the entry of that record's table (dword +0x2c, 0x15-byte entries, count word +0x2a, entries 0xfe / 0xff skipped) whose name (table 0x13315c) equals the text 0x184e68 into byte 0x1a5533, and refill the buttons (0x4f7d0). */
+void refresh_button_dialog_4f8a8(void)
+{
+    char buf[0x10];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    uint32_t root = guest_fn_a46cc(0x00184ae4u);
+    uint32_t w, rec;
+    int16_t i;
+    w = find_widget_checked_a78bc(root, 0x00184e4cu);
+    (void)guest_sprintf_a4342(b, 0x00184c94u, (uint32_t)EF_U8(0x001a5530u));
+    guest_fn_a7588_x(w, b);
+    w = find_widget_checked_a78bc(root, 0x00184e54u);
+    (void)guest_sprintf_a4342(b, 0x00184c94u, (uint32_t)EF_U8(0x001a5531u));
+    guest_fn_a7588_x(w, b);
+    w = find_widget_checked_a78bc(root, 0x00184e60u);
+    guest_fn_a7588_x(w, EF_U32(EF_U32(0x001a5506u) + 0xcu));
+    EF_U8(0x001a5533u) = 0u;
+    for (i = 0; i < (int16_t)EF_U16(EF_U32(0x001a5506u) + 0x2au); i++) {
+        uint32_t v;
+        rec = EF_U32(0x001a5506u);
+        v = EF_U8(EF_U32(rec + 0x2cu) + (uint32_t)((int32_t)i * 0x15));
+        if (v == 0xffu || v == 0xfeu)
+            continue;
+        if (guest_fn_a4380(0x00184e68u, EF_U32(0x0013315cu + v * 4u)) == 0u)
+            EF_U8(0x001a5533u) = (uint8_t)i;
+    }
+    fill_button_widgets_4f7d0();
+}
