@@ -17922,3 +17922,64 @@ void update_atmosphere_e6c54(void)
 	w = v * (0.287 * m);
 	memcpy(ef_guest_memory_ptr(0x00432db8u), &w, 8);
 }
+
+/* 0x6f2bc, 290 bytes. Aim the chase camera at the point stored in the class row of the player unit (dword 0x1f71bc; row 0xca bytes, doubles +0x27, +0x2f, +0x37), unless the double 0x1f71b0 is below 1.0 or (for unit kinds 1 and 3, byte +0x2a) the check 0x6e390(1, 1) holds: heading 0x1f70f8 = atan2(y distance, x distance) (0xb4620), target height 0x1f7088 = z + (-304.8), distance 0x1f70a0 = 2d distance to the unit (0xb415c), the double 0x1f7100 is set to 100000.0 and the camera is started with 0x6ebe0 (3.0, 1.3, 0.0, 0.0, 1000.0 passed as ten stack dwords). */
+void aim_chase_camera_6f2bc(void)
+{
+	uint32_t unit = EF_U32(0x001f71bcu);
+	uint32_t row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+	double p[3], lim, v, w, h;
+
+	memcpy(&p[0], ef_guest_memory_ptr(row + 0x27u), 8);
+	memcpy(&p[1], ef_guest_memory_ptr(row + 0x2fu), 8);
+	memcpy(&p[2], ef_guest_memory_ptr(row + 0x37u), 8);
+	memcpy(&lim, ef_guest_memory_ptr(0x001f71b0u), 8);
+	if (1.0 > lim)
+		return;
+	if (EF_U8(unit + 0x2au) == 1u || EF_U8(unit + 0x2au) == 3u) {
+		if ((uint8_t)guest_fn_6e390(1u, 1u) != 0u)
+			return;
+	}
+	unit = EF_U32(0x001f71bcu);
+	memcpy(&v, ef_guest_memory_ptr(unit + 0x49u), 8);
+	memcpy(&w, ef_guest_memory_ptr(unit + 0x51u), 8);
+	h = atan2_b4620(p[1] - w, p[0] - v);
+	memcpy(ef_guest_memory_ptr(0x001f70f8u), &h, 8);
+	v = p[2] + -304.8;
+	memcpy(ef_guest_memory_ptr(0x001f7088u), &v, 8);
+	h = distance_2d_b415c(unit + 0x49u, (ef_addr32)(uintptr_t)p);
+	memcpy(ef_guest_memory_ptr(0x001f70a0u), &h, 8);
+	EF_U32(0x001f7104u) = 0x40f86a00u;
+	EF_U32(0x001f7100u) = 0u;
+	guest_fn_6ebe0_x(0u, 0x40080000u, 0xcccccccdu, 0x3ff4ccccu, 0u, 0u, 0u, 0u, 0u, 0x408f4000u);
+}
+
+/* 0x6f3e0, 289 bytes. Variant of 0x6f2bc for a fixed height: when the double 0x1f71b0 is at least 1.0 and (for unit kinds 1 and 3) 0x6e390(0, byte row+0x5e) is false, the heading 0x1f70f8 is the bearing from the unit to the row point (doubles +0x27, +0x2f), the target 0x1f7088 is set to -5000.0, 0x1f70a0 is the distance to the unit and the camera is started with 0x6ebe0 like 0x6f2bc. */
+void aim_camera_fixed_6f3e0(void)
+{
+	uint32_t unit, row;
+	double p[3], lim, v, w, h;
+
+	memcpy(&lim, ef_guest_memory_ptr(0x001f71b0u), 8);
+	if (1.0 > lim)
+		return;
+	unit = EF_U32(0x001f71bcu);
+	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+	memcpy(&p[0], ef_guest_memory_ptr(row + 0x27u), 8);
+	memcpy(&p[1], ef_guest_memory_ptr(row + 0x2fu), 8);
+	p[2] = -5000.0;
+	if (EF_U8(unit + 0x2au) == 1u || EF_U8(unit + 0x2au) == 3u) {
+		row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+		if ((uint8_t)guest_fn_6e390(0u, EF_U8(row + 0x5eu)) != 0u)
+			return;
+	}
+	unit = EF_U32(0x001f71bcu);
+	memcpy(&v, ef_guest_memory_ptr(unit + 0x49u), 8);
+	memcpy(&w, ef_guest_memory_ptr(unit + 0x51u), 8);
+	h = atan2_b4620(p[1] - w, p[0] - v);
+	memcpy(ef_guest_memory_ptr(0x001f7088u), &p[2], 8);
+	memcpy(ef_guest_memory_ptr(0x001f70f8u), &h, 8);
+	h = distance_2d_b415c(unit + 0x49u, (ef_addr32)(uintptr_t)p);
+	memcpy(ef_guest_memory_ptr(0x001f70a0u), &h, 8);
+	guest_fn_6ebe0_x(0u, 0x40080000u, 0xcccccccdu, 0x3ff4ccccu, 0u, 0u, 0u, 0u, 0u, 0x408f4000u);
+}

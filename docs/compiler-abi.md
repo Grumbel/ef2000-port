@@ -8516,3 +8516,10 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6f2bc` | none | none | 6c488@6c567 | Aim the chase camera at the point stored in the class row of the player unit (dword 0x1f71bc; row 0xca bytes, doubles +0 |
+| `0x6f3e0` | none | none | 6c488@6c55d | Variant of 0x6f2bc for a fixed height: when the double 0x1f71b0 is at least 1.0 and (for unit kinds 1 and 3) 0x6e390(0,  |
