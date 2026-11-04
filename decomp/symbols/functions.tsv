@@ -3215,7 +3215,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc334	26			unknown	unclassified	unverified		
 0x000dc34e	135			unknown	unclassified	unverified		
 0x000dc3d5	91	reset_scale_dc3d5	engine_helpers	compiles	game	confirmed	decomp/tests/0x000dc3d5.json	docs/compiler-abi.md; Reset the scale factors and the patched shift counts to 8.; callers dc314@dc329; guest pending
-0x000dc43e	219			unknown	unclassified	unverified		
+0x000dc43e	219	build_rotation_words_dc43e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dc43e.json	docs/compiler-abi.md; Implicit-register fragment (EBX, ESI, EDI = three angles; params in that order). Builds eight rotation-matrix words at 0; callers dc519@dc528; guest pending
 0x000dc519	126			unknown	unclassified	unverified		
 0x000dc5a9	158			unknown	unclassified	unverified		
 0x000dc71b	73			unknown	unclassified	unverified		

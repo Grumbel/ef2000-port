@@ -7302,3 +7302,34 @@ void assign_table_slot_8fe4(uint32_t index, uint32_t table)
     EF_U8(EF_U32(ent + 0x16u) + base + 0x22u) = 0u;
     guest_fn_46254(0x899u, (int32_t)EF_U32(obj + 0x4eu) >> 16, 0x4eu, slot, 0u, 0u);
 }
+
+/* 0xdc43e, 219 bytes. Implicit-register fragment (EBX, ESI, EDI = three angles; params in that order). Builds eight rotation-matrix words at 0xdc597 (inside the code segment, patched in place) from the sine table at 0x137e08 and cosine table at 0x139e08 (dword entries indexed by (angle >> 1) & 0x7ffc). The three reduced angles are also stored in 0xdc438/0xdc43a/0xdc43c. */
+void build_rotation_words_dc43e(uint32_t ebx, uint32_t esi, uint32_t edi)
+{
+    uint32_t a = (ebx >> 1) & 0x7ffcu;
+    uint32_t b = (esi >> 1) & 0x7ffcu;
+    uint32_t c = (edi >> 1) & 0x7ffcu;
+    uint32_t out = 0x000dc597u;
+    int32_t p, q, s_a, c_a, s_b, c_b;
+    uint32_t i;
+    int16_t w[8];
+    EF_U16(0x000dc438u) = (uint16_t)a;
+    EF_U16(0x000dc43au) = (uint16_t)b;
+    EF_U16(0x000dc43cu) = (uint16_t)c;
+    w[0] = (int16_t)((int32_t)EF_U32(0x00139e08u + c) >> 9);
+    p = (int32_t)EF_U32(0x00137e08u + (((a + c) & 0xffffu) & 0x7ffcu)) >> 10;
+    q = (int32_t)EF_U32(0x00139e08u + (((a + c) & 0xffffu) & 0x7ffcu)) >> 10;
+    s_a = (int32_t)EF_U32(0x00137e08u + (((a - c) & 0xffffu) & 0x7ffcu)) >> 10;
+    c_a = (int32_t)EF_U32(0x00139e08u + (((a - c) & 0xffffu) & 0x7ffcu)) >> 10;
+    w[1] = (int16_t)(p - s_a);
+    w[2] = (int16_t)(c_a - q);
+    w[3] = (int16_t)(-((int32_t)EF_U32(0x00137e08u + c) >> 9));
+    w[4] = (int16_t)(q + c_a);
+    w[5] = (int16_t)(p + s_a);
+    s_b = (int32_t)EF_U32(0x00137e08u + a) >> 9;
+    c_b = (int32_t)EF_U32(0x00139e08u + a) >> 9;
+    w[6] = (int16_t)(-s_b);
+    w[7] = (int16_t)c_b;
+    for (i = 0; i < 8u; i++)
+        EF_U16(out + i * 2u) = (uint16_t)w[i];
+}

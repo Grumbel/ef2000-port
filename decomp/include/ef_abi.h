@@ -5118,4 +5118,6 @@ void find_lowest_rank_a38f8(void);
 
 void assign_table_slot_8fe4(uint32_t index, uint32_t table);
 
+void build_rotation_words_dc43e(uint32_t ebx, uint32_t esi, uint32_t edi);
+
 #endif
