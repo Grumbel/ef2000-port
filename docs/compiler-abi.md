@@ -7688,3 +7688,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc0534` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | EAX:uint32_t | bc610@bc770 | Twin of 0xc02ec for the kinds 0xe and 0x16: for the first two indices J (0 and 1) of the list LIST (EDX, count by 0xbc5d |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe9cd8` | EAX:ef_addr32,EDX:double,EBX:double,ECX:double | none | 8e940@8ea35,e9c00@e9ca1 | Build the 3x3 rotation matrix of three angles A1, A2, A3 (stack doubles, ret 0x18) into the nine doubles at OUT (EAX), r |

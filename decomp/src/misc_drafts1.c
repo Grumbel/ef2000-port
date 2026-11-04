@@ -12674,3 +12674,25 @@ uint32_t fold_list_kinds_c0534(uint32_t a, uint32_t list, uint32_t b, uint32_t c
     }
     return cur;
 }
+
+/* 0xe9cd8, 243 bytes. Build the 3x3 rotation matrix of three angles A1, A2, A3 (stack doubles, ret 0x18) into the nine doubles at OUT (EAX), row major: with ci = cos(Ai), si = sin(Ai) the entries are c1*c2, c1*s2*s3 - s1*c3, c1*s2*c3 + s1*s3, s1*c2, s1*s2*s3 + c1*c3, s1*s2*c3 - c1*s3, -s2, s3*c2, c2*c3. */
+void build_rotation_matrix_e9cd8(ef_addr32 out, double a1, double a2, double a3)
+{
+    double c1 = cos_b45a2(a1);
+    double s1 = sin_b45ac(a1);
+    double c2 = cos_b45a2(a2);
+    double s2 = sin_b45ac(a2);
+    double c3 = cos_b45a2(a3);
+    double s3 = sin_b45ac(a3);
+    double m[9];
+    m[0] = c1 * c2;
+    m[1] = (c1 * s2) * s3 - s1 * c3;
+    m[2] = (c1 * s2) * c3 + s1 * s3;
+    m[3] = s1 * c2;
+    m[4] = (s1 * s2) * s3 + c1 * c3;
+    m[5] = (s1 * s2) * c3 - c1 * s3;
+    m[6] = -s2;
+    m[7] = s3 * c2;
+    m[8] = c2 * c3;
+    memcpy(ef_guest_memory_ptr(out), m, sizeof m);
+}

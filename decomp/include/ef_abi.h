@@ -5589,4 +5589,6 @@ void guest_fn_d5fa8_x(ef_addr32 out_a, ef_addr32 out_b); /* 0xd5fa8 EAX/EDX */
 uint32_t fold_list_kinds_c0534(uint32_t a, uint32_t list, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
 uint32_t guest_fn_c0624_x(int32_t cur, uint32_t kind, uint32_t j, uint32_t list, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xc0624 EAX/EDX/EBX/ECX + 6 stack, ret 0x18, -> AX */
 
+void build_rotation_matrix_e9cd8(ef_addr32 out, double a1, double a2, double a3);
+
 #endif
