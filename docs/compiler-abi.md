@@ -2862,3 +2862,15 @@ in EAX, format string address, one value).
 | `0x109e6c` | none | EAX:uint32_t | none direct |  |
 | `0x10d9e0` | none | EAX:uint32_t | e9ac0@e9b0d |  |
 | `0x10d1f4` | EAX:ef_addr32 | EAX:uint32_t | e8651@e867d |  |
+
+## runtime_helpers10 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa63c0` | EAX:ef_addr32 | none | a66cc@a66e3,e1958@e1b58 | Update a widget's position words from the colour nibble. |
+| `0xa73cc` | EAX:ef_addr32,EDX:uint32_t,BL:uint8_t | EAX:ef_addr32 | 33e78@33eb0,33e78@33ec5,34a98@34ac4 | Set bit 6 of the located widget's flags and refresh it. |
+| `0xa74bc` | EAX:ef_addr32,DX:int16_t,BX:int16_t | none | c768@c7b7,c768@c7ee,c768@c829 | Move a widget (negative coordinates clamp to 0) and relayout it. |
+| `0xa7588` | EAX:ef_addr32 | none | 40dc@4115,40dc@4163,40dc@4171 | Show a widget. |
+| `0xa788c` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | a59ac@a59b8,a78bc@a78d9 | Find the child control of a widget whose name equals key. |
+| `0xa8060` | none | none | 283c8@2840f | Write the fill byte to every live entry of the table, clear dead ones. |
+| `0xa9d0c` | none | EAX:uint32_t | a9e70@aa0f9 | Select the list node at position count (1-based) and return its payload. |

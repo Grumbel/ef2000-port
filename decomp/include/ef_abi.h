@@ -2113,4 +2113,15 @@ uint32_t return_zero_10d9e0(void);
 uint32_t block_start_10d1f4(ef_addr32 block);
 
 
+/* runtime_helpers10.c */
+void update_widget_metrics_a63c0(ef_addr32 widget);
+ef_addr32 set_widget_bit6_a73cc(ef_addr32 key, uint32_t unused_edx, uint8_t flag);
+void move_widget_a74bc(ef_addr32 widget, int16_t x, int16_t y);
+void show_widget_a7588(ef_addr32 widget);
+ef_addr32 find_child_by_name_a788c(ef_addr32 widget, ef_addr32 key);
+void fill_entries_a8060(void);
+uint32_t select_list_node_a9d0c(void);
+uint32_t guest_fn_e284c(uint32_t a, uint32_t b); /* 0xe284c EAX/EDX */
+void guest_fn_a7510(ef_addr32 widget); /* 0xa7510 EAX */
+
 #endif

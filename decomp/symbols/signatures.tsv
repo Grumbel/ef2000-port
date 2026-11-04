@@ -1276,3 +1276,10 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00109e6c	return_zero_109e6c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00109e6c (3 bytes); ; callers none direct; docs/compiler-abi.md
 0x0010d9e0	return_zero_10d9e0		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010d9e0 (3 bytes); ; callers e9ac0@e9b0d; docs/compiler-abi.md
 0x0010d1f4	block_start_10d1f4	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010d1f4 (9 bytes); ; callers e8651@e867d; docs/compiler-abi.md
+0x000a63c0	update_widget_metrics_a63c0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a63c0 (60 bytes); Update a widget's position words from the colour nibble.; callers a66cc@a66e3,e1958@e1b58; docs/compiler-abi.md
+0x000a73cc	set_widget_bit6_a73cc	EAX:ef_addr32,EDX:uint32_t,BL:uint8_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a73cc (57 bytes); Set bit 6 of the located widget's flags and refresh it.; callers 33e78@33eb0,33e78@33ec5,34a98@34ac4; docs/compiler-abi.md
+0x000a74bc	move_widget_a74bc	EAX:ef_addr32,DX:int16_t,BX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a74bc (83 bytes); Move a widget (negative coordinates clamp to 0) and relayout it.; callers c768@c7b7,c768@c7ee,c768@c829; docs/compiler-abi.md
+0x000a7588	show_widget_a7588	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7588 (42 bytes); Show a widget.; callers 40dc@4115,40dc@4163,40dc@4171; docs/compiler-abi.md
+0x000a788c	find_child_by_name_a788c	EAX:ef_addr32,EDX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a788c (45 bytes); Find the child control of a widget whose name equals key.; callers a59ac@a59b8,a78bc@a78d9; docs/compiler-abi.md
+0x000a8060	fill_entries_a8060			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a8060 (80 bytes); Write the fill byte to every live entry of the table, clear dead ones.; callers 283c8@2840f; docs/compiler-abi.md
+0x000a9d0c	select_list_node_a9d0c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a9d0c (60 bytes); Select the list node at position count (1-based) and return its payload.; callers a9e70@aa0f9; docs/compiler-abi.md
