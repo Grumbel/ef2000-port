@@ -4060,7 +4060,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00110f3c	51	scale_110f3c	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110f3c.json	docs/compiler-abi.md; 0x110f0c(value < 0xd68d ? value * 10000 / 0x20bc : 0).; callers 110f6f@110fb1; guest pending
 0x00110f6f	101			unknown	unclassified	unverified		
 0x00110fd4	241			unknown	unclassified	unverified		
-0x001110c5	83			unknown	unclassified	unverified		
+0x001110c5	83	restore_timer_vector_1110c5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001110c5.json	docs/compiler-abi.md; Restore the timer interrupt: reprogram the timer with divisor 0 (the default rate), restore the saved real-mode vector 8; callers 104694@1046ba; guest pending
 0x00111118	42	get_realmode_vector_111118	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00111118.json	docs/compiler-abi.md; cdecl: look up interrupt INTNO with the DOS extender calls 0x2502 (protected-mode vector, result discarded) and 0x2503 (; callers 101e80@101ea5; guest pending
 0x00111142	26	set_rm_vector_111142	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00111142.json	docs/compiler-abi.md; DOS4G set real-mode interrupt vector (int 21h, AX = 0x2505) for interrupt number CL = NUM (low byte) with EBX = VALUE; c; callers 101ed4@101efe; guest pending
 0x001111b1	25	check_marker_1111b1	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111b1.json	docs/compiler-abi.md; Compare the dword at 0x17d7c0 with -1 and do nothing either way (an empty check left over in the runtime).; callers 101f08@101f38; guest pending

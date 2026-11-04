@@ -21739,3 +21739,13 @@ uint32_t decode_symbol_fa200(uint32_t *esi, int32_t *edx, uint32_t *eax, uint32_
 	}
 	return ~ebx;
 }
+
+/* 0x1110c5, 83 bytes. Restore the timer interrupt: reprogram the timer with divisor 0 (the default rate), restore the saved real-mode vector 8 (dword 0x17d7aa) with int 21h AX=0x2505 and the saved protected-mode vector 8 (offset dword 0x17d7a4, selector word 0x17d7a8) with AX=0x2504. Interrupts are disabled around the sequence and the caller's interrupt flag is restored. */
+void restore_timer_vector_1110c5(void)
+{
+	uint32_t out[7];
+
+	set_timer_divisor_110f0c(0u);
+	run_dos_int_ex(0x21u, 0x2505u, EF_U32(0x17d7aau), 8u, 0u, out);
+	run_dos_int_ex(0x21u, 0x2504u, EF_U16(0x17d7a8u), 8u, EF_U32(0x17d7a4u), out);
+}

@@ -6357,4 +6357,7 @@ void normalize_double_ebe17(uint32_t *eax, uint32_t *edx, uint32_t *esi, uint32_
 uint32_t decode_symbol_fa200(uint32_t *esi, int32_t *edx, uint32_t *eax, uint32_t ecx);
 uint32_t decode_symbol_fa200(uint32_t *esi, int32_t *edx, uint32_t *eax, uint32_t ecx); /* 0xfa200 */
 
+void restore_timer_vector_1110c5(void);
+void restore_timer_vector_1110c5(void); /* 0x1110c5 */
+
 #endif

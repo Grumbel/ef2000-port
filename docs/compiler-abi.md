@@ -9241,3 +9241,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfa200` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fa02c@fa118 | Implicit-register fragment (ESI = stream pointer, EDX = remaining bytes minus one, AL = bit buffer; all updated; ECX and |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1110c5` | none | none | 104694@1046ba | Restore the timer interrupt: reprogram the timer with divisor 0 (the default rate), restore the saved real-mode vector 8 |
