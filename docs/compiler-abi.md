@@ -8753,3 +8753,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x4e14` | none | none | none direct | Enter the high-score screen: load the table, pick the arcade text file for the difficulty and enable the summary widgets |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf34cc` | none | none | f3f84@f3fa7 | Present one frame of the status screen: redraw the overlay when the frame is live, otherwise rebuild the caption, call t |

@@ -3630,7 +3630,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f3378	263	draw_overlay_polys_f3378	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f3378.json	docs/compiler-abi.md; Draw the outlined polygons of the overlay list: when word 0x1616e8 and byte 0x4859dc are both set run 0xf3214 first; the; callers f34cc@f34f6; guest pending
 0x000f3480	32	refresh_f3480	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3480.json	docs/compiler-abi.md; ; callers f34cc@f35a8; guest pending
 0x000f34a0	42	refresh_f34a0	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f34a0.json	docs/compiler-abi.md; ; callers f3f84@f40b1; guest pending
-0x000f34cc	266			unknown	unclassified	unverified		
+0x000f34cc	266	present_status_frame_f34cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f34cc.json	docs/compiler-abi.md; Present one frame of the status screen: redraw the overlay when the frame is live, otherwise rebuild the caption, call t; callers f3f84@f3fa7; guest pending
 0x000f35d8	22	load_path_value_f35d8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f35d8.json	docs/compiler-abi.md; Word 0x161e1c = 0x9d4cd(0x48592c) after 0xf2cd0().; callers f3b78@f3c2b; guest pending
 0x000f35f0	32	refresh_f35f0	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f35f0.json	docs/compiler-abi.md; ; callers f36a4@f36f2; guest pending
 0x000f3610	148	draw_path_segments_f3610	tactical_marks1	compiles	game	confirmed	decomp/tests/0x000f3610.json	docs/compiler-abi.md; Draw the segments of path record index (42-byte records at 0x484be0, count in the first word): one 0xe7a34 call per segm; callers f36a4@f36b0; guest pending

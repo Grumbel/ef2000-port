@@ -19509,3 +19509,41 @@ void enter_hiscore_screen_4e14(void)
 	guest_fn_a5ef8(EF_U8(node + 0x10u));
 	guest_fn_40dc_x(0u);
 }
+
+/* 0xf34cc, 266 bytes. Present one frame of the status screen: redraw the overlay when the frame is live, otherwise rebuild the caption, call the save routine and finish the palette fade. */
+void present_status_frame_f34cc(void)
+{
+	uint32_t i;
+
+	if (EF_U8(0x004859dcu) == 0u)
+		guest_fn_d65e8();
+	if (EF_U8(0x004859deu) == 0u) {
+		guest_fn_dc250();
+		if (EF_U8(0x004859ddu) != 0u)
+			draw_overlay_polys_f3378();
+		guest_fn_c386c();
+		guest_fn_dc250();
+		if (EF_U8(0x004859dcu) == 0u)
+			guest_fn_de580(0x00425c8cu);
+		else
+			guest_fn_d663c(0x00425c8cu);
+		guest_fn_c3990();
+		guest_fn_dd8dc();
+		guest_fn_dd8c0_x();
+		return;
+	}
+	guest_fn_c3974();
+	guest_fn_9d749(0x00485908u, EF_U32(0x00417254u));
+	guest_sprintf_a4342(EF_U32(0x00417258u), 0x00191990u, (uint32_t)EF_U8(0x004859dfu));
+	for (i = 0; i < 10u; i++)
+		EF_U8(EF_U32(0x00417260u) + i) = EF_U8(0x00191994u + i);
+	if ((uint16_t)guest_fn_eac48_x(7u, 0x00417250u) != 0u) {
+		guest_fn_c3f80(EF_U32(0x00485928u));
+		guest_callptr2_x(EF_U32(0x00132a74u), 0x001919a0u, 0x00485908u);
+	}
+	refresh_f3480();
+	if (EF_U8(0x004859dcu) == 0u)
+		guest_fn_de580(0x00425c8cu);
+	else
+		guest_fn_d663c(0x00425c8cu);
+}
