@@ -9451,3 +9451,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf05e5` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | none direct | 80-bit extended divide in place: [a] /= [b]. * Returns the quotient sign/overflow word left in EDI (0 for trivial cases) |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10a0d4` | EAX:ef_addr32,EDX:ef_addr32 | none | 109ec0@109eea,109ec0@109ef9,109ec0@109f08 | Fill the measurement record DST (doubles) from the bounding box SRC using the 0x11af60-0x11b040 box helpers. |

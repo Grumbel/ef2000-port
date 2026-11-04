@@ -6482,4 +6482,7 @@ void mantissa_div_f064b(uint32_t *r); /* 0xf064b */
 uint32_t ext_div_f05e5(ef_addr32 a, ef_addr32 b);
 uint32_t ext_div_f05e5(ef_addr32 a, ef_addr32 b); /* 0xf05e5 */
 
+void box_record_fill_10a0d4(ef_addr32 dst, ef_addr32 src);
+void box_record_fill_10a0d4(ef_addr32 dst, ef_addr32 src); /* 0x10a0d4 */
+
 #endif

@@ -23098,3 +23098,19 @@ uint32_t ext_div_f05e5(ef_addr32 a, ef_addr32 b)
 	EF_U16(a + 8) = (uint16_t)r[4];
 	return r[5];
 }
+
+/* 0x10a0d4, 144 bytes. Fill the measurement record DST (doubles) from the bounding box SRC using the 0x11af60-0x11b040 box helpers. */
+void box_record_fill_10a0d4(ef_addr32 dst, ef_addr32 src)
+{
+	*(double *)ef_guest_memory_ptr(dst) = abs_area_11af60(src);
+	*(double *)ef_guest_memory_ptr(dst + 0x08) = box_width_11af88(src);
+	*(double *)ef_guest_memory_ptr(dst + 0x10) = box_extent_sum_11af9c(src);
+	*(double *)ef_guest_memory_ptr(dst + 0x18) = box_shape_ratio_11afb4(src);
+	*(double *)ef_guest_memory_ptr(dst + 0x28) = blend_angle_11aff4(src, 0.0);
+	*(double *)ef_guest_memory_ptr(dst + 0x30) = blend_angle_11aff4(src, 0.5);
+	*(double *)ef_guest_memory_ptr(dst + 0x38) = blend_angle_11aff4(src, 0.25);
+	*(double *)ef_guest_memory_ptr(dst + 0x40) = box_measure_11b040(src, md_rd_f64(0x432ad8));
+	EF_U32(dst + 0x48) = 0;
+	EF_U32(dst + 0x4c) = 0;
+	*(double *)ef_guest_memory_ptr(dst + 0x20) = box_extent_ratio_11afe4(src);
+}
