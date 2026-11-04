@@ -3588,7 +3588,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f0cec	285			unknown	unclassified	unverified		
 0x000f0fac	82			unknown	unclassified	unverified		
 0x000f0ffe	72			unknown	unclassified	unverified		
-0x000f10ca	195			unknown	unclassified	unverified		
+0x000f10ca	195	dos_get_time_f10ca	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f10ca.json	docs/compiler-abi.md; Fill the broken-down time record TM (EAX) from DOS: dwords +0 seconds, +4 minutes, +8 hours, +0xc day, +0x10 month - 1, ; callers a4574@a457d; guest pending
 0x000f118d	340			unknown	unclassified	unverified		
 0x000f13ac	27	refresh_object_f13ac	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000f13ac.json	docs/compiler-abi.md; ; callers a56f8@a5704; guest pending
 0x000f17d8	51	process_words_f17d8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f17d8.json	docs/compiler-abi.md; Call 0xa4cb4 on up to five words starting at +0x59.; callers f18a4@f18fa,f18a4@f19a7,f1a70@f1b6f; guest pending

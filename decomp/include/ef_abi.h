@@ -5169,4 +5169,6 @@ uint32_t strstr_e7d27(uint32_t hay, uint32_t needle);
 
 void fill_span_d4510(void);
 
+uint32_t dos_get_time_f10ca(uint32_t tm);
+
 #endif

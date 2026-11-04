@@ -8050,3 +8050,29 @@ void fill_span_d4510(void)
     for (i = 0; i < (uint32_t)n; i++)
         EF_U8(dst + i) = col;
 }
+
+/* 0xf10ca, 195 bytes. Fill the broken-down time record TM (EAX) from DOS: dwords +0 seconds, +4 minutes, +8 hours, +0xc day, +0x10 month - 1, +0x14 year - 1900, +0x20 = -1 (DST unknown). The date (INT 21h/2Ah) is read before and after the time (2Ch); when the day rolled over meanwhile and the hour is not 23, the later date is used. Returns the hundredths of a second times 10. */
+uint32_t dos_get_time_f10ca(uint32_t tm)
+{
+    uint32_t r[7];
+    uint32_t d0, d1, t;
+    run_dos_int_ex(0x21u, 0x2a00u, 0u, 0u, 0u, r);
+    d0 = ((((r[2] & 0xffffu) - 0x76cu) & 0xffu) << 16) | (((r[0] & 0xffu)) << 24) | (r[3] & 0xffffu);
+    EF_U32(tm + 0x14u) = (d0 >> 16) & 0xffu;
+    EF_U32(tm + 0x10u) = ((d0 >> 8) & 0xffu) - 1u;
+    EF_U32(tm + 0xcu) = d0 & 0xffu;
+    run_dos_int_ex(0x21u, 0x2c00u, 0u, 0u, 0u, r);
+    t = ((r[2] & 0xffffu) << 16) | (r[3] & 0xffffu);
+    EF_U32(tm + 8u) = t >> 24;
+    EF_U32(tm + 4u) = (t >> 16) & 0xffu;
+    EF_U32(tm) = (t >> 8) & 0xffu;
+    run_dos_int_ex(0x21u, 0x2a00u, 0u, 0u, 0u, r);
+    d1 = ((((r[2] & 0xffffu) - 0x76cu) & 0xffu) << 16) | (((r[0] & 0xffu)) << 24) | (r[3] & 0xffffu);
+    if ((d1 & 0xffu) != (d0 & 0xffu) && EF_U32(tm + 8u) != 0x17u) {
+        EF_U32(tm + 0x14u) = (d1 >> 16) & 0xffu;
+        EF_U32(tm + 0x10u) = ((d1 >> 8) & 0xffu) - 1u;
+        EF_U32(tm + 0xcu) = d1 & 0xffu;
+    }
+    EF_U32(tm + 0x20u) = 0xffffffffu;
+    return (t & 0xffu) * 10u;
+}
