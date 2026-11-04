@@ -1890,3 +1890,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000919d4	reset_scene_angle_state_919d4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000919d4 (245 bytes); Reset the scene angle state and install the default handlers.; callers 3cfc0@3d1cf; docs/compiler-abi.md
 0x00093e58	init_scene_angles_93e58			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00093e58 (234 bytes); Compute the scene angles from the stored vector (variant with heading latch).; callers 95e58@960f5; docs/compiler-abi.md
 0x00091f30	apply_orientation_input_91f30			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00091f30 (249 bytes); Apply the pending yaw and roll input to the scene orientation.; callers 9357c@935c6,9357c@935de; docs/compiler-abi.md
+0x00008654	step_activity_slot_8654	AL:uint8_t,DL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00008654 (242 bytes); Advance a unit's activity slot, nudging the object it refers to.; callers 8cc4@8d22; docs/compiler-abi.md

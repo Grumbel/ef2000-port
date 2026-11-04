@@ -3821,3 +3821,9 @@ in EAX, format string address, one value).
 | `0x919d4` | none | none | 3cfc0@3d1cf | Reset the scene angle state and install the default handlers. |
 | `0x93e58` | none | none | 95e58@960f5 | Compute the scene angles from the stored vector (variant with heading latch). |
 | `0x91f30` | none | none | 9357c@935c6,9357c@935de | Apply the pending yaw and roll input to the scene orientation. |
+
+## game_helpers55 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8654` | AL:uint8_t,DL:uint8_t | none | 8cc4@8d22 | Advance a unit's activity slot, nudging the object it refers to. |

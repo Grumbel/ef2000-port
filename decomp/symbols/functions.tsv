@@ -120,7 +120,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00008394	144	flag_sub_entry_side_8394	float_helpers3	compiles	game	confirmed	decomp/tests/0x00008394.json	docs/compiler-abi.md; Flag a sub-entry as ahead (1) or behind (0xff) from a direction test.; callers 84b8@85df,8fe4@905d; guest pending
 0x00008424	145	sub_entry_heading_8424	float_helpers3	compiles	game	confirmed	decomp/tests/0x00008424.json	docs/compiler-abi.md; Scaled heading of a sub-entry as an integer angle, wrapped positive.; callers 84b8@861a,8cc4@8dbc; guest pending
 0x000084b8	410			unknown	unclassified	unverified		
-0x00008654	242			unknown	unclassified	unverified		
+0x00008654	242	step_activity_slot_8654	game_helpers55	compiles	game	confirmed	decomp/tests/0x00008654.json	docs/compiler-abi.md; Advance a unit's activity slot, nudging the object it refers to.; callers 8cc4@8d22; guest pending
 0x00008748	1401			unknown	unclassified	unverified		
 0x00008cc4	648			unknown	unclassified	unverified		
 0x00008f4c	77	update_table_slots_8f4c	game_helpers7	compiles	game	confirmed	decomp/tests/0x00008f4c.json	docs/compiler-abi.md; ; callers c630@c6f9,54210@5426a,7e8c0@7ebb6; guest pending

@@ -3390,4 +3390,10 @@ void guest_fn_a4d90_w(uint32_t a); /* 0xa4d90 EAX */
 uint32_t guest_fn_7b7d8_w(void); /* 0x7b7d8 -> EAX */
 uint64_t guest_fn_d9b30_w(void); /* 0xd9b30 -> EDX:EAX */
 
+/* game_helpers55.c */
+void step_activity_slot_8654(uint8_t group, uint8_t slot);
+
+/* game_helpers55.c */
+void step_activity_slot_8654(uint8_t group, uint8_t slot);
+
 #endif
