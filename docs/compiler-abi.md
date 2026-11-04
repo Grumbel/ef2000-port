@@ -5215,3 +5215,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x3170c` | none | none | 3122c@312ad | Rotate the vector at 0x19e57e by zero angles into 0x19e5c1 and add the offset triple at 0x19e560. |
 | `0x85380` | EAX:uint32_t | none | 857bc@85883 | While the owner record has an active chain (byte +0x8e) whose last 0x19-byte entry has kind 2, run 0x85358. |
+
+## code_maps1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbbdc4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 8883c@8889b,8e940@8eb37,90438@90606 | Map an index through the mapper chosen by kind (0..3: 0xbbbe4, 0xbbb34, 0xbbae4, 0xbbd8c) and look the result up in the  |

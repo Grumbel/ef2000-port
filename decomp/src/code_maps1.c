@@ -3,6 +3,7 @@
 
 #include "ef_abi.h"
 #include "ef_globals.h"
+#include "ef_mem.h"
 
 /* Jump-table code mappers. */
 
@@ -168,4 +169,18 @@ uint8_t map_code_ba0e4(uint32_t code)
     case 104: return 5;
     default: return 0;
     }
+}
+
+/* 0xbbdc4, 106 bytes. Map an index through the mapper chosen by kind (0..3: 0xbbbe4, 0xbbb34, 0xbbae4, 0xbbd8c) and look the result up in the 11-byte rows at 0x134087; kinds above 3 give 0. */
+uint32_t lookup_mapped_code_bbdc4(uint32_t kind, uint32_t index, uint32_t row)
+{
+    uint8_t r;
+    switch ((uint8_t)kind) {
+    case 0: r = map_code_flag_bbbe4((uint8_t)index); break;
+    case 1: r = map_code_5_6_bbb34((uint8_t)index); break;
+    case 2: r = map_code_9_10_bbae4((uint8_t)index); break;
+    case 3: r = map_code_class_bbd8c((uint8_t)index); break;
+    default: return 0u;
+    }
+    return EF_U8(0x00134087u + (row & 0xffu) * 11u + r);
 }

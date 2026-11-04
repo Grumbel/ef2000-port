@@ -2625,7 +2625,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bbb34	26	map_code_5_6_bbb34	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbb34.json	docs/compiler-abi.md; Map a code 0..12 to 5 or 6 (0 when out of range).; callers bbdc4@bbde6; guest pending
 0x000bbbe4	23	map_code_flag_bbbe4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbbe4.json	docs/compiler-abi.md; Map a code 0..36 to a flag.; callers bbdc4@bbdd9; guest pending
 0x000bbd8c	37	map_code_class_bbd8c	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbd8c.json	docs/compiler-abi.md; Map a code 1..100 to a class 0..8 (0 when out of range).; callers bbdc4@bbe00; guest pending
-0x000bbdc4	106			unknown	unclassified	unverified		
+0x000bbdc4	106	lookup_mapped_code_bbdc4	code_maps1	compiles	game	confirmed	decomp/tests/0x000bbdc4.json	docs/compiler-abi.md; Map an index through the mapper chosen by kind (0..3: 0xbbbe4, 0xbbb34, 0xbbae4, 0xbbd8c) and look the result up in the ; callers 8883c@8889b,8e940@8eb37,90438@90606; guest pending
 0x000bbf1c	447			unknown	unclassified	unverified		
 0x000bc0dc	247			unknown	unclassified	unverified		
 0x000bc1d3	180	parse_open_mode_bc1d3	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000bc1d3.json	docs/compiler-abi.md; Convert an fopen mode string to open flags.; callers bc287@bc291; guest pending

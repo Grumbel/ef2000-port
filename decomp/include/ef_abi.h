@@ -4418,4 +4418,6 @@ uint32_t guest_fn_85bc8_x(ef_addr32 point); /* 0x85bc8 EAX, result in AL */
 void place_rotated_vector_3170c(void);
 void drain_kind_two_chain_85380(uint32_t owner);
 
+uint32_t lookup_mapped_code_bbdc4(uint32_t kind, uint32_t index, uint32_t row);
+
 #endif
