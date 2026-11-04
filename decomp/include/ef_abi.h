@@ -2178,4 +2178,11 @@ void free_table_blocks_cd7a0(void);
 uint32_t forward_word_cd81c(int16_t stack_value);
 
 
+/* runtime_helpers16.c */
+uint32_t claim_device_slot_d70a0(uint8_t priority);
+uint32_t add_word_d7704(ef_addr32 record, uint16_t delta);
+int32_t scale_by_magnitude_d77dc(int16_t a, int16_t b);
+void shift_window_d7bf0(void);
+
+
 #endif

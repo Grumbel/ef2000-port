@@ -3090,7 +3090,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d6ffc	65			unknown	unclassified	unverified		
 0x000d7040	47	build_path_d7040	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d7040.json	docs/compiler-abi.md; Build "<default path><first><second>" with a fixed separator.; callers d7070@d7078; guest pending
 0x000d7070	20	build_path_d7070	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000d7070.json	docs/compiler-abi.md; ; callers d6fa8@d6fb4; guest pending
-0x000d70a0	103			unknown	unclassified	unverified		
+0x000d70a0	103	claim_device_slot_d70a0	runtime_helpers16	compiles	game	confirmed	decomp/tests/0x000d70a0.json	docs/compiler-abi.md; Claim a device slot for a priority, or evict the lowest-priority one.; callers 7fcdc@7fdd4,8018c@801b1,801e4@80284; guest pending
 0x000d710c	44			unknown	unclassified	unverified		
 0x000d7158	348			unknown	unclassified	unverified		
 0x000d72b4	259			unknown	unclassified	unverified		
@@ -3103,7 +3103,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d75fc	49	device_state_is_4	code_predicates	compiles	game	confirmed	decomp/tests/0x000d75fc.json	docs/compiler-abi.md; As 0xd7594, comparing with 4.; callers 47fbc@47fc3,77c90@77ddb,81308@81318; guest pending
 0x000d76f4	5	set_word_d76f4	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d76f4.json	docs/compiler-abi.md; ; callers 7eec4@7eee5,7ef14@7f42e,7ef14@7f48e; guest pending
 0x000d76fc	5	get_word_d76fc	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d76fc.json	docs/compiler-abi.md; ; callers 7ef14@7f2c3,7ef14@7f369,7ef14@7f416; guest pending
-0x000d7704	15			unknown	unclassified	unverified		
+0x000d7704	15	add_word_d7704	runtime_helpers16	compiles	game	confirmed	decomp/tests/0x000d7704.json	docs/compiler-abi.md; Add to the word at +0xf and return the new value.; callers 7ef14@7f5fe,7ef14@7f674; guest pending
 0x000d7714	5	set_word_d7714	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d7714.json	docs/compiler-abi.md; ; callers 7ef14@7f3fd,7ef14@7f46e,7f850@7f901; guest pending
 0x000d771c	7	get_high_word_d771c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d771c.json	docs/compiler-abi.md; High word of the dword at +0xf, sign-extended.; callers 7ef14@7f264,7ef14@7f282,7ef14@7f3e8; guest pending
 0x000d7724	11	add_to_word_11	code_predicates	compiles	game	confirmed	decomp/tests/0x000d7724.json	docs/compiler-abi.md; Word +0x11 += DX; return the signed high word of dword +0xf.; callers 7ef14@7f33d; guest pending
@@ -3115,10 +3115,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d775c	4	get_dword_d775c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d775c.json	docs/compiler-abi.md; ; callers 81448@814dc,81448@81512; guest pending
 0x000d7760	1	nop_d7760	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d7760.json	docs/compiler-abi.md; Empty stub (single ret).; callers 81448@8147e,81448@81565,81448@8158a; guest pending
 0x000d7764	118			unknown	unclassified	unverified		
-0x000d77dc	34			unknown	unclassified	unverified		
+0x000d77dc	34	scale_by_magnitude_d77dc	runtime_helpers16	compiles	game	confirmed	decomp/tests/0x000d77dc.json	docs/compiler-abi.md; Scale -(a << 6) by the magnitude of b plus one, biased by 0x40.; callers 7fcdc@7fdbb; guest pending
 0x000d7800	4	set_dword_d7800	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d7800.json	docs/compiler-abi.md; ; callers 7fcdc@7fe05; guest pending
 0x000d7b6c	129			unknown	unclassified	unverified		
-0x000d7bf0	77			unknown	unclassified	unverified		
+0x000d7bf0	77	shift_window_d7bf0	runtime_helpers16	compiles	game	confirmed	decomp/tests/0x000d7bf0.json	docs/compiler-abi.md; Shift four window words by ten.; callers d7c40@d7cad,d7cb8@d7e87; guest pending
 0x000d7c40	118	copy_block_d7c40	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d7c40.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000d7cb8	474			unknown	unclassified	unverified		
 0x000d7e94	118	permute_block_d7e94	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d7e94.json	docs/compiler-abi.md; ; callers d86e0@d8993,d86e0@d89cb,d86e0@d8cd2; guest pending

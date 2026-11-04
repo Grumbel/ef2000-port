@@ -2932,3 +2932,12 @@ in EAX, format string address, one value).
 | `0xcc840` | EAX:ef_addr32 | EAX:uint32_t | afc5c@afc90,cc90c@cc944 | Count the 21-byte entries that are free (0xff) or reserved (0xfe) for other kinds. |
 | `0xcd7a0` | none | none | e4264@e42ae | Free the blocks in table slots 101..n and reset the count. |
 | `0xcd81c` | [ESP+4]:int16_t | EAX:uint32_t | none direct | Forward the stack word to 0xcd7f0. |
+
+## runtime_helpers16 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd70a0` | AL:uint8_t | EAX:uint32_t | 7fcdc@7fdd4,8018c@801b1,801e4@80284 | Claim a device slot for a priority, or evict the lowest-priority one. |
+| `0xd7704` | EAX:ef_addr32,DX:uint16_t | EAX:uint32_t | 7ef14@7f5fe,7ef14@7f674 | Add to the word at +0xf and return the new value. |
+| `0xd77dc` | AX:int16_t,DX:int16_t | EAX:int32_t | 7fcdc@7fdbb | Scale -(a << 6) by the magnitude of b plus one, biased by 0x40. |
+| `0xd7bf0` | none | none | d7c40@d7cad,d7cb8@d7e87 | Shift four window words by ten. |
