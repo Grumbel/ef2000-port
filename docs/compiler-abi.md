@@ -9074,3 +9074,12 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xdeb1a` | EAX:double | EAX:double | 28b80@28ea9,7bb00@7bba3,8a318@8a62b | Implicit-register fragment (x87 ST0 = X). Computes S = sqrt(1 - X*X) with 0xa4472 (error code 2); when the square root s |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xce0e8` | EAX:uint32_t,EDX:float,EBX:float,ECX:float,[ESP+4]:float,[ESP+8]:float,[ESP+12]:float,[ESP+16]:float,[ESP+20]:float,[ESP+24]:float | none | ce268@ce316,ce354@ce48b | (EAX = dst, ret 0x24: nine floats, three points x1,y1,z1 .. x3,y3,z3) Build the plane through the three points: the norm |
+| `0xce268` | EAX:uint32_t,EDX:float,EBX:float,ECX:float,[ESP+4]:float | none | ce354@ce3f0,ce354@ce40c,ce354@ce427 | (EAX = dst, ret 0x10: four floats p1..p4) Scale the view-space values with 0xce0b0 / 0xce0cc at factors 256 and 1024 and |
+| `0xce354` | none | none | dc314@dc32e,dc334@dc344 | Rebuild the four view clip planes from the 16.16 view bounds at 0x15bdc0..0x15bdcc (each shifted left 16, +/-0x4000, sca |
+| `0xdc334` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 3dd30@3e04d,63d5c@63fcc,69740@69751 | (ret 8: x shift, y shift) Patch the view shift with 0xdc34e (AL = y arg... second stack arg, BL = first stack arg), then |

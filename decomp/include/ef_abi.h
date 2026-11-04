@@ -6224,4 +6224,13 @@ double ln_checked_fa362(double x, uint32_t *flag); /* 0xfa362 */
 double asin_deb1a(double x);
 double asin_deb1a(double x); /* 0xdeb1a */
 
+void plane_from_points_ce0e8(uint32_t dst, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3);
+void view_plane_ce268(uint32_t dst, float p1, float p2, float p3, float p4);
+void rebuild_clip_planes_ce354(void);
+void set_view_shift_dc334(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b);
+void plane_from_points_ce0e8(uint32_t dst, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3); /* 0xce0e8 */
+void view_plane_ce268(uint32_t dst, float p1, float p2, float p3, float p4); /* 0xce268 */
+void rebuild_clip_planes_ce354(void); /* 0xce354 */
+void set_view_shift_dc334(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b); /* 0xdc334 */
+
 #endif

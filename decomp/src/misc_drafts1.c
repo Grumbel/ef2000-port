@@ -20864,3 +20864,77 @@ double asin_deb1a(double x)
 		return s;
 	return atan2_dc1e9(x, s);
 }
+
+/* 0xce0e8, 383 bytes. (EAX = dst, ret 0x24: nine floats, three points x1,y1,z1 .. x3,y3,z3) Build the plane through the three points: the normal is the cross product of (p2-p1) and (p3-p2), normalised with 1/sqrt (0xa4472, code 3). dst[0..2] = normal components * scale (float at 0x18f664) truncated, dst[3] = -(p1 . normal) * scale truncated, dst[4] = -(dst[3] < 0), dst[5] = handler address (0xce498, or 0xce51c / 0xce538 / 0xce550 when dst[3] is zero together with dst[0] / dst[1] or when dst[0] and dst[1] are both zero; the later tests win). */
+void plane_from_points_ce0e8(uint32_t dst, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3)
+{
+	float ax = x2 - x1, bx = x3 - x2;
+	float ay = y2 - y1, by = y3 - y2;
+	float az = z2 - z1, bz = z3 - z2;
+	float nx = ay * bz - by * az;
+	float ny = az * bx - bz * ax;
+	float nz = ax * by - bx * ay;
+	uint32_t flag = 0u;
+	double inv = 1.0 / sqrt_checked_a4472((double)ny * ny + (double)nx * nx + (double)nz * nz, 3u, &flag);
+	double k = (double)*(float *)ef_guest_memory_ptr(0x18f664u);
+	double d;
+	nx = (float)(nx * inv);
+	ny = (float)(ny * inv);
+	nz = (float)(inv * nz);
+	d = -((double)y1 * ny + (double)x1 * nx + (double)z1 * nz);
+	EF_S32(dst) = (int32_t)truncate_9d72c(nx * k);
+	EF_S32(dst + 4u) = (int32_t)truncate_9d72c(ny * k);
+	EF_S32(dst + 8u) = (int32_t)truncate_9d72c(nz * k);
+	EF_S32(dst + 0xcu) = (int32_t)truncate_9d72c(d * k);
+	EF_U32(dst + 0x14u) = 0xce498u;
+	EF_S32(dst + 0x10u) = -(int32_t)(EF_S32(dst + 0xcu) < 0);
+	if (EF_S32(dst) == 0 && EF_S32(dst + 0xcu) == 0)
+		EF_U32(dst + 0x14u) = 0xce51cu;
+	if (EF_S32(dst + 4u) == 0 && EF_S32(dst + 0xcu) == 0)
+		EF_U32(dst + 0x14u) = 0xce538u;
+	if (EF_S32(dst) == 0 && EF_S32(dst + 4u) == 0)
+		EF_U32(dst + 0x14u) = 0xce550u;
+}
+
+/* 0xce268, 190 bytes. (EAX = dst, ret 0x10: four floats p1..p4) Scale the view-space values with 0xce0b0 / 0xce0cc at factors 256 and 1024 and build a plane with 0xce0e8 through the points (x(p1),y(p2),256), (x(p1)@1024,y(p2)@1024,1024), (x(p3),y(p4),256). */
+void view_plane_ce268(uint32_t dst, float p1, float p2, float p3, float p4)
+{
+	float f1 = (float)scale_view_x_ce0b0(p1, 256.0f);
+	float f2 = (float)scale_view_y_ce0cc(p2, 256.0f);
+	float f3 = (float)scale_view_x_ce0b0(p1, 1024.0f);
+	float f4 = (float)scale_view_y_ce0cc(p2, 1024.0f);
+	float f5 = (float)scale_view_x_ce0b0(p3, 256.0f);
+	float f6 = (float)scale_view_y_ce0cc(p4, 256.0f);
+	plane_from_points_ce0e8(dst, f1, f2, 256.0f, f3, f4, 1024.0f, f5, f6, 256.0f);
+}
+
+/* 0xce354, 323 bytes. Rebuild the four view clip planes from the 16.16 view bounds at 0x15bdc0..0x15bdcc (each shifted left 16, +/-0x4000, scaled by the double at 0x18f668 and stored in 0x4208bc / 0x4208b8 / 0x4208c0 / 0x4208b4), writing them to 0x420808, 0x420888, 0x420848 and 0x420828 with 0xce268, then the plane through the nine floats at 0x15b774..0x15b794 to 0x420868. */
+void rebuild_clip_planes_ce354(void)
+{
+	double k = md_rd_f64(0x18f668u);
+	float v0, v1, v2, v3;
+	EF_S32(0x4208bcu) = (int32_t)((uint32_t)EF_S32(0x15bdc0u) << 16) + 0x4000;
+	v0 = (float)((double)EF_S32(0x4208bcu) * k);
+	EF_S32(0x4208b8u) = (int32_t)((uint32_t)EF_S32(0x15bdc4u) << 16) - 0x4000;
+	v1 = (float)((double)EF_S32(0x4208b8u) * k);
+	EF_S32(0x4208c0u) = (int32_t)((uint32_t)EF_S32(0x15bdc8u) << 16) + 0x4000;
+	v2 = (float)((double)EF_S32(0x4208c0u) * k);
+	EF_S32(0x4208b4u) = (int32_t)((uint32_t)EF_S32(0x15bdccu) << 16) - 0x4000;
+	v3 = (float)((double)EF_S32(0x4208b4u) * k);
+	view_plane_ce268(0x420808u, -1000.0f, v2, 1000.0f, v2);
+	view_plane_ce268(0x420888u, v1, -1000.0f, v1, 1000.0f);
+	view_plane_ce268(0x420848u, 1000.0f, v3, -1000.0f, v3);
+	view_plane_ce268(0x420828u, v0, 1000.0f, v0, -1000.0f);
+	{
+		float *g = (float *)ef_guest_memory_ptr(0x15b774u);
+		plane_from_points_ce0e8(0x420868u, g[0], g[1], g[2], g[3], g[4], g[5], g[6], g[7], g[8]);
+	}
+}
+
+/* 0xdc334, 26 bytes. (ret 8: x shift, y shift) Patch the view shift with 0xdc34e (AL = y arg... second stack arg, BL = first stack arg), then rebuild the clip planes with 0xce354. */
+void set_view_shift_dc334(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b)
+{
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	patch_view_shift_dc34e(b, a);
+	rebuild_clip_planes_ce354();
+}
