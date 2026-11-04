@@ -93,7 +93,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00006c1c	461			unknown	unclassified	unverified		
 0x00006df0	38	alloc_zero_5x_6df0	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00006df0.json	docs/compiler-abi.md; Allocate and zero five bytes per unit.; callers 6e18@6e35; guest pending
 0x00006e18	89	reset_slots_6e18	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00006e18.json	docs/compiler-abi.md; ; callers 49228@495bc; guest pending
-0x00006e74	211			unknown	unclassified	unverified		
+0x00006e74	211	bind_object_slot_6e74	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00006e74.json	docs/compiler-abi.md; Bind the object ID (looked up with 0x7489c) to the first free entry of the 5-byte table at [0x197260] (0x121e55 entries;; callers 8c49c@8c88c; guest pending
 0x00006f48	229			unknown	unclassified	unverified		
 0x00007030	459			unknown	unclassified	unverified		
 0x000071fc	266			unknown	unclassified	unverified		
@@ -716,7 +716,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003d4b0	765			unknown	unclassified	unverified		
 0x0003d7b0	338			unknown	unclassified	unverified		
 0x0003d904	73	draw_grid_3d904	game_helpers8	compiles	game	confirmed	decomp/tests/0x0003d904.json	docs/compiler-abi.md; Draw the 16x16 grid of 10x10 cells.; callers 3dd30@3e458; guest pending
-0x0003d950	210			unknown	unclassified	unverified		
+0x0003d950	210	scan_triggers_3d950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003d950.json	docs/compiler-abi.md; For each of the [0x1a5a86] 26-byte trigger records at 0x12b268 whose flag test (0xa0e98 on the id word) succeeds and whi; callers 3dd30@3dfae; guest pending
 0x0003da24	92	all_entries_ready_3da24	game_helpers8	compiles	game	confirmed	decomp/tests/0x0003da24.json	docs/compiler-abi.md; Are all entries of the table at 0x12b268 satisfied?; callers none direct; guest pending
 0x0003db9c	84	run_timed_events_3db9c	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0003db9c.json	docs/compiler-abi.md; Fire due events from the 9-byte table at 0x1a5a28.; callers 3dd30@3dfa9; guest pending
 0x0003dbf0	189	check_unit_leaves_map_3dbf0	game_helpers63	compiles	game	confirmed	decomp/tests/0x0003dbf0.json	docs/compiler-abi.md; Flag the player unit as out of the map when its cell leaves the valid range.; callers 3dd30@3dfb3; guest pending

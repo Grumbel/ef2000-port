@@ -4726,4 +4726,7 @@ void insert_nearest_65570(ef_addr32 rec);
 
 void write_string_table_e36bc(void);
 
+void scan_triggers_3d950(void);
+void bind_object_slot_6e74(uint32_t id);
+
 #endif

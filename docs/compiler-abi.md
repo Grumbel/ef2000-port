@@ -5757,3 +5757,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe36bc` | none | none | e3444@e3468 | Write the string table of the resource being built through the writer at [0x42922c]: the 2-byte count word 0x15eea0, the |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3d950` | none | none | 3dd30@3dfae | For each of the [0x1a5a86] 26-byte trigger records at 0x12b268 whose flag test (0xa0e98 on the id word) succeeds and whi |
+| `0x6e74` | EAX:uint32_t | none | 8c49c@8c88c | Bind the object ID (looked up with 0x7489c) to the first free entry of the 5-byte table at [0x197260] (0x121e55 entries; |

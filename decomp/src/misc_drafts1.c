@@ -3019,3 +3019,61 @@ void write_string_table_e36bc(void)
         guest_callptr_eaxedx_x(EF_U32(0x0042922cu), s, (uint16_t)(guest_fn_b1b8b(s) + 1u));
     }
 }
+
+/* 0x3d950, 210 bytes. For each of the [0x1a5a86] 26-byte trigger records at 0x12b268 whose flag test (0xa0e98 on the id word) succeeds and which is not yet marked (byte 0x1a35d8 + index): mark it, count it (0x1a5a82, 0x127d14), notify the callback at +0xa when set, remember the value at +6 in 0x1a35ac unless it is -1, and advance the cursor word 0x12b360 (wrapping at the record count). */
+void scan_triggers_3d950(void)
+{
+    int16_t i = 0;
+    if ((int16_t)EF_U16(0x001a5a86u) > 0) {
+        do {
+            uint32_t rec = (uint32_t)(int32_t)i * 0x1au;
+            if ((guest_fn_a0e98((int16_t)EF_U16(0x0012b268u + rec)) & 0xffu) != 0u && EF_U8(0x001a35d8u + (uint32_t)(int32_t)i) == 0u) {
+                uint32_t cb;
+                uint32_t v;
+                EF_U8(0x001a35d8u + (uint32_t)(int32_t)i) = 1u;
+                EF_U16(0x001a5a82u) = (uint16_t)(EF_U16(0x001a5a82u) + 1u);
+                EF_U32(0x00127d14u) += 1u;
+                cb = EF_U32(0x0012b272u + rec);
+                if (cb != 0u)
+                    guest_fn_151c4(cb);
+                v = EF_U32(0x0012b26eu + rec);
+                if (v != 0xffffffffu)
+                    EF_U32(0x001a35acu) = v;
+                EF_U16(0x0012b360u) = (uint16_t)(EF_U16(0x0012b360u) + 1u);
+                if ((int16_t)EF_U16(0x0012b360u) >= (int16_t)EF_U16(0x001a5a86u))
+                    EF_U16(0x0012b360u) = 0u;
+            }
+            i++;
+        } while (i < (int16_t)EF_U16(0x001a5a86u));
+    }
+}
+
+/* 0x6e74, 211 bytes. Bind the object ID (looked up with 0x7489c) to the first free entry of the 5-byte table at [0x197260] (0x121e55 entries; free means the id word at +1 is 0xff while the object's slot byte at +0x187 is still 0xff): clear the entry, store the id and the slot number in the object. Errors through 0x132a74 when no entry was free. Afterwards bump the counter byte 0x19726a and flag the owner (byte 0x1fcc63 + word at +0x15 of its record) as used. */
+void bind_object_slot_6e74(uint32_t id)
+{
+    uint32_t obj = guest_fn_7489c((int16_t)id);
+    uint8_t i;
+    uint32_t table;
+    uint32_t rec;
+    if (obj == 0u)
+        return;
+    table = EF_U32(0x00197260u);
+    if (EF_U8(0x00121e55u) != 0u) {
+        i = 0u;
+        do {
+            uint32_t e = table + (uint32_t)i * 5u;
+            if ((int16_t)EF_U16(e + 1u) == 0xff && EF_U8(obj + 0x187u) == 0xffu) {
+                EF_U8(e) = 0u;
+                EF_U16(e + 3u) = 0u;
+                EF_U16(e + 1u) = (uint16_t)id;
+                EF_U8(obj + 0x187u) = i;
+            }
+            i++;
+        } while (i < EF_U8(0x00121e55u));
+    }
+    if (EF_U8(obj + 0x187u) == 0xffu)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018038cu);
+    rec = (uint32_t)(int32_t)(int16_t)EF_U16(obj + 0x28u) * 0xcau;
+    EF_U8(0x0019726au) = (uint8_t)(EF_U8(0x0019726au) + 1u);
+    EF_U8(0x001fcc63u + (uint32_t)(int32_t)(int16_t)EF_U16(EF_U32(0x0019bb58u) + rec + 0x15u)) = 1u;
+}
