@@ -8037,3 +8037,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5a2d0` | none | none | 598e8@5991a,598e8@59926,598e8@59937 | Redraw the map cursor for the player unit (word 0x1f71c8): latch the camera (dwords 0x1a6cee.. as high words, the first  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe9dcc` | none | none | e9c00@e9ca6 | Derive three view angles from the direction doubles at 0x464490, 0x4644a8, 0x4644b0, 0x4644b8 and 0x4644c0: 0x432220 = a |

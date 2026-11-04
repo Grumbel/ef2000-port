@@ -14520,3 +14520,32 @@ void draw_map_cursor_5a2d0(void)
     guest_fn_c8ccc_x((uint32_t)(py + m), (uint32_t)(px + m), (uint32_t)(py - m), (uint32_t)(px - m), EF_U8(0x00128148u));
     guest_fn_c8ccc_x((uint32_t)(py + m), (uint32_t)(px - m), (uint32_t)(py - m), (uint32_t)(px + m), EF_U8(0x00128148u));
 }
+
+/* 0xe9dcc, 175 bytes. Derive three view angles from the direction doubles at 0x464490, 0x4644a8, 0x4644b0, 0x4644b8 and 0x4644c0: 0x432220 = atan2(0x464490, -0x4644a8), 0x4321f0 = atan2(0x4644b0, 0x4644b8) and, with 0x4644c0 clamped to [double 0x19149c, 1.0] in place, 0x432288 = acos-style 0xe7df4 of it. */
+void derive_view_angles_e9dcc(void)
+{
+    double a, b, c, d, v, lo;
+    double r;
+    memcpy(&a, ef_guest_memory_ptr(0x00464490u), sizeof a);
+    memcpy(&b, ef_guest_memory_ptr(0x004644a8u), sizeof b);
+    r = atan2_b4620(a, -b);
+    memcpy(&c, ef_guest_memory_ptr(0x004644b0u), sizeof c);
+    memcpy(&d, ef_guest_memory_ptr(0x004644b8u), sizeof d);
+    memcpy(ef_guest_memory_ptr(0x00432220u), &r, sizeof r);
+    r = atan2_b4620(c, d);
+    memcpy(ef_guest_memory_ptr(0x004321f0u), &r, sizeof r);
+    memcpy(&v, ef_guest_memory_ptr(0x004644c0u), sizeof v);
+    if (!(1.0 >= v)) {
+        v = 1.0;
+        memcpy(ef_guest_memory_ptr(0x004644c0u), &v, sizeof v);
+    }
+    memcpy(&v, ef_guest_memory_ptr(0x004644c0u), sizeof v);
+    memcpy(&lo, ef_guest_memory_ptr(0x0019149cu), sizeof lo);
+    if (!(v >= lo)) {
+        EF_U32(0x004644c0u) = 0u;
+        EF_U32(0x004644c4u) = 0xbff00000u;
+    }
+    memcpy(&v, ef_guest_memory_ptr(0x004644c0u), sizeof v);
+    r = guest_fn_e7df4_x(v);
+    memcpy(ef_guest_memory_ptr(0x00432288u), &r, sizeof r);
+}
