@@ -18664,3 +18664,29 @@ void steer_record_26744(ef_addr32 rec)
 	EF_U16(rec + 0x24u) = (uint16_t)turn;
 	EF_U16(rec + 0xeu) = (uint16_t)(EF_U16(rec + 0xeu) + (uint16_t)(turn * (int32_t)EF_U16(0x00127d92u)));
 }
+
+/* 0x8883c, 142 bytes. Classify the unit record REC (EAX) for the radio menu: *OUT1 (EDX) is set to 4 and *OUT2 (EBX) to 0. Nothing more happens when 0xcd258 returns 100 or word 0x1f8ec2 is zero. Otherwise the scene group named 0x18a460 (0xa1a40) is searched for the entry numbered by that word (0xa1a90); without an entry *OUT1 becomes 6. With an entry its first byte, the unit's type byte +0x18 mapped through 0x8ac64 are looked up with 0xbbdc4 (kind 3) into *OUT2, which is passed to 0xcd2e8; *OUT1 is the percentage class (0x75620) of the new 0xcd258 result. */
+void classify_radio_target_8883c(ef_addr32 rec, ef_addr32 out1, ef_addr32 out2)
+{
+	uint32_t name, entry;
+	uint32_t dl, bl;
+
+	EF_U8(out1) = 4u;
+	EF_U8(out2) = 0u;
+	if ((int16_t)guest_fn_cd258() == 0x64)
+		return;
+	if (EF_U16(0x001f8ec2u) == 0u)
+		return;
+	name = (uint32_t)lookup_name_value_a1a40(0x0018a460u);
+	entry = guest_fn_a1a90((int32_t)EF_U32(0x001f8ec0u) >> 16, name);
+	if (entry == 0u) {
+		EF_U8(out2) = 0u;
+		EF_U8(out1) = 6u;
+		return;
+	}
+	dl = EF_U8(entry);
+	bl = guest_fn_8ac64_x(EF_U8(rec + 0x18u)) & 0xffu;
+	EF_U8(out2) = (uint8_t)lookup_mapped_code_bbdc4(3u, dl, bl);
+	guest_fn_cd2e8(EF_U8(out2));
+	EF_U8(out1) = (uint8_t)classify_object_percentage((uint8_t)(guest_fn_cd258() & 0xffu));
+}

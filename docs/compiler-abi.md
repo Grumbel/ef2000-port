@@ -8609,3 +8609,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x26744` | EAX:ef_addr32 | none | 266f8@266fe | Steer the moving record REC (EAX): turn its heading word +0xe towards the target. The owner is entry (signed word +0x38) |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8883c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 888cc@88b17 | Classify the unit record REC (EAX) for the radio menu: *OUT1 (EDX) is set to 4 and *OUT2 (EBX) to 0. Nothing more happen |
