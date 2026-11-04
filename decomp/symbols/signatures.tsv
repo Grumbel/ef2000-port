@@ -1671,3 +1671,8 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000eb272	switch_page_eb272	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb272 (22 bytes); Run the page callback pair, then hand the argument to 0x20d.; callers eb25a@eb26b; docs/compiler-abi.md
 0x000eb35c	check_error_flag_eb35c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb35c (24 bytes); Abort with the stored message when the error flag is set.; callers dc250@dc250,dc280@dc281; docs/compiler-abi.md
 0x000ed6c5	forward_callback_ed6c5			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ed6c5 (7 bytes); Forward to the callback at 0x17d498.; callers ed6cc@ed831; docs/compiler-abi.md
+0x00098050	select_sound_slot_98050	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00098050 (141 bytes); Switch the active sound slot (0..3), restarting the driver when it fails.; callers 3ea0c@3ed7e,3ea0c@3ef0e,98198@98266; docs/compiler-abi.md
+0x0009a624	update_records_9a624			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009a624 (213 bytes); Dispatch every active 54-byte record by kind and sum the four counters.; callers 98bec@98bf1; docs/compiler-abi.md
+0x0009aa78	count_event_9aa78	EAX:ef_addr32,DX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009aa78 (182 bytes); Count an event kind in the counter row of the current slot.; callers 9a624@9a683; docs/compiler-abi.md
+0x0009d1e8	read_text_line_9d1e8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009d1e8 (141 bytes); Read the next non-comment text line of a stream into its buffer.; callers f80@1158,f80@1171,f80@11b4; docs/compiler-abi.md
+0x0009d990	load_string_table_9d990			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009d990 (191 bytes); Load the quoted-string file into an arena block and index its strings.; callers 9da80@9da8d; docs/compiler-abi.md

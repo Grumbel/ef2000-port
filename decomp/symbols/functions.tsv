@@ -1970,7 +1970,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00097f70	21	pointer_or_default	misc_state	compiles	game	confirmed	decomp/tests/0x00097f70.json	docs/compiler-abi.md; 0x9c858 result or 0x18acb0; callers 3ea0c@3ed91,3ea0c@3ed9f; guest pending
 0x00097f90	110	install_input_tables_97f90	game_helpers33	compiles	game	confirmed	decomp/tests/0x00097f90.json	docs/compiler-abi.md; Pick the table for the detected input device and install the handlers.; callers 8b39c@8b4ba; guest pending
 0x00098000	19	forward_if_enabled	misc_state	compiles	game	confirmed	decomp/tests/0x00098000.json	docs/compiler-abi.md; if byte 0x420a72 tail 0xd5f0c(dword 0x12dd98); callers 8b39c@8b4bf; guest pending
-0x00098050	141			unknown	unclassified	unverified		
+0x00098050	141	select_sound_slot_98050	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00098050.json	docs/compiler-abi.md; Switch the active sound slot (0..3), restarting the driver when it fails.; callers 3ea0c@3ed7e,3ea0c@3ef0e,98198@98266; guest pending
 0x000980e8	76	reset_sound_slot_980e8	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000980e8.json	docs/compiler-abi.md; Reset a 13-byte slot when the sound path is on; abort on a bad slot.; callers 98050@98094,98198@9825b,98280@9828a; guest pending
 0x00098198	230			unknown	unclassified	unverified		
 0x00098280	31	reset_mode_98280	game_helpers6	compiles	game	confirmed	decomp/tests/0x00098280.json	docs/compiler-abi.md; ; callers 3ea0c@3eede; guest pending
@@ -1998,11 +1998,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009a348	400			unknown	unclassified	unverified		
 0x0009a4d8	108	clear_tables_9a4d8	camera_helpers	compiles	game	confirmed	decomp/tests/0x0009a4d8.json	docs/compiler-abi.md; ; callers 98bec@98bec; guest pending
 0x0009a544	221			unknown	unclassified	unverified		
-0x0009a624	213			unknown	unclassified	unverified		
+0x0009a624	213	update_records_9a624	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009a624.json	docs/compiler-abi.md; Dispatch every active 54-byte record by kind and sum the four counters.; callers 98bec@98bf1; guest pending
 0x0009a6fc	440			unknown	unclassified	unverified		
 0x0009a8b4	228			unknown	unclassified	unverified		
 0x0009a998	224			unknown	unclassified	unverified		
-0x0009aa78	182			unknown	unclassified	unverified		
+0x0009aa78	182	count_event_9aa78	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009aa78.json	docs/compiler-abi.md; Count an event kind in the counter row of the current slot.; callers 9a624@9a683; guest pending
 0x0009ab30	57			unknown	unclassified	unverified		
 0x0009ab6c	280			unknown	unclassified	unverified		
 0x0009ac84	448			unknown	unclassified	unverified		
@@ -2058,7 +2058,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d088	5			unknown	unclassified	unverified		
 0x0009d114	90	new_stream_9d114	game_helpers30	compiles	game	confirmed	decomp/tests/0x0009d114.json	docs/compiler-abi.md; Allocate and initialise a 0x56c-byte stream record bound to an owner.; callers f80@114f,2ff44@2ffb8,30214@30291; guest pending
 0x0009d170	118	read_stream_char_9d170	game_helpers33	compiles	game	confirmed	decomp/tests/0x0009d170.json	docs/compiler-abi.md; Read the next byte of a buffered stream, skipping CRs; 0 at end of data.; callers 9d1e8@9d1fe,9d1e8@9d217,9d1e8@9d245; guest pending
-0x0009d1e8	141			unknown	unclassified	unverified		
+0x0009d1e8	141	read_text_line_9d1e8	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009d1e8.json	docs/compiler-abi.md; Read the next non-comment text line of a stream into its buffer.; callers f80@1158,f80@1171,f80@11b4; guest pending
 0x0009d278	263			unknown	unclassified	unverified		
 0x0009d4cd	87	parse_int	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009d4cd.json	docs/compiler-abi.md; atoi: skip class-2 characters, optional sign, class-0x20 digits.; callers f80@1196,f80@11e0,4cf4@4cf9; guest pending
 0x0009d524	57	ascii_stricmp		named	unclassified	unverified		case-folding compare; docs/ghidra-findings.md
@@ -2077,7 +2077,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d834	258			unknown	unclassified	unverified		
 0x0009d938	41	reset_parser_state_9d938	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d938.json	docs/compiler-abi.md; ; callers e4264@e429f; guest pending
 0x0009d964	42	parse_decimal_9d964	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d964.json	docs/compiler-abi.md; Parse the decimal digits at text.; callers 9d990@9d9f1,9da80@9db84; guest pending
-0x0009d990	191			unknown	unclassified	unverified		
+0x0009d990	191	load_string_table_9d990	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009d990.json	docs/compiler-abi.md; Load the quoted-string file into an arena block and index its strings.; callers 9da80@9da8d; guest pending
 0x0009da50	47	skip_line_9da50	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009da50.json	docs/compiler-abi.md; Skip to the end of the current line and past the line break.; callers 9da80@9db09,9da80@9dbc8; guest pending
 0x0009da80	365			unknown	unclassified	unverified		
 0x0009dbf0	149			unknown	unclassified	unverified		

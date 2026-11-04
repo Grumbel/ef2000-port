@@ -3502,3 +3502,13 @@ in EAX, format string address, one value).
 | `0xeb272` | EAX:uint32_t | none | eb25a@eb26b | Run the page callback pair, then hand the argument to 0x20d. |
 | `0xeb35c` | none | none | dc250@dc250,dc280@dc281 | Abort with the stored message when the error flag is set. |
 | `0xed6c5` | none | none | ed6cc@ed831 | Forward to the callback at 0x17d498. |
+
+## runtime_helpers31 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x98050` | AL:uint8_t | none | 3ea0c@3ed7e,3ea0c@3ef0e,98198@98266 | Switch the active sound slot (0..3), restarting the driver when it fails. |
+| `0x9a624` | none | none | 98bec@98bf1 | Dispatch every active 54-byte record by kind and sum the four counters. |
+| `0x9aa78` | EAX:ef_addr32,DX:int16_t | none | 9a624@9a683 | Count an event kind in the counter row of the current slot. |
+| `0x9d1e8` | EAX:ef_addr32 | none | f80@1158,f80@1171,f80@11b4 | Read the next non-comment text line of a stream into its buffer. |
+| `0x9d990` | none | none | 9da80@9da8d | Load the quoted-string file into an arena block and index its strings. |

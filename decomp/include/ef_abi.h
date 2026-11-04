@@ -2850,4 +2850,21 @@ void forward_callback_ed6c5(void);
 void guest_fn_20d(uint32_t value); /* 0x20d EAX */
 void switch_page_eb272(uint32_t page);
 
+/* runtime_helpers31.c */
+void select_sound_slot_98050(uint8_t slot);
+void update_records_9a624(void);
+void count_event_9aa78(ef_addr32 record, int16_t kind);
+void read_text_line_9d1e8(ef_addr32 stream);
+void load_string_table_9d990(void);
+uint32_t guest_fn_d5e0c(ef_addr32 slot); /* 0xd5e0c EAX -> EAX */
+void guest_fn_82e40(void); /* 0x82e40 */
+uint32_t guest_fn_9a6fc(ef_addr32 record); /* 0x9a6fc EAX -> EAX */
+void guest_fn_9a8b4(ef_addr32 record, int32_t value); /* 0x9a8b4 EAX/EDX */
+void guest_fn_9a998(ef_addr32 record); /* 0x9a998 EAX */
+void guest_fn_9b780(void); /* 0x9b780 */
+void guest_fn_9b8a0(void); /* 0x9b8a0 */
+uint32_t guest_fn_9d964(ef_addr32 text); /* 0x9d964 EAX -> AX */
+void guest_fatal_arg0(ef_addr32 format); /* [0x132a74] cdecl, no extra argument */
+void count_event_9aa78(ef_addr32 record, int16_t kind);
+
 #endif
