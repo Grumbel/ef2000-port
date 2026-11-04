@@ -4358,4 +4358,6 @@ void guest_callptr0_x(ef_addr32 fn); /* indirect call, no arguments */
 uint32_t compare_variable_a9640(uint32_t index, uint32_t op, int32_t value);
 void restore_saved_block_dd870(void);
 
+uint32_t random_code_aa6c(void);
+
 #endif

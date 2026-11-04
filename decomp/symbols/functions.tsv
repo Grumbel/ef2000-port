@@ -144,7 +144,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000a974	49	gcZoomMapInOut		named	unclassified	unverified		
 0x0000a9a8	67	pick_count_a9a8	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000a9a8.json	docs/compiler-abi.md; Smaller of (table byte + 1) and (random % 3 + 2).; callers ab74@ad1f,ab74@adfd,ab74@af5d; guest pending
 0x0000a9fc	69	random_delay_a9fc	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0000a9fc.json	docs/compiler-abi.md; Pick a delay (0x28, 0x46, 0x78 or 0xc8) from a random number modulo 4.; callers ab74@ad18,ab74@adf6,ab74@af56; guest pending
-0x0000aa6c	85			unknown	unclassified	unverified		
+0x0000aa6c	85	random_code_aa6c	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0000aa6c.json	docs/compiler-abi.md; Pick a code (9..14) from a random number modulo 10.; callers ab74@ad0f,ab74@aded,ab74@af4d; guest pending
 0x0000aaec	61	random_step_aaec	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0000aaec.json	docs/compiler-abi.md; Pick 3, 6 or 9 from a random number modulo 10.; callers e490@e556,e490@e624; guest pending
 0x0000ab2c	72	random_clamped_ab2c	game_helpers7	compiles	game	confirmed	decomp/tests/0x0000ab2c.json	docs/compiler-abi.md; Random value in [a - b, a + b], clamped to 10..0x186.; callers ab74@acf2,ab74@ad08,ab74@add0; guest pending
 0x0000ab74	1096			unknown	unclassified	unverified		

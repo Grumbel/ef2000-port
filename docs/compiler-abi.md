@@ -5119,3 +5119,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xa9640` | EAX:uint32_t,EDX:uint32_t,EBX:int32_t | EAX:uint32_t | a9694@a96ac,a9694@a96da,a9694@a970b | Compare the signed value at 0x418708[index] with value using operator op (1 ==, 2 !=, 3 >, 4 <, 5 >=, 6 <=); returns 1 w |
 | `0xdd870` | none | none | dd8d0@dd8d0,dd9e4@dd9ff,f2ac0@f2b13 | If a screen area was saved under the parameter block (0x15ee94 != -1), put it back, then mark it unsaved. |
+
+## small_wrappers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xaa6c` | none | EAX:uint32_t | ab74@ad0f,ab74@aded,ab74@af4d | Pick a code (9..14) from a random number modulo 10. |

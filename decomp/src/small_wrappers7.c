@@ -183,3 +183,16 @@ void restore_saved_block_dd870(void)
         put_screen_rows_eb050(0u, 0u, 0u, 0u, EF_U16(0x0015ee94u), EF_U16(0x0015ee96u), EF_U16(0x0015ee88u), EF_U16(0x0015ee8au), EF_U32(0x0015ee90u));
     EF_U16(0x0015ee94u) = 0xffffu;
 }
+
+/* 0xaa6c, 85 bytes. Pick a code (9..14) from a random number modulo 10. */
+uint32_t random_code_aa6c(void)
+{
+    switch ((half_word_9c960() & 0xffffu) % 10u) {
+    case 0: case 1: return 0xcu;
+    case 2: case 3: return 0xbu;
+    case 4: return 0x9u;
+    case 5: return 0xdu;
+    case 8: case 9: return 0xau;
+    default: return 0xeu;
+    }
+}
