@@ -737,7 +737,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000407c4	94			unknown	unclassified	unverified		
 0x00040820	78	reference_clock_reaches	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00040820.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00040870	77	clock_rate_difference_40870	float_helpers2	compiles	game	confirmed	decomp/tests/0x00040870.json	docs/compiler-abi.md; Rate between two clock readings and a distance, minus a divided distance.; callers 59adc@59d66; guest pending
-0x00040e20	47			unknown	unclassified	unverified		
+0x00040e20	47	reset_name_record_40e20	game_helpers132	compiles	game	confirmed	decomp/tests/0x00040e20.json	docs/compiler-abi.md; Copy the 12-byte record at 0x184358 to 0x41f30c, set the pending name to 0x184364, clear the word at 0x41eeda and store ; callers none direct; guest pending
 0x00040e50	107	gcSetDifficulty		named	unclassified	unverified		
 0x00040ebc	8	gcStartNewCampaign		named	unclassified	unverified		
 0x00040ec4	9	gcPerformanceYes		named	unclassified	unverified		
@@ -2215,7 +2215,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a42d0	34	start_device_a42d0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a42d0.json	docs/compiler-abi.md; Start the device through its callback if it is not yet started.; callers a41dc@a420c; guest pending
 0x000a42f4	35	stop_device_a42f4	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a42f4.json	docs/compiler-abi.md; Stop the device through its callback when running.; callers 357a4@357b5,3711c@37175,a3da0@a3db4; guest pending
 0x000a4318	23	clear_dwords_135820	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4318.json	docs/compiler-abi.md; clear dwords 0x135820 0x135824 0x135828; callers 3dd30@3de2d; guest pending
-0x000a4342	48			unknown	unclassified	unverified		
+0x000a4342	48	guest_sprintf_a4342	game_helpers132	compiles	game	confirmed	decomp/tests/0x000a4342.json	docs/compiler-abi.md; sprintf: format into buf (callback 0xa432f) and terminate it (cdecl, variadic).; callers 20ec@268e,20ec@26c6,20ec@2755; guest pending
 0x000a4380	161	guest_strcmp	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a4380.json	docs/compiler-abi.md; strcmp: 0, -1 or 1.; callers 20ec@2d06,4d4c@4d5b,4d4c@4d83; guest pending
 0x000a4421	31	uppercase_string	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4421.json	docs/compiler-abi.md; uppercase a..z in place, return pointer; callers 3b58@3be9,3b58@3c3e,2aa34@2aab1; guest pending
 0x000a4470	2	return_three_a4470	game_helpers119	compiles	game	confirmed	decomp/tests/0x000a4470.json	docs/compiler-abi.md; Return the constant 3.; callers 3c74@3cbb,601c@6148,1dc20@1de11; guest pending
@@ -3026,7 +3026,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d1e50	187			unknown	unclassified	unverified		
 0x000d1f10	73	install_handlers_d1f10	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d1f10.json	docs/compiler-abi.md; Install the four handler pairs.; callers 69fac@69fbd; guest pending
 0x000d1f5c	41	copy_four_dwords_15b87c	code_predicates	compiles	game	confirmed	decomp/tests/0x000d1f5c.json	docs/compiler-abi.md; Copy dwords 0x15b88c..98 to 0x15b87c..88.; callers none direct; guest pending
-0x000d1f88	53			unknown	unclassified	unverified		
+0x000d1f88	53	set_resource_addresses_d1f88	game_helpers132	compiles	game	confirmed	decomp/tests/0x000d1f88.json	docs/compiler-abi.md; Store the four resource addresses 0xd3c50, 0xff498, 0xd4250 and 0xff81c at 0x15b87c..0x15b888.; callers c448b@c4544; guest pending
 0x000d1fc0	127	compute_vertex_bounds_d1fc0	game_helpers88	compiles	game	confirmed	decomp/tests/0x000d1fc0.json	docs/compiler-abi.md; Compute (once) the 2D bounding box of an object's vertex list into fields 0x10..0x1c.; callers d2130@d2144; guest pending
 0x000d2040	205	compute_point_bounds_d2040	game_helpers100	compiles	game	confirmed	decomp/tests/0x000d2040.json	docs/compiler-abi.md; Compute (once) the 3D bounding box of an object's points into fields 0x30..0x44.; callers d2130@d21c1; guest pending
 0x000d2110	30	forward_record_d2110	code_predicates	compiles	game	confirmed	decomp/tests/0x000d2110.json	docs/compiler-abi.md; 0xfc8cc(dword [p], p+4) for p = dword +0x4c; set bit 0 of byte +0x2c.; callers d23d8@d2437,d299c@d2a3f; guest pending
@@ -3063,7 +3063,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d5ec0	75			unknown	unclassified	unverified		
 0x000d5f0c	154			unknown	unclassified	unverified		
 0x000d5fa8	31	call_103778_if_enabled	code_predicates	compiles	game	confirmed	decomp/tests/0x000d5fa8.json	docs/compiler-abi.md; When byte 0x15b968 is set call cdecl 0x103778(dword 0x420a64, EAX, EDX).; callers 98198@981d0; guest pending
-0x000d5fc8	52			unknown	unclassified	unverified		
+0x000d5fc8	52	note_value_d5fc8	game_helpers132	compiles	game	confirmed	decomp/tests/0x000d5fc8.json	docs/compiler-abi.md; When the flag at 0x15b968 is set, trace-call 0x1033c8 with the pointer at 0x420a6c and the value, and remember the low b; callers d5d18@d5da9; guest pending
 0x000d6024	53	midi_reset_channels_d6024	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d6024.json	docs/compiler-abi.md; Send two controller messages on each of the 16 MIDI channels (reset sequence).; callers d5ec0@d5eef; guest pending
 0x000d605c	23			unknown	unclassified	unverified		
 0x000d6090	679			unknown	unclassified	unverified		

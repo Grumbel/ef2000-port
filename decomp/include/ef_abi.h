@@ -4037,4 +4037,10 @@ void start_record_11402c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_
 void copy_rows_109dd0(ef_addr32 dst, ef_addr32 src, uint32_t len, int32_t count);
 void copy_rows_at_109e40(uint32_t x, uint32_t idx, uint32_t len, int32_t count);
 
+/* game_helpers132.c */
+void set_resource_addresses_d1f88(void);
+void reset_name_record_40e20(void);
+int32_t guest_sprintf_a4342(ef_addr32 buf, ef_addr32 fmt, ...);
+void note_value_d5fc8(uint32_t value);
+
 #endif

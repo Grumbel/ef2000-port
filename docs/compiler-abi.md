@@ -4639,3 +4639,12 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x109dd0` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:int32_t | none | 109e08@109e33,109e40@109e63 | Copy count rows of len bytes from src to dst, advancing both by the row pitch at 0x1631f4. |
 | `0x109e40` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:int32_t | none | e516c@e51b1 | Copy count rows of len bytes at row offset table[idx] + x, from the buffer returned by 0xc382c into the one at 0x15b754. |
+
+## game_helpers132 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd1f88` | none | none | c448b@c4544 | Store the four resource addresses 0xd3c50, 0xff498, 0xd4250 and 0xff81c at 0x15b87c..0x15b888. |
+| `0x40e20` | none | none | none direct | Copy the 12-byte record at 0x184358 to 0x41f30c, set the pending name to 0x184364, clear the word at 0x41eeda and store  |
+| `0xa4342` | [ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | EAX:int32_t | 20ec@268e,20ec@26c6,20ec@2755 | sprintf: format into buf (callback 0xa432f) and terminate it (cdecl, variadic). |
+| `0xd5fc8` | EAX:uint32_t | none | d5d18@d5da9 | When the flag at 0x15b968 is set, trace-call 0x1033c8 with the pointer at 0x420a6c and the value, and remember the low b |
