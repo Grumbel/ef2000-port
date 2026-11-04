@@ -5338,4 +5338,6 @@ void select_mode_byte_9338(uint32_t kind);
 
 uint32_t start_voice_sample_d72b4(uint32_t idx, ef_addr32 obj, uint32_t size);
 
+ef_addr32 create_slot_record_fc0ec(uint32_t a, uint32_t b);
+
 #endif

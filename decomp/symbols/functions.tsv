@@ -3743,7 +3743,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fbad8	1392			unknown	unclassified	unverified		
 0x000fc050	57	classify_kind_fc050	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000fc050.json	docs/compiler-abi.md; Classify a kind into 1, 2 or 3.; callers fc0ec@fc119,fc1e8@fc21a; guest pending
 0x000fc08c	93	map_mode_fc08c	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc08c.json	docs/compiler-abi.md; Map a mode code (and a flag word) to a table index.; callers fc0ec@fc167; guest pending
-0x000fc0ec	250			unknown	unclassified	unverified		
+0x000fc0ec	250	create_slot_record_fc0ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fc0ec.json	docs/compiler-abi.md; Allocate the slot-set record for the pair (A = AL, B = DL): a 10-byte header (a at +0, b at +1, the slot count from 0xfc; callers bf444@bf5d4,bf81c@bf8f4,bfa58@bfab1; guest pending
 0x000fc1e8	364			unknown	unclassified	unverified		
 0x000fc354	69			unknown	unclassified	unverified		
 0x000fc39c	48	build_row_table_fc39c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fc39c.json	docs/compiler-abi.md; Stack (ret 8): fill the row-offset table at 0x163200 with COUNT dwords 0, STEP, 2*STEP, ...; store COUNT*STEP in 0x16460; callers c39ac@c39ea,c39f0@c3a1f,cdb20@cdbcb; guest pending

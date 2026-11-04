@@ -7206,3 +7206,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd72b4` | EAX:uint32_t,EDX:ef_addr32,EBX:uint32_t | EAX:uint32_t | 815f4@81602 | Start the sample OBJ (EDX; data pointer at +0x1c) of SIZE bytes (EBX) on voice IDX (AL): nothing happens (returns 0) unl |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfc0ec` | EAX:uint32_t,EDX:uint32_t | EAX:ef_addr32 | bf444@bf5d4,bf81c@bf8f4,bfa58@bfab1 | Allocate the slot-set record for the pair (A = AL, B = DL): a 10-byte header (a at +0, b at +1, the slot count from 0xfc |

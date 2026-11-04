@@ -10348,3 +10348,34 @@ uint32_t start_voice_sample_d72b4(uint32_t idx, ef_addr32 obj, uint32_t size)
     trace_call_102774(EF_U32(0x00420dd0u + voice * 4u));
     return 1u;
 }
+
+/* 0xfc0ec, 250 bytes. Allocate the slot-set record for the pair (A = AL, B = DL): a 10-byte header (a at +0, b at +1, the slot count from 0xfc050 at +2, +3 and +5, the 10-byte slot array pointer at +6; allocated through 0xcc6c0 with the tags 0x193614 and 0x193630) and fill every slot: word +0 = 1, byte +9 the mapped mode (0xfc08c), bytes +3/+2 the slot count for the variant A (0xfb1a0 with divisor 0 and list 0) and dword +4 the result of 0xfb87c for the 1-based slot number. Returns the record. */
+ef_addr32 create_slot_record_fc0ec(uint32_t a, uint32_t b)
+{
+    uint8_t av = (uint8_t)a;
+    uint8_t bv = (uint8_t)b;
+    ef_addr32 rec = guest_fn_cc6c0_x(0xau, 0x00193614u);
+    ef_addr32 arr;
+    uint32_t n;
+    int16_t i;
+    uint32_t off;
+    EF_U8(rec + 1u) = bv;
+    EF_U8(rec) = av;
+    n = classify_kind_fc050(bv);
+    EF_U8(rec + 5u) = (uint8_t)n;
+    EF_U8(rec + 2u) = (uint8_t)n;
+    EF_U8(rec + 3u) = (uint8_t)n;
+    arr = guest_fn_cc6c0_x((n & 0xffu) * 10u, 0x00193630u);
+    EF_U32(rec + 6u) = arr;
+    for (i = 0; (int16_t)EF_U8(rec + 5u) > i; i++) {
+        off = (uint32_t)((int32_t)i * 10);
+        EF_U16(EF_U32(rec + 6u) + off) = 1u;
+        EF_U8(EF_U32(rec + 6u) + off + 9u) = (uint8_t)map_mode_fc08c(EF_U8(rec + 1u), 0u);
+        EF_U8(EF_U32(rec + 6u) + off + 3u) = (uint8_t)select_slot_count_by_variant_fb1a0(
+            EF_U8(EF_U32(rec + 6u) + off + 9u), EF_U8(rec + 1u), EF_U8(rec), 0u, 0u);
+        EF_U8(EF_U32(rec + 6u) + off + 2u) = EF_U8(EF_U32(rec + 6u) + off + 3u);
+        EF_U32(EF_U32(rec + 6u) + off + 4u) = guest_fn_fb87c_x(
+            EF_U8(rec + 1u), EF_U8(EF_U32(rec + 6u) + off + 9u), av, (uint32_t)(uint16_t)(i + 1));
+    }
+    return rec;
+}
