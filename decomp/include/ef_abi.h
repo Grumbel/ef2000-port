@@ -2198,4 +2198,12 @@ void get_view_state_dd988(ef_addr32 out_a, ef_addr32 out_b, ef_addr32 out_c, ef_
 uint32_t read_plane_pixel_dec4c(int32_t x, int32_t y);
 
 
+/* game_helpers25.c */
+int32_t read_stream_byte_df21b(ef_addr32 stream);
+uint8_t rows_clear_e17b8(uint32_t column, int32_t first_row, int32_t count);
+void draw_glyph_e3040(uint32_t color, uint32_t x, uint32_t y, uint32_t glyph);
+void draw_text_e30e0(uint32_t color, uint32_t x, uint32_t y, ef_addr32 text);
+uint32_t find_word_backwards_e3908(uint32_t value);
+
+
 #endif

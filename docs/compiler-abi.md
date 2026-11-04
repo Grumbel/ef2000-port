@@ -2955,3 +2955,13 @@ in EAX, format string address, one value).
 | `0xdd650` | EAX:ef_addr32 | EAX:uint32_t | 27d18@27d9a,27d18@27de7,27fec@28192 | Pixel width of a string; blanks are tested before masking. |
 | `0xdd988` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32,[ESP+12]:ef_addr32,[ESP+16]:ef_addr32 | none | f2ac0@f2b0e | Copy the saved view state at 0x15ee80..0x15ee90 to eight output pointers. |
 | `0xdec4c` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | 75f00@75fbf,75f00@75fe3,75f00@76005 | Read a byte from the clipped 8-bit plane, or -1 outside the window. |
+
+## game_helpers25 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdf21b` | EAX:ef_addr32 | EAX:int32_t | none direct | Read the next byte from a stream, or -1 (setting flag 2) at its end. |
+| `0xe17b8` | EAX:uint32_t,EDX:int32_t,EBX:int32_t | AL:uint8_t | e17f8@e1891,e17f8@e18ab | True when a column of 256-byte rows is clear for the given count. |
+| `0xe3040` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | e30e0@e3108 | Draw a 8x6 glyph, each set bit writes the colour byte. |
+| `0xe30e0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32 | none | 3d308@3d34b,3d308@3d35b,3dd30@3e73d | Draw a string with 9-pixel glyph spacing. |
+| `0xe3908` | EAX:uint32_t | EAX:uint32_t | e3ad0@e3afd | Search a word table backwards for a value, using slot 0 as the sentinel. |
