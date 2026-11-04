@@ -7724,3 +7724,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xbc0dc` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 16e60@16eec | Pick a response code from the 6 x 7 byte table at 0xb9e20: the column follows the difference D of the rating bytes 0x134 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7eda4` | none | none | 7eccc@7ed55 | Draw the roster list centred on the 320x200 screen (after 0xdc2c0, before 0xdc250): for each of the byte 0x12583a entrie |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

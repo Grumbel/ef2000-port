@@ -1507,7 +1507,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007e89c	33	scene_slot_valid	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007e89c.json	docs/compiler-abi.md; slot=high word 0x19bb5c; valid unless 0xff and 0x2c358 nonzero; callers 7e8c0@7e953,7e8c0@7eb1d; guest pending
 0x0007e8c0	1035			unknown	unclassified	unverified		
 0x0007eccc	216	wait_target_count_7eccc	game_helpers46	compiles	game	confirmed	decomp/tests/0x0007eccc.json	docs/compiler-abi.md; Wait until the counter at 0x127da4 reaches the target at 0x12583a.; callers 8bb50@8bc0b; guest pending
-0x0007eda4	246			unknown	unclassified	unverified		
+0x0007eda4	246	draw_roster_list_7eda4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007eda4.json	docs/compiler-abi.md; Draw the roster list centred on the 320x200 screen (after 0xdc2c0, before 0xdc250): for each of the byte 0x12583a entrie; callers 7eccc@7ed55; guest pending
 0x0007eea0	25	set_control_mode_a	runtime_control	compiles	game	confirmed	decomp/tests/0x0007eea0.json	docs/compiler-abi.md; AL gate at 0x15bac6; selected zero or AL stored 0x12b070, returned zero-extended EAX; original guest replacement unverified
 0x0007eebc	8	get_flag_7eebc	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0007eebc.json	docs/compiler-abi.md; ; callers 3dd30@3dd88; guest pending
 0x0007eec4	50	reset_menu_7eec4	game_helpers6	compiles	game	confirmed	decomp/tests/0x0007eec4.json	docs/compiler-abi.md; ; callers 17f10@17f85,8d11c@8d218; guest pending

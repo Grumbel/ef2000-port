@@ -5606,4 +5606,8 @@ uint32_t guest_fn_2c224_x(int32_t index); /* 0x2c224 EAX -> AL */
 
 uint32_t pick_response_bc0dc(uint32_t a, uint32_t b);
 
+void draw_roster_list_7eda4(void);
+
+
+
 #endif

@@ -12881,3 +12881,27 @@ uint32_t pick_response_bc0dc(uint32_t a, uint32_t b)
     row = (guest_fn_a45b3() & 0xffffu) % 6u;
     return table[row * 7u + band];
 }
+
+/* 0x7eda4, 246 bytes. Draw the roster list centred on the 320x200 screen (after 0xdc2c0, before 0xdc250): for each of the byte 0x12583a entries (names at 0x1368bc, flag byte at 0x1a5c32 + 0x1b * i) copy and upper-case the name, format it with 0x1886d0 (colour 0xf, flag set) or 0x1886dc (colour 0xc), and draw it with 0x48c90 centred horizontally at row 8 * (i + 1) below the vertical start (200 - 8 * count) / 2. */
+void draw_roster_list_7eda4(void)
+{
+    uint8_t frame[0x3c];
+    ef_addr32 text = (ef_addr32)(uintptr_t)frame;
+    ef_addr32 name = (ef_addr32)(uintptr_t)(frame + 0x28);
+    int32_t y = (0xc8 - (int32_t)(EF_U8(0x0012583au) << 3)) >> 1;
+    int16_t i;
+    guest_fn_dc2c0();
+    for (i = 0; i < (int16_t)EF_U8(0x0012583au); i++) {
+        uint32_t flag = EF_U8((uint32_t)(int32_t)i * 0x1bu + 0x001a5c32u);
+        int32_t w;
+        int32_t x;
+        copy_string_9d749(name, EF_U32((uint32_t)(int32_t)i * 4u + 0x001368bcu));
+        uppercase_string(name);
+        guest_sprintf_a4342(text, flag != 0u ? 0x001886d0u : 0x001886dcu, name);
+        y += 8;
+        w = (int16_t)formatted_width_48d5c(text);
+        x = (int16_t)((0x140 - w) >> 1);
+        draw_shadowed_text_48c90(flag != 0u ? 0xfu : 0xcu, x, (int16_t)y, text);
+    }
+    guest_fn_dc250();
+}
