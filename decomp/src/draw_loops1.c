@@ -57,3 +57,42 @@ void draw_linked_pages_2c600(uint32_t page, uint32_t arg)
         guest_fn_47764_x((int32_t)EF_S16(rec + 0x50u), 0x3eu, (int32_t)a, 0u, 0u);
     }
 }
+
+/* Transfer a link from object a's unit to object b's when the three units belong to different pages with matching sides, then redraw. link_off is the word +0x156/+0x144 naming the third unit's index (high word at +2), copy_off the word copied into b at +0x146. */
+static void transfer_link_common(uint32_t a, uint32_t b, uint32_t link_off, uint32_t copy_off, uint32_t colour)
+{
+    int16_t sa = (int16_t)a, sb = (int16_t)b;
+    ef_addr32 u1 = guest_fn_7489c((int32_t)sa);
+    ef_addr32 u2 = guest_fn_7489c((int32_t)sb);
+    ef_addr32 u3 = guest_fn_7489c((int32_t)EF_S16(u1 + link_off + 2u));
+    uint32_t base, p1, p2, p3;
+    if (u2 == 0u || u3 == 0u || u1 == u2 || u1 == u3 || u2 == u3)
+        return;
+    base = EF_U32(0x0019bb58u);
+    p3 = base + (uint32_t)(EF_S16(u3 + 0x28u) * 0xca);
+    p1 = base + (uint32_t)(EF_S16(u1 + 0x28u) * 0xca);
+    p2 = base + (uint32_t)(EF_S16(u2 + 0x28u) * 0xca);
+    if (EF_U16(p3 + 0x15u) == EF_U16(p1 + 0x15u))
+        return;
+    if (EF_U16(p2 + 0x15u) != EF_U16(p1 + 0x15u))
+        return;
+    if (EF_U8(u3 + 0x24u) & 4u)
+        return;
+    if (EF_U8(u3 + 0x24u) & 8u)
+        return;
+    EF_U16(u2 + 0x146u) = EF_U16(u1 + copy_off);
+    set_indexed_object_mode(sb, 0u);
+    guest_fn_46254((uint32_t)(int32_t)sb, (int32_t)sa, colour, 0u, 0u, 0u);
+}
+
+/* 0x485a8, 245 bytes. Transfer the unit's link word (+0x158) from a to b. */
+void transfer_link_485a8(uint32_t a, uint32_t b)
+{
+    transfer_link_common(a, b, 0x156u, 0x158u, 0x37u);
+}
+
+/* 0x486a0, 245 bytes. Transfer the unit's word at +0x146 from a to b. */
+void transfer_link_486a0(uint32_t a, uint32_t b)
+{
+    transfer_link_common(a, b, 0x144u, 0x146u, 0x34u);
+}

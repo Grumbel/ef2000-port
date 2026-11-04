@@ -5182,3 +5182,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x48d5c` | [ESP+4]:ef_addr32 | EAX:uint32_t | 3b58@3bf1,3b58@3c46,3ea8@3ebd | printf-format a string and return its width: the text width for zoom 0, else its length times 4. Variadic; all arguments |
 | `0x48da0` | [ESP+4]:ef_addr32 | EAX:uint32_t | 48e7c@48f35,5c354@5c43d,5c518@5c64d | Same with length times 8 for the nonzero zoom. |
+
+## draw_loops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x485a8` | EAX:uint32_t,EDX:uint32_t | none | 46454@46e13 | Transfer the unit's link word (+0x158) from a to b. |
+| `0x486a0` | EAX:uint32_t,EDX:uint32_t | none | 46454@47097 | Transfer the unit's word at +0x146 from a to b. |

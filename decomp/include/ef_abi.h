@@ -4398,4 +4398,7 @@ uint32_t guest_fn_1133f8_x(uint32_t a0, uint32_t a1); /* 0x1133f8 cdecl, two sta
 uint32_t formatted_width_48d5c(ef_addr32 fmt, ...);
 uint32_t formatted_width_48da0(ef_addr32 fmt, ...);
 
+void transfer_link_485a8(uint32_t a, uint32_t b);
+void transfer_link_486a0(uint32_t a, uint32_t b);
+
 #endif

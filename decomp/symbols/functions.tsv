@@ -823,8 +823,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00047fbc	97	tick_countdown_47fbc	game_helpers31	compiles	game	confirmed	decomp/tests/0x00047fbc.json	docs/compiler-abi.md; Decrease the second countdown word unless device 0xb is in state 4.; callers 48064@4808a; guest pending
 0x00048020	68	advance_ticks_48020	game_helpers5	compiles	game	confirmed	decomp/tests/0x00048020.json	docs/compiler-abi.md; Advance the tick counter at 0x126658 by the frame time (a third in slow mode).; callers 77c90@77dc7; guest pending
 0x00048064	179	update_timers_48064	game_helpers38	compiles	game	confirmed	decomp/tests/0x00048064.json	docs/compiler-abi.md; Advance the countdowns and age the four 140-entry timer tables.; callers 3dd30@3e712; guest pending
-0x000485a8	245			unknown	unclassified	unverified		
-0x000486a0	245			unknown	unclassified	unverified		
+0x000485a8	245	transfer_link_485a8	draw_loops1	compiles	game	confirmed	decomp/tests/0x000485a8.json	docs/compiler-abi.md; Transfer the unit's link word (+0x158) from a to b.; callers 46454@46e13; guest pending
+0x000486a0	245	transfer_link_486a0	draw_loops1	compiles	game	confirmed	decomp/tests/0x000486a0.json	docs/compiler-abi.md; Transfer the unit's word at +0x146 from a to b.; callers 46454@47097; guest pending
 0x00048798	175	share_link_48798	game_helpers38	compiles	game	confirmed	decomp/tests/0x00048798.json	docs/compiler-abi.md; Set the target mode and share the link with an enemy-owned linked unit.; callers 46454@46daa,46454@46dc4; guest pending
 0x00048848	175	share_link_48848	game_helpers38	compiles	game	confirmed	decomp/tests/0x00048848.json	docs/compiler-abi.md; Like 0x48798 with modes 6 and 7; the flag test comes first.; callers 46454@46de1,46454@46dfb; guest pending
 0x000488f8	99	set_unit_mode_488f8	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x000488f8.json	docs/compiler-abi.md; Store a mode byte in unit AX and send the matching request.; callers 857bc@85933; guest pending
