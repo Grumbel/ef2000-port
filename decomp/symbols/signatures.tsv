@@ -1485,3 +1485,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0001c3d0	latch_input_state_1c3d0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001c3d0 (361 bytes); Latch the raw input state, clearing it when a menu or pause is active.; callers 1cde8@1ce50; docs/compiler-abi.md
 0x000045a4	select_mode_from_record_45a4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000045a4 (401 bytes); Read the default record and derive the chord mode from its two fields.; callers 4738@47da,4bf8@4c2f; docs/compiler-abi.md
 0x00004738	reset_menu_state_4738			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00004738 (321 bytes); Reset the menu: read the clicked mode widget, load the record and refresh.; callers none direct; docs/compiler-abi.md
+0x000283c8	check_data_file_283c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000283c8 (289 bytes); Draw the splash buttons and probe the data file for its magic word.; callers 284ec@28553,284ec@28578; docs/compiler-abi.md
+0x000404bc	draw_debug_counters_404bc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000404bc (358 bytes); Draw seven debug counters, one per text row.; callers 3dd30@3e466; docs/compiler-abi.md

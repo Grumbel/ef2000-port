@@ -2499,4 +2499,13 @@ void select_mode_from_record_45a4(void);
 void reset_menu_state_4738(void);
 uint32_t guest_fn_105a4(ef_addr32 a, ef_addr32 b, ef_addr32 c, ef_addr32 d, ef_addr32 name); /* 0x105a4 EAX/EDX/EBX/ECX + stack */
 
+/* game_helpers43.c */
+void check_data_file_283c8(void);
+void draw_debug_counters_404bc(void);
+void guest_fn_275a4(void); /* 0x275a4 */
+uint32_t guest_fn_27fec(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x27fec EAX/EDX/EBX/ECX */
+void guest_fn_a4342_plain(ef_addr32 destination, ef_addr32 format); /* 0xa4342 cdecl */
+uint32_t guest_fn_a7900(ef_addr32 name); /* 0xa7900 cdecl */
+void guest_fn_48c90(uint32_t row, uint32_t col, uint32_t y, ef_addr32 text); /* 0x48c90 cdecl */
+
 #endif

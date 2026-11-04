@@ -403,7 +403,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00027d18	721			unknown	unclassified	unverified		
 0x00027fec	567			unknown	unclassified	unverified		
 0x00028224	418			unknown	unclassified	unverified		
-0x000283c8	289			unknown	unclassified	unverified		
+0x000283c8	289	check_data_file_283c8	game_helpers43	compiles	game	confirmed	decomp/tests/0x000283c8.json	docs/compiler-abi.md; Draw the splash buttons and probe the data file for its magic word.; callers 284ec@28553,284ec@28578; guest pending
 0x000284ec	204			unknown	unclassified	unverified		
 0x000285b8	132			unknown	unclassified	unverified		
 0x0002863c	130			unknown	unclassified	unverified		
@@ -731,7 +731,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003f7fc	2477			unknown	unclassified	unverified		
 0x000401ac	634			unknown	unclassified	unverified		
 0x00040428	145	refresh_selected_unit_40428	game_helpers17	compiles	game	confirmed	decomp/tests/0x00040428.json	docs/compiler-abi.md; Clear the 320x200 view and refresh the unit selected by the current key.; callers 3dd30@3e435; guest pending
-0x000404bc	358			unknown	unclassified	unverified		
+0x000404bc	358	draw_debug_counters_404bc	game_helpers43	compiles	game	confirmed	decomp/tests/0x000404bc.json	docs/compiler-abi.md; Draw seven debug counters, one per text row.; callers 3dd30@3e466; guest pending
 0x00040624	125			unknown	unclassified	unverified		
 0x00040774	54	clock_words_to_seconds	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00040774.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x000407c4	94			unknown	unclassified	unverified		

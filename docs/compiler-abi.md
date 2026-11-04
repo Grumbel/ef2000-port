@@ -3216,3 +3216,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x45a4` | none | none | 4738@47da,4bf8@4c2f | Read the default record and derive the chord mode from its two fields. |
 | `0x4738` | none | none | none direct | Reset the menu: read the clicked mode widget, load the record and refresh. |
+
+## game_helpers43 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x283c8` | none | none | 284ec@28553,284ec@28578 | Draw the splash buttons and probe the data file for its magic word. |
+| `0x404bc` | none | none | 3dd30@3e466 | Draw seven debug counters, one per text row. |
