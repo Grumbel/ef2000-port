@@ -4774,3 +4774,10 @@ in EAX, format string address, one value).
 | `0x11288c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t | none | 1123a4@11274e | Release every slot of a record whose id (+0x558) matches, then send the pending-count message. |
 | `0x77c34` | none | none | 79128@79171 | Shrink the pending line count at 0x1f8d52 to the limit at 0x127d92 and redraw the uppercased message line. |
 | `0xeb0b0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:ef_addr32 | none | e4c9c@e4f79 | Copy rows of bytes into the framebuffer at (x, y), advancing the destination by the row stride at 0x1631f4. |
+
+## small_wrappers5 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xeb050` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32 | none | 98658@986e3,98658@98877,98658@9890c | Copy a packed buffer of rows to the framebuffer at (x, y). |
+| `0xeb1f0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32 | none | 98ac0@98b09,98ac0@98b36,98ac0@98b51 | Copy rows from the framebuffer at (x, y) into a packed buffer. |
