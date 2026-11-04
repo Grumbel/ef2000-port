@@ -4274,4 +4274,6 @@ void commit_mode_selection_35b2c(void);
 /* tactical_marks1.c */
 void draw_diamond_5d48c(uint32_t x, uint32_t y);
 
+void relink_random_objects_8873c(int32_t chance, ef_addr32 link, uint32_t kind, ef_addr32 new_link);
+
 #endif
