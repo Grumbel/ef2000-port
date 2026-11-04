@@ -6578,3 +6578,17 @@ void blit_masked_cd82c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
         rows--;
     } while (rows != 0u);
 }
+
+/* 0xe8784, 105 bytes. Variadic cdecl diagnostic: when byte 0x1600a6 is set, format FMT with its arguments into a 0x140-byte stack buffer and pass the format string 0x190cc0, dword 0x464390, word 0x16007c and the buffer to the error callback at 0x132a74. Returns 0. */
+uint32_t report_formatted_e8784(ef_addr32 fmt, ...)
+{
+    if (EF_U8(0x001600a6u) != 0u) {
+        char buf[0x140];
+        va_list ap;
+        va_start(ap, fmt);
+        format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+        va_end(ap);
+        guest_callptr4c_x(EF_U32(0x00132a74u), 0x00190cc0u, EF_U32(0x00464390u), EF_U16(0x0016007cu), (uint32_t)(uintptr_t)buf);
+    }
+    return 0u;
+}

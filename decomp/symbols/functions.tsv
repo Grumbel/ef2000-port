@@ -3444,7 +3444,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e86f7	60	floor_e86f7	float_helpers9	compiles	game	confirmed	decomp/tests/0x000e86f7.json	docs/compiler-abi.md; (ret 8) Floor-like: take the integral part with 0x10d9c6 and add the constant at 0x190c8c when the fractional part is ne; callers 7f850@7f87d,b59a8@b5b2e,b59a8@b5b69; guest pending
 0x000e8733	24	allocate_cleared	math_string	compiles	game	confirmed	decomp/tests/0x000e8733.json	docs/compiler-abi.md; Allocate EAX*EDX bytes through 0xfc795 and clear them.; callers 106f10@106f64,117ed4@117ee9,117f14@117f23; guest pending
 0x000e874b	26	find_char	math_string	compiles	game	confirmed	decomp/tests/0x000e874b.json	docs/compiler-abi.md; strchr: first occurrence of byte EDX in the string at EAX * (including the terminator), or 0.; callers aaee8@aaf06,e7fc0@e7fec,e7fc0@e803a; guest pending
-0x000e8784	105			unknown	unclassified	unverified		
+0x000e8784	105	report_formatted_e8784	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e8784.json	docs/compiler-abi.md; Variadic cdecl diagnostic: when byte 0x1600a6 is set, format FMT with its arguments into a 0x140-byte stack buffer and p; callers e882c@e888e,e882c@e891d,e882c@e89b1; guest pending
 0x000e882c	2990			unknown	unclassified	unverified		
 0x000e93dc	272			unknown	unclassified	unverified		
 0x000e94ec	134	load_text_file_e94ec	load_planes1	compiles	game	confirmed	decomp/tests/0x000e94ec.json	docs/compiler-abi.md; Load a text file through the size/read handlers at 0x132ab4/0x132ab8 into a new buffer at 0x1600a0, trimming a trailing ; callers 80058@80095,81230@8126e,82cec@82d29; guest pending
