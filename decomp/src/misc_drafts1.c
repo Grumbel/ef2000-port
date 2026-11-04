@@ -12521,3 +12521,29 @@ void refresh_weapon_readout_597d8(void)
         EF_U8(0x001a6d1cu) = 0u;
     }
 }
+
+/* 0x73c38, 228 bytes. Round-robin hail: for the unit UNIT (AX) advance its cursor byte +0x142 (wrapping to 0 at the signed word 0x2119f4) and look up the unit it names; when that unit exists, 0x2e910(its side, own side) holds (sides are the bytes at +0x15 of the owner records, owner word at +0x26 of each) and the distance 0x6a5f0(UNIT, cursor) is below byte(+0x140) * 0x9c40, send message 0x72 with 0x46254(UNIT, cursor, 0x72, byte(+0x140), 0, 0). */
+void hail_next_unit_73c38(uint32_t unit)
+{
+    int32_t sid = (int16_t)unit;
+    ef_addr32 obj = guest_fn_7489c(sid);
+    ef_addr32 other;
+    uint32_t tab;
+    int16_t cursor;
+    if (obj == 0u)
+        return;
+    EF_U8(obj + 0x142u) = (uint8_t)(EF_U8(obj + 0x142u) + 1u);
+    cursor = (int16_t)EF_U8(obj + 0x142u);
+    if (cursor >= (int16_t)EF_U16(0x002119f4u))
+        EF_U8(obj + 0x142u) = 0u;
+    other = guest_fn_7489c((int32_t)EF_U8(obj + 0x142u));
+    if (other == 0u)
+        return;
+    tab = EF_U32(0x0019bb58u);
+    if ((uint8_t)guest_fn_2e910_x(EF_U8(tab + (uint32_t)((int32_t)EF_U32(other + 0x26u) >> 16) * 0xcau + 0x15u),
+                                  EF_U8(tab + (uint32_t)((int32_t)EF_U32(obj + 0x26u) >> 16) * 0xcau + 0x15u)) == 0u)
+        return;
+    if (!(guest_fn_6a5f0_x(sid, (int32_t)EF_U8(obj + 0x142u)) < (double)(int32_t)((uint32_t)EF_U8(obj + 0x140u) * 0x9c40u)))
+        return;
+    guest_fn_46254((uint32_t)sid, (int32_t)EF_U8(obj + 0x142u), 0x72u, EF_U8(obj + 0x140u), 0u, 0u);
+}

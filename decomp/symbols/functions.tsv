@@ -1353,7 +1353,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00073820	260			unknown	unclassified	unverified		
 0x00073924	63	release_pending_73924	game_helpers29	compiles	game	confirmed	decomp/tests/0x00073924.json	docs/compiler-abi.md; Release a unit's current entry and clear its pending slot id if it matches.; callers 46454@46761; guest pending
 0x00073964	699			unknown	unclassified	unverified		
-0x00073c38	228			unknown	unclassified	unverified		
+0x00073c38	228	hail_next_unit_73c38	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00073c38.json	docs/compiler-abi.md; Round-robin hail: for the unit UNIT (AX) advance its cursor byte +0x142 (wrapping to 0 at the signed word 0x2119f4) and ; callers 6c8e0@6c913; guest pending
 0x00073d1c	52	clear_unit_flag_73d1c	game_helpers5	compiles	game	confirmed	decomp/tests/0x00073d1c.json	docs/compiler-abi.md; Clear a unit flag one time in five.; callers 6c8e0@6c920,72944@72c4d; guest pending
 0x00073d50	397			unknown	unclassified	unverified		
 0x00073ee0	513			unknown	unclassified	unverified		

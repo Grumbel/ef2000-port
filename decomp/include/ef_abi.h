@@ -5575,4 +5575,6 @@ void guest_fn_58d04_x(void); /* 0x58d04 */
 void guest_fn_58d24_x(void); /* 0x58d24 */
 void guest_fn_58d44_x(void); /* 0x58d44 */
 
+void hail_next_unit_73c38(uint32_t unit);
+
 #endif
