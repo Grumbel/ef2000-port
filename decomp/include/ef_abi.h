@@ -3823,4 +3823,8 @@ void compute_point_bounds_d2040(ef_addr32 object);
 void fill_current_table_entry_b570c(ef_addr32 object, ef_addr32 source, uint8_t flag);
 void blend_by_angle_weight_a2244(ef_addr32 rec);
 
+/* game_helpers101.c */
+void blend_by_complement_weight_a2334(ef_addr32 rec);
+void read_next_token_9d278(ef_addr32 ctx);
+
 #endif

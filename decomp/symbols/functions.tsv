@@ -2059,7 +2059,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d114	90	new_stream_9d114	game_helpers30	compiles	game	confirmed	decomp/tests/0x0009d114.json	docs/compiler-abi.md; Allocate and initialise a 0x56c-byte stream record bound to an owner.; callers f80@114f,2ff44@2ffb8,30214@30291; guest pending
 0x0009d170	118	read_stream_char_9d170	game_helpers33	compiles	game	confirmed	decomp/tests/0x0009d170.json	docs/compiler-abi.md; Read the next byte of a buffered stream, skipping CRs; 0 at end of data.; callers 9d1e8@9d1fe,9d1e8@9d217,9d1e8@9d245; guest pending
 0x0009d1e8	141	read_text_line_9d1e8	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009d1e8.json	docs/compiler-abi.md; Read the next non-comment text line of a stream into its buffer.; callers f80@1158,f80@1171,f80@11b4; guest pending
-0x0009d278	263			unknown	unclassified	unverified		
+0x0009d278	263	read_next_token_9d278	game_helpers101	compiles	game	confirmed	decomp/tests/0x0009d278.json	docs/compiler-abi.md; Read the next token (blank/comma separated, optionally quoted, at most 0x50 bytes) from the text at ctx using the cursor; callers f80@117f,f80@1187,f80@11d2; guest pending
 0x0009d4cd	87	parse_int	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009d4cd.json	docs/compiler-abi.md; atoi: skip class-2 characters, optional sign, class-0x20 digits.; callers f80@1196,f80@11e0,4cf4@4cf9; guest pending
 0x0009d524	57	ascii_stricmp		named	unclassified	unverified		case-folding compare; docs/ghidra-findings.md
 0x0009d55d	462			unknown	unclassified	unverified		
@@ -2150,7 +2150,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a207c	266			unknown	unclassified	unverified		
 0x000a2188	186	blend_linear_a2188	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a2188.json	docs/compiler-abi.md; Blend two 3-word keys by a 14-bit weight (linear).; callers none direct; guest pending
 0x000a2244	240	blend_by_angle_weight_a2244	game_helpers100	compiles	game	confirmed	decomp/tests/0x000a2244.json	docs/compiler-abi.md; Blend two sets of three words into rec+8..0xc, weighted by the cosine of the record's angle (1.14 weights).; callers none direct; guest pending
-0x000a2334	254			unknown	unclassified	unverified		
+0x000a2334	254	blend_by_complement_weight_a2334	game_helpers101	compiles	game	confirmed	decomp/tests/0x000a2334.json	docs/compiler-abi.md; Like a2244 but the cosine weight is taken at the complementary angle and the weights are swapped.; callers none direct; guest pending
 0x000a2434	203	blend_quadratic_a2434	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a2434.json	docs/compiler-abi.md; Blend two 3-word keys by a 9-bit weight (quadratic).; callers none direct; guest pending
 0x000a2500	308			unknown	unclassified	unverified		
 0x000a2634	100	set_page_entry_a2634	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a2634.json	docs/compiler-abi.md; Fill one entry of the current page and refresh the page slot.; callers 9e7bc@9f498; guest pending

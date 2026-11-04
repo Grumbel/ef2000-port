@@ -4314,3 +4314,10 @@ in EAX, format string address, one value).
 | `0xd2040` | EAX:ef_addr32 | none | d2130@d21c1 | Compute (once) the 3D bounding box of an object's points into fields 0x30..0x44. |
 | `0xb570c` | EAX:ef_addr32,EDX:ef_addr32,BL:uint8_t | none | b7d4c@b7f8f,b80ac@b8167,b80ac@b842c | Fill the current (last added) 0x19-byte table entry of an object from a source record and a flag byte. |
 | `0xa2244` | EAX:ef_addr32 | none | none direct | Blend two sets of three words into rec+8..0xc, weighted by the cosine of the record's angle (1.14 weights). |
+
+## game_helpers101 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa2334` | EAX:ef_addr32 | none | none direct | Like a2244 but the cosine weight is taken at the complementary angle and the weights are swapped. |
+| `0x9d278` | EAX:ef_addr32 | none | f80@117f,f80@1187,f80@11d2 | Read the next token (blank/comma separated, optionally quoted, at most 0x50 bytes) from the text at ctx using the cursor |
