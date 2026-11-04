@@ -5251,3 +5251,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa2ef4` | none | EAX:uint32_t | a2f70@a30f5,a410c@a35b2 | Scan the first 0x1357b0 table entries for one without flag 1 (+0x1c); if found, queue request 0x137198 with its index an |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x28744` | none | none | 284ec@285a2,3ea0c@3ecc3,a9724@a9825 | Sibling of 0x287bc: build the same file name, open it with 0xa7948, run 0xab324 with mode 2 and close the handle. |

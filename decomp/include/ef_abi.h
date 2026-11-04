@@ -4433,4 +4433,11 @@ void guest_fn_d1c54_x(ef_addr32 name, uint32_t a, uint32_t mode); /* 0xd1c54 EAX
 
 uint32_t scan_entries_a2ef4(void);
 
+/* misc_drafts1.c */
+void open_named_file_28744(void);
+void queue_request_36100(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1);
+void draw_mode_dispatch_a8660(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t index);
+void guest_fn_35de0_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1);
+void guest_fn_a8578_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+
 #endif
