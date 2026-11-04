@@ -6805,3 +6805,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x103e0c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | none direct | cdecl (OBJ): one-shot guarded notification. When the guard dword 0x17d2d0 is clear, set it, take the handle from 0x101f7 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10dc1d` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 10da50@10daf0 | Implicit-register fragment (ESI = data pointer, ECX = byte count; params in that order): the two-byte running checksum u |
+| `0xded60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | dedde@dee7e,dedde@defce,dedde@df034 | Implicit-register fragment (ESI = first buffer, EDI = second buffer, ECX = byte count; params in that order): swap COUNT |

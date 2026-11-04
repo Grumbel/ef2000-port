@@ -5192,4 +5192,7 @@ uint32_t project_if_outside_c46f8(uint32_t margin, uint32_t rec);
 
 void send_guarded_message_103e0c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj);
 
+uint32_t checksum_bytes_10dc1d(uint32_t p, uint32_t count);
+void swap_buffers_ded60(uint32_t a, uint32_t b, uint32_t count);
+
 #endif

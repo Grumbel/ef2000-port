@@ -8311,3 +8311,38 @@ void send_guarded_message_103e0c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
     forward_to_1111e5_101f78(0u, 0u, 0u, 0u, EF_U32(0x004dd7c8u));
     EF_U32(0x0017d2d0u) = 0u;
 }
+
+/* 0x10dc1d, 30 bytes. Implicit-register fragment (ESI = data pointer, ECX = byte count; params in that order): the two-byte running checksum used by the compressed streams. Per byte: BL += byte; BH += BL. Returns BX (zero-extended). ORIGINAL BUG: a count of 0 or 1 makes the LOOP instruction run 2^32 times; not modelled, the word loop is skipped. */
+uint32_t checksum_bytes_10dc1d(uint32_t p, uint32_t count)
+{
+    uint8_t bl = 0u, bh = 0u;
+    uint32_t words = count >> 1, i;
+    for (i = 0; i < words; i++) {
+        uint8_t al = EF_U8(p + i * 2u), ah = EF_U8(p + i * 2u + 1u);
+        bl = (uint8_t)(bl + al);
+        bh = (uint8_t)(bh + bl);
+        bl = (uint8_t)(bl + ah);
+        bh = (uint8_t)(bh + bl);
+    }
+    if (count & 1u) {
+        bl = (uint8_t)(bl + EF_U8(p + words * 2u));
+        bh = (uint8_t)(bh + bl);
+    }
+    return ((uint32_t)bh << 8) | bl;
+}
+
+/* 0xded60, 38 bytes. Implicit-register fragment (ESI = first buffer, EDI = second buffer, ECX = byte count; params in that order): swap COUNT bytes between the two buffers, dword-wise first, then the remaining bytes. */
+void swap_buffers_ded60(uint32_t a, uint32_t b, uint32_t count)
+{
+    uint32_t i, n4 = count >> 2;
+    for (i = 0; i < n4; i++) {
+        uint32_t t = EF_U32(b + i * 4u);
+        EF_U32(b + i * 4u) = EF_U32(a + i * 4u);
+        EF_U32(a + i * 4u) = t;
+    }
+    for (i = 0; i < (count & 3u); i++) {
+        uint8_t t = EF_U8(b + n4 * 4u + i);
+        EF_U8(b + n4 * 4u + i) = EF_U8(a + n4 * 4u + i);
+        EF_U8(a + n4 * 4u + i) = t;
+    }
+}

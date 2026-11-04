@@ -3287,7 +3287,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000decfb	28			unknown	unclassified	unverified		
 0x000ded1a	35	copy_dta_out_ded1a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded1a.json	docs/compiler-abi.md; When the file-search mode byte 0x132a5e is 9, copy the 0x2b-byte DOS DTA (address from int 21h, AH = 0x2f) to the buffer; callers decde@decf4,decfb@ded10; guest pending
 0x000ded3d	35	copy_dta_in_ded3d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded3d.json	docs/compiler-abi.md; The reverse of 0xded1a: copy the 0x2b bytes at SRC into the DOS DTA.; callers decfb@ded02; guest pending
-0x000ded60	38			unknown	unclassified	unverified		
+0x000ded60	38	swap_buffers_ded60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded60.json	docs/compiler-abi.md; Implicit-register fragment (ESI = first buffer, EDI = second buffer, ECX = byte count; params in that order): swap COUNT; callers dedde@dee7e,dedde@defce,dedde@df034; guest pending
 0x000ded86	88			unknown	unclassified	unverified		
 0x000dedde	1085			unknown	unclassified	unverified		
 0x000df21b	41	read_stream_byte_df21b	game_helpers25	compiles	game	confirmed	decomp/tests/0x000df21b.json	docs/compiler-abi.md; Read the next byte from a stream, or -1 (setting flag 2) at its end.; callers none direct; guest pending
@@ -3994,7 +3994,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010db7e	67			unknown	unclassified	unverified		
 0x0010dbc1	76			unknown	unclassified	unverified		
 0x0010dc0d	16			unknown	unclassified	unverified		
-0x0010dc1d	30			unknown	unclassified	unverified		
+0x0010dc1d	30	checksum_bytes_10dc1d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010dc1d.json	docs/compiler-abi.md; Implicit-register fragment (ESI = data pointer, ECX = byte count; params in that order): the two-byte running checksum u; callers 10da50@10daf0; guest pending
 0x0010dc7f	133	set_channel_mode_10dc7f	game_helpers75	compiles	game	confirmed	decomp/tests/0x0010dc7f.json	docs/compiler-abi.md; Switch the mode of one of 12 channels, running the per-channel transition.; callers ea470@ea48e; guest pending
 0x0010ddf7	5	return_minus_one_10ddf7	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0010ddf7.json	docs/compiler-abi.md; Return -1.; callers ea4a7@ea4af; guest pending
 0x0010ddfc	47	count_matching_streams	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010ddfc.json	docs/compiler-abi.md; Count list entries (list at dword 0x485f9f) whose flags in +0xc match the mask; flush those with bit 0x10 in +0xd via 0x; callers 10f1bf@10f1e2; guest pending
