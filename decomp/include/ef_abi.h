@@ -5615,4 +5615,6 @@ void integrate_drift_538e4(void);
 double angle_between_88ff8(ef_addr32 a, ef_addr32 b);
 double guest_fn_e7df4_x(double x); /* 0xe7df4 ST0 -> ST0: arccosine */
 
+void project_aim_vector_89f50(void);
+
 #endif

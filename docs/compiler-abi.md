@@ -7747,3 +7747,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x88ff8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:double | 28b80@28d85,29b14@29c99,89060@8911b | Unsigned angle between the unit vectors A (EAX) and B (EDX): the dot product (0xb43dc) clamped to [-1, 1], its arccosine |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x89f50` | none | none | 8a318@8a48f,8a318@8a4be,8a318@8a53a | Project the aim vector: with the angles A = double 0x1fd020 and B = double 0x1fcfd0 and the range D = double 0x1fcf48, s |

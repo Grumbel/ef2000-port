@@ -12945,3 +12945,33 @@ double angle_between_88ff8(ef_addr32 a, ef_addr32 b)
         d = -1.0;
     return abs_double_b427c(wrap_angle_b42f0(guest_fn_e7df4_x(d)));
 }
+
+/* 0x89f50, 105 bytes. Project the aim vector: with the angles A = double 0x1fd020 and B = double 0x1fcfd0 and the range D = double 0x1fcf48, store D * cos(B) * cos(A) at 0x1fcff0, cos(A) * (sin(B) * D) at 0x1fcff8 and (-sin(A)) * D + double 0x1fcf10 * double 0x1fcca0 at 0x1fd000. */
+void project_aim_vector_89f50(void)
+{
+    double a;
+    double b;
+    double d;
+    double e;
+    double f;
+    double ca;
+    double sa;
+    double cb;
+    double sb;
+    double r;
+    memcpy(&a, ef_guest_memory_ptr(0x001fd020u), sizeof a);
+    ca = cos_b45a2(a);
+    sa = sin_b45ac(a);
+    memcpy(&b, ef_guest_memory_ptr(0x001fcfd0u), sizeof b);
+    cb = cos_b45a2(b);
+    sb = sin_b45ac(b);
+    memcpy(&d, ef_guest_memory_ptr(0x001fcf48u), sizeof d);
+    r = (cb * d) * ca;
+    memcpy(ef_guest_memory_ptr(0x001fcff0u), &r, sizeof r);
+    r = ca * (sb * d);
+    memcpy(ef_guest_memory_ptr(0x001fcff8u), &r, sizeof r);
+    memcpy(&e, ef_guest_memory_ptr(0x001fcf10u), sizeof e);
+    memcpy(&f, ef_guest_memory_ptr(0x001fcca0u), sizeof f);
+    r = d * (-sa) + e * f;
+    memcpy(ef_guest_memory_ptr(0x001fd000u), &r, sizeof r);
+}

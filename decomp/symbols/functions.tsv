@@ -1759,7 +1759,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00089bf0	115	period_elapsed_89bf0	game_helpers21	compiles	game	confirmed	decomp/tests/0x00089bf0.json	docs/compiler-abi.md; True when a random value modulo the configured period is within the tick budget.; callers 89ac0@89af4; guest pending
 0x00089c64	418			unknown	unclassified	unverified		
 0x00089e08	325			unknown	unclassified	unverified		
-0x00089f50	105			unknown	unclassified	unverified		
+0x00089f50	105	project_aim_vector_89f50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089f50.json	docs/compiler-abi.md; Project the aim vector: with the angles A = double 0x1fd020 and B = double 0x1fcfd0 and the range D = double 0x1fcf48, s; callers 8a318@8a48f,8a318@8a4be,8a318@8a53a; guest pending
 0x00089fbc	542			unknown	unclassified	unverified		
 0x0008a1dc	313			unknown	unclassified	unverified		
 0x0008a318	956			unknown	unclassified	unverified		
