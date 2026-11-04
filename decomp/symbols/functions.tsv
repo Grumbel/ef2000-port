@@ -612,7 +612,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00036054	172	open_stream_36054	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00036054.json	docs/compiler-abi.md; Open the named stream for playback and arm the stream state.; callers 36f84@37066,36f84@37077; guest pending
 0x00036100	124	queue_request_36100	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00036100.json	docs/compiler-abi.md; (ret 8) Store a request block (0x19f34c.., flag 0x19f5aa) and run 0x35de0; reports errors through the 0x132a74 handler i; callers 35c08@35cba,36f84@3700b; guest pending
 0x0003617c	303			unknown	unclassified	unverified		
-0x000362c4	86			unknown	unclassified	unverified		
+0x000362c4	86	enable_state_widget_362c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000362c4.json	docs/compiler-abi.md; Look up the widget named 0x1830f8 and enable it with a label chosen by the state byte 0x19f5aa (2..7); other states clea; callers 36438@367b2,36d30@36f45; guest pending
 0x00036340	132			unknown	unclassified	unverified		
 0x000363c4	80	sync_list_363c4	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x000363c4.json	docs/compiler-abi.md; Walk the list from dword 0x19f320 (next at +0x21), toggling each node by the flag bytes at 0x19f318.; callers 36438@364f6,36438@3652a,36438@365e9; guest pending
 0x00036438	905			unknown	unclassified	unverified		
@@ -1525,7 +1525,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007fe4c	62	ui_finalize_releases	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe4c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fe8c	34	ui_release_all_controls	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe8c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007feb0	69	start_page_7feb0	game_helpers56	compiles	game	confirmed	decomp/tests/0x0007feb0.json	docs/compiler-abi.md; Start the page, or fall back to the default control mode.; callers 3dd30@3dd91,8b39c@8b48f; guest pending
-0x0007ff0c	84			unknown	unclassified	unverified		
+0x0007ff0c	84	append_entry_7ff0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007ff0c.json	docs/compiler-abi.md; (ret 12) Create an entry through 0xd7764 with the caller's EAX/EDX/EBX/ECX and three stack arguments and append it to th; callers none direct; guest pending
 0x00080058	192	init_sound_bank_80058	game_helpers46	compiles	game	confirmed	decomp/tests/0x00080058.json	docs/compiler-abi.md; Load the first sound bank once and register its release hook.; callers 3ea0c@3ed58; guest pending
 0x00080120	105	reset_menu_80120	unit_flags	compiles	game	confirmed	decomp/tests/0x00080120.json	docs/compiler-abi.md; ; callers 3dd30@3e881,3ea0c@3eed4,7feb0@7feee; guest pending
 0x0008018c	87	show_menu_value_8018c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0008018c.json	docs/compiler-abi.md; ; callers 3122c@314fe,94d08@94f51; guest pending
@@ -2390,7 +2390,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aae6c	124	match_default_key_aae6c	game_helpers26	compiles	game	confirmed	decomp/tests/0x000aae6c.json	docs/compiler-abi.md; Set flag 0x137206 when the default key letter matches a slot in mode 5.; callers aaee8@aaf47; guest pending
 0x000aaee8	255	main_control_loop		named	unclassified	unverified		docs/ghidra-findings.md; purpose of callees provisional
 0x000aafe8	120	find_node_position_aafe8	runtime_helpers18	compiles	game	confirmed	decomp/tests/0x000aafe8.json	docs/compiler-abi.md; Find a node in the nested group lists; report its index and group index.; callers ab060@ab07e,ab324@ab395,ab324@ab418; guest pending
-0x000ab060	80			unknown	unclassified	unverified		
+0x000ab060	80	write_node_position_ab060	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ab060.json	docs/compiler-abi.md; Find the node at 0x4191d4 in the group lists and write its two indices (words from a zeroed pair) plus one byte at 0x419; callers ab0dc@ab162; guest pending
 0x000ab0b0	42	emit_record_pair_ab0b0	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab0b0.json	docs/compiler-abi.md; Two 0xa7a1c(EAX, ...) stack calls with record fields.; callers ab0dc@ab12a,ab0dc@ab138,ab0dc@ab148; guest pending
 0x000ab0dc	149	notify_group_links_ab0dc	game_helpers36	compiles	game	confirmed	decomp/tests/0x000ab0dc.json	docs/compiler-abi.md; Visit every kind-0xe node of every group and notify its three links.; callers ab324@ab45e; guest pending
 0x000ab174	233			unknown	unclassified	unverified		
@@ -3791,7 +3791,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ffe78	211			unknown	unclassified	unverified		
 0x001014a4	214			unknown	unclassified	unverified		
 0x0010162c	91	vertex_depth_range_flat_10162c	game_helpers92	compiles	game	confirmed	decomp/tests/0x0010162c.json	docs/compiler-abi.md; Return 1 when the minimum and maximum of the vertices' z field have the same integer part (high 16 bits).; callers 1016e0@101757; guest pending
-0x00101688	85			unknown	unclassified	unverified		
+0x00101688	85	pulse_delay_101688	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00101688.json	docs/compiler-abi.md; Run a short hardware delay loop: n pulses of the two callbacks at 0x486da4/0x486da0, one for the low bit and two per rem; callers 1016e0@101826; guest pending
 0x001016e0	439			unknown	unclassified	unverified		
 0x00101a90	169			unknown	unclassified	unverified		
 0x00101ba8	171			unknown	unclassified	unverified		

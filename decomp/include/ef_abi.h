@@ -4484,4 +4484,13 @@ uint32_t mode_code_a7dac(void);
 void format_state_bytes_82b6c(uint32_t buf);
 void init_sound_entries_80374(uint32_t eax);
 
+void enable_state_widget_362c4(void);
+void pulse_delay_101688(int32_t n);
+void append_entry_7ff0c(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1, uint32_t s2);
+void write_node_position_ab060(uint32_t handle);
+void guest_fn_a7318_2_x(uint32_t node, uint32_t key); /* 0xa7318 EAX/EDX */
+
+
+void guest_fn_a7318_2_x(uint32_t node, uint32_t key); /* 0xa7318 EAX/EDX */
+
 #endif

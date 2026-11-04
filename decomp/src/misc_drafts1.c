@@ -419,3 +419,64 @@ void init_sound_entries_80374(uint32_t eax)
     EF_U32(0x001f9024u) = guest_fn_d7764_7(0x0018878cu, 0u, 0u, 0u, 0u, 0u, 0u);
     guest_fn_d6f90(0x001f9020u, 0u, 0u);
 }
+
+/* 0x362c4, 86 bytes. Look up the widget named 0x1830f8 and enable it with a label chosen by the state byte 0x19f5aa (2..7); other states clear the children dirty flags instead. */
+void enable_state_widget_362c4(void)
+{
+    static const uint32_t labels[6] = { 0x1831c0u, 0x1831d0u, 0x1831c8u, 0x1831c0u, 0x1831c8u, 0x1831d0u };
+    ef_addr32 widget = find_named_or_abort_a46cc(0x001830f8u);
+    uint8_t idx;
+    if (widget == 0u)
+        return;
+    idx = (uint8_t)(EF_U8(0x0019f5aau) - 2u);
+    if (idx > 5u) {
+        clear_children_dirty(widget);
+        return;
+    }
+    guest_fn_a7318_2_x(widget, labels[idx]);
+}
+
+/* 0x101688, 85 bytes. Run a short hardware delay loop: n pulses of the two callbacks at 0x486da4/0x486da0, one for the low bit and two per remaining half step. */
+void pulse_delay_101688(int32_t n)
+{
+    if (n & 1) {
+        guest_callptr0_x(EF_U32(0x00486da4u));
+        guest_callptr0_x(EF_U32(0x00486da0u));
+    }
+    n >>= 1;
+    if (n != 0) {
+        do {
+            guest_callptr0_x(EF_U32(0x00486da4u));
+            guest_callptr0_x(EF_U32(0x00486da0u));
+            guest_callptr0_x(EF_U32(0x00486da4u));
+            n--;
+            guest_callptr0_x(EF_U32(0x00486da0u));
+        } while (n > 0);
+    }
+}
+
+/* 0x7ff0c, 84 bytes. (ret 12) Create an entry through 0xd7764 with the caller's EAX/EDX/EBX/ECX and three stack arguments and append it to the table at 0x1f9078 (count at 0x12b090, capacity 0x12b0b4); reports an error through 0x132a74 when full. */
+void append_entry_7ff0c(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1, uint32_t s2)
+{
+    uint32_t entry;
+    uint32_t count;
+    if (EF_U32(0x0012b090u) == EF_U32(0x0012b0b4u))
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00188790u);
+    entry = guest_fn_d7764_7(eax, edx, ebx, ecx, s0, s1, s2);
+    count = EF_U32(0x0012b090u);
+    EF_U32(EF_U32(0x001f9078u) + count * 4u) = entry;
+    EF_U32(0x0012b090u) = count + 1u;
+}
+
+/* 0xab060, 80 bytes. Find the node at 0x4191d4 in the group lists and write its two indices (words from a zeroed pair) plus one byte at 0x41955f to the handle in eax. */
+void write_node_position_ab060(uint32_t handle)
+{
+    uint32_t pos[2];
+    ef_addr32 p = (uint32_t)(uintptr_t)pos;
+    pos[0] = 0u;
+    pos[1] = 0u;
+    find_node_position_aafe8(p, p + 4u, EF_U32(0x004191d4u));
+    write_handle_a7a1c(0u, 0u, 0u, 0u, handle, 2u, p);
+    write_handle_a7a1c(0u, 0u, 0u, 0u, handle, 2u, p + 4u);
+    write_handle_a7a1c(0u, 0u, 0u, 0u, handle, 1u, 0x0041955fu);
+}

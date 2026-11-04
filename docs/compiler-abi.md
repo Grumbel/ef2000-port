@@ -5335,3 +5335,12 @@ in EAX, format string address, one value).
 | `0xa7dac` | none | EAX:uint32_t | a8718@a87a2,a8718@a88bd | Map the mode byte at [[0x4191d0]+0x10] (0..9) to a code through a jump table; out of range gives 0. |
 | `0x82b6c` | EAX:uint32_t | none | 82e40@82ed3 | sprintf(buf, format 0x188bd8, seven state bytes and the byte at 0x15b7e6). |
 | `0x80374` | EAX:uint32_t | none | a8bd4@a8d03 | Create two entries with 0xd7764 (the first with the caller's EAX and parameters 1, 1, 0x5622, 0x7f, 1, 1; the second for |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x362c4` | none | none | 36438@367b2,36d30@36f45 | Look up the widget named 0x1830f8 and enable it with a label chosen by the state byte 0x19f5aa (2..7); other states clea |
+| `0x101688` | EAX:int32_t | none | 1016e0@101826 | Run a short hardware delay loop: n pulses of the two callbacks at 0x486da4/0x486da0, one for the low bit and two per rem |
+| `0x7ff0c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | none direct | (ret 12) Create an entry through 0xd7764 with the caller's EAX/EDX/EBX/ECX and three stack arguments and append it to th |
+| `0xab060` | EAX:uint32_t | none | ab0dc@ab162 | Find the node at 0x4191d4 in the group lists and write its two indices (words from a zeroed pair) plus one byte at 0x419 |
