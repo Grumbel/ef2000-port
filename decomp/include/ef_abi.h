@@ -2388,4 +2388,15 @@ void guest_fn_74970(int32_t unit, uint32_t b, uint32_t c, uint32_t kind); /* 0x7
 void guest_fn_8f07c(ef_addr32 object); /* 0x8f07c EAX */
 uint32_t guest_fn_906b4(int32_t id); /* 0x906b4 EAX -> AL */
 
+/* game_helpers33.c */
+void store_pending_name_57714(void);
+void update_flight_62454(void);
+void collect_marked_objects_7775c(void);
+void install_input_tables_97f90(void);
+uint8_t read_stream_char_9d170(ef_addr32 stream);
+void guest_fn_625d8(void); /* 0x625d8 */
+void guest_fn_6322c(void); /* 0x6322c */
+uint32_t guest_fn_d5d18(ef_addr32 name); /* 0xd5d18 EAX -> EAX */
+uint32_t guest_fn_9cde8(ef_addr32 buffer, uint32_t count, uint32_t owner); /* 0x9cde8 EAX/EDX/EBX -> EAX */
+
 #endif

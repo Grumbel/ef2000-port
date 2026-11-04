@@ -3098,3 +3098,13 @@ in EAX, format string address, one value).
 | `0x948c4` | AX:int16_t | none | 95e58@96874,95e58@96af7 | Pair the current unit with a target unit, or reset the target state. |
 | `0x97a94` | AX:int16_t | none | 97b18@97b51 | Apply a 78-byte camera record through 0xa0ea8 and 0x9e0c4. |
 | `0x97ca8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | none | 97064@970f1,97064@971c2 | Copy the current 78-byte camera record to six output pointers. |
+
+## game_helpers33 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x57714` | none | none | 3dd30@3de10 | Clear the eight name slots, then store the pending name (upper-cased) in its slot. |
+| `0x62454` | none | none | 601c@6076 | Refresh the flight timers and run the per-frame entry updates. |
+| `0x7775c` | none | none | 49228@49b48 | Collect the level-0x20 objects into a new table when the marker word is -1. |
+| `0x97f90` | none | none | 8b39c@8b4ba | Pick the table for the detected input device and install the handlers. |
+| `0x9d170` | EAX:ef_addr32 | AL:uint8_t | 9d1e8@9d1fe,9d1e8@9d217,9d1e8@9d245 | Read the next byte of a buffered stream, skipping CRs; 0 at end of data. |

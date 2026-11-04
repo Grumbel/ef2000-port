@@ -1094,7 +1094,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000576d4	16	bump_counter_19b96c	marker_packets	compiles	game	confirmed	decomp/tests/0x000576d4.json	docs/compiler-abi.md; Same on base 0x19b96c; sole direct caller 581b0@585c8; guest pending
 0x000576e4	31	send_object_code_4c	command_packets	compiles	game	confirmed	decomp/tests/0x000576e4.json	docs/compiler-abi.md; Three-byte opcode 0x4c packet AX little-endian; original call 0xa3f74; guest dispatch unverified
 0x00057704	16	bump_counter_19b966	marker_packets	compiles	game	confirmed	decomp/tests/0x00057704.json	docs/compiler-abi.md; Same on base 0x19b966; sole direct caller 581b0@585d7; guest pending
-0x00057714	150			unknown	unclassified	unverified		
+0x00057714	150	store_pending_name_57714	game_helpers33	compiles	game	confirmed	decomp/tests/0x00057714.json	docs/compiler-abi.md; Clear the eight name slots, then store the pending name (upper-cased) in its slot.; callers 3dd30@3de10; guest pending
 0x000577ac	57	send_packet_2c	ui_operations	compiles	game	confirmed	decomp/tests/0x000577ac.json	docs/compiler-abi.md; host model; guest differential pending
 0x000577e8	56	count_and_forward_577e8	game_helpers28	compiles	game	confirmed	decomp/tests/0x000577e8.json	docs/compiler-abi.md; Count a local-owner message, then hand the message on.; callers 581b0@58473; guest pending
 0x00057820	315			unknown	unclassified	unverified		
@@ -1176,7 +1176,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005f944	88			unknown	unclassified	unverified		
 0x0005fc80	168			unknown	unclassified	unverified		
 0x0005fefc	845			unknown	unclassified	unverified		
-0x00062454	160			unknown	unclassified	unverified		
+0x00062454	160	update_flight_62454	game_helpers33	compiles	game	confirmed	decomp/tests/0x00062454.json	docs/compiler-abi.md; Refresh the flight timers and run the per-frame entry updates.; callers 601c@6076; guest pending
 0x000624f4	16	refresh_all_624f4	game_helpers6	compiles	game	confirmed	decomp/tests/0x000624f4.json	docs/compiler-abi.md; ; callers 601c@607d; guest pending
 0x00062504	67	process_entries_62504	game_helpers5	compiles	game	confirmed	decomp/tests/0x00062504.json	docs/compiler-abi.md; Process every entry of the 0x17-byte table at 0x1a7d32.; callers 62454@624eb; guest pending
 0x00062548	61	active_unit_record_contains	tactical_io	compiles	game	confirmed	decomp/tests/0x00062548.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
@@ -1407,7 +1407,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000775f0	315			unknown	unclassified	unverified		
 0x0007772c	26	reset_pair_counter	marker_packets	compiles	game	confirmed	decomp/tests/0x0007772c.json	docs/compiler-abi.md; Words 0x1f891e=0xffff and 0x1f891c=0; sole direct caller 49228@49248; guest pending
 0x00077748	18	count_pending_77748	game_helpers28	compiles	game	confirmed	decomp/tests/0x00077748.json	docs/compiler-abi.md; Count a pending frame while the marker word is -1.; callers 8c49c@8c56d; guest pending
-0x0007775c	152			unknown	unclassified	unverified		
+0x0007775c	152	collect_marked_objects_7775c	game_helpers33	compiles	game	confirmed	decomp/tests/0x0007775c.json	docs/compiler-abi.md; Collect the level-0x20 objects into a new table when the marker word is -1.; callers 49228@49b48; guest pending
 0x000777f4	339			unknown	unclassified	unverified		
 0x00077950	41	lookup_by_word_checked	mid_helpers	compiles	game	confirmed	decomp/tests/0x00077950.json	docs/compiler-abi.md; 0xa1a90(sx DX, 0xa1a40()) unless null, 0 or 0xffff; callers 8748@8823,8748@8855,8748@88ec; guest pending
 0x000779f4	264			unknown	unclassified	unverified		
@@ -1968,7 +1968,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00097dc0	11	sample_tick_counter	misc_state	compiles	game	confirmed	decomp/tests/0x00097dc0.json	docs/compiler-abi.md; 0x10640 then return dword 0x197c14; callers 97dcc@97edb,97dcc@97f27; guest pending
 0x00097dcc	412			unknown	unclassified	unverified		
 0x00097f70	21	pointer_or_default	misc_state	compiles	game	confirmed	decomp/tests/0x00097f70.json	docs/compiler-abi.md; 0x9c858 result or 0x18acb0; callers 3ea0c@3ed91,3ea0c@3ed9f; guest pending
-0x00097f90	110			unknown	unclassified	unverified		
+0x00097f90	110	install_input_tables_97f90	game_helpers33	compiles	game	confirmed	decomp/tests/0x00097f90.json	docs/compiler-abi.md; Pick the table for the detected input device and install the handlers.; callers 8b39c@8b4ba; guest pending
 0x00098000	19	forward_if_enabled	misc_state	compiles	game	confirmed	decomp/tests/0x00098000.json	docs/compiler-abi.md; if byte 0x420a72 tail 0xd5f0c(dword 0x12dd98); callers 8b39c@8b4bf; guest pending
 0x00098050	141			unknown	unclassified	unverified		
 0x000980e8	76			unknown	unclassified	unverified		
@@ -2057,7 +2057,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d060	37			unknown	unclassified	unverified		
 0x0009d088	5			unknown	unclassified	unverified		
 0x0009d114	90	new_stream_9d114	game_helpers30	compiles	game	confirmed	decomp/tests/0x0009d114.json	docs/compiler-abi.md; Allocate and initialise a 0x56c-byte stream record bound to an owner.; callers f80@114f,2ff44@2ffb8,30214@30291; guest pending
-0x0009d170	118			unknown	unclassified	unverified		
+0x0009d170	118	read_stream_char_9d170	game_helpers33	compiles	game	confirmed	decomp/tests/0x0009d170.json	docs/compiler-abi.md; Read the next byte of a buffered stream, skipping CRs; 0 at end of data.; callers 9d1e8@9d1fe,9d1e8@9d217,9d1e8@9d245; guest pending
 0x0009d1e8	141			unknown	unclassified	unverified		
 0x0009d278	263			unknown	unclassified	unverified		
 0x0009d4cd	87	parse_int	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009d4cd.json	docs/compiler-abi.md; atoi: skip class-2 characters, optional sign, class-0x20 digits.; callers f80@1196,f80@11e0,4cf4@4cf9; guest pending
