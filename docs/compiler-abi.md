@@ -6369,3 +6369,16 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfeddc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | fdf60@fdfdb | Plot a two-pixel-wide, two-row block with implicit registers (ESI = row, EBX = x offset, CH = colour): both bytes of the |
 | `0xc59b7` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | c4680@c4690 | Shift three consecutive dword triples left by SHIFT (CL) with implicit registers (ESI = source, EDI = destination): the  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc5409` | EAX:uint32_t,EDX:uint32_t | none | c552e@c5540,c565e@c5670 | Divide the three table entries at index ESI (dword arrays 0x150e58, 0x152e58 and 0x154e58) by the signed byte DIV (AL);  |
+| `0xc5441` | EAX:uint32_t,EDX:uint32_t | none | c552e@c5549,c565e@c5679 | Multiply the three table entries at index ESI (arrays 0x150e58, 0x152e58, 0x154e58) by the signed byte MUL (AL, sign ext |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc54ef` | EAX:uint32_t | EAX:uint32_t | c5551@c5562,c5681@c5692 | Fetch the scaled value for table index EDI (implicit register): clear byte 0x158ed8, take the signed word 0x14fe58[index |

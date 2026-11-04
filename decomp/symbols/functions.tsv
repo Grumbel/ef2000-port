@@ -2796,9 +2796,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c539c	12	swap_word_c539c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c539c.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
 0x000c53a8	12	swap_word_c53a8	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c53a8.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
 0x000c53df	15	swap_dword_c53df	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c53df.json	docs/compiler-abi.md; Byte-swap a dword in place; returns the advanced pointer (EBX).; callers none direct; guest pending
-0x000c5409	56			unknown	unclassified	unverified		
-0x000c5441	62			unknown	unclassified	unverified		
-0x000c54ef	41			unknown	unclassified	unverified		
+0x000c5409	56	divide_table_entries_c5409	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5409.json	docs/compiler-abi.md; Divide the three table entries at index ESI (dword arrays 0x150e58, 0x152e58 and 0x154e58) by the signed byte DIV (AL); ; callers c552e@c5540,c565e@c5670; guest pending
+0x000c5441	62	multiply_table_entries_c5441	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5441.json	docs/compiler-abi.md; Multiply the three table entries at index ESI (arrays 0x150e58, 0x152e58, 0x154e58) by the signed byte MUL (AL, sign ext; callers c552e@c5549,c565e@c5679; guest pending
+0x000c54ef	41	fetch_scaled_value_c54ef	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c54ef.json	docs/compiler-abi.md; Fetch the scaled value for table index EDI (implicit register): clear byte 0x158ed8, take the signed word 0x14fe58[index; callers c5551@c5562,c5681@c5692; guest pending
 0x000c552e	35			unknown	unclassified	unverified		
 0x000c5551	59			unknown	unclassified	unverified		
 0x000c565e	35			unknown	unclassified	unverified		

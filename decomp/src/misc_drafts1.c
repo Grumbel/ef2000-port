@@ -6425,3 +6425,39 @@ void shift_triples_c59b7(ef_addr32 src, ef_addr32 dst, uint32_t shift)
         dst += 4u;
     }
 }
+
+/* 0xc5409, 56 bytes. Divide the three table entries at index ESI (dword arrays 0x150e58, 0x152e58 and 0x154e58) by the signed byte DIV (AL); implicit registers, parameters in the order DIV (AL), INDEX (ESI). */
+void divide_table_entries_c5409(uint32_t div, uint32_t index)
+{
+    int32_t d = (int8_t)div;
+    uint32_t off = index * 4u;
+    EF_U32(0x00150e58u + off) = (uint32_t)((int32_t)EF_U32(0x00150e58u + off) / d);
+    EF_U32(0x00152e58u + off) = (uint32_t)((int32_t)EF_U32(0x00152e58u + off) / d);
+    EF_U32(0x00154e58u + off) = (uint32_t)((int32_t)EF_U32(0x00154e58u + off) / d);
+}
+
+/* 0xc5441, 62 bytes. Multiply the three table entries at index ESI (arrays 0x150e58, 0x152e58, 0x154e58) by the signed byte MUL (AL, sign extended); nothing is stored when any of the products overflows 32 bits. Implicit registers, parameters in the order MUL (AL), INDEX (ESI). */
+void multiply_table_entries_c5441(uint32_t mul, uint32_t index)
+{
+    int64_t m = (int8_t)mul;
+    uint32_t off = index * 4u;
+    int64_t a = (int64_t)(int32_t)EF_U32(0x00150e58u + off) * m;
+    int64_t b = (int64_t)(int32_t)EF_U32(0x00152e58u + off) * m;
+    int64_t c = (int64_t)(int32_t)EF_U32(0x00154e58u + off) * m;
+    if (a != (int32_t)a || b != (int32_t)b || c != (int32_t)c)
+        return;
+    EF_U32(0x00150e58u + off) = (uint32_t)a;
+    EF_U32(0x00152e58u + off) = (uint32_t)b;
+    EF_U32(0x00154e58u + off) = (uint32_t)c;
+}
+
+/* 0xc54ef, 41 bytes. Fetch the scaled value for table index EDI (implicit register): clear byte 0x158ed8, take the signed word 0x14fe58[index], shift it right by (byte 0x15912e - 0x10), store the low word in 0x15912c and return the shifted value (also left in EDX). */
+uint32_t fetch_scaled_value_c54ef(uint32_t index)
+{
+    int32_t v;
+    EF_U8(0x00158ed8u) = 0u;
+    v = (int16_t)EF_U16(0x0014fe58u + index * 2u);
+    v >>= (uint8_t)(EF_U8(0x0015912eu) - 0x10u) & 31u;
+    EF_U16(0x0015912cu) = (uint16_t)v;
+    return (uint32_t)v;
+}

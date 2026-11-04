@@ -5031,4 +5031,9 @@ void put_pixel_fedcc(uint32_t row, uint32_t x, uint32_t colour);
 void put_block2_feddc(uint32_t row, uint32_t x, uint32_t colour);
 void shift_triples_c59b7(ef_addr32 src, ef_addr32 dst, uint32_t shift);
 
+void divide_table_entries_c5409(uint32_t div, uint32_t index);
+void multiply_table_entries_c5441(uint32_t mul, uint32_t index);
+
+uint32_t fetch_scaled_value_c54ef(uint32_t index);
+
 #endif
