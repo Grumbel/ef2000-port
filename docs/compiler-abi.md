@@ -9633,3 +9633,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10944c` | none | none | 109440@109440 | Scales the control input doubles into the two control-response sets selected by a mode flag. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x89e08` | EAX:ef_addr32 | none | 55928@55a9d,8846c@884aa | EAX = object. Advances the object's position by a velocity derived from the elapsed time since obj+0x8b (clamped to 0x96 |

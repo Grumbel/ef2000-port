@@ -24143,3 +24143,41 @@ void update_control_scaling_10944c(void)
 		EF_U32(0x432464) = 0;
 	}
 }
+
+/* 0x89e08, 325 bytes. EAX = object. Advances the object's position by a velocity derived from the elapsed time since obj+0x8b (clamped to 0x96 ticks); once accumulated time at obj+0x8d would reach 0x32 the object is released instead. */
+void advance_object_89e08(ef_addr32 obj)
+{
+	uint8_t tmp[0x54];
+	ef_addr32 t = (ef_addr32)(uintptr_t)tmp;
+	uint16_t dt;
+	uint32_t sum;
+	double d38, a20, a28, v30, c20, s20, c28, s28;
+	double *p = (double *)tmp;
+
+	if (obj == 0 || EF_U8(0x122c5c) != 0) return;
+	dt = (uint16_t)(EF_U16(0x1357d6) - EF_U16(obj + 0x8b));
+	EF_U16(obj + 0x8b) = EF_U16(0x1357d6);
+	if (dt & 0x8000) dt = 0;
+	if (dt > 0x96) dt = 0x96;
+	sum = (uint32_t)dt + EF_U16(obj + 0x8d);
+	if (sum >= 0x32) {
+		EF_U16(obj + 0x8d) = 0x32;
+		guest_fn_878c8(obj);
+		return;
+	}
+	EF_U16(obj + 0x8d) = (uint16_t)sum;
+	d38 = (double)dt * md_rd_f64(0x18a5e8u);
+	convert_scene_vector(obj, t);
+	convert_scene_scalar(obj, t + 0x30);
+	transform_signed_angle_pair(obj, t + 0x20, t + 0x28);
+	EF_U32(obj + 0x1a) = EF_U32(obj);
+	EF_U32(obj + 0x1e) = EF_U32(obj + 4);
+	EF_U32(obj + 0x22) = EF_U32(obj + 8);
+	a20 = p[4]; a28 = p[5]; v30 = p[6];
+	c20 = cos_b45a2(a20); s20 = sin_b45ac(a20);
+	c28 = cos_b45a2(a28); s28 = sin_b45ac(a28);
+	p[0] += c28 * v30 * c20 * d38;
+	p[1] += c20 * (s28 * v30) * d38;
+	p[2] += -s20 * v30 * d38;
+	scale_vector_to_ints_88d90(obj, t);
+}
