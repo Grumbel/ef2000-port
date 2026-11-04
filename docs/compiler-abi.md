@@ -4349,3 +4349,11 @@ in EAX, format string address, one value).
 | `0xd65e8` | none | none | 284ec@284f2,39204@39211,3dccc@3dccf | Upload an all-zero (black) 0x300-byte palette. |
 | `0xcc7d0` | AX:int16_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | b0f5c@b154b | Forward two stack arguments to cc90c with the 16-bit register argument sign-extended. |
 | `0xf8600` | AX:int16_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | b0f5c@b158e | Forward four stack arguments to f9448 with the 16-bit register argument sign-extended. |
+
+## game_helpers107 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x110b30` | EAX:ef_addr32,EDX:ef_addr32,BX:int16_t | none | none direct | Copy 200 lines of 0x140 bytes with the destination advancing by a 16-bit stride per line. |
+| `0x1e0ec` | EAX:ef_addr32,DX:int16_t | none | 1df90@1e0e1 | Look up an event code for a record (position >> 8 as a 3-vector) and dispatch it unless the lookup returns -1. |
+| `0x11004b` | none | EAX:uint32_t | 1100b1@1100b3 | DOS get-time call (int 21h, AH=2Ch) converted to hundredths of a second since midnight. |

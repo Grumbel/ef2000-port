@@ -331,7 +331,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001dc20	666			unknown	unclassified	unverified		
 0x0001debc	209			unknown	unclassified	unverified		
 0x0001df90	348			unknown	unclassified	unverified		
-0x0001e0ec	68			unknown	unclassified	unverified		
+0x0001e0ec	68	dispatch_record_event_1e0ec	game_helpers107	compiles	game	confirmed	decomp/tests/0x0001e0ec.json	docs/compiler-abi.md; Look up an event code for a record (position >> 8 as a 3-vector) and dispatch it unless the lookup returns -1.; callers 1df90@1e0e1; guest pending
 0x0001e130	53	forget_record_1e130	game_helpers5	compiles	game	confirmed	decomp/tests/0x0001e130.json	docs/compiler-abi.md; Forget the cached record pointer if it equals record index.; callers 5437c@543eb; guest pending
 0x0001e1c0	68	point_in_box_1e1c0	game_helpers7	compiles	game	confirmed	decomp/tests/0x0001e1c0.json	docs/compiler-abi.md; Is the point inside the 16-bit box at box?; callers 1e214@1e268; guest pending
 0x0001e214	117			unknown	unclassified	unverified		
@@ -4030,7 +4030,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010f26a	465			unknown	unclassified	unverified		
 0x0010f43b	164			unknown	unclassified	unverified		
 0x0010f4df	17	call_fa95f_from_start	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f4df.json	docs/compiler-abi.md; 0xfa95f(EAX, 0, 1).; callers f2183@f2227,f227f@f2287; guest pending
-0x0011004b	91			unknown	unclassified	unverified		
+0x0011004b	91	dos_time_hundredths_11004b	game_helpers107	compiles	game	confirmed	decomp/tests/0x0011004b.json	docs/compiler-abi.md; DOS get-time call (int 21h, AH=2Ch) converted to hundredths of a second since midnight.; callers 1100b1@1100b3; guest pending
 0x001100b1	33	elapsed_since_start	runtime_libc	compiles	game	confirmed	decomp/tests/0x001100b1.json	docs/compiler-abi.md; Elapsed value of 0x11004b relative to dword 0x4dd984, wrapping at 0x83d600.; callers none direct; guest pending
 0x001100d2	81			unknown	unclassified	unverified		
 0x00110123	13	call_1100d2_default	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110123.json	docs/compiler-abi.md; 0x1100d2(EAX, 0x4dd988).; callers f9ecd@f9ecd,101c54@101ce1; guest pending
@@ -4052,7 +4052,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00110894	151	decode_rle_rows_110894	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x00110894.json	docs/compiler-abi.md; Decode run-length coded rows: each row starts with a run count, each run is a signed length (negative = literal bytes, p; callers none direct; guest pending
 0x0011092c	217			unknown	unclassified	unverified		
 0x00110a08	296			unknown	unclassified	unverified		
-0x00110b30	61			unknown	unclassified	unverified		
+0x00110b30	61	copy_screen_lines_110b30	game_helpers107	compiles	game	confirmed	decomp/tests/0x00110b30.json	docs/compiler-abi.md; Copy 200 lines of 0x140 bytes with the destination advancing by a 16-bit stride per line.; callers none direct; guest pending
 0x00110b70	51	clear_rows_110b70	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00110b70.json	docs/compiler-abi.md; Zero len bytes at the start of each of count rows spaced stride bytes apart.; callers none direct; guest pending
 0x00110dcc	13	increment_17d7ba	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110dcc.json	docs/compiler-abi.md; ; callers 101ba8@101bb1; guest pending
 0x00110dd9	13	decrement_17d7ba	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110dd9.json	docs/compiler-abi.md; ; callers 101ba8@101bd1; guest pending

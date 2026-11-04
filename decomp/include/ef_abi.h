@@ -3851,4 +3851,11 @@ void forward_word_args_f8600(int16_t a, uint32_t u1, uint32_t u2, uint32_t u3, u
 void guest_fn_cc90c_x(int32_t a, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1); /* 0xcc90c EAX + 2 stack, callee cleanup */
 void guest_fn_f9448_x(int32_t a, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3); /* 0xf9448 EAX + 4 stack, callee cleanup */
 
+/* game_helpers107.c */
+void copy_screen_lines_110b30(ef_addr32 src, ef_addr32 dst, int16_t stride);
+void dispatch_record_event_1e0ec(ef_addr32 rec, int16_t value);
+uint32_t dos_time_hundredths_11004b(void);
+uint32_t guest_fn_39548_x(ef_addr32 rec, uint32_t code, int32_t value); /* 0x39548 EAX EDX EBX -> AX */
+void guest_fn_11f287_x(ef_addr32 in_regs, ef_addr32 out_regs); /* 0x11f287 EAX EDX (DOS int call) */
+
 #endif
