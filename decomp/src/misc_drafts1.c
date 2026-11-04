@@ -11651,3 +11651,20 @@ void pump_serial_transmit_117b18(ef_addr32 p)
             return;
     }
 }
+
+/* 0xc02ec, 197 bytes. For every index J below the count of list LIST (EDX, 0xbc5d0, signed word) and each of the kinds 0xf, 0x10 and 0x11, find the node (0xcc51c) and, if present, fold it into the running value with 0xc03b4 (EAX = running value, EDX = kind, EBX = J, ECX = LIST, stack: B, C, S0..S3 with B = EBX and C = ECX of this call). Returns the final running value (starts as AX = A). */
+uint32_t fold_list_kinds_c02ec(uint32_t a, uint32_t list, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3)
+{
+    uint16_t cur = (uint16_t)a;
+    int16_t count = (int16_t)guest_fn_bc5d0_x(list);
+    int16_t j;
+    for (j = 0; j < count; j++) {
+        int16_t k;
+        for (k = 0; k < 3; k++) {
+            uint32_t kind = k == 0 ? 0xfu : (k == 1 ? 0x10u : 0x11u);
+            if ((uint16_t)find_node_matching_cc51c((uint32_t)(int32_t)j, list, kind) != 0u)
+                cur = (uint16_t)guest_fn_c03b4_x((int32_t)(int16_t)cur, kind, (uint32_t)(uint8_t)j, list, b, c, s0, s1, s2, s3);
+        }
+    }
+    return cur;
+}

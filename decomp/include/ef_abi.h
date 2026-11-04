@@ -5478,4 +5478,7 @@ void guest_fn_88100_x(ef_addr32 obj); /* 0x88100 EAX */
 
 void pump_serial_transmit_117b18(ef_addr32 p);
 
+uint32_t fold_list_kinds_c02ec(uint32_t a, uint32_t list, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
+uint32_t guest_fn_c03b4_x(int32_t cur, uint32_t kind, uint32_t j, uint32_t list, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xc03b4 EAX/EDX/EBX/ECX + 6 stack, ret 0x18, -> AX */
+
 #endif

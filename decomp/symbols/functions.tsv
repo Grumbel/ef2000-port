@@ -2705,7 +2705,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bfb88	336			unknown	unclassified	unverified		
 0x000bfcd8	36	find_node_by_record_a	list_lookup	compiles	game	confirmed	decomp/tests/0x000bfcd8.json	docs/compiler-abi.md; Node in the list at *EDX with dwords +0x16/+0x1a equal * to the record's +0x11/+0x15.; callers b0b00@b0b3d,b0b00@b0bcd,c0b04@c0f1d; guest pending
 0x000bfcfc	34	find_node_by_record_b	list_lookup	compiles	game	confirmed	decomp/tests/0x000bfcfc.json	docs/compiler-abi.md; Node in the list at *EAX with dwords +0x11/+0x15 equal * to the record's +0x16/+0x1a.; callers 4ce4c@4cf86,50770@507ae,b47e4@b4970; guest pending
-0x000c02ec	197			unknown	unclassified	unverified		
+0x000c02ec	197	fold_list_kinds_c02ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c02ec.json	docs/compiler-abi.md; For every index J below the count of list LIST (EDX, 0xbc5d0, signed word) and each of the kinds 0xf, 0x10 and 0x11, fin; callers bc610@bc752; guest pending
 0x000c03b4	382			unknown	unclassified	unverified		
 0x000c0534	240			unknown	unclassified	unverified		
 0x000c0624	377			unknown	unclassified	unverified		
