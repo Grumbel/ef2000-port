@@ -22656,3 +22656,64 @@ void build_matrix_11c4ec(ef_addr32 out, ef_addr32 rec)
 	for (i = 0; i < 9; i++)
 		*(double *)ef_guest_memory_ptr((ef_addr32)(out + i * 8)) = v[i];
 }
+
+/* 0x110410, 163 bytes. First-fit allocation from a circular free list heap. */
+uint32_t heap_alloc_110410(uint32_t size, uint32_t seg, ef_addr32 heap)
+{
+	uint32_t n, esi, edi, edx, next, remain;
+
+	(void)seg;
+	if (size == 0)
+		return 0;
+	if (size + 7 < size)
+		return 0;
+	n = (size + 7) & ~3u;
+	if (n < 12)
+		n = 12;
+	if (n > EF_U32(heap + 0x14))
+		return 0;
+	esi = EF_U32(heap + 0xc);
+	edi = EF_U32(heap + 0x10);
+	if (n <= edi) {
+		esi = EF_U32(heap + 0x28);
+		edi = 0;
+	}
+	for (;;) {
+		edx = EF_U32(esi);
+		if (n <= edx)
+			break;
+		if (edi < edx)
+			edi = edx;
+		esi = EF_U32(esi + 8);
+		if (esi == heap + 0x20) {
+			EF_U32(heap + 0x14) = edi;
+			return 0;
+		}
+	}
+	remain = edx - n;
+	EF_U32(heap + 0x10) = edi;
+	EF_U32(heap + 0x18)++;
+	next = EF_U32(esi + 8);
+	if (remain < 12) {
+		uint32_t prev;
+
+		EF_U32(heap + 0x1c)--;
+		prev = EF_U32(esi + 4);
+		EF_U32(prev + 8) = next;
+		EF_U32(next + 4) = prev;
+		EF_U32(heap + 0xc) = prev;
+	} else {
+		uint32_t rest = esi + n;
+		uint32_t prev = EF_U32(esi + 4);
+
+		EF_U32(heap + 0xc) = rest;
+		EF_U32(rest) = remain;
+		EF_U32(esi) = n;
+		EF_U32(rest + 4) = prev;
+		EF_U32(rest + 8) = next;
+		EF_U32(prev + 8) = rest;
+		EF_U32(next + 4) = rest;
+	}
+	EF_U32(esi) |= 1;
+	return esi + 4;
+}
