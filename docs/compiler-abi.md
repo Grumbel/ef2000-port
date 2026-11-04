@@ -4955,3 +4955,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x35b2c` | none | none | 35590@35632 | Commit the chosen game mode: copy the selection (0x1357ae) to the mode/slot bytes, format its name for mode 3, store the |
+
+## tactical_marks1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5d48c` | EAX:uint32_t,EDX:uint32_t | none | 5cff0@5d074,5d1c4@5d30e,5d1c4@5d47d | Draw a diamond of four lines around (x, y); the half-size is the word at 0x1a6ce8 shifted by the zoom byte 0x12b369 and  |

@@ -4271,4 +4271,7 @@ uint32_t guest_fn_48d5c_x(ef_addr32 text); /* 0x48d5c cdecl, one stack argument,
 
 void commit_mode_selection_35b2c(void);
 
+/* tactical_marks1.c */
+void draw_diamond_5d48c(uint32_t x, uint32_t y);
+
 #endif
