@@ -6750,3 +6750,40 @@ void select_animation_11458c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
         }
     }
 }
+
+/* 0x31774, 161 bytes. Reposition the camera from the angles at 0x19e572/0x19e560 (0xdc91c) by the offset (0, 0, -dword 0x19e597) rotated into 0x19e5c1, then add the velocity (0x19e560/64/68) plus the extra offsets 0x19e57e/0x19e582 to the position dwords 0x19e5c1/5c5/5c9. Sets byte 0x1a6d1f. */
+void reposition_camera_31774(void)
+{
+    uint16_t angles[4];
+    int32_t vec[3];
+    EF_U8(0x001a6d1fu) = 1u;
+    guest_fn_dc91c((uint32_t)(uintptr_t)angles, 0x0019e572u, 0x0019e560u);
+    vec[0] = 0;
+    vec[1] = 0;
+    vec[2] = -(int32_t)EF_U32(0x0019e597u);
+    rotate_vector_by_angles_32414((uint32_t)(uintptr_t)angles, (uint32_t)(uintptr_t)vec, 0x0019e5c1u);
+    EF_U32(0x0019e5c1u) += EF_U32(0x0019e560u) + EF_U32(0x0019e57eu);
+    EF_U32(0x0019e5c5u) += EF_U32(0x0019e564u) + EF_U32(0x0019e582u);
+    EF_U32(0x0019e5c9u) += EF_U32(0x0019e568u);
+}
+
+/* 0xdfeb8, 145 bytes. Serial line status handler: store (line status (port 0x15eed0 + 5) >> 1) & 0xf in byte 0x15eed5; when bit 3 of that is set, switch the receive state byte 0x15f089 from 1 to 2 (setting byte 0x15f08f and word 0x15f090 = 0xe) and count the error in word 0x15f0a0 while clearing word 0x15f09c; otherwise, in state 3 with byte 0x15f088 set, set dword 0x15f084 = 5 and latch the menu entry (0xdf65c). */
+void serial_status_dfeb8(void)
+{
+    uint32_t st = ((guest_fn_9c430(EF_U32(0x0015eed0u) + 5u) & 0xffu) >> 1) & 0xfu;
+    EF_U8(0x0015eed5u) = (uint8_t)st;
+    if ((EF_U8(0x0015eed5u) & 8u) != 0u) {
+        if (EF_U8(0x0015f089u) == 1u) {
+            EF_U8(0x0015f08fu) = 1u;
+            EF_U16(0x0015f090u) = 0xeu;
+            EF_U8(0x0015f089u) = 2u;
+        }
+        EF_U16(0x0015f09cu) = 0u;
+        EF_U16(0x0015f0a0u) = (uint16_t)(EF_U16(0x0015f0a0u) + 1u);
+        return;
+    }
+    if (EF_U8(0x0015f089u) == 3u && EF_U8(0x0015f088u) != 0u) {
+        EF_U32(0x0015f084u) = 5u;
+        (void)latch_menu_entry_df65c();
+    }
+}

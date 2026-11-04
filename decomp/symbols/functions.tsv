@@ -507,7 +507,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00031514	420			unknown	unclassified	unverified		
 0x000316b8	84	advance_position_316b8	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x000316b8.json	docs/compiler-abi.md; Run 0x32414 and add the three deltas at 0x19e560 to the position at 0x19e5c1.; callers 2fbc4@2ff14,3122c@3129c; guest pending
 0x0003170c	103	place_rotated_vector_3170c	search_helpers1	compiles	game	confirmed	decomp/tests/0x0003170c.json	docs/compiler-abi.md; Rotate the vector at 0x19e57e by zero angles into 0x19e5c1 and add the offset triple at 0x19e560.; callers 3122c@312ad; guest pending
-0x00031774	161			unknown	unclassified	unverified		
+0x00031774	161	reposition_camera_31774	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00031774.json	docs/compiler-abi.md; Reposition the camera from the angles at 0x19e572/0x19e560 (0xdc91c) by the offset (0, 0, -dword 0x19e597) rotated into ; callers 3122c@312c3; guest pending
 0x00031818	402			unknown	unclassified	unverified		
 0x000319ac	318	update_camera_position_319ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000319ac.json	docs/compiler-abi.md; Update the camera position (dwords 0x19e5c1/5c5/5c9): rotate the offset (0, 0, -dword 0x19e597) by the angle pair at wor; callers 3122c@312ee; guest pending
 0x00031aec	84	advance_position_31aec	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00031aec.json	docs/compiler-abi.md; Identical to 0x316b8.; callers 3122c@312e7; guest pending
@@ -3300,7 +3300,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000df738	122	poll_modem_status_df738	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000df738.json	docs/compiler-abi.md; Poll the modem status register (port dword 0x15eed0 + 6, saved in byte 0x15eed4): in mode 2 (byte 0x13579a) with the del; callers none direct; guest pending
 0x000df7b4	786			unknown	unclassified	unverified		
 0x000dfac8	1008			unknown	unclassified	unverified		
-0x000dfeb8	145			unknown	unclassified	unverified		
+0x000dfeb8	145	serial_status_dfeb8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dfeb8.json	docs/compiler-abi.md; Serial line status handler: store (line status (port 0x15eed0 + 5) >> 1) & 0xf in byte 0x15eed5; when bit 3 of that is s; callers none direct; guest pending
 0x000dff4c	24	poll_serial_dff4c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dff4c.json	docs/compiler-abi.md; Poll the serial line status register (port dword 0x15eed0 + 5): when its data-ready bit is set call the receive handler ; callers none direct; guest pending
 0x000e06ac	77			unknown	unclassified	unverified		
 0x000e0870	111	fill_channel_e0870	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e0870.json	docs/compiler-abi.md; Fill the channel record selected by byte 0x15f07f.; callers e1194@e1194; guest pending
