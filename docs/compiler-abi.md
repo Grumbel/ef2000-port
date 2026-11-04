@@ -5367,3 +5367,12 @@ in EAX, format string address, one value).
 | `0x11d385` | EAX:uint32_t,EDX:int32_t,EBX:int32_t | none | 11d3f0@11d606 | Right-align the len-byte text at buf inside width bytes: move it to the end, then fix a leading "." or sign+"." by inser |
 | `0x11451c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | 103778@1037aa | Advance a (column, row) cursor of a text object by 0x4dd804 steps: each step adds +0x68 to the accumulator at +0x6c and  |
 | `0xa6038` | none | none | a4b08@a4b43,a4b5c@a4b79,a4b80@a4c79 | Redraw: when a backdrop (0x41eeac) is active draw it over the screen rectangle, otherwise run 0xc9ec4; then re-apply eac |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x97950` | EAX:uint32_t | none | 978e8@9790d | Integrate a record's motion unless 0x122c5c is set: add the vector at +0x18 (scaled by the step 0x132b20) to the positio |
+| `0xa374c` | EAX:uint32_t | none | a348c@a34f0 | When at least 8 bytes are pending (0x1357da), send a 13-byte request built from 0x1357ae, 7 bytes of the template at [0x |
+| `0xd7764` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | 7ff0c@7ff3d,80374@80391,80374@803ac | (ret 12) Allocate and clear a 0x25-byte entry, copy the name from EAX into it and fill in the bytes/words at +0x0d, +0x0 |
+| `0xdd2f4` | EAX:uint32_t | EAX:uint32_t | 275e0@27658,275e0@276a8,275e0@276e5 | Measure the pixel width of a zero-terminated string: spaces and tabs count 3, characters above 0x7f use the byte table a |

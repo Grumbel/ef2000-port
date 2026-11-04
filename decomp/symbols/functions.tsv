@@ -1957,7 +1957,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00097860	135			unknown	unclassified	unverified		
 0x000978e8	44	update_record_978e8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000978e8.json	docs/compiler-abi.md; if word +0xa: high word +6 <= 2 -> 0x979c8,0x97914; then 0x97950; callers 97464@974a0; guest pending
 0x00097914	59	add_scaled_vector_97914	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00097914.json	docs/compiler-abi.md; Unless 0x122c5c is set, copy the vector at obj+0x30 to a temporary, scale it by the float bits at 0x132b20 and add it to; callers 978e8@97906; guest pending
-0x00097950	118			unknown	unclassified	unverified		
+0x00097950	118	integrate_motion_97950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00097950.json	docs/compiler-abi.md; Integrate a record's motion unless 0x122c5c is set: add the vector at +0x18 (scaled by the step 0x132b20) to the positio; callers 978e8@9790d; guest pending
 0x000979c8	129			unknown	unclassified	unverified		
 0x00097a4c	69	init_chain_97a4c	game_helpers22	compiles	game	confirmed	decomp/tests/0x00097a4c.json	docs/compiler-abi.md; Load two string handles and reset the chain head.; callers 3dd30@3de0b; guest pending
 0x00097a94	131	apply_camera_record_97a94	game_helpers32	compiles	game	confirmed	decomp/tests/0x00097a94.json	docs/compiler-abi.md; Apply a 78-byte camera record through 0xa0ea8 and 0x9e0c4.; callers 97b18@97b51; guest pending
@@ -2181,7 +2181,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a348c	247			unknown	unclassified	unverified		
 0x000a35bc	242			unknown	unclassified	unverified		
 0x000a36b0	156	accumulate_offsets_a36b0	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a36b0.json	docs/compiler-abi.md; Accumulate clamped timing offsets of the listed entries.; callers a410c@a39de; guest pending
-0x000a374c	118			unknown	unclassified	unverified		
+0x000a374c	118	flush_pending_a374c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a374c.json	docs/compiler-abi.md; When at least 8 bytes are pending (0x1357da), send a 13-byte request built from 0x1357ae, 7 bytes of the template at [0x; callers a348c@a34f0; guest pending
 0x000a37c4	31	send_byte_request_8_a37c4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a37c4.json	docs/compiler-abi.md; Send a one-byte request with code 8.; callers a3824@a389d; guest pending
 0x000a37e4	31	send_byte_request_9_a37e4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a37e4.json	docs/compiler-abi.md; Send a one-byte request with code 9.; callers a3824@a38bd; guest pending
 0x000a3804	31	send_byte_request_10_a3804	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a3804.json	docs/compiler-abi.md; Send a one-byte request with code 10.; callers a3824@a3883; guest pending
@@ -3114,7 +3114,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d7758	4	set_dword_d7758	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d7758.json	docs/compiler-abi.md; ; callers 81230@812e3,81448@814c8; guest pending
 0x000d775c	4	get_dword_d775c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d775c.json	docs/compiler-abi.md; ; callers 81448@814dc,81448@81512; guest pending
 0x000d7760	1	nop_d7760	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d7760.json	docs/compiler-abi.md; Empty stub (single ret).; callers 81448@8147e,81448@81565,81448@8158a; guest pending
-0x000d7764	118			unknown	unclassified	unverified		
+0x000d7764	118	create_entry_d7764	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d7764.json	docs/compiler-abi.md; (ret 12) Allocate and clear a 0x25-byte entry, copy the name from EAX into it and fill in the bytes/words at +0x0d, +0x0; callers 7ff0c@7ff3d,80374@80391,80374@803ac; guest pending
 0x000d77dc	34	scale_by_magnitude_d77dc	runtime_helpers16	compiles	game	confirmed	decomp/tests/0x000d77dc.json	docs/compiler-abi.md; Scale -(a << 6) by the magnitude of b plus one, biased by 0x40.; callers 7fcdc@7fdbb; guest pending
 0x000d7800	4	set_dword_d7800	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000d7800.json	docs/compiler-abi.md; ; callers 7fcdc@7fe05; guest pending
 0x000d7b6c	129	init_camera_table_d7b6c	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000d7b6c.json	docs/compiler-abi.md; Initialise the camera table from the mode handle, or copy the default.; callers d86e0@d87e6,d8fd8@d911f; guest pending
@@ -3240,7 +3240,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd1b0	95	draw_text_5_dd1b0	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd1b0.json	docs/compiler-abi.md; Draw a string in the 5-pixel-blank font, advancing by each glyph width.; callers a8578@a8605; guest pending
 0x000dd210	89	text_width_6_dd210	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd210.json	docs/compiler-abi.md; Pixel width of a string in the font with 6-pixel blanks and 2-pixel gaps.; callers a82f0@a84d8; guest pending
 0x000dd26c	133			unknown	unclassified	unverified		
-0x000dd2f4	122			unknown	unclassified	unverified		
+0x000dd2f4	122	text_width_dd2f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd2f4.json	docs/compiler-abi.md; Measure the pixel width of a zero-terminated string: spaces and tabs count 3, characters above 0x7f use the byte table a; callers 275e0@27658,275e0@276a8,275e0@276e5; guest pending
 0x000dd370	238			unknown	unclassified	unverified		
 0x000dd460	100	text_width_17_dd460	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd460.json	docs/compiler-abi.md; Width of a string in the 17-pixel-blank font minus the trailing gap.; callers a82f0@a84ed; guest pending
 0x000dd4c4	150			unknown	unclassified	unverified		

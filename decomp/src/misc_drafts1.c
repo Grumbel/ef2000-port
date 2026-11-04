@@ -683,3 +683,92 @@ void redraw_entries_a6038(void)
         } while (i < EF_U16(0x0041eed8u));
     }
 }
+
+/* 0x97950, 118 bytes. Integrate a record's motion unless 0x122c5c is set: add the vector at +0x18 (scaled by the step 0x132b20) to the position at +0x0c, then fold the vector scaled by +0x48 and offset by +0x3c back into +0x18 (also scaled by the step). */
+void integrate_motion_97950(uint32_t obj)
+{
+    uint8_t tmp[12];
+    ef_addr32 t = (uint32_t)(uintptr_t)tmp;
+    if (EF_U8(0x00122c5cu) != 0u)
+        return;
+    copy_vector3(t, obj + 0x18u);
+    guest_fn_ea8cc_x(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
+    add_vector3(obj + 0xcu, t);
+    copy_vector3(t, obj + 0x18u);
+    guest_fn_ea8cc_x(t, 0u, 0u, 0u, EF_U32(obj + 0x48u));
+    add_vector3(t, obj + 0x3cu);
+    guest_fn_ea8cc_x(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
+    add_vector3(obj + 0x18u, t);
+}
+
+/* 0xa374c, 118 bytes. When at least 8 bytes are pending (0x1357da), send a 13-byte request built from 0x1357ae, 7 bytes of the template at [0x13587c + 32 * code + 1], the pending count and the word at 0x1357ec, then clear both pending values. */
+void flush_pending_a374c(uint32_t code)
+{
+    uint8_t req[0x10];
+    if ((uint32_t)EF_U16(0x001357dau) < 8u)
+        return;
+    {
+        uint32_t src = EF_U32(0x0013587cu + ((code & 0xffu) << 5));
+        uint16_t w1 = EF_U16(src + 1u);
+        uint32_t d3 = EF_U32(src + 3u);
+        uint16_t pend = EF_U16(0x001357dau);
+        uint32_t d9 = EF_U32(0x001357ecu);
+        req[0] = EF_U8(0x001357aeu);
+        req[1] = (uint8_t)w1;
+        req[2] = (uint8_t)(w1 >> 8);
+        req[3] = (uint8_t)d3;
+        req[4] = (uint8_t)(d3 >> 8);
+        req[5] = (uint8_t)(d3 >> 16);
+        req[6] = (uint8_t)(d3 >> 24);
+        req[7] = (uint8_t)pend;
+        req[8] = (uint8_t)(pend >> 8);
+        req[9] = (uint8_t)d9;
+        req[10] = (uint8_t)(d9 >> 8);
+        req[11] = (uint8_t)(d9 >> 16);
+        req[12] = (uint8_t)(d9 >> 24);
+    }
+    issue_request_a3e50((uint32_t)(uintptr_t)req, 0xdu, 7u);
+    EF_U16(0x001357dau) = 0u;
+    EF_U32(0x001357ecu) = 0u;
+}
+
+/* 0xd7764, 118 bytes. (ret 12) Allocate and clear a 0x25-byte entry, copy the name from EAX into it and fill in the bytes/words at +0x0d, +0x0e, +0x0f, +0x11, +0x13 and +0x17 from EDX, EBX, ECX and the three stack arguments. Reports an error through 0x132a74 when allocation fails. */
+uint32_t create_entry_d7764(uint32_t name, uint32_t b13, uint32_t b14, uint32_t w15, uint32_t w17, uint32_t d19, uint32_t b23)
+{
+    uint32_t rec = guest_fn_fc795(0x25u);
+    if (rec == 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018fa70u);
+    fill_bytes_b3fb0(rec, 0u, 0x25u);
+    copy_string_9d749(rec, name);
+    EF_U16(rec + 0xfu) = (uint16_t)w15;
+    EF_U8(rec + 0xdu) = (uint8_t)b13;
+    EF_U8(rec + 0xeu) = (uint8_t)b14;
+    EF_U16(rec + 0x11u) = (uint16_t)w17;
+    EF_U32(rec + 0x13u) = d19;
+    EF_U8(rec + 0x17u) = (uint8_t)b23;
+    return rec;
+}
+
+/* 0xdd2f4, 122 bytes. Measure the pixel width of a zero-terminated string: spaces and tabs count 3, characters above 0x7f use the byte table at 0x15ea20 (+1), others index through 0x15e1bb/0x15e31d (+1). 0xa5 is measured as 'N'. */
+uint32_t text_width_dd2f4(uint32_t str)
+{
+    uint32_t width = 0u;
+    int16_t i = 0;
+    for (;; i++) {
+        uint8_t c = EF_U8(str + (uint32_t)(int32_t)i);
+        if (c == 0u)
+            return width;
+        if (c == 0xa5u)
+            c = 0x4eu;
+        if (c == 0x20u || c == 9u) {
+            width += 3u;
+            continue;
+        }
+        if (c > 0x7fu) {
+            width += EF_U8(0x0015ea20u + (uint32_t)(uint8_t)(c - 0x80u)) + 1u;
+        } else {
+            int32_t k = (int32_t)(int8_t)EF_U8(0x0015e1bbu + (uint32_t)(c & 0x3fu) + 3u);
+            width += EF_U8(0x0015e31du + (uint32_t)k) + 1u;
+        }
+    }
+}

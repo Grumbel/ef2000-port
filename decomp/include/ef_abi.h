@@ -4508,4 +4508,9 @@ void right_align_number_11d385(uint32_t buf, int32_t len, int32_t width);
 void advance_text_cursor_11451c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj, uint32_t out_col, uint32_t out_row);
 void redraw_entries_a6038(void);
 
+void integrate_motion_97950(uint32_t obj);
+void flush_pending_a374c(uint32_t code);
+uint32_t create_entry_d7764(uint32_t name, uint32_t b13, uint32_t b14, uint32_t w15, uint32_t w17, uint32_t d19, uint32_t b23);
+uint32_t text_width_dd2f4(uint32_t str);
+
 #endif
