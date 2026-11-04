@@ -832,8 +832,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00048bb0	131	draw_formatted_text_mode_48bb0	game_helpers131	compiles	game	confirmed	decomp/tests/0x00048bb0.json	docs/compiler-abi.md; Draw a formatted string at (x, y) with the renderer chosen by mode (1: 0x15a14, 2: 0xe5db4, otherwise 0xe605c); the firs; callers 11e7c@1212b,150d4@15175,1e7c0@1eab1; guest pending
 0x00048c34	91	formatted_text_width_48c34	game_helpers131	compiles	game	confirmed	decomp/tests/0x00048c34.json	docs/compiler-abi.md; Width of a formatted string: mode 1 uses the proportional font width, mode 2 six pixels per character, anything else eig; callers 11e7c@11f84,11e7c@12067,150d4@1513c; guest pending
 0x00048c90	201			unknown	unclassified	unverified		
-0x00048d5c	68			unknown	unclassified	unverified		
-0x00048da0	68			unknown	unclassified	unverified		
+0x00048d5c	68	formatted_width_48d5c	text_metrics1	compiles	game	confirmed	decomp/tests/0x00048d5c.json	docs/compiler-abi.md; printf-format a string and return its width: the text width for zoom 0, else its length times 4. Variadic; all arguments; callers 3b58@3bf1,3b58@3c46,3ea8@3ebd; guest pending
+0x00048da0	68	formatted_width_48da0	text_metrics1	compiles	game	confirmed	decomp/tests/0x00048da0.json	docs/compiler-abi.md; Same with length times 8 for the nonzero zoom.; callers 48e7c@48f35,5c354@5c43d,5c518@5c64d; guest pending
 0x00048df8	132			unknown	unclassified	unverified		
 0x00048e7c	464			unknown	unclassified	unverified		
 0x0004904c	6	get_byte_4904c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0004904c.json	docs/compiler-abi.md; ; callers 1cde8@1ce2f,1cde8@1cef7; guest pending
