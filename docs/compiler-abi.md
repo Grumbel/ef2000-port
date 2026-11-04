@@ -4031,3 +4031,10 @@ in EAX, format string address, one value).
 | `0x88fb4` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:double | none | 29b14@29c90,89060@890cd,899d8@89a44 | Unit direction vector from a heading (a) and pitch (b): (cos a cos b, sin a cos b, -sin b). |
 | `0xb4508` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | e6990@e69ba,e6990@e69ce,11a6e4@11aacb | out = transpose(mat) * vec for a 3x3 double matrix stored by rows. |
 | `0xb4550` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 1098f0@1099cb,11a6e4@11a883,11c584@11c63a | out = mat * vec for a 3x3 double matrix stored by rows. |
+
+## float_helpers11 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xea038` | EAX:ef_addr32,EDX:ef_addr32 | none | 119f88@119ff0,119f88@11a07f,11a5c0@11a5e8 | out = M * vec with the 3x3 double matrix at 0x464480 (rows are 0x18 bytes apart). |
+| `0xe3120` | none | none | 3dd30@3def1 | Sample the tick counter and store the scaled change since the previous sample. |

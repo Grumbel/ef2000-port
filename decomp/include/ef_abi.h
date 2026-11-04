@@ -3615,4 +3615,9 @@ void matrix_transpose_mul_vector_b4508(ef_addr32 out, ef_addr32 vec, ef_addr32 m
 void matrix_mul_vector_b4550(ef_addr32 out, ef_addr32 vec, ef_addr32 mat);
 uint32_t guest_fn_7b16c_x(uint32_t a, uint32_t b, uint32_t c); /* 0x7b16c EAX/EDX/EBX -> EAX */
 
+/* float_helpers11.c */
+void transform_by_global_matrix_ea038(ef_addr32 out, ef_addr32 vec);
+void update_tick_rate_e3120(void);
+uint32_t guest_fn_f8248_x(void); /* 0xf8248 -> EAX */
+
 #endif

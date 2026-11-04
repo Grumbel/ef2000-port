@@ -3351,7 +3351,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e3022	21	format_to_buffer_e3022	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000e3022.json	docs/compiler-abi.md; Format into a buffer through 0xed133 and terminate the result.; callers 3d308@3d330,48bb0@48bd1,48c34@48c50; guest pending
 0x000e3040	160	draw_glyph_e3040	game_helpers25	compiles	game	confirmed	decomp/tests/0x000e3040.json	docs/compiler-abi.md; Draw a 8x6 glyph, each set bit writes the colour byte.; callers e30e0@e3108; guest pending
 0x000e30e0	61	draw_text_e30e0	game_helpers25	compiles	game	confirmed	decomp/tests/0x000e30e0.json	docs/compiler-abi.md; Draw a string with 9-pixel glyph spacing.; callers 3d308@3d34b,3d308@3d35b,3dd30@3e73d; guest pending
-0x000e3120	57			unknown	unclassified	unverified		
+0x000e3120	57	update_tick_rate_e3120	float_helpers11	compiles	game	confirmed	decomp/tests/0x000e3120.json	docs/compiler-abi.md; Sample the tick counter and store the scaled change since the previous sample.; callers 3dd30@3def1; guest pending
 0x000e3170	45	read_resource_e3170	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e3170.json	docs/compiler-abi.md; Read from the resource handle and abort when the count is short.; callers e330c@e332a,e330c@e333b,e378c@e37b5; guest pending
 0x000e330c	183			unknown	unclassified	unverified		
 0x000e3444	163			unknown	unclassified	unverified		
@@ -3461,7 +3461,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e9dcc	175			unknown	unclassified	unverified		
 0x000e9e7c	264			unknown	unclassified	unverified		
 0x000e9f84	177			unknown	unclassified	unverified		
-0x000ea038	99			unknown	unclassified	unverified		
+0x000ea038	99	transform_by_global_matrix_ea038	float_helpers11	compiles	game	confirmed	decomp/tests/0x000ea038.json	docs/compiler-abi.md; out = M * vec with the 3x3 double matrix at 0x464480 (rows are 0x18 bytes apart).; callers 119f88@119ff0,119f88@11a07f,11a5c0@11a5e8; guest pending
 0x000ea100	46	alloc_zeroed_checked_ea100	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000ea100.json	docs/compiler-abi.md; Allocate and zero a block, aborting on failure.; callers ea270@ea2b9,ea270@ea2e2,ea270@ea34d; guest pending
 0x000ea130	35	strip_carriage_returns	math_string	compiles	game	confirmed	decomp/tests/0x000ea130.json	docs/compiler-abi.md; Remove carriage returns in place; returns the number removed.; callers ea270@ea2d5; guest pending
 0x000ea154	38	split_line	math_string	compiles	game	confirmed	decomp/tests/0x000ea154.json	docs/compiler-abi.md; Advance to the next newline, replace it with NUL and * return the pointer after it (or the end of string).; callers ea270@ea2fb; guest pending
