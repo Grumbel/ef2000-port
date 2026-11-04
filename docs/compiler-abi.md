@@ -3398,3 +3398,11 @@ in EAX, format string address, one value).
 | `0x36054` | EAX:ef_addr32,DL:uint8_t | none | 36f84@37066,36f84@37077 | Open the named stream for playback and arm the stream state. |
 | `0x3730c` | none | EAX:uint32_t | 37498@374b6 | Take the next 69-byte record of the table, linking it to the previous one. |
 | `0x39e0c` | AX:int16_t | none | 8c49c@8c85f | Claim a free slot in the 4-byte slot table for a unit and mark its owner. |
+
+## runtime_helpers29 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3ce70` | none | none | 3cfc0@3d2e1 | Resolve the terrain cell of every 11-byte entry that has none yet. |
+| `0xf478c` | none | none | f4a88@f4b2a,f4bdc@f4c06,f4c60@f4c91 | Run the handler of the table entry whose name matches the current one. |
+| `0xfddf0` | EAX:ef_addr32,EDX:uint32_t | none | none direct | Store the lower and upper bound of a range as 16.16 values and notify. |

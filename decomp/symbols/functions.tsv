@@ -708,7 +708,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003ce04	37	fill_random_offsets	low_helpers	compiles	game	confirmed	decomp/tests/0x0003ce04.json	docs/compiler-abi.md; 258 dwords at 0x1a3150.. random(0x1ff)-0x100; callers 3cfc0@3d2f0; guest pending
 0x0003ce2c	3	return_true_3ce2c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0003ce2c.json	docs/compiler-abi.md; ; callers a9bfc@a9ca2; guest pending
 0x0003ce30	61	tick_timer_3ce30	game_helpers5	compiles	game	confirmed	decomp/tests/0x0003ce30.json	docs/compiler-abi.md; Count down the timer at 0x1a35ac, firing 151c4 when it runs out.; callers 3dd30@3e37a; guest pending
-0x0003ce70	149			unknown	unclassified	unverified		
+0x0003ce70	149	resolve_entry_cells_3ce70	runtime_helpers29	compiles	game	confirmed	decomp/tests/0x0003ce70.json	docs/compiler-abi.md; Resolve the terrain cell of every 11-byte entry that has none yet.; callers 3cfc0@3d2e1; guest pending
 0x0003cf08	137	run_timed_events_3cf08	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0003cf08.json	docs/compiler-abi.md; Fire due timed events from the 11-byte table at 0x1a57d0.; callers 3dd30@3e36c; guest pending
 0x0003cfc0	840			unknown	unclassified	unverified		
 0x0003d308	97			unknown	unclassified	unverified		
@@ -3654,7 +3654,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f45d8	104	read_buffered_char_f45d8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f45d8.json	docs/compiler-abi.md; Read one character from the buffer at 0x485e59 (see 0xe774).; callers f4640@f464e,f4640@f4665,f4640@f4696; guest pending
 0x000f4640	138			unknown	unclassified	unverified		
 0x000f46cc	190	read_next_command_token	unk_cli	typed	game	confirmed		docs/compiler-abi.md; token into 0x485e08; 16-bit cursor at 0x161eac
-0x000f478c	100			unknown	unclassified	unverified		
+0x000f478c	100	run_matching_handler_f478c	runtime_helpers29	compiles	game	confirmed	decomp/tests/0x000f478c.json	docs/compiler-abi.md; Run the handler of the table entry whose name matches the current one.; callers f4a88@f4b2a,f4bdc@f4c06,f4c60@f4c91; guest pending
 0x000f4a88	337			unknown	unclassified	unverified		
 0x000f4bdc	131			unknown	unclassified	unverified		
 0x000f4c60	169			unknown	unclassified	unverified		
@@ -3769,7 +3769,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fd518	2197			unknown	unclassified	unverified		
 0x000fddb0	7	muldiv_fddb0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fddb0.json	docs/compiler-abi.md; (a * b) / c with a 64-bit intermediate; EDX is preserved.; callers ce5f8@ce74e,ce5f8@ce766,ce5f8@ce77e; guest pending
 0x000fddd2	27	map_address_fddd2	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fddd2.json	docs/compiler-abi.md; Map 0xfddb3 to 0xfddb7 and 0xfddc5 to 0xfddcc, else keep.; callers c4310@c433a; guest pending
-0x000fddf0	46			unknown	unclassified	unverified		
+0x000fddf0	46	store_range_fddf0	runtime_helpers29	compiles	game	confirmed	decomp/tests/0x000fddf0.json	docs/compiler-abi.md; Store the lower and upper bound of a range as 16.16 values and notify.; callers none direct; guest pending
 0x000fde20	160			unknown	unclassified	unverified		
 0x000fdec0	160			unknown	unclassified	unverified		
 0x000fdf60	349			unknown	unclassified	unverified		

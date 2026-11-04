@@ -2733,4 +2733,10 @@ void guest_fn_a3e04(void); /* 0xa3e04 */
 void guest_fn_35fbc(void); /* 0x35fbc */
 void guest_fn_9ce84(uint32_t handle); /* 0x9ce84 EAX */
 
+/* runtime_helpers29.c */
+void resolve_entry_cells_3ce70(void);
+void run_matching_handler_f478c(void);
+void store_range_fddf0(ef_addr32 center, uint32_t radius);
+uint32_t guest_fn_8b9e8(uint32_t a, uint32_t b); /* 0x8b9e8 EAX/EDX -> AX */
+
 #endif
