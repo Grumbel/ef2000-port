@@ -5057,3 +5057,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5c8e0` | EAX:ef_addr32 | EAX:uint32_t | 5c518@5c5d3 | Walk the 12-byte point table at 0x1fd098 from the current index (0x20f19a) backwards in steps of n = remaining/50 + 1, p |
+
+## small_wrappers6 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdd8c0` | none | none | dd9e4@dda4a,f34cc@f352e | Run 0xdd8dc when the saved width at 0x15ee94 is -1 (nothing saved yet); otherwise do nothing. |
+| `0x101f78` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 103e0c@103e4a,105648@1056a8,105648@1056f0 | Forward a stack argument to 0x1111e5. |

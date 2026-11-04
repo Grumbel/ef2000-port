@@ -4316,4 +4316,9 @@ void guest_fn_38be8_x(uint32_t a, int32_t b, int32_t c); /* 0x38be8 EAX/EDX/EBX 
 uint32_t draw_trail_5c8e0(ef_addr32 out);
 uint32_t guest_fn_15c0ea_x(uint32_t a0, uint32_t a1, uint32_t a2, ef_addr32 out); /* 0x15c0ea four stack arguments, callee cleanup, result in AL */
 
+/* small_wrappers6.c */
+void redraw_if_unsaved_dd8c0(void);
+void forward_to_1111e5_101f78(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
+void guest_fn_1111e5_x(uint32_t a); /* 0x1111e5 cdecl, one stack argument, caller cleanup */
+
 #endif

@@ -3251,7 +3251,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd728	94	text_width_6_dd728	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd728.json	docs/compiler-abi.md; Width of a string in the 6-pixel-blank font minus the trailing gap.; callers a82f0@a8458; guest pending
 0x000dd788	218			unknown	unclassified	unverified		
 0x000dd870	80			unknown	unclassified	unverified		
-0x000dd8c0	14			unknown	unclassified	unverified		
+0x000dd8c0	14	redraw_if_unsaved_dd8c0	small_wrappers6	compiles	game	confirmed	decomp/tests/0x000dd8c0.json	docs/compiler-abi.md; Run 0xdd8dc when the saved width at 0x15ee94 is -1 (nothing saved yet); otherwise do nothing.; callers dd9e4@dda4a,f34cc@f352e; guest pending
 0x000dd8d0	12	run_shutdown_pair_dd8d0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000dd8d0.json	docs/compiler-abi.md; Run the two shutdown helpers in order.; callers 278c0@27b2d,27d18@27eb1,f3f84@f40f8; guest pending
 0x000dd8dc	170	save_and_draw_block_dd8dc	screen_clip1	compiles	game	confirmed	decomp/tests/0x000dd8dc.json	docs/compiler-abi.md; Save the screen area under the parameter block at 0x15ee80 (size clamped against 0x425fc6/0x425fc8) into its buffer and ; callers 278c0@27b26,27d18@27eaa,f3480@f3492; guest pending
 0x000dd988	90	get_view_state_dd988	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd988.json	docs/compiler-abi.md; Copy the saved view state at 0x15ee80..0x15ee90 to eight output pointers.; callers f2ac0@f2b0e; guest pending
@@ -3805,7 +3805,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00101f08	58	trace_call_101f08	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101f08.json	docs/compiler-abi.md; AIL trace wrapper for 0x1111b1 (cdecl, all arguments on the stack).; callers none direct; guest pending
 0x00101f44	44	trace_call_101f44	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00101f44.json	docs/compiler-abi.md; Trace wrapper for 0x1111ca.; callers 104464@10449b,105e38@106237,105e38@1062cb; guest pending
 0x00101f70	5	tail_jump_101f70	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00101f70.json	docs/compiler-abi.md; tail jump. Forward to 0x1111e1.; callers 103e0c@103e21,105648@10567c; guest pending
-0x00101f78	14			unknown	unclassified	unverified		
+0x00101f78	14	forward_to_1111e5_101f78	small_wrappers6	compiles	game	confirmed	decomp/tests/0x00101f78.json	docs/compiler-abi.md; Forward a stack argument to 0x1111e5.; callers 103e0c@103e4a,105648@1056a8,105648@1056f0; guest pending
 0x00101f88	106	trace_call_101f88	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101f88.json	docs/compiler-abi.md; AIL trace wrapper for 0x11124c with result trace (cdecl, all arguments on the stack).; callers 103e0c@103e39,104200@1043b3,104464@1044ad; guest pending
 0x00101ff4	44	trace_call_101ff4	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00101ff4.json	docs/compiler-abi.md; Trace wrapper for 0x1112ed.; callers 105da0@105dd7,112808@11287d,1133f8@113a06; guest pending
 0x00102020	5	tail_jump_102020	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00102020.json	docs/compiler-abi.md; tail jump. Forward to 0x111359.; callers 112808@112872,113d10@113f6d; guest pending
