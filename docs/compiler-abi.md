@@ -3567,3 +3567,17 @@ in EAX, format string address, one value).
 | `0xbc1d3` | EAX:ef_addr32 | EAX:uint32_t | bc287@bc291 | Convert an fopen mode string to open flags. |
 | `0xbd5f8` | EAX:ef_addr32 | AL:uint8_t | bdbf8@bdc8d,bdbf8@bdcd7,bdbf8@bdd26 | Clear the unusable entries of a record's slot table. |
 | `0xbe320` | EAX:ef_addr32,EDX:ef_addr32 | none | b0f5c@b15e4 | Link matching shape entries of two lists to their lookup value. |
+
+## runtime_helpers35 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd1d40` | EAX:uint32_t,EDX:uint32_t | none | d1da8@d1dde,d1de8@d1e31 | Set the screen size and run the video start-up sequence. |
+| `0xdeb87` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | a3b48@a3b59,deb50@deb67 | Fill count dwords at dst with value. |
+| `0xe284c` | EAX:ef_addr32,DX:uint16_t | EAX:uint32_t | a63c0@a63d4 | Width in pixels of a string in the given font. |
+| `0xe994c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 80b14@80b95,83a40@83a66,a04b4@a0511 | Build a rotation matrix and optionally mirror it. |
+| `0xe99b8` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | 80b14@80ba5,83734@83737,a04b4@a0526 | Transform a vector by the current matrix (result doubled). |
+| `0xf22af` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:uint32_t | EAX:int32_t | 11159a@1115af | Set a file's buffer (setvbuf). |
+| `0xf25b0` | AL:uint8_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | f261c@f2644 | Draw a 3-column by 6-row glyph into the frame buffer. |
+| `0xf36a4` | none | none | f3f84@f4079 | Advance the animation counter and wrap it. |
+| `0xfba6c` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | bfb88@bfcb6,fba54@fba63 | Count matching type-2 entries across a shape list. |

@@ -2942,4 +2942,29 @@ uint32_t guest_fn_bdbc8(ef_addr32 record); /* 0xbdbc8 -> AX */
 uint32_t guest_fn_bd5a8(ef_addr32 record); /* 0xbd5a8 -> AX */
 uint32_t guest_fn_bb7c0(ef_addr32 entry); /* 0xbb7c0 -> AX */
 
+/* runtime_helpers35.c */
+void init_video_d1d40(uint32_t width, uint32_t height);
+void fill_dwords_deb87(ef_addr32 dst, uint32_t value, uint32_t count);
+uint32_t text_width_e284c(ef_addr32 text, uint16_t font);
+void build_rotation_e994c(uint32_t flags, uint32_t a, uint32_t b, uint32_t c);
+void transform_vector_e99b8(ef_addr32 out, int32_t x, int32_t y, int32_t z);
+int32_t set_file_buffer_f22af(ef_addr32 file, ef_addr32 buffer, uint32_t mode, uint32_t size);
+void draw_glyph_f25b0(uint8_t value, uint32_t x, uint32_t row, uint32_t glyph);
+void step_animation_f36a4(void);
+uint32_t count_matching_entries_fba6c(uint32_t a, uint32_t b, ef_addr32 listp);
+uint32_t guest_fn_fc6c8(void); /* 0xfc6c8 -> EAX */
+void guest_fn_fc39c(uint32_t a, uint32_t b, uint32_t width, uint32_t height); /* 0xfc39c EAX/EDX/EBX/ECX */
+void guest_fn_c3ae8(void); /* 0xc3ae8 */
+void guest_fn_fef26(void); /* 0xfef26 */
+void guest_fn_d663c(ef_addr32 table); /* 0xd663c EAX */
+void guest_fn_c37ec(void); /* 0xc37ec */
+void guest_fn_c3770(void); /* 0xc3770 */
+void guest_fn_dc2c0(void); /* 0xdc2c0 */
+void guest_fn_e95c0(uint32_t a, uint32_t b, uint32_t c); /* 0xe95c0 EAX/EDX/EBX */
+void guest_fn_e977c(uint32_t a, uint32_t b, uint32_t c); /* 0xe977c EAX/EDX/EBX */
+void guest_fn_10f071(ef_addr32 file); /* 0x10f071 EAX */
+void guest_fn_f3610(int32_t value); /* 0xf3610 EAX */
+void guest_fn_f35f0(void); /* 0xf35f0 */
+uint32_t guest_fn_bcbc0(uint32_t value); /* 0xbcbc0 EAX -> AX */
+
 #endif

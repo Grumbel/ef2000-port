@@ -3020,7 +3020,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d1afc	237			unknown	unclassified	unverified		
 0x000d1bec	104			unknown	unclassified	unverified		
 0x000d1c54	70			unknown	unclassified	unverified		
-0x000d1d40	102			unknown	unclassified	unverified		
+0x000d1d40	102	init_video_d1d40	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000d1d40.json	docs/compiler-abi.md; Set the screen size and run the video start-up sequence.; callers d1da8@d1dde,d1de8@d1e31; guest pending
 0x000d1da8	61	set_mode_640x400_d1da8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d1da8.json	docs/compiler-abi.md; Pick the 640x400 video mode if either mode is available.; callers d1e50@d1ecd,d1e50@d1ede; guest pending
 0x000d1de8	82	set_video_mode_d1de8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d1de8.json	docs/compiler-abi.md; Set up the 640x480 video mode; other modes abort but continue.; callers d1e50@d1ee7; guest pending
 0x000d1e50	187			unknown	unclassified	unverified		
@@ -3276,7 +3276,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dead0	74	find_table_entry_dead0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000dead0.json	docs/compiler-abi.md; Find a key in the 1-based id table (stack argument) or abort.; callers a1d50@a1e67,c5d8f@c5df0,c74bc@c7509; guest pending
 0x000deb1a	27			unknown	unclassified	unverified		
 0x000deb50	49			unknown	unclassified	unverified		
-0x000deb87	108			unknown	unclassified	unverified		
+0x000deb87	108	fill_dwords_deb87	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000deb87.json	docs/compiler-abi.md; Fill count dwords at dst with value.; callers a3b48@a3b59,deb50@deb67; guest pending
 0x000dec00	21	plot_byte	math_string	compiles	game	confirmed	decomp/tests/0x000dec00.json	docs/compiler-abi.md; Byte at dword 0x15b754 + EDX + dword 0x163200[EBX] = AL.; callers none direct; guest pending
 0x000dec18	51	plot_byte_clipped	math_string	compiles	game	confirmed	decomp/tests/0x000dec18.json	docs/compiler-abi.md; As 0xdec00 but only inside the signed clip rectangle * 0x15bdc0..c4 (x) and 0x15bdc8..cc (y).; callers 39a0c@39a69,39a0c@39b47,3a3a8@3b84b; guest pending
 0x000dec4c	65	read_plane_pixel_dec4c	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dec4c.json	docs/compiler-abi.md; Read a byte from the clipped 8-bit plane, or -1 outside the window.; callers 75f00@75fbf,75f00@75fe3,75f00@76005; guest pending
@@ -3334,7 +3334,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e2374	493			unknown	unclassified	unverified		
 0x000e2564	186			unknown	unclassified	unverified		
 0x000e26bc	400			unknown	unclassified	unverified		
-0x000e284c	106			unknown	unclassified	unverified		
+0x000e284c	106	text_width_e284c	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000e284c.json	docs/compiler-abi.md; Width in pixels of a string in the given font.; callers a63c0@a63d4; guest pending
 0x000e28e8	160			unknown	unclassified	unverified		
 0x000e2988	24	wait_for_counter_15f748	math_string	compiles	game	confirmed	decomp/tests/0x000e2988.json	docs/compiler-abi.md; Store EAX in dword 0x15f748 and, if positive, wait for * an interrupt handler to bring it to zero or below.; callers 357ec@35aa8,56bdc@56c5f,57030@570bc; guest pending
 0x000e29a0	72	init_arena_e29a0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e29a0.json	docs/compiler-abi.md; Allocate the arena on first use, register its release hook, then reset it.; callers 80058@8006d,81230@81246,8b274@8b29a; guest pending
@@ -3451,8 +3451,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e9574	70	release_buffer_e9574	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e9574.json	docs/compiler-abi.md; Release the buffer at 0x1600a0 once and mark it released.; callers 80058@800d0,81230@812a9,82cec@82d3e; guest pending
 0x000e95c0	444			unknown	unclassified	unverified		
 0x000e977c	463			unknown	unclassified	unverified		
-0x000e994c	106			unknown	unclassified	unverified		
-0x000e99b8	106			unknown	unclassified	unverified		
+0x000e994c	106	build_rotation_e994c	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000e994c.json	docs/compiler-abi.md; Build a rotation matrix and optionally mirror it.; callers 80b14@80b95,83a40@83a66,a04b4@a0511; guest pending
+0x000e99b8	106	transform_vector_e99b8	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000e99b8.json	docs/compiler-abi.md; Transform a vector by the current matrix (result doubled).; callers 80b14@80ba5,83734@83737,a04b4@a0526; guest pending
 0x000e9a24	132	original_memcpy		named	unclassified	unverified		RET 0Ch, EAX/EDX advance; docs/ghidra-findings.md
 0x000e9ac0	117			unknown	unclassified	unverified		
 0x000e9b38	188			unknown	unclassified	unverified		
@@ -3603,10 +3603,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2141	66	advance_window_f2141	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f2141.json	docs/compiler-abi.md; Advance a window cursor by count; wrap and report 1 when out of range.; callers f2183@f2206,f2183@f2239; guest pending
 0x000f2183	252			unknown	unclassified	unverified		
 0x000f227f	48	file_position_f227f	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f227f.json	docs/compiler-abi.md; Position from 0x10f4df(dword +0x10) combined with dword +4.; callers a7a64@a7aa9,bc4da@bc507; guest pending
-0x000f22af	103			unknown	unclassified	unverified		
+0x000f22af	103	set_file_buffer_f22af	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000f22af.json	docs/compiler-abi.md; Set a file's buffer (setvbuf).; callers 11159a@1115af; guest pending
 0x000f2320	138			unknown	unclassified	unverified		
 0x000f23ac	49	draw_text_f23ac	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f23ac.json	docs/compiler-abi.md; For each byte of the string at ECX call 0xf2320(x, y, byte & 0x3f), x += 8.; callers a8578@a85b5,a9130@a938a,a9130@a93bd; guest pending
-0x000f25b0	107			unknown	unclassified	unverified		
+0x000f25b0	107	draw_glyph_f25b0	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000f25b0.json	docs/compiler-abi.md; Draw a 3-column by 6-row glyph into the frame buffer.; callers f261c@f2644; guest pending
 0x000f261c	61	draw_text_f261c	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f261c.json	docs/compiler-abi.md; Draw a string with 4-pixel glyph spacing.; callers a8578@a85c9; guest pending
 0x000f2660	264			unknown	unclassified	unverified		
 0x000f2800	25	result_f2800	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2800.json	docs/compiler-abi.md; 0xf2819(), then return byte 0x161156.; callers a8bd4@a8bf5; guest pending
@@ -3634,7 +3634,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f35d8	22	load_path_value_f35d8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f35d8.json	docs/compiler-abi.md; Word 0x161e1c = 0x9d4cd(0x48592c) after 0xf2cd0().; callers f3b78@f3c2b; guest pending
 0x000f35f0	32	refresh_f35f0	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f35f0.json	docs/compiler-abi.md; ; callers f36a4@f36f2; guest pending
 0x000f3610	148			unknown	unclassified	unverified		
-0x000f36a4	109			unknown	unclassified	unverified		
+0x000f36a4	109	step_animation_f36a4	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000f36a4.json	docs/compiler-abi.md; Advance the animation counter and wrap it.; callers f3f84@f4079; guest pending
 0x000f3714	495			unknown	unclassified	unverified		
 0x000f3904	277			unknown	unclassified	unverified		
 0x000f3a1c	139			unknown	unclassified	unverified		
@@ -3739,7 +3739,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fb87c	1649			unknown	unclassified	unverified		
 0x000fb954	254			unknown	unclassified	unverified		
 0x000fba54	24	call_fba6c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fba54.json	docs/compiler-abi.md; 0xfba6c(dword +0x16, dword +0x1a) with EBX = EAX.; callers fbad8@fbb2b,fbad8@fbc83; guest pending
-0x000fba6c	105			unknown	unclassified	unverified		
+0x000fba6c	105	count_matching_entries_fba6c	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000fba6c.json	docs/compiler-abi.md; Count matching type-2 entries across a shape list.; callers bfb88@bfcb6,fba54@fba63; guest pending
 0x000fbad8	1392			unknown	unclassified	unverified		
 0x000fc050	57	classify_kind_fc050	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000fc050.json	docs/compiler-abi.md; Classify a kind into 1, 2 or 3.; callers fc0ec@fc119,fc1e8@fc21a; guest pending
 0x000fc08c	93	map_mode_fc08c	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc08c.json	docs/compiler-abi.md; Map a mode code (and a flag word) to a table index.; callers fc0ec@fc167; guest pending
