@@ -3765,4 +3765,9 @@ void quicksort_range_e67a0(ef_addr32 object, int16_t lo, int16_t hi, int16_t ext
 uint8_t vertex_depth_range_flat_10162c(ef_addr32 object);
 uint32_t guest_fn_e6684_x(ef_addr32 obj, int32_t lo, int32_t hi, int32_t extra); /* 0xe6684 EAX EDX EBX ECX -> EAX */
 
+/* game_helpers93.c */
+void update_scene_angle_first(ef_addr32 record, uint16_t value);
+void update_scene_angle_second(ef_addr32 record, uint16_t value);
+void update_scene_angle_third(ef_addr32 record, uint16_t value);
+
 #endif

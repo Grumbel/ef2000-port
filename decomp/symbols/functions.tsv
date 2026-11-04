@@ -3000,9 +3000,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d08fc	160			unknown	unclassified	unverified		
 0x000d099c	66			unknown	unclassified	unverified		
 0x000d0b68	63	init_bounds_d0b68	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d0b68.json	docs/compiler-abi.md; Reset a 9-dword bounds record (0x7fff limits).; callers 1b4a4@1b5e3,26b60@26f51,27348@27355; guest pending
-0x000d0dbc	254			unknown	unclassified	unverified		
-0x000d0ebc	251			unknown	unclassified	unverified		
-0x000d0fb8	251			unknown	unclassified	unverified		
+0x000d0dbc	254	update_scene_angle_second	game_helpers93	compiles	game	confirmed	decomp/tests/0x000d0dbc.json	docs/compiler-abi.md; Rotate the matrix's second and third columns by an angle.; callers 1b4a4@1b5fc,26b60@26f6b,27348@2736f; guest pending
+0x000d0ebc	251	update_scene_angle_first	game_helpers93	compiles	game	confirmed	decomp/tests/0x000d0ebc.json	docs/compiler-abi.md; Rotate the matrix's first and third columns by an angle.; callers 1b4a4@1b5ed,26b60@26f5e,27348@27362; guest pending
+0x000d0fb8	251	update_scene_angle_third	game_helpers93	compiles	game	confirmed	decomp/tests/0x000d0fb8.json	docs/compiler-abi.md; Rotate the matrix's first and second columns by an angle.; callers 26b60@26f78,27348@2737c,2a1fc@2a2b9; guest pending
 0x000d13ac	46	angle_d13ac	code_predicates	compiles	game	confirmed	decomp/tests/0x000d13ac.json	docs/compiler-abi.md; -0xb3b1c(-dword +0x14, low word of 0xe2b60(dword+8 squared + dword+0x20 squared)).; callers 31b40@31cbe,31d7c@31e0a,53c80@53e0f; guest pending
 0x000d13dc	14	forward_pair_d13dc	code_predicates	compiles	game	confirmed	decomp/tests/0x000d13dc.json	docs/compiler-abi.md; 0xb3b1c(dword +8, dword +0x20).; callers 31b40@31ccb,31d7c@31e17,53c80@53e1f; guest pending
 0x000d13ec	39	angle_d13ec	code_predicates	compiles	game	confirmed	decomp/tests/0x000d13ec.json	docs/compiler-abi.md; -0xb3b1c(dword +0xc, (dword+0 * dword+0x20 - dword+8 * dword+0x18) >> 15).; callers 31b40@31c78,31b40@31cfc,53c80@53e2f; guest pending

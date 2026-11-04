@@ -4228,3 +4228,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xe67a0` | EAX:ef_addr32,DX:int16_t,BX:int16_t,CX:int16_t | none | e67a0@e67e2,e6800@e680e | Quicksort driver: partition [lo,hi] with e6684, recurse on the left part and loop on the right. |
 | `0x10162c` | EAX:ef_addr32 | AL:uint8_t | 1016e0@101757 | Return 1 when the minimum and maximum of the vertices' z field have the same integer part (high 16 bits). |
+
+## game_helpers93 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd0ebc` | EAX:ef_addr32,DX:uint16_t | none | 1b4a4@1b5ed,26b60@26f5e,27348@27362 | Rotate the matrix's first and third columns by an angle. |
+| `0xd0dbc` | EAX:ef_addr32,DX:uint16_t | none | 1b4a4@1b5fc,26b60@26f6b,27348@2736f | Rotate the matrix's second and third columns by an angle. |
+| `0xd0fb8` | EAX:ef_addr32,DX:uint16_t | none | 26b60@26f78,27348@2737c,2a1fc@2a2b9 | Rotate the matrix's first and second columns by an angle. |
