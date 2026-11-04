@@ -15364,3 +15364,73 @@ uint32_t parse_component_record_f314(ef_addr32 rec, uint32_t parent)
 	EF_U32(rec + 0x78u) = 0u;
 	return 1u;
 }
+
+/* 0xf6a8, 591 bytes. Load a text data file into the scene: EAX and EBX are guest pointers to words that receive the header and record counts, EDX and ECX are the owner arguments for the header and 0x53-byte records, the four stack words (s0..s3) are guest pointers receiving four integers and the last stack argument (ret 0x14) is the file name. Sets the allocation hook 0x121ebc to 0xe744, clears 0x121eac and the running totals 0x197ab4/0x197ab8/0x197ab6, checks the name through the size hook at 0x132ab4 (error format 0x180ffc) and opens it (0x9ccb8, error format 0x181028; handle in 0x197ab0). Then reads the header count into word EAX, flag 0x121eb8 (first keyword equals 0x181054), four integers into the stack-word destinations, optionally (second keyword equals 0x181064) the header list through 0xf198 with hook 0xe764, otherwise clears 0x1379c4. Each header record (0x1b bytes, 0xf604) is attached with 0xbc570; the second count (word EBX) 0x53-byte records parsed with 0xf260 and attached the same way (error formats 0x181078 and 0x18109c for failed allocations); a final count (word 0x1a5a8e) allocates sixteen-byte entries at 0x1a5904 filled by 0xef5c. The file is closed (0x9ce84). Returns 1. */
+uint32_t load_data_file_f6a8(ef_addr32 count_a, ef_addr32 owner_a, ef_addr32 count_b, ef_addr32 owner_b,
+	ef_addr32 dst0, ef_addr32 dst1, ef_addr32 dst2, ef_addr32 dst3, ef_addr32 name)
+{
+	uint32_t state_a[2] = { 0u, 0u };
+	uint32_t i, p;
+
+	EF_U32(0x00121ebcu) = 0x0000e744u;
+	EF_U32(0x00121eacu) = 0u;
+	EF_U16(0x00197ab4u) = 0u;
+	EF_U16(0x00197ab8u) = 0u;
+	EF_U16(0x00197ab6u) = 0u;
+	if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), name) == 0u)
+		guest_callptr2_x(EF_U32(0x00132a74u), 0x00180ffcu, name);
+	EF_U32(0x00197ab0u) = open_resource_9ccb8(name);
+	if (EF_U32(0x00197ab0u) == 0xffffffffu)
+		guest_callptr2_x(EF_U32(0x00132a74u), 0x00181028u, name);
+	initialize_parser_records();
+	read_parser_line();
+	read_parser_token();
+	EF_U16(count_a) = (uint16_t)read_parser_integer();
+	read_parser_token();
+	EF_U8(0x00121eb8u) = guest_fn_a4380(0x00197abeu, 0x00181054u) == 0u ? 1u : 0u;
+	read_parser_line();
+	read_parser_token();
+	EF_U16(dst0) = (uint16_t)read_parser_integer();
+	EF_U16(dst1) = (uint16_t)read_parser_integer();
+	EF_U16(dst2) = (uint16_t)read_parser_integer();
+	EF_U16(dst3) = (uint16_t)read_parser_integer();
+	read_parser_token();
+	release_parser_buffers();
+	if (guest_fn_a4380(0x00197abeu, 0x00181064u) == 0u) {
+		EF_U32(0x00121ebcu) = 0x0000e764u;
+		read_header_list_f198();
+		EF_U32(0x00121ebcu) = 0x0000e744u;
+	} else {
+		EF_U32(0x001379c4u) = 0u;
+	}
+	for (i = 0; (int32_t)i < (int16_t)EF_U16(count_a); i++) {
+		p = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), 0x1bu);
+		read_record_header_f604(p);
+		if (p != 0u)
+			guest_fn_bc570_x(p, owner_a, (uint32_t)(uintptr_t)&state_a[1]);
+		else
+			guest_callptr1_x(EF_U32(0x00132a74u), 0x00181078u);
+	}
+	read_parser_line();
+	read_parser_token();
+	EF_U16(count_b) = (uint16_t)read_parser_integer();
+	for (i = 0; (int32_t)i < (int16_t)EF_U16(count_b); i++) {
+		p = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), 0x53u);
+		parse_record_f260(p);
+		if (p != 0u)
+			guest_fn_bc570_x(p, owner_b, (uint32_t)(uintptr_t)&state_a[0]);
+		else
+			guest_callptr1_x(EF_U32(0x00132a74u), 0x0018109cu);
+	}
+	read_parser_line();
+	EF_U32(0x001a5904u) = 0u;
+	read_parser_token();
+	EF_U16(0x001a5a8eu) = (uint16_t)read_parser_integer();
+	if ((int16_t)EF_U16(0x001a5a8eu) > 0) {
+		EF_U32(0x001a5904u) = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), (uint32_t)(int32_t)(int16_t)EF_U16(0x001a5a8eu) << 4);
+		for (i = 0; (int32_t)i < (int16_t)EF_U16(0x001a5a8eu); i++)
+			fill_random_ef5c(EF_U32(0x001a5904u) + i * 16u);
+	}
+	guest_fn_9ce84(EF_U32(0x00197ab0u));
+	return 1u;
+}

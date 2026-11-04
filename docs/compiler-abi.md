@@ -8173,3 +8173,14 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf6a8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32,[ESP+12]:ef_addr32,[ESP+16]:ef_addr32,[ESP+20]:ef_addr32 | EAX:uint32_t | 357ec@3583f,49228@49453,69094@69167 | Load a text data file into the scene: EAX, EBX and the four leading stack words are guest pointers to words that receive |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

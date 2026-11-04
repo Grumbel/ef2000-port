@@ -215,7 +215,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000f260	180	parse_record_f260	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000f260.json	docs/compiler-abi.md; Parse one record from the text parser into the record EAX: skip the line and token, byte +0xb from the enum reader (0xe9; callers f6a8@f85a; guest pending
 0x0000f314	749	parse_component_record_f314	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000f314.json	docs/compiler-abi.md; Parse one component record from the text parser into the record EAX (DL = parent kind byte). Byte +1 is the count; byte ; callers f604@f68c; guest pending
 0x0000f604	163	read_record_header_f604	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000f604.json	docs/compiler-abi.md; Read a record header and its list of 124-byte sub-records.; callers f6a8@f7ff; guest pending
-0x0000f6a8	591			unknown	unclassified	unverified		
+0x0000f6a8	591	load_data_file_f6a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000f6a8.json	docs/compiler-abi.md; Load a text data file into the scene: EAX, EBX and the four leading stack words are guest pointers to words that receive; callers 357ec@3583f,49228@49453,69094@69167; guest pending
 0x0000f8f8	30	release_secondary_parser_text	parser_line_records	compiles	game	confirmed	decomp/tests/0x000f8f8.json	Release optional text buffer and null it; callers b1b10@b1b7f/ca7e0@ca7e3; guest pending
 0x0000f918	504			unknown	unclassified	unverified		
 0x0000fb10	187	read_point_list_fb10	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000fb10.json	docs/compiler-abi.md; Read a list of 25-byte points and clamp the inner ones into 12..387.; callers fbcc@fc39; guest pending

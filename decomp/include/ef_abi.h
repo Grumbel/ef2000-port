@@ -5797,4 +5797,9 @@ uint32_t parse_component_record_f314(ef_addr32 rec, uint32_t parent);
 
 
 
+uint32_t load_data_file_f6a8(ef_addr32 count_a, ef_addr32 owner_a, ef_addr32 count_b, ef_addr32 owner_b,
+	ef_addr32 dst0, ef_addr32 dst1, ef_addr32 dst2, ef_addr32 dst3, ef_addr32 name);
+
+
+
 #endif
