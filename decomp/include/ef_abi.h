@@ -5198,4 +5198,8 @@ void swap_buffers_ded60(uint32_t a, uint32_t b, uint32_t count);
 void build_row_table_fc39c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t count, uint32_t step);
 uint32_t handler_address_117dd8(uint32_t index);
 
+uint32_t project_relative_point_c89cc(uint32_t src, uint32_t out, uint32_t dst);
+uint32_t project_offset_point_c89f4(uint32_t src, uint32_t out, uint32_t dst);
+uint32_t checksum_bytes_fa2e4(uint32_t p, uint32_t count);
+
 #endif

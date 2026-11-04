@@ -8370,3 +8370,33 @@ uint32_t handler_address_117dd8(uint32_t index)
     static const uint32_t tbl[4] = { 0x00117d38u, 0x00117d5cu, 0x00117d80u, 0x00117da4u };
     return index > 3u ? 0u : tbl[index];
 }
+
+/* 0xc89cc, 40 bytes. Implicit-register fragment (params EBX = source point, ESI = output vector, EDI = screen destination): ESI = EBX - camera position (dwords 0x15b590, 0x15b594, 0x15b598), then project the pair (0xc737c, ESI/EBX/EDI). Returns the advanced destination. */
+uint32_t project_relative_point_c89cc(uint32_t src, uint32_t out, uint32_t dst)
+{
+    EF_U32(out) = EF_U32(src) - EF_U32(0x0015b590u);
+    EF_U32(out + 4u) = EF_U32(src + 4u) - EF_U32(0x0015b594u);
+    EF_U32(out + 8u) = EF_U32(src + 8u) - EF_U32(0x0015b598u);
+    return project_point_pair_c737c(out, src, dst);
+}
+
+/* 0xc89f4, 40 bytes. As 0xc89cc but ESI = EBX + camera position. */
+uint32_t project_offset_point_c89f4(uint32_t src, uint32_t out, uint32_t dst)
+{
+    EF_U32(out) = EF_U32(src) + EF_U32(0x0015b590u);
+    EF_U32(out + 4u) = EF_U32(src + 4u) + EF_U32(0x0015b594u);
+    EF_U32(out + 8u) = EF_U32(src + 8u) + EF_U32(0x0015b598u);
+    return project_point_pair_c737c(out, src, dst);
+}
+
+/* 0xfa2e4, 55 bytes. Implicit-register fragment (ESI = data pointer, EDX = byte count; params in that order): the two-byte running checksum (BL += byte; BH += BL per byte) over COUNT bytes. Returns BX zero-extended. */
+uint32_t checksum_bytes_fa2e4(uint32_t p, uint32_t count)
+{
+    uint8_t bl = 0u, bh = 0u;
+    uint32_t i;
+    for (i = 0; i < count; i++) {
+        bl = (uint8_t)(bl + EF_U8(p + i));
+        bh = (uint8_t)(bh + bl);
+    }
+    return ((uint32_t)bh << 8) | bl;
+}

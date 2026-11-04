@@ -6819,3 +6819,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfc39c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | c39ac@c39ea,c39f0@c3a1f,cdb20@cdbcb | Stack (ret 8): fill the row-offset table at 0x163200 with COUNT dwords 0, STEP, 2*STEP, ...; store COUNT*STEP in 0x16460 |
 | `0x117dd8` | EAX:uint32_t | EAX:uint32_t | 117f68@118196 | Return the code address (EAX; EDX is set to the code segment) of the INDEX-th (0..3) handler 0x117d38, 0x117d5c, 0x117d8 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc89cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | c8820@c8931,c8820@c8946 | Implicit-register fragment (params EBX = source point, ESI = output vector, EDI = screen destination): ESI = EBX - camer |
+| `0xc89f4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | c8820@c8936,c8820@c8941 | As 0xc89cc but ESI = EBX + camera position. |
+| `0xfa2e4` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | fa02c@fa14e | Implicit-register fragment (ESI = data pointer, EDX = byte count; params in that order): the two-byte running checksum ( |

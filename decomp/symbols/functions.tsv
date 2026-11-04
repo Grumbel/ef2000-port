@@ -2827,8 +2827,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c7f0c	256			unknown	unclassified	unverified		
 0x000c8720	57			unknown	unclassified	unverified		
 0x000c8820	428			unknown	unclassified	unverified		
-0x000c89cc	40			unknown	unclassified	unverified		
-0x000c89f4	40			unknown	unclassified	unverified		
+0x000c89cc	40	project_relative_point_c89cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89cc.json	docs/compiler-abi.md; Implicit-register fragment (params EBX = source point, ESI = output vector, EDI = screen destination): ESI = EBX - camer; callers c8820@c8931,c8820@c8946; guest pending
+0x000c89f4	40	project_offset_point_c89f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89f4.json	docs/compiler-abi.md; As 0xc89cc but ESI = EBX + camera position.; callers c8820@c8936,c8820@c8941; guest pending
 0x000c8c34	60			unknown	unclassified	unverified		
 0x000c8c78	63			unknown	unclassified	unverified		
 0x000c8ccc	58			unknown	unclassified	unverified		
@@ -3709,7 +3709,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa200	81			unknown	unclassified	unverified		
 0x000fa251	112			unknown	unclassified	unverified		
 0x000fa2ce	22			unknown	unclassified	unverified		
-0x000fa2e4	55			unknown	unclassified	unverified		
+0x000fa2e4	55	checksum_bytes_fa2e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa2e4.json	docs/compiler-abi.md; Implicit-register fragment (ESI = data pointer, EDX = byte count; params in that order): the two-byte running checksum (; callers fa02c@fa14e; guest pending
 0x000fa31b	23			unknown	unclassified	unverified		
 0x000fa332	35			unknown	unclassified	unverified		
 0x000fa362	67			unknown	unclassified	unverified		
