@@ -377,7 +377,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00024f94	1159			unknown	unclassified	unverified		
 0x0002541c	77	set_indexed_object_mode	object_control	compiles	game	confirmed	decomp/tests/0x0002541c.json	AX/DL; kind 2 mode dispatch; host model passes; guest verification pending
 0x0002546c	118	update_current_mode_2546c	game_helpers31	compiles	game	confirmed	decomp/tests/0x0002546c.json	docs/compiler-abi.md; Reset or advance the current object's mode after a transition test.; callers 239ac@23a6b,255f0@256ac,255f0@256e9; guest pending
-0x000254e4	268			unknown	unclassified	unverified		
+0x000254e4	268	check_contact_254e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000254e4.json	docs/compiler-abi.md; Player/leader contact check for the record at 0x1f71bc: look up the unit of its +0x144 word and of its +0x41 word (kind ; callers 6f15c@6f1d9,6f15c@6f1f7; guest pending
 0x000255f0	461			unknown	unclassified	unverified		
 0x000257d0	1207			unknown	unclassified	unverified		
 0x00025c98	1156			unknown	unclassified	unverified		

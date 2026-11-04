@@ -13299,3 +13299,43 @@ void queue_effect_event_1d5f4(ef_addr32 vec, uint32_t type)
     EF_U16(slot + 0x12u) = EF_U16(slot + (uint32_t)((int32_t)t * 2) + 0x14u);
     guest_fn_9e508((int32_t)(int16_t)EF_U16(slot + 0x12u), 0u);
 }
+
+/* 0x254e4, 268 bytes. Player/leader contact check for the record at 0x1f71bc: look up the unit of its +0x144 word and of its +0x41 word (kind byte +0x16c must be 2 and flag bits 2, 4, 8 of +0x24 clear). If the second unit's mode byte +0x16d is 3 and the record's double +0x15a is positive and +0x150 negative, send message code 0x12 (otherwise return); otherwise compare the unit's double +0x150 with the record's +0x150: not greater sends 0x13, greater sends 0x14 and also sets mode 3 on the object of word 0x1f71c6. Messages go through 0x46254 with the word 0x1f71c6 as source, the +0x41 word as target and two zero stack arguments. */
+void check_contact_254e4(void)
+{
+    ef_addr32 p = EF_U32(0x001f71bcu);
+    ef_addr32 u;
+    uint32_t flags;
+    uint32_t code;
+    double m150, m15a;
+    if (guest_fn_7489c((int32_t)EF_U32(p + 0x144u) >> 16) == 0u)
+        return;
+    u = guest_fn_7489c((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x41u) >> 16);
+    if (u == 0u || EF_U8(u + 0x16cu) != 2u)
+        return;
+    flags = EF_U8(u + 0x24u);
+    if ((flags & 2u) != 0u || (flags & 4u) != 0u || (flags & 8u) != 0u)
+        return;
+    p = EF_U32(0x001f71bcu);
+    if (EF_U8(u + 0x16du) == 3u) {
+        memcpy(&m15a, ef_guest_memory_ptr(p + 0x15au), sizeof m15a);
+        if (0.0 >= m15a)
+            return;
+        memcpy(&m150, ef_guest_memory_ptr(p + 0x150u), sizeof m150);
+        if (0.0 <= m150)
+            return;
+        code = 0x12u;
+    } else {
+        double um150;
+        memcpy(&um150, ef_guest_memory_ptr(u + 0x150u), sizeof um150);
+        memcpy(&m150, ef_guest_memory_ptr(p + 0x150u), sizeof m150);
+        if (um150 <= m150) {
+            code = 0x13u;
+        } else {
+            guest_fn_46254((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), (int32_t)EF_U32(p + 0x41u) >> 16, 0x14u, 0u, 0u, 0u);
+            guest_fn_2541c_x((int32_t)EF_U32(0x001f71c6u) >> 16, 3u);
+            return;
+        }
+    }
+    guest_fn_46254((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), (int32_t)EF_U32(p + 0x41u) >> 16, code, 0u, 0u, 0u);
+}

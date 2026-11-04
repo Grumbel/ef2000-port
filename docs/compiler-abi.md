@@ -7829,3 +7829,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1d5f4` | EAX:ef_addr32,EDX:uint32_t | none | 1d5cc@1d5ea,56928@5694a | In play mode (byte 0x125847) queue a sound/effect event for the vector VEC (EAX, three dwords; a positive second compone |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x254e4` | none | none | 6f15c@6f1d9,6f15c@6f1f7 | Player/leader contact check for the record at 0x1f71bc: look up the unit of its +0x144 word and of its +0x41 word (kind  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
