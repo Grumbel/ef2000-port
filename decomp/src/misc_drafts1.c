@@ -7277,3 +7277,28 @@ void find_lowest_rank_a38f8(void)
     EF_U32(0x00136b74u) = list_b;
     EF_U16(0x001357b0u) = (uint16_t)best;
 }
+
+/* 0x8fe4, 220 bytes. Assign object INDEX (sign-extended word) to a free sub-slot of table TABLE: find a slot with 0x825c, clear its byte +0x25, set byte +0x26, flag it via 0x8394, and when the index is below the object count (word 0x19bb5c) and the object (0xca-byte records at 0x19bb58) has type 0xc, store the index at slot +0x20, clear +0x22 and post event 0x899 (dword +0x4e of the object >> 16). Slot records are 0x38 bytes in the array at +0x16 of the 0x22-byte table entries at 0x1972e0. */
+void assign_table_slot_8fe4(uint32_t index, uint32_t table)
+{
+    uint32_t tbl = table & 0xffu;
+    uint32_t slot = find_free_slot_825c((uint8_t)tbl) & 0xffu;
+    int16_t idx = (int16_t)index;
+    uint32_t ent, base, obj;
+    if (slot == 0xffu || slot == 0xfeu || (int32_t)idx == 0xff)
+        return;
+    ent = EF_U32(0x001972e0u) + tbl * 34u;
+    base = slot * 56u;
+    EF_U8(EF_U32(ent + 0x16u) + base + 0x25u) = 0u;
+    EF_U8(base + EF_U32(ent + 0x16u) + 0x26u) = 1u;
+    flag_sub_entry_side_8394((uint8_t)tbl, (uint8_t)slot);
+    if (idx >= (int16_t)EF_U16(0x0019bb5cu))
+        return;
+    obj = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)idx * 0xca);
+    if (EF_U8(obj + 0x1au) != 0xcu)
+        return;
+    ent = EF_U32(0x001972e0u) + tbl * 34u;
+    EF_U16(base + EF_U32(ent + 0x16u) + 0x20u) = (uint16_t)idx;
+    EF_U8(EF_U32(ent + 0x16u) + base + 0x22u) = 0u;
+    guest_fn_46254(0x899u, (int32_t)EF_U32(obj + 0x4eu) >> 16, 0x4eu, slot, 0u, 0u);
+}

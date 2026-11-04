@@ -125,7 +125,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00008cc4	648			unknown	unclassified	unverified		
 0x00008f4c	77	update_table_slots_8f4c	game_helpers7	compiles	game	confirmed	decomp/tests/0x00008f4c.json	docs/compiler-abi.md; ; callers c630@c6f9,54210@5426a,7e8c0@7ebb6; guest pending
 0x00008f9c	69	run_unit_slots_8f9c	game_helpers7	compiles	game	confirmed	decomp/tests/0x00008f9c.json	docs/compiler-abi.md; Run 46254 for each of the seven word slots of a unit.; callers 90c0@90fa; guest pending
-0x00008fe4	220			unknown	unclassified	unverified		
+0x00008fe4	220	assign_table_slot_8fe4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00008fe4.json	docs/compiler-abi.md; Assign object INDEX (sign-extended word) to a free sub-slot of table TABLE: find a slot with 0x825c, clear its byte +0x2; callers 90c0@910b; guest pending
 0x000090c0	83	update_unit_90c0	game_state_helpers	compiles	game	confirmed	decomp/tests/0x000090c0.json	docs/compiler-abi.md; ; callers 2d488@2d645; guest pending
 0x00009114	461			unknown	unclassified	unverified		
 0x000092f0	69	clear_word_tables_92f0	game_helpers29	compiles	game	confirmed	decomp/tests/0x000092f0.json	docs/compiler-abi.md; Clear five 8-entry word tables.; callers bfcc@c275,c630@c757,c868@c879; guest pending

@@ -5116,4 +5116,6 @@ void add_dirty_rect_e51c4(uint32_t a, uint32_t c, uint32_t b, uint32_t d, uint32
 
 void find_lowest_rank_a38f8(void);
 
+void assign_table_slot_8fe4(uint32_t index, uint32_t table);
+
 #endif

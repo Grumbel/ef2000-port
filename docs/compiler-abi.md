@@ -6587,3 +6587,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa38f8` | none | none | a410c@a39d9 | Find the lowest rank (byte +5 of the entry record) among the flagged entries of two index lists: with byte 0x135798 set, |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8fe4` | EAX:uint32_t,EDX:uint32_t | none | 90c0@910b | Assign object INDEX (sign-extended word) to a free sub-slot of table TABLE: find a slot with 0x825c, clear its byte +0x2 |
