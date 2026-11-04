@@ -1769,12 +1769,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008af68	749			unknown	unclassified	unverified		
 0x0008b274	100	candidate_game_main		named	unclassified	unverified		candidate game main; docs/ghidra-findings.md
 0x0008b2d8	78			unknown	unclassified	unverified		
-0x0008b328	99			unknown	unclassified	unverified		
+0x0008b328	99	format_number_commas_8b328	game_helpers81	compiles	game	confirmed	decomp/tests/0x0008b328.json	docs/compiler-abi.md; Format a number right-aligned into a field of the given width, with ',' every 3 digits.; callers 8b39c@8b3c5,8b39c@8b3f8,8b39c@8b40c; guest pending
 0x0008b39c	402	tactcom_init		named	unclassified	unverified		TACTCOM init diagnostic string; docs/ghidra-findings.md
 0x0008b530	38	copy_selected_object	scene_helpers	compiles	game	confirmed	decomp/tests/0x0008b530.json	docs/compiler-abi.md; copy 0x8e dwords of filtered object to 0x2117b0; callers 8bb50@8bb53; guest pending
 0x0008b5f0	38	latch_mode_word_8b5f0	game_helpers28	compiles	game	confirmed	decomp/tests/0x0008b5f0.json	docs/compiler-abi.md; Latch a word pointer (+1) and clamp its mode to 1 or 2.; callers 8ba98@8bac8; guest pending
 0x0008b650	50	select_validated_ui_record	ui_secondary	compiles	game	confirmed	decomp/tests/0x0008b650.json	docs/compiler-abi.md; host model; guest differential pending
-0x0008b684	89			unknown	unclassified	unverified		
+0x0008b684	89	scan_directory_entry_8b684	game_helpers81	compiles	game	confirmed	decomp/tests/0x0008b684.json	docs/compiler-abi.md; Start (mode 1) or continue a directory scan; returns 1 when no more entries.; callers 8b7e8@8b84d; guest pending
 0x0008b6e0	262			unknown	unclassified	unverified		
 0x0008b7e8	317			unknown	unclassified	unverified		
 0x0008b988	95	draw_nearby_effects_8b988	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008b988.json	docs/compiler-abi.md; Draw every effect of the ring at 0x12db5c that is close to (x, y).; callers 8bb18@8bb44; guest pending
@@ -2021,7 +2021,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009be0c	1	nop_9be0c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0009be0c.json	docs/compiler-abi.md; Empty stub (single ret).; callers ee43c@ee463; guest pending
 0x0009be0d	40			unknown	unclassified	unverified		
 0x0009be38	427			unknown	unclassified	unverified		
-0x0009bfe3	65			unknown	unclassified	unverified		
+0x0009bfe3	65	add_far_offset_9bfe3	game_helpers81	compiles	game	confirmed	decomp/tests/0x0009bfe3.json	docs/compiler-abi.md; Add an offset to a segment:offset pair, renormalising so the offset stays in 0..0xffff.; callers 9be38@9bebb,9be38@9bf12,9be38@9bf34; guest pending
 0x0009c024	23	far_to_linear_9c024	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c024.json	docs/compiler-abi.md; Real-mode segment:offset style conversion of a dword (cdecl).; callers none direct; guest pending
 0x0009c1a1	16	high_word_9c1a1	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c1a1.json	docs/compiler-abi.md; High word of a dword (cdecl).; callers none direct; guest pending
 0x0009c1b1	10	identity_9c1b1	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c1b1.json	docs/compiler-abi.md; Identity (cdecl).; callers none direct; guest pending
@@ -2102,7 +2102,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009f940	446			unknown	unclassified	unverified		
 0x0009fb00	254			unknown	unclassified	unverified		
 0x0009fc00	467			unknown	unclassified	unverified		
-0x0009fdd4	72			unknown	unclassified	unverified		
+0x0009fdd4	72	select_lowest_rated_entry_9fdd4	game_helpers81	compiles	game	confirmed	decomp/tests/0x0009fdd4.json	docs/compiler-abi.md; Select the entry with the smallest rating below 10 and activate it; -1 slot ends early.; callers 9fea8@9feb6; guest pending
 0x0009fe1c	139	unlink_record_9fe1c	game_helpers34	compiles	game	confirmed	decomp/tests/0x0009fe1c.json	docs/compiler-abi.md; Unlink an id from the singly linked list of 78-byte records.; callers 9fdd4@9fe10; guest pending
 0x0009fea8	288			unknown	unclassified	unverified		
 0x0009ffc8	80	convert_entry_vector_9ffc8	float_helpers5	compiles	game	confirmed	decomp/tests/0x0009ffc8.json	docs/compiler-abi.md; Convert a table entry's vector and scale a word into a float.; callers 9e7bc@9e8b1; guest pending
@@ -2358,7 +2358,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a9694	143			unknown	unclassified	unverified		
 0x000a9724	277			unknown	unclassified	unverified		
 0x000a983c	60	apply_operation_a983c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a983c.json	docs/compiler-abi.md; Apply a set/add/subtract operation to a guest value.; callers a9e70@a9fba; guest pending
-0x000a9878	88			unknown	unclassified	unverified		
+0x000a9878	88	build_status_line_a9878	game_helpers81	compiles	game	confirmed	decomp/tests/0x000a9878.json	docs/compiler-abi.md; Build a status line from three fragments, store the title, and refresh.; callers a9e70@a9fab; guest pending
 0x000a98d0	48	save_state_a98d0	list_helpers	compiles	game	confirmed	decomp/tests/0x000a98d0.json	docs/compiler-abi.md; Latch several words and dwords after 0xa7bb0.; callers a99c0@a9a2b; guest pending
 0x000a9900	43	restore_state_a9900	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9900.json	docs/compiler-abi.md; Reverse of 0xa98d0 (without the 0xa7bb0 call).; callers a9e70@aa095,a9e70@aa0ee; guest pending
 0x000a992c	97	restore_list_state_a992c	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000a992c.json	docs/compiler-abi.md; Rotate the saved list state into place; returns the global at 0x146e18.; callers a9e70@aa008; guest pending

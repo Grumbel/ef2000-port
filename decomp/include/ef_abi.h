@@ -3670,4 +3670,26 @@ uint32_t guest_fn_decde_x(uint32_t a, uint32_t b, uint32_t c); /* 0xdecde EAX/ED
 uint32_t guest_fn_decfb_x(uint32_t a); /* 0xdecfb EAX */
 void guest_fn_dedde_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xdedde EAX/EDX/EBX/ECX */
 
+/* game_helpers81.c */
+ef_addr32 format_number_commas_8b328(ef_addr32 dest, int32_t width, int32_t value);
+uint8_t scan_directory_entry_8b684(int16_t mode, ef_addr32 name, ef_addr32 suffix, ef_addr32 buf);
+uint32_t add_far_offset_9bfe3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t far_ptr, int32_t delta);
+int32_t select_lowest_rated_entry_9fdd4(void);
+void build_status_line_a9878(ef_addr32 name);
+void guest_fn_9fe1c_x(int32_t a); /* 0x9fe1c EAX */
+uint32_t guest_fn_a7b70_x(void); /* 0xa7b70 -> EAX */
+void guest_fn_cd554_x(void); /* 0xcd554 */
+void guest_fn_cd4d4_x(void); /* 0xcd4d4 */
+
+/* game_helpers81.c */
+ef_addr32 format_number_commas_8b328(ef_addr32 dest, int32_t width, int32_t value);
+uint8_t scan_directory_entry_8b684(int16_t mode, ef_addr32 name, ef_addr32 suffix, ef_addr32 buf);
+uint32_t add_far_offset_9bfe3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t far_ptr, int32_t delta);
+int32_t select_lowest_rated_entry_9fdd4(void);
+void build_status_line_a9878(ef_addr32 name);
+void guest_fn_9fe1c_x(int32_t a); /* 0x9fe1c EAX */
+uint32_t guest_fn_a7b70_x(void); /* 0xa7b70 -> EAX */
+void guest_fn_cd554_x(void); /* 0xcd554 */
+void guest_fn_cd4d4_x(void); /* 0xcd4d4 */
+
 #endif

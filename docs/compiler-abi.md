@@ -4118,3 +4118,13 @@ in EAX, format string address, one value).
 | `0x4f388` | EAX:ef_addr32,EDX:ef_addr32 | none | 4b1a4@4b1b8,4b1a4@4b1d7 | Bind two values into the named dialog's widgets, then emit its flag and close it. |
 | `0x34a98` | EAX:ef_addr32 | EAX:ef_addr32 | 34b2c@34b55,34b2c@34b70,34b2c@34b7c | Rebuild the child dialog list with the given text and return the dialog. |
 | `0x32de8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:int32_t | 7a66c@7a68b | List the files matching a path and mask into the 13-byte name table; returns the count. |
+
+## game_helpers81 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8b328` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t | EAX:ef_addr32 | 8b39c@8b3c5,8b39c@8b3f8,8b39c@8b40c | Format a number right-aligned into a field of the given width, with ',' every 3 digits. |
+| `0x8b684` | AX:int16_t,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32 | AL:uint8_t | 8b7e8@8b84d | Start (mode 1) or continue a directory scan; returns 1 when no more entries. |
+| `0x9bfe3` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:int32_t | EAX:uint32_t | 9be38@9bebb,9be38@9bf12,9be38@9bf34 | Add an offset to a segment:offset pair, renormalising so the offset stays in 0..0xffff. |
+| `0x9fdd4` | none | EAX:int32_t | 9fea8@9feb6 | Select the entry with the smallest rating below 10 and activate it; -1 slot ends early. |
+| `0xa9878` | EAX:ef_addr32 | none | a9e70@a9fab | Build a status line from three fragments, store the title, and refresh. |
