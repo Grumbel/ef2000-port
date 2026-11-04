@@ -17983,3 +17983,56 @@ void aim_camera_fixed_6f3e0(void)
 	memcpy(ef_guest_memory_ptr(0x001f70a0u), &h, 8);
 	guest_fn_6ebe0_x(0u, 0x40080000u, 0xcccccccdu, 0x3ff4ccccu, 0u, 0u, 0u, 0u, 0u, 0x408f4000u);
 }
+
+/* 0x85604, 410 bytes (ret 8). Decide whether the class row ID (EAX, signed word) needs its target refreshed (0x857bc), given the factor SCALE (stack double). A row without a table (dword +0x8a zero) is reported through the error hook (0x189cb0). Nothing happens for the player's own row (word 0x19bb5e) while word 0x126516 and byte 0x132ac2 are clear and byte 0x125847 is set and the current entry (byte +0x8e of 25-byte entries) has kind 5. Otherwise the distance (0xb415c) from the row position (+0x61) to the entry point (dwords +0 and +4 times 2.4384) is compared: the refresh happens when double row+0x79 * SCALE exceeds the distance, or by row kind (byte 0x128568 + 0xe5 * byte row+0x19): 2 below 5000.0, 3 below 10000.0, 4 below 2000.0, otherwise when row+0x79 * 20.0 * 1.5 exceeds the distance. */
+void check_row_target_85604(uint32_t id, double scale)
+{
+	int32_t ib = (int32_t)(int16_t)id;
+	uint32_t rows = EF_U32(0x0019bb58u);
+	uint32_t row = rows + (uint32_t)(ib * 0xca);
+	uint32_t k, tbl, kind;
+	double pt[3], dist, h, hd, c;
+
+	if (EF_U32(row + 0x8au) == 0u)
+		guest_callptr2_x(EF_U32(0x00132a74u), 0x00189cb0u, (uint32_t)ib);
+	rows = EF_U32(0x0019bb58u);
+	k = EF_U8(rows + (uint32_t)(ib * 0xca) + 0x8eu);
+	if ((uint16_t)id == EF_U16(0x0019bb5eu) && EF_U16(0x00126516u) == 0u && EF_U8(0x00132ac2u) == 0u &&
+	    EF_U8(0x00125847u) != 0u) {
+		row = rows + (uint32_t)((int32_t)(int16_t)id * 0xca);
+		if (EF_U8(EF_U32(row + 0x8au) + k * 25u + 0x18u) == 5u)
+			return;
+	}
+	row = EF_U32(0x0019bb58u) + (uint32_t)(ib * 0xca);
+	tbl = EF_U32(row + 0x8au);
+	pt[0] = (double)(int32_t)EF_U32(tbl + k * 25u) * 2.4384;
+	tbl = EF_U32(row + 0x8au);
+	pt[1] = (double)(int32_t)EF_U32(tbl + k * 25u + 4u) * 2.4384;
+	pt[2] = 0.0;
+	dist = distance_2d_b415c(row + 0x61u, (ef_addr32)(uintptr_t)pt);
+	row = EF_U32(0x0019bb58u) + (uint32_t)(ib * 0xca);
+	memcpy(&hd, ef_guest_memory_ptr(row + 0x79u), 8);
+	h = hd * 20.0;
+	if (hd * scale > dist) {
+		guest_fn_857bc_x(ib);
+		return;
+	}
+	kind = EF_U8(0x00128568u + (uint32_t)EF_U8(row + 0x19u) * 0xe5u);
+	if (kind == 3u) {
+		c = 10000.0;
+		if (dist >= c)
+			return;
+	} else if (kind == 2u) {
+		c = 5000.0;
+		if (dist >= c)
+			return;
+	} else if (kind == 4u) {
+		c = 2000.0;
+		if (dist >= c)
+			return;
+	} else {
+		if (!(h * 1.5 > dist))
+			return;
+	}
+	guest_fn_857bc_x(ib);
+}

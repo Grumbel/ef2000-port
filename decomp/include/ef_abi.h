@@ -5944,4 +5944,7 @@ void aim_chase_camera_6f2bc(void);
 void aim_camera_fixed_6f3e0(void);
 void guest_fn_6ebe0_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6, uint32_t s7, uint32_t s8, uint32_t s9); /* 0x6ebe0 ten stack dwords, callee cleanup (ret 0x28); s0 is the last pushed */
 
+void check_row_target_85604(uint32_t id, double scale);
+void guest_fn_857bc_x(int32_t id); /* 0x857bc EAX */
+
 #endif
