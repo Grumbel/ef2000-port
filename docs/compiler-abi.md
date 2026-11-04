@@ -8126,3 +8126,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7cf64` | none | none | 7d2f8@7d301 | Read six button states from the dialog named 0x187f94 (bit 0 of byte +0x1d of the widgets named 0x188048 = A, 0x187fac = |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1c16c` | none | none | 1cde8@1ce41 | Pack the low bits of two groups of key-state bytes into the bit sets at 0x2144aa and 0x2144ab. Byte 0x2144aa takes bit 0 |

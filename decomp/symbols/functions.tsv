@@ -307,7 +307,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001abbc	195	try_fire_selected_weapon_1abbc	game_helpers53	compiles	game	confirmed	decomp/tests/0x0001abbc.json	docs/compiler-abi.md; Run the fire action when the selected weapon kind allows it.; callers 1cde8@1cf13; guest pending
 0x0001b4a4	441			unknown	unclassified	unverified		
 0x0001b52c	42	selected_unit_visible_1b52c	game_helpers4	compiles	game	confirmed	decomp/tests/0x0001b52c.json	docs/compiler-abi.md; ; callers 1b4a4@1b4ca,1b4a4@1b4d9; guest pending
-0x0001c16c	609			unknown	unclassified	unverified		
+0x0001c16c	609	pack_key_state_bits_1c16c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001c16c.json	docs/compiler-abi.md; Pack the low bits of two groups of key-state bytes into the bit sets at 0x2144aa and 0x2144ab. Byte 0x2144aa takes bit 0; callers 1cde8@1ce41; guest pending
 0x0001c3d0	361	latch_input_state_1c3d0	game_helpers41	compiles	game	confirmed	decomp/tests/0x0001c3d0.json	docs/compiler-abi.md; Latch the raw input state, clearing it when a menu or pause is active.; callers 1cde8@1ce50; guest pending
 0x0001c60c	210	scale_words_1c60c	line_of_sight	compiles	game	confirmed	decomp/tests/0x0001c60c.json	docs/compiler-abi.md; Scale six signed words by the percentage in dword 0x122dc4.; callers 8b39c@8b51e; guest pending
 0x0001c780	1549			unknown	unclassified	unverified		

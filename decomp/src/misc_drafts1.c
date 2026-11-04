@@ -15009,3 +15009,30 @@ void read_button_selection_7cf64(void)
 	EF_U8(0x001f9003u) = (uint8_t)f[4];
 	EF_U8(0x001f9002u) = (uint8_t)f[2];
 }
+
+/* 0x1c16c, 609 bytes. Pack the low bits of two groups of key-state bytes into the bit sets at 0x2144aa and 0x2144ab. Byte 0x2144aa takes bit 0 of the bytes 0x41f805, 0x41f808, 0x41f809, 0x41f801, 0x41f7d7, 0x41f7df, 0x41f7d9 and 0x41f7e1 (bits 0..7) when word 0x19843c is nonzero and the pair probe 0x913dc (0xff, 2) fails, otherwise it is cleared. When byte 0x41f7ad is set the low six bits of 0x2144ab are replaced by bit 0 of 0x41f7db, 0x41f7dd, 0x41f7e1, 0x41f7d9, 0x41f7d8 and 0x41f7e0, otherwise they are cleared; bits 6 and 7 are kept. */
+void pack_key_state_bits_1c16c(void)
+{
+	static const uint32_t a[8] = { 0x0041f805u, 0x0041f808u, 0x0041f809u, 0x0041f801u,
+		0x0041f7d7u, 0x0041f7dfu, 0x0041f7d9u, 0x0041f7e1u };
+	static const uint32_t b[6] = { 0x0041f7dbu, 0x0041f7ddu, 0x0041f7e1u, 0x0041f7d9u, 0x0041f7d8u, 0x0041f7e0u };
+	uint8_t v;
+	int i;
+
+	if (EF_U16(0x0019843cu) != 0u && probe_scene_pair_state(0xff, 2, 0, 0) == 0u) {	/* EBX/ECX are not set by the original */
+		v = EF_U8(0x002144aau);
+		for (i = 0; i < 8; i++)
+			v = (uint8_t)((v & ~(1u << i)) | ((EF_U8(a[i]) & 1u) << i));
+		EF_U8(0x002144aau) = v;
+	} else {
+		EF_U8(0x002144aau) = 0u;
+	}
+	v = EF_U8(0x002144abu);
+	if (EF_U8(0x0041f7adu) != 0u) {
+		for (i = 0; i < 6; i++)
+			v = (uint8_t)((v & ~(1u << i)) | ((EF_U8(b[i]) & 1u) << i));
+	} else {
+		v = (uint8_t)(v & 0xc0u);
+	}
+	EF_U8(0x002144abu) = v;
+}
