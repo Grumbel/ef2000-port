@@ -8734,3 +8734,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x81680` | none | none | 817a8@8184c | Periodic pseudo-random effect update: steps a small word generator and spawns a record at a rotated offset. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7bb00` | EAX:ef_addr32 | EAX:ef_addr32 | 1d5f4@1d616 | Look up the terrain record under a world position and publish its slope and heading in a global triple. |
+| `0xb3c04` | EAX:ef_addr32,EDX:ef_addr32 | AL:uint8_t | 6b50@6b9f,510d0@5115e,82e40@82e71 | Load a named file into a buffer, unpacking RJ/AR compressed payloads. |

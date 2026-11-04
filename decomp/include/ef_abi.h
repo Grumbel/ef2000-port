@@ -6026,4 +6026,9 @@ double guest_fn_2ccf0_x(int32_t unit, double a, double b); /* 0x2ccf0 AX, two st
 
 void update_random_effect_81680(void);
 
+ef_addr32 terrain_slope_at_7bb00(ef_addr32 pos);
+uint8_t load_file_unpacked_b3c04(ef_addr32 name, ef_addr32 dest);
+ef_addr32 guest_fn_cfc68_x(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e); /* 0xcfc68 EAX,EDX,EBX,ECX + 1 stack, callee cleanup */
+void guest_fn_fa02c_x(uint32_t handle, uint32_t dest); /* 0xfa02c 2 stack, callee cleanup */
+
 #endif

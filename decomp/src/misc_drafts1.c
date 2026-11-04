@@ -19364,3 +19364,75 @@ void update_random_effect_81680(void)
 	guest_fn_15be10_x();
 	EF_U8(0x00128549u) = 2u;
 }
+
+/* 0x7bb00, 251 bytes. Look up the terrain record under a world position and publish its slope and heading in a global triple. */
+ef_addr32 terrain_slope_at_7bb00(ef_addr32 pos)
+{
+	int32_t x = EF_S32(pos);
+	int32_t z = EF_S32(pos + 8u);
+	int32_t row = 0x18f - (z >> 11);
+	ef_addr32 rec = 0u;
+	uint32_t m;
+
+	select_plane_source(0);
+	m = map_value_7ae0c(x, z);
+	if ((uint16_t)m != 0xffffu) {
+		rec = guest_fn_cfc68_x((int32_t)(int16_t)m, (x >> 11) * 2 + 1 << 10, (0x18f - row) * 2 + 1 << 10, x, z);
+	}
+	if (rec != 0u) {
+		double v = (double)(int16_t)EF_U16(rec + 2u) * 3.0517578125e-05;
+		double ang;
+		int32_t a;
+		if (!(1.0 >= v))
+			v = 1.0;
+		if (!(v >= -1.0))
+			v = -1.0;
+		ang = guest_fn_deb1a_x(v) * 32768.0 * 0.3183098861827565 + -16384.0;
+		a = (int32_t)truncate_9d72c(ang);
+		EF_U16(0x001f8ebcu) = (uint16_t)a;
+		EF_U16(0x001f8ebeu) = (uint16_t)angle_of_b3b1c((int16_t)EF_U16(rec), (int16_t)EF_U16(rec + 4u));
+		EF_U16(0x001f8ec0u) = 0u;
+		rec = 0x001f8ebcu;
+	}
+	return rec;
+}
+
+/* 0xb3c04, 252 bytes. Load a named file into a buffer, unpacking RJ/AR compressed payloads. */
+uint8_t load_file_unpacked_b3c04(ef_addr32 name, ef_addr32 dest)
+{
+	uint32_t size = read_file_payload_size_b3b90(name);
+	uint32_t h, tag, n, buf;
+
+	if (size == 0u)
+		return 0u;
+	h = guest_fn_a7900(name);
+	if (h == 0xffffffffu)
+		return 0u;
+	EF_U16(0x0041f360u) = 0u;
+	guest_fn_a79d4(h, 8u, 0x0041f360u);
+	seek_start_a7ab4(0u, 0u, 0u, 0u, h, 0u);
+	tag = EF_U16(0x0041f360u);
+	if (tag == 0x524au) {
+		n = guest_fn_a7ae0(h, 0u) + 0x10u;
+		buf = guest_fn_c3f70(n);
+		if (buf == 0u) {
+			buf = size + dest - n;
+			guest_fn_a79d4(h, n, buf);
+			guest_fn_f9ee0_x(dest, buf);
+		} else {
+			guest_fn_a79d4(h, n, buf);
+			guest_fn_f9ee0_x(dest, buf);
+			guest_fn_c3f80(buf);
+		}
+		guest_fn_a7990(h);
+		return 1u;
+	}
+	if (tag == 0x4152u) {
+		guest_fn_fa02c_x(h, dest);
+		guest_fn_a7990(h);
+		return 1u;
+	}
+	guest_fn_a79d4(h, size, dest);
+	guest_fn_a7990(h);
+	return 1u;
+}
