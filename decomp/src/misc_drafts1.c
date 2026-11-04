@@ -18721,3 +18721,37 @@ void update_widget_extent_a558c(ef_addr32 obj)
 	if ((int16_t)EF_U16(obj + 0x6bu) < 0)
 		EF_U16(obj + 0x6bu) = 0u;
 }
+
+/* 0x3cb2c, 250 bytes. Parse the placement script TEXT (EAX): normalise line endings, clear the list heads at 0x1a2e94/0x1a2e98, then for each line (0x3c994 parses it into the scratch fields at 0x1a2e80..0x1a2ea4) allocate a 0x38-byte record (pointer kept in 0x1264c8), link it at the list head and fill it from the scratch fields; finally expand the table entry and placement list named by the high word of 0x1a2ea0. */
+void load_placement_script_3cb2c(ef_addr32 text)
+{
+	ef_addr32 cur, rec;
+	uint32_t v;
+
+	cur = text;
+	normalize_script_line_endings(text);
+	EF_U32(0x001a2e98u) = 0u;
+	EF_U32(0x001a2e94u) = 0u;
+	if (EF_U8(text) == 0u)
+		return;
+	do {
+		cur = parse_table_line_3c994(cur);
+		rec = alloc_zeroed_cc6c0(0u, 0u, 0u, 0u, 0x38u, 0x001837c8u);
+		EF_U32(0x001264c8u) = rec;
+		list_insert_head(rec, 0x001a2e98u, 0x001a2e94u);
+		EF_U32(rec + 0xcu) = alloc_checked_cc744(EF_U32(0x001a2e88u));
+		EF_U32(rec + 0x10u) = alloc_checked_cc744(EF_U32(0x001a2e80u));
+		EF_U32(rec + 0x16u) = (uint32_t)parse_int(EF_U32(0x001a2e8cu));
+		EF_U32(rec + 0x1au) = 0u;
+		v = (uint32_t)parse_int(EF_U32(0x001a2e90u));
+		rec = EF_U32(0x001264c8u);
+		EF_U16(rec + 0x22u) = 0u;
+		EF_U16(rec + 0x24u) = 0u;
+		EF_U16(rec + 0x26u) = 0u;
+		EF_U32(rec + 0x1eu) = v;
+		EF_U16(rec + 0x14u) = EF_U16(0x001a2ea4u);
+		copy_table_entry_to_record((int16_t)((int32_t)EF_U32(0x001a2ea0u) >> 16));
+		load_placement_list_3c790((uint32_t)((int32_t)EF_U32(0x001a2ea0u) >> 16));
+		EF_U32(EF_U32(0x001264c8u) + 0x2cu) = EF_U32(0x001a2e84u);
+	} while (EF_U8(cur) != 0u);
+}

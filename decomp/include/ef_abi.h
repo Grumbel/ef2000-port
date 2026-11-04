@@ -5981,4 +5981,6 @@ void classify_radio_target_8883c(ef_addr32 rec, ef_addr32 out1, ef_addr32 out2);
 
 void update_widget_extent_a558c(ef_addr32 obj);
 
+void load_placement_script_3cb2c(ef_addr32 text);
+
 #endif

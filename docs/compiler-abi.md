@@ -8621,3 +8621,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa558c` | EAX:ef_addr32 | none | a520c@a5239,a5508@a5578 | Recompute the scroll extent words of widget OBJ (EAX) along both axes. Horizontally N = word +0x45 + word +0x69 - word + |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3cb2c` | EAX:ef_addr32 | none | 3cd40@3cd4c | Parse the placement script TEXT (EAX): normalise line endings, clear the list heads at 0x1a2e94/0x1a2e98, then for each  |
