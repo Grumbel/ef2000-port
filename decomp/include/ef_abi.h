@@ -6424,4 +6424,7 @@ void accum_cross_119f10(uint32_t eax, uint32_t edx); /* 0x119f10 */
 uint32_t lookup_pair_106514(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0);
 uint32_t lookup_pair_106514(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0); /* 0x106514 */
 
+void combine_globals_1199c8(void);
+void combine_globals_1199c8(void); /* 0x1199c8 */
+
 #endif

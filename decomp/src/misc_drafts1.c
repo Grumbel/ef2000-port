@@ -22507,3 +22507,18 @@ uint32_t lookup_pair_106514(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
     EF_U32(a0) = r;
     return r == 0 ? 2u : 0u;
 }
+
+/* 0x1199c8, 139 bytes. Sibling of 0x119a54: X = (A+B+C)*g + D*h*k is stored at 0x432b58 and k*m*g*h*p*X at 0x432b00. */
+void combine_globals_1199c8(void)
+{
+    double g = md_rd_f64(0x00432200u);
+    double h = md_rd_f64(0x00433040u);
+    double k = md_rd_f64(0x001956c4u);
+    double t = md_rd_f64(0x00432ae8u) * md_rd_f64(0x00432948u) * md_rd_f64(0x00432908u)
+             + md_rd_f64(0x00432be0u) * md_rd_f64(0x00432c48u)
+             + md_rd_f64(0x00432ab0u) * md_rd_f64(0x00432998u) * md_rd_f64(0x004328e0u);
+    double x = t * g + md_rd_f64(0x00432af0u) * md_rd_f64(0x00432338u) * h * k;
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x00432b58u) = x;
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x00432b00u) =
+        k * md_rd_f64(0x00432da0u) * (g * h * md_rd_f64(0x00433058u)) * x;
+}

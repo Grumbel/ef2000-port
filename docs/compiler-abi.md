@@ -9342,3 +9342,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x106514` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 1024b4@1024d9 | Twin of 0x113af0 using lookup 0x102508: returns 1 if the first lookup fails (error text from 0x194a24 copied to 0x4dd6b0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1199c8` | none | none | 1196a0@1196b4 | Sibling of 0x119a54: X = (A+B+C)*g + D*h*k is stored at 0x432b58 and k*m*g*h*p*X at 0x432b00. |
