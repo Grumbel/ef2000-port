@@ -2767,7 +2767,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c41b0	131			unknown	unclassified	unverified		
 0x000c425a	17	run_handler_stack_c425a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c425a.json	docs/compiler-abi.md; At the entry (the loop at 0xc4281 follows). Implicit-register fragment: walk the word stack at 0x147e56 from the top (wo; callers c4167@c41a2; guest pending
 0x000c4281	30			unknown	unclassified	unverified		
-0x000c4310	99			unknown	unclassified	unverified		
+0x000c4310	99	remap_handler_c4310	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4310.json	docs/compiler-abi.md; Map a code address to its replacement handler; unmatched addresses are recorded and routed to 0xc4377.; callers fcc01@fcc15,fcc6f@fcc91; guest pending
 0x000c4389	10	run_e3c20	list_lookup	compiles	game	confirmed	decomp/tests/0x000c4389.json	docs/compiler-abi.md; Run 0xe3c20.; callers c5261@c5283; guest pending
 0x000c4412	121	setup_renderer_tables_c4412	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4412.json	docs/compiler-abi.md; Renderer setup (ret 4): VALUE (stack, byte) is stored in bytes 0x159138 and 0x15908a; the immediate operands of three se; callers none direct; guest pending
 0x000c448b	191	install_graphics_dispatch_c448b	game_helpers75	compiles	game	confirmed	decomp/tests/0x000c448b.json	docs/compiler-abi.md; Install the graphics dispatch pointers (including the patched code words).; callers c8c34@c4555; guest pending
@@ -3756,8 +3756,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fc8c0	1	nop_fc8c0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fc8c0.json	docs/compiler-abi.md; Empty stub (single ret).; callers c4167@c41a7; guest pending
 0x000fc8cc	210	project_vertices_fc8cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fc8cc.json	docs/compiler-abi.md; Cdecl-style (COUNT, LIST; ret 8): project COUNT (byte) vertex records whose pointers are listed at LIST: skip those alre; callers c46f8@c4720,d2110@d2120; guest pending
 0x000fc9f8	37	update_fc9f8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fc9f8.json	docs/compiler-abi.md; ; callers c4a50@c4acd,c4aeb@c4b68,c4b95@c4c12; guest pending
-0x000fcc01	31			unknown	unclassified	unverified		
-0x000fcc6f	45			unknown	unclassified	unverified		
+0x000fcc01	31	remap_frame_fcc01	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fcc01.json	docs/compiler-abi.md; Far-call thunk: remap the return address in the caller frame when its segment matches.; callers none direct; guest pending
+0x000fcc6f	45	remap_iret_frame_fcc6f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fcc6f.json	docs/compiler-abi.md; Interrupt handler: remap the saved return address in the interrupt frame.; callers none direct; guest pending
 0x000fcd20	402	build_rotation_matrix_fcd20	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fcd20.json	docs/compiler-abi.md; Variant of 0xe7a7c (angles in EBX, ESI, EDI) that stops after the nine matrix entries, written to 0x1590e4..0x159104, wi; callers c5cd3@c5ce6,e9b38@e9b47; guest pending
 0x000fceb4	327	matrix_mul_transposed_fceb4	matrix_fixed	compiles	game	confirmed	decomp/tests/0x000fceb4.json	docs/compiler-abi.md; out = a * transpose(b); inputs in ESI (a), EBX (b), output EDI.; callers c6b80@c6bda; guest pending
 0x000fcffb	327	matrix_mul_fcffb	matrix_fixed	compiles	game	confirmed	decomp/tests/0x000fcffb.json	docs/compiler-abi.md; out = a * b; inputs in ESI (a), EBX (b), output EDI.; callers c5cd3@c5cfa; guest pending

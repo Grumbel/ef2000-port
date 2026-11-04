@@ -21749,3 +21749,43 @@ void restore_timer_vector_1110c5(void)
 	run_dos_int_ex(0x21u, 0x2505u, EF_U32(0x17d7aau), 8u, 0u, out);
 	run_dos_int_ex(0x21u, 0x2504u, EF_U16(0x17d7a8u), 8u, EF_U32(0x17d7a4u), out);
 }
+
+/* 0xc4310, 99 bytes. Map a code address to its replacement handler; unmatched addresses are recorded and routed to 0xc4377. */
+uint32_t remap_handler_c4310(uint32_t eax)
+{
+    uint32_t r;
+
+    if (eax == 0xc5a02u || eax == 0xc5a2eu)
+        return 0xc5a53u;
+    if (eax == 0xc5a7cu || eax == 0xc5aa8u)
+        return 0xc5acdu;
+    if (eax == 0xc6834u)
+        return 0xc6846u;
+    r = alias_code_address_fd404(eax);
+    if (r != eax)
+        return r;
+    r = map_address_fddd2(eax);
+    if (r != eax)
+        return r;
+    r = remap_address_d5c84((int32_t)eax);
+    if (r != eax)
+        return r;
+    EF_U32(0x159068) = eax - 0xc428du;
+    return 0xc4377u;
+}
+
+/* 0xfcc01, 31 bytes. Far-call thunk: remap the return address in the caller frame when its segment matches. */
+void remap_frame_fcc01(uint32_t ebp)
+{
+    if (EF_U16(0x17bf74) == EF_U16(ebp + 0x14))
+        EF_U32(ebp + 0x10) = remap_handler_c4310(EF_U32(ebp + 0x10));
+}
+
+/* 0xfcc6f, 45 bytes. Interrupt handler: remap the saved return address in the interrupt frame. */
+void remap_iret_frame_fcc6f(uint32_t ebp)
+{
+    uint32_t f = EF_U32(ebp + 0x10);
+
+    if (EF_U16(f + 0xe) == 2 && EF_U16(f + 0x14) == EF_U16(0x17bf74))
+        EF_U32(f + 0x10) = remap_handler_c4310(EF_U32(f + 0x10));
+}

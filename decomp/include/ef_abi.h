@@ -6360,4 +6360,11 @@ uint32_t decode_symbol_fa200(uint32_t *esi, int32_t *edx, uint32_t *eax, uint32_
 void restore_timer_vector_1110c5(void);
 void restore_timer_vector_1110c5(void); /* 0x1110c5 */
 
+uint32_t remap_handler_c4310(uint32_t eax);
+void remap_frame_fcc01(uint32_t ebp);
+void remap_iret_frame_fcc6f(uint32_t ebp);
+uint32_t remap_handler_c4310(uint32_t eax); /* 0xc4310 */
+void remap_frame_fcc01(uint32_t ebp); /* 0xfcc01 */
+void remap_iret_frame_fcc6f(uint32_t ebp); /* 0xfcc6f */
+
 #endif

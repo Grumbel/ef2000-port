@@ -9247,3 +9247,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1110c5` | none | none | 104694@1046ba | Restore the timer interrupt: reprogram the timer with divisor 0 (the default rate), restore the saved real-mode vector 8 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc4310` | EAX:uint32_t | EAX:uint32_t | fcc01@fcc15,fcc6f@fcc91 | Map a code address to its replacement handler; unmatched addresses are recorded and routed to 0xc4377. |
+| `0xfcc01` | EAX:uint32_t | none | none direct | Far-call thunk: remap the return address in the caller frame when its segment matches. |
+| `0xfcc6f` | EAX:uint32_t | none | none direct | Interrupt handler: remap the saved return address in the interrupt frame. |
