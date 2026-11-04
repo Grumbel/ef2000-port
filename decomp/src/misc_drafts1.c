@@ -8598,3 +8598,20 @@ void show_preview_picture_41314(uint32_t name)
     w = guest_fn_a46cc(EF_U8(0x001a53dcu) == 0u ? 0x001843f0u : 0x001843f4u);
     set_widget_params_a5b1c(w, EF_U32(0x0012656cu), 0x190u, 0x190u, 0x200u);
 }
+
+/* 0xe28e8, 160 bytes. One-time timer service start-up (guard byte 0x15f751): init the module (0xd6dc4), lock the handler code range (0xe28c4, 0xe28d8 - 0xe28c0 bytes) and its data (0x15f73c, 0x14 bytes) with 0x104908, hook the handler 0xe28c4 (0x102144, handle in 0x15f74c, -1 reported through 0x132a74 with 0x190860), configure it (0x102228 with 0x32), start it (0x1022dc) and install the callback 0xe28e0 in dword 0x15b620. */
+void start_timer_service_e28e8(void)
+{
+    if (EF_U8(0x0015f751u) != 0u)
+        return;
+    EF_U8(0x0015f751u) = 1u;
+    init_module_d6dc4();
+    stack_range_104908(0x000e28c4u, 0x000e28d8u - 0x000e28c0u);
+    stack_range_104908(0x0015f73cu, 0x0015f750u - 0x0015f73cu);
+    EF_U32(0x0015f74cu) = trace_call_102144(0u, 0u, 0u, 0u, 0x000e28c4u);
+    if (EF_U32(0x0015f74cu) == 0xffffffffu)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00190860u);
+    trace_call_102228(EF_U32(0x0015f74cu), 0x32u);
+    EF_U32(0x0015b620u) = 0x000e28e0u;
+    trace_call_1022dc(EF_U32(0x0015f74cu));
+}

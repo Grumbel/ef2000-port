@@ -5224,4 +5224,6 @@ void load_fixed_files_c8f38(void);
 
 void show_preview_picture_41314(uint32_t name);
 
+void start_timer_service_e28e8(void);
+
 #endif
