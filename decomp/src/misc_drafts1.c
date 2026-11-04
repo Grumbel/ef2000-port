@@ -14483,3 +14483,40 @@ void outline_box_c9360(uint32_t color, uint32_t style)
         guest_fn_e7a34_x((uint32_t)yy, (uint32_t)xx, (uint32_t)yy, (uint32_t)(ww + xx - 1), pat, c);
     }
 }
+
+/* 0x5a2d0, 405 bytes. Redraw the map cursor for the player unit (word 0x1f71c8): latch the camera (dwords 0x1a6cee.. as high words, the first minus half of the tile size word 0x128172 + 15 * byte 0x1a6d1b, shifted by 1 - byte 0x12b369) with 0xce328 and 0xcdf48, look up the player's map position (0x84e3c with the owner's byte +0x8e of the record 0x19bb5c), find the ground height (0x7b16c) and project it (0x5cb1c). When the point is visible draw a cross of half-size 5 << byte 0x12b369 in colour byte 0x128148 with two 0xc8ccc lines. */
+void draw_map_cursor_5a2d0(void)
+{
+    uint32_t pos[2];
+    uint16_t pr[2];
+    ef_addr32 u;
+    uint32_t idx;
+    uint32_t sh;
+    int32_t half;
+    uint32_t d;
+    uint32_t owner;
+    int32_t px, py, m;
+    u = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    if (u == 0u)
+        return;
+    idx = EF_U8(0x001a6d1bu);
+    sh = 1u - EF_U8(0x0012b369u);
+    half = ((int32_t)EF_U32(0x00128172u + idx * 15u) >> 16) >> sh;
+    latch_values_ce328((uint32_t)((int32_t)EF_U32(0x001a6cf0u) >> 16), (uint32_t)((int32_t)EF_U32(0x001a6cf6u) >> 16),
+                       (uint32_t)(((int32_t)EF_U32(0x001a6ceeu) >> 16) - half), (uint32_t)((int32_t)EF_U32(0x001a6cf4u) >> 16));
+    idx = EF_U8(0x001a6d1bu);
+    sh = 1u - EF_U8(0x0012b369u);
+    half = ((int32_t)EF_U32(0x00128172u + idx * 15u) >> 16) >> sh;
+    guest_fn_cdf48((uint32_t)((int32_t)EF_U32(0x001a6cf0u) >> 16), (uint32_t)((int32_t)EF_U32(0x001a6cf6u) >> 16),
+                   (uint32_t)(((int32_t)EF_U32(0x001a6ceeu) >> 16) - half), (uint32_t)((int32_t)EF_U32(0x001a6cf4u) >> 16));
+    owner = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)EF_U32(0x0019bb5cu) >> 16) * 0xcau + 0x8eu);
+    fetch_entry_pair_84e3c((ef_addr32)(uintptr_t)pos, (uint32_t)((int32_t)EF_U32(0x001f71c8u) >> 16), owner);
+    d = cell_distance_at_7b16c(0u, (int32_t)pos[0], (int32_t)pos[1]);
+    if (guest_fn_5cb1c_x((uint32_t)(uintptr_t)pr, (int32_t)pos[0], (int32_t)(0u - d), (int32_t)pos[1]) == 0u)
+        return;
+    px = (int16_t)pr[0];
+    py = (int16_t)pr[1];
+    m = 5 << EF_U8(0x0012b369u);
+    guest_fn_c8ccc_x((uint32_t)(py + m), (uint32_t)(px + m), (uint32_t)(py - m), (uint32_t)(px - m), EF_U8(0x00128148u));
+    guest_fn_c8ccc_x((uint32_t)(py + m), (uint32_t)(px - m), (uint32_t)(py - m), (uint32_t)(px + m), EF_U8(0x00128148u));
+}

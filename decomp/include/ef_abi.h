@@ -5731,4 +5731,7 @@ void outline_box_c9360(uint32_t color, uint32_t style);
 
 
 
+void draw_map_cursor_5a2d0(void);
+uint8_t guest_fn_5cb1c_x(uint32_t arg, int32_t x, int32_t y, int32_t z); /* 0x5cb1c EAX/EDX/EBX/ECX -> AL */
+
 #endif

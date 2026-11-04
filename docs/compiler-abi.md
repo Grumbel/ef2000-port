@@ -8031,3 +8031,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5a2d0` | none | none | 598e8@5991a,598e8@59926,598e8@59937 | Redraw the map cursor for the player unit (word 0x1f71c8): latch the camera (dwords 0x1a6cee.. as high words, the first  |
