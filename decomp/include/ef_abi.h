@@ -4410,4 +4410,9 @@ void draw_bar_9bca4(uint32_t colour, uint32_t unused, uint32_t x, uint32_t h);
 
 
 
+/* search_helpers1.c */
+uint32_t find_text_in_buffer_e0b10(ef_addr32 text);
+uint32_t cell_changed_3a268(uint32_t index);
+uint32_t guest_fn_85bc8_x(ef_addr32 point); /* 0x85bc8 EAX, result in AL */
+
 #endif

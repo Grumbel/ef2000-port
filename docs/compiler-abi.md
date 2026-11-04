@@ -5201,3 +5201,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9bca4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 98eac@98ecd,98eac@98eea,98eac@98f07 | Draw a bar of height h (when non-zero) at x: a coloured strip via 0xc99ac and a highlight via 0xc9a98. |
+
+## search_helpers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe0b10` | EAX:ef_addr32 | EAX:uint32_t | e0b88@e0bbd,e115c@e1172,e1260@e1265 | Search the buffer at 0x15f5fd (length byte at 0x15f684) for the text, ignoring case; on a hit remember its position at 0 |
+| `0x3a268` | EAX:uint32_t | EAX:uint32_t | 3a148@3a238 | Return 1 when the cell found for the 69-byte record's coordinates (dwords at +7/+0xf divided by 2048) differs from the r |

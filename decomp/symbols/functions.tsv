@@ -677,7 +677,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00039edc	289			unknown	unclassified	unverified		
 0x0003a000	328			unknown	unclassified	unverified		
 0x0003a148	288			unknown	unclassified	unverified		
-0x0003a268	94			unknown	unclassified	unverified		
+0x0003a268	94	cell_changed_3a268	search_helpers1	compiles	game	confirmed	decomp/tests/0x0003a268.json	docs/compiler-abi.md; Return 1 when the cell found for the 69-byte record's coordinates (dwords at +7/+0xf divided by 2048) differs from the r; callers 3a148@3a238; guest pending
 0x0003a2d0	117	build_ring_table_3a2d0	game_helpers31	compiles	game	confirmed	decomp/tests/0x0003a2d0.json	docs/compiler-abi.md; Build a 36-entry table of scaled sine/cosine pairs (radius 60).; callers 3a3a8@3a499; guest pending
 0x0003a3a8	6328			unknown	unclassified	unverified		
 0x0003bc60	47	draw_cross_3bc60	game_helpers23	compiles	game	confirmed	decomp/tests/0x0003bc60.json	docs/compiler-abi.md; Draw a small cross of arm length 3 at (x, y).; callers 3a3a8@3b038; guest pending
@@ -3306,7 +3306,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e0870	111	fill_channel_e0870	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e0870.json	docs/compiler-abi.md; Fill the channel record selected by byte 0x15f07f.; callers e1194@e1194; guest pending
 0x000e0930	81			unknown	unclassified	unverified		
 0x000e0a90	116			unknown	unclassified	unverified		
-0x000e0b10	92			unknown	unclassified	unverified		
+0x000e0b10	92	find_text_in_buffer_e0b10	search_helpers1	compiles	game	confirmed	decomp/tests/0x000e0b10.json	docs/compiler-abi.md; Search the buffer at 0x15f5fd (length byte at 0x15f684) for the text, ignoring case; on a hit remember its position at 0; callers e0b88@e0bbd,e115c@e1172,e1260@e1265; guest pending
 0x000e0b6c	28			unknown	unclassified	unverified		
 0x000e0b88	65	open_device_e0b88	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000e0b88.json	docs/compiler-abi.md; Open the device selected by value and report success.; callers e0b6c@e0b71,e0bcc@e0c37,e1194@e11c6; guest pending
 0x000e0bcc	114			unknown	unclassified	unverified		
