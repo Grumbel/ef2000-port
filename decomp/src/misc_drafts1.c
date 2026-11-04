@@ -4526,3 +4526,16 @@ void compact_slots_3739c(int32_t unit)
         }
     }
 }
+
+/* 0x8ae6c, 251 bytes. Map the key code 1..36 to its command number through a jump table (0 and anything above 36 report 0x18a7a4 through the error hook 0x132a74 and give 0). */
+uint32_t map_key_to_command_8ae6c(uint32_t key)
+{
+    static const uint8_t map[37] = {
+        0, 2, 3, 4, 5, 17, 18, 19, 6, 7, 8, 9, 21, 20, 22, 23, 10, 11,
+        12, 13, 14, 15, 24, 25, 26, 27, 28, 1, 29, 30, 33, 34, 35, 42, 41, 38, 39
+    };
+    if (key <= 0x24u && map[key] != 0u)
+        return map[key];
+    guest_callptr2_x(EF_U32(0x00132a74u), 0x0018a7a4u, key);
+    return 0u;
+}

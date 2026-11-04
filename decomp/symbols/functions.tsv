@@ -1765,7 +1765,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008a318	956			unknown	unclassified	unverified		
 0x0008a6d4	1241			unknown	unclassified	unverified		
 0x0008ac64	370			unknown	unclassified	unverified		
-0x0008ae6c	251			unknown	unclassified	unverified		
+0x0008ae6c	251	map_key_to_command_8ae6c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008ae6c.json	docs/compiler-abi.md; Map the key code 1..36 to its command number through a jump table (0 and anything above 36 report 0x18a7a4 through the e; callers 69094@690e8,69094@69190,69094@692c4; guest pending
 0x0008af68	749			unknown	unclassified	unverified		
 0x0008b274	100	candidate_game_main		named	unclassified	unverified		candidate game main; docs/ghidra-findings.md
 0x0008b2d8	78	reload_game_data_8b2d8	state_reset1	compiles	game	confirmed	decomp/tests/0x0008b2d8.json	docs/compiler-abi.md; Reload the game data: tear down the video state, build the data file path, load it to 0x425190 through the handler at 0x; callers 8b274@8b290; guest pending

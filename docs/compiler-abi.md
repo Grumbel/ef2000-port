@@ -6013,3 +6013,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x3739c` | EAX:int32_t | none | 17388@1739c,90074@900b5 | Compact the nine slot words (+0x28, stride 0x45 per group in the table 0x1a14f8) of the group UNIT: a slot is kept when  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8ae6c` | EAX:uint32_t | EAX:uint32_t | 69094@690e8,69094@69190,69094@692c4 | Map the key code 1..36 to its command number through a jump table (0 and anything above 36 report 0x18a7a4 through the e |
