@@ -4825,3 +4825,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xba77c` | EAX:ef_addr32,EDX:uint32_t | none | bb324@bb47d | Fill a six-byte colour record chosen by a 1-based key: two leading bytes from the key, four trailing bytes of 4, except  |
+
+## draw_loops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x461e8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 76e2c@76f47 | Call 0x46254 for each of the seven 16-bit entries (+0x4e) of a 0xca-byte record. |

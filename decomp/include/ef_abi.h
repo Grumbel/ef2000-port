@@ -4196,4 +4196,7 @@ uint32_t wait_ring_data_106dc4(ef_addr32 rec, uint32_t timeout);
 /* colour_tables3.c */
 void fill_colour_record_ba77c(ef_addr32 rec, uint32_t key);
 
+/* draw_loops1.c */
+void draw_record_entries_461e8(uint32_t x, uint32_t index, uint32_t y, uint32_t c, uint32_t s0, uint32_t s1);
+
 #endif
