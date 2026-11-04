@@ -3303,3 +3303,12 @@ in EAX, format string address, one value).
 | `0xb3f58` | AX:int16_t | EAX:uint32_t | 6b50@6b8e,6b50@6bd0,bc38@bc55 | Look up a 1-based id in the table at [0x41f370] or abort. |
 | `0xc32dc` | EAX:int32_t | none | c3430@c345c | Allocate the work block from either pool depending on its size. |
 | `0xc34cc` | EAX:uint32_t | EAX:uint32_t | ab74@ae62,278c0@2790a,284ec@28501 | Start the driver unless it is already busy; abort when it fails. |
+
+## runtime_helpers23 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc3714` | EAX:uint32_t,EDX:ef_addr32,EBX:ef_addr32 | AL:uint8_t | abf8c@ac00d,abf8c@ac077 | Query the driver and return its two 16-bit status words. |
+| `0xc3f1c` | none | none | cdb20@cdc2b,d1d40@d1d9d,dc250@dc25c | Blit the screen buffer through the driver callback. |
+| `0xca780` | EAX:ef_addr32 | EAX:uint32_t | aca14@aca48,acac0@acb26 | Find a name in the table of 25-byte entries at 0x13727e. |
+| `0xcc744` | EAX:uint32_t | EAX:uint32_t | 3cb2c@3cb84,3cb2c@3cb97,b3374@b339f | Allocate a block for a non-null request, aborting on failure. |

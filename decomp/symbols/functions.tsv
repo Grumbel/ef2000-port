@@ -2734,7 +2734,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c3584	234			unknown	unclassified	unverified		
 0x000c3670	68			unknown	unclassified	unverified		
 0x000c36b4	95			unknown	unclassified	unverified		
-0x000c3714	81			unknown	unclassified	unverified		
+0x000c3714	81	query_driver_words_c3714	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000c3714.json	docs/compiler-abi.md; Query the driver and return its two 16-bit status words.; callers abf8c@ac00d,abf8c@ac077; guest pending
 0x000c3770	121			unknown	unclassified	unverified		
 0x000c37ec	55	free_buffers_c37ec	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000c37ec.json	docs/compiler-abi.md; Free the two buffers at 0x146e40/0x146e44.; callers cdc38@cdc3a,d1d40@d1d84; guest pending
 0x000c3824	6	get_global_c3824	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000c3824.json	docs/compiler-abi.md; ; callers eac48@eaca8; guest pending
@@ -2755,7 +2755,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c3a48	41	release_buffer_c3a48	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3a48.json	docs/compiler-abi.md; When dword 0x15b758 is set and byte 0x146e4a clear, * release it through 0xc3f80 and clear it.; callers c3ae8@c3c11; guest pending
 0x000c3a74	79	select_draw_handlers_c3a74	game_helpers30	compiles	game	confirmed	decomp/tests/0x000c3a74.json	docs/compiler-abi.md; Choose the drawing handlers from two mode flags.; callers cdb20@cdbd0; guest pending
 0x000c3ae8	363			unknown	unclassified	unverified		
-0x000c3f1c	52			unknown	unclassified	unverified		
+0x000c3f1c	52	blit_screen_c3f1c	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000c3f1c.json	docs/compiler-abi.md; Blit the screen buffer through the driver callback.; callers cdb20@cdc2b,d1d40@d1d9d,dc250@dc25c; guest pending
 0x000c3f50	21	read_buffer_byte	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3f50.json	docs/compiler-abi.md; Byte at dword 0x15b754 + EAX + dword 0x163200[EDX].; callers afbc@b0b2,afbc@b0c1,afbc@b0d4; guest pending
 0x000c3f70	5			unknown	unclassified	unverified		
 0x000c3f78	5			unknown	unclassified	unverified		
@@ -2862,7 +2862,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ca290	474			unknown	unclassified	unverified		
 0x000ca5e4	60	clear_record_flags_ca5e4	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ca5e4.json	docs/compiler-abi.md; Clear the flag bytes of records from the start index upward.; callers ac16c@ac177; guest pending
 0x000ca620	349			unknown	unclassified	unverified		
-0x000ca780	85			unknown	unclassified	unverified		
+0x000ca780	85	find_name_index_ca780	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000ca780.json	docs/compiler-abi.md; Find a name in the table of 25-byte entries at 0x13727e.; callers aca14@aca48,acac0@acb26; guest pending
 0x000ca7e0	88	rebuild_tables_ca7e0	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ca7e0.json	docs/compiler-abi.md; ; callers ba5c@baaf,bfcc@c0c1; guest pending
 0x000ca838	58	free_kind2_nodes_ca838	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000ca838.json	docs/compiler-abi.md; Unlink and free every kind-2 node of the list.; callers b0f5c@b115d,b0f5c@b1516; guest pending
 0x000ca874	391			unknown	unclassified	unverified		
@@ -2909,7 +2909,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc694	24	code_is_23_or_24	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc694.json	docs/compiler-abi.md; AL is 0x23 or 0x24.; callers d68c@e00b,d68c@e157,d68c@e25f; guest pending
 0x000cc6ac	17	code_is_22	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc6ac.json	docs/compiler-abi.md; AL is 0x22.; callers d68c@e035,d68c@e288,9a8b4@9a97d; guest pending
 0x000cc6c0	132			unknown	unclassified	unverified		
-0x000cc744	34			unknown	unclassified	unverified		
+0x000cc744	34	alloc_checked_cc744	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000cc744.json	docs/compiler-abi.md; Allocate a block for a non-null request, aborting on failure.; callers 3cb2c@3cb84,3cb2c@3cb97,b3374@b339f; guest pending
 0x000cc768	5			unknown	unclassified	unverified		
 0x000cc76d	87	parse_int_cc76d	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc76d.json	docs/compiler-abi.md; Same as 0x9d4cd.; callers e980@e98a,f3b58@f3b6f; guest pending
 0x000cc7d0	23			unknown	unclassified	unverified		

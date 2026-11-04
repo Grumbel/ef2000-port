@@ -2603,4 +2603,13 @@ uint32_t guest_fn_e2b54(void); /* 0xe2b54 -> EAX */
 uint32_t guest_fn_c3430(uint32_t a); /* 0xc3430 EAX -> AL */
 void guest_fn_c3328(void); /* 0xc3328 */
 
+/* runtime_helpers23.c */
+uint8_t query_driver_words_c3714(uint32_t request, ef_addr32 first, ef_addr32 second);
+void blit_screen_c3f1c(void);
+uint32_t find_name_index_ca780(ef_addr32 name);
+uint32_t alloc_checked_cc744(uint32_t size);
+void guest_fn_c3a28(void); /* 0xc3a28 */
+uint32_t guest_fn_9d524(ef_addr32 a, ef_addr32 b); /* 0x9d524 EAX/EDX */
+uint32_t guest_fn_c3f78(uint32_t size); /* 0xc3f78 EAX */
+
 #endif
