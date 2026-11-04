@@ -5927,3 +5927,36 @@ void run_top_script_f4a88(void)
     if (EF_U8(0x00485f78u) == 0u)
         guest_callptr2_x(EF_U32(0x00132a74u), 0x00191f0cu, EF_U32(0x00161ea8u));
 }
+
+/* 0x777f4, 339 bytes. Test the position POS (three dwords) against the entries of the pointer table at dword 0x1f8900 (count word 0x1f891c, scanned from the end, key word 0x1f891e must not be 0xffff): for each entry without flag 8 (byte +0x24) and within 0x40000 units on all three axes, call 0xa0ea8; then ask 0xd0470 (coordinates >> 8) whether the entry is hit and, if so, trigger the two impact effects (0x106b0 at the entry and at POS, each followed by 0x748f4 on the object ID word +0x16 with kind 0x64) and stop. Returns 1 when something was hit, else 0. */
+uint32_t check_position_hit_777f4(uint32_t pos)
+{
+    uint16_t n = EF_U16(0x001f891cu);
+    uint8_t found = 0u;
+    uint32_t e;
+    if (EF_U16(0x001f891eu) == 0xffffu)
+        return 0u;
+    while (n != 0u && found == 0u) {
+        n--;
+        e = EF_U32(EF_U32(0x001f8900u) + (uint32_t)(int32_t)(int16_t)n * 4u);
+        if (!(EF_U8(e + 0x24u) & 8u)) {
+            if ((int32_t)abs_a28f2((int32_t)(EF_U32(e) - EF_U32(pos))) < 0x40000 &&
+                (int32_t)abs_a28f2((int32_t)(EF_U32(e + 4u) - EF_U32(pos + 4u))) < 0x40000 &&
+                (int32_t)abs_a28f2((int32_t)(EF_U32(e + 8u) - EF_U32(pos + 8u))) < 0x40000) {
+                guest_fn_a0ea8((int16_t)EF_U16(0x001f891eu), (uint32_t)(int32_t)(int16_t)EF_U16(e + 0xcu),
+                               (int16_t)EF_U16(e + 0xeu), (uint32_t)(int32_t)(int16_t)EF_U16(e + 0x10u));
+            }
+        }
+        if (guest_fn_d0470((int16_t)EF_U16(0x001f891eu), (int32_t)EF_U32(e) >> 8, (int32_t)EF_U32(e + 4u) >> 8,
+                           (int32_t)EF_U32(e + 8u) >> 8) != 0u) {
+            found = 1u;
+            guest_fn_106b0_x(0xffffffffu, (uint32_t)((int32_t)EF_U32(e) >> 8), (uint32_t)((int32_t)EF_U32(e + 4u) >> 8),
+                             (uint32_t)((int32_t)EF_U32(e + 8u) >> 8), 0u);
+            send_or_defer_748f4((int16_t)EF_U16(e + 0x16u), 0u, 0u, 0x64u);
+            guest_fn_106b0_x(0xffffffffu, (uint32_t)((int32_t)EF_U32(pos) >> 8), (uint32_t)((int32_t)EF_U32(pos + 4u) >> 8),
+                             (uint32_t)((int32_t)EF_U32(pos + 8u) >> 8), 0u);
+            send_or_defer_748f4((int16_t)EF_U16(pos + 0x16u), 0u, 0u, 0x64u);
+        }
+    }
+    return found;
+}

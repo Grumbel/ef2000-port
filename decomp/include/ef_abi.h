@@ -4981,4 +4981,7 @@ void install_render_table_e1570(void);
 
 void run_top_script_f4a88(void);
 
+uint32_t check_position_hit_777f4(uint32_t pos);
+void guest_fn_106b0_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0x106b0 EAX/EDX/EBX/ECX + 1 stack, ret 4 */
+
 #endif

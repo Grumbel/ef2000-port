@@ -6265,3 +6265,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf4a88` | none | none | f478c@f47bb | Start the script section at the top level: push a fresh node (0xf57d4), set its default view words (+0x4f/+0x51 = 0x14,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x777f4` | EAX:uint32_t | EAX:uint32_t | 8de9c@8e006 | Test the position POS (three dwords) against the entries of the pointer table at dword 0x1f8900 (count word 0x1f891c, sc |
