@@ -9311,3 +9311,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x110f6f` | none | none | 1114c7@1114e8 | Under the 0x101e70/0x101e78 lock find the smallest reload value among the active timer slots (0x17d664[i] != 0, value 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x119a54` | none | none | 1196a0@1196b9 | Combine globals: M = a*b*c*d + e*f*g + i*j*k*g is stored at 0x432a48 and c*d*n*g*p*M at 0x432920. |

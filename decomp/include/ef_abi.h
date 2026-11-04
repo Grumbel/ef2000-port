@@ -6407,4 +6407,7 @@ void interp_blend_10a164(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0x10a164 
 void timer_reprogram_110f6f(void);
 void timer_reprogram_110f6f(void); /* 0x110f6f */
 
+void combine_globals_119a54(void);
+void combine_globals_119a54(void); /* 0x119a54 */
+
 #endif

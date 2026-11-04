@@ -4163,7 +4163,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001198ec	75	update_globals_1198ec	float_helpers9	compiles	game	confirmed	decomp/tests/0x001198ec.json	docs/compiler-abi.md; Combine the double globals: 0x432a70 = g[432ae0] * g[432948] * g[432908] + g[432c48] * g[432ac8]; 0x432b38 = g[432da0] *; callers 1196a0@1196aa; guest pending
 0x00119938	141			unknown	unclassified	unverified		
 0x001199c8	139			unknown	unclassified	unverified		
-0x00119a54	117			unknown	unclassified	unverified		
+0x00119a54	117	combine_globals_119a54	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119a54.json	docs/compiler-abi.md; Combine globals: M = a*b*c*d + e*f*g + i*j*k*g is stored at 0x432a48 and c*d*n*g*p*M at 0x432920.; callers 1196a0@1196b9; guest pending
 0x00119acc	265			unknown	unclassified	unverified		
 0x00119be0	813			unknown	unclassified	unverified		
 0x00119f10	119			unknown	unclassified	unverified		

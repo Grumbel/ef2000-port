@@ -22399,3 +22399,19 @@ void timer_reprogram_110f6f(void)
     }
     guest_fn_101e78();
 }
+
+/* 0x119a54, 117 bytes. Combine globals: M = a*b*c*d + e*f*g + i*j*k*g is stored at 0x432a48 and c*d*n*g*p*M at 0x432920. */
+void combine_globals_119a54(void)
+{
+    double a = md_rd_f64(0x00432ac0u) * md_rd_f64(0x00432348u);
+    double c = md_rd_f64(0x00433040u);
+    double d = md_rd_f64(0x001956ccu);
+    double g = md_rd_f64(0x00432200u);
+    double m;
+
+    m = a * c * d;
+    m = m + md_rd_f64(0x00432a40u) * md_rd_f64(0x00432c48u) * g;
+    m = m + md_rd_f64(0x00432b28u) * md_rd_f64(0x00432948u) * md_rd_f64(0x00432908u) * g;
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x00432a48u) = m;
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x00432920u) = c * d * md_rd_f64(0x00432da0u) * g * md_rd_f64(0x00433058u) * m;
+}
