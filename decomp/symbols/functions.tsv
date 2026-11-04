@@ -1248,7 +1248,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00069374	458	apply_selection_69374	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069374.json	docs/compiler-abi.md; Variant of 0x69540 that acts on the selection: latches the same two position triples into the cursor state (the latch is; callers 69740@698e9; guest pending
 0x00069540	317	latch_box_69540	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069540.json	docs/compiler-abi.md; Latch a box defined by two position triples (EAX: three words, EDX: three words) into the cursor state when word 0x1f6f4; callers 69740@698f6; guest pending
 0x00069680	189	transform_point_69680	game_helpers39	compiles	game	confirmed	decomp/tests/0x00069680.json	docs/compiler-abi.md; Transform (x, y) by the 3x3 matrix at 0x15ffda and add the translation pair.; callers 69740@69859; guest pending
-0x00069740	466			unknown	unclassified	unverified		
+0x00069740	466	update_cursor_window_69740	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069740.json	docs/compiler-abi.md; Per-frame update of the tactical cursor window. Updates the view scale (0xdc314), calls 0xdc334(2, 2) and resets the vie; callers none direct; guest pending
 0x00069914	10	gpwShowCurrent		named	unclassified	unverified		
 0x00069920	86	gpwTurnYPlane		named	unclassified	unverified		
 0x00069978	89	gpwArcadeAccepted		named	unclassified	unverified		

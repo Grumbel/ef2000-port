@@ -16520,3 +16520,50 @@ void apply_selection_69374(ef_addr32 first, ef_addr32 second)
 	}
 	EF_U32(0x001282e0u) = 0xffffffffu;
 }
+
+/* 0x69740, 466 bytes. Per-frame update of the tactical cursor window. Updates the view scale (0xdc314), calls 0xdc334(2, 2) and resets the view (0xc4105). Moves the window corner words 0x1f6f46, 0x1f6f44 and 0x1f6f3a one eighth of the way (signed, truncating) towards their targets (words 0x1f6f3c, 0x1f6f3e and 0x1f6f48), rotates the offset (0xc8d30 with the new corners), sets the scene angles (0xc4654), calls 0x9e0c4 for the unit in the high half of dword 0x1282da, transforms the cursor point (0x69680, from words 0x41eefc/0x41eefe minus 0x15bdbc/0x15bdb8), clears the pair references of the thirteen slots (0xe7c50 with -1), reassigns the page words (0x68e84), re-attaches every active slot (byte 0x1f6ef4 + 3 * slot set and word 0x1f6ef5 nonzero) through 0xe7c50 and finally runs 0x69374 (word 0x12830e set) or 0x69540 on the transformed point. Clears word 0x12830e after 0xc4167. */
+void update_cursor_window_69740(void)
+{
+	uint8_t pt[16];
+	int16_t t3c, t3e, t3a, t44, t46, t48, r1, r2, r3, x, y;
+	int32_t i, slot;
+	uint32_t unit;
+
+	update_view_scale_dc314();
+	guest_mode_36_hook(2u, 2u);
+	reset_view_c4105();
+	t3c = (int16_t)EF_U16(0x001f6f3cu);
+	t46 = (int16_t)EF_U16(0x001f6f46u);
+	r1 = (int16_t)(t46 + (int16_t)(t3c - t46) / 8);
+	t3e = (int16_t)EF_U16(0x001f6f3eu);
+	t44 = (int16_t)EF_U16(0x001f6f44u);
+	r2 = (int16_t)(t44 + (int16_t)(t3e - t44) / 8);
+	EF_U16(0x001f6f46u) = (uint16_t)r1;
+	t48 = (int16_t)EF_U16(0x001f6f48u);
+	t3a = (int16_t)EF_U16(0x001f6f3au);
+	r3 = (int16_t)(t3a + (int16_t)(t48 - t3a) / 8);
+	EF_U16(0x001f6f44u) = (uint16_t)r2;
+	EF_U16(0x001f6f3au) = (uint16_t)r3;
+	rotate_offset_c8d30(0u, 0u, 0u, (uint32_t)(int32_t)r1, (uint32_t)(int32_t)r2, (uint32_t)(int32_t)r3);
+	guest_fn_c4654(0u, (uint32_t)(int32_t)r2, (uint32_t)(int32_t)r1);
+	unit = (uint32_t)((int32_t)EF_U32(0x001282dau) >> 16);
+	guest_fn_9e0c4((int32_t)unit, 0u, 0u, 0u);
+	x = (int16_t)(EF_U16(0x0041eefcu) - EF_U16(0x0015bdbcu));
+	y = (int16_t)(EF_U16(0x0041eefeu) - EF_U16(0x0015bdb8u));
+	transform_point_69680((ef_addr32)(uintptr_t)pt, (ef_addr32)(uintptr_t)(pt + 8), (int16_t)y, (int16_t)x);
+	for (i = 0; i < 13; i++)
+		guest_fn_e7c50((int32_t)unit, -1, (uint32_t)i);
+	assign_page_words_68e84((uint32_t)((int32_t)EF_U32(0x001f6f48u) >> 16));
+	for (i = 0; i < 13; i++) {
+		if (EF_U8(0x001f6ef4u + (uint32_t)(i * 3)) == 0u || EF_U16(0x001f6ef5u + (uint32_t)(i * 3)) == 0u)
+			continue;
+		slot = (int32_t)EF_U32(0x001f6ef1u + (uint32_t)(i * 3)) >> 24;
+		guest_fn_e7c50((int32_t)unit, (int32_t)EF_U32(0x0012bc88u + (uint32_t)(slot * 0x91)) >> 16, (uint32_t)i);
+	}
+	if (EF_U16(0x0012830eu) != 0u)
+		apply_selection_69374((ef_addr32)(uintptr_t)pt, (ef_addr32)(uintptr_t)(pt + 8));
+	else
+		latch_box_69540((ef_addr32)(uintptr_t)pt, (ef_addr32)(uintptr_t)(pt + 8));
+	guest_fn_c4167_x();
+	EF_U16(0x0012830eu) = 0u;
+}

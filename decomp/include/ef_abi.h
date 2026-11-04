@@ -5864,4 +5864,9 @@ uint32_t pick_nearest_candidate_6a8fc(uint32_t ax);
 void apply_selection_69374(ef_addr32 first, ef_addr32 second);
 void guest_fn_68a60_x(int32_t a, int32_t b); /* 0x68a60 EAX/EDX */
 
+void update_cursor_window_69740(void);
+void guest_fn_c4167_x(void); /* 0xc4167 */
+
+
+
 #endif
