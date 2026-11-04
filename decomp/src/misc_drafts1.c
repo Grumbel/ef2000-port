@@ -8174,3 +8174,35 @@ void normalise_globals_109a80(void)
     EF_D(0x004323a8u) = EF_D(0x00432b18u) / EF_D(0x00432d38u);
 #undef EF_D
 }
+
+/* 0xd4430, 117 bytes. Draw one dithered shaded span: from the signed word 0x485fea to the signed word 0x485fd2 (nothing unless the end is after the start) on the row signed word 0x485fee, stepping the shade value from dword 0x485ff8 towards dword 0x485fe0 (signed step = difference / length), fetching each pixel from the shade table whose base is dword 0x159084 at (dither + shade) >> 16. The dither word comes from 0x486014[(row * 2) ^ x0] and is advanced with the add/adc pair on its two bytes. The span is length + 1 pixels long. */
+void draw_dithered_span_d4430(void)
+{
+    int32_t x0 = (int16_t)EF_U16(0x00485feau);
+    int32_t n = (int32_t)(int16_t)EF_U16(0x00485fd2u) - x0;
+    int32_t row, step;
+    uint32_t dst, end, v, base;
+    uint8_t cl, ch, c;
+    if (n <= 0)
+        return;
+    row = (int16_t)EF_U16(0x00485feeu);
+    dst = EF_U32(0x00163200u + (uint32_t)row * 4u) + EF_U32(0x0015b754u) + (uint32_t)x0;
+    step = ((int32_t)EF_U32(0x00485fe0u) - (int32_t)EF_U32(0x00485ff8u)) / n;
+    v = EF_U32(0x00485ff8u);
+    end = dst + (uint32_t)n;
+    {
+        uint32_t d = EF_U16(0x00486014u + ((((uint32_t)row * 2u) ^ (uint32_t)x0)));
+        cl = (uint8_t)d;
+        ch = (uint8_t)(d >> 8);
+    }
+    base = EF_U32(0x00159084u);
+    do {
+        uint32_t idx = (((uint32_t)ch << 8 | cl) + v) >> 16;
+        v += (uint32_t)step;
+        EF_U8(dst) = EF_U8(base + idx);
+        c = (uint8_t)(((uint32_t)ch + cl) > 0xffu);
+        ch = (uint8_t)(ch + cl);
+        dst++;
+        cl = (uint8_t)(cl + ch + c);
+    } while (dst <= end);
+}

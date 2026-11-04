@@ -6774,3 +6774,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x109a80` | none | none | e474c@e476d | Normalise the double globals: with k = 1 / double 0x433050, 0x432378/0x432380/0x432388 = 0x432a90/98/a0 * k and 0x432360 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd4430` | none | none | none direct | Draw one dithered shaded span: from the signed word 0x485fea to the signed word 0x485fd2 (nothing unless the end is afte |

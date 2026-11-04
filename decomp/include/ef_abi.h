@@ -5181,4 +5181,6 @@ void matrix_multiply_d08fc(uint32_t out, uint32_t a, uint32_t b);
 
 void normalise_globals_109a80(void);
 
+void draw_dithered_span_d4430(void);
+
 #endif

@@ -3052,7 +3052,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d3e50	1015			unknown	unclassified	unverified		
 0x000d4250	250			unknown	unclassified	unverified		
 0x000d4370	173			unknown	unclassified	unverified		
-0x000d4430	117			unknown	unclassified	unverified		
+0x000d4430	117	draw_dithered_span_d4430	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d4430.json	docs/compiler-abi.md; Draw one dithered shaded span: from the signed word 0x485fea to the signed word 0x485fd2 (nothing unless the end is afte; callers none direct; guest pending
 0x000d44b0	84			unknown	unclassified	unverified		
 0x000d4510	197	fill_span_d4510	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d4510.json	docs/compiler-abi.md; Fill one horizontal span with the colour byte 0x159138: from the signed word 0x485fea to the signed word 0x485fd2 (inclu; callers fddf0@fde0c; guest pending
 0x000d53ff	1676			unknown	unclassified	unverified		
