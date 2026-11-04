@@ -7310,3 +7310,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa5b70` | EAX:ef_addr32 | none | a5ef8@a5fa1 | Draw the widget W (EAX) when it is visible: its size words +0x75/+0x77 must be positive and its rectangle (position high |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa80b0` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a83c3 | Expand the %NAME placeholders of the text at TEXT (EAX) in place: copy characters to a 0x50-byte work buffer and, at eve |

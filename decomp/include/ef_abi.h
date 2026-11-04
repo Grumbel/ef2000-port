@@ -5382,4 +5382,6 @@ uint32_t fseek_f2183(ef_addr32 stream, uint32_t offset, uint32_t whence);
 
 void draw_widget_a5b70(ef_addr32 w);
 
+uint32_t expand_placeholders_a80b0(ef_addr32 text);
+
 #endif

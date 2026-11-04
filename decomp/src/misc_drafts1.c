@@ -10959,3 +10959,61 @@ void draw_widget_a5b70(ef_addr32 w)
         init_view_corners_c9ecc();
     }
 }
+
+/* 0xa80b0, 308 bytes. Expand the %NAME placeholders of the text at TEXT (EAX) in place: copy characters to a 0x50-byte work buffer and, at every '%', read the word up to the next blank (upper-cased with 0xe7835), look it up in the 0x15-byte name table at 0x419218 (count word 0x4194c4, compared with 0xa4380) and append its value: the string pointer at dword table 0x418708 for entries whose byte 0x41948e is 1, otherwise the number formatted with 0x18d664. An unknown name is reported (through 0x132a74 with 0x18d634 when byte 0x1371f9 is set) or replaced by the text 0x18d658. The result is copied back over TEXT; returns its length. */
+uint32_t expand_placeholders_a80b0(ef_addr32 text)
+{
+    char L[0x74];
+    uint32_t l = (uint32_t)(uintptr_t)L;
+    uint32_t in = 0u;
+    int16_t out = 0;
+    int16_t cx;
+    uint32_t si;
+    uint8_t c;
+    memset(L, 0, sizeof(L));
+    for (;;) {
+        c = EF_U8(text + (uint32_t)(int32_t)(int16_t)in);
+        if (c == 0u)
+            break;
+        if (c != 0x25u) {
+            in++;
+            L[(int16_t)out] = (char)c;
+            out++;
+            continue;
+        }
+        in++;
+        L[(int16_t)out] = 0;
+        si = 0u;
+        for (;;) {
+            c = EF_U8(text + (uint32_t)(int32_t)(int16_t)in);
+            if (c == 0x20u || c == 0u)
+                break;
+            c = (uint8_t)guest_fn_e7835(c);
+            in++;
+            L[0x50 + (int16_t)si] = (char)c;
+            si++;
+        }
+        L[0x50 + (int16_t)si] = 0;
+        cx = 0;
+        while (guest_fn_a4380(l + 0x50u, 0x00419218u + (uint32_t)((int32_t)cx * 0x15)) != 0u
+               && cx < (int16_t)EF_U16(0x004194c4u))
+            cx++;
+        if (cx >= (int16_t)EF_U16(0x004194c4u)) {
+            if (EF_U8(0x001371f9u) != 0u) {
+                (void)guest_sprintf_a4342(l, 0x0018d634u, l + 0x50u);
+                guest_callptr1_x(EF_U32(0x00132a74u), l);
+            } else {
+                (void)strcat_9ca57(l, 0x0018d658u);
+            }
+        } else if (EF_U8(0x0041948eu + (uint32_t)(int32_t)cx) == 1u) {
+            (void)strcat_9ca57(l, EF_U32(0x00418708u + (uint32_t)((int32_t)cx * 4)));
+        } else {
+            (void)guest_sprintf_a4342(l + 0x68u, 0x0018d664u, EF_U32(0x00418708u + (uint32_t)((int32_t)cx * 4)));
+            (void)strcat_9ca57(l, l + 0x68u);
+        }
+        out = (int16_t)guest_fn_b1b8b(l);
+    }
+    L[(int16_t)out] = 0;
+    copy_string_9d749(text, l);
+    return guest_fn_b1b8b(text);
+}

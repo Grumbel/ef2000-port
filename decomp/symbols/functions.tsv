@@ -2334,7 +2334,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a7ec4	158	lookup_key_a7ec4	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a7ec4.json	docs/compiler-abi.md; Look up a key name; unknown names return a fallback slot.; callers 4738@47ec,4bf8@4c41,5488@55fd; guest pending
 0x000a7f64	173	find_key_checked_a7f64	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a7f64.json	docs/compiler-abi.md; Look up a key name that must exist and be of kind 1.; callers 27fec@27ffe; guest pending
 0x000a8060	80	fill_entries_a8060	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a8060.json	docs/compiler-abi.md; Write the fill byte to every live entry of the table, clear dead ones.; callers 283c8@2840f; guest pending
-0x000a80b0	308			unknown	unclassified	unverified		
+0x000a80b0	308	expand_placeholders_a80b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a80b0.json	docs/compiler-abi.md; Expand the %NAME placeholders of the text at TEXT (EAX) in place: copy characters to a 0x50-byte work buffer and, at eve; callers a82f0@a83c3; guest pending
 0x000a81e4	225	open_named_data_a81e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a81e4.json	docs/compiler-abi.md; Open a named script/data file: take the first whitespace-delimited token of NAME (EAX), format "<fmt 0x18d668>" from the; callers a82f0@a83a3; guest pending
 0x000a82f0	607			unknown	unclassified	unverified		
 0x000a8578	229	draw_text_by_font_a8578	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a8578.json	docs/compiler-abi.md; Draw the text at ECX with the font selected by the byte at [[0x4191d0] + 0x10] (0..9: 0xdd788, 0xf23ac, 0xf261c, 0xdccd8; callers a8660@a86d6; guest pending
