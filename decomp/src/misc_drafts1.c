@@ -5077,3 +5077,45 @@ void update_view_stages_45574(uint32_t a, uint32_t s, uint32_t b)
         guest_fn_441fc_x(a, s);
     }
 }
+
+/* 0xa5ef8, 285 bytes. Redraw the item ID (1..count, flag 4 set in byte +0x3b of its record): outside a draw (byte 0x13725c clear) the state is set to 2 and 0xe5870 decides (1: save the rect list, 2: abort and clear the state again, 0: proceed); then the record is rendered through 0xe5960, 0xe58a8, 0xa5b70, 0xa7260, 0xe599c, 0xe58a8 and 0xa5ca4, flushing with 0xab954 after the two passes when 0x137268 or 0x13725d is set. A started draw restores the rect list (0xe516c, when 0xe5870 returned 1) and clears the state. Reports error 0x18d03c when called while 0x41f2e5 is 1. */
+void redraw_item_a5ef8(uint32_t id)
+{
+    uint32_t rec;
+    uint8_t bl = 0u;
+    uint8_t outer;
+    if ((uint16_t)id == 0u || (uint16_t)id > EF_U16(0x0041eed8u))
+        return;
+    if (EF_U8(0x0041f2e5u) == 1u)
+        guest_callptr3_x(EF_U32(0x00132a74u), 0x0018d03cu, EF_U32(0x0041edfcu + (uint32_t)(uint16_t)id * 4u), EF_U32(0x0041eea0u));
+    rec = EF_U32(0x0041edfcu + (uint32_t)(uint16_t)id * 4u);
+    if ((EF_U8(rec + 0x3bu) & 4u) == 0u)
+        return;
+    outer = EF_U8(0x0013725cu);
+    if (outer == 0u) {
+        EF_U8(0x0013725cu) = 2u;
+        bl = (uint8_t)guest_fn_e5870_x(rec);
+        if (bl == 1u) {
+            save_rect_list_e5114();
+        } else if (bl == 2u) {
+            EF_U8(0x0013725cu) = outer;
+            return;
+        }
+    }
+    guest_fn_e5960(rec);
+    clip_rect_to_screen_e58a8();
+    guest_fn_a5b70_x(rec);
+    if (EF_U8(0x00137268u) != 0u || EF_U8(0x0013725du) != 0u)
+        tail_jump_ab954(0u);
+    redraw_all_children_a7260(rec);
+    copy_record_words_e599c(rec);
+    clip_rect_to_screen_e58a8();
+    guest_fn_a5ca4_x(rec);
+    if (EF_U8(0x00137268u) != 0u || EF_U8(0x0013725du) != 0u)
+        tail_jump_ab954(0u);
+    if (EF_U8(0x0013725cu) == 2u) {
+        if (bl == 1u)
+            restore_rect_list_e516c();
+        EF_U8(0x0013725cu) = 0u;
+    }
+}

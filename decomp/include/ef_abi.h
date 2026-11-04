@@ -4922,4 +4922,9 @@ void guest_fn_450f4_x(uint32_t a, uint32_t b); /* 0x450f4 EAX/EDX */
 void guest_fn_45274_x(uint32_t a, uint32_t b); /* 0x45274 EAX/EDX */
 void guest_fn_453f4_x(uint32_t a, uint32_t b); /* 0x453f4 EAX/EDX */
 
+void redraw_item_a5ef8(uint32_t id);
+uint32_t guest_fn_e5870_x(uint32_t record); /* 0xe5870 EAX -> AL */
+void guest_fn_a5b70_x(uint32_t record); /* 0xa5b70 EAX */
+void guest_fn_a5ca4_x(uint32_t record); /* 0xa5ca4 EAX */
+
 #endif

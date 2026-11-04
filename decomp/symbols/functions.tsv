@@ -2269,7 +2269,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a5b1c	60	set_widget_params_a5b1c	runtime_helpers9	compiles	game	confirmed	decomp/tests/0x000a5b1c.json	docs/compiler-abi.md; Store four parameters in a widget and redraw it when visible.; callers 41314@413a5,4b1f0@4b2ce,69bdc@69c7c; guest pending
 0x000a5b70	306			unknown	unclassified	unverified		
 0x000a5ca4	596			unknown	unclassified	unverified		
-0x000a5ef8	285			unknown	unclassified	unverified		
+0x000a5ef8	285	redraw_item_a5ef8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a5ef8.json	docs/compiler-abi.md; Redraw the item ID (1..count, flag 4 set in byte +0x3b of its record): outside a draw (byte 0x13725c clear) the state is; callers 4aa0@4af8,4cf4@4d42,4d4c@4e08; guest pending
 0x000a6018	29	apply_a5ef8_a6018	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a6018.json	docs/compiler-abi.md; ; callers 5110@51c6,ba5c@bbab,bfcc@c4aa; guest pending
 0x000a6038	111	redraw_entries_a6038	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a6038.json	docs/compiler-abi.md; Redraw: when a backdrop (0x41eeac) is active draw it over the screen rectangle, otherwise run 0xc9ec4; then re-apply eac; callers a4b08@a4b43,a4b5c@a4b79,a4b80@a4c79; guest pending
 0x000a60a8	262			unknown	unclassified	unverified		

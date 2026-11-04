@@ -6128,3 +6128,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x45574` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 426a4@426d6 | Run the enabled stages of the cockpit update for the view object A (EAX) with the secondary values S (EDX) and B (EBX):  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa5ef8` | EAX:uint32_t | none | 4aa0@4af8,4cf4@4d42,4d4c@4e08 | Redraw the item ID (1..count, flag 4 set in byte +0x3b of its record): outside a draw (byte 0x13725c clear) the state is |
