@@ -2005,9 +2005,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009aa78	182	count_event_9aa78	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009aa78.json	docs/compiler-abi.md; Count an event kind in the counter row of the current slot.; callers 9a624@9a683; guest pending
 0x0009ab30	57	update_sound_chain_9ab30	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x0009ab30.json	docs/compiler-abi.md; Run the sound bank update chain on the object from 0x9a544.; callers bfcc@c0bc; guest pending
 0x0009ab6c	280	dump_page_header_9ab6c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009ab6c.json	docs/compiler-abi.md; Dump the page header table at 0x40d006..0x40d024 as text lines to the stream STREAM through 0xbc400 (formats 0x13179b..0; callers 9ab30@9ab38; guest pending
-0x0009ac84	448			unknown	unclassified	unverified		
-0x0009ae44	517			unknown	unclassified	unverified		
-0x0009b04c	600			unknown	unclassified	unverified		
+0x0009ac84	448	dump_state_block_a_9ac84	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009ac84.json	docs/compiler-abi.md; Debug dump (fprintf-style, 0xbc400) of the state block A: the high words of the dwords at 0x40cfb2..0x40cfd4 are printed; callers 9ab30@9ab3f; guest pending
+0x0009ae44	517	dump_state_block_b_9ae44	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009ae44.json	docs/compiler-abi.md; Debug dump (fprintf-style, 0xbc400) of the state block B: the high words of the dwords at 0x40cf8e..0x40cfb0 are printed; callers 9ab30@9ab46; guest pending
+0x0009b04c	600	dump_state_block_c_9b04c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009b04c.json	docs/compiler-abi.md; Debug dump (fprintf-style, 0xbc400) of the state block C: the high words of the dwords at 0x40cfdc..0x40d004 are printed; callers 9ab30@9ab4d; guest pending
 0x0009b2a4	961			unknown	unclassified	unverified		
 0x0009b668	278	count_side_tallies_9b668	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009b668.json	docs/compiler-abi.md; Rebuild the per-side tallies: clear the two 0x18-byte tables at 0x40ce70 and 0x40cf78, then for every node of the list a; callers b1e0@b3d7; guest pending
 0x0009b780	287	uncount_side_tallies_9b780	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009b780.json	docs/compiler-abi.md; Remove the contribution of each active entry to the side tallies: for every 0x36-byte entry of the table at [0x1379bc] (; callers 9a624@9a6e9; guest pending

@@ -16940,3 +16940,94 @@ void update_threat_value_24074(uint32_t ax, uint32_t dx)
 		EF_U32(ua + 0x154u) = 0u;
 	}
 }
+
+/* 0x9ac84, 448 bytes. Debug dump (fprintf-style, 0xbc400) of the state block A: the high words of the dwords at 0x40cfb2..0x40cfd4 are printed to the stream in AX, one format string per field with a separator string (0x18b12c) after each group. */
+void dump_state_block_a_9ac84(ef_addr32 stream)
+{
+	guest_fn_bc400(stream, 0x0013185cu);
+	guest_fn_bc400(stream, 0x00131871u);
+	guest_fn_bc400(stream, 0x00131894u, (uint32_t)((int32_t)EF_U32(0x0040cfb2u) >> 16));
+	guest_fn_bc400(stream, 0x001318abu, (uint32_t)((int32_t)EF_U32(0x0040cfb4u) >> 16));
+	guest_fn_bc400(stream, 0x001318c5u, (uint32_t)((int32_t)EF_U32(0x0040cfb6u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x001318deu, (uint32_t)((int32_t)EF_U32(0x0040cfb8u) >> 16));
+	guest_fn_bc400(stream, 0x001318f0u, (uint32_t)((int32_t)EF_U32(0x0040cfbau) >> 16));
+	guest_fn_bc400(stream, 0x00131905u, (uint32_t)((int32_t)EF_U32(0x0040cfbcu) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131919u, (uint32_t)((int32_t)EF_U32(0x0040cfbeu) >> 16));
+	guest_fn_bc400(stream, 0x00131930u, (uint32_t)((int32_t)EF_U32(0x0040cfc0u) >> 16));
+	guest_fn_bc400(stream, 0x0013194au, (uint32_t)((int32_t)EF_U32(0x0040cfc2u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131963u, (uint32_t)((int32_t)EF_U32(0x0040cfcau) >> 16));
+	guest_fn_bc400(stream, 0x0013197cu, (uint32_t)((int32_t)EF_U32(0x0040cfccu) >> 16));
+	guest_fn_bc400(stream, 0x00131998u, (uint32_t)((int32_t)EF_U32(0x0040cfceu) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x001319b3u, (uint32_t)((int32_t)EF_U32(0x0040cfd0u) >> 16));
+	guest_fn_bc400(stream, 0x001319c4u, (uint32_t)((int32_t)EF_U32(0x0040cfd2u) >> 16));
+	guest_fn_bc400(stream, 0x001319d8u, (uint32_t)((int32_t)EF_U32(0x0040cfd4u) >> 16));
+	guest_fn_bc400(stream, 0x0018b128u);
+}
+
+/* 0x9ae44, 517 bytes. Debug dump (fprintf-style, 0xbc400) of the state block B: the high words of the dwords at 0x40cf8e..0x40cfb0 are printed to the stream in AX, one format string per field with a separator string (0x18b12c) after each group. */
+void dump_state_block_b_9ae44(ef_addr32 stream)
+{
+	guest_fn_bc400(stream, 0x001319ebu);
+	guest_fn_bc400(stream, 0x001319fdu, (uint32_t)((int32_t)EF_U32(0x0040cf8eu) >> 16));
+	guest_fn_bc400(stream, 0x00131a14u, (uint32_t)((int32_t)EF_U32(0x0040cf90u) >> 16));
+	guest_fn_bc400(stream, 0x00131a2du, (uint32_t)((int32_t)EF_U32(0x0040cf92u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131a46u, (uint32_t)((int32_t)EF_U32(0x0040cf94u) >> 16));
+	guest_fn_bc400(stream, 0x00131a5du, (uint32_t)((int32_t)EF_U32(0x0040cf96u) >> 16));
+	guest_fn_bc400(stream, 0x00131a77u, (uint32_t)((int32_t)EF_U32(0x0040cf98u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131a90u, (uint32_t)((int32_t)EF_U32(0x0040cf9au) >> 16));
+	guest_fn_bc400(stream, 0x00131aa3u, (uint32_t)((int32_t)EF_U32(0x0040cf9cu) >> 16));
+	guest_fn_bc400(stream, 0x00131ab9u, (uint32_t)((int32_t)EF_U32(0x0040cf9eu) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131aceu, (uint32_t)((int32_t)EF_U32(0x0040cfa0u) >> 16));
+	guest_fn_bc400(stream, 0x00131aedu, (uint32_t)((int32_t)EF_U32(0x0040cfa2u) >> 16));
+	guest_fn_bc400(stream, 0x00131b0fu, (uint32_t)((int32_t)EF_U32(0x0040cfa4u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131b30u, (uint32_t)((int32_t)EF_U32(0x0040cfa6u) >> 16));
+	guest_fn_bc400(stream, 0x00131b4au, (uint32_t)((int32_t)EF_U32(0x0040cfa8u) >> 16));
+	guest_fn_bc400(stream, 0x00131b66u, (uint32_t)((int32_t)EF_U32(0x0040cfaau) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131b82u, (uint32_t)((int32_t)EF_U32(0x0040cfacu) >> 16));
+	guest_fn_bc400(stream, 0x00131b9eu, (uint32_t)((int32_t)EF_U32(0x0040cfaeu) >> 16));
+	guest_fn_bc400(stream, 0x00131bbdu, (uint32_t)((int32_t)EF_U32(0x0040cfb0u) >> 16));
+	guest_fn_bc400(stream, 0x0018b128u);
+}
+
+/* 0x9b04c, 600 bytes. Debug dump (fprintf-style, 0xbc400) of the state block C: the high words of the dwords at 0x40cfdc..0x40d004 are printed to the stream in AX, one format string per field with a separator string (0x18b12c) after each group. */
+void dump_state_block_c_9b04c(ef_addr32 stream)
+{
+	guest_fn_bc400(stream, 0x00131bdbu);
+	guest_fn_bc400(stream, 0x00131bf6u, (uint32_t)((int32_t)EF_U32(0x0040cfdcu) >> 16));
+	guest_fn_bc400(stream, 0x00131c11u, (uint32_t)((int32_t)EF_U32(0x0040cfdeu) >> 16));
+	guest_fn_bc400(stream, 0x00131c2fu, (uint32_t)((int32_t)EF_U32(0x0040cfe0u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131c4cu, (uint32_t)((int32_t)EF_U32(0x0040cfe2u) >> 16));
+	guest_fn_bc400(stream, 0x00131c67u, (uint32_t)((int32_t)EF_U32(0x0040cfe4u) >> 16));
+	guest_fn_bc400(stream, 0x00131c85u, (uint32_t)((int32_t)EF_U32(0x0040cfe6u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131ca2u, (uint32_t)((int32_t)EF_U32(0x0040cfe8u) >> 16));
+	guest_fn_bc400(stream, 0x00131cbcu, (uint32_t)((int32_t)EF_U32(0x0040cfeau) >> 16));
+	guest_fn_bc400(stream, 0x00131cd9u, (uint32_t)((int32_t)EF_U32(0x0040cfecu) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131cf5u, (uint32_t)((int32_t)EF_U32(0x0040cfeeu) >> 16));
+	guest_fn_bc400(stream, 0x00131d0eu, (uint32_t)((int32_t)EF_U32(0x0040cff0u) >> 16));
+	guest_fn_bc400(stream, 0x00131d2au, (uint32_t)((int32_t)EF_U32(0x0040cff2u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131d45u, (uint32_t)((int32_t)EF_U32(0x0040cff4u) >> 16));
+	guest_fn_bc400(stream, 0x00131d5bu, (uint32_t)((int32_t)EF_U32(0x0040cff6u) >> 16));
+	guest_fn_bc400(stream, 0x00131d72u, (uint32_t)((int32_t)EF_U32(0x0040cff8u) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131d88u, (uint32_t)((int32_t)EF_U32(0x0040cffau) >> 16));
+	guest_fn_bc400(stream, 0x00131d99u, (uint32_t)((int32_t)EF_U32(0x0040cffcu) >> 16));
+	guest_fn_bc400(stream, 0x00131dadu, (uint32_t)((int32_t)EF_U32(0x0040cffeu) >> 16));
+	guest_fn_bc400(stream, 0x0018b12cu);
+	guest_fn_bc400(stream, 0x00131dc0u, (uint32_t)((int32_t)EF_U32(0x0040d000u) >> 16));
+	guest_fn_bc400(stream, 0x00131dd1u, (uint32_t)((int32_t)EF_U32(0x0040d002u) >> 16));
+	guest_fn_bc400(stream, 0x00131de5u, (uint32_t)((int32_t)EF_U32(0x0040d004u) >> 16));
+	guest_fn_bc400(stream, 0x0018b128u);
+}

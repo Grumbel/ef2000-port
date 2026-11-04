@@ -5888,4 +5888,8 @@ uint8_t row_has_active_unit_2bfcc(uint32_t ax);
 void update_threat_value_24074(uint32_t ax, uint32_t dx);
 void guest_fn_243ac_x(int32_t unit); /* 0x243ac EAX */
 
+void dump_state_block_a_9ac84(ef_addr32 stream);
+void dump_state_block_b_9ae44(ef_addr32 stream);
+void dump_state_block_c_9b04c(ef_addr32 stream);
+
 #endif
