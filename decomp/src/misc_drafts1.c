@@ -21691,3 +21691,51 @@ void normalize_double_ebe17(uint32_t *eax, uint32_t *edx, uint32_t *esi, uint32_
 	*esi = st;
 	*edx = (hi & 0xfffffu) | *edi;
 }
+
+static uint32_t next_bit_fa200(uint32_t *esi, int32_t *edx, uint32_t *eax)
+{
+	uint32_t al = *eax & 0xffu;
+	uint32_t bit;
+
+	al <<= 1;
+	bit = (al >> 8) & 1u;
+	al &= 0xffu;
+	if (al == 0u) {
+		uint32_t b;
+		if (--*edx < 0)
+			bitstream_refill_fa332(esi, edx);
+		b = EF_U8(*esi);
+		*esi += 1u;
+		al = (b << 1) | 1u;
+		bit = (al >> 8) & 1u;
+		al &= 0xffu;
+	}
+	*eax = (*eax & 0xffffff00u) | al;
+	return bit;
+}
+
+/* 0xfa200, 81 bytes. Implicit-register fragment (ESI = stream pointer, EDX = remaining bytes minus one, AL = bit buffer; all updated; ECX and EDI preserved): decode one symbol from the buffered stream using the tree at 0x162fa0 and the value table at 0x162fc0; values of 2 or more are followed by value-1 literal bits. Refills the buffer via 0xfa332 when it runs dry. Returns the bitwise complement of the result in EBX. */
+uint32_t decode_symbol_fa200(uint32_t *esi, int32_t *edx, uint32_t *eax, uint32_t ecx)
+{
+	uint32_t edi = 0u;
+	uint32_t ebx;
+	uint32_t node;
+	int32_t n;
+
+	(void)ecx;
+	for (;;) {
+		edi = edi * 2u + next_bit_fa200(esi, edx, eax);
+		node = EF_U8(edi + 0x162fa0u);
+		if (node == 0u)
+			break;
+		edi = node;
+	}
+	ebx = EF_U8(edi + 0x162fc0u);
+	if ((int8_t)ebx >= 2) {
+		n = (int32_t)(ebx & 0xffu) - 1;
+		ebx = 1u;
+		while (n-- > 0)
+			ebx = ebx * 2u + next_bit_fa200(esi, edx, eax);
+	}
+	return ~ebx;
+}

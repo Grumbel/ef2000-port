@@ -6354,4 +6354,7 @@ uint32_t decode_symbol_10db10(uint32_t *esi, uint32_t *eax, uint32_t ebp); /* 0x
 void normalize_double_ebe17(uint32_t *eax, uint32_t *edx, uint32_t *esi, uint32_t *edi);
 void normalize_double_ebe17(uint32_t *eax, uint32_t *edx, uint32_t *esi, uint32_t *edi); /* 0xebe17 */
 
+uint32_t decode_symbol_fa200(uint32_t *esi, int32_t *edx, uint32_t *eax, uint32_t ecx);
+uint32_t decode_symbol_fa200(uint32_t *esi, int32_t *edx, uint32_t *eax, uint32_t ecx); /* 0xfa200 */
+
 #endif

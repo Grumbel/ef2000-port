@@ -3706,7 +3706,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa02c	310	decompress_ra_stream	unk_runtime	typed	asm	confirmed		ABI only; source/dest stack pointers, EAX Boolean, ret 8, INT3 on failure
 0x000fa16e	102			unknown	unclassified	unverified		
 0x000fa1d4	44	bitstream_decode_symbol_fa1d4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa1d4.json	docs/compiler-abi.md; Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EDX = bytes left, params in th; callers fa02c@fa0ff; guest pending
-0x000fa200	81			unknown	unclassified	unverified		
+0x000fa200	81	decode_symbol_fa200	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa200.json	docs/compiler-abi.md; Implicit-register fragment (ESI = stream pointer, EDX = remaining bytes minus one, AL = bit buffer; all updated; ECX and; callers fa02c@fa118; guest pending
 0x000fa251	112			unknown	unclassified	unverified		
 0x000fa2ce	22	bitstream_read_bits_fa2ce	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa2ce.json	docs/compiler-abi.md; Implicit-register fragment (CL = bit count, AL = bit buffer with a trailing 1 sentinel, ESI, EDX as in 0xfa31b; AL/ESI/E; callers fa251@fa26b,fa251@fa27a,fa251@fa29e; guest pending
 0x000fa2e4	55	checksum_bytes_fa2e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa2e4.json	docs/compiler-abi.md; Implicit-register fragment (ESI = data pointer, EDX = byte count; params in that order): the two-byte running checksum (; callers fa02c@fa14e; guest pending
