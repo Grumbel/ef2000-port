@@ -4269,4 +4269,6 @@ void init_locked_ranges_103d80(void);
 void redraw_pending_message_78ac0(void);
 uint32_t guest_fn_48d5c_x(ef_addr32 text); /* 0x48d5c cdecl, one stack argument, caller cleanup */
 
+void commit_mode_selection_35b2c(void);
+
 #endif

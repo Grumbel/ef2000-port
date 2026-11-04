@@ -597,7 +597,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000357a4	70	start_screen_357a4	game_helpers5	compiles	game	confirmed	decomp/tests/0x000357a4.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000357ec	715			unknown	unclassified	unverified		
 0x00035ab8	113	select_screen_35ab8	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00035ab8.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x00035b2c	139			unknown	unclassified	unverified		
+0x00035b2c	139	commit_mode_selection_35b2c	state_reset1	compiles	game	confirmed	decomp/tests/0x00035b2c.json	docs/compiler-abi.md; Commit the chosen game mode: copy the selection (0x1357ae) to the mode/slot bytes, format its name for mode 3, store the; callers 35590@35632; guest pending
 0x00035bb8	78	copy_counts_35bb8	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00035bb8.json	docs/compiler-abi.md; ; callers 35cfc@35d1e; guest pending
 0x00035c08	189			unknown	unclassified	unverified		
 0x00035cc8	49	mark_slot_35cc8	game_helpers5	compiles	game	confirmed	decomp/tests/0x00035cc8.json	docs/compiler-abi.md; ; callers 36438@36472,36438@3657e,36438@3669d; guest pending

@@ -83,3 +83,23 @@ void redraw_pending_message_78ac0(void)
     width = (int32_t)(int16_t)guest_fn_48d5c_x(0x001f8d00u);
     guest_fn_48c90(0xcu, (uint32_t)(int32_t)(int16_t)(0x136 - width), 0x1eu, 0x001f8d00u);
 }
+
+/* 0x35b2c, 139 bytes. Commit the chosen game mode: copy the selection (0x1357ae) to the mode/slot bytes, format its name for mode 3, store the 0x12583b flag into the named setting and set the update flags. */
+void commit_mode_selection_35b2c(void)
+{
+    uint32_t value;
+    ef_addr32 setting;
+    if (EF_U8(0x00125846u) != 1u)
+        EF_U8(0x00125838u) = EF_U8(0x001357aeu);
+    if (EF_U8(0x00125846u) == 3u)
+        guest_sprintf_a4342(0x00125828u, 0x00183080u, (uint32_t)EF_U16(0x001357aeu));
+    EF_U8(0x001a666bu) = EF_U8(0x001357aeu);
+    EF_U8(0x00127da9u) = 1u;
+    value = EF_U8(0x0012583bu);
+    setting = lookup_key_a7ec4(0x0018308cu);
+    EF_U32(setting) = value;
+    if (EF_U8(0x00125846u) == 1u)
+        EF_U8(0x00127da8u) = 1u;
+    EF_U8(0x00125847u) = 1u;
+    EF_U8(0x001264e2u) = EF_U8(0x0012584au);
+}
