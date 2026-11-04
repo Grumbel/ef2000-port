@@ -5712,4 +5712,6 @@ ef_addr32 spell_number_45dd4(int32_t value);
 
 void play_queued_effects_1d474(void);
 
+void detach_parts_27348(ef_addr32 u);
+
 #endif

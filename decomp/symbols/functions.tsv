@@ -392,7 +392,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00026960	483			unknown	unclassified	unverified		
 0x00026b60	1390			unknown	unclassified	unverified		
 0x000270d0	631			unknown	unclassified	unverified		
-0x00027348	361			unknown	unclassified	unverified		
+0x00027348	361	detach_parts_27348	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00027348.json	docs/compiler-abi.md; Release the parts of the unit U (EAX) that are marked as detached (bit 4 of byte +0x16 in the 0x44 byte part records at ; callers 38284@382be; guest pending
 0x00027538	12	store_dword_pair_19b430	low_helpers	compiles	game	confirmed	decomp/tests/0x00027538.json	docs/compiler-abi.md; dword 0x19b430=EDX 0x19b434=EAX; callers 275a4@275c9; guest pending
 0x00027544	96	draw_centered_entries_27544	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00027544.json	docs/compiler-abi.md; Draw a null-terminated list of 6-byte text entries, centered at x=160.; callers 275a4@275d2; guest pending
 0x000275a4	60			unknown	unclassified	unverified		

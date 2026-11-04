@@ -7978,3 +7978,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1d474` | none | none | 3dd30@3e1ee | Replay the queued effect events (see queue_effect_event_1d5f4) that are close to the camera (0x21444c, 0x214448, 0x21445 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x27348` | EAX:ef_addr32 | none | 38284@382be | Release the parts of the unit U (EAX) that are marked as detached (bit 4 of byte +0x16 in the 0x44 byte part records at  |

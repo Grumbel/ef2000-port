@@ -14136,3 +14136,39 @@ void play_queued_effects_1d474(void)
         } while (s != head);
     }
 }
+
+/* 0x27348, 361 bytes. Release the parts of the unit U (EAX) that are marked as detached (bit 4 of byte +0x16 in the 0x44 byte part records at [U+0x48], counted by the type byte table 0x123819 + 0xa4 * (byte U+0x3a)). The unit's rotation matrix is built from its angle words +0xe, +0xc, +0x10 (0xd0b68, 0xd0ebc, 0xd0dbc, 0xd0fb8); each marked part gets the world position U.pos + (offset(+0x28, +0x2c, +0x30) * matrix) >> 15, is created as a unit of its own with 0x87db8 (its +0xa and +0xc words, byte +0x19, owner U) and loses the mark. */
+void detach_parts_27348(ef_addr32 u)
+{
+    int32_t m[9];
+    uint16_t i;
+    ef_addr32 mp = (ef_addr32)(uintptr_t)m;
+    initialize_scene_angle_record(mp);
+    update_scene_angle_first(mp, EF_U16(u + 0xeu));
+    update_scene_angle_second(mp, EF_U16(u + 0xcu));
+    update_scene_angle_third(mp, EF_U16(u + 0x10u));
+    for (i = 0u; (int16_t)EF_U8(0x00123819u + (uint32_t)EF_U8(u + 0x3au) * 0xa4u) > (int16_t)i; i++) {
+        ef_addr32 r = EF_U32(u + 0x48u) + (uint32_t)i * 0x44u;
+        int32_t ox, oy, oz;
+        if ((EF_U8(r + 0x16u) & 0x4u) == 0u)
+            continue;
+        ox = (int32_t)EF_U32(r + 0x28u);
+        oy = (int32_t)EF_U32(r + 0x2cu);
+        oz = (int32_t)EF_U32(r + 0x30u);
+        EF_U32(r) = EF_U32(u)
+            + (uint32_t)(((int32_t)((uint32_t)ox * (uint32_t)m[0])) >> 15)
+            + (uint32_t)(((int32_t)((uint32_t)oy * (uint32_t)m[1])) >> 15)
+            + (uint32_t)(((int32_t)((uint32_t)oz * (uint32_t)m[2])) >> 15);
+        EF_U32(r + 4u) = EF_U32(u + 4u)
+            + (uint32_t)(((int32_t)((uint32_t)ox * (uint32_t)m[3])) >> 15)
+            + (uint32_t)(((int32_t)((uint32_t)oy * (uint32_t)m[4])) >> 15)
+            + (uint32_t)(((int32_t)((uint32_t)oz * (uint32_t)m[5])) >> 15);
+        EF_U32(r + 8u) = EF_U32(u + 8u)
+            + (uint32_t)(((int32_t)((uint32_t)ox * (uint32_t)m[6])) >> 15)
+            + (uint32_t)(((int32_t)((uint32_t)oy * (uint32_t)m[7])) >> 15)
+            + (uint32_t)(((int32_t)((uint32_t)oz * (uint32_t)m[8])) >> 15);
+        create_unit_87db8(EF_U32(r), EF_U32(r + 4u), EF_U32(r + 8u), (uint32_t)((int32_t)EF_U32(r + 0xau) >> 16),
+                          (uint32_t)((int32_t)EF_U32(r + 0xcu) >> 16), 0u, 0u, EF_U8(r + 0x19u), 0u, u);
+        EF_U8(r + 0x16u) = (uint8_t)(EF_U8(r + 0x16u) & 0xfbu);
+    }
+}
