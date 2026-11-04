@@ -246,3 +246,73 @@ void rotate_offset_shift_c8d10(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_
 {
     rotate_offset_c8d30(eax << 16, edx << 16, ebx << 16, ecx, s0, s1);
 }
+
+/* 0xef950, 42 bytes. Combine two 10-byte records (dword, dword, word) at eax and edx with the core routine 0xef9aa and store the 10-byte result at the record in ebx. */
+void combine_records_ef950(uint32_t a, uint32_t b, uint32_t out)
+{
+    guest_fn_ef9aa_x(EF_U32(a), EF_U32(a + 4u), EF_U32(b), EF_U32(b + 4u),
+                     ((uint32_t)EF_U16(b + 8u) << 16) | EF_U16(a + 8u), out);
+}
+
+/* 0xefbaf, 42 bytes. Same wrapper as 0xef950 around the core routine 0xefbd9. */
+void combine_records_efbaf(uint32_t a, uint32_t b, uint32_t out)
+{
+    guest_fn_efbd9_x(EF_U32(a), EF_U32(a + 4u), EF_U32(b), EF_U32(b + 4u),
+                     ((uint32_t)EF_U16(b + 8u) << 16) | EF_U16(a + 8u), out);
+}
+
+/* 0xefd84, 42 bytes. Same wrapper as 0xef950 around the core routine 0xefdae. */
+void combine_records_efd84(uint32_t a, uint32_t b, uint32_t out)
+{
+    guest_fn_efdae_x(EF_U32(a), EF_U32(a + 4u), EF_U32(b), EF_U32(b + 4u),
+                     ((uint32_t)EF_U16(b + 8u) << 16) | EF_U16(a + 8u), out);
+}
+
+/* 0xef97a, 48 bytes. (ret 12) Variant of 0xef950 whose second record comes by value on the stack (dword, dword, word). */
+void combine_record_value_ef97a(uint32_t a, uint32_t edx, uint32_t out, uint32_t ecx, uint32_t y0, uint32_t y1, uint32_t y2)
+{
+    (void)edx;
+    (void)ecx;
+    guest_fn_ef9aa_x(EF_U32(a), EF_U32(a + 4u), y0, y1, ((y2 & 0xffffu) << 16) | EF_U16(a + 8u), out);
+}
+
+/* 0x106d00, 52 bytes. Optionally trace the string through printf (when 0x17d364 is set), then feed each byte to the handler 0x118428 of the object whose first word is at eax. */
+void feed_string_106d00(uint32_t obj, uint32_t str)
+{
+    if (EF_U32(0x0017d364u) != 0u)
+        stdout_printf_cd12e(0x00194a60u, str);
+    while (EF_U8(str) != 0u) {
+        guest_fn_118428(EF_U32(obj), EF_U8(str));
+        str++;
+    }
+}
+
+/* 0x8fdb8, 56 bytes. Map the record type (low 7 bits of the first byte, 14..17) of the record at eax to 0x4a, 0x3a, 0x2e or 0x22; anything else (or null) gives 0. */
+uint32_t record_type_size_8fdb8(uint32_t rec)
+{
+    if (rec == 0u)
+        return 0u;
+    switch ((uint32_t)(EF_U8(rec) & 0x7fu)) {
+    case 0xeu: return 0x4au;
+    case 0xfu: return 0x3au;
+    case 0x10u: return 0x2eu;
+    case 0x11u: return 0x22u;
+    default: return 0u;
+    }
+}
+
+/* 0x1087cd, 53 bytes. Pull characters through the reader at [obj] until one is not in the class-2 skip set (table 0x195af0, indexed by char+1), counting skipped ones; unless bit 1 of obj+0x10 is set, then hand the character to [obj+4]. Returns the skip count. */
+uint32_t skip_and_dispatch_1087cd(uint32_t obj)
+{
+    uint32_t skipped = 0u;
+    uint32_t ch;
+    for (;;) {
+        ch = guest_callptr_eax_ret_x(EF_U32(obj), obj);
+        if ((EF_U8(0x00195af0u + ((ch + 1u) & 0xffu)) & 2u) == 0u)
+            break;
+        skipped++;
+    }
+    if ((EF_U8(obj + 0x10u) & 2u) == 0u)
+        guest_callptr_eaxedx_x(EF_U32(obj + 4u), ch, obj);
+    return skipped;
+}

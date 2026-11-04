@@ -4462,4 +4462,15 @@ void rotate_offset_shift_c8d10(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_
 double sin_scaled_f8278(double angle);
 double cos_scaled_f8298(double angle);
 
+void combine_records_ef950(uint32_t a, uint32_t b, uint32_t out);
+void combine_records_efbaf(uint32_t a, uint32_t b, uint32_t out);
+void combine_records_efd84(uint32_t a, uint32_t b, uint32_t out);
+void combine_record_value_ef97a(uint32_t a, uint32_t edx, uint32_t out, uint32_t ecx, uint32_t y0, uint32_t y1, uint32_t y2);
+void feed_string_106d00(uint32_t obj, uint32_t str);
+uint32_t record_type_size_8fdb8(uint32_t rec);
+uint32_t skip_and_dispatch_1087cd(uint32_t obj);
+void guest_fn_ef9aa_x(uint32_t x0, uint32_t x1, uint32_t y0, uint32_t y1, uint32_t esi_in, ef_addr32 out); /* 0xef9aa EAX/EDX/EBX/ECX/ESI; results EAX, EDX, SI stored as dword, dword, word at out */
+void guest_fn_efbd9_x(uint32_t x0, uint32_t x1, uint32_t y0, uint32_t y1, uint32_t esi_in, ef_addr32 out); /* 0xefbd9, same convention */
+void guest_fn_efdae_x(uint32_t x0, uint32_t x1, uint32_t y0, uint32_t y1, uint32_t esi_in, ef_addr32 out); /* 0xefdae, same convention */
+
 #endif

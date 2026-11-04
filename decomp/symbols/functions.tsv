@@ -1848,7 +1848,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008fc24	180	fade_effect_slots_8fc24	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fc24.json	docs/compiler-abi.md; Fade the ten 24-byte effect slots and relink their records.; callers 3dd30@3e1f8; guest pending
 0x0008fcec	130	name_formation_units_8fcec	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fcec.json	docs/compiler-abi.md; Name the units of a player's formation from the name table.; callers 4a210@4a806; guest pending
 0x0008fd70	55	build_path_8fd70	game_helpers22	compiles	game	confirmed	decomp/tests/0x0008fd70.json	docs/compiler-abi.md; Build a path from the default directory and three parts.; callers 8fe58@8fe71; guest pending
-0x0008fdb8	56			unknown	unclassified	unverified		
+0x0008fdb8	56	record_type_size_8fdb8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008fdb8.json	docs/compiler-abi.md; Map the record type (low 7 bits of the first byte, 14..17) of the record at eax to 0x4a, 0x3a, 0x2e or 0x22; anything el; callers 8fe58@8feb9; guest pending
 0x0008fdf0	64	find_entry_by_id_8fdf0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008fdf0.json	docs/compiler-abi.md; Find the entry with the given id in the 50-entry table or abort.; callers 8ba30@8ba3a; guest pending
 0x0008fe30	39	clear_blocks_8fe30	scene_helpers	compiles	game	confirmed	decomp/tests/0x0008fe30.json	docs/compiler-abi.md; 0xb3fb0(0x211ac8,0,4) and (0x211a00,0,0xc8); callers 8fe58@8fe5e; guest pending
 0x0008fe58	135	load_record_table_8fe58	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fe58.json	docs/compiler-abi.md; Load the table resource and index its 50 records.; callers 8bd58@8bd70; guest pending
@@ -3559,13 +3559,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eed92	21	caseD_40		named	unclassified	unverified		
 0x000ef41f	38			unknown	unclassified	unverified		
 0x000ef942	14			unknown	unclassified	unverified		
-0x000ef950	42			unknown	unclassified	unverified		
-0x000ef97a	48			unknown	unclassified	unverified		
+0x000ef950	42	combine_records_ef950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef950.json	docs/compiler-abi.md; Combine two 10-byte records (dword, dword, word) at eax and edx with the core routine 0xef9aa and store the 10-byte resu; callers ee589@ee59f,ee22c@ee76d,ee22c@ee8fd; guest pending
+0x000ef97a	48	combine_record_value_ef97a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef97a.json	docs/compiler-abi.md; (ret 12) Variant of 0xef950 whose second record comes by value on the stack (dword, dword, word).; callers f03cc@f045d,f03cc@f0479,f0482@f05b1; guest pending
 0x000ef9aa	364			unknown	unclassified	unverified		
 0x000efb16	153			unknown	unclassified	unverified		
-0x000efbaf	42			unknown	unclassified	unverified		
+0x000efbaf	42	combine_records_efbaf	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000efbaf.json	docs/compiler-abi.md; Same wrapper as 0xef950 around the core routine 0xefbd9.; callers ee22c@ee653,ee22c@ee672,ee22c@ee821; guest pending
 0x000efbd9	427			unknown	unclassified	unverified		
-0x000efd84	42			unknown	unclassified	unverified		
+0x000efd84	42	combine_records_efd84	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000efd84.json	docs/compiler-abi.md; Same wrapper as 0xef950 around the core routine 0xefdae.; callers ee22c@ee5be,ee22c@ee78c,ee22c@ee920; guest pending
 0x000efdae	249			unknown	unclassified	unverified		
 0x000efeff	5			unknown	unclassified	unverified		
 0x000eff04	106			unknown	unclassified	unverified		
@@ -3913,7 +3913,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00106bfc	32	times_100_div_10	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106bfc.json	docs/compiler-abi.md; value * 100 / 10.; callers d9cb4@d9cf4,d9dc0@d9de6,106d34@106d9c; guest pending
 0x00106c3c	22	elapsed_at_least	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106c3c.json	docs/compiler-abi.md; 0xf8248() - EAX >= EDX (signed).; callers 106cb0@106cec,106d34@106da5,106d34@106db2; guest pending
 0x00106cb0	78	read_ring_bytes_106cb0	small_wrappers7	compiles	game	confirmed	decomp/tests/0x00106cb0.json	docs/compiler-abi.md; Read count bytes from a ring record into buf, waiting up to timeout; returns 0 when done or 3 on timeout.; callers 107070@107083; guest pending
-0x00106d00	52			unknown	unclassified	unverified		
+0x00106d00	52	feed_string_106d00	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00106d00.json	docs/compiler-abi.md; Optionally trace the string through printf (when 0x17d364 is set), then feed each byte to the handler 0x118428 of the ob; callers 106d34@106d52,106e2c@106e2f; guest pending
 0x00106d34	143			unknown	unclassified	unverified		
 0x00106dc4	103	wait_ring_data_106dc4	dos_slots1	compiles	game	confirmed	decomp/tests/0x00106dc4.json	docs/compiler-abi.md; Wait on a ring record until its data arrives (0), the end marker 0x4f (0) or 0x45 (8) is popped, or the timeout expires ; callers 106e2c@106e38; guest pending
 0x00106e2c	19	run_pair_106e2c	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00106e2c.json	docs/compiler-abi.md; Run 106d00 on the object, then 106dc4 on it with the second argument.; callers d9c30@d9c8a; guest pending
@@ -3927,7 +3927,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001084c0	19			unknown	unclassified	unverified		
 0x001084d3	545			unknown	unclassified	unverified		
 0x001086f4	217	parse_format_modifiers_1086f4	game_helpers102	compiles	game	confirmed	decomp/tests/0x001086f4.json	docs/compiler-abi.md; Parse the width and size modifiers of a printf conversion ('*', digits, N/F, h/l/w/L) into the spec record; returns the ; callers 1084d3@108552,1084d3@1086bc; guest pending
-0x001087cd	53			unknown	unclassified	unverified		
+0x001087cd	53	skip_and_dispatch_1087cd	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001087cd.json	docs/compiler-abi.md; Pull characters through the reader at [obj] until one is not in the class-2 skip set (table 0x195af0, indexed by char+1); callers 1084d3@10851d; guest pending
 0x00108802	134			unknown	unclassified	unverified		
 0x00108888	238			unknown	unclassified	unverified		
 0x00108976	94			unknown	unclassified	unverified		

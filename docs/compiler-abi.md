@@ -5305,3 +5305,15 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xf8278` | EAX:double | EAX:double | b59a8@b59fc,b59a8@b5a39 | sin of the argument scaled by the two constants used in 0xf8250 (0x1932a4 and 0x1932ac). |
 | `0xf8298` | EAX:double | EAX:double | b59a8@b59e8,b59a8@b5a48 | cos of the same scaled argument. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xef950` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | ee589@ee59f,ee22c@ee76d,ee22c@ee8fd | Combine two 10-byte records (dword, dword, word) at eax and edx with the core routine 0xef9aa and store the 10-byte resu |
+| `0xefbaf` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | ee22c@ee653,ee22c@ee672,ee22c@ee821 | Same wrapper as 0xef950 around the core routine 0xefbd9. |
+| `0xefd84` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | ee22c@ee5be,ee22c@ee78c,ee22c@ee920 | Same wrapper as 0xef950 around the core routine 0xefdae. |
+| `0xef97a` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | f03cc@f045d,f03cc@f0479,f0482@f05b1 | (ret 12) Variant of 0xef950 whose second record comes by value on the stack (dword, dword, word). |
+| `0x106d00` | EAX:uint32_t,EDX:uint32_t | none | 106d34@106d52,106e2c@106e2f | Optionally trace the string through printf (when 0x17d364 is set), then feed each byte to the handler 0x118428 of the ob |
+| `0x8fdb8` | EAX:uint32_t | EAX:uint32_t | 8fe58@8feb9 | Map the record type (low 7 bits of the first byte, 14..17) of the record at eax to 0x4a, 0x3a, 0x2e or 0x22; anything el |
+| `0x1087cd` | EAX:uint32_t | EAX:uint32_t | 1084d3@10851d | Pull characters through the reader at [obj] until one is not in the class-2 skip set (table 0x195af0, indexed by char+1) |
