@@ -4453,4 +4453,6 @@ uint8_t load_resource_9cc28(uint32_t key, uint32_t buffer);
 void run_script_conditions_a9694(uint32_t rec);
 void guest_fn_a94e4_x(uint32_t rec, uint32_t edx_in);
 
+void update_distance_minima_3237c(void);
+
 #endif

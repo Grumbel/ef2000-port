@@ -202,3 +202,19 @@ void run_script_conditions_a9694(uint32_t rec)
             guest_fn_a94e4_x(EF_U32(rec + 0x26u), EF_U32(0x00418708u + EF_U32(rec + 0x14u) * 4u));
     }
 }
+
+/* 0x3237c, 150 bytes. Update two running minima (0x19e5c5 with its companion word 0x19e5a5, and 0x19e5b9) from the distances computed by 0x7b16c between pairs of fixed-point values, offset by 0x19e55b. */
+void update_distance_minima_3237c(void)
+{
+    int32_t d = -(int32_t)guest_fn_7b16c_x(0u, (uint32_t)(EF_S32(0x0019e5c1u) >> 8), (uint32_t)(EF_S32(0x0019e5c9u) >> 8));
+    int32_t v = (int32_t)((uint32_t)d << 8) + EF_S32(0x0019e55bu);
+    if (v < EF_S32(0x0019e5c5u)) {
+        int32_t idx = EF_S32(0x0019e547u) >> 16;
+        EF_S32(0x0019e5c5u) = v;
+        EF_U16(0x0019e5a5u) = EF_U16((uint32_t)(idx * 161) + 0x0019cc33u);
+    }
+    d = -(int32_t)guest_fn_7b16c_x(0u, (uint32_t)(EF_S32(0x0019e5b5u) >> 8), (uint32_t)(EF_S32(0x0019e5bdu) >> 8));
+    v = (int32_t)((uint32_t)d << 8) + EF_S32(0x0019e55bu);
+    if (v < EF_S32(0x0019e5b9u))
+        EF_S32(0x0019e5b9u) = v;
+}

@@ -5285,3 +5285,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x9cc28` | EAX:uint32_t,EDX:uint32_t | AL:uint8_t | ea1a0@ea1ab | Load the resource with key into buffer: try the two archive contexts at 0x40d1f0/0x40d1f4 (enabled by bits 0 and 1 of 0x |
 | `0xa9694` | EAX:uint32_t | none | a9e70@a9fe6 | Evaluate up to three variable conditions of a script record (index, operator, value triples at +0, +0xa, +0x14); the fir |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3237c` | none | none | 31e2c@32057 | Update two running minima (0x19e5c5 with its companion word 0x19e5a5, and 0x19e5b9) from the distances computed by 0x7b1 |
