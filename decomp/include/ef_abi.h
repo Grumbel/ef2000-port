@@ -5232,4 +5232,6 @@ void insert_midpoint_4e5bc(void);
 
 void advance_position_cef3c(uint32_t v, uint32_t ang, uint32_t scale);
 
+void draw_displaced_span_ffe78(void);
+
 #endif

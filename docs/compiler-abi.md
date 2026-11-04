@@ -6912,3 +6912,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xcef3c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 26960@26b37,87a20@87c1f,8de9c@8df70 | Advance the 3-dword position V (EAX) by SCALE (EBX) along the direction given by the two angle words at ANG (EDX; a = +0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xffe78` | none | none | none direct | Draw one texture-displaced span: from x = high word of dword 0x485fe8 to x = high word of dword 0x485fd0 (clipped to dwo |

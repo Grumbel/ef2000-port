@@ -8703,3 +8703,30 @@ void advance_position_cef3c(uint32_t v, uint32_t ang, uint32_t scale)
     if (m > (int32_t)EF_U32(v + 4u))
         EF_U32(v + 4u) = (uint32_t)m;
 }
+
+/* 0xffe78, 211 bytes. Draw one texture-displaced span: from x = high word of dword 0x485fe8 to x = high word of dword 0x485fd0 (clipped to dword 0x15bdc4 - 3) on the row high word of 0x485fec, with the texture coordinates stepping from the dwords 0x485ff0 (u) / 0x485ff4 (v) towards 0x485fd8 / 0x485fdc. Each of the n + 1 pixels is replaced by the screen byte (dword 0x159080 texture at (v >> 8 & 0xff00) + (u >> 16), low two bits) that many bytes further along the row. */
+void draw_displaced_span_ffe78(void)
+{
+    int32_t y = (int32_t)EF_U32(0x00485fecu) >> 16;
+    int32_t x0 = (int32_t)EF_U32(0x00485fe8u) >> 16;
+    int32_t x1 = (int32_t)EF_U32(0x00485fd0u) >> 16;
+    int32_t lim = (int32_t)EF_U32(0x0015bdc4u) - 3;
+    int32_t n, du, dv, k;
+    uint32_t u = EF_U32(0x00485ff0u), v = EF_U32(0x00485ff4u), dst;
+    if (x1 > lim)
+        x1 = lim;
+    n = x1 - x0;
+    if (n <= 0)
+        return;
+    dst = EF_U32(0x0015b754u) + EF_U32(0x00163200u + (uint32_t)y * 4u) + (uint32_t)x0;
+    du = ((int32_t)EF_U32(0x00485fd8u) - (int32_t)u) / n;
+    dv = ((int32_t)EF_U32(0x00485fdcu) - (int32_t)v) / n;
+    for (k = 0; k <= n; k++) {
+        uint32_t off = ((uint32_t)((int32_t)v >> 8) & 0xff00u) + ((uint32_t)((int32_t)u >> 16));
+        uint32_t t = EF_U8(EF_U32(0x00159080u) + off) & 3u;
+        EF_U8(dst) = EF_U8(dst + t);
+        dst++;
+        v += (uint32_t)dv;
+        u += (uint32_t)du;
+    }
+}
