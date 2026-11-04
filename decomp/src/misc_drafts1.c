@@ -20080,3 +20080,19 @@ uint32_t debugger_hook_1204b6(void)
 {
 	return 0u;
 }
+
+/* 0xed566, 35 bytes. Wide-character counterpart of 0xed542: length in 16-bit units of the string at SEG:OFFSET (selector ignored in the flat model), stopping at a zero word or when MAX is reached. Parameters in the order offset (EAX), seg (EDX), max (EBX). */
+uint32_t wcsnlen_far_ed566(uint32_t offset, uint32_t seg, uint32_t max)
+{
+	uint32_t n = 0u;
+	(void)seg;
+	for (;;) {
+		if (EF_U16(offset) == 0u)
+			break;
+		offset += 2u;
+		if (n == max)
+			break;
+		n++;
+	}
+	return n;
+}

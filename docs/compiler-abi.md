@@ -8860,3 +8860,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1204b6` | none | EAX:uint32_t | 11d258@11d260 | Debugger hook: when the flag byte at 0x17ee30 is set the original executes INT 3 (a debugger-only breakpoint call) and r |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xed566` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | ed6cc@ed952 | Wide-character counterpart of 0xed542: length in 16-bit units of the string at SEG:OFFSET (selector ignored in the flat  |

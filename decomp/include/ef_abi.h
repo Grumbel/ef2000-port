@@ -6091,4 +6091,7 @@ void open_devices_e0b6c(void);
 uint32_t debugger_hook_1204b6(void);
 uint32_t debugger_hook_1204b6(void);
 
+uint32_t wcsnlen_far_ed566(uint32_t offset, uint32_t seg, uint32_t max);
+uint32_t wcsnlen_far_ed566(uint32_t offset, uint32_t seg, uint32_t max);
+
 #endif
