@@ -8196,3 +8196,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x367f0` | none | none | 35590@355da | One step of the connection state machine in byte 0x19f5a9 (states 1..11, the dispatch is a jump table in the code segmen |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x36f84` | none | none | none direct | Setup-screen state machine in byte 0x19f5a8. Updates the frame delta (0xa4138), stores word 0x1357ac - 3 in word 0x12590 |

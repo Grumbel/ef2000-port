@@ -15574,3 +15574,67 @@ void step_connection_367f0(void)
 	if (state != EF_U8(0x0019f5a9u) || flag != EF_U8(0x0019f598u))
 		enable_state_widget_36340();
 }
+
+/* 0x36f84, 406 bytes. Setup-screen state machine in byte 0x19f5a8. Updates the frame delta (0xa4138), stores word 0x1357ac - 3 in word 0x125900, then runs 0x36438 when byte 0x19f5af is 1, 0x36d30 when it is 2 and otherwise steps the state: 0 -> 1; 1 queues request 0x36100 (0x12590e, 0x13, 0x44, 5, 2, 0); 2 packs the settings record (0x35c08); 3 goes to 4 when byte 0x125846 is 3, to 5 when the name at 0x125828 equals the text 0x182f7c and to 6 otherwise; 4 opens the stream 0x183260 (volume 5); 5 opens the stream named at 0x125828 (volume 6); 6 refreshes the widgets (0xaca88, 0xa4c84), applies the text 0x182f94 (byte 0x125846 equal to 3) or 0x182fa0 (0xa4d90) and sets byte 0x41f2e8. When the state changed the label widget (key 0x182fa8 in the dialog named 0x1830f8) is bound to the state text (0x130fde, 0x130ff1, none, 0x13101f, 0x13100a, 0x130fa8 for states 1..6). */
+void step_setup_screen_36f84(void)
+{
+	uint8_t saved = EF_U8(0x0019f5a8u);
+	uint32_t dlg, widget, text;
+
+	update_frame_delta_a4138();
+	EF_U16(0x00125900u) = (uint16_t)(EF_U16(0x001357acu) - 3u);
+	if (EF_U8(0x0019f5afu) == 1u) {
+		guest_fn_36438_x();
+	} else if (EF_U8(0x0019f5afu) == 2u) {
+		guest_fn_36d30_x();
+	} else {
+		switch (EF_U8(0x0019f5a8u)) {
+		case 0:
+			EF_U8(0x0019f5a8u) = 1u;
+			break;
+		case 1:
+			queue_request_36100(0x0012590eu, 0x13u, 0x44u, 5u, 2u, 0u);
+			break;
+		case 2:
+			pack_settings_record_35c08();
+			break;
+		case 3:
+			if (EF_U8(0x00125846u) == 3u)
+				EF_U8(0x0019f5a8u) = 4u;
+			else if (guest_fn_a4380(0x00125828u, 0x00182f7cu) == 0u)
+				EF_U8(0x0019f5a8u) = 5u;
+			else
+				EF_U8(0x0019f5a8u) = 6u;
+			break;
+		case 4:
+			open_stream_36054(0x00183260u, 5u);
+			break;
+		case 5:
+			open_stream_36054(0x00125828u, 6u);
+			break;
+		case 6:
+			guest_fn_aca88_w();
+			refresh_all_widgets_a4c84();
+			guest_fn_a4d90(EF_U8(0x00125846u) == 3u ? 0x00182f94u : 0x00182fa0u);
+			EF_U8(0x0041f2e8u) = 1u;
+			break;
+		default:
+			break;
+		}
+	}
+	if (saved != EF_U8(0x0019f5a8u)) {
+		dlg = guest_fn_a46cc(0x001830f8u);
+		widget = find_widget_checked_a78bc(dlg, 0x00182fa8u);
+		if (widget != 0u) {
+			switch (EF_U8(0x0019f5a8u)) {
+			case 1: text = 0x00130fdeu; break;
+			case 2: text = 0x00130ff1u; break;
+			case 4: text = 0x0013101fu; break;
+			case 5: text = 0x0013100au; break;
+			case 6: text = 0x00130fa8u; break;
+			default: return;
+			}
+			guest_bind_dialog_widget(widget, text);
+		}
+	}
+}

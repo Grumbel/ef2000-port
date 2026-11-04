@@ -5806,4 +5806,8 @@ void process_packets_3527c(void);
 
 void step_connection_367f0(void);
 
+void step_setup_screen_36f84(void);
+void guest_fn_36438_x(void); /* 0x36438 */
+void guest_fn_36d30_x(void); /* 0x36d30 */
+
 #endif
