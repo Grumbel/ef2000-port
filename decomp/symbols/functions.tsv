@@ -584,7 +584,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00034e18	140	end_session_34e18	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00034e18.json	docs/compiler-abi.md; Wait for the device to stop, then shut it down and clear the session.; callers none direct; guest pending
 0x00034ea4	139	clear_session_34ea4	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00034ea4.json	docs/compiler-abi.md; Clear the session flags and check the device state in mode 3.; callers 335c0@335c9,3361c@3361c,336c0@336c0; guest pending
 0x00034f30	97	scan_entries_34f30	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00034f30.json	docs/compiler-abi.md; ; callers 34f94@34ff6; guest pending
-0x00034f94	403			unknown	unclassified	unverified		
+0x00034f94	403	update_mission_page_34f94	game_helpers77	compiles	game	confirmed	decomp/tests/0x00034f94.json	docs/compiler-abi.md; Per-frame update of the mission dialog page: reload, timers and dialog switching.; callers none direct; guest pending
 0x00035128	27	onopenInitialise		named	unclassified	unverified		
 0x00035144	85	reset_flags_35144	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00035144.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0003519c	122			unknown	unclassified	unverified		

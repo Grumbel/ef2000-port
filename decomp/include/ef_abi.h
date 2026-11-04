@@ -3592,4 +3592,18 @@ void compute_box_padding_a66cc(ef_addr32 box, uint8_t grow);
 uint32_t guest_fn_f60_x(uint32_t a); /* 0xf60 EAX -> AL */
 void guest_fn_a63c0_x(uint32_t a); /* 0xa63c0 EAX */
 
+/* game_helpers77.c */
+void update_mission_page_34f94(void);
+void guest_fn_a4138_x(void); /* 0xa4138 */
+uint32_t guest_fn_a41dc_x(void); /* 0xa41dc -> AL */
+void guest_fn_a42c4_x(void); /* 0xa42c4 */
+void guest_fn_34f30_x(void); /* 0x34f30 */
+void guest_fn_a3f0c_x(void); /* 0xa3f0c */
+uint32_t guest_fn_a46cc_x(uint32_t name); /* 0xa46cc EAX -> EAX */
+void guest_fn_33b5c_x(uint32_t dialog); /* 0x33b5c EAX */
+void guest_fn_33888_x(uint32_t dialog); /* 0x33888 EAX */
+uint32_t guest_fn_a3bdc_x(void); /* 0xa3bdc -> AL */
+void guest_fn_34b2c_x(void); /* 0x34b2c */
+void guest_fn_34ea4_x(void); /* 0x34ea4 */
+
 #endif

@@ -4014,3 +4014,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x1f64` | none | none | 1b70@1c4a,1cd8@1eb2,1cd8@1ed7 | Select the active entry: a direct code match first, else the best flagged candidate. |
 | `0xa66cc` | EAX:ef_addr32,DL:uint8_t | none | a6998@a69b7,a74bc@a74f1,a7588@a759b | Recompute the left/right and top/bottom padding of a layout box. |
+
+## game_helpers77 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x34f94` | none | none | none direct | Per-frame update of the mission dialog page: reload, timers and dialog switching. |
