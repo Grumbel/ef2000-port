@@ -8565,3 +8565,22 @@ void setup_camera_955c0(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t
     EF_U32(0x00214474u) = EF_U32(p + 8u);
     guest_fn_9357c();
 }
+
+/* 0xc8f38, 163 bytes. Load the two fixed data files: the path 0x18ef60 is loaded with the hook at 0x132ab8 into 0x425c8c (failure reported through 0x132a74 with 0x18ef70), 0xe9a24(0x300, 0x425c8c, 0x4195d0) is run, then the path 0x18efa0 is loaded into 0x433f34; on success set dword 0x433f30 to 1, rebuild the remap table and clear dword 0x160000, otherwise report 0x18efac. */
+void load_fixed_files_c8f38(void)
+{
+    char path[0x90];
+    uint32_t p = (uint32_t)(uintptr_t)path;
+    build_path_9c9c0(p, 0x0018ef60u);
+    if ((guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), p, 0x00425c8cu) & 0xffu) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018ef70u, p);
+    guest_fn_e9a24(0x300u, 0x00425c8cu, 0x004195d0u);
+    build_path_9c9c0(p, 0x0018efa0u);
+    if ((guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), p, 0x00433f34u) & 0xffu) == 0u) {
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018efacu, p);
+    } else {
+        EF_U32(0x00433f30u) = 1u;
+        rebuild_remap_table_e7e30(0u, 0u, 0u);
+        EF_U32(0x00160000u) = 0u;
+    }
+}

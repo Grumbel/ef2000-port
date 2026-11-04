@@ -5220,4 +5220,6 @@ void load_resource_list_d5f0c(uint32_t list);
 
 void setup_camera_955c0(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0);
 
+void load_fixed_files_c8f38(void);
+
 #endif
