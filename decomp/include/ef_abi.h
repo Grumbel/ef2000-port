@@ -5080,4 +5080,6 @@ void send_command_packet_55f54(uint32_t a, uint32_t b, uint32_t c, uint32_t d,
 
 void draw_count_icon_4d24c(uint32_t x, uint32_t y, uint32_t rec, uint32_t count);
 
+uint32_t reserve_entries_81394(uint32_t unused, uint32_t list, uint32_t sum);
+
 #endif

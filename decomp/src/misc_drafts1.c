@@ -6840,3 +6840,37 @@ void draw_count_icon_4d24c(uint32_t x, uint32_t y, uint32_t rec, uint32_t count)
     guest_fn_ca620((int32_t)(EF_U32(0x00126570u) + 0x23f00u + (uint32_t)((int32_t)cx - 1) * 20u),
                    (int16_t)(x - 10u), (int16_t)(y + 3u), 0x14u, 0xdu, 0x280u);
 }
+
+/* 0x81394, 179 bytes. Reserve cost from the budget dword 0x12b118 for the entries of the word list LIST (first word = count, then entry indices terminated by 0xffff): each entry's cost comes from 0xd7754 on the record in the table at dword 0x1fca00; the entry is accepted (index appended to the list at 0x1fc97e, counter 0x1fc9f8, at most 0x14) only while the cost fits the remaining budget. Returns the running total SUM plus the accepted costs; returns 0 when byte 0x12b104 is clear and SUM unchanged when SUM or LIST is null. */
+uint32_t reserve_entries_81394(uint32_t unused, uint32_t list, uint32_t sum)
+{
+    uint32_t p = list;
+    int16_t i = 1;
+    (void)unused;
+    if (EF_U8(0x0012b104u) == 0u)
+        return 0u;
+    if (sum == 0u || list == 0u)
+        return sum;
+    if (!((int16_t)i <= (int16_t)EF_U16(list)))
+        return sum;
+    p = list + 2u;
+    for (;;) {
+        uint32_t cost, slot;
+        if (EF_U16(p) == 0xffffu)
+            return sum;
+        if ((int32_t)EF_U32(0x001fc9f8u) >= 0x14)
+            return sum;
+        cost = get_dword_d7754(EF_U32(EF_U32(0x001fca00u) + (uint32_t)(int32_t)(int16_t)EF_U16(p) * 4u));
+        if ((int32_t)cost > (int32_t)EF_U32(0x0012b118u) - 1)
+            return sum;
+        slot = EF_U32(0x001fc9f8u) + 1u;
+        EF_U16(0x001fc97eu + slot * 2u) = EF_U16(p);
+        EF_U32(0x001fc9f8u) = slot;
+        EF_U32(0x0012b118u) = EF_U32(0x0012b118u) - cost;
+        sum += cost;
+        i++;
+        p += 2u;
+        if (!((int16_t)i <= (int16_t)EF_U16(list)))
+            return sum;
+    }
+}

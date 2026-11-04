@@ -6491,3 +6491,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x4d24c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 441fc@443a5 | Draw the stacked-count icon for the record REC at (X, Y) in game modes 1 and 2 (byte 0x1a53dc) when REC word +0x36 is se |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x81394` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 77c90@77ef3,77c90@77fc6,77c90@77ffa | Reserve cost from the budget dword 0x12b118 for the entries of the word list LIST (first word = count, then entry indice |
