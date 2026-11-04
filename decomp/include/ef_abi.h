@@ -4770,4 +4770,11 @@ void guest_dos_intdos_x(uint32_t in, uint32_t out, uint32_t sregs); /* int 21h w
 
 void run_page_text_9e508(int32_t page, uint32_t index);
 
+int32_t sum_char_table_diff_bef2c(uint32_t a, uint32_t b, uint32_t obj);
+void format_and_enter_eb2c0(ef_addr32 fmt, ...);
+void copy_rows_eb174(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+                     uint32_t x, uint32_t y, uint32_t len, uint32_t count,
+                     uint32_t step, uint32_t x0, uint32_t rows, uint32_t base);
+uint32_t guest_fn_fb87c_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xfb87c EAX/EDX/EBX/ECX */
+
 #endif

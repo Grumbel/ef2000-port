@@ -2692,7 +2692,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000becf8	36	record_pending_becf8	list_lookup	compiles	game	confirmed	decomp/tests/0x000becf8.json	docs/compiler-abi.md; 1 when 0xbc7ec(record) is zero and 0xbecc0(record) is nonzero.; callers bed1c@bed72; guest pending
 0x000bed1c	415			unknown	unclassified	unverified		
 0x000beebc	109	for_each_entry_beebc	game_helpers131	compiles	game	confirmed	decomp/tests/0x000beebc.json	docs/compiler-abi.md; Run 0xbed1c once for every entry of a list (count from 0xbc5d0), passing the index as a byte in EBX and forwarding the other arguments; returns the last result; callers bc610@bc793; guest pending
-0x000bef2c	99			unknown	unclassified	unverified		
+0x000bef2c	99	sum_char_table_diff_bef2c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bef2c.json	docs/compiler-abi.md; Sum, over up to 8 leading characters of the string returned by 0xfb87c (stopping at '%'), of the difference of two per-c; callers bf444@bf4b2; guest pending
 0x000bef90	40	find_node_by_pair	list_lookup	compiles	game	confirmed	decomp/tests/0x000bef90.json	docs/compiler-abi.md; Find the node in the list at *EBX with dword +0x16 == * signed AX and dword +0x1a == signed DX.; callers befb8@bf1f2; guest pending
 0x000befb8	1145			unknown	unclassified	unverified		
 0x000bf444	984			unknown	unclassified	unverified		
@@ -3498,7 +3498,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb008	61	draw_glyph_string_eb008	game_helpers91	compiles	game	confirmed	decomp/tests/0x000eb008.json	docs/compiler-abi.md; Draw a NUL-terminated string glyph by glyph (6 pixels apart, 6-bit codes).; callers 98658@986b1,98658@9884d,98658@988da; guest pending
 0x000eb050	94	put_screen_rows_eb050	small_wrappers5	compiles	game	confirmed	decomp/tests/0x000eb050.json	docs/compiler-abi.md; Copy a packed buffer of rows to the framebuffer at (x, y).; callers 98658@986e3,98658@98877,98658@9890c; guest pending
 0x000eb0b0	89	copy_rows_to_screen_eb0b0	small_wrappers4	compiles	game	confirmed	decomp/tests/0x000eb0b0.json	docs/compiler-abi.md; Copy rows of bytes into the framebuffer at (x, y), advancing the destination by the row stride at 0x1631f4.; callers e4c9c@e4f79; guest pending
-0x000eb174	123			unknown	unclassified	unverified		
+0x000eb174	123	copy_rows_eb174	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eb174.json	docs/compiler-abi.md; Copy COUNT rows through 0xe9a24: the destination starts at base 0x15b754 + row-offset table 0x163200[Y] + X and advances; callers c92e4@c9350; guest pending
 0x000eb1f0	94	get_screen_rows_eb1f0	small_wrappers5	compiles	game	confirmed	decomp/tests/0x000eb1f0.json	docs/compiler-abi.md; Copy rows from the framebuffer at (x, y) into a packed buffer.; callers 98ac0@98b09,98ac0@98b36,98ac0@98b51; guest pending
 0x000eb24e	11	set_limit_eb24e	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000eb24e.json	docs/compiler-abi.md; Set the 0x17d400 limit to 0x8000.; callers 9bd20@9bd50; guest pending
 0x000eb259	1	nop_eb259	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000eb259.json	docs/compiler-abi.md; Empty stub (single ret).; callers eb25a@eb25d,eb25a@eb263,eb272@eb275; guest pending
@@ -3506,7 +3506,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb272	22	switch_page_eb272	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000eb272.json	docs/compiler-abi.md; Run the page callback pair, then hand the argument to 0x20d.; callers eb25a@eb26b; guest pending
 0x000eb288	32			unknown	unclassified	unverified		
 0x000eb2a8	24			unknown	unclassified	unverified		
-0x000eb2c0	99			unknown	unclassified	unverified		
+0x000eb2c0	99	format_and_enter_eb2c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eb2c0.json	docs/compiler-abi.md; Printf-style message (cdecl, FORMAT and varargs on the stack) formatted into a 0x280-byte buffer, then, if the counter b; callers 510@572,628@647,628@65a; guest pending
 0x000eb35c	24	check_error_flag_eb35c	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000eb35c.json	docs/compiler-abi.md; Abort with the stored message when the error flag is set.; callers dc250@dc250,dc280@dc281; guest pending
 0x000eb374	87	compare_nocase_eb374	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000eb374.json	docs/compiler-abi.md; Case-insensitive compare of up to n bytes.; callers 9c858@9c88a,103f04@104091,103f04@1040b9; guest pending
 0x000eb448	48	enter_handler_eb448	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000eb448.json	docs/compiler-abi.md; ; callers ea50c@ea5e7,eb2c0@eb315; guest pending

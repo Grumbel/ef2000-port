@@ -3565,3 +3565,60 @@ void run_page_text_9e508(int32_t page, uint32_t index)
     EF_U32(0x00417178u) = saved_handler;
     EF_U32(0x0041717cu) = saved_table;
 }
+
+/* 0xbef2c, 99 bytes. Sum, over up to 8 leading characters of the string returned by 0xfb87c (stopping at '%'), of the difference of two per-character byte tables at OBJ+0x33 and OBJ+0x37. */
+int32_t sum_char_table_diff_bef2c(uint32_t a, uint32_t b, uint32_t obj)
+{
+    uint32_t kind = EF_U8(obj + 0xbu);
+    uint32_t str = guest_fn_fb87c_x(a & 0xffu, b & 0xffu, kind, obj);
+    uint32_t sum = 0u;
+    int16_t i;
+    for (i = 0; i < 8; i++) {
+        uint32_t c = EF_U8(str + (uint32_t)(int32_t)i);
+        uint32_t t1 = EF_U32(obj + 0x33u);
+        uint32_t d;
+        if (c == 0x25u)
+            break;
+        /* ORIGINAL BUG: only the low byte of the table pointer is replaced, so bits 16..31 of the pointer leak into the difference */
+        d = (t1 & 0xffff0000u) | EF_U8(t1 + c);
+        d -= EF_U8(EF_U32(obj + 0x37u) + c);
+        sum += d;
+    }
+    guest_fn_cc768(str);
+    return (int32_t)sum;
+}
+
+/* 0xeb2c0, 99 bytes. Printf-style message (cdecl, FORMAT and varargs on the stack) formatted into a 0x280-byte buffer, then, if the counter byte 0x160794 became 1 after being incremented, 0x1915e0 is appended and the buffer is handed to 0xeb448. */
+void format_and_enter_eb2c0(ef_addr32 fmt, ...)
+{
+    char buf[0x284];
+    va_list ap;
+    EF_U8(0x00160794u)++;
+    if (EF_U8(0x00160794u) == 1u) {
+        va_start(ap, fmt);
+        format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+        va_end(ap);
+        strcat_9ca57((uint32_t)(uintptr_t)buf, 0x001915e0u);
+        enter_handler_eb448((uint32_t)(uintptr_t)buf);
+    }
+}
+
+/* 0xeb174, 123 bytes. Copy COUNT rows through 0xe9a24: the destination starts at base 0x15b754 + row-offset table 0x163200[Y] + X and advances by the pitch 0x1631f4; the source starts at X0 + row*pitch + base and advances by the row step (cdecl, eight stack arguments). */
+void copy_rows_eb174(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+                     uint32_t x, uint32_t y, uint32_t len, uint32_t count,
+                     uint32_t step, uint32_t x0, uint32_t rows, uint32_t base)
+{
+    uint32_t dst;
+    uint32_t src;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    dst = EF_U32(0x0015b754u) + EF_U32(0x00163200u + (y & 0xffffu) * 4u) + (x & 0xffffu);
+    src = (x0 & 0xffffu) + (step & 0xffffu) * (rows & 0xffffu) + base;
+    if ((uint16_t)count == 0u)
+        return;
+    do {
+        guest_fn_e9a24(len & 0xffffu, src, dst);
+        dst += EF_U32(0x001631f4u);
+        src += step & 0xffffu;
+        count--;
+    } while ((uint16_t)count != 0u);
+}
