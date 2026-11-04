@@ -16221,3 +16221,33 @@ void select_first_entry_487c(void)
 	widget = find_widget_checked_a78bc(dlg, 0x0017f74cu);
 	guest_bind_dialog_widget(widget, 0x00130bacu);
 }
+
+/* 0xa99c0, 229 bytes. Load the saved state named EAX (number). Reports the error text 0x18d798 when byte 0x1371ed is already set. Builds the file name from the default path (0xa7b70), the optional 0xa7b80 prefix and the number (formats 0x18d7cc and 0x18d7dc), saves the current state (0xa98d0), formats the number with 0x18d7e8 into a second buffer, opens that with 0xa7900 and falls back to the name buffer (0x9ccb8, error format 0x18d7f0). The file is read (0xaaa50) and closed (0x9ce84), dword 0x419200 is copied to 0x4191f8 and byte 0x1371ed is set to 2. */
+void load_saved_state_a99c0(uint32_t number)
+{
+	char name[0x98];
+	char alt[0x98];
+	uint32_t h;
+
+	if (EF_U8(0x001371edu) != 0u)
+		guest_callptr1_x(EF_U32(0x00132a74u), 0x0018d798u);
+	if (call_9c858_18d57c() != 0u) {
+		uint32_t r80 = call_9c858_18d57c();
+		uint32_t r70 = guest_fn_a7b70_x();
+		guest_sprintf_a4342((ef_addr32)(uintptr_t)name, 0x0018d7ccu, r70, r80, number);
+	} else {
+		guest_sprintf_a4342((ef_addr32)(uintptr_t)name, 0x0018d7dcu, guest_fn_a7b70_x(), number);
+	}
+	save_state_a98d0();
+	guest_sprintf_a4342((ef_addr32)(uintptr_t)alt, 0x0018d7e8u, number);
+	h = guest_fn_a7900((ef_addr32)(uintptr_t)alt);
+	if (h == 0xffffffffu) {
+		h = open_resource_9ccb8((uint32_t)(uintptr_t)name);
+		if (h == 0xffffffffu)
+			guest_callptr2_x(EF_U32(0x00132a74u), 0x0018d7f0u, (uint32_t)(uintptr_t)name);
+	}
+	guest_fn_aaa50_x(h);
+	guest_fn_9ce84(h);
+	EF_U32(0x004191f8u) = EF_U32(0x00419200u);
+	EF_U8(0x001371edu) = 2u;
+}
