@@ -4831,3 +4831,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x461e8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 76e2c@76f47 | Call 0x46254 for each of the seven 16-bit entries (+0x4e) of a 0xca-byte record. |
+
+## unit_events1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x88664` | EAX:ef_addr32,EDX:uint32_t | none | 29dd0@29e00,29dd0@29e84,29dd0@29f3c | Raise unit event 0x20 (code 2) for a unit record. |
+| `0x886d0` | EAX:ef_addr32,EDX:uint32_t | none | 29b14@29c1a,29b14@29db6 | Raise unit event 0x1f (code 1) for a unit record. |

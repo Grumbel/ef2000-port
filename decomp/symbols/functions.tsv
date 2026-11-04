@@ -1719,8 +1719,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008846c	217	step_objects_8846c	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008846c.json	docs/compiler-abi.md; Step every object of the ring and publish the visible ones.; callers 3dcb0@3dcb5; guest pending
 0x00088548	42	reset_target_search	scene_helpers	compiles	game	confirmed	decomp/tests/0x00088548.json	docs/compiler-abi.md; dwords 0x20f14c=0x7fffffff 0x20f154=0 0x20f150=filtered lookup; callers 8846c@88474; guest pending
 0x00088574	239			unknown	unclassified	unverified		
-0x00088664	106			unknown	unclassified	unverified		
-0x000886d0	106			unknown	unclassified	unverified		
+0x00088664	106	unit_event_88664	unit_events1	compiles	game	confirmed	decomp/tests/0x00088664.json	docs/compiler-abi.md; Raise unit event 0x20 (code 2) for a unit record.; callers 29dd0@29e00,29dd0@29e84,29dd0@29f3c; guest pending
+0x000886d0	106	unit_event_886d0	unit_events1	compiles	game	confirmed	decomp/tests/0x000886d0.json	docs/compiler-abi.md; Raise unit event 0x1f (code 1) for a unit record.; callers 29b14@29c1a,29b14@29db6; guest pending
 0x0008873c	148			unknown	unclassified	unverified		
 0x000887d0	107	flag_first_hit_887d0	game_helpers20	compiles	game	confirmed	decomp/tests/0x000887d0.json	docs/compiler-abi.md; Flag the first kind-0x1f/0x20 record of the ring at 0x20f160 that passes the hit test.; callers 888cc@889e3; guest pending
 0x0008883c	142			unknown	unclassified	unverified		

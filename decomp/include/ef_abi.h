@@ -4199,4 +4199,9 @@ void fill_colour_record_ba77c(ef_addr32 rec, uint32_t key);
 /* draw_loops1.c */
 void draw_record_entries_461e8(uint32_t x, uint32_t index, uint32_t y, uint32_t c, uint32_t s0, uint32_t s1);
 
+/* unit_events1.c */
+void unit_event_88664(ef_addr32 unit, uint32_t arg);
+void unit_event_886d0(ef_addr32 unit, uint32_t arg);
+void guest_fn_87db8_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0x87db8 EAX/EDX/EBX/ECX + 6 stack, callee cleanup */
+
 #endif
