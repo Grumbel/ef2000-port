@@ -2530,7 +2530,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b3fb0	24	fill_bytes_b3fb0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000b3fb0.json	docs/compiler-abi.md; Fill bytes of a block with one value.; callers 6df0@6e0e,7780@779e,b1e0@b4de; guest pending
 0x000b3fd0	9	square_double_b3fd0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000b3fd0.json	docs/compiler-abi.md; Square of a double.; callers 1dc20@1ddf9,1dc20@1de08,2461c@24676; guest pending
 0x000b3fdc	13	cube_double_b3fdc	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000b3fdc.json	docs/compiler-abi.md; Cube of a double.; callers 11b73c@11b7ec,11b73c@11b843,11b73c@11b893; guest pending
-0x000b3fec	192			unknown	unclassified	unverified		
+0x000b3fec	192	pow_b3fec	float_helpers9	compiles	game	confirmed	decomp/tests/0x000b3fec.json	docs/compiler-abi.md; (ret 16) pow(x, y) for positive x via exp(y * ln x) (0xfa362 and 0xdcb96); 0.0 for x <= 0. When the product exceeds the ; callers 16b0c@16b78,6cc5c@6cc81,6cf00@6cf27; guest pending
 0x000b415c	93	distance_2d_b415c	float_helpers5	compiles	game	confirmed	decomp/tests/0x000b415c.json	docs/compiler-abi.md; Distance between two 2D double points, 0.0 when degenerate.; callers 73ec@7448,78c0@79c5,80f4@815d; guest pending
 0x000b41bc	116	distance_3d_b41bc	float_helpers5	compiles	game	confirmed	decomp/tests/0x000b41bc.json	docs/compiler-abi.md; Distance between two 3D double points, 0.0 when degenerate.; callers 6a66c@6a6d3; guest pending
 0x000b4230	31	word_to_scaled_b4230	float_helpers5	compiles	game	confirmed	decomp/tests/0x000b4230.json	docs/compiler-abi.md; Convert a signed word to a scaled double.; callers 78c0@790d,78c0@7929,7ca8@7cc7; guest pending

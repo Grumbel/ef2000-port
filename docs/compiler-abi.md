@@ -5515,3 +5515,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x10a078` | EAX:uint32_t,EDX:uint32_t | none | 109ec0@109ecc | Build a segment record at EAX from the record at EDX: copy the doubles at +0x20/+0x30/+0x38, zero the first 8 bytes and  |
 | `0x10a1c4` | EAX:uint32_t,EDX:uint32_t | none | 109ec0@10a025 | Derive the coefficient record at EAX from the parameters at EDX (doubles s[0]=+0, s[1]=+8, s[2]=+0x10): +0 = s2 * k1, +8 |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb3fec` | EAX:double,EDX:double | EAX:double | 16b0c@16b78,6cc5c@6cc81,6cf00@6cf27 | (ret 16) pow(x, y) for positive x via exp(y * ln x) (0xfa362 and 0xdcb96); 0.0 for x <= 0. When the product exceeds the  |

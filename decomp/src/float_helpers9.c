@@ -6,6 +6,7 @@
 #include "ef_mem.h"
 
 #include <math.h>
+#include <string.h>
 
 /* Ninth x87 batch: scaled trig wrappers. */
 
@@ -62,7 +63,7 @@ double scaled_call_11b588(double x)
 /* 0x11bf00, 37 bytes. (ret 16) Linear combination: f(a0) * v[0] + v[1] * a1 with f computed by 0x11bf00's helper 0xb3fd0 and the pair of doubles at EAX. */
 double combine_11bf00(uint32_t v, double a0, double a1)
 {
-    return guest_fn_b3fd0_x(a0) * EF_F64(v) + EF_F64(v + 8u) * a1;
+    return square_double_b3fd0(a0) * EF_F64(v) + EF_F64(v + 8u) * a1;
 }
 
 /* 0xdc1e9, 21 bytes. fpatan after an exchange: atan2(st0, st1) of the two x87 registers (ST0 = y, ST1 = x on entry); the emulation path 0x10848c is used when bit 0 of 0x1631f0 is set. */
@@ -142,69 +143,29 @@ double scaled_ratio_11bfc8(uint32_t p, double a0, double a1)
     return x * (EF_F64(0x001959c4u) / r) * EF_F64(0x001959ccu);
 }
 
-/* 0x11b540, 69 bytes. (ret 8) f(x * k4) * 0.53 with f = 0xb3fec; the intermediate x * k1 * k2 + k3 is computed and discarded. */
+/* 0x11b540, 69 bytes. (ret 8) pow(x * k4, 0.53) * (x * k1 * k2 + k3) with the constants at 0x1958b4, 0x19589c, 0x1958a4 and 0x1958ac. */
 double scaled_call_11b540(double x)
 {
-    return guest_fn_b3fec_x(x * EF_F64(0x001958b4u)) * 0.53;
+    double t1 = x * EF_F64(0x0019589cu) * EF_F64(0x001958a4u) + EF_F64(0x001958acu);
+    return pow_b3fec(x * EF_F64(0x001958b4u), 0.53) * t1;
 }
 
-/* 0x1198ec, 75 bytes. Combine the double globals: 0x432a70 = g[432ae0] * g[432948] * g[432908] + g[432c48] * g[432ac8]; 0x432b38 = g[432da0] * g[1956b4] * g[432278] * g[433058] * 0x432a70. */
-void update_globals_1198ec(void)
+/* 0xb3fec, 192 bytes. (ret 16) pow(x, y) for positive x via exp(y * ln x) (0xfa362 and 0xdcb96); 0.0 for x <= 0. When the product exceeds the threshold at 0x18e85d an error message is sent through 0x132a74. */
+double pow_b3fec(double x, double y)
 {
-    EF_F64(0x00432a70u) = EF_F64(0x00432ae0u) * EF_F64(0x00432948u) * EF_F64(0x00432908u) + EF_F64(0x00432c48u) * EF_F64(0x00432ac8u);
-    EF_F64(0x00432b38u) = EF_F64(0x00432da0u) * EF_F64(0x001956b4u) * EF_F64(0x00432278u) * EF_F64(0x00433058u) * EF_F64(0x00432a70u);
-}
-
-/* 0x11af14, 76 bytes. (ret 8) r = f(a) (0xb3fd0); for |a| > 1 add the constant at 0x1957fc, otherwise use 1 - r; return the 0xa4470 transform (square root with error code 3) of it. */
-double sqrt_branch_11af14(double a)
-{
-    double r = guest_fn_b3fd0_x(a);
-    if (abs_double_b427c(a) > 1.0)
-        r = r + EF_F64(0x001957fcu);
-    else
-        r = 1.0 - r;
-    return guest_fn_a4470(r);
-}
-
-/* 0x11016c, 82 bytes. Pentium FDIV bug probe: when the CPU level 0x13719d is at least 3, compute 4195835 - (4195835 / 3145727) * 3145727 and set bit 0 of 0x1631f0 (use the FPU emulation) when the residue exceeds the constant at 0x1952cc. */
-void fdiv_bug_probe_11016c(void)
-{
-    volatile double a = 4195835.0;
-    volatile double b = 3145727.0;
-    if (EF_U8(0x0013719du) >= 3u) {
-        double residue = a - (a / b) * b;
-        if (residue > EF_F64(0x001952ccu))
-            EF_U8(0x001631f0u) = (uint8_t)(EF_U8(0x001631f0u) | 1u);
+    double p;
+    if (!(x > 0.0))
+        return 0.0;
+    EF_F64(0x0041f380u) = x;
+    p = guest_fn_fa362_x(x);
+    p = y * p;
+    if (p > EF_F64(0x0018e85du)) {
+        uint32_t py[2];
+        uint32_t yb[2];
+        memcpy(py, &p, 8);
+        memcpy(yb, &y, 8);
+        /* ORIGINAL BUG: the second dword of the product is read from the saved EDI slot instead of the product's high word; 0 is passed here. */
+        guest_callptr7_x(EF_U32(0x00132a74u), 0x0018e830u, EF_U32(0x0041f380u), EF_U32(0x0041f384u), yb[0], yb[1], 0u, py[0]);
     }
-}
-
-/* 0x10a078, 90 bytes. Build a segment record at EAX from the record at EDX: copy the doubles at +0x20/+0x30/+0x38, zero the first 8 bytes and linearly interpolate the doubles at +0x10 and +0x18 between the endpoints at +0x30 and +0x38 over the extent [+0, +0x20]. */
-void build_segment_record_10a078(uint32_t dst, uint32_t src)
-{
-    double x0 = EF_F64(src);
-    double x1 = EF_F64(src + 0x20u);
-    EF_U32(dst + 0x20u) = EF_U32(src + 0x20u);
-    EF_U32(dst + 0x24u) = EF_U32(src + 0x24u);
-    EF_U32(dst + 0x30u) = EF_U32(src + 0x30u);
-    EF_U32(dst + 0x34u) = EF_U32(src + 0x34u);
-    EF_F64(dst + 0x38u) = EF_F64(src + 0x38u);
-    EF_U32(dst) = 0u;
-    EF_U32(dst + 4u) = 0u;
-    EF_F64(dst + 0x10u) = ((EF_F64(src + 0x10u) - EF_F64(src + 0x30u)) * x1) / (x1 - x0) + EF_F64(src + 0x30u);
-    EF_F64(dst + 0x18u) = ((EF_F64(src + 0x18u) - EF_F64(src + 0x38u)) * x1) / (x1 - x0) + EF_F64(src + 0x38u);
-}
-
-/* 0x10a1c4, 86 bytes. Derive the coefficient record at EAX from the parameters at EDX (doubles s[0]=+0, s[1]=+8, s[2]=+0x10): +0 = s2 * k1, +8 = f(s2) * k2 (f = 0xb3fd0), +0x18 = k2 * s2 * s1 + s2 * k3 * s0, +0x20 = (s1 + s0) / [+0], +0x10 = [+8] * s0. */
-void derive_coefficients_10a1c4(uint32_t dst, uint32_t src)
-{
-    double s0 = EF_F64(src);
-    double s1 = EF_F64(src + 8u);
-    double s2 = EF_F64(src + 0x10u);
-    double r;
-    EF_F64(dst) = s2 * EF_F64(0x001950d0u);
-    r = guest_fn_b3fd0_x(s2);
-    EF_F64(dst + 8u) = r * EF_F64(0x001950d8u);
-    EF_F64(dst + 0x18u) = EF_F64(0x001950d8u) * s2 * s1 + s2 * EF_F64(0x001950e0u) * s0;
-    EF_F64(dst + 0x20u) = (s1 + s0) / EF_F64(dst);
-    EF_F64(dst + 0x10u) = EF_F64(dst + 8u) * s0;
+    return guest_fn_dcb96_x(p);
 }

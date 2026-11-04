@@ -3687,10 +3687,6 @@ uint8_t scan_directory_entry_8b684(int16_t mode, ef_addr32 name, ef_addr32 suffi
 uint32_t add_far_offset_9bfe3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t far_ptr, int32_t delta);
 int32_t select_lowest_rated_entry_9fdd4(void);
 void build_status_line_a9878(ef_addr32 name);
-void guest_fn_9fe1c_x(int32_t a); /* 0x9fe1c EAX */
-uint32_t guest_fn_a7b70_x(void); /* 0xa7b70 -> EAX */
-void guest_fn_cd554_x(void); /* 0xcd554 */
-void guest_fn_cd4d4_x(void); /* 0xcd4d4 */
 
 /* game_helpers82.c */
 void print_move_record_b2504(ef_addr32 rec, int16_t value, uint32_t handle);
@@ -4500,7 +4496,6 @@ uint32_t queue_byte_118428(uint32_t obj, uint32_t ch);
 void guest_fn_117b18_x(uint32_t obj); /* 0x117b18 EAX */
 
 
-void guest_fn_117b18_x(uint32_t obj); /* 0x117b18 EAX */
 
 uint32_t layout_digits_11d322(uint32_t out, uint32_t src, int32_t intdigits, int32_t frac);
 
@@ -4519,7 +4514,6 @@ void draw_ratio_text_40624(void);
 int32_t guest_fn_23760_x(ef_addr32 vec); /* 0x23760 EAX -> EAX */
 
 
-int32_t guest_fn_23760_x(ef_addr32 vec); /* 0x23760 EAX -> EAX */
 
 void write_marker_file_286c0(void);
 void append_entry_and_children_a499c(uint32_t id);
@@ -4568,7 +4562,6 @@ double modf_10d9c6(double x, uint32_t ip);
 double scaled_call_11b588(double x);
 double combine_11bf00(uint32_t v, double a0, double a1);
 double guest_fn_11b540_x(double x); /* 0x11b540 one double on the stack, callee cleanup, result in ST0 */
-double guest_fn_b3fd0_x(double x); /* 0xb3fd0 one double on the stack, callee cleanup, result in ST0 */
 
 double atan2_dc1e9(double st0, double st1);
 double abs_area_11af60(uint32_t p);
@@ -4581,21 +4574,21 @@ double blend_angle_11aff4(uint32_t p, double d);
 double scaled_ratio_11bfc8(uint32_t p, double a0, double a1);
 double scaled_call_11b540(double x);
 double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
-double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
 
 
-double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
-double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
 
 void update_globals_1198ec(void);
 double sqrt_branch_11af14(double a);
 void fdiv_bug_probe_11016c(void);
-double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
-double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
 
 void build_segment_record_10a078(uint32_t dst, uint32_t src);
 void derive_coefficients_10a1c4(uint32_t dst, uint32_t src);
-double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
-double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
+
+double pow_b3fec(double x, double y);
+double guest_fn_fa362_x(double x); /* 0xfa362 ST0 -> ST0, natural logarithm */
+double guest_fn_dcb96_x(double x); /* 0xdcb96 ST0 -> ST0, exponential */
+void guest_callptr7_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f, uint32_t g); /* indirect cdecl call with seven stack arguments */
+
+
 
 #endif
