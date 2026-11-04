@@ -13528,3 +13528,54 @@ uint8_t still_aligned_89b58(ef_addr32 u)
     EF_U8(u + 0x59u) = 0u;
     return 0u;
 }
+
+/* 0x6c2a4, 297 bytes. Derive the flight-model drag terms from the player's double at [0x1f71bc]+0x59 (v). g = -v * K(0x18644c) is stored at 0x1f6fc8 and the ratio (K(0x186454) - g) / (K(0x186454) + g) * double 0x1284a4 at 0x12849c; when g exceeds 0x18645c a quadratic correction t * t * 0x18646c * 0x186474 + 0x12849c (t = g + 0x186464) is added there, and the result is reset to the constant 0x3fb6872b020c49ba when it stays below 0x18646c. The lift term 0x1f6f90 is 0x1284ac * 0x1284b4 + 0x1284bc, recomputed with v in place of 0x1284b4 when v exceeds 0x1284b4. Finally 0x1f6fc0 = 0xa4470(max(0, 0x1f6f90 * 0x18647c)) and 0x1f6fb0 = double 0x1f71b0 / 0x1f6fc0. */
+void update_drag_terms_6c2a4(void)
+{
+    double v, g, k1, k2, ratio, a, b;
+    double t, c, kq, s;
+    double ca, cb, cc, lift, h, r, num;
+    ef_addr32 p = EF_U32(0x001f71bcu);
+    memcpy(&v, ef_guest_memory_ptr(p + 0x59u), sizeof v);
+    memcpy(&k1, ef_guest_memory_ptr(0x0018644cu), sizeof k1);
+    g = (-v) * k1;
+    memcpy(ef_guest_memory_ptr(0x001f6fc8u), &g, sizeof g);
+    memcpy(&k2, ef_guest_memory_ptr(0x00186454u), sizeof k2);
+    memcpy(&a, ef_guest_memory_ptr(0x001284a4u), sizeof a);
+    ratio = ((k2 - g) / (g + k2)) * a;
+    memcpy(ef_guest_memory_ptr(0x0012849cu), &ratio, sizeof ratio);
+    memcpy(&b, ef_guest_memory_ptr(0x0018645cu), sizeof b);
+    if (g > b) {
+        memcpy(&t, ef_guest_memory_ptr(0x00186464u), sizeof t);
+        t = g + t;
+        memcpy(&c, ef_guest_memory_ptr(0x0018646cu), sizeof c);
+        memcpy(&kq, ef_guest_memory_ptr(0x00186474u), sizeof kq);
+        s = ((t * c) * t) * kq + ratio;
+        memcpy(ef_guest_memory_ptr(0x0012849cu), &s, sizeof s);
+        if (!(s >= c)) {
+            EF_U32(0x0012849cu) = 0x020c49bau;
+            EF_U32(0x001284a0u) = 0x3fb6872bu;
+        }
+    }
+    memcpy(&cb, ef_guest_memory_ptr(0x001284b4u), sizeof cb);
+    memcpy(&ca, ef_guest_memory_ptr(0x001284acu), sizeof ca);
+    memcpy(&cc, ef_guest_memory_ptr(0x001284bcu), sizeof cc);
+    lift = ca * cb + cc;
+    memcpy(ef_guest_memory_ptr(0x001f6f90u), &lift, sizeof lift);
+    p = EF_U32(0x001f71bcu);
+    memcpy(&v, ef_guest_memory_ptr(p + 0x59u), sizeof v);
+    if (v > cb) {
+        lift = ca * v + cc;
+        memcpy(ef_guest_memory_ptr(0x001f6f90u), &lift, sizeof lift);
+    }
+    memcpy(&h, ef_guest_memory_ptr(0x0018647cu), sizeof h);
+    memcpy(&lift, ef_guest_memory_ptr(0x001f6f90u), sizeof lift);
+    h = lift * h;
+    if (0.0 > h)
+        h = 0.0;
+    r = guest_fn_a4470(h);
+    memcpy(ef_guest_memory_ptr(0x001f6fc0u), &r, sizeof r);
+    memcpy(&num, ef_guest_memory_ptr(0x001f71b0u), sizeof num);
+    num = num / r;
+    memcpy(ef_guest_memory_ptr(0x001f6fb0u), &num, sizeof num);
+}

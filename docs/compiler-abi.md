@@ -7877,3 +7877,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x89b58` | EAX:ef_addr32 | AL:uint8_t | 89ac0@89ad5 | Is the unit U (EAX) still pointing at its target? Take the target word at [[U+0x30]+0x4b] (0 gives 0), convert the navig |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6c2a4` | none | none | 6bd88@6be04 | Derive the flight-model drag terms from the player's double at [0x1f71bc]+0x59 (v). g = -v * K(0x18644c) is stored at 0x |

@@ -1299,7 +1299,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006be28	190	follow_target_6be28	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006be28.json	docs/compiler-abi.md; Follow-up for the current ship (record at [0x1f71bc]) when its mode byte at +0x16c is 6: look up the object named by the; callers 6bd88@6be1c; guest pending
 0x0006bee8	773			unknown	unclassified	unverified		
 0x0006c1f0	178	estimate_coefficient_6c1f0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006c1f0.json	docs/compiler-abi.md; Stack (ret 8): rational estimate of a coefficient from the double X. R = (X + k) / (k - X) * 1.2 with k = double 0x18641; callers 28b80@28c1f,2ccf0@2cd1d,89c64@89daa; guest pending
-0x0006c2a4	297			unknown	unclassified	unverified		
+0x0006c2a4	297	update_drag_terms_6c2a4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006c2a4.json	docs/compiler-abi.md; Derive the flight-model drag terms from the player's double at [0x1f71bc]+0x59 (v). g = -v * K(0x18644c) is stored at 0x; callers 6bd88@6be04; guest pending
 0x0006c3d0	99	notify_player_unit_6c3d0	unit_flags	compiles	game	confirmed	decomp/tests/0x0006c3d0.json	docs/compiler-abi.md; ; callers 6b6c8@6bbbd; guest pending
 0x0006c488	647			unknown	unclassified	unverified		
 0x0006c710	463			unknown	unclassified	unverified		

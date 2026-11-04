@@ -5669,4 +5669,6 @@ void to_camera_space_83200(ef_addr32 out, int32_t x, int32_t y, int32_t z);
 
 uint8_t still_aligned_89b58(ef_addr32 u);
 
+void update_drag_terms_6c2a4(void);
+
 #endif
