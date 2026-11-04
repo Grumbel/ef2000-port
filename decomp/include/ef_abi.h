@@ -5721,4 +5721,6 @@ void destroy_unit_74718(uint32_t id);
 void update_ground_sound_9021c(ef_addr32 u);
 uint32_t guest_fn_7b7d8_x(void); /* 0x7b7d8 -> EAX */
 
+uint32_t build_scenery_map_7a844(void);
+
 #endif

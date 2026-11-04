@@ -8002,3 +8002,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9021c` | EAX:ef_addr32 | none | 901ec@90203 | Per-frame handling of a ground sound source U (EAX): when it lies within 0x100000 of the camera (fixed point, compare wi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7a844` | none | EAX:uint32_t | 7ab00@7ac24 | Populate the 400 x 400 scenery map: for every cell whose id (hi byte plane 0x1f8eb4, lo byte plane 0x1f8eb8) is not 0xff |

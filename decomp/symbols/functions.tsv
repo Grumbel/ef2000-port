@@ -1458,7 +1458,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a5f0	121	record_word_7a5f0	game_helpers26	compiles	game	confirmed	decomp/tests/0x0007a5f0.json	docs/compiler-abi.md; Append a word to the recorder table from the stream or a 73-byte record.; callers 7a738@7a7a9; guest pending
 0x0007a66c	204	load_directory_list_7a66c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007a66c.json	docs/compiler-abi.md; Load or build a directory list for PATH (EAX) into the save buffer: with the flag 0x12afc8 set the count comes from the ; callers 7a738@7a7cd; guest pending
 0x0007a738	265			unknown	unclassified	unverified		
-0x0007a844	375			unknown	unclassified	unverified		
+0x0007a844	375	build_scenery_map_7a844	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007a844.json	docs/compiler-abi.md; Populate the 400 x 400 scenery map: for every cell whose id (hi byte plane 0x1f8eb4, lo byte plane 0x1f8eb8) is not 0xff; callers 7ab00@7ac24; guest pending
 0x0007a9bc	111	replay_plane_grid_7a9bc	game_helpers63	compiles	game	confirmed	decomp/tests/0x0007a9bc.json	docs/compiler-abi.md; Replay the 400x400 byte-pair grid through the plane source when it is enabled.; callers 7a454@7a45f; guest pending
 0x0007aa2c	15	register_status_description_7aa2c	game_helpers119	compiles	game	confirmed	decomp/tests/0x0007aa2c.json	docs/compiler-abi.md; Register the status description built for the string at 0x187c00.; callers 7ab00@7ab9a; guest pending
 0x0007aa3c	132	pick_random_pair_7aa3c	game_helpers27	compiles	game	confirmed	decomp/tests/0x0007aa3c.json	docs/compiler-abi.md; Pick two random table values for the current stream slot.; callers 7ab00@7abc4; guest pending

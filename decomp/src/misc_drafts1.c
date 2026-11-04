@@ -14301,3 +14301,48 @@ void update_ground_sound_9021c(ef_addr32 u)
     if (guest_fn_7b7d8_x() == 0u)
         guest_fn_9e0c4((int32_t)EF_U32(u + 0x1eu) >> 16, EF_U32(u) << 8, EF_U32(u + 4u) << 8, EF_U32(u + 8u) << 8);
 }
+
+/* 0x7a844, 375 bytes. Populate the 400 x 400 scenery map: for every cell whose id (hi byte plane 0x1f8eb4, lo byte plane 0x1f8eb8) is not 0xff, look the id up in the 6 byte variant table (0x1f8ea4: count word >> 16 at +2, base word >> 16 at +0, flag bits 14.. of +6), pick a random variant (the 16 bit generator 0xa45b3 modulo the count; 0x7a428 selects the active buffer first), and replace the id by the one 0x9de08 produces for that variant (17 byte entries from 0x1f8e9c); cells without a source get 0xffff. An id past the table count (0x1a2e74) is reported through the error hook (0x187bec). Runs inside the state file bracket 0xa1bf4(0x1f8db0, 2) / 0xa1cb4 when byte 0x12afbc is 1 and dword 0x1f8ea0 is 0, reseeds the generator (0xa45a8) and reports progress per column (0x985b0 / 0x985f4). Returns 0. */
+uint32_t build_scenery_map_7a844(void)
+{
+    int32_t col;
+    nop_9dddc();
+    if (EF_U8(0x0012afbcu) == 1u && EF_U32(0x001f8ea0u) == 0u)
+        open_state_file_a1bf4(0x001f8db0u, 2u);
+    reseed_generator_a45a8();
+    start_transfer_985b0(2u, 0x0013292cu, 0u, 0x18fu);
+    for (col = 0; col < 0x190; col++) {
+        uint32_t off;
+        update_progress_985f4(2u, col);
+        for (off = 0u; off != 0x27100u; off += 0x190u) {
+            uint16_t result;
+            uint32_t hi = EF_U8(EF_U32(0x001f8eb4u) + off + (uint32_t)col);
+            if (hi != 0xffu) {
+                uint32_t lo = EF_U8(EF_U32(0x001f8eb8u) + off + (uint32_t)col);
+                int32_t id = (int32_t)((hi << 8) | lo);
+                int32_t count = (int32_t)EF_U32(0x001a2e74u);
+                ef_addr32 ent;
+                int32_t n, rem, base;
+                uint32_t r;
+                if (id >= count)
+                    guest_callptr3_x(EF_U32(0x00132a74u), 0x00187becu, (uint32_t)id, (uint32_t)count);
+                ent = EF_U32(0x001f8ea4u) + (uint32_t)id * 6u;
+                n = (int32_t)EF_U32(ent + 2u) >> 16;
+                r = guest_fn_a45b3() & 0xffffu;
+                rem = (int32_t)r % n;
+                (void)copy_active_buffer_pointer();
+                base = (int32_t)EF_U32(ent) >> 16;
+                result = (uint16_t)guest_fn_9de08(EF_U32(0x001f8e9cu) + (uint32_t)((rem + base) * 0x11),
+                                                  (uint32_t)((EF_U16(ent + 6u) >> 14) & 0xffu));
+            } else {
+                result = 0xffffu;
+            }
+            EF_U8(EF_U32(0x001f8eb8u) + off + (uint32_t)col) = (uint8_t)result;
+            EF_U8(EF_U32(0x001f8eb4u) + off + (uint32_t)col) = (uint8_t)(result >> 8);
+        }
+    }
+    if (EF_U8(0x0012afbcu) == 1u && EF_U32(0x001f8ea0u) == 0u)
+        guest_fn_a1cb4();
+    nop_9dddc();
+    return 0u;
+}
