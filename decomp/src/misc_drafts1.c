@@ -7568,3 +7568,28 @@ void build_unit_name_7548c(uint32_t dest, uint32_t index)
     }
     strcat_9ca57(dest, (uint32_t)(uintptr_t)tmp);
 }
+
+/* 0x7b08c, 221 bytes. Scale two 3-double vectors (A = EAX, B = EDX; components used in the order +8, +0x10, +0) by the double at 0x187c60, truncate each to an integer and store them as the dwords 0x420910/0x420904/0x420918 and 0x420914/0x420908/0x42091c (the +0x10 and second-vector +0x10 values minus 10) and as the words 0x420930..0x42093a, then call 0x7b7d8 and return its result. */
+uint32_t store_scaled_vectors_7b08c(uint32_t a, uint32_t b)
+{
+    double s = *(double *)ef_guest_memory_ptr(0x00187c60u);
+    int32_t i0 = (int32_t)truncate_9d72c(*(double *)ef_guest_memory_ptr(a + 8u) * s);
+    int32_t i1 = (int32_t)truncate_9d72c(*(double *)ef_guest_memory_ptr(a + 0x10u) * s);
+    int32_t i2 = (int32_t)truncate_9d72c(*(double *)ef_guest_memory_ptr(a) * s);
+    int32_t i3 = (int32_t)truncate_9d72c(*(double *)ef_guest_memory_ptr(b + 8u) * s);
+    int32_t i4 = (int32_t)truncate_9d72c(*(double *)ef_guest_memory_ptr(b + 0x10u) * s);
+    int32_t i5 = (int32_t)truncate_9d72c(*(double *)ef_guest_memory_ptr(b) * s);
+    EF_U32(0x00420910u) = (uint32_t)i0;
+    EF_U32(0x00420904u) = (uint32_t)(i1 - 10);
+    EF_U32(0x00420918u) = (uint32_t)i2;
+    EF_U32(0x00420914u) = (uint32_t)i3;
+    EF_U32(0x00420908u) = (uint32_t)(i4 - 10);
+    EF_U32(0x0042091cu) = (uint32_t)i5;
+    EF_U16(0x00420930u) = (uint16_t)i0;
+    EF_U16(0x00420932u) = (uint16_t)(i1 - 10);
+    EF_U16(0x00420934u) = (uint16_t)i2;
+    EF_U16(0x00420936u) = (uint16_t)i3;
+    EF_U16(0x00420938u) = (uint16_t)(i4 - 10);
+    EF_U16(0x0042093au) = (uint16_t)i5;
+    return guest_fn_7b7d8();
+}

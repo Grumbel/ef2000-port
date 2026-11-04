@@ -5132,4 +5132,6 @@ void normalise_angles_6bca8(void);
 
 void build_unit_name_7548c(uint32_t dest, uint32_t index);
 
+uint32_t store_scaled_vectors_7b08c(uint32_t a, uint32_t b);
+
 #endif
