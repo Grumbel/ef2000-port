@@ -3990,3 +3990,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x11d44` | none | none | 601c@60aa,11de0@11e70 | Advance the letter table walk; emits up to 18 letters per step for the active mode. |
 | `0x12210` | AX:int16_t | none | 12d90@12de7 | Refresh a group's entries: its flagged head, then every member from the cx-th list on. |
+
+## game_helpers74 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x941e4` | none | none | 95e58@96182 | Fold the view roll into the scene angles and request a refresh at the limits. |
+| `0x9586c` | none | none | 95e58@96d0e | Chase-camera distance control driven by the speed input bits. |
+| `0x9bba4` | none | none | none direct | Draw the HUD frame: three vertical rails and four border lines. |

@@ -1944,3 +1944,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000944f4	latch_scene_camera_944f4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000944f4 (135 bytes); Latch the camera position and place the scene with the negated view angles.; callers 95e58@96bcb; docs/compiler-abi.md
 0x00011d44	step_letter_table_11d44			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00011d44 (156 bytes); Advance the letter table walk; emits up to 18 letters per step for the active mode.; callers 601c@60aa,11de0@11e70; docs/compiler-abi.md
 0x00012210	refresh_group_entries_12210	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00012210 (142 bytes); Refresh a group's entries: its flagged head, then every member from the cx-th list on.; callers 12d90@12de7; docs/compiler-abi.md
+0x000941e4	update_scene_roll_941e4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000941e4 (229 bytes); Fold the view roll into the scene angles and request a refresh at the limits.; callers 95e58@96182; docs/compiler-abi.md
+0x0009586c	update_chase_distance_9586c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009586c (256 bytes); Chase-camera distance control driven by the speed input bits.; callers 95e58@96d0e; docs/compiler-abi.md
+0x0009bba4	draw_hud_frame_9bba4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009bba4 (253 bytes); Draw the HUD frame: three vertical rails and four border lines.; callers none direct; docs/compiler-abi.md

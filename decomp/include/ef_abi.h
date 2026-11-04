@@ -3562,4 +3562,14 @@ void guest_fn_11e7c_x(int32_t a); /* 0x11e7c EAX */
 void guest_fn_12140_x(void); /* 0x12140 */
 void guest_fn_11d20_x(int32_t a, int32_t b); /* 0x11d20 EAX/EDX */
 
+/* game_helpers74.c */
+void update_scene_roll_941e4(void);
+void update_chase_distance_9586c(void);
+void draw_hud_frame_9bba4(void);
+uint32_t guest_fn_d13ac_x(uint32_t a, uint32_t c); /* 0xd13ac EAX/ECX -> AX */
+void guest_fn_c4105_x(void); /* 0xc4105 */
+void guest_fn_c99ac_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0xc99ac EAX/EDX/EBX/ECX + stack */
+void guest_fn_c9a98_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0xc9a98 EAX/EDX/EBX/ECX + stack */
+void guest_fn_c95ac_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0xc95ac EAX/EDX/EBX/ECX + stack */
+
 #endif

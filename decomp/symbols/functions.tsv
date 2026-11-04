@@ -1919,7 +1919,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000940e0	8			unknown	unclassified	unverified		
 0x00094194	39	reset_scene_update_94194	scene_helpers	compiles	game	confirmed	decomp/tests/0x00094194.json	docs/compiler-abi.md; clear words 0x12dba0/a6; 0x91df4 0x9202c 0x93a8c; scene refresh; callers 95e58@961d5,95e58@96217; guest pending
 0x000941bc	39	reset_scene_update_941bc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000941bc.json	docs/compiler-abi.md; identical body to 0x94194; callers 95e58@96240; guest pending
-0x000941e4	229			unknown	unclassified	unverified		
+0x000941e4	229	update_scene_roll_941e4	game_helpers74	compiles	game	confirmed	decomp/tests/0x000941e4.json	docs/compiler-abi.md; Fold the view roll into the scene angles and request a refresh at the limits.; callers 95e58@96182; guest pending
 0x000942cc	162			unknown	unclassified	unverified		
 0x00094370	162			unknown	unclassified	unverified		
 0x00094484	109	update_camera_94484	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094484.json	docs/compiler-abi.md; ; callers 95e58@9619b; guest pending
@@ -1942,7 +1942,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00095660	161			unknown	unclassified	unverified		
 0x00095704	196			unknown	unclassified	unverified		
 0x000957c8	161			unknown	unclassified	unverified		
-0x0009586c	256			unknown	unclassified	unverified		
+0x0009586c	256	update_chase_distance_9586c	game_helpers74	compiles	game	confirmed	decomp/tests/0x0009586c.json	docs/compiler-abi.md; Chase-camera distance control driven by the speed input bits.; callers 95e58@96d0e; guest pending
 0x0009596c	370			unknown	unclassified	unverified		
 0x00095ae0	276	setup_scene_camera_95ae0	game_helpers59	compiles	game	confirmed	decomp/tests/0x00095ae0.json	docs/compiler-abi.md; Set up the scene camera from the pending target record, or a default view.; callers 95e58@96717; guest pending
 0x00095bf4	313			unknown	unclassified	unverified		
@@ -2013,7 +2013,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009b780	287			unknown	unclassified	unverified		
 0x0009b8a0	707			unknown	unclassified	unverified		
 0x0009bb64	64	shift_tables_9bb64	game_helpers6	compiles	game	confirmed	decomp/tests/0x0009bb64.json	docs/compiler-abi.md; Shift the three 20-entry word tables of a record down by one.; callers 9b8a0@9b8c0,9b8a0@9b8e0,9b8a0@9b900; guest pending
-0x0009bba4	253			unknown	unclassified	unverified		
+0x0009bba4	253	draw_hud_frame_9bba4	game_helpers74	compiles	game	confirmed	decomp/tests/0x0009bba4.json	docs/compiler-abi.md; Draw the HUD frame: three vertical rails and four border lines.; callers none direct; guest pending
 0x0009bca4	83			unknown	unclassified	unverified		
 0x0009bd20	79	watcom_cmain		library	clib	unverified		Watcom C entry: startup command buffer and EBP initialization, calls candidate game main 0x8b274; docs/startup-symbols.md
 0x0009bd70	75	watcom_init_routines		library	clib	unverified		Watcom initializer dispatcher: called with EAX=0xff and walks init table; docs/startup-symbols.md
