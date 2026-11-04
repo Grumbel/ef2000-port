@@ -5208,3 +5208,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xe0b10` | EAX:ef_addr32 | EAX:uint32_t | e0b88@e0bbd,e115c@e1172,e1260@e1265 | Search the buffer at 0x15f5fd (length byte at 0x15f684) for the text, ignoring case; on a hit remember its position at 0 |
 | `0x3a268` | EAX:uint32_t | EAX:uint32_t | 3a148@3a238 | Return 1 when the cell found for the 69-byte record's coordinates (dwords at +7/+0xf divided by 2048) differs from the r |
+
+## search_helpers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3170c` | none | none | 3122c@312ad | Rotate the vector at 0x19e57e by zero angles into 0x19e5c1 and add the offset triple at 0x19e560. |
+| `0x85380` | EAX:uint32_t | none | 857bc@85883 | While the owner record has an active chain (byte +0x8e) whose last 0x19-byte entry has kind 2, run 0x85358. |

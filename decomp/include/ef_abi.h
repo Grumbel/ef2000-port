@@ -4415,4 +4415,7 @@ uint32_t find_text_in_buffer_e0b10(ef_addr32 text);
 uint32_t cell_changed_3a268(uint32_t index);
 uint32_t guest_fn_85bc8_x(ef_addr32 point); /* 0x85bc8 EAX, result in AL */
 
+void place_rotated_vector_3170c(void);
+void drain_kind_two_chain_85380(uint32_t owner);
+
 #endif

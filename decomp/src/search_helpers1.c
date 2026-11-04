@@ -38,3 +38,28 @@ uint32_t cell_changed_3a268(uint32_t index)
     cell = guest_fn_85bc8_x((uint32_t)(uintptr_t)pt) & 0xffu;
     return cell != EF_U16(rec + 0x1du);
 }
+
+/* 0x3170c, 103 bytes. Rotate the vector at 0x19e57e by zero angles into 0x19e5c1 and add the offset triple at 0x19e560. */
+void place_rotated_vector_3170c(void)
+{
+    int16_t angles[3] = { 0, 0, 0 };
+    rotate_vector_by_angles_32414((uint32_t)(uintptr_t)angles, 0x0019e57eu, 0x0019e5c1u);
+    EF_U32(0x0019e5c1u) = EF_U32(0x0019e5c1u) + EF_U32(0x0019e560u);
+    EF_U32(0x0019e5c5u) = EF_U32(0x0019e5c5u) + EF_U32(0x0019e564u);
+    EF_U32(0x0019e5c9u) = EF_U32(0x0019e5c9u) + EF_U32(0x0019e568u);
+}
+
+/* 0x85380, 104 bytes. While the owner record has an active chain (byte +0x8e) whose last 0x19-byte entry has kind 2, run 0x85358. */
+void drain_kind_two_chain_85380(uint32_t owner)
+{
+    int16_t o = (int16_t)owner;
+    for (;;) {
+        uint32_t rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)o * 0xca);
+        uint32_t n = EF_U8(rec + 0x8eu);
+        if (n == 0u)
+            break;
+        if (EF_U8(EF_U32(rec + 0x8au) + (n - 1u) * 0x19u + 0x18u) != 2u)
+            break;
+        decrement_grid_activity((uint32_t)(int32_t)o);
+    }
+}
