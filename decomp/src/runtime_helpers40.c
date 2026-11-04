@@ -100,3 +100,14 @@ int32_t stream_refill_10f1bf(ef_addr32 stream)
     }
     return EF_S32(stream + 4u);
 }
+
+/* 0x11402c, 42 bytes. Start a record that is not yet state 1: trace-call it, reset its table record and link, and set state 4 (cdecl, record on the stack). */
+void start_record_11402c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec)
+{
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (rec != 0 && EF_U32(rec + 4u) != 1u) {
+        trace_call_103148(rec);
+        reset_table_record_and_link_112bbc(0, 0, 0, 0, rec);
+        EF_U32(rec + 4u) = 4;
+    }
+}

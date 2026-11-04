@@ -4626,3 +4626,16 @@ in EAX, format string address, one value).
 | `0x48bb0` | [ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:int32_t,[ESP+16]:int32_t,[ESP+20]:ef_addr32 | none | 11e7c@1212b,150d4@15175,1e7c0@1eab1 | Draw a formatted string at (x, y) with the renderer chosen by mode (1: 0x15a14, 2: 0xe5db4, otherwise 0xe605c); the firs |
 | `0x7e01c` | AX:int16_t,DX:int16_t | none | 7e0a4@7e13f,7e0a4@7e1b5 | Position the numbered child widgets of the container at 0x188034: hide children "0".."8" at (0, 0), then place children  |
 | `0x97d10` | AX:int16_t,DX:int16_t,BX:int16_t,CX:int16_t | none | 97dcc@97ea1 | Set the view origin to the centre of the box (x1, x2, y1, y2), latch its corners and run the 0xdc71b / 0xcdf48 box updat |
+
+## runtime_helpers40 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11402c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 10311c@10313f | Start a record that is not yet state 1: trace-call it, reset its table record and link, and set state 4 (cdecl, record o |
+
+## game_helpers131 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x109dd0` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:int32_t | none | 109e08@109e33,109e40@109e63 | Copy count rows of len bytes from src to dst, advancing both by the row pitch at 0x1631f4. |
+| `0x109e40` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:int32_t | none | e516c@e51b1 | Copy count rows of len bytes at row offset table[idx] + x, from the buffer returned by 0xc382c into the one at 0x15b754. |

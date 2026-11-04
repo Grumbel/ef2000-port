@@ -4032,4 +4032,9 @@ void guest_fn_e5db4_x(uint32_t color, int16_t x, int16_t y, ef_addr32 text); /* 
 void guest_fn_e605c_x(uint32_t color, int16_t x, int16_t y, ef_addr32 text); /* 0xe605c EAX/EDX/EBX/ECX */
 void guest_fn_dc71b_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0xdc71b stack */
 
+void start_record_11402c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+
+void copy_rows_109dd0(ef_addr32 dst, ef_addr32 src, uint32_t len, int32_t count);
+void copy_rows_at_109e40(uint32_t x, uint32_t idx, uint32_t len, int32_t count);
+
 #endif

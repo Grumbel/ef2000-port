@@ -121,3 +121,21 @@ void update_box_view_97d10(int16_t x1, int16_t x2, int16_t y1, int16_t y2)
     guest_fn_dc71b_x((uint32_t)(int32_t)(int16_t)mid_y, (uint32_t)d, (uint32_t)c, (uint32_t)b, (uint32_t)a);
     guest_fn_cdf48((uint32_t)a, (uint32_t)b, (uint32_t)c, (uint32_t)d);
 }
+
+/* 0x109dd0, 53 bytes. Copy count rows of len bytes from src to dst, advancing both by the row pitch at 0x1631f4. */
+void copy_rows_109dd0(ef_addr32 dst, ef_addr32 src, uint32_t len, int32_t count)
+{
+    while (count > 0) {
+        guest_fn_e9a24(len, src, dst);
+        count--;
+        src += EF_U32(0x001631f4u);
+        dst += EF_U32(0x001631f4u);
+    }
+}
+
+/* 0x109e40, 44 bytes. Copy count rows of len bytes at row offset table[idx] + x, from the buffer returned by 0xc382c into the one at 0x15b754. */
+void copy_rows_at_109e40(uint32_t x, uint32_t idx, uint32_t len, int32_t count)
+{
+    uint32_t offset = EF_U32(0x00163200u + idx * 4u) + x;
+    copy_rows_109dd0(EF_U32(0x0015b754u) + offset, guest_fn_c382c() + offset, len, count);
+}

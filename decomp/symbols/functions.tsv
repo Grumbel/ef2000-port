@@ -3954,9 +3954,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001098f0	340			unknown	unclassified	unverified		
 0x00109a80	151			unknown	unclassified	unverified		
 0x00109b20	685			unknown	unclassified	unverified		
-0x00109dd0	53			unknown	unclassified	unverified		
+0x00109dd0	53	copy_rows_109dd0	game_helpers131	compiles	game	confirmed	decomp/tests/0x00109dd0.json	docs/compiler-abi.md; Copy count rows of len bytes from src to dst, advancing both by the row pitch at 0x1631f4.; callers 109e08@109e33,109e40@109e63; guest pending
 0x00109e08	55			unknown	unclassified	unverified		
-0x00109e40	44			unknown	unclassified	unverified		
+0x00109e40	44	copy_rows_at_109e40	game_helpers131	compiles	game	confirmed	decomp/tests/0x00109e40.json	docs/compiler-abi.md; Copy count rows of len bytes at row offset table[idx] + x, from the buffer returned by 0xc382c into the one at 0x15b754.; callers e516c@e51b1; guest pending
 0x00109e6c	3	return_zero_109e6c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00109e6c.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x00109e6f	76	guest_memmove_109e6f	game_helpers129	compiles	game	confirmed	decomp/tests/0x00109e6f.json	docs/compiler-abi.md; memmove: copy n bytes from src to dst, copying backwards when the ranges overlap with dst above src.; callers e6144@e639c,f4347@f4469,f44b6@f454a; guest pending
 0x00109ec0	365			unknown	unclassified	unverified		
@@ -4114,7 +4114,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00113c7c	120			unknown	unclassified	unverified		
 0x00113cf4	27	trace_and_mark_113cf4	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00113cf4.json	docs/compiler-abi.md; Trace-call a non-null record and mark its field 4 as 1.; callers none direct; guest pending
 0x00113d10	794			unknown	unclassified	unverified		
-0x0011402c	42			unknown	unclassified	unverified		
+0x0011402c	42	start_record_11402c	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x0011402c.json	docs/compiler-abi.md; Start a record that is not yet state 1: trace-call it, reset its table record and link, and set state 4 (cdecl, record o; callers 10311c@10313f; guest pending
 0x00114058	171	reset_controllers_114058	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00114058.json	docs/compiler-abi.md; Reset the controllers of a state-4 sound record: set state 8, run 0x112808, then for each of its 16 channels send contro; callers 103148@10316b; guest pending
 0x00114170	47	activate_record_114170	game_helpers120	compiles	game	confirmed	decomp/tests/0x00114170.json	docs/compiler-abi.md; Activate a record: trace it, set state 2 and run its field 0x28 callback (cdecl, record on the stack).; callers 1031a0@1031c3; guest pending
 0x001141a0	16	set_record_field_1141a0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001141a0.json	docs/compiler-abi.md; Store a value at +0x2c of a record when the record exists.; callers 103244@10326e; guest pending
