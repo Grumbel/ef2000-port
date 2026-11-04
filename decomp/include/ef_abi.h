@@ -5947,4 +5947,6 @@ void guest_fn_6ebe0_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32
 void check_row_target_85604(uint32_t id, double scale);
 void guest_fn_857bc_x(int32_t id); /* 0x857bc EAX */
 
+void load_flight_model_89c64(ef_addr32 rec);
+
 #endif

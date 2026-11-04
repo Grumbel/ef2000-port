@@ -18036,3 +18036,46 @@ void check_row_target_85604(uint32_t id, double scale)
 	}
 	guest_fn_857bc_x(ib);
 }
+
+/* 0x89c64, 418 bytes. Load the flight model of aircraft record REC (EAX; type byte +0x18 selects the 145-byte row at 0x12bc99 + 145 * type): double 0x1fcca0 = frame time word 0x127d92 * 0.02, double 0x1fcf50 = row double +0, the dword pairs 0x1fcef8, 0x1fcc80 (or the row's alternates when byte 0x20f230 is set), 0x1fcf08, 0x1fcc88 are copied from the row, double 0x1fcee8 = row double (+0x3c) * pi * (1/180). The derived blocks are then computed (0x88c54 -> 0x1fcf58, 0x88c80 -> 0x1fcf88/0x1fcfd0, 0x88d4c -> 0x1fd020, 0x88d84 -> 0x1fcf48), the coefficient 0x1fcc90 = 0x6c1f0(double 0x1fcf68), the doubles 0x1fcc98 and 0x1fcf10 are set to constants (the latter 9.81 unless the type is 1, 9 or 0x14 and byte 0x20f230 is clear: then 0.0). */
+void load_flight_model_89c64(ef_addr32 rec)
+{
+	uint32_t t = EF_U8(rec + 0x18u);
+	uint32_t row = t * 145u;
+	double d, x;
+
+	d = (double)(uint32_t)EF_U16(0x00127d92u) * 0.02;
+	memcpy(ef_guest_memory_ptr(0x001fcca0u), &d, 8);
+	memcpy(ef_guest_memory_ptr(0x001fcf50u), ef_guest_memory_ptr(row + 0x0012bc99u), 8);
+	EF_U32(0x001fcef8u) = EF_U32(row + 0x0012bccdu);
+	EF_U32(0x001fcefcu) = EF_U32(row + 0x0012bcd1u);
+	EF_U32(0x001fcc80u) = EF_U32(row + 0x0012bcbdu);
+	EF_U32(0x001fcc84u) = EF_U32(row + 0x0012bcc1u);
+	if (EF_U8(0x0020f230u) != 0u) {
+		EF_U32(0x001fcc80u) = EF_U32(row + 0x0012bcb5u);
+		EF_U32(0x001fcc84u) = EF_U32(row + 0x0012bcb9u);
+	}
+	EF_U32(0x001fcf08u) = EF_U32(row + 0x0012bcadu);
+	EF_U32(0x001fcf0cu) = EF_U32(row + 0x0012bcb1u);
+	EF_U32(0x001fcc88u) = EF_U32(row + 0x0012bcc5u);
+	EF_U32(0x001fcc8cu) = EF_U32(row + 0x0012bcc9u);
+	memcpy(&x, ef_guest_memory_ptr(row + 0x0012bcd5u), 8);
+	d = x * 3.1415926536 * 0.005555555555555555;
+	memcpy(ef_guest_memory_ptr(0x001fcee8u), &d, 8);
+	guest_fn_88c54_x(rec, 0x001fcf58u);
+	guest_fn_88c80_x(rec, 0x001fcf88u, 0x001fcfd0u);
+	guest_fn_88d4c_x(rec, 0x001fd020u);
+	convert_scene_scalar(rec, 0x001fcf48u);
+	memcpy(&x, ef_guest_memory_ptr(0x001fcf68u), 8);
+	d = estimate_coefficient_6c1f0(0u, 0u, 0u, 0u, x);
+	memcpy(ef_guest_memory_ptr(0x001fcc90u), &d, 8);
+	EF_U32(0x001fcc98u) = 0x211975d4u;
+	EF_U32(0x001fcf14u) = 0x40239eb8u;
+	EF_U32(0x001fcc9cu) = 0x3ee24d15u;
+	EF_U32(0x001fcf10u) = 0x51eb851fu;
+	t = EF_U8(rec + 0x18u);
+	if ((t == 1u || t == 9u || t == 0x14u) && EF_U8(0x0020f230u) == 0u) {
+		EF_U32(0x001fcf10u) = 0u;
+		EF_U32(0x001fcf14u) = 0u;
+	}
+}

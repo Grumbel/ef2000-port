@@ -1757,7 +1757,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00089ac0	151	try_take_target_89ac0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089ac0.json	docs/compiler-abi.md; When the object's target record (object+0x30 -> +0x4b) is in range (0x89b58), may be swapped in as the object's own targ; callers 8a318@8a54c; guest pending
 0x00089b58	151	still_aligned_89b58	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089b58.json	docs/compiler-abi.md; Is the unit U (EAX) still pointing at its target? Take the target word at [[U+0x30]+0x4b] (0 gives 0), convert the navig; callers 89ac0@89ad5; guest pending
 0x00089bf0	115	period_elapsed_89bf0	game_helpers21	compiles	game	confirmed	decomp/tests/0x00089bf0.json	docs/compiler-abi.md; True when a random value modulo the configured period is within the tick budget.; callers 89ac0@89af4; guest pending
-0x00089c64	418			unknown	unclassified	unverified		
+0x00089c64	418	load_flight_model_89c64	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089c64.json	docs/compiler-abi.md; Load the flight model of aircraft record REC (EAX; type byte +0x18 selects the 145-byte row at 0x12bc99 + 145 * type): d; callers 8a318@8a370; guest pending
 0x00089e08	325			unknown	unclassified	unverified		
 0x00089f50	105	project_aim_vector_89f50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089f50.json	docs/compiler-abi.md; Project the aim vector: with the angles A = double 0x1fd020 and B = double 0x1fcfd0 and the range D = double 0x1fcf48, s; callers 8a318@8a48f,8a318@8a4be,8a318@8a53a; guest pending
 0x00089fbc	542			unknown	unclassified	unverified		
