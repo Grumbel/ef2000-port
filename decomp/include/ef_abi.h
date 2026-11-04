@@ -4698,4 +4698,8 @@ void clip_rect_to_screen_e58a8(void);
 void select_button_state_4f718(uint32_t idx, uint32_t mode);
 void decode_run_literal_e330c(uint32_t fill, uint32_t dst, uint32_t count);
 
+void teardown_once_106b1c(void);
+void mark_matching_slots_35f04(void);
+uint32_t start_trace_d5d18(uint32_t a);
+
 #endif

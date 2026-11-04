@@ -5701,3 +5701,11 @@ in EAX, format string address, one value).
 | `0xe58a8` | none | none | a5ef8@a5f9a,a5ef8@a5fcb,a6d00@a6dc6 | Clip the rectangle at 0x41ec08 (x, y, width, height words) to the screen: a negative origin moves into the size, a recta |
 | `0x4f718` | EAX:uint32_t,EDX:uint32_t | none | 4f3e0@4f481,4f494@4f535,4f548@4f5f5 | Update a row of four button widgets of the group IDX under the root named at 0x184a8c: clear the dirty flag of widgets " |
 | `0xe330c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e393c@e39de,e393c@e39f6,e393c@e3a29 | Decode a run/literal stream from the resource into DST until COUNT bytes are produced: each record is a run length (fill |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x106b1c` | none | none | none direct | One-time runtime teardown guarded by the flag at 0x17d360: register the handler pair (0x105230, 0x106b1c) with 0x1048b4  |
+| `0x35f04` | none | none | 3617c@36258,3617c@3628a,36438@364ba | Walk the byte list at [0x136b74] (length byte at [[0x136b78]]): for every entry whose descriptor (32-byte records at 0x1 |
+| `0xd5d18` | EAX:uint32_t | EAX:uint32_t | 97f90@97fb1 | Start the trace layer once (returns -1 when already started): set the started flag 0x15b968, configure it with A, initia |

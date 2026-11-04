@@ -2616,3 +2616,71 @@ void decode_run_literal_e330c(uint32_t fill, uint32_t dst, uint32_t count)
             guest_callptr1_x(EF_U32(0x00132a74u), 0x00190910u);
     }
 }
+
+/* 0x106b1c, 184 bytes. One-time runtime teardown guarded by the flag at 0x17d360: register the handler pair (0x105230, 0x106b1c) with 0x1048b4 and mark nine ranges through 0x104920 (0x17d2dc..0x4dd850), then clear the flag. */
+void teardown_once_106b1c(void)
+{
+    if (EF_U32(0x0017d360u) == 0u)
+        return;
+    guest_fn_1048b4(0x00105230u, 0x00106b1cu);
+    stack_range_104920(0x0017d2dcu, 0x80u);
+    stack_range_104920(0x0017d35cu, 4u);
+    stack_range_104920(0x004dd84cu, 4u);
+    stack_range_104920(0x004dd840u, 0xcu);
+    stack_range_104920(0x004dd850u, 4u);
+    stack_range_104920(0x004dd83cu, 4u);
+    stack_range_104920(0x004dd834u, 4u);
+    stack_range_104920(0x004dd838u, 4u);
+    stack_range_104920(0x004dd830u, 4u);
+    EF_U32(0x0017d360u) = 0u;
+}
+
+/* 0x35f04, 184 bytes. Walk the byte list at [0x136b74] (length byte at [[0x136b78]]): for every entry whose descriptor (32-byte records at 0x135878) has type 3 and whose key byte equals [0x19f5a6] (for key 0x48 also the word at +1 must equal [0x19f594]), set the per-slot flag 0x19f318 + slot (slot = byte at descriptor +6) and count newly set flags in the word 0x19f58e. */
+void mark_matching_slots_35f04(void)
+{
+    uint16_t found = EF_U16(0x0019f58eu);
+    uint32_t list = EF_U32(0x00136b74u);
+    int32_t i;
+    for (i = 0; i < (int32_t)EF_U8(EF_U32(0x00136b78u)); i++) {
+        uint32_t id = EF_U8(list + (uint32_t)i);
+        uint32_t desc = EF_U32(0x00135878u + (id << 5));
+        uint32_t key = EF_U32(0x0013587cu + (id << 5));
+        uint32_t slot;
+        if (EF_U16(desc + 7u) != 3u)
+            continue;
+        if (EF_U8(key) != EF_U8(0x0019f5a6u))
+            continue;
+        /* The original compares the key against 0x48 and then edx with itself, so the word test below is always taken for key 0x48. */
+        if (EF_U8(0x0019f5a6u) == 0x48u && EF_U16(key + 1u) != EF_U16(0x0019f594u))
+            continue;
+        slot = EF_U8(EF_U32(0x00135878u + (id << 5)) + 6u);
+        if (EF_U8(0x0019f318u + slot) == 0u) {
+            EF_U8(0x0019f318u + slot) = 1u;
+            found++;
+        }
+    }
+    EF_U32(0x00136b74u) = list;
+    EF_U16(0x0019f58eu) = found;
+}
+
+/* 0xd5d18, 188 bytes. Start the trace layer once (returns -1 when already started): set the started flag 0x15b968, configure it with A, initialise the module, open the trace file named at 0x420a6c (undoing the start and reporting through 0x132a74 when that fails), obtain the handle 0x420a64, note the level byte 0x420a71, register the handler 0xd5cc4 and finish with 0x1034b0. */
+uint32_t start_trace_d5d18(uint32_t a)
+{
+    if (EF_U8(0x0015b968u) != 0u)
+        return 0xffffffffu;
+    EF_U8(0x0015b968u) = 1u;
+    trace_call_103504(a);
+    init_module_d6dc4();
+    if (trace_call_102f60(0u, 0u, 0u, 0u, 0x00420a6cu) != 0u) {
+        trace_call_101ddc();
+        EF_U8(0x0015b968u) = 0u;
+        EF_U8(0x0015bac5u) = 0u;
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018f858u, EF_U32(0x0015b964u));
+    }
+    EF_U32(0x00420a64u) = trace_call_10303c(0u, 0u, 0u, 0u, EF_U32(0x00420a6cu));
+    if (EF_U32(0x00420a64u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018f868u, 0x004dd6b0u);
+    note_value_d5fc8(EF_U8(0x00420a71u));
+    guest_fn_9c3cf(0x000d5cc4u);
+    return trace_call_1034b0(0u, 0u, 0u, 0u, EF_U32(0x00420a6cu));
+}

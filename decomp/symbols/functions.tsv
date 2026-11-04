@@ -606,7 +606,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00035e68	37	onopenRxstatus		named	unclassified	unverified		
 0x00035e90	37	gnSetNonEntryFlag		named	unclassified	unverified		
 0x00035eb8	75	gnNewType		named	unclassified	unverified		
-0x00035f04	184			unknown	unclassified	unverified		
+0x00035f04	184	mark_matching_slots_35f04	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035f04.json	docs/compiler-abi.md; Walk the byte list at [0x136b74] (length byte at [[0x136b78]]): for every entry whose descriptor (32-byte records at 0x1; callers 3617c@36258,3617c@3628a,36438@364ba; guest pending
 0x00035fbc	71	set_buttons_35fbc	game_helpers7	compiles	game	confirmed	decomp/tests/0x00035fbc.json	docs/compiler-abi.md; ; callers 36054@36076; guest pending
 0x00036004	77	set_buttons_36004	game_helpers7	compiles	game	confirmed	decomp/tests/0x00036004.json	docs/compiler-abi.md; ; callers 36438@367a1; guest pending
 0x00036054	172	open_stream_36054	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00036054.json	docs/compiler-abi.md; Open the named stream for playback and arm the stream state.; callers 36f84@37066,36f84@37077; guest pending
@@ -3058,7 +3058,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d53ff	1676			unknown	unclassified	unverified		
 0x000d5a90	271			unknown	unclassified	unverified		
 0x000d5c84	22	remap_address_d5c84	game_helpers119	compiles	game	confirmed	decomp/tests/0x000d5c84.json	docs/compiler-abi.md; Map an address inside the range 0xd3900..0xd5c84 to 0xc454a; any other value is returned unchanged.; callers c4310@c4341; guest pending
-0x000d5d18	188			unknown	unclassified	unverified		
+0x000d5d18	188	start_trace_d5d18	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d5d18.json	docs/compiler-abi.md; Start the trace layer once (returns -1 when already started): set the started flag 0x15b968, configure it with A, initia; callers 97f90@97fb1; guest pending
 0x000d5e0c	179	register_trace_block_d5e0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d5e0c.json	docs/compiler-abi.md; Register the block REC (size at +5, address at +9) with the trace layer: touch each of its pages, mark the range (0x1049; callers 98050@980af; guest pending
 0x000d5ec0	75	release_block_d5ec0	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000d5ec0.json	docs/compiler-abi.md; Tear down a loaded block record: trace-call 0x1031a0 with the handle at 0x420a64, release its range (+9 pointer, +5 leng; callers 980e8@98114; guest pending
 0x000d5f0c	154			unknown	unclassified	unverified		
@@ -3907,7 +3907,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001068b8	70	deactivate_record_1068b8	game_helpers121	compiles	game	confirmed	decomp/tests/0x001068b8.json	docs/compiler-abi.md; Deactivate a record that is not yet state 1 or 2: set state 2, run the callbacks at 0x84c and 0x850 (cdecl, record on th; callers 1027f8@10281b; guest pending
 0x00106938	28	exchange_callback_106938	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106938.json	docs/compiler-abi.md; Exchange dword +0x850; null object returns 0.; callers 102dbc@102de8; guest pending
 0x00106988	63	set_and_notify_106988	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106988.json	docs/compiler-abi.md; Store dword +0x68 and notify each of the +0x60 entries (0x894 bytes each) whose state is not 1.; callers 102a98@102ac2; guest pending
-0x00106b1c	184			unknown	unclassified	unverified		
+0x00106b1c	184	teardown_once_106b1c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00106b1c.json	docs/compiler-abi.md; One-time runtime teardown guarded by the flag at 0x17d360: register the handler pair (0x105230, 0x106b1c) with 0x1048b4 ; callers none direct; guest pending
 0x00106be0	5	tail_jump_106be0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00106be0.json	docs/compiler-abi.md; tail jump. Forward to 0xf8248.; callers 106cb0@106cbd,106d34@106d3d,106d34@106d57; guest pending
 0x00106be8	18	times_100	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106be8.json	docs/compiler-abi.md; value * 100.; callers d9c30@d9c45,d9c30@d9c7e,d9cb4@d9cd5; guest pending
 0x00106bfc	32	times_100_div_10	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106bfc.json	docs/compiler-abi.md; value * 100 / 10.; callers d9cb4@d9cf4,d9dc0@d9de6,106d34@106d9c; guest pending
