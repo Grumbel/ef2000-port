@@ -5,162 +5,88 @@
 #include "ef_globals.h"
 #include "ef_mem.h"
 
-/* Named key table, widget drawing and scene group walk, 0xa6c20..0xaa350.
- * In the flat 32-bit guest, host stack buffers are valid guest pointers. */
+/* Row clearing and the 15-slot sound channel table. */
 
-/* 0xa6c20, 203 bytes. Draw a widget's text when its rectangle lies inside the clip box. */
-void draw_widget_text_a6c20(ef_addr32 widget)
+/* 0x110b70, 51 bytes. Zero len bytes at the start of each of count rows spaced stride bytes apart. */
+void clear_rows_110b70(ef_addr32 dest, int16_t stride, int16_t len, int16_t count)
 {
-    char text[0x84];
-    int32_t x = (EF_S32(0x0041ec00u) >> 16) + (EF_S32(widget + 0x2bu) >> 16);
-    int32_t limit = (EF_S32(0x0041ec0cu) >> 16) + (EF_S32(0x0041ec08u) >> 16);
-    int32_t y;
-    int32_t ylimit;
-
-    if (x >= limit || x + EF_U16(widget + 0x31u) < (EF_S32(0x0041ec08u) >> 16))
+    if (count <= 0)
         return;
-    y = (EF_S32(0x0041ebfeu) >> 16) + (EF_S32(widget + 0x29u) >> 16);
-    ylimit = (EF_S32(0x0041ec0au) >> 16) + (EF_S32(0x0041ec06u) >> 16);
-    if (y >= ylimit || y + EF_U16(widget + 0x2fu) < (EF_S32(0x0041ec06u) >> 16))
-        return;
-    copy_string_9d749((ef_addr32)(uintptr_t)text, EF_U32(widget + 0x27u));
-    guest_fn_e26bc(0, (int16_t)(EF_U16(0x0041ec00u) + EF_U16(widget + 0x2bu)),
-                   (int16_t)(EF_U16(0x0041ec02u) + EF_U16(widget + 0x2du)),
-                   (ef_addr32)(uintptr_t)text, (uint32_t)(EF_U8(widget + 0x8bu) >> 4));
+    do {
+        fill_bytes_b3fb0(dest, 0, (uint32_t)(int32_t)len);
+        count--;
+        dest += (uint32_t)(int32_t)stride;
+    } while (count > 0);
 }
 
-/* 0xa713c, 199 bytes. Draw a widget's frame rectangle when it is visible. */
-void draw_widget_frame_a713c(ef_addr32 widget)
+/* 0x111365, 71 bytes. Claim a free slot of the 15-entry table at 0x17d664, store the argument in 0x17d624 and return the slot offset (-1 when full). */
+uint32_t claim_table_slot_111365(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value)
 {
-    ef_addr32 owner;
-    int32_t x;
-    int32_t y;
-    int32_t w;
-    uint32_t color;
+    uint32_t slot = 0;
 
-    if ((EF_U8(widget + 0x3au) & 0x40) == 0 || (EF_U8(widget + 0x3au) & 1) == 0)
-        return;
-    if ((EF_S32(widget + 0x3fu) >> 16) + (EF_S32(widget + 0x43u) >> 16) > EF_S32(0x0015b744u))
-        return;
-    owner = find_widget_checked_a78bc(widget, 0x0018d1ecu);
-    x = (int16_t)(EF_U16(widget + 0x41u) + EF_U16(owner + 4u));
-    w = (int16_t)((uint16_t)(EF_U16(widget + 0x41u) + EF_U16(widget + 0x45u)) - (uint16_t)x);
-    y = (int16_t)(EF_U16(widget + 0x43u) + 1);
-    if (EF_U8(owner + 0x1du) & 1) {
-        color = EF_U32(0x0041ec1cu);
-    } else {
-        color = EF_U32(0x0041ec24u);
-        w = (int16_t)(w - 1);
-    }
-    guest_fn_c92e4(x, y, w, EF_S32(owner + 4u) >> 16, EF_S32(0x0015b742u) >> 16, x, y, color);
-}
-
-/* 0xa7510, 119 bytes. Store a name in a record, allocating its buffer on first use. */
-void set_record_name_a7510(ef_addr32 record, ef_addr32 name)
-{
-    if (name == 0)
-        name = 0x0018d1f4u;
-    if (EF_U32(record + 0x27u) == 0) {
-        EF_U16(record + 0x3du) = (uint16_t)guest_string_length(name);
-        EF_U32(record + 0x27u) = alloc_zeroed_ab840((uint32_t)EF_U16(record + 0x3du) + 1u);
-        if (EF_U32(record + 0x27u) == 0)
-            guest_fatal_arg(0x0018d1f8u, name);
-    } else if (guest_string_length(name) > (uint32_t)EF_U16(record + 0x3du)) {
-        guest_fatal_arg3(0x0018d234u, record + 0x3fu, name, EF_U32(record + 0x27u));
-    }
-    copy_string_9d749(EF_U32(record + 0x27u), name);
-}
-
-/* 0xa7ec4, 158 bytes. Look up a key name; unknown names return a fallback slot. */
-ef_addr32 lookup_key_a7ec4(ef_addr32 name)
-{
-    int16_t i = 0;
-
-    guest_fn_eb478(name);
-    copy_string_9d749(0x00419218u + (uint32_t)(EF_S32(0x004194c2u) >> 16) * 21u, name);
-    while (guest_fn_a4380(name, 0x00419218u + (uint32_t)(int32_t)i * 21u) != 0)
-        i++;
-    if (i >= (int16_t)EF_U16(0x004194c4u)) {
-        if (EF_U8(0x001371f9u) == 0)
-            return 0x001371e8u;
-        guest_fatal_arg(0x0018d584u, name);
-    }
-    if (EF_U8(0x0041948eu + (uint32_t)(int32_t)i) != 0)
-        guest_fatal_arg(0x0018d5acu, name);
-    return 0x00418708u + (uint32_t)(int32_t)i * 4u;
-}
-
-/* 0xa7f64, 173 bytes. Look up a key name that must exist and be of kind 1. */
-ef_addr32 find_key_checked_a7f64(ef_addr32 name)
-{
-    char message[0x50];
-    int16_t i = 0;
-
-    guest_fn_eb478(name);
-    while (guest_fn_a4380(name, 0x00419218u + (uint32_t)(int32_t)i * 21u) != 0
-           && i < (int16_t)EF_U16(0x004194c4u))
-        i++;
-    if (i >= (int16_t)EF_U16(0x004194c4u)) {
-        if (EF_U8(0x001371f9u) == 0)
-            return 0x001371d8u;
-        format_ui_status_value((ef_addr32)(uintptr_t)message, 0x0018d5dcu, name);
-        ui_report_missing_record((ef_addr32)(uintptr_t)message);
-    }
-    if (EF_U8(0x0041948eu + (uint32_t)(int32_t)i) != 1) {
-        format_ui_status_value((ef_addr32)(uintptr_t)message, 0x0018d604u, name);
-        ui_report_missing_record((ef_addr32)(uintptr_t)message);
-    }
-    return 0x00418708u + (uint32_t)(int32_t)i * 4u;
-}
-
-/* 0xa9bfc, 209 bytes. Reset the key table state and its buffer pointers. */
-void reset_key_tables_a9bfc(void)
-{
-    EF_U8(0x00137205u) = 0;
-    EF_U8(0x001371fbu) = 0;
-    EF_U32(0x00419214u) = 0;
-    EF_U16(0x004194acu) = 0;
-    EF_U8(0x001371edu) = 0;
-    EF_U32(0x00417254u) = 0x0041952fu;
-    EF_U32(0x00417258u) = 0x00419502u;
-    EF_U32(0x0041725cu) = 0x00419511u;
-    EF_U32(0x00417260u) = 0x004194e4u;
-    EF_U16(0x004194c4u) = 0;
-    EF_U32(0x00417250u) = 0x00419520u;
-    EF_U32(0x00417264u) = 0x004194f3u;
-    EF_U32(0x00417270u) = 0x0041953eu;
-    EF_U32(0x00417274u) = 0x0041954du;
-    EF_U32(0x00417268u) = 0x004194c6u;
-    EF_U32(0x0041726cu) = 0x004194d5u;
-    latch_b3f48();
-    EF_U8(0x001371f9u) = return_true_3ce2c();
-    EF_U8(0x001371eeu) = 0;
-    EF_U8(0x001371ffu) = 0;
-    EF_U8(0x00137200u) = 0;
-    EF_U8(0x00137201u) = 0;
-}
-
-/* 0xaa350, 140 bytes. Walk every scene group and resolve its child nodes. */
-void resolve_scene_groups_aa350(void)
-{
-    ef_addr32 group = EF_U32(0x00419200u);
-    int16_t g;
-    int16_t n;
-
-    for (g = 0; g < (int16_t)EF_U16(0x004194c2u); g++) {
-        ef_addr32 node = EF_U32(group + 8u);
-        for (n = 0; n < (int16_t)EF_U16(group + 0xcu); n++) {
-            uint8_t type = EF_U8(node);
-            if (type == 3) {
-                if (guest_fn_aa2f8(EF_U32(node + 9u)) != 0)
-                    guest_report_parser_enum_error(0x0018d888u, (uint32_t)(int32_t)g, (uint32_t)(int32_t)n);
-                resolve_child_aa2b4(EF_U32(node + 9u));
-                guest_fn_aa198(EF_U32(node + 9u));
-            } else if (type == 0xa) {
-                guest_fn_aa1c0(EF_U32(node + 9u));
-            }
-            node = EF_U32(node + 1u);
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    guest_fn_101e70();
+    for (;;) {
+        if (EF_U32(0x0017d664u + slot) == 0) {
+            EF_U32(0x0017d664u + slot) = 1;
+            EF_U32(0x0017d624u + slot) = value;
+            break;
         }
-        group = EF_U32(group);
+        slot += 4;
+        if (slot >= 0x3c) {
+            slot = 0xffffffffu;
+            break;
+        }
     }
+    guest_fn_101e78();
+    return slot;
+}
+
+/* 0x11141f, 48 bytes. Promote a table slot from state 1 to state 2. */
+void table_slot_1_to_2_11141f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot)
+{
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    guest_fn_101e70();
+    if (slot != 0xffffffffu && EF_U32(0x0017d664u + slot) == 1)
+        EF_U32(0x0017d664u + slot) = 2;
+    guest_fn_101e78();
+}
+
+/* 0x111473, 48 bytes. Demote a table slot from state 2 to state 1. */
+void table_slot_2_to_1_111473(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot)
+{
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    guest_fn_101e70();
+    if (slot != 0xffffffffu && EF_U32(0x0017d664u + slot) == 2)
+        EF_U32(0x0017d664u + slot) = 1;
+    guest_fn_101e78();
+}
+
+/* 0x1114c7, 48 bytes. Set a slot's field at 0x17d6e4, clear its field at 0x17d6a4 and run 110f6f. */
+void set_table_slot_value_1114c7(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot, uint32_t value)
+{
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    guest_fn_101e70();
+    EF_U32(0x0017d6e4u + slot) = value;
+    EF_U32(0x0017d6a4u + slot) = 0;
+    guest_fn_110f6f_x();
+    guest_fn_101e78();
+}
+
+/* 0x111f20, 45 bytes. Read a MIDI variable-length quantity (up to 4 bytes) and advance the cursor stored at the argument. */
+uint32_t read_varlen_111f20(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 cursor)
+{
+    uint32_t value = 0;
+    int32_t left = 4;
+
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    do {
+        uint32_t b = EF_U8(EF_U32(cursor));
+        EF_U32(cursor) = EF_U32(cursor) + 1u;
+        value = (value << 7) | (b & 0x7fu);
+        if ((b & 0x80u) == 0)
+            break;
+        left--;
+    } while (left != 0);
+    return value;
 }

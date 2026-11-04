@@ -3784,4 +3784,13 @@ void clear_table_entry_1113d4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 void guest_fn_106d00_x(uint32_t a); /* 0x106d00 EAX */
 void guest_fn_106dc4_x(uint32_t a, uint32_t b); /* 0x106dc4 EAX EDX */
 
+/* runtime_helpers32.c */
+void clear_rows_110b70(ef_addr32 dest, int16_t stride, int16_t len, int16_t count);
+uint32_t claim_table_slot_111365(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
+void table_slot_1_to_2_11141f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot);
+void table_slot_2_to_1_111473(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot);
+void set_table_slot_value_1114c7(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot, uint32_t value);
+uint32_t read_varlen_111f20(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 cursor);
+void guest_fn_110f6f_x(void); /* 0x110f6f */
+
 #endif

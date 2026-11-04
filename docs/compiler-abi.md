@@ -4257,3 +4257,14 @@ in EAX, format string address, one value).
 | `0x112bbc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 113d10@113e46,11402c@114045 | Reset a table record and point its field 0x14 8 bytes past field 0x10. |
 | `0x113cf4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Trace-call a non-null record and mark its field 4 as 1. |
 | `0x1113d4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 102384@1023a7 | Between the 101e70/101e78 bracket clear one table dword (index from the stack) unless it is -1. |
+
+## runtime_helpers32 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x110b70` | EAX:ef_addr32,DX:int16_t,BX:int16_t,CX:int16_t | none | none direct | Zero len bytes at the start of each of count rows spaced stride bytes apart. |
+| `0x111365` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 101c54@101d7c,102144@102169 | Claim a free slot of the 15-entry table at 0x17d664, store the argument in 0x17d624 and return the slot offset (-1 when  |
+| `0x11141f` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 101c54@101da0,1022dc@1022ff | Promote a table slot from state 1 to state 2. |
+| `0x111473` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 102330@102353 | Demote a table slot from state 2 to state 1. |
+| `0x1114c7` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 1021f4@10221e | Set a slot's field at 0x17d6e4, clear its field at 0x17d6a4 and run 110f6f. |
+| `0x111f20` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 112c10@112db4,112c10@112f7b,112c10@1130f0 | Read a MIDI variable-length quantity (up to 4 bytes) and advance the cursor stored at the argument. |

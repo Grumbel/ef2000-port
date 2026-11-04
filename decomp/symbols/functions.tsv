@@ -4053,7 +4053,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011092c	217			unknown	unclassified	unverified		
 0x00110a08	296			unknown	unclassified	unverified		
 0x00110b30	61			unknown	unclassified	unverified		
-0x00110b70	51			unknown	unclassified	unverified		
+0x00110b70	51	clear_rows_110b70	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00110b70.json	docs/compiler-abi.md; Zero len bytes at the start of each of count rows spaced stride bytes apart.; callers none direct; guest pending
 0x00110dcc	13	increment_17d7ba	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110dcc.json	docs/compiler-abi.md; ; callers 101ba8@101bb1; guest pending
 0x00110dd9	13	decrement_17d7ba	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110dd9.json	docs/compiler-abi.md; ; callers 101ba8@101bd1; guest pending
 0x00110f0c	48			unknown	unclassified	unverified		
@@ -4070,15 +4070,15 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011124c	161			unknown	unclassified	unverified		
 0x001112ed	108			unknown	unclassified	unverified		
 0x00111359	12	value_17d7b6	runtime_libc	compiles	game	confirmed	decomp/tests/0x00111359.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x00111365	71			unknown	unclassified	unverified		
+0x00111365	71	claim_table_slot_111365	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00111365.json	docs/compiler-abi.md; Claim a free slot of the 15-entry table at 0x17d664, store the argument in 0x17d624 and return the slot offset (-1 when ; callers 101c54@101d7c,102144@102169; guest pending
 0x001113ac	40	exchange_slot_1113ac	runtime_libc	compiles	game	confirmed	decomp/tests/0x001113ac.json	docs/compiler-abi.md; Exchange dword 0x17d764[index] under the lock 0x101e70/0x101e78.; callers 102198@1021c4; guest pending
 0x001113d4	39	clear_table_entry_1113d4	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x001113d4.json	docs/compiler-abi.md; Between the 101e70/101e78 bracket clear one table dword (index from the stack) unless it is -1.; callers 102384@1023a7; guest pending
 0x001113fb	36	for_each_slot_1113fb	runtime_libc	compiles	game	confirmed	decomp/tests/0x001113fb.json	docs/compiler-abi.md; Call trace_call_102384 for the slots 0x38 down to 0.; callers 1023b0@1023d1; guest pending
-0x0011141f	48			unknown	unclassified	unverified		
+0x0011141f	48	table_slot_1_to_2_11141f	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x0011141f.json	docs/compiler-abi.md; Promote a table slot from state 1 to state 2.; callers 101c54@101da0,1022dc@1022ff; guest pending
 0x0011144f	36	for_each_slot_11144f	runtime_libc	compiles	game	confirmed	decomp/tests/0x0011144f.json	docs/compiler-abi.md; As 0x1113fb for 0x1022dc.; callers none direct; guest pending
-0x00111473	48			unknown	unclassified	unverified		
+0x00111473	48	table_slot_2_to_1_111473	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00111473.json	docs/compiler-abi.md; Demote a table slot from state 2 to state 1.; callers 102330@102353; guest pending
 0x001114a3	36	for_each_slot_1114a3	runtime_libc	compiles	game	confirmed	decomp/tests/0x001114a3.json	docs/compiler-abi.md; As 0x1113fb for 0x102330.; callers none direct; guest pending
-0x001114c7	48			unknown	unclassified	unverified		
+0x001114c7	48	set_table_slot_value_1114c7	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x001114c7.json	docs/compiler-abi.md; Set a slot's field at 0x17d6e4, clear its field at 0x17d6a4 and run 110f6f.; callers 1021f4@10221e; guest pending
 0x001114f7	48	set_rate_1114f7	runtime_libc	compiles	game	confirmed	decomp/tests/0x001114f7.json	docs/compiler-abi.md; 0x1021f4(a, 1000000 / b) under the lock.; callers 101c54@101d8c,102228@102252; guest pending
 0x00111527	66	set_period_111527	runtime_libc	compiles	game	confirmed	decomp/tests/0x00111527.json	docs/compiler-abi.md; 0x1021f4(a, b == 0 ? 0xd68d : 10000 * b / 0x2e9c) under the lock.; callers 10225c@102286; guest pending
 0x00111569	12	value_17d7ae	runtime_libc	compiles	game	confirmed	decomp/tests/0x00111569.json	docs/compiler-abi.md; ; callers none direct; guest pending
@@ -4091,7 +4091,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00111df0	77			unknown	unclassified	unverified		
 0x00111e40	146			unknown	unclassified	unverified		
 0x00111ed4	76			unknown	unclassified	unverified		
-0x00111f20	45			unknown	unclassified	unverified		
+0x00111f20	45	read_varlen_111f20	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00111f20.json	docs/compiler-abi.md; Read a MIDI variable-length quantity (up to 4 bytes) and advance the cursor stored at the argument.; callers 112c10@112db4,112c10@112f7b,112c10@1130f0; guest pending
 0x00111f50	52	byte_swap_111f50	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00111f50.json	docs/compiler-abi.md; Byte-swap a dword (cdecl).; callers 111f84@111fc4,111f84@112031,113d10@113d60; guest pending
 0x00111f84	196			unknown	unclassified	unverified		
 0x00112048	408			unknown	unclassified	unverified		
