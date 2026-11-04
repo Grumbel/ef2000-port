@@ -3905,6 +3905,6 @@ uint32_t attach_buffer_117ed4(ef_addr32 obj, ef_addr32 holder, uint16_t size);
 void refresh_player_channels_1142cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 player, uint32_t value);
 
 /* game_helpers118.c */
-
+int32_t find_free_slot_run_b58a8(ef_addr32 obj, int16_t start, int16_t need);
 
 #endif

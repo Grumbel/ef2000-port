@@ -4435,3 +4435,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## game_helpers118 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb58a8` | EAX:ef_addr32,DX:int16_t,BX:int16_t | EAX:int32_t | 4fa64@4fb14,b5640@b565a,b5800@b587b | Search the object's slot table (9-byte entries, count at +0x48, flag byte at +3 meaning used) from start for a slot whos |

@@ -8,7 +8,7 @@
 /* Free slot run search in a 9-byte entry table. */
 
 /* 0xb58a8, 253 bytes. Search the object's slot table (9-byte entries, count at +0x48, flag byte at +3 meaning used) from start for a slot whose following window holds at least need free slots; falls back to the first free slot, or the last slot. */
-int16_t find_free_slot_run_b58a8(ef_addr32 obj, int16_t start, int16_t need)
+int32_t find_free_slot_run_b58a8(ef_addr32 obj, int16_t start, int16_t need)
 {
     int16_t result = -1;
     int16_t first_free = 1;
@@ -46,6 +46,6 @@ int16_t find_free_slot_run_b58a8(ef_addr32 obj, int16_t start, int16_t need)
         }
     }
     if (result == -1 || result >= EF_S16(obj + 0x48u))
-        return (int16_t)(EF_S16(obj + 0x48u) - 1);
+        return (int32_t)EF_S16(obj + 0x48u) - 1;
     return result;
 }
