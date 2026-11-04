@@ -4365,4 +4365,11 @@ void copy_rows_from_screen_109e08(uint32_t x, uint32_t idx, uint32_t len, int32_
 void save_rect_list_e5114(void);
 void restore_rect_list_e516c(void);
 
+/* script_helpers2.c */
+void run_section_one_f4c60(void);
+void run_section_two_f4d0c(void);
+
+
+void guest_fn_f46cc(void); /* 0xf46cc no arguments */
+
 #endif

@@ -5133,3 +5133,10 @@ in EAX, format string address, one value).
 | `0x109e08` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:int32_t | none | e5114@e5159 | Copy count rows of len bytes at row offset table[idx] + x from the screen (0x15b754) into the buffer returned by 0xc382c |
 | `0xe5114` | none | none | a5ef8@a5f81,a60a8@a60da,a6d00@a6d69 | Copy every rectangle of the list at 0x43399e (8-byte entries, count in the word at 0x433eac) from the screen into the ba |
 | `0xe516c` | none | none | a5ef8@a6003,a60a8@a61a1,a6d00@a70d6 | Copy every rectangle of the list at 0x43399e from the backing buffer back to the screen. |
+
+## script_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf4c60` | none | none | none direct | Run the mode-1 script section, complaining about each missing part (flags 0x485f72, 0x485f6f, 0x485f73). |
+| `0xf4d0c` | none | none | none direct | Run the mode-2 script section (flags 0x485f6d, 0x485f6c, 0x485f6e). |
