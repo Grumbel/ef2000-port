@@ -8644,3 +8644,34 @@ void assign_group_slots_49fd4(uint32_t p)
         i++;
     } while (i < EF_U8(p + 0x12u));
 }
+
+/* 0x4e5bc, 256 bytes. Insert an interpolated entry into the 24-slot waypoint arrays when byte 0x1a568a is 0x11 and the entry kind at 0x1a5673[byte 0x1a559f] is not: shift slots (word arrays 0x1a55a2 and 0x1a55d6, byte array 0x1a5672, dword array 0x1a560a) up by one from the end down to the current index, advance the index (byte 0x1a559f, 8-bit wrap) and store at the new index the midpoints (rounded toward zero) of the neighbouring word pairs 0x1a55a0/0x1a55a4 and 0x1a55d4/0x1a55d8, with kind 0x12. */
+void insert_midpoint_4e5bc(void)
+{
+    int16_t k;
+    uint8_t idx;
+    uint32_t n;
+    int32_t a, c, d, e, f;
+    if (EF_U8(0x001a568au) != 0x11u)
+        return;
+    if (EF_U8(0x001a5673u + EF_U8(0x001a559fu)) == 0x11u)
+        return;
+    for (k = 0x17; k > (int16_t)EF_U8(0x001a559fu); k--) {
+        uint32_t i = (uint32_t)(int32_t)k;
+        EF_U16(0x001a55a4u + i * 2u) = EF_U16(0x001a55a2u + i * 2u);
+        EF_U16(0x001a55d8u + i * 2u) = EF_U16(0x001a55d6u + i * 2u);
+        EF_U8(0x001a5673u + i) = EF_U8(0x001a5672u + i);
+        EF_U32(0x001a560eu + i * 4u) = EF_U32(0x001a560au + i * 4u);
+    }
+    idx = (uint8_t)(EF_U8(0x001a559fu) + 1u);
+    EF_U8(0x001a559fu) = idx;
+    n = idx;
+    a = (int16_t)EF_U16(0x001a55a0u + n * 2u);
+    c = (int16_t)EF_U16(0x001a55a4u + n * 2u);
+    d = a - c;
+    EF_U16(0x001a55a2u + n * 2u) = (uint16_t)(d / 2 + c);
+    e = (int16_t)EF_U16(0x001a55d4u + n * 2u);
+    f = (int16_t)EF_U16(0x001a55d8u + n * 2u);
+    EF_U16(0x001a55d6u + (uint32_t)EF_U8(0x001a559fu) * 2u) = (uint16_t)((e - f) / 2 + f);
+    EF_U8(0x001a5672u + EF_U8(0x001a559fu)) = 0x12u;
+}

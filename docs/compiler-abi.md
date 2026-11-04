@@ -6900,3 +6900,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x49fd4` | EAX:uint32_t | none | 49228@49799 | For every member I (byte +0x12 of the group record P = EAX) look up the object index in the row table at 0x1fcb40 (rows  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4e5bc` | none | none | 4dcd8@4dd6d | Insert an interpolated entry into the 24-slot waypoint arrays when byte 0x1a568a is 0x11 and the entry kind at 0x1a5673[ |

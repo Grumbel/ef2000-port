@@ -5228,4 +5228,6 @@ void start_timer_service_e28e8(void);
 
 void assign_group_slots_49fd4(uint32_t p);
 
+void insert_midpoint_4e5bc(void);
+
 #endif

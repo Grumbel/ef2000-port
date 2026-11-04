@@ -895,7 +895,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004e0d0	306			unknown	unclassified	unverified		
 0x0004e204	347			unknown	unclassified	unverified		
 0x0004e360	602			unknown	unclassified	unverified		
-0x0004e5bc	256			unknown	unclassified	unverified		
+0x0004e5bc	256	insert_midpoint_4e5bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004e5bc.json	docs/compiler-abi.md; Insert an interpolated entry into the 24-slot waypoint arrays when byte 0x1a568a is 0x11 and the entry kind at 0x1a5673[; callers 4dcd8@4dd6d; guest pending
 0x0004e6bc	169	shift_queue_4e6bc	game_helpers35	compiles	game	confirmed	decomp/tests/0x0004e6bc.json	docs/compiler-abi.md; Drop the oldest queued entry by shifting the 24-entry queue down.; callers 4dcd8@4decc; guest pending
 0x0004e768	79	mpRedrawWPHeights		named	unclassified	unverified		
 0x0004e7b8	83	update_counter_widget_4e7b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004e7b8.json	docs/compiler-abi.md; Update the counter widget (0x184d4c) of the dialog named at 0x184b3c: with SHOW (AL) nonzero it shows the decimal value ; callers 4dcd8@4dd77,4dcd8@4ddec,4dcd8@4dea9; guest pending
