@@ -2773,7 +2773,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c448b	191	install_graphics_dispatch_c448b	game_helpers75	compiles	game	confirmed	decomp/tests/0x000c448b.json	docs/compiler-abi.md; Install the graphics dispatch pointers (including the patched code words).; callers c8c34@c4555; guest pending
 0x000c4565	183			unknown	unclassified	unverified		
 0x000c4654	44	set_params_and_run_c4654	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4654.json	docs/compiler-abi.md; Stack (ret 0xc): store the three arguments in dwords 0x1590b0 (first), 0x1590ac (second), 0x1590a8 (third) and run 0xe7a; callers b69c@b836,b69c@b8c5,b69c@b961; guest pending
-0x000c4680	27			unknown	unclassified	unverified		
+0x000c4680	27	shift_triples_to_1590c0_c4680	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4680.json	docs/compiler-abi.md; Stack argument SRC (callee cleanup): shift the three triples at SRC left by 9 into the table at 0x1590c0.; callers 95e58@96269; guest pending
 0x000c469b	33	copy_constants_c469b	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000c469b.json	docs/compiler-abi.md; Copy three constant dwords from the code area into the work area.; callers 39744@3975c; guest pending
 0x000c46bc	60			unknown	unclassified	unverified		
 0x000c46f8	67	project_if_outside_c46f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c46f8.json	docs/compiler-abi.md; Implicit-register fragment (EAX = MARGIN, EBX = vertex record pointer; params in that order). Remember the record in dwo; callers c680b@c6820,c73b0@c73b8,c73b0@c73c7; guest pending
@@ -3307,7 +3307,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e0930	81	init_serial_port_e0930	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e0930.json	docs/compiler-abi.md; Program the serial port at base dword 0x15eed0 (nothing when it is zero): clear the modem control (base + 4), set the in; callers e0a90@e0aee; guest pending
 0x000e0a90	116			unknown	unclassified	unverified		
 0x000e0b10	92	find_text_in_buffer_e0b10	search_helpers1	compiles	game	confirmed	decomp/tests/0x000e0b10.json	docs/compiler-abi.md; Search the buffer at 0x15f5fd (length byte at 0x15f684) for the text, ignoring case; on a hit remember its position at 0; callers e0b88@e0bbd,e115c@e1172,e1260@e1265; guest pending
-0x000e0b6c	28			unknown	unclassified	unverified		
+0x000e0b6c	28	open_devices_e0b6c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e0b6c.json	docs/compiler-abi.md; Opens the device named at 0x15f4fd, waits 0x96 ticks, then falls through into 0xe0b88 with EAX = 0x15f5bd (a second devi; callers none direct; guest pending
 0x000e0b88	65	open_device_e0b88	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000e0b88.json	docs/compiler-abi.md; Open the device selected by value and report success.; callers e0b6c@e0b71,e0bcc@e0c37,e1194@e11c6; guest pending
 0x000e0bcc	114			unknown	unclassified	unverified		
 0x000e10a0	63	send_serial_text_e10a0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e10a0.json	docs/compiler-abi.md; Send the text at TEXT (EAX) to the serial port at base dword 0x15eed0: remember the pointer in dword 0x15f690, set byte ; callers e0b88@e0b92,e0b88@e0b9c,e0bcc@e0c23; guest pending

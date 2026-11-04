@@ -20060,3 +20060,17 @@ uint8_t bitstream_read_bits_fa2ce(uint8_t count, uint8_t *buf, uint32_t *esi, in
 	*buf = al;
 	return acc;
 }
+
+/* 0xc4680, 27 bytes. Stack argument SRC (callee cleanup): shift the three triples at SRC left by 9 into the table at 0x1590c0. */
+void shift_triples_to_1590c0_c4680(ef_addr32 src)
+{
+	shift_triples_c59b7(src, 0x1590c0u, 9u);
+}
+
+/* 0xe0b6c, 28 bytes. Opens the device named at 0x15f4fd, waits 0x96 ticks, then falls through into 0xe0b88 with EAX = 0x15f5bd (a second device open). */
+void open_devices_e0b6c(void)
+{
+	open_device_e0b88(0x15f4fdu);
+	wait_ticks_or_press_e115c(0x96u);
+	open_device_e0b88(0x15f5bdu);
+}

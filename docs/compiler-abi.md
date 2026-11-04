@@ -8847,3 +8847,10 @@ in EAX, format string address, one value).
 | `0xfa332` | EAX:uint32_t,EDX:int32_t | none | fa02c@fa0a7,fa02c@fa109,fa02c@fa133 | Implicit-register fragment (ESI, EDX out; EAX, EBX, ECX preserved; carry set on return): refill the bit-stream buffer. R |
 | `0xfa31b` | EAX:uint32_t,EDX:int32_t | AX:uint16_t | fa02c@fa04b,fa02c@fa050,fa02c@fa055 | Implicit-register fragment (ESI = stream pointer, EDX = remaining bytes minus one; both updated): fetch the next two byt |
 | `0xfa2ce` | AL:uint8_t,DL:uint8_t,EBX:uint32_t,ECX:int32_t | AL:uint8_t | fa251@fa26b,fa251@fa27a,fa251@fa29e | Implicit-register fragment (CL = bit count, AL = bit buffer with a trailing 1 sentinel, ESI, EDX as in 0xfa31b; AL/ESI/E |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc4680` | EAX:ef_addr32 | none | 95e58@96269 | Stack argument SRC (callee cleanup): shift the three triples at SRC left by 9 into the table at 0x1590c0. |
+| `0xe0b6c` | none | none | none direct | Opens the device named at 0x15f4fd, waits 0x96 ticks, then falls through into 0xe0b88 with EAX = 0x15f5bd (a second devi |
