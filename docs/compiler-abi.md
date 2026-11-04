@@ -7188,3 +7188,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11f368` | EAX:int32_t,EDX:int32_t | EAX:int32_t | 118770@118830 | Fixed-point arctangent of A (EAX) over B (EDX), angle units of 0x10000 per turn: 0 for (0, 0); with /A/ < /B/ the table  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xebb58` | EAX:uint32_t,EDX:ef_addr32 | EAX:uint32_t | 9ccb8@9ccd8,9ccb8@9cd03 | Start streaming KEY (EAX) into the stream object OBJ (EDX): look the key's record up (0xeb520) and seek it (0xeb698); fo |

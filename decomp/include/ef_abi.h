@@ -5332,4 +5332,6 @@ void refresh_status_widgets_d550(void);
 
 int32_t atan2_fixed_11f368(int32_t a, int32_t b);
 
+uint32_t start_stream_ebb58(uint32_t key, ef_addr32 obj);
+
 #endif

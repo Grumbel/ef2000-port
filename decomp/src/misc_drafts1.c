@@ -10254,3 +10254,43 @@ int32_t atan2_fixed_11f368(int32_t a, int32_t b)
         return 0x6487 - r;
     return -0x6487 - r;
 }
+
+/* 0xebb58, 247 bytes. Start streaming KEY (EAX) into the stream object OBJ (EDX): look the key's record up (0xeb520) and seek it (0xeb698); for object types 0x524a and 0x4152 (dword +0x146 high half) allocate the buffer (size dword +0x14c, plus 0x10 for 0x524a) into +0x154 (reported with 0x191620 when one already exists), fill it (0xeba64), set the window +0x158/+0x15c and return 0x80000; for other types open the slot named at +4 (0xa7900), seek it (0xa7ab4), set the window to 0 .. record size and return the slot. Returns -1 for a missing object, record or slot. */
+uint32_t start_stream_ebb58(uint32_t key, ef_addr32 obj)
+{
+    ef_addr32 rec;
+    uint32_t pos;
+    int32_t type;
+    uint32_t size;
+    uint32_t buf;
+    uint32_t slot;
+    if (obj == 0u)
+        return 0xffffffffu;
+    rec = guest_fn_eb520(key, obj);
+    if (rec == 0u)
+        return 0xffffffffu;
+    pos = EF_U32(rec + 4u);
+    seek_record_eb698(pos, obj);
+    type = (int32_t)EF_U32(obj + 0x146u) >> 16;
+    if (type == 0x524a || type == 0x4152) {
+        if (EF_U32(obj + 0x154u) != 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x00191620u);
+        type = (int32_t)EF_U32(obj + 0x146u) >> 16;
+        size = EF_U32(obj + 0x14cu);
+        if (type == 0x524a)
+            size += 0x10u;
+        buf = alloc_block_checked_eb4a0(size);
+        EF_U32(obj + 0x154u) = buf;
+        (void)guest_fn_eba64_x(key, buf, obj);
+        EF_U32(obj + 0x158u) = EF_U32(obj + 0x154u);
+        EF_U32(obj + 0x15cu) = EF_U32(obj + 0x154u) + size;
+        return 0x80000u;
+    }
+    slot = open_slot_a7900(0u, 0u, 0u, 0u, obj + 4u);
+    if (slot == 0xffffffffu)
+        return slot;
+    (void)seek_start_a7ab4(0u, 0u, 0u, 0u, slot, pos);
+    EF_U32(obj + 0x158u) = 0u;
+    EF_U32(obj + 0x15cu) = EF_U32(rec + 8u);
+    return slot;
+}
