@@ -5271,3 +5271,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc1e3c` | EAX:uint32_t | none | c3584@c3614,c3584@c362a | Decode a PackBits-style run-length stream at the pointer 0x41f3a0 into dst: rows (byte 0x146e34) of width 0x146e38; cont |
 | `0x6b344` | EAX:uint32_t | none | 6c488@6c702 | For unit id, look up its object; if the table entry (0xca bytes at 0x19bb58) of the object's owner still points back at  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbc4da` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | bc450@bc453 | Close a stream record: flush when flagged, release its handle, optionally run 0xfa9a0, free the buffer and remove a temp |
+| `0x5ca88` | EAX:uint32_t,EDX:uint32_t | none | 5a220@5a284,5c354@5c3e6,5c518@5c5f6 | Convert a fixed-point position (words at +0,+4,+8, 8 fractional bits) to be camera relative (origin at 0x21444c/214448/2 |

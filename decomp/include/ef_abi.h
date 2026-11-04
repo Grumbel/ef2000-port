@@ -4445,4 +4445,8 @@ void guest_fn_a8578_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
 void decode_rle_rows_c1e3c(uint32_t dst);
 void unit_owner_update_6b344(uint32_t unit);
 
+uint32_t close_stream_record_bc4da(uint32_t rec, uint32_t extra);
+void project_position_5ca88(uint32_t pos, uint32_t arg);
+uint32_t guest_fn_15c0c4_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
+
 #endif

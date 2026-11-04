@@ -1142,7 +1142,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005c8e0	242	draw_trail_5c8e0	tactical_marks1	compiles	game	confirmed	decomp/tests/0x0005c8e0.json	docs/compiler-abi.md; Walk the 12-byte point table at 0x1fd098 from the current index (0x20f19a) backwards in steps of n = remaining/50 + 1, p; callers 5c518@5c5d3; guest pending
 0x0005c9d4	140			unknown	unclassified	unverified		
 0x0005ca60	38	apply_stream_value_5ca60	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x0005ca60.json	docs/compiler-abi.md; Read the 9th stream value into a local and apply it when valid.; callers 598e8@5997a; guest pending
-0x0005ca88	146			unknown	unclassified	unverified		
+0x0005ca88	146	project_position_5ca88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ca88.json	docs/compiler-abi.md; Convert a fixed-point position (words at +0,+4,+8, 8 fractional bits) to be camera relative (origin at 0x21444c/214448/2; callers 5a220@5a284,5c354@5c3e6,5c518@5c5f6; guest pending
 0x0005cb1c	126			unknown	unclassified	unverified		
 0x0005cb9c	42	position_within_tactical_bounds	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005cb9c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0005cbc8	1062			unknown	unclassified	unverified		
@@ -2637,7 +2637,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bc450	21	release_by_key_bc450	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000bc450.json	docs/compiler-abi.md; ; callers bc421@bc448; guest pending
 0x000bc465	12	digit_character	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc465.json	docs/compiler-abi.md; Digit character for a value: +0x30, then +0x27 past '9'.; callers bc471@bc491,bc471@bc4ac,bc471@bc4b9; guest pending
 0x000bc471	105	make_temp_name_bc471	game_helpers83	compiles	game	confirmed	decomp/tests/0x000bc471.json	docs/compiler-abi.md; Build a temp file name "t" + four hex digits + "_" + two hex digits + ".tmp".; callers bc4da@bc54d; guest pending
-0x000bc4da	137			unknown	unclassified	unverified		
+0x000bc4da	137	close_stream_record_bc4da	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bc4da.json	docs/compiler-abi.md; Close a stream record: flush when flagged, release its handle, optionally run 0xfa9a0, free the buffer and remove a temp; callers bc450@bc453; guest pending
 0x000bc570	36	list_insert_head	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc570.json	docs/compiler-abi.md; Insert EAX at the head of the doubly linked list whose * head pointer is EBX and tail pointer EDX (previous at +0, next ; callers f6a8@f810,f6a8@f86b,fecc@ff7f; guest pending
 0x000bc594	59	unlink_node_bc594	list_helpers	compiles	game	confirmed	decomp/tests/0x000bc594.json	docs/compiler-abi.md; Unlink node from a list whose head slot is *head_a (edx) / *head_b (ebx).; callers ca838@ca85c,cb9f4@cba68,cb9f4@cbb84; guest pending
 0x000bc5d0	21	list_count	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc5d0.json	docs/compiler-abi.md; Count nodes of the list at *EAX (next at +4).; callers 49228@494f9,49228@49509,b0f5c@b1505; guest pending

@@ -115,3 +115,47 @@ void unit_owner_update_6b344(uint32_t unit)
         guest_fn_46254((uint32_t)id, w, 0x1bu, 0u, 0u, 0u);
     }
 }
+
+/* 0xbc4da, 137 bytes. Close a stream record: flush when flagged, release its handle, optionally run 0xfa9a0, free the buffer and remove a temporary file. Returns the accumulated status (-1 for an unused record). */
+uint32_t close_stream_record_bc4da(uint32_t rec, uint32_t extra)
+{
+    uint8_t tmp[0x10];
+    uint32_t status = 0u;
+    if (EF_U32(rec + 0xcu) == 0u)
+        return 0xffffffffu;
+    if (EF_U8(rec + 0xdu) & 0x10u)
+        status = (uint32_t)stream_flush_fa8a0(rec);
+    {
+        int32_t pos = file_position_f227f(rec);
+        if (pos != -1)
+            guest_fn_fa95f(EF_U32(rec + 0x10u), (uint32_t)pos, 0u);
+    }
+    if (extra != 0u)
+        status |= guest_tail_fa9a0(EF_U32(rec + 0x10u));
+    if (EF_U8(rec + 0xcu) & 0x8u) {
+        guest_fn_fa9d2(EF_U32(rec + 0x8u));
+        EF_U32(rec + 0x8u) = 0u;
+    }
+    if (EF_U8(rec + 0xdu) & 0x8u) {
+        make_temp_name_bc471((uint32_t)(uintptr_t)tmp, EF_U8(rec + 0x19u));
+        guest_fn_cbc9b_w((uint32_t)(uintptr_t)tmp);
+    }
+    return status;
+}
+
+/* 0x5ca88, 146 bytes. Convert a fixed-point position (words at +0,+4,+8, 8 fractional bits) to be camera relative (origin at 0x21444c/214448/214450); if any component is 0x4000 or more away, scale all three down by 16; add the origin back and hand the truncated 16-bit triple plus esi to 0x15c0c4. */
+void project_position_5ca88(uint32_t pos, uint32_t arg)
+{
+    int32_t x = (EF_S32(pos) >> 8) - EF_S32(0x0021444cu);
+    int32_t y = (EF_S32(pos + 4u) >> 8) - EF_S32(0x00214448u);
+    int32_t z = (EF_S32(pos + 8u) >> 8) - EF_S32(0x00214450u);
+    if (abs_a28f2(x) >= 0x4000 || abs_a28f2(y) >= 0x4000 || abs_a28f2(z) >= 0x4000) {
+        x >>= 4;
+        y >>= 4;
+        z >>= 4;
+    }
+    x += EF_S32(0x0021444cu);
+    y += EF_S32(0x00214448u);
+    z += EF_S32(0x00214450u);
+    guest_fn_15c0c4_x(0u, 0u, 0u, 0u, (uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
+}
