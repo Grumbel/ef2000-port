@@ -5293,4 +5293,6 @@ void handle_event_record_a348c(uint32_t index);
 
 uint32_t run_choice_prompt_7a194(void);
 
+void send_mouse_requests_de3b4(uint32_t start);
+
 #endif

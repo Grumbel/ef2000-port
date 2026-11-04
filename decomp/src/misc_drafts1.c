@@ -9605,3 +9605,42 @@ uint32_t run_choice_prompt_7a194(void)
     }
     return result;
 }
+
+/* 0xde3b4, 251 bytes. Send the queued mouse request blocks starting at index START (EAX, low 16 bits signed; dword table at 0x4260d0-0x100): while the byte 0x15ee99 is set and the table entry is not -1, reset the mouse state (0xde4b0), build the 0x16-byte request at [0x42609c] (command 0x16, device byte 0x15ee98, subcommand 0x84, the entry at +0xe and the distance 0x4260ac - entry at +0x12), fill the real-mode call block 0x4260b4 (0x1510, the encoded request address, the dword 0x42611e high half) and issue call 0x2f (0x8b8); stop when the reply word at +3 is 0x300 or the index reaches the word at 0x426122, otherwise advance to the next entry. */
+void send_mouse_requests_de3b4(uint32_t start)
+{
+    uint32_t ecx = start;
+    if (EF_U8(0x0015ee99u) == 0u)
+        return;
+    for (;;) {
+        uint32_t ent = 0x00425fd0u + (uint32_t)((int32_t)(int16_t)ecx * 4);
+        ef_addr32 blk;
+        uint32_t tab;
+        uint32_t enc;
+        if (EF_U32(ent) == 0xffffffffu)
+            return;
+        mouse_request_de4b0();
+        EF_U8(0x00426147u) = 1u;
+        blk = EF_U32(0x0042609cu);
+        fill_bytes_b3fb0(blk, 0u, 0x16u);
+        tab = EF_U32(ent);
+        EF_U8(blk + 1u) = EF_U8(0x0015ee98u);
+        EF_U32(blk + 0xeu) = tab;
+        EF_U8(blk + 2u) = 0x84u;
+        EF_U8(blk) = 0x16u;
+        EF_U32(blk + 0x12u) = EF_U32(0x004260acu) - tab;
+        enc = encode_runtime_segment_offset(blk);
+        EF_U32(0x004260d0u) = 0x1510u;
+        EF_U32(0x004260c4u) = enc & 0xffffu;
+        EF_U16(0x004260d6u) = (uint16_t)((int32_t)enc >> 16);
+        EF_U32(0x004260ccu) = (uint32_t)((int32_t)EF_U32(0x0042611eu) >> 16);
+        EF_U32(0x004260c8u) = 0u;
+        guest_fn_8b8(0x2fu, 0x004260b4u);
+        blk = EF_U32(0x0042609cu);
+        if (((int32_t)EF_U32(blk + 1u) >> 16) == 0x300)
+            return;
+        if ((int16_t)ecx >= (int16_t)EF_U16(0x00426122u))
+            return;
+        ecx++;
+    }
+}

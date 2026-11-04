@@ -3265,7 +3265,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dde80	231	dos_date_request_dde80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dde80.json	docs/compiler-abi.md; Issue the DOS call 0x2f for the date/time request with the low byte of VALUE: fills the request block 0x4260b0 (bytes 0x; callers ddce8@ddd13; guest pending
 0x000de12c	141	mouse_request_de12c	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de12c.json	docs/compiler-abi.md; ; callers ddce8@ddce8; guest pending
 0x000de2d8	153	mouse_request_de2d8	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de2d8.json	docs/compiler-abi.md; ; callers a9cd0@a9ce4; guest pending
-0x000de3b4	251			unknown	unclassified	unverified		
+0x000de3b4	251	send_mouse_requests_de3b4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000de3b4.json	docs/compiler-abi.md; Send the queued mouse request blocks starting at index START (EAX, low 16 bits signed; dword table at 0x4260d0-0x100): w; callers 982d4@982fa,a9cd0@a9d03,f41c4@f41d5; guest pending
 0x000de4b0	125	mouse_request_de4b0	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de4b0.json	docs/compiler-abi.md; ; callers 984b4@984c1,a9aa8@a9b91,a9d48@a9daf; guest pending
 0x000de580	113	fade_palette_in_de580	game_helpers89	compiles	game	confirmed	decomp/tests/0x000de580.json	docs/compiler-abi.md; Fade the palette in from black over 40 steps.; callers 284ec@2851f,39204@39244,97dcc@97e2a; guest pending
 0x000de5f4	84	fade_palette_in_slow_de5f4	game_helpers91	compiles	game	confirmed	decomp/tests/0x000de5f4.json	docs/compiler-abi.md; Fade the palette in from black over 80 steps.; callers a8a38@a8afa,a8bd4@a8d6d; guest pending

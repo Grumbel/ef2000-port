@@ -1618,6 +1618,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  564  Drafted and Watcom-compiled 1 more functions in misc_drafts1 (2776 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  565  Drafted and Watcom-compiled 1 more functions in misc_drafts1 (2777 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  566  Drafted and Watcom-compiled 1 more functions in misc_drafts1 (2778 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  567  Drafted and Watcom-compiled 1 more functions in misc_drafts1 (2779 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---
