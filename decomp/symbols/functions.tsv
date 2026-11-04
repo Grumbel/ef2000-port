@@ -2498,7 +2498,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b29a8	129	dump_group_list_b29a8	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b29a8.json	docs/compiler-abi.md; Dump a list of sub-lists.; callers b2560@b26d2,b2560@b26ff,b2560@b272c; guest pending
 0x000b2a2c	53	print_coordinate_record_b2a2c	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2a2c.json	docs/compiler-abi.md; Print a plain coordinate record.; callers b1f80@b21df,b2560@b25d9,b2560@b268b; guest pending
 0x000b2b00	515			unknown	unclassified	unverified		
-0x000b2d04	135			unknown	unclassified	unverified		
+0x000b2d04	135	dump_list_b2d04	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b2d04.json	docs/compiler-abi.md; Debug dump of the list LIST (EAX; first node at +0, links at +4) to the file handle FILE (EBX): print the header text FM; callers b3168@b31b5; guest pending
 0x000b2d8c	155	print_point_b2d8c	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b2d8c.json	docs/compiler-abi.md; Print one shape point record.; callers b2e98@b2f28; guest pending
 0x000b2e28	59	dump_point_list_b2e28	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b2e28.json	docs/compiler-abi.md; Dump a point list: the format string, a value, then each entry via 0xb2e98.; callers b3168@b31d3; guest pending
 0x000b2e64	50	count_active_entries	list_helpers	compiles	game	confirmed	decomp/tests/0x000b2e64.json	docs/compiler-abi.md; Count the 9-byte entries (pointer +0x4a, count word * +0x48) whose byte +3 is nonzero.; callers b2e98@b2ef5; guest pending

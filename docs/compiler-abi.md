@@ -7362,3 +7362,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xe06ac` | none | none | e1194@e1199 | Set the serial divisor for the state record at dword 0x15eec0: take the divisor word from the table at 0xdf290 indexed b |
 | `0x8fbc8` | EAX:ef_addr32 | none | 56a44@56a45 | Append the 24-byte record at SRC (EAX) to the ring of ten records at 0x20f460 (index word 0x2119f0), announce the high h |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb2d04` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | b3168@b31b5 | Debug dump of the list LIST (EAX; first node at +0, links at +4) to the file handle FILE (EBX): print the header text FM |

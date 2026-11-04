@@ -11210,3 +11210,18 @@ void push_ring_record_8fbc8(ef_addr32 src)
     if (((int32_t)EF_U32(0x002119eeu) >> 16) >= 10)
         EF_U16(0x002119f0u) = 0u;
 }
+
+/* 0xb2d04, 135 bytes. Debug dump of the list LIST (EAX; first node at +0, links at +4) to the file handle FILE (EBX): print the header text FMT (ECX), the separator 0x18e384, the list's id word (0xbc5d0, signed) with 0x18e3a4 and the four signed words S0..S3 (stack, ret 0x10) with 0x18e3c8, then dump every node with 0xb2b00 (passing EDX = E and the file). */
+void dump_list_b2d04(ef_addr32 list, uint32_t e, uint32_t file, ef_addr32 fmt, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3)
+{
+    ef_addr32 node = EF_U32(list);
+    guest_fn_b1bb0(file, fmt);
+    guest_fn_b1bb0(file, 0x0018e384u);
+    guest_fn_b1bb0(file, 0x0018e3a4u, (uint32_t)(int32_t)(int16_t)guest_fn_bc5d0_x(list));
+    guest_fn_b1bb0(file, 0x0018e3c8u, (uint32_t)(int32_t)(int16_t)s0, (uint32_t)(int32_t)(int16_t)s1,
+                   (uint32_t)(int32_t)(int16_t)s2, (uint32_t)(int32_t)(int16_t)s3);
+    while (node != 0u) {
+        guest_fn_b2b00_x(node, e, file);
+        node = EF_U32(node + 4u);
+    }
+}

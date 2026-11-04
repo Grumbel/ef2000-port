@@ -5403,4 +5403,8 @@ uint32_t guest_fn_10e97f_ret_x(ef_addr32 tm); /* 0x10e97f EAX -> EAX */
 void set_serial_divisor_e06ac(void);
 void push_ring_record_8fbc8(ef_addr32 src);
 
+void dump_list_b2d04(ef_addr32 list, uint32_t e, uint32_t file, ef_addr32 fmt, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
+uint32_t guest_fn_bc5d0_x(ef_addr32 obj); /* 0xbc5d0 EAX -> AX */
+void guest_fn_b2b00_x(ef_addr32 node, uint32_t b, uint32_t c); /* 0xb2b00 EAX/EDX/EBX */
+
 #endif
