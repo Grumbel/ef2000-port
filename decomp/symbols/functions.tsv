@@ -1345,7 +1345,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000724a8	305	advance_object_position_724a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000724a8.json	docs/compiler-abi.md; Advance the position of unit object OBJ (EDX; NULL or byte 0x122c5c set: nothing) by its velocity for the time since the; callers 55144@552ee,8d3d4@8d470; guest pending
 0x000725dc	787			unknown	unclassified	unverified		
 0x00072944	1571			unknown	unclassified	unverified		
-0x00072f68	283			unknown	unclassified	unverified		
+0x00072f68	283	predict_unit_position_72f68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00072f68.json	docs/compiler-abi.md; Predict the position of unit UNIT (AX, sign extended) after time DT (stack double): when the turn rate +0x79 exceeds 0.0; callers 2479c@249d6,26b60@26e50; guest pending
 0x00073084	394			unknown	unclassified	unverified		
 0x00073210	749			unknown	unclassified	unverified		
 0x00073500	564			unknown	unclassified	unverified		

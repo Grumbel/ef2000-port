@@ -8669,3 +8669,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe9e7c` | EAX:ef_addr32,EDX:double,EBX:double,ECX:double | none | e9c00@e9c40 | Build a 3x3 double rotation matrix at OUT (EAX) from the three Euler angles X, Y, Z (stack doubles in this order, ret 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x72f68` | EAX:int32_t,EDX:double,EBX:ef_addr32 | none | 2479c@249d6,26b60@26e50 | Predict the position of unit UNIT (AX, sign extended) after time DT (stack double): when the turn rate +0x79 exceeds 0.0 |

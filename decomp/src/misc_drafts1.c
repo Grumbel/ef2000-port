@@ -19010,3 +19010,40 @@ void euler_to_matrix_e9e7c(ef_addr32 out, double x, double y, double z)
 	m[8] = cy;
 	memcpy(ef_guest_memory_ptr(out), m, sizeof m);
 }
+
+/* 0x72f68, 283 bytes. Predict the position of unit UNIT (AX, sign extended) after time DT (stack double): when the turn rate +0x79 exceeds 0.01745 the point moves on an arc (X = q*sin(w*dt), Z = q*(cos(w*dt) - 1) with q = speed(+0x91)/rate), otherwise on a straight line X = speed*dt. The local offset (X, 0, Z) is rotated by the matrix at +0xa1.. and added to the position at +0x49; the three result doubles go to OUT (ret 0xc). */
+void predict_unit_position_72f68(int32_t unit, double dt, ef_addr32 out)
+{
+	ef_addr32 u = guest_fn_7489c((int32_t)(int16_t)unit);
+	double v79, v91, ang, q, x, y, z, r[3];
+
+	if (u == 0u)
+		return;
+	memcpy(&v79, ef_guest_memory_ptr(u + 0x79u), 8);
+	memcpy(&v91, ef_guest_memory_ptr(u + 0x91u), 8);
+	ang = v79 * dt;
+	if (abs_double_b427c(v79) > 0.01745329252) {
+		q = v91 / v79;
+		x = q * sin_b45ac(ang);
+		y = 0.0;
+		z = q * (cos_b45a2(ang) + -1.0);
+	} else {
+		x = v91 * dt;
+		y = 0.0;
+		z = 0.0;
+	}
+	{
+		static const uint32_t col[3] = { 0xa1u, 0xb9u, 0xd1u };
+		static const uint32_t pos[3] = { 0x49u, 0x51u, 0x59u };
+		int i;
+		for (i = 0; i < 3; i++) {
+			double m0, m1, m2, p;
+			memcpy(&m0, ef_guest_memory_ptr(u + col[i]), 8);
+			memcpy(&m1, ef_guest_memory_ptr(u + col[i] + 8u), 8);
+			memcpy(&m2, ef_guest_memory_ptr(u + col[i] + 16u), 8);
+			memcpy(&p, ef_guest_memory_ptr(u + pos[i]), 8);
+			r[i] = m0 * x + p + m1 * y + m2 * z;
+		}
+	}
+	memcpy(ef_guest_memory_ptr(out), r, sizeof r);
+}

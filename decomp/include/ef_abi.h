@@ -5997,4 +5997,6 @@ void build_rotation_matrix_fcd20(uint32_t ebx, uint32_t esi, uint32_t edi);
 
 void euler_to_matrix_e9e7c(ef_addr32 out, double x, double y, double z);
 
+void predict_unit_position_72f68(int32_t unit, double dt, ef_addr32 out);
+
 #endif
