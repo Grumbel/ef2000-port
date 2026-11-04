@@ -4300,4 +4300,6 @@ void measure_page_point_a0aa0(uint32_t index);
 void guest_callptr2r_x(ef_addr32 fn, int32_t a, int32_t b); /* indirect call: EAX/EDX register arguments */
 void guest_fn_e2374_x(ef_addr32 a, ef_addr32 b); /* 0xe2374 EAX/EDX */
 
+void visit_overlapping_nodes_e2564(ef_addr32 obj);
+
 #endif

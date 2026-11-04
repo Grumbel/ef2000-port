@@ -107,3 +107,29 @@ void run_text_on_page_9e494(uint32_t page, ef_addr32 text)
     EF_U32(0x0041717cu) = saved_tab;
     EF_U32(0x00417178u) = saved_fn;
 }
+
+/* 0xe2564, 186 bytes. Walk the node list at obj+0xc7 (next at +0xa) and call 0xe2374 for every node whose position, widened by a per-kind margin from 0x1378d8, overlaps the window starting at 0x41ec0a/0x41ec0e; stops at the first node beyond the object's extent. */
+void visit_overlapping_nodes_e2564(ef_addr32 obj)
+{
+    uint32_t node = EF_U32(obj + 0xc7u);
+    uint32_t kind = (uint8_t)((uint8_t)(EF_U8(obj + 0xcbu) << 3) >> 4);
+    while (node != 0u && EF_U16(node + 4u) != 0u) {
+        int32_t x = EF_S16(node + 2u);
+        int32_t margin = EF_U8(0x001378d8u + kind * 10u) + x;
+        int32_t base = EF_S16(obj + 0x6bu);
+        if (margin > base) {
+            int32_t ext = EF_S16(obj + 0x77u) + base;
+            int32_t lo, sz, lim;
+            if (x > ext)
+                break;
+            lo = EF_S16(obj + 0x43u);
+            sz = EF_S16(obj + 0x73u);
+            lim = EF_S16(0x0041ec0au);
+            if (sz + (margin + lo) - base > lim) {
+                if (x + lo + sz - base < EF_S16(0x0041ec0eu) + lim)
+                    guest_fn_e2374_x(obj, node);
+            }
+        }
+        node = EF_U32(node + 0xau);
+    }
+}

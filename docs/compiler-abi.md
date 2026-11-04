@@ -5021,3 +5021,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa0aa0` | EAX:uint32_t | none | 9e7bc@9eb15,9e7bc@9eb9e,9e7bc@9f14e | Fetch the 6-byte point entry of the current page (table at 0x41717c + 0xa), let the hook at 0x132af4 transform it, add t |
+
+## list_ops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe2564` | EAX:ef_addr32 | none | a5b70@a5c56 | Walk the node list at obj+0xc7 (next at +0xa) and call 0xe2374 for every node whose position, widened by a per-kind marg |
