@@ -9182,3 +9182,44 @@ void fill_button_widgets_4f7d0(void)
         n++;
     }
 }
+
+/* 0xab174, 233 bytes. Read a (group, item, kind) selector from the stream HANDLE (EAX): word A, word B and byte C (0xa79d4). A kind above 2 or a group B not below word 0x4194c2 clears byte 0x41955f and stops; otherwise the byte is set to C, the B-th element of the linked list headed by dword 0x419200 is taken (link at +0), its item count (word +0xc) must exceed A, and the A-th element (link at +1) of its sub-list (dword +8) is stored in dword 0x4191d4 (clearing the byte 0x41955f when the item index is out of range). */
+void read_selector_ab174(uint32_t handle)
+{
+    uint16_t a = 0u, b = 0u;
+    uint8_t c = 0u;
+    uint32_t node = EF_U32(0x00419200u);
+    int32_t i;
+    guest_fn_a79d4(handle, 2u, (uint32_t)(uintptr_t)&a);
+    guest_fn_a79d4(handle, 2u, (uint32_t)(uintptr_t)&b);
+    guest_fn_a79d4(handle, 1u, (uint32_t)(uintptr_t)&c);
+    if (c > 2u) {
+        EF_U8(0x0041955fu) = 0u;
+        return;
+    }
+    EF_U8(0x0041955fu) = c;
+    if ((int16_t)b >= (int16_t)EF_U16(0x004194c2u)) {
+        EF_U8(0x0041955fu) = 0u;
+        return;
+    }
+    if ((int16_t)b > 0) {
+        i = 0;
+        do {
+            i++;
+            node = EF_U32(node);
+        } while ((int16_t)i < (int16_t)b);
+    }
+    if ((int16_t)a >= (int16_t)EF_U16(node + 0xcu)) {
+        EF_U8(0x0041955fu) = 0u;
+        return;
+    }
+    node = EF_U32(node + 8u);
+    if ((int16_t)a > 0) {
+        i = 0;
+        do {
+            i++;
+            node = EF_U32(node + 1u);
+        } while ((int16_t)i < (int16_t)a);
+    }
+    EF_U32(0x004191d4u) = node;
+}

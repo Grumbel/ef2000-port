@@ -2393,7 +2393,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ab060	80	write_node_position_ab060	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ab060.json	docs/compiler-abi.md; Find the node at 0x4191d4 in the group lists and write its two indices (words from a zeroed pair) plus one byte at 0x419; callers ab0dc@ab162; guest pending
 0x000ab0b0	42	emit_record_pair_ab0b0	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab0b0.json	docs/compiler-abi.md; Two 0xa7a1c(EAX, ...) stack calls with record fields.; callers ab0dc@ab12a,ab0dc@ab138,ab0dc@ab148; guest pending
 0x000ab0dc	149	notify_group_links_ab0dc	game_helpers36	compiles	game	confirmed	decomp/tests/0x000ab0dc.json	docs/compiler-abi.md; Visit every kind-0xe node of every group and notify its three links.; callers ab324@ab45e; guest pending
-0x000ab174	233			unknown	unclassified	unverified		
+0x000ab174	233	read_selector_ab174	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ab174.json	docs/compiler-abi.md; Read a (group, item, kind) selector from the stream HANDLE (EAX): word A, word B and byte C (0xa79d4). A kind above 2 or; callers ab28c@ab312; guest pending
 0x000ab260	42	emit_record_pair_ab260	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab260.json	docs/compiler-abi.md; As 0xab0b0 through 0xa79d4.; callers ab28c@ab2da,ab28c@ab2e8,ab28c@ab2f8; guest pending
 0x000ab28c	149	visit_group_nodes_ab28c	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000ab28c.json	docs/compiler-abi.md; Visit the pointer fields of every type 0xe node, then finish the context.; callers ab47c@ab5a8; guest pending
 0x000ab324	341			unknown	unclassified	unverified		
