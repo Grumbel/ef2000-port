@@ -4384,3 +4384,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x3df8` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | 3668@36de,3668@3718,3668@37a2 | Forget the tracked target (*current = 0) when the new position is missing or farther than limit * 32 from it. |
 | `0x10f107` | EAX:ef_addr32 | EAX:int32_t | 11580e@115831 | fgetc: read the next byte of a stream (refilling when the count runs out); in text mode skip a CR and treat Ctrl-Z as en |
+
+## game_helpers112 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc08d4` | AL:uint8_t,EDX:ef_addr32,EBX:ef_addr32 | none | c0b04@c0fba,c0b04@c0ff9 | For each record at the object's position with the given type, reactivate state-7 records (counting them in the object's  |
+| `0xc09e4` | EAX:ef_addr32,EDX:ef_addr32 | none | c0b04@c0fc3,c0b04@c100c,c0b04@c1020 | Refill an object's sub-entries of kind 0x35/0x37, then reactivate matching non-idle records up to the free capacity of i |

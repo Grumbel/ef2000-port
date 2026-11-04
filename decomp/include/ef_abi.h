@@ -3875,4 +3875,8 @@ void highlight_widget_22e98(int16_t idx);
 void drop_target_if_far_3df8(ef_addr32 position, ef_addr32 current, uint32_t limit);
 int32_t stream_fgetc_10f107(ef_addr32 stream);
 
+/* game_helpers112.c */
+void reactivate_records_at_object_c08d4(uint8_t type, ef_addr32 object, ef_addr32 list);
+void refill_object_cell_c09e4(ef_addr32 object, ef_addr32 list);
+
 #endif
