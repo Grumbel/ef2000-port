@@ -3796,39 +3796,39 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00101a90	169			unknown	unclassified	unverified		
 0x00101ba8	171			unknown	unclassified	unverified		
 0x00101c54	392			unknown	unclassified	unverified		
-0x00101ddc	53			unknown	unclassified	unverified		
-0x00101e14	92			unknown	unclassified	unverified		
+0x00101ddc	53	trace_call_101ddc	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101ddc.json	docs/compiler-abi.md; AIL trace wrapper for 0x104694 (cdecl, all arguments on the stack).; callers d5d18@d5d4f,d6e58@d6ef3; guest pending
+0x00101e14	92	trace_call_101e14	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101e14.json	docs/compiler-abi.md; AIL trace wrapper for 0x1041e4 with result trace (cdecl, all arguments on the stack).; callers d6e58@d6eaa,d6e58@d6eb6,d6e58@d6ec2; guest pending
 0x00101e70	5	tail_jump_101e70	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00101e70.json	docs/compiler-abi.md; tail jump. Forward to 0x110dcc.; callers 1065c8@1065ce,110f6f@110f73,11124c@111257; guest pending
 0x00101e78	5	tail_jump_101e78	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00101e78.json	docs/compiler-abi.md; tail jump. Forward to 0x110dd9.; callers 1065c8@10660a,1065c8@106628,110f6f@110fca; guest pending
-0x00101e80	84			unknown	unclassified	unverified		
+0x00101e80	84	trace_call_101e80	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101e80.json	docs/compiler-abi.md; AIL trace wrapper for 0x111118 with result trace (cdecl, all arguments on the stack).; callers 104200@104373; guest pending
 0x00101ed4	52	trace_call_101ed4	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00101ed4.json	docs/compiler-abi.md; Trace wrapper for 0x111142.; callers 104200@104393,104200@104402,104464@1044be; guest pending
-0x00101f08	58			unknown	unclassified	unverified		
+0x00101f08	58	trace_call_101f08	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101f08.json	docs/compiler-abi.md; AIL trace wrapper for 0x1111b1 (cdecl, all arguments on the stack).; callers none direct; guest pending
 0x00101f44	44	trace_call_101f44	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00101f44.json	docs/compiler-abi.md; Trace wrapper for 0x1111ca.; callers 104464@10449b,105e38@106237,105e38@1062cb; guest pending
 0x00101f70	5	tail_jump_101f70	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00101f70.json	docs/compiler-abi.md; tail jump. Forward to 0x1111e1.; callers 103e0c@103e21,105648@10567c; guest pending
 0x00101f78	14			unknown	unclassified	unverified		
-0x00101f88	106			unknown	unclassified	unverified		
+0x00101f88	106	trace_call_101f88	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101f88.json	docs/compiler-abi.md; AIL trace wrapper for 0x11124c with result trace (cdecl, all arguments on the stack).; callers 103e0c@103e39,104200@1043b3,104464@1044ad; guest pending
 0x00101ff4	44	trace_call_101ff4	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00101ff4.json	docs/compiler-abi.md; Trace wrapper for 0x1112ed.; callers 105da0@105dd7,112808@11287d,1133f8@113a06; guest pending
 0x00102020	5	tail_jump_102020	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00102020.json	docs/compiler-abi.md; tail jump. Forward to 0x111359.; callers 112808@112872,113d10@113f6d; guest pending
 0x00102028	283			unknown	unclassified	unverified		
-0x00102144	84			unknown	unclassified	unverified		
-0x00102198	92			unknown	unclassified	unverified		
+0x00102144	84	trace_call_102144	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00102144.json	docs/compiler-abi.md; AIL trace wrapper for 0x111365 with result trace (cdecl, all arguments on the stack).; callers e28e8@e2939,104200@1043d8,105e38@10635b; guest pending
+0x00102198	92	trace_call_102198	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00102198.json	docs/compiler-abi.md; AIL trace wrapper for 0x1113ac with result trace (cdecl, all arguments on the stack).; callers 104200@104431,105e38@106405,1133f8@1138f0; guest pending
 0x001021f4	52	trace_call_1021f4	misc_helpers2	compiles	game	confirmed	decomp/tests/0x001021f4.json	docs/compiler-abi.md; Trace wrapper for 0x1114c7.; callers 110fd4@1110ab,1114f7@111515,111527@111557; guest pending
 0x00102228	52	trace_call_102228	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102228.json	docs/compiler-abi.md; Trace wrapper for 0x1114f7.; callers e28e8@e2962,104200@104447,105e38@106418; guest pending
 0x0010225c	52	trace_call_10225c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x0010225c.json	docs/compiler-abi.md; Trace wrapper for 0x111527.; callers none direct; guest pending
 0x001022dc	44	trace_call_1022dc	misc_helpers2	compiles	game	confirmed	decomp/tests/0x001022dc.json	docs/compiler-abi.md; Trace wrapper for 0x11141f.; callers e28e8@e297c,104200@104453,105e38@106424; guest pending
 0x00102330	44	trace_call_102330	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102330.json	docs/compiler-abi.md; Trace wrapper for 0x111473.; callers 1114a3@1114b1; guest pending
 0x00102384	44	trace_call_102384	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102384.json	docs/compiler-abi.md; Trace wrapper for 0x1113d4.; callers 104464@104484,105da0@105de3,1113fb@111409; guest pending
-0x001023b0	38			unknown	unclassified	unverified		
-0x001023d8	84			unknown	unclassified	unverified		
-0x0010242c	92			unknown	unclassified	unverified		
+0x001023b0	38	trace_call_1023b0	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x001023b0.json	docs/compiler-abi.md; AIL trace wrapper for 0x1113fb (no arguments, tail call).; callers 104694@1046b5; guest pending
+0x001023d8	84	trace_call_1023d8	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x001023d8.json	docs/compiler-abi.md; AIL trace wrapper for 0x104504 with result trace (cdecl, all arguments on the stack).; callers 105e38@105f8e,1133f8@1135bf; guest pending
+0x0010242c	92	trace_call_10242c	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x0010242c.json	docs/compiler-abi.md; AIL trace wrapper for 0x104200 with result trace (cdecl, all arguments on the stack).; callers 106464@10649b,113a40@113a77; guest pending
 0x00102488	44	trace_call_102488	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102488.json	docs/compiler-abi.md; Trace wrapper for 0x104464.; callers 104694@1046a5,106464@1064ca,113a40@113aa6; guest pending
-0x001024b4	84			unknown	unclassified	unverified		
-0x00102508	92			unknown	unclassified	unverified		
-0x00102590	84			unknown	unclassified	unverified		
+0x001024b4	84	trace_call_1024b4	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x001024b4.json	docs/compiler-abi.md; AIL trace wrapper for 0x106514 with result trace (cdecl, all arguments on the stack).; callers d6e58@d6ee7; guest pending
+0x00102508	92	trace_call_102508	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00102508.json	docs/compiler-abi.md; AIL trace wrapper for 0x106464 with result trace (cdecl, all arguments on the stack).; callers 106514@10655b; guest pending
+0x00102590	84	trace_call_102590	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00102590.json	docs/compiler-abi.md; AIL trace wrapper for 0x1065c8 with result trace (cdecl, all arguments on the stack).; callers d6e58@d6f41; guest pending
 0x00102644	44	trace_call_102644	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102644.json	docs/compiler-abi.md; Trace wrapper for 0x106634.; callers 1115fc@11161e; guest pending
 0x00102670	44	trace_call_102670	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102670.json	docs/compiler-abi.md; Trace wrapper for 0x106644.; callers d6e58@d6f6b,d72b4@d7323,1065c8@106620; guest pending
-0x001026fc	58			unknown	unclassified	unverified		
-0x00102738	58			unknown	unclassified	unverified		
+0x001026fc	58	trace_call_1026fc	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x001026fc.json	docs/compiler-abi.md; AIL trace wrapper for 0x106718 (cdecl, all arguments on the stack).; callers d7158@d7209,d72b4@d7388; guest pending
+0x00102738	58	trace_call_102738	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00102738.json	docs/compiler-abi.md; AIL trace wrapper for 0x106740 (cdecl, all arguments on the stack).; callers d7158@d71f1,d72b4@d7337; guest pending
 0x00102774	44	trace_call_102774	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102774.json	docs/compiler-abi.md; Trace wrapper for 0x10683c.; callers d7158@d72a5,d72b4@d7398; guest pending
 0x001027a0	44	trace_call_1027a0	misc_helpers2	compiles	game	confirmed	decomp/tests/0x001027a0.json	docs/compiler-abi.md; Trace wrapper for 0x10687c.; callers d7490@d74c1; guest pending
 0x001027cc	44	trace_call_1027cc	misc_helpers2	compiles	game	confirmed	decomp/tests/0x001027cc.json	docs/compiler-abi.md; Trace wrapper for 0x106894.; callers d7530@d7561; guest pending
@@ -3837,27 +3837,27 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00102858	52	trace_call_102858	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102858.json	docs/compiler-abi.md; Trace wrapper for 0x10679c.; callers d7158@d7248,d72b4@d735e,d73b8@d73e4; guest pending
 0x0010288c	52	trace_call_10288c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x0010288c.json	docs/compiler-abi.md; Trace wrapper for 0x1067cc.; callers none direct; guest pending
 0x001028c0	52	trace_call_1028c0	misc_helpers2	compiles	game	confirmed	decomp/tests/0x001028c0.json	docs/compiler-abi.md; Trace wrapper for 0x10682c.; callers d7158@d7273; guest pending
-0x001028f4	84			unknown	unclassified	unverified		
+0x001028f4	84	trace_call_1028f4	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x001028f4.json	docs/compiler-abi.md; AIL trace wrapper for 0x106708 with result trace (cdecl, all arguments on the stack).; callers d7594@d75ad,d75fc@d7615; guest pending
 0x00102a98	52	trace_call_102a98	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00102a98.json	docs/compiler-abi.md; Trace wrapper for 0x106988.; callers d6e58@d6f32; guest pending
-0x00102dbc	92			unknown	unclassified	unverified		
-0x00102f60	84			unknown	unclassified	unverified		
-0x00102fb4	92			unknown	unclassified	unverified		
-0x0010303c	84			unknown	unclassified	unverified		
-0x001030bc	95			unknown	unclassified	unverified		
+0x00102dbc	92	trace_call_102dbc	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00102dbc.json	docs/compiler-abi.md; AIL trace wrapper for 0x106938 with result trace (cdecl, all arguments on the stack).; callers d7158@d7288,d72b4@d7373; guest pending
+0x00102f60	84	trace_call_102f60	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00102f60.json	docs/compiler-abi.md; AIL trace wrapper for 0x113af0 with result trace (cdecl, all arguments on the stack).; callers d5d18@d5d43; guest pending
+0x00102fb4	92	trace_call_102fb4	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00102fb4.json	docs/compiler-abi.md; AIL trace wrapper for 0x113a40 with result trace (cdecl, all arguments on the stack).; callers 113af0@113b37; guest pending
+0x0010303c	84	trace_call_10303c	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x0010303c.json	docs/compiler-abi.md; AIL trace wrapper for 0x113c7c with result trace (cdecl, all arguments on the stack).; callers d5d18@d5d7e; guest pending
+0x001030bc	95	trace_call_1030bc	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x001030bc.json	docs/compiler-abi.md; AIL trace wrapper for 0x113d10 with result trace (cdecl, all arguments on the stack).; callers d5e0c@d5e73; guest pending
 0x0010311c	44	trace_call_10311c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x0010311c.json	docs/compiler-abi.md; Trace wrapper for 0x11402c.; callers d5e0c@d5ea5; guest pending
 0x00103148	44	trace_call_103148	misc_helpers2	compiles	game	confirmed	decomp/tests/0x00103148.json	docs/compiler-abi.md; Trace wrapper for 0x114058.; callers 112c10@112e38,112c10@11308a,113cf4@113cfe; guest pending
 0x001031a0	44	trace_call_1031a0	misc_helpers2	compiles	game	confirmed	decomp/tests/0x001031a0.json	docs/compiler-abi.md; Trace wrapper for 0x114170.; callers d5ec0@d5ed6,113398@1133b1; guest pending
-0x001031cc	58			unknown	unclassified	unverified		
+0x001031cc	58	trace_call_1031cc	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x001031cc.json	docs/compiler-abi.md; AIL trace wrapper for 0x1141b0 (cdecl, all arguments on the stack).; callers none direct; guest pending
 0x00103244	52	trace_call_103244	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00103244.json	docs/compiler-abi.md; Trace wrapper for 0x1141a0.; callers d5e0c@d5e96; guest pending
 0x001033c8	52	trace_call_1033c8	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001033c8.json	docs/compiler-abi.md; Trace wrapper for 0x1142cc.; callers d5fc8@d5fe5; guest pending
-0x001034b0	84			unknown	unclassified	unverified		
+0x001034b0	84	trace_call_1034b0	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x001034b0.json	docs/compiler-abi.md; AIL trace wrapper for 0x113b78 with result trace (cdecl, all arguments on the stack).; callers d5d18@d5dbf; guest pending
 0x00103504	44	trace_call_103504	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00103504.json	docs/compiler-abi.md; Trace wrapper for 0x113c24.; callers d5d18@d5d31; guest pending
-0x00103778	102			unknown	unclassified	unverified		
+0x00103778	102	trace_call_103778	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00103778.json	docs/compiler-abi.md; AIL trace wrapper for 0x11451c with result trace (cdecl, all arguments on the stack).; callers d5fa8@d5fbc,112c10@113190; guest pending
 0x001037e0	52	trace_call_1037e0	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001037e0.json	docs/compiler-abi.md; Trace wrapper for 0x11458c.; callers 1123a4@1126c1; guest pending
-0x00103b08	84			unknown	unclassified	unverified		
+0x00103b08	84	trace_call_103b08	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00103b08.json	docs/compiler-abi.md; AIL trace wrapper for 0x1146ec with result trace (cdecl, all arguments on the stack).; callers 1123a4@112710; guest pending
 0x00103b5c	52	trace_call_103b5c	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00103b5c.json	docs/compiler-abi.md; Trace wrapper for 0x114878.; callers 1123a4@112761,114058@1140ea; guest pending
 0x00103b90	58	trace_call_103b90	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00103b90.json	docs/compiler-abi.md; Trace wrapper for 0x114994.; callers 1123a4@112725,1123a4@11276c; guest pending
-0x00103c28	81			unknown	unclassified	unverified		
+0x00103c28	81	trace_call_103c28	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00103c28.json	docs/compiler-abi.md; AIL trace wrapper for 0x1149e0 (cdecl, all arguments on the stack).; callers d605c@d6069; guest pending
 0x00103d48	42	shutdown_103d48	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00103d48.json	docs/compiler-abi.md; If dword 0x17d2cc is set, run 0x1048b4(0x101a90, 0x103d48) and clear it.; callers none direct; guest pending
 0x00103d80	138			unknown	unclassified	unverified		
 0x00103e0c	79			unknown	unclassified	unverified		

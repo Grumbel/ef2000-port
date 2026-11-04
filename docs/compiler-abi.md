@@ -4648,3 +4648,34 @@ in EAX, format string address, one value).
 | `0x40e20` | none | none | none direct | Copy the 12-byte record at 0x184358 to 0x41f30c, set the pending name to 0x184364, clear the word at 0x41eeda and store  |
 | `0xa4342` | [ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | EAX:int32_t | 20ec@268e,20ec@26c6,20ec@2755 | sprintf: format into buf (callback 0xa432f) and terminate it (cdecl, variadic). |
 | `0xd5fc8` | EAX:uint32_t | none | d5d18@d5da9 | When the flag at 0x15b968 is set, trace-call 0x1033c8 with the pointer at 0x420a6c and the value, and remember the low b |
+
+## trace_wrappers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x101ddc` | none | EAX:uint32_t | d5d18@d5d4f,d6e58@d6ef3 | AIL trace wrapper for 0x104694 (cdecl, all arguments on the stack). |
+| `0x101e14` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | d6e58@d6eaa,d6e58@d6eb6,d6e58@d6ec2 | AIL trace wrapper for 0x1041e4 with result trace (cdecl, all arguments on the stack). |
+| `0x101e80` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 104200@104373 | AIL trace wrapper for 0x111118 with result trace (cdecl, all arguments on the stack). |
+| `0x101f08` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | none direct | AIL trace wrapper for 0x1111b1 (cdecl, all arguments on the stack). |
+| `0x101f88` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | EAX:uint32_t | 103e0c@103e39,104200@1043b3,104464@1044ad | AIL trace wrapper for 0x11124c with result trace (cdecl, all arguments on the stack). |
+| `0x102144` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | e28e8@e2939,104200@1043d8,105e38@10635b | AIL trace wrapper for 0x111365 with result trace (cdecl, all arguments on the stack). |
+| `0x102198` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 104200@104431,105e38@106405,1133f8@1138f0 | AIL trace wrapper for 0x1113ac with result trace (cdecl, all arguments on the stack). |
+| `0x1023d8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 105e38@105f8e,1133f8@1135bf | AIL trace wrapper for 0x104504 with result trace (cdecl, all arguments on the stack). |
+| `0x10242c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 106464@10649b,113a40@113a77 | AIL trace wrapper for 0x104200 with result trace (cdecl, all arguments on the stack). |
+| `0x1024b4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d6e58@d6ee7 | AIL trace wrapper for 0x106514 with result trace (cdecl, all arguments on the stack). |
+| `0x102508` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 106514@10655b | AIL trace wrapper for 0x106464 with result trace (cdecl, all arguments on the stack). |
+| `0x102590` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d6e58@d6f41 | AIL trace wrapper for 0x1065c8 with result trace (cdecl, all arguments on the stack). |
+| `0x1026fc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | d7158@d7209,d72b4@d7388 | AIL trace wrapper for 0x106718 (cdecl, all arguments on the stack). |
+| `0x102738` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | d7158@d71f1,d72b4@d7337 | AIL trace wrapper for 0x106740 (cdecl, all arguments on the stack). |
+| `0x1028f4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d7594@d75ad,d75fc@d7615 | AIL trace wrapper for 0x106708 with result trace (cdecl, all arguments on the stack). |
+| `0x102dbc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | d7158@d7288,d72b4@d7373 | AIL trace wrapper for 0x106938 with result trace (cdecl, all arguments on the stack). |
+| `0x102f60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d5d18@d5d43 | AIL trace wrapper for 0x113af0 with result trace (cdecl, all arguments on the stack). |
+| `0x102fb4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 113af0@113b37 | AIL trace wrapper for 0x113a40 with result trace (cdecl, all arguments on the stack). |
+| `0x10303c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d5d18@d5d7e | AIL trace wrapper for 0x113c7c with result trace (cdecl, all arguments on the stack). |
+| `0x1030bc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | d5e0c@d5e73 | AIL trace wrapper for 0x113d10 with result trace (cdecl, all arguments on the stack). |
+| `0x1031cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | none direct | AIL trace wrapper for 0x1141b0 (cdecl, all arguments on the stack). |
+| `0x1034b0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d5d18@d5dbf | AIL trace wrapper for 0x113b78 with result trace (cdecl, all arguments on the stack). |
+| `0x103778` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | d5fa8@d5fbc,112c10@113190 | AIL trace wrapper for 0x11451c with result trace (cdecl, all arguments on the stack). |
+| `0x103b08` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 1123a4@112710 | AIL trace wrapper for 0x1146ec with result trace (cdecl, all arguments on the stack). |
+| `0x103c28` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t | EAX:uint32_t | d605c@d6069 | AIL trace wrapper for 0x1149e0 (cdecl, all arguments on the stack). |
+| `0x1023b0` | none | EAX:uint32_t | 104694@1046b5 | AIL trace wrapper for 0x1113fb (no arguments, tail call). |

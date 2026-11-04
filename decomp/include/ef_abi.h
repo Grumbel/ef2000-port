@@ -4043,4 +4043,58 @@ void reset_name_record_40e20(void);
 int32_t guest_sprintf_a4342(ef_addr32 buf, ef_addr32 fmt, ...);
 void note_value_d5fc8(uint32_t value);
 
+/* trace_wrappers1.c */
+uint32_t trace_call_101ddc(void);
+uint32_t trace_call_101e14(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t trace_call_101e80(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_101f08(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
+uint32_t trace_call_101f88(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3);
+uint32_t trace_call_102144(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_102198(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t trace_call_1023d8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_10242c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t trace_call_1024b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_102508(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t trace_call_102590(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_1026fc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
+uint32_t trace_call_102738(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
+uint32_t trace_call_1028f4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_102dbc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t trace_call_102f60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_102fb4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t trace_call_10303c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_1030bc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
+uint32_t trace_call_1031cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
+uint32_t trace_call_1034b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_103778(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
+uint32_t trace_call_103b08(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
+uint32_t trace_call_103c28(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4);
+uint32_t trace_call_1023b0(void);
+uint32_t guest_fn_104694_t(void); /* 0x104694 cdecl */
+uint32_t guest_fn_1041e4_t(uint32_t a0, uint32_t a1); /* 0x1041e4 cdecl */
+uint32_t guest_fn_111118_t(uint32_t a0); /* 0x111118 cdecl */
+uint32_t guest_fn_1111b1_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x1111b1 cdecl */
+uint32_t guest_fn_11124c_t(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3); /* 0x11124c cdecl */
+uint32_t guest_fn_111365_t(uint32_t a0); /* 0x111365 cdecl */
+uint32_t guest_fn_1113ac_t(uint32_t a0, uint32_t a1); /* 0x1113ac cdecl */
+uint32_t guest_fn_104504_t(uint32_t a0); /* 0x104504 cdecl */
+uint32_t guest_fn_104200_t(uint32_t a0, uint32_t a1); /* 0x104200 cdecl */
+uint32_t guest_fn_106514_t(uint32_t a0); /* 0x106514 cdecl */
+uint32_t guest_fn_106464_t(uint32_t a0, uint32_t a1); /* 0x106464 cdecl */
+uint32_t guest_fn_1065c8_t(uint32_t a0); /* 0x1065c8 cdecl */
+uint32_t guest_fn_106718_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x106718 cdecl */
+uint32_t guest_fn_106740_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x106740 cdecl */
+uint32_t guest_fn_106708_t(uint32_t a0); /* 0x106708 cdecl */
+uint32_t guest_fn_106938_t(uint32_t a0, uint32_t a1); /* 0x106938 cdecl */
+uint32_t guest_fn_113af0_t(uint32_t a0); /* 0x113af0 cdecl */
+uint32_t guest_fn_113a40_t(uint32_t a0, uint32_t a1); /* 0x113a40 cdecl */
+uint32_t guest_fn_113c7c_t(uint32_t a0); /* 0x113c7c cdecl */
+uint32_t guest_fn_113d10_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x113d10 cdecl */
+uint32_t guest_fn_1141b0_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x1141b0 cdecl */
+uint32_t guest_fn_113b78_t(uint32_t a0); /* 0x113b78 cdecl */
+uint32_t guest_fn_11451c_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x11451c cdecl */
+uint32_t guest_fn_1146ec_t(uint32_t a0); /* 0x1146ec cdecl */
+uint32_t guest_fn_1149e0_t(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4); /* 0x1149e0 cdecl */
+uint32_t guest_fn_1113fb_t(void); /* 0x1113fb cdecl */
+
 #endif
