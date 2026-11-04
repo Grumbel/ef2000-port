@@ -4328,3 +4328,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xbfb2c` | AX:int16_t,DX:int16_t,EBX:ef_addr32 | EAX:uint32_t | bfb88@bfca5,c09e4@c0a35,c09e4@c0a5a | Count the idle records at cell (x,y) that pass bcf18 and whose code is in the cc584 set or 10..15. |
 | `0x1086f4` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 1084d3@108552,1084d3@1086bc | Parse the width and size modifiers of a printf conversion ('*', digits, N/F, h/l/w/L) into the spec record; returns the  |
+
+## game_helpers103 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb3830` | AX:int16_t,DX:int16_t,BX:int16_t | EAX:int32_t | cff64@cff75,cff80@d0209 | Approximate 3D distance from three 16-bit components: 15/16 of the largest absolute value plus 3/8 of the other two. |
+| `0xbcc2c` | EAX:ef_addr32 | EAX:uint32_t | bd2f4@bd30b | Check that an object has a ready sub-entry (matching its type's code) and set the flag at +0x36; returns 1 or 0. |

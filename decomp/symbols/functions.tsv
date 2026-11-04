@@ -2512,7 +2512,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b33ac	22	latch_and_forward_b33ac	list_helpers	compiles	game	confirmed	decomp/tests/0x000b33ac.json	docs/compiler-abi.md; Dword 0x41f354 = 0xa4574(0); tail-call 0xf9ecd(0x41f354).; callers b3374@b337d; guest pending
 0x000b3580	96	dump_buffer_b3580	game_helpers83	compiles	game	confirmed	decomp/tests/0x000b3580.json	docs/compiler-abi.md; Hex dump 0x640 bytes through the printf sink, 40 values per line.; callers b3084@b314b; guest pending
 0x000b3648	486			unknown	unclassified	unverified		
-0x000b3830	343			unknown	unclassified	unverified		
+0x000b3830	343	approx_distance3_16_b3830	game_helpers103	compiles	game	confirmed	decomp/tests/0x000b3830.json	docs/compiler-abi.md; Approximate 3D distance from three 16-bit components: 15/16 of the largest absolute value plus 3/8 of the other two.; callers cff64@cff75,cff80@d0209; guest pending
 0x000b3988	100	approx_length_b3988	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b3988.json	docs/compiler-abi.md; Approximate length from two components: max - max/32 - max/128 + 3/8 min + 3/128 min...; callers 67d4@687c,21654@21955,21654@219f0; guest pending
 0x000b39ec	235			unknown	unclassified	unverified		
 0x000b3ae0	57	ratio_lookup_b3ae0	game_helpers28	compiles	game	confirmed	decomp/tests/0x000b3ae0.json	docs/compiler-abi.md; Table-driven ratio of two unsigned values (a/b or complement).; callers b3b1c@b3b4a,b3b1c@b3b55,b3b1c@b3b67; guest pending
@@ -2649,7 +2649,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bcb50	111	code_in_set_bcb50	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bcb50.json	docs/compiler-abi.md; ; callers faafc@fab3e,fabf0@fac23; guest pending
 0x000bcbc0	54	is_kind_bcbc0	list_helpers	compiles	game	confirmed	decomp/tests/0x000bcbc0.json	docs/compiler-abi.md; Is the kind one of 8, 0xe, 0xf, 0x11, 0x13, 0x16, 0x17, 0x1a?; callers be438@be462,fba6c@fbaae; guest pending
 0x000bcc04	38	map_code_bcc04	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcc04.json	docs/compiler-abi.md; Map code: 0x31 -> 0x37, 0x49 -> 0x4b, 0x0b/0x56 -> 0x0c, else 0.; callers bcc2c@bcd1b,bcda0@bce49; guest pending
-0x000bcc2c	332			unknown	unclassified	unverified		
+0x000bcc2c	332	object_has_ready_entry_bcc2c	game_helpers103	compiles	game	confirmed	decomp/tests/0x000bcc2c.json	docs/compiler-abi.md; Check that an object has a ready sub-entry (matching its type's code) and set the flag at +0x36; returns 1 or 0.; callers bd2f4@bd30b; guest pending
 0x000bcd78	38	map_code_bcd78	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcd78.json	docs/compiler-abi.md; Map code: 0x31 -> 0x27, 0x49 -> 0x12, 0x0b/0x56 -> 0x1b, else 0.; callers bcf44@bcfe7; guest pending
 0x000bcda0	246			unknown	unclassified	unverified		
 0x000bce98	38	map_code_bce98	list_lookup	compiles	game	confirmed	decomp/tests/0x000bce98.json	docs/compiler-abi.md; Map code: 0x31 -> 2, 0x49 -> 0x3c, 0x0b/0x56 -> 0x0c, else 0.; callers bcf44@bd1a6; guest pending

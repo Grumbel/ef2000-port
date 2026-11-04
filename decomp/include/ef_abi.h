@@ -3832,4 +3832,8 @@ uint32_t count_records_at_cell_bfb2c(int16_t x, int16_t y, ef_addr32 head);
 ef_addr32 parse_format_modifiers_1086f4(ef_addr32 fmt, ef_addr32 spec);
 uint32_t guest_fn_bcf18_x(ef_addr32 rec); /* 0xbcf18 EAX -> AX */
 
+/* game_helpers103.c */
+int32_t approx_distance3_16_b3830(int16_t a, int16_t b, int16_t c);
+uint32_t object_has_ready_entry_bcc2c(ef_addr32 obj);
+
 #endif
