@@ -19859,3 +19859,35 @@ void rebuild_word_map_49e00(void)
 			return;
 	}
 }
+
+/* 0xabb00, 294 bytes. Compute a clipped view window from record p into the word block at 0x41eee2..0x41ef00 and scale two of its extents by 1/(double at p+0x9f), truncated toward zero. Registers are preserved. */
+void compute_view_window_abb00(ef_addr32 p)
+{
+	int16_t si, cx, dx;
+	int32_t i1, i2;
+	uint32_t t;
+	double inv;
+
+	EF_U16(0x0041eef6u) = EF_U16(0x0041ec08u);
+	EF_U16(0x0041eef8u) = EF_U16(0x0041ec0au);
+	EF_U16(0x0041eefau) = EF_U16(0x0041ec0cu);
+	EF_U16(0x0041ef00u) = EF_U16(0x0041ec0eu);
+	si = (int16_t)(EF_U16(p + 0x41u) + EF_U16(p + 0x71u));
+	cx = (int16_t)(EF_U16(p + 0x73u) + EF_U16(p + 0x43u));
+	EF_U16(0x0041eeeau) = EF_U16(p + 0x75u);
+	EF_U16(0x0041eeecu) = EF_U16(p + 0x77u);
+	dx = (int16_t)(si - (int16_t)EF_U16(p + 0x69u));
+	EF_U16(0x0041eee6u) = (uint16_t)dx;
+	dx = (int16_t)(cx - (int16_t)EF_U16(p + 0x6bu));
+	EF_U16(0x0041eee8u) = (uint16_t)dx;
+	EF_U16(0x0041eee4u) = EF_U16(p + 0x65u);
+	EF_U16(0x0041eee2u) = EF_U16(p + 0x67u);
+	i1 = ((int32_t)EF_U32(0x0041eefcu) >> 16) - (int32_t)si + ((int32_t)EF_U32(p + 0x67u) >> 16);
+	inv = 1.0 / EF_F64(p + 0x9fu);
+	t = EF_U32(0x0041eefau);
+	EF_U16(0x0041eef4u) = (uint16_t)(int32_t)truncate_9d72c((double)i1 * inv);
+	i2 = ((int32_t)t >> 16) - (int32_t)cx + ((int32_t)EF_U32(p + 0x69u) >> 16);
+	EF_U16(0x0041eef0u) = (uint16_t)si;
+	EF_U16(0x0041eef2u) = (uint16_t)(int32_t)truncate_9d72c(inv * (double)i2);
+	EF_U16(0x0041eeeeu) = (uint16_t)cx;
+}

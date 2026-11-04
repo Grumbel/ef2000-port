@@ -6055,4 +6055,6 @@ void register_update_message_80b14(ef_addr32 p);
 
 void rebuild_word_map_49e00(void);
 
+void compute_view_window_abb00(ef_addr32 p);
+
 #endif
