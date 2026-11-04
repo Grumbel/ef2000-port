@@ -5517,4 +5517,10 @@ void guest_fn_95bf4_x(void); /* 0x95bf4 */
 uint8_t clip_segment_points_d299c(uint32_t a, uint32_t b, ef_addr32 out);
 void guest_fn_d2130_x(ef_addr32 record); /* 0xd2130 EAX */
 
+uint8_t can_reach_target_89060(ef_addr32 rec, uint32_t target);
+void guest_fn_88c54_x(ef_addr32 rec, ef_addr32 out); /* 0x88c54 EAX/EDX */
+void guest_fn_88c80_x(ef_addr32 rec, ef_addr32 out, ef_addr32 out2); /* 0x88c80 EAX/EDX/EBX */
+void guest_fn_88d4c_x(ef_addr32 rec, ef_addr32 out); /* 0x88d4c EAX/EDX */
+double guest_fn_88ff8_x(ef_addr32 a, ef_addr32 b); /* 0x88ff8 EAX/EDX -> ST0 */
+
 #endif

@@ -11992,3 +11992,35 @@ uint8_t clip_segment_points_d299c(uint32_t a, uint32_t b, ef_addr32 out)
     EF_U16(out + 6u) = EF_U16(EF_U32(pts + 8u) + 0x1eu);
     return 1u;
 }
+
+/* 0x89060, 221 bytes. Test whether the unit record R (EAX) can reach the point: store the target dword T (EDX, when nonzero and R's class byte +0x18 is 6) at +0x30, fetch three vectors of R (0x88c54, 0x88c80, 0x88d4c), build the direction 0x88fb4 from two of them against 0x1fcf58/0x1fcf88, subtract (0x88d30), normalise (0xb4424) and return 1 when the distance 0x88ff8 is below the class limit: the double at class*0x91+0x12bcd5 times 0x18a4d0 times 0x18a4d8. */
+uint8_t can_reach_target_89060(ef_addr32 rec, uint32_t target)
+{
+    double v48[3];
+    double v60[3];
+    double v78[3];
+    double v80[3];
+    double v2c[6];
+    double v18[3];
+    double v00[3];
+    double v30[3];
+    double c1;
+    double c2;
+    double limit;
+    uint32_t cls;
+    if (target != 0u && EF_U8(rec + 0x18u) == 6u)
+        EF_U32(rec + 0x30u) = target;
+    guest_fn_88c54_x(rec, (ef_addr32)(uintptr_t)v48);
+    guest_fn_88c80_x(rec, (ef_addr32)(uintptr_t)v60, (ef_addr32)(uintptr_t)v80);
+    guest_fn_88d4c_x(rec, (ef_addr32)(uintptr_t)v78);
+    direction_vector_88fb4((ef_addr32)(uintptr_t)v2c, 0x001fcf58u, 0x001fcf88u, 0u, v80[0], v78[0]);
+    subtract_scene_vectors((ef_addr32)(uintptr_t)v18, 0x001fcf58u, 0x001fcf88u);
+    if (normalize_vector_b4424((ef_addr32)(uintptr_t)v00, (ef_addr32)(uintptr_t)v18) == 0u)
+        return 0u;
+    cls = EF_U8(rec + 0x18u);
+    memcpy(&limit, ef_guest_memory_ptr(cls * 0x91u + 0x0012bcd5u), sizeof limit);
+    memcpy(&c1, ef_guest_memory_ptr(0x0018a4d0u), sizeof c1);
+    memcpy(&c2, ef_guest_memory_ptr(0x0018a4d8u), sizeof c2);
+    limit = limit * c1 * c2;
+    return guest_fn_88ff8_x((ef_addr32)(uintptr_t)v30, (ef_addr32)(uintptr_t)v00) < limit ? 1u : 0u;
+}

@@ -7557,3 +7557,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd299c` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | AL:uint8_t | c6370@c6396 | Clip the segment between two points of the table at [0x17bf70] (byte offsets A = AX and B = EDX, 16 bit) against the vie |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x89060` | EAX:ef_addr32,EDX:uint32_t | AL:uint8_t | 89698@89784 | Test whether the unit record R (EAX) can reach the point: store the target dword T (EDX, when nonzero and R's class byte |
