@@ -7474,3 +7474,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x87db8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:uint32_t | none | 26b60@27094,27348@27475,2a1fc@2a3c6 | Create and initialise a unit record: allocate one (0x879c4), mark the words at +0x47/+0x49 as 0x1234 and remember it in  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x117b18` | EAX:ef_addr32 | none | 117bfc@117cba,117bfc@117cf7,118428@118477 | Transmit pump of a serial port record P (EAX; I/O base at +0x1c, ring buffer record at +0, data at +4, flow control flag |

@@ -11612,3 +11612,42 @@ void create_unit_87db8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t 
     if (EF_U8(0x00127da9u) != 0u && (EF_U8(unit + 0x67u) & 1u) == 0u)
         send_record_state_55aac(unit);
 }
+
+/* 0x117b18, 198 bytes. Transmit pump of a serial port record P (EAX; I/O base at +0x1c, ring buffer record at +0, data at +4, flow control flag at +0x14, FIFO flag at +0x18, status record at +0x2c). With flow control on, bit 1 of the status word at +4 follows the modem line CTS (inb base+6 bit 4). When the transmitter holding register is empty (inb base+5 bit 5) send up to 16 bytes (1 without FIFO) from the ring: head word at +0, count word at +4, wrap size at +6. */
+void pump_serial_transmit_117b18(ef_addr32 p)
+{
+    ef_addr32 base;
+    ef_addr32 ring;
+    uint32_t limit;
+    uint32_t sent = 0u;
+    if (EF_U32(p + 0x1cu) == 0u)
+        return;
+    if (EF_U32(p + 0x14u) != 0u) {
+        ef_addr32 st = EF_U32(p + 0x2cu);
+        if ((uint8_t)(guest_fn_9c430(EF_U32(p + 0x1cu) + 6u) & 0x10u) == 0u) {
+            EF_U16(st + 4u) = (uint16_t)(EF_U16(st + 4u) | 2u);
+            return;
+        }
+        EF_U16(st + 4u) = (uint16_t)(EF_U16(st + 4u) & ~2u);
+    }
+    base = EF_U32(p + 0x1cu);
+    if ((uint8_t)(guest_fn_9c430(base + 5u) & 0x20u) == 0u)
+        return;
+    limit = EF_U32(p + 0x18u) != 0u ? 0x10u : 1u;
+    ring = EF_U32(p);
+    while ((int16_t)EF_U16(ring + 4u) > 0) {
+        uint8_t b;
+        int16_t head = (int16_t)EF_U16(ring);
+        EF_U16(ring) = (uint16_t)(EF_U16(ring) + 1u);
+        b = EF_U8(EF_U32(p + 4u) + (uint32_t)(int32_t)head);
+        if (EF_U16(ring) == EF_U16(ring + 6u))
+            EF_U16(ring) = 0u;
+        EF_U16(ring + 4u) = (uint16_t)(EF_U16(ring + 4u) - 1u);
+        sent = (sent + 1u) & 0xffu;
+        guest_fn_117b0c(EF_U32(p + 0x1cu), b);
+        if ((int16_t)EF_U16(ring + 4u) <= 0)
+            return;
+        if ((int32_t)sent >= (int32_t)limit)
+            return;
+    }
+}

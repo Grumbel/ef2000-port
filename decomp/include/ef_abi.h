@@ -5476,4 +5476,6 @@ void guest_fn_87a20_x(ef_addr32 obj, uint32_t a, uint32_t b, uint32_t c, uint32_
 uint32_t guest_fn_80abc_x(void); /* 0x80abc -> AX */
 void guest_fn_88100_x(ef_addr32 obj); /* 0x88100 EAX */
 
+void pump_serial_transmit_117b18(ef_addr32 p);
+
 #endif
