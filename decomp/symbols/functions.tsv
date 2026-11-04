@@ -695,7 +695,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003c768	37	copy_table_entry_to_record	low_helpers	compiles	game	confirmed	decomp/tests/0x0003c768.json	docs/compiler-abi.md; copy byte +0 and word +2 of 0x3c730 entry into record 0x1264c8 at +0x0b/+0x2a; callers 3cb2c@3cbf8; guest pending
 0x0003c790	441			unknown	unclassified	unverified		
 0x0003c94c	69	store_plane_pixel_3c94c	game_helpers8	compiles	game	confirmed	decomp/tests/0x0003c94c.json	docs/compiler-abi.md; Store a 16-bit value split over two byte planes at (row, 0x18f - column).; callers 3cc94@3ccd9; guest pending
-0x0003c994	407			unknown	unclassified	unverified		
+0x0003c994	407	parse_table_line_3c994	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003c994.json	docs/compiler-abi.md; Split one text line at LINE (EAX) into its four fields by overwriting the separators with zeros: name (pointer kept in 0; callers 3cb2c@3cb53,3cc94@3cca9; guest pending
 0x0003cb2c	250			unknown	unclassified	unverified		
 0x0003cc28	105	normalize_script_line_endings	tactical_io	compiles	game	confirmed	decomp/tests/0x0003cc28.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0003cc94	85	plot_trail_3cc94	game_helpers11	compiles	game	confirmed	decomp/tests/0x0003cc94.json	docs/compiler-abi.md; Plot a pixel for each step of the string walker.; callers 3cd24@3cd30; guest pending

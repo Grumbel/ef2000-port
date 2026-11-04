@@ -14369,3 +14369,66 @@ void select_language_tables_45bfc(uint32_t language)
     for (i = 0u; i < 10u; i++)
         EF_U32(slots[i]) = sets[lang][i];
 }
+
+/* 0x3c994, 407 bytes. Split one text line at LINE (EAX) into its four fields by overwriting the separators with zeros: name (pointer kept in 0x1a2e8c), second field (0x1a2e90), the angle number (parsed by 0x9d4cd into word 0x1a2ea4), third field (0x1a2e80) and a quoted string (0x1a2e88, the closing quote is zeroed). Every missing field (newline reached first) is reported through the error hook with 0x183728, 0x183750, 0x183778 and 0x1837a0. The angle 90, 180 or 270 selects the variant 1, 2 or 3 (0 otherwise) for 0x9de08 on the third field, whose result goes to word 0x1a2ea2. Returns the pointer after the line's newline. */
+ef_addr32 parse_table_line_3c994(ef_addr32 line)
+{
+    ef_addr32 p = line;
+    uint32_t variant;
+    uint16_t angle;
+    EF_U32(0x001a2e8cu) = line;
+    while (EF_U8(p) != 0x20u && EF_U8(p) != 0x09u && EF_U8(p) != 0x0au)
+        p++;
+    if (EF_U8(p) == 0x0au)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00183728u);
+    while (EF_U8(p) == 0x20u || EF_U8(p) == 0x09u) {
+        EF_U8(p) = 0u;
+        p++;
+    }
+    EF_U32(0x001a2e90u) = p;
+    while (EF_U8(p) != 0x20u && EF_U8(p) != 0x09u && EF_U8(p) != 0x0au)
+        p++;
+    if (EF_U8(p) == 0x0au)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00183750u);
+    while (EF_U8(p) == 0x20u || EF_U8(p) == 0x09u) {
+        EF_U8(p) = 0u;
+        p++;
+    }
+    EF_U16(0x001a2ea4u) = (uint16_t)guest_fn_9d4cd(p);
+    while (EF_U8(p) != 0x20u && EF_U8(p) != 0x09u && EF_U8(p) != 0x0au)
+        p++;
+    if (EF_U8(p) == 0x0au)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00183778u);
+    while (EF_U8(p) == 0x20u || EF_U8(p) == 0x09u) {
+        EF_U8(p) = 0u;
+        p++;
+    }
+    EF_U32(0x001a2e80u) = p;
+    while (EF_U8(p) != 0x20u && EF_U8(p) != 0x09u && EF_U8(p) != 0x0au)
+        p++;
+    if (EF_U8(p) == 0x0au)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x001837a0u);
+    while (EF_U8(p) == 0x20u || EF_U8(p) == 0x09u || EF_U8(p) == 0x22u) {
+        EF_U8(p) = 0u;
+        p++;
+    }
+    EF_U32(0x001a2e88u) = p;
+    while (EF_U8(p) != 0x22u)
+        p++;
+    EF_U8(p) = 0u;
+    p++;
+    while (EF_U8(p) != 0x0au)
+        p++;
+    angle = EF_U16(0x001a2ea4u);
+    p++;
+    if (angle == 0x5au)
+        variant = 1u;
+    else if (angle == 0xb4u)
+        variant = 2u;
+    else if (angle == 0x10eu)
+        variant = 3u;
+    else
+        variant = 0u;
+    EF_U16(0x001a2ea2u) = (uint16_t)guest_fn_9de08(EF_U32(0x001a2e80u), variant);
+    return p;
+}

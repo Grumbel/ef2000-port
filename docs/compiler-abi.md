@@ -8014,3 +8014,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x45bfc` | EAX:uint32_t | none | 77c90@77e19 | Select the language tables for LANGUAGE (AL): store the byte in dword 0x1a51f0 and point the ten table slots 0x1a5218, 0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3c994` | EAX:ef_addr32 | EAX:ef_addr32 | 3cb2c@3cb53,3cc94@3cca9 | Split one text line at LINE (EAX) into its four fields by overwriting the separators with zeros: name (pointer kept in 0 |

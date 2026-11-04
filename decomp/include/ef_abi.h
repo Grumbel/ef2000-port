@@ -5725,4 +5725,6 @@ uint32_t build_scenery_map_7a844(void);
 
 void select_language_tables_45bfc(uint32_t language);
 
+ef_addr32 parse_table_line_3c994(ef_addr32 line);
+
 #endif
