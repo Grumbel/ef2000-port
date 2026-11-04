@@ -3480,3 +3480,25 @@ in EAX, format string address, one value).
 | `0x90378` | EAX:ef_addr32 | none | 901ec@9020c | Drop an object near the camera onto the terrain and register its move. |
 | `0x93f44` | none | none | 95e58@96106 | Reset the angle record from the current limits and flag out-of-range limits. |
 | `0x94954` | AX:int16_t | none | 95e58@969b0,95e58@96ac9 | Update the navigation target of a unit from its linked object. |
+
+## runtime_helpers30 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x39db0` | AL:uint8_t | none | 39dc4@39dd4 | Allocate the four-byte slot table of the given length. |
+| `0x8204c` | EAX:uint32_t | EAX:ef_addr32 | 4ae5c@4b0a5 | Allocate a 12-byte node holding a value. |
+| `0x84650` | none | AL:uint8_t | 84678@846bf | Unsupported feature: abort and report failure. |
+| `0xa292c` | none | AL:uint8_t | a3eac@a3ebb,a42c4@a42c4 | Abort when the device is not ready; always reports ready. |
+| `0xa41a0` | none | none | 3617c@36233,3617c@36244,3617c@3628f | Run the optional device idle callback. |
+| `0xa7d34` | none | none | a82f0@a853a | Remember the current clock. |
+| `0xab820` | EAX:uint32_t | none | f18a4@f1a02,f18a4@f1a5f,f1a70@f1b43 | Run the optional word callback with the low 16 bits of the argument. |
+| `0xe1110` | EAX:uint32_t | none | e0b88@e0bb3,e0bcc@e0bfa,e0bcc@e0c2d | Busy-wait for the given number of clock ticks. |
+| `0xe1730` | none | AL:uint8_t | 34390@343a3 | Unsupported input query: abort and report none. |
+| `0xe1744` | none | AL:uint8_t | 34140@3415e,34ea4@34f03 | Unsupported input query: abort and report none. |
+| `0xe1758` | none | AL:uint8_t | 34298@342e1 | Unsupported input query: abort and report none. |
+| `0xe1780` | none | AL:uint8_t | 34140@34150,34ea4@34ef5 | Unsupported input query: abort and report none. |
+| `0xe1948` | EAX:uint32_t | none | e1e6c@e1efb,e1e6c@e1fc8,e1e6c@e20c5 | Abort with a message that includes the argument. |
+| `0xeb25a` | EAX:uint32_t | none | 9bd20@9bd65,eb448@eb471 | Run the two page callbacks, then the page switch for the argument. |
+| `0xeb272` | EAX:uint32_t | none | eb25a@eb26b | Run the page callback pair, then hand the argument to 0x20d. |
+| `0xeb35c` | none | none | dc250@dc250,dc280@dc281 | Abort with the stored message when the error flag is set. |
+| `0xed6c5` | none | none | ed6cc@ed831 | Forward to the callback at 0x17d498. |

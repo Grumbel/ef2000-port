@@ -2829,4 +2829,25 @@ void guest_fn_10a9c(int32_t a, int32_t b); /* 0x10a9c EAX/EDX */
 void guest_fn_55f0c(int32_t a, int32_t b, int32_t c, int32_t d); /* 0x55f0c EAX/EDX/EBX/ECX */
 void guest_fn_d9cb4(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xd9cb4 EAX/EDX/EBX */
 
+/* runtime_helpers30.c */
+void alloc_slot_table_39db0(uint8_t count);
+ef_addr32 make_node_8204c(uint32_t value);
+uint8_t unsupported_84650(void);
+uint8_t require_device_ready_a292c(void);
+void run_idle_callback_a41a0(void);
+void remember_clock_a7d34(void);
+void run_word_callback_ab820(uint32_t value);
+void wait_ticks_e1110(uint32_t ticks);
+uint8_t unsupported_query_e1730(void);
+uint8_t unsupported_query_e1744(void);
+uint8_t unsupported_query_e1758(void);
+uint8_t unsupported_query_e1780(void);
+void fatal_with_arg_e1948(uint32_t value);
+void switch_page_eb25a(uint32_t page);
+void switch_page_eb272(uint32_t page);
+void check_error_flag_eb35c(void);
+void forward_callback_ed6c5(void);
+void guest_fn_20d(uint32_t value); /* 0x20d EAX */
+void switch_page_eb272(uint32_t page);
+
 #endif
