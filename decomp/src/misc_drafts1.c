@@ -16317,3 +16317,33 @@ void load_page_palette_f2660(ef_addr32 name)
 		EF_U32(0x00433f30u) = 1u;
 	}
 }
+
+/* 0x69fac, 227 bytes. Rebuild the tactical screen state: clear bits 2 and 6 of byte 0x159130, install the handlers (0xd1f10), clear byte 0x1f6f4f, set byte 0x137a00, reset the view (0x6900c) and reload the setup (0x69080, 0x68bf4, 0x68efc, 0x69b70), clear the paired object marks of the twenty slots (0x68c18), notify the tactical action 5 for the unit in the high half of dword 0x1282da (0x9e508), run 0x68fe0(0, 0), build the widget parameters from 0xc3670 (0x186370, stack 0x12c) and the dialog 0x18637c (0xa5b1c with 0x1e0, 0x12c, 0x1e0), clear the twenty three-byte slot records at 0x1f6eac, run 0x69094 on the name 0x125828 and, when byte 0x1f6f4e is set, copy the table (0x689f0). */
+void rebuild_tactical_screen_69fac(void)
+{
+	uint32_t i, r, widget;
+
+	EF_U8(0x00159130u) = (uint8_t)(EF_U8(0x00159130u) & 0xbbu);
+	install_handlers_d1f10();
+	EF_U8(0x001f6f4fu) = 0u;
+	EF_U8(0x00137a00u) = 1u;
+	reset_view_6900c();
+	load_word_0x1282dc();
+	load_halfword_pair();
+	resolve_weapon_names_68efc();
+	refresh_weapon_widgets_69b70();
+	for (i = 0; i < 0x14u; i++)
+		clear_paired_object_marks((int16_t)i);
+	notify_tactical_action((int32_t)EF_U32(0x001282dau) >> 16, 5u);
+	guest_fn_68fe0_x(0u, 0u);
+	r = guest_fn_c3670(0x00186370u, 0u, 0u, 0x1e0u, 0x12cu);
+	widget = guest_fn_a46cc(0x0018637cu);
+	set_widget_params_a5b1c(widget, r, 0x1e0u, 0x12cu, 0x1e0u);
+	for (i = 0; i < 0x14u; i++) {
+		EF_U16(0x001f6eadu + i * 3u) = 0u;
+		EF_U8(0x001f6eacu + i * 3u) = 0u;
+	}
+	guest_fn_69094_x(0x00125828u);
+	if (EF_U8(0x001f6f4eu) != 0u)
+		copy_table_689f0();
+}

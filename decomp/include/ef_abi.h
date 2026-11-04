@@ -5850,4 +5850,8 @@ void guest_fn_aa350_x(void); /* 0xaa350 */
 
 void load_page_palette_f2660(ef_addr32 name);
 
+void rebuild_tactical_screen_69fac(void);
+void guest_fn_68fe0_x(uint32_t a, uint32_t b); /* 0x68fe0 EAX/EBX */
+void guest_fn_69094_x(uint32_t name); /* 0x69094 EAX */
+
 #endif

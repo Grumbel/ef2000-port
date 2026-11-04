@@ -8290,3 +8290,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf2660` | EAX:ef_addr32 | none | a8958@a896e,a9aa8@a9b35 | Load the palette pair for the page named EAX. Builds the file name (default path 0x9c980 plus the separator 0x1918c4 whe |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x69fac` | none | none | none direct | Rebuild the tactical screen state: clear bits 2 and 6 of byte 0x159130, install the handlers (0xd1f10), clear byte 0x1f6 |

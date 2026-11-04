@@ -1259,7 +1259,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00069bdc	305	gpwRedrawCurrentWeaponWindow		named	unclassified	unverified		
 0x00069d10	524			unknown	unclassified	unverified		
 0x00069f1c	141	gpwRedrawPlaneWindow		named	unclassified	unverified		
-0x00069fac	227			unknown	unclassified	unverified		
+0x00069fac	227	rebuild_tactical_screen_69fac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069fac.json	docs/compiler-abi.md; Rebuild the tactical screen state: clear bits 2 and 6 of byte 0x159130, install the handlers (0xd1f10), clear byte 0x1f6; callers none direct; guest pending
 0x0006a090	90	any_special_slot_6a090	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0006a090.json	docs/compiler-abi.md; True when any of the twenty slots refers to a record whose type byte is 10 or 11.; callers 68a60@68a76,68a60@68ad3; guest pending
 0x0006a0f8	22	lookup_record_value	marker_packets	compiles	game	confirmed	decomp/tests/0x0006a0f8.json	docs/compiler-abi.md; Tail call 0x9ddfc with dword at 0x128564+0xe5*AL; sole direct caller 8c49c@8c54c; guest pending
 0x0006a148	100	next_unit_6a148	game_helpers9	compiles	game	confirmed	decomp/tests/0x0006a148.json	docs/compiler-abi.md; Next unit after start that belongs to a record of kind 1, or 0xff.; callers 73500@7355a; guest pending
