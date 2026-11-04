@@ -7152,3 +7152,37 @@ int32_t setup_edge_step_1014a4(uint32_t out, uint32_t step, uint32_t p0, uint32_
     *(float *)ef_guest_memory_ptr(step + 0x14u) = r1;
     return n;
 }
+
+static uint32_t project_axis_fc8cc(int32_t v, uint32_t shift, int32_t depth, uint32_t center)
+{
+    uint32_t lo = (uint32_t)v << (shift & 31u);
+    int32_t hi = v >> ((0u - shift) & 31u);
+    int64_t num = ((int64_t)hi << 32) | lo;
+    int32_t q = (int32_t)(num / depth);
+    return ((uint32_t)q << 8) + center;
+}
+
+/* 0xfc8cc, 210 bytes. Cdecl-style (COUNT, LIST; ret 8): project COUNT (byte) vertex records whose pointers are listed at LIST: skip those already flagged (word +0x20 bit 0), otherwise flag them and divide the x and y fields (+0, +4) shifted left by the bytes 0x164660/0x164664 (plus 8 when the depth dword +8 is below 0x800000) by the depth (+8 >> 8) and store the screen position (<< 8, plus the centre dwords 0x164658/0x16465c) in +0x18 and +0x1c. */
+void project_vertices_fc8cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t count, uint32_t list)
+{
+    uint8_t n = (uint8_t)count;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    do {
+        uint32_t v = EF_U32(list);
+        uint32_t d;
+        list += 4u;
+        if (EF_U16(v + 0x20u) & 1u)
+            continue;
+        d = EF_U32(v + 8u);
+        EF_U16(v + 0x20u) = (uint16_t)(EF_U16(v + 0x20u) | 1u);
+        if ((d & 0xff800000u) != 0u) {
+            int32_t depth = (int32_t)d >> 8;
+            EF_U32(v + 0x18u) = project_axis_fc8cc((int32_t)EF_U32(v), EF_U8(0x00164660u), depth, EF_U32(0x00164658u));
+            EF_U32(v + 0x1cu) = project_axis_fc8cc((int32_t)EF_U32(v + 4u), EF_U8(0x00164664u), depth, EF_U32(0x0016465cu));
+        } else {
+            int32_t depth = (int32_t)d;
+            EF_U32(v + 0x18u) = project_axis_fc8cc((int32_t)EF_U32(v), (uint32_t)(EF_U8(0x00164660u) + 8u) & 0xffu, depth, EF_U32(0x00164658u));
+            EF_U32(v + 0x1cu) = project_axis_fc8cc((int32_t)EF_U32(v + 4u), (uint32_t)(EF_U8(0x00164664u) + 8u) & 0xffu, depth, EF_U32(0x0016465cu));
+        }
+    } while (--n != 0u);
+}

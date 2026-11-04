@@ -5108,4 +5108,6 @@ int32_t find_icon_at_4dee0(uint32_t x, uint32_t y);
 
 int32_t setup_edge_step_1014a4(uint32_t out, uint32_t step, uint32_t p0, uint32_t p1);
 
+void project_vertices_fc8cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t count, uint32_t list);
+
 #endif
