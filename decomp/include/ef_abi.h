@@ -5470,4 +5470,10 @@ void tick_cycle_list_54274(void);
 void guest_fn_2e740_x(int32_t a, double x, uint32_t z); /* 0x2e740 EAX + stack double and dword, ret 0xc */
 void guest_fn_37eac_x(int32_t a, double x, uint32_t z); /* 0x37eac EAX + stack double and dword, ret 0xc */
 
+void create_unit_87db8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
+ef_addr32 guest_fn_879c4_x(void); /* 0x879c4 -> EAX */
+void guest_fn_87a20_x(ef_addr32 obj, uint32_t a, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6); /* 0x87a20 EAX/EDX/EBX/ECX + 7 stack, ret 0x1c */
+uint32_t guest_fn_80abc_x(void); /* 0x80abc -> AX */
+void guest_fn_88100_x(ef_addr32 obj); /* 0x88100 EAX */
+
 #endif

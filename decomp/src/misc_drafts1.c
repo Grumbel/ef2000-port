@@ -11592,3 +11592,23 @@ void tick_cycle_list_54274(void)
     }
     EF_U16(0x001a5c1cu) = pos;
 }
+
+/* 0x87db8, 196 bytes. Create and initialise a unit record: allocate one (0x879c4), mark the words at +0x47/+0x49 as 0x1234 and remember it in 0x1fd9f8, then fill it in with 0x87a20 (EAX = A, EDX = B, EBX = C, ECX = D plus the six stack arguments S0..S5, several reduced to signed words) while the word 0x20f194 is zero. Afterwards set +0x50 from byte 0x1a666b and +0x56 to 0xff, give a class-1 unit (class byte at +0x18 indexing the 0x91 byte table at 0x12bca7) its word at +0x68 from 0x80abc, run 0x88100 and, when byte 0x127da9 is set and bit 0 of +0x67 is clear, send its state with 0x55aac. */
+void create_unit_87db8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5)
+{
+    ef_addr32 unit = guest_fn_879c4_x();
+    EF_U16(unit + 0x47u) = 0x1234u;
+    EF_U32(0x001fd9f8u) = unit;
+    EF_U16(unit + 0x49u) = 0x1234u;
+    EF_U16(0x0020f194u) = 0u;
+    guest_fn_87a20_x(unit, a, b, c, (uint32_t)(int32_t)(int16_t)d, (uint32_t)(int32_t)(int16_t)s0,
+                     (uint32_t)(int32_t)(int16_t)s1, s2, (uint32_t)(int32_t)(int16_t)s3, s4, s5);
+    EF_U16(0x0020f194u) = 1u;
+    EF_U8(unit + 0x50u) = EF_U8(0x001a666bu);
+    EF_U16(unit + 0x56u) = 0xffu;
+    if (EF_U8((uint32_t)EF_U8(unit + 0x18u) * 0x91u + 0x0012bca7u) == 1u)
+        EF_U16(unit + 0x68u) = (uint16_t)guest_fn_80abc_x();
+    guest_fn_88100_x(unit);
+    if (EF_U8(0x00127da9u) != 0u && (EF_U8(unit + 0x67u) & 1u) == 0u)
+        send_record_state_55aac(unit);
+}

@@ -7468,3 +7468,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x5414c` | none | none | 54110@5412d | Frame tick of the first cycling list: when the signed count word 0x19bb5c is nonzero, add the step byte 0x127d92 to the  |
 | `0x54274` | none | none | 54110@54137 | Twin of 0x5414c for the second list: count word 0x1a1506 (double 0x185bb4), accumulator byte 0x127da2 and cursor word 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x87db8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:uint32_t | none | 26b60@27094,27348@27475,2a1fc@2a3c6 | Create and initialise a unit record: allocate one (0x879c4), mark the words at +0x47/+0x49 as 0x1234 and remember it in  |
