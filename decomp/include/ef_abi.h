@@ -5316,4 +5316,6 @@ void refresh_node_blocks_caea0(ef_addr32 headptr, ef_addr32 table, uint32_t coun
 
 void apply_pending_notices_6563c(void);
 
+void decode_column_sprite_110a08(ef_addr32 src, ef_addr32 dst, uint32_t stride);
+
 #endif

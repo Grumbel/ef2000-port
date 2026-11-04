@@ -7140,3 +7140,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6563c` | none | none | 654b8@65564 | Apply the pending 8-byte notices at 0x1a6d2e (count word 0x1a81b2, only while byte 0x1a81e5 is set): look up each node ( |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x110a08` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | none direct | Decode a column-compressed sprite from SRC (EAX, word stream) into DST (EDX) with row stride STRIDE (BX, signed): the fi |

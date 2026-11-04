@@ -9979,3 +9979,56 @@ void apply_pending_notices_6563c(void)
     if ((int16_t)EF_U16(0x001a81beu) > 0x19)
         EF_U16(0x001a81beu) = (uint16_t)(EF_U16(0x001a81beu) - 0x19u);
 }
+
+/* 0x110a08, 296 bytes. Decode a column-compressed sprite from SRC (EAX, word stream) into DST (EDX) with row stride STRIDE (BX, signed): the first word is the column count; each column starts with words whose top two bits are set (skip |w| rows), then a span count n (a negative word w means n is the next word and a trailing byte w is stored after the spans); each span is a byte skip, a signed word count c, then c literal words (c > 0) or one word repeated -c times (c < 0). Columns advance by STRIDE from where their data started. */
+void decode_column_sprite_110a08(ef_addr32 src, ef_addr32 dst, uint32_t stride)
+{
+    int32_t st = (int16_t)stride;
+    int16_t ncols = (int16_t)EF_U16(src);
+    int16_t col;
+    src += 2u;
+    for (col = 0; col < ncols; col++) {
+        uint16_t w = EF_U16(src);
+        int16_t n;
+        int16_t j;
+        ef_addr32 start;
+        src += 2u;
+        while ((w & 0xc000u) == 0xc000u) {
+            dst -= (uint32_t)((int32_t)(int16_t)w * st);
+            w = EF_U16(src);
+            src += 2u;
+        }
+        start = dst;
+        n = (int16_t)w;
+        if (n < 0) {
+            n = (int16_t)EF_U16(src);
+            src += 2u;
+        }
+        for (j = 0; n > 0 && j < n; j++) {
+            int8_t c;
+            int16_t b;
+            dst += EF_U8(src);
+            src++;
+            c = (int8_t)EF_U8(src);
+            src++;
+            if (c > 0) {
+                for (b = 0; b < (int16_t)c; b++) {
+                    EF_U16(dst) = EF_U16(src);
+                    dst += 2u;
+                    src += 2u;
+                }
+            }
+            if (c < 0) {
+                uint16_t v = EF_U16(src);
+                src += 2u;
+                for (b = 0; b < (int16_t)-c; b++) {
+                    EF_U16(dst) = v;
+                    dst += 2u;
+                }
+            }
+        }
+        if ((int16_t)w < 0)
+            EF_U8(dst) = (uint8_t)w;
+        dst = (uint32_t)st + start;
+    }
+}
