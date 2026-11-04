@@ -4265,4 +4265,8 @@ uint32_t load_text_file_e94ec(ef_addr32 name, uint32_t flag);
 uint32_t guest_callptr_eax_ret_x(ef_addr32 fn, uint32_t a); /* indirect call, argument in EAX, result in EAX */
 void guest_callptr_eaxedx_x(ef_addr32 fn, uint32_t a, uint32_t b); /* indirect call, arguments in EAX and EDX */
 
+void init_locked_ranges_103d80(void);
+void redraw_pending_message_78ac0(void);
+uint32_t guest_fn_48d5c_x(ef_addr32 text); /* 0x48d5c cdecl, one stack argument, caller cleanup */
+
 #endif

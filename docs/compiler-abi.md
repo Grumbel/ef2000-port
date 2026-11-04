@@ -4942,3 +4942,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xcdc90` | EAX:ef_addr32,EDX:ef_addr32 | none | cde00@cdf14 | Interleave four planes of rows x width bytes from a packed source into every fourth byte of the destination (non-zero so |
 | `0xe94ec` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | 80058@80095,81230@8126e,82cec@82d29 | Load a text file through the size/read handlers at 0x132ab4/0x132ab8 into a new buffer at 0x1600a0, trimming a trailing  |
+
+## state_reset1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x103d80` | none | none | 104580@104580 | One-time setup of the runtime's locked ranges: register the code range 0x103d80..0x1046c4 and the six data ranges below, |
+| `0x78ac0` | none | none | 79128@791a3 | While the pending-message count at 0x1f8d56 is positive and 0x127da8 is clear, shrink it to the limit at 0x127d92 and re |

@@ -47,3 +47,39 @@ void reset_page_record_2ce18(uint32_t page)
     EF_U32(rec + 0x91u) = EF_U32(rec + 0x99u);
     EF_U32(rec + 0x95u) = EF_U32(rec + 0x9du);
 }
+
+/* 0x103d80, 138 bytes. One-time setup of the runtime's locked ranges: register the code range 0x103d80..0x1046c4 and the six data ranges below, then mark it done at 0x17d2d4. */
+void init_locked_ranges_103d80(void)
+{
+    if (EF_U32(0x0017d2d4u) != 0u)
+        return;
+    guest_fn_104840(0x00103d80u, 0x001046c4u);
+    stack_range_104908(0x004dd670u, 0x40u);
+    stack_range_104908(0x004dd7ccu, 0x4cu);
+    stack_range_104908(0x004dd6b0u, 0x100u);
+    stack_range_104908(0x004dd7b0u, 0x18u);
+    stack_range_104908(0x0017d2d0u, 0x4u);
+    stack_range_104908(0x004dd7c8u, 0x4u);
+    EF_U32(0x0017d2d4u) = 1u;
+}
+
+/* 0x78ac0, 139 bytes. While the pending-message count at 0x1f8d56 is positive and 0x127da8 is clear, shrink it to the limit at 0x127d92 and redraw the uppercased message at row 0xc; otherwise clear the count. */
+void redraw_pending_message_78ac0(void)
+{
+    int32_t limit, count, width;
+    if (EF_U8(0x00127da8u) != 0u)
+        return;
+    if (EF_S16(0x001f8d56u) <= 0) {
+        EF_U16(0x001f8d56u) = 0u;
+        return;
+    }
+    limit = (int32_t)EF_U16(0x00127d92u);
+    count = EF_S32(0x001f8d54u) >> 16;
+    if (limit >= count)
+        limit = count;
+    EF_U16(0x001f8d56u) = (uint16_t)(count - limit);
+    uppercase_string(0x001f8d00u);
+    EF_U8(0x00127b1au) = 1u;
+    width = (int32_t)(int16_t)guest_fn_48d5c_x(0x001f8d00u);
+    guest_fn_48c90(0xcu, (uint32_t)(int32_t)(int16_t)(0x136 - width), 0x1eu, 0x001f8d00u);
+}
