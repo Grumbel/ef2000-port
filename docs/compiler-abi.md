@@ -3581,3 +3581,19 @@ in EAX, format string address, one value).
 | `0xf25b0` | AL:uint8_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | f261c@f2644 | Draw a 3-column by 6-row glyph into the frame buffer. |
 | `0xf36a4` | none | none | f3f84@f4079 | Advance the animation counter and wrap it. |
 | `0xfba6c` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | bfb88@bfcb6,fba54@fba63 | Count matching type-2 entries across a shape list. |
+
+## float_helpers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3c74` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | 20ec@215f,20ec@21b7,20ec@2211 | Integer length of a 3D integer vector, at least 1. |
+| `0x66c4` | none | EAX:int32_t | 6924@69a2,625d8@629d6 | Integer result of a table lookup for the current object, or 0. |
+| `0x7ca8` | EAX:ef_addr32,DL:uint8_t,BL:uint8_t | none | 7e44@7e7b,70a58@70d8f,70a58@70ed2 | Scaled point from a table entry and one sub-entry, stored as two doubles. |
+| `0x8184` | EAX:ef_addr32 | AL:uint8_t | 84b8@84d5 | Index of the table entry with the smallest metric, or 0xff. |
+| `0x81ec` | AL:uint8_t,DL:uint8_t | EAX:double | 7ee8@7f74,712e8@71322,7156c@715bb | Double value of a sub-entry, wrapped through a helper unless its kind is 1. |
+| `0x1d844` | EAX:ef_addr32 | none | 1d7a4@1d808,1db08@1db10 | Pass the scaled offset of the current waypoint to a helper. |
+| `0x1d8e8` | EAX:ef_addr32 | AL:uint8_t | 1d8a8@1d8d1,1d954@1daed | True when the current waypoint is within the limit on either axis. |
+| `0x29adc` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 29b14@29c4d | Two scaled components from a record's rotation words. |
+| `0x2aa08` | EAX:ef_addr32,EDX:ef_addr32 | none | 2b1f4@2b331 | Convert a packed 16.16 pair to doubles and clear the third component. |
+| `0x2dc84` | AX:int16_t | AL:uint8_t | 2dce0@2dcf6 | True when a record is close enough and active. |
+| `0x37bc8` | EAX:ef_addr32,DX:int16_t | EAX:double | 2d9a4@2d9f2,39edc@39fac,3a000@3a0e5 | Distance helper over a scaled pair taken from a table entry. |

@@ -2967,4 +2967,24 @@ void guest_fn_f3610(int32_t value); /* 0xf3610 EAX */
 void guest_fn_f35f0(void); /* 0xf35f0 */
 uint32_t guest_fn_bcbc0(uint32_t value); /* 0xbcbc0 EAX -> AX */
 
+/* float_helpers1.c */
+int32_t vector_length_3c74(int32_t x, int32_t y, int32_t z);
+int32_t current_object_metric_66c4(void);
+void scaled_entry_point_7ca8(ef_addr32 out, uint8_t index, uint8_t sub);
+uint8_t find_min_metric_index_8184(ef_addr32 context);
+double sub_entry_value_81ec(uint8_t index, uint8_t sub);
+void report_waypoint_offset_1d844(ef_addr32 context);
+uint8_t waypoint_near_1d8e8(ef_addr32 context);
+void scaled_rotation_29adc(ef_addr32 record, ef_addr32 out1, ef_addr32 out2);
+void unpack_pair_2aa08(ef_addr32 out, ef_addr32 in);
+uint8_t record_close_and_active_2dc84(int16_t index);
+double scaled_pair_distance_37bc8(ef_addr32 out, int16_t index);
+double guest_fn_a4470(double value); /* 0xa4470 ST0 -> ST0 */
+double guest_fn_6a760(int32_t a, int32_t b); /* 0x6a760 EAX/EDX -> ST0 */
+double guest_fn_b4230(int32_t value); /* 0xb4230 EAX -> ST0 */
+double guest_fn_80f4(ef_addr32 context, uint32_t index); /* 0x80f4 EAX/EDX -> ST0 */
+double guest_fn_b42f0(double value); /* 0xb42f0 stack -> ST0 */
+void guest_fn_b4620(double first, double second); /* 0xb4620 stack */
+double guest_fn_b415c(ef_addr32 a, ef_addr32 b); /* 0xb415c EAX/EDX -> ST0 */
+
 #endif
