@@ -1429,7 +1429,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00078aa8	24	configure_navigation_record	scene_indexed	compiles	game	confirmed	decomp/tests/0x00078aa8.json	docs/compiler-abi.md
 0x00078ac0	139	redraw_pending_message_78ac0	state_reset1	compiles	game	confirmed	decomp/tests/0x00078ac0.json	docs/compiler-abi.md; While the pending-message count at 0x1f8d56 is positive and 0x127da8 is clear, shrink it to the limit at 0x127d92 and re; callers 79128@791a3; guest pending
 0x00078b4c	717			unknown	unclassified	unverified		
-0x00078e1c	288			unknown	unclassified	unverified		
+0x00078e1c	288	draw_mission_clock_78e1c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00078e1c.json	docs/compiler-abi.md; Draw the mission clock at (10, 0xbe) in colour 15: in mode 1 (byte 0x125846) the time is taken from the record at 0x1379; callers 78b4c@78dc3; guest pending
 0x00078f3c	489			unknown	unclassified	unverified		
 0x00079128	169	update_hud_79128	game_helpers35	compiles	game	confirmed	decomp/tests/0x00079128.json	docs/compiler-abi.md; Per-frame HUD pass: latch the screen rectangle and run the overlay updates.; callers 3dd30@3e71c; guest pending
 0x000791e0	835			unknown	unclassified	unverified		

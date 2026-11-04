@@ -6134,3 +6134,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa5ef8` | EAX:uint32_t | none | 4aa0@4af8,4cf4@4d42,4d4c@4e08 | Redraw the item ID (1..count, flag 4 set in byte +0x3b of its record): outside a draw (byte 0x13725c clear) the state is |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x78e1c` | none | none | 78b4c@78dc3 | Draw the mission clock at (10, 0xbe) in colour 15: in mode 1 (byte 0x125846) the time is taken from the record at 0x1379 |

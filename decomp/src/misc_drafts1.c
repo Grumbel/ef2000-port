@@ -5119,3 +5119,46 @@ void redraw_item_a5ef8(uint32_t id)
         EF_U8(0x0013725cu) = 0u;
     }
 }
+
+/* 0x78e1c, 288 bytes. Draw the mission clock at (10, 0xbe) in colour 15: in mode 1 (byte 0x125846) the time is taken from the record at 0x1379c4 (its two words minus the epoch words 0x12583e/0x125840/0x1379a2, borrowing a minute when the seconds go negative, zero when the result is negative) and formatted as "0 h m" with 0x187b40, otherwise the hour is the word 0x12583c + 0x12b054 wrapped into 0..23 and formatted with the words 0x12583e and 0x125840. With the blink flag 0x1a3647 set the blink counter 0x12aeb4 appends 0x187b50 after its first tick (reset to -10 above 10). */
+void draw_mission_clock_78e1c(void)
+{
+    char buf[0x14];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    if (EF_U8(0x00125846u) == 1u) {
+        uint16_t hour = 0u;
+        uint16_t minute = 0u;
+        uint32_t rec = EF_U32(0x001379c4u);
+        if (rec != 0u && ((int16_t)EF_U16(rec) > 0 || (int16_t)EF_U16(rec + 2u) > 0)) {
+            hour = (uint16_t)(EF_U16(rec) - (EF_U16(0x0012583eu) - EF_U16(0x001379a2u)));
+            minute = (uint16_t)(EF_U16(rec + 2u) - EF_U16(0x00125840u));
+            if ((int16_t)minute < 0) {
+                minute = (uint16_t)(minute + 0x3cu);
+                hour--;
+            }
+            if ((int16_t)hour < 0) {
+                hour = 0u;
+                minute = 0u;
+            }
+        }
+        guest_fn_a4342_va(b, 0x00187b40u, 0u, (int32_t)(int16_t)hour, (int32_t)(int16_t)minute);
+    } else {
+        int16_t h = (int16_t)(EF_U16(0x0012583cu) + EF_U16(0x0012b054u));
+        while (h > 0x17)
+            h = (int16_t)(h - 0x18);
+        while (h < 0)
+            h = (int16_t)(h + 0x18);
+        guest_fn_a4342_va(b, 0x00187b40u, (int32_t)h, (int32_t)(int16_t)EF_U16(0x0012583eu), (int32_t)(int16_t)EF_U16(0x00125840u));
+    }
+    if (EF_U8(0x001a3647u) != 0u) {
+        if ((int16_t)EF_U16(0x0012aeb4u) > 10) {
+            EF_U16(0x0012aeb4u) = 0xfff6u;
+        } else {
+            if ((int16_t)EF_U16(0x0012aeb4u) > 0)
+                strcat_9ca57(b, 0x00187b50u);
+            EF_U16(0x0012aeb4u)++;
+        }
+    }
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(15u, 10, 0xbe, b);
+}

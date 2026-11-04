@@ -4927,4 +4927,6 @@ uint32_t guest_fn_e5870_x(uint32_t record); /* 0xe5870 EAX -> AL */
 void guest_fn_a5b70_x(uint32_t record); /* 0xa5b70 EAX */
 void guest_fn_a5ca4_x(uint32_t record); /* 0xa5ca4 EAX */
 
+void draw_mission_clock_78e1c(void);
+
 #endif
