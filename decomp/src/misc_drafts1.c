@@ -2684,3 +2684,70 @@ uint32_t start_trace_d5d18(uint32_t a)
     guest_fn_9c3cf(0x000d5cc4u);
     return trace_call_1034b0(0u, 0u, 0u, 0u, EF_U32(0x00420a6cu));
 }
+
+/* 0x105230, 191 bytes. One-time runtime init guarded by the flag at 0x17d360: register the handler pair (0x105230, 0x106b1c), mark nine ranges (0x17d2dc..0x4dd850) through 0x104908, run 0x117ace and set the flag. */
+void init_once_105230(void)
+{
+    if (EF_U32(0x0017d360u) != 0u)
+        return;
+    guest_fn_104840(0x00105230u, 0x00106b1cu);
+    stack_range_104908(0x0017d2dcu, 0x80u);
+    stack_range_104908(0x0017d35cu, 4u);
+    stack_range_104908(0x004dd84cu, 4u);
+    stack_range_104908(0x004dd840u, 0xcu);
+    stack_range_104908(0x004dd850u, 4u);
+    stack_range_104908(0x004dd83cu, 4u);
+    stack_range_104908(0x004dd834u, 4u);
+    stack_range_104908(0x004dd838u, 4u);
+    stack_range_104908(0x004dd830u, 4u);
+    guest_fn_117ace_x();
+    EF_U32(0x0017d360u) = 1u;
+}
+
+/* 0x50b68, 193 bytes. Store the state code for KIND (0..11 -> 0, 1, 2, 3, 4, 5, 0x12, 7, 6, 0x10, 0x11, 0x16) in the byte at 0x1a553b + INDEX; other kinds leave it unchanged. */
+void set_slot_state_50b68(uint32_t index, uint32_t kind)
+{
+    static const uint8_t codes[12] = { 0, 1, 2, 3, 4, 5, 0x12, 7, 6, 0x10, 0x11, 0x16 };
+    kind &= 0xffu;
+    if (kind > 11u)
+        return;
+    EF_U8(0x001a553bu + (index & 0xffu)) = codes[kind];
+}
+
+/* 0xcf960, 194 bytes. Test whether the point (PX, PY) lies inside (or on the edge of) the triangle whose three 16-bit (x, y) vertices are stored at TRI: returns 1 when all three edge cross products are not positive, else 0. */
+uint32_t point_in_triangle_cf960(ef_addr32 tri, int32_t px, int32_t py)
+{
+    int32_t x0 = (int16_t)EF_U16(tri);
+    int32_t y0 = (int16_t)EF_U16(tri + 2u);
+    int32_t x1 = (int16_t)EF_U16(tri + 4u);
+    int32_t y1 = (int16_t)EF_U16(tri + 6u);
+    int32_t x2 = (int16_t)EF_U16(tri + 8u);
+    int32_t y2 = (int16_t)EF_U16(tri + 0xau);
+    if ((x1 - x0) * (py - y1) - (px - x1) * (y1 - y0) > 0)
+        return 0u;
+    if ((x2 - x1) * (py - y2) - (y2 - y1) * (px - x2) > 0)
+        return 0u;
+    if ((x0 - x2) * (py - y0) - (px - x0) * (y0 - y2) > 0)
+        return 0u;
+    return 1u;
+}
+
+/* 0x9f710, 189 bytes. Like 0x9f664 for an explicit point: store Y at 0x417226, let the hook at 0x132af4 transform (A, Z), add the offset 0x417194..98 to the result (written back to 0x417224..28), build the relative position to 0x159094..9c and the three words at +2..+6 of the record at [0x417174], and run the hook at 0x132ae0 on them with the scale C. */
+void transform_and_relate_9f710(int32_t a, uint32_t y, int32_t z, int32_t c)
+{
+    uint16_t rel[3];
+    uint16_t rec[3];
+    uint32_t r = EF_U32(0x00417174u);
+    EF_U16(0x00417226u) = (uint16_t)y;
+    guest_callptr2r_x(EF_U32(0x00132af4u), (int16_t)a, (int16_t)z);
+    EF_U16(0x00417224u) = (uint16_t)(EF_U16(0x00417224u) + EF_U16(0x00417194u));
+    EF_U16(0x00417226u) = (uint16_t)(EF_U16(0x00417226u) + EF_U16(0x00417196u));
+    EF_U16(0x00417228u) = (uint16_t)(EF_U16(0x00417228u) + EF_U16(0x00417198u));
+    rel[0] = (uint16_t)(EF_U16(0x00417224u) - EF_U16(0x00159094u));
+    rel[1] = (uint16_t)(EF_U16(0x00417226u) - EF_U16(0x00159098u));
+    rel[2] = (uint16_t)(EF_U16(0x00417228u) - EF_U16(0x0015909cu));
+    rec[0] = EF_U16(r + 2u);
+    rec[1] = EF_U16(r + 4u);
+    rec[2] = EF_U16(r + 6u);
+    guest_callptr3r_x(EF_U32(0x00132ae0u), (uint32_t)(uintptr_t)rel, (uint32_t)(uintptr_t)rec, (uint32_t)(int16_t)c);
+}

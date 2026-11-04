@@ -938,7 +938,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005095c	96	mpType4Click		named	unclassified	unverified		
 0x000509bc	96	apply_tactical_code_509bc	game_helpers63	compiles	game	confirmed	decomp/tests/0x000509bc.json	docs/compiler-abi.md; Select the tactical code from a two-digit field and apply or bind it.; callers none direct; guest pending
 0x00050a1c	54	tactical_lookup_contains	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00050a1c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
-0x00050b68	193			unknown	unclassified	unverified		
+0x00050b68	193	set_slot_state_50b68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00050b68.json	docs/compiler-abi.md; Store the state code for KIND (0..11 -> 0, 1, 2, 3, 4, 5, 0x12, 7, 6, 0x10, 0x11, 0x16) in the byte at 0x1a553b + INDEX;; callers 5089c@508ef,508fc@5094f,5095c@509af; guest pending
 0x00050c2c	18	mpChangeMode		named	unclassified	unverified		
 0x00050c40	43	mpRedrawTargetView		named	unclassified	unverified		
 0x00050c70	51	reset_text_50c70	game_helpers5	compiles	game	confirmed	decomp/tests/0x00050c70.json	docs/compiler-abi.md; ; callers 510d0@51175; guest pending
@@ -2095,7 +2095,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009e508	175			unknown	unclassified	unverified		
 0x0009e7bc	3752			unknown	unclassified	unverified		
 0x0009f664	170	update_bearing_9f664	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009f664.json	docs/compiler-abi.md; For the 6-byte point entry INDEX of the current page (table at 0x41717c + 0xa) copy its Y word to 0x417226, let the hook; callers 9e7bc@9f230,9e7bc@9f279,9e7bc@9f2c2; guest pending
-0x0009f710	189			unknown	unclassified	unverified		
+0x0009f710	189	transform_and_relate_9f710	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009f710.json	docs/compiler-abi.md; Like 0x9f664 for an explicit point: store Y at 0x417226, let the hook at 0x132af4 transform (A, Z), add the offset 0x417; callers 9e7bc@9f360; guest pending
 0x0009f7d0	55	clear_page_slot_9f7d0	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009f7d0.json	docs/compiler-abi.md; Clear the flag byte of a page slot and mark the page dirty.; callers 9e7bc@9e80d; guest pending
 0x0009f808	69	set_page_slot_9f808	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009f808.json	docs/compiler-abi.md; Set flags and a relative word offset in a page slot and mark the page dirty.; callers 9e7bc@9e832; guest pending
 0x0009f850	240			unknown	unclassified	unverified		
@@ -2987,7 +2987,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cf7c4	120			unknown	unclassified	unverified		
 0x000cf83c	270			unknown	unclassified	unverified		
 0x000cf94a	7	abs_cf94a	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000cf94a.json	docs/compiler-abi.md; Absolute value.; callers 15b7c@15c23,15b7c@15c48,15b7c@15cf2; guest pending
-0x000cf960	194			unknown	unclassified	unverified		
+0x000cf960	194	point_in_triangle_cf960	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cf960.json	docs/compiler-abi.md; Test whether the point (PX, PY) lies inside (or on the edge of) the triangle whose three 16-bit (x, y) vertices are stor; callers cfa24@cfa66,cfde4@cff4b; guest pending
 0x000cfa24	103	find_entry_at_point_cfa24	game_helpers108	compiles	game	confirmed	decomp/tests/0x000cfa24.json	docs/compiler-abi.md; Return the first of count 0x4a-byte entries whose bounding box contains (x,y) and which passes the cf960 test, else 0.; callers cfa9c@cfb21,cfc68@cfd02; guest pending
 0x000cfa9c	204			unknown	unclassified	unverified		
 0x000cfc68	380			unknown	unclassified	unverified		
@@ -3880,7 +3880,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00104920	21	stack_range_104920	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00104920.json	docs/compiler-abi.md; 0x1048b4(base, base + length).; callers d5ec0@d5ee7,d6ffc@d701d,d710c@d7123; guest pending
 0x00105024	76	file_size_by_name_105024	small_wrappers2	compiles	game	confirmed	decomp/tests/0x00105024.json	docs/compiler-abi.md; Open a file and return its size; the error code is left at 0x17d2d8 (3 open failed, 5 size failed).; callers 105070@105080,106464@106491,113a40@113a6d; guest pending
 0x00105070	183			unknown	unclassified	unverified		
-0x00105230	191			unknown	unclassified	unverified		
+0x00105230	191	init_once_105230	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00105230.json	docs/compiler-abi.md; One-time runtime init guarded by the flag at 0x17d360: register the handler pair (0x105230, 0x106b1c), mark nine ranges ; callers 105e38@105e3e; guest pending
 0x001052f0	67	send_record_size_message_1052f0	game_helpers125	compiles	game	confirmed	decomp/tests/0x001052f0.json	docs/compiler-abi.md; Once per record: send message 0x401 with the two words at +0x14 and +0x18 (cdecl, record on the stack).; callers 10585c@105c7f,10683c@106870,106894@1068ac; guest pending
 0x00105334	40	stop_object_105334	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00105334.json	docs/compiler-abi.md; If dword +0x54 is set, send message 0x402 through 0x101f88 and clear it.; callers 105648@105803,10585c@1058aa,105da0@105dae; guest pending
 0x0010535c	747			unknown	unclassified	unverified		

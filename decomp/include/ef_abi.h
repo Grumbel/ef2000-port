@@ -4702,4 +4702,11 @@ void teardown_once_106b1c(void);
 void mark_matching_slots_35f04(void);
 uint32_t start_trace_d5d18(uint32_t a);
 
+void init_once_105230(void);
+void set_slot_state_50b68(uint32_t index, uint32_t kind);
+uint32_t point_in_triangle_cf960(ef_addr32 tri, int32_t px, int32_t py);
+void transform_and_relate_9f710(int32_t a, uint32_t y, int32_t z, int32_t c);
+void guest_fn_117ace_x(void); /* 0x117ace unknown, no arguments */
+void guest_callptr3r_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c); /* indirect call: EAX/EDX/EBX register arguments */
+
 #endif

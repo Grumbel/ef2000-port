@@ -5709,3 +5709,12 @@ in EAX, format string address, one value).
 | `0x106b1c` | none | none | none direct | One-time runtime teardown guarded by the flag at 0x17d360: register the handler pair (0x105230, 0x106b1c) with 0x1048b4  |
 | `0x35f04` | none | none | 3617c@36258,3617c@3628a,36438@364ba | Walk the byte list at [0x136b74] (length byte at [[0x136b78]]): for every entry whose descriptor (32-byte records at 0x1 |
 | `0xd5d18` | EAX:uint32_t | EAX:uint32_t | 97f90@97fb1 | Start the trace layer once (returns -1 when already started): set the started flag 0x15b968, configure it with A, initia |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x105230` | none | none | 105e38@105e3e | One-time runtime init guarded by the flag at 0x17d360: register the handler pair (0x105230, 0x106b1c), mark nine ranges  |
+| `0x50b68` | EAX:uint32_t,EDX:uint32_t | none | 5089c@508ef,508fc@5094f,5095c@509af | Store the state code for KIND (0..11 -> 0, 1, 2, 3, 4, 5, 0x12, 7, 6, 0x10, 0x11, 0x16) in the byte at 0x1a553b + INDEX; |
+| `0xcf960` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t | EAX:uint32_t | cfa24@cfa66,cfde4@cff4b | Test whether the point (PX, PY) lies inside (or on the edge of) the triangle whose three 16-bit (x, y) vertices are stor |
+| `0x9f710` | EAX:int32_t,EDX:uint32_t,EBX:int32_t,ECX:int32_t | none | 9e7bc@9f360 | Like 0x9f664 for an explicit point: store Y at 0x417226, let the hook at 0x132af4 transform (A, Z), add the offset 0x417 |
