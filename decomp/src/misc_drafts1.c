@@ -9518,3 +9518,39 @@ void queue_record_entry_9f850(uint32_t index)
     }
     append_table_entry_16018a();
 }
+
+/* 0xa348c, 247 bytes. Handle the event record INDEX (EAX; low 16 bits index the 32-byte records at 0x135878) by the type in the low nibble of its first record's byte +0xd: type 4 copies the name and flag (0xa3424); types 6, 8, 9 and 10 only act when the byte at the record's pointer (+0x13587c) equals word 0x1357ae: type 6 flushes the pending slots with the low byte of EAX (0xa374c), type 8 decrements and type 9 increments dword 0x136dd4, type 10 latches the clock hook 0x15b620 into word 0x1357d6 from the record word +0xb and stores the elapsed time in 0x136dd4; other types do nothing. */
+void handle_event_record_a348c(uint32_t index)
+{
+    uint32_t i = index & 0xffffu;
+    ef_addr32 rec = EF_U32(0x00135878u + (i << 5));
+    ef_addr32 ptr = EF_U32(0x0013587cu + (i << 5));
+    uint32_t type = (uint8_t)((EF_U8(rec + 0xdu) & 0xfu) - 4u);
+    if (type > 6u)
+        return;
+    switch (type) {
+    case 0:
+        copy_name_and_flag_a3424((uint16_t)i);
+        return;
+    case 2:
+        if (EF_U8(ptr) == EF_U16(0x001357aeu))
+            flush_pending_a374c(index & 0xffu);
+        return;
+    case 4:
+        if (EF_U8(ptr) == EF_U16(0x001357aeu))
+            EF_U32(0x00136dd4u) = EF_U32(0x00136dd4u) - 1u;
+        return;
+    case 5:
+        if (EF_U8(ptr) == EF_U16(0x001357aeu))
+            EF_U32(0x00136dd4u) = EF_U32(0x00136dd4u) + 1u;
+        return;
+    case 6:
+        if (EF_U8(ptr) == EF_U16(0x001357aeu)) {
+            EF_U16(0x001357d6u) = EF_U16(rec + 0xbu);
+            EF_U32(0x00136dd4u) = ((uint32_t (*)(void))EF_U32(0x0015b620u))() - EF_U16(0x001357d6u);
+        }
+        return;
+    default:
+        return;
+    }
+}
