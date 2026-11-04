@@ -4176,7 +4176,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011af60	39	abs_area_11af60	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011af60.json	docs/compiler-abi.md; /((p[3] - p[2]) + (p[7] - p[6])) * ((p[4] - p[0]) * k)/ for the doubles at EAX, with k at 0x195804.; callers 10a0d4@10a0db,11afb4@11afba,11b040@11b0ce; guest pending
 0x0011af88	17	box_width_11af88	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011af88.json	docs/compiler-abi.md; Absolute width of a bounding box.; callers 10a0d4@10a0e4,11b040@11b0c3; guest pending
 0x0011af9c	21	box_extent_sum_11af9c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011af9c.json	docs/compiler-abi.md; Scaled sum of two extents.; callers 10a0d4@10a0ee,11afb4@11afca; guest pending
-0x0011afb4	46			unknown	unclassified	unverified		
+0x0011afb4	46	box_shape_ratio_11afb4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011afb4.json	docs/compiler-abi.md; Box shape ratio for the doubles at BOX: 2 * area (0x11af60) / (extent sum (0x11af9c))^2; the constant 2.0 sits at 0x1958; callers 10a0d4@10a0f8; guest pending
 0x0011afe4	15	box_extent_ratio_11afe4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011afe4.json	docs/compiler-abi.md; Ratio of two extents.; callers 10a0d4@10a158; guest pending
 0x0011aff4	74	blend_angle_11aff4	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011aff4.json	docs/compiler-abi.md; (ret 8) Blend two pairs of doubles by the fraction d and return atan2(a - b, /p[4] - p[0]/): a = p[3] * (1 - d) + p[2] *; callers 10a0d4@10a106,10a0d4@10a117,10a0d4@10a128; guest pending
 0x0011b040	172			unknown	unclassified	unverified		

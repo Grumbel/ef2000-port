@@ -6496,3 +6496,11 @@ void load_vertices_c48dc(ef_addr32 src, uint32_t count)
         dst += 0x30u;
     }
 }
+
+/* 0x11afb4, 46 bytes. Box shape ratio for the doubles at BOX: 2 * area (0x11af60) / (extent sum (0x11af9c))^2; the constant 2.0 sits at 0x195814. Returns the result in ST0. */
+double box_shape_ratio_11afb4(uint32_t box)
+{
+    double num = abs_area_11af60(box) * 2.0;
+    double ext = box_extent_sum_11af9c(box);
+    return num / square_double_b3fd0(ext);
+}

@@ -5040,4 +5040,6 @@ void select_shade_table_c47e0(uint32_t index);
 
 void load_vertices_c48dc(ef_addr32 src, uint32_t count);
 
+double box_shape_ratio_11afb4(uint32_t box);
+
 #endif

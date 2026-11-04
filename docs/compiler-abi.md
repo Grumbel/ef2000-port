@@ -6394,3 +6394,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc48dc` | EAX:ef_addr32,EDX:uint32_t | none | c49c4@c4a10,c4a50@c4aaf,c4aeb@c4b4a | Load COUNT 2D vertices (word pairs) starting at SRC (implicit registers ESI = source, ECX = count) into the 48-byte vert |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11afb4` | EAX:uint32_t | EAX:double | 10a0d4@10a0f8 | Box shape ratio for the doubles at BOX: 2 * area (0x11af60) / (extent sum (0x11af9c))^2; the constant 2.0 sits at 0x1958 |
