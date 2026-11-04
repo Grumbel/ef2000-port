@@ -5671,4 +5671,6 @@ uint8_t still_aligned_89b58(ef_addr32 u);
 
 void update_drag_terms_6c2a4(void);
 
+uint8_t offset_in_unit_frame_6e0b0(ef_addr32 out, int32_t a_id, int32_t b_id, uint32_t index, uint32_t sel);
+
 #endif

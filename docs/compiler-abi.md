@@ -7883,3 +7883,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6c2a4` | none | none | 6bd88@6be04 | Derive the flight-model drag terms from the player's double at [0x1f71bc]+0x59 (v). g = -v * K(0x18644c) is stored at 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6e0b0` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:uint32_t,[ESP+4]:uint32_t | AL:uint8_t | 2e184@2e316 | Place a table offset in the frame of unit B (EBX): both units A (EDX) and B must exist. Copy B's dwords +0x71, +0x75, +0 |

@@ -13579,3 +13579,39 @@ void update_drag_terms_6c2a4(void)
     num = num / r;
     memcpy(ef_guest_memory_ptr(0x001f6fb0u), &num, sizeof num);
 }
+
+/* 0x6e0b0, 273 bytes. Place a table offset in the frame of unit B (EBX): both units A (EDX) and B must exist. Copy B's dwords +0x71, +0x75, +0x69, +0x6d to 0x1f6fd0, 0x1f6fd4, 0x1f7060, 0x1f7064 and its double +0x61 (heading) to 0x1f6ff0, then take the offset (x, y, z doubles at 0x1252ac, 0x125304, 0x12535c plus 279 * ECX + 8 * S0) and write OUT (EAX) = (cos(h) * x - sin(h) * y + B.x, sin(h) * x + cos(h) * y + B.y, z + B.z) with B's position at +0x49, +0x51, +0x59. Returns 1 on success, 0 when a unit is missing. */
+uint8_t offset_in_unit_frame_6e0b0(ef_addr32 out, int32_t a_id, int32_t b_id, uint32_t index, uint32_t sel)
+{
+    ef_addr32 ua = guest_fn_7489c((int16_t)a_id);
+    ef_addr32 ub = guest_fn_7489c((int16_t)b_id);
+    ef_addr32 row;
+    double heading, mx, my, mz, c, s, x, y, z, px, py, pz;
+    if (ua == 0u || ub == 0u)
+        return 0u;
+    EF_U32(0x001f6fd0u) = EF_U32(ub + 0x71u);
+    EF_U32(0x001f6fd4u) = EF_U32(ub + 0x75u);
+    EF_U32(0x001f7060u) = EF_U32(ub + 0x69u);
+    EF_U32(0x001f7064u) = EF_U32(ub + 0x6du);
+    row = 0x001252acu + (index & 0xffu) * 279u + (sel & 0xffu) * 8u;
+    memcpy(&heading, ef_guest_memory_ptr(ub + 0x61u), sizeof heading);
+    memcpy(ef_guest_memory_ptr(0x001f6ff0u), &heading, sizeof heading);
+    memcpy(&mx, ef_guest_memory_ptr(row), sizeof mx);
+    memcpy(&my, ef_guest_memory_ptr(row + 0x58u), sizeof my);
+    memcpy(&mz, ef_guest_memory_ptr(row + 0xb0u), sizeof mz);
+    c = cos_b45a2(heading);
+    s = sin_b45ac(heading);
+    x = c * mx - s * my;
+    y = s * mx + c * my;
+    z = mz;
+    memcpy(&px, ef_guest_memory_ptr(ub + 0x49u), sizeof px);
+    memcpy(&py, ef_guest_memory_ptr(ub + 0x51u), sizeof py);
+    memcpy(&pz, ef_guest_memory_ptr(ub + 0x59u), sizeof pz);
+    x = px + x;
+    y = py + y;
+    z = pz + z;
+    memcpy(ef_guest_memory_ptr(out), &x, sizeof x);
+    memcpy(ef_guest_memory_ptr(out + 8u), &y, sizeof y);
+    memcpy(ef_guest_memory_ptr(out + 0x10u), &z, sizeof z);
+    return 1u;
+}

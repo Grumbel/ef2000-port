@@ -1309,7 +1309,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006cf00	1044			unknown	unclassified	unverified		
 0x0006d38c	879			unknown	unclassified	unverified		
 0x0006d948	1894			unknown	unclassified	unverified		
-0x0006e0b0	273			unknown	unclassified	unverified		
+0x0006e0b0	273	offset_in_unit_frame_6e0b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006e0b0.json	docs/compiler-abi.md; Place a table offset in the frame of unit B (EBX): both units A (EDX) and B must exist. Copy B's dwords +0x71, +0x75, +0; callers 2e184@2e316; guest pending
 0x0006e1c4	348			unknown	unclassified	unverified		
 0x0006e320	110	forward_table_entry_6e320	game_helpers80	compiles	game	confirmed	decomp/tests/0x0006e320.json	docs/compiler-abi.md; Gather six table dwords for a (kind, slot) pair and forward them.; callers 6e390@6e39b; guest pending
 0x0006e390	77	apply_step_6e390	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x0006e390.json	docs/compiler-abi.md; Apply the standard step when the request is accepted.; callers 6e59c@6e825,6f2bc@6f348,6f3e0@6f47c; guest pending
