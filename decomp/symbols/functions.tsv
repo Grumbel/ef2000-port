@@ -145,7 +145,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000a9a8	67	pick_count_a9a8	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000a9a8.json	docs/compiler-abi.md; Smaller of (table byte + 1) and (random % 3 + 2).; callers ab74@ad1f,ab74@adfd,ab74@af5d; guest pending
 0x0000a9fc	69			unknown	unclassified	unverified		
 0x0000aa6c	85			unknown	unclassified	unverified		
-0x0000aaec	61			unknown	unclassified	unverified		
+0x0000aaec	61	random_step_aaec	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0000aaec.json	docs/compiler-abi.md; Pick 3, 6 or 9 from a random number modulo 10.; callers e490@e556,e490@e624; guest pending
 0x0000ab2c	72	random_clamped_ab2c	game_helpers7	compiles	game	confirmed	decomp/tests/0x0000ab2c.json	docs/compiler-abi.md; Random value in [a - b, a + b], clamped to 10..0x186.; callers ab74@acf2,ab74@ad08,ab74@add0; guest pending
 0x0000ab74	1096			unknown	unclassified	unverified		
 0x0000afbc	546			unknown	unclassified	unverified		
@@ -2026,7 +2026,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009c1a1	16	high_word_9c1a1	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c1a1.json	docs/compiler-abi.md; High word of a dword (cdecl).; callers none direct; guest pending
 0x0009c1b1	10	identity_9c1b1	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c1b1.json	docs/compiler-abi.md; Identity (cdecl).; callers none direct; guest pending
 0x0009c1bb	37	real_mode_to_linear_9c1bb	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x0009c1bb.json	docs/compiler-abi.md; Convert a real-mode segment:offset dword to a linear address.; callers 9be38@9be69,9be38@9be83,9be38@9be99; guest pending
-0x0009c1e0	63			unknown	unclassified	unverified		
+0x0009c1e0	63	sum_list_9c1e0	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0009c1e0.json	docs/compiler-abi.md; Sum 16 times the value of 0xeb2a8 and the +4 field of every node on the list headed at 0x132a70 (node pointers go throug; callers none direct; guest pending
 0x0009c220	29			unknown	unclassified	unverified		
 0x0009c23d	6	tail_jump_9c23d	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0009c23d.json	docs/compiler-abi.md; tail jump. Forward to 0x9c224.; callers 6b8@6eb; guest pending
 0x0009c243	57			unknown	unclassified	unverified		
@@ -2107,7 +2107,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009fea8	288			unknown	unclassified	unverified		
 0x0009ffc8	80	convert_entry_vector_9ffc8	float_helpers5	compiles	game	confirmed	decomp/tests/0x0009ffc8.json	docs/compiler-abi.md; Convert a table entry's vector and scale a word into a float.; callers 9e7bc@9e8b1; guest pending
 0x000a0018	69	find_chain_entry_a0018	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a0018.json	docs/compiler-abi.md; Find the entry in the 0x4e-byte chain whose two keys match, or -1.; callers a0228@a0240; guest pending
-0x000a0060	65			unknown	unclassified	unverified		
+0x000a0060	65	run_entry_chain_a0060	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000a0060.json	docs/compiler-abi.md; Reset the time scale at 0x132b20 and, if 0x137a00 is set, run 0xa0174 on every entry of the 0x4e-byte chain starting at ; callers 3dd30@3deec; guest pending
 0x000a00a4	67	countdown_record_a00a4	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a00a4.json	docs/compiler-abi.md; Count a record down; true while it is still live.; callers a00e8@a013d; guest pending
 0x000a00e8	137			unknown	unclassified	unverified		
 0x000a0174	177			unknown	unclassified	unverified		
@@ -2955,7 +2955,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cde00	327			unknown	unclassified	unverified		
 0x000cdf48	24	store_four_dwords_17cf9c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cdf48.json	docs/compiler-abi.md; Dwords 0x17cf9c..a8 = EAX, EDX, EBX, ECX.; callers 11e7c@11f78,11e7c@12059,1e7c0@1e8e4; guest pending
 0x000cdf60	72	mouse_button_count_cdf60	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cdf60.json	docs/compiler-abi.md; Query the mouse driver once and cache the button count.; callers 3ea0c@3edf6,aaee8@aaf5f,abf8c@abfb9; guest pending
-0x000cdfe8	68			unknown	unclassified	unverified		
+0x000cdfe8	68	query_pointer_cdfe8	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000cdfe8.json	docs/compiler-abi.md; Query service 0x33 sub-function 3 through 0x8b8 and return the low three bits of the status, half the x value and the y ; callers ac854@ac8c2,f3f84@f4045; guest pending
 0x000ce02c	54	mouse_read_motion_ce02c	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ce02c.json	docs/compiler-abi.md; Mouse function 0xb: read motion counters into two outputs.; callers 121f0@121fa,ac16c@ac1ce,ac854@ac87e; guest pending
 0x000ce064	39	mouse_read_buttons_ce064	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ce064.json	docs/compiler-abi.md; Mouse function 3: button state.; callers 278c0@27b32,278c0@27bc8,27d18@27eb6; guest pending
 0x000ce08c	6	get_global_ce08c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000ce08c.json	docs/compiler-abi.md; ; callers 8b39c@8b481,ac854@ac8aa; guest pending

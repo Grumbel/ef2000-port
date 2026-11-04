@@ -5081,3 +5081,12 @@ in EAX, format string address, one value).
 | `0xb1bf8` | EAX:uint32_t | none | b3084@b3099 | Print the two status lines (0x1264e2; 0x1a364c and 0x1a364b) to a handle. |
 | `0xb3374` | EAX:uint32_t | none | b3084@b30e3,b3084@b3101,b3084@b311f | Format a message from the global at 0x197674, the argument and the latch value, and pass it to 0xcc744. |
 | `0x65a50` | none | none | 66548@665b7,66548@66689,66548@666b2 | Dispatch on the mode byte at 0x1282c5 (0..8) to the matching refresh routine, then flag the display dirty. |
+
+## small_wrappers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xaaec` | none | EAX:uint32_t | e490@e556,e490@e624 | Pick 3, 6 or 9 from a random number modulo 10. |
+| `0x9c1e0` | none | EAX:uint32_t | none direct | Sum 16 times the value of 0xeb2a8 and the +4 field of every node on the list headed at 0x132a70 (node pointers go throug |
+| `0xcdfe8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | ac854@ac8c2,f3f84@f4045 | Query service 0x33 sub-function 3 through 0x8b8 and return the low three bits of the status, half the x value and the y  |
+| `0xa0060` | none | none | 3dd30@3deec | Reset the time scale at 0x132b20 and, if 0x137a00 is set, run 0xa0174 on every entry of the 0x4e-byte chain starting at  |

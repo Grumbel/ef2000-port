@@ -4335,4 +4335,13 @@ void guest_fn_65a88_x(void); /* 0x65a88 no arguments */
 void guest_fn_65d24_x(void); /* 0x65d24 no arguments */
 void guest_fn_65c1c_x(void); /* 0x65c1c no arguments */
 
+/* small_wrappers7.c */
+uint32_t random_step_aaec(void);
+uint32_t sum_list_9c1e0(void);
+void query_pointer_cdfe8(ef_addr32 x_out, ef_addr32 y_out, ef_addr32 buttons_out);
+void run_entry_chain_a0060(void);
+uint32_t guest_fn_eb2a8_x(void); /* 0xeb2a8 no arguments, result in EAX */
+void guest_fn_a0174_x(ef_addr32 entry); /* 0xa0174 EAX */
+void guest_fn_a00e8_x(void); /* 0xa00e8 no arguments */
+
 #endif
