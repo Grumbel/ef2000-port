@@ -1317,7 +1317,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006e59c	828			unknown	unclassified	unverified		
 0x0006e8d8	537			unknown	unclassified	unverified		
 0x0006eaf4	200			unknown	unclassified	unverified		
-0x0006ebbc	36			unknown	unclassified	unverified		
+0x0006ebbc	36	store_scaled_angle_difference_6ebbc	float_helpers10	compiles	game	confirmed	decomp/tests/0x0006ebbc.json	docs/compiler-abi.md; Store the wrapped difference of two angles scaled by a constant.; callers 70914@70a46,712e8@71414; guest pending
 0x0006ebe0	916			unknown	unclassified	unverified		
 0x0006ef74	450			unknown	unclassified	unverified		
 0x0006f15c	349			unknown	unclassified	unverified		
@@ -1468,7 +1468,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007ae0c	123	map_value_7ae0c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0007ae0c.json	docs/compiler-abi.md; Read the 16-bit value at wrapped (a, b) of the 0x190x0x190 two-plane map.; callers 7bb00@7bb2c; guest pending
 0x0007ae88	213			unknown	unclassified	unverified		
 0x0007af60	221			unknown	unclassified	unverified		
-0x0007b040	76			unknown	unclassified	unverified		
+0x0007b040	76	lookup_scaled_cell_7b040	float_helpers10	compiles	game	confirmed	decomp/tests/0x0007b040.json	docs/compiler-abi.md; Scale a 2D double point, look up the cell value and return it negated and scaled.; callers 2e184@2e268,6d38c@6d579,6f504@6f60f; guest pending
 0x0007b08c	221			unknown	unclassified	unverified		
 0x0007b16c	196			unknown	unclassified	unverified		
 0x0007b2f4	63	read_plane_cell	plane_sources	compiles	game	confirmed	decomp/tests/0x0007b2f4.json	docs/compiler-abi.md
@@ -1737,7 +1737,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00088e50	71	matrix_vector_88e50	float_helpers4	compiles	game	confirmed	decomp/tests/0x00088e50.json	docs/compiler-abi.md; Multiply a vector of three doubles by a 3x3 double matrix (column form).; callers 89fbc@8a073; guest pending
 0x00088e98	209			unknown	unclassified	unverified		
 0x00088f6c	71	matrix_vector_88f6c	float_helpers4	compiles	game	confirmed	decomp/tests/0x00088f6c.json	docs/compiler-abi.md; Multiply a vector of three doubles by a 3x3 double matrix (row form).; callers 89fbc@8a184; guest pending
-0x00088fb4	67			unknown	unclassified	unverified		
+0x00088fb4	67	direction_vector_88fb4	float_helpers10	compiles	game	confirmed	decomp/tests/0x00088fb4.json	docs/compiler-abi.md; Unit direction vector from a heading (a) and pitch (b): (cos a cos b, sin a cos b, -sin b).; callers 29b14@29c90,89060@890cd,899d8@89a44; guest pending
 0x00088ff8	103			unknown	unclassified	unverified		
 0x00089060	221			unknown	unclassified	unverified		
 0x00089140	33	adjust_record_scalar	misc_state	compiles	game	confirmed	decomp/tests/0x00089140.json	docs/compiler-abi.md; record+0x26 = trunc(dword + double 0x18a4e0) then 0x89924; callers 86968@86a6d; guest pending
@@ -2063,7 +2063,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d4cd	87	parse_int	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009d4cd.json	docs/compiler-abi.md; atoi: skip class-2 characters, optional sign, class-0x20 digits.; callers f80@1196,f80@11e0,4cf4@4cf9; guest pending
 0x0009d524	57	ascii_stricmp		named	unclassified	unverified		case-folding compare; docs/ghidra-findings.md
 0x0009d55d	462			unknown	unclassified	unverified		
-0x0009d72c	29			unknown	unclassified	unverified		
+0x0009d72c	29	truncate_9d72c	float_helpers10	compiles	game	confirmed	decomp/tests/0x0009d72c.json	docs/compiler-abi.md; Truncate ST0 toward zero (FPU control word temporarily set to round-to-zero).; callers f80@14eb,f80@1525,f80@1566; guest pending
 0x0009d749	31	copy_string_9d749	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d749.json	docs/compiler-abi.md; strcpy.; callers f80@15a5,f80@1a32,20ec@2646; guest pending
 0x0009d770	1	nop_9d770	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0009d770.json	docs/compiler-abi.md; Empty stub (single ret).; callers 9e0c4@9e285,9f940@9faf0,9fc00@9fdc5; guest pending
 0x0009d774	3	nop_9d774	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0009d774.json	docs/compiler-abi.md; Empty stub that pops two stack arguments (ret 8).; callers a0a2c@a0a6d; guest pending
@@ -2546,8 +2546,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b449c	49	reject_vector_b449c	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b449c.json	docs/compiler-abi.md; Component of a vector perpendicular to a direction.; callers 119f88@11a2af; guest pending
 0x000b44d0	25	add_vectors_doubles	list_helpers	compiles	game	confirmed	decomp/tests/0x000b44d0.json	docs/compiler-abi.md; out = a + b for three doubles (EDX + EBX into EAX).; callers 11c350@11c395,11c584@11c623; guest pending
 0x000b44ec	25	sub_vectors_doubles	list_helpers	compiles	game	confirmed	decomp/tests/0x000b44ec.json	docs/compiler-abi.md; out = a - b for three doubles (EDX - EBX into EAX).; callers 8e940@8e9f6,e6990@e69a9; guest pending
-0x000b4508	71			unknown	unclassified	unverified		
-0x000b4550	71			unknown	unclassified	unverified		
+0x000b4508	71	matrix_transpose_mul_vector_b4508	float_helpers10	compiles	game	confirmed	decomp/tests/0x000b4508.json	docs/compiler-abi.md; out = transpose(mat) * vec for a 3x3 double matrix stored by rows.; callers e6990@e69ba,e6990@e69ce,11a6e4@11aacb; guest pending
+0x000b4550	71	matrix_mul_vector_b4550	float_helpers10	compiles	game	confirmed	decomp/tests/0x000b4550.json	docs/compiler-abi.md; out = mat * vec for a 3x3 double matrix stored by rows.; callers 1098f0@1099cb,11a6e4@11a883,11c584@11c63a; guest pending
 0x000b45a2	10	cos_b45a2	float_helpers8	compiles	game	confirmed	decomp/tests/0x000b45a2.json	docs/compiler-abi.md; fcos on ST0, retried while the FPU reports an incomplete reduction.; callers 7d20@7d54,7ee8@8029,1d954@1d9e3; guest pending
 0x000b45ac	10	sin_b45ac	float_helpers8	compiles	game	confirmed	decomp/tests/0x000b45ac.json	docs/compiler-abi.md; fsin on ST0, retried while the FPU reports an incomplete reduction.; callers 7d20@7d4c,7ee8@8032,1d954@1d9ee; guest pending
 0x000b45b6	44			unknown	unclassified	unverified		

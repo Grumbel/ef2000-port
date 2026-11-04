@@ -3606,4 +3606,13 @@ uint32_t guest_fn_a3bdc_x(void); /* 0xa3bdc -> AL */
 void guest_fn_34b2c_x(void); /* 0x34b2c */
 void guest_fn_34ea4_x(void); /* 0x34ea4 */
 
+/* float_helpers10.c */
+double truncate_9d72c(double value);
+void store_scaled_angle_difference_6ebbc(void);
+double lookup_scaled_cell_7b040(ef_addr32 point);
+void direction_vector_88fb4(ef_addr32 out, uint32_t u1, uint32_t u2, uint32_t u3, double a, double b);
+void matrix_transpose_mul_vector_b4508(ef_addr32 out, ef_addr32 vec, ef_addr32 mat);
+void matrix_mul_vector_b4550(ef_addr32 out, ef_addr32 vec, ef_addr32 mat);
+uint32_t guest_fn_7b16c_x(uint32_t a, uint32_t b, uint32_t c); /* 0x7b16c EAX/EDX/EBX -> EAX */
+
 #endif

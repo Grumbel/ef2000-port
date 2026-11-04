@@ -4020,3 +4020,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x34f94` | none | none | none direct | Per-frame update of the mission dialog page: reload, timers and dialog switching. |
+
+## float_helpers10 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9d72c` | EAX:double | EAX:double | f80@14eb,f80@1525,f80@1566 | Truncate ST0 toward zero (FPU control word temporarily set to round-to-zero). |
+| `0x6ebbc` | none | none | 70914@70a46,712e8@71414 | Store the wrapped difference of two angles scaled by a constant. |
+| `0x7b040` | EAX:ef_addr32 | EAX:double | 2e184@2e268,6d38c@6d579,6f504@6f60f | Scale a 2D double point, look up the cell value and return it negated and scaled. |
+| `0x88fb4` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:double | none | 29b14@29c90,89060@890cd,899d8@89a44 | Unit direction vector from a heading (a) and pitch (b): (cos a cos b, sin a cos b, -sin b). |
+| `0xb4508` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | e6990@e69ba,e6990@e69ce,11a6e4@11aacb | out = transpose(mat) * vec for a 3x3 double matrix stored by rows. |
+| `0xb4550` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 1098f0@1099cb,11a6e4@11a883,11c584@11c63a | out = mat * vec for a 3x3 double matrix stored by rows. |
