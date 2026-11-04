@@ -11277,3 +11277,21 @@ void rebuild_angle_record_942cc(void)
     guest_fn_93a8c();
     guest_fn_d099c(0x0012dbecu, 0x002143c0u);
 }
+
+/* 0x94370, 162 bytes. Mirror of 0x942cc for the opposite direction: the angle starts at 0xfc00, and when the signed high word at 0x12db98 is below -0x6800 the record is rotated by 0x400 after 0x95018. */
+void rebuild_angle_record_rev_94370(void)
+{
+    guest_fn_d099c(0x0021439cu, 0x0012dbecu);
+    EF_U16(0x0012db9au) = (uint16_t)guest_fn_d13dc(0x0021439cu, 0xfc00u);
+    guest_fn_92070();
+    guest_fn_d0ebc(0x0021439cu, 0u);
+    if (((int32_t)EF_U32(0x0012db98u) >> 16) < -0x6800) {
+        guest_fn_95018();
+        guest_fn_d0ebc(0x0021439cu, 0x400u);
+    }
+    memcpy_dc832(0x002143c0u, 0x0021439cu, 36u);
+    guest_fn_d0dbc(0x0021439cu, 0xf800u, 0u);
+    guest_fn_d099c(0x0012dbecu, 0x0021439cu);
+    guest_fn_93a8c();
+    guest_fn_d099c(0x0012dbecu, 0x002143c0u);
+}

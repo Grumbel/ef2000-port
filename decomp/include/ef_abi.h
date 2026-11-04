@@ -5420,4 +5420,6 @@ void guest_fn_b3084_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s
 
 void rebuild_angle_record_942cc(void);
 
+void rebuild_angle_record_rev_94370(void);
+
 #endif

@@ -1921,7 +1921,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000941bc	39	reset_scene_update_941bc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000941bc.json	docs/compiler-abi.md; identical body to 0x94194; callers 95e58@96240; guest pending
 0x000941e4	229	update_scene_roll_941e4	game_helpers74	compiles	game	confirmed	decomp/tests/0x000941e4.json	docs/compiler-abi.md; Fold the view roll into the scene angles and request a refresh at the limits.; callers 95e58@96182; guest pending
 0x000942cc	162	rebuild_angle_record_942cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000942cc.json	docs/compiler-abi.md; Rebuild the 9-dword record at 0x21439c from the template 0x12dbec: set its word at +0x0e from 0xd13dc(0x400), classify t; callers 95e58@961a5; guest pending
-0x00094370	162			unknown	unclassified	unverified		
+0x00094370	162	rebuild_angle_record_rev_94370	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00094370.json	docs/compiler-abi.md; Mirror of 0x942cc for the opposite direction: the angle starts at 0xfc00, and when the signed high word at 0x12db98 is b; callers 95e58@961af; guest pending
 0x00094484	109	update_camera_94484	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094484.json	docs/compiler-abi.md; ; callers 95e58@9619b; guest pending
 0x000944f4	135	latch_scene_camera_944f4	game_helpers72	compiles	game	confirmed	decomp/tests/0x000944f4.json	docs/compiler-abi.md; Latch the camera position and place the scene with the negated view angles.; callers 95e58@96bcb; guest pending
 0x0009457c	583			unknown	unclassified	unverified		

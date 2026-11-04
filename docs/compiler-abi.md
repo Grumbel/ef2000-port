@@ -7386,3 +7386,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x942cc` | none | none | 95e58@961a5 | Rebuild the 9-dword record at 0x21439c from the template 0x12dbec: set its word at +0x0e from 0xd13dc(0x400), classify t |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x94370` | none | none | 95e58@961af | Mirror of 0x942cc for the opposite direction: the angle starts at 0xfc00, and when the signed high word at 0x12db98 is b |
