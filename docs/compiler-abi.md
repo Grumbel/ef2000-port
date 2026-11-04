@@ -7403,3 +7403,14 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x168d8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 16034@16198 | Try an engagement of record A (EAX) against record B (EDX); SKIP (BL) suppresses the actual attack. Proceeds only when B |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

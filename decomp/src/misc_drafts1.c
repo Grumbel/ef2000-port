@@ -11312,3 +11312,29 @@ uint32_t within_range_16b0c(uint32_t a, uint32_t b)
     *(float *)ef_guest_memory_ptr(0x00197df0u) = (float)dist;
     return dist <= thr ? 1u : 0u;
 }
+
+/* 0x168d8, 169 bytes. Try an engagement of record A (EAX) against record B (EDX); SKIP (BL) suppresses the actual attack. Proceeds only when B is within range (0x16b0c) and A's best weapon value (0x16bac) is not below the distance stored by it at 0x197df0. While the word 0x126518 is zero and either record passes 0x17474, byte 0x1f9011 is set instead; otherwise, unless SKIP, a best-weapon type of 1 first runs 0x16c7c and 0x173a4 on B, then 0x16e60 is called for the pair. */
+void try_engagement_168d8(uint32_t a, uint32_t b, uint32_t skip)
+{
+    uint32_t kind[2];
+    uint16_t id[2];
+    uint8_t b_kind;
+    double value;
+    if (!within_range_16b0c(a, b))
+        return;
+    b_kind = EF_U8(EF_U32(0x0019bb58u) + b * 0xcau + 0x1bu);
+    value = pick_best_weapon_16bac((int32_t)a, (ef_addr32)(uintptr_t)kind, (ef_addr32)(uintptr_t)id);
+    if (value < (double)*(float *)ef_guest_memory_ptr(0x00197df0u))
+        return;
+    if (EF_U16(0x00126518u) == 0u && ((uint16_t)call_2dba4_17474((int16_t)a) != 0u || (uint16_t)call_2dba4_17474((int16_t)b) != 0u)) {
+        EF_U8(0x001f9011u) = 1u;
+        return;
+    }
+    if ((uint8_t)skip == 0u) {
+        if (b_kind == 1u) {
+            guest_fn_16c7c_x(b);
+            decrement_grid_row_link_wide((int32_t)b);
+        }
+        guest_fn_16e60_x(a, b);
+    }
+}

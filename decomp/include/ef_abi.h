@@ -5426,4 +5426,12 @@ uint32_t within_range_16b0c(uint32_t a, uint32_t b);
 
 
 
+void try_engagement_168d8(uint32_t a, uint32_t b, uint32_t skip);
+void guest_fn_16c7c_x(uint32_t record); /* 0x16c7c EAX */
+void guest_fn_16e60_x(uint32_t a, uint32_t b); /* 0x16e60 EAX/EDX */
+
+
+void guest_fn_16c7c_x(uint32_t record); /* 0x16c7c EAX */
+void guest_fn_16e60_x(uint32_t a, uint32_t b); /* 0x16e60 EAX/EDX */
+
 #endif

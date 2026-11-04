@@ -271,7 +271,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00016034	416			unknown	unclassified	unverified		
 0x000161d4	947			unknown	unclassified	unverified		
 0x00016588	846			unknown	unclassified	unverified		
-0x000168d8	169			unknown	unclassified	unverified		
+0x000168d8	169	try_engagement_168d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000168d8.json	docs/compiler-abi.md; Try an engagement of record A (EAX) against record B (EDX); SKIP (BL) suppresses the actual attack. Proceeds only when B; callers 16034@16198; guest pending
 0x00016984	45	unit_active_16984	game_helpers4	compiles	game	confirmed	decomp/tests/0x00016984.json	docs/compiler-abi.md; Is the unit alive and not of kind 0xc?; callers 169b4@169c6,16a04@16a07,16a3c@16a4e; guest pending
 0x000169b4	79	unit_in_state_169b4	game_state_helpers	compiles	game	confirmed	decomp/tests/0x000169b4.json	docs/compiler-abi.md; ; callers 15af0@15b33,16034@16055; guest pending
 0x00016a04	56	unit_kind1_with_target_16a04	game_helpers4	compiles	game	confirmed	decomp/tests/0x00016a04.json	docs/compiler-abi.md; ; callers 15af0@15b4a; guest pending
