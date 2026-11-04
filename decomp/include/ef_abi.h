@@ -4812,4 +4812,6 @@ void guest_fn_a7bd4_x(void); /* 0xa7bd4 */
 
 void draw_clipped_text_e5db4(uint32_t color, int32_t x, int32_t y, uint32_t str);
 
+int32_t classify_object_b4ee0(uint32_t obj);
+
 #endif

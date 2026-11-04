@@ -4014,3 +4014,46 @@ void draw_clipped_text_e5db4(uint32_t color, int32_t x, int32_t y, uint32_t str)
         str++;
     }
 }
+
+/* 0xb4ee0, 211 bytes. Pick the behaviour class of the object OBJ from its type byte (+2) and store the matching handler table in +0x74. Types 2 and 10 map the code byte at *(+0x51) through 0xba0e4 and use (result - 1): 0 and 6 give 1 (table 0x133a70), 1 gives 1 or, when bit 0x20 of the 0xa45b3 word is set, 3 (0x133e70), 2 gives 3, 4 gives 4 (0x1338ac) when +0x5b is 10 and else 3, 5 gives 2 (0x133c34), and 3 or anything above 6 gives -1 without a table. Type 1 gives 5 (0x133ec0), type 11 gives 4 (0x1338ac), others -1. */
+int32_t classify_object_b4ee0(uint32_t obj)
+{
+    uint32_t t = EF_U8(obj + 2u);
+    uint32_t cls;
+    int32_t r;
+    uint32_t table;
+    if (t == 2u || t == 10u) {
+        cls = (uint8_t)(map_code_ba0e4(EF_U8(EF_U32(obj + 0x51u))) - 1u);
+        if (cls > 6u)
+            return -1;
+        switch (cls) {
+        case 0: case 6:
+            r = 1; table = 0x00133a70u; break;
+        case 1:
+            if ((guest_fn_a45b3() & 0x20u) != 0u) { r = 3; table = 0x00133e70u; }
+            else { r = 1; table = 0x00133a70u; }
+            break;
+        case 2:
+            r = 3; table = 0x00133e70u; break;
+        case 3:
+            return -1;
+        case 4:
+            if (EF_U8(obj + 0x5bu) == 10u) { r = 4; table = 0x001338acu; }
+            else { r = 3; table = 0x00133e70u; }
+            break;
+        default:
+            r = 2; table = 0x00133c34u; break;
+        }
+        EF_U32(obj + 0x74u) = table;
+        return r;
+    }
+    if (t == 1u) {
+        EF_U32(obj + 0x74u) = 0x00133ec0u;
+        return 5;
+    }
+    if (t == 11u) {
+        EF_U32(obj + 0x74u) = 0x001338acu;
+        return 4;
+    }
+    return -1;
+}

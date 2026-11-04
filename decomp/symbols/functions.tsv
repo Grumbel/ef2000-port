@@ -2563,7 +2563,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b4db0	151	find_node_b4db0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b4db0.json	docs/compiler-abi.md; Find the first node of type 0x31 whose byte +0xb passes 0xcc1ac for KIND and PARAM. KIND 0, 2 and 5 walk forward from th; callers c0b04@c0bc2; guest pending
 0x000b4e48	43	find_free_entry	list_helpers	compiles	game	confirmed	decomp/tests/0x000b4e48.json	docs/compiler-abi.md; First index >= AX with a zero byte +3 in the 9-byte * entry table of EDX, or -1.; callers b914c@b91c1; guest pending
 0x000b4e74	79	set_table_entry_b4e74	runtime_helpers11	compiles	game	confirmed	decomp/tests/0x000b4e74.json	docs/compiler-abi.md; Fill the 9-byte entry idx of the table at +0x4a of an object.; callers b5fe8@b6833,b5fe8@b685b,b69e4@b7ce8; guest pending
-0x000b4ee0	211			unknown	unclassified	unverified		
+0x000b4ee0	211	classify_object_b4ee0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b4ee0.json	docs/compiler-abi.md; Pick the behaviour class of the object OBJ from its type byte (+2) and store the matching handler table in +0x74. Types ; callers b7d4c@b7fca,b8510@b896a,b8510@b8c2b; guest pending
 0x000b4fb4	391	init_sub_records_b4fb4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b4fb4.json	docs/compiler-abi.md; Initialise the sub-records (0x7c bytes each, count at +0x12, array at +0x13) of an object from a template: allocate each; callers b47e4@b4829; guest pending
 0x000b513c	358			unknown	unclassified	unverified		
 0x000b52bc	477			unknown	unclassified	unverified		

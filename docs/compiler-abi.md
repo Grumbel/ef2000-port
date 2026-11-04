@@ -5911,3 +5911,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe5db4` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:uint32_t | none | 48bb0@48c11 | Draw the NUL-terminated string STR at (X, Y) in colour COLOR (stored in 0x433eb0) with 6-pixel cells (glyph = character  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb4ee0` | EAX:uint32_t | EAX:int32_t | b7d4c@b7fca,b8510@b896a,b8510@b8c2b | Pick the behaviour class of the object OBJ from its type byte (+2) and store the matching handler table in +0x74. Types  |
