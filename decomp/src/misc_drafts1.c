@@ -8780,3 +8780,43 @@ void build_render_list_d2704(uint32_t list, uint32_t count)
     }
     process_render_object_d23d8(ro);
 }
+
+/* Shared body of 0xd2c84 / 0xd2d7c: like 0xd2704 with the coordinate shift 9 when dword 0x158f0c is set (else 0x10) and a caller-chosen handler value in render object +0x24 (0x420994). */
+static void build_render_list_shifted(uint32_t list, uint32_t count, uint32_t handler)
+{
+    uint32_t ro = 0x00420970u, tbl = 0x004209d0u, i, obj, t = tbl;
+    uint32_t sh = EF_U32(0x00158f0cu) != 0u ? 9u : 0x10u;
+    EF_U32(0x0042099cu) = 1u;
+    EF_U32(0x00420974u) = 0u;
+    EF_U32(0x004209bcu) = tbl;
+    EF_U32(tbl) = count;
+    EF_U32(ro + 0x20u) = 0x001016e0u;
+    EF_U32(ro + 0x24u) = handler;
+    if ((int32_t)count > 0) {
+        for (i = 0; i < count; i++) {
+            uint8_t fl;
+            obj = EF_U32(0x0017bf70u) + EF_U16(list);
+            EF_U32(obj + 0x24u) = (uint32_t)EF_U16(0x0015997cu + i * 4u) << sh;
+            fl = (uint8_t)(EF_U8(obj + 0x20u) | 2u);
+            EF_U32(obj + 0x28u) = (uint32_t)EF_U16(0x0015997eu + i * 4u) << sh;
+            EF_U8(obj + 0x20u) = (uint8_t)(fl & 0xfbu);
+            list += 2u;
+            EF_U32(ro + 0x2cu) = EF_U32(ro + 0x2cu) & EF_U32(obj + 0x20u);
+            t += 4u;
+            EF_U32(t) = obj;
+        }
+    }
+    process_render_object_d23d8(ro);
+}
+
+/* 0xd2c84, 245 bytes. Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): build the render list with handler value 0xffe78. */
+void build_render_list_d2c84(uint32_t list, uint32_t count)
+{
+    build_render_list_shifted(list, count, 0x000ffe78u);
+}
+
+/* 0xd2d7c, 267 bytes. As 0xd2c84 but the handler value is the dword 0x15b884 when dword 0x158f0c is set, else 0x15b888. */
+void build_render_list_d2d7c(uint32_t list, uint32_t count)
+{
+    build_render_list_shifted(list, count, EF_U32(0x00158f0cu) != 0u ? EF_U32(0x0015b884u) : EF_U32(0x0015b888u));
+}

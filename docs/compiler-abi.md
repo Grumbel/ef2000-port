@@ -6925,3 +6925,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xd2500` | EAX:uint32_t,EDX:uint32_t | none | c4d43@c4da7,c8c78@c8cab | Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): fill the render objec |
 | `0xd2704` | EAX:uint32_t,EDX:uint32_t | none | c4aeb@c4b89 | Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): as 0xd2500 but with t |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd2c84` | EAX:uint32_t,EDX:uint32_t | none | none direct | Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): build the render list |
+| `0xd2d7c` | EAX:uint32_t,EDX:uint32_t | none | none direct | As 0xd2c84 but the handler value is the dword 0x15b884 when dword 0x158f0c is set, else 0x15b888. |

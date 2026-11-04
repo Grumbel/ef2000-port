@@ -3040,8 +3040,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d2704	191	build_render_list_d2704	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2704.json	docs/compiler-abi.md; Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): as 0xd2500 but with t; callers c4aeb@c4b89; guest pending
 0x000d299c	223			unknown	unclassified	unverified		
 0x000d2a7c	518			unknown	unclassified	unverified		
-0x000d2c84	245			unknown	unclassified	unverified		
-0x000d2d7c	267			unknown	unclassified	unverified		
+0x000d2c84	245	build_render_list_d2c84	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2c84.json	docs/compiler-abi.md; Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): build the render list; callers none direct; guest pending
+0x000d2d7c	267	build_render_list_d2d7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2d7c.json	docs/compiler-abi.md; As 0xd2c84 but the handler value is the dword 0x15b884 when dword 0x158f0c is set, else 0x15b888.; callers none direct; guest pending
 0x000d35b0	276			unknown	unclassified	unverified		
 0x000d36c4	302			unknown	unclassified	unverified		
 0x000d37f4	80	count_hit_d37f4	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d37f4.json	docs/compiler-abi.md; Count a hit when the cell under the object equals dword 0x159144 + 0xe0.; callers none direct; guest pending
