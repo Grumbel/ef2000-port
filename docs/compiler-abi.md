@@ -6695,3 +6695,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x87fe4` | none | none | 3dd30@3e1d5,63d5c@6404d | Draw the nearby entries of the linked list whose head is dword 0x20f160 (sentinel 0x20f164, next link at +0x34): with th |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x76620` | none | none | 3dd30@3e01a | Set up the view window for the current viewport record (28-byte records at 0x125ad6, index byte 0x12db9e; X = dword +0 h |

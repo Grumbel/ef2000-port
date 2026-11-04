@@ -1387,7 +1387,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00075f00	1065			unknown	unclassified	unverified		
 0x0007632c	68	expand_table_7632c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0007632c.json	docs/compiler-abi.md; Copy the 3-byte payloads of the 4-byte entries at 0x421750 until 0xff.; callers 767f4@76871; guest pending
 0x00076370	688			unknown	unclassified	unverified		
-0x00076620	228			unknown	unclassified	unverified		
+0x00076620	228	setup_viewport_window_76620	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00076620.json	docs/compiler-abi.md; Set up the view window for the current viewport record (28-byte records at 0x125ad6, index byte 0x12db9e; X = dword +0 h; callers 3dd30@3e01a; guest pending
 0x00076704	239			unknown	unclassified	unverified		
 0x000767f4	136	reset_colour_tables_767f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000767f4.json	docs/compiler-abi.md; Reset the 256-entry colour tables: fill 0x1f71e0 with (0x3f, 0, 0x3f), zero the first entry at 0x464060, copy the 256 tr; callers 58d64@58d73; guest pending
 0x000768fc	10	set_limit_768fc	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000768fc.json	docs/compiler-abi.md; Set the 4000 limit word.; callers 58d64@58d78; guest pending

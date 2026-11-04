@@ -7840,3 +7840,17 @@ void draw_nearby_entries_87fe4(void)
     EF_U32(0x001a5bf0u) = save_b;
     EF_U32(0x001a5be8u) = save_c;
 }
+
+/* 0x76620, 228 bytes. Set up the view window for the current viewport record (28-byte records at 0x125ad6, index byte 0x12db9e; X = dword +0 high half, Y = dword +0xe high half, both shifted left by byte 0x12b369) over the screen size (width dword 0x15b744, height 0x15b748): set the view origin (0xdc21c), run the box update (0xdc71b), latch the vertical origin (0xce328) and the full-screen box (0xcdf48). */
+void setup_viewport_window_76620(void)
+{
+    uint32_t rec = (uint32_t)EF_U8(0x0012db9eu) * 28u;
+    uint32_t w = EF_U32(0x0015b744u);
+    uint32_t sh = EF_U8(0x0012b369u);
+    uint32_t x = (uint32_t)((int32_t)EF_U32(0x00125ad6u + rec) >> 16) << sh;
+    uint32_t y = (uint32_t)((int32_t)EF_U32(0x00125ae4u + rec) >> 16) << sh;
+    set_view_origin_dc21c(y, w - 1u, x, (uint32_t)((int32_t)w >> 1));
+    guest_fn_dc71b_x(x, y, 0u, EF_U32(0x0015b744u) - 1u, 0u);
+    latch_values_ce328(0u, EF_U32(0x0015b744u) - 1u, 0u, y);
+    guest_fn_cdf48(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+}

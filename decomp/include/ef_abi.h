@@ -5152,4 +5152,6 @@ void update_proximity_39874(uint32_t x, uint32_t y, uint32_t z);
 
 void draw_nearby_entries_87fe4(void);
 
+void setup_viewport_window_76620(void);
+
 #endif
