@@ -5927,4 +5927,6 @@ void update_frame_time_53270(void);
 
 int32_t find_slot_at_point_4dfb4(uint32_t x, uint32_t y);
 
+void advance_object_position_724a8(uint32_t index, uint32_t obj);
+
 #endif

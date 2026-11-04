@@ -17721,3 +17721,50 @@ int32_t find_slot_at_point_4dfb4(uint32_t x, uint32_t y)
 	}
 	return -1;
 }
+
+/* 0x724a8, 305 bytes. Advance the position of unit object OBJ (EDX; NULL or byte 0x122c5c set: nothing) by its velocity for the time since the last call: the signed difference of word 0x1357d6 and the object's word +0x234 (stored back; negative counts as 0, capped at 150) is added to the accumulated word +0x236 (capped: at 150 the update stops there), and unless flag 8 of byte +0x24 is set the doubles +0x49, +0x51, +0x59 are advanced by the unit vector (+0xa1, +0xb9, +0xd1) times the speed (dword +0x12 * 7.857254924047374e-06) times the step (ticks * 0.02, times 5.0 when byte 0x1f9012 is set); a positive height +0x59 is clamped to 0.0. Then the object INDEX (EAX, signed word) is refreshed with 0x73d50. */
+void advance_object_position_724a8(uint32_t index, uint32_t obj)
+{
+	uint32_t dt;
+	int32_t diff, total;
+	double a, b, v, p;
+
+	if (obj == 0u || EF_U8(0x00122c5cu) != 0u)
+		return;
+	diff = (int32_t)(int16_t)(EF_U16(0x001357d6u) - EF_U16(obj + 0x234u));
+	EF_U16(obj + 0x234u) = EF_U16(0x001357d6u);
+	dt = (uint32_t)(uint16_t)diff;
+	if ((dt & 0x8000u) != 0u)
+		dt = 0u;
+	if ((int32_t)dt > 0x96)
+		dt = 0x96u;
+	total = (int32_t)dt + (int32_t)EF_U16(obj + 0x236u);
+	if (total >= 0x96) {
+		EF_U16(obj + 0x236u) = 0x96u;
+		return;
+	}
+	EF_U16(obj + 0x236u) = (uint16_t)total;
+	if ((EF_U8(obj + 0x24u) & 8u) != 0u)
+		return;
+	a = (double)(int32_t)dt * 0.02;
+	b = (double)(int32_t)EF_U32(obj + 0x12u) * 7.857254924047374e-06;
+	if (EF_U8(0x001f9012u) != 0u)
+		a = a * 5.0;
+	memcpy(&v, ef_guest_memory_ptr(obj + 0xa1u), 8);
+	memcpy(&p, ef_guest_memory_ptr(obj + 0x49u), 8);
+	p = v * b * a + p;
+	memcpy(ef_guest_memory_ptr(obj + 0x49u), &p, 8);
+	memcpy(&v, ef_guest_memory_ptr(obj + 0xb9u), 8);
+	memcpy(&p, ef_guest_memory_ptr(obj + 0x51u), 8);
+	p = v * b * a + p;
+	memcpy(ef_guest_memory_ptr(obj + 0x51u), &p, 8);
+	memcpy(&v, ef_guest_memory_ptr(obj + 0xd1u), 8);
+	memcpy(&p, ef_guest_memory_ptr(obj + 0x59u), 8);
+	p = b * v * a + p;
+	memcpy(ef_guest_memory_ptr(obj + 0x59u), &p, 8);
+	if (!(0.0 >= p)) {
+		EF_U32(obj + 0x59u) = 0u;
+		EF_U32(obj + 0x5du) = 0u;
+	}
+	guest_fn_73d50_w((int32_t)(int16_t)index);
+}
