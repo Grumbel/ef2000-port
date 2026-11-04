@@ -27,7 +27,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00000c74	55	dos_call_3502_c74	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000c74.json	docs/compiler-abi.md; Issue DOS service 0x3502 with a sign-extended 16-bit argument.; callers none direct; guest pending
 0x00000cac	38	open_checked_cac	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000cac.json	docs/compiler-abi.md; Open a file through 0x9c2d3 and abort when it fails.; callers fc534@fc5e8; guest pending
 0x00000d08	93	record_for_kind	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00000d08.json	docs/compiler-abi.md; Select a record address by kind.; callers d68@e00; guest pending
-0x00000d68	183			unknown	unclassified	unverified		
+0x00000d68	183	report_bad_record_d68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000d68.json	docs/compiler-abi.md; Report a bad record P (stack, cdecl): when its word at +0x26 is set and the wrapping byte counter 0x120d2c reaches zero ; callers none direct; guest pending
 0x00000e20	292			unknown	unclassified	unverified		
 0x00000f44	22			unknown	unclassified	unverified		
 0x00000f60	32	random_modulo	low_helpers	compiles	game	confirmed	decomp/tests/0x00000f60.json	docs/compiler-abi.md; zero divisor returns 0 else low-word random (0x9c960) modulo divisor; callers 1ef8@1f58,1f64@1f87,1f64@20a0; guest pending

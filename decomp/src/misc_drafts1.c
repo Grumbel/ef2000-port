@@ -11433,3 +11433,21 @@ void draw_circle_scaled_c9680(uint32_t colour, uint32_t d, uint32_t b, uint32_t 
     cy = (int32_t)truncate_9d72c((double)(int16_t)d * scale + (double)off_y);
     draw_arc_by_length_fe49c(colour & 0xffu, (uint32_t)cy, (uint32_t)cx, 0u, 0xffffu, (uint32_t)radius);
 }
+
+/* 0xd68, 183 bytes. Report a bad record P (stack, cdecl): when its word at +0x26 is set and the wrapping byte counter 0x120d2c reaches zero after incrementing, dump the record and its linked record at +0x34 (fields at +0x00..+0x18 of each plus the words and dwords at +0x1c..+0x38, with 0xd08 applied to the word at +0x24) through the error hook at 0x132a74 with the format 0x17f268. */
+void report_bad_record_d68(ef_addr32 p)
+{
+    ef_addr32 q;
+    if (EF_U16(p + 0x26u) == 0u)
+        return;
+    EF_U8(0x00120d2cu) = (uint8_t)(EF_U8(0x00120d2cu) + 1u);
+    if (EF_U8(0x00120d2cu) != 0u)
+        return;
+    q = EF_U32(p + 0x34u);
+    guest_callptr26_x(EF_U32(0x00132a74u), 0x0017f268u, EF_U16(p + 0x24u), guest_fn_d08_x(EF_U16(p + 0x24u)),
+                      EF_U32(p + 0x28u), EF_U32(p + 0x30u), EF_U16(p + 0x2cu), EF_U16(p + 0x38u),
+                      EF_U16(p + 0x1cu), EF_U16(p + 0x1eu), EF_U16(p + 0x20u), EF_U16(p + 0x22u),
+                      EF_U32(p), EF_U32(p + 4u), EF_U32(p + 8u), EF_U32(p + 0xcu), EF_U32(p + 0x10u),
+                      EF_U32(p + 0x14u), EF_U32(p + 0x18u), q, EF_U32(q), EF_U32(q + 4u), EF_U32(q + 8u),
+                      EF_U32(q + 0xcu), EF_U32(q + 0x10u), EF_U32(q + 0x14u), EF_U32(q + 0x18u));
+}

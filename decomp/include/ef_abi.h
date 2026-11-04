@@ -5449,4 +5449,10 @@ void guest_fn_24c40_x(int32_t a); /* 0x24c40 EAX */
 
 void draw_circle_scaled_c9680(uint32_t colour, uint32_t d, uint32_t b, uint32_t r);
 
+void report_bad_record_d68(ef_addr32 p);
+uint32_t guest_fn_d08_x(uint32_t a); /* 0xd08 EAX -> EAX */
+void guest_callptr26_x(ef_addr32 fn, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5, uint32_t a6, uint32_t a7, uint32_t a8, uint32_t a9, uint32_t a10, uint32_t a11, uint32_t a12, uint32_t a13, uint32_t a14, uint32_t a15, uint32_t a16, uint32_t a17, uint32_t a18, uint32_t a19, uint32_t a20, uint32_t a21, uint32_t a22, uint32_t a23, uint32_t a24, uint32_t a25); /* indirect cdecl call with 26 stack arguments, caller cleanup */
+
+
+
 #endif

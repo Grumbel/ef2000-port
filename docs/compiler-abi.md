@@ -7432,3 +7432,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc9680` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 4c3bc@4c510 | Draw a full circle of colour COLOUR (EAX, byte) in the viewport record at [0x41eea0] (nothing when NULL). D (EDX), B (EB |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd68` | EAX:ef_addr32 | none | none direct | Report a bad record P (stack, cdecl): when its word at +0x26 is set and the wrapping byte counter 0x120d2c reaches zero  |
