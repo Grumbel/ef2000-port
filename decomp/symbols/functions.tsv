@@ -519,7 +519,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00032260	75	save_position_32260	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00032260.json	docs/compiler-abi.md; Save the current position and angles.; callers 3122c@3131d; guest pending
 0x000322ac	207			unknown	unclassified	unverified		
 0x0003237c	150			unknown	unclassified	unverified		
-0x00032414	155			unknown	unclassified	unverified		
+0x00032414	155	rotate_vector_by_angles_32414	game_helpers84	compiles	game	confirmed	decomp/tests/0x00032414.json	docs/compiler-abi.md; Rotate an integer vector by the angle triple (yaw/pitch/roll words) with a 1.15 matrix.; callers 316b8@316ca,3170c@3172e,31774@317bd; guest pending
 0x000324b0	488			unknown	unclassified	unverified		
 0x000326d8	263			unknown	unclassified	unverified		
 0x000327e0	156	latch_vectors_327e0	line_of_sight	compiles	game	confirmed	decomp/tests/0x000327e0.json	docs/compiler-abi.md; Latch the position and target vectors.; callers 3122c@31246; guest pending
@@ -2281,7 +2281,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a6808	309			unknown	unclassified	unverified		
 0x000a6940	86	init_timers_a6940	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a6940.json	docs/compiler-abi.md; Walk the child list at +0x91 (next at +0x21) and default the timers at +0x14 / +0x16.; callers a59d8@a5a40; guest pending
 0x000a6998	53	refresh_children_a6998	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a6998.json	docs/compiler-abi.md; Refresh every child of a widget that is not of kind 9.; callers a59d8@a5a32; guest pending
-0x000a69d0	145			unknown	unclassified	unverified		
+0x000a69d0	145	clamp_box_to_container_a69d0	game_helpers84	compiles	game	confirmed	decomp/tests/0x000a69d0.json	docs/compiler-abi.md; Clamp a layout box's origin and size inside the limits of its container.; callers a6a64@a6a80,a74bc@a74e8; guest pending
 0x000a6a64	44	walk_children_a6a64	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a6a64.json	docs/compiler-abi.md; children without those bits: 0xa69d0; callers a59d8@a5a39; guest pending
 0x000a6c20	203	draw_widget_text_a6c20	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a6c20.json	docs/compiler-abi.md; Draw a widget's text when its rectangle lies inside the clip box.; callers a6d00@a7082; guest pending
 0x000a6d00	1025			unknown	unclassified	unverified		

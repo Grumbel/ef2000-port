@@ -3703,4 +3703,8 @@ void make_temp_name_bc471(ef_addr32 name, uint32_t index);
 uint32_t guest_fn_fa89a_x(void); /* 0xfa89a -> EAX */
 uint32_t guest_fn_bc465_x(uint32_t nibble); /* 0xbc465 EAX -> AL */
 
+/* game_helpers84.c */
+void rotate_vector_by_angles_32414(ef_addr32 angles, ef_addr32 vec, ef_addr32 out);
+void clamp_box_to_container_a69d0(ef_addr32 container, ef_addr32 box);
+
 #endif

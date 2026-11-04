@@ -4143,3 +4143,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb3580` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | b3084@b314b | Hex dump 0x640 bytes through the printf sink, 40 values per line. |
 | `0xbc471` | EAX:ef_addr32,EDX:uint32_t | none | bc4da@bc54d | Build a temp file name "t" + four hex digits + "_" + two hex digits + ".tmp". |
+
+## game_helpers84 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x32414` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 316b8@316ca,3170c@3172e,31774@317bd | Rotate an integer vector by the angle triple (yaw/pitch/roll words) with a 1.15 matrix. |
+| `0xa69d0` | EAX:ef_addr32,EDX:ef_addr32 | none | a6a64@a6a80,a74bc@a74e8 | Clamp a layout box's origin and size inside the limits of its container. |
