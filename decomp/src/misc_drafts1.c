@@ -13078,3 +13078,36 @@ void assign_task_71fc(ef_addr32 a, ef_addr32 b)
         EF_U16(b + 0x22u) = (uint16_t)idw;
     guest_fn_2b634_x(id);
 }
+
+/* 0x843b0, 255 bytes. Per-frame wander of the view reference point. While either word at 0x1fcbd0/0x1fcbd2 is set, recentre (0x842b4) and refresh (0x84370); if the point at the high words of 0x1fcc3c/0x1fcc3e fails 0x834e8, do both again; either way restart the 0x28-tick timer at 0x12b4c0 from the clock 0x1fcbbc. Otherwise, once 0x28 ticks have passed, draw a new random word into 0x12b4bc; each frame move the point (0x1fcc2c, 0x1fcc34) by a random 0..0x1ff offset per axis (sign from bits 0 and 1 of that word) when 0x83294 accepts the new position, then recentre and refresh. Always returns 0. */
+uint8_t wander_view_point_843b0(void)
+{
+    if (EF_U16(0x001fcbd0u) != 0u || EF_U16(0x001fcbd2u) != 0u) {
+        center_view_842b4();
+        update_ui_composite();
+        if (guest_fn_834e8_w((int32_t)EF_U32(0x001fcc3cu) >> 16, (int32_t)EF_U32(0x001fcc3eu) >> 16) != 0u) {
+            center_view_842b4();
+            update_ui_composite();
+        }
+        EF_U32(0x0012b4c0u) = EF_U32(0x001fcbbcu) - 0x28u;
+    } else {
+        int32_t dx, dy;
+        if ((int32_t)(EF_U32(0x001fcbbcu) - EF_U32(0x0012b4c0u)) >= 0x28) {
+            EF_U32(0x0012b4c0u) = EF_U32(0x001fcbbcu);
+            EF_U16(0x0012b4bcu) = (uint16_t)guest_fn_a45b3();
+        }
+        dx = (int32_t)(guest_fn_a45b3() & 0x1ffu);
+        if ((EF_U16(0x0012b4bcu) & 0x1u) != 0u)
+            dx = -dx;
+        dy = (int32_t)(guest_fn_a45b3() & 0x1ffu);
+        if ((EF_U16(0x0012b4bcu) & 0x2u) != 0u)
+            dy = -dy;
+        if (ui_point_near_reference((int32_t)EF_U32(0x001fcc2cu) + dx, (int32_t)EF_U32(0x001fcc34u) + dy) != 0u) {
+            EF_U32(0x001fcc2cu) = EF_U32(0x001fcc2cu) + (uint32_t)dx;
+            EF_U32(0x001fcc34u) = EF_U32(0x001fcc34u) + (uint32_t)dy;
+        }
+        center_view_842b4();
+        update_ui_composite();
+    }
+    return 0u;
+}

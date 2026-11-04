@@ -1602,7 +1602,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000842b4	188	center_view_842b4	game_helpers47	compiles	game	confirmed	decomp/tests/0x000842b4.json	docs/compiler-abi.md; Center the view on the current camera position and publish its origin.; callers 843b0@843c8,843b0@843ec,843b0@8449e; guest pending
 0x00084370	35	update_ui_composite	ui_operations	compiles	game	confirmed	decomp/tests/0x00084370.json	docs/compiler-abi.md; host model; guest differential pending
 0x00084394	25	forward_vector_to_83708	scene_helpers	compiles	game	confirmed	decomp/tests/0x00084394.json	docs/compiler-abi.md; 0x83708(0x1fcc3e, dwords 0/4/8); callers 845c0@845df,845c0@84611; guest pending
-0x000843b0	255			unknown	unclassified	unverified		
+0x000843b0	255	wander_view_point_843b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000843b0.json	docs/compiler-abi.md; Per-frame wander of the view reference point. While either word at 0x1fcbd0/0x1fcbd2 is set, recentre (0x842b4) and refr; callers 844b0@844ce; guest pending
 0x000844b0	51	refresh_view_844b0	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x000844b0.json	docs/compiler-abi.md; Refresh the view when a cursor offset is set, else reset it.; callers none direct; guest pending
 0x000844e4	47	reset_pending_mode_844e4	scene_helpers	compiles	game	confirmed	decomp/tests/0x000844e4.json	docs/compiler-abi.md; word 0x12b4a6=1, 0xdc832, byte 0x1fcc43=0, AL=0; callers 84678@8469d; guest pending
 0x00084514	47	initialize_ui_component	ui_secondary	compiles	game	confirmed	decomp/tests/0x00084514.json	docs/compiler-abi.md; host model; guest differential pending
