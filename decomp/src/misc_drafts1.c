@@ -15219,3 +15219,59 @@ uint32_t parse_record_f260(ef_addr32 rec)
 		read_record_ee0c(EF_U32(rec + 0x4au) + base);
 	return 1u;
 }
+
+/* 0xfcf4, 343 bytes. Parse one record from the text parser into the record EAX: skip line and token, byte +0xb from the two-family enum reader (0xea0c) selects the name reader for byte +0xc (0 the 39-name, 1 the 18-name, 2 the 27-name list; anything else reports the unknown name through the error hook, format 0x18113c with 0x197abe and dword 0x121eac), byte +0xd the 10-name enum, byte +0xe an enum, dword +0xf a duplicated token, then integers: word +0x13 (overwritten by the running counter word 0x121ea6), bytes +0x15 and +0x16, words +0x17, +0x29, +0x2b, +0x2d, +0x2f, +0x19, +0x1b, +0x1d, +0x1f, +0x21, +0x23, +0x25, +0x27, three reads into +0x31 (the last wins) and +0x51. Word +0x53 is cleared, the text record whose pointer is dword +0x4d is parsed (0xfe4c) and the six-field record at +0x3b is read. Returns 1. */
+uint32_t parse_record_fcf4(ef_addr32 rec)
+{
+	uint32_t kind;
+	uint16_t counter;
+
+	read_parser_line();
+	read_parser_token();
+	kind = read_parser_enum_two_families() & 0xffu;
+	EF_U8(rec + 0xbu) = (uint8_t)kind;
+	switch (kind) {
+	case 0:
+		EF_U8(rec + 0xcu) = (uint8_t)read_parser_enum_39_names();
+		break;
+	case 1:
+		EF_U8(rec + 0xcu) = (uint8_t)read_parser_enum_18_names();
+		break;
+	case 2:
+		EF_U8(rec + 0xcu) = (uint8_t)read_parser_enum_27_names();
+		break;
+	default:
+		guest_callptr3_x(EF_U32(0x00132a74u), 0x0018113cu, 0x00197abeu, EF_U32(0x00121eacu));
+		break;
+	}
+	EF_U8(rec + 0xdu) = (uint8_t)read_parser_enum_10_names();
+	EF_U8(rec + 0xeu) = (uint8_t)read_parser_enum();
+	EF_U32(rec + 0xfu) = duplicate_parser_token();
+	EF_U16(rec + 0x13u) = (uint16_t)read_parser_integer();
+	counter = EF_U16(0x00121ea6u);
+	EF_U16(rec + 0x13u) = counter;
+	EF_U16(0x00121ea6u) = (uint16_t)(counter + 1u);
+	EF_U8(rec + 0x15u) = (uint8_t)read_parser_integer();
+	EF_U8(rec + 0x16u) = (uint8_t)read_parser_integer();
+	EF_U16(rec + 0x17u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x29u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x2bu) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x2du) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x2fu) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x19u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x1bu) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x1du) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x1fu) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x21u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x23u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x25u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x27u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x31u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x31u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x31u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x51u) = (uint16_t)read_parser_integer();
+	EF_U16(rec + 0x53u) = 0u;
+	read_parser_text_record(EF_U32(rec + 0x4du));
+	read_parser_six_field_record(rec + 0x3bu);
+	return 1u;
+}

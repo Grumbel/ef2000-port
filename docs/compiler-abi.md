@@ -8156,3 +8156,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf260` | EAX:ef_addr32 | EAX:uint32_t | f6a8@f85a | Parse one record from the text parser into the record EAX: skip the line and token, byte +0xb from the enum reader (0xe9 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfcf4` | EAX:ef_addr32 | EAX:uint32_t | 1001c@1032e | Parse one record from the text parser into the record EAX: skip line and token, byte +0xb from the two-family enum reade |

@@ -5791,4 +5791,6 @@ uint32_t guest_fn_ce064_x(void); /* 0xce064 -> AX */
 
 uint32_t parse_record_f260(ef_addr32 rec);
 
+uint32_t parse_record_fcf4(ef_addr32 rec);
+
 #endif
