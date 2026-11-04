@@ -4688,4 +4688,10 @@ void count_matching_tiles_d3844(ef_addr32 obj);
 void update_grid_nodes_2a7f8(void);
 uint32_t register_trace_block_d5e0c(ef_addr32 rec);
 
+void add_direction_offset_cee88(ef_addr32 vec, uint32_t a, uint32_t b, int32_t k);
+void set_clip_rect_c94f4(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1);
+void prepare_shape_list_d2320(ef_addr32 obj);
+
+
+
 #endif

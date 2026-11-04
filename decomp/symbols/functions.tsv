@@ -2844,7 +2844,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c9238	171	set_clip_and_shade_c9238	tactical_marks1	compiles	game	confirmed	decomp/tests/0x000c9238.json	docs/compiler-abi.md; Store a clip rectangle (a, b, c-1, d-1) at 0x15b60e..0x15b61c, build the two 64-entry shade tables at 0x41f3f0 on first ; callers a6d00@a6f9a; guest pending
 0x000c92e4	122	draw_clipped_c92e4	screen_clip1	compiles	game	confirmed	decomp/tests/0x000c92e4.json	docs/compiler-abi.md; Forward a rectangle to 0xeb174 when it lies wholly inside the screen (limits 0x15b744/0x15b748).; callers a6d00@a6e63,a6d00@a6eab,a6d00@a6f49; guest pending
 0x000c9360	404			unknown	unclassified	unverified		
-0x000c94f4	182			unknown	unclassified	unverified		
+0x000c94f4	182	set_clip_rect_c94f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c94f4.json	docs/compiler-abi.md; Clip the rectangle (X0, Y0)-(X1, Y1) to the screen size 0x15b744 x 0x15b748 (ret 4, Y1 on the stack); a rectangle entire; callers a5ca4@a5cde,a5ca4@a5d17,a5ca4@a5d54; guest pending
 0x000c95ac	212			unknown	unclassified	unverified		
 0x000c9680	180			unknown	unclassified	unverified		
 0x000c9734	409			unknown	unclassified	unverified		
@@ -2978,7 +2978,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cec00	201			unknown	unclassified	unverified		
 0x000ceccc	99	fill_rect_ceccc	fill_rects1	compiles	game	confirmed	decomp/tests/0x000ceccc.json	docs/compiler-abi.md; Fill the rectangle x0..x1, y0..y1 (coordinates swapped into order) with a colour byte, one row at a time. Callee pops th; callers 14d58@14e04,1e480@1e54c,1e480@1e5c2; guest pending
 0x000ceda0	231			unknown	unclassified	unverified		
-0x000cee88	180			unknown	unclassified	unverified		
+0x000cee88	180	add_direction_offset_cee88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cee88.json	docs/compiler-abi.md; Add the direction (from the sine/cosine tables at 0x141e08/0x142e08, indexed by the negated angles A and B divided by 8); callers a0f84@a11a1; guest pending
 0x000cef3c	264			unknown	unclassified	unverified		
 0x000cf050	850			unknown	unclassified	unverified		
 0x000cf3a4	993			unknown	unclassified	unverified		
@@ -3032,7 +3032,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d2110	30	forward_record_d2110	code_predicates	compiles	game	confirmed	decomp/tests/0x000d2110.json	docs/compiler-abi.md; 0xfc8cc(dword [p], p+4) for p = dword +0x4c; set bit 0 of byte +0x2c.; callers d23d8@d2437,d299c@d2a3f; guest pending
 0x000d2130	416			unknown	unclassified	unverified		
 0x000d22d0	80	triangle_is_clockwise_d22d0	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d22d0.json	docs/compiler-abi.md; Return 1 when the three records' 16.16 (x,y) points form a clockwise triangle (negative cross product).; callers d23d8@d2459; guest pending
-0x000d2320	182			unknown	unclassified	unverified		
+0x000d2320	182	prepare_shape_list_d2320	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2320.json	docs/compiler-abi.md; Prepare the shape list of OBJ (list at +0x4c: count, then entry pointers): shift each entry's three coordinates (+0x24, ; callers d23d8@d243e; guest pending
 0x000d23d8	162	process_render_object_d23d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d23d8.json	docs/compiler-abi.md; Process a render object: count it (0x4209c8), prepare it with 0xd2130 unless 0x158ed8 is set, and when the object is act; callers d2500@d2576,d2584@d2626,d2634@d26f3; guest pending
 0x000d2500	129			unknown	unclassified	unverified		
 0x000d2584	176			unknown	unclassified	unverified		

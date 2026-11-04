@@ -2447,3 +2447,91 @@ uint32_t register_trace_block_d5e0c(ef_addr32 rec)
     EF_U32(0x00420a68u) = rec;
     return 0u;
 }
+
+/* 0xcee88, 180 bytes. Add the direction (from the sine/cosine tables at 0x141e08/0x142e08, indexed by the negated angles A and B divided by 8) scaled by K (fixed point, 15 bits) to the three 16-bit components at VEC. */
+void add_direction_offset_cee88(ef_addr32 vec, uint32_t a, uint32_t b, int32_t k)
+{
+    uint32_t i1 = ((0u - a) & 0xffffu) >> 3;
+    uint32_t i2 = ((0u - b) & 0xffffu) >> 3;
+    int32_t ta = (int16_t)EF_U16(0x00141e08u + i1 * 2u);
+    int32_t tb = (int16_t)EF_U16(0x00142e08u + i1 * 2u);
+    int32_t tc = (int16_t)EF_U16(0x00141e08u + i2 * 2u);
+    int32_t td = (int16_t)EF_U16(0x00142e08u + i2 * 2u);
+    int32_t k16 = (int16_t)k;
+    int32_t dx = (int16_t)(-((tc * tb) >> 15));
+    int32_t dy = (int16_t)(-ta);
+    int32_t dz = (int16_t)((tb * td) >> 15);
+    EF_U16(vec) = (uint16_t)((int16_t)EF_U16(vec) + ((dx * k16) >> 15));
+    EF_U16(vec + 2u) = (uint16_t)((int16_t)EF_U16(vec + 2u) + ((dy * k16) >> 15));
+    EF_U16(vec + 4u) = (uint16_t)((int16_t)EF_U16(vec + 4u) + ((dz * k16) >> 15));
+}
+
+/* 0xc94f4, 182 bytes. Clip the rectangle (X0, Y0)-(X1, Y1) to the screen size 0x15b744 x 0x15b748 (ret 4, Y1 on the stack); a rectangle entirely outside is ignored, otherwise store the clipped corners at 0x4208e6..0x4208ec and the colour byte at 0x4208e4 and run 0xcf78c. */
+void set_clip_rect_c94f4(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1)
+{
+    int32_t w = (int32_t)EF_U32(0x0015b744u);
+    int32_t h = (int32_t)EF_U32(0x0015b748u);
+    int16_t ax0 = (int16_t)x0;
+    int16_t ay0 = (int16_t)y0;
+    int16_t ax1 = (int16_t)x1;
+    int16_t ay1 = (int16_t)y1;
+    if (ax0 < 0 && ax1 < 0)
+        return;
+    if (ay0 < 0 && ay1 < 0)
+        return;
+    if (ax0 >= w && ax1 >= w)
+        return;
+    if (ay0 >= h && ay1 >= h)
+        return;
+    if (ax0 < 0)
+        ax0 = 0;
+    if (ay0 < 0)
+        ay0 = 0;
+    if (ax1 >= w)
+        ax1 = (int16_t)(EF_U16(0x0015b744u) - 1u);
+    if (ay1 >= h)
+        ay1 = (int16_t)(EF_U16(0x0015b748u) - 1u);
+    EF_U16(0x004208e6u) = (uint16_t)ax0;
+    EF_U16(0x004208e8u) = (uint16_t)ay0;
+    EF_U16(0x004208eau) = (uint16_t)ax1;
+    EF_U16(0x004208ecu) = (uint16_t)ay1;
+    EF_U16(0x004208e4u) = (uint16_t)(colour & 0xffu);
+    forward_record_cf78c();
+}
+
+/* 0xd2320, 182 bytes. Prepare the shape list of OBJ (list at +0x4c: count, then entry pointers): shift each entry's three coordinates (+0x24, +0x28, +0x2c) by 0x8000, append a copy of the pointer table after the end, and record in the object the index of the entry with the smallest key (+0x1c) at +8, the index of the entry with the largest key (ties broken by +0x18; 0 maps to the count) at +0xc, and the smallest and largest keys at +0x18 and +0x1c. */
+void prepare_shape_list_d2320(ef_addr32 obj)
+{
+    uint32_t list = EF_U32(obj + 0x4cu);
+    int32_t count = (int32_t)EF_U32(list);
+    int32_t min_key = 0x7fffffff;
+    int32_t max_key = (int32_t)0x80000000u;
+    int32_t max_lo = (int32_t)0x80000000u;
+    int32_t min_idx = 0;
+    int32_t max_idx = 0;
+    int32_t i;
+    for (i = 0; i < count; i++) {
+        uint32_t e = EF_U32(list + (uint32_t)(i + 1) * 4u);
+        int32_t key;
+        EF_U32(e + 0x24u) += 0x8000u;
+        EF_U32(e + 0x28u) += 0x8000u;
+        EF_U32(e + 0x2cu) += 0x8000u;
+        key = (int32_t)EF_U32(e + 0x1cu);
+        if (key < min_key) {
+            min_key = key;
+            min_idx = i;
+        }
+        if (key >= max_key) {
+            if (key > max_key || (int32_t)EF_U32(e + 0x18u) >= max_lo) {
+                max_idx = i;
+                max_lo = (int32_t)EF_U32(e + 0x18u);
+            }
+            max_key = key;
+        }
+        EF_U32(list + (uint32_t)(count + i + 1) * 4u) = e;
+    }
+    EF_U32(obj + 8u) = (uint32_t)min_idx;
+    EF_U32(obj + 0xcu) = (max_idx != 0) ? (uint32_t)max_idx : (uint32_t)count;
+    EF_U32(obj + 0x18u) = (uint32_t)min_key;
+    EF_U32(obj + 0x1cu) = (uint32_t)max_key;
+}

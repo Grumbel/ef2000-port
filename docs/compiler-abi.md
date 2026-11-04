@@ -5680,3 +5680,16 @@ in EAX, format string address, one value).
 | `0xd3844` | EAX:ef_addr32 | none | none direct | Count how many of the four tiles around the object's cell (x, y)..(x+1, y+1), read with 0xc3f50, equal the value [0x1591 |
 | `0x2a7f8` | none | none | 3dd30@3e1f3 | When the larger of the two coordinate distances between (0x125250, 0x125254) and (0x1a5bec, 0x1a5be8) is at most 0x7fff, |
 | `0xd5e0c` | EAX:ef_addr32 | EAX:uint32_t | 98050@980af | Register the block REC (size at +5, address at +9) with the trace layer: touch each of its pages, mark the range (0x1049 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcee88` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:int32_t | none | a0f84@a11a1 | Add the direction (from the sine/cosine tables at 0x141e08/0x142e08, indexed by the negated angles A and B divided by 8) |
+| `0xc94f4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | a5ca4@a5cde,a5ca4@a5d17,a5ca4@a5d54 | Clip the rectangle (X0, Y0)-(X1, Y1) to the screen size 0x15b744 x 0x15b748 (ret 4, Y1 on the stack); a rectangle entire |
+| `0xd2320` | EAX:ef_addr32 | none | d23d8@d243e | Prepare the shape list of OBJ (list at +0x4c: count, then entry pointers): shift each entry's three coordinates (+0x24,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
