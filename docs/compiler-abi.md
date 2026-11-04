@@ -4221,3 +4221,10 @@ in EAX, format string address, one value).
 | `0xe7cec` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32 | none | 69094@691c8,8b2d8@8b2f9,d9e50@d9fad | Build a path from the default directory plus two parts, appending the third part unless it equals the string at 0x190c50 |
 | `0xea17c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | ea270@ea306,ea270@ea37a | Build a path from a record's first name, an extra part and the record's second name. |
 | `0xeb008` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32 | none | 98658@986b1,98658@9884d,98658@988da | Draw a NUL-terminated string glyph by glyph (6 pixels apart, 6-bit codes). |
+
+## game_helpers92 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe67a0` | EAX:ef_addr32,DX:int16_t,BX:int16_t,CX:int16_t | none | e67a0@e67e2,e6800@e680e | Quicksort driver: partition [lo,hi] with e6684, recurse on the left part and loop on the right. |
+| `0x10162c` | EAX:ef_addr32 | AL:uint8_t | 1016e0@101757 | Return 1 when the minimum and maximum of the vertices' z field have the same integer part (high 16 bits). |

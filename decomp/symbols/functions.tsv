@@ -3404,7 +3404,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e6144	700			unknown	unclassified	unverified		
 0x000e65d8	169	swap_records_e65d8	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000e65d8.json	docs/compiler-abi.md; Exchange the fields of two 0x15-byte records.; callers e6684@e66ea,e6684@e6746,e6684@e6782; guest pending
 0x000e6684	281			unknown	unclassified	unverified		
-0x000e67a0	93			unknown	unclassified	unverified		
+0x000e67a0	93	quicksort_range_e67a0	game_helpers92	compiles	game	confirmed	decomp/tests/0x000e67a0.json	docs/compiler-abi.md; Quicksort driver: partition [lo,hi] with e6684, recurse on the left part and loop on the right.; callers e67a0@e67e2,e6800@e680e; guest pending
 0x000e6800	23	call_e67a0	math_string	compiles	game	confirmed	decomp/tests/0x000e6800.json	docs/compiler-abi.md; 0xe67a0(EAX, signed DX, signed BX+DX, signed CX); returns EAX.; callers e6818@e6834; guest pending
 0x000e6818	48	adjust_list_e6818	math_string	compiles	game	confirmed	decomp/tests/0x000e6818.json	docs/compiler-abi.md; For each node of the list at *EAX call 0xe6800 on its * dword +0x2c with (0, word +0x2a minus 1, 1).; callers 49228@493ab,b0f5c@b1034,b0f5c@b1234; guest pending
 0x000e6848	326			unknown	unclassified	unverified		
@@ -3790,7 +3790,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ff81c	686			unknown	unclassified	unverified		
 0x000ffe78	211			unknown	unclassified	unverified		
 0x001014a4	214			unknown	unclassified	unverified		
-0x0010162c	91			unknown	unclassified	unverified		
+0x0010162c	91	vertex_depth_range_flat_10162c	game_helpers92	compiles	game	confirmed	decomp/tests/0x0010162c.json	docs/compiler-abi.md; Return 1 when the minimum and maximum of the vertices' z field have the same integer part (high 16 bits).; callers 1016e0@101757; guest pending
 0x00101688	85			unknown	unclassified	unverified		
 0x001016e0	439			unknown	unclassified	unverified		
 0x00101a90	169			unknown	unclassified	unverified		

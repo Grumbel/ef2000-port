@@ -3760,4 +3760,9 @@ void build_path_from_record_ea17c(ef_addr32 buffer, ef_addr32 record, ef_addr32 
 void draw_glyph_string_eb008(uint32_t ctx, uint32_t x, uint32_t y, ef_addr32 text);
 void guest_fn_eaf80_x(uint32_t ctx, uint32_t x, uint32_t y, uint32_t glyph); /* 0xeaf80 EAX EDX EBX ECX */
 
+/* game_helpers92.c */
+void quicksort_range_e67a0(ef_addr32 object, int16_t lo, int16_t hi, int16_t extra);
+uint8_t vertex_depth_range_flat_10162c(ef_addr32 object);
+uint32_t guest_fn_e6684_x(ef_addr32 obj, int32_t lo, int32_t hi, int32_t extra); /* 0xe6684 EAX EDX EBX ECX -> EAX */
+
 #endif
