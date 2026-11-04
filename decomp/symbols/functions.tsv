@@ -237,7 +237,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00010750	843			unknown	unclassified	unverified		
 0x00010a9c	1163			unknown	unclassified	unverified		
 0x00010f28	71	transform_runtime_word_pair	runtime_small_ops	compiles	game	confirmed	decomp/tests/0x0010f28.json	AX mode 1/2/3 rotates and negates two words; callers 10f70@10fb5/11014@11092; guest pending
-0x00010f70	164			unknown	unclassified	unverified		
+0x00010f70	164	point_in_window_10f70	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00010f70.json	docs/compiler-abi.md; Is the point INDEX (DL) of the 6-byte point list at BASE (EAX; words at +0x18, +0x1a hold y and x) inside the current sc; callers 110ec@112a3,110ec@114ad; guest pending
 0x00011014	216	find_entry_at_cursor_11014	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00011014.json	docs/compiler-abi.md; Find the entry of OBJ's list (count word at +0x2a, pointer at +0x2c, 21-byte entries with the word pair at +7/+9) that m; callers 110ec@1119b; guest pending
 0x000110ec	1140			unknown	unclassified	unverified		
 0x00011560	527			unknown	unclassified	unverified		

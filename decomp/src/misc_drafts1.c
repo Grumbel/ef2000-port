@@ -13822,3 +13822,28 @@ void setup_disk_request_ddd48(void)
     EF_U32(0x004260acu) = sector - 0x96u;
     EF_U16(0x00426122u) = (uint16_t)(end - (start & 0xffffu) + 1u);
 }
+
+/* 0x10f70, 164 bytes. Is the point INDEX (DL) of the 6-byte point list at BASE (EAX; words at +0x18, +0x1a hold y and x) inside the current script window? When byte 0x121ec6 is clear, orient the pair with the mode from the unit of word 0x1f8ec0 (0xa1858, then 0x10f28) and test it strictly inside the rectangle at 0xcd29c (left +0, right +6, top +4, bottom +0xa); otherwise it must equal the cursor words 0x197c24/0x197c26. */
+uint8_t point_in_window_10f70(ef_addr32 base, uint32_t index)
+{
+    uint32_t v[2];
+    ef_addr32 p = base + (index & 0xffu) * 6u;
+    ef_addr32 r;
+    int16_t x, y;
+    v[0] = EF_U16(p + 0x18u);
+    v[1] = EF_U16(p + 0x1au);
+    if (EF_U8(0x00121ec6u) == 0u) {
+        uint32_t mode = record_flag_bits56((int16_t)((int32_t)EF_U32(0x001f8ec0u) >> 16));
+        transform_runtime_word_pair((uint16_t)(int16_t)mode, (ef_addr32)(uintptr_t)&v[1], (ef_addr32)(uintptr_t)&v[0]);
+        r = script_cursor_data_cd29c();
+        x = (int16_t)v[1];
+        y = (int16_t)v[0];
+        if (x > (int16_t)EF_U16(r) && x < (int16_t)EF_U16(r + 6u)
+            && y > (int16_t)EF_U16(r + 4u) && y < (int16_t)EF_U16(r + 0xau))
+            return 1u;
+        return 0u;
+    }
+    if ((int16_t)v[1] == (int16_t)EF_U16(0x00197c24u) && (int16_t)v[0] == (int16_t)EF_U16(0x00197c26u))
+        return 1u;
+    return 0u;
+}
