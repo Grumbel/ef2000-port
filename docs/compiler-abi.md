@@ -9627,3 +9627,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x775f0` | EAX:uint32_t,EDX:uint32_t | none | 72944@72ea7,770d4@77296 | Clears the state of a unit slot and refreshes related UI/network state. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10944c` | none | none | 109440@109440 | Scales the control input doubles into the two control-response sets selected by a mode flag. |

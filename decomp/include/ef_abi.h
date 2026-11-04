@@ -6573,4 +6573,7 @@ void apply_rotated_offset_95bf4(void); /* 0x95bf4 */
 void reset_unit_slot_775f0(uint32_t eax, uint32_t edx);
 void reset_unit_slot_775f0(uint32_t eax, uint32_t edx); /* 0x775f0 */
 
+void update_control_scaling_10944c(void);
+void update_control_scaling_10944c(void); /* 0x10944c */
+
 #endif

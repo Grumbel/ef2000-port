@@ -24097,3 +24097,49 @@ void reset_unit_slot_775f0(uint32_t eax, uint32_t edx)
 		send_word_byte_packet_3d((uint16_t)a, idx);
 	}
 }
+
+/* 0x10944c, 317 bytes. Scales the control input doubles into the two control-response sets selected by a mode flag. */
+void update_control_scaling_10944c(void)
+{
+	double in_a = md_rd_f64(0x4328f0);
+	double in_b = md_rd_f64(0x4328e8);
+	double t;
+	double u;
+
+	if (EF_U8(0x43397f) != 0) {
+		if (0.0 < in_a) {
+			t = md_rd_f64(0x4328c0) * in_a;
+		} else {
+			t = -in_a * md_rd_f64(0x432848);
+		}
+		md_wr_f64(0x432940, t);
+		md_wr_f64(0x432890, md_rd_f64(0x432878) * in_b);
+	} else {
+		if (0.0 < in_a) {
+			t = md_rd_f64(0x432888) * in_a;
+		} else {
+			t = -in_a * md_rd_f64(0x432838);
+		}
+		md_wr_f64(0x432990, t);
+		md_wr_f64(0x432998, md_rd_f64(0x432830) * in_b);
+		EF_U32(0x432970) = EF_U32(0x432990);
+		EF_U32(0x432974) = EF_U32(0x432994);
+		EF_U32(0x432928) = EF_U32(0x432998);
+		EF_U32(0x43292c) = EF_U32(0x43299c);
+	}
+	u = md_rd_f64(0x4328f8) * md_rd_f64(0x432820);
+	md_wr_f64(0x432900, u);
+	md_wr_f64(0x432948, u);
+	if (EF_U8(0x43398a) != 0) {
+		double k;
+		if (md_rd_f64(0x432218) > md_rd_f64(0x195010)) {
+			k = md_rd_f64(0x4323d0) * md_rd_f64(0x195010) / md_rd_f64(0x432218);
+		} else {
+			k = md_rd_f64(0x4323d0);
+		}
+		md_wr_f64(0x432460, -md_rd_f64(0x4328f8) * k);
+	} else {
+		EF_U32(0x432460) = 0;
+		EF_U32(0x432464) = 0;
+	}
+}

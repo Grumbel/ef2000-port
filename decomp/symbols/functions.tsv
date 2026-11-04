@@ -3948,7 +3948,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010934c	138	copy_identifier_10934c	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x0010934c.json	docs/compiler-abi.md; Skip blanks and copy an identifier (class bits 0xe0 or '_') at *cursor into dest, NUL-terminated.; callers e3f00@e3f0e; guest pending
 0x001093d8	95	run_text_script_1093d8	script_helpers1	compiles	game	confirmed	decomp/tests/0x001093d8.json	docs/compiler-abi.md; Run a line-oriented text script: each non-empty line not starting with ';' is passed to the current handler (0x4dd890), ; callers e4010@e40cf; guest pending
 0x00109440	10	run_pair_109440	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00109440.json	docs/compiler-abi.md; Run 0x10944c then 0x118b60.; callers e474c@e4763; guest pending
-0x0010944c	317			unknown	unclassified	unverified		
+0x0010944c	317	update_control_scaling_10944c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010944c.json	docs/compiler-abi.md; Scales the control input doubles into the two control-response sets selected by a mode flag.; callers 109440@109440; guest pending
 0x0010958c	375			unknown	unclassified	unverified		
 0x00109704	483			unknown	unclassified	unverified		
 0x001098f0	340			unknown	unclassified	unverified		
