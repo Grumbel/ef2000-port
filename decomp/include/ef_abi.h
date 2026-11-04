@@ -4458,4 +4458,8 @@ void update_distance_minima_3237c(void);
 void rotate_offset_c8d30(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1);
 void rotate_offset_shift_c8d10(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1);
 
+/* float_helpers9.c */
+double sin_scaled_f8278(double angle);
+double cos_scaled_f8298(double angle);
+
 #endif

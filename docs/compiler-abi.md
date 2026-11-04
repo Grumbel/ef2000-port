@@ -5298,3 +5298,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc8d30` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 69740@69800,7d1f0@7d291,944f4@94557 | (ret 8) Offset a 16.16 vector (eax, edx, ebx) by the table-rotated displacement of length s1: two angles (-ecx and -s0,  |
 | `0xc8d10` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | b69c@b948 | (ret 8) Wrapper for 0xc8d30 that first shifts eax, edx and ebx left by 16. |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf8278` | EAX:double | EAX:double | b59a8@b59fc,b59a8@b5a39 | sin of the argument scaled by the two constants used in 0xf8250 (0x1932a4 and 0x1932ac). |
+| `0xf8298` | EAX:double | EAX:double | b59a8@b59e8,b59a8@b5a48 | cos of the same scaled argument. |

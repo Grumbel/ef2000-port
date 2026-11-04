@@ -3677,8 +3677,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f819c	171			unknown	unclassified	unverified		
 0x000f8248	5	elapsed_centiseconds	unk_time	typed	thunk	confirmed		docs/compiler-abi.md; tail jump 0x1100b1; elapsed centiseconds modulo day
 0x000f8250	19	scale_double_to_st0	unk_fp_runtime	typed	game	confirmed		docs/compiler-abi.md; qword argument at [ESP+4], ST0 float10 return, ret 8; callers 0xf8285/0xf82a5
-0x000f8278	29			unknown	unclassified	unverified		
-0x000f8298	29			unknown	unclassified	unverified		
+0x000f8278	29	sin_scaled_f8278	float_helpers9	compiles	game	confirmed	decomp/tests/0x000f8278.json	docs/compiler-abi.md; sin of the argument scaled by the two constants used in 0xf8250 (0x1932a4 and 0x1932ac).; callers b59a8@b59fc,b59a8@b5a39; guest pending
+0x000f8298	29	cos_scaled_f8298	float_helpers9	compiles	game	confirmed	decomp/tests/0x000f8298.json	docs/compiler-abi.md; cos of the same scaled argument.; callers b59a8@b59e8,b59a8@b5a48; guest pending
 0x000f8314	78	divide_by_scaled_word_f8314	float_helpers7	compiles	game	confirmed	decomp/tests/0x000f8314.json	docs/compiler-abi.md; Divide a value by a word scaled with 0x1932cc, 0.0 when the divisor is zero.; callers b52bc@b5348; guest pending
 0x000f83d0	79	int_distance_2d_f83d0	float_helpers7	compiles	game	confirmed	decomp/tests/0x000f83d0.json	docs/compiler-abi.md; Distance between two integer 2D points, 0.0 when coincident.; callers b04e8@b04fc,b52bc@b5332,b686c@b68c4; guest pending
 0x000f8600	35	forward_word_args_f8600	game_helpers106	compiles	game	confirmed	decomp/tests/0x000f8600.json	docs/compiler-abi.md; Forward four stack arguments to f9448 with the 16-bit register argument sign-extended.; callers b0f5c@b158e; guest pending
