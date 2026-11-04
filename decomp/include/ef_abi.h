@@ -6256,4 +6256,9 @@ double profile_mix_11b3c8(uint32_t a, uint32_t d, double x, double y);
 double profile_sum_11b6bc(uint32_t a, uint32_t d); /* 0x11b6bc */
 double profile_mix_11b3c8(uint32_t a, uint32_t d, double x, double y); /* 0x11b3c8 */
 
+double ratio_inverse_11bb80(uint32_t a, double x, double y);
+double ratio_rotated_11baf8(uint32_t a, uint32_t d, uint32_t b, double p, double q, double r);
+double ratio_inverse_11bb80(uint32_t a, double x, double y); /* 0x11bb80 */
+double ratio_rotated_11baf8(uint32_t a, uint32_t d, uint32_t b, double p, double q, double r); /* 0x11baf8 */
+
 #endif

@@ -4202,8 +4202,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011ba4c	45	ratio_scaled_11ba4c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011ba4c.json	docs/compiler-abi.md; EAX = reference pointer, EDX = object pointer; stack: two doubles (arg, unused), callee cleanup. Result = ratio_formula_; callers 11ba7c@11ba95,11bab4@11badf,11baf8@11bb69; guest pending
 0x0011ba7c	54	ratio_sum_11ba7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011ba7c.json	docs/compiler-abi.md; Sum of the scaled ratio (ref, obj, arg) and the * scaled power formula (ref, obj2). Second stack double is unused.; callers 10a220@10a4ea; guest pending
 0x0011bab4	65	ratio_offset_11bab4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011bab4.json	docs/compiler-abi.md; EAX = reference pointer, EDX = object pointer; stack: two doubles (a, b), callee cleanup. Result = ratio_scaled_11ba4c(r; callers 10a220@10a434; guest pending
-0x0011baf8	135			unknown	unclassified	unverified		
-0x0011bb80	92			unknown	unclassified	unverified		
+0x0011baf8	135	ratio_rotated_11baf8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011baf8.json	docs/compiler-abi.md; EAX = reference A, EDX = object D, EBX = box B; stack: doubles P, Q and R, callee cleanup.; callers 10a220@10a3e5; guest pending
+0x0011bb80	92	ratio_inverse_11bb80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011bb80.json	docs/compiler-abi.md; EAX = A; stack: doubles X and Y, callee cleanup.; callers 10a220@10a240,11c584@11c708; guest pending
 0x0011bbdc	98	falloff_11bbdc	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bbdc.json	docs/compiler-abi.md; (ret 16) Falloff curve: for a0 above the threshold at 0x19593c return (1 - pow(a0, 2.9) * k2) * k3 (constants 0x195944 a; callers 11bc40@11bc66; guest pending
 0x0011bc40	130			unknown	unclassified	unverified		
 0x0011bcc4	252			unknown	unclassified	unverified		

@@ -21057,3 +21057,32 @@ double profile_mix_11b3c8(uint32_t a, uint32_t d, double x, double y)
 
 	return ratio_formula_11b134(a, x, y) * r + q * md_rd_f64(0x19588cu);
 }
+
+/* 0x11bb80, 92 bytes. EAX = A; stack: doubles X and Y, callee cleanup. */
+double ratio_inverse_11bb80(uint32_t a, double x, double y)
+{
+	double g = md_rd_f64(a + 0x18u);
+	double f1 = ratio_formula_11b134(a, x, y) / g;
+	double f2 = ratio_formula_11b134(a, x, y) / g * md_rd_f64(0x19592cu) / f1;
+
+	return 1.0 / (f2 * (g * md_rd_f64(0x195934u)));
+}
+
+/* 0x11baf8, 135 bytes. EAX = reference A, EDX = object D, EBX = box B; stack: doubles P, Q and R, callee cleanup. */
+double ratio_rotated_11baf8(uint32_t a, uint32_t d, uint32_t b, double p, double q, double r)
+{
+	double t = (md_rd_f64(b + 0x20u) - md_rd_f64(b)) * md_rd_f64(d + 0x10u);
+	double u = md_rd_f64(b + 0x38u) - md_rd_f64(b + 0x30u);
+	double w;
+	double x;
+	double y;
+	double s;
+
+	t = t + md_rd_f64(b) * u;
+	w = t - (md_rd_f64(b + 0x18u) - md_rd_f64(b + 0x10u)) * md_rd_f64(b + 0x20u);
+	x = w * (1.0 / (u - md_rd_f64(b + 0x18u) + md_rd_f64(b + 0x10u)));
+	y = md_rd_f64(d + 0x40u) - md_rd_f64(0x433070u);
+	s = sin_b45ac(r);
+	s = y * s + x * cos_b45a2(r);
+	return ratio_scaled_11ba4c(a, d, p, q) * s / md_rd_f64(a + 8u);
+}

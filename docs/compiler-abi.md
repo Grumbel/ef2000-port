@@ -9117,3 +9117,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x11b6bc` | EAX:uint32_t,EDX:uint32_t | EAX:double | 10a220@10a301 |  |
 | `0x11b3c8` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 10a220@10a2b8,11c584@11c6d9 |  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11bb80` | EAX:uint32_t,EDX:double,EBX:double | EAX:double | 10a220@10a240,11c584@11c708 | EAX = A; stack: doubles X and Y, callee cleanup. |
+| `0x11baf8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:double,[ESP+4]:double,[ESP+8]:double | EAX:double | 10a220@10a3e5 | EAX = reference A, EDX = object D, EBX = box B; stack: doubles P, Q and R, callee cleanup. |
