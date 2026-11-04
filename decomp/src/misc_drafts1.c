@@ -3985,3 +3985,32 @@ void update_remote_view_f2ac0(void)
         guest_fn_c3990();
     }
 }
+
+/* 0xe5db4, 207 bytes. Draw the NUL-terminated string STR at (X, Y) in colour COLOR (stored in 0x433eb0) with 6-pixel cells (glyph = character & 0x3f), clipped against the rectangle 0x17cf9c/a0/a4/a8: glyphs fully inside use 0xe5c30 (only when the text also fits vertically), partially visible ones 0xe5cf0. */
+void draw_clipped_text_e5db4(uint32_t color, int32_t x, int32_t y, uint32_t str)
+{
+    int32_t top = EF_S32(0x0017cfa4u);
+    int32_t bottom = EF_S32(0x0017cfa8u);
+    EF_U8(0x00433eb0u) = (uint8_t)color;
+    if (y + 7 < top)
+        return;
+    if (y > bottom)
+        return;
+    if (y < top || y + 7 > bottom) {
+        while (EF_U8(str) != 0u) {
+            if (x + 6 > EF_S32(0x0017cf9cu) && x < EF_S32(0x0017cfa0u))
+                draw_glyph_7x7_e5cf0(x, y, (int32_t)(EF_U8(str) & 0x3fu));
+            x += 6;
+            str++;
+        }
+        return;
+    }
+    while (EF_U8(str) != 0u) {
+        if (x >= EF_S32(0x0017cf9cu) && x + 6 < EF_S32(0x0017cfa0u))
+            draw_glyph_e5c30((uint32_t)x, (uint32_t)y, EF_U8(str) & 0x3fu);
+        else if (x + 6 > EF_S32(0x0017cf9cu) && x < EF_S32(0x0017cfa0u))
+            draw_glyph_7x7_e5cf0(x, y, (int32_t)(EF_U8(str) & 0x3fu));
+        x += 6;
+        str++;
+    }
+}

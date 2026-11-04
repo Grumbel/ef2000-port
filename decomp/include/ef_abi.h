@@ -4810,4 +4810,6 @@ uint32_t write_status_lines_101ba8(void);
 void update_remote_view_f2ac0(void);
 void guest_fn_a7bd4_x(void); /* 0xa7bd4 */
 
+void draw_clipped_text_e5db4(uint32_t color, int32_t x, int32_t y, uint32_t str);
+
 #endif

@@ -5905,3 +5905,9 @@ in EAX, format string address, one value).
 | `0x7fc34` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 7ef14@7f21a,7fcdc@7fd79 | Remaining share of entry INDEX in the table at 0x1f9078: when the record's size (0xd7730) is 1 the value is the record's |
 | `0x101ba8` | none | EAX:uint32_t | 101c54@101db4 | Write the status line to the stream 0x4dd620: with the mode word 0x4dd634 equal to 1 one formatted line from the values  |
 | `0xf2ac0` | none | none | f3f84@f4034 | Frame update of the remote view when either activity flag (0x41f7c6, 0x41f7ba) and the enable flag 0x41f7a0 are set: fet |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe5db4` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:uint32_t | none | 48bb0@48c11 | Draw the NUL-terminated string STR at (X, Y) in colour COLOR (stored in 0x433eb0) with 6-pixel cells (glyph = character  |
