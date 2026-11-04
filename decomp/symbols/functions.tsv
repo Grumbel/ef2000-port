@@ -1363,7 +1363,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00074448	53	map_code_74448	code_maps1	compiles	game	confirmed	decomp/tests/0x00074448.json	docs/compiler-abi.md; Map a code to a constant via a jump table (codes outside the range give 1).; callers 74718@74878; guest pending
 0x00074480	259	credit_hit_74480	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00074480.json	docs/compiler-abi.md; Credit a hit by the unit A on the unit named by the word 0x197c28 (ignored when either is 0xff/-1, missing, or flagged 4; callers 74970@74ad6,74970@74bc2; guest pending
 0x00074584	404			unknown	unclassified	unverified		
-0x00074718	382			unknown	unclassified	unverified		
+0x00074718	382	destroy_unit_74718	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00074718.json	docs/compiler-abi.md; Destroy the unit ID (AX). Units that use the secondary grid (0x7574c) are removed with the effect 0x5f/2 (0x106b0 with t; callers 5674c@5681e,74970@74c0c; guest pending
 0x0007489c	93	lookup_filtered_indexed_object	object_lookup	compiles	game	confirmed	decomp/tests/0x0007489c.json	Noncontiguous 88+5-byte body with shared epilogue 0x6a1ac; C draft, cannot use 93 as in-place contiguous size; Watcom/diff pending
 0x000748f4	107	send_or_defer_748f4	game_helpers32	compiles	game	confirmed	decomp/tests/0x000748f4.json	docs/compiler-abi.md; Send unit parameters when a remote unit is selected, otherwise defer to 0x74970.; callers 777f4@77901,777f4@7792f,8cd78@8cee9; guest pending
 0x00074970	1063			unknown	unclassified	unverified		

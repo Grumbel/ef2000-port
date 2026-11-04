@@ -14230,3 +14230,42 @@ void build_unit_from_record_55928(ef_addr32 r, uint32_t type)
     }
     guest_fn_89e08(u);
 }
+
+/* 0x74718, 382 bytes. Destroy the unit ID (AX). Units that use the secondary grid (0x7574c) are removed with the effect 0x5f/2 (0x106b0 with the position >> 8, then 0x10750; in play mode also announced with packet 0x56974); other units first unlink from their leader (the unit of dword +0x144 >> 16 loses its +0x158 back reference when it points at ID) and, unless bit 0x10 of +0x24 is already set, explode: 0x106b0, bit 0x10 set, 0x10750(ID, 1, 0x64) and the matching packet. Units owned by us (word +0x18 equal 0xff or byte 0x1a666b) that are not yet flagged (bit 2 of +0x24) and not on the secondary grid get the wreck timer +0x22 = 0x96 and the wreck model byte +0x187 from the map 0x74448 of byte +0xe9. Bit 2 is set in every case. */
+void destroy_unit_74718(uint32_t id)
+{
+    int32_t uid = (int16_t)id;
+    ef_addr32 u = guest_fn_7489c(uid);
+    if (u == 0u)
+        return;
+    if (object_uses_secondary_grid((int16_t)uid) != 0u) {
+        guest_fn_106b0_x(0xffffffffu, (uint32_t)((int32_t)EF_U32(u) >> 8), (uint32_t)((int32_t)EF_U32(u + 4u) >> 8), (uint32_t)((int32_t)EF_U32(u + 8u) >> 8), 0u);
+        guest_fn_10750_x(uid, 2, 0x5f);
+        if (EF_U8(0x00127da9u) != 0u)
+            send_packet_2b((int16_t)uid, 2, 0x5f);
+    } else {
+        if (EF_U16(u + 0x146u) != 0xffu) {
+            ef_addr32 p = guest_fn_7489c((int32_t)EF_U32(u + 0x144u) >> 16);
+            if (p != 0u && EF_U16(p + 0x158u) == (uint16_t)uid) {
+                EF_U32(p + 0x15au) = 0u;
+                EF_U32(p + 0x15eu) = 0u;
+                EF_U16(p + 0x158u) = 0xffu;
+            }
+        }
+        if ((EF_U8(u + 0x24u) & 0x10u) == 0u) {
+            guest_fn_106b0_x(0xffffffffu, (uint32_t)((int32_t)EF_U32(u) >> 8), (uint32_t)((int32_t)EF_U32(u + 4u) >> 8), (uint32_t)((int32_t)EF_U32(u + 8u) >> 8), 0u);
+            EF_U8(u + 0x24u) = (uint8_t)(EF_U8(u + 0x24u) | 0x10u);
+            guest_fn_10750_x(uid, 1, 0x64);
+            if (EF_U8(0x00127da9u) != 0u)
+                send_packet_2b((int16_t)uid, 1, 0x64);
+        }
+    }
+    if (((int32_t)EF_U32(u + 0x16u) >> 16) == 0xff || (uint16_t)EF_U8(0x001a666bu) == EF_U16(u + 0x18u)) {
+        if ((EF_U8(u + 0x24u) & 0x2u) == 0u && object_uses_secondary_grid((int16_t)uid) == 0u) {
+            uint32_t m = map_code_74448(EF_U8(u + 0xe9u));
+            EF_U16(u + 0x22u) = 0x96u;
+            EF_U8(u + 0x187u) = (uint8_t)m;
+        }
+    }
+    EF_U8(u + 0x24u) = (uint8_t)(EF_U8(u + 0x24u) | 0x2u);
+}

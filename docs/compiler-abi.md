@@ -7990,3 +7990,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x55928` | EAX:ef_addr32,EDX:uint32_t | none | 581b0@5834a | Build (or refresh) the unit described by the mission record R (EAX) of type TYPE (DL): look for an existing unit with th |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x74718` | EAX:uint32_t | none | 5674c@5681e,74970@74c0c | Destroy the unit ID (AX). Units that use the secondary grid (0x7574c) are removed with the effect 0x5f/2 (0x106b0 with t |
