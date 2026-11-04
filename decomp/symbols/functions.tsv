@@ -370,7 +370,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00024480	409	test_indexed_spatial_overlap	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index, EDX triple-double pointer, qword threshold on stack, AL result, ret 8; caller sites 0x248b9/0x6b1aa
 0x0002461c	381	update_indexed_projection_globals	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index and EDX triple-double pointer, x87 global outputs; caller sites 0x24557/0x24982
 0x0002479c	1187			unknown	unclassified	unverified		
-0x00024c40	533			unknown	unclassified	unverified		
+0x00024c40	533	focus_camera_on_unit_24c40	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00024c40.json	docs/compiler-abi.md; Point the chase camera at unit AX (signed 16-bit id; 0x6a1b4; nothing but the height clamp when missing). The target hei; callers 2631c@263c5,6f15c@6f1b2; guest pending
 0x00024e58	175	select_view_object_24e58	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00024e58.json	docs/compiler-abi.md; Point the view at object ID (AX, word; nothing for an unknown object): select it for the current target (0x2479c with th; callers 257d0@258ea,25c98@25e33,25c98@2607c; guest pending
 0x00024f08	634			unknown	unclassified	unverified		
 0x00024f24	79			unknown	unclassified	unverified		

@@ -5963,4 +5963,6 @@ void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb);
 
 void update_chase_camera_6e3e0(double d1, double d2);
 
+void focus_camera_on_unit_24c40(uint32_t ax);
+
 #endif

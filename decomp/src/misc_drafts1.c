@@ -18367,3 +18367,65 @@ void update_chase_camera_6e3e0(double d1, double d2)
 	guest_fn_6ebe0_x(0u, 0x40080000u, 0xcccccccdu, 0x3ff4ccccu, lo4, hi4,
 	    EF_U32(0x001f7060u), EF_U32(0x001f7064u), EF_U32(0x001f70a0u), EF_U32(0x001f70a4u));
 }
+
+/* 0x24c40, 533 bytes. Point the chase camera at unit AX (signed 16-bit id; 0x6a1b4; nothing but the height clamp when missing). The target height 0x1f7088 is limited to [0x1284d4] - 200.0. The unit is registered with 0x2479c (word 0x1f71c8, id, 0), the heading 0x1f70f8 is the wrapped bearing (0xb42f0 of atan2) from the player unit (dword 0x1f71bc) to it, and the height is the unit's double +0x59 (clamped again). If the player's class row (dword +0x26) lists another current unit (word +0x50 differing from word 0x1f71c8) that is alive (byte +0x24 flags 2 and 4 clear) the height comes from that unit and the distance 0x1f7100 from its double +0x91, raised to at least [0x1f7010]. The shake value 0x1f7050 = [0x1f7058] * 3.0 + [0x1f6ff8] + 1.0 (3.0 when negative) is set and the camera starts via 0x6ebe0 (2.5, 1.3, 0.0 x4, double 0x1f70a0 as ten stack dwords). */
+void focus_camera_on_unit_24c40(uint32_t ax)
+{
+	int32_t id = (int32_t)(int16_t)ax;
+	uint32_t u = guest_fn_6a1b4(id);
+	uint32_t player, row, v;
+	double lim, h, base, c, dx, dy;
+
+	memcpy(&base, ef_guest_memory_ptr(0x001284d4u), 8);
+	lim = base + -200.0;
+	memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
+	if (h > lim)
+		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
+	if (u == 0u)
+		return;
+	guest_fn_2479c_x((int32_t)EF_U32(0x001f71c6u) >> 16, id, 0u);
+	player = EF_U32(0x001f71bcu);
+	memcpy(&dx, ef_guest_memory_ptr(u + 0x49u), 8);
+	memcpy(&c, ef_guest_memory_ptr(player + 0x49u), 8);
+	dx = dx - c;
+	memcpy(&dy, ef_guest_memory_ptr(u + 0x51u), 8);
+	memcpy(&c, ef_guest_memory_ptr(player + 0x51u), 8);
+	dy = dy - c;
+	h = wrap_angle_b42f0(atan2_b4620(dy, dx));
+	memcpy(ef_guest_memory_ptr(0x001f70f8u), &h, 8);
+	EF_U32(0x001f7088u) = EF_U32(u + 0x59u);
+	EF_U32(0x001f708cu) = EF_U32(u + 0x5du);
+	memcpy(&base, ef_guest_memory_ptr(0x001284d4u), 8);
+	lim = base + -200.0;
+	memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
+	if (h > lim)
+		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
+	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+	if ((int32_t)EF_U16(row + 0x50u) != ((int32_t)EF_U32(0x001f71c6u) >> 16)) {
+		v = guest_fn_7489c((int32_t)EF_U32(row + 0x4eu) >> 16);
+		if (v != 0u && (EF_U8(v + 0x24u) & 2u) == 0u && (EF_U8(v + 0x24u) & 4u) == 0u) {
+			EF_U32(0x001f7088u) = EF_U32(v + 0x59u);
+			EF_U32(0x001f708cu) = EF_U32(v + 0x5du);
+			memcpy(&base, ef_guest_memory_ptr(0x001284d4u), 8);
+			lim = base + -200.0;
+			memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
+			if (h > lim)
+				memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
+			EF_U32(0x001f7100u) = EF_U32(v + 0x91u);
+			EF_U32(0x001f7104u) = EF_U32(v + 0x95u);
+			memcpy(&h, ef_guest_memory_ptr(0x001f7100u), 8);
+			memcpy(&c, ef_guest_memory_ptr(0x001f7010u), 8);
+			if (h < c)
+				memcpy(ef_guest_memory_ptr(0x001f7100u), &c, 8);
+		}
+	}
+	memcpy(&h, ef_guest_memory_ptr(0x001f7058u), 8);
+	memcpy(&c, ef_guest_memory_ptr(0x001f6ff8u), 8);
+	h = h * 3.0 + c + 1.0;
+	memcpy(ef_guest_memory_ptr(0x001f7050u), &h, 8);
+	if (0.0 > h) {
+		EF_U32(0x001f7050u) = 0u;
+		EF_U32(0x001f7054u) = 0x40080000u;
+	}
+	guest_fn_6ebe0_x(0u, 0x40040000u, 0xcccccccdu, 0x3ff4ccccu, 0u, 0u, 0u, 0u, EF_U32(0x001f70a0u), EF_U32(0x001f70a4u));
+}
