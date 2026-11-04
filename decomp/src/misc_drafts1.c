@@ -17163,3 +17163,33 @@ void scan_ui_record_files_8b7e8(void)
 		}
 	} while ((guest_callptr4_ret_x(EF_U32(0x0020f428u), 0u, pathp, 0x0018a860u, namep) & 0xffffu) != 0u);
 }
+
+/* 0x5d080, 321 bytes. Draw a marker for the map point PTR (EAX; signed words x at +0, y at +2): the bearing from the map centre (words 0x1a6cfc / 0x1a6cfa) to the point is converted with 0xb3b1c, the sine/cosine tables (word tables 0x141e08 / 0x142e08, index angle/8) rotate the scaled radius (word 0x1a6cf4 << shift byte 0x12b369) around the centre, and six lines (0xc8ccc, colour byte 0x128148) form a diamond-like cross of half size 5 << shift around the resulting point (X, Y). */
+void draw_bearing_marker_5d080(ef_addr32 ptr)
+{
+	uint32_t sh = EF_U8(0x0012b369u);
+	int32_t r = (int32_t)(int16_t)(5u << sh);
+	int32_t da = (int32_t)(int16_t)EF_U16(ptr) - (int32_t)(int16_t)EF_U16(0x001a6cfcu);
+	int32_t db = (int32_t)(int16_t)EF_U16(ptr + 2u) - (int32_t)(int16_t)EF_U16(0x001a6cfau);
+	uint32_t idx = guest_fn_b3b1c((uint32_t)da, (uint32_t)db) & 0xffffu;
+	int32_t sn, cs, a2, X, Y, XP, YP, XM, YM;
+	uint32_t col;
+
+	idx >>= 3;
+	sn = (int32_t)(int16_t)EF_U16(0x00141e08u + idx * 2u);
+	cs = (int32_t)(int16_t)EF_U16(0x00142e08u + idx * 2u);
+	a2 = (int32_t)((uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf4u) << sh);
+	X = (int32_t)(int16_t)(((sn * a2) >> 16) + (int32_t)(int16_t)EF_U16(0x001a6cfcu));
+	Y = (int32_t)(int16_t)(((a2 * cs) >> 16) + (int32_t)(int16_t)EF_U16(0x001a6cfau));
+	XP = X + r;
+	YP = Y + r;
+	XM = X - r;
+	YM = Y - r;
+	col = EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)YM, (uint32_t)XM, (uint32_t)YP, (uint32_t)XP, col);
+	guest_fn_c8ccc_x((uint32_t)YP, (uint32_t)XM, (uint32_t)YM, (uint32_t)XP, col);
+	guest_fn_c8ccc_x((uint32_t)Y, (uint32_t)XP, (uint32_t)YM, (uint32_t)X, col);
+	guest_fn_c8ccc_x((uint32_t)YP, (uint32_t)X, (uint32_t)Y, (uint32_t)XP, col);
+	guest_fn_c8ccc_x((uint32_t)Y, (uint32_t)XM, (uint32_t)YP, (uint32_t)X, col);
+	guest_fn_c8ccc_x((uint32_t)YM, (uint32_t)X, (uint32_t)Y, (uint32_t)XM, col);
+}

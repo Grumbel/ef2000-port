@@ -5899,4 +5899,6 @@ void draw_cell_grid_42568(void);
 
 void scan_ui_record_files_8b7e8(void);
 
+void draw_bearing_marker_5d080(ef_addr32 ptr);
+
 #endif
