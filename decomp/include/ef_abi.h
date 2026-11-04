@@ -5848,4 +5848,6 @@ void guest_fn_aa3dc_x(void); /* 0xaa3dc */
 void guest_fn_aa4d4_x(void); /* 0xaa4d4 */
 void guest_fn_aa350_x(void); /* 0xaa350 */
 
+void load_page_palette_f2660(ef_addr32 name);
+
 #endif

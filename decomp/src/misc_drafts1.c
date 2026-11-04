@@ -16285,3 +16285,35 @@ uint32_t load_named_state_aad7c(ef_addr32 name)
 	EF_U8(0x00419160u) = EF_U8(0x0018d544u);
 	return 1u;
 }
+
+/* 0xf2660, 264 bytes. Load the palette pair for the page named EAX. Builds the file name (default path 0x9c980 plus the separator 0x1918c4 when the path is not empty plus the name), and if the file exists (hook 0x132ab4) reads it into 0x464060 with the load hook 0x132ab8, otherwise 0x464063..0x464065 are set to 0xff; bytes 0x464060..0x464062 are cleared in any case. Then the name is split (0xe7fc0) and rebuilt (0xe80d0) with the extension 0x1918d8 after the second default path (separator 0x1918d0), and when that file exists it is loaded into 0x433f34 and dword 0x433f30 is set to 1. */
+void load_page_palette_f2660(ef_addr32 name)
+{
+	uint8_t b[0x12c];
+	ef_addr32 base = (ef_addr32)(uintptr_t)b;
+
+	build_default_path_9c980(base);
+	if (b[0] != 0u)
+		strcat_9ca57(base, 0x001918c4u);
+	strcat_9ca57(base, name);
+	if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), base) != 0u) {
+		guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), base, 0x00464060u);
+	} else {
+		EF_U8(0x00464063u) = 0xffu;
+		EF_U8(0x00464064u) = 0xffu;
+		EF_U8(0x00464065u) = 0xffu;
+	}
+	EF_U8(0x00464060u) = 0u;
+	EF_U8(0x00464061u) = 0u;
+	EF_U8(0x00464062u) = 0u;
+	build_default_path_9c980(base);
+	if (b[0] != 0u)
+		strcat_9ca57(base, 0x001918d0u);
+	strcat_9ca57(base, name);
+	split_path_e7fc0(base, base + 0x128u, base + 0x90u, base + 0x114u, base + 0x120u);
+	make_path_e80d0(base, base + 0x128u, base + 0x90u, base + 0x114u, 0x001918d8u);
+	if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), base) != 0u) {
+		guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), base, 0x00433f34u);
+		EF_U32(0x00433f30u) = 1u;
+	}
+}

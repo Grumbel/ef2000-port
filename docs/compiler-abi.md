@@ -8284,3 +8284,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xaad7c` | EAX:ef_addr32 | EAX:uint32_t | aaee8@aafbb | Load the named saved state EAX: the name is cut at its first '.' (in place), formatted with 0x18d7e8 into a lookup buffe |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf2660` | EAX:ef_addr32 | none | a8958@a896e,a9aa8@a9b35 | Load the palette pair for the page named EAX. Builds the file name (default path 0x9c980 plus the separator 0x1918c4 whe |

@@ -3608,7 +3608,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f23ac	49	draw_text_f23ac	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f23ac.json	docs/compiler-abi.md; For each byte of the string at ECX call 0xf2320(x, y, byte & 0x3f), x += 8.; callers a8578@a85b5,a9130@a938a,a9130@a93bd; guest pending
 0x000f25b0	107	draw_glyph_f25b0	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000f25b0.json	docs/compiler-abi.md; Draw a 3-column by 6-row glyph into the frame buffer.; callers f261c@f2644; guest pending
 0x000f261c	61	draw_text_f261c	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f261c.json	docs/compiler-abi.md; Draw a string with 4-pixel glyph spacing.; callers a8578@a85c9; guest pending
-0x000f2660	264			unknown	unclassified	unverified		
+0x000f2660	264	load_page_palette_f2660	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2660.json	docs/compiler-abi.md; Load the palette pair for the page named EAX. Builds the file name (default path 0x9c980 plus the separator 0x1918c4 whe; callers a8958@a896e,a9aa8@a9b35; guest pending
 0x000f2800	25	result_f2800	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2800.json	docs/compiler-abi.md; 0xf2819(), then return byte 0x161156.; callers a8bd4@a8bf5; guest pending
 0x000f2819	185			unknown	unclassified	unverified		
 0x000f2960	138	draw_glyph_6x6_f2960	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2960.json	docs/compiler-abi.md; Draw a 6x6 glyph (index ecx, 6 mask bytes at 0x16116c) in colour al at (x = edx, y row = ebx).; callers f29ec@f2a10; guest pending
