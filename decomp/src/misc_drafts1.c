@@ -17877,3 +17877,48 @@ double unit_bearing_6a3e4(uint32_t a, uint32_t b)
 	r = guest_fn_a4470(square_double_b3fd0(o[2]) + v);
 	return atan2_b4620(r, o[0]);
 }
+
+/* 0xe6c54, 289 bytes. Update the atmosphere model from the altitude-like double P at 0x432270. 0x432da0 = (20.0 - P) / (20.0 + P) * [0x432da8]; above P = 10.0 it gets the correction (P - 10.0)^2 * 0.088 * 0.01 added and is raised to 0.088 when below that value. The dword pair 0x432dd8 is set to 288.15, 0x432dc0 = 288.15 - [0x432dc8] * [0x432dd0] (or [0x432dc8] * [0x432330] + 288.15 when -[0x432330] < [0x432dd0]). The derived values are 0x432d98 = sqrt([0x432dc0] * 401.8) (0xa4470), 0x432db0 = [0x432da0] * 0.287 * [0x432dc0] and 0x432db8 = [0x432dc0] * (0.287 * [0x432da8]). */
+void update_atmosphere_e6c54(void)
+{
+	double p, m, q, w, r, s, z, v, f, t;
+
+	memcpy(&p, ef_guest_memory_ptr(0x00432270u), 8);
+	memcpy(&m, ef_guest_memory_ptr(0x00432da8u), 8);
+	q = (20.0 - p) / (20.0 + p);
+	q = q * m;
+	memcpy(ef_guest_memory_ptr(0x00432da0u), &q, 8);
+	if (p > 10.0) {
+		memcpy(&p, ef_guest_memory_ptr(0x00432270u), 8);
+		t = p + -10.0;
+		w = t * (t * 0.088) * 0.01;
+		memcpy(&q, ef_guest_memory_ptr(0x00432da0u), 8);
+		w = w + q;
+		memcpy(ef_guest_memory_ptr(0x00432da0u), &w, 8);
+		if (w < 0.088) {
+			w = 0.088;
+			memcpy(ef_guest_memory_ptr(0x00432da0u), &w, 8);
+		}
+	}
+	memcpy(&r, ef_guest_memory_ptr(0x00432dd0u), 8);
+	memcpy(&s, ef_guest_memory_ptr(0x00432dc8u), 8);
+	t = 288.15;
+	memcpy(ef_guest_memory_ptr(0x00432dd8u), &t, 8);
+	v = 288.15 - s * r;
+	memcpy(ef_guest_memory_ptr(0x00432dc0u), &v, 8);
+	memcpy(&z, ef_guest_memory_ptr(0x00432330u), 8);
+	if (!(-z >= r)) {
+		memcpy(&s, ef_guest_memory_ptr(0x00432dc8u), 8);
+		v = s * z + 288.15;
+		memcpy(ef_guest_memory_ptr(0x00432dc0u), &v, 8);
+	}
+	memcpy(&v, ef_guest_memory_ptr(0x00432dc0u), 8);
+	f = guest_fn_a4470(v * 401.8);
+	memcpy(ef_guest_memory_ptr(0x00432d98u), &f, 8);
+	memcpy(&q, ef_guest_memory_ptr(0x00432da0u), 8);
+	w = q * 0.287 * v;
+	memcpy(ef_guest_memory_ptr(0x00432db0u), &w, 8);
+	memcpy(&m, ef_guest_memory_ptr(0x00432da8u), 8);
+	w = v * (0.287 * m);
+	memcpy(ef_guest_memory_ptr(0x00432db8u), &w, 8);
+}

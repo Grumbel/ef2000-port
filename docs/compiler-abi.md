@@ -8505,3 +8505,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6a3e4` | EAX:uint32_t,EDX:uint32_t | EAX:double | 28ed8@28fd3 | Bearing of unit B (EDX, signed id) as seen from unit A (EAX, signed id), returned in ST0; 0.0 when either unit is missin |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe6c54` | none | none | e6990@e6b7c | Update the atmosphere model from the altitude-like double P at 0x432270. 0x432da0 = (20.0 - P) / (20.0 + P) * [0x432da8] |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
