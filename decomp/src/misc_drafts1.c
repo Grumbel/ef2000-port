@@ -13782,3 +13782,43 @@ uint8_t parse_script_text_e93dc(ef_addr32 text, uint32_t flag)
     EF_U32(0x00464384u) = cur;
     return ok;
 }
+
+/* 0xddd48, 288 bytes. Build the real-mode call block for a disk request: the request record at 0x4260a0 gets command byte 0x0a and the control record at 0x426098 command 0x1a, drive byte 0x15ee98, 3, offset word +0xe = low 4 bits of the real-mode address of the first record (0x604), segment word +0x10 and +0x12 = 7; the real-mode registers at 0x4260b4 take the segment/offset of the control record (0x4260d6/0x4260c4), 0x1510 in 0x4260d0, word 0x42611e >> 16 in 0x4260cc and 0 in 0x4260c8 before the interrupt shim 0x8b8(0x2f). The request's sector is then computed as 4500 * (+3 dword >> 16) + 75 * byte +4 + byte +3 (stored in 0x4260ac minus 0x96 at the end), the start/end words 0x42611c/0x42611a come from bytes +1/+2 and the count word 0x426122 is end - start + 1. */
+void setup_disk_request_ddd48(void)
+{
+    ef_addr32 req = EF_U32(0x004260a0u);
+    ef_addr32 ctl;
+    uint32_t r = guest_fn_604_x(req);
+    uint32_t r2;
+    int32_t hi;
+    uint32_t sector;
+    uint32_t start, end;
+    EF_U8(req) = 0x0au;
+    ctl = EF_U32(0x00426098u);
+    EF_U8(ctl) = 0x1au;
+    EF_U8(ctl + 1u) = EF_U8(0x0015ee98u);
+    EF_U8(ctl + 2u) = 3u;
+    EF_U16(ctl + 0x12u) = 7u;
+    EF_U16(ctl + 0xeu) = (uint16_t)(r & 0xfu);
+    EF_U16(ctl + 0x10u) = (uint16_t)((int32_t)r >> 16);
+    r2 = guest_fn_604_x(ctl);
+    EF_U16(0x004260d6u) = (uint16_t)((int32_t)r2 >> 16);
+    EF_U32(0x004260c4u) = r2 & 0xffffu;
+    EF_U32(0x004260d0u) = 0x1510u;
+    EF_U32(0x004260ccu) = (uint32_t)((int32_t)EF_U32(0x0042611eu) >> 16);
+    EF_U32(0x004260c8u) = 0u;
+    guest_fn_8b8(0x2fu, 0x004260b4u);
+    req = EF_U32(0x004260a0u);
+    hi = (int32_t)EF_U32(req + 3u) >> 16;
+    sector = (uint32_t)hi * 4500u;
+    sector = sector + (uint32_t)EF_U8(req + 4u) * 75u;
+    EF_U32(0x004260acu) = sector;
+    sector = sector + EF_U8(req + 3u);
+    start = EF_U8(req + 1u);
+    EF_U16(0x0042611cu) = (uint16_t)start;
+    EF_U32(0x004260acu) = sector;
+    end = EF_U8(req + 2u);
+    EF_U16(0x0042611au) = (uint16_t)end;
+    EF_U32(0x004260acu) = sector - 0x96u;
+    EF_U16(0x00426122u) = (uint16_t)(end - (start & 0xffffu) + 1u);
+}

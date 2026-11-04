@@ -7913,3 +7913,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe93dc` | EAX:ef_addr32,EDX:uint32_t | AL:uint8_t | 80058@800cb,81230@812a4,82cec@82d39 | Run the text parser over the script TEXT (EAX, stored at 0x464380; DL goes to byte 0x1600a6): the cursor 0x464384 starts |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xddd48` | none | none | ddce8@ddced | Build the real-mode call block for a disk request: the request record at 0x4260a0 gets command byte 0x0a and the control |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

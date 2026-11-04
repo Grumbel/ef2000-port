@@ -3261,7 +3261,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ddbe0	168	init_mouse_ddbe0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ddbe0.json	docs/compiler-abi.md; One-time mouse/cursor setup: on the first call allocate the cursor buffers (7, 0x1a, 7 and 0x800 bytes) into 0x4260b0..0; callers 982a0@982b0; guest pending
 0x000ddc88	96	query_mouse_ddc88	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ddc88.json	docs/compiler-abi.md; ; callers ddbe0@ddc69; guest pending
 0x000ddce8	115			unknown	unclassified	unverified		
-0x000ddd48	288			unknown	unclassified	unverified		
+0x000ddd48	288	setup_disk_request_ddd48	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ddd48.json	docs/compiler-abi.md; Build the real-mode call block for a disk request: the request record at 0x4260a0 gets command byte 0x0a and the control; callers ddce8@ddced; guest pending
 0x000dde80	231	dos_date_request_dde80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dde80.json	docs/compiler-abi.md; Issue the DOS call 0x2f for the date/time request with the low byte of VALUE: fills the request block 0x4260b0 (bytes 0x; callers ddce8@ddd13; guest pending
 0x000de12c	141	mouse_request_de12c	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de12c.json	docs/compiler-abi.md; ; callers ddce8@ddce8; guest pending
 0x000de2d8	153	mouse_request_de2d8	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de2d8.json	docs/compiler-abi.md; ; callers a9cd0@a9ce4; guest pending
