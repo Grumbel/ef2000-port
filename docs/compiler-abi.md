@@ -4716,3 +4716,23 @@ in EAX, format string address, one value).
 | `0xba9c4` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key. |
 | `0xbaa4c` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key (identical copy). |
 | `0xbaad4` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key (identical copy). |
+
+## colour_tables2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xba2c0` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xba460` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xba580` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xba6a0` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xba804` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xba8dc` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbab5c` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbabd0` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbac90` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbad70` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbae78` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbaf48` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbafe4` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbb0ac` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+| `0xbb1ac` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |

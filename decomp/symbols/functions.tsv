@@ -2594,31 +2594,31 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b9e9c	164			unknown	unclassified	unverified		
 0x000ba0e4	43			unknown	unclassified	unverified		
 0x000ba13c	359			unknown	unclassified	unverified		
-0x000ba2c0	249			unknown	unclassified	unverified		
+0x000ba2c0	249	fill_colour_record_ba2c0	colour_tables2	compiles	game	confirmed	decomp/tests/0x000ba2c0.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000ba3bc	40	fill_ten_bytes_04	list_lookup	compiles	game	confirmed	decomp/tests/0x000ba3bc.json	docs/compiler-abi.md; Fill bytes 0..9 with 4.; callers bb324@bb47d; guest pending
 0x000ba3e4	40	fill_ten_bytes_0d	list_lookup	compiles	game	confirmed	decomp/tests/0x000ba3e4.json	docs/compiler-abi.md; Fill bytes 0..9 with 0x0d.; callers bb324@bb47d; guest pending
 0x000ba40c	56	fill_level_table_ba40c	list_helpers	compiles	game	confirmed	decomp/tests/0x000ba40c.json	docs/compiler-abi.md; Fill an 8-byte table depending on mode (3 selects the flat variant).; callers bb324@bb47d; guest pending
-0x000ba460	257			unknown	unclassified	unverified		
-0x000ba580	257			unknown	unclassified	unverified		
-0x000ba6a0	189			unknown	unclassified	unverified		
+0x000ba460	257	fill_colour_record_ba460	colour_tables2	compiles	game	confirmed	decomp/tests/0x000ba460.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000ba580	257	fill_colour_record_ba580	colour_tables2	compiles	game	confirmed	decomp/tests/0x000ba580.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000ba6a0	189	fill_colour_record_ba6a0	colour_tables2	compiles	game	confirmed	decomp/tests/0x000ba6a0.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000ba77c	105			unknown	unclassified	unverified		
-0x000ba804	185			unknown	unclassified	unverified		
-0x000ba8dc	201			unknown	unclassified	unverified		
+0x000ba804	185	fill_colour_record_ba804	colour_tables2	compiles	game	confirmed	decomp/tests/0x000ba804.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000ba8dc	201	fill_colour_record_ba8dc	colour_tables2	compiles	game	confirmed	decomp/tests/0x000ba8dc.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000ba9c4	107	fill_colour_record_ba9c4	colour_tables	compiles	game	confirmed	decomp/tests/0x000ba9c4.json	docs/compiler-abi.md; Fill a colour record for a key.; callers bb324@bb47d; guest pending
 0x000baa4c	107	fill_colour_record_baa4c	colour_tables	compiles	game	confirmed	decomp/tests/0x000baa4c.json	docs/compiler-abi.md; Fill a colour record for a key (identical copy).; callers bb324@bb47d; guest pending
 0x000baad4	107	fill_colour_record_baad4	colour_tables	compiles	game	confirmed	decomp/tests/0x000baad4.json	docs/compiler-abi.md; Fill a colour record for a key (identical copy).; callers bb324@bb47d; guest pending
-0x000bab5c	85			unknown	unclassified	unverified		
-0x000babd0	162			unknown	unclassified	unverified		
-0x000bac90	193			unknown	unclassified	unverified		
-0x000bad70	193			unknown	unclassified	unverified		
+0x000bab5c	85	fill_colour_record_bab5c	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bab5c.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000babd0	162	fill_colour_record_babd0	colour_tables2	compiles	game	confirmed	decomp/tests/0x000babd0.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000bac90	193	fill_colour_record_bac90	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bac90.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000bad70	193	fill_colour_record_bad70	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bad70.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000bae34	23	fill_pair_by_flag	list_lookup	compiles	game	confirmed	decomp/tests/0x000bae34.json	docs/compiler-abi.md; Bytes 0 and 1 = 0x12 when DL is 1, else 0x11.; callers bb324@bb47d; guest pending
 0x000bae4c	16	fill_four_bytes_2233	list_lookup	compiles	game	confirmed	decomp/tests/0x000bae4c.json	docs/compiler-abi.md; Bytes 0..3 = 2, 2, 3, 3.; callers bb324@bb47d; guest pending
-0x000bae78	169			unknown	unclassified	unverified		
+0x000bae78	169	fill_colour_record_bae78	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bae78.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000baf24	8	clear_pair_baf24	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000baf24.json	docs/compiler-abi.md; ; callers bb324@bb47d; guest pending
-0x000baf48	125			unknown	unclassified	unverified		
-0x000bafe4	169			unknown	unclassified	unverified		
-0x000bb0ac	225			unknown	unclassified	unverified		
-0x000bb1ac	225			unknown	unclassified	unverified		
+0x000baf48	125	fill_colour_record_baf48	colour_tables2	compiles	game	confirmed	decomp/tests/0x000baf48.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000bafe4	169	fill_colour_record_bafe4	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bafe4.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000bb0ac	225	fill_colour_record_bb0ac	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bb0ac.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
+0x000bb1ac	225	fill_colour_record_bb1ac	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bb1ac.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000bb324	353			unknown	unclassified	unverified		
 0x000bb7c0	693			unknown	unclassified	unverified		
 0x000bbae4	26	map_code_9_10_bbae4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbae4.json	docs/compiler-abi.md; Map a code 0..26 to 9 or 10 (0 when out of range).; callers bbdc4@bbdf3; guest pending

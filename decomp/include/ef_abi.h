@@ -4122,4 +4122,21 @@ void fill_colour_record_ba9c4(ef_addr32 rec, uint8_t key);
 void fill_colour_record_baa4c(ef_addr32 rec, uint8_t key);
 void fill_colour_record_baad4(ef_addr32 rec, uint8_t key);
 
+/* colour_tables2.c */
+void fill_colour_record_ba2c0(ef_addr32 rec, uint8_t key);
+void fill_colour_record_ba460(ef_addr32 rec, uint8_t key);
+void fill_colour_record_ba580(ef_addr32 rec, uint8_t key);
+void fill_colour_record_ba6a0(ef_addr32 rec, uint8_t key);
+void fill_colour_record_ba804(ef_addr32 rec, uint8_t key);
+void fill_colour_record_ba8dc(ef_addr32 rec, uint8_t key);
+void fill_colour_record_bab5c(ef_addr32 rec, uint8_t key);
+void fill_colour_record_babd0(ef_addr32 rec, uint8_t key);
+void fill_colour_record_bac90(ef_addr32 rec, uint8_t key);
+void fill_colour_record_bad70(ef_addr32 rec, uint8_t key);
+void fill_colour_record_bae78(ef_addr32 rec, uint8_t key);
+void fill_colour_record_baf48(ef_addr32 rec, uint8_t key);
+void fill_colour_record_bafe4(ef_addr32 rec, uint8_t key);
+void fill_colour_record_bb0ac(ef_addr32 rec, uint8_t key);
+void fill_colour_record_bb1ac(ef_addr32 rec, uint8_t key);
+
 #endif
