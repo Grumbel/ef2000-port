@@ -4013,4 +4013,7 @@ int32_t open_file_fa485(ef_addr32 name, uint32_t flags, ...);
 int32_t file_size_a7b3c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 name);
 int32_t guest_fn_fa4a9_x(ef_addr32 name, uint32_t oflag, uint32_t shflag, uint32_t pmode); /* 0xfa4a9 cdecl (open/sopen) */
 
+void apply_palette_d663c(ef_addr32 palette);
+void finish_record_range_d710c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+
 #endif

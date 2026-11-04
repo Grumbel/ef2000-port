@@ -3074,7 +3074,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d65a8	62	remap_palette_d65a8	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d65a8.json	docs/compiler-abi.md; Remap a 256-entry RGB palette through three 64-byte tables.; callers d660c@d6620,d663c@d664b; guest pending
 0x000d65e8	34	set_black_palette_d65e8	game_helpers106	compiles	game	confirmed	decomp/tests/0x000d65e8.json	docs/compiler-abi.md; Upload an all-zero (black) 0x300-byte palette.; callers 284ec@284f2,39204@39211,3dccc@3dccf; guest pending
 0x000d660c	46	compare_remapped_palette_d660c	game_helpers120	compiles	game	confirmed	decomp/tests/0x000d660c.json	docs/compiler-abi.md; Remap the 256-entry palette at the stack argument and compare the result with the 0x300 bytes at 0x420a90 (cdecl; return; callers eac48@eacbc,eac48@ead32; guest pending
-0x000d663c	53			unknown	unclassified	unverified		
+0x000d663c	53	apply_palette_d663c	game_helpers125	compiles	game	confirmed	decomp/tests/0x000d663c.json	docs/compiler-abi.md; Remap a 256-entry palette, upload it to the VGA DAC and keep a copy of the source at 0x420a90.; callers 1a358@1a385,1a390@1a3c0,1e480@1e4fc; guest pending
 0x000d6694	46			unknown	unclassified	unverified		
 0x000d66c2	358			unknown	unclassified	unverified		
 0x000d6960	541			unknown	unclassified	unverified		
@@ -3091,7 +3091,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d7040	47	build_path_d7040	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d7040.json	docs/compiler-abi.md; Build "<default path><first><second>" with a fixed separator.; callers d7070@d7078; guest pending
 0x000d7070	20	build_path_d7070	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000d7070.json	docs/compiler-abi.md; ; callers d6fa8@d6fb4; guest pending
 0x000d70a0	103	claim_device_slot_d70a0	runtime_helpers16	compiles	game	confirmed	decomp/tests/0x000d70a0.json	docs/compiler-abi.md; Claim a device slot for a priority, or evict the lowest-priority one.; callers 7fcdc@7fdd4,8018c@801b1,801e4@80284; guest pending
-0x000d710c	44			unknown	unclassified	unverified		
+0x000d710c	44	finish_record_range_d710c	game_helpers125	compiles	game	confirmed	decomp/tests/0x000d710c.json	docs/compiler-abi.md; If a record's mode (+0x30) is 1, register its stack range (+8, length +0x10 minus 1) and set its field to 0x40 (cdecl, r; callers none direct; guest pending
 0x000d7158	348			unknown	unclassified	unverified		
 0x000d72b4	259			unknown	unclassified	unverified		
 0x000d73b8	55	channel_call_102858_d73b8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d73b8.json	docs/compiler-abi.md; Run channel call 0x102858 on the driver channel (0..13).; callers 7ef14@7f3ae,7ef14@7f3be,7f850@7f96d; guest pending

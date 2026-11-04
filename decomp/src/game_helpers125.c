@@ -69,3 +69,22 @@ void send_pending_count_message_111df0(uint32_t u0, uint32_t u1, uint32_t u2, ui
         EF_U32(rec + 0x1acu) = 0;
     }
 }
+
+/* 0xd663c, 53 bytes. Remap a 256-entry palette, upload it to the VGA DAC and keep a copy of the source at 0x420a90. */
+void apply_palette_d663c(ef_addr32 palette)
+{
+    uint8_t buf[0x300];
+    remap_palette_d65a8((uint32_t)(uintptr_t)buf, palette);
+    upload_vga_palette_feec8((uint32_t)(uintptr_t)buf);
+    guest_fn_e9a24(0x300u, palette, 0x00420a90u);
+}
+
+/* 0xd710c, 44 bytes. If a record's mode (+0x30) is 1, register its stack range (+8, length +0x10 minus 1) and set its field to 0x40 (cdecl, record on the stack). */
+void finish_record_range_d710c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec)
+{
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (EF_U32(rec + 0x30u) == 1u) {
+        stack_range_104920(EF_U32(rec + 8u), EF_U32(rec + 0x10u) - 1u);
+        set_field_1067cc(rec, 0x40u);
+    }
+}

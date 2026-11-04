@@ -4602,3 +4602,10 @@ in EAX, format string address, one value).
 | `0xcd12e` | [ESP+4]:ef_addr32 | EAX:int32_t | fecc@ff8b,1001c@1034d,1001c@10524 | printf to the standard output stream at 0x16043e (cdecl, variadic). |
 | `0xfa485` | [ESP+4]:ef_addr32,[ESP+8]:uint32_t | EAX:int32_t | 105024@105036,105070@1050ce | open: forward name, flags and the optional permission argument to 0xfa4a9 with share mode 0 (cdecl, variadic). |
 | `0xa7b3c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:int32_t | 35cfc@35d6b,35cfc@35da6,36054@360a1 | File size: open the named file in a handle slot, seek to its end, close it and return the end position, or -1 when it ca |
+
+## game_helpers125 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd663c` | EAX:ef_addr32 | none | 1a358@1a385,1a390@1a3c0,1e480@1e4fc | Remap a 256-entry palette, upload it to the VGA DAC and keep a copy of the source at 0x420a90. |
+| `0xd710c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | If a record's mode (+0x30) is 1, register its stack range (+8, length +0x10 minus 1) and set its field to 0x40 (cdecl, r |
