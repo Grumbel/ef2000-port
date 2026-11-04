@@ -4956,4 +4956,6 @@ void load_object_geometry_a6808(uint32_t rec);
 
 void fill_selection_dialog_4db60(void);
 
+void nudge_view_orientation_91df4(void);
+
 #endif

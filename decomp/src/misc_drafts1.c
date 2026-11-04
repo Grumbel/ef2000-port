@@ -5463,3 +5463,39 @@ void fill_selection_dialog_4db60(void)
     default: break;
     }
 }
+
+/* 0x91df4, 314 bytes. Apply the key-driven orientation nudges (byte flags 0x2144aa: 1/2 adjust the scratch matrix 0x21439c by +/-0x800, 4/8 rotate the camera matrix 0x12dbec by +/-0x200) and then clamp: if the pitch angle (0xd13ac) exceeds 0x2000 rotate by the word at 0x127d92 instead, and if the pitch or the second angle (0xd13dc) leave their allowed ranges restore the saved matrix and, for a pitch above 0x808, rotate back by -pitch. Sets byte 0x1a6d1f when either angle was nonzero on entry. */
+void nudge_view_orientation_91df4(void)
+{
+    uint8_t saved[0x24];
+    int32_t pitch, a, b;
+    guest_fn_d099c(0x0021439cu, 0x0012dbecu);
+    pitch = angle_d13ac(0x0012dbecu);
+    b = (int16_t)forward_pair_d13dc(0x0012dbecu);
+    if ((int16_t)pitch != 0)
+        EF_U8(0x001a6d1fu) = 1u;
+    if (b != 0)
+        EF_U8(0x001a6d1fu) = 1u;
+    if (EF_U8(0x002144aau) & 1u)
+        guest_fn_d0ebc(0x0021439cu, 0x800u);
+    if (EF_U8(0x002144aau) & 2u)
+        guest_fn_d0ebc(0x0021439cu, 0xf800u);
+    guest_fn_d099c(0x0012dbecu, 0x0021439cu);
+    copy_record9_d0858((uint32_t)(uintptr_t)saved, 0x0012dbecu);
+    if ((int16_t)pitch > 0x2000) {
+        guest_fn_d0dbc(0x0012dbecu, EF_U16(0x00127d92u), 0u);
+        return;
+    }
+    if (EF_U8(0x002144aau) & 4u)
+        guest_fn_d0dbc(0x0012dbecu, 0x200u, 0u);
+    if (EF_U8(0x002144aau) & 8u)
+        guest_fn_d0dbc(0x0012dbecu, 0xfe00u, 0u);
+    pitch = (int16_t)angle_d13ac(0x0012dbecu);
+    a = pitch;
+    if (a >= 0x2000 || a < -0x3000)
+        copy_record9_d0858(0x0012dbecu, (uint32_t)(uintptr_t)saved);
+    if (b >= 0x5200 || b < -0x5200) {
+        if ((int16_t)pitch > 0x808)
+            guest_fn_d0dbc(0x0012dbecu, (uint16_t)(-pitch), 0u);
+    }
+}

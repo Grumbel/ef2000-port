@@ -1896,7 +1896,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091c48	80	record_scene_event	scene_state	compiles	game	confirmed	decomp/tests/0x00091c48.json	docs/compiler-abi.md
 0x00091c98	257			unknown	unclassified	unverified		
 0x00091d9c	85	configure_scene_angle_triplet	scene_controls	compiles	game	confirmed	decomp/tests/0x00091d9c.json	docs/compiler-abi.md; Init 0x214404 then callbacks for DX/AX/BX low words; mirror at 0x2144b6/b4/b0; awaiting OMF guest differential
-0x00091df4	314			unknown	unclassified	unverified		
+0x00091df4	314	nudge_view_orientation_91df4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00091df4.json	docs/compiler-abi.md; Apply the key-driven orientation nudges (byte flags 0x2144aa: 1/2 adjust the scratch matrix 0x21439c by +/-0x800, 4/8 ro; callers 1c780@1cc33,1c780@1cd71,94194@941a5; guest pending
 0x00091f30	249	apply_orientation_input_91f30	game_helpers54	compiles	game	confirmed	decomp/tests/0x00091f30.json	docs/compiler-abi.md; Apply the pending yaw and roll input to the scene orientation.; callers 9357c@935c6,9357c@935de; guest pending
 0x0009202c	65	recompute_scene_extents_9202c	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x0009202c.json	docs/compiler-abi.md; Recompute the two scene extents.; callers 94194@941aa,941bc@941d2; guest pending
 0x00092070	169	classify_angle_92070	game_helpers36	compiles	game	confirmed	decomp/tests/0x00092070.json	docs/compiler-abi.md; Classify the signed angle word into a -2..1 step (kept when out of range).; callers 942cc@942f4,94370@94398,94484@944a9; guest pending

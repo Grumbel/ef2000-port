@@ -6194,3 +6194,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x4db60` | none | none | 4b6a0@4bb11,4d9cc@4da23,4da2c@4da88 | Fill two text widgets of the dialog named at 0x184b0c (widgets 0x184cf8 and 0x184d38, or 0x184d30 for the second when by |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x91df4` | none | none | 1c780@1cc33,1c780@1cd71,94194@941a5 | Apply the key-driven orientation nudges (byte flags 0x2144aa: 1/2 adjust the scratch matrix 0x21439c by +/-0x800, 4/8 ro |
