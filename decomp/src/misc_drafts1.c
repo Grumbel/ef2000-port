@@ -15875,3 +15875,131 @@ void step_lobby_36d30(void)
 	if (state != EF_U8(0x0019f5aau))
 		enable_state_widget_362c4();
 }
+
+/* 0x36438, 905 bytes. Host-side transfer state machine in byte 0x19f5aa (states 2..9 through a jump table). 2 saves dword 0x19f350 in 0x19f324, marks the slot (0x35cc8), sets word 0x1357b2 = 1 and byte 0x19f5a6 = 0x47, sends the 4-byte request at 0x19f324 (0xa3eac between idle callbacks 0xa41a0), stamps the clock into 0x19f338 and moves to 4; 4 recomputes the total (0xa4030) and marks the matching slots (0x35f04) and, while word 0x19f58e is below byte 0x12583a, waits 16 ticks and moves to 3 (else syncs the list 0x363c4 and moves to 5); 3 resends the request, syncs the list and returns to 4; 5 reads the next block from the handle in dword 0x19f360 (0xa79d4, size = high half of dword 0x1258fe * 8, buffer dword 0x19f34c), keeps the length in dword 0x19f368, subtracts it from the remaining count 0x19f350 and sends the packets (0x3617c); 6 waits for the receivers as in 0x36d30 and then either, with nothing left, closes the handle (0xa7990), clears byte 0x19f5a3, frees the buffer (0xe2af4), clears the progress and moves to 8 or increments word 0x19f594, shows the progress (0x35de0, (total - remaining) / total) and returns to 5; 7 resends the packets and syncs; 8 and 9 end the transfer like the lobby states 8 and 9 of 0x36d30 (state 9 also refreshes the buttons 0x36004 when it ends). The state widget is refreshed (0x362c4) when the state changed. */
+void step_host_transfer_36438(void)
+{
+	uint8_t state = EF_U8(0x0019f5aau);
+	int32_t remaining;
+	uint32_t n;
+	uint16_t old;
+	double ratio;
+
+	switch (state) {
+	case 2:
+		EF_U32(0x0019f324u) = EF_U32(0x0019f350u);
+		mark_slot_35cc8();
+		EF_U16(0x001357b2u) = 1u;
+		EF_U8(0x0019f5a6u) = 0x47u;
+		EF_U8(0x0019f5aau) = 4u;
+		run_idle_callback_a41a0();
+		guest_fn_a3eac_args(0x0019f324u, 4u);
+		run_idle_callback_a41a0();
+		EF_U32(0x0019f338u) = guest_read_runtime_tick();
+		break;
+	case 4:
+		recompute_total_a4030();
+		mark_matching_slots_35f04();
+		if ((int32_t)EF_U16(0x0019f58eu) < (int32_t)EF_U8(0x0012583au)) {
+			if (guest_read_runtime_tick() - EF_U32(0x0019f338u) > 0xfu)
+				EF_U8(0x0019f5aau) = 3u;
+		} else {
+			sync_list_363c4();
+			EF_U8(0x0019f5aau) = 5u;
+		}
+		break;
+	case 3:
+		run_idle_callback_a41a0();
+		guest_fn_a3eac_args(0x0019f324u, 4u);
+		run_idle_callback_a41a0();
+		EF_U32(0x0019f338u) = guest_read_runtime_tick();
+		sync_list_363c4();
+		EF_U8(0x0019f5aau) = 4u;
+		break;
+	case 5:
+		EF_U16(0x001357b2u) = 2u;
+		n = guest_fn_a79d4_ret(EF_U32(0x0019f360u), (uint32_t)(((int32_t)EF_U32(0x001258feu) >> 16) << 3), EF_U32(0x0019f34cu));
+		EF_U32(0x0019f368u) = n;
+		EF_U32(0x0019f350u) = EF_U32(0x0019f350u) - n;
+		recompute_total_a4030();
+		mark_slot_35cc8();
+		send_packets_3617c(EF_U32(0x0019f368u), EF_U32(0x0019f350u));
+		EF_U32(0x0019f338u) = guest_read_runtime_tick();
+		break;
+	case 6:
+		recompute_total_a4030();
+		mark_matching_slots_35f04();
+		if ((int32_t)EF_U16(0x0019f58eu) < ((int32_t)EF_U32(0x001357aeu) >> 16)) {
+			if (guest_read_runtime_tick() - EF_U32(0x0019f338u) > 0xfu) {
+				EF_U8(0x0019f5aau) = 7u;
+				EF_U32(0x0019f358u) += 1u;
+			}
+			break;
+		}
+		sync_list_363c4();
+		remaining = (int32_t)EF_U32(0x0019f350u);
+		if (remaining <= 0) {
+			guest_fn_a7990(EF_U32(0x0019f360u));
+			EF_U8(0x0019f5a3u) = 0u;
+			arena_free_e2af4(EF_U32(0x0019f34cu));
+			EF_U8(0x0019f5aau) = 8u;
+			rescale_dialog_widgets_35de0(0u, 0u, 0u, 0u, 0.0);
+		} else {
+			ratio = (double)(uint32_t)(EF_U32(0x0019f348u) - (uint32_t)remaining) / (double)EF_U32(0x0019f348u);
+			EF_U8(0x0019f5aau) = 5u;
+			EF_U16(0x0019f594u) = (uint16_t)(EF_U16(0x0019f594u) + 1u);
+			rescale_dialog_widgets_35de0(0u, 0u, 0u, 0u, ratio);
+		}
+		break;
+	case 7:
+		send_packets_3617c(EF_U32(0x0019f368u), EF_U32(0x0019f350u));
+		sync_list_363c4();
+		break;
+	case 8:
+		if (EF_U8(0x0019f5adu) != 0u) {
+			mark_slot_35cc8();
+			EF_U16(0x001357b2u) = 4u;
+			EF_U8(0x0019f5a6u) = 0x46u;
+			run_idle_callback_a41a0();
+			guest_fn_a3eac_args(0x00125903u, 0xbu);
+			run_idle_callback_a41a0();
+			EF_U32(0x0019f338u) = guest_read_runtime_tick();
+			EF_U16(0x0019f596u) = 0u;
+			EF_U8(0x0019f5aau) = 9u;
+		} else {
+			EF_U8(0x0019f5aau) = 0u;
+			EF_U8(0x0019f5afu) = 0u;
+			EF_U8(0x0019f5a8u) = EF_U8(0x0019f5acu);
+		}
+		break;
+	case 9:
+		recompute_total_a4030();
+		mark_matching_slots_35f04();
+		if ((int32_t)EF_U16(0x0019f58eu) < (int32_t)EF_U8(0x0012583au)) {
+			if (guest_read_runtime_tick() - EF_U32(0x0019f338u) > 0xfu) {
+				run_idle_callback_a41a0();
+				guest_fn_a3eac_args(0x00125903u, 0xbu);
+				run_idle_callback_a41a0();
+				EF_U32(0x0019f338u) = guest_read_runtime_tick();
+				old = EF_U16(0x0019f596u);
+				EF_U16(0x0019f596u) = (uint16_t)(old + 1u);
+				if (old > 0x1eu) {
+					EF_U8(0x0019f5aau) = 0u;
+					EF_U8(0x0019f5afu) = 0u;
+					EF_U8(0x0019f5a8u) = EF_U8(0x0019f5acu);
+					set_buttons_36004();
+				}
+			}
+		} else {
+			EF_U8(0x0019f5aau) = 0u;
+			EF_U8(0x0019f5afu) = 0u;
+			EF_U8(0x0019f5a8u) = EF_U8(0x0019f5acu);
+			set_buttons_36004();
+		}
+		break;
+	default:
+		break;
+	}
+	if (state != EF_U8(0x0019f5aau))
+		enable_state_widget_362c4();
+}

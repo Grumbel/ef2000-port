@@ -5817,4 +5817,6 @@ void step_transfer_36ad8(void);
 
 void step_lobby_36d30(void);
 
+void step_host_transfer_36438(void);
+
 #endif
