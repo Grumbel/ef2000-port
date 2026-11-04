@@ -19078,3 +19078,58 @@ void slew_aim_angles_1db08(ef_addr32 ctx)
 		memcpy(ef_guest_memory_ptr(ctx + 0x89u), &a89, 8);
 	}
 }
+
+/* 0xa9724, 277 bytes. Handle the command line TEXT (EAX). When 0x1371ff is set only a leading '%' matters (it sets 0x137200). Otherwise clear 0x1371ee/0x1371fb, build "<0x18d780><text><0x18d784>" in a local buffer, split it on white space (ctype table 0x195af0, bit 2) into an argv array whose slot 0 is the program name at 0x137209, run the option parser 0x3ea0c (argc in EAX, argv in EDX), reset the display if it set 0x41955d, and finally call 0x28744 when 0x1371fb was set by the parser. */
+void parse_command_line_a9724(ef_addr32 text)
+{
+	uint8_t buf[0x64];
+	uint32_t argv[0x10];
+	uint32_t argc;
+	uint8_t *p;
+
+	if (EF_U8(0x001371ffu) != 0u) {
+		if (EF_U8(text) == 0x25u)
+			EF_U8(0x00137200u) = 1u;
+		return;
+	}
+	EF_U8(0x001371eeu) = 0u;
+	EF_U8(0x001371fbu) = 0u;
+	memset(buf, 0, sizeof buf);
+	memcpy(buf, ef_guest_memory_ptr(0x0018d780u), 4);
+	guest_fn_9ca57((ef_addr32)(uintptr_t)buf, text);
+	guest_fn_9ca57((ef_addr32)(uintptr_t)buf, 0x0018d784u);
+	argv[0] = 0x00137209u;
+	argc = 1u;
+	p = buf;
+	if (buf[0] != 0u) {
+		do {
+			while ((EF_U8(0x00195af0u + (uint8_t)(*p + 1u)) & 2u) != 0u)
+				p++;
+			if (*p == 0u)
+				break;
+			argv[argc++] = (uint32_t)(uintptr_t)p;
+			for (;;) {
+				uint8_t sp = (uint8_t)(EF_U8(0x00195af0u + (uint8_t)(*p + 1u)) & 2u);
+				uint8_t *next = p + 1;
+				if (sp != 0u) {
+					*p = 0u;
+					p = next;
+					break;
+				}
+				p = next;
+			}
+		} while (*p != 0u);
+	}
+	EF_U8(0x0041955du) = 0u;
+	guest_fn_3ea0c_x(argc, (ef_addr32)(uintptr_t)argv);
+	if (EF_U8(0x0041955du) != 0u) {
+		set_black_palette_d65e8();
+		guest_fn_dc250();
+		clear_buffer_dc2c0();
+		guest_fn_dc250();
+	}
+	if (EF_U8(0x001371fbu) != 0u) {
+		open_named_file_28744();
+		EF_U8(0x001371fbu) = 0u;
+	}
+}

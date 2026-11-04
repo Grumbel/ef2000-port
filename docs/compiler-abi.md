@@ -8681,3 +8681,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1db08` | EAX:ef_addr32 | none | 1d954@1d9c0 | Slew the two aim angles of object CTX (EAX), at +0x81 and +0x89, toward their targets. The first target is the offset fr |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa9724` | EAX:ef_addr32 | none | a9e70@a9f8d | Handle the command line TEXT (EAX). When 0x1371ff is set only a leading '%' matters (it sets 0x137200). Otherwise clear  |
