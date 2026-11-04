@@ -4148,4 +4148,9 @@ uint8_t map_code_ba0e4(uint32_t code);
 /* small_wrappers1.c */
 void forward_trace_call_d605c(uint32_t a, uint32_t b, uint32_t c);
 
+/* small_wrappers2.c */
+void close_log_handle_a1cb4(void);
+uint32_t file_size_by_name_105024(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 name);
+int32_t lookup_name_value_a1a40(ef_addr32 name);
+
 #endif

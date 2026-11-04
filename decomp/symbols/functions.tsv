@@ -2137,13 +2137,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a1824	52	copy_record_header_a1824	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a1824.json	docs/compiler-abi.md; Copy the header fields of record id into dest.; callers d0470@d04d3; guest pending
 0x000a1858	17	record_flag_bits56	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a1858.json	docs/compiler-abi.md; bits 5-6 of byte +0xa; callers 10f70@10faf,11014@11038,1e214@1e22b; guest pending
 0x000a1a10	47	record_entry_address	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a1a10.json	docs/compiler-abi.md; table 0x40d200[word record] entry+0xa+6*byte +9; callers cd150@cd193,e8484@e84e6; guest pending
-0x000a1a40	77			unknown	unclassified	unverified		
+0x000a1a40	77	lookup_name_value_a1a40	small_wrappers2	compiles	game	confirmed	decomp/tests/0x000a1a40.json	docs/compiler-abi.md; Look a name up in the pointer table at 0x417180 (sentinel stored at the count slot) and return the matching 16-bit value; callers 2fbc4@2fc63,3c730@3c734,74228@74245; guest pending
 0x000a1a90	83	find_page_pair_a1a90	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a1a90.json	docs/compiler-abi.md; Look up key in the (key, offset) pair table of a page; return the address or 0.; callers 2fbc4@2fc8b,3c730@3c744,74228@74267; guest pending
 0x000a1afc	41	read_checked_a1afc	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a1afc.json	docs/compiler-abi.md; Read from the stream and abort if the count is short.; callers a1bf4@a1c36,a1bf4@a1c9e,a1ec8@a1edf; guest pending
 0x000a1b28	41	write_checked_a1b28	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a1b28.json	docs/compiler-abi.md; Write to the stream and abort if the count is short.; callers a1b54@a1bd6,a1cb4@a1cdf,a1d00@a1d36; guest pending
 0x000a1b54	157	create_state_file_a1b54	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a1b54.json	docs/compiler-abi.md; Create the state file and write its 12-byte header.; callers 7a9bc@7a9db; guest pending
 0x000a1bf4	189	open_state_file_a1bf4	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a1bf4.json	docs/compiler-abi.md; Open the state file and validate its 12-byte header.; callers 7a844@7a871; guest pending
-0x000a1cb4	76			unknown	unclassified	unverified		
+0x000a1cb4	76	close_log_handle_a1cb4	small_wrappers2	compiles	game	confirmed	decomp/tests/0x000a1cb4.json	docs/compiler-abi.md; Close the log handle at 0x132b18 (writing a -1 marker first when 0x132b1c is 1) and mark it closed.; callers 7a844@7a9a5,7a9bc@7aa22,a1bf4@a1c82; guest pending
 0x000a1d00	80			unknown	unclassified	unverified		
 0x000a1d50	376			unknown	unclassified	unverified		
 0x000a1ec8	405			unknown	unclassified	unverified		
@@ -3878,7 +3878,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001048b4	82			unknown	unclassified	unverified		
 0x00104908	21	stack_range_104908	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00104908.json	docs/compiler-abi.md; 0x104840(base, base + length).; callers d5e0c@d5e5e,d6df0@d6e03,d6df0@d6e15; guest pending
 0x00104920	21	stack_range_104920	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00104920.json	docs/compiler-abi.md; 0x1048b4(base, base + length).; callers d5ec0@d5ee7,d6ffc@d701d,d710c@d7123; guest pending
-0x00105024	76			unknown	unclassified	unverified		
+0x00105024	76	file_size_by_name_105024	small_wrappers2	compiles	game	confirmed	decomp/tests/0x00105024.json	docs/compiler-abi.md; Open a file and return its size; the error code is left at 0x17d2d8 (3 open failed, 5 size failed).; callers 105070@105080,106464@106491,113a40@113a6d; guest pending
 0x00105070	183			unknown	unclassified	unverified		
 0x00105230	191			unknown	unclassified	unverified		
 0x001052f0	67	send_record_size_message_1052f0	game_helpers125	compiles	game	confirmed	decomp/tests/0x001052f0.json	docs/compiler-abi.md; Once per record: send message 0x401 with the two words at +0x14 and +0x18 (cdecl, record on the stack).; callers 10585c@105c7f,10683c@106870,106894@1068ac; guest pending
