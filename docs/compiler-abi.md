@@ -7528,3 +7528,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe9c00` | none | none | d6090@d6250,d6090@d632c,e740c@e74c4 | Toggle the mode byte 0x43399d (hysteresis on a distance): in mode 1 run the first constraint solver 0xe9e7c on 0x464480  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x872c8` | EAX:uint32_t,EDX:uint32_t | none | 873a4@873cd | Spawn a unit at the current position of the selected object: look up the object named by the high word of 0x1f71c8 (noth |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

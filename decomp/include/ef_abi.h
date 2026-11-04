@@ -5504,4 +5504,9 @@ void guest_fn_e9f84_x(void); /* 0xe9f84 */
 void guest_fn_e9cd8_x(ef_addr32 obj, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xe9cd8 EAX + 6 stack, ret 0x18 */
 void guest_fn_e9dcc_x(void); /* 0xe9dcc */
 
+void spawn_at_selected_872c8(uint32_t a, uint32_t b);
+void guest_fn_e9b38_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0xe9b38 5 stack, ret 0x14 */
+
+
+
 #endif

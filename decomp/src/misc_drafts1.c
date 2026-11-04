@@ -11876,3 +11876,27 @@ void update_mode_e9c00(void)
             EF_U8(0x0043399du) = 1u;
     }
 }
+
+/* 0x872c8, 217 bytes. Spawn a unit at the current position of the selected object: look up the object named by the high word of 0x1f71c8 (nothing if missing), build the position vector from the dwords 0x1a5bec, 0x1a5bf0 and 0x1a5be8 shifted left by 8, run 0xe9b38 with the vector, the three signed high words at 0x127d3a, 0x127d3c, 0x127d3e and 0x85c90 of the top byte of object+0x1d4, then (with the flag word 0x20f194 set around it) create the unit record at 0x20f1a0 through 0x87a20 with the vector and the stack values: the three high words, 0x1a5be4, the signed word A (EAX), B (EDX) and the object. */
+void spawn_at_selected_872c8(uint32_t a, uint32_t b)
+{
+    ef_addr32 obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    uint32_t vec[3];
+    uint32_t w3a;
+    uint32_t w3c;
+    uint32_t w3e;
+    if (obj == 0u)
+        return;
+    vec[0] = EF_U32(0x001a5becu) << 8;
+    vec[1] = EF_U32(0x001a5bf0u) << 8;
+    vec[2] = EF_U32(0x001a5be8u) << 8;
+    w3a = (uint32_t)((int32_t)EF_U32(0x00127d3au) >> 16);
+    w3c = (uint32_t)((int32_t)EF_U32(0x00127d3cu) >> 16);
+    w3e = (uint32_t)((int32_t)EF_U32(0x00127d3eu) >> 16);
+    guest_fn_e9b38_x(page_row_85c90((int16_t)((int32_t)EF_U32(obj + 0x1d4u) >> 24)), w3e, w3c, w3a,
+                     (uint32_t)(uintptr_t)vec);
+    EF_U16(0x0020f194u) = 1u;
+    guest_fn_87a20_x(0x0020f1a0u, vec[0], vec[1], vec[2], w3a, w3c, w3e, EF_U32(0x001a5be4u),
+                     (uint32_t)(int32_t)(int16_t)a, b, obj);
+    EF_U16(0x0020f194u) = 0u;
+}

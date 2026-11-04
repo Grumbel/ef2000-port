@@ -1700,7 +1700,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00086968	886			unknown	unclassified	unverified		
 0x00086e44	309			unknown	unclassified	unverified		
 0x00086f7c	843	query_projected_object_position	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX selector, EDX output pair pointer, BX iteration count; returns signed EAX; caller sites 0x5c7b9/0x5ca6e; indirect callback effects remain replay concern
-0x000872c8	217			unknown	unclassified	unverified		
+0x000872c8	217	spawn_at_selected_872c8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000872c8.json	docs/compiler-abi.md; Spawn a unit at the current position of the selected object: look up the object named by the high word of 0x1f71c8 (noth; callers 873a4@873cd; guest pending
 0x000873a4	432			unknown	unclassified	unverified		
 0x00087700	454			unknown	unclassified	unverified		
 0x000878c8	165	release_object_878c8	game_helpers35	compiles	game	confirmed	decomp/tests/0x000878c8.json	docs/compiler-abi.md; Remove an object from the active list and put it on the free list.; callers 56954@5696c,879c4@879d4,880c8@880e9; guest pending
