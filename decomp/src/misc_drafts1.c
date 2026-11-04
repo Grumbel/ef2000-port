@@ -20979,3 +20979,56 @@ double profile_ratio_11b644(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint
 	double t = profile_term_11b5a8(d, b, c, s, p, q);
 	return (t * r * (md_rd_f64(b + 0x40u) - md_rd_f64(0x433070u))) / md_rd_f64(a + 0x10u);
 }
+
+/* 0x11b73c, 411 bytes. Profile term of object a (doubles at +0x10, +0x18,
+ * +0x38, +0x40) for the two scale doubles p1/p2; 0 when the sqrt argument
+ * 1 - (cos(a[+0x38]) * p1)^2 is not positive. */
+double profile_term_11b73c(uint32_t a, double p1, double p2)
+{
+	double d1 = md_rd_f64(a + 0x40u) - md_rd_f64(0x433070u);
+	double ang = md_rd_f64(a + 0x38u);
+	double g = md_rd_f64(a + 0x18u);
+	double t = 1.0 - square_double_b3fd0(cos_b45a2(ang) * p1);
+	double inv, m, s, q1, r1, u, v, w, tn2;
+	uint32_t flag = 0u;
+
+	if (!(0.0 < t)) {
+		return 0.0;
+	}
+	t = sqrt_checked_a4472(t, a, &flag);
+	inv = 1.0 / md_rd_f64(a + 0x10u);
+	m = d1 * md_rd_f64(0x1958ccu) * inv;
+	s = square_double_b3fd0(d1 * inv);
+	q1 = ((s * md_rd_f64(0x1958d4u) + m) * g) / (cos_b45a2(ang) * md_rd_f64(0x1958d4u) + g);
+	(void)cube_double_b3fdc(g);
+	tn2 = square_double_b3fd0(tan_b45fa(ang));
+	(void)tn2;
+	r1 = p2 * md_rd_f64(0x1958dcu) * cos_b45a2(ang) * q1;
+	u = g * t + cos_b45a2(ang) * md_rd_f64(0x1958e4u);
+	/* NOTE: the original recomputes cos() here; value identical. */
+	v = (square_double_b3fd0(tan_b45fa(ang)) * cube_double_b3fdc(g)) / u
+	    + md_rd_f64(0x1958ecu) / t;
+	w = cos_b45a2(ang) * md_rd_f64(0x1958e4u) + g;
+	return (v / ((square_double_b3fd0(tan_b45fa(ang)) * cube_double_b3fdc(g)) / w
+	             + md_rd_f64(0x1958ecu))) * r1;
+}
+
+/* 0x11b8d8, 119 bytes. */
+double profile_diff_11b8d8(uint32_t a, uint32_t d, double x, double y)
+{
+	double local0 = md_rd_f64(d) / md_rd_f64(a) * md_rd_f64(0x1958f4u);
+	double p1 = square_double_b3fd0((md_rd_f64(0x433070u) - md_rd_f64(d + 0x40u))
+	                                / md_rd_f64(a + 0x10u)) * local0;
+	double p2 = ratio_formula_11b134(d, x, 6.0) * p1;
+
+	return profile_term_11b73c(a, x, y) - p2;
+}
+
+/* 0x11b950, 91 bytes. */
+double profile_diff_clamped_11b950(uint32_t a, uint32_t d, double x, double y)
+{
+	if (x < md_rd_f64(0x1958fcu)) {
+		return profile_diff_11b8d8(a, d, x, y);
+	}
+	return profile_diff_11b8d8(a, d, 0.9, y);
+}

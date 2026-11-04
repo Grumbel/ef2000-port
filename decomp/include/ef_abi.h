@@ -6244,4 +6244,11 @@ double profile_ratio_11b644(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint
 double profile_ratio_11bf78(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t s, double p, double q); /* 0x11bf78 */
 double profile_ratio_11b644(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t s, double p, double q); /* 0x11b644 */
 
+double profile_term_11b73c(uint32_t a, double p1, double p2);
+double profile_diff_11b8d8(uint32_t a, uint32_t d, double x, double y);
+double profile_diff_clamped_11b950(uint32_t a, uint32_t d, double x, double y);
+double profile_term_11b73c(uint32_t a, double p1, double p2); /* 0x11b73c */
+double profile_diff_11b8d8(uint32_t a, uint32_t d, double x, double y); /* 0x11b8d8 */
+double profile_diff_clamped_11b950(uint32_t a, uint32_t d, double x, double y); /* 0x11b950 */
+
 #endif

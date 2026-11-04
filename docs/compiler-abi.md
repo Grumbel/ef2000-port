@@ -9102,3 +9102,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x11bf78` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:double,[ESP+12]:double | EAX:double | 10a220@10a4bc | (EAX = A, EDX = D, EBX = B, ECX = C guest pointers; stack: dword S, doubles P and Q; ret 0x14) Returns profile_term(D, B |
 | `0x11b644` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:double,[ESP+12]:double | EAX:double | 10a220@10a357 | (as 0x11bf78 but passes C and S to the term in swapped positions and divides by A[0x10]) |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11b73c` | EAX:uint32_t,EDX:double,EBX:double | EAX:double | 11b8d8@11b93c,11c584@11c73b | Profile term of object a (doubles at +0x10, +0x18, * +0x38, +0x40) for the two scale doubles p1/p2; 0 when the sqrt argu |
+| `0x11b8d8` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 11b950@11b995 |  |
+| `0x11b950` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 10a220@10a26a |  |

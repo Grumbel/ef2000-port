@@ -4194,9 +4194,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b694	19	level_below_11b694	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b694.json	docs/compiler-abi.md; Scaled distance below the reference level.; callers 10a220@10a31f,11c584@11c750; guest pending
 0x0011b6a8	19	level_above_11b6a8	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b6a8.json	docs/compiler-abi.md; Scaled distance above the reference level.; callers 11b6bc@11b6f8,11b6bc@11b729; guest pending
 0x0011b6bc	126			unknown	unclassified	unverified		
-0x0011b73c	411			unknown	unclassified	unverified		
-0x0011b8d8	119			unknown	unclassified	unverified		
-0x0011b950	91			unknown	unclassified	unverified		
+0x0011b73c	411	profile_term_11b73c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b73c.json	docs/compiler-abi.md; Profile term of object a (doubles at +0x10, +0x18, * +0x38, +0x40) for the two scale doubles p1/p2; 0 when the sqrt argu; callers 11b8d8@11b93c,11c584@11c73b; guest pending
+0x0011b8d8	119	profile_diff_11b8d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b8d8.json	docs/compiler-abi.md; ; callers 11b950@11b995; guest pending
+0x0011b950	91	profile_diff_clamped_11b950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b950.json	docs/compiler-abi.md; ; callers 10a220@10a26a; guest pending
 0x0011b9ac	61	profile_term_ratio_11b9ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b9ac.json	docs/compiler-abi.md; EAX=A, EDX=D, EBX=B, ECX=C pointers; stack: pointer E, then two doubles P, Q (ret 0x14). Returns (double at B / double a; callers 10a220@10a523; guest pending
 0x0011b9ec	95	scaled_pow_formula_11b9ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b9ec.json	docs/compiler-abi.md; EAX = pointer to a reference double (divisor), EDX = object pointer. Computes t = (C3 - exp(-(obj[0x20] + C1) * C2)) * C; callers 11ba7c@11baa1; guest pending
 0x0011ba4c	45	ratio_scaled_11ba4c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011ba4c.json	docs/compiler-abi.md; EAX = reference pointer, EDX = object pointer; stack: two doubles (arg, unused), callee cleanup. Result = ratio_formula_; callers 11ba7c@11ba95,11bab4@11badf,11baf8@11bb69; guest pending
