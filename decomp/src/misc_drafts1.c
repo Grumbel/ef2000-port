@@ -21626,3 +21626,30 @@ void decode_pair_table_10dbc1(uint32_t *esi, uint32_t *eax, uint32_t *edx, uint3
 		EF_U32(ebp - 0x854u) -= 1u;
 	} while (EF_U32(ebp - 0x854u) != 0u);
 }
+
+/* 0x10db10, 72 bytes. Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = frame with the code tables): walk the bit-driven tree at EBP+index-0x810 until a zero node, then look the symbol up at EBP+index-0x610; the escape value 0xff reads two more bits and a byte and returns 0xff plus that value. Result in ECX. */
+uint32_t decode_symbol_10db10(uint32_t *esi, uint32_t *eax, uint32_t ebp)
+{
+	uint32_t edi = 0u;
+	uint32_t ecx = 0u;
+	uint32_t node;
+
+	for (;;) {
+		edi = edi * 2u + next_bit_10db7e(esi, eax);
+		node = EF_U8(ebp + edi - 0x810u);
+		if (node == 0u) {
+			break;
+		}
+		edi = node;
+	}
+	ecx = EF_U8(ebp + edi - 0x610u);
+	if (ecx != 0xffu) {
+		return ecx;
+	}
+	ecx = 0u;
+	ecx = (ecx << 1) | next_bit_10db7e(esi, eax);
+	ecx = (ecx << 1) | next_bit_10db7e(esi, eax);
+	ecx = (ecx << 8) | EF_U8(*esi);
+	*esi += 1u;
+	return ecx + 0xffu;
+}

@@ -9223,3 +9223,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x1600c4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 160255@1602c1,160329@16037e | Implicit-register fragment (ESI, EDI, EBP = signed 16.16 vector components; ESI and EBP are updated through the pointers |
 | `0x10dbc1` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 10da50@10da99,10da50@10daaa,10da50@10dabb | Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EDX and EDI = output pointers in/out, E |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10db10` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 10da50@10dac9 | Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = frame with the code tables): walk |

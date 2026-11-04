@@ -3989,7 +3989,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010d9e0	3	return_zero_10d9e0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0010d9e0.json	docs/compiler-abi.md; ; callers e9ac0@e9b0d; guest pending
 0x0010d9e3	107	bsearch_10d9e3	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010d9e3.json	docs/compiler-abi.md; bsearch: find KEY in the sorted array BASE of N elements of SIZE bytes using the comparison callback CMP (stack argument; callers ea20c@ea234; guest pending
 0x0010da50	192			unknown	unclassified	unverified		
-0x0010db10	72			unknown	unclassified	unverified		
+0x0010db10	72	decode_symbol_10db10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010db10.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = frame with the code tables): walk; callers 10da50@10dac9; guest pending
 0x0010db58	38	bitstream_decode_symbol_10db58	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010db58.json	docs/compiler-abi.md; Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EBP = table base, params in th; callers 10da50@10dac2; guest pending
 0x0010db7e	67	decode_distance_10db7e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010db7e.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = decoder table base, ECX preserved; callers 10da50@10dad1; guest pending
 0x0010dbc1	76	decode_pair_table_10dbc1	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010dbc1.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EDX and EDI = output pointers in/out, E; callers 10da50@10da99,10da50@10daaa,10da50@10dabb; guest pending

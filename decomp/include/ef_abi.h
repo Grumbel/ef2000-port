@@ -6348,4 +6348,7 @@ void decode_pair_table_10dbc1(uint32_t *esi, uint32_t *eax, uint32_t *edx, uint3
 void vector_length_1600c4(uint32_t *esi, uint32_t edi, uint32_t *ebp); /* 0x1600c4 */
 void decode_pair_table_10dbc1(uint32_t *esi, uint32_t *eax, uint32_t *edx, uint32_t *edi, uint32_t ebp); /* 0x10dbc1 */
 
+uint32_t decode_symbol_10db10(uint32_t *esi, uint32_t *eax, uint32_t ebp);
+uint32_t decode_symbol_10db10(uint32_t *esi, uint32_t *eax, uint32_t ebp); /* 0x10db10 */
+
 #endif
