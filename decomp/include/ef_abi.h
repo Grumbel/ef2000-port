@@ -4113,4 +4113,8 @@ void draw_box_rows_99fe0(void);
 void draw_box_rows_9a0dc(void);
 void draw_box_rows_9a1d8(void);
 
+void draw_extent_markers_43834(ef_addr32 head, ef_addr32 holder);
+void draw_extent_markers_439a4(ef_addr32 head, ef_addr32 holder);
+void draw_extent_markers_43c84(ef_addr32 head, ef_addr32 holder);
+
 #endif

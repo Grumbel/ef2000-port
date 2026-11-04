@@ -4700,3 +4700,11 @@ in EAX, format string address, one value).
 | `0x99fe0` | none | none | none direct | Draw the box rows for the table at 0x40cefe (count word at 0x40d02c). |
 | `0x9a0dc` | none | none | none direct | Draw the box rows for the table at 0x40cd7e (count word at 0x40d026). |
 | `0x9a1d8` | none | none | none direct | Draw the box rows for the table at 0x40ce86 (count word at 0x40d02e). |
+
+## hotspot_draw (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x43834` | EAX:ef_addr32,EDX:ef_addr32 | none | 4bf1c@4c051 | Draw the extent markers for list type 0xe. |
+| `0x439a4` | EAX:ef_addr32,EDX:ef_addr32 | none | 4bf1c@4c067 | Draw the extent markers for list type 0x17. |
+| `0x43c84` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@45676,4bf1c@4bff9 | Draw the extent markers for list type 0xf. |

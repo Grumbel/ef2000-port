@@ -85,3 +85,56 @@ void draw_hotspots_453f4(ef_addr32 head, ef_addr32 holder)
 {
     draw_hotspots_common(head, holder, 0x4f, 0x001344deu, 0x001344d5u, 0x001344e7u);
 }
+
+/* Like draw_hotspots_common, but the type byte is at +0xa, the group index at +0xb and the marker is placed from the extent record behind +0x13 (word +8 = x, word +0xc = y). */
+static void draw_extent_markers_common(ef_addr32 head, ef_addr32 holder, uint32_t code, uint32_t p1, uint32_t p2, uint32_t p3)
+{
+    ef_addr32 node;
+
+    for (node = EF_U32(holder); node != 0; node = EF_U32(node + 4u)) {
+        uint8_t found = 0;
+        ef_addr32 pos = 0;
+        ef_addr32 ext;
+        int32_t x;
+        int32_t y;
+
+        if (EF_U8(node + 0xau) != code)
+            continue;
+        if ((uint16_t)group_flag_positive_cc22c(0, EF_U8(node + 0xbu), head) != 0 && EF_U16(0x00126554u) != 0) {
+            pos = EF_U32(0x00126570u) + (uint32_t)((int32_t)EF_S16(p1 + 2u) * 0x280 + EF_S16(p1));
+            found = 1;
+        } else if ((uint16_t)group_flag_negative_cc1ac(0, EF_U8(node + 0xbu), head) != 0 && EF_U16(0x00126556u) != 0) {
+            pos = EF_U32(0x00126570u) + (uint32_t)((int32_t)EF_S16(p2 + 2u) * 0x280 + EF_S16(p2));
+            found = 1;
+        } else if ((uint16_t)group_flag_zero_cc1ec(0, EF_U8(node + 0xbu), head) != 0 && EF_U16(0x00126558u) != 0) {
+            pos = EF_U32(0x00126570u) + (uint32_t)((int32_t)EF_S16(p3 + 2u) * 0x280 + EF_S16(p3));
+            found = 1;
+        }
+        if (found == 0)
+            continue;
+        ext = EF_U32(node + 0x13u);
+        y = (int16_t)(0x190 - EF_S16(ext + 0xcu) - 0xa);
+        x = (int16_t)(EF_S16(ext + 8u) - 0xa);
+        guest_fn_ca620((int32_t)pos, x, y, 0x14u, 0x14u, 0x280u);
+        if (EF_U16(0x0012656au) != 0)
+            guest_fn_440f4_x(EF_U8(node + 0xbu), x, y, 0x14u, 0x1au, 0x280u);
+    }
+}
+
+/* 0x43834, 368 bytes. Draw the extent markers for list type 0xe. */
+void draw_extent_markers_43834(ef_addr32 head, ef_addr32 holder)
+{
+    draw_extent_markers_common(head, holder, 0xe, 0x00134325u, 0x0013431cu, 0x0013432eu);
+}
+
+/* 0x439a4, 368 bytes. Draw the extent markers for list type 0x17. */
+void draw_extent_markers_439a4(ef_addr32 head, ef_addr32 holder)
+{
+    draw_extent_markers_common(head, holder, 0x17, 0x00134325u, 0x0013431cu, 0x0013432eu);
+}
+
+/* 0x43c84, 368 bytes. Draw the extent markers for list type 0xf. */
+void draw_extent_markers_43c84(ef_addr32 head, ef_addr32 holder)
+{
+    draw_extent_markers_common(head, holder, 0xf, 0x00134340u, 0x00134337u, 0x00134349u);
+}

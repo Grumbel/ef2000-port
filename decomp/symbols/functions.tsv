@@ -779,10 +779,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000433fc	381			unknown	unclassified	unverified		
 0x0004357c	352			unknown	unclassified	unverified		
 0x000436dc	342			unknown	unclassified	unverified		
-0x00043834	368			unknown	unclassified	unverified		
-0x000439a4	368			unknown	unclassified	unverified		
+0x00043834	368	draw_extent_markers_43834	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00043834.json	docs/compiler-abi.md; Draw the extent markers for list type 0xe.; callers 4bf1c@4c051; guest pending
+0x000439a4	368	draw_extent_markers_439a4	hotspot_draw	compiles	game	confirmed	decomp/tests/0x000439a4.json	docs/compiler-abi.md; Draw the extent markers for list type 0x17.; callers 4bf1c@4c067; guest pending
 0x00043b14	365			unknown	unclassified	unverified		
-0x00043c84	368			unknown	unclassified	unverified		
+0x00043c84	368	draw_extent_markers_43c84	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00043c84.json	docs/compiler-abi.md; Draw the extent markers for list type 0xf.; callers 45574@45676,4bf1c@4bff9; guest pending
 0x00043df4	338			unknown	unclassified	unverified		
 0x00043f48	343			unknown	unclassified	unverified		
 0x000440f4	262			unknown	unclassified	unverified		

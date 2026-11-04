@@ -2229,3 +2229,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00099fe0	draw_box_rows_99fe0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00099fe0 (251 bytes); Draw the box rows for the table at 0x40cefe (count word at 0x40d02c).; callers none direct; docs/compiler-abi.md
 0x0009a0dc	draw_box_rows_9a0dc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009a0dc (251 bytes); Draw the box rows for the table at 0x40cd7e (count word at 0x40d026).; callers none direct; docs/compiler-abi.md
 0x0009a1d8	draw_box_rows_9a1d8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009a1d8 (251 bytes); Draw the box rows for the table at 0x40ce86 (count word at 0x40d02e).; callers none direct; docs/compiler-abi.md
+0x00043834	draw_extent_markers_43834	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00043834 (368 bytes); Draw the extent markers for list type 0xe.; callers 4bf1c@4c051; docs/compiler-abi.md
+0x000439a4	draw_extent_markers_439a4	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000439a4 (368 bytes); Draw the extent markers for list type 0x17.; callers 4bf1c@4c067; docs/compiler-abi.md
+0x00043c84	draw_extent_markers_43c84	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00043c84 (368 bytes); Draw the extent markers for list type 0xf.; callers 45574@45676,4bf1c@4bff9; docs/compiler-abi.md
