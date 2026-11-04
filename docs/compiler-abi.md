@@ -8807,3 +8807,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xabb00` | EAX:ef_addr32 | none | a5b70@a5c68,a60a8@a60e1,f18a4@f18ca | Compute a clipped view window from record p into the word block at 0x41eee2..0x41ef00 and scale two of its extents by 1/ |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd36c4` | EAX:uint32_t | EAX:uint32_t | none direct | (ret 4) Allocate the next 0x6ec byte entry (byte counter 0x17d2c0, table 0x486db0, at most 200) for the object s0: clear |

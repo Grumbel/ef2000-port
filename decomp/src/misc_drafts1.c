@@ -19893,3 +19893,51 @@ void compute_view_window_abb00(ef_addr32 p)
 	EF_U16(0x0041eef2u) = (uint16_t)(int32_t)truncate_9d72c(inv * (double)i2);
 	EF_U16(0x0041eeeeu) = (uint16_t)cx;
 }
+
+/* 0xd36c4, 302 bytes. (ret 4) Allocate the next 0x6ec byte entry (byte counter 0x17d2c0, table 0x486db0, at most 200) for the object s0: clear flag bits 1-2 of byte s0+0x20, set up the scratch state at 0x4209xx, copy 0x50 bytes from 0x420970 to entry+0x684 and 0x30 bytes from s0 to entry+0x84, then fill the entry's links and extents. Over the limit the error handler at 0x132a74 is called. Returns s0. */
+uint32_t alloc_object_entry_d36c4(uint32_t s0)
+{
+	uint32_t i, n;
+	ef_addr32 e, q;
+	int32_t v;
+	uint64_t bits;
+	double d, k;
+
+	EF_U32(0x0042099cu) = 1u;
+	EF_U32(0x00420974u) = 0u;
+	EF_U32(0x004209bcu) = 0x004209d0u;
+	EF_U8(s0 + 0x20u) = (uint8_t)(EF_U8(s0 + 0x20u) & 0xf9u);
+	EF_U32(0x004209d0u) = 1u;
+	EF_U32(0x004209d4u) = s0;
+	n = EF_U8(0x0017d2c0u);
+	if ((int32_t)n >= 0xc8) {
+		guest_callptr3_x(EF_U32(0x00132a74u), 0x0018f814u, n, 0xc8u);
+		return s0;
+	}
+	e = 0x00486db0u + n * 0x6ecu;
+	EF_U8(0x0017d2c0u) = (uint8_t)(n + 1u);
+	for (i = 0; i < 0x14u; i++)
+		EF_U32(e + 0x684u + i * 4u) = EF_U32(0x00420970u + i * 4u);
+	EF_U32(e) = 1u;
+	EF_U32(e + 0x6d4u) = 0x000d3844u;
+	for (i = 0; i < 0xcu; i++)
+		EF_U32(e + 0x84u + i * 4u) = EF_U32(s0 + i * 4u);
+	EF_U32(e + 0x6d0u) = e;
+	v = (int32_t)EF_U32(e + 0x8cu);
+	memcpy(&k, ef_guest_memory_ptr(0x0018f840u), sizeof k);
+	d = (double)v * k;
+	memcpy(&bits, &d, sizeof bits);
+	EF_U32(e + 0x6d8u) = (uint32_t)bits;
+	EF_U32(e + 0x6dcu) = (uint32_t)(bits >> 32);
+	q = EF_U32(EF_U32(0x004209bcu) + 4u);
+	EF_U32(e + 0x694u) = EF_U32(q + 0x18u);
+	q = EF_U32(EF_U32(0x004209bcu) + 4u);
+	EF_U32(e + 0x698u) = EF_U32(q + 0x18u) + 1u;
+	q = EF_U32(EF_U32(0x004209bcu) + 4u);
+	EF_U32(e + 0x69cu) = EF_U32(q + 0x1cu);
+	q = EF_U32(EF_U32(0x004209bcu) + 4u);
+	EF_U32(e + 0x6e0u) = 4u;
+	EF_U32(e + 0x6a0u) = EF_U32(q + 0x1cu) + 1u;
+	EF_U32(e + 0x6e8u) = EF_U32(0x00159144u);
+	return s0;
+}

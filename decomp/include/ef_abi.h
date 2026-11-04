@@ -6059,4 +6059,6 @@ void compute_view_window_abb00(ef_addr32 p);
 
 
 
+uint32_t alloc_object_entry_d36c4(uint32_t s0);
+
 #endif
