@@ -302,7 +302,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001a358	54	enter_mode_1a358	game_helpers78	compiles	game	confirmed	decomp/tests/0x0001a358.json	docs/compiler-abi.md; Enter the mode once: apply the argument to the driver and refresh its table.; callers 95e58@95f15; guest pending
 0x0001a390	57	leave_mode_1a390	game_helpers78	compiles	game	confirmed	decomp/tests/0x0001a390.json	docs/compiler-abi.md; Leave the mode: restore the saved driver parameters and refresh its table.; callers 95e58@95f1c; guest pending
 0x0001a3cc	176	step_demo_script_1a3cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001a3cc.json	docs/compiler-abi.md; Step the demo script at 0x122c80: when the expected key code 0x41f833 matches the current script byte, clear it and adva; callers 1cde8@1ce46; guest pending
-0x0001a47c	259			unknown	unclassified	unverified		
+0x0001a47c	259	dispatch_pending_key_1a47c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001a47c.json	docs/compiler-abi.md; Dispatch the pending key byte 0x41f833: refresh the flag words 0x19843c (0x41f7ba / 0x41f7c6), 0x198420 (0x41f7c8) and 0; callers 1cde8@1ce4b; guest pending
 0x0001a580	1595			unknown	unclassified	unverified		
 0x0001abbc	195	try_fire_selected_weapon_1abbc	game_helpers53	compiles	game	confirmed	decomp/tests/0x0001abbc.json	docs/compiler-abi.md; Run the fire action when the selected weapon kind allows it.; callers 1cde8@1cf13; guest pending
 0x0001b4a4	441			unknown	unclassified	unverified		

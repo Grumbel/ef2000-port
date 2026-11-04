@@ -6032,3 +6032,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfb954` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | fc1e8@fc2ac,fc1e8@fc333 | Allocate a 4-byte route record (tag 0x1935bc) and fill it from the class A, sub-class B and slot C: class 0xe with B = 9 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1a47c` | none | none | 1cde8@1ce4b | Dispatch the pending key byte 0x41f833: refresh the flag words 0x19843c (0x41f7ba / 0x41f7c6), 0x198420 (0x41f7c8) and 0 |

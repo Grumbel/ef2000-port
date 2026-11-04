@@ -4615,3 +4615,34 @@ uint32_t make_route_record_fb954(uint32_t a, uint32_t b, uint32_t c)
     }
     return rec;
 }
+
+/* 0x1a47c, 259 bytes. Dispatch the pending key byte 0x41f833: refresh the flag words 0x19843c (0x41f7ba | 0x41f7c6), 0x198420 (0x41f7c8) and 0x198422 (0x41f7ad), then, if a key is pending, either (word 0x12288a set) forward it to 0x11de0 when the mode byte 0x122c53 is 1..4, or call the handler for it from the table 0x198000 (flag 0x19843c), 0x197e00 (flag 0x198420) or 0x198200, if present. The pending key is cleared in every case. */
+void dispatch_pending_key_1a47c(void)
+{
+    uint32_t key;
+    uint32_t fn;
+    EF_U16(0x0019843cu) = (uint16_t)(EF_U8(0x0041f7bau) | EF_U8(0x0041f7c6u));
+    EF_U16(0x00198420u) = EF_U8(0x0041f7c8u);
+    EF_U16(0x00198422u) = EF_U8(0x0041f7adu);
+    if (EF_U8(0x0041f833u) == 0u)
+        return;
+    key = EF_U8(0x0041f833u);
+    if (EF_U16(0x0012288au) != 0u) {
+        int32_t mode = (int8_t)EF_U8(0x00122c53u);
+        if (mode >= 1 && mode <= 4)
+            guest_fn_11de0_x(key);
+    } else if (EF_U16(0x0019843cu) != 0u) {
+        fn = EF_U32(0x00198000u + key * 4u);
+        if (fn != 0u)
+            guest_callptr0_x(fn);
+    } else if (EF_U16(0x00198420u) != 0u) {
+        fn = EF_U32(0x00197e00u + key * 4u);
+        if (fn != 0u)
+            guest_callptr0_x(fn);
+    } else {
+        fn = EF_U32(0x00198200u + key * 4u);
+        if (fn != 0u)
+            guest_callptr0_x(fn);
+    }
+    EF_U8(0x0041f833u) = 0u;
+}

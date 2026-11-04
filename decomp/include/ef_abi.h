@@ -4862,4 +4862,7 @@ void guest_fn_160255_x(void); /* 0x160255 */
 
 uint32_t make_route_record_fb954(uint32_t a, uint32_t b, uint32_t c);
 
+void dispatch_pending_key_1a47c(void);
+void guest_fn_11de0_x(uint32_t key); /* 0x11de0 EAX */
+
 #endif
