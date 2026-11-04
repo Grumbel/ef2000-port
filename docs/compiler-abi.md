@@ -8873,3 +8873,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfa1d4` | AL:uint8_t,EDX:uint32_t,EBX:int32_t | AL:uint8_t | fa02c@fa0ff | Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EDX = bytes left, params in th |
 | `0x10db58` | AL:uint8_t,EDX:uint32_t,EBX:uint32_t | AL:uint8_t | 10da50@10dac2 | Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EBP = table base, params in th |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11d614` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 11ce30@11cf07,11cfe4@11cfc4,11d01c@11d0fe | Register parameters AL = interrupt vector, EBX = handler offset, ECX = handler selector. Sets a DOS interrupt vector (IN |

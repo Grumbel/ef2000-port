@@ -20144,3 +20144,23 @@ uint8_t bitstream_decode_symbol_10db58(uint8_t *buf, uint32_t *esi, uint32_t ebp
 	*buf = al;
 	return EF_U8(ebp + node - 0x210u);
 }
+
+/* 0x11d614, 43 bytes. Register parameters AL = interrupt vector, EBX = handler offset, ECX = handler selector. Sets a DOS interrupt vector (INT 21h AH=25h). When the extender mode byte at 0x132a5e is 2..8, the vector number is passed in CL and AL is 4 (AX = 0x2504) instead. EBX is clobbered by the mode byte, the handler offset travels in EDX. */
+void set_dos_vector_11d614(uint32_t vector, uint32_t offset, uint32_t selector)
+{
+	uint32_t in[7] = {0};
+	uint32_t out[7] = {0};
+	uint8_t sregs[12];
+	uint8_t mode = EF_U8(0x132a5eu);
+	segread_9be0d((uint32_t)(uintptr_t)sregs);
+	in[3] = offset;
+	if (mode >= 2u && mode <= 8u) {
+		in[0] = 0x2504u;
+		in[2] = vector & 0xffu;
+	} else {
+		in[0] = 0x2500u | (vector & 0xffu);
+		in[2] = selector;
+	}
+	in[1] = mode;
+	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+}

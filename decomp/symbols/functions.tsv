@@ -4233,7 +4233,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011d322	99	layout_digits_11d322	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d322.json	docs/compiler-abi.md; Lay out a decimal digit string as "intdigits.fracdigits" at out: copy up to intdigits digits from src, pad with zeros, a; callers 11d3f0@11d57f,11d3f0@11d5ec; guest pending
 0x0011d385	107	right_align_number_11d385	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d385.json	docs/compiler-abi.md; Right-align the len-byte text at buf inside width bytes: move it to the end, then fix a leading "." or sign+"." by inser; callers 11d3f0@11d606; guest pending
 0x0011d3f0	548			unknown	unclassified	unverified		
-0x0011d614	43			unknown	unclassified	unverified		
+0x0011d614	43	set_dos_vector_11d614	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d614.json	docs/compiler-abi.md; Register parameters AL = interrupt vector, EBX = handler offset, ECX = handler selector. Sets a DOS interrupt vector (IN; callers 11ce30@11cf07,11cfe4@11cfc4,11d01c@11d0fe; guest pending
 0x0011d63f	29	read_console_char_11d63f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d63f.json	docs/compiler-abi.md; Return the pending pushed-back character in dword 0x132a50 (clearing it) or, when none is pending, read one character fr; callers 10f1bf@10f210; guest pending
 0x0011d695	444			unknown	unclassified	unverified		
 0x0011f287	76			unknown	unclassified	unverified		
