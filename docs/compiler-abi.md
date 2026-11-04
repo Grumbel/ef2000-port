@@ -6116,3 +6116,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x102028` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 106514@106526,113af0@113b02 | Traced lookup (cdecl, two stack arguments): calls 0x103f04 and, with tracing on (0x17d2c8 == 1), logs the request (forma |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3b58` | none | none | 3dd30@3e30b | Draw the three status lines of the tactical header: the caption 0x1320d7 (colour 12, x = 0x112, y = 1), the target/mode  |

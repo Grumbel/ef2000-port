@@ -5010,3 +5010,30 @@ uint32_t traced_lookup_102028(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a60u, r);
     return r;
 }
+
+/* 0x3b58, 284 bytes. Draw the three status lines of the tactical header: the caption 0x1320d7 (colour 12, x = 0x112, y = 1), the target/mode line (built from the unit named by the pointer at 0x197061 and the mode tables, upper-cased and right-aligned at x = 0x13b - width, y = 10, colour 7) and the key hint line (y = 0x12, same alignment). */
+void draw_tactical_header_3b58(void)
+{
+    char buf[0x3c];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    uint32_t w;
+    uint8_t live;
+    guest_fn_3ea8_x();
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(12u, 0x112, 1, 0x001320d7u);
+    live = guest_fn_7574c((int32_t)(int16_t)EF_U16(EF_U32(0x00197061u) + 0x16u)) != 0u ? 1u : 0u;
+    buf[0] = 0;
+    if (EF_U8(0x00197088u) == 0xffu)
+        guest_fn_a4342_va(b, 0x00131fe6u);
+    if (!live)
+        guest_fn_a4342_va(b, 0x0017f620u, 0x0013208fu, EF_U32(0x00121110u + (uint32_t)EF_U8(0x00197080u) * 4u));
+    uppercase_string(b);
+    w = guest_fn_48d5c_x(b);
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(7u, (int16_t)(0x13bu - w), 10, b);
+    guest_fn_a4342_va(b, 0x0017f628u, 0x00132088u, 0x00196ffbu, 0x0019702du);
+    uppercase_string(b);
+    w = guest_fn_48d5c_x(b);
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(7u, (int16_t)(0x13bu - w), 0x12, b);
+}

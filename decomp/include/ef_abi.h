@@ -4896,4 +4896,8 @@ uint32_t guest_fn_7780_x(uint32_t count, uint32_t size); /* 0x7780 EAX/EDX -> EA
 uint32_t traced_lookup_102028(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t p1, uint32_t p2);
 uint32_t guest_fn_103f04_x(uint32_t a, uint32_t b); /* 0x103f04 cdecl, 2 stack arguments */
 
+void draw_tactical_header_3b58(void);
+void guest_fn_3ea8_x(void); /* 0x3ea8 */
+void guest_fn_a4342_va(ef_addr32 dest, ef_addr32 format, ...); /* 0xa4342 cdecl, variadic */
+
 #endif

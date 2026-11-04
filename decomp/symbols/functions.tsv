@@ -44,7 +44,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00003668	1022			unknown	unclassified	unverified		
 0x00003aa8	61	map_code_3aa8	code_maps1	compiles	game	confirmed	decomp/tests/0x00003aa8.json	docs/compiler-abi.md; Map a code (1-based) to a constant via a jump table (codes outside the range give 26).; callers 2e04@2edf,2e04@2f95,3d74@3d94; guest pending
 0x00003b1c	59	map_code_3b1c	code_maps1	compiles	game	confirmed	decomp/tests/0x00003b1c.json	docs/compiler-abi.md; Map a code to a constant via a jump table (codes outside the range give 26).; callers 3d74@3dcd; guest pending
-0x00003b58	284			unknown	unclassified	unverified		
+0x00003b58	284	draw_tactical_header_3b58	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00003b58.json	docs/compiler-abi.md; Draw the three status lines of the tactical header: the caption 0x1320d7 (colour 12, x = 0x112, y = 1), the target/mode ; callers 3dd30@3e30b; guest pending
 0x00003c74	96	vector_length_3c74	float_helpers1	compiles	game	confirmed	decomp/tests/0x00003c74.json	docs/compiler-abi.md; Integer length of a 3D integer vector, at least 1.; callers 20ec@215f,20ec@21b7,20ec@2211; guest pending
 0x00003cd4	27	max3_signed	low_helpers	compiles	game	confirmed	decomp/tests/0x00003cd4.json	docs/compiler-abi.md; signed maximum of three; callers 2e04@304c,2e04@30d9,2e04@31a3; guest pending
 0x00003cf0	129	reset_selection_3cf0	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00003cf0.json	docs/compiler-abi.md; Reset the selection state from the record at dword 0x197061.; callers 1b70@1c5d,1cd8@1eea,3ea8@3f64; guest pending
