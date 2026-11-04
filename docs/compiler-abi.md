@@ -8043,3 +8043,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe9dcc` | none | none | e9c00@e9ca6 | Derive three view angles from the direction doubles at 0x464490, 0x4644a8, 0x4644b0, 0x4644b8 and 0x4644c0: 0x432220 = a |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe9f84` | none | none | e9c00@e9c45 | Second set of view angles (sibling of 0xe9dcc): 0x4321f8 = atan2(double 0x4644b8, double 0x4644c0), 0x432230 = atan2(dou |

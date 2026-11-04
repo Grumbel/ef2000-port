@@ -5736,4 +5736,7 @@ uint8_t guest_fn_5cb1c_x(uint32_t arg, int32_t x, int32_t y, int32_t z); /* 0x5c
 
 void derive_view_angles_e9dcc(void);
 
+void derive_view_angles_e9f84(void);
+double guest_fn_deb1a_x(double x); /* 0xdeb1a ST0 -> ST0, arcsine */
+
 #endif

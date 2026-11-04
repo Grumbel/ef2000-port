@@ -14549,3 +14549,31 @@ void derive_view_angles_e9dcc(void)
     r = guest_fn_e7df4_x(v);
     memcpy(ef_guest_memory_ptr(0x00432288u), &r, sizeof r);
 }
+
+/* 0xe9f84, 177 bytes. Second set of view angles (sibling of 0xe9dcc): 0x4321f8 = atan2(double 0x4644b8, double 0x4644c0), 0x432230 = atan2(double 0x464498, double 0x464480) and, with the double at 0x4644b0 clamped to [0x1914a4, 1.0] in place, 0x432298 = 0xdeb1a(-0x4644b0). */
+void derive_view_angles_e9f84(void)
+{
+    double a, b, c, d, v, lo, r;
+    memcpy(&a, ef_guest_memory_ptr(0x004644b8u), sizeof a);
+    memcpy(&b, ef_guest_memory_ptr(0x004644c0u), sizeof b);
+    r = atan2_b4620(a, b);
+    memcpy(ef_guest_memory_ptr(0x004321f8u), &r, sizeof r);
+    memcpy(&c, ef_guest_memory_ptr(0x00464498u), sizeof c);
+    memcpy(&d, ef_guest_memory_ptr(0x00464480u), sizeof d);
+    r = atan2_b4620(c, d);
+    memcpy(ef_guest_memory_ptr(0x00432230u), &r, sizeof r);
+    memcpy(&v, ef_guest_memory_ptr(0x004644b0u), sizeof v);
+    if (!(1.0 >= v)) {
+        EF_U32(0x004644b0u) = 0u;
+        EF_U32(0x004644b4u) = 0x3ff00000u;
+    }
+    memcpy(&v, ef_guest_memory_ptr(0x004644b0u), sizeof v);
+    memcpy(&lo, ef_guest_memory_ptr(0x001914a4u), sizeof lo);
+    if (!(v >= lo)) {
+        EF_U32(0x004644b0u) = 0u;
+        EF_U32(0x004644b4u) = 0xbff00000u;
+    }
+    memcpy(&v, ef_guest_memory_ptr(0x004644b0u), sizeof v);
+    r = guest_fn_deb1a_x(-v);
+    memcpy(ef_guest_memory_ptr(0x00432298u), &r, sizeof r);
+}
