@@ -116,3 +116,47 @@ void release_block_d5ec0(ef_addr32 block)
     if (block == EF_U32(0x00420a68u))
         EF_U32(0x00420a68u) = 0u;
 }
+
+/* 0x84678, 79 bytes. Advance the page counter, run the transition selected by bits 3..5 of the word at 0x1fcbe2 (1..4), then call the handler indexed by the word at 0x12b4a6 in the table at 0x12b4a8. */
+void run_state_handler_84678(void)
+{
+    advance_page_counter_83b50();
+    switch ((EF_U16(0x001fcbe2u) >> 3) & 7u) {
+    case 1: reset_pending_mode_844e4(); break;
+    case 2: initialize_ui_component(); break;
+    case 3: set_pending_mode_two(); break;
+    case 4: advance_state_8461c(); break;
+    default: break;
+    }
+    guest_callptr0_x(EF_U32(0x0012b4a8u + (uint32_t)EF_U16(0x0012b4a6u) * 4u));
+}
+
+/* 0x912b8, 79 bytes. While the pending-message count at 0x2144b2 is positive, shrink it by the limit at 0x127d92 and draw the message at row 5 near the right edge. */
+void draw_pending_message_912b8(ef_addr32 text)
+{
+    int32_t count = EF_S16(0x002144b2u);
+    int32_t width;
+    if (count <= 0)
+        return;
+    EF_U16(0x002144b2u) = (uint16_t)(count - (int32_t)EF_U16(0x00127d92u));
+    EF_U8(0x00127b1au) = 1u;
+    width = (int16_t)guest_fn_48d5c_x(text);
+    guest_fn_48c90(0xfu, (uint32_t)(int32_t)(int16_t)(0x136 - width), 5u, text);
+}
+
+/* 0x106cb0, 78 bytes. Read count bytes from a ring record into buf, waiting up to timeout; returns 0 when done or 3 on timeout. */
+uint32_t read_ring_bytes_106cb0(ef_addr32 rec, ef_addr32 buf, uint32_t count, uint32_t timeout)
+{
+    uint32_t start = tail_jump_106be0(rec);
+    uint32_t n = 0u;
+    for (;;) {
+        if (entry_empty_118520(EF_U32(rec)) == 0u) {
+            EF_U8(buf++) = (uint8_t)ring_pop_1184c4(EF_U32(rec));
+            n++;
+            if (n == count)
+                return 0u;
+        } else if (elapsed_at_least((int32_t)start, (int32_t)timeout) != 0u) {
+            return 3u;
+        }
+    }
+}

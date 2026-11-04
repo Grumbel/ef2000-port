@@ -5104,3 +5104,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x8557c` | EAX:uint32_t | EAX:uint32_t | 857bc@85949 | Return 0 when the owner has no weight of the class implied by its type byte (+0x1b: filter 1 for types 0-2, 9, 13; filte |
 | `0xd5ec0` | EAX:ef_addr32 | none | 980e8@98114 | Tear down a loaded block record: trace-call 0x1031a0 with the handle at 0x420a64, release its range (+9 pointer, +5 leng |
+
+## small_wrappers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x84678` | none | none | 92f98@92faa | Advance the page counter, run the transition selected by bits 3..5 of the word at 0x1fcbe2 (1..4), then call the handler |
+| `0x912b8` | EAX:ef_addr32 | none | 3dd30@3e344 | While the pending-message count at 0x2144b2 is positive, shrink it by the limit at 0x127d92 and draw the message at row  |
+| `0x106cb0` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 107070@107083 | Read count bytes from a ring record into buf, waiting up to timeout; returns 0 when done or 3 on timeout. |

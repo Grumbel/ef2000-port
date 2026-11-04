@@ -1611,7 +1611,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000845c0	91	forward_cursor_vector_845c0	game_helpers72	compiles	game	confirmed	decomp/tests/0x000845c0.json	docs/compiler-abi.md; Forward the cursor vector, redoing it once when the hit test accepts the position.; callers none direct; guest pending
 0x0008461c	52	advance_state_8461c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0008461c.json	docs/compiler-abi.md; ; callers 84678@846b2; guest pending
 0x00084650	17	unsupported_84650	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x00084650.json	docs/compiler-abi.md; Unsupported feature: abort and report failure.; callers 84678@846bf; guest pending
-0x00084678	79			unknown	unclassified	unverified		
+0x00084678	79	run_state_handler_84678	small_wrappers7	compiles	game	confirmed	decomp/tests/0x00084678.json	docs/compiler-abi.md; Advance the page counter, run the transition selected by bits 3..5 of the word at 0x1fcbe2 (1..4), then call the handler; callers 92f98@92faa; guest pending
 0x000846c8	190	reset_unit_view_846c8	game_helpers47	compiles	game	confirmed	decomp/tests/0x000846c8.json	docs/compiler-abi.md; Reset a unit record to its idle state and rebuild the draw defaults.; callers 848e0@84932; guest pending
 0x00084788	342			unknown	unclassified	unverified		
 0x000848e0	280			unknown	unclassified	unverified		
@@ -1881,7 +1881,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091238	33	begin_mode_35	misc_state	compiles	game	confirmed	decomp/tests/0x00091238.json	docs/compiler-abi.md; byte 0x12db9e=0x35, word 0x21449c=1, 0xd0b68(0x12dbec); callers 92c28@92ceb,92c28@92daf; guest pending
 0x0009125c	60	scene_lookup_named_word	scene_state	compiles	game	confirmed	decomp/tests/0x0009125c.json	docs/compiler-abi.md
 0x00091298	29	scene_metric_remaining	scene_state	compiles	game	confirmed	decomp/tests/0x00091298.json	docs/compiler-abi.md
-0x000912b8	79			unknown	unclassified	unverified		
+0x000912b8	79	draw_pending_message_912b8	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000912b8.json	docs/compiler-abi.md; While the pending-message count at 0x2144b2 is positive, shrink it by the limit at 0x127d92 and draw the message at row ; callers 3dd30@3e344; guest pending
 0x000913dc	1298			unknown	unclassified	unverified		
 0x000918f0	30	scene_metric_reaches_threshold	scene_state	compiles	game	confirmed	decomp/tests/0x000918f0.json	docs/compiler-abi.md
 0x00091910	73	set_scene_input_triplet	scene_state	compiles	game	confirmed	decomp/tests/0x00091910.json	docs/compiler-abi.md
@@ -3912,7 +3912,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00106be8	18	times_100	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106be8.json	docs/compiler-abi.md; value * 100.; callers d9c30@d9c45,d9c30@d9c7e,d9cb4@d9cd5; guest pending
 0x00106bfc	32	times_100_div_10	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106bfc.json	docs/compiler-abi.md; value * 100 / 10.; callers d9cb4@d9cf4,d9dc0@d9de6,106d34@106d9c; guest pending
 0x00106c3c	22	elapsed_at_least	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106c3c.json	docs/compiler-abi.md; 0xf8248() - EAX >= EDX (signed).; callers 106cb0@106cec,106d34@106da5,106d34@106db2; guest pending
-0x00106cb0	78			unknown	unclassified	unverified		
+0x00106cb0	78	read_ring_bytes_106cb0	small_wrappers7	compiles	game	confirmed	decomp/tests/0x00106cb0.json	docs/compiler-abi.md; Read count bytes from a ring record into buf, waiting up to timeout; returns 0 when done or 3 on timeout.; callers 107070@107083; guest pending
 0x00106d00	52			unknown	unclassified	unverified		
 0x00106d34	143			unknown	unclassified	unverified		
 0x00106dc4	103	wait_ring_data_106dc4	dos_slots1	compiles	game	confirmed	decomp/tests/0x00106dc4.json	docs/compiler-abi.md; Wait on a ring record until its data arrives (0), the end marker 0x4f (0) or 0x45 (8) is popped, or the timeout expires ; callers 106e2c@106e38; guest pending

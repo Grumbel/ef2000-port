@@ -4350,4 +4350,9 @@ ef_addr32 utoa_cbcc5(uint32_t value, ef_addr32 dst, uint32_t base);
 uint32_t owner_has_weight_8557c(uint32_t owner);
 void release_block_d5ec0(ef_addr32 block);
 
+void run_state_handler_84678(void);
+void draw_pending_message_912b8(ef_addr32 text);
+uint32_t read_ring_bytes_106cb0(ef_addr32 rec, ef_addr32 buf, uint32_t count, uint32_t timeout);
+void guest_callptr0_x(ef_addr32 fn); /* indirect call, no arguments */
+
 #endif
