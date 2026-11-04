@@ -5642,6 +5642,7 @@ void draw_overlay_polys_f3378(void);
 void guest_fn_f3214_x(void); /* 0xf3214 */
 
 
-void guest_fn_f3214_x(void); /* 0xf3214 */
+
+
 
 #endif
