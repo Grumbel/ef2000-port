@@ -7122,3 +7122,33 @@ int32_t find_icon_at_4dee0(uint32_t x, uint32_t y)
     }
     return -1;
 }
+
+/* 0x1014a4, 214 bytes. Set up the scan-line interpolation between the vertex records P0 (EBX) and P1 (ECX): N = the integer part (>> 16) of the y fields (+0x1c) of P1 minus P0; when N <= 0 return it unchanged, otherwise copy P0's x, y, +0x24, +0x28, +0x2c and +8 into the start record OUT (EAX) and fill the step record STEP (EDX) with the per-line deltas of +0x18 (x), of +0x24/+0x28 when P0 flag 2 is set and of +0x2c when flag 4 is set (zero otherwise), plus the reciprocal depth 1/P0[+8] (float +0x10) and its per-line change (float +0x14). Returns N. */
+int32_t setup_edge_step_1014a4(uint32_t out, uint32_t step, uint32_t p0, uint32_t p1)
+{
+    int32_t n = ((int32_t)EF_U32(p1 + 0x1cu) >> 16) - ((int32_t)EF_U32(p0 + 0x1cu) >> 16);
+    float r0, r1;
+    if (n <= 0)
+        return n;
+    EF_U32(out) = EF_U32(p0 + 0x18u);
+    EF_U32(out + 4u) = EF_U32(p0 + 0x1cu);
+    EF_U32(out + 8u) = EF_U32(p0 + 0x24u);
+    EF_U32(out + 0xcu) = EF_U32(p0 + 0x28u);
+    EF_U32(out + 0x10u) = EF_U32(p0 + 0x2cu);
+    EF_U32(out + 0x14u) = EF_U32(p0 + 8u);
+    EF_U32(step + 4u) = 0u;
+    EF_U32(step + 8u) = 0u;
+    EF_U32(step + 0xcu) = 0u;
+    EF_U32(step) = (uint32_t)(((int32_t)EF_U32(p1 + 0x18u) - (int32_t)EF_U32(p0 + 0x18u)) / n);
+    if (EF_U8(p0 + 0x20u) & 2u) {
+        EF_U32(step + 4u) = (uint32_t)(((int32_t)EF_U32(p1 + 0x24u) - (int32_t)EF_U32(p0 + 0x24u)) / n);
+        EF_U32(step + 8u) = (uint32_t)(((int32_t)EF_U32(p1 + 0x28u) - (int32_t)EF_U32(p0 + 0x28u)) / n);
+    }
+    if (EF_U8(p0 + 0x20u) & 4u)
+        EF_U32(step + 0xcu) = (uint32_t)(((int32_t)EF_U32(p1 + 0x2cu) - (int32_t)EF_U32(p0 + 0x2cu)) / n);
+    r0 = (float)(1.0 / (double)(int32_t)EF_U32(p0 + 8u));
+    *(float *)ef_guest_memory_ptr(step + 0x10u) = r0;
+    r1 = (float)(((1.0 / (double)(int32_t)EF_U32(p1 + 8u)) - (double)r0) / (double)n);
+    *(float *)ef_guest_memory_ptr(step + 0x14u) = r1;
+    return n;
+}

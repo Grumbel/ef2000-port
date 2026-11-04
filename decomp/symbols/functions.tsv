@@ -3789,7 +3789,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ff498	900			unknown	unclassified	unverified		
 0x000ff81c	686			unknown	unclassified	unverified		
 0x000ffe78	211			unknown	unclassified	unverified		
-0x001014a4	214			unknown	unclassified	unverified		
+0x001014a4	214	setup_edge_step_1014a4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001014a4.json	docs/compiler-abi.md; Set up the scan-line interpolation between the vertex records P0 (EBX) and P1 (ECX): N = the integer part (>> 16) of the; callers 1016e0@1017ba,1016e0@1017f4; guest pending
 0x0010162c	91	vertex_depth_range_flat_10162c	game_helpers92	compiles	game	confirmed	decomp/tests/0x0010162c.json	docs/compiler-abi.md; Return 1 when the minimum and maximum of the vertices' z field have the same integer part (high 16 bits).; callers 1016e0@101757; guest pending
 0x00101688	85	pulse_delay_101688	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00101688.json	docs/compiler-abi.md; Run a short hardware delay loop: n pulses of the two callbacks at 0x486da4/0x486da0, one for the low bit and two per rem; callers 1016e0@101826; guest pending
 0x001016e0	439			unknown	unclassified	unverified		

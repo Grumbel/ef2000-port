@@ -5106,4 +5106,6 @@ uint32_t fopen_core_bc287(uint32_t name, uint32_t mode, uint32_t file, uint32_t 
 
 int32_t find_icon_at_4dee0(uint32_t x, uint32_t y);
 
+int32_t setup_edge_step_1014a4(uint32_t out, uint32_t step, uint32_t p0, uint32_t p1);
+
 #endif
