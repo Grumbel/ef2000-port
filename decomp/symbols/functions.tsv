@@ -2170,7 +2170,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a2ef4	123	scan_entries_a2ef4	search_helpers1	compiles	game	confirmed	decomp/tests/0x000a2ef4.json	docs/compiler-abi.md; Scan the first 0x1357b0 table entries for one without flag 1 (+0x1c); if found, queue request 0x137198 with its index an; callers a2f70@a30f5,a410c@a35b2; guest pending
 0x000a2f70	406			unknown	unclassified	unverified		
 0x000a3108	33	forward_if_clear_a3108	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3108.json	docs/compiler-abi.md; tail 0xec0ec when byte 0x13579a clear else 0; callers a312c@a3186; guest pending
-0x000a312c	337			unknown	unclassified	unverified		
+0x000a312c	337	find_session_entry_a312c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a312c.json	docs/compiler-abi.md; Find or create the session entry for packet EAX (low word; descriptors at 0x135878/0x13587c, the sender name is at paylo; callers a32e8@a330e; guest pending
 0x000a3280	72	request_status_string_a3280	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x000a3280.json	docs/compiler-abi.md; Request a status string for an index and restore the frame delta.; callers a32e8@a3327; guest pending
 0x000a32c8	30	issue_state_request_a32c8	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000a32c8.json	docs/compiler-abi.md; Issue a request for one byte of state.; callers a32e8@a331d,a32e8@a3342; guest pending
 0x000a32e8	98	request_status_for_a32e8	game_helpers64	compiles	game	confirmed	decomp/tests/0x000a32e8.json	docs/compiler-abi.md; Request the state matching the current limit, or a status string for a lookup.; callers a33a4@a33d2; guest pending

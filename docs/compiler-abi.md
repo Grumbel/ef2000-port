@@ -8226,3 +8226,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x36438` | none | none | 36f84@36fb4 | Host-side transfer state machine in byte 0x19f5aa (states 2..9 through a jump table). 2 saves dword 0x19f350 in 0x19f324 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa312c` | EAX:uint32_t | EAX:uint32_t | a32e8@a330e | Find or create the session entry for packet EAX (low word; descriptors at 0x135878/0x13587c, the sender name is at paylo |

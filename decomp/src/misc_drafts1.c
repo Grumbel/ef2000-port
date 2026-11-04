@@ -16003,3 +16003,47 @@ void step_host_transfer_36438(void)
 	if (state != EF_U8(0x0019f5aau))
 		enable_state_widget_362c4();
 }
+
+/* 0xa312c, 337 bytes. Find or create the session entry for packet EAX (low word; descriptors at 0x135878/0x13587c, the sender name is at payload +6). Scans the entries (pointers at 0x1368bc, count = high half of dword 0x1357ae) that have flag bit 0 set: A is the last index whose name equals the sender name and B the last index for which 0xa3108 forwards (checked only when byte [0x136f04 + byte 0x13579a] is set). An index A above zero that equals B, or with that byte clear, gets flag bits 0 and 2 (values 1 and 2) set and is returned (sign-extended). With neither A nor B found and room left (word 0x1357b4 above the count) a new entry is announced through 0xe9a24 (0x21, name, entry), flagged and word 0x1357b0 is incremented; the old value of that word is returned. Otherwise returns 0xffff. ORIGINAL BUG: index 0 can never be matched because the test is "A > 0". */
+uint32_t find_session_entry_a312c(uint32_t packet)
+{
+	int8_t a = -1, b = -1;
+	uint32_t i, ent, name, n, old;
+	int32_t cnt;
+
+	packet &= 0xffffu;
+	cnt = (int32_t)EF_U32(0x001357aeu) >> 16;
+	for (i = 0; (int32_t)(i & 0xffffu) < cnt; i++) {
+		ent = EF_U32(0x001368bcu + (i & 0xffffu) * 4u);
+		if ((EF_U8(ent + 0x1cu) & 1u) == 0u)
+			continue;
+		name = EF_U32(0x0013587cu + packet * 32u) + 6u;
+		if (guest_fn_a4380(ent, name) == 0u)
+			a = (int8_t)i;
+		if (EF_U8(0x00136f04u + EF_U8(0x0013579au)) != 0u) {
+			if ((forward_if_clear_a3108((uint16_t)i, (uint16_t)packet) & 0xffu) != 0u)
+				b = (int8_t)i;
+		}
+	}
+	if (a > 0 && (a == b || EF_U8(0x00136f04u + EF_U8(0x0013579au)) == 0u)) {
+		ent = EF_U32(0x001368bcu + (uint32_t)(int32_t)a * 4u);
+		EF_U8(ent + 0x1cu) |= 1u;
+		EF_U8(ent + 0x1cu) |= 2u;
+		return (uint32_t)(int32_t)(int16_t)a & 0xffffu;
+	}
+	if (a == -1 && b == -1) {
+		n = (uint32_t)((int32_t)EF_U32(0x001357aeu) >> 16);
+		if ((int32_t)n < (int32_t)EF_U16(0x001357b4u)) {
+			ent = EF_U32(0x001368bcu + n * 4u);
+			name = EF_U32(0x0013587cu + packet * 32u) + 6u;
+			guest_fn_e9a24(0x21u, name, ent);
+			n = (uint32_t)((int32_t)EF_U32(0x001357aeu) >> 16);
+			EF_U8(EF_U32(0x001368bcu + n * 4u) + 0x1cu) |= 1u;
+			EF_U8(EF_U32(0x001368bcu + n * 4u) + 0x1cu) |= 2u;
+			old = EF_U16(0x001357b0u);
+			EF_U16(0x001357b0u) = (uint16_t)(old + 1u);
+			return old;
+		}
+	}
+	return 0xffffu;
+}

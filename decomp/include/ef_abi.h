@@ -5819,4 +5819,6 @@ void step_lobby_36d30(void);
 
 void step_host_transfer_36438(void);
 
+uint32_t find_session_entry_a312c(uint32_t packet);
+
 #endif
