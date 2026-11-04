@@ -6623,3 +6623,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe378c` | EAX:uint32_t | AL:uint8_t | 97dcc@97eb0 | Open the resource file NAME (handle stored in dword 0x15f8fc), read its count word into 0x15f900 and, when non-zero, all |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6bca8` | none | none | 6b620@6b666 | Normalise the three angle-like doubles of the current object (dword pointer 0x1f71bc; fields +0x69, +0x71, +0x61 = X, Y, |

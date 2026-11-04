@@ -1294,7 +1294,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006b608	24			unknown	unclassified	unverified		
 0x0006b620	196			unknown	unclassified	unverified		
 0x0006b6c8	1472			unknown	unclassified	unverified		
-0x0006bca8	221			unknown	unclassified	unverified		
+0x0006bca8	221	normalise_angles_6bca8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006bca8.json	docs/compiler-abi.md; Normalise the three angle-like doubles of the current object (dword pointer 0x1f71bc; fields +0x69, +0x71, +0x61 = X, Y,; callers 6b620@6b666; guest pending
 0x0006bd88	157	update_camera_state_6bd88	float_helpers3	compiles	game	confirmed	decomp/tests/0x0006bd88.json	docs/compiler-abi.md; Copy the camera position and recompute the closing-speed state.; callers 6b6c8@6bbb8; guest pending
 0x0006be28	190			unknown	unclassified	unverified		
 0x0006bee8	773			unknown	unclassified	unverified		

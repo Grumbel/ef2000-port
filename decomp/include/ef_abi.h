@@ -5128,4 +5128,6 @@ uint32_t find_nearest_object_2c454(uint32_t pos, uint32_t id, uint32_t side, uin
 
 uint8_t open_resource_file_e378c(uint32_t name);
 
+void normalise_angles_6bca8(void);
+
 #endif

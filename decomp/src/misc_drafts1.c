@@ -7501,3 +7501,36 @@ uint8_t open_resource_file_e378c(uint32_t name)
     seek_start_a7ab4(0u, 0u, 0u, 0u, EF_U32(0x0015f8fcu), 10u);
     return 1u;
 }
+
+/* 0x6bca8, 221 bytes. Normalise the three angle-like doubles of the current object (dword pointer 0x1f71bc; fields +0x69, +0x71, +0x61 = X, Y, Z) into range: if X is above the limit at 0x1863cc it is mirrored (X = k - X, with Y and Z each advanced by k = double 0x1863d4); if X is below 0x1863dc it is mirrored about 0x1863e4 with the same Y/Z advance; then Z and Y are wrapped by the period (0x1863ec / 0x1863f4) when above 0x1863d4 or below 0x1863e4. */
+void normalise_angles_6bca8(void)
+{
+    uint32_t o = EF_U32(0x001f71bcu);
+    double *x = (double *)ef_guest_memory_ptr(o + 0x69u);
+    double *y = (double *)ef_guest_memory_ptr(o + 0x71u);
+    double *z = (double *)ef_guest_memory_ptr(o + 0x61u);
+    double k = *(double *)ef_guest_memory_ptr(0x001863d4u);
+    double lim_hi = *(double *)ef_guest_memory_ptr(0x001863ccu);
+    double lim_lo = *(double *)ef_guest_memory_ptr(0x001863dcu);
+    double d = *(double *)ef_guest_memory_ptr(0x001863e4u);
+    double wrap_dn = *(double *)ef_guest_memory_ptr(0x001863ecu);
+    double wrap_up = *(double *)ef_guest_memory_ptr(0x001863f4u);
+    if (*x > lim_hi) {
+        *x = k - *x;
+        *y = *y + k;
+        *z = k + *z;
+    }
+    if (*x < lim_lo) {
+        *x = d - *x;
+        *y = *y + k;
+        *z = k + *z;
+    }
+    if (*z > k)
+        *z = *z + wrap_dn;
+    if (*z < d)
+        *z = *z + wrap_up;
+    if (*y > k)
+        *y = *y + wrap_dn;
+    if (*y < d)
+        *y = *y + wrap_up;
+}
