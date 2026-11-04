@@ -6006,4 +6006,7 @@ void slew_aim_angles_1db08(ef_addr32 ctx);
 void parse_command_line_a9724(ef_addr32 text);
 void guest_fn_3ea0c_x(uint32_t argc, ef_addr32 argv); /* 0x3ea0c EAX=argc, EDX=argv */
 
+void destroy_unit_8cf10(int32_t unit);
+void guest_fn_7ef14_x(void); /* 0x7ef14 */
+
 #endif

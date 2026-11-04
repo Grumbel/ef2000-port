@@ -8687,3 +8687,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa9724` | EAX:ef_addr32 | none | a9e70@a9f8d | Handle the command line TEXT (EAX). When 0x1371ff is set only a leading '%' matters (it sets 0x137200). Otherwise clear  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8cf10` | EAX:int32_t | none | 8de9c@8e01c | Remove unit UNIT (AX, sign extended) from play unless its flag +0x24 bit 2 is set. When it is the local player's unit (w |

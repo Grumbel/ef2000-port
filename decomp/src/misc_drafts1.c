@@ -19133,3 +19133,40 @@ void parse_command_line_a9724(ef_addr32 text)
 		EF_U8(0x001371fbu) = 0u;
 	}
 }
+
+/* 0x8cf10, 287 bytes. Remove unit UNIT (AX, sign extended) from play unless its flag +0x24 bit 2 is set. When it is the local player's unit (word 0x1f71ce) the working state is reset and, in a network game (0x127da8), the owner's loss counter (word array 0x1a6378) is bumped, its score (0x1a6398) lowered by 4 (8 in game mode 3) and the owner summary and a packet are sent. Then the unit's +0x12/+0x91/+0x95 are cleared, bit 3 of +0x26 dropped, 0x7ef14 run, the position packed and a kind-0x64 message sent; a linked panel strip (+0x20b) is cleared. */
+void destroy_unit_8cf10(int32_t unit)
+{
+	ef_addr32 u = guest_fn_7489c((int32_t)(int16_t)unit);
+	int32_t player;
+
+	if (u == 0u)
+		return;
+	if ((EF_U8(u + 0x24u) & 4u) != 0u)
+		return;
+	if ((uint16_t)unit == EF_U16(0x001f71ceu)) {
+		EF_U8(0x001a363au) = 1u;
+		reset_working_state_e76c8();
+		EF_U8(0x001a3638u) = 0u;
+		player = (int32_t)EF_U8(0x001a666bu);
+		EF_U8(0x001a363fu) = 0u;
+		if (player < 8 && EF_U8(0x00127da8u) != 0u) {
+			EF_U16(0x001a6378u + (uint32_t)player * 2u) = (uint16_t)(EF_U16(0x001a6378u + (uint32_t)player * 2u) + 1u);
+			if (EF_U8(0x0012584bu) == 3u)
+				EF_U16(0x001a6398u + (uint32_t)player * 2u) = (uint16_t)(EF_U16(0x001a6398u + (uint32_t)player * 2u) - 8u);
+			else
+				EF_U16(0x001a6398u + (uint32_t)player * 2u) = (uint16_t)(EF_U16(0x001a6398u + (uint32_t)player * 2u) - 4u);
+			send_owner_summary_56a4c();
+			send_packet_2c(0u, EF_U8(0x001a666bu), 1u, 0u, 0u);
+		}
+	}
+	EF_U32(u + 0x12u) = 0u;
+	EF_U32(u + 0x91u) = 0u;
+	EF_U32(u + 0x95u) = 0u;
+	EF_U8(u + 0x26u) = (uint8_t)(EF_U8(u + 0x26u) & 0xf7u);
+	guest_fn_7ef14_x();
+	pack_runtime_position(-1, (int32_t)EF_U32(u) >> 8, (int32_t)EF_U32(u + 8u) >> 8, 0u);
+	send_or_defer_748f4((int16_t)unit, 0u, 0u, 0x64u);
+	if (EF_U8(u + 0x22fu) != 0u)
+		clear_panel_strip((int16_t)((int32_t)EF_U32(u + 0x20bu) >> 16));
+}

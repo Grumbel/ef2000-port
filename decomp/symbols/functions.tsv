@@ -1809,7 +1809,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008ccec	90	reset_unit_links_8ccec	game_helpers30	compiles	game	confirmed	decomp/tests/0x0008ccec.json	docs/compiler-abi.md; Reset a unit's link slots to 0xff.; callers 8c49c@8c800; guest pending
 0x0008cd48	46	select_object_8cd48	scene_helpers	compiles	game	confirmed	decomp/tests/0x0008cd48.json	docs/compiler-abi.md; word 0x12db60=1; 0x8c0f0(0); store signed word at 0x1f71d0 and obj+0x16 unless -1; callers 49228@4970e; guest pending
 0x0008cd78	406			unknown	unclassified	unverified		
-0x0008cf10	287			unknown	unclassified	unverified		
+0x0008cf10	287	destroy_unit_8cf10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008cf10.json	docs/compiler-abi.md; Remove unit UNIT (AX, sign extended) from play unless its flag +0x24 bit 2 is set. When it is the local player's unit (w; callers 8de9c@8e01c; guest pending
 0x0008d030	176	check_cell_trigger_8d030	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008d030.json	docs/compiler-abi.md; Fire the cell trigger when the player's unit stands on a special terrain value.; callers 8dd48@8de90; guest pending
 0x0008d0e0	57	mark_ui_links_by_slot	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x0008d0e0.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0008d11c	531			unknown	unclassified	unverified		
