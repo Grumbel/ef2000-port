@@ -7972,3 +7972,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x45dd4` | EAX:int32_t | EAX:ef_addr32 | 77c90@78289,77c90@782b1,77c90@78413 | Spell the number VALUE (EAX) as a list of glyph words at 0x1a522a (word 0 holds the count, the glyphs follow at +2, +4,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1d474` | none | none | 3dd30@3e1ee | Replay the queued effect events (see queue_effect_event_1d5f4) that are close to the camera (0x21444c, 0x214448, 0x21445 |

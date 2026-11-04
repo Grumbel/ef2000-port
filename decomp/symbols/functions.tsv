@@ -317,7 +317,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001d318	149	reset_loop_state_1d318	game_helpers15	compiles	game	confirmed	decomp/tests/0x0001d318.json	docs/compiler-abi.md; Reset the game-loop state and run ten warm-up ticks.; callers 3ea0c@3ee4b; guest pending
 0x0001d3c4	79	select_tables_1d3c4	game_state_helpers	compiles	game	confirmed	decomp/tests/0x0001d3c4.json	docs/compiler-abi.md; ; callers 8b39c@8b519; guest pending
 0x0001d420	11	reset_handler_1d420	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x0001d420.json	docs/compiler-abi.md; Reset the 0x132ae0 handler pointer.; callers 15af0@15b74,3cfc0@3d1c0,3dd30@3dd7c; guest pending
-0x0001d474	343			unknown	unclassified	unverified		
+0x0001d474	343	play_queued_effects_1d474	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001d474.json	docs/compiler-abi.md; Replay the queued effect events (see queue_effect_event_1d5f4) that are close to the camera (0x21444c, 0x214448, 0x21445; callers 3dd30@3e1ee; guest pending
 0x0001d5cc	38	dispatch_two_object_events	event_wrappers	compiles	game	confirmed	decomp/tests/0x001d5cc.json	Optional event by 127da9 then always required; callers 1e0ec@1e126/394e0@3953f; guest pending
 0x0001d5f4	266	queue_effect_event_1d5f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001d5f4.json	docs/compiler-abi.md; In play mode (byte 0x125847) queue a sound/effect event for the vector VEC (EAX, three dwords; a positive second compone; callers 1d5cc@1d5ea,56928@5694a; guest pending
 0x0001d700	120	update_record_1d700	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0001d700.json	docs/compiler-abi.md; Dispatch on the kind byte +0x41 of the 0x171-byte record number AX.; callers 5437c@543d0; guest pending

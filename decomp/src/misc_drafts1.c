@@ -14098,3 +14098,41 @@ ef_addr32 spell_number_45dd4(int32_t value)
     EF_U32(0x001a51f4u) = tab;
     return 0x001a522au;
 }
+
+/* 0x1d474, 343 bytes. Replay the queued effect events (see queue_effect_event_1d5f4) that are close to the camera (0x21444c, 0x214448, 0x214450 as x, y, z): walk the circular list headed at 0x425b88 (limit 0x2000 on each axis) and then the one at 0x425b24 (limit 0x1000). A slot is played when the scene gate (0x8bf1c on y << 8) allows it and its sound word (+0x10 >> 16) is not -1; slots of the first list first load their orientation words (+0xa, +0xc, +0xe >> 16) into the sound record with 0xa0ea8, then both lists start the sound with 0x9e0c4 using the position shifted left by 16. */
+void play_queued_effects_1d474(void)
+{
+    ef_addr32 head = EF_U32(0x00425b88u);
+    ef_addr32 s;
+    if (head != 0u) {
+        s = head;
+        do {
+            if ((int32_t)guest_fn_cf94a(EF_U32(s) - EF_U32(0x0021444cu)) < 0x2000
+                && (int32_t)guest_fn_cf94a(EF_U32(s + 4u) - EF_U32(0x00214448u)) < 0x2000
+                && (int32_t)guest_fn_cf94a(EF_U32(s + 8u) - EF_U32(0x00214450u)) < 0x2000
+                && scene_gate_allows((int32_t)(EF_U32(s + 4u) << 8)) != 0u
+                && ((int32_t)EF_U32(s + 0x10u) >> 16) != -1) {
+                guest_fn_a0ea8((int32_t)EF_U32(s + 0x10u) >> 16, (uint32_t)((int32_t)EF_U32(s + 0xau) >> 16),
+                               (int32_t)EF_U32(s + 0xcu) >> 16, (uint32_t)((int32_t)EF_U32(s + 0xeu) >> 16));
+                guest_fn_9e0c4((int32_t)EF_U32(s + 0x10u) >> 16, EF_U32(s) << 16, EF_U32(s + 4u) << 16, EF_U32(s + 8u) << 16);
+            }
+            head = EF_U32(0x00425b88u);
+            s = EF_U32(s + 0x6au);
+        } while (s != head);
+    }
+    head = EF_U32(0x00425b24u);
+    if (head != 0u) {
+        s = head;
+        do {
+            if ((int32_t)guest_fn_cf94a(EF_U32(s) - EF_U32(0x0021444cu)) < 0x1000
+                && (int32_t)guest_fn_cf94a(EF_U32(s + 4u) - EF_U32(0x00214448u)) < 0x1000
+                && (int32_t)guest_fn_cf94a(EF_U32(s + 8u) - EF_U32(0x00214450u)) < 0x1000
+                && scene_gate_allows((int32_t)(EF_U32(s + 4u) << 8)) != 0u
+                && ((int32_t)EF_U32(s + 0x10u) >> 16) != -1) {
+                guest_fn_9e0c4((int32_t)EF_U32(s + 0x10u) >> 16, EF_U32(s) << 16, EF_U32(s + 4u) << 16, EF_U32(s + 8u) << 16);
+            }
+            head = EF_U32(0x00425b24u);
+            s = EF_U32(s + 0x6au);
+        } while (s != head);
+    }
+}
