@@ -4557,3 +4557,10 @@ in EAX, format string address, one value).
 | `0x111ed4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32,[ESP+12]:uint32_t | none | 112c10@112fa0 | Queue a raw MIDI block (at most 0x200 bytes) into the record's buffer, flushing before and after (cdecl: record, data, l |
 | `0xdc91c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 26b60@26f1a,30214@3119b,3122c@314ad | Store the elevation and heading angles of the vector from point b to point a (three dwords each) into two words at out:  |
 | `0xc117c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:int32_t | c1210@c12a0 | Whether the record may be reactivated: its cell holds more than 12 records and reactivating at most 0x30 - count of them |
+
+## game_helpers130 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb4fb4` | EAX:ef_addr32,EDX:ef_addr32 | none | b47e4@b4829 | Initialise the sub-records (0x7c bytes each, count at +0x12, array at +0x13) of an object from a template: allocate each |
+| `0xb31f0` | EAX:ef_addr32,EDX:uint32_t | none | b3168@b31dc | Dump the area list: the number of matching entries (type 0x14 whose first byte pairs with the entry's kind), then each m |
