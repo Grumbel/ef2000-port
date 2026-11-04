@@ -15072,3 +15072,66 @@ void populate_slots_2aa34(uint32_t ax, uint32_t dl, uint32_t bl, ef_addr32 recs,
 		}
 	}
 }
+
+/* 0xac5f8, 391 bytes. Main frame step of the front-end state machine (AL = loop flag). Leaves a pending redraw state (byte 0x41f2e4), then repeats until a result code is produced or, with AL clear, once: move the pending key byte 0x41f833 to 0x41f2e6; when word 0x41eeda is set update the record 0x41f284 (0xacb68, 0xf8248 -> dword 0x41eea4, 0xacbe4, 0xacfb8, 0xf1c58) and take the result of 0xf18a4; handle the pending key (0x58 runs the save-slot search 0xac57c when bytes 0x41f7ba or 0x41f7c6 are set; 0xf1a70 supplies the result when none exists yet); apply the selection (0xf1d54), relabel (0xabc34), 0xa6038, run the entry callbacks (0xabde4) and 0xac780 when flagged; redraw (0xc9fc4) and let byte 0x41f2e8 override the result. With AL set the engine is reset (0xe4264) at the end and result 0x3e7 reports the fatal text 0x18dc54. Returns the result code. */
+uint32_t run_frame_step_ac5f8(uint32_t al)
+{
+	uint32_t result = 0u, t;
+	uint8_t loop = (uint8_t)al;
+
+	EF_U32(0x0041eea0u) = 0u;
+	if (EF_U8(0x0041f2e4u) != 0u) {
+		tail_jump_c9ec4();
+		guest_fn_d663c(0x004195d0u);
+		redraw_ca17c();
+		EF_U8(0x0041f2e4u) = 0u;
+	}
+	EF_U8(0x0041f2e8u) = 0u;
+	if (loop != 0u)
+		EF_U8(0x0041f833u) = 0u;
+	EF_U8(0x0041f2e6u) = 0u;
+	do {
+		if (EF_U8(0x0041f833u) != 0u) {
+			EF_U8(0x0041f2e6u) = EF_U8(0x0041f833u);
+			EF_U8(0x0041f833u) = 0u;
+		}
+		result = 0u;
+		EF_U16(0x0041eed2u) = 0u;
+		if (EF_U16(0x0041eedau) != 0u) {
+			latch_previous_acb68(0x0041f284u);
+			EF_U32(0x0041eea4u) = guest_fn_f8248();
+			guest_fn_acbe4_x(0x0041f284u);
+			guest_fn_acfb8_x(0x0041f284u);
+			switch_active_object_f1c58(0x0041f284u);
+			result = guest_fn_f18a4_x(0x0041f284u);
+		}
+		if (EF_U8(0x0041f2e6u) != 0u) {
+			if (EF_U8(0x0041f2e6u) == 0x58u && ((EF_U8(0x0041f7bau) | EF_U8(0x0041f7c6u)) != 0u))
+				find_free_save_slot_ac57c();
+			t = guest_fn_f1a70_x();
+			if (result == 0u)
+				result = t;
+			EF_U8(0x0041f2e6u) = 0u;
+		}
+		if (EF_U16(0x0041eedau) != 0u) {
+			apply_selection_f1d54();
+			if (EF_U8(0x0041f2e3u) != 0u)
+				relabel_named_widget_abc34();
+			if (EF_U8(0x0013727cu) != 0u)
+				guest_fn_a6038();
+		}
+		if (EF_U8(0x0041f2deu) == 0u)
+			run_entry_callbacks_abde4();
+		if (EF_U16(0x0041eed2u) != 0u)
+			guest_fn_ac780_x();
+		guest_fn_c9fc4();
+		if (EF_U8(0x0041f2e8u) != 0u)
+			result = EF_U8(0x0041f2e8u);
+		EF_U8(0x0041f2e4u) = 0u;
+	} while (result == 0u && loop != 0u);
+	if (loop != 0u)
+		reset_engine_e4264();
+	if (result == 0x3e7u)
+		report_fatal_ac7c8(0x0018dc54u);
+	return result;
+}

@@ -5773,4 +5773,11 @@ void pack_key_state_bits_1c16c(void);
 void populate_slots_2aa34(uint32_t ax, uint32_t dl, uint32_t bl, ef_addr32 recs, ef_addr32 table);
 void guest_fn_8c49c_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1); /* 0x8c49c EAX/EDX/EBX/ECX + 2 stack */
 
+uint32_t run_frame_step_ac5f8(uint32_t al);
+void guest_fn_acbe4_x(uint32_t a); /* 0xacbe4 EAX */
+void guest_fn_acfb8_x(uint32_t a); /* 0xacfb8 EAX */
+uint32_t guest_fn_f18a4_x(uint32_t a); /* 0xf18a4 EAX -> EAX */
+uint32_t guest_fn_f1a70_x(void); /* 0xf1a70 -> EAX */
+void guest_fn_ac780_x(void); /* 0xac780 */
+
 #endif
