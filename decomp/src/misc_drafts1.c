@@ -10088,3 +10088,38 @@ void draw_arc_fe380(uint32_t colour, uint32_t cy, uint32_t cx, uint32_t lo, uint
     }
     EF_U32(0x00485fb0u) = EF_U32(0x00485fb0u) + 1u;
 }
+
+/* 0x4cff4, 285 bytes. Fill in the labels of the dialog 0x184a58. Without a current entry (dword 0x1a54f6 zero) set the first label (0x184cf8) from byte 0x1a559a (1: 0x13058d, 2: 0x13059e, 3 and 4: 0x131fcc, otherwise unchanged) and the other two (0x184d00, 0x184d0c) to the empty/default texts 0x13231c and 0x132326. With an entry, set the first label from the entry's text pointer (+0xc), the second from "%d" (format 0x184c94) of its byte +0x30, and the third from 0x132335 when 0xbc7ec says so for the entry, else 0x132326. */
+void fill_dialog_labels_4cff4(void)
+{
+    char buf[0x34];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    uint32_t root = guest_fn_a46cc(0x00184a58u);
+    uint32_t node = EF_U32(0x001a54f6u);
+    uint32_t w;
+    uint32_t text;
+    if (node == 0u) {
+        w = find_widget_checked_a78bc(root, 0x00184cf8u);
+        switch (EF_U8(0x001a559au)) {
+        case 1: text = 0x0013058du; break;
+        case 2: text = 0x0013059eu; break;
+        case 3: case 4: text = 0x00131fccu; break;
+        default: text = 0u; break;
+        }
+        if (text != 0u)
+            guest_fn_a7588_x(w, text);
+        w = find_widget_checked_a78bc(root, 0x00184d00u);
+        guest_fn_a7588_x(w, 0x0013231cu);
+        w = find_widget_checked_a78bc(root, 0x00184d0cu);
+        guest_fn_a7588_x(w, 0x00132326u);
+        return;
+    }
+    w = find_widget_checked_a78bc(root, 0x00184cf8u);
+    guest_fn_a7588_x(w, EF_U32(node + 0xcu));
+    w = find_widget_checked_a78bc(root, 0x00184d00u);
+    (void)guest_sprintf_a4342(b, 0x00184c94u, (uint32_t)EF_U8(node + 0x30u));
+    guest_fn_a7588_x(w, b);
+    copy_string_9d749(b, (uint16_t)guest_fn_bc7ec(node) != 0u ? 0x00132335u : 0x00132326u);
+    w = find_widget_checked_a78bc(root, 0x00184d0cu);
+    guest_fn_a7588_x(w, b);
+}
