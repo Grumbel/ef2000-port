@@ -16136,3 +16136,39 @@ void write_settings_file_a2bdc(void)
 	guest_fn_a2a90_x(0x0018cbacu, 0x0015f57du, 0u, 4u);
 	guest_fn_a7990(EF_U32(0x00136df8u));
 }
+
+/* 0xa9aa8, 273 bytes. Report the fatal text EAX. With byte 0x1371ff set only byte 0x137200 is set. Otherwise clear byte 0x1371ee and, unless byte 0x1371f9 is set, clear the screen buffer (0xdc2c0), blacken the palette (0xd65e8), print the upper-cased text with format 0x18d818 at (15, 20) and the hint 0x18d82c at (15, 20, colour 0x12) with 0xdd370, show the page 0x18d698 (0xf2660, 0xdc250), load the palette 0x464060 (0xd663c) and wait for the key code 0x15 or 0x31 in byte 0x41f833; code 0x31 raises the error text 0x18d840 through the error hook. Then, with byte 0x137206 set, run 0xde4b0, format the text with 0x18d7e8 into 0x419160 and set byte 0x1371f8. */
+void report_fatal_text_a9aa8(ef_addr32 text)
+{
+	char buf[0x64];
+	uint8_t key;
+
+	if (EF_U8(0x001371ffu) != 0u) {
+		EF_U8(0x00137200u) = 1u;
+		return;
+	}
+	EF_U8(0x001371eeu) = 0u;
+	if (EF_U8(0x001371f9u) == 0u) {
+		clear_buffer_dc2c0();
+		set_black_palette_d65e8();
+		guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x0018d818u, uppercase_string(text));
+		guest_fn_dd370(0xfu, 0x14u, 0xau, (ef_addr32)(uintptr_t)buf);
+		guest_fn_dd370(0xfu, 0x14u, 0x12u, 0x0018d82cu);
+		guest_fn_f2660_w(0x0018d698u);
+		guest_fn_dc250();
+		guest_fn_d663c(0x00464060u);
+		EF_U8(0x0041f833u) = 0u;
+		for (;;) {
+			key = EF_U8(0x0041f833u);
+			if (key == 0x15u || key == 0x31u)
+				break;
+		}
+		set_black_palette_d65e8();
+		if (EF_U8(0x0041f833u) == 0x31u)
+			guest_callptr1_x(EF_U32(0x00132a74u), 0x0018d840u);
+	}
+	if (EF_U8(0x00137206u) != 0u)
+		mouse_request_de4b0();
+	guest_sprintf_a4342(0x00419160u, 0x0018d7e8u, text);
+	EF_U8(0x001371f8u) = 1u;
+}

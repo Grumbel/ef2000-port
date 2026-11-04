@@ -5828,4 +5828,6 @@ void guest_fn_a2a90_x(uint32_t name, uint32_t value, uint32_t table, uint32_t ty
 
 
 
+void report_fatal_text_a9aa8(ef_addr32 text);
+
 #endif

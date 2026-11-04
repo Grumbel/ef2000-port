@@ -2364,7 +2364,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a992c	97	restore_list_state_a992c	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000a992c.json	docs/compiler-abi.md; Rotate the saved list state into place; returns the global at 0x146e18.; callers a9e70@aa008; guest pending
 0x000a9990	47	restore_state_a9990	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9990.json	docs/compiler-abi.md; Load the live words from a second saved set, then * tail-call 0xb3f50.; callers a9e70@aa01a; guest pending
 0x000a99c0	229			unknown	unclassified	unverified		
-0x000a9aa8	273			unknown	unclassified	unverified		
+0x000a9aa8	273	report_fatal_text_a9aa8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a9aa8.json	docs/compiler-abi.md; Report the fatal text EAX. With byte 0x1371ff set only byte 0x137200 is set. Otherwise clear byte 0x1371ee and, unless b; callers a9e70@a9fa1; guest pending
 0x000a9bbc	17	clear_latch_if_idle	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9bbc.json	docs/compiler-abi.md; When byte 0x1371ff is zero clear byte 0x1371ee.; callers a9e70@a9fd2; guest pending
 0x000a9bd0	25	request_by_state	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9bd0.json	docs/compiler-abi.md; Byte 0x137200 = 1 when 0x1371ff is set, else byte 0x1371f8 = 1.; callers a9e70@a9fcb; guest pending
 0x000a9bec	16	clear_latch_and_notify	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9bec.json	docs/compiler-abi.md; Clear byte 0x1371ee, then call 0xf41dc.; callers a9e70@a9f97; guest pending

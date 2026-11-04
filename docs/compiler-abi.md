@@ -8249,3 +8249,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa9aa8` | EAX:ef_addr32 | none | a9e70@a9fa1 | Report the fatal text EAX. With byte 0x1371ff set only byte 0x137200 is set. Otherwise clear byte 0x1371ee and, unless b |
