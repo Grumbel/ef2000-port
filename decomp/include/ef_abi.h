@@ -4302,4 +4302,6 @@ void guest_fn_e2374_x(ef_addr32 a, ef_addr32 b); /* 0xe2374 EAX/EDX */
 
 void visit_overlapping_nodes_e2564(ef_addr32 obj);
 
+void decode_rle_image_11092c(ef_addr32 src, ef_addr32 dst, uint32_t stride, ef_addr32 end);
+
 #endif

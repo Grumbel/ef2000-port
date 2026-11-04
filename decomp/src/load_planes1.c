@@ -75,3 +75,44 @@ void load_companion_files_dbf3c(ef_addr32 dest, ef_addr32 part_b, ef_addr32 dest
         EF_U32(dest2) = 1u;
     }
 }
+
+/* 0x11092c, 217 bytes. Decode run-length sprite data from src up to end into the byte image at dst with the given row stride. Each block holds a start row (word), a row count (word), a lines-per-row byte, then per line a skip byte and a signed run: positive copies that many literal bytes, negative repeats the next byte. */
+void decode_rle_image_11092c(ef_addr32 src, ef_addr32 dst, uint32_t stride, ef_addr32 end)
+{
+    int32_t pitch = (int16_t)stride;
+    do {
+        int16_t start = (int16_t)EF_U16(src);
+        int16_t rows = (int16_t)EF_U16(src + 2u);
+        uint8_t lines;
+        int16_t row, j;
+        src += 4u;
+        dst += (uint32_t)(pitch * start);
+        for (row = 0; row < rows; ) {
+            uint32_t base = dst;
+            lines = EF_U8(src);
+            src++;
+            for (j = 0; (uint16_t)lines > (uint16_t)j; j++) {
+                int8_t run;
+                int16_t k;
+                dst += EF_U8(src);
+                run = (int8_t)EF_U8(src + 1u);
+                src += 2u;
+                if (run > 0) {
+                    for (k = 0; k < run; k++)
+                        EF_U8(dst++) = EF_U8(src++);
+                }
+                if (run < 0) {
+                    uint8_t fill = EF_U8(src);
+                    src++;
+                    for (k = 0; (int32_t)k < -(int32_t)run; k++)
+                        EF_U8(dst++) = fill;
+                }
+                if (src >= end)
+                    return;
+            }
+            dst = (uint32_t)((int32_t)base + pitch);
+            row++;
+            /* the outer test below re-reads the row counter as a 16-bit signed value */
+        }
+    } while (src < end);
+}

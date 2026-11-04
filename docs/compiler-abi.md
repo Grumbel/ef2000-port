@@ -5027,3 +5027,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe2564` | EAX:ef_addr32 | none | a5b70@a5c56 | Walk the node list at obj+0xc7 (next at +0xa) and call 0xe2374 for every node whose position, widened by a per-kind marg |
+
+## load_planes1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11092c` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:ef_addr32 | none | none direct | Decode run-length sprite data from src up to end into the byte image at dst with the given row stride. Each block holds  |
