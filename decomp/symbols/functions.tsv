@@ -2354,7 +2354,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a9468	40	random_scaled	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9468.json	docs/compiler-abi.md; Random 16-bit value times signed SI, divided by 65536 * rounding toward zero (the SBB sequence).; callers a94e4@a95cf; guest pending
 0x000a9490	82	step_list_cursor_a9490	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x000a9490.json	docs/compiler-abi.md; Step a list cursor n rows forward and latch the result.; callers a94e4@a9505,a94e4@a9530,a94e4@a959a; guest pending
 0x000a94e4	321			unknown	unclassified	unverified		
-0x000a9640	81			unknown	unclassified	unverified		
+0x000a9640	81	compare_variable_a9640	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000a9640.json	docs/compiler-abi.md; Compare the signed value at 0x418708[index] with value using operator op (1 ==, 2 !=, 3 >, 4 <, 5 >=, 6 <=); returns 1 w; callers a9694@a96ac,a9694@a96da,a9694@a970b; guest pending
 0x000a9694	143			unknown	unclassified	unverified		
 0x000a9724	277			unknown	unclassified	unverified		
 0x000a983c	60	apply_operation_a983c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a983c.json	docs/compiler-abi.md; Apply a set/add/subtract operation to a guest value.; callers a9e70@a9fba; guest pending
@@ -3250,7 +3250,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd6a0	134			unknown	unclassified	unverified		
 0x000dd728	94	text_width_6_dd728	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd728.json	docs/compiler-abi.md; Width of a string in the 6-pixel-blank font minus the trailing gap.; callers a82f0@a8458; guest pending
 0x000dd788	218			unknown	unclassified	unverified		
-0x000dd870	80			unknown	unclassified	unverified		
+0x000dd870	80	restore_saved_block_dd870	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000dd870.json	docs/compiler-abi.md; If a screen area was saved under the parameter block (0x15ee94 != -1), put it back, then mark it unsaved.; callers dd8d0@dd8d0,dd9e4@dd9ff,f2ac0@f2b13; guest pending
 0x000dd8c0	14	redraw_if_unsaved_dd8c0	small_wrappers6	compiles	game	confirmed	decomp/tests/0x000dd8c0.json	docs/compiler-abi.md; Run 0xdd8dc when the saved width at 0x15ee94 is -1 (nothing saved yet); otherwise do nothing.; callers dd9e4@dda4a,f34cc@f352e; guest pending
 0x000dd8d0	12	run_shutdown_pair_dd8d0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000dd8d0.json	docs/compiler-abi.md; Run the two shutdown helpers in order.; callers 278c0@27b2d,27d18@27eb1,f3f84@f40f8; guest pending
 0x000dd8dc	170	save_and_draw_block_dd8dc	screen_clip1	compiles	game	confirmed	decomp/tests/0x000dd8dc.json	docs/compiler-abi.md; Save the screen area under the parameter block at 0x15ee80 (size clamped against 0x425fc6/0x425fc8) into its buffer and ; callers 278c0@27b26,27d18@27eaa,f3480@f3492; guest pending

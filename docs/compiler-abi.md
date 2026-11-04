@@ -5112,3 +5112,10 @@ in EAX, format string address, one value).
 | `0x84678` | none | none | 92f98@92faa | Advance the page counter, run the transition selected by bits 3..5 of the word at 0x1fcbe2 (1..4), then call the handler |
 | `0x912b8` | EAX:ef_addr32 | none | 3dd30@3e344 | While the pending-message count at 0x2144b2 is positive, shrink it by the limit at 0x127d92 and draw the message at row  |
 | `0x106cb0` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 107070@107083 | Read count bytes from a ring record into buf, waiting up to timeout; returns 0 when done or 3 on timeout. |
+
+## small_wrappers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa9640` | EAX:uint32_t,EDX:uint32_t,EBX:int32_t | EAX:uint32_t | a9694@a96ac,a9694@a96da,a9694@a970b | Compare the signed value at 0x418708[index] with value using operator op (1 ==, 2 !=, 3 >, 4 <, 5 >=, 6 <=); returns 1 w |
+| `0xdd870` | none | none | dd8d0@dd8d0,dd9e4@dd9ff,f2ac0@f2b13 | If a screen area was saved under the parameter block (0x15ee94 != -1), put it back, then mark it unsaved. |

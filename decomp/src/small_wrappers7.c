@@ -160,3 +160,26 @@ uint32_t read_ring_bytes_106cb0(ef_addr32 rec, ef_addr32 buf, uint32_t count, ui
         }
     }
 }
+
+/* 0xa9640, 81 bytes. Compare the signed value at 0x418708[index] with value using operator op (1 ==, 2 !=, 3 >, 4 <, 5 >=, 6 <=); returns 1 when it holds, else 0. */
+uint32_t compare_variable_a9640(uint32_t index, uint32_t op, int32_t value)
+{
+    int32_t v = (int32_t)EF_U32(0x00418708u + index * 4u);
+    switch ((uint16_t)(op - 1u)) {
+    case 0: return v == value;
+    case 1: return v != value;
+    case 2: return v > value;
+    case 3: return v < value;
+    case 4: return v >= value;
+    case 5: return v <= value;
+    default: return 0u;
+    }
+}
+
+/* 0xdd870, 80 bytes. If a screen area was saved under the parameter block (0x15ee94 != -1), put it back, then mark it unsaved. */
+void restore_saved_block_dd870(void)
+{
+    if (EF_S16(0x0015ee94u) != -1)
+        put_screen_rows_eb050(0u, 0u, 0u, 0u, EF_U16(0x0015ee94u), EF_U16(0x0015ee96u), EF_U16(0x0015ee88u), EF_U16(0x0015ee8au), EF_U32(0x0015ee90u));
+    EF_U16(0x0015ee94u) = 0xffffu;
+}
