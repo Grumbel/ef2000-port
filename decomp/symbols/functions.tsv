@@ -2116,7 +2116,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a060c	245			unknown	unclassified	unverified		
 0x000a0704	452			unknown	unclassified	unverified		
 0x000a08c8	356			unknown	unclassified	unverified		
-0x000a0a2c	114			unknown	unclassified	unverified		
+0x000a0a2c	114	step_page_slot_a0a2c	list_ops1	compiles	game	confirmed	decomp/tests/0x000a0a2c.json	docs/compiler-abi.md; Step a page slot: when its counter (+0) is zero invoke the handler at 0x132adc with the slot's words and the current 0x4; callers 9e7bc@9f13e; guest pending
 0x000a0aa0	186			unknown	unclassified	unverified		
 0x000a0b98	73	copy_page_byte_a0b98	game_helpers29	compiles	game	confirmed	decomp/tests/0x000a0b98.json	docs/compiler-abi.md; Copy one byte between two page rows (29-byte stride, offset 0x14).; callers 9e7bc@9f3c4,9e7bc@9f3de,9e7bc@9f3f6; guest pending
 0x000a0c04	340			unknown	unclassified	unverified		

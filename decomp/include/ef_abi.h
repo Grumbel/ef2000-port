@@ -4227,4 +4227,7 @@ void guest_fn_f3904_x(int32_t a, int32_t b, int32_t c, int32_t d); /* 0xf3904 EA
 
 void open_named_file_287bc(void);
 
+void step_page_slot_a0a2c(uint32_t index);
+void guest_callptr4s2_x(ef_addr32 fn, int32_t a, int32_t b, int32_t c, int32_t d, int32_t s0, int32_t s1); /* indirect call: EAX/EDX/EBX/ECX plus two stack arguments, callee cleanup */
+
 #endif

@@ -4882,3 +4882,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x287bc` | none | none | 284ec@28571 | Build a file name from a format (one of two, chosen by 0x15ee9a), open it, and if that succeeds run 0xab47c and close th |
+
+## list_ops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa0a2c` | EAX:uint32_t | none | 9e7bc@9f13e | Step a page slot: when its counter (+0) is zero invoke the handler at 0x132adc with the slot's words and the current 0x4 |

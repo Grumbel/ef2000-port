@@ -51,3 +51,20 @@ void open_named_file_287bc(void)
         close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
     }
 }
+
+/* 0xa0a2c, 114 bytes. Step a page slot: when its counter (+0) is zero invoke the handler at 0x132adc with the slot's words and the current 0x417194 triple, otherwise decrement the counter; then copy the triple into the slot. */
+void step_page_slot_a0a2c(uint32_t index)
+{
+    ef_addr32 slot = page_slot_a0da8((int16_t)index);
+    uint16_t counter = EF_U16(slot);
+    if (counter == 0u) {
+        guest_callptr4s2_x(EF_U32(0x00132adcu),
+                           EF_S16(0x00417194u), EF_S16(0x00417196u), EF_S16(0x00417198u),
+                           EF_S16(slot + 2u), EF_S16(slot + 4u), EF_S16(slot + 6u));
+    } else {
+        EF_U16(slot) = (uint16_t)(counter - 1u);
+    }
+    EF_U16(slot + 2u) = EF_U16(0x00417194u);
+    EF_U16(slot + 4u) = EF_U16(0x00417196u);
+    EF_U16(slot + 6u) = EF_U16(0x00417198u);
+}
