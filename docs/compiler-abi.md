@@ -4150,3 +4150,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x32414` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 316b8@316ca,3170c@3172e,31774@317bd | Rotate an integer vector by the angle triple (yaw/pitch/roll words) with a 1.15 matrix. |
 | `0xa69d0` | EAX:ef_addr32,EDX:ef_addr32 | none | a6a64@a6a80,a74bc@a74e8 | Clamp a layout box's origin and size inside the limits of its container. |
+
+## game_helpers85 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbe3f4` | EAX:ef_addr32,EDX:ef_addr32 | none | b0f5c@b118f,b0f5c@b147c | For each flag-less record of the first list copy the id of every record of the second list that shares its position. |
+| `0xbe77c` | EAX:ef_addr32,EDX:ef_addr32 | none | be59c@be74e,f8e44@f908d | Find the record whose id matches the object's and move its entries' weights from field 0x23 to field 0x25. |
+| `0xbd2f4` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | b0f5c@b10de,b0f5c@b13de | Instantiate every valid record of a list into a destination list, numbering them; returns the count. |

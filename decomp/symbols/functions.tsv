@@ -2657,7 +2657,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bcf18	13	record_flag_clear_d	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcf18.json	docs/compiler-abi.md; Byte +0xd is zero.; callers bcf44@bd0e4,bfb2c@bfb52,f90ac@f9252; guest pending
 0x000bcf28	28	records_share_position	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcf28.json	docs/compiler-abi.md; Dwords +0x11/+0x15 equal the other record's +0x3b/+0x3f.; callers bcf44@bd0d8,be3f4@be413,f90ac@f9246; guest pending
 0x000bcf44	943			unknown	unclassified	unverified		
-0x000bd2f4	79			unknown	unclassified	unverified		
+0x000bd2f4	79	instantiate_list_records_bd2f4	game_helpers85	compiles	game	confirmed	decomp/tests/0x000bd2f4.json	docs/compiler-abi.md; Instantiate every valid record of a list into a destination list, numbering them; returns the count.; callers b0f5c@b10de,b0f5c@b13de; guest pending
 0x000bd344	61	find_kind10_bd344	list_helpers	compiles	game	confirmed	decomp/tests/0x000bd344.json	docs/compiler-abi.md; Is there a kind-0x10 entry in the list matching the id at ref+9?; callers bd39c@bd438; guest pending
 0x000bd39c	243			unknown	unclassified	unverified		
 0x000bd490	78	slot_type_is_special_bd490	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd490.json	docs/compiler-abi.md; ; callers bd508@bd52b,bd554@bd581,bd5a8@bd5ca; guest pending
@@ -2680,11 +2680,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bdeec	780			unknown	unclassified	unverified		
 0x000be208	278			unknown	unclassified	unverified		
 0x000be320	210	link_matching_entries_be320	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000be320.json	docs/compiler-abi.md; Link matching shape entries of two lists to their lookup value.; callers b0f5c@b15e4; guest pending
-0x000be3f4	68			unknown	unclassified	unverified		
+0x000be3f4	68	copy_ids_of_colocated_records_be3f4	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be3f4.json	docs/compiler-abi.md; For each flag-less record of the first list copy the id of every record of the second list that shares its position.; callers b0f5c@b118f,b0f5c@b147c; guest pending
 0x000be438	69	find_target_be438	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000be438.json	docs/compiler-abi.md; Find the kind-2 node of the list whose target matches the two keys and is valid.; callers be480@be526,c1438@c1781; guest pending
 0x000be480	281			unknown	unclassified	unverified		
 0x000be59c	477			unknown	unclassified	unverified		
-0x000be77c	104			unknown	unclassified	unverified		
+0x000be77c	104	transfer_entry_weights_be77c	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be77c.json	docs/compiler-abi.md; Find the record whose id matches the object's and move its entries' weights from field 0x23 to field 0x25.; callers be59c@be74e,f8e44@f908d; guest pending
 0x000be7e4	827			unknown	unclassified	unverified		
 0x000beb20	353	scan_code_to_function_key_beb20	game_helpers60	compiles	game	confirmed	decomp/tests/0x000beb20.json	docs/compiler-abi.md; Map a keyboard scan code to the 1..23 index of the matching function key, 0 for none.; callers bed1c@bed9a; guest pending
 0x000bec84	59	is_active_bec84	list_helpers	compiles	game	confirmed	decomp/tests/0x000bec84.json	docs/compiler-abi.md; ; callers becc0@becde,faafc@fab1a,fabf0@fac0e; guest pending

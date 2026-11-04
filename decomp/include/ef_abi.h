@@ -3707,4 +3707,11 @@ uint32_t guest_fn_bc465_x(uint32_t nibble); /* 0xbc465 EAX -> AL */
 void rotate_vector_by_angles_32414(ef_addr32 angles, ef_addr32 vec, ef_addr32 out);
 void clamp_box_to_container_a69d0(ef_addr32 container, ef_addr32 box);
 
+/* game_helpers85.c */
+void copy_ids_of_colocated_records_be3f4(ef_addr32 first_list, ef_addr32 second_list);
+void transfer_entry_weights_be77c(ef_addr32 object, ef_addr32 list);
+uint32_t instantiate_list_records_bd2f4(ef_addr32 list, uint32_t arg_b, uint32_t dest_head, uint32_t dest_tail, uint32_t extra);
+uint32_t guest_fn_bcc2c_x(ef_addr32 node); /* 0xbcc2c EAX -> AX */
+uint32_t guest_fn_bcf44_x(ef_addr32 node, uint32_t b, uint32_t c); /* 0xbcf44 EAX EDX EBX -> EAX */
+
 #endif
