@@ -3269,3 +3269,28 @@ uint32_t open_numbered_log_9a544(void)
     stream_printf_bc400(h, 0x0018b114u, (int16_t)EF_U16(0x001379a0u), (int16_t)EF_U16(0x001379a2u), (int16_t)EF_U16(0x001379a4u));
     return h;
 }
+
+/* 0x14c5c, 224 bytes. Set the state byte of the 19-byte record IDX at 0x1225d4 to STATE; when it changed and the current object is not locked (flag 0x10 at +0x24), run 0x14d58 for the record and, for states 9 and 10, claim the UI slots (the record's own control byte at +0x12 with arg 8, then control 0x1f for state 9 or 0x1d for state 10 with arg 0x14) and push the event stored at +0xe. */
+void set_record_state_14c5c(int32_t idx, uint32_t state)
+{
+    uint32_t rec = 0x001225d4u + (uint32_t)(int32_t)(int16_t)idx * 0x13u;
+    uint8_t old = EF_U8(rec);
+    uint8_t st = (uint8_t)state;
+    uint32_t obj;
+    uint32_t ev;
+    EF_U8(rec) = st;
+    if (old == st)
+        return;
+    obj = guest_fn_7489c((int16_t)EF_U16(0x001f71cau));
+    if (obj != 0u && (EF_U8(obj + 0x24u) & 0x10u) != 0u)
+        return;
+    guest_fn_14d58_x((int16_t)idx);
+    if (st != 9u && st != 10u)
+        return;
+    if (EF_U8(rec + 0x12u) != 0u)
+        claim_ui_slot_801e4(EF_U8(rec + 0x12u), 8u, 0u);
+    claim_ui_slot_801e4((st == 9u) ? 0x1f : 0x1d, 0x14u, 0u);
+    ev = EF_U32(rec + 0xeu);
+    if (ev != 0u)
+        push_event_1f878(ev);
+}

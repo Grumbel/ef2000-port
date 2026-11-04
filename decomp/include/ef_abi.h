@@ -4741,4 +4741,7 @@ uint32_t lookup_plane_cell_7af60(uint32_t mode, int32_t x, uint32_t y, int32_t z
 uint32_t open_numbered_log_9a544(void);
 uint32_t guest_fn_d0278_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xd0278 EAX/EDX/EBX/ECX -> EAX */
 
+void set_record_state_14c5c(int32_t idx, uint32_t state);
+void guest_fn_14d58_x(uint32_t a); /* 0x14d58 EAX */
+
 #endif

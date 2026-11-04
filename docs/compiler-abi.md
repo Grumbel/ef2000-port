@@ -5786,3 +5786,9 @@ in EAX, format string address, one value).
 | `0x5ae70` | none | none | 5af50@5af80 | Build the three 24-entry offset rings (radii 25, 20 and 15 at 0x1a69e0, 0x1a6aa0 and 0x1a6a40; two words per entry: cos  |
 | `0x7af60` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t,ECX:int32_t | EAX:uint32_t | 1df90@1e096,82478@826a8,86f7c@8718e | Like 0x7ae88 for the query in progress: returns 1 while the endpoint word 0x420908 is non-negative, otherwise looks up t |
 | `0x9a544` | none | EAX:uint32_t | 9ab30@9ab31 | Open the next numbered log file: build the name from the template at 0x98bd0, the running number (word 0x12dda8, post-in |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x14c5c` | EAX:int32_t,EDX:uint32_t | none | 589c0@58a1b,589c0@58a2a,589c0@58a39 | Set the state byte of the 19-byte record IDX at 0x1225d4 to STATE; when it changed and the current object is not locked  |
