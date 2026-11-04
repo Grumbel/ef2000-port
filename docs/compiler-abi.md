@@ -4922,3 +4922,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc8e8` | none | none | bfcc@c27a,c868@c88f | For the current page (word at 0x121e98) call 0x11560 once for each of its entries, passing per-entry slots of the tables |
+
+## state_reset1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa29f8` | none | none | 34ca4@34d04,a29cc@a29cf | Reset the input/menu state: default words and the 7-byte block at 0x13579b, clear the table, then set the control flags. |
+| `0x2ce18` | EAX:uint32_t | none | 2ced4@2cfd8 | Reset a 0xca-byte page record: clear the object limit of each of its six slots (unless 0xff), recompute its grid limit,  |

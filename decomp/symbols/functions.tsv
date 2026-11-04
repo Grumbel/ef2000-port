@@ -481,7 +481,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002c6dc	127	owner_check_fails_2c6dc	game_helpers16	compiles	game	confirmed	decomp/tests/0x0002c6dc.json	docs/compiler-abi.md; Nonzero (1) when the owner fails the check selected by its record type.; callers 2c778@2cbd7; guest pending
 0x0002c778	1398			unknown	unclassified	unverified		
 0x0002ccf0	293			unknown	unclassified	unverified		
-0x0002ce18	127			unknown	unclassified	unverified		
+0x0002ce18	127	reset_page_record_2ce18	state_reset1	compiles	game	confirmed	decomp/tests/0x0002ce18.json	docs/compiler-abi.md; Reset a 0xca-byte page record: clear the object limit of each of its six slots (unless 0xff), recompute its grid limit, ; callers 2ced4@2cfd8; guest pending
 0x0002ced4	1387			unknown	unclassified	unverified		
 0x0002d488	1036			unknown	unclassified	unverified		
 0x0002d894	54	set_owner_pair_2d894	game_helpers10	compiles	game	confirmed	decomp/tests/0x0002d894.json	docs/compiler-abi.md; Store two words in the owner record and refresh it.; callers 2b1f4@2b2fe,2b1f4@2b358; guest pending
@@ -2161,7 +2161,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a292c	26	require_device_ready_a292c	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000a292c.json	docs/compiler-abi.md; Abort when the device is not ready; always reports ready.; callers a3eac@a3ebb,a42c4@a42c4; guest pending
 0x000a2948	131	probe_data_file_a2948	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000a2948.json	docs/compiler-abi.md; Probe the data file; returns a status code (8, 9, 0xc or 0).; callers a29cc@a29da; guest pending
 0x000a29cc	41	latch_decoded_key_a29cc	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000a29cc.json	docs/compiler-abi.md; Latch a decoded key into the state table.; callers 34ca4@34cde,a3c18@a3c72; guest pending
-0x000a29f8	126			unknown	unclassified	unverified		
+0x000a29f8	126	reset_input_state_a29f8	state_reset1	compiles	game	confirmed	decomp/tests/0x000a29f8.json	docs/compiler-abi.md; Reset the input/menu state: default words and the 7-byte block at 0x13579b, clear the table, then set the control flags.; callers 34ca4@34d04,a29cc@a29cf; guest pending
 0x000a2a90	331			unknown	unclassified	unverified		
 0x000a2bdc	621			unknown	unclassified	unverified		
 0x000a2e4c	29	clear_entry_a2e4c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a2e4c.json	docs/compiler-abi.md; 0xb3fb0(dword 0x1368bc[AX],0,0x21); callers a2e6c@a2e7b; guest pending

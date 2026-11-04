@@ -4253,4 +4253,8 @@ void guest_fn_eb174_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32
 void draw_page_entries_c8e8(void);
 void guest_fn_11560_x(int32_t a, int32_t b, int32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3); /* 0x11560 EAX/EDX/EBX/ECX + 4 stack, callee cleanup */
 
+/* state_reset1.c */
+void reset_input_state_a29f8(void);
+void reset_page_record_2ce18(uint32_t page);
+
 #endif
