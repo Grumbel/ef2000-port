@@ -7614,3 +7614,33 @@ void update_stock_e6d78(void)
     }
 #undef EF_D
 }
+
+/* 0x1132b8, 221 bytes. cdecl (OBJ, REC): copy the 24-byte record REC, fill every part of it that is below 1 (four signed words, then four signed dwords) from the default table addressed by dword +0xc of the object's descriptor (real-mode seg:off plus 0x120cc6), provided word +0x10 of that descriptor is non-zero, store the result at descriptor +0x16 and send message 0x304 to the object. */
+void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj, uint32_t rec)
+{
+    uint16_t w[4];
+    uint32_t d[4];
+    uint32_t desc, p, def, i;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    for (i = 0; i < 4u; i++)
+        w[i] = EF_U16(rec + i * 2u);
+    for (i = 0; i < 4u; i++)
+        d[i] = EF_U32(rec + 8u + i * 4u);
+    desc = EF_U32(EF_U32(obj) + 0x10u);
+    if (EF_U16(desc + 0x10u) != 0u) {
+        p = EF_U32(desc + 0xcu);
+        def = EF_U32(0x00120cc6u) + (p & 0xffffu) + ((p >> 16) << 4);
+        for (i = 0; i < 4u; i++)
+            if ((int16_t)w[i] < 1)
+                w[i] = EF_U16(def + i * 2u);
+        for (i = 0; i < 4u; i++)
+            if ((int32_t)d[i] < 1)
+                d[i] = EF_U32(def + 8u + i * 4u);
+    }
+    desc = EF_U32(EF_U32(obj) + 0x10u);
+    for (i = 0; i < 4u; i++)
+        EF_U16(desc + 0x16u + i * 2u) = w[i];
+    for (i = 0; i < 4u; i++)
+        EF_U32(desc + 0x1eu + i * 4u) = d[i];
+    guest_fn_101f88(EF_U32(obj), 0x304u, 0u, 0u);
+}

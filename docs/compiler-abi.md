@@ -6647,3 +6647,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe6d78` | none | none | e6990@e6c44 | Fuel/energy-style update on the double globals: 0x4327e8 = 0x4327d8*0x432770*0x432da0/0x432da8*0x4327e0 + 0x432808*0x432 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1132b8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 1133f8@113592,1133f8@1135df,1133f8@113662 | cdecl (OBJ, REC): copy the 24-byte record REC, fill every part of it that is below 1 (four signed words, then four signe |

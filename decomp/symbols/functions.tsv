@@ -4104,7 +4104,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00112bbc	25	reset_table_record_and_link_112bbc	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00112bbc.json	docs/compiler-abi.md; Reset a table record and point its field 0x14 8 bytes past field 0x10.; callers 113d10@113e46,11402c@114045; guest pending
 0x00112bd8	54	send_channel_volumes_112bd8	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x00112bd8.json	docs/compiler-abi.md; Send controller 7 (volume) for each of the 16 channels whose stored value is not -1.; callers 112c10@113222,1142cc@1142fd; guest pending
 0x00112c10	1704			unknown	unclassified	unverified		
-0x001132b8	221			unknown	unclassified	unverified		
+0x001132b8	221	apply_default_record_1132b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001132b8.json	docs/compiler-abi.md; cdecl (OBJ, REC): copy the 24-byte record REC, fill every part of it that is below 1 (four signed words, then four signe; callers 1133f8@113592,1133f8@1135df,1133f8@113662; guest pending
 0x00113398	96	release_record_array_113398	runtime_helpers36	compiles	game	confirmed	decomp/tests/0x00113398.json	docs/compiler-abi.md; Release a record container: trace each 0x718-byte element, trace field 0xc, free the element array and the 0x1d4-byte co; callers none direct; guest pending
 0x001133f8	1608			unknown	unclassified	unverified		
 0x00113a40	115	load_resource_113a40	trace_loaders1	compiles	game	confirmed	decomp/tests/0x00113a40.json	docs/compiler-abi.md; Same with parser 0x1133f8 and default block 0x1954bc.; callers 102fb4@102fe0; guest pending

@@ -5136,4 +5136,6 @@ uint32_t store_scaled_vectors_7b08c(uint32_t a, uint32_t b);
 
 void update_stock_e6d78(void);
 
+void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj, uint32_t rec);
+
 #endif
