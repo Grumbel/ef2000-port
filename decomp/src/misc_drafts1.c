@@ -22770,3 +22770,24 @@ double box_measure_11b040(ef_addr32 obj, double limit)
 
 	return w1 / w2 * md_rd_f64(0x195824) * v;
 }
+
+/* 0xc4565, 183 bytes. Implicit-register fragment (ESI is an in/out pointer): save ESP at 0x159064, copy the camera state words and the 3x3 matrix 0x1590c0 to its shadow at 0x159108, rotate the zero vector with 0xc4755 storing the results into the code immediates 0xc8c3f/0xc8c4b/0xc8c56 (high word of the third also to 0x15912c), then dispatch the word at ESI like 0xc5e56 and return the handler address. */
+uint32_t setup_rotation_c4565(uint32_t *esi)
+{
+	int32_t out[3];
+	uint32_t i;
+
+	EF_U32(0x159084u) = EF_U32(0x164604u);
+	EF_U32(0x159168u) = EF_U32(0x159160u);
+	EF_U32(0x159174u) = EF_U32(0x15916cu);
+	EF_U32(0x159180u) = EF_U32(0x159178u);
+	for (i = 0; i < 9u; i++) {
+		EF_U32(0x159108u + 4u * i) = EF_U32(0x1590c0u + 4u * i);
+	}
+	rotate_vector_c4755(0, 0, 0, out);
+	EF_U32(0xc8c3fu) = (uint32_t)out[0];
+	EF_U32(0xc8c4bu) = (uint32_t)out[1];
+	EF_U32(0xc8c56u) = (uint32_t)out[2];
+	EF_U16(0x15912cu) = (uint16_t)((uint32_t)out[2] >> 16);
+	return dispatch_word_c5e56(esi);
+}

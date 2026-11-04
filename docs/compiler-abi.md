@@ -9403,3 +9403,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11b040` | EAX:ef_addr32,EDX:double | EAX:double | 10a0d4@10a140 | Weighted box measure scaled by the ratio of two box helpers. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc4565` | EAX:uint32_t | EAX:uint32_t | 16000c@16004f | Implicit-register fragment (ESI is an in/out pointer): save ESP at 0x159064, copy the camera state words and the 3x3 mat |

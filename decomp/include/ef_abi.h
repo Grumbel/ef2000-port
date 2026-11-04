@@ -6456,4 +6456,7 @@ void rotate_add_patch_c5c24(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
 double box_measure_11b040(ef_addr32 obj, double limit);
 double box_measure_11b040(ef_addr32 obj, double limit); /* 0x11b040 */
 
+uint32_t setup_rotation_c4565(uint32_t *esi);
+uint32_t setup_rotation_c4565(uint32_t *esi); /* 0xc4565 */
+
 #endif
