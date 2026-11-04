@@ -831,7 +831,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00048ae8	140	classify_entry_48ae8	game_helpers17	compiles	game	confirmed	decomp/tests/0x00048ae8.json	docs/compiler-abi.md; Classify an entry: 0/1 for ordinary, 2 for kind 2, logs unknown kinds.; callers 77c90@77dff; guest pending
 0x00048bb0	131	draw_formatted_text_mode_48bb0	game_helpers131	compiles	game	confirmed	decomp/tests/0x00048bb0.json	docs/compiler-abi.md; Draw a formatted string at (x, y) with the renderer chosen by mode (1: 0x15a14, 2: 0xe5db4, otherwise 0xe605c); the firs; callers 11e7c@1212b,150d4@15175,1e7c0@1eab1; guest pending
 0x00048c34	91	formatted_text_width_48c34	game_helpers131	compiles	game	confirmed	decomp/tests/0x00048c34.json	docs/compiler-abi.md; Width of a formatted string: mode 1 uses the proportional font width, mode 2 six pixels per character, anything else eig; callers 11e7c@11f84,11e7c@12067,150d4@1513c; guest pending
-0x00048c90	201			unknown	unclassified	unverified		
+0x00048c90	201	draw_shadowed_text_48c90	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00048c90.json	docs/compiler-abi.md; Draw the formatted string FMT (cdecl, variadic) at (X, Y) in the colour byte COLOR with the renderer 0xe605c (doubled co; callers 3b58@3b78,3b58@3c13,3b58@3c66; guest pending
 0x00048d5c	68	formatted_width_48d5c	text_metrics1	compiles	game	confirmed	decomp/tests/0x00048d5c.json	docs/compiler-abi.md; printf-format a string and return its width: the text width for zoom 0, else its length times 4. Variadic; all arguments; callers 3b58@3bf1,3b58@3c46,3ea8@3ebd; guest pending
 0x00048da0	68	formatted_width_48da0	text_metrics1	compiles	game	confirmed	decomp/tests/0x00048da0.json	docs/compiler-abi.md; Same with length times 8 for the nonzero zoom.; callers 48e7c@48f35,5c354@5c43d,5c518@5c64d; guest pending
 0x00048df8	132	draw_status_counter_48df8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00048df8.json	docs/compiler-abi.md; Clamp the counter 0x127b1c at zero; while it is non-zero draw the two status strings (0x1a524c) at (17, 17) with modes 0; callers 3dd30@3e759; guest pending
@@ -3625,7 +3625,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2e54	30	copy_path_f2e54	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2e54.json	docs/compiler-abi.md; 0xf2cd0(), 0x9d749(0x485908, 0x48592c), byte 0x4859de = 1.; callers f3b78@f3bb3; guest pending
 0x000f2e74	327	read_plain_entry_f2e74	game_helpers61	compiles	game	confirmed	decomp/tests/0x000f2e74.json	docs/compiler-abi.md; Read a plain entry record and bump the record count.; callers f2fbc@f2fc7,f3b78@f3bd0; guest pending
 0x000f2fbc	399	read_entry_f2fbc	game_helpers61	compiles	game	confirmed	decomp/tests/0x000f2fbc.json	docs/compiler-abi.md; Read an entry record, with a trailing value unless the plain flag is set.; callers f3b78@f3bed; guest pending
-0x000f314c	200			unknown	unclassified	unverified		
+0x000f314c	200	read_pair_list_f314c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f314c.json	docs/compiler-abi.md; Read a list of number pairs from the script into the table entry [0x1616e8]: each pair (two parsed integers, stored as w; callers f3b78@f3c0a; guest pending
 0x000f3214	355			unknown	unclassified	unverified		
 0x000f3378	263			unknown	unclassified	unverified		
 0x000f3480	32	refresh_f3480	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3480.json	docs/compiler-abi.md; ; callers f34cc@f35a8; guest pending

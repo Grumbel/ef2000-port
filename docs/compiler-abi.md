@@ -5732,3 +5732,10 @@ in EAX, format string address, one value).
 | `0xd1924` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | d19ec@d1ad9 | Run-length encode [0x15b7cc] bytes from SRC into DST (PackBits style: a control byte 1-L followed by one byte for a run  |
 | `0x5ee80` | none | EAX:ef_addr32 | 9114@9160 | Find the entry (0x54-byte records at 0x1a6b3c, count byte at [[0x1a6b08] + 0x13]) whose position is within 0x7fff of the |
 | `0x801e4` | EAX:int32_t,EDX:uint32_t,EBX:uint32_t | none | 14c5c@14ce6,14c5c@14d11,1851c@18574 | Claim a UI control slot for the object INDEX: when the feature byte 0x12b070 is set and the count (0x12b07c when FLAG, e |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x48c90` | [ESP+4]:uint32_t,[ESP+8]:int32_t,[ESP+12]:int32_t,[ESP+16]:ef_addr32 | none | 3b58@3b78,3b58@3c13,3b58@3c66 | Draw the formatted string FMT (cdecl, variadic) at (X, Y) in the colour byte COLOR with the renderer 0xe605c (doubled co |
+| `0xf314c` | none | none | f3b78@f3c0a | Read a list of number pairs from the script into the table entry [0x1616e8]: each pair (two parsed integers, stored as w |

@@ -4715,4 +4715,9 @@ uint32_t rle_encode_d1924(ef_addr32 dst, ef_addr32 src);
 ef_addr32 find_entry_in_range_5ee80(void);
 void claim_ui_slot_801e4(int32_t index, uint32_t arg, uint32_t flag);
 
+void draw_shadowed_text_48c90(uint32_t color, int32_t x, int32_t y, ef_addr32 fmt, ...);
+void read_pair_list_f314c(void);
+
+
+
 #endif

@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com> */
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
+#include <stdarg.h>
 #include "ef_abi.h"
 #include "ef_globals.h"
 #include "ef_mem.h"
@@ -2879,4 +2880,49 @@ void claim_ui_slot_801e4(int32_t index, uint32_t arg, uint32_t flag)
         return;
     EF_U8(0x001f9088u + (slot & 0xffu)) = (uint8_t)index;
     guest_fn_7fbec(slot & 0xffu, arg & 0xffu, (uint32_t)(int32_t)(int16_t)index, count);
+}
+
+/* 0x48c90, 201 bytes. Draw the formatted string FMT (cdecl, variadic) at (X, Y) in the colour byte COLOR with the renderer 0xe605c (doubled coordinates when [0x12b369] is 1) or 0x15a14; when the shadow flag 0x127b1a is set a colour 3 copy is drawn one pixel further first. Clears the shadow flag afterwards. */
+void draw_shadowed_text_48c90(uint32_t color, int32_t x, int32_t y, ef_addr32 fmt, ...)
+{
+    char buf[0x78];
+    va_list ap;
+    va_start(ap, fmt);
+    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    va_end(ap);
+    if (EF_U8(0x0012b369u) == 1u) {
+        if (EF_U8(0x00127b1au) != 0u)
+            guest_fn_e605c_x(3u, (int16_t)(((int16_t)x) * 2 + 1), (int16_t)(((int16_t)y) * 2 + 1), (uint32_t)(uintptr_t)buf);
+        guest_fn_e605c_x(color & 0xffu, (int16_t)(((int16_t)x) * 2), (int16_t)(((int16_t)y) * 2), (uint32_t)(uintptr_t)buf);
+    } else {
+        if (EF_U8(0x00127b1au) != 0u)
+            guest_fn_15a14_x(3u, (int16_t)(x + 1), (int16_t)(y + 1), (uint32_t)(uintptr_t)buf);
+        guest_fn_15a14_x(color & 0xffu, (int16_t)x, (int16_t)y, (uint32_t)(uintptr_t)buf);
+    }
+    EF_U8(0x00127b1au) = 0u;
+}
+
+/* 0xf314c, 200 bytes. Read a list of number pairs from the script into the table entry [0x1616e8]: each pair (two parsed integers, stored as words at 0x484be2/0x484be4 + 0x2a * entry + 4 * n) is followed by a token; the list ends when the token equals the string at 0x19198c. Stores the pair count at 0x484be0 + 0x2a * entry and advances the entry counter. Errors (through 0x132a74) when the entry counter reaches 0x28 or the list has 10 pairs. */
+void read_pair_list_f314c(void)
+{
+    int16_t n = 0;
+    int32_t entry = (int16_t)EF_U16(0x001616e8u);
+    uint32_t base;
+    if (entry >= 0x28)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0019191cu);
+    read_script_token_f2cd0();
+    do {
+        if (n == 10)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x00191954u);
+        base = (uint32_t)((int32_t)(int16_t)EF_U16(0x001616e8u) * 0x2a);
+        EF_U16(0x00484be2u + base + (uint32_t)(int32_t)n * 4u) = (uint16_t)guest_fn_9d4cd(0x0048592cu);
+        read_script_token_f2cd0();
+        base = (uint32_t)((int32_t)(int16_t)EF_U16(0x001616e8u) * 0x2a);
+        EF_U16(0x00484be4u + base + (uint32_t)(int32_t)n * 4u) = (uint16_t)guest_fn_9d4cd(0x0048592cu);
+        read_script_token_f2cd0();
+        n++;
+    } while (guest_fn_a4380(0x0048592cu, 0x0019198cu) != 0u);
+    base = (uint32_t)((int32_t)(int16_t)EF_U16(0x001616e8u) * 0x2a);
+    EF_U16(0x00484be0u + base) = (uint16_t)n;
+    EF_U16(0x001616e8u) = (uint16_t)(EF_U16(0x001616e8u) + 1u);
 }
