@@ -22754,3 +22754,19 @@ void rotate_add_patch_c5c24(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
 	EF_U32(0xc8c4bu) += r[1];
 	EF_U32(0xc8c56u) += r[2];
 }
+
+/* 0x11b040, 172 bytes. Weighted box measure scaled by the ratio of two box helpers. */
+double box_measure_11b040(ef_addr32 obj, double limit)
+{
+	double k = (1.0 > limit) ? 0.25 : 0.5;
+	double m = 1.0 - k;
+	double a = md_rd_f64(obj + 0x18) - md_rd_f64(obj + 0x10);
+	double b = md_rd_f64(obj + 0x38) - md_rd_f64(obj + 0x30);
+	double p = m * md_rd_f64(obj + 0x18) + k * md_rd_f64(obj + 0x10);
+	double q = m * md_rd_f64(obj + 0x38) + k * md_rd_f64(obj + 0x30);
+	double v = (a * p + b * q) * md_rd_f64(0x19581c) + p * b + a * q;
+	double w1 = box_width_11af88(obj);
+	double w2 = abs_area_11af60(obj);
+
+	return w1 / w2 * md_rd_f64(0x195824) * v;
+}

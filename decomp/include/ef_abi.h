@@ -6453,4 +6453,7 @@ void combine_globals_119844(void); /* 0x119844 */
 void rotate_add_patch_c5c24(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0);
 void rotate_add_patch_c5c24(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0); /* 0xc5c24 */
 
+double box_measure_11b040(ef_addr32 obj, double limit);
+double box_measure_11b040(ef_addr32 obj, double limit); /* 0x11b040 */
+
 #endif
