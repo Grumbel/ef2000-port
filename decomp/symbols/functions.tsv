@@ -1775,7 +1775,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008b5f0	38	latch_mode_word_8b5f0	game_helpers28	compiles	game	confirmed	decomp/tests/0x0008b5f0.json	docs/compiler-abi.md; Latch a word pointer (+1) and clamp its mode to 1 or 2.; callers 8ba98@8bac8; guest pending
 0x0008b650	50	select_validated_ui_record	ui_secondary	compiles	game	confirmed	decomp/tests/0x0008b650.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008b684	89	scan_directory_entry_8b684	game_helpers81	compiles	game	confirmed	decomp/tests/0x0008b684.json	docs/compiler-abi.md; Start (mode 1) or continue a directory scan; returns 1 when no more entries.; callers 8b7e8@8b84d; guest pending
-0x0008b6e0	262			unknown	unclassified	unverified		
+0x0008b6e0	262	next_list_token_8b6e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008b6e0.json	docs/compiler-abi.md; Fetch the next token of a word list into OUT (ECX): with MODE (EAX, signed word) 1 the list file is (re)loaded first (de; callers 8b7e8@8b84d,8b7e8@8b90b; guest pending
 0x0008b7e8	317			unknown	unclassified	unverified		
 0x0008b988	95	draw_nearby_effects_8b988	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008b988.json	docs/compiler-abi.md; Draw every effect of the ring at 0x12db5c that is close to (x, y).; callers 8bb18@8bb44; guest pending
 0x0008b9e8	71	find_cell_8b9e8	unit_flags	compiles	game	confirmed	decomp/tests/0x0008b9e8.json	docs/compiler-abi.md; Find the list node (list dword 0x12db5c, next at +0x1d) whose coordinates match; returns its word +0x1b or -1.; callers 3ce70@3cea4; guest pending

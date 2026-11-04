@@ -6956,3 +6956,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x440f4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | 433fc@43560,4357c@436c3,436dc@43819 | Draw a sprite from the table selected by SEL (EAX low byte; EDX, EBX, ECX, then the two stack arguments S0, S1, ret 8; t |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8b6e0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 8b7e8@8b84d,8b7e8@8b90b | Fetch the next token of a word list into OUT (ECX): with MODE (EAX, signed word) 1 the list file is (re)loaded first (de |

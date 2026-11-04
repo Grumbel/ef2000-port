@@ -8934,3 +8934,52 @@ void draw_table_sprite_440f4(uint32_t sel, uint32_t edx, uint32_t ebx, uint32_t 
     guest_fn_ca620((int32_t)addr, (int32_t)(int16_t)edx, (int32_t)(int16_t)ebx, (uint32_t)(int32_t)(int16_t)ecx,
                    (uint32_t)(int32_t)(int16_t)s0, s1 & 0xffffu);
 }
+
+/* 0x8b6e0, 262 bytes. Fetch the next token of a word list into OUT (ECX): with MODE (EAX, signed word) 1 the list file is (re)loaded first (default path + 0x18a854, sized with the hook 0x132ab4, read with 0x132ab8 into a fresh arena block kept in 0x20f424, NUL terminated) and the read cursor 0x20f42c is rewound to it. Then OUT = PREFIX (EDX) followed by the next characters up to the next separator (ctype table 0x195af0, bit 2 of entry byte + 1), the following separators are skipped and the cursor stored. Returns 1 when a token was produced; returns 0 with OUT empty at the end of the data (the block is freed) or when nothing is loaded. */
+uint32_t next_list_token_8b6e0(uint32_t mode, uint32_t prefix, uint32_t out)
+{
+    uint32_t cur = EF_U32(0x0020f42cu);
+    uint32_t size, blk;
+    if ((int32_t)(int16_t)mode == 1) {
+        build_default_path_9c980(out);
+        cur = 0u;
+        strcat_9ca57(out, 0x0018a854u);
+        EF_U32(0x0020f42cu) = 0u;
+        size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), out);
+        cur = EF_U32(0x0020f42cu);
+        if (size != 0u) {
+            blk = guest_fn_e2a94(size + 1u);
+            EF_U32(0x0020f424u) = blk;
+            guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), out, blk);
+            cur = EF_U32(0x0020f424u);
+            EF_U8(cur + size) = 0u;
+        }
+    }
+    if (cur != 0u) {
+        uint8_t c = EF_U8(cur);
+        EF_U32(0x0020f42cu) = cur;
+        if (c != 0u) {
+            copy_string_9d749(out, prefix);
+            out += guest_fn_b1b8b(out);
+            for (;;) {
+                cur = EF_U32(0x0020f42cu);
+                if (EF_U8(0x00195af0u + (uint8_t)(EF_U8(cur) + 1u)) & 2u)
+                    break;
+                cur++;
+                out++;
+                EF_U8(out - 1u) = EF_U8(cur - 1u);
+                EF_U32(0x0020f42cu) = cur;
+            }
+            while (EF_U8(0x00195af0u + (uint8_t)(EF_U8(cur) + 1u)) & 2u)
+                cur++;
+            EF_U8(out) = 0u;
+            EF_U32(0x0020f42cu) = cur;
+            return 1u;
+        }
+        guest_fn_e2af4(EF_U32(0x0020f424u));
+        cur = 0u;
+    }
+    EF_U8(out) = 0u;
+    EF_U32(0x0020f42cu) = cur;
+    return 0u;
+}
