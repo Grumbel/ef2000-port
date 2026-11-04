@@ -4480,4 +4480,8 @@ void walk_effect_records_8ba98(uint32_t rec);
 void load_effect_list_8bad4(uint32_t first, uint32_t second);
 void guest_fn_ea8cc_x(uint32_t vec, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t scale_bits); /* 0xea8cc EAX + one stack float, callee cleanup */
 
+uint32_t mode_code_a7dac(void);
+void format_state_bytes_82b6c(uint32_t buf);
+void init_sound_entries_80374(uint32_t eax);
+
 #endif

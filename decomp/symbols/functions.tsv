@@ -1533,7 +1533,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000802ac	49	ui_release_matching_control	ui_dispatch	compiles	game	confirmed	decomp/tests/0x000802ac.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000802e0	52	show_menu_item_802e0	game_helpers6	compiles	game	confirmed	decomp/tests/0x000802e0.json	docs/compiler-abi.md; ; callers 7ef14@7f445; guest pending
 0x00080314	62	show_menu_item_80314	game_helpers6	compiles	game	confirmed	decomp/tests/0x00080314.json	docs/compiler-abi.md; ; callers 87a20@87d40; guest pending
-0x00080374	80			unknown	unclassified	unverified		
+0x00080374	80	init_sound_entries_80374	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00080374.json	docs/compiler-abi.md; Create two entries with 0xd7764 (the first with the caller's EAX and parameters 1, 1, 0x5622, 0x7f, 1, 1; the second for; callers a8bd4@a8d03; guest pending
 0x000803c4	36	ui_reset_active_panel	ui_dispatch	compiles	game	confirmed	decomp/tests/0x000803c4.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000803e8	21	wait_for_event_803e8	mid_helpers	compiles	game	confirmed	decomp/tests/0x000803e8.json	docs/compiler-abi.md; poll 0xd7594(0) until nonzero low byte when byte 0x15bac6; callers a8bd4@a8e5c; guest pending
 0x00080400	15	ui_reset_panel_and_release	ui_dispatch	compiles	game	confirmed	decomp/tests/0x00080400.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
@@ -1579,7 +1579,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000827b4	25	write_status_queried_value	status_values	compiles	game	confirmed	decomp/tests/0x000827b4.json	docs/compiler-abi.md; 0x810ec(dest) result formatted with fmt 0x188b68; sole direct caller 82e40@82fba; guest pending
 0x000827d0	35	write_ui_status_flags_b	packet_status	compiles	game	confirmed	decomp/tests/0x000827d0.json	docs/compiler-abi.md; host model; guest differential pending
 0x000827f4	24	write_status_dword_122dc4	status_values	compiles	game	confirmed	decomp/tests/0x000827f4.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188b84, dword 0x122dc4); sole direct caller 82e40@82ffc; guest pending
-0x00082b6c	80			unknown	unclassified	unverified		
+0x00082b6c	80	format_state_bytes_82b6c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00082b6c.json	docs/compiler-abi.md; sprintf(buf, format 0x188bd8, seven state bytes and the byte at 0x15b7e6).; callers 82e40@82ed3; guest pending
 0x00082bd4	27	write_ui_status_float	packet_status	compiles	game	confirmed	decomp/tests/0x00082bd4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082bf0	26	write_status_byte_15bdd0	status_values	compiles	game	confirmed	decomp/tests/0x00082bf0.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188c10, byte 0x15bdd0); sole direct caller 82e40@82eb2; guest pending
 0x00082cec	183	apply_options_82cec	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x00082cec.json	docs/compiler-abi.md; Apply the saved options and refresh the display flags.; callers 8b39c@8b472; guest pending
@@ -2326,7 +2326,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a7be8	237	handle_key_a7be8	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000a7be8.json	docs/compiler-abi.md; Handle the current key code at 0x41f833; returns 1 if consumed.; callers a8958@a89d7,a8a38@a8b8c,a8bd4@a8e4a; guest pending
 0x000a7d34	12	remember_clock_a7d34	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000a7d34.json	docs/compiler-abi.md; Remember the current clock.; callers a82f0@a853a; guest pending
 0x000a7d40	65	clock_delta_a7d40	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000a7d40.json	docs/compiler-abi.md; Clock ticks since the last call, clamped to 1..50.; callers a8718@a87bd; guest pending
-0x000a7dac	70			unknown	unclassified	unverified		
+0x000a7dac	70	mode_code_a7dac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a7dac.json	docs/compiler-abi.md; Map the mode byte at [[0x4191d0]+0x10] (0..9) to a code through a jump table; out of range gives 0.; callers a8718@a87a2,a8718@a88bd; guest pending
 0x000a7df4	41	save_table_418e38	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7df4.json	docs/compiler-abi.md; Copy 100 dwords from 0x418e38 to 0x418fc8.; callers a9d48@a9da1; guest pending
 0x000a7e20	41	restore_table_418e38	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7e20.json	docs/compiler-abi.md; Copy 100 dwords from 0x418fc8 back to 0x418e38.; callers a9d48@a9dff; guest pending
 0x000a7e4c	60	save_table_a7e4c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a7e4c.json	docs/compiler-abi.md; Copy table 0x418708 to 0x418690 for unlocked entries.; callers a9d48@a9d9c; guest pending

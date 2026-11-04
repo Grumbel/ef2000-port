@@ -5327,3 +5327,11 @@ in EAX, format string address, one value).
 | `0x97914` | EAX:uint32_t | none | 978e8@97906 | Unless 0x122c5c is set, copy the vector at obj+0x30 to a temporary, scale it by the float bits at 0x132b20 and add it to |
 | `0x8ba98` | EAX:uint32_t | none | 8bad4@8bb0d | Walk a list of length-prefixed records (word length at +0, zero ends); type byte at +2 of 0x11 links an effect via 0x8ba |
 | `0x8bad4` | EAX:uint32_t,EDX:uint32_t | none | 8bd58@8bdc5 | Build the default path with suffix 0x18a86c, append the two names, look up the UI record for it and process its effect l |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa7dac` | none | EAX:uint32_t | a8718@a87a2,a8718@a88bd | Map the mode byte at [[0x4191d0]+0x10] (0..9) to a code through a jump table; out of range gives 0. |
+| `0x82b6c` | EAX:uint32_t | none | 82e40@82ed3 | sprintf(buf, format 0x188bd8, seven state bytes and the byte at 0x15b7e6). |
+| `0x80374` | EAX:uint32_t | none | a8bd4@a8d03 | Create two entries with 0xd7764 (the first with the caller's EAX and parameters 1, 1, 0x5622, 0x7f, 1, 1; the second for |

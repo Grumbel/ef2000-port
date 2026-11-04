@@ -392,3 +392,30 @@ void load_effect_list_8bad4(uint32_t first, uint32_t second)
     if (rec != 0u)
         walk_effect_records_8ba98(rec);
 }
+
+/* 0xa7dac, 70 bytes. Map the mode byte at [[0x4191d0]+0x10] (0..9) to a code through a jump table; out of range gives 0. */
+uint32_t mode_code_a7dac(void)
+{
+    static const uint8_t codes[10] = { 0xd, 9, 6, 0x10, 0xc, 7, 7, 0x12, 9, 7 };
+    uint8_t mode = EF_U8(EF_U32(0x004191d0u) + 0x10u);
+    return mode <= 9u ? codes[mode] : 0u;
+}
+
+/* 0x82b6c, 80 bytes. sprintf(buf, format 0x188bd8, seven state bytes and the byte at 0x15b7e6). */
+void format_state_bytes_82b6c(uint32_t buf)
+{
+    guest_sprintf_a4342(buf, 0x00188bd8u,
+                        (uint32_t)EF_U8(0x0012854bu), (uint32_t)EF_U8(0x001a363eu),
+                        (uint32_t)EF_U8(0x001a3636u), (uint32_t)EF_U8(0x001a3640u),
+                        (uint32_t)EF_U8(0x001a3639u), (uint32_t)EF_U8(0x001a3641u),
+                        (uint32_t)EF_U8(0x0015b7e6u));
+}
+
+/* 0x80374, 80 bytes. Create two entries with 0xd7764 (the first with the caller's EAX and parameters 1, 1, 0x5622, 0x7f, 1, 1; the second for the string 0x18878c), store them at 0x1f9020/0x1f9024, set 0x12b0f4 and process the list at 0x1f9020. */
+void init_sound_entries_80374(uint32_t eax)
+{
+    EF_U8(0x0012b0f4u) = 1u;
+    EF_U32(0x001f9020u) = guest_fn_d7764_7(eax, 1u, 1u, 0x5622u, 0x7fu, 1u, 1u);
+    EF_U32(0x001f9024u) = guest_fn_d7764_7(0x0018878cu, 0u, 0u, 0u, 0u, 0u, 0u);
+    guest_fn_d6f90(0x001f9020u, 0u, 0u);
+}
