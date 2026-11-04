@@ -3336,3 +3336,25 @@ in EAX, format string address, one value).
 | `0xda190` | EAX:ef_addr32,EDX:ef_addr32 | none | d9e50@da06f | Select the table entry matching a name, store the key and run its handler. |
 | `0xdc250` | none | none | 277d8@2780d,27858@2788a,278c0@27afd | Toggle the page flag between 0 and 1 around the page callbacks. |
 | `0xdc280` | none | none | 1e480@1e514,1e480@1e58a,1e480@1e602 | Cycle the page flag through 0..2 around the page callbacks. |
+
+## runtime_helpers25 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdead0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | a1d50@a1e67,c5d8f@c5df0,c74bc@c7509 | Find a key in the 1-based id table (stack argument) or abort. |
+| `0xe1130` | EAX:uint32_t | none | none direct | Wait for the given ticks or until the abort bit 0x80 is set. |
+| `0xe115c` | EAX:uint32_t | none | e0b6c@e0b7b,e1194@e11bc | Wait for the given ticks or until the input poll reports a press. |
+| `0xe29a0` | none | none | 80058@8006d,81230@81246,8b274@8b29a | Allocate the arena on first use, register its release hook, then reset it. |
+| `0xe29e8` | EAX:uint32_t | EAX:uint32_t | 7ab00@7ab2d,7b3c8@7b3d6,7b3c8@7b3ee | Take bytes from the arena without a header; abort when it runs out. |
+| `0xe2a94` | EAX:uint32_t | EAX:uint32_t | 36054@36086,369fc@36aa3,3c410@3c415 | Allocate a block with a 4-byte size header from the arena. |
+| `0xe2af4` | EAX:uint32_t | none | 36438@36611,3c434@3c439,3c6c0@3c718 | Free a block of the arena; the arena resets when the last block is freed. |
+| `0xe3170` | EAX:uint32_t,DX:uint16_t | none | e330c@e332a,e330c@e333b,e378c@e37b5 | Read from the resource handle and abort when the count is short. |
+| `0xe3c20` | none | EAX:ef_addr32 | c4389@c438b | Take the next 36-byte record of the 1000-record pool. |
+| `0xe3fbc` | EAX:uint32_t | none | none direct | Translate a value and append the non-zero result to the 32-entry list. |
+| `0xe9574` | none | none | 80058@800d0,81230@812a9,82cec@82d3e | Release the buffer at 0x1600a0 once and mark it released. |
+| `0xea100` | EAX:uint32_t | EAX:uint32_t | ea270@ea2b9,ea270@ea2e2,ea270@ea34d | Allocate and zero a block, aborting on failure. |
+| `0xea1a0` | EAX:ef_addr32,EDX:uint32_t | none | ea270@ea398 | Read a header into an object and take its chunk size when tagged 'RA'. |
+| `0xea420` | EAX:uint32_t | none | 9dcf8@9dd1d,de864@de999 | Decode the current chunk either with the 'RA' decoder or a plain copy. |
+| `0xea470` | EAX:uint32_t | none | 8b274@8b2a9 | Install the exit handler and restart; abort when called with a mode other than 1. |
+| `0xeaab0` | none | none | eac48@eac83 | Open the data file and read its 0x306-byte header. |
+| `0xeaaf4` | none | none | eab44@eab6d,eac48@eaccb | Read the data file's size-prefixed block into 0x474368. |

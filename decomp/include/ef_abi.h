@@ -2646,4 +2646,30 @@ void guest_fn_1027cc(uint32_t a); /* 0x1027cc cdecl */
 void guest_fn_102824(uint32_t a); /* 0x102824 cdecl */
 void guest_fn_102858(uint32_t a); /* 0x102858 cdecl */
 
+/* runtime_helpers25.c */
+uint32_t find_table_entry_dead0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_key);
+void wait_ticks_or_key_e1130(uint32_t ticks);
+void wait_ticks_or_press_e115c(uint32_t ticks);
+void init_arena_e29a0(void);
+uint32_t arena_take_e29e8(uint32_t bytes);
+uint32_t arena_alloc_e2a94(uint32_t bytes);
+void arena_free_e2af4(uint32_t block);
+void read_resource_e3170(uint32_t buffer, uint16_t count);
+ef_addr32 next_pool_record_e3c20(void);
+void append_translated_e3fbc(uint32_t value);
+void release_buffer_e9574(void);
+uint32_t alloc_zeroed_checked_ea100(uint32_t size);
+void read_chunk_header_ea1a0(ef_addr32 object, uint32_t source);
+void decode_chunk_ea420(uint32_t destination);
+void install_exit_handler_ea470(uint32_t mode);
+void open_data_file_eaab0(void);
+void read_data_block_eaaf4(void);
+void guest_fn_e2a1c(void); /* 0xe2a1c */
+uint32_t guest_fn_1092b0(ef_addr32 pointer); /* 0x1092b0 EAX */
+void guest_fn_9cc28(uint32_t a, uint32_t b); /* 0x9cc28 EAX/EDX */
+uint32_t guest_fn_10da50(ef_addr32 a, uint32_t b); /* 0x10da50 cdecl -> AL */
+void guest_fn_10dc7f(uint32_t a, uint32_t b); /* 0x10dc7f EAX/EDX */
+void guest_fn_81c(void); /* 0x81c */
+uint32_t guest_fn_9ccb8(ef_addr32 name); /* 0x9ccb8 EAX -> EAX */
+
 #endif
