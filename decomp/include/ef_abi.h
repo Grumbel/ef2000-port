@@ -5563,4 +5563,10 @@ uint32_t pick_weapon_slot_293b0(uint32_t unit);
 
 uint32_t position_clear_2dee4(uint32_t id);
 
+void next_target_65d24(void);
+ef_addr32 guest_fn_907f0_x(ef_addr32 cur); /* 0x907f0 EAX -> EAX: next node in the ring */
+uint32_t guest_fn_2e910_x(uint32_t a, uint32_t b); /* 0x2e910 EAX/EDX -> AL */
+
+
+
 #endif

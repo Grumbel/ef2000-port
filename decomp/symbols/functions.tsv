@@ -1214,7 +1214,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00065a88	402			unknown	unclassified	unverified		
 0x00065c1c	249			unknown	unclassified	unverified		
 0x00065d18	12	store_631bc_65d18	game_helpers5	compiles	game	confirmed	decomp/tests/0x00065d18.json	docs/compiler-abi.md; ; callers 65a50@65a6d; guest pending
-0x00065d24	235			unknown	unclassified	unverified		
+0x00065d24	235	next_target_65d24	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00065d24.json	docs/compiler-abi.md; Advance the target cursor 0x1a820c to the next visible candidate for the selected object (high word of 0x1f71c8, looked ; callers 65a50@65a74; guest pending
 0x00065e10	673			unknown	unclassified	unverified		
 0x000663a4	186	find_next_unit_663a4	game_helpers39	compiles	game	confirmed	decomp/tests/0x000663a4.json	docs/compiler-abi.md; Find the next unit after an index that matches a team mode; return its id or -1.; callers 65a88@65aed,65a88@65b09,65c1c@65c59; guest pending
 0x00066548	1075			unknown	unclassified	unverified		

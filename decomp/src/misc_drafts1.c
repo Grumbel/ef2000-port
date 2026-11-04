@@ -12449,3 +12449,37 @@ uint32_t position_clear_2dee4(uint32_t id)
     }
     return ok;
 }
+
+/* 0x65d24, 235 bytes. Advance the target cursor 0x1a820c to the next visible candidate for the selected object (high word of 0x1f71c8, looked up with 0x7489c; when it is missing the cursor is cleared). Step through the ring (0x907f0, wrapping at most once more) until a node passes: 0x2e910(side byte of the owner record, node byte +0x3e) is true, bit 2 of node+0x30 is clear, both |dx| and |dz| to the object are below 0x486c00 and the line of sight request 0x66bf4 is false. If none passes the previous cursor is restored. */
+void next_target_65d24(void)
+{
+    ef_addr32 obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    ef_addr32 saved;
+    uint8_t wraps = 0u;
+    uint8_t found = 0u;
+    if (obj == 0u) {
+        EF_U32(0x001a820cu) = 0u;
+        return;
+    }
+    saved = EF_U32(0x001a820cu);
+    do {
+        ef_addr32 cur = guest_fn_907f0_x(EF_U32(0x001a820cu));
+        EF_U32(0x001a820cu) = cur;
+        if (cur == 0u) {
+            cur = guest_fn_907f0_x(0u);
+            EF_U32(0x001a820cu) = cur;
+            wraps++;
+        }
+        cur = EF_U32(0x001a820cu);
+        if (cur != 0u) {
+            uint32_t side = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)EF_U32(obj + 0x26u) >> 16) * 0xcau + 0x15u);
+            if ((uint8_t)guest_fn_2e910_x(side, EF_U8(cur + 0x3eu)) != 0u && (EF_U8(cur + 0x30u) & 2u) == 0u &&
+                (int32_t)abs_a28f2((int32_t)(EF_U32(cur) - EF_U32(obj))) < 0x486c00 &&
+                (int32_t)abs_a28f2((int32_t)(EF_U32(cur + 8u) - EF_U32(obj + 8u))) < 0x486c00 &&
+                request_los_66bf4(cur) == 0u)
+                found = 1u;
+        }
+    } while (found == 0u && wraps < 2u);
+    if (found == 0u)
+        EF_U32(0x001a820cu) = saved;
+}

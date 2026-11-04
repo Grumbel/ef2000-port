@@ -7641,3 +7641,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x2dee4` | EAX:uint32_t | EAX:uint32_t | 2e740@2e871 | Is the record ID (AX; 0xca byte table at [0x19bb58]) clear of its neighbours? ID 0xff gives 1 and a record whose state b |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x65d24` | none | none | 65a50@65a74 | Advance the target cursor 0x1a820c to the next visible candidate for the selected object (high word of 0x1f71c8, looked  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
