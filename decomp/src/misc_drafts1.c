@@ -17528,3 +17528,54 @@ void apply_total_adjustment_4430(uint32_t sel, uint32_t id, uint32_t level, uint
 		break;
 	}
 }
+
+/* 0x85d00, 369 bytes. Select the next weapon slot of the selected unit (signed word 0x1f71ca) whose weapon class byte (0x12bc94 + 0x91 * type) equals TAG (AL). The current slot is the signed byte at unit +0x1d7 (0x14 = none: the slot becomes 0x13 and 0x14 is returned); slots 0..0x13 are tried cyclically after it (slot 0x13 stores TAG in byte 0x12bd25 and is returned immediately). A slot qualifies when its count word (+0x19c) is non-zero, no earlier slot holds the same type with a count, its type differs from the current slot's and is not 0x21 or 0x22. Returns the slot number in BX, or 0x14 when the search wrapped round to the current slot. */
+uint32_t next_weapon_slot_85d00(uint32_t tag)
+{
+	uint32_t unit = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+	int32_t cur = (int32_t)(int8_t)EF_U8(unit + 0x1d7u);
+	int16_t bx = (int16_t)cur;
+	int16_t cursel, ax;
+	uint32_t edx, ebp;
+	int32_t type;
+	uint8_t ch;
+
+	if (((int32_t)EF_U32(unit + 0x1d4u) >> 24) == 0x14) {
+		EF_U8(unit + 0x1d7u) = 0x13u;
+		return 0x14u;
+	}
+	cursel = (int16_t)(int8_t)EF_U8(unit + (uint32_t)(((int32_t)EF_U32(unit + 0x1d4u) >> 24) * 3) + 0x19bu);
+	for (;;) {
+		bx = (int16_t)(bx + 1);
+		if ((int32_t)bx >= 0x14)
+			bx = 0;
+		if ((int32_t)bx == 0x13) {
+			EF_U8(0x0012bd25u) = (uint8_t)tag;
+			return (uint32_t)(uint16_t)bx;
+		}
+		if (bx == (int16_t)(int8_t)EF_U8(unit + 0x1d7u))
+			return 0x14u;
+		ch = 0u;
+		for (ax = 0; ax < bx; ax++) {
+			uint32_t e = unit + (uint32_t)((int32_t)ax * 3);
+			if (EF_U8(e + 0x19bu) == EF_U8(unit + (uint32_t)((int32_t)bx * 3) + 0x19bu) && EF_U16(e + 0x19cu) != 0u)
+				ch = 1u;
+		}
+		edx = unit + (uint32_t)((int32_t)bx * 3);
+		type = (int32_t)EF_U32(edx + 0x198u) >> 24;
+		ebp = (uint32_t)(type * 0x91);
+		if (EF_U8(ebp + 0x0012bc94u) != (uint8_t)tag)
+			continue;
+		if (EF_U16(edx + 0x19cu) == 0u)
+			continue;
+		if (ch != 0u)
+			continue;
+		if ((int16_t)(int8_t)EF_U8(edx + 0x19bu) == cursel)
+			continue;
+		if (type == 0x21 || type == 0x22)
+			continue;
+		if (bx != (int16_t)(int8_t)EF_U8(unit + 0x1d7u) && (uint8_t)tag == EF_U8(ebp + 0x0012bc94u) && EF_U16(edx + 0x19cu) != 0u)
+			return (uint32_t)(uint16_t)bx;
+		return 0x14u;
+	}
+}

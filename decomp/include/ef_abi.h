@@ -5917,4 +5917,6 @@ void load_placement_list_3c790(uint32_t ax);
 
 void apply_total_adjustment_4430(uint32_t sel, uint32_t id, uint32_t level, uint32_t mode);
 
+uint32_t next_weapon_slot_85d00(uint32_t tag);
+
 #endif
