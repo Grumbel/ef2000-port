@@ -3723,7 +3723,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa89a	6	get_global_fa89a	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fa89a.json	docs/compiler-abi.md; ; callers bc471@bc479; guest pending
 0x000fa8a0	191	stream_flush_fa8a0	runtime_helpers38	compiles	game	confirmed	decomp/tests/0x000fa8a0.json	docs/compiler-abi.md; fflush: write out a dirty write buffer, or seek back over unread input; resets the buffer position and returns 0 or -1.; callers bc4da@bc4fe,f1f5a@f207d,f1f5a@f2112; guest pending
 0x000fa95f	65	lseek_fa95f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa95f.json	docs/compiler-abi.md; DOS lseek (int 21h, AH = 0x42): move the file HANDLE to OFFSET relative to WHENCE. Returns the new position (DX:AX), or ; callers bc4da@bc518,f2183@f21d9,f2183@f2216; guest pending
-0x000fa9a0	50			unknown	unclassified	unverified		
+0x000fa9a0	50	close_handle_fa9a0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa9a0.json	docs/compiler-abi.md; close: close the DOS handle HANDLE (EAX, int 21h AH = 0x3e); on success clear its table entry (0x1102a3 with 0) and retu; callers bc4da@bc524; guest pending
 0x000fa9d2	94			unknown	unclassified	unverified		
 0x000faa30	202	scan_code_class_faa30	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000faa30.json	docs/compiler-abi.md; Map a scan code to a key class, 0 if unmapped.; callers fbad8@fbc5b; guest pending
 0x000faafc	130	count_group_entries_faafc	game_helpers122	compiles	game	confirmed	decomp/tests/0x000faafc.json	docs/compiler-abi.md; Count the active elite 0x15-byte entries of a group whose code is not in the set; the original then always returns 1.; callers fbad8@fbc73; guest pending
@@ -4056,7 +4056,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00110b70	51	clear_rows_110b70	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00110b70.json	docs/compiler-abi.md; Zero len bytes at the start of each of count rows spaced stride bytes apart.; callers none direct; guest pending
 0x00110dcc	13	increment_17d7ba	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110dcc.json	docs/compiler-abi.md; ; callers 101ba8@101bb1; guest pending
 0x00110dd9	13	decrement_17d7ba	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110dd9.json	docs/compiler-abi.md; ; callers 101ba8@101bd1; guest pending
-0x00110f0c	48			unknown	unclassified	unverified		
+0x00110f0c	48	set_timer_divisor_110f0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110f0c.json	docs/compiler-abi.md; cdecl: program the system timer with the reload value DIVISOR (channel 0, mode 3: command 0x36 to port 0x43, low then hi; callers 110f3c@110f62,1110c5@1110cc; guest pending
 0x00110f3c	51	scale_110f3c	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110f3c.json	docs/compiler-abi.md; 0x110f0c(value < 0xd68d ? value * 10000 / 0x20bc : 0).; callers 110f6f@110fb1; guest pending
 0x00110f6f	101			unknown	unclassified	unverified		
 0x00110fd4	241			unknown	unclassified	unverified		

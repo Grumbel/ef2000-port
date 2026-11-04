@@ -7335,3 +7335,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x111118` | EAX:uint32_t | EAX:uint32_t | 101e80@101ea5 | cdecl: look up interrupt INTNO with the DOS extender calls 0x2502 (protected-mode vector, result discarded) and 0x2503 ( |
 | `0x117ace` | none | none | 105230@1052dc | Register the two memory ranges 0x17e270..0x17e290 and 0x1159c8..0x117ace with the lock service (0x104840, cdecl) around  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfa9a0` | EAX:uint32_t | EAX:uint32_t | bc4da@bc524 | close: close the DOS handle HANDLE (EAX, int 21h AH = 0x3e); on success clear its table entry (0x1102a3 with 0) and retu |
+| `0x110f0c` | EAX:uint32_t | none | 110f3c@110f62,1110c5@1110cc | cdecl: program the system timer with the reload value DIVISOR (channel 0, mode 3: command 0x36 to port 0x43, low then hi |

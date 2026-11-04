@@ -11115,3 +11115,25 @@ void register_locked_ranges_117ace(void)
     guest_fn_104840(0x0017e270u, 0x0017e290u);
     guest_fn_104840(0x001159c8u, 0x00117aceu);
 }
+
+/* 0xfa9a0, 50 bytes. close: close the DOS handle HANDLE (EAX, int 21h AH = 0x3e); on success clear its table entry (0x1102a3 with 0) and return 0, on failure set error 4 (0xebe6d) and return -1. */
+uint32_t close_handle_fa9a0(uint32_t handle)
+{
+    uint32_t out[7];
+    run_dos_int_ex(0x21u, 0x3e00u, handle, 0u, handle, out);
+    if ((out[0] & 0x80000000u) == 0u && out[6] == 0u) {
+        store_flagged_value(handle, 0u);
+        return 0u;
+    }
+    guest_fn_ebe6d(4u);
+    return 0xffffffffu;
+}
+
+/* 0x110f0c, 48 bytes. cdecl: program the system timer with the reload value DIVISOR (channel 0, mode 3: command 0x36 to port 0x43, low then high byte to port 0x40) with interrupts disabled, and remember it in dword 0x17d7ae. */
+void set_timer_divisor_110f0c(uint32_t divisor)
+{
+    guest_fn_117b0c(0x43u, 0x36u);
+    EF_U32(0x0017d7aeu) = divisor;
+    guest_fn_117b0c(0x40u, divisor & 0xffu);
+    guest_fn_117b0c(0x40u, (divisor >> 8) & 0xffu);
+}
