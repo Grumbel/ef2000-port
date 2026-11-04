@@ -5476,3 +5476,12 @@ in EAX, format string address, one value).
 | `0x10d9c6` | EAX:double,EDX:uint32_t | EAX:double | e86f7@e870c,120560@120646 | (ret 12) modf: truncate x toward zero (0x9d72c), store the integral part through ip and return the fractional part. |
 | `0x11b588` | EAX:double | EAX:double | 11b5a8@11b608 | (ret 8) Call 0x11b540 with the double argument and scale its result by the constant at 0x1958bc. |
 | `0x11bf00` | EAX:uint32_t,EDX:double,EBX:double | EAX:double | 11bf28@11bf64 | (ret 16) Linear combination: f(a0) * v[0] + v[1] * a1 with f computed by 0x11bf00's helper 0xb3fd0 and the pair of doubl |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdc1e9` | EAX:double,EDX:double | EAX:double | b4620@b4664,deb1a@deb2f,e6990@e6a41 | fpatan after an exchange: atan2(st0, st1) of the two x87 registers (ST0 = y, ST1 = x on entry); the emulation path 0x108 |
+| `0x11af60` | EAX:uint32_t | EAX:double | 10a0d4@10a0db,11afb4@11afba,11b040@11b0ce | /((p[3] - p[2]) + (p[7] - p[6])) * ((p[4] - p[0]) * k)/ for the doubles at EAX, with k at 0x195804. |
+| `0x11b0ec` | EAX:uint32_t | EAX:double | none direct | atan2(p[1] - p[5], /p[4] - p[0]/) for the doubles at EAX. |
+| `0xe86f7` | EAX:double | EAX:double | 7f850@7f87d,b59a8@b5b2e,b59a8@b5b69 | (ret 8) Floor-like: take the integral part with 0x10d9c6 and add the constant at 0x190c8c when the fractional part is ne |

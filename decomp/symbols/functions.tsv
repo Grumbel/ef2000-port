@@ -3205,7 +3205,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc094	143	east_west_palettes		named	unclassified	unverified		
 0x000dc124	175	setsun		named	unclassified	unverified		
 0x000dc1d4	21	atan_dc1d4	float_helpers9	compiles	game	confirmed	decomp/tests/0x000dc1d4.json	docs/compiler-abi.md; atan of ST0 (fld1; fpatan); the emulation path 0x10848c is used when bit 0 of 0x1631f0 is set.; callers 1db08@1dba3; guest pending
-0x000dc1e9	21			unknown	unclassified	unverified		
+0x000dc1e9	21	atan2_dc1e9	float_helpers9	compiles	game	confirmed	decomp/tests/0x000dc1e9.json	docs/compiler-abi.md; fpatan after an exchange: atan2(st0, st1) of the two x87 registers (ST0 = y, ST1 = x on entry); the emulation path 0x108; callers b4620@b4664,deb1a@deb2f,e6990@e6a41; guest pending
 0x000dc21c	52	set_view_origin_dc21c	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc21c.json	docs/compiler-abi.md; Store two 16.16 coordinates (with a half-unit bias) from stack arguments.; callers 1e480@1e4d8,3cfc0@3d26b,63d5c@63ec5; guest pending
 0x000dc250	46	toggle_page_dc250	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000dc250.json	docs/compiler-abi.md; Toggle the page flag between 0 and 1 around the page callbacks.; callers 277d8@2780d,27858@2788a,278c0@27afd; guest pending
 0x000dc280	60	cycle_page_dc280	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000dc280.json	docs/compiler-abi.md; Cycle the page flag through 0..2 around the page callbacks.; callers 1e480@1e514,1e480@1e58a,1e480@1e602; guest pending
@@ -3441,7 +3441,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e85e4	12	store_bytes_46437d	math_string	compiles	game	confirmed	decomp/tests/0x000e85e4.json	docs/compiler-abi.md; Byte 0x46437e = AL, byte 0x46437d = DL.; callers 7b3fc@7b499,7b3fc@7b4b8; guest pending
 0x000e85f0	97	interpolate_line_e85f0	game_helpers37	compiles	game	confirmed	decomp/tests/0x000e85f0.json	docs/compiler-abi.md; Interpolate a point back along a slope defined by the line at 0x420904.; callers 7b7d8@7b943; guest pending
 0x000e8651	166			unknown	unclassified	unverified		
-0x000e86f7	60			unknown	unclassified	unverified		
+0x000e86f7	60	floor_e86f7	float_helpers9	compiles	game	confirmed	decomp/tests/0x000e86f7.json	docs/compiler-abi.md; (ret 8) Floor-like: take the integral part with 0x10d9c6 and add the constant at 0x190c8c when the fractional part is ne; callers 7f850@7f87d,b59a8@b5b2e,b59a8@b5b69; guest pending
 0x000e8733	24	allocate_cleared	math_string	compiles	game	confirmed	decomp/tests/0x000e8733.json	docs/compiler-abi.md; Allocate EAX*EDX bytes through 0xfc795 and clear them.; callers 106f10@106f64,117ed4@117ee9,117f14@117f23; guest pending
 0x000e874b	26	find_char	math_string	compiles	game	confirmed	decomp/tests/0x000e874b.json	docs/compiler-abi.md; strchr: first occurrence of byte EDX in the string at EAX * (including the terminator), or 0.; callers aaee8@aaf06,e7fc0@e7fec,e7fc0@e803a; guest pending
 0x000e8784	105			unknown	unclassified	unverified		
@@ -4173,14 +4173,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011ac3c	35	table_double_11ac3c	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011ac3c.json	docs/compiler-abi.md; Fetch a double from the table at [obj+0xf]; the index is built from three bytes with the multipliers at obj+1 and obj+2 ; callers 11acb0@11ad04; guest pending
 0x0011acb0	397			unknown	unclassified	unverified		
 0x0011af14	76			unknown	unclassified	unverified		
-0x0011af60	39			unknown	unclassified	unverified		
+0x0011af60	39	abs_area_11af60	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011af60.json	docs/compiler-abi.md; /((p[3] - p[2]) + (p[7] - p[6])) * ((p[4] - p[0]) * k)/ for the doubles at EAX, with k at 0x195804.; callers 10a0d4@10a0db,11afb4@11afba,11b040@11b0ce; guest pending
 0x0011af88	17	box_width_11af88	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011af88.json	docs/compiler-abi.md; Absolute width of a bounding box.; callers 10a0d4@10a0e4,11b040@11b0c3; guest pending
 0x0011af9c	21	box_extent_sum_11af9c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011af9c.json	docs/compiler-abi.md; Scaled sum of two extents.; callers 10a0d4@10a0ee,11afb4@11afca; guest pending
 0x0011afb4	46			unknown	unclassified	unverified		
 0x0011afe4	15	box_extent_ratio_11afe4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011afe4.json	docs/compiler-abi.md; Ratio of two extents.; callers 10a0d4@10a158; guest pending
 0x0011aff4	74			unknown	unclassified	unverified		
 0x0011b040	172			unknown	unclassified	unverified		
-0x0011b0ec	40			unknown	unclassified	unverified		
+0x0011b0ec	40	slope_angle_11b0ec	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b0ec.json	docs/compiler-abi.md; atan2(p[1] - p[5], /p[4] - p[0]/) for the doubles at EAX.; callers none direct; guest pending
 0x0011b134	122			unknown	unclassified	unverified		
 0x0011b1b0	36	forward_to_11b134_11b1b0	small_wrappers6	compiles	game	confirmed	decomp/tests/0x0011b1b0.json	docs/compiler-abi.md; Forward four stack arguments to 0x11b134.; callers 11b6bc@11b6eb,11b6bc@11b71c,11bb80@11bb9e; guest pending
 0x0011b3c0	7	constant_double_11b3c0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b3c0.json	docs/compiler-abi.md; Constant double at 0x195864.; callers 11c584@11c6e4; guest pending

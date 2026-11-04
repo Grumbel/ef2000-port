@@ -64,3 +64,35 @@ double combine_11bf00(uint32_t v, double a0, double a1)
 {
     return guest_fn_b3fd0_x(a0) * EF_F64(v) + EF_F64(v + 8u) * a1;
 }
+
+/* 0xdc1e9, 21 bytes. fpatan after an exchange: atan2(st0, st1) of the two x87 registers (ST0 = y, ST1 = x on entry); the emulation path 0x10848c is used when bit 0 of 0x1631f0 is set. */
+double atan2_dc1e9(double st0, double st1)
+{
+    return atan2(st0, st1);
+}
+
+/* 0x11af60, 39 bytes. |((p[3] - p[2]) + (p[7] - p[6])) * ((p[4] - p[0]) * k)| for the doubles at EAX, with k at 0x195804. */
+double abs_area_11af60(uint32_t p)
+{
+    double sum = (EF_F64(p + 0x18u) - EF_F64(p + 0x10u)) + (EF_F64(p + 0x38u) - EF_F64(p + 0x30u));
+    double e = (EF_F64(p + 0x20u) - EF_F64(p)) * EF_F64(0x00195804u);
+    return abs_double_b427c(sum * e);
+}
+
+/* 0x11b0ec, 40 bytes. atan2(p[1] - p[5], |p[4] - p[0]|) for the doubles at EAX. */
+double slope_angle_11b0ec(uint32_t p)
+{
+    double dy = EF_F64(p + 8u) - EF_F64(p + 0x28u);
+    double dx = abs_double_b427c(EF_F64(p + 0x20u) - EF_F64(p));
+    return atan2_dc1e9(dy, dx);
+}
+
+/* 0xe86f7, 60 bytes. (ret 8) Floor-like: take the integral part with 0x10d9c6 and add the constant at 0x190c8c when the fractional part is negative. */
+double floor_e86f7(double x)
+{
+    double whole;
+    double frac = modf_10d9c6(x, (uint32_t)(uintptr_t)&whole);
+    if (frac < 0.0)
+        whole += EF_F64(0x00190c8cu);
+    return whole;
+}

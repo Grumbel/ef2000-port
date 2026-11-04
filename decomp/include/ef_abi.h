@@ -4570,4 +4570,9 @@ double combine_11bf00(uint32_t v, double a0, double a1);
 double guest_fn_11b540_x(double x); /* 0x11b540 one double on the stack, callee cleanup, result in ST0 */
 double guest_fn_b3fd0_x(double x); /* 0xb3fd0 one double on the stack, callee cleanup, result in ST0 */
 
+double atan2_dc1e9(double st0, double st1);
+double abs_area_11af60(uint32_t p);
+double slope_angle_11b0ec(uint32_t p);
+double floor_e86f7(double x);
+
 #endif
