@@ -5283,4 +5283,6 @@ uint32_t compare_extended_efb16(ef_addr32 a, ef_addr32 b);
 
 void offset_vector_by_angles_ceda0(ef_addr32 vec, ef_addr32 ang, uint32_t scale);
 
+void build_mode_label_326d8(void);
+
 #endif

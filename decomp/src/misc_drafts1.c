@@ -9434,3 +9434,33 @@ void offset_vector_by_angles_ceda0(ef_addr32 vec, ef_addr32 ang, uint32_t scale)
     if ((int32_t)EF_U32(0x0015b7c0u) > (int32_t)EF_U32(vec + 4u))
         EF_U32(vec + 4u) = EF_U32(0x0015b7c0u);
 }
+
+/* 0x326d8, 263 bytes. Build the label text at 0x19e4da: copy a short constant chosen by byte 0x19e555 (0..7, else a default; 5 to 8 bytes each from 0x182708 and 0x182a44..0x182a7c), then when byte 0x19e558 is 4 or 5 append the suffix chosen by byte 0x19e556 (1..7 from 0x182a84.., values above 7 use 0x182acc, 0 appends nothing). */
+void build_mode_label_326d8(void)
+{
+    static const uint32_t src[9] = {
+        0x00182708u, 0x00182a44u, 0x00182a54u, 0x00182a4cu, 0x00182a5cu,
+        0x00182a64u, 0x00182a6cu, 0x00182a74u, 0x00182a7cu
+    };
+    static const uint8_t len[9] = { 5u, 7u, 8u, 7u, 6u, 8u, 7u, 7u, 6u };
+    static const uint32_t suffix[8] = {
+        0u, 0x00182a84u, 0x00182a90u, 0x00182acc, 0x00182a9cu,
+        0x00182aa8u, 0x00182ab4u, 0x00182ac0u
+    };
+    uint32_t k = EF_U8(0x0019e555u);
+    uint32_t i;
+    uint32_t m;
+    uint32_t s;
+    if (k > 7u)
+        k = 8u;
+    for (i = 0u; i < len[k]; i++)
+        EF_U8(0x0019e4dau + i) = EF_U8(src[k] + i);
+    m = EF_U8(0x0019e558u);
+    if (m == 4u || m == 5u) {
+        s = EF_U8(0x0019e556u);
+        if (s > 7u)
+            s = 3u;
+        if (s != 0u)
+            (void)strcat_9ca57(0x0019e4dau, suffix[s]);
+    }
+}

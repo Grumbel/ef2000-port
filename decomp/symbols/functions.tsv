@@ -521,7 +521,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003237c	150	update_distance_minima_3237c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003237c.json	docs/compiler-abi.md; Update two running minima (0x19e5c5 with its companion word 0x19e5a5, and 0x19e5b9) from the distances computed by 0x7b1; callers 31e2c@32057; guest pending
 0x00032414	155	rotate_vector_by_angles_32414	game_helpers84	compiles	game	confirmed	decomp/tests/0x00032414.json	docs/compiler-abi.md; Rotate an integer vector by the angle triple (yaw/pitch/roll words) with a 1.15 matrix.; callers 316b8@316ca,3170c@3172e,31774@317bd; guest pending
 0x000324b0	488			unknown	unclassified	unverified		
-0x000326d8	263			unknown	unclassified	unverified		
+0x000326d8	263	build_mode_label_326d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000326d8.json	docs/compiler-abi.md; Build the label text at 0x19e4da: copy a short constant chosen by byte 0x19e555 (0..7, else a default; 5 to 8 bytes each; callers 2fbc4@2ff34,3122c@31363; guest pending
 0x000327e0	156	latch_vectors_327e0	line_of_sight	compiles	game	confirmed	decomp/tests/0x000327e0.json	docs/compiler-abi.md; Latch the position and target vectors.; callers 3122c@31246; guest pending
 0x0003287c	512			unknown	unclassified	unverified		
 0x00032b3c	10	call_32c04_182ad8	low_helpers	compiles	game	confirmed	decomp/tests/0x00032b3c.json	docs/compiler-abi.md; tail 0x32c04 with EAX=0x182ad8; callers none direct; guest pending
