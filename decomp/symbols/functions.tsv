@@ -167,7 +167,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000c630	311			unknown	unclassified	unverified		
 0x0000c768	207	layout_slot_widgets_c768	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000c768.json	docs/compiler-abi.md; Lay out the four numbered slot widgets of the dialog 0x180728 for the selection INDEX (EAX, signed word): the widget 0x1; callers bfcc@c264,c868@c88a,7bc00@7bc1d; guest pending
 0x0000c838	48	gpwShowDebrief		named	unclassified	unverified		
-0x0000c868	127			unknown	unclassified	unverified		
+0x0000c868	127	rebuild_page_c868	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000c868.json	docs/compiler-abi.md; Rebuild the current page: clear the word tables (0x92f0), lay out the slots up to the count in word 0x121e98 (0xc768), d; callers a5bc@a5d1,c838@c85f; guest pending
 0x0000c8e8	122	draw_page_entries_c8e8	screen_clip1	compiles	game	confirmed	decomp/tests/0x0000c8e8.json	docs/compiler-abi.md; For the current page (word at 0x121e98) call 0x11560 once for each of its entries, passing per-entry slots of the tables; callers bfcc@c27a,c868@c88f; guest pending
 0x0000c964	218	update_match_ratio_c964	float_helpers9	compiles	game	confirmed	decomp/tests/0x0000c964.json	docs/compiler-abi.md; Recompute the ratio of matching entries and store it as a float.; callers bfcc@c27f; guest pending
 0x0000ca40	25	gpwAlterSize		named	unclassified	unverified		

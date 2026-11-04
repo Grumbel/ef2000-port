@@ -5367,4 +5367,7 @@ uint32_t guest_fn_f118d_x(ef_addr32 tm); /* 0xf118d EAX -> EAX */
 
 void queue_grid_node_2a8ac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, ef_addr32 s1);
 
+void rebuild_page_c868(void);
+void guest_fn_cccc_x(ef_addr32 w); /* 0xcccc EAX */
+
 #endif

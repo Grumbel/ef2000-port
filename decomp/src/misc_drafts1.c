@@ -10791,3 +10791,22 @@ void queue_grid_node_2a8ac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
         EF_U32(0x0019bb3cu) = node;
     }
 }
+
+/* 0xc868, 127 bytes. Rebuild the current page: clear the word tables (0x92f0), lay out the slots up to the count in word 0x121e98 (0xc768), draw the page entries (0xc8e8), total the first count words of the table at 0x1a53b0 into word 0x121e9c and redraw the child 0x180580 of the dialog 0x180728 (0xcccc). */
+void rebuild_page_c868(void)
+{
+    int16_t n;
+    int16_t i;
+    uint32_t total = 0u;
+    uint32_t w;
+    clear_word_tables_92f0();
+    layout_slot_widgets_c768((uint32_t)(int32_t)(int16_t)EF_U16(0x00121e98u));
+    draw_page_entries_c8e8();
+    n = (int16_t)EF_U16(0x00121e98u);
+    for (i = 0; n > 0 && i < n; i++)
+        total += EF_U16(0x001a53b0u + (uint32_t)(uint16_t)i * 2u);
+    EF_U16(0x00121e9cu) = (uint16_t)total;
+    EF_U16(0x00121e98u) = (uint16_t)n;
+    w = guest_fn_a46cc(0x00180728u);
+    guest_fn_cccc_x(find_widget_checked_a78bc(w, 0x00180580u));
+}
