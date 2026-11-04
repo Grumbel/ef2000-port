@@ -7677,3 +7677,28 @@ void scan_nodes_near_unit_18a68(void)
         }
     } while (!found && left != 0u);
 }
+
+/* 0xc8e58, 224 bytes. When a data-set name is present (byte 0x41f5f0), build the two paths prefix+name+suffix (0x18eee0/0x18eeec, loaded into 0x425c8c, and 0x18ef1c/0x18ef24, loaded into 0x433f34) through the loader pointer at 0x132ab8, reporting a failure through the pointer at 0x132a74; on success of the second load set dword 0x433f30 to 1, rebuild the remap table and clear dword 0x160000. Finally call 0xe9a24(0x2d0, 0x425cbc, 0x419600). */
+void load_dataset_files_c8e58(void)
+{
+    char path[0x90];
+    uint32_t p = (uint32_t)(uintptr_t)path;
+    if (EF_U8(0x0041f5f0u) == 0u)
+        return;
+    build_path_9c9c0(p, 0x0018eee0u);
+    strcat_9ca57(p, 0x0041f5f0u);
+    strcat_9ca57(p, 0x0018eeecu);
+    if ((guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), p, 0x00425c8cu) & 0xffu) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018eef4u, p);
+    build_path_9c9c0(p, 0x0018ef1cu);
+    strcat_9ca57(p, 0x0041f5f0u);
+    strcat_9ca57(p, 0x0018ef24u);
+    if ((guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), p, 0x00433f34u) & 0xffu) == 0u) {
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018ef2cu, p);
+    } else {
+        EF_U32(0x00433f30u) = 1u;
+        rebuild_remap_table_e7e30(0u, 0u, 0u);
+        EF_U32(0x00160000u) = 0u;
+    }
+    guest_fn_e9a24(0x2d0u, 0x00425cbcu, 0x00419600u);
+}

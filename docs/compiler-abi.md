@@ -6659,3 +6659,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x18a68` | none | none | 1d318@1d369,92f10@92f1b | Advance the scene-node scan cursor (word 0x211ae2, starting at 0x2001) for the unit whose index is the signed word at 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc8e58` | none | none | ac408@ac50d | When a data-set name is present (byte 0x41f5f0), build the two paths prefix+name+suffix (0x18eee0/0x18eeec, loaded into  |

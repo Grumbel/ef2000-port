@@ -5140,4 +5140,6 @@ void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
 
 void scan_nodes_near_unit_18a68(void);
 
+void load_dataset_files_c8e58(void);
+
 #endif
