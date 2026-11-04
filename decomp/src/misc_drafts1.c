@@ -10872,3 +10872,50 @@ void recompute_bounds_31d7c(void)
     EF_U16(0x0019e5d3u) = (uint16_t)angle_d13ac(r);
     EF_U16(0x0019e5d5u) = (uint16_t)forward_pair_d13dc(r);
 }
+
+/* 0xf2183, 252 bytes. fseek: reposition STREAM (EAX) by OFFSET (EDX) from WHENCE (EBX; 0 start, 1 current, 2 end). A stream with write/read state (flags 6 in byte +0xc) is flushed first when flag 0x10 is set (a failed flush with whence 0 and a negative offset reports error 9); otherwise a relative seek is made absolute and the buffer emptied, then the mode bits are cleared and the file seeks (0xfa95f). For idle streams whence 0/1 first try to move the buffer window (0xf2141) and only seek the file when that fails, whence 2 resets the buffer and seeks, other values report error 9. Returns 0, or -1 on failure. */
+uint32_t fseek_f2183(ef_addr32 stream, uint32_t offset, uint32_t whence)
+{
+    uint32_t r;
+    uint32_t edi;
+    if ((EF_U8(stream + 0xcu) & 6u) != 0u) {
+        if ((EF_U8(stream + 0xdu) & 0x10u) != 0u) {
+            if (stream_flush_fa8a0(stream) != 0) {
+                if (whence == 0u && (int32_t)offset < 0)
+                    guest_fn_ebe6d(9u);
+                return 0xffffffffu;
+            }
+        } else {
+            if (whence == 1u)
+                offset -= EF_U32(stream + 4u);
+            EF_U32(stream) = EF_U32(stream + 8u);
+            EF_U32(stream + 4u) = 0u;
+        }
+        EF_U8(stream + 0xcu) &= 0xebu;
+        r = lseek_fa95f(EF_U32(stream + 0x10u), offset, whence);
+        return r == 0xffffffffu ? r : 0u;
+    }
+    if (whence == 1u) {
+        edi = EF_U32(stream + 4u);
+        if (advance_window_f2141((int32_t)offset, stream) == 0u)
+            return 0u;
+        r = lseek_fa95f(EF_U32(stream + 0x10u), offset - edi, whence);
+        return r == 0xffffffffu ? r : 0u;
+    }
+    if (whence == 0u) {
+        edi = offset - (guest_fn_10f4df(EF_U32(stream + 0x10u)) - EF_U32(stream + 4u));
+        if (advance_window_f2141((int32_t)edi, stream) == 0u)
+            return 0u;
+        r = lseek_fa95f(EF_U32(stream + 0x10u), offset, whence);
+        return r == 0xffffffffu ? r : 0u;
+    }
+    if (whence == 2u) {
+        EF_U32(stream) = EF_U32(stream + 8u);
+        EF_U8(stream + 0xcu) &= 0xefu;
+        EF_U32(stream + 4u) = 0u;
+        r = lseek_fa95f(EF_U32(stream + 0x10u), offset, whence);
+        return r == 0xffffffffu ? r : 0u;
+    }
+    guest_fn_ebe6d(9u);
+    return 0xffffffffu;
+}

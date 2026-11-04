@@ -5378,4 +5378,6 @@ void define_text_slot_e3e50(ef_addr32 text);
 void recompute_bounds_31d7c(void);
 void guest_fn_324b0_x(ef_addr32 a, ef_addr32 b, ef_addr32 c, ef_addr32 out); /* 0x324b0 EAX/EDX/EBX/ECX */
 
+uint32_t fseek_f2183(ef_addr32 stream, uint32_t offset, uint32_t whence);
+
 #endif

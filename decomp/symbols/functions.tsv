@@ -3601,7 +3601,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f1d90	458			unknown	unclassified	unverified		
 0x000f1f5a	487			unknown	unclassified	unverified		
 0x000f2141	66	advance_window_f2141	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f2141.json	docs/compiler-abi.md; Advance a window cursor by count; wrap and report 1 when out of range.; callers f2183@f2206,f2183@f2239; guest pending
-0x000f2183	252			unknown	unclassified	unverified		
+0x000f2183	252	fseek_f2183	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2183.json	docs/compiler-abi.md; fseek: reposition STREAM (EAX) by OFFSET (EDX) from WHENCE (EBX; 0 start, 1 current, 2 end). A stream with write/read st; callers a7a64@a7a9e,bc287@bc33e; guest pending
 0x000f227f	48	file_position_f227f	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f227f.json	docs/compiler-abi.md; Position from 0x10f4df(dword +0x10) combined with dword +4.; callers a7a64@a7aa9,bc4da@bc507; guest pending
 0x000f22af	103	set_file_buffer_f22af	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000f22af.json	docs/compiler-abi.md; Set a file's buffer (setvbuf).; callers 11159a@1115af; guest pending
 0x000f2320	138	draw_glyph_f2320	copy_rects1	compiles	game	confirmed	decomp/tests/0x000f2320.json	docs/compiler-abi.md; Draw a 7x6 glyph from the second font at (x, y).; callers f23ac@f23cc; guest pending
