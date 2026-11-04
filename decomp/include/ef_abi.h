@@ -5375,4 +5375,7 @@ void guest_fn_10a9c_x(int32_t a, int32_t b, int32_t c); /* 0x10a9c EAX/EDX/EBX *
 
 void define_text_slot_e3e50(ef_addr32 text);
 
+void recompute_bounds_31d7c(void);
+void guest_fn_324b0_x(ef_addr32 a, ef_addr32 b, ef_addr32 c, ef_addr32 out); /* 0x324b0 EAX/EDX/EBX/ECX */
+
 #endif

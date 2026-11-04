@@ -10851,3 +10851,24 @@ void define_text_slot_e3e50(ef_addr32 text)
     (void)strcat_9ca57(b, 0x00190a54u);
     set_text_slot_cd724((int16_t)(n - 1u), b);
 }
+
+/* 0x31d7c, 173 bytes. Recompute the cached bounds record: skipped when byte 0x19e557 is set, and then guarded by a test that compares the address constant 0x19e58b with 1 (ORIGINAL BUG: it was meant to test the byte at that address, so the body below never runs). The body builds a 0x24-byte bounds record on the stack from the cells 0x19e560/0x19e56c/0x19e572 (0x324b0), initialises it (0xd0b68), applies the words 0x19e56e, 0x19e56c, 0x19e570 and the two results (0xd0ebc, 0xd0dbc, 0xd0fb8) and stores the angle (0xd13ac) in word 0x19e5d3 and the pair (0xd13dc) in word 0x19e5d5. */
+void recompute_bounds_31d7c(void)
+{
+    uint8_t rec[0x2c];
+    uint32_t r = (uint32_t)(uintptr_t)rec;
+    if (EF_U8(0x0019e557u) != 0u)
+        return;
+    if (0x0019e58bu != 1u)
+        return;
+    memset(rec, 0, sizeof(rec));
+    guest_fn_324b0_x(0x0019e560u, 0x0019e56cu, 0x0019e572u, r + 0x24u);
+    init_bounds_d0b68(r);
+    guest_fn_d0ebc(r, EF_U16(0x0019e56eu));
+    guest_fn_d0dbc(r, EF_U16(0x0019e56cu), 0x0019e572u);
+    guest_fn_d0fb8(r, EF_U16(0x0019e570u), r + 0x24u);
+    guest_fn_d0ebc(r, *(uint16_t *)&rec[0x26]);
+    guest_fn_d0dbc(r, *(uint16_t *)&rec[0x24], 0x0019e572u);
+    EF_U16(0x0019e5d3u) = (uint16_t)angle_d13ac(r);
+    EF_U16(0x0019e5d5u) = (uint16_t)forward_pair_d13dc(r);
+}

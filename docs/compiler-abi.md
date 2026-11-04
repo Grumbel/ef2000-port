@@ -7292,3 +7292,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe3e50` | EAX:ef_addr32 | none | none direct | Parse a text-slot definition "N=name" at TEXT (EAX): read the slot number N, expect '=' and skip blanks (a number below  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x31d7c` | none | none | 3122c@31302 | Recompute the cached bounds record: skipped when byte 0x19e557 is set, and then guarded by a test that compares the addr |

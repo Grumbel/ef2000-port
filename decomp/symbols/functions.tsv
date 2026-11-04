@@ -513,7 +513,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00031aec	84	advance_position_31aec	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00031aec.json	docs/compiler-abi.md; Identical to 0x316b8.; callers 3122c@312e7; guest pending
 0x00031b40	462			unknown	unclassified	unverified		
 0x00031d10	108	update_angles_31d10	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00031d10.json	docs/compiler-abi.md; Update the angle words from mode byte 0x19e55f.; callers 3122c@3128e,3122c@312fd; guest pending
-0x00031d7c	173			unknown	unclassified	unverified		
+0x00031d7c	173	recompute_bounds_31d7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00031d7c.json	docs/compiler-abi.md; Recompute the cached bounds record: skipped when byte 0x19e557 is set, and then guarded by a test that compares the addr; callers 3122c@31302; guest pending
 0x00031e2c	570			unknown	unclassified	unverified		
 0x00032068	502			unknown	unclassified	unverified		
 0x00032260	75	save_position_32260	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00032260.json	docs/compiler-abi.md; Save the current position and angles.; callers 3122c@3131d; guest pending
