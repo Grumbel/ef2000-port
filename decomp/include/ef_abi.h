@@ -4986,4 +4986,8 @@ void guest_fn_106b0_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s
 
 void latch_control_bits_84788(uint32_t rec);
 
+void draw_map_markers_436dc(uint32_t head, uint32_t list);
+
+
+
 #endif

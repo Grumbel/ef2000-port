@@ -6000,3 +6000,39 @@ void latch_control_bits_84788(uint32_t rec)
     EF_U32(rec + 0x26u) = 0u;
     EF_U32(0x001fcbbcu) = EF_U32(0x00197c14u);
 }
+
+/* 0x436dc, 342 bytes. Draw the map markers for the objects of the list at *LIST (nodes of type 0x0e and 0x17, link +4; group flag tables checked against HEAD): when the node's index byte (+0xb) is flagged positive (cc22c, enabled by word 0x126554), negative (cc1ac, 0x126556) or zero (cc1ec, 0x126558) the target address is the base dword 0x126570 plus the matching position word pair (0x134325/27, 0x13431c/1e or 0x13432e/30; second word times 0x280); a 20x20 marker is then drawn at the object's screen position (words +8/+0xc of the structure at +0x13, y inverted from 0x190) with 0xca620 and, when word 0x12656a is set, a label with 0x440f4. */
+void draw_map_markers_436dc(uint32_t head, uint32_t list)
+{
+    uint32_t node = EF_U32(list);
+    while (node != 0u) {
+        uint32_t type = EF_U8(node + 0xau);
+        if (type == 0xeu || type == 0x17u) {
+            uint32_t idx = EF_U8(node + 0xbu);
+            uint32_t pos = 0u;
+            uint8_t have = 0u;
+            if ((guest_fn_cc22c(0u, idx, head) & 0xffffu) != 0u && EF_U16(0x00126554u) != 0u) {
+                pos = EF_U32(0x00126570u) + (uint32_t)(int32_t)(int16_t)EF_U16(0x00134325u) +
+                      (uint32_t)((int32_t)(int16_t)EF_U16(0x00134327u) * 0x280);
+                have = 1u;
+            } else if ((guest_fn_cc1ac(0u, idx, head) & 0xffffu) != 0u && EF_U16(0x00126556u) != 0u) {
+                pos = EF_U32(0x00126570u) + (uint32_t)(int32_t)(int16_t)EF_U16(0x0013431cu) +
+                      (uint32_t)((int32_t)(int16_t)EF_U16(0x0013431eu) * 0x280);
+                have = 1u;
+            } else if ((group_flag_zero_cc1ec(0u, idx, head) & 0xffffu) != 0u && EF_U16(0x00126558u) != 0u) {
+                pos = EF_U32(0x00126570u) + (uint32_t)(int32_t)(int16_t)EF_U16(0x0013432eu) +
+                      (uint32_t)((int32_t)(int16_t)EF_U16(0x00134330u) * 0x280);
+                have = 1u;
+            }
+            if (have) {
+                uint32_t obj = EF_U32(node + 0x13u);
+                int32_t x = (int16_t)(EF_U16(obj + 8u) - 10u);
+                int32_t y = (int16_t)(0x190u - EF_U16(obj + 0xcu) - 10u);
+                guest_fn_ca620((int32_t)pos, x, y, 0x14u, 0x14u, 0x280u);
+                if (EF_U16(0x0012656au) != 0u)
+                    guest_fn_440f4_x(idx, x, y, 0x14u, 0x1au, 0x280u);
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+}

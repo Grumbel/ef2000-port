@@ -6277,3 +6277,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x84788` | EAX:uint32_t | none | 848e0@84939 | Latch the control bits of the flight record REC into the global control word 0x1fcbe2: clear bits 0 and 7 of its low byt |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x436dc` | EAX:uint32_t,EDX:uint32_t | none | 45574@4562c | Draw the map markers for the objects of the list at *LIST (nodes of type 0x0e and 0x17, link +4; group flag tables check |
