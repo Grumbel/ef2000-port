@@ -8575,3 +8575,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x24c40` | EAX:uint32_t | none | 2631c@263c5,6f15c@6f1b2 | Point the chase camera at unit AX (signed 16-bit id; 0x6a1b4; nothing but the height clamp when missing). The target hei |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2611c` | EAX:uint32_t | none | 2631c@263b0 | Variant of 0x24c40 for a side view of unit AX (signed 16-bit id; nothing when missing): the unit is registered with 0x24 |
