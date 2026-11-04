@@ -364,7 +364,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000238a0	31	sync_current_object_slot	object_control	compiles	game	confirmed	decomp/tests/0x000238a0.json	conditional copy; host model passes; guest compile/splice/replay outstanding
 0x000238c0	161	can_support_238c0	line_of_sight	compiles	game	confirmed	decomp/tests/0x000238c0.json	docs/compiler-abi.md; Can unit AX attack the target of its own target?; callers 242b8@24376; guest pending
 0x000239ac	1128			unknown	unclassified	unverified		
-0x00024074	577			unknown	unclassified	unverified		
+0x00024074	577	update_threat_value_24074	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00024074.json	docs/compiler-abi.md; Update unit AX's accumulated threat value (double +0x150) with respect to unit DX (both signed 16-bit ids, units via 0x6; callers 2479c@24c18; guest pending
 0x000242b8	243	propagate_target_record_242b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000242b8.json	docs/compiler-abi.md; Propagate unit A's target record to unit B (AX, DX are signed 16-bit unit ids). Nothing happens if either unit is missin; callers 8d59c@8d993; guest pending
 0x000243ac	211	update_indexed_object_relation	unk_geometry	typed	game	confirmed		ABI only; AX signed index, void memory mutation, x87 compare
 0x00024480	409	test_indexed_spatial_overlap	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index, EDX triple-double pointer, qword threshold on stack, AL result, ret 8; caller sites 0x248b9/0x6b1aa
@@ -471,7 +471,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002bcb8	448			unknown	unclassified	unverified		
 0x0002beb0	85	grid_has_active_link	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002beb0.json	all seven filtered lookups must execute; C host test only
 0x0002bf08	95	grid_has_object_mode	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002bf08.json	byte-count attached-object scan; C host test only
-0x0002bfcc	287			unknown	unclassified	unverified		
+0x0002bfcc	287	row_has_active_unit_2bfcc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002bfcc.json	docs/compiler-abi.md; Scan the six unit entries (signed words at row+0x50) of class row AX (signed 16-bit; 0xff gives 0) and return 1 when any; callers 2c224@2c331,2c6dc@2c723,2c6dc@2c72e; guest pending
 0x0002c0ec	143	grid_has_cross_object_relation	world_grid_neighbors	compiles	game	confirmed	decomp/tests/0x0002c0ec.json	AX row to AL; up to 14 filtered lookups and cross-row locator test
 0x0002c17c	165	has_enemy_link_2c17c	game_helpers35	compiles	game	confirmed	decomp/tests/0x0002c17c.json	docs/compiler-abi.md; True when an owner has a linked unit whose own link is on another team.; callers 2c6dc@2c73b; guest pending
 0x0002c224	308	row_needs_attention_2c224	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002c224.json	docs/compiler-abi.md; Test whether class row AX (signed 16-bit) needs attention: true when the row's byte +0x1a is 2, 5 or 6; when the entry (; callers 2c358@2c3d3,2c358@2c3f3,2c358@2c431; guest pending

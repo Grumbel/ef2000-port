@@ -5884,4 +5884,8 @@ void propagate_target_record_242b8(uint32_t ax, uint32_t dx);
 void compact_slot_list_2b708(uint32_t ax);
 uint8_t row_needs_attention_2c224(uint32_t ax);
 
+uint8_t row_has_active_unit_2bfcc(uint32_t ax);
+void update_threat_value_24074(uint32_t ax, uint32_t dx);
+void guest_fn_243ac_x(int32_t unit); /* 0x243ac EAX */
+
 #endif

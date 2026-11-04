@@ -16820,3 +16820,123 @@ uint8_t row_needs_attention_2c224(uint32_t ax)
 		bl = 1u;
 	return bl;
 }
+
+/* 0x2bfcc, 287 bytes. Scan the six unit entries (signed words at row+0x50) of class row AX (signed 16-bit; 0xff gives 0) and return 1 when any unit: moves faster than 0.045 (double +0x15a), or faster than 0.03 while the row's byte +0x1b is 2, or faster than 0.02 and grid_is_current_or_external(row) holds; has a non-zero dword +0x1c; or has a linked unit (word +0x146) while its double +0x150 exceeds 0.06 and the linked unit belongs to another side (class row word +0x15). */
+uint8_t row_has_active_unit_2bfcc(uint32_t ax)
+{
+	int32_t row = (int32_t)(int16_t)ax;
+	uint8_t bl = 0u;
+	int32_t k;
+	uint32_t base, u, t, r2;
+	double v, c;
+
+	if (row == 0xff)
+		return 0u;
+	for (k = 0; k < 6; k++) {
+		base = EF_U32(0x0019bb58u) + (uint32_t)(row * 0xca);
+		u = guest_fn_7489c((int32_t)(int16_t)EF_U16(base + (uint32_t)(k * 2) + 0x50u));
+		if (u == 0u)
+			continue;
+		t = guest_fn_7489c((int32_t)(int16_t)EF_U16(u + 0x146u));
+		memcpy(&v, ef_guest_memory_ptr(u + 0x15au), 8);
+		memcpy(&c, ef_guest_memory_ptr(0x0018253au), 8);
+		if (v > c && EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(row * 0xca) + 0x1bu) == 2u) {
+			bl = 1u;
+		} else {
+			memcpy(&c, ef_guest_memory_ptr(0x00182542u), 8);
+			if (v > c) {
+				bl = 1u;
+			} else {
+				memcpy(&c, ef_guest_memory_ptr(0x0018254au), 8);
+				if (v > c && grid_is_current_or_external((int16_t)row) != 0u)
+					bl = 1u;
+			}
+		}
+		if (EF_U32(u + 0x1cu) != 0u)
+			bl = 1u;
+		if (t == 0u)
+			continue;
+		memcpy(&v, ef_guest_memory_ptr(u + 0x150u), 8);
+		memcpy(&c, ef_guest_memory_ptr(0x00182552u), 8);
+		if (v <= c)
+			continue;
+		r2 = EF_U32(0x0019bb58u);
+		if (EF_U16(r2 + (uint32_t)(row * 0xca) + 0x15u) != EF_U16(r2 + (uint32_t)(((int32_t)EF_U32(t + 0x26u) >> 16) * 0xca) + 0x15u))
+			bl = 1u;
+	}
+	return bl;
+}
+
+/* 0x24074, 577 bytes. Update unit AX's accumulated threat value (double +0x150) with respect to unit DX (both signed 16-bit ids, units via 0x6a1b4). Does nothing when unit A is missing or A == B; with B missing the selector double 0x1f6fe8 is cleared. If both units belong to the same class row side (word +0x15 of the rows, B's row not 0xff) the value is reset to 0. Otherwise the selector 0x1f6fe8 is set from the angle double 0x1f7018 and the sign of the dot product of the two unit vectors (doubles +0xa1, +0xb9, +0xd1): above 2.0943951 gives 3.0 (negative dot) or 5.0; below 0.7853981634 gives 2.0 or 4.0; otherwise 1.0. Then 0x1f7050 = 2*[0x1f7058] + [0x1f6ff8] + 1 (clamped to 3.0 when negative) and the value becomes cos(angle)*0.1 / (distance*0.0005 + 1) + 0.9 * value, reset to 0 when the selector is 3.0. */
+void update_threat_value_24074(uint32_t ax, uint32_t dx)
+{
+	int32_t a = (int32_t)(int16_t)ax;
+	int32_t b = (int32_t)(int16_t)dx;
+	uint32_t ua = guest_fn_6a1b4(a);
+	uint32_t ub = guest_fn_6a1b4(b);
+	uint32_t rows, rb, ra;
+	double g, c, dot, sel, v, t, x;
+
+	if (ua == 0u)
+		return;
+	guest_fn_243ac_x(a);
+	if ((int16_t)a == (int16_t)b)
+		return;
+	if (ub == 0u) {
+		EF_U32(0x001f6fe8u) = 0u;
+		EF_U32(0x001f6fecu) = 0u;
+		return;
+	}
+	if (((int32_t)EF_U32(ub + 0x26u) >> 16) != 0xff) {
+		rows = EF_U32(0x0019bb58u);
+		rb = (uint32_t)(((int32_t)EF_U32(ub + 0x26u) >> 16) * 0xca) + rows;
+		ra = (uint32_t)(((int32_t)EF_U32(ua + 0x26u) >> 16) * 0xca) + rows;
+		if (EF_U16(rb + 0x15u) == EF_U16(ra + 0x15u)) {
+			EF_U32(ua + 0x150u) = 0u;
+			EF_U32(ua + 0x154u) = 0u;
+			return;
+		}
+	}
+	memcpy(&g, ef_guest_memory_ptr(0x001f7018u), 8);
+	{
+		double p, q, r, s, u2, w;
+		memcpy(&p, ef_guest_memory_ptr(ub + 0xa1u), 8);
+		memcpy(&q, ef_guest_memory_ptr(ua + 0xa1u), 8);
+		memcpy(&r, ef_guest_memory_ptr(ub + 0xb9u), 8);
+		memcpy(&s, ef_guest_memory_ptr(ua + 0xb9u), 8);
+		memcpy(&u2, ef_guest_memory_ptr(ub + 0xd1u), 8);
+		memcpy(&w, ef_guest_memory_ptr(ua + 0xd1u), 8);
+		dot = p * q + r * s + u2 * w;
+	}
+	memcpy(&c, ef_guest_memory_ptr(0x00181c58u), 8);
+	if (g > c) {
+		sel = (dot < 0.0) ? 3.0 : 5.0;
+	} else {
+		memcpy(&c, ef_guest_memory_ptr(0x00181c60u), 8);
+		if (g < c)
+			sel = (dot < 0.0) ? 2.0 : 4.0;
+		else
+			sel = 1.0;
+	}
+	memcpy(ef_guest_memory_ptr(0x001f6fe8u), &sel, 8);
+	memcpy(&t, ef_guest_memory_ptr(0x001f7058u), 8);
+	memcpy(&x, ef_guest_memory_ptr(0x001f6ff8u), 8);
+	t = t * 2.0 + x + 1.0;
+	memcpy(ef_guest_memory_ptr(0x001f7050u), &t, 8);
+	if (0.0 > t) {
+		t = 3.0;
+		memcpy(ef_guest_memory_ptr(0x001f7050u), &t, 8);
+	}
+	x = indexed_object_distance((int16_t)a, (int16_t)b) * 0.0005 + 1.0;
+	memcpy(&g, ef_guest_memory_ptr(0x001f7018u), 8);
+	v = cos_b45a2(g) * 0.1;
+	v = v / x;
+	memcpy(&t, ef_guest_memory_ptr(ua + 0x150u), 8);
+	v = v + t * 0.9;
+	memcpy(ef_guest_memory_ptr(ua + 0x150u), &v, 8);
+	memcpy(&sel, ef_guest_memory_ptr(0x001f6fe8u), 8);
+	if (sel == 3.0) {
+		EF_U32(ua + 0x150u) = 0u;
+		EF_U32(ua + 0x154u) = 0u;
+	}
+}

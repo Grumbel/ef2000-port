@@ -8363,3 +8363,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x2b708` | EAX:uint32_t | none | 172b4@1737a,55784@557db,8d59c@8d794 | Compact the seven-entry slot list of class row AX (signed 16-bit; rows of 0xca bytes at dword 0x19bb58): words at row+0x |
 | `0x2c224` | EAX:uint32_t | AL:uint8_t | 2c358@2c3d3,2c358@2c3f3,2c358@2c431 | Test whether class row AX (signed 16-bit) needs attention: true when the row's byte +0x1a is 2, 5 or 6; when the entry ( |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2bfcc` | EAX:uint32_t | AL:uint8_t | 2c224@2c331,2c6dc@2c723,2c6dc@2c72e | Scan the six unit entries (signed words at row+0x50) of class row AX (signed 16-bit; 0xff gives 0) and return 1 when any |
+| `0x24074` | EAX:uint32_t,EDX:uint32_t | none | 2479c@24c18 | Update unit AX's accumulated threat value (double +0x150) with respect to unit DX (both signed 16-bit ids, units via 0x6 |
