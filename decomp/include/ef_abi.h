@@ -4952,4 +4952,6 @@ uint32_t guest_fn_bfcd8_x(uint32_t node, uint32_t arg); /* 0xbfcd8 EAX/EDX -> EA
 
 void skip_to_section_f3a1c(uint32_t name);
 
+void load_object_geometry_a6808(uint32_t rec);
+
 #endif

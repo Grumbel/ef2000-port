@@ -6182,3 +6182,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf3a1c` | EAX:uint32_t | none | f3aa8@f3b10,f3b1c@f3b36 | Skip script lines until the token buffer 0x48592c matches NAME (0xa4380 == 0) or the end marker string 0x1919c8; if the  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa6808` | EAX:uint32_t | none | a6998@a69be,a74bc@a74f8 | Load the per-object geometry for REC from two 25-byte table entries at 0x13727e indexed by words +0x55 and +0x57 (nothin |

@@ -5387,3 +5387,42 @@ void skip_to_section_f3a1c(uint32_t name)
         guest_callptr1_x(EF_U32(0x00132a74u), (uint32_t)(uintptr_t)buf);
     }
 }
+
+/* 0xa6808, 309 bytes. Load the per-object geometry for REC from two 25-byte table entries at 0x13727e indexed by words +0x55 and +0x57 (nothing if both are 0): copy A's words +0x15/+0x17 to REC +0x37/+0x39, compute the two data pointers REC +0x8d/+0x91 (base 0x41eea8 + word +0x11 + (word +0x13 << 8)), set word +0x3b = 0x100, and derive the deltas +0x33 (x) and +0x35 (y) from the mode bits of byte +0x1c: 0 half the difference, 1 zero, 2 the full difference, 3 unchanged. X uses bits 4..5, Y bits 6..7. */
+void load_object_geometry_a6808(uint32_t rec)
+{
+    uint32_t ia = EF_U16(rec + 0x55u);
+    uint32_t ib = EF_U16(rec + 0x57u);
+    uint32_t a, b, base, m;
+    int32_t d;
+    if (ia == 0u && ib == 0u)
+        return;
+    a = 0x0013727eu + ia * 25u;
+    b = 0x0013727eu + ib * 25u;
+    EF_U16(rec + 0x37u) = EF_U16(a + 0x15u);
+    EF_U16(rec + 0x39u) = EF_U16(a + 0x17u);
+    base = EF_U32(0x0041eea8u);
+    EF_U32(rec + 0x8du) = base + EF_U16(a + 0x11u) + (EF_U16(a + 0x13u) << 8);
+    EF_U32(rec + 0x91u) = base + EF_U16(b + 0x11u) + (EF_U16(b + 0x13u) << 8);
+    EF_U16(rec + 0x3bu) = 0x100u;
+    m = (EF_U8(rec + 0x1cu) >> 4) & 3u;
+    if (m == 0u) {
+        d = (int32_t)EF_U16(rec + 4u) - (int32_t)EF_U16(rec + 0x37u);
+        d -= (d >> 31);
+        EF_U16(rec + 0x33u) = (uint16_t)(d >> 1);
+    } else if (m == 1u) {
+        EF_U16(rec + 0x33u) = 0u;
+    } else if (m == 2u) {
+        EF_U16(rec + 0x33u) = (uint16_t)(EF_U16(rec + 4u) - EF_U16(rec + 0x37u));
+    }
+    m = EF_U8(rec + 0x1cu) >> 6;
+    if (m == 0u) {
+        d = (int32_t)EF_U16(rec + 6u) - (int32_t)EF_U16(rec + 0x39u);
+        d -= (d >> 31);
+        EF_U16(rec + 0x35u) = (uint16_t)(d >> 1);
+    } else if (m == 1u) {
+        EF_U16(rec + 0x35u) = 0u;
+    } else if (m == 2u) {
+        EF_U16(rec + 0x35u) = (uint16_t)(EF_U16(rec + 6u) - EF_U16(rec + 0x39u));
+    }
+}

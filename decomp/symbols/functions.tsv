@@ -2278,7 +2278,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a6438	616			unknown	unclassified	unverified		
 0x000a66a0	44	walk_children_a66a0	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a66a0.json	docs/compiler-abi.md; children with low five bits of +0x8c: 0xa6438; callers a520c@a5318,a59d8@a5a2b,f13ac@f13b6; guest pending
 0x000a66cc	316	compute_box_padding_a66cc	game_helpers76	compiles	game	confirmed	decomp/tests/0x000a66cc.json	docs/compiler-abi.md; Recompute the left/right and top/bottom padding of a layout box.; callers a6998@a69b7,a74bc@a74f1,a7588@a759b; guest pending
-0x000a6808	309			unknown	unclassified	unverified		
+0x000a6808	309	load_object_geometry_a6808	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a6808.json	docs/compiler-abi.md; Load the per-object geometry for REC from two 25-byte table entries at 0x13727e indexed by words +0x55 and +0x57 (nothin; callers a6998@a69be,a74bc@a74f8; guest pending
 0x000a6940	86	init_timers_a6940	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a6940.json	docs/compiler-abi.md; Walk the child list at +0x91 (next at +0x21) and default the timers at +0x14 / +0x16.; callers a59d8@a5a40; guest pending
 0x000a6998	53	refresh_children_a6998	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a6998.json	docs/compiler-abi.md; Refresh every child of a widget that is not of kind 9.; callers a59d8@a5a32; guest pending
 0x000a69d0	145	clamp_box_to_container_a69d0	game_helpers84	compiles	game	confirmed	decomp/tests/0x000a69d0.json	docs/compiler-abi.md; Clamp a layout box's origin and size inside the limits of its container.; callers a6a64@a6a80,a74bc@a74e8; guest pending
