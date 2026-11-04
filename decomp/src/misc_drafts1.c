@@ -22360,3 +22360,18 @@ double reduce_angle_b45b6(double st0, uint32_t c2)
     memcpy(&k, ef_guest_memory_ptr(0x000b4598u), 10);
     return fmod(st0, (double)k);
 }
+
+/* 0x10a164, 94 bytes. Blend two plane-style interpolations from the doubles at EBX (a) and EDX (b) and store the scaled sum at the double pointed to by EAX. */
+void interp_blend_10a164(uint32_t eax, uint32_t edx, uint32_t ebx)
+{
+    double iR, P, T, X, Z, Z2;
+
+    P = md_rd_f64(ebx + 0x18u) - md_rd_f64(ebx + 0x10u);
+    iR = 1.0 / (md_rd_f64(ebx + 0x20u) - md_rd_f64(ebx));
+    T = (md_rd_f64(ebx + 0x20u) - md_rd_f64(edx)) * P * iR;
+    X = T + (md_rd_f64(edx) - md_rd_f64(ebx)) * (md_rd_f64(ebx + 0x38u) - md_rd_f64(ebx + 0x30u)) * iR;
+    Z = P * (md_rd_f64(ebx + 0x20u) - md_rd_f64(edx + 0x10u)) * iR;
+    Z2 = Z + iR * ((md_rd_f64(ebx + 0x38u) - md_rd_f64(ebx + 0x30u)) * (md_rd_f64(edx + 0x10u) - md_rd_f64(ebx)));
+    *(double *)ef_guest_memory_ptr((ef_addr32)eax) =
+        (md_rd_f64(edx + 8u) / X + md_rd_f64(edx + 0x18u) / Z2) * md_rd_f64(0x001950c8u);
+}

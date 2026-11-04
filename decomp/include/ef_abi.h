@@ -6401,4 +6401,7 @@ double signed_constant_120a07(double st0, uint32_t ebx); /* 0x120a07 */
 double load_extended_120a2d(uint32_t esi, uint32_t ebx); /* 0x120a2d */
 double reduce_angle_b45b6(double st0, uint32_t c2); /* 0xb45b6 */
 
+void interp_blend_10a164(uint32_t eax, uint32_t edx, uint32_t ebx);
+void interp_blend_10a164(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0x10a164 */
+
 #endif

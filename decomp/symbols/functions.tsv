@@ -3963,7 +3963,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010a030	72	build_extent_record_10a030	float_helpers9	compiles	game	confirmed	decomp/tests/0x0010a030.json	docs/compiler-abi.md; Build a record at EAX from the one at EDX: zero the first 8 bytes, store the extent F64[+0x20] - F64[+0], and copy the d; callers 109ec0@109edb; guest pending
 0x0010a078	90	build_segment_record_10a078	float_helpers9	compiles	game	confirmed	decomp/tests/0x0010a078.json	docs/compiler-abi.md; Build a segment record at EAX from the record at EDX: copy the doubles at +0x20/+0x30/+0x38, zero the first 8 bytes and ; callers 109ec0@109ecc; guest pending
 0x0010a0d4	144			unknown	unclassified	unverified		
-0x0010a164	94			unknown	unclassified	unverified		
+0x0010a164	94	interp_blend_10a164	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010a164.json	docs/compiler-abi.md; Blend two plane-style interpolations from the doubles at EBX (a) and EDX (b) and store the scaled sum at the double poin; callers 109ec0@109fee,109ec0@10a002,109ec0@10a016; guest pending
 0x0010a1c4	86	derive_coefficients_10a1c4	float_helpers9	compiles	game	confirmed	decomp/tests/0x0010a1c4.json	docs/compiler-abi.md; Derive the coefficient record at EAX from the parameters at EDX (doubles s[0]=+0, s[1]=+8, s[2]=+0x10): +0 = s2 * k1, +8; callers 109ec0@10a025; guest pending
 0x0010a220	849			unknown	unclassified	unverified		
 0x0010a580	3936			unknown	unclassified	unverified		

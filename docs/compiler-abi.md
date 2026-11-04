@@ -9299,3 +9299,9 @@ in EAX, format string address, one value).
 | `0x120a07` | EAX:double,EDX:uint32_t | EAX:double | 1209b5@1209cd,1209b5@120a01 | x87 fragment: ftst ST0 and pop it, then push the constant at 0x17ee4a (double, when bit 10 of EBX is set) or 0x17ee52 (f |
 | `0x120a2d` | EAX:uint32_t,EDX:uint32_t | EAX:double | 1209b5@1209fa | x87 fragment: load the 80-bit extended value at ESI into the stack slot selected by EBX (slot = EBX & 7 when bit 10 of E |
 | `0xb45b6` | EAX:double,EDX:uint32_t | EAX:double | b45a2@b45a4,b45ac@b45ae | Finish a trig argument reduction: when the FPU reported an incomplete reduction (C2 set), reduce ST0 modulo the extended |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10a164` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 109ec0@109fee,109ec0@10a002,109ec0@10a016 | Blend two plane-style interpolations from the doubles at EBX (a) and EDX (b) and store the scaled sum at the double poin |
