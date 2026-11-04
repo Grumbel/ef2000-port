@@ -4455,4 +4455,7 @@ void guest_fn_a94e4_x(uint32_t rec, uint32_t edx_in);
 
 void update_distance_minima_3237c(void);
 
+void rotate_offset_c8d30(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1);
+void rotate_offset_shift_c8d10(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1);
+
 #endif

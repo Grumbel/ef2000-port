@@ -2832,8 +2832,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c8c34	60			unknown	unclassified	unverified		
 0x000c8c78	63			unknown	unclassified	unverified		
 0x000c8ccc	58			unknown	unclassified	unverified		
-0x000c8d10	31			unknown	unclassified	unverified		
-0x000c8d30	183			unknown	unclassified	unverified		
+0x000c8d10	31	rotate_offset_shift_c8d10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8d10.json	docs/compiler-abi.md; (ret 8) Wrapper for 0xc8d30 that first shifts eax, edx and ebx left by 16.; callers b69c@b948; guest pending
+0x000c8d30	183	rotate_offset_c8d30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8d30.json	docs/compiler-abi.md; (ret 8) Offset a 16.16 vector (eax, edx, ebx) by the table-rotated displacement of length s1: two angles (-ecx and -s0, ; callers 69740@69800,7d1f0@7d291,944f4@94557; guest pending
 0x000c8e38	9	clear_byte_c8e38	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000c8e38.json	docs/compiler-abi.md; ; callers ac408@ac438; guest pending
 0x000c8e58	224			unknown	unclassified	unverified		
 0x000c8f38	163			unknown	unclassified	unverified		

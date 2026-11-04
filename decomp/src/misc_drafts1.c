@@ -218,3 +218,31 @@ void update_distance_minima_3237c(void)
     if (v < EF_S32(0x0019e5b9u))
         EF_S32(0x0019e5b9u) = v;
 }
+
+/* 0xc8d30, 183 bytes. (ret 8) Offset a 16.16 vector (eax, edx, ebx) by the table-rotated displacement of length s1: two angles (-ecx and -s0, 16-bit, 8192-entry sin/cos tables at 0x141e08/0x142e08) give the x/z/y deltas; the results are stored as 32-bit values at 0xc4756/0xc475c/0xc4762 and their high words at 0x159094/0x159098/0x15909c. */
+void rotate_offset_c8d30(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1)
+{
+    uint32_t a = ((0u - ecx) & 0xffffu) >> 3;
+    uint32_t b = ((0u - s0) & 0xffffu) >> 3;
+    uint32_t len = s1 + s1;
+    uint32_t dx = (uint32_t)((int32_t)EF_S16(0x00141e08u + a * 2u) * (int32_t)len);
+    int32_t t4 = (int32_t)EF_S16(0x00142e08u + a * 2u);
+    int32_t cb = (int32_t)EF_S16(0x00141e08u + b * 2u);
+    int32_t t0 = (int32_t)EF_S16(0x00142e08u + b * 2u);
+    int32_t k = (int32_t)((uint32_t)(t4 * (int32_t)len)) >> 15;
+    eax -= (uint32_t)(cb * k);
+    edx -= dx;
+    ebx -= (uint32_t)(k * t0);
+    EF_U32(0x000c475cu) = edx;
+    EF_U16(0x00159098u) = (uint16_t)((int32_t)edx >> 16);
+    EF_U32(0x000c4756u) = eax;
+    EF_U32(0x000c4762u) = ebx;
+    EF_U16(0x00159094u) = (uint16_t)((int32_t)eax >> 16);
+    EF_U16(0x0015909cu) = (uint16_t)((int32_t)ebx >> 16);
+}
+
+/* 0xc8d10, 31 bytes. (ret 8) Wrapper for 0xc8d30 that first shifts eax, edx and ebx left by 16. */
+void rotate_offset_shift_c8d10(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1)
+{
+    rotate_offset_c8d30(eax << 16, edx << 16, ebx << 16, ecx, s0, s1);
+}
