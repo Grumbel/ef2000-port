@@ -2399,4 +2399,14 @@ void guest_fn_6322c(void); /* 0x6322c */
 uint32_t guest_fn_d5d18(ef_addr32 name); /* 0xd5d18 EAX -> EAX */
 uint32_t guest_fn_9cde8(ef_addr32 buffer, uint32_t count, uint32_t owner); /* 0x9cde8 EAX/EDX/EBX -> EAX */
 
+/* game_helpers34.c */
+void unlink_record_9fe1c(int16_t id);
+void fill_page_cell_a0ebc(ef_addr32 source);
+void apply_page_cell_a2698(int16_t slot, int16_t column);
+void accumulate_offsets_a36b0(void);
+void remove_id_a4718(uint16_t id);
+void append_id_a479c(uint16_t id);
+void push_front_id_a4820(uint16_t id);
+void guest_fn_a2728(int32_t slot, int32_t a, int32_t b, int32_t c); /* 0xa2728 EAX/EDX/EBX/ECX */
+
 #endif

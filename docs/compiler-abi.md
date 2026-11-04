@@ -3108,3 +3108,15 @@ in EAX, format string address, one value).
 | `0x7775c` | none | none | 49228@49b48 | Collect the level-0x20 objects into a new table when the marker word is -1. |
 | `0x97f90` | none | none | 8b39c@8b4ba | Pick the table for the detected input device and install the handlers. |
 | `0x9d170` | EAX:ef_addr32 | AL:uint8_t | 9d1e8@9d1fe,9d1e8@9d217,9d1e8@9d245 | Read the next byte of a buffered stream, skipping CRs; 0 at end of data. |
+
+## game_helpers34 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9fe1c` | AX:int16_t | none | 9fdd4@9fe10 | Unlink an id from the singly linked list of 78-byte records. |
+| `0xa0ebc` | EAX:ef_addr32 | none | 9e7bc@9f0cc | Fill a page row cell from a 9-word descriptor and mark it present. |
+| `0xa2698` | AX:int16_t,DX:int16_t | none | 9e7bc@9f4b0 | Apply a page cell to a slot unless the slot is locked, and refresh it. |
+| `0xa36b0` | none | none | a410c@a39de | Accumulate clamped timing offsets of the listed entries. |
+| `0xa4718` | AX:uint16_t | none | a4a94@a4abe,a4a94@a4aef | Remove an object id from the id table and clear its flag 4. |
+| `0xa479c` | AX:uint16_t | none | a499c@a49cb | Add a flagged object id to the first free slot of the id table. |
+| `0xa4820` | AX:uint16_t | none | a4a20@a4a4b | Push a flagged object id to the front of the id table. |
