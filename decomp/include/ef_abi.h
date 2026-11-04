@@ -5276,4 +5276,7 @@ void refresh_button_dialog_4f8a8(void);
 
 void show_splash_picture_f41dc(uint32_t name);
 
+void copy_last_token_abe44(ef_addr32 str);
+uint32_t extended_to_int_eff04(ef_addr32 p);
+
 #endif

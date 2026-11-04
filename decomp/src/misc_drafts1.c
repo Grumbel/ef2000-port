@@ -9330,3 +9330,54 @@ void show_splash_picture_f41dc(uint32_t name)
     reset_flags_f4178();
     guest_fn_c3f80(EF_U32(0x00485928u));
 }
+
+/* 0xabe44, 127 bytes. Split the string at STR (EAX) into whitespace-separated tokens (character class table 0x195af0 indexed by c+1, flag 2 = blank); after clearing the 0x150-byte token buffer at 0x41eab0 (0xabe24) each token is copied to its start, so on return the buffer holds the last token of the string. */
+void copy_last_token_abe44(ef_addr32 str)
+{
+    ef_addr32 p = str;
+    uint32_t n;
+    uint32_t i;
+    uint8_t c;
+    clear_block_abe24();
+    if (EF_U8(p) == 0u)
+        return;
+    for (;;) {
+        n = 0u;
+        for (;;) {
+            i = n & 0xffffu;
+            c = EF_U8(p + i);
+            if (c == 0u || (EF_U8(0x00195af0u + (uint8_t)(c + 1u)) & 2u) != 0u)
+                break;
+            EF_U8(0x0041eab0u + i) = c;
+            n++;
+        }
+        EF_U8(0x0041eab0u + (n & 0xffffu)) = 0u;
+        p += n & 0xffffu;
+        while ((EF_U8(0x00195af0u + (uint8_t)(EF_U8(p) + 1u)) & 2u) != 0u)
+            p++;
+        if (EF_U8(p) == 0u)
+            return;
+    }
+}
+
+/* 0xeff04, 106 bytes. Convert the 80-bit extended value at P (EAX) to a truncated int32: exponents below 0.5 give 0, magnitudes of 2^32 and above give 0x80000000, otherwise the top mantissa bits shifted down, negated for a set sign. */
+uint32_t extended_to_int_eff04(ef_addr32 p)
+{
+    uint16_t se = EF_U16(p + 8u);
+    int32_t e = (int32_t)(se & 0x7fffu) - 0x3ffe;
+    uint32_t hi = EF_U32(p + 4u);
+    uint32_t r;
+    if (e < 0)
+        return 0u;
+    if (e > 0x20)
+        return 0x80000000u;
+    if (e == 0)
+        r = 0u;
+    else if (e == 0x20)
+        r = hi;
+    else
+        r = hi >> (32 - e);
+    if ((se & 0x8000u) != 0u)
+        r = (uint32_t)(-(int32_t)r);
+    return r;
+}

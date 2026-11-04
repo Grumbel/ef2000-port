@@ -7024,3 +7024,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf41dc` | EAX:uint32_t | none | a9bec@a9bf5 | Show the splash picture NAME (EAX): clear byte 0x161e20, set byte 0x161e22, remember the request (0xf41a8), size the fil |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xabe44` | EAX:ef_addr32 | none | 4738@47fa,5630@5652,b1e0@b2eb | Split the string at STR (EAX) into whitespace-separated tokens (character class table 0x195af0 indexed by c+1, flag 2 =  |
+| `0xeff04` | EAX:ef_addr32 | EAX:uint32_t | ee22c@eed53 | Convert the 80-bit extended value at P (EAX) to a truncated int32: exponents below 0.5 give 0, magnitudes of 2^32 and ab |

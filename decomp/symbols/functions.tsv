@@ -2414,7 +2414,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000abce8	66	refresh_named_widget_abce8	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x000abce8.json	docs/compiler-abi.md; Refresh the named widget's page and draw its label.; callers none direct; guest pending
 0x000abde4	61	run_entry_callbacks_abde4	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000abde4.json	docs/compiler-abi.md; Run the callback of every registered 21-byte entry.; callers ac5f8@ac722,ca17c@ca1b8,e1958@e1b03; guest pending
 0x000abe24	31	clear_block_abe24	list_helpers	compiles	game	confirmed	decomp/tests/0x000abe24.json	docs/compiler-abi.md; Clear 0x150 bytes at 0x41eab0 and word 0x41eeca.; callers abe44@abe4b,abf8c@abfe4,ac408@ac491; guest pending
-0x000abe44	127			unknown	unclassified	unverified		
+0x000abe44	127	copy_last_token_abe44	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000abe44.json	docs/compiler-abi.md; Split the string at STR (EAX) into whitespace-separated tokens (character class table 0x195af0 indexed by c+1, flag 2 = ; callers 4738@47fa,5630@5652,b1e0@b2eb; guest pending
 0x000abec4	84	clear_registered_callbacks	unk_runtime	named	game	unverified		Partial ABI: indirect callback clobbers unresolved; register setup and table stride audited
 0x000abf24	45	set_eight_pointers	list_helpers	compiles	game	confirmed	decomp/tests/0x000abf24.json	docs/compiler-abi.md; When non-null store EAX into eight dwords spaced 0x12 apart from 0x1621be.; callers abf8c@abfb4; guest pending
 0x000abf8c	338			unknown	unclassified	unverified		
@@ -3568,7 +3568,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000efd84	42	combine_records_efd84	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000efd84.json	docs/compiler-abi.md; Same wrapper as 0xef950 around the core routine 0xefdae.; callers ee22c@ee5be,ee22c@ee78c,ee22c@ee920; guest pending
 0x000efdae	249			unknown	unclassified	unverified		
 0x000efeff	5			unknown	unclassified	unverified		
-0x000eff04	106			unknown	unclassified	unverified		
+0x000eff04	106	extended_to_int_eff04	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eff04.json	docs/compiler-abi.md; Convert the 80-bit extended value at P (EAX) to a truncated int32: exponents below 0.5 give 0, magnitudes of 2^32 and ab; callers ee22c@eed53; guest pending
 0x000eff6e	17			unknown	unclassified	unverified		
 0x000eff7f	53	uint_to_extended_eff7f	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000eff7f.json	docs/compiler-abi.md; Convert an unsigned 32-bit integer to an 80-bit extended value at dest.; callers ee22c@eed2d; guest pending
 0x000effb4	128			unknown	unclassified	unverified		
