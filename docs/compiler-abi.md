@@ -7765,3 +7765,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5c7dc` | none | none | 5a998@5a9e2 | Like 0x5a220 (apply 0xcdf48 then latch 0xce328 with the four signed high words at 0x1a6cf4/0x1a6cee/0x1a6cf6/0x1a6cf0; p |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x539e0` | none | none | 53c80@53cb0 | Variant of 0x538e4 for the second drift mode: the tick counter 0x1a5b5c advances by DT (word 0x127d92), the positions an |

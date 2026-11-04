@@ -5623,4 +5623,6 @@ uint32_t guest_fn_90438_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32
 
 void refresh_map_label_5c7dc(void);
 
+void integrate_drift_539e0(void);
+
 #endif
