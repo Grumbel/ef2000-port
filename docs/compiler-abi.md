@@ -7551,3 +7551,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x92e30` | EAX:uint32_t | none | 92c28@92dcb,95e58@96a53,95e58@96b3b | Load the camera record 0x214378 from the object UNIT (word in EDX, 0x7489c): convert the float 0x1a5bb8 to the dword 0x1 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd299c` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | AL:uint8_t | c6370@c6396 | Clip the segment between two points of the table at [0x17bf70] (byte offsets A = AX and B = EDX, 16 bit) against the vie |

@@ -11958,3 +11958,37 @@ void load_camera_92e30(uint32_t unit)
         EF_U16(0x0021448au) = (uint16_t)guest_fn_9125c((int32_t)EF_U32(obj + 0x1eu) >> 16);
     guest_fn_9357c();
 }
+
+/* 0xd299c, 223 bytes. Clip the segment between two points of the table at [0x17bf70] (byte offsets A = AX and B = EDX, 16 bit) against the view planes and return the result: build the clip record 0x420970 (flags 0x42099c = 1 & the dwords at +0x20 of both points after clearing bits 1 and 2 there, point count 2, points at 0x4209d4/0x4209d8), classify it with 0xd2130 and return 0 when bit 3 of the flag byte is set or the clip 0xce9a4 rejects it; otherwise run 0xd2110 and copy the words +0x1a and +0x1e of the two clipped points into the four words at *OUT (EBX) and return 1. */
+uint8_t clip_segment_points_d299c(uint32_t a, uint32_t b, ef_addr32 out)
+{
+    ef_addr32 base = EF_U32(0x0017bf70u);
+    ef_addr32 p1 = base + (a & 0xffffu);
+    ef_addr32 p2 = base + (b & 0xffffu);
+    uint32_t flags;
+    ef_addr32 pts;
+    EF_U32(0x0042099cu) = 1u;
+    EF_U32(0x00420974u) = 0u;
+    EF_U32(0x004209bcu) = 0x004209d0u;
+    EF_U32(0x004209d0u) = 2u;
+    EF_U32(0x004209d4u) = p1;
+    EF_U32(0x004209d8u) = p2;
+    EF_U8(p1 + 0x20u) = (uint8_t)(EF_U8(p1 + 0x20u) & 0xf9u);
+    EF_U8(p2 + 0x20u) = (uint8_t)(EF_U8(p2 + 0x20u) & 0xf9u);
+    flags = EF_U32(0x0042099cu) & EF_U32(p1 + 0x20u);
+    EF_U32(0x0042099cu) = flags;
+    flags &= EF_U32(p2 + 0x20u);
+    EF_U32(0x0042099cu) = flags;
+    guest_fn_d2130_x(0x00420970u);
+    if ((EF_U8(0x0042099cu) & 8u) != 0u)
+        return 0u;
+    if ((uint8_t)clip_segment_ce9a4(0x00420970u) == 0u)
+        return 0u;
+    forward_record_d2110(0x00420970u);
+    pts = EF_U32(0x004209bcu);
+    EF_U16(out) = EF_U16(EF_U32(pts + 4u) + 0x1au);
+    EF_U16(out + 2u) = EF_U16(EF_U32(pts + 4u) + 0x1eu);
+    EF_U16(out + 4u) = EF_U16(EF_U32(pts + 8u) + 0x1au);
+    EF_U16(out + 6u) = EF_U16(EF_U32(pts + 8u) + 0x1eu);
+    return 1u;
+}

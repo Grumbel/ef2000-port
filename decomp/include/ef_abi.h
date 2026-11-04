@@ -5514,4 +5514,7 @@ void fill_slots_from_nearest_b686c(ef_addr32 rec, ef_addr32 obj, ef_addr32 listh
 void load_camera_92e30(uint32_t unit);
 void guest_fn_95bf4_x(void); /* 0x95bf4 */
 
+uint8_t clip_segment_points_d299c(uint32_t a, uint32_t b, ef_addr32 out);
+void guest_fn_d2130_x(ef_addr32 record); /* 0xd2130 EAX */
+
 #endif
