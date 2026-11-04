@@ -576,7 +576,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00034a38	45	show_status_34a38	game_helpers10	compiles	game	confirmed	decomp/tests/0x00034a38.json	docs/compiler-abi.md; ; callers 35590@35605; guest pending
 0x00034a68	45	show_status_34a68	game_helpers10	compiles	game	confirmed	decomp/tests/0x00034a68.json	docs/compiler-abi.md; ; callers 35cfc@35d19; guest pending
 0x00034a98	76	rebuild_child_dialog_34a98	game_helpers80	compiles	game	confirmed	decomp/tests/0x00034a98.json	docs/compiler-abi.md; Rebuild the child dialog list with the given text and return the dialog.; callers 34b2c@34b55,34b2c@34b70,34b2c@34b7c; guest pending
-0x00034b2c	158			unknown	unclassified	unverified		
+0x00034b2c	158	dispatch_dialog_state_34b2c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00034b2c.json	docs/compiler-abi.md; Dispatch on the state byte 0x13578e (3..19): rebuild the child dialog for the matching label, update the buttons (states; callers 345e8@3474e,34bcc@34c91,34f94@350da; guest pending
 0x00034bcc	215	gnInitialiseAbort		named	unclassified	unverified		
 0x00034ca4	170	start_session_34ca4	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00034ca4.json	docs/compiler-abi.md; Start a new session: clear the flags and open the device if needed.; callers none direct; guest pending
 0x00034d50	68	run_progress_delay_34d50	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00034d50.json	docs/compiler-abi.md; Show the 60-step progress sequence, waiting five clock ticks per step.; callers 34d94@34db2; guest pending
@@ -1425,7 +1425,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00078848	235			unknown	unclassified	unverified		
 0x00078934	153	draw_clock_text_78934	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00078934.json	docs/compiler-abi.md; Unless 0x127da8 is set: count the timer 0x1f8d58 down by the step 0x127d92 (clearing it above 0xdc), format the hour-lik; callers 79128@7918f; guest pending
 0x000789d0	58	set_owner_name_789d0	game_helpers28	compiles	game	confirmed	decomp/tests/0x000789d0.json	docs/compiler-abi.md; Store a 122-byte name entry for an owner slot, skipping the local owner.; callers 56e94@56ec2; guest pending
-0x00078a0c	155			unknown	unclassified	unverified		
+0x00078a0c	155	update_slot_texts_78a0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00078a0c.json	docs/compiler-abi.md; For each of the 8 slots (0x7a bytes at 0x1f8930, countdown word at +0x78): count it down by the frame step 0x127d92 (cla; callers 79128@79194; guest pending
 0x00078aa8	24	configure_navigation_record	scene_indexed	compiles	game	confirmed	decomp/tests/0x00078aa8.json	docs/compiler-abi.md
 0x00078ac0	139	redraw_pending_message_78ac0	state_reset1	compiles	game	confirmed	decomp/tests/0x00078ac0.json	docs/compiler-abi.md; While the pending-message count at 0x1f8d56 is positive and 0x127da8 is clear, shrink it to the limit at 0x127d92 and re; callers 79128@791a3; guest pending
 0x00078b4c	717			unknown	unclassified	unverified		
@@ -2670,7 +2670,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bd6d8	78	count_slots_bd6d8	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd6d8.json	docs/compiler-abi.md; Count the present slots and total their counts.; callers bdbf8@bdc84,bdbf8@bdc99,bdbf8@bdcce; guest pending
 0x000bd728	20	value_below_word_23	list_lookup	compiles	game	confirmed	decomp/tests/0x000bd728.json	docs/compiler-abi.md; DL (as a signed word) is below the signed word +0x23.; callers bdbf8@bdc65,f8b14@f8bb0; guest pending
 0x000bd73c	94	has_free_run_bd73c	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000bd73c.json	docs/compiler-abi.md; True when some window of (width) consecutive 9-byte entries are all unused.; callers bdbf8@bdcaf,f8b14@f8bfa; guest pending
-0x000bd7cc	157			unknown	unclassified	unverified		
+0x000bd7cc	157	shrink_counter_bd7cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bd7cc.json	docs/compiler-abi.md; Try to shrink the counter byte at p+3 by one: the minimum depends on the type byte p+9 (types 1, 2, 10 need more than 2,; callers bd86c@bd8a7; guest pending
 0x000bd86c	92	record_has_valid_entry_bd86c	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000bd86c.json	docs/compiler-abi.md; True when a non-kind-2 record has a filled entry (scanned from the end) that passes the check.; callers bdbf8@bdc78,bdbf8@bdcc2,bdbf8@bdd11; guest pending
 0x000bd8c8	100	nth_match_exists_bd8c8	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000bd8c8.json	docs/compiler-abi.md; True when the list's index-th node matching the criteria exists.; callers bd92c@bda20; guest pending
 0x000bd92c	666			unknown	unclassified	unverified		

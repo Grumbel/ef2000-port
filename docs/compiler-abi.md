@@ -5528,3 +5528,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x11bbdc` | EAX:double,EDX:double | EAX:double | 11bc40@11bc66 | (ret 16) Falloff curve: for a0 above the threshold at 0x19593c return (1 - pow(a0, 2.9) * k2) * k3 (constants 0x195944 a |
 | `0x11c484` | EAX:uint32_t,EDX:uint32_t | none | 11c20c@11c2b1,11c350@11c379 | Project the record at EDX into the coordinate triple at EAX: v = (s[0x50] - s[0x48] * tan(s[0x58])) / (1 + tan^2) - k80; |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x78a0c` | none | none | 79128@79194 | For each of the 8 slots (0x7a bytes at 0x1f8930, countdown word at +0x78): count it down by the frame step 0x127d92 (cla |
+| `0x34b2c` | none | none | 345e8@3474e,34bcc@34c91,34f94@350da | Dispatch on the state byte 0x13578e (3..19): rebuild the child dialog for the matching label, update the buttons (states |
+| `0xbd7cc` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | bd86c@bd8a7 | Try to shrink the counter byte at p+3 by one: the minimum depends on the type byte p+9 (types 1, 2, 10 need more than 2, |

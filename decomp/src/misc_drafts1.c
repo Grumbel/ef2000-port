@@ -1350,3 +1350,85 @@ uint32_t read_bytes_9cde8(uint32_t dst, uint32_t count, uint32_t flags)
     }
     return read_handle_a79d4(0u, 0u, 0u, 0u, flags, count, dst);
 }
+
+/* 0x78a0c, 155 bytes. For each of the 8 slots (0x7a bytes at 0x1f8930, countdown word at +0x78): count it down by the frame step 0x127d92 (clamped to the remaining value), uppercase its name text, mark 0x127b1a and print the name at (15, 10, 0x55 + 10 * slot); a non-positive counter is reset to 0. */
+void update_slot_texts_78a0c(void)
+{
+    uint8_t slot;
+    for (slot = 0u; slot < 8u; slot++) {
+        uint32_t rec = (uint32_t)slot * 0x7au;
+        if ((int16_t)EF_U16(0x001f89a8u + rec) > 0) {
+            int32_t c = (int32_t)(int16_t)EF_U16(0x001f89a8u + rec);
+            int32_t step = (int32_t)EF_U16(0x00127d92u);
+            uint32_t text = 0x001f8930u + rec;
+            if (step >= c)
+                step = c;
+            EF_U16(0x001f89a8u + rec) = (uint16_t)(c - step);
+            uppercase_string(text);
+            EF_U8(0x00127b1au) = 1u;
+            guest_fn_48c90(15u, 10u, (uint32_t)(int32_t)(int16_t)(0x55u + (uint32_t)slot * 10u), text);
+        } else {
+            EF_U16(0x001f89a8u + rec) = 0u;
+        }
+    }
+}
+
+/* 0x34b2c, 158 bytes. Dispatch on the state byte 0x13578e (3..19): rebuild the child dialog for the matching label, update the buttons (states 4 and 13), clear 0x15f07f and run 0xa2bdc (state 5); any other state reports an error through 0x132a74. */
+void dispatch_dialog_state_34b2c(void)
+{
+    uint8_t idx = (uint8_t)(EF_U8(0x0013578eu) - 3u);
+    uint32_t label = 0u;
+    if (idx > 16u) {
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00182ed4u, EF_U32(0x00135790u));
+        return;
+    }
+    switch (idx) {
+    case 0: label = 0x00182e80u; break;
+    case 1:
+    case 10:
+        update_buttons_33e78();
+        return;
+    case 2:
+        EF_U8(0x0015f07fu) = 0u;
+        guest_fn_a2bdc();
+        return;
+    case 3: label = 0x00182e8cu; break;
+    case 4: label = 0x00182e9cu; break;
+    case 12: label = 0x00182ea8u; break;
+    case 13: label = 0x00182ebcu; break;
+    case 15: label = 0x00182ec8u; break;
+    case 16: label = 0x00182eb0u; break;
+    default:
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00182ed4u, EF_U32(0x00135790u));
+        return;
+    }
+    rebuild_child_dialog_34a98(label);
+}
+
+/* 0xbd7cc, 157 bytes. Try to shrink the counter byte at p+3 by one: the minimum depends on the type byte p+9 (types 1, 2, 10 need more than 2, type 12 more than 3, type 3 never, others more than 1). Returns 1 when it was decremented; EDX is returned unchanged (with DH cleared) in the early case of a high level and an idle type. */
+uint32_t shrink_counter_bd7cc(uint32_t p, uint32_t edx)
+{
+    uint8_t type;
+    uint8_t min;
+    if (EF_U8(0x0012583au) > 4u) {
+        uint8_t t9 = EF_U8(p + 9u);
+        if ((t9 == 0u || t9 == 2u) && (edx & 0xffu) == 0u)
+            return edx & 0xffff00ffu;
+    }
+    type = (uint8_t)(EF_U8(p + 9u) - 1u);
+    if (type > 0xbu)
+        min = 1u;
+    else if (type == 0u || type == 1u || type == 9u)
+        min = 2u;
+    else if (type == 11u)
+        min = 3u;
+    else if (type == 2u)
+        return 0u;
+    else
+        min = 1u;
+    if (EF_U8(p + 3u) > min) {
+        EF_U8(p + 3u) = (uint8_t)(EF_U8(p + 3u) - 1u);
+        return 1u;
+    }
+    return 0u;
+}

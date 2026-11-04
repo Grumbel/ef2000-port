@@ -4594,4 +4594,8 @@ void guest_callptr7_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t
 double falloff_11bbdc(double a0, double a1);
 void project_triple_11c484(uint32_t dst, uint32_t src);
 
+void update_slot_texts_78a0c(void);
+void dispatch_dialog_state_34b2c(void);
+uint32_t shrink_counter_bd7cc(uint32_t p, uint32_t edx);
+
 #endif
