@@ -6973,3 +6973,25 @@ void build_render_object_d2584(ef_addr32 list, uint32_t count)
     }
     process_render_object_d23d8(obj);
 }
+
+/* 0x510d0, 175 bytes. Load the language text file: build the path (default directory + 0x18515c + the decimal word from the high half of dword 0x1a5a86 (format 0x18516c) + suffix 0x185170) in a stack buffer, ask the size callback at 0x132ab4 (error 0x185178 when 0), allocate that many bytes into 0x1a58b0 (error 0x18519c when out of memory), read the file with 0xb3c04 and fall back to the load callback at 0x132ab8 when that fails, then reset the text state (0x50c70). */
+void load_text_file_510d0(void)
+{
+    char path[0x64];
+    char num[8];
+    uint32_t size;
+    build_default_path_9c980((uint32_t)(uintptr_t)path);
+    strcat_9ca57((uint32_t)(uintptr_t)path, 0x0018515cu);
+    guest_sprintf_a4342((uint32_t)(uintptr_t)num, 0x0018516cu, (uint32_t)((int32_t)EF_U32(0x001a5a86u) >> 16));
+    strcat_9ca57((uint32_t)(uintptr_t)path, (uint32_t)(uintptr_t)num);
+    strcat_9ca57((uint32_t)(uintptr_t)path, 0x00185170u);
+    size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), (uint32_t)(uintptr_t)path);
+    if (size == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00185178u, (uint32_t)(uintptr_t)path);
+    EF_U32(0x001a58b0u) = arena_alloc_e2a94(size);
+    if (EF_U32(0x001a58b0u) == 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018519cu);
+    if ((guest_fn_b3c04_x((uint32_t)(uintptr_t)path, EF_U32(0x001a58b0u)) & 0xffu) == 0u)
+        guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), (uint32_t)(uintptr_t)path, EF_U32(0x001a58b0u));
+    reset_text_50c70();
+}

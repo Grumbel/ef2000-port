@@ -6521,3 +6521,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd2584` | EAX:ef_addr32,EDX:uint32_t | none | c49c4@c4a3a | Build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit ESI; COUNT in ECX): set dword |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x510d0` | none | none | 52164@522a7 | Load the language text file: build the path (default directory + 0x18515c + the decimal word from the high half of dword |

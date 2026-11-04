@@ -949,7 +949,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00050e84	69	wait_command_50e84	game_helpers11	compiles	game	confirmed	decomp/tests/0x00050e84.json	docs/compiler-abi.md; Wait for a key other than 0x3b with a long enough name, then handle it.; callers 52164@522bb; guest pending
 0x00050f54	117	dispatch_command_50f54	game_helpers44	compiles	game	confirmed	decomp/tests/0x00050f54.json	docs/compiler-abi.md; Dispatch the current word through the 10-byte command table.; callers 52164@522ca; guest pending
 0x00050fcc	193	skip_to_word_50fcc	game_helpers44	compiles	game	confirmed	decomp/tests/0x00050fcc.json	docs/compiler-abi.md; Skip script lines until the current word equals the given name or the end marker.; callers 52164@522b6; guest pending
-0x000510d0	175			unknown	unclassified	unverified		
+0x000510d0	175	load_text_file_510d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000510d0.json	docs/compiler-abi.md; Load the language text file: build the path (default directory + 0x18515c + the decimal word from the high half of dword; callers 52164@522a7; guest pending
 0x00052128	57	note_extension_52128	game_helpers5	compiles	game	confirmed	decomp/tests/0x00052128.json	docs/compiler-abi.md; ; callers 50f54@50fae; guest pending
 0x00052164	611			unknown	unclassified	unverified		
 0x00052eb0	13	scale_float_52eb0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00052eb0.json	docs/compiler-abi.md; Scale a float to double.; callers 5375c@537cf,5375c@53816,5375c@5385d; guest pending

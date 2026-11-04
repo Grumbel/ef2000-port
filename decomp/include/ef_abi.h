@@ -5092,4 +5092,6 @@ uint32_t print_matching_records_b2758(uint32_t x, uint32_t y, uint32_t max, uint
 
 void build_render_object_d2584(ef_addr32 list, uint32_t count);
 
+void load_text_file_510d0(void);
+
 #endif
