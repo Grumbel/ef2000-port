@@ -9203,3 +9203,10 @@ in EAX, format string address, one value).
 | `0xee420` | EAX:uint32_t,EDX:uint32_t | none | ee22c@ee5de,ee22c@ee7ac,ee22c@ee944 | Implicit-register fragment (EAX = index, EBP = record pointer; the original then jumps to 0xee22c): increment the index  |
 | `0xeddfe` | none | none | edd49@edd64,eddc3@edde3 | Implicit-register fragment (no inputs): install the handler at 0x160a3c for interrupt 0x35 through DOS function 0x25 (in |
 | `0xef41f` | EAX:uint32_t | none | ee22c@eeb2f | Implicit-register fragment (EBP = record pointer; the original clears EDI and jumps to 0xee22c): initialise the record w |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10db7e` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 10da50@10dad1 | Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = decoder table base, ECX preserved |
+| `0xc3670` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 1f0c8@1f0ee,4b1f0@4b2ae,69fac@6a02b | Stack (ret 4): allocate a pool block of (int16)cx * (int16)size bytes, look its id up and draw into it with 0xc36b4 (EAX |

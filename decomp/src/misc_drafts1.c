@@ -21487,3 +21487,56 @@ void init_record_ef41f(uint32_t ebp)
 	EF_U16(ebp + 8u) = 0xffffu;
 	EF_U32(ebp + 0x76u) = 0xee22cu;
 }
+
+/* Bit reader used by the 0x10db7e decoder: shift the next bit out of the byte buffer *AL (reloading it from *ESI when it runs empty), exactly as `add al,al; jne; lods; adc al,al`. */
+static uint32_t next_bit_10db7e(uint32_t *esi, uint32_t *eax)
+{
+	uint32_t al = *eax & 0xffu;
+	uint32_t carry = al >> 7;
+
+	al = (al << 1) & 0xffu;
+	if (al == 0u) {
+		uint32_t b = EF_U8(*esi);
+
+		*esi += 1u;
+		al = ((b << 1) | carry) & 0xffu;
+		carry = b >> 7;
+	}
+	*eax = (*eax & 0xffffff00u) | al;
+	return carry;
+}
+
+/* 0x10db7e, 67 bytes. Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = decoder table base, ECX preserved): read bits to walk the code tree (bytes at EBP-0x850+index while non-zero), then fetch the extra-bit count from EBP-0x830+index; when it is at least 2, read count-1 more bits into a value starting at 1. Returns the complemented value (EBX). */
+uint32_t decode_distance_10db7e(uint32_t *esi, uint32_t *eax, uint32_t ebp, uint32_t ecx)
+{
+	uint32_t ebx = 0u;
+	uint32_t edi = 0u;
+	uint32_t cnt;
+
+	do {
+		edi = edi * 2u + next_bit_10db7e(esi, eax);
+		ebx = EF_U8(ebp + edi - 0x850u);
+	} while (ebx != 0u);
+	ebx = EF_U8(ebp + edi - 0x830u);
+	if ((int8_t)ebx >= 2) {
+		cnt = ((ecx & 0xffff0000u) | (ebx & 0xffu)) - 1u;
+		ebx = 1u;
+		do {
+			ebx = ebx * 2u + next_bit_10db7e(esi, eax);
+		} while (--cnt != 0u);
+	}
+	return ~ebx;
+}
+
+/* 0xc3670, 68 bytes. Stack (ret 4): allocate a pool block of (int16)cx * (int16)size bytes, look its id up and draw into it with 0xc36b4 (EAX unchanged, EDX and EBX sign-extended words, ECX the sign-extended word, stack: size then block). Returns the block pointer. */
+uint32_t alloc_picture_c3670(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t size)
+{
+	int32_t w = (int16_t)ecx;
+	int32_t s = (int16_t)size;
+	uint32_t blk;
+
+	blk = take_pool_block_b3db0((uint32_t)(w * s));
+	blk = lookup_id_b3f58((int16_t)blk);
+	guest_fn_c36b4(eax, (uint32_t)(int32_t)(int16_t)edx, (uint32_t)(int32_t)(int16_t)ebx, (uint32_t)w, (uint32_t)s, blk);
+	return blk;
+}

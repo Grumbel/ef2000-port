@@ -2732,7 +2732,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c3430	154			unknown	unclassified	unverified		
 0x000c34cc	65	start_driver_c34cc	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000c34cc.json	docs/compiler-abi.md; Start the driver unless it is already busy; abort when it fails.; callers ab74@ae62,278c0@2790a,284ec@28501; guest pending
 0x000c3584	234			unknown	unclassified	unverified		
-0x000c3670	68			unknown	unclassified	unverified		
+0x000c3670	68	alloc_picture_c3670	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c3670.json	docs/compiler-abi.md; Stack (ret 4): allocate a pool block of (int16)cx * (int16)size bytes, look its id up and draw into it with 0xc36b4 (EAX; callers 1f0c8@1f0ee,4b1f0@4b2ae,69fac@6a02b; guest pending
 0x000c36b4	95			unknown	unclassified	unverified		
 0x000c3714	81	query_driver_words_c3714	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000c3714.json	docs/compiler-abi.md; Query the driver and return its two 16-bit status words.; callers abf8c@ac00d,abf8c@ac077; guest pending
 0x000c3770	121	init_work_buffers_c3770	screen_clip1	compiles	game	confirmed	decomp/tests/0x000c3770.json	docs/compiler-abi.md; Allocate the two work buffers at 0x146e40/0x146e44 (size 0x164600) if needed, complain when either failed, then zero bot; callers cdb20@cdc17,d1d40@d1d89; guest pending
@@ -3991,7 +3991,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010da50	192			unknown	unclassified	unverified		
 0x0010db10	72			unknown	unclassified	unverified		
 0x0010db58	38	bitstream_decode_symbol_10db58	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010db58.json	docs/compiler-abi.md; Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EBP = table base, params in th; callers 10da50@10dac2; guest pending
-0x0010db7e	67			unknown	unclassified	unverified		
+0x0010db7e	67	decode_distance_10db7e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010db7e.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = decoder table base, ECX preserved; callers 10da50@10dad1; guest pending
 0x0010dbc1	76			unknown	unclassified	unverified		
 0x0010dc0d	16	bitstream_read_bits_10dc0d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010dc0d.json	docs/compiler-abi.md; Implicit-register fragment (CL = bit count, AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, params in that; callers 10dbc1@10dbcf,10dbc1@10dbda,10dbc1@10dbee; guest pending
 0x0010dc1d	30	checksum_bytes_10dc1d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010dc1d.json	docs/compiler-abi.md; Implicit-register fragment (ESI = data pointer, ECX = byte count; params in that order): the two-byte running checksum u; callers 10da50@10daf0; guest pending
