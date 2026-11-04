@@ -1204,7 +1204,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00065498	14	record_field_16_or_default	mid_helpers	compiles	game	confirmed	decomp/tests/0x00065498.json	docs/compiler-abi.md; dword +0x16 or dword 0x1a7c54 when null; callers 646d4@64d88; guest pending
 0x000654b8	181			unknown	unclassified	unverified		
 0x00065570	204	insert_nearest_65570	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00065570.json	docs/compiler-abi.md; Insert the record REC (fixed point position at +0 and +8, ids at +0xc and +0xe) into the list of the six nearest records; callers 654b8@654ed,654b8@6551c; guest pending
-0x0006563c	267			unknown	unclassified	unverified		
+0x0006563c	267	apply_pending_notices_6563c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006563c.json	docs/compiler-abi.md; Apply the pending 8-byte notices at 0x1a6d2e (count word 0x1a81b2, only while byte 0x1a81e5 is set): look up each node (; callers 654b8@65564; guest pending
 0x00065748	124	check_range_65748	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00065748.json	docs/compiler-abi.md; Flag 4 or 1 in byte 0x1a81de when the object is within range of the viewpoint (positions scaled by 256).; callers 654b8@654f4; guest pending
 0x000657c4	120	check_range_657c4	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x000657c4.json	docs/compiler-abi.md; As 0x65748 without the second shift, flags in byte 0x1a81dd.; callers 654b8@654fd; guest pending
 0x0006583c	143	advance_countdown_y_6583c	game_helpers27	compiles	game	confirmed	decomp/tests/0x0006583c.json	docs/compiler-abi.md; Advance the vertical countdown; step to the next frame when it expires.; callers 654b8@6555f; guest pending

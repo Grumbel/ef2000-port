@@ -5314,4 +5314,6 @@ void claim_idle_nodes_be208(uint32_t owner, uint32_t target, uint32_t value, ef_
 
 void refresh_node_blocks_caea0(ef_addr32 headptr, ef_addr32 table, uint32_t count);
 
+void apply_pending_notices_6563c(void);
+
 #endif

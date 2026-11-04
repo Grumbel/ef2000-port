@@ -9941,3 +9941,41 @@ void refresh_node_blocks_caea0(ef_addr32 headptr, ef_addr32 table, uint32_t coun
         }
     }
 }
+
+/* 0x6563c, 267 bytes. Apply the pending 8-byte notices at 0x1a6d2e (count word 0x1a81b2, only while byte 0x1a81e5 is set): look up each node (0x653d8; kind = word +4, id = word +2), mark it with byte +0xd = 1, and by kind set byte +0x13f of the unit (kind 1, 0x7489c), byte +0x3d of the object (kind 2, 0x8ffe8) or run 0x87f9c with the top nibble of the first word and the low 12 bits of the id (kind 4); afterwards advance the clock word 0x1a81be by word 0x127d92, wrapping by 0x19 when it exceeds 0x19. */
+void apply_pending_notices_6563c(void)
+{
+    int16_t i;
+    if (EF_U8(0x001a81e5u) == 0u || EF_U16(0x001a81b2u) == 0u)
+        return;
+    for (i = 0; i < (int16_t)EF_U16(0x001a81b2u); i++) {
+        ef_addr32 b = 0x001a6d2eu + (uint32_t)((int32_t)i * 8);
+        int32_t id = (int16_t)EF_U16(b + 2u);
+        uint16_t kind = EF_U16(b + 4u);
+        ef_addr32 node = find_node_653d8(kind, (uint32_t)id);
+        ef_addr32 o;
+        if (node == 0u)
+            continue;
+        EF_U8(node + 0xdu) = 1u;
+        switch (kind) {
+        case 1:
+            o = guest_fn_7489c(id);
+            if (o != 0u)
+                EF_U8(o + 0x13fu) = 1u;
+            break;
+        case 2:
+            o = guest_fn_8ffe8(id);
+            if (o != 0u)
+                EF_U8(o + 0x3du) = 1u;
+            break;
+        case 4:
+            (void)guest_fn_87f9c((uint32_t)(((int32_t)EF_U32(b) >> 28) & 0xff), (uint32_t)(int32_t)(int16_t)(EF_U16(b + 2u) & 0x0fffu));
+            break;
+        default:
+            break;
+        }
+    }
+    EF_U16(0x001a81beu) = (uint16_t)(EF_U16(0x001a81beu) + EF_U16(0x00127d92u));
+    if ((int16_t)EF_U16(0x001a81beu) > 0x19)
+        EF_U16(0x001a81beu) = (uint16_t)(EF_U16(0x001a81beu) - 0x19u);
+}
