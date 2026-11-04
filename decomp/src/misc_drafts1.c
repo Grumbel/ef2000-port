@@ -4826,3 +4826,32 @@ void step_animation_script_a207c(uint32_t obj, uint32_t other)
     guest_callptr_eax_x(EF_U32(obj + 0x1au), obj);
     EF_U16(obj + 4u) = (uint16_t)(EF_U16(obj + 4u) + EF_U16(obj + 6u));
 }
+
+/* 0xd19ec, 272 bytes. Pack the 8 bit planes of an image row block: SRC holds 0x15b7cc groups of 8 bytes (bit 0 of each is one pixel's plane bit); for each of the 8 planes the low bits of every group form one byte (first byte in bit 7), the bytes are run-length coded behind DST with 0xd1924 and the source bytes are shifted right. Returns the total number of coded bytes. The original takes its scratch row from the stack (error 0x18f6f4 when it does not fit). */
+uint32_t pack_bit_planes_d19ec(uint32_t dst, uint32_t src)
+{
+    uint8_t row[0x800];
+    int32_t groups = EF_S32(0x0015b7ccu);
+    uint32_t total = 0u;
+    int plane;
+    int32_t i;
+    int k;
+    if (groups > (int32_t)sizeof(row))
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f6f4u);
+    for (plane = 0; plane < 8; plane++) {
+        uint32_t p = src;
+        uint32_t n;
+        for (i = 0; i < groups; i++, p += 8u) {
+            uint8_t b = 0u;
+            for (k = 0; k < 8; k++)
+                b |= (uint8_t)((EF_U8(p + (uint32_t)k) & 1u) << (7 - k));
+            row[i] = b;
+            for (k = 0; k < 8; k++)
+                EF_U8(p + (uint32_t)k) = (uint8_t)(EF_U8(p + (uint32_t)k) >> 1);
+        }
+        n = rle_encode_d1924(dst, (uint32_t)(uintptr_t)row);
+        total += n;
+        dst += n;
+    }
+    return total;
+}

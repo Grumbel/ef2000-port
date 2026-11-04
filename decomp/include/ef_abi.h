@@ -4877,4 +4877,6 @@ void randomize_pilot_779f4(uint32_t obj);
 
 void step_animation_script_a207c(uint32_t obj, uint32_t other);
 
+uint32_t pack_bit_planes_d19ec(uint32_t dst, uint32_t src);
+
 #endif

@@ -6074,3 +6074,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa207c` | EAX:uint32_t,EDX:uint32_t | none | a2634@a268f,a2698@a271a | Step the animation script of OBJ (script pointer +0, time +4, wait +6): once the time word is at least 0x4000 the wait i |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd19ec` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | d1afc@d1bb9 | Pack the 8 bit planes of an image row block: SRC holds 0x15b7cc groups of 8 bytes (bit 0 of each is one pixel's plane bi |
