@@ -3430,7 +3430,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e7e30	113			unknown	unclassified	unverified		
 0x000e7ea4	177			unknown	unclassified	unverified		
 0x000e7fa4	19	install_handler_e7fa4	math_string	compiles	game	confirmed	decomp/tests/0x000e7fa4.json	docs/compiler-abi.md; Dword 0x464360 = EAX, dword 0x15b268 = 0xe7f60.; callers 7a38c@7a397; guest pending
-0x000e7fc0	263			unknown	unclassified	unverified		
+0x000e7fc0	263	split_path_e7fc0	game_helpers96	compiles	game	confirmed	decomp/tests/0x000e7fc0.json	docs/compiler-abi.md; _splitpath: normalise '/' to '\\' in place and split into drive, directory, name and extension (each output optional).; callers 7ab00@7ab5c,de864@de907,de864@de940; guest pending
 0x000e80d0	202			unknown	unclassified	unverified		
 0x000e81b0	408			unknown	unclassified	unverified		
 0x000e8348	32	rotate_calls_e8348	math_string	compiles	game	confirmed	decomp/tests/0x000e8348.json	docs/compiler-abi.md; 0xe81b0 on (A,B), (B,C), (C,A) for EAX, EDX, EBX.; callers e8368@e83c1; guest pending
@@ -3487,7 +3487,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ea958	33	add_vector3	math_string	compiles	game	confirmed	decomp/tests/0x000ea958.json	docs/compiler-abi.md; Add three dwords of EDX to those at EAX.; callers 97914@97944,97950@97983,97950@979a0; guest pending
 0x000ea9a0	22	set_vector3_from_words	math_string	compiles	game	confirmed	decomp/tests/0x000ea9a0.json	docs/compiler-abi.md; Dwords at EAX = sign-extended DX, BX, CX.; callers 9ffc8@9fffe; guest pending
 0x000ea9b8	52	dot_product_fixed	math_string	compiles	game	confirmed	decomp/tests/0x000ea9b8.json	docs/compiler-abi.md; Fixed-point (16.16) dot product of two dword triples.; callers 97534@975a2; guest pending
-0x000ea9ec	184			unknown	unclassified	unverified		
+0x000ea9ec	184	transform_vector_by_matrix_ea9ec	game_helpers96	compiles	game	confirmed	decomp/tests/0x000ea9ec.json	docs/compiler-abi.md; Transform a 3-vector in place by a 3x3 1.15 matrix (each product divided by 0x8000 separately).; callers 97534@97595; guest pending
 0x000eaab0	65	open_data_file_eaab0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000eaab0.json	docs/compiler-abi.md; Open the data file and read its 0x306-byte header.; callers eac48@eac83; guest pending
 0x000eaaf4	79	read_data_block_eaaf4	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000eaaf4.json	docs/compiler-abi.md; Read the data file's size-prefixed block into 0x474368.; callers eab44@eab6d,eac48@eaccb; guest pending
 0x000eab44	162			unknown	unclassified	unverified		
@@ -3533,7 +3533,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ebe90	12	store_through_ebd36	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebe90.json	docs/compiler-abi.md; As 0xebe6d with 0xebd36.; callers 1101e8@1101f2; guest pending
 0x000ebea3	65			unknown	unclassified	unverified		
 0x000ebee4	231			unknown	unclassified	unverified		
-0x000ebfd0	182			unknown	unclassified	unverified		
+0x000ebfd0	182	name_hash_ebfd0	game_helpers96	compiles	game	confirmed	decomp/tests/0x000ebfd0.json	docs/compiler-abi.md; Hash up to the first 15 characters of a name into 32 bits (length, sum, running sum, mix and ordering bits; '_' is skipp; callers 9dbf0@9dbfd,9dcf8@9dd9c,a1d50@a1d6d; guest pending
 0x000ec0ec	51	compare_names_ec0ec	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ec0ec.json	docs/compiler-abi.md; Compare 6 bytes at dword 0x1368bc[AX]+0x15 with those at dword 0x135874[DX*32]+0x16.; callers a3108@a311e; guest pending
 0x000ece90	30	reset_table_ece90	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ece90.json	docs/compiler-abi.md; Clear 0x10 bytes at 0x13577c and byte 0x484665.; callers a29f8@a2a3a; guest pending
 0x000ed115	30	guest_memcmp	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ed115.json	docs/compiler-abi.md; memcmp of EBX bytes at EAX and EDX: 0, -1 or 1 (unsigned).; callers a2f70@a2fed,d660c@d662c,ec0ec@ec113; guest pending

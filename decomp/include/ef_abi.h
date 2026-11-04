@@ -3799,4 +3799,9 @@ void start_value_ramp_1141b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
 void send_channel_volumes_112bd8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 player);
 void guest_fn_1123a4_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0x1123a4 5 stack args, caller cleanup */
 
+/* game_helpers96.c */
+void split_path_e7fc0(ef_addr32 path, ef_addr32 drive, ef_addr32 dir, ef_addr32 name, ef_addr32 ext);
+void transform_vector_by_matrix_ea9ec(ef_addr32 vec, ef_addr32 matrix);
+uint32_t name_hash_ebfd0(ef_addr32 text);
+
 #endif

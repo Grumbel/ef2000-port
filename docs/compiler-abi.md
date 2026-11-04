@@ -4276,3 +4276,11 @@ in EAX, format string address, one value).
 | `0x115989` | EAX:uint32_t | EAX:uint32_t | 105024@105050 | Size of an open file: remember the position, seek to the end, seek back; -1 when the position query fails. |
 | `0x1141b0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:int32_t,[ESP+12]:int32_t | none | 1031cc@1031fc | Start a ramp of the value at +0x48 to a target over time; sets the per-step delta at +0x54. |
 | `0x112bd8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 112c10@113222,1142cc@1142fd | Send controller 7 (volume) for each of the 16 channels whose stored value is not -1. |
+
+## game_helpers96 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe7fc0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | 7ab00@7ab5c,de864@de907,de864@de940 | _splitpath: normalise '/' to '\\' in place and split into drive, directory, name and extension (each output optional). |
+| `0xea9ec` | EAX:ef_addr32,EDX:ef_addr32 | none | 97534@97595 | Transform a 3-vector in place by a 3x3 1.15 matrix (each product divided by 0x8000 separately). |
+| `0xebfd0` | EAX:ef_addr32 | EAX:uint32_t | 9dbf0@9dbfd,9dcf8@9dd9c,a1d50@a1d6d | Hash up to the first 15 characters of a name into 32 bits (length, sum, running sum, mix and ordering bits; '_' is skipp |
