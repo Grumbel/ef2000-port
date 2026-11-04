@@ -6986,3 +6986,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc3364` | EAX:uint32_t,EDX:uint32_t | none | c3430@c343d | Find the size of the data file NAME (EDX) trying several locations; BUF (EAX) is the work buffer and the result is store |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc768` | EAX:uint32_t | none | bfcc@c264,c868@c88a,7bc00@7bc1d | Lay out the four numbered slot widgets of the dialog 0x180728 for the selection INDEX (EAX, signed word): the widget 0x1 |

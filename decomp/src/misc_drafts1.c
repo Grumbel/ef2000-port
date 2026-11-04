@@ -9105,3 +9105,26 @@ void find_data_size_c3364(uint32_t buf, uint32_t name)
     copy_string_9d749(buf, name);
     EF_U32(0x0041f3c8u) = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), buf);
 }
+
+/* 0xc768, 207 bytes. Lay out the four numbered slot widgets of the dialog 0x180728 for the selection INDEX (EAX, signed word): the widget 0x1809a8 and the widgets named "1".."4" are first moved to (0x32, 0x14); then, starting at the slot number stored in word 0x1a53b0[INDEX], the widgets "n+1" up to "4" are moved to (0, 0); the widget 0x180580 is enabled (0xa72d8) and, when the signed word 0x1a53c0 is below 2, the widget 0x1809a8 is moved to (0, 0) as well. */
+void layout_slot_widgets_c768(uint32_t index)
+{
+    char name[12];
+    uint32_t nm = (uint32_t)(uintptr_t)name;
+    uint32_t root = guest_fn_a46cc(0x00180728u);
+    int16_t n;
+    move_widget_a74bc(find_widget_checked_a78bc(root, 0x001809a8u), 0x32, 0x14);
+    for (n = 0; n < 4; n++) {
+        (void)signed_to_digits_cbd0f((int32_t)n + 1, nm, 10u);
+        move_widget_a74bc(find_widget_checked_a78bc(root, nm), 0x32, 0x14);
+    }
+    n = (int16_t)EF_U16(0x001a53b0u + (uint32_t)(int32_t)(int16_t)index * 2u);
+    while (n < 4) {
+        (void)signed_to_digits_cbd0f((int32_t)n + 1, nm, 10u);
+        move_widget_a74bc(find_widget_checked_a78bc(root, nm), 0, 0);
+        n++;
+    }
+    enable_widget_a72d8(find_widget_checked_a78bc(root, 0x00180580u));
+    if ((int16_t)EF_U16(0x001a53c0u) < 2)
+        move_widget_a74bc(find_widget_checked_a78bc(root, 0x001809a8u), 0, 0);
+}

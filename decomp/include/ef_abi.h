@@ -5262,4 +5262,6 @@ void update_item_dialog_34298(void);
 
 void find_data_size_c3364(uint32_t buf, uint32_t name);
 
+void layout_slot_widgets_c768(uint32_t index);
+
 #endif

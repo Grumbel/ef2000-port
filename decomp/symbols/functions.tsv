@@ -165,7 +165,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000bfcc	1449			unknown	unclassified	unverified		
 0x0000c594	155			unknown	unclassified	unverified		
 0x0000c630	311			unknown	unclassified	unverified		
-0x0000c768	207			unknown	unclassified	unverified		
+0x0000c768	207	layout_slot_widgets_c768	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000c768.json	docs/compiler-abi.md; Lay out the four numbered slot widgets of the dialog 0x180728 for the selection INDEX (EAX, signed word): the widget 0x1; callers bfcc@c264,c868@c88a,7bc00@7bc1d; guest pending
 0x0000c838	48	gpwShowDebrief		named	unclassified	unverified		
 0x0000c868	127			unknown	unclassified	unverified		
 0x0000c8e8	122	draw_page_entries_c8e8	screen_clip1	compiles	game	confirmed	decomp/tests/0x0000c8e8.json	docs/compiler-abi.md; For the current page (word at 0x121e98) call 0x11560 once for each of its entries, passing per-entry slots of the tables; callers bfcc@c27a,c868@c88f; guest pending
