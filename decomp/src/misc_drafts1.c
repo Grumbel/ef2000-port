@@ -6159,3 +6159,28 @@ void init_event_record_bb324(uint32_t rec, uint32_t kind, uint32_t arg)
     if (fn != 0u)
         guest_callptr_eaxedx_x(fn, rec, arg & 0xffu);
 }
+
+/* 0xfe700, 14 bytes. BIOS get video mode (int 10h, AH = 0xf): returns the current mode number in AL (EBX, ESI and EDI are preserved). */
+uint32_t get_video_mode_fe700(void)
+{
+    uint32_t in[7];
+    uint32_t out[7];
+    uint8_t sregs[12];
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    in[0] = 0x0f00u;
+    in[1] = 0u;
+    in[2] = 0u;
+    in[3] = 0u;
+    in[4] = 0u;
+    in[5] = 0u;
+    in[6] = 0u;
+    guest_dos_int_x(0x10u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+    return out[0] & 0xffu;
+}
+
+/* 0xa45e4, 16 bytes. Store the stack argument VALUE into the code-patch dword at 0xa45a4 (stdcall-style frame, ret 4). */
+void set_patch_dword_a45e4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value)
+{
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    EF_U32(0x000a45a4u) = value;
+}

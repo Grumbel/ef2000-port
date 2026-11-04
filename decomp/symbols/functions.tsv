@@ -2224,7 +2224,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a4574	45			unknown	unclassified	unverified		
 0x000a45a8	11	reseed_generator_a45a8	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000a45a8.json	docs/compiler-abi.md; Reseed the generator.; callers 3dd30@3dd60,3dd30@3de1f,7a844@7a876; guest pending
 0x000a45b3	49	step_generator_a45b3	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a45b3.json	docs/compiler-abi.md; Step a 32-bit generator held in two words; reseed when it reaches zero.; callers 6c1c@6cf3,6c1c@6d15,6c1c@6d2f; guest pending
-0x000a45e4	16			unknown	unclassified	unverified		
+0x000a45e4	16	set_patch_dword_a45e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a45e4.json	docs/compiler-abi.md; Store the stack argument VALUE into the code-patch dword at 0xa45a4 (stdcall-style frame, ret 4).; callers 4050@405c,bfcc@c0f1,a9e70@a9e7e; guest pending
 0x000a4640	53	find_id_a4640	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a4640.json	docs/compiler-abi.md; Find a word in the 0x41eda8 id table; returns its index, or a cleared low byte.; callers e52a4@e533f; guest pending
 0x000a4678	82	find_registered_a4678	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a4678.json	docs/compiler-abi.md; Find the registered entry whose name equals key, or 0.; callers a46cc@a46d0; guest pending
 0x000a46cc	35	find_named_or_abort_a46cc	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a46cc.json	docs/compiler-abi.md; Look up a named object or abort.; callers 40dc@40eb,40dc@4133,40dc@41ae; guest pending
@@ -3778,7 +3778,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fe541	31			unknown	unclassified	unverified		
 0x000fe560	174			unknown	unclassified	unverified		
 0x000fe610	15			unknown	unclassified	unverified		
-0x000fe700	14			unknown	unclassified	unverified		
+0x000fe700	14	get_video_mode_fe700	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe700.json	docs/compiler-abi.md; BIOS get video mode (int 10h, AH = 0xf): returns the current mode number in AL (EBX, ESI and EDI are preserved).; callers cdb20@cdb97,cdc64@cdc6c; guest pending
 0x000fe710	31			unknown	unclassified	unverified		
 0x000fe730	666			unknown	unclassified	unverified		
 0x000fedcc	16			unknown	unclassified	unverified		

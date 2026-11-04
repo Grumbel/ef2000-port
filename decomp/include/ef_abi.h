@@ -5001,4 +5001,7 @@ void draw_map_markers_4357c(uint32_t head, uint32_t list);
 
 void init_event_record_bb324(uint32_t rec, uint32_t kind, uint32_t arg);
 
+uint32_t get_video_mode_fe700(void);
+void set_patch_dword_a45e4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
+
 #endif
