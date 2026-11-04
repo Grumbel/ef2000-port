@@ -8918,3 +8918,19 @@ void refresh_list_widget_348e4(void)
     if ((uint16_t)active == EF_U16(0x001357b0u))
         EF_U8(0x0019f59bu) = EF_U8(0x001357b0u);
 }
+
+/* 0x440f4, 262 bytes. Draw a sprite from the table selected by SEL (EAX low byte; EDX, EBX, ECX, then the two stack arguments S0, S1, ret 8; the implicit ESI input is the last parameter and is used unchanged for SEL > 5): the sprite address is word x + word y * 640 + the frame base dword 0x126570, where x/y are the words at BASE and BASE + 2 with BASE = 0x134565, 0x134553, 0x134541, 0x13454a, 0x13456e, 0x13455c for SEL 0..5. Calls 0xca620 with the address, the sign-extended EDX, EBX, ECX and the low words of S0 (signed) and S1. */
+void draw_table_sprite_440f4(uint32_t sel, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1, uint32_t esi_in)
+{
+    static const uint32_t base[6] = { 0x00134565u, 0x00134553u, 0x00134541u, 0x0013454au, 0x0013456eu, 0x0013455cu };
+    uint32_t frame = EF_U32(0x00126570u);
+    uint32_t addr = esi_in;
+    if ((sel & 0xffu) <= 5u) {
+        uint32_t b = base[sel & 0xffu];
+        int32_t x = (int16_t)EF_U16(b), y = (int16_t)EF_U16(b + 2u);
+        addr = (uint32_t)(x + y * 5 * 128) + frame;
+    }
+    EF_U32(0x00126570u) = frame;
+    guest_fn_ca620((int32_t)addr, (int32_t)(int16_t)edx, (int32_t)(int16_t)ebx, (uint32_t)(int32_t)(int16_t)ecx,
+                   (uint32_t)(int32_t)(int16_t)s0, s1 & 0xffffu);
+}

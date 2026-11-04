@@ -5247,4 +5247,6 @@ void queue_message_47764(uint32_t di, uint32_t si, uint32_t ebx, uint32_t ecx, u
 void refresh_list_widget_348e4(void);
 void guest_fn_a7588_x(ef_addr32 a, ef_addr32 b); /* 0xa7588 EAX/EDX */
 
+void draw_table_sprite_440f4(uint32_t sel, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1, uint32_t esi_in);
+
 #endif

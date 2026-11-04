@@ -785,7 +785,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00043c84	368	draw_extent_markers_43c84	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00043c84.json	docs/compiler-abi.md; Draw the extent markers for list type 0xf.; callers 45574@45676,4bf1c@4bff9; guest pending
 0x00043df4	338			unknown	unclassified	unverified		
 0x00043f48	343			unknown	unclassified	unverified		
-0x000440f4	262			unknown	unclassified	unverified		
+0x000440f4	262	draw_table_sprite_440f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000440f4.json	docs/compiler-abi.md; Draw a sprite from the table selected by SEL (EAX low byte; EDX, EBX, ECX, then the two stack arguments S0, S1, ret 8; t; callers 433fc@43560,4357c@436c3,436dc@43819; guest pending
 0x000441fc	450			unknown	unclassified	unverified		
 0x000443fc	1007			unknown	unclassified	unverified		
 0x000447ec	382	draw_hotspots_447ec	hotspot_draw	compiles	game	confirmed	decomp/tests/0x000447ec.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x1d.; callers 45574@455aa,4bf1c@4bf78; guest pending
