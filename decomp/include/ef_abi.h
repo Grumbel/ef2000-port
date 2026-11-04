@@ -4729,4 +4729,8 @@ void write_string_table_e36bc(void);
 void scan_triggers_3d950(void);
 void bind_object_slot_6e74(uint32_t id);
 
+uint32_t heading_to_current_object_66fc(void);
+uint32_t lookup_plane_cell_7ae88(uint32_t mode, int32_t x, uint32_t y, int32_t z);
+void guest_fn_84e3c_x(uint32_t a, uint32_t b, uint32_t c); /* 0x84e3c EAX/EDX/EBX */
+
 #endif

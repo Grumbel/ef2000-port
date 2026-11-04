@@ -3077,3 +3077,58 @@ void bind_object_slot_6e74(uint32_t id)
     EF_U8(0x0019726au) = (uint8_t)(EF_U8(0x0019726au) + 1u);
     EF_U8(0x001fcc63u + (uint32_t)(int32_t)(int16_t)EF_U16(EF_U32(0x0019bb58u) + rec + 0x15u)) = 1u;
 }
+
+/* 0x66fc, 213 bytes. Heading from the view origin (0x1a5bec, 0x1a5be8) to the current object: the object (word 0x1f71ca) is looked up, its position is taken from the active coordinates (mode 2), the entry at [0x1a821c] (mode 6, scaled by 1/256) or computed by 0x84e3c; the offsets are shifted down until both fit in 16 bits and the angle is returned (0 when the object does not exist). ORIGINAL BUG: in mode 6 with no entry the position buffer is used uninitialised (zero here). */
+uint32_t heading_to_current_object_66fc(void)
+{
+    int32_t pos[2] = { 0, 0 };
+    uint32_t p;
+    int32_t bx;
+    int32_t dx;
+    uint8_t mode;
+    if (guest_fn_7489c((int16_t)EF_U16(0x001f71cau)) == 0u)
+        return 0u;
+    mode = EF_U8(0x0012814cu);
+    if (mode == 2u) {
+        sample_active_coordinates((uint32_t)(uintptr_t)pos);
+    } else if (mode == 6u) {
+        p = EF_U32(0x001a821cu);
+        if (p != 0u) {
+            pos[0] = (int32_t)EF_U32(p) >> 8;
+            pos[1] = (int32_t)EF_U32(p + 8u) >> 8;
+        }
+    } else {
+        uint32_t rec = (uint32_t)(int32_t)(int16_t)EF_U16(0x0019bb5eu) * 0xcau;
+        guest_fn_84e3c_x((uint32_t)(uintptr_t)pos, (int16_t)EF_U16(0x001f71cau), EF_U8(EF_U32(0x0019bb58u) + rec + 0x8eu));
+    }
+    bx = pos[0] - (int32_t)EF_U32(0x001a5becu);
+    dx = pos[1] - (int32_t)EF_U32(0x001a5be8u);
+    while ((int32_t)abs_a28f2(bx) > 0x7fff || (int32_t)abs_a28f2(dx) > 0x7fff) {
+        bx >>= 2;
+        dx >>= 2;
+    }
+    return (uint32_t)angle_of_b3b1c(bx, dx);
+}
+
+/* 0x7ae88, 213 bytes. Look up the cell of the plane map for the position (X, Z) (both in units of 2048; wrapped to 400 with the original off-by-one correction for negative remainders): combine the bytes of the two planes (0x1f8eb4, 0x1f8eb8) into a word, remember it at 0x1f8ec2 and, unless it is 0xffff, run 0xd0470 for it with the cell centre coordinates. Returns 0 for an empty cell. */
+uint32_t lookup_plane_cell_7ae88(uint32_t mode, int32_t x, uint32_t y, int32_t z)
+{
+    int32_t gx = x >> 11;
+    int32_t gz = 0x18f - (z >> 11);
+    int32_t col = gx % 0x190;
+    int32_t row = gz % 0x190;
+    uint32_t off;
+    uint32_t v;
+    select_plane_source((int32_t)mode);
+    if (col < 0)
+        col += 0x18f;
+    if (row < 0)
+        row += 0x18f;
+    off = (uint32_t)(col * 400);
+    v = ((uint32_t)EF_U8(EF_U32(0x001f8eb4u) + off + (uint32_t)row) << 8) | EF_U8(EF_U32(0x001f8eb8u) + off + (uint32_t)row);
+    EF_U16(0x001f8ec2u) = 0u;
+    if ((uint16_t)v == 0xffffu)
+        return 0u;
+    EF_U16(0x001f8ec2u) = (uint16_t)v;
+    return guest_fn_d0470((int16_t)v, (int32_t)((uint32_t)(gx * 2 + 1) << 10), (int32_t)y, (int32_t)((uint32_t)((0x18f - gz) * 2 + 1) << 10));
+}

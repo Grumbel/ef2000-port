@@ -5764,3 +5764,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x3d950` | none | none | 3dd30@3dfae | For each of the [0x1a5a86] 26-byte trigger records at 0x12b268 whose flag test (0xa0e98 on the id word) succeeds and whi |
 | `0x6e74` | EAX:uint32_t | none | 8c49c@8c88c | Bind the object ID (looked up with 0x7489c) to the first free entry of the 5-byte table at [0x197260] (0x121e55 entries; |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x66fc` | none | EAX:uint32_t | 6460@669f | Heading from the view origin (0x1a5bec, 0x1a5be8) to the current object: the object (word 0x1f71ca) is looked up, its po |
+| `0x7ae88` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t,ECX:int32_t | EAX:uint32_t | 161d4@164a7,1df90@1e040,56084@56141 | Look up the cell of the plane map for the position (X, Z) (both in units of 2048; wrapped to 400 with the original off-b |

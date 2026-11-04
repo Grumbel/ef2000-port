@@ -83,7 +83,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00006330	81	tick_object_timer_6330	game_helpers30	compiles	game	confirmed	decomp/tests/0x00006330.json	docs/compiler-abi.md; Count down a timer for an active object; call 0x56a4c and rewind on underflow.; callers 601c@62e0; guest pending
 0x00006460	610			unknown	unclassified	unverified		
 0x000066c4	56	current_object_metric_66c4	float_helpers1	compiles	game	confirmed	decomp/tests/0x000066c4.json	docs/compiler-abi.md; Integer result of a table lookup for the current object, or 0.; callers 6924@69a2,625d8@629d6; guest pending
-0x000066fc	213			unknown	unclassified	unverified		
+0x000066fc	213	heading_to_current_object_66fc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000066fc.json	docs/compiler-abi.md; Heading from the view origin (0x1a5bec, 0x1a5be8) to the current object: the object (word 0x1f71ca) is looked up, its po; callers 6460@669f; guest pending
 0x000067d4	315			unknown	unclassified	unverified		
 0x00006924	423			unknown	unclassified	unverified		
 0x00006acc	78	object_category	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00006acc.json	docs/compiler-abi.md; Category of an object from the byte at +0xe9: 1 (<=0xf), 2 (0x10..0x15), 3 (0x20..0x21), 4 (0x22..0x24).; callers 6924@6996,625d8@62b2a,65c1c@65c7d; guest pending
@@ -1466,7 +1466,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007ab00	369			unknown	unclassified	unverified		
 0x0007ac74	405			unknown	unclassified	unverified		
 0x0007ae0c	123	map_value_7ae0c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0007ae0c.json	docs/compiler-abi.md; Read the 16-bit value at wrapped (a, b) of the 0x190x0x190 two-plane map.; callers 7bb00@7bb2c; guest pending
-0x0007ae88	213			unknown	unclassified	unverified		
+0x0007ae88	213	lookup_plane_cell_7ae88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007ae88.json	docs/compiler-abi.md; Look up the cell of the plane map for the position (X, Z) (both in units of 2048; wrapped to 400 with the original off-b; callers 161d4@164a7,1df90@1e040,56084@56141; guest pending
 0x0007af60	221			unknown	unclassified	unverified		
 0x0007b040	76	lookup_scaled_cell_7b040	float_helpers10	compiles	game	confirmed	decomp/tests/0x0007b040.json	docs/compiler-abi.md; Scale a 2D double point, look up the cell value and return it negated and scaled.; callers 2e184@2e268,6d38c@6d579,6f504@6f60f; guest pending
 0x0007b08c	221			unknown	unclassified	unverified		
