@@ -3285,8 +3285,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000decc4	26	length_3d_decc4	math_string	compiles	game	confirmed	decomp/tests/0x000decc4.json	docs/compiler-abi.md; Low word of 0xe2b60(EAX^2 + EDX^2 + EBX^2).; callers 30214@311ed,31514@31588,83a40@83adb; guest pending
 0x000decde	29			unknown	unclassified	unverified		
 0x000decfb	28			unknown	unclassified	unverified		
-0x000ded1a	35			unknown	unclassified	unverified		
-0x000ded3d	35			unknown	unclassified	unverified		
+0x000ded1a	35	copy_dta_out_ded1a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded1a.json	docs/compiler-abi.md; When the file-search mode byte 0x132a5e is 9, copy the 0x2b-byte DOS DTA (address from int 21h, AH = 0x2f) to the buffer; callers decde@decf4,decfb@ded10; guest pending
+0x000ded3d	35	copy_dta_in_ded3d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded3d.json	docs/compiler-abi.md; The reverse of 0xded1a: copy the 0x2b bytes at SRC into the DOS DTA.; callers decfb@ded02; guest pending
 0x000ded60	38			unknown	unclassified	unverified		
 0x000ded86	88			unknown	unclassified	unverified		
 0x000dedde	1085			unknown	unclassified	unverified		
@@ -3504,7 +3504,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb259	1	nop_eb259	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000eb259.json	docs/compiler-abi.md; Empty stub (single ret).; callers eb25a@eb25d,eb25a@eb263,eb272@eb275; guest pending
 0x000eb25a	24	switch_page_eb25a	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000eb25a.json	docs/compiler-abi.md; Run the two page callbacks, then the page switch for the argument.; callers 9bd20@9bd65,eb448@eb471; guest pending
 0x000eb272	22	switch_page_eb272	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000eb272.json	docs/compiler-abi.md; Run the page callback pair, then hand the argument to 0x20d.; callers eb25a@eb26b; guest pending
-0x000eb288	32			unknown	unclassified	unverified		
+0x000eb288	32	dos_alloc_eb288	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eb288.json	docs/compiler-abi.md; DOS allocate memory (int 21h, AH = 0x48) for PARAGRAPHS (16-bit): returns the segment/selector, or 0 when the allocation; callers 9be38@9bf6d; guest pending
 0x000eb2a8	24	largest_free_block_eb2a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eb2a8.json	docs/compiler-abi.md; DOS allocate memory with the impossible request BX = 0xffff (int 21h, AH = 0x48), which fails and returns the size of th; callers 9c1e0@9c1e3; guest pending
 0x000eb2c0	99	format_and_enter_eb2c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eb2c0.json	docs/compiler-abi.md; Printf-style message (cdecl, FORMAT and varargs on the stack) formatted into a 0x280-byte buffer, then, if the counter b; callers 510@572,628@647,628@65a; guest pending
 0x000eb35c	24	check_error_flag_eb35c	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000eb35c.json	docs/compiler-abi.md; Abort with the stored message when the error flag is set.; callers dc250@dc250,dc280@dc281; guest pending
@@ -3775,11 +3775,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fdf60	349			unknown	unclassified	unverified		
 0x000fe380	284			unknown	unclassified	unverified		
 0x000fe49c	165			unknown	unclassified	unverified		
-0x000fe541	31			unknown	unclassified	unverified		
+0x000fe541	31	delete_file_fe541	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe541.json	docs/compiler-abi.md; DOS delete file (int 21h, AH = 0x41) NAME: 0 on success, otherwise the translated DOS error (0x1101e8) of the failing co; callers none direct; guest pending
 0x000fe560	174			unknown	unclassified	unverified		
 0x000fe610	15			unknown	unclassified	unverified		
 0x000fe700	14	get_video_mode_fe700	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe700.json	docs/compiler-abi.md; BIOS get video mode (int 10h, AH = 0xf): returns the current mode number in AL (EBX, ESI and EDI are preserved).; callers cdb20@cdb97,cdc64@cdc6c; guest pending
-0x000fe710	31			unknown	unclassified	unverified		
+0x000fe710	31	set_and_check_video_mode_fe710	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe710.json	docs/compiler-abi.md; Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low; callers cdb20@cdbae,cdc64@cdc83; guest pending
 0x000fe730	666			unknown	unclassified	unverified		
 0x000fedcc	16			unknown	unclassified	unverified		
 0x000feddc	29			unknown	unclassified	unverified		
@@ -4023,7 +4023,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010edda	278			unknown	unclassified	unverified		
 0x0010eef0	242	parse_tz_rule_10eef0	runtime_helpers39	compiles	game	confirmed	decomp/tests/0x0010eef0.json	docs/compiler-abi.md; Parse a TZ rule ("Jn", "n" or "Mm.w.d", optionally "/h:m:s") into the record at out; returns the text position after the; callers 10eda1@10f055,10eda1@10f065; guest pending
 0x0010f071	119	alloc_stream_buffer_10f071	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0010f071.json	docs/compiler-abi.md; Allocate the buffer of a stream record.; callers f1d90@f1dd0,f1f5a@f1f95,f22af@f230d; guest pending
-0x0010f0e8	31			unknown	unclassified	unverified		
+0x0010f0e8	31	dos_read_10f0e8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010f0e8.json	docs/compiler-abi.md; DOS read (int 21h, AH = 0x3f): read COUNT bytes from HANDLE into BUFFER. Returns the byte count, or the translated DOS e; callers f1d90@f1e7d,10f1bf@10f23c; guest pending
 0x0010f107	137	stream_fgetc_10f107	game_helpers111	compiles	game	confirmed	decomp/tests/0x0010f107.json	docs/compiler-abi.md; fgetc: read the next byte of a stream (refilling when the count runs out); in text mode skip a CR and treat Ctrl-Z as en; callers 11580e@115831; guest pending
 0x0010f190	47	stream_getc	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f190.json	docs/compiler-abi.md; Read one byte from a counted buffer stream; -1 at the end.; callers 10f107@10f13a,10f107@10f165; guest pending
 0x0010f1bf	171	stream_refill_10f1bf	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x0010f1bf.json	docs/compiler-abi.md; Refill a stream buffer (_filbuf): allocate it if missing, flush stdout-style linked streams, then read from the handle (; callers f1d90@f1ec2,f1d90@f1ee2,f1d90@f1f0f; guest pending
@@ -4036,7 +4036,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00110123	13	call_1100d2_default	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110123.json	docs/compiler-abi.md; 0x1100d2(EAX, 0x4dd988).; callers f9ecd@f9ecd,101c54@101ce1; guest pending
 0x00110130	60	classify_double_110130	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110130.json	docs/compiler-abi.md; Wrapper for 0x10e4dd on the double (S0, S1): control word (S2 & 0x1f) with 0x1080 when S2 is not 8 and the value is +/-0; callers fa362@fa380; guest pending
 0x0011016c	82	fdiv_bug_probe_11016c	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011016c.json	docs/compiler-abi.md; Pentium FDIV bug probe: when the CPU level 0x13719d is at least 3, compute 4195835 - (4195835 / 3145727) * 3145727 and s; callers none direct; guest pending
-0x001101be	30			unknown	unclassified	unverified		
+0x001101be	30	is_device_handle_1101be	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001101be.json	docs/compiler-abi.md; DOS IOCTL get device information (int 21h, AX = 0x4400) for HANDLE: true when bit 7 of the device word (a character devi; callers fa4a9@fa504,fa4a9@fa605,fa7d2@fa7e0; guest pending
 0x001101e3	5			unknown	unclassified	unverified		
 0x001101e8	102	translate_key_1101e8	key_helpers1	compiles	game	confirmed	decomp/tests/0x001101e8.json	docs/compiler-abi.md; Store a key code, then translate it (via a table at 0x17d5a8 for plain keys, or its high byte for extended codes) and st; callers fa4a9@fa560,fa95f@fa98b,fe541@fe555; guest pending
 0x0011024e	85	lookup_slot_11024e	runtime_libc	compiles	game	confirmed	decomp/tests/0x0011024e.json	docs/compiler-abi.md; Look up dword table 0x17d614[index], marking the first six slots as seen.; callers fa4a9@fa5fa,10f26a@10f276,110393@1103a1; guest pending

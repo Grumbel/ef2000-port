@@ -6283,3 +6283,94 @@ uint32_t read_console_char_11d63f(void)
     }
     return c;
 }
+
+/* Run int 21h/10h with the given EAX, EBX, ECX, EDX (ESI/EDI zero); the result block is returned in OUT (EAX, EBX, ECX, EDX, ESI, EDI, carry). */
+static void run_dos_int_ex(uint32_t intno, uint32_t eax, uint32_t ebx, uint32_t ecx, uint32_t edx, uint32_t *out)
+{
+    uint32_t in[7];
+    uint8_t sregs[12];
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    in[0] = eax;
+    in[1] = ebx;
+    in[2] = ecx;
+    in[3] = edx;
+    in[4] = 0u;
+    in[5] = 0u;
+    in[6] = 0u;
+    guest_dos_int_x(intno, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+}
+
+/* 0x1101be, 30 bytes. DOS IOCTL get device information (int 21h, AX = 0x4400) for HANDLE: true when bit 7 of the device word (a character device) is set. */
+uint32_t is_device_handle_1101be(uint32_t handle)
+{
+    uint32_t out[7];
+    run_dos_int_ex(0x21u, 0x4400u, handle, 0u, 0u, out);
+    return (out[3] & 0x80u) != 0u ? 1u : 0u;
+}
+
+/* 0xfe541, 31 bytes. DOS delete file (int 21h, AH = 0x41) NAME: 0 on success, otherwise the translated DOS error (0x1101e8) of the failing code. */
+uint32_t delete_file_fe541(uint32_t name)
+{
+    uint32_t out[7];
+    run_dos_int_ex(0x21u, 0x4100u, 0u, 0u, name, out);
+    if (out[6] != 0u)
+        return (uint32_t)translate_key_1101e8(out[0] & 0xffffu);
+    return 0u;
+}
+
+/* 0x10f0e8, 31 bytes. DOS read (int 21h, AH = 0x3f): read COUNT bytes from HANDLE into BUFFER. Returns the byte count, or the translated DOS error (0x1101e8) when the carry flag is set. */
+uint32_t dos_read_10f0e8(uint32_t handle, uint32_t buffer, uint32_t count)
+{
+    uint32_t out[7];
+    run_dos_int_ex(0x21u, 0x3f00u, handle, count, buffer, out);
+    if (out[6] != 0u)
+        return (uint32_t)translate_key_1101e8(out[0] & 0xffffu);
+    return out[0];
+}
+
+/* 0xfe710, 31 bytes. Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low byte, else 0. Stack argument (ret 4). */
+uint32_t set_and_check_video_mode_fe710(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t mode)
+{
+    uint32_t out[7];
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    run_dos_int_ex(0x10u, mode, 0u, 0u, 0u, out);
+    run_dos_int_ex(0x10u, 0x0f00u, 0u, 0u, 0u, out);
+    return ((out[0] - mode) & 0xffu) == 0u ? 1u : 0u;
+}
+
+/* 0xeb288, 32 bytes. DOS allocate memory (int 21h, AH = 0x48) for PARAGRAPHS (16-bit): returns the segment/selector, or 0 when the allocation failed. Cdecl, one stack argument. */
+uint32_t dos_alloc_eb288(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t paragraphs)
+{
+    uint32_t out[7];
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    run_dos_int_ex(0x21u, 0x4800u, paragraphs & 0xffffu, 0u, 0u, out);
+    if (out[6] != 0u)
+        return 0u;
+    return out[0];
+}
+
+/* 0xded1a, 35 bytes. When the file-search mode byte 0x132a5e is 9, copy the 0x2b-byte DOS DTA (address from int 21h, AH = 0x2f) to the buffer DST. */
+void copy_dta_out_ded1a(uint32_t u0, uint32_t dst)
+{
+    uint32_t out[7];
+    uint32_t i;
+    (void)u0;
+    if (EF_U8(0x00132a5eu) != 9u)
+        return;
+    run_dos_int_ex(0x21u, 0x2f00u, 0u, 0u, 0u, out);
+    for (i = 0u; i < 0x2bu; i++)
+        EF_U8(dst + i) = EF_U8(out[1] + i);
+}
+
+/* 0xded3d, 35 bytes. The reverse of 0xded1a: copy the 0x2b bytes at SRC into the DOS DTA. */
+void copy_dta_in_ded3d(uint32_t u0, uint32_t src)
+{
+    uint32_t out[7];
+    uint32_t i;
+    (void)u0;
+    if (EF_U8(0x00132a5eu) != 9u)
+        return;
+    run_dos_int_ex(0x21u, 0x2f00u, 0u, 0u, 0u, out);
+    for (i = 0u; i < 0x2bu; i++)
+        EF_U8(out[1] + i) = EF_U8(src + i);
+}

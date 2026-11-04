@@ -5015,4 +5015,12 @@ void send_keyboard_byte_cd3c0(uint32_t value);
 void set_keyboard_leds_cd414(uint32_t mask);
 uint32_t read_console_char_11d63f(void);
 
+uint32_t is_device_handle_1101be(uint32_t handle);
+uint32_t delete_file_fe541(uint32_t name);
+uint32_t dos_read_10f0e8(uint32_t handle, uint32_t buffer, uint32_t count);
+uint32_t set_and_check_video_mode_fe710(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t mode);
+uint32_t dos_alloc_eb288(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t paragraphs);
+void copy_dta_out_ded1a(uint32_t u0, uint32_t dst);
+void copy_dta_in_ded3d(uint32_t u0, uint32_t src);
+
 #endif

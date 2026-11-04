@@ -6337,3 +6337,15 @@ in EAX, format string address, one value).
 | `0xcd3c0` | EAX:uint32_t | none | cd414@cd41d,cd414@cd426 | Send the byte VALUE to the keyboard controller (port 0x60) and wait for the 0xfa acknowledge, retrying up to three times |
 | `0xcd414` | EAX:uint32_t | none | cd4d4@cd4e5,cd554@cd5d7 | Set the keyboard LEDs: command 0xed followed by the LED mask byte, with interrupts disabled. |
 | `0x11d63f` | none | EAX:uint32_t | 10f1bf@10f210 | Return the pending pushed-back character in dword 0x132a50 (clearing it) or, when none is pending, read one character fr |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1101be` | EAX:uint32_t | EAX:uint32_t | fa4a9@fa504,fa4a9@fa605,fa7d2@fa7e0 | DOS IOCTL get device information (int 21h, AX = 0x4400) for HANDLE: true when bit 7 of the device word (a character devi |
+| `0xfe541` | EAX:uint32_t | EAX:uint32_t | none direct | DOS delete file (int 21h, AH = 0x41) NAME: 0 on success, otherwise the translated DOS error (0x1101e8) of the failing co |
+| `0x10f0e8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | f1d90@f1e7d,10f1bf@10f23c | DOS read (int 21h, AH = 0x3f): read COUNT bytes from HANDLE into BUFFER. Returns the byte count, or the translated DOS e |
+| `0xfe710` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | cdb20@cdbae,cdc64@cdc83 | Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low |
+| `0xeb288` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 9be38@9bf6d | DOS allocate memory (int 21h, AH = 0x48) for PARAGRAPHS (16-bit): returns the segment/selector, or 0 when the allocation |
+| `0xded1a` | EAX:uint32_t,EDX:uint32_t | none | decde@decf4,decfb@ded10 | When the file-search mode byte 0x132a5e is 9, copy the 0x2b-byte DOS DTA (address from int 21h, AH = 0x2f) to the buffer |
+| `0xded3d` | EAX:uint32_t,EDX:uint32_t | none | decfb@ded02 | The reverse of 0xded1a: copy the 0x2b bytes at SRC into the DOS DTA. |
