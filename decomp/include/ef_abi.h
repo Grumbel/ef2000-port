@@ -3818,4 +3818,9 @@ uint8_t plane_eval_sign_ce498(ef_addr32 plane, int32_t x, int32_t y, int32_t z);
 int32_t compare_nocase_10901d(ef_addr32 a, ef_addr32 b, uint32_t n);
 void palette_8_to_6bit_11082c(ef_addr32 data);
 
+/* game_helpers100.c */
+void compute_point_bounds_d2040(ef_addr32 object);
+void fill_current_table_entry_b570c(ef_addr32 object, ef_addr32 source, uint8_t flag);
+void blend_by_angle_weight_a2244(ef_addr32 rec);
+
 #endif

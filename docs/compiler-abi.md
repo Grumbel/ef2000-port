@@ -4306,3 +4306,11 @@ in EAX, format string address, one value).
 | `0xce498` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | AL:uint8_t | none direct | Same evaluation as ce4dc; returns 1 when the result is negative. |
 | `0x10901d` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:int32_t | e0b10@e0b39 | Case-insensitive compare of up to n bytes (does not stop at NUL); returns the first difference of the lower-cased bytes. |
 | `0x11082c` | EAX:ef_addr32 | none | none direct | Scale 8-bit palette chunks down to 6 bits in place (count byte, then per chunk a skipped byte, a colour count and 3 byte |
+
+## game_helpers100 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd2040` | EAX:ef_addr32 | none | d2130@d21c1 | Compute (once) the 3D bounding box of an object's points into fields 0x30..0x44. |
+| `0xb570c` | EAX:ef_addr32,EDX:ef_addr32,BL:uint8_t | none | b7d4c@b7f8f,b80ac@b8167,b80ac@b842c | Fill the current (last added) 0x19-byte table entry of an object from a source record and a flag byte. |
+| `0xa2244` | EAX:ef_addr32 | none | none direct | Blend two sets of three words into rec+8..0xc, weighted by the cosine of the record's angle (1.14 weights). |
