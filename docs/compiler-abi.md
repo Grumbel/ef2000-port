@@ -7368,3 +7368,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xb2d04` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | b3168@b31b5 | Debug dump of the list LIST (EAX; first node at +0, links at +4) to the file handle FILE (EBX): print the header text FM |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x35de0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | none | 35e68@35e84,35e90@35eac,36100@36173 | Rescale a pair of widgets of the dialog (name chosen by byte 0x1357c8: 0x1830f8 or 0x182fb0). The word at +4 of child 0x |

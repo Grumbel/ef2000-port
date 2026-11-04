@@ -11225,3 +11225,21 @@ void dump_list_b2d04(ef_addr32 list, uint32_t e, uint32_t file, ef_addr32 fmt, u
         node = EF_U32(node + 4u);
     }
 }
+
+/* 0x35de0, 136 bytes. Rescale a pair of widgets of the dialog (name chosen by byte 0x1357c8: 0x1830f8 or 0x182fb0). The word at +4 of child 0x183104 times SCALE (stack double, ret 8), rounded, becomes the x position of child 0x18310c (y kept from its high word); finally redraw the item whose id is the byte at +0x10 of the dialog. */
+void rescale_dialog_widgets_35de0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double scale)
+{
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    ef_addr32 root = guest_fn_a46cc(EF_U8(0x001357c8u) != 0u ? 0x001830f8u : 0x00182fb0u);
+    if (root != 0u) {
+        ef_addr32 w = find_widget_checked_a78bc(root, 0x00183104u);
+        if (w != 0u) {
+            int32_t x = (int32_t)truncate_9d72c((double)EF_U16(w + 4u) * scale);
+            ef_addr32 w2 = find_widget_checked_a78bc(root, 0x0018310cu);
+            if (w2 != 0u)
+                move_widget_a74bc(w2, (int16_t)x, (int16_t)((int32_t)EF_U32(w2 + 4u) >> 16));
+        }
+    }
+    /* ORIGINAL BUG: ROOT is dereferenced even when it is NULL. */
+    redraw_item_a5ef8(EF_U8(root + 0x10u));
+}

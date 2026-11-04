@@ -5407,4 +5407,12 @@ void dump_list_b2d04(ef_addr32 list, uint32_t e, uint32_t file, ef_addr32 fmt, u
 uint32_t guest_fn_bc5d0_x(ef_addr32 obj); /* 0xbc5d0 EAX -> AX */
 void guest_fn_b2b00_x(ef_addr32 node, uint32_t b, uint32_t c); /* 0xb2b00 EAX/EDX/EBX */
 
+void rescale_dialog_widgets_35de0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double scale);
+
+
+
+
+
+
+
 #endif
