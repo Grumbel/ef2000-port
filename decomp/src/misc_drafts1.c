@@ -19883,7 +19883,9 @@ void compute_view_window_abb00(ef_addr32 p)
 	EF_U16(0x0041eee4u) = EF_U16(p + 0x65u);
 	EF_U16(0x0041eee2u) = EF_U16(p + 0x67u);
 	i1 = ((int32_t)EF_U32(0x0041eefcu) >> 16) - (int32_t)si + ((int32_t)EF_U32(p + 0x67u) >> 16);
-	inv = 1.0 / EF_F64(p + 0x9fu);
+	double d;
+	memcpy(&d, ef_guest_memory_ptr(p + 0x9fu), sizeof d);
+	inv = 1.0 / d;
 	t = EF_U32(0x0041eefau);
 	EF_U16(0x0041eef4u) = (uint16_t)(int32_t)truncate_9d72c((double)i1 * inv);
 	i2 = ((int32_t)t >> 16) - (int32_t)cx + ((int32_t)EF_U32(p + 0x69u) >> 16);

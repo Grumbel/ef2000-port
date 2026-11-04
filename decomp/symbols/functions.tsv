@@ -2408,7 +2408,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ab954	5	tail_jump_ab954	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000ab954.json	docs/compiler-abi.md; tail jump. Forward to 0xc9fc4.; callers a5ef8@a5fb8,a5ef8@a5fe9; guest pending
 0x000ab95c	404	guiUpdateMemoryUse		named	unclassified	unverified		
 0x000abaf0	13	build_default_path_abaf0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000abaf0.json	docs/compiler-abi.md; Build the default path into a buffer.; callers ca200@ca20b,f819c@f81aa; guest pending
-0x000abb00	294			unknown	unclassified	unverified		
+0x000abb00	294	compute_view_window_abb00	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000abb00.json	docs/compiler-abi.md; Compute a clipped view window from record p into the word block at 0x41eee2..0x41ef00 and scale two of its extents by 1/; callers a5b70@a5c68,a60a8@a60e1,f18a4@f18ca; guest pending
 0x000abc34	98	relabel_named_widget_abc34	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000abc34.json	docs/compiler-abi.md; Re-label the named widget when its owner record changed.; callers ac5f8@ac706; guest pending
 0x000abc98	78	draw_named_widget_abc98	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000abc98.json	docs/compiler-abi.md; Draw the named widget's label and activate its page.; callers 84afc@84afc,ac408@ac556; guest pending
 0x000abce8	66	refresh_named_widget_abce8	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x000abce8.json	docs/compiler-abi.md; Refresh the named widget's page and draw its label.; callers none direct; guest pending

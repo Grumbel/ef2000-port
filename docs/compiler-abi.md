@@ -8801,3 +8801,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x49e00` | none | none | 49228@49947 | Rebuild the word map at 0x1a5290. In mode 1 (byte 0x125849) clear 0x20 bytes, then for each of the (word 0x1357b0) entri |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xabb00` | EAX:ef_addr32 | none | a5b70@a5c68,a60a8@a60e1,f18a4@f18ca | Compute a clipped view window from record p into the word block at 0x41eee2..0x41ef00 and scale two of its extents by 1/ |
