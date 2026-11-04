@@ -2604,9 +2604,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ba77c	105			unknown	unclassified	unverified		
 0x000ba804	185			unknown	unclassified	unverified		
 0x000ba8dc	201			unknown	unclassified	unverified		
-0x000ba9c4	107			unknown	unclassified	unverified		
-0x000baa4c	107			unknown	unclassified	unverified		
-0x000baad4	107			unknown	unclassified	unverified		
+0x000ba9c4	107	fill_colour_record_ba9c4	colour_tables	compiles	game	confirmed	decomp/tests/0x000ba9c4.json	docs/compiler-abi.md; Fill a colour record for a key.; callers bb324@bb47d; guest pending
+0x000baa4c	107	fill_colour_record_baa4c	colour_tables	compiles	game	confirmed	decomp/tests/0x000baa4c.json	docs/compiler-abi.md; Fill a colour record for a key (identical copy).; callers bb324@bb47d; guest pending
+0x000baad4	107	fill_colour_record_baad4	colour_tables	compiles	game	confirmed	decomp/tests/0x000baad4.json	docs/compiler-abi.md; Fill a colour record for a key (identical copy).; callers bb324@bb47d; guest pending
 0x000bab5c	85			unknown	unclassified	unverified		
 0x000babd0	162			unknown	unclassified	unverified		
 0x000bac90	193			unknown	unclassified	unverified		

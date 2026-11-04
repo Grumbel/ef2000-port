@@ -4708,3 +4708,11 @@ in EAX, format string address, one value).
 | `0x43834` | EAX:ef_addr32,EDX:ef_addr32 | none | 4bf1c@4c051 | Draw the extent markers for list type 0xe. |
 | `0x439a4` | EAX:ef_addr32,EDX:ef_addr32 | none | 4bf1c@4c067 | Draw the extent markers for list type 0x17. |
 | `0x43c84` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@45676,4bf1c@4bff9 | Draw the extent markers for list type 0xf. |
+
+## colour_tables (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xba9c4` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key. |
+| `0xbaa4c` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key (identical copy). |
+| `0xbaad4` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key (identical copy). |

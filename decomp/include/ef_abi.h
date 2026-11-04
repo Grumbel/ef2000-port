@@ -4117,4 +4117,9 @@ void draw_extent_markers_43834(ef_addr32 head, ef_addr32 holder);
 void draw_extent_markers_439a4(ef_addr32 head, ef_addr32 holder);
 void draw_extent_markers_43c84(ef_addr32 head, ef_addr32 holder);
 
+/* colour_tables.c */
+void fill_colour_record_ba9c4(ef_addr32 rec, uint8_t key);
+void fill_colour_record_baa4c(ef_addr32 rec, uint8_t key);
+void fill_colour_record_baad4(ef_addr32 rec, uint8_t key);
+
 #endif
