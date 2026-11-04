@@ -4818,4 +4818,6 @@ void draw_prop_text_15a14(uint32_t color, int32_t x, int32_t y, uint32_t str);
 
 void show_splash_c90e0(void);
 
+void draw_planar_sprite_cdd18(uint32_t dst, uint32_t src, uint32_t xmin, uint32_t xmax, uint32_t ymin, uint32_t ymax);
+
 #endif

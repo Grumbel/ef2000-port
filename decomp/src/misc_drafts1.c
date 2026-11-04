@@ -4113,3 +4113,31 @@ void show_splash_c90e0(void)
     guest_fn_e9a24(0x2d0u, 0x00425cbcu, 0x00419600u);
     guest_fn_c39ac();
 }
+
+/* 0xcdd18, 230 bytes. Plot a four-plane sprite (width 0x4201a0, height 0x4201a4) read from SRC into the frame buffer at DST: pass P (0..3) writes the column P + 4 * i of every row whose index lies in [YMIN, YMAX] when that column lies in [XMIN, XMAX], skipping zero source bytes; the source keeps advancing from pass to pass. Registers EAX/EDX/EBX/ECX plus two stack words (ret 8). */
+void draw_planar_sprite_cdd18(uint32_t dst, uint32_t src, uint32_t xmin, uint32_t xmax, uint32_t ymin, uint32_t ymax)
+{
+    int32_t pass;
+    for (pass = 0; pass < 4; pass++) {
+        uint32_t row_ptr = dst + (uint32_t)pass;
+        int32_t row;
+        int32_t height = EF_S32(0x004201a4u);
+        if (height <= 0)
+            continue;
+        for (row = 0; row < height; row++) {
+            if (!((int32_t)(int16_t)ymin > row || (int32_t)(int16_t)ymax < row)) {
+                int32_t width = EF_S32(0x004201a0u);
+                int32_t i;
+                int32_t x = pass;
+                for (i = 0; i < width; i++, x += 4) {
+                    uint8_t c = EF_U8(src + (uint32_t)i);
+                    if (c != 0u && x >= (int32_t)(int16_t)xmin && x <= (int32_t)(int16_t)xmax)
+                        EF_U8(row_ptr + (uint32_t)i * 4u) = c;
+                }
+            }
+            src += EF_U32(0x004201a0u);
+            row_ptr += EF_U32(0x001631f4u);
+            height = EF_S32(0x004201a4u);
+        }
+    }
+}
