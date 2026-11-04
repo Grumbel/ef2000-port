@@ -4397,3 +4397,15 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xcac4c` | EAX:ef_addr32 | none | b0f5c@b12e5 | Add a random amount (mod 35 for kinds 0x35/0x37, mod 10 for elite records, else mod 5) to every sub-entry counter below  |
+
+## game_helpers114 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbcda0` | EAX:ef_addr32 | AL:uint8_t | bcf44@bd152 | Count the ready sub-entries of an object (see bcc2c); types 0xb/0x56 also clear the flag at +0x36. |
+
+## game_helpers115 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb0cfc` | EAX:ef_addr32,DX:int16_t,BL:uint8_t,CX:int16_t | none | b0f5c@b12c2 | Shuffle pass over a word array: for each iteration pick two random positions and swap them with the xor trick. |

@@ -3882,4 +3882,10 @@ void refill_object_cell_c09e4(ef_addr32 object, ef_addr32 list);
 /* game_helpers113.c */
 void recharge_sub_entries_cac4c(ef_addr32 list);
 
+/* game_helpers114.c */
+uint8_t count_ready_entries_bcda0(ef_addr32 obj);
+
+/* game_helpers115.c */
+void shuffle_words_b0cfc(ef_addr32 array, int16_t n, uint8_t start, int16_t limit);
+
 #endif

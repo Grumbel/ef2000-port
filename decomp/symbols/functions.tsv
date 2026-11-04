@@ -2462,7 +2462,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b0b00	306			unknown	unclassified	unverified		
 0x000b0c34	102			unknown	unclassified	unverified		
 0x000b0c9c	95			unknown	unclassified	unverified		
-0x000b0cfc	245			unknown	unclassified	unverified		
+0x000b0cfc	245	shuffle_words_b0cfc	game_helpers115	compiles	game	confirmed	decomp/tests/0x000b0cfc.json	docs/compiler-abi.md; Shuffle pass over a word array: for each iteration pick two random positions and swap them with the xor trick.; callers b0f5c@b12c2; guest pending
 0x000b0df4	359			unknown	unclassified	unverified		
 0x000b0f5c	1888	initialize_global_node_state	unk_nodes	typed	game	confirmed		docs/compiler-abi.md; zero inputs, all GPRs except EAX preserved, EAX=0, DS-to-ES movsd; callers 0xbab4/0xc0f6
 0x000b16c0	64	free_entry_array_b16c0	list_helpers	compiles	game	confirmed	decomp/tests/0x000b16c0.json	docs/compiler-abi.md; Free a record with 10-byte entries (count at +5, array at +6).; callers bed1c@bee8f,bf444@bf7f7,bf81c@bf963; guest pending
@@ -2651,7 +2651,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bcc04	38	map_code_bcc04	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcc04.json	docs/compiler-abi.md; Map code: 0x31 -> 0x37, 0x49 -> 0x4b, 0x0b/0x56 -> 0x0c, else 0.; callers bcc2c@bcd1b,bcda0@bce49; guest pending
 0x000bcc2c	332	object_has_ready_entry_bcc2c	game_helpers103	compiles	game	confirmed	decomp/tests/0x000bcc2c.json	docs/compiler-abi.md; Check that an object has a ready sub-entry (matching its type's code) and set the flag at +0x36; returns 1 or 0.; callers bd2f4@bd30b; guest pending
 0x000bcd78	38	map_code_bcd78	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcd78.json	docs/compiler-abi.md; Map code: 0x31 -> 0x27, 0x49 -> 0x12, 0x0b/0x56 -> 0x1b, else 0.; callers bcf44@bcfe7; guest pending
-0x000bcda0	246			unknown	unclassified	unverified		
+0x000bcda0	246	count_ready_entries_bcda0	game_helpers114	compiles	game	confirmed	decomp/tests/0x000bcda0.json	docs/compiler-abi.md; Count the ready sub-entries of an object (see bcc2c); types 0xb/0x56 also clear the flag at +0x36.; callers bcf44@bd152; guest pending
 0x000bce98	38	map_code_bce98	list_lookup	compiles	game	confirmed	decomp/tests/0x000bce98.json	docs/compiler-abi.md; Map code: 0x31 -> 2, 0x49 -> 0x3c, 0x0b/0x56 -> 0x0c, else 0.; callers bcf44@bd1a6; guest pending
 0x000bcec0	87	code_pair_matches_bcec0	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bcec0.json	docs/compiler-abi.md; ; callers bcf44@bd0c6,f90ac@f9234; guest pending
 0x000bcf18	13	record_flag_clear_d	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcf18.json	docs/compiler-abi.md; Byte +0xd is zero.; callers bcf44@bd0e4,bfb2c@bfb52,f90ac@f9252; guest pending
