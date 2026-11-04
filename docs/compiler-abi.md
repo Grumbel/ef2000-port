@@ -7629,3 +7629,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc99ac` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 98c1c@98d30,98c1c@98d4b,98c1c@98d66 | Fill a rectangle in colour COLOUR (EAX, byte) given in viewport units: X0 (EDX), Y0 (EBX), X1 (ECX) and Y1 (stack, ret 4 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x293b0` | EAX:uint32_t | EAX:uint32_t | 24f24@24f4a,294ec@295c9 | Choose which of the 19 three-byte slots (+0x198 of the unit UNIT, AX) to fire at the range D (double 0x1f7000): a slot q |

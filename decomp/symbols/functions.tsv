@@ -420,7 +420,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00028b80	854			unknown	unclassified	unverified		
 0x00028ed8	803			unknown	unclassified	unverified		
 0x000291fc	435			unknown	unclassified	unverified		
-0x000293b0	236			unknown	unclassified	unverified		
+0x000293b0	236	pick_weapon_slot_293b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000293b0.json	docs/compiler-abi.md; Choose which of the 19 three-byte slots (+0x198 of the unit UNIT, AX) to fire at the range D (double 0x1f7000): a slot q; callers 24f24@24f4a,294ec@295c9; guest pending
 0x0002949c	79	query_indexed_object_feature	record_callers	compiles	game	confirmed	decomp/tests/0x0002949c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000294ec	1025			unknown	unclassified	unverified		
 0x000298f0	491			unknown	unclassified	unverified		

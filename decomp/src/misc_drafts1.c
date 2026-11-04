@@ -12372,3 +12372,44 @@ void fill_scaled_rect_c99ac(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t 
     rx0 = (int32_t)truncate_9d72c((double)(int16_t)x0 * scale + xoff);
     fill_rect_clipped_cec00(colour & 0xffu, rx0, ry0, rx1, ry1);
 }
+
+/* 0x293b0, 236 bytes. Choose which of the 19 three-byte slots (+0x198 of the unit UNIT, AX) to fire at the range D (double 0x1f7000): a slot qualifies when its type byte (+0x19b, class record of 0x91 bytes at 0x12bc94) has class byte 1, a nonzero count word (+0x19c), a maximum range (dword +0x12bca3 times the double 0x18246c) above D and a minimum range (word +0x12bca1 times the same factor) below D; the qualifying slot with the largest dword wins and its index is returned. Without a winner return 0x13 when D is positive, the double 0x1f70a0 is below the double 0x182464 and the square of the double 0x1f7018 is below 20 squared, else 0x14. */
+uint32_t pick_weapon_slot_293b0(uint32_t unit)
+{
+    ef_addr32 obj = guest_fn_7489c((int32_t)(int16_t)unit);
+    uint32_t best = 0xffu;
+    int32_t bestv = 0;
+    uint32_t i;
+    double factor;
+    double range;
+    double a;
+    double b;
+    double c;
+    memcpy(&factor, ef_guest_memory_ptr(0x0018246cu), sizeof factor);
+    for (i = 0u; i < 0x13u; i++) {
+        ef_addr32 slot = obj + i * 3u;
+        uint32_t k = (uint32_t)((int32_t)EF_U32(slot + 0x198u) >> 24) * 0x91u;
+        int32_t maxr;
+        memcpy(&range, ef_guest_memory_ptr(0x001f7000u), sizeof range);
+        if (EF_U8(k + 0x0012bc94u) != 1u || EF_U16(slot + 0x19cu) == 0u)
+            continue;
+        maxr = (int32_t)EF_U32(k + 0x0012bca3u);
+        if (!((double)maxr * factor > range))
+            continue;
+        if (!((double)(int16_t)EF_U16(k + 0x0012bca1u) * factor < range))
+            continue;
+        if (bestv < maxr) {
+            bestv = maxr;
+            best = i;
+        }
+    }
+    if (best != 0xffu)
+        return best;
+    memcpy(&range, ef_guest_memory_ptr(0x001f7000u), sizeof range);
+    memcpy(&a, ef_guest_memory_ptr(0x001f70a0u), sizeof a);
+    memcpy(&b, ef_guest_memory_ptr(0x00182464u), sizeof b);
+    if (!(0.0 < range) || !(a < b))
+        return 0x14u;
+    memcpy(&c, ef_guest_memory_ptr(0x001f7018u), sizeof c);
+    return square_double_b3fd0(20.0) > square_double_b3fd0(c) ? 0x13u : 0x14u;
+}

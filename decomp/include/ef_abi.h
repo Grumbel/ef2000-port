@@ -5559,4 +5559,6 @@ void guest_fn_bc570_x(ef_addr32 obj, uint32_t arg, ef_addr32 state); /* 0xbc570 
 
 void fill_scaled_rect_c99ac(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1);
 
+uint32_t pick_weapon_slot_293b0(uint32_t unit);
+
 #endif
