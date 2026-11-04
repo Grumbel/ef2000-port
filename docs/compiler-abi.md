@@ -4290,3 +4290,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe80d0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | 7ab00@7ab7b,7ab00@7ab95,de864@de9c0 | _makepath: join drive, directory, name and extension into path, adding the missing separators and normalising '/' to '\\ |
+
+## game_helpers98 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe6684` | EAX:ef_addr32,DX:int16_t,BX:int16_t,ECX:uint32_t | EAX:uint32_t | e67a0@e67ce | Partition records lo..hi around the middle record's key (descending when the flag is set); returns the pivot's final ind |

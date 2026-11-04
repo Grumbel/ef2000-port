@@ -3807,4 +3807,8 @@ uint32_t name_hash_ebfd0(ef_addr32 text);
 /* game_helpers97.c */
 void make_path_e80d0(ef_addr32 path, ef_addr32 drive, ef_addr32 dir, ef_addr32 name, ef_addr32 ext);
 
+/* game_helpers98.c */
+uint32_t partition_records_e6684(ef_addr32 base, int16_t lo, int16_t hi, uint32_t descending);
+uint32_t guest_fn_cc6c0_x(uint32_t size, ef_addr32 tag); /* 0xcc6c0 cdecl, two stack args */
+
 #endif
