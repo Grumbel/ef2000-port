@@ -24181,3 +24181,50 @@ void advance_object_89e08(ef_addr32 obj)
 	p[2] += -s20 * v30 * d38;
 	scale_vector_to_ints_88d90(obj, t);
 }
+
+/* 0x8b8, 327 bytes. EAX = interrupt number word, EDX = register block. Fills the DOS/4GW real-mode call structure at 0x196170 from the block, issues int 21h AX=0x2511 and copies the resulting registers back into the block. */
+void guest_fn_8b8(uint32_t code, ef_addr32 block)
+{
+	uint32_t in[7];
+	uint32_t out[7];
+	uint8_t sregs[12];
+
+	EF_U16(0x196170u) = (uint16_t)code;
+	EF_U32(0x19617au) = EF_U32(block + 0x1c);
+	EF_U32(0x19617eu) = EF_U32(block + 0x14);
+	EF_U16(0x196172u) = EF_U16(block + 0x24);
+	EF_U16(0x196174u) = EF_U16(block + 0x22);
+	EF_U16(0x196176u) = EF_U16(block + 0x26);
+	EF_U16(0x196178u) = EF_U16(block + 0x28);
+	EF_U32(0x196148u) = 0x2511u;
+	EF_U32(0x19614cu) = EF_U32(block + 0x10);
+	EF_U32(0x196150u) = EF_U32(block + 0x18);
+	EF_U32(0x196154u) = 0x196170u;
+	EF_U32(0x196158u) = EF_U32(block + 4);
+	EF_U32(0x19615cu) = EF_U32(block);
+	segread_9be0d((uint32_t)(uintptr_t)sregs);
+	in[0] = EF_U32(0x196148u);
+	in[1] = EF_U32(0x19614cu);
+	in[2] = EF_U32(0x196150u);
+	in[3] = EF_U32(0x196154u);
+	in[4] = EF_U32(0x196158u);
+	in[5] = EF_U32(0x19615cu);
+	in[6] = 0u;
+	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+	EF_U32(0x196148u) = out[0];
+	EF_U32(0x19614cu) = out[1];
+	EF_U32(0x196150u) = out[2];
+	EF_U32(0x196154u) = out[3];
+	EF_U32(0x196158u) = out[4];
+	EF_U32(0x19615cu) = out[5];
+	EF_U32(block + 0x1c) = EF_U32(0x196148u);
+	EF_U32(block + 0x14) = EF_U32(0x19617eu);
+	EF_U32(block + 0x10) = EF_U32(0x19614cu);
+	EF_U32(block + 0x18) = EF_U32(0x196150u);
+	EF_U32(block + 4) = EF_U32(0x196158u);
+	EF_U32(block) = EF_U32(0x19615cu);
+	EF_U16(block + 0x24) = EF_U16(0x196172u);
+	EF_U16(block + 0x22) = EF_U16(0x196174u);
+	EF_U16(block + 0x26) = EF_U16(0x196176u);
+	EF_U16(block + 0x28) = EF_U16(0x196178u);
+}

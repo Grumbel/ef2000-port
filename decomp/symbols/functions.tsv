@@ -18,7 +18,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000007b4	104	release_hook_slot_7b4	dos_slots1	compiles	game	confirmed	decomp/tests/0x000007b4.json	docs/compiler-abi.md; Release hook slot idx (14-byte records at 0x1960c4): restore its vector, clear the pointer and push idx on the free list; callers cd554@cd5b5,e0a90@e0ae3,118290@1182aa; guest pending
 0x0000081c	98			unknown	unclassified	unverified		
 0x00000880	53	dos_call_350b_880	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000880.json	docs/compiler-abi.md; Issue DOS service 0x350b and return the result register.; callers 8b39c@8b3a6; guest pending
-0x000008b8	327			unknown	unclassified	unverified		
+0x000008b8	327	guest_fn_8b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000008b8.json	docs/compiler-abi.md; EAX = interrupt number word, EDX = register block. Fills the DOS/4GW real-mode call structure at 0x196170 from the block; callers cdf60@cdf82,cdfe8@ce003,ce02c@ce047; guest pending
 0x00000a00	95	request_returns_cf_a00	game_helpers31	compiles	game	confirmed	decomp/tests/0x00000a00.json	docs/compiler-abi.md; Issue request 0x2503 and report whether the returned code byte is 0xcf.; callers a60@a68,a60@a81; guest pending
 0x00000a60	57	find_pending_key_a60	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x00000a60.json	docs/compiler-abi.md; First key code with a pending request, else the default 0x3f.; callers b04@b06; guest pending
 0x00000a9c	60	dos_call_2505_a9c	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000a9c.json	docs/compiler-abi.md; Issue DOS service 0x2505 with two register values.; callers b04@b2e; guest pending

@@ -6579,4 +6579,7 @@ void update_control_scaling_10944c(void); /* 0x10944c */
 void advance_object_89e08(ef_addr32 obj);
 void advance_object_89e08(ef_addr32 obj); /* 0x89e08 */
 
+
+void guest_fn_8b8(uint32_t code, ef_addr32 block); /* 0x8b8 */
+
 #endif
