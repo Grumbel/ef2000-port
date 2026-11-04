@@ -3572,4 +3572,18 @@ void guest_fn_c99ac_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s
 void guest_fn_c9a98_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0xc9a98 EAX/EDX/EBX/ECX + stack */
 void guest_fn_c95ac_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0xc95ac EAX/EDX/EBX/ECX + stack */
 
+/* game_helpers75.c */
+void install_graphics_dispatch_c448b(void);
+void merge_pending_flags_f75e0(void);
+uint32_t switch_active_object_f1c58(ef_addr32 state);
+uint32_t set_channel_mode_10dc7f(int32_t channel, int32_t mode);
+void guest_fn_d1f88_x(void); /* 0xd1f88 */
+void guest_fn_abb00_x(uint32_t a); /* 0xabb00 EAX */
+void guest_fn_a4b08_x(void); /* 0xa4b08 */
+void guest_fn_11ce30_x(void); /* 0x11ce30 */
+void guest_fn_11d01c_x(void); /* 0x11d01c */
+void guest_fn_11cfe4_x(void); /* 0x11cfe4 */
+void guest_fn_11d135_x(void); /* 0x11d135 */
+void guest_fn_11d24e_x(void); /* 0x11d24e */
+
 #endif

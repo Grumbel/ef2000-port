@@ -3998,3 +3998,12 @@ in EAX, format string address, one value).
 | `0x941e4` | none | none | 95e58@96182 | Fold the view roll into the scene angles and request a refresh at the limits. |
 | `0x9586c` | none | none | 95e58@96d0e | Chase-camera distance control driven by the speed input bits. |
 | `0x9bba4` | none | none | none direct | Draw the HUD frame: three vertical rails and four border lines. |
+
+## game_helpers75 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc448b` | none | none | c8c34@c4555 | Install the graphics dispatch pointers (including the patched code words). |
+| `0xf75e0` | none | none | none direct | Merge the pending flag word into the active record, or clear it. |
+| `0xf1c58` | EAX:ef_addr32 | EAX:uint32_t | ac5f8@ac69b | Run the leave callback of the old object and the refresh steps of the new one. |
+| `0x10dc7f` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | ea470@ea48e | Switch the mode of one of 12 channels, running the per-channel transition. |

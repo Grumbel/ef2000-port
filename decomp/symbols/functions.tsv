@@ -2770,7 +2770,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c4310	99			unknown	unclassified	unverified		
 0x000c4389	10	run_e3c20	list_lookup	compiles	game	confirmed	decomp/tests/0x000c4389.json	docs/compiler-abi.md; Run 0xe3c20.; callers c5261@c5283; guest pending
 0x000c4412	121			unknown	unclassified	unverified		
-0x000c448b	191			unknown	unclassified	unverified		
+0x000c448b	191	install_graphics_dispatch_c448b	game_helpers75	compiles	game	confirmed	decomp/tests/0x000c448b.json	docs/compiler-abi.md; Install the graphics dispatch pointers (including the patched code words).; callers c8c34@c4555; guest pending
 0x000c4565	183			unknown	unclassified	unverified		
 0x000c4654	44			unknown	unclassified	unverified		
 0x000c4680	27			unknown	unclassified	unverified		
@@ -3596,7 +3596,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f1850	81	select_entry_kind_f1850	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000f1850.json	docs/compiler-abi.md; Copy an entry's name when its kind is 1 and publish the kind.; callers f18a4@f1912,f18a4@f1a13,f1a70@f1b94; guest pending
 0x000f18a4	457			unknown	unclassified	unverified		
 0x000f1a70	488			unknown	unclassified	unverified		
-0x000f1c58	249			unknown	unclassified	unverified		
+0x000f1c58	249	switch_active_object_f1c58	game_helpers75	compiles	game	confirmed	decomp/tests/0x000f1c58.json	docs/compiler-abi.md; Run the leave callback of the old object and the refresh steps of the new one.; callers ac5f8@ac69b; guest pending
 0x000f1d54	60	apply_selection_f1d54	game_helpers57	compiles	game	confirmed	decomp/tests/0x000f1d54.json	docs/compiler-abi.md; Apply the stored selection when the pending-input bit is set.; callers ac5f8@ac6f8; guest pending
 0x000f1d90	458			unknown	unclassified	unverified		
 0x000f1f5a	487			unknown	unclassified	unverified		
@@ -3671,7 +3671,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f5e6c	61	latch_words_f5e6c	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f5e6c.json	docs/compiler-abi.md; Latch six words and install the 0xf5eac handler.; callers f5484@f5688; guest pending
 0x000f6124	38	format_global_option_line	unk_parser	named	game	unverified		docs/compiler-abi.md; zero caller arguments, indirect format call [0x132a74], EDX saved; clobbers unresolved
 0x000f7518	98			unknown	unclassified	unverified		
-0x000f75e0	119			unknown	unclassified	unverified		
+0x000f75e0	119	merge_pending_flags_f75e0	game_helpers75	compiles	game	confirmed	decomp/tests/0x000f75e0.json	docs/compiler-abi.md; Merge the pending flag word into the active record, or clear it.; callers none direct; guest pending
 0x000f79b0	62	or_flag_mask_f79b0	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000f79b0.json	docs/compiler-abi.md; OR the mask at 0x46438c into the flag words.; callers none direct; guest pending
 0x000f8010	132	merge_flag_fields_f8010	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000f8010.json	docs/compiler-abi.md; Merge the two 2-bit fields of the mask at 0x46438c into the object flag bytes.; callers none direct; guest pending
 0x000f819c	171			unknown	unclassified	unverified		
@@ -3995,7 +3995,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010dbc1	76			unknown	unclassified	unverified		
 0x0010dc0d	16			unknown	unclassified	unverified		
 0x0010dc1d	30			unknown	unclassified	unverified		
-0x0010dc7f	133			unknown	unclassified	unverified		
+0x0010dc7f	133	set_channel_mode_10dc7f	game_helpers75	compiles	game	confirmed	decomp/tests/0x0010dc7f.json	docs/compiler-abi.md; Switch the mode of one of 12 channels, running the per-channel transition.; callers ea470@ea48e; guest pending
 0x0010ddf7	5	return_minus_one_10ddf7	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0010ddf7.json	docs/compiler-abi.md; Return -1.; callers ea4a7@ea4af; guest pending
 0x0010ddfc	47	count_matching_streams	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010ddfc.json	docs/compiler-abi.md; Count list entries (list at dword 0x485f9f) whose flags in +0xc match the mask; flush those with bit 0x10 in +0xd via 0x; callers 10f1bf@10f1e2; guest pending
 0x0010dfe0	12	field_10dfe0	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010dfe0.json	docs/compiler-abi.md; Dword +0x46c of the object pointed to by dword 0x120cc6.; callers eab44@eab47,eac48@eadfa; guest pending
