@@ -3920,3 +3920,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xa32e8` | AX:uint16_t | none | a33a4@a33d2 | Request the state matching the current limit, or a status string for a lookup. |
 | `0xd3c50` | none | none | none direct | Redraw when the tracked span is large enough and the two edge values differ by more than 0x800. |
+
+## game_helpers65 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdf65c` | none | AL:uint8_t | dfac8@dfb73,dfac8@dfbf6,dfac8@dfe68 | Latch the selected menu entry's geometry; returns 1 when an entry was latched. |
+| `0xe3ad0` | none | AL:uint8_t | 97dcc@97ee7 | Reload the halfword table one step at a time; returns whether more steps remain. |

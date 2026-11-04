@@ -3492,4 +3492,11 @@ void redraw_wide_span_d3c50(void);
 int32_t guest_fn_a312c_w(uint32_t a); /* 0xa312c EAX */
 void guest_fn_d3900_w(void); /* 0xd3900 */
 
+/* game_helpers65.c */
+uint8_t latch_menu_entry_df65c(void);
+uint8_t reload_halfword_table_e3ad0(void);
+void guest_fn_e393c_w(void); /* 0xe393c */
+int32_t guest_fn_e3908_w(int32_t a); /* 0xe3908 EAX */
+void guest_fn_c4654_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xc4654 EAX/EDX/EBX/ECX */
+
 #endif
