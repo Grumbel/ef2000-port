@@ -7146,3 +7146,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x110a08` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | none direct | Decode a column-compressed sprite from SRC (EAX, word stream) into DST (EDX) with row stride STRIDE (BX, signed): the fi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf3904` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | f3aa8@f3af0 | Draw a box outline from the signed 16-bit coordinates A0 (EAX), A1 (EDX), A2 (EBX) and A3 (ECX): after saving the screen |

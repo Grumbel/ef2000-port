@@ -10032,3 +10032,31 @@ void decode_column_sprite_110a08(ef_addr32 src, ef_addr32 dst, uint32_t stride)
         dst = (uint32_t)st + start;
     }
 }
+
+/* 0xf3904, 277 bytes. Draw a box outline from the signed 16-bit coordinates A0 (EAX), A1 (EDX), A2 (EBX) and A3 (ECX): after saving the screen block (0xdd870, plus 0xc386c while byte 0x4859de is set) four lines of colour 0 are drawn one pixel inside at A1+1/A3+1 by A0+1/A2+1, then four lines in the colour held in the high half of dword 0x161e1a on the outer rectangle, using the line routine 0xc8ccc; finally the block is redrawn (0xdd8dc, plus 0xdc250 while the flag is set). */
+void draw_shadow_box_f3904(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3)
+{
+    int32_t v0 = (int16_t)a0;
+    int32_t u0 = (int16_t)a1;
+    int32_t v1 = (int16_t)a2;
+    int32_t u1 = (int16_t)a3;
+    uint32_t c;
+    restore_saved_block_dd870();
+    if (EF_U8(0x004859deu) != 0u)
+        guest_fn_c386c();
+    guest_fn_c8ccc_x((uint32_t)(u0 + 1), (uint32_t)(v1 + 1), (uint32_t)(u0 + 1), (uint32_t)(v0 + 1), 0u);
+    guest_fn_c8ccc_x((uint32_t)(u1 + 1), (uint32_t)(v1 + 1), (uint32_t)(u0 + 1), (uint32_t)(v1 + 1), 0u);
+    guest_fn_c8ccc_x((uint32_t)(u1 + 1), (uint32_t)(v0 + 1), (uint32_t)(u1 + 1), (uint32_t)(v1 + 1), 0u);
+    guest_fn_c8ccc_x((uint32_t)(u0 + 1), (uint32_t)(v0 + 1), (uint32_t)(u1 + 1), (uint32_t)(v0 + 1), 0u);
+    c = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
+    guest_fn_c8ccc_x((uint32_t)u0, (uint32_t)v1, (uint32_t)u0, (uint32_t)v0, c);
+    c = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
+    guest_fn_c8ccc_x((uint32_t)u1, (uint32_t)v1, (uint32_t)u0, (uint32_t)v1, c);
+    c = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
+    guest_fn_c8ccc_x((uint32_t)u1, (uint32_t)v0, (uint32_t)u1, (uint32_t)v1, c);
+    c = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
+    guest_fn_c8ccc_x((uint32_t)u0, (uint32_t)v0, (uint32_t)u1, (uint32_t)v0, c);
+    save_and_draw_block_dd8dc();
+    if (EF_U8(0x004859deu) != 0u)
+        guest_fn_dc250();
+}

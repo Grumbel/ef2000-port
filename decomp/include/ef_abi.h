@@ -5318,4 +5318,6 @@ void apply_pending_notices_6563c(void);
 
 void decode_column_sprite_110a08(ef_addr32 src, ef_addr32 dst, uint32_t stride);
 
+void draw_shadow_box_f3904(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3);
+
 #endif
