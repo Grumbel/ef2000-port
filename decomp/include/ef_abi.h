@@ -4893,4 +4893,7 @@ void dump_page_header_9ab6c(uint32_t stream);
 void init_roster_state_77a8(uint32_t n);
 uint32_t guest_fn_7780_x(uint32_t count, uint32_t size); /* 0x7780 EAX/EDX -> EAX */
 
+uint32_t traced_lookup_102028(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t p1, uint32_t p2);
+uint32_t guest_fn_103f04_x(uint32_t a, uint32_t b); /* 0x103f04 cdecl, 2 stack arguments */
+
 #endif

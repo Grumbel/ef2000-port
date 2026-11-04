@@ -4984,3 +4984,29 @@ void init_roster_state_77a8(uint32_t n)
     EF_U32(0x001972b4u) = 0xc05b8000u;
     EF_U8(0x001972edu) = 3u;
 }
+
+/* 0x102028, 283 bytes. Traced lookup (cdecl, two stack arguments): calls 0x103f04 and, with tracing on (0x17d2c8 == 1), logs the request (format 0x1939e4) and then either the six fields of the found record (name at +0x80, the pointer, the signed words +0x100..+0x106; formats 0x193a00..0x193a50) or a failure line (0x193a60). Returns the record. */
+uint32_t traced_lookup_102028(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t p1, uint32_t p2)
+{
+    uint32_t r;
+    uint32_t s;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (EF_U32(0x0017d2c8u) == 1u)
+        guest_fn_bc400(EF_U32(0x004dd620u), 0x001939e4u, p1, p2);
+    r = guest_fn_103f04_x(p1, p2);
+    if (r != 0u) {
+        if (EF_U32(0x0017d2c8u) == 1u) {
+            s = EF_U32(0x004dd620u);
+            guest_fn_bc400(s, 0x00193a00u, p1 + 0x80u);
+            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a10u, p1);
+            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a20u, (int32_t)(int16_t)EF_U16(p1 + 0x100u));
+            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a30u, (int32_t)(int16_t)EF_U16(p1 + 0x102u));
+            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a40u, (int32_t)(int16_t)EF_U16(p1 + 0x104u));
+            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a50u, (int32_t)(int16_t)EF_U16(p1 + 0x106u));
+        }
+        return r;
+    }
+    if (EF_U32(0x0017d2c8u) == 1u)
+        guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a60u, r);
+    return r;
+}
