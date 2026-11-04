@@ -1506,7 +1506,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007e7e0	187	wait_round_clear_7e7e0	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e7e0.json	docs/compiler-abi.md; Wait for the pending round to clear, then mark this player ready.; callers 8bb50@8bc3e; guest pending
 0x0007e89c	33	scene_slot_valid	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007e89c.json	docs/compiler-abi.md; slot=high word 0x19bb5c; valid unless 0xff and 0x2c358 nonzero; callers 7e8c0@7e953,7e8c0@7eb1d; guest pending
 0x0007e8c0	1035			unknown	unclassified	unverified		
-0x0007eccc	216			unknown	unclassified	unverified		
+0x0007eccc	216	wait_target_count_7eccc	game_helpers46	compiles	game	confirmed	decomp/tests/0x0007eccc.json	docs/compiler-abi.md; Wait until the counter at 0x127da4 reaches the target at 0x12583a.; callers 8bb50@8bc0b; guest pending
 0x0007eda4	246			unknown	unclassified	unverified		
 0x0007eea0	25	set_control_mode_a	runtime_control	compiles	game	confirmed	decomp/tests/0x0007eea0.json	docs/compiler-abi.md; AL gate at 0x15bac6; selected zero or AL stored 0x12b070, returned zero-extended EAX; original guest replacement unverified
 0x0007eebc	8	get_flag_7eebc	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0007eebc.json	docs/compiler-abi.md; ; callers 3dd30@3dd88; guest pending
@@ -1526,7 +1526,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007fe8c	34	ui_release_all_controls	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe8c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007feb0	69			unknown	unclassified	unverified		
 0x0007ff0c	84			unknown	unclassified	unverified		
-0x00080058	192			unknown	unclassified	unverified		
+0x00080058	192	init_sound_bank_80058	game_helpers46	compiles	game	confirmed	decomp/tests/0x00080058.json	docs/compiler-abi.md; Load the first sound bank once and register its release hook.; callers 3ea0c@3ed58; guest pending
 0x00080120	105	reset_menu_80120	unit_flags	compiles	game	confirmed	decomp/tests/0x00080120.json	docs/compiler-abi.md; ; callers 3dd30@3e881,3ea0c@3eed4,7feb0@7feee; guest pending
 0x0008018c	87	show_menu_value_8018c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0008018c.json	docs/compiler-abi.md; ; callers 3122c@314fe,94d08@94f51; guest pending
 0x000801e4	198			unknown	unclassified	unverified		
@@ -1550,7 +1550,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000810ec	8	get_flag_810ec	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000810ec.json	docs/compiler-abi.md; ; callers 827b4@827b7; guest pending
 0x000810f4	25	set_control_mode_c	runtime_control	compiles	game	confirmed	decomp/tests/0x000810f4.json	docs/compiler-abi.md; AL gate at 0x15bac7; selected zero or AL stored 0x12b105, returned zero-extended EAX; original guest replacement unverified
 0x00081110	74			unknown	unclassified	unverified		
-0x00081230	214			unknown	unclassified	unverified		
+0x00081230	214	init_sound_bank_81230	game_helpers46	compiles	game	confirmed	decomp/tests/0x00081230.json	docs/compiler-abi.md; Load the second sound bank once, create its voice and register its release hook.; callers 3ea0c@3ed46; guest pending
 0x00081308	74	prepare_block_81308	unit_flags	compiles	game	confirmed	decomp/tests/0x00081308.json	docs/compiler-abi.md; Prepare the 0x28-byte block at 0x1fc980; returns its descriptor or 0.; callers 77c90@77e39; guest pending
 0x00081354	63	find_named_entry_81354	game_helpers20	compiles	game	confirmed	decomp/tests/0x00081354.json	docs/compiler-abi.md; Find the 8-byte table entry whose name equals key; return its payload address or 0.; callers 8c49c@8c50b,8fcec@8fd50; guest pending
 0x00081394	179			unknown	unclassified	unverified		
@@ -1567,7 +1567,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082000	36	make_record_17_82000	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00082000.json	docs/compiler-abi.md; Build a 17-byte record from the arguments.; callers 4ae5c@4afbe; guest pending
 0x00082024	37	make_record_16_82024	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00082024.json	docs/compiler-abi.md; Build a 16-byte record from the arguments.; callers 4ae5c@4afed; guest pending
 0x0008204c	18			unknown	unclassified	unverified		
-0x00082060	125			unknown	unclassified	unverified		
+0x00082060	125	alloc_grid_table_82060	game_helpers46	compiles	game	confirmed	decomp/tests/0x00082060.json	docs/compiler-abi.md; Allocate the grid table of n rows of 17 bytes and mark every cell empty (0xff).; callers 49228@495a0; guest pending
 0x00082168	142	claim_slot_82168	game_helpers27	compiles	game	confirmed	decomp/tests/0x00082168.json	docs/compiler-abi.md; Claim the first free (0xff) slot in a row of eight and link both tables.; callers 4a210@4a818,4aa4c@4ae37; guest pending
 0x000821f8	70	find_row_slot_821f8	game_helpers20	compiles	game	confirmed	decomp/tests/0x000821f8.json	docs/compiler-abi.md; Index of the last 16-bit slot of row b (17 bytes per row) equal to a.; callers 426a4@42758; guest pending
 0x00082478	628			unknown	unclassified	unverified		
@@ -1587,13 +1587,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082dd0	45	compact_ui_fragment	ui_operations	compiles	game	confirmed	decomp/tests/0x00082dd0.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082e00	61	find_matching_ui_fragment	ui_operations	compiles	game	confirmed	decomp/tests/0x00082e00.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082e40	483			unknown	unclassified	unverified		
-0x000830b8	219			unknown	unclassified	unverified		
+0x000830b8	219	rewrite_settings_830b8	game_helpers46	compiles	game	confirmed	decomp/tests/0x000830b8.json	docs/compiler-abi.md; Rewrite the settings file with the status text lines appended.; callers 19a80@19adb,84aec@84aec; guest pending
 0x000831a4	89	store_scaled_vector_831a4	game_helpers20	compiles	game	confirmed	decomp/tests/0x000831a4.json	docs/compiler-abi.md; Store a vector, halved until every component fits in 16 bits.; callers 83a40@83aac; guest pending
 0x00083200	145			unknown	unclassified	unverified		
 0x00083294	34	ui_point_near_reference	ui_secondary	compiles	game	confirmed	decomp/tests/0x00083294.json	docs/compiler-abi.md; host model; guest differential pending
 0x000832b8	232			unknown	unclassified	unverified		
 0x000833a0	131	muldiv_saturate_833a0	game_helpers27	compiles	game	confirmed	decomp/tests/0x000833a0.json	docs/compiler-abi.md; Compute a*b/c, saturating to +/-0x7fffffff-ish when the product overflows.; callers 83424@834c3,83424@834d0,834e8@83527; guest pending
-0x00083424	194			unknown	unclassified	unverified		
+0x00083424	194	project_point_83424	game_helpers46	compiles	game	confirmed	decomp/tests/0x00083424.json	docs/compiler-abi.md; Project a point through the view matrix; false when it is behind the viewer.; callers 834e8@8357c,834e8@835b4; guest pending
 0x000834e8	541			unknown	unclassified	unverified		
 0x00083708	42	compose_ui_relative_vector	ui_secondary	compiles	game	confirmed	decomp/tests/0x00083708.json	docs/compiler-abi.md; host model; guest differential pending
 0x00083734	35	scale_vector_down_16	scene_helpers	compiles	game	confirmed	decomp/tests/0x00083734.json	docs/compiler-abi.md; 0xe99b8 then three dwords >>= 16 (arithmetic); callers 83a40@83a78; guest pending

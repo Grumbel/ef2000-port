@@ -3429,3 +3429,14 @@ in EAX, format string address, one value).
 | `0x7e5a0` | none | AL:uint8_t | 7e758@7e75a | Mark unowned players as ours and resend until all players answer or time runs out. |
 | `0x7e758` | none | AL:uint8_t | 7e8c0@7e9d6 | Claim the players, then send command 0x1d until the pending counter drains. |
 | `0x7e7e0` | none | none | 8bb50@8bc3e | Wait for the pending round to clear, then mark this player ready. |
+
+## game_helpers46 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7eccc` | none | none | 8bb50@8bc0b | Wait until the counter at 0x127da4 reaches the target at 0x12583a. |
+| `0x80058` | none | none | 3ea0c@3ed58 | Load the first sound bank once and register its release hook. |
+| `0x81230` | none | none | 3ea0c@3ed46 | Load the second sound bank once, create its voice and register its release hook. |
+| `0x82060` | AX:int16_t | none | 49228@495a0 | Allocate the grid table of n rows of 17 bytes and mark every cell empty (0xff). |
+| `0x830b8` | none | none | 19a80@19adb,84aec@84aec | Rewrite the settings file with the status text lines appended. |
+| `0x83424` | AX:int16_t,DX:int16_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | AL:uint8_t | 834e8@8357c,834e8@835b4 | Project a point through the view matrix; false when it is behind the viewer. |

@@ -2767,4 +2767,18 @@ void guest_fn_9c980_sfx(ef_addr32 buffer, ef_addr32 suffix); /* 0x9c980 EAX/EDX 
 void guest_fn_e1e6c_3(uint32_t a, uint32_t b, uint32_t c); /* 0xe1e6c EAX/EDX/EBX */
 uint32_t guest_fn_7e670(void); /* 0x7e670 -> AL */
 
+/* game_helpers46.c */
+void wait_target_count_7eccc(void);
+void init_sound_bank_80058(void);
+void init_sound_bank_81230(void);
+void alloc_grid_table_82060(int16_t rows);
+void rewrite_settings_830b8(void);
+uint8_t project_point_83424(int16_t x, int16_t y, uint32_t scale, ef_addr32 out_x, ef_addr32 out_y);
+void guest_fn_7eda4(void); /* 0x7eda4 */
+uint32_t guest_fn_e94ec(ef_addr32 path, uint32_t flags); /* 0xe94ec EAX/EDX -> AL */
+void guest_fn_e93dc(uint32_t a, uint32_t b); /* 0xe93dc EAX/EDX */
+void guest_fn_d6f90(uint32_t a, uint32_t b, uint32_t c); /* 0xd6f90 EAX/EDX/ECX */
+uint32_t guest_fn_d7764_7(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s1, uint32_t s2, uint32_t s3); /* 0xd7764 EAX/EDX/EBX/ECX + stack */
+void guest_fn_d7758(uint32_t a, uint32_t b); /* 0xd7758 EAX/EDX */
+
 #endif
