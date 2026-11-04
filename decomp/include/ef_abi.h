@@ -3933,4 +3933,8 @@ ef_addr32 stream_fgets_11580e(ef_addr32 buf, int32_t n, ef_addr32 stream);
 void refresh_weapon_widgets_69b70(void);
 uint32_t count_group_entries_faafc(ef_addr32 group);
 
+/* game_helpers123.c */
+void log_palette_d1894(ef_addr32 source, int16_t mode);
+void update_frame_slot_b5800(ef_addr32 owner, ef_addr32 obj, int16_t need);
+
 #endif

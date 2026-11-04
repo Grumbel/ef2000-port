@@ -4488,3 +4488,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x69b70` | none | none | 69fac@69fe3 | Walk the widget chain starting at the named widget at 0x186320 under the object at 0x186314; for each entry whose weapon |
 | `0xfaafc` | EAX:ef_addr32 | EAX:uint32_t | fbad8@fbc73 | Count the active elite 0x15-byte entries of a group whose code is not in the set; the original then always returns 1. |
+
+## game_helpers123 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd1894` | EAX:ef_addr32,DX:int16_t | none | d1c54@d1c83 | Log a 256-entry palette: header text, dword 0x300, then three values per entry (a fixed 10/20/30 when mode == 2, otherwi |
+| `0xb5800` | EAX:ef_addr32,EDX:ef_addr32,BX:int16_t | none | b7d4c@b800e,b80ac@b81be,b80ac@b8487 | Recompute the frame index of the current 25-byte slot (object+0x20 table, 1-based index at +0x1c) and then find a free s |

@@ -2576,7 +2576,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b5640	142			unknown	unclassified	unverified		
 0x000b56d0	57	frame_index_b56d0	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000b56d0.json	docs/compiler-abi.md; Frame index scaled by the per-row count: (column * 60 + row) / divisor.; callers b5800@b5831; guest pending
 0x000b570c	242	fill_current_table_entry_b570c	game_helpers100	compiles	game	confirmed	decomp/tests/0x000b570c.json	docs/compiler-abi.md; Fill the current (last added) 0x19-byte table entry of an object from a source record and a flag byte.; callers b7d4c@b7f8f,b80ac@b8167,b80ac@b842c; guest pending
-0x000b5800	165			unknown	unclassified	unverified		
+0x000b5800	165	update_frame_slot_b5800	game_helpers123	compiles	game	confirmed	decomp/tests/0x000b5800.json	docs/compiler-abi.md; Recompute the frame index of the current 25-byte slot (object+0x20 table, 1-based index at +0x1c) and then find a free s; callers b7d4c@b800e,b80ac@b81be,b80ac@b8487; guest pending
 0x000b58a8	253	find_free_slot_run_b58a8	game_helpers118	compiles	game	confirmed	decomp/tests/0x000b58a8.json	docs/compiler-abi.md; Search the object's slot table (9-byte entries, count at +0x48, flag byte at +3 meaning used) from start for a slot whos; callers 4fa64@4fb14,b5640@b565a,b5800@b587b; guest pending
 0x000b59a8	995			unknown	unclassified	unverified		
 0x000b5d8c	579			unknown	unclassified	unverified		
@@ -3014,7 +3014,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d17bc	19	call_a7990_420944	code_predicates	compiles	game	confirmed	decomp/tests/0x000d17bc.json	docs/compiler-abi.md; 0xa7990(dword 0x420944), callee pops 4.; callers d1c54@d1c92; guest pending
 0x000d17d0	144	emit_display_list_d17d0	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000d17d0.json	docs/compiler-abi.md; Emit the fixed command sequence of the 0x18f6e4 display list.; callers d1c54@d1c7c; guest pending
 0x000d1860	52	write_log_word_swapped_d1860	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d1860.json	docs/compiler-abi.md; Write a 16-bit word to the log in big-endian byte order.; callers d17d0@d17ec,d17d0@d17f9,d17d0@d1800; guest pending
-0x000d1894	142			unknown	unclassified	unverified		
+0x000d1894	142	log_palette_d1894	game_helpers123	compiles	game	confirmed	decomp/tests/0x000d1894.json	docs/compiler-abi.md; Log a 256-entry palette: header text, dword 0x300, then three values per entry (a fixed 10/20/30 when mode == 2, otherwi; callers d1c54@d1c83; guest pending
 0x000d1924	197			unknown	unclassified	unverified		
 0x000d19ec	272			unknown	unclassified	unverified		
 0x000d1afc	237			unknown	unclassified	unverified		
