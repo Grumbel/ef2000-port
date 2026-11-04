@@ -5163,4 +5163,6 @@ void guest_fn_c552e_x(uint32_t esi); /* 0xc552e ESI = slot index */
 double scale_by_table_ebee4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, int32_t n);
 void compute_turn_rate_6eaf4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg);
 
+double estimate_coefficient_6c1f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x);
+
 #endif

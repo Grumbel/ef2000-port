@@ -7977,3 +7977,23 @@ void compute_turn_rate_6eaf4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
     EF_D(0x001f7080u) = EF_D(0x001f7090u) * arg * EF_D(0x001866ecu) * EF_D(0x001f70b8u);
 #undef EF_D
 }
+
+/* 0x6c1f0, 178 bytes. Stack (ret 8): rational estimate of a coefficient from the double X. R = (X + k) / (k - X) * 1.225 with k = double 0x18641c (X is forced to 0 first when it is positive); when X is below the limit 0x186424 the polynomial term u*u*c*0x186444 with u = -X * 0x18642c + 0x186434 and c = 0x18643c is added, and a result below c is replaced by the constant 0.0055. Returns R in ST0. */
+double estimate_coefficient_6c1f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x)
+{
+#define EF_D(a) (*(double *)ef_guest_memory_ptr(a))
+    double r, u, c;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (0.0 < x)
+        x = 0.0;
+    r = (x + EF_D(0x0018641cu)) / (EF_D(0x0018641cu) - x) * 1.225;
+    if (x < EF_D(0x00186424u)) {
+        u = -x * EF_D(0x0018642cu) + EF_D(0x00186434u);
+        c = EF_D(0x0018643cu);
+        r = r + u * (u * c) * EF_D(0x00186444u);
+        if (!(r >= c))
+            r = 0.0055;
+    }
+    return r;
+#undef EF_D
+}

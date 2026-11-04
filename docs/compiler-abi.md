@@ -6720,3 +6720,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xebee4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:int32_t | EAX:double | 9d55d@9d704,ebea3@ebec1,11d3f0@11d52a | Stack (ret 0xc): scale the double X by 2^N-style factors from a table. The special values at 0x195bfc / 0x195c04 are fir |
 | `0x6eaf4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | none | 6d948@6e09a,6ebe0@6ef63,6ef74@6f127 | Stack (ret 8): clamp the double at 0x1f7110 to +-the limit at 0x1f7098, take its difference to the current object's fiel |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6c1f0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | EAX:double | 28b80@28c1f,2ccf0@2cd1d,89c64@89daa | Stack (ret 8): rational estimate of a coefficient from the double X. R = (X + k) / (k - X) * 1.2 with k = double 0x18641 |

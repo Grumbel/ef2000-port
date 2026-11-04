@@ -1298,7 +1298,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006bd88	157	update_camera_state_6bd88	float_helpers3	compiles	game	confirmed	decomp/tests/0x0006bd88.json	docs/compiler-abi.md; Copy the camera position and recompute the closing-speed state.; callers 6b6c8@6bbb8; guest pending
 0x0006be28	190			unknown	unclassified	unverified		
 0x0006bee8	773			unknown	unclassified	unverified		
-0x0006c1f0	178			unknown	unclassified	unverified		
+0x0006c1f0	178	estimate_coefficient_6c1f0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006c1f0.json	docs/compiler-abi.md; Stack (ret 8): rational estimate of a coefficient from the double X. R = (X + k) / (k - X) * 1.2 with k = double 0x18641; callers 28b80@28c1f,2ccf0@2cd1d,89c64@89daa; guest pending
 0x0006c2a4	297			unknown	unclassified	unverified		
 0x0006c3d0	99	notify_player_unit_6c3d0	unit_flags	compiles	game	confirmed	decomp/tests/0x0006c3d0.json	docs/compiler-abi.md; ; callers 6b6c8@6bbbd; guest pending
 0x0006c488	647			unknown	unclassified	unverified		
