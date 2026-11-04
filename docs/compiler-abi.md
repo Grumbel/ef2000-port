@@ -9609,3 +9609,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7fcdc` | EAX:uint32_t,EDX:ef_addr32 | EAX:uint32_t | 74970@74b35 | Starts positional sound effect INDEX if the source is * audible. ORIGINAL BUG: the source position pointer is whatever E |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8a1dc` | EAX:ef_addr32 | none | 8a318@8a5ad | Updates the best (smallest-angle) target direction for * an object that has a detail block, using its three detail field |

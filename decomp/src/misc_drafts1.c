@@ -23994,3 +23994,32 @@ uint32_t start_positional_sound_7fcdc(uint32_t eax, ef_addr32 edx)
 	set_dword_d7800(record, (uint32_t)sc);
 	return 0;
 }
+
+/* 0x8a1dc, 313 bytes. Updates the best (smallest-angle) target direction for
+ * an object that has a detail block, using its three detail fields. */
+void update_best_direction_8a1dc(ef_addr32 obj)
+{
+	double d50, d58, d60, limit, c50, len;
+	double v0[3], v18[3], v30[3];
+	uint64_t bits = 0x3ee24d15211975d4ull;
+
+	if (EF_U32(obj + 0x30u) == 0)
+		return;
+	memcpy(&limit, &bits, sizeof limit);
+	copy_detail_fields_88cd0(obj, (ef_addr32)(uintptr_t)&d50, (ef_addr32)(uintptr_t)&d58, (ef_addr32)(uintptr_t)&d60);
+	c50 = cos_b45a2(d50);
+	len = vector_length_b4364(0x1fcfa0u) / md_rd_f64(0x1fcf48u);
+	v30[0] = len * d60 * cos_b45a2(d58) * c50 + md_rd_f64(0x1fcf88u);
+	len = vector_length_b4364(0x1fcfa0u) / md_rd_f64(0x1fcf48u);
+	v30[1] = len * d60 * sin_b45ac(d58) * c50 + md_rd_f64(0x1fcf90u);
+	len = vector_length_b4364(0x1fcfa0u) / md_rd_f64(0x1fcf48u);
+	v30[2] = len * d60 * (-sin_b45ac(d50)) + md_rd_f64(0x1fcf98u);
+	subtract_scene_vectors((ef_addr32)(uintptr_t)v0, 0x1fcf58u, (ef_addr32)(uintptr_t)v30);
+	if (normalize_vector_b4424((ef_addr32)(uintptr_t)v18, (ef_addr32)(uintptr_t)v0) != 0)
+		limit = angle_between_88ff8(0x1fcfd8u, (ef_addr32)(uintptr_t)v18);
+	if (limit < md_rd_f64(0x1fcee8u)) {
+		copy_24_bytes(0x1fcfa0u, (ef_addr32)(uintptr_t)v0);
+		copy_24_bytes(0x1fcf30u, (ef_addr32)(uintptr_t)v18);
+		md_wr_f64(0x1fcc98u, limit);
+	}
+}

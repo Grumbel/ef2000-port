@@ -6564,4 +6564,7 @@ void offset_project_86e44(ef_addr32 outp); /* 0x86e44 */
 uint32_t start_positional_sound_7fcdc(uint32_t eax, ef_addr32 edx);
 uint32_t start_positional_sound_7fcdc(uint32_t eax, ef_addr32 edx); /* 0x7fcdc */
 
+void update_best_direction_8a1dc(ef_addr32 obj);
+void update_best_direction_8a1dc(ef_addr32 obj); /* 0x8a1dc */
+
 #endif
