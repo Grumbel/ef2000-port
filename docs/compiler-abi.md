@@ -6617,3 +6617,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x2c454` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 71fc@7214,7308@7325,7308@7343 | Search the 0xca-byte object records (count word 0x19bb5c, base dword 0x19bb58) for the match nearest POS (distance from  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe378c` | EAX:uint32_t | AL:uint8_t | 97dcc@97eb0 | Open the resource file NAME (handle stored in dword 0x15f8fc), read its count word into 0x15f900 and, when non-zero, all |

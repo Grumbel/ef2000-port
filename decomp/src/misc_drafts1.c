@@ -7475,3 +7475,29 @@ uint32_t find_nearest_object_2c454(uint32_t pos, uint32_t id, uint32_t side, uin
     }
     return result;
 }
+
+/* 0xe378c, 220 bytes. Open the resource file NAME (handle stored in dword 0x15f8fc), read its count word into 0x15f900 and, when non-zero, allocate and fill with 0xff two tables (0x7d0 and 0xfa0 bytes, pointers in 0x429224/0x429228), read two dwords (the second wins), seek to it, load the string table (0xe3868) and seek to offset 10. Returns 1 on success, 0 when the open fails or the count is zero (the handle is then closed and reset to -1). */
+uint8_t open_resource_file_e378c(uint32_t name)
+{
+    uint32_t pos[2];
+    uint32_t h = guest_fn_a7900(name);
+    EF_U32(0x0015f8fcu) = h;
+    if (h == 0xffffffffu)
+        return 0u;
+    read_resource_e3170(0x0015f900u, 2u);
+    if (EF_U16(0x0015f900u) == 0u) {
+        guest_fn_a7990(EF_U32(0x0015f8fcu));
+        EF_U32(0x0015f8fcu) = 0xffffffffu;
+        return 0u;
+    }
+    EF_U32(0x00429224u) = arena_take_e29e8(0x7d0u);
+    fill_bytes_b3fb0(EF_U32(0x00429224u), 0xffu, 0x7d0u);
+    EF_U32(0x00429228u) = arena_take_e29e8(0xfa0u);
+    fill_bytes_b3fb0(EF_U32(0x00429228u), 0xffu, 0xfa0u);
+    read_resource_e3170((uint32_t)(uintptr_t)&pos[0], 4u);
+    read_resource_e3170((uint32_t)(uintptr_t)&pos[0], 4u);
+    seek_start_a7ab4(0u, 0u, 0u, 0u, EF_U32(0x0015f8fcu), pos[0]);
+    load_string_table_e3868();
+    seek_start_a7ab4(0u, 0u, 0u, 0u, EF_U32(0x0015f8fcu), 10u);
+    return 1u;
+}

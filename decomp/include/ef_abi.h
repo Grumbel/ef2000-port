@@ -5126,4 +5126,6 @@ double eval_binary_record_10e4dd(uint32_t flags, uint32_t a, uint32_t b);
 
 uint32_t find_nearest_object_2c454(uint32_t pos, uint32_t id, uint32_t side, uint32_t type);
 
+uint8_t open_resource_file_e378c(uint32_t name);
+
 #endif
