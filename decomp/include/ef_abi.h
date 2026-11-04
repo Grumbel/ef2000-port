@@ -4293,4 +4293,7 @@ void guest_fn_cde00_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcde0
 
 void load_companion_files_dbf3c(ef_addr32 dest, ef_addr32 part_b, ef_addr32 dest2);
 
+void switch_display_mode_d1e50(uint32_t mode);
+void guest_fn_cdb20_x(void); /* 0xcdb20 no arguments */
+
 #endif

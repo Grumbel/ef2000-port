@@ -103,3 +103,37 @@ void commit_mode_selection_35b2c(void)
     EF_U8(0x00125847u) = 1u;
     EF_U8(0x001264e2u) = EF_U8(0x0012584au);
 }
+
+/* 0xd1e50, 187 bytes. Switch the display mode (1..5; 3 and 4 count as 2 for the "already current" test against 0x15b7d0), tearing down and rebuilding the video state for the new mode. */
+void switch_display_mode_d1e50(uint32_t mode)
+{
+    uint32_t target = (mode >= 3u && mode <= 4u) ? 2u : mode;
+    uint32_t cur = EF_U8(0x0015b7d0u);
+    if (cur == target)
+        return;
+    if (cur == 0u && target != 1u)
+        guest_fn_cdb20_x();
+    switch (mode - 1u) {
+    case 0:
+        EF_U32(0x00420950u) = 0x000fee30u;
+        release_buffer_cdc38();
+        guest_fn_cdb20_x();
+        fill_table_fef26();
+        apply_palette_d663c(0x00420a90u);
+        break;
+    case 1:
+    case 2:
+        set_mode_640x400_d1da8(0x100u, 0x101u);
+        break;
+    case 3:
+        set_mode_640x400_d1da8(0x101u, 0x100u);
+        break;
+    case 4:
+        set_video_mode_d1de8(mode, mode, 0u, 0u);
+        break;
+    default:
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f79cu);
+        break;
+    }
+    EF_U8(0x0015b7d0u) = (uint8_t)target;
+}

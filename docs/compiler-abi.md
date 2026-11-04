@@ -5009,3 +5009,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xdbf3c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | da644@da6a9,da644@da6fe,da7fc@da8a0 | Load two companion files named from part b: the first into dest (complaining when missing), then, if the second exists,  |
+
+## state_reset1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd1e50` | EAX:uint32_t | none | 39204@3920c,3ea0c@3ee75,3ea0c@3ef7b | Switch the display mode (1..5; 3 and 4 count as 2 for the "already current" test against 0x15b7d0), tearing down and reb |
