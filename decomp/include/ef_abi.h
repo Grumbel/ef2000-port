@@ -3920,4 +3920,9 @@ void register_stack_ranges_d6df0(void);
 int32_t angle_of_fitted_pair_dc8d8(int32_t x, int32_t y);
 void guest_callptr1_x(ef_addr32 fn, ef_addr32 arg); /* indirect cdecl call with one stack argument */
 
+/* game_helpers121.c */
+void deactivate_record_1068b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+void seek_record_eb698(ef_addr32 pos, ef_addr32 ctx);
+void copy_name_and_flag_a3424(uint16_t index);
+
 #endif

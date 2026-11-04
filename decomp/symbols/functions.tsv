@@ -2177,7 +2177,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a334c	86	request_entry_details_a334c	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x000a334c.json	docs/compiler-abi.md; Request the details of an entry when its table flag is set.; callers a33a4@a33da; guest pending
 0x000a33a4	74	dispatch_entry_a33a4	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a33a4.json	docs/compiler-abi.md; Dispatch on the low nibble of the entry's kind byte.; callers a33f0@a3404; guest pending
 0x000a33f0	52	dispatch_all_a33f0	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a33f0.json	docs/compiler-abi.md; Dispatch every entry of the list at 0x136b84.; callers a410c@a4119; guest pending
-0x000a3424	73			unknown	unclassified	unverified		
+0x000a3424	73	copy_name_and_flag_a3424	game_helpers121	compiles	game	confirmed	decomp/tests/0x000a3424.json	docs/compiler-abi.md; Copy the 0x21-byte name of table entry (index << 5) at 0x13587c into the buffer of the slot it names and flag that slot ; callers a348c@a34c4; guest pending
 0x000a348c	247			unknown	unclassified	unverified		
 0x000a35bc	242			unknown	unclassified	unverified		
 0x000a36b0	156	accumulate_offsets_a36b0	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a36b0.json	docs/compiler-abi.md; Accumulate clamped timing offsets of the listed entries.; callers a410c@a39de; guest pending
@@ -3515,7 +3515,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb4c0	26	release_pointer_eb4c0	math_string	compiles	game	confirmed	decomp/tests/0x000eb4c0.json	docs/compiler-abi.md; Release the pointer stored at EAX through 0xc3f80 and clear it.; callers ebcd8@ebceb; guest pending
 0x000eb4dc	65	bsearch_entries_eb4dc	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000eb4dc.json	docs/compiler-abi.md; Binary search 12-byte entries sorted by their first signed dword.; callers eb520@eb684; guest pending
 0x000eb520	373			unknown	unclassified	unverified		
-0x000eb698	71			unknown	unclassified	unverified		
+0x000eb698	71	seek_record_eb698	game_helpers121	compiles	game	confirmed	decomp/tests/0x000eb698.json	docs/compiler-abi.md; Seek the context's handle to the given position; on a position change first reread the 8-byte header into context+0x148 ; callers eb9f8@eba16,eba64@eba9c,ebb58@ebb92; guest pending
 0x000eb9f8	84	resolve_entry_eb9f8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000eb9f8.json	docs/compiler-abi.md; ; callers 9cb20@9cb3a,9cb20@9cb5a; guest pending
 0x000eba4c	21	lookup_field_eba4c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000eba4c.json	docs/compiler-abi.md; Zero when EDX is zero, else dword +8 of 0xeb520's result (or 0).; callers 9cb70@9cb8a,9cb70@9cbaa; guest pending
 0x000eba64	169			unknown	unclassified	unverified		
@@ -3904,7 +3904,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010683c	62	stop_selected_10683c	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010683c.json	docs/compiler-abi.md; ; callers 102774@102797; guest pending
 0x0010687c	22	pause_object_10687c	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010687c.json	docs/compiler-abi.md; State 4 becomes 8.; callers 1027a0@1027c3; guest pending
 0x00106894	33	resume_object_106894	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106894.json	docs/compiler-abi.md; State 8 becomes 4 and 0x1052f0 runs.; callers 1027cc@1027ef; guest pending
-0x001068b8	70			unknown	unclassified	unverified		
+0x001068b8	70	deactivate_record_1068b8	game_helpers121	compiles	game	confirmed	decomp/tests/0x001068b8.json	docs/compiler-abi.md; Deactivate a record that is not yet state 1 or 2: set state 2, run the callbacks at 0x84c and 0x850 (cdecl, record on th; callers 1027f8@10281b; guest pending
 0x00106938	28	exchange_callback_106938	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106938.json	docs/compiler-abi.md; Exchange dword +0x850; null object returns 0.; callers 102dbc@102de8; guest pending
 0x00106988	63	set_and_notify_106988	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106988.json	docs/compiler-abi.md; Store dword +0x68 and notify each of the +0x60 entries (0x894 bytes each) whose state is not 1.; callers 102a98@102ac2; guest pending
 0x00106b1c	184			unknown	unclassified	unverified		
