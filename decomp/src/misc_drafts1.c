@@ -7041,3 +7041,28 @@ void setup_external_view_95704(uint32_t a, uint32_t b, uint32_t c, uint32_t d, u
         EF_U16(0x0021448au) = (uint16_t)guest_fn_9125c((int32_t)EF_U32(EF_U32(0x0020f15cu) + 0x2cu) >> 16);
     guest_fn_9357c();
 }
+
+/* 0x1e6f0, 207 bytes. Draw an icon (sprite pair) for COLOR (EAX) with SHADOW flag (EDX) at the position (X, Y) (stack arguments, ret 8) displaced by the word pair 0x123688[IDX]: the sprite index comes from the word table 0x1235e0[KIND] (0 = nothing, otherwise minus one); the sprite from the pointer table 0x123640 is drawn centred (position minus half its byte width/height) with 0xcf7c4 in colour 3 when SHADOW is set, else COLOR; with SHADOW set the sprite from table 0x123664 is drawn on top in COLOR. */
+void draw_icon_1e6f0(uint32_t color, uint32_t shadow, uint32_t idx, uint32_t kind, uint32_t x, uint32_t y)
+{
+    int16_t i = (int16_t)idx;
+    int16_t k = (int16_t)kind;
+    int16_t px = (int16_t)(x + EF_U16(0x00123688u + (uint32_t)(int32_t)i * 4u));
+    int16_t py = (int16_t)(y + EF_U16(0x0012368au + (uint32_t)(int32_t)i * 4u));
+    int16_t s = (int16_t)EF_U16(0x001235e0u + (uint32_t)(int32_t)k * 2u);
+    uint32_t off, spr;
+    if (s == 0)
+        return;
+    s--;
+    off = (uint32_t)(int32_t)s * 4u;
+    spr = EF_U32(0x00123640u + off);
+    guest_fn_cf7c4_x(spr, (uint32_t)((int32_t)py - ((int32_t)EF_U8(spr + 1u) >> 1)),
+                     (uint32_t)((int32_t)px - ((int32_t)EF_U8(spr) >> 1)),
+                     (shadow & 0xffffu) == 0u ? (uint32_t)(int32_t)(int16_t)color : 3u);
+    if ((shadow & 0xffffu) == 0u)
+        return;
+    spr = EF_U32(0x00123664u + off);
+    guest_fn_cf7c4_x(spr, (uint32_t)((int32_t)py - ((int32_t)EF_U8(spr + 1u) >> 1)),
+                     (uint32_t)((int32_t)px - ((int32_t)EF_U8(spr) >> 1)),
+                     (uint32_t)(int32_t)(int16_t)color);
+}

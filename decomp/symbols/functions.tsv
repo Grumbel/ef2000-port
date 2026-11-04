@@ -339,7 +339,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001e3c4	176	reroll_list_entries_1e3c4	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x0001e3c4.json	docs/compiler-abi.md; Re-roll the strength of every entry whose spot is occupied, per list node.; callers 3dd30@3e886; guest pending
 0x0001e480	499			unknown	unclassified	unverified		
 0x0001e684	107	age_timers_1e684	game_helpers7	compiles	game	confirmed	decomp/tests/0x0001e684.json	docs/compiler-abi.md; Age the twelve timers; those in state 0xe expire back to state 2.; callers 3dd30@3dfb8; guest pending
-0x0001e6f0	207			unknown	unclassified	unverified		
+0x0001e6f0	207	draw_icon_1e6f0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001e6f0.json	docs/compiler-abi.md; Draw an icon (sprite pair) for COLOR (EAX) with SHADOW flag (EDX) at the position (X, Y) (stack arguments, ret 8) displa; callers 1e7c0@1e9c9,1e7c0@1ea1b; guest pending
 0x0001e7c0	1070			unknown	unclassified	unverified		
 0x0001f0c8	52	load_resource_1f0c8	game_helpers10	compiles	game	confirmed	decomp/tests/0x0001f0c8.json	docs/compiler-abi.md; ; callers 5f60@5f84; guest pending
 0x0001f0fc	1751			unknown	unclassified	unverified		
