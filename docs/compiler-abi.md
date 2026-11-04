@@ -7948,3 +7948,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x381a0` | EAX:uint32_t | none | 37eac@37f4b | Update the follower record INDEX (AX; 69 byte records at 0x1a14f8): fetch the scene object of the word +0x26 >> 16 (0x8f |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x83a40` | none | none | 848e0@8493e | Classify how directly the pick point 0x1fcc2c.. lies along the view axis: build the rotation from the three angle words  |

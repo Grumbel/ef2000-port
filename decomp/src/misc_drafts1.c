@@ -13931,3 +13931,24 @@ void update_follower_381a0(uint32_t index)
     }
     refresh_link_pointer(rec);
 }
+
+/* 0x83a40, 245 bytes. Classify how directly the pick point 0x1fcc2c.. lies along the view axis: build the rotation from the three angle words (high halves of 0x1fcc1e, 0x1fcc20, 0x1fcc22, 0xe994c), transform the forward vector (0, 0, 0x4000) with 0x83734 and the offset from the camera 0x1fcc14.. to the pick point with 0x831a4, then store 2 * dot(forward, offset) / |offset| in 0x1fcbcc and set bit 0x80 of byte 0x1fcbe2 when the high word of 0x143ee8 exceeds that value (cleared otherwise). */
+void classify_view_axis_83a40(void)
+{
+    int32_t fwd[3];
+    int32_t off[3];
+    int32_t dot, len, q;
+    uint8_t cond;
+    build_rotation_e994c(0u, (uint32_t)((int32_t)EF_U32(0x001fcc1eu) >> 16), (uint32_t)((int32_t)EF_U32(0x001fcc20u) >> 16), (uint32_t)((int32_t)EF_U32(0x001fcc22u) >> 16));
+    guest_fn_83734_x((ef_addr32)(uintptr_t)fwd, 0, 0x4000, 0);
+    store_scaled_vector_831a4((ef_addr32)(uintptr_t)off,
+                              (int32_t)(EF_U32(0x001fcc2cu) - EF_U32(0x001fcc14u)),
+                              (int32_t)(EF_U32(0x001fcc30u) - EF_U32(0x001fcc18u)),
+                              (int32_t)(EF_U32(0x001fcc34u) - EF_U32(0x001fcc1cu)));
+    dot = (int32_t)((uint32_t)fwd[1] * (uint32_t)off[1] + (uint32_t)fwd[0] * (uint32_t)off[0] + (uint32_t)fwd[2] * (uint32_t)off[2]);
+    len = (int32_t)length_3d_decc4(off[0], off[1], off[2]);
+    q = (int32_t)((uint32_t)dot * 2u) / len;
+    EF_U32(0x001fcbccu) = (uint32_t)q;
+    cond = ((int32_t)EF_U32(0x00143ee8u) >> 16) > q ? 1u : 0u;
+    EF_U8(0x001fcbe2u) = (uint8_t)((EF_U8(0x001fcbe2u) & 0x7fu) | (uint8_t)(cond << 7));
+}

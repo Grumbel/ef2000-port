@@ -5699,4 +5699,7 @@ void guest_fn_2a4c8_x(void); /* 0x2a4c8 */
 
 void update_follower_381a0(uint32_t index);
 
+void classify_view_axis_83a40(void);
+void guest_fn_83734_x(ef_addr32 out, int32_t x, int32_t z, int32_t y); /* 0x83734 EAX/EDX/EBX/ECX */
+
 #endif

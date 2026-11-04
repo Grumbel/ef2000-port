@@ -1597,7 +1597,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000834e8	541			unknown	unclassified	unverified		
 0x00083708	42	compose_ui_relative_vector	ui_secondary	compiles	game	confirmed	decomp/tests/0x00083708.json	docs/compiler-abi.md; host model; guest differential pending
 0x00083734	35	scale_vector_down_16	scene_helpers	compiles	game	confirmed	decomp/tests/0x00083734.json	docs/compiler-abi.md; 0xe99b8 then three dwords >>= 16 (arithmetic); callers 83a40@83a78; guest pending
-0x00083a40	245			unknown	unclassified	unverified		
+0x00083a40	245	classify_view_axis_83a40	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00083a40.json	docs/compiler-abi.md; Classify how directly the pick point 0x1fcc2c.. lies along the view axis: build the rotation from the three angle words ; callers 848e0@8493e; guest pending
 0x00083b50	73	advance_page_counter_83b50	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x00083b50.json	docs/compiler-abi.md; Advance the page counter by 3 or 1 depending on a flag bit.; callers 84678@84678; guest pending
 0x000842b4	188	center_view_842b4	game_helpers47	compiles	game	confirmed	decomp/tests/0x000842b4.json	docs/compiler-abi.md; Center the view on the current camera position and publish its origin.; callers 843b0@843c8,843b0@843ec,843b0@8449e; guest pending
 0x00084370	35	update_ui_composite	ui_operations	compiles	game	confirmed	decomp/tests/0x00084370.json	docs/compiler-abi.md; host model; guest differential pending
