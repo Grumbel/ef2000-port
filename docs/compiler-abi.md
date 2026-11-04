@@ -5885,3 +5885,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xeab44` | none | EAX:uint32_t | 97dcc@97e2f,97dcc@97e73,a8bd4@a8dba | Timed record pump: when the clock 0x10dfe0 has advanced by at least the interval word 0x484466 since 0x484154, re-reads  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe605c` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:uint32_t | none | 48bb0@48c26,48c90@48cf0,48c90@48d0a | Draw the NUL-terminated string STR at (X, Y) in colour COLOR (stored in 0x433ec0) with 8-pixel cells, clipped against th |

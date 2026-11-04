@@ -4800,4 +4800,7 @@ uint32_t pump_records_eab44(void);
 void guest_fn_f9ee0_x(uint32_t a, uint32_t b); /* 0xf9ee0 2 stack, callee cleanup */
 void guest_fn_10dfec_x(uint32_t a, uint32_t b); /* 0x10dfec 2 stack, callee cleanup */
 
+void draw_clipped_text_e605c(uint32_t color, int32_t x, int32_t y, uint32_t str);
+void guest_fn_e5f64_x(uint32_t x, uint32_t y, uint32_t code); /* 0xe5f64 EAX/EDX/EBX */
+
 #endif
