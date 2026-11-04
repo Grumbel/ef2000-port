@@ -14746,3 +14746,50 @@ void integrate_drift_53aec(void)
     fv = (float)(((r * dt) * (double)damp) * (double)damp + (double)*p1);
     *p1 = fv;
 }
+
+/* 0x67d4, 315 bytes. Measure the selected unit's range and bearing to the view point. Clears the result dword 0x19721c to -1, looks up the unit named by the high half of 0x1f71c8 and returns when it does not exist. The target point (two dwords) comes from 0x5f1ec in mode 2, from the record at [0x1a821c] (>> 8) in mode 6 and from the entry pair 0x84e3c otherwise. The range is the approximate length 0xb3988 to the point at 0x1a5be8/0x1a5bec, scaled by 3/2048, and the bearing is word 0x19724a minus word 0x127d3e. The truncated range goes to 0x19722c, the sine-table row (word table at 0x142e08, index bearing >> 3) times [0x1a3048]/32768 to float 0x1a357c and the range to float 0x1a356c; when that row value exceeds 10.0 the dword 0x19721c is set to range * 1854 / row. */
+void measure_view_range_67d4(void)
+{
+    uint32_t pt[2];
+    uint32_t unit, rec, mode, flag;
+    int32_t dx, dy, idx;
+    uint16_t ang;
+    double range, row, k;
+    float f;
+    int32_t hi = (int32_t)EF_U32(0x001f71c8u) >> 16;
+
+    EF_U32(0x0019721cu) = 0xffffffffu;
+    unit = guest_fn_7489c(hi);
+    if (unit == 0u)
+        return;
+    pt[0] = 0u;
+    pt[1] = 0u;   /* ORIGINAL BUG: mode 6 with a null record leaves the point uninitialised */
+    mode = EF_U8(0x0012814cu);
+    if (mode == 2u) {
+        sample_active_coordinates((ef_addr32)(uintptr_t)pt);
+    } else if (mode == 6u) {
+        rec = EF_U32(0x001a821cu);
+        if (rec != 0u) {
+            pt[0] = (uint32_t)((int32_t)EF_U32(rec) >> 8);
+            pt[1] = (uint32_t)((int32_t)EF_U32(rec + 8u) >> 8);
+        }
+    } else {
+        idx = (int32_t)EF_U32(0x0019bb5cu) >> 16;
+        flag = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(idx * 0xca) + 0x8eu);
+        fetch_entry_pair_84e3c((ef_addr32)(uintptr_t)pt, (uint32_t)((int32_t)EF_U32(0x001f71c8u) >> 16), flag);
+    }
+    dy = (int32_t)pt[1] - (int32_t)EF_U32(0x001a5be8u);
+    dx = (int32_t)pt[0] - (int32_t)EF_U32(0x001a5becu);
+    range = (double)approx_length_b3988((uint32_t)dx, (uint32_t)dy) * 3.0 * 0.00048828125;
+    ang = (uint16_t)(EF_U16(0x0019724au) - EF_U16(0x00127d3eu));
+    EF_U32(0x0019722cu) = (uint32_t)(int32_t)truncate_9d72c(range);
+    row = (double)(int16_t)EF_U16(0x00142e08u + (uint32_t)(ang >> 3) * 2u);
+    memcpy(&k, ef_guest_memory_ptr(0x001a3048u), sizeof k);
+    row = row * k * 3.0517578125e-05;
+    f = (float)row;
+    memcpy(ef_guest_memory_ptr(0x001a357cu), &f, sizeof f);
+    f = (float)range;
+    memcpy(ef_guest_memory_ptr(0x001a356cu), &f, sizeof f);
+    if (row > 10.0)
+        EF_U32(0x0019721cu) = (uint32_t)(int32_t)truncate_9d72c(range * 1854.0 / row);
+}

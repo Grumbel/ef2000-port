@@ -8079,3 +8079,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x53aec` | none | none | 53c80@53cb7 | Third drift mode step. Convert the three signed words 0x1a5bda, 0x1a5bce, 0x1a5bc2 (high halves) with 0x53308, add the f |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x67d4` | none | none | 6460@66aa | Measure the selected unit's range and bearing to the view point. Clears the result dword 0x19721c to -1, looks up the un |

@@ -84,7 +84,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00006460	610			unknown	unclassified	unverified		
 0x000066c4	56	current_object_metric_66c4	float_helpers1	compiles	game	confirmed	decomp/tests/0x000066c4.json	docs/compiler-abi.md; Integer result of a table lookup for the current object, or 0.; callers 6924@69a2,625d8@629d6; guest pending
 0x000066fc	213	heading_to_current_object_66fc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000066fc.json	docs/compiler-abi.md; Heading from the view origin (0x1a5bec, 0x1a5be8) to the current object: the object (word 0x1f71ca) is looked up, its po; callers 6460@669f; guest pending
-0x000067d4	315			unknown	unclassified	unverified		
+0x000067d4	315	measure_view_range_67d4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000067d4.json	docs/compiler-abi.md; Measure the selected unit's range and bearing to the view point. Clears the result dword 0x19721c to -1, looks up the un; callers 6460@66aa; guest pending
 0x00006924	423			unknown	unclassified	unverified		
 0x00006acc	78	object_category	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00006acc.json	docs/compiler-abi.md; Category of an object from the byte at +0xe9: 1 (<=0xf), 2 (0x10..0x15), 3 (0x20..0x21), 4 (0x22..0x24).; callers 6924@6996,625d8@62b2a,65c1c@65c7d; guest pending
 0x00006b1c	50	update_flag_6b1c	game_helpers4	compiles	game	confirmed	decomp/tests/0x00006b1c.json	docs/compiler-abi.md; ; callers 5f60@5fb5; guest pending

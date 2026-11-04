@@ -5752,4 +5752,6 @@ void integrate_drift_53aec(void);
 
 
 
+void measure_view_range_67d4(void);
+
 #endif
