@@ -2459,4 +2459,14 @@ void apply_owner_summary_56af4(ef_addr32 message);
 uint8_t turn_direction_5f588(ef_addr32 a, ef_addr32 b, ef_addr32 c);
 uint32_t guest_fn_7574c(int32_t value); /* 0x7574c EAX -> AL */
 
+/* game_helpers39.c */
+void rotate_vector_6456c(ef_addr32 vector);
+void rotate_vector_64618(ef_addr32 vector);
+uint32_t find_next_unit_663a4(uint32_t start, uint8_t mode);
+void transform_point_69680(ef_addr32 out_xyz, ef_addr32 out_base, int16_t x, int16_t y);
+void blend_palette_758c0(uint16_t factor, ef_addr32 source, ef_addr32 dest, uint8_t red,
+                         uint8_t stack_green, uint8_t stack_blue);
+void trigger_linked_event_77534(uint32_t id);
+
+
 #endif

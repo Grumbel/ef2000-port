@@ -1193,8 +1193,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00064498	140	build_ring_table_64498	game_helpers32	compiles	game	confirmed	decomp/tests/0x00064498.json	docs/compiler-abi.md; Build a 36-entry table of scaled sine/cosine pairs (radius 50, truncating).; callers 646d4@6474b; guest pending
 0x00064524	38	apply_runtime_word_negated	marker_packets	compiles	game	confirmed	decomp/tests/0x00064524.json	docs/compiler-abi.md; Acquire 0x1a7c30 via 0xd0b68, set via 0xd0ebc with 16-bit negation of word 0x127d3e; sole direct caller 646d4@64d7b; guest pending
 0x0006454c	32	apply_runtime_word_forward	marker_packets	compiles	game	confirmed	decomp/tests/0x0006454c.json	docs/compiler-abi.md; Acquire 0x1a7c30, set via 0xd0ebc with word 0x127d3e; sole direct caller 624f4@624f4; guest pending
-0x0006456c	171			unknown	unclassified	unverified		
-0x00064618	171			unknown	unclassified	unverified		
+0x0006456c	171	rotate_vector_6456c	game_helpers39	compiles	game	confirmed	decomp/tests/0x0006456c.json	docs/compiler-abi.md; Rotate a vector by the matrix at 0x1a7c30.; callers 62b84@62c7c,62edc@62fa7,646d4@64ec7; guest pending
+0x00064618	171	rotate_vector_64618	game_helpers39	compiles	game	confirmed	decomp/tests/0x00064618.json	docs/compiler-abi.md; Rotate a vector by the matrix at 0x1a5bc0.; callers 625d8@62856,62b84@62c8c; guest pending
 0x000646d4	2254			unknown	unclassified	unverified		
 0x00064fa4	107	init_free_list_64fa4	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00064fa4.json	docs/compiler-abi.md; Build the doubly linked free list of 100 entries (0x1c bytes) at 0x1a6d60.; callers 5f60@5f70; guest pending
 0x00065030	813			unknown	unclassified	unverified		
@@ -1216,7 +1216,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00065d18	12	store_631bc_65d18	game_helpers5	compiles	game	confirmed	decomp/tests/0x00065d18.json	docs/compiler-abi.md; ; callers 65a50@65a6d; guest pending
 0x00065d24	235			unknown	unclassified	unverified		
 0x00065e10	673			unknown	unclassified	unverified		
-0x000663a4	186			unknown	unclassified	unverified		
+0x000663a4	186	find_next_unit_663a4	game_helpers39	compiles	game	confirmed	decomp/tests/0x000663a4.json	docs/compiler-abi.md; Find the next unit after an index that matches a team mode; return its id or -1.; callers 65a88@65aed,65a88@65b09,65c1c@65c59; guest pending
 0x00066548	1075			unknown	unclassified	unverified		
 0x0006697c	330			unknown	unclassified	unverified		
 0x00066ac8	38	update_position_bin	record_transitions	compiles	game	confirmed	decomp/tests/0x00066ac8.json	docs/compiler-abi.md; host model; guest differential pending
@@ -1247,7 +1247,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00069354	29	gpwCheckHitPylon		named	unclassified	unverified		
 0x00069374	458			unknown	unclassified	unverified		
 0x00069540	317			unknown	unclassified	unverified		
-0x00069680	189			unknown	unclassified	unverified		
+0x00069680	189	transform_point_69680	game_helpers39	compiles	game	confirmed	decomp/tests/0x00069680.json	docs/compiler-abi.md; Transform (x, y) by the 3x3 matrix at 0x15ffda and add the translation pair.; callers 69740@69859; guest pending
 0x00069740	466			unknown	unclassified	unverified		
 0x00069914	10	gpwShowCurrent		named	unclassified	unverified		
 0x00069920	86	gpwTurnYPlane		named	unclassified	unverified		
@@ -1379,7 +1379,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007574c	87	object_uses_secondary_grid	scene_indexed	compiles	game	confirmed	decomp/tests/0x0007574c.json	docs/compiler-abi.md
 0x000757b0	10	nonzero_or_one	mid_helpers	compiles	game	confirmed	decomp/tests/0x000757b0.json	docs/compiler-abi.md; zero becomes 1; callers 759b8@75bbf; guest pending
 0x000757bc	260			unknown	unclassified	unverified		
-0x000758c0	186			unknown	unclassified	unverified		
+0x000758c0	186	blend_palette_758c0	game_helpers39	compiles	game	confirmed	decomp/tests/0x000758c0.json	docs/compiler-abi.md; Blend a 256-entry RGB palette towards a target colour by factor/50.; callers 76370@7642a,76370@764f2; guest pending
 0x0007597c	58	reset_selection_7597c	game_helpers5	compiles	game	confirmed	decomp/tests/0x0007597c.json	docs/compiler-abi.md; ; callers 3dd30@3dd65; guest pending
 0x000759b8	714			unknown	unclassified	unverified		
 0x00075c84	27	reset_object_link_controls	scene_indexed	compiles	game	confirmed	decomp/tests/0x00075c84.json	docs/compiler-abi.md
@@ -1403,7 +1403,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00077088	74	assign_slot_77088	game_helpers9	compiles	game	confirmed	decomp/tests/0x00077088.json	docs/compiler-abi.md; ; callers 770d4@772a7; guest pending
 0x000770d4	505			unknown	unclassified	unverified		
 0x000772d0	610			unknown	unclassified	unverified		
-0x00077534	187			unknown	unclassified	unverified		
+0x00077534	187	trigger_linked_event_77534	game_helpers39	compiles	game	confirmed	decomp/tests/0x00077534.json	docs/compiler-abi.md; Trigger the linked-unit event for a unit and notify the matching display slots.; callers 46454@46795; guest pending
 0x000775f0	315			unknown	unclassified	unverified		
 0x0007772c	26	reset_pair_counter	marker_packets	compiles	game	confirmed	decomp/tests/0x0007772c.json	docs/compiler-abi.md; Words 0x1f891e=0xffff and 0x1f891c=0; sole direct caller 49228@49248; guest pending
 0x00077748	18	count_pending_77748	game_helpers28	compiles	game	confirmed	decomp/tests/0x00077748.json	docs/compiler-abi.md; Count a pending frame while the marker word is -1.; callers 8c49c@8c56d; guest pending

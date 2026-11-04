@@ -3167,3 +3167,14 @@ in EAX, format string address, one value).
 | `0x54410` | none | none | 49228@49b5b | Reset every unit's team word, the owner flags and the 8 counters. |
 | `0x56af4` | EAX:ef_addr32 | none | 581b0@583b3 | Store an owner summary message: name, counters and flags. |
 | `0x5f588` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | AL:uint8_t | 5f220@5f467 | Turn direction of three points: 1, -1 (0xff) or 0, with a collinear tiebreak. |
+
+## game_helpers39 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6456c` | EAX:ef_addr32 | none | 62b84@62c7c,62edc@62fa7,646d4@64ec7 | Rotate a vector by the matrix at 0x1a7c30. |
+| `0x64618` | EAX:ef_addr32 | none | 625d8@62856,62b84@62c8c | Rotate a vector by the matrix at 0x1a5bc0. |
+| `0x663a4` | EAX:uint32_t,DL:uint8_t | EAX:uint32_t | 65a88@65aed,65a88@65b09,65c1c@65c59 | Find the next unit after an index that matches a team mode; return its id or -1. |
+| `0x69680` | EAX:ef_addr32,EDX:ef_addr32,BX:int16_t,CX:int16_t | none | 69740@69859 | Transform (x, y) by the 3x3 matrix at 0x15ffda and add the translation pair. |
+| `0x758c0` | AX:uint16_t,EDX:ef_addr32,EBX:ef_addr32,CL:uint8_t,[ESP+4]:uint8_t,[ESP+8]:uint8_t | none | 76370@7642a,76370@764f2 | Blend a 256-entry RGB palette towards a target colour by factor/50. |
+| `0x77534` | EAX:uint32_t | none | 46454@46795 | Trigger the linked-unit event for a unit and notify the matching display slots. |
