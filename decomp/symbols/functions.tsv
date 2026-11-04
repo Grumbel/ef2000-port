@@ -4017,7 +4017,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010e957	40	compare_dates_10e957	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e957.json	docs/compiler-abi.md; 0x10e872(a, c) > 0x10e872(b, c).; callers 10e97f@10e9a8; guest pending
 0x0010e97f	691			unknown	unclassified	unverified		
 0x0010ec32	48	triple_less_than	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010ec32.json	docs/compiler-abi.md; Three-dword signed lexicographic less-than (most significant dword at +8).; callers 10e97f@10eb13,10e97f@10ec0e; guest pending
-0x0010ec62	277			unknown	unclassified	unverified		
+0x0010ec62	277	break_down_time_10ec62	runtime_helpers39	compiles	game	confirmed	decomp/tests/0x0010ec62.json	docs/compiler-abi.md; Break a day count and seconds-of-day (minus a zone offset) into a broken-down time record: +0 sec, +4 min, +8 hour, +0xc; callers f118d@f1257,1100d2@1100f0,1100d2@110117; guest pending
 0x0010eda1	162			unknown	unclassified	unverified		
 0x0010edb4	38	parse_decimal	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010edb4.json	docs/compiler-abi.md; Parse decimal digits at EAX into *EDX; returns the pointer after them.; callers 10edda@10ee89,10edda@10ee9e,10edda@10eeb0; guest pending
 0x0010edda	278			unknown	unclassified	unverified		

@@ -86,3 +86,50 @@ ef_addr32 find_chunk_111f84(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
     }
     return 0;
 }
+
+/* 0x10ec62, 277 bytes. Break a day count and seconds-of-day (minus a zone offset) into a broken-down time record: +0 sec, +4 min, +8 hour, +0xc day of month, +0x10 month, +0x14 year (from 1900), +0x18 weekday, +0x1c day of year; returns the record. */
+ef_addr32 break_down_time_10ec62(uint32_t days, uint32_t secs, int32_t offset, ef_addr32 tm)
+{
+    uint32_t rem;
+    uint32_t year;
+    uint32_t yday;
+    uint32_t year_len;
+    uint32_t month;
+    ef_addr32 table;
+
+    if (secs < 0xa8c0u && offset > 0) {
+        secs = secs + 0x15180u - (uint32_t)offset;
+        days = days + secs / 0x15180u - 1u;
+    } else {
+        secs = secs - (uint32_t)offset;
+        days = days + secs / 0x15180u;
+    }
+    rem = secs % 0x15180u;
+    EF_U32(tm + 8u) = rem / 0xe10u;
+    rem %= 0xe10u;
+    EF_U32(tm + 4u) = rem / 0x3cu;
+    EF_U32(tm) = rem % 0x3cu;
+
+    year = days / 0x16eu;
+    yday = days - year * 0x16du;
+    if (year > 0)
+        yday -= (year - 1u) >> 2;
+    year_len = is_leap_year(year + 0x76cu) + 0x16du;
+    /* ORIGINAL BUG: the year length is not recomputed as the year advances. */
+    while (yday >= year_len) {
+        year++;
+        yday -= year_len;
+    }
+    EF_U32(tm + 0x1cu) = yday;
+    EF_U32(tm + 0x14u) = year;
+    table = 0x00195cb0u;
+    if (is_leap_year(year + 0x76cu) != 0)
+        table = 0x00195ccau;
+    month = yday / 0x1fu;
+    if (yday >= EF_U16(table + month * 2u + 2u))
+        month++;
+    EF_U32(tm + 0x10u) = month;
+    EF_U32(tm + 0xcu) = yday - (uint32_t)EF_S16(table + month * 2u) + 1u;
+    EF_U32(tm + 0x18u) = (days + 1u) % 7u;
+    return tm;
+}

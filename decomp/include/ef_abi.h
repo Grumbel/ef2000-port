@@ -3988,5 +3988,6 @@ uint32_t guest_alloc_fmt_cc6c0(uint32_t size, ef_addr32 fmt, ...); /* 0xcc6c0 cd
 /* runtime_helpers39.c */
 ef_addr32 parse_tz_rule_10eef0(ef_addr32 text, ef_addr32 out);
 ef_addr32 find_chunk_111f84(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 data, int32_t n);
+ef_addr32 break_down_time_10ec62(uint32_t days, uint32_t secs, int32_t offset, ef_addr32 tm);
 
 #endif

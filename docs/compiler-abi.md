@@ -4571,3 +4571,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x10eef0` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 10eda1@10f055,10eda1@10f065 | Parse a TZ rule ("Jn", "n" or "Mm.w.d", optionally "/h:m:s") into the record at out; returns the text position after the |
 | `0x111f84` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:int32_t | EAX:ef_addr32 | 113d10@113d36 | Walk a chunk stream (4-byte tags, big-endian sizes): find the n-th chunk of the tag at 0x1953c8 inside the container tag |
+
+## runtime_helpers39 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10ec62` | EAX:uint32_t,EDX:uint32_t,EBX:int32_t,ECX:ef_addr32 | EAX:ef_addr32 | f118d@f1257,1100d2@1100f0,1100d2@110117 | Break a day count and seconds-of-day (minus a zone offset) into a broken-down time record: +0 sec, +4 min, +8 hour, +0xc |
