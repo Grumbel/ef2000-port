@@ -4281,4 +4281,6 @@ void guest_fn_e7a34_x(uint32_t p0, uint32_t p1, uint32_t p2, uint32_t p3, uint32
 
 uint32_t next_matching_slot_85f78(uint32_t key);
 
+void select_page_9e3f8(uint32_t page);
+
 #endif

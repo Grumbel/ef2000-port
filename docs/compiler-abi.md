@@ -4979,3 +4979,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x85f78` | EAX:uint32_t | EAX:uint32_t | 86110@866a9 | Starting after the current slot (byte +0x1d7) of the player's unit, scan its 20 three-byte slots (+0x198) cyclically for |
+
+## tactical_marks1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9e3f8` | EAX:uint32_t | none | 7775c@77790,87a20@87c57,8c49c@8c55b | Make a page current: record it at 0x41722a/0x417174/0x41717c and, when its table entry has flag 1, clear the eight words |

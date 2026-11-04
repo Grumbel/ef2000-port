@@ -91,3 +91,25 @@ uint32_t next_matching_slot_85f78(uint32_t key)
         return (uint32_t)(uint16_t)slot;
     }
 }
+
+/* 0x9e3f8, 155 bytes. Make a page current: record it at 0x41722a/0x417174/0x41717c and, when its table entry has flag 1, clear the eight words (+2..+0x10) and eight bytes (+0x14..) of each of its 0x1d-byte sub-records before notifying action 0. */
+void select_page_9e3f8(uint32_t page)
+{
+    ef_addr32 obj, entry;
+    uint32_t i, j;
+    EF_U16(0x0041722au) = (uint16_t)page;
+    obj = (uint32_t)guest_fn_b3f58((int32_t)(int16_t)page);
+    entry = EF_U32(0x0040d200u + (uint32_t)EF_U16(obj) * 4u);
+    EF_U32(0x00417174u) = obj;
+    if (EF_U8(entry + 5u) & 1u) {
+        for (i = 0; i < EF_U8(entry + 1u); i++) {
+            uint32_t base = obj + 0xbu + i * 0x1du;
+            for (j = 0; j < 8u; j++) {
+                EF_U8(base + 0x14u + j) = 0u;
+                EF_U16(base + 2u + j * 2u) = 0u;
+            }
+        }
+    }
+    EF_U32(0x0041717cu) = entry;
+    notify_tactical_action((int32_t)(int16_t)page, 0u);
+}
