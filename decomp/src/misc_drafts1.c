@@ -20560,3 +20560,49 @@ void patch_view_shift_dc34e(uint32_t al_in, uint32_t bl_in)
 		while (n != 0) { EF_U32(0x0015bdd8u) <<= 1; n--; }
 	}
 }
+
+static double md_rd_f64(uint32_t addr)
+{
+	double v;
+	memcpy(&v, ef_guest_memory_ptr((ef_addr32)addr), 8);
+	return v;
+}
+
+/* 0x11b134, 122 bytes. EAX = object pointer; stack: a double (the second 8 stack bytes are popped but unused). Computes q = tan(obj[0x30]) / helper_11af14(arg), then (c3 * obj[0x18] * c2) ... as the original: r = (obj[0x18]*q)^2 * (1 + q^2) + c1; result = c2*obj[0x18]*c3 / (a4470(r) + c2). */
+double ratio_formula_11b134(uint32_t obj, double arg, double unused)
+{
+	double t;
+	double q;
+	double a;
+	double r;
+	double x;
+
+	(void)unused;
+	t = guest_fn_11af14_x(arg);
+	q = guest_fn_b45fa(md_rd_f64(obj + 0x30u)) / t;
+	a = guest_fn_b3fd0(q) + 1.0;
+	r = guest_fn_b3fd0(md_rd_f64(obj + 0x18u) * q) * a + md_rd_f64(0x00195834u);
+	x = guest_fn_a4470(r);
+	return (md_rd_f64(0x0019583cu) * md_rd_f64(obj + 0x18u) * md_rd_f64(0x00195844u)) / (x + md_rd_f64(0x0019583cu));
+}
+
+/* 0x11b9ec, 95 bytes. EAX = pointer to a reference double (divisor), EDX = object pointer. Computes t = (C3 - exp(-(obj[0x20] + C1) * C2)) * C4 * obj[8], result = t / pow(obj[0x10], K) * (obj[8] / *EAX) with K = 0x3fe55810624dd2f2; also stores the result at 0x432ac8 and returns it in ST0. */
+double scaled_pow_formula_11b9ec(uint32_t ref, uint32_t obj)
+{
+	double t;
+	double k;
+	double y;
+	double res;
+	uint32_t kb[2] = { 0x624dd2f2u, 0x3fe55810u };
+
+	memcpy(&k, kb, 8);
+	t = -(md_rd_f64(obj + 0x20u) + md_rd_f64(0x00195904u)) * md_rd_f64(0x0019590cu);
+	t = guest_fn_dcb96_x(t);
+	t = md_rd_f64(0x00195914u) - t;
+	t = t * md_rd_f64(0x0019591cu);
+	y = md_rd_f64(obj + 0x10u);
+	t = t * md_rd_f64(obj + 8u);
+	res = (t / pow_b3fec(y, k)) * (md_rd_f64(obj + 8u) / md_rd_f64(ref));
+	memcpy(ef_guest_memory_ptr(0x00432ac8u), &res, 8);
+	return res;
+}

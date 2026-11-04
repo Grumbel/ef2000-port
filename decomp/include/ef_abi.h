@@ -6166,4 +6166,9 @@ void draw_disc_fdf60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_
 void patch_view_shift_dc34e(uint32_t al_in, uint32_t bl_in);
 void patch_view_shift_dc34e(uint32_t al_in, uint32_t bl_in); /* 0xdc34e */
 
+double ratio_formula_11b134(uint32_t obj, double arg, double unused);
+double scaled_pow_formula_11b9ec(uint32_t ref, uint32_t obj);
+double ratio_formula_11b134(uint32_t obj, double arg, double unused); /* 0x11b134 */
+double scaled_pow_formula_11b9ec(uint32_t ref, uint32_t obj); /* 0x11b9ec */
+
 #endif

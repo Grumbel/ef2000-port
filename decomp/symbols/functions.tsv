@@ -4181,7 +4181,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011aff4	74	blend_angle_11aff4	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011aff4.json	docs/compiler-abi.md; (ret 8) Blend two pairs of doubles by the fraction d and return atan2(a - b, /p[4] - p[0]/): a = p[3] * (1 - d) + p[2] *; callers 10a0d4@10a106,10a0d4@10a117,10a0d4@10a128; guest pending
 0x0011b040	172			unknown	unclassified	unverified		
 0x0011b0ec	40	slope_angle_11b0ec	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b0ec.json	docs/compiler-abi.md; atan2(p[1] - p[5], /p[4] - p[0]/) for the doubles at EAX.; callers none direct; guest pending
-0x0011b134	122			unknown	unclassified	unverified		
+0x0011b134	122	ratio_formula_11b134	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b134.json	docs/compiler-abi.md; EAX = object pointer; stack: a double (the second 8 stack bytes are popped but unused). Computes q = tan(obj[0x30]) / he; callers 10a220@10a28f,11b1b0@11b1c8,11b3c8@11b43d; guest pending
 0x0011b1b0	36	forward_to_11b134_11b1b0	small_wrappers6	compiles	game	confirmed	decomp/tests/0x0011b1b0.json	docs/compiler-abi.md; Forward four stack arguments to 0x11b134.; callers 11b6bc@11b6eb,11b6bc@11b71c,11bb80@11bb9e; guest pending
 0x0011b3c0	7	constant_double_11b3c0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b3c0.json	docs/compiler-abi.md; Constant double at 0x195864.; callers 11c584@11c6e4; guest pending
 0x0011b3c8	149			unknown	unclassified	unverified		
@@ -4198,7 +4198,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b8d8	119			unknown	unclassified	unverified		
 0x0011b950	91			unknown	unclassified	unverified		
 0x0011b9ac	61			unknown	unclassified	unverified		
-0x0011b9ec	95			unknown	unclassified	unverified		
+0x0011b9ec	95	scaled_pow_formula_11b9ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b9ec.json	docs/compiler-abi.md; EAX = pointer to a reference double (divisor), EDX = object pointer. Computes t = (C3 - exp(-(obj[0x20] + C1) * C2)) * C; callers 11ba7c@11baa1; guest pending
 0x0011ba4c	45			unknown	unclassified	unverified		
 0x0011ba7c	54			unknown	unclassified	unverified		
 0x0011bab4	65			unknown	unclassified	unverified		
