@@ -5090,3 +5090,10 @@ in EAX, format string address, one value).
 | `0x9c1e0` | none | EAX:uint32_t | none direct | Sum 16 times the value of 0xeb2a8 and the +4 field of every node on the list headed at 0x132a70 (node pointers go throug |
 | `0xcdfe8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | ac854@ac8c2,f3f84@f4045 | Query service 0x33 sub-function 3 through 0x8b8 and return the low three bits of the status, half the x value and the y  |
 | `0xa0060` | none | none | 3dd30@3deec | Reset the time scale at 0x132b20 and, if 0x137a00 is set, run 0xa0174 on every entry of the 0x4e-byte chain starting at  |
+
+## small_wrappers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa9fc` | none | EAX:uint32_t | ab74@ad18,ab74@adf6,ab74@af56 | Pick a delay (0x28, 0x46, 0x78 or 0xc8) from a random number modulo 4. |
+| `0xcbcc5` | EAX:uint32_t,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | cbd0f@cbd21 | Convert an unsigned number to text in the given base (digits 0-9, a-z) at dst, returning dst. |

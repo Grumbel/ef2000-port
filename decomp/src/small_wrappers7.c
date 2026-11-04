@@ -55,3 +55,36 @@ void run_entry_chain_a0060(void)
     }
     guest_fn_a00e8_x();
 }
+
+/* 0xa9fc, 69 bytes. Pick a delay (0x28, 0x46, 0x78 or 0xc8) from a random number modulo 4. */
+uint32_t random_delay_a9fc(void)
+{
+    switch ((half_word_9c960() & 0xffffu) % 4u) {
+    case 0: return 0x28u;
+    case 1: return 0x46u;
+    case 3: return 0xc8u;
+    default: return 0x78u;
+    }
+}
+
+/* 0xcbcc5, 74 bytes. Convert an unsigned number to text in the given base (digits 0-9, a-z) at dst, returning dst. */
+ef_addr32 utoa_cbcc5(uint32_t value, ef_addr32 dst, uint32_t base)
+{
+    static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+    uint8_t tmp[0x28];
+    uint32_t n = 1u;
+    uint32_t out = dst;
+    uint8_t c;
+    tmp[0] = 0u;
+    do {
+        uint32_t q = value / base;
+        tmp[n++] = (uint8_t)digits[value % base];
+        value = q;
+    } while (value != 0u);
+    do {
+        n--;
+        c = tmp[n];
+        EF_U8(out++) = c;
+    } while (c != 0u);
+    return dst;
+}

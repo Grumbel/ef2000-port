@@ -4344,4 +4344,7 @@ uint32_t guest_fn_eb2a8_x(void); /* 0xeb2a8 no arguments, result in EAX */
 void guest_fn_a0174_x(ef_addr32 entry); /* 0xa0174 EAX */
 void guest_fn_a00e8_x(void); /* 0xa00e8 no arguments */
 
+uint32_t random_delay_a9fc(void);
+ef_addr32 utoa_cbcc5(uint32_t value, ef_addr32 dst, uint32_t base);
+
 #endif

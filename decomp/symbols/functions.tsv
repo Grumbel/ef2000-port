@@ -143,7 +143,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000a960	19	gcChangeMode		named	unclassified	unverified		
 0x0000a974	49	gcZoomMapInOut		named	unclassified	unverified		
 0x0000a9a8	67	pick_count_a9a8	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000a9a8.json	docs/compiler-abi.md; Smaller of (table byte + 1) and (random % 3 + 2).; callers ab74@ad1f,ab74@adfd,ab74@af5d; guest pending
-0x0000a9fc	69			unknown	unclassified	unverified		
+0x0000a9fc	69	random_delay_a9fc	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0000a9fc.json	docs/compiler-abi.md; Pick a delay (0x28, 0x46, 0x78 or 0xc8) from a random number modulo 4.; callers ab74@ad18,ab74@adf6,ab74@af56; guest pending
 0x0000aa6c	85			unknown	unclassified	unverified		
 0x0000aaec	61	random_step_aaec	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0000aaec.json	docs/compiler-abi.md; Pick 3, 6 or 9 from a random number modulo 10.; callers e490@e556,e490@e624; guest pending
 0x0000ab2c	72	random_clamped_ab2c	game_helpers7	compiles	game	confirmed	decomp/tests/0x0000ab2c.json	docs/compiler-abi.md; Random value in [a - b, a + b], clamped to 10..0x186.; callers ab74@acf2,ab74@ad08,ab74@add0; guest pending
@@ -2885,7 +2885,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cb9f4	608			unknown	unclassified	unverified		
 0x000cbc54	71	lookup_tiles_cbc54	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cbc54.json	docs/compiler-abi.md; Look up each node's tile byte in a 40-wide grid from its position.; callers 49228@49417,b0df4@b0e82,b0f5c@b1149; guest pending
 0x000cbc9b	5	tail_jump_cbc9b	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000cbc9b.json	docs/compiler-abi.md; tail jump. Forward to 0xfe541.; callers ba5c@bad2,ba5c@baf5,42e8c@42ea1; guest pending
-0x000cbcc5	74			unknown	unclassified	unverified		
+0x000cbcc5	74	utoa_cbcc5	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000cbcc5.json	docs/compiler-abi.md; Convert an unsigned number to text in the given base (digits 0-9, a-z) at dst, returning dst.; callers cbd0f@cbd21; guest pending
 0x000cbd0f	27	signed_to_digits_cbd0f	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000cbd0f.json	docs/compiler-abi.md; Signed decimal prefix, then the digit conversion.; callers c768@c79e,c768@c7db,4d668@4d78e; guest pending
 0x000cbd30	451	scan_code_weight_cbd30	game_helpers71	compiles	game	confirmed	decomp/tests/0x000cbd30.json	docs/compiler-abi.md; Weight for a scan code (0 when unmapped); the original is a binary decision tree.; callers caa28@cab5f; guest pending
 0x000cbef4	12	code_if_one_to_four	code_predicates	compiles	game	confirmed	decomp/tests/0x000cbef4.json	docs/compiler-abi.md; AL if it is 1..4, else 0.; callers cabb0@cabd0; guest pending
