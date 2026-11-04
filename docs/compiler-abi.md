@@ -7545,3 +7545,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xb686c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:uint32_t | none | b47e4@b4834,b47e4@b485d,b47e4@b4895 | Fill the slots of the record A (EAX; slot table pointer at +0x13, slot count byte at +0x12, 0x7c byte slots) from the ne |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x92e30` | EAX:uint32_t | none | 92c28@92dcb,95e58@96a53,95e58@96b3b | Load the camera record 0x214378 from the object UNIT (word in EDX, 0x7489c): convert the float 0x1a5bb8 to the dword 0x1 |

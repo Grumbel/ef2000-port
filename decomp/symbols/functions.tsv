@@ -1905,7 +1905,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00092668	793			unknown	unclassified	unverified		
 0x00092984	633			unknown	unclassified	unverified		
 0x00092c28	520			unknown	unclassified	unverified		
-0x00092e30	222			unknown	unclassified	unverified		
+0x00092e30	222	load_camera_92e30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00092e30.json	docs/compiler-abi.md; Load the camera record 0x214378 from the object UNIT (word in EDX, 0x7489c): convert the float 0x1a5bb8 to the dword 0x1; callers 92c28@92dcb,95e58@96a53,95e58@96b3b; guest pending
 0x00092f10	135	reset_scene_record_92f10	float_helpers4	compiles	game	confirmed	decomp/tests/0x00092f10.json	docs/compiler-abi.md; Reset the scene record from the current object and the scene angle record.; callers 95e58@96ce1; guest pending
 0x00092f98	98	update_viewpoint_92f98	camera_helpers	compiles	game	confirmed	decomp/tests/0x00092f98.json	docs/compiler-abi.md; ; callers 95e58@96cf0; guest pending
 0x00092ffc	99	step_list_92ffc	camera_helpers	compiles	game	confirmed	decomp/tests/0x00092ffc.json	docs/compiler-abi.md; Step byte 0x12dc34 through the list of words at +0x50 of the current record, skipping the player.; callers 93060@93098; guest pending

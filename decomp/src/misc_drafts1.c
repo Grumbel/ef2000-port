@@ -11930,3 +11930,31 @@ void fill_slots_from_nearest_b686c(ef_addr32 rec, ef_addr32 obj, ef_addr32 listh
         memcpy(ef_guest_memory_ptr(slot + 0x28u), ef_guest_memory_ptr(src + 0x11u), 18u);
     }
 }
+
+/* 0x92e30, 222 bytes. Load the camera record 0x214378 from the object UNIT (word in EDX, 0x7489c): convert the float 0x1a5bb8 to the dword 0x1a5bf0 (0x9d72c) and initialise the bounds of 0x214404 and 0x214378. Without an object set word 0x21449c to 1 and copy byte 0x214486 to 0x12db9e. Otherwise copy the position (dwords +0..+8) to 0x21446c, run 0x95bf4 when byte +0xe9 is zero, rotate by the words at +0xe, +0xc (only when byte 0x21454b is set) and +0x10 and, if the target named by the high word of +0x1e resolves (0x9125c), store that result in word 0x21448a; finish with 0x9357c. The EBX and ECX arguments of the rotate helpers are not set by the original (EBX is the object for 0xd0dbc). */
+void load_camera_92e30(uint32_t unit)
+{
+    ef_addr32 obj;
+    double v = (double)*(float *)ef_guest_memory_ptr(0x001a5bb8u);
+    EF_U32(0x001a5bf0u) = (uint32_t)(int32_t)truncate_9d72c(v);
+    guest_fn_d0b68(0x00214404u, 0u);
+    guest_fn_d0b68(0x00214378u, 0u);
+    obj = guest_fn_7489c((int32_t)(int16_t)unit);
+    if (obj == 0u) {
+        EF_U16(0x0021449cu) = 1u;
+        EF_U8(0x0012db9eu) = EF_U8(0x00214486u);
+        return;
+    }
+    EF_U32(0x0021446cu) = EF_U32(obj);
+    EF_U32(0x00214470u) = EF_U32(obj + 4u);
+    EF_U32(0x00214474u) = EF_U32(obj + 8u);
+    if (EF_U8(obj + 0xe9u) == 0u)
+        guest_fn_95bf4_x();
+    guest_fn_d0ebc(0x00214378u, EF_U16(obj + 0xeu));
+    if (EF_U8(0x0021454bu) != 0u)
+        guest_fn_d0dbc(0x00214378u, EF_U16(obj + 0xcu), obj);
+    guest_fn_d0fb8(0x00214378u, EF_U16(obj + 0x10u), 0u);
+    if ((uint16_t)guest_fn_9125c((int32_t)EF_U32(obj + 0x1eu) >> 16) != 0u)
+        EF_U16(0x0021448au) = (uint16_t)guest_fn_9125c((int32_t)EF_U32(obj + 0x1eu) >> 16);
+    guest_fn_9357c();
+}

@@ -5511,4 +5511,7 @@ void guest_fn_e9b38_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32
 
 void fill_slots_from_nearest_b686c(ef_addr32 rec, ef_addr32 obj, ef_addr32 listhead, uint32_t mask);
 
+void load_camera_92e30(uint32_t unit);
+void guest_fn_95bf4_x(void); /* 0x95bf4 */
+
 #endif
