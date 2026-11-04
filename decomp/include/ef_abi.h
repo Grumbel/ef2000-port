@@ -4554,4 +4554,8 @@ void draw_text_small_dd6a0(uint32_t colour, uint32_t x, uint32_t y, uint32_t str
 uint32_t tree_find_or_insert_de7d0(uint32_t text);
 uint32_t tree_find_or_insert_9dbf0(uint32_t text);
 
+uint32_t find_chunk_c1c24(uint32_t id);
+void set_view_rect_c9f28(uint32_t obj);
+void draw_clock_text_78934(void);
+
 #endif

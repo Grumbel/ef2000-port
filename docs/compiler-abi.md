@@ -5450,3 +5450,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xde7d0` | EAX:uint32_t | EAX:uint32_t | de864@de958 | Look up the hash of the name in the binary tree whose keys are at 0x426150 and child word pairs at 0x4270f0 (left/right  |
 | `0x9dbf0` | EAX:uint32_t | EAX:uint32_t | 9de08@9de29 | Same lookup/insert as 0xde7d0 over the tables at 0x412fc0 (keys), 0x40f140 (signed child words) and 0x411080 (payload, n |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc1c24` | EAX:uint32_t | EAX:uint32_t | c3584@c35fd | Scan the chunk stream that starts 0xc bytes into the buffer at 0x41f3bc (cursor 0x41f3a0, end 0x41f3c0) for the chunk wi |
+| `0xc9f28` | EAX:uint32_t | none | a5b70@a5c71,a60a8@a60e8 | Set the view to the rectangle at 0x41ec08 (x, y, width, height words): origin at the centre, latch the rectangle twice a |
+| `0x78934` | none | none | 79128@7918f | Unless 0x127da8 is set: count the timer 0x1f8d58 down by the step 0x127d92 (clearing it above 0xdc), format the hour-lik |

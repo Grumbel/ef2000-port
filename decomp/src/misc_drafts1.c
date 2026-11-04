@@ -1251,3 +1251,61 @@ uint32_t tree_find_or_insert_9dbf0(uint32_t text)
     EF_U16(0x0040f140u + prev * 4u + (diff >= 0 ? 2u : 0u)) = (uint16_t)idx;
     return 0xffffffffu;
 }
+
+/* 0xc1c24, 151 bytes. Scan the chunk stream that starts 0xc bytes into the buffer at 0x41f3bc (cursor 0x41f3a0, end 0x41f3c0) for the chunk with the given id: each chunk has an 8-byte header (id, big-endian size, rounded up to even). Returns the chunk size and leaves the cursor at its data; reports an error and returns 0 when not found. */
+uint32_t find_chunk_c1c24(uint32_t id)
+{
+    uint32_t hdr[2];
+    uint32_t p = EF_U32(0x0041f3bcu) + 0xcu;
+    EF_U32(0x0041f3a0u) = p;
+    if (p < EF_U32(0x0041f3c0u)) {
+        do {
+            uint32_t size;
+            guest_fn_e9a24(8u, EF_U32(0x0041f3a0u), (uint32_t)(uintptr_t)hdr);
+            EF_U32(0x0041f3a0u) = EF_U32(0x0041f3a0u) + 8u;
+            size = byte_swap32_c1bd0(hdr[1]);
+            size += size & 1u;
+            hdr[1] = size;
+            if (id == hdr[0])
+                return size;
+            p = EF_U32(0x0041f3a0u) + size;
+            EF_U32(0x0041f3a0u) = p;
+        } while (p < EF_U32(0x0041f3c0u));
+    }
+    guest_callptr1_x(EF_U32(0x00132a74u), 0x0018eda8u);
+    return 0u;
+}
+
+/* 0xc9f28, 153 bytes. Set the view to the rectangle at 0x41ec08 (x, y, width, height words): origin at the centre, latch the rectangle twice and refresh the view scale when bit 0 of obj+0x3c is set. */
+void set_view_rect_c9f28(uint32_t obj)
+{
+    int32_t x0 = EF_S16(0x0041ec08u);
+    int32_t y0 = EF_S16(0x0041ec0au);
+    int32_t x1 = EF_S16(0x0041ec0cu) + x0 - 1;
+    int32_t y1 = EF_S16(0x0041ec0eu) + y0 - 1;
+    set_view_origin_dc21c((uint32_t)y1, (uint32_t)x1, (uint32_t)((y1 + y0) / 2 - 1), (uint32_t)((x1 + x0) / 2 - 1));
+    guest_fn_ce328_w(x0, x1, y0, y1);
+    guest_fn_cdf48((uint32_t)x0, (uint32_t)x1, (uint32_t)y0, (uint32_t)y1);
+    if (EF_U8(obj + 0x3cu) & 1u)
+        update_view_scale_dc314();
+}
+
+/* 0x78934, 153 bytes. Unless 0x127da8 is set: count the timer 0x1f8d58 down by the step 0x127d92 (clearing it above 0xdc), format the hour-like value (0x12583c + 0x12b054 wrapped into 0..23) and the word at 0x12583e with the format 0x12f4a1, print it at (15, 10, 110) and set 0x127b1a. */
+void draw_clock_text_78934(void)
+{
+    uint8_t buf[0x20];
+    int16_t v;
+    if (EF_U8(0x00127da8u) != 0u)
+        return;
+    EF_U8(0x001f8d58u) = (uint8_t)(EF_U8(0x001f8d58u) - EF_U8(0x00127d92u));
+    if (EF_U8(0x001f8d58u) > 0xdcu)
+        EF_U8(0x001f8d58u) = 0u;
+    v = (int16_t)(EF_U16(0x0012583cu) + EF_U16(0x0012b054u));
+    while (v > 0x17)
+        v = (int16_t)(v - 0x18);
+    while (v < 0)
+        v = (int16_t)(v + 0x18);
+    guest_sprintf_a4342((uint32_t)(uintptr_t)buf, 0x0012f4a1u, (uint32_t)(int32_t)v, (uint32_t)(int32_t)EF_S16(0x0012583eu));
+    EF_U8(0x00127b1au) = 1u;
+    guest_fn_48c90(15u, 10u, 0x6eu, (uint32_t)(uintptr_t)buf);
+}
