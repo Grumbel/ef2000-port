@@ -159,3 +159,46 @@ void project_position_5ca88(uint32_t pos, uint32_t arg)
     z += EF_S32(0x00214450u);
     guest_fn_15c0c4_x(0u, 0u, 0u, 0u, (uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
 }
+
+/* 0x9cc28, 143 bytes. Load the resource with key into buffer: try the two archive contexts at 0x40d1f0/0x40d1f4 (enabled by bits 0 and 1 of 0x132ab0), then fall back to opening the file through the archive lookup. Returns 1 on success. */
+uint8_t load_resource_9cc28(uint32_t key, uint32_t buffer)
+{
+    uint32_t ctx = EF_U32(0x0040d1f0u);
+    uint32_t count;
+    int32_t handle;
+    if (ctx != 0u && (EF_U8(0x00132ab0u) & 1u) && read_entry_block_ebb10(key, buffer, ctx) != 0u)
+        return 1u;
+    ctx = EF_U32(0x0040d1f4u);
+    if (ctx != 0u && (EF_U8(0x00132ab0u) & 2u) && read_entry_block_ebb10(key, buffer, ctx) != 0u)
+        return 1u;
+    count = lookup_in_archives_9cb70(key);
+    if (count == 0u)
+        return 0u;
+    handle = open_slot_a7900(0u, 0u, 0u, 0u, key);
+    if (handle == -1)
+        return 0u;
+    read_handle_a79d4(0u, 0u, 0u, 0u, (uint32_t)handle, count, buffer);
+    close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
+    return 1u;
+}
+
+/* 0xa9694, 143 bytes. Evaluate up to three variable conditions of a script record (index, operator, value triples at +0, +0xa, +0x14); the first that holds triggers 0xa94e4 on the matching target (+0x1e, +0x22, +0x26) and stops the scan. */
+void run_script_conditions_a9694(uint32_t rec)
+{
+    uint8_t fired = 0u;
+    if (compare_variable_a9640(EF_U32(rec), (uint32_t)EF_S16(rec + 4u), EF_S32(rec + 6u)) & 0xffu) {
+        guest_fn_a94e4_x(EF_U32(rec + 0x1eu), 1u);
+        fired = 1u;
+    }
+    if (fired == 0u && EF_U32(rec + 0x22u) != 0u) {
+        if (compare_variable_a9640(EF_U32(rec + 0xau), (uint32_t)EF_S16(rec + 0xeu), EF_S32(rec + 0x10u)) & 0xffu) {
+            /* EDX at the call is the variable value left by 0xa9640. */
+            guest_fn_a94e4_x(EF_U32(rec + 0x22u), EF_U32(0x00418708u + EF_U32(rec + 0xau) * 4u));
+            fired++;
+        }
+    }
+    if (fired == 0u && EF_U32(rec + 0x26u) != 0u) {
+        if (compare_variable_a9640(EF_U32(rec + 0x14u), (uint32_t)EF_S16(rec + 0x18u), EF_S32(rec + 0x1au)) & 0xffu)
+            guest_fn_a94e4_x(EF_U32(rec + 0x26u), EF_U32(0x00418708u + EF_U32(rec + 0x14u) * 4u));
+    }
+}

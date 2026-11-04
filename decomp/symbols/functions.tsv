@@ -2048,7 +2048,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009cb20	78	find_in_archives_9cb20	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009cb20.json	docs/compiler-abi.md; Try the two open archives, then fall back to 0xb3b90.; callers 41fc@420d,6b50@6bb9,f6a8@f700; guest pending
 0x0009cb70	84	lookup_in_archives_9cb70	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009cb70.json	docs/compiler-abi.md; As 0x9cb20 with 0xeba4c and 0xa7b3c; -1 becomes 0.; callers 9cc28@9cc81,ea270@ea30d; guest pending
 0x0009cbc4	98	try_handlers_9cbc4	script_helpers1	compiles	game	confirmed	decomp/tests/0x0009cbc4.json	docs/compiler-abi.md; Try the two optional handlers (0x40d1f0 gated by bit 0 and 0x40d1f4 gated by bit 1 of 0x132ab0); return 1 if one accepts; callers 6b50@6be1,371b0@37216,3c6c0@3c705; guest pending
-0x0009cc28	143			unknown	unclassified	unverified		
+0x0009cc28	143	load_resource_9cc28	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009cc28.json	docs/compiler-abi.md; Load the resource with key into buffer: try the two archive contexts at 0x40d1f0/0x40d1f4 (enabled by bits 0 and 1 of 0x; callers ea1a0@ea1ab; guest pending
 0x0009ccb8	303			unknown	unclassified	unverified		
 0x0009cde8	154			unknown	unclassified	unverified		
 0x0009ce84	98	close_request_9ce84	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009ce84.json	docs/compiler-abi.md; Dispatch a close request by flag bits 0x10000/0x20000/0x40000.; callers f80@1ac1,f6a8@f8e4,fecc@ffa1; guest pending
@@ -2355,7 +2355,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a9490	82	step_list_cursor_a9490	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x000a9490.json	docs/compiler-abi.md; Step a list cursor n rows forward and latch the result.; callers a94e4@a9505,a94e4@a9530,a94e4@a959a; guest pending
 0x000a94e4	321			unknown	unclassified	unverified		
 0x000a9640	81	compare_variable_a9640	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000a9640.json	docs/compiler-abi.md; Compare the signed value at 0x418708[index] with value using operator op (1 ==, 2 !=, 3 >, 4 <, 5 >=, 6 <=); returns 1 w; callers a9694@a96ac,a9694@a96da,a9694@a970b; guest pending
-0x000a9694	143			unknown	unclassified	unverified		
+0x000a9694	143	run_script_conditions_a9694	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a9694.json	docs/compiler-abi.md; Evaluate up to three variable conditions of a script record (index, operator, value triples at +0, +0xa, +0x14); the fir; callers a9e70@a9fe6; guest pending
 0x000a9724	277			unknown	unclassified	unverified		
 0x000a983c	60	apply_operation_a983c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a983c.json	docs/compiler-abi.md; Apply a set/add/subtract operation to a guest value.; callers a9e70@a9fba; guest pending
 0x000a9878	88	build_status_line_a9878	game_helpers81	compiles	game	confirmed	decomp/tests/0x000a9878.json	docs/compiler-abi.md; Build a status line from three fragments, store the title, and refresh.; callers a9e70@a9fab; guest pending

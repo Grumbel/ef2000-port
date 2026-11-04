@@ -5278,3 +5278,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xbc4da` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | bc450@bc453 | Close a stream record: flush when flagged, release its handle, optionally run 0xfa9a0, free the buffer and remove a temp |
 | `0x5ca88` | EAX:uint32_t,EDX:uint32_t | none | 5a220@5a284,5c354@5c3e6,5c518@5c5f6 | Convert a fixed-point position (words at +0,+4,+8, 8 fractional bits) to be camera relative (origin at 0x21444c/214448/2 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9cc28` | EAX:uint32_t,EDX:uint32_t | AL:uint8_t | ea1a0@ea1ab | Load the resource with key into buffer: try the two archive contexts at 0x40d1f0/0x40d1f4 (enabled by bits 0 and 1 of 0x |
+| `0xa9694` | EAX:uint32_t | none | a9e70@a9fe6 | Evaluate up to three variable conditions of a script record (index, operator, value triples at +0, +0xa, +0x14); the fir |

@@ -4449,4 +4449,8 @@ uint32_t close_stream_record_bc4da(uint32_t rec, uint32_t extra);
 void project_position_5ca88(uint32_t pos, uint32_t arg);
 uint32_t guest_fn_15c0c4_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
 
+uint8_t load_resource_9cc28(uint32_t key, uint32_t buffer);
+void run_script_conditions_a9694(uint32_t rec);
+void guest_fn_a94e4_x(uint32_t rec, uint32_t edx_in);
+
 #endif
