@@ -3434,7 +3434,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e80d0	202	make_path_e80d0	game_helpers97	compiles	game	confirmed	decomp/tests/0x000e80d0.json	docs/compiler-abi.md; _makepath: join drive, directory, name and extension into path, adding the missing separators and normalising '/' to '\\; callers 7ab00@7ab7b,7ab00@7ab95,de864@de9c0; guest pending
 0x000e81b0	408			unknown	unclassified	unverified		
 0x000e8348	32	rotate_calls_e8348	math_string	compiles	game	confirmed	decomp/tests/0x000e8348.json	docs/compiler-abi.md; 0xe81b0 on (A,B), (B,C), (C,A) for EAX, EDX, EBX.; callers e8368@e83c1; guest pending
-0x000e8368	112			unknown	unclassified	unverified		
+0x000e8368	112	rotate_page_entries_e8368	page_rotate1	compiles	game	confirmed	decomp/tests/0x000e8368.json	docs/compiler-abi.md; Look up a page's vertex group and rotate each 0x4a-byte entry's three points, storing the rotation parameters at 0x46437; callers 7b3fc@7b4a9; guest pending
 0x000e83d8	169	draw_rect_outline_e83d8	game_helpers90	compiles	game	confirmed	decomp/tests/0x000e83d8.json	docs/compiler-abi.md; Draw the four edges of the rectangle spanned by two 3-word points in the plane of the first point's y.; callers e853c@e8545,e853c@e854e; guest pending
 0x000e8484	159			unknown	unclassified	unverified		
 0x000e853c	167	draw_box_outline_e853c	game_helpers90	compiles	game	confirmed	decomp/tests/0x000e853c.json	docs/compiler-abi.md; Draw a wireframe box: both rectangle outlines plus the four vertical edges.; callers e8484@e850a; guest pending
