@@ -5536,3 +5536,10 @@ in EAX, format string address, one value).
 | `0x78a0c` | none | none | 79128@79194 | For each of the 8 slots (0x7a bytes at 0x1f8930, countdown word at +0x78): count it down by the frame step 0x127d92 (cla |
 | `0x34b2c` | none | none | 345e8@3474e,34bcc@34c91,34f94@350da | Dispatch on the state byte 0x13578e (3..19): rebuild the child dialog for the matching label, update the buttons (states |
 | `0xbd7cc` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | bd86c@bd8a7 | Try to shrink the counter byte at p+3 by one: the minimum depends on the type byte p+9 (types 1, 2, 10 need more than 2, |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe5e90` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e605c@e60e7 | Draw a 7x9 glyph in the colour byte 0x433ec0 at (x = eax, y row = edx): code bit 7 selects the table at 0x15feb0 (index  |
+| `0x6f6b8` | EAX:uint32_t | AL:uint8_t | 6f758@6f891 | For the unit's 20 three-byte slot records (+0x198: type word area, +0x19b: kind byte) find the slot of rank-2 weapon typ |

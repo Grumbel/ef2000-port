@@ -1432,3 +1432,47 @@ uint32_t shrink_counter_bd7cc(uint32_t p, uint32_t edx)
     }
     return 0u;
 }
+
+/* 0xe5e90, 159 bytes. Draw a 7x9 glyph in the colour byte 0x433ec0 at (x = eax, y row = edx): code bit 7 selects the table at 0x15feb0 (index code & 0x1f) otherwise 0x15fc70 (index code & 0x3f), 9 mask bytes per glyph. */
+void draw_glyph_7x9_e5e90(uint32_t x, uint32_t y, uint32_t code)
+{
+    uint8_t colour = EF_U8(0x00433ec0u);
+    uint32_t tbl;
+    if (code & 0x80u)
+        tbl = 0x0015feb0u + (code & 0x1fu) * 9u;
+    else
+        tbl = 0x0015fc70u + (code & 0x3fu) * 9u;
+    draw_glyph_rows(colour, x, y, tbl, 9u, 7u, 0x80u);
+    EF_U8(0x00433ec0u) = colour;
+}
+
+/* 0x6f6b8, 160 bytes. For the unit's 20 three-byte slot records (+0x198: type word area, +0x19b: kind byte) find the slot of rank-2 weapon type with the lowest class (1, 2, 3 by kind byte - 6, 0xff for others) and return its kind byte; 0 when no slot qualifies or the unit is unknown. */
+uint8_t best_slot_kind_6f6b8(uint32_t unit)
+{
+    static const uint8_t cls[23] = { 1, 1, 1, 3, 1, 1, 2, 2, 1, 3, 0xff, 0xff, 0xff, 0xff, 3, 1, 1, 2, 1, 1, 1, 3, 1 };
+    ef_addr32 obj = lookup_filtered_indexed_object((int16_t)unit);
+    uint8_t best = 0xffu;
+    uint8_t result = 0u;
+    int16_t i;
+    if (obj == 0u)
+        return 0u;
+    for (i = 0; i < 20; i++) {
+        uint32_t rec = obj + (uint32_t)((int32_t)i * 3);
+        int32_t type;
+        uint8_t kind;
+        uint8_t c;
+        if (EF_U16(rec + 0x19cu) == 0u)
+            continue;
+        type = (int32_t)(int8_t)EF_U8(rec + 0x19bu);
+        if (EF_U8(0x0012bc94u + (uint32_t)(type * 0x91)) != 2u)
+            continue;
+        kind = EF_U8(rec + 0x19bu);
+        c = (uint8_t)(kind - 6u);
+        c = c > 0x16u ? 0xffu : cls[c];
+        if (c < best) {
+            best = c;
+            result = EF_U8(rec + 0x19bu);
+        }
+    }
+    return result;
+}

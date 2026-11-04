@@ -1324,7 +1324,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006f2bc	290			unknown	unclassified	unverified		
 0x0006f3e0	289			unknown	unclassified	unverified		
 0x0006f504	344			unknown	unclassified	unverified		
-0x0006f6b8	160			unknown	unclassified	unverified		
+0x0006f6b8	160	best_slot_kind_6f6b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006f6b8.json	docs/compiler-abi.md; For the unit's 20 three-byte slot records (+0x198: type word area, +0x19b: kind byte) find the slot of rank-2 weapon typ; callers 6f758@6f891; guest pending
 0x0006f758	2845			unknown	unclassified	unverified		
 0x00070278	416			unknown	unclassified	unverified		
 0x00070418	31	forward_object_level	mid_helpers	compiles	game	confirmed	decomp/tests/0x00070418.json	docs/compiler-abi.md; 0x6e390(byte obj+0x18c +2, 3) with obj dword 0x1f71bc; callers 6c488@6c5cf; guest pending
@@ -3397,7 +3397,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e5c30	138	draw_glyph_e5c30	copy_rects1	compiles	game	confirmed	decomp/tests/0x000e5c30.json	docs/compiler-abi.md; Draw a 7x7 glyph at (x, y).; callers e5db4@e5e4a; guest pending
 0x000e5cf0	196			unknown	unclassified	unverified		
 0x000e5db4	207			unknown	unclassified	unverified		
-0x000e5e90	159			unknown	unclassified	unverified		
+0x000e5e90	159	draw_glyph_7x9_e5e90	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e5e90.json	docs/compiler-abi.md; Draw a 7x9 glyph in the colour byte 0x433ec0 at (x = eax, y row = edx): code bit 7 selects the table at 0x15feb0 (index ; callers e605c@e60e7; guest pending
 0x000e5f64	248			unknown	unclassified	unverified		
 0x000e605c	188			unknown	unclassified	unverified		
 0x000e6120	35	set_settings_e6120	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e6120.json	docs/compiler-abi.md; Store five scalar settings.; callers 109070@109072; guest pending
