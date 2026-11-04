@@ -2976,3 +2976,11 @@ in EAX, format string address, one value).
 | `0xe7c90` | AX:int16_t,DX:int16_t | AX:uint16_t | 68e84@68e9e | Read a word from the 0x190c3c page table entry, or 0. |
 | `0xeb374` | EAX:ef_addr32,EDX:ef_addr32,EBX:int32_t | EAX:int32_t | 9c858@9c88a,103f04@104091,103f04@1040b9 | Case-insensitive compare of up to n bytes. |
 | `0xeb4dc` | EAX:ef_addr32,EDX:ef_addr32,EBX:int32_t | EAX:ef_addr32 | eb520@eb684 | Binary search 12-byte entries sorted by their first signed dword. |
+
+## game_helpers26 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x68e84` | EAX:uint32_t | EAX:uint32_t | 69740@69889,69bdc@69cfc | Assign an object bit test to each of 20 page words; returns the number set. |
+| `0x7a5f0` | EAX:uint32_t | none | 7a738@7a7a9 | Append a word to the recorder table from the stream or a 73-byte record. |
+| `0xaae6c` | none | none | aaee8@aaf47 | Set flag 0x137206 when the default key letter matches a slot in mode 5. |

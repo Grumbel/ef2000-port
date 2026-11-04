@@ -2215,4 +2215,22 @@ int32_t compare_nocase_eb374(ef_addr32 a, ef_addr32 b, int32_t count);
 ef_addr32 bsearch_entries_eb4dc(ef_addr32 key_ptr, ef_addr32 table, int32_t count);
 
 
+/* game_helpers26.c */
+uint32_t assign_page_words_68e84(uint32_t object);
+void record_word_7a5f0(uint32_t index);
+void match_default_key_aae6c(void);
+
+
+/* game_helpers26.c */
+uint32_t assign_page_words_68e84(uint32_t object);
+void record_word_7a5f0(uint32_t index);
+void match_default_key_aae6c(void);
+
+
+/* game_helpers26.c */
+uint32_t assign_page_words_68e84(uint32_t object);
+void record_word_7a5f0(uint32_t index);
+void match_default_key_aae6c(void);
+uint32_t guest_fn_68ccc(int16_t object, uint16_t index); /* 0x68ccc AX/DX -> AL */
+
 #endif
