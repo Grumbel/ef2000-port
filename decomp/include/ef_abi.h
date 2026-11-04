@@ -6033,4 +6033,7 @@ void guest_fn_fa02c_x(uint32_t handle, uint32_t dest); /* 0xfa02c 2 stack, calle
 
 uint32_t read_device_angles_d9cb4(ef_addr32 out1, ef_addr32 out2, ef_addr32 out3);
 
+void enter_hiscore_screen_4e14(void);
+void guest_fn_41fc_x(void); /* 0x41fc */
+
 #endif

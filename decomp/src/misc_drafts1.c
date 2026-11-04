@@ -19464,3 +19464,48 @@ uint32_t read_device_angles_d9cb4(ef_addr32 out1, ef_addr32 out2, ef_addr32 out3
 	EF_S32(out3) = (int32_t)truncate_9d72c(192.0 * (f * c));
 	return 1u;
 }
+
+/* 0x4e14, 260 bytes. Enter the high-score screen: load the table, pick the arcade text file for the difficulty and enable the summary widgets. */
+void enter_hiscore_screen_4e14(void)
+{
+	ef_addr32 root, widget, src, node;
+	uint32_t i;
+
+	EF_U8(0x00137a00u) = 1u;
+	guest_fn_41fc_x();
+	guest_fn_42a4_x();
+	EF_U8(0x00125847u) = 1u;
+	guest_fn_e710();
+	EF_U32(0x001970a0u) = 0u;
+	EF_U16(0x00121e46u) = 1u;
+	guest_fn_a4d90(0x0017f648u);
+	switch (EF_S32(0x00121e42u) >> 16) {
+	case 1:
+		root = find_named_or_abort_a46cc(0x0017f6acu);
+		widget = find_widget_checked_a78bc(root, 0x0017f6b8u);
+		src = 0x0017f7b8u;
+		break;
+	case 2:
+		root = find_named_or_abort_a46cc(0x0017f6acu);
+		widget = find_widget_checked_a78bc(root, 0x0017f6c0u);
+		src = 0x0017f7c4u;
+		break;
+	default:
+		root = find_named_or_abort_a46cc(0x0017f6acu);
+		widget = find_widget_checked_a78bc(root, 0x0017f6c4u);
+		src = 0x0017f7d0u;
+		break;
+	}
+	for (i = 0; i < 11u; i++)
+		EF_U8(0x001f8fc8u + i) = EF_U8(src + i);
+	enable_widget_a72d8(widget);
+	root = find_named_or_abort_a46cc(0x0017f7e8u);
+	widget = find_widget_checked_a78bc(root, 0x0017f7f4u);
+	enable_widget_a72d8(widget);
+	guest_fn_7bee8_x(0x00121e40u);
+	node = find_named_or_abort_a46cc(0x0017f7a4u);
+	EF_U16(node + 0xd6u) = 0u;
+	set_session_text_7c4fc(EF_U32(0x00121e40u) + 0x28u, node);
+	guest_fn_a5ef8(EF_U8(node + 0x10u));
+	guest_fn_40dc_x(0u);
+}

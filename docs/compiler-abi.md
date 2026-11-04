@@ -8747,3 +8747,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd9cb4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:uint32_t | 93f44@93f64 | Poll the attached device and convert its latest position sample to three scaled integers. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4e14` | none | none | none direct | Enter the high-score screen: load the table, pick the arcade text file for the difficulty and enable the summary widgets |

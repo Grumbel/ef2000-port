@@ -70,7 +70,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00004c50	162	InitArcade		named	unclassified	unverified		
 0x00004cf4	86	gpwChangeDifficulty		named	unclassified	unverified		
 0x00004d4c	199	gpwAcceptHiscore		named	unclassified	unverified		
-0x00004e14	260			unknown	unclassified	unverified		
+0x00004e14	260	enter_hiscore_screen_4e14	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00004e14.json	docs/compiler-abi.md; Enter the high-score screen: load the table, pick the arcade text file for the difficulty and enable the summary widgets; callers none direct; guest pending
 0x00004f18	502			unknown	unclassified	unverified		
 0x00005110	194	kotsClickBase		named	unclassified	unverified		
 0x000051d4	86	kotsClickPlayType		named	unclassified	unverified		
