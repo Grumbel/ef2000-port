@@ -6447,4 +6447,7 @@ void build_matrix_11c4ec(ef_addr32 out, ef_addr32 rec); /* 0x11c4ec */
 uint32_t heap_alloc_110410(uint32_t size, uint32_t seg, ef_addr32 heap);
 uint32_t heap_alloc_110410(uint32_t size, uint32_t seg, ef_addr32 heap); /* 0x110410 */
 
+void combine_globals_119844(void);
+void combine_globals_119844(void); /* 0x119844 */
+
 #endif

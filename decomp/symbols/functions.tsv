@@ -4159,7 +4159,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00118b60	2869			unknown	unclassified	unverified		
 0x001196a0	40	run_table_initialisers_1196a0	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x001196a0.json	docs/compiler-abi.md; Run the seven table initialisers, then 0x11c20c.; callers 1098f0@1098f0; guest pending
 0x001196c8	377			unknown	unclassified	unverified		
-0x00119844	166			unknown	unclassified	unverified		
+0x00119844	166	combine_globals_119844	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119844.json	docs/compiler-abi.md; Combines globals into doubles at 0x432cc8 and 0x432ab8.; callers 1196a0@1196a5; guest pending
 0x001198ec	75	update_globals_1198ec	float_helpers9	compiles	game	confirmed	decomp/tests/0x001198ec.json	docs/compiler-abi.md; Combine the double globals: 0x432a70 = g[432ae0] * g[432948] * g[432908] + g[432c48] * g[432ac8]; 0x432b38 = g[432da0] *; callers 1196a0@1196aa; guest pending
 0x00119938	141	combine_globals_119938	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119938.json	docs/compiler-abi.md; Combine globals: Z = A*B*C-chain terms stored at 0x432b50, then 0x432af8 = J*C*K*M*N*Z.; callers 1196a0@1196af; guest pending
 0x001199c8	139	combine_globals_1199c8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001199c8.json	docs/compiler-abi.md; Sibling of 0x119a54: X = (A+B+C)*g + D*h*k is stored at 0x432b58 and k*m*g*h*p*X at 0x432b00.; callers 1196a0@1196b4; guest pending

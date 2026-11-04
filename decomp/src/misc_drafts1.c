@@ -22717,3 +22717,20 @@ uint32_t heap_alloc_110410(uint32_t size, uint32_t seg, ef_addr32 heap)
 	EF_U32(esi) |= 1;
 	return esi + 4;
 }
+
+/* 0x119844, 166 bytes. Combines globals into doubles at 0x432cc8 and 0x432ab8. */
+void combine_globals_119844(void)
+{
+	double t;
+
+	t = md_rd_f64(0x432c18) * md_rd_f64(0x432bc8) * md_rd_f64(0x432c18);
+	t = t + (md_rd_f64(0x432c60) + md_rd_f64(0x432cb8));
+	t = t + (double)(int16_t)EF_U8(0x433991) * md_rd_f64(0x432b68);
+	t = t + (double)(int16_t)EF_U8(0x43398c) * md_rd_f64(0x432bf8);
+	*(double *)ef_guest_memory_ptr(0x432cc8) = t;
+	t = md_rd_f64(0x432898) * md_rd_f64(0x1956a4) / md_rd_f64(0x433058)
+	    * (double)(int16_t)EF_U8(0x433995) + t;
+	*(double *)ef_guest_memory_ptr(0x432cc8) = t;
+	*(double *)ef_guest_memory_ptr(0x432ab8) =
+	    md_rd_f64(0x433058) * (md_rd_f64(0x432da0) * md_rd_f64(0x1956ac) * md_rd_f64(0x432278)) * t;
+}

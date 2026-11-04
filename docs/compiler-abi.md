@@ -9385,3 +9385,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x110410` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | fc795@fc80c | First-fit allocation from a circular free list heap. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x119844` | none | none | 1196a0@1196a5 | Combines globals into doubles at 0x432cc8 and 0x432ab8. |
