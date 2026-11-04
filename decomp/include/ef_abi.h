@@ -5434,4 +5434,7 @@ void guest_fn_16e60_x(uint32_t a, uint32_t b); /* 0x16e60 EAX/EDX */
 void guest_fn_16c7c_x(uint32_t record); /* 0x16c7c EAX */
 void guest_fn_16e60_x(uint32_t a, uint32_t b); /* 0x16e60 EAX/EDX */
 
+void clear_missile_slots_16c7c(uint32_t a);
+void guest_fn_56f0c_x(int32_t unit, uint32_t index); /* 0x56f0c EAX/EDX */
+
 #endif

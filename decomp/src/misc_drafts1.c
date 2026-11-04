@@ -11338,3 +11338,40 @@ void try_engagement_168d8(uint32_t a, uint32_t b, uint32_t skip)
         guest_fn_16e60_x(a, b);
     }
 }
+
+/* 0x16c7c, 226 bytes. Strip the missile-like stores (types 7, 9..0xf, 0x15..0x1c) from record A (EAX) in the table at [0x19bb58]: for each of its seven object words at +0x50 (0xff skips), walk the 20 three-byte slots at obj+0x19b; a matching slot gets its count word cleared, after first calling 0x8f22c (and 0x56f0c when byte 0x127da9 is set) with the owner (obj+0x14 high word) and the running slot counter, unless byte 0x125847 is clear or the type is 9. The slot counter is not reset between objects (original behaviour). */
+void clear_missile_slots_16c7c(uint32_t a)
+{
+    uint32_t rec = EF_U32(0x0019bb58u) + a * 0xcau;
+    uint16_t counter = 0u;
+    uint32_t k;
+    for (k = 0u; k != 0xeu; k += 2u) {
+        uint32_t wid = EF_U16(rec + k + 0x50u);
+        ef_addr32 obj;
+        ef_addr32 p;
+        uint32_t i;
+        if (wid == 0xffu)
+            continue;
+        obj = guest_fn_7489c((int32_t)(int16_t)wid);
+        if (obj == 0u)
+            continue;
+        p = obj + 0x19bu;
+        for (i = 0u; i < 0x14u; i++, p += 3u, counter++) {
+            int32_t t = (int32_t)(int8_t)EF_U8(p);
+            if ((uint32_t)t < 7u)
+                continue;
+            if ((uint32_t)t != 7u) {
+                if ((uint32_t)t < 9u)
+                    continue;
+                if ((uint32_t)t > 0xfu && ((uint32_t)t < 0x15u || (uint32_t)t > 0x1cu))
+                    continue;
+            }
+            if (EF_U8(0x00125847u) != 0u && t != 9 && t != 0x14) {
+                guest_fn_8f22c((int32_t)EF_U32(obj + 0x14u) >> 16, (uint32_t)(uint8_t)counter);
+                if (EF_U8(0x00127da9u) != 0u)
+                    guest_fn_56f0c_x((int32_t)EF_U32(obj + 0x14u) >> 16, (uint32_t)(uint8_t)counter);
+            }
+            EF_U16(p + 1u) = 0u;
+        }
+    }
+}

@@ -280,7 +280,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00016ab4	87	record_kind_matches_16ab4	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00016ab4.json	docs/compiler-abi.md; Active record whose kind byte +0x1c is one of a fixed set.; callers 15b7c@15c5d; guest pending
 0x00016b0c	159	within_range_16b0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00016b0c.json	docs/compiler-abi.md; Range test between table entries A (EAX) and B (EDX) of the 0xca-byte records at [0x19bb58]: the type byte at +0x19 sele; callers 168d8@168e5; guest pending
 0x00016bac	205	pick_best_weapon_16bac	float_helpers9	compiles	game	confirmed	decomp/tests/0x00016bac.json	docs/compiler-abi.md; Pick the best-rated weapon among a record's carried ones, returned scaled.; callers 168d8@1690e,16e60@16f07,16e60@17025; guest pending
-0x00016c7c	226			unknown	unclassified	unverified		
+0x00016c7c	226	clear_missile_slots_16c7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00016c7c.json	docs/compiler-abi.md; Strip the missile-like stores (types 7, 9..0xf, 0x15..0x1c) from record A (EAX) in the table at [0x19bb58]: for each of ; callers 161d4@16579,168d8@16963; guest pending
 0x00016d60	255	count_down_slots_16d60	game_helpers41	compiles	game	confirmed	decomp/tests/0x00016d60.json	docs/compiler-abi.md; Count down the 20 three-byte slots of the given kind by the given amount.; callers 15b7c@15eab,16588@168a2,16e60@16f72; guest pending
 0x00016e60	1105			unknown	unclassified	unverified		
 0x000172b4	211			unknown	unclassified	unverified		
