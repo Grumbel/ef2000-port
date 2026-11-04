@@ -3759,8 +3759,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fcc01	31			unknown	unclassified	unverified		
 0x000fcc6f	45			unknown	unclassified	unverified		
 0x000fcd20	402			unknown	unclassified	unverified		
-0x000fceb4	327			unknown	unclassified	unverified		
-0x000fcffb	327			unknown	unclassified	unverified		
+0x000fceb4	327	matrix_mul_transposed_fceb4	matrix_fixed	compiles	game	confirmed	decomp/tests/0x000fceb4.json	docs/compiler-abi.md; out = a * transpose(b); inputs in ESI (a), EBX (b), output EDI.; callers c6b80@c6bda; guest pending
+0x000fcffb	327	matrix_mul_fcffb	matrix_fixed	compiles	game	confirmed	decomp/tests/0x000fcffb.json	docs/compiler-abi.md; out = a * b; inputs in ESI (a), EBX (b), output EDI.; callers c5cd3@c5cfa; guest pending
 0x000fd162	1	nop_fd162	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fd162.json	docs/compiler-abi.md; Empty stub (single ret).; callers none direct; guest pending
 0x000fd164	335			unknown	unclassified	unverified		
 0x000fd371	11	set_pointer_fd371	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000fd371.json	docs/compiler-abi.md; Set the 0x17bfea pointer to its default.; callers none direct; guest pending

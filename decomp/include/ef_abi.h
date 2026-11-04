@@ -3517,4 +3517,8 @@ void stream_saved_tables_e393c(void);
 void guest_fn_e3170_w(uint32_t addr, uint32_t size); /* 0xe3170 EAX/EDX */
 void guest_fn_e330c_w(uint32_t flag, uint32_t addr, uint32_t size); /* 0xe330c EAX/EDX/EBX */
 
+/* matrix_fixed.c */
+void matrix_mul_transposed_fceb4(ef_addr32 a, ef_addr32 b, ef_addr32 out);
+void matrix_mul_fcffb(ef_addr32 a, ef_addr32 b, ef_addr32 out);
+
 #endif

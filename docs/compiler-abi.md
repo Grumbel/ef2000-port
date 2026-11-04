@@ -3949,3 +3949,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xdf4f4` | none | AL:uint8_t | dfac8@dfdec,dfac8@dfe2d | Step the menu back one level; returns 1 when an earlier entry was re-latched. |
 | `0xe393c` | none | none | e3ad0@e3add | Stream the saved table blocks (sizes scale with the count at 0x146e50). |
+
+## matrix_fixed (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfceb4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | c6b80@c6bda | out = a * transpose(b); inputs in ESI (a), EBX (b), output EDI. |
+| `0xfcffb` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | c5cd3@c5cfa | out = a * b; inputs in ESI (a), EBX (b), output EDI. |
