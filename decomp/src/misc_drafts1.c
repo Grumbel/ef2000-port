@@ -2199,3 +2199,69 @@ void hash_and_run_ea20c(ef_addr32 obj, ef_addr32 text)
     block[0] = name_hash_ebfd0(text);
     guest_fn_10d9e3_x((uint32_t)(uintptr_t)block, EF_U32(obj + 0x10u), EF_U32(obj + 0xcu), 0x10u);
 }
+
+/* 0x113b78, 169 bytes. Classify the record pair CTX (cdecl): returns 3 when the name of the first record (+0xba, only when its size at +8 is at least 0x112) matches neither string at 0x1954fc nor 0x195510, otherwise looks up the name referenced by the second record's far pointer (segment base table 0x120cc6): 1 when it equals the string at 0x19552c and the size at +0xc is at most 0x5000, 2 when it equals the string at 0x195530, else 0. */
+uint32_t classify_record_113b78(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 ctx)
+{
+    uint32_t rec = EF_U32(EF_U32(ctx) + 0x10u);
+    uint32_t far_ptr;
+    uint32_t name;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (EF_U32(rec + 8u) >= 0x112u) {
+        name = rec + 0xbau;
+        if (guest_fn_9d524(name, 0x001954fcu) == 0u)
+            return 3u;
+        if (guest_fn_9d524(name, 0x00195510u) == 0u)
+            return 3u;
+    }
+    far_ptr = EF_U32(EF_U32(ctx + 4u) + 4u);
+    name = (far_ptr >> 16) * 16u + (far_ptr & 0xffffu) + EF_U32(0x00120cc6u);
+    if (name != 0u && EF_U8(name) != 0u) {
+        if (guest_fn_9d524(name, 0x0019552cu) == 0u) {
+            if (EF_U32(EF_U32(ctx) + 0xcu) <= 0x5000u)
+                return 1u;
+        } else if (guest_fn_9d524(name, 0x00195530u) == 0u) {
+            return 2u;
+        }
+    }
+    return 0u;
+}
+
+/* 0xf819c, 171 bytes. Load the text file NAME from the default path: build the path in a 144-byte buffer, append NAME and the suffix at 0x19322c, load it with the flags byte at 0x41f2df, report through 0x132a74 when the load returned non-zero (the case-2 message at 0x19326c is unreachable because the result is reduced to 0/1), reset the flag byte 0x41f2e2, rebuild both tables at 0x161fb8/0x1621b4, release the buffer and re-initialise the entities. */
+void reload_text_file_f819c(ef_addr32 name)
+{
+    uint8_t buf[0x90];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    uint32_t r;
+    build_default_path_abaf0(b);
+    guest_fn_9ca57(b, name);
+    guest_fn_9ca57(b, 0x0019322cu);
+    r = (load_text_file_e94ec(b, EF_U8(0x0041f2dfu)) & 0xffu) != 0u;
+    if (r == 1u) {
+        guest_callptr3_x(EF_U32(0x00132a74u), 0x00193234u, name, b);
+    } else if (r == 2u) {
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0019326cu, name);
+    }
+    EF_U8(0x0041f2e2u) = 0u;
+    guest_fn_e93dc(0x00161fb8u, 0u);
+    guest_fn_e93dc(0x001621b4u, 1u);
+    release_buffer_e9574();
+    init_entities_a59d8();
+}
+
+/* 0x9f664, 170 bytes. For the 6-byte point entry INDEX of the current page (table at 0x41717c + 0xa) copy its Y word to 0x417226, let the hook at 0x132af4 transform the point, add the offset 0x417194..98 and compute the bearing (out 0x417150) from the position 0x159094..9c to the offset point. */
+void update_bearing_9f664(int32_t index)
+{
+    uint32_t e = EF_U32(0x0041717cu) + 0xau + (uint32_t)(index * 6);
+    uint16_t from[3];
+    uint16_t to[3];
+    EF_U16(0x00417226u) = EF_U16(e + 2u);
+    guest_callptr2r_x(EF_U32(0x00132af4u), (int16_t)EF_U16(e), (int16_t)EF_U16(e + 4u));
+    to[0] = (uint16_t)(EF_U16(0x00417224u) + EF_U16(0x00417194u));
+    to[1] = (uint16_t)(EF_U16(0x00417226u) + EF_U16(0x00417196u));
+    to[2] = (uint16_t)(EF_U16(0x00417228u) + EF_U16(0x00417198u));
+    from[0] = EF_U16(0x00159094u);
+    from[1] = EF_U16(0x00159098u);
+    from[2] = EF_U16(0x0015909cu);
+    bearing_between_positions_dcaa4(0x00417150u, (uint32_t)(uintptr_t)from, (uint32_t)(uintptr_t)to);
+}

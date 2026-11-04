@@ -4661,4 +4661,9 @@ uint32_t guest_fn_d66c2_x(void); /* 0xd66c2 unknown, no arguments, result in EAX
 uint32_t guest_fn_106f10_x(uint32_t a, uint32_t b); /* 0x106f10 EAX/EDX -> AL */
 void guest_fn_10d9e3_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x10d9e3 EAX/EDX/EBX/ECX */
 
+uint32_t classify_record_113b78(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 ctx);
+void reload_text_file_f819c(ef_addr32 name);
+void update_bearing_9f664(int32_t index);
+void guest_callptr3_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c); /* indirect cdecl call with three stack arguments */
+
 #endif

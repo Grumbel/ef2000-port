@@ -5641,3 +5641,11 @@ in EAX, format string address, one value).
 | `0xd6694` | none | EAX:uint32_t | 1c60c@1c60f,82cec@82d03 | Run the step 0xd66c2; when it succeeds (non-zero) run it five more times and return -1, otherwise return 0. |
 | `0x107004` | EAX:ef_addr32,EDX:ef_addr32 | AL:uint8_t | d9c30@d9c56 | Try 0x106f10 with the object A and the current slot index [0x464470] - 1: on success (0) store the index through OUT and |
 | `0xea20c` | EAX:ef_addr32,EDX:ef_addr32 | none | ea3ec@ea3fd | Hash the name TEXT (0xebfd0), place the hash in a 16-byte block (a callback address 0xea1e8 sits just below it on the st |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x113b78` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 1034b0@1034d5 | Classify the record pair CTX (cdecl): returns 3 when the name of the first record (+0xba, only when its size at +8 is at |
+| `0xf819c` | EAX:ef_addr32 | none | ac2e4@ac3d2 | Load the text file NAME from the default path: build the path in a 144-byte buffer, append NAME and the suffix at 0x1932 |
+| `0x9f664` | EAX:int32_t | none | 9e7bc@9f230,9e7bc@9f279,9e7bc@9f2c2 | For the 6-byte point entry INDEX of the current page (table at 0x41717c + 0xa) copy its Y word to 0x417226, let the hook |

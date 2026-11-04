@@ -2094,7 +2094,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009e494	116	run_text_on_page_9e494	list_ops1	compiles	game	confirmed	decomp/tests/0x0009e494.json	docs/compiler-abi.md; Run the 0x9e7bc text routine with the current-page globals (0x417174/0x417178/0x41717c/0x41722a) temporarily pointed at ; callers a0c04@a0d37,cd2e8@cd378; guest pending
 0x0009e508	175			unknown	unclassified	unverified		
 0x0009e7bc	3752			unknown	unclassified	unverified		
-0x0009f664	170			unknown	unclassified	unverified		
+0x0009f664	170	update_bearing_9f664	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009f664.json	docs/compiler-abi.md; For the 6-byte point entry INDEX of the current page (table at 0x41717c + 0xa) copy its Y word to 0x417226, let the hook; callers 9e7bc@9f230,9e7bc@9f279,9e7bc@9f2c2; guest pending
 0x0009f710	189			unknown	unclassified	unverified		
 0x0009f7d0	55	clear_page_slot_9f7d0	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009f7d0.json	docs/compiler-abi.md; Clear the flag byte of a page slot and mark the page dirty.; callers 9e7bc@9e80d; guest pending
 0x0009f808	69	set_page_slot_9f808	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009f808.json	docs/compiler-abi.md; Set flags and a relative word offset in a page slot and mark the page dirty.; callers 9e7bc@9e832; guest pending
@@ -3674,7 +3674,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f75e0	119	merge_pending_flags_f75e0	game_helpers75	compiles	game	confirmed	decomp/tests/0x000f75e0.json	docs/compiler-abi.md; Merge the pending flag word into the active record, or clear it.; callers none direct; guest pending
 0x000f79b0	62	or_flag_mask_f79b0	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000f79b0.json	docs/compiler-abi.md; OR the mask at 0x46438c into the flag words.; callers none direct; guest pending
 0x000f8010	132	merge_flag_fields_f8010	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000f8010.json	docs/compiler-abi.md; Merge the two 2-bit fields of the mask at 0x46438c into the object flag bytes.; callers none direct; guest pending
-0x000f819c	171			unknown	unclassified	unverified		
+0x000f819c	171	reload_text_file_f819c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f819c.json	docs/compiler-abi.md; Load the text file NAME from the default path: build the path in a 144-byte buffer, append NAME and the suffix at 0x1932; callers ac2e4@ac3d2; guest pending
 0x000f8248	5	elapsed_centiseconds	unk_time	typed	thunk	confirmed		docs/compiler-abi.md; tail jump 0x1100b1; elapsed centiseconds modulo day
 0x000f8250	19	scale_double_to_st0	unk_fp_runtime	typed	game	confirmed		docs/compiler-abi.md; qword argument at [ESP+4], ST0 float10 return, ret 8; callers 0xf8285/0xf82a5
 0x000f8278	29	sin_scaled_f8278	float_helpers9	compiles	game	confirmed	decomp/tests/0x000f8278.json	docs/compiler-abi.md; sin of the argument scaled by the two constants used in 0xf8250 (0x1932a4 and 0x1932ac).; callers b59a8@b59fc,b59a8@b5a39; guest pending
@@ -4109,7 +4109,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001133f8	1608			unknown	unclassified	unverified		
 0x00113a40	115	load_resource_113a40	trace_loaders1	compiles	game	confirmed	decomp/tests/0x00113a40.json	docs/compiler-abi.md; Same with parser 0x1133f8 and default block 0x1954bc.; callers 102fb4@102fe0; guest pending
 0x00113af0	117			unknown	unclassified	unverified		
-0x00113b78	169			unknown	unclassified	unverified		
+0x00113b78	169	classify_record_113b78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00113b78.json	docs/compiler-abi.md; Classify the record pair CTX (cdecl): returns 3 when the name of the first record (+0xba, only when its size at +8 is at; callers 1034b0@1034d5; guest pending
 0x00113c24	86	strip_extension_113c24	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00113c24.json	docs/compiler-abi.md; Copy a path to 0x17e1d8 and cut the extension (cdecl).; callers 103504@103527; guest pending
 0x00113c7c	120			unknown	unclassified	unverified		
 0x00113cf4	27	trace_and_mark_113cf4	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00113cf4.json	docs/compiler-abi.md; Trace-call a non-null record and mark its field 4 as 1.; callers none direct; guest pending
