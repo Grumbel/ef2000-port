@@ -8475,3 +8475,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x53270` | none | none | 1cde8@1cf30,3dd30@3e119,410d0@410d1 | Advance the smoothed frame time: the elapsed ticks (0x10688, low word as signed, at least 1) are stored in word 0x12afd4 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4dfb4` | EAX:uint32_t,EDX:uint32_t | EAX:int32_t | 4dcd8@4dd4c | Find the first slot 1..0x17 whose box contains the point (X = low word of EAX, Y = low word of EDX; signed): the slot ce |

@@ -17679,3 +17679,45 @@ void update_frame_time_53270(void)
 		step *= 5;
 	EF_U16(0x00127d92u) = (uint16_t)step;
 }
+
+/* 0x4dfb4, 281 bytes. Find the first slot 1..0x17 whose box contains the point (X = low word of EAX, Y = low word of EDX; signed): the slot centre is the midpoint of its word pairs (x0 = 0x1a55a0, x1 = 0x1a55a2; y0 = 0x1a55d4, y1 = 0x1a55d6, indexed by slot * 2; halves truncated towards zero) and the half size is the float at 0x184d43 divided by the float at 0x1a53df. Slots whose type byte (0x1a5672 + slot) is 0x11 are skipped. Returns the slot number or -1. */
+int32_t find_slot_at_point_4dfb4(uint32_t x, uint32_t y)
+{
+	int32_t slot;
+	int16_t wa, wb;
+	int32_t x0, y0, hx, hy;
+	float num, den, r, cxf, cyf, xf, yf;
+	double v;
+
+	memcpy(&num, ef_guest_memory_ptr(0x00184d43u), 4);
+	for (slot = 1; (int16_t)slot < 0x18; slot++) {
+		x0 = (int16_t)EF_U16(0x001a55a0u + (uint32_t)slot * 2u);
+		wa = (int16_t)EF_U16(0x001a55a2u + (uint32_t)slot * 2u);
+		hx = ((int32_t)wa - x0) / 2;
+		memcpy(&den, ef_guest_memory_ptr(0x001a53dfu), 4);
+		r = (float)((double)num / (double)den);
+		y0 = (int16_t)EF_U16(0x001a55d4u + (uint32_t)slot * 2u);
+		wb = (int16_t)EF_U16(0x001a55d6u + (uint32_t)slot * 2u);
+		hy = ((int32_t)wb - y0) / 2;
+		wa = (int16_t)(x0 + hx);
+		cxf = (float)wa;
+		xf = (float)(int16_t)x;
+		v = (double)wa - (double)r;
+		if (v >= (double)xf)
+			continue;
+		if ((double)cxf + (double)r <= (double)xf)
+			continue;
+		wb = (int16_t)(y0 + hy);
+		cyf = (float)wb;
+		yf = (float)(int16_t)y;
+		v = (double)wb - (double)r;
+		if (v >= (double)yf)
+			continue;
+		if ((double)cyf + (double)r <= (double)yf)
+			continue;
+		if (EF_U8(0x001a5672u + (uint32_t)slot) == 0x11u)
+			continue;
+		return slot;
+	}
+	return -1;
+}

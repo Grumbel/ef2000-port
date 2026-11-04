@@ -5925,4 +5925,6 @@ void setup_renderer_tables_c4412(uint32_t value);
 
 void update_frame_time_53270(void);
 
+int32_t find_slot_at_point_4dfb4(uint32_t x, uint32_t y);
+
 #endif
