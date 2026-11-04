@@ -5529,4 +5529,7 @@ void guest_fn_5d520_x(int32_t a, int32_t b, ef_addr32 obj); /* 0x5d520 EAX/EDX/E
 void guest_fn_5dbc8_x(int32_t a, int32_t b); /* 0x5dbc8 EAX/EDX */
 void guest_fn_5df08_x(void); /* 0x5df08 */
 
+void select_view_object_24e58(uint32_t id);
+void guest_fn_6d948_x(void); /* 0x6d948 */
+
 #endif

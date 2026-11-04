@@ -7569,3 +7569,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5a220` | none | none | 598e8@59941 | Refresh the map cursor: latch (0xce328) and apply (0xcdf48) the four signed high words 0x1a6cf0, 0x1a6cee, 0x1a6cf6 and  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x24e58` | EAX:uint32_t | none | 257d0@258ea,25c98@25e33,25c98@2607c | Point the view at object ID (AX, word; nothing for an unknown object): select it for the current target (0x2479c with th |

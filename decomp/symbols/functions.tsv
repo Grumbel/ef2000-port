@@ -371,7 +371,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002461c	381	update_indexed_projection_globals	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index and EDX triple-double pointer, x87 global outputs; caller sites 0x24557/0x24982
 0x0002479c	1187			unknown	unclassified	unverified		
 0x00024c40	533			unknown	unclassified	unverified		
-0x00024e58	175			unknown	unclassified	unverified		
+0x00024e58	175	select_view_object_24e58	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00024e58.json	docs/compiler-abi.md; Point the view at object ID (AX, word; nothing for an unknown object): select it for the current target (0x2479c with th; callers 257d0@258ea,25c98@25e33,25c98@2607c; guest pending
 0x00024f08	634			unknown	unclassified	unverified		
 0x00024f24	79			unknown	unclassified	unverified		
 0x00024f94	1159			unknown	unclassified	unverified		

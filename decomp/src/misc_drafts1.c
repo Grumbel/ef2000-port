@@ -12047,3 +12047,37 @@ void refresh_map_cursor_5a220(void)
         guest_fn_5df08_x();
     }
 }
+
+/* 0x24e58, 175 bytes. Point the view at object ID (AX, word; nothing for an unknown object): select it for the current target (0x2479c with the high word of 0x1f71c6, ID and 1) and, unless ID is 0xff, store the bearing atan2(dy, dx) to the object, relative to the current ship ([0x1f71bc], doubles at +0x51 / +0x49), at 0x1f70f8, copy the double at object+0x59 to 0x1f7088 clamped to at most double 0x1284d4 + double 0x181d30, and run 0x24f24. Always finish with 0x6d948. */
+void select_view_object_24e58(uint32_t id)
+{
+    int32_t sid = (int16_t)id;
+    ef_addr32 obj = guest_fn_7489c(sid);
+    ef_addr32 cur;
+    double dx, dy, bearing, v, limit, t;
+    double ox, oy, cx, cy;
+    if (obj == 0u)
+        return;
+    guest_fn_2479c_x((int32_t)EF_U32(0x001f71c6u) >> 16, sid, 1u);
+    if (sid != 0xff) {
+        cur = EF_U32(0x001f71bcu);
+        memcpy(&ox, ef_guest_memory_ptr(obj + 0x49u), sizeof ox);
+        memcpy(&cx, ef_guest_memory_ptr(cur + 0x49u), sizeof cx);
+        memcpy(&oy, ef_guest_memory_ptr(obj + 0x51u), sizeof oy);
+        memcpy(&cy, ef_guest_memory_ptr(cur + 0x51u), sizeof cy);
+        dx = ox - cx;
+        dy = oy - cy;
+        bearing = atan2_b4620(dy, dx);
+        memcpy(ef_guest_memory_ptr(0x001f70f8u), &bearing, sizeof bearing);
+        EF_U32(0x001f7088u) = EF_U32(obj + 0x59u);
+        EF_U32(0x001f708cu) = EF_U32(obj + 0x5du);
+        memcpy(&t, ef_guest_memory_ptr(0x001284d4u), sizeof t);
+        memcpy(&limit, ef_guest_memory_ptr(0x00181d30u), sizeof limit);
+        limit += t;
+        memcpy(&v, ef_guest_memory_ptr(0x001f7088u), sizeof v);
+        if (v > limit)
+            memcpy(ef_guest_memory_ptr(0x001f7088u), &limit, sizeof limit);
+        guest_fn_24f24_x();
+    }
+    guest_fn_6d948_x();
+}
