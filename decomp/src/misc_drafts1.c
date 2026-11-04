@@ -4441,3 +4441,27 @@ void draw_glyph_clipped_e5f64(int32_t x, int32_t y, uint32_t code)
     }
     EF_U32(0x0017cf9cu) = (uint32_t)left;
 }
+
+/* 0x50658, 248 bytes. Tally the roster kinds: for each of the 0x1a5531 entries (kind byte 0x1a5510[i], 1..4) count the kind in 0x1a5536[kind - 1] and mark the first entry of every kind in 0x1a5520[i]; 0x1a5534 receives the number of marked entries and 0x1a5535 the number of distinct kinds seen. */
+void tally_roster_kinds_50658(void)
+{
+    uint8_t seen[4] = { 0u, 0u, 0u, 0u };
+    int16_t i;
+    EF_U8(0x001a5534u) = 0u;
+    for (i = 0; i < 4; i++)
+        EF_U8(0x001a5536u + (uint32_t)i) = 0u;
+    for (i = 0; i < (int16_t)EF_U8(0x001a5531u); i++) {
+        uint8_t k;
+        EF_U8(0x001a5520u + (uint32_t)i) = 0u;
+        k = (uint8_t)(EF_U8(0x001a5510u + (uint32_t)i) - 1u);
+        if (k > 3u)
+            continue;
+        EF_U8(0x001a5536u + k)++;
+        if (seen[k] == 0u) {
+            EF_U8(0x001a5520u + (uint32_t)i) = 1u;
+            EF_U8(0x001a5534u)++;
+        }
+        seen[k] = 1u;
+    }
+    EF_U8(0x001a5535u) = (uint8_t)(seen[0] + seen[1] + seen[2] + seen[3]);
+}

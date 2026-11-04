@@ -4846,4 +4846,6 @@ void rebuild_group_tables_49bdc(uint32_t p);
 
 void draw_glyph_clipped_e5f64(int32_t x, int32_t y, uint32_t code);
 
+void tally_roster_kinds_50658(void);
+
 #endif

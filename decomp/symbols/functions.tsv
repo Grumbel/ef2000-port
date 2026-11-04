@@ -926,7 +926,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000505e4	32	mpReturnToCampaign		named	unclassified	unverified		
 0x00050604	52	mpNoQuit		named	unclassified	unverified		
 0x00050638	15	mpDrawFuelBar		named	unclassified	unverified		
-0x00050658	248			unknown	unclassified	unverified		
+0x00050658	248	tally_roster_kinds_50658	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00050658.json	docs/compiler-abi.md; Tally the roster kinds: for each of the 0x1a5531 entries (kind byte 0x1a5510[i], 1..4) count the kind in 0x1a5536[kind -; callers 4fa64@4fadc; guest pending
 0x00050750	32	mpMissPlanTask		named	unclassified	unverified		
 0x00050770	106	max_difference_50770	game_helpers8	compiles	game	confirmed	decomp/tests/0x00050770.json	docs/compiler-abi.md; Largest (second - first) byte difference over the list at 0x137988.; callers ba5c@bbe1,bfcc@c4ea,d628@d640; guest pending
 0x000507dc	23	refresh_widget_507dc	game_helpers11	compiles	game	confirmed	decomp/tests/0x000507dc.json	docs/compiler-abi.md; ; callers ba5c@bbef,bfcc@c4f8,d628@d64e; guest pending
