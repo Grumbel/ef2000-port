@@ -6441,4 +6441,7 @@ void combine_globals_119938(void); /* 0x119938 */
 uint32_t poll_device_106d34(ef_addr32 obj, uint32_t duration);
 uint32_t poll_device_106d34(ef_addr32 obj, uint32_t duration); /* 0x106d34 */
 
+void build_matrix_11c4ec(ef_addr32 out, ef_addr32 rec);
+void build_matrix_11c4ec(ef_addr32 out, ef_addr32 rec); /* 0x11c4ec */
+
 #endif

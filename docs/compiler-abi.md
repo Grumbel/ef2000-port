@@ -9373,3 +9373,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x106d34` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | d9cb4@d9d00,d9dc0@d9df2,106f10@106ff8 | Send the string at 0x194a6c to the device record OBJ and poll its ring buffer: returns 0 when the byte 0x4f arrives, or  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11c4ec` | EAX:ef_addr32,EDX:ef_addr32 | none | 11c20c@11c310,11c584@11c5a8 | Builds a 3x3 double rotation matrix from two angles. |

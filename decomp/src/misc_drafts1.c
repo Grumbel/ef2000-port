@@ -22631,3 +22631,28 @@ uint32_t poll_device_106d34(ef_addr32 obj, uint32_t duration)
 			return 3;
 	}
 }
+
+/* 0x11c4ec, 152 bytes. Builds a 3x3 double rotation matrix from two angles. */
+void build_matrix_11c4ec(ef_addr32 out, ef_addr32 rec)
+{
+	double a = md_rd_f64(rec + 0x58);
+	double b = md_rd_f64(rec + 0x60);
+	double fa = cos_b45a2(a);
+	double ga = sin_b45ac(a);
+	double fb = cos_b45a2(b);
+	double gb = sin_b45ac(b);
+	double v[9];
+	int i;
+
+	v[0] = fb;
+	v[1] = 0.0;
+	v[2] = -gb;
+	v[3] = -ga * gb;
+	v[4] = fa;
+	v[5] = -ga * fb;
+	v[6] = fa * gb;
+	v[7] = ga;
+	v[8] = fa * fb;
+	for (i = 0; i < 9; i++)
+		*(double *)ef_guest_memory_ptr((ef_addr32)(out + i * 8)) = v[i];
+}

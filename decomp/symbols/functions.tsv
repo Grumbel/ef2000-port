@@ -4220,7 +4220,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011c20c	323			unknown	unclassified	unverified		
 0x0011c350	305			unknown	unclassified	unverified		
 0x0011c484	101	project_triple_11c484	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011c484.json	docs/compiler-abi.md; Project the record at EDX into the coordinate triple at EAX: v = (s[0x50] - s[0x48] * tan(s[0x58])) / (1 + tan^2) - k80;; callers 11c20c@11c2b1,11c350@11c379; guest pending
-0x0011c4ec	152			unknown	unclassified	unverified		
+0x0011c4ec	152	build_matrix_11c4ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011c4ec.json	docs/compiler-abi.md; Builds a 3x3 double rotation matrix from two angles.; callers 11c20c@11c310,11c584@11c5a8; guest pending
 0x0011c584	1391			unknown	unclassified	unverified		
 0x0011cda5	139			unknown	unclassified	unverified		
 0x0011ce30	242			unknown	unclassified	unverified		
