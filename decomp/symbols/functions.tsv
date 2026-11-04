@@ -1788,7 +1788,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008bd58	121	reset_ui_state_8bd58	screen_clip1	compiles	game	confirmed	decomp/tests/0x0008bd58.json	docs/compiler-abi.md; Reset the UI state (record table, four work areas, pool) and then run 0x8bad4 with the caller's two arguments.; callers 3cfc0@3d2ce,410d0@410e8; guest pending
 0x0008bdd4	11	copy_dword_20f420_to_132ad4	misc_state	compiles	game	confirmed	decomp/tests/0x0008bdd4.json	docs/compiler-abi.md; dword 0x132ad4=dword 0x20f420; callers 3ea0c@3eec5; guest pending
 0x0008bde0	6	set_global_8bde0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0008bde0.json	docs/compiler-abi.md; ; callers 888cc@889eb,888cc@88a70; guest pending
-0x0008bde8	83			unknown	unclassified	unverified		
+0x0008bde8	83	sum_scores_8bde8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008bde8.json	docs/compiler-abi.md; Sum of two scores for the same arguments A (EAX), B (EDX), C (EBX), D (ECX) and the signed word S (stack, ret 4): the by; callers 888cc@88a5b; guest pending
 0x0008be3c	23	update_object_remove_link	ui_secondary	compiles	game	confirmed	decomp/tests/0x0008be3c.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008be54	23	update_object_with_link	ui_operations	compiles	game	confirmed	decomp/tests/0x0008be54.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008bf00	28	set_secondary_object_byte	scene_controls	compiles	game	confirmed	decomp/tests/0x0008bf00.json	docs/compiler-abi.md; Filtered lookup from signed high selector 0x1f71c8; set object+0x1d7 to incoming AL; awaiting OMF guest differential

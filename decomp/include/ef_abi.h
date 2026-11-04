@@ -5617,4 +5617,8 @@ double guest_fn_e7df4_x(double x); /* 0xe7df4 ST0 -> ST0: arccosine */
 
 void project_aim_vector_89f50(void);
 
+uint32_t sum_scores_8bde8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s);
+uint32_t guest_fn_8ecdc_x(uint32_t a, uint32_t b, uint32_t s0); /* 0x8ecdc EAX/EDX + 1 stack, ret 4, -> AL */
+uint32_t guest_fn_90438_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0x90438 EAX/EDX/EBX/ECX + 1 stack, ret 4 -> EAX */
+
 #endif

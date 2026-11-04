@@ -12975,3 +12975,11 @@ void project_aim_vector_89f50(void)
     r = d * (-sa) + e * f;
     memcpy(ef_guest_memory_ptr(0x001fd000u), &r, sizeof r);
 }
+
+/* 0x8bde8, 83 bytes. Sum of two scores for the same arguments A (EAX), B (EDX), C (EBX), D (ECX) and the signed word S (stack, ret 4): the byte result of 0x8ecdc(A, B, S) plus the result of 0x90438(A, B, C, D, S). */
+uint32_t sum_scores_8bde8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s)
+{
+    uint32_t sw = (uint32_t)(int32_t)(int16_t)s;
+    uint32_t r1 = guest_fn_8ecdc_x(a, b, sw) & 0xffu;
+    return r1 + guest_fn_90438_x(a, b, c, d, sw);
+}
