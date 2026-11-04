@@ -13111,3 +13111,35 @@ uint8_t wander_view_point_843b0(void)
     }
     return 0u;
 }
+
+/* 0x9d834, 258 bytes. Initialise the C-runtime style globals: zero 0x132b08/0x132b0c and byte 0x132ac2, point 0x411080 at 0x18b22c, set -1 into 0x417160/0x132b18/words 0x132ac4, 0x132ad0, 0x132ad2, clear byte 0x132b1c and words 0x40f140/0x40f142, set word 0x132b10 = 1, and store the table pointers 0x9d770..0x9d780 into 0x132ad4..0x132af0. On the first call only (byte 0x132b12 clear) build the default path in 0x41719a, append 0x18b234 to it, run 0x9da80 and mark the byte. */
+void init_runtime_globals_9d834(void)
+{
+    EF_U32(0x00132b08u) = 0u;
+    EF_U32(0x00132b0cu) = 0u;
+    EF_U32(0x00411080u) = 0x0018b22cu;
+    EF_U8(0x00132ac2u) = 0u;
+    EF_U32(0x00417160u) = 0xffffffffu;
+    EF_U32(0x00132b18u) = 0xffffffffu;
+    EF_U8(0x00132b1cu) = 0u;
+    EF_U32(0x00132ad4u) = 0x0009d778u;
+    EF_U32(0x00132ae0u) = 0x0009d77cu;
+    EF_U32(0x00132aecu) = 0x0009d77cu;
+    EF_U16(0x0040f140u) = 0u;
+    EF_U16(0x0040f142u) = 0u;
+    EF_U16(0x00132b10u) = 1u;
+    EF_U16(0x00132ac4u) = 0xffffu;
+    EF_U16(0x00132ad0u) = 0xffffu;
+    EF_U16(0x00132ad2u) = 0xffffu;
+    EF_U32(0x00132ad8u) = 0x0009d770u;
+    EF_U32(0x00132af0u) = 0x0009d780u;
+    EF_U32(0x00132adcu) = 0x0009d774u;
+    EF_U32(0x00132ae4u) = 0x0009d77cu;
+    EF_U32(0x00132ae8u) = 0x0009d77cu;
+    if (EF_U8(0x00132b12u) == 0u) {
+        build_default_path_9c980(0x0041719au);
+        strcat_9ca57(0x0041719au, 0x0018b234u);
+        guest_fn_9da80_x();
+        EF_U8(0x00132b12u) = 1u;
+    }
+}

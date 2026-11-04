@@ -5631,4 +5631,7 @@ void guest_fn_407c4_x(ef_addr32 clock, int32_t delta); /* 0x407c4 EAX/EDX */
 
 uint8_t wander_view_point_843b0(void);
 
+void init_runtime_globals_9d834(void);
+void guest_fn_9da80_x(void); /* 0x9da80 */
+
 #endif

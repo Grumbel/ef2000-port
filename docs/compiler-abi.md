@@ -7783,3 +7783,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x843b0` | none | AL:uint8_t | 844b0@844ce | Per-frame wander of the view reference point. While either word at 0x1fcbd0/0x1fcbd2 is set, recentre (0x842b4) and refr |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9d834` | none | none | e4188@e421a | Initialise the C-runtime style globals: zero 0x132b08/0x132b0c and byte 0x132ac2, point 0x411080 at 0x18b22c, set -1 int |

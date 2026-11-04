@@ -2074,7 +2074,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d7ac	39	set_axis_9d7ac	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d7ac.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0009d7d4	54	set_clip_9d7d4	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009d7d4.json	docs/compiler-abi.md; Reset the clip words; the first stores are overwritten in the original.; callers none direct; guest pending
 0x0009d80c	37	set_axis_9d80c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d80c.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x0009d834	258			unknown	unclassified	unverified		
+0x0009d834	258	init_runtime_globals_9d834	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009d834.json	docs/compiler-abi.md; Initialise the C-runtime style globals: zero 0x132b08/0x132b0c and byte 0x132ac2, point 0x411080 at 0x18b22c, set -1 int; callers e4188@e421a; guest pending
 0x0009d938	41	reset_parser_state_9d938	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d938.json	docs/compiler-abi.md; ; callers e4264@e429f; guest pending
 0x0009d964	42	parse_decimal_9d964	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d964.json	docs/compiler-abi.md; Parse the decimal digits at text.; callers 9d990@9d9f1,9da80@9db84; guest pending
 0x0009d990	191	load_string_table_9d990	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009d990.json	docs/compiler-abi.md; Load the quoted-string file into an arena block and index its strings.; callers 9da80@9da8d; guest pending
