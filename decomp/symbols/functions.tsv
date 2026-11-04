@@ -4205,12 +4205,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011baf8	135	ratio_rotated_11baf8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011baf8.json	docs/compiler-abi.md; EAX = reference A, EDX = object D, EBX = box B; stack: doubles P, Q and R, callee cleanup.; callers 10a220@10a3e5; guest pending
 0x0011bb80	92	ratio_inverse_11bb80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011bb80.json	docs/compiler-abi.md; EAX = A; stack: doubles X and Y, callee cleanup.; callers 10a220@10a240,11c584@11c708; guest pending
 0x0011bbdc	98	falloff_11bbdc	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bbdc.json	docs/compiler-abi.md; (ret 16) Falloff curve: for a0 above the threshold at 0x19593c return (1 - pow(a0, 2.9) * k2) * k3 (constants 0x195944 a; callers 11bc40@11bc66; guest pending
-0x0011bc40	130			unknown	unclassified	unverified		
+0x0011bc40	130	falloff_scaled_11bc40	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011bc40.json	docs/compiler-abi.md; EAX = A, EDX = D; stack: double X, callee cleanup.; callers 10a220@10a37a,11c584@11c763; guest pending
 0x0011bcc4	252			unknown	unclassified	unverified		
 0x0011bdc0	133			unknown	unclassified	unverified		
-0x0011be48	183			unknown	unclassified	unverified		
+0x0011be48	183	ratio_combo_11be48	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011be48.json	docs/compiler-abi.md; EAX = reference A, EDX = object D, EBX = box B; stack: doubles P and Q, callee cleanup.; callers 11bf28@11bf43; guest pending
 0x0011bf00	37	combine_11bf00	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bf00.json	docs/compiler-abi.md; (ret 16) Linear combination: f(a0) * v[0] + v[1] * a1 with f computed by 0x11bf00's helper 0xb3fd0 and the pair of doubl; callers 11bf28@11bf64; guest pending
-0x0011bf28	78			unknown	unclassified	unverified		
+0x0011bf28	78	ratio_combo_sum_11bf28	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011bf28.json	docs/compiler-abi.md; EAX/EDX/EBX forwarded; stack: doubles P and Q, dword V, doubles A0 and A1, callee cleanup.; callers 10a220@10a483; guest pending
 0x0011bf78	77	profile_ratio_11bf78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011bf78.json	docs/compiler-abi.md; (EAX = A, EDX = D, EBX = B, ECX = C guest pointers; stack: dword S, doubles P and Q; ret 0x14) Returns profile_term(D, B; callers 10a220@10a4bc; guest pending
 0x0011bfc8	74	scaled_ratio_11bfc8	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bfc8.json	docs/compiler-abi.md; (ret 16) (((p[0] + k1) * k2 * k3 + k4) * (k5 / f(a0))) * k6 with f = 0x11af14 and the constants at 0x1959a4..0x1959cc.; callers 10a220@10a40a; guest pending
 0x0011c020	76	alloc_records_11c020	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011c020.json	docs/compiler-abi.md; Allocate and clear n records of 0xd5 bytes at 0x4ddee0.; callers 10a580@10a8ac,10c1b0@10c4d8; guest pending

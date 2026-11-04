@@ -21086,3 +21086,46 @@ double ratio_rotated_11baf8(uint32_t a, uint32_t d, uint32_t b, double p, double
 	s = y * s + x * cos_b45a2(r);
 	return ratio_scaled_11ba4c(a, d, p, q) * s / md_rd_f64(a + 8u);
 }
+
+/* 0x11bc40, 130 bytes. EAX = A, EDX = D; stack: double X, callee cleanup. */
+double falloff_scaled_11bc40(uint32_t a, uint32_t d, double x)
+{
+	double h = sqrt_branch_11af14(x);
+	double f = falloff_11bbdc(x, 6.0);
+	double m = md_rd_f64(d + 8u) * md_rd_f64(0x195954u) * (1.0 / md_rd_f64(a + 8u));
+	double n = md_rd_f64(0x195954u) * m;
+	double s = sin_b45ac(md_rd_f64(a + 0x48u));
+	double q = 1.0 - n * s;
+	double r = square_double_b3fd0(m * s) * md_rd_f64(0x19595cu) + q;
+
+	return r * (1.0 / h * f);
+}
+
+/* 0x11be48, 183 bytes. EAX = reference A, EDX = object D, EBX = box B; stack: doubles P and Q, callee cleanup. */
+double ratio_combo_11be48(uint32_t a, uint32_t d, uint32_t b, double p, double q)
+{
+	double t = (md_rd_f64(b + 0x20u) - md_rd_f64(b)) * md_rd_f64(d + 0x10u);
+	double u = md_rd_f64(b + 0x38u) - md_rd_f64(b + 0x30u);
+	double w;
+	double x;
+	double y;
+	double ang = md_rd_f64(0x432c28u);
+	double z;
+	double v;
+
+	t = t + md_rd_f64(b) * u;
+	w = t - (md_rd_f64(b + 0x18u) - md_rd_f64(b + 0x10u)) * md_rd_f64(b + 0x20u);
+	x = w * (1.0 / (u - md_rd_f64(b + 0x18u) + md_rd_f64(b + 0x10u)));
+	z = md_rd_f64(0x19599cu) / square_double_b3fd0(md_rd_f64(a + 8u));
+	y = md_rd_f64(d + 0x40u) - md_rd_f64(0x433070u);
+	v = y * cos_b45a2(ang) + (-sin_b45ac(ang)) * (-x);
+	return ratio_scaled_11ba4c(a, d, p, q) * (square_double_b3fd0(v) * z);
+}
+
+/* 0x11bf28, 78 bytes. EAX/EDX/EBX forwarded; stack: doubles P and Q, dword V, doubles A0 and A1, callee cleanup. */
+double ratio_combo_sum_11bf28(uint32_t a, uint32_t d, uint32_t b, double p, double q, uint32_t v, double a0, double a1)
+{
+	double first = ratio_combo_11be48(a, d, b, p, q);
+
+	return combine_11bf00(v, a0, a1) + first;
+}

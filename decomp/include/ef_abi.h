@@ -6261,4 +6261,11 @@ double ratio_rotated_11baf8(uint32_t a, uint32_t d, uint32_t b, double p, double
 double ratio_inverse_11bb80(uint32_t a, double x, double y); /* 0x11bb80 */
 double ratio_rotated_11baf8(uint32_t a, uint32_t d, uint32_t b, double p, double q, double r); /* 0x11baf8 */
 
+double falloff_scaled_11bc40(uint32_t a, uint32_t d, double x);
+double ratio_combo_11be48(uint32_t a, uint32_t d, uint32_t b, double p, double q);
+double ratio_combo_sum_11bf28(uint32_t a, uint32_t d, uint32_t b, double p, double q, uint32_t v, double a0, double a1);
+double falloff_scaled_11bc40(uint32_t a, uint32_t d, double x); /* 0x11bc40 */
+double ratio_combo_11be48(uint32_t a, uint32_t d, uint32_t b, double p, double q); /* 0x11be48 */
+double ratio_combo_sum_11bf28(uint32_t a, uint32_t d, uint32_t b, double p, double q, uint32_t v, double a0, double a1); /* 0x11bf28 */
+
 #endif

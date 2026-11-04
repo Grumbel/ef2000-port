@@ -9124,3 +9124,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x11bb80` | EAX:uint32_t,EDX:double,EBX:double | EAX:double | 10a220@10a240,11c584@11c708 | EAX = A; stack: doubles X and Y, callee cleanup. |
 | `0x11baf8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:double,[ESP+4]:double,[ESP+8]:double | EAX:double | 10a220@10a3e5 | EAX = reference A, EDX = object D, EBX = box B; stack: doubles P, Q and R, callee cleanup. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11bc40` | EAX:uint32_t,EDX:uint32_t,EBX:double | EAX:double | 10a220@10a37a,11c584@11c763 | EAX = A, EDX = D; stack: double X, callee cleanup. |
+| `0x11be48` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:double,[ESP+4]:double | EAX:double | 11bf28@11bf43 | EAX = reference A, EDX = object D, EBX = box B; stack: doubles P and Q, callee cleanup. |
+| `0x11bf28` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:double,[ESP+4]:double,[ESP+8]:uint32_t,[ESP+12]:double,[ESP+16]:double | EAX:double | 10a220@10a483 | EAX/EDX/EBX forwarded; stack: doubles P and Q, dword V, doubles A0 and A1, callee cleanup. |
