@@ -50,3 +50,28 @@ void draw_clipped_c92e4(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t
     guest_fn_eb174_x(0u, 0u, 0u, 0u, x & 0xffffu, y & 0xffffu, w & 0xffffu, h & 0xffffu,
                      s0 & 0xffffu, s1 & 0xffffu, s2 & 0xffffu, s3);
 }
+
+/* 0xc8e8, 122 bytes. For the current page (word at 0x121e98) call 0x11560 once for each of its entries, passing per-entry slots of the tables at 0x197300..0x197360. */
+void draw_page_entries_c8e8(void)
+{
+    int16_t i = 0;
+    for (;;) {
+        uint32_t page = (uint32_t)(int32_t)EF_S16(0x00121e98u);
+        uint32_t off = (page & 0xffffffffu) * 2u;
+        int32_t slot2;
+        int16_t colour;
+        if (!(i < EF_S16(0x001a53b0u + off)))
+            break;
+        slot2 = (int32_t)i * 2;
+        colour = (int16_t)EF_U16(0x001a52b0u + page * 16u + (uint32_t)slot2);
+        i++;
+        guest_fn_11560_x((int32_t)EF_S16(0x00197696u),
+                         (int32_t)EF_S16(0x001a5280u + off),
+                         (int32_t)colour,
+                         0x00197330u + (uint32_t)slot2,
+                         0x00197300u + (uint32_t)slot2,
+                         0x00197340u + (uint32_t)slot2,
+                         0x00197360u + (uint32_t)slot2,
+                         0x00197350u + (uint32_t)slot2);
+    }
+}

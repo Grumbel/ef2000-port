@@ -4916,3 +4916,9 @@ in EAX, format string address, one value).
 | `0xc3770` | none | none | cdb20@cdc17,d1d40@d1d89 | Allocate the two work buffers at 0x146e40/0x146e44 (size 0x164600) if needed, complain when either failed, then zero bot |
 | `0x8bd58` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 3cfc0@3d2ce,410d0@410e8 | Reset the UI state (record table, four work areas, pool) and then run 0x8bad4 with the caller's two arguments. |
 | `0xc92e4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | a6d00@a6e63,a6d00@a6eab,a6d00@a6f49 | Forward a rectangle to 0xeb174 when it lies wholly inside the screen (limits 0x15b744/0x15b748). |
+
+## screen_clip1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc8e8` | none | none | bfcc@c27a,c868@c88f | For the current page (word at 0x121e98) call 0x11560 once for each of its entries, passing per-entry slots of the tables |

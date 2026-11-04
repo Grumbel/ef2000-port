@@ -4250,4 +4250,7 @@ void guest_fn_8b7e8_x(void); /* 0x8b7e8 no arguments */
 uint32_t guest_fn_8bad4_x(uint32_t a, uint32_t b); /* 0x8bad4 EAX/EDX, returns EAX */
 void guest_fn_eb174_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5, uint32_t a6, uint32_t a7); /* 0xeb174 cdecl, eight stack arguments */
 
+void draw_page_entries_c8e8(void);
+void guest_fn_11560_x(int32_t a, int32_t b, int32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3); /* 0x11560 EAX/EDX/EBX/ECX + 4 stack, callee cleanup */
+
 #endif
