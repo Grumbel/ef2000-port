@@ -2480,4 +2480,12 @@ void set_limit_eb24e(void);
 void set_pointer_fd371(void);
 
 
+/* game_helpers40.c */
+void step_damage_level_6322c(void);
+void reset_target_state_65960(void);
+uint8_t is_valid_target_6a82c(int16_t first, int16_t second);
+void fade_palette_76948(void);
+void report_formation_76f58(uint32_t roster, ef_addr32 formation);
+void guest_fn_76b30(uint32_t roster, uint32_t slot, uint32_t value); /* 0x76b30 EAX/EDX/EBX */
+
 #endif

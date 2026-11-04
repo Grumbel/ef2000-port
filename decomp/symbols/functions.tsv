@@ -1186,7 +1186,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006319c	32	push_history_6319c	game_helpers28	compiles	game	confirmed	decomp/tests/0x0006319c.json	docs/compiler-abi.md; Append a word to the 100-entry history ring.; callers 62edc@6317c; guest pending
 0x000631bc	61	next_round_robin_record	tactical_io	compiles	game	confirmed	decomp/tests/0x000631bc.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000631fc	45	history_contains_631fc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000631fc.json	docs/compiler-abi.md; True when a value is present in the history ring.; callers 66548@6673b; guest pending
-0x0006322c	206			unknown	unclassified	unverified		
+0x0006322c	206	step_damage_level_6322c	game_helpers40	compiles	game	confirmed	decomp/tests/0x0006322c.json	docs/compiler-abi.md; Step the damage level down when the weakest live part dropped far enough.; callers 62454@624e6; guest pending
 0x000633ac	528			unknown	unclassified	unverified		
 0x00063d5c	820			unknown	unclassified	unverified		
 0x000640b8	388			unknown	unclassified	unverified		
@@ -1209,7 +1209,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000657c4	120	check_range_657c4	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x000657c4.json	docs/compiler-abi.md; As 0x65748 without the second shift, flags in byte 0x1a81dd.; callers 654b8@654fd; guest pending
 0x0006583c	143	advance_countdown_y_6583c	game_helpers27	compiles	game	confirmed	decomp/tests/0x0006583c.json	docs/compiler-abi.md; Advance the vertical countdown; step to the next frame when it expires.; callers 654b8@6555f; guest pending
 0x000658cc	143	advance_countdown_x_658cc	game_helpers27	compiles	game	confirmed	decomp/tests/0x000658cc.json	docs/compiler-abi.md; Advance the horizontal countdown; step to the next frame when it expires.; callers 654b8@6555a; guest pending
-0x00065960	202			unknown	unclassified	unverified		
+0x00065960	202	reset_target_state_65960	game_helpers40	compiles	game	confirmed	decomp/tests/0x00065960.json	docs/compiler-abi.md; Reset the target-tracking state.; callers 5f60@5f75,5fd8@5fe3; guest pending
 0x00065a50	56			unknown	unclassified	unverified		
 0x00065a88	402			unknown	unclassified	unverified		
 0x00065c1c	249			unknown	unclassified	unverified		
@@ -1277,7 +1277,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a66c	121			unknown	unclassified	unverified		
 0x0006a6e8	117			unknown	unclassified	unverified		
 0x0006a760	202			unknown	unclassified	unverified		
-0x0006a82c	207			unknown	unclassified	unverified		
+0x0006a82c	207	is_valid_target_6a82c	game_helpers40	compiles	game	confirmed	decomp/tests/0x0006a82c.json	docs/compiler-abi.md; True when the second unit is a valid hostile target for the first.; callers 6a8fc@6a95b,6aeb4@6af2b,6aeb4@6afa6; guest pending
 0x0006a8fc	369			unknown	unclassified	unverified		
 0x0006aa70	316			unknown	unclassified	unverified		
 0x0006abac	331			unknown	unclassified	unverified		
@@ -1392,13 +1392,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000767f4	136			unknown	unclassified	unverified		
 0x000768fc	10	set_limit_768fc	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000768fc.json	docs/compiler-abi.md; Set the 4000 limit word.; callers 58d64@58d78; guest pending
 0x00076944	1	nop_76944	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00076944.json	docs/compiler-abi.md; Empty stub (single ret).; callers 76704@767e6; guest pending
-0x00076948	213			unknown	unclassified	unverified		
+0x00076948	213	fade_palette_76948	game_helpers40	compiles	game	confirmed	decomp/tests/0x00076948.json	docs/compiler-abi.md; Fade the 256-entry palette towards white by the fade counter.; callers 76370@765d8; guest pending
 0x00076b10	32			unknown	unclassified	unverified		
 0x00076b30	79	attach_object_link_child	scene_indexed	compiles	game	confirmed	decomp/tests/0x00076b30.json	docs/compiler-abi.md
 0x00076b80	321			unknown	unclassified	unverified		
 0x00076cc4	358			unknown	unclassified	unverified		
 0x00076e2c	297			unknown	unclassified	unverified		
-0x00076f58	218			unknown	unclassified	unverified		
+0x00076f58	218	report_formation_76f58	game_helpers40	compiles	game	confirmed	decomp/tests/0x00076f58.json	docs/compiler-abi.md; Report the formation members and leader to the roster function 0x76b30.; callers 77088@770c9; guest pending
 0x00077034	81	send_slot_command_77034	game_helpers11	compiles	game	confirmed	decomp/tests/0x00077034.json	docs/compiler-abi.md; Send command 0x44/0x45/0x43 for kind 0/1/2.; callers 77088@770c0; guest pending
 0x00077088	74	assign_slot_77088	game_helpers9	compiles	game	confirmed	decomp/tests/0x00077088.json	docs/compiler-abi.md; ; callers 770d4@772a7; guest pending
 0x000770d4	505			unknown	unclassified	unverified		

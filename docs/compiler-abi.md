@@ -3191,3 +3191,13 @@ in EAX, format string address, one value).
 | `0xe3c60` | none | none | c8c34@c4550,e4188@e423e | Set the 0x159134 pointer to its default. |
 | `0xeb24e` | none | none | 9bd20@9bd50 | Set the 0x17d400 limit to 0x8000. |
 | `0xfd371` | none | none | none direct | Set the 0x17bfea pointer to its default. |
+
+## game_helpers40 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6322c` | none | none | 62454@624e6 | Step the damage level down when the weakest live part dropped far enough. |
+| `0x65960` | none | none | 5f60@5f75,5fd8@5fe3 | Reset the target-tracking state. |
+| `0x6a82c` | AX:int16_t,DX:int16_t | AL:uint8_t | 6a8fc@6a95b,6aeb4@6af2b,6aeb4@6afa6 | True when the second unit is a valid hostile target for the first. |
+| `0x76948` | none | none | 76370@765d8 | Fade the 256-entry palette towards white by the fade counter. |
+| `0x76f58` | EAX:uint32_t,EDX:ef_addr32 | none | 77088@770c9 | Report the formation members and leader to the roster function 0x76b30. |
