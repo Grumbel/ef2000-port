@@ -8893,3 +8893,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x10d040` | EAX:uint32_t,DL:uint8_t,EBX:ef_addr32 | none | 10d188@10d1ac | Register parameters PATTERN (EAX, 32-bit dash mask rotated right one bit per pixel), COLOR (DL) and RECT (EBX, four word |
 | `0x10d188` | EAX:ef_addr32 | none | e7a34@e7a6f | Implicit-register fragment (ESI = pointer just past a record whose byte at -4 is a color and byte at -2 is a pattern byt |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc6800` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | none direct | Implicit-register fragment (EAX, EDX, EBX pass through unchanged to the callee): call the function pointer at 0x159158 w |

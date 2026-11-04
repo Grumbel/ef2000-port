@@ -20245,3 +20245,9 @@ void draw_patterned_line_10d188(ef_addr32 esi)
 	uint32_t pat = b | (b << 8) | (b << 16) | (b << 24);
 	draw_patterned_line_10d040(pat, EF_U8(esi - 2u), esi);
 }
+
+/* 0xc6800, 11 bytes. Implicit-register fragment (EAX, EDX, EBX pass through unchanged to the callee): call the function pointer at 0x159158 with ECX = 1; the code after it belongs to the next routine. */
+void call_hook_159158_c6800(uint32_t eax, uint32_t edx, uint32_t ebx)
+{
+	guest_callptr4_x(EF_U32(0x159158u), eax, edx, ebx, 1u);
+}

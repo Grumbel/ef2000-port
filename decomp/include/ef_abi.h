@@ -6112,4 +6112,7 @@ void draw_patterned_line_10d188(ef_addr32 esi);
 void draw_patterned_line_10d040(uint32_t pattern, uint8_t color, ef_addr32 rect);
 void draw_patterned_line_10d188(ef_addr32 esi);
 
+void call_hook_159158_c6800(uint32_t eax, uint32_t edx, uint32_t ebx);
+void call_hook_159158_c6800(uint32_t eax, uint32_t edx, uint32_t ebx);
+
 #endif

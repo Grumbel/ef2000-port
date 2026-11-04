@@ -2815,7 +2815,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c6370	92			unknown	unclassified	unverified		
 0x000c6428	15			unknown	unclassified	unverified		
 0x000c64d0	20			unknown	unclassified	unverified		
-0x000c6800	11			unknown	unclassified	unverified		
+0x000c6800	11	call_hook_159158_c6800	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c6800.json	docs/compiler-abi.md; Implicit-register fragment (EAX, EDX, EBX pass through unchanged to the callee): call the function pointer at 0x159158 w; callers none direct; guest pending
 0x000c680b	60			unknown	unclassified	unverified		
 0x000c6b80	357			unknown	unclassified	unverified		
 0x000c71dc	416			unknown	unclassified	unverified		
