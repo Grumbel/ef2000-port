@@ -1470,7 +1470,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007af60	221	lookup_plane_cell_7af60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007af60.json	docs/compiler-abi.md; Like 0x7ae88 for the query in progress: returns 1 while the endpoint word 0x420908 is non-negative, otherwise looks up t; callers 1df90@1e096,82478@826a8,86f7c@8718e; guest pending
 0x0007b040	76	lookup_scaled_cell_7b040	float_helpers10	compiles	game	confirmed	decomp/tests/0x0007b040.json	docs/compiler-abi.md; Scale a 2D double point, look up the cell value and return it negated and scaled.; callers 2e184@2e268,6d38c@6d579,6f504@6f60f; guest pending
 0x0007b08c	221	store_scaled_vectors_7b08c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007b08c.json	docs/compiler-abi.md; Scale two 3-double vectors (A = EAX, B = EDX; components used in the order +8, +0x10, +0) by the double at 0x187c60, tru; callers 239ac@23c42,239ac@23d2f,26b60@27056; guest pending
-0x0007b16c	196			unknown	unclassified	unverified		
+0x0007b16c	196	cell_distance_at_7b16c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007b16c.json	docs/compiler-abi.md; Look up the map cell under the point (X = EDX, Y = EBX, 11-bit cell size) for plane MODE (EAX, 0x7aac0): the cell column; callers 6460@65d2,6924@69fd,1dc20@1dd1d; guest pending
 0x0007b2f4	63	read_plane_cell	plane_sources	compiles	game	confirmed	decomp/tests/0x0007b2f4.json	docs/compiler-abi.md
 0x0007b3c8	49	alloc_buffers_7b3c8	game_helpers6	compiles	game	confirmed	decomp/tests/0x0007b3c8.json	docs/compiler-abi.md; Allocate the two 0x27100-byte buffers once.; callers 3ea0c@3ee55; guest pending
 0x0007b3fc	453			unknown	unclassified	unverified		

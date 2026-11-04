@@ -5690,4 +5690,6 @@ uint32_t guest_fn_604_x(uint32_t addr); /* 0x604 EAX -> EAX, linear address to s
 
 uint8_t point_in_window_10f70(ef_addr32 base, uint32_t index);
 
+uint32_t cell_distance_at_7b16c(uint32_t mode, int32_t x, int32_t y);
+
 #endif

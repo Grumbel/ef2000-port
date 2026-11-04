@@ -13847,3 +13847,28 @@ uint8_t point_in_window_10f70(ef_addr32 base, uint32_t index)
         return 1u;
     return 0u;
 }
+
+/* 0x7b16c, 196 bytes. Look up the map cell under the point (X = EDX, Y = EBX, 11-bit cell size) for plane MODE (EAX, 0x7aac0): the cell column is X >> 11 and the row 0x18f - (Y >> 11), both wrapped into 0..0x18f (a negative remainder gets 0x18f added, as the original does). The tile id is built from the two plane bytes (hi from 0x1f8eb4, lo from 0x1f8eb8, 400 bytes per row); 0xffff gives 0, otherwise the result is the 0xcfa9c distance of the point to the cell centre. */
+uint32_t cell_distance_at_7b16c(uint32_t mode, int32_t x, int32_t y)
+{
+    int32_t cx = x >> 11;
+    int32_t ry = 0x18f - (y >> 11);
+    int32_t col = cx % 0x190;
+    int32_t row = ry % 0x190;
+    uint32_t id;
+    select_plane_source((int32_t)mode);
+    if (col < 0)
+        col += 0x18f;
+    if (row < 0)
+        row += 0x18f;
+    {
+        uint32_t off = (uint32_t)col * 400u + (uint32_t)row;
+        id = ((uint32_t)EF_U8(EF_U32(0x001f8eb4u) + off) << 8) | EF_U8(EF_U32(0x001f8eb8u) + off);
+    }
+    if ((uint16_t)id == 0xffffu)
+        return 0u;
+    return page_point_distance_cfa9c((uint32_t)(int32_t)(int16_t)id,
+                                      (uint32_t)((cx * 2 + 1) << 10),
+                                      (uint32_t)(((y >> 11) * 2 + 1) << 10),
+                                      (uint32_t)x, (uint32_t)y);
+}

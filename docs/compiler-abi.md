@@ -7930,3 +7930,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10f70` | EAX:ef_addr32,EDX:uint32_t | AL:uint8_t | 110ec@112a3,110ec@114ad | Is the point INDEX (DL) of the 6-byte point list at BASE (EAX; words at +0x18, +0x1a hold y and x) inside the current sc |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7b16c` | EAX:uint32_t,EDX:int32_t,EBX:int32_t | EAX:uint32_t | 6460@65d2,6924@69fd,1dc20@1dd1d | Look up the map cell under the point (X = EDX, Y = EBX, 11-bit cell size) for plane MODE (EAX, 0x7aac0): the cell column |
