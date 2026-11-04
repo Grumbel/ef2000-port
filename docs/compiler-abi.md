@@ -9330,3 +9330,15 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x104504` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 1023d8@1023fd | Resolve the far pointer at [[obj+0x10]+0x12]; if set and a current pointer exists, copy its name into [obj+0x10]+0x3a, s |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x119f10` | EAX:uint32_t,EDX:uint32_t | none | 119f88@11a5ab,11a5c0@11a6d8 | Accumulate vector b (EDX) into the sum at 0x432a28 and the cross product a x b (EAX, EDX) into 0x4329c0. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x106514` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 1024b4@1024d9 | Twin of 0x113af0 using lookup 0x102508: returns 1 if the first lookup fails (error text from 0x194a24 copied to 0x4dd6b0 |

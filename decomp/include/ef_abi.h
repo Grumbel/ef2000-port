@@ -6418,4 +6418,10 @@ uint32_t claim_slot_113c7c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 uint32_t send_303_104504(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj);
 uint32_t send_303_104504(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj); /* 0x104504 */
 
+void accum_cross_119f10(uint32_t eax, uint32_t edx);
+void accum_cross_119f10(uint32_t eax, uint32_t edx); /* 0x119f10 */
+
+uint32_t lookup_pair_106514(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0);
+uint32_t lookup_pair_106514(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0); /* 0x106514 */
+
 #endif

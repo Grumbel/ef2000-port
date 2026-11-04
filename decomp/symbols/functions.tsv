@@ -3890,7 +3890,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00105da0	149	destroy_sound_object_105da0	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00105da0.json	docs/compiler-abi.md; Destroy a sound object: if it was started, stop it, clear its buffer, run 0x117a0f twice, trace 0xa; then trace its fiel; callers none direct; guest pending
 0x00105e38	1580			unknown	unclassified	unverified		
 0x00106464	115	load_resource_106464	trace_loaders1	compiles	game	confirmed	decomp/tests/0x00106464.json	docs/compiler-abi.md; Load and parse a resource by name; on a missing file install the 23-byte default block at 0x194a04.; callers 102508@102534; guest pending
-0x00106514	117			unknown	unclassified	unverified		
+0x00106514	117	lookup_pair_106514	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00106514.json	docs/compiler-abi.md; Twin of 0x113af0 using lookup 0x102508: returns 1 if the first lookup fails (error text from 0x194a24 copied to 0x4dd6b0; callers 1024b4@1024d9; guest pending
 0x001065c8	106	find_open_entry_1065c8	trace_loaders1	compiles	game	confirmed	decomp/tests/0x001065c8.json	docs/compiler-abi.md; Find the first type-1 0x894-byte entry in the list of an object (array pointer +0x5c, count +0x60); if none is type 1 in; callers 102590@1025b5; guest pending
 0x00106634	16	set_state_1_106634	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106634.json	docs/compiler-abi.md; Dword +4 = 1.; callers 102644@102667; guest pending
 0x00106644	196	reset_stream_block_106644	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00106644.json	docs/compiler-abi.md; Reset the stream control block P (cdecl): fixed defaults in the fields up to +0x40 (the clock word 0x4dd7e0 goes into +0; callers 102670@102693; guest pending
@@ -4166,7 +4166,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00119a54	117	combine_globals_119a54	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119a54.json	docs/compiler-abi.md; Combine globals: M = a*b*c*d + e*f*g + i*j*k*g is stored at 0x432a48 and c*d*n*g*p*M at 0x432920.; callers 1196a0@1196b9; guest pending
 0x00119acc	265			unknown	unclassified	unverified		
 0x00119be0	813			unknown	unclassified	unverified		
-0x00119f10	119			unknown	unclassified	unverified		
+0x00119f10	119	accum_cross_119f10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119f10.json	docs/compiler-abi.md; Accumulate vector b (EDX) into the sum at 0x432a28 and the cross product a x b (EAX, EDX) into 0x4329c0.; callers 119f88@11a5ab,11a5c0@11a6d8; guest pending
 0x00119f88	1591			unknown	unclassified	unverified		
 0x0011a5c0	292			unknown	unclassified	unverified		
 0x0011a6e4	1337			unknown	unclassified	unverified		

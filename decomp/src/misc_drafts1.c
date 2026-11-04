@@ -22479,3 +22479,31 @@ uint32_t send_303_104504(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_
            ef_guest_memory_ptr((ef_addr32)(EF_U32(obj + 0x10u) + 0x16u)), 24);
     return 0x004dd818u;
 }
+
+/* 0x119f10, 119 bytes. Accumulate vector b (EDX) into the sum at 0x432a28 and the cross product a x b (EAX, EDX) into 0x4329c0. */
+void accum_cross_119f10(uint32_t eax, uint32_t edx)
+{
+    double ax = md_rd_f64(eax), ay = md_rd_f64(eax + 8u), az = md_rd_f64(eax + 0x10u);
+    double bx = md_rd_f64(edx), by = md_rd_f64(edx + 8u), bz = md_rd_f64(edx + 0x10u);
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x00432a28u) = bx + md_rd_f64(0x00432a28u);
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x00432a30u) = by + md_rd_f64(0x00432a30u);
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x00432a38u) = bz + md_rd_f64(0x00432a38u);
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x004329c0u) = (ay * bz - az * by) + md_rd_f64(0x004329c0u);
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x004329c8u) = (az * bx - ax * bz) + md_rd_f64(0x004329c8u);
+    *(double *)ef_guest_memory_ptr((ef_addr32)0x004329d0u) = (ax * by - ay * bx) + md_rd_f64(0x004329d0u);
+}
+
+/* 0x106514, 117 bytes. Twin of 0x113af0 using lookup 0x102508: returns 1 if the first lookup fails (error text from 0x194a24 copied to 0x4dd6b0), 2 if the second yields 0, else 0; the second result is stored through a0. */
+uint32_t lookup_pair_106514(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0)
+{
+    uint8_t b[0x118];
+    uint32_t r;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (traced_lookup_102028(0, 0, 0, 0, (uint32_t)(uintptr_t)&b[4], 0x00194a1cu) == 0) {
+        memcpy(ef_guest_memory_ptr((ef_addr32)0x004dd6b0u), ef_guest_memory_ptr((ef_addr32)0x00194a24u), 29);
+        return 1;
+    }
+    r = trace_call_102508(0, 0, 0, 0, (uint32_t)(uintptr_t)&b[0x80], (uint32_t)(uintptr_t)&b[0x100]);
+    EF_U32(a0) = r;
+    return r == 0 ? 2u : 0u;
+}
