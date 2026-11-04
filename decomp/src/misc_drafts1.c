@@ -17114,3 +17114,52 @@ void draw_cell_grid_42568(void)
 		y1 = (int16_t)(y1 + 10);
 	}
 }
+
+/* 0x8b7e8, 317 bytes. Scan the UI record list file: clear the three counters (words 0x12db50, 0x12db4e, 0x12db4c), build the default path plus 0x18a864 in a local buffer and enumerate the entries with the scanner 0x8b684 (or the token reader 0x8b6e0 when dword 0x12afc8 is set; the choice is kept in 0x20f428). Each entry is validated with 0x8b650 and filed by its kind byte (0, 1, 2) into the pointer tables 0x20f240, 0x20f2e0 and 0x20f380 (at most 40 entries each, counted by the words 0x12db50, 0x12db4e, 0x12db4c respectively). */
+void scan_ui_record_files_8b7e8(void)
+{
+	uint8_t path[0x78];
+	uint8_t name[0x78];
+	ef_addr32 pathp = (ef_addr32)(uintptr_t)path;
+	ef_addr32 namep = (ef_addr32)(uintptr_t)name;
+	uint32_t fn, p, kind, n;
+
+	EF_U16(0x0012db50u) = 0u;
+	EF_U16(0x0012db4eu) = 0u;
+	EF_U16(0x0012db4cu) = 0u;
+	build_default_path_9c980(pathp);
+	strcat_9ca57(pathp, 0x0018a864u);
+	fn = 0x0008b684u;
+	EF_U32(0x0020f428u) = fn;
+	if (EF_U32(0x0012afc8u) != 0u) {
+		fn = 0x0008b6e0u;
+		EF_U32(0x0020f428u) = fn;
+	}
+	if ((guest_callptr4_ret_x(EF_U32(0x0020f428u), 1u, pathp, 0x0018a860u, namep) & 0xffffu) == 0u)
+		return;
+	do {
+		p = select_validated_ui_record(namep);
+		if (p != 0u) {
+			kind = EF_U8(p);
+			if (kind == 0u) {
+				if (((int32_t)EF_U32(0x0012db4eu) >> 16) < 0x28) {
+					n = EF_U16(0x0012db50u);
+					EF_U32(0x0020f240u + (uint32_t)((int32_t)(int16_t)n * 4)) = p;
+					EF_U16(0x0012db50u) = (uint16_t)(n + 1u);
+				}
+			} else if (kind == 1u) {
+				if (((int32_t)EF_U32(0x0012db4cu) >> 16) < 0x28) {
+					n = EF_U16(0x0012db4eu);
+					EF_U32(0x0020f2e0u + (uint32_t)((int32_t)(int16_t)n * 4)) = p;
+					EF_U16(0x0012db4eu) = (uint16_t)(n + 1u);
+				}
+			} else if (kind == 2u) {
+				if (((int32_t)EF_U32(0x0012db4au) >> 16) < 0x28) {
+					n = EF_U16(0x0012db4cu);
+					EF_U32(0x0020f380u + (uint32_t)((int32_t)(int16_t)n * 4)) = p;
+					EF_U16(0x0012db4cu) = (uint16_t)(n + 1u);
+				}
+			}
+		}
+	} while ((guest_callptr4_ret_x(EF_U32(0x0020f428u), 0u, pathp, 0x0018a860u, namep) & 0xffffu) != 0u);
+}

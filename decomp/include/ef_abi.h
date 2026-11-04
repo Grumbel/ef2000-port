@@ -5897,4 +5897,6 @@ uint32_t median_of_three_ded86(uint32_t a, uint32_t b, uint32_t c, uint32_t cmp)
 
 void draw_cell_grid_42568(void);
 
+void scan_ui_record_files_8b7e8(void);
+
 #endif

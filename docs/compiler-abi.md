@@ -8391,3 +8391,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x42568` | none | none | 426a4@426e1 | Debug overlay of the 40 x 40 cell map at dword 0x12657c (nothing when NULL): every cell (row i, column j) is outlined by |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8b7e8` | none | none | 8bd58@8bdbc | Scan the UI record list file: clear the three counters (words 0x12db50, 0x12db4e, 0x12db4c), build the default path plus |
