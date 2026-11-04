@@ -8548,3 +8548,20 @@ void load_resource_list_d5f0c(uint32_t list)
             break;
     }
 }
+
+/* 0x955c0, 157 bytes. Camera set-up (EAX, EDX, EBX, ECX and one stack argument, ret 4; named A, B, C, D, S): rebuild the rotation record at 0x12dbec (bounds init 0xd0b68, 0xd0ebc with -S, 0xd0dbc with -D scaled by C), store the negated rotation words A, B, C at 0x12dba2/0x12dba4/0x12dba6 (and 0 at 0x12dba0), copy the three position dwords at the pointer 0x214458 to 0x21446c.. and refresh the view (0x9357c). */
+void setup_camera_955c0(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0)
+{
+    uint32_t p = EF_U32(0x00214458u);
+    init_bounds_d0b68(0x0012dbecu);
+    guest_fn_d0ebc(0x0012dbecu, (0u - s0) & 0xffffu);
+    guest_fn_d0dbc(0x0012dbecu, (0u - d) & 0xffffu, c);
+    EF_U16(0x0012dba2u) = (uint16_t)(0u - a);
+    EF_U16(0x0012dba4u) = (uint16_t)(0u - b);
+    EF_U16(0x0012dba0u) = 0u;
+    EF_U16(0x0012dba6u) = (uint16_t)(0u - c);
+    EF_U32(0x0021446cu) = EF_U32(p);
+    EF_U32(0x00214470u) = EF_U32(p + 4u);
+    EF_U32(0x00214474u) = EF_U32(p + 8u);
+    guest_fn_9357c();
+}

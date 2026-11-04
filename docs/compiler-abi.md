@@ -6870,3 +6870,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd5f0c` | EAX:uint32_t | none | 98000@9800e | Load a list of resource records (13 bytes each: name pointer dword +0, size dword +5, data pointer dword +9; ended by a  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x955c0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 95660@956f3 | Camera set-up (EAX, EDX, EBX, ECX and one stack argument, ret 4; named A, B, C, D, S): rebuild the rotation record at 0x |
