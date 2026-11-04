@@ -4736,3 +4736,12 @@ in EAX, format string address, one value).
 | `0xbafe4` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
 | `0xbb0ac` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
 | `0xbb1ac` | EAX:ef_addr32,DL:uint8_t | none | bb324@bb47d | Fill a colour record for a key 1..7 (other keys use the default shade). |
+
+## code_maps1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3aa8` | EAX:uint32_t | AL:uint8_t | 2e04@2edf,2e04@2f95,3d74@3d94 | Map a code (1-based) to a constant via a jump table (codes outside the range give 26). |
+| `0x3b1c` | EAX:uint32_t | AL:uint8_t | 3d74@3dcd | Map a code to a constant via a jump table (codes outside the range give 26). |
+| `0x74448` | EAX:uint32_t | EAX:uint32_t | 74718@74878 | Map a code to a constant via a jump table (codes outside the range give 1). |
+| `0xba0e4` | EAX:uint32_t | AL:uint8_t | b4ee0@b4f03,b9e9c@b9eb0,bb7c0@bb7dc | Map a code (1-based) to a constant via a jump table (codes outside the range give 0). |

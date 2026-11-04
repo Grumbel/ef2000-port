@@ -42,8 +42,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00002e04	1456			unknown	unclassified	unverified		
 0x000033b4	689			unknown	unclassified	unverified		
 0x00003668	1022			unknown	unclassified	unverified		
-0x00003aa8	61			unknown	unclassified	unverified		
-0x00003b1c	59			unknown	unclassified	unverified		
+0x00003aa8	61	map_code_3aa8	code_maps1	compiles	game	confirmed	decomp/tests/0x00003aa8.json	docs/compiler-abi.md; Map a code (1-based) to a constant via a jump table (codes outside the range give 26).; callers 2e04@2edf,2e04@2f95,3d74@3d94; guest pending
+0x00003b1c	59	map_code_3b1c	code_maps1	compiles	game	confirmed	decomp/tests/0x00003b1c.json	docs/compiler-abi.md; Map a code to a constant via a jump table (codes outside the range give 26).; callers 3d74@3dcd; guest pending
 0x00003b58	284			unknown	unclassified	unverified		
 0x00003c74	96	vector_length_3c74	float_helpers1	compiles	game	confirmed	decomp/tests/0x00003c74.json	docs/compiler-abi.md; Integer length of a 3D integer vector, at least 1.; callers 20ec@215f,20ec@21b7,20ec@2211; guest pending
 0x00003cd4	27	max3_signed	low_helpers	compiles	game	confirmed	decomp/tests/0x00003cd4.json	docs/compiler-abi.md; signed maximum of three; callers 2e04@304c,2e04@30d9,2e04@31a3; guest pending
@@ -1360,7 +1360,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000740e4	267			unknown	unclassified	unverified		
 0x000741f0	53	report_tactical_object_action	record_transitions	compiles	game	confirmed	decomp/tests/0x000741f0.json	docs/compiler-abi.md; host model; guest differential pending
 0x00074228	393			unknown	unclassified	unverified		
-0x00074448	53			unknown	unclassified	unverified		
+0x00074448	53	map_code_74448	code_maps1	compiles	game	confirmed	decomp/tests/0x00074448.json	docs/compiler-abi.md; Map a code to a constant via a jump table (codes outside the range give 1).; callers 74718@74878; guest pending
 0x00074480	259			unknown	unclassified	unverified		
 0x00074584	404			unknown	unclassified	unverified		
 0x00074718	382			unknown	unclassified	unverified		
@@ -2592,7 +2592,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b9aa4	450			unknown	unclassified	unverified		
 0x000b9c68	426			unknown	unclassified	unverified		
 0x000b9e9c	164			unknown	unclassified	unverified		
-0x000ba0e4	43			unknown	unclassified	unverified		
+0x000ba0e4	43	map_code_ba0e4	code_maps1	compiles	game	confirmed	decomp/tests/0x000ba0e4.json	docs/compiler-abi.md; Map a code (1-based) to a constant via a jump table (codes outside the range give 0).; callers b4ee0@b4f03,b9e9c@b9eb0,bb7c0@bb7dc; guest pending
 0x000ba13c	359			unknown	unclassified	unverified		
 0x000ba2c0	249	fill_colour_record_ba2c0	colour_tables2	compiles	game	confirmed	decomp/tests/0x000ba2c0.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000ba3bc	40	fill_ten_bytes_04	list_lookup	compiles	game	confirmed	decomp/tests/0x000ba3bc.json	docs/compiler-abi.md; Fill bytes 0..9 with 4.; callers bb324@bb47d; guest pending

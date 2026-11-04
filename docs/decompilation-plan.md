@@ -1262,6 +1262,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  251  Drafted and Watcom-compiled 3 more functions in hotspot_draw (2203 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  252  Drafted and Watcom-compiled 3 more functions in colour_tables (2206 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  253  Drafted and Watcom-compiled 15 more functions in colour_tables2 (2221 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  254  Drafted and Watcom-compiled 4 more functions in code_maps1 (2225 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---

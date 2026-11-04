@@ -4139,4 +4139,10 @@ void fill_colour_record_bafe4(ef_addr32 rec, uint8_t key);
 void fill_colour_record_bb0ac(ef_addr32 rec, uint8_t key);
 void fill_colour_record_bb1ac(ef_addr32 rec, uint8_t key);
 
+/* code_maps1.c */
+uint8_t map_code_3aa8(uint32_t code);
+uint8_t map_code_3b1c(uint32_t code);
+uint32_t map_code_74448(uint32_t code);
+uint8_t map_code_ba0e4(uint32_t code);
+
 #endif
