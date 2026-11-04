@@ -2249,4 +2249,52 @@ int32_t muldiv_saturate_833a0(int32_t a, int32_t b, int32_t c);
 void guest_fn_29dd0(int32_t value); /* 0x29dd0 EAX */
 void guest_fn_29b14(int32_t value); /* 0x29b14 EAX */
 
+/* game_helpers28.c */
+uint8_t all_ready_56ba8(void);
+void mark_ready_56cbc(ef_addr32 message);
+void mark_ready_56efc(ef_addr32 message);
+void forward_slot_message_56f30(ef_addr32 message);
+uint8_t all_ready_56ffc(void);
+void mark_ready_570fc(ef_addr32 message);
+void count_and_forward_577e8(ef_addr32 message);
+void push_history_6319c(uint16_t value);
+uint8_t history_contains_631fc(uint16_t value);
+void count_pending_77748(void);
+void set_owner_name_789d0(uint8_t owner, ef_addr32 name);
+void latch_mode_word_8b5f0(ef_addr32 pointer);
+void step_generator_a45b3(void);
+uint32_t find_id_a4640(uint16_t id);
+void clear_id_table_a4e6c(void);
+void update_mouse_request_a9cd0(void);
+void set_pending_name_ac7a8(ef_addr32 name);
+uint32_t ratio_lookup_b3ae0(uint32_t a, uint32_t b);
+void reset_clip_bounds_c58cc(uint32_t stack_a, uint32_t stack_b);
+void load_sincos_dc7bc(uint32_t angle);
+void guest_fn_8f22c(int32_t unit, uint32_t index); /* 0x8f22c EAX/EDX */
+void guest_fn_57820(ef_addr32 message); /* 0x57820 EAX */
+
+/* game_helpers28.c */
+uint8_t all_ready_56ba8(void);
+void mark_ready_56cbc(ef_addr32 message);
+void mark_ready_56efc(ef_addr32 message);
+void forward_slot_message_56f30(ef_addr32 message);
+uint8_t all_ready_56ffc(void);
+void mark_ready_570fc(ef_addr32 message);
+void count_and_forward_577e8(ef_addr32 message);
+void push_history_6319c(uint16_t value);
+uint8_t history_contains_631fc(uint16_t value);
+void count_pending_77748(void);
+void set_owner_name_789d0(uint8_t owner, ef_addr32 name);
+void latch_mode_word_8b5f0(ef_addr32 pointer);
+void step_generator_a45b3(void);
+uint32_t find_id_a4640(uint16_t id);
+void clear_id_table_a4e6c(void);
+void update_mouse_request_a9cd0(void);
+void set_pending_name_ac7a8(ef_addr32 name);
+uint32_t ratio_lookup_b3ae0(uint32_t a, uint32_t b);
+void reset_clip_bounds_c58cc(uint32_t stack_a, uint32_t stack_b);
+void load_sincos_dc7bc(uint32_t angle);
+void guest_fn_8f22c(int32_t unit, uint32_t index); /* 0x8f22c EAX/EDX */
+void guest_fn_57820(ef_addr32 message); /* 0x57820 EAX */
+
 #endif

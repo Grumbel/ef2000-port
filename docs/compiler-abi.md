@@ -3002,3 +3002,28 @@ in EAX, format string address, one value).
 | `0x7aa3c` | none | none | 7ab00@7abc4 | Pick two random table values for the current stream slot. |
 | `0x82168` | AX:int16_t,DX:int16_t,BL:uint8_t | none | 4a210@4a818,4aa4c@4ae37 | Claim the first free (0xff) slot in a row of eight and link both tables. |
 | `0x833a0` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | 83424@834c3,83424@834d0,834e8@83527 | Compute a*b/c, saturating to +/-0x7fffffff-ish when the product overflows. |
+
+## game_helpers28 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x56ba8` | none | AL:uint8_t | 56bdc@56c2c | True when every ready word in table 0x1a5dd0 is nonzero. |
+| `0x56cbc` | EAX:ef_addr32 | none | 581b0@585f3 | Mark the ready word of the unit in a message at +1 (table 0x1a5dd0). |
+| `0x56efc` | EAX:ef_addr32 | none | 581b0@584cd | Mark the ready word of the unit in a message at +1 (table 0x1a5dc0). |
+| `0x56f30` | EAX:ef_addr32 | none | 581b0@584dc | Forward a message to 0x8f22c when its unit has a nonzero slot word. |
+| `0x56ffc` | none | AL:uint8_t | 57030@5707d | True when every ready word in table 0x1a5de0 is nonzero. |
+| `0x570fc` | EAX:ef_addr32 | none | 581b0@58514 | Mark the ready word indexed by the message byte at +1 (table 0x1a5de0). |
+| `0x577e8` | EAX:ef_addr32 | none | 581b0@58473 | Count a local-owner message, then hand the message on. |
+| `0x6319c` | AX:uint16_t | none | 62edc@6317c | Append a word to the 100-entry history ring. |
+| `0x631fc` | AX:uint16_t | AL:uint8_t | 66548@6673b | True when a value is present in the history ring. |
+| `0x77748` | none | none | 8c49c@8c56d | Count a pending frame while the marker word is -1. |
+| `0x789d0` | AL:uint8_t,EDX:ef_addr32 | none | 56e94@56ec2 | Store a 122-byte name entry for an owner slot, skipping the local owner. |
+| `0x8b5f0` | EAX:ef_addr32 | none | 8ba98@8bac8 | Latch a word pointer (+1) and clamp its mode to 1 or 2. |
+| `0xa45b3` | none | none | 6c1c@6cf3,6c1c@6d15,6c1c@6d2f | Step a 32-bit generator held in two words; reseed when it reaches zero. |
+| `0xa4640` | AX:uint16_t | EAX:uint32_t | e52a4@e533f | Find a word in the 0x41eda8 id table; returns its index, or a cleared low byte. |
+| `0xa4e6c` | none | none | ac2e4@ac3dc,ac408@ac43d | Clear the 42-entry id table. |
+| `0xa9cd0` | none | none | a9e70@a9ff3 | Track a mouse request and refresh the cursor when its value changed. |
+| `0xac7a8` | EAX:ef_addr32 | none | 4738@4840,4b54@4b76,4c50@4cea | Set the pending flag and copy a name into the message buffer. |
+| `0xb3ae0` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | b3b1c@b3b4a,b3b1c@b3b55,b3b1c@b3b67 | Table-driven ratio of two unsigned values (a/b or complement). |
+| `0xc58cc` | [ESP+4]:uint32_t,[ESP+8]:uint32_t | none | none direct | Reset three clip bounds; both stack arguments are ignored. |
+| `0xdc7bc` | EAX:uint32_t | none | 1f0fc@1f2a2,1f0fc@1f609,2a4c8@2a5e4 | Load a sine/cosine word pair for an angle (8 angle units per table step). |
