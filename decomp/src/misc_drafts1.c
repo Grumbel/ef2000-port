@@ -12081,3 +12081,38 @@ void select_view_object_24e58(uint32_t id)
     }
     guest_fn_6d948_x();
 }
+
+/* 0x2d9a4, 176 bytes. Check whether the record ID (AX; table 0xca byte records at [0x19bb58]) is in range of its target: skipped for ID 0xff, a target word (+0xb9) of 0xff or a kind byte (+0xbb) of 0xff. The distance comes from 0x37bc8 (kind 1) or 0x2bae0 of the target block at +0x61 (EDX is the target word, left over in the original); when the record's state byte +0x1b is 6 or 7 and the distance is below the double at (+0xbd)->+4, run 0x2b1f4(ID, 6) and, if 0x2dba4 then reports true, set byte 0x1f9011. */
+void check_target_range_2d9a4(uint32_t id)
+{
+    int32_t sid = (int16_t)id;
+    ef_addr32 rec;
+    int32_t tw;
+    uint32_t kind;
+    double d;
+    double limit;
+    ef_addr32 lim;
+    if (sid == 0xff)
+        return;
+    rec = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+    tw = (int32_t)EF_U32(rec + 0xb7u) >> 16;
+    if (tw == 0xff)
+        return;
+    kind = EF_U8(rec + 0xbbu);
+    if (kind == 0xffu)
+        return;
+    if (kind == 1u)
+        d = scaled_pair_distance_37bc8(rec + 0x61u, (int16_t)tw);
+    else
+        d = guest_fn_2bae0_x(rec + 0x61u, tw);
+    rec = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+    if (EF_U8(rec + 0x1bu) < 6u || EF_U8(rec + 0x1bu) > 7u)
+        return;
+    lim = EF_U32(rec + 0xbdu);
+    memcpy(&limit, ef_guest_memory_ptr(lim + 4u), sizeof limit);
+    if (d >= limit)
+        return;
+    guest_fn_2b1f4_x(sid, 6u);
+    if ((uint8_t)guest_fn_2dba4(sid) != 0u)
+        EF_U8(0x001f9011u) = 1u;
+}

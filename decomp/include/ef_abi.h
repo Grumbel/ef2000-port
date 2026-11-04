@@ -5532,4 +5532,8 @@ void guest_fn_5df08_x(void); /* 0x5df08 */
 void select_view_object_24e58(uint32_t id);
 void guest_fn_6d948_x(void); /* 0x6d948 */
 
+void check_target_range_2d9a4(uint32_t id);
+double guest_fn_2bae0_x(ef_addr32 p, int32_t aux); /* 0x2bae0 EAX (EDX left over from the caller) -> ST0 */
+void guest_fn_2b1f4_x(int32_t id, uint32_t mode); /* 0x2b1f4 EAX/EDX */
+
 #endif

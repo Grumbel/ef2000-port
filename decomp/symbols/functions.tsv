@@ -485,7 +485,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002ced4	1387			unknown	unclassified	unverified		
 0x0002d488	1036			unknown	unclassified	unverified		
 0x0002d894	54	set_owner_pair_2d894	game_helpers10	compiles	game	confirmed	decomp/tests/0x0002d894.json	docs/compiler-abi.md; Store two words in the owner record and refresh it.; callers 2b1f4@2b2fe,2b1f4@2b358; guest pending
-0x0002d9a4	176			unknown	unclassified	unverified		
+0x0002d9a4	176	check_target_range_2d9a4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002d9a4.json	docs/compiler-abi.md; Check whether the record ID (AX; table 0xca byte records at [0x19bb58]) is in range of its target: skipped for ID 0xff, ; callers 2d488@2d752; guest pending
 0x0002da54	269	refresh_grid_category	world_grid_category	compiles	game	confirmed	decomp/tests/0x0002da54.json	20 three-byte object features select lowest priority into row +0xbc
 0x0002db64	63	unit_has_id_2db64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0002db64.json	docs/compiler-abi.md; Does the unit named by table entry slot carry id?; callers 2dba4@2dbd4; guest pending
 0x0002dba4	82	grid_is_current_or_external	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002dba4.json	sentinel and external-list predicate; original callee unresolved

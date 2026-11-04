@@ -7575,3 +7575,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x24e58` | EAX:uint32_t | none | 257d0@258ea,25c98@25e33,25c98@2607c | Point the view at object ID (AX, word; nothing for an unknown object): select it for the current target (0x2479c with th |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2d9a4` | EAX:uint32_t | none | 2d488@2d752 | Check whether the record ID (AX; table 0xca byte records at [0x19bb58]) is in range of its target: skipped for ID 0xff,  |
