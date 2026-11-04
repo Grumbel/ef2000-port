@@ -11803,3 +11803,29 @@ void mirror_record_floats_1debc(ef_addr32 r)
     EF_U16(r + 0x17u) = (uint16_t)(int32_t)truncate_9d72c(a89 * c3 * c4);
     EF_U16(r + 0x19u) = (uint16_t)(int32_t)truncate_9d72c(a81 * c3 * c4);
 }
+
+/* 0xce9a4, 203 bytes. Clip the segment stored in the record R (EAX; segment record at +0x4c with its two end points at +4 and +8) against the up to five planes whose mask bits at 0x15b798 + 8*i match the dword at R+0x2c (plane object at 0x15b79c + 8*i, its outside test is the hook at +0x14). If both end points are outside one plane return 0; otherwise replace an outside end point by the intersection (0xce5f8) and, after all planes, store the clipped end points back and return 1. Sets 0x4208ac to 0x420508 first. */
+uint32_t clip_segment_ce9a4(ef_addr32 r)
+{
+    ef_addr32 seg = EF_U32(r + 0x4cu);
+    ef_addr32 p0 = EF_U32(seg + 4u);
+    ef_addr32 p1 = EF_U32(seg + 8u);
+    uint32_t i;
+    EF_U32(0x004208acu) = 0x00420508u;
+    for (i = 0u; i < 0x28u; i += 8u) {
+        if ((EF_U32(i + 0x0015b798u) & EF_U32(r + 0x2cu)) != 0u) {
+            ef_addr32 plane = EF_U32(i + 0x0015b79cu);
+            uint32_t out0 = guest_callptr4_ret_x(EF_U32(plane + 0x14u), plane, EF_U32(p0), EF_U32(p0 + 4u), EF_U32(p0 + 8u)) & 0xffu;
+            uint32_t out1 = guest_callptr4_ret_x(EF_U32(plane + 0x14u), plane, EF_U32(p1), EF_U32(p1 + 4u), EF_U32(p1 + 8u)) & 0xffu;
+            if (out0 != 0u && out1 != 0u)
+                return 0u;
+            if (out0 != 0u)
+                p0 = guest_fn_ce5f8_x(plane, p0, p1);
+            if (out1 != 0u)
+                p1 = guest_fn_ce5f8_x(plane, p0, p1);
+        }
+    }
+    EF_U32(EF_U32(r + 0x4cu) + 4u) = p0;
+    EF_U32(EF_U32(r + 0x4cu) + 8u) = p1;
+    return 1u;
+}

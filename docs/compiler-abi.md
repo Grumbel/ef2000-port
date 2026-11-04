@@ -7510,3 +7510,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1debc` | EAX:ef_addr32 | none | 1d954@1dadc | Convert the floating point state of the record R (EAX) into its integer mirror: save the dwords at +9, +0xd and +0x11 to |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xce9a4` | EAX:ef_addr32 | EAX:uint32_t | d299c@d2a31 | Clip the segment stored in the record R (EAX; segment record at +0x4c with its two end points at +4 and +8) against the  |
