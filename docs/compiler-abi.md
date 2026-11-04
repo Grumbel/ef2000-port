@@ -6894,3 +6894,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe28e8` | none | none | 8b39c@8b4c4 | One-time timer service start-up (guard byte 0x15f751): init the module (0xd6dc4), lock the handler code range (0xe28c4,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x49fd4` | EAX:uint32_t | none | 49228@49799 | For every member I (byte +0x12 of the group record P = EAX) look up the object index in the row table at 0x1fcb40 (rows  |

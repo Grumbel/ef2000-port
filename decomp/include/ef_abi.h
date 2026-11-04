@@ -5226,4 +5226,6 @@ void show_preview_picture_41314(uint32_t name);
 
 void start_timer_service_e28e8(void);
 
+void assign_group_slots_49fd4(uint32_t p);
+
 #endif

@@ -845,7 +845,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00049d2c	210	seek_segment_49d2c	game_helpers44	compiles	game	confirmed	decomp/tests/0x00049d2c.json	docs/compiler-abi.md; Walk the segment list to the node holding the budget in 0x1a666b.; callers 357ec@35852; guest pending
 0x00049e00	294			unknown	unclassified	unverified		
 0x00049f28	171	grid_cell_word_49f28	game_helpers44	compiles	game	confirmed	decomp/tests/0x00049f28.json	docs/compiler-abi.md; Look up a word of the unit record owning grid cell (a, b); abort on a bad cell.; callers 49228@4988b,49228@4990d,49228@49970; guest pending
-0x00049fd4	237			unknown	unclassified	unverified		
+0x00049fd4	237	assign_group_slots_49fd4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00049fd4.json	docs/compiler-abi.md; For every member I (byte +0x12 of the group record P = EAX) look up the object index in the row table at 0x1fcb40 (rows ; callers 49228@49799; guest pending
 0x0004a210	2020			unknown	unclassified	unverified		
 0x0004aa4c	1037			unknown	unclassified	unverified		
 0x0004ae5c	625			unknown	unclassified	unverified		

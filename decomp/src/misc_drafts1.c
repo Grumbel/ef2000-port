@@ -8615,3 +8615,32 @@ void start_timer_service_e28e8(void)
     EF_U32(0x0015b620u) = 0x000e28e0u;
     trace_call_1022dc(EF_U32(0x0015f74cu));
 }
+
+/* 0x49fd4, 237 bytes. For every member I (byte +0x12 of the group record P = EAX) look up the object index in the row table at 0x1fcb40 (rows of 0x11 bytes selected by the signed word +0x10 of P, words from byte offset 1): objects of type 0, 7 or 9 (byte +0x1b of the 0xca-byte records at 0x19bb58) receive the word and byte read from the same table at the position given by the member entry (0x7c-byte entries at dword +0x13 of P, signed words +0x6e / +0x70) into their fields +0xb9 and +0xbb; all other objects get 0xff in both. */
+void assign_group_slots_49fd4(uint32_t p)
+{
+    uint8_t i;
+    if (EF_U8(p + 0x12u) == 0u)
+        return;
+    i = 0u;
+    do {
+        uint32_t row = EF_U32(0x001fcb40u) + (uint32_t)((int32_t)(int16_t)EF_U16(p + 0x10u) * 0x11);
+        uint16_t w = EF_U16(row + (uint32_t)i * 2u + 1u);
+        int32_t obj = (int16_t)w;
+        uint8_t type = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(obj * 0xca) + 0x1bu);
+        uint32_t orec;
+        if (type == 0u || type == 7u || type == 9u) {
+            uint32_t ent = EF_U32(p + 0x13u) + (uint32_t)i * 0x7cu;
+            uint32_t r0 = EF_U32(0x001fcb40u) + (uint32_t)((int32_t)(int16_t)EF_U16(ent + 0x6eu) * 0x11)
+                        + (uint32_t)((int32_t)(int16_t)EF_U16(ent + 0x70u) * 2);
+            orec = EF_U32(0x0019bb58u) + (uint32_t)(obj * 0xca);
+            EF_U16(orec + 0xb9u) = EF_U16(r0 + 1u);
+            EF_U8(orec + 0xbbu) = EF_U8(EF_U32(0x001fcb40u) + (uint32_t)((int32_t)(int16_t)EF_U16(ent + 0x6eu) * 0x11));
+        } else {
+            orec = EF_U32(0x0019bb58u) + (uint32_t)(obj * 0xca);
+            EF_U16(orec + 0xb9u) = 0xffu;
+            EF_U8(orec + 0xbbu) = 0xffu;
+        }
+        i++;
+    } while (i < EF_U8(p + 0x12u));
+}
