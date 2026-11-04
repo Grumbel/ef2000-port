@@ -7098,3 +7098,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa4b80` | EAX:uint32_t | none | 4a90@4a9b,4b54@4b5f,94fc@978a | Close the widget ID (AX; valid 1..word 0x41eed8 in the pointer table 0x41edfc, only when flag 4 of its byte +0x3b is set |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7bc0` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 7e44@7e65,7104c@71089,7156c@719ce | Pick a roster slot for the unit UNIT (AX, signed) in group GROUP (DL): keep the unit's own slot (byte +0x20b) when it st |

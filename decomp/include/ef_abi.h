@@ -5302,4 +5302,6 @@ void release_locked_ranges_114ad8(void);
 
 void close_widget_a4b80(uint32_t id);
 
+uint32_t pick_roster_slot_7bc0(uint32_t unit, uint32_t group);
+
 #endif

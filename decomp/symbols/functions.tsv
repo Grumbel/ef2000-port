@@ -106,7 +106,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000078c0	465			unknown	unclassified	unverified		
 0x00007ae4	81	send_unit_command_7ae4	game_helpers10	compiles	game	confirmed	decomp/tests/0x00007ae4.json	docs/compiler-abi.md; Forward a command for a unit; kind 10 uses 0xff in place of its byte.; callers 46454@469fe,7156c@71a1c; guest pending
 0x00007b38	134	slot_matches_unit_7b38	game_helpers13	compiles	game	confirmed	decomp/tests/0x00007b38.json	docs/compiler-abi.md; True when the unit's slot entry matches its type and refers to it (or to anyone).; callers 7bc0@7c00,7bc0@7c4c; guest pending
-0x00007bc0	231			unknown	unclassified	unverified		
+0x00007bc0	231	pick_roster_slot_7bc0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00007bc0.json	docs/compiler-abi.md; Pick a roster slot for the unit UNIT (AX, signed) in group GROUP (DL): keep the unit's own slot (byte +0x20b) when it st; callers 7e44@7e65,7104c@71089,7156c@719ce; guest pending
 0x00007ca8	120	scaled_entry_point_7ca8	float_helpers1	compiles	game	confirmed	decomp/tests/0x00007ca8.json	docs/compiler-abi.md; Scaled point from a table entry and one sub-entry, stored as two doubles.; callers 7e44@7e7b,70a58@70d8f,70a58@70ed2; guest pending
 0x00007d20	203	point_in_oriented_box_7d20	float_helpers8	compiles	game	confirmed	decomp/tests/0x00007d20.json	docs/compiler-abi.md; Test whether a 2D point lies inside the oriented box of a record.; callers 7dec@7e34,82b8@8336; guest pending
 0x00007dec	85	apply_slot_7dec	game_helpers7	compiles	game	confirmed	decomp/tests/0x00007dec.json	docs/compiler-abi.md; ; callers 2c778@2cae2,70a58@70b7e; guest pending

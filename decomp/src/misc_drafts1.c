@@ -9758,3 +9758,29 @@ void close_widget_a4b80(uint32_t id)
     }
     redraw_entries_a6038();
 }
+
+/* 0x7bc0, 231 bytes. Pick a roster slot for the unit UNIT (AX, signed) in group GROUP (DL): keep the unit's own slot (byte +0x20b) when it still matches (0x7b38), otherwise take the first slot of the group (count in byte +0x15 of the 0x22-byte record at [0x1972e0]) that matches, reporting a missing slot table (dword +0x1e, 0x1803d4 through 0x132a74) on the way; then assign it (0x740e4 with the unit's bytes +0x209, +0x20a, +0x16d). Returns the slot, or 0xff when the unit does not exist or no slot fits. */
+uint32_t pick_roster_slot_7bc0(uint32_t unit, uint32_t group)
+{
+    int32_t id = (int16_t)unit;
+    uint8_t g = (uint8_t)group;
+    uint8_t best = 0xffu;
+    ef_addr32 u = guest_fn_7489c(id);
+    ef_addr32 rec;
+    int16_t i;
+    if (u == 0u)
+        return 0xffu;
+    if (EF_U8(u + 0x20bu) != 0xffu && slot_matches_unit_7b38(g, EF_U8(u + 0x20bu), (int16_t)id) != 0u)
+        best = EF_U8(u + 0x20bu);
+    for (i = 0;; i++) {
+        rec = EF_U32(0x001972e0u) + (uint32_t)g * 0x22u;
+        if (i >= (int16_t)EF_U8(rec + 0x15u))
+            break;
+        if (EF_U32(rec + 0x1eu) == 0u)
+            guest_callptr3_x(EF_U32(0x00132a74u), 0x001803d4u, best, g);
+        if (best == 0xffu && slot_matches_unit_7b38(g, (uint8_t)i, (int16_t)id) != 0u)
+            best = (uint8_t)i;
+    }
+    assign_roster_slot_740e4((uint32_t)id, EF_U8(u + 0x209u), EF_U8(u + 0x20au), EF_U8(u + 0x16du), best);
+    return best;
+}
