@@ -4437,7 +4437,7 @@ uint32_t scan_entries_a2ef4(void);
 void open_named_file_28744(void);
 void queue_request_36100(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1);
 void draw_mode_dispatch_a8660(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t index);
-void guest_fn_35de0_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1);
+void guest_fn_35de0_x(uint32_t s0, uint32_t s1); /* 0x35de0 2 stack, callee cleanup */
 void guest_fn_a8578_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
 
 
@@ -4447,7 +4447,7 @@ void unit_owner_update_6b344(uint32_t unit);
 
 uint32_t close_stream_record_bc4da(uint32_t rec, uint32_t extra);
 void project_position_5ca88(uint32_t pos, uint32_t arg);
-uint32_t guest_fn_15c0c4_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
+uint32_t guest_fn_15c0c4_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3); /* 0x15c0c4 4 stack, callee cleanup */
 
 uint8_t load_resource_9cc28(uint32_t key, uint32_t buffer);
 void run_script_conditions_a9694(uint32_t rec);
@@ -4546,5 +4546,9 @@ uint8_t step_timer_entry_a1500(uint32_t idx);
 void init_slot_record_b5640(uint32_t obj, uint32_t src, uint32_t ecx, uint32_t ebx, uint32_t need);
 void send_param_block_f2a30(void);
 void guest_fn_b54d0_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0xb54d0 EAX/EDX/EBX/ECX + one stack argument, callee cleanup */
+
+void draw_text_large_dd4c4(uint32_t colour, uint32_t x, uint32_t y, uint32_t str);
+void draw_text_medium_dd5bc(uint32_t colour, uint32_t x, uint32_t y, uint32_t str);
+void draw_text_small_dd6a0(uint32_t colour, uint32_t x, uint32_t y, uint32_t str);
 
 #endif

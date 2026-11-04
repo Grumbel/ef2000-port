@@ -40,7 +40,7 @@ void queue_request_36100(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx,
     EF_U8(0x0019f5acu) = (uint8_t)s0;
     EF_U8(0x0019f5aau) = 1u;
     EF_U8(0x0019f5adu) = (uint8_t)s1;
-    guest_fn_35de0_x(0u, 0u, 0u, 0u, 0u, 0u);
+    guest_fn_35de0_x(0u, 0u);
 }
 
 /* 0xa8660, 129 bytes. (ret 4) Dispatch on the mode byte at [[0x4191d0]+4]: 0 passes the arguments straight on to 0xa8578, 1 mirrors x against 0x13f using a table at 0x418780, 2 offsets x from a table at 0x4187d0. */
@@ -157,7 +157,7 @@ void project_position_5ca88(uint32_t pos, uint32_t arg)
     x += EF_S32(0x0021444cu);
     y += EF_S32(0x00214448u);
     z += EF_S32(0x00214450u);
-    guest_fn_15c0c4_x(0u, 0u, 0u, 0u, (uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
+    guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
 }
 
 /* 0x9cc28, 143 bytes. Load the resource with key into buffer: try the two archive contexts at 0x40d1f0/0x40d1f4 (enabled by bits 0 and 1 of 0x132ab0), then fall back to opening the file through the archive lookup. Returns 1 on success. */
@@ -787,7 +787,7 @@ void project_position_5cb1c(uint32_t arg, int32_t x, int32_t y, int32_t z)
     x += EF_S32(0x0021444cu);
     y += EF_S32(0x00214448u);
     z += EF_S32(0x00214450u);
-    guest_fn_15c0c4_x(0u, 0u, 0u, 0u, (uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
+    guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
 }
 
 /* 0x66b74, 126 bytes. Return 1 when the metric distance (0x23760) from the 8.8 fixed-point position at pos to the reference point is below the radius stored in the table at 0x12bca3 (145-byte rows) for the current unit's selected entry. */
@@ -1157,4 +1157,45 @@ void send_param_block_f2a30(void)
                           (uint32_t)(int32_t)EF_S16(0x00485950u), (uint32_t)(int32_t)EF_S16(0x0048594cu));
     if (EF_U16(0x00161e18u) == 0u && EF_U16(0x00161e16u) == 0u && EF_U8(0x001616edu) != 0u)
         EF_U16(0x00161e18u) = 0xffffu;
+}
+
+/* Draw a zero-terminated string with the glyph pointer table glyph_tbl and the advance table width_tbl: spaces and tabs advance by gap, other characters (low 6 bits index the map at 0x15e1be, -1 for none) are drawn with 0xcf7c4 and advance by width + extra. */
+static void draw_text_glyphs(uint32_t colour, uint32_t x, uint32_t y, uint32_t str, uint32_t glyph_tbl, uint32_t width_tbl, uint32_t gap, uint32_t extra, int remap_a5)
+{
+    int16_t i;
+    for (i = 0;; i++) {
+        uint8_t c = EF_U8(str + (uint32_t)(int32_t)i);
+        int32_t idx;
+        if (c == 0u)
+            return;
+        if (remap_a5 && c == 0xa5u)
+            c = 0x4eu;
+        if (c == 0x20u || c == 9u) {
+            x += gap;
+            continue;
+        }
+        idx = (int32_t)(int8_t)EF_U8(0x0015e1beu + (uint32_t)(c & 0x3fu));
+        if (idx == -1)
+            continue;
+        guest_fn_cf7c4_x(EF_U32(glyph_tbl + (uint32_t)idx * 4u), (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, colour & 0xffu);
+        x += EF_U8(width_tbl + (uint32_t)idx) + extra;
+    }
+}
+
+/* 0xdd4c4, 150 bytes. Draw a string with the large font (glyphs 0x15e61c, widths 0x15e27e, space 0x11, spacing 2). */
+void draw_text_large_dd4c4(uint32_t colour, uint32_t x, uint32_t y, uint32_t str)
+{
+    draw_text_glyphs(colour, x, y, str, 0x0015e61cu, 0x0015e27eu, 0x11u, 2u, 1);
+}
+
+/* 0xdd5bc, 148 bytes. Draw a string with the medium font (glyphs 0x15e6ac, widths 0x15e2a2, space 5, spacing 1). */
+void draw_text_medium_dd5bc(uint32_t colour, uint32_t x, uint32_t y, uint32_t str)
+{
+    draw_text_glyphs(colour, x, y, str, 0x0015e6acu, 0x0015e2a2u, 5u, 1u, 1);
+}
+
+/* 0xdd6a0, 134 bytes. Draw a string with the small font (glyphs 0x15e73c, widths 0x15e2c6, space 5, spacing 1; 0xa5 is not remapped). */
+void draw_text_small_dd6a0(uint32_t colour, uint32_t x, uint32_t y, uint32_t str)
+{
+    draw_text_glyphs(colour, x, y, str, 0x0015e73cu, 0x0015e2c6u, 5u, 1u, 0);
 }

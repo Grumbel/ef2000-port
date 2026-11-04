@@ -3243,11 +3243,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd2f4	122	text_width_dd2f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd2f4.json	docs/compiler-abi.md; Measure the pixel width of a zero-terminated string: spaces and tabs count 3, characters above 0x7f use the byte table a; callers 275e0@27658,275e0@276a8,275e0@276e5; guest pending
 0x000dd370	238			unknown	unclassified	unverified		
 0x000dd460	100	text_width_17_dd460	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd460.json	docs/compiler-abi.md; Width of a string in the 17-pixel-blank font minus the trailing gap.; callers a82f0@a84ed; guest pending
-0x000dd4c4	150			unknown	unclassified	unverified		
+0x000dd4c4	150	draw_text_large_dd4c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd4c4.json	docs/compiler-abi.md; Draw a string with the large font (glyphs 0x15e61c, widths 0x15e27e, space 0x11, spacing 2).; callers a8578@a862e; guest pending
 0x000dd55c	94	text_width_5_dd55c	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd55c.json	docs/compiler-abi.md; Width of a string in the 5-pixel-blank font minus the trailing gap.; callers a82f0@a84f4; guest pending
-0x000dd5bc	148			unknown	unclassified	unverified		
+0x000dd5bc	148	draw_text_medium_dd5bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd5bc.json	docs/compiler-abi.md; Draw a string with the medium font (glyphs 0x15e6ac, widths 0x15e2a2, space 5, spacing 1).; callers a8578@a8642; guest pending
 0x000dd650	78	text_width_raw_dd650	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd650.json	docs/compiler-abi.md; Pixel width of a string; blanks are tested before masking.; callers 27d18@27d9a,27d18@27de7,27fec@28192; guest pending
-0x000dd6a0	134			unknown	unclassified	unverified		
+0x000dd6a0	134	draw_text_small_dd6a0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd6a0.json	docs/compiler-abi.md; Draw a string with the small font (glyphs 0x15e73c, widths 0x15e2c6, space 5, spacing 1; 0xa5 is not remapped).; callers 27d18@27dc1,27d18@27e77,27fec@281b6; guest pending
 0x000dd728	94	text_width_6_dd728	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd728.json	docs/compiler-abi.md; Width of a string in the 6-pixel-blank font minus the trailing gap.; callers a82f0@a8458; guest pending
 0x000dd788	218			unknown	unclassified	unverified		
 0x000dd870	80	restore_saved_block_dd870	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000dd870.json	docs/compiler-abi.md; If a screen area was saved under the parameter block (0x15ee94 != -1), put it back, then mark it unsaved.; callers dd8d0@dd8d0,dd9e4@dd9ff,f2ac0@f2b13; guest pending

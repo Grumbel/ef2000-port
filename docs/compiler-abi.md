@@ -5435,3 +5435,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb5640` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | b5fe8@b64d9,b69e4@b7a3b,b7d4c@b7ed1 | (ret 4) Fill the sub-record at [obj+0x20] from the object in edx: find a free slot run (0xb58a8 with start bx and count  |
 | `0xf2a30` | none | none | f2ac0@f2b32 | Apply the palette at 0x425c8c, decrement the word 0x1616ee and send the parameter block built from 0x485920/0x48591c and |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdd4c4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | a8578@a862e | Draw a string with the large font (glyphs 0x15e61c, widths 0x15e27e, space 0x11, spacing 2). |
+| `0xdd5bc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | a8578@a8642 | Draw a string with the medium font (glyphs 0x15e6ac, widths 0x15e2a2, space 5, spacing 1). |
+| `0xdd6a0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 27d18@27dc1,27d18@27e77,27fec@281b6 | Draw a string with the small font (glyphs 0x15e73c, widths 0x15e2c6, space 5, spacing 1; 0xa5 is not remapped). |
