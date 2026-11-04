@@ -2454,7 +2454,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b0448	136	perturb_orientation_b0448	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b0448.json	docs/compiler-abi.md; As 0xb038c but offset by the previous values (high words of the neighbouring dwords).; callers ca7e0@ca82f; guest pending
 0x000b04e8	107			unknown	unclassified	unverified		
 0x000b0554	69	list_has_match_b0554	runtime_helpers11	compiles	game	confirmed	decomp/tests/0x000b0554.json	docs/compiler-abi.md; True when the list holds a node with the same two keys and the hash of b.; callers b059c@b0637; guest pending
-0x000b059c	236			unknown	unclassified	unverified		
+0x000b059c	236	classify_entries_b059c	game_helpers128	compiles	game	confirmed	decomp/tests/0x000b059c.json	docs/compiler-abi.md; Classify every entry of the list: entries of kind 0x31 whose type is 2 get state 2 if some other qualifying entry matche; callers b0f5c@b11a0,b0f5c@b149f; guest pending
 0x000b0718	156	match_ratio_b0718	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b0718.json	docs/compiler-abi.md; Ratio of listed entries of kind 1 or 2 to all matching entries.; callers b0c34@b0c64; guest pending
 0x000b07b4	156	match_ratio_b07b4	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b07b4.json	docs/compiler-abi.md; Same ratio using the second matching predicate.; callers b0c9c@b0ccd; guest pending
 0x000b0850	260	count_filtered_node_matches	unk_records	typed	game	confirmed		ABI only; AL mode, EBX list head, EDX filter list, EAX count
@@ -2488,7 +2488,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1c34	77	dump_entry_list_b1c34	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b1c34.json	docs/compiler-abi.md; Dump a numbered entry list: the format string, the entry count, then each entry (numbered from 0 in word +0x13) via 0xb1; callers b3084@b310c; guest pending
 0x000b1f80	618			unknown	unclassified	unverified		
 0x000b21ec	140	print_record_b21ec	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b21ec.json	docs/compiler-abi.md; Print one record to a text handle.; callers b1f80@b21c7,b2758@b27d0; guest pending
-0x000b23bc	226			unknown	unclassified	unverified		
+0x000b23bc	226	dump_record_b23bc	game_helpers128	compiles	game	confirmed	decomp/tests/0x000b23bc.json	docs/compiler-abi.md; Dump one 0x13-byte record to a handle: an index or fallback value, its kind name, an optional dword and six signed words; callers b2560@b26a9; guest pending
 0x000b2504	89	print_move_record_b2504	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2504.json	docs/compiler-abi.md; Print a movement record with its kind name.; callers b2560@b261a,b2810@b2898,b28b8@b2940; guest pending
 0x000b2560	504			unknown	unclassified	unverified		
 0x000b2758	183			unknown	unclassified	unverified		

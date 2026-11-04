@@ -4540,3 +4540,10 @@ in EAX, format string address, one value).
 | `0xb3038` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | b3084@b30ee | Dump a group list: heading with a title, the entry count, then each group via 0xb2f48. |
 | `0xb1c34` | EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32 | none | b3084@b310c | Dump a numbered entry list: the format string, the entry count, then each entry (numbered from 0 in word +0x13) via 0xb1 |
 | `0xb2e28` | EAX:uint32_t,EDX:ef_addr32,BX:int16_t,ECX:ef_addr32 | none | b3168@b31d3 | Dump a point list: the format string, a value, then each entry via 0xb2e98. |
+
+## game_helpers128 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb23bc` | EAX:ef_addr32,DX:int16_t,EBX:uint32_t,CX:int16_t | none | b2560@b26a9 | Dump one 0x13-byte record to a handle: an index or fallback value, its kind name, an optional dword and six signed words |
+| `0xb059c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | b0f5c@b11a0,b0f5c@b149f | Classify every entry of the list: entries of kind 0x31 whose type is 2 get state 2 if some other qualifying entry matche |

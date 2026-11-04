@@ -3968,4 +3968,9 @@ void dump_point_list_b2e28(uint32_t handle, ef_addr32 list_ptr, int16_t value, e
 void guest_fn_b1f80_x(ef_addr32 node, uint32_t handle); /* 0xb1f80 EAX/EDX */
 void guest_fn_b2e98_x(ef_addr32 node, uint32_t handle); /* 0xb2e98 EAX/EDX */
 
+/* game_helpers128.c */
+void dump_record_b23bc(ef_addr32 rec, int16_t index, uint32_t handle, int16_t fallback);
+void classify_entries_b059c(ef_addr32 list_holder, ef_addr32 head_a, ef_addr32 list_b);
+uint32_t guest_fn_b04e8_x(ef_addr32 a, ef_addr32 b); /* 0xb04e8 EAX/EDX -> AX (x87 distance test) */
+
 #endif
