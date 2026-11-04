@@ -6271,3 +6271,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x777f4` | EAX:uint32_t | EAX:uint32_t | 8de9c@8e006 | Test the position POS (three dwords) against the entries of the pointer table at dword 0x1f8900 (count word 0x1f891c, sc |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x84788` | EAX:uint32_t | none | 848e0@84939 | Latch the control bits of the flight record REC into the global control word 0x1fcbe2: clear bits 0 and 7 of its low byt |

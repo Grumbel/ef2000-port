@@ -5960,3 +5960,43 @@ uint32_t check_position_hit_777f4(uint32_t pos)
     }
     return found;
 }
+
+/* 0x84788, 342 bytes. Latch the control bits of the flight record REC into the global control word 0x1fcbe2: clear bits 0 and 7 of its low byte, clear word 0x1fcbe0, then copy REC dword +0x22 bit 1 to bit 0, bits 3:2 to bits 2:1, bit 7 to bit 6 and bits 6:4 to bits 5:3 (clearing bits 6:4 in the record); the field in bits 10:9 steps the byte 0x1fcc42 by +2 (value 1) or -2 (value 2), clamped to 6..10, and bits 9 and 10 are cleared in the record. Finally copy the words +0x26/+0x2a to 0x1fcbd0/0x1fcbd2, zero both dwords and latch dword 0x197c14 into 0x1fcbbc. */
+void latch_control_bits_84788(uint32_t rec)
+{
+    uint32_t d, g, v;
+    EF_U8(0x001fcbe2u) &= 0x7eu;
+    EF_U16(0x001fcbe0u) = 0u;
+    d = EF_U32(rec + 0x22u);
+    g = EF_U16(0x001fcbe2u);
+    g |= (d >> 1) & 1u;
+    EF_U16(0x001fcbe2u) = (uint16_t)g;
+    d = EF_U32(rec + 0x22u);
+    g = EF_U16(0x001fcbe2u) & ~6u;
+    g |= ((d >> 2) & 3u) * 2u;
+    EF_U16(0x001fcbe2u) = (uint16_t)g;
+    d = EF_U32(rec + 0x22u);
+    g = EF_U16(0x001fcbe2u) & ~0x40u;
+    g |= ((d >> 7) & 1u) << 6;
+    EF_U16(0x001fcbe2u) = (uint16_t)g;
+    d = EF_U32(rec + 0x22u);
+    g = EF_U16(0x001fcbe2u) & ~0x38u;
+    g |= ((d >> 4) & 7u) << 3;
+    EF_U8(rec + 0x22u) &= 0x8fu;
+    EF_U16(0x001fcbe2u) = (uint16_t)g;
+    v = (EF_U32(rec + 0x22u) >> 9) & 3u;
+    if (v == 1u)
+        EF_U8(0x001fcc42u) = (uint8_t)(EF_U8(0x001fcc42u) + 2u);
+    else if (v == 2u)
+        EF_U8(0x001fcc42u) = (uint8_t)(EF_U8(0x001fcc42u) - 2u);
+    EF_U8(rec + 0x23u) &= 0xf9u;
+    if (EF_U8(0x001fcc42u) < 6u)
+        EF_U8(0x001fcc42u) = 6u;
+    if (EF_U8(0x001fcc42u) > 10u)
+        EF_U8(0x001fcc42u) = 10u;
+    EF_U16(0x001fcbd0u) = EF_U16(rec + 0x26u);
+    EF_U16(0x001fcbd2u) = EF_U16(rec + 0x2au);
+    EF_U32(rec + 0x2au) = 0u;
+    EF_U32(rec + 0x26u) = 0u;
+    EF_U32(0x001fcbbcu) = EF_U32(0x00197c14u);
+}
