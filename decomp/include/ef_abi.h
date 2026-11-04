@@ -5100,4 +5100,8 @@ void setup_external_view_95704(uint32_t a, uint32_t b, uint32_t c, uint32_t d, u
 
 void draw_icon_1e6f0(uint32_t color, uint32_t shadow, uint32_t idx, uint32_t kind, uint32_t x, uint32_t y);
 
+uint32_t fopen_core_bc287(uint32_t name, uint32_t mode, uint32_t file, uint32_t share);
+
+
+
 #endif

@@ -2629,7 +2629,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bbf1c	447			unknown	unclassified	unverified		
 0x000bc0dc	247			unknown	unclassified	unverified		
 0x000bc1d3	180	parse_open_mode_bc1d3	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000bc1d3.json	docs/compiler-abi.md; Convert an fopen mode string to open flags.; callers bc287@bc291; guest pending
-0x000bc287	200			unknown	unclassified	unverified		
+0x000bc287	200	fopen_core_bc287	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bc287.json	docs/compiler-abi.md; fopen core: open the file NAME with the mode string MODE into the stream record FILE (flags dword +0xc, handle +0x10, bu; callers bc34f@bc362; guest pending
 0x000bc34f	27	run_if_available_bc34f	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc34f.json	docs/compiler-abi.md; When 0xfa6d3(0) returns nonzero, run 0xbc287(EAX).; callers bc36a@bc36d; guest pending
 0x000bc36a	10	run_if_available_bc36a	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc36a.json	docs/compiler-abi.md; Run 0xbc34f with EBX preserved as zero.; callers 9ea0@9fa4,a3dc@a3f7,357ec@3589f; guest pending
 0x000bc400	33	stream_printf_bc400	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000bc400.json	docs/compiler-abi.md; fprintf (cdecl, variadic).; callers 9ea0@a012,9ea0@a0c6,9ea0@a119; guest pending

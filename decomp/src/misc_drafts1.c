@@ -7066,3 +7066,34 @@ void draw_icon_1e6f0(uint32_t color, uint32_t shadow, uint32_t idx, uint32_t kin
                      (uint32_t)((int32_t)px - ((int32_t)EF_U8(spr) >> 1)),
                      (uint32_t)(int32_t)(int16_t)color);
 }
+
+/* 0xbc287, 200 bytes. fopen core: open the file NAME with the mode string MODE into the stream record FILE (flags dword +0xc, handle +0x10, buffer fields +4/+8/+0x14), SHARE being passed on to the low-level open (0xfa4a9). The first mode character selects read (open flags from the write bit, no creation) or write/append (flags 0x21/0x22 plus 0x10 for append, 0x40 otherwise, permissions 0x180); the text/binary bit 0x40 of the stream flags adds 0x200 or 0x100. On failure (handle -1) release the record and return 0; for append seek to the end (0xf2183). Updates the stream flags (0xfa7d2) and returns FILE. */
+uint32_t fopen_core_bc287(uint32_t name, uint32_t mode, uint32_t file, uint32_t share)
+{
+    uint32_t flags, perm, c;
+    EF_U8(file + 0xcu) = (uint8_t)(EF_U8(file + 0xcu) & 0xfcu);
+    EF_U32(file + 0xcu) = EF_U32(file + 0xcu) | parse_open_mode_bc1d3(mode);
+    c = guest_fn_e7835(EF_U8(mode)) & 0xffu;
+    if (c == 0x72u) {
+        flags = (EF_U8(file + 0xcu) & 2u) ? 2u : 0u;
+        flags |= (EF_U8(file + 0xcu) & 0x40u) ? 0x200u : 0x100u;
+        perm = 0u;
+    } else {
+        flags = ((EF_U8(file + 0xcu) & 1u) != 0u ? 1u : 0u) + 0x21u;
+        flags |= (c == 0x61u) ? 0x10u : 0x40u;
+        flags |= (EF_U8(file + 0xcu) & 0x40u) ? 0x200u : 0x100u;
+        perm = 0x180u;
+    }
+    EF_U32(file + 0x10u) = (uint32_t)guest_fn_fa4a9_x(name, flags, share, perm);
+    if (EF_U32(file + 0x10u) == 0xffffffffu) {
+        release_list_node_fa77b(file);
+        return 0u;
+    }
+    EF_U32(file + 4u) = 0u;
+    EF_U32(file + 8u) = 0u;
+    EF_U32(file + 0x14u) = 0u;
+    if (c == 0x61u)
+        guest_fn_f2183(file, 0u, 2u);
+    update_flags_fa7d2(file);
+    return file;
+}

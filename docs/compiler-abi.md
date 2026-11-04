@@ -6545,3 +6545,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1e6f0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 1e7c0@1e9c9,1e7c0@1ea1b | Draw an icon (sprite pair) for COLOR (EAX) with SHADOW flag (EDX) at the position (X, Y) (stack arguments, ret 8) displa |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbc287` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | bc34f@bc362 | fopen core: open the file NAME with the mode string MODE into the stream record FILE (flags dword +0xc, handle +0x10, bu |
