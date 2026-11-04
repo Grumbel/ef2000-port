@@ -4197,3 +4197,10 @@ in EAX, format string address, one value).
 | `0xde6c4` | EAX:ef_addr32 | none | a8a38@a8bba,a8bd4@a8f3a | Same as de648 but over 80 steps. |
 | `0xe1df0` | EAX:ef_addr32,DX:int16_t,BL:uint8_t | EAX:int32_t | e1958@e1a87,e1958@e1baa,e1958@e1bee | Pixel width of up to len characters of a string for the given font (spaces use the font's space width). |
 | `0xfab80` | EAX:ef_addr32 | EAX:int32_t | fbad8@fbbed | Half the number of non-type-1 sub-entries of an object, clamped to 1..2. |
+
+## game_helpers90 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe83d8` | EAX:ef_addr32,EDX:ef_addr32 | none | e853c@e8545,e853c@e854e | Draw the four edges of the rectangle spanned by two 3-word points in the plane of the first point's y. |
+| `0xe853c` | EAX:ef_addr32,EDX:ef_addr32 | none | e8484@e850a | Draw a wireframe box: both rectangle outlines plus the four vertical edges. |

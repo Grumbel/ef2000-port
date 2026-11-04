@@ -3744,4 +3744,8 @@ void fade_palette_out_slow_de6c4(ef_addr32 palette);
 int32_t text_width_e1df0(ef_addr32 text, int16_t len, uint8_t font);
 int32_t half_active_entry_count_fab80(ef_addr32 object);
 
+/* game_helpers90.c */
+void draw_rect_outline_e83d8(ef_addr32 p, ef_addr32 q);
+void draw_box_outline_e853c(ef_addr32 p, ef_addr32 q);
+
 #endif

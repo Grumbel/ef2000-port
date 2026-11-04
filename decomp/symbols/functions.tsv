@@ -3435,9 +3435,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e81b0	408			unknown	unclassified	unverified		
 0x000e8348	32	rotate_calls_e8348	math_string	compiles	game	confirmed	decomp/tests/0x000e8348.json	docs/compiler-abi.md; 0xe81b0 on (A,B), (B,C), (C,A) for EAX, EDX, EBX.; callers e8368@e83c1; guest pending
 0x000e8368	112			unknown	unclassified	unverified		
-0x000e83d8	169			unknown	unclassified	unverified		
+0x000e83d8	169	draw_rect_outline_e83d8	game_helpers90	compiles	game	confirmed	decomp/tests/0x000e83d8.json	docs/compiler-abi.md; Draw the four edges of the rectangle spanned by two 3-word points in the plane of the first point's y.; callers e853c@e8545,e853c@e854e; guest pending
 0x000e8484	159			unknown	unclassified	unverified		
-0x000e853c	167			unknown	unclassified	unverified		
+0x000e853c	167	draw_box_outline_e853c	game_helpers90	compiles	game	confirmed	decomp/tests/0x000e853c.json	docs/compiler-abi.md; Draw a wireframe box: both rectangle outlines plus the four vertical edges.; callers e8484@e850a; guest pending
 0x000e85e4	12	store_bytes_46437d	math_string	compiles	game	confirmed	decomp/tests/0x000e85e4.json	docs/compiler-abi.md; Byte 0x46437e = AL, byte 0x46437d = DL.; callers 7b3fc@7b499,7b3fc@7b4b8; guest pending
 0x000e85f0	97	interpolate_line_e85f0	game_helpers37	compiles	game	confirmed	decomp/tests/0x000e85f0.json	docs/compiler-abi.md; Interpolate a point back along a slope defined by the line at 0x420904.; callers 7b7d8@7b943; guest pending
 0x000e8651	166			unknown	unclassified	unverified		
