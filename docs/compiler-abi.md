@@ -7420,3 +7420,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x16c7c` | EAX:uint32_t | none | 161d4@16579,168d8@16963 | Strip the missile-like stores (types 7, 9..0xf, 0x15..0x1c) from record A (EAX) in the table at [0x19bb58]: for each of  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2631c` | EAX:uint32_t | none | 6f15c@6f2a0 | Per-frame update of the selected target when FLAG (EAX) is set: run 0x73084 and 0x2479c on the two signed high words at  |

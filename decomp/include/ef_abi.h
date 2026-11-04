@@ -5437,4 +5437,14 @@ void guest_fn_16e60_x(uint32_t a, uint32_t b); /* 0x16e60 EAX/EDX */
 void clear_missile_slots_16c7c(uint32_t a);
 void guest_fn_56f0c_x(int32_t unit, uint32_t index); /* 0x56f0c EAX/EDX */
 
+void update_target_2631c(uint32_t flag);
+void guest_fn_73084_x(void); /* 0x73084 */
+void guest_fn_2479c_x(int32_t a, int32_t b, uint32_t c); /* 0x2479c EAX/EDX/EBX */
+void guest_fn_24f94_x(void); /* 0x24f94 */
+double guest_fn_6a5f0_x(int32_t a, int32_t b); /* 0x6a5f0 EAX/EDX -> ST0 */
+void guest_fn_2541c_x(int32_t a, uint32_t b); /* 0x2541c EAX/EDX */
+void guest_fn_2611c_x(int32_t a); /* 0x2611c EAX */
+void guest_fn_24f24_x(void); /* 0x24f24 */
+void guest_fn_24c40_x(int32_t a); /* 0x24c40 EAX */
+
 #endif

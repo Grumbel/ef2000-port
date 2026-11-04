@@ -11375,3 +11375,40 @@ void clear_missile_slots_16c7c(uint32_t a)
         }
     }
 }
+
+/* 0x2631c, 182 bytes. Per-frame update of the selected target when FLAG (EAX) is set: run 0x73084 and 0x2479c on the two signed high words at 0x1f71c6 (A) and 0x1f71ce (B); if 0x6a1b4(B) is zero finish with 0x24f94 and 0x24f24, otherwise a value from 0x6a5f0(A, B) above the double 0x181e88 calls 0x2541c(A, 2) and returns, else the ratio of the doubles 0x1f7000 / 0x19b2c8 picks 0x2611c(B) (below the double 0x181e90) or 0x24c40(B) before 0x24f24. */
+void update_target_2631c(uint32_t flag)
+{
+    int32_t a;
+    int32_t b;
+    double c1;
+    double c2;
+    double num;
+    double den;
+    if (flag == 0u)
+        return;
+    guest_fn_73084_x();
+    a = (int32_t)EF_U32(0x001f71c6u) >> 16;
+    b = (int32_t)EF_U32(0x001f71ceu) >> 16;
+    guest_fn_2479c_x(a, b, 0u);
+    b = (int32_t)EF_U32(0x001f71ceu) >> 16;
+    if (guest_fn_6a1b4(b) == 0u) {
+        guest_fn_24f94_x();
+    } else {
+        a = (int32_t)EF_U32(0x001f71c6u) >> 16;
+        b = (int32_t)EF_U32(0x001f71ceu) >> 16;
+        memcpy(&c1, ef_guest_memory_ptr(0x00181e88u), sizeof c1);
+        if (guest_fn_6a5f0_x(a, b) > c1) {
+            guest_fn_2541c_x((int32_t)EF_U32(0x001f71c6u) >> 16, 2u);
+            return;
+        }
+        memcpy(&num, ef_guest_memory_ptr(0x001f7000u), sizeof num);
+        memcpy(&den, ef_guest_memory_ptr(0x0019b2c8u), sizeof den);
+        memcpy(&c2, ef_guest_memory_ptr(0x00181e90u), sizeof c2);
+        if (num / den < c2)
+            guest_fn_2611c_x((int32_t)EF_U32(0x001f71ceu) >> 16);
+        else
+            guest_fn_24c40_x((int32_t)EF_U32(0x001f71ceu) >> 16);
+    }
+    guest_fn_24f24_x();
+}
