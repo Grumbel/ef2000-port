@@ -1558,7 +1558,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000815b4	64	find_entry_815b4	game_helpers6	compiles	game	confirmed	decomp/tests/0x000815b4.json	docs/compiler-abi.md; Find the 8-byte entry whose two words match those at pointer.; callers 8748@878a; guest pending
 0x000815f4	22	forward_if_flag_12b104	scene_helpers	compiles	game	confirmed	decomp/tests/0x000815f4.json	docs/compiler-abi.md; tail 0xd72b4(AL) when byte 0x12b104 set else 0; callers 81448@815a2; guest pending
 0x0008160c	111	trigger_sound_8160c	unit_flags	compiles	game	confirmed	decomp/tests/0x0008160c.json	docs/compiler-abi.md; ; callers 29b14@29bc5,29dd0@29e26,589c0@58a9b; guest pending
-0x00081680	273			unknown	unclassified	unverified		
+0x00081680	273	update_random_effect_81680	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00081680.json	docs/compiler-abi.md; Periodic pseudo-random effect update: steps a small word generator and spawns a record at a rotated offset.; callers 817a8@8184c; guest pending
 0x00081794	17	load_halfword_1fcaec	status_values	compiles	game	confirmed	decomp/tests/0x00081794.json	docs/compiler-abi.md; Word 0x1fcaec from 0xde864(0x1889d4); sole direct caller 3cfc0@3d13a; guest pending
 0x000817a8	188	update_view_target_817a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000817a8.json	docs/compiler-abi.md; Per-frame hook of the tracked view target (record at 0x425b*): when its mode word 0x425bc8 is clear, or the dword 0x425b; callers 3dd30@3e24b; guest pending
 0x00081864	1	nop_81864	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00081864.json	docs/compiler-abi.md; Empty stub (single ret).; callers 3dd30@3e38e; guest pending

@@ -19332,3 +19332,35 @@ uint8_t row_within_reach_85420(int32_t unit)
 	cls = b;
 	return (x * 0.5 > dist / cls) ? 1u : 0u;
 }
+
+/* 0x81680, 273 bytes. Periodic pseudo-random effect update: steps a small word generator and spawns a record at a rotated offset. */
+void update_random_effect_81680(void)
+{
+	int16_t out[2];
+	uint32_t old;
+	int32_t s;
+
+	if (EF_U8(0x00137a00u) == 0u)
+		return;
+	EF_U16(0x0012b254u) = (uint16_t)(EF_U16(0x0012b254u) - 1u);
+	if (EF_U16(0x0012b254u) != 0u)
+		return;
+	old = EF_U16(0x0012b250u);
+	EF_U16(0x0012b254u) = (uint16_t)(old & 0xfu);
+	s = (int32_t)(int16_t)old;
+	EF_U16(0x0012b250u) = (uint16_t)(old + EF_U16(0x0012b252u));
+	EF_U16(0x0012b252u) = (uint16_t)((s >> 1) + (int32_t)((uint32_t)s << 15) + ((int32_t)EF_U32(0x0012b250u) >> 16));
+	load_sincos_dc7bc(old);
+	rotate_point_dc7e4((ef_addr32)(uintptr_t)out, (int16_t)((int32_t)EF_U32(0x0012b250u) >> 16), 0);
+	EF_U32(0x001fcae0u) = EF_U32(0x001a5becu) + (uint32_t)((int32_t)out[0] * 4);
+	EF_U32(0x001fcae4u) = EF_U32(0x001a5be8u) + (uint32_t)((int32_t)out[1] * 4);
+	EF_U32(0x0015be0cu) = 0xfa0u;
+	EF_U32(0x0015bddcu) = 0u;
+	EF_U32(0x0015bde0u) = (uint32_t)((int32_t)EF_U32(0x001fcaeau) >> 16);
+	EF_U32(0x0015bde4u) = 0u;
+	EF_U32(0x0015bde8u) = EF_U32(0x001fcae0u);
+	EF_U32(0x0015bdecu) = 0u;
+	EF_U32(0x0015bdf0u) = EF_U32(0x001fcae4u);
+	guest_fn_15be10_x();
+	EF_U8(0x00128549u) = 2u;
+}
