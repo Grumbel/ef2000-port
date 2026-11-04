@@ -3318,7 +3318,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e1194	101	setup_sound_e1194	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e1194.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000e1260	87	any_device_e1260	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e1260.json	docs/compiler-abi.md; Is any of the six devices present?; callers none direct; guest pending
 0x000e1540	38	next_enabled_index	math_string	compiles	game	confirmed	decomp/tests/0x000e1540.json	docs/compiler-abi.md; Next index after AL (mod 5) whose byte at 0x15f708+index is nonzero.; callers 337c4@337d0; guest pending
-0x000e1570	337			unknown	unclassified	unverified		
+0x000e1570	337	install_render_table_e1570	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e1570.json	docs/compiler-abi.md; Install the draw routine table (dwords 0x136ba0..0x136bc4, code addresses) for the renderer mode in byte 0x13579a: 0, 1 ; callers a3c18@a3c95; guest pending
 0x000e1730	17	unsupported_query_e1730	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1730.json	docs/compiler-abi.md; Unsupported input query: abort and report none.; callers 34390@343a3; guest pending
 0x000e1744	17	unsupported_query_e1744	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1744.json	docs/compiler-abi.md; Unsupported input query: abort and report none.; callers 34140@3415e,34ea4@34f03; guest pending
 0x000e1758	17	unsupported_query_e1758	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1758.json	docs/compiler-abi.md; Unsupported input query: abort and report none.; callers 34298@342e1; guest pending

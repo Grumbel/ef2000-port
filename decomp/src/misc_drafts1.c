@@ -5839,3 +5839,44 @@ uint32_t assign_unit_object_6abac(uint32_t id, uint32_t k)
     }
     return found;
 }
+
+/* 0xe1570, 337 bytes. Install the draw routine table (dwords 0x136ba0..0x136bc4, code addresses) for the renderer mode in byte 0x13579a: 0, 1 and 2 select three sets of routines (modes 1 and 2 also fill 0x136bb0, mode 2 additionally 0x136bb4/b8), any other mode only sets 0x136ba0 to the default 0xe1568. */
+void install_render_table_e1570(void)
+{
+    switch (EF_U8(0x0013579au)) {
+    case 0:
+        EF_U32(0x00136ba8u) = 0x000ecb84u;
+        EF_U32(0x00136bacu) = 0x000ecb80u;
+        EF_U32(0x00136ba4u) = 0x000ed108u;
+        EF_U32(0x00136bbcu) = 0x000ecdf8u;
+        EF_U32(0x00136bc0u) = 0x000ecb8cu;
+        EF_U32(0x00136bc4u) = 0x000e156cu;
+        EF_U32(0x00136ba0u) = 0x000ed090u;
+        break;
+    case 1:
+        EF_U32(0x00136ba8u) = 0x000e0c40u;
+        EF_U32(0x00136bacu) = 0x000e0c94u;
+        EF_U32(0x00136bb0u) = 0x000e105cu;
+        EF_U32(0x00136ba4u) = 0x000e0a90u;
+        EF_U32(0x00136bbcu) = 0x000e0e84u;
+        EF_U32(0x00136bc0u) = 0x000e0cc0u;
+        EF_U32(0x00136bc4u) = 0x000e156cu;
+        EF_U32(0x00136ba0u) = 0x000e0984u;
+        break;
+    case 2:
+        EF_U32(0x00136ba8u) = 0x000e0c40u;
+        EF_U32(0x00136bacu) = 0x000e0c94u;
+        EF_U32(0x00136bb0u) = 0x000e105cu;
+        EF_U32(0x00136ba4u) = 0x000e0a64u;
+        EF_U32(0x00136bb4u) = 0x000e12d4u;
+        EF_U32(0x00136bb8u) = 0x000e0a64u;
+        EF_U32(0x00136bbcu) = 0x000e0e84u;
+        EF_U32(0x00136bc0u) = 0x000e0cc0u;
+        EF_U32(0x00136bc4u) = 0x000e156cu;
+        EF_U32(0x00136ba0u) = 0x000e11fcu;
+        break;
+    default:
+        EF_U32(0x00136ba0u) = 0x000e1568u;
+        break;
+    }
+}

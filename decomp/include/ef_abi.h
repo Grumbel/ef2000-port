@@ -4977,4 +4977,6 @@ void draw_table_sprite_cde00(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
 
 uint32_t assign_unit_object_6abac(uint32_t id, uint32_t k);
 
+void install_render_table_e1570(void);
+
 #endif
