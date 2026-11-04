@@ -6142,3 +6142,20 @@ void draw_map_markers_4357c(uint32_t head, uint32_t list)
         node = EF_U32(node + 4u);
     }
 }
+
+/* 0xbb324, 353 bytes. Clear the 0x14-byte record REC and initialise it for event KIND (0..0x24) by calling the matching initialiser (EAX = REC, EDX = ARG byte); kinds without an initialiser (0x18..0x1b, 0x1d, 0x1e, 0x20..0x24) leave it cleared. */
+void init_event_record_bb324(uint32_t rec, uint32_t kind, uint32_t arg)
+{
+    static const uint32_t handlers[0x25] = {
+        0xba13cu, 0xba77cu, 0xba6a0u, 0xba580u, 0xba460u, 0xba40cu, 0xbad70u, 0xba804u,
+        0xba8dcu, 0xba9c4u, 0xbaa4cu, 0xbaad4u, 0xbab5cu, 0xbabd0u, 0xbac90u, 0xba2c0u,
+        0xbae34u, 0xbae4cu, 0xbae78u, 0xbaf24u, 0xbaf48u, 0xbafe4u, 0xbb1acu, 0xbb0acu,
+        0u, 0u, 0u, 0u, 0xba3bcu, 0u, 0u, 0xba3e4u, 0u, 0u, 0u, 0u, 0u
+    };
+    uint32_t fn = 0u;
+    fill_bytes_b3fb0(rec, 0u, 0x14u);
+    if ((kind & 0xffu) <= 0x24u)
+        fn = handlers[kind & 0xffu];
+    if (fn != 0u)
+        guest_callptr_eaxedx_x(fn, rec, arg & 0xffu);
+}

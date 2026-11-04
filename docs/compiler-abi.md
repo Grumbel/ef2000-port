@@ -6306,3 +6306,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x4357c` | EAX:uint32_t,EDX:uint32_t | none | 45574@45651,4bf1c@4c03b | Variant of 0x436dc for the nodes of type 0x14: the position words come from 0x1344f9/fb (positive flag), 0x1344f0/f2 (ne |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbb324` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 7d2f8@7d6d1,7d2f8@7d892,7d2f8@7daeb | Clear the 0x14-byte record REC and initialise it for event KIND (0..0x24) by calling the matching initialiser (EAX = REC |

@@ -4999,4 +4999,6 @@ void guest_fn_110ec_x(uint32_t a, uint32_t b); /* 0x110ec EAX/EDX */
 
 void draw_map_markers_4357c(uint32_t head, uint32_t list);
 
+void init_event_record_bb324(uint32_t rec, uint32_t kind, uint32_t arg);
+
 #endif

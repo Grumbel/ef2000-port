@@ -2619,7 +2619,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bafe4	169	fill_colour_record_bafe4	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bafe4.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000bb0ac	225	fill_colour_record_bb0ac	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bb0ac.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
 0x000bb1ac	225	fill_colour_record_bb1ac	colour_tables2	compiles	game	confirmed	decomp/tests/0x000bb1ac.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
-0x000bb324	353			unknown	unclassified	unverified		
+0x000bb324	353	init_event_record_bb324	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bb324.json	docs/compiler-abi.md; Clear the 0x14-byte record REC and initialise it for event KIND (0..0x24) by calling the matching initialiser (EAX = REC; callers 7d2f8@7d6d1,7d2f8@7d892,7d2f8@7daeb; guest pending
 0x000bb7c0	693			unknown	unclassified	unverified		
 0x000bbae4	26	map_code_9_10_bbae4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbae4.json	docs/compiler-abi.md; Map a code 0..26 to 9 or 10 (0 when out of range).; callers bbdc4@bbdf3; guest pending
 0x000bbb34	26	map_code_5_6_bbb34	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbb34.json	docs/compiler-abi.md; Map a code 0..12 to 5 or 6 (0 when out of range).; callers bbdc4@bbde6; guest pending
