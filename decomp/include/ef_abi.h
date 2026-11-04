@@ -2297,4 +2297,23 @@ void load_sincos_dc7bc(uint32_t angle);
 void guest_fn_8f22c(int32_t unit, uint32_t index); /* 0x8f22c EAX/EDX */
 void guest_fn_57820(ef_addr32 message); /* 0x57820 EAX */
 
+/* game_helpers29.c */
+void clear_word_tables_92f0(void);
+void send_chat_line_56ccc(void);
+void release_pending_73924(int16_t unit_id, int16_t slot_id);
+void fill_random_pairs_81868(void);
+void raise_gauge_90c2c(int16_t index);
+void copy_page_byte_a0b98(int16_t from, int16_t row, int16_t to);
+void refresh_flagged_object_a4b08(ef_addr32 object);
+int32_t rate_divisor_df2b0(void);
+void release_saved_handle_e3b58(void);
+uint32_t advance_window_f2141(int32_t count, ef_addr32 window);
+void draw_text_f261c(uint32_t color, uint32_t x, uint32_t y, ef_addr32 text);
+void draw_text_f29ec(uint32_t color, uint32_t x, uint32_t y, ef_addr32 text);
+void remember_request_f41a8(void);
+void apply_request_f41c4(void);
+void latch_words_f5e6c(uint16_t a, uint16_t b, uint16_t c, uint16_t d, uint32_t stack_e, uint32_t stack_f);
+void guest_fn_f25b0(uint32_t color, uint32_t x, uint32_t y, uint32_t glyph); /* 0xf25b0 EAX/EDX/EBX/ECX */
+void guest_fn_f2960(uint32_t color, uint32_t x, uint32_t y, uint32_t glyph); /* 0xf2960 EAX/EDX/EBX/ECX */
+
 #endif

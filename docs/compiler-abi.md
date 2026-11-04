@@ -3027,3 +3027,23 @@ in EAX, format string address, one value).
 | `0xb3ae0` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | b3b1c@b3b4a,b3b1c@b3b55,b3b1c@b3b67 | Table-driven ratio of two unsigned values (a/b or complement). |
 | `0xc58cc` | [ESP+4]:uint32_t,[ESP+8]:uint32_t | none | none direct | Reset three clip bounds; both stack arguments are ignored. |
 | `0xdc7bc` | EAX:uint32_t | none | 1f0fc@1f2a2,1f0fc@1f609,2a4c8@2a5e4 | Load a sine/cosine word pair for an angle (8 angle units per table step). |
+
+## game_helpers29 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x92f0` | none | none | bfcc@c275,c630@c757,c868@c879 | Clear five 8-entry word tables. |
+| `0x56ccc` | none | none | 601c@6035 | Send the stored chat line as packet 0x2f when chat is allowed. |
+| `0x73924` | AX:int16_t,DX:int16_t | none | 46454@46761 | Release a unit's current entry and clear its pending slot id if it matches. |
+| `0x81868` | none | none | 3cfc0@3d2eb | Fill 50 word pairs with generator output. |
+| `0x90c2c` | AX:int16_t | none | 90c6c@90e9b | Raise a 48-byte record's gauge by 0x41a, capped at 0x1400. |
+| `0xa0b98` | AX:int16_t,DX:int16_t,BX:int16_t | none | 9e7bc@9f3c4,9e7bc@9f3de,9e7bc@9f3f6 | Copy one byte between two page rows (29-byte stride, offset 0x14). |
+| `0xa4b08` | EAX:ef_addr32 | none | b5d0@b66f,b5d0@b68c,bfcc@c20f | Refresh the list for an object that is flagged and not owned. |
+| `0xdf2b0` | none | EAX:int32_t | 33888@338be | Divide 115200 by the table entry for the current rate index. |
+| `0xe3b58` | none | none | 97dcc@97f4b | Release the saved handle, if any. |
+| `0xf2141` | EAX:int32_t,EDX:ef_addr32 | EAX:uint32_t | f2183@f2206,f2183@f2239 | Advance a window cursor by count; wrap and report 1 when out of range. |
+| `0xf261c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32 | none | a8578@a85c9 | Draw a string with 4-pixel glyph spacing. |
+| `0xf29ec` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32 | none | a9130@a9374 | Draw a string with 6-pixel spacing, glyphs offset from the blank. |
+| `0xf41a8` | none | none | f41dc@f41f7 | With the flag set, remember the request value and refresh the cursor. |
+| `0xf41c4` | none | none | a9d48@a9e20,f3f84@f3fa2 | With the flag set, apply the saved request value. |
+| `0xf5e6c` | AX:uint16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | f5484@f5688 | Latch six words and install the 0xf5eac handler. |
