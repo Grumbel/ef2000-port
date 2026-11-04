@@ -4086,3 +4086,30 @@ void draw_prop_text_15a14(uint32_t color, int32_t x, int32_t y, uint32_t str)
         px = (int16_t)(px + EF_U8(0x00122b28u + (uint32_t)idx) + 1);
     }
 }
+
+/* 0xc90e0, 230 bytes. Show the splash picture named by the string at 0x41ef06 (dropped when 0x9d524 rejects the name): allocate the 0x3e800-byte picture buffer 0x41eeac on first use, load "<default path><name><suffix>" through the driver call 0xc34cc, copy a 640x400 block into the buffer with 0xeb1f0, blit it with 0xe9a24 and refresh the screen (0xc3974 before, 0xc39ac after). */
+void show_splash_c90e0(void)
+{
+    char buf[0x90];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    if (EF_U8(0x0041ef06u) == 0u)
+        return;
+    if (guest_fn_9d524(0x0041ef06u, 0x0018efdcu) == 0u) {
+        EF_U8(0x0041ef06u) = 0u;
+        return;
+    }
+    if (EF_U32(0x0041eeacu) == 0u) {
+        EF_U32(0x0041eeacu) = arena_take_e29e8(0x0003e800u);
+        if (EF_U32(0x0041eeacu) == 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x0018efe0u);
+    }
+    guest_fn_c3974();
+    build_path_9c9c0(b, 0x0018f010u);
+    strcat_9ca57(b, 0x0041ef06u);
+    strcat_9ca57(b, 0x0018f01cu);
+    if ((start_driver_c34cc(b) & 0xffffu) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018f024u, b);
+    get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0u, 0u, 0x280u, 0x190u, EF_U32(0x0041eeacu));
+    guest_fn_e9a24(0x2d0u, 0x00425cbcu, 0x00419600u);
+    guest_fn_c39ac();
+}

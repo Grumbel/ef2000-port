@@ -5923,3 +5923,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x15a14` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:uint32_t | none | 3f7fc@3fb6c,3f7fc@3fbf9,3f7fc@3fd32 | Draw STR in colour COLOR with the proportional bitmap font at (X, Y): a space advances 3, characters with bit 7 set use  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc90e0` | none | none | ac408@ac508 | Show the splash picture named by the string at 0x41ef06 (dropped when 0x9d524 rejects the name): allocate the 0x3e800-by |

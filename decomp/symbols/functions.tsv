@@ -2839,7 +2839,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c8f38	163			unknown	unclassified	unverified		
 0x000c8fdc	9	clear_byte_c8fdc	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000c8fdc.json	docs/compiler-abi.md; ; callers ac408@ac42e; guest pending
 0x000c90c0	9	clear_byte_c90c0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000c90c0.json	docs/compiler-abi.md; ; callers ac408@ac433; guest pending
-0x000c90e0	230			unknown	unclassified	unverified		
+0x000c90e0	230	show_splash_c90e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c90e0.json	docs/compiler-abi.md; Show the splash picture named by the string at 0x41ef06 (dropped when 0x9d524 rejects the name): allocate the 0x3e800-by; callers ac408@ac508; guest pending
 0x000c91c8	111	fill_rect_clipped_c91c8	fill_rects2	compiles	game	confirmed	decomp/tests/0x000c91c8.json	docs/compiler-abi.md; Fill a rectangle given as exclusive coordinates when it lies inside the screen (limits 0x15b744/0x15b748); colours up to; callers a5b70@a5c2d,a60a8@a614f,a6d00@a6f05; guest pending
 0x000c9238	171	set_clip_and_shade_c9238	tactical_marks1	compiles	game	confirmed	decomp/tests/0x000c9238.json	docs/compiler-abi.md; Store a clip rectangle (a, b, c-1, d-1) at 0x15b60e..0x15b61c, build the two 64-entry shade tables at 0x41f3f0 on first ; callers a6d00@a6f9a; guest pending
 0x000c92e4	122	draw_clipped_c92e4	screen_clip1	compiles	game	confirmed	decomp/tests/0x000c92e4.json	docs/compiler-abi.md; Forward a rectangle to 0xeb174 when it lies wholly inside the screen (limits 0x15b744/0x15b748).; callers a6d00@a6e63,a6d00@a6eab,a6d00@a6f49; guest pending

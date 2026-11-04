@@ -4816,4 +4816,6 @@ int32_t classify_object_b4ee0(uint32_t obj);
 
 void draw_prop_text_15a14(uint32_t color, int32_t x, int32_t y, uint32_t str);
 
+void show_splash_c90e0(void);
+
 #endif
