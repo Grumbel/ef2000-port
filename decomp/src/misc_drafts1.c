@@ -20741,3 +20741,20 @@ double ratio_sum_11ba7c(uint32_t ref, uint32_t obj, uint32_t obj2, uint32_t u3, 
 	(void)unused;
 	return scaled_pow_formula_11b9ec(ref, obj2) + local;
 }
+
+/* 0x9c2d3, 61 bytes. cdecl (BASE, LENGTH): returns BASE + the dword at 0x120cc6 when BASE+LENGTH stays within 1 MiB; above 1 MiB (BASE itself at or above 1 MiB) int 21h AX=0x350A is run with EBX = BASE and the same sum is returned unless the carry flag is set. Returns -1 on overflow, on a range that starts below 1 MiB but ends above it, and on carry. */
+uint32_t extender_range_9c2d3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t base, uint32_t length)
+{
+	uint32_t end;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	end = base + length;
+	if (end < base)
+		return 0xffffffffu;
+	if (end <= 0x100000u)
+		return EF_U32(0x00120cc6u) + base;
+	if (base < 0x100000u)
+		return 0xffffffffu;
+	if (md_int21_regs(0x350au, base, 0u, 0u, 0u, 0) != 0u)
+		return 0xffffffffu;
+	return base + EF_U32(0x00120cc6u);
+}

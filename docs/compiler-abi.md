@@ -9029,3 +9029,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11ba7c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:double | EAX:double | 10a220@10a4ea | Sum of the scaled ratio (ref, obj, arg) and the * scaled power formula (ref, obj2). Second stack double is unused. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9c2d3` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | cac@cb0 | cdecl (BASE, LENGTH): returns BASE + the dword at 0x120cc6 when BASE+LENGTH stays within 1 MiB; above 1 MiB (BASE itself |

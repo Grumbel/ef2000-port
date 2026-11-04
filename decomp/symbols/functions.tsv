@@ -2032,7 +2032,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009c243	57			unknown	unclassified	unverified		
 0x0009c27c	63	extender_call_3502_9c27c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c27c.json	docs/compiler-abi.md; cdecl (ARG0, SELECTOR): returns -1 when SELECTOR equals the word at 0x120cc4. Otherwise any of ES, FS, GS that holds SEL; callers none direct; guest pending
 0x0009c2bb	24	extender_call_3504_9c2bb	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c2bb.json	docs/compiler-abi.md; cdecl (ADDEND, SELECTOR): int 21h AX=0x3504 with EBX = SELECTOR; returns ECX + ADDEND, or -1 when the carry flag is set.; callers none direct; guest pending
-0x0009c2d3	61			unknown	unclassified	unverified		
+0x0009c2d3	61	extender_range_9c2d3	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c2d3.json	docs/compiler-abi.md; cdecl (BASE, LENGTH): returns BASE + the dword at 0x120cc6 when BASE+LENGTH stays within 1 MiB; above 1 MiB (BASE itself; callers cac@cb0; guest pending
 0x0009c3cf	60	push_handler_9c3cf	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009c3cf.json	docs/compiler-abi.md; Push a handler on the 32-entry stack at 0x40d030; -1 if full.; callers 81c@875,b04@b44,80058@8010a; guest pending
 0x0009c430	8	inp_9c430	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c430.json	docs/compiler-abi.md; inp: read a byte from the I/O port PORT.; callers 117b18@117b38,117b18@117b67,117bfc@117c39; guest pending
 0x0009c446	27	int386_9c446	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c446.json	docs/compiler-abi.md; int386: int386x with a freshly read segment block.; callers 1047e4@104803; guest pending
