@@ -5216,4 +5216,6 @@ void flush_pending_slots_112808(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
 
 void read_script_line_f4640(void);
 
+void load_resource_list_d5f0c(uint32_t list);
+
 #endif

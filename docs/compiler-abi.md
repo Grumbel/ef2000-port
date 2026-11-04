@@ -6864,3 +6864,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf4640` | none | none | none direct | Read the next significant script line into the buffer at 0x4859e0: leading spaces/tabs are skipped, characters are store |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd5f0c` | EAX:uint32_t | none | 98000@9800e | Load a list of resource records (13 bytes each: name pointer dword +0, size dword +5, data pointer dword +9; ended by a  |

@@ -8521,3 +8521,30 @@ void read_script_line_f4640(void)
         break;
     }
 }
+
+/* 0xd5f0c, 154 bytes. Load a list of resource records (13 bytes each: name pointer dword +0, size dword +5, data pointer dword +9; ended by a zero name pointer) starting at LIST (EAX; nothing for 0, the list pointer is also kept in 0x420a60): for each record build the path default + 0x18f89c + name + 0x18f8a4, size it with the hook at 0x132ab4 (zero reported through 0x132a74 with 0x18f8ac), allocate the data (0xc3f70, failure reported with 0x18f8cc) and load it with the hook at 0x132ab8. */
+void load_resource_list_d5f0c(uint32_t list)
+{
+    char path[0x50];
+    uint32_t p = (uint32_t)(uintptr_t)path;
+    uint32_t r = list;
+    EF_U32(0x00420a60u) = list;
+    if (list == 0u)
+        return;
+    while (EF_U32(r) != 0u) {
+        build_default_path_9c980(p);
+        strcat_9ca57(p, 0x0018f89cu);
+        strcat_9ca57(p, EF_U32(r));
+        strcat_9ca57(p, 0x0018f8a4u);
+        EF_U32(r + 5u) = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), p);
+        if (EF_U32(r + 5u) == 0u)
+            guest_callptr2_x(EF_U32(0x00132a74u), 0x0018f8acu, p);
+        EF_U32(r + 9u) = guest_fn_c3f70(EF_U32(r + 5u));
+        if (EF_U32(r + 9u) == 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f8ccu);
+        guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), p, EF_U32(r + 9u));
+        r += 0xdu;
+        if (r == 0u)
+            break;
+    }
+}
