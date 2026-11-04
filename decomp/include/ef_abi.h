@@ -6558,4 +6558,7 @@ void restore_int23_11ce30(void); /* 0x11ce30 */
 void midpoint_offset_a2500(ef_addr32 p);
 void midpoint_offset_a2500(ef_addr32 p); /* 0xa2500 */
 
+void offset_project_86e44(ef_addr32 outp);
+void offset_project_86e44(ef_addr32 outp); /* 0x86e44 */
+
 #endif

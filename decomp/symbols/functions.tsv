@@ -1698,7 +1698,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00086720	146	sum_slot_weights_86720	float_helpers3	compiles	game	confirmed	decomp/tests/0x00086720.json	docs/compiler-abi.md; Sum the weighted entries of the player's slot list into two doubles.; callers 86110@866c6,8cb60@8cc35; guest pending
 0x00086920	71	reset_ui_panel_selection	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00086920.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00086968	886			unknown	unclassified	unverified		
-0x00086e44	309			unknown	unclassified	unverified		
+0x00086e44	309	offset_project_86e44	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00086e44.json	docs/compiler-abi.md; Computes a scaled offset vector from globals (optionally * rotated by sin/cos of a heading) and passes it to rotate_proj; callers 5b080@5b08b; guest pending
 0x00086f7c	843	query_projected_object_position	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX selector, EDX output pair pointer, BX iteration count; returns signed EAX; caller sites 0x5c7b9/0x5ca6e; indirect callback effects remain replay concern
 0x000872c8	217	spawn_at_selected_872c8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000872c8.json	docs/compiler-abi.md; Spawn a unit at the current position of the selected object: look up the object named by the high word of 0x1f71c8 (noth; callers 873a4@873cd; guest pending
 0x000873a4	432			unknown	unclassified	unverified		

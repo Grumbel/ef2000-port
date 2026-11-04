@@ -23909,3 +23909,47 @@ void midpoint_offset_a2500(ef_addr32 p)
     EF_U16(p + 0x0au) = (uint16_t)my;
     EF_U16(p + 0x0cu) = (uint16_t)(b + (int32_t)(int16_t)mz);
 }
+
+static float md_rd_f32_86e44(uint32_t addr)
+{
+	float f;
+	memcpy(&f, ef_guest_memory_ptr(addr), sizeof f);
+	return f;
+}
+
+/* 0x86e44, 309 bytes. Computes a scaled offset vector from globals (optionally
+ * rotated by sin/cos of a heading) and passes it to rotate_project_15c0ea. */
+void offset_project_86e44(ef_addr32 outp)
+{
+	double k = md_rd_f64(0x18a3feu);
+	int32_t bx, by, bz, x, y, z;
+
+	bx = (int32_t)truncate_9d72c((double)md_rd_f32_86e44(0x1a5c00u) * k);
+	EF_S32(0x2117b0u) = bx;
+	by = (int32_t)truncate_9d72c((double)md_rd_f32_86e44(0x1a5bb8u) * k);
+	EF_S32(0x2117b4u) = by;
+	EF_U16(0x20f194u) = 1;
+	bz = (int32_t)truncate_9d72c(k * (double)md_rd_f32_86e44(0x1a5bbcu));
+	EF_S32(0x2117b8u) = bz;
+	if (md_rd_f64(0x1a30d8u) > md_rd_f64(0x18a406u)) {
+		double k2 = md_rd_f64(0x18a416u);
+		int32_t tx = (int32_t)truncate_9d72c(md_rd_f64(0x1a2f38u) * k2);
+		int32_t ty = (int32_t)truncate_9d72c(md_rd_f64(0x1a2f40u) * k2);
+		int32_t tz = (int32_t)truncate_9d72c(k2 * md_rd_f64(0x1a2f30u));
+		x = bx + tx;
+		y = by + ty;
+		z = bz + tz;
+	} else {
+		double a = md_rd_f64(0x1a2fa0u);
+		double s = sin_b45ac(a);
+		double c = cos_b45a2(a);
+		double k3 = md_rd_f64(0x18a40eu);
+		int32_t tx = (int32_t)truncate_9d72c(s * k3);
+		int32_t tz = (int32_t)truncate_9d72c(k3 * c);
+		x = bx + tx;
+		y = by;
+		z = bz + tz;
+	}
+	rotate_project_15c0ea((uint32_t)z << 8, (uint32_t)y << 8, (uint32_t)x << 8, outp);
+	EF_U16(0x20f194u) = 0;
+}

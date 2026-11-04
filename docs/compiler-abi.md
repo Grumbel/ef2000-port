@@ -9597,3 +9597,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa2500` | EAX:ef_addr32 | none | none direct | Computes the midpoint of two 3D points (words at +0xe..+0x18, overlapping stride-2 layout) and offsets it along a rotate |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x86e44` | EAX:ef_addr32 | none | 5b080@5b08b | Computes a scaled offset vector from globals (optionally * rotated by sin/cos of a heading) and passes it to rotate_proj |
