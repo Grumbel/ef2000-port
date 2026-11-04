@@ -6528,3 +6528,26 @@ void update_counter_widget_4e7b8(uint32_t show)
         guest_bind_dialog_widget(w, 0x00184d58u);
     }
 }
+
+/* 0x1047e4, 88 bytes. Try to allocate PARAGRAPHS of DOS memory through int386 (int 21h, AH = 0x48). Cdecl (PARAGRAPHS, BLOCKS_OUT, SEGMENT_OUT, ERROR_OUT): on failure return 0; on success store the BX result in *BLOCKS_OUT, the AX result shifted left 16 in *SEGMENT_OUT, the (zero) carry word in *ERROR_OUT and return 1. */
+uint32_t dos_alloc_block_1047e4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+                                uint32_t paragraphs, uint32_t blocks_out, uint32_t segment_out, uint32_t error_out)
+{
+    uint32_t in[7];
+    uint32_t out[7];
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    in[0] = 0x4800u;
+    in[1] = paragraphs;
+    in[2] = 0u;
+    in[3] = 0u;
+    in[4] = 0u;
+    in[5] = 0u;
+    in[6] = 0u;
+    int386_9c446(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out);
+    if (out[6] != 0u)
+        return 0u;
+    EF_U32(segment_out) = out[0] << 16;
+    EF_U32(blocks_out) = out[1];
+    EF_U32(error_out) = out[6];
+    return 1u;
+}

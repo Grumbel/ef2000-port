@@ -6412,3 +6412,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x4e7b8` | EAX:uint32_t | none | 4dcd8@4dd77,4dcd8@4ddec,4dcd8@4dea9 | Update the counter widget (0x184d4c) of the dialog named at 0x184b3c: with SHOW (AL) nonzero it shows the decimal value  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1047e4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | EAX:uint32_t | 104200@104244,105e38@106107 | Try to allocate PARAGRAPHS of DOS memory through int386 (int 21h, AH = 0x48). Cdecl (PARAGRAPHS, BLOCKS_OUT, SEGMENT_OUT |
