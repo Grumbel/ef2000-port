@@ -3200,7 +3200,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dbee4	8	shield		named	unclassified	unverified		
 0x000dbeec	9	city		named	unclassified	unverified		
 0x000dbef8	41	day		named	unclassified	unverified		
-0x000dbf3c	186			unknown	unclassified	unverified		
+0x000dbf3c	186	load_companion_files_dbf3c	load_planes1	compiles	game	confirmed	decomp/tests/0x000dbf3c.json	docs/compiler-abi.md; Load two companion files named from part b: the first into dest (complaining when missing), then, if the second exists, ; callers da644@da6a9,da644@da6fe,da7fc@da8a0; guest pending
 0x000dbff8	153	init3d_file		named	unclassified	unverified		
 0x000dc094	143	east_west_palettes		named	unclassified	unverified		
 0x000dc124	175	setsun		named	unclassified	unverified		

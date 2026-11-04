@@ -5003,3 +5003,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xdd8dc` | none | none | 278c0@27b26,27d18@27eaa,f3480@f3492 | Save the screen area under the parameter block at 0x15ee80 (size clamped against 0x425fc6/0x425fc8) into its buffer and  |
+
+## load_planes1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdbf3c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | da644@da6a9,da644@da6fe,da7fc@da8a0 | Load two companion files named from part b: the first into dest (complaining when missing), then, if the second exists,  |

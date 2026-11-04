@@ -54,3 +54,24 @@ uint32_t load_text_file_e94ec(ef_addr32 name, uint32_t flag)
     EF_U8(0x001600a4u) = 1u;
     return 0u;
 }
+
+/* 0xdbf3c, 186 bytes. Load two companion files named from part b: the first into dest (complaining when missing), then, if the second exists, into dest2 + 4 with a presence flag stored at dest2. */
+void load_companion_files_dbf3c(ef_addr32 dest, ef_addr32 part_b, ef_addr32 dest2)
+{
+    uint8_t name1[0x98], name2[0x64], msg[0x98];
+    ef_addr32 n1 = (uint32_t)(uintptr_t)name1;
+    ef_addr32 n2 = (uint32_t)(uintptr_t)name2;
+    build_path_with_name_e7cec(0x00190064u, part_b, 0x001900a4u, n1);
+    build_path_with_name_e7cec(0x001904a8u, part_b, 0x001904a4u, n2);
+    if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), n1) == 0u) {
+        guest_sprintf_a4342((uint32_t)(uintptr_t)msg, 0x001904b0u, n1);
+        guest_callptr1_x(EF_U32(0x00132a74u), (uint32_t)(uintptr_t)msg);
+    }
+    guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), n1, dest);
+    if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), n2) == 0u) {
+        EF_U32(dest2) = 0u;
+    } else {
+        guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), n2, dest2 + 4u);
+        EF_U32(dest2) = 1u;
+    }
+}

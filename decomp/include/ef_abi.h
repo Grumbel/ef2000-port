@@ -4291,4 +4291,6 @@ void guest_fn_c4b95_x(ef_addr32 block); /* 0xc4b95 one stack argument, callee cl
 void save_and_draw_block_dd8dc(void);
 void guest_fn_cde00_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcde00 four stack arguments, callee cleanup */
 
+void load_companion_files_dbf3c(ef_addr32 dest, ef_addr32 part_b, ef_addr32 dest2);
+
 #endif
