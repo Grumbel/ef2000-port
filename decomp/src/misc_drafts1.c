@@ -10504,3 +10504,39 @@ void refresh_unit_roster_76e2c(uint32_t a, uint32_t b)
     else
         draw_record_entries_461e8((uint32_t)unit, (uint32_t)cls, 0x42u, 0u, 0u, 0u);
 }
+
+/* 0xac854, 297 bytes. Poll the pointer device: when byte 0x41f2e1 is set read the motion counters and the button bits (copied to 0x41f2f1, with bit 0 to 0x41f2f2, bit 1 to 0x41f2f0 and bit 2 to 0x41f2f3); then move the cursor (0x13725e, 0x137260) either by the motion or, when 0xce08c returns 1, to the pointer position reported by the service (0xcdfe8). The word 0x41eec2 gains 8 * (|dx| + |dy|) - 0x20, clamped to 0..0x2ff; when its 0x300 bits change and word 0x41eede is zero the default video entry is reselected (0xaca14). Finally clamp the cursor (0xac7f0). */
+void poll_pointer_device_ac854(void)
+{
+    uint16_t dx = 0u;
+    uint16_t dy = 0u;
+    uint16_t tmp = 0u;
+    uint16_t old = EF_U16(0x0041eec2u);
+    uint32_t t;
+    uint32_t s;
+    if (EF_U8(0x0041f2e1u) != 0u) {
+        uint8_t bt;
+        mouse_read_motion_ce02c((uint32_t)(uintptr_t)&dx, (uint32_t)(uintptr_t)&dy);
+        bt = (uint8_t)mouse_read_buttons_ce064();
+        EF_U8(0x0041f2f1u) = bt;
+        EF_U8(0x0041f2f2u) = bt & 1u;
+        EF_U8(0x0041f2f0u) = bt & 2u;
+        EF_U8(0x0041f2f3u) = bt & 4u;
+    }
+    if (get_global_ce08c() == 1u) {
+        query_pointer_cdfe8(0x0013725eu, 0x00137260u, (uint32_t)(uintptr_t)&tmp);
+    } else {
+        EF_U16(0x0013725eu) = (uint16_t)(EF_U16(0x0013725eu) + dx);
+        EF_U16(0x00137260u) = (uint16_t)(EF_U16(0x00137260u) + dy);
+    }
+    t = abs_a28f2((int16_t)dx);
+    s = abs_a28f2((int16_t)dy) + t;
+    EF_U16(0x0041eec2u) = (uint16_t)(EF_U16(0x0041eec2u) + (s * 8u - 0x20u));
+    if ((int16_t)EF_U16(0x0041eec2u) < 0)
+        EF_U16(0x0041eec2u) = 0u;
+    if ((int16_t)EF_U16(0x0041eec2u) > 0x2ff)
+        EF_U16(0x0041eec2u) = 0x2ffu;
+    if ((int16_t)(old & 0x300u) != (int16_t)(EF_U16(0x0041eec2u) & 0x300u) && EF_U16(0x0041eedeu) == 0u)
+        select_default_video_aca14();
+    clamp_cursor_ac7f0();
+}

@@ -5346,4 +5346,6 @@ uint32_t find_object_near_90940(ef_addr32 pos);
 
 void refresh_unit_roster_76e2c(uint32_t a, uint32_t b);
 
+void poll_pointer_device_ac854(void);
+
 #endif
