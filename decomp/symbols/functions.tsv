@@ -3431,7 +3431,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e7ea4	177			unknown	unclassified	unverified		
 0x000e7fa4	19	install_handler_e7fa4	math_string	compiles	game	confirmed	decomp/tests/0x000e7fa4.json	docs/compiler-abi.md; Dword 0x464360 = EAX, dword 0x15b268 = 0xe7f60.; callers 7a38c@7a397; guest pending
 0x000e7fc0	263	split_path_e7fc0	game_helpers96	compiles	game	confirmed	decomp/tests/0x000e7fc0.json	docs/compiler-abi.md; _splitpath: normalise '/' to '\\' in place and split into drive, directory, name and extension (each output optional).; callers 7ab00@7ab5c,de864@de907,de864@de940; guest pending
-0x000e80d0	202			unknown	unclassified	unverified		
+0x000e80d0	202	make_path_e80d0	game_helpers97	compiles	game	confirmed	decomp/tests/0x000e80d0.json	docs/compiler-abi.md; _makepath: join drive, directory, name and extension into path, adding the missing separators and normalising '/' to '\\; callers 7ab00@7ab7b,7ab00@7ab95,de864@de9c0; guest pending
 0x000e81b0	408			unknown	unclassified	unverified		
 0x000e8348	32	rotate_calls_e8348	math_string	compiles	game	confirmed	decomp/tests/0x000e8348.json	docs/compiler-abi.md; 0xe81b0 on (A,B), (B,C), (C,A) for EAX, EDX, EBX.; callers e8368@e83c1; guest pending
 0x000e8368	112			unknown	unclassified	unverified		

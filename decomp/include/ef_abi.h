@@ -3804,4 +3804,7 @@ void split_path_e7fc0(ef_addr32 path, ef_addr32 drive, ef_addr32 dir, ef_addr32 
 void transform_vector_by_matrix_ea9ec(ef_addr32 vec, ef_addr32 matrix);
 uint32_t name_hash_ebfd0(ef_addr32 text);
 
+/* game_helpers97.c */
+void make_path_e80d0(ef_addr32 path, ef_addr32 drive, ef_addr32 dir, ef_addr32 name, ef_addr32 ext);
+
 #endif

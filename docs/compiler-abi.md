@@ -4284,3 +4284,9 @@ in EAX, format string address, one value).
 | `0xe7fc0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | 7ab00@7ab5c,de864@de907,de864@de940 | _splitpath: normalise '/' to '\\' in place and split into drive, directory, name and extension (each output optional). |
 | `0xea9ec` | EAX:ef_addr32,EDX:ef_addr32 | none | 97534@97595 | Transform a 3-vector in place by a 3x3 1.15 matrix (each product divided by 0x8000 separately). |
 | `0xebfd0` | EAX:ef_addr32 | EAX:uint32_t | 9dbf0@9dbfd,9dcf8@9dd9c,a1d50@a1d6d | Hash up to the first 15 characters of a name into 32 bits (length, sum, running sum, mix and ordering bits; '_' is skipp |
+
+## game_helpers97 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe80d0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | 7ab00@7ab7b,7ab00@7ab95,de864@de9c0 | _makepath: join drive, directory, name and extension into path, adding the missing separators and normalising '/' to '\\ |
