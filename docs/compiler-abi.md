@@ -6575,3 +6575,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd2634` | EAX:ef_addr32,EDX:uint32_t | none | c4a50@c4adf | Textured variant of 0xd2584: build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe51c4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | e52a4@e56ff,e52a4@e5739,e52a4@e579e | Add a clipped rectangle to the dirty-rectangle list at 0x4339a0 (8-byte entries, running index in dword 0x433ea0, count  |

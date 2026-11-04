@@ -5112,4 +5112,6 @@ void project_vertices_fc8cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
 
 void build_textured_object_d2634(ef_addr32 list, uint32_t count);
 
+void add_dirty_rect_e51c4(uint32_t a, uint32_t c, uint32_t b, uint32_t d, uint32_t add);
+
 #endif

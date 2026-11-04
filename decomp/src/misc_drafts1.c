@@ -7211,3 +7211,35 @@ void build_textured_object_d2634(ef_addr32 list, uint32_t count)
     }
     process_render_object_d23d8(obj);
 }
+
+/* 0xe51c4, 224 bytes. Add a clipped rectangle to the dirty-rectangle list at 0x4339a0 (8-byte entries, running index in dword 0x433ea0, count word 0x433eac): the rectangle given by A (EAX), C (EDX), B (EBX), D (ECX) is rejected unless A < word 0x433ea4, B > word 0x433ea6, C < word 0x433ea8 and D > word 0x433eaa; with the stack flag ADD (ret 4) nonzero it is clamped to those bounds and stored as (A', C', B' - A', D' - C') at the current entry, the index and the count are advanced; the byte 0x433eae is set to 1 whenever the rectangle passed the bounds. */
+void add_dirty_rect_e51c4(uint32_t a, uint32_t c, uint32_t b, uint32_t d, uint32_t add)
+{
+    uint32_t idx = EF_U32(0x00433ea0u);
+    int16_t va = (int16_t)a, vb = (int16_t)b, vc = (int16_t)c, vd = (int16_t)d;
+    if (va >= (int16_t)EF_U16(0x00433ea4u) || vb <= (int16_t)EF_U16(0x00433ea6u) ||
+        vc >= (int16_t)EF_U16(0x00433ea8u) || vd <= (int16_t)EF_U16(0x00433eaau)) {
+        EF_U32(0x00433ea0u) = idx;
+        return;
+    }
+    if ((add & 0xffu) != 0u) {
+        int16_t lim;
+        uint32_t e = 0x004339a0u + idx * 8u;
+        lim = (int16_t)EF_U16(0x00433ea6u);
+        if (!(va > lim)) va = lim;
+        EF_U16(e) = (uint16_t)va;
+        lim = (int16_t)EF_U16(0x00433eaau);
+        if (!(vc > lim)) vc = lim;
+        EF_U16(e + 2u) = (uint16_t)vc;
+        lim = (int16_t)EF_U16(0x00433ea4u);
+        if (!(vb < lim)) vb = lim;
+        EF_U16(e + 4u) = (uint16_t)(vb - va);
+        lim = (int16_t)EF_U16(0x00433ea8u);
+        if (!(vd < lim)) vd = lim;
+        EF_U16(e + 6u) = (uint16_t)(vd - vc);
+        idx++;
+        EF_U16(0x00433eacu) = (uint16_t)(EF_U16(0x00433eacu) + 1u);
+    }
+    EF_U8(0x00433eaeu) = 1u;
+    EF_U32(0x00433ea0u) = idx;
+}
