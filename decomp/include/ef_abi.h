@@ -2749,4 +2749,22 @@ void guest_fatal_arg3(ef_addr32 format, uint32_t a, uint32_t b, uint32_t c); /* 
 void guest_fn_50ca4(void); /* 0x50ca4 */
 void guest_fn_50d04(void); /* 0x50d04 */
 
+/* game_helpers45.c */
+void finish_marker_round_558b0(void);
+void announce_ready_56bdc(void);
+void announce_ready_57030(void);
+void init_status_text_7a4a4(void);
+void set_session_text_7c4fc(ef_addr32 name, uint32_t target);
+uint8_t claim_players_7e5a0(void);
+uint8_t sync_players_7e758(void);
+void wait_round_clear_7e7e0(void);
+uint32_t guest_fn_56ba8(void); /* 0x56ba8 -> AL */
+uint32_t guest_fn_56ffc(void); /* 0x56ffc -> AL */
+void guest_fn_e2988(uint32_t ticks); /* 0xe2988 EAX */
+void guest_fn_581b0(void); /* 0x581b0 */
+void guest_fn_58094(void); /* 0x58094 */
+void guest_fn_9c980_sfx(ef_addr32 buffer, ef_addr32 suffix); /* 0x9c980 EAX/EDX */
+void guest_fn_e1e6c_3(uint32_t a, uint32_t b, uint32_t c); /* 0xe1e6c EAX/EDX/EBX */
+uint32_t guest_fn_7e670(void); /* 0x7e670 -> AL */
+
 #endif

@@ -1016,7 +1016,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000557e8	117	update_view_557e8	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x000557e8.json	docs/compiler-abi.md; ; callers 581b0@5840e; guest pending
 0x00055860	35	clear_activity_record_flag	marker_packets	compiles	game	confirmed	decomp/tests/0x00055860.json	docs/compiler-abi.md; Clear byte at 0x1a5c32+23*record[1] then call 0x544c0; sole direct caller 581b0@58437; guest pending
 0x00055884	43	set_activity_record_flag	mid_helpers	compiles	game	confirmed	decomp/tests/0x00055884.json	docs/compiler-abi.md; byte 0x1a5c32+23*record[1]=1 unless byte 0x1f9012; always 0x544c0; callers 581b0@58428; guest pending
-0x000558b0	117			unknown	unclassified	unverified		
+0x000558b0	117	finish_marker_round_558b0	game_helpers45	compiles	game	confirmed	decomp/tests/0x000558b0.json	docs/compiler-abi.md; Finish the pending marker round: mark this player ready and update the scene.; callers 581b0@5841b; guest pending
 0x00055928	385			unknown	unclassified	unverified		
 0x00055aac	152	send_record_state_55aac	game_helpers18	compiles	game	confirmed	decomp/tests/0x00055aac.json	docs/compiler-abi.md; Send the full state of a record (command 0x0e).; callers 87db8@87e71,883cc@88423; guest pending
 0x00055b44	58	send_packet_41	packet_status	compiles	game	confirmed	decomp/tests/0x00055b44.json	docs/compiler-abi.md; host model; guest differential pending
@@ -1051,7 +1051,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00056a4c	166	send_owner_summary_56a4c	game_helpers35	compiles	game	confirmed	decomp/tests/0x00056a4c.json	docs/compiler-abi.md; Send packet 0x12 with the local owner's name and counters.; callers 6330@6371,9114@91f3,9114@9244; guest pending
 0x00056af4	179	apply_owner_summary_56af4	game_helpers38	compiles	game	confirmed	decomp/tests/0x00056af4.json	docs/compiler-abi.md; Store an owner summary message: name, counters and flags.; callers 581b0@583b3; guest pending
 0x00056ba8	52	all_ready_56ba8	game_helpers28	compiles	game	confirmed	decomp/tests/0x00056ba8.json	docs/compiler-abi.md; True when every ready word in table 0x1a5dd0 is nonzero.; callers 56bdc@56c2c; guest pending
-0x00056bdc	159			unknown	unclassified	unverified		
+0x00056bdc	159	announce_ready_56bdc	game_helpers45	compiles	game	confirmed	decomp/tests/0x00056bdc.json	docs/compiler-abi.md; Announce readiness (command 0x4d) until everyone answers or 150 ticks pass.; callers 11820@11d02,19a80@19ac1,19a80@19b12; guest pending
 0x00056c7c	20			unknown	unclassified	unverified		
 0x00056c90	42	send_marker_word_packet_4e	mid_helpers	compiles	game	confirmed	decomp/tests/0x00056c90.json	docs/compiler-abi.md; packet 4e marker word then 0xa3f30; callers 56c7c@56c82; guest pending
 0x00056cbc	15	mark_ready_56cbc	game_helpers28	compiles	game	confirmed	decomp/tests/0x00056cbc.json	docs/compiler-abi.md; Mark the ready word of the unit in a message at +1 (table 0x1a5dd0).; callers 581b0@585f3; guest pending
@@ -1068,7 +1068,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00056fa8	35	copy_record_words_12583c	mid_helpers	compiles	game	confirmed	decomp/tests/0x00056fa8.json	docs/compiler-abi.md; words +1,+3,+5 to 0x12583c/3e/40; callers 581b0@584eb; guest pending
 0x00056fe8	17	flag_marker_zero	mid_helpers	compiles	game	confirmed	decomp/tests/0x00056fe8.json	docs/compiler-abi.md; byte 0x1264e1=1 when marker is 0; callers 581b0@584fa; guest pending
 0x00056ffc	52	all_ready_56ffc	game_helpers28	compiles	game	confirmed	decomp/tests/0x00056ffc.json	docs/compiler-abi.md; True when every ready word in table 0x1a5de0 is nonzero.; callers 57030@5707d; guest pending
-0x00057030	152			unknown	unclassified	unverified		
+0x00057030	152	announce_ready_57030	game_helpers45	compiles	game	confirmed	decomp/tests/0x00057030.json	docs/compiler-abi.md; Announce readiness (command 0x36) until everyone answers or 100 ticks pass.; callers 3dd30@3e08d; guest pending
 0x000570c8	51	send_player_57_570c8	game_helpers12	compiles	game	confirmed	decomp/tests/0x000570c8.json	docs/compiler-abi.md; ; callers 581b0@58507; guest pending
 0x000570fc	19	mark_ready_570fc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000570fc.json	docs/compiler-abi.md; Mark the ready word indexed by the message byte at +1 (table 0x1a5de0).; callers 581b0@58514; guest pending
 0x00057134	9	copy_byte_57134	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00057134.json	docs/compiler-abi.md; Copy the byte at +1 of the record to 0x1a3649.; callers 581b0@58523; guest pending
@@ -1448,7 +1448,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a434	30	release_block_12afc4	status_values	compiles	game	confirmed	decomp/tests/0x0007a434.json	docs/compiler-abi.md; Release pointer 0x12afc4 via 0xc3f80 if nonzero then clear; sole direct caller 7ab00@7ac5c; guest pending
 0x0007a454	44	reset_sound_state_7a454	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007a454.json	docs/compiler-abi.md; 0x7a9bc if dword 0x12afd0; clear 0x1f8ea0,0x12afd0; 0x12afc0=-1; callers 3ea0c@3eeca; guest pending
 0x0007a480	33	check_buffer_capacity	buffer_cursor	compiles	game	confirmed	decomp/tests/0x0007a480.json	docs/compiler-abi.md
-0x0007a4a4	106			unknown	unclassified	unverified		
+0x0007a4a4	106	init_status_text_7a4a4	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007a4a4.json	docs/compiler-abi.md; Allocate the status text buffer, copying the description when enabled.; callers 7a738@7a73f; guest pending
 0x0007a510	10	forward_value_1f8e90	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007a510.json	docs/compiler-abi.md; tail 0xe2af4(dword 0x1f8e90); callers 7a738@7a832; guest pending
 0x0007a51c	46	pool_append_7a51c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0007a51c.json	docs/compiler-abi.md; Append a string to the string pool at 0x1f8e94.; callers 7a66c@7a6ef; guest pending
 0x0007a54c	54	pool_take_7a54c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0007a54c.json	docs/compiler-abi.md; Copy the pool string into 0x1f8f14 and advance the pool.; callers 7a66c@7a6cc; guest pending
@@ -1482,7 +1482,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007bc40	679	simUpdateSlot		named	unclassified	unverified		
 0x0007bee8	1085			unknown	unclassified	unverified		
 0x0007c328	465	gpwMissionSelected		named	unclassified	unverified		
-0x0007c4fc	119			unknown	unclassified	unverified		
+0x0007c4fc	119	set_session_text_7c4fc	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007c4fc.json	docs/compiler-abi.md; Build a path from a name, remember it and hand a copy to the loader.; callers 4aa0@4aee,4cf4@4d38,4d4c@4dfe; guest pending
 0x0007c574	506	gpwMissionAccepted		named	unclassified	unverified		
 0x0007c770	775			unknown	unclassified	unverified		
 0x0007ca78	92			unknown	unclassified	unverified		
@@ -1500,10 +1500,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007e01c	136			unknown	unclassified	unverified		
 0x0007e0a4	516	simNextFlight		named	unclassified	unverified		
 0x0007e2a8	749			unknown	unclassified	unverified		
-0x0007e5a0	205			unknown	unclassified	unverified		
+0x0007e5a0	205	claim_players_7e5a0	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e5a0.json	docs/compiler-abi.md; Mark unowned players as ours and resend until all players answer or time runs out.; callers 7e758@7e75a; guest pending
 0x0007e670	229			unknown	unclassified	unverified		
-0x0007e758	135			unknown	unclassified	unverified		
-0x0007e7e0	187			unknown	unclassified	unverified		
+0x0007e758	135	sync_players_7e758	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e758.json	docs/compiler-abi.md; Claim the players, then send command 0x1d until the pending counter drains.; callers 7e8c0@7e9d6; guest pending
+0x0007e7e0	187	wait_round_clear_7e7e0	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e7e0.json	docs/compiler-abi.md; Wait for the pending round to clear, then mark this player ready.; callers 8bb50@8bc3e; guest pending
 0x0007e89c	33	scene_slot_valid	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007e89c.json	docs/compiler-abi.md; slot=high word 0x19bb5c; valid unless 0xff and 0x2c358 nonzero; callers 7e8c0@7e953,7e8c0@7eb1d; guest pending
 0x0007e8c0	1035			unknown	unclassified	unverified		
 0x0007eccc	216			unknown	unclassified	unverified		

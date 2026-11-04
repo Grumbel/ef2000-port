@@ -3416,3 +3416,16 @@ in EAX, format string address, one value).
 | `0x4b0d0` | EAX:ef_addr32 | none | 49228@4981a | Find the segment holding the budget in 0x1357ae and publish its cell word. |
 | `0x50f54` | AL:uint8_t | AL:uint8_t | 52164@522ca | Dispatch the current word through the 10-byte command table. |
 | `0x50fcc` | EAX:ef_addr32 | none | 52164@522b6 | Skip script lines until the current word equals the given name or the end marker. |
+
+## game_helpers45 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x558b0` | none | none | 581b0@5841b | Finish the pending marker round: mark this player ready and update the scene. |
+| `0x56bdc` | none | none | 11820@11d02,19a80@19ac1,19a80@19b12 | Announce readiness (command 0x4d) until everyone answers or 150 ticks pass. |
+| `0x57030` | none | none | 3dd30@3e08d | Announce readiness (command 0x36) until everyone answers or 100 ticks pass. |
+| `0x7a4a4` | none | none | 7a738@7a73f | Allocate the status text buffer, copying the description when enabled. |
+| `0x7c4fc` | EAX:ef_addr32,EDX:uint32_t | none | 4aa0@4aee,4cf4@4d38,4d4c@4dfe | Build a path from a name, remember it and hand a copy to the loader. |
+| `0x7e5a0` | none | AL:uint8_t | 7e758@7e75a | Mark unowned players as ours and resend until all players answer or time runs out. |
+| `0x7e758` | none | AL:uint8_t | 7e8c0@7e9d6 | Claim the players, then send command 0x1d until the pending counter drains. |
+| `0x7e7e0` | none | none | 8bb50@8bc3e | Wait for the pending round to clear, then mark this player ready. |
