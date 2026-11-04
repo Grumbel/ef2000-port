@@ -5146,4 +5146,6 @@ void open_named_data_a81e4(uint32_t name, uint32_t src);
 
 void draw_effect_records_80c3c(void);
 
+void prepare_briefing_file_35cfc(void);
+
 #endif

@@ -7757,3 +7757,32 @@ void draw_effect_records_80c3c(void)
         }
     }
 }
+
+/* 0x35cfc, 227 bytes. Prepare the briefing/mission screen: clear bytes 0x19f5aa and 0x19f5af, apply the key string 0x182f4c, refresh the status (0x34a68), counts (0x35bb8) and 0xa42c4, set byte 0x127da9, then open the data file named at 0x125828 into dword 0x19f364. When byte 0x125846 is 3 a random variant (0xa45b3 modulo 3, stored in word 0x125844) is chosen and the 12-byte name template at 0x183094 is copied in; otherwise the name is built by 0xa4380 from 0x182f7c, and a zero result skips opening. Open failures are reported through the pointer at 0x132a74. Finally clear byte 0x19f5a8. */
+void prepare_briefing_file_35cfc(void)
+{
+    uint32_t i;
+    EF_U8(0x0019f5aau) = 0u;
+    EF_U8(0x0019f5afu) = 0u;
+    guest_fn_a4d90(0x00182f4cu);
+    show_status_34a68();
+    copy_counts_35bb8();
+    guest_fn_a42c4_x();
+    EF_U8(0x00127da9u) = 1u;
+    if (EF_U8(0x00125846u) == 3u) {
+        uint32_t r = guest_fn_a45b3() & 0xffffu;
+        EF_U16(0x00125844u) = (uint16_t)(r % 3u);
+        for (i = 0; i < 12u; i++)
+            EF_U8(0x00125828u + i) = EF_U8(0x00183094u + i);
+        EF_U32(0x0019f364u) = guest_fn_a7b3c(0x00125828u);
+        if (EF_U32(0x0019f364u) == 0u)
+            guest_callptr2_x(EF_U32(0x00132a74u), 0x001830a0u, 0x00125828u);
+    } else if (guest_fn_a4380(0x00125828u, 0x00182f7cu) == 0u) {
+        EF_U32(0x0019f364u) = guest_fn_a7b3c(0x00125828u);
+        if (EF_U32(0x0019f364u) == 0u)
+            guest_callptr2_x(EF_U32(0x00132a74u), 0x001830ccu, 0x00125828u);
+    } else {
+        EF_U32(0x0019f364u) = 0u;
+    }
+    EF_U8(0x0019f5a8u) = 0u;
+}

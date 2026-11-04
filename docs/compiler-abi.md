@@ -6677,3 +6677,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x80c3c` | none | none | 3dd30@3e1fd | Reset the 16 twelve-byte slots at 0x1fc8a0 (word +0 = 0xffff), then walk the 256 fifty-six-byte effect records at 0x1f90 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x35cfc` | none | none | none direct | Prepare the briefing/mission screen: clear bytes 0x19f5aa and 0x19f5af, apply the key string 0x182f4c, refresh the statu |
