@@ -8771,3 +8771,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xce830` | EAX:ef_addr32,EDX:ef_addr32 | none | ce944@ce975 | Clip the polygon at obj+0x4c against the test callback at ctx+0x14: build the clipped vertex list in the scratch pool at |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5eaa4` | none | none | 601c@62d9 | Advance the nearest-record scan: for the current index compute the squared distance to the view position and, when it be |

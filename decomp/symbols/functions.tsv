@@ -1163,7 +1163,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005e664	535			unknown	unclassified	unverified		
 0x0005e87c	485			unknown	unclassified	unverified		
 0x0005ea64	62	reset_range_5ea64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0005ea64.json	docs/compiler-abi.md; ; callers 5f634@5f688; guest pending
-0x0005eaa4	276			unknown	unclassified	unverified		
+0x0005eaa4	276	scan_nearest_record_5eaa4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005eaa4.json	docs/compiler-abi.md; Advance the nearest-record scan: for the current index compute the squared distance to the view position and, when it be; callers 601c@62d9; guest pending
 0x0005ebb8	711			unknown	unclassified	unverified		
 0x0005ee80	198	find_entry_in_range_5ee80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ee80.json	docs/compiler-abi.md; Find the entry (0x54-byte records at 0x1a6b3c, count byte at [[0x1a6b08] + 0x13]) whose position is within 0x7fff of the; callers 9114@9160; guest pending
 0x0005f1ec	52	sample_active_coordinates	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005f1ec.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending

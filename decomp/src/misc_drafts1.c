@@ -19619,3 +19619,42 @@ void clip_polygon_ce830(ef_addr32 obj, ef_addr32 ctx)
 	if (changed != 0u)
 		EF_U8(obj + 0x2cu) = (uint8_t)(EF_U8(obj + 0x2cu) & 0xfeu);
 }
+
+/* 0x5eaa4, 276 bytes. Advance the nearest-record scan: for the current index compute the squared distance to the view position and, when it beats the best so far, make it current and run the 0x5ebb8 update. */
+void scan_nearest_record_5eaa4(void)
+{
+	int16_t cx = (int16_t)EF_U16(0x001a6cccu);
+	int16_t di = (int16_t)EF_U16(0x001a6cceu);
+	ef_addr32 base, rec;
+	int32_t dx, dy, dist;
+
+	if (cx >= (int16_t)EF_U16(0x001972e6u))
+		cx = 0;
+	base = EF_U32(0x001972e0u);
+	if (base != 0u) {
+		if (di >= 0) {
+			rec = base + (uint32_t)((int32_t)di * 34);
+			dx = EF_S32(rec + 8u) - (EF_S32(0x001a5becu) >> 11);
+			dy = EF_S32(rec + 0xcu) - (EF_S32(0x001a5be8u) >> 11);
+			EF_U32(0x001a6b00u) = (uint32_t)(dx * dx + dy * dy);
+		}
+		rec = base + (uint32_t)((int32_t)cx * 34);
+		dx = EF_S32(rec + 8u) - (EF_S32(0x001a5becu) >> 11);
+		dy = EF_S32(rec + 0xcu) - (EF_S32(0x001a5be8u) >> 11);
+		dist = dx * dx + dy * dy;
+		if (dist < EF_S32(0x001a6b00u) && cx != di) {
+			EF_U32(0x001a6b00u) = (uint32_t)dist;
+			EF_U16(0x001a6cfeu) = (uint16_t)cx;
+			EF_U16(0x001a6cccu) = (uint16_t)cx;
+			EF_U16(0x001a6cceu) = (uint16_t)cx;
+			EF_U32(0x001a6b08u) = rec;
+			EF_U32(0x001a6b04u) = EF_U32(rec + 0x16u);
+			guest_fn_5ebb8_x();
+			di = (int16_t)EF_U16(0x001a6cceu);
+			cx = (int16_t)EF_U16(0x001a6cccu);
+		}
+		cx++;
+	}
+	EF_U16(0x001a6cceu) = (uint16_t)di;
+	EF_U16(0x001a6cccu) = (uint16_t)cx;
+}

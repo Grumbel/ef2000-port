@@ -6043,4 +6043,7 @@ void claim_list_nodes_f8c98(uint32_t key, uint32_t owner, uint32_t slot_value, e
 
 void clip_polygon_ce830(ef_addr32 obj, ef_addr32 ctx);
 
+void scan_nearest_record_5eaa4(void);
+void guest_fn_5ebb8_x(void); /* 0x5ebb8 */
+
 #endif
