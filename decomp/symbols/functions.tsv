@@ -1125,7 +1125,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005aa10	82	count_matching_activity_slots	tactical_io	compiles	game	confirmed	decomp/tests/0x0005aa10.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0005aa64	651			unknown	unclassified	unverified		
 0x0005acf0	384			unknown	unclassified	unverified		
-0x0005ae70	221			unknown	unclassified	unverified		
+0x0005ae70	221	build_offset_rings_5ae70	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ae70.json	docs/compiler-abi.md; Build the three 24-entry offset rings (radii 25, 20 and 15 at 0x1a69e0, 0x1a6aa0 and 0x1a6a40; two words per entry: cos ; callers 5af50@5af80; guest pending
 0x0005af50	302			unknown	unclassified	unverified		
 0x0005b080	519			unknown	unclassified	unverified		
 0x0005b288	101	run_with_temp_state_5b288	game_helpers32	compiles	game	confirmed	decomp/tests/0x0005b288.json	docs/compiler-abi.md; Run 0x5b2f0 with temporary values for four globals, then restore them.; callers 5fc80@5fd1e; guest pending
@@ -1467,7 +1467,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007ac74	405			unknown	unclassified	unverified		
 0x0007ae0c	123	map_value_7ae0c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0007ae0c.json	docs/compiler-abi.md; Read the 16-bit value at wrapped (a, b) of the 0x190x0x190 two-plane map.; callers 7bb00@7bb2c; guest pending
 0x0007ae88	213	lookup_plane_cell_7ae88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007ae88.json	docs/compiler-abi.md; Look up the cell of the plane map for the position (X, Z) (both in units of 2048; wrapped to 400 with the original off-b; callers 161d4@164a7,1df90@1e040,56084@56141; guest pending
-0x0007af60	221			unknown	unclassified	unverified		
+0x0007af60	221	lookup_plane_cell_7af60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007af60.json	docs/compiler-abi.md; Like 0x7ae88 for the query in progress: returns 1 while the endpoint word 0x420908 is non-negative, otherwise looks up t; callers 1df90@1e096,82478@826a8,86f7c@8718e; guest pending
 0x0007b040	76	lookup_scaled_cell_7b040	float_helpers10	compiles	game	confirmed	decomp/tests/0x0007b040.json	docs/compiler-abi.md; Scale a 2D double point, look up the cell value and return it negated and scaled.; callers 2e184@2e268,6d38c@6d579,6f504@6f60f; guest pending
 0x0007b08c	221			unknown	unclassified	unverified		
 0x0007b16c	196			unknown	unclassified	unverified		
@@ -1997,7 +1997,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009a1d8	251	draw_box_rows_9a1d8	box_rows	compiles	game	confirmed	decomp/tests/0x0009a1d8.json	docs/compiler-abi.md; Draw the box rows for the table at 0x40ce86 (count word at 0x40d02e).; callers none direct; guest pending
 0x0009a348	400			unknown	unclassified	unverified		
 0x0009a4d8	108	clear_tables_9a4d8	camera_helpers	compiles	game	confirmed	decomp/tests/0x0009a4d8.json	docs/compiler-abi.md; ; callers 98bec@98bec; guest pending
-0x0009a544	221			unknown	unclassified	unverified		
+0x0009a544	221	open_numbered_log_9a544	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009a544.json	docs/compiler-abi.md; Open the next numbered log file: build the name from the template at 0x98bd0, the running number (word 0x12dda8, post-in; callers 9ab30@9ab31; guest pending
 0x0009a624	213	update_records_9a624	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009a624.json	docs/compiler-abi.md; Dispatch every active 54-byte record by kind and sum the four counters.; callers 98bec@98bf1; guest pending
 0x0009a6fc	440			unknown	unclassified	unverified		
 0x0009a8b4	228	count_ground_kill_9a8b4	game_helpers53	compiles	game	confirmed	decomp/tests/0x0009a8b4.json	docs/compiler-abi.md; Count a destroyed ground object in the statistics table by its class.; callers 9a624@9a66e; guest pending

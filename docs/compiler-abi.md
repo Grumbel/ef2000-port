@@ -5778,3 +5778,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x28aa8` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | AL:uint8_t | 28ed8@291b5 | Set up the line-of-sight query between the fixed point positions A and B (both 24.8) for an object of KIND: the clearanc |
 | `0x11014` | EAX:ef_addr32 | EAX:uint32_t | 110ec@1119b | Find the entry of OBJ's list (count word at +0x2a, pointer at +0x2c, 21-byte entries with the word pair at +7/+9) that m |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5ae70` | none | none | 5af50@5af80 | Build the three 24-entry offset rings (radii 25, 20 and 15 at 0x1a69e0, 0x1a6aa0 and 0x1a6a40; two words per entry: cos  |
+| `0x7af60` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t,ECX:int32_t | EAX:uint32_t | 1df90@1e096,82478@826a8,86f7c@8718e | Like 0x7ae88 for the query in progress: returns 1 while the endpoint word 0x420908 is non-negative, otherwise looks up t |
+| `0x9a544` | none | EAX:uint32_t | 9ab30@9ab31 | Open the next numbered log file: build the name from the template at 0x98bd0, the running number (word 0x12dda8, post-in |

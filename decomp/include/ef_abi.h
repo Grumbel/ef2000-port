@@ -4736,4 +4736,9 @@ void guest_fn_84e3c_x(uint32_t a, uint32_t b, uint32_t c); /* 0x84e3c EAX/EDX/EB
 uint8_t setup_line_query_28aa8(ef_addr32 a, ef_addr32 b, uint32_t kind);
 uint32_t find_entry_at_cursor_11014(ef_addr32 obj);
 
+void build_offset_rings_5ae70(void);
+uint32_t lookup_plane_cell_7af60(uint32_t mode, int32_t x, uint32_t y, int32_t z);
+uint32_t open_numbered_log_9a544(void);
+uint32_t guest_fn_d0278_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xd0278 EAX/EDX/EBX/ECX -> EAX */
+
 #endif

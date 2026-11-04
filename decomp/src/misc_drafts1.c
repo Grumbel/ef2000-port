@@ -3197,3 +3197,75 @@ uint32_t find_entry_at_cursor_11014(ef_addr32 obj)
     }
     return 0u;
 }
+
+/* 0x5ae70, 221 bytes. Build the three 24-entry offset rings (radii 25, 20 and 15 at 0x1a69e0, 0x1a6aa0 and 0x1a6a40; two words per entry: cos and -sin scaled by the radius / 0x8000, from the sine/cosine tables at 0x141e08/0x142e08) and set the flag byte 0x1281a0. */
+void build_offset_rings_5ae70(void)
+{
+    int32_t i;
+    EF_U8(0x001281a0u) = 1u;
+    for (i = 0; i < 0x18; i++) {
+        uint32_t idx = ((uint32_t)((i * 0xffff) / 0x18) & 0xffffu) >> 3;
+        int32_t c = (int16_t)EF_U16(0x00141e08u + idx * 2u);
+        int32_t s = (int16_t)EF_U16(0x00142e08u + idx * 2u);
+        uint32_t o = (uint32_t)i * 4u;
+        EF_U16(0x001a69e0u + o) = (uint16_t)((c * 0x19) / 0x8000);
+        EF_U16(0x001a69e2u + o) = (uint16_t)((-(s * 0x19)) / 0x8000);
+        EF_U16(0x001a6aa0u + o) = (uint16_t)((c * 0x14) / 0x8000);
+        EF_U16(0x001a6aa2u + o) = (uint16_t)((-(s * 0x14)) / 0x8000);
+        EF_U16(0x001a6a40u + o) = (uint16_t)((c * 0xf) / 0x8000);
+        EF_U16(0x001a6a42u + o) = (uint16_t)((-(s * 0xf)) / 0x8000);
+    }
+}
+
+/* 0x7af60, 221 bytes. Like 0x7ae88 for the query in progress: returns 1 while the endpoint word 0x420908 is non-negative, otherwise looks up the plane map cell for (X, Z) and, unless it is empty (0xffff), runs 0xd0278 for it with the cell centre coordinates. */
+uint32_t lookup_plane_cell_7af60(uint32_t mode, int32_t x, uint32_t y, int32_t z)
+{
+    int32_t gx;
+    int32_t gz;
+    int32_t col;
+    int32_t row;
+    uint32_t off;
+    uint32_t v;
+    if ((int32_t)EF_U32(0x00420908u) >= 0)
+        return 1u;
+    select_plane_source((int32_t)mode);
+    gx = x >> 11;
+    gz = 0x18f - (z >> 11);
+    col = gx % 0x190;
+    row = gz % 0x190;
+    if (col < 0)
+        col += 0x18f;
+    if (row < 0)
+        row += 0x18f;
+    off = (uint32_t)(col * 400);
+    v = ((uint32_t)EF_U8(EF_U32(0x001f8eb4u) + off + (uint32_t)row) << 8) | EF_U8(EF_U32(0x001f8eb8u) + off + (uint32_t)row);
+    if ((uint16_t)v == 0xffffu)
+        return 0u;
+    return guest_fn_d0278_x((int16_t)v, (uint32_t)(gx * 2 + 1) << 10, y, (uint32_t)((0x18f - gz) * 2 + 1) << 10);
+}
+
+/* 0x9a544, 221 bytes. Open the next numbered log file: build the name from the template at 0x98bd0, the running number (word 0x12dda8, post-incremented) and the suffix template at 0x98be4 (appended to the same buffer), open it with the mode string at 0x18b0f0 (error through 0x132a74 when that fails) and write three header lines (formats 0x131754, 0x13177f, 0x131792 with [0x13799e] + 1) and the date line 0x18b114 (words at 0x1379a0, 0x1379a2, 0x1379a4). Returns the file handle. */
+uint32_t open_numbered_log_9a544(void)
+{
+    uint8_t frame[0x24];
+    uint32_t f = (uint32_t)(uintptr_t)frame;
+    int16_t n = (int16_t)EF_U16(0x0012dda8u);
+    uint32_t h;
+    uint32_t i;
+    for (i = 0u; i < 20u; i++)
+        frame[i] = EF_U8(0x00098bd0u + i);
+    for (i = 0u; i < 5u; i++)
+        frame[0x14u + i] = EF_U8(0x00098be4u + i);
+    EF_U16(0x0012dda8u) = (uint16_t)(n + 1);
+    signed_to_digits_cbd0f(n, f + 0x1cu, 10u);
+    guest_fn_9ca57(f, f + 0x1cu);
+    guest_fn_9ca57(f, f + 0x14u);
+    h = guest_fn_bc36a_w(f, 0x0018b0f0u);
+    if (h == 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018b0f4u);
+    stream_printf_bc400(h, 0x00131754u);
+    stream_printf_bc400(h, 0x0013177fu);
+    stream_printf_bc400(h, 0x00131792u, (int16_t)EF_U16(0x0013799eu) + 1);
+    stream_printf_bc400(h, 0x0018b114u, (int16_t)EF_U16(0x001379a0u), (int16_t)EF_U16(0x001379a2u), (int16_t)EF_U16(0x001379a4u));
+    return h;
+}
