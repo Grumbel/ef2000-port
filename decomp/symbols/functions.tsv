@@ -4190,7 +4190,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b540	69	scaled_call_11b540	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b540.json	docs/compiler-abi.md; (ret 8) f(x * k4) * 0.53 with f = 0x11b3fec's sibling 0xb3fec; the intermediate x * k1 * k2 + k3 is computed and discard; callers 11b588@11b595; guest pending
 0x0011b588	30	scaled_call_11b588	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b588.json	docs/compiler-abi.md; (ret 8) Call 0x11b540 with the double argument and scale its result by the constant at 0x1958bc.; callers 11b5a8@11b608; guest pending
 0x0011b5a8	156	profile_term_11b5a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b5a8.json	docs/compiler-abi.md; EAX=A, EDX=D, EBX=B, ECX=C are guest pointers (A+0x20, B+0x00/0x10, D+0x18 and the double at C are read); stack: two dou; callers 10a220@10a2ec,11b644@11b674,11b9ac@11b9d8; guest pending
-0x0011b644	79			unknown	unclassified	unverified		
+0x0011b644	79	profile_ratio_11b644	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b644.json	docs/compiler-abi.md; (as 0x11bf78 but passes C and S to the term in swapped positions and divides by A[0x10]); callers 10a220@10a357; guest pending
 0x0011b694	19	level_below_11b694	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b694.json	docs/compiler-abi.md; Scaled distance below the reference level.; callers 10a220@10a31f,11c584@11c750; guest pending
 0x0011b6a8	19	level_above_11b6a8	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b6a8.json	docs/compiler-abi.md; Scaled distance above the reference level.; callers 11b6bc@11b6f8,11b6bc@11b729; guest pending
 0x0011b6bc	126			unknown	unclassified	unverified		
@@ -4211,7 +4211,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011be48	183			unknown	unclassified	unverified		
 0x0011bf00	37	combine_11bf00	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bf00.json	docs/compiler-abi.md; (ret 16) Linear combination: f(a0) * v[0] + v[1] * a1 with f computed by 0x11bf00's helper 0xb3fd0 and the pair of doubl; callers 11bf28@11bf64; guest pending
 0x0011bf28	78			unknown	unclassified	unverified		
-0x0011bf78	77			unknown	unclassified	unverified		
+0x0011bf78	77	profile_ratio_11bf78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011bf78.json	docs/compiler-abi.md; (EAX = A, EDX = D, EBX = B, ECX = C guest pointers; stack: dword S, doubles P and Q; ret 0x14) Returns profile_term(D, B; callers 10a220@10a4bc; guest pending
 0x0011bfc8	74	scaled_ratio_11bfc8	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bfc8.json	docs/compiler-abi.md; (ret 16) (((p[0] + k1) * k2 * k3 + k4) * (k5 / f(a0))) * k6 with f = 0x11af14 and the constants at 0x1959a4..0x1959cc.; callers 10a220@10a40a; guest pending
 0x0011c020	76	alloc_records_11c020	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011c020.json	docs/compiler-abi.md; Allocate and clear n records of 0xd5 bytes at 0x4ddee0.; callers 10a580@10a8ac,10c1b0@10c4d8; guest pending
 0x0011c06c	56	free_records_11c06c	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011c06c.json	docs/compiler-abi.md; Free the five records at 0x4ddee0 and their 0x69 sub-buffers.; callers 11c020@11c02d; guest pending

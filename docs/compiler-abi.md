@@ -9095,3 +9095,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9c8b4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | e20@f38 | (stack arg: value) Saves the value at 0x132a9c and the caller's ESP / SS / DS at 0x132aa0 / 0x132aa4 / 0x132aa6, then wi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11bf78` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:double,[ESP+12]:double | EAX:double | 10a220@10a4bc | (EAX = A, EDX = D, EBX = B, ECX = C guest pointers; stack: dword S, doubles P and Q; ret 0x14) Returns profile_term(D, B |
+| `0x11b644` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:double,[ESP+12]:double | EAX:double | 10a220@10a357 | (as 0x11bf78 but passes C and S to the term in swapped positions and divides by A[0x10]) |

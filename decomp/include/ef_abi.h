@@ -6239,4 +6239,9 @@ void patch_span_dc71b(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32
 void install_trap_handlers_9c8b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
 void install_trap_handlers_9c8b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value); /* 0x9c8b4 */
 
+double profile_ratio_11bf78(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t s, double p, double q);
+double profile_ratio_11b644(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t s, double p, double q);
+double profile_ratio_11bf78(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t s, double p, double q); /* 0x11bf78 */
+double profile_ratio_11b644(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t s, double p, double q); /* 0x11b644 */
+
 #endif

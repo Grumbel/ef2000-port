@@ -20963,3 +20963,19 @@ void install_trap_handlers_9c8b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
 	for (i = 0; i < 8u; i++)
 		md_int21_regs(0x2533u, 0u, vec[i], i == 0u ? 0x9c908u : 0x9c909u, 0u, 0);
 }
+
+/* 0x11bf78, 77 bytes. (EAX = A, EDX = D, EBX = B, ECX = C guest pointers; stack: dword S, doubles P and Q; ret 0x14) Returns profile_term(D, B, S, C, P, Q) * (B[0] / A[0]) * (B[0x40] - K) / A[8], K being the double at 0x433070. */
+double profile_ratio_11bf78(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t s, double p, double q)
+{
+	double r = md_rd_f64(b) / md_rd_f64(a);
+	double t = profile_term_11b5a8(d, b, s, c, p, q);
+	return (t * r * (md_rd_f64(b + 0x40u) - md_rd_f64(0x433070u))) / md_rd_f64(a + 8u);
+}
+
+/* 0x11b644, 79 bytes. (as 0x11bf78 but passes C and S to the term in swapped positions and divides by A[0x10]) */
+double profile_ratio_11b644(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t s, double p, double q)
+{
+	double r = md_rd_f64(b) / md_rd_f64(a);
+	double t = profile_term_11b5a8(d, b, c, s, p, q);
+	return (t * r * (md_rd_f64(b + 0x40u) - md_rd_f64(0x433070u))) / md_rd_f64(a + 0x10u);
+}
