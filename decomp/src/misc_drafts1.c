@@ -13464,3 +13464,20 @@ void show_scaled_value_5c2d8(void)
         guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185f94u, (double)f);
     guest_fn_5e21c_x((uint32_t)(int32_t)(int16_t)id, 0u, (uint32_t)(uintptr_t)buf, 0u);
 }
+
+/* 0x5fc80, 168 bytes. Label the box ENTRY (AX) of the table at 0x127a98 (10 byte entries: x, y, w, h words, 5th word unused): draw the double 0x1a3078 * 0x186072 with format 0x18604c at (x - w/2 + 5, y - h/2 + 2) and the dword 0x197238 with format 0x186064 at (x + w/2 - 0x1e, same y), both in colour 0xf mode 1, then run 0x5b288 with value 0xf, word x, zero. */
+void label_box_5fc80(uint32_t entry)
+{
+    ef_addr32 e = 0x00127a98u + (uint32_t)((int32_t)(int16_t)entry * 10);
+    int32_t sx = (int16_t)EF_U16(e);
+    int32_t sy = (int16_t)EF_U16(e + 2u);
+    int32_t hw = (int32_t)(int16_t)EF_U16(e + 4u) >> 1;
+    int32_t hh = (int32_t)(int16_t)EF_U16(e + 6u) >> 1;
+    int32_t y = (int16_t)(uint16_t)(sy - hh + 2);
+    double a, b;
+    memcpy(&a, ef_guest_memory_ptr(0x001a3078u), sizeof a);
+    memcpy(&b, ef_guest_memory_ptr(0x00186072u), sizeof b);
+    draw_formatted_text_mode_48bb0(0xfu, 1u, (int16_t)(uint16_t)(sx - hw + 5), y, 0x0018604cu, a * b);
+    draw_formatted_text_mode_48bb0(0xfu, 1u, (int16_t)(uint16_t)(hw + sx - 0x1e), y, 0x00186064u, EF_U32(0x00197238u));
+    run_with_temp_state_5b288(0xfu, (uint16_t)sx, 0u, 0u);
+}

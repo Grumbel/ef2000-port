@@ -7859,3 +7859,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb04e8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | b059c@b0627 | Is record B (EDX) within the range limit of record A (EAX)? Distance of the integer coordinates at +0x11/+0x15 (0xf83d0) |
 | `0x5c2d8` | none | none | none direct | Show the scaled value (double 0x1a2ef0 * 0x185f9a * 0x185fa2, rounded to float): format it into a 16 byte buffer with 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5fc80` | EAX:uint32_t | none | 1e7c0@1ebe0,1f0fc@1f7c4,20b10@21642 | Label the box ENTRY (AX) of the table at 0x127a98 (10 byte entries: x, y, w, h words, 5th word unused): draw the double  |

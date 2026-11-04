@@ -1174,7 +1174,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005f8a8	44	notify_selected_object	mid_helpers	compiles	game	confirmed	decomp/tests/0x0005f8a8.json	docs/compiler-abi.md; 0x9e508(high word obj+0x1e,0x24) for object from 0x1f71c8; clear byte 0x1a6d18; callers 5f60@5f89; guest pending
 0x0005f8d4	106	set_indicator_5f8d4	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0005f8d4.json	docs/compiler-abi.md; Switch indicator 0x1a6d18 on (mode 1) or off.; callers 5f60@5fa5,5fd8@5ff4,601c@60c5; guest pending
 0x0005f944	88	fill_sine_table_5f944	float_helpers2	compiles	game	confirmed	decomp/tests/0x0005f944.json	docs/compiler-abi.md; Fill a 90-entry scaled sine table.; callers 5f60@5f61; guest pending
-0x0005fc80	168			unknown	unclassified	unverified		
+0x0005fc80	168	label_box_5fc80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005fc80.json	docs/compiler-abi.md; Label the box ENTRY (AX) of the table at 0x127a98 (10 byte entries: x, y, w, h words, 5th word unused): draw the double ; callers 1e7c0@1ebe0,1f0fc@1f7c4,20b10@21642; guest pending
 0x0005fefc	845			unknown	unclassified	unverified		
 0x00062454	160	update_flight_62454	game_helpers33	compiles	game	confirmed	decomp/tests/0x00062454.json	docs/compiler-abi.md; Refresh the flight timers and run the per-frame entry updates.; callers 601c@6076; guest pending
 0x000624f4	16	refresh_all_624f4	game_helpers6	compiles	game	confirmed	decomp/tests/0x000624f4.json	docs/compiler-abi.md; ; callers 601c@607d; guest pending

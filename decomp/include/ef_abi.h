@@ -5663,4 +5663,6 @@ void step_approach_897c4(ef_addr32 u);
 uint32_t in_kind_range_b04e8(ef_addr32 a, ef_addr32 b);
 void show_scaled_value_5c2d8(void);
 
+void label_box_5fc80(uint32_t entry);
+
 #endif
