@@ -4183,4 +4183,8 @@ int32_t translate_key_1101e8(uint32_t code);
 
 
 
+/* table_switches1.c */
+void notify_record_action_8c988(ef_addr32 rec);
+uint32_t find_node_matching_cc51c(uint32_t id, uint32_t list, uint32_t kind);
+
 #endif

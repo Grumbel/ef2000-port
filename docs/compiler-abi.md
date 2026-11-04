@@ -4800,3 +4800,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1101e8` | EAX:uint32_t | EAX:int32_t | fa4a9@fa560,fa95f@fa98b,fe541@fe555 | Store a key code, then translate it (via a table at 0x17d5a8 for plain keys, or its high byte for extended codes) and st |
+
+## table_switches1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8c988` | EAX:ef_addr32 | none | 8c49c@8c780,8d11c@8d1aa | Report a tactical action for a record whose mode word (+0x45) selects one of nine action codes. |
+| `0xcc51c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | bed1c@bee18,bf444@bf498,bf81c@bf8db | Search a linked list (next at +4) for a node whose id byte (+0xb) equals id and whose state byte (+0x2e) satisfies the t |

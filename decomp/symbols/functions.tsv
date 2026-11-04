@@ -1801,7 +1801,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008c0f0	940			unknown	unclassified	unverified		
 0x0008c49c	1169			unknown	unclassified	unverified		
 0x0008c930	52	select_slot_8c930	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008c930.json	docs/compiler-abi.md; Select the page slot for a page id, or 0 when the page table lacks it.; callers 8c49c@8c919; guest pending
-0x0008c988	103			unknown	unclassified	unverified		
+0x0008c988	103	notify_record_action_8c988	table_switches1	compiles	game	confirmed	decomp/tests/0x0008c988.json	docs/compiler-abi.md; Report a tactical action for a record whose mode word (+0x45) selects one of nine action codes.; callers 8c49c@8c780,8d11c@8d1aa; guest pending
 0x0008ca24	194			unknown	unclassified	unverified		
 0x0008cae8	120	reset_slot_entries_8cae8	game_helpers32	compiles	game	confirmed	decomp/tests/0x0008cae8.json	docs/compiler-abi.md; Fill an object's 20 slot entries from the defaults table and reset its cursor.; callers 8cb60@8cb83; guest pending
 0x0008cb60	222	refresh_weapon_state_8cb60	game_helpers53	compiles	game	confirmed	decomp/tests/0x0008cb60.json	docs/compiler-abi.md; Refresh the player's weapon state and the activity display.; callers 9114@91c4,9114@9214,9114@926e; guest pending
@@ -2900,7 +2900,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc22c	61	group_flag_positive_cc22c	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cc22c.json	docs/compiler-abi.md; Is the flag byte for index positive?; callers d68c@d993,d68c@df24,d68c@e333; guest pending
 0x000cc26c	25	find_node_by_byte_b	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc26c.json	docs/compiler-abi.md; Node in the list at *EDX whose byte +0xb equals AL.; callers b059c@b05c3,bed1c@bed3a; guest pending
 0x000cc468	74	node_has_negative_flag_cc468	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cc468.json	docs/compiler-abi.md; True when the first node of this kind has a negative flag byte.; callers befb8@bf2cc,c0b04@c0b86,ccdbc@cd0e0; guest pending
-0x000cc51c	103			unknown	unclassified	unverified		
+0x000cc51c	103	find_node_matching_cc51c	table_switches1	compiles	game	confirmed	decomp/tests/0x000cc51c.json	docs/compiler-abi.md; Search a linked list (next at +4) for a node whose id byte (+0xb) equals id and whose state byte (+0x2e) satisfies the t; callers bed1c@bee18,bf444@bf498,bf81c@bf8db; guest pending
 0x000cc584	119	code_in_set_cc584	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc584.json	docs/compiler-abi.md; ; callers d68c@df3a,d68c@e07c,d68c@e187; guest pending
 0x000cc5fc	44	code_is_10_to_15	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc5fc.json	docs/compiler-abi.md; AL is 0x10..0x15.; callers d68c@df63,d68c@e0a8,d68c@e1b3; guest pending
 0x000cc628	44	code_is_18_to_1b_1d_1e	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc628.json	docs/compiler-abi.md; AL is 0x18, 0x19, 0x1a, 0x1b, 0x1d or 0x1e.; callers d68c@df8c,d68c@e0d4,d68c@e1df; guest pending
