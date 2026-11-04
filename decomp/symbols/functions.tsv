@@ -15,7 +15,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00000628	144	start_request_628	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x00000628.json	docs/compiler-abi.md; Take a free 10-byte request slot, fill it and start the request.; callers e20@e73,e20@e84,e20@e95; guest pending
 0x000006b8	124	finish_request_6b8	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x000006b8.json	docs/compiler-abi.md; Finish a request slot and return it to the free list.; callers cd554@cd5a1,cd554@cd5ab,118290@1182bd; guest pending
 0x00000734	120	start_timer_734	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x00000734.json	docs/compiler-abi.md; Take a free 14-byte timer slot, fill it from the source and start it.; callers 81c@866,cd4d4@cd529,117f68@1181a4; guest pending
-0x000007b4	104			unknown	unclassified	unverified		
+0x000007b4	104	release_hook_slot_7b4	dos_slots1	compiles	game	confirmed	decomp/tests/0x000007b4.json	docs/compiler-abi.md; Release hook slot idx (14-byte records at 0x1960c4): restore its vector, clear the pointer and push idx on the free list; callers cd554@cd5b5,e0a90@e0ae3,118290@1182aa; guest pending
 0x0000081c	98			unknown	unclassified	unverified		
 0x00000880	53	dos_call_350b_880	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00000880.json	docs/compiler-abi.md; Issue DOS service 0x350b and return the result register.; callers 8b39c@8b3a6; guest pending
 0x000008b8	327			unknown	unclassified	unverified		
@@ -3915,7 +3915,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00106cb0	78			unknown	unclassified	unverified		
 0x00106d00	52			unknown	unclassified	unverified		
 0x00106d34	143			unknown	unclassified	unverified		
-0x00106dc4	103			unknown	unclassified	unverified		
+0x00106dc4	103	wait_ring_data_106dc4	dos_slots1	compiles	game	confirmed	decomp/tests/0x00106dc4.json	docs/compiler-abi.md; Wait on a ring record until its data arrives (0), the end marker 0x4f (0) or 0x45 (8) is popped, or the timeout expires ; callers 106e2c@106e38; guest pending
 0x00106e2c	19	run_pair_106e2c	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00106e2c.json	docs/compiler-abi.md; Run 106d00 on the object, then 106dc4 on it with the second argument.; callers d9c30@d9c8a; guest pending
 0x00106f10	244			unknown	unclassified	unverified		
 0x00107004	56			unknown	unclassified	unverified		

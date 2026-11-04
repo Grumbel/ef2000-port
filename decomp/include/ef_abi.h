@@ -4187,4 +4187,10 @@ int32_t translate_key_1101e8(uint32_t code);
 void notify_record_action_8c988(ef_addr32 rec);
 uint32_t find_node_matching_cc51c(uint32_t id, uint32_t list, uint32_t kind);
 
+/* dos_slots1.c */
+void release_hook_slot_7b4(uint32_t idx);
+void guest_fn_3f8_x(uint32_t a, uint32_t unused_edx, uint32_t b, uint32_t c); /* 0x3f8 EAX/EDX/EBX/ECX, EDX ignored */
+
+uint32_t wait_ring_data_106dc4(ef_addr32 rec, uint32_t timeout);
+
 #endif

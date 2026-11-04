@@ -4807,3 +4807,15 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x8c988` | EAX:ef_addr32 | none | 8c49c@8c780,8d11c@8d1aa | Report a tactical action for a record whose mode word (+0x45) selects one of nine action codes. |
 | `0xcc51c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | bed1c@bee18,bf444@bf498,bf81c@bf8db | Search a linked list (next at +4) for a node whose id byte (+0xb) equals id and whose state byte (+0x2e) satisfies the t |
+
+## dos_slots1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7b4` | EAX:uint32_t | none | cd554@cd5b5,e0a90@e0ae3,118290@1182aa | Release hook slot idx (14-byte records at 0x1960c4): restore its vector, clear the pointer and push idx on the free list |
+
+## dos_slots1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x106dc4` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | 106e2c@106e38 | Wait on a ring record until its data arrives (0), the end marker 0x4f (0) or 0x45 (8) is popped, or the timeout expires  |
