@@ -3857,7 +3857,6 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
-| `0xea884` | AX:int16_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | EAX:double | 9775c@977d4,979c8@97a03 | Length of an integer 3D vector as a float, 0.0 for a negative sum. */ float int_vector_length_ea884(ef_addr32 vec) { int |
 | `0xf83d0` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | EAX:double | b04e8@b04fc,b52bc@b5332,b686c@b68c4 | Distance between two integer 2D points, 0.0 when coincident. |
 
 ## float_helpers8 (2026-11-03)
@@ -4038,3 +4037,39 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xea038` | EAX:ef_addr32,EDX:ef_addr32 | none | 119f88@119ff0,119f88@11a07f,11a5c0@11a5e8 | out = M * vec with the 3x3 double matrix at 0x464480 (rows are 0x18 bytes apart). |
 | `0xe3120` | none | none | 3dd30@3def1 | Sample the tick counter and store the scaled change since the previous sample. |
+
+## float_helpers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xea884` | EAX:ef_addr32 | ST0:float | 9775c@977d4,979c8@97a03 | Length of an integer 3D vector as a float, 0.0 for a negative sum. |
+| `0xf8314` | AX:int16_t,[ESP+4]:double | ST0:double | b52bc@b5348 | Divide a value by a word scaled with 0x1932cc, 0.0 when the divisor is zero. |
+
+## leaf_helpers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9d77c` | none | none | 9e7bc@9f3ac,9e7bc@9f508,9e7bc@9f5b1 | 1 byte. No-op. |
+| `0x9dddc` | none | none | 7a844@7a84d,7a844@7a9aa | 1 byte. No-op. |
+| `0x39180` | EAX:uint32_t | EAX:uint32_t | f2ac0@f2b18 | tail jump. Forward to 0x7a290. |
+| `0x56a44` | EAX:uint32_t | EAX:uint32_t | 581b0@58482 | tail jump. Forward to 0x8fbc8. |
+| `0x58094` | EAX:uint32_t | EAX:uint32_t | 3dd30@3e071,3dd30@3e092,7e5a0@7e622 | tail jump. Forward to 0xa3f30. |
+| `0x9d088` | EAX:uint32_t | EAX:uint32_t | f80@1ab8,2ff44@301c3,30214@3120d | tail jump. Forward to 0xc3f80. |
+| `0xcc768` | EAX:uint32_t | EAX:uint32_t | e710@e728,e710@e734,f8f8@f906 | tail jump. Forward to 0xc3f80. |
+| `0xab954` | EAX:uint32_t | EAX:uint32_t | a5ef8@a5fb8,a5ef8@a5fe9 | tail jump. Forward to 0xc9fc4. |
+| `0xac7c0` | EAX:uint32_t | EAX:uint32_t | 84c84@84c91,84c84@84ca7,84c84@84cee | tail jump. Forward to 0xabec4. |
+| `0xc3f70` | EAX:uint32_t | EAX:uint32_t | d68c@d6df,7a3e8@7a3f8,9ccb8@9cd87 | tail jump. Forward to 0xfc795. |
+| `0xc3f78` | EAX:uint32_t | EAX:uint32_t | cc744@cc749 | tail jump. Forward to 0xfc354. |
+| `0xc3f80` | EAX:uint32_t | EAX:uint32_t | b1e0@b383,7a434@7a442,9ce84@9cecd | tail jump. Forward to 0xfa9d2. |
+| `0xcbc9b` | EAX:uint32_t | EAX:uint32_t | ba5c@bad2,ba5c@baf5,42e8c@42ea1 | tail jump. Forward to 0xfe541. |
+| `0x11c0a4` | EAX:uint32_t | EAX:uint32_t | 10a580@10a91d,10a580@10a96b | tail jump. Forward to 0xc3f70. |
+| `0xe5bfe` | EAX:uint32_t | EAX:uint32_t | 45b60@45b65 | tail jump. Forward to 0x109e6c. |
+| `0x101e70` | EAX:uint32_t | EAX:uint32_t | 1065c8@1065ce,110f6f@110f73,11124c@111257 | tail jump. Forward to 0x110dcc. |
+| `0x101e78` | EAX:uint32_t | EAX:uint32_t | 1065c8@10660a,1065c8@106628,110f6f@110fca | tail jump. Forward to 0x110dd9. |
+| `0x101f70` | EAX:uint32_t | EAX:uint32_t | 103e0c@103e21,105648@10567c | tail jump. Forward to 0x1111e1. |
+| `0x102020` | EAX:uint32_t | EAX:uint32_t | 112808@112872,113d10@113f6d | tail jump. Forward to 0x111359. |
+| `0x106be0` | EAX:uint32_t | EAX:uint32_t | 106cb0@106cbd,106d34@106d3d,106d34@106d57 | tail jump. Forward to 0xf8248. |
+| `0x115984` | EAX:uint32_t | EAX:uint32_t | 105024@105068,105070@10511c | tail jump. Forward to 0xfa9a0. |
+| `0x11d24e` | EAX:uint32_t | EAX:uint32_t | 10dc7f@10dcef | tail jump. Forward to 0x120485. |
+| `0xc9ec4` | EAX:uint32_t | EAX:uint32_t | a6038@a606f,ac5f8@ac610 | tail jump. Forward to 0xdc2c0. |
+| `0x9c23d` | EAX:uint32_t | EAX:uint32_t | 6b8@6eb | tail jump. Forward to 0x9c224. |
