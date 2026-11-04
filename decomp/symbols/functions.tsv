@@ -2163,7 +2163,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a29cc	41	latch_decoded_key_a29cc	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000a29cc.json	docs/compiler-abi.md; Latch a decoded key into the state table.; callers 34ca4@34cde,a3c18@a3c72; guest pending
 0x000a29f8	126	reset_input_state_a29f8	state_reset1	compiles	game	confirmed	decomp/tests/0x000a29f8.json	docs/compiler-abi.md; Reset the input/menu state: default words and the 7-byte block at 0x13579b, clear the table, then set the control flags.; callers 34ca4@34d04,a29cc@a29cf; guest pending
 0x000a2a90	331			unknown	unclassified	unverified		
-0x000a2bdc	621			unknown	unclassified	unverified		
+0x000a2bdc	621	write_settings_file_a2bdc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a2bdc.json	docs/compiler-abi.md; Write the multiplayer settings file: open it (0xa7948, text 0x18cc18; handle in dword 0x136df8, failure reported through; callers 335c0@33607,3361c@3362b,336c0@336e3; guest pending
 0x000a2e4c	29	clear_entry_a2e4c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a2e4c.json	docs/compiler-abi.md; 0xb3fb0(dword 0x1368bc[AX],0,0x21); callers a2e6c@a2e7b; guest pending
 0x000a2e6c	33	clear_all_entries_a2e6c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a2e6c.json	docs/compiler-abi.md; 0xa2e4c for 0..7; callers a3c18@a3cc5,a3da0@a3de4; guest pending
 0x000a2e90	32	format_entry_a2e90	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a2e90.json	docs/compiler-abi.md; 0xe9a24(0x21,0x135840,dword 0x1368bc[AX]); callers a2f70@a303a,a3c18@a3ce4; guest pending

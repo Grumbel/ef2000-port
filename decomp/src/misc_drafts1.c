@@ -16090,3 +16090,49 @@ uint32_t discover_session_a2f70(void)
 	}
 	return 0u;
 }
+
+/* 0xa2bdc, 621 bytes. Write the multiplayer settings file: open it (0xa7948, text 0x18cc18; handle in dword 0x136df8, failure reported through the error hook with 0x18cc74), write the header/section lines (0x18cc94, 0x18cab0, 0x18ccc4, ...) and the entries with 0xa2a90 (name, pointer, type, extra): text 0x13579b (type 4), byte 0x1357c8 (3, table 0x136f3c), byte 0x13579a (3, table 0x136f0c), 0x1357b6 (1), 0x1357b8 (2), every nonzero dword of the table at 0x13577c (type 5), the byte 0x15f07f incremented around the entry 0x18cb54 and decremented again for 0x15f07d, 0x15f07e (3, table 0x136f3c), 0x15f099 (3, table 0x136f84), 0x15f09a (1), 0x15f4fd (4), 0x15f688 (3, table 0x136f9c), 0x15f53d and 0x15f57d (4). The file is closed (0xa7990). */
+void write_settings_file_a2bdc(void)
+{
+	uint32_t z = 0u;
+	uint32_t zp = (uint32_t)(uintptr_t)&z;
+	uint32_t h, esi;
+	uint8_t v;
+
+	h = guest_fn_a7948(0x0018cc18u);
+	EF_U32(0x00136df8u) = h;
+	if (h == 0xffffffffu)
+		guest_callptr1_x(EF_U32(0x00132a74u), 0x0018cc74u);
+	guest_fn_a2a90_x(0x0018cc94u, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018cab0u, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018ccc4u, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018cb28u, 0x0013579bu, 0u, 4u);
+	guest_fn_a2a90_x(0x0018cb14u, 0x001357c8u, 0x00136f3cu, 3u);
+	guest_fn_a2a90_x(0x0018cb00u, 0x0013579au, 0x00136f0cu, 3u);
+	guest_fn_a2a90_x(0x0018cb44u, 0x001357b6u, 0u, 1u);
+	guest_fn_a2a90_x(0x0018cab0u, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018ccd4u, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018cb4cu, 0x001357b8u, 0u, 2u);
+	for (esi = 0u; esi != 0x10u; esi += 4u) {
+		if (EF_U32(0x0013577cu + esi) != 0u)
+			guest_fn_a2a90_x(0x0018cb38u, 0x0013577cu + esi, 0u, 5u);
+	}
+	guest_fn_a2a90_x(0x0018cab0u, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018cce0u, zp, 0u, 0u);
+	v = EF_U8(0x0015f07fu);
+	EF_U8(0x0015f07fu) = (uint8_t)(v + 1u);
+	guest_fn_a2a90_x(0x0018cb54u, 0x0015f07fu, 0u, 1u);
+	EF_U8(0x0015f07fu) = (uint8_t)(EF_U8(0x0015f07fu) - 1u);
+	guest_fn_a2a90_x(0x0018cb5cu, 0x0015f07du, 0u, 1u);
+	guest_fn_a2a90_x(0x0018cb6cu, 0x0015f07eu, 0x00136f3cu, 3u);
+	guest_fn_a2a90_x(0x0018ccf0u, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018cb74u, 0x0015f099u, 0x00136f84u, 3u);
+	guest_fn_a2a90_x(0x0018cb7cu, 0x0015f09au, 0u, 1u);
+	guest_fn_a2a90_x(0x0018cab0u, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018ccfcu, zp, 0u, 0u);
+	guest_fn_a2a90_x(0x0018cb88u, 0x0015f4fdu, 0u, 4u);
+	guest_fn_a2a90_x(0x0018cb94u, 0x0015f688u, 0x00136f9cu, 3u);
+	guest_fn_a2a90_x(0x0018cba0u, 0x0015f53du, 0u, 4u);
+	guest_fn_a2a90_x(0x0018cbacu, 0x0015f57du, 0u, 4u);
+	guest_fn_a7990(EF_U32(0x00136df8u));
+}

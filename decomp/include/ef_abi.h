@@ -5823,4 +5823,9 @@ uint32_t find_session_entry_a312c(uint32_t packet);
 
 uint32_t discover_session_a2f70(void);
 
+void write_settings_file_a2bdc(void);
+void guest_fn_a2a90_x(uint32_t name, uint32_t value, uint32_t table, uint32_t type); /* 0xa2a90 EAX/EDX/EBX/ECX: write one settings entry */
+
+
+
 #endif

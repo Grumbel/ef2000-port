@@ -8238,3 +8238,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa2f70` | none | EAX:uint32_t | a41dc@a4250 | Client-side session discovery step. While byte 0x1357c9 is clear, scan the received packets (count: byte at [0x136b88],  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa2bdc` | none | none | 335c0@33607,3361c@3362b,336c0@336e3 | Write the multiplayer settings file: open it (0xa7948, text 0x18cc18; handle in dword 0x136df8, failure reported through |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
