@@ -1748,7 +1748,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008960c	79	select_object_8960c	unit_flags	compiles	game	confirmed	decomp/tests/0x0008960c.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0008965c	59	activate_8965c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0008965c.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x00089698	300	find_nearest_target_89698	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089698.json	docs/compiler-abi.md; Pick the closest enemy for the unit OBJ: for every group of the table 0x1a14f8 (0x45-byte entries, 0x1a1506 of them) who; callers 897c4@8989e; guest pending
-0x000897c4	270			unknown	unclassified	unverified		
+0x000897c4	270	step_approach_897c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000897c4.json	docs/compiler-abi.md; Per-frame step of the approach controller of unit U (EAX) driven by the phase byte 0x20f22f. Phase 1: while the double 0; callers 8a318@8a41f; guest pending
 0x000898d4	80	force_select_898d4	unit_flags	compiles	game	confirmed	decomp/tests/0x000898d4.json	docs/compiler-abi.md; ; callers 8935c@8936e,8935c@89410,8935c@89451; guest pending
 0x00089924	60	recalculate_object_temporarily	ui_secondary	compiles	game	confirmed	decomp/tests/0x00089924.json	docs/compiler-abi.md; host model; guest differential pending
 0x00089960	48	finish_record_89960	scene_helpers	compiles	game	confirmed	decomp/tests/0x00089960.json	docs/compiler-abi.md; byte 0x12d7b3=0; if byte 0x125847 0x9e508(high word +0x2c,4); 0x8a318; callers none direct; guest pending

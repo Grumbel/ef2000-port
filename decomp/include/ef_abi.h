@@ -5658,4 +5658,6 @@ uint8_t read_axis_d6b80(ef_addr32 out);
 
 
 
+void step_approach_897c4(ef_addr32 u);
+
 #endif

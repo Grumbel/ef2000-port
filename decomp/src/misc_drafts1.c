@@ -13374,3 +13374,55 @@ uint8_t read_axis_d6b80(ef_addr32 out)
     EF_U32(0x00420dacu) = (uint32_t)pos;
     return 1u;
 }
+
+/* 0x897c4, 270 bytes. Per-frame step of the approach controller of unit U (EAX) driven by the phase byte 0x20f22f. Phase 1: while the double 0x1fcf68 exceeds the double 0x18a580 integrate d = ((0x1fcf08 * 0x1fcf10) / ((0x18a588 - 0x1fd020) * 0x1fcf48, a zero divisor replaced by 1.0) * 0x18a590), store it in 0x1fcef0 and add d * 0x1fcca0 to 0x1fd020; otherwise finish with 0x87970(U). Phase 2: raise 0x1fcf48 by the double 0x18a5a0 while it is above 0x18a598 and, once 0x1fd020 drops below 0x18a5a8 and 0x89698(U) succeeds, jump to the unit's alternate target (+0x5b into +0x30, clearing +0x5a, then 0x87970) or, without one, mark it unreachable (+0x63 = 0x7fffffff, +0x5f = 0). */
+void step_approach_897c4(ef_addr32 u)
+{
+    double a, b, c, d, e, f, g, h;
+    if (EF_U8(0x0020f22fu) == 1u) {
+        memcpy(&a, ef_guest_memory_ptr(0x001fcf68u), sizeof a);
+        memcpy(&b, ef_guest_memory_ptr(0x0018a580u), sizeof b);
+        if (a > b) {
+            double t;
+            memcpy(&c, ef_guest_memory_ptr(0x0018a588u), sizeof c);
+            memcpy(&d, ef_guest_memory_ptr(0x001fd020u), sizeof d);
+            memcpy(&e, ef_guest_memory_ptr(0x001fcf48u), sizeof e);
+            t = (c - d) * e;
+            if (t == 0.0)
+                t = 1.0;
+            memcpy(&f, ef_guest_memory_ptr(0x001fcf08u), sizeof f);
+            memcpy(&g, ef_guest_memory_ptr(0x001fcf10u), sizeof g);
+            memcpy(&h, ef_guest_memory_ptr(0x0018a590u), sizeof h);
+            f = ((f * g) / t) * h;
+            memcpy(ef_guest_memory_ptr(0x001fcef0u), &f, sizeof f);
+            memcpy(&g, ef_guest_memory_ptr(0x001fcca0u), sizeof g);
+            d = f * g + d;
+            memcpy(ef_guest_memory_ptr(0x001fd020u), &d, sizeof d);
+        } else {
+            guest_fn_87970(u);
+        }
+    }
+    if (EF_U8(0x0020f22fu) == 2u) {
+        double e2, lim, inc, z, zl;
+        memcpy(&e2, ef_guest_memory_ptr(0x001fcf48u), sizeof e2);
+        memcpy(&lim, ef_guest_memory_ptr(0x0018a598u), sizeof lim);
+        if (e2 > lim) {
+            memcpy(&inc, ef_guest_memory_ptr(0x0018a5a0u), sizeof inc);
+            e2 = e2 + inc;
+            memcpy(ef_guest_memory_ptr(0x001fcf48u), &e2, sizeof e2);
+        }
+        memcpy(&z, ef_guest_memory_ptr(0x001fd020u), sizeof z);
+        memcpy(&zl, ef_guest_memory_ptr(0x0018a5a8u), sizeof zl);
+        if (z < zl && find_nearest_target_89698(u) != 0u) {
+            ef_addr32 alt = EF_U32(u + 0x5bu);
+            if (alt != 0u) {
+                EF_U8(u + 0x5au) = 0u;
+                EF_U32(u + 0x30u) = alt;
+                guest_fn_87970(u);
+            } else {
+                EF_U32(u + 0x63u) = 0x7fffffffu;
+                EF_U32(u + 0x5fu) = alt;
+            }
+        }
+    }
+}
