@@ -6525,4 +6525,7 @@ void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c);
 void dosx_int21_2502_3f8(uint32_t a, uint32_t b, uint32_t c); /* 0x3f8 */
 void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c); /* 0x484 */
 
+void draw_textured_span_ff3bc(void);
+void draw_textured_span_ff3bc(void); /* 0xff3bc */
+
 #endif

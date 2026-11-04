@@ -23491,3 +23491,42 @@ void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c)
 {
 	dosx_call_196148(0x2506u, a, b, c);
 }
+
+/* 0xff3bc, 217 bytes. Textured horizontal span: from X0 (0x485fe8>>16) to X1 (0x485fd0>>16) on the row at table 0x163200[0x485fec>>16] into the screen base 0x15b754, stepping the 8.8 texture coordinates (0x485ff0/0x485ff4 to 0x485fd8/0x485fdc) through the colour map at 0x159084 (mask 0x158f20). Writes width+1 pixels. */
+void draw_textured_span_ff3bc(void)
+{
+	int32_t x0 = (int32_t)EF_U32(0x485fe8u) >> 16;
+	int32_t width = ((int32_t)EF_U32(0x485fd0u) >> 16) - x0;
+	int32_t dst;
+	int32_t end;
+	int32_t u;
+	int32_t v;
+	int32_t du;
+	int32_t dv;
+	uint32_t ebx;
+	if (width <= 0)
+		return;
+	dst = x0 + (int32_t)(EF_U32(0x15b754u) + EF_U32(0x163200u + 4u * (uint32_t)((int32_t)EF_U32(0x485fecu) >> 16)));
+	EF_U32(0x486000u) = EF_U32(0x485ff0u);
+	EF_U32(0x486004u) = EF_U32(0x485ff4u);
+	EF_U32(0x48600cu) = (uint32_t)((int32_t)(EF_U32(0x485fd8u) - EF_U32(0x486000u)) / width);
+	EF_U32(0x486008u) = (uint32_t)((int32_t)(EF_U32(0x485fdcu) - EF_U32(0x486004u)) / width);
+	end = dst + width;
+	EF_U32(0x486010u) = (uint32_t)end;
+	u = (int32_t)(EF_U32(0x486000u) << 8);
+	v = (int32_t)(EF_U32(0x486004u) << 8);
+	du = (int32_t)(EF_U32(0x48600cu) << 8);
+	dv = (int32_t)(EF_U32(0x486008u) << 8);
+	ebx = (uint32_t)width;
+	do {
+		uint32_t eax = EF_U32(0x159084u);
+		ebx = (ebx << 8) | ((uint32_t)v >> 24);
+		ebx = (ebx << 8) | ((uint32_t)u >> 24);
+		ebx &= EF_U32(0x158f20u);
+		eax = (eax & 0xffffff00u) | EF_U8(ebx);
+		EF_U8((uint32_t)dst) = EF_U8(eax);
+		u += du;
+		dst++;
+		v += dv;
+	} while (dst <= (int32_t)EF_U32(0x486010u));
+}

@@ -3785,7 +3785,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000feddc	29	put_block2_feddc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000feddc.json	docs/compiler-abi.md; Plot a two-pixel-wide, two-row block with implicit registers (ESI = row, EBX = x offset, CH = colour): both bytes of the; callers fdf60@fdfdb; guest pending
 0x000feec8	94	upload_vga_palette_feec8	game_helpers125	compiles	game	confirmed	decomp/tests/0x000feec8.json	docs/compiler-abi.md; Upload a 256-entry RGB palette to the VGA DAC (ports 0x3c8/0x3c9), sending only entries that differ from the shadow copy; callers d663c@d6652; guest pending
 0x000fef26	27	fill_table_fef26	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fef26.json	docs/compiler-abi.md; Fill 192 dwords at 0x17cfc0 with -1.; callers d1d40@d1d75,d1e50@d1eb2; guest pending
-0x000ff3bc	217			unknown	unclassified	unverified		
+0x000ff3bc	217	draw_textured_span_ff3bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ff3bc.json	docs/compiler-abi.md; Textured horizontal span: from X0 (0x485fe8>>16) to X1 (0x485fd0>>16) on the row at table 0x163200[0x485fec>>16] into th; callers none direct; guest pending
 0x000ff498	900			unknown	unclassified	unverified		
 0x000ff81c	686			unknown	unclassified	unverified		
 0x000ffe78	211	draw_displaced_span_ffe78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ffe78.json	docs/compiler-abi.md; Draw one texture-displaced span: from x = high word of dword 0x485fe8 to x = high word of dword 0x485fd0 (clipped to dwo; callers none direct; guest pending

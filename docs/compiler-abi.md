@@ -9531,3 +9531,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x3f8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 7b4@7f3 | DOS-extender int 21h AX=2502h (get protected-mode interrupt vector) through the register block at 0x196148. |
 | `0x484` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 734@7a0 | DOS-extender int 21h AX=2506h through the register block at 0x196148. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xff3bc` | none | none | none direct | Textured horizontal span: from X0 (0x485fe8>>16) to X1 (0x485fd0>>16) on the row at table 0x163200[0x485fec>>16] into th |
