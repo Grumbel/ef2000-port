@@ -179,3 +179,20 @@ void raise_random_counters_74ed8(uint32_t key, uint32_t n)
             EF_U8(obj + j + 0x18eu) = 100u;
     }
 }
+
+/* 0x22f28, 241 bytes. Draw the HUD indicator for slot idx (10-byte records at 0x127a96): if its text slot exists and its enable byte (0x1a81d8, offset 5 for slots above 2) is set, set up the scaled table and plot the indicator at the position scaled by 1/4 and 3/8 from the record's words. */
+void draw_indicator_22f28(uint32_t index)
+{
+    int32_t idx = (int16_t)index;
+    uint32_t rec = (uint32_t)(idx * 10);
+    int32_t px, py;
+    if (guest_fn_cd7f0((int32_t)(EF_U32(rec + 0x127a9du) >> 24)) == 0u)
+        return;
+    if (EF_U8(0x001a81d8u + (uint32_t)(idx - (idx > 2 ? 5 : 0))) == 0u)
+        return;
+    set_scaled_table_38750(0xedu, 0x1eu, 0xfu, 6u, 0xdu, 1u, 1u);
+    guest_fn_387e0_x(EF_U16(0x00127d3cu), EF_U16(0x00127d40u));
+    px = (int32_t)EF_S16(rec + 0x127a9eu) / 4 + (int32_t)EF_S16(rec + 0x127a9au);
+    py = (int32_t)EF_S16(rec + 0x127a9cu) * 3 / 8 + (int32_t)EF_S16(rec + 0x127a98u);
+    guest_fn_38be8_x(EF_U32(rec + 0x127a9du) >> 24, (int32_t)(int16_t)py, (int32_t)(int16_t)px);
+}

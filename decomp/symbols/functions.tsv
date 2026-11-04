@@ -356,7 +356,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00021654	1967			unknown	unclassified	unverified		
 0x00021e04	616			unknown	unclassified	unverified		
 0x00022e98	142	highlight_widget_22e98	game_helpers110	compiles	game	confirmed	decomp/tests/0x00022e98.json	docs/compiler-abi.md; Highlight widget record idx: when its slot byte is set, look the text slot up and enter scroll mode, then draw the recta; callers 1f960@1f968; guest pending
-0x00022f28	241			unknown	unclassified	unverified		
+0x00022f28	241	draw_indicator_22f28	tactical_marks1	compiles	game	confirmed	decomp/tests/0x00022f28.json	docs/compiler-abi.md; Draw the HUD indicator for slot idx (10-byte records at 0x127a96): if its text slot exists and its enable byte (0x1a81d8; callers none direct; guest pending
 0x000233c4	920			unknown	unclassified	unverified		
 0x00023760	48	position_delta_metric	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX pointer to 3 dwords produces signed metric
 0x000237c8	48	translate_and_call_237c8	game_helpers7	compiles	game	confirmed	decomp/tests/0x000237c8.json	docs/compiler-abi.md; Translate a vector by the origin at 0x21444c.. and pass it to b39ec.; callers 8846c@884f1; guest pending

@@ -4309,4 +4309,8 @@ void raise_random_counters_74ed8(uint32_t key, uint32_t n);
 void draw_linked_pages_2c600(uint32_t page, uint32_t arg);
 void guest_fn_47764_x(int32_t a, uint32_t b, int32_t c, uint32_t d, uint32_t s0); /* 0x47764 EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
 
+void draw_indicator_22f28(uint32_t index);
+void guest_fn_387e0_x(uint32_t a, uint32_t b); /* 0x387e0 EAX/EDX */
+void guest_fn_38be8_x(uint32_t a, int32_t b, int32_t c); /* 0x38be8 EAX/EDX/EBX */
+
 #endif
