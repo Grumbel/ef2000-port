@@ -7795,3 +7795,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7f6d8` | EAX:ef_addr32 | EAX:uint32_t | 7ef14@7eff4,7ef14@7f035,7ef14@7f0a3 | Squared distance from the camera (words 0x21444c, 0x214448, 0x214450) to the position at REC (three 8.8-ish coordinates, |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3c5b8` | none | none | 3c6c0@3c711 | Parse a table from the text reader: the first line (read_line_3c558 into 0x1a2df0, format 0x18365c) gives the entry coun |

@@ -13174,3 +13174,36 @@ uint32_t camera_distance_sq_7f6d8(ef_addr32 rec)
     }
     return (uint32_t)(sx * sx + sy * sy + sz * sz);
 }
+
+/* 0x3c5b8, 261 bytes. Parse a table from the text reader: the first line (read_line_3c558 into 0x1a2df0, format 0x18365c) gives the entry count stored as a word at the table 0x1a2e78; then per entry read a line for a 4-byte item (format 0x183660) stored at table + 2 + i * 0x49, and a second line (format 0x1264a8, ten values) filling the word at +0x3c and the bytes +0x40..+0x48. */
+void load_table_3c5b8(void)
+{
+    uint32_t v[10];
+    uint32_t count = 0;
+    int32_t i;
+    read_line_3c558();
+    guest_fn_df26f_x(0x001a2df0u, 0x0018365cu, (ef_addr32)(uintptr_t)&count);
+    EF_U16(EF_U32(0x001a2e78u)) = (uint16_t)count;
+    for (i = 0; (int32_t)(int16_t)EF_U16(EF_U32(0x001a2e78u)) > i; i++) {
+        ef_addr32 e = EF_U32(0x001a2e78u) + 2u + (uint32_t)i * 0x49u;
+        read_line_3c558();
+        guest_fn_df26f_x(0x001a2df0u, 0x00183660u, e);
+        read_line_3c558();
+        guest_fn_df26f_x(0x001a2df0u, 0x001264a8u,
+                         (ef_addr32)(uintptr_t)&v[9], (ef_addr32)(uintptr_t)&v[8],
+                         (ef_addr32)(uintptr_t)&v[7], (ef_addr32)(uintptr_t)&v[6],
+                         (ef_addr32)(uintptr_t)&v[5], (ef_addr32)(uintptr_t)&v[4],
+                         (ef_addr32)(uintptr_t)&v[3], (ef_addr32)(uintptr_t)&v[2],
+                         (ef_addr32)(uintptr_t)&v[1], (ef_addr32)(uintptr_t)&v[0]);
+        EF_U16(e + 0x3cu) = (uint16_t)v[9];
+        EF_U8(e + 0x40u) = (uint8_t)v[8];
+        EF_U8(e + 0x41u) = (uint8_t)v[7];
+        EF_U8(e + 0x42u) = (uint8_t)v[6];
+        EF_U8(e + 0x43u) = (uint8_t)v[5];
+        EF_U8(e + 0x44u) = (uint8_t)v[4];
+        EF_U8(e + 0x45u) = (uint8_t)v[3];
+        EF_U8(e + 0x46u) = (uint8_t)v[2];
+        EF_U8(e + 0x47u) = (uint8_t)v[1];
+        EF_U8(e + 0x48u) = (uint8_t)v[0];
+    }
+}

@@ -5636,4 +5636,6 @@ void guest_fn_9da80_x(void); /* 0x9da80 */
 
 uint32_t camera_distance_sq_7f6d8(ef_addr32 rec);
 
+void load_table_3c5b8(void);
+
 #endif

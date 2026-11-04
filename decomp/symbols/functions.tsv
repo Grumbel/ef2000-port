@@ -689,7 +689,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003c410	34	alloc_work_area_3c410	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x0003c410.json	docs/compiler-abi.md; Allocate the 0x9202-byte work area.; callers 7ab00@7ab0e; guest pending
 0x0003c434	10	forward_value_1a2e78	low_helpers	compiles	game	confirmed	decomp/tests/0x0003c434.json	docs/compiler-abi.md; tail 0xe2af4(dword 0x1a2e78); callers 7ab00@7abbf; guest pending
 0x0003c558	93	read_line_3c558	game_helpers8	compiles	game	confirmed	decomp/tests/0x0003c558.json	docs/compiler-abi.md; Copy the next CR-terminated line from the input buffer to 0x1a2df0.; callers 3c5b8@3c5bd,3c5b8@3c5f9,3c5b8@3c611; guest pending
-0x0003c5b8	261			unknown	unclassified	unverified		
+0x0003c5b8	261	load_table_3c5b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003c5b8.json	docs/compiler-abi.md; Parse a table from the text reader: the first line (read_line_3c558 into 0x1a2df0, format 0x18365c) gives the entry coun; callers 3c6c0@3c711; guest pending
 0x0003c6c0	97	register_string_3c6c0	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x0003c6c0.json	docs/compiler-abi.md; Copy a string into a fresh buffer and register it.; callers 7aa2c@7aa36; guest pending
 0x0003c730	56	find_entry_or_abort_3c730	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x0003c730.json	docs/compiler-abi.md; Find a named entry in the scene or abort.; callers 3c768@3c772,3c790@3c7a1; guest pending
 0x0003c768	37	copy_table_entry_to_record	low_helpers	compiles	game	confirmed	decomp/tests/0x0003c768.json	docs/compiler-abi.md; copy byte +0 and word +2 of 0x3c730 entry into record 0x1264c8 at +0x0b/+0x2a; callers 3cb2c@3cbf8; guest pending
