@@ -6238,3 +6238,48 @@ void poll_serial_dff4c(void)
     if (guest_fn_9c430(EF_U32(0x0015eed0u) + 5u) & 1u)
         guest_fn_dfac8_x();
 }
+
+/* 0xcd3c0, 83 bytes. Send the byte VALUE to the keyboard controller (port 0x60) and wait for the 0xfa acknowledge, retrying up to three times: wait for the input buffer to empty (port 0x64 bit 1 clear), write, wait for output data (bit 0 set) and read the answer. */
+void send_keyboard_byte_cd3c0(uint32_t value)
+{
+    uint32_t tries;
+    for (tries = 0u; tries < 3u; tries++) {
+        while (guest_fn_9c430(0x64u) & 2u)
+            ;
+        guest_fn_117b0c(0x60u, value & 0xffu);
+        while (!(guest_fn_9c430(0x64u) & 1u))
+            ;
+        if ((guest_fn_9c430(0x60u) & 0xffu) == 0xfau)
+            break;
+    }
+}
+
+/* 0xcd414, 27 bytes. Set the keyboard LEDs: command 0xed followed by the LED mask byte, with interrupts disabled. */
+void set_keyboard_leds_cd414(uint32_t mask)
+{
+    send_keyboard_byte_cd3c0(0xedu);
+    send_keyboard_byte_cd3c0(mask & 0xffu);
+}
+
+/* 0x11d63f, 29 bytes. Return the pending pushed-back character in dword 0x132a50 (clearing it) or, when none is pending, read one character from the console (int 21h, AH = 1). */
+uint32_t read_console_char_11d63f(void)
+{
+    uint32_t c = EF_U32(0x00132a50u);
+    EF_U32(0x00132a50u) = 0u;
+    if (c == 0u) {
+        uint32_t in[7];
+        uint32_t out[7];
+        uint8_t sregs[12];
+        segread_9be0d((uint32_t)(uintptr_t)sregs);
+        in[0] = 0x0100u;
+        in[1] = 0u;
+        in[2] = 0u;
+        in[3] = 0u;
+        in[4] = 0u;
+        in[5] = 0u;
+        in[6] = 0u;
+        guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+        c = out[0] & 0xffu;
+    }
+    return c;
+}

@@ -2930,8 +2930,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cd2a8	64	store_offset_cd2a8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000cd2a8.json	docs/compiler-abi.md; Store a half-word offset in the current table entry.; callers 9e7bc@9f5ff; guest pending
 0x000cd2e8	166	add_progress_cd2e8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cd2e8.json	docs/compiler-abi.md; Add DELTA to the 16-bit progress value of the current entry (clamped to 100, stored in the table at 0x41f700). When the ; callers 161d4@164bf,1e28c@1e383,56084@56196; guest pending
 0x000cd390	34	advance_cursor	code_predicates	compiles	game	confirmed	decomp/tests/0x000cd390.json	docs/compiler-abi.md; Advance dword 0x15b628 by twice its signed word at +0; * return whether the word at the new position is nonzero.; callers 1e214@1e27a,d0470@d0768; guest pending
-0x000cd3c0	83			unknown	unclassified	unverified		
-0x000cd414	27			unknown	unclassified	unverified		
+0x000cd3c0	83	send_keyboard_byte_cd3c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cd3c0.json	docs/compiler-abi.md; Send the byte VALUE to the keyboard controller (port 0x60) and wait for the 0xfa acknowledge, retrying up to three times; callers cd414@cd41d,cd414@cd426; guest pending
+0x000cd414	27	set_keyboard_leds_cd414	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cd414.json	docs/compiler-abi.md; Set the keyboard LEDs: command 0xed followed by the LED mask byte, with interrupts disabled.; callers cd4d4@cd4e5,cd554@cd5d7; guest pending
 0x000cd430	161	init_keys_cd430	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cd430.json	docs/compiler-abi.md; Clear the key state tables and set the default scan codes.; callers cd4d4@cd4ea; guest pending
 0x000cd4d4	125			unknown	unclassified	unverified		
 0x000cd554	146	restore_page_cd554	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x000cd554.json	docs/compiler-abi.md; Drain the pending key table, release the buffers and restore the page.; callers 8b2d8@8b315,a9878@a98bd,aaee8@aafd6; guest pending
@@ -4234,7 +4234,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011d385	107	right_align_number_11d385	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d385.json	docs/compiler-abi.md; Right-align the len-byte text at buf inside width bytes: move it to the end, then fix a leading "." or sign+"." by inser; callers 11d3f0@11d606; guest pending
 0x0011d3f0	548			unknown	unclassified	unverified		
 0x0011d614	43			unknown	unclassified	unverified		
-0x0011d63f	29			unknown	unclassified	unverified		
+0x0011d63f	29	read_console_char_11d63f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d63f.json	docs/compiler-abi.md; Return the pending pushed-back character in dword 0x132a50 (clearing it) or, when none is pending, read one character fr; callers 10f1bf@10f210; guest pending
 0x0011d695	444			unknown	unclassified	unverified		
 0x0011f287	76			unknown	unclassified	unverified		
 0x0011f2d3	2	disable_interrupts_11f2d3	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011f2d3.json	docs/compiler-abi.md; Disable interrupts (no-op on the host).; callers 117e0c@117e57,117f68@1180b7,118290@1182a2; guest pending

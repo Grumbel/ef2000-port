@@ -6329,3 +6329,11 @@ in EAX, format string address, one value).
 | `0xeb2a8` | none | EAX:uint32_t | 9c1e0@9c1e3 | DOS allocate memory with the impossible request BX = 0xffff (int 21h, AH = 0x48), which fails and returns the size of th |
 | `0x111142` | EAX:uint32_t,EDX:uint32_t | none | 101ed4@101efe | DOS4G set real-mode interrupt vector (int 21h, AX = 0x2505) for interrupt number CL = NUM (low byte) with EBX = VALUE; c |
 | `0xdff4c` | none | none | none direct | Poll the serial line status register (port dword 0x15eed0 + 5): when its data-ready bit is set call the receive handler  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcd3c0` | EAX:uint32_t | none | cd414@cd41d,cd414@cd426 | Send the byte VALUE to the keyboard controller (port 0x60) and wait for the 0xfa acknowledge, retrying up to three times |
+| `0xcd414` | EAX:uint32_t | none | cd4d4@cd4e5,cd554@cd5d7 | Set the keyboard LEDs: command 0xed followed by the LED mask byte, with interrupts disabled. |
+| `0x11d63f` | none | EAX:uint32_t | 10f1bf@10f210 | Return the pending pushed-back character in dword 0x132a50 (clearing it) or, when none is pending, read one character fr |

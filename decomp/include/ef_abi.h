@@ -5011,4 +5011,8 @@ void set_rm_vector_111142(uint32_t num, uint32_t value);
 void poll_serial_dff4c(void);
 void guest_fn_dfac8_x(void); /* 0xdfac8 */
 
+void send_keyboard_byte_cd3c0(uint32_t value);
+void set_keyboard_leds_cd414(uint32_t mask);
+uint32_t read_console_char_11d63f(void);
+
 #endif
