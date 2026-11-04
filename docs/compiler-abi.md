@@ -8403,3 +8403,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5d080` | EAX:ef_addr32 | none | 59fa4@5a1e7,5cff0@5d05a | Draw a marker for the map point PTR (EAX; signed words x at +0, y at +2): the bearing from the map centre (words 0x1a6cf |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x59998` | none | none | 598e8@5991f,598e8@59930,598e8@59946 | Draw the label of the selected tactical unit (unit id: signed word 0x1f71ca, via 0x7489c; nothing when missing). The anc |

@@ -17193,3 +17193,46 @@ void draw_bearing_marker_5d080(ef_addr32 ptr)
 	guest_fn_c8ccc_x((uint32_t)Y, (uint32_t)XM, (uint32_t)YP, (uint32_t)X, col);
 	guest_fn_c8ccc_x((uint32_t)YM, (uint32_t)X, (uint32_t)Y, (uint32_t)XM, col);
 }
+
+/* 0x59998, 321 bytes. Draw the label of the selected tactical unit (unit id: signed word 0x1f71ca, via 0x7489c; nothing when missing). The anchor comes from the 15-byte entry 0x128170 + 15 * byte 0x1a6d1b: X = word +0, base Y = word +2, offset word +6 (times 3, divided by 6). When byte 0x1a81e5 is set a text (format 0x185e88) is drawn first at (word +2 minus the metric of that text, 0x594a4; offset - 0x18). Then the unit's weapon slot (signed byte at unit +0x1d7, 0x14 = none) selects a name pointer at 0x12bc6c + 145 * (signed byte at unit + 3 * slot + 0x19b); with a name, the count (word at unit + 3 * slot + 0x19c for slot 0x13, else 0x5aa10) is formatted with "%s %d"-style format 0x185e8c and drawn at (X, offset) (without a count the name pointer itself is the aux argument), and finally 0x59adc runs. */
+void draw_selected_unit_label_59998(void)
+{
+	uint8_t buf[0x14];
+	ef_addr32 bufp = (ef_addr32)(uintptr_t)buf;
+	uint32_t row = (uint32_t)EF_U8(0x001a6d1bu) * 15u;
+	int32_t off = (int32_t)EF_U32(0x00128174u + row) >> 16;
+	int16_t x = (int16_t)EF_U16(0x00128170u + row);
+	int32_t esi = (off * 3) / 6;
+	uint32_t unit = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+	int32_t k, slot;
+	uint32_t name, count;
+
+	if (unit == 0u)
+		return;
+	if (EF_U8(0x001a81e5u) != 0u) {
+		guest_fn_a4342_plain(bufp, 0x00185e88u);
+		draw_tactical_coordinates((int16_t)(EF_U16(0x00128172u + row) - (uint16_t)draw_tactical_item_metric(bufp)),
+		    (int16_t)(esi - 0x18), bufp);
+	}
+	k = (int32_t)EF_U32(unit + 0x1d4u) >> 24;
+	if (k != 0x14) {
+		slot = (int32_t)EF_U32(unit + (uint32_t)(k * 3) + 0x198u) >> 24;
+		name = EF_U32(0x0012bc6cu + (uint32_t)(slot * 145));
+	} else {
+		name = 0u;
+	}
+	if (name == 0u)
+		return;
+	k = (int32_t)EF_U32(unit + 0x1d4u) >> 24;
+	if (k == 0x13)
+		count = EF_U16(unit + (uint32_t)(k * 3) + 0x19cu);
+	else
+		count = count_matching_activity_slots(unit) & 0xffffu;
+	if ((uint16_t)count != 0u) {
+		guest_fn_a4342_va(bufp, 0x00185e8cu, name, (uint32_t)(int32_t)(int16_t)count);
+		draw_tactical_coordinates(x, (int16_t)esi, bufp);
+	} else {
+		draw_tactical_coordinates(x, (int16_t)esi, name);
+	}
+	guest_fn_59adc_w();
+}
