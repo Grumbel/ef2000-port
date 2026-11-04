@@ -6494,4 +6494,7 @@ void build_curve_tables_d6340(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 void unit_rotation_matrix_7215c(int32_t unit);
 void unit_rotation_matrix_7215c(int32_t unit); /* 0x7215c */
 
+void rotation_matrix_88e98(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double a, double b, double c, ef_addr32 out);
+void rotation_matrix_88e98(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double a, double b, double c, ef_addr32 out); /* 0x88e98 */
+
 #endif

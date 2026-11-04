@@ -23195,3 +23195,23 @@ void unit_rotation_matrix_7215c(int32_t unit)
 	*(double *)ef_guest_memory_ptr(p + 0xd9u) = sB * cC;
 	*(double *)ef_guest_memory_ptr(p + 0xe1u) = cB * cC;
 }
+
+/* 0x88e98, 209 bytes. Build the 3x3 rotation matrix for the three angles A, B, C (doubles on the stack) and store its nine doubles at OUT+0..0x40. */
+void rotation_matrix_88e98(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double a, double b, double c, ef_addr32 out)
+{
+	double cA = cos_b45a2(a), sA = sin_b45ac(a);
+	double cB = cos_b45a2(b), sB = sin_b45ac(b);
+	double sC = sin_b45ac(c), cC = cos_b45a2(c);
+	double u = cA * sB;
+	double v = sA * sB;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	*(double *)ef_guest_memory_ptr(out) = cA * cB;
+	*(double *)ef_guest_memory_ptr(out + 0x08u) = u * sC - sA * cC;
+	*(double *)ef_guest_memory_ptr(out + 0x10u) = u * cC + sA * sC;
+	*(double *)ef_guest_memory_ptr(out + 0x18u) = sA * cB;
+	*(double *)ef_guest_memory_ptr(out + 0x20u) = v * sC + cA * cC;
+	*(double *)ef_guest_memory_ptr(out + 0x28u) = v * cC - cA * sC;
+	*(double *)ef_guest_memory_ptr(out + 0x30u) = -sB;
+	*(double *)ef_guest_memory_ptr(out + 0x38u) = cB * sC;
+	*(double *)ef_guest_memory_ptr(out + 0x40u) = cB * cC;
+}

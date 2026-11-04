@@ -9475,3 +9475,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7215c` | EAX:int32_t | none | 6d38c@6d683,71cb8@7214a,725dc@727e5 | For the unit record found by 0x7489c (index in AX, sign-extended), build the 3x3 rotation matrix from the angles at +0x6 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x88e98` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:double,[ESP+12]:double,[ESP+16]:ef_addr32 | none | 89fbc@8a069 | Build the 3x3 rotation matrix for the three angles A, B, C (doubles on the stack) and store its nine doubles at OUT+0..0 |
