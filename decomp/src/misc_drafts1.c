@@ -17579,3 +17579,59 @@ uint32_t next_weapon_slot_85d00(uint32_t tag)
 		return 0x14u;
 	}
 }
+
+/* 0xca874, 391 bytes. Reset the entries of the list whose head pointer is stored at HEAD1 (EAX; next link +4) except those of state 7 (byte +0xd). With word 0x137992 set an entry is first cleared (state 0, byte +0x15 = 100, word +9 = 0). Word +9 is cleared; when words 0x137994 and 0x137992 are both zero the second list at HEAD2 (EDX) is searched: for every entry of mode 0 or 1 (byte +9) and kind other than 0x1b..0x1d (byte +0xa), each sub-record (0x7c bytes at dword +0x13, count byte +0x12) with a zero byte +3 lists word ids (dword +0x78, count byte +1); when one equals the entry's word +0x13 the entry's word +9 is set to 1. Then the three 4-byte fields at +0x29, +0x19, +0x21 are filled with 0xff (0xb3fb0), word +0x31 = 0xffff, words +0x51 and +0x53 = 0, the linked record at dword +0x4d gets byte +9 = 0, and unless the state is 1 or 2 it is reset to 0 (kept when 7) and byte +0x15 set to 100. */
+void reset_list_entries_ca874(ef_addr32 head1, ef_addr32 head2)
+{
+	uint32_t node = EF_U32(head1);
+	uint32_t p, ent, ptr, rec;
+	uint32_t st;
+	int16_t i;
+	int32_t ax;
+
+	while (node != 0u) {
+		if (EF_U8(node + 0xdu) != 7u) {
+			if (EF_U16(0x00137992u) != 0u) {
+				EF_U8(node + 0xdu) = 0u;
+				EF_U8(node + 0x15u) = 0x64u;
+				EF_U16(node + 9u) = 0u;
+			}
+			EF_U16(node + 9u) = 0u;
+			if (EF_U16(0x00137994u) == 0u && EF_U16(0x00137992u) == 0u) {
+				p = EF_U32(head2);
+				while (p != 0u) {
+					if ((EF_U8(p + 9u) == 0u || EF_U8(p + 9u) == 1u) &&
+					    EF_U8(p + 0xau) != 0x1bu && EF_U8(p + 0xau) != 0x1cu && EF_U8(p + 0xau) != 0x1du) {
+						for (i = 0; (int32_t)i < (int32_t)EF_U8(p + 0x12u); i++) {
+							ent = EF_U32(p + 0x13u) + (uint32_t)((int32_t)i * 0x7c);
+							if (EF_U8(ent + 3u) != 0u)
+								continue;
+							for (ax = 0; ax < (int32_t)EF_U8(ent + 1u); ax++) {
+								ptr = EF_U32(ent + 0x78u);
+								if (EF_U16(node + 0x13u) == EF_U16(ptr + (uint32_t)(ax * 2)))
+									EF_U16(node + 9u) = 1u;
+							}
+						}
+					}
+					p = EF_U32(p + 4u);
+				}
+			}
+			guest_fn_b3fb0(node + 0x29u, 0xffffffffu, 4u);
+			guest_fn_b3fb0(node + 0x19u, 0xffffffffu, 4u);
+			guest_fn_b3fb0(node + 0x21u, 0xffffffffu, 4u);
+			EF_U16(node + 0x31u) = 0xffffu;
+			EF_U16(node + 0x51u) = 0u;
+			rec = EF_U32(node + 0x4du);
+			EF_U16(node + 0x53u) = 0u;
+			if (rec != 0u)
+				EF_U8(rec + 9u) = 0u;
+			st = EF_U8(node + 0xdu);
+			if (st != 1u && st != 2u) {
+				if (st != 7u)
+					EF_U8(node + 0xdu) = 0u;
+				EF_U8(node + 0x15u) = 0x64u;
+			}
+		}
+		node = EF_U32(node + 4u);
+	}
+}

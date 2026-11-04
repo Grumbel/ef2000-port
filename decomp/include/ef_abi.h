@@ -5919,4 +5919,6 @@ void apply_total_adjustment_4430(uint32_t sel, uint32_t id, uint32_t level, uint
 
 uint32_t next_weapon_slot_85d00(uint32_t tag);
 
+void reset_list_entries_ca874(ef_addr32 head1, ef_addr32 head2);
+
 #endif

@@ -2865,7 +2865,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ca780	85	find_name_index_ca780	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000ca780.json	docs/compiler-abi.md; Find a name in the table of 25-byte entries at 0x13727e.; callers aca14@aca48,acac0@acb26; guest pending
 0x000ca7e0	88	rebuild_tables_ca7e0	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ca7e0.json	docs/compiler-abi.md; ; callers ba5c@baaf,bfcc@c0c1; guest pending
 0x000ca838	58	free_kind2_nodes_ca838	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000ca838.json	docs/compiler-abi.md; Unlink and free every kind-2 node of the list.; callers b0f5c@b115d,b0f5c@b1516; guest pending
-0x000ca874	391			unknown	unclassified	unverified		
+0x000ca874	391	reset_list_entries_ca874	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ca874.json	docs/compiler-abi.md; Reset the entries of the list whose head pointer is stored at HEAD1 (EAX; next link +4) except those of state 7 (byte +0; callers 49228@493f0,b0f5c@b10ac,b0f5c@b128c; guest pending
 0x000ca9fc	43	grid_index_ca9fc	list_lookup	compiles	game	confirmed	decomp/tests/0x000ca9fc.json	docs/compiler-abi.md; EAX / 40 + 10 * (EDX / 40), signed.; callers b0554@b0564,b8510@b8534,caa28@caace; guest pending
 0x000caa28	392			unknown	unclassified	unverified		
 0x000cabb0	56	translate_bytes_cabb0	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cabb0.json	docs/compiler-abi.md; Translate 400 bytes through the lookup routine at 0xcbef4.; callers 49228@494d5; guest pending
