@@ -8385,3 +8385,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xa520c` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 94fc@976f,bfcc@c1f3,cccc@cd1e | Resize widget OBJ (EAX) to the given width DX and height BX (16-bit, negative values become 0; stored at +0x45 / +0x47), |
 | `0xded86` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | dedde@def70,dedde@def87,dedde@def9d | Median of three: return whichever of A (EAX), B (EDX) and C (EBX) lies between the other two according to the comparison |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x42568` | none | none | 426a4@426e1 | Debug overlay of the 40 x 40 cell map at dword 0x12657c (nothing when NULL): every cell (row i, column j) is outlined by |

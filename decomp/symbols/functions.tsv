@@ -768,7 +768,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00042004	317			unknown	unclassified	unverified		
 0x000421c0	904			unknown	unclassified	unverified		
 0x00042548	29	ui_emit_selected_message	ui_dispatch	compiles	game	confirmed	decomp/tests/0x00042548.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
-0x00042568	314			unknown	unclassified	unverified		
+0x00042568	314	draw_cell_grid_42568	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00042568.json	docs/compiler-abi.md; Debug overlay of the 40 x 40 cell map at dword 0x12657c (nothing when NULL): every cell (row i, column j) is outlined by; callers 426a4@426e1; guest pending
 0x000426a4	477	gpwUpdateMap		named	unclassified	unverified		
 0x00042a98	107	gpwMapModeSelected		named	unclassified	unverified		
 0x00042b04	131	WarWonLostStartup		named	unclassified	unverified		

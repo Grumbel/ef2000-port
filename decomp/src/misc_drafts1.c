@@ -17087,3 +17087,30 @@ uint32_t median_of_three_ded86(uint32_t a, uint32_t b, uint32_t c, uint32_t cmp)
 		return c;
 	return b;
 }
+
+/* 0x42568, 314 bytes. Debug overlay of the 40 x 40 cell map at dword 0x12657c (nothing when NULL): every cell (row i, column j) is outlined by four lines (0xc95ac) over the 10 x 10 unit square at (10*j, 10*i), coloured with the cell's byte (value 10 is drawn as 15). */
+void draw_cell_grid_42568(void)
+{
+	int16_t i, j, y0, y1, x0, x1;
+	uint32_t colour;
+
+	if (EF_U32(0x0012657cu) == 0u)
+		return;
+	y1 = 9;
+	for (i = 0; i < 0x28; i++) {
+		y0 = (int16_t)(i * 10);
+		x1 = 9;
+		for (j = 0; j < 0x28; j++) {
+			colour = EF_U8(EF_U32(0x0012657cu) + (uint32_t)(i * 0x28 + j));
+			if (colour == 0xau)
+				colour = 0xfu;
+			x0 = (int16_t)(j * 10);
+			draw_scaled_rect_c95ac(colour, (uint32_t)(int32_t)x0, (uint32_t)(int32_t)y0, (uint32_t)(int32_t)x1, (uint32_t)(int32_t)y0);
+			draw_scaled_rect_c95ac(colour, (uint32_t)(int32_t)x1, (uint32_t)(int32_t)y0, (uint32_t)(int32_t)x1, (uint32_t)(int32_t)y1);
+			draw_scaled_rect_c95ac(colour, (uint32_t)(int32_t)x0, (uint32_t)(int32_t)y1, (uint32_t)(int32_t)x1, (uint32_t)(int32_t)y1);
+			draw_scaled_rect_c95ac(colour, (uint32_t)(int32_t)x0, (uint32_t)(int32_t)y0, (uint32_t)(int32_t)x0, (uint32_t)(int32_t)y1);
+			x1 = (int16_t)(x1 + 10);
+		}
+		y1 = (int16_t)(y1 + 10);
+	}
+}
