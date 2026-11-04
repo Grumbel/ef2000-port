@@ -3943,9 +3943,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001091fc	46	copy_line	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001091fc.json	docs/compiler-abi.md; Copy one line from EDX to EAX, consuming the newline; returns the source after it.; callers 1093d8@109405; guest pending
 0x0010922c	85			unknown	unclassified	unverified		
 0x00109284	41	skip_class_chars	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00109284.json	docs/compiler-abi.md; Advance *pointer over characters whose class-table entry (0x195af0[c+1]) has bit 2.; callers e3e50@e3e88,1092b0@1092bf,1092b0@109314; guest pending
-0x001092b0	119			unknown	unclassified	unverified		
+0x001092b0	119	parse_decimal_1092b0	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x001092b0.json	docs/compiler-abi.md; Skip blanks, parse a decimal number at *cursor, skip blanks again and store the new cursor.; callers e3e50@e3e6c,e3fbc@e3fc5; guest pending
 0x00109328	36			unknown	unclassified	unverified		
-0x0010934c	138			unknown	unclassified	unverified		
+0x0010934c	138	copy_identifier_10934c	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x0010934c.json	docs/compiler-abi.md; Skip blanks and copy an identifier (class bits 0xe0 or '_') at *cursor into dest, NUL-terminated.; callers e3f00@e3f0e; guest pending
 0x001093d8	95			unknown	unclassified	unverified		
 0x00109440	10	run_pair_109440	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00109440.json	docs/compiler-abi.md; Run 0x10944c then 0x118b60.; callers e474c@e4763; guest pending
 0x0010944c	317			unknown	unclassified	unverified		
@@ -4049,7 +4049,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001105d4	3	discard_two_1105d4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001105d4.json	docs/compiler-abi.md; Stub that discards two stack arguments.; callers none direct; guest pending
 0x00110790	156			unknown	unclassified	unverified		
 0x0011082c	101			unknown	unclassified	unverified		
-0x00110894	151			unknown	unclassified	unverified		
+0x00110894	151	decode_rle_rows_110894	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x00110894.json	docs/compiler-abi.md; Decode run-length coded rows: each row starts with a run count, each run is a signed length (negative = literal bytes, p; callers none direct; guest pending
 0x0011092c	217			unknown	unclassified	unverified		
 0x00110a08	296			unknown	unclassified	unverified		
 0x00110b30	61			unknown	unclassified	unverified		

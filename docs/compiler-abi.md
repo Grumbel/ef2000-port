@@ -4204,3 +4204,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xe83d8` | EAX:ef_addr32,EDX:ef_addr32 | none | e853c@e8545,e853c@e854e | Draw the four edges of the rectangle spanned by two 3-word points in the plane of the first point's y. |
 | `0xe853c` | EAX:ef_addr32,EDX:ef_addr32 | none | e8484@e850a | Draw a wireframe box: both rectangle outlines plus the four vertical edges. |
+
+## runtime_helpers30 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1092b0` | EAX:ef_addr32 | EAX:uint32_t | e3e50@e3e6c,e3fbc@e3fc5 | Skip blanks, parse a decimal number at *cursor, skip blanks again and store the new cursor. |
+| `0x10934c` | EAX:ef_addr32,EDX:ef_addr32 | none | e3f00@e3f0e | Skip blanks and copy an identifier (class bits 0xe0 or '_') at *cursor into dest, NUL-terminated. |
+| `0x110894` | EAX:ef_addr32,EDX:ef_addr32,BX:int16_t,CX:int16_t | none | none direct | Decode run-length coded rows: each row starts with a run count, each run is a signed length (negative = literal bytes, p |

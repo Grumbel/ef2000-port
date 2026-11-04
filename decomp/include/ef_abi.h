@@ -3748,4 +3748,9 @@ int32_t half_active_entry_count_fab80(ef_addr32 object);
 void draw_rect_outline_e83d8(ef_addr32 p, ef_addr32 q);
 void draw_box_outline_e853c(ef_addr32 p, ef_addr32 q);
 
+/* runtime_helpers30.c */
+uint32_t parse_decimal_1092b0(ef_addr32 cursor);
+void copy_identifier_10934c(ef_addr32 dest, ef_addr32 cursor);
+void decode_rle_rows_110894(ef_addr32 src, ef_addr32 dst, int16_t stride, int16_t rows);
+
 #endif
