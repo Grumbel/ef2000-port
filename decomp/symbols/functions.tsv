@@ -1283,7 +1283,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006abac	331			unknown	unclassified	unverified		
 0x0006ae30	130	indexed_object_has_grid_link	scene_indexed	compiles	game	confirmed	decomp/tests/0x0006ae30.json	docs/compiler-abi.md
 0x0006aeb4	1165			unknown	unclassified	unverified		
-0x0006b344	137			unknown	unclassified	unverified		
+0x0006b344	137	unit_owner_update_6b344	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006b344.json	docs/compiler-abi.md; For unit id, look up its object; if the table entry (0xca bytes at 0x19bb58) of the object's owner still points back at ; callers 6c488@6c702; guest pending
 0x0006b3d0	79	object_kind_is_eligible	object_geometry	compiles	game	confirmed	decomp/tests/0x0006b3d0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0006b420	35	record_mode_is_four	marker_packets	compiles	game	confirmed	decomp/tests/0x0006b420.json	docs/compiler-abi.md; AL=1 iff byte 0x128568+0xe5*AL equals 4; sole direct caller 6d948@6dae4,6d948@6dbf1,6d948@6de22; guest pending
 0x0006b444	104	notify_unit_6b444	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0006b444.json	docs/compiler-abi.md; ; callers 242b8@2439d; guest pending
@@ -2723,7 +2723,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c1ba8	30	list_nth_word	list_lookup	compiles	game	confirmed	decomp/tests/0x000c1ba8.json	docs/compiler-abi.md; Node number AX of the list at *EDX (16-bit compare), or 0.; callers 9b2a4@9b4ae; guest pending
 0x000c1bd0	76	byte_swap32_c1bd0	game_helpers86	compiles	game	confirmed	decomp/tests/0x000c1bd0.json	docs/compiler-abi.md; Reverse the byte order of a 32-bit word (xor-swap sequence).; callers c1c24@c1c6a; guest pending
 0x000c1c24	151			unknown	unclassified	unverified		
-0x000c1e3c	136			unknown	unclassified	unverified		
+0x000c1e3c	136	decode_rle_rows_c1e3c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c1e3c.json	docs/compiler-abi.md; Decode a PackBits-style run-length stream at the pointer 0x41f3a0 into dst: rows (byte 0x146e34) of width 0x146e38; cont; callers c3584@c3614,c3584@c362a; guest pending
 0x000c1ee8	4139			unknown	unclassified	unverified		
 0x000c2f80	125	fill_bit_pattern_table_c2f80	game_helpers88	compiles	game	confirmed	decomp/tests/0x000c2f80.json	docs/compiler-abi.md; Fill a 512-byte table: for each of the 8 bit values and 16 nibble patterns write four bytes (the bit value where the pat; callers c3584@c3608; guest pending
 0x000c32dc	76	alloc_work_block_c32dc	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000c32dc.json	docs/compiler-abi.md; Allocate the work block from either pool depending on its size.; callers c3430@c345c; guest pending

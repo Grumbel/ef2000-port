@@ -59,3 +59,59 @@ void draw_mode_dispatch_a8660(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t
         guest_fn_a8578_x((uint32_t)(int32_t)(int16_t)x, (uint32_t)(int32_t)(int16_t)ebx, col, eax);
     }
 }
+
+/* 0xc1e3c, 136 bytes. Decode a PackBits-style run-length stream at the pointer 0x41f3a0 into dst: rows (byte 0x146e34) of width 0x146e38; control byte >= 0 copies n+1 literals, negative repeats the next byte -n+1 times (-128 is a no-op). */
+void decode_rle_rows_c1e3c(uint32_t dst)
+{
+    int32_t row;
+    for (row = 0; (int32_t)EF_U8(0x00146e34u) > row; row++) {
+        int32_t done = 0;
+        do {
+            uint32_t p = EF_U32(0x0041f3a0u);
+            int32_t n = (int32_t)(int8_t)EF_U8(p);
+            p++;
+            EF_U32(0x0041f3a0u) = p;
+            if (n >= 0) {
+                n++;
+                guest_fn_e9a24((uint32_t)n, p, dst);
+                EF_U32(0x0041f3a0u) = EF_U32(0x0041f3a0u) + (uint32_t)n;
+                done += n;
+                dst += (uint32_t)n;
+            } else {
+                n = -n;
+                if (n < 0x80) {
+                    n++;
+                    p++;
+                    EF_U32(0x0041f3a0u) = p;
+                    fill_bytes_b3fb0(dst, EF_U8(p - 1u), (uint32_t)n);
+                    done += n;
+                    dst += (uint32_t)n;
+                }
+            }
+        } while (done < (int32_t)EF_U32(0x00146e38u));
+    }
+}
+
+/* 0x6b344, 137 bytes. For unit id, look up its object; if the table entry (0xca bytes at 0x19bb58) of the object's owner still points back at the unit, enable the owner's grid link and slot, otherwise call 0x46254 with the current owner's word at +0x50. */
+void unit_owner_update_6b344(uint32_t unit)
+{
+    int32_t id = (int32_t)(int16_t)unit;
+    ef_addr32 obj = lookup_filtered_indexed_object((int16_t)id);
+    uint32_t tbl;
+    int16_t idx;
+    if (obj == 0u)
+        return;
+    idx = EF_S16(obj + 0x28u);
+    tbl = EF_U32(0x0019bb58u);
+    if ((uint32_t)EF_U16(tbl + (uint32_t)((int32_t)idx * 0xca) + 0x50u) == (uint32_t)id) {
+        set_grid_link_state(idx, 2);
+        enable_grid_slot_state(idx);
+        enable_grid_slot_activation(idx);
+        return;
+    }
+    {
+        int16_t idx2 = EF_S16(EF_U32(0x001f71bcu) + 0x28u);
+        int32_t w = (int32_t)EF_S16(tbl + (uint32_t)((int32_t)idx2 * 0xca) + 0x50u);
+        guest_fn_46254((uint32_t)id, w, 0x1bu, 0u, 0u, 0u);
+    }
+}

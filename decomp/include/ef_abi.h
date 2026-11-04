@@ -4442,4 +4442,7 @@ void guest_fn_a8578_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
 
 
 
+void decode_rle_rows_c1e3c(uint32_t dst);
+void unit_owner_update_6b344(uint32_t unit);
+
 #endif
