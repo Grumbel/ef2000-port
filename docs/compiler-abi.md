@@ -5033,3 +5033,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11092c` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:ef_addr32 | none | none direct | Decode run-length sprite data from src up to end into the byte image at dst with the given row stride. Each block holds  |
+
+## tactical_marks1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x74ed8` | EAX:uint32_t,EDX:uint32_t | none | 2a4c8@2a669,74970@74d28 | Randomly raise the twelve 0..100 counters (+0x18e) of the object found for key by up to n, redrawing its entries first w |

@@ -157,3 +157,25 @@ void set_clip_and_shade_c9238(uint32_t a, uint32_t b, uint32_t c, uint32_t d, ui
     EF_U32(0x00159080u) = 0x0041f3f0u + (shade & 0xffu) * 4u;
     guest_fn_c4b95_x(0x0015b5fcu);
 }
+
+/* 0x74ed8, 219 bytes. Randomly raise the twelve 0..100 counters (+0x18e) of the object found for key by up to n, redrawing its entries first when the counter is zero and the object is not flagged 4 or 8. */
+void raise_random_counters_74ed8(uint32_t key, uint32_t n)
+{
+    ef_addr32 obj = guest_fn_7489c((int32_t)(int16_t)key);
+    uint32_t j;
+    if (obj == 0u || (int16_t)n <= 0)
+        return;
+    for (j = 0; j < 12u; j++) {
+        uint32_t rem2, add, v;
+        if ((half_word_9c960() & 0xffffu) % 2u == 0u)
+            continue;
+        if (!(EF_U8(obj + 0x24u) & 4u) && !(EF_U8(obj + 0x24u) & 8u) && EF_U8(obj + j + 0x18eu) == 0u)
+            draw_object_entries_46168((uint32_t)(int32_t)(int16_t)key, (uint32_t)(int32_t)EF_S16(0x00128524u + j * 2u), 0u, 0u, 0u);
+        rem2 = (half_word_9c960() & 0xffffu);
+        add = rem2 % (uint32_t)(int32_t)(int16_t)n;
+        v = (uint8_t)(EF_U8(obj + j + 0x18eu) + add);
+        EF_U8(obj + j + 0x18eu) = (uint8_t)v;
+        if (v > 100u)
+            EF_U8(obj + j + 0x18eu) = 100u;
+    }
+}

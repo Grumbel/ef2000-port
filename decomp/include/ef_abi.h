@@ -4304,4 +4304,6 @@ void visit_overlapping_nodes_e2564(ef_addr32 obj);
 
 void decode_rle_image_11092c(ef_addr32 src, ef_addr32 dst, uint32_t stride, ef_addr32 end);
 
+void raise_random_counters_74ed8(uint32_t key, uint32_t n);
+
 #endif

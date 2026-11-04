@@ -1368,7 +1368,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000748f4	107	send_or_defer_748f4	game_helpers32	compiles	game	confirmed	decomp/tests/0x000748f4.json	docs/compiler-abi.md; Send unit parameters when a remote unit is selected, otherwise defer to 0x74970.; callers 777f4@77901,777f4@7792f,8cd78@8cee9; guest pending
 0x00074970	1063			unknown	unclassified	unverified		
 0x00074d98	320			unknown	unclassified	unverified		
-0x00074ed8	219			unknown	unclassified	unverified		
+0x00074ed8	219	raise_random_counters_74ed8	tactical_marks1	compiles	game	confirmed	decomp/tests/0x00074ed8.json	docs/compiler-abi.md; Randomly raise the twelve 0..100 counters (+0x18e) of the object found for key by up to n, redrawing its entries first w; callers 2a4c8@2a669,74970@74d28; guest pending
 0x00074fb4	794			unknown	unclassified	unverified		
 0x000752d0	113	load_waypoint_752d0	game_helpers9	compiles	game	confirmed	decomp/tests/0x000752d0.json	docs/compiler-abi.md; Copy the waypoint selected by the unit's index into the unit.; callers 6a1d0@6a2c9,6a1d0@6a2d5; guest pending
 0x00075344	327			unknown	unclassified	unverified		
