@@ -5861,4 +5861,7 @@ uint32_t advance_to_nearby_object_6aa70(uint32_t ax);
 
 uint32_t pick_nearest_candidate_6a8fc(uint32_t ax);
 
+void apply_selection_69374(ef_addr32 first, ef_addr32 second);
+void guest_fn_68a60_x(int32_t a, int32_t b); /* 0x68a60 EAX/EDX */
+
 #endif

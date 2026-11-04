@@ -8314,3 +8314,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6a8fc` | EAX:uint32_t | EAX:uint32_t | 6aeb4@6b260 | Choose the nearest valid candidate in the eight-entry candidate list (words at +0x12b, 2 bytes apart; 0xff means empty)  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x69374` | EAX:ef_addr32,EDX:ef_addr32 | none | 69740@698e9 | Variant of 0x69540 that acts on the selection: latches the same two position triples into the cursor state (the latch is |

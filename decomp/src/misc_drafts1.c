@@ -16469,3 +16469,54 @@ uint32_t pick_nearest_candidate_6a8fc(uint32_t ax)
 	}
 	return found ? 1u : 0u;
 }
+
+/* 0x69374, 458 bytes. Variant of 0x69540 that acts on the selection: latches the same two position triples into the cursor state (the latch is unconditional here), and when 0xd0470 for the unit in the high half of dword 0x1282da returns 1 and the selection index from 0xcd24c (dword 0x1282e0) is valid and 0x68ccc accepts (high halves of 0x1f6f48 and 0x1282de): with word 0x1282d8 set and the first slot equal to 0x1d (and 0x1e accepted too) run 0x68a60 on the target with word 0x1f6f4a temporarily set to 0x1e and the high half of dword 0x12cd86, otherwise on the target with the dword at 0x12bc88 + 145 * slot (high half) and return; with word 0x1282d8 clear, or when 0x68ccc rejected, clear the paired object marks (0x68c18) of the target if word 0x1282da is nonzero. Dword 0x1282e0 is reset to -1. */
+void apply_selection_69374(ef_addr32 first, ef_addr32 second)
+{
+	int32_t a0, a1, a2, b0, b1, b2, idx, slot, tgt;
+
+	a0 = (int16_t)EF_U16(first);
+	a1 = (int16_t)EF_U16(first + 2u);
+	a2 = (int16_t)EF_U16(first + 4u);
+	b0 = (int16_t)EF_U16(second);
+	b1 = (int16_t)EF_U16(second + 2u);
+	b2 = (int16_t)EF_U16(second + 4u);
+	EF_U32(0x00420910u) = (uint32_t)a0;
+	EF_U32(0x00420918u) = (uint32_t)a2;
+	EF_U32(0x00420914u) = (uint32_t)b0;
+	EF_U32(0x00420908u) = (uint32_t)b1;
+	EF_U32(0x0042091cu) = (uint32_t)b2;
+	EF_U16(0x00420930u) = (uint16_t)a0;
+	EF_U16(0x00420932u) = (uint16_t)a1;
+	EF_U16(0x00420934u) = (uint16_t)a2;
+	EF_U16(0x00420936u) = (uint16_t)b0;
+	EF_U16(0x00420938u) = (uint16_t)b1;
+	EF_U16(0x0042093au) = (uint16_t)b2;
+	EF_U32(0x00420904u) = (uint32_t)a1;
+	if (guest_fn_d0470((int32_t)EF_U32(0x001282dau) >> 16, 0, 0, 0) != 1u)
+		return;
+	idx = (int16_t)guest_fn_cd24c_x();
+	EF_U32(0x001282e0u) = (uint32_t)idx;
+	if (idx == -1)
+		return;
+	slot = (int32_t)EF_U32(0x001f6f48u) >> 16;
+	tgt = (int32_t)EF_U32(0x001282deu) >> 16;
+	if ((guest_fn_68ccc((int16_t)slot, (uint16_t)tgt) & 0xffu) != 0u) {
+		if (EF_U16(0x001282d8u) != 0u) {
+			if (slot == 0x1d && (guest_fn_68ccc(0x1e, (uint16_t)tgt) & 0xffu) != 0u) {
+				EF_U16(0x001f6f4au) = 0x1eu;
+				guest_fn_68a60_x(tgt, (int32_t)EF_U32(0x0012cd86u) >> 16);
+				EF_U16(0x001f6f4au) = 0x1du;
+			} else {
+				guest_fn_68a60_x(tgt, (int32_t)EF_U32((uint32_t)slot * 145u + 0x0012bc88u) >> 16);
+				EF_U32(0x001282e0u) = 0xffffffffu;
+				return;
+			}
+		} else if (EF_U16(0x001282dau) != 0u) {
+			clear_paired_object_marks((int16_t)tgt);
+		}
+	} else if (EF_U16(0x001282dau) != 0u) {
+		clear_paired_object_marks((int16_t)tgt);
+	}
+	EF_U32(0x001282e0u) = 0xffffffffu;
+}
