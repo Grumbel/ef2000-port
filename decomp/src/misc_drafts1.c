@@ -19305,3 +19305,30 @@ void report_nearest_object_39edc(uint32_t a, uint32_t b)
 	               (int32_t)((int32_t)EF_U32(rows + found * 0xcau + 0x4eu) >> 16), 0x64u, (uint32_t)ib,
 	               (uint32_t)(int32_t)(int16_t)angle, (uint32_t)(int32_t)(int16_t)d);
 }
+
+/* 0x85420, 292 bytes. Return 1 when unit row UNIT (AX; rows of 0xca bytes at dword 0x19bb58) is within reach of its target: the flat distance between the row position (+0x61) and the map point taken from the two scaled words of its type (+0x5f indexes 34-byte entries at dword 0x1972e0, words +6/+0xa) divided by the class (+0x19, 0xe5-byte records at 0x128591) value is below half of (+0x99 / the 0x2ccf0 estimate). Rows whose +0x20 is 1 first get their grid limit recomputed (0x2e08c). */
+uint8_t row_within_reach_85420(int32_t unit)
+{
+	int32_t u = (int32_t)(int16_t)unit;
+	ef_addr32 rows = EF_U32(0x0019bb58u);
+	ef_addr32 row = rows + (uint32_t)(u * 0xca);
+	uint32_t t = EF_U8(row + 0x5fu);
+	double vec[3], dist, x, a, b, c99, cls;
+	uint32_t cl;
+
+	vec[0] = word_to_scaled_b4230((int16_t)((int32_t)EF_U32(EF_U32(0x001972e0u) + t * 34u + 0xau) >> 16));
+	vec[1] = word_to_scaled_b4230((int16_t)((int32_t)EF_U32(EF_U32(0x001972e0u) + t * 34u + 6u) >> 16));
+	vec[2] = 0.0;
+	dist = distance_2d_b415c(row + 0x61u, (ef_addr32)(uintptr_t)vec);
+	if (EF_U8(row + 0x20u) == 1u)
+		recompute_grid_limit(u);
+	rows = EF_U32(0x0019bb58u);
+	row = rows + (uint32_t)(u * 0xca);
+	cl = EF_U8(row + 0x19u);
+	memcpy(&a, ef_guest_memory_ptr(row + 0x71u), 8);
+	memcpy(&b, ef_guest_memory_ptr(0x00128591u + cl * 0xe5u), 8);
+	memcpy(&c99, ef_guest_memory_ptr(row + 0x99u), 8);
+	x = c99 / guest_fn_2ccf0_x(u, a, b);
+	cls = b;
+	return (x * 0.5 > dist / cls) ? 1u : 0u;
+}

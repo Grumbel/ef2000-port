@@ -8722,3 +8722,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x85420` | EAX:int32_t | AL:uint8_t | 857bc@85962 | Return 1 when unit row UNIT (AX; rows of 0xca bytes at dword 0x19bb58) is within reach of its target: the flat distance  |

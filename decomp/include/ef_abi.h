@@ -6021,4 +6021,7 @@ void report_nearest_object_39edc(uint32_t a, uint32_t b);
 
 
 
+uint8_t row_within_reach_85420(int32_t unit);
+double guest_fn_2ccf0_x(int32_t unit, double a, double b); /* 0x2ccf0 AX, two stack doubles (ret 0x10) -> ST0 */
+
 #endif

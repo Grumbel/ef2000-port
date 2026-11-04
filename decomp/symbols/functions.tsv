@@ -1679,7 +1679,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00085358	38	decrement_grid_activity	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00085358.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00085380	104	drain_kind_two_chain_85380	search_helpers1	compiles	game	confirmed	decomp/tests/0x00085380.json	docs/compiler-abi.md; While the owner record has an active chain (byte +0x8e) whose last 0x19-byte entry has kind 2, run 0x85358.; callers 857bc@85883; guest pending
 0x00085400	31	decrement_grid_row_link	misc_state	compiles	game	confirmed	decomp/tests/0x00085400.json	docs/compiler-abi.md; row[0x8e]=row[0x8f]-1 for grid row AX; callers 857bc@85954,857bc@8599a; guest pending
-0x00085420	292			unknown	unclassified	unverified		
+0x00085420	292	row_within_reach_85420	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00085420.json	docs/compiler-abi.md; Return 1 when unit row UNIT (AX; rows of 0xca bytes at dword 0x19bb58) is within reach of its target: the flat distance ; callers 857bc@85962; guest pending
 0x0008557c	73	owner_has_weight_8557c	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0008557c.json	docs/compiler-abi.md; Return 0 when the owner has no weight of the class implied by its type byte (+0x1b: filter 1 for types 0-2, 9, 13; filte; callers 857bc@85949; guest pending
 0x000855c8	57	grid_clock_reaches_reference	record_callers	compiles	game	confirmed	decomp/tests/0x000855c8.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00085604	410			unknown	unclassified	unverified		
