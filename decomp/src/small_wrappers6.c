@@ -60,3 +60,32 @@ void run_with_hook_9e094(uint32_t value, uint32_t u1, uint32_t u2, uint32_t u3, 
     guest_fn_9e0c4_x((int32_t)(int16_t)value);
     EF_U32(0x00132b14u) = 0x0016010eu;
 }
+
+/* 0xb1bf8, 57 bytes. Print the two status lines (0x1264e2; 0x1a364c and 0x1a364b) to a handle. */
+void print_status_lines_b1bf8(uint32_t handle)
+{
+    print_to_handle_b1bb0(handle, 0x0018de34u, (uint32_t)EF_U8(0x001264e2u));
+    print_to_handle_b1bb0(handle, 0x0018de44u, (uint32_t)EF_U8(0x001a364cu), (uint32_t)EF_U8(0x001a364bu));
+}
+
+/* 0xb3374, 56 bytes. Format a message from the global at 0x197674, the argument and the latch value, and pass it to 0xcc744. */
+void report_message_b3374(uint32_t value)
+{
+    uint8_t buf[0xc8];
+    uint32_t latched = latch_and_forward_b33ac();
+    guest_sprintf_a4342((uint32_t)(uintptr_t)buf, 0x0018e5d0u, EF_U32(0x00197674u), value, latched);
+    alloc_checked_cc744((uint32_t)(uintptr_t)buf);
+}
+
+/* 0x65a50, 56 bytes. Dispatch on the mode byte at 0x1282c5 (0..8) to the matching refresh routine, then flag the display dirty. */
+void refresh_for_mode_65a50(void)
+{
+    switch (EF_U8(0x001282c5u)) {
+    case 0: case 1: case 6: guest_fn_65a88_x(); break;
+    case 2: store_631bc_65d18(); break;
+    case 7: guest_fn_65d24_x(); break;
+    case 8: guest_fn_65c1c_x(); break;
+    default: break;
+    }
+    EF_U8(0x001a8246u) = 1u;
+}

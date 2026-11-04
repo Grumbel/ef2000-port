@@ -4328,4 +4328,11 @@ void run_with_hook_9e094(uint32_t value, uint32_t u1, uint32_t u2, uint32_t u3, 
 void guest_fn_11b134_x(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3); /* 0x11b134 four stack arguments, callee cleanup */
 void guest_fn_9e0c4_x(int32_t value); /* 0x9e0c4 EAX */
 
+void print_status_lines_b1bf8(uint32_t handle);
+void report_message_b3374(uint32_t value);
+void refresh_for_mode_65a50(void);
+void guest_fn_65a88_x(void); /* 0x65a88 no arguments */
+void guest_fn_65d24_x(void); /* 0x65d24 no arguments */
+void guest_fn_65c1c_x(void); /* 0x65c1c no arguments */
+
 #endif

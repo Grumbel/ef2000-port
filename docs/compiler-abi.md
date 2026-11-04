@@ -5073,3 +5073,11 @@ in EAX, format string address, one value).
 | `0x109328` | EAX:ef_addr32,EDX:uint32_t | none | e3e50@e3e7c,e3f00@e3f1c | Check that the byte at *cursor equals expected (printing a message through 0x132a74 if not) and advance the cursor. |
 | `0x11b1b0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | 11b6bc@11b6eb,11b6bc@11b71c,11bb80@11bb9e | Forward four stack arguments to 0x11b134. |
 | `0x9e094` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 8e5f0@8e639 | Run 0x9e0c4 with the hook at 0x132b14 pointing to 0x9e08c and the stack argument saved at 0x41714c, then restore the def |
+
+## small_wrappers6 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb1bf8` | EAX:uint32_t | none | b3084@b3099 | Print the two status lines (0x1264e2; 0x1a364c and 0x1a364b) to a handle. |
+| `0xb3374` | EAX:uint32_t | none | b3084@b30e3,b3084@b3101,b3084@b311f | Format a message from the global at 0x197674, the argument and the latch value, and pass it to 0xcc744. |
+| `0x65a50` | none | none | 66548@665b7,66548@66689,66548@666b2 | Dispatch on the mode byte at 0x1282c5 (0..8) to the matching refresh routine, then flag the display dirty. |
