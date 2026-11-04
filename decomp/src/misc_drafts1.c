@@ -3538,3 +3538,30 @@ uint32_t dos_range_1048b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ui
     intdos_2b0((uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out);
     return out[6] == 0u;
 }
+
+/* 0x9e508, 175 bytes. Run the INDEXth text of the page PAGE: select the page (word 0x41722a, record 0x417174 from the id lookup, table entry 0x41717c from the table at 0x40d200), and when INDEX is below the page's text count (byte +8) run 0x9e7bc on the text at offset-table entry INDEX (6-byte records after +0xa) with the handler 0xa0b5c in 0x417178. The previous page state is restored afterwards. */
+void run_page_text_9e508(int32_t page, uint32_t index)
+{
+    uint16_t saved_page = EF_U16(0x0041722au);
+    uint32_t saved_rec = EF_U32(0x00417174u);
+    uint32_t saved_handler = EF_U32(0x00417178u);
+    uint32_t saved_table = EF_U32(0x0041717cu);
+    uint32_t rec;
+    uint32_t table;
+    uint32_t p;
+    EF_U16(0x0041722au) = (uint16_t)page;
+    rec = guest_fn_b3f58((int16_t)page);
+    EF_U32(0x00417174u) = rec;
+    table = EF_U32(0x0040d200u + (uint32_t)EF_U16(rec) * 4u);
+    EF_U32(0x0041717cu) = table;
+    if ((index & 0xffffu) < (uint32_t)EF_U8(table + 8u)) {
+        EF_U32(0x00417178u) = 0x000a0b5cu;
+        p = (uint32_t)EF_U8(table + 9u) * 6u + (table + 0xau) + (uint32_t)(int32_t)(int16_t)index * 2u;
+        p += (uint32_t)((int32_t)(int16_t)EF_U16(p) * 2);
+        guest_fn_9e7bc_x(p);
+    }
+    EF_U16(0x0041722au) = saved_page;
+    EF_U32(0x00417174u) = saved_rec;
+    EF_U32(0x00417178u) = saved_handler;
+    EF_U32(0x0041717cu) = saved_table;
+}

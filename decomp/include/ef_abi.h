@@ -4768,4 +4768,6 @@ uint32_t dos_range_1048b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ui
 void guest_fn_1101e8_x(uint32_t a); /* 0x1101e8 EAX */
 void guest_dos_intdos_x(uint32_t in, uint32_t out, uint32_t sregs); /* int 21h without storing the flags */
 
+void run_page_text_9e508(int32_t page, uint32_t index);
+
 #endif

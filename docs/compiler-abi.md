@@ -5827,3 +5827,9 @@ in EAX, format string address, one value).
 | `0x2b0` | EAX:uint32_t,EDX:uint32_t | none | 324@33b,3d0@3ee,880@892 | intdos: run DOS interrupt 0x21 with the registers from the block IN (EAX, EBX, ECX, EDX, ESI, EDI at +0..+0x14) and the  |
 | `0x104840` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 101a90@101aaa,103d80@103d96,104908@104914 | Run DOS service 0x252b / 0x501 over the address range [min(FIRST, LAST), max(...)] (cdecl). Returns 1 when the carry fla |
 | `0x1048b4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 103d48@103d5e,1046c4@1046da,104920@10492c | Like 0x104840 for the service 0x252b / 0x61, issued through intdos (0x2b0). ORIGINAL BUG: 0x2b0 does not store the carry |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9e508` | EAX:int32_t,EDX:uint32_t | none | 9820@9ae3,17754@178ad,1cde8@1ce2a | Run the INDEXth text of the page PAGE: select the page (word 0x41722a, record 0x417174 from the id lookup, table entry 0 |
