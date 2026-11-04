@@ -2185,7 +2185,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a37c4	31			unknown	unclassified	unverified		
 0x000a37e4	31			unknown	unclassified	unverified		
 0x000a3804	31			unknown	unclassified	unverified		
-0x000a3824	164			unknown	unclassified	unverified		
+0x000a3824	164	dispatch_entry_ratio_a3824	float_helpers6	compiles	game	confirmed	decomp/tests/0x000a3824.json	docs/compiler-abi.md; Dispatch on the balance ratio of a table entry.; callers a33a4@a33e6; guest pending
 0x000a38c8	48	clear_tables_a38c8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a38c8.json	docs/compiler-abi.md; clear 8 words 0x1357d8, 8 words 0x13580a, 8 dwords 0x1357e8; callers a3c18@a3d81; guest pending
 0x000a38f8	225			unknown	unclassified	unverified		
 0x000a39ec	36	check_name_a39ec	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a39ec.json	docs/compiler-abi.md; Abort unless the stored name matches the expected one.; callers a3c18@a3c47; guest pending
@@ -2455,8 +2455,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b04e8	107			unknown	unclassified	unverified		
 0x000b0554	69	list_has_match_b0554	runtime_helpers11	compiles	game	confirmed	decomp/tests/0x000b0554.json	docs/compiler-abi.md; True when the list holds a node with the same two keys and the hash of b.; callers b059c@b0637; guest pending
 0x000b059c	236			unknown	unclassified	unverified		
-0x000b0718	156			unknown	unclassified	unverified		
-0x000b07b4	156			unknown	unclassified	unverified		
+0x000b0718	156	match_ratio_b0718	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b0718.json	docs/compiler-abi.md; Ratio of listed entries of kind 1 or 2 to all matching entries.; callers b0c34@b0c64; guest pending
+0x000b07b4	156	match_ratio_b07b4	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b07b4.json	docs/compiler-abi.md; Same ratio using the second matching predicate.; callers b0c9c@b0ccd; guest pending
 0x000b0850	260	count_filtered_node_matches	unk_records	typed	game	confirmed		ABI only; AL mode, EBX list head, EDX filter list, EAX count
 0x000b0954	427	count_positive_filtered_node_matches	unk_records	typed	game	confirmed		ABI only; AL mode, EBX source head, EDX filter head, EAX count
 0x000b0b00	306			unknown	unclassified	unverified		
@@ -2539,11 +2539,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b42b0	63	sign_double_b42b0	float_helpers5	compiles	game	confirmed	decomp/tests/0x000b42b0.json	docs/compiler-abi.md; Sign of a double as +1.0 or -1.0 (zero gives -1.0).; callers 1db08@1db8b,5f698@5f6e0; guest pending
 0x000b42f0	113	wrap_angle_b42f0	float_helpers5	compiles	game	confirmed	decomp/tests/0x000b42f0.json	docs/compiler-abi.md; Wrap an angle in degrees into its canonical range.; callers 7e44@7eac,81ec@824a,8394@83f0; guest pending
 0x000b4364	118	vector_length_b4364	float_helpers5	compiles	game	confirmed	decomp/tests/0x000b4364.json	docs/compiler-abi.md; Length of a 3D vector of doubles, 0.0 when degenerate.; callers 1d954@1dad2,772d0@77465,8a1dc@8a222; guest pending
-0x000b43dc	21			unknown	unclassified	unverified		
+0x000b43dc	21	dot_product_b43dc	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b43dc.json	docs/compiler-abi.md; Dot product of two 3D double vectors.; callers 88ff8@88ffe,b4468@b4479,119f88@11a2d2; guest pending
 0x000b43f4	47	cross_product_doubles	list_helpers	compiles	game	confirmed	decomp/tests/0x000b43f4.json	docs/compiler-abi.md; Cross product EDX x EBX into EAX (three doubles each).; callers 74d98@74e03,89fbc@89fe2,89fbc@8a005; guest pending
-0x000b4424	68			unknown	unclassified	unverified		
-0x000b4468	50			unknown	unclassified	unverified		
-0x000b449c	49			unknown	unclassified	unverified		
+0x000b4424	68	normalize_vector_b4424	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b4424.json	docs/compiler-abi.md; Normalise a 3D vector into out; false when it is too short.; callers 28b80@28d50,28b80@28d70,29b14@29c69; guest pending
+0x000b4468	50	project_vector_b4468	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b4468.json	docs/compiler-abi.md; Projection of a vector onto the unit direction of another.; callers b449c@b44a7; guest pending
+0x000b449c	49	reject_vector_b449c	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b449c.json	docs/compiler-abi.md; Component of a vector perpendicular to a direction.; callers 119f88@11a2af; guest pending
 0x000b44d0	25	add_vectors_doubles	list_helpers	compiles	game	confirmed	decomp/tests/0x000b44d0.json	docs/compiler-abi.md; out = a + b for three doubles (EDX + EBX into EAX).; callers 11c350@11c395,11c584@11c623; guest pending
 0x000b44ec	25	sub_vectors_doubles	list_helpers	compiles	game	confirmed	decomp/tests/0x000b44ec.json	docs/compiler-abi.md; out = a - b for three doubles (EDX - EBX into EAX).; callers 8e940@8e9f6,e6990@e69a9; guest pending
 0x000b4508	71			unknown	unclassified	unverified		
@@ -2552,7 +2552,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b45ac	10			unknown	unclassified	unverified		
 0x000b45b6	44			unknown	unclassified	unverified		
 0x000b45fa	21			unknown	unclassified	unverified		
-0x000b4620	91			unknown	unclassified	unverified		
+0x000b4620	91	atan2_b4620	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b4620.json	docs/compiler-abi.md; Two-argument arctangent (y, x); 0.0 when both are zero.; callers 8394@83e1,1d844@1d89b,1dc20@1de39; guest pending
 0x000b47e4	437			unknown	unclassified	unverified		
 0x000b49b4	288			unknown	unclassified	unverified		
 0x000b4aec	306			unknown	unclassified	unverified		
@@ -2891,7 +2891,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cbef4	12	code_if_one_to_four	code_predicates	compiles	game	confirmed	decomp/tests/0x000cbef4.json	docs/compiler-abi.md; AL if it is 1..4, else 0.; callers cabb0@cabd0; guest pending
 0x000cbf00	30	release_pointer_1379c8	code_predicates	compiles	game	confirmed	decomp/tests/0x000cbf00.json	docs/compiler-abi.md; Release dword 0x1379c8 through 0xcc768 when set, then clear it.; callers b0f5c@b1684,b1b10@b1b84; guest pending
 0x000cbf20	126			unknown	unclassified	unverified		
-0x000cbfa0	79			unknown	unclassified	unverified		
+0x000cbfa0	79	default_range_cbfa0	float_helpers6	compiles	game	confirmed	decomp/tests/0x000cbfa0.json	docs/compiler-abi.md; Default range of an object: 400 for kinds 1 and 3, else 300.; callers cbff0@cc091; guest pending
 0x000cbff0	370			unknown	unclassified	unverified		
 0x000cc164	36	mark_list_entry_9c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc164.json	docs/compiler-abi.md; In list EBX node number AL, set byte [dword +0xc + DL] * to 0x9c and byte [dword +0x10 + DL] to 0x7f.; callers c0b04@c0eac,c0b04@c0ee1,cb6fc@cb7c2; guest pending
 0x000cc188	36	mark_list_entry_64	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc188.json	docs/compiler-abi.md; As 0xcc164 with the value 0x64.; callers c0b04@c0d0a,c0b04@c0d1d,c0b04@c0d52; guest pending
@@ -2959,8 +2959,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ce02c	54	mouse_read_motion_ce02c	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ce02c.json	docs/compiler-abi.md; Mouse function 0xb: read motion counters into two outputs.; callers 121f0@121fa,ac16c@ac1ce,ac854@ac87e; guest pending
 0x000ce064	39	mouse_read_buttons_ce064	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ce064.json	docs/compiler-abi.md; Mouse function 3: button state.; callers 278c0@27b32,278c0@27bc8,27d18@27eb6; guest pending
 0x000ce08c	6	get_global_ce08c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000ce08c.json	docs/compiler-abi.md; ; callers 8b39c@8b481,ac854@ac8aa; guest pending
-0x000ce0b0	25			unknown	unclassified	unverified		
-0x000ce0cc	25			unknown	unclassified	unverified		
+0x000ce0b0	25	scale_view_x_ce0b0	float_helpers6	compiles	game	confirmed	decomp/tests/0x000ce0b0.json	docs/compiler-abi.md; Scale a value relative to the horizontal viewport origin and size.; callers ce268@ce27b,ce268@ce29e,ce268@ce2c2; guest pending
+0x000ce0cc	25	scale_view_y_ce0cc	float_helpers6	compiles	game	confirmed	decomp/tests/0x000ce0cc.json	docs/compiler-abi.md; Scale a value relative to the vertical viewport origin and size.; callers ce268@ce28c,ce268@ce2b0,ce268@ce2d9; guest pending
 0x000ce0e8	383			unknown	unclassified	unverified		
 0x000ce268	190			unknown	unclassified	unverified		
 0x000ce328	44	latch_values_ce328	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ce328.json	docs/compiler-abi.md; Latch four values and the current pair at 0x15b744/0x15b748.; callers 1e480@1e4a7,1e7c0@1e8d5,1f0fc@1f1de; guest pending

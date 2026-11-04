@@ -3061,4 +3061,23 @@ void guest_fn_ea9a0(ef_addr32 out, int32_t a, int32_t b, int32_t c); /* 0xea9a0 
 void guest_fn_a558c(ef_addr32 record); /* 0xa558c EAX */
 double guest_fn_b3fd0(double value); /* 0xb3fd0 stack -> ST0 */
 
+/* float_helpers6.c */
+void dispatch_entry_ratio_a3824(uint8_t index);
+double match_ratio_b0718(uint8_t type, uint32_t arg, ef_addr32 listp);
+double match_ratio_b07b4(uint8_t type, uint32_t arg, ef_addr32 listp);
+double dot_product_b43dc(ef_addr32 a, ef_addr32 b);
+uint8_t normalize_vector_b4424(ef_addr32 out, ef_addr32 in);
+void project_vector_b4468(ef_addr32 out, ef_addr32 dir, ef_addr32 vec);
+void reject_vector_b449c(ef_addr32 out, ef_addr32 dir, ef_addr32 vec);
+double atan2_b4620(double y, double x);
+int32_t default_range_cbfa0(ef_addr32 object);
+double scale_view_x_ce0b0(float value, float factor);
+double scale_view_y_ce0cc(float value, float factor);
+void guest_fn_a3804(uint32_t kind); /* 0xa3804 EAX */
+void guest_fn_a37c4(uint32_t kind); /* 0xa37c4 EAX */
+void guest_fn_a37e4(uint32_t kind); /* 0xa37e4 EAX */
+uint32_t guest_fn_cc1ac(uint32_t a, uint32_t b, uint32_t c); /* 0xcc1ac EAX/EDX/EBX -> AX */
+uint32_t guest_fn_cc22c(uint32_t a, uint32_t b, uint32_t c); /* 0xcc22c EAX/EDX/EBX -> AX */
+double guest_fn_dc1e9(double a, double b); /* 0xdc1e9 ST1/ST0 -> ST0 */
+
 #endif

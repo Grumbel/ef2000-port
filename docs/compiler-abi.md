@@ -3660,3 +3660,19 @@ in EAX, format string address, one value).
 | `0xb42b0` | EAX:double | EAX:double | 1db08@1db8b,5f698@5f6e0 | Sign of a double as +1.0 or -1.0 (zero gives -1.0). |
 | `0xb42f0` | EAX:double | EAX:double | 7e44@7eac,81ec@824a,8394@83f0 | Wrap an angle in degrees into its canonical range. |
 | `0xb4364` | EAX:ef_addr32 | EAX:double | 1d954@1dad2,772d0@77465,8a1dc@8a222 | Length of a 3D vector of doubles, 0.0 when degenerate. |
+
+## float_helpers6 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa3824` | AL:uint8_t | none | a33a4@a33e6 | Dispatch on the balance ratio of a table entry. |
+| `0xb0718` | AL:uint8_t,EDX:uint32_t,EBX:ef_addr32 | EAX:double | b0c34@b0c64 | Ratio of listed entries of kind 1 or 2 to all matching entries. |
+| `0xb07b4` | AL:uint8_t,EDX:uint32_t,EBX:ef_addr32 | EAX:double | b0c9c@b0ccd | Same ratio using the second matching predicate. |
+| `0xb43dc` | EAX:ef_addr32,EDX:ef_addr32 | EAX:double | 88ff8@88ffe,b4468@b4479,119f88@11a2d2 | Dot product of two 3D double vectors. |
+| `0xb4424` | EAX:ef_addr32,EDX:ef_addr32 | AL:uint8_t | 28b80@28d50,28b80@28d70,29b14@29c69 | Normalise a 3D vector into out; false when it is too short. |
+| `0xb4468` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | b449c@b44a7 | Projection of a vector onto the unit direction of another. |
+| `0xb449c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 119f88@11a2af | Component of a vector perpendicular to a direction. |
+| `0xb4620` | EAX:double,EDX:double | EAX:double | 8394@83e1,1d844@1d89b,1dc20@1de39 | Two-argument arctangent (y, x); 0.0 when both are zero. |
+| `0xcbfa0` | EAX:ef_addr32 | EAX:int32_t | cbff0@cc091 | Default range of an object: 400 for kinds 1 and 3, else 300. |
+| `0xce0b0` | EAX:float,EDX:float | EAX:double | ce268@ce27b,ce268@ce29e,ce268@ce2c2 | Scale a value relative to the horizontal viewport origin and size. |
+| `0xce0cc` | EAX:float,EDX:float | EAX:double | ce268@ce28c,ce268@ce2b0,ce268@ce2d9 | Scale a value relative to the vertical viewport origin and size. |
