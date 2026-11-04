@@ -4100,7 +4100,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00112808	132			unknown	unclassified	unverified		
 0x0011288c	88			unknown	unclassified	unverified		
 0x001128e4	567			unknown	unclassified	unverified		
-0x00112b1c	158			unknown	unclassified	unverified		
+0x00112b1c	158	reset_table_record_112b1c	game_helpers58	compiles	game	confirmed	decomp/tests/0x00112b1c.json	docs/compiler-abi.md; Reset a table record: clear the slots, fill the index tables with -1 and set defaults.; callers 112bbc@112bc2,113c7c@113cdb; guest pending
 0x00112bbc	25			unknown	unclassified	unverified		
 0x00112bd8	54			unknown	unclassified	unverified		
 0x00112c10	1704			unknown	unclassified	unverified		

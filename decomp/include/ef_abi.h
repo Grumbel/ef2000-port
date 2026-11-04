@@ -3426,4 +3426,7 @@ void release_pending_handle_eae10(void);
 void apply_selection_f1d54(void);
 uint32_t guest_fn_bc36a_w(uint32_t a, uint32_t b); /* 0xbc36a EAX/EDX */
 
+/* game_helpers58.c */
+void reset_table_record_112b1c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 stack_rec);
+
 #endif

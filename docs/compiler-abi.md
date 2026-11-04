@@ -3846,3 +3846,9 @@ in EAX, format string address, one value).
 | `0xa7948` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 42a4@42bb,5630@5692,285b8@28609 | Open a resource through the first free one of five slots (name B). |
 | `0xeae10` | none | none | 97dcc@97e45,97dcc@97e89,a8bd4@a8e61 | Release the pending handle and the status message. |
 | `0xf1d54` | none | none | ac5f8@ac6f8 | Apply the stored selection when the pending-input bit is set. |
+
+## game_helpers58 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x112b1c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 112bbc@112bc2,113c7c@113cdb | Reset a table record: clear the slots, fill the index tables with -1 and set defaults. |
