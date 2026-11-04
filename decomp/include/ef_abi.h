@@ -6390,4 +6390,15 @@ int32_t sscanf_df26f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr
 int32_t sscanf_core_df248(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0xdf248 */
 int32_t sscanf_df26f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 str, ef_addr32 fmt, ...); /* 0xdf26f */
 
+void dos_commit_f44(void);
+uint32_t int_thunk_dispatch_9c4b2(uint32_t esi);
+double signed_constant_120a07(double st0, uint32_t ebx);
+double load_extended_120a2d(uint32_t esi, uint32_t ebx);
+double reduce_angle_b45b6(double st0, uint32_t c2);
+void dos_commit_f44(void); /* 0xf44 */
+uint32_t int_thunk_dispatch_9c4b2(uint32_t esi); /* 0x9c4b2 */
+double signed_constant_120a07(double st0, uint32_t ebx); /* 0x120a07 */
+double load_extended_120a2d(uint32_t esi, uint32_t ebx); /* 0x120a2d */
+double reduce_angle_b45b6(double st0, uint32_t c2); /* 0xb45b6 */
+
 #endif

@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include <stdarg.h>
+#include <math.h>
 #include <string.h>
 #include "ef_abi.h"
 #include "ef_globals.h"
@@ -22298,4 +22299,64 @@ int32_t sscanf_df26f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr
     r = sscanf_core_df248(str, fmt, (uint32_t)(uintptr_t)&ap[0]);
     va_end(ap);
     return r;
+}
+
+/* 0xf44, 22 bytes. DOS service 0x68 (commit file) for the handle in the word at offset 0x5ce of the segment named by the word at 0x132a24; all registers preserved. */
+void dos_commit_f44(void)
+{
+    uint32_t in[6];
+    uint32_t out[7];
+    uint8_t sregs[12];
+
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    in[0] = 0x6800u;
+    in[1] = EF_U16(EF_U16(0x00132a24u) + 0x5ceu);
+    in[2] = 0u;
+    in[3] = 0u;
+    in[4] = 0u;
+    in[5] = 0u;
+    guest_dos_intdos_x((uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+}
+
+/* 0x9c4b2, 37 bytes. Implicit-register fragment of the interrupt thunk: index ESI into the stub table (3 bytes per entry), push that stub as the return target, then load ES/BP from [EBX] and the general registers from the block at EDI. Returns the stub address. */
+uint32_t int_thunk_dispatch_9c4b2(uint32_t esi)
+{
+    return esi * 3u + 0x0009c558u;
+}
+
+/* 0x120a07, 38 bytes. x87 fragment: ftst ST0 and pop it, then push the constant at 0x17ee4a (double, when bit 10 of EBX is set) or 0x17ee52 (float), negated when ST0 was negative. */
+double signed_constant_120a07(double st0, uint32_t ebx)
+{
+    double k;
+
+    if (ebx & 0x400u)
+        k = md_rd_f64(0x0017ee4au);
+    else {
+        uint32_t bits = EF_U32(0x0017ee52u);
+        float f;
+        memcpy(&f, &bits, sizeof f);
+        k = (double)f;
+    }
+    return (st0 < 0.0) ? -k : k;
+}
+
+/* 0x120a2d, 37 bytes. x87 fragment: load the 80-bit extended value at ESI into the stack slot selected by EBX (slot = EBX & 7 when bit 10 of EBX is set, else 0), replacing the value that was there. Returns the loaded value. */
+double load_extended_120a2d(uint32_t esi, uint32_t ebx)
+{
+    long double v = 0.0L;
+
+    (void)ebx;
+    memcpy(&v, ef_guest_memory_ptr((ef_addr32)esi), 10);
+    return (double)v;
+}
+
+/* 0xb45b6, 44 bytes. Finish a trig argument reduction: when the FPU reported an incomplete reduction (C2 set), reduce ST0 modulo the extended constant at 0xb4598 with fprem until complete and clear carry; otherwise ST0 is untouched. */
+double reduce_angle_b45b6(double st0, uint32_t c2)
+{
+    long double k = 0.0L;
+
+    if (!c2)
+        return st0;
+    memcpy(&k, ef_guest_memory_ptr(0x000b4598u), 10);
+    return fmod(st0, (double)k);
 }

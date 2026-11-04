@@ -9289,3 +9289,13 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xdf248` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:int32_t | df26f@df285 | sscanf core: build a string stream object (reader 0xdf21b, unget 0xdf244, string pointer at +8) on the stack and run the |
 | `0xdf26f` | [ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32,[ESP+24]:ef_addr32 | EAX:int32_t | 335c0@335df,33ee8@33f26,344bc@344fa | sscanf(str, fmt, ...) (cdecl, variadic; all arguments on the stack). |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf44` | none | none | 3dd30@3dd55,43020@430f4 | DOS service 0x68 (commit file) for the handle in the word at offset 0x5ce of the segment named by the word at 0x132a24;  |
+| `0x9c4b2` | EAX:uint32_t | EAX:uint32_t | 9c47a@9c47f | Implicit-register fragment of the interrupt thunk: index ESI into the stub table (3 bytes per entry), push that stub as  |
+| `0x120a07` | EAX:double,EDX:uint32_t | EAX:double | 1209b5@1209cd,1209b5@120a01 | x87 fragment: ftst ST0 and pop it, then push the constant at 0x17ee4a (double, when bit 10 of EBX is set) or 0x17ee52 (f |
+| `0x120a2d` | EAX:uint32_t,EDX:uint32_t | EAX:double | 1209b5@1209fa | x87 fragment: load the 80-bit extended value at ESI into the stack slot selected by EBX (slot = EBX & 7 when bit 10 of E |
+| `0xb45b6` | EAX:double,EDX:uint32_t | EAX:double | b45a2@b45a4,b45ac@b45ae | Finish a trig argument reduction: when the FPU reported an incomplete reduction (C2 set), reduce ST0 modulo the extended |

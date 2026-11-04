@@ -29,7 +29,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00000d08	93	record_for_kind	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00000d08.json	docs/compiler-abi.md; Select a record address by kind.; callers d68@e00; guest pending
 0x00000d68	183	report_bad_record_d68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000d68.json	docs/compiler-abi.md; Report a bad record P (stack, cdecl): when its word at +0x26 is set and the wrapping byte counter 0x120d2c reaches zero ; callers none direct; guest pending
 0x00000e20	292			unknown	unclassified	unverified		
-0x00000f44	22			unknown	unclassified	unverified		
+0x00000f44	22	dos_commit_f44	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000f44.json	docs/compiler-abi.md; DOS service 0x68 (commit file) for the handle in the word at offset 0x5ce of the segment named by the word at 0x132a24; ; callers 3dd30@3dd55,43020@430f4; guest pending
 0x00000f60	32	random_modulo	low_helpers	compiles	game	confirmed	decomp/tests/0x00000f60.json	docs/compiler-abi.md; zero divisor returns 0 else low-word random (0x9c960) modulo divisor; callers 1ef8@1f58,1f64@1f87,1f64@20a0; guest pending
 0x00000f80	2904			unknown	unclassified	unverified		
 0x00001ad8	150	reset_selection_state_1ad8	game_helpers13	compiles	game	confirmed	decomp/tests/0x00001ad8.json	docs/compiler-abi.md; Reset the selection state block at 0x196fe8.; callers f80@1ac6; guest pending
@@ -2038,7 +2038,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009c446	27	int386_9c446	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c446.json	docs/compiler-abi.md; int386: int386x with a freshly read segment block.; callers 1047e4@104803; guest pending
 0x0009c461	25	int386x_9c461	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c461.json	docs/compiler-abi.md; int386x: perform software interrupt INTNO with the register blocks IN/OUT and the segment block SREGS; returns the EAX t; callers 9c446@9c457,104840@10489a; guest pending
 0x0009c47a	56	int386x_core_9c47a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c47a.json	docs/compiler-abi.md; The software interrupt dispatcher behind int386x (registers ESI = interrupt number, EDI = input register block, EDX = ou; callers 9c461@9c46e; guest pending
-0x0009c4b2	37			unknown	unclassified	unverified		
+0x0009c4b2	37	int_thunk_dispatch_9c4b2	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c4b2.json	docs/compiler-abi.md; Implicit-register fragment of the interrupt thunk: index ESI into the stub table (3 bytes per entry), push that stub as ; callers 9c47a@9c47f; guest pending
 0x0009c858	90	getenv_9c858	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c858.json	docs/compiler-abi.md; getenv: search the environment table at [0x160a18] (null terminated array of "NAME=value" strings) for NAME, ignoring ca; callers e20@f2a,28224@28259,283c8@28473; guest pending
 0x0009c8b4	84	install_trap_handlers_9c8b4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c8b4.json	docs/compiler-abi.md; (stack arg: value) Saves the value at 0x132a9c and the caller's ESP / SS / DS at 0x132aa0 / 0x132aa4 / 0x132aa6, then wi; callers e20@f38; guest pending
 0x0009c960	19	half_word_9c960	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c960.json	docs/compiler-abi.md; ; callers f60@f6a,2e04@334f,2e04@337c; guest pending
@@ -2550,7 +2550,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b4550	71	matrix_mul_vector_b4550	float_helpers10	compiles	game	confirmed	decomp/tests/0x000b4550.json	docs/compiler-abi.md; out = mat * vec for a 3x3 double matrix stored by rows.; callers 1098f0@1099cb,11a6e4@11a883,11c584@11c63a; guest pending
 0x000b45a2	10	cos_b45a2	float_helpers8	compiles	game	confirmed	decomp/tests/0x000b45a2.json	docs/compiler-abi.md; fcos on ST0, retried while the FPU reports an incomplete reduction.; callers 7d20@7d54,7ee8@8029,1d954@1d9e3; guest pending
 0x000b45ac	10	sin_b45ac	float_helpers8	compiles	game	confirmed	decomp/tests/0x000b45ac.json	docs/compiler-abi.md; fsin on ST0, retried while the FPU reports an incomplete reduction.; callers 7d20@7d4c,7ee8@8032,1d954@1d9ee; guest pending
-0x000b45b6	44			unknown	unclassified	unverified		
+0x000b45b6	44	reduce_angle_b45b6	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b45b6.json	docs/compiler-abi.md; Finish a trig argument reduction: when the FPU reported an incomplete reduction (C2 set), reduce ST0 modulo the extended; callers b45a2@b45a4,b45ac@b45ae; guest pending
 0x000b45fa	21	tan_b45fa	float_helpers9	compiles	game	confirmed	decomp/tests/0x000b45fa.json	docs/compiler-abi.md; tan of ST0 (fptan, popping the pushed 1.0); with bit 0 of 0x1631f0 set the library emulation 0xfa3d4 is used instead.; callers 5f698@5f763,5f944@5f962,6e3e0@6e536; guest pending
 0x000b4620	91	atan2_b4620	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b4620.json	docs/compiler-abi.md; Two-argument arctangent (y, x); 0.0 when both are zero.; callers 8394@83e1,1d844@1d89b,1dc20@1de39; guest pending
 0x000b47e4	437			unknown	unclassified	unverified		
@@ -4256,8 +4256,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00120800	21	x87_unmask_exceptions	unk_fp_runtime	typed	asm	confirmed		docs/compiler-abi.md; CW &= 0xfff2; no GPR/stack args or outputs; FP state side effect
 0x00120928	141			unknown	unclassified	unverified		
 0x001209b5	82			unknown	unclassified	unverified		
-0x00120a07	38			unknown	unclassified	unverified		
-0x00120a2d	37			unknown	unclassified	unverified		
+0x00120a07	38	signed_constant_120a07	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00120a07.json	docs/compiler-abi.md; x87 fragment: ftst ST0 and pop it, then push the constant at 0x17ee4a (double, when bit 10 of EBX is set) or 0x17ee52 (f; callers 1209b5@1209cd,1209b5@120a01; guest pending
+0x00120a2d	37	load_extended_120a2d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00120a2d.json	docs/compiler-abi.md; x87 fragment: load the 80-bit extended value at ESI into the stack slot selected by EBX (slot = EBX & 7 when bit 10 of E; callers 1209b5@1209fa; guest pending
 0x00120a52	14	store_x87_st0_via_es	unk_fp_runtime	typed	asm	confirmed		docs/compiler-abi.md; BL bit 2 selects ES:[EDI] float32/64 FST without pop; ST0 live-in/live-out; caller sites 0x12097d/0x1209dc
 0x00120a60	111			unknown	unclassified	unverified		
 0x00120ad0	195			unknown	unclassified	unverified		
