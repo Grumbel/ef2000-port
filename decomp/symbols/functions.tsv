@@ -3475,7 +3475,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ea414	9	read_link_ea414	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000ea414.json	docs/compiler-abi.md; ; callers 9dcf8@9dd0f,de864@de985; guest pending
 0x000ea420	70	decode_chunk_ea420	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000ea420.json	docs/compiler-abi.md; Decode the current chunk either with the 'RA' decoder or a plain copy.; callers 9dcf8@9dd1d,de864@de999; guest pending
 0x000ea470	42	install_exit_handler_ea470	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000ea470.json	docs/compiler-abi.md; Install the exit handler and restart; abort when called with a mode other than 1.; callers 8b274@8b2a9; guest pending
-0x000ea49a	13			unknown	unclassified	unverified		
+0x000ea49a	13	divmod_store_ea49a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ea49a.json	docs/compiler-abi.md; Signed divide helper with implicit registers (EAX = dividend, EDX = divisor, ESI = result pointer): store the quotient a; callers 8b328@8b35c; guest pending
 0x000ea4a7	16	forward_or_clear_ea4a7	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000ea4a7.json	docs/compiler-abi.md; Forward a non-zero value to 0xfa8a0, else clear via 0x10ddf7.; callers 8b39c@8b3dd; guest pending
 0x000ea4c0	75	rewrite_template_ea4c0	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000ea4c0.json	docs/compiler-abi.md; Rewrite a "$...:...$" template in place.; callers ea50c@ea56b; guest pending
 0x000ea50c	234			unknown	unclassified	unverified		
@@ -3540,7 +3540,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ed133	641			unknown	unclassified	unverified		
 0x000ed3b4	307	parse_output_spec_ed3b4	game_helpers104	compiles	game	confirmed	decomp/tests/0x000ed3b4.json	docs/compiler-abi.md; Parse flags (ed4e7), width ('*' or digits), precision ('.' then '*' or digits) and size modifier (N F L h l w) into the ; callers ed133@ed163; guest pending
 0x000ed4e7	91	parse_format_flags	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000ed4e7.json	docs/compiler-abi.md; Parse printf flag characters into the spec at EDX (+0x14 flags, +0x16 fill).; callers ed3b4@ed3c3; guest pending
-0x000ed542	36			unknown	unclassified	unverified		
+0x000ed542	36	strnlen_far_ed542	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ed542.json	docs/compiler-abi.md; Length of the string at SEG:OFFSET (the selector SEG is ignored in the flat model), limited to MAX: counts characters un; callers ed6cc@ed872,ed6cc@edaf2; guest pending
 0x000ed566	35			unknown	unclassified	unverified		
 0x000ed589	97			unknown	unclassified	unverified		
 0x000ed5ea	219			unknown	unclassified	unverified		
@@ -3781,7 +3781,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fe700	14	get_video_mode_fe700	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe700.json	docs/compiler-abi.md; BIOS get video mode (int 10h, AH = 0xf): returns the current mode number in AL (EBX, ESI and EDI are preserved).; callers cdb20@cdb97,cdc64@cdc6c; guest pending
 0x000fe710	31	set_and_check_video_mode_fe710	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe710.json	docs/compiler-abi.md; Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low; callers cdb20@cdbae,cdc64@cdc83; guest pending
 0x000fe730	666			unknown	unclassified	unverified		
-0x000fedcc	16			unknown	unclassified	unverified		
+0x000fedcc	16	put_pixel_fedcc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fedcc.json	docs/compiler-abi.md; Plot one pixel with implicit registers (ESI = row, EBX = x offset, CH = colour): address = row table 0x163200[row] + X +; callers fdf60@fdff2; guest pending
 0x000feddc	29			unknown	unclassified	unverified		
 0x000feec8	94	upload_vga_palette_feec8	game_helpers125	compiles	game	confirmed	decomp/tests/0x000feec8.json	docs/compiler-abi.md; Upload a 256-entry RGB palette to the VGA DAC (ports 0x3c8/0x3c9), sending only entries that differ from the shadow copy; callers d663c@d6652; guest pending
 0x000fef26	27	fill_table_fef26	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fef26.json	docs/compiler-abi.md; Fill 192 dwords at 0x17cfc0 with -1.; callers d1d40@d1d75,d1e50@d1eb2; guest pending

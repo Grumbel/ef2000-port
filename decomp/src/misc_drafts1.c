@@ -6374,3 +6374,32 @@ void copy_dta_in_ded3d(uint32_t u0, uint32_t src)
     for (i = 0u; i < 0x2bu; i++)
         EF_U8(out[1] + i) = EF_U8(src + i);
 }
+
+/* 0xed542, 36 bytes. Length of the string at SEG:OFFSET (the selector SEG is ignored in the flat model), limited to MAX: counts characters until a zero byte or MAX is reached. */
+uint32_t strnlen_far_ed542(uint32_t offset, uint32_t seg, uint32_t max)
+{
+    uint32_t n = 0u;
+    (void)seg;
+    for (;;) {
+        uint8_t c = EF_U8(offset + n);
+        if (c == 0u)
+            break;
+        if (n == max)
+            break;
+        n++;
+    }
+    return n;
+}
+
+/* 0xea49a, 13 bytes. Signed divide helper with implicit registers (EAX = dividend, EDX = divisor, ESI = result pointer): store the quotient at [ESI] and the remainder at [ESI+4]. Parameters are given in that register order. */
+void divmod_store_ea49a(int32_t dividend, int32_t divisor, ef_addr32 result)
+{
+    EF_U32(result) = (uint32_t)(dividend / divisor);
+    EF_U32(result + 4u) = (uint32_t)(dividend % divisor);
+}
+
+/* 0xfedcc, 16 bytes. Plot one pixel with implicit registers (ESI = row, EBX = x offset, CH = colour): address = row table 0x163200[row] + X + frame base 0x15b754. Parameters are given in that register order. */
+void put_pixel_fedcc(uint32_t row, uint32_t x, uint32_t colour)
+{
+    EF_U8(x + EF_U32(0x00163200u + row * 4u) + EF_U32(0x0015b754u)) = (uint8_t)colour;
+}

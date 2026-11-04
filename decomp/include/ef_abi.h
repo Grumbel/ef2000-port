@@ -5023,4 +5023,9 @@ uint32_t dos_alloc_eb288(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uin
 void copy_dta_out_ded1a(uint32_t u0, uint32_t dst);
 void copy_dta_in_ded3d(uint32_t u0, uint32_t src);
 
+uint32_t strnlen_far_ed542(uint32_t offset, uint32_t seg, uint32_t max);
+
+void divmod_store_ea49a(int32_t dividend, int32_t divisor, ef_addr32 result);
+void put_pixel_fedcc(uint32_t row, uint32_t x, uint32_t colour);
+
 #endif

@@ -6349,3 +6349,16 @@ in EAX, format string address, one value).
 | `0xeb288` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 9be38@9bf6d | DOS allocate memory (int 21h, AH = 0x48) for PARAGRAPHS (16-bit): returns the segment/selector, or 0 when the allocation |
 | `0xded1a` | EAX:uint32_t,EDX:uint32_t | none | decde@decf4,decfb@ded10 | When the file-search mode byte 0x132a5e is 9, copy the 0x2b-byte DOS DTA (address from int 21h, AH = 0x2f) to the buffer |
 | `0xded3d` | EAX:uint32_t,EDX:uint32_t | none | decfb@ded02 | The reverse of 0xded1a: copy the 0x2b bytes at SRC into the DOS DTA. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xed542` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | ed6cc@ed872,ed6cc@edaf2 | Length of the string at SEG:OFFSET (the selector SEG is ignored in the flat model), limited to MAX: counts characters un |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xea49a` | EAX:int32_t,EDX:int32_t,EBX:ef_addr32 | none | 8b328@8b35c | Signed divide helper with implicit registers (EAX = dividend, EDX = divisor, ESI = result pointer): store the quotient a |
+| `0xfedcc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | fdf60@fdff2 | Plot one pixel with implicit registers (ESI = row, EBX = x offset, CH = colour): address = row table 0x163200[row] + X + |
