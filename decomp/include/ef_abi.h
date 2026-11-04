@@ -6130,4 +6130,7 @@ void report_error_11d258(uint32_t code, uint32_t message);
 void show_status_ac780(void);
 void show_status_ac780(void);
 
+void rotate_vector_c4755(int32_t x, int32_t y, int32_t z, int32_t *out);
+void rotate_vector_c4755(int32_t x, int32_t y, int32_t z, int32_t *out);
+
 #endif

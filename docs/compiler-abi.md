@@ -8920,3 +8920,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xac780` | none | none | ac5f8@ac731 | Tail fragment of the preceding routine (reached when its test succeeds; the original jumps back to the return at 0xac77e |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc4755` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | c4565@c45f4,15c0ea@15c0fa,160156@16016c | Implicit-register fragment (in: EAX, EBX, ECX; out: ESI, EDI, EBP via out[0..2]): subtract the self-modified camera orig |

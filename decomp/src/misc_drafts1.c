@@ -20337,3 +20337,19 @@ void show_status_ac780(void)
 	show_text_ac408(0x41f262u);
 	redraw_ca17c();
 }
+
+/* 0xc4755, 136 bytes. Implicit-register fragment (in: EAX, EBX, ECX; out: ESI, EDI, EBP via out[0..2]): subtract the self-modified camera origin immediates (0xc4756/0xc475c/0xc4762) from the vector, then multiply by the 3x3 fixed-point matrix at 0x1590c0 (64-bit accumulate, >>25). */
+void rotate_vector_c4755(int32_t x, int32_t y, int32_t z, int32_t *out)
+{
+    int32_t v[3];
+    int i;
+    v[0] = x - (int32_t)EF_U32(0x000c4756u);
+    v[1] = y - (int32_t)EF_U32(0x000c475cu);
+    v[2] = z - (int32_t)EF_U32(0x000c4762u);
+    for (i = 0; i < 3; i++) {
+        int64_t s = (int64_t)(int32_t)EF_S32(0x1590c0u + 12u * i) * v[0]
+                  + (int64_t)(int32_t)EF_S32(0x1590c4u + 12u * i) * v[1]
+                  + (int64_t)(int32_t)EF_S32(0x1590c8u + 12u * i) * v[2];
+        out[i] = (int32_t)(uint32_t)(((uint64_t)s >> 25) | ((uint64_t)s >> 32 << 7));
+    }
+}
