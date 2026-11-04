@@ -7122,3 +7122,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9b780` | none | none | 9a624@9a6e9 | Remove the contribution of each active entry to the side tallies: for every 0x36-byte entry of the table at [0x1379bc] ( |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbe208` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | bd92c@bdb85 | Assign free nodes to the request record REC (ECX; node count in byte +3, kind byte +8): walk the node list whose head po |

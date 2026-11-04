@@ -2678,7 +2678,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bdbf8	340			unknown	unclassified	unverified		
 0x000bdd64	391			unknown	unclassified	unverified		
 0x000bdeec	780			unknown	unclassified	unverified		
-0x000be208	278			unknown	unclassified	unverified		
+0x000be208	278	claim_idle_nodes_be208	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000be208.json	docs/compiler-abi.md; Assign free nodes to the request record REC (ECX; node count in byte +3, kind byte +8): walk the node list whose head po; callers bd92c@bdb85; guest pending
 0x000be320	210	link_matching_entries_be320	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000be320.json	docs/compiler-abi.md; Link matching shape entries of two lists to their lookup value.; callers b0f5c@b15e4; guest pending
 0x000be3f4	68	copy_ids_of_colocated_records_be3f4	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be3f4.json	docs/compiler-abi.md; For each flag-less record of the first list copy the id of every record of the second list that shares its position.; callers b0f5c@b118f,b0f5c@b147c; guest pending
 0x000be438	69	find_target_be438	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000be438.json	docs/compiler-abi.md; Find the kind-2 node of the list whose target matches the two keys and is valid.; callers be480@be526,c1438@c1781; guest pending

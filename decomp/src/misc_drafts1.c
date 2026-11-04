@@ -9881,3 +9881,38 @@ void uncount_side_tallies_9b780(void)
         }
     }
 }
+
+/* 0xbe208, 278 bytes. Assign free nodes to the request record REC (ECX; node count in byte +3, kind byte +8): walk the node list whose head pointer is stored at HEADPTR (stack argument, ret 4) and, for every idle node (word +0x31 equal to OWNER (EAX low 16 bits), bytes +0xb and +0xd zero, byte +0xc equal to the record's kind, word +9 zero) while fewer than the record's count have been taken, mark it busy (word +9 = 1), store the values TARGET (EDX) and VALUE (EBX) and the running index into the first of its four 2-byte link groups whose three words (+0x17, +0x1f, +0x27 high halves) are all -1, write the index to byte +4 of the record at dword +0x4d, and clear words +0x51 and +0x53. */
+void claim_idle_nodes_be208(uint32_t owner, uint32_t target, uint32_t value, ef_addr32 rec, ef_addr32 headptr)
+{
+    ef_addr32 node = EF_U32(headptr);
+    uint16_t k = 0u;
+    while (node != 0u && (int16_t)EF_U8(rec + 3u) > (int16_t)k) {
+        if ((uint16_t)EF_U16(node + 0x31u) == (uint16_t)owner
+            && EF_U8(node + 0xbu) == 0u
+            && EF_U8(node + 0xcu) == EF_U8(rec + 8u)
+            && EF_U16(node + 9u) == 0u
+            && EF_U8(node + 0xdu) == 0u) {
+            uint16_t flag = 1u;
+            int16_t i = 0;
+            EF_U16(node + 9u) = 1u;
+            while ((int32_t)i < 4 && flag != 0u) {
+                ef_addr32 p = node + (uint32_t)(uint16_t)i * 2u;
+                if (((int32_t)EF_U32(p + 0x27u) >> 16) == -1
+                    && ((int32_t)EF_U32(p + 0x17u) >> 16) == -1
+                    && ((int32_t)EF_U32(p + 0x1fu) >> 16) == -1) {
+                    EF_U16(p + 0x19u) = (uint16_t)target;
+                    EF_U16(p + 0x29u) = k;
+                    EF_U16(p + 0x21u) = (uint16_t)value;
+                    flag = 0u;
+                }
+                i++;
+            }
+            EF_U8(EF_U32(node + 0x4du) + 4u) = (uint8_t)k;
+            k++;
+            EF_U16(node + 0x51u) = 0u;
+            EF_U16(node + 0x53u) = 0u;
+        }
+        node = EF_U32(node + 4u);
+    }
+}

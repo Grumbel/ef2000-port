@@ -5310,4 +5310,6 @@ uint32_t find_paired_node_b49b4(ef_addr32 a, ef_addr32 b, uint32_t group, ef_add
 
 void uncount_side_tallies_9b780(void);
 
+void claim_idle_nodes_be208(uint32_t owner, uint32_t target, uint32_t value, ef_addr32 rec, ef_addr32 headptr);
+
 #endif
