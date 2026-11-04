@@ -7316,3 +7316,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa80b0` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a83c3 | Expand the %NAME placeholders of the text at TEXT (EAX) in place: copy characters to a 0x50-byte work buffer and, at eve |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3617c` | EAX:uint32_t,EDX:uint32_t | none | 36438@3658e,36438@36684 | Send TOTAL (EAX) bytes from the buffer at dword 0x19f34c to the link in packets: set word 0x1357b2 = 2 and byte 0x19f5a6 |

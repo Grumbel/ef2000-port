@@ -5384,4 +5384,6 @@ void draw_widget_a5b70(ef_addr32 w);
 
 uint32_t expand_placeholders_a80b0(ef_addr32 text);
 
+void send_packets_3617c(uint32_t total, uint32_t flag);
+
 #endif

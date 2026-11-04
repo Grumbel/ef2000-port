@@ -11017,3 +11017,49 @@ uint32_t expand_placeholders_a80b0(ef_addr32 text)
     copy_string_9d749(text, l);
     return guest_fn_b1b8b(text);
 }
+
+/* 0x3617c, 303 bytes. Send TOTAL (EAX) bytes from the buffer at dword 0x19f34c to the link in packets: set word 0x1357b2 = 2 and byte 0x19f5a6 = 0x48, then for every packet number (chunk size = high half of dword 0x1258fe) build a 3-byte header (packet number in the low six bits of byte 0, bit 0x40 on the last packet, bit 0x80 when FLAG (EDX) is not positive, word 0x19f594 at +1) followed by the chunk, issue the request (0xa3eac) between idle callbacks (0xa41a0) and after every fourth packet recompute the totals (0xa4030) and mark slots (0x35f04). Finally set byte 0x19f5aa = 6, flush the same way and store the clock (hook 0x15b620) in dword 0x19f338. */
+void send_packets_3617c(uint32_t total, uint32_t flag)
+{
+    uint8_t buf[0x1fc];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    int32_t left = (int32_t)total;
+    uint32_t idx = 0u;
+    int32_t csz;
+    int32_t chunk;
+    memset(buf, 0, sizeof(buf));
+    EF_U16(0x001357b2u) = 2u;
+    EF_U8(0x0019f5a6u) = 0x48u;
+    while (left > 0) {
+        csz = (int32_t)EF_U32(0x001258feu) >> 16;
+        chunk = (left > csz) ? csz : left;
+        buf[0] = (uint8_t)((buf[0] & 0xc0u) | (idx & 0x3fu));
+        {
+            uint16_t w = EF_U16(0x0019f594u);
+            memcpy(&buf[1], &w, 2);
+        }
+        if (left - csz <= 0)
+            buf[0] |= 0x40u;
+        else
+            buf[0] &= 0xbfu;
+        if ((int32_t)flag <= 0)
+            buf[0] |= 0x80u;
+        else
+            buf[0] &= 0x7fu;
+        (void)memcpy_dc832(b + 3u, EF_U32(0x0019f34cu) + (uint32_t)(csz * (int32_t)idx), (uint32_t)chunk);
+        run_idle_callback_a41a0();
+        issue_request_ready_a3eac(b, (uint16_t)(chunk + 3));
+        run_idle_callback_a41a0();
+        if ((idx & 3u) == 3u) {
+            recompute_total_a4030();
+            mark_matching_slots_35f04();
+        }
+        idx++;
+        left -= csz;
+    }
+    EF_U8(0x0019f5aau) = 6u;
+    recompute_total_a4030();
+    mark_matching_slots_35f04();
+    run_idle_callback_a41a0();
+    EF_U32(0x0019f338u) = ((uint32_t (*)(void))EF_U32(0x0015b620u))();
+}
