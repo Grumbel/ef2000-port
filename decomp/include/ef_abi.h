@@ -6182,4 +6182,9 @@ double ratio_offset_11bab4(uint32_t ref, uint32_t obj, double a, double b); /* 0
 uint32_t project_three_vertices_c7408(void);
 uint32_t project_three_vertices_c7408(void); /* 0xc7408 */
 
+void hook_interrupt_120bc0(void);
+void hook_interrupt_120c06(void);
+void hook_interrupt_120bc0(void); /* 0x120bc0 */
+void hook_interrupt_120c06(void); /* 0x120c06 */
+
 #endif

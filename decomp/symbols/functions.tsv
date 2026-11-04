@@ -4261,8 +4261,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00120a52	14	store_x87_st0_via_es	unk_fp_runtime	typed	asm	confirmed		docs/compiler-abi.md; BL bit 2 selects ES:[EDI] float32/64 FST without pop; ST0 live-in/live-out; caller sites 0x12097d/0x1209dc
 0x00120a60	111			unknown	unclassified	unverified		
 0x00120ad0	195			unknown	unclassified	unverified		
-0x00120bc0	45			unknown	unclassified	unverified		
-0x00120c06	62			unknown	unclassified	unverified		
+0x00120bc0	45	hook_interrupt_120bc0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00120bc0.json	docs/compiler-abi.md; Hook the interrupt vector whose number is the byte at 0x17f05c with the handler at 0x120822, remembering the old vector ; callers 120746@12077b; guest pending
+0x00120c06	62	hook_interrupt_120c06	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00120c06.json	docs/compiler-abi.md; Same as 0x120bc0 for the vector number at 0x17f05e; the handler is 0x120815 when the byte at 0x17f05f is 0x20 and 0x1208; callers 120746@12076b; guest pending
 0x00120c5e	88			unknown	unclassified	unverified		
 0x0015be10	179	append_projected_global_record	unk_geometry	typed	asm	confirmed		ABI only; global inputs, EAX Boolean, nonstandard EBP restoration
 0x0015c071	83	write_projected_fixedpoint_pair	unk_geometry	typed	game	confirmed		ABI only; EBX output pointer, ECX/ESI/EDI fixed-point input, EAX Boolean

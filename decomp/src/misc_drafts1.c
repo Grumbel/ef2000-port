@@ -20654,3 +20654,37 @@ uint32_t project_three_vertices_c7408(void)
 		return 0u;
 	return 1u;
 }
+
+/* Shared body of 0x120bc0 and 0x120c06: save the interrupt vector VEC (DOS get-vector, AH = 0x35) as offset 0x17ee36 / selector 0x17ee34, then install the handler at HANDLER in the code segment (AH = 0x25). */
+static void md_swap_int_vector(uint32_t vec, uint32_t handler)
+{
+	uint32_t in[7];
+	uint32_t out[7];
+	uint8_t sregs[12];
+
+	segread_9be0d((uint32_t)(uintptr_t)sregs);
+	in[0] = 0x3500u | (vec & 0xffu);
+	in[1] = 0u; in[2] = 0u; in[3] = 0u; in[4] = 0u; in[5] = 0u; in[6] = 0u;
+	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+	EF_U32(0x0017ee36u) = out[1];
+	EF_U16(0x0017ee34u) = (uint16_t)guest_seg_x(0u); /* ES as returned by the get-vector call */
+	in[0] = 0x2500u | (vec & 0xffu);
+	in[1] = 0u; in[2] = 0u;
+	in[3] = handler;
+	in[4] = 0u; in[5] = 0u; in[6] = 0u;
+	segread_9be0d((uint32_t)(uintptr_t)sregs);
+	*(uint16_t *)(sregs + 6) = *(uint16_t *)(sregs + 2); /* DS = CS */
+	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+}
+
+/* 0x120bc0, 45 bytes. Hook the interrupt vector whose number is the byte at 0x17f05c with the handler at 0x120822, remembering the old vector at 0x17ee34/0x17ee36. */
+void hook_interrupt_120bc0(void)
+{
+	md_swap_int_vector(EF_U8(0x0017f05cu), 0x00120822u);
+}
+
+/* 0x120c06, 62 bytes. Same as 0x120bc0 for the vector number at 0x17f05e; the handler is 0x120815 when the byte at 0x17f05f is 0x20 and 0x120822 otherwise. */
+void hook_interrupt_120c06(void)
+{
+	md_swap_int_vector(EF_U8(0x0017f05eu), EF_U8(0x0017f05fu) == 0x20u ? 0x00120815u : 0x00120822u);
+}

@@ -9008,3 +9008,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc7408` | none | EAX:uint32_t | c75d4@c7666 | Implicit-register fragment (no inputs; outputs EBX, EDI, EBP are not modelled). Runs project_if_outside_c46f8 with margi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x120bc0` | none | none | 120746@12077b | Hook the interrupt vector whose number is the byte at 0x17f05c with the handler at 0x120822, remembering the old vector  |
+| `0x120c06` | none | none | 120746@12076b | Same as 0x120bc0 for the vector number at 0x17f05e; the handler is 0x120815 when the byte at 0x17f05f is 0x20 and 0x1208 |
