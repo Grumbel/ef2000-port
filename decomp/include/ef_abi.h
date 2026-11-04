@@ -3235,4 +3235,37 @@ void guest_fn_119acc_w(void); /* 0x119acc */
 void guest_fn_11c20c_w(void); /* 0x11c20c */
 uint32_t guest_fn_11f4d8_w(uint32_t value); /* 0x11f4d8 EAX -> EAX */
 
+/* leaf_helpers3.c */
+uint32_t find_pending_key_a60(void);
+void reset_scroll_state_1f960(void);
+void toggle_named_widget_7bc00(void);
+uint8_t refresh_view_844b0(void);
+void recompute_scene_extents_9202c(void);
+void update_sound_chain_9ab30(void);
+void flush_pending_bytes_a3f30(void);
+void refresh_named_widget_abce8(void);
+void fill_pattern_deb50(ef_addr32 dst, uint32_t pattern, uint32_t count);
+void store_args_and_shutdown_e474c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_a,
+                                   uint32_t stack_b);
+void guest_fn_22e98_w(uint32_t a, uint32_t b); /* 0x22e98 EAX/EDX */
+uint8_t guest_fn_843b0_w(void); /* 0x843b0 -> AL */
+void guest_fn_84370_w(void); /* 0x84370 */
+uint32_t guest_fn_d13ac_w(ef_addr32 a); /* 0xd13ac EAX -> AX */
+uint32_t guest_fn_d13dc_w(ef_addr32 a, ef_addr32 b); /* 0xd13dc EAX/EDX -> AX */
+uint32_t guest_fn_9a544_w(void); /* 0x9a544 -> EAX */
+void guest_fn_9ab6c_w(uint32_t obj); /* 0x9ab6c EAX */
+void guest_fn_9ac84_w(uint32_t obj); /* 0x9ac84 EAX */
+void guest_fn_9ae44_w(uint32_t obj); /* 0x9ae44 EAX */
+void guest_fn_9b04c_w(uint32_t obj); /* 0x9b04c EAX */
+void guest_fn_ca5c_w(uint32_t obj); /* 0xca5c EAX */
+void guest_fn_9b2a4_w(uint32_t obj); /* 0x9b2a4 EAX */
+void guest_fn_bc421_w(uint32_t obj); /* 0xbc421 EAX */
+void guest_fn_e6990_w(void); /* 0xe6990 */
+void guest_fn_109440_w(void); /* 0x109440 */
+void guest_fn_1098f0_w(void); /* 0x1098f0 */
+void guest_fn_109a80_w(void); /* 0x109a80 */
+void guest_fn_109b20_w(void); /* 0x109b20 */
+void guest_fn_d6090_w(void); /* 0xd6090 */
+void guest_fn_e4340_w(void); /* 0xe4340 */
+
 #endif

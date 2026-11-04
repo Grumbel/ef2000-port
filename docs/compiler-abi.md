@@ -3748,3 +3748,18 @@ in EAX, format string address, one value).
 | `0x118520` | EAX:ef_addr32 | EAX:uint32_t | 106cb0@106cc8,106d34@106d60,106dc4@106dd5 | True when the record has no entry or its entry holds zero. |
 | `0x1196a0` | none | none | 1098f0@1098f0 | Run the seven table initialisers, then 0x11c20c. |
 | `0x11f538` | EAX:ef_addr32,EDX:uint32_t | none | 118770@1187aa,118770@1187b5 | Store two derived values for a number. |
+
+## leaf_helpers3 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa60` | none | EAX:uint32_t | b04@b06 | First key code with a pending request, else the default 0x3f. |
+| `0x1f960` | none | none | 5f60@5f7f | Reset the scroll state. |
+| `0x7bc00` | none | none | none direct | Toggle a flag word, then run 0x7bc40 on a named widget. |
+| `0x844b0` | none | AL:uint8_t | none direct | Refresh the view when a cursor offset is set, else reset it. |
+| `0x9202c` | none | none | 94194@941aa,941bc@941d2 | Recompute the two scene extents. |
+| `0x9ab30` | none | none | bfcc@c0bc | Run the sound bank update chain on the object from 0x9a544. |
+| `0xa3f30` | none | none | 56bdc@56c55,56c90@56cb0,56ed0@56ef0 | Flush the pending byte buffer through 0xa3eac. |
+| `0xabce8` | none | none | none direct | Refresh the named widget's page and draw its label. |
+| `0xdeb50` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 2af20@2af31,2af20@2af45,2af20@2af59 | Fill a block with a repeating four-byte pattern. |
+| `0xe474c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 53ecc@53f95,53ecc@53fdd | Store two arguments and run the shutdown call chain. |
