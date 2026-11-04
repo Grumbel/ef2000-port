@@ -9062,3 +9062,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x11b5a8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:double | EAX:double | 10a220@10a2ec,11b644@11b674,11b9ac@11b9d8 | EAX=A, EDX=D, EBX=B, ECX=C are guest pointers (A+0x20, B+0x00/0x10, D+0x18 and the double at C are read); stack: two dou |
 | `0x11b9ac` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:double,[ESP+12]:double | EAX:double | 10a220@10a523 | EAX=A, EDX=D, EBX=B, ECX=C pointers; stack: pointer E, then two doubles P, Q (ret 0x14). Returns (double at B / double a |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfa362` | EAX:double,EDX:uint32_t | EAX:double | b3fec@b401a | Implicit-register fragment (x87 ST0 = X; the entry forces AL=0x0a, so the natural-log path is taken; the AL=9/0x0b paths |

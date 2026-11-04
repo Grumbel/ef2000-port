@@ -6218,4 +6218,7 @@ double profile_term_ratio_11b9ac(uint32_t a, uint32_t d, uint32_t b, uint32_t c,
 double profile_term_11b5a8(uint32_t a, uint32_t d, uint32_t b, uint32_t c, double p, double q); /* 0x11b5a8 */
 double profile_term_ratio_11b9ac(uint32_t a, uint32_t d, uint32_t b, uint32_t c, uint32_t e, double p, double q); /* 0x11b9ac */
 
+double ln_checked_fa362(double x, uint32_t *flag);
+double ln_checked_fa362(double x, uint32_t *flag); /* 0xfa362 */
+
 #endif

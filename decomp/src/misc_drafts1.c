@@ -20839,3 +20839,18 @@ double profile_term_ratio_11b9ac(uint32_t a, uint32_t d, uint32_t b, uint32_t c,
 	double ratio = md_rd_f64(b) / md_rd_f64(a);
 	return ratio * profile_term_11b5a8(d, b, e, c, p, q);
 }
+
+double log(double);
+/* 0xfa362, 67 bytes. Implicit-register fragment (x87 ST0 = X; the entry forces AL=0x0a, so the natural-log path is taken; the AL=9/0x0b paths at 0xfa389 are reached from other entries). For X > 0 returns ln(X) and sets *flag = 0. Otherwise reports through 0xfa380 -> classify_double_110130(X, 0x0a), sets *flag = 1 and returns the value left in ST0 by that wrapper (not modelled by the void draft; 0.0 here). */
+double ln_checked_fa362(double x, uint32_t *flag)
+{
+	uint32_t bits[2];
+	if (x > 0.0) {
+		if (flag) *flag = 0u;
+		return log(x);
+	}
+	memcpy(bits, &x, 8);
+	classify_double_110130(0u, 0u, 0u, 0u, bits[0], bits[1], 0x0au);
+	if (flag) *flag = 1u;
+	return 0.0;
+}
