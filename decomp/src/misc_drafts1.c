@@ -7534,3 +7534,37 @@ void normalise_angles_6bca8(void)
     if (*y < d)
         *y = *y + wrap_up;
 }
+
+/* 0x7548c, 221 bytes. Build the display name of unit INDEX (16-bit, looked up with 0x7489c) into DEST. When the record's word +0x28 equals word 0x19bb5e, copy its name (+0x2b), or the table string 0x12684c[byte +0x2a], or the default format 0x12f44d when that byte is 0. Otherwise copy the name of the object whose index is the high half of dword +0x26 (0xca-byte records at 0x19bb58, name at +1), append the separator string 0x186c10 and then the unit's name as above. */
+void build_unit_name_7548c(uint32_t dest, uint32_t index)
+{
+    char tmp[0x50];
+    uint32_t rec = guest_fn_7489c((int32_t)(int16_t)index);
+    uint32_t name, kind;
+    if (rec == 0u)
+        return;
+    name = rec + 0x2bu;
+    kind = EF_U8(rec + 0x2au);
+    if (EF_U16(0x0019bb5eu) == EF_U16(rec + 0x28u)) {
+        if (name != 0u) {
+            copy_string_9d749(dest, name);
+        } else if (kind == 0u) {
+            guest_sprintf_a4342((uint32_t)(uintptr_t)tmp, 0x0012f44du);
+        } else {
+            copy_string_9d749((uint32_t)(uintptr_t)tmp, EF_U32(0x0012684cu + kind * 4u));
+        }
+        return;
+    }
+    copy_string_9d749(dest, EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(rec + 0x26u) >> 16) * 0xca) + 1u);
+    strcat_9ca57(dest, 0x00186c10u);
+    if (name != 0u) {
+        copy_string_9d749((uint32_t)(uintptr_t)tmp, name);
+    } else {
+        if (kind == 0u) {
+            guest_sprintf_a4342((uint32_t)(uintptr_t)tmp, 0x0012f44du);
+        } else {
+            copy_string_9d749((uint32_t)(uintptr_t)tmp, EF_U32(0x0012684cu + kind * 4u));
+        }
+    }
+    strcat_9ca57(dest, (uint32_t)(uintptr_t)tmp);
+}
