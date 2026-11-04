@@ -437,7 +437,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002a794	23	clear_dwords_19bb38	low_helpers	compiles	game	confirmed	decomp/tests/0x0002a794.json	docs/compiler-abi.md; clear dwords 0x19bb38/3c/40; callers db21c@db27b; guest pending
 0x0002a7ac	74	init_entries_2a7ac	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0002a7ac.json	docs/compiler-abi.md; As 0x2a720 but for string EAX into the word at +8+2*EDX.; callers db808@db882; guest pending
 0x0002a7f8	178	update_grid_nodes_2a7f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002a7f8.json	docs/compiler-abi.md; When the larger of the two coordinate distances between (0x125250, 0x125254) and (0x1a5bec, 0x1a5be8) is at most 0x7fff,; callers 3dd30@3e1f3; guest pending
-0x0002a8ac	136			unknown	unclassified	unverified		
+0x0002a8ac	136	queue_grid_node_2a8ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002a8ac.json	docs/compiler-abi.md; Take a node from the free list at dword 0x19bb40 (refilled by recycling the oldest, 0x2a934) and queue it at the tail of; callers 2a4c8@2a707; guest pending
 0x0002a934	57	recycle_oldest_grid_node	grid_node_pool	compiles	game	confirmed	decomp/tests/0x0002a934.json	linked queue head to free list; original assumes nonempty
 0x0002a970	104	pop_triple_2a970	game_helpers31	compiles	game	confirmed	decomp/tests/0x0002a970.json	docs/compiler-abi.md; Pop one entry of the 6-byte stack at 0x125262 into the current triple.; callers 3dd30@3e250; guest pending
 0x0002aa08	42	unpack_pair_2aa08	float_helpers1	compiles	game	confirmed	decomp/tests/0x0002aa08.json	docs/compiler-abi.md; Convert a packed 16.16 pair to doubles and clear the third component.; callers 2b1f4@2b331; guest pending

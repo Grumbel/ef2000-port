@@ -10764,3 +10764,30 @@ uint32_t get_time_seconds_a4574(ef_addr32 out)
         EF_U32(out) = r;
     return r;
 }
+
+/* 0x2a8ac, 136 bytes. Take a node from the free list at dword 0x19bb40 (refilled by recycling the oldest, 0x2a934) and queue it at the tail of the list headed by 0x19bb38/0x19bb3c: its words +0, +2, +4 come from the words +0, +4, +8 of the record at S1, word +6 from its own word table (+8, index S0 signed 16 bits), and with byte 0x125847 set the value at +6 is announced with 0x9e508. EBX is left clobbered by the original. */
+void queue_grid_node_2a8ac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, ef_addr32 s1)
+{
+    ef_addr32 node;
+    ef_addr32 tail;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (EF_U32(0x0019bb40u) == 0u)
+        recycle_oldest_grid_node();
+    node = EF_U32(0x0019bb40u);
+    EF_U32(0x0019bb40u) = EF_U32(node + 0x12u);
+    EF_U32(node + 0x12u) = 0u;
+    EF_U16(node) = EF_U16(s1);
+    EF_U16(node + 2u) = EF_U16(s1 + 4u);
+    EF_U16(node + 4u) = EF_U16(s1 + 8u);
+    EF_U16(node + 6u) = EF_U16(node + (uint32_t)((int32_t)(int16_t)s0 * 2) + 8u);
+    if (EF_U8(0x00125847u) != 0u)
+        guest_fn_9e508((int16_t)EF_U16(node + 6u), 0u);
+    tail = EF_U32(0x0019bb38u);
+    if (tail != 0u) {
+        EF_U32(0x0019bb38u) = node;
+        EF_U32(tail + 0x12u) = node;
+    } else {
+        EF_U32(0x0019bb38u) = node;
+        EF_U32(0x0019bb3cu) = node;
+    }
+}
