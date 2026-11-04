@@ -8493,3 +8493,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x89478` | none | none | 8a318@8a42e | Per-frame damping of the heading double at 0x1fd020 (X) by mode byte 0x12d7b2 (1..4; the mode is rewritten unchanged). M |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x53618` | none | none | 53c80@53c9b | Integrate the camera motion state. After refreshing the scene angle record 0x1a5bc0 (value 0xfa00, 0xd0dbc), three float |

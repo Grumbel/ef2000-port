@@ -17801,3 +17801,49 @@ void damp_heading_89478(void)
 	memcpy(ef_guest_memory_ptr(0x001fd020u), &x, 8);
 	EF_U8(0x0012d7b2u) = mode;
 }
+
+static double rd_f32_53618(uint32_t addr)
+{
+	float f;
+
+	memcpy(&f, ef_guest_memory_ptr(addr), 4);
+	return (double)f;
+}
+
+static void wr_f32_53618(uint32_t addr, double v)
+{
+	float f = (float)v;
+
+	memcpy(ef_guest_memory_ptr(addr), &f, 4);
+}
+
+/* 0x53618, 322 bytes. Integrate the camera motion state. After refreshing the scene angle record 0x1a5bc0 (value 0xfa00, 0xd0dbc), three float accumulators are decreased by the scaled words at 0x1a5bc4, 0x1a5bd0, 0x1a5bdc (0x53308: word * float 0x185b50, times -1.0) added to 0x1a5c00, 0x1a5bb8, 0x1a5bbc, and the three rates 0x1a5ba0, 0x1a5ba4, 0x1a5ba8 are set from the scaled words 0x1a5bc8, 0x1a5bd4, 0x1a5be0 times dword 0x1a5be4 times 1/256. With the frame time T (word 0x127d92), 0x1a5c00 += rate0 * T, 0x1a5bb8 += rate1 * T and 0x1a5bbc += T * rate2. The dwords 0x1a5b4c, 0x1a5b38, 0x1a5b5c are cleared and byte 0x1a364e incremented. */
+void integrate_camera_motion_53618(void)
+{
+	double t, s;
+
+	update_scene_angle_second(0x001a5bc0u, 0xfa00u);
+	t = convert_signed_short_scale((int16_t)EF_U16(0x001a5bc4u)) * -1.0;
+	wr_f32_53618(0x001a5c00u, t + rd_f32_53618(0x001a5c00u));
+	t = convert_signed_short_scale((int16_t)EF_U16(0x001a5bd0u)) * -1.0;
+	wr_f32_53618(0x001a5bb8u, t + rd_f32_53618(0x001a5bb8u));
+	t = convert_signed_short_scale((int16_t)EF_U16(0x001a5bdcu)) * -1.0;
+	wr_f32_53618(0x001a5bbcu, t + rd_f32_53618(0x001a5bbcu));
+	t = convert_signed_short_scale((int16_t)EF_U16(0x001a5bc8u)) * (double)(int32_t)EF_U32(0x001a5be4u);
+	wr_f32_53618(0x001a5ba0u, t * 0.00390625);
+	t = convert_signed_short_scale((int16_t)EF_U16(0x001a5bd4u)) * (double)(int32_t)EF_U32(0x001a5be4u);
+	wr_f32_53618(0x001a5ba4u, t * 0.00390625);
+	t = convert_signed_short_scale((int16_t)EF_U16(0x001a5be0u)) * (double)(int32_t)EF_U32(0x001a5be4u);
+	wr_f32_53618(0x001a5ba8u, t * 0.00390625);
+	t = (double)(int32_t)EF_U16(0x00127d92u);
+	s = rd_f32_53618(0x001a5ba0u) * t;
+	wr_f32_53618(0x001a5c00u, s + rd_f32_53618(0x001a5c00u));
+	s = rd_f32_53618(0x001a5ba4u) * t;
+	wr_f32_53618(0x001a5bb8u, s + rd_f32_53618(0x001a5bb8u));
+	s = t * rd_f32_53618(0x001a5ba8u);
+	EF_U32(0x001a5b4cu) = 0u;
+	EF_U32(0x001a5b38u) = 0u;
+	EF_U32(0x001a5b5cu) = 0u;
+	EF_U8(0x001a364eu) = (uint8_t)(EF_U8(0x001a364eu) + 1u);
+	wr_f32_53618(0x001a5bbcu, s + rd_f32_53618(0x001a5bbcu));
+}

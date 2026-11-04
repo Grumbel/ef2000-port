@@ -5931,4 +5931,6 @@ void advance_object_position_724a8(uint32_t index, uint32_t obj);
 
 void damp_heading_89478(void);
 
+void integrate_camera_motion_53618(void);
+
 #endif
