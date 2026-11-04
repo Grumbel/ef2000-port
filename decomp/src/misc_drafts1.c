@@ -10294,3 +10294,25 @@ uint32_t start_stream_ebb58(uint32_t key, ef_addr32 obj)
     EF_U32(obj + 0x15cu) = EF_U32(rec + 8u);
     return slot;
 }
+
+/* 0x9338, 306 bytes. Choose the mode byte 0x12583b for the kind KIND (AX, signed) and store it in the keyed cell named 0x180548 (0xa7ec4): the kind falls into class A (5..7, 20, 21), class B (8..19) or class C (everything else) and the high half of dword 0x41f32c selects the column (2, 1 or other); the nine class/column pairs give 9, 7, 8 / 3, 1, 2 / 6, 4, 5. */
+void select_mode_byte_9338(uint32_t kind)
+{
+    int32_t k = (int16_t)kind;
+    int32_t col;
+    uint8_t cls;
+    uint8_t c;
+    if ((k >= 5 && k < 8) || (k > 0x13 && k <= 0x15))
+        cls = 0u;
+    else if (k >= 8 && k <= 0x13)
+        cls = 1u;
+    else
+        cls = 2u;
+    col = (int32_t)EF_U32(0x0041f32cu) >> 16;
+    c = (col == 2) ? 0u : (col == 1) ? 1u : 2u;
+    {
+        static const uint8_t mode[3][3] = { { 9u, 7u, 8u }, { 3u, 1u, 2u }, { 6u, 4u, 5u } };
+        EF_U8(0x0012583bu) = mode[cls][c];
+    }
+    EF_U32(lookup_key_a7ec4(0x00180548u)) = EF_U8(0x0012583bu);
+}

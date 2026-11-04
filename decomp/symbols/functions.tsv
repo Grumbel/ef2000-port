@@ -129,7 +129,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000090c0	83	update_unit_90c0	game_state_helpers	compiles	game	confirmed	decomp/tests/0x000090c0.json	docs/compiler-abi.md; ; callers 2d488@2d645; guest pending
 0x00009114	461			unknown	unclassified	unverified		
 0x000092f0	69	clear_word_tables_92f0	game_helpers29	compiles	game	confirmed	decomp/tests/0x000092f0.json	docs/compiler-abi.md; Clear five 8-entry word tables.; callers bfcc@c275,c630@c757,c868@c879; guest pending
-0x00009338	306			unknown	unclassified	unverified		
+0x00009338	306	select_mode_byte_9338	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00009338.json	docs/compiler-abi.md; Choose the mode byte 0x12583b for the kind KIND (AX, signed) and store it in the keyed cell named 0x180548 (0xa7ec4): th; callers 9ea0@a0d7; guest pending
 0x0000946c	142	sort_pairs_946c	game_helpers14	compiles	game	confirmed	decomp/tests/0x0000946c.json	docs/compiler-abi.md; Bubble-sort the (key, value) word pairs at 0x197370 by key.; callers 94fc@97ab; guest pending
 0x000094fc	801			unknown	unclassified	unverified		
 0x00009820	1560			unknown	unclassified	unverified		

@@ -5334,4 +5334,6 @@ int32_t atan2_fixed_11f368(int32_t a, int32_t b);
 
 uint32_t start_stream_ebb58(uint32_t key, ef_addr32 obj);
 
+void select_mode_byte_9338(uint32_t kind);
+
 #endif
