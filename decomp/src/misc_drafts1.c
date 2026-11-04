@@ -12137,3 +12137,29 @@ void draw_arc_scaled_c98f8(uint32_t colour, uint32_t d, uint32_t b, uint32_t lo,
     cy = (int32_t)truncate_9d72c((double)(int16_t)d * scale + (double)off_y);
     draw_arc_by_length_fe49c(colour & 0xffu, (uint32_t)cy, (uint32_t)cx, lo, hi, (uint32_t)radius);
 }
+
+/* 0x6a760, 202 bytes. Signed distance of unit B (EDX) along the axis from unit A (EAX): look both up (0x6a1b4); when either is missing or they are the same unit the result is 0.0; otherwise take the position difference (B - A, doubles at +0x49/+0x51/+0x59), the axis vector (0x6a6e8) and the separation (0x6a66c), and return -(dot product of difference and axis) / separation, or 0.0 when the separation is not positive. */
+double axis_offset_6a760(uint32_t a, uint32_t b)
+{
+    int16_t ia = (int16_t)a;
+    int16_t ib = (int16_t)b;
+    ef_addr32 pa = guest_fn_6a1b4(ia);
+    ef_addr32 pb = guest_fn_6a1b4(ib);
+    double axis[3];
+    double diff[3];
+    double len;
+    double xa, xb;
+    int i;
+    if (pa == 0u || pb == 0u || pa == pb)
+        return 0.0;
+    for (i = 0; i < 3; i++) {
+        memcpy(&xb, ef_guest_memory_ptr(pb + 0x49u + (uint32_t)i * 8u), sizeof xb);
+        memcpy(&xa, ef_guest_memory_ptr(pa + 0x49u + (uint32_t)i * 8u), sizeof xa);
+        diff[i] = xb - xa;
+    }
+    unit_axis_difference_6a6e8((ef_addr32)(uintptr_t)axis, ia, ib);
+    len = unit_distance_6a66c(ia, ib);
+    if (0.0 >= len)
+        return 0.0;
+    return ((-diff[1]) * axis[1] + (-diff[0]) * axis[0] + (-diff[2]) * axis[2]) / len;
+}

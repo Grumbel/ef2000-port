@@ -1276,7 +1276,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a5f0	121	indexed_object_distance	object_geometry	compiles	game	confirmed	decomp/tests/0x0006a5f0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x0006a66c	121	unit_distance_6a66c	float_helpers3	compiles	game	confirmed	decomp/tests/0x0006a66c.json	docs/compiler-abi.md; Distance between two units, or 0.0 when either is missing.; callers 6a760@6a7c6; guest pending
 0x0006a6e8	117	unit_axis_difference_6a6e8	float_helpers3	compiles	game	confirmed	decomp/tests/0x0006a6e8.json	docs/compiler-abi.md; Difference of two units' weighted axes, stored as three doubles.; callers 6a760@6a7bd; guest pending
-0x0006a760	202			unknown	unclassified	unverified		
+0x0006a760	202	axis_offset_6a760	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006a760.json	docs/compiler-abi.md; Signed distance of unit B (EDX) along the axis from unit A (EAX): look both up (0x6a1b4); when either is missing or they; callers 66c4@66e6,2479c@24961,73210@7349b; guest pending
 0x0006a82c	207	is_valid_target_6a82c	game_helpers40	compiles	game	confirmed	decomp/tests/0x0006a82c.json	docs/compiler-abi.md; True when the second unit is a valid hostile target for the first.; callers 6a8fc@6a95b,6aeb4@6af2b,6aeb4@6afa6; guest pending
 0x0006a8fc	369			unknown	unclassified	unverified		
 0x0006aa70	316			unknown	unclassified	unverified		

@@ -7587,3 +7587,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc98f8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 4c3bc@4c4e6 | Arc version of 0xc9680: draw an arc in colour COLOUR (EAX, byte) from angle LO (ECX, passed straight through) to HI (sta |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6a760` | EAX:uint32_t,EDX:uint32_t | EAX:double | 66c4@66e6,2479c@24961,73210@7349b | Signed distance of unit B (EDX) along the axis from unit A (EAX): look both up (0x6a1b4); when either is missing or they |

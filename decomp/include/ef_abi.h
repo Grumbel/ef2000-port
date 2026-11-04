@@ -5538,4 +5538,6 @@ void guest_fn_2b1f4_x(int32_t id, uint32_t mode); /* 0x2b1f4 EAX/EDX */
 
 void draw_arc_scaled_c98f8(uint32_t colour, uint32_t d, uint32_t b, uint32_t lo, uint32_t hi, uint32_t r);
 
+double axis_offset_6a760(uint32_t a, uint32_t b);
+
 #endif
