@@ -4209,4 +4209,10 @@ void init_record_pool_80d8c(ef_addr32 text);
 
 void select_handlers_9cfdc(ef_addr32 name);
 
+/* fill_rects2.c */
+void fill_rect_clipped_c91c8(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1);
+void set_param_block_dd9e4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
+void guest_fn_dd870_x(void); /* 0xdd870 no arguments */
+void guest_fn_dd8c0_x(void); /* 0xdd8c0 no arguments */
+
 #endif

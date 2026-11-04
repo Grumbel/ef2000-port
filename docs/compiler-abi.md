@@ -4850,3 +4850,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9cfdc` | EAX:ef_addr32 | none | 3cfc0@3d272,3cfc0@3d2fa,82cec@82cf4 | Select the two handler pairs for a name: defaults when it is empty, otherwise build the path string at 0x40d150 from 0x4 |
+
+## fill_rects2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc91c8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | a5b70@a5c2d,a60a8@a614f,a6d00@a6f05 | Fill a rectangle given as exclusive coordinates when it lies inside the screen (limits 0x15b744/0x15b748); colours up to |
+| `0xdd9e4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | 278c0@2792d,27d18@27d50,f2a30@f2a8e | Store a parameter block at 0x15ee80, bracketing the writes with 0xdd870/0xdd8c0 unless 0x15ee94 is -1. |
