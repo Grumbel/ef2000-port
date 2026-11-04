@@ -4879,4 +4879,6 @@ void step_animation_script_a207c(uint32_t obj, uint32_t other);
 
 uint32_t pack_bit_planes_d19ec(uint32_t dst, uint32_t src);
 
+void assign_roster_slot_740e4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t slot);
+
 #endif

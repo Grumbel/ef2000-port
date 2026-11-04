@@ -6080,3 +6080,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd19ec` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | d1afc@d1bb9 | Pack the 8 bit planes of an image row block: SRC holds 0x15b7cc groups of 8 bytes (bit 0 of each is one pixel's plane bi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x740e4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 7ae4@7b21,7bc0@7c96,2ced4@2d0b7 | Assign the unit A to the slot SLOT (stack byte, 0xff = none) of its owner's roster: the unit's previous slot (byte +0x20 |

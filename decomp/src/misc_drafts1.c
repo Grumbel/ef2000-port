@@ -4855,3 +4855,30 @@ uint32_t pack_bit_planes_d19ec(uint32_t dst, uint32_t src)
     }
     return total;
 }
+
+/* 0x740e4, 263 bytes. Assign the unit A to the slot SLOT (stack byte, 0xff = none) of its owner's roster: the unit's previous slot (byte +0x20b) is cleared (word +0xd of the 25-byte slot entry in the owner's table 0x1972e0[owner byte +0x5f]) when the new slot is 0xff, a new slot receives the unit number; then the bytes +0x209 (B), +0x20a (C) and +0x16d (D) and the slot number are stored in the unit record. (Registers EAX/EDX/EBX/ECX plus one stack byte, ret 4.) */
+void assign_roster_slot_740e4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t slot)
+{
+    uint32_t rec = guest_fn_7489c((int16_t)a);
+    uint32_t owner;
+    uint32_t prev;
+    uint32_t table;
+    if (rec == 0u || EF_U8(0x00125847u) == 0u)
+        return;
+    slot &= 0xffu;
+    owner = (uint32_t)((int32_t)(int16_t)EF_U16(rec + 0x28u) * 0xca) + EF_U32(0x0019bb58u);
+    table = EF_U32(0x001972e0u) + (uint32_t)EF_U8(owner + 0x5fu) * 0x22u;
+    if (slot == 0xffu) {
+        prev = EF_U8(rec + 0x20bu);
+        if (prev != 0xffu) {
+            /* the original recomputes the owner record here; same value */
+            EF_U16(EF_U32(table + 0x1eu) + prev * 25u + 0xdu) = 0xffu;
+        }
+    }
+    if (slot != 0xffu)
+        EF_U16(EF_U32(table + 0x1eu) + slot * 25u + 0xdu) = (uint16_t)a;
+    EF_U8(rec + 0x209u) = (uint8_t)b;
+    EF_U8(rec + 0x20au) = (uint8_t)c;
+    EF_U8(rec + 0x20bu) = (uint8_t)slot;
+    EF_U8(rec + 0x16du) = (uint8_t)d;
+}
