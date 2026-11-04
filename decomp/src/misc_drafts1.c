@@ -1660,7 +1660,7 @@ void finish_resource_file_e3444(void)
     if (h == 0xffffffffu)
         return;
     pos_a = seek_end_a7ae0(0u, 0u, 0u, 0u, h, 0u);
-    guest_fn_e36bc_x();
+    write_string_table_e36bc();
     pos_b = seek_end_a7ae0(0u, 0u, 0u, 0u, EF_U32(0x0015f8f8u), 0u);
     seek_start_a7ab4(0u, 0u, 0u, 0u, EF_U32(0x0015f8f8u), 2u);
     guest_callptr_eaxedx_x(EF_U32(0x0042922cu), (uint32_t)(uintptr_t)&pos_b, 4u);
@@ -3000,4 +3000,22 @@ void insert_nearest_65570(ef_addr32 rec)
             count = 6;
     }
     EF_U16(0x001a81b2u) = (uint16_t)count;
+}
+
+/* 0xe36bc, 205 bytes. Write the string table of the resource being built through the writer at [0x42922c]: the 2-byte count word 0x15eea0, the count * 2 bytes at 0x428090, the total length (4 bytes) of strings 1..count-1 with their terminators, and then those strings (with terminator) from the pointer table [0x428860]. Reports an error through 0x132a74 when fewer than two strings exist. */
+void write_string_table_e36bc(void)
+{
+    uint32_t total = 0u;
+    int16_t i;
+    if ((int16_t)EF_U16(0x0015eea0u) < 2)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00190938u);
+    guest_callptr_eaxedx_x(EF_U32(0x0042922cu), 0x0015eea0u, 2u);
+    guest_callptr_eaxedx_x(EF_U32(0x0042922cu), 0x00428090u, (uint16_t)(EF_U16(0x0015eea0u) * 2u));
+    for (i = 1; i < (int16_t)EF_U16(0x0015eea0u); i++)
+        total += guest_fn_b1b8b(EF_U32(EF_U32(0x00428860u) + (uint32_t)(int32_t)i * 4u)) + 1u;
+    guest_callptr_eaxedx_x(EF_U32(0x0042922cu), (uint32_t)(uintptr_t)&total, 4u);
+    for (i = 1; i < (int16_t)EF_U16(0x0015eea0u); i++) {
+        uint32_t s = EF_U32(EF_U32(0x00428860u) + (uint32_t)(int32_t)i * 4u);
+        guest_callptr_eaxedx_x(EF_U32(0x0042922cu), s, (uint16_t)(guest_fn_b1b8b(s) + 1u));
+    }
 }

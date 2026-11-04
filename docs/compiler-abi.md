@@ -5751,3 +5751,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x65570` | EAX:ef_addr32 | none | 654b8@654ed,654b8@6551c | Insert the record REC (fixed point position at +0 and +8, ids at +0xc and +0xe) into the list of the six nearest records |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe36bc` | none | none | e3444@e3468 | Write the string table of the resource being built through the writer at [0x42922c]: the 2-byte count word 0x15eea0, the |
