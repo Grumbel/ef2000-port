@@ -8296,3 +8296,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x69fac` | none | none | none direct | Rebuild the tactical screen state: clear bits 2 and 6 of byte 0x159130, install the handlers (0xd1f10), clear byte 0x1f6 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x69540` | EAX:ef_addr32,EDX:ef_addr32 | none | 69740@698f6 | Latch a box defined by two position triples (EAX: three words, EDX: three words) into the cursor state when word 0x1f6f4 |

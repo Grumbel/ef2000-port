@@ -5854,4 +5854,7 @@ void rebuild_tactical_screen_69fac(void);
 void guest_fn_68fe0_x(uint32_t a, uint32_t b); /* 0x68fe0 EAX/EBX */
 void guest_fn_69094_x(uint32_t name); /* 0x69094 EAX */
 
+void latch_box_69540(ef_addr32 first, ef_addr32 second);
+uint32_t guest_fn_cd24c_x(void); /* 0xcd24c -> AX */
+
 #endif

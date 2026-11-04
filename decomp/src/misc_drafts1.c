@@ -16347,3 +16347,39 @@ void rebuild_tactical_screen_69fac(void)
 	if (EF_U8(0x001f6f4eu) != 0u)
 		copy_table_689f0();
 }
+
+/* 0x69540, 317 bytes. Latch a box defined by two position triples (EAX: three words, EDX: three words) into the cursor state when word 0x1f6f4a is set: dwords 0x420910, 0x420918, 0x420914, 0x420908, 0x42091c and 0x420904 and words 0x420930..0x42093a. Then, when 0xd0470 for the unit in the high half of dword 0x1282da (all other arguments zero) returns 1, take the selection index from 0xcd24c into dword 0x1282e0; if it is valid, 0x68ccc accepts the pair (high half of dwords 0x1f6f48 and 0x1282de) and the slot word at 0x1f6ef5 + 3 * index is zero, clear the object pair reference (0xe7c50 with the unit, the high half of dword 0x1f6f40 and of 0x1282de). Dword 0x1282e0 is reset to -1. */
+void latch_box_69540(ef_addr32 first, ef_addr32 second)
+{
+	int32_t a0, a1, a2, b0, b1, b2, idx;
+
+	if (EF_U16(0x001f6f4au) == 0u)
+		return;
+	a0 = (int16_t)EF_U16(first);
+	a1 = (int16_t)EF_U16(first + 2u);
+	a2 = (int16_t)EF_U16(first + 4u);
+	b0 = (int16_t)EF_U16(second);
+	b1 = (int16_t)EF_U16(second + 2u);
+	b2 = (int16_t)EF_U16(second + 4u);
+	EF_U32(0x00420910u) = (uint32_t)a0;
+	EF_U32(0x00420918u) = (uint32_t)a2;
+	EF_U32(0x00420914u) = (uint32_t)b0;
+	EF_U32(0x00420908u) = (uint32_t)b1;
+	EF_U32(0x0042091cu) = (uint32_t)b2;
+	EF_U16(0x00420930u) = (uint16_t)a0;
+	EF_U16(0x00420932u) = (uint16_t)a1;
+	EF_U16(0x00420934u) = (uint16_t)a2;
+	EF_U16(0x00420936u) = (uint16_t)b0;
+	EF_U16(0x00420938u) = (uint16_t)b1;
+	EF_U16(0x0042093au) = (uint16_t)b2;
+	EF_U32(0x00420904u) = (uint32_t)a1;
+	if (guest_fn_d0470((int32_t)EF_U32(0x001282dau) >> 16, 0, 0, 0) != 1u)
+		return;
+	idx = (int16_t)guest_fn_cd24c_x();
+	EF_U32(0x001282e0u) = (uint32_t)idx;
+	if (idx != -1
+	    && (guest_fn_68ccc((int16_t)((int32_t)EF_U32(0x001f6f48u) >> 16), (uint16_t)((int32_t)EF_U32(0x001282deu) >> 16)) & 0xffu) != 0u
+	    && EF_U16(0x001f6ef5u + (uint32_t)(idx * 3)) == 0u)
+		guest_fn_e7c50((int32_t)EF_U32(0x001282dau) >> 16, (int32_t)EF_U32(0x001f6f40u) >> 16, (uint32_t)((int32_t)EF_U32(0x001282deu) >> 16));
+	EF_U32(0x001282e0u) = 0xffffffffu;
+}
