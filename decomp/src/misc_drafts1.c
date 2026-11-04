@@ -9606,7 +9606,7 @@ uint32_t run_choice_prompt_7a194(void)
     return result;
 }
 
-/* 0xde3b4, 251 bytes. Send the queued mouse request blocks starting at index START (EAX, low 16 bits signed; dword table at 0x4260d0-0x100): while the byte 0x15ee99 is set and the table entry is not -1, reset the mouse state (0xde4b0), build the 0x16-byte request at [0x42609c] (command 0x16, device byte 0x15ee98, subcommand 0x84, the entry at +0xe and the distance 0x4260ac - entry at +0x12), fill the real-mode call block 0x4260b4 (0x1510, the encoded request address, the dword 0x42611e high half) and issue call 0x2f (0x8b8); stop when the reply word at +3 is 0x300 or the index reaches the word at 0x426122, otherwise advance to the next entry. */
+/* 0xde3b4, 251 bytes. Send the queued mouse request blocks starting at index START (EAX, low 16 bits signed; dword table at 0x425fd0): while the byte 0x15ee99 is set and the table entry is not -1, reset the mouse state (0xde4b0), build the 0x16-byte request at [0x42609c] (command 0x16, device byte 0x15ee98, subcommand 0x84, the entry at +0xe and the distance 0x4260ac - entry at +0x12), fill the real-mode call block 0x4260b4 (0x1510, the encoded request address, the dword 0x42611e high half) and issue call 0x2f (0x8b8); stop when the reply word at +3 is 0x300 or the index reaches the word at 0x426122, otherwise advance to the next entry. */
 void send_mouse_requests_de3b4(uint32_t start)
 {
     uint32_t ecx = start;
