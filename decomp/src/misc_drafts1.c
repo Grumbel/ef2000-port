@@ -12652,3 +12652,25 @@ void update_sound_mode_98198(void)
     EF_U8(0x0012dd0du) = mode;
     EF_U8(0x0012dd0cu) = 1u;
 }
+
+/* 0xc0534, 240 bytes. Twin of 0xc02ec for the kinds 0xe and 0x16: for the first two indices J (0 and 1) of the list LIST (EDX, count by 0xbc5d0) try the two kinds in turn (starting with 0xe, the kind byte toggles on every attempt), find the node (0xcc51c) and fold it into the running value with 0xc0624 (EAX = running value, EDX = kind, EBX = J, ECX = LIST, stack: B, C, S0..S3). Returns the final running value (starts as AX = A). */
+uint32_t fold_list_kinds_c0534(uint32_t a, uint32_t list, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3)
+{
+    uint16_t cur = (uint16_t)a;
+    uint8_t type = 0x16u;
+    int16_t count = (int16_t)guest_fn_bc5d0_x(list);
+    int16_t j;
+    for (j = 0; j < count; j++) {
+        int16_t k;
+        if (j != 0 && j != 1)
+            continue;
+        for (k = 0; k < 2; k++) {
+            uint32_t kind;
+            type = type == 0xeu ? 0x16u : 0xeu;
+            kind = type;
+            if ((uint16_t)find_node_matching_cc51c((uint32_t)(int32_t)j, list, kind) != 0u)
+                cur = (uint16_t)guest_fn_c0624_x((int32_t)(int16_t)cur, kind, (uint32_t)(uint8_t)j, list, b, c, s0, s1, s2, s3);
+        }
+    }
+    return cur;
+}

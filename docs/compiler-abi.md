@@ -7682,3 +7682,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x98198` | none | none | 3dd30@3dfcc | Pick the music/sound mode for the selected object (high word of 0x1f71c8, 0x7489c) and switch to it: only while byte 0x4 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc0534` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | EAX:uint32_t | bc610@bc770 | Twin of 0xc02ec for the kinds 0xe and 0x16: for the first two indices J (0 and 1) of the list LIST (EDX, count by 0xbc5d |

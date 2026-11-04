@@ -2707,7 +2707,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bfcfc	34	find_node_by_record_b	list_lookup	compiles	game	confirmed	decomp/tests/0x000bfcfc.json	docs/compiler-abi.md; Node in the list at *EAX with dwords +0x11/+0x15 equal * to the record's +0x16/+0x1a.; callers 4ce4c@4cf86,50770@507ae,b47e4@b4970; guest pending
 0x000c02ec	197	fold_list_kinds_c02ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c02ec.json	docs/compiler-abi.md; For every index J below the count of list LIST (EDX, 0xbc5d0, signed word) and each of the kinds 0xf, 0x10 and 0x11, fin; callers bc610@bc752; guest pending
 0x000c03b4	382			unknown	unclassified	unverified		
-0x000c0534	240			unknown	unclassified	unverified		
+0x000c0534	240	fold_list_kinds_c0534	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c0534.json	docs/compiler-abi.md; Twin of 0xc02ec for the kinds 0xe and 0x16: for the first two indices J (0 and 1) of the list LIST (EDX, count by 0xbc5d; callers bc610@bc770; guest pending
 0x000c0624	377			unknown	unclassified	unverified		
 0x000c07a0	305	deactivate_records_at_object_c07a0	game_helpers117	compiles	game	confirmed	decomp/tests/0x000c07a0.json	docs/compiler-abi.md; Disable (state 7) every record at the object's position with the object's type, decrementing the object's counters.; callers c0b04@c0f32,c0b04@c0fa0,c0b04@c0fe1; guest pending
 0x000c08d4	270	reactivate_records_at_object_c08d4	game_helpers112	compiles	game	confirmed	decomp/tests/0x000c08d4.json	docs/compiler-abi.md; For each record at the object's position with the given type, reactivate state-7 records (counting them in the object's ; callers c0b04@c0fba,c0b04@c0ff9; guest pending
