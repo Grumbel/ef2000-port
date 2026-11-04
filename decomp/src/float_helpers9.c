@@ -147,3 +147,33 @@ double scaled_call_11b540(double x)
 {
     return guest_fn_b3fec_x(x * EF_F64(0x001958b4u)) * 0.53;
 }
+
+/* 0x1198ec, 75 bytes. Combine the double globals: 0x432a70 = g[432ae0] * g[432948] * g[432908] + g[432c48] * g[432ac8]; 0x432b38 = g[432da0] * g[1956b4] * g[432278] * g[433058] * 0x432a70. */
+void update_globals_1198ec(void)
+{
+    EF_F64(0x00432a70u) = EF_F64(0x00432ae0u) * EF_F64(0x00432948u) * EF_F64(0x00432908u) + EF_F64(0x00432c48u) * EF_F64(0x00432ac8u);
+    EF_F64(0x00432b38u) = EF_F64(0x00432da0u) * EF_F64(0x001956b4u) * EF_F64(0x00432278u) * EF_F64(0x00433058u) * EF_F64(0x00432a70u);
+}
+
+/* 0x11af14, 76 bytes. (ret 8) r = f(a) (0xb3fd0); for |a| > 1 add the constant at 0x1957fc, otherwise use 1 - r; return the 0xa4470 transform (square root with error code 3) of it. */
+double sqrt_branch_11af14(double a)
+{
+    double r = guest_fn_b3fd0_x(a);
+    if (abs_double_b427c(a) > 1.0)
+        r = r + EF_F64(0x001957fcu);
+    else
+        r = 1.0 - r;
+    return guest_fn_a4470(r);
+}
+
+/* 0x11016c, 82 bytes. Pentium FDIV bug probe: when the CPU level 0x13719d is at least 3, compute 4195835 - (4195835 / 3145727) * 3145727 and set bit 0 of 0x1631f0 (use the FPU emulation) when the residue exceeds the constant at 0x1952cc. */
+void fdiv_bug_probe_11016c(void)
+{
+    volatile double a = 4195835.0;
+    volatile double b = 3145727.0;
+    if (EF_U8(0x0013719du) >= 3u) {
+        double residue = a - (a / b) * b;
+        if (residue > EF_F64(0x001952ccu))
+            EF_U8(0x001631f0u) = (uint8_t)(EF_U8(0x001631f0u) | 1u);
+    }
+}

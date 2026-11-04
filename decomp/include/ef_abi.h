@@ -4587,4 +4587,10 @@ double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cl
 double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
 double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
 
+void update_globals_1198ec(void);
+double sqrt_branch_11af14(double a);
+void fdiv_bug_probe_11016c(void);
+double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
+double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
+
 #endif
