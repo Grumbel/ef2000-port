@@ -4860,4 +4860,6 @@ void start_script_record_9fb00(int32_t n);
 void guest_callptr4_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* indirect call: EAX/EDX/EBX/ECX register arguments */
 void guest_fn_160255_x(void); /* 0x160255 */
 
+uint32_t make_route_record_fb954(uint32_t a, uint32_t b, uint32_t c);
+
 #endif

@@ -4576,3 +4576,42 @@ void start_script_record_9fb00(int32_t n)
 {
     start_script_record(n, EF_U16(0x00417222u));
 }
+
+/* 0xfb954, 254 bytes. Allocate a 4-byte route record (tag 0x1935bc) and fill it from the class A, sub-class B and slot C: class 0xe with B = 9 gives {12, 11, 17, 17}; class 0xe with B = 0 gives {3, 5, 9, 17} for slots 0, 2, 5 and {6, 4, 7, 8} for slots 1, 3, 4; classes 0x15..0x17 with B = 2 give {0, 1, 17, 17} (slots 0, 2, 5) or {4, 2, 17, 17}, and with B = 0 give {3, 5, 9, 17} or {7, 6, 7, 8}. Any other combination leaves the record untouched. Returns the record. */
+uint32_t make_route_record_fb954(uint32_t a, uint32_t b, uint32_t c)
+{
+    uint32_t rec = guest_alloc_fmt_cc6c0(4u, 0x001935bcu);
+    uint8_t cls = (uint8_t)a;
+    uint8_t sub = (uint8_t)b;
+    uint8_t slot = (uint8_t)c;
+    int even = (slot == 0u || slot == 2u || slot == 5u);
+    uint32_t v = 0u;
+    int set = 0;
+    if (cls == 0x0eu) {
+        if (sub != 0u) {
+            if (sub == 9u) { v = 0x1111060cu | 0u; set = 2; }
+        } else if (slot <= 5u) {
+            set = 1;
+            v = even ? 0x11090503u : 0x08070406u;
+        }
+    } else if (cls >= 0x15u && cls <= 0x17u) {
+        if (sub != 0u) {
+            if (sub == 2u && slot <= 5u) {
+                set = 1;
+                v = even ? 0x11110100u : 0x11110204u;
+            }
+        } else if (slot <= 5u) {
+            set = 1;
+            v = even ? 0x11090503u : 0x08070607u;
+        }
+    }
+    if (set == 2)
+        v = 0x11110b0cu;
+    if (set != 0) {
+        EF_U8(rec) = (uint8_t)v;
+        EF_U8(rec + 1u) = (uint8_t)(v >> 8);
+        EF_U8(rec + 2u) = (uint8_t)(v >> 16);
+        EF_U8(rec + 3u) = (uint8_t)(v >> 24);
+    }
+    return rec;
+}

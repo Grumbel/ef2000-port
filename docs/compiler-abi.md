@@ -6026,3 +6026,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xa060c` | EAX:int32_t | none | 9e7bc@9e8be | Start the script record number N of the current page. |
 | `0x9fb00` | EAX:int32_t | none | 9e7bc@9e854 | Start the script record number N of the current page, shifted down by the offset word 0x417222. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfb954` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | fc1e8@fc2ac,fc1e8@fc333 | Allocate a 4-byte route record (tag 0x1935bc) and fill it from the class A, sub-class B and slot C: class 0xe with B = 9 |

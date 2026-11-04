@@ -3737,7 +3737,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fb0d4	178	select_wide_slot_count_fb0d4	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fb0d4.json	docs/compiler-abi.md; Identical to 0xfaf0c.; callers fb1a0@fb23e; guest pending
 0x000fb1a0	173	select_slot_count_by_variant_fb1a0	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fb1a0.json	docs/compiler-abi.md; Dispatch to one of the six slot-count selectors by VARIANT (BL): 0 fac78, 1 fad54, 2 fae30, 3 faf0c, 4 faff0, 5 fb0d4, e; callers fbad8@fbe49,fbad8@fbf05,fbad8@fbfd5; guest pending
 0x000fb87c	1649			unknown	unclassified	unverified		
-0x000fb954	254			unknown	unclassified	unverified		
+0x000fb954	254	make_route_record_fb954	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fb954.json	docs/compiler-abi.md; Allocate a 4-byte route record (tag 0x1935bc) and fill it from the class A, sub-class B and slot C: class 0xe with B = 9; callers fc1e8@fc2ac,fc1e8@fc333; guest pending
 0x000fba54	24	call_fba6c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fba54.json	docs/compiler-abi.md; 0xfba6c(dword +0x16, dword +0x1a) with EBX = EAX.; callers fbad8@fbb2b,fbad8@fbc83; guest pending
 0x000fba6c	105	count_matching_entries_fba6c	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000fba6c.json	docs/compiler-abi.md; Count matching type-2 entries across a shape list.; callers bfb88@bfcb6,fba54@fba63; guest pending
 0x000fbad8	1392			unknown	unclassified	unverified		
