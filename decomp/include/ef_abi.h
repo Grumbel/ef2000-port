@@ -5330,4 +5330,6 @@ void update_notice_list_654b8(void);
 
 void refresh_status_widgets_d550(void);
 
+int32_t atan2_fixed_11f368(int32_t a, int32_t b);
+
 #endif

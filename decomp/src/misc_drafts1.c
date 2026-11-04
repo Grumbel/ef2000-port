@@ -10209,3 +10209,48 @@ void refresh_status_widgets_d550(void)
     guest_fn_a4cb4(EF_U8(w + 0x10u));
     refresh_flagged_object_a4b08(w);
 }
+
+/* 0x11f368, 248 bytes. Fixed-point arctangent of A (EAX) over B (EDX), angle units of 0x10000 per turn: 0 for (0, 0); with |A| < |B| the table lookup (0x11f308) of (A << 14) / B, offset by +0xc90f when only B is negative and by -0xc90f when both are negative; otherwise 0x6487 (or -0x6487 for negative A) minus the lookup of (B << 14) / A. */
+int32_t atan2_fixed_11f368(int32_t a, int32_t b)
+{
+    int32_t sa;
+    int32_t sb;
+    uint32_t flag = 0u;
+    int32_t q;
+    int32_t r;
+    if (a == 0 && b == 0)
+        return 0;
+    if (a < 0) {
+        sa = -a;
+        flag = 1u;
+    } else {
+        sa = a;
+    }
+    if (b < 0) {
+        sb = -b;
+        flag |= 2u;
+    } else {
+        sb = b;
+    }
+    if (sa < sb) {
+        q = (int32_t)(((int64_t)a << 14) / b);
+        r = trig_lookup_11f308(q);
+        switch (flag) {
+        case 0: case 1:
+            return r;
+        case 2:
+            return r + 0xc90f;
+        case 3:
+            return r - 0xc90f;
+        default:
+            return 0;
+        }
+    }
+    if (flag > 3u)
+        return 0;
+    q = (int32_t)(((int64_t)b << 14) / a);
+    r = trig_lookup_11f308(q);
+    if ((flag & 1u) == 0u)
+        return 0x6487 - r;
+    return -0x6487 - r;
+}
