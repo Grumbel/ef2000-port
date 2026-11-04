@@ -4711,4 +4711,8 @@ void guest_callptr3r_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c); /* ind
 
 void draw_glyph_7x7_e5cf0(int32_t x, int32_t y, int32_t glyph);
 
+uint32_t rle_encode_d1924(ef_addr32 dst, ef_addr32 src);
+ef_addr32 find_entry_in_range_5ee80(void);
+void claim_ui_slot_801e4(int32_t index, uint32_t arg, uint32_t flag);
+
 #endif

@@ -1165,7 +1165,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005ea64	62	reset_range_5ea64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0005ea64.json	docs/compiler-abi.md; ; callers 5f634@5f688; guest pending
 0x0005eaa4	276			unknown	unclassified	unverified		
 0x0005ebb8	711			unknown	unclassified	unverified		
-0x0005ee80	198			unknown	unclassified	unverified		
+0x0005ee80	198	find_entry_in_range_5ee80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ee80.json	docs/compiler-abi.md; Find the entry (0x54-byte records at 0x1a6b3c, count byte at [[0x1a6b08] + 0x13]) whose position is within 0x7fff of the; callers 9114@9160; guest pending
 0x0005f1ec	52	sample_active_coordinates	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005f1ec.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0005f220	871			unknown	unclassified	unverified		
 0x0005f588	172	turn_direction_5f588	game_helpers38	compiles	game	confirmed	decomp/tests/0x0005f588.json	docs/compiler-abi.md; Turn direction of three points: 1, -1 (0xff) or 0, with a collinear tiebreak.; callers 5f220@5f467; guest pending
@@ -1529,7 +1529,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00080058	192	init_sound_bank_80058	game_helpers46	compiles	game	confirmed	decomp/tests/0x00080058.json	docs/compiler-abi.md; Load the first sound bank once and register its release hook.; callers 3ea0c@3ed58; guest pending
 0x00080120	105	reset_menu_80120	unit_flags	compiles	game	confirmed	decomp/tests/0x00080120.json	docs/compiler-abi.md; ; callers 3dd30@3e881,3ea0c@3eed4,7feb0@7feee; guest pending
 0x0008018c	87	show_menu_value_8018c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0008018c.json	docs/compiler-abi.md; ; callers 3122c@314fe,94d08@94f51; guest pending
-0x000801e4	198			unknown	unclassified	unverified		
+0x000801e4	198	claim_ui_slot_801e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000801e4.json	docs/compiler-abi.md; Claim a UI control slot for the object INDEX: when the feature byte 0x12b070 is set and the count (0x12b07c when FLAG, e; callers 14c5c@14ce6,14c5c@14d11,1851c@18574; guest pending
 0x000802ac	49	ui_release_matching_control	ui_dispatch	compiles	game	confirmed	decomp/tests/0x000802ac.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000802e0	52	show_menu_item_802e0	game_helpers6	compiles	game	confirmed	decomp/tests/0x000802e0.json	docs/compiler-abi.md; ; callers 7ef14@7f445; guest pending
 0x00080314	62	show_menu_item_80314	game_helpers6	compiles	game	confirmed	decomp/tests/0x00080314.json	docs/compiler-abi.md; ; callers 87a20@87d40; guest pending
@@ -3015,7 +3015,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d17d0	144	emit_display_list_d17d0	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000d17d0.json	docs/compiler-abi.md; Emit the fixed command sequence of the 0x18f6e4 display list.; callers d1c54@d1c7c; guest pending
 0x000d1860	52	write_log_word_swapped_d1860	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d1860.json	docs/compiler-abi.md; Write a 16-bit word to the log in big-endian byte order.; callers d17d0@d17ec,d17d0@d17f9,d17d0@d1800; guest pending
 0x000d1894	142	log_palette_d1894	game_helpers123	compiles	game	confirmed	decomp/tests/0x000d1894.json	docs/compiler-abi.md; Log a 256-entry palette: header text, dword 0x300, then three values per entry (a fixed 10/20/30 when mode == 2, otherwi; callers d1c54@d1c83; guest pending
-0x000d1924	197			unknown	unclassified	unverified		
+0x000d1924	197	rle_encode_d1924	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d1924.json	docs/compiler-abi.md; Run-length encode [0x15b7cc] bytes from SRC into DST (PackBits style: a control byte 1-L followed by one byte for a run ; callers d19ec@d1ad9; guest pending
 0x000d19ec	272			unknown	unclassified	unverified		
 0x000d1afc	237			unknown	unclassified	unverified		
 0x000d1bec	104	finish_log_d1bec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d1bec.json	docs/compiler-abi.md; Finish the log file at handle 0x420944: write the sizes into the header (offsets 4 and 0x334, size 0x330 rounded up to e; callers d1c54@d1c8d; guest pending

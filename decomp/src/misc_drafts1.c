@@ -2775,3 +2775,108 @@ void draw_glyph_7x7_e5cf0(int32_t x, int32_t y, int32_t glyph)
         dst += EF_U32(0x001631f4u);
     }
 }
+
+/* 0xd1924, 197 bytes. Run-length encode [0x15b7cc] bytes from SRC into DST (PackBits style: a control byte 1-L followed by one byte for a run of L equal bytes, or L-1 followed by L literal bytes). When the encoding is longer than the input, store the input raw instead (first byte length-1). Returns the number of bytes written. */
+uint32_t rle_encode_d1924(ef_addr32 dst, ef_addr32 src)
+{
+    int32_t n = (int32_t)EF_U32(0x0015b7ccu);
+    uint32_t in = src;
+    uint32_t out = dst;
+    int32_t used = 0;
+    int32_t total = 0;
+    while (n > 0 && total < n) {
+        uint32_t ctl = out;
+        if (EF_U8(in) == EF_U8(in + 1u)) {
+            uint8_t v = EF_U8(in);
+            EF_U8(ctl) = 0u;
+            out++;
+            EF_U8(out) = v;
+            out++;
+            do {
+                EF_U8(ctl) = (uint8_t)(EF_U8(ctl) + 1u);
+                in++;
+                total++;
+            } while (v == EF_U8(in) && total < n);
+            EF_U8(ctl) = (uint8_t)(0u - (uint8_t)(EF_U8(ctl) - 1u));
+            used += 2;
+        } else {
+            EF_U8(ctl) = 0u;
+            out++;
+            do {
+                EF_U8(out) = EF_U8(in);
+                EF_U8(ctl) = (uint8_t)(EF_U8(ctl) + 1u);
+                in++;
+                total++;
+                out++;
+            } while (EF_U8(in) != EF_U8(in + 1u) && total < n);
+            used += (int32_t)EF_U8(ctl) + 1;
+            EF_U8(ctl) = (uint8_t)(EF_U8(ctl) - 1u);
+        }
+    }
+    if (used > (int32_t)EF_U32(0x0015b7ccu)) {
+        EF_U8(dst) = (uint8_t)(EF_U32(0x0015b7ccu) - 1u);
+        guest_fn_dc832(dst + 1u, src, EF_U32(0x0015b7ccu));
+        used = (int32_t)EF_U32(0x0015b7ccu) + 1;
+    }
+    return (uint32_t)used;
+}
+
+/* 0x5ee80, 198 bytes. Find the entry (0x54-byte records at 0x1a6b3c, count byte at [[0x1a6b08] + 0x13]) whose position is within 0x7fff of the view origin (0x1a5bec, 0x1a5be8) and whose offset, rotated by the record's angle, lies inside the limits at +0x1a6b44/46; returns [0x1a6b08] for the first hit, else 0. Does nothing while [0x1a6b04] is zero. */
+ef_addr32 find_entry_in_range_5ee80(void)
+{
+    int16_t i;
+    int16_t n;
+    if (EF_U32(0x001a6b04u) == 0u)
+        return 0u;
+    n = (int16_t)EF_U8(EF_U32(0x001a6b08u) + 0x13u);
+    for (i = 0; i < n; i++) {
+        uint32_t rec = (uint32_t)(int32_t)i * 0x54u;
+        int32_t dx = (int32_t)(EF_U32(0x001a5becu) - EF_U32(0x001a6b3cu + rec));
+        int32_t dy = (int32_t)(EF_U32(0x001a5be8u) - EF_U32(0x001a6b40u + rec));
+        uint16_t out[2];
+        if (dx >= 0x7fff || dy >= 0x7fff)
+            continue;
+        load_sincos_dc7bc(EF_U16(0x001a6b48u + rec));
+        rotate_point_dc7e4((uint32_t)(uintptr_t)out, (int16_t)dx, (int16_t)dy);
+        if ((int32_t)abs_a28f2((int16_t)EF_U16(0x001a6b44u + rec)) > (int32_t)abs_a28f2((int16_t)out[0])
+            && (int32_t)abs_a28f2((int16_t)EF_U16(0x001a6b46u + rec)) > (int32_t)abs_a28f2((int16_t)out[1]))
+            return EF_U32(0x001a6b08u);
+    }
+    return 0u;
+}
+
+/* 0x801e4, 198 bytes. Claim a UI control slot for the object INDEX: when the feature byte 0x12b070 is set and the count (0x12b07c when FLAG, else the byte 0x12b078) is non-zero, give up if the object is already shown in one of the ten slots (0x1f9088) in an active state; otherwise take a device slot for its class (0xd70a0) and dispatch the control (0x7fbec). */
+void claim_ui_slot_801e4(int32_t index, uint32_t arg, uint32_t flag)
+{
+    uint32_t count = 0u;
+    uint32_t slot;
+    uint8_t i;
+    if (EF_U8(0x0012b070u) == 0u)
+        return;
+    if ((flag & 0xffu) != 0u)
+        count = EF_U32(0x0012b07cu);
+    else
+        count = EF_U8(0x0012b078u);
+    if (count == 0u)
+        return;
+    if (read_field_d7748(EF_U32(EF_U32(0x001f9078u) + (uint32_t)(int32_t)(int16_t)index * 4u)) != 0u) {
+        for (i = 0u; i < 10u; i++) {
+            if ((uint16_t)EF_U8(0x001f9088u + i) == (uint16_t)index && (guest_fn_d7594(i) & 0xffu) == 0u)
+                return;
+        }
+    }
+    if ((flag & 0xffu) != 0u) {
+        count = EF_U32(0x0012b07cu);
+        if (count == 0u)
+            return;
+    } else {
+        count = 0u;
+        if (EF_U8(0x0012b078u) == 0u)
+            return;
+    }
+    slot = claim_device_slot_d70a0((uint8_t)read_field_d7738(EF_U32(EF_U32(0x001f9078u) + (uint32_t)(int32_t)(int16_t)index * 4u)));
+    if ((slot & 0xffu) == 0xeu)
+        return;
+    EF_U8(0x001f9088u + (slot & 0xffu)) = (uint8_t)index;
+    guest_fn_7fbec(slot & 0xffu, arg & 0xffu, (uint32_t)(int32_t)(int16_t)index, count);
+}

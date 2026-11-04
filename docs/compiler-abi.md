@@ -5724,3 +5724,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe5cf0` | EAX:int32_t,EDX:int32_t,EBX:int32_t | none | e5db4@e5e15,e5db4@e5e74 | Draw the 7x7 bitmap glyph GLYPH (7 row bytes at 0x15fab0 + 7 * GLYPH, bit 7 first) at (X, Y) in the colour [0x433eb0], c |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd1924` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | d19ec@d1ad9 | Run-length encode [0x15b7cc] bytes from SRC into DST (PackBits style: a control byte 1-L followed by one byte for a run  |
+| `0x5ee80` | none | EAX:ef_addr32 | 9114@9160 | Find the entry (0x54-byte records at 0x1a6b3c, count byte at [[0x1a6b08] + 0x13]) whose position is within 0x7fff of the |
+| `0x801e4` | EAX:int32_t,EDX:uint32_t,EBX:uint32_t | none | 14c5c@14ce6,14c5c@14d11,1851c@18574 | Claim a UI control slot for the object INDEX: when the feature byte 0x12b070 is set and the count (0x12b07c when FLAG, e |
