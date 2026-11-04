@@ -11243,3 +11243,19 @@ void rescale_dialog_widgets_35de0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_
     /* ORIGINAL BUG: ROOT is dereferenced even when it is NULL. */
     redraw_item_a5ef8(EF_U8(root + 0x10u));
 }
+
+/* 0xc594, 155 bytes. Close out the current trace: unless byte 0x126576 or either word 0x137998/0x13799a is set, dump the pending record (0xb3084 with text 0x18086c and the records at 0x137988, 0x137970, 0x137980 plus six signed high words), then reset the view tables, clear bytes 0x121e8c, 0x126576 and 0x126577 and set the pending name 0x18099c. */
+void finish_trace_c594(void)
+{
+    if (EF_U8(0x00126576u) == 0u && EF_U16(0x00137998u) == 0u && EF_U16(0x0013799au) == 0u) {
+        guest_fn_b3084_x(0x0018086cu, 0x00137988u, 0x00137970u, 0x00137980u, 0x00134d8au,
+                         (uint32_t)((int32_t)EF_U32(0x0013799cu) >> 16), (uint32_t)((int32_t)EF_U32(0x0013799eu) >> 16),
+                         (uint32_t)((int32_t)EF_U32(0x001379a0u) >> 16), (uint32_t)((int32_t)EF_U32(0x0041f32cu) >> 16),
+                         (uint32_t)((int32_t)EF_U32(0x0041f328u) >> 16), (uint32_t)((int32_t)EF_U32(0x0041f32au) >> 16));
+    }
+    reset_view_tables_b1b10();
+    EF_U8(0x00121e8cu) = 0u;
+    EF_U8(0x00126576u) = 0u;
+    EF_U8(0x00126577u) = 0u;
+    set_pending_name_ac7a8(0x0018099cu);
+}

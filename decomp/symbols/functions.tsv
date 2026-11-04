@@ -163,7 +163,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000bf24	75	gpwSaveConflict		named	unclassified	unverified		
 0x0000bf70	91	onleaveOptions		named	unclassified	unverified		
 0x0000bfcc	1449			unknown	unclassified	unverified		
-0x0000c594	155			unknown	unclassified	unverified		
+0x0000c594	155	finish_trace_c594	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000c594.json	docs/compiler-abi.md; Close out the current trace: unless byte 0x126576 or either word 0x137998/0x13799a is set, dump the pending record (0xb3; callers none direct; guest pending
 0x0000c630	311			unknown	unclassified	unverified		
 0x0000c768	207	layout_slot_widgets_c768	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000c768.json	docs/compiler-abi.md; Lay out the four numbered slot widgets of the dialog 0x180728 for the selection INDEX (EAX, signed word): the widget 0x1; callers bfcc@c264,c868@c88a,7bc00@7bc1d; guest pending
 0x0000c838	48	gpwShowDebrief		named	unclassified	unverified		
