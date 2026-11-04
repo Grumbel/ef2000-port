@@ -4990,4 +4990,6 @@ void draw_map_markers_436dc(uint32_t head, uint32_t list);
 
 
 
+void start_sample_d7158(uint32_t chan, uint32_t pan, uint32_t rec, uint32_t vol);
+
 #endif

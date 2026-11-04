@@ -6036,3 +6036,32 @@ void draw_map_markers_436dc(uint32_t head, uint32_t list)
         node = EF_U32(node + 4u);
     }
 }
+
+/* 0xd7158, 348 bytes. Start sample channel CHAN (< 0xe, else report through the callback at 0x132a74 with string 0x18f998) playing the sound record REC (data pointer +0x1c, length +0x18, volume word +0xf, flag byte +0xd; nothing unless the data exists, byte 0x15bac4 is set and REC flag +0xd is set; a zero length falls back to the record at +0x1c): touch every 4 KiB page of the data, lock the range, then program the channel handle (table 0x420dd0): reset, set data/length, parameter 0x5622, volume (VOL, or the record's byte +0x11), word +0xf, the second argument PAN, the completion callback 0xd710c, count the playing sound (dword 0x15bad0) and start. */
+void start_sample_d7158(uint32_t chan, uint32_t pan, uint32_t rec, uint32_t vol)
+{
+    uint32_t r = rec;
+    uint32_t len, i, h, v;
+    uint8_t c = (uint8_t)chan;
+    if (EF_U32(r + 0x1cu) == 0u || EF_U8(0x0015bac4u) == 0u || EF_U8(r + 0xdu) == 0u)
+        return;
+    if (c >= 0xeu)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018f998u, c);
+    if (EF_U32(r + 0x18u) == 0u)
+        r = EF_U32(r + 0x1cu);
+    len = EF_U32(r + 0x18u);
+    for (i = 0u; (int32_t)i < (int32_t)len; i += 0x1000u)
+        (void)EF_U8(EF_U32(r + 0x1cu) + i);
+    stack_range_104908(EF_U32(r + 0x1cu), EF_U32(r + 0x18u) - 1u);
+    h = EF_U32(0x00420dd0u + c * 4u);
+    trace_call_102738(0u, 0u, 0u, 0u, h, 0u, 0u);
+    trace_call_1026fc(0u, 0u, 0u, 0u, h, EF_U32(r + 0x1cu), EF_U32(r + 0x18u));
+    trace_call_102824(h, 0x5622u);
+    v = vol != 0u ? vol : (uint32_t)((int32_t)EF_U32(r + 0xfu) >> 16);
+    trace_call_102858(h, v & 0xffu);
+    trace_call_102824(h, EF_U16(r + 0xfu));
+    trace_call_1028c0(h, pan);
+    trace_call_102dbc(0u, 0u, 0u, 0u, h, 0x000d710cu);
+    EF_U32(0x0015bad0u) = EF_U32(0x0015bad0u) + 1u;
+    trace_call_102774(h);
+}
