@@ -426,7 +426,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000298f0	491			unknown	unclassified	unverified		
 0x00029adc	55	scaled_rotation_29adc	float_helpers1	compiles	game	confirmed	decomp/tests/0x00029adc.json	docs/compiler-abi.md; Two scaled components from a record's rotation words.; callers 29b14@29c4d; guest pending
 0x00029b14	699			unknown	unclassified	unverified		
-0x00029dd0	386			unknown	unclassified	unverified		
+0x00029dd0	386	unit_damage_tick_29dd0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00029dd0.json	docs/compiler-abi.md; Per-unit damage tick for unit AX (signed). Does nothing for a missing unit. A unit without a target (+0x1c) with a nonze; callers 29f54@2a159,6583c@6588c; guest pending
 0x00029f54	532			unknown	unclassified	unverified		
 0x0002a168	92	refresh_object_2a168	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0002a168.json	docs/compiler-abi.md; ; callers 2541c@25450; guest pending
 0x0002a1c4	54	refresh_record_2a1c4	game_helpers23	compiles	game	confirmed	decomp/tests/0x0002a1c4.json	docs/compiler-abi.md; Re-evaluate a record's state byte and refresh the object.; callers 2541c@25457; guest pending

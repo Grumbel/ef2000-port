@@ -8091,3 +8091,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1e28c` | none | none | 3dd30@3dd77 | Walk the list at [0x137988] (next link at +4) and set flag byte 0x137a00. For every node read the plane cell for (+0x16, |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x29dd0` | EAX:uint32_t | none | 29f54@2a159,6583c@6588c | Per-unit damage tick for unit AX (signed). Does nothing for a missing unit. A unit without a target (+0x1c) with a nonze |

@@ -5756,4 +5756,6 @@ void measure_view_range_67d4(void);
 
 void refresh_node_progress_1e28c(void);
 
+void unit_damage_tick_29dd0(uint32_t ax);
+
 #endif

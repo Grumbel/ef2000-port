@@ -14833,3 +14833,53 @@ void refresh_node_progress_1e28c(void)
         node = EF_U32(node + 4u);
     }
 }
+
+/* 0x29dd0, 386 bytes. Per-unit damage tick for unit AX (signed). Does nothing for a missing unit. A unit without a target (+0x1c) with a nonzero counter (word +0x1d8) raises event 0x88664 and decrements the counter; with a zero counter and byte 0x41f833 equal to 0x74 it triggers sound 0x42. With a target and a nonzero counter: when the larger axis distance (x or z, dwords +0 and +8) to the target exceeds 0x2b40d5, raise the event with 0 and return without decrementing; otherwise compute a level 0..100, either from the byte table at 0x1264e5 (5-byte rows indexed by byte 0x1264e2) when 0x7574c accepts the unit or as 10.0 minus the double at record +0x128637 (0xe5-byte rows, row from the high half of 0x126302, capped at 9.0), raise the event with that level and decrement the counter. */
+void unit_damage_tick_29dd0(uint32_t ax)
+{
+    uint32_t unit, target, dist, row;
+    int32_t dx, dz;
+    int16_t level;
+    double d;
+
+    unit = guest_fn_7489c((int32_t)(int16_t)ax);
+    if (unit == 0u)
+        return;
+    target = EF_U32(unit + 0x1cu);
+    if (target == 0u) {
+        if (EF_U16(unit + 0x1d8u) != 0u) {
+            unit_event_88664(unit, 0u);
+            EF_U16(unit + 0x1d8u) = (uint16_t)(EF_U16(unit + 0x1d8u) - 1u);
+        } else if (EF_U8(0x0041f833u) == 0x74u) {
+            trigger_sound_8160c(0x42u);
+        }
+        return;
+    }
+    if (EF_U16(unit + 0x1d8u) == 0u)
+        return;
+    dx = (int32_t)(EF_U32(target) - EF_U32(unit));
+    dz = (int32_t)(EF_U32(target + 8u) - EF_U32(unit + 8u));
+    if (abs_cf94a(dx) > abs_cf94a(dz))
+        dist = abs_cf94a(dx);
+    else
+        dist = abs_cf94a(dz);
+    if ((int32_t)dist > 0x2b40d5) {
+        unit_event_88664(unit, 0u);
+        return;
+    }
+    if (object_uses_secondary_grid((int16_t)ax)) {
+        level = (int16_t)EF_U8(0x001264e5u + EF_U8(0x001264e2u) * 5u);
+    } else {
+        row = (uint32_t)(((int32_t)EF_U32(0x00126302u) >> 16) * 0xe5);
+        memcpy(&d, ef_guest_memory_ptr(0x00128637u + row), sizeof d);
+        if (d > 9.0)
+            d = 9.0;
+        level = (int16_t)(int32_t)truncate_9d72c(10.0 - d);
+    }
+    if (level < 0)
+        level = 0;
+    if (level > 100)
+        level = 100;
+    unit_event_88664(unit, (uint32_t)(uint16_t)level);
+    EF_U16(unit + 0x1d8u) = (uint16_t)(EF_U16(unit + 0x1d8u) - 1u);
+}
