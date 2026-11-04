@@ -6427,4 +6427,7 @@ uint32_t lookup_pair_106514(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
 void combine_globals_1199c8(void);
 void combine_globals_1199c8(void); /* 0x1199c8 */
 
+void age_record_chain_a00e8(void);
+void age_record_chain_a00e8(void); /* 0xa00e8 */
+
 #endif

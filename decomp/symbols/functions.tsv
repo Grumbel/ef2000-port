@@ -2109,7 +2109,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a0018	69	find_chain_entry_a0018	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a0018.json	docs/compiler-abi.md; Find the entry in the 0x4e-byte chain whose two keys match, or -1.; callers a0228@a0240; guest pending
 0x000a0060	65	run_entry_chain_a0060	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000a0060.json	docs/compiler-abi.md; Reset the time scale at 0x132b20 and, if 0x137a00 is set, run 0xa0174 on every entry of the 0x4e-byte chain starting at ; callers 3dd30@3deec; guest pending
 0x000a00a4	67	countdown_record_a00a4	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a00a4.json	docs/compiler-abi.md; Count a record down; true while it is still live.; callers a00e8@a013d; guest pending
-0x000a00e8	137			unknown	unclassified	unverified		
+0x000a00e8	137	age_record_chain_a00e8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a00e8.json	docs/compiler-abi.md; Advance the float at 0x132b38 by the float at 0x132b20; once it reaches 1.0 add the double at 0x18b310 and age the chain; callers a0060@a009a; guest pending
 0x000a0174	177	advance_object_vectors_a0174	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a0174.json	docs/compiler-abi.md; Advance the two vector pairs of the object OBJ: copy the vector at +0x3c to 0x132b28, then add the vector at +0x30 scale; callers a0060@a008c; guest pending
 0x000a0228	651			unknown	unclassified	unverified		
 0x000a04b4	344			unknown	unclassified	unverified		

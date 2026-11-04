@@ -22522,3 +22522,29 @@ void combine_globals_1199c8(void)
     *(double *)ef_guest_memory_ptr((ef_addr32)0x00432b00u) =
         k * md_rd_f64(0x00432da0u) * (g * h * md_rd_f64(0x00433058u)) * x;
 }
+
+/* 0xa00e8, 137 bytes. Advance the float at 0x132b38 by the float at 0x132b20; once it reaches 1.0 add the double at 0x18b310 and age the chain of 0x4e-byte records starting at the index word 0x132b26, unlinking each record whose countdown expired. */
+void age_record_chain_a00e8(void)
+{
+	float *acc = (float *)ef_guest_memory_ptr((ef_addr32)0x132b38);
+	int32_t idx;
+	uint32_t cx;
+
+	*acc = *(float *)ef_guest_memory_ptr((ef_addr32)0x132b20) + *acc;
+	if (1.0 >= (double)*acc)
+		return;
+	*acc = (float)((double)*acc + md_rd_f64(0x18b310));
+	idx = (int16_t)EF_U16(0x132b26);
+	for (;;) {
+		uint32_t off;
+		if (idx == -1)
+			return;
+		off = (uint32_t)idx * 0x4e;
+		if (countdown_record_a00a4(0x416e40 + off) != 0) {
+			cx = EF_U16(0x416e46 + off);
+			EF_U16(0x132b26) = EF_U16(0x416e44 + off);
+			EF_U16(0x416e46 + off) = (uint16_t)(cx - 1);
+		}
+		idx = (int16_t)EF_U16(0x416e44 + off);
+	}
+}

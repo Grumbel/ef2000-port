@@ -9348,3 +9348,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1199c8` | none | none | 1196a0@1196b4 | Sibling of 0x119a54: X = (A+B+C)*g + D*h*k is stored at 0x432b58 and k*m*g*h*p*X at 0x432b00. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa00e8` | none | none | a0060@a009a | Advance the float at 0x132b38 by the float at 0x132b20; once it reaches 1.0 add the double at 0x18b310 and age the chain |
