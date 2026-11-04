@@ -6610,3 +6610,15 @@ void push_message_entry_56268(ef_addr32 src)
         idx = 0u;
     EF_U32(0x00127db4u) = idx;
 }
+
+/* 0x10e2f5, 106 bytes. Convert the unsigned 64-bit value at VALUE_PTR to exactly N decimal digits (zero padded, high digits truncated) at BUF, followed by a zero byte. */
+void u64_to_digits_10e2f5(ef_addr32 value_ptr, ef_addr32 buf, uint32_t n)
+{
+    uint64_t v = ((uint64_t)EF_U32(value_ptr + 4u) << 32) | EF_U32(value_ptr);
+    uint32_t i;
+    EF_U8(buf + n) = 0u;
+    for (i = n; i > 0u; i--) {
+        EF_U8(buf + i - 1u) = (uint8_t)(0x30u + (uint32_t)(v % 10u));
+        v /= 10u;
+    }
+}

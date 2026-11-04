@@ -6436,3 +6436,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x56268` | EAX:ef_addr32 | none | 55f54@55ff0 | Append a message entry to the ring of ten 55-byte records at 0x1a63c0 (next index in dword 0x127db4): clear the first ei |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10e2f5` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | 120560@120715 | Convert the unsigned 64-bit value at VALUE_PTR to exactly N decimal digits (zero padded, high digits truncated) at BUF,  |

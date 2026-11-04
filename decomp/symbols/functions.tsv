@@ -4003,7 +4003,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010e08d	17			unknown	unclassified	unverified		
 0x0010e250	58			unknown	unclassified	unverified		
 0x0010e28a	107	round_double_to_int64_10e28a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e28a.json	docs/compiler-abi.md; Convert the positive double at P in place to a 64-bit integer: restore the hidden mantissa bit, shift left for large exp; callers ebea3@ebece; guest pending
-0x0010e2f5	106			unknown	unclassified	unverified		
+0x0010e2f5	106	u64_to_digits_10e2f5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e2f5.json	docs/compiler-abi.md; Convert the unsigned 64-bit value at VALUE_PTR to exactly N decimal digits (zero padded, high digits truncated) at BUF, ; callers 120560@120715; guest pending
 0x0010e35f	167			unknown	unclassified	unverified		
 0x0010e414	2			unknown	unclassified	unverified		
 0x0010e438	18	call_11d258_default	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e438.json	docs/compiler-abi.md; 0x11d258(0x195168, 1).; callers ed6c5@ed6c5,108afd@108d4e; guest pending

@@ -5058,4 +5058,6 @@ void guest_callptr4c_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_
 
 void push_message_entry_56268(ef_addr32 src);
 
+void u64_to_digits_10e2f5(ef_addr32 value_ptr, ef_addr32 buf, uint32_t n);
+
 #endif
