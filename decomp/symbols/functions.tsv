@@ -97,7 +97,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00006f48	229			unknown	unclassified	unverified		
 0x00007030	459			unknown	unclassified	unverified		
 0x000071fc	266			unknown	unclassified	unverified		
-0x00007308	201			unknown	unclassified	unverified		
+0x00007308	201	maybe_fire_message_7308	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00007308.json	docs/compiler-abi.md; Occasionally fire a message from object B (EDX) at the nearest record of the owner of A (EAX; owner word at +0x15 of... ; callers 73ec@7563; guest pending
 0x000073d4	23	record_value_not_above_limit	low_helpers	compiles	game	confirmed	decomp/tests/0x000073d4.json	docs/compiler-abi.md; !(double record+0x71 > double 0x1803c4); callers 759c@7753; guest pending
 0x000073ec	430			unknown	unclassified	unverified		
 0x0000759c	469			unknown	unclassified	unverified		

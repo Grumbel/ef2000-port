@@ -7593,3 +7593,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6a760` | EAX:uint32_t,EDX:uint32_t | EAX:double | 66c4@66e6,2479c@24961,73210@7349b | Signed distance of unit B (EDX) along the axis from unit A (EAX): look both up (0x6a1b4); when either is missing or they |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7308` | EAX:ef_addr32,EDX:ef_addr32 | none | 73ec@7563 | Occasionally fire a message from object B (EDX) at the nearest record of the owner of A (EAX; owner word at +0x15 of...  |

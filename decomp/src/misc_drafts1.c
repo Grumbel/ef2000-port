@@ -12163,3 +12163,37 @@ double axis_offset_6a760(uint32_t a, uint32_t b)
         return 0.0;
     return ((-diff[1]) * axis[1] + (-diff[0]) * axis[0] + (-diff[2]) * axis[2]) / len;
 }
+
+/* 0x7308, 201 bytes. Occasionally fire a message from object B (EDX) at the nearest record of the owner of A (EAX; owner word at +0x15 of... high word of +0x13): search the table with 0x2c454 at B+0x61 (first with mode 0xd, then 0), skip when none (0xff) or the record's flag byte +0x1a is clear or its grid distance to the target word at 0x197262 scaled by the double 0x1803b4 exceeds the double 0x1803bc, and fire only when a random number (0x9c960) is a multiple of the byte 0x197268 (the original divides by it unchecked). Then call 0x46254 with the words at +0x4e of A and the record, the code 0x3a, the target word and two zero stack values. */
+void maybe_fire_message_7308(ef_addr32 a, ef_addr32 b)
+{
+    ef_addr32 p = b + 0x61u;
+    int32_t hw = (int32_t)EF_U32(a + 0x13u) >> 16;
+    int32_t id = (int16_t)guest_fn_2c454(p, hw, 0xdu, 1u);
+    ef_addr32 rec;
+    double d;
+    double limit;
+    double scale;
+    uint32_t r;
+    uint32_t div;
+    int32_t target = (int32_t)EF_U32(0x00197262u) >> 16;
+    if (id == 0xff) {
+        id = (int16_t)guest_fn_2c454(p, (int32_t)EF_U32(a + 0x13u) >> 16, 0u, 1u);
+        if (id == 0xff)
+            return;
+    }
+    rec = EF_U32(0x0019bb58u) + (uint32_t)id * 0xcau;
+    if (rec == 0u || EF_U8(rec + 0x1au) == 0u)
+        return;
+    memcpy(&scale, ef_guest_memory_ptr(0x001803b4u), sizeof scale);
+    memcpy(&limit, ef_guest_memory_ptr(0x001803bcu), sizeof limit);
+    d = grid_cell_distance((int16_t)id, (int16_t)target) * scale;
+    if (d > limit)
+        return;
+    r = guest_fn_9c960() & 0xffffu;
+    div = EF_U8(0x00197268u);
+    if (r % div != 0u)
+        return;
+    guest_fn_46254((uint32_t)((int32_t)EF_U32(a + 0x4eu) >> 16), (int32_t)EF_U32(rec + 0x4eu) >> 16, 0x3au,
+                   (uint32_t)target, 0u, 0u);
+}

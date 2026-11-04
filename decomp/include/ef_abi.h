@@ -5540,4 +5540,6 @@ void draw_arc_scaled_c98f8(uint32_t colour, uint32_t d, uint32_t b, uint32_t lo,
 
 double axis_offset_6a760(uint32_t a, uint32_t b);
 
+void maybe_fire_message_7308(ef_addr32 a, ef_addr32 b);
+
 #endif
