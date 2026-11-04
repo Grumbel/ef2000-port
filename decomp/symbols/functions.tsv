@@ -294,7 +294,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000174f8	62	unit_kind_allows_174f8	game_helpers4	compiles	game	confirmed	decomp/tests/0x000174f8.json	docs/compiler-abi.md; Is the unit's kind not one of 0, 7, 9, 0xa, 0xb, 0xc?; callers 16034@16069,16034@16158,16034@16170; guest pending
 0x00017538	95	take_charge_17538	game_helpers7	compiles	game	confirmed	decomp/tests/0x00017538.json	docs/compiler-abi.md; Take one charge from the first of the ten word slots that has one.; callers 15b7c@15ff6; guest pending
 0x00017754	517			unknown	unclassified	unverified		
-0x00017f10	289			unknown	unclassified	unverified		
+0x00017f10	289	switch_player_mode_17f10	game_helpers66	compiles	game	confirmed	decomp/tests/0x00017f10.json	docs/compiler-abi.md; Switch the player unit's mode when no blocking state is active.; callers 601c@60d3; guest pending
 0x00018118	154	toggle_hint_flag_18118	float_helpers3	compiles	game	confirmed	decomp/tests/0x00018118.json	docs/compiler-abi.md; Toggle the autopilot hint flag when the player is in the right state.; callers 7957c@79654; guest pending
 0x0001851c	96	fire_idle_action_1851c	game_helpers31	compiles	game	confirmed	decomp/tests/0x0001851c.json	docs/compiler-abi.md; Fire the one-shot action when the idle conditions hold.; callers 72944@72ce2,72944@72d3f; guest pending
 0x00018a68	222			unknown	unclassified	unverified		
@@ -1254,7 +1254,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00069978	89	gpwArcadeAccepted		named	unclassified	unverified		
 0x000699d4	29	onopenBigCurrentWeapon		named	unclassified	unverified		
 0x000699f4	73	find_named_record_699f4	game_helpers9	compiles	game	confirmed	decomp/tests/0x000699f4.json	docs/compiler-abi.md; Index of the 0x91-byte record whose name equals text, or 0.; callers 69bdc@69bfd; guest pending
-0x00069a40	301			unknown	unclassified	unverified		
+0x00069a40	301	weapon_flags_any_69a40	game_helpers66	compiles	game	confirmed	decomp/tests/0x00069a40.json	docs/compiler-abi.md; Test whether any of the low 13 flag bits of a weapon table entry is set.; callers 69b70@69ba4; guest pending
 0x00069b70	106			unknown	unclassified	unverified		
 0x00069bdc	305	gpwRedrawCurrentWeaponWindow		named	unclassified	unverified		
 0x00069d10	524			unknown	unclassified	unverified		
@@ -1831,7 +1831,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008e664	729			unknown	unclassified	unverified		
 0x0008e940	924			unknown	unclassified	unverified		
 0x0008ecdc	604			unknown	unclassified	unverified		
-0x0008ef38	270			unknown	unclassified	unverified		
+0x0008ef38	270	clear_named_references_8ef38	game_helpers66	compiles	game	confirmed	decomp/tests/0x0008ef38.json	docs/compiler-abi.md; Clear nine named object references for the object's id.; callers 8c49c@8c8c1,8d11c@8d1a3,8d330@8d3b6; guest pending
 0x0008f07c	377			unknown	unclassified	unverified		
 0x0008f22c	341			unknown	unclassified	unverified		
 0x0008f3c0	3	return_zero_8f3c0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0008f3c0.json	docs/compiler-abi.md; ; callers 3f7fc@3f91c; guest pending

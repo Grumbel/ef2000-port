@@ -3499,4 +3499,11 @@ void guest_fn_e393c_w(void); /* 0xe393c */
 int32_t guest_fn_e3908_w(int32_t a); /* 0xe3908 EAX */
 void guest_fn_c4654_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xc4654 EAX/EDX/EBX/ECX */
 
+/* game_helpers66.c */
+uint8_t weapon_flags_any_69a40(int16_t index);
+void clear_named_references_8ef38(ef_addr32 object);
+void switch_player_mode_17f10(void);
+void guest_fn_7eec4_w(void); /* 0x7eec4 */
+int32_t guest_fn_85d00_w(int32_t a); /* 0x85d00 EAX -> AX */
+
 #endif

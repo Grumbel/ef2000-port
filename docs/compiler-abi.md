@@ -3927,3 +3927,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xdf65c` | none | AL:uint8_t | dfac8@dfb73,dfac8@dfbf6,dfac8@dfe68 | Latch the selected menu entry's geometry; returns 1 when an entry was latched. |
 | `0xe3ad0` | none | AL:uint8_t | 97dcc@97ee7 | Reload the halfword table one step at a time; returns whether more steps remain. |
+
+## game_helpers66 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x69a40` | AX:int16_t | AL:uint8_t | 69b70@69ba4 | Test whether any of the low 13 flag bits of a weapon table entry is set. |
+| `0x8ef38` | EAX:ef_addr32 | none | 8c49c@8c8c1,8d11c@8d1a3,8d330@8d3b6 | Clear nine named object references for the object's id. |
+| `0x17f10` | none | none | 601c@60d3 | Switch the player unit's mode when no blocking state is active. |
