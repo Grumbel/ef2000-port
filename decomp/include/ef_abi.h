@@ -5185,4 +5185,7 @@ void draw_dithered_span_d4430(void);
 
 uint32_t extended_to_float_f0034(uint32_t ptr);
 
+uint32_t double_bits_to_float_118b10(uint32_t lo, uint32_t hi);
+void draw_shaded_span_d44b0(void);
+
 #endif

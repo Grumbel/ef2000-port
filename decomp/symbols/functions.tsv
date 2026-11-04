@@ -3053,7 +3053,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d4250	250			unknown	unclassified	unverified		
 0x000d4370	173			unknown	unclassified	unverified		
 0x000d4430	117	draw_dithered_span_d4430	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d4430.json	docs/compiler-abi.md; Draw one dithered shaded span: from the signed word 0x485fea to the signed word 0x485fd2 (nothing unless the end is afte; callers none direct; guest pending
-0x000d44b0	84			unknown	unclassified	unverified		
+0x000d44b0	84	draw_shaded_span_d44b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d44b0.json	docs/compiler-abi.md; Draw one shaded span: from the signed word 0x485fea to the signed word 0x485fd2 (nothing unless the end is after the sta; callers none direct; guest pending
 0x000d4510	197	fill_span_d4510	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d4510.json	docs/compiler-abi.md; Fill one horizontal span with the colour byte 0x159138: from the signed word 0x485fea to the signed word 0x485fd2 (inclu; callers fddf0@fde0c; guest pending
 0x000d53ff	1676			unknown	unclassified	unverified		
 0x000d5a90	271			unknown	unclassified	unverified		
@@ -4155,7 +4155,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001186cc	53	serial_set_rts_1186cc	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x001186cc.json	docs/compiler-abi.md; Set or clear bit 1 of the modem control register.; callers 106f10@106fe5,117f68@118273; guest pending
 0x00118770	277			unknown	unclassified	unverified		
 0x00118910	368			unknown	unclassified	unverified		
-0x00118b10	76			unknown	unclassified	unverified		
+0x00118b10	76	double_bits_to_float_118b10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00118b10.json	docs/compiler-abi.md; Convert the double whose bits are EDX:EAX (EAX = low dword, EDX = high dword) to the bits of a float (returned in EAX): ; callers 108afd@108dc8; guest pending
 0x00118b60	2869			unknown	unclassified	unverified		
 0x001196a0	40	run_table_initialisers_1196a0	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x001196a0.json	docs/compiler-abi.md; Run the seven table initialisers, then 0x11c20c.; callers 1098f0@1098f0; guest pending
 0x001196c8	377			unknown	unclassified	unverified		

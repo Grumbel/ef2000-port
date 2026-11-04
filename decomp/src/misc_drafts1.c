@@ -8241,3 +8241,44 @@ uint32_t extended_to_float_f0034(uint32_t ptr)
     eax = (eax >> 8) | ((uint32_t)(uint16_t)e << 24);
     return sign | (eax >> 1);
 }
+
+/* 0x118b10, 76 bytes. Convert the double whose bits are EDX:EAX (EAX = low dword, EDX = high dword) to the bits of a float (returned in EAX): rounds at the 2^29 bit, overflow gives infinity with the sign, a zero or too-small exponent gives plain 0 (sign dropped). */
+uint32_t double_bits_to_float_118b10(uint32_t lo, uint32_t hi)
+{
+    uint64_t v;
+    uint32_t sign;
+    if ((hi & 0x7ff00000u) == 0u)
+        return 0u;
+    sign = hi & 0x80000000u;
+    v = (((uint64_t)hi << 32) | lo) << 1;
+    v += 0x20000000u;
+    hi = (uint32_t)(v >> 32);
+    lo = (uint32_t)v;
+    if (hi == 0u || hi >= 0x8fe00000u)
+        return 0x7f800000u | sign;
+    if (hi < 0x70200000u)
+        return 0u;
+    hi -= 0x70000000u;
+    v = (((uint64_t)hi << 32) | lo) << 2;
+    return (uint32_t)(v >> 32) | sign;
+}
+
+/* 0xd44b0, 84 bytes. Draw one shaded span: from the signed word 0x485fea to the signed word 0x485fd2 (nothing unless the end is after the start) on the row signed word 0x485fee, stepping the shade value from dword 0x485ff8 towards dword 0x485fe0 (signed step = difference / length) and fetching each of the length + 1 pixels from the shade table at dword 0x159084 indexed by the shade value >> 16. */
+void draw_shaded_span_d44b0(void)
+{
+    int32_t x0 = (int16_t)EF_U16(0x00485feau);
+    int32_t n = (int32_t)(int16_t)EF_U16(0x00485fd2u) - x0;
+    int32_t step, k;
+    uint32_t v, dst, base;
+    if (n <= 0)
+        return;
+    v = EF_U32(0x00485ff8u);
+    step = ((int32_t)EF_U32(0x00485fe0u) - (int32_t)v) / n;
+    dst = EF_U32(0x00163200u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00485feeu) * 4u) + EF_U32(0x0015b754u) + (uint32_t)x0;
+    base = EF_U32(0x00159084u);
+    for (k = n; k >= 0; k--) {
+        EF_U8(dst) = EF_U8(base + (v >> 16));
+        v += (uint32_t)step;
+        dst++;
+    }
+}
