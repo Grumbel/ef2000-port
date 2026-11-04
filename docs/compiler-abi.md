@@ -8777,3 +8777,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5eaa4` | none | none | 601c@62d9 | Advance the nearest-record scan: for the current index compute the squared distance to the view position and, when it be |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd35b0` | EAX:ef_addr32 | EAX:ef_addr32 | none direct | Queue effect object P: reset the build state at 0x420974/0x42099c/0x4209bc/0x4209d0/0x4209d4, clear flag bits 1-2 of P+0 |

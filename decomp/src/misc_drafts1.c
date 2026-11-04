@@ -19658,3 +19658,55 @@ void scan_nearest_record_5eaa4(void)
 	EF_U16(0x001a6cceu) = (uint16_t)di;
 	EF_U16(0x001a6cccu) = (uint16_t)cx;
 }
+
+/* 0xd35b0, 276 bytes. Queue effect object P: reset the build state at 0x420974/0x42099c/0x4209bc/0x4209d0/0x4209d4, clear flag bits 1-2 of P+0x20, then (while fewer than 200 slots are used, counter at 0x17d2c0) fill a 0x6ec-byte slot at 0x486db0: 20 dwords from 0x420970, 12 dwords from P, a double scaled from the int at slot+0x8c, and two value pairs from the node chain at 0x4209bc. Over the limit it reports through the function pointer at 0x132a74. Returns P (ret 4). */
+ef_addr32 queue_effect_slot_d35b0(ef_addr32 p)
+{
+	uint32_t n, i;
+	ef_addr32 slot, node;
+	uint32_t v;
+	int32_t iv;
+	double d, scale;
+
+	EF_U32(0x0042099cu) = 1u;
+	EF_U32(0x00420974u) = 0u;
+	EF_U32(0x004209bcu) = 0x004209d0u;
+	EF_U8(p + 0x20u) = (uint8_t)(EF_U8(p + 0x20u) & 0xf9u);
+	EF_U32(0x004209d0u) = 1u;
+	EF_U32(0x004209d4u) = p;
+	n = EF_U8(0x0017d2c0u);
+	if (n >= 0xc8u) {
+		guest_callptr3_x(EF_U32(0x00132a74u), 0x0018f7e0u, n, 0xc8u);
+		return p;
+	}
+	slot = 0x00486db0u + n * 0x6ecu;
+	EF_U8(0x0017d2c0u) = (uint8_t)(n + 1u);
+	for (i = 0; i < 20u; i++)
+		EF_U32(slot + 0x684u + i * 4u) = EF_U32(0x00420970u + i * 4u);
+	EF_U32(slot) = 1u;
+	EF_U32(slot + 0x6d4u) = 0x000d37f4u;
+	for (i = 0; i < 12u; i++)
+		EF_U32(slot + 0x84u + i * 4u) = EF_U32(p + i * 4u);
+	EF_U32(slot + 0x6d0u) = slot;
+	iv = EF_S32(slot + 0x8cu);
+	{
+		uint32_t lo = EF_U32(0x0018f80cu), hi = EF_U32(0x0018f810u);
+		uint64_t bits = ((uint64_t)hi << 32) | lo, out;
+		memcpy(&scale, &bits, 8);
+		d = (double)iv * scale;
+		memcpy(&out, &d, 8);
+		EF_U32(slot + 0x6d8u) = (uint32_t)out;
+		EF_U32(slot + 0x6dcu) = (uint32_t)(out >> 32);
+	}
+	node = EF_U32(EF_U32(0x004209bcu) + 4u);
+	v = EF_U32(node + 0x18u);
+	EF_U32(slot + 0x694u) = v;
+	EF_U32(slot + 0x698u) = v;
+	node = EF_U32(EF_U32(0x004209bcu) + 4u);
+	v = EF_U32(node + 0x1cu);
+	EF_U32(slot + 0x6e0u) = 1u;
+	EF_U32(slot + 0x69cu) = v;
+	EF_U32(slot + 0x6a0u) = v;
+	EF_U32(slot + 0x6e8u) = EF_U32(0x00159144u);
+	return p;
+}

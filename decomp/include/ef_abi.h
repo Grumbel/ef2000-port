@@ -6046,4 +6046,6 @@ void clip_polygon_ce830(ef_addr32 obj, ef_addr32 ctx);
 void scan_nearest_record_5eaa4(void);
 void guest_fn_5ebb8_x(void); /* 0x5ebb8 */
 
+ef_addr32 queue_effect_slot_d35b0(ef_addr32 p);
+
 #endif
