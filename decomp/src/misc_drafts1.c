@@ -18261,3 +18261,51 @@ void update_gun_mount_70278(void)
 	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
 	guest_fn_6f758_x((ef_addr32)(uintptr_t)v, EF_U8(row + 0xbcu), EF_U32(row + 0xc1u), EF_U32(row + 0xc5u));
 }
+
+/* 0x74d98, 320 bytes. Apply an impulse to unit AX (signed 16-bit id) from the force vector pair A (EDX) and B (EBX) (pointers to three doubles each; nothing when the unit is missing, either pointer is NULL or the double 0x1a5b30 is not positive). Both vectors are converted for the unit (0x6a538), their cross product (0xb43f4) O is taken and the unit's doubles +0x81, +0x79, +0x89 are increased by O0 * 0.05 / m, O1 * 0.05 / m and O2 * 0.003 / m (m = double 0x128569 + 0xe5 * byte unit+0xe9). For the selected unit (word 0x1f71ca) the camera accumulators 0x1a2ef8, 0x1a2f00, 0x1a2f08 also get O0 * 10.0 / [0x1a5b30], O1 / [0x1a5b30] and O2 / [0x1a5b30] added. */
+void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb)
+{
+	int32_t id = (int32_t)(int16_t)ax;
+	uint32_t unit = guest_fn_7489c(id);
+	double t0[3], t1[3], o[3], g, m, c1, v, w, inv;
+
+	if (unit == 0u)
+		return;
+	memcpy(&g, ef_guest_memory_ptr(0x001a5b30u), 8);
+	if (0.0 >= g)
+		return;
+	if (va == 0u || vb == 0u)
+		return;
+	guest_fn_6a538_x(va, (ef_addr32)(uintptr_t)t1, id);
+	guest_fn_6a538_x(vb, (ef_addr32)(uintptr_t)t0, id);
+	cross_product_doubles((ef_addr32)(uintptr_t)o, (ef_addr32)(uintptr_t)t1, (ef_addr32)(uintptr_t)t0);
+	memcpy(&m, ef_guest_memory_ptr(0x00128569u + (uint32_t)EF_U8(unit + 0xe9u) * 0xe5u), 8);
+	c1 = 0.05;
+	v = o[0] * c1 / m;
+	memcpy(&w, ef_guest_memory_ptr(unit + 0x81u), 8);
+	w = v + w;
+	memcpy(ef_guest_memory_ptr(unit + 0x81u), &w, 8);
+	v = c1 * o[1] / m;
+	memcpy(&w, ef_guest_memory_ptr(unit + 0x79u), 8);
+	w = v + w;
+	memcpy(ef_guest_memory_ptr(unit + 0x79u), &w, 8);
+	v = o[2] * 0.003 / m;
+	memcpy(&w, ef_guest_memory_ptr(unit + 0x89u), 8);
+	w = v + w;
+	memcpy(ef_guest_memory_ptr(unit + 0x89u), &w, 8);
+	if ((uint16_t)ax == EF_U16(0x001f71cau)) {
+		inv = 1.0 / g;
+		v = o[0] * 10.0 * inv;
+		memcpy(&w, ef_guest_memory_ptr(0x001a2ef8u), 8);
+		w = v + w;
+		memcpy(ef_guest_memory_ptr(0x001a2ef8u), &w, 8);
+		v = o[1] * inv;
+		memcpy(&w, ef_guest_memory_ptr(0x001a2f00u), 8);
+		w = v + w;
+		memcpy(ef_guest_memory_ptr(0x001a2f00u), &w, 8);
+		v = inv * o[2];
+		memcpy(&w, ef_guest_memory_ptr(0x001a2f08u), 8);
+		w = v + w;
+		memcpy(ef_guest_memory_ptr(0x001a2f08u), &w, 8);
+	}
+}

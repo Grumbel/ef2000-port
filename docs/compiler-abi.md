@@ -8558,3 +8558,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x70278` | none | none | 6c488@6c5c8 | Per-frame update of the player unit's (dword 0x1f71bc) gun mount: look up the mount record M (0x8ffe8 with the signed wo |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x74d98` | EAX:uint32_t,EDX:ef_addr32,EBX:ef_addr32 | none | 2a4c8@2a6fb,74970@74d8b | Apply an impulse to unit AX (signed 16-bit id) from the force vector pair A (EDX) and B (EBX) (pointers to three doubles |

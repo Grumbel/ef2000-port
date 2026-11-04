@@ -5959,4 +5959,6 @@ void guest_fn_8516c_x(int32_t id); /* 0x8516c EAX */
 void update_gun_mount_70278(void);
 void guest_fn_6f758_x(ef_addr32 vec, uint32_t kind, uint32_t s0, uint32_t s1); /* 0x6f758 EAX/EDX + 2 stack dwords (s0 last pushed), callee cleanup */
 
+void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb);
+
 #endif
