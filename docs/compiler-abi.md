@@ -7218,3 +7218,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe17f8` | none | none | ac0e0@ac119 | Rebuild the 0x800-byte entry table at 0x4198c8 for the page in byte 0x15f714: initialise every 8-byte entry from index 2 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x90940` | EAX:ef_addr32 | EAX:uint32_t | 8de9c@8dffb | Find the id of the first object near POS (EAX; three dwords): scan the 0x45-byte records (count word 0x1a1506, table at  |

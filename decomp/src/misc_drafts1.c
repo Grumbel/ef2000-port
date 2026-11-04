@@ -10427,3 +10427,41 @@ void build_glyph_runs_e17f8(void)
         }
     }
 }
+
+/* 0x90940, 297 bytes. Find the id of the first object near POS (EAX; three dwords): scan the 0x45-byte records (count word 0x1a1506, table at [0x1a14f8], index 0xff skipped) whose byte +0x1c is at least 0x1b and byte +0 is 1, and for each of their ten 2-byte object ids (words from +0x28) look the object up (0x8ffe8); objects without flag 2 in byte +0x30 and within 0x40000 of POS on every axis (|difference| via 0xa28f2) that pass the visibility test 0xd0470 (hull id = high half of dword +0x1e, position >> 8) return their word +0x16. Returns 0 when none qualifies. */
+uint32_t find_object_near_90940(ef_addr32 pos)
+{
+    int16_t k;
+    int16_t j;
+    for (k = 0; k < (int16_t)EF_U16(0x001a1506u); k++) {
+        ef_addr32 rec;
+        if (k == 0xff)
+            continue;
+        rec = EF_U32(0x001a14f8u) + (uint32_t)((int32_t)k * 0x45);
+        if ((int32_t)EF_U8(rec + 0x1cu) < 0x1b)
+            continue;
+        if (EF_U8(rec) != 1u)
+            continue;
+        for (j = 0; j < 10; j++) {
+            ef_addr32 ent = EF_U32(0x001a14f8u) + (uint32_t)((int32_t)k * 0x45) + (uint32_t)((int32_t)j * 2);
+            ef_addr32 obj;
+            if (EF_U16(ent + 0x28u) == 0u)
+                continue;
+            obj = guest_fn_8ffe8((int16_t)EF_U16(ent + 0x28u));
+            if (obj == 0u)
+                continue;
+            if ((EF_U8(obj + 0x30u) & 2u) != 0u)
+                continue;
+            if ((int32_t)abs_a28f2(EF_U32(obj) - EF_U32(pos)) >= 0x40000)
+                continue;
+            if ((int32_t)abs_a28f2(EF_U32(obj + 4u) - EF_U32(pos + 4u)) >= 0x40000)
+                continue;
+            if ((int32_t)abs_a28f2(EF_U32(obj + 8u) - EF_U32(pos + 8u)) >= 0x40000)
+                continue;
+            if (guest_fn_d0470((int32_t)EF_U32(obj + 0x1eu) >> 16, (int32_t)EF_U32(obj) >> 8,
+                               (int32_t)EF_U32(obj + 4u) >> 8, (int32_t)EF_U32(obj + 8u) >> 8) != 0u)
+                return EF_U16(obj + 0x16u);
+        }
+    }
+    return 0u;
+}

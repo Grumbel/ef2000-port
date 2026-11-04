@@ -5342,4 +5342,6 @@ ef_addr32 create_slot_record_fc0ec(uint32_t a, uint32_t b);
 
 void build_glyph_runs_e17f8(void);
 
+uint32_t find_object_near_90940(ef_addr32 pos);
+
 #endif

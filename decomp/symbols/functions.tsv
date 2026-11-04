@@ -1871,7 +1871,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00090828	88	update_ticker_90828	camera_helpers	compiles	game	confirmed	decomp/tests/0x00090828.json	docs/compiler-abi.md; ; callers 8bb50@8bb5d; guest pending
 0x00090880	161	update_nearest_link_90880	game_helpers35	compiles	game	confirmed	decomp/tests/0x00090880.json	docs/compiler-abi.md; Keep the nearest candidate in an object's +0x1c link (Chebyshev-like distance).; callers 8be3c@8be4b; guest pending
 0x00090924	26	clear_matching_link_b	misc_state	compiles	game	confirmed	decomp/tests/0x00090924.json	docs/compiler-abi.md; if 0x90050(record,value) and value==record+0x1c then clear it; callers 8be54@8be63; guest pending
-0x00090940	297			unknown	unclassified	unverified		
+0x00090940	297	find_object_near_90940	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00090940.json	docs/compiler-abi.md; Find the id of the first object near POS (EAX; three dwords): scan the 0x45-byte records (count word 0x1a1506, table at ; callers 8de9c@8dffb; guest pending
 0x00090a70	84	init_entries_90a70	camera_helpers	compiles	game	confirmed	decomp/tests/0x00090a70.json	docs/compiler-abi.md; Initialise the forty 0x30-byte entries at 0x211b00.; callers 3cfc0@3d2d3; guest pending
 0x00090ac4	357			unknown	unclassified	unverified		
 0x00090c2c	64	raise_gauge_90c2c	game_helpers29	compiles	game	confirmed	decomp/tests/0x00090c2c.json	docs/compiler-abi.md; Raise a 48-byte record's gauge by 0x41a, capped at 0x1400.; callers 90c6c@90e9b; guest pending
