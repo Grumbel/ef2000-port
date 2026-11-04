@@ -108,7 +108,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00007b38	134	slot_matches_unit_7b38	game_helpers13	compiles	game	confirmed	decomp/tests/0x00007b38.json	docs/compiler-abi.md; True when the unit's slot entry matches its type and refers to it (or to anyone).; callers 7bc0@7c00,7bc0@7c4c; guest pending
 0x00007bc0	231			unknown	unclassified	unverified		
 0x00007ca8	120	scaled_entry_point_7ca8	float_helpers1	compiles	game	confirmed	decomp/tests/0x00007ca8.json	docs/compiler-abi.md; Scaled point from a table entry and one sub-entry, stored as two doubles.; callers 7e44@7e7b,70a58@70d8f,70a58@70ed2; guest pending
-0x00007d20	203			unknown	unclassified	unverified		
+0x00007d20	203	point_in_oriented_box_7d20	float_helpers8	compiles	game	confirmed	decomp/tests/0x00007d20.json	docs/compiler-abi.md; Test whether a 2D point lies inside the oriented box of a record.; callers 7dec@7e34,82b8@8336; guest pending
 0x00007dec	85	apply_slot_7dec	game_helpers7	compiles	game	confirmed	decomp/tests/0x00007dec.json	docs/compiler-abi.md; ; callers 2c778@2cae2,70a58@70b7e; guest pending
 0x00007e44	164			unknown	unclassified	unverified		
 0x00007ee8	524			unknown	unclassified	unverified		
@@ -116,7 +116,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00008184	104	find_min_metric_index_8184	float_helpers1	compiles	game	confirmed	decomp/tests/0x00008184.json	docs/compiler-abi.md; Index of the table entry with the smallest metric, or 0xff.; callers 84b8@84d5; guest pending
 0x000081ec	111	sub_entry_value_81ec	float_helpers1	compiles	game	confirmed	decomp/tests/0x000081ec.json	docs/compiler-abi.md; Double value of a sub-entry, wrapped through a helper unless its kind is 1.; callers 7ee8@7f74,712e8@71322,7156c@715bb; guest pending
 0x0000825c	92	find_free_slot_825c	game_helpers7	compiles	game	confirmed	decomp/tests/0x0000825c.json	docs/compiler-abi.md; Find the first free slot of table al (0xfe if all are used, 0xff if none usable).; callers 84b8@8546,8fe4@8ff6,2ab54@2acfb; guest pending
-0x000082b8	219			unknown	unclassified	unverified		
+0x000082b8	219	mark_entry_at_point_82b8	float_helpers8	compiles	game	confirmed	decomp/tests/0x000082b8.json	docs/compiler-abi.md; Find the first unmarked entry of the cell containing the scaled point and mark it.; callers 882b0@88304; guest pending
 0x00008394	144	flag_sub_entry_side_8394	float_helpers3	compiles	game	confirmed	decomp/tests/0x00008394.json	docs/compiler-abi.md; Flag a sub-entry as ahead (1) or behind (0xff) from a direction test.; callers 84b8@85df,8fe4@905d; guest pending
 0x00008424	145	sub_entry_heading_8424	float_helpers3	compiles	game	confirmed	decomp/tests/0x00008424.json	docs/compiler-abi.md; Scaled heading of a sub-entry as an integer angle, wrapped positive.; callers 84b8@861a,8cc4@8dbc; guest pending
 0x000084b8	410			unknown	unclassified	unverified		
@@ -2548,8 +2548,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b44ec	25	sub_vectors_doubles	list_helpers	compiles	game	confirmed	decomp/tests/0x000b44ec.json	docs/compiler-abi.md; out = a - b for three doubles (EDX - EBX into EAX).; callers 8e940@8e9f6,e6990@e69a9; guest pending
 0x000b4508	71			unknown	unclassified	unverified		
 0x000b4550	71			unknown	unclassified	unverified		
-0x000b45a2	10			unknown	unclassified	unverified		
-0x000b45ac	10			unknown	unclassified	unverified		
+0x000b45a2	10	cos_b45a2	float_helpers8	compiles	game	confirmed	decomp/tests/0x000b45a2.json	docs/compiler-abi.md; fcos on ST0, retried while the FPU reports an incomplete reduction.; callers 7d20@7d54,7ee8@8029,1d954@1d9e3; guest pending
+0x000b45ac	10	sin_b45ac	float_helpers8	compiles	game	confirmed	decomp/tests/0x000b45ac.json	docs/compiler-abi.md; fsin on ST0, retried while the FPU reports an incomplete reduction.; callers 7d20@7d4c,7ee8@8032,1d954@1d9ee; guest pending
 0x000b45b6	44			unknown	unclassified	unverified		
 0x000b45fa	21			unknown	unclassified	unverified		
 0x000b4620	91	atan2_b4620	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b4620.json	docs/compiler-abi.md; Two-argument arctangent (y, x); 0.0 when both are zero.; callers 8394@83e1,1d844@1d89b,1dc20@1de39; guest pending

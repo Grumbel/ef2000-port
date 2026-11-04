@@ -3433,4 +3433,10 @@ void reset_table_record_112b1c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
 double divide_by_scaled_word_f8314(int16_t n, uint32_t u1, uint32_t u2, uint32_t u3, double value);
 double int_distance_2d_f83d0(int32_t x1, int32_t x2, int32_t y1, int32_t y2);
 
+/* float_helpers8.c */
+double cos_b45a2(double angle);
+double sin_b45ac(double angle);
+uint8_t point_in_oriented_box_7d20(ef_addr32 point, ef_addr32 box);
+ef_addr32 mark_entry_at_point_82b8(int32_t x, int32_t y);
+
 #endif

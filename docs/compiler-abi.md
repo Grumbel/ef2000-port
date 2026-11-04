@@ -3859,3 +3859,12 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xea884` | AX:int16_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | EAX:double | 9775c@977d4,979c8@97a03 | Length of an integer 3D vector as a float, 0.0 for a negative sum. */ float int_vector_length_ea884(ef_addr32 vec) { int |
 | `0xf83d0` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | EAX:double | b04e8@b04fc,b52bc@b5332,b686c@b68c4 | Distance between two integer 2D points, 0.0 when coincident. |
+
+## float_helpers8 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb45a2` | EAX:double | EAX:double | 7d20@7d54,7ee8@8029,1d954@1d9e3 | fcos on ST0, retried while the FPU reports an incomplete reduction. |
+| `0xb45ac` | EAX:double | EAX:double | 7d20@7d4c,7ee8@8032,1d954@1d9ee | fsin on ST0, retried while the FPU reports an incomplete reduction. |
+| `0x7d20` | EAX:ef_addr32,EDX:ef_addr32 | AL:uint8_t | 7dec@7e34,82b8@8336 | Test whether a 2D point lies inside the oriented box of a record. |
+| `0x82b8` | EAX:int32_t,EDX:int32_t | EAX:ef_addr32 | 882b0@88304 | Find the first unmarked entry of the cell containing the scaled point and mark it. |
