@@ -8020,3 +8020,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x3c994` | EAX:ef_addr32 | EAX:ef_addr32 | 3cb2c@3cb53,3cc94@3cca9 | Split one text line at LINE (EAX) into its four fields by overwriting the separators with zeros: name (pointer kept in 0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc9360` | EAX:uint32_t,EDX:uint32_t | none | a6d00@a7034,a6d00@a7075 | Outline the visible box of the clip record at 0x41ec00 (words: 0x41ec00 clip left, 0x41ec02 clip top, 0x41ec04 clip widt |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

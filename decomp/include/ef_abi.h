@@ -5727,4 +5727,8 @@ void select_language_tables_45bfc(uint32_t language);
 
 ef_addr32 parse_table_line_3c994(ef_addr32 line);
 
+void outline_box_c9360(uint32_t color, uint32_t style);
+
+
+
 #endif

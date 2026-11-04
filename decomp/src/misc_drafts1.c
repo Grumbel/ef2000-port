@@ -14432,3 +14432,54 @@ ef_addr32 parse_table_line_3c994(ef_addr32 line)
     EF_U16(0x001a2ea2u) = (uint16_t)guest_fn_9de08(EF_U32(0x001a2e80u), variant);
     return p;
 }
+
+/* 0xc9360, 404 bytes. Outline the visible box of the clip record at 0x41ec00 (clip words at 0x41ec00..0x41ec06; the box proper is x = 0x41ec08, y = 0x41ec0a, w = 0x41ec0c, h = 0x41ec0e). Colour COLOR (AL; values up to 0x10 go through the map at 0x13793c) and the pattern word 0x15b5cc[STYLE] are used. Nothing is drawn when the box lies entirely outside the screen limits (dwords 0x15b744, 0x15b748) or is empty; each of the four edges is drawn with 0xe7a34 only when it lies on the corresponding clip border. */
+void outline_box_c9360(uint32_t color, uint32_t style)
+{
+    int32_t col = (int32_t)(color & 0xffu);
+    uint8_t c;
+    uint32_t pat;
+    int32_t x, y, w, h;
+    if (col <= 0x10)
+        col = EF_U8(0x0013793cu + (uint32_t)col);
+    c = (uint8_t)col;
+    pat = EF_U16(0x0015b5ccu + (style & 0xffu) * 2u);
+    x = (int32_t)EF_U32(0x0041ec06u) >> 16;
+    y = (int32_t)EF_U32(0x0041ec08u) >> 16;
+    w = (int32_t)EF_U32(0x0041ec0au) >> 16;
+    h = (int32_t)EF_U32(0x0041ec0cu) >> 16;
+    if (x >= (int32_t)EF_U32(0x0015b744u))
+        return;
+    if (y >= (int32_t)EF_U32(0x0015b748u))
+        return;
+    if (w + x <= 0)
+        return;
+    if (h + y <= 0)
+        return;
+    if (EF_U16(0x0041ec08u) == EF_U16(0x0041ec00u))
+        guest_fn_e7a34_x((uint32_t)(h + y - 1), (uint32_t)x, (uint32_t)y, (uint32_t)x, pat, c);
+    y = (int32_t)EF_U32(0x0041ec08u) >> 16;
+    h = (int32_t)EF_U32(0x0041ec0cu) >> 16;
+    {
+        int32_t b = y + h;
+        if (b == ((int32_t)EF_U32(0x0041ec00u) >> 16) + ((int32_t)EF_U32(0x0041ec04u) >> 16)) {
+            int32_t xx = (int32_t)EF_U32(0x0041ec06u) >> 16;
+            int32_t ww = (int32_t)EF_U32(0x0041ec0au) >> 16;
+            guest_fn_e7a34_x((uint32_t)(b - 1), (uint32_t)(xx + ww - 1), (uint32_t)(b - 1), (uint32_t)xx, pat, c);
+        }
+    }
+    {
+        int32_t r = ((int32_t)EF_U32(0x0041ec0au) >> 16) + ((int32_t)EF_U32(0x0041ec06u) >> 16);
+        if (r == ((int32_t)EF_U32(0x0041ec02u) >> 16) + ((int32_t)EF_U32(0x0041ebfeu) >> 16)) {
+            int32_t yy = (int32_t)EF_U32(0x0041ec08u) >> 16;
+            int32_t hh = (int32_t)EF_U32(0x0041ec0cu) >> 16;
+            guest_fn_e7a34_x((uint32_t)yy, (uint32_t)(r - 1), (uint32_t)(hh + yy - 1), (uint32_t)(r - 1), pat, c);
+        }
+    }
+    if (EF_U16(0x0041ec0au) == EF_U16(0x0041ec02u)) {
+        int32_t xx = (int32_t)EF_U32(0x0041ec06u) >> 16;
+        int32_t yy = (int32_t)EF_U32(0x0041ec08u) >> 16;
+        int32_t ww = (int32_t)EF_U32(0x0041ec0au) >> 16;
+        guest_fn_e7a34_x((uint32_t)yy, (uint32_t)xx, (uint32_t)yy, (uint32_t)(ww + xx - 1), pat, c);
+    }
+}
