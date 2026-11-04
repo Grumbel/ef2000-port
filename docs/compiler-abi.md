@@ -8759,3 +8759,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf34cc` | none | none | f3f84@f3fa7 | Present one frame of the status screen: redraw the overlay when the frame is live, otherwise rebuild the caption, call t |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf8c98` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | f8624@f885c | (ret 4) Walk the node list, claim each unclaimed matching node for the next index of the request and record the owner in |

@@ -19547,3 +19547,39 @@ void present_status_frame_f34cc(void)
 	else
 		guest_fn_d663c(0x00425c8cu);
 }
+
+/* 0xf8c98, 270 bytes. (ret 4) Walk the node list, claim each unclaimed matching node for the next index of the request and record the owner in its first free slot. */
+void claim_list_nodes_f8c98(uint32_t key, uint32_t owner, uint32_t slot_value, ef_addr32 request, ef_addr32 list)
+{
+	ef_addr32 node = EF_U32(list);
+	uint16_t idx = 0u;
+
+	while (node != 0u && (int16_t)EF_U8(request + 3u) > (int16_t)idx) {
+		if (EF_U16(node + 0x31u) == (uint16_t)key
+		    && EF_U8(node + 0x0bu) == 1u
+		    && EF_U8(node + 0x0cu) == EF_U8(request + 8u)
+		    && EF_U16(node + 0x09u) == 0u) {
+			uint16_t pending = 1u;
+			int16_t i;
+
+			EF_U16(node + 0x09u) = 1u;
+			for (i = 0; i < 4 && pending != 0u; i++) {
+				ef_addr32 e = node + (uint32_t)(i * 2);
+
+				if ((EF_S32(e + 0x27u) >> 16) == -1
+				    && (EF_S32(e + 0x17u) >> 16) == -1
+				    && (EF_S32(e + 0x1fu) >> 16) == -1) {
+					EF_U16(e + 0x21u) = (uint16_t)slot_value;
+					EF_U16(e + 0x29u) = idx;
+					EF_U16(e + 0x19u) = (uint16_t)owner;
+					pending = 0u;
+				}
+			}
+			EF_U8(EF_U32(node + 0x4du) + 4u) = (uint8_t)idx;
+			idx++;
+			EF_U16(node + 0x51u) = 0u;
+			EF_U16(node + 0x53u) = 0u;
+		}
+		node = EF_U32(node + 4u);
+	}
+}

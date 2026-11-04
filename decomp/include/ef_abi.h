@@ -6039,4 +6039,6 @@ void guest_fn_41fc_x(void); /* 0x41fc */
 void present_status_frame_f34cc(void);
 uint32_t guest_fn_eac48_x(uint32_t a, ef_addr32 b); /* 0xeac48 EAX/EDX */
 
+void claim_list_nodes_f8c98(uint32_t key, uint32_t owner, uint32_t slot_value, ef_addr32 request, ef_addr32 list);
+
 #endif
