@@ -3073,7 +3073,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d6478	303			unknown	unclassified	unverified		
 0x000d65a8	62	remap_palette_d65a8	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d65a8.json	docs/compiler-abi.md; Remap a 256-entry RGB palette through three 64-byte tables.; callers d660c@d6620,d663c@d664b; guest pending
 0x000d65e8	34	set_black_palette_d65e8	game_helpers106	compiles	game	confirmed	decomp/tests/0x000d65e8.json	docs/compiler-abi.md; Upload an all-zero (black) 0x300-byte palette.; callers 284ec@284f2,39204@39211,3dccc@3dccf; guest pending
-0x000d660c	46			unknown	unclassified	unverified		
+0x000d660c	46	compare_remapped_palette_d660c	game_helpers120	compiles	game	confirmed	decomp/tests/0x000d660c.json	docs/compiler-abi.md; Remap the 256-entry palette at the stack argument and compare the result with the 0x300 bytes at 0x420a90 (cdecl; return; callers eac48@eacbc,eac48@ead32; guest pending
 0x000d663c	53			unknown	unclassified	unverified		
 0x000d6694	46			unknown	unclassified	unverified		
 0x000d66c2	358			unknown	unclassified	unverified		
@@ -3082,7 +3082,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d6cac	176			unknown	unclassified	unverified		
 0x000d6d5c	26	store_handle_if_enabled	code_predicates	compiles	game	confirmed	decomp/tests/0x000d6d5c.json	docs/compiler-abi.md; When bit 1 of byte 0x15bac0 is set store dword 0x420da0 at EAX; return whether it was.; callers 1c780@1cb3a,3d37c@3d43b; guest pending
 0x000d6dc4	43	init_module_d6dc4	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d6dc4.json	docs/compiler-abi.md; One-time module init; registers the exit handler at 0xd6da0.; callers d5d18@d5d39,d6e58@d6e9e,e28e8@e28ff; guest pending
-0x000d6df0	49			unknown	unclassified	unverified		
+0x000d6df0	49	register_stack_ranges_d6df0	game_helpers120	compiles	game	confirmed	decomp/tests/0x000d6df0.json	docs/compiler-abi.md; Register the stack ranges 0xd7108 (0x48 bytes) and 0x1048b4 (0x400 bytes).; callers d6dc4@d6ddc; guest pending
 0x000d6e58	303			unknown	unclassified	unverified		
 0x000d6f88	8	read_byte_d6f88	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000d6f88.json	docs/compiler-abi.md; ; callers 80120@80177; guest pending
 0x000d6f90	22	process_string_list	code_predicates	compiles	game	confirmed	decomp/tests/0x000d6f90.json	docs/compiler-abi.md; For each pointer in the array at EAX whose string is nonempty run 0xd6fa8.; callers 80058@800fa,80374@803bb,81230@812b3; guest pending
@@ -3224,7 +3224,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc832	37			unknown	unclassified	unverified		
 0x000dc860	47	halve_pair_to_fit16	math_string	compiles	game	confirmed	decomp/tests/0x000dc860.json	docs/compiler-abi.md; Halve the dwords at EAX and EDX until both fit in a signed 16-bit range.; callers dc8d8@dc906; guest pending
 0x000dc890	69	halve_triple_to_fit16_dc890	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc890.json	docs/compiler-abi.md; Halve three dwords until all fit in a signed 16-bit range.; callers dc91c@dc98f,dcaa4@dcb2a; guest pending
-0x000dc8d8	67			unknown	unclassified	unverified		
+0x000dc8d8	67	angle_of_fitted_pair_dc8d8	game_helpers120	compiles	game	confirmed	decomp/tests/0x000dc8d8.json	docs/compiler-abi.md; Angle of the vector (x, y) after halving it until both components fit in 16 bits.; callers dc91c@dc9a9,dc91c@dc9bf; guest pending
 0x000dc91c	180			unknown	unclassified	unverified		
 0x000dcaa4	207	bearing_between_positions_dcaa4	game_helpers95	compiles	game	confirmed	decomp/tests/0x000dcaa4.json	docs/compiler-abi.md; Pitch and yaw angles of the vector from position b to position a, stored as two words at out.; callers 9f664@9f702; guest pending
 0x000dcb74	9	stack_used_dcb74	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000dcb74.json	docs/compiler-abi.md; Stack bytes in use relative to the recorded stack base.; callers 233c4@2341e,9bd20@9bd30,c3584@c35a8; guest pending
@@ -4085,7 +4085,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00111575	37			unknown	unclassified	unverified		
 0x0011159a	29	set_default_file_buffer_11159a	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x0011159a.json	docs/compiler-abi.md; Set a file's buffer: fully buffered for a given buffer, else line buffered.; callers 101c54@101cd3; guest pending
 0x001115f0	10	dword_shr8_1115f0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001115f0.json	docs/compiler-abi.md; Upper three bytes of a dword.; callers none direct; guest pending
-0x001115fc	54			unknown	unclassified	unverified		
+0x001115fc	54	teardown_record_1115fc	game_helpers120	compiles	game	confirmed	decomp/tests/0x001115fc.json	docs/compiler-abi.md; Tear down a record: run its field 0x874 callback, trace-call 0x102644 if field 0x88c is positive, then set it to -1 (cde; callers none direct; guest pending
 0x00111c90	262			unknown	unclassified	unverified		
 0x00111d98	88	midi_data_length_111d98	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00111d98.json	docs/compiler-abi.md; Number of data bytes of a MIDI status byte (cdecl).; callers 111e40@111e4b,112c10@113021; guest pending
 0x00111df0	77			unknown	unclassified	unverified		
@@ -4116,7 +4116,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00113d10	794			unknown	unclassified	unverified		
 0x0011402c	42			unknown	unclassified	unverified		
 0x00114058	171			unknown	unclassified	unverified		
-0x00114170	47			unknown	unclassified	unverified		
+0x00114170	47	activate_record_114170	game_helpers120	compiles	game	confirmed	decomp/tests/0x00114170.json	docs/compiler-abi.md; Activate a record: trace it, set state 2 and run its field 0x28 callback (cdecl, record on the stack).; callers 1031a0@1031c3; guest pending
 0x001141a0	16	set_record_field_1141a0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001141a0.json	docs/compiler-abi.md; Store a value at +0x2c of a record when the record exists.; callers 103244@10326e; guest pending
 0x001141b0	95	start_value_ramp_1141b0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x001141b0.json	docs/compiler-abi.md; Start a ramp of the value at +0x48 to a target over time; sets the per-step delta at +0x54.; callers 1031cc@1031fc; guest pending
 0x001142cc	75	refresh_player_channels_1142cc	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x001142cc.json	docs/compiler-abi.md; When the value at the argument changes, resend the channel volumes of every active (state 4) channel of the player.; callers 1033c8@1033f2; guest pending

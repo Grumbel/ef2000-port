@@ -4456,3 +4456,13 @@ in EAX, format string address, one value).
 | `0xa4470` | none | AL:uint8_t | 3c74@3cbb,601c@6148,1dc20@1de11 | Return the constant 3. |
 | `0x7aa2c` | none | none | 7ab00@7ab9a | Register the status description built for the string at 0x187c00. |
 | `0xd5c84` | EAX:int32_t | EAX:uint32_t | c4310@c4341 | Map an address inside the range 0xd3900..0xd5c84 to 0xc454a; any other value is returned unchanged. |
+
+## game_helpers120 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x114170` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 1031a0@1031c3 | Activate a record: trace it, set state 2 and run its field 0x28 callback (cdecl, record on the stack). |
+| `0x1115fc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Tear down a record: run its field 0x874 callback, trace-call 0x102644 if field 0x88c is positive, then set it to -1 (cde |
+| `0xd660c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:int32_t | eac48@eacbc,eac48@ead32 | Remap the 256-entry palette at the stack argument and compare the result with the 0x300 bytes at 0x420a90 (cdecl; return |
+| `0xd6df0` | none | none | d6dc4@d6ddc | Register the stack ranges 0xd7108 (0x48 bytes) and 0x1048b4 (0x400 bytes). |
+| `0xdc8d8` | EAX:int32_t,EDX:int32_t | EAX:int32_t | dc91c@dc9a9,dc91c@dc9bf | Angle of the vector (x, y) after halving it until both components fit in 16 bits. |

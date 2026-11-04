@@ -3912,4 +3912,12 @@ uint8_t return_three_a4470(void);
 void register_status_description_7aa2c(void);
 uint32_t remap_address_d5c84(int32_t addr);
 
+/* game_helpers120.c */
+void activate_record_114170(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+void teardown_record_1115fc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+int32_t compare_remapped_palette_d660c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 palette);
+void register_stack_ranges_d6df0(void);
+int32_t angle_of_fitted_pair_dc8d8(int32_t x, int32_t y);
+void guest_callptr1_x(ef_addr32 fn, ef_addr32 arg); /* indirect cdecl call with one stack argument */
+
 #endif
