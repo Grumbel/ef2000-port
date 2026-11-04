@@ -6051,4 +6051,6 @@ ef_addr32 queue_effect_slot_d35b0(ef_addr32 p);
 void build_record_be480(ef_addr32 dst, ef_addr32 src1, ef_addr32 src2, ef_addr32 src3, uint32_t s0);
 uint32_t guest_fn_bdeec_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xbdeec EAX/EDX/EBX/ECX, result AL */
 
+void register_update_message_80b14(ef_addr32 p);
+
 #endif

@@ -8789,3 +8789,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xbe480` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t | none | be59c@be691 | Build a 0x78-byte record DST from SRC1 (EDX), SRC2 (EBX) and SRC3 (ECX): copy header bytes and 18 bytes from SRC2+0x11,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x80b14` | EAX:ef_addr32 | none | 8846c@88529,8d3d4@8d523 | Register the update message P (EAX) in the 16-entry table at 0x1fc8a2 (12-byte entries keyed by word P[0] % 16): when th |

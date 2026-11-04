@@ -1540,7 +1540,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000809bc	89	clear_panel_strip	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x000809bc.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00080a18	162	init_name_entries_80a18	game_helpers35	compiles	game	confirmed	decomp/tests/0x00080a18.json	docs/compiler-abi.md; Reset the 256 name entries, register them in the page table and clear 16 slots.; callers 80d8c@80de7; guest pending
 0x00080abc	87	advance_panel_strip	record_callers	compiles	game	confirmed	decomp/tests/0x00080abc.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
-0x00080b14	293			unknown	unclassified	unverified		
+0x00080b14	293	register_update_message_80b14	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00080b14.json	docs/compiler-abi.md; Register the update message P (EAX) in the 16-entry table at 0x1fc8a2 (12-byte entries keyed by word P[0] % 16): when th; callers 8846c@88529,8d3d4@8d523; guest pending
 0x00080c3c	226	draw_effect_records_80c3c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00080c3c.json	docs/compiler-abi.md; Reset the 16 twelve-byte slots at 0x1fc8a0 (word +0 = 0xffff), then walk the 256 fifty-six-byte effect records at 0x1f90; callers 3dd30@3e1fd; guest pending
 0x00080d20	30	lookup_by_word	mid_helpers	compiles	game	confirmed	decomp/tests/0x00080d20.json	docs/compiler-abi.md; 0xa1a90(sx DX, 0xa1a40()) or 0; callers 80d40@80d4b; guest pending
 0x00080d40	72	update_ui_record_from_template	ui_operations	compiles	game	confirmed	decomp/tests/0x00080d40.json	docs/compiler-abi.md; host model; guest differential pending

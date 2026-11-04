@@ -19761,3 +19761,39 @@ void build_record_be480(ef_addr32 dst, ef_addr32 src1, ef_addr32 src2, ef_addr32
 	}
 	init_event_record_bb324(dst + 0x55u, kind, EF_U8(dst));
 }
+
+/* 0x80b14, 293 bytes. Register the update message P (EAX) in the 16-entry table at 0x1fc8a2 (12-byte entries keyed by word P[0] % 16): when the key matches, mark the 56-byte record 0x1f90a0 + 56 * (entry.hi + entry.idx) as active (byte 0 = 1, dword 8 = 1), build a rotation from the angles P[0xe..0x12] >> 16, transform the vector P[0x16..0x1e], store float positions (P[2], P[6], P[0xa] plus the transformed values >> 8) in the record at +0x24/+0x28/+0x2c, advance entry.idx modulo 16 and copy word P[0xe] to entry+8. All registers are preserved. */
+void register_update_message_80b14(ef_addr32 p)
+{
+	int32_t out[3];
+	int32_t sum, v, rem;
+	ef_addr32 ent, rec;
+	int16_t idx;
+	float f;
+
+	rem = (int32_t)(int16_t)EF_U16(p) % 16;
+	ent = 0x001fc8a2u + (uint32_t)(rem * 12);
+	if (EF_U16(p) != EF_U16(ent))
+		return;
+	idx = (int16_t)EF_U16(ent + 4u);
+	sum = ((int32_t)EF_U32(ent) >> 16) + idx;
+	rec = 0x001f90a0u + (uint32_t)(sum * 56);
+	EF_U8(rec) = 1u;
+	EF_U32(rec + 8u) = 1u;
+	build_rotation_e994c(1u, (uint32_t)((int32_t)EF_U32(p + 0xeu) >> 16), (uint32_t)((int32_t)EF_U32(p + 0x10u) >> 16), (uint32_t)((int32_t)EF_U32(p + 0x12u) >> 16));
+	transform_vector_e99b8((ef_addr32)(uintptr_t)out, (int32_t)EF_U32(p + 0x16u), (int32_t)EF_U32(p + 0x1au), (int32_t)EF_U32(p + 0x1eu));
+	v = (int32_t)EF_U32(p + 2u) + (out[0] >> 8);
+	f = (float)v;
+	memcpy(&sum, &f, 4);
+	EF_U32(rec + 0x24u) = (uint32_t)sum;
+	v = (int32_t)EF_U32(p + 6u) + (out[1] >> 8);
+	f = (float)v;
+	memcpy(&sum, &f, 4);
+	EF_U32(rec + 0x28u) = (uint32_t)sum;
+	v = (int32_t)EF_U32(p + 0xau) + (out[2] >> 8);
+	f = (float)v;
+	memcpy(&sum, &f, 4);
+	EF_U32(rec + 0x2cu) = (uint32_t)sum;
+	EF_U16(ent + 4u) = (uint16_t)(((int32_t)idx + 1) % 16);
+	EF_U16(ent + 8u) = EF_U16(p + 0xeu);
+}
