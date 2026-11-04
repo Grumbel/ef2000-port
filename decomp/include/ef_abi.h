@@ -5350,4 +5350,6 @@ void poll_pointer_device_ac854(void);
 
 void draw_outline_5af50(uint32_t n);
 
+ef_addr32 find_group_node_b4aec(ef_addr32 a, ef_addr32 b, uint32_t group, ef_addr32 list);
+
 #endif

@@ -10576,3 +10576,49 @@ void draw_outline_5af50(uint32_t n)
     EF_U16(0x004208ecu) = (uint16_t)(((uint32_t)EF_U16(tab + 2u) << sh) + sx);
     forward_record_cf78c();
 }
+
+/* 0xb4aec, 306 bytes. Sibling of 0xb49b4 returning a node: for group GROUP (BL, 0..5) walk the list headed by *A (groups 0, 2, 5, links +4) or *B (groups 1, 3, 4, links +0) for a type-0x31 node that is negative (0xcc1ac) in LIST (ECX); a negative node without a follower is returned itself, otherwise the follower chain (outer link walk) is searched for a type-0x31 node of side GROUP, which is returned (0 when the chain ends). Groups 1, 3 and 4 whose first walk finds nothing then look through *A for the first type-0x31 node that is positive (0xcc22c). Returns 0 otherwise. */
+ef_addr32 find_group_node_b4aec(ef_addr32 a, ef_addr32 b, uint32_t group, ef_addr32 list)
+{
+    uint8_t g = (uint8_t)group;
+    ef_addr32 node;
+    ef_addr32 nxt;
+    if (g > 5u)
+        return 0u;
+    if (g == 0u || g == 2u || g == 5u) {
+        for (node = EF_U32(a); node != 0u; node = EF_U32(node + 4u)) {
+            if (EF_U8(node + 0xcu) != 0x31u || (uint16_t)group_flag_negative_cc1ac(g, EF_U8(node + 0xbu), list) == 0u)
+                continue;
+            if (EF_U32(node) == 0u)
+                return node;
+            for (;;) {
+                nxt = EF_U32(node);
+                if (nxt == 0u)
+                    return 0u;
+                if (EF_U8(nxt + 0xbu) == g && EF_U8(nxt + 0xcu) == 0x31u)
+                    return nxt;
+                node = EF_U32(node);
+            }
+        }
+        return 0u;
+    }
+    for (node = EF_U32(b); node != 0u; node = EF_U32(node)) {
+        if (EF_U8(node + 0xcu) != 0x31u || (uint16_t)group_flag_negative_cc1ac(g, EF_U8(node + 0xbu), list) == 0u)
+            continue;
+        if (EF_U32(node + 4u) == 0u)
+            return node;
+        for (;;) {
+            nxt = EF_U32(node + 4u);
+            if (nxt == 0u)
+                return 0u;
+            if (EF_U8(nxt + 0xbu) == g && EF_U8(nxt + 0xcu) == 0x31u)
+                return nxt;
+            node = EF_U32(node + 4u);
+        }
+    }
+    for (node = EF_U32(a); node != 0u; node = EF_U32(node + 4u)) {
+        if (EF_U8(node + 0xcu) == 0x31u && (uint16_t)group_flag_positive_cc22c(g, EF_U8(node + 0xbu), list) != 0u)
+            return node;
+    }
+    return 0u;
+}

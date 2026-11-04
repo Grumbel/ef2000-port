@@ -7242,3 +7242,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5af50` | EAX:uint32_t | none | 5a8d0@5a8ef | Draw the closed outline number N (AL, looked up in the pointer table 0x1281a4; nothing is drawn for N = 0) as 24 line se |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb4aec` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:ef_addr32 | EAX:ef_addr32 | 94fc@9548,b0f5c@b1120,b0f5c@b1430 | Sibling of 0xb49b4 returning a node: for group GROUP (BL, 0..5) walk the list headed by *A (groups 0, 2, 5, links +4) or |
