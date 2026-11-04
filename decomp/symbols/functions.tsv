@@ -917,7 +917,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004f608	180	mpClickATC		named	unclassified	unverified		
 0x0004f6bc	74	flush_active_dialog_slots	event_wrappers	compiles	game	confirmed	decomp/tests/0x004f6bc.json	BL-index loop over mapped active slots, clear and update dialog; callers 4f3e0@4f48b/4f494@4f53f; guest pending
 0x0004f718	183	select_button_state_4f718	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004f718.json	docs/compiler-abi.md; Update a row of four button widgets of the group IDX under the root named at 0x184a8c: clear the dirty flag of widgets "; callers 4f3e0@4f481,4f494@4f535,4f548@4f5f5; guest pending
-0x0004f7d0	215			unknown	unclassified	unverified		
+0x0004f7d0	215	fill_button_widgets_4f7d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004f7d0.json	docs/compiler-abi.md; Fill the 16 button widgets "<n>" (format 0x184a9c) of the dialog 0x184a8c: the first byte 0x1a5531 buttons get the label; callers 4b6a0@4ba2c,4ca90@4cada,4f3e0@4f486; guest pending
 0x0004f8a8	236			unknown	unclassified	unverified		
 0x0004f994	206	mpFlyMission		named	unclassified	unverified		
 0x0004fa64	910			unknown	unclassified	unverified		
@@ -3372,7 +3372,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e3f00	188			unknown	unclassified	unverified		
 0x000e3fbc	61	append_translated_e3fbc	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e3fbc.json	docs/compiler-abi.md; Translate a value and append the non-zero result to the 32-entry list.; callers none direct; guest pending
 0x000e3ffc	20	set_scratch_name_e3ffc	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000e3ffc.json	docs/compiler-abi.md; Copy a name to the scratch string and run 0x107310.; callers none direct; guest pending
-0x000e4010	211			unknown	unclassified	unverified		
+0x000e4010	211	load_pattern_file_e4010	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e4010.json	docs/compiler-abi.md; Load the text file NAME (EAX) into a local 0x400-byte buffer (default path + 0x190ad4 + name through the hooks 0x132ab4 ; callers dc094@dc111,e4188@e4255; guest pending
 0x000e40e4	161	init_pattern_buffer_e40e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e40e4.json	docs/compiler-abi.md; Allocate (once) the pattern buffer of ([0x15f93c] << 8) + 0x200 bytes, align it to 256 bytes (0x15b958) and fill consecu; callers e4010@e40d4,e4188@e425a; guest pending
 0x000e4188	220			unknown	unclassified	unverified		
 0x000e4264	116	reset_engine_e4264	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000e4264.json	docs/compiler-abi.md; Reset the engine state unless already in state 0 or 2.; callers 3ea0c@3edc9,3ea0c@3ee1d,3ea0c@3ef59; guest pending

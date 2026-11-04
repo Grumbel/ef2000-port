@@ -6992,3 +6992,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc768` | EAX:uint32_t | none | bfcc@c264,c868@c88a,7bc00@7bc1d | Lay out the four numbered slot widgets of the dialog 0x180728 for the selection INDEX (EAX, signed word): the widget 0x1 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe4010` | EAX:uint32_t | none | dc094@dc111,e4188@e4255 | Load the text file NAME (EAX) into a local 0x400-byte buffer (default path + 0x190ad4 + name through the hooks 0x132ab4  |
+| `0x4f7d0` | none | none | 4b6a0@4ba2c,4ca90@4cada,4f3e0@4f486 | Fill the 16 button widgets "<n>" (format 0x184a9c) of the dialog 0x184a8c: the first byte 0x1a5531 buttons get the label |

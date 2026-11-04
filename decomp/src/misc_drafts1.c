@@ -9128,3 +9128,57 @@ void layout_slot_widgets_c768(uint32_t index)
     if ((int16_t)EF_U16(0x001a53c0u) < 2)
         move_widget_a74bc(find_widget_checked_a78bc(root, 0x001809a8u), 0, 0);
 }
+
+/* 0xe4010, 211 bytes. Load the text file NAME (EAX) into a local 0x400-byte buffer (default path + 0x190ad4 + name through the hooks 0x132ab4 / 0x132ab8; an oversized file is reported with 0x190ad8, a missing one falls back to the default text at dword 0x15f934), reset dword 0x15f93c, free and clear the previous table block (dword 0x15f940), clear the 0x20 bytes at 0x431ed0, run the text script (0x1093d8, table 0x15f944, 7 entries) and rebuild the pattern buffer (0xe40e4). */
+void load_pattern_file_e4010(uint32_t name)
+{
+    char text[0x400];
+    char path[0x90];
+    uint32_t t = (uint32_t)(uintptr_t)text;
+    uint32_t p = (uint32_t)(uintptr_t)path;
+    uint32_t size, old;
+    build_default_path_9c980(p);
+    strcat_9ca57(p, 0x00190ad4u);
+    strcat_9ca57(p, name);
+    size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), p);
+    if (size != 0u) {
+        if (size > 0x3ffu)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x00190ad8u);
+        guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), p, t);
+        text[size] = 0;
+    } else {
+        copy_string_9d749(t, EF_U32(0x0015f934u));
+    }
+    old = EF_U32(0x0015f940u);
+    EF_U32(0x0015f93cu) = 0u;
+    if (old != 0u)
+        guest_fn_c3f80(old);
+    EF_U32(0x0015f940u) = 0u;
+    fill_bytes_b3fb0(0x00431ed0u, 0u, 0x20u);
+    run_text_script_1093d8(t, 0x0015f944u, 7u);
+    init_pattern_buffer_e40e4();
+}
+
+/* 0x4f7d0, 215 bytes. Fill the 16 button widgets "<n>" (format 0x184a9c) of the dialog 0x184a8c: the first byte 0x1a5531 buttons get the label 0x1a53e3 + n * 0x11 and the state byte 0x1a5510[n] (via 0x4f718); a state of 3 or 4 sets byte 0x1a5532. The remaining buttons up to 16 get the empty label 0x184e44 and state 0. */
+void fill_button_widgets_4f7d0(void)
+{
+    char name[0x20];
+    uint32_t nm = (uint32_t)(uintptr_t)name;
+    uint32_t root = guest_fn_a46cc(0x00184a8cu);
+    int16_t n;
+    EF_U8(0x001a5532u) = 0u;
+    for (n = 0; n < (int16_t)EF_U8(0x001a5531u); n++) {
+        (void)guest_sprintf_a4342(nm, 0x00184a9cu, (int32_t)n);
+        guest_fn_a7588_x(find_widget_checked_a78bc(root, nm), 0x001a53e3u + (uint32_t)n * 0x11u);
+        select_button_state_4f718((uint32_t)n, EF_U8(0x001a5510u + (uint32_t)n));
+        if (EF_U8(0x001a5510u + (uint32_t)n) == 3u || EF_U8(0x001a5510u + (uint32_t)n) == 4u)
+            EF_U8(0x001a5532u) = 1u;
+    }
+    n = (int16_t)EF_U8(0x001a5531u);
+    while (n < 0x10) {
+        (void)guest_sprintf_a4342(nm, 0x00184a9cu, (int32_t)n);
+        guest_fn_a7588_x(find_widget_checked_a78bc(root, nm), 0x00184e44u);
+        select_button_state_4f718((uint32_t)n, 0u);
+        n++;
+    }
+}

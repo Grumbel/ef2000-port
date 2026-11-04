@@ -5264,4 +5264,7 @@ void find_data_size_c3364(uint32_t buf, uint32_t name);
 
 void layout_slot_widgets_c768(uint32_t index);
 
+void load_pattern_file_e4010(uint32_t name);
+void fill_button_widgets_4f7d0(void);
+
 #endif
