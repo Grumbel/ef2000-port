@@ -4898,3 +4898,40 @@ void reset_settings_104580(void)
     EF_U8(0x004dd6b0u) = 0u;
     guest_fn_110fd4_x();
 }
+
+/* 0xcdb20, 277 bytes. Set up the 320x200 video mode: on the first call read the environment string at 0x18f620, flag the options named 0x18f62c, 0x18f634 and 0x18f644 in the bytes 0x146e48..4a, store the driver word 0xfe700 in 0x15b75c and register the exit handler 0xcdc64. Every call selects mode 0x13 (0xfe710), sets the size words 0x15b744/48 to 320 x 200, applies it with 0xfc39c, picks the draw handlers, points the frame base 0x15b758 at 0xa0000 + the DOS base (option 0x146e4a) or at a fresh 0xfc84-byte block (error 0x18f64c), initialises the work buffers and finally calls the two driver hooks 0x15b750 and 0x15b74c (clearing the screen in between). */
+void init_video_mode_cdb20(void)
+{
+    if (EF_U8(0x0015b75eu) == 0u) {
+        uint32_t env;
+        EF_U8(0x0015b75eu) = 1u;
+        env = getenv_9c858(0x0018f620u);
+        if (env != 0u) {
+            uppercase_string(env);
+            if (guest_fn_a4380(env, 0x0018f62cu) == 0u)
+                EF_U8(0x00146e48u) = 1u;
+            if (guest_fn_a4380(env, 0x0018f634u) == 0u)
+                EF_U8(0x00146e49u) = 1u;
+            if (guest_fn_a4380(env, 0x0018f644u) == 0u)
+                EF_U8(0x00146e4au) = 1u;
+        }
+        EF_U16(0x0015b75cu) = (uint16_t)guest_fn_fe700_w();
+        guest_fn_9c3cf(0x000cdc64u);
+    }
+    guest_fn_fe710_s(0x13u);
+    EF_U32(0x0015b744u) = 0x140u;
+    EF_U32(0x0015b748u) = 0xc8u;
+    guest_fn_fc39c_s(0xc8u, 0x140u);
+    select_draw_handlers_c3a74();
+    if (EF_U8(0x00146e4au) != 0u)
+        EF_U32(0x0015b758u) = EF_U32(0x00120cc6u) + 0xa0000u;
+    if (EF_U32(0x0015b758u) == 0u) {
+        EF_U32(0x0015b758u) = guest_fn_c3f70(0xfc84u);
+        if (EF_U32(0x0015b758u) == 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f64cu);
+    }
+    guest_fn_c3770();
+    guest_callptr_eax_x(EF_U32(0x0015b750u), 0u);
+    guest_fn_dc2c0();
+    guest_callptr_eax_x(EF_U32(0x0015b74cu), 0u);
+}

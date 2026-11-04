@@ -6092,3 +6092,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x104580` | none | none | 101c54@101c7d,101c54@101cb4,101c54@101d58 | Reset the 19 runtime settings (via 0x101e14: index, value) to their defaults after 0x103d80, clear the 16 dwords at 0x4d |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcdb20` | none | none | 8b2d8@8b2de,aaee8@aaf77,d1e50@d1e89 | Set up the 320x200 video mode: on the first call read the environment string at 0x18f620, flag the options named 0x18f62 |

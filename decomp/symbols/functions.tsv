@@ -2947,7 +2947,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cd82c	105			unknown	unclassified	unverified		
 0x000cd957	79	blit_transparent_cd957	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cd957.json	docs/compiler-abi.md; Copy a SRC block of ROWS rows of WIDTH bytes to the frame buffer at (X, Y), skipping zero (transparent) source bytes; SK; callers 98b68@98bc2; guest pending
 0x000cd9a6	368			unknown	unclassified	unverified		
-0x000cdb20	277			unknown	unclassified	unverified		
+0x000cdb20	277	init_video_mode_cdb20	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cdb20.json	docs/compiler-abi.md; Set up the 320x200 video mode: on the first call read the environment string at 0x18f620, flag the options named 0x18f62; callers 8b2d8@8b2de,aaee8@aaf77,d1e50@d1e89; guest pending
 0x000cdc38	44	release_buffer_cdc38	code_predicates	compiles	game	confirmed	decomp/tests/0x000cdc38.json	docs/compiler-abi.md; Run 0xc37ec, then release dword 0x15b758 as 0xc3a48 does.; callers cdc64@cdc67,d1e50@d1ea8; guest pending
 0x000cdc64	40	restore_video_mode_cdc64	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000cdc64.json	docs/compiler-abi.md; Re-apply the stored video mode if it differs from the current one.; callers 8b2d8@8b31a,aaee8@aafdb; guest pending
 0x000cdc90	134	interleave_planes_cdc90	load_planes1	compiles	game	confirmed	decomp/tests/0x000cdc90.json	docs/compiler-abi.md; Interleave four planes of rows x width bytes from a packed source into every fourth byte of the destination (non-zero so; callers cde00@cdf14; guest pending

@@ -4884,4 +4884,8 @@ void assign_roster_slot_740e4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, ui
 void reset_settings_104580(void);
 void guest_fn_110fd4_x(void); /* 0x110fd4 (tail jump) */
 
+void init_video_mode_cdb20(void);
+void guest_fn_fe710_s(uint32_t mode); /* 0xfe710 1 stack argument, callee cleanup */
+void guest_fn_fc39c_s(uint32_t a, uint32_t b); /* 0xfc39c 2 stack arguments, callee cleanup */
+
 #endif
