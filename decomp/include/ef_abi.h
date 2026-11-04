@@ -4694,4 +4694,8 @@ void prepare_shape_list_d2320(ef_addr32 obj);
 
 
 
+void clip_rect_to_screen_e58a8(void);
+void select_button_state_4f718(uint32_t idx, uint32_t mode);
+void decode_run_literal_e330c(uint32_t fill, uint32_t dst, uint32_t count);
+
 #endif

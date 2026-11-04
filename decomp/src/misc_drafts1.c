@@ -2535,3 +2535,84 @@ void prepare_shape_list_d2320(ef_addr32 obj)
     EF_U32(obj + 0x18u) = (uint32_t)min_key;
     EF_U32(obj + 0x1cu) = (uint32_t)max_key;
 }
+
+/* 0xe58a8, 183 bytes. Clip the rectangle at 0x41ec08 (x, y, width, height words) to the screen: a negative origin moves into the size, a rectangle reaching past the screen width 0x15b744 / height 0x15b748 is shortened. */
+void clip_rect_to_screen_e58a8(void)
+{
+    int16_t x = (int16_t)EF_U16(0x0041ec08u);
+    int16_t y;
+    if (x < 0) {
+        EF_U16(0x0041ec0cu) = (uint16_t)(EF_U16(0x0041ec0cu) + (uint16_t)x);
+        EF_U16(0x0041ec08u) = 0u;
+    }
+    if ((int32_t)(int16_t)EF_U16(0x0041ec0cu) + (int32_t)(int16_t)EF_U16(0x0041ec08u) >= (int32_t)EF_U32(0x0015b744u))
+        EF_U16(0x0041ec0cu) = (uint16_t)(EF_U16(0x0015b744u) - EF_U16(0x0041ec08u));
+    y = (int16_t)EF_U16(0x0041ec0au);
+    if (y < 0) {
+        EF_U16(0x0041ec0eu) = (uint16_t)(EF_U16(0x0041ec0eu) + (uint16_t)y);
+        EF_U16(0x0041ec0au) = 0u;
+    }
+    if ((int32_t)(int16_t)EF_U16(0x0041ec0eu) + (int32_t)(int16_t)EF_U16(0x0041ec0au) >= (int32_t)EF_U32(0x0015b748u))
+        EF_U16(0x0041ec0eu) = (uint16_t)(EF_U16(0x0015b748u) - EF_U16(0x0041ec0au));
+}
+
+/* 0x4f718, 183 bytes. Update a row of four button widgets of the group IDX under the root named at 0x184a8c: clear the dirty flag of widgets "fmt(1..4, IDX)" (format 0x184e3c) and then enable the widget for MODE (1..4 remapped 1->3, 2->4, 3->1, 4->2; 0 leaves them all cleared). */
+void select_button_state_4f718(uint32_t idx, uint32_t mode)
+{
+    uint8_t buf[0x14];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    ef_addr32 root = find_named_or_abort_a46cc(0x00184a8cu);
+    uint32_t n;
+    for (n = 1u; n < 5u; n++) {
+        guest_sprintf_a4342(b, 0x00184e3cu, n, idx & 0xffu);
+        guest_fn_a7380(find_widget_checked_a78bc(root, b));
+    }
+    mode &= 0xffu;
+    if (mode == 0u)
+        return;
+    switch (mode) {
+    case 1: mode = 3u; break;
+    case 2: mode = 4u; break;
+    case 3: mode = 1u; break;
+    case 4: mode = 2u; break;
+    default: break;
+    }
+    guest_sprintf_a4342(b, 0x00184e3cu, mode, idx & 0xffu);
+    guest_fn_a72d8(find_widget_checked_a78bc(root, b));
+}
+
+/* 0xe330c, 183 bytes. Decode a run/literal stream from the resource into DST until COUNT bytes are produced: each record is a run length (fill with FILL), a literal length and that many literal bytes; the stream (a 16-bit length followed by the data, at most 0x800 bytes) is read with 0xe3170. Reports an error through 0x132a74 when a record reads past the end of the data. */
+void decode_run_literal_e330c(uint32_t fill, uint32_t dst, uint32_t count)
+{
+    uint8_t buf[0x800];
+    uint16_t len = 0u;
+    const uint8_t *p = buf;
+    const uint8_t *end;
+    uint16_t left = (uint16_t)count;
+    read_resource_e3170((uint32_t)(uintptr_t)&len, 2u);
+    read_resource_e3170((uint32_t)(uintptr_t)buf, len);
+    end = buf + len;
+    while (left != 0u) {
+        uint16_t run = *p++;
+        uint16_t lit;
+        if (run != 0u) {
+            do {
+                EF_U8(dst) = (uint8_t)fill;
+                dst++;
+                run--;
+                left--;
+            } while (run != 0u);
+        }
+        lit = *p++;
+        if (lit != 0u) {
+            do {
+                EF_U8(dst) = *p++;
+                dst++;
+                lit--;
+                left--;
+            } while (lit != 0u);
+        }
+        if (p > end)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x00190910u);
+    }
+}
