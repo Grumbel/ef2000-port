@@ -7605,3 +7605,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x172b4` | EAX:uint32_t | EAX:uint32_t | 15b7c@15f84,16e60@1719c,16e60@17255 | Release one pending item of record ID (EAX; 0xca byte table at [0x19bb58]): needs a nonzero count byte +0x4f and flag by |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcfa9c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 7b16c@7b21f | Distance of the point (XB = ECX, YB = stack, ret 4) from the entry found for the point (XA = EDX, YA = EBX) in the shape |

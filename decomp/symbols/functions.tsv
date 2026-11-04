@@ -2989,7 +2989,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cf94a	7	abs_cf94a	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000cf94a.json	docs/compiler-abi.md; Absolute value.; callers 15b7c@15c23,15b7c@15c48,15b7c@15cf2; guest pending
 0x000cf960	194	point_in_triangle_cf960	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cf960.json	docs/compiler-abi.md; Test whether the point (PX, PY) lies inside (or on the edge of) the triangle whose three 16-bit (x, y) vertices are stor; callers cfa24@cfa66,cfde4@cff4b; guest pending
 0x000cfa24	103	find_entry_at_point_cfa24	game_helpers108	compiles	game	confirmed	decomp/tests/0x000cfa24.json	docs/compiler-abi.md; Return the first of count 0x4a-byte entries whose bounding box contains (x,y) and which passes the cf960 test, else 0.; callers cfa9c@cfb21,cfc68@cfd02; guest pending
-0x000cfa9c	204			unknown	unclassified	unverified		
+0x000cfa9c	204	page_point_distance_cfa9c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cfa9c.json	docs/compiler-abi.md; Distance of the point (XB = ECX, YB = stack, ret 4) from the entry found for the point (XA = EDX, YA = EBX) in the shape; callers 7b16c@7b21f; guest pending
 0x000cfc68	380			unknown	unclassified	unverified		
 0x000cfde4	381			unknown	unclassified	unverified		
 0x000cff64	26	forward_triple_cff64	code_predicates	compiles	game	confirmed	decomp/tests/0x000cff64.json	docs/compiler-abi.md; 0xb3830(signed word +0, high words of +2 and +6), as signed 16.; callers cff80@cffc4,cff80@cffce,cff80@d0057; guest pending

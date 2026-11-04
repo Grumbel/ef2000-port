@@ -12233,3 +12233,54 @@ uint32_t release_pending_item_172b4(uint32_t id)
     guest_fn_2b708((int16_t)id);
     return item;
 }
+
+/* 0xcfa9c, 204 bytes. Distance of the point (XB = ECX, YB = stack, ret 4) from the entry found for the point (XA = EDX, YA = EBX) in the shape of page ID (AX): fetch the page pair (0xa1a40 key 0x18f690, 0xa1a90) and the orientation 0xa1858(ID, YB); rotate the offset (XB - XA, YB - YA) by that quarter turn (0 = as is, 1 = (-dy, dx), 2 = (-dx, -dy), 3 = (dy, -dx)); look the rotated point up with 0xcfa24 (entry count word first, entries after it). Returns |(hi(+0x28) * X + hi(+0x2c) * Y + (hi(+0x2e) << 15)) / hi(+0x2a)| (hi = signed high word of the dword), or 0 when nothing is found. */
+uint32_t page_point_distance_cfa9c(uint32_t id, uint32_t xa, uint32_t ya, uint32_t xb, uint32_t yb)
+{
+    int32_t sid = (int16_t)id;
+    uint32_t key = guest_fn_a1a40_key(0x0018f690u);
+    ef_addr32 page;
+    ef_addr32 entries;
+    int32_t count;
+    int32_t dx;
+    int32_t dy;
+    int32_t x;
+    int32_t y;
+    ef_addr32 e;
+    int32_t num;
+    int32_t den;
+    if (key == 0u)
+        return 0u;
+    page = guest_fn_a1a90(sid, key);
+    if (page == 0u)
+        return 0u;
+    entries = page + 2u;
+    count = (int16_t)EF_U16(page);
+    dx = (int32_t)(xb - xa);
+    dy = (int32_t)(yb - ya);
+    switch ((uint16_t)guest_fn_a1858_x(sid, yb)) {
+    case 1:
+        x = -dy;
+        y = dx;
+        break;
+    case 2:
+        x = -dx;
+        y = -dy;
+        break;
+    case 3:
+        x = dy;
+        y = -dx;
+        break;
+    default:
+        x = dx;
+        y = dy;
+        break;
+    }
+    e = find_entry_at_point_cfa24((uint32_t)count, entries, x, y);
+    if (e == 0u)
+        return 0u;
+    num = ((int32_t)EF_U32(e + 0x28u) >> 16) * x + ((int32_t)EF_U32(e + 0x2cu) >> 16) * y +
+          (((int32_t)EF_U32(e + 0x2eu) >> 16) << 15);
+    den = (int32_t)EF_U32(e + 0x2au) >> 16;
+    return abs_a28f2(num / den);
+}
