@@ -4207,4 +4207,6 @@ void guest_fn_87db8_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s
 /* init_tables1.c */
 void init_record_pool_80d8c(ef_addr32 text);
 
+void select_handlers_9cfdc(ef_addr32 name);
+
 #endif

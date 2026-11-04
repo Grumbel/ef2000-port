@@ -22,3 +22,18 @@ void init_record_pool_80d8c(ef_addr32 text)
     init_name_entries_80a18();
     EF_U32(0x00132adcu) = 0x00080f88u; /* EDX survives the call */
 }
+
+/* 0x9cfdc, 110 bytes. Select the two handler pairs for a name: defaults when it is empty, otherwise build the path string at 0x40d150 from 0x40d0c0, a separator and the name. */
+void select_handlers_9cfdc(ef_addr32 name)
+{
+    if (name == 0u || EF_U8(name) == 0u) {
+        EF_U32(0x00132ab4u) = 0x0009cb20u;
+        EF_U32(0x00132ab8u) = 0x0009cbc4u;
+        return;
+    }
+    EF_U32(0x00132ab4u) = 0x0009cf74u;
+    EF_U32(0x00132ab8u) = 0x0009cfa4u;
+    copy_string_9d749(0x0040d150u, 0x0040d0c0u);
+    guest_fn_9ca57(0x0040d150u, 0x0018b1b4u);
+    guest_fn_9ca57(0x0040d150u, name);
+}

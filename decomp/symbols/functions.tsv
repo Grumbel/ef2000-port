@@ -2053,7 +2053,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009cde8	154			unknown	unclassified	unverified		
 0x0009ce84	98	close_request_9ce84	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009ce84.json	docs/compiler-abi.md; Dispatch a close request by flag bits 0x10000/0x20000/0x40000.; callers f80@1ac1,f6a8@f8e4,fecc@ffa1; guest pending
 0x0009cee8	68			unknown	unclassified	unverified		
-0x0009cfdc	110			unknown	unclassified	unverified		
+0x0009cfdc	110	select_handlers_9cfdc	init_tables1	compiles	game	confirmed	decomp/tests/0x0009cfdc.json	docs/compiler-abi.md; Select the two handler pairs for a name: defaults when it is empty, otherwise build the path string at 0x40d150 from 0x4; callers 3cfc0@3d272,3cfc0@3d2fa,82cec@82cf4; guest pending
 0x0009d060	37	alloc_or_abort_9d060	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0009d060.json	docs/compiler-abi.md; Allocate a block or abort with the requested size.; callers 9d114@9d11c; guest pending
 0x0009d088	5	tail_jump_9d088	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0009d088.json	docs/compiler-abi.md; tail jump. Forward to 0xc3f80.; callers f80@1ab8,2ff44@301c3,30214@3120d; guest pending
 0x0009d114	90	new_stream_9d114	game_helpers30	compiles	game	confirmed	decomp/tests/0x0009d114.json	docs/compiler-abi.md; Allocate and initialise a 0x56c-byte stream record bound to an owner.; callers f80@114f,2ff44@2ffb8,30214@30291; guest pending

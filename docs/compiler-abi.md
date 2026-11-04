@@ -4844,3 +4844,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x80d8c` | EAX:ef_addr32 | none | db0b4@db0f9 | Allocate the 0xaf0-byte record pool, fill the 16-bit slot of each of its 200 14-byte records from a lookup on text, and  |
+
+## init_tables1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9cfdc` | EAX:ef_addr32 | none | 3cfc0@3d272,3cfc0@3d2fa,82cec@82cf4 | Select the two handler pairs for a name: defaults when it is empty, otherwise build the path string at 0x40d150 from 0x4 |
