@@ -3827,3 +3827,13 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8654` | AL:uint8_t,DL:uint8_t | none | 8cc4@8d22 | Advance a unit's activity slot, nudging the object it refers to. |
+
+## game_helpers56 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x53c10` | none | none | 53c80@53cbe | Accumulate the frame ticks and clear the idle flag once past the limit. |
+| `0x70698` | none | none | 6c488@6c510 | Clear the motion accumulators and set the default scale limits. |
+| `0x7feb0` | none | none | 3dd30@3dd91,8b39c@8b48f | Start the page, or fall back to the default control mode. |
+| `0xc39ac` | none | none | ab74@af26,11e7c@12133,14d58@14ee3 | Latch the view scroll and leave the pending-scroll mode. |
+| `0xc39f0` | EAX:uint32_t | none | 11e7c@11ef1,14d58@14dbc,150d4@15134 | Enter the pending-scroll mode with the given latch value. |

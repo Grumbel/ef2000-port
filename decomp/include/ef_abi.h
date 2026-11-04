@@ -3396,4 +3396,27 @@ void step_activity_slot_8654(uint8_t group, uint8_t slot);
 /* game_helpers55.c */
 void step_activity_slot_8654(uint8_t group, uint8_t slot);
 
+/* game_helpers55.c */
+void step_activity_slot_8654(uint8_t group, uint8_t slot);
+void accumulate_ticks_53c10(void);
+void reset_motion_limits_70698(void);
+void start_page_7feb0(void);
+void leave_scroll_mode_c39ac(void);
+void enter_scroll_mode_c39f0(uint32_t value);
+void guest_fn_53350_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, float s1, uint32_t s2); /* 0x53350 stack */
+void guest_fn_6e8d8_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double v); /* 0x6e8d8 stack */
+void guest_fn_6eaf4_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double v); /* 0x6eaf4 stack */
+void guest_fn_80120_w(void); /* 0x80120 */
+
+/* game_helpers56.c */
+void accumulate_ticks_53c10(void);
+void reset_motion_limits_70698(void);
+void start_page_7feb0(void);
+void leave_scroll_mode_c39ac(void);
+void enter_scroll_mode_c39f0(uint32_t value);
+void guest_fn_53350_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, float s1, uint32_t s2); /* 0x53350 stack */
+void guest_fn_6e8d8_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double v); /* 0x6e8d8 stack */
+void guest_fn_6eaf4_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double v); /* 0x6eaf4 stack */
+void guest_fn_80120_w(void); /* 0x80120 */
+
 #endif

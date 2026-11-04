@@ -964,7 +964,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000538e4	252			unknown	unclassified	unverified		
 0x000539e0	265			unknown	unclassified	unverified		
 0x00053aec	289			unknown	unclassified	unverified		
-0x00053c10	69			unknown	unclassified	unverified		
+0x00053c10	69	accumulate_ticks_53c10	game_helpers56	compiles	game	confirmed	decomp/tests/0x00053c10.json	docs/compiler-abi.md; Accumulate the frame ticks and clear the idle flag once past the limit.; callers 53c80@53cbe; guest pending
 0x00053c80	446			unknown	unclassified	unverified		
 0x00053ecc	315			unknown	unclassified	unverified		
 0x00054008	5	nop_54008	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00054008.json	docs/compiler-abi.md; Tail jump to the empty stub 0x106a8.; callers 3ea0c@3eecf; guest pending
@@ -1329,7 +1329,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00070278	416			unknown	unclassified	unverified		
 0x00070418	31	forward_object_level	mid_helpers	compiles	game	confirmed	decomp/tests/0x00070418.json	docs/compiler-abi.md; 0x6e390(byte obj+0x18c +2, 3) with obj dword 0x1f71bc; callers 6c488@6c5cf; guest pending
 0x00070438	606			unknown	unclassified	unverified		
-0x00070698	67			unknown	unclassified	unverified		
+0x00070698	67	reset_motion_limits_70698	game_helpers56	compiles	game	confirmed	decomp/tests/0x00070698.json	docs/compiler-abi.md; Clear the motion accumulators and set the default scale limits.; callers 6c488@6c510; guest pending
 0x000706dc	568			unknown	unclassified	unverified		
 0x00070914	323			unknown	unclassified	unverified		
 0x00070a58	1523			unknown	unclassified	unverified		
@@ -1524,7 +1524,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007fe18	51	ui_initialize_releases	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe18.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fe4c	62	ui_finalize_releases	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe4c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fe8c	34	ui_release_all_controls	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe8c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
-0x0007feb0	69			unknown	unclassified	unverified		
+0x0007feb0	69	start_page_7feb0	game_helpers56	compiles	game	confirmed	decomp/tests/0x0007feb0.json	docs/compiler-abi.md; Start the page, or fall back to the default control mode.; callers 3dd30@3dd91,8b39c@8b48f; guest pending
 0x0007ff0c	84			unknown	unclassified	unverified		
 0x00080058	192	init_sound_bank_80058	game_helpers46	compiles	game	confirmed	decomp/tests/0x00080058.json	docs/compiler-abi.md; Load the first sound bank once and register its release hook.; callers 3ea0c@3ed58; guest pending
 0x00080120	105	reset_menu_80120	unit_flags	compiles	game	confirmed	decomp/tests/0x00080120.json	docs/compiler-abi.md; ; callers 3dd30@3e881,3ea0c@3eed4,7feb0@7feee; guest pending
@@ -2749,8 +2749,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c3980	11	select_buffer_146e44	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3980.json	docs/compiler-abi.md; Dword 0x15b754 = dword 0x146e44.; callers 284ec@284f7,f53bc@f546c; guest pending
 0x000c3990	11	select_buffer_15b758	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3990.json	docs/compiler-abi.md; Dword 0x15b754 = dword 0x15b758.; callers 278c0@27b21,27d18@27e9d,39204@39216; guest pending
 0x000c399c	16	select_buffer_15b758_both	list_lookup	compiles	game	confirmed	decomp/tests/0x000c399c.json	docs/compiler-abi.md; Dwords 0x15b754 and 0x146e4c = dword 0x15b758.; callers cdb20@cdc1e,d1d40@d1d90,dc250@dc277; guest pending
-0x000c39ac	68			unknown	unclassified	unverified		
-0x000c39f0	54			unknown	unclassified	unverified		
+0x000c39ac	68	leave_scroll_mode_c39ac	game_helpers56	compiles	game	confirmed	decomp/tests/0x000c39ac.json	docs/compiler-abi.md; Latch the view scroll and leave the pending-scroll mode.; callers ab74@af26,11e7c@12133,14d58@14ee3; guest pending
+0x000c39f0	54	enter_scroll_mode_c39f0	game_helpers56	compiles	game	confirmed	decomp/tests/0x000c39f0.json	docs/compiler-abi.md; Enter the pending-scroll mode with the given latch value.; callers 11e7c@11ef1,14d58@14dbc,150d4@15134; guest pending
 0x000c3a28	29	swap_buffers_c3a28	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3a28.json	docs/compiler-abi.md; When dword 0x146e40 is set, replace it with dword * 0x15b758 and store the old value at 0x15b758.; callers c3f1c@c3f47; guest pending
 0x000c3a48	41	release_buffer_c3a48	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3a48.json	docs/compiler-abi.md; When dword 0x15b758 is set and byte 0x146e4a clear, * release it through 0xc3f80 and clear it.; callers c3ae8@c3c11; guest pending
 0x000c3a74	79	select_draw_handlers_c3a74	game_helpers30	compiles	game	confirmed	decomp/tests/0x000c3a74.json	docs/compiler-abi.md; Choose the drawing handlers from two mode flags.; callers cdb20@cdbd0; guest pending
