@@ -3065,7 +3065,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d5fa8	31	call_103778_if_enabled	code_predicates	compiles	game	confirmed	decomp/tests/0x000d5fa8.json	docs/compiler-abi.md; When byte 0x15b968 is set call cdecl 0x103778(dword 0x420a64, EAX, EDX).; callers 98198@981d0; guest pending
 0x000d5fc8	52	note_value_d5fc8	game_helpers132	compiles	game	confirmed	decomp/tests/0x000d5fc8.json	docs/compiler-abi.md; When the flag at 0x15b968 is set, trace-call 0x1033c8 with the pointer at 0x420a6c and the value, and remember the low b; callers d5d18@d5da9; guest pending
 0x000d6024	53	midi_reset_channels_d6024	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d6024.json	docs/compiler-abi.md; Send two controller messages on each of the 16 MIDI channels (reset sequence).; callers d5ec0@d5eef; guest pending
-0x000d605c	23			unknown	unclassified	unverified		
+0x000d605c	23	forward_trace_call_d605c	small_wrappers1	compiles	game	confirmed	decomp/tests/0x000d605c.json	docs/compiler-abi.md; Forward three register values to the AIL trace call 0x103c28 with the global handle at 0x420a6c.; callers d6024@d6038,d6024@d604a; guest pending
 0x000d6090	679			unknown	unclassified	unverified		
 0x000d6340	196			unknown	unclassified	unverified		
 0x000d6410	26	sum_three_bytes	code_predicates	compiles	game	confirmed	decomp/tests/0x000d6410.json	docs/compiler-abi.md; Sum of the first three bytes.; callers d6478@d64e0,d6478@d6532; guest pending

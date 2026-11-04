@@ -4745,3 +4745,9 @@ in EAX, format string address, one value).
 | `0x3b1c` | EAX:uint32_t | AL:uint8_t | 3d74@3dcd | Map a code to a constant via a jump table (codes outside the range give 26). |
 | `0x74448` | EAX:uint32_t | EAX:uint32_t | 74718@74878 | Map a code to a constant via a jump table (codes outside the range give 1). |
 | `0xba0e4` | EAX:uint32_t | AL:uint8_t | b4ee0@b4f03,b9e9c@b9eb0,bb7c0@bb7dc | Map a code (1-based) to a constant via a jump table (codes outside the range give 0). |
+
+## small_wrappers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd605c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | d6024@d6038,d6024@d604a | Forward three register values to the AIL trace call 0x103c28 with the global handle at 0x420a6c. |

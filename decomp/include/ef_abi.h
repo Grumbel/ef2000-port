@@ -4145,4 +4145,7 @@ uint8_t map_code_3b1c(uint32_t code);
 uint32_t map_code_74448(uint32_t code);
 uint8_t map_code_ba0e4(uint32_t code);
 
+/* small_wrappers1.c */
+void forward_trace_call_d605c(uint32_t a, uint32_t b, uint32_t c);
+
 #endif
