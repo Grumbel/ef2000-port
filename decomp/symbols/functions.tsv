@@ -4153,7 +4153,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00118664	47	serial_set_flow_118664	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00118664.json	docs/compiler-abi.md; Set or clear the hardware-flow flag of a serial record.; callers 106f10@106fee; guest pending
 0x00118694	53	serial_set_dtr_118694	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00118694.json	docs/compiler-abi.md; Set or clear bit 0 of the modem control register.; callers 106f10@106fd9,117f68@11827f; guest pending
 0x001186cc	53	serial_set_rts_1186cc	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x001186cc.json	docs/compiler-abi.md; Set or clear bit 1 of the modem control register.; callers 106f10@106fe5,117f68@118273; guest pending
-0x00118770	277			unknown	unclassified	unverified		
+0x00118770	277	angles_from_vector_118770	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00118770.json	docs/compiler-abi.md; Convert the two angle values D and E (x 0xc90f in 14-bit fixed point) through 0x11f538 into sine/cosine style pairs, com; callers 107070@107149; guest pending
 0x00118910	368			unknown	unclassified	unverified		
 0x00118b10	76	double_bits_to_float_118b10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00118b10.json	docs/compiler-abi.md; Convert the double whose bits are EDX:EAX (EAX = low dword, EDX = high dword) to the bits of a float (returned in EAX): ; callers 108afd@108dc8; guest pending
 0x00118b60	2869			unknown	unclassified	unverified		

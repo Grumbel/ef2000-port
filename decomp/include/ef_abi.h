@@ -6506,4 +6506,7 @@ int32_t calendar_day_index_10e872(ef_addr32 p, int32_t year); /* 0x10e872 */
 void rotate_view_pair_119acc(void);
 void rotate_view_pair_119acc(void); /* 0x119acc */
 
+void angles_from_vector_118770(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, ef_addr32 out1, ef_addr32 out2, ef_addr32 out3);
+void angles_from_vector_118770(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, ef_addr32 out1, ef_addr32 out2, ef_addr32 out3); /* 0x118770 */
+
 #endif

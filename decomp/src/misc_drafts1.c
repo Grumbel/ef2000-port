@@ -23305,3 +23305,33 @@ void rotate_view_pair_119acc(void)
 			EF_U32(0x432910u + i * 4u) = 0u;
 	}
 }
+
+static int32_t md_fx14(int32_t a, int32_t b)
+{
+	int64_t p = (int64_t)a * (int64_t)b;
+	return (int32_t)((p >> 14) + ((p >> 13) & 1));
+}
+
+/* 0x118770, 277 bytes. Convert the two angle values D and E (x 0xc90f in 14-bit fixed point) through 0x11f538 into sine/cosine style pairs, combine them with A, B and C into a rotated vector, store 0xe52ee-scaled results: *OUT1 = scaled atan2_fixed of the vector, *OUT2 = scaled converted D, *OUT3 = scaled converted E. Stack arguments: E, OUT1, OUT2, OUT3 (callee cleans 0x10). */
+void angles_from_vector_118770(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, ef_addr32 out1, ef_addr32 out2, ef_addr32 out3)
+{
+	uint32_t l[8];
+	int32_t ca, cb, t1, t2, x, y, r;
+
+	ca = md_fx14(d, 0xc90f);
+	cb = md_fx14(e, 0xc90f);
+	store_derived_pair_11f538((ef_addr32)(uintptr_t)&l[3], (uint32_t)ca);
+	store_derived_pair_11f538((ef_addr32)(uintptr_t)&l[5], (uint32_t)cb);
+	t1 = md_fx14((int32_t)l[4], b);
+	t2 = md_fx14((int32_t)l[3], c);
+	l[7] = (uint32_t)t1;
+	l[1] = (uint32_t)(t1 - t2);
+	x = md_fx14((int32_t)l[3], b) + md_fx14((int32_t)l[4], c);
+	l[2] = (uint32_t)x;
+	y = md_fx14((int32_t)l[6], a) - md_fx14((int32_t)l[5], (int32_t)l[1]);
+	l[0] = (uint32_t)y;
+	r = atan2_fixed_11f368(x, y);
+	EF_U32(out1) = (uint32_t)md_fx14(r, 0xe52ee);
+	EF_U32(out2) = (uint32_t)md_fx14(ca, 0xe52ee);
+	EF_U32(out3) = (uint32_t)md_fx14(cb, 0xe52ee);
+}

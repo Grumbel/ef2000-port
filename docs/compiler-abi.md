@@ -9499,3 +9499,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x119acc` | none | none | 1196a0@1196be | Rotate the double pair at 0x432ab8 / 0x432ad0 by the angle at 0x432c28 into 0x432950 (-(X*cos - Y*sin)) and 0x432960 (-Y |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x118770` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:int32_t,[ESP+8]:ef_addr32,[ESP+12]:ef_addr32,[ESP+16]:ef_addr32 | none | 107070@107149 | Convert the two angle values D and E (x 0xc90f in 14-bit fixed point) through 0x11f538 into sine/cosine style pairs, com |
