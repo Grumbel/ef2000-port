@@ -5880,3 +5880,50 @@ void install_render_table_e1570(void)
         break;
     }
 }
+
+/* 0xf4a88, 337 bytes. Start the script section at the top level: push a fresh node (0xf57d4), set its default view words (+0x4f/+0x51 = 0x14, +0x5b/5d/67/69 = 0 and the screen-centre pairs from dwords 0x15b744/48 halved at +0x4b..+0x65), make it current (dword 0x485de0), run the script reader until it is done, then complain through the callback at 0x132a74 about each missing part (flag bytes 0x485f77, 74, 75, 76, 78 with strings 0x191e3c, 0x191e70, 0x191ea4, 0x191ed8, 0x191f0c). */
+void run_top_script_f4a88(void)
+{
+    uint32_t node = push_node_f57d4();
+    int32_t cx, cy;
+    EF_U16(node + 0x4fu) = 0x14u;
+    EF_U16(node + 0x51u) = 0x14u;
+    EF_U16(node + 0x5bu) = 0u;
+    EF_U16(node + 0x5du) = 0u;
+    EF_U16(node + 0x67u) = 0u;
+    EF_U16(node + 0x69u) = 0u;
+    cx = (int32_t)EF_U32(0x0015b744u) >> 1;
+    cy = (int32_t)EF_U32(0x0015b748u) >> 1;
+    EF_U16(node + 0x4bu) = (uint16_t)cx;
+    EF_U16(node + 0x4du) = (uint16_t)cy;
+    EF_U16(node + 0x53u) = (uint16_t)cx;
+    EF_U16(node + 0x55u) = (uint16_t)cy;
+    EF_U16(node + 0x57u) = (uint16_t)cx;
+    EF_U16(node + 0x59u) = (uint16_t)cy;
+    EF_U16(node + 0x5fu) = (uint16_t)cx;
+    EF_U16(node + 0x61u) = (uint16_t)cy;
+    EF_U16(node + 0x63u) = (uint16_t)cx;
+    EF_U32(0x00485de0u) = node;
+    EF_U16(node + 0x65u) = (uint16_t)cy;
+    EF_U16(0x00485dfcu) = 0u;
+    EF_U8(0x00485f77u) = 0u;
+    EF_U8(0x00485f74u) = 0u;
+    EF_U8(0x00485f75u) = 0u;
+    EF_U8(0x00485f76u) = 0u;
+    EF_U8(0x00485f78u) = 0u;
+    guest_fn_f46cc();
+    while (EF_U8(0x00485e08u) != 0u) {
+        run_matching_handler_f478c();
+        guest_fn_f46cc();
+    }
+    if (EF_U8(0x00485f77u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00191e3cu, EF_U32(0x00161ea8u));
+    if (EF_U8(0x00485f74u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00191e70u, EF_U32(0x00161ea8u));
+    if (EF_U8(0x00485f75u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00191ea4u, EF_U32(0x00161ea8u));
+    if (EF_U8(0x00485f76u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00191ed8u, EF_U32(0x00161ea8u));
+    if (EF_U8(0x00485f78u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00191f0cu, EF_U32(0x00161ea8u));
+}

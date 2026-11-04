@@ -3655,7 +3655,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f4640	138			unknown	unclassified	unverified		
 0x000f46cc	190	read_next_command_token	unk_cli	typed	game	confirmed		docs/compiler-abi.md; token into 0x485e08; 16-bit cursor at 0x161eac
 0x000f478c	100	run_matching_handler_f478c	runtime_helpers29	compiles	game	confirmed	decomp/tests/0x000f478c.json	docs/compiler-abi.md; Run the handler of the table entry whose name matches the current one.; callers f4a88@f4b2a,f4bdc@f4c06,f4c60@f4c91; guest pending
-0x000f4a88	337			unknown	unclassified	unverified		
+0x000f4a88	337	run_top_script_f4a88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f4a88.json	docs/compiler-abi.md; Start the script section at the top level: push a fresh node (0xf57d4), set its default view words (+0x4f/+0x51 = 0x14, ; callers f478c@f47bb; guest pending
 0x000f4bdc	131	run_command_loop_f4bdc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f4bdc.json	docs/compiler-abi.md; Reset the command parser state (0x485dfc = 3, 0x485f70/71 = 0), read tokens and run handlers until 0x485e08 clears, repo; callers none direct; guest pending
 0x000f4c60	169	run_section_one_f4c60	script_helpers2	compiles	game	confirmed	decomp/tests/0x000f4c60.json	docs/compiler-abi.md; Run the mode-1 script section, complaining about each missing part (flags 0x485f72, 0x485f6f, 0x485f73).; callers none direct; guest pending
 0x000f4d0c	169	run_section_two_f4d0c	script_helpers2	compiles	game	confirmed	decomp/tests/0x000f4d0c.json	docs/compiler-abi.md; Run the mode-2 script section (flags 0x485f6d, 0x485f6c, 0x485f6e).; callers none direct; guest pending

@@ -4979,4 +4979,6 @@ uint32_t assign_unit_object_6abac(uint32_t id, uint32_t k);
 
 void install_render_table_e1570(void);
 
+void run_top_script_f4a88(void);
+
 #endif
