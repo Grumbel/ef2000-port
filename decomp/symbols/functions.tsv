@@ -3952,7 +3952,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010958c	375			unknown	unclassified	unverified		
 0x00109704	483			unknown	unclassified	unverified		
 0x001098f0	340			unknown	unclassified	unverified		
-0x00109a80	151			unknown	unclassified	unverified		
+0x00109a80	151	normalise_globals_109a80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00109a80.json	docs/compiler-abi.md; Normalise the double globals: with k = 1 / double 0x433050, 0x432378/0x432380/0x432388 = 0x432a90/98/a0 * k and 0x432360; callers e474c@e476d; guest pending
 0x00109b20	685			unknown	unclassified	unverified		
 0x00109dd0	53	copy_rows_109dd0	game_helpers131	compiles	game	confirmed	decomp/tests/0x00109dd0.json	docs/compiler-abi.md; Copy count rows of len bytes from src to dst, advancing both by the row pitch at 0x1631f4.; callers 109e08@109e33,109e40@109e63; guest pending
 0x00109e08	55	copy_rows_from_screen_109e08	copy_rects1	compiles	game	confirmed	decomp/tests/0x00109e08.json	docs/compiler-abi.md; Copy count rows of len bytes at row offset table[idx] + x from the screen (0x15b754) into the buffer returned by 0xc382c; callers e5114@e5159; guest pending

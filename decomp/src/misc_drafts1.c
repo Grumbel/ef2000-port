@@ -8157,3 +8157,20 @@ void matrix_multiply_d08fc(uint32_t out, uint32_t a, uint32_t b)
     for (r = 0; r < 9u; r++)
         EF_U32(out + r * 4u) = (uint32_t)t[r];
 }
+
+/* 0x109a80, 151 bytes. Normalise the double globals: with k = 1 / double 0x433050, 0x432378/0x432380/0x432388 = 0x432a90/98/a0 * k and 0x432360/0x432368/0x432370 = 0x432a78/80/88 * k; then 0x432398 = 0x432b08 / 0x432f30, 0x4323a0 = 0x432b10 / 0x432ce0 and 0x4323a8 = 0x432b18 / 0x432d38. */
+void normalise_globals_109a80(void)
+{
+#define EF_D(a) (*(double *)ef_guest_memory_ptr(a))
+    double k = 1.0 / EF_D(0x00433050u);
+    EF_D(0x00432378u) = EF_D(0x00432a90u) * k;
+    EF_D(0x00432380u) = EF_D(0x00432a98u) * k;
+    EF_D(0x00432388u) = EF_D(0x00432aa0u) * k;
+    EF_D(0x00432360u) = EF_D(0x00432a78u) * k;
+    EF_D(0x00432368u) = EF_D(0x00432a80u) * k;
+    EF_D(0x00432370u) = EF_D(0x00432a88u) * k;
+    EF_D(0x00432398u) = EF_D(0x00432b08u) / EF_D(0x00432f30u);
+    EF_D(0x004323a0u) = EF_D(0x00432b10u) / EF_D(0x00432ce0u);
+    EF_D(0x004323a8u) = EF_D(0x00432b18u) / EF_D(0x00432d38u);
+#undef EF_D
+}

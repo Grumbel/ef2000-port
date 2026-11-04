@@ -6768,3 +6768,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd08fc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 93170@9322c,9357c@93603,93a8c@93ae6 | 3x3 fixed-point matrix product OUT = A * B (OUT = EAX, A = EDX, B = EBX; nine dwords each, row major, results arithmetic |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x109a80` | none | none | e474c@e476d | Normalise the double globals: with k = 1 / double 0x433050, 0x432378/0x432380/0x432388 = 0x432a90/98/a0 * k and 0x432360 |
