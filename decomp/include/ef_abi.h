@@ -3811,4 +3811,11 @@ void make_path_e80d0(ef_addr32 path, ef_addr32 drive, ef_addr32 dir, ef_addr32 n
 uint32_t partition_records_e6684(ef_addr32 base, int16_t lo, int16_t hi, uint32_t descending);
 uint32_t guest_fn_cc6c0_x(uint32_t size, ef_addr32 tag); /* 0xcc6c0 cdecl, two stack args */
 
+/* game_helpers99.c */
+uint8_t plane_eval_z_ce550(ef_addr32 plane, uint32_t u1, uint32_t u2, int32_t c);
+uint32_t plane_eval_hi_ce4dc(ef_addr32 plane, int32_t x, int32_t y, int32_t z);
+uint8_t plane_eval_sign_ce498(ef_addr32 plane, int32_t x, int32_t y, int32_t z);
+int32_t compare_nocase_10901d(ef_addr32 a, ef_addr32 b, uint32_t n);
+void palette_8_to_6bit_11082c(ef_addr32 data);
+
 #endif

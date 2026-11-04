@@ -4296,3 +4296,13 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe6684` | EAX:ef_addr32,DX:int16_t,BX:int16_t,ECX:uint32_t | EAX:uint32_t | e67a0@e67ce | Partition records lo..hi around the middle record's key (descending when the flag is set); returns the pivot's final ind |
+
+## game_helpers99 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xce550` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:int32_t | AL:uint8_t | none direct | Accumulate constant + z-coefficient * c into the plane's 64-bit result; returns 1 when the result is negative. |
+| `0xce4dc` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | EAX:uint32_t | ceb40@cebc2 | Evaluate a*x + b*y + c*z + constant into the plane's 64-bit result; returns the high dword. |
+| `0xce498` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | AL:uint8_t | none direct | Same evaluation as ce4dc; returns 1 when the result is negative. |
+| `0x10901d` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:int32_t | e0b10@e0b39 | Case-insensitive compare of up to n bytes (does not stop at NUL); returns the first difference of the lower-cased bytes. |
+| `0x11082c` | EAX:ef_addr32 | none | none direct | Scale 8-bit palette chunks down to 6 bits in place (count byte, then per chunk a skipped byte, a colour count and 3 byte |
