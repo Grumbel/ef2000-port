@@ -2781,4 +2781,17 @@ void guest_fn_d6f90(uint32_t a, uint32_t b, uint32_t c); /* 0xd6f90 EAX/EDX/ECX 
 uint32_t guest_fn_d7764_7(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s1, uint32_t s2, uint32_t s3); /* 0xd7764 EAX/EDX/EBX/ECX + stack */
 void guest_fn_d7758(uint32_t a, uint32_t b); /* 0xd7758 EAX/EDX */
 
+/* game_helpers47.c */
+void center_view_842b4(void);
+void reset_unit_view_846c8(ef_addr32 unit);
+void dispatch_named_handler_84cfc(int16_t count, ef_addr32 args);
+void fill_unit_entry_84ff0(int16_t unit, ef_addr32 position, uint32_t u2, uint32_t u3,
+                           uint32_t stack_a, uint32_t stack_b, uint32_t stack_index, uint32_t stack_flag,
+                           ef_addr32 stack_words);
+void alloc_unit_entries_850a4(int16_t unit, uint8_t count);
+uint16_t find_next_slot_8600c(uint8_t kind);
+void guest_fn_dc91c(ef_addr32 out, ef_addr32 a, ef_addr32 b); /* 0xdc91c EAX/EDX/EBX */
+void guest_fn_91afc(int32_t a, uint32_t b); /* 0x91afc EAX/EDX */
+void guest_fn_c4654(uint32_t a, uint32_t b, uint32_t c); /* 0xc4654 cdecl */
+
 #endif

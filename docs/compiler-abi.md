@@ -3440,3 +3440,14 @@ in EAX, format string address, one value).
 | `0x82060` | AX:int16_t | none | 49228@495a0 | Allocate the grid table of n rows of 17 bytes and mark every cell empty (0xff). |
 | `0x830b8` | none | none | 19a80@19adb,84aec@84aec | Rewrite the settings file with the status text lines appended. |
 | `0x83424` | AX:int16_t,DX:int16_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | AL:uint8_t | 834e8@8357c,834e8@835b4 | Project a point through the view matrix; false when it is behind the viewer. |
+
+## game_helpers47 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x842b4` | none | none | 843b0@843c8,843b0@843ec,843b0@8449e | Center the view on the current camera position and publish its origin. |
+| `0x846c8` | EAX:ef_addr32 | none | 848e0@84932 | Reset a unit record to its idle state and rebuild the draw defaults. |
+| `0x84cfc` | AX:int16_t,EDX:ef_addr32 | none | 3ea0c@3ecfa | Run the handler whose name matches the first argument of the list. |
+| `0x84ff0` | AX:int16_t,EDX:ef_addr32,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32 | none | 4a210@4a93f | Fill one 25-byte entry of a unit's table (stack arguments). |
+| `0x850a4` | AX:int16_t,DL:uint8_t | none | 2ab54@2abd2 | Allocate a unit's table of 25-byte entries. |
+| `0x8600c` | AL:uint8_t | AX:uint16_t | 86110@8666b | Find the next slot after the current one that holds the given kind. |

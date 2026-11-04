@@ -1599,7 +1599,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00083734	35	scale_vector_down_16	scene_helpers	compiles	game	confirmed	decomp/tests/0x00083734.json	docs/compiler-abi.md; 0xe99b8 then three dwords >>= 16 (arithmetic); callers 83a40@83a78; guest pending
 0x00083a40	245			unknown	unclassified	unverified		
 0x00083b50	73			unknown	unclassified	unverified		
-0x000842b4	188			unknown	unclassified	unverified		
+0x000842b4	188	center_view_842b4	game_helpers47	compiles	game	confirmed	decomp/tests/0x000842b4.json	docs/compiler-abi.md; Center the view on the current camera position and publish its origin.; callers 843b0@843c8,843b0@843ec,843b0@8449e; guest pending
 0x00084370	35	update_ui_composite	ui_operations	compiles	game	confirmed	decomp/tests/0x00084370.json	docs/compiler-abi.md; host model; guest differential pending
 0x00084394	25	forward_vector_to_83708	scene_helpers	compiles	game	confirmed	decomp/tests/0x00084394.json	docs/compiler-abi.md; 0x83708(0x1fcc3e, dwords 0/4/8); callers 845c0@845df,845c0@84611; guest pending
 0x000843b0	255			unknown	unclassified	unverified		
@@ -1612,7 +1612,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008461c	52	advance_state_8461c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0008461c.json	docs/compiler-abi.md; ; callers 84678@846b2; guest pending
 0x00084650	17			unknown	unclassified	unverified		
 0x00084678	79			unknown	unclassified	unverified		
-0x000846c8	190			unknown	unclassified	unverified		
+0x000846c8	190	reset_unit_view_846c8	game_helpers47	compiles	game	confirmed	decomp/tests/0x000846c8.json	docs/compiler-abi.md; Reset a unit record to its idle state and rebuild the draw defaults.; callers 848e0@84932; guest pending
 0x00084788	342			unknown	unclassified	unverified		
 0x000848e0	280			unknown	unclassified	unverified		
 0x00084a80	60	unit_has_slot_84a80	game_helpers6	compiles	game	confirmed	decomp/tests/0x00084a80.json	docs/compiler-abi.md; Does the unit own a slot of kind 0x21 or 0x22?; callers 848e0@848ef; guest pending
@@ -1667,13 +1667,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00084c74	5	gpwUpdateTime		named	unclassified	unverified		
 0x00084c7c	5	InitCustom		named	unclassified	unverified		
 0x00084c84	120			unknown	unclassified	unverified		
-0x00084cfc	151			unknown	unclassified	unverified		
+0x00084cfc	151	dispatch_named_handler_84cfc	game_helpers47	compiles	game	confirmed	decomp/tests/0x00084cfc.json	docs/compiler-abi.md; Run the handler whose name matches the first argument of the list.; callers 3ea0c@3ecfa; guest pending
 0x00084d94	37			unknown	unclassified	unverified		
 0x00084ddc	13	gpwshowsummaryinfo		named	unclassified	unverified		
 0x00084e3c	289			unknown	unclassified	unverified		
 0x00084f60	144			unknown	unclassified	unverified		
-0x00084ff0	180			unknown	unclassified	unverified		
-0x000850a4	157			unknown	unclassified	unverified		
+0x00084ff0	180	fill_unit_entry_84ff0	game_helpers47	compiles	game	confirmed	decomp/tests/0x00084ff0.json	docs/compiler-abi.md; Fill one 25-byte entry of a unit's table (stack arguments).; callers 4a210@4a93f; guest pending
+0x000850a4	157	alloc_unit_entries_850a4	game_helpers47	compiles	game	confirmed	decomp/tests/0x000850a4.json	docs/compiler-abi.md; Allocate a unit's table of 25-byte entries.; callers 2ab54@2abd2; guest pending
 0x00085144	37	clock_triplet_is_present	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00085144.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0008516c	489			unknown	unclassified	unverified		
 0x00085358	38	decrement_grid_activity	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00085358.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
@@ -1690,7 +1690,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00085cf8	8	set_mode_85cf8	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00085cf8.json	docs/compiler-abi.md; ; callers 3ea0c@3ee3c; guest pending
 0x00085d00	369			unknown	unclassified	unverified		
 0x00085f78	148			unknown	unclassified	unverified		
-0x0008600c	179			unknown	unclassified	unverified		
+0x0008600c	179	find_next_slot_8600c	game_helpers47	compiles	game	confirmed	decomp/tests/0x0008600c.json	docs/compiler-abi.md; Find the next slot after the current one that holds the given kind.; callers 86110@8666b; guest pending
 0x000860c0	80	first_nonignored_activity_slot	record_callers	compiles	game	confirmed	decomp/tests/0x000860c0.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00086110	1476			unknown	unclassified	unverified		
 0x000866d4	1	nop_866d4	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000866d4.json	docs/compiler-abi.md; Empty stub (single ret).; callers 87fe4@88038; guest pending
