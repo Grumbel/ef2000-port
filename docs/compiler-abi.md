@@ -5585,3 +5585,16 @@ in EAX, format string address, one value).
 | `0xcd2e8` | EAX:uint32_t | EAX:uint32_t | 161d4@164bf,1e28c@1e383,56084@56196 | Add DELTA to the 16-bit progress value of the current entry (clamped to 100, stored in the table at 0x41f700). When the  |
 | `0x103e5c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:int32_t,[ESP+12]:uint32_t | EAX:int32_t | 103f04@1040e9,103f04@104117,103f04@104145 | Parse a number from the string STR in base BASE (digit characters are looked up case insensitively in the table at 0x194 |
 | `0x85bc8` | EAX:ef_addr32 | AL:uint8_t | 73ec@74eb,3a268@3a2af | Classify the map cell at POS (two 16-bit coordinates): look up the cell byte in the grid at 0x134d8a (rows of 40, 10 uni |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xddbe0` | none | AL:uint8_t | 982a0@982b0 | One-time mouse/cursor setup: on the first call allocate the cursor buffers (7, 0x1a, 7 and 0x800 bytes) into 0x4260b0..0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x101a90` | none | none | 101c54@101c5a | One-time runtime init guarded by the flag at 0x17d2cc: register the exit handler pair (0x101a90, 0x103d48) and mark eigh |
+| `0xfa6d3` | none | EAX:ef_addr32 | bc34f@bc355 | Allocate a stream slot (26 bytes): reuse a node from the free list at 0x4644e0 (keeping its 0x4000 flag), else take an u |

@@ -1821,3 +1821,85 @@ uint8_t classify_cell_85bc8(ef_addr32 pos)
         return 4u;
     }
 }
+
+/* 0xddbe0, 168 bytes. One-time mouse/cursor setup: on the first call allocate the cursor buffers (7, 0x1a, 7 and 0x800 bytes) into 0x4260b0..0x4260a8, report an error through 0x132a74 when one of the first two allocations fails, probe the mouse driver (0xddc88) and, when present, finish the setup (0xddce8). Registers the handler 0xde374. Returns the byte at 0x15ee99. */
+uint8_t init_mouse_ddbe0(void)
+{
+    if (EF_U8(0x0015ee9cu) == 0u) {
+        EF_U8(0x00426147u) = 0u;
+        EF_U8(0x0015ee9cu) = 1u;
+        EF_U32(0x004260b0u) = alloc_aligned_510(7u);
+        EF_U32(0x00426098u) = alloc_aligned_510(0x1au);
+        EF_U32(0x0042609cu) = EF_U32(0x00426098u);
+        EF_U32(0x004260a4u) = EF_U32(0x004260b0u);
+        EF_U32(0x004260a0u) = alloc_aligned_510(7u);
+        EF_U32(0x004260a8u) = alloc_aligned_510(0x800u);
+        if (EF_U32(0x004260b0u) == 0u || EF_U32(0x00426098u) == 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x0019053cu);
+        if (query_mouse_ddc88() != 0u)
+            guest_fn_ddce8_x();
+        guest_fn_9c3cf(0x000de374u);
+    }
+    return EF_U8(0x0015ee99u);
+}
+
+/* 0x101a90, 169 bytes. One-time runtime init guarded by the flag at 0x17d2cc: register the exit handler pair (0x101a90, 0x103d48) and mark eight 4-byte ranges (0x4dd620..0x4dd640) through 0x104908. */
+void init_once_101a90(void)
+{
+    if (EF_U32(0x0017d2ccu) == 0u) {
+        guest_fn_104840(0x00101a90u, 0x00103d48u);
+        stack_range_104908(0x004dd624u, 4u);
+        stack_range_104908(0x004dd628u, 4u);
+        stack_range_104908(0x004dd620u, 4u);
+        stack_range_104908(0x004dd62cu, 4u);
+        stack_range_104908(0x004dd63cu, 4u);
+        stack_range_104908(0x004dd638u, 4u);
+        stack_range_104908(0x004dd640u, 4u);
+        stack_range_104908(0x004dd630u, 4u);
+        EF_U32(0x0017d2ccu) = 1u;
+    }
+}
+
+/* 0xfa6d3, 168 bytes. Allocate a stream slot (26 bytes): reuse a node from the free list at 0x4644e0 (keeping its 0x4000 flag), else take an unused slot of the table 0x160424..0x16062c (flags & 3 clear) with a fresh 8-byte list node, else allocate node and slot together (flag 0x4003). The slot is cleared, flagged 3 and linked into the list at 0x485f9c. Returns the slot, or 0 after reporting error 5. */
+ef_addr32 alloc_stream_slot_fa6d3(void)
+{
+    uint32_t node = EF_U32(0x004644e0u);
+    uint32_t slot;
+    uint32_t flags;
+    if (node != 0u) {
+        slot = EF_U32(node + 4u);
+        flags = (EF_U32(slot + 0xcu) & 0x4003u) | 3u;
+        EF_U32(0x004644e0u) = EF_U32(node);
+    } else {
+        slot = 0x00160424u;
+        for (;;) {
+            if (slot >= 0x0016062cu) {
+                node = guest_fn_fc795(0x22u);
+                flags = 0x4003u;
+                slot = node;
+                if (node == 0u) {
+                    guest_fn_ebe6d(5u);
+                    return 0u;
+                }
+                slot = node + 8u;
+                break;
+            }
+            if ((EF_U8(slot + 0xcu) & 3u) == 0u) {
+                node = guest_fn_fc795(8u);
+                if (node == 0u) {
+                    guest_fn_ebe6d(5u);
+                    return 0u;
+                }
+                flags = 3u;
+                break;
+            }
+            slot += 0x1au;
+        }
+    }
+    fill_bytes_b3fb0(slot, 0u, 0x1au);
+    EF_U32(slot + 0xcu) = flags;
+    EF_U32(node + 4u) = slot;
+    EF_U32(node) = EF_U32(0x00485f9cu);
+    EF_U32(0x00485f9cu) = node;
+    return slot;
+}

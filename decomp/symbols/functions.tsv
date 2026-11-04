@@ -3258,7 +3258,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd9e4	112	set_param_block_dd9e4	fill_rects2	compiles	game	confirmed	decomp/tests/0x000dd9e4.json	docs/compiler-abi.md; Store a parameter block at 0x15ee80, bracketing the writes with 0xdd870/0xdd8c0 unless 0x15ee94 is -1.; callers 278c0@2792d,27d18@27d50,f2a30@f2a8e; guest pending
 0x000ddae0	232			unknown	unclassified	unverified		
 0x000ddbc8	14	to_upper_ascii	math_string	compiles	game	confirmed	decomp/tests/0x000ddbc8.json	docs/compiler-abi.md; Signed 'a'..'z' to uppercase.; callers 27fec@28121,a82f0@a8374,a9130@a9355; guest pending
-0x000ddbe0	168			unknown	unclassified	unverified		
+0x000ddbe0	168	init_mouse_ddbe0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ddbe0.json	docs/compiler-abi.md; One-time mouse/cursor setup: on the first call allocate the cursor buffers (7, 0x1a, 7 and 0x800 bytes) into 0x4260b0..0; callers 982a0@982b0; guest pending
 0x000ddc88	96	query_mouse_ddc88	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ddc88.json	docs/compiler-abi.md; ; callers ddbe0@ddc69; guest pending
 0x000ddce8	115			unknown	unclassified	unverified		
 0x000ddd48	288			unknown	unclassified	unverified		
@@ -3716,7 +3716,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa3d4	177			unknown	unclassified	unverified		
 0x000fa485	36	open_file_fa485	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000fa485.json	docs/compiler-abi.md; open: forward name, flags and the optional permission argument to 0xfa4a9 with share mode 0 (cdecl, variadic).; callers 105024@105036,105070@1050ce; guest pending
 0x000fa4a9	453			unknown	unclassified	unverified		
-0x000fa6d3	168			unknown	unclassified	unverified		
+0x000fa6d3	168	alloc_stream_slot_fa6d3	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa6d3.json	docs/compiler-abi.md; Allocate a stream slot (26 bytes): reuse a node from the free list at 0x4644e0 (keeping its 0x4000 flag), else take an u; callers bc34f@bc355; guest pending
 0x000fa77b	57	release_list_node_fa77b	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000fa77b.json	docs/compiler-abi.md; Move the node owning object from the list at 0x485f9c to the free list.; callers bc287@bc311,bc450@bc45c; guest pending
 0x000fa7d2	49	update_flags_fa7d2	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fa7d2.json	docs/compiler-abi.md; ; callers bc287@bc345,f22af@f22e5,10f071@10f075; guest pending
 0x000fa815	133	stream_vprintf_fa815	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000fa815.json	docs/compiler-abi.md; vfprintf: format into a stream through 0xed133 with the putc callback at 0xfa804, temporarily making an unbuffered-flagg; callers bc400@bc416,cd12e@cd145; guest pending
@@ -3793,7 +3793,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010162c	91	vertex_depth_range_flat_10162c	game_helpers92	compiles	game	confirmed	decomp/tests/0x0010162c.json	docs/compiler-abi.md; Return 1 when the minimum and maximum of the vertices' z field have the same integer part (high 16 bits).; callers 1016e0@101757; guest pending
 0x00101688	85	pulse_delay_101688	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00101688.json	docs/compiler-abi.md; Run a short hardware delay loop: n pulses of the two callbacks at 0x486da4/0x486da0, one for the low bit and two per rem; callers 1016e0@101826; guest pending
 0x001016e0	439			unknown	unclassified	unverified		
-0x00101a90	169			unknown	unclassified	unverified		
+0x00101a90	169	init_once_101a90	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00101a90.json	docs/compiler-abi.md; One-time runtime init guarded by the flag at 0x17d2cc: register the exit handler pair (0x101a90, 0x103d48) and mark eigh; callers 101c54@101c5a; guest pending
 0x00101ba8	171			unknown	unclassified	unverified		
 0x00101c54	392			unknown	unclassified	unverified		
 0x00101ddc	53	trace_call_101ddc	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101ddc.json	docs/compiler-abi.md; AIL trace wrapper for 0x104694 (cdecl, all arguments on the stack).; callers d5d18@d5d4f,d6e58@d6ef3; guest pending

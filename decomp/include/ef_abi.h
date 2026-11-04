@@ -4623,4 +4623,10 @@ uint32_t add_progress_cd2e8(uint32_t delta);
 int32_t parse_number_103e5c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t str, int32_t base, uint32_t endp);
 uint8_t classify_cell_85bc8(ef_addr32 pos);
 
+uint8_t init_mouse_ddbe0(void);
+void guest_fn_ddce8_x(void); /* 0xddce8 unknown, no arguments */
+
+void init_once_101a90(void);
+ef_addr32 alloc_stream_slot_fa6d3(void);
+
 #endif
