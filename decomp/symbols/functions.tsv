@@ -2004,7 +2004,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009a998	224	count_air_kill_9a998	game_helpers53	compiles	game	confirmed	decomp/tests/0x0009a998.json	docs/compiler-abi.md; Count a destroyed air object in the statistics table by its class.; callers 9a624@9a677; guest pending
 0x0009aa78	182	count_event_9aa78	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009aa78.json	docs/compiler-abi.md; Count an event kind in the counter row of the current slot.; callers 9a624@9a683; guest pending
 0x0009ab30	57	update_sound_chain_9ab30	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x0009ab30.json	docs/compiler-abi.md; Run the sound bank update chain on the object from 0x9a544.; callers bfcc@c0bc; guest pending
-0x0009ab6c	280			unknown	unclassified	unverified		
+0x0009ab6c	280	dump_page_header_9ab6c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009ab6c.json	docs/compiler-abi.md; Dump the page header table at 0x40d006..0x40d024 as text lines to the stream STREAM through 0xbc400 (formats 0x13179b..0; callers 9ab30@9ab38; guest pending
 0x0009ac84	448			unknown	unclassified	unverified		
 0x0009ae44	517			unknown	unclassified	unverified		
 0x0009b04c	600			unknown	unclassified	unverified		

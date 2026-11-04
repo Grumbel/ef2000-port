@@ -6098,3 +6098,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xcdb20` | none | none | 8b2d8@8b2de,aaee8@aaf77,d1e50@d1e89 | Set up the 320x200 video mode: on the first call read the environment string at 0x18f620, flag the options named 0x18f62 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9ab6c` | EAX:uint32_t | none | 9ab30@9ab38 | Dump the page header table at 0x40d006..0x40d024 as text lines to the stream STREAM through 0xbc400 (formats 0x13179b..0 |

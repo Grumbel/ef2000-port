@@ -4935,3 +4935,18 @@ void init_video_mode_cdb20(void)
     guest_fn_dc2c0();
     guest_callptr_eax_x(EF_U32(0x0015b74cu), 0u);
 }
+
+/* 0x9ab6c, 280 bytes. Dump the page header table at 0x40d006..0x40d024 as text lines to the stream STREAM through 0xbc400 (formats 0x13179b..0x131846 and the closing line 0x18b128); the values are the signed words of the table. */
+void dump_page_header_9ab6c(uint32_t stream)
+{
+    guest_fn_bc400(stream, 0x0013179bu);
+    guest_fn_bc400(stream, 0x001317b8u, (int32_t)(int16_t)EF_U16(0x0040d008u));
+    guest_fn_bc400(stream, 0x001317cau, (int32_t)(int16_t)EF_U16(0x0040d00au));
+    guest_fn_bc400(stream, 0x001317e0u, (int32_t)(int16_t)EF_U16(0x0040d00cu));
+    guest_fn_bc400(stream, 0x0013180cu);
+    guest_fn_bc400(stream, 0x001317f9u, (int32_t)(int16_t)EF_U16(0x0040d00eu), (int32_t)(int16_t)EF_U16(0x0040d016u), (int32_t)(int16_t)EF_U16(0x0040d01eu));
+    guest_fn_bc400(stream, 0x00131823u, (int32_t)(int16_t)EF_U16(0x0040d010u), (int32_t)(int16_t)EF_U16(0x0040d018u), (int32_t)(int16_t)EF_U16(0x0040d020u));
+    guest_fn_bc400(stream, 0x00131835u, (int32_t)(int16_t)EF_U16(0x0040d012u), (int32_t)(int16_t)EF_U16(0x0040d01au), (int32_t)(int16_t)EF_U16(0x0040d022u));
+    guest_fn_bc400(stream, 0x00131846u, (int32_t)(int16_t)EF_U16(0x0040d014u), (int32_t)(int16_t)EF_U16(0x0040d01cu), (int32_t)(int16_t)EF_U16(0x0040d024u));
+    guest_fn_bc400(stream, 0x0018b128u);
+}
