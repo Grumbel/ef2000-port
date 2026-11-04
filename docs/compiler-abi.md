@@ -7611,3 +7611,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xcfa9c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 7b16c@7b21f | Distance of the point (XB = ECX, YB = stack, ret 4) from the entry found for the point (XA = EDX, YA = EBX) in the shape |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x899d8` | EAX:ef_addr32 | none | 8a318@8a555 | Let the unit record R (EAX) lock on to its target T (+0x30) when T is valid (0x8c09c) and has neither bit 2 nor bit 3 of |

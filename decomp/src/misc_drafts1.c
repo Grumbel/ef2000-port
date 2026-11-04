@@ -12013,7 +12013,7 @@ uint8_t can_reach_target_89060(ef_addr32 rec, uint32_t target)
     guest_fn_88c54_x(rec, (ef_addr32)(uintptr_t)v48);
     guest_fn_88c80_x(rec, (ef_addr32)(uintptr_t)v60, (ef_addr32)(uintptr_t)v80);
     guest_fn_88d4c_x(rec, (ef_addr32)(uintptr_t)v78);
-    direction_vector_88fb4((ef_addr32)(uintptr_t)v2c, 0x001fcf58u, 0x001fcf88u, 0u, v80[0], v78[0]);
+    direction_vector_88fb4((ef_addr32)(uintptr_t)v2c, 0x001fcf58u, 0x001fcf88u, rec, v80[0], v78[0]);
     subtract_scene_vectors((ef_addr32)(uintptr_t)v18, 0x001fcf58u, 0x001fcf88u);
     if (normalize_vector_b4424((ef_addr32)(uintptr_t)v00, (ef_addr32)(uintptr_t)v18) == 0u)
         return 0u;
@@ -12283,4 +12283,37 @@ uint32_t page_point_distance_cfa9c(uint32_t id, uint32_t xa, uint32_t ya, uint32
           (((int32_t)EF_U32(e + 0x2eu) >> 16) << 15);
     den = (int32_t)EF_U32(e + 0x2au) >> 16;
     return abs_a28f2(num / den);
+}
+
+/* 0x899d8, 231 bytes. Let the unit record R (EAX) lock on to its target T (+0x30) when T is valid (0x8c09c) and has neither bit 2 nor bit 3 of +0x24 set: fetch T's vectors (0x8fa58) and R's (0x88d4c), build the direction 0x88fb4 against 0x1fcf58 into 0x1fcfd8, subtract, normalise (0xb4424) and, when the distance 0x88ff8 is at least the class limit (double at class*0x91+0x12bcd5 times 0x18a5b0 times 0x18a5b8), clear the word R+0x56 to 0xff, set byte R+0x5a and call 0x8be54(T, R). */
+void lock_on_target_899d8(ef_addr32 rec)
+{
+    ef_addr32 t = EF_U32(rec + 0x30u);
+    double v00[3];
+    double v50[1];
+    double v48[1];
+    double v30[3];
+    double v18[3];
+    double limit;
+    double c1;
+    double c2;
+    if ((uint8_t)guest_fn_8c09c_x(t) == 0u)
+        return;
+    if ((EF_U8(t + 0x24u) & 4u) != 0u || (EF_U8(t + 0x24u) & 8u) != 0u)
+        return;
+    guest_fn_8fa58_x(t, (ef_addr32)(uintptr_t)v00, (ef_addr32)(uintptr_t)v50);
+    guest_fn_88d4c_x(rec, (ef_addr32)(uintptr_t)v48);
+    direction_vector_88fb4(0x001fcfd8u, 0x001fcf58u, (ef_addr32)(uintptr_t)v00, rec, v50[0], v48[0]);
+    subtract_scene_vectors((ef_addr32)(uintptr_t)v30, 0x001fcf58u, (ef_addr32)(uintptr_t)v00);
+    if (normalize_vector_b4424((ef_addr32)(uintptr_t)v18, (ef_addr32)(uintptr_t)v30) == 0u)
+        return;
+    memcpy(&limit, ef_guest_memory_ptr((uint32_t)EF_U8(rec + 0x18u) * 0x91u + 0x0012bcd5u), sizeof limit);
+    memcpy(&c1, ef_guest_memory_ptr(0x0018a5b0u), sizeof c1);
+    memcpy(&c2, ef_guest_memory_ptr(0x0018a5b8u), sizeof c2);
+    limit = limit * c1 * c2;
+    if (guest_fn_88ff8_x(0x001fcfd8u, (ef_addr32)(uintptr_t)v18) < limit)
+        return;
+    EF_U16(rec + 0x56u) = 0xffu;
+    EF_U8(rec + 0x5au) = 1u;
+    guest_fn_8be54_x(t, rec);
 }

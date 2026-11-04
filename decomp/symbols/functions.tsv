@@ -1753,7 +1753,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00089924	60	recalculate_object_temporarily	ui_secondary	compiles	game	confirmed	decomp/tests/0x00089924.json	docs/compiler-abi.md; host model; guest differential pending
 0x00089960	48	finish_record_89960	scene_helpers	compiles	game	confirmed	decomp/tests/0x00089960.json	docs/compiler-abi.md; byte 0x12d7b3=0; if byte 0x125847 0x9e508(high word +0x2c,4); 0x8a318; callers none direct; guest pending
 0x00089990	69	activate_89990	game_helpers6	compiles	game	confirmed	decomp/tests/0x00089990.json	docs/compiler-abi.md; ; callers 8935c@89428,8935c@89469; guest pending
-0x000899d8	231			unknown	unclassified	unverified		
+0x000899d8	231	lock_on_target_899d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000899d8.json	docs/compiler-abi.md; Let the unit record R (EAX) lock on to its target T (+0x30) when T is valid (0x8c09c) and has neither bit 2 nor bit 3 of; callers 8a318@8a555; guest pending
 0x00089ac0	151	try_take_target_89ac0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089ac0.json	docs/compiler-abi.md; When the object's target record (object+0x30 -> +0x4b) is in range (0x89b58), may be swapped in as the object's own targ; callers 8a318@8a54c; guest pending
 0x00089b58	151			unknown	unclassified	unverified		
 0x00089bf0	115	period_elapsed_89bf0	game_helpers21	compiles	game	confirmed	decomp/tests/0x00089bf0.json	docs/compiler-abi.md; True when a random value modulo the configured period is within the tick budget.; callers 89ac0@89af4; guest pending

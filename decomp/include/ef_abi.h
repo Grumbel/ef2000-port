@@ -5548,4 +5548,9 @@ void guest_fn_2b0b4_x(int32_t id, uint32_t mode); /* 0x2b0b4 EAX/EDX */
 uint32_t page_point_distance_cfa9c(uint32_t id, uint32_t xa, uint32_t ya, uint32_t xb, uint32_t yb);
 uint32_t guest_fn_a1858_x(int32_t id, uint32_t arg); /* 0xa1858 EAX/EDX -> AX */
 
+void lock_on_target_899d8(ef_addr32 rec);
+uint32_t guest_fn_8c09c_x(ef_addr32 unit); /* 0x8c09c EAX -> AL */
+void guest_fn_8be54_x(ef_addr32 unit, ef_addr32 rec); /* 0x8be54 EAX/EDX */
+void guest_fn_8fa58_x(ef_addr32 unit, ef_addr32 out, ef_addr32 out2); /* 0x8fa58 EAX/EDX/EBX */
+
 #endif
