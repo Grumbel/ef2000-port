@@ -7670,3 +7670,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6f48` | EAX:ef_addr32,EDX:ef_addr32 | none | 73ec@758c | Maybe fire a radio call from unit A (EAX) in answer to B (EDX): B's owner record is the one named by the high word of B+ |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7e670` | none | EAX:uint32_t | 7e758@7e767 | Run the unit setup passes for up to 0x4074 clock ticks (clock hook 0x15b620): after 0xe2988(0x1e), repeat { for every un |

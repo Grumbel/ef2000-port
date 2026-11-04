@@ -12581,3 +12581,35 @@ void maybe_radio_call_6f48(ef_addr32 a, ef_addr32 b)
     guest_fn_46254((uint32_t)((int32_t)EF_U32(a + 0x4eu) >> 16), (int32_t)EF_U32(owner + 0x4eu) >> 16, 0x3cu,
                    (uint32_t)angle, (uint32_t)rounded, ctl & 0xffu);
 }
+
+/* 0x7e670, 229 bytes. Run the unit setup passes for up to 0x4074 clock ticks (clock hook 0x15b620): after 0xe2988(0x1e), repeat { for every unit (count word 0x2119f4, 0x7489c) that is not flagged (bit 3 of +0x24), whose owner word (+0x16 high) is not 0xff and differs from byte 0x1a666b (an owner of 0xfe first becomes 0x1a666b), count it and run 0x545b8(unit, 1); then 0x581b0 and 0x58094 } while some unit was handled, word 0x126518 is zero and the deadline has not passed. Report the number of units still handled through the error hook (0x18866c) when the word 0x126518 is zero. Returns 1. */
+uint32_t run_unit_setup_7e670(void)
+{
+    uint32_t deadline = ((uint32_t (*)(void))EF_U32(0x0015b620u))() + 0x4074u;
+    uint32_t count;
+    int16_t i;
+    guest_fn_e2988(0x1eu);
+    do {
+        count = 0u;
+        for (i = 0; i < (int16_t)EF_U16(0x002119f4u); i++) {
+            ef_addr32 u = guest_fn_7489c((int32_t)i);
+            if (u == 0u)
+                continue;
+            if (((int32_t)EF_U32(u + 0x16u) >> 16) == 0xfe)
+                EF_U16(u + 0x18u) = (uint16_t)EF_U8(0x001a666bu);
+            if ((uint16_t)EF_U8(0x001a666bu) == EF_U16(u + 0x18u))
+                continue;
+            if (((int32_t)EF_U32(u + 0x16u) >> 16) == 0xff)
+                continue;
+            if ((EF_U8(u + 0x24u) & 8u) != 0u)
+                continue;
+            count++;
+            guest_fn_545b8_x((int32_t)i, 1u);
+        }
+        guest_fn_581b0();
+        guest_fn_58094();
+    } while ((uint16_t)count != 0u && EF_U16(0x00126518u) == 0u && ((uint32_t (*)(void))EF_U32(0x0015b620u))() < deadline);
+    if ((uint16_t)count != 0u && EF_U16(0x00126518u) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018866cu, (uint32_t)(int32_t)(int16_t)count);
+    return 1u;
+}

@@ -1501,7 +1501,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007e0a4	516	simNextFlight		named	unclassified	unverified		
 0x0007e2a8	749			unknown	unclassified	unverified		
 0x0007e5a0	205	claim_players_7e5a0	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e5a0.json	docs/compiler-abi.md; Mark unowned players as ours and resend until all players answer or time runs out.; callers 7e758@7e75a; guest pending
-0x0007e670	229			unknown	unclassified	unverified		
+0x0007e670	229	run_unit_setup_7e670	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007e670.json	docs/compiler-abi.md; Run the unit setup passes for up to 0x4074 clock ticks (clock hook 0x15b620): after 0xe2988(0x1e), repeat { for every un; callers 7e758@7e767; guest pending
 0x0007e758	135	sync_players_7e758	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e758.json	docs/compiler-abi.md; Claim the players, then send command 0x1d until the pending counter drains.; callers 7e8c0@7e9d6; guest pending
 0x0007e7e0	187	wait_round_clear_7e7e0	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e7e0.json	docs/compiler-abi.md; Wait for the pending round to clear, then mark this player ready.; callers 8bb50@8bc3e; guest pending
 0x0007e89c	33	scene_slot_valid	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007e89c.json	docs/compiler-abi.md; slot=high word 0x19bb5c; valid unless 0xff and 0x2c358 nonzero; callers 7e8c0@7e953,7e8c0@7eb1d; guest pending
