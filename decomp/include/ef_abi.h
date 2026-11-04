@@ -5741,4 +5741,6 @@ double guest_fn_deb1a_x(double x); /* 0xdeb1a ST0 -> ST0, arcsine */
 
 void draw_status_overlay_59334(void);
 
+void track_closest_link_88574(ef_addr32 rec);
+
 #endif

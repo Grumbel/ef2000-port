@@ -8055,3 +8055,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x59334` | none | none | none direct | Status overlay: unless word 0x126516 is set, latch the full screen (0xcdf48 with 0..width-1, 0..height-1), print the dwo |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x88574` | EAX:ef_addr32 | none | 8846c@884c1 | Track the closest candidate for the current target link: for the record REC (EAX) of class other than 1, 0x1f or 0x20 wh |

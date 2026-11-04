@@ -14604,3 +14604,39 @@ void draw_status_overlay_59334(void)
     EF_U8(0x00127b1au) = 1u;
     draw_shadowed_text_48c90(0xfu, 0, 0xb4, (ef_addr32)(uintptr_t)buf);
 }
+
+/* 0x88574, 239 bytes. Track the closest candidate for the current target link: for the record REC (EAX) of class other than 1, 0x1f or 0x20 whose link +0x30 equals the target 0x20f150, compute the squared distance (positions >> 8) to the target and, when it beats the best so far (0x20f14c) and REC's byte +0x59 is clear, convert REC to a scene vector (0x88c54), build the player's position (doubles +0x49, +0x51 and +0x59 raised by double 0x18a456) and, unless 0x7b08c rejects the line (nonzero result), remember REC in 0x20f154. */
+void track_closest_link_88574(ef_addr32 rec)
+{
+    uint8_t buf[0x30];
+    ef_addr32 player = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    ef_addr32 t = EF_U32(0x0020f150u);
+    uint8_t cls;
+    int32_t dx, dy, dz, d2;
+    double z, add;
+    if (t == 0u)
+        return;
+    cls = EF_U8(rec + 0x18u);
+    if (cls == 1u || cls == 0x1fu || cls == 0x20u)
+        return;
+    t = EF_U32(0x0020f150u);
+    if (EF_U32(rec + 0x30u) != t)
+        return;
+    dx = ((int32_t)EF_U32(rec) >> 8) - ((int32_t)EF_U32(t) >> 8);
+    dy = ((int32_t)EF_U32(rec + 4u) >> 8) - ((int32_t)EF_U32(t + 4u) >> 8);
+    dz = ((int32_t)EF_U32(rec + 8u) >> 8) - ((int32_t)EF_U32(t + 8u) >> 8);
+    d2 = dx * dx + dy * dy + dz * dz;
+    if (d2 >= (int32_t)EF_U32(0x0020f14cu))
+        return;
+    EF_U32(0x0020f14cu) = (uint32_t)d2;
+    if (EF_U8(rec + 0x59u) != 0u)
+        return;
+    guest_fn_88c54_x(rec, (ef_addr32)(uintptr_t)buf);
+    memcpy(buf + 0x18, ef_guest_memory_ptr(player + 0x49u), 16u);
+    memcpy(&z, ef_guest_memory_ptr(player + 0x59u), sizeof z);
+    memcpy(&add, ef_guest_memory_ptr(0x0018a456u), sizeof add);
+    z = z + add;
+    memcpy(buf + 0x28, &z, sizeof z);
+    if ((uint8_t)store_scaled_vectors_7b08c((uint32_t)(uintptr_t)(buf + 0x18), (uint32_t)(uintptr_t)buf) == 0u)
+        EF_U32(0x0020f154u) = rec;
+}
