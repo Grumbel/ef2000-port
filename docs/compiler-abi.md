@@ -9561,3 +9561,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11a5c0` | EAX:ef_addr32 | none | 11a6e4@11a7bf | Transform the object's point and a cross-product offset by the global matrix, and when the point is at or above the 0x43 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2ccf0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:double | EAX:double | 2ced4@2d35a,401ac@4035d,85420@854fb | Record-table term: ax selects, edx indexes 0xe5-byte records. |

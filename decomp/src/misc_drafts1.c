@@ -23692,3 +23692,37 @@ void accum_depth_force_11a5c0(ef_addr32 obj)
 	acc[2] += t * md_rd_f64(0x004644c0u);
 	accum_cross_119f10(obj, (uint32_t)(uintptr_t)acc);
 }
+
+/* 0x2ccf0, 293 bytes. Record-table term: ax selects, edx indexes 0xe5-byte records. */
+double record_term_2ccf0(uint32_t sel, uint32_t idx, uint32_t u2, uint32_t u3, double a, double b)
+{
+	double acc;
+	double r;
+	double t;
+	double v2;
+	double d;
+	ef_addr32 rec;
+	uint64_t k = 0x3e7ad7f29abcaf47ull;
+	double kd;
+
+	(void)u2;
+	(void)u3;
+	if ((sel & 0xffffu) != (uint32_t)EF_U16(0x0019bb5eu)) {
+		memcpy(&kd, &k, sizeof(kd));
+		return kd;
+	}
+	md_wr_f64(0x001a3140u, a);
+	r = estimate_coefficient_6c1f0(0, 0, 0, 0, a);
+	md_wr_f64(0x001a3140u, b);
+	rec = (idx & 0xffu) * 0xe5u;
+	d = md_rd_f64(rec + 0x00128569u);
+	if (1.0 >= b) {
+		acc = 0.0;
+	} else {
+		t = r * md_rd_f64(0x0018257au);
+		acc = guest_fn_b3fd0(b) * t * md_rd_f64(rec + 0x00128571u) * md_rd_f64(rec + 0x001285adu);
+		v2 = guest_fn_b3fd0(b) * t * md_rd_f64(rec + 0x00128571u);
+		acc += (guest_fn_b3fd0(d) * md_rd_f64(rec + 0x001285b5u)) / v2;
+	}
+	return acc * md_rd_f64(0x00182582u);
+}

@@ -480,7 +480,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002c600	218	draw_linked_pages_2c600	draw_loops1	compiles	game	confirmed	decomp/tests/0x0002c600.json	docs/compiler-abi.md; For each of a page's eight linked pages (table at 0x1fcb40) other than itself, call 0x46254 with colour 0x3e; if none we; callers 46454@471bf,46454@47232; guest pending
 0x0002c6dc	127	owner_check_fails_2c6dc	game_helpers16	compiles	game	confirmed	decomp/tests/0x0002c6dc.json	docs/compiler-abi.md; Nonzero (1) when the owner fails the check selected by its record type.; callers 2c778@2cbd7; guest pending
 0x0002c778	1398			unknown	unclassified	unverified		
-0x0002ccf0	293			unknown	unclassified	unverified		
+0x0002ccf0	293	record_term_2ccf0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002ccf0.json	docs/compiler-abi.md; Record-table term: ax selects, edx indexes 0xe5-byte records.; callers 2ced4@2d35a,401ac@4035d,85420@854fb; guest pending
 0x0002ce18	127	reset_page_record_2ce18	state_reset1	compiles	game	confirmed	decomp/tests/0x0002ce18.json	docs/compiler-abi.md; Reset a 0xca-byte page record: clear the object limit of each of its six slots (unless 0xff), recompute its grid limit, ; callers 2ced4@2cfd8; guest pending
 0x0002ced4	1387			unknown	unclassified	unverified		
 0x0002d488	1036			unknown	unclassified	unverified		
