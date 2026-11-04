@@ -557,7 +557,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00034140	151	onopenDirectPlayGames		named	unclassified	unverified		
 0x000341d8	62	gpwDirectPlayGameSelected		named	unclassified	unverified		
 0x00034218	125	opengamesell		named	unclassified	unverified		
-0x00034298	237			unknown	unclassified	unverified		
+0x00034298	237	update_item_dialog_34298	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00034298.json	docs/compiler-abi.md; Update the item-list dialog: without a name match (0xa4380 of 0x125937 against 0x182b34) just activate and redraw the wi; callers none direct; guest pending
 0x00034390	76	show_notice_34390	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00034390.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000343dc	109	check_files_343dc	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x000343dc.json	docs/compiler-abi.md; Check both data files; show an error dialog and return 0 on failure.; callers 34bcc@34be4; guest pending
 0x0003444c	49	sumbalance		named	unclassified	unverified		

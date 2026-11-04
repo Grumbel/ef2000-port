@@ -5258,4 +5258,6 @@ void draw_heading_marker_5de14(uint32_t x, uint32_t y, uint32_t size, uint32_t o
 
 
 
+void update_item_dialog_34298(void);
+
 #endif

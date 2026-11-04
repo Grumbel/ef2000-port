@@ -9039,3 +9039,36 @@ void draw_heading_marker_5de14(uint32_t x, uint32_t y, uint32_t size, uint32_t o
                      (uint32_t)(int32_t)(int16_t)(p0[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p0[0] + (int16_t)x),
                      EF_U8(0x00128148u));
 }
+
+/* 0x34298, 237 bytes. Update the item-list dialog: without a name match (0xa4380 of 0x125937 against 0x182b34) just activate and redraw the widget 0x182dd0. Otherwise, unless one of the bytes 0x19f5ae, 0x125902, 0x1357c8 is set, query 0xe1758 and then either lay out the list widget 0x182dc4 for dword 0x429210 rows (rows * 20 height at word +0x67; fewer than 5 rows show the children and resize to rows * 20 + 0x18 high, otherwise hide them and use the fixed size 0x7c) and activate it, or (no rows) activate and redraw the widget 0x182de0. */
+void update_item_dialog_34298(void)
+{
+    uint32_t w;
+    if (guest_fn_a4380(0x00125937u, 0x00182b34u) == 0u) {
+        w = guest_fn_a46cc(0x00182dd0u);
+        guest_fn_a4cb4(EF_U8(w + 0x10u));
+        redraw_widget_ac9a0(w);
+        return;
+    }
+    if (EF_U8(0x0019f5aeu) != 0u || EF_U8(0x00125902u) != 0u || EF_U8(0x001357c8u) != 0u)
+        return;
+    (void)unsupported_query_e1758();
+    if (EF_U32(0x00429210u) == 0u) {
+        w = guest_fn_a46cc(0x00182de0u);
+        guest_fn_a4cb4(EF_U8(w + 0x10u));
+        redraw_widget_ac9a0(w);
+        return;
+    }
+    w = guest_fn_a46cc(0x00182dc4u);
+    EF_U16(w + 0x67u) = (uint16_t)(EF_U16(0x00429210u) * 0x14u);
+    if ((int32_t)EF_U32(0x00429210u) < 5) {
+        int16_t h;
+        toggle_children_a570c(w, 0u);
+        h = (int16_t)((int16_t)EF_U16(0x00429210u) * 0x14 + 0x18);
+        guest_fn_a520c(w, 0x11c, (uint32_t)(int32_t)h, 0u);
+    } else {
+        toggle_children_a570c(w, 1u);
+        guest_fn_a520c(w, 0x12c, 0x7cu, 0u);
+    }
+    guest_fn_a4cb4(EF_U8(w + 0x10u));
+}
