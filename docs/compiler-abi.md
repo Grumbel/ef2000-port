@@ -7049,3 +7049,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x326d8` | none | none | 2fbc4@2ff34,3122c@31363 | Build the label text at 0x19e4da: copy a short constant chosen by byte 0x19e555 (0..7, else a default; 5 to 8 bytes each |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x84e3c` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 601c@621b,66fc@677e,67d4@685f | Fetch two packed words for sub-entry SUB (BL) of the class record owned by unit UNIT (DX, signed) into OUT[0..1] (EAX):  |

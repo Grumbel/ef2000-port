@@ -1670,7 +1670,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00084cfc	151	dispatch_named_handler_84cfc	game_helpers47	compiles	game	confirmed	decomp/tests/0x00084cfc.json	docs/compiler-abi.md; Run the handler whose name matches the first argument of the list.; callers 3ea0c@3ecfa; guest pending
 0x00084d94	37	register_callback_84d94	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x00084d94.json	docs/compiler-abi.md; Register the 0x84dbc callback through 0xab838 after 0xabf8c.; callers aaee8@aafaf; guest pending
 0x00084ddc	13	gpwshowsummaryinfo		named	unclassified	unverified		
-0x00084e3c	289			unknown	unclassified	unverified		
+0x00084e3c	289	fetch_entry_pair_84e3c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00084e3c.json	docs/compiler-abi.md; Fetch two packed words for sub-entry SUB (BL) of the class record owned by unit UNIT (DX, signed) into OUT[0..1] (EAX): ; callers 601c@621b,66fc@677e,67d4@685f; guest pending
 0x00084f60	144	unit_slot_value_84f60	float_helpers3	compiles	game	confirmed	decomp/tests/0x00084f60.json	docs/compiler-abi.md; Double stored in a unit's slot table, or 0.0 when the unit is missing.; callers 49228@49b86,55bf8@55c73,55bf8@55ccb; guest pending
 0x00084ff0	180	fill_unit_entry_84ff0	game_helpers47	compiles	game	confirmed	decomp/tests/0x00084ff0.json	docs/compiler-abi.md; Fill one 25-byte entry of a unit's table (stack arguments).; callers 4a210@4a93f; guest pending
 0x000850a4	157	alloc_unit_entries_850a4	game_helpers47	compiles	game	confirmed	decomp/tests/0x000850a4.json	docs/compiler-abi.md; Allocate a unit's table of 25-byte entries.; callers 2ab54@2abd2; guest pending

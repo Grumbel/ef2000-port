@@ -5285,4 +5285,6 @@ void offset_vector_by_angles_ceda0(ef_addr32 vec, ef_addr32 ang, uint32_t scale)
 
 void build_mode_label_326d8(void);
 
+void fetch_entry_pair_84e3c(ef_addr32 out, uint32_t unit, uint32_t sub);
+
 #endif
