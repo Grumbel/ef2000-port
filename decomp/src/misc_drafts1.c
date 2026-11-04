@@ -15517,3 +15517,60 @@ void process_packets_3527c(void)
 		}
 	}
 }
+
+/* 0x367f0, 369 bytes. One step of the connection state machine in byte 0x19f5a9 (states 1..11, the dispatch is a jump table in the code segment). 1 sets state 4; 4 and 8 recompute the total (0xa4030) and process the received packets (0x3527c); 6 does the same and moves to state 8; 7 sends the key request for byte 0x19f5a2 (0x35220) and moves to 6; 9 starts the retry timer (state 10, ten retries in word 0x19f58e, clock into dword 0x19f338, random delay 18 + random % 10 in dword 0x19f328) and sends request 0x46; 10 recomputes the total and, once the delay has elapsed, restarts the timer, sends request 0x46 again and counts the retries down to state 11; 11 resets state, byte 0x19f5a1 and copies byte 0x19f5a0 to 0x19f5a7. When the state or byte 0x19f598 changed the state widget is refreshed (0x36340). */
+void step_connection_367f0(void)
+{
+	uint8_t state = EF_U8(0x0019f5a9u);
+	uint8_t flag = EF_U8(0x0019f598u);
+	uint32_t r;
+
+	switch (state) {
+	case 1:
+		EF_U8(0x0019f5a9u) = 4u;
+		break;
+	case 4:
+	case 8:
+		recompute_total_a4030();
+		process_packets_3527c();
+		break;
+	case 6:
+		recompute_total_a4030();
+		process_packets_3527c();
+		EF_U8(0x0019f5a9u) = 8u;
+		break;
+	case 7:
+		send_key_request_35220(EF_U8(0x0019f5a2u));
+		EF_U8(0x0019f5a9u) = 6u;
+		break;
+	case 9:
+		EF_U8(0x0019f5a9u) = 0xau;
+		EF_U16(0x0019f58eu) = 10u;
+		EF_U32(0x0019f338u) = guest_read_runtime_tick();
+		r = guest_fn_a45b3() & 0xffffu;
+		EF_U32(0x0019f328u) = r % 10u + 0x12u;
+		send_key_request_35220(0x46u);
+		break;
+	case 10:
+		recompute_total_a4030();
+		if (guest_read_runtime_tick() - EF_U32(0x0019f338u) > EF_U32(0x0019f328u)) {
+			EF_U32(0x0019f338u) = guest_read_runtime_tick();
+			r = guest_fn_a45b3() & 0xffffu;
+			EF_U32(0x0019f328u) = r % 10u + 0x12u;
+			send_key_request_35220(0x46u);
+			EF_U16(0x0019f58eu) = (uint16_t)(EF_U16(0x0019f58eu) - 1u);
+			if (EF_U16(0x0019f58eu) == 0u)
+				EF_U8(0x0019f5a9u) = 0xbu;
+		}
+		break;
+	case 11:
+		EF_U8(0x0019f5a9u) = 0u;
+		EF_U8(0x0019f5a1u) = 0u;
+		EF_U8(0x0019f5a7u) = EF_U8(0x0019f5a0u);
+		break;
+	default:
+		break;
+	}
+	if (state != EF_U8(0x0019f5a9u) || flag != EF_U8(0x0019f598u))
+		enable_state_widget_36340();
+}

@@ -8190,3 +8190,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x3527c` | none | none | 367f0@36833,367f0@36844,36ad8@36b12 | Process the received packet list: the byte at [0x136b78] gives the packet count and the bytes at [0x136b74] index 32-byt |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x367f0` | none | none | 35590@355da | One step of the connection state machine in byte 0x19f5a9 (states 1..11, the dispatch is a jump table in the code segmen |

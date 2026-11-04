@@ -616,7 +616,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00036340	132	enable_state_widget_36340	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00036340.json	docs/compiler-abi.md; Enable the widget named 0x182fb0 with a label picked from the state byte 0x19f5a9 (2..10): 0x1831dc/0x1831e8 (by 0x19f59; callers 367f0@36955,36ad8@36cfd; guest pending
 0x000363c4	80	sync_list_363c4	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x000363c4.json	docs/compiler-abi.md; Walk the list from dword 0x19f320 (next at +0x21), toggling each node by the flag bytes at 0x19f318.; callers 36438@364f6,36438@3652a,36438@365e9; guest pending
 0x00036438	905			unknown	unclassified	unverified		
-0x000367f0	369			unknown	unclassified	unverified		
+0x000367f0	369	step_connection_367f0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000367f0.json	docs/compiler-abi.md; One step of the connection state machine in byte 0x19f5a9 (states 1..11, the dispatch is a jump table in the code segmen; callers 35590@355da; guest pending
 0x00036964	71	set_buttons_36964	game_helpers7	compiles	game	confirmed	decomp/tests/0x00036964.json	docs/compiler-abi.md; ; callers 369fc@36a17; guest pending
 0x000369ac	77	set_buttons_369ac	game_helpers7	compiles	game	confirmed	decomp/tests/0x000369ac.json	docs/compiler-abi.md; ; callers 36ad8@36ce1; guest pending
 0x000369fc	180	open_stream_369fc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000369fc.json	docs/compiler-abi.md; Open the stream file NAME for the player (flag byte MODE goes to 0x19f5a0): complain through the callback at 0x132a74 wh; callers 35590@3568b,35590@3569c; guest pending
