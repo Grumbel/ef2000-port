@@ -5745,3 +5745,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xcec00` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:int32_t | none | 26424@265f0,387e0@38a83,3bc90@3bcb8 | Fill the rectangle (X0, Y0)-(X1, Y1) with the colour byte COLOR, clipped to the rectangle [0x15bdc0..0x15bdc4] x [0x15bd |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x65570` | EAX:ef_addr32 | none | 654b8@654ed,654b8@6551c | Insert the record REC (fixed point position at +0 and +8, ids at +0xc and +0xe) into the list of the six nearest records |

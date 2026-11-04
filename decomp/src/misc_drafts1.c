@@ -2964,3 +2964,40 @@ void fill_rect_clipped_cec00(uint32_t color, int32_t x0, int32_t y0, int32_t x1,
         dst += EF_U32(0x001631f4u);
     }
 }
+
+/* 0x65570, 204 bytes. Insert the record REC (fixed point position at +0 and +8, ids at +0xc and +0xe) into the list of the six nearest records at 0x1a6d30 (8-byte entries: word at +0xe, byte at +0xc as word, squared distance to the view origin 0x1a5bec/0x1a5be8 as dword), kept sorted by distance; the count word 0x1a81b2 is capped at 6. Only active while the byte 0x1a81e5 is set. */
+void insert_nearest_65570(ef_addr32 rec)
+{
+    int16_t count = (int16_t)EF_U16(0x001a81b2u);
+    if (EF_U8(0x001a81e5u) != 0u) {
+        int32_t d1 = ((int32_t)EF_U32(0x001a5be8u) - ((int32_t)EF_U32(rec + 8u) >> 8)) >> 8;
+        int32_t d0 = ((int32_t)EF_U32(0x001a5becu) - ((int32_t)EF_U32(rec) >> 8)) >> 8;
+        int32_t dist = d0 * d0 + d1 * d1;
+        int16_t i = 0;
+        int16_t k;
+        if (count > 0) {
+            do {
+                if (dist <= (int32_t)EF_U32(0x001a6d34u + (uint32_t)(int32_t)i * 8u))
+                    break;
+                i++;
+            } while (i < count);
+        }
+        if (i < count && i < 5) {
+            k = 5;
+            do {
+                EF_U32(0x001a6d30u + (uint32_t)(int32_t)k * 8u) = EF_U32(0x001a6d28u + (uint32_t)(int32_t)k * 8u);
+                EF_U32(0x001a6d34u + (uint32_t)(int32_t)k * 8u) = EF_U32(0x001a6d2cu + (uint32_t)(int32_t)k * 8u);
+                k--;
+            } while (k > i);
+        }
+        if ((int32_t)i < 6) {
+            EF_U16(0x001a6d30u + (uint32_t)(int32_t)i * 8u) = EF_U16(rec + 0xeu);
+            EF_U16(0x001a6d32u + (uint32_t)(int32_t)i * 8u) = EF_U8(rec + 0xcu);
+            count++;
+            EF_U32(0x001a6d34u + (uint32_t)(int32_t)i * 8u) = (uint32_t)dist;
+        }
+        if ((int32_t)count > 6)
+            count = 6;
+    }
+    EF_U16(0x001a81b2u) = (uint16_t)count;
+}
