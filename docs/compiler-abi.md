@@ -8914,3 +8914,9 @@ in EAX, format string address, one value).
 | `0x9bdbb` | EAX:uint32_t,EDX:uint32_t | none | 1e9@218 | Run the registered exit handlers with priority between MIN (AL) and MAX (DL): the 6-byte records at 0x195ade..0x195af0 h |
 | `0x1e9` | EAX:uint32_t,EDX:uint32_t | none | 11d258@11d26d | Fatal exit with a message: STRING (EDX, zero-terminated) is written to the file opened by name 0x120d1b (INT 21h AX=3D01 |
 | `0x11d258` | EAX:uint32_t,EDX:uint32_t | none | 10e438@10e443,11d695@11d69f | Report an error: if the debugger hook (0x1204b6) returns zero, call the fatal exit 0x1e9 with the same two register argu |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xac780` | none | none | ac5f8@ac731 | Tail fragment of the preceding routine (reached when its test succeeds; the original jumps back to the return at 0xac77e |

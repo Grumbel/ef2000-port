@@ -6127,4 +6127,7 @@ void run_exit_handlers_9bdbb(uint32_t eax, uint32_t edx);
 void fatal_exit_1e9(uint32_t code, uint32_t message);
 void report_error_11d258(uint32_t code, uint32_t message);
 
+void show_status_ac780(void);
+void show_status_ac780(void);
+
 #endif

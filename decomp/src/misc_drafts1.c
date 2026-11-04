@@ -20326,3 +20326,14 @@ void report_error_11d258(uint32_t code, uint32_t message)
 	if (debugger_hook_1204b6() == 0u)
 		fatal_exit_1e9(code, message);
 }
+
+/* 0xac780, 37 bytes. Tail fragment of the preceding routine (reached when its test succeeds; the original jumps back to the return at 0xac77e otherwise): when the word at 0x41eed2 equals 1, clear the registered callbacks and the UI state, show the text at 0x41f262 and finish by tail-calling the redraw. */
+void show_status_ac780(void)
+{
+	if (EF_U16(0x41eed2u) != 1u)
+		return;
+	guest_tail_abec4(0u);
+	clear_ui_state_ac16c();
+	show_text_ac408(0x41f262u);
+	redraw_ca17c();
+}
