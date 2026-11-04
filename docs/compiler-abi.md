@@ -7700,3 +7700,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x2b0b4` | EAX:uint32_t,EDX:uint32_t | none | 161d4@16253,161d4@16317,16588@16619 | Switch the record ID (AX; 0xca byte table at [0x19bb58]) to the state MODE (DL): run 0x2afcc(ID, MODE) and then by MODE  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x711f0` | none | none | 6c488@6c4d6,6c488@6c58b | Altitude check of the player ship (record at [0x1f71bc]; altitude double at +0x59): below the double 0x1868d1 the ship i |

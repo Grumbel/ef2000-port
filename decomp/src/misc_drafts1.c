@@ -12738,3 +12738,51 @@ void set_record_state_2b0b4(uint32_t id, uint32_t mode)
     }
     EF_U8(EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau + 0x1au) = m;
 }
+
+/* 0x711f0, 248 bytes. Altitude check of the player ship (record at [0x1f71bc]; altitude double at +0x59): below the double 0x1868d1 the ship is dropped from its roster slot (0x740e4(.., 0xff, 0xff, 0, 0xff) and 0x6a1d0(.., 1) for the id in the high word of 0x1f71c6). The double 0x1f6f68 is set to (double 0x1868d9 - altitude) * double 0x1868e1; below the double 0x1284fc the byte +0x18d is cleared. When bit 6 of +0x24 is set and the altitude is below 0x1284fc - 0x12847c, send 0x46168(id, 0x5b, 0, 0, 0) and clear that bit. Always finish by zeroing the controls (dwords 0x1f7100/04/10/14 and 0x1f70b0/b4) and running 0x6eaf4(1.3) and 0x6e8d8(2.5). */
+void check_player_altitude_711f0(void)
+{
+    ef_addr32 cur = EF_U32(0x001f71bcu);
+    double alt;
+    double lim;
+    double a;
+    double b;
+    double c;
+    int32_t id = (int32_t)EF_U32(0x001f71c6u) >> 16;
+    memcpy(&alt, ef_guest_memory_ptr(cur + 0x59u), sizeof alt);
+    memcpy(&lim, ef_guest_memory_ptr(0x001868d1u), sizeof lim);
+    if (alt < lim) {
+        guest_fn_740e4(id, 0xffu, 0xffu, 0u, 0xffu);
+        guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
+    }
+    cur = EF_U32(0x001f71bcu);
+    memcpy(&a, ef_guest_memory_ptr(0x001868d9u), sizeof a);
+    memcpy(&b, ef_guest_memory_ptr(0x001868e1u), sizeof b);
+    memcpy(&alt, ef_guest_memory_ptr(cur + 0x59u), sizeof alt);
+    c = (a - alt) * b;
+    memcpy(ef_guest_memory_ptr(0x001f6f68u), &c, sizeof c);
+    memcpy(&lim, ef_guest_memory_ptr(0x001284fcu), sizeof lim);
+    memcpy(&alt, ef_guest_memory_ptr(cur + 0x59u), sizeof alt);
+    if (alt < lim)
+        EF_U8(cur + 0x18du) = 0u;
+    cur = EF_U32(0x001f71bcu);
+    if ((EF_U8(cur + 0x24u) & 0x40u) != 0u) {
+        double l2;
+        memcpy(&lim, ef_guest_memory_ptr(0x001284fcu), sizeof lim);
+        memcpy(&l2, ef_guest_memory_ptr(0x0012847cu), sizeof l2);
+        memcpy(&alt, ef_guest_memory_ptr(cur + 0x59u), sizeof alt);
+        if (lim - l2 > alt) {
+            draw_object_entries_46168((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), 0x5bu, 0u, 0u, 0u);
+            cur = EF_U32(0x001f71bcu);
+            EF_U8(cur + 0x24u) = (uint8_t)(EF_U8(cur + 0x24u) & 0xbfu);
+        }
+    }
+    EF_U32(0x001f7100u) = 0u;
+    EF_U32(0x001f7104u) = 0u;
+    EF_U32(0x001f7110u) = 0u;
+    EF_U32(0x001f7114u) = 0u;
+    EF_U32(0x001f70b0u) = 0u;
+    EF_U32(0x001f70b4u) = 0u;
+    compute_turn_rate_6eaf4(0u, 0u, 0u, 0u, 1.3);
+    guest_fn_6e8d8_x(0u, 0u, 0u, 0u, 2.5);
+}

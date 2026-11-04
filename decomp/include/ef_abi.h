@@ -5595,4 +5595,7 @@ void set_record_state_2b0b4(uint32_t id, uint32_t mode);
 void guest_fn_2afcc_x(int32_t id, uint32_t mode); /* 0x2afcc EAX/EDX */
 void guest_fn_2b95c_x(int32_t id); /* 0x2b95c EAX */
 
+void check_player_altitude_711f0(void);
+void guest_fn_6e8d8_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg); /* 0x6e8d8 stack double, ret 8 */
+
 #endif

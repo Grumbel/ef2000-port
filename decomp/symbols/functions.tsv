@@ -1335,7 +1335,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00070a58	1523			unknown	unclassified	unverified		
 0x0007104c	87	advance_state_7104c	unit_flags	compiles	game	confirmed	decomp/tests/0x0007104c.json	docs/compiler-abi.md; Advance the state byte +0x16e of the player record.; callers 6c488@6c500,6c488@6c5b3; guest pending
 0x000710a4	332			unknown	unclassified	unverified		
-0x000711f0	248			unknown	unclassified	unverified		
+0x000711f0	248	check_player_altitude_711f0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000711f0.json	docs/compiler-abi.md; Altitude check of the player ship (record at [0x1f71bc]; altitude double at +0x59): below the double 0x1868d1 the ship i; callers 6c488@6c4d6,6c488@6c58b; guest pending
 0x000712e8	641			unknown	unclassified	unverified		
 0x0007156c	1864			unknown	unclassified	unverified		
 0x00071cb8	1188			unknown	unclassified	unverified		
