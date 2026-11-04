@@ -4958,4 +4958,7 @@ void fill_selection_dialog_4db60(void);
 
 void nudge_view_orientation_91df4(void);
 
+void serial_interrupt_117bfc(uint32_t rec);
+void guest_fn_117b18_x(uint32_t rec); /* 0x117b18 EAX */
+
 #endif

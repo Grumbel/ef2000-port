@@ -5499,3 +5499,62 @@ void nudge_view_orientation_91df4(void)
             guest_fn_d0dbc(0x0012dbecu, (uint16_t)(-pitch), 0u);
     }
 }
+
+/* 0x117bfc, 314 bytes. Serial port interrupt service for the channel record REC (port base at +0x1c, state block at +0x2c, receive ring descriptor at +0xa with buffer +0xe, transmit-enable at +0x14): mark the state flags |= 0x10, then loop on the interrupt identification register (port+2) until no interrupt is pending, handling modem status (0: CTS low sets flag 2, CTS high with flag 2 set calls the transmit pump 0x117b18), THR empty (2: pump), received data (4: drain the receiver into the ring while the line status (port+5) shows data and the ring is not full) and line status (6: read port+5). Finishes by sending end-of-interrupt (0x20 to port 0x20); the same EOI is sent when the record has no port or state block. */
+void serial_interrupt_117bfc(uint32_t rec)
+{
+    uint32_t port, st;
+    if (rec == 0u)
+        return;
+    port = EF_U32(rec + 0x1cu);
+    st = EF_U32(rec + 0x2cu);
+    if (port == 0u || st == 0u) {
+        guest_fn_117b0c(0x20u, 0x20u);
+        return;
+    }
+    EF_U16(st + 4u) = (uint16_t)(EF_U16(st + 4u) | 0x10u);
+    for (;;) {
+        uint32_t iir = guest_fn_9c430(EF_U32(rec + 0x1cu) + 2u) & 0xffu;
+        uint32_t id = iir & 7u;
+        if (iir & 1u)
+            break;
+        if (id > 6u)
+            continue;
+        switch (id) {
+        case 0: {
+            uint32_t ms = guest_fn_9c430(EF_U32(rec + 0x1cu) + 6u) & 0xffu;
+            if (EF_U32(rec + 0x14u) == 0u)
+                break;
+            if ((ms & 0x10u) == 0u) {
+                EF_U16(EF_U32(rec + 0x2cu) + 4u) = (uint16_t)(EF_U16(EF_U32(rec + 0x2cu) + 4u) | 2u);
+            } else if (EF_U16(EF_U32(rec + 0x2cu) + 4u) & 2u) {
+                guest_fn_117b18_x(rec);
+            }
+            break;
+        }
+        case 2:
+            guest_fn_117b18_x(rec);
+            break;
+        case 4:
+            while (guest_fn_9c430(EF_U32(rec + 0x1cu) + 5u) & 1u) {
+                uint32_t b = guest_fn_9c430(EF_U32(rec + 0x1cu));
+                uint32_t q = EF_U32(rec + 0xau);
+                if ((int16_t)EF_U16(q + 4u) < (int16_t)EF_U16(q + 6u)) {
+                    uint16_t idx = EF_U16(q + 2u);
+                    EF_U16(q + 2u) = (uint16_t)(idx + 1u);
+                    EF_U8(EF_U32(rec + 0xeu) + (uint32_t)(int32_t)(int16_t)idx) = (uint8_t)b;
+                    if (EF_U16(q + 2u) == EF_U16(q + 6u))
+                        EF_U16(q + 2u) = 0u;
+                    EF_U16(q + 4u) = (uint16_t)(EF_U16(q + 4u) + 1u);
+                }
+            }
+            break;
+        case 6:
+            (void)guest_fn_9c430(EF_U32(rec + 0x1cu) + 5u);
+            break;
+        default:
+            break;
+        }
+    }
+    guest_fn_117b0c(0x20u, 0x20u);
+}

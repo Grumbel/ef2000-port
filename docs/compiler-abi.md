@@ -6200,3 +6200,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x91df4` | none | none | 1c780@1cc33,1c780@1cd71,94194@941a5 | Apply the key-driven orientation nudges (byte flags 0x2144aa: 1/2 adjust the scratch matrix 0x21439c by +/-0x800, 4/8 ro |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x117bfc` | EAX:uint32_t | none | none direct | Serial port interrupt service for the channel record REC (port base at +0x1c, state block at +0x2c, receive ring descrip |
