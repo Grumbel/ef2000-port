@@ -2014,7 +2014,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009b8a0	707			unknown	unclassified	unverified		
 0x0009bb64	64	shift_tables_9bb64	game_helpers6	compiles	game	confirmed	decomp/tests/0x0009bb64.json	docs/compiler-abi.md; Shift the three 20-entry word tables of a record down by one.; callers 9b8a0@9b8c0,9b8a0@9b8e0,9b8a0@9b900; guest pending
 0x0009bba4	253	draw_hud_frame_9bba4	game_helpers74	compiles	game	confirmed	decomp/tests/0x0009bba4.json	docs/compiler-abi.md; Draw the HUD frame: three vertical rails and four border lines.; callers none direct; guest pending
-0x0009bca4	83			unknown	unclassified	unverified		
+0x0009bca4	83	draw_bar_9bca4	screen_clip1	compiles	game	confirmed	decomp/tests/0x0009bca4.json	docs/compiler-abi.md; Draw a bar of height h (when non-zero) at x: a coloured strip via 0xc99ac and a highlight via 0xc9a98.; callers 98eac@98ecd,98eac@98eea,98eac@98f07; guest pending
 0x0009bd20	79	watcom_cmain		library	clib	unverified		Watcom C entry: startup command buffer and EBP initialization, calls candidate game main 0x8b274; docs/startup-symbols.md
 0x0009bd70	75	watcom_init_routines		library	clib	unverified		Watcom initializer dispatcher: called with EAX=0xff and walks init table; docs/startup-symbols.md
 0x0009bdbb	79			unknown	unclassified	unverified		

@@ -5195,3 +5195,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8b2d8` | none | none | 8b274@8b290 | Reload the game data: tear down the video state, build the data file path, load it to 0x425190 through the handler at 0x |
+
+## screen_clip1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9bca4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 98eac@98ecd,98eac@98eea,98eac@98f07 | Draw a bar of height h (when non-zero) at x: a coloured strip via 0xc99ac and a highlight via 0xc9a98. |

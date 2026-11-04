@@ -110,3 +110,14 @@ void measure_page_point_a0aa0(uint32_t index)
                                                           (int16_t)(y - (int16_t)EF_U16(0x00159098u)),
                                                           (int16_t)(z - (int16_t)EF_U16(0x0015909cu)));
 }
+
+/* 0x9bca4, 83 bytes. Draw a bar of height h (when non-zero) at x: a coloured strip via 0xc99ac and a highlight via 0xc9a98. */
+void draw_bar_9bca4(uint32_t colour, uint32_t unused, uint32_t x, uint32_t h)
+{
+    int32_t sx = (int16_t)x;
+    (void)unused;
+    if ((uint16_t)h == 0u)
+        return;
+    guest_fn_c99ac_x(colour & 0xffu, 0x78, sx, (int32_t)(int16_t)(h + 0x78u), (int32_t)(int16_t)(x + 0xeu));
+    guest_fn_c9a98_x(8u, 0x78, sx, (int32_t)(int16_t)(h + 0x79u), (int32_t)(int16_t)(x + 0xfu));
+}

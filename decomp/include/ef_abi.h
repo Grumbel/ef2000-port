@@ -4404,4 +4404,10 @@ void transfer_link_486a0(uint32_t a, uint32_t b);
 void reload_game_data_8b2d8(void);
 void guest_fn_97dcc_x(void); /* 0x97dcc no arguments */
 
+void draw_bar_9bca4(uint32_t colour, uint32_t unused, uint32_t x, uint32_t h);
+
+
+
+
+
 #endif
