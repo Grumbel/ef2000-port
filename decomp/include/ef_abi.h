@@ -3956,4 +3956,8 @@ void destroy_record_104464(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 int32_t stream_flush_fa8a0(ef_addr32 stream);
 uint32_t guest_fn_110393_x(uint32_t handle, ef_addr32 buf, uint32_t count); /* 0x110393 EAX/EDX/EBX, DOS write */
 
+
+/* game_helpers126.c */
+void print_to_handle_b1bb0(uint32_t handle, ef_addr32 fmt, ...);
+
 #endif

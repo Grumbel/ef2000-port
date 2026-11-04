@@ -2483,7 +2483,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1ae4	41	free_list_b1ae4	list_helpers	compiles	game	confirmed	decomp/tests/0x000b1ae4.json	docs/compiler-abi.md; As 0xb1814 through 0xb1a68.; callers b1b10@b1b57; guest pending
 0x000b1b10	123	reset_view_tables_b1b10	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b1b10.json	docs/compiler-abi.md; ; callers c594@c608; guest pending
 0x000b1b8b	25	strlen_ds	unk_runtime	typed	unclassified	confirmed		docs/compiler-abi.md; repnz scasb uses ES=DS and assumes DF clear; classification deferred to 3.6
-0x000b1bb0	70			unknown	unclassified	unverified		
+0x000b1bb0	70	print_to_handle_b1bb0	game_helpers126	compiles	game	confirmed	decomp/tests/0x000b1bb0.json	docs/compiler-abi.md; printf to a handle (100..105): format into a 0x7c-byte buffer and write it (cdecl, variadic; all arguments on the stack); callers 5630@56e0,5630@56ee,5630@56fc; guest pending
 0x000b1bf8	57			unknown	unclassified	unverified		
 0x000b1c34	77			unknown	unclassified	unverified		
 0x000b1f80	618			unknown	unclassified	unverified		

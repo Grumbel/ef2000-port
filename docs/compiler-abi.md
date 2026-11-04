@@ -4525,3 +4525,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfa8a0` | EAX:ef_addr32 | EAX:int32_t | bc4da@bc4fe,f1f5a@f207d,f1f5a@f2112 | fflush: write out a dirty write buffer, or seek back over unread input; resets the buffer position and returns 0 or -1. |
+
+## game_helpers126 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb1bb0` | [ESP+4]:uint32_t,[ESP+8]:ef_addr32 | none | 5630@56e0,5630@56ee,5630@56fc | printf to a handle (100..105): format into a 0x7c-byte buffer and write it (cdecl, variadic; all arguments on the stack) |
