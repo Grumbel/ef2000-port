@@ -4043,7 +4043,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001102a3	21	store_flagged_value	runtime_libc	compiles	game	confirmed	decomp/tests/0x001102a3.json	docs/compiler-abi.md; Store value / 0x4000 in dword table 0x17d614[index].; callers fa4a9@fa65e,fa9a0@fa9b6; guest pending
 0x00110393	124			unknown	unclassified	unverified		
 0x00110410	163	heap_alloc_110410	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110410.json	docs/compiler-abi.md; First-fit allocation from a circular free list heap.; callers fc795@fc80c; guest pending
-0x001104b8	272			unknown	unclassified	unverified		
+0x001104b8	272	heap_free_1104b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001104b8.json	docs/compiler-abi.md; Free a heap block: coalesce with neighbouring free blocks and update the heap's free list and statistics.; callers fa9d2@faa03; guest pending
 0x001105c3	3	return_zero_1105c3	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001105c3.json	docs/compiler-abi.md; Return zero.; callers fc795@fc843; guest pending
 0x001105d0	3	discard_three_1105d0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001105d0.json	docs/compiler-abi.md; Stub that discards three stack arguments.; callers none direct; guest pending
 0x001105d4	3	discard_two_1105d4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001105d4.json	docs/compiler-abi.md; Stub that discards two stack arguments.; callers none direct; guest pending

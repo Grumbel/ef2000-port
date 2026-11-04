@@ -6470,4 +6470,7 @@ void setup_rotation_args_16000c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
 	uint32_t a18, uint32_t a1c, uint32_t a20, uint32_t a24);
 void setup_rotation_args_16000c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a8, uint32_t ac, uint32_t a10, uint32_t a14, uint32_t a18, uint32_t a1c, uint32_t a20, uint32_t a24); /* 0x16000c */
 
+void heap_free_1104b8(uint32_t ptr, uint32_t seg, uint32_t heap);
+void heap_free_1104b8(uint32_t ptr, uint32_t seg, uint32_t heap); /* 0x1104b8 */
+
 #endif
