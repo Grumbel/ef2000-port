@@ -13234,3 +13234,33 @@ void draw_overlay_polys_f3378(void)
     }
     guest_fn_c39ac();
 }
+
+/* 0x45a54, 265 bytes. Hit-test the point (x = EAX, y = EDX, both 16-bit) against the marker table of the current map record (pointer 0x1a4a9c, count word +0x1c, entries of 0x19 bytes at the pointer +0x20: x word +0, y word +4 measured from 0x190, kind byte +0x18). Each entry owns a square of half-size 8 / (high word of 0x19769c); returns the first hit's index, or -1 when none, when byte 0x121e8c or 0x126576 is set, or when the kind byte of the last entry examined is 1, 2, 5 or 8. */
+int32_t hit_test_markers_45a54(uint32_t x, uint32_t y)
+{
+    int32_t px = (int16_t)x;
+    int32_t py = (int16_t)y;
+    int32_t result = -1;
+    uint8_t kind = 0u; /* ORIGINAL BUG: uninitialised stack byte when the table is not scanned */
+    if (EF_U8(0x00121e8cu) == 0u && EF_U8(0x00126576u) == 0u) {
+        ef_addr32 map = EF_U32(0x001a4a9cu);
+        EF_U16(0x001a4b9cu) = EF_U16(map + 0x1cu);
+        if (EF_U32(map + 0x20u) != 0u) {
+            int32_t i;
+            for (i = 0; (int16_t)i < (int16_t)EF_U16(EF_U32(0x001a4a9cu) + 0x1cu); i++) {
+                ef_addr32 e = EF_U32(EF_U32(0x001a4a9cu) + 0x20u) + (uint32_t)((int32_t)(int16_t)i * 0x19);
+                int32_t ex = (int16_t)EF_U16(e);
+                int32_t ey = (int16_t)(uint16_t)(0x190 - (int32_t)(int16_t)EF_U16(e + 4u));
+                int32_t m = 8 / ((int32_t)EF_U32(0x0019769cu) >> 16);
+                kind = EF_U8(e + 0x18u);
+                if (px > ex - m && px < ex + m && py > ey - m && py < ey + m) {
+                    result = i;
+                    break;
+                }
+            }
+        }
+    }
+    if (kind == 1u || kind == 2u || kind == 8u || kind == 5u)
+        result = -1;
+    return result;
+}

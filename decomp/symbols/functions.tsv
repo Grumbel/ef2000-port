@@ -801,7 +801,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00045694	82	reset_words_45694	game_helpers8	compiles	game	confirmed	decomp/tests/0x00045694.json	docs/compiler-abi.md; ; callers bfcc@c0cd; guest pending
 0x000456e8	625			unknown	unclassified	unverified		
 0x0004595c	245	GenGUIHelp		named	unclassified	unverified		
-0x00045a54	265			unknown	unclassified	unverified		
+0x00045a54	265	hit_test_markers_45a54	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00045a54.json	docs/compiler-abi.md; Hit-test the point (x = EAX, y = EDX, both 16-bit) against the marker table of the current map record (pointer 0x1a4a9c,; callers 4595c@459ce; guest pending
 0x00045b60	50	object_double_value_45b60	float_helpers2	compiles	game	confirmed	decomp/tests/0x00045b60.json	docs/compiler-abi.md; Double value of an object, reporting an error when its check fails.; callers 10e4dd@10e5ac; guest pending
 0x00045ba0	91	reset_tables_45ba0	game_helpers8	compiles	game	confirmed	decomp/tests/0x00045ba0.json	docs/compiler-abi.md; Reset the 10-entry id table and the four 0x190-byte pages.; callers 3dd30@3ddd7,46038@46039; guest pending
 0x00045bfc	412			unknown	unclassified	unverified		
