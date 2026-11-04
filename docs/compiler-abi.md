@@ -4089,3 +4089,14 @@ in EAX, format string address, one value).
 | `0x940e0` | none | AL:uint8_t | 94a74@94cdf | Whether the scene record pointer is unset. |
 | `0x9c1bb` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 9be38@9be69,9be38@9be83,9be38@9be99 | Convert a real-mode segment:offset dword to a linear address. |
 | `0x5ca60` | none | none | 598e8@5997a | Read the 9th stream value into a local and apply it when valid. |
+
+## game_helpers78 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1a358` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 95e58@95f15 | Enter the mode once: apply the argument to the driver and refresh its table. |
+| `0x1a390` | none | none | 95e58@95f1c | Leave the mode: restore the saved driver parameters and refresh its table. |
+| `0x3dccc` | none | none | 3dd30@3de1a | Reset the drivers and step the four channels, then refresh the matching table. |
+| `0xbc421` | EAX:uint32_t | EAX:uint32_t | 9ea0@a3ca,a3dc@a5aa,357ec@35a99 | Find the list node with the given key and open it; -1 when absent. |
+| `0xa61b0` | none | none | c9fc4@c9fd5 | Run the pending handler for every listed object that has one set. |
+| `0x120485` | none | none | none direct | Install the runtime hook once. |

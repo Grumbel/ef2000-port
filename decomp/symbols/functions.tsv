@@ -299,8 +299,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001851c	96	fire_idle_action_1851c	game_helpers31	compiles	game	confirmed	decomp/tests/0x0001851c.json	docs/compiler-abi.md; Fire the one-shot action when the idle conditions hold.; callers 72944@72ce2,72944@72d3f; guest pending
 0x00018a68	222			unknown	unclassified	unverified		
 0x00019a80	312			unknown	unclassified	unverified		
-0x0001a358	54			unknown	unclassified	unverified		
-0x0001a390	57			unknown	unclassified	unverified		
+0x0001a358	54	enter_mode_1a358	game_helpers78	compiles	game	confirmed	decomp/tests/0x0001a358.json	docs/compiler-abi.md; Enter the mode once: apply the argument to the driver and refresh its table.; callers 95e58@95f15; guest pending
+0x0001a390	57	leave_mode_1a390	game_helpers78	compiles	game	confirmed	decomp/tests/0x0001a390.json	docs/compiler-abi.md; Leave the mode: restore the saved driver parameters and refresh its table.; callers 95e58@95f1c; guest pending
 0x0001a3cc	176			unknown	unclassified	unverified		
 0x0001a47c	259			unknown	unclassified	unverified		
 0x0001a580	1595			unknown	unclassified	unverified		
@@ -722,7 +722,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003dbf0	189	check_unit_leaves_map_3dbf0	game_helpers63	compiles	game	confirmed	decomp/tests/0x0003dbf0.json	docs/compiler-abi.md; Flag the player unit as out of the map when its cell leaves the valid range.; callers 3dd30@3dfb3; guest pending
 0x0003dcb0	15	run_reset_sequence_3dcb0	low_helpers	compiles	game	confirmed	decomp/tests/0x0003dcb0.json	docs/compiler-abi.md; 0x394e0, 0x8846c, tail 0x888cc; callers 3dd30@3e015; guest pending
 0x0003dcc0	10	set_runtime_phase_five	runtime_control	compiles	game	confirmed	decomp/tests/0x0003dcc0.json	docs/compiler-abi.md; Literal five written to word 0x1a35ec; original guest replacement unverified
-0x0003dccc	56			unknown	unclassified	unverified		
+0x0003dccc	56	reset_channels_3dccc	game_helpers78	compiles	game	confirmed	decomp/tests/0x0003dccc.json	docs/compiler-abi.md; Reset the drivers and step the four channels, then refresh the matching table.; callers 3dd30@3de1a; guest pending
 0x0003dd30	2924			unknown	unclassified	unverified		
 0x0003ea0c	1425			unknown	unclassified	unverified		
 0x0003efa0	6	get_byte_3efa0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0003efa0.json	docs/compiler-abi.md; ; callers f3f84@f40bd; guest pending
@@ -2273,7 +2273,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a6018	29	apply_a5ef8_a6018	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a6018.json	docs/compiler-abi.md; ; callers 5110@51c6,ba5c@bbab,bfcc@c4aa; guest pending
 0x000a6038	111			unknown	unclassified	unverified		
 0x000a60a8	262			unknown	unclassified	unverified		
-0x000a61b0	58			unknown	unclassified	unverified		
+0x000a61b0	58	run_pending_handlers_a61b0	game_helpers78	compiles	game	confirmed	decomp/tests/0x000a61b0.json	docs/compiler-abi.md; Run the pending handler for every listed object that has one set.; callers c9fc4@c9fd5; guest pending
 0x000a63c0	60	update_widget_metrics_a63c0	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a63c0.json	docs/compiler-abi.md; Update a widget's position words from the colour nibble.; callers a66cc@a66e3,e1958@e1b58; guest pending
 0x000a6438	616			unknown	unclassified	unverified		
 0x000a66a0	44	walk_children_a66a0	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a66a0.json	docs/compiler-abi.md; children with low five bits of +0x8c: 0xa6438; callers a520c@a5318,a59d8@a5a2b,f13ac@f13b6; guest pending
@@ -2633,7 +2633,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bc34f	27	run_if_available_bc34f	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc34f.json	docs/compiler-abi.md; When 0xfa6d3(0) returns nonzero, run 0xbc287(EAX).; callers bc36a@bc36d; guest pending
 0x000bc36a	10	run_if_available_bc36a	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc36a.json	docs/compiler-abi.md; Run 0xbc34f with EBX preserved as zero.; callers 9ea0@9fa4,a3dc@a3f7,357ec@3589f; guest pending
 0x000bc400	33			unknown	unclassified	unverified		
-0x000bc421	47			unknown	unclassified	unverified		
+0x000bc421	47	open_list_node_bc421	game_helpers78	compiles	game	confirmed	decomp/tests/0x000bc421.json	docs/compiler-abi.md; Find the list node with the given key and open it; -1 when absent.; callers 9ea0@a3ca,a3dc@a5aa,357ec@35a99; guest pending
 0x000bc450	21	release_by_key_bc450	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000bc450.json	docs/compiler-abi.md; ; callers bc421@bc448; guest pending
 0x000bc465	12	digit_character	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc465.json	docs/compiler-abi.md; Digit character for a value: +0x30, then +0x27 past '9'.; callers bc471@bc491,bc471@bc4ac,bc471@bc4b9; guest pending
 0x000bc471	105			unknown	unclassified	unverified		
@@ -4248,7 +4248,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011f7ef	10			unknown	unclassified	unverified		
 0x0011fd90	1703			unknown	unclassified	unverified		
 0x00120451	52	dos_int21_vector_bridge	unk_runtime	named	asm	unverified		docs/compiler-abi.md; AH=0x25/0x35 INT 21h, returns ES selector in DX and original EAX; interrupt clobbers unresolved
-0x00120485	49			unknown	unclassified	unverified		
+0x00120485	49	install_runtime_hook_120485	game_helpers78	compiles	game	confirmed	decomp/tests/0x00120485.json	docs/compiler-abi.md; Install the runtime hook once.; callers none direct; guest pending
 0x001204b6	21			unknown	unclassified	unverified		
 0x001204dc	132	format_nonfinite_double	unk_runtime	typed	unclassified	confirmed		ABI only; two stack dwords of FP bits plus dest pointer, EAX Boolean, ret 12
 0x00120560	486			unknown	unclassified	unverified		

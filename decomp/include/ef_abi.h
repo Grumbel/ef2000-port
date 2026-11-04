@@ -3635,4 +3635,19 @@ void apply_stream_value_5ca60(void);
 int32_t guest_fn_86f7c_x(uint32_t a, uint32_t b); /* 0x86f7c EAX/EDX -> EAX */
 void guest_fn_5c9d4_x(uint32_t a, uint32_t b); /* 0x5c9d4 EAX/EDX */
 
+/* game_helpers78.c */
+void enter_mode_1a358(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_arg);
+void leave_mode_1a390(void);
+void reset_channels_3dccc(void);
+uint32_t open_list_node_bc421(uint32_t key);
+void run_pending_handlers_a61b0(void);
+void install_runtime_hook_120485(void);
+void guest_fn_d6340_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b, uint32_t c); /* 0xd6340 stack */
+void guest_fn_dc2c0_x(uint32_t a, uint32_t i); /* 0xdc2c0 EDX */
+void guest_fn_dc280_x(uint32_t a, uint32_t i); /* 0xdc280 EDX */
+uint32_t guest_fn_bc450_x(uint32_t a, uint32_t b); /* 0xbc450 EAX/EDX */
+void guest_fn_a60a8_x(uint32_t a); /* 0xa60a8 EAX */
+void guest_fn_120746_x(void); /* 0x120746 */
+void guest_fn_120800_x(void); /* 0x120800 */
+
 #endif
