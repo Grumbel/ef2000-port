@@ -5306,4 +5306,6 @@ uint32_t pick_roster_slot_7bc0(uint32_t unit, uint32_t group);
 
 void count_side_tallies_9b668(void);
 
+uint32_t find_paired_node_b49b4(ef_addr32 a, ef_addr32 b, uint32_t group, ef_addr32 list);
+
 #endif

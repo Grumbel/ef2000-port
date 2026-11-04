@@ -2554,7 +2554,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b45fa	21	tan_b45fa	float_helpers9	compiles	game	confirmed	decomp/tests/0x000b45fa.json	docs/compiler-abi.md; tan of ST0 (fptan, popping the pushed 1.0); with bit 0 of 0x1631f0 set the library emulation 0xfa3d4 is used instead.; callers 5f698@5f763,5f944@5f962,6e3e0@6e536; guest pending
 0x000b4620	91	atan2_b4620	float_helpers6	compiles	game	confirmed	decomp/tests/0x000b4620.json	docs/compiler-abi.md; Two-argument arctangent (y, x); 0.0 when both are zero.; callers 8394@83e1,1d844@1d89b,1dc20@1de39; guest pending
 0x000b47e4	437			unknown	unclassified	unverified		
-0x000b49b4	288			unknown	unclassified	unverified		
+0x000b49b4	288	find_paired_node_b49b4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b49b4.json	docs/compiler-abi.md; Search two linked lists for a type-0x31 node of side GROUP (BL, 0..5) that is negative (0xcc1ac) in the list LIST (ECX),; callers b47e4@b48f1; guest pending
 0x000b4aec	306			unknown	unclassified	unverified		
 0x000b4c20	91	find_child_b4c20	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000b4c20.json	docs/compiler-abi.md; Find a kind-0x31 child (following the first link) that passes the check.; callers c0b04@c0c99,c0b04@c0cf5,c0b04@c0d8c; guest pending
 0x000b4c7c	93	find_sibling_b4c7c	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000b4c7c.json	docs/compiler-abi.md; Find a kind-0x31 sibling (following the second link) that passes the check.; callers c0b04@c0cbd,c0b04@c0d38,c0b04@c0db3; guest pending

@@ -9813,3 +9813,45 @@ void count_side_tallies_9b668(void)
         EF_U16(0x0040cf78u + row) = (uint16_t)(EF_U16(0x0040cf78u + row) + 1u);
     }
 }
+
+/* 0xb49b4, 288 bytes. Search two linked lists for a type-0x31 node of side GROUP (BL, 0..5) that is negative (0xcc1ac) in the list LIST (ECX), followed by a positive (0xcc22c) type-0x31 node along the second link; returns the word at +9 of the first positive node, or 0. Groups 0, 2 and 5 start from the head pointed to by A (EAX) and walk the outer list by link +4 and the inner by link +0; groups 1, 3 and 4 start from the head pointed to by B (EDX) with the links swapped; other groups return 0. */
+uint32_t find_paired_node_b49b4(ef_addr32 a, ef_addr32 b, uint32_t group, ef_addr32 list)
+{
+    uint8_t g = (uint8_t)group;
+    uint32_t outer_off;
+    uint32_t inner_off;
+    ef_addr32 node;
+    ef_addr32 in;
+    if (g > 5u)
+        return 0u;
+    if (g == 0u || g == 2u || g == 5u) {
+        node = EF_U32(a);
+        outer_off = 4u;
+        inner_off = 0u;
+    } else {
+        node = EF_U32(b);
+        outer_off = 0u;
+        inner_off = 4u;
+    }
+    if (node == 0u)
+        return 0u;
+    while (node != 0u) {
+        if (EF_U8(node + 0xcu) == 0x31u
+            && (uint16_t)group_flag_negative_cc1ac(g, EF_U8(node + 0xbu), list) != 0u) {
+            in = EF_U32(node + inner_off);
+            if (in == 0u)
+                return EF_U16(node + 9u);
+            while (in != 0u) {
+                if (EF_U8(in + 0xcu) == 0x31u
+                    && (uint16_t)group_flag_positive_cc22c(g, EF_U8(in + 0xbu), list) != 0u)
+                    return EF_U16(in + 9u);
+                in = EF_U32(in + inner_off);
+            }
+            /* ORIGINAL BUG: the outer step reuses the exhausted (null) inner pointer, reading the link at guest address 0 or 4 instead of the outer node's. */
+            node = EF_U32(0u + outer_off);
+        } else {
+            node = EF_U32(node + outer_off);
+        }
+    }
+    return 0u;
+}
