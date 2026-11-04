@@ -5359,3 +5359,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11d322` | EAX:uint32_t,EDX:uint32_t,EBX:int32_t,ECX:int32_t | EAX:uint32_t | 11d3f0@11d57f,11d3f0@11d5ec | Lay out a decimal digit string as "intdigits.fracdigits" at out: copy up to intdigits digits from src, pad with zeros, a |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11d385` | EAX:uint32_t,EDX:int32_t,EBX:int32_t | none | 11d3f0@11d606 | Right-align the len-byte text at buf inside width bytes: move it to the end, then fix a leading "." or sign+"." by inser |
+| `0x11451c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | 103778@1037aa | Advance a (column, row) cursor of a text object by 0x4dd804 steps: each step adds +0x68 to the accumulator at +0x6c and  |
+| `0xa6038` | none | none | a4b08@a4b43,a4b5c@a4b79,a4b80@a4c79 | Redraw: when a backdrop (0x41eeac) is active draw it over the screen rectangle, otherwise run 0xc9ec4; then re-apply eac |

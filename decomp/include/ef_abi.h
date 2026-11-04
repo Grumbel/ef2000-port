@@ -4504,4 +4504,8 @@ void guest_fn_117b18_x(uint32_t obj); /* 0x117b18 EAX */
 
 uint32_t layout_digits_11d322(uint32_t out, uint32_t src, int32_t intdigits, int32_t frac);
 
+void right_align_number_11d385(uint32_t buf, int32_t len, int32_t width);
+void advance_text_cursor_11451c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj, uint32_t out_col, uint32_t out_row);
+void redraw_entries_a6038(void);
+
 #endif

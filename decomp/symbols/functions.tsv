@@ -2271,7 +2271,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a5ca4	596			unknown	unclassified	unverified		
 0x000a5ef8	285			unknown	unclassified	unverified		
 0x000a6018	29	apply_a5ef8_a6018	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a6018.json	docs/compiler-abi.md; ; callers 5110@51c6,ba5c@bbab,bfcc@c4aa; guest pending
-0x000a6038	111			unknown	unclassified	unverified		
+0x000a6038	111	redraw_entries_a6038	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a6038.json	docs/compiler-abi.md; Redraw: when a backdrop (0x41eeac) is active draw it over the screen rectangle, otherwise run 0xc9ec4; then re-apply eac; callers a4b08@a4b43,a4b5c@a4b79,a4b80@a4c79; guest pending
 0x000a60a8	262			unknown	unclassified	unverified		
 0x000a61b0	58	run_pending_handlers_a61b0	game_helpers78	compiles	game	confirmed	decomp/tests/0x000a61b0.json	docs/compiler-abi.md; Run the pending handler for every listed object that has one set.; callers c9fc4@c9fd5; guest pending
 0x000a63c0	60	update_widget_metrics_a63c0	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a63c0.json	docs/compiler-abi.md; Update a widget's position words from the colour nibble.; callers a66cc@a66e3,e1958@e1b58; guest pending
@@ -4120,7 +4120,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001141a0	16	set_record_field_1141a0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001141a0.json	docs/compiler-abi.md; Store a value at +0x2c of a record when the record exists.; callers 103244@10326e; guest pending
 0x001141b0	95	start_value_ramp_1141b0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x001141b0.json	docs/compiler-abi.md; Start a ramp of the value at +0x48 to a target over time; sets the per-step delta at +0x54.; callers 1031cc@1031fc; guest pending
 0x001142cc	75	refresh_player_channels_1142cc	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x001142cc.json	docs/compiler-abi.md; When the value at the argument changes, resend the channel volumes of every active (state 4) channel of the player.; callers 1033c8@1033f2; guest pending
-0x0011451c	110			unknown	unclassified	unverified		
+0x0011451c	110	advance_text_cursor_11451c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011451c.json	docs/compiler-abi.md; Advance a (column, row) cursor of a text object by 0x4dd804 steps: each step adds +0x68 to the accumulator at +0x6c and ; callers 103778@1037aa; guest pending
 0x0011458c	138			unknown	unclassified	unverified		
 0x001146ec	394			unknown	unclassified	unverified		
 0x00114878	284			unknown	unclassified	unverified		
@@ -4231,7 +4231,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011d258	29			unknown	unclassified	unverified		
 0x0011d27b	167			unknown	unclassified	unverified		
 0x0011d322	99	layout_digits_11d322	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d322.json	docs/compiler-abi.md; Lay out a decimal digit string as "intdigits.fracdigits" at out: copy up to intdigits digits from src, pad with zeros, a; callers 11d3f0@11d57f,11d3f0@11d5ec; guest pending
-0x0011d385	107			unknown	unclassified	unverified		
+0x0011d385	107	right_align_number_11d385	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d385.json	docs/compiler-abi.md; Right-align the len-byte text at buf inside width bytes: move it to the end, then fix a leading "." or sign+"." by inser; callers 11d3f0@11d606; guest pending
 0x0011d3f0	548			unknown	unclassified	unverified		
 0x0011d614	43			unknown	unclassified	unverified		
 0x0011d63f	29			unknown	unclassified	unverified		

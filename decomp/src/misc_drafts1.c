@@ -593,3 +593,93 @@ uint32_t layout_digits_11d322(uint32_t out, uint32_t src, int32_t intdigits, int
     }
     return out;
 }
+
+/* 0x11d385, 107 bytes. Right-align the len-byte text at buf inside width bytes: move it to the end, then fix a leading "." or sign+"." by inserting a zero, and fill the freed leading bytes with spaces. */
+void right_align_number_11d385(uint32_t buf, int32_t len, int32_t width)
+{
+    uint8_t first;
+    uint8_t second;
+    if (len == width)
+        return;
+    second = EF_U8(buf + 1u);
+    {
+        uint32_t src = buf + (uint32_t)len;
+        uint32_t dst = buf + (uint32_t)width;
+        do {
+            src--;
+            dst--;
+            EF_U8(dst) = EF_U8(src);
+            width--;
+        } while (src != buf);
+    }
+    first = EF_U8(buf);
+    if (first == '.') {
+        width--;
+        EF_U8(buf + (uint32_t)width) = '0';
+    } else if ((first == '+' || first == '-') && second == '.') {
+        EF_U8(buf + (uint32_t)width) = '0';
+        width--;
+        EF_U8(buf + (uint32_t)width) = EF_U8(buf);
+    }
+    fill_bytes_b3fb0(buf, 0x20u, (uint32_t)width);
+}
+
+/* 0x11451c, 110 bytes. Advance a (column, row) cursor of a text object by 0x4dd804 steps: each step adds +0x68 to the accumulator at +0x6c and carries into the column (+0x5c) and row (+0x60) against the limits at +0x70 and +0x64. Stores row and column through the two pointers. */
+void advance_text_cursor_11451c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj, uint32_t out_col, uint32_t out_row)
+{
+    int32_t col;
+    int32_t row;
+    int32_t acc;
+    int32_t i;
+    uint32_t rec;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (obj == 0u)
+        return;
+    rec = EF_U32(obj);
+    EF_S32(rec + 0x14u) = EF_S32(rec + 0x14u) + 1;
+    col = EF_S32(obj + 0x5cu);
+    row = EF_S32(obj + 0x60u);
+    acc = EF_S32(obj + 0x6cu);
+    if (EF_S32(0x004dd804u) > 0) {
+        i = 0;
+        do {
+            acc += EF_S32(obj + 0x68u);
+            if (acc >= EF_S32(obj + 0x70u)) {
+                col++;
+                acc -= EF_S32(obj + 0x70u);
+                if (col >= EF_S32(obj + 0x64u)) {
+                    row++;
+                    col = 0;
+                }
+            }
+            i++;
+        } while (i < EF_S32(0x004dd804u));
+    }
+    if (row < 0)
+        row = 0;
+    if (out_row != 0u)
+        EF_S32(out_row) = row;
+    if (out_col != 0u)
+        EF_S32(out_col) = col;
+    rec = EF_U32(obj);
+    EF_S32(rec + 0x14u) = EF_S32(rec + 0x14u) - 1;
+}
+
+/* 0xa6038, 111 bytes. Redraw: when a backdrop (0x41eeac) is active draw it over the screen rectangle, otherwise run 0xc9ec4; then re-apply each entry of the word list at 0x41eda8 (count 0x41eed8) through 0xa5ef8. */
+void redraw_entries_a6038(void)
+{
+    uint16_t i;
+    uint16_t count;
+    if (EF_U32(0x0041eeacu) != 0u && EF_U8(0x0041ef06u) != 0u)
+        put_screen_rows_eb050(0u, 0u, 0u, 0u, 0u, 0u, EF_U16(0x0015b744u), EF_U16(0x0015b748u), EF_U32(0x0041eeacu));
+    else
+        tail_jump_c9ec4();
+    count = EF_U16(0x0041eed8u);
+    if (count != 0u) {
+        i = 0u;
+        do {
+            guest_fn_a5ef8((uint32_t)EF_U16(0x0041eda8u + (uint32_t)i * 2u));
+            i++;
+        } while (i < EF_U16(0x0041eed8u));
+    }
+}
