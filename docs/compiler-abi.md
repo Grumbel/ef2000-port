@@ -7996,3 +7996,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x74718` | EAX:uint32_t | none | 5674c@5681e,74970@74c0c | Destroy the unit ID (AX). Units that use the secondary grid (0x7574c) are removed with the effect 0x5f/2 (0x106b0 with t |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9021c` | EAX:ef_addr32 | none | 901ec@90203 | Per-frame handling of a ground sound source U (EAX): when it lies within 0x100000 of the camera (fixed point, compare wi |

@@ -1861,7 +1861,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000900c0	97	dispatch_scene_node_event	scene_nodes	compiles	game	confirmed	decomp/tests/0x000900c0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x00090124	200	apply_slot_result_90124	game_helpers50	compiles	game	confirmed	decomp/tests/0x00090124.json	docs/compiler-abi.md; Apply a result to an object slot, optionally computing the response value.; callers 15b7c@15e7e,16588@167e1,900c0@90111; guest pending
 0x000901ec	46	visit_all_scene_nodes	scene_nodes	compiles	game	confirmed	decomp/tests/0x000901ec.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
-0x0009021c	345			unknown	unclassified	unverified		
+0x0009021c	345	update_ground_sound_9021c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009021c.json	docs/compiler-abi.md; Per-frame handling of a ground sound source U (EAX): when it lies within 0x100000 of the camera (fixed point, compare wi; callers 901ec@90203; guest pending
 0x00090378	189	drop_object_near_camera_90378	game_helpers50	compiles	game	confirmed	decomp/tests/0x00090378.json	docs/compiler-abi.md; Drop an object near the camera onto the terrain and register its move.; callers 901ec@9020c; guest pending
 0x00090438	547			unknown	unclassified	unverified		
 0x0009065c	14	next_scene_node	scene_nodes	compiles	game	confirmed	decomp/tests/0x0009065c.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending

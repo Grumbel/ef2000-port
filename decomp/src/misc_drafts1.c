@@ -14269,3 +14269,35 @@ void destroy_unit_74718(uint32_t id)
     }
     EF_U8(u + 0x24u) = (uint8_t)(EF_U8(u + 0x24u) | 0x2u);
 }
+
+/* 0x9021c, 345 bytes. Per-frame handling of a ground sound source U (EAX): when it lies within 0x100000 of the camera (fixed point, compare with 0x21444c, 0x214448, 0x214450 shifted by 8) set its height +4 to the negative cell distance (0x7b16c, plane 0) shifted left by 8, load its orientation words into the sound record (0xa0ea8) and, if the scene gate (0x8bf1c) allows the height, snapshot the camera and source positions into the line-of-sight block 0x420904.. (source y raised by -10) and its word copies 0x420930... Unless 0x7b7d8 reports it as muted start the sound with 0x9e0c4 using the position shifted left by 8. */
+void update_ground_sound_9021c(ef_addr32 u)
+{
+    uint32_t d;
+    if ((int32_t)guest_fn_cf94a(EF_U32(u) - (EF_U32(0x0021444cu) << 8)) >= 0x100000)
+        return;
+    if ((int32_t)guest_fn_cf94a(EF_U32(u + 4u) - (EF_U32(0x00214448u) << 8)) >= 0x100000)
+        return;
+    if ((int32_t)guest_fn_cf94a(EF_U32(u + 8u) - (EF_U32(0x00214450u) << 8)) >= 0x100000)
+        return;
+    d = cell_distance_at_7b16c(0u, (int32_t)EF_U32(u) >> 8, (int32_t)EF_U32(u + 8u) >> 8);
+    EF_U32(u + 4u) = (0u - d) << 8;
+    guest_fn_a0ea8((int32_t)EF_U32(u + 0x1eu) >> 16, (uint32_t)((int32_t)EF_U32(u + 0xau) >> 16),
+                   (int32_t)EF_U32(u + 0xcu) >> 16, (uint32_t)((int32_t)EF_U32(u + 0xeu) >> 16));
+    if (scene_gate_allows((int32_t)EF_U32(u + 4u)) != 0u) {
+        EF_U32(0x00420910u) = EF_U32(0x0021444cu);
+        EF_U32(0x00420904u) = EF_U32(0x00214448u);
+        EF_U32(0x00420918u) = EF_U32(0x00214450u);
+        EF_U32(0x00420914u) = (uint32_t)((int32_t)EF_U32(u) >> 8);
+        EF_U32(0x00420908u) = (uint32_t)(((int32_t)EF_U32(u + 4u) >> 8) - 0xa);
+        EF_U32(0x0042091cu) = (uint32_t)((int32_t)EF_U32(u + 8u) >> 8);
+        EF_U16(0x00420930u) = EF_U16(0x0021444cu);
+        EF_U16(0x00420932u) = EF_U16(0x00214448u);
+        EF_U16(0x00420934u) = EF_U16(0x00214450u);
+        EF_U16(0x00420936u) = EF_U16(0x00420914u);
+        EF_U16(0x00420938u) = EF_U16(0x00420908u);
+        EF_U16(0x0042093au) = EF_U16(0x0042091cu);
+    }
+    if (guest_fn_7b7d8_x() == 0u)
+        guest_fn_9e0c4((int32_t)EF_U32(u + 0x1eu) >> 16, EF_U32(u) << 8, EF_U32(u + 4u) << 8, EF_U32(u + 8u) << 8);
+}
