@@ -7889,3 +7889,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6e0b0` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:uint32_t,[ESP+4]:uint32_t | AL:uint8_t | 2e184@2e316 | Place a table offset in the frame of unit B (EBX): both units A (EDX) and B must exist. Copy B's dwords +0x71, +0x75, +0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x72390` | EAX:uint32_t | none | 8d3d4@8d464 | Move unit ID (AX) one tick: dt = word 0x127d92 * double 0x186a69 (stored at 0x1f7188); the velocity (doubles +0xa1, +0xb |

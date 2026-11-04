@@ -13615,3 +13615,53 @@ uint8_t offset_in_unit_frame_6e0b0(ef_addr32 out, int32_t a_id, int32_t b_id, ui
     memcpy(ef_guest_memory_ptr(out + 0x10u), &z, sizeof z);
     return 1u;
 }
+
+/* 0x72390, 277 bytes. Move unit ID (AX) one tick: dt = word 0x127d92 * double 0x186a69 (stored at 0x1f7188); the velocity (doubles +0xa1, +0xb9, +0xd1 times the double +0x91, stored at 0x1f7170, 0x1f7178, 0x1f7180) gains the second set +0xb1, +0xc9, +0xe1 times the double +0x99 when the type table byte 0x1285a1 + 0xe5 * (byte +0xe9) is set. Unless bit 0x10 of byte +0x26 is set the position doubles +0x49, +0x51, +0x59 advance by velocity * dt; the bit is then cleared and 0x73d50(ID) runs. */
+void move_unit_72390(uint32_t id)
+{
+    ef_addr32 u = guest_fn_7489c((int16_t)id);
+    double dt, k, m, s, vx, vy, vz, px, py, pz;
+    uint32_t type;
+    if (u == 0u)
+        return;
+    {
+        int32_t ticks = (int32_t)EF_U16(0x00127d92u);
+        memcpy(&k, ef_guest_memory_ptr(0x00186a69u), sizeof k);
+        dt = (double)ticks * k;
+    }
+    memcpy(ef_guest_memory_ptr(0x001f7188u), &dt, sizeof dt);
+    type = (uint32_t)EF_U8(u + 0xe9u) * 0xe5u;
+    memcpy(&m, ef_guest_memory_ptr(u + 0x91u), sizeof m);
+    memcpy(&vx, ef_guest_memory_ptr(u + 0xa1u), sizeof vx);
+    memcpy(&vy, ef_guest_memory_ptr(u + 0xb9u), sizeof vy);
+    memcpy(&vz, ef_guest_memory_ptr(u + 0xd1u), sizeof vz);
+    vx = vx * m;
+    vy = vy * m;
+    vz = vz * m;
+    if (EF_U8(0x001285a1u + type) != 0u) {
+        double ex, ey, ez;
+        memcpy(&s, ef_guest_memory_ptr(u + 0x99u), sizeof s);
+        memcpy(&ex, ef_guest_memory_ptr(u + 0xb1u), sizeof ex);
+        memcpy(&ey, ef_guest_memory_ptr(u + 0xc9u), sizeof ey);
+        memcpy(&ez, ef_guest_memory_ptr(u + 0xe1u), sizeof ez);
+        vx = ex * s + vx;
+        vy = ey * s + vy;
+        vz = ez * s + vz;
+    }
+    memcpy(ef_guest_memory_ptr(0x001f7170u), &vx, sizeof vx);
+    memcpy(ef_guest_memory_ptr(0x001f7178u), &vy, sizeof vy);
+    memcpy(ef_guest_memory_ptr(0x001f7180u), &vz, sizeof vz);
+    if ((EF_U8(u + 0x26u) & 0x10u) == 0u) {
+        memcpy(&px, ef_guest_memory_ptr(u + 0x49u), sizeof px);
+        memcpy(&py, ef_guest_memory_ptr(u + 0x51u), sizeof py);
+        memcpy(&pz, ef_guest_memory_ptr(u + 0x59u), sizeof pz);
+        px = vx * dt + px;
+        py = vy * dt + py;
+        pz = vz * dt + pz;
+        memcpy(ef_guest_memory_ptr(u + 0x49u), &px, sizeof px);
+        memcpy(ef_guest_memory_ptr(u + 0x51u), &py, sizeof py);
+        memcpy(ef_guest_memory_ptr(u + 0x59u), &pz, sizeof pz);
+    }
+    EF_U8(u + 0x26u) = (uint8_t)(EF_U8(u + 0x26u) & 0xefu);
+    guest_fn_73d50_w((int16_t)id);
+}
