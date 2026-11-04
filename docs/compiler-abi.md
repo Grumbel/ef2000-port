@@ -9463,3 +9463,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe9b38` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32 | none | 86968@86a0c,86f7c@87016,872c8@8733d | Builds the rotation matrix at 0x1590e4 (via 0xfcd20) from three angles, then adds the three signed words at the source p |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd6340` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | 1a358@1a37b,1a390@1a3b6 | Fill three 64-entry byte tables (0x15b96c, 0x15b9ac, 0x15b9ec) with a rational response curve x / (1 + (1/k + c) * (1 -  |

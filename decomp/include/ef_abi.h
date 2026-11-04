@@ -6488,4 +6488,7 @@ void box_record_fill_10a0d4(ef_addr32 dst, ef_addr32 src); /* 0x10a0d4 */
 void rotate_add_words_e9b38(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 words, uint32_t ang_edi, uint32_t ang_esi, uint32_t ang_ebx, ef_addr32 vec);
 void rotate_add_words_e9b38(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 words, uint32_t ang_edi, uint32_t ang_esi, uint32_t ang_ebx, ef_addr32 vec); /* 0xe9b38 */
 
+void build_curve_tables_d6340(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t k0_bits, uint32_t k1_bits, uint32_t k2_bits);
+void build_curve_tables_d6340(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t k0_bits, uint32_t k1_bits, uint32_t k2_bits); /* 0xd6340 */
+
 #endif

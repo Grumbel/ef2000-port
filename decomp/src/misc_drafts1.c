@@ -23141,3 +23141,32 @@ void rotate_add_words_e9b38(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
 	EF_U32(vec + 4u) = y;
 	EF_U32(vec + 8u) = z;
 }
+
+static float d6340_bits_f32(uint32_t bits)
+{
+	float f;
+	memcpy(&f, &bits, sizeof f);
+	return f;
+}
+
+/* 0xd6340, 196 bytes. Fill three 64-entry byte tables (0x15b96c, 0x15b9ac, 0x15b9ec) with a rational response curve x / (1 + (1/k + c) * (1 - x)) scaled by the double at 0x18f900, where x = i * float 0x18f8fc and k is each of the three single precision arguments. */
+void build_curve_tables_d6340(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t k0_bits, uint32_t k1_bits, uint32_t k2_bits)
+{
+	double c = *(double *)ef_guest_memory_ptr(0x0018f908u);
+	double scale = *(double *)ef_guest_memory_ptr(0x0018f900u);
+	float step = d6340_bits_f32(EF_U32(0x0018f8fcu));
+	double k[3];
+	int32_t i, j;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	k[0] = d6340_bits_f32(k0_bits);
+	k[1] = d6340_bits_f32(k1_bits);
+	k[2] = d6340_bits_f32(k2_bits);
+	for (i = 0; i < 0x40; i++) {
+		double x = (double)i * (double)step;
+		for (j = 0; j < 3; j++) {
+			double d = (1.0 / k[j] + c) * (1.0 - x) + 1.0;
+			int32_t v = (int32_t)truncate_9d72c(x / d * scale);
+			EF_U8(0x0015b96cu + 0x40u * (uint32_t)j + (uint32_t)i) = (uint8_t)v;
+		}
+	}
+}

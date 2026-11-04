@@ -3067,7 +3067,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d6024	53	midi_reset_channels_d6024	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d6024.json	docs/compiler-abi.md; Send two controller messages on each of the 16 MIDI channels (reset sequence).; callers d5ec0@d5eef; guest pending
 0x000d605c	23	forward_trace_call_d605c	small_wrappers1	compiles	game	confirmed	decomp/tests/0x000d605c.json	docs/compiler-abi.md; Forward three register values to the AIL trace call 0x103c28 with the global handle at 0x420a6c.; callers d6024@d6038,d6024@d604a; guest pending
 0x000d6090	679			unknown	unclassified	unverified		
-0x000d6340	196			unknown	unclassified	unverified		
+0x000d6340	196	build_curve_tables_d6340	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6340.json	docs/compiler-abi.md; Fill three 64-entry byte tables (0x15b96c, 0x15b9ac, 0x15b9ec) with a rational response curve x / (1 + (1/k + c) * (1 - ; callers 1a358@1a37b,1a390@1a3b6; guest pending
 0x000d6410	26	sum_three_bytes	code_predicates	compiles	game	confirmed	decomp/tests/0x000d6410.json	docs/compiler-abi.md; Sum of the first three bytes.; callers d6478@d64e0,d6478@d6532; guest pending
 0x000d642c	73	nearest_entry_index_d642c	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d642c.json	docs/compiler-abi.md; Index of the table entry closest to the given value (first minimum wins, limit 0x100).; callers d6478@d653d; guest pending
 0x000d6478	303	build_shade_tables_d6478	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6478.json	docs/compiler-abi.md; Builds the 256-entry remap tables (one per shade group, 0x100 bytes each, starting at [0x15b958]+0x100) from the 3-byte ; callers 3dd30@3de3b; guest pending
