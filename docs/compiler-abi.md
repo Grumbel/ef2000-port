@@ -5147,3 +5147,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfac78` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb1cb | Slot count for a selector with a cap of 4. |
 | `0xfad54` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb1e2 | Same as 0xfac78 with a cap of 6. |
+
+## script_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfaf0c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb210 | Slot count for a selector, wide variant (cap 6). |
+| `0xfaff0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb227 | Identical to 0xfaf0c. |

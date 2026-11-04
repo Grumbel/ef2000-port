@@ -4375,4 +4375,7 @@ void guest_fn_f46cc(void); /* 0xf46cc no arguments */
 uint32_t select_slot_count_fac78(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list);
 uint32_t select_slot_count_fad54(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list);
 
+uint32_t select_wide_slot_count_faf0c(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list);
+uint32_t select_wide_slot_count_faff0(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list);
+
 #endif

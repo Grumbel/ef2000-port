@@ -3732,8 +3732,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fac78	171	select_slot_count_fac78	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fac78.json	docs/compiler-abi.md; Slot count for a selector with a cap of 4.; callers fb1a0@fb1cb; guest pending
 0x000fad54	171	select_slot_count_fad54	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fad54.json	docs/compiler-abi.md; Same as 0xfac78 with a cap of 6.; callers fb1a0@fb1e2; guest pending
 0x000fae30	171			unknown	unclassified	unverified		
-0x000faf0c	178			unknown	unclassified	unverified		
-0x000faff0	178			unknown	unclassified	unverified		
+0x000faf0c	178	select_wide_slot_count_faf0c	script_helpers2	compiles	game	confirmed	decomp/tests/0x000faf0c.json	docs/compiler-abi.md; Slot count for a selector, wide variant (cap 6).; callers fb1a0@fb210; guest pending
+0x000faff0	178	select_wide_slot_count_faff0	script_helpers2	compiles	game	confirmed	decomp/tests/0x000faff0.json	docs/compiler-abi.md; Identical to 0xfaf0c.; callers fb1a0@fb227; guest pending
 0x000fb0d4	178			unknown	unclassified	unverified		
 0x000fb1a0	173			unknown	unclassified	unverified		
 0x000fb87c	1649			unknown	unclassified	unverified		

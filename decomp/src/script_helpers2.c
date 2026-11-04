@@ -84,3 +84,48 @@ uint32_t select_slot_count_fad54(uint32_t sel, uint32_t cls, uint32_t divisor, u
 {
     return select_slot_count_common(sel, cls, divisor, list, 6u);
 }
+
+/* Shared body of the two wide slot-count selectors (cap 6). */
+static uint32_t select_wide_slot_count_common(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list)
+{
+    uint8_t c = (uint8_t)cls;
+    int16_t div = (int16_t)divisor;
+    int32_t q;
+    if (c == 0x15u)
+        return 4u;
+    if (c == 0x19u || c == 2u)
+        return 6u;
+    switch ((uint8_t)sel) {
+    case 0: case 1: case 3: case 4: case 5:
+        return 2u;
+    case 2:
+        q = (int32_t)(int16_t)count_valid_entries_becc0(list) / div;
+        if (q < 2)
+            q = 2;
+        else
+            q = (int32_t)(int16_t)count_valid_entries_becc0(list) / div;
+        if (q > 6)
+            return 6u;
+        if ((int32_t)(int16_t)count_valid_entries_becc0(list) / div < 2)
+            return 2u;
+        return (uint32_t)((int32_t)(int16_t)count_valid_entries_becc0(list) / div);
+    case 6: case 7: case 8:
+        return 1u;
+    case 11:
+        return 4u;
+    default:
+        return 0u;
+    }
+}
+
+/* 0xfaf0c, 178 bytes. Slot count for a selector, wide variant (cap 6). */
+uint32_t select_wide_slot_count_faf0c(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list)
+{
+    return select_wide_slot_count_common(sel, cls, divisor, list);
+}
+
+/* 0xfaff0, 178 bytes. Identical to 0xfaf0c. */
+uint32_t select_wide_slot_count_faff0(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list)
+{
+    return select_wide_slot_count_common(sel, cls, divisor, list);
+}
