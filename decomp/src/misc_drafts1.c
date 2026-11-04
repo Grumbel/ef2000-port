@@ -23623,3 +23623,44 @@ uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count)
 			return total;
 	}
 }
+
+/* Big-endian 16-bit field of the serial packet; the high byte is sign-extended through 16 bits like the original's cwde. */
+static int32_t serial_field_107070(const uint8_t *b, int idx)
+{
+	return (int32_t)(int16_t)(uint16_t)((uint32_t)b[idx] << 8) | (int32_t)b[idx + 1];
+}
+
+/* 0x107070, 281 bytes. Read a 12-byte packet from the serial ring record, verify its sum checksum and store the five decoded fields plus the three angle results into the record. Returns 0, 3 on timeout, 4 on checksum error. */
+uint8_t serial_read_packet_107070(ef_addr32 rec, uint32_t timeout)
+{
+	uint8_t b[12];
+	uint32_t o20, o24, o28;
+	int32_t v30, v3, v34, v7, v2c;
+	uint8_t sum = 0u;
+	int i;
+	if (read_ring_bytes_106cb0(rec, (ef_addr32)(uintptr_t)b, 0xcu, timeout) != 0u) {
+		serial_reset_1185ec(EF_U32(rec));
+		return 3u;
+	}
+	v30 = serial_field_107070(b, 1);
+	v3 = serial_field_107070(b, 3);
+	v34 = serial_field_107070(b, 5);
+	v7 = serial_field_107070(b, 7);
+	v2c = serial_field_107070(b, 9);
+	for (i = 0; i < 11; i++)
+		sum = (uint8_t)(sum + b[i]);
+	if (sum != b[11]) {
+		serial_reset_1185ec(EF_U32(rec));
+		return 4u;
+	}
+	angles_from_vector_118770(v30, v3, v34, v7, v2c, (ef_addr32)(uintptr_t)&o24, (ef_addr32)(uintptr_t)&o28, (ef_addr32)(uintptr_t)&o20);
+	EF_S32(rec + 8u) = v3;
+	EF_S32(rec + 0x10u) = v7;
+	EF_S32(rec + 4u) = v30;
+	EF_S32(rec + 0xcu) = v34;
+	EF_S32(rec + 0x14u) = v2c;
+	EF_U32(rec + 0x18u) = o28;
+	EF_U32(rec + 0x1cu) = o24;
+	EF_U32(rec + 0x20u) = o20;
+	return 0u;
+}

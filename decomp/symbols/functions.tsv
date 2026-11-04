@@ -3921,7 +3921,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00107004	56	try_open_slot_107004	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00107004.json	docs/compiler-abi.md; Try 0x106f10 with the object A and the current slot index [0x464470] - 1: on success (0) store the index through OUT and; callers d9c30@d9c56; guest pending
 0x0010703c	33	release_object_10703c	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010703c.json	docs/compiler-abi.md; Release the object stored at *slot.; callers d9c30@d9c69,d9c30@d9c9d,106f10@106f22; guest pending
 0x00107060	15	send_command_107060	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00107060.json	docs/compiler-abi.md; 0x118428(*EAX, 0x53).; callers d9cb4@d9d1a,d9dc0@d9e01; guest pending
-0x00107070	281			unknown	unclassified	unverified		
+0x00107070	281	serial_read_packet_107070	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00107070.json	docs/compiler-abi.md; Read a 12-byte packet from the serial ring record, verify its sum checksum and store the five decoded fields plus the th; callers d9cb4@d9ce1,d9dc0@d9dd3; guest pending
 0x00107310	246	load_colour_table_107310	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00107310.json	docs/compiler-abi.md; Load the 0x4000-byte colour table from the file named at 0x17d368: on first use allocate 0x10100 bytes (dword 0x4dd860, ; callers dbff8@dc07f,e3ffc@e4009; guest pending
 0x0010848c	52			unknown	unclassified	unverified		
 0x001084c0	19	translate_key_masked_1084c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001084c0.json	docs/compiler-abi.md; Implicit-register fragment (EAX = value, CF = carry on entry, passed as the second parameter): when the carry is clear, ; callers decde@deced,decfb@ded0b; guest pending

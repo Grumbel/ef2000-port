@@ -6534,4 +6534,7 @@ uint32_t process_name_table_7a738(void); /* 0x7a738 */
 uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count);
 uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count); /* 0x115871 */
 
+uint8_t serial_read_packet_107070(ef_addr32 rec, uint32_t timeout);
+uint8_t serial_read_packet_107070(ef_addr32 rec, uint32_t timeout); /* 0x107070 */
+
 #endif

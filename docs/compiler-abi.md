@@ -9549,3 +9549,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x115871` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 105070@1050f9 | DOS read(handle, buffer, count). Binary handles (flag 0x40) read directly; text handles drop CR bytes and stop at Ctrl-Z |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x107070` | EAX:ef_addr32,EDX:uint32_t | AL:uint8_t | d9cb4@d9ce1,d9dc0@d9dd3 | Read a 12-byte packet from the serial ring record, verify its sum checksum and store the five decoded fields plus the th |
