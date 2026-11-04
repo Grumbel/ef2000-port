@@ -2830,7 +2830,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c89cc	40	project_relative_point_c89cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89cc.json	docs/compiler-abi.md; Implicit-register fragment (params EBX = source point, ESI = output vector, EDI = screen destination): ESI = EBX - camer; callers c8820@c8931,c8820@c8946; guest pending
 0x000c89f4	40	project_offset_point_c89f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89f4.json	docs/compiler-abi.md; As 0xc89cc but ESI = EBX + camera position.; callers c8820@c8936,c8820@c8941; guest pending
 0x000c8c34	60			unknown	unclassified	unverified		
-0x000c8c78	63			unknown	unclassified	unverified		
+0x000c8c78	63	render_vertex_list_c8c78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8c78.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source vertex words, ECX = count; params in that order): temporarily point the vertex-; callers c71dc@c7305,c8820@c8955,fd164@fd2a7; guest pending
 0x000c8ccc	58			unknown	unclassified	unverified		
 0x000c8d10	31	rotate_offset_shift_c8d10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8d10.json	docs/compiler-abi.md; (ret 8) Wrapper for 0xc8d30 that first shifts eax, edx and ebx left by 16.; callers b69c@b948; guest pending
 0x000c8d30	183	rotate_offset_c8d30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8d30.json	docs/compiler-abi.md; (ret 8) Offset a 16.16 vector (eax, edx, ebx) by the table-rotated displacement of length s1: two angles (-ecx and -s0, ; callers 69740@69800,7d1f0@7d291,944f4@94557; guest pending
@@ -3745,7 +3745,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fc08c	93	map_mode_fc08c	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc08c.json	docs/compiler-abi.md; Map a mode code (and a flag word) to a table index.; callers fc0ec@fc167; guest pending
 0x000fc0ec	250	create_slot_record_fc0ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fc0ec.json	docs/compiler-abi.md; Allocate the slot-set record for the pair (A = AL, B = DL): a 10-byte header (a at +0, b at +1, the slot count from 0xfc; callers bf444@bf5d4,bf81c@bf8f4,bfa58@bfab1; guest pending
 0x000fc1e8	364			unknown	unclassified	unverified		
-0x000fc354	69			unknown	unclassified	unverified		
+0x000fc354	69	strdup_fc354	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fc354.json	docs/compiler-abi.md; strdup: allocate strlen+1 bytes through 0xfc795 and copy the string including the NUL; returns 0 if allocation fails.; callers c1438@c1668,c1438@c172b,c1438@c17cc; guest pending
 0x000fc39c	48	build_row_table_fc39c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fc39c.json	docs/compiler-abi.md; Stack (ret 8): fill the row-offset table at 0x163200 with COUNT dwords 0, STEP, 2*STEP, ...; store COUNT*STEP in 0x16460; callers c39ac@c39ea,c39f0@c3a1f,cdb20@cdbcb; guest pending
 0x000fc478	106	query_video_mode_fc478	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc478.json	docs/compiler-abi.md; VESA call 0x4f01 for mode ECX; true when the BIOS answers 0x4f.; callers fc4e4@fc502,fc600@fc605; guest pending
 0x000fc4e4	80	find_linear_mode_fc4e4	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000fc4e4.json	docs/compiler-abi.md; Find the first VESA mode in the list whose info has bit 7 set; returns dword +0x28 of its info.; callers fc534@fc5da; guest pending

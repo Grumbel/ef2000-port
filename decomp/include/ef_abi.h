@@ -6141,4 +6141,10 @@ void draw_fixed_text_list_275a4(void);
 void load_origin_and_run_c46bc(void);
 void draw_fixed_text_list_275a4(void);
 
+void render_vertex_list_c8c78(ef_addr32 src, uint32_t count);
+void render_vertex_list_c8c78(ef_addr32 src, uint32_t count);
+
+ef_addr32 strdup_fc354(ef_addr32 s);
+ef_addr32 strdup_fc354(ef_addr32 s);
+
 #endif

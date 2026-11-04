@@ -20378,3 +20378,36 @@ void draw_fixed_text_list_275a4(void)
     store_dword_pair_19b430(0xdd6a0u, 0xdd650u);
     draw_centered_entries_27544(0x274c0u, 10, 10);
 }
+
+/* 0xc8c78, 63 bytes. Implicit-register fragment (ESI = source vertex words, ECX = count; params in that order): temporarily point the vertex-buffer base 0x17bf70 at 0x159244, load COUNT vertices, build the identity word list 0, 0x30, 0x60, ... at 0x159190 and render it through 0xd2500, then restore the base. */
+void render_vertex_list_c8c78(ef_addr32 src, uint32_t count)
+{
+    uint32_t saved = EF_U32(0x0017bf70u);
+    uint32_t i;
+    EF_U32(0x0017bf70u) = 0x159244u;
+    load_vertices_c48dc(src, count);
+    for (i = 0; i < count; i++) {
+        EF_U16(0x159190u + 2u * i) = (uint16_t)(0x30u * i);
+    }
+    build_render_list_d2500(0x159190u, count);
+    EF_U32(0x0017bf70u) = saved;
+}
+
+/* 0xfc354, 69 bytes. strdup: allocate strlen+1 bytes through 0xfc795 and copy the string including the NUL; returns 0 if allocation fails. */
+ef_addr32 strdup_fc354(ef_addr32 s)
+{
+    uint32_t len = 0;
+    ef_addr32 p;
+    uint32_t i;
+    while (EF_U8(s + len) != 0) {
+        len++;
+    }
+    len++;
+    p = guest_fn_fc795(len);
+    if (p != 0) {
+        for (i = 0; i < len; i++) {
+            EF_U8(p + i) = EF_U8(s + i);
+        }
+    }
+    return p;
+}

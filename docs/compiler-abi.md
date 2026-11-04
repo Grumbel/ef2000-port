@@ -8939,3 +8939,15 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc46bc` | none | none | 39744@39862 | Patch the three self-modified origin immediates at 0xc4756/0xc475c/0xc4762 from the dwords at 0x1590b4/0x1590b8/0x1590bc |
 | `0x275a4` | none | none | 283c8@283fb | Draw the fixed centered text list: the 120-byte entry table at 0x274c0 is copied to the stack (read-only use, so the gue |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc8c78` | EAX:ef_addr32,EDX:uint32_t | none | c71dc@c7305,c8820@c8955,fd164@fd2a7 | Implicit-register fragment (ESI = source vertex words, ECX = count; params in that order): temporarily point the vertex- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfc354` | EAX:ef_addr32 | EAX:ef_addr32 | c1438@c1668,c1438@c172b,c1438@c17cc | strdup: allocate strlen+1 bytes through 0xfc795 and copy the string including the NUL; returns 0 if allocation fails. |
