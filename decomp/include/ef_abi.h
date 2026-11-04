@@ -5090,4 +5090,6 @@ void open_stream_369fc(uint32_t name, uint32_t mode);
 
 uint32_t print_matching_records_b2758(uint32_t x, uint32_t y, uint32_t max, uint32_t head_ptr, uint32_t out);
 
+void build_render_object_d2584(ef_addr32 list, uint32_t count);
+
 #endif

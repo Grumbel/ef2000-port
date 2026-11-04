@@ -6947,3 +6947,29 @@ uint32_t print_matching_records_b2758(uint32_t x, uint32_t y, uint32_t max, uint
     }
     return n;
 }
+
+/* 0xd2584, 176 bytes. Build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit ESI; COUNT in ECX): set dword 0x42099c = 1, the count at 0x4209d0, 0x420974 = 0, the vertex pointer array 0x4209d0 (pointers stored from +4), the callback 0x1016e0 and the shade table entry selected by dword 0x15907c; every vertex (record in the buffer at dword 0x17bf70 indexed by the word) gets flag 4 set and flag 2 cleared, its dword +0x2c set to the shade value 0x15977c[i] >> 8 << 16, and the object's clip mask (+0x2c) is ANDed with the vertex flags. Finishes with 0xd23d8 on the object. Parameters in the order LIST, COUNT. */
+void build_render_object_d2584(ef_addr32 list, uint32_t count)
+{
+    uint32_t obj = 0x00420970u;
+    uint32_t slot = 0x004209d0u;
+    int32_t i;
+    EF_U32(0x0042099cu) = 1u;
+    EF_U32(0x004209d0u) = count;
+    EF_U32(0x00420974u) = 0u;
+    EF_U32(0x004209bcu) = slot;
+    EF_U32(0x00420990u) = 0x001016e0u;
+    EF_U32(0x00420994u) = EF_U32(((EF_U32(0x0015907cu) >> 2) * 4u) + 0x0015b86cu);
+    for (i = 0; i < (int32_t)count; i++) {
+        uint32_t v = EF_U32(0x0017bf70u) + EF_U16(list);
+        uint32_t shade = (uint32_t)((int32_t)EF_U32(0x0015977cu + (uint32_t)i * 4u) >> 8);
+        EF_U8(v + 0x20u) = (uint8_t)(EF_U8(v + 0x20u) | 4u);
+        EF_U8(v + 0x20u) = (uint8_t)(EF_U8(v + 0x20u) & 0xfdu);
+        EF_U32(v + 0x2cu) = shade << 16;
+        EF_U32(obj + 0x2cu) = EF_U32(obj + 0x2cu) & EF_U32(v + 0x20u);
+        list += 2u;
+        EF_U32(slot + 4u) = v;
+        slot += 4u;
+    }
+    process_render_object_d23d8(obj);
+}
