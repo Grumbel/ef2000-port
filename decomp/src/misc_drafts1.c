@@ -6515,3 +6515,16 @@ uint32_t project_point_pair_c737c(ef_addr32 p1, ef_addr32 p2, ef_addr32 dst)
     EF_U16(dst + 2u) = (uint16_t)(y + (int32_t)EF_U16(0x0015bdbcu));
     return dst + 4u;
 }
+
+/* 0x4e7b8, 83 bytes. Update the counter widget (0x184d4c) of the dialog named at 0x184b3c: with SHOW (AL) nonzero it shows the decimal value of dword 0x1a560a[byte 0x1a559f], otherwise the placeholder string 0x184d58. */
+void update_counter_widget_4e7b8(uint32_t show)
+{
+    uint8_t buf[0x14];
+    uint32_t w = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x00184b3cu), 0x00184d4cu);
+    if ((show & 0xffu) != 0u) {
+        signed_to_digits_cbd0f((int32_t)EF_U32(0x001a560au + EF_U8(0x001a559fu) * 4u), (uint32_t)(uintptr_t)buf, 10u);
+        guest_bind_dialog_widget(w, (uint32_t)(uintptr_t)buf);
+    } else {
+        guest_bind_dialog_widget(w, 0x00184d58u);
+    }
+}

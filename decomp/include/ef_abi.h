@@ -5044,4 +5044,6 @@ double box_shape_ratio_11afb4(uint32_t box);
 
 uint32_t project_point_pair_c737c(ef_addr32 p1, ef_addr32 p2, ef_addr32 dst);
 
+void update_counter_widget_4e7b8(uint32_t show);
+
 #endif
