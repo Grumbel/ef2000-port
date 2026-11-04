@@ -2965,3 +2965,14 @@ in EAX, format string address, one value).
 | `0xe3040` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | e30e0@e3108 | Draw a 8x6 glyph, each set bit writes the colour byte. |
 | `0xe30e0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32 | none | 3d308@3d34b,3d308@3d35b,3dd30@3e73d | Draw a string with 9-pixel glyph spacing. |
 | `0xe3908` | EAX:uint32_t | EAX:uint32_t | e3ad0@e3afd | Search a word table backwards for a value, using slot 0 as the sentinel. |
+
+## runtime_helpers17 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe3c6c` | [ESP+4]:uint32_t | none | none direct | Resolve a page slot from the 0x190a44 chain and store it in 0x159134. |
+| `0xe6120` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 109070@109072 | Store five scalar settings. |
+| `0xe7c50` | AX:int16_t,DX:uint16_t,BX:int16_t | none | 68a2c@68a58,68a60@68ace,68a60@68b3a | Store a word into the 0x190c3c page table entry. |
+| `0xe7c90` | AX:int16_t,DX:int16_t | AX:uint16_t | 68e84@68e9e | Read a word from the 0x190c3c page table entry, or 0. |
+| `0xeb374` | EAX:ef_addr32,EDX:ef_addr32,EBX:int32_t | EAX:int32_t | 9c858@9c88a,103f04@104091,103f04@1040b9 | Case-insensitive compare of up to n bytes. |
+| `0xeb4dc` | EAX:ef_addr32,EDX:ef_addr32,EBX:int32_t | EAX:ef_addr32 | eb520@eb684 | Binary search 12-byte entries sorted by their first signed dword. |

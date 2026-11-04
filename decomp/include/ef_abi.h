@@ -2206,4 +2206,13 @@ void draw_text_e30e0(uint32_t color, uint32_t x, uint32_t y, ef_addr32 text);
 uint32_t find_word_backwards_e3908(uint32_t value);
 
 
+/* runtime_helpers17.c */
+void select_page_e3c6c(uint32_t stack_page);
+void set_settings_e6120(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t stack_e);
+void set_page_word_e7c50(int16_t page, uint16_t value, int16_t index);
+uint16_t get_page_word_e7c90(int16_t page, int16_t index);
+int32_t compare_nocase_eb374(ef_addr32 a, ef_addr32 b, int32_t count);
+ef_addr32 bsearch_entries_eb4dc(ef_addr32 key_ptr, ef_addr32 table, int32_t count);
+
+
 #endif

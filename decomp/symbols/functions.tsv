@@ -3366,7 +3366,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e3b7c	158			unknown	unclassified	unverified		
 0x000e3c20	63			unknown	unclassified	unverified		
 0x000e3c60	11			unknown	unclassified	unverified		
-0x000e3c6c	61			unknown	unclassified	unverified		
+0x000e3c6c	61	select_page_e3c6c	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e3c6c.json	docs/compiler-abi.md; Resolve a page slot from the 0x190a44 chain and store it in 0x159134.; callers none direct; guest pending
 0x000e3cac	396			unknown	unclassified	unverified		
 0x000e3e50	153			unknown	unclassified	unverified		
 0x000e3f00	188			unknown	unclassified	unverified		
@@ -3400,7 +3400,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e5e90	159			unknown	unclassified	unverified		
 0x000e5f64	248			unknown	unclassified	unverified		
 0x000e605c	188			unknown	unclassified	unverified		
-0x000e6120	35			unknown	unclassified	unverified		
+0x000e6120	35	set_settings_e6120	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e6120.json	docs/compiler-abi.md; Store five scalar settings.; callers 109070@109072; guest pending
 0x000e6144	700			unknown	unclassified	unverified		
 0x000e65d8	169	swap_records_e65d8	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000e65d8.json	docs/compiler-abi.md; Exchange the fields of two 0x15-byte records.; callers e6684@e66ea,e6684@e6746,e6684@e6782; guest pending
 0x000e6684	281			unknown	unclassified	unverified		
@@ -3421,8 +3421,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e7a30	1	nop_e7a30	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000e7a30.json	docs/compiler-abi.md; Empty stub (single ret).; callers 581b0@581d1,581b0@5862c,581b0@58651; guest pending
 0x000e7a34	71			unknown	unclassified	unverified		
 0x000e7a7c	459			unknown	unclassified	unverified		
-0x000e7c50	63			unknown	unclassified	unverified		
-0x000e7c90	64			unknown	unclassified	unverified		
+0x000e7c50	63	set_page_word_e7c50	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c50.json	docs/compiler-abi.md; Store a word into the 0x190c3c page table entry.; callers 68a2c@68a58,68a60@68ace,68a60@68b3a; guest pending
+0x000e7c90	64	get_page_word_e7c90	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c90.json	docs/compiler-abi.md; Read a word from the 0x190c3c page table entry, or 0.; callers 68e84@68e9e; guest pending
 0x000e7cd0	28	append_two_e7cd0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000e7cd0.json	docs/compiler-abi.md; Append a fixed string and then second to first.; callers e7cec@e7d1f; guest pending
 0x000e7cec	59			unknown	unclassified	unverified		
 0x000e7d27	194			unknown	unclassified	unverified		
@@ -3508,12 +3508,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb2a8	24			unknown	unclassified	unverified		
 0x000eb2c0	99			unknown	unclassified	unverified		
 0x000eb35c	24			unknown	unclassified	unverified		
-0x000eb374	87			unknown	unclassified	unverified		
+0x000eb374	87	compare_nocase_eb374	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000eb374.json	docs/compiler-abi.md; Case-insensitive compare of up to n bytes.; callers 9c858@9c88a,103f04@104091,103f04@1040b9; guest pending
 0x000eb448	48	enter_handler_eb448	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000eb448.json	docs/compiler-abi.md; ; callers ea50c@ea5e7,eb2c0@eb315; guest pending
 0x000eb478	31	lowercase_string	math_string	compiles	game	confirmed	decomp/tests/0x000eb478.json	docs/compiler-abi.md; Lowercase ASCII 'A'..'Z' in place; returns the pointer.; callers 9c980@9c9b6,9c9c0@9ca0d,a7ec4@a7ec9; guest pending
 0x000eb4a0	30			unknown	unclassified	unverified		
 0x000eb4c0	26	release_pointer_eb4c0	math_string	compiles	game	confirmed	decomp/tests/0x000eb4c0.json	docs/compiler-abi.md; Release the pointer stored at EAX through 0xc3f80 and clear it.; callers ebcd8@ebceb; guest pending
-0x000eb4dc	65			unknown	unclassified	unverified		
+0x000eb4dc	65	bsearch_entries_eb4dc	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000eb4dc.json	docs/compiler-abi.md; Binary search 12-byte entries sorted by their first signed dword.; callers eb520@eb684; guest pending
 0x000eb520	373			unknown	unclassified	unverified		
 0x000eb698	71			unknown	unclassified	unverified		
 0x000eb9f8	84	resolve_entry_eb9f8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000eb9f8.json	docs/compiler-abi.md; ; callers 9cb20@9cb3a,9cb20@9cb5a; guest pending
