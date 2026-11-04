@@ -5212,4 +5212,6 @@ void set_object_target_26670(uint32_t index, uint32_t x, uint32_t y, uint32_t z)
 
 uint32_t alloc_zeroed_cc6c0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t size, uint32_t fmt, ...);
 
+void flush_pending_slots_112808(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj);
+
 #endif

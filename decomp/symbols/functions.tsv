@@ -4097,7 +4097,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00112048	408	get_channel_value_112048	game_helpers105	compiles	game	confirmed	decomp/tests/0x00112048.json	docs/compiler-abi.md; Read a stored MIDI channel value: program change (0xc0), pitch bend (0xe0, two 7-bit halves) or a controller (0xb0) from; callers none direct; guest pending
 0x001121e0	449			unknown	unclassified	unverified		
 0x001123a4	1122			unknown	unclassified	unverified		
-0x00112808	132			unknown	unclassified	unverified		
+0x00112808	132	flush_pending_slots_112808	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00112808.json	docs/compiler-abi.md; cdecl (OBJ): flush the 32 pending slot dwords at OBJ + 0x558 (one per 4 bytes of OBJ): every slot not equal to -1 is pos; callers 114058@114081; guest pending
 0x0011288c	88	release_matching_slots_11288c	small_wrappers4	compiles	game	confirmed	decomp/tests/0x0011288c.json	docs/compiler-abi.md; Release every slot of a record whose id (+0x558) matches, then send the pending-count message.; callers 1123a4@11274e; guest pending
 0x001128e4	567			unknown	unclassified	unverified		
 0x00112b1c	158	reset_table_record_112b1c	game_helpers58	compiles	game	confirmed	decomp/tests/0x00112b1c.json	docs/compiler-abi.md; Reset a table record: clear the slots, fill the index tables with -1 and set defaults.; callers 112bbc@112bc2,113c7c@113cdb; guest pending

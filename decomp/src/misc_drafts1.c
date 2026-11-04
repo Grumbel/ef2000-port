@@ -8473,3 +8473,22 @@ uint32_t alloc_zeroed_cc6c0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
     fill_bytes_b3fb0(p, 0u, size);
     return p;
 }
+
+/* 0x112808, 132 bytes. cdecl (OBJ): flush the 32 pending slot dwords at OBJ + 0x558 (one per 4 bytes of OBJ): every slot not equal to -1 is posted (0x1123a4 with OBJ, slot | 0x80, the matching dword at +0x5d8, 0, 0) and reset to -1; afterwards dword +0x554 is cleared, 0x111df0 is told about the object's first dword and, when something was posted and 0x102020 returns 0, trace code 3 is emitted. */
+void flush_pending_slots_112808(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj)
+{
+    uint32_t s, posted = 0u;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    for (s = obj; s != obj + 0x80u; s += 4u) {
+        uint32_t v = EF_U32(s + 0x558u);
+        if (v == 0xffffffffu)
+            continue;
+        guest_callptr5_x(0x001123a4u, obj, v | 0x80u, EF_U32(s + 0x5d8u), 0u, 0u);
+        posted++;
+        EF_U32(s + 0x558u) = 0xffffffffu;
+    }
+    EF_U32(obj + 0x554u) = 0u;
+    send_pending_count_message_111df0(0u, 0u, 0u, 0u, EF_U32(obj));
+    if (posted != 0u && tail_jump_102020(0u) == 0u)
+        trace_call_101ff4(3u);
+}
