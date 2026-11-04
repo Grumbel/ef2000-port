@@ -816,7 +816,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00046254	509			unknown	unclassified	unverified		
 0x00046454	4171			unknown	unclassified	unverified		
 0x000474b8	683			unknown	unclassified	unverified		
-0x00047764	259			unknown	unclassified	unverified		
+0x00047764	259	queue_message_47764	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00047764.json	docs/compiler-abi.md; Queue a message in the 9-slot table at 0x12668e (0x14-byte slots: word +2 = SI id, +4 = DI, dwords +0xa/+0xe/+0x12 = EBX; callers 73ec@7492,2c600@2c6cc,46254@463cf; guest pending
 0x00047ee4	22	reset_pointer_126688	mid_helpers	compiles	game	confirmed	decomp/tests/0x00047ee4.json	docs/compiler-abi.md; byte 0x126654=0, dword 0x126688=0x12665c; callers 47f48@47f93; guest pending
 0x00047f48	83	tick_countdown_47f48	game_helpers30	compiles	game	confirmed	decomp/tests/0x00047f48.json	docs/compiler-abi.md; Decrease the countdown word, by a third of the frame time when flagged.; callers 48064@4807c; guest pending
 0x00047f9c	29	sync_scene_marker	mid_helpers	compiles	game	confirmed	decomp/tests/0x00047f9c.json	docs/compiler-abi.md; 0x46070; clear byte 0x126655 when high word of 0x12668e is 0xff; callers 47fbc@48015,77c18@77c22; guest pending

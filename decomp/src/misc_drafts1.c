@@ -8853,3 +8853,34 @@ void advance_view_queue_91c98(void)
     EF_U16(0x00122c54u) = 0u;
     EF_U8(0x0012dbc4u) = 0u;
 }
+
+/* 0x47764, 259 bytes. Queue a message in the 9-slot table at 0x12668e (0x14-byte slots: word +2 = SI id, +4 = DI, dwords +0xa/+0xe/+0x12 = EBX, ECX and the stack argument, dword +6 = serial number from 0x12668c) for the unit DI (signed word, must exist or be 0x899 / 0xff) when SI is in 1..0x84 and the entry 0x126a5c[SI * 7] is not 0x12f3d2. Nothing is queued when a slot already holds the same SI / DI pair; the first free slot (id 0xff) is used. Also sets word 0x126658 to 0x6e and byte 0x126655 to 1. */
+void queue_message_47764(uint32_t di, uint32_t si, uint32_t ebx, uint32_t ecx, uint32_t s0)
+{
+    int32_t unit = (int16_t)di;
+    int32_t id = (int16_t)si;
+    uint8_t dl, done = 0u;
+    if (!(guest_fn_7489c(unit) != 0u || unit == 0x899 || unit == 0xff))
+        return;
+    if (id <= 0 || id >= 0x85)
+        return;
+    if (EF_U32(0x00126a5cu + (uint32_t)id * 7u) == 0x0012f3d2u)
+        return;
+    for (dl = 0; dl < 9u; dl++) {
+        uint32_t rec = 0x0012668eu + (uint32_t)dl * 0x14u;
+        if ((uint16_t)si == EF_U16(rec + 2u) && (uint16_t)di == EF_U16(rec + 4u))
+            return;
+        if ((int16_t)EF_U16(rec + 2u) == 0xff && !done) {
+            EF_U16(rec + 2u) = (uint16_t)si;
+            EF_U16(rec + 4u) = (uint16_t)di;
+            EF_U32(rec + 0xeu) = ecx;
+            EF_U32(rec + 0xau) = ebx;
+            EF_U32(rec + 0x12u) = s0;
+            EF_U32(rec + 6u) = EF_U32(0x0012668cu);
+            EF_U16(0x00126658u) = 0x6eu;
+            EF_U32(0x0012668cu) = EF_U32(0x0012668cu) + 1u;
+            EF_U8(0x00126655u) = 1u;
+            done = 1u;
+        }
+    }
+}

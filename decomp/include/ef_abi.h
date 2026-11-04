@@ -5242,4 +5242,6 @@ void build_render_list_d2d7c(uint32_t list, uint32_t count);
 
 void advance_view_queue_91c98(void);
 
+void queue_message_47764(uint32_t di, uint32_t si, uint32_t ebx, uint32_t ecx, uint32_t s0);
+
 #endif
