@@ -4187,3 +4187,13 @@ in EAX, format string address, one value).
 | `0xce578` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | ce5f8@ce60f,ce5f8@ce62a | Approximate 3D distance: 15/16 of the largest absolute component plus 3/8 of the other two. |
 | `0xd1fc0` | EAX:ef_addr32 | none | d2130@d2144 | Compute (once) the 2D bounding box of an object's vertex list into fields 0x10..0x1c. |
 | `0xcb55c` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | b0f5c@b146d | Mark records whose map cell (position / 10, 40 cells per row) passes the cc1ac test as used. |
+
+## game_helpers89 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xde580` | EAX:ef_addr32 | none | 284ec@2851f,39204@39244,97dcc@97e2a | Fade the palette in from black over 40 steps. |
+| `0xde648` | EAX:ef_addr32 | none | 284ec@285ac,a8958@a89e5,a8a38@a8ba9 | Fade the palette out to black over 40 steps, then clear and reset it. |
+| `0xde6c4` | EAX:ef_addr32 | none | a8a38@a8bba,a8bd4@a8f3a | Same as de648 but over 80 steps. |
+| `0xe1df0` | EAX:ef_addr32,DX:int16_t,BL:uint8_t | EAX:int32_t | e1958@e1a87,e1958@e1baa,e1958@e1bee | Pixel width of up to len characters of a string for the given font (spaces use the font's space width). |
+| `0xfab80` | EAX:ef_addr32 | EAX:int32_t | fbad8@fbbed | Half the number of non-type-1 sub-entries of an object, clamped to 1..2. |

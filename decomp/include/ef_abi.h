@@ -3737,4 +3737,11 @@ int32_t approx_distance3_ce578(int32_t a, int32_t b, int32_t c);
 void compute_vertex_bounds_d1fc0(ef_addr32 object);
 void mark_records_by_map_cell_cb55c(ef_addr32 list, ef_addr32 map, uint32_t extra);
 
+/* game_helpers89.c */
+void fade_palette_in_de580(ef_addr32 palette);
+void fade_palette_out_de648(ef_addr32 palette);
+void fade_palette_out_slow_de6c4(ef_addr32 palette);
+int32_t text_width_e1df0(ef_addr32 text, int16_t len, uint8_t font);
+int32_t half_active_entry_count_fab80(ef_addr32 object);
+
 #endif
