@@ -8463,3 +8463,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xca874` | EAX:ef_addr32,EDX:ef_addr32 | none | 49228@493f0,b0f5c@b10ac,b0f5c@b128c | Reset the entries of the list whose head pointer is stored at HEAD1 (EAX; next link +4) except those of state 7 (byte +0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc4412` | EAX:uint32_t | none | none direct | Renderer setup (ret 4): VALUE (stack, byte) is stored in bytes 0x159138 and 0x15908a; the immediate operands of three se |

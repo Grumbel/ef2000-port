@@ -17635,3 +17635,21 @@ void reset_list_entries_ca874(ef_addr32 head1, ef_addr32 head2)
 		node = EF_U32(node + 4u);
 	}
 }
+
+/* 0xc4412, 121 bytes. Renderer setup (ret 4): VALUE (stack, byte) is stored in bytes 0x159138 and 0x15908a; the immediate operands of three self-patched instructions at 0xc6438, 0xc6497 and 0xc64e5 are set to 0x15913a and the eight dwords 0x159160, 0x159164, 0x15916c, 0x159170, 0x159178, 0x15917c, 0x159184 and 0x159188 to 0xd2500. */
+void setup_renderer_tables_c4412(uint32_t value)
+{
+	EF_U32(0x000c6438u) = 0x0015913au;
+	EF_U32(0x000c6497u) = 0x0015913au;
+	EF_U32(0x000c64e5u) = 0x0015913au;
+	EF_U8(0x00159138u) = (uint8_t)value;
+	EF_U8(0x0015908au) = (uint8_t)value;
+	EF_U32(0x0015916cu) = 0x000d2500u;
+	EF_U32(0x00159178u) = 0x000d2500u;
+	EF_U32(0x00159170u) = 0x000d2500u;
+	EF_U32(0x0015917cu) = 0x000d2500u;
+	EF_U32(0x00159184u) = 0x000d2500u;
+	EF_U32(0x00159188u) = 0x000d2500u;
+	EF_U32(0x00159160u) = 0x000d2500u;
+	EF_U32(0x00159164u) = 0x000d2500u;
+}
