@@ -22548,3 +22548,41 @@ void age_record_chain_a00e8(void)
 		idx = (int16_t)EF_U16(0x416e44 + off);
 	}
 }
+
+/* 0xdc519, 126 bytes. Build the rotation words for the angles (EDI=a0, EBX=a1, ESI=0) and copy eight sign-extended words from the table at 0xdc597 into the immediates of the code at 0xdc5b6..0xdc6d9. */
+void patch_rotation_immediates_dc519(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1)
+{
+	uint32_t w[8];
+	int i;
+
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	build_rotation_words_dc43e(a1, 0, a0);
+	for (i = 0; i < 8; i++)
+		w[i] = (uint32_t)(int32_t)(int16_t)EF_U16(0xdc597 + 2 * i);
+	EF_U32(0xdc682) = w[0];
+	EF_U32(0xdc68b) = w[1];
+	EF_U32(0xdc5d7) = w[1];
+	EF_U32(0xdc696) = w[2];
+	EF_U32(0xdc5e0) = w[2];
+	EF_U32(0xdc6c5) = w[3];
+	EF_U32(0xdc6ce) = w[4];
+	EF_U32(0xdc60f) = w[4];
+	EF_U32(0xdc6d9) = w[5];
+	EF_U32(0xdc618) = w[5];
+	EF_U32(0xdc661) = w[6];
+	EF_U32(0xdc5b6) = w[6];
+	EF_U32(0xdc66a) = w[7];
+	EF_U32(0xdc5bf) = w[7];
+}
+
+/* 0xc5cd3, 139 bytes. Build the rotation matrix for the three angle words at [a0] and multiply it with the matrix at 0x1590e4 / 0x159108, storing the result back to 0x159108. */
+void rotate_matrix_c5cd3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0)
+{
+	int i;
+
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	build_rotation_matrix_fcd20(EF_U16(a0), EF_U16(a0 + 2), EF_U16(a0 + 4));
+	matrix_mul_fcffb(0x159108, 0x1590e4, 0x15b234);
+	for (i = 0; i < 9; i++)
+		EF_U32(0x159108 + 4 * i) = EF_U32(0x15b234 + 4 * i);
+}

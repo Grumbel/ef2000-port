@@ -2806,7 +2806,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c58cc	38	reset_clip_bounds_c58cc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000c58cc.json	docs/compiler-abi.md; Reset three clip bounds; both stack arguments are ignored.; callers none direct; guest pending
 0x000c59b7	35	shift_triples_c59b7	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c59b7.json	docs/compiler-abi.md; Shift three consecutive dword triples left by SHIFT (CL) with implicit registers (ESI = source, EDI = destination): the ; callers c4680@c4690; guest pending
 0x000c5c24	175			unknown	unclassified	unverified		
-0x000c5cd3	139			unknown	unclassified	unverified		
+0x000c5cd3	139	rotate_matrix_c5cd3	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5cd3.json	docs/compiler-abi.md; Build the rotation matrix for the three angle words at [a0] and multiply it with the matrix at 0x1590e4 / 0x159108, stor; callers 8e494@8e505; guest pending
 0x000c5d8f	115			unknown	unclassified	unverified		
 0x000c5e02	50			unknown	unclassified	unverified		
 0x000c5e56	12	dispatch_word_c5e56	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5e56.json	docs/compiler-abi.md; Implicit-register fragment (ESI is an in/out pointer): fetch the signed word at ESI (advancing ESI by 2) and return the ; callers c4565@c4616; guest pending
@@ -3216,7 +3216,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc34e	135	patch_view_shift_dc34e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dc34e.json	docs/compiler-abi.md; Implicit-register fragment (AL = x shift, BL = y shift, both signed): patch the immediate bytes of the self-modifying co; callers dc334@dc33f; guest pending
 0x000dc3d5	91	reset_scale_dc3d5	engine_helpers	compiles	game	confirmed	decomp/tests/0x000dc3d5.json	docs/compiler-abi.md; Reset the scale factors and the patched shift counts to 8.; callers dc314@dc329; guest pending
 0x000dc43e	219	build_rotation_words_dc43e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dc43e.json	docs/compiler-abi.md; Implicit-register fragment (EBX, ESI, EDI = three angles; params in that order). Builds eight rotation-matrix words at 0; callers dc519@dc528; guest pending
-0x000dc519	126			unknown	unclassified	unverified		
+0x000dc519	126	patch_rotation_immediates_dc519	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dc519.json	docs/compiler-abi.md; Build the rotation words for the angles (EDI=a0, EBX=a1, ESI=0) and copy eight sign-extended words from the table at 0xd; callers 91afc@91b70,d86e0@d874b,d8fd8@d901e; guest pending
 0x000dc5a9	158			unknown	unclassified	unverified		
 0x000dc71b	73	patch_span_dc71b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dc71b.json	docs/compiler-abi.md; (ret 0x14: a, b, c, d, e) Patches 16-bit immediates in the code at 0xdc717 (= b), 0xdc719 (= b - c + 1), 0xdc715 (= c), ; callers 63d5c@63edf,76620@766af,97d10@97d72; guest pending
 0x000dc7bc	40	load_sincos_dc7bc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000dc7bc.json	docs/compiler-abi.md; Load a sine/cosine word pair for an angle (8 angle units per table step).; callers 1f0fc@1f2a2,1f0fc@1f609,2a4c8@2a5e4; guest pending

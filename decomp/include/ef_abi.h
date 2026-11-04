@@ -6430,4 +6430,9 @@ void combine_globals_1199c8(void); /* 0x1199c8 */
 void age_record_chain_a00e8(void);
 void age_record_chain_a00e8(void); /* 0xa00e8 */
 
+void patch_rotation_immediates_dc519(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+void rotate_matrix_c5cd3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0);
+void patch_rotation_immediates_dc519(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1); /* 0xdc519 */
+void rotate_matrix_c5cd3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0); /* 0xc5cd3 */
+
 #endif
