@@ -10919,3 +10919,43 @@ uint32_t fseek_f2183(ef_addr32 stream, uint32_t offset, uint32_t whence)
     guest_fn_ebe6d(9u);
     return 0xffffffffu;
 }
+
+/* 0xa5b70, 306 bytes. Draw the widget W (EAX) when it is visible: its size words +0x75/+0x77 must be positive and its rectangle (position high halves +0x3f/+0x41 plus offsets +0x6f/+0x71, extents +0x73/+0x75) must lie inside the screen (dwords 0x15b744, 0x15b748). With flag 1 of byte +0xc4 it first fills the rectangle 0x41ec08.. (colour byte +0xc2, 0xc91c8); then runs the unit hook +0x95 (0xe4c9c), the overlap visit (0xe2564, flag 1 of +0xcb and pointer +0xc7) and the draw callback +0xb1: set up the view (0xabb00, 0xc9f28), raise byte 0x41f2e5 and the current widget 0x41eea0 around the call, then restore the view corners (0xc9ecc). */
+void draw_widget_a5b70(ef_addr32 w)
+{
+    int32_t x;
+    int32_t y;
+    if ((int16_t)EF_U16(w + 0x75u) <= 0 || (int16_t)EF_U16(w + 0x77u) <= 0)
+        return;
+    x = ((int32_t)EF_U32(w + 0x3fu) >> 16) + ((int32_t)EF_U32(w + 0x6fu) >> 16);
+    if (x >= (int32_t)EF_U32(0x0015b744u))
+        return;
+    x += (int32_t)EF_U32(w + 0x73u) >> 16;
+    if (x <= 0)
+        return;
+    y = ((int32_t)EF_U32(w + 0x41u) >> 16) + ((int32_t)EF_U32(w + 0x71u) >> 16);
+    if (y >= (int32_t)EF_U32(0x0015b748u))
+        return;
+    y += (int32_t)EF_U32(w + 0x75u) >> 16;
+    if (y <= 0)
+        return;
+    if ((EF_U8(w + 0xc4u) & 1u) != 0u) {
+        uint16_t x1 = (uint16_t)(EF_U16(0x0041ec08u) + EF_U16(0x0041ec0cu));
+        uint16_t y1 = (uint16_t)(EF_U16(0x0041ec0au) + EF_U16(0x0041ec0eu));
+        fill_rect_clipped_c91c8(EF_U8(w + 0xc2u), EF_U16(0x0041ec08u), EF_U16(0x0041ec0au), x1, y1);
+    }
+    if (EF_U32(w + 0x95u) != 0u)
+        guest_fn_e4c9c_w(w);
+    if ((EF_U8(w + 0xcbu) & 1u) != 0u && EF_U32(w + 0xc7u) != 0u)
+        visit_overlapping_nodes_e2564(w);
+    if (EF_U32(w + 0xb1u) != 0u) {
+        guest_fn_abb00_x(w);
+        set_view_rect_c9f28(w);
+        EF_U8(0x0041f2e5u) = 1u;
+        EF_U32(0x0041eea0u) = w;
+        guest_callptr_eax_x(EF_U32(w + 0xb1u), w);
+        EF_U8(0x0041f2e5u) = 0u;
+        EF_U32(0x0041eea0u) = 0u;
+        init_view_corners_c9ecc();
+    }
+}

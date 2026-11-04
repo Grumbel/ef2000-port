@@ -5380,4 +5380,6 @@ void guest_fn_324b0_x(ef_addr32 a, ef_addr32 b, ef_addr32 c, ef_addr32 out); /* 
 
 uint32_t fseek_f2183(ef_addr32 stream, uint32_t offset, uint32_t whence);
 
+void draw_widget_a5b70(ef_addr32 w);
+
 #endif

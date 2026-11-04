@@ -7304,3 +7304,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf2183` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | a7a64@a7a9e,bc287@bc33e | fseek: reposition STREAM (EAX) by OFFSET (EDX) from WHENCE (EBX; 0 start, 1 current, 2 end). A stream with write/read st |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa5b70` | EAX:ef_addr32 | none | a5ef8@a5fa1 | Draw the widget W (EAX) when it is visible: its size words +0x75/+0x77 must be positive and its rectangle (position high |
