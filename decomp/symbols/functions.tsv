@@ -1589,7 +1589,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082e40	483			unknown	unclassified	unverified		
 0x000830b8	219	rewrite_settings_830b8	game_helpers46	compiles	game	confirmed	decomp/tests/0x000830b8.json	docs/compiler-abi.md; Rewrite the settings file with the status text lines appended.; callers 19a80@19adb,84aec@84aec; guest pending
 0x000831a4	89	store_scaled_vector_831a4	game_helpers20	compiles	game	confirmed	decomp/tests/0x000831a4.json	docs/compiler-abi.md; Store a vector, halved until every component fits in 16 bits.; callers 83a40@83aac; guest pending
-0x00083200	145			unknown	unclassified	unverified		
+0x00083200	145	to_camera_space_83200	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00083200.json	docs/compiler-abi.md; Convert the world point (EDX, EBX, ECX) to camera-relative 8.8 fixed point for OUT (EAX): subtract the camera dwords 0x1; callers 83708@8370b; guest pending
 0x00083294	34	ui_point_near_reference	ui_secondary	compiles	game	confirmed	decomp/tests/0x00083294.json	docs/compiler-abi.md; host model; guest differential pending
 0x000832b8	232	box_outside_bounds_832b8	game_helpers54	compiles	game	confirmed	decomp/tests/0x000832b8.json	docs/compiler-abi.md; Latch the scaled box corner and test it against the current volume bounds.; callers 834e8@835ff,848e0@8498b; guest pending
 0x000833a0	131	muldiv_saturate_833a0	game_helpers27	compiles	game	confirmed	decomp/tests/0x000833a0.json	docs/compiler-abi.md; Compute a*b/c, saturating to +/-0x7fffffff-ish when the product overflows.; callers 83424@834c3,83424@834d0,834e8@83527; guest pending

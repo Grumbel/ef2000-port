@@ -13481,3 +13481,26 @@ void label_box_5fc80(uint32_t entry)
     draw_formatted_text_mode_48bb0(0xfu, 1u, (int16_t)(uint16_t)(hw + sx - 0x1e), y, 0x00186064u, EF_U32(0x00197238u));
     run_with_temp_state_5b288(0xfu, (uint16_t)sx, 0u, 0u);
 }
+
+/* 0x83200, 145 bytes. Convert the world point (EDX, EBX, ECX) to camera-relative 8.8 fixed point for OUT (EAX): subtract the camera dwords 0x1fcc14, 0x1fcc18, 0x1fcc1c, halve all three differences until none needs more than 16 bits, add the camera back and pass the values shifted left by 8 to 0x15c0ea (z, y, x order of the stack arguments, result pointer last). */
+void to_camera_space_83200(ef_addr32 out, int32_t x, int32_t y, int32_t z)
+{
+    int32_t cx = (int32_t)EF_U32(0x001fcc14u);
+    int32_t cy = (int32_t)EF_U32(0x001fcc18u);
+    int32_t cz = (int32_t)EF_U32(0x001fcc1cu);
+    int32_t dx = x - cx;
+    int32_t dy = y - cy;
+    int32_t dz = z - cz;
+    uint32_t t = (uint32_t)((dx >> 31) ^ (dx >> 15)) | (uint32_t)((dy >> 31) ^ (dy >> 15)) | (uint32_t)((dz >> 31) ^ (dz >> 15));
+    if (t != 0u) {
+        do {
+            dx >>= 1;
+            dy >>= 1;
+            dz >>= 1;
+            t >>= 1;
+        } while (t != 0u);
+    }
+    guest_fn_15c0ea_x((uint32_t)((dz + (int32_t)EF_U32(0x001fcc1cu)) << 8),
+                      (uint32_t)((dy + (int32_t)EF_U32(0x001fcc18u)) << 8),
+                      (uint32_t)((dx + (int32_t)EF_U32(0x001fcc14u)) << 8), out);
+}

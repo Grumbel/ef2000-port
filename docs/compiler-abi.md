@@ -7865,3 +7865,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5fc80` | EAX:uint32_t | none | 1e7c0@1ebe0,1f0fc@1f7c4,20b10@21642 | Label the box ENTRY (AX) of the table at 0x127a98 (10 byte entries: x, y, w, h words, 5th word unused): draw the double  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x83200` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | 83708@8370b | Convert the world point (EDX, EBX, ECX) to camera-relative 8.8 fixed point for OUT (EAX): subtract the camera dwords 0x1 |

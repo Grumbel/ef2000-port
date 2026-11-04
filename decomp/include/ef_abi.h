@@ -5665,4 +5665,6 @@ void show_scaled_value_5c2d8(void);
 
 void label_box_5fc80(uint32_t entry);
 
+void to_camera_space_83200(ef_addr32 out, int32_t x, int32_t y, int32_t z);
+
 #endif
