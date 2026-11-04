@@ -14671,3 +14671,43 @@ uint32_t land_object_9775c(ef_addr32 u)
     result = guest_fn_9783c_ret_x(u, 4u);
     return result;
 }
+
+/* 0x4e0d0, 306 bytes. Pointer click X (EAX), Y (EDX; both signed words) on the current panel slot (byte 0x1a559f): slot state 5 ignores the click; state 8 clears the pending flag 0x1a5708. The slot state 0x1a5672[slot] becomes 0x12 and, unless the flag is already 1, the click must hit the cursor box (centre words 0x1a54fe / 0x1a5500, half size = float 0x184d47 / float 0x1a53df); a hit stores the centre words and the dword 0x1a5502 for the slot (0x1a55a2, 0x1a55d6, 0x1a560a), sets the state to 8 and the flag to 1. */
+void click_panel_slot_4e0d0(uint32_t x, uint32_t y)
+{
+    uint32_t slot = EF_U8(0x001a559fu);
+    uint32_t state = EF_U8(0x001a5672u + slot);
+    float hw, den;
+    double cx, cy, px, py;
+    if (state == 5u)
+        return;
+    if (state == 8u)
+        EF_U8(0x001a5708u) = 0u;
+    EF_U8(0x001a5672u + EF_U8(0x001a559fu)) = 0x12u;
+    if (EF_U8(0x001a5708u) == 1u)
+        return;
+    memcpy(&hw, ef_guest_memory_ptr(0x00184d47u), sizeof hw);
+    memcpy(&den, ef_guest_memory_ptr(0x001a53dfu), sizeof den);
+    hw = hw / den;
+    cx = (double)(int16_t)EF_U16(0x001a54feu);
+    px = (double)(float)(int16_t)x;
+    if (cx - (double)hw > px)
+        return;
+    if (cx + (double)hw < px)
+        return;
+    cy = (double)(int16_t)EF_U16(0x001a5500u);
+    py = (double)(float)(int16_t)y;
+    if (cy - (double)hw > py)
+        return;
+    if (cy + (double)hw < py)
+        return;
+    slot = EF_U8(0x001a559fu);
+    EF_U16(0x001a55a2u + slot * 2u) = EF_U16(0x001a54feu);
+    slot = EF_U8(0x001a559fu);
+    EF_U16(0x001a55d6u + slot * 2u) = EF_U16(0x001a5500u);
+    slot = EF_U8(0x001a559fu);
+    EF_U32(0x001a560au + slot * 4u) = EF_U32(0x001a5502u);
+    slot = EF_U8(0x001a559fu);
+    EF_U8(0x001a5672u + slot) = 8u;
+    EF_U8(0x001a5708u) = 1u;
+}

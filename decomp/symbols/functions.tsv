@@ -892,7 +892,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004dcd8	520			unknown	unclassified	unverified		
 0x0004dee0	209	find_icon_at_4dee0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004dee0.json	docs/compiler-abi.md; Hit test the 24 map icons (index 1..24) against the point (X, Y) (16-bit signed): icon I has its centre at the words 0x1; callers 4dcd8@4dd39,4dcd8@4de13; guest pending
 0x0004dfb4	281			unknown	unclassified	unverified		
-0x0004e0d0	306			unknown	unclassified	unverified		
+0x0004e0d0	306	click_panel_slot_4e0d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004e0d0.json	docs/compiler-abi.md; Pointer click X (EAX), Y (EDX; both signed words) on the current panel slot (byte 0x1a559f): slot state 5 ignores the cl; callers 4dcd8@4ddd9,4dcd8@4de96; guest pending
 0x0004e204	347			unknown	unclassified	unverified		
 0x0004e360	602			unknown	unclassified	unverified		
 0x0004e5bc	256	insert_midpoint_4e5bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004e5bc.json	docs/compiler-abi.md; Insert an interpolated entry into the 24-slot waypoint arrays when byte 0x1a568a is 0x11 and the entry kind at 0x1a5673[; callers 4dcd8@4dd6d; guest pending
