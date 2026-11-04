@@ -20164,3 +20164,30 @@ void set_dos_vector_11d614(uint32_t vector, uint32_t offset, uint32_t selector)
 	in[1] = mode;
 	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
 }
+
+/* 0x10dc0d, 16 bytes. Implicit-register fragment (CL = bit count, AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, params in that order; AL/ESI updated): like 0xfa2ce but without refill; reads CL bits MSB first and returns them in AH. */
+uint8_t bitstream_read_bits_10dc0d(uint8_t count, uint8_t *buf, uint32_t *esi)
+{
+	uint8_t acc = 0;
+	uint8_t al = *buf;
+	do {
+		unsigned carry = al >> 7;
+		al = (uint8_t)(al << 1);
+		if (al == 0) {
+			al = EF_U8((*esi)++);
+			carry = al >> 7;
+			al = (uint8_t)((al << 1) | 1u);
+		}
+		acc = (uint8_t)((acc << 1) | carry);
+	} while (--count != 0);
+	*buf = al;
+	return acc;
+}
+
+/* 0xc474c, 9 bytes. Implicit-register fragment (EAX, EBX, ECX in that order, all updated): shift each left by 16. */
+void shift_left16_three_c474c(uint32_t *eax, uint32_t *ebx, uint32_t *ecx)
+{
+	*eax <<= 16;
+	*ebx <<= 16;
+	*ecx <<= 16;
+}

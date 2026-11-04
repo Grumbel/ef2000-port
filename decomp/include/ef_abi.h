@@ -6102,4 +6102,9 @@ uint8_t bitstream_decode_symbol_10db58(uint8_t *buf, uint32_t *esi, uint32_t ebp
 void set_dos_vector_11d614(uint32_t vector, uint32_t offset, uint32_t selector);
 void set_dos_vector_11d614(uint32_t vector, uint32_t offset, uint32_t selector);
 
+uint8_t bitstream_read_bits_10dc0d(uint8_t count, uint8_t *buf, uint32_t *esi);
+void shift_left16_three_c474c(uint32_t *eax, uint32_t *ebx, uint32_t *ecx);
+uint8_t bitstream_read_bits_10dc0d(uint8_t count, uint8_t *buf, uint32_t *esi);
+void shift_left16_three_c474c(uint32_t *eax, uint32_t *ebx, uint32_t *ecx);
+
 #endif

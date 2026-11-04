@@ -8879,3 +8879,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11d614` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 11ce30@11cf07,11cfe4@11cfc4,11d01c@11d0fe | Register parameters AL = interrupt vector, EBX = handler offset, ECX = handler selector. Sets a DOS interrupt vector (IN |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10dc0d` | AL:uint8_t,DL:uint8_t,EBX:uint32_t | AL:uint8_t | 10dbc1@10dbcf,10dbc1@10dbda,10dbc1@10dbee | Implicit-register fragment (CL = bit count, AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, params in that |
+| `0xc474c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 15be10@15be24,15c0c4@15c0d4,160122@160138 | Implicit-register fragment (EAX, EBX, ECX in that order, all updated): shift each left by 16. |
