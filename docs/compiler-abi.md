@@ -4416,3 +4416,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb39ec` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | 23760@23786,237c8@237ee,834e8@8363d | Approximate 3D distance of three components (15/16 of the largest magnitude plus 3/8 of the other two). |
 | `0xa4eec` | EAX:ef_addr32 | none | a59d8@a5a08 | Compute the current and maximum load figures of a loadout record from its flag bytes (+0x3a/+0x3b) and raise the stored  |
+
+## game_helpers117 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc07a0` | EAX:ef_addr32,EDX:ef_addr32 | none | c0b04@c0f32,c0b04@c0fa0,c0b04@c0fe1 | Disable (state 7) every record at the object's position with the object's type, decrementing the object's counters. |

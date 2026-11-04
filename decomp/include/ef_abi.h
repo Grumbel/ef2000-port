@@ -3892,4 +3892,7 @@ void shuffle_words_b0cfc(ef_addr32 array, int16_t n, uint8_t start, int16_t limi
 int32_t approx_distance3_b39ec(int32_t a, int32_t b, int32_t c);
 void update_loadout_maxima_a4eec(ef_addr32 rec);
 
+/* game_helpers117.c */
+void deactivate_records_at_object_c07a0(ef_addr32 object, ef_addr32 list);
+
 #endif

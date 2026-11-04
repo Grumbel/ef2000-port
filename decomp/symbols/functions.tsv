@@ -2709,7 +2709,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c03b4	382			unknown	unclassified	unverified		
 0x000c0534	240			unknown	unclassified	unverified		
 0x000c0624	377			unknown	unclassified	unverified		
-0x000c07a0	305			unknown	unclassified	unverified		
+0x000c07a0	305	deactivate_records_at_object_c07a0	game_helpers117	compiles	game	confirmed	decomp/tests/0x000c07a0.json	docs/compiler-abi.md; Disable (state 7) every record at the object's position with the object's type, decrementing the object's counters.; callers c0b04@c0f32,c0b04@c0fa0,c0b04@c0fe1; guest pending
 0x000c08d4	270	reactivate_records_at_object_c08d4	game_helpers112	compiles	game	confirmed	decomp/tests/0x000c08d4.json	docs/compiler-abi.md; For each record at the object's position with the given type, reactivate state-7 records (counting them in the object's ; callers c0b04@c0fba,c0b04@c0ff9; guest pending
 0x000c09e4	202	refill_object_cell_c09e4	game_helpers112	compiles	game	confirmed	decomp/tests/0x000c09e4.json	docs/compiler-abi.md; Refill an object's sub-entries of kind 0x35/0x37, then reactivate matching non-idle records up to the free capacity of i; callers c0b04@c0fc3,c0b04@c100c,c0b04@c1020; guest pending
 0x000c0b04	1326			unknown	unclassified	unverified		
