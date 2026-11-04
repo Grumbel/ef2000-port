@@ -4558,4 +4558,7 @@ uint32_t find_chunk_c1c24(uint32_t id);
 void set_view_rect_c9f28(uint32_t obj);
 void draw_clock_text_78934(void);
 
+uint32_t read_archive_ebc50(uint32_t dst, uint32_t count, uint32_t flags, uint32_t ctx);
+uint32_t read_bytes_9cde8(uint32_t dst, uint32_t count, uint32_t flags);
+
 #endif

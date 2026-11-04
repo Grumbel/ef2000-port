@@ -2050,7 +2050,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009cbc4	98	try_handlers_9cbc4	script_helpers1	compiles	game	confirmed	decomp/tests/0x0009cbc4.json	docs/compiler-abi.md; Try the two optional handlers (0x40d1f0 gated by bit 0 and 0x40d1f4 gated by bit 1 of 0x132ab0); return 1 if one accepts; callers 6b50@6be1,371b0@37216,3c6c0@3c705; guest pending
 0x0009cc28	143	load_resource_9cc28	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009cc28.json	docs/compiler-abi.md; Load the resource with key into buffer: try the two archive contexts at 0x40d1f0/0x40d1f4 (enabled by bits 0 and 1 of 0x; callers ea1a0@ea1ab; guest pending
 0x0009ccb8	303			unknown	unclassified	unverified		
-0x0009cde8	154			unknown	unclassified	unverified		
+0x0009cde8	154	read_bytes_9cde8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009cde8.json	docs/compiler-abi.md; Read count bytes into dst: with flag bits 16/17 from the archive context at 0x40d1f0/0x40d1f4 (0xebc50), with bit 18 fro; callers e774@e79d,9d170@9d1a1,aa5c4@aa5e9; guest pending
 0x0009ce84	98	close_request_9ce84	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009ce84.json	docs/compiler-abi.md; Dispatch a close request by flag bits 0x10000/0x20000/0x40000.; callers f80@1ac1,f6a8@f8e4,fecc@ffa1; guest pending
 0x0009cee8	68	seek_context_9cee8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009cee8.json	docs/compiler-abi.md; Seek: when flags carry bit 16 or 17 use the archive context at 0x40d1f0 (bit 16) or 0x40d1f4 and advance its cursor by a; callers aaa50@aaa87,eab44@eabb7,eab44@eabc8; guest pending
 0x0009cfdc	110	select_handlers_9cfdc	init_tables1	compiles	game	confirmed	decomp/tests/0x0009cfdc.json	docs/compiler-abi.md; Select the two handler pairs for a name: defaults when it is empty, otherwise build the path string at 0x40d150 from 0x4; callers 3cfc0@3d272,3cfc0@3d2fa,82cec@82cf4; guest pending
@@ -3521,7 +3521,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eba64	169			unknown	unclassified	unverified		
 0x000ebb10	69	read_entry_block_ebb10	game_helpers131	compiles	game	confirmed	decomp/tests/0x000ebb10.json	docs/compiler-abi.md; Read an entry's block: find the directory entry for the key in the context, seek the context's handle to the entry posit; callers 9cc28@9cc4a,9cc28@9cc6e; guest pending
 0x000ebb58	247			unknown	unclassified	unverified		
-0x000ebc50	133			unknown	unclassified	unverified		
+0x000ebc50	133	read_archive_ebc50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ebc50.json	docs/compiler-abi.md; Read count bytes into dst from the archive context ctx (position +0x158, end +0x15c): the part beyond the end is filled ; callers 9cde8@9ce0e,9cde8@9ce1f; guest pending
 0x000ebcd8	36	release_or_forward_ebcd8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebcd8.json	docs/compiler-abi.md; Release the object's pointer at +0x154 for flag 0x80000, else defer to 0xa7990.; callers 9ce84@9cea5,9ce84@9ceb6; guest pending
 0x000ebcfc	52	advance_cursor_ebcfc	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebcfc.json	docs/compiler-abi.md; Advance the cursor at +0x158 by EAX and return the distance from +0x154.; callers 9cee8@9cf0a,9cee8@9cf1a; guest pending
 0x000ebd30	6	get_address_ebd30	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000ebd30.json	docs/compiler-abi.md; ; callers ebe6d@ebe70,f4db8@f4ddf,f4db8@f4df6; guest pending

@@ -5458,3 +5458,10 @@ in EAX, format string address, one value).
 | `0xc1c24` | EAX:uint32_t | EAX:uint32_t | c3584@c35fd | Scan the chunk stream that starts 0xc bytes into the buffer at 0x41f3bc (cursor 0x41f3a0, end 0x41f3c0) for the chunk wi |
 | `0xc9f28` | EAX:uint32_t | none | a5b70@a5c71,a60a8@a60e8 | Set the view to the rectangle at 0x41ec08 (x, y, width, height words): origin at the centre, latch the rectangle twice a |
 | `0x78934` | none | none | 79128@7918f | Unless 0x127da8 is set: count the timer 0x1f8d58 down by the step 0x127d92 (clearing it above 0xdc), format the hour-lik |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xebc50` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 9cde8@9ce0e,9cde8@9ce1f | Read count bytes into dst from the archive context ctx (position +0x158, end +0x15c): the part beyond the end is filled  |
+| `0x9cde8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | e774@e79d,9d170@9d1a1,aa5c4@aa5e9 | Read count bytes into dst: with flag bits 16/17 from the archive context at 0x40d1f0/0x40d1f4 (0xebc50), with bit 18 fro |

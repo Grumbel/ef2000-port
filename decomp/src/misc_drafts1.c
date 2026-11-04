@@ -1309,3 +1309,44 @@ void draw_clock_text_78934(void)
     EF_U8(0x00127b1au) = 1u;
     guest_fn_48c90(15u, 10u, 0x6eu, (uint32_t)(uintptr_t)buf);
 }
+
+/* 0xebc50, 133 bytes. Read count bytes into dst from the archive context ctx (position +0x158, end +0x15c): the part beyond the end is filled with 0xff; with bit 19 of flags the data is copied from memory (0xdc832), otherwise read from the handle in flags (0xa79d4). Returns the number of bytes read (0 without a context). */
+uint32_t read_archive_ebc50(uint32_t dst, uint32_t count, uint32_t flags, uint32_t ctx)
+{
+    uint32_t remaining;
+    if (ctx == 0u)
+        return 0u;
+    remaining = EF_U32(ctx + 0x15cu) - EF_U32(ctx + 0x158u);
+    if ((int32_t)count > (int32_t)remaining) {
+        fill_bytes_b3fb0(dst + remaining, 0xffu, count - remaining);
+        count = remaining;
+    }
+    if ((flags >> 16) & 8u) {
+        guest_fn_dc832(dst, EF_U32(ctx + 0x158u), count);
+        EF_U32(ctx + 0x158u) = EF_U32(ctx + 0x158u) + count;
+        return count;
+    }
+    EF_U32(ctx + 0x158u) = EF_U32(ctx + 0x158u) + count;
+    return read_handle_a79d4(0u, 0u, 0u, 0u, flags, count, dst);
+}
+
+/* 0x9cde8, 154 bytes. Read count bytes into dst: with flag bits 16/17 from the archive context at 0x40d1f0/0x40d1f4 (0xebc50), with bit 18 from the in-memory block at 0x40d1ec/0x40d1e4 (padding with 0xff), otherwise from the handle in flags. */
+uint32_t read_bytes_9cde8(uint32_t dst, uint32_t count, uint32_t flags)
+{
+    if (flags & 0x30000u) {
+        uint32_t rest = flags & 0xfffcffffu;
+        uint32_t ctx = (flags & 0x10000u) ? EF_U32(0x0040d1f0u) : EF_U32(0x0040d1f4u);
+        return read_archive_ebc50(dst, count, rest, ctx);
+    }
+    if (flags & 0x40000u) {
+        int32_t avail = EF_S32(0x0040d1e4u) - EF_S32(0x0040d1ecu);
+        if ((int32_t)count > avail) {
+            fill_bytes_b3fb0(dst + (uint32_t)avail, 0xffu, count - (uint32_t)avail);
+            count = (uint32_t)avail;
+        }
+        guest_fn_dc832(dst, EF_U32(0x0040d1ecu), count);
+        EF_U32(0x0040d1ecu) = EF_U32(0x0040d1ecu) + count;
+        return count;
+    }
+    return read_handle_a79d4(0u, 0u, 0u, 0u, flags, count, dst);
+}
