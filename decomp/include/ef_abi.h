@@ -3937,4 +3937,8 @@ uint32_t count_group_entries_faafc(ef_addr32 group);
 void log_palette_d1894(ef_addr32 source, int16_t mode);
 void update_frame_slot_b5800(ef_addr32 owner, ef_addr32 obj, int16_t need);
 
+/* game_helpers124.c */
+uint32_t point_in_view_volume_ceb40(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, int32_t margin, int32_t z, int32_t y, int32_t x);
+void register_code_ranges_111575(void);
+
 #endif

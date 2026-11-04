@@ -2974,7 +2974,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ce830	275			unknown	unclassified	unverified		
 0x000ce944	93	apply_pending_events_ce944	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ce944.json	docs/compiler-abi.md; Apply pending event bits of an object through the 5-entry table at 0x15b798.; callers d23d8@d2411; guest pending
 0x000ce9a4	203			unknown	unclassified	unverified		
-0x000ceb40	183			unknown	unclassified	unverified		
+0x000ceb40	183	point_in_view_volume_ceb40	game_helpers124	compiles	game	confirmed	decomp/tests/0x000ceb40.json	docs/compiler-abi.md; Test a point (z, y, x on the stack after a margin) against the five planes at 0x15b79c: returns 1 when a coordinate is o; callers c46f8@c4710,c473c@c4743; guest pending
 0x000cec00	201			unknown	unclassified	unverified		
 0x000ceccc	99			unknown	unclassified	unverified		
 0x000ceda0	231			unknown	unclassified	unverified		
@@ -4082,7 +4082,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001114f7	48	set_rate_1114f7	runtime_libc	compiles	game	confirmed	decomp/tests/0x001114f7.json	docs/compiler-abi.md; 0x1021f4(a, 1000000 / b) under the lock.; callers 101c54@101d8c,102228@102252; guest pending
 0x00111527	66	set_period_111527	runtime_libc	compiles	game	confirmed	decomp/tests/0x00111527.json	docs/compiler-abi.md; 0x1021f4(a, b == 0 ? 0xd68d : 10000 * b / 0x2e9c) under the lock.; callers 10225c@102286; guest pending
 0x00111569	12	value_17d7ae	runtime_libc	compiles	game	confirmed	decomp/tests/0x00111569.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x00111575	37			unknown	unclassified	unverified		
+0x00111575	37	register_code_ranges_111575	game_helpers124	compiles	game	confirmed	decomp/tests/0x00111575.json	docs/compiler-abi.md; Register the two code ranges 0x17d624..0x17e1d4 and 0x110dcc..0x111575 with the stack range tracker.; callers 110fd4@110feb; guest pending
 0x0011159a	29	set_default_file_buffer_11159a	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x0011159a.json	docs/compiler-abi.md; Set a file's buffer: fully buffered for a given buffer, else line buffered.; callers 101c54@101cd3; guest pending
 0x001115f0	10	dword_shr8_1115f0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001115f0.json	docs/compiler-abi.md; Upper three bytes of a dword.; callers none direct; guest pending
 0x001115fc	54	teardown_record_1115fc	game_helpers120	compiles	game	confirmed	decomp/tests/0x001115fc.json	docs/compiler-abi.md; Tear down a record: run its field 0x874 callback, trace-call 0x102644 if field 0x88c is positive, then set it to -1 (cde; callers none direct; guest pending

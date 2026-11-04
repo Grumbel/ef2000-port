@@ -4495,3 +4495,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xd1894` | EAX:ef_addr32,DX:int16_t | none | d1c54@d1c83 | Log a 256-entry palette: header text, dword 0x300, then three values per entry (a fixed 10/20/30 when mode == 2, otherwi |
 | `0xb5800` | EAX:ef_addr32,EDX:ef_addr32,BX:int16_t | none | b7d4c@b800e,b80ac@b81be,b80ac@b8487 | Recompute the frame index of the current 25-byte slot (object+0x20 table, 1-based index at +0x1c) and then find a free s |
+
+## game_helpers124 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xceb40` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:int32_t,[ESP+8]:int32_t,[ESP+12]:int32_t,[ESP+16]:int32_t | EAX:uint32_t | c46f8@c4710,c473c@c4743 | Test a point (z, y, x on the stack after a margin) against the five planes at 0x15b79c: returns 1 when a coordinate is o |
+| `0x111575` | none | none | 110fd4@110feb | Register the two code ranges 0x17d624..0x17e1d4 and 0x110dcc..0x111575 with the stack range tracker. |
