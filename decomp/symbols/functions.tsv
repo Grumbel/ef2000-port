@@ -2944,7 +2944,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cd7a0	77	free_table_blocks_cd7a0	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cd7a0.json	docs/compiler-abi.md; Free the blocks in table slots 101..n and reset the count.; callers e4264@e42ae; guest pending
 0x000cd7f0	42	get_text_slot_cd7f0	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000cd7f0.json	docs/compiler-abi.md; Return the text block of a slot (0..599).; callers 11e7c@11ec3,11e7c@11eda,14d58@14da5; guest pending
 0x000cd81c	15	forward_word_cd81c	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cd81c.json	docs/compiler-abi.md; Forward the stack word to 0xcd7f0.; callers none direct; guest pending
-0x000cd82c	105			unknown	unclassified	unverified		
+0x000cd82c	105	blit_masked_cd82c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cd82c.json	docs/compiler-abi.md; Masked blit from a 256-byte-wide source bitmap to the screen (colour 0 is transparent). Stack-only (ret 0x1c): Y, X (des; callers 11e7c@11f50,38be8@38cd2,ca290@ca42c; guest pending
 0x000cd957	79	blit_transparent_cd957	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cd957.json	docs/compiler-abi.md; Copy a SRC block of ROWS rows of WIDTH bytes to the frame buffer at (X, Y), skipping zero (transparent) source bytes; SK; callers 98b68@98bc2; guest pending
 0x000cd9a6	368			unknown	unclassified	unverified		
 0x000cdb20	277	init_video_mode_cdb20	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cdb20.json	docs/compiler-abi.md; Set up the 320x200 video mode: on the first call read the environment string at 0x18f620, flag the options named 0x18f62; callers 8b2d8@8b2de,aaee8@aaf77,d1e50@d1e89; guest pending

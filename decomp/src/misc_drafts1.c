@@ -6551,3 +6551,30 @@ uint32_t dos_alloc_block_1047e4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
     EF_U32(error_out) = out[6];
     return 1u;
 }
+
+/* 0xcd82c, 105 bytes. Masked blit from a 256-byte-wide source bitmap to the screen (colour 0 is transparent). Stack-only (ret 0x1c): Y, X (destination, signed words), HEIGHT, WIDTH (words), SRC_Y, SRC_X (signed words) and the SRC bitmap base. The destination row comes from the row table 0x163200 plus frame base 0x15b754, rows advance by the stride dword 0x1631f4. ORIGINAL BUG: a zero WIDTH or HEIGHT loops 2^32 times (do-while on the counters). */
+void blit_masked_cd82c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+                       uint32_t y, uint32_t x, uint32_t height, uint32_t width,
+                       uint32_t src_y, uint32_t src_x, uint32_t src)
+{
+    uint32_t s = src + (uint32_t)((int32_t)(int16_t)src_y << 8) + (uint32_t)(int32_t)(int16_t)src_x;
+    uint32_t d = EF_U32(0x00163200u + (uint32_t)(int32_t)(int16_t)y * 4u) + EF_U32(0x0015b754u) +
+                 (uint32_t)(int32_t)(int16_t)x;
+    uint32_t stride = EF_U32(0x001631f4u);
+    uint32_t rows = height & 0xffffu;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    do {
+        uint32_t i = 0u;
+        uint32_t cols = width & 0xffffu;
+        do {
+            uint8_t c = EF_U8(s + i);
+            if (c != 0u)
+                EF_U8(d + i) = c;
+            i++;
+            cols--;
+        } while (cols != 0u);
+        d += stride;
+        s += 0x100u;
+        rows--;
+    } while (rows != 0u);
+}

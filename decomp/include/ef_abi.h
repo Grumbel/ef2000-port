@@ -5049,4 +5049,8 @@ void update_counter_widget_4e7b8(uint32_t show);
 uint32_t dos_alloc_block_1047e4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
                                 uint32_t paragraphs, uint32_t blocks_out, uint32_t segment_out, uint32_t error_out);
 
+void blit_masked_cd82c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
+                       uint32_t y, uint32_t x, uint32_t height, uint32_t width,
+                       uint32_t src_y, uint32_t src_x, uint32_t src);
+
 #endif
