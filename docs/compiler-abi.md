@@ -6968,3 +6968,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa60a8` | EAX:uint32_t | none | a61b0@a61e2 | Redraw the widget OBJ (EAX): the mode byte comes from 0xe588c (0 when flag 2 of byte +0x3b is set); mode 1 saves the rec |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5de14` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 5d1c4@5d2d4,5d1c4@5d430 | Draw a small direction marker: with SIZE (EBX, signed word) the two points (0, 2 * SIZE) and (0, SIZE * 4 / 3) are rotat |

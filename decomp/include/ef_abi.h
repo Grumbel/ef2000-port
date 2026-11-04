@@ -5255,6 +5255,7 @@ void redraw_widget_a60a8(uint32_t obj);
 uint32_t guest_fn_e588c_ret_x(ef_addr32 record); /* 0xe588c EAX -> EAX */
 
 void draw_heading_marker_5de14(uint32_t x, uint32_t y, uint32_t size, uint32_t obj);
-void guest_fn_c8ccc_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t y1, uint32_t x1, uint32_t y0, uint32_t x0, uint32_t colour); /* 0xc8ccc stack, ret 0x14 */
+
+
 
 #endif

@@ -9034,7 +9034,7 @@ void draw_heading_marker_5de14(uint32_t x, uint32_t y, uint32_t size, uint32_t o
     load_sincos_dc7bc((uint32_t)(uint16_t)(EF_U16(obj + 0xeu) + 0x8000u));
     rotate_point_dc7e4((uint32_t)(uintptr_t)p0, (int16_t)EF_U16(0x001281fau), (int16_t)EF_U16(0x001281fcu));
     rotate_point_dc7e4((uint32_t)(uintptr_t)p1, (int16_t)EF_U16(0x001281feu), (int16_t)EF_U16(0x00128200u));
-    guest_fn_c8ccc_x(0u, 0u, 0u, 0u,
+    guest_fn_c8ccc_x(
                      (uint32_t)(int32_t)(int16_t)(p1[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p1[0] + (int16_t)x),
                      (uint32_t)(int32_t)(int16_t)(p0[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p0[0] + (int16_t)x),
                      EF_U8(0x00128148u));
