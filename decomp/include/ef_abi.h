@@ -5388,4 +5388,7 @@ void send_packets_3617c(uint32_t total, uint32_t flag);
 
 uint32_t init_sound_driver_d6e58(void);
 
+uint32_t get_realmode_vector_111118(uint32_t intno);
+void register_locked_ranges_117ace(void);
+
 #endif

@@ -7328,3 +7328,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd6e58` | none | EAX:uint32_t | 7feb0@7febb,81110@8111b | Initialise the sound driver. When both configuration bytes 0x15bac6 and 0x15bac7 are zero clear the three state bytes (0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x111118` | EAX:uint32_t | EAX:uint32_t | 101e80@101ea5 | cdecl: look up interrupt INTNO with the DOS extender calls 0x2502 (protected-mode vector, result discarded) and 0x2503 ( |
+| `0x117ace` | none | none | 105230@1052dc | Register the two memory ranges 0x17e270..0x17e290 and 0x1159c8..0x117ace with the lock service (0x104840, cdecl) around  |

@@ -11099,3 +11099,19 @@ uint32_t init_sound_driver_d6e58(void)
     EF_U8(0x0015bac4u) = 1u;
     return 0u;
 }
+
+/* 0x111118, 42 bytes. cdecl: look up interrupt INTNO with the DOS extender calls 0x2502 (protected-mode vector, result discarded) and 0x2503 (real-mode vector) and return the real-mode vector held in EBX. */
+uint32_t get_realmode_vector_111118(uint32_t intno)
+{
+    uint32_t out[7];
+    run_dos_int_ex(0x21u, 0x2502u, 0u, intno & 0xffu, 0u, out);
+    run_dos_int_ex(0x21u, 0x2503u, 0u, intno & 0xffu, 0u, out);
+    return out[1];
+}
+
+/* 0x117ace, 47 bytes. Register the two memory ranges 0x17e270..0x17e290 and 0x1159c8..0x117ace with the lock service (0x104840, cdecl) around saved DS/ES. */
+void register_locked_ranges_117ace(void)
+{
+    guest_fn_104840(0x0017e270u, 0x0017e290u);
+    guest_fn_104840(0x001159c8u, 0x00117aceu);
+}

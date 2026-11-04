@@ -4061,7 +4061,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00110f6f	101			unknown	unclassified	unverified		
 0x00110fd4	241			unknown	unclassified	unverified		
 0x001110c5	83			unknown	unclassified	unverified		
-0x00111118	42			unknown	unclassified	unverified		
+0x00111118	42	get_realmode_vector_111118	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00111118.json	docs/compiler-abi.md; cdecl: look up interrupt INTNO with the DOS extender calls 0x2502 (protected-mode vector, result discarded) and 0x2503 (; callers 101e80@101ea5; guest pending
 0x00111142	26	set_rm_vector_111142	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00111142.json	docs/compiler-abi.md; DOS4G set real-mode interrupt vector (int 21h, AX = 0x2505) for interrupt number CL = NUM (low byte) with EBX = VALUE; c; callers 101ed4@101efe; guest pending
 0x001111b1	25	check_marker_1111b1	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111b1.json	docs/compiler-abi.md; Compare the dword at 0x17d7c0 with -1 and do nothing either way (an empty check left over in the runtime).; callers 101f08@101f38; guest pending
 0x001111ca	23	reset_marker_1111ca	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111ca.json	docs/compiler-abi.md; Set the dword at 0x17d7c0 to -1 (frame with saved registers, no arguments).; callers 101f44@101f67; guest pending
@@ -4135,7 +4135,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001177f4	539			unknown	unclassified	unverified		
 0x00117a0f	147			unknown	unclassified	unverified		
 0x00117aa2	44	clear_buffer_117aa2	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00117aa2.json	docs/compiler-abi.md; Zero the buffer at +0x50 (length at +0x4c) of a record (cdecl, record on the stack).; callers 105648@105713,10585c@1058b3,10585c@105c60; guest pending
-0x00117ace	47			unknown	unclassified	unverified		
+0x00117ace	47	register_locked_ranges_117ace	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117ace.json	docs/compiler-abi.md; Register the two memory ranges 0x17e270..0x17e290 and 0x1159c8..0x117ace with the lock service (0x104840, cdecl) around ; callers 105230@1052dc; guest pending
 0x00117b0c	10	outp_117b0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117b0c.json	docs/compiler-abi.md; outp: write the byte VALUE to the I/O port PORT.; callers 117b18@117bc4,117bfc@117d2a,117e0c@117e67; guest pending
 0x00117b18	198			unknown	unclassified	unverified		
 0x00117bfc	314	serial_interrupt_117bfc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117bfc.json	docs/compiler-abi.md; Serial port interrupt service for the channel record REC (port base at +0x1c, state block at +0x2c, receive ring descrip; callers none direct; guest pending
