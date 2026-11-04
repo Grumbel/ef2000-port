@@ -5553,4 +5553,8 @@ uint32_t guest_fn_8c09c_x(ef_addr32 unit); /* 0x8c09c EAX -> AL */
 void guest_fn_8be54_x(ef_addr32 unit, ef_addr32 rec); /* 0x8be54 EAX/EDX */
 void guest_fn_8fa58_x(ef_addr32 unit, ef_addr32 out, ef_addr32 out2); /* 0x8fa58 EAX/EDX/EBX */
 
+uint32_t load_group_records_fecc(ef_addr32 countp, uint32_t arg, ef_addr32 name);
+void guest_fn_e7dc_x(void); /* 0xe7dc */
+void guest_fn_bc570_x(ef_addr32 obj, uint32_t arg, ef_addr32 state); /* 0xbc570 EAX/EDX/EBX */
+
 #endif

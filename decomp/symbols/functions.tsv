@@ -223,7 +223,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000fc54	159	read_group_header_fc54	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000fc54.json	docs/compiler-abi.md; Read a group header and its list of 10-byte polyline records.; callers fecc@ff70; guest pending
 0x0000fcf4	343			unknown	unclassified	unverified		
 0x0000fe4c	125	read_parser_text_record	parser_line_records	compiles	game	confirmed	decomp/tests/0x000fe4c.json	Parser line then two token advances, string plus 5 bytes and 6 words; callers f314@f5d3/fcf4@fe36; guest pending
-0x0000fecc	231			unknown	unclassified	unverified		
+0x0000fecc	231	load_group_records_fecc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000fecc.json	docs/compiler-abi.md; Load a resource of group records: NAME (EBX) is checked with the size hook 0x132ab4 and opened (0x9ccb8, kept in 0x197ab; callers b0f5c@b1040,b0f5c@b123e; guest pending
 0x0000ffb4	103	find_unique_node_ffb4	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x0000ffb4.json	docs/compiler-abi.md; Find the node whose name matches; abort unless exactly one matches.; callers 1001c@1022b; guest pending
 0x0001001c	1414			unknown	unclassified	unverified		
 0x000105a4	141	read_four_words_105a4	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x000105a4.json	docs/compiler-abi.md; Read four numbers from a parser file into the given words.; callers 45a4@45f0,7c574@7c6a3; guest pending

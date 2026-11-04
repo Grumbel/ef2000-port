@@ -7617,3 +7617,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x899d8` | EAX:ef_addr32 | none | 8a318@8a555 | Let the unit record R (EAX) lock on to its target T (+0x30) when T is valid (0x8c09c) and has neither bit 2 nor bit 3 of |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfecc` | EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | b0f5c@b1040,b0f5c@b123e | Load a resource of group records: NAME (EBX) is checked with the size hook 0x132ab4 and opened (0x9ccb8, kept in 0x197ab |

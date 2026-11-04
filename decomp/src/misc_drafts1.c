@@ -12317,3 +12317,33 @@ void lock_on_target_899d8(ef_addr32 rec)
     EF_U8(rec + 0x5au) = 1u;
     guest_fn_8be54_x(t, rec);
 }
+
+/* 0xfecc, 231 bytes. Load a resource of group records: NAME (EBX) is checked with the size hook 0x132ab4 and opened (0x9ccb8, kept in 0x197ab0), reporting through the error hook 0x132a74 when either fails. After the setup calls 0xe7dc, 0xe810 and 0xe89c the record count from 0xe95c is stored to *COUNTP (EAX); each of the records is allocated with the hook at 0x121ebc (initially 0xe764, 0x24 bytes), initialised with 0xfc54 and filled with 0xbc570(record, ARG = EDX, local state), or reported with 0xcd12e when the allocation failed. The handle is closed with 0x9ce84; returns 1. */
+uint32_t load_group_records_fecc(ef_addr32 countp, uint32_t arg, ef_addr32 name)
+{
+    uint32_t state = 0u;
+    int32_t i;
+    EF_U32(0x00121ebcu) = 0xe764u;
+    EF_U32(0x00121eacu) = 0u;
+    if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), name) == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00181174u, name);
+    EF_U32(0x00197ab0u) = guest_fn_9ccb8(name);
+    if (EF_U32(0x00197ab0u) == 0xffffffffu)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x001811a0u, name);
+    guest_fn_e7dc_x();
+    guest_fn_e810();
+    guest_fn_e89c();
+    EF_U32(countp) = guest_fn_e95c();
+    for (i = 0; i < (int32_t)EF_U32(countp); i++) {
+        ef_addr32 p = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), 0x24u);
+        if (p == 0u)
+            guest_callptr3_x(EF_U32(0x00132a74u), 0x001811ccu, 0x24u, (uint32_t)i);
+        read_group_header_fc54(p);
+        if (p != 0u)
+            guest_fn_bc570_x(p, arg, (ef_addr32)(uintptr_t)&state);
+        else
+            guest_fn_cd12e(0x001811f8u, 0u, 0u);
+    }
+    guest_fn_9ce84(EF_U32(0x00197ab0u));
+    return 1u;
+}
