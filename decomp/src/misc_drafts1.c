@@ -772,3 +772,58 @@ uint32_t text_width_dd2f4(uint32_t str)
         }
     }
 }
+
+/* 0x5cb1c, 126 bytes. Variant of 0x5ca88 taking the position in EDX/EBX/ECX (fixed point already shifted) and the extra argument in EAX: make it camera relative, scale down by 16 until all components are below 0x4000, add the origin back and call 0x15c0c4. */
+void project_position_5cb1c(uint32_t arg, int32_t x, int32_t y, int32_t z)
+{
+    x -= EF_S32(0x0021444cu);
+    y -= EF_S32(0x00214448u);
+    z -= EF_S32(0x00214450u);
+    while (abs_a28f2(x) >= 0x4000 || abs_a28f2(y) >= 0x4000 || abs_a28f2(z) >= 0x4000) {
+        x >>= 4;
+        y >>= 4;
+        z >>= 4;
+    }
+    x += EF_S32(0x0021444cu);
+    y += EF_S32(0x00214448u);
+    z += EF_S32(0x00214450u);
+    guest_fn_15c0c4_x(0u, 0u, 0u, 0u, (uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
+}
+
+/* 0x66b74, 126 bytes. Return 1 when the metric distance (0x23760) from the 8.8 fixed-point position at pos to the reference point is below the radius stored in the table at 0x12bca3 (145-byte rows) for the current unit's selected entry. */
+uint8_t within_unit_radius_66b74(uint32_t pos)
+{
+    uint32_t unit = lookup_filtered_indexed_object((int16_t)(EF_S32(0x001f71c8u) >> 16));
+    uint8_t vec[12];
+    ef_addr32 v = (uint32_t)(uintptr_t)vec;
+    int32_t sel;
+    int32_t slot;
+    int32_t radius;
+    if (unit == 0u)
+        return 0u;
+    sel = EF_S32(unit + 0x1d4u) >> 24;
+    slot = EF_S32(unit + (uint32_t)(sel * 3) + 0x198u) >> 24;
+    radius = EF_S32(0x0012bca3u + (uint32_t)(slot * 145));
+    EF_S32(v) = EF_S32(pos) >> 8;
+    EF_S32(v + 4u) = EF_S32(pos + 4u) >> 8;
+    EF_S32(v + 8u) = EF_S32(pos + 8u) >> 8;
+    return guest_fn_23760_x(v) < radius ? 1u : 0u;
+}
+
+/* 0x40624, 125 bytes. Latch the full screen rectangle twice, optionally format "ratio" text (50 / 0x127d92) and print it at row 12, column 10, y 30. */
+void draw_ratio_text_40624(void)
+{
+    uint8_t buf[0x64];
+    uint16_t d;
+    int32_t w = EF_S32(0x0015b744u) - 1;
+    int32_t h = EF_S32(0x0015b748u) - 1;
+    guest_fn_ce328_w(0, w, 0, h);
+    w = EF_S32(0x0015b744u) - 1;
+    h = EF_S32(0x0015b748u) - 1;
+    guest_fn_cdf48(0u, (uint32_t)w, 0u, (uint32_t)h);
+    d = EF_U16(0x00127d92u);
+    if (d != 0u)
+        guest_sprintf_a4342((uint32_t)(uintptr_t)buf, 0x001842d4u, (uint32_t)d, (uint32_t)(50 / (int32_t)d));
+    /* ORIGINAL BUG: prints the uninitialised buffer when 0x127d92 is zero. */
+    guest_fn_48c90(12u, 10u, 0x1eu, (uint32_t)(uintptr_t)buf);
+}

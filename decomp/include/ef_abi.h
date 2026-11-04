@@ -4513,4 +4513,12 @@ void flush_pending_a374c(uint32_t code);
 uint32_t create_entry_d7764(uint32_t name, uint32_t b13, uint32_t b14, uint32_t w15, uint32_t w17, uint32_t d19, uint32_t b23);
 uint32_t text_width_dd2f4(uint32_t str);
 
+void project_position_5cb1c(uint32_t arg, int32_t x, int32_t y, int32_t z);
+uint8_t within_unit_radius_66b74(uint32_t pos);
+void draw_ratio_text_40624(void);
+int32_t guest_fn_23760_x(ef_addr32 vec); /* 0x23760 EAX -> EAX */
+
+
+int32_t guest_fn_23760_x(ef_addr32 vec); /* 0x23760 EAX -> EAX */
+
 #endif

@@ -732,7 +732,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000401ac	634			unknown	unclassified	unverified		
 0x00040428	145	refresh_selected_unit_40428	game_helpers17	compiles	game	confirmed	decomp/tests/0x00040428.json	docs/compiler-abi.md; Clear the 320x200 view and refresh the unit selected by the current key.; callers 3dd30@3e435; guest pending
 0x000404bc	358	draw_debug_counters_404bc	game_helpers43	compiles	game	confirmed	decomp/tests/0x000404bc.json	docs/compiler-abi.md; Draw seven debug counters, one per text row.; callers 3dd30@3e466; guest pending
-0x00040624	125			unknown	unclassified	unverified		
+0x00040624	125	draw_ratio_text_40624	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00040624.json	docs/compiler-abi.md; Latch the full screen rectangle twice, optionally format "ratio" text (50 / 0x127d92) and print it at row 12, column 10,; callers 3dd30@3e451; guest pending
 0x00040774	54	clock_words_to_seconds	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00040774.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x000407c4	94			unknown	unclassified	unverified		
 0x00040820	78	reference_clock_reaches	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00040820.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
@@ -1143,7 +1143,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005c9d4	140			unknown	unclassified	unverified		
 0x0005ca60	38	apply_stream_value_5ca60	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x0005ca60.json	docs/compiler-abi.md; Read the 9th stream value into a local and apply it when valid.; callers 598e8@5997a; guest pending
 0x0005ca88	146	project_position_5ca88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ca88.json	docs/compiler-abi.md; Convert a fixed-point position (words at +0,+4,+8, 8 fractional bits) to be camera relative (origin at 0x21444c/214448/2; callers 5a220@5a284,5c354@5c3e6,5c518@5c5f6; guest pending
-0x0005cb1c	126			unknown	unclassified	unverified		
+0x0005cb1c	126	project_position_5cb1c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005cb1c.json	docs/compiler-abi.md; Variant of 0x5ca88 taking the position in EDX/EBX/ECX (fixed point already shifted) and the extra argument in EAX: make ; callers 5a2d0@5a3e5,5a468@5a6bb; guest pending
 0x0005cb9c	42	position_within_tactical_bounds	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005cb9c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0005cbc8	1062			unknown	unclassified	unverified		
 0x0005cff0	141	redraw_panel_5cff0	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x0005cff0.json	docs/compiler-abi.md; Redraw the panel frame, then the selection or the help text.; callers none direct; guest pending
@@ -1220,7 +1220,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00066548	1075			unknown	unclassified	unverified		
 0x0006697c	330	select_cursor_mode_6697c	game_helpers67	compiles	game	confirmed	decomp/tests/0x0006697c.json	docs/compiler-abi.md; Pick the cursor mode from the player's selected station kind and the panel mode.; callers 66548@665d7; guest pending
 0x00066ac8	38	update_position_bin	record_transitions	compiles	game	confirmed	decomp/tests/0x00066ac8.json	docs/compiler-abi.md; host model; guest differential pending
-0x00066b74	126			unknown	unclassified	unverified		
+0x00066b74	126	within_unit_radius_66b74	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00066b74.json	docs/compiler-abi.md; Return 1 when the metric distance (0x23760) from the 8.8 fixed-point position at pos to the reference point is below the; callers 59fa4@5a1a7,5cbc8@5cef2,66548@66624; guest pending
 0x00066bf4	224	request_los_66bf4	line_of_sight	compiles	game	confirmed	decomp/tests/0x00066bf4.json	docs/compiler-abi.md; Line-of-sight request from the viewpoint at 0x1a5bec to the object.; callers 65a88@65bcd,65d24@65de3,65e10@65e93; guest pending
 0x00066cd4	169	request_los_66cd4	line_of_sight	compiles	game	confirmed	decomp/tests/0x00066cd4.json	docs/compiler-abi.md; Line-of-sight request from `object` to unit AX.; callers 291fc@29220,298f0@29942; guest pending
 0x00066d80	165	request_los_66d80	line_of_sight	compiles	game	confirmed	decomp/tests/0x00066d80.json	docs/compiler-abi.md; As 0x66bf4 from the point at 0x21444c.; callers 62edc@63099; guest pending

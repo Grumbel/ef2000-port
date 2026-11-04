@@ -5376,3 +5376,16 @@ in EAX, format string address, one value).
 | `0xa374c` | EAX:uint32_t | none | a348c@a34f0 | When at least 8 bytes are pending (0x1357da), send a 13-byte request built from 0x1357ae, 7 bytes of the template at [0x |
 | `0xd7764` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | 7ff0c@7ff3d,80374@80391,80374@803ac | (ret 12) Allocate and clear a 0x25-byte entry, copy the name from EAX into it and fill in the bytes/words at +0x0d, +0x0 |
 | `0xdd2f4` | EAX:uint32_t | EAX:uint32_t | 275e0@27658,275e0@276a8,275e0@276e5 | Measure the pixel width of a zero-terminated string: spaces and tabs count 3, characters above 0x7f use the byte table a |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5cb1c` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | 5a2d0@5a3e5,5a468@5a6bb | Variant of 0x5ca88 taking the position in EDX/EBX/ECX (fixed point already shifted) and the extra argument in EAX: make  |
+| `0x66b74` | EAX:uint32_t | AL:uint8_t | 59fa4@5a1a7,5cbc8@5cef2,66548@66624 | Return 1 when the metric distance (0x23760) from the 8.8 fixed-point position at pos to the reference point is below the |
+| `0x40624` | none | none | 3dd30@3e451 | Latch the full screen rectangle twice, optionally format "ratio" text (50 / 0x127d92) and print it at row 12, column 10, |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
