@@ -8123,3 +8123,20 @@ uint32_t read_hires_timer_fe560(void)
     }
     return EF_U32(0x00485fc0u);
 }
+
+/* 0xd6cac, 176 bytes. When bit 0 of byte 0x15bac0 is set, store 1 - clamp(r, 0, 1) as a float at OUT (EAX), r being the float ratio dword 0x420db0 / dword 0x420db4, and return 1; otherwise return 0. */
+uint8_t store_inverse_ratio_d6cac(uint32_t out)
+{
+    float r;
+    double v, t;
+    if (!(EF_U8(0x0015bac0u) & 1u))
+        return 0u;
+    r = (float)((double)(int32_t)EF_U32(0x00420db0u) / (double)(int32_t)EF_U32(0x00420db4u));
+    v = (0.0 < (double)r) ? (double)r : 0.0;
+    if (1.0 > v)
+        t = (0.0 < (double)r) ? (double)r : 0.0;
+    else
+        t = 1.0;
+    *(float *)ef_guest_memory_ptr(out) = (float)(1.0 - t);
+    return 1u;
+}

@@ -5175,4 +5175,6 @@ uint32_t build_ramp_table_e7ea4(int32_t lo, int32_t hi);
 
 uint32_t read_hires_timer_fe560(void);
 
+uint8_t store_inverse_ratio_d6cac(uint32_t out);
+
 #endif

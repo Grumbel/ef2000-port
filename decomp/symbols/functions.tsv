@@ -3079,7 +3079,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d66c2	358			unknown	unclassified	unverified		
 0x000d6960	541			unknown	unclassified	unverified		
 0x000d6b80	268			unknown	unclassified	unverified		
-0x000d6cac	176			unknown	unclassified	unverified		
+0x000d6cac	176	store_inverse_ratio_d6cac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6cac.json	docs/compiler-abi.md; When bit 0 of byte 0x15bac0 is set, store 1 - clamp(r, 0, 1) as a float at OUT (EAX), r being the float ratio dword 0x42; callers 1c780@1c936,3d37c@3d3fc; guest pending
 0x000d6d5c	26	store_handle_if_enabled	code_predicates	compiles	game	confirmed	decomp/tests/0x000d6d5c.json	docs/compiler-abi.md; When bit 1 of byte 0x15bac0 is set store dword 0x420da0 at EAX; return whether it was.; callers 1c780@1cb3a,3d37c@3d43b; guest pending
 0x000d6dc4	43	init_module_d6dc4	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d6dc4.json	docs/compiler-abi.md; One-time module init; registers the exit handler at 0xd6da0.; callers d5d18@d5d39,d6e58@d6e9e,e28e8@e28ff; guest pending
 0x000d6df0	49	register_stack_ranges_d6df0	game_helpers120	compiles	game	confirmed	decomp/tests/0x000d6df0.json	docs/compiler-abi.md; Register the stack ranges 0xd7108 (0x48 bytes) and 0x1048b4 (0x400 bytes).; callers d6dc4@d6ddc; guest pending
