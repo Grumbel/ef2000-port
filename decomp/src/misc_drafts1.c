@@ -12855,3 +12855,29 @@ uint32_t any_nearby_flagged_2c358(void)
     }
     return found;
 }
+
+/* 0xbc0dc, 247 bytes. Pick a response code from the 6 x 7 byte table at 0xb9e20: the column follows the difference D of the rating bytes 0x134012[A] - 0x134012[B] (A = EAX, B = DL; bands: <= -12, <= -7, <= -3, below 3, below 7, below 12, else 0..6) and the row is a random number (0xa45b3, 16 bit) modulo 6. */
+uint32_t pick_response_bc0dc(uint32_t a, uint32_t b)
+{
+    uint8_t table[42];
+    int16_t d = (int16_t)((uint32_t)EF_U8((a & 0xffu) + 0x00134012u) - (uint32_t)EF_U8((b & 0xffu) + 0x00134012u));
+    uint32_t band;
+    uint32_t row;
+    memcpy(table, ef_guest_memory_ptr(0x000b9e20u), sizeof table);
+    if (d <= -12)
+        band = 0u;
+    else if (d <= -7)
+        band = 1u;
+    else if (d <= -3)
+        band = 2u;
+    else if (d < 3)
+        band = 3u;
+    else if (d < 7)
+        band = 4u;
+    else if (d < 12)
+        band = 5u;
+    else
+        band = 6u;
+    row = (guest_fn_a45b3() & 0xffffu) % 6u;
+    return table[row * 7u + band];
+}

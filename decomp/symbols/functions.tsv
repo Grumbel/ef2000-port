@@ -2627,7 +2627,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bbd8c	37	map_code_class_bbd8c	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbd8c.json	docs/compiler-abi.md; Map a code 1..100 to a class 0..8 (0 when out of range).; callers bbdc4@bbe00; guest pending
 0x000bbdc4	106	lookup_mapped_code_bbdc4	code_maps1	compiles	game	confirmed	decomp/tests/0x000bbdc4.json	docs/compiler-abi.md; Map an index through the mapper chosen by kind (0..3: 0xbbbe4, 0xbbb34, 0xbbae4, 0xbbd8c) and look the result up in the ; callers 8883c@8889b,8e940@8eb37,90438@90606; guest pending
 0x000bbf1c	447			unknown	unclassified	unverified		
-0x000bc0dc	247			unknown	unclassified	unverified		
+0x000bc0dc	247	pick_response_bc0dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bc0dc.json	docs/compiler-abi.md; Pick a response code from the 6 x 7 byte table at 0xb9e20: the column follows the difference D of the rating bytes 0x134; callers 16e60@16eec; guest pending
 0x000bc1d3	180	parse_open_mode_bc1d3	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000bc1d3.json	docs/compiler-abi.md; Convert an fopen mode string to open flags.; callers bc287@bc291; guest pending
 0x000bc287	200	fopen_core_bc287	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bc287.json	docs/compiler-abi.md; fopen core: open the file NAME with the mode string MODE into the stream record FILE (flags dword +0xc, handle +0x10, bu; callers bc34f@bc362; guest pending
 0x000bc34f	27	run_if_available_bc34f	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc34f.json	docs/compiler-abi.md; When 0xfa6d3(0) returns nonzero, run 0xbc287(EAX).; callers bc36a@bc36d; guest pending

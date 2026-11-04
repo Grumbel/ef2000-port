@@ -7718,3 +7718,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x2c358` | none | EAX:uint32_t | 7e89c@7e8ae | Is any record near the current one flagged by 0x2c224? Only when byte 0x196fe8 is 1: take the current record P (high wor |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbc0dc` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 16e60@16eec | Pick a response code from the 6 x 7 byte table at 0xb9e20: the column follows the difference D of the rating bytes 0x134 |

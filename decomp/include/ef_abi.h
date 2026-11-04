@@ -5604,4 +5604,6 @@ uint32_t guest_fn_6acc_x(ef_addr32 unit); /* 0x6acc EAX -> AL */
 uint32_t any_nearby_flagged_2c358(void);
 uint32_t guest_fn_2c224_x(int32_t index); /* 0x2c224 EAX -> AL */
 
+uint32_t pick_response_bc0dc(uint32_t a, uint32_t b);
+
 #endif
