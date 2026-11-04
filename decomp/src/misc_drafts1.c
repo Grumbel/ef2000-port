@@ -4539,3 +4539,40 @@ uint32_t map_key_to_command_8ae6c(uint32_t key)
     guest_callptr2_x(EF_U32(0x00132a74u), 0x0018a7a4u, key);
     return 0u;
 }
+
+/* Shared body of the two script-record starters 0xa060c and 0x9fb00: set up the 3-word position 0x417188 from the page origin (0x41718e..92, with EXTRA added to the middle word), arm the call block 0x1600a8..c0 for the record REC and call it through 0x132b14. */
+static void start_script_record(int32_t n, uint32_t extra)
+{
+    int16_t idx = (int16_t)n;
+    uint32_t rec = (uint32_t)((int32_t)idx * 0x1d) + EF_U32(0x00417174u) + 0xbu;
+    uint32_t pos = EF_U32(0x0041717cu) + (uint32_t)((int32_t)(int16_t)EF_U16(rec + 0x12u) * 2);
+    guest_callptr4_x(EF_U32(0x00132af4u), 0u, 0u, 0u, pos);
+    EF_U16(0x00417188u) = EF_U16(0x0041718eu);
+    EF_U16(0x0041718au) = (uint16_t)(EF_U16(0x00417190u) + extra);
+    EF_U16(0x0041718cu) = EF_U16(0x00417192u);
+    EF_U32(0x001600b4u) = 0x00417188u;
+    EF_U32(0x001600a8u) = (uint32_t)(int32_t)(int16_t)EF_U16(rec);
+    EF_U32(0x001600b8u) = 1u;
+    EF_U32(0x001600acu) = rec + 0x14u;
+    EF_U32(0x001600b0u) = 0x00417154u;
+    if (EF_U8(rec + 0x1cu) != 0u) {
+        EF_U16(0x00417188u) = (uint16_t)(EF_U16(0x00417188u) + EF_U16(pos));
+        EF_U16(0x0041718au) = (uint16_t)(EF_U16(0x0041718au) + EF_U16(pos + 2u));
+        EF_U16(0x0041718cu) = (uint16_t)(EF_U16(0x0041718cu) + EF_U16(pos + 4u));
+        EF_U32(0x001600b8u) = EF_U8(rec + 0x1cu);
+    }
+    guest_callptr1_x(EF_U32(0x00132b14u), (uint32_t)(int32_t)(int16_t)EF_U16(rec));
+    guest_fn_160255_x();
+}
+
+/* 0xa060c, 245 bytes. Start the script record number N of the current page. */
+void start_script_record_a060c(int32_t n)
+{
+    start_script_record(n, 0u);
+}
+
+/* 0x9fb00, 254 bytes. Start the script record number N of the current page, shifted down by the offset word 0x417222. */
+void start_script_record_9fb00(int32_t n)
+{
+    start_script_record(n, EF_U16(0x00417222u));
+}

@@ -4855,4 +4855,9 @@ uint32_t guest_fn_8ffe8_x(uint32_t id); /* 0x8ffe8 EAX -> EAX */
 
 uint32_t map_key_to_command_8ae6c(uint32_t key);
 
+void start_script_record_a060c(int32_t n);
+void start_script_record_9fb00(int32_t n);
+void guest_callptr4_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* indirect call: EAX/EDX/EBX/ECX register arguments */
+void guest_fn_160255_x(void); /* 0x160255 */
+
 #endif

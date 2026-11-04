@@ -6019,3 +6019,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8ae6c` | EAX:uint32_t | EAX:uint32_t | 69094@690e8,69094@69190,69094@692c4 | Map the key code 1..36 to its command number through a jump table (0 and anything above 36 report 0x18a7a4 through the e |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa060c` | EAX:int32_t | none | 9e7bc@9e8be | Start the script record number N of the current page. |
+| `0x9fb00` | EAX:int32_t | none | 9e7bc@9e854 | Start the script record number N of the current page, shifted down by the offset word 0x417222. |
