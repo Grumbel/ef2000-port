@@ -5739,3 +5739,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x48c90` | [ESP+4]:uint32_t,[ESP+8]:int32_t,[ESP+12]:int32_t,[ESP+16]:ef_addr32 | none | 3b58@3b78,3b58@3c13,3b58@3c66 | Draw the formatted string FMT (cdecl, variadic) at (X, Y) in the colour byte COLOR with the renderer 0xe605c (doubled co |
 | `0xf314c` | none | none | f3b78@f3c0a | Read a list of number pairs from the script into the table entry [0x1616e8]: each pair (two parsed integers, stored as w |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcec00` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:int32_t | none | 26424@265f0,387e0@38a83,3bc90@3bcb8 | Fill the rectangle (X0, Y0)-(X1, Y1) with the colour byte COLOR, clipped to the rectangle [0x15bdc0..0x15bdc4] x [0x15bd |

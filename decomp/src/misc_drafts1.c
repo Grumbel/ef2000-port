@@ -2926,3 +2926,41 @@ void read_pair_list_f314c(void)
     EF_U16(0x00484be0u + base) = (uint16_t)n;
     EF_U16(0x001616e8u) = (uint16_t)(EF_U16(0x001616e8u) + 1u);
 }
+
+/* 0xcec00, 201 bytes. Fill the rectangle (X0, Y0)-(X1, Y1) with the colour byte COLOR, clipped to the rectangle [0x15bdc0..0x15bdc4] x [0x15bdc8..0x15bdcc] (ret 4; Y1 on the stack). The corners may be given in any order; a rectangle entirely outside is ignored. */
+void fill_rect_clipped_cec00(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1)
+{
+    int32_t left = (int32_t)EF_U32(0x0015bdc0u);
+    int32_t right = (int32_t)EF_U32(0x0015bdc4u);
+    int32_t top = (int32_t)EF_U32(0x0015bdc8u);
+    int32_t bottom = (int32_t)EF_U32(0x0015bdccu);
+    uint32_t dst;
+    int32_t width;
+    int32_t t;
+    if (x0 > x1) {
+        t = x0;
+        x0 = x1;
+        x1 = t;
+    }
+    if (y0 > y1) {
+        t = y0;
+        y0 = y1;
+        y1 = t;
+    }
+    if (x0 > right || y0 > bottom || x1 < left || y1 < top)
+        return;
+    if (x0 < left)
+        x0 = left;
+    if (x1 > right)
+        x1 = right;
+    if (y0 < top)
+        y0 = top;
+    if (y1 > bottom)
+        y1 = bottom;
+    dst = EF_U32(0x0015b754u) + EF_U32(0x00163200u + (uint32_t)y0 * 4u) + (uint32_t)x0;
+    width = x1 - x0 + 1;
+    for (; y0 <= y1; y0++) {
+        fill_bytes_b3fb0(dst, (uint8_t)color, (uint32_t)width);
+        dst += EF_U32(0x001631f4u);
+    }
+}

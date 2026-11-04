@@ -4720,4 +4720,6 @@ void read_pair_list_f314c(void);
 
 
 
+void fill_rect_clipped_cec00(uint32_t color, int32_t x0, int32_t y0, int32_t x1, int32_t y1);
+
 #endif
