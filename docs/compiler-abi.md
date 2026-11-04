@@ -5317,3 +5317,13 @@ in EAX, format string address, one value).
 | `0x106d00` | EAX:uint32_t,EDX:uint32_t | none | 106d34@106d52,106e2c@106e2f | Optionally trace the string through printf (when 0x17d364 is set), then feed each byte to the handler 0x118428 of the ob |
 | `0x8fdb8` | EAX:uint32_t | EAX:uint32_t | 8fe58@8feb9 | Map the record type (low 7 bits of the first byte, 14..17) of the record at eax to 0x4a, 0x3a, 0x2e or 0x22; anything el |
 | `0x1087cd` | EAX:uint32_t | EAX:uint32_t | 1084d3@10851d | Pull characters through the reader at [obj] until one is not in the class-2 skip set (table 0x195af0, indexed by char+1) |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd6ffc` | EAX:uint32_t | none | 80400@8040a | Walk a list of record pointers until one whose first byte is zero; for each, release the range (+0x1c, +0x18) when both  |
+| `0x9cee8` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | aaa50@aaa87,eab44@eabb7,eab44@eabc8 | Seek: when flags carry bit 16 or 17 use the archive context at 0x40d1f0 (bit 16) or 0x40d1f4 and advance its cursor by a |
+| `0x97914` | EAX:uint32_t | none | 978e8@97906 | Unless 0x122c5c is set, copy the vector at obj+0x30 to a temporary, scale it by the float bits at 0x132b20 and add it to |
+| `0x8ba98` | EAX:uint32_t | none | 8bad4@8bb0d | Walk a list of length-prefixed records (word length at +0, zero ends); type byte at +2 of 0x11 links an effect via 0x8ba |
+| `0x8bad4` | EAX:uint32_t,EDX:uint32_t | none | 8bd58@8bdc5 | Build the default path with suffix 0x18a86c, append the two names, look up the UI record for it and process its effect l |

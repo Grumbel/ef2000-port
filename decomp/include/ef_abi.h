@@ -4473,4 +4473,11 @@ void guest_fn_ef9aa_x(uint32_t x0, uint32_t x1, uint32_t y0, uint32_t y1, uint32
 void guest_fn_efbd9_x(uint32_t x0, uint32_t x1, uint32_t y0, uint32_t y1, uint32_t esi_in, ef_addr32 out); /* 0xefbd9, same convention */
 void guest_fn_efdae_x(uint32_t x0, uint32_t x1, uint32_t y0, uint32_t y1, uint32_t esi_in, ef_addr32 out); /* 0xefdae, same convention */
 
+void release_record_ranges_d6ffc(uint32_t list);
+uint32_t seek_context_9cee8(uint32_t amount, uint32_t flags);
+void add_scaled_vector_97914(uint32_t obj);
+void walk_effect_records_8ba98(uint32_t rec);
+void load_effect_list_8bad4(uint32_t first, uint32_t second);
+void guest_fn_ea8cc_x(uint32_t vec, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t scale_bits); /* 0xea8cc EAX + one stack float, callee cleanup */
+
 #endif

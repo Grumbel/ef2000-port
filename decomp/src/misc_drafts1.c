@@ -316,3 +316,79 @@ uint32_t skip_and_dispatch_1087cd(uint32_t obj)
         guest_callptr_eaxedx_x(EF_U32(obj + 4u), ch, obj);
     return skipped;
 }
+
+/* 0xd6ffc, 65 bytes. Walk a list of record pointers until one whose first byte is zero; for each, release the range (+0x1c, +0x18) when both are set and clear +0x1c. */
+void release_record_ranges_d6ffc(uint32_t list)
+{
+    for (;;) {
+        uint32_t rec = EF_U32(list);
+        uint32_t base;
+        uint32_t length;
+        if (EF_U8(rec) == 0u)
+            return;
+        base = EF_U32(rec + 0x1cu);
+        length = EF_U32(rec + 0x18u);
+        if (base != 0u && length != 0u) {
+            guest_fn_104920(base, length);
+            guest_fn_c3f80(EF_U32(EF_U32(list) + 0x1cu));
+        }
+        rec = EF_U32(list);
+        list += 4u;
+        EF_U32(rec + 0x1cu) = 0u;
+    }
+}
+
+/* 0x9cee8, 68 bytes. Seek: when flags carry bit 16 or 17 use the archive context at 0x40d1f0 (bit 16) or 0x40d1f4 and advance its cursor by amount with the remaining flags; otherwise fall back to the plain 0xa7ac8 seek. */
+uint32_t seek_context_9cee8(uint32_t amount, uint32_t flags)
+{
+    if ((flags & 0x30000u) != 0u) {
+        uint32_t rest = flags & 0xfffcffffu;
+        uint32_t ctx = (flags & 0x10000u) ? EF_U32(0x0040d1f0u) : EF_U32(0x0040d1f4u);
+        return advance_cursor_ebcfc(amount, rest, ctx);
+    }
+    return seek_current_a7ac8(0u, 0u, 0u, 0u, flags, amount);
+}
+
+/* 0x97914, 59 bytes. Unless 0x122c5c is set, copy the vector at obj+0x30 to a temporary, scale it by the float bits at 0x132b20 and add it to the vector at obj+0x24. */
+void add_scaled_vector_97914(uint32_t obj)
+{
+    uint8_t tmp[12];
+    ef_addr32 t = (uint32_t)(uintptr_t)tmp;
+    if (EF_U8(0x00122c5cu) != 0u)
+        return;
+    copy_vector3(t, obj + 0x30u);
+    guest_fn_ea8cc_x(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
+    add_vector3(obj + 0x24u, t);
+}
+
+/* 0x8ba98, 60 bytes. Walk a list of length-prefixed records (word length at +0, zero ends); type byte at +2 of 0x11 links an effect via 0x8ba30 and 0x12 latches the mode word via 0x8b5f0. */
+void walk_effect_records_8ba98(uint32_t rec)
+{
+    for (;;) {
+        int16_t len = (int16_t)EF_U16(rec);
+        uint8_t type;
+        if (len == 0)
+            return;
+        type = (uint8_t)(EF_U8(rec + 2u) - 0xeu);
+        rec += 2u;
+        if (type == 3u)
+            link_effect_8ba30(rec);
+        else if (type == 4u)
+            latch_mode_word_8b5f0(rec);
+        rec += (uint32_t)(int32_t)len;
+    }
+}
+
+/* 0x8bad4, 68 bytes. Build the default path with suffix 0x18a86c, append the two names, look up the UI record for it and process its effect list. */
+void load_effect_list_8bad4(uint32_t first, uint32_t second)
+{
+    uint8_t buf[0x78];
+    ef_addr32 b = (uint32_t)(uintptr_t)buf;
+    ef_addr32 rec;
+    guest_fn_9c980_sfx(b, 0x0018a86cu);
+    guest_fn_9ca57(b, first);
+    guest_fn_9ca57(b, second);
+    rec = select_validated_ui_record(b);
+    if (rec != 0u)
+        walk_effect_records_8ba98(rec);
+}

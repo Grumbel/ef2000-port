@@ -1781,8 +1781,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008b9e8	71	find_cell_8b9e8	unit_flags	compiles	game	confirmed	decomp/tests/0x0008b9e8.json	docs/compiler-abi.md; Find the list node (list dword 0x12db5c, next at +0x1d) whose coordinates match; returns its word +0x1b or -1.; callers 3ce70@3cea4; guest pending
 0x0008ba30	70	link_effect_8ba30	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008ba30.json	docs/compiler-abi.md; Allocate the sprite for an effect and link it at the head of the ring.; callers 8ba98@8babf; guest pending
 0x0008ba78	11	clear_dword_12db5c	misc_state	compiles	game	confirmed	decomp/tests/0x0008ba78.json	docs/compiler-abi.md; dword 0x12db5c=0; callers 8bd58@8bdb7; guest pending
-0x0008ba98	60			unknown	unclassified	unverified		
-0x0008bad4	68			unknown	unclassified	unverified		
+0x0008ba98	60	walk_effect_records_8ba98	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008ba98.json	docs/compiler-abi.md; Walk a list of length-prefixed records (word length at +0, zero ends); type byte at +2 of 0x11 links an effect via 0x8ba; callers 8bad4@8bb0d; guest pending
+0x0008bad4	68	load_effect_list_8bad4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008bad4.json	docs/compiler-abi.md; Build the default path with suffix 0x18a86c, append the two names, look up the UI record for it and process its effect l; callers 8bd58@8bdc5; guest pending
 0x0008bb18	54	draw_effects_at_camera_8bb18	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008bb18.json	docs/compiler-abi.md; Draw the effects around the camera position.; callers 3dd30@3e1da; guest pending
 0x0008bb50	288	refresh_selection_frame_8bb50	game_helpers59	compiles	game	confirmed	decomp/tests/0x0008bb50.json	docs/compiler-abi.md; Per-frame selection refresh; mirrors the saved camera into the unit table.; callers 3dd30@3dff0; guest pending
 0x0008bd58	121	reset_ui_state_8bd58	screen_clip1	compiles	game	confirmed	decomp/tests/0x0008bd58.json	docs/compiler-abi.md; Reset the UI state (record table, four work areas, pool) and then run 0x8bad4 with the caller's two arguments.; callers 3cfc0@3d2ce,410d0@410e8; guest pending
@@ -1956,7 +1956,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009783c	16	reset_record_range	misc_state	compiles	game	confirmed	decomp/tests/0x0009783c.json	docs/compiler-abi.md; word+6=0 word+8=EDX-1 tail 0x975f0; callers 9775c@9782c,97860@978bd; guest pending
 0x00097860	135			unknown	unclassified	unverified		
 0x000978e8	44	update_record_978e8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000978e8.json	docs/compiler-abi.md; if word +0xa: high word +6 <= 2 -> 0x979c8,0x97914; then 0x97950; callers 97464@974a0; guest pending
-0x00097914	59			unknown	unclassified	unverified		
+0x00097914	59	add_scaled_vector_97914	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00097914.json	docs/compiler-abi.md; Unless 0x122c5c is set, copy the vector at obj+0x30 to a temporary, scale it by the float bits at 0x132b20 and add it to; callers 978e8@97906; guest pending
 0x00097950	118			unknown	unclassified	unverified		
 0x000979c8	129			unknown	unclassified	unverified		
 0x00097a4c	69	init_chain_97a4c	game_helpers22	compiles	game	confirmed	decomp/tests/0x00097a4c.json	docs/compiler-abi.md; Load two string handles and reset the chain head.; callers 3dd30@3de0b; guest pending
@@ -2052,7 +2052,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009ccb8	303			unknown	unclassified	unverified		
 0x0009cde8	154			unknown	unclassified	unverified		
 0x0009ce84	98	close_request_9ce84	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009ce84.json	docs/compiler-abi.md; Dispatch a close request by flag bits 0x10000/0x20000/0x40000.; callers f80@1ac1,f6a8@f8e4,fecc@ffa1; guest pending
-0x0009cee8	68			unknown	unclassified	unverified		
+0x0009cee8	68	seek_context_9cee8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009cee8.json	docs/compiler-abi.md; Seek: when flags carry bit 16 or 17 use the archive context at 0x40d1f0 (bit 16) or 0x40d1f4 and advance its cursor by a; callers aaa50@aaa87,eab44@eabb7,eab44@eabc8; guest pending
 0x0009cfdc	110	select_handlers_9cfdc	init_tables1	compiles	game	confirmed	decomp/tests/0x0009cfdc.json	docs/compiler-abi.md; Select the two handler pairs for a name: defaults when it is empty, otherwise build the path string at 0x40d150 from 0x4; callers 3cfc0@3d272,3cfc0@3d2fa,82cec@82cf4; guest pending
 0x0009d060	37	alloc_or_abort_9d060	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0009d060.json	docs/compiler-abi.md; Allocate a block or abort with the requested size.; callers 9d114@9d11c; guest pending
 0x0009d088	5	tail_jump_9d088	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0009d088.json	docs/compiler-abi.md; tail jump. Forward to 0xc3f80.; callers f80@1ab8,2ff44@301c3,30214@3120d; guest pending
@@ -3087,7 +3087,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d6f88	8	read_byte_d6f88	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000d6f88.json	docs/compiler-abi.md; ; callers 80120@80177; guest pending
 0x000d6f90	22	process_string_list	code_predicates	compiles	game	confirmed	decomp/tests/0x000d6f90.json	docs/compiler-abi.md; For each pointer in the array at EAX whose string is nonempty run 0xd6fa8.; callers 80058@800fa,80374@803bb,81230@812b3; guest pending
 0x000d6fa8	83	alloc_object_text_d6fa8	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000d6fa8.json	docs/compiler-abi.md; Allocate the text buffer of an object and fill it from the default text.; callers 81230@812ed,81448@814d2,d6f90@d6f9a; guest pending
-0x000d6ffc	65			unknown	unclassified	unverified		
+0x000d6ffc	65	release_record_ranges_d6ffc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6ffc.json	docs/compiler-abi.md; Walk a list of record pointers until one whose first byte is zero; for each, release the range (+0x1c, +0x18) when both ; callers 80400@8040a; guest pending
 0x000d7040	47	build_path_d7040	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d7040.json	docs/compiler-abi.md; Build "<default path><first><second>" with a fixed separator.; callers d7070@d7078; guest pending
 0x000d7070	20	build_path_d7070	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000d7070.json	docs/compiler-abi.md; ; callers d6fa8@d6fb4; guest pending
 0x000d70a0	103	claim_device_slot_d70a0	runtime_helpers16	compiles	game	confirmed	decomp/tests/0x000d70a0.json	docs/compiler-abi.md; Claim a device slot for a priority, or evict the lowest-priority one.; callers 7fcdc@7fdd4,8018c@801b1,801e4@80284; guest pending
