@@ -2849,7 +2849,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c9680	180	draw_circle_scaled_c9680	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c9680.json	docs/compiler-abi.md; Draw a full circle of colour COLOUR (EAX, byte) in the viewport record at [0x41eea0] (nothing when NULL). D (EDX), B (EB; callers 4c3bc@4c510; guest pending
 0x000c9734	409			unknown	unclassified	unverified		
 0x000c98f8	177	draw_arc_scaled_c98f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c98f8.json	docs/compiler-abi.md; Arc version of 0xc9680: draw an arc in colour COLOUR (EAX, byte) from angle LO (ECX, passed straight through) to HI (sta; callers 4c3bc@4c4e6; guest pending
-0x000c99ac	235			unknown	unclassified	unverified		
+0x000c99ac	235	fill_scaled_rect_c99ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c99ac.json	docs/compiler-abi.md; Fill a rectangle in colour COLOUR (EAX, byte) given in viewport units: X0 (EDX), Y0 (EBX), X1 (ECX) and Y1 (stack, ret 4; callers 98c1c@98d30,98c1c@98d4b,98c1c@98d66; guest pending
 0x000c9a98	531			unknown	unclassified	unverified		
 0x000c9cac	536			unknown	unclassified	unverified		
 0x000c9ec4	5	tail_jump_c9ec4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c9ec4.json	docs/compiler-abi.md; tail jump. Forward to 0xdc2c0.; callers a6038@a606f,ac5f8@ac610; guest pending

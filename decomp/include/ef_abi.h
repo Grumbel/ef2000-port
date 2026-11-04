@@ -5557,4 +5557,6 @@ uint32_t load_group_records_fecc(ef_addr32 countp, uint32_t arg, ef_addr32 name)
 void guest_fn_e7dc_x(void); /* 0xe7dc */
 void guest_fn_bc570_x(ef_addr32 obj, uint32_t arg, ef_addr32 state); /* 0xbc570 EAX/EDX/EBX */
 
+void fill_scaled_rect_c99ac(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1);
+
 #endif

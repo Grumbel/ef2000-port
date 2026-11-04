@@ -7623,3 +7623,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfecc` | EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | b0f5c@b1040,b0f5c@b123e | Load a resource of group records: NAME (EBX) is checked with the size hook 0x132ab4 and opened (0x9ccb8, kept in 0x197ab |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc99ac` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 98c1c@98d30,98c1c@98d4b,98c1c@98d66 | Fill a rectangle in colour COLOUR (EAX, byte) given in viewport units: X0 (EDX), Y0 (EBX), X1 (ECX) and Y1 (stack, ret 4 |

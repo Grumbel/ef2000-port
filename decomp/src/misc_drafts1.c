@@ -12347,3 +12347,28 @@ uint32_t load_group_records_fecc(ef_addr32 countp, uint32_t arg, ef_addr32 name)
     guest_fn_9ce84(EF_U32(0x00197ab0u));
     return 1u;
 }
+
+/* 0xc99ac, 235 bytes. Fill a rectangle in colour COLOUR (EAX, byte) given in viewport units: X0 (EDX), Y0 (EBX), X1 (ECX) and Y1 (stack, ret 4) as signed words, scaled by the viewport scale (double at +0x9f of the record at [0x41eea0]; nothing when NULL, X0 == X1 or Y0 == Y1) with the same offsets as 0xc95ac, rounded by 0x9d72c and filled with the clipped fill 0xcec00. */
+void fill_scaled_rect_c99ac(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1)
+{
+    ef_addr32 vp = EF_U32(0x0041eea0u);
+    double scale;
+    double xoff;
+    double yoff;
+    int32_t rx0;
+    int32_t ry0;
+    int32_t rx1;
+    int32_t ry1;
+    if (vp == 0u)
+        return;
+    if ((int16_t)x1 == (int16_t)x0 || (int16_t)y0 == (int16_t)y1)
+        return;
+    memcpy(&scale, ef_guest_memory_ptr(vp + 0x9fu), sizeof scale);
+    xoff = (double)(int16_t)(EF_U16(vp + 0x41u) + EF_U16(vp + 0x71u) - EF_U16(vp + 0x69u));
+    yoff = (double)(int16_t)(EF_U16(vp + 0x43u) + EF_U16(vp + 0x73u) - EF_U16(vp + 0x6bu));
+    ry1 = (int32_t)truncate_9d72c((double)(int16_t)y1 * scale + yoff);
+    rx1 = (int32_t)truncate_9d72c((double)(int16_t)x1 * scale + xoff);
+    ry0 = (int32_t)truncate_9d72c((double)(int16_t)y0 * scale + yoff);
+    rx0 = (int32_t)truncate_9d72c((double)(int16_t)x0 * scale + xoff);
+    fill_rect_clipped_cec00(colour & 0xffu, rx0, ry0, rx1, ry1);
+}
