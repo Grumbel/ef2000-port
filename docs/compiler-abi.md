@@ -5848,3 +5848,15 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x5c9d4` | EAX:uint32_t,EDX:uint32_t | none | 5c518@5c7cf,5ca60@5ca7b | Draw the horizontal tick marks of a cursor at the point stored in OBJ (x word, y word): refresh through 0x39a0c, plot th |
 | `0xca200` | EAX:uint32_t | none | ac0e0@ac108 | Load the record file NAME: build the default path with NAME appended and the suffix 0x18f058, open it through the indire |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb4db0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | c0b04@c0bc2 | Find the first node of type 0x31 whose byte +0xb passes 0xcc1ac for KIND and PARAM. KIND 0, 2 and 5 walk forward from th |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x89ac0` | EAX:uint32_t | none | 8a318@8a54c | When the object's target record (object+0x30 -> +0x4b) is in range (0x89b58), may be swapped in as the object's own targ |

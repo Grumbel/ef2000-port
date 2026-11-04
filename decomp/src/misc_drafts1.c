@@ -3658,3 +3658,54 @@ void load_record_file_ca200(uint32_t name)
     if ((guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), b, EF_U32(0x0041eea8u)) & 0xffu) != 1u)
         guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f0c0u);
 }
+
+/* 0xb4db0, 151 bytes. Find the first node of type 0x31 whose byte +0xb passes 0xcc1ac for KIND and PARAM. KIND 0, 2 and 5 walk forward from the head pointer at *HEAD_A (next link +4); 1, 3 and 4 walk backward from *HEAD_B (link +0). Returns the node or 0. */
+uint32_t find_node_b4db0(uint32_t head_a, uint32_t head_b, uint32_t kind, uint32_t param)
+{
+    uint32_t node;
+    uint32_t link;
+    uint8_t k = (uint8_t)kind;
+    if (k > 5u)
+        return 0u;
+    if (k == 0u || k == 2u || k == 5u) {
+        node = EF_U32(head_a);
+        link = 4u;
+    } else {
+        node = EF_U32(head_b);
+        link = 0u;
+    }
+    while (node != 0u) {
+        if (EF_U8(node + 0xcu) == 0x31u &&
+            (guest_fn_cc1ac(k, EF_U8(node + 0xbu), param) & 0xffffu) != 0u)
+            return node;
+        node = EF_U32(node + link);
+    }
+    return 0u;
+}
+
+/* 0x89ac0, 151 bytes. When the object's target record (object+0x30 -> +0x4b) is in range (0x89b58), may be swapped in as the object's own target: done when the target's heading object passes 0x7574c and the period check 0x89bf0, or else by a random roll (word from 0x9c960 modulo 0x5c not above the step word 0x127d92 of at most 10). The takeover copies the link, clears +0x59, copies the target word +0x16 to +0x56 and points the target's back-link +0x1c at the object. */
+void try_take_target_89ac0(uint32_t obj)
+{
+    uint32_t cur = EF_U32(obj + 0x30u);
+    uint32_t tgt = EF_U32(cur + 0x4bu);
+    uint32_t rem;
+    uint32_t step;
+    if (tgt == 0u)
+        return;
+    if ((guest_fn_89b58_x(obj) & 0xffu) == 0u)
+        return;
+    if ((guest_fn_7574c((int32_t)(EF_S32(tgt + 0x14u) >> 16)) & 0xffu) != 0u && (period_elapsed_89bf0() & 0xffu) != 0u) {
+        EF_U32(obj + 0x30u) = EF_U32(cur + 0x4bu);
+        EF_U8(obj + 0x59u) = 0u;
+        EF_U16(obj + 0x56u) = EF_U16(tgt + 0x16u);
+        EF_U32(tgt + 0x1cu) = obj;
+    }
+    rem = (guest_fn_9c960() & 0xffffu) % 0x5cu;
+    step = EF_U16(0x00127d92u);
+    if ((int32_t)rem > (int32_t)step || (int32_t)step > 10)
+        return;
+    EF_U32(obj + 0x30u) = EF_U32(cur + 0x4bu);
+    EF_U8(obj + 0x59u) = 0u;
+    EF_U16(obj + 0x56u) = EF_U16(tgt + 0x16u);
+    EF_U32(tgt + 0x1cu) = obj;
+}
