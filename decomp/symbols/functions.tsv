@@ -36,7 +36,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00001b70	359			unknown	unclassified	unverified		
 0x00001cd8	543			unknown	unclassified	unverified		
 0x00001ef8	108	tick_selector_1ef8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00001ef8.json	docs/compiler-abi.md; Every second call pick a byte from tables 0x1961f8 (stride 51) or 0x196191 (stride 52) * and store 0xf60 of it in byte 0; callers 1cd8@1ec6; guest pending
-0x00001f64	331			unknown	unclassified	unverified		
+0x00001f64	331	select_active_entry_1f64	game_helpers76	compiles	game	confirmed	decomp/tests/0x00001f64.json	docs/compiler-abi.md; Select the active entry: a direct code match first, else the best flagged candidate.; callers 1b70@1c4a,1cd8@1eb2,1cd8@1ed7; guest pending
 0x000020ec	3211			unknown	unclassified	unverified		
 0x00002d78	117	schedule_allows_2d78	game_helpers13	compiles	game	confirmed	decomp/tests/0x00002d78.json	docs/compiler-abi.md; True when both owner bytes of the 62-byte record match and the time is in range.; callers 20ec@24d9,20ec@24fd,20ec@2521; guest pending
 0x00002e04	1456			unknown	unclassified	unverified		
@@ -2277,7 +2277,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a63c0	60	update_widget_metrics_a63c0	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a63c0.json	docs/compiler-abi.md; Update a widget's position words from the colour nibble.; callers a66cc@a66e3,e1958@e1b58; guest pending
 0x000a6438	616			unknown	unclassified	unverified		
 0x000a66a0	44	walk_children_a66a0	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a66a0.json	docs/compiler-abi.md; children with low five bits of +0x8c: 0xa6438; callers a520c@a5318,a59d8@a5a2b,f13ac@f13b6; guest pending
-0x000a66cc	316			unknown	unclassified	unverified		
+0x000a66cc	316	compute_box_padding_a66cc	game_helpers76	compiles	game	confirmed	decomp/tests/0x000a66cc.json	docs/compiler-abi.md; Recompute the left/right and top/bottom padding of a layout box.; callers a6998@a69b7,a74bc@a74f1,a7588@a759b; guest pending
 0x000a6808	309			unknown	unclassified	unverified		
 0x000a6940	86	init_timers_a6940	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a6940.json	docs/compiler-abi.md; Walk the child list at +0x91 (next at +0x21) and default the timers at +0x14 / +0x16.; callers a59d8@a5a40; guest pending
 0x000a6998	53	refresh_children_a6998	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a6998.json	docs/compiler-abi.md; Refresh every child of a widget that is not of kind 9.; callers a59d8@a5a32; guest pending

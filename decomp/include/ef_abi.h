@@ -3586,4 +3586,10 @@ void guest_fn_11cfe4_x(void); /* 0x11cfe4 */
 void guest_fn_11d135_x(void); /* 0x11d135 */
 void guest_fn_11d24e_x(void); /* 0x11d24e */
 
+/* game_helpers76.c */
+void select_active_entry_1f64(void);
+void compute_box_padding_a66cc(ef_addr32 box, uint8_t grow);
+uint32_t guest_fn_f60_x(uint32_t a); /* 0xf60 EAX -> AL */
+void guest_fn_a63c0_x(uint32_t a); /* 0xa63c0 EAX */
+
 #endif

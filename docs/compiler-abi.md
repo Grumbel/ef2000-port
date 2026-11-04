@@ -4007,3 +4007,10 @@ in EAX, format string address, one value).
 | `0xf75e0` | none | none | none direct | Merge the pending flag word into the active record, or clear it. |
 | `0xf1c58` | EAX:ef_addr32 | EAX:uint32_t | ac5f8@ac69b | Run the leave callback of the old object and the refresh steps of the new one. |
 | `0x10dc7f` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | ea470@ea48e | Switch the mode of one of 12 channels, running the per-channel transition. |
+
+## game_helpers76 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1f64` | none | none | 1b70@1c4a,1cd8@1eb2,1cd8@1ed7 | Select the active entry: a direct code match first, else the best flagged candidate. |
+| `0xa66cc` | EAX:ef_addr32,DL:uint8_t | none | a6998@a69b7,a74bc@a74f1,a7588@a759b | Recompute the left/right and top/bottom padding of a layout box. |
