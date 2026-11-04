@@ -3875,3 +3875,12 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc964` | none | none | bfcc@c27f | Recompute the ratio of matching entries and store it as a float. |
 | `0x16bac` | EAX:int32_t,EDX:ef_addr32,EBX:ef_addr32 | EAX:double | 168d8@1690e,16e60@16f07,16e60@17025 | Pick the best-rated weapon among a record's carried ones, returned scaled. |
+
+## game_helpers59 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x57480` | EAX:ef_addr32 | none | 581b0@5857d | Copy a decoded descriptor into its 0x30-byte table entry. |
+| `0x8bb50` | none | none | 3dd30@3dff0 | Per-frame selection refresh; mirrors the saved camera into the unit table. |
+| `0x93060` | none | none | 95e58@96bb3 | Point the scene camera at the current weapon station's object. |
+| `0x95ae0` | none | none | 95e58@96717 | Set up the scene camera from the pending target record, or a default view. |

@@ -3443,4 +3443,18 @@ ef_addr32 mark_entry_at_point_82b8(int32_t x, int32_t y);
 void update_match_ratio_c964(void);
 double pick_best_weapon_16bac(int32_t record_index, ef_addr32 kind_out, ef_addr32 id_out);
 
+/* game_helpers59.c */
+void store_descriptor_entry_57480(ef_addr32 src);
+void refresh_selection_frame_8bb50(void);
+void aim_scene_at_station_93060(void);
+void setup_scene_camera_95ae0(void);
+void guest_fn_cd20c_w(uint32_t a); /* 0xcd20c EAX */
+void guest_fn_8dd48_w(void); /* 0x8dd48 */
+void guest_fn_90828_w(void); /* 0x90828 */
+void guest_fn_7eccc_w(void); /* 0x7eccc */
+void guest_fn_7e8c0_w(uint32_t a); /* 0x7e8c0 EAX */
+void guest_fn_7e7e0_w(uint32_t a, uint32_t b); /* 0x7e7e0 EAX/EDX */
+void guest_fn_92ffc_w(void); /* 0x92ffc */
+void guest_fn_957c8_w(uint32_t a); /* 0x957c8 EAX */
+
 #endif

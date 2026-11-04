@@ -1083,7 +1083,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00057348	33	send_word_byte_packet_3d	marker_packets	compiles	game	confirmed	decomp/tests/0x00057348.json	docs/compiler-abi.md; Packet 3d AX DL size 4; sole direct caller 775f0@7771e; guest pending
 0x0005736c	100	clear_owner_slot_5736c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0005736c.json	docs/compiler-abi.md; Clear slot message[3] of the owner's table.; callers 581b0@5856e; guest pending
 0x000573d0	176	send_table_entry_573d0	game_helpers19	compiles	game	confirmed	decomp/tests/0x000573d0.json	docs/compiler-abi.md; Send entry idx of the 48-byte table at 0x211af0 (command 0x3f).; callers 90ac4@90c0e,90c6c@90f36; guest pending
-0x00057480	380			unknown	unclassified	unverified		
+0x00057480	380	store_descriptor_entry_57480	game_helpers59	compiles	game	confirmed	decomp/tests/0x00057480.json	docs/compiler-abi.md; Copy a decoded descriptor into its 0x30-byte table entry.; callers 581b0@5857d; guest pending
 0x000575fc	36	send_two_word_packet_40	marker_packets	compiles	game	confirmed	decomp/tests/0x000575fc.json	docs/compiler-abi.md; Packet 40 AX DX size 5; sole direct caller 910f4@911e5; guest pending
 0x00057620	48	handle_entry_57620	game_helpers5	compiles	game	confirmed	decomp/tests/0x00057620.json	docs/compiler-abi.md; ; callers 581b0@5858c; guest pending
 0x00057650	31	send_word_packet_2e	marker_packets	compiles	game	confirmed	decomp/tests/0x00057650.json	docs/compiler-abi.md; Packet 2e AX size 3; sole direct caller 74584@7469a; guest pending
@@ -1784,7 +1784,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008ba98	60			unknown	unclassified	unverified		
 0x0008bad4	68			unknown	unclassified	unverified		
 0x0008bb18	54	draw_effects_at_camera_8bb18	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008bb18.json	docs/compiler-abi.md; Draw the effects around the camera position.; callers 3dd30@3e1da; guest pending
-0x0008bb50	288			unknown	unclassified	unverified		
+0x0008bb50	288	refresh_selection_frame_8bb50	game_helpers59	compiles	game	confirmed	decomp/tests/0x0008bb50.json	docs/compiler-abi.md; Per-frame selection refresh; mirrors the saved camera into the unit table.; callers 3dd30@3dff0; guest pending
 0x0008bd58	121			unknown	unclassified	unverified		
 0x0008bdd4	11	copy_dword_20f420_to_132ad4	misc_state	compiles	game	confirmed	decomp/tests/0x0008bdd4.json	docs/compiler-abi.md; dword 0x132ad4=dword 0x20f420; callers 3ea0c@3eec5; guest pending
 0x0008bde0	6	set_global_8bde0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0008bde0.json	docs/compiler-abi.md; ; callers 888cc@889eb,888cc@88a70; guest pending
@@ -1909,7 +1909,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00092f10	135	reset_scene_record_92f10	float_helpers4	compiles	game	confirmed	decomp/tests/0x00092f10.json	docs/compiler-abi.md; Reset the scene record from the current object and the scene angle record.; callers 95e58@96ce1; guest pending
 0x00092f98	98	update_viewpoint_92f98	camera_helpers	compiles	game	confirmed	decomp/tests/0x00092f98.json	docs/compiler-abi.md; ; callers 95e58@96cf0; guest pending
 0x00092ffc	99	step_list_92ffc	camera_helpers	compiles	game	confirmed	decomp/tests/0x00092ffc.json	docs/compiler-abi.md; Step byte 0x12dc34 through the list of words at +0x50 of the current record, skipping the player.; callers 93060@93098; guest pending
-0x00093060	269			unknown	unclassified	unverified		
+0x00093060	269	aim_scene_at_station_93060	game_helpers59	compiles	game	confirmed	decomp/tests/0x00093060.json	docs/compiler-abi.md; Point the scene camera at the current weapon station's object.; callers 95e58@96bb3; guest pending
 0x00093170	1036			unknown	unclassified	unverified		
 0x0009357c	1293			unknown	unclassified	unverified		
 0x00093a8c	972			unknown	unclassified	unverified		
@@ -1944,7 +1944,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000957c8	161			unknown	unclassified	unverified		
 0x0009586c	256			unknown	unclassified	unverified		
 0x0009596c	370			unknown	unclassified	unverified		
-0x00095ae0	276			unknown	unclassified	unverified		
+0x00095ae0	276	setup_scene_camera_95ae0	game_helpers59	compiles	game	confirmed	decomp/tests/0x00095ae0.json	docs/compiler-abi.md; Set up the scene camera from the pending target record, or a default view.; callers 95e58@96717; guest pending
 0x00095bf4	313			unknown	unclassified	unverified		
 0x00095e58	4618			unknown	unclassified	unverified		
 0x00097064	620			unknown	unclassified	unverified		
