@@ -12821,3 +12821,37 @@ void pick_nearest_unit_65c1c(void)
     }
     EF_U16(0x001a8242u) = (uint16_t)best;
 }
+
+/* 0x2c358, 251 bytes. Is any record near the current one flagged by 0x2c224? Only when byte 0x196fe8 is 1: take the current record P (high word of 0x19bb5c) and scan the records P - 4 .. P + 4 (clamped to 0 and the count at 0x19bb54) whose group word (+0x1c) equals P's, then P itself unless it is 0xff, and with byte 0x127da9 set the owner records (+0x26 high word) of the objects listed at 0x1a5c2e + 0x1b * i (count byte 0x12583a); each is passed to 0x2c224 and a true result makes the function return 1. */
+uint32_t any_nearby_flagged_2c358(void)
+{
+    uint8_t found = 0u;
+    int32_t p;
+    int32_t start;
+    int32_t end;
+    int32_t i;
+    uint32_t group;
+    uint8_t n;
+    if (EF_U8(0x00196fe8u) != 1u)
+        return 0u;
+    p = (int32_t)EF_U32(0x0019bb5cu) >> 16;
+    group = EF_U16(EF_U32(0x0019bb58u) + (uint32_t)p * 0xcau + 0x1cu);
+    start = p - 4 > 0 ? p - 4 : 0;
+    end = p + 4 < (int32_t)EF_U32(0x0019bb54u) ? p + 4 : (int32_t)EF_U32(0x0019bb54u);
+    for (i = start; (int16_t)i <= (int16_t)end && (int16_t)start <= (int16_t)end; i++) {
+        if (EF_U16(EF_U32(0x0019bb58u) + (uint32_t)(int32_t)(int16_t)i * 0xcau + 0x1cu) == (uint16_t)group &&
+            (uint8_t)guest_fn_2c224_x((int32_t)(int16_t)i) != 0u)
+            found = 1u;
+    }
+    p = (int32_t)EF_U32(0x0019bb5cu) >> 16;
+    if (p != 0xff && (uint8_t)guest_fn_2c224_x(p) != 0u)
+        found = 1u;
+    if (EF_U8(0x00127da9u) != 0u) {
+        for (n = 0u; n < EF_U8(0x0012583au); n++) {
+            ef_addr32 u = guest_fn_7489c((int32_t)EF_U32((uint32_t)n * 0x1bu + 0x001a5c2eu) >> 16);
+            if (u != 0u && (uint8_t)guest_fn_2c224_x((int32_t)EF_U32(u + 0x26u) >> 16) != 0u)
+                found = 1u;
+        }
+    }
+    return found;
+}

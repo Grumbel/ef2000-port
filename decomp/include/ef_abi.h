@@ -5601,4 +5601,7 @@ void guest_fn_6e8d8_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double
 void pick_nearest_unit_65c1c(void);
 uint32_t guest_fn_6acc_x(ef_addr32 unit); /* 0x6acc EAX -> AL */
 
+uint32_t any_nearby_flagged_2c358(void);
+uint32_t guest_fn_2c224_x(int32_t index); /* 0x2c224 EAX -> AL */
+
 #endif

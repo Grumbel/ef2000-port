@@ -7712,3 +7712,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x65c1c` | none | none | 65a50@65a7b | Pick the nearest unit of kind 3 (0x6acc) to the viewpoint (dwords 0x1a5bec, 0x1a5bf0, 0x1a5be8 divided by 256) among the |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2c358` | none | EAX:uint32_t | 7e89c@7e8ae | Is any record near the current one flagged by 0x2c224? Only when byte 0x196fe8 is 1: take the current record P (high wor |
