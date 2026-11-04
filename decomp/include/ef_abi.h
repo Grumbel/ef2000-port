@@ -2185,4 +2185,17 @@ int32_t scale_by_magnitude_d77dc(int16_t a, int16_t b);
 void shift_window_d7bf0(void);
 
 
+/* game_helpers24.c */
+void set_view_origin_dc21c(uint32_t stack_a, uint32_t stack_b, uint32_t stack_y, uint32_t stack_x);
+void rotate_point_dc7e4(ef_addr32 out, int16_t a, int16_t b);
+void halve_triple_to_fit16_dc890(ef_addr32 a, ef_addr32 b, ef_addr32 c);
+uint32_t text_width_4_dced0(ef_addr32 text);
+uint32_t text_width_5_dd10c(ef_addr32 text);
+uint32_t text_width_6_dd210(ef_addr32 text);
+uint32_t text_width_raw_dd650(ef_addr32 text);
+void get_view_state_dd988(ef_addr32 out_a, ef_addr32 out_b, ef_addr32 out_c, ef_addr32 out_d,
+                          ef_addr32 stack_e, ef_addr32 stack_f, ef_addr32 stack_g, ef_addr32 stack_h);
+uint32_t read_plane_pixel_dec4c(int32_t x, int32_t y);
+
+
 #endif

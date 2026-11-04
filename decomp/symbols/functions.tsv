@@ -3206,7 +3206,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc124	175	setsun		named	unclassified	unverified		
 0x000dc1d4	21			unknown	unclassified	unverified		
 0x000dc1e9	21			unknown	unclassified	unverified		
-0x000dc21c	52			unknown	unclassified	unverified		
+0x000dc21c	52	set_view_origin_dc21c	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc21c.json	docs/compiler-abi.md; Store two 16.16 coordinates (with a half-unit bias) from stack arguments.; callers 1e480@1e4d8,3cfc0@3d26b,63d5c@63ec5; guest pending
 0x000dc250	46			unknown	unclassified	unverified		
 0x000dc280	60			unknown	unclassified	unverified		
 0x000dc2c0	23	clear_buffer_dc2c0	math_string	compiles	game	confirmed	decomp/tests/0x000dc2c0.json	docs/compiler-abi.md; 0xb3fb0(dword 0x15b754, 0, dword 0x164600).; callers 1e480@1e51c,1e480@1e58f,1e480@1e636; guest pending
@@ -3220,10 +3220,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc5a9	158			unknown	unclassified	unverified		
 0x000dc71b	73			unknown	unclassified	unverified		
 0x000dc7bc	40			unknown	unclassified	unverified		
-0x000dc7e4	78			unknown	unclassified	unverified		
+0x000dc7e4	78	rotate_point_dc7e4	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc7e4.json	docs/compiler-abi.md; Rotate (b, a) by the sine/cosine pair at 0x425f90 and store two words.; callers 1f0fc@1f2c3,1f0fc@1f2df,1f0fc@1f302; guest pending
 0x000dc832	37			unknown	unclassified	unverified		
 0x000dc860	47	halve_pair_to_fit16	math_string	compiles	game	confirmed	decomp/tests/0x000dc860.json	docs/compiler-abi.md; Halve the dwords at EAX and EDX until both fit in a signed 16-bit range.; callers dc8d8@dc906; guest pending
-0x000dc890	69			unknown	unclassified	unverified		
+0x000dc890	69	halve_triple_to_fit16_dc890	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc890.json	docs/compiler-abi.md; Halve three dwords until all fit in a signed 16-bit range.; callers dc91c@dc98f,dcaa4@dcb2a; guest pending
 0x000dc8d8	67			unknown	unclassified	unverified		
 0x000dc91c	180			unknown	unclassified	unverified		
 0x000dcaa4	207			unknown	unclassified	unverified		
@@ -3233,12 +3233,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dcc54	67	reset_clip_dcc54	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000dcc54.json	docs/compiler-abi.md; Same as dcc10 with the stores in a different order.; callers a9e70@a9eb7; guest pending
 0x000dcc98	61			unknown	unclassified	unverified		
 0x000dccd8	98			unknown	unclassified	unverified		
-0x000dced0	88			unknown	unclassified	unverified		
+0x000dced0	88	text_width_4_dced0	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dced0.json	docs/compiler-abi.md; Pixel width of a string in the font with 4-pixel blanks.; callers a82f0@a84d1; guest pending
 0x000dcf28	135			unknown	unclassified	unverified		
-0x000dd10c	87			unknown	unclassified	unverified		
+0x000dd10c	87	text_width_5_dd10c	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd10c.json	docs/compiler-abi.md; Pixel width of a string in the font with 5-pixel blanks.; callers a82f0@a84df; guest pending
 0x000dd164	74			unknown	unclassified	unverified		
 0x000dd1b0	95			unknown	unclassified	unverified		
-0x000dd210	89			unknown	unclassified	unverified		
+0x000dd210	89	text_width_6_dd210	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd210.json	docs/compiler-abi.md; Pixel width of a string in the font with 6-pixel blanks and 2-pixel gaps.; callers a82f0@a84d8; guest pending
 0x000dd26c	133			unknown	unclassified	unverified		
 0x000dd2f4	122			unknown	unclassified	unverified		
 0x000dd370	238			unknown	unclassified	unverified		
@@ -3246,7 +3246,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd4c4	150			unknown	unclassified	unverified		
 0x000dd55c	94			unknown	unclassified	unverified		
 0x000dd5bc	148			unknown	unclassified	unverified		
-0x000dd650	78			unknown	unclassified	unverified		
+0x000dd650	78	text_width_raw_dd650	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd650.json	docs/compiler-abi.md; Pixel width of a string; blanks are tested before masking.; callers 27d18@27d9a,27d18@27de7,27fec@28192; guest pending
 0x000dd6a0	134			unknown	unclassified	unverified		
 0x000dd728	94			unknown	unclassified	unverified		
 0x000dd788	218			unknown	unclassified	unverified		
@@ -3254,7 +3254,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd8c0	14			unknown	unclassified	unverified		
 0x000dd8d0	12			unknown	unclassified	unverified		
 0x000dd8dc	170			unknown	unclassified	unverified		
-0x000dd988	90			unknown	unclassified	unverified		
+0x000dd988	90	get_view_state_dd988	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd988.json	docs/compiler-abi.md; Copy the saved view state at 0x15ee80..0x15ee90 to eight output pointers.; callers f2ac0@f2b0e; guest pending
 0x000dd9e4	112			unknown	unclassified	unverified		
 0x000ddae0	232			unknown	unclassified	unverified		
 0x000ddbc8	14	to_upper_ascii	math_string	compiles	game	confirmed	decomp/tests/0x000ddbc8.json	docs/compiler-abi.md; Signed 'a'..'z' to uppercase.; callers 27fec@28121,a82f0@a8374,a9130@a9355; guest pending
@@ -3279,7 +3279,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000deb87	108			unknown	unclassified	unverified		
 0x000dec00	21	plot_byte	math_string	compiles	game	confirmed	decomp/tests/0x000dec00.json	docs/compiler-abi.md; Byte at dword 0x15b754 + EDX + dword 0x163200[EBX] = AL.; callers none direct; guest pending
 0x000dec18	51	plot_byte_clipped	math_string	compiles	game	confirmed	decomp/tests/0x000dec18.json	docs/compiler-abi.md; As 0xdec00 but only inside the signed clip rectangle * 0x15bdc0..c4 (x) and 0x15bdc8..cc (y).; callers 39a0c@39a69,39a0c@39b47,3a3a8@3b84b; guest pending
-0x000dec4c	65			unknown	unclassified	unverified		
+0x000dec4c	65	read_plane_pixel_dec4c	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dec4c.json	docs/compiler-abi.md; Read a byte from the clipped 8-bit plane, or -1 outside the window.; callers 75f00@75fbf,75f00@75fe3,75f00@76005; guest pending
 0x000dec90	30	length_squared_dec90	math_string	compiles	game	confirmed	decomp/tests/0x000dec90.json	docs/compiler-abi.md; 0xe2b60 of the sum of squares of three signed words.; callers 9e0c4@9e195,a0aa0@a0b49,a2500@a2580; guest pending
 0x000decb0	19	length_2d_decb0	math_string	compiles	game	confirmed	decomp/tests/0x000decb0.json	docs/compiler-abi.md; Low word of 0xe2b60(EAX^2 + EDX^2).; callers 2f740@2f786,dc91c@dc99b,dcaa4@dcb36; guest pending
 0x000decc4	26	length_3d_decc4	math_string	compiles	game	confirmed	decomp/tests/0x000decc4.json	docs/compiler-abi.md; Low word of 0xe2b60(EAX^2 + EDX^2 + EBX^2).; callers 30214@311ed,31514@31588,83a40@83adb; guest pending

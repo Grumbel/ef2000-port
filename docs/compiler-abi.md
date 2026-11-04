@@ -2941,3 +2941,17 @@ in EAX, format string address, one value).
 | `0xd7704` | EAX:ef_addr32,DX:uint16_t | EAX:uint32_t | 7ef14@7f5fe,7ef14@7f674 | Add to the word at +0xf and return the new value. |
 | `0xd77dc` | AX:int16_t,DX:int16_t | EAX:int32_t | 7fcdc@7fdbb | Scale -(a << 6) by the magnitude of b plus one, biased by 0x40. |
 | `0xd7bf0` | none | none | d7c40@d7cad,d7cb8@d7e87 | Shift four window words by ten. |
+
+## game_helpers24 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdc21c` | [ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | 1e480@1e4d8,3cfc0@3d26b,63d5c@63ec5 | Store two 16.16 coordinates (with a half-unit bias) from stack arguments. |
+| `0xdc7e4` | EAX:ef_addr32,DX:int16_t,BX:int16_t | none | 1f0fc@1f2c3,1f0fc@1f2df,1f0fc@1f302 | Rotate (b, a) by the sine/cosine pair at 0x425f90 and store two words. |
+| `0xdc890` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | dc91c@dc98f,dcaa4@dcb2a | Halve three dwords until all fit in a signed 16-bit range. |
+| `0xdced0` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a84d1 | Pixel width of a string in the font with 4-pixel blanks. |
+| `0xdd10c` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a84df | Pixel width of a string in the font with 5-pixel blanks. |
+| `0xdd210` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a84d8 | Pixel width of a string in the font with 6-pixel blanks and 2-pixel gaps. |
+| `0xdd650` | EAX:ef_addr32 | EAX:uint32_t | 27d18@27d9a,27d18@27de7,27fec@28192 | Pixel width of a string; blanks are tested before masking. |
+| `0xdd988` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32,[ESP+12]:ef_addr32,[ESP+16]:ef_addr32 | none | f2ac0@f2b0e | Copy the saved view state at 0x15ee80..0x15ee90 to eight output pointers. |
+| `0xdec4c` | EAX:int32_t,EDX:int32_t | EAX:uint32_t | 75f00@75fbf,75f00@75fe3,75f00@76005 | Read a byte from the clipped 8-bit plane, or -1 outside the window. |
