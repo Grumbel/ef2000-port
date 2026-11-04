@@ -5859,4 +5859,6 @@ uint32_t guest_fn_cd24c_x(void); /* 0xcd24c -> AX */
 
 uint32_t advance_to_nearby_object_6aa70(uint32_t ax);
 
+uint32_t pick_nearest_candidate_6a8fc(uint32_t ax);
+
 #endif

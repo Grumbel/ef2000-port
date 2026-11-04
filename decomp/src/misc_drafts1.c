@@ -16424,3 +16424,48 @@ uint32_t advance_to_nearby_object_6aa70(uint32_t ax)
 	}
 	return ((int32_t)EF_U32(unit + 0x168u) >> 16) == 0xff ? 0u : 1u;
 }
+
+/* 0x6a8fc, 369 bytes. Choose the nearest valid candidate in the eight-entry candidate list (words at +0x12b, 2 bytes apart; 0xff means empty) of unit AX (signed). A candidate counts when 0x6a82c accepts the pair, the candidate unit exists, has no target (+0x1c) and bit 1 of byte +0x24 clear, each coordinate difference (doubles at +0x49, +0x51, +0x59; truncated by 0x9d72c and made absolute by 0xa28f2) is below the best distance so far and the indexed distance 0x6a5f0 is below it too. The best distance starts at 100000.0; the closest candidate's word is stored in word +0x146 of the unit. Returns 1 when any candidate was chosen, otherwise 0 (also for a missing unit). */
+uint32_t pick_nearest_candidate_6a8fc(uint32_t ax)
+{
+	uint32_t unit, p, other_u;
+	int32_t j, other, diff;
+	double best = 100000.0, d;
+	int found = 0;
+	static const uint32_t axis[3] = { 0x49u, 0x51u, 0x59u };
+	double a, b;
+	int k, skip;
+
+	unit = guest_fn_7489c((int32_t)(int16_t)ax);
+	if (unit == 0u)
+		return 0u;
+	for (j = 0; j < 8; j++) {
+		p = unit + (uint32_t)(j * 2);
+		other = (int32_t)EF_U32(p + 0x129u) >> 16;
+		if (other == 0xff)
+			continue;
+		if (is_valid_target_6a82c((int16_t)ax, (int16_t)other) == 0u)
+			continue;
+		other_u = guest_fn_7489c(other);
+		if (EF_U32(other_u + 0x1cu) != 0u || (EF_U8(other_u + 0x24u) & 2u) != 0u)
+			continue;
+		skip = 0;
+		for (k = 0; k < 3 && !skip; k++) {
+			memcpy(&a, ef_guest_memory_ptr(unit + axis[k]), sizeof a);
+			memcpy(&b, ef_guest_memory_ptr(other_u + axis[k]), sizeof b);
+			diff = (int32_t)truncate_9d72c(a - b);
+			diff = (int32_t)abs_a28f2(diff);
+			if (!((double)diff < best))
+				skip = 1;
+		}
+		if (skip)
+			continue;
+		d = indexed_object_distance((int16_t)ax, (int16_t)other);
+		if (!(d < best))
+			continue;
+		EF_U16(unit + 0x146u) = EF_U16(p + 0x12bu);
+		best = d;
+		found = 1;
+	}
+	return found ? 1u : 0u;
+}
