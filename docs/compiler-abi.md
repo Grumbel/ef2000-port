@@ -4370,3 +4370,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xdcf28` | AL:uint8_t,DX:int16_t,BX:int16_t,CX:int16_t | AL:uint8_t | dd26c@dd2de | Draw the glyph for a character code (0xa5 maps to 0x4e, codes above 0x7f use the extended tables) through cf7c4; returns |
+
+## game_helpers110 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x49144` | AX:int16_t | none | 3a3a8@3a566,646d4@6479b | Draw the outline of widget record idx: its centre (x,y) and size (w,h) become a rectangle; mode 0 when the record's kind |
+| `0x22e98` | AX:int16_t | none | 1f960@1f968 | Highlight widget record idx: when its slot byte is set, look the text slot up and enter scroll mode, then draw the recta |

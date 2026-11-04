@@ -355,7 +355,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00020b10	2881			unknown	unclassified	unverified		
 0x00021654	1967			unknown	unclassified	unverified		
 0x00021e04	616			unknown	unclassified	unverified		
-0x00022e98	142			unknown	unclassified	unverified		
+0x00022e98	142	highlight_widget_22e98	game_helpers110	compiles	game	confirmed	decomp/tests/0x00022e98.json	docs/compiler-abi.md; Highlight widget record idx: when its slot byte is set, look the text slot up and enter scroll mode, then draw the recta; callers 1f960@1f968; guest pending
 0x00022f28	241			unknown	unclassified	unverified		
 0x000233c4	920			unknown	unclassified	unverified		
 0x00023760	48	position_delta_metric	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX pointer to 3 dwords produces signed metric
@@ -838,7 +838,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00048e7c	464			unknown	unclassified	unverified		
 0x0004904c	6	get_byte_4904c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0004904c.json	docs/compiler-abi.md; ; callers 1cde8@1ce2f,1cde8@1cef7; guest pending
 0x00049054	61	clear_tactical_accumulators	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00049054.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
-0x00049144	156			unknown	unclassified	unverified		
+0x00049144	156	draw_widget_rect_49144	game_helpers110	compiles	game	confirmed	decomp/tests/0x00049144.json	docs/compiler-abi.md; Draw the outline of widget record idx: its centre (x,y) and size (w,h) become a rectangle; mode 0 when the record's kind; callers 3a3a8@3a566,646d4@6479b; guest pending
 0x00049228	2484			unknown	unclassified	unverified		
 0x00049bdc	245			unknown	unclassified	unverified		
 0x00049cd4	86	copy_row_words_49cd4	game_helpers30	compiles	game	confirmed	decomp/tests/0x00049cd4.json	docs/compiler-abi.md; Copy the row words selected by an object's count into the 0x1a5280 list.; callers 49bdc@49c4c; guest pending

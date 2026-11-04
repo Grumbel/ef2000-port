@@ -3867,4 +3867,8 @@ uint32_t guest_fn_cc6c0_z(uint32_t size, ef_addr32 tag, uint32_t n); /* 0xcc6c0 
 /* game_helpers109.c */
 uint8_t draw_glyph_dcf28(uint8_t code, int16_t dx_val, int16_t bx_val, int16_t cx_val);
 
+/* game_helpers110.c */
+void draw_widget_rect_49144(int16_t idx);
+void highlight_widget_22e98(int16_t idx);
+
 #endif
