@@ -719,7 +719,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003d950	210			unknown	unclassified	unverified		
 0x0003da24	92	all_entries_ready_3da24	game_helpers8	compiles	game	confirmed	decomp/tests/0x0003da24.json	docs/compiler-abi.md; Are all entries of the table at 0x12b268 satisfied?; callers none direct; guest pending
 0x0003db9c	84	run_timed_events_3db9c	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0003db9c.json	docs/compiler-abi.md; Fire due events from the 9-byte table at 0x1a5a28.; callers 3dd30@3dfa9; guest pending
-0x0003dbf0	189			unknown	unclassified	unverified		
+0x0003dbf0	189	check_unit_leaves_map_3dbf0	game_helpers63	compiles	game	confirmed	decomp/tests/0x0003dbf0.json	docs/compiler-abi.md; Flag the player unit as out of the map when its cell leaves the valid range.; callers 3dd30@3dfb3; guest pending
 0x0003dcb0	15	run_reset_sequence_3dcb0	low_helpers	compiles	game	confirmed	decomp/tests/0x0003dcb0.json	docs/compiler-abi.md; 0x394e0, 0x8846c, tail 0x888cc; callers 3dd30@3e015; guest pending
 0x0003dcc0	10	set_runtime_phase_five	runtime_control	compiles	game	confirmed	decomp/tests/0x0003dcc0.json	docs/compiler-abi.md; Literal five written to word 0x1a35ec; original guest replacement unverified
 0x0003dccc	56			unknown	unclassified	unverified		
@@ -936,7 +936,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005089c	96	mpType2Click		named	unclassified	unverified		
 0x000508fc	96	mpType3Click		named	unclassified	unverified		
 0x0005095c	96	mpType4Click		named	unclassified	unverified		
-0x000509bc	96			unknown	unclassified	unverified		
+0x000509bc	96	apply_tactical_code_509bc	game_helpers63	compiles	game	confirmed	decomp/tests/0x000509bc.json	docs/compiler-abi.md; Select the tactical code from a two-digit field and apply or bind it.; callers none direct; guest pending
 0x00050a1c	54	tactical_lookup_contains	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00050a1c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00050b68	193			unknown	unclassified	unverified		
 0x00050c2c	18	mpChangeMode		named	unclassified	unverified		
@@ -1121,7 +1121,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005a2d0	405			unknown	unclassified	unverified		
 0x0005a468	1127			unknown	unclassified	unverified		
 0x0005a8d0	197	submit_view_5a8d0	line_of_sight	compiles	game	confirmed	decomp/tests/0x0005a8d0.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x0005a998	117			unknown	unclassified	unverified		
+0x0005a998	117	draw_player_coordinates_5a998	game_helpers63	compiles	game	confirmed	decomp/tests/0x0005a998.json	docs/compiler-abi.md; Draw the tactical coordinates of the player unit from the current table row.; callers none direct; guest pending
 0x0005aa10	82	count_matching_activity_slots	tactical_io	compiles	game	confirmed	decomp/tests/0x0005aa10.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0005aa64	651			unknown	unclassified	unverified		
 0x0005acf0	384			unknown	unclassified	unverified		
@@ -1459,7 +1459,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a66c	204			unknown	unclassified	unverified		
 0x0007a738	265			unknown	unclassified	unverified		
 0x0007a844	375			unknown	unclassified	unverified		
-0x0007a9bc	111			unknown	unclassified	unverified		
+0x0007a9bc	111	replay_plane_grid_7a9bc	game_helpers63	compiles	game	confirmed	decomp/tests/0x0007a9bc.json	docs/compiler-abi.md; Replay the 400x400 byte-pair grid through the plane source when it is enabled.; callers 7a454@7a45f; guest pending
 0x0007aa2c	15			unknown	unclassified	unverified		
 0x0007aa3c	132	pick_random_pair_7aa3c	game_helpers27	compiles	game	confirmed	decomp/tests/0x0007aa3c.json	docs/compiler-abi.md; Pick two random table values for the current stream slot.; callers 7ab00@7abc4; guest pending
 0x0007aac0	61	select_plane_source	plane_sources	compiles	game	confirmed	decomp/tests/0x0007aac0.json	docs/compiler-abi.md

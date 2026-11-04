@@ -3904,3 +3904,12 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfd404` | EAX:uint32_t | EAX:uint32_t | c4310@c4333 | Redirect any of a fixed set of code addresses to the shared handler 0xfd52f. |
+
+## game_helpers63 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x509bc` | EAX:ef_addr32 | none | none direct | Select the tactical code from a two-digit field and apply or bind it. |
+| `0x3dbf0` | none | none | 3dd30@3dfb3 | Flag the player unit as out of the map when its cell leaves the valid range. |
+| `0x7a9bc` | none | none | 7a454@7a45f | Replay the 400x400 byte-pair grid through the plane source when it is enabled. |
+| `0x5a998` | none | none | none direct | Draw the tactical coordinates of the player unit from the current table row. |
