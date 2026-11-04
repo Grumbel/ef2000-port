@@ -20473,3 +20473,55 @@ int32_t rotate_view_test_160156(ef_addr32 out, uint32_t z, uint32_t y, uint32_t 
     t = point_in_view_volume_ceb40(0u, 0u, 0u, 0u, (int32_t)(margin & 0xffffu), r[2], r[1], r[0]);
     return (t & 1u) ? 0 : -1;
 }
+
+/* 0xfdf60, 349 bytes. (ret 12; three stack arguments R, Y, X) Draw a filled disc of radius R-1 centred at (X, Y) (signed words) with colour byte 0x159138, clipped against the window words 0x15bdc0..0x15bdcc (x min/max, y min/max, all exclusive for the single-pixel cases). R <= 0 draws nothing; R == 1 plots one pixel (pointer 0xfc894, 0xfedcc), R == 2 a 2x2 block (pointer 0xfc898, 0xfeddc), larger discs (radius capped at 200) must lie completely inside the window and are filled row by row with the two circle walks 0xfde20/0xfdec0 and the range callback 0xfddf0, whose centre dword lives in the original's stack frame (here the scratch dword 0x485ff4). */
+void draw_disc_fdf60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t r, uint32_t y, uint32_t x)
+{
+    int32_t s, xs, ys, xl, xr, yt, yb, err;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if ((int16_t)r < 0)
+        return;
+    r = (r - 1u) & 0xffffu;
+    s = (int16_t)r;
+    xs = (int16_t)x;
+    ys = (int16_t)y;
+    if (s < 2) {
+        if (xs <= (int32_t)EF_U32(0x0015bdc0u) || xs >= (int32_t)EF_U32(0x0015bdc4u))
+            return;
+        if (ys <= (int32_t)EF_U32(0x0015bdc8u) || ys >= (int32_t)EF_U32(0x0015bdccu))
+            return;
+        if (r == 0u)
+            put_pixel_fedcc((uint32_t)ys, (uint32_t)xs, EF_U8(0x00159138u));
+        else if (r == 1u)
+            put_block2_feddc((uint32_t)ys, (uint32_t)xs, EF_U8(0x00159138u));
+        return;
+    }
+    if (s > 0xc8)
+        r = 0xc8u;
+    s = (int16_t)r;
+    xl = (int16_t)(x - (uint32_t)s);
+    xr = (int16_t)(x + (uint32_t)s);
+    yt = (int16_t)(y - (uint32_t)s);
+    yb = (int16_t)(y + (uint32_t)s);
+    if (xr < (int32_t)EF_U32(0x0015bdc0u))
+        return;
+    if (xl > (int32_t)EF_U32(0x0015bdc4u))
+        return;
+    if (yb < (int32_t)EF_U32(0x0015bdc8u))
+        return;
+    if (yt > (int32_t)EF_U32(0x0015bdccu))
+        return;
+    EF_U32(0x00485ff4u) = (uint32_t)xs;
+    EF_U32(0x00485fecu) = (uint32_t)yt << 16;
+    if (xr > (int32_t)EF_U32(0x0015bdc4u))
+        return;
+    if (xl < (int32_t)EF_U32(0x0015bdc0u))
+        return;
+    if (yb > (int32_t)EF_U32(0x0015bdccu))
+        return;
+    if (yt < (int32_t)EF_U32(0x0015bdc8u))
+        return;
+    err = (1 - s) * 2;
+    circle_walk_up_fde20(0, s, err, 0, 0x000fddf0u, 0x00485ff4u);
+    circle_walk_down_fdec0(s, 0, err, s, 0x000fddf0u, 0x00485ff4u);
+}

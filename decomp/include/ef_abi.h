@@ -6160,4 +6160,7 @@ int32_t rotate_view_test_160156(ef_addr32 out, uint32_t z, uint32_t y, uint32_t 
 int32_t rotate_view_test_160122(ef_addr32 out, uint32_t z, uint32_t y, uint32_t x, uint32_t margin);
 int32_t rotate_view_test_160156(ef_addr32 out, uint32_t z, uint32_t y, uint32_t x, uint32_t margin);
 
+void draw_disc_fdf60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t r, uint32_t y, uint32_t x);
+void draw_disc_fdf60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t r, uint32_t y, uint32_t x);
+
 #endif

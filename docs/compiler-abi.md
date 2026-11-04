@@ -8970,3 +8970,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x160122` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 9f940@9fa11,a0704@a07d3,a0f84@a11e8 | Stack-argument wrapper (ret 0x14: OUT, Z, Y, X, MARGIN): shift X, Y, Z left by 16 and rotate them through 0xc474c/0xc475 |
 | `0x160156` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 9e0c4@9e140,9fc00@9fcd7,a0228@a0378 | Same as 0x160122 but without the left shift by 16 of X, Y, Z (enters 0xc4755 directly). |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfdf60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | c680b@c6841 | (ret 12; three stack arguments R, Y, X) Draw a filled disc of radius R-1 centred at (X, Y) (signed words) with colour by |
