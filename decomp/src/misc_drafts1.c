@@ -21405,3 +21405,20 @@ uint32_t add_patched_offsets_c8c34(uint32_t *edi)
 	*edi = r + 0x30u;
 	return 1u;
 }
+
+/* 0xc8720, 57 bytes. Implicit-register fragment (ESI is an in/out stream pointer, advanced by 8; returns the handler address). Set the view shift from the signed words at ESI and ESI+2 (second word first), run dispatch_relative_c5f08 on a copy of ESI past them (result discarded), then set the view shift again from the negated words and return the handler at 0x15b270 plus the signed word at ESI+6. */
+uint32_t set_view_shift_pair_c8720(uint32_t *esi)
+{
+	uint32_t p = *esi;
+	int32_t a = (int16_t)EF_U16(p);
+	int32_t b = (int16_t)EF_U16(p + 2u);
+	uint32_t q = p + 4u;
+	int32_t op;
+
+	set_view_shift_dc334(0u, 0u, 0u, 0u, (uint32_t)b, (uint32_t)a);
+	(void)dispatch_relative_c5f08(&q);
+	set_view_shift_dc334(0u, 0u, 0u, 0u, (uint32_t)-b, (uint32_t)-a);
+	op = (int16_t)EF_U16(p + 6u);
+	*esi = p + 8u;
+	return EF_U32(0x15b270u + (uint32_t)op);
+}

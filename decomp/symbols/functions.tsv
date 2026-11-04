@@ -2825,7 +2825,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c74bc	117			unknown	unclassified	unverified		
 0x000c75d4	154			unknown	unclassified	unverified		
 0x000c7f0c	256			unknown	unclassified	unverified		
-0x000c8720	57			unknown	unclassified	unverified		
+0x000c8720	57	set_view_shift_pair_c8720	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8720.json	docs/compiler-abi.md; Implicit-register fragment (ESI is an in/out stream pointer, advanced by 8; returns the handler address). Set the view s; callers none direct; guest pending
 0x000c8820	428			unknown	unclassified	unverified		
 0x000c89cc	40	project_relative_point_c89cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89cc.json	docs/compiler-abi.md; Implicit-register fragment (params EBX = source point, ESI = output vector, EDI = screen destination): ESI = EBX - camer; callers c8820@c8931,c8820@c8946; guest pending
 0x000c89f4	40	project_offset_point_c89f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89f4.json	docs/compiler-abi.md; As 0xc89cc but ESI = EBX + camera position.; callers c8820@c8936,c8820@c8941; guest pending

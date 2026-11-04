@@ -9177,3 +9177,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc680b` | EAX:uint32_t | none | none direct | Implicit-register fragment (ESI = stream pointer, advanced by 4): read an object index and a word value; the record is 0 |
 | `0xc8c34` | EAX:uint32_t | EAX:uint32_t | none direct | Implicit-register fragment (EDI = output record pointer, advanced by 0x30): add three patched 32-bit immediates (at 0xc8 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc8720` | EAX:uint32_t | EAX:uint32_t | none direct | Implicit-register fragment (ESI is an in/out stream pointer, advanced by 8; returns the handler address). Set the view s |

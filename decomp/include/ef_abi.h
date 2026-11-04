@@ -6319,4 +6319,7 @@ uint32_t add_patched_offsets_c8c34(uint32_t *edi);
 void draw_object_disc_c680b(uint32_t *esi); /* 0xc680b */
 uint32_t add_patched_offsets_c8c34(uint32_t *edi); /* 0xc8c34 */
 
+uint32_t set_view_shift_pair_c8720(uint32_t *esi);
+uint32_t set_view_shift_pair_c8720(uint32_t *esi); /* 0xc8720 */
+
 #endif
