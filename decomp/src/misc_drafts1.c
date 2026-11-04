@@ -6504,3 +6504,14 @@ double box_shape_ratio_11afb4(uint32_t box)
     double ext = box_extent_sum_11af9c(box);
     return num / square_double_b3fd0(ext);
 }
+
+/* 0xc737c, 50 bytes. Project the sum of two 3D points to a 2D screen point (implicit registers ESI = first point, EBX = second point, EDI = destination word pair): depth = (z1 + z2) >> 16, x = ((x1 + x2) >> 8) / depth + word 0x15bdb8, y = ((y1 + y2) >> 8) / depth + word 0x15bdbc, stored as two words; returns the advanced destination pointer. Parameters in the order ESI, EBX, EDI. */
+uint32_t project_point_pair_c737c(ef_addr32 p1, ef_addr32 p2, ef_addr32 dst)
+{
+    int32_t depth = ((int32_t)EF_U32(p2 + 8u) + (int32_t)EF_U32(p1 + 8u)) >> 16;
+    int32_t x = (((int32_t)EF_U32(p2) + (int32_t)EF_U32(p1)) >> 8) / depth;
+    int32_t y = (((int32_t)EF_U32(p2 + 4u) + (int32_t)EF_U32(p1 + 4u)) >> 8) / depth;
+    EF_U16(dst) = (uint16_t)(x + (int32_t)EF_U16(0x0015bdb8u));
+    EF_U16(dst + 2u) = (uint16_t)(y + (int32_t)EF_U16(0x0015bdbcu));
+    return dst + 4u;
+}

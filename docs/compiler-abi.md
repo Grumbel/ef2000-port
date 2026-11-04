@@ -6400,3 +6400,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11afb4` | EAX:uint32_t | EAX:double | 10a0d4@10a0f8 | Box shape ratio for the doubles at BOX: 2 * area (0x11af60) / (extent sum (0x11af9c))^2; the constant 2.0 sits at 0x1958 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc737c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:uint32_t | c71dc@c72c3,c71dc@c72d4,c71dc@c72e5 | Project the sum of two 3D points to a 2D screen point (implicit registers ESI = first point, EBX = second point, EDI = d |

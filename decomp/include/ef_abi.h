@@ -5042,4 +5042,6 @@ void load_vertices_c48dc(ef_addr32 src, uint32_t count);
 
 double box_shape_ratio_11afb4(uint32_t box);
 
+uint32_t project_point_pair_c737c(ef_addr32 p1, ef_addr32 p2, ef_addr32 dst);
+
 #endif
