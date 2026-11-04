@@ -6224,3 +6224,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x76b80` | EAX:uint32_t | none | 8c49c@8c833 | Bind unit ID (16-bit) to the first free 25-byte entry (word +1 == 0xff) of the table at dword 0x1f8918 (count in byte 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa94e4` | EAX:uint32_t | none | a9694@a96ba,a9694@a96eb,a9694@a9717 | Advance the playlist LIST (flag array at +0xe, entry count word +8, played count word +0xa, sequential flag byte +0xd, p |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

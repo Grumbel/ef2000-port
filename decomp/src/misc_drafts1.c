@@ -5652,3 +5652,71 @@ void bind_unit_entry_76b80(uint32_t id)
         guest_fn_76b30(unit, i, 0xffu);
     EF_U8(tbl + slot * 25u) = EF_U8(unit + 0xe9u) == 0x21u ? 1u : 0u;
 }
+
+/* 0xa94e4, 321 bytes. Advance the playlist LIST (flag array at +0xe, entry count word +8, played count word +0xa, sequential flag byte +0xd, pending-track word +0x12): when byte 0x1371ff is 0 and a track is pending, step to it (0xa9490) and clear the request; otherwise pick the next entry - the first unplayed one in sequential mode, else a random unplayed one (five random tries, then a linear scan) with the last remaining one chosen directly - mark it played, and once every entry has been played clear all the flags and the counter. */
+void advance_playlist_a94e4(uint32_t list)
+{
+    uint32_t flags, i;
+    int16_t idx;
+    if (EF_U8(0x001371ffu) == 0u && EF_U16(list + 0x12u) != 0u) {
+        step_list_cursor_a9490(list, (int16_t)(EF_U16(list + 0x12u) - 1u));
+        EF_U16(list + 0x12u) = 0u;
+        return;
+    }
+    if (EF_U8(list + 0xdu) != 0u) {
+        i = 0u;
+        while (EF_U8(EF_U32(list + 0xeu) + (uint32_t)(int32_t)(int16_t)i) != 0u)
+            i++;
+        idx = (int16_t)i;
+        step_list_cursor_a9490(list, idx);
+        EF_U8(EF_U32(list + 0xeu) + (uint32_t)(int32_t)idx) = 1u;
+        EF_U16(list + 0xau) = (uint16_t)(EF_U16(list + 0xau) + 1u);
+        if (EF_U16(list + 0xau) == EF_U16(list + 8u)) {
+            if ((int16_t)EF_U16(list + 8u) > 0) {
+                i = 0u;
+                do {
+                    EF_U8(EF_U32(list + 0xeu) + (uint32_t)(int32_t)(int16_t)i) = 0u;
+                    i++;
+                } while ((int16_t)i < (int16_t)EF_U16(list + 8u));
+            }
+            EF_U16(list + 0xau) = 0u;
+        }
+        return;
+    }
+    if ((int32_t)(int16_t)EF_U16(list + 0xau) == (int32_t)(int16_t)EF_U16(list + 8u) - 1) {
+        i = 0u;
+        while (EF_U8(EF_U32(list + 0xeu) + (uint32_t)(int32_t)(int16_t)i) != 0u)
+            i++;
+        step_list_cursor_a9490(list, (int16_t)i);
+        if ((int16_t)EF_U16(list + 8u) > 0) {
+            i = 0u;
+            do {
+                EF_U8(EF_U32(list + 0xeu) + (uint32_t)(int32_t)(int16_t)i) = 0u;
+                i++;
+            } while ((int16_t)i < (int16_t)EF_U16(list + 8u));
+        }
+        EF_U16(list + 0xau) = 0u;
+        return;
+    } else {
+        uint32_t tries = 0u, r;
+        flags = EF_U32(list + 0xeu);
+        do {
+            r = (uint32_t)random_scaled((int16_t)EF_U16(list + 8u));
+            tries++;
+            if (EF_U8(EF_U32(list + 0xeu) + (uint32_t)(int32_t)(int16_t)r) == 0u)
+                break;
+        } while ((int16_t)tries < 6);
+        if ((int16_t)tries >= 6) {
+            do {
+                r++;
+                if ((int16_t)r >= (int16_t)EF_U16(list + 8u))
+                    r = 0u;
+            } while (EF_U8(EF_U32(list + 0xeu) + (uint32_t)(int32_t)(int16_t)r) != 0u);
+        }
+        (void)flags;
+        idx = (int16_t)r;
+        step_list_cursor_a9490(list, idx);
+        EF_U8(EF_U32(list + 0xeu) + (uint32_t)(int32_t)idx) = 1u;
+        EF_U16(list + 0xau) = (uint16_t)(EF_U16(list + 0xau) + 1u);
+    }
+}

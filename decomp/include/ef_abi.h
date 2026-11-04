@@ -4967,4 +4967,8 @@ void update_camera_position_319ac(void);
 
 void bind_unit_entry_76b80(uint32_t id);
 
+void advance_playlist_a94e4(uint32_t list);
+
+
+
 #endif
