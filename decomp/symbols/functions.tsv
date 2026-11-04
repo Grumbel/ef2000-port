@@ -2805,7 +2805,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c5681	59			unknown	unclassified	unverified		
 0x000c58cc	38	reset_clip_bounds_c58cc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000c58cc.json	docs/compiler-abi.md; Reset three clip bounds; both stack arguments are ignored.; callers none direct; guest pending
 0x000c59b7	35	shift_triples_c59b7	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c59b7.json	docs/compiler-abi.md; Shift three consecutive dword triples left by SHIFT (CL) with implicit registers (ESI = source, EDI = destination): the ; callers c4680@c4690; guest pending
-0x000c5c24	175			unknown	unclassified	unverified		
+0x000c5c24	175	rotate_add_patch_c5c24	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5c24.json	docs/compiler-abi.md; Rotates a 3-word vector by the matrix at 0x159108 and adds the result to the patched immediates at 0xc8c3f, 0xc8c4b and ; callers 8e494@8e4fd; guest pending
 0x000c5cd3	139	rotate_matrix_c5cd3	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5cd3.json	docs/compiler-abi.md; Build the rotation matrix for the three angle words at [a0] and multiply it with the matrix at 0x1590e4 / 0x159108, stor; callers 8e494@8e505; guest pending
 0x000c5d8f	115			unknown	unclassified	unverified		
 0x000c5e02	50			unknown	unclassified	unverified		

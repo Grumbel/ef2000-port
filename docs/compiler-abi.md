@@ -9391,3 +9391,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x119844` | none | none | 1196a0@1196a5 | Combines globals into doubles at 0x432cc8 and 0x432ab8. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc5c24` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 8e494@8e4fd | Rotates a 3-word vector by the matrix at 0x159108 and adds the result to the patched immediates at 0xc8c3f, 0xc8c4b and  |

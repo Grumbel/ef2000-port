@@ -22734,3 +22734,23 @@ void combine_globals_119844(void)
 	*(double *)ef_guest_memory_ptr(0x432ab8) =
 	    md_rd_f64(0x433058) * (md_rd_f64(0x432da0) * md_rd_f64(0x1956ac) * md_rd_f64(0x432278)) * t;
 }
+
+/* 0xc5c24, 175 bytes. Rotates a 3-word vector by the matrix at 0x159108 and adds the result to the patched immediates at 0xc8c3f, 0xc8c4b and 0xc8c56. */
+void rotate_add_patch_c5c24(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0)
+{
+	int32_t v[3];
+	uint32_t r[3];
+	int i, j;
+
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	for (i = 0; i < 3; i++)
+		v[i] = (int16_t)EF_U16(a0 + i * 2);
+	for (i = 0; i < 3; i++) {
+		r[i] = 0;
+		for (j = 0; j < 3; j++)
+			r[i] += (uint32_t)(((int64_t)v[j] * (int32_t)EF_U32(0x159108 + i * 12 + j * 4)) >> 9);
+	}
+	EF_U32(0xc8c3fu) += r[0];
+	EF_U32(0xc8c4bu) += r[1];
+	EF_U32(0xc8c56u) += r[2];
+}
