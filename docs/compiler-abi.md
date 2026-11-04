@@ -4158,3 +4158,12 @@ in EAX, format string address, one value).
 | `0xbe3f4` | EAX:ef_addr32,EDX:ef_addr32 | none | b0f5c@b118f,b0f5c@b147c | For each flag-less record of the first list copy the id of every record of the second list that shares its position. |
 | `0xbe77c` | EAX:ef_addr32,EDX:ef_addr32 | none | be59c@be74e,f8e44@f908d | Find the record whose id matches the object's and move its entries' weights from field 0x23 to field 0x25. |
 | `0xbd2f4` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | b0f5c@b10de,b0f5c@b13de | Instantiate every valid record of a list into a destination list, numbering them; returns the count. |
+
+## game_helpers86 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc1bd0` | EAX:uint32_t | EAX:uint32_t | c1c24@c1c6a | Reverse the byte order of a 32-bit word (xor-swap sequence). |
+| `0xcb184` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Mark up to count pristine records matching type and position as used. |
+| `0xcb614` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | b0f5c@b12fb | For type-3 table entries clear a flag byte of the indexed sub-entry of the n-th list record. |
+| `0xcb984` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:uint32_t | cb9f4@cba55 | Return 1 when a list record sits at the same position as the object's last table entry and cc1ac accepts the pair. |

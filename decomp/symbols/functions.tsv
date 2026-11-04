@@ -2721,7 +2721,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c193c	591			unknown	unclassified	unverified		
 0x000c1b8c	26	find_node_by_word_c1b8c	list_lookup	compiles	game	confirmed	decomp/tests/0x000c1b8c.json	docs/compiler-abi.md; Node in the list at *EDX whose word +0x13 equals AX.; callers 9a8b4@9a8c4,9a998@9a9a7,9b2a4@9b391; guest pending
 0x000c1ba8	30	list_nth_word	list_lookup	compiles	game	confirmed	decomp/tests/0x000c1ba8.json	docs/compiler-abi.md; Node number AX of the list at *EDX (16-bit compare), or 0.; callers 9b2a4@9b4ae; guest pending
-0x000c1bd0	76			unknown	unclassified	unverified		
+0x000c1bd0	76	byte_swap32_c1bd0	game_helpers86	compiles	game	confirmed	decomp/tests/0x000c1bd0.json	docs/compiler-abi.md; Reverse the byte order of a 32-bit word (xor-swap sequence).; callers c1c24@c1c6a; guest pending
 0x000c1c24	151			unknown	unclassified	unverified		
 0x000c1e3c	136			unknown	unclassified	unverified		
 0x000c1ee8	4139			unknown	unclassified	unverified		
@@ -2873,15 +2873,15 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cac4c	270			unknown	unclassified	unverified		
 0x000caea0	296			unknown	unclassified	unverified		
 0x000cafc8	443			unknown	unclassified	unverified		
-0x000cb184	111			unknown	unclassified	unverified		
+0x000cb184	111	mark_matching_records_cb184	game_helpers86	compiles	game	confirmed	decomp/tests/0x000cb184.json	docs/compiler-abi.md; Mark up to count pristine records matching type and position as used.; callers none direct; guest pending
 0x000cb3c4	408			unknown	unclassified	unverified		
 0x000cb55c	155			unknown	unclassified	unverified		
 0x000cb5f8	26	find_node_by_word_cb5f8	list_lookup	compiles	game	confirmed	decomp/tests/0x000cb5f8.json	docs/compiler-abi.md; Identical body to 0xc1b8c.; callers cb800@cb876,cb800@cb897; guest pending
-0x000cb614	116			unknown	unclassified	unverified		
+0x000cb614	116	clear_indexed_subentry_flags_cb614	game_helpers86	compiles	game	confirmed	decomp/tests/0x000cb614.json	docs/compiler-abi.md; For type-3 table entries clear a flag byte of the indexed sub-entry of the n-th list record.; callers b0f5c@b12fb; guest pending
 0x000cb688	90	tick_slot_timers_cb688	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cb688.json	docs/compiler-abi.md; Count down the per-slot timers of every node and reload expired ones.; callers b0f5c@b136a; guest pending
 0x000cb6fc	235			unknown	unclassified	unverified		
 0x000cb800	385			unknown	unclassified	unverified		
-0x000cb984	110			unknown	unclassified	unverified		
+0x000cb984	110	list_has_matching_entry_cb984	game_helpers86	compiles	game	confirmed	decomp/tests/0x000cb984.json	docs/compiler-abi.md; Return 1 when a list record sits at the same position as the object's last table entry and cc1ac accepts the pair.; callers cb9f4@cba55; guest pending
 0x000cb9f4	608			unknown	unclassified	unverified		
 0x000cbc54	71	lookup_tiles_cbc54	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cbc54.json	docs/compiler-abi.md; Look up each node's tile byte in a 40-wide grid from its position.; callers 49228@49417,b0df4@b0e82,b0f5c@b1149; guest pending
 0x000cbc9b	5	tail_jump_cbc9b	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000cbc9b.json	docs/compiler-abi.md; tail jump. Forward to 0xfe541.; callers ba5c@bad2,ba5c@baf5,42e8c@42ea1; guest pending

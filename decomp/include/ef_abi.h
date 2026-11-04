@@ -3714,4 +3714,11 @@ uint32_t instantiate_list_records_bd2f4(ef_addr32 list, uint32_t arg_b, uint32_t
 uint32_t guest_fn_bcc2c_x(ef_addr32 node); /* 0xbcc2c EAX -> AX */
 uint32_t guest_fn_bcf44_x(ef_addr32 node, uint32_t b, uint32_t c); /* 0xbcf44 EAX EDX EBX -> EAX */
 
+/* game_helpers86.c */
+uint32_t byte_swap32_c1bd0(uint32_t value);
+void mark_matching_records_cb184(uint32_t x, uint32_t y, uint32_t type, uint32_t count, ef_addr32 list);
+void clear_indexed_subentry_flags_cb614(ef_addr32 list, ef_addr32 table, uint32_t count);
+uint32_t list_has_matching_entry_cb984(ef_addr32 object, ef_addr32 list, uint32_t extra);
+uint32_t guest_fn_cc1ac_x(uint32_t a, uint32_t b, uint32_t c); /* 0xcc1ac EAX EDX EBX -> AX */
+
 #endif
