@@ -9367,3 +9367,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x119938` | none | none | 1196a0@1196af | Combine globals: Z = A*B*C-chain terms stored at 0x432b50, then 0x432af8 = J*C*K*M*N*Z. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x106d34` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | d9cb4@d9d00,d9dc0@d9df2,106f10@106ff8 | Send the string at 0x194a6c to the device record OBJ and poll its ring buffer: returns 0 when the byte 0x4f arrives, or  |

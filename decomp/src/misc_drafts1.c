@@ -22606,3 +22606,28 @@ void combine_globals_119938(void)
 	*(double *)ef_guest_memory_ptr((ef_addr32)0x432af8) =
 		j * (c * (k * md_rd_f64(0x432da0)) * md_rd_f64(0x433058)) * z;
 }
+
+/* 0x106d34, 143 bytes. Send the string at 0x194a6c to the device record OBJ and poll its ring buffer: returns 0 when the byte 0x4f arrives, or 3 once DURATION (EDX) has elapsed overall; a shorter inner timeout re-sends the string. */
+uint32_t poll_device_106d34(ef_addr32 obj, uint32_t duration)
+{
+	uint32_t start = tail_jump_106be0(obj);
+	uint32_t inner;
+
+	for (;;) {
+		feed_string_106d00(obj, 0x194a6c);
+		inner = tail_jump_106be0(obj);
+		for (;;) {
+			if (entry_empty_118520(EF_U32(obj)) == 0) {
+				int32_t c = ring_pop_1184c4(EF_U32(obj));
+				if (EF_U32(0x17d364) != 0)
+					stdout_printf_cd12e(0x194a70, (uint32_t)c, (uint32_t)(uint8_t)c);
+				if (c == 0x4f)
+					return 0;
+			}
+			if (elapsed_at_least((int32_t)inner, (int32_t)guest_fn_106bfc_w(1)) != 0)
+				break;
+		}
+		if (elapsed_at_least((int32_t)start, (int32_t)duration) != 0)
+			return 3;
+	}
+}

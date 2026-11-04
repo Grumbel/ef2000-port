@@ -3914,7 +3914,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00106c3c	22	elapsed_at_least	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106c3c.json	docs/compiler-abi.md; 0xf8248() - EAX >= EDX (signed).; callers 106cb0@106cec,106d34@106da5,106d34@106db2; guest pending
 0x00106cb0	78	read_ring_bytes_106cb0	small_wrappers7	compiles	game	confirmed	decomp/tests/0x00106cb0.json	docs/compiler-abi.md; Read count bytes from a ring record into buf, waiting up to timeout; returns 0 when done or 3 on timeout.; callers 107070@107083; guest pending
 0x00106d00	52	feed_string_106d00	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00106d00.json	docs/compiler-abi.md; Optionally trace the string through printf (when 0x17d364 is set), then feed each byte to the handler 0x118428 of the ob; callers 106d34@106d52,106e2c@106e2f; guest pending
-0x00106d34	143			unknown	unclassified	unverified		
+0x00106d34	143	poll_device_106d34	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00106d34.json	docs/compiler-abi.md; Send the string at 0x194a6c to the device record OBJ and poll its ring buffer: returns 0 when the byte 0x4f arrives, or ; callers d9cb4@d9d00,d9dc0@d9df2,106f10@106ff8; guest pending
 0x00106dc4	103	wait_ring_data_106dc4	dos_slots1	compiles	game	confirmed	decomp/tests/0x00106dc4.json	docs/compiler-abi.md; Wait on a ring record until its data arrives (0), the end marker 0x4f (0) or 0x45 (8) is popped, or the timeout expires ; callers 106e2c@106e38; guest pending
 0x00106e2c	19	run_pair_106e2c	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00106e2c.json	docs/compiler-abi.md; Run 106d00 on the object, then 106dc4 on it with the second argument.; callers d9c30@d9c8a; guest pending
 0x00106f10	244			unknown	unclassified	unverified		
