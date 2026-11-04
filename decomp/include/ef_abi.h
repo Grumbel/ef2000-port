@@ -5979,4 +5979,6 @@ void steer_record_26744(ef_addr32 rec);
 
 void classify_radio_target_8883c(ef_addr32 rec, ef_addr32 out1, ef_addr32 out2);
 
+void update_widget_extent_a558c(ef_addr32 obj);
+
 #endif

@@ -18690,3 +18690,34 @@ void classify_radio_target_8883c(ef_addr32 rec, ef_addr32 out1, ef_addr32 out2)
 	guest_fn_cd2e8(EF_U8(out2));
 	EF_U8(out1) = (uint8_t)classify_object_percentage((uint8_t)(guest_fn_cd258() & 0xffu));
 }
+
+/* 0xa558c, 292 bytes. Recompute the scroll extent words of widget OBJ (EAX) along both axes. Horizontally N = word +0x45 + word +0x69 - word +0x61 - word +0x63 is compared with the visible size word +0x65 scaled by the double +0x9f; when N exceeds it the word +0x69 becomes trunc(size * scale - word +0x45 + word +0x63 + word +0x61) (0x9d72c). Vertically the same is done with words +0x47, +0x6b, +0x5d, +0x5f and +0x67 for word +0x6b. Both result words are clamped to non-negative values. */
+void update_widget_extent_a558c(ef_addr32 obj)
+{
+	int32_t n, w;
+	double p, scale;
+
+	memcpy(&scale, ef_guest_memory_ptr(obj + 0x9fu), 8);
+	n = (int32_t)(int16_t)EF_U16(obj + 0x45u) + ((int32_t)EF_U32(obj + 0x67u) >> 16) - (int32_t)EF_U16(obj + 0x61u) -
+	    (int32_t)EF_U16(obj + 0x63u);
+	w = (int32_t)EF_U16(obj + 0x65u);
+	p = (double)w * scale;
+	if ((double)n > p) {
+		p = p - (double)(int32_t)(int16_t)EF_U16(obj + 0x45u) + (double)(int32_t)EF_U16(obj + 0x63u) +
+		    (double)(int32_t)EF_U16(obj + 0x61u);
+		EF_U16(obj + 0x69u) = (uint16_t)(int32_t)truncate_9d72c(p);
+	}
+	if ((int16_t)EF_U16(obj + 0x69u) < 0)
+		EF_U16(obj + 0x69u) = 0u;
+	n = ((int32_t)EF_U32(obj + 0x45u) >> 16) + ((int32_t)EF_U32(obj + 0x69u) >> 16) - (int32_t)EF_U16(obj + 0x5du) -
+	    (int32_t)EF_U16(obj + 0x5fu);
+	w = (int32_t)EF_U16(obj + 0x67u);
+	p = (double)w * scale;
+	if ((double)n > p) {
+		p = p - (double)(int32_t)(int16_t)EF_U16(obj + 0x47u) + (double)(int32_t)EF_U16(obj + 0x5du) +
+		    (double)(int32_t)EF_U16(obj + 0x5fu);
+		EF_U16(obj + 0x6bu) = (uint16_t)(int32_t)truncate_9d72c(p);
+	}
+	if ((int16_t)EF_U16(obj + 0x6bu) < 0)
+		EF_U16(obj + 0x6bu) = 0u;
+}

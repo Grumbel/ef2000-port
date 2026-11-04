@@ -8615,3 +8615,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8883c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 888cc@88b17 | Classify the unit record REC (EAX) for the radio menu: *OUT1 (EDX) is set to 4 and *OUT2 (EBX) to 0. Nothing more happen |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa558c` | EAX:ef_addr32 | none | a520c@a5239,a5508@a5578 | Recompute the scroll extent words of widget OBJ (EAX) along both axes. Horizontally N = word +0x45 + word +0x69 - word + |
