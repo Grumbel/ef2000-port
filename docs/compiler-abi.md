@@ -4167,3 +4167,14 @@ in EAX, format string address, one value).
 | `0xcb184` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Mark up to count pristine records matching type and position as used. |
 | `0xcb614` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | b0f5c@b12fb | For type-3 table entries clear a flag byte of the indexed sub-entry of the n-th list record. |
 | `0xcb984` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:uint32_t | cb9f4@cba55 | Return 1 when a list record sits at the same position as the object's last table entry and cc1ac accepts the pair. |
+
+## game_helpers87 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd22d0` | EAX:ef_addr32 | AL:uint8_t | d23d8@d2459 | Return 1 when the three records' 16.16 (x,y) points form a clockwise triangle (negative cross product). |
+| `0xd1860` | AX:uint16_t | none | d17d0@d17ec,d17d0@d17f9,d17d0@d1800 | Write a 16-bit word to the log in big-endian byte order. |
+| `0xd642c` | EAX:int32_t,EDX:ef_addr32,EBX:int32_t | AL:uint8_t | d6478@d653d | Index of the table entry closest to the given value (first minimum wins, limit 0x100). |
+| `0xd6024` | none | none | d5ec0@d5eef | Send two controller messages on each of the 16 MIDI channels (reset sequence). |
+| `0xdcc98` | AL:uint8_t,DX:int16_t,BX:int16_t,CX:int16_t | AL:uint8_t | dccd8@dcd27 | Look up a 6-bit code in the table at 0x15e1be and dispatch it to cf7c4; returns the entry's count + 1. |
+| `0xdd164` | AL:uint8_t,DX:int16_t,BX:int16_t,CX:int16_t | AL:uint8_t | dd1b0@dd203 | Same lookup as dcc98 with code 0xa5 remapped to 0x4e and the second table set. |

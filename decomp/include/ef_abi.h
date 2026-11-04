@@ -3721,4 +3721,14 @@ void clear_indexed_subentry_flags_cb614(ef_addr32 list, ef_addr32 table, uint32_
 uint32_t list_has_matching_entry_cb984(ef_addr32 object, ef_addr32 list, uint32_t extra);
 uint32_t guest_fn_cc1ac_x(uint32_t a, uint32_t b, uint32_t c); /* 0xcc1ac EAX EDX EBX -> AX */
 
+/* game_helpers87.c */
+uint8_t triangle_is_clockwise_d22d0(ef_addr32 triangle);
+void write_log_word_swapped_d1860(uint16_t value);
+uint8_t nearest_entry_index_d642c(int32_t value, ef_addr32 table, int32_t count);
+void midi_reset_channels_d6024(void);
+uint8_t dispatch_code_table_a_dcc98(uint8_t code, int16_t dx_val, int16_t bx_val, int16_t cx_val);
+uint8_t dispatch_code_table_b_dd164(uint8_t code, int16_t dx_val, int16_t bx_val, int16_t cx_val);
+void guest_fn_cf7c4_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcf7c4 4 stack, callee cleanup */
+void guest_fn_d605c_x(uint32_t a, uint32_t b, uint32_t c); /* 0xd605c EAX EDX EBX */
+
 #endif
