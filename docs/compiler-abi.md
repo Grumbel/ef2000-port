@@ -6442,3 +6442,21 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10e2f5` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | 120560@120715 | Convert the unsigned 64-bit value at VALUE_PTR to exactly N decimal digits (zero padded, high digits truncated) at BUF,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10d9e3` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | ea20c@ea234 | bsearch: find KEY in the sorted array BASE of N elements of SIZE bytes using the comparison callback CMP (stack argument |
+| `0xc486c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | d9e50@d9e6b,da1b4@da211 | Set the scale pair from the stack argument VALUE (ret 4): for VALUE < 10 word 0x158ed0 = VALUE and word 0x158ed4 = 1 <<  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3519c` | EAX:ef_addr32 | none | 35590@3562d | Unpack the 0x4c-byte settings record at SRC into the game globals: copy the first 44 bytes to 0x125828, scatter the byte |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

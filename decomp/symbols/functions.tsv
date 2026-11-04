@@ -587,7 +587,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00034f94	403	update_mission_page_34f94	game_helpers77	compiles	game	confirmed	decomp/tests/0x00034f94.json	docs/compiler-abi.md; Per-frame update of the mission dialog page: reload, timers and dialog switching.; callers none direct; guest pending
 0x00035128	27	onopenInitialise		named	unclassified	unverified		
 0x00035144	85	reset_flags_35144	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00035144.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x0003519c	122			unknown	unclassified	unverified		
+0x0003519c	122	unpack_settings_3519c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003519c.json	docs/compiler-abi.md; Unpack the 0x4c-byte settings record at SRC into the game globals: copy the first 44 bytes to 0x125828, scatter the byte; callers 35590@3562d; guest pending
 0x00035218	8	constant_44_35218	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00035218.json	docs/compiler-abi.md; Constant 0x44.; callers 34f30@34f70,3527c@352b6; guest pending
 0x00035220	92	send_key_request_35220	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035220.json	docs/compiler-abi.md; Build a 3-byte request (the key byte plus a word: 0x19f592 - 1 for key 0x48, else 0xffff), mirror the word to 0x19f58c, ; callers 367f0@3685d,367f0@368b0,367f0@36906; guest pending
 0x0003527c	682			unknown	unclassified	unverified		
@@ -2781,7 +2781,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c474c	9			unknown	unclassified	unverified		
 0x000c4755	136			unknown	unclassified	unverified		
 0x000c47e0	66	select_shade_table_c47e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c47e0.json	docs/compiler-abi.md; Select the shade table for table index EDI (implicit register): take the signed word 0x14fe58[index] >> 5 clamped to 0..; callers none direct; guest pending
-0x000c486c	112			unknown	unclassified	unverified		
+0x000c486c	112	set_scale_pair_c486c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c486c.json	docs/compiler-abi.md; Set the scale pair from the stack argument VALUE (ret 4): for VALUE < 10 word 0x158ed0 = VALUE and word 0x158ed4 = 1 << ; callers d9e50@d9e6b,da1b4@da211; guest pending
 0x000c48dc	112	load_vertices_c48dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c48dc.json	docs/compiler-abi.md; Load COUNT 2D vertices (word pairs) starting at SRC (implicit registers ESI = source, ECX = count) into the 48-byte vert; callers c49c4@c4a10,c4a50@c4aaf,c4aeb@c4b4a; guest pending
 0x000c49c4	140			unknown	unclassified	unverified		
 0x000c4a50	155			unknown	unclassified	unverified		
@@ -3987,7 +3987,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010d94f	119			unknown	unclassified	unverified		
 0x0010d9c6	25	modf_10d9c6	float_helpers9	compiles	game	confirmed	decomp/tests/0x0010d9c6.json	docs/compiler-abi.md; (ret 12) modf: truncate x toward zero (0x9d72c), store the integral part through ip and return the fractional part.; callers e86f7@e870c,120560@120646; guest pending
 0x0010d9e0	3	return_zero_10d9e0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0010d9e0.json	docs/compiler-abi.md; ; callers e9ac0@e9b0d; guest pending
-0x0010d9e3	107			unknown	unclassified	unverified		
+0x0010d9e3	107	bsearch_10d9e3	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010d9e3.json	docs/compiler-abi.md; bsearch: find KEY in the sorted array BASE of N elements of SIZE bytes using the comparison callback CMP (stack argument; callers ea20c@ea234; guest pending
 0x0010da50	192			unknown	unclassified	unverified		
 0x0010db10	72			unknown	unclassified	unverified		
 0x0010db58	38			unknown	unclassified	unverified		

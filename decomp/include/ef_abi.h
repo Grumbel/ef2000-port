@@ -5060,4 +5060,11 @@ void push_message_entry_56268(ef_addr32 src);
 
 void u64_to_digits_10e2f5(ef_addr32 value_ptr, ef_addr32 buf, uint32_t n);
 
+uint32_t bsearch_10d9e3(uint32_t key, uint32_t base, uint32_t n, uint32_t size, uint32_t cmp);
+void set_scale_pair_c486c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
+
+void unpack_settings_3519c(ef_addr32 src);
+
+
+
 #endif

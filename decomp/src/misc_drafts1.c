@@ -6622,3 +6622,75 @@ void u64_to_digits_10e2f5(ef_addr32 value_ptr, ef_addr32 buf, uint32_t n)
         v /= 10u;
     }
 }
+
+/* 0x10d9e3, 107 bytes. bsearch: find KEY in the sorted array BASE of N elements of SIZE bytes using the comparison callback CMP (stack argument, EAX/EDX = key and element pointers, result sign in EAX). Returns the matching element or 0. */
+uint32_t bsearch_10d9e3(uint32_t key, uint32_t base, uint32_t n, uint32_t size, uint32_t cmp)
+{
+    uint32_t lo, hi, mid;
+    int32_t r;
+    if (n == 0u)
+        return 0u;
+    lo = base;
+    hi = base + (n - 1u) * size;
+    while (lo < hi) {
+        mid = lo + (((hi - lo) / size) >> 1) * size;
+        r = (int32_t)guest_callptr_eaxedx_ret_x(cmp, key, mid);
+        if (r == 0)
+            return mid;
+        if (r < 0)
+            hi = mid;
+        else
+            lo = mid + size;
+    }
+    if (lo == hi && (int32_t)guest_callptr_eaxedx_ret_x(cmp, key, lo) == 0)
+        return lo;
+    return 0u;
+}
+
+/* 0xc486c, 112 bytes. Set the scale pair from the stack argument VALUE (ret 4): for VALUE < 10 word 0x158ed0 = VALUE and word 0x158ed4 = 1 << (VALUE - 2); otherwise 0x158ed0 = VALUE / 10, 0x158ed4 = 1 << (VALUE / 10 - 2) and, when the remainder R is nonzero, 0x158ed4 += (0x158ed4 * 2 - 0x158ed4) * R / 10. */
+void set_scale_pair_c486c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value)
+{
+    int32_t v = (int32_t)value;
+    int32_t q, rem;
+    uint16_t scale;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (v < 10) {
+        EF_U16(0x00158ed0u) = (uint16_t)v;
+        EF_U16(0x00158ed4u) = (uint16_t)(1u << (uint8_t)(v - 2));
+        return;
+    }
+    q = v / 10;
+    rem = v % 10;
+    EF_U16(0x00158ed0u) = (uint16_t)q;
+    scale = (uint16_t)(1u << (uint8_t)(q - 2));
+    EF_U16(0x00158ed4u) = scale;
+    if (rem != 0) {
+        uint16_t dbl = (uint16_t)(scale << 1);
+        dbl = (uint16_t)(dbl - EF_U16(0x00158ed4u));
+        EF_U16(0x00158ed4u) = (uint16_t)(EF_U16(0x00158ed4u) + (uint16_t)(((int32_t)dbl * rem) / 10));
+    }
+}
+
+/* 0x3519c, 122 bytes. Unpack the settings record at SRC into the game globals: copy the first 44 bytes to 0x125828, scatter the bytes/words at +0x2c..+0x3d to 0x15b7e6, 0x1f88fa, 0x1f88f0, 0x1f88ee, 0x1f88fb, 0x1a3636, 0x1a3640 and 0x15b7e4, convert the double at +0x33 to a single float stored at 0x128550 and copy the 18 bytes at +0x3e to 0x19bbf0. */
+void unpack_settings_3519c(ef_addr32 src)
+{
+    uint32_t i;
+    double d;
+    float f;
+    for (i = 0u; i < 0x2cu; i += 4u)
+        EF_U32(0x00125828u + i) = EF_U32(src + i);
+    EF_U8(0x0015b7e6u) = EF_U8(src + 0x2cu);
+    EF_U8(0x001f88fau) = EF_U8(src + 0x2du);
+    EF_U16(0x001f88f0u) = EF_U16(src + 0x2eu);
+    EF_U16(0x001f88eeu) = EF_U16(src + 0x30u);
+    d = *(double *)ef_guest_memory_ptr(src + 0x33u);
+    EF_U8(0x001f88fbu) = EF_U8(src + 0x32u);
+    EF_U8(0x001a3636u) = EF_U8(src + 0x3bu);
+    EF_U8(0x001a3640u) = EF_U8(src + 0x3cu);
+    f = (float)d;
+    *(float *)ef_guest_memory_ptr(0x00128550u) = f;
+    EF_U8(0x0015b7e4u) = EF_U8(src + 0x3du);
+    for (i = 0u; i < 0x10u; i += 4u)
+        EF_U32(0x0019bbf0u + i) = EF_U32(src + 0x3eu + i);
+    EF_U16(0x0019bc00u) = EF_U16(src + 0x4eu);
+}
