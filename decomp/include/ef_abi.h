@@ -5678,4 +5678,6 @@ void move_unit_72390(uint32_t id);
 void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec);
 void guest_fn_83a40_x(void); /* 0x83a40 */
 
+uint8_t hit_map_entry_910f4(uint32_t u0, int32_t x, uint32_t u2, int32_t y, uint32_t s0);
+
 #endif

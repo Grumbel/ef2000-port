@@ -13702,3 +13702,33 @@ void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec)
     }
     EF_U32(rec + 4u) = 0x80000000u;
 }
+
+/* 0x910f4, 284 bytes. Try to hit one of the 0x28 map entries (0x30 bytes each at 0x211af0: x dword +0, z +4, y +8, kind word +0x1e, flags byte +0x24) with the point (x = EDX, y = ECX) in play mode (byte 0x125847): entries with flag bits 1, 2 or 4 are skipped, as are those more than 0x80000 away on either axis; an entry accepted by 0xd0470 (its kind word >> 16 and the position >> 8) is consumed: 0xcd150 for the kind, flag 4 set, word +0x22 = 0xffff, 0xcd258 and score 0x64 (0xcd2e8); in play mode a 0x64 notification for its index goes out through 0x575fc. Returns 1 when an entry was hit. S0 only feeds the unused 0x8ac64 lookup of the original (a pure table mapping, not called here). */
+uint8_t hit_map_entry_910f4(uint32_t u0, int32_t x, uint32_t u2, int32_t y, uint32_t s0)
+{
+    int32_t i;
+    (void)u0; (void)u2; (void)s0;
+    if (EF_U8(0x00125847u) == 0u)
+        return 0u;
+    for (i = 0; i < 0x28; i++) {
+        ef_addr32 e = 0x00211af0u + (uint32_t)i * 0x30u;
+        uint8_t fl = EF_U8(e + 0x24u);
+        if ((fl & 2u) != 0u || (fl & 1u) != 0u || (fl & 4u) != 0u)
+            continue;
+        if ((int32_t)guest_fn_cf94a(EF_U32(e) - (uint32_t)x) > 0x80000)
+            continue;
+        if ((int32_t)guest_fn_cf94a(EF_U32(e + 8u) - (uint32_t)y) > 0x80000)
+            continue;
+        if (guest_fn_d0470((int32_t)EF_U32(e + 0x1eu) >> 16, (int32_t)EF_U32(e) >> 8, (int32_t)EF_U32(e + 4u) >> 8, (int32_t)EF_U32(e + 8u) >> 8) == 0u)
+            continue;
+        guest_fn_cd150((int32_t)EF_U32(e + 0x1eu) >> 16);
+        EF_U8(e + 0x24u) = (uint8_t)(EF_U8(e + 0x24u) | 4u);
+        EF_U16(e + 0x22u) = 0xffffu;
+        guest_fn_cd258();
+        guest_fn_cd2e8(0x64);
+        if (EF_U8(0x00127da9u) != 0u)
+            send_two_word_packet_40((uint16_t)i, 0x64u);
+        return 1u;
+    }
+    return 0u;
+}

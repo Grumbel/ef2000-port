@@ -7901,3 +7901,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x848e0` | EAX:ef_addr32,EDX:ef_addr32 | none | 601c@60a0 | Refresh the view cursor record REC (EDX) from the camera block SRC (EAX: 12 bytes copied to 0x1fcc14, 6 bytes from +0xc  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x910f4` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t,ECX:int32_t,[ESP+4]:uint32_t | AL:uint8_t | 888cc@88a8b | Try to hit one of the 0x28 map entries (0x30 bytes each at 0x211af0: x dword +0, z +4, y +8, kind word +0x1e, flags byte |
