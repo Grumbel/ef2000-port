@@ -1516,7 +1516,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007f6d8	260			unknown	unclassified	unverified		
 0x0007f7dc	115	squared_distance_7f7dc	game_helpers9	compiles	game	confirmed	decomp/tests/0x0007f7dc.json	docs/compiler-abi.md; Squared distance between a vector (>>8, 16-bit) and the origin at 0x21444c.; callers 7ef14@7f103,7ef14@7f1bc; guest pending
 0x0007f850	401			unknown	unclassified	unverified		
-0x0007f9e4	440			unknown	unclassified	unverified		
+0x0007f9e4	440	select_contact_icon_7f9e4	game_helpers70	compiles	game	confirmed	decomp/tests/0x0007f9e4.json	docs/compiler-abi.md; Pick the icon code for a unit record (0x47 for none).; callers 7ef14@7efeb,7ef14@7f02c,7ef14@7f09a; guest pending
 0x0007fb9c	77	object_glyph_7fb9c	unit_flags	compiles	game	confirmed	decomp/tests/0x0007fb9c.json	docs/compiler-abi.md; Character code for an object.; callers 7ef14@7f0f5,7ef14@7f122,7ef14@7f1b0; guest pending
 0x0007fbec	71	ui_dispatch_indexed_control	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fbec.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fc34	166			unknown	unclassified	unverified		

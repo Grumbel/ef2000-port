@@ -3963,3 +3963,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x17754` | none | none | 1abbc@1ac77,5c518@5c79e | Track the trigger hold time for the selected station, firing the release notifications. |
 | `0x1cde8` | none | none | 3dd30@3dfdb | One simulation frame: input latch, unit updates and the sub-step loop. |
+
+## game_helpers70 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7f9e4` | EAX:ef_addr32 | AL:uint8_t | 7ef14@7efeb,7ef14@7f02c,7ef14@7f09a | Pick the icon code for a unit record (0x47 for none). |

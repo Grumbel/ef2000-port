@@ -3540,4 +3540,8 @@ void guest_fn_53ecc_x(void); /* 0x53ecc */
 void guest_fn_7957c_x(void); /* 0x7957c */
 void guest_fn_1cd90_x(void); /* 0x1cd90 */
 
+/* game_helpers70.c */
+uint8_t select_contact_icon_7f9e4(ef_addr32 unit);
+void guest_fn_7f850_x(uint32_t a); /* 0x7f850 EAX */
+
 #endif
