@@ -3414,7 +3414,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e6e58	674			unknown	unclassified	unverified		
 0x000e70fc	784			unknown	unclassified	unverified		
 0x000e740c	698			unknown	unclassified	unverified		
-0x000e76c8	365			unknown	unclassified	unverified		
+0x000e76c8	365	reset_working_state_e76c8	game_helpers61	compiles	game	confirmed	decomp/tests/0x000e76c8.json	docs/compiler-abi.md; Clear the 0x4322xx..0x432axx working state and set the 0.6 default scale.; callers 49228@49bca,8cd78@8cdd2,8cf10@8cf48; guest pending
 0x000e7835	14	to_lower_ascii	math_string	compiles	game	confirmed	decomp/tests/0x000e7835.json	docs/compiler-abi.md; Signed 'A'..'Z' to lowercase.; callers 50d9c@50db5,a80b0@a80fe,bc1d3@bc1e1; guest pending
 0x000e7850	97	init_time_constants_e7850	game_helpers37	compiles	game	confirmed	decomp/tests/0x000e7850.json	docs/compiler-abi.md; Store the double constants used by the time conversion.; callers e78b4@e7935; guest pending
 0x000e78b4	366			unknown	unclassified	unverified		
@@ -3623,8 +3623,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2dcc	46	strip_extension	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2dcc.json	docs/compiler-abi.md; Truncate the string at the last '.'.; callers f2dfc@f2e15; guest pending
 0x000f2dfc	86	restart_driver_f2dfc	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000f2dfc.json	docs/compiler-abi.md; Save the current path, restart the driver and abort when it fails.; callers f3b78@f3b99; guest pending
 0x000f2e54	30	copy_path_f2e54	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2e54.json	docs/compiler-abi.md; 0xf2cd0(), 0x9d749(0x485908, 0x48592c), byte 0x4859de = 1.; callers f3b78@f3bb3; guest pending
-0x000f2e74	327			unknown	unclassified	unverified		
-0x000f2fbc	399			unknown	unclassified	unverified		
+0x000f2e74	327	read_plain_entry_f2e74	game_helpers61	compiles	game	confirmed	decomp/tests/0x000f2e74.json	docs/compiler-abi.md; Read a plain entry record and bump the record count.; callers f2fbc@f2fc7,f3b78@f3bd0; guest pending
+0x000f2fbc	399	read_entry_f2fbc	game_helpers61	compiles	game	confirmed	decomp/tests/0x000f2fbc.json	docs/compiler-abi.md; Read an entry record, with a trailing value unless the plain flag is set.; callers f3b78@f3bed; guest pending
 0x000f314c	200			unknown	unclassified	unverified		
 0x000f3214	355			unknown	unclassified	unverified		
 0x000f3378	263			unknown	unclassified	unverified		

@@ -3463,4 +3463,9 @@ uint32_t scan_code_to_function_key_beb20(uint8_t code);
 /* game_helpers60.c */
 uint32_t scan_code_to_function_key_beb20(uint8_t code);
 
+/* game_helpers61.c */
+void reset_working_state_e76c8(void);
+void read_plain_entry_f2e74(void);
+void read_entry_f2fbc(void);
+
 #endif
