@@ -5251,4 +5251,7 @@ void draw_table_sprite_440f4(uint32_t sel, uint32_t edx, uint32_t ebx, uint32_t 
 
 uint32_t next_list_token_8b6e0(uint32_t mode, uint32_t prefix, uint32_t out);
 
+void redraw_widget_a60a8(uint32_t obj);
+uint32_t guest_fn_e588c_ret_x(ef_addr32 record); /* 0xe588c EAX -> EAX */
+
 #endif

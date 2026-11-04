@@ -8983,3 +8983,41 @@ uint32_t next_list_token_8b6e0(uint32_t mode, uint32_t prefix, uint32_t out)
     EF_U32(0x0020f42cu) = cur;
     return 0u;
 }
+
+/* 0xa60a8, 262 bytes. Redraw the widget OBJ (EAX): the mode byte comes from 0xe588c (0 when flag 2 of byte +0x3b is set); mode 1 saves the rectangle list first and mode 2 does nothing at all. Refresh the object (0xabb00, view rect 0xc9f28), draw its background (0xe4c9c when dword +0x95 is set, else a filled rectangle from the rectangle words 0x41eef6/0x41eef8/0x41eefa/0x41ef00 in colour byte +0xc2 when flag 1 of byte +0xc4 is set; both only if flag 1 of byte +0x3c), then call its draw hook (dword +0xb5) with the draw-in-progress markers 0x41eea0 / 0x41f2e5 set, rebuild the view corners (0xc9ecc), tidy the chain (0xa7204) with byte 0x13725c forced to 1 and, for mode 1, restore the rectangle list. */
+void redraw_widget_a60a8(uint32_t obj)
+{
+    uint8_t mode, saved;
+    if (EF_U8(obj + 0x3bu) & 2u)
+        mode = 0u;
+    else
+        mode = (uint8_t)(guest_fn_e588c_ret_x(obj) & 0xffu);
+    if (mode == 2u)
+        return;
+    if (mode == 1u)
+        save_rect_list_e5114();
+    guest_fn_abb00_x(obj);
+    set_view_rect_c9f28(obj);
+    if (EF_U8(obj + 0x3cu) & 1u) {
+        if (EF_U32(obj + 0x95u) != 0u) {
+            guest_fn_e4c9c_w(obj);
+        } else if (EF_U8(obj + 0xc4u) & 1u) {
+            uint32_t x0 = EF_U16(0x0041eef6u), y0 = EF_U16(0x0041eef8u);
+            uint32_t x1 = (uint16_t)(EF_U16(0x0041eef6u) + EF_U16(0x0041eefau));
+            uint32_t y1 = (uint16_t)(EF_U16(0x0041eef8u) + EF_U16(0x0041ef00u));
+            fill_rect_clipped_c91c8(EF_U8(obj + 0xc2u), x0, y0, x1, y1);
+        }
+    }
+    EF_U32(0x0041eea0u) = obj;
+    EF_U8(0x0041f2e5u) = 1u;
+    guest_callptr_eax_ret_x(EF_U32(obj + 0xb5u), obj);
+    EF_U32(0x0041eea0u) = 0u;
+    EF_U8(0x0041f2e5u) = 0u;
+    init_view_corners_c9ecc();
+    saved = EF_U8(0x0013725cu);
+    EF_U8(0x0013725cu) = 1u;
+    tidy_chain_a7204(obj);
+    EF_U8(0x0013725cu) = saved;
+    if (mode == 1u)
+        restore_rect_list_e516c();
+}

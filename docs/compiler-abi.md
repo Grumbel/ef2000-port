@@ -6962,3 +6962,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8b6e0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 8b7e8@8b84d,8b7e8@8b90b | Fetch the next token of a word list into OUT (ECX): with MODE (EAX, signed word) 1 the list file is (re)loaded first (de |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa60a8` | EAX:uint32_t | none | a61b0@a61e2 | Redraw the widget OBJ (EAX): the mode byte comes from 0xe588c (0 when flag 2 of byte +0x3b is set); mode 1 saves the rec |

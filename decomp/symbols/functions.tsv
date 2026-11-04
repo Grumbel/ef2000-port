@@ -2272,7 +2272,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a5ef8	285	redraw_item_a5ef8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a5ef8.json	docs/compiler-abi.md; Redraw the item ID (1..count, flag 4 set in byte +0x3b of its record): outside a draw (byte 0x13725c clear) the state is; callers 4aa0@4af8,4cf4@4d42,4d4c@4e08; guest pending
 0x000a6018	29	apply_a5ef8_a6018	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a6018.json	docs/compiler-abi.md; ; callers 5110@51c6,ba5c@bbab,bfcc@c4aa; guest pending
 0x000a6038	111	redraw_entries_a6038	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a6038.json	docs/compiler-abi.md; Redraw: when a backdrop (0x41eeac) is active draw it over the screen rectangle, otherwise run 0xc9ec4; then re-apply eac; callers a4b08@a4b43,a4b5c@a4b79,a4b80@a4c79; guest pending
-0x000a60a8	262			unknown	unclassified	unverified		
+0x000a60a8	262	redraw_widget_a60a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a60a8.json	docs/compiler-abi.md; Redraw the widget OBJ (EAX): the mode byte comes from 0xe588c (0 when flag 2 of byte +0x3b is set); mode 1 saves the rec; callers a61b0@a61e2; guest pending
 0x000a61b0	58	run_pending_handlers_a61b0	game_helpers78	compiles	game	confirmed	decomp/tests/0x000a61b0.json	docs/compiler-abi.md; Run the pending handler for every listed object that has one set.; callers c9fc4@c9fd5; guest pending
 0x000a63c0	60	update_widget_metrics_a63c0	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a63c0.json	docs/compiler-abi.md; Update a widget's position words from the colour nibble.; callers a66cc@a66e3,e1958@e1b58; guest pending
 0x000a6438	616			unknown	unclassified	unverified		
