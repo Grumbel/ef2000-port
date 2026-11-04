@@ -7392,3 +7392,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x94370` | none | none | 95e58@961af | Mirror of 0x942cc for the opposite direction: the angle starts at 0xfc00, and when the signed high word at 0x12db98 is b |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x16b0c` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 168d8@168e5 | Range test between table entries A (EAX) and B (EDX) of the 0xca-byte records at [0x19bb58]: the type byte at +0x19 sele |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

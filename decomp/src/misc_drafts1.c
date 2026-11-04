@@ -11295,3 +11295,20 @@ void rebuild_angle_record_rev_94370(void)
     guest_fn_93a8c();
     guest_fn_d099c(0x0012dbecu, 0x002143c0u);
 }
+
+/* 0x16b0c, 159 bytes. Range test between table entries A (EAX) and B (EDX) of the 0xca-byte records at [0x19bb58]: the type byte at +0x19 selects a 0xe5-byte class record; the threshold is pow(double at class(B)+0x128637, 0.25) * 1000 * dword at class(A)+0x12863f, stored as a float. The grid distance 0x2bb3c(A, B) is saved in the float 0x197df0 and the result is 1 when it does not exceed the threshold. */
+uint32_t within_range_16b0c(uint32_t a, uint32_t b)
+{
+    uint32_t tab = EF_U32(0x0019bb58u);
+    uint32_t ca = (uint32_t)EF_U8(tab + a * 0xcau + 0x19u) * 0xe5u;
+    uint32_t cb = (uint32_t)EF_U8(tab + b * 0xcau + 0x19u) * 0xe5u;
+    double base;
+    float thr;
+    double dist;
+    int32_t scaled = (int32_t)(EF_U32(ca + 0x0012863fu) * 1000u);
+    memcpy(&base, ef_guest_memory_ptr(cb + 0x00128637u), sizeof base);
+    thr = (float)(pow_b3fec(base, 0.25) * (double)scaled);
+    dist = grid_cell_distance((int16_t)a, (int16_t)b);
+    *(float *)ef_guest_memory_ptr(0x00197df0u) = (float)dist;
+    return dist <= thr ? 1u : 0u;
+}

@@ -5422,4 +5422,8 @@ void rebuild_angle_record_942cc(void);
 
 void rebuild_angle_record_rev_94370(void);
 
+uint32_t within_range_16b0c(uint32_t a, uint32_t b);
+
+
+
 #endif
