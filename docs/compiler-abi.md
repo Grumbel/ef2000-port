@@ -9439,3 +9439,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfa9d2` | EAX:uint32_t | none | bc4da@bc534,e8651@e8671,e8651@e86db | Find the heap that owns the pointer, free it there and update the high-water mark. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf064b` | EAX:uint32_t | none | f05e5@f0633,f0aa8@f0ae4 | Software mantissa division fragment. r[] holds * eax,edx,ebx,ecx,esi,edi in and out (dividend edx:eax, divisor ecx:ebx,  |

@@ -6476,4 +6476,7 @@ void heap_free_1104b8(uint32_t ptr, uint32_t seg, uint32_t heap); /* 0x1104b8 */
 void heap_free_find_fa9d2(uint32_t ptr);
 void heap_free_find_fa9d2(uint32_t ptr); /* 0xfa9d2 */
 
+void mantissa_div_f064b(uint32_t *r);
+void mantissa_div_f064b(uint32_t *r); /* 0xf064b */
+
 #endif

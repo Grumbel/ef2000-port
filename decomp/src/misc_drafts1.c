@@ -22999,3 +22999,76 @@ void heap_free_find_fa9d2(uint32_t ptr)
 	}
 	EF_U8(0x4dd8a1) = 0;
 }
+
+/* 0xf064b, 123 bytes. Software mantissa division fragment. r[] holds
+ * eax,edx,ebx,ecx,esi,edi in and out (dividend edx:eax, divisor ecx:ebx,
+ * esi/edi = sign|exponent words). */
+void mantissa_div_f064b(uint32_t *r)
+{
+	uint32_t eax = r[0], edx = r[1], ebx = r[2], ecx = r[3], esi = r[4], edi = r[5];
+	uint32_t esi_o = esi, edi_o = edi;
+	int32_t d;
+	esi &= 0x7fff;
+	edi &= 0x7fff;
+	d = (int32_t)(esi - edi);
+	if (d < 0) {
+		esi = esi + edi;
+		edi = 0;
+	} else {
+		uint32_t cf;
+		esi = (uint32_t)d;
+		edi = 0;
+		for (;;) {
+			uint64_t dv = ((uint64_t)edx << 32) | eax;
+			uint64_t ds = ((uint64_t)ecx << 32) | ebx;
+			int sub_again;
+			if (dv >= ds) {
+				dv -= ds;
+				eax = (uint32_t)dv;
+				edx = (uint32_t)(dv >> 32);
+				cf = 1;
+			} else {
+				cf = 0;
+			}
+			for (;;) {
+				edi = edi + edi + cf;
+				esi--;
+				if ((int32_t)esi < 0)
+					goto normalize;
+				sub_again = (edx >> 31) & 1;
+				edx = (edx << 1) | (eax >> 31);
+				eax <<= 1;
+				if (sub_again) {
+					dv = ((uint64_t)edx << 32) | eax;
+					dv -= ds;
+					eax = (uint32_t)dv;
+					edx = (uint32_t)(dv >> 32);
+					cf = 1;
+					continue;
+				}
+				if (edx & 0x80000000u)
+					break;
+				cf = 0;
+			}
+		}
+normalize:
+		esi = 0;
+		if (eax != 0 || edx != 0) {
+			while (!(edx & 0x80000000u)) {
+				edx = (edx << 1) | (eax >> 31);
+				eax <<= 1;
+				esi--;
+			}
+			esi += edi_o & 0x7fff;
+		}
+	}
+	ecx = edi_o;
+	ebx = esi_o & 0x8000;
+	esi |= ebx;
+	if (edx == 0)
+		esi = 0;
+	ebx = (ebx & 0xffff0000u) | ((ebx ^ ecx) & 0xffff);
+	if (ebx & 0x8000)
+		edi = (uint32_t)(-(int32_t)edi);
+	r[0] = eax; r[1] = edx; r[2] = ebx; r[3] = ecx; r[4] = esi; r[5] = edi;
+}
