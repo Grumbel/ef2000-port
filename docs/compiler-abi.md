@@ -8675,3 +8675,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x72f68` | EAX:int32_t,EDX:double,EBX:ef_addr32 | none | 2479c@249d6,26b60@26e50 | Predict the position of unit UNIT (AX, sign extended) after time DT (stack double): when the turn rate +0x79 exceeds 0.0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1db08` | EAX:ef_addr32 | none | 1d954@1d9c0 | Slew the two aim angles of object CTX (EAX), at +0x81 and +0x89, toward their targets. The first target is the offset fr |

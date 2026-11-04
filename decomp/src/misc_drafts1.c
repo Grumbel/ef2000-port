@@ -19060,7 +19060,7 @@ void slew_aim_angles_1db08(ef_addr32 ctx)
 	memcpy(&v71, ef_guest_memory_ptr(ctx + 0x71u), 8);
 	memcpy(&dt, ef_guest_memory_ptr(0x0019af70u), 8);
 	d1 = d1 - a81;
-	a1 = fabs(d1);
+	a1 = abs_double_b427c(d1);
 	if (a1 > 5e-05) {
 		lim = rate * dt;
 		if (a1 > lim)
@@ -19069,7 +19069,7 @@ void slew_aim_angles_1db08(ef_addr32 ctx)
 		memcpy(ef_guest_memory_ptr(ctx + 0x81u), &a81, 8);
 	}
 	d2 = -atan_dc1d4(sign_double_b42b0(d1) * a1 * v71 / dt * 0.1019367991845056) - a89;
-	a2 = fabs(d2);
+	a2 = abs_double_b427c(d2);
 	if (a2 > 5e-05) {
 		lim = rate * dt * 10.0;
 		if (a2 > lim)

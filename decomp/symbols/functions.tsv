@@ -327,7 +327,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001d8a8	63	advance_stage_1d8a8	game_helpers5	compiles	game	confirmed	decomp/tests/0x0001d8a8.json	docs/compiler-abi.md; Advance the stage counter for some stage kinds; returns 1 if advanced by 0x1d8e8.; callers 1d700@1d73f,1d700@1d75d; guest pending
 0x0001d8e8	106	waypoint_near_1d8e8	float_helpers1	compiles	game	confirmed	decomp/tests/0x0001d8e8.json	docs/compiler-abi.md; True when the current waypoint is within the limit on either axis.; callers 1d8a8@1d8d1,1d954@1daed; guest pending
 0x0001d954	434			unknown	unclassified	unverified		
-0x0001db08	280			unknown	unclassified	unverified		
+0x0001db08	280	slew_aim_angles_1db08	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001db08.json	docs/compiler-abi.md; Slew the two aim angles of object CTX (EAX), at +0x81 and +0x89, toward their targets. The first target is the offset fr; callers 1d954@1d9c0; guest pending
 0x0001dc20	666			unknown	unclassified	unverified		
 0x0001debc	209	mirror_record_floats_1debc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001debc.json	docs/compiler-abi.md; Convert the floating point state of the record R (EAX) into its integer mirror: save the dwords at +9, +0xd and +0x11 to; callers 1d954@1dadc; guest pending
 0x0001df90	348	projectile_ground_test_1df90	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001df90.json	docs/compiler-abi.md; Ground impact test for the projectile REC (owner byte +0x27 must match byte 0x1a666b and the done flag +0x47 must be cle; callers 1d954@1daf8; guest pending
