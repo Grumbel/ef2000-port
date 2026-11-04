@@ -23664,3 +23664,31 @@ uint8_t serial_read_packet_107070(ef_addr32 rec, uint32_t timeout)
 	EF_U32(rec + 0x20u) = o20;
 	return 0u;
 }
+
+/* 0x11a5c0, 292 bytes. Transform the object's point and a cross-product offset by the global matrix, and when the point is at or above the 0x432240 level and the constant at 0x4644c0 is not below 0x1957b4, accumulate a depth-proportional force term and hand it to 0x119f10. */
+void accum_depth_force_11a5c0(ef_addr32 obj)
+{
+	double a[3], b[3], c[3], acc[3];
+	double d, t;
+	acc[0] = 0.0; acc[1] = 0.0; acc[2] = 0.0;
+	transform_by_global_matrix_ea038((ef_addr32)(uintptr_t)c, obj);
+	c[0] += md_rd_f64(0x00432320u);
+	c[1] += md_rd_f64(0x00432328u);
+	c[2] += md_rd_f64(0x00432330u);
+	cross_product_doubles((ef_addr32)(uintptr_t)b, 0x00432338u, obj);
+	b[0] += md_rd_f64(0x004322e8u);
+	b[1] += md_rd_f64(0x004322f0u);
+	b[2] += md_rd_f64(0x004322f8u);
+	transform_by_global_matrix_ea038((ef_addr32)(uintptr_t)a, (ef_addr32)(uintptr_t)b);
+	if (c[2] < md_rd_f64(0x00432240u))
+		return;
+	if (md_rd_f64(0x004644c0u) < md_rd_f64(0x001957b4u))
+		return;
+	d = c[2] - md_rd_f64(0x00432240u);
+	md_wr_f64(0x00432748u, d);
+	t = (-d) * md_rd_f64(0x001957bcu) - a[2] * md_rd_f64(0x001957c4u);
+	acc[0] += t * md_rd_f64(0x004644b0u);
+	acc[1] += t * md_rd_f64(0x004644b8u);
+	acc[2] += t * md_rd_f64(0x004644c0u);
+	accum_cross_119f10(obj, (uint32_t)(uintptr_t)acc);
+}

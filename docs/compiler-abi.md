@@ -9555,3 +9555,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x107070` | EAX:ef_addr32,EDX:uint32_t | AL:uint8_t | d9cb4@d9ce1,d9dc0@d9dd3 | Read a 12-byte packet from the serial ring record, verify its sum checksum and store the five decoded fields plus the th |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11a5c0` | EAX:ef_addr32 | none | 11a6e4@11a7bf | Transform the object's point and a cross-product offset by the global matrix, and when the point is at or above the 0x43 |

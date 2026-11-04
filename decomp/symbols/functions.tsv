@@ -4168,7 +4168,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00119be0	813			unknown	unclassified	unverified		
 0x00119f10	119	accum_cross_119f10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119f10.json	docs/compiler-abi.md; Accumulate vector b (EDX) into the sum at 0x432a28 and the cross product a x b (EAX, EDX) into 0x4329c0.; callers 119f88@11a5ab,11a5c0@11a6d8; guest pending
 0x00119f88	1591			unknown	unclassified	unverified		
-0x0011a5c0	292			unknown	unclassified	unverified		
+0x0011a5c0	292	accum_depth_force_11a5c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011a5c0.json	docs/compiler-abi.md; Transform the object's point and a cross-product offset by the global matrix, and when the point is at or above the 0x43; callers 11a6e4@11a7bf; guest pending
 0x0011a6e4	1337			unknown	unclassified	unverified		
 0x0011ac3c	35	table_double_11ac3c	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011ac3c.json	docs/compiler-abi.md; Fetch a double from the table at [obj+0xf]; the index is built from three bytes with the multipliers at obj+1 and obj+2 ; callers 11acb0@11ad04; guest pending
 0x0011acb0	397			unknown	unclassified	unverified		

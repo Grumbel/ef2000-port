@@ -6537,4 +6537,7 @@ uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count); /* 0
 uint8_t serial_read_packet_107070(ef_addr32 rec, uint32_t timeout);
 uint8_t serial_read_packet_107070(ef_addr32 rec, uint32_t timeout); /* 0x107070 */
 
+void accum_depth_force_11a5c0(ef_addr32 obj);
+void accum_depth_force_11a5c0(ef_addr32 obj); /* 0x11a5c0 */
+
 #endif
