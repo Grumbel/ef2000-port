@@ -1467,3 +1467,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00069680	transform_point_69680	EAX:ef_addr32,EDX:ef_addr32,BX:int16_t,CX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00069680 (189 bytes); Transform (x, y) by the 3x3 matrix at 0x15ffda and add the translation pair.; callers 69740@69859; docs/compiler-abi.md
 0x000758c0	blend_palette_758c0	AX:uint16_t,EDX:ef_addr32,EBX:ef_addr32,CL:uint8_t,[ESP+4]:uint8_t,[ESP+8]:uint8_t		ebx,ecx,edx,esi,edi,ebp	8	Original 0x000758c0 (186 bytes); Blend a 256-entry RGB palette towards a target colour by factor/50.; callers 76370@7642a,76370@764f2; docs/compiler-abi.md
 0x00077534	trigger_linked_event_77534	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00077534 (187 bytes); Trigger the linked-unit event for a unit and notify the matching display slots.; callers 46454@46795; docs/compiler-abi.md
+0x0001d420	reset_handler_1d420			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0001d420 (11 bytes); Reset the 0x132ae0 handler pointer.; callers 15af0@15b74,3cfc0@3d1c0,3dd30@3dd7c; docs/compiler-abi.md
+0x000768fc	set_limit_768fc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000768fc (10 bytes); Set the 4000 limit word.; callers 58d64@58d78; docs/compiler-abi.md
+0x00077c28	set_timer_77c28			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00077c28 (10 bytes); Set the 0x118 timer word.; callers 77c90@77d94; docs/compiler-abi.md
+0x0009854c	set_handler_9854c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009854c (11 bytes); Install the 0x984f0 handler.; callers 49228@49288,49228@494e8,69094@69133; docs/compiler-abi.md
+0x000a45a8	reseed_generator_a45a8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a45a8 (11 bytes); Reseed the generator.; callers 3dd30@3dd60,3dd30@3de1f,7a844@7a876; docs/compiler-abi.md
+0x000e3c60	set_pointer_e3c60			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e3c60 (11 bytes); Set the 0x159134 pointer to its default.; callers c8c34@c4550,e4188@e423e; docs/compiler-abi.md
+0x000eb24e	set_limit_eb24e			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb24e (11 bytes); Set the 0x17d400 limit to 0x8000.; callers 9bd20@9bd50; docs/compiler-abi.md
+0x000fd371	set_pointer_fd371			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fd371 (11 bytes); Set the 0x17bfea pointer to its default.; callers none direct; docs/compiler-abi.md

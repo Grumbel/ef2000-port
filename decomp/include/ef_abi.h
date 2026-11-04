@@ -2469,4 +2469,15 @@ void blend_palette_758c0(uint16_t factor, ef_addr32 source, ef_addr32 dest, uint
 void trigger_linked_event_77534(uint32_t id);
 
 
+/* tiny_helpers3.c */
+void reset_handler_1d420(void);
+void set_limit_768fc(void);
+void set_timer_77c28(void);
+void set_handler_9854c(void);
+void reseed_generator_a45a8(void);
+void set_pointer_e3c60(void);
+void set_limit_eb24e(void);
+void set_pointer_fd371(void);
+
+
 #endif

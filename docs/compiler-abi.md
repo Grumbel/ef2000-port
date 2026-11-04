@@ -3178,3 +3178,16 @@ in EAX, format string address, one value).
 | `0x69680` | EAX:ef_addr32,EDX:ef_addr32,BX:int16_t,CX:int16_t | none | 69740@69859 | Transform (x, y) by the 3x3 matrix at 0x15ffda and add the translation pair. |
 | `0x758c0` | AX:uint16_t,EDX:ef_addr32,EBX:ef_addr32,CL:uint8_t,[ESP+4]:uint8_t,[ESP+8]:uint8_t | none | 76370@7642a,76370@764f2 | Blend a 256-entry RGB palette towards a target colour by factor/50. |
 | `0x77534` | EAX:uint32_t | none | 46454@46795 | Trigger the linked-unit event for a unit and notify the matching display slots. |
+
+## tiny_helpers3 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1d420` | none | none | 15af0@15b74,3cfc0@3d1c0,3dd30@3dd7c | Reset the 0x132ae0 handler pointer. |
+| `0x768fc` | none | none | 58d64@58d78 | Set the 4000 limit word. |
+| `0x77c28` | none | none | 77c90@77d94 | Set the 0x118 timer word. |
+| `0x9854c` | none | none | 49228@49288,49228@494e8,69094@69133 | Install the 0x984f0 handler. |
+| `0xa45a8` | none | none | 3dd30@3dd60,3dd30@3de1f,7a844@7a876 | Reseed the generator. |
+| `0xe3c60` | none | none | c8c34@c4550,e4188@e423e | Set the 0x159134 pointer to its default. |
+| `0xeb24e` | none | none | 9bd20@9bd50 | Set the 0x17d400 limit to 0x8000. |
+| `0xfd371` | none | none | none direct | Set the 0x17bfea pointer to its default. |
