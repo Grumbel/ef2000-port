@@ -4973,3 +4973,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf3610` | EAX:uint32_t | none | f36a4@f36b0 | Draw the segments of path record index (42-byte records at 0x484be0, count in the first word): one 0xe7a34 call per segm |
+
+## tactical_marks1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x85f78` | EAX:uint32_t | EAX:uint32_t | 86110@866a9 | Starting after the current slot (byte +0x1d7) of the player's unit, scan its 20 three-byte slots (+0x198) cyclically for |

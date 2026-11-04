@@ -59,3 +59,35 @@ void draw_path_segments_f3610(uint32_t index)
     guest_fn_c3990();
     guest_fn_dd8dc();
 }
+
+/* 0x85f78, 148 bytes. Starting after the current slot (byte +0x1d7) of the player's unit, scan its 20 three-byte slots (+0x198) cyclically for one of class key whose count word (+0x19c) is non-zero and whose type byte is not 0x21/0x22. Returns the slot, 0x13 (after storing key at 0x12bd25) or 0x14 for none. */
+uint32_t next_matching_slot_85f78(uint32_t key)
+{
+    ef_addr32 unit = guest_fn_7489c((int32_t)EF_S16(0x001f71cau));
+    int16_t slot;
+    key &= 0xffu;
+    if ((EF_U32(unit + 0x1d4u) >> 24) == 0x14u)
+        return 0x14u;
+    slot = (int8_t)EF_U8(unit + 0x1d7u);
+    for (;;) {
+        uint32_t base, type;
+        slot++;
+        if ((int32_t)slot >= 0x14)
+            slot = 0;
+        if (slot == 0x13) {
+            EF_U8(0x0012bd25u) = (uint8_t)key;
+            return (uint32_t)(uint16_t)slot;
+        }
+        if (slot == (int16_t)(int8_t)EF_U8(unit + 0x1d7u))
+            return 0x14u;
+        base = unit + (uint32_t)(int32_t)slot * 3u;
+        type = EF_U32(base + 0x198u) >> 24;
+        if (key != EF_U8(0x0012bc94u + type * 0x91u))
+            continue;
+        if (EF_U16(base + 0x19cu) == 0u)
+            continue;
+        if (type == 0x21u || type == 0x22u)
+            continue;
+        return (uint32_t)(uint16_t)slot;
+    }
+}

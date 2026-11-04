@@ -1689,7 +1689,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00085c90	104	page_row_85c90	game_helpers20	compiles	game	confirmed	decomp/tests/0x00085c90.json	docs/compiler-abi.md; Address of row `index` (6 bytes) in the selected unit's page table, or the default table.; callers 2a1fc@2a27b,86110@86188,86968@86a06; guest pending
 0x00085cf8	8	set_mode_85cf8	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00085cf8.json	docs/compiler-abi.md; ; callers 3ea0c@3ee3c; guest pending
 0x00085d00	369			unknown	unclassified	unverified		
-0x00085f78	148			unknown	unclassified	unverified		
+0x00085f78	148	next_matching_slot_85f78	tactical_marks1	compiles	game	confirmed	decomp/tests/0x00085f78.json	docs/compiler-abi.md; Starting after the current slot (byte +0x1d7) of the player's unit, scan its 20 three-byte slots (+0x198) cyclically for; callers 86110@866a9; guest pending
 0x0008600c	179	find_next_slot_8600c	game_helpers47	compiles	game	confirmed	decomp/tests/0x0008600c.json	docs/compiler-abi.md; Find the next slot after the current one that holds the given kind.; callers 86110@8666b; guest pending
 0x000860c0	80	first_nonignored_activity_slot	record_callers	compiles	game	confirmed	decomp/tests/0x000860c0.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00086110	1476			unknown	unclassified	unverified		
