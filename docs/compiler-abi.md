@@ -7438,3 +7438,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd68` | EAX:ef_addr32 | none | none direct | Report a bad record P (stack, cdecl): when its word at +0x26 is set and the wrapping byte counter 0x120d2c reaches zero  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe3f00` | EAX:ef_addr32 | none | none direct | Parse one "KEY=path" setting (TEXT in EAX): copy the identifier KEY, skip the '=' and build PATH with a leading and a tr |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

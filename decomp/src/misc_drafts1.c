@@ -11451,3 +11451,30 @@ void report_bad_record_d68(ef_addr32 p)
                       EF_U32(p + 0x14u), EF_U32(p + 0x18u), q, EF_U32(q), EF_U32(q + 4u), EF_U32(q + 8u),
                       EF_U32(q + 0xcu), EF_U32(q + 0x10u), EF_U32(q + 0x14u), EF_U32(q + 0x18u));
 }
+
+/* 0xe3f00, 188 bytes. Parse one "KEY=path" setting (TEXT in EAX): copy the identifier KEY, skip the '=' and build PATH with a leading and a trailing separator (0x190aac) unless it already starts or ends with a backslash. KEY is upper-cased and compared (0xa4380) with 0x190ab0, which stores PATH at 0x15f910, or else with 0x190ab4, which stores it at 0x15f920. The 16 byte KEY and PATH buffers live back to back with the cursor in one frame, so a long value overruns into it (original behaviour). */
+void parse_path_setting_e3f00(ef_addr32 text)
+{
+    uint32_t frame[9];
+    uint8_t *f = (uint8_t *)frame;
+    ef_addr32 key = (ef_addr32)(uintptr_t)f;
+    ef_addr32 buf = (ef_addr32)(uintptr_t)(f + 0x10);
+    ef_addr32 cursor = (ef_addr32)(uintptr_t)(f + 0x20);
+    memcpy(f + 0x20, &text, sizeof text);
+    copy_identifier_10934c(key, cursor);
+    expect_byte_109328(cursor, 0x3du);
+    f[0x10] = 0u;
+    memcpy(&text, f + 0x20, sizeof text);
+    if (EF_U8(text) != 0x5cu)
+        strcat_9ca57(buf, 0x00190aacu);
+    memcpy(&text, f + 0x20, sizeof text);
+    strcat_9ca57(buf, text);
+    if (f[0x10 + guest_fn_b1b8b(buf) - 1u] != 0x5cu)
+        strcat_9ca57(buf, 0x00190aacu);
+    uppercase_string(key);
+    if (guest_fn_a4380(key, 0x00190ab0u) == 0u) {
+        copy_string_9d749(0x0015f910u, buf);
+    } else if (guest_fn_a4380(key, 0x00190ab4u) == 0u) {
+        copy_string_9d749(0x0015f920u, buf);
+    }
+}

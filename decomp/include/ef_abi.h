@@ -5455,4 +5455,8 @@ void guest_callptr26_x(ef_addr32 fn, uint32_t a0, uint32_t a1, uint32_t a2, uint
 
 
 
+void parse_path_setting_e3f00(ef_addr32 text);
+
+
+
 #endif
