@@ -12934,3 +12934,14 @@ void integrate_drift_538e4(void)
         EF_U32(0x001a5b5cu) = 0u;
     }
 }
+
+/* 0x88ff8, 103 bytes. Unsigned angle between the unit vectors A (EAX) and B (EDX): the dot product (0xb43dc) clamped to [-1, 1], its arccosine (0xe7df4), wrapped by 0xb42f0 and made positive by 0xb427c. */
+double angle_between_88ff8(ef_addr32 a, ef_addr32 b)
+{
+    double d = dot_product_b43dc(a, b);
+    if (!(1.0 >= d))
+        d = 1.0;
+    if (!(d >= -1.0))
+        d = -1.0;
+    return abs_double_b427c(wrap_angle_b42f0(guest_fn_e7df4_x(d)));
+}

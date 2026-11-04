@@ -7741,3 +7741,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x538e4` | none | none | 53c80@53ca9 | Integrate the floating drift state for one frame of DT = word 0x127d92 ticks: the positions 0x1a5c00, 0x1a5bb8 and 0x1a5 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x88ff8` | EAX:ef_addr32,EDX:ef_addr32 | EAX:double | 28b80@28d85,29b14@29c99,89060@8911b | Unsigned angle between the unit vectors A (EAX) and B (EDX): the dot product (0xb43dc) clamped to [-1, 1], its arccosine |

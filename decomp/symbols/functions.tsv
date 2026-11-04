@@ -1738,7 +1738,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00088e98	209			unknown	unclassified	unverified		
 0x00088f6c	71	matrix_vector_88f6c	float_helpers4	compiles	game	confirmed	decomp/tests/0x00088f6c.json	docs/compiler-abi.md; Multiply a vector of three doubles by a 3x3 double matrix (row form).; callers 89fbc@8a184; guest pending
 0x00088fb4	67	direction_vector_88fb4	float_helpers10	compiles	game	confirmed	decomp/tests/0x00088fb4.json	docs/compiler-abi.md; Unit direction vector from a heading (a) and pitch (b): (cos a cos b, sin a cos b, -sin b).; callers 29b14@29c90,89060@890cd,899d8@89a44; guest pending
-0x00088ff8	103			unknown	unclassified	unverified		
+0x00088ff8	103	angle_between_88ff8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00088ff8.json	docs/compiler-abi.md; Unsigned angle between the unit vectors A (EAX) and B (EDX): the dot product (0xb43dc) clamped to [-1, 1], its arccosine; callers 28b80@28d85,29b14@29c99,89060@8911b; guest pending
 0x00089060	221	can_reach_target_89060	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089060.json	docs/compiler-abi.md; Test whether the unit record R (EAX) can reach the point: store the target dword T (EDX, when nonzero and R's class byte; callers 89698@89784; guest pending
 0x00089140	33	adjust_record_scalar	misc_state	compiles	game	confirmed	decomp/tests/0x00089140.json	docs/compiler-abi.md; record+0x26 = trunc(dword + double 0x18a4e0) then 0x89924; callers 86968@86a6d; guest pending
 0x00089164	473			unknown	unclassified	unverified		
