@@ -5708,4 +5708,6 @@ void guest_fn_20ec_x(void); /* 0x20ec */
 
 void init_slot_table_76cc4(void);
 
+ef_addr32 spell_number_45dd4(int32_t value);
+
 #endif

@@ -7966,3 +7966,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x76cc4` | none | none | 49228@495c1 | Initialise the table of 30 (0x1e) 25 byte slots with 0x76b10 (count byte 0x1f8920), set the word at +1 of every slot to  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x45dd4` | EAX:int32_t | EAX:ef_addr32 | 77c90@78289,77c90@782b1,77c90@78413 | Spell the number VALUE (EAX) as a list of glyph words at 0x1a522a (word 0 holds the count, the glyphs follow at +2, +4,  |

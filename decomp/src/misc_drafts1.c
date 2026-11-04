@@ -14058,3 +14058,43 @@ void init_slot_table_76cc4(void)
     EF_U8(0x0012a715u) = 3u;
     EF_U8(0x001f8920u) = n;
 }
+
+/* 0x45dd4, 358 bytes. Spell the number VALUE (EAX) as a list of glyph words at 0x1a522a (word 0 holds the count, the glyphs follow at +2, +4, ...): thousands from the table pointed to by 0x1a51f4 (glyph = word +2 of the entry, followed by the word of 0x1a5208 +2 in the second slot), hundreds likewise with the "hundred" glyph of 0x1a520c, then 0..19 straight from the table, or the tens digit from 0x1a5204 plus the unit digit. The quotient bytes are truncated to 8 bits as in the original. Returns 0x1a522a. */
+ef_addr32 spell_number_45dd4(int32_t value)
+{
+    ef_addr32 tab = EF_U32(0x001a51f4u);
+    int32_t rest = value;
+    uint8_t n = 1u;
+    uint8_t q;
+    q = (uint8_t)(rest / 1000);
+    if (q != 0u) {
+        EF_U16(0x001a522cu) = EF_U16(tab + (uint32_t)q * 4u + 2u);
+        EF_U16(0x001a522eu) = EF_U16(EF_U32(0x001a5208u) + 2u);
+        n = 3u;
+        rest -= (int32_t)q * 1000;
+    }
+    q = (uint8_t)(rest / 100);
+    if (q != 0u) {
+        EF_U16(0x001a522au + (uint32_t)n * 2u) = EF_U16(tab + (uint32_t)q * 4u + 2u);
+        n++;
+        EF_U16(0x001a522au + (uint32_t)n * 2u) = EF_U16(EF_U32(0x001a520cu) + 2u);
+        n++;
+        rest -= (int32_t)q * 100;
+    }
+    if (rest <= 0x13) {
+        EF_U16(0x001a522au + (uint32_t)n * 2u) = EF_U16(tab + (uint32_t)rest * 4u + 2u);
+        n++;
+    } else {
+        q = (uint8_t)(rest / 10);
+        EF_U16(0x001a522au + (uint32_t)n * 2u) = EF_U16(EF_U32(0x001a5204u) + (uint32_t)q * 4u + 2u);
+        n++;
+        rest -= (int32_t)q * 10;
+        if (rest != 0) {
+            EF_U16(0x001a522au + (uint32_t)n * 2u) = EF_U16(tab + (uint32_t)rest * 4u + 2u);
+            n++;
+        }
+    }
+    EF_U16(0x001a522au) = (uint16_t)(n - 1u);
+    EF_U32(0x001a51f4u) = tab;
+    return 0x001a522au;
+}
