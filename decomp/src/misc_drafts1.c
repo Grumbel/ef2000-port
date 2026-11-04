@@ -24260,3 +24260,49 @@ void update_unit_vector_75344(int16_t unit)
 	EF_U32(obj + 0x1fc) = 0;
 	EF_S32(obj + 0x1f0) = (int32_t)truncate_9d72c(k2 * (k1 * d0));
 }
+
+/* 0xa2a90, 331 bytes. Formats "<name><sep><value><end>" into a 96-byte host buffer and writes it to the handle at 0x136df8. type: 1 byte hex, 2 word hex, 3 byte enum looked up in table (pairs of name pointer and value; terminated by an empty name), 4 literal string, 5 word hex. */
+void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, uint8_t type)
+{
+	char buf[96];
+	ef_addr32 b = (ef_addr32)(uintptr_t)buf;
+	ef_addr32 found = 0;
+	ef_addr32 t;
+
+	guest_fn_9d749(b, name);
+	guest_fn_9ca57(b, 0x18cc2cu);
+	switch (type) {
+	case 1:
+		guest_sprintf_a4342(b + guest_fn_b1b8b(b), 0x18cc30u, (uint32_t)EF_U8(data));
+		break;
+	case 2:
+		guest_sprintf_a4342(b + guest_fn_b1b8b(b), 0x18cc34u, (uint32_t)EF_U16(data));
+		break;
+	case 3:
+		t = table;
+		while (EF_U8(EF_U32(t)) != 0 && found == 0) {
+			if ((uint32_t)EF_U8(data) == EF_U32(t + 4)) found = EF_U32(t);
+			t += 8;
+		}
+		if (found == 0) guest_report_parser_enum_error(0x18cc44u, name, data);
+		guest_fn_9ca57(b, found);
+		t = table;
+		for (;;) {
+			guest_fn_9ca57(b, 0x18cc68u);
+			if (EF_U8(EF_U32(t)) == 0) break;
+			guest_fn_9ca57(b, EF_U32(t));
+			t += 8;
+		}
+		break;
+	case 4:
+		guest_fn_9ca57(b, data);
+		break;
+	case 5:
+		guest_sprintf_a4342(b + guest_fn_b1b8b(b), 0x18cc3cu, (uint32_t)EF_U16(data));
+		break;
+	default:
+		break;
+	}
+	guest_fn_9ca57(b, 0x18cc70u);
+	write_handle_a7a1c(0, 0, 0, 0, EF_U32(0x136df8u), guest_fn_b1b8b(b), b);
+}

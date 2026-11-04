@@ -9651,3 +9651,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x75344` | AX:int16_t | none | 6a1d0@6a2dc | AX = unit index. Looks up the unit object and sets its integer vector fields at +0x1e8, +0x1ec and +0x1f0 (and zeroes +0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa2a90` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,CL:uint8_t | none | a2bdc@a2c16,a2bdc@a2c26,a2bdc@a2c36 | Formats "<name><sep><value><end>" into a 96-byte host buffer and writes it to the handle at 0x136df8. type: 1 byte hex,  |

@@ -6585,4 +6585,7 @@ void guest_fn_8b8(uint32_t code, ef_addr32 block); /* 0x8b8 */
 void update_unit_vector_75344(int16_t unit);
 void update_unit_vector_75344(int16_t unit); /* 0x75344 */
 
+void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, uint8_t type);
+void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, uint8_t type); /* 0xa2a90 */
+
 #endif
