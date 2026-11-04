@@ -6520,4 +6520,9 @@ uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count);
 uint32_t dpmi_present_11cda5(void); /* 0x11cda5 */
 uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count); /* 0x110393 */
 
+void dosx_int21_2502_3f8(uint32_t a, uint32_t b, uint32_t c);
+void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c);
+void dosx_int21_2502_3f8(uint32_t a, uint32_t b, uint32_t c); /* 0x3f8 */
+void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c); /* 0x484 */
+
 #endif

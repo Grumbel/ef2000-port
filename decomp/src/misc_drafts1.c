@@ -23462,3 +23462,32 @@ uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count)
 		guest_fn_ebe6d(0xcu);
 	return out[0];
 }
+
+/* Shared body of the DOS-extender int 21h wrappers at 0x3f8/0x484: fill the register block at 0x196148 and run int 21h with it, storing the results back. */
+static void dosx_call_196148(uint32_t func, uint32_t ecx_in, uint32_t edx_in, uint32_t seg)
+{
+	uint32_t out[7];
+	EF_U32(0x196148u) = func;
+	EF_U32(0x196150u) = ecx_in;
+	EF_U32(0x196154u) = edx_in;
+	EF_U16(0x19616au) = (uint16_t)seg;
+	run_dos_int_ex(0x21u, func, EF_U32(0x19614cu), ecx_in, edx_in, out);
+	EF_U32(0x196148u) = out[0];
+	EF_U32(0x19614cu) = out[1];
+	EF_U32(0x196150u) = out[2];
+	EF_U32(0x196154u) = out[3];
+	EF_U32(0x196158u) = out[4];
+	EF_U32(0x19615cu) = out[5];
+}
+
+/* 0x3f8, 140 bytes. DOS-extender int 21h AX=2502h (get protected-mode interrupt vector) through the register block at 0x196148. */
+void dosx_int21_2502_3f8(uint32_t a, uint32_t b, uint32_t c)
+{
+	dosx_call_196148(0x2502u, a, b, c);
+}
+
+/* 0x484, 140 bytes. DOS-extender int 21h AX=2506h through the register block at 0x196148. */
+void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c)
+{
+	dosx_call_196148(0x2506u, a, b, c);
+}
