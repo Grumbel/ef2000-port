@@ -10379,3 +10379,51 @@ ef_addr32 create_slot_record_fc0ec(uint32_t a, uint32_t b)
     }
     return rec;
 }
+
+/* 0xe17f8, 307 bytes. Rebuild the 0x800-byte entry table at 0x4198c8 for the page in byte 0x15f714: initialise every 8-byte entry from index 2 on with the default bytes 0x84, 0, 0xa, 9 at +0, +1, +2, +3, then walk the descriptor array at 0x15f714 (8 bytes each: page byte, start column, two parameters at +2/+3, string pointer at +4, ended by an empty string) and for each character of every string find the next run of rows that are clear (0xe17b8, first skipping set ones), recording for the character the run start (+0), the run length (+2) and the two parameters (+1, +3) in the entry at 0x4198d0 + page * 0x800 + char * 8. */
+void build_glyph_runs_e17f8(void)
+{
+    uint32_t page = (uint32_t)EF_U8(0x0015f714u) << 11;
+    uint32_t e;
+    uint32_t k;
+    for (e = page + 0x110u; e <= page + 0x800u; e += 8u) {
+        EF_U8(e + 0x4198c8u) = 0x84u;
+        EF_U8(e + 0x4198cau) = 0xau;
+        EF_U8(e + 0x4198cbu) = 9u;
+        EF_U8(e + 0x4198c9u) = 0u;
+    }
+    for (k = 0u;; k++) {
+        uint32_t d = k * 8u;
+        ef_addr32 str = EF_U32(0x0015f718u + d);
+        uint32_t vc;
+        uint32_t vd;
+        uint32_t col;
+        uint32_t start;
+        uint32_t base;
+        uint32_t ch;
+        if (EF_U8(str) == 0u)
+            return;
+        vc = EF_U8(0x0015f716u + d);
+        vd = EF_U8(0x0015f717u + d);
+        col = EF_U8(0x0015f715u + d);
+        if (EF_U8(str) == 0u)
+            continue;
+        for (;;) {
+            while (rows_clear_e17b8(col, (int32_t)vc, (int32_t)vd) != 0u)
+                col++;
+            start = col;
+            while (rows_clear_e17b8(col, (int32_t)vc, (int32_t)vd) == 0u)
+                col++;
+            base = (uint32_t)EF_U8(0x0015f714u + d) << 11;
+            ch = EF_U8(str);
+            EF_U8(base + ch * 8u + 0x4198d0u) = (uint8_t)start;
+            EF_U8(base + ch * 8u + 0x4198d2u) = (uint8_t)((uint8_t)col - (uint8_t)start);
+            EF_U8(base + ch * 8u + 0x4198d1u) = (uint8_t)vc;
+            EF_U8(base + ch * 8u + 0x4198d3u) = (uint8_t)vd;
+            ch = EF_U8(str + 1u);
+            str++;
+            if (ch == 0u)
+                break;
+        }
+    }
+}

@@ -3325,7 +3325,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e1780	17	unsupported_query_e1780	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1780.json	docs/compiler-abi.md; Unsupported input query: abort and report none.; callers 34140@34150,34ea4@34ef5; guest pending
 0x000e17a0	22	clear_block_e17a0	math_string	compiles	game	confirmed	decomp/tests/0x000e17a0.json	docs/compiler-abi.md; Clear 0x5000 bytes at 0x4198d0.; callers abf8c@abfcd; guest pending
 0x000e17b8	64	rows_clear_e17b8	game_helpers25	compiles	game	confirmed	decomp/tests/0x000e17b8.json	docs/compiler-abi.md; True when a column of 256-byte rows is clear for the given count.; callers e17f8@e1891,e17f8@e18ab; guest pending
-0x000e17f8	307			unknown	unclassified	unverified		
+0x000e17f8	307	build_glyph_runs_e17f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e17f8.json	docs/compiler-abi.md; Rebuild the 0x800-byte entry table at 0x4198c8 for the page in byte 0x15f714: initialise every 8-byte entry from index 2; callers ac0e0@ac119; guest pending
 0x000e192c	25	read_table_e192c	math_string	compiles	game	confirmed	decomp/tests/0x000e192c.json	docs/compiler-abi.md; Byte at 0x1378d8 + 10*AL.; callers a63c0@a63f0; guest pending
 0x000e1948	16	fatal_with_arg_e1948	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1948.json	docs/compiler-abi.md; Abort with a message that includes the argument.; callers e1e6c@e1efb,e1e6c@e1fc8,e1e6c@e20c5; guest pending
 0x000e1958	956			unknown	unclassified	unverified		

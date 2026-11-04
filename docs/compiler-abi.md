@@ -7212,3 +7212,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfc0ec` | EAX:uint32_t,EDX:uint32_t | EAX:ef_addr32 | bf444@bf5d4,bf81c@bf8f4,bfa58@bfab1 | Allocate the slot-set record for the pair (A = AL, B = DL): a 10-byte header (a at +0, b at +1, the slot count from 0xfc |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe17f8` | none | none | ac0e0@ac119 | Rebuild the 0x800-byte entry table at 0x4198c8 for the page in byte 0x15f714: initialise every 8-byte entry from index 2 |
