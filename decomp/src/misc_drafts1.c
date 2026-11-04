@@ -1501,3 +1501,74 @@ void load_string_table_e3868(void)
     }
     EF_U32(EF_U32(0x00429228u)) = 0x00190944u;
 }
+
+/* 0xfdec0, 160 bytes. (ret 8) Bresenham circle quadrant walk: x = esi decreasing, y = edi increasing until it reaches the end row ebp, err = ebx the decision variable; the callback fn (first stack argument) is called with EAX = ctx (second stack argument) and EDX = x at the points of the walk. */
+void circle_walk_down_fdec0(int32_t x, int32_t y, int32_t err, int32_t y_end, uint32_t fn, uint32_t ctx)
+{
+    while (y < y_end) {
+        if (err == 0) {
+            y++;
+            x--;
+            err = (y - x) * 2;
+            guest_callptr_eaxedx_x(fn, ctx, (uint32_t)x);
+            err += 2;
+        } else if (err < 0) {
+            if ((err + x) * 2 - 1 > 0) {
+                x--;
+                guest_callptr_eaxedx_x(fn, ctx, (uint32_t)x);
+                y++;
+                err += (y - x) * 2 + 2;
+            } else {
+                guest_callptr_eaxedx_x(fn, ctx, (uint32_t)x);
+                y++;
+                err += y * 2 + 1;
+            }
+        } else {
+            if ((err - y) * 2 - 1 > 0) {
+                x--;
+                err += 1 - x * 2;
+            } else {
+                x--;
+                guest_callptr_eaxedx_x(fn, ctx, (uint32_t)x);
+                y++;
+                err += (y - x) * 2 + 2;
+            }
+        }
+    }
+}
+
+/* 0xfde20, 160 bytes. (ret 8) Mirror image of 0xfdec0: x = esi increasing, y = edi decreasing until it reaches the end row ebp. */
+void circle_walk_up_fde20(int32_t x, int32_t y, int32_t err, int32_t y_end, uint32_t fn, uint32_t ctx)
+{
+    while (y > y_end) {
+        if (err == 0) {
+            uint32_t cx = (uint32_t)x;
+            x++;
+            y--;
+            err = (x - y) * 2;
+            guest_callptr_eaxedx_x(fn, ctx, cx);
+            err += 2;
+        } else if (err < 0) {
+            if ((err + y) * 2 - 1 > 0) {
+                guest_callptr_eaxedx_x(fn, ctx, (uint32_t)x);
+                x++;
+                y--;
+                err += (x - y) * 2 + 2;
+            } else {
+                x++;
+                err += x * 2 + 1;
+            }
+        } else {
+            if ((err - x) * 2 - 1 > 0) {
+                guest_callptr_eaxedx_x(fn, ctx, (uint32_t)x);
+                y--;
+                err += 1 - y * 2;
+            } else {
+                guest_callptr_eaxedx_x(fn, ctx, (uint32_t)x);
+                x++;
+                y--;
+                err += (x - y) * 2 + 2;
+            }
+        }
+    }
+}

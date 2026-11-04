@@ -5549,3 +5549,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe3868` | none | none | e378c@e384a | Load the string table from the resource stream: the entry count word (0x15f902), a 2 * count byte header into the buffer |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfdec0` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | fdf60@fe0af | (ret 8) Bresenham circle quadrant walk: x = esi decreasing, y = edi increasing until it reaches the end row ebp, err = e |
+| `0xfde20` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | fdf60@fe09a | (ret 8) Mirror image of 0xfdec0: x = esi increasing, y = edi decreasing until it reaches the end row ebp. |

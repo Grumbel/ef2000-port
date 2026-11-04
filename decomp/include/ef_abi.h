@@ -4603,4 +4603,7 @@ uint8_t best_slot_kind_6f6b8(uint32_t unit);
 
 void load_string_table_e3868(void);
 
+void circle_walk_down_fdec0(int32_t x, int32_t y, int32_t err, int32_t y_end, uint32_t fn, uint32_t ctx);
+void circle_walk_up_fde20(int32_t x, int32_t y, int32_t err, int32_t y_end, uint32_t fn, uint32_t ctx);
+
 #endif
