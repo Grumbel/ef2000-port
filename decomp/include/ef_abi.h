@@ -5542,4 +5542,7 @@ double axis_offset_6a760(uint32_t a, uint32_t b);
 
 void maybe_fire_message_7308(ef_addr32 a, ef_addr32 b);
 
+uint32_t release_pending_item_172b4(uint32_t id);
+void guest_fn_2b0b4_x(int32_t id, uint32_t mode); /* 0x2b0b4 EAX/EDX */
+
 #endif

@@ -7599,3 +7599,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7308` | EAX:ef_addr32,EDX:ef_addr32 | none | 73ec@7563 | Occasionally fire a message from object B (EDX) at the nearest record of the owner of A (EAX; owner word at +0x15 of...  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x172b4` | EAX:uint32_t | EAX:uint32_t | 15b7c@15f84,16e60@1719c,16e60@17255 | Release one pending item of record ID (EAX; 0xca byte table at [0x19bb58]): needs a nonzero count byte +0x4f and flag by |

@@ -12197,3 +12197,39 @@ void maybe_fire_message_7308(ef_addr32 a, ef_addr32 b)
     guest_fn_46254((uint32_t)((int32_t)EF_U32(a + 0x4eu) >> 16), (int32_t)EF_U32(rec + 0x4eu) >> 16, 0x3au,
                    (uint32_t)target, 0u, 0u);
 }
+
+/* 0x172b4, 211 bytes. Release one pending item of record ID (EAX; 0xca byte table at [0x19bb58]): needs a nonzero count byte +0x4f and flag byte +0x1a, otherwise (and when the item word at +0x50 is 0xff, or its object is gone) returns 0xff. The item word is cleared; its object (0x7489c) gets bit 3 of +0x24 set, with 0x6a1d0(item, 0) and 0x741f0, and 0x56444(item, 0x64, -1) when byte 0x127da9 is set. Then the count is decremented, at zero 0x2b0b4(ID, 0) runs and the count byte is cleared; finally 0x2b708(ID). Returns the item word. */
+uint32_t release_pending_item_172b4(uint32_t id)
+{
+    ef_addr32 rec = EF_U32(0x0019bb58u) + id * 0xcau;
+    uint16_t item;
+    int32_t sitem;
+    ef_addr32 obj;
+    uint8_t cnt;
+    if (EF_U8(rec + 0x4fu) == 0u || EF_U8(rec + 0x1au) == 0u)
+        return 0xffu;
+    item = EF_U16(rec + 0x50u);
+    if (item == 0xffu)
+        return 0xffu;
+    sitem = (int16_t)item;
+    EF_U16(rec + 0x50u) = 0xffu;
+    obj = guest_fn_7489c(sitem);
+    if (obj == 0u)
+        return 0xffu;
+    if ((EF_U8(obj + 0x24u) & 8u) == 0u) {
+        EF_U8(obj + 0x24u) = (uint8_t)(EF_U8(obj + 0x24u) | 8u);
+        guest_fn_6a1d0(sitem, 0u);
+        guest_fn_741f0(obj);
+        if (EF_U8(0x00127da9u) != 0u)
+            send_unit_options_56444((int16_t)sitem, 0x64u, 0xffffu);
+    }
+    rec = EF_U32(0x0019bb58u) + id * 0xcau;
+    cnt = (uint8_t)(EF_U8(rec + 0x4fu) - 1u);
+    EF_U8(rec + 0x4fu) = cnt;
+    if (cnt == 0u) {
+        guest_fn_2b0b4_x((int16_t)id, 0u);
+        EF_U8(EF_U32(0x0019bb58u) + id * 0xcau + 0x4fu) = 0u;
+    }
+    guest_fn_2b708((int16_t)id);
+    return item;
+}

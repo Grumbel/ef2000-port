@@ -283,7 +283,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00016c7c	226	clear_missile_slots_16c7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00016c7c.json	docs/compiler-abi.md; Strip the missile-like stores (types 7, 9..0xf, 0x15..0x1c) from record A (EAX) in the table at [0x19bb58]: for each of ; callers 161d4@16579,168d8@16963; guest pending
 0x00016d60	255	count_down_slots_16d60	game_helpers41	compiles	game	confirmed	decomp/tests/0x00016d60.json	docs/compiler-abi.md; Count down the 20 three-byte slots of the given kind by the given amount.; callers 15b7c@15eab,16588@168a2,16e60@16f72; guest pending
 0x00016e60	1105			unknown	unclassified	unverified		
-0x000172b4	211			unknown	unclassified	unverified		
+0x000172b4	211	release_pending_item_172b4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000172b4.json	docs/compiler-abi.md; Release one pending item of record ID (EAX; 0xca byte table at [0x19bb58]): needs a nonzero count byte +0x4f and flag by; callers 15b7c@15f84,16e60@1719c,16e60@17255; guest pending
 0x00017388	25	flag_object_and_forward	low_helpers	compiles	game	confirmed	decomp/tests/0x00017388.json	docs/compiler-abi.md; 0x8ffe8 lookup; or 3 into +0x30; tail 0x3739c(high word +0x36); callers 16588@167ed; guest pending
 0x000173a4	30	decrement_grid_row_link_wide	low_helpers	compiles	game	confirmed	decomp/tests/0x000173a4.json	docs/compiler-abi.md; row[0x8e]=row[0x8f]-1 with 32-bit row index; callers 168d8@1696a; guest pending
 0x000173c4	112	find_special_slot_173c4	game_helpers15	compiles	game	confirmed	decomp/tests/0x000173c4.json	docs/compiler-abi.md; Scan the owner's linked units for a slot code of 6 or 0x15.; callers 16a74@16a9d; guest pending
