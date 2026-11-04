@@ -3486,4 +3486,10 @@ void guest_fn_a1d00_w(int32_t a); /* 0xa1d00 EAX */
 void guest_fn_5c7dc_w(uint32_t a); /* 0x5c7dc EAX */
 void guest_fn_59adc_w(void); /* 0x59adc */
 
+/* game_helpers64.c */
+void request_status_for_a32e8(uint16_t key);
+void redraw_wide_span_d3c50(void);
+int32_t guest_fn_a312c_w(uint32_t a); /* 0xa312c EAX */
+void guest_fn_d3900_w(void); /* 0xd3900 */
+
 #endif

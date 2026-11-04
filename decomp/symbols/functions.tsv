@@ -2173,7 +2173,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a312c	337			unknown	unclassified	unverified		
 0x000a3280	72	request_status_string_a3280	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x000a3280.json	docs/compiler-abi.md; Request a status string for an index and restore the frame delta.; callers a32e8@a3327; guest pending
 0x000a32c8	30	issue_state_request_a32c8	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000a32c8.json	docs/compiler-abi.md; Issue a request for one byte of state.; callers a32e8@a331d,a32e8@a3342; guest pending
-0x000a32e8	98			unknown	unclassified	unverified		
+0x000a32e8	98	request_status_for_a32e8	game_helpers64	compiles	game	confirmed	decomp/tests/0x000a32e8.json	docs/compiler-abi.md; Request the state matching the current limit, or a status string for a lookup.; callers a33a4@a33d2; guest pending
 0x000a334c	86	request_entry_details_a334c	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x000a334c.json	docs/compiler-abi.md; Request the details of an entry when its table flag is set.; callers a33a4@a33da; guest pending
 0x000a33a4	74	dispatch_entry_a33a4	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a33a4.json	docs/compiler-abi.md; Dispatch on the low nibble of the entry's kind byte.; callers a33f0@a3404; guest pending
 0x000a33f0	52	dispatch_all_a33f0	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a33f0.json	docs/compiler-abi.md; Dispatch every entry of the list at 0x136b84.; callers a410c@a4119; guest pending
@@ -3047,7 +3047,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d37f4	80	count_hit_d37f4	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d37f4.json	docs/compiler-abi.md; Count a hit when the cell under the object equals dword 0x159144 + 0xe0.; callers none direct; guest pending
 0x000d3844	178			unknown	unclassified	unverified		
 0x000d3900	839			unknown	unclassified	unverified		
-0x000d3c50	84			unknown	unclassified	unverified		
+0x000d3c50	84	redraw_wide_span_d3c50	game_helpers64	compiles	game	confirmed	decomp/tests/0x000d3c50.json	docs/compiler-abi.md; Redraw when the tracked span is large enough and the two edge values differ by more than 0x800.; callers none direct; guest pending
 0x000d3cb0	248			unknown	unclassified	unverified		
 0x000d3e50	1015			unknown	unclassified	unverified		
 0x000d4250	250			unknown	unclassified	unverified		

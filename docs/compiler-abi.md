@@ -3913,3 +3913,10 @@ in EAX, format string address, one value).
 | `0x3dbf0` | none | none | 3dd30@3dfb3 | Flag the player unit as out of the map when its cell leaves the valid range. |
 | `0x7a9bc` | none | none | 7a454@7a45f | Replay the 400x400 byte-pair grid through the plane source when it is enabled. |
 | `0x5a998` | none | none | none direct | Draw the tactical coordinates of the player unit from the current table row. |
+
+## game_helpers64 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa32e8` | AX:uint16_t | none | a33a4@a33d2 | Request the state matching the current limit, or a status string for a lookup. |
+| `0xd3c50` | none | none | none direct | Redraw when the tracked span is large enough and the two edge values differ by more than 0x800. |
