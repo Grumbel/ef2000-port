@@ -6713,3 +6713,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x16018a` | none | none | 9f850@9f935,9f940@9fac2 | Implicit-global fragment: append one entry to the table set indexed by word 0x146e52: bytes 0x149e58 (byte 0x1600b8), 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xebee4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:int32_t | EAX:double | 9d55d@9d704,ebea3@ebec1,11d3f0@11d52a | Stack (ret 0xc): scale the double X by 2^N-style factors from a table. The special values at 0x195bfc / 0x195c04 are fir |
+| `0x6eaf4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | none | 6d948@6e09a,6ebe0@6ef63,6ef74@6f127 | Stack (ret 8): clamp the double at 0x1f7110 to +-the limit at 0x1f7098, take its difference to the current object's fiel |

@@ -1316,7 +1316,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006e3e0	443			unknown	unclassified	unverified		
 0x0006e59c	828			unknown	unclassified	unverified		
 0x0006e8d8	537			unknown	unclassified	unverified		
-0x0006eaf4	200			unknown	unclassified	unverified		
+0x0006eaf4	200	compute_turn_rate_6eaf4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006eaf4.json	docs/compiler-abi.md; Stack (ret 8): clamp the double at 0x1f7110 to +-the limit at 0x1f7098, take its difference to the current object's fiel; callers 6d948@6e09a,6ebe0@6ef63,6ef74@6f127; guest pending
 0x0006ebbc	36	store_scaled_angle_difference_6ebbc	float_helpers10	compiles	game	confirmed	decomp/tests/0x0006ebbc.json	docs/compiler-abi.md; Store the wrapped difference of two angles scaled by a constant.; callers 70914@70a46,712e8@71414; guest pending
 0x0006ebe0	916			unknown	unclassified	unverified		
 0x0006ef74	450			unknown	unclassified	unverified		
@@ -3532,7 +3532,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ebe79	7	report_error_14_ebe79	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000ebe79.json	docs/compiler-abi.md; Report error code 14.; callers 9d55d@9d6b8,9d55d@9d6ea; guest pending
 0x000ebe90	12	store_through_ebd36	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebe90.json	docs/compiler-abi.md; As 0xebe6d with 0xebd36.; callers 1101e8@1101f2; guest pending
 0x000ebea3	65			unknown	unclassified	unverified		
-0x000ebee4	231			unknown	unclassified	unverified		
+0x000ebee4	231	scale_by_table_ebee4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ebee4.json	docs/compiler-abi.md; Stack (ret 0xc): scale the double X by 2^N-style factors from a table. The special values at 0x195bfc / 0x195c04 are fir; callers 9d55d@9d704,ebea3@ebec1,11d3f0@11d52a; guest pending
 0x000ebfd0	182	name_hash_ebfd0	game_helpers96	compiles	game	confirmed	decomp/tests/0x000ebfd0.json	docs/compiler-abi.md; Hash up to the first 15 characters of a name into 32 bits (length, sum, running sum, mix and ordering bits; '_' is skipp; callers 9dbf0@9dbfd,9dcf8@9dd9c,a1d50@a1d6d; guest pending
 0x000ec0ec	51	compare_names_ec0ec	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ec0ec.json	docs/compiler-abi.md; Compare 6 bytes at dword 0x1368bc[AX]+0x15 with those at dword 0x135874[DX*32]+0x16.; callers a3108@a311e; guest pending
 0x000ece90	30	reset_table_ece90	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ece90.json	docs/compiler-abi.md; Clear 0x10 bytes at 0x13577c and byte 0x484665.; callers a29f8@a2a3a; guest pending

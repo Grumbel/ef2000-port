@@ -7913,3 +7913,67 @@ void append_table_entry_16018a(void)
     else
         guest_fn_c565e_x(EF_U16(0x00146e52u));
 }
+
+/* 0xebee4, 231 bytes. Stack (ret 0xc): scale the double X by 2^N-style factors from a table. The special values at 0x195bfc / 0x195c04 are first replaced by the constants at 0x195c0c / 0x195c14; then for |N| above 0x134 X is multiplied (N >= 0) or divided (N < 0) by the double at 0x195c62 and the count reduced by 0xd8; the remainder is consumed greedily against the (word count, double factor) 10-byte table at 0x195c60 and X is multiplied (N >= 0) or divided (N < 0) by the product. Returns X in ST0. */
+double scale_by_table_ebee4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, int32_t n)
+{
+#define EF_D(a) (*(double *)ef_guest_memory_ptr(a))
+    uint32_t p = 0x00195c60u;
+    int32_t e;
+    double f = 1.0;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (x == EF_D(0x00195bfcu))
+        x = EF_D(0x00195c0cu);
+    else if (x == EF_D(0x00195c04u))
+        x = EF_D(0x00195c14u);
+    if (n < 0) {
+        e = -n;
+        if (e > 0x134) {
+            x = x / EF_D(0x00195c62u);
+            e -= 0xd8;
+        }
+    } else {
+        e = n;
+        if (n > 0x134) {
+            x = x * EF_D(0x00195c62u);
+            e = n - 0xd8;
+        }
+    }
+    for (;;) {
+        int32_t cnt = (int32_t)(int16_t)EF_U16(p);
+        if (e >= cnt) {
+            f = f * EF_D(p + 2u);
+            e -= cnt;
+        }
+        if (e == 0)
+            break;
+        if (EF_U16(p) != 1u)
+            p += 10u;
+    }
+    if (n < 0)
+        x = x / f;
+    else
+        x = x * f;
+    return x;
+#undef EF_D
+}
+
+/* 0x6eaf4, 200 bytes. Stack (ret 8): clamp the double at 0x1f7110 to +-the limit at 0x1f7098, take its difference to the current object's field +0x71 (object pointer 0x1f71bc), wrap it with the constants 0x1866cc/0x1866d4 and 0x1866dc/0x1866e4 into 0x1f7090 and store (difference * ARG * 0x1866ec * 0x1f70b8) in 0x1f7080. */
+void compute_turn_rate_6eaf4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg)
+{
+#define EF_D(a) (*(double *)ef_guest_memory_ptr(a))
+    double t;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (EF_D(0x001f7110u) > EF_D(0x001f7098u))
+        EF_D(0x001f7110u) = EF_D(0x001f7098u);
+    if (!(EF_D(0x001f7110u) >= -EF_D(0x001f7098u)))
+        EF_D(0x001f7110u) = -EF_D(0x001f7098u);
+    t = EF_D(0x001f7110u) - EF_D(EF_U32(0x001f71bcu) + 0x71u);
+    EF_D(0x001f7090u) = t;
+    if (EF_D(0x001f7090u) > EF_D(0x001866ccu))
+        EF_D(0x001f7090u) = EF_D(0x001f7090u) + EF_D(0x001866d4u);
+    if (EF_D(0x001f7090u) < EF_D(0x001866dcu))
+        EF_D(0x001f7090u) = EF_D(0x001f7090u) + EF_D(0x001866e4u);
+    EF_D(0x001f7080u) = EF_D(0x001f7090u) * arg * EF_D(0x001866ecu) * EF_D(0x001f70b8u);
+#undef EF_D
+}
