@@ -6430,3 +6430,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe8784` | [ESP+4]:ef_addr32 | EAX:uint32_t | e882c@e888e,e882c@e891d,e882c@e89b1 | Variadic cdecl diagnostic: when byte 0x1600a6 is set, format FMT with its arguments into a 0x140-byte stack buffer and p |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x56268` | EAX:ef_addr32 | none | 55f54@55ff0 | Append a message entry to the ring of ten 55-byte records at 0x1a63c0 (next index in dword 0x127db4): clear the first ei |

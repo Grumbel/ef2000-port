@@ -6592,3 +6592,21 @@ uint32_t report_formatted_e8784(ef_addr32 fmt, ...)
     }
     return 0u;
 }
+
+/* 0x56268, 109 bytes. Append a message entry to the ring of ten 55-byte records at 0x1a63c0 (next index in dword 0x127db4): clear the first eight bytes, set the words +8 = 0x14 and +0xa = 5, copy the 43 bytes at SRC to +0xc, advance the index modulo ten. */
+void push_message_entry_56268(ef_addr32 src)
+{
+    uint32_t idx = EF_U32(0x00127db4u);
+    uint32_t rec = 0x001a63c0u + idx * 55u;
+    uint32_t i;
+    for (i = 0u; i < 8u; i++)
+        EF_U8(rec + i) = 0u;
+    EF_U16(rec + 8u) = 0x14u;
+    EF_U16(rec + 0xau) = 5u;
+    for (i = 0u; i < 43u; i++)
+        EF_U8(rec + 0xcu + i) = EF_U8(src + i);
+    idx++;
+    if ((int32_t)idx >= 10)
+        idx = 0u;
+    EF_U32(0x00127db4u) = idx;
+}

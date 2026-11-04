@@ -5056,4 +5056,6 @@ void blit_masked_cd82c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
 uint32_t report_formatted_e8784(ef_addr32 fmt, ...);
 void guest_callptr4c_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* indirect cdecl call with four stack arguments, caller cleanup */
 
+void push_message_entry_56268(ef_addr32 src);
+
 #endif
