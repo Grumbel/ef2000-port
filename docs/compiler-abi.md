@@ -3154,3 +3154,16 @@ in EAX, format string address, one value).
 | `0xdd728` | EAX:ef_addr32 | EAX:uint32_t | a82f0@a8458 | Width of a string in the 6-pixel-blank font minus the trailing gap. |
 | `0xe7850` | none | none | e78b4@e7935 | Store the double constants used by the time conversion. |
 | `0xe85f0` | EAX:ef_addr32,EDX:ef_addr32 | none | 7b7d8@7b943 | Interpolate a point back along a slope defined by the line at 0x420904. |
+
+## game_helpers38 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x46070` | none | none | 47f9c@47f9c | Shift the nine 20-byte history records down and reset the newest slots. |
+| `0x48064` | none | none | 3dd30@3e712 | Advance the countdowns and age the four 140-entry timer tables. |
+| `0x48798` | AX:int16_t,DX:int16_t,BL:uint8_t | none | 46454@46daa,46454@46dc4 | Set the target mode and share the link with an enemy-owned linked unit. |
+| `0x48848` | AX:int16_t,DX:int16_t,BL:uint8_t | none | 46454@46de1,46454@46dfb | Like 0x48798 with modes 6 and 7; the flag test comes first. |
+| `0x54010` | none | none | 3ea0c@3edba | Reset the flight-control state words and floats. |
+| `0x54410` | none | none | 49228@49b5b | Reset every unit's team word, the owner flags and the 8 counters. |
+| `0x56af4` | EAX:ef_addr32 | none | 581b0@583b3 | Store an owner summary message: name, counters and flags. |
+| `0x5f588` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | AL:uint8_t | 5f220@5f467 | Turn direction of three points: 1, -1 (0xff) or 0, with a collinear tiebreak. |

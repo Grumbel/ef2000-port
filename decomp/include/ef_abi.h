@@ -2448,4 +2448,15 @@ void interpolate_line_e85f0(ef_addr32 out_x, ef_addr32 out_y);
 uint32_t guest_fn_dcc98(uint32_t glyph, int32_t x, int32_t y, uint32_t color); /* 0xdcc98 AL/EDX/EBX/ECX -> AL */
 uint32_t guest_fn_dd164(uint32_t glyph, int32_t x, int32_t y, uint32_t color); /* 0xdd164 AL/EDX/EBX/ECX -> AL */
 
+/* game_helpers38.c */
+void shift_history_46070(void);
+void update_timers_48064(void);
+void share_link_48798(int16_t first, int16_t second, uint8_t mode);
+void share_link_48848(int16_t first, int16_t second, uint8_t mode);
+void reset_flight_state_54010(void);
+void reset_unit_teams_54410(void);
+void apply_owner_summary_56af4(ef_addr32 message);
+uint8_t turn_direction_5f588(ef_addr32 a, ef_addr32 b, ef_addr32 c);
+uint32_t guest_fn_7574c(int32_t value); /* 0x7574c EAX -> AL */
+
 #endif
