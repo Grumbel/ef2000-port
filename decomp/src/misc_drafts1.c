@@ -10182,3 +10182,30 @@ void update_notice_list_654b8(void)
     advance_countdown_y_6583c();
     apply_pending_notices_6563c();
 }
+
+/* 0xd550, 216 bytes. Refresh the two status widgets (0x180850, 0x180728) while word 0x1f71d2 is set and byte 0x126576 is clear: refresh the first (0xa4b08); for the second, when byte 0x125839 is 1 set its button value to mode 0xa1 and show the entry text 0x1a62f0 + 17 * index (index = high half of dword 0x121e98, up to byte 0x12583a - 1, else the text 0x13111b) in its child 0x180aec, otherwise set its button to mode 0x83; then activate (0xa4cb4) with its byte +0x10 and refresh it. */
+void refresh_status_widgets_d550(void)
+{
+    uint32_t w1;
+    uint32_t w;
+    uint32_t child;
+    int32_t idx;
+    if (EF_U16(0x001f71d2u) == 0u || EF_U8(0x00126576u) != 0u)
+        return;
+    w1 = guest_fn_a46cc(0x00180850u);
+    refresh_flagged_object_a4b08(w1);
+    w = guest_fn_a46cc(0x00180728u);
+    if (EF_U8(0x00125839u) == 1u) {
+        guest_fn_a520c(w, (int32_t)EF_U32(w + 0x43u) >> 16, 0xa1u, 0u);
+        idx = (int32_t)EF_U32(0x00121e98u) >> 16;
+        child = find_widget_checked_a78bc(w, 0x00180aecu);
+        if (idx <= (int32_t)EF_U8(0x0012583au) - 1)
+            guest_fn_a7588_x(child, 0x001a62f0u + (uint32_t)(idx * 17));
+        else
+            guest_fn_a7588_x(child, 0x0013111bu);
+    } else {
+        guest_fn_a520c(w, (int32_t)EF_U32(w + 0x43u) >> 16, 0x83u, 0u);
+    }
+    guest_fn_a4cb4(EF_U8(w + 0x10u));
+    refresh_flagged_object_a4b08(w);
+}

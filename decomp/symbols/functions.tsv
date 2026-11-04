@@ -175,7 +175,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000cccc	1475	gpwRedrawRoute		named	unclassified	unverified		
 0x0000d290	671			unknown	unclassified	unverified		
 0x0000d530	29	copy_runtime_input_state	runtime_small_ops	compiles	game	confirmed	decomp/tests/0x000d530.json	Three independent packed input fields; callers 418c4@418dd/45a54@45a79; guest pending
-0x0000d550	216			unknown	unclassified	unverified		
+0x0000d550	216	refresh_status_widgets_d550	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000d550.json	docs/compiler-abi.md; Refresh the two status widgets (0x180850, 0x180728) while word 0x1f71d2 is set and byte 0x126576 is clear: refresh the f; callers none direct; guest pending
 0x0000d628	99	emit_and_advance_d628	game_helpers31	compiles	game	confirmed	decomp/tests/0x0000d628.json	docs/compiler-abi.md; Emit the pending message and, when idle, open the dialog and advance the page.; callers none direct; guest pending
 0x0000d68c	3585			unknown	unclassified	unverified		
 0x0000e490	625			unknown	unclassified	unverified		

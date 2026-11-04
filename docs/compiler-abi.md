@@ -7176,3 +7176,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x654b8` | none | none | 601c@6082 | Per-frame update of the notice list headed by dword 0x1a7c54 (link at +0x16): clear the notice count word 0x1a81b2, then |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd550` | none | none | none direct | Refresh the two status widgets (0x180850, 0x180728) while word 0x1f71d2 is set and byte 0x126576 is clear: refresh the f |
