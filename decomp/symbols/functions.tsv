@@ -840,7 +840,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00049054	61	clear_tactical_accumulators	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00049054.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00049144	156	draw_widget_rect_49144	game_helpers110	compiles	game	confirmed	decomp/tests/0x00049144.json	docs/compiler-abi.md; Draw the outline of widget record idx: its centre (x,y) and size (w,h) become a rectangle; mode 0 when the record's kind; callers 3a3a8@3a566,646d4@6479b; guest pending
 0x00049228	2484			unknown	unclassified	unverified		
-0x00049bdc	245			unknown	unclassified	unverified		
+0x00049bdc	245	rebuild_group_tables_49bdc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00049bdc.json	docs/compiler-abi.md; Rebuild the group tables from the list node reached by following the next links (+4) of P up to the word 0x125835 times:; callers 49228@49939,49228@499f9; guest pending
 0x00049cd4	86	copy_row_words_49cd4	game_helpers30	compiles	game	confirmed	decomp/tests/0x00049cd4.json	docs/compiler-abi.md; Copy the row words selected by an object's count into the 0x1a5280 list.; callers 49bdc@49c4c; guest pending
 0x00049d2c	210	seek_segment_49d2c	game_helpers44	compiles	game	confirmed	decomp/tests/0x00049d2c.json	docs/compiler-abi.md; Walk the segment list to the node holding the budget in 0x1a666b.; callers 357ec@35852; guest pending
 0x00049e00	294			unknown	unclassified	unverified		

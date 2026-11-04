@@ -4369,3 +4369,43 @@ void accumulate_samples_a35bc(void)
         }
     }
 }
+
+/* 0x49bdc, 245 bytes. Rebuild the group tables from the list node reached by following the next links (+4) of P up to the word 0x125835 times: collect the class byte (+0x4e) of the units named in the group's roster (byte +0x12 entries at 0x1fcb40[group * 0x11] + 1) into the word table 0x1a53b0, run 0x49cd4, and then for every group copy each unit's slot word (+0x50) into 0x1a5330 and the matching unit's word +0x47 into 0x1a52b0 (rows of 16 bytes). */
+void rebuild_group_tables_49bdc(uint32_t p)
+{
+    int16_t n = (int16_t)EF_U16(0x00125835u);
+    int16_t i;
+    int16_t j;
+    int16_t groups;
+    int16_t cnt = 0;
+    if (p != 0u) {
+        while (cnt < n) {
+            p = EF_U32(p + 4u);
+            cnt++;
+            if (p == 0u)
+                break;
+        }
+    }
+    cnt = 0;
+    for (i = 0; i < (int16_t)EF_U8(p + 0x12u); i++) {
+        uint32_t roster = EF_U32(0x001fcb40u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x00125835u) * 0x11);
+        int16_t unit = (int16_t)EF_U16(roster + (uint32_t)(int32_t)i * 2u + 1u);
+        uint32_t rec = (uint32_t)((int32_t)unit * 0xca) + EF_U32(0x0019bb58u);
+        EF_U16(0x001a53b0u + (uint32_t)(int32_t)cnt * 2u) = EF_U8(rec + 0x4eu);
+        cnt++;
+    }
+    copy_row_words_49cd4(p);
+    groups = (int16_t)EF_U16(0x001a53c0u);
+    for (i = 0; i < groups; i++) {
+        for (j = 0; j < (int16_t)EF_U16(0x001a53b0u + (uint32_t)(int32_t)i * 2u); j++) {
+            int16_t k = (int16_t)EF_U16(0x001a5280u + (uint32_t)(int32_t)i * 2u);
+            uint32_t rec = (uint32_t)((int32_t)k * 0xca) + EF_U32(0x0019bb58u);
+            uint32_t off = (uint32_t)(int32_t)j * 2u + (uint32_t)(int32_t)i * 16u;
+            uint32_t u;
+            EF_U16(0x001a5330u + off) = EF_U16(rec + 0x50u + (uint32_t)(int32_t)j * 2u);
+            u = guest_fn_7489c((int16_t)EF_U16(0x001a5330u + off));
+            EF_U16(0x001a52b0u + off) = EF_U16(u + 0x47u);
+        }
+        groups = (int16_t)EF_U16(0x001a53c0u);
+    }
+}

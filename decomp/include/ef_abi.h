@@ -4842,4 +4842,6 @@ uint32_t guest_fn_86968_x(uint32_t value, uint32_t out); /* 0x86968 EAX/EDX -> A
 void accumulate_samples_a35bc(void);
 void guest_fn_a3e50_x(uint32_t buf, uint32_t code, uint32_t len); /* 0xa3e50 EAX/EDX/EBX */
 
+void rebuild_group_tables_49bdc(uint32_t p);
+
 #endif

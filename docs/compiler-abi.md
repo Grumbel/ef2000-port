@@ -5983,3 +5983,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa35bc` | none | none | a410c@a411e | Fold the per-slot samples into running statistics: for each entry of the id list 0x136b74 (count byte at *0x136b78) take |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x49bdc` | EAX:uint32_t | none | 49228@49939,49228@499f9 | Rebuild the group tables from the list node reached by following the next links (+4) of P up to the word 0x125835 times: |
