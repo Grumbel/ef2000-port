@@ -2315,7 +2315,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a7ab4	18	seek_start_a7ab4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000a7ab4.json	docs/compiler-abi.md; Seek a handle to its start.; callers b3c04@b3c4e,d1bec@d1c08,d1bec@d1c33; guest pending
 0x000a7ac8	21	seek_current_a7ac8	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000a7ac8.json	docs/compiler-abi.md; Seek a handle relative to the current position.; callers 9ccb8@9cdd6,9cee8@9cf24,ebcfc@ebd29; guest pending
 0x000a7ae0	21	seek_end_a7ae0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000a7ae0.json	docs/compiler-abi.md; Seek a handle to its end (returns the size).; callers a7b3c@a7b52,b3b90@b3bec,b3c04@b3c67; guest pending
-0x000a7b3c	42			unknown	unclassified	unverified		
+0x000a7b3c	42	file_size_a7b3c	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000a7b3c.json	docs/compiler-abi.md; File size: open the named file in a handle slot, seek to its end, close it and return the end position, or -1 when it ca; callers 35cfc@35d6b,35cfc@35da6,36054@360a1; guest pending
 0x000a7b70	16	default_path_a7b70	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a7b70.json	docs/compiler-abi.md; ; callers a81e4@a8243,a9878@a9882,a99c0@a99f2; guest pending
 0x000a7b80	10	call_9c858_18d57c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a7b80.json	docs/compiler-abi.md; tail 0x9c858 with EAX=0x18d57c; callers a99c0@a99e2,a99c0@a99ec,aad7c@aadb4; guest pending
 0x000a7b8c	11	latch_b3f48	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a7b8c.json	docs/compiler-abi.md; dword 0x4191c8 = 0xb3f48(); callers a9bfc@a9c9d; guest pending
@@ -2632,7 +2632,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bc287	200			unknown	unclassified	unverified		
 0x000bc34f	27	run_if_available_bc34f	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc34f.json	docs/compiler-abi.md; When 0xfa6d3(0) returns nonzero, run 0xbc287(EAX).; callers bc36a@bc36d; guest pending
 0x000bc36a	10	run_if_available_bc36a	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc36a.json	docs/compiler-abi.md; Run 0xbc34f with EBX preserved as zero.; callers 9ea0@9fa4,a3dc@a3f7,357ec@3589f; guest pending
-0x000bc400	33			unknown	unclassified	unverified		
+0x000bc400	33	stream_printf_bc400	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000bc400.json	docs/compiler-abi.md; fprintf (cdecl, variadic).; callers 9ea0@a012,9ea0@a0c6,9ea0@a119; guest pending
 0x000bc421	47	open_list_node_bc421	game_helpers78	compiles	game	confirmed	decomp/tests/0x000bc421.json	docs/compiler-abi.md; Find the list node with the given key and open it; -1 when absent.; callers 9ea0@a3ca,a3dc@a5aa,357ec@35a99; guest pending
 0x000bc450	21	release_by_key_bc450	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000bc450.json	docs/compiler-abi.md; ; callers bc421@bc448; guest pending
 0x000bc465	12	digit_character	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc465.json	docs/compiler-abi.md; Digit character for a value: +0x30, then +0x27 past '9'.; callers bc471@bc491,bc471@bc4ac,bc471@bc4b9; guest pending
@@ -2920,7 +2920,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc8e0	3	return_esc_cc8e0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000cc8e0.json	docs/compiler-abi.md; Returns the ESC scan code.; callers bcf44@bcff2; guest pending
 0x000cc90c	1199			unknown	unclassified	unverified		
 0x000ccdbc	882			unknown	unclassified	unverified		
-0x000cd12e	34			unknown	unclassified	unverified		
+0x000cd12e	34	stdout_printf_cd12e	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000cd12e.json	docs/compiler-abi.md; printf to the standard output stream at 0x16043e (cdecl, variadic).; callers fecc@ff8b,1001c@1034d,1001c@10524; guest pending
 0x000cd150	113	open_entry_cd150	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cd150.json	docs/compiler-abi.md; ; callers 1e214@1e220,1e28c@1e2c6,1e3c4@1e3f3; guest pending
 0x000cd20c	63	script_store_step_cd20c	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cd20c.json	docs/compiler-abi.md; Store value into the output table and step the script cursor.; callers 57480@575f3,8d11c@8d18c,8d330@8d39f; guest pending
 0x000cd24c	10	cursor_word_at_2	code_predicates	compiles	game	confirmed	decomp/tests/0x000cd24c.json	docs/compiler-abi.md; Word at +2 of the structure at dword 0x15b628.; callers 1df90@1e04d,56084@5614a,69374@69437; guest pending
@@ -3714,12 +3714,12 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa332	35			unknown	unclassified	unverified		
 0x000fa362	67			unknown	unclassified	unverified		
 0x000fa3d4	177			unknown	unclassified	unverified		
-0x000fa485	36			unknown	unclassified	unverified		
+0x000fa485	36	open_file_fa485	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000fa485.json	docs/compiler-abi.md; open: forward name, flags and the optional permission argument to 0xfa4a9 with share mode 0 (cdecl, variadic).; callers 105024@105036,105070@1050ce; guest pending
 0x000fa4a9	453			unknown	unclassified	unverified		
 0x000fa6d3	168			unknown	unclassified	unverified		
 0x000fa77b	57	release_list_node_fa77b	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000fa77b.json	docs/compiler-abi.md; Move the node owning object from the list at 0x485f9c to the free list.; callers bc287@bc311,bc450@bc45c; guest pending
 0x000fa7d2	49	update_flags_fa7d2	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fa7d2.json	docs/compiler-abi.md; ; callers bc287@bc345,f22af@f22e5,10f071@10f075; guest pending
-0x000fa815	133			unknown	unclassified	unverified		
+0x000fa815	133	stream_vprintf_fa815	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000fa815.json	docs/compiler-abi.md; vfprintf: format into a stream through 0xed133 with the putc callback at 0xfa804, temporarily making an unbuffered-flagg; callers bc400@bc416,cd12e@cd145; guest pending
 0x000fa89a	6	get_global_fa89a	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fa89a.json	docs/compiler-abi.md; ; callers bc471@bc479; guest pending
 0x000fa8a0	191	stream_flush_fa8a0	runtime_helpers38	compiles	game	confirmed	decomp/tests/0x000fa8a0.json	docs/compiler-abi.md; fflush: write out a dirty write buffer, or seek back over unread input; resets the buffer position and returns 0 or -1.; callers bc4da@bc4fe,f1f5a@f207d,f1f5a@f2112; guest pending
 0x000fa95f	65			unknown	unclassified	unverified		

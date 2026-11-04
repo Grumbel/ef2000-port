@@ -4592,3 +4592,13 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x1149e0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:int32_t | none | 103c28@103c6d | Dispatch a MIDI event for a sound record (cdecl: record, port, status, data1, data2): with a non-zero port forward it to |
+
+## runtime_helpers42 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfa815` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:int32_t | bc400@bc416,cd12e@cd145 | vfprintf: format into a stream through 0xed133 with the putc callback at 0xfa804, temporarily making an unbuffered-flagg |
+| `0xbc400` | [ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | EAX:int32_t | 9ea0@a012,9ea0@a0c6,9ea0@a119 | fprintf (cdecl, variadic). |
+| `0xcd12e` | [ESP+4]:ef_addr32 | EAX:int32_t | fecc@ff8b,1001c@1034d,1001c@10524 | printf to the standard output stream at 0x16043e (cdecl, variadic). |
+| `0xfa485` | [ESP+4]:ef_addr32,[ESP+8]:uint32_t | EAX:int32_t | 105024@105036,105070@1050ce | open: forward name, flags and the optional permission argument to 0xfa4a9 with share mode 0 (cdecl, variadic). |
+| `0xa7b3c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:int32_t | 35cfc@35d6b,35cfc@35da6,36054@360a1 | File size: open the named file in a handle slot, seek to its end, close it and return the end position, or -1 when it ca |

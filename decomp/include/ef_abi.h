@@ -4005,4 +4005,12 @@ void dispatch_midi_event_1149e0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
 uint32_t guest_callptr5_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* indirect cdecl call with five stack arguments */
 void guest_fn_1123a4_x(uint32_t port, uint32_t status, uint32_t data1, uint32_t data2, uint32_t zero); /* 0x1123a4 cdecl */
 
+/* runtime_helpers42.c */
+int32_t stream_vprintf_fa815(ef_addr32 stream, ef_addr32 fmt, ef_addr32 args);
+int32_t stream_printf_bc400(ef_addr32 stream, ef_addr32 fmt, ...);
+int32_t stdout_printf_cd12e(ef_addr32 fmt, ...);
+int32_t open_file_fa485(ef_addr32 name, uint32_t flags, ...);
+int32_t file_size_a7b3c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 name);
+int32_t guest_fn_fa4a9_x(ef_addr32 name, uint32_t oflag, uint32_t shflag, uint32_t pmode); /* 0xfa4a9 cdecl (open/sopen) */
+
 #endif
