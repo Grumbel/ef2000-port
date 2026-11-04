@@ -4248,3 +4248,12 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xdcaa4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 9f664@9f702 | Pitch and yaw angles of the vector from position b to position a, stored as two words at out. |
+
+## runtime_helpers31 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x106e2c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | d9c30@d9c8a | Run 106d00 on the object, then 106dc4 on it with the second argument. |
+| `0x112bbc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 113d10@113e46,11402c@114045 | Reset a table record and point its field 0x14 8 bytes past field 0x10. |
+| `0x113cf4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Trace-call a non-null record and mark its field 4 as 1. |
+| `0x1113d4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 102384@1023a7 | Between the 101e70/101e78 bracket clear one table dword (index from the stack) unless it is -1. |

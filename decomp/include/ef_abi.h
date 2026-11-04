@@ -3776,4 +3776,12 @@ uint32_t reactivate_records_at_cell_c10c4(int16_t x, int16_t y, uint32_t count, 
 /* game_helpers95.c */
 void bearing_between_positions_dcaa4(ef_addr32 out, ef_addr32 a, ef_addr32 b);
 
+/* runtime_helpers31.c */
+void run_pair_106e2c(uint32_t object, uint32_t u1, uint32_t second);
+void reset_table_record_and_link_112bbc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+void trace_and_mark_113cf4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+void clear_table_entry_1113d4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t index);
+void guest_fn_106d00_x(uint32_t a); /* 0x106d00 EAX */
+void guest_fn_106dc4_x(uint32_t a, uint32_t b); /* 0x106dc4 EAX EDX */
+
 #endif
