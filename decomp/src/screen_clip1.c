@@ -92,3 +92,21 @@ void save_and_draw_block_dd8dc(void)
                      (uint32_t)((int32_t)EF_S16(0x0015ee84u) + (int32_t)EF_S16(0x00425fc8u)),
                      0u, EF_U32(0x0015ee80u));
 }
+
+/* 0xa0aa0, 186 bytes. Fetch the 6-byte point entry of the current page (table at 0x41717c + 0xa), let the hook at 0x132af4 transform it, add the offset at 0x417194..98 and store the squared distance from the origin at 0x159094..9c in 0x132abc. */
+void measure_page_point_a0aa0(uint32_t index)
+{
+    ef_addr32 ent = EF_U32(0x0041717cu) + 0xau + (uint32_t)((int32_t)(int16_t)index * 6);
+    int16_t x, y, z;
+    EF_U16(0x00417226u) = EF_U16(ent + 2u);
+    guest_callptr2r_x(EF_U32(0x00132af4u), (int32_t)EF_S16(ent), (int32_t)EF_S16(ent + 4u));
+    x = (int16_t)(EF_U16(0x00417224u) + EF_U16(0x00417194u));
+    y = (int16_t)(EF_U16(0x00417226u) + EF_U16(0x00417196u));
+    z = (int16_t)(EF_U16(0x00417228u) + EF_U16(0x00417198u));
+    EF_U16(0x00417224u) = (uint16_t)x;
+    EF_U16(0x00417226u) = (uint16_t)y;
+    EF_U16(0x00417228u) = (uint16_t)z;
+    EF_U16(0x00132abcu) = (uint16_t)length_squared_dec90((int16_t)(x - (int16_t)EF_U16(0x00159094u)),
+                                                          (int16_t)(y - (int16_t)EF_U16(0x00159098u)),
+                                                          (int16_t)(z - (int16_t)EF_U16(0x0015909cu)));
+}

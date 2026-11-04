@@ -5015,3 +5015,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd1e50` | EAX:uint32_t | none | 39204@3920c,3ea0c@3ee75,3ea0c@3ef7b | Switch the display mode (1..5; 3 and 4 count as 2 for the "already current" test against 0x15b7d0), tearing down and reb |
+
+## screen_clip1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa0aa0` | EAX:uint32_t | none | 9e7bc@9eb15,9e7bc@9eb9e,9e7bc@9f14e | Fetch the 6-byte point entry of the current page (table at 0x41717c + 0xa), let the hook at 0x132af4 transform it, add t |

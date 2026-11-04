@@ -4296,4 +4296,8 @@ void load_companion_files_dbf3c(ef_addr32 dest, ef_addr32 part_b, ef_addr32 dest
 void switch_display_mode_d1e50(uint32_t mode);
 void guest_fn_cdb20_x(void); /* 0xcdb20 no arguments */
 
+void measure_page_point_a0aa0(uint32_t index);
+void guest_callptr2r_x(ef_addr32 fn, int32_t a, int32_t b); /* indirect call: EAX/EDX register arguments */
+void guest_fn_e2374_x(ef_addr32 a, ef_addr32 b); /* 0xe2374 EAX/EDX */
+
 #endif

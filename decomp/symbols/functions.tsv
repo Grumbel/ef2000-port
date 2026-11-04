@@ -2117,7 +2117,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a0704	452			unknown	unclassified	unverified		
 0x000a08c8	356			unknown	unclassified	unverified		
 0x000a0a2c	114	step_page_slot_a0a2c	list_ops1	compiles	game	confirmed	decomp/tests/0x000a0a2c.json	docs/compiler-abi.md; Step a page slot: when its counter (+0) is zero invoke the handler at 0x132adc with the slot's words and the current 0x4; callers 9e7bc@9f13e; guest pending
-0x000a0aa0	186			unknown	unclassified	unverified		
+0x000a0aa0	186	measure_page_point_a0aa0	screen_clip1	compiles	game	confirmed	decomp/tests/0x000a0aa0.json	docs/compiler-abi.md; Fetch the 6-byte point entry of the current page (table at 0x41717c + 0xa), let the hook at 0x132af4 transform it, add t; callers 9e7bc@9eb15,9e7bc@9eb9e,9e7bc@9f14e; guest pending
 0x000a0b98	73	copy_page_byte_a0b98	game_helpers29	compiles	game	confirmed	decomp/tests/0x000a0b98.json	docs/compiler-abi.md; Copy one byte between two page rows (29-byte stride, offset 0x14).; callers 9e7bc@9f3c4,9e7bc@9f3de,9e7bc@9f3f6; guest pending
 0x000a0c04	340			unknown	unclassified	unverified		
 0x000a0d58	80	copy_page_words_a0d58	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a0d58.json	docs/compiler-abi.md; Copy count words into the current page from source.; callers 9e7bc@9e916,9e7bc@9e937,9e7bc@9e94c; guest pending
