@@ -20642,3 +20642,15 @@ double ratio_offset_11bab4(uint32_t ref, uint32_t obj, double a, double b)
 
 	return ratio_scaled_11ba4c(ref, obj, a, b) * local / md_rd_f64(ref + 8u);
 }
+
+/* 0xc7408, 64 bytes. Implicit-register fragment (no inputs; outputs EBX, EDI, EBP are not modelled). Runs project_if_outside_c46f8 with margin 0 on the vertex records whose pointers are stored at 0x15b558, 0x15b55c and 0x15b560, stopping at the first one that reports zero. Returns 1 when all three reported non-zero (the original then loads EBX, EDI and EBP with the three pointers) and 0 otherwise. */
+uint32_t project_three_vertices_c7408(void)
+{
+	if (project_if_outside_c46f8(0u, EF_U32(0x0015b558u)) == 0u)
+		return 0u;
+	if (project_if_outside_c46f8(0u, EF_U32(0x0015b55cu)) == 0u)
+		return 0u;
+	if (project_if_outside_c46f8(0u, EF_U32(0x0015b560u)) == 0u)
+		return 0u;
+	return 1u;
+}

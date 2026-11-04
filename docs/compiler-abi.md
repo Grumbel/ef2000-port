@@ -9002,3 +9002,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x11ba4c` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 11ba7c@11ba95,11bab4@11badf,11baf8@11bb69 | EAX = reference pointer, EDX = object pointer; stack: two doubles (arg, unused), callee cleanup. Result = ratio_formula_ |
 | `0x11bab4` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 10a220@10a434 | EAX = reference pointer, EDX = object pointer; stack: two doubles (a, b), callee cleanup. Result = ratio_scaled_11ba4c(r |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc7408` | none | EAX:uint32_t | c75d4@c7666 | Implicit-register fragment (no inputs; outputs EBX, EDI, EBP are not modelled). Runs project_if_outside_c46f8 with margi |

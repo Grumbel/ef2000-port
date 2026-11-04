@@ -6179,4 +6179,7 @@ double ratio_offset_11bab4(uint32_t ref, uint32_t obj, double a, double b);
 double ratio_scaled_11ba4c(uint32_t ref, uint32_t obj, double arg, double unused); /* 0x11ba4c */
 double ratio_offset_11bab4(uint32_t ref, uint32_t obj, double a, double b); /* 0x11bab4 */
 
+uint32_t project_three_vertices_c7408(void);
+uint32_t project_three_vertices_c7408(void); /* 0xc7408 */
+
 #endif
