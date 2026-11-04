@@ -8415,3 +8415,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x5acf0` | none | none | 5aa64@5ac8c | Draw the three-line target readout of the tactical display. Skipped when the signed words 0x1a823e and 0x1a8238 are both |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x433fc` | EAX:uint32_t,EDX:ef_addr32 | none | 45574@4566d,4bf1c@4c093,4bf1c@4c0ca | Walk the linked list whose head pointer is stored at HEAD (EDX; next link +4) for the group value A (EAX) and draw an ic |

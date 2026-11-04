@@ -5905,4 +5905,6 @@ void draw_selected_unit_label_59998(void);
 
 void draw_target_readout_5acf0(void);
 
+void draw_group_icons_433fc(uint32_t a, ef_addr32 head);
+
 #endif

@@ -17266,3 +17266,38 @@ void draw_target_readout_5acf0(void)
 	esi -= 6;
 	draw_tactical_coordinates((int16_t)(di - (uint16_t)draw_tactical_item_metric(bufp)), (int16_t)esi, bufp);
 }
+
+/* 0x433fc, 381 bytes. Walk the linked list whose head pointer is stored at HEAD (EDX; next link +4) for the group value A (EAX) and draw an icon for every entry of kind 0x10 (byte +0xa, index byte +0xb): when the positive, negative or zero group flag of the entry (0xcc22c, 0xcc1ac, 0xcc1ec; enabled by the words 0x126554, 0x126556, 0x126558) holds, the destination offset is dword 0x126570 plus the matching position pair (words 0x1342b9/0x1342bb, 0x1342b0/0x1342b2, 0x1342c2/0x1342c4; x + y * 640). The entry's record (dword +0x13; words +8 and +0xc) gives the icon position (x - 10, 400 - h - 10); the 20-pixel tile is blitted with 0xca620 and, when word 0x12656a is set and byte 0x1a53dc is clear, the sprite 0x1a is drawn at the same place (0x440f4). */
+void draw_group_icons_433fc(uint32_t a, ef_addr32 head)
+{
+	uint32_t node = EF_U32(head);
+	uint32_t ebp = 0u;
+	uint32_t rec;
+	int32_t x, y;
+	uint8_t flag;
+
+	while (node != 0u) {
+		if (EF_U8(node + 0xau) == 0x10u) {
+			flag = 0u;
+			if ((uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 0xbu), a) != 0u && EF_U16(0x00126554u) != 0u) {
+				ebp = EF_U32(0x00126570u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x001342b9u) + (int32_t)(int16_t)EF_U16(0x001342bbu) * 0x280);
+				flag = 1u;
+			} else if ((uint16_t)group_flag_negative_cc1ac(0u, EF_U8(node + 0xbu), a) != 0u && EF_U16(0x00126556u) != 0u) {
+				ebp = EF_U32(0x00126570u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x001342b0u) + (int32_t)(int16_t)EF_U16(0x001342b2u) * 0x280);
+				flag = 1u;
+			} else if ((uint16_t)group_flag_zero_cc1ec(0u, EF_U8(node + 0xbu), a) != 0u && EF_U16(0x00126558u) != 0u) {
+				ebp = EF_U32(0x00126570u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x001342c2u) + (int32_t)(int16_t)EF_U16(0x001342c4u) * 0x280);
+				flag = 1u;
+			}
+			if (flag != 0u) {
+				rec = EF_U32(node + 0x13u);
+				y = (int32_t)(int16_t)(0x190u - EF_U16(rec + 0xcu) - 10u);
+				x = (int32_t)(int16_t)(EF_U16(rec + 8u) - 10u);
+				guest_fn_ca620((int32_t)ebp, x, y, 0x14u, 0x14u, 0x280u);
+				if (EF_U16(0x0012656au) != 0u && EF_U8(0x001a53dcu) == 0u)
+					guest_fn_440f4_x(EF_U8(node + 0xbu), x, y, 0x14u, 0x1au, 0x280u);
+			}
+		}
+		node = EF_U32(node + 4u);
+	}
+}
