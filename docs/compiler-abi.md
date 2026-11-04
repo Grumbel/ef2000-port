@@ -8926,3 +8926,16 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc4755` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | c4565@c45f4,15c0ea@15c0fa,160156@16016c | Implicit-register fragment (in: EAX, EBX, ECX; out: ESI, EDI, EBP via out[0..2]): subtract the self-modified camera orig |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1101e3` | EAX:uint32_t,EDX:uint32_t | EAX:int32_t | 11f287@11f2c5 | Implicit-register fragment (EAX, EDX): returns immediately when EDX is zero, otherwise falls into the key translator 0x1 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc46bc` | none | none | 39744@39862 | Patch the three self-modified origin immediates at 0xc4756/0xc475c/0xc4762 from the dwords at 0x1590b4/0x1590b8/0x1590bc |
+| `0x275a4` | none | none | 283c8@283fb | Draw the fixed centered text list: the 120-byte entry table at 0x274c0 is copied to the stack (read-only use, so the gue |

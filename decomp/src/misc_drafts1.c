@@ -20353,3 +20353,28 @@ void rotate_vector_c4755(int32_t x, int32_t y, int32_t z, int32_t *out)
         out[i] = (int32_t)(uint32_t)(((uint64_t)s >> 25) | ((uint64_t)s >> 32 << 7));
     }
 }
+
+/* 0x1101e3, 5 bytes. Implicit-register fragment (EAX, EDX): returns immediately when EDX is zero, otherwise falls into the key translator 0x1101e8 with EAX; the result (EAX, -1 after translation) is returned. When EDX is zero EAX is passed through unchanged. */
+int32_t translate_key_if_1101e3(uint32_t code, uint32_t flag)
+{
+    if (flag == 0u) {
+        return (int32_t)code;
+    }
+    return translate_key_1101e8(code);
+}
+
+/* 0xc46bc, 60 bytes. Patch the three self-modified origin immediates at 0xc4756/0xc475c/0xc4762 from the dwords at 0x1590b4/0x1590b8/0x1590bc, then run 0xc4654 with the dwords 0x1590b0, 0x1590ac, 0x1590a8 (all registers preserved). */
+void load_origin_and_run_c46bc(void)
+{
+    EF_U32(0x000c4756u) = EF_U32(0x001590b4u);
+    EF_U32(0x000c475cu) = EF_U32(0x001590b8u);
+    EF_U32(0x000c4762u) = EF_U32(0x001590bcu);
+    set_params_and_run_c4654(0u, 0u, 0u, 0u, EF_U32(0x001590b0u), EF_U32(0x001590acu), EF_U32(0x001590a8u));
+}
+
+/* 0x275a4, 60 bytes. Draw the fixed centered text list: the 120-byte entry table at 0x274c0 is copied to the stack (read-only use, so the guest table is passed directly), 0x19b430/0x19b434 are set to 0xdd650/0xdd6a0, and the list is drawn with y = step = 10. */
+void draw_fixed_text_list_275a4(void)
+{
+    store_dword_pair_19b430(0xdd6a0u, 0xdd650u);
+    draw_centered_entries_27544(0x274c0u, 10, 10);
+}

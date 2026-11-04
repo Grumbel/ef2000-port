@@ -6133,4 +6133,12 @@ void show_status_ac780(void);
 void rotate_vector_c4755(int32_t x, int32_t y, int32_t z, int32_t *out);
 void rotate_vector_c4755(int32_t x, int32_t y, int32_t z, int32_t *out);
 
+int32_t translate_key_if_1101e3(uint32_t code, uint32_t flag);
+int32_t translate_key_if_1101e3(uint32_t code, uint32_t flag);
+
+void load_origin_and_run_c46bc(void);
+void draw_fixed_text_list_275a4(void);
+void load_origin_and_run_c46bc(void);
+void draw_fixed_text_list_275a4(void);
+
 #endif
