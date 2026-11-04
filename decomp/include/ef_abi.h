@@ -4561,4 +4561,13 @@ void draw_clock_text_78934(void);
 uint32_t read_archive_ebc50(uint32_t dst, uint32_t count, uint32_t flags, uint32_t ctx);
 uint32_t read_bytes_9cde8(uint32_t dst, uint32_t count, uint32_t flags);
 
+double tan_b45fa(double angle);
+double atan_dc1d4(double value);
+double table_double_11ac3c(uint32_t obj, uint32_t a, uint32_t b, uint32_t c);
+double modf_10d9c6(double x, uint32_t ip);
+double scaled_call_11b588(double x);
+double combine_11bf00(uint32_t v, double a0, double a1);
+double guest_fn_11b540_x(double x); /* 0x11b540 one double on the stack, callee cleanup, result in ST0 */
+double guest_fn_b3fd0_x(double x); /* 0xb3fd0 one double on the stack, callee cleanup, result in ST0 */
+
 #endif

@@ -22,3 +22,45 @@ double cos_scaled_f8298(double angle)
 {
     return cos(angle * EF_F64(0x001932a4u) * EF_F64(0x001932acu));
 }
+
+/* 0xb45fa, 21 bytes. tan of ST0 (fptan, popping the pushed 1.0); with bit 0 of 0x1631f0 set the library emulation 0xfa3d4 is used instead. */
+double tan_b45fa(double angle)
+{
+    return tan(angle);
+}
+
+/* 0xdc1d4, 21 bytes. atan of ST0 (fld1; fpatan); the emulation path 0x10848c is used when bit 0 of 0x1631f0 is set. */
+double atan_dc1d4(double value)
+{
+    return atan(value);
+}
+
+/* 0x11ac3c, 35 bytes. Fetch a double from the table at [obj+0xf]; the index is built from three bytes with the multipliers at obj+1 and obj+2 (8-bit arithmetic): (a * [obj+1] * [obj+2] + b * [obj+2] + c) & 0xff. */
+double table_double_11ac3c(uint32_t obj, uint32_t a, uint32_t b, uint32_t c)
+{
+    uint8_t m2 = EF_U8(obj + 2u);
+    uint8_t t = (uint8_t)(((uint8_t)((a & 0xffu) * EF_U8(obj + 1u))) * m2);
+    uint8_t u = (uint8_t)((b & 0xffu) * m2);
+    uint8_t idx = (uint8_t)(t + u + (c & 0xffu));
+    return EF_F64(EF_U32(obj + 0xfu) + (uint32_t)idx * 8u);
+}
+
+/* 0x10d9c6, 25 bytes. (ret 12) modf: truncate x toward zero (0x9d72c), store the integral part through ip and return the fractional part. */
+double modf_10d9c6(double x, uint32_t ip)
+{
+    double whole = trunc(x);
+    EF_F64(ip) = whole;
+    return x - whole;
+}
+
+/* 0x11b588, 30 bytes. (ret 8) Call 0x11b540 with the double argument and scale its result by the constant at 0x1958bc. */
+double scaled_call_11b588(double x)
+{
+    return guest_fn_11b540_x(x) * EF_F64(0x001958bcu);
+}
+
+/* 0x11bf00, 37 bytes. (ret 16) Linear combination: f(a0) * v[0] + v[1] * a1 with f computed by 0x11bf00's helper 0xb3fd0 and the pair of doubles at EAX. */
+double combine_11bf00(uint32_t v, double a0, double a1)
+{
+    return guest_fn_b3fd0_x(a0) * EF_F64(v) + EF_F64(v + 8u) * a1;
+}

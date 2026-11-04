@@ -5465,3 +5465,14 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xebc50` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 9cde8@9ce0e,9cde8@9ce1f | Read count bytes into dst from the archive context ctx (position +0x158, end +0x15c): the part beyond the end is filled  |
 | `0x9cde8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | e774@e79d,9d170@9d1a1,aa5c4@aa5e9 | Read count bytes into dst: with flag bits 16/17 from the archive context at 0x40d1f0/0x40d1f4 (0xebc50), with bit 18 fro |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb45fa` | EAX:double | EAX:double | 5f698@5f763,5f944@5f962,6e3e0@6e536 | tan of ST0 (fptan, popping the pushed 1.0); with bit 0 of 0x1631f0 set the library emulation 0xfa3d4 is used instead. |
+| `0xdc1d4` | EAX:double | EAX:double | 1db08@1dba3 | atan of ST0 (fld1; fpatan); the emulation path 0x10848c is used when bit 0 of 0x1631f0 is set. |
+| `0x11ac3c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:double | 11acb0@11ad04 | Fetch a double from the table at [obj+0xf]; the index is built from three bytes with the multipliers at obj+1 and obj+2  |
+| `0x10d9c6` | EAX:double,EDX:uint32_t | EAX:double | e86f7@e870c,120560@120646 | (ret 12) modf: truncate x toward zero (0x9d72c), store the integral part through ip and return the fractional part. |
+| `0x11b588` | EAX:double | EAX:double | 11b5a8@11b608 | (ret 8) Call 0x11b540 with the double argument and scale its result by the constant at 0x1958bc. |
+| `0x11bf00` | EAX:uint32_t,EDX:double,EBX:double | EAX:double | 11bf28@11bf64 | (ret 16) Linear combination: f(a0) * v[0] + v[1] * a1 with f computed by 0x11bf00's helper 0xb3fd0 and the pair of doubl |
