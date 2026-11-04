@@ -5933,4 +5933,7 @@ void damp_heading_89478(void);
 
 void integrate_camera_motion_53618(void);
 
+double unit_bearing_6a3e4(uint32_t a, uint32_t b);
+void guest_fn_6a538_x(ef_addr32 in, ef_addr32 out, int32_t b); /* 0x6a538 EAX/EDX/EBX */
+
 #endif

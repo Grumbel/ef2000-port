@@ -17847,3 +17847,33 @@ void integrate_camera_motion_53618(void)
 	EF_U8(0x001a364eu) = (uint8_t)(EF_U8(0x001a364eu) + 1u);
 	wr_f32_53618(0x001a5bbcu, s + rd_f32_53618(0x001a5bbcu));
 }
+
+/* 0x6a3e4, 223 bytes. Bearing of unit B (EDX, signed id) as seen from unit A (EAX, signed id), returned in ST0; 0.0 when either unit is missing. When B's word +0x146 equals A's id the result is the wrapped angle pi - double +0x148 of B (0xb42f0). Otherwise the vector from A to B (doubles +0x49, +0x51, +0x59) is converted with 0x6a538 and the result is atan2(sqrt(y*y + z*z), x) (0xb4620, with squares from 0xb3fd0 and the root 0xa4470). */
+double unit_bearing_6a3e4(uint32_t a, uint32_t b)
+{
+	int32_t ia = (int32_t)(int16_t)a;
+	int32_t ib = (int32_t)(int16_t)b;
+	uint32_t ua = guest_fn_7489c(ia);
+	uint32_t ub = guest_fn_7489c(ib);
+	double d[3], o[3], v, w, r;
+
+	if (ua == 0u || ub == 0u)
+		return 0.0;
+	if (EF_U16(ub + 0x146u) == (uint32_t)ia) {
+		memcpy(&v, ef_guest_memory_ptr(ub + 0x148u), 8);
+		return wrap_angle_b42f0(3.1415926536 - v);
+	}
+	memcpy(&v, ef_guest_memory_ptr(ub + 0x49u), 8);
+	memcpy(&w, ef_guest_memory_ptr(ua + 0x49u), 8);
+	d[0] = v - w;
+	memcpy(&v, ef_guest_memory_ptr(ub + 0x51u), 8);
+	memcpy(&w, ef_guest_memory_ptr(ua + 0x51u), 8);
+	d[1] = v - w;
+	memcpy(&v, ef_guest_memory_ptr(ub + 0x59u), 8);
+	memcpy(&w, ef_guest_memory_ptr(ua + 0x59u), 8);
+	d[2] = v - w;
+	guest_fn_6a538_x((ef_addr32)(uintptr_t)d, (ef_addr32)(uintptr_t)o, ib);
+	v = square_double_b3fd0(o[1]);
+	r = guest_fn_a4470(square_double_b3fd0(o[2]) + v);
+	return atan2_b4620(r, o[0]);
+}

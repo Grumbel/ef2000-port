@@ -1269,7 +1269,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a378	27	clear_indexed_object_activation	object_state	compiles	game	confirmed	decomp/tests/0x0006a378.json	Two original callers; C wrapper draft, clears +0x141 only when +0x140 nonzero; Watcom/diff pending
 0x0006a394	57	set_indexed_object_state	object_state	compiles	game	confirmed	decomp/tests/0x0006a394.json	C wrapper draft; kind byte +0xe9 and 0xe5-stride flag table; Watcom/diff pending
 0x0006a3d0	18	clear_indexed_object_state	object_state	compiles	game	confirmed	decomp/tests/0x0006a3d0.json	Two original callers; C wrapper draft, clears +0x12a without enable guard; Watcom/diff pending
-0x0006a3e4	223			unknown	unclassified	unverified		
+0x0006a3e4	223	unit_bearing_6a3e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006a3e4.json	docs/compiler-abi.md; Bearing of unit B (EDX, signed id) as seen from unit A (EAX, signed id), returned in ST0; 0.0 when either unit is missin; callers 28ed8@28fd3; guest pending
 0x0006a4c4	115	mul_object_matrix_vector	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX output vector EDX input vector BX signed object index
 0x0006a538	115	mul_object_matrix_transpose_vector	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; EAX input vector EDX output vector BX signed object index
 0x0006a5ac	66	unit_offset_value_6a5ac	float_helpers3	compiles	game	confirmed	decomp/tests/0x0006a5ac.json	docs/compiler-abi.md; Helper result for the offset from a position to a unit, or 0.0.; callers 73820@738f8; guest pending

@@ -8499,3 +8499,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x53618` | none | none | 53c80@53c9b | Integrate the camera motion state. After refreshing the scene angle record 0x1a5bc0 (value 0xfa00, 0xd0dbc), three float |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6a3e4` | EAX:uint32_t,EDX:uint32_t | EAX:double | 28ed8@28fd3 | Bearing of unit B (EDX, signed id) as seen from unit A (EAX, signed id), returned in ST0; 0.0 when either unit is missin |
