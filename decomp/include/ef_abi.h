@@ -5621,4 +5621,6 @@ uint32_t sum_scores_8bde8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32
 uint32_t guest_fn_8ecdc_x(uint32_t a, uint32_t b, uint32_t s0); /* 0x8ecdc EAX/EDX + 1 stack, ret 4, -> AL */
 uint32_t guest_fn_90438_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0x90438 EAX/EDX/EBX/ECX + 1 stack, ret 4 -> EAX */
 
+void refresh_map_label_5c7dc(void);
+
 #endif

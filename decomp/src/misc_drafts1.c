@@ -12983,3 +12983,34 @@ uint32_t sum_scores_8bde8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32
     uint32_t r1 = guest_fn_8ecdc_x(a, b, sw) & 0xffu;
     return r1 + guest_fn_90438_x(a, b, c, d, sw);
 }
+
+/* 0x5c7dc, 258 bytes. Like 0x5a220 (apply 0xcdf48 then latch 0xce328 with the four signed high words at 0x1a6cf4/0x1a6cee/0x1a6cf6/0x1a6cf0; project the selected node [0x1a821c] with 0x5ca88 and update it with 0x5d520) but then draw the label: format 0x185fac with dword 0x1971b0 and print it with 0x48bb0 (colour byte 0x128148, mode (1 - shift) & 0xff), centred on the projected x (half the text width, 0x48da0) and placed above the projected y by (word 0x1a6ce2 + 7) << shift, shift being the byte 0x12b369. */
+void refresh_map_label_5c7dc(void)
+{
+    uint32_t a = (uint32_t)((int32_t)EF_U32(0x001a6cf0u) >> 16);
+    uint32_t b = (uint32_t)((int32_t)EF_U32(0x001a6cf6u) >> 16);
+    uint32_t c = (uint32_t)((int32_t)EF_U32(0x001a6ceeu) >> 16);
+    uint32_t d = (uint32_t)((int32_t)EF_U32(0x001a6cf4u) >> 16);
+    ef_addr32 node;
+    char text[16];
+    int16_t pt[2];
+    ef_addr32 textp = (ef_addr32)(uintptr_t)text;
+    int32_t half;
+    uint32_t shift;
+    int32_t y;
+    int32_t x;
+    guest_fn_cdf48(a, b, c, d);
+    latch_values_ce328(a, b, c, d);
+    node = EF_U32(0x001a821cu);
+    if (node == 0u)
+        return;
+    if ((uint8_t)guest_fn_5ca88_ret_x(node, (ef_addr32)(uintptr_t)pt) == 0u)
+        return;
+    guest_fn_5d520_x(pt[0], pt[1], node);
+    guest_sprintf_a4342(textp, 0x00185facu, EF_U32(0x001971b0u));
+    half = (int16_t)formatted_width_48da0(textp) >> 1;
+    shift = EF_U8(0x0012b369u);
+    y = (int16_t)((int32_t)pt[1] - (int32_t)((EF_U16(0x001a6ce2u) + 7u) << shift));
+    x = (int16_t)((int32_t)pt[0] - half);
+    draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), (1u - shift) & 0xffu, x, y, textp);
+}
