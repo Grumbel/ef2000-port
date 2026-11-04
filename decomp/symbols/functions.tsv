@@ -2491,7 +2491,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b23bc	226	dump_record_b23bc	game_helpers128	compiles	game	confirmed	decomp/tests/0x000b23bc.json	docs/compiler-abi.md; Dump one 0x13-byte record to a handle: an index or fallback value, its kind name, an optional dword and six signed words; callers b2560@b26a9; guest pending
 0x000b2504	89	print_move_record_b2504	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2504.json	docs/compiler-abi.md; Print a movement record with its kind name.; callers b2560@b261a,b2810@b2898,b28b8@b2940; guest pending
 0x000b2560	504			unknown	unclassified	unverified		
-0x000b2758	183			unknown	unclassified	unverified		
+0x000b2758	183	print_matching_records_b2758	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b2758.json	docs/compiler-abi.md; Print the records of the list whose head pointer is at HEAD_PTR (link +4) that are of kind 0 (byte +0xb) and whose coord; callers b2b00@b2c62; guest pending
 0x000b2810	166	dump_table_a_b2810	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b2810.json	docs/compiler-abi.md; Dump a table entry and its sub-records (variant A names).; callers b2b00@b2cb9; guest pending
 0x000b28b8	166	dump_table_b_b28b8	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b28b8.json	docs/compiler-abi.md; Dump a table entry and its sub-records (variant B names).; callers b2b00@b2cd1; guest pending
 0x000b2960	71	print_class_record_b2960	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2960.json	docs/compiler-abi.md; Print a classified record with its class name.; callers b29a8@b2a08; guest pending

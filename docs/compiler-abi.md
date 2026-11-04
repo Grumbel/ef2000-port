@@ -6509,3 +6509,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x369fc` | EAX:uint32_t,EDX:uint32_t | none | 35590@3568b,35590@3569c | Open the stream file NAME for the player (flag byte MODE goes to 0x19f5a0): complain through the callback at 0x132a74 wh |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb2758` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | b2b00@b2c62 | Print the records of the list whose head pointer is at HEAD_PTR (link +4) that are of kind 0 (byte +0xb) and whose coord |

@@ -6923,3 +6923,27 @@ void open_stream_369fc(uint32_t name, uint32_t mode)
     EF_U8(0x0019f59eu) = 1u;
     EF_U32(0x0019f354u) = arena_alloc_e2a94((uint32_t)((int32_t)(int16_t)EF_U16(0x00125900u) << 3));
 }
+
+/* 0xb2758, 183 bytes. Print the records of the list whose head pointer is at HEAD_PTR (link +4) that are of kind 0 (byte +0xb) and whose coordinate word pairs (+0x19/+0x21, +0x1b/+0x23, +0x1d/+0x25, +0x1f/+0x27) match (X, Y): each match is printed with 0xb21ec to the handle OUT (stack argument, ret 4) followed by two copies of the separator format 0x18e060. Stops after MAX matches. Returns the number printed. */
+uint32_t print_matching_records_b2758(uint32_t x, uint32_t y, uint32_t max, uint32_t head_ptr, uint32_t out)
+{
+    uint32_t node = EF_U32(head_ptr);
+    uint32_t n = 0u;
+    while (node != 0u) {
+        if (EF_U8(node + 0xbu) == 0u) {
+            if ((EF_U16(node + 0x19u) == (x & 0xffffu) && EF_U16(node + 0x21u) == (y & 0xffffu)) ||
+                (EF_U16(node + 0x1bu) == (x & 0xffffu) && EF_U16(node + 0x23u) == (y & 0xffffu)) ||
+                (EF_U16(node + 0x1du) == (x & 0xffffu) && EF_U16(node + 0x25u) == (y & 0xffffu)) ||
+                (EF_U16(node + 0x1fu) == (x & 0xffffu) && EF_U16(node + 0x27u) == (y & 0xffffu))) {
+                n++;
+                print_record_b21ec(EF_U32(node + 0x4du), out);
+                guest_fn_b1bb0(out, 0x0018e060u);
+                guest_fn_b1bb0(out, 0x0018e060u);
+                if ((n & 0xffffu) == (max & 0xffffu))
+                    return n;
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+    return n;
+}
