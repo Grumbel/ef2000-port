@@ -6164,3 +6164,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x89698` | EAX:uint32_t | AL:uint8_t | 897c4@8989e | Pick the closest enemy for the unit OBJ: for every group of the table 0x1a14f8 (0x45-byte entries, 0x1a1506 of them) who |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9ccb8` | EAX:uint32_t | EAX:uint32_t | f80@112e,f6a8@f71b,fecc@ff0e | Open the resource NAME: first through the archive handles 0x40d1f0 (option bit 1 of 0x132ab0, result / 0x10000) and 0x40 |

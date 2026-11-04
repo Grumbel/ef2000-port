@@ -4943,4 +4943,8 @@ uint8_t find_nearest_target_89698(uint32_t obj);
 uint32_t guest_fn_906b4_x(uint32_t v); /* 0x906b4 EAX -> AL */
 uint32_t guest_fn_89060_x(uint32_t obj, uint32_t unit); /* 0x89060 EAX/EDX -> AL */
 
+uint32_t open_resource_9ccb8(uint32_t name);
+uint32_t guest_fn_ebb58_x(uint32_t name, uint32_t archive); /* 0xebb58 EAX/EDX */
+void guest_fn_a7ac8_x(uint32_t handle, uint32_t offset); /* 0xa7ac8 2 stack arguments, callee cleanup */
+
 #endif

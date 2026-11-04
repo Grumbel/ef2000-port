@@ -5300,3 +5300,45 @@ uint8_t find_nearest_target_89698(uint32_t obj)
     }
     return EF_U32(obj + 0x5bu) != 0u ? 1u : 0u;
 }
+
+/* 0x9ccb8, 303 bytes. Open the resource NAME: first through the archive handles 0x40d1f0 (option bit 1 of 0x132ab0, result | 0x10000) and 0x40d1f4 (bit 2, result | 0x20000) via 0xebb58, otherwise as a plain file. A file whose 8-byte header carries the packed-data magic 0x524a or 0x4152 is closed again and loaded whole into a fresh buffer (0x40d1e8, size + 0x10 for 0x524a; errors 0x18b178 when the buffer was still in use and 0x18b190 when it cannot be allocated) with the end at 0x40d1e4 and the read pointer at 0x40d1ec, returning handle | 0x40000; any other file is rewound by 8 bytes and its handle returned. */
+uint32_t open_resource_9ccb8(uint32_t name)
+{
+    uint8_t hdr[8];
+    int32_t h;
+    uint32_t r;
+    uint32_t magic;
+    uint32_t size;
+    if (EF_U32(0x0040d1f0u) != 0u && (EF_U8(0x00132ab0u) & 1u) != 0u) {
+        r = guest_fn_ebb58_x(name, EF_U32(0x0040d1f0u));
+        if (r != 0xffffffffu)
+            return r | 0x10000u;
+    }
+    if (EF_U32(0x0040d1f4u) != 0u && (EF_U8(0x00132ab0u) & 2u) != 0u) {
+        r = guest_fn_ebb58_x(name, EF_U32(0x0040d1f4u));
+        if (r != 0xffffffffu)
+            return r | 0x20000u;
+    }
+    h = open_slot_a7900(0u, 0u, 0u, 0u, name);
+    if (h == -1)
+        return (uint32_t)h;
+    read_handle_a79d4(0u, 0u, 0u, 0u, (uint32_t)h, 8u, (uint32_t)(uintptr_t)hdr);
+    magic = (uint32_t)hdr[0] | ((uint32_t)hdr[1] << 8);
+    size = (uint32_t)hdr[4] | ((uint32_t)hdr[5] << 8) | ((uint32_t)hdr[6] << 16) | ((uint32_t)hdr[7] << 24);
+    if (magic != 0x524au && magic != 0x4152u) {
+        guest_fn_a7ac8_x((uint32_t)h, 0xfffffff8u);
+        return (uint32_t)h;
+    }
+    close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)h);
+    if (EF_U32(0x0040d1e8u) != 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018b178u);
+    if (magic == 0x524au)
+        size += 0x10u;
+    EF_U32(0x0040d1e8u) = guest_fn_c3f70(size);
+    if (EF_U32(0x0040d1e8u) == 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018b190u);
+    guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), name, EF_U32(0x0040d1e8u));
+    EF_U32(0x0040d1ecu) = EF_U32(0x0040d1e8u);
+    EF_U32(0x0040d1e4u) = EF_U32(0x0040d1e8u) + size;
+    return (uint32_t)h | 0x40000u;
+}
