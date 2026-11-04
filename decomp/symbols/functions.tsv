@@ -3699,7 +3699,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f90ac	921			unknown	unclassified	unverified		
 0x000f9448	343			unknown	unclassified	unverified		
 0x000f9d98	51	store_two_digits	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f9d98.json	docs/compiler-abi.md; Store the two decimal digits of EAX at EBX+EDX.; callers f9dcb@f9e23,f9dcb@f9e40,f9dcb@f9e53; guest pending
-0x000f9dcb	233			unknown	unclassified	unverified		
+0x000f9dcb	233	format_time_f9dcb	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000f9dcb.json	docs/compiler-abi.md; asctime: format a broken-down time record into "Www Mmm dd hh:mm:ss yyyy\n"; returns the buffer.; callers f9ed2@f9ed8; guest pending
 0x000f9ecd	5	call_110123_f9ecd	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000f9ecd.json	docs/compiler-abi.md; Call 0x110123.; callers b33ac@b33bd; guest pending
 0x000f9ed2	13	call_f9dcb	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f9ed2.json	docs/compiler-abi.md; ; callers 101c54@101ce6; guest pending
 0x000f9ee0	331	decompress_bitstream_backrefs	unk_runtime	typed	asm	confirmed		ABI only; dest/source stack pointers, ret 8, ES output and DF clear
@@ -4094,7 +4094,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00111f20	45	read_varlen_111f20	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00111f20.json	docs/compiler-abi.md; Read a MIDI variable-length quantity (up to 4 bytes) and advance the cursor stored at the argument.; callers 112c10@112db4,112c10@112f7b,112c10@1130f0; guest pending
 0x00111f50	52	byte_swap_111f50	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00111f50.json	docs/compiler-abi.md; Byte-swap a dword (cdecl).; callers 111f84@111fc4,111f84@112031,113d10@113d60; guest pending
 0x00111f84	196			unknown	unclassified	unverified		
-0x00112048	408			unknown	unclassified	unverified		
+0x00112048	408	get_channel_value_112048	game_helpers105	compiles	game	confirmed	decomp/tests/0x00112048.json	docs/compiler-abi.md; Read a stored MIDI channel value: program change (0xc0), pitch bend (0xe0, two 7-bit halves) or a controller (0xb0) from; callers none direct; guest pending
 0x001121e0	449			unknown	unclassified	unverified		
 0x001123a4	1122			unknown	unclassified	unverified		
 0x00112808	132			unknown	unclassified	unverified		

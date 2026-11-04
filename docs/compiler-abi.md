@@ -4441,3 +4441,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xb58a8` | EAX:ef_addr32,DX:int16_t,BX:int16_t | EAX:int32_t | 4fa64@4fb14,b5640@b565a,b5800@b587b | Search the object's slot table (9-byte entries, count at +0x48, flag byte at +3 meaning used) from start for a slot whos |
+
+## runtime_helpers34+game_helpers105 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x112048` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | none direct | Read a stored MIDI channel value: program change (0xc0), pitch bend (0xe0, two 7-bit halves) or a controller (0xb0) from |
+| `0xf9dcb` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | f9ed2@f9ed8 | asctime: format a broken-down time record into "Www Mmm dd hh:mm:ss yyyy\n"; returns the buffer. |
