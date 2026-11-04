@@ -1954,7 +1954,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000975f0	363			unknown	unclassified	unverified		
 0x0009775c	222			unknown	unclassified	unverified		
 0x0009783c	16	reset_record_range	misc_state	compiles	game	confirmed	decomp/tests/0x0009783c.json	docs/compiler-abi.md; word+6=0 word+8=EDX-1 tail 0x975f0; callers 9775c@9782c,97860@978bd; guest pending
-0x00097860	135			unknown	unclassified	unverified		
+0x00097860	135	step_animation_97860	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00097860.json	docs/compiler-abi.md; Step the animation record: bump its frame word (+6), restart it through 0x975f0 when the frame reaches the limit table e; callers 974b8@9750c; guest pending
 0x000978e8	44	update_record_978e8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000978e8.json	docs/compiler-abi.md; if word +0xa: high word +6 <= 2 -> 0x979c8,0x97914; then 0x97950; callers 97464@974a0; guest pending
 0x00097914	59	add_scaled_vector_97914	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00097914.json	docs/compiler-abi.md; Unless 0x122c5c is set, copy the vector at obj+0x30 to a temporary, scale it by the float bits at 0x132b20 and add it to; callers 978e8@97906; guest pending
 0x00097950	118	integrate_motion_97950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00097950.json	docs/compiler-abi.md; Integrate a record's motion unless 0x122c5c is set: add the vector at +0x18 (scaled by the step 0x132b20) to the positio; callers 978e8@9790d; guest pending
@@ -3869,7 +3869,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00104504	121			unknown	unclassified	unverified		
 0x00104580	273			unknown	unclassified	unverified		
 0x00104694	45	shutdown_104694	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00104694.json	docs/compiler-abi.md; Call 0x102488 on each non-null dword 0x4dd670[0..15], then 0x1023b0 and 0x1110c5.; callers 101ddc@101df9; guest pending
-0x001046c4	135			unknown	unclassified	unverified		
+0x001046c4	135	release_runtime_buffers_1046c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001046c4.json	docs/compiler-abi.md; When 0x17d2d4 is set, run 0x1048b4 over the range (0x103d80, 0x1046c4), release the six runtime buffers (0x4dd670, 0x4dd; callers none direct; guest pending
 0x001047a4	32	allocate_and_init_1047a4	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001047a4.json	docs/compiler-abi.md; Allocate with 0xc3f70(size) and, if successful, run 0x104908(block, size).; callers 104200@104209,105e38@105e48,105e38@106209; guest pending
 0x001047c4	32	free_block_1047c4	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001047c4.json	docs/compiler-abi.md; For a non-null block run 0x104920(block, size) then free it with 0xc3f80.; callers 104200@104267,104200@1042e4,104200@10434c; guest pending
 0x001047e4	88			unknown	unclassified	unverified		

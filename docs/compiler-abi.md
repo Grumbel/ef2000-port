@@ -5399,3 +5399,10 @@ in EAX, format string address, one value).
 | `0xf4bdc` | none | none | none direct | Reset the command parser state (0x485dfc = 3, 0x485f70/71 = 0), read tokens and run handlers until 0x485e08 clears, repo |
 | `0x36340` | none | none | 367f0@36955,36ad8@36cfd | Enable the widget named 0x182fb0 with a label picked from the state byte 0x19f5a9 (2..10): 0x1831dc/0x1831e8 (by 0x19f59 |
 | `0x48df8` | none | none | 3dd30@3e759 | Clamp the counter 0x127b1c at zero; while it is non-zero draw the two status strings (0x1a524c) at (17, 17) with modes 0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x97860` | EAX:uint32_t | EAX:uint32_t | 974b8@9750c | Step the animation record: bump its frame word (+6), restart it through 0x975f0 when the frame reaches the limit table e |
+| `0x1046c4` | none | none | none direct | When 0x17d2d4 is set, run 0x1048b4 over the range (0x103d80, 0x1046c4), release the six runtime buffers (0x4dd670, 0x4dd |

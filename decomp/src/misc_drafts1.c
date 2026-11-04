@@ -928,3 +928,47 @@ void draw_status_counter_48df8(void)
     draw_formatted_text_mode_48bb0(6u, mode, 0x11, 0x11, EF_U32(0x001a524cu));
     EF_U16(0x00127b1cu) = (uint16_t)(EF_U16(0x00127b1cu) - EF_U16(0x00127d92u));
 }
+
+/* 0x97860, 135 bytes. Step the animation record: bump its frame word (+6), restart it through 0x975f0 when the frame reaches the limit table entry 0x12dcb8[kind], then act on the kind word (+8): 1 restarts with kind 3 when the object faces the camera, 2 refreshes and applies 0x9775c, 3 and 4 apply 0x9775c. Returns the result of the final call or 0. */
+uint32_t step_animation_97860(uint32_t obj)
+{
+    int16_t frame = (int16_t)EF_U16(obj + 6u);
+    int32_t limit = EF_S32(0x0012dcb8u + (uint32_t)((int32_t)(int16_t)EF_U16(obj + 8u)) * 4u);
+    uint32_t result = 0u;
+    EF_U16(obj + 6u) = (uint16_t)(frame + 1);
+    if ((int32_t)frame >= limit)
+        guest_fn_975f0_x(obj);
+    switch ((uint16_t)(EF_U16(obj + 8u) - 1u)) {
+    case 0:
+        if (object_faces_camera_97534(obj) != 0u)
+            result = guest_fn_9783c_ret_x(obj, 3u);
+        break;
+    case 1:
+        if (object_faces_camera_97534(obj) != 0u)
+            guest_fn_975f0_x(obj);
+        result = guest_fn_9775c_x(obj);
+        break;
+    case 2:
+    case 3:
+        result = guest_fn_9775c_x(obj);
+        break;
+    default:
+        break;
+    }
+    return result;
+}
+
+/* 0x1046c4, 135 bytes. When 0x17d2d4 is set, run 0x1048b4 over the range (0x103d80, 0x1046c4), release the six runtime buffers (0x4dd670, 0x4dd7cc, 0x4dd6b0, 0x4dd7b0, 0x17d2d0, 0x4dd7c8) and clear the flag. */
+void release_runtime_buffers_1046c4(void)
+{
+    if (EF_U32(0x0017d2d4u) == 0u)
+        return;
+    guest_fn_1048b4(0x00103d80u, 0x001046c4u);
+    guest_fn_104920(0x004dd670u, 0x40u);
+    guest_fn_104920(0x004dd7ccu, 0x4cu);
+    guest_fn_104920(0x004dd6b0u, 0x100u);
+    guest_fn_104920(0x004dd7b0u, 0x18u);
+    guest_fn_104920(0x0017d2d0u, 4u);
+    guest_fn_104920(0x004dd7c8u, 4u);
+    EF_U32(0x0017d2d4u) = 0u;
+}

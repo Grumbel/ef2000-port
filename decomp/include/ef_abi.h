@@ -4527,4 +4527,10 @@ void run_command_loop_f4bdc(void);
 void enable_state_widget_36340(void);
 void draw_status_counter_48df8(void);
 
+uint32_t step_animation_97860(uint32_t obj);
+void release_runtime_buffers_1046c4(void);
+void guest_fn_975f0_x(ef_addr32 record); /* 0x975f0 EAX */
+uint32_t guest_fn_9783c_ret_x(ef_addr32 record, uint32_t count); /* 0x9783c EAX/EDX -> EAX */
+uint32_t guest_fn_9775c_x(ef_addr32 record); /* 0x9775c EAX -> EAX */
+
 #endif
