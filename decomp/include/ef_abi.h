@@ -4168,4 +4168,11 @@ void copy_rows_to_screen_eb0b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
 void put_screen_rows_eb050(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t x, uint32_t y, uint32_t width, uint32_t rows, ef_addr32 buf);
 void get_screen_rows_eb1f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t x, uint32_t y, uint32_t width, uint32_t rows, ef_addr32 buf);
 
+/* script_helpers1.c */
+void run_text_script_1093d8(ef_addr32 text, uint32_t table, uint32_t count);
+uint32_t try_handlers_9cbc4(uint32_t a, uint32_t b);
+void guest_callptr_eax_x(ef_addr32 fn, ef_addr32 arg); /* indirect call with the argument in EAX */
+uint32_t guest_fn_eba64_x(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xeba64 EAX/EDX/EBX */
+uint32_t guest_fn_b3c04_x(uint32_t a, uint32_t b); /* 0xb3c04 EAX/EDX, returns EAX */
+
 #endif

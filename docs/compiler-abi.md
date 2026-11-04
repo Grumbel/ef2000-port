@@ -4781,3 +4781,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xeb050` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32 | none | 98658@986e3,98658@98877,98658@9890c | Copy a packed buffer of rows to the framebuffer at (x, y). |
 | `0xeb1f0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32 | none | 98ac0@98b09,98ac0@98b36,98ac0@98b51 | Copy rows from the framebuffer at (x, y) into a packed buffer. |
+
+## script_helpers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1093d8` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | e4010@e40cf | Run a line-oriented text script: each non-empty line not starting with ';' is passed to the current handler (0x4dd890),  |
+| `0x9cbc4` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 6b50@6be1,371b0@37216,3c6c0@3c705 | Try the two optional handlers (0x40d1f0 gated by bit 0 and 0x40d1f4 gated by bit 1 of 0x132ab0); return 1 if one accepts |
