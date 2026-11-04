@@ -1338,6 +1338,8 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  278  Drafted and Watcom-compiled 1 more functions in small_wrappers7 (2342 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  278  Drafted and Watcom-compiled 1 more functions in small_wrappers7 (2343 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  282  Drafted and Watcom-compiled 1 more functions in trace_loaders1 (2344 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  284  Drafted and Watcom-compiled 1 more functions in search_helpers1 (2345 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  284  Drafted and Watcom-compiled 1 more functions in search_helpers1 (2346 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---

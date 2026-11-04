@@ -2167,7 +2167,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a2e4c	29	clear_entry_a2e4c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a2e4c.json	docs/compiler-abi.md; 0xb3fb0(dword 0x1368bc[AX],0,0x21); callers a2e6c@a2e7b; guest pending
 0x000a2e6c	33	clear_all_entries_a2e6c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a2e6c.json	docs/compiler-abi.md; 0xa2e4c for 0..7; callers a3c18@a3cc5,a3da0@a3de4; guest pending
 0x000a2e90	32	format_entry_a2e90	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a2e90.json	docs/compiler-abi.md; 0xe9a24(0x21,0x135840,dword 0x1368bc[AX]); callers a2f70@a303a,a3c18@a3ce4; guest pending
-0x000a2ef4	123			unknown	unclassified	unverified		
+0x000a2ef4	123	scan_entries_a2ef4	search_helpers1	compiles	game	confirmed	decomp/tests/0x000a2ef4.json	docs/compiler-abi.md; Scan the first 0x1357b0 table entries for one without flag 1 (+0x1c); if found, queue request 0x137198 with its index an; callers a2f70@a30f5,a410c@a35b2; guest pending
 0x000a2f70	406			unknown	unclassified	unverified		
 0x000a3108	33	forward_if_clear_a3108	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3108.json	docs/compiler-abi.md; tail 0xec0ec when byte 0x13579a clear else 0; callers a312c@a3186; guest pending
 0x000a312c	337			unknown	unclassified	unverified		
@@ -2423,7 +2423,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ac240	162	run_page_callbacks_ac240	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000ac240.json	docs/compiler-abi.md; Run the registered page callbacks, then wait for the mouse buttons to clear.; callers ac408@ac449,ac408@ac480,ac408@ac4dc; guest pending
 0x000ac2e4	289			unknown	unclassified	unverified		
 0x000ac408	372			unknown	unclassified	unverified		
-0x000ac57c	123			unknown	unclassified	unverified		
+0x000ac57c	123	find_free_save_slot_ac57c	search_helpers1	compiles	game	confirmed	decomp/tests/0x000ac57c.json	docs/compiler-abi.md; Probe save files numbered from the counter at 0x13794e (name format 0x18dc48): close each one that exists and advance th; callers ac5f8@ac6d6; guest pending
 0x000ac5f8	391			unknown	unclassified	unverified		
 0x000ac780	37			unknown	unclassified	unverified		
 0x000ac7a8	24	set_pending_name_ac7a8	game_helpers28	compiles	game	confirmed	decomp/tests/0x000ac7a8.json	docs/compiler-abi.md; Set the pending flag and copy a name into the message buffer.; callers 4738@4840,4b54@4b76,4c50@4cea; guest pending

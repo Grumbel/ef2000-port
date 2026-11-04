@@ -63,3 +63,45 @@ void drain_kind_two_chain_85380(uint32_t owner)
         decrement_grid_activity((uint32_t)(int32_t)o);
     }
 }
+
+/* 0xac57c, 123 bytes. Probe save files numbered from the counter at 0x13794e (name format 0x18dc48): close each one that exists and advance the counter, then hand the first free name to 0xd1c54. */
+void find_free_save_slot_ac57c(void)
+{
+    uint8_t name[0x20];
+    ef_addr32 buf = (uint32_t)(uintptr_t)name;
+    int32_t h;
+    guest_sprintf_a4342(buf, 0x0018dc48u, (uint32_t)EF_S16(0x0013794eu));
+    h = open_slot_a7900(0u, 0u, 0u, 0u, buf);
+    while (h != -1) {
+        close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)h);
+        EF_U16(0x0013794eu) = (uint16_t)(EF_U16(0x0013794eu) + 1u);
+        guest_sprintf_a4342(buf, 0x0018dc48u, (uint32_t)EF_S16(0x0013794eu));
+        h = open_slot_a7900(0u, 0u, 0u, 0u, buf);
+    }
+    guest_fn_d1c54_x(buf, 0x004195d0u, 1u);
+}
+
+/* 0xa2ef4, 123 bytes. Scan the first 0x1357b0 table entries for one without flag 1 (+0x1c); if found, queue request 0x137198 with its index and set 0x13583c. Returns 1 when all entries have the flag. */
+uint32_t scan_entries_a2ef4(void)
+{
+    int16_t count = (int16_t)EF_U16(0x001357b0u);
+    uint8_t ok = 1u;
+    uint16_t i = 0u;
+    while ((int32_t)i < (int32_t)count && ok == 1u) {
+        uint32_t entry = EF_U32(0x001368bcu + (uint32_t)i * 4u);
+        if (!(EF_U8(entry + 0x1cu) & 1u)) {
+            i--;
+            ok = 0u;
+        }
+        i++;
+    }
+    EF_U16(0x001357b0u) = (uint16_t)count;
+    if (ok == 0u) {
+        EF_U16(0x00137198u) = i;
+        issue_request_a3e50(0x00137198u, 2u, 3u);
+        EF_U8(0x0013583cu) = 1u;
+    } else {
+        EF_U8(0x0013583cu) = 0u;
+    }
+    return ok;
+}

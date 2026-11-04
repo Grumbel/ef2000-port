@@ -4428,4 +4428,9 @@ uint32_t find_open_entry_1065c8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
 
 
 
+void find_free_save_slot_ac57c(void);
+void guest_fn_d1c54_x(ef_addr32 name, uint32_t a, uint32_t mode); /* 0xd1c54 EAX/EDX/EBX */
+
+uint32_t scan_entries_a2ef4(void);
+
 #endif
