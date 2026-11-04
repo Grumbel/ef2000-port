@@ -5097,3 +5097,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xa9fc` | none | EAX:uint32_t | ab74@ad18,ab74@adf6,ab74@af56 | Pick a delay (0x28, 0x46, 0x78 or 0xc8) from a random number modulo 4. |
 | `0xcbcc5` | EAX:uint32_t,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | cbd0f@cbd21 | Convert an unsigned number to text in the given base (digits 0-9, a-z) at dst, returning dst. |
+
+## small_wrappers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8557c` | EAX:uint32_t | EAX:uint32_t | 857bc@85949 | Return 0 when the owner has no weight of the class implied by its type byte (+0x1b: filter 1 for types 0-2, 9, 13; filte |
+| `0xd5ec0` | EAX:ef_addr32 | none | 980e8@98114 | Tear down a loaded block record: trace-call 0x1031a0 with the handle at 0x420a64, release its range (+9 pointer, +5 leng |

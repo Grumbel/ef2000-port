@@ -4347,4 +4347,7 @@ void guest_fn_a00e8_x(void); /* 0xa00e8 no arguments */
 uint32_t random_delay_a9fc(void);
 ef_addr32 utoa_cbcc5(uint32_t value, ef_addr32 dst, uint32_t base);
 
+uint32_t owner_has_weight_8557c(uint32_t owner);
+void release_block_d5ec0(ef_addr32 block);
+
 #endif

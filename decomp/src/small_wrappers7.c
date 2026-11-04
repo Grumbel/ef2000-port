@@ -88,3 +88,31 @@ ef_addr32 utoa_cbcc5(uint32_t value, ef_addr32 dst, uint32_t base)
     } while (c != 0u);
     return dst;
 }
+
+/* 0x8557c, 73 bytes. Return 0 when the owner has no weight of the class implied by its type byte (+0x1b: filter 1 for types 0-2, 9, 13; filter 2 for 6, 7, 10, 11), else 1. */
+uint32_t owner_has_weight_8557c(uint32_t owner)
+{
+    int16_t o = (int16_t)owner;
+    uint32_t type = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)o * 0xca) + 0x1bu);
+    uint8_t filter;
+    switch (type) {
+    case 0: case 1: case 2: case 9: case 13: filter = 1u; break;
+    case 6: case 7: case 10: case 11: filter = 2u; break;
+    default: return 1u;
+    }
+    if ((uint16_t)sum_owner_weights_2af78(o, filter) == 0u)
+        return 0u;
+    return 1u;
+}
+
+/* 0xd5ec0, 75 bytes. Tear down a loaded block record: trace-call 0x1031a0 with the handle at 0x420a64, release its range (+9 pointer, +5 length - 1), reset the MIDI channels and forget it if it is the current block at 0x420a68. */
+void release_block_d5ec0(ef_addr32 block)
+{
+    if (EF_U8(0x0015b968u) == 0u)
+        return;
+    trace_call_1031a0(EF_U32(0x00420a64u));
+    stack_range_104920(EF_U32(block + 9u), EF_U32(block + 5u) - 1u);
+    midi_reset_channels_d6024();
+    if (block == EF_U32(0x00420a68u))
+        EF_U32(0x00420a68u) = 0u;
+}
