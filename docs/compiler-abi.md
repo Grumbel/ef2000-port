@@ -8356,3 +8356,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x242b8` | EAX:uint32_t,EDX:uint32_t | none | 8d59c@8d993 | Propagate unit A's target record to unit B (AX, DX are signed 16-bit unit ids). Nothing happens if either unit is missin |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2b708` | EAX:uint32_t | none | 172b4@1737a,55784@557db,8d59c@8d794 | Compact the seven-entry slot list of class row AX (signed 16-bit; rows of 0xca bytes at dword 0x19bb58): words at row+0x |
+| `0x2c224` | EAX:uint32_t | AL:uint8_t | 2c358@2c3d3,2c358@2c3f3,2c358@2c431 | Test whether class row AX (signed 16-bit) needs attention: true when the row's byte +0x1a is 2, 5 or 6; when the entry ( |

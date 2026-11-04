@@ -457,7 +457,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002b5c0	116	link_external_grid_cell	world_grid_links	compiles	game	confirmed	decomp/tests/0x0002b5c0.json	AX/DX link to external 0x45-byte node; dispatcher unrecovered
 0x0002b634	91	copy_grid_link_position	world_grid_links	compiles	game	confirmed	decomp/tests/0x0002b634.json	copy three 64-bit grid positions from forward link
 0x0002b690	118	refresh_external_grid_position	world_grid_links	compiles	game	confirmed	decomp/tests/0x0002b690.json	scale three signed external-node integers to row doubles; x87 precision pending
-0x0002b708	379			unknown	unclassified	unverified		
+0x0002b708	379	compact_slot_list_2b708	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002b708.json	docs/compiler-abi.md; Compact the seven-entry slot list of class row AX (signed 16-bit; rows of 0xca bytes at dword 0x19bb58): words at row+0x; callers 172b4@1737a,55784@557db,8d59c@8d794; guest pending
 0x0002b884	58	grid_slot_matches_object	world_grid	compiles	game	confirmed	decomp/tests/0x0002b884.json	filtered object lookup and +0xca grid row identity; guest verification pending
 0x0002b910	75	set_grid_slot_event	world_grid	compiles	game	confirmed	decomp/tests/0x0002b910.json	AX/DL event 0x58+value; calls 0x46168 ret4 before +0x90 store
 0x0002b95c	100	enable_grid_slot_state	world_grid	compiles	game	confirmed	decomp/tests/0x0002b95c.json	conditional type-stride gate, state wrapper and event 7; host model passes
@@ -474,7 +474,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002bfcc	287			unknown	unclassified	unverified		
 0x0002c0ec	143	grid_has_cross_object_relation	world_grid_neighbors	compiles	game	confirmed	decomp/tests/0x0002c0ec.json	AX row to AL; up to 14 filtered lookups and cross-row locator test
 0x0002c17c	165	has_enemy_link_2c17c	game_helpers35	compiles	game	confirmed	decomp/tests/0x0002c17c.json	docs/compiler-abi.md; True when an owner has a linked unit whose own link is on another team.; callers 2c6dc@2c73b; guest pending
-0x0002c224	308			unknown	unclassified	unverified		
+0x0002c224	308	row_needs_attention_2c224	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002c224.json	docs/compiler-abi.md; Test whether class row AX (signed 16-bit) needs attention: true when the row's byte +0x1a is 2, 5 or 6; when the entry (; callers 2c358@2c3d3,2c358@2c3f3,2c358@2c431; guest pending
 0x0002c358	251	any_nearby_flagged_2c358	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002c358.json	docs/compiler-abi.md; Is any record near the current one flagged by 0x2c224? Only when byte 0x196fe8 is 1: take the current record P (high wor; callers 7e89c@7e8ae; guest pending
 0x0002c454	220	find_nearest_object_2c454	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002c454.json	docs/compiler-abi.md; Search the 0xca-byte object records (count word 0x19bb5c, base dword 0x19bb58) for the match nearest POS (distance from ; callers 71fc@7214,7308@7325,7308@7343; guest pending
 0x0002c600	218	draw_linked_pages_2c600	draw_loops1	compiles	game	confirmed	decomp/tests/0x0002c600.json	docs/compiler-abi.md; For each of a page's eight linked pages (table at 0x1fcb40) other than itself, call 0x46254 with colour 0x3e; if none we; callers 46454@471bf,46454@47232; guest pending

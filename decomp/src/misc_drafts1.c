@@ -16737,3 +16737,86 @@ void propagate_target_record_242b8(uint32_t ax, uint32_t dx)
 	memcpy(ef_guest_memory_ptr(b + 0x15au), ef_guest_memory_ptr(a + 0x150u), 8);
 	notify_unit_6b444((int16_t)ub);
 }
+
+/* 0x2b708, 379 bytes. Compact the seven-entry slot list of class row AX (signed 16-bit; rows of 0xca bytes at dword 0x19bb58): words at row+0x50 equal to 0xff are filled by moving up the next used entry, together with its three words at +0x18/+0x1a/+0x1c of the 6-byte records behind dword row+0xb5, then the old entry is set to 0xff. Afterwards every entry's unit (0x7489c) gets its byte +0x2a set to the entry index. The loop test reuses the last search index, as in the original. */
+void compact_slot_list_2b708(uint32_t ax)
+{
+	int32_t row = (int32_t)(int16_t)ax;
+	uint32_t rows = EF_U32(0x0019bb58u);
+	int32_t i = 0, j = 0, k;
+	uint32_t base, ptr, u;
+
+	while (j < 7) {
+		base = rows + (uint32_t)(row * 0xca);
+		if (EF_U16(base + (uint32_t)(i * 2) + 0x50u) == 0xffu) {
+			j = i + 1;
+			while (EF_U16(base + (uint32_t)(j * 2) + 0x50u) == 0xffu && j * 2 < 0xe)
+				j++;
+			if (j < 7) {
+				EF_U16(base + (uint32_t)(i * 2) + 0x50u) = EF_U16(base + (uint32_t)(j * 2) + 0x50u);
+				ptr = EF_U32(base + 0xb5u);
+				if (ptr != 0u) {
+					EF_U16(ptr + (uint32_t)(i * 6) + 0x18u) = EF_U16(ptr + (uint32_t)(j * 6) + 0x18u);
+					EF_U16(ptr + (uint32_t)(i * 6) + 0x1au) = EF_U16(ptr + (uint32_t)(j * 6) + 0x1au);
+					EF_U16(ptr + (uint32_t)(i * 6) + 0x1cu) = EF_U16(ptr + (uint32_t)(j * 6) + 0x1cu);
+				}
+				EF_U16(base + (uint32_t)(j * 2) + 0x50u) = 0xffu;
+			}
+		}
+		i++;
+		if (i >= 7)
+			break;
+	}
+	for (k = 0; k < 7; k++) {
+		base = rows + (uint32_t)(row * 0xca);
+		u = guest_fn_7489c((int32_t)(int16_t)EF_U16(base + (uint32_t)(k * 2) + 0x50u));
+		rows = EF_U32(0x0019bb58u);
+		if (u != 0u)
+			EF_U8(u + 0x2au) = (uint8_t)k;
+	}
+}
+
+/* 0x2c224, 308 bytes. Test whether class row AX (signed 16-bit) needs attention: true when the row's byte +0x1a is 2, 5 or 6; when the entry (byte +0x8e) of its table (dword +0x8a, 25-byte entries) has kind 5 and the distance (0xb415c) from the row position (+0x61) to the point formed by the entry's two dwords scaled by the double at 0x18255a is below 64890.0; when the row's linked row (high word of dword +0x20, if not 0xff and of a different side, word +0x15) is closer than 74160.0 (0x2bb3c); or when 0x2bfcc or grid_has_object_mode(row, 2) report true. */
+uint8_t row_needs_attention_2c224(uint32_t ax)
+{
+	int32_t cx = (int32_t)(int16_t)ax;
+	uint32_t rows = EF_U32(0x0019bb58u);
+	uint32_t r = rows + (uint32_t)(cx * 0xca);
+	uint8_t bl = 0u;
+	uint8_t al = EF_U8(r + 0x1au);
+	uint32_t k, tab, other, r2;
+	double pt[3], scale, d;
+
+	if (al == 2u || al == 5u || al == 6u)
+		bl = 1u;
+	rows = EF_U32(0x0019bb58u);
+	r = rows + (uint32_t)(cx * 0xca);
+	k = EF_U8(r + 0x8eu);
+	tab = EF_U32(r + 0x8au);
+	if (EF_U8(tab + k * 25u + 0x18u) == 5u) {
+		memcpy(&scale, ef_guest_memory_ptr(0x0018255au), 8);
+		pt[0] = (double)EF_S32(tab + k * 25u) * scale;
+		tab = EF_U32(r + 0x8au);
+		pt[1] = (double)EF_S32(tab + k * 25u + 4u) * scale;
+		pt[2] = 0.0;
+		memcpy(&scale, ef_guest_memory_ptr(0x00182562u), 8);
+		d = distance_2d_b415c(r + 0x61u, (ef_addr32)(uintptr_t)pt);
+		if (d < scale)
+			bl = 1u;
+	}
+	rows = EF_U32(0x0019bb58u);
+	r = rows + (uint32_t)(cx * 0xca);
+	other = (uint32_t)((int32_t)EF_U32(r + 0x20u) >> 16);
+	if ((int32_t)other != 0xff) {
+		r2 = (uint32_t)((int32_t)other * 0xca) + rows;
+		if (EF_U16(r + 0x15u) != EF_U16(r2 + 0x15u)) {
+			d = grid_cell_distance((int16_t)cx, (int16_t)other);
+			memcpy(&scale, ef_guest_memory_ptr(0x0018256au), 8);
+			if (d < scale)
+				bl = 1u;
+		}
+	}
+	if (guest_fn_2bfcc(cx) != 0u || grid_has_object_mode((int16_t)cx, 2u) != 0u)
+		bl = 1u;
+	return bl;
+}
