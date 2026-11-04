@@ -7581,3 +7581,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x2d9a4` | EAX:uint32_t | none | 2d488@2d752 | Check whether the record ID (AX; table 0xca byte records at [0x19bb58]) is in range of its target: skipped for ID 0xff,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc98f8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 4c3bc@4c4e6 | Arc version of 0xc9680: draw an arc in colour COLOUR (EAX, byte) from angle LO (ECX, passed straight through) to HI (sta |

@@ -12116,3 +12116,24 @@ void check_target_range_2d9a4(uint32_t id)
     if ((uint8_t)guest_fn_2dba4(sid) != 0u)
         EF_U8(0x001f9011u) = 1u;
 }
+
+/* 0xc98f8, 177 bytes. Arc version of 0xc9680: draw an arc in colour COLOUR (EAX, byte) from angle LO (ECX, passed straight through) to HI (stack dword) in the viewport record at [0x41eea0] (nothing when NULL). D (EDX), B (EBX) and the radius R (second stack word, ret 8) are signed words scaled by the double at viewport+0x9f; the centre is (cy = D*scale + (w41 + w71 - w69), cx = B*scale + (w43 + w73 - w6b)), all rounded with 0x9d72c, and the arc is drawn with 0xfe49c. */
+void draw_arc_scaled_c98f8(uint32_t colour, uint32_t d, uint32_t b, uint32_t lo, uint32_t hi, uint32_t r)
+{
+    ef_addr32 vp = EF_U32(0x0041eea0u);
+    double scale;
+    int32_t radius;
+    int32_t cx;
+    int32_t cy;
+    int16_t off_y;
+    int16_t off_x;
+    if (vp == 0u)
+        return;
+    memcpy(&scale, ef_guest_memory_ptr(vp + 0x9fu), sizeof scale);
+    off_y = (int16_t)(EF_U16(vp + 0x41u) + EF_U16(vp + 0x71u) - EF_U16(vp + 0x69u));
+    off_x = (int16_t)(EF_U16(vp + 0x43u) + EF_U16(vp + 0x73u) - EF_U16(vp + 0x6bu));
+    radius = (int32_t)truncate_9d72c((double)(int16_t)r * scale);
+    cx = (int32_t)truncate_9d72c((double)(int16_t)b * scale + (double)off_x);
+    cy = (int32_t)truncate_9d72c((double)(int16_t)d * scale + (double)off_y);
+    draw_arc_by_length_fe49c(colour & 0xffu, (uint32_t)cy, (uint32_t)cx, lo, hi, (uint32_t)radius);
+}

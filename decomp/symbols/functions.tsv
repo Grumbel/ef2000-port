@@ -2848,7 +2848,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c95ac	212	draw_scaled_rect_c95ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c95ac.json	docs/compiler-abi.md; Draw a rectangle in colour COLOUR (EAX, byte) given in viewport units: the signed words X1 (EDX), Y1 (EBX), X2 (ECX) and; callers 4161c@416a1,42568@42607,42568@42621; guest pending
 0x000c9680	180	draw_circle_scaled_c9680	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c9680.json	docs/compiler-abi.md; Draw a full circle of colour COLOUR (EAX, byte) in the viewport record at [0x41eea0] (nothing when NULL). D (EDX), B (EB; callers 4c3bc@4c510; guest pending
 0x000c9734	409			unknown	unclassified	unverified		
-0x000c98f8	177			unknown	unclassified	unverified		
+0x000c98f8	177	draw_arc_scaled_c98f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c98f8.json	docs/compiler-abi.md; Arc version of 0xc9680: draw an arc in colour COLOUR (EAX, byte) from angle LO (ECX, passed straight through) to HI (sta; callers 4c3bc@4c4e6; guest pending
 0x000c99ac	235			unknown	unclassified	unverified		
 0x000c9a98	531			unknown	unclassified	unverified		
 0x000c9cac	536			unknown	unclassified	unverified		

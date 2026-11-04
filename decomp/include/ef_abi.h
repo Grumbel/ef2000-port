@@ -5536,4 +5536,6 @@ void check_target_range_2d9a4(uint32_t id);
 double guest_fn_2bae0_x(ef_addr32 p, int32_t aux); /* 0x2bae0 EAX (EDX left over from the caller) -> ST0 */
 void guest_fn_2b1f4_x(int32_t id, uint32_t mode); /* 0x2b1f4 EAX/EDX */
 
+void draw_arc_scaled_c98f8(uint32_t colour, uint32_t d, uint32_t b, uint32_t lo, uint32_t hi, uint32_t r);
+
 #endif
