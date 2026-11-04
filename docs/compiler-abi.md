@@ -5718,3 +5718,9 @@ in EAX, format string address, one value).
 | `0x50b68` | EAX:uint32_t,EDX:uint32_t | none | 5089c@508ef,508fc@5094f,5095c@509af | Store the state code for KIND (0..11 -> 0, 1, 2, 3, 4, 5, 0x12, 7, 6, 0x10, 0x11, 0x16) in the byte at 0x1a553b + INDEX; |
 | `0xcf960` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t | EAX:uint32_t | cfa24@cfa66,cfde4@cff4b | Test whether the point (PX, PY) lies inside (or on the edge of) the triangle whose three 16-bit (x, y) vertices are stor |
 | `0x9f710` | EAX:int32_t,EDX:uint32_t,EBX:int32_t,ECX:int32_t | none | 9e7bc@9f360 | Like 0x9f664 for an explicit point: store Y at 0x417226, let the hook at 0x132af4 transform (A, Z), add the offset 0x417 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe5cf0` | EAX:int32_t,EDX:int32_t,EBX:int32_t | none | e5db4@e5e15,e5db4@e5e74 | Draw the 7x7 bitmap glyph GLYPH (7 row bytes at 0x15fab0 + 7 * GLYPH, bit 7 first) at (X, Y) in the colour [0x433eb0], c |

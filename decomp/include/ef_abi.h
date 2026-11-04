@@ -4709,4 +4709,6 @@ void transform_and_relate_9f710(int32_t a, uint32_t y, int32_t z, int32_t c);
 void guest_fn_117ace_x(void); /* 0x117ace unknown, no arguments */
 void guest_callptr3r_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c); /* indirect call: EAX/EDX/EBX register arguments */
 
+void draw_glyph_7x7_e5cf0(int32_t x, int32_t y, int32_t glyph);
+
 #endif

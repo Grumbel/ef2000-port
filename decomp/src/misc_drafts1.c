@@ -2751,3 +2751,27 @@ void transform_and_relate_9f710(int32_t a, uint32_t y, int32_t z, int32_t c)
     rec[2] = EF_U16(r + 6u);
     guest_callptr3r_x(EF_U32(0x00132ae0u), (uint32_t)(uintptr_t)rel, (uint32_t)(uintptr_t)rec, (uint32_t)(int16_t)c);
 }
+
+/* 0xe5cf0, 196 bytes. Draw the 7x7 bitmap glyph GLYPH (7 row bytes at 0x15fab0 + 7 * GLYPH, bit 7 first) at (X, Y) in the colour [0x433eb0], clipped to the rectangle [0x17cf9c..0x17cfa0] x [0x17cfa4..0x17cfa8]. */
+void draw_glyph_7x7_e5cf0(int32_t x, int32_t y, int32_t glyph)
+{
+    uint32_t dst = EF_U32(0x0015b754u) + EF_U32(0x00163200u + (uint32_t)y * 4u) + (uint32_t)x;
+    uint32_t bits = 0x0015fab0u + (uint32_t)glyph * 7u;
+    int32_t end = y + 7;
+    int32_t left = (int32_t)EF_U32(0x0017cf9cu);
+    for (; y != end; y++) {
+        uint32_t row = EF_U8(bits);
+        bits++;
+        if (y >= (int32_t)EF_U32(0x0017cfa4u) && y <= (int32_t)EF_U32(0x0017cfa8u)) {
+            uint8_t mask = 0x80u;
+            uint32_t d = dst;
+            int32_t cx = x;
+            for (; d != dst + 7u; d++, cx++) {
+                if (cx >= left && cx <= (int32_t)EF_U32(0x0017cfa0u) && (row & mask) != 0u)
+                    EF_U8(d) = EF_U8(0x00433eb0u);
+                mask >>= 1;
+            }
+        }
+        dst += EF_U32(0x001631f4u);
+    }
+}

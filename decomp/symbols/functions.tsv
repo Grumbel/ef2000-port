@@ -3395,7 +3395,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e5bfe	5	tail_jump_e5bfe	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000e5bfe.json	docs/compiler-abi.md; tail jump. Forward to 0x109e6c.; callers 45b60@45b65; guest pending
 0x000e5c03	41	compare_strings_e5c03	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000e5c03.json	docs/compiler-abi.md; strncmp.; callers 81354@81369,82e00@82e17,c3430@c3495; guest pending
 0x000e5c30	138	draw_glyph_e5c30	copy_rects1	compiles	game	confirmed	decomp/tests/0x000e5c30.json	docs/compiler-abi.md; Draw a 7x7 glyph at (x, y).; callers e5db4@e5e4a; guest pending
-0x000e5cf0	196			unknown	unclassified	unverified		
+0x000e5cf0	196	draw_glyph_7x7_e5cf0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e5cf0.json	docs/compiler-abi.md; Draw the 7x7 bitmap glyph GLYPH (7 row bytes at 0x15fab0 + 7 * GLYPH, bit 7 first) at (X, Y) in the colour [0x433eb0], c; callers e5db4@e5e15,e5db4@e5e74; guest pending
 0x000e5db4	207			unknown	unclassified	unverified		
 0x000e5e90	159	draw_glyph_7x9_e5e90	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e5e90.json	docs/compiler-abi.md; Draw a 7x9 glyph in the colour byte 0x433ec0 at (x = eax, y row = edx): code bit 7 selects the table at 0x15feb0 (index ; callers e605c@e60e7; guest pending
 0x000e5f64	248			unknown	unclassified	unverified		
