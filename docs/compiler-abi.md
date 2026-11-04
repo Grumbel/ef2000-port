@@ -2885,3 +2885,19 @@ in EAX, format string address, one value).
 | `0xb19a0` | EAX:ef_addr32 | none | b19e4@b19f5,ca838@ca863 | Free a record with an owned block, a nested block and its own storage. |
 | `0xb4e74` | AX:int16_t,DL:uint8_t,BL:uint8_t,CX:uint16_t,[ESP+4]:uint32_t,[ESP+8]:ef_addr32 | none | b5fe8@b6833,b5fe8@b685b,b69e4@b7ce8 | Fill the 9-byte entry idx of the table at +0x4a of an object. |
 | `0xb55f8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,CL:uint8_t | EAX:ef_addr32 | b97a4@b97c0,b9aa4@b9abc,f8b14@f8b8f | Find the list node matching two key pairs and a kind byte. |
+
+## runtime_helpers12 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa992c` | none | EAX:uint32_t | a9e70@aa008 | Rotate the saved list state into place; returns the global at 0x146e18. |
+| `0xac7f0` | none | none | ac854@ac96f,ac980@ac99b | Clamp the cursor (0x13725e, 0x137260) into the window rectangle. |
+| `0xb0238` | EAX:ef_addr32,DX:int16_t | none | b0f5c@b15f3 | Copy per-column values into every matching node of the list. |
+| `0xb18b8` | EAX:ef_addr32,EDX:ef_addr32 | none | b1b10@b1b39 | Free every node of the list (and their three owned blocks), then clear both heads. |
+| `0xb1918` | EAX:ef_addr32 | none | b1974@b1985 | Free the owned blocks of a record, then the record. |
+| `0xb4c20` | EAX:ef_addr32,DL:uint8_t,EBX:ef_addr32,ECX:uint32_t | EAX:ef_addr32 | c0b04@c0c99,c0b04@c0cf5,c0b04@c0d8c | Find a kind-0x31 child (following the first link) that passes the check. |
+| `0xb4c7c` | EAX:ef_addr32,DL:uint8_t,EBX:ef_addr32,ECX:uint32_t | EAX:ef_addr32 | c0b04@c0cbd,c0b04@c0d38,c0b04@c0db3 | Find a kind-0x31 sibling (following the second link) that passes the check. |
+| `0xb56d0` | AX:int16_t,DX:int16_t,EBX:ef_addr32 | EAX:int32_t | b5800@b5831 | Frame index scaled by the per-row count: (column * 60 + row) / divisor. |
+| `0xbd508` | EAX:ef_addr32 | EAX:uint32_t | bd5a8@bd5d6 | Count the 10-byte entries of the record that are special and non-empty. |
+| `0xbd554` | EAX:ef_addr32 | EAX:uint32_t | bd5a8@bd5df | Count the special entries of a kind-0x15 record, 1 for other kinds. |
+| `0xbe438` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:ef_addr32 | be480@be526,c1438@c1781 | Find the kind-2 node of the list whose target matches the two keys and is valid. |

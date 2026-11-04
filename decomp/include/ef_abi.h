@@ -2135,4 +2135,20 @@ void guest_fn_ac980(int32_t a, int32_t b, int32_t c, int32_t d); /* 0xac980 EAX/
 uint32_t guest_fn_ca9fc(uint32_t a, uint32_t b); /* 0xca9fc EAX/EDX -> AX */
 void guest_fn_cc768(ef_addr32 block); /* 0xcc768 EAX */
 
+/* runtime_helpers12.c */
+uint32_t restore_list_state_a992c(void);
+void clamp_cursor_ac7f0(void);
+void update_columns_b0238(ef_addr32 list, int16_t count);
+void free_node_list_b18b8(ef_addr32 head, ef_addr32 other);
+void free_record_b1918(ef_addr32 record);
+ef_addr32 find_child_b4c20(ef_addr32 key, uint8_t kind, ef_addr32 list, uint32_t context);
+ef_addr32 find_sibling_b4c7c(ef_addr32 key, uint8_t kind, ef_addr32 list, uint32_t context);
+int32_t frame_index_b56d0(int16_t column, int16_t row, ef_addr32 object);
+uint32_t count_special_entries_bd508(ef_addr32 record);
+uint32_t count_entries_bd554(ef_addr32 record);
+ef_addr32 find_target_be438(uint32_t key_a, uint32_t key_b, ef_addr32 list);
+uint32_t guest_fn_b0208(ef_addr32 list, uint32_t column, uint32_t field); /* 0xb0208 EAX/EDX/EBX -> AX */
+uint32_t guest_fn_cc1ac(uint32_t a, uint32_t b, uint32_t c); /* 0xcc1ac EAX/EDX/EBX -> AX */
+uint32_t guest_fn_b549c(int32_t value); /* 0xb549c EAX -> AX */
+
 #endif
