@@ -4100,3 +4100,9 @@ in EAX, format string address, one value).
 | `0xbc421` | EAX:uint32_t | EAX:uint32_t | 9ea0@a3ca,a3dc@a5aa,357ec@35a99 | Find the list node with the given key and open it; -1 when absent. |
 | `0xa61b0` | none | none | c9fc4@c9fd5 | Run the pending handler for every listed object that has one set. |
 | `0x120485` | none | none | none direct | Install the runtime hook once. |
+
+## game_helpers79 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf7518` | none | none | none direct | Merge the pending flag word into the second flag field, or clear it (mode 2 skips the refresh). |

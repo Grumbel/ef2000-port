@@ -3650,4 +3650,8 @@ void guest_fn_a60a8_x(uint32_t a); /* 0xa60a8 EAX */
 void guest_fn_120746_x(void); /* 0x120746 */
 void guest_fn_120800_x(void); /* 0x120800 */
 
+/* game_helpers79.c */
+void merge_pending_flags2_f7518(void);
+void guest_fn_f6124_x(void); /* 0xf6124 */
+
 #endif

@@ -3670,7 +3670,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f57d4	78	push_node_f57d4	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f57d4.json	docs/compiler-abi.md; Take a node from the free list at 0x485df8 (or allocate one) and push it on the list at 0x485df4.; callers f4a88@f4a8d; guest pending
 0x000f5e6c	61	latch_words_f5e6c	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f5e6c.json	docs/compiler-abi.md; Latch six words and install the 0xf5eac handler.; callers f5484@f5688; guest pending
 0x000f6124	38	format_global_option_line	unk_parser	named	game	unverified		docs/compiler-abi.md; zero caller arguments, indirect format call [0x132a74], EDX saved; clobbers unresolved
-0x000f7518	98			unknown	unclassified	unverified		
+0x000f7518	98	merge_pending_flags2_f7518	game_helpers79	compiles	game	confirmed	decomp/tests/0x000f7518.json	docs/compiler-abi.md; Merge the pending flag word into the second flag field, or clear it (mode 2 skips the refresh).; callers none direct; guest pending
 0x000f75e0	119	merge_pending_flags_f75e0	game_helpers75	compiles	game	confirmed	decomp/tests/0x000f75e0.json	docs/compiler-abi.md; Merge the pending flag word into the active record, or clear it.; callers none direct; guest pending
 0x000f79b0	62	or_flag_mask_f79b0	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000f79b0.json	docs/compiler-abi.md; OR the mask at 0x46438c into the flag words.; callers none direct; guest pending
 0x000f8010	132	merge_flag_fields_f8010	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000f8010.json	docs/compiler-abi.md; Merge the two 2-bit fields of the mask at 0x46438c into the object flag bytes.; callers none direct; guest pending

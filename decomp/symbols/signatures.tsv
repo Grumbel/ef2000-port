@@ -2004,3 +2004,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000bc421	open_list_node_bc421	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bc421 (47 bytes); Find the list node with the given key and open it; -1 when absent.; callers 9ea0@a3ca,a3dc@a5aa,357ec@35a99; docs/compiler-abi.md
 0x000a61b0	run_pending_handlers_a61b0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a61b0 (58 bytes); Run the pending handler for every listed object that has one set.; callers c9fc4@c9fd5; docs/compiler-abi.md
 0x00120485	install_runtime_hook_120485			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00120485 (49 bytes); Install the runtime hook once.; callers none direct; docs/compiler-abi.md
+0x000f7518	merge_pending_flags2_f7518			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f7518 (98 bytes); Merge the pending flag word into the second flag field, or clear it (mode 2 skips the refresh).; callers none direct; docs/compiler-abi.md
