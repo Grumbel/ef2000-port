@@ -4564,3 +4564,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xb4fb4` | EAX:ef_addr32,EDX:ef_addr32 | none | b47e4@b4829 | Initialise the sub-records (0x7c bytes each, count at +0x12, array at +0x13) of an object from a template: allocate each |
 | `0xb31f0` | EAX:ef_addr32,EDX:uint32_t | none | b3168@b31dc | Dump the area list: the number of matching entries (type 0x14 whose first byte pairs with the entry's kind), then each m |
+
+## runtime_helpers39 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10eef0` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 10eda1@10f055,10eda1@10f065 | Parse a TZ rule ("Jn", "n" or "Mm.w.d", optionally "/h:m:s") into the record at out; returns the text position after the |
+| `0x111f84` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:int32_t | EAX:ef_addr32 | 113d10@113d36 | Walk a chunk stream (4-byte tags, big-endian sizes): find the n-th chunk of the tag at 0x1953c8 inside the container tag |

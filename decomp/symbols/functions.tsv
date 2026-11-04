@@ -4021,7 +4021,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010eda1	162			unknown	unclassified	unverified		
 0x0010edb4	38	parse_decimal	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010edb4.json	docs/compiler-abi.md; Parse decimal digits at EAX into *EDX; returns the pointer after them.; callers 10edda@10ee89,10edda@10ee9e,10edda@10eeb0; guest pending
 0x0010edda	278			unknown	unclassified	unverified		
-0x0010eef0	242			unknown	unclassified	unverified		
+0x0010eef0	242	parse_tz_rule_10eef0	runtime_helpers39	compiles	game	confirmed	decomp/tests/0x0010eef0.json	docs/compiler-abi.md; Parse a TZ rule ("Jn", "n" or "Mm.w.d", optionally "/h:m:s") into the record at out; returns the text position after the; callers 10eda1@10f055,10eda1@10f065; guest pending
 0x0010f071	119	alloc_stream_buffer_10f071	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0010f071.json	docs/compiler-abi.md; Allocate the buffer of a stream record.; callers f1d90@f1dd0,f1f5a@f1f95,f22af@f230d; guest pending
 0x0010f0e8	31			unknown	unclassified	unverified		
 0x0010f107	137	stream_fgetc_10f107	game_helpers111	compiles	game	confirmed	decomp/tests/0x0010f107.json	docs/compiler-abi.md; fgetc: read the next byte of a stream (refilling when the count runs out); in text mode skip a CR and treat Ctrl-Z as en; callers 11580e@115831; guest pending
@@ -4093,7 +4093,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00111ed4	76	append_midi_block_111ed4	game_helpers129	compiles	game	confirmed	decomp/tests/0x00111ed4.json	docs/compiler-abi.md; Queue a raw MIDI block (at most 0x200 bytes) into the record's buffer, flushing before and after (cdecl: record, data, l; callers 112c10@112fa0; guest pending
 0x00111f20	45	read_varlen_111f20	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x00111f20.json	docs/compiler-abi.md; Read a MIDI variable-length quantity (up to 4 bytes) and advance the cursor stored at the argument.; callers 112c10@112db4,112c10@112f7b,112c10@1130f0; guest pending
 0x00111f50	52	byte_swap_111f50	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00111f50.json	docs/compiler-abi.md; Byte-swap a dword (cdecl).; callers 111f84@111fc4,111f84@112031,113d10@113d60; guest pending
-0x00111f84	196			unknown	unclassified	unverified		
+0x00111f84	196	find_chunk_111f84	runtime_helpers39	compiles	game	confirmed	decomp/tests/0x00111f84.json	docs/compiler-abi.md; Walk a chunk stream (4-byte tags, big-endian sizes): find the n-th chunk of the tag at 0x1953c8 inside the container tag; callers 113d10@113d36; guest pending
 0x00112048	408	get_channel_value_112048	game_helpers105	compiles	game	confirmed	decomp/tests/0x00112048.json	docs/compiler-abi.md; Read a stored MIDI channel value: program change (0xc0), pitch bend (0xe0, two 7-bit halves) or a controller (0xb0) from; callers none direct; guest pending
 0x001121e0	449			unknown	unclassified	unverified		
 0x001123a4	1122			unknown	unclassified	unverified		
