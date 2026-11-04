@@ -4200,7 +4200,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b9ac	61			unknown	unclassified	unverified		
 0x0011b9ec	95	scaled_pow_formula_11b9ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b9ec.json	docs/compiler-abi.md; EAX = pointer to a reference double (divisor), EDX = object pointer. Computes t = (C3 - exp(-(obj[0x20] + C1) * C2)) * C; callers 11ba7c@11baa1; guest pending
 0x0011ba4c	45	ratio_scaled_11ba4c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011ba4c.json	docs/compiler-abi.md; EAX = reference pointer, EDX = object pointer; stack: two doubles (arg, unused), callee cleanup. Result = ratio_formula_; callers 11ba7c@11ba95,11bab4@11badf,11baf8@11bb69; guest pending
-0x0011ba7c	54			unknown	unclassified	unverified		
+0x0011ba7c	54	ratio_sum_11ba7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011ba7c.json	docs/compiler-abi.md; Sum of the scaled ratio (ref, obj, arg) and the * scaled power formula (ref, obj2). Second stack double is unused.; callers 10a220@10a4ea; guest pending
 0x0011bab4	65	ratio_offset_11bab4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011bab4.json	docs/compiler-abi.md; EAX = reference pointer, EDX = object pointer; stack: two doubles (a, b), callee cleanup. Result = ratio_scaled_11ba4c(r; callers 10a220@10a434; guest pending
 0x0011baf8	135			unknown	unclassified	unverified		
 0x0011bb80	92			unknown	unclassified	unverified		

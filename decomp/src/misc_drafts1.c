@@ -20730,3 +20730,14 @@ uint32_t extender_call_3504_9c2bb(uint32_t u0, uint32_t u1, uint32_t u2, uint32_
 		return 0xffffffffu;
 	return ecx + addend;
 }
+
+/* 0x11ba7c, 54 bytes. Sum of the scaled ratio (ref, obj, arg) and the
+ * scaled power formula (ref, obj2). Second stack double is unused. */
+double ratio_sum_11ba7c(uint32_t ref, uint32_t obj, uint32_t obj2, uint32_t u3, double arg, double unused)
+{
+	double local;
+	(void)u3;
+	local = ratio_scaled_11ba4c(ref, obj, arg, 6.0);
+	(void)unused;
+	return scaled_pow_formula_11b9ec(ref, obj2) + local;
+}

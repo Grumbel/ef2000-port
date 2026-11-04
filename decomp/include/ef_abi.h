@@ -6194,4 +6194,7 @@ uint32_t extender_call_252b_9c220(uint32_t u0, uint32_t u1, uint32_t u2, uint32_
 uint32_t extender_call_3502_9c27c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t arg0, uint32_t selector); /* 0x9c27c */
 uint32_t extender_call_3504_9c2bb(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t addend, uint32_t selector); /* 0x9c2bb */
 
+double ratio_sum_11ba7c(uint32_t ref, uint32_t obj, uint32_t obj2, uint32_t u3, double arg, double unused);
+double ratio_sum_11ba7c(uint32_t ref, uint32_t obj, uint32_t obj2, uint32_t u3, double arg, double unused); /* 0x11ba7c */
+
 #endif
