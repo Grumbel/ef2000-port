@@ -3521,4 +3521,23 @@ void guest_fn_e330c_w(uint32_t flag, uint32_t addr, uint32_t size); /* 0xe330c E
 void matrix_mul_transposed_fceb4(ef_addr32 a, ef_addr32 b, ef_addr32 out);
 void matrix_mul_fcffb(ef_addr32 a, ef_addr32 b, ef_addr32 out);
 
+/* game_helpers69.c */
+void update_trigger_hold_17754(void);
+void simulation_frame_1cde8(void);
+void guest_fn_86110_x(void); /* 0x86110 */
+uint32_t guest_fn_4904c_x(void); /* 0x4904c -> AL */
+void guest_fn_1c16c_x(void); /* 0x1c16c */
+void guest_fn_1a3cc_x(void); /* 0x1a3cc */
+void guest_fn_1a47c_x(void); /* 0x1a47c */
+void guest_fn_1c3d0_x(void); /* 0x1c3d0 */
+void guest_fn_1c780_x(void); /* 0x1c780 */
+void guest_fn_1abbc_x(void); /* 0x1abbc */
+void guest_fn_53270_x(void); /* 0x53270 */
+void guest_fn_5331c_x(void); /* 0x5331c */
+void guest_fn_1cfd8_x(void); /* 0x1cfd8 */
+void guest_fn_791e0_x(void); /* 0x791e0 */
+void guest_fn_53ecc_x(void); /* 0x53ecc */
+void guest_fn_7957c_x(void); /* 0x7957c */
+void guest_fn_1cd90_x(void); /* 0x1cd90 */
+
 #endif

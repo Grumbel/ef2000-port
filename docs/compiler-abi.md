@@ -3956,3 +3956,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfceb4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | c6b80@c6bda | out = a * transpose(b); inputs in ESI (a), EBX (b), output EDI. |
 | `0xfcffb` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | c5cd3@c5cfa | out = a * b; inputs in ESI (a), EBX (b), output EDI. |
+
+## game_helpers69 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x17754` | none | none | 1abbc@1ac77,5c518@5c79e | Track the trigger hold time for the selected station, firing the release notifications. |
+| `0x1cde8` | none | none | 3dd30@3dfdb | One simulation frame: input latch, unit updates and the sub-step loop. |
