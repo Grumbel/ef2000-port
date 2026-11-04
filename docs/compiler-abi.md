@@ -3083,3 +3083,18 @@ in EAX, format string address, one value).
 | `0x54210` | none | none | 54110@54132 | Cycle a frame counter every other tick and pass the frame to 0x8f4c. |
 | `0x5437c` | none | none | 54110@54141 | Update every record of the 171-byte list: arm ready ones and refresh active ones. |
 | `0xd628` | none | none | none direct | Emit the pending message and, when idle, open the dialog and advance the page. |
+
+## game_helpers32 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x56208` | none | none | 58028@58047 | Clear ten 55-byte record counters and the 80x8 ready-word grid. |
+| `0x5b288` | AL:uint8_t,DX:uint16_t,BX:uint16_t,CL:uint8_t | none | 5fc80@5fd1e | Run 0x5b2f0 with temporary values for four globals, then restore them. |
+| `0x5b9a8` | none | none | 5ba10@5ba28 | Build a 10-entry table of scaled sine/cosine pairs (radius 12). |
+| `0x64498` | none | none | 646d4@6474b | Build a 36-entry table of scaled sine/cosine pairs (radius 50, truncating). |
+| `0x748f4` | AX:int16_t,EDX:uint32_t,EBX:uint32_t,CL:uint8_t | none | 777f4@77901,777f4@7792f,8cd78@8cee9 | Send unit parameters when a remote unit is selected, otherwise defer to 0x74970. |
+| `0x8cae8` | EAX:ef_addr32 | none | 8cb60@8cb83 | Fill an object's 20 slot entries from the defaults table and reset its cursor. |
+| `0x9075c` | EAX:uint32_t | EAX:uint32_t | 6aa70@6aaa2,6aa70@6aaba | Find the next free object id after a start id, wrapping at the table end. |
+| `0x948c4` | AX:int16_t | none | 95e58@96874,95e58@96af7 | Pair the current unit with a target unit, or reset the target state. |
+| `0x97a94` | AX:int16_t | none | 97b18@97b51 | Apply a 78-byte camera record through 0xa0ea8 and 0x9e0c4. |
+| `0x97ca8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | none | 97064@970f1,97064@971c2 | Copy the current 78-byte camera record to six output pointers. |

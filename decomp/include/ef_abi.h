@@ -2371,4 +2371,21 @@ void guest_fn_1e130(void); /* 0x1e130 */
 void guest_fn_a78bc_name(ef_addr32 root, ef_addr32 name); /* 0xa78bc EAX/EDX */
 void guest_fn_43020(void); /* 0x43020 */
 
+/* game_helpers32.c */
+void clear_counters_56208(void);
+void run_with_temp_state_5b288(uint8_t a, uint16_t b, uint16_t c, uint8_t d);
+void build_ring_table_5b9a8(void);
+void build_ring_table_64498(void);
+void send_or_defer_748f4(int16_t unit_id, uint32_t b, uint32_t c, uint8_t kind);
+void reset_slot_entries_8cae8(ef_addr32 object);
+uint32_t next_free_object_9075c(uint32_t start);
+void pair_with_target_948c4(int16_t target_id);
+void apply_camera_record_97a94(int16_t index);
+void read_camera_record_97ca8(ef_addr32 out_x, ef_addr32 out_y, ef_addr32 out_z, ef_addr32 out_a,
+                              ef_addr32 stack_b, ef_addr32 stack_c);
+void guest_fn_5b2f0(void); /* 0x5b2f0 */
+void guest_fn_74970(int32_t unit, uint32_t b, uint32_t c, uint32_t kind); /* 0x74970 EAX/EDX/EBX/ECX */
+void guest_fn_8f07c(ef_addr32 object); /* 0x8f07c EAX */
+uint32_t guest_fn_906b4(int32_t id); /* 0x906b4 EAX -> AL */
+
 #endif
