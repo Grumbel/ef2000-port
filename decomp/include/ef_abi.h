@@ -4965,4 +4965,6 @@ void format_event_message_57820(uint32_t rec);
 
 void update_camera_position_319ac(void);
 
+void bind_unit_entry_76b80(uint32_t id);
+
 #endif

@@ -5627,3 +5627,28 @@ void update_camera_position_319ac(void)
         EF_U32(0x0019e5c9u) += EF_U32(0x0019e568u);
     }
 }
+
+/* 0x76b80, 321 bytes. Bind unit ID (16-bit) to the first free 25-byte entry (word +1 == 0xff) of the table at dword 0x1f8918 (count in byte 0x1f8920): report an error through the callback at 0x132a74 when the table is full (string 0x186d44) or the unit does not exist (0x186d58), store the entry index in the unit (byte +0x187) and the ID in the entry, set the three words at +0x13 to 0xff, reset the unit's eight slots to 0xff and flag byte 0 of the entry when the unit's type byte (+0xe9) is 0x21. */
+void bind_unit_entry_76b80(uint32_t id)
+{
+    uint32_t tbl = EF_U32(0x001f8918u);
+    uint32_t n = EF_U8(0x001f8920u);
+    uint32_t i, slot = 0xffu, unit;
+    for (i = 0u; i < n; i++) {
+        if ((int16_t)EF_U16(tbl + i * 25u + 1u) == 0xff && slot == 0xffu)
+            slot = i;
+    }
+    if (slot == 0xffu)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00186d44u);
+    unit = guest_fn_7489c((int16_t)id);
+    if (unit == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00186d58u, (uint32_t)(int32_t)(int16_t)id);
+    tbl = EF_U32(0x001f8918u);
+    EF_U8(unit + 0x187u) = (uint8_t)slot;
+    EF_U16(tbl + slot * 25u + 1u) = (uint16_t)id;
+    for (i = 0u; i < 3u; i++)
+        EF_U16(tbl + slot * 25u + 0x13u + i * 2u) = 0xffu;
+    for (i = 0u; i < 8u; i++)
+        guest_fn_76b30(unit, i, 0xffu);
+    EF_U8(tbl + slot * 25u) = EF_U8(unit + 0xe9u) == 0x21u ? 1u : 0u;
+}

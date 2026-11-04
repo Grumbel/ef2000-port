@@ -6218,3 +6218,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x319ac` | none | none | 3122c@312ee | Update the camera position (dwords 0x19e5c1/5c5/5c9): rotate the offset (0, 0, -dword 0x19e597) by the angle pair at wor |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x76b80` | EAX:uint32_t | none | 8c49c@8c833 | Bind unit ID (16-bit) to the first free 25-byte entry (word +1 == 0xff) of the table at dword 0x1f8918 (count in byte 0x |

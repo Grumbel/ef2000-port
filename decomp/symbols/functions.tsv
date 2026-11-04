@@ -1395,7 +1395,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00076948	213	fade_palette_76948	game_helpers40	compiles	game	confirmed	decomp/tests/0x00076948.json	docs/compiler-abi.md; Fade the 256-entry palette towards white by the fade counter.; callers 76370@765d8; guest pending
 0x00076b10	32	alloc_table_25_76b10	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00076b10.json	docs/compiler-abi.md; Allocate a table of count 25-byte records.; callers 76cc4@76cd7; guest pending
 0x00076b30	79	attach_object_link_child	scene_indexed	compiles	game	confirmed	decomp/tests/0x00076b30.json	docs/compiler-abi.md
-0x00076b80	321			unknown	unclassified	unverified		
+0x00076b80	321	bind_unit_entry_76b80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00076b80.json	docs/compiler-abi.md; Bind unit ID (16-bit) to the first free 25-byte entry (word +1 == 0xff) of the table at dword 0x1f8918 (count in byte 0x; callers 8c49c@8c833; guest pending
 0x00076cc4	358			unknown	unclassified	unverified		
 0x00076e2c	297			unknown	unclassified	unverified		
 0x00076f58	218	report_formation_76f58	game_helpers40	compiles	game	confirmed	decomp/tests/0x00076f58.json	docs/compiler-abi.md; Report the formation members and leader to the roster function 0x76b30.; callers 77088@770c9; guest pending
