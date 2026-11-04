@@ -7444,3 +7444,34 @@ double eval_binary_record_10e4dd(uint32_t flags, uint32_t a, uint32_t b)
     rec[7] = hi;
     return object_double_value_45b60((ef_addr32)(uintptr_t)rec);
 }
+
+/* 0x2c454, 220 bytes. Search the 0xca-byte object records (count word 0x19bb5c, base dword 0x19bb58) for the match nearest POS (distance from the position at +0x61 via 0xb415c) whose word +0x15 equals ID, byte +0x1b equals SIDE, byte +0x1a equals TYPE (or TYPE is 0) and byte +0x3f is 0. Returns the record index, or 0xff. */
+uint32_t find_nearest_object_2c454(uint32_t pos, uint32_t id, uint32_t side, uint32_t type)
+{
+    double best = 0.0;
+    uint32_t result = 0xffu;
+    int16_t i;
+    for (i = 0; i < (int16_t)EF_U16(0x0019bb5cu); i++) {
+        uint32_t obj, base;
+        double d;
+        if ((int32_t)i == 0xff)
+            continue;
+        base = EF_U32(0x0019bb58u);
+        d = distance_2d_b415c(base + (uint32_t)((int32_t)i * 0xca) + 0x61u, pos);
+        if (!(d < best) && (int32_t)(int16_t)result != 0xff)
+            continue;
+        base = EF_U32(0x0019bb58u);
+        obj = base + (uint32_t)((int32_t)i * 0xca);
+        if ((uint16_t)id != EF_U16(obj + 0x15u))
+            continue;
+        if (EF_U8(obj + 0x1bu) != (uint8_t)side)
+            continue;
+        if (EF_U8(obj + 0x1au) != (uint8_t)type && (uint8_t)type != 0u)
+            continue;
+        if (EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)i * 0xca) + 0x3fu) != 0u)
+            continue;
+        best = d;
+        result = (uint32_t)(uint16_t)i;
+    }
+    return result;
+}
