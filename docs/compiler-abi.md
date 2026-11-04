@@ -6533,3 +6533,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x150d4` | none | none | 5f60@5fc4,5fd8@600d,6c1c@6c90 | Draw the 0x22 label entries of the table at 0x1225d4 (19 bytes each: kind byte +1, box words +2/+4/+6, height word +8, t |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x95704` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 957c8@9585b | Set up the external view from the angle words A, B, C (EAX, EDX, EBX), D (ECX) and the stack argument E (ret 4): reset t |

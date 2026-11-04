@@ -5096,4 +5096,6 @@ void load_text_file_510d0(void);
 
 void draw_label_entries_150d4(void);
 
+void setup_external_view_95704(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e);
+
 #endif

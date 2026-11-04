@@ -7018,3 +7018,26 @@ void draw_label_entries_150d4(void)
     }
     leave_scroll_mode_c39ac();
 }
+
+/* 0x95704, 196 bytes. Set up the external view from the angle words A, B, C (EAX, EDX, EBX), D (ECX) and the stack argument E (ret 4): reset the view matrix 0x12dbec (0xd0b68), rotate it by -E (0xd0ebc) and -D (0xd0dbc), store the angles at words 0x12dba2/a4/a6 (negated, word 0x12dba0 = 0), copy the target's position (dwords 0 .. 8 of the record at dword 0x20f15c) to 0x21446c/70/74 and, when the target's class (high word of +0x2c) passes 0x9125c, store the same lookup result for it in word 0x21448a. Finishes with 0x9357c. */
+void setup_external_view_95704(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e)
+{
+    uint32_t tgt;
+    init_bounds_d0b68(0x0012dbecu);
+    guest_fn_d0ebc(0x0012dbecu, (uint16_t)(0u - e));
+    guest_fn_d0dbc(0x0012dbecu, (uint16_t)(0u - d), 0u);
+    tgt = EF_U32(0x0020f15cu);
+    EF_U16(0x0012dba2u) = (uint16_t)a;
+    EF_U16(0x0012dba4u) = (uint16_t)b;
+    EF_U16(0x0012dba6u) = (uint16_t)c;
+    EF_U16(0x0012dba2u) = (uint16_t)(0u - a);
+    EF_U16(0x0012dba4u) = (uint16_t)(0u - b);
+    EF_U32(0x0021446cu) = EF_U32(tgt);
+    EF_U16(0x0012dba0u) = 0u;
+    EF_U32(0x00214470u) = EF_U32(tgt + 4u);
+    EF_U32(0x00214474u) = EF_U32(tgt + 8u);
+    EF_U16(0x0012dba6u) = (uint16_t)(0u - c);
+    if ((guest_fn_9125c((int32_t)EF_U32(tgt + 0x2cu) >> 16) & 0xffffu) != 0u)
+        EF_U16(0x0021448au) = (uint16_t)guest_fn_9125c((int32_t)EF_U32(EF_U32(0x0020f15cu) + 0x2cu) >> 16);
+    guest_fn_9357c();
+}

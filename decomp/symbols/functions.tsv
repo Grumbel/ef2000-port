@@ -1940,7 +1940,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00095020	728			unknown	unclassified	unverified		
 0x000955c0	157			unknown	unclassified	unverified		
 0x00095660	161	lookup_entry_95660	page_lookup1	compiles	game	confirmed	decomp/tests/0x00095660.json	docs/compiler-abi.md; Look up a named entry for the object at 0x214458 and pass it to 0x955c0.; callers 9596c@959e6,95e58@96d77,95e58@96de3; guest pending
-0x00095704	196			unknown	unclassified	unverified		
+0x00095704	196	setup_external_view_95704	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00095704.json	docs/compiler-abi.md; Set up the external view from the angle words A, B, C (EAX, EDX, EBX), D (ECX) and the stack argument E (ret 4): reset t; callers 957c8@9585b; guest pending
 0x000957c8	161	lookup_entry_957c8	page_lookup1	compiles	game	confirmed	decomp/tests/0x000957c8.json	docs/compiler-abi.md; Same for the object at 0x20f15c (page word at +0x2e), passing the entry to 0x95704.; callers 95ae0@95be5; guest pending
 0x0009586c	256	update_chase_distance_9586c	game_helpers74	compiles	game	confirmed	decomp/tests/0x0009586c.json	docs/compiler-abi.md; Chase-camera distance control driven by the speed input bits.; callers 95e58@96d0e; guest pending
 0x0009596c	370			unknown	unclassified	unverified		
