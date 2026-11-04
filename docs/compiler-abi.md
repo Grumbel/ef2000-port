@@ -6300,3 +6300,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4357c` | EAX:uint32_t,EDX:uint32_t | none | 45574@45651,4bf1c@4c03b | Variant of 0x436dc for the nodes of type 0x14: the position words come from 0x1344f9/fb (positive flag), 0x1344f0/f2 (ne |

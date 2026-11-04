@@ -777,7 +777,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00043020	386	gpwClosePilots		named	unclassified	unverified		
 0x000431a4	597	gpwOnOpenTargetWindow		named	unclassified	unverified		
 0x000433fc	381			unknown	unclassified	unverified		
-0x0004357c	352			unknown	unclassified	unverified		
+0x0004357c	352	draw_map_markers_4357c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004357c.json	docs/compiler-abi.md; Variant of 0x436dc for the nodes of type 0x14: the position words come from 0x1344f9/fb (positive flag), 0x1344f0/f2 (ne; callers 45574@45651,4bf1c@4c03b; guest pending
 0x000436dc	342	draw_map_markers_436dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000436dc.json	docs/compiler-abi.md; Draw the map markers for the objects of the list at *LIST (nodes of type 0x0e and 0x17, link +4; group flag tables check; callers 45574@4562c; guest pending
 0x00043834	368	draw_extent_markers_43834	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00043834.json	docs/compiler-abi.md; Draw the extent markers for list type 0xe.; callers 4bf1c@4c051; guest pending
 0x000439a4	368	draw_extent_markers_439a4	hotspot_draw	compiles	game	confirmed	decomp/tests/0x000439a4.json	docs/compiler-abi.md; Draw the extent markers for list type 0x17.; callers 4bf1c@4c067; guest pending

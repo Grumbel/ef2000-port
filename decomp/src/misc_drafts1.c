@@ -6107,3 +6107,38 @@ void projectile_ground_test_1df90(uint32_t rec)
         dispatch_record_event_1e0ec(rec, (int16_t)event);
     }
 }
+
+/* 0x4357c, 352 bytes. Variant of 0x436dc for the nodes of type 0x14: the position words come from 0x1344f9/fb (positive flag), 0x1344f0/f2 (negative) and 0x134502/04 (zero), and the marker is placed from the words +0 and +4 of the structure reached through +0x13 and +0x20 of the node. */
+void draw_map_markers_4357c(uint32_t head, uint32_t list)
+{
+    uint32_t node = EF_U32(list);
+    while (node != 0u) {
+        if (EF_U8(node + 0xau) == 0x14u) {
+            uint32_t idx = EF_U8(node + 0xbu);
+            uint32_t pos = 0u;
+            uint8_t have = 0u;
+            if ((guest_fn_cc22c(0u, idx, head) & 0xffffu) != 0u && EF_U16(0x00126554u) != 0u) {
+                pos = EF_U32(0x00126570u) + (uint32_t)(int32_t)(int16_t)EF_U16(0x001344f9u) +
+                      (uint32_t)((int32_t)(int16_t)EF_U16(0x001344fbu) * 0x280);
+                have = 1u;
+            } else if ((guest_fn_cc1ac(0u, idx, head) & 0xffffu) != 0u && EF_U16(0x00126556u) != 0u) {
+                pos = EF_U32(0x00126570u) + (uint32_t)(int32_t)(int16_t)EF_U16(0x001344f0u) +
+                      (uint32_t)((int32_t)(int16_t)EF_U16(0x001344f2u) * 0x280);
+                have = 1u;
+            } else if ((group_flag_zero_cc1ec(0u, idx, head) & 0xffffu) != 0u && EF_U16(0x00126558u) != 0u) {
+                pos = EF_U32(0x00126570u) + (uint32_t)(int32_t)(int16_t)EF_U16(0x00134502u) +
+                      (uint32_t)((int32_t)(int16_t)EF_U16(0x00134504u) * 0x280);
+                have = 1u;
+            }
+            if (have) {
+                uint32_t obj = EF_U32(EF_U32(node + 0x13u) + 0x20u);
+                int32_t x = (int16_t)(EF_U16(obj) - 10u);
+                int32_t y = (int16_t)(0x190u - EF_U16(obj + 4u) - 10u);
+                guest_fn_ca620((int32_t)pos, x, y, 0x14u, 0x14u, 0x280u);
+                if (EF_U16(0x0012656au) != 0u)
+                    guest_fn_440f4_x(idx, x, y, 0x14u, 0x1au, 0x280u);
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+}
