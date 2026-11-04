@@ -3572,7 +3572,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eff6e	17			unknown	unclassified	unverified		
 0x000eff7f	53	uint_to_extended_eff7f	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000eff7f.json	docs/compiler-abi.md; Convert an unsigned 32-bit integer to an 80-bit extended value at dest.; callers ee22c@eed2d; guest pending
 0x000effb4	128			unknown	unclassified	unverified		
-0x000f0034	127			unknown	unclassified	unverified		
+0x000f0034	127	extended_to_float_f0034	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f0034.json	docs/compiler-abi.md; Convert the 80-bit extended value at PTR (EAX) to the bits of a 32-bit float (returned in EAX): round the mantissa to 24; callers ee22c@ee6b9,ee22c@ee6ca; guest pending
 0x000f00b3	199			unknown	unclassified	unverified		
 0x000f017a	69	float_to_extended_f017a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f017a.json	docs/compiler-abi.md; Convert the single precision float BITS to an 80-bit extended value at OUT (mantissa at +0/+4, sign and exponent at +8).; callers ee589@ee58f,ee22c@ee5ae,ee22c@ee5cd; guest pending
 0x000f023f	307			unknown	unclassified	unverified		

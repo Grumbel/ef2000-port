@@ -8206,3 +8206,38 @@ void draw_dithered_span_d4430(void)
         cl = (uint8_t)(cl + ch + c);
     } while (dst <= end);
 }
+
+/* 0xf0034, 127 bytes. Convert the 80-bit extended value at PTR (EAX) to the bits of a 32-bit float (returned in EAX): round the mantissa to 24 bits (ties to even), re-bias the exponent by 0x3f80, saturate to infinity above 0xfe, flush to 0 below the float range and keep the sign. ORIGINAL BUG: a zero exponent (zero or denormal) returns the masked high mantissa dword without the sign. */
+uint32_t extended_to_float_f0034(uint32_t ptr)
+{
+    uint32_t mask = 0xffffff00u;
+    uint32_t hi = EF_U32(ptr + 4u);
+    uint32_t lo = EF_U32(ptr);
+    uint16_t se = EF_U16(ptr + 8u);
+    uint32_t eax = hi;
+    uint32_t sign;
+    int16_t e;
+    if (hi & 0x80u) {
+        if ((hi & 0x7fu) == 0u && lo == 0u)
+            mask += mask;
+        eax = hi + 0x100u;
+        if (eax < hi) {
+            eax = 0x80000000u;
+            se = (uint16_t)(se + 1u);
+        }
+    }
+    eax &= mask;
+    sign = (uint32_t)(se >> 15) << 31;
+    if ((se & 0x7fffu) == 0u)
+        return eax;
+    if ((se & 0x7fffu) == 0x7fffu)
+        return sign | ((((eax + eax) >> 8) | 0xff000000u) >> 1);
+    e = (int16_t)((se & 0x7fffu) + 0xc080u);
+    if (e < 0)
+        return 0u;
+    if (e >= 0xff)
+        return sign | (0xff000000u >> 1);
+    eax = eax + eax;
+    eax = (eax >> 8) | ((uint32_t)(uint16_t)e << 24);
+    return sign | (eax >> 1);
+}

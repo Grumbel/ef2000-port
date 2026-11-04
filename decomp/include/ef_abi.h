@@ -5183,4 +5183,6 @@ void normalise_globals_109a80(void);
 
 void draw_dithered_span_d4430(void);
 
+uint32_t extended_to_float_f0034(uint32_t ptr);
+
 #endif
