@@ -5324,4 +5324,6 @@ void draw_arc_fe380(uint32_t colour, uint32_t cy, uint32_t cx, uint32_t lo, uint
 
 void fill_dialog_labels_4cff4(void);
 
+void draw_arc_by_length_fe49c(uint32_t colour, uint32_t cy, uint32_t cx, uint32_t lo, uint32_t hi, uint32_t radius);
+
 #endif

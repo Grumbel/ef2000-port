@@ -10123,3 +10123,27 @@ void fill_dialog_labels_4cff4(void)
     w = find_widget_checked_a78bc(root, 0x00184d0cu);
     guest_fn_a7588_x(w, b);
 }
+
+/* 0xfe49c, 165 bytes. Draw an arc from angle LO (ECX) to angle HI (stack, ret 8; both reduced to 16 bits, HI moved a full turn up when it is not above LO) with radius RADIUS (stack) around (CX = EBX, CY = EDX) in colour COLOUR (EAX): pick the subdivision depth for dword 0x485fb0 from the scaled arc length (span * 44 * radius / 0x70000: 5 when negative or above 0xfde8, otherwise 1 plus the number of times it can be shifted right by two before reaching zero) and draw it with 0xfe380. */
+void draw_arc_by_length_fe49c(uint32_t colour, uint32_t cy, uint32_t cx, uint32_t lo, uint32_t hi, uint32_t radius)
+{
+    int32_t l = (int32_t)(lo & 0xffffu);
+    int32_t h = (int32_t)(hi & 0xffffu);
+    int32_t span;
+    int32_t q;
+    uint32_t depth = 1u;
+    if (l > h)
+        h += 0x10000;
+    span = h - l;
+    q = (int32_t)((int64_t)(int32_t)((uint32_t)span * (radius * 44u)) / 0x70000);
+    if (q < 0 || q > 0xfde8) {
+        depth = 5u;
+    } else {
+        while (q != 0) {
+            q >>= 2;
+            depth++;
+        }
+    }
+    EF_U32(0x00485fb0u) = depth;
+    draw_arc_fe380(colour, cy, cx, (uint32_t)l, (uint32_t)h, radius);
+}
