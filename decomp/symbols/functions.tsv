@@ -61,7 +61,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00004430	369			unknown	unclassified	unverified		
 0x000045a4	401	select_mode_from_record_45a4	game_helpers42	compiles	game	confirmed	decomp/tests/0x000045a4.json	docs/compiler-abi.md; Read the default record and derive the chord mode from its two fields.; callers 4738@47da,4bf8@4c2f; guest pending
 0x00004738	321	reset_menu_state_4738	game_helpers42	compiles	game	confirmed	decomp/tests/0x00004738.json	docs/compiler-abi.md; Reset the menu: read the clicked mode widget, load the record and refresh.; callers none direct; guest pending
-0x0000487c	206			unknown	unclassified	unverified		
+0x0000487c	206	select_first_entry_487c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000487c.json	docs/compiler-abi.md; Select the first entry of the table named 0x17f6f0: look its number up (0x433c; failure reported through the error hook ; callers 494c@49bb; guest pending
 0x0000494c	323			unknown	unclassified	unverified		
 0x00004a90	16	arcEndgameAccept		named	unclassified	unverified		
 0x00004aa0	299			unknown	unclassified	unverified		

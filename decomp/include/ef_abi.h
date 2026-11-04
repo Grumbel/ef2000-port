@@ -5832,4 +5832,11 @@ void report_fatal_text_a9aa8(ef_addr32 text);
 
 void format_hex_padded_ed589(int32_t value, ef_addr32 buf, uint32_t width);
 
+void select_first_entry_487c(void);
+uint32_t guest_fn_433c_x(uint32_t name); /* 0x433c EAX -> AX */
+void guest_fn_40dc_x(uint32_t a); /* 0x40dc EAX */
+void guest_fn_42a4_x(void); /* 0x42a4 */
+
+
+
 #endif

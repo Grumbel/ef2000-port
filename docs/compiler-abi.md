@@ -8261,3 +8261,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xed589` | EAX:int32_t,EDX:ef_addr32,EBX:uint32_t | none | ed6cc@ed9ea,ed6cc@eda08 | Format EAX as hexadecimal text in the buffer EDX (0xcbd0f, base 16) and right-justify it to EBX characters with leading  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x487c` | none | none | 494c@49bb | Select the first entry of the table named 0x17f6f0: look its number up (0x433c; failure reported through the error hook  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

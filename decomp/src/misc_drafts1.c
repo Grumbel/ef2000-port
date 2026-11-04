@@ -16194,3 +16194,30 @@ void format_hex_padded_ed589(int32_t value, ef_addr32 buf, uint32_t width)
 		EF_U8(buf + (uint32_t)fill) = 0x30u;
 	EF_U8(buf + width) = 0u;
 }
+
+/* 0x487c, 206 bytes. Select the first entry of the table named 0x17f6f0: look its number up (0x433c; failure reported through the error hook with 0x17f6f4), store it in word 0x121e48, copy byte 0x121e44 to byte +0 of the 25-byte row at 0x1970b8 + 25 * number, run 0x40dc(0) and 0x42a4, apply the texts 0x17f714 and 0x17f648 (0xa4d90), format the one-based number with 0x17f720 into a buffer, look the widget of that name up in the dialog returned for 0x17f648 (0xa78bc) and enable it (0xa72d8), apply 0x17f728 and 0x17f734 (0xa4db0) and 0x17f740 (0xa4d90), then bind the widget named 0x17f74c in that dialog to the text 0x130bac (0xa7588). */
+void select_first_entry_487c(void)
+{
+	char buf[0x28];
+	int16_t num;
+	uint32_t dlg, widget;
+
+	num = (int16_t)guest_fn_433c_x(0x0017f6f0u);
+	EF_U16(0x00121e48u) = (uint16_t)num;
+	if (num < 0)
+		guest_callptr1_x(EF_U32(0x00132a74u), 0x0017f6f4u);
+	num = (int16_t)EF_U16(0x00121e48u);
+	EF_U8(0x001970b8u + (uint32_t)((int32_t)num * 25)) = EF_U8(0x00121e44u);
+	guest_fn_40dc_x(0u);
+	guest_fn_42a4_x();
+	guest_fn_a4d90(0x0017f714u);
+	dlg = apply_a4cb4_a4d90(0x0017f648u);
+	guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x0017f720u, (uint32_t)((int32_t)num + 1));
+	widget = find_widget_checked_a78bc(dlg, (ef_addr32)(uintptr_t)buf);
+	enable_widget_a72d8(widget);
+	guest_fn_a4db0(0x0017f728u);
+	guest_fn_a4db0(0x0017f734u);
+	dlg = apply_a4cb4_a4d90(0x0017f740u);
+	widget = find_widget_checked_a78bc(dlg, 0x0017f74cu);
+	guest_bind_dialog_widget(widget, 0x00130bacu);
+}
