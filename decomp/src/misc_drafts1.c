@@ -14981,3 +14981,31 @@ void draw_node_markers_44aec(uint32_t group, ef_addr32 head_addr)
 			guest_fn_440f4_x(EF_U8(node + 9u), x, y, 0x14u, 0x1au, 0x280u);
 	}
 }
+
+/* 0x7cf64, 465 bytes. Read six button states from the dialog named 0x187f94 (bit 0 of byte +0x1d of the widgets named 0x188048 = A, 0x187fac = B, 0x188054 = C, 0x18805c = D, 0x188064 = E, 0x187fb0 = F), derive the selection byte 0x12583b from the pairs (last matching pair wins: A+D 9, A+E 7, A+F 8, B+D 3, B+E 1, B+F 2, C+D 6, C+E 4, C+F 5), store it in the entry returned by 0xa7ec4 for key 0x187ee0 and copy the flags to bytes 0x1f9000 (A), 0x1f9001 (B), 0x1f9002 (C), 0x1f9005 (D), 0x1f9003 (E) and 0x1f8fff (F). */
+void read_button_selection_7cf64(void)
+{
+	static const uint32_t names[6] = { 0x00188048u, 0x00187facu, 0x00188054u, 0x0018805cu, 0x00188064u, 0x00187fb0u };
+	uint32_t dlg = guest_fn_a46cc(0x00187f94u);
+	uint16_t f[6];
+	int i;
+
+	for (i = 0; i < 6; i++)
+		f[i] = (EF_U8(find_widget_checked_a78bc(dlg, names[i]) + 0x1du) & 1u) ? 1u : 0u;
+	if (f[0] && f[3]) EF_U8(0x0012583bu) = 9u;
+	if (f[0] && f[4]) EF_U8(0x0012583bu) = 7u;
+	if (f[0] && f[5]) EF_U8(0x0012583bu) = 8u;
+	if (f[1] && f[3]) EF_U8(0x0012583bu) = 3u;
+	if (f[1] && f[4]) EF_U8(0x0012583bu) = 1u;
+	if (f[1] && f[5]) EF_U8(0x0012583bu) = 2u;
+	if (f[2] && f[3]) EF_U8(0x0012583bu) = 6u;
+	if (f[2] && f[4]) EF_U8(0x0012583bu) = 4u;
+	if (f[2] && f[5]) EF_U8(0x0012583bu) = 5u;
+	EF_U32(guest_fn_a7ec4(0x00187ee0u)) = EF_U8(0x0012583bu);
+	EF_U8(0x001f9005u) = (uint8_t)f[3];
+	EF_U8(0x001f8fffu) = (uint8_t)f[5];
+	EF_U8(0x001f9000u) = (uint8_t)f[0];
+	EF_U8(0x001f9001u) = (uint8_t)f[1];
+	EF_U8(0x001f9003u) = (uint8_t)f[4];
+	EF_U8(0x001f9002u) = (uint8_t)f[2];
+}

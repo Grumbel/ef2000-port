@@ -5766,4 +5766,6 @@ void draw_node_markers_44aec(uint32_t group, ef_addr32 head_addr);
 
 
 
+void read_button_selection_7cf64(void);
+
 #endif

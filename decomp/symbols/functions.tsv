@@ -1492,7 +1492,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007cc5c	114	show_main_widgets_7cc5c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007cc5c.json	docs/compiler-abi.md; Show the main widget set: release the parser buffers, activate the widget stored at "0x187f74" when the mode byte at 0x1; callers none direct; guest pending
 0x0007ccd0	10	call_b1a10_1379bc	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007ccd0.json	docs/compiler-abi.md; tail 0xb1a10 with EAX=0x1379bc; callers none direct; guest pending
 0x0007ccdc	648			unknown	unclassified	unverified		
-0x0007cf64	465			unknown	unclassified	unverified		
+0x0007cf64	465	read_button_selection_7cf64	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007cf64.json	docs/compiler-abi.md; Read six button states from the dialog named 0x187f94 (bit 0 of byte +0x1d of the widgets named 0x188048 = A, 0x187fac =; callers 7d2f8@7d301; guest pending
 0x0007d138	184	RedrawEnemyView		named	unclassified	unverified		
 0x0007d1f0	263	AcceptCustom		named	unclassified	unverified		
 0x0007d2f8	2916			unknown	unclassified	unverified		
