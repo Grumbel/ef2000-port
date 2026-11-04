@@ -2545,4 +2545,34 @@ void guest_fn_a3eac_args(uint32_t a, uint32_t b); /* 0xa3eac EAX/EDX */
 uint32_t guest_fn_e2a94(uint32_t size); /* 0xe2a94 EAX -> EAX */
 void guest_fn_3c5b8(void); /* 0x3c5b8 */
 
+/* runtime_helpers21.c */
+ef_addr32 find_entry_by_id_8fdf0(int16_t id);
+void init_buffer_8fee0(void);
+ef_addr32 alloc_zero_68_8ff20(uint8_t count);
+void reset_sound_slot_980e8(uint8_t slot);
+void start_transfer_985b0(uint8_t mode, uint32_t target, uint32_t start, uint32_t end);
+ef_addr32 alloc_or_abort_9d060(uint32_t size);
+uint32_t countdown_record_a00a4(ef_addr32 record);
+void read_checked_a1afc(uint32_t buffer, uint32_t count);
+void write_checked_a1b28(uint32_t buffer, uint32_t count);
+uint8_t check_count_a2900(uint16_t count);
+void check_name_a39ec(void);
+void cache_current_slot_a3bdc(void);
+void shutdown_device_a3da0(void);
+void close_device_a3e04(void);
+void issue_request_a3e50(uint32_t request, uint16_t size, uint8_t flag);
+void issue_request_ready_a3eac(uint32_t request, uint16_t size);
+void poll_device_a3fe0(void);
+void start_device_a42d0(void);
+void stop_device_a42f4(void);
+ef_addr32 find_named_or_abort_a46cc(ef_addr32 name);
+void guest_fatal_arg(ef_addr32 format, uint32_t value); /* [0x132a74] cdecl, one argument */
+void guest_fn_d5ec0(ef_addr32 slot); /* 0xd5ec0 EAX */
+uint32_t guest_fn_a79d4_ret(uint32_t a, uint32_t b, uint32_t c); /* 0xa79d4 stack -> EAX */
+uint32_t guest_fn_a7a1c_ret(uint32_t a, uint32_t b, uint32_t c); /* 0xa7a1c stack -> EAX */
+void guest_fn_a42f4(void); /* 0xa42f4 */
+void guest_fn_a3fe0(void); /* 0xa3fe0 */
+uint32_t guest_fn_a292c(void); /* 0xa292c -> AL */
+ef_addr32 guest_fn_a4678(ef_addr32 name); /* 0xa4678 EAX -> EAX */
+
 #endif

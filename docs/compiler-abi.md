@@ -3260,3 +3260,28 @@ in EAX, format string address, one value).
 | `0x82000` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint8_t | EAX:ef_addr32 | 4ae5c@4afbe | Build a 17-byte record from the arguments. |
 | `0x82024` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:ef_addr32 | 4ae5c@4afed | Build a 16-byte record from the arguments. |
 | `0x8c0c8` | AX:int16_t,EDX:uint32_t | none | 8c0f0@8c148 | Store a value in the 0x898-entry table, aborting on a bad index. |
+
+## runtime_helpers21 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8fdf0` | AX:int16_t | EAX:ef_addr32 | 8ba30@8ba3a | Find the entry with the given id in the 50-entry table or abort. |
+| `0x8fee0` | none | none | 49228@4962e | Reset the 0x5dc0-byte buffer state and allocate the buffer. |
+| `0x8ff20` | AL:uint8_t | EAX:ef_addr32 | 37498@37780 | Allocate and zero a table of count 68-byte records. |
+| `0x980e8` | AL:uint8_t | none | 98050@98094,98198@9825b,98280@9828a | Reset a 13-byte slot when the sound path is on; abort on a bad slot. |
+| `0x985b0` | AL:uint8_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 49228@49737,7a844@7a88c,7e8c0@7ea77 | Store a range and start the transfer; abort when the range is negative. |
+| `0x9d060` | EAX:uint32_t | EAX:ef_addr32 | 9d114@9d11c | Allocate a block or abort with the requested size. |
+| `0xa00a4` | EAX:ef_addr32 | EAX:uint32_t | a00e8@a013d | Count a record down; true while it is still live. |
+| `0xa1afc` | EAX:uint32_t,EDX:uint32_t | none | a1bf4@a1c36,a1bf4@a1c9e,a1ec8@a1edf | Read from the stream and abort if the count is short. |
+| `0xa1b28` | EAX:uint32_t,EDX:uint32_t | none | a1b54@a1bd6,a1cb4@a1cdf,a1d00@a1d36 | Write to the stream and abort if the count is short. |
+| `0xa2900` | AX:uint16_t | AL:uint8_t | a3e50@a3e67,a3eac@a3ecc | Check a count against the limit at 0x1357ac, aborting if above. |
+| `0xa39ec` | none | none | a3c18@a3c47 | Abort unless the stored name matches the expected one. |
+| `0xa3bdc` | none | none | 34f94@350a3 | Query the current slot through the callback and cache its table entry. |
+| `0xa3da0` | none | none | 335c0@335ce,3361c@33621,336c0@336c5 | Shut the device down and clear its state flags. |
+| `0xa3e04` | none | none | 34a98@34a9e,34e18@34e95,35128@3512f | Close the device through its callback when it is armed but not running. |
+| `0xa3e50` | EAX:uint32_t,DX:uint16_t,BL:uint8_t | none | a2ef4@a2f4b,a2f70@a30ee,a3280@a32c0 | Issue a request through the callback and account for it. |
+| `0xa3eac` | EAX:uint32_t,DX:uint16_t | none | 34d50@34d6a,35220@3526a,3617c@3623f | Issue a request with a zero flag if the device is ready. |
+| `0xa3fe0` | none | none | a3da0@a3dda,a3da0@a3ddf,a4030@a4052 | Poll the device and accumulate its two status bytes. |
+| `0xa42d0` | none | none | a41dc@a420c | Start the device through its callback if it is not yet started. |
+| `0xa42f4` | none | none | 357a4@357b5,3711c@37175,a3da0@a3db4 | Stop the device through its callback when running. |
+| `0xa46cc` | EAX:ef_addr32 | EAX:ef_addr32 | 40dc@40eb,40dc@4133,40dc@41ae | Look up a named object or abort. |

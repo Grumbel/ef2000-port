@@ -1849,11 +1849,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008fcec	130			unknown	unclassified	unverified		
 0x0008fd70	55	build_path_8fd70	game_helpers22	compiles	game	confirmed	decomp/tests/0x0008fd70.json	docs/compiler-abi.md; Build a path from the default directory and three parts.; callers 8fe58@8fe71; guest pending
 0x0008fdb8	56			unknown	unclassified	unverified		
-0x0008fdf0	64			unknown	unclassified	unverified		
+0x0008fdf0	64	find_entry_by_id_8fdf0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008fdf0.json	docs/compiler-abi.md; Find the entry with the given id in the 50-entry table or abort.; callers 8ba30@8ba3a; guest pending
 0x0008fe30	39	clear_blocks_8fe30	scene_helpers	compiles	game	confirmed	decomp/tests/0x0008fe30.json	docs/compiler-abi.md; 0xb3fb0(0x211ac8,0,4) and (0x211a00,0,0xc8); callers 8fe58@8fe5e; guest pending
 0x0008fe58	135			unknown	unclassified	unverified		
-0x0008fee0	64			unknown	unclassified	unverified		
-0x0008ff20	40			unknown	unclassified	unverified		
+0x0008fee0	64	init_buffer_8fee0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008fee0.json	docs/compiler-abi.md; Reset the 0x5dc0-byte buffer state and allocate the buffer.; callers 49228@4962e; guest pending
+0x0008ff20	40	alloc_zero_68_8ff20	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008ff20.json	docs/compiler-abi.md; Allocate and zero a table of count 68-byte records.; callers 37498@37780; guest pending
 0x0008ff48	159			unknown	unclassified	unverified		
 0x0008ffe8	38	lookup_scene_node	scene_indexed	compiles	game	confirmed	decomp/tests/0x0008ffe8.json	docs/compiler-abi.md
 0x00090050	34	scene_node_is_registered	scene_nodes	compiles	game	confirmed	decomp/tests/0x00090050.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
@@ -1971,7 +1971,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00097f90	110	install_input_tables_97f90	game_helpers33	compiles	game	confirmed	decomp/tests/0x00097f90.json	docs/compiler-abi.md; Pick the table for the detected input device and install the handlers.; callers 8b39c@8b4ba; guest pending
 0x00098000	19	forward_if_enabled	misc_state	compiles	game	confirmed	decomp/tests/0x00098000.json	docs/compiler-abi.md; if byte 0x420a72 tail 0xd5f0c(dword 0x12dd98); callers 8b39c@8b4bf; guest pending
 0x00098050	141			unknown	unclassified	unverified		
-0x000980e8	76			unknown	unclassified	unverified		
+0x000980e8	76	reset_sound_slot_980e8	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000980e8.json	docs/compiler-abi.md; Reset a 13-byte slot when the sound path is on; abort on a bad slot.; callers 98050@98094,98198@9825b,98280@9828a; guest pending
 0x00098198	230			unknown	unclassified	unverified		
 0x00098280	31	reset_mode_98280	game_helpers6	compiles	game	confirmed	decomp/tests/0x00098280.json	docs/compiler-abi.md; ; callers 3ea0c@3eede; guest pending
 0x000982a0	50	select_handlers_982a0	game_helpers6	compiles	game	confirmed	decomp/tests/0x000982a0.json	docs/compiler-abi.md; ; callers 8b39c@8b4b5; guest pending
@@ -1980,7 +1980,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000984f0	25	alloc_zeroed_984f0	game_helpers6	compiles	game	confirmed	decomp/tests/0x000984f0.json	docs/compiler-abi.md; Allocate size bytes and clear them.; callers 6df0@6e03,7780@7794,2aef8@2af0b; guest pending
 0x0009854c	11	set_handler_9854c	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x0009854c.json	docs/compiler-abi.md; Install the 0x984f0 handler.; callers 49228@49288,49228@494e8,69094@69133; guest pending
 0x00098558	27	install_allocator_hooks	misc_state	compiles	game	confirmed	decomp/tests/0x00098558.json	docs/compiler-abi.md; dword 0x12dd9c=0x9850c, 0x408580=0x1f4000; callers 49228@494ef; guest pending
-0x000985b0	66			unknown	unclassified	unverified		
+0x000985b0	66	start_transfer_985b0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000985b0.json	docs/compiler-abi.md; Store a range and start the transfer; abort when the range is negative.; callers 49228@49737,7a844@7a88c,7e8c0@7ea77; guest pending
 0x000985f4	97	update_progress_985f4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000985f4.json	docs/compiler-abi.md; Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change.; callers 49228@49753,7a844@7a89a,7e8c0@7eac1; guest pending
 0x00098658	1126			unknown	unclassified	unverified		
 0x00098ac0	166			unknown	unclassified	unverified		
@@ -2054,7 +2054,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009ce84	98	close_request_9ce84	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009ce84.json	docs/compiler-abi.md; Dispatch a close request by flag bits 0x10000/0x20000/0x40000.; callers f80@1ac1,f6a8@f8e4,fecc@ffa1; guest pending
 0x0009cee8	68			unknown	unclassified	unverified		
 0x0009cfdc	110			unknown	unclassified	unverified		
-0x0009d060	37			unknown	unclassified	unverified		
+0x0009d060	37	alloc_or_abort_9d060	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0009d060.json	docs/compiler-abi.md; Allocate a block or abort with the requested size.; callers 9d114@9d11c; guest pending
 0x0009d088	5			unknown	unclassified	unverified		
 0x0009d114	90	new_stream_9d114	game_helpers30	compiles	game	confirmed	decomp/tests/0x0009d114.json	docs/compiler-abi.md; Allocate and initialise a 0x56c-byte stream record bound to an owner.; callers f80@114f,2ff44@2ffb8,30214@30291; guest pending
 0x0009d170	118	read_stream_char_9d170	game_helpers33	compiles	game	confirmed	decomp/tests/0x0009d170.json	docs/compiler-abi.md; Read the next byte of a buffered stream, skipping CRs; 0 at end of data.; callers 9d1e8@9d1fe,9d1e8@9d217,9d1e8@9d245; guest pending
@@ -2108,7 +2108,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009ffc8	80			unknown	unclassified	unverified		
 0x000a0018	69	find_chain_entry_a0018	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a0018.json	docs/compiler-abi.md; Find the entry in the 0x4e-byte chain whose two keys match, or -1.; callers a0228@a0240; guest pending
 0x000a0060	65			unknown	unclassified	unverified		
-0x000a00a4	67			unknown	unclassified	unverified		
+0x000a00a4	67	countdown_record_a00a4	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a00a4.json	docs/compiler-abi.md; Count a record down; true while it is still live.; callers a00e8@a013d; guest pending
 0x000a00e8	137			unknown	unclassified	unverified		
 0x000a0174	177			unknown	unclassified	unverified		
 0x000a0228	651			unknown	unclassified	unverified		
@@ -2139,8 +2139,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a1a10	47	record_entry_address	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a1a10.json	docs/compiler-abi.md; table 0x40d200[word record] entry+0xa+6*byte +9; callers cd150@cd193,e8484@e84e6; guest pending
 0x000a1a40	77			unknown	unclassified	unverified		
 0x000a1a90	83	find_page_pair_a1a90	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a1a90.json	docs/compiler-abi.md; Look up key in the (key, offset) pair table of a page; return the address or 0.; callers 2fbc4@2fc8b,3c730@3c744,74228@74267; guest pending
-0x000a1afc	41			unknown	unclassified	unverified		
-0x000a1b28	41			unknown	unclassified	unverified		
+0x000a1afc	41	read_checked_a1afc	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a1afc.json	docs/compiler-abi.md; Read from the stream and abort if the count is short.; callers a1bf4@a1c36,a1bf4@a1c9e,a1ec8@a1edf; guest pending
+0x000a1b28	41	write_checked_a1b28	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a1b28.json	docs/compiler-abi.md; Write to the stream and abort if the count is short.; callers a1b54@a1bd6,a1cb4@a1cdf,a1d00@a1d36; guest pending
 0x000a1b54	157			unknown	unclassified	unverified		
 0x000a1bf4	189			unknown	unclassified	unverified		
 0x000a1cb4	76			unknown	unclassified	unverified		
@@ -2157,7 +2157,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a2698	141	apply_page_cell_a2698	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a2698.json	docs/compiler-abi.md; Apply a page cell to a slot unless the slot is locked, and refresh it.; callers 9e7bc@9f4b0; guest pending
 0x000a2728	399			unknown	unclassified	unverified		
 0x000a28f2	7	abs_a28f2	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000a28f2.json	docs/compiler-abi.md; Absolute value.; callers 20ec@2128,20ec@2142,20ec@215a; guest pending
-0x000a2900	44			unknown	unclassified	unverified		
+0x000a2900	44	check_count_a2900	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a2900.json	docs/compiler-abi.md; Check a count against the limit at 0x1357ac, aborting if above.; callers a3e50@a3e67,a3eac@a3ecc; guest pending
 0x000a292c	26			unknown	unclassified	unverified		
 0x000a2948	131			unknown	unclassified	unverified		
 0x000a29cc	41			unknown	unclassified	unverified		
@@ -2188,21 +2188,21 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a3824	164			unknown	unclassified	unverified		
 0x000a38c8	48	clear_tables_a38c8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a38c8.json	docs/compiler-abi.md; clear 8 words 0x1357d8, 8 words 0x13580a, 8 dwords 0x1357e8; callers a3c18@a3d81; guest pending
 0x000a38f8	225			unknown	unclassified	unverified		
-0x000a39ec	36			unknown	unclassified	unverified		
+0x000a39ec	36	check_name_a39ec	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a39ec.json	docs/compiler-abi.md; Abort unless the stored name matches the expected one.; callers a3c18@a3c47; guest pending
 0x000a3a10	24	string_short_enough	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3a10.json	docs/compiler-abi.md; nonempty string with 0xb1b8b result <= 0x10; callers 34844@34858; guest pending
 0x000a3acc	122	install_handlers_a3acc	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a3acc.json	docs/compiler-abi.md; Install the table of ten handler addresses.; callers a3c18@a3c90; guest pending
 0x000a3b48	25	fill_block_a3b48	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3b48.json	docs/compiler-abi.md; 0xdeb87(0x136dd8,-1,8); callers a3c18@a3c5a; guest pending
-0x000a3bdc	31			unknown	unclassified	unverified		
+0x000a3bdc	31	cache_current_slot_a3bdc	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3bdc.json	docs/compiler-abi.md; Query the current slot through the callback and cache its table entry.; callers 34f94@350a3; guest pending
 0x000a3bfc	27	init_entry_table_a3bfc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3bfc.json	docs/compiler-abi.md; dwords 0x1368bc[i]=0x136dfc+0x21*i for i<8; callers a3c18@a3c5f; guest pending
 0x000a3c18	390			unknown	unclassified	unverified		
-0x000a3da0	99			unknown	unclassified	unverified		
-0x000a3e04	46			unknown	unclassified	unverified		
-0x000a3e50	91			unknown	unclassified	unverified		
-0x000a3eac	96			unknown	unclassified	unverified		
+0x000a3da0	99	shutdown_device_a3da0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3da0.json	docs/compiler-abi.md; Shut the device down and clear its state flags.; callers 335c0@335ce,3361c@33621,336c0@336c5; guest pending
+0x000a3e04	46	close_device_a3e04	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3e04.json	docs/compiler-abi.md; Close the device through its callback when it is armed but not running.; callers 34a98@34a9e,34e18@34e95,35128@3512f; guest pending
+0x000a3e50	91	issue_request_a3e50	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3e50.json	docs/compiler-abi.md; Issue a request through the callback and account for it.; callers a2ef4@a2f4b,a2f70@a30ee,a3280@a32c0; guest pending
+0x000a3eac	96	issue_request_ready_a3eac	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3eac.json	docs/compiler-abi.md; Issue a request with a zero flag if the device is ready.; callers 34d50@34d6a,35220@3526a,3617c@3623f; guest pending
 0x000a3f0c	33			unknown	unclassified	unverified		
 0x000a3f30	67			unknown	unclassified	unverified		
 0x000a3f74	105			unknown	unclassified	unverified		
-0x000a3fe0	78			unknown	unclassified	unverified		
+0x000a3fe0	78	poll_device_a3fe0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3fe0.json	docs/compiler-abi.md; Poll the device and accumulate its two status bytes.; callers a3da0@a3dda,a3da0@a3ddf,a4030@a4052; guest pending
 0x000a4030	211	recompute_total_a4030	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000a4030.json	docs/compiler-abi.md; Recompute the total size at 0x135838 from the two index lists.; callers 34e18@34e53,34f94@34ff1,357a4@357ba; guest pending
 0x000a4104	8			unknown	unclassified	unverified		
 0x000a410c	107			unknown	unclassified	unverified		
@@ -2212,8 +2212,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a41d0	9	clear_flag_a41d0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a41d0.json	docs/compiler-abi.md; ; callers 34ca4@34d34; guest pending
 0x000a41dc	169			unknown	unclassified	unverified		
 0x000a42c4	13			unknown	unclassified	unverified		
-0x000a42d0	34			unknown	unclassified	unverified		
-0x000a42f4	35			unknown	unclassified	unverified		
+0x000a42d0	34	start_device_a42d0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a42d0.json	docs/compiler-abi.md; Start the device through its callback if it is not yet started.; callers a41dc@a420c; guest pending
+0x000a42f4	35	stop_device_a42f4	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a42f4.json	docs/compiler-abi.md; Stop the device through its callback when running.; callers 357a4@357b5,3711c@37175,a3da0@a3db4; guest pending
 0x000a4318	23	clear_dwords_135820	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4318.json	docs/compiler-abi.md; clear dwords 0x135820 0x135824 0x135828; callers 3dd30@3de2d; guest pending
 0x000a4342	48			unknown	unclassified	unverified		
 0x000a4380	161	guest_strcmp	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a4380.json	docs/compiler-abi.md; strcmp: 0, -1 or 1.; callers 20ec@2d06,4d4c@4d5b,4d4c@4d83; guest pending
@@ -2227,7 +2227,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a45e4	16			unknown	unclassified	unverified		
 0x000a4640	53	find_id_a4640	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a4640.json	docs/compiler-abi.md; Find a word in the 0x41eda8 id table; returns its index, or a cleared low byte.; callers e52a4@e533f; guest pending
 0x000a4678	82	find_registered_a4678	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a4678.json	docs/compiler-abi.md; Find the registered entry whose name equals key, or 0.; callers a46cc@a46d0; guest pending
-0x000a46cc	35			unknown	unclassified	unverified		
+0x000a46cc	35	find_named_or_abort_a46cc	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a46cc.json	docs/compiler-abi.md; Look up a named object or abort.; callers 40dc@40eb,40dc@4133,40dc@41ae; guest pending
 0x000a46f0	38			unknown	unclassified	unverified		
 0x000a4718	129	remove_id_a4718	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a4718.json	docs/compiler-abi.md; Remove an object id from the id table and clear its flag 4.; callers a4a94@a4abe,a4a94@a4aef; guest pending
 0x000a479c	131	append_id_a479c	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a479c.json	docs/compiler-abi.md; Add a flagged object id to the first free slot of the id table.; callers a499c@a49cb; guest pending
