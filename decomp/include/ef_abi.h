@@ -2124,4 +2124,15 @@ uint32_t select_list_node_a9d0c(void);
 uint32_t guest_fn_e284c(uint32_t a, uint32_t b); /* 0xe284c EAX/EDX */
 void guest_fn_a7510(ef_addr32 widget); /* 0xa7510 EAX */
 
+/* runtime_helpers11.c */
+void redraw_widget_ac9a0(ef_addr32 widget);
+uint32_t list_has_match_b0554(ef_addr32 a, ef_addr32 b, ef_addr32 list);
+void free_record_b1840(ef_addr32 record);
+void free_nested_record_b19a0(ef_addr32 record);
+void set_table_entry_b4e74(int16_t index, uint8_t byte_b, uint8_t byte_a, uint16_t word_b, uint32_t stack_word_a, ef_addr32 stack_object);
+ef_addr32 find_node_b55f8(ef_addr32 list, ef_addr32 a, ef_addr32 b, uint8_t kind);
+void guest_fn_ac980(int32_t a, int32_t b, int32_t c, int32_t d); /* 0xac980 EAX/EDX/EBX/ECX */
+uint32_t guest_fn_ca9fc(uint32_t a, uint32_t b); /* 0xca9fc EAX/EDX -> AX */
+void guest_fn_cc768(ef_addr32 block); /* 0xcc768 EAX */
+
 #endif

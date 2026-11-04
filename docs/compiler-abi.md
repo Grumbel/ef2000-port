@@ -2874,3 +2874,14 @@ in EAX, format string address, one value).
 | `0xa788c` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | a59ac@a59b8,a78bc@a78d9 | Find the child control of a widget whose name equals key. |
 | `0xa8060` | none | none | 283c8@2840f | Write the fill byte to every live entry of the table, clear dead ones. |
 | `0xa9d0c` | none | EAX:uint32_t | a9e70@aa0f9 | Select the list node at position count (1-based) and return its payload. |
+
+## runtime_helpers11 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xac9a0` | EAX:ef_addr32 | none | 34298@3437a,34390@343d5,343dc@34408 | Redraw the rectangle of a widget and remember it as the active one. |
+| `0xb0554` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:uint32_t | b059c@b0637 | True when the list holds a node with the same two keys and the hash of b. |
+| `0xb1840` | EAX:ef_addr32 | none | b188c@b189d | Free the four blocks of a record, then the record. |
+| `0xb19a0` | EAX:ef_addr32 | none | b19e4@b19f5,ca838@ca863 | Free a record with an owned block, a nested block and its own storage. |
+| `0xb4e74` | AX:int16_t,DL:uint8_t,BL:uint8_t,CX:uint16_t,[ESP+4]:uint32_t,[ESP+8]:ef_addr32 | none | b5fe8@b6833,b5fe8@b685b,b69e4@b7ce8 | Fill the 9-byte entry idx of the table at +0x4a of an object. |
+| `0xb55f8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,CL:uint8_t | EAX:ef_addr32 | b97a4@b97c0,b9aa4@b9abc,f8b14@f8b8f | Find the list node matching two key pairs and a kind byte. |
