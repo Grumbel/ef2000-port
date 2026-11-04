@@ -20009,3 +20009,11 @@ void load_ds_from_120cd4_222(void)
 void pop_edi_ret_10e414(void)
 {
 }
+
+/* 0x1111e5, 21 bytes. Restore the interrupt flag from a saved flags image (cdecl FLAGS): interrupts are enabled when bit 9 (0x200) is set, otherwise left disabled. */
+void restore_flags_1111e5(uint32_t flags)
+{
+	disable_interrupts_11f2d3();
+	if (flags & 0x200u)
+		enable_interrupts_11f2d5();
+}

@@ -6072,4 +6072,10 @@ uint32_t save_flags_disable_interrupts_1111e1(void);
 void load_ds_from_120cd4_222(void);
 void pop_edi_ret_10e414(void);
 
+void restore_flags_1111e5(uint32_t flags);
+void restore_flags_1111e5(uint32_t flags);
+
+
+void restore_flags_1111e5(uint32_t flags);
+
 #endif

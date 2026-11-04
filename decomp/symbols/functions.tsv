@@ -4066,7 +4066,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001111b1	25	check_marker_1111b1	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111b1.json	docs/compiler-abi.md; Compare the dword at 0x17d7c0 with -1 and do nothing either way (an empty check left over in the runtime).; callers 101f08@101f38; guest pending
 0x001111ca	23	reset_marker_1111ca	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111ca.json	docs/compiler-abi.md; Set the dword at 0x17d7c0 to -1 (frame with saved registers, no arguments).; callers 101f44@101f67; guest pending
 0x001111e1	4	save_flags_disable_interrupts_1111e1	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111e1.json	docs/compiler-abi.md; Save the flags register and disable interrupts (PUSHF; POP EAX; CLI). The flags image is modelled as 0x202 (interrupts e; callers none direct; guest pending
-0x001111e5	21			unknown	unclassified	unverified		
+0x001111e5	21	restore_flags_1111e5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111e5.json	docs/compiler-abi.md; Restore the interrupt flag from a saved flags image (cdecl FLAGS): interrupts are enabled when bit 9 (0x200) is set, oth; callers 101f78@101f7d; guest pending
 0x0011124c	161			unknown	unclassified	unverified		
 0x001112ed	108			unknown	unclassified	unverified		
 0x00111359	12	value_17d7b6	runtime_libc	compiles	game	confirmed	decomp/tests/0x00111359.json	docs/compiler-abi.md; ; callers none direct; guest pending

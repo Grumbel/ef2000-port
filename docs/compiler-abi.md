@@ -8828,3 +8828,14 @@ in EAX, format string address, one value).
 | `0x1111e1` | none | EAX:uint32_t | none direct | Save the flags register and disable interrupts (PUSHF; POP EAX; CLI). The flags image is modelled as 0x202 (interrupts e |
 | `0x222` | none | none | ee22c@ee28d,ee22c@ee318 | Load the data segment register from the word at code-segment offset 0x120cd4. Segments are flat in this port, so there i |
 | `0x10e414` | none | none | 10e35f@10e35f | Epilogue fragment (POP EDI; RET) of the neighbouring routine; the register pop has no observable effect here. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1111e5` | EAX:uint32_t | none | 101f78@101f7d | Restore the interrupt flag from a saved flags image (cdecl FLAGS): interrupts are enabled when bit 9 (0x200) is set, oth |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
