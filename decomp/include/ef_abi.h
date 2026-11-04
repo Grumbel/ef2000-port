@@ -2739,4 +2739,14 @@ void run_matching_handler_f478c(void);
 void store_range_fddf0(ef_addr32 center, uint32_t radius);
 uint32_t guest_fn_8b9e8(uint32_t a, uint32_t b); /* 0x8b9e8 EAX/EDX -> AX */
 
+/* game_helpers44.c */
+void seek_segment_49d2c(ef_addr32 list);
+uint16_t grid_cell_word_49f28(int16_t a, int16_t b, int16_t c);
+void locate_segment_4b0d0(ef_addr32 list);
+uint8_t dispatch_command_50f54(uint8_t mask);
+void skip_to_word_50fcc(ef_addr32 name);
+void guest_fatal_arg3(ef_addr32 format, uint32_t a, uint32_t b, uint32_t c); /* [0x132a74] cdecl, three arguments */
+void guest_fn_50ca4(void); /* 0x50ca4 */
+void guest_fn_50d04(void); /* 0x50d04 */
+
 #endif

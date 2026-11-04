@@ -3406,3 +3406,13 @@ in EAX, format string address, one value).
 | `0x3ce70` | none | none | 3cfc0@3d2e1 | Resolve the terrain cell of every 11-byte entry that has none yet. |
 | `0xf478c` | none | none | f4a88@f4b2a,f4bdc@f4c06,f4c60@f4c91 | Run the handler of the table entry whose name matches the current one. |
 | `0xfddf0` | EAX:ef_addr32,EDX:uint32_t | none | none direct | Store the lower and upper bound of a range as 16.16 values and notify. |
+
+## game_helpers44 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x49d2c` | EAX:ef_addr32 | none | 357ec@35852 | Walk the segment list to the node holding the budget in 0x1a666b. |
+| `0x49f28` | AX:int16_t,DX:int16_t,BX:int16_t | AX:uint16_t | 49228@4988b,49228@4990d,49228@49970 | Look up a word of the unit record owning grid cell (a, b); abort on a bad cell. |
+| `0x4b0d0` | EAX:ef_addr32 | none | 49228@4981a | Find the segment holding the budget in 0x1357ae and publish its cell word. |
+| `0x50f54` | AL:uint8_t | AL:uint8_t | 52164@522ca | Dispatch the current word through the 10-byte command table. |
+| `0x50fcc` | EAX:ef_addr32 | none | 52164@522b6 | Skip script lines until the current word equals the given name or the end marker. |

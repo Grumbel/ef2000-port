@@ -842,14 +842,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00049228	2484			unknown	unclassified	unverified		
 0x00049bdc	245			unknown	unclassified	unverified		
 0x00049cd4	86	copy_row_words_49cd4	game_helpers30	compiles	game	confirmed	decomp/tests/0x00049cd4.json	docs/compiler-abi.md; Copy the row words selected by an object's count into the 0x1a5280 list.; callers 49bdc@49c4c; guest pending
-0x00049d2c	210			unknown	unclassified	unverified		
+0x00049d2c	210	seek_segment_49d2c	game_helpers44	compiles	game	confirmed	decomp/tests/0x00049d2c.json	docs/compiler-abi.md; Walk the segment list to the node holding the budget in 0x1a666b.; callers 357ec@35852; guest pending
 0x00049e00	294			unknown	unclassified	unverified		
-0x00049f28	171			unknown	unclassified	unverified		
+0x00049f28	171	grid_cell_word_49f28	game_helpers44	compiles	game	confirmed	decomp/tests/0x00049f28.json	docs/compiler-abi.md; Look up a word of the unit record owning grid cell (a, b); abort on a bad cell.; callers 49228@4988b,49228@4990d,49228@49970; guest pending
 0x00049fd4	237			unknown	unclassified	unverified		
 0x0004a210	2020			unknown	unclassified	unverified		
 0x0004aa4c	1037			unknown	unclassified	unverified		
 0x0004ae5c	625			unknown	unclassified	unverified		
-0x0004b0d0	183			unknown	unclassified	unverified		
+0x0004b0d0	183	locate_segment_4b0d0	game_helpers44	compiles	game	confirmed	decomp/tests/0x0004b0d0.json	docs/compiler-abi.md; Find the segment holding the budget in 0x1357ae and publish its cell word.; callers 49228@4981a; guest pending
 0x0004b188	3	return_false_4b188	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0004b188.json	docs/compiler-abi.md; ; callers 4a210@4a990; guest pending
 0x0004b1a4	75	cgWarningOkClick		named	unclassified	unverified		
 0x0004b1f0	1199	mpSetWindows		named	unclassified	unverified		
@@ -947,8 +947,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00050d9c	41	transform_string_1a5968	mid_helpers	compiles	game	confirmed	decomp/tests/0x00050d9c.json	docs/compiler-abi.md; map bytes of 0x1a5968 through 0xe7835 until zero; callers 50e84@50ebe; guest pending
 0x00050dc8	31	text_ends_with_colon_50dc8	game_helpers5	compiles	game	confirmed	decomp/tests/0x00050dc8.json	docs/compiler-abi.md; Does the text at 0x1a5968 end in ':'?; callers 50e84@50eb1; guest pending
 0x00050e84	69	wait_command_50e84	game_helpers11	compiles	game	confirmed	decomp/tests/0x00050e84.json	docs/compiler-abi.md; Wait for a key other than 0x3b with a long enough name, then handle it.; callers 52164@522bb; guest pending
-0x00050f54	117			unknown	unclassified	unverified		
-0x00050fcc	193			unknown	unclassified	unverified		
+0x00050f54	117	dispatch_command_50f54	game_helpers44	compiles	game	confirmed	decomp/tests/0x00050f54.json	docs/compiler-abi.md; Dispatch the current word through the 10-byte command table.; callers 52164@522ca; guest pending
+0x00050fcc	193	skip_to_word_50fcc	game_helpers44	compiles	game	confirmed	decomp/tests/0x00050fcc.json	docs/compiler-abi.md; Skip script lines until the current word equals the given name or the end marker.; callers 52164@522b6; guest pending
 0x000510d0	175			unknown	unclassified	unverified		
 0x00052128	57	note_extension_52128	game_helpers5	compiles	game	confirmed	decomp/tests/0x00052128.json	docs/compiler-abi.md; ; callers 50f54@50fae; guest pending
 0x00052164	611			unknown	unclassified	unverified		
