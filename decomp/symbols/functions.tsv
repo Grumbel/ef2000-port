@@ -2228,7 +2228,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a4640	53	find_id_a4640	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a4640.json	docs/compiler-abi.md; Find a word in the 0x41eda8 id table; returns its index, or a cleared low byte.; callers e52a4@e533f; guest pending
 0x000a4678	82	find_registered_a4678	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a4678.json	docs/compiler-abi.md; Find the registered entry whose name equals key, or 0.; callers a46cc@a46d0; guest pending
 0x000a46cc	35	find_named_or_abort_a46cc	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a46cc.json	docs/compiler-abi.md; Look up a named object or abort.; callers 40dc@40eb,40dc@4133,40dc@41ae; guest pending
-0x000a46f0	38			unknown	unclassified	unverified		
+0x000a46f0	38	lookup_named_widget_pair_a46f0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a46f0.json	docs/compiler-abi.md; Implicit-register fragment (ESI = destination pair, EAX = name, EDX = widget key; params in that order): look up NAME (a; callers 35590@356f0,36f84@370c4; guest pending
 0x000a4718	129	remove_id_a4718	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a4718.json	docs/compiler-abi.md; Remove an object id from the id table and clear its flag 4.; callers a4a94@a4abe,a4a94@a4aef; guest pending
 0x000a479c	131	append_id_a479c	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a479c.json	docs/compiler-abi.md; Add a flagged object id to the first free slot of the id table.; callers a499c@a49cb; guest pending
 0x000a4820	137	push_front_id_a4820	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a4820.json	docs/compiler-abi.md; Push a flagged object id to the front of the id table.; callers a4a20@a4a4b; guest pending

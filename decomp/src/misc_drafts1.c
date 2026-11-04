@@ -20437,3 +20437,13 @@ uint32_t rotate_project_15c0ea(uint32_t a, uint32_t b, uint32_t c, ef_addr32 out
     rotate_vector_c4755((int32_t)c, (int32_t)b, (int32_t)a, r);
     return project_point_15c071((uint32_t)r[2], r[0], r[1], outp);
 }
+
+/* 0xa46f0, 38 bytes. Implicit-register fragment (ESI = destination pair, EAX = name, EDX = widget key; params in that order): look up NAME (aborting if missing), look up the widget KEY inside it, store both pointers at DST[0], DST[1] and return DST. */
+ef_addr32 lookup_named_widget_pair_a46f0(ef_addr32 dst, ef_addr32 name, ef_addr32 key)
+{
+    ef_addr32 root = find_named_or_abort_a46cc(name);
+    ef_addr32 widget = find_widget_checked_a78bc(root, key);
+    EF_U32(dst) = root;
+    EF_U32(dst + 4u) = widget;
+    return dst;
+}

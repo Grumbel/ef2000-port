@@ -8957,3 +8957,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x15c0ea` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32 | EAX:uint32_t | 5c8e0@5c949,5f698@5f7a8,83200@83285 | Stack-argument wrapper (ret 0x10): rotate the vector (C, B, A) through 0xc4755 and project it with 0x15c071 into OUTP; r |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa46f0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:ef_addr32 | 35590@356f0,36f84@370c4 | Implicit-register fragment (ESI = destination pair, EAX = name, EDX = widget key; params in that order): look up NAME (a |
