@@ -1476,3 +1476,28 @@ uint8_t best_slot_kind_6f6b8(uint32_t unit)
     }
     return result;
 }
+
+/* 0xe3868, 160 bytes. Load the string table from the resource stream: the entry count word (0x15f902), a 2 * count byte header into the buffer at [0x429224], then a size dword, an arena block of that size and the packed zero-terminated strings; entry i (1..count-1) of the pointer table at [0x429228] points at the i-th string and entry 0 at the constant 0x190944. */
+void load_string_table_e3868(void)
+{
+    uint32_t size = 0u;
+    uint32_t block;
+    int16_t i;
+    read_resource_e3170(0x0015f902u, 2u);
+    read_resource_e3170(EF_U32(0x00429224u), (uint16_t)(EF_U16(0x0015f902u) * 2u));
+    read_resource_e3170((uint32_t)(uintptr_t)&size, 4u);
+    block = guest_fn_e29e8(size);
+    read_resource_e3170(block, (uint16_t)size);
+    for (i = 1; i < (int16_t)EF_U16(0x0015f902u); i++) {
+        EF_U32(EF_U32(0x00429228u) + (uint32_t)(int32_t)i * 4u) = block;
+        if (EF_U8(block) != 0u) {
+            uint8_t c;
+            do {
+                c = EF_U8(block + 1u);
+                block++;
+            } while (c != 0u);
+        }
+        block++;
+    }
+    EF_U32(EF_U32(0x00429228u)) = 0x00190944u;
+}

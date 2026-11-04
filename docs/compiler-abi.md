@@ -5543,3 +5543,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xe5e90` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e605c@e60e7 | Draw a 7x9 glyph in the colour byte 0x433ec0 at (x = eax, y row = edx): code bit 7 selects the table at 0x15feb0 (index  |
 | `0x6f6b8` | EAX:uint32_t | AL:uint8_t | 6f758@6f891 | For the unit's 20 three-byte slot records (+0x198: type word area, +0x19b: kind byte) find the slot of rank-2 weapon typ |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe3868` | none | none | e378c@e384a | Load the string table from the resource stream: the entry count word (0x15f902), a 2 * count byte header into the buffer |

@@ -4601,4 +4601,6 @@ uint32_t shrink_counter_bd7cc(uint32_t p, uint32_t edx);
 void draw_glyph_7x9_e5e90(uint32_t x, uint32_t y, uint32_t code);
 uint8_t best_slot_kind_6f6b8(uint32_t unit);
 
+void load_string_table_e3868(void);
+
 #endif
