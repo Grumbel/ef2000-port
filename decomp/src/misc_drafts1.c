@@ -1630,3 +1630,42 @@ void process_render_object_d23d8(uint32_t obj)
         }
     }
 }
+
+/* 0xb9e9c, 164 bytes. Map a (class, selector) pair to a code: the class byte comes from the record at [obj+0x51] through 0xba0e4 (4 when absent), the selector 0..5 picks one of two 7-entry tables (selectors 0, 2, 5 use the first); selector above 5 gives 4, class out of range 0. */
+uint8_t class_selector_code_b9e9c(uint32_t obj, uint32_t sel)
+{
+    static const uint8_t tbl_a[7] = { 0x13, 9, 0x11, 2, 0xa, 8, 0x14 };
+    static const uint8_t tbl_b[7] = { 0x17, 0xc, 0x1a, 5, 0xf, 7, 0x18 };
+    uint8_t code = 4u;
+    uint8_t v;
+    uint32_t cls = EF_U32(obj + 0x51u);
+    if (cls != 0u)
+        code = map_code_ba0e4(EF_U8(cls));
+    sel &= 0xffu;
+    if (sel > 5u)
+        return 4u;
+    v = (uint8_t)(code - 1u);
+    if (v > 6u)
+        return 0u;
+    return (sel == 0u || sel == 2u || sel == 5u) ? tbl_a[v] : tbl_b[v];
+}
+
+/* 0xe3444, 163 bytes. Finish the open resource file 0x15f8f8 (when not -1): read two file positions around the call to 0xe36bc, append them (4 bytes each, through the writer at [0x42922c]), rewrite the 2-byte header at 0x15f900, close the file and mark it closed. */
+void finish_resource_file_e3444(void)
+{
+    uint32_t pos_a;
+    uint32_t pos_b;
+    uint32_t h = EF_U32(0x0015f8f8u);
+    if (h == 0xffffffffu)
+        return;
+    pos_a = seek_end_a7ae0(0u, 0u, 0u, 0u, h, 0u);
+    guest_fn_e36bc_x();
+    pos_b = seek_end_a7ae0(0u, 0u, 0u, 0u, EF_U32(0x0015f8f8u), 0u);
+    seek_start_a7ab4(0u, 0u, 0u, 0u, EF_U32(0x0015f8f8u), 2u);
+    guest_callptr_eaxedx_x(EF_U32(0x0042922cu), (uint32_t)(uintptr_t)&pos_b, 4u);
+    guest_callptr_eaxedx_x(EF_U32(0x0042922cu), (uint32_t)(uintptr_t)&pos_a, 4u);
+    seek_start_a7ab4(0u, 0u, 0u, 0u, EF_U32(0x0015f8f8u), 0u);
+    guest_callptr_eaxedx_x(EF_U32(0x0042922cu), 0x0015f900u, 2u);
+    close_handle_a7990(0u, 0u, 0u, 0u, EF_U32(0x0015f8f8u));
+    EF_U32(0x0015f8f8u) = 0xffffffffu;
+}

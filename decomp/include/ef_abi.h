@@ -4613,4 +4613,8 @@ void guest_fn_d2320_x(ef_addr32 obj); /* 0xd2320 EAX */
 
 
 
+uint8_t class_selector_code_b9e9c(uint32_t obj, uint32_t sel);
+void finish_resource_file_e3444(void);
+void guest_fn_e36bc_x(void); /* 0xe36bc no arguments */
+
 #endif

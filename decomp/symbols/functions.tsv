@@ -2591,7 +2591,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b97a4	768			unknown	unclassified	unverified		
 0x000b9aa4	450			unknown	unclassified	unverified		
 0x000b9c68	426			unknown	unclassified	unverified		
-0x000b9e9c	164			unknown	unclassified	unverified		
+0x000b9e9c	164	class_selector_code_b9e9c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b9e9c.json	docs/compiler-abi.md; Map a (class, selector) pair to a code: the class byte comes from the record at [obj+0x51] through 0xba0e4 (4 when absen; callers 9820@9bf9; guest pending
 0x000ba0e4	43	map_code_ba0e4	code_maps1	compiles	game	confirmed	decomp/tests/0x000ba0e4.json	docs/compiler-abi.md; Map a code (1-based) to a constant via a jump table (codes outside the range give 0).; callers b4ee0@b4f03,b9e9c@b9eb0,bb7c0@bb7dc; guest pending
 0x000ba13c	359			unknown	unclassified	unverified		
 0x000ba2c0	249	fill_colour_record_ba2c0	colour_tables2	compiles	game	confirmed	decomp/tests/0x000ba2c0.json	docs/compiler-abi.md; Fill a colour record for a key 1..7 (other keys use the default shade).; callers bb324@bb47d; guest pending
@@ -3354,7 +3354,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e3120	57	update_tick_rate_e3120	float_helpers11	compiles	game	confirmed	decomp/tests/0x000e3120.json	docs/compiler-abi.md; Sample the tick counter and store the scaled change since the previous sample.; callers 3dd30@3def1; guest pending
 0x000e3170	45	read_resource_e3170	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e3170.json	docs/compiler-abi.md; Read from the resource handle and abort when the count is short.; callers e330c@e332a,e330c@e333b,e378c@e37b5; guest pending
 0x000e330c	183			unknown	unclassified	unverified		
-0x000e3444	163			unknown	unclassified	unverified		
+0x000e3444	163	finish_resource_file_e3444	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e3444.json	docs/compiler-abi.md; Finish the open resource file 0x15f8f8 (when not -1): read two file positions around the call to 0xe36bc, append them (4; callers 3ea0c@3ef4d; guest pending
 0x000e34e8	467	read_saved_tables_e34e8	game_helpers71	compiles	game	confirmed	decomp/tests/0x000e34e8.json	docs/compiler-abi.md; Read back the saved table blocks through the indirect readers; returns whether a record id is set.; callers 3dd30@3e216; guest pending
 0x000e36bc	205			unknown	unclassified	unverified		
 0x000e378c	220			unknown	unclassified	unverified		
