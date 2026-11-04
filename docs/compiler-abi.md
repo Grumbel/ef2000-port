@@ -6382,3 +6382,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc54ef` | EAX:uint32_t | EAX:uint32_t | c5551@c5562,c5681@c5692 | Fetch the scaled value for table index EDI (implicit register): clear byte 0x158ed8, take the signed word 0x14fe58[index |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc47e0` | EAX:uint32_t | none | none direct | Select the shade table for table index EDI (implicit register): take the signed word 0x14fe58[index] >> 5 clamped to 0.. |

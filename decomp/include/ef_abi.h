@@ -5036,4 +5036,6 @@ void multiply_table_entries_c5441(uint32_t mul, uint32_t index);
 
 uint32_t fetch_scaled_value_c54ef(uint32_t index);
 
+void select_shade_table_c47e0(uint32_t index);
+
 #endif

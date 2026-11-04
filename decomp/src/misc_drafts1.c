@@ -6461,3 +6461,17 @@ uint32_t fetch_scaled_value_c54ef(uint32_t index)
     EF_U16(0x0015912cu) = (uint16_t)v;
     return (uint32_t)v;
 }
+
+/* 0xc47e0, 66 bytes. Select the shade table for table index EDI (implicit register): take the signed word 0x14fe58[index] >> 5 clamped to 0..255, look up that entry in the byte table 0x463f60 and set the shading base dword 0x159084 to (byte << 8) + dword 0x164604; clear byte 0x159140. */
+void select_shade_table_c47e0(uint32_t index)
+{
+    int32_t v = (int32_t)(int16_t)EF_U16(0x0014fe58u + index * 2u) >> 5;
+    uint32_t b;
+    if (v < 0)
+        v = 0;
+    if ((uint32_t)v > 0xffu)
+        v = 0xff;
+    b = EF_U8(0x00463f60u + (uint32_t)v);
+    EF_U32(0x00159084u) = (b << 8) + EF_U32(0x00164604u);
+    EF_U8(0x00159140u) = 0u;
+}

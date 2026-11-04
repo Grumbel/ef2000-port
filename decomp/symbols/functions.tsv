@@ -2780,7 +2780,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c473c	15			unknown	unclassified	unverified		
 0x000c474c	9			unknown	unclassified	unverified		
 0x000c4755	136			unknown	unclassified	unverified		
-0x000c47e0	66			unknown	unclassified	unverified		
+0x000c47e0	66	select_shade_table_c47e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c47e0.json	docs/compiler-abi.md; Select the shade table for table index EDI (implicit register): take the signed word 0x14fe58[index] >> 5 clamped to 0..; callers none direct; guest pending
 0x000c486c	112			unknown	unclassified	unverified		
 0x000c48dc	112			unknown	unclassified	unverified		
 0x000c49c4	140			unknown	unclassified	unverified		
