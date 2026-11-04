@@ -20096,3 +20096,51 @@ uint32_t wcsnlen_far_ed566(uint32_t offset, uint32_t seg, uint32_t max)
 	}
 	return n;
 }
+
+/* 0xfa1d4, 44 bytes. Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EDX = bytes left, params in that order; AL/ESI/EDX updated): decode one Huffman-style symbol. Walks the bit tree table at 0x1627a0 one bit (MSB first) at a time until an entry is zero, then returns the byte at 0x1629a0 indexed by the final node. */
+uint8_t bitstream_decode_symbol_fa1d4(uint8_t *buf, uint32_t *esi, int32_t *edx)
+{
+	uint8_t al = *buf;
+	uint32_t node = 0u;
+	uint8_t entry;
+	do {
+		unsigned carry = al >> 7;
+		al = (uint8_t)(al << 1);
+		if (al == 0) {
+			if (--*edx < 0)
+				bitstream_refill_fa332(esi, edx);
+			al = EF_U8((*esi)++);
+			carry = al >> 7;
+			al = (uint8_t)((al << 1) | 1u);
+		}
+		node = (node * 2u) + carry;
+		entry = EF_U8(0x1627a0u + node);
+		if (entry != 0u)
+			node = entry;
+	} while (entry != 0u);
+	*buf = al;
+	return EF_U8(0x1629a0u + node);
+}
+
+/* 0x10db58, 38 bytes. Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EBP = table base, params in that order; AL/ESI updated): same decode as 0xfa1d4 but without refill, using the tables at EBP-0x410 (tree) and EBP-0x210 (symbols). */
+uint8_t bitstream_decode_symbol_10db58(uint8_t *buf, uint32_t *esi, uint32_t ebp)
+{
+	uint8_t al = *buf;
+	uint32_t node = 0u;
+	uint8_t entry;
+	do {
+		unsigned carry = al >> 7;
+		al = (uint8_t)(al << 1);
+		if (al == 0) {
+			al = EF_U8((*esi)++);
+			carry = al >> 7;
+			al = (uint8_t)((al << 1) | 1u);
+		}
+		node = (node * 2u) + carry;
+		entry = EF_U8(ebp + node - 0x410u);
+		if (entry != 0u)
+			node = entry;
+	} while (entry != 0u);
+	*buf = al;
+	return EF_U8(ebp + node - 0x210u);
+}

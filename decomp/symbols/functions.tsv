@@ -3705,7 +3705,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f9ee0	331	decompress_bitstream_backrefs	unk_runtime	typed	asm	confirmed		ABI only; dest/source stack pointers, ret 8, ES output and DF clear
 0x000fa02c	310	decompress_ra_stream	unk_runtime	typed	asm	confirmed		ABI only; source/dest stack pointers, EAX Boolean, ret 8, INT3 on failure
 0x000fa16e	102			unknown	unclassified	unverified		
-0x000fa1d4	44			unknown	unclassified	unverified		
+0x000fa1d4	44	bitstream_decode_symbol_fa1d4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa1d4.json	docs/compiler-abi.md; Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EDX = bytes left, params in th; callers fa02c@fa0ff; guest pending
 0x000fa200	81			unknown	unclassified	unverified		
 0x000fa251	112			unknown	unclassified	unverified		
 0x000fa2ce	22	bitstream_read_bits_fa2ce	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa2ce.json	docs/compiler-abi.md; Implicit-register fragment (CL = bit count, AL = bit buffer with a trailing 1 sentinel, ESI, EDX as in 0xfa31b; AL/ESI/E; callers fa251@fa26b,fa251@fa27a,fa251@fa29e; guest pending
@@ -3990,7 +3990,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010d9e3	107	bsearch_10d9e3	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010d9e3.json	docs/compiler-abi.md; bsearch: find KEY in the sorted array BASE of N elements of SIZE bytes using the comparison callback CMP (stack argument; callers ea20c@ea234; guest pending
 0x0010da50	192			unknown	unclassified	unverified		
 0x0010db10	72			unknown	unclassified	unverified		
-0x0010db58	38			unknown	unclassified	unverified		
+0x0010db58	38	bitstream_decode_symbol_10db58	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010db58.json	docs/compiler-abi.md; Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EBP = table base, params in th; callers 10da50@10dac2; guest pending
 0x0010db7e	67			unknown	unclassified	unverified		
 0x0010dbc1	76			unknown	unclassified	unverified		
 0x0010dc0d	16			unknown	unclassified	unverified		

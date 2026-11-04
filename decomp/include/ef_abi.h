@@ -6094,4 +6094,9 @@ uint32_t debugger_hook_1204b6(void);
 uint32_t wcsnlen_far_ed566(uint32_t offset, uint32_t seg, uint32_t max);
 uint32_t wcsnlen_far_ed566(uint32_t offset, uint32_t seg, uint32_t max);
 
+uint8_t bitstream_decode_symbol_fa1d4(uint8_t *buf, uint32_t *esi, int32_t *edx);
+uint8_t bitstream_decode_symbol_10db58(uint8_t *buf, uint32_t *esi, uint32_t ebp);
+uint8_t bitstream_decode_symbol_fa1d4(uint8_t *buf, uint32_t *esi, int32_t *edx);
+uint8_t bitstream_decode_symbol_10db58(uint8_t *buf, uint32_t *esi, uint32_t ebp);
+
 #endif

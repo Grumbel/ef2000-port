@@ -8866,3 +8866,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xed566` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | ed6cc@ed952 | Wide-character counterpart of 0xed542: length in 16-bit units of the string at SEG:OFFSET (selector ignored in the flat  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfa1d4` | AL:uint8_t,EDX:uint32_t,EBX:int32_t | AL:uint8_t | fa02c@fa0ff | Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EDX = bytes left, params in th |
+| `0x10db58` | AL:uint8_t,EDX:uint32_t,EBX:uint32_t | AL:uint8_t | 10da50@10dac2 | Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EBP = table base, params in th |
