@@ -8326,3 +8326,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x69740` | none | none | none direct | Per-frame update of the tactical cursor window. Updates the view scale (0xdc314), calls 0xdc334(2, 2) and resets the vie |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x69d10` | none | none | 69f1c@69f4a,69f1c@69f64 | Refresh the slot bytes of the list at dword 0x137960 (next link +4) and redraw it through 0xb3168. For every node that i |

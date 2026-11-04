@@ -1257,7 +1257,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00069a40	301	weapon_flags_any_69a40	game_helpers66	compiles	game	confirmed	decomp/tests/0x00069a40.json	docs/compiler-abi.md; Test whether any of the low 13 flag bits of a weapon table entry is set.; callers 69b70@69ba4; guest pending
 0x00069b70	106	refresh_weapon_widgets_69b70	game_helpers122	compiles	game	confirmed	decomp/tests/0x00069b70.json	docs/compiler-abi.md; Walk the widget chain starting at the named widget at 0x186320 under the object at 0x186314; for each entry whose weapon; callers 69fac@69fe3; guest pending
 0x00069bdc	305	gpwRedrawCurrentWeaponWindow		named	unclassified	unverified		
-0x00069d10	524			unknown	unclassified	unverified		
+0x00069d10	524	refresh_slot_list_69d10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069d10.json	docs/compiler-abi.md; Refresh the slot bytes of the list at dword 0x137960 (next link +4) and redraw it through 0xb3168. For every node that i; callers 69f1c@69f4a,69f1c@69f64; guest pending
 0x00069f1c	141	gpwRedrawPlaneWindow		named	unclassified	unverified		
 0x00069fac	227	rebuild_tactical_screen_69fac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069fac.json	docs/compiler-abi.md; Rebuild the tactical screen state: clear bits 2 and 6 of byte 0x159130, install the handlers (0xd1f10), clear byte 0x1f6; callers none direct; guest pending
 0x0006a090	90	any_special_slot_6a090	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0006a090.json	docs/compiler-abi.md; True when any of the twenty slots refers to a record whose type byte is 10 or 11.; callers 68a60@68a76,68a60@68ad3; guest pending

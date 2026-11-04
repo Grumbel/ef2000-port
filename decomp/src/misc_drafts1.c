@@ -16567,3 +16567,48 @@ void update_cursor_window_69740(void)
 	guest_fn_c4167_x();
 	EF_U16(0x0012830eu) = 0u;
 }
+
+/* 0x69d10, 524 bytes. Refresh the slot bytes of the list at dword 0x137960 (next link +4) and redraw it through 0xb3168. For every node that is selected (mode byte 0x125846 equal to 1, the first node, or the second node when more than four players are present in the high half of dword 0x1357ae) the twenty bytes at node-data +0x55 (rows of 0x7c bytes, row byte 0x125837, data pointer at node +0x13) are cleared for unused slots (byte 0x1f6ef4 + 3 * slot clear) and otherwise set from the mapping 0x8ac64 of the slot's top byte (dword 0x1f6ef1 + 3 * slot >> 24). Mode 3 only updates the node whose index equals the high half of dword 0x125833. The list is then drawn with 0xb3168 using the table 0x186284 (modes 1 and 2) or 0x186348 (mode 3) and the four window words 0x1f6f32, 0x1f6f2e, 0x1f6f30 and 0x1f6f34 (high halves). */
+void refresh_slot_list_69d10(void)
+{
+	uint32_t mode = EF_U8(0x00125846u), p, i, k, row;
+	int32_t hi_players;
+	uint32_t w34 = (uint32_t)((int32_t)EF_U32(0x001f6f34u) >> 16);
+	uint32_t w30 = (uint32_t)((int32_t)EF_U32(0x001f6f30u) >> 16);
+	uint32_t w2e = (uint32_t)((int32_t)EF_U32(0x001f6f2eu) >> 16);
+	uint32_t w32 = (uint32_t)((int32_t)EF_U32(0x001f6f32u) >> 16);
+
+	if (mode != 3u) {
+		i = 0;
+		for (p = EF_U32(0x00137960u); p != 0u; p = EF_U32(p + 4u), i++) {
+			hi_players = (int32_t)EF_U32(0x001357aeu) >> 16;
+			if (!(mode == 1u || i == 0u || (hi_players > 4 && i == 1u)))
+				continue;
+			row = EF_U32(p + 0x13u) + EF_U8(0x00125837u) * 0x7cu;
+			for (k = 0; k < 0x14u; k++) {
+				if (EF_U8(0x001f6ef4u + k * 3u) == 0u)
+					EF_U8(row + k + 0x55u) = 0u;
+				else
+					EF_U8(row + k + 0x55u) = (uint8_t)guest_fn_8ac64_x((int32_t)EF_U32(0x001f6ef1u + k * 3u) >> 24);
+			}
+		}
+		guest_fn_b3168_x(0x00186284u, 0x00137960u, 0x00137970u, 0x00137958u, mode == 1u ? 2u : 1u, w32, w2e, w30, w34);
+		return;
+	}
+	i = 0;
+	p = EF_U32(0x00137960u);
+	while (p != 0u && (int32_t)i < ((int32_t)EF_U32(0x00125833u) >> 16)) {
+		p = EF_U32(p + 4u);
+		i++;
+	}
+	if (p == 0u)
+		return;
+	row = EF_U32(p + 0x13u) + EF_U8(0x00125837u) * 0x7cu;
+	for (k = 0; k < 0x14u; k++) {
+		if (EF_U8(0x001f6ef4u + k * 3u) == 0u)
+			EF_U8(row + k + 0x55u) = 0u;
+		else
+			EF_U8(row + k + 0x55u) = (uint8_t)guest_fn_8ac64_x((int32_t)EF_U32(0x001f6ef1u + k * 3u) >> 24);
+	}
+	guest_fn_b3168_x(0x00186348u, 0x00137960u, 0x00137970u, 0x00137958u, (uint32_t)((int32_t)EF_U32(0x0041f31eu) >> 16), w32, w2e, w30, w34);
+}
