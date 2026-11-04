@@ -4440,4 +4440,6 @@ void draw_mode_dispatch_a8660(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t
 void guest_fn_35de0_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1);
 void guest_fn_a8578_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
 
+
+
 #endif

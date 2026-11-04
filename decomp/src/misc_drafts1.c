@@ -24,7 +24,7 @@ void open_named_file_28744(void)
     }
 }
 
-/* 0x36100, 124 bytes, ret 8. Store a request block (0x19f34c.., flag 0x19f5aa) and run 0x35de0; reports errors through the 0x132a74 handler if a request is already pending or dx is above 0x1f6. */
+/* 0x36100, 124 bytes. (ret 8) Store a request block (0x19f34c.., flag 0x19f5aa) and run 0x35de0; reports errors through the 0x132a74 handler if a request is already pending or dx is above 0x1f6. */
 void queue_request_36100(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t s0, uint32_t s1)
 {
     int32_t v = (int32_t)(int16_t)edx;
@@ -43,7 +43,7 @@ void queue_request_36100(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx,
     guest_fn_35de0_x(0u, 0u, 0u, 0u, 0u, 0u);
 }
 
-/* 0xa8660, 129 bytes, ret 4. Dispatch on the mode byte at [[0x4191d0]+4]: 0 passes the arguments straight on to 0xa8578, 1 mirrors x against 0x13f using a table at 0x418780, 2 offsets x from a table at 0x4187d0. */
+/* 0xa8660, 129 bytes. (ret 4) Dispatch on the mode byte at [[0x4191d0]+4]: 0 passes the arguments straight on to 0xa8578, 1 mirrors x against 0x13f using a table at 0x418780, 2 offsets x from a table at 0x4187d0. */
 void draw_mode_dispatch_a8660(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t index)
 {
     uint8_t mode = EF_U8(EF_U32(0x004191d0u) + 4u);

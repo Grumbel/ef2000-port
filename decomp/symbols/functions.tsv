@@ -610,7 +610,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00035fbc	71	set_buttons_35fbc	game_helpers7	compiles	game	confirmed	decomp/tests/0x00035fbc.json	docs/compiler-abi.md; ; callers 36054@36076; guest pending
 0x00036004	77	set_buttons_36004	game_helpers7	compiles	game	confirmed	decomp/tests/0x00036004.json	docs/compiler-abi.md; ; callers 36438@367a1; guest pending
 0x00036054	172	open_stream_36054	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00036054.json	docs/compiler-abi.md; Open the named stream for playback and arm the stream state.; callers 36f84@37066,36f84@37077; guest pending
-0x00036100	124			unknown	unclassified	unverified		
+0x00036100	124	queue_request_36100	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00036100.json	docs/compiler-abi.md; (ret 8) Store a request block (0x19f34c.., flag 0x19f5aa) and run 0x35de0; reports errors through the 0x132a74 handler i; callers 35c08@35cba,36f84@3700b; guest pending
 0x0003617c	303			unknown	unclassified	unverified		
 0x000362c4	86			unknown	unclassified	unverified		
 0x00036340	132			unknown	unclassified	unverified		
@@ -2338,7 +2338,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a81e4	225			unknown	unclassified	unverified		
 0x000a82f0	607			unknown	unclassified	unverified		
 0x000a8578	229			unknown	unclassified	unverified		
-0x000a8660	129			unknown	unclassified	unverified		
+0x000a8660	129	draw_mode_dispatch_a8660	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a8660.json	docs/compiler-abi.md; (ret 4) Dispatch on the mode byte at [[0x4191d0]+4]: 0 passes the arguments straight on to 0xa8578, 1 mirrors x against ; callers a8718@a8770,a8718@a879d,a8718@a886b; guest pending
 0x000a86e4	50	clamp_word_425fa6	list_helpers	compiles	game	confirmed	decomp/tests/0x000a86e4.json	docs/compiler-abi.md; When byte 0x41f833 is 0x39 and signed word 0x425fa6 is * below signed word 0x4194ae, copy the latter over it and clear t; callers a8718@a87b8; guest pending
 0x000a8718	574			unknown	unclassified	unverified		
 0x000a8958	149	run_animation_loop_a8958	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x000a8958.json	docs/compiler-abi.md; Run the animation loop of a list record until a key press.; callers a9e70@a9f69; guest pending
