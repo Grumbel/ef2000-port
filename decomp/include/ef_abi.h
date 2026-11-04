@@ -2409,4 +2409,22 @@ void append_id_a479c(uint16_t id);
 void push_front_id_a4820(uint16_t id);
 void guest_fn_a2728(int32_t slot, int32_t a, int32_t b, int32_t c); /* 0xa2728 EAX/EDX/EBX/ECX */
 
+/* game_helpers35.c */
+uint8_t has_enemy_link_2c17c(int16_t owner);
+void shift_queue_4e6bc(void);
+void send_owner_summary_56a4c(void);
+void update_hud_79128(void);
+void init_name_entries_80a18(void);
+void release_object_878c8(ef_addr32 object);
+void update_nearest_link_90880(ef_addr32 object, ef_addr32 candidate);
+void guest_fn_78848(void); /* 0x78848 */
+void guest_fn_77c34(void); /* 0x77c34 */
+void guest_fn_77c90(void); /* 0x77c90 */
+void guest_fn_78934(void); /* 0x78934 */
+void guest_fn_78a0c(void); /* 0x78a0c */
+void guest_fn_78ac0(void); /* 0x78ac0 */
+void guest_fn_78b4c(void); /* 0x78b4c */
+void guest_fn_78f3c(void); /* 0x78f3c */
+void guest_fn_a1770(void); /* 0xa1770 */
+
 #endif

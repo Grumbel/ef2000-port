@@ -473,7 +473,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002bf08	95	grid_has_object_mode	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002bf08.json	byte-count attached-object scan; C host test only
 0x0002bfcc	287			unknown	unclassified	unverified		
 0x0002c0ec	143	grid_has_cross_object_relation	world_grid_neighbors	compiles	game	confirmed	decomp/tests/0x0002c0ec.json	AX row to AL; up to 14 filtered lookups and cross-row locator test
-0x0002c17c	165			unknown	unclassified	unverified		
+0x0002c17c	165	has_enemy_link_2c17c	game_helpers35	compiles	game	confirmed	decomp/tests/0x0002c17c.json	docs/compiler-abi.md; True when an owner has a linked unit whose own link is on another team.; callers 2c6dc@2c73b; guest pending
 0x0002c224	308			unknown	unclassified	unverified		
 0x0002c358	251			unknown	unclassified	unverified		
 0x0002c454	220			unknown	unclassified	unverified		
@@ -896,7 +896,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004e204	347			unknown	unclassified	unverified		
 0x0004e360	602			unknown	unclassified	unverified		
 0x0004e5bc	256			unknown	unclassified	unverified		
-0x0004e6bc	169			unknown	unclassified	unverified		
+0x0004e6bc	169	shift_queue_4e6bc	game_helpers35	compiles	game	confirmed	decomp/tests/0x0004e6bc.json	docs/compiler-abi.md; Drop the oldest queued entry by shifting the 24-entry queue down.; callers 4dcd8@4decc; guest pending
 0x0004e768	79	mpRedrawWPHeights		named	unclassified	unverified		
 0x0004e7b8	83			unknown	unclassified	unverified		
 0x0004e80c	875	mpClickWPHeight		named	unclassified	unverified		
@@ -1048,7 +1048,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00056974	61	send_packet_2b	packet_status	compiles	game	confirmed	decomp/tests/0x00056974.json	docs/compiler-abi.md; host model; guest differential pending
 0x000569b4	96			unknown	unclassified	unverified		
 0x00056a44	6			unknown	unclassified	unverified		
-0x00056a4c	166			unknown	unclassified	unverified		
+0x00056a4c	166	send_owner_summary_56a4c	game_helpers35	compiles	game	confirmed	decomp/tests/0x00056a4c.json	docs/compiler-abi.md; Send packet 0x12 with the local owner's name and counters.; callers 6330@6371,9114@91f3,9114@9244; guest pending
 0x00056af4	179			unknown	unclassified	unverified		
 0x00056ba8	52	all_ready_56ba8	game_helpers28	compiles	game	confirmed	decomp/tests/0x00056ba8.json	docs/compiler-abi.md; True when every ready word in table 0x1a5dd0 is nonzero.; callers 56bdc@56c2c; guest pending
 0x00056bdc	159			unknown	unclassified	unverified		
@@ -1431,7 +1431,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00078b4c	717			unknown	unclassified	unverified		
 0x00078e1c	288			unknown	unclassified	unverified		
 0x00078f3c	489			unknown	unclassified	unverified		
-0x00079128	169			unknown	unclassified	unverified		
+0x00079128	169	update_hud_79128	game_helpers35	compiles	game	confirmed	decomp/tests/0x00079128.json	docs/compiler-abi.md; Per-frame HUD pass: latch the screen rectangle and run the overlay updates.; callers 3dd30@3e71c; guest pending
 0x000791e0	835			unknown	unclassified	unverified		
 0x00079524	87	clear_runtime_transient_counters	tactical_io	compiles	game	confirmed	decomp/tests/0x00079524.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007957c	1111			unknown	unclassified	unverified		
@@ -1538,7 +1538,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000803e8	21	wait_for_event_803e8	mid_helpers	compiles	game	confirmed	decomp/tests/0x000803e8.json	docs/compiler-abi.md; poll 0xd7594(0) until nonzero low byte when byte 0x15bac6; callers a8bd4@a8e5c; guest pending
 0x00080400	15	ui_reset_panel_and_release	ui_dispatch	compiles	game	confirmed	decomp/tests/0x00080400.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000809bc	89	clear_panel_strip	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x000809bc.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
-0x00080a18	162			unknown	unclassified	unverified		
+0x00080a18	162	init_name_entries_80a18	game_helpers35	compiles	game	confirmed	decomp/tests/0x00080a18.json	docs/compiler-abi.md; Reset the 256 name entries, register them in the page table and clear 16 slots.; callers 80d8c@80de7; guest pending
 0x00080abc	87	advance_panel_strip	record_callers	compiles	game	confirmed	decomp/tests/0x00080abc.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00080b14	293			unknown	unclassified	unverified		
 0x00080c3c	226			unknown	unclassified	unverified		
@@ -1703,7 +1703,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000872c8	217			unknown	unclassified	unverified		
 0x000873a4	432			unknown	unclassified	unverified		
 0x00087700	454			unknown	unclassified	unverified		
-0x000878c8	165			unknown	unclassified	unverified		
+0x000878c8	165	release_object_878c8	game_helpers35	compiles	game	confirmed	decomp/tests/0x000878c8.json	docs/compiler-abi.md; Remove an object from the active list and put it on the free list.; callers 56954@5696c,879c4@879d4,880c8@880e9; guest pending
 0x00087970	81	refresh_record_selection	record_transitions	compiles	game	confirmed	decomp/tests/0x00087970.json	docs/compiler-abi.md; host model; guest differential pending
 0x000879c4	89	rotate_ui_record_ring	record_transitions	compiles	game	confirmed	decomp/tests/0x000879c4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00087a20	821			unknown	unclassified	unverified		
@@ -1869,7 +1869,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009075c	148	next_free_object_9075c	game_helpers32	compiles	game	confirmed	decomp/tests/0x0009075c.json	docs/compiler-abi.md; Find the next free object id after a start id, wrapping at the table end.; callers 6aa70@6aaa2,6aa70@6aaba; guest pending
 0x000907f0	53	next_scene_node_with_active_children	scene_nodes	compiles	game	confirmed	decomp/tests/0x000907f0.json	docs/compiler-abi.md; host model only; OpenWatcom splice and guest differential pending
 0x00090828	88	update_ticker_90828	camera_helpers	compiles	game	confirmed	decomp/tests/0x00090828.json	docs/compiler-abi.md; ; callers 8bb50@8bb5d; guest pending
-0x00090880	161			unknown	unclassified	unverified		
+0x00090880	161	update_nearest_link_90880	game_helpers35	compiles	game	confirmed	decomp/tests/0x00090880.json	docs/compiler-abi.md; Keep the nearest candidate in an object's +0x1c link (Chebyshev-like distance).; callers 8be3c@8be4b; guest pending
 0x00090924	26	clear_matching_link_b	misc_state	compiles	game	confirmed	decomp/tests/0x00090924.json	docs/compiler-abi.md; if 0x90050(record,value) and value==record+0x1c then clear it; callers 8be54@8be63; guest pending
 0x00090940	297			unknown	unclassified	unverified		
 0x00090a70	84	init_entries_90a70	camera_helpers	compiles	game	confirmed	decomp/tests/0x00090a70.json	docs/compiler-abi.md; Initialise the forty 0x30-byte entries at 0x211b00.; callers 3cfc0@3d2d3; guest pending

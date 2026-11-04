@@ -3120,3 +3120,15 @@ in EAX, format string address, one value).
 | `0xa4718` | AX:uint16_t | none | a4a94@a4abe,a4a94@a4aef | Remove an object id from the id table and clear its flag 4. |
 | `0xa479c` | AX:uint16_t | none | a499c@a49cb | Add a flagged object id to the first free slot of the id table. |
 | `0xa4820` | AX:uint16_t | none | a4a20@a4a4b | Push a flagged object id to the front of the id table. |
+
+## game_helpers35 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2c17c` | AX:int16_t | AL:uint8_t | 2c6dc@2c73b | True when an owner has a linked unit whose own link is on another team. |
+| `0x4e6bc` | none | none | 4dcd8@4decc | Drop the oldest queued entry by shifting the 24-entry queue down. |
+| `0x56a4c` | none | none | 6330@6371,9114@91f3,9114@9244 | Send packet 0x12 with the local owner's name and counters. |
+| `0x79128` | none | none | 3dd30@3e71c | Per-frame HUD pass: latch the screen rectangle and run the overlay updates. |
+| `0x80a18` | none | none | 80d8c@80de7 | Reset the 256 name entries, register them in the page table and clear 16 slots. |
+| `0x878c8` | EAX:ef_addr32 | none | 56954@5696c,879c4@879d4,880c8@880e9 | Remove an object from the active list and put it on the free list. |
+| `0x90880` | EAX:ef_addr32,EDX:ef_addr32 | none | 8be3c@8be4b | Keep the nearest candidate in an object's +0x1c link (Chebyshev-like distance). |
