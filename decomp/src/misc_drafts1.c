@@ -22375,3 +22375,27 @@ void interp_blend_10a164(uint32_t eax, uint32_t edx, uint32_t ebx)
     *(double *)ef_guest_memory_ptr((ef_addr32)eax) =
         (md_rd_f64(edx + 8u) / X + md_rd_f64(edx + 0x18u) / Z2) * md_rd_f64(0x001950c8u);
 }
+
+/* 0x110f6f, 101 bytes. Under the 0x101e70/0x101e78 lock find the smallest reload value among the active timer slots (0x17d664[i] != 0, value 0x17d6e4[i], 16 slots); when it differs from the cached 0x17d7b2, store it, reprogram the timer with 0x110f3c and clear the 16 dwords at 0x17d6a4. */
+void timer_reprogram_110f6f(void)
+{
+    uint32_t best = 0xffffffffu;
+    uint32_t i;
+
+    (void)guest_fn_101e70();
+    for (i = 0; i < 0x40u; i += 4u) {
+        if (EF_U32(0x0017d664u + i) != 0u) {
+            uint32_t v = EF_U32(0x0017d6e4u + i);
+
+            if (v < best)
+                best = v;
+        }
+    }
+    if (best != EF_U32(0x0017d7b2u)) {
+        EF_U32(0x0017d7b2u) = best;
+        (void)scale_110f3c(best);
+        for (i = 0; i < 16u; i++)
+            EF_U32(0x0017d6a4u + i * 4u) = 0u;
+    }
+    guest_fn_101e78();
+}

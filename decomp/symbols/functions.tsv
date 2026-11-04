@@ -4058,7 +4058,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00110dd9	13	decrement_17d7ba	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110dd9.json	docs/compiler-abi.md; ; callers 101ba8@101bd1; guest pending
 0x00110f0c	48	set_timer_divisor_110f0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110f0c.json	docs/compiler-abi.md; cdecl: program the system timer with the reload value DIVISOR (channel 0, mode 3: command 0x36 to port 0x43, low then hi; callers 110f3c@110f62,1110c5@1110cc; guest pending
 0x00110f3c	51	scale_110f3c	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110f3c.json	docs/compiler-abi.md; 0x110f0c(value < 0xd68d ? value * 10000 / 0x20bc : 0).; callers 110f6f@110fb1; guest pending
-0x00110f6f	101			unknown	unclassified	unverified		
+0x00110f6f	101	timer_reprogram_110f6f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110f6f.json	docs/compiler-abi.md; Under the 0x101e70/0x101e78 lock find the smallest reload value among the active timer slots (0x17d664[i] != 0, value 0x; callers 1114c7@1114e8; guest pending
 0x00110fd4	241			unknown	unclassified	unverified		
 0x001110c5	83	restore_timer_vector_1110c5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001110c5.json	docs/compiler-abi.md; Restore the timer interrupt: reprogram the timer with divisor 0 (the default rate), restore the saved real-mode vector 8; callers 104694@1046ba; guest pending
 0x00111118	42	get_realmode_vector_111118	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00111118.json	docs/compiler-abi.md; cdecl: look up interrupt INTNO with the DOS extender calls 0x2502 (protected-mode vector, result discarded) and 0x2503 (; callers 101e80@101ea5; guest pending

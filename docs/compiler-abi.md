@@ -9305,3 +9305,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10a164` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 109ec0@109fee,109ec0@10a002,109ec0@10a016 | Blend two plane-style interpolations from the doubles at EBX (a) and EDX (b) and store the scaled sum at the double poin |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x110f6f` | none | none | 1114c7@1114e8 | Under the 0x101e70/0x101e78 lock find the smallest reload value among the active timer slots (0x17d664[i] != 0, value 0x |

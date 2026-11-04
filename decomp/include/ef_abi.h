@@ -6404,4 +6404,7 @@ double reduce_angle_b45b6(double st0, uint32_t c2); /* 0xb45b6 */
 void interp_blend_10a164(uint32_t eax, uint32_t edx, uint32_t ebx);
 void interp_blend_10a164(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0x10a164 */
 
+void timer_reprogram_110f6f(void);
+void timer_reprogram_110f6f(void); /* 0x110f6f */
+
 #endif
