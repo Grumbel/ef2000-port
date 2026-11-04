@@ -4097,4 +4097,14 @@ uint32_t guest_fn_1146ec_t(uint32_t a0); /* 0x1146ec cdecl */
 uint32_t guest_fn_1149e0_t(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4); /* 0x1149e0 cdecl */
 uint32_t guest_fn_1113fb_t(void); /* 0x1113fb cdecl */
 
+/* hotspot_draw.c */
+void draw_hotspots_447ec(ef_addr32 head, ef_addr32 holder);
+void draw_hotspots_4496c(ef_addr32 head, ef_addr32 holder);
+void draw_hotspots_44c68(ef_addr32 head, ef_addr32 holder);
+void draw_hotspots_44de8(ef_addr32 head, ef_addr32 holder);
+void draw_hotspots_450f4(ef_addr32 head, ef_addr32 holder);
+void draw_hotspots_45274(ef_addr32 head, ef_addr32 holder);
+void draw_hotspots_453f4(ef_addr32 head, ef_addr32 holder);
+void guest_fn_440f4_x(uint32_t a, int32_t x, int32_t y, uint32_t w, uint32_t s0, uint32_t s1); /* 0x440f4 EAX/EDX/EBX/ECX + 2 stack */
+
 #endif

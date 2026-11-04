@@ -4679,3 +4679,15 @@ in EAX, format string address, one value).
 | `0x103b08` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 1123a4@112710 | AIL trace wrapper for 0x1146ec with result trace (cdecl, all arguments on the stack). |
 | `0x103c28` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t | EAX:uint32_t | d605c@d6069 | AIL trace wrapper for 0x1149e0 (cdecl, all arguments on the stack). |
 | `0x1023b0` | none | EAX:uint32_t | 104694@1046b5 | AIL trace wrapper for 0x1113fb (no arguments, tail call). |
+
+## hotspot_draw (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x447ec` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@455aa,4bf1c@4bf78 | Draw the hotspot markers for list type 0x1d. |
+| `0x4496c` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@455fd,4bf1c@4bfb7 | Draw the hotspot markers for list type 0x13. |
+| `0x44c68` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@455b3 | Draw the hotspot markers for list type 0x2b. |
+| `0x44de8` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@45610,4bf1c@4bfcd | Draw the hotspot markers for list type 0x26. |
+| `0x450f4` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@455eb | Draw the hotspot markers for list type 0x5. |
+| `0x45274` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@4563e,4bf1c@4bfe3 | Draw the hotspot markers for list type 0x49. |
+| `0x453f4` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@455bc,4bf1c@4bf8e | Draw the hotspot markers for list type 0x4f. |
