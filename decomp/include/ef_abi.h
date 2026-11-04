@@ -4257,4 +4257,6 @@ void guest_fn_11560_x(int32_t a, int32_t b, int32_t c, uint32_t d, uint32_t s0, 
 void reset_input_state_a29f8(void);
 void reset_page_record_2ce18(uint32_t page);
 
+void draw_object_entries_46168(uint32_t key, uint32_t b, uint32_t c, uint32_t d, uint32_t s0);
+
 #endif

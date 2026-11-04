@@ -4929,3 +4929,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xa29f8` | none | none | 34ca4@34d04,a29cc@a29cf | Reset the input/menu state: default words and the 7-byte block at 0x13579b, clear the table, then set the control flags. |
 | `0x2ce18` | EAX:uint32_t | none | 2ced4@2cfd8 | Reset a 0xca-byte page record: clear the object limit of each of its six slots (unless 0xff), recompute its grid limit,  |
+
+## draw_loops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x46168` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 257d0@2584f,257d0@25aee,257d0@25b4e | For the object found by guest_fn_7489c, call 0x46254 for each of its page record's seven 16-bit entries (+0x50) that dif |

@@ -811,7 +811,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00046038	56	reset_queue_46038	game_helpers5	compiles	game	confirmed	decomp/tests/0x00046038.json	docs/compiler-abi.md; ; callers 49228@49610,7e8c0@7ea1f; guest pending
 0x00046070	183	shift_history_46070	game_helpers38	compiles	game	confirmed	decomp/tests/0x00046070.json	docs/compiler-abi.md; Shift the nine 20-byte history records down and reset the newest slots.; callers 47f9c@47f9c; guest pending
 0x00046128	64	retire_entries_46128	game_helpers8	compiles	game	confirmed	decomp/tests/0x00046128.json	docs/compiler-abi.md; Retire the entries of the 9-slot table that belong to object.; callers 8d59c@8d708; guest pending
-0x00046168	128			unknown	unclassified	unverified		
+0x00046168	128	draw_object_entries_46168	draw_loops1	compiles	game	confirmed	decomp/tests/0x00046168.json	docs/compiler-abi.md; For the object found by guest_fn_7489c, call 0x46254 for each of its page record's seven 16-bit entries (+0x50) that dif; callers 257d0@2584f,257d0@25aee,257d0@25b4e; guest pending
 0x000461e8	106	draw_record_entries_461e8	draw_loops1	compiles	game	confirmed	decomp/tests/0x000461e8.json	docs/compiler-abi.md; Call 0x46254 for each of the seven 16-bit entries (+0x4e) of a 0xca-byte record.; callers 76e2c@76f47; guest pending
 0x00046254	509			unknown	unclassified	unverified		
 0x00046454	4171			unknown	unclassified	unverified		
