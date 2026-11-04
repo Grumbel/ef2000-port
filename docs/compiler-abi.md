@@ -9132,3 +9132,23 @@ in EAX, format string address, one value).
 | `0x11bc40` | EAX:uint32_t,EDX:uint32_t,EBX:double | EAX:double | 10a220@10a37a,11c584@11c763 | EAX = A, EDX = D; stack: double X, callee cleanup. |
 | `0x11be48` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:double,[ESP+4]:double | EAX:double | 11bf28@11bf43 | EAX = reference A, EDX = object D, EBX = box B; stack: doubles P and Q, callee cleanup. |
 | `0x11bf28` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:double,[ESP+4]:double,[ESP+8]:uint32_t,[ESP+12]:double,[ESP+16]:double | EAX:double | 10a220@10a483 | EAX/EDX/EBX forwarded; stack: doubles P and Q, dword V, doubles A0 and A1, callee cleanup. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfe610` | none | EAX:uint32_t | cd4d4@cd4ef | Store the current data selector in word 0xfe624 and return 0xd5 (the data selector is modelled as 0). |
+| `0xc5e56` | EAX:uint32_t | EAX:uint32_t | c4565@c4616 | Implicit-register fragment (ESI is an in/out pointer): fetch the signed word at ESI (advancing ESI by 2) and return the  |
+| `0xc5f08` | EAX:uint32_t | EAX:uint32_t | c5f1c@c5f1d,c6b80@c6c72,c8720@c8732 | Implicit-register fragment (ESI is an in/out pointer): add the signed word at ESI to ESI, fetch the signed word there (a |
+| `0x11f7ef` | EAX:uint32_t | EAX:uint32_t | 118910@1189a6,118910@1189df | Implicit-register fragment (EAX = index): reserve 0x20 bytes of stack and return the address of the handler in the dword |
+| `0x1084c0` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | decde@deced,decfb@ded0b | Implicit-register fragment (EAX = value, CF = carry on entry, passed as the second parameter): when the carry is clear,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xeff6e` | EAX:int32_t,EDX:uint32_t | none | ee22c@ee75d,ee22c@ee77c,ee22c@ee79b | At the entry (the routine continues into 0xeff87). Implicit-register fragment (EAX = signed 32-bit value, EDX = output r |
+| `0xefeff` | EAX:uint32_t | EAX:int32_t | ee22c@ee8a6,ee22c@ee8d6,ee22c@eeca3 | At the entry (the routine continues into 0xeff07). Implicit-register fragment (EAX = extended record): convert the 10-by |
+| `0xef942` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | ee22c@ee615,ee22c@ee634,ee22c@ee7e3 | At the entry (the routine continues into 0xef957). Implicit-register fragment (EAX = record A, EDX = record B, EBX = out |
+| `0xc425a` | none | none | c4167@c41a2 | At the entry (the loop at 0xc4281 follows). Implicit-register fragment: walk the word stack at 0x147e56 from the top (wo |
+| `0xa42c4` | none | EAX:uint32_t | 34f94@34fd7,35cfc@35d23,49228@49b56 | At the entry. Implicit-register fragment: poll the device-ready check 0xa292c and return its AL result (the original loo |

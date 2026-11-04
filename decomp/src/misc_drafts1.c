@@ -21129,3 +21129,126 @@ double ratio_combo_sum_11bf28(uint32_t a, uint32_t d, uint32_t b, double p, doub
 
 	return combine_11bf00(v, a0, a1) + first;
 }
+
+/* 0xeff6e, 17 bytes. At the entry (the routine continues into 0xeff87). Implicit-register fragment (EAX = signed 32-bit value, EDX = output record): convert VALUE to the 10-byte extended record at OUT (dword 0, normalised mantissa dword, exponent word); negative values store the magnitude with sign bit and exponent base 0xbfff, positive values use base 0x3fff, zero stores an all-zero record. */
+void int_to_extended_eff6e(int32_t value, uint32_t out)
+{
+	uint32_t mag = (uint32_t)value;
+	uint16_t base = 0x3fffu;
+	uint32_t bit = 31u;
+
+	if (value < 0) {
+		mag = 0u - mag;
+		base = 0xbfffu;
+	}
+	if (mag == 0u) {
+		EF_U32(out) = 0u;
+		EF_U32(out + 4u) = 0u;
+		EF_U16(out + 8u) = 0u;
+		return;
+	}
+	while ((mag >> bit) == 0u)
+		bit--;
+	EF_U32(out) = 0u;
+	EF_U32(out + 4u) = mag << (31u - bit);
+	EF_U16(out + 8u) = (uint16_t)(bit + base);
+}
+
+/* 0xefeff, 5 bytes. At the entry (the routine continues into 0xeff07). Implicit-register fragment (EAX = extended record): convert the 10-byte record at REC to a signed 32-bit integer with rounding on the first fractional bit; magnitudes below 0.5 give 0 and magnitudes that need more than 31 bits give 0x80000000. */
+int32_t extended_to_int_efeff(uint32_t rec)
+{
+	uint32_t lo = EF_U32(rec);
+	uint32_t hi = EF_U32(rec + 4u);
+	uint16_t se = EF_U16(rec + 8u);
+	int32_t cl = (int32_t)(se & 0x7fffu) - 0x3ffe;
+	uint32_t mag;
+	uint32_t round;
+
+	if (cl < 0)
+		return 0;
+	if (cl > 0x1f)
+		return (int32_t)0x80000000u;
+	if (cl == 0x20) {
+		mag = hi;
+		round = lo >> 31;
+	} else {
+		mag = (uint32_t)(((uint64_t)hi << cl) >> 32);
+		round = (uint32_t)((((uint64_t)hi << cl) >> 31) & 1u);
+		if (cl == 0)
+			mag = 0u;
+	}
+	mag += round;
+	return (se & 0x8000u) ? (int32_t)(0u - mag) : (int32_t)mag;
+}
+
+/* 0xef942, 14 bytes. At the entry (the routine continues into 0xef957). Implicit-register fragment (EAX = record A, EDX = record B, EBX = output): like 0xef950 but the sign bit of record B is flipped first, i.e. the combination of A and -B. */
+void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out)
+{
+	guest_fn_ef9aa_x(EF_U32(a), EF_U32(a + 4u), EF_U32(b), EF_U32(b + 4u),
+	                 ((uint32_t)(EF_U16(b + 8u) ^ 0x8000u) << 16) | EF_U16(a + 8u), out);
+}
+
+/* 0xc425a, 17 bytes. At the entry (the loop at 0xc4281 follows). Implicit-register fragment: walk the word stack at 0x147e56 from the top (word count at 0x146e50) down to its base; for each entry, take its word as an index into the byte table at 0x148e58 and call the handler in the dword table at 0xc3f88 selected by that byte. ESI (the index) is passed implicitly to the handler. */
+void run_handler_stack_c425a(void)
+{
+	uint32_t p = 0x147e56u + 2u * EF_U16(0x146e50u);
+
+	while (p != 0x147e56u) {
+		uint32_t idx;
+		uint32_t kind;
+
+		p -= 2u;
+		idx = EF_U16(p);
+		kind = EF_U8(idx + 0x148e58u);
+		guest_callptr0_x(EF_U32(kind + 0xc3f88u));
+	}
+}
+
+/* 0xfe610, 15 bytes. Store the current data selector in word 0xfe624 and return 0xd5 (the data selector is modelled as 0). */
+uint32_t store_selector_fe610(void)
+{
+	EF_U16(0xfe624u) = 0u;
+	return 0xd5u;
+}
+
+/* 0xc5e56, 12 bytes. Implicit-register fragment (ESI is an in/out pointer): fetch the signed word at ESI (advancing ESI by 2) and return the address of its handler, the dword at 0x15b270 plus that offset (the original jumps through it). */
+uint32_t dispatch_word_c5e56(uint32_t *esi)
+{
+	int32_t op = (int16_t)EF_U16(*esi);
+
+	*esi += 2u;
+	return EF_U32(0x15b270u + (uint32_t)op);
+}
+
+/* 0xc5f08, 17 bytes. Implicit-register fragment (ESI is an in/out pointer): add the signed word at ESI to ESI, fetch the signed word there (advancing ESI by 2) and return the address of its handler, the dword at 0x15b270 plus that offset. */
+uint32_t dispatch_relative_c5f08(uint32_t *esi)
+{
+	int32_t op;
+
+	*esi += (uint32_t)(int32_t)(int16_t)EF_U16(*esi);
+	op = (int16_t)EF_U16(*esi);
+	*esi += 2u;
+	return EF_U32(0x15b270u + (uint32_t)op);
+}
+
+/* 0x11f7ef, 10 bytes. Implicit-register fragment (EAX = index): reserve 0x20 bytes of stack and return the address of the handler in the dword table at 0x195eb0 (the original jumps through it). */
+uint32_t jump_target_11f7ef(uint32_t index)
+{
+	return EF_U32(0x195eb0u + index * 4u);
+}
+
+/* 0xa42c4, 13 bytes. At the entry. Implicit-register fragment: poll the device-ready check 0xa292c and return its AL result (the original loops back while it is zero). */
+uint32_t poll_device_ready_a42c4(void)
+{
+	return guest_fn_a292c() & 0xffu;
+}
+
+/* 0x1084c0, 19 bytes. Implicit-register fragment (EAX = value, CF = carry on entry, passed as the second parameter): when the carry is clear, translate the key code (EAX & 0xffff) through 0x1101e8 and return the masked code; when it is set, return 0. */
+uint32_t translate_key_masked_1084c0(uint32_t value, uint32_t carry)
+{
+	if (carry)
+		return 0u;
+	value &= 0xffffu;
+	guest_fn_1101e8_x(value);
+	return value;
+}

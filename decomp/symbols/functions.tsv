@@ -2211,7 +2211,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a41c8	8	set_flag_a41c8	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a41c8.json	docs/compiler-abi.md; ; callers 33750@33759,34e18@34e20; guest pending
 0x000a41d0	9	clear_flag_a41d0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a41d0.json	docs/compiler-abi.md; ; callers 34ca4@34d34; guest pending
 0x000a41dc	169	start_device_a41dc	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a41dc.json	docs/compiler-abi.md; Start the device; returns true when it is running.; callers 34f94@34fa3; guest pending
-0x000a42c4	13			unknown	unclassified	unverified		
+0x000a42c4	13	poll_device_ready_a42c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a42c4.json	docs/compiler-abi.md; At the entry. Implicit-register fragment: poll the device-ready check 0xa292c and return its AL result (the original loo; callers 34f94@34fd7,35cfc@35d23,49228@49b56; guest pending
 0x000a42d0	34	start_device_a42d0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a42d0.json	docs/compiler-abi.md; Start the device through its callback if it is not yet started.; callers a41dc@a420c; guest pending
 0x000a42f4	35	stop_device_a42f4	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a42f4.json	docs/compiler-abi.md; Stop the device through its callback when running.; callers 357a4@357b5,3711c@37175,a3da0@a3db4; guest pending
 0x000a4318	23	clear_dwords_135820	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4318.json	docs/compiler-abi.md; clear dwords 0x135820 0x135824 0x135828; callers 3dd30@3de2d; guest pending
@@ -2765,7 +2765,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c4105	98	reset_view_c4105	engine_helpers	compiles	game	confirmed	decomp/tests/0x000c4105.json	docs/compiler-abi.md; ; callers b69c@b6c0,39744@3979d,3dd30@3e01f; guest pending
 0x000c4167	73			unknown	unclassified	unverified		
 0x000c41b0	131			unknown	unclassified	unverified		
-0x000c425a	17			unknown	unclassified	unverified		
+0x000c425a	17	run_handler_stack_c425a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c425a.json	docs/compiler-abi.md; At the entry (the loop at 0xc4281 follows). Implicit-register fragment: walk the word stack at 0x147e56 from the top (wo; callers c4167@c41a2; guest pending
 0x000c4281	30			unknown	unclassified	unverified		
 0x000c4310	99			unknown	unclassified	unverified		
 0x000c4389	10	run_e3c20	list_lookup	compiles	game	confirmed	decomp/tests/0x000c4389.json	docs/compiler-abi.md; Run 0xe3c20.; callers c5261@c5283; guest pending
@@ -2809,8 +2809,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c5cd3	139			unknown	unclassified	unverified		
 0x000c5d8f	115			unknown	unclassified	unverified		
 0x000c5e02	50			unknown	unclassified	unverified		
-0x000c5e56	12			unknown	unclassified	unverified		
-0x000c5f08	17			unknown	unclassified	unverified		
+0x000c5e56	12	dispatch_word_c5e56	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5e56.json	docs/compiler-abi.md; Implicit-register fragment (ESI is an in/out pointer): fetch the signed word at ESI (advancing ESI by 2) and return the ; callers c4565@c4616; guest pending
+0x000c5f08	17	dispatch_relative_c5f08	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5f08.json	docs/compiler-abi.md; Implicit-register fragment (ESI is an in/out pointer): add the signed word at ESI to ESI, fetch the signed word there (a; callers c5f1c@c5f1d,c6b80@c6c72,c8720@c8732; guest pending
 0x000c5f1c	21			unknown	unclassified	unverified		
 0x000c6370	92			unknown	unclassified	unverified		
 0x000c6428	15	shade_lookup_c6428	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c6428.json	docs/compiler-abi.md; Implicit-register fragment (ESI is an in/out pointer; result in AL): load the word at ESI (advancing ESI by 2), add the ; callers c6370@c6370; guest pending
@@ -3558,7 +3558,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ee589	31	caseD_0		named	unclassified	unverified		
 0x000eed92	21	caseD_40		named	unclassified	unverified		
 0x000ef41f	38			unknown	unclassified	unverified		
-0x000ef942	14			unknown	unclassified	unverified		
+0x000ef942	14	combine_records_negated_ef942	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef942.json	docs/compiler-abi.md; At the entry (the routine continues into 0xef957). Implicit-register fragment (EAX = record A, EDX = record B, EBX = out; callers ee22c@ee615,ee22c@ee634,ee22c@ee7e3; guest pending
 0x000ef950	42	combine_records_ef950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef950.json	docs/compiler-abi.md; Combine two 10-byte records (dword, dword, word) at eax and edx with the core routine 0xef9aa and store the 10-byte resu; callers ee589@ee59f,ee22c@ee76d,ee22c@ee8fd; guest pending
 0x000ef97a	48	combine_record_value_ef97a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef97a.json	docs/compiler-abi.md; (ret 12) Variant of 0xef950 whose second record comes by value on the stack (dword, dword, word).; callers f03cc@f045d,f03cc@f0479,f0482@f05b1; guest pending
 0x000ef9aa	364			unknown	unclassified	unverified		
@@ -3567,9 +3567,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000efbd9	427			unknown	unclassified	unverified		
 0x000efd84	42	combine_records_efd84	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000efd84.json	docs/compiler-abi.md; Same wrapper as 0xef950 around the core routine 0xefdae.; callers ee22c@ee5be,ee22c@ee78c,ee22c@ee920; guest pending
 0x000efdae	249			unknown	unclassified	unverified		
-0x000efeff	5			unknown	unclassified	unverified		
+0x000efeff	5	extended_to_int_efeff	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000efeff.json	docs/compiler-abi.md; At the entry (the routine continues into 0xeff07). Implicit-register fragment (EAX = extended record): convert the 10-by; callers ee22c@ee8a6,ee22c@ee8d6,ee22c@eeca3; guest pending
 0x000eff04	106	extended_to_int_eff04	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eff04.json	docs/compiler-abi.md; Convert the 80-bit extended value at P (EAX) to a truncated int32: exponents below 0.5 give 0, magnitudes of 2^32 and ab; callers ee22c@eed53; guest pending
-0x000eff6e	17			unknown	unclassified	unverified		
+0x000eff6e	17	int_to_extended_eff6e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eff6e.json	docs/compiler-abi.md; At the entry (the routine continues into 0xeff87). Implicit-register fragment (EAX = signed 32-bit value, EDX = output r; callers ee22c@ee75d,ee22c@ee77c,ee22c@ee79b; guest pending
 0x000eff7f	53	uint_to_extended_eff7f	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000eff7f.json	docs/compiler-abi.md; Convert an unsigned 32-bit integer to an 80-bit extended value at dest.; callers ee22c@eed2d; guest pending
 0x000effb4	128			unknown	unclassified	unverified		
 0x000f0034	127	extended_to_float_f0034	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f0034.json	docs/compiler-abi.md; Convert the 80-bit extended value at PTR (EAX) to the bits of a 32-bit float (returned in EAX): round the mantissa to 24; callers ee22c@ee6b9,ee22c@ee6ca; guest pending
@@ -3777,7 +3777,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fe49c	165	draw_arc_by_length_fe49c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe49c.json	docs/compiler-abi.md; Draw an arc from angle LO (ECX) to angle HI (stack, ret 8; both reduced to 16 bits, HI moved a full turn up when it is n; callers c9680@c9729,c98f8@c999c; guest pending
 0x000fe541	31	delete_file_fe541	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe541.json	docs/compiler-abi.md; DOS delete file (int 21h, AH = 0x41) NAME: 0 on success, otherwise the translated DOS error (0x1101e8) of the failing co; callers none direct; guest pending
 0x000fe560	174	read_hires_timer_fe560	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe560.json	docs/compiler-abi.md; High-resolution timer read. The first call (dword 0x17cf98 clear) points 0x485fc4 at the BIOS tick counter (0x120cc6 + 0; callers 10640@10640,34ca4@34d3f,34d50@34d6f; guest pending
-0x000fe610	15			unknown	unclassified	unverified		
+0x000fe610	15	store_selector_fe610	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe610.json	docs/compiler-abi.md; Store the current data selector in word 0xfe624 and return 0xd5 (the data selector is modelled as 0).; callers cd4d4@cd4ef; guest pending
 0x000fe700	14	get_video_mode_fe700	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe700.json	docs/compiler-abi.md; BIOS get video mode (int 10h, AH = 0xf): returns the current mode number in AL (EBX, ESI and EDI are preserved).; callers cdb20@cdb97,cdc64@cdc6c; guest pending
 0x000fe710	31	set_and_check_video_mode_fe710	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe710.json	docs/compiler-abi.md; Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low; callers cdb20@cdbae,cdc64@cdc83; guest pending
 0x000fe730	666			unknown	unclassified	unverified		
@@ -3924,7 +3924,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00107070	281			unknown	unclassified	unverified		
 0x00107310	246	load_colour_table_107310	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00107310.json	docs/compiler-abi.md; Load the 0x4000-byte colour table from the file named at 0x17d368: on first use allocate 0x10100 bytes (dword 0x4dd860, ; callers dbff8@dc07f,e3ffc@e4009; guest pending
 0x0010848c	52			unknown	unclassified	unverified		
-0x001084c0	19			unknown	unclassified	unverified		
+0x001084c0	19	translate_key_masked_1084c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001084c0.json	docs/compiler-abi.md; Implicit-register fragment (EAX = value, CF = carry on entry, passed as the second parameter): when the carry is clear, ; callers decde@deced,decfb@ded0b; guest pending
 0x001084d3	545			unknown	unclassified	unverified		
 0x001086f4	217	parse_format_modifiers_1086f4	game_helpers102	compiles	game	confirmed	decomp/tests/0x001086f4.json	docs/compiler-abi.md; Parse the width and size modifiers of a printf conversion ('*', digits, N/F, h/l/w/L) into the spec record; returns the ; callers 1084d3@108552,1084d3@1086bc; guest pending
 0x001087cd	53	skip_and_dispatch_1087cd	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001087cd.json	docs/compiler-abi.md; Pull characters through the reader at [obj] until one is not in the class-2 skip set (table 0x195af0, indexed by char+1); callers 1084d3@10851d; guest pending
@@ -4245,7 +4245,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011f4d8	94	trig_full_circle_11f4d8	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011f4d8.json	docs/compiler-abi.md; Full-circle (0x1921f units) wrapper around trig_lookup_11f460.; callers 11f538@11f53d,11f538@11f54a; guest pending
 0x0011f538	28	store_derived_pair_11f538	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x0011f538.json	docs/compiler-abi.md; Store two derived values for a number.; callers 118770@1187aa,118770@1187b5; guest pending
 0x0011f6d8	279			unknown	unclassified	unverified		
-0x0011f7ef	10			unknown	unclassified	unverified		
+0x0011f7ef	10	jump_target_11f7ef	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011f7ef.json	docs/compiler-abi.md; Implicit-register fragment (EAX = index): reserve 0x20 bytes of stack and return the address of the handler in the dword; callers 118910@1189a6,118910@1189df; guest pending
 0x0011fd90	1703			unknown	unclassified	unverified		
 0x00120451	52	dos_int21_vector_bridge	unk_runtime	named	asm	unverified		docs/compiler-abi.md; AH=0x25/0x35 INT 21h, returns ES selector in DX and original EAX; interrupt clobbers unresolved
 0x00120485	49	install_runtime_hook_120485	game_helpers78	compiles	game	confirmed	decomp/tests/0x00120485.json	docs/compiler-abi.md; Install the runtime hook once.; callers none direct; guest pending

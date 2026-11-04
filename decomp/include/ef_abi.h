@@ -6268,4 +6268,32 @@ double falloff_scaled_11bc40(uint32_t a, uint32_t d, double x); /* 0x11bc40 */
 double ratio_combo_11be48(uint32_t a, uint32_t d, uint32_t b, double p, double q); /* 0x11be48 */
 double ratio_combo_sum_11bf28(uint32_t a, uint32_t d, uint32_t b, double p, double q, uint32_t v, double a0, double a1); /* 0x11bf28 */
 
+void int_to_extended_eff6e(int32_t value, uint32_t out);
+int32_t extended_to_int_efeff(uint32_t rec);
+void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out);
+void run_handler_stack_c425a(void);
+uint32_t store_selector_fe610(void);
+uint32_t dispatch_word_c5e56(uint32_t *esi);
+uint32_t dispatch_relative_c5f08(uint32_t *esi);
+uint32_t jump_target_11f7ef(uint32_t index);
+uint32_t poll_device_ready_a42c4(void);
+uint32_t translate_key_masked_1084c0(uint32_t value, uint32_t carry);
+void int_to_extended_eff6e(int32_t value, uint32_t out); /* 0xeff6e */
+int32_t extended_to_int_efeff(uint32_t rec); /* 0xefeff */
+void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out); /* 0xef942 */
+void run_handler_stack_c425a(void); /* 0xc425a */
+uint32_t store_selector_fe610(void); /* 0xfe610 */
+uint32_t dispatch_word_c5e56(uint32_t *esi); /* 0xc5e56 */
+uint32_t dispatch_relative_c5f08(uint32_t *esi); /* 0xc5f08 */
+uint32_t jump_target_11f7ef(uint32_t index); /* 0x11f7ef */
+uint32_t poll_device_ready_a42c4(void); /* 0xa42c4 */
+uint32_t translate_key_masked_1084c0(uint32_t value, uint32_t carry); /* 0x1084c0 */
+
+
+void int_to_extended_eff6e(int32_t value, uint32_t out); /* 0xeff6e */
+int32_t extended_to_int_efeff(uint32_t rec); /* 0xefeff */
+void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out); /* 0xef942 */
+void run_handler_stack_c425a(void); /* 0xc425a */
+uint32_t poll_device_ready_a42c4(void); /* 0xa42c4 */
+
 #endif
