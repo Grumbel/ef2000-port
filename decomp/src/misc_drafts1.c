@@ -4728,3 +4728,20 @@ void blend_palette_757bc(int32_t t, uint32_t to, uint32_t from, uint32_t dest, u
     }
     EF_U8(0x00128548u) = 1u;
 }
+
+/* 0x111c90, 262 bytes. One-time registration (flag 0x17e25c) of the data ranges of this module: the code range 0x111c90..0x114ad8 through 0x104840 and the buffers 0x17e1d8 (0x80 bytes), 0x17e258 and the dwords 0x4ddccc, d0, d4, d8, dc, b8, bc, b4, c0, c8, c4, b0 (4 bytes each) through 0x104908. */
+void register_ranges_111c90(void)
+{
+    static const uint32_t words[] = {
+        0x17e258u, 0x4ddcccu, 0x4ddcd0u, 0x4ddcd4u, 0x4ddcd8u, 0x4ddcdcu, 0x4ddcb8u,
+        0x4ddcbcu, 0x4ddcb4u, 0x4ddcc0u, 0x4ddcc8u, 0x4ddcc4u, 0x4ddcb0u
+    };
+    unsigned i;
+    if (EF_U32(0x0017e25cu) != 0u)
+        return;
+    guest_fn_104840(0x00111c90u, 0x00114ad8u);
+    stack_range_104908(0x0017e1d8u, 0x80u);
+    for (i = 0; i < sizeof(words) / sizeof(words[0]); i++)
+        stack_range_104908(words[i], 4u);
+    EF_U32(0x0017e25cu) = 1u;
+}
