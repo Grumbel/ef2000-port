@@ -6787,3 +6787,32 @@ void serial_status_dfeb8(void)
         (void)latch_menu_entry_df65c();
     }
 }
+
+/* 0x55f54, 174 bytes. Build and send the 43-byte command packet of type 0x29: fields A (EAX), B (EDX), C (EBX) and D (ECX) at +1/+5/+9/+0xd, then the seven stack arguments at +0x11 (dword), +0x15 (dword), +0x19 (word), +0x21 (dword), +0x1d (word), +0x1f (word) and +0x1b (word); word +0x25 is 0xffff and dword +0x27 is (running counter 0x127db0 << 4) + player byte 0x1a666b (the counter is incremented). The packet is emitted (0xa3f74), pushed on the message ring (0x56268) and copied to 0x1a663c. Stack-only parameters with ret 0x1c. */
+void send_command_packet_55f54(uint32_t a, uint32_t b, uint32_t c, uint32_t d,
+                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3,
+                               uint32_t s4, uint32_t s5, uint32_t s6)
+{
+    uint8_t p[0x2b];
+    uint32_t i, counter;
+    p[0] = 0x29u;
+    *(uint32_t *)&p[1] = a;
+    *(uint32_t *)&p[5] = b;
+    *(uint32_t *)&p[9] = c;
+    *(uint32_t *)&p[0xd] = d;
+    *(uint32_t *)&p[0x11] = s0;
+    *(uint32_t *)&p[0x15] = s1;
+    *(uint16_t *)&p[0x19] = (uint16_t)s2;
+    *(uint32_t *)&p[0x21] = s3;
+    *(uint16_t *)&p[0x1d] = (uint16_t)s4;
+    *(uint16_t *)&p[0x25] = 0xffffu;
+    *(uint16_t *)&p[0x1f] = (uint16_t)s5;
+    *(uint16_t *)&p[0x1b] = (uint16_t)s6;
+    counter = EF_U32(0x00127db0u);
+    *(uint32_t *)&p[0x27] = (counter << 4) + EF_U8(0x001a666bu);
+    EF_U32(0x00127db0u) = counter + 1u;
+    append_packet_a3f74((uint32_t)(uintptr_t)p, 0x2bu);
+    push_message_entry_56268((uint32_t)(uintptr_t)p);
+    for (i = 0u; i < 0x2bu; i++)
+        EF_U8(0x001a663cu + i) = p[i];
+}

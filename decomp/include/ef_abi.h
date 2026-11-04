@@ -5074,4 +5074,8 @@ void select_animation_11458c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
 void reposition_camera_31774(void);
 void serial_status_dfeb8(void);
 
+void send_command_packet_55f54(uint32_t a, uint32_t b, uint32_t c, uint32_t d,
+                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3,
+                               uint32_t s4, uint32_t s5, uint32_t s6);
+
 #endif

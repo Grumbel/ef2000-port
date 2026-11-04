@@ -1028,7 +1028,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00055e1c	120	send_object_params_55e1c	game_helpers12	compiles	game	confirmed	decomp/tests/0x00055e1c.json	docs/compiler-abi.md; Send the parameter block for an object (command 0x28).; callers 900c0@900fb; guest pending
 0x00055e94	119	send_unit_params_55e94	game_helpers12	compiles	game	confirmed	decomp/tests/0x00055e94.json	docs/compiler-abi.md; Send the parameter block for a unit (command 0x23).; callers 748f4@7493f; guest pending
 0x00055f0c	69	send_object_words_55f0c	game_helpers12	compiles	game	confirmed	decomp/tests/0x00055f0c.json	docs/compiler-abi.md; Send an object's parameters with four caller words (command 0x27).; callers 90124@901e0; guest pending
-0x00055f54	174			unknown	unclassified	unverified		
+0x00055f54	174	send_command_packet_55f54	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00055f54.json	docs/compiler-abi.md; Build and send the 43-byte command packet of type 0x29: fields A (EAX), B (EDX), C (EBX) and D (ECX) at +1/+5/+9/+0xd, t; callers 888cc@88b79; guest pending
 0x00056004	19	clear_scene_word_latches	marker_packets	compiles	game	confirmed	decomp/tests/0x00056004.json	docs/compiler-abi.md; Clear words 0x1a6630 and 0x127dae; sole direct caller 58028@58042; guest pending
 0x00056018	106	remember_value_56018	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00056018.json	docs/compiler-abi.md; Record a value in the history of twenty dwords at 0x1a5d70; returns 1 if already present.; callers 56084@560b9; guest pending
 0x00056084	310			unknown	unclassified	unverified		

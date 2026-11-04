@@ -6479,3 +6479,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x31774` | none | none | 3122c@312c3 | Reposition the camera from the angles at 0x19e572/0x19e560 (0xdc91c) by the offset (0, 0, -dword 0x19e597) rotated into  |
 | `0xdfeb8` | none | none | none direct | Serial line status handler: store (line status (port 0x15eed0 + 5) >> 1) & 0xf in byte 0x15eed5; when bit 3 of that is s |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x55f54` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:uint32_t,[ESP+28]:uint32_t | none | 888cc@88b79 | Build and send the 43-byte command packet of type 0x29: fields A (EAX), B (EDX), C (EBX) and D (ECX) at +1/+5/+9/+0xd, t |
