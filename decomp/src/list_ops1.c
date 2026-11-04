@@ -68,3 +68,42 @@ void step_page_slot_a0a2c(uint32_t index)
     EF_U16(slot + 4u) = EF_U16(0x00417196u);
     EF_U16(slot + 6u) = EF_U16(0x00417198u);
 }
+
+/* 0xa4a20, 116 bytes. Variant of 0xa4a94: if entry id has flag 8, push it to the front and rewrite every entry whose owner byte is id via 0xa48ac. */
+void promote_entry_and_children_a4a20(uint32_t id)
+{
+    uint16_t i;
+    id &= 0xffffu;
+    if (id == 0u || id > EF_U16(0x0041eed8u))
+        return;
+    {
+        uint32_t rec = EF_U32(0x0041edfcu + id * 4u);
+        if (rec == 0u || (EF_U8(rec + 0x3bu) & 8u) == 0u)
+            return;
+    }
+    push_front_id_a4820((uint16_t)id);
+    for (i = 1; i <= EF_U16(0x0041eed8u); i++) {
+        if (EF_U8(EF_U32(0x0041edfcu + (uint32_t)i * 4u) + 0x11u) == id)
+            guest_fn_a48ac_x(i);
+    }
+}
+
+/* 0x9e494, 116 bytes. Run the 0x9e7bc text routine with the current-page globals (0x417174/0x417178/0x41717c/0x41722a) temporarily pointed at page a, restoring them afterwards. */
+void run_text_on_page_9e494(uint32_t page, ef_addr32 text)
+{
+    uint16_t saved_page = EF_U16(0x0041722au);
+    uint32_t saved_cur = EF_U32(0x00417174u);
+    uint32_t saved_tab = EF_U32(0x0041717cu);
+    uint32_t saved_fn = EF_U32(0x00417178u);
+    uint32_t cur;
+    EF_U16(0x0041722au) = (uint16_t)page;
+    cur = (uint32_t)guest_fn_b3f58((int32_t)(int16_t)page);
+    EF_U32(0x00417174u) = cur;
+    EF_U32(0x0041717cu) = EF_U32(0x0040d200u + (uint32_t)EF_U16(cur) * 4u);
+    EF_U32(0x00417178u) = 0x000a0b5cu;
+    guest_fn_9e7bc_x(text);
+    EF_U16(0x0041722au) = saved_page;
+    EF_U32(0x00417174u) = saved_cur;
+    EF_U32(0x0041717cu) = saved_tab;
+    EF_U32(0x00417178u) = saved_fn;
+}

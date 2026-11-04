@@ -4888,3 +4888,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa0a2c` | EAX:uint32_t | none | 9e7bc@9f13e | Step a page slot: when its counter (+0) is zero invoke the handler at 0x132adc with the slot's words and the current 0x4 |
+
+## list_ops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa4a20` | EAX:uint32_t | none | a4b5c@a4b74 | Variant of 0xa4a94: if entry id has flag 8, push it to the front and rewrite every entry whose owner byte is id via 0xa4 |
+| `0x9e494` | EAX:uint32_t,EDX:ef_addr32 | none | a0c04@a0d37,cd2e8@cd378 | Run the 0x9e7bc text routine with the current-page globals (0x417174/0x417178/0x41717c/0x41722a) temporarily pointed at  |

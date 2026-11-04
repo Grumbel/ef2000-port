@@ -2091,7 +2091,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009e094	45			unknown	unclassified	unverified		
 0x0009e0c4	466			unknown	unclassified	unverified		
 0x0009e3f8	155			unknown	unclassified	unverified		
-0x0009e494	116			unknown	unclassified	unverified		
+0x0009e494	116	run_text_on_page_9e494	list_ops1	compiles	game	confirmed	decomp/tests/0x0009e494.json	docs/compiler-abi.md; Run the 0x9e7bc text routine with the current-page globals (0x417174/0x417178/0x41717c/0x41722a) temporarily pointed at ; callers a0c04@a0d37,cd2e8@cd378; guest pending
 0x0009e508	175			unknown	unclassified	unverified		
 0x0009e7bc	3752			unknown	unclassified	unverified		
 0x0009f664	170			unknown	unclassified	unverified		
@@ -2234,7 +2234,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a4820	137	push_front_id_a4820	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a4820.json	docs/compiler-abi.md; Push a flagged object id to the front of the id table.; callers a4a20@a4a4b; guest pending
 0x000a48ac	237			unknown	unclassified	unverified		
 0x000a499c	130			unknown	unclassified	unverified		
-0x000a4a20	116			unknown	unclassified	unverified		
+0x000a4a20	116	promote_entry_and_children_a4a20	list_ops1	compiles	game	confirmed	decomp/tests/0x000a4a20.json	docs/compiler-abi.md; Variant of 0xa4a94: if entry id has flag 8, push it to the front and rewrite every entry whose owner byte is id via 0xa4; callers a4b5c@a4b74; guest pending
 0x000a4a94	114	remove_entry_and_children_a4a94	list_ops1	compiles	game	confirmed	decomp/tests/0x000a4a94.json	docs/compiler-abi.md; If entry id has flag 8 set, remove it and every entry whose owner byte (+0x11) is id.; callers a4b08@a4b34,a4b5c@a4b6a,a4b80@a4bb8; guest pending
 0x000a4b08	66	refresh_flagged_object_a4b08	game_helpers29	compiles	game	confirmed	decomp/tests/0x000a4b08.json	docs/compiler-abi.md; Refresh the list for an object that is flagged and not owned.; callers b5d0@b66f,b5d0@b68c,bfcc@c20f; guest pending
 0x000a4b5c	36	refresh_widget_a4b5c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4b5c.json	docs/compiler-abi.md; when byte +0x11 clear: 0xa4a94 0xa4a20 on byte +0x10, 0xa6038; callers f1c58@f1d1f; guest pending

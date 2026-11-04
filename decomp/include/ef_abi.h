@@ -4230,4 +4230,9 @@ void open_named_file_287bc(void);
 void step_page_slot_a0a2c(uint32_t index);
 void guest_callptr4s2_x(ef_addr32 fn, int32_t a, int32_t b, int32_t c, int32_t d, int32_t s0, int32_t s1); /* indirect call: EAX/EDX/EBX/ECX plus two stack arguments, callee cleanup */
 
+void promote_entry_and_children_a4a20(uint32_t id);
+void run_text_on_page_9e494(uint32_t page, ef_addr32 text);
+void guest_fn_a48ac_x(uint32_t index); /* 0xa48ac EAX */
+void guest_fn_9e7bc_x(ef_addr32 text); /* 0x9e7bc EAX, preserves EBX/ECX/ESI/EDI */
+
 #endif
