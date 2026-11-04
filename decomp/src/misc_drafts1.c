@@ -8675,3 +8675,31 @@ void insert_midpoint_4e5bc(void)
     EF_U16(0x001a55d6u + (uint32_t)EF_U8(0x001a559fu) * 2u) = (uint16_t)((e - f) / 2 + f);
     EF_U8(0x001a5672u + EF_U8(0x001a559fu)) = 0x12u;
 }
+
+/* 0xcef3c, 264 bytes. Advance the 3-dword position V (EAX) by SCALE (EBX) along the direction given by the two angle words at ANG (EDX; a = +0, b = +2), using the sine table at 0x141e08 and cosine table at 0x142e08 (words indexed by angle >> 3): x += SCALE * (sin(a+b) - sin(a-b)) >> 16, y += SCALE * 2 sin(a) >> 16, z += SCALE * (cos(a+b) + cos(a-b)) >> 16. Afterwards y is clamped between (dword 0x15b7c0 << 8) and (dword 0x15b7c4 << 8). */
+void advance_position_cef3c(uint32_t v, uint32_t ang, uint32_t scale)
+{
+    uint32_t a = EF_U16(ang), b = EF_U16(ang + 2u);
+    uint32_t i1 = ((a + b) & 0xffffu) >> 3;
+    uint32_t i2 = ((a - b) & 0xffffu) >> 3;
+    uint32_t ia = a >> 3;
+    int32_t c1 = (int16_t)EF_U16(0x00142e08u + i1 * 2u);
+    int32_t c2 = (int16_t)EF_U16(0x00142e08u + i2 * 2u);
+    int32_t s1 = (int16_t)EF_U16(0x00141e08u + i1 * 2u);
+    int32_t s2 = (int16_t)EF_U16(0x00141e08u + i2 * 2u);
+    int32_t sa = (int16_t)EF_U16(0x00141e08u + ia * 2u);
+    int64_t p;
+    int32_t m;
+    p = (int64_t)(int32_t)scale * (int64_t)(s1 - s2);
+    EF_U32(v) = EF_U32(v) + (uint32_t)(p >> 16);
+    p = (int64_t)(int32_t)scale * (int64_t)(sa * 2);
+    EF_U32(v + 4u) = EF_U32(v + 4u) + (uint32_t)(p >> 16);
+    p = (int64_t)(int32_t)scale * (int64_t)(c1 + c2);
+    EF_U32(v + 8u) = EF_U32(v + 8u) + (uint32_t)(p >> 16);
+    m = (int32_t)(EF_U32(0x0015b7c4u) << 8);
+    if (m < (int32_t)EF_U32(v + 4u))
+        EF_U32(v + 4u) = (uint32_t)m;
+    m = (int32_t)(EF_U32(0x0015b7c0u) << 8);
+    if (m > (int32_t)EF_U32(v + 4u))
+        EF_U32(v + 4u) = (uint32_t)m;
+}

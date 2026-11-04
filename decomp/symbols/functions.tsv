@@ -2979,7 +2979,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ceccc	99	fill_rect_ceccc	fill_rects1	compiles	game	confirmed	decomp/tests/0x000ceccc.json	docs/compiler-abi.md; Fill the rectangle x0..x1, y0..y1 (coordinates swapped into order) with a colour byte, one row at a time. Callee pops th; callers 14d58@14e04,1e480@1e54c,1e480@1e5c2; guest pending
 0x000ceda0	231			unknown	unclassified	unverified		
 0x000cee88	180	add_direction_offset_cee88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cee88.json	docs/compiler-abi.md; Add the direction (from the sine/cosine tables at 0x141e08/0x142e08, indexed by the negated angles A and B divided by 8); callers a0f84@a11a1; guest pending
-0x000cef3c	264			unknown	unclassified	unverified		
+0x000cef3c	264	advance_position_cef3c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cef3c.json	docs/compiler-abi.md; Advance the 3-dword position V (EAX) by SCALE (EBX) along the direction given by the two angle words at ANG (EDX; a = +0; callers 26960@26b37,87a20@87c1f,8de9c@8df70; guest pending
 0x000cf050	850			unknown	unclassified	unverified		
 0x000cf3a4	993			unknown	unclassified	unverified		
 0x000cf788	4			unknown	unclassified	unverified		
