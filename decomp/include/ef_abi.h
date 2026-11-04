@@ -6328,4 +6328,11 @@ uint64_t probe_vectors_9c243(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
 uint32_t project_four_vertices_c73b0(void);
 uint32_t project_four_vertices_c73b0(void); /* 0xc73b0 */
 
+void set_record_flags_ee420(uint32_t eax, uint32_t ebp);
+void install_int35_eddfe(void);
+void init_record_ef41f(uint32_t ebp);
+void set_record_flags_ee420(uint32_t eax, uint32_t ebp); /* 0xee420 */
+void install_int35_eddfe(void); /* 0xeddfe */
+void init_record_ef41f(uint32_t ebp); /* 0xef41f */
+
 #endif

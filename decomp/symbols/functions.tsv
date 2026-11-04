@@ -3550,14 +3550,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000edb2d	123	math_error_edb2d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000edb2d.json	docs/compiler-abi.md; Math error dispatcher (ret 12): X is the offending double, CODE the error kind. CODE 1..3 reports with flags 0x2040/CODE; callers a4472@a4496,dcb96@dcbbd; guest pending
 0x000edd49	122			unknown	unclassified	unverified		
 0x000eddc3	59			unknown	unclassified	unverified		
-0x000eddfe	33			unknown	unclassified	unverified		
+0x000eddfe	33	install_int35_eddfe	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eddfe.json	docs/compiler-abi.md; Implicit-register fragment (no inputs): install the handler at 0x160a3c for interrupt 0x35 through DOS function 0x25 (in; callers edd49@edd64,eddc3@edde3; guest pending
 0x000ee22c	3350			unknown	unclassified	unverified		
 0x000ee3ce	82			unknown	unclassified	unverified		
-0x000ee420	28			unknown	unclassified	unverified		
+0x000ee420	28	set_record_flags_ee420	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ee420.json	docs/compiler-abi.md; Implicit-register fragment (EAX = index, EBP = record pointer; the original then jumps to 0xee22c): increment the index ; callers ee22c@ee5de,ee22c@ee7ac,ee22c@ee944; guest pending
 0x000ee43c	78	segmented_callback_bridge	unk_runtime	named	asm	unverified		docs/compiler-abi.md; manual DS/ES/SS copy and indirect callback, AL/AH live; do not splice automatically
 0x000ee589	31	caseD_0		named	unclassified	unverified		
 0x000eed92	21	caseD_40		named	unclassified	unverified		
-0x000ef41f	38			unknown	unclassified	unverified		
+0x000ef41f	38	init_record_ef41f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef41f.json	docs/compiler-abi.md; Implicit-register fragment (EBP = record pointer; the original clears EDI and jumps to 0xee22c): initialise the record w; callers ee22c@eeb2f; guest pending
 0x000ef942	14	combine_records_negated_ef942	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef942.json	docs/compiler-abi.md; At the entry (the routine continues into 0xef957). Implicit-register fragment (EAX = record A, EDX = record B, EBX = out; callers ee22c@ee615,ee22c@ee634,ee22c@ee7e3; guest pending
 0x000ef950	42	combine_records_ef950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef950.json	docs/compiler-abi.md; Combine two 10-byte records (dword, dword, word) at eax and edx with the core routine 0xef9aa and store the 10-byte resu; callers ee589@ee59f,ee22c@ee76d,ee22c@ee8fd; guest pending
 0x000ef97a	48	combine_record_value_ef97a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ef97a.json	docs/compiler-abi.md; (ret 12) Variant of 0xef950 whose second record comes by value on the stack (dword, dword, word).; callers f03cc@f045d,f03cc@f0479,f0482@f05b1; guest pending

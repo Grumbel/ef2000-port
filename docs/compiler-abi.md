@@ -9195,3 +9195,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc73b0` | none | EAX:uint32_t | c71dc@c7370,c8820@c89c0 | Implicit-register fragment (no inputs; outputs EBX, EDI, EBP, EDX are not modelled). Runs project_if_outside_c46f8 with  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xee420` | EAX:uint32_t,EDX:uint32_t | none | ee22c@ee5de,ee22c@ee7ac,ee22c@ee944 | Implicit-register fragment (EAX = index, EBP = record pointer; the original then jumps to 0xee22c): increment the index  |
+| `0xeddfe` | none | none | edd49@edd64,eddc3@edde3 | Implicit-register fragment (no inputs): install the handler at 0x160a3c for interrupt 0x35 through DOS function 0x25 (in |
+| `0xef41f` | EAX:uint32_t | none | ee22c@eeb2f | Implicit-register fragment (EBP = record pointer; the original clears EDI and jumps to 0xee22c): initialise the record w |

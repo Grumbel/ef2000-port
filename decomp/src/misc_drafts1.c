@@ -21457,3 +21457,33 @@ uint32_t project_four_vertices_c73b0(void)
 		return 0u;
 	return 1u;
 }
+
+/* 0xee420, 28 bytes. Implicit-register fragment (EAX = index, EBP = record pointer; the original then jumps to 0xee22c): increment the index and replace bits 8..15 of the record's word at +4 (keeping the bits selected by 0xb8ff) with the table byte at 0xedeca + index. */
+void set_record_flags_ee420(uint32_t eax, uint32_t ebp)
+{
+	uint32_t dx;
+
+	eax += 1u;
+	dx = EF_U16(ebp + 4u) & 0xb8ffu;
+	dx |= (uint32_t)EF_U8(0xedecau + eax) << 8;
+	EF_U16(ebp + 4u) = (uint16_t)dx;
+}
+
+/* 0xeddfe, 33 bytes. Implicit-register fragment (no inputs): install the handler at 0x160a3c for interrupt 0x35 through DOS function 0x25 (int 21h, AX = 0x2535, EDX = 0x160a3c), then store the word at 0x160a82 as the dword at 0x160a3c and issue the call once more with EBX = 1. */
+void install_int35_eddfe(void)
+{
+	uint32_t out[7];
+
+	run_dos_int_ex(0x21u, 0x2535u, 0u, 0u, 0x160a3cu, out);
+	EF_U32(0x160a3cu) = EF_U16(0x160a82u);
+	run_dos_int_ex(0x21u, out[0], 1u, 0u, 0x160a3cu, out);
+}
+
+/* 0xef41f, 38 bytes. Implicit-register fragment (EBP = record pointer; the original clears EDI and jumps to 0xee22c): initialise the record with word +0 = 0x33f, word +4 = 0, word +8 = 0xffff and dword +0x76 = 0xee22c. */
+void init_record_ef41f(uint32_t ebp)
+{
+	EF_U16(ebp) = 0x33fu;
+	EF_U16(ebp + 4u) = 0u;
+	EF_U16(ebp + 8u) = 0xffffu;
+	EF_U32(ebp + 0x76u) = 0xee22cu;
+}
