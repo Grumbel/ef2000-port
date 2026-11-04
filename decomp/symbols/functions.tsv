@@ -3446,7 +3446,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e874b	26	find_char	math_string	compiles	game	confirmed	decomp/tests/0x000e874b.json	docs/compiler-abi.md; strchr: first occurrence of byte EDX in the string at EAX * (including the terminator), or 0.; callers aaee8@aaf06,e7fc0@e7fec,e7fc0@e803a; guest pending
 0x000e8784	105	report_formatted_e8784	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e8784.json	docs/compiler-abi.md; Variadic cdecl diagnostic: when byte 0x1600a6 is set, format FMT with its arguments into a 0x140-byte stack buffer and p; callers e882c@e888e,e882c@e891d,e882c@e89b1; guest pending
 0x000e882c	2990			unknown	unclassified	unverified		
-0x000e93dc	272			unknown	unclassified	unverified		
+0x000e93dc	272	parse_script_text_e93dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e93dc.json	docs/compiler-abi.md; Run the text parser over the script TEXT (EAX, stored at 0x464380; DL goes to byte 0x1600a6): the cursor 0x464384 starts; callers 80058@800cb,81230@812a4,82cec@82d39; guest pending
 0x000e94ec	134	load_text_file_e94ec	load_planes1	compiles	game	confirmed	decomp/tests/0x000e94ec.json	docs/compiler-abi.md; Load a text file through the size/read handlers at 0x132ab4/0x132ab8 into a new buffer at 0x1600a0, trimming a trailing ; callers 80058@80095,81230@8126e,82cec@82d29; guest pending
 0x000e9574	70	release_buffer_e9574	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e9574.json	docs/compiler-abi.md; Release the buffer at 0x1600a0 once and mark it released.; callers 80058@800d0,81230@812a9,82cec@82d3e; guest pending
 0x000e95c0	444			unknown	unclassified	unverified		

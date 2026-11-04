@@ -7907,3 +7907,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x910f4` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t,ECX:int32_t,[ESP+4]:uint32_t | AL:uint8_t | 888cc@88a8b | Try to hit one of the 0x28 map entries (0x30 bytes each at 0x211af0: x dword +0, z +4, y +8, kind word +0x1e, flags byte |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe93dc` | EAX:ef_addr32,EDX:uint32_t | AL:uint8_t | 80058@800cb,81230@812a4,82cec@82d39 | Run the text parser over the script TEXT (EAX, stored at 0x464380; DL goes to byte 0x1600a6): the cursor 0x464384 starts |

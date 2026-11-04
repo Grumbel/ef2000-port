@@ -13732,3 +13732,53 @@ uint8_t hit_map_entry_910f4(uint32_t u0, int32_t x, uint32_t u2, int32_t y, uint
     }
     return 0u;
 }
+
+/* 0xe93dc, 272 bytes. Run the text parser over the script TEXT (EAX, stored at 0x464380; DL goes to byte 0x1600a6): the cursor 0x464384 starts at dword 0x1600a0, the line counter word 0x16007c at 1. Complains through the error hook when the parser mode byte 0x1600a4 is 0 (0x1912c0) or 2 (0x191304). Then loops: skip blanks and tabs, count CR LF pairs as lines, hand every other token to 0xe882c (a zero result makes the whole run fail) and skip the rest of its line. Returns 1 when all tokens parsed. */
+uint8_t parse_script_text_e93dc(ef_addr32 text, uint32_t flag)
+{
+    uint8_t ok = 1u;
+    uint16_t line = 1u;
+    ef_addr32 cur;
+    EF_U32(0x00464380u) = text;
+    EF_U8(0x001600a6u) = (uint8_t)flag;
+    cur = EF_U32(0x001600a0u);
+    EF_U32(0x00464384u) = cur;
+    EF_U16(0x0016007cu) = 1u;
+    if (EF_U8(0x001600a4u) == 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x001912c0u);
+    if (EF_U8(0x001600a4u) == 2u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00191304u);
+    line = EF_U16(0x0016007cu);
+    cur = EF_U32(0x00464384u);
+    while (EF_U8(cur) != 0u) {
+        uint8_t c = EF_U8(cur);
+        if (c == 0x20u || c == 0x09u) {
+            cur++;
+            continue;
+        }
+        EF_U32(0x00464384u) = cur;
+        EF_U16(0x0016007cu) = line;
+        if (c == 0x0du) {
+            cur++;
+            line++;
+            if (EF_U8(cur) == 0x0au)
+                cur++;
+            continue;
+        }
+        if (guest_fn_e882c_x() == 0u)
+            ok = 0u;
+        line = EF_U16(0x0016007cu);
+        cur = EF_U32(0x00464384u);
+        while (EF_U8(cur) != 0u && EF_U8(cur) != 0x0du)
+            cur++;
+        if (EF_U8(cur) == 0x0du) {
+            cur++;
+            line++;
+            if (EF_U8(cur) == 0x0au)
+                cur++;
+        }
+    }
+    EF_U16(0x0016007cu) = line;
+    EF_U32(0x00464384u) = cur;
+    return ok;
+}
