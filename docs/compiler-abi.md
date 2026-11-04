@@ -3868,3 +3868,10 @@ in EAX, format string address, one value).
 | `0xb45ac` | EAX:double | EAX:double | 7d20@7d4c,7ee8@8032,1d954@1d9ee | fsin on ST0, retried while the FPU reports an incomplete reduction. |
 | `0x7d20` | EAX:ef_addr32,EDX:ef_addr32 | AL:uint8_t | 7dec@7e34,82b8@8336 | Test whether a 2D point lies inside the oriented box of a record. |
 | `0x82b8` | EAX:int32_t,EDX:int32_t | EAX:ef_addr32 | 882b0@88304 | Find the first unmarked entry of the cell containing the scaled point and mark it. |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc964` | none | none | bfcc@c27f | Recompute the ratio of matching entries and store it as a float. |
+| `0x16bac` | EAX:int32_t,EDX:ef_addr32,EBX:ef_addr32 | EAX:double | 168d8@1690e,16e60@16f07,16e60@17025 | Pick the best-rated weapon among a record's carried ones, returned scaled. |

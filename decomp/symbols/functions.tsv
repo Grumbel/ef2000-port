@@ -169,7 +169,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000c838	48	gpwShowDebrief		named	unclassified	unverified		
 0x0000c868	127			unknown	unclassified	unverified		
 0x0000c8e8	122			unknown	unclassified	unverified		
-0x0000c964	218			unknown	unclassified	unverified		
+0x0000c964	218	update_match_ratio_c964	float_helpers9	compiles	game	confirmed	decomp/tests/0x0000c964.json	docs/compiler-abi.md; Recompute the ratio of matching entries and store it as a float.; callers bfcc@c27f; guest pending
 0x0000ca40	25	gpwAlterSize		named	unclassified	unverified		
 0x0000ca5c	573			unknown	unclassified	unverified		
 0x0000cccc	1475	gpwRedrawRoute		named	unclassified	unverified		
@@ -279,7 +279,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00016a74	64	unit_kind_b_or_flag_16a74	game_helpers4	compiles	game	confirmed	decomp/tests/0x00016a74.json	docs/compiler-abi.md; ; callers 15b7c@15bf3; guest pending
 0x00016ab4	87	record_kind_matches_16ab4	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00016ab4.json	docs/compiler-abi.md; Active record whose kind byte +0x1c is one of a fixed set.; callers 15b7c@15c5d; guest pending
 0x00016b0c	159			unknown	unclassified	unverified		
-0x00016bac	205			unknown	unclassified	unverified		
+0x00016bac	205	pick_best_weapon_16bac	float_helpers9	compiles	game	confirmed	decomp/tests/0x00016bac.json	docs/compiler-abi.md; Pick the best-rated weapon among a record's carried ones, returned scaled.; callers 168d8@1690e,16e60@16f07,16e60@17025; guest pending
 0x00016c7c	226			unknown	unclassified	unverified		
 0x00016d60	255	count_down_slots_16d60	game_helpers41	compiles	game	confirmed	decomp/tests/0x00016d60.json	docs/compiler-abi.md; Count down the 20 three-byte slots of the given kind by the given amount.; callers 15b7c@15eab,16588@168a2,16e60@16f72; guest pending
 0x00016e60	1105			unknown	unclassified	unverified		

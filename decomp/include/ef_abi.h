@@ -3439,4 +3439,8 @@ double sin_b45ac(double angle);
 uint8_t point_in_oriented_box_7d20(ef_addr32 point, ef_addr32 box);
 ef_addr32 mark_entry_at_point_82b8(int32_t x, int32_t y);
 
+/* float_helpers9.c */
+void update_match_ratio_c964(void);
+double pick_best_weapon_16bac(int32_t record_index, ef_addr32 kind_out, ef_addr32 id_out);
+
 #endif
