@@ -4744,4 +4744,11 @@ uint32_t guest_fn_d0278_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x
 void set_record_state_14c5c(int32_t idx, uint32_t state);
 void guest_fn_14d58_x(uint32_t a); /* 0x14d58 EAX */
 
+void draw_text_font0_dd788(uint32_t colour, uint32_t x, uint32_t y, uint32_t str);
+void draw_text_font6_dd370(uint32_t colour, uint32_t x, uint32_t y, uint32_t str);
+void draw_text_upper_dd26c(uint32_t colour, uint32_t x, uint32_t y, uint32_t str);
+void draw_text_by_font_a8578(int32_t x, int32_t y, uint32_t colour, uint32_t text);
+
+
+
 #endif

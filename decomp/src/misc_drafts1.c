@@ -50,14 +50,14 @@ void draw_mode_dispatch_a8660(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t
     uint8_t mode = EF_U8(EF_U32(0x004191d0u) + 4u);
     uint32_t col = ecx & 0xffu;
     if (mode == 0u) {
-        guest_fn_a8578_x((uint32_t)(int32_t)(int16_t)edx, (uint32_t)(int32_t)(int16_t)ebx, col, eax);
+        draw_text_by_font_a8578((uint32_t)(int32_t)(int16_t)edx, (uint32_t)(int32_t)(int16_t)ebx, col, eax);
     } else if (mode == 1u) {
         uint32_t entry = (index & 0xffff0000u) | EF_U16(0x00418780u + (uint32_t)(int32_t)(int16_t)index * 2u);
         uint32_t x = edx + (0x13fu - entry);
-        guest_fn_a8578_x((uint32_t)(int32_t)(int16_t)x, (uint32_t)(int32_t)(int16_t)ebx, col, eax);
+        draw_text_by_font_a8578((uint32_t)(int32_t)(int16_t)x, (uint32_t)(int32_t)(int16_t)ebx, col, eax);
     } else if (mode == 2u) {
         uint16_t x = (uint16_t)(edx + EF_U16(0x004187d0u + (uint32_t)(int32_t)(int16_t)index * 2u));
-        guest_fn_a8578_x((uint32_t)(int32_t)(int16_t)x, (uint32_t)(int32_t)(int16_t)ebx, col, eax);
+        draw_text_by_font_a8578((uint32_t)(int32_t)(int16_t)x, (uint32_t)(int32_t)(int16_t)ebx, col, eax);
     }
 }
 
@@ -3293,4 +3293,88 @@ void set_record_state_14c5c(int32_t idx, uint32_t state)
     ev = EF_U32(rec + 0xeu);
     if (ev != 0u)
         push_event_1f878(ev);
+}
+
+/* Draw a string with a font that has an extended glyph range: characters of 0x80 and up (0xa5 is remapped to 'N') use the pointer table ext_glyph and width table ext_w (a zero width means no glyph and no advance), drawn EXT_DY above the line; the others (low 6 bits index the map at 0x15e1be, -1 for none) use reg_glyph/reg_w. Spaces and tabs advance by gap, drawn glyphs by width + extra. */
+static void draw_text_ext_glyphs(uint32_t colour, uint32_t x, uint32_t y, uint32_t str, uint32_t gap, uint32_t ext_glyph, uint32_t ext_w, uint32_t ext_dy, uint32_t reg_glyph, uint32_t reg_w, uint32_t extra)
+{
+    int16_t i;
+    for (i = 0;; i++) {
+        uint8_t c = EF_U8(str + (uint32_t)(int32_t)i);
+        uint32_t idx;
+        uint32_t w;
+        if (c == 0u)
+            return;
+        if (c == 0xa5u)
+            c = 0x4eu;
+        if (c == 0x20u || c == 9u) {
+            x += gap;
+            continue;
+        }
+        if (c > 0x7fu) {
+            idx = (uint8_t)(c - 0x80u);
+            w = EF_U8(ext_w + idx);
+            if (w == 0u)
+                continue;
+            guest_fn_cf7c4_x(EF_U32(ext_glyph + idx * 4u), (uint32_t)(int32_t)(int16_t)y - ext_dy, (uint32_t)(int32_t)(int16_t)x, colour & 0xffu);
+        } else {
+            int32_t m = (int32_t)(int8_t)EF_U8(0x0015e1beu + (uint32_t)(c & 0x3fu));
+            if (m == -1)
+                continue;
+            idx = (uint32_t)m;
+            guest_fn_cf7c4_x(EF_U32(reg_glyph + idx * 4u), (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, colour & 0xffu);
+            w = EF_U8(reg_w + idx);
+        }
+        x += w + extra;
+    }
+}
+
+/* 0xdd788, 218 bytes. Draw a string with the first extended font (regular glyphs 0x15e7cc / widths 0x15e2ea, extended glyphs 0x15ec70 / widths 0x15edf8, space 6, spacing 2). */
+void draw_text_font0_dd788(uint32_t colour, uint32_t x, uint32_t y, uint32_t str)
+{
+    draw_text_ext_glyphs(colour, x, y, str, 6u, 0x0015ec70u, 0x0015edf8u, 0u, 0x0015e7ccu, 0x0015e2eau, 2u);
+}
+
+/* 0xdd370, 238 bytes. Draw a string with the narrow extended font (regular glyphs 0x15e4e8 / widths 0x15e31d, extended glyphs 0x15e898 / widths 0x15ea20 drawn 2 lines higher, space 3, spacing 1). */
+void draw_text_font6_dd370(uint32_t colour, uint32_t x, uint32_t y, uint32_t str)
+{
+    draw_text_ext_glyphs(colour, x, y, str, 3u, 0x0015e898u, 0x0015ea20u, 2u, 0x0015e4e8u, 0x0015e31du, 1u);
+}
+
+/* 0xdd26c, 133 bytes. Draw a string through the glyph routine 0xdcf28 (upper-cased, spaces and tabs advance by 6). ORIGINAL BUG: the character is read at index (i & 0x3f) instead of i, so strings longer than 64 characters repeat. */
+void draw_text_upper_dd26c(uint32_t colour, uint32_t x, uint32_t y, uint32_t str)
+{
+    int16_t i;
+    int16_t sx = (int16_t)x;
+    for (i = 0;; i++) {
+        uint8_t c = EF_U8(str + (uint32_t)(int32_t)i);
+        if (c == 0u)
+            return;
+        if (c == 0x20u || c == 9u) {
+            sx = (int16_t)(sx + 6);
+            continue;
+        }
+        sx = (int16_t)(sx + draw_glyph_dcf28((uint8_t)to_upper_ascii(EF_U8(str + (uint32_t)(i & 0x3f))), sx, (int16_t)y, (int16_t)(colour & 0xffu)));
+    }
+}
+
+/* 0xa8578, 229 bytes. Draw the text at ECX with the font selected by the byte at [[0x4191d0] + 0x10] (0..9: 0xdd788, 0xf23ac, 0xf261c, 0xdccd8, 0xdd26c, 0xdd1b0, 0xdd370, 0xdd4c4, 0xdd5bc, 0xdd6a0) at (X, Y) in the colour byte COLOUR; fonts above 9 draw nothing. X and Y are sign extended from 16 bits. */
+void draw_text_by_font_a8578(int32_t x, int32_t y, uint32_t colour, uint32_t text)
+{
+    int32_t sx = (int16_t)x;
+    int32_t sy = (int16_t)y;
+    uint32_t col = colour & 0xffu;
+    switch (EF_U8(EF_U32(0x004191d0u) + 0x10u)) {
+    case 0: draw_text_font0_dd788(col, (uint32_t)sx, (uint32_t)sy, text); break;
+    case 1: draw_text_f23ac((uint8_t)col, sx, sy, text); break;
+    case 2: draw_text_f261c(col, (uint32_t)sx, (uint32_t)sy, text); break;
+    case 3: draw_text_4_dccd8((uint8_t)col, sx, (uint16_t)sy, text); break;
+    case 4: draw_text_upper_dd26c(col, (uint32_t)sx, (uint32_t)sy, text); break;
+    case 5: draw_text_5_dd1b0((uint8_t)col, sx, (uint16_t)sy, text); break;
+    case 6: draw_text_font6_dd370(col, (uint32_t)sx, (uint32_t)sy, text); break;
+    case 7: draw_text_large_dd4c4(col, (uint32_t)sx, (uint32_t)sy, text); break;
+    case 8: draw_text_medium_dd5bc(col, (uint32_t)sx, (uint32_t)sy, text); break;
+    case 9: draw_text_small_dd6a0(col, (uint32_t)sx, (uint32_t)sy, text); break;
+    default: break;
+    }
 }

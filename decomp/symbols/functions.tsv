@@ -2337,7 +2337,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a80b0	308			unknown	unclassified	unverified		
 0x000a81e4	225			unknown	unclassified	unverified		
 0x000a82f0	607			unknown	unclassified	unverified		
-0x000a8578	229			unknown	unclassified	unverified		
+0x000a8578	229	draw_text_by_font_a8578	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a8578.json	docs/compiler-abi.md; Draw the text at ECX with the font selected by the byte at [[0x4191d0] + 0x10] (0..9: 0xdd788, 0xf23ac, 0xf261c, 0xdccd8; callers a8660@a86d6; guest pending
 0x000a8660	129	draw_mode_dispatch_a8660	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a8660.json	docs/compiler-abi.md; (ret 4) Dispatch on the mode byte at [[0x4191d0]+4]: 0 passes the arguments straight on to 0xa8578, 1 mirrors x against ; callers a8718@a8770,a8718@a879d,a8718@a886b; guest pending
 0x000a86e4	50	clamp_word_425fa6	list_helpers	compiles	game	confirmed	decomp/tests/0x000a86e4.json	docs/compiler-abi.md; When byte 0x41f833 is 0x39 and signed word 0x425fa6 is * below signed word 0x4194ae, copy the latter over it and clear t; callers a8718@a87b8; guest pending
 0x000a8718	574			unknown	unclassified	unverified		
@@ -3239,9 +3239,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd164	74	dispatch_code_table_b_dd164	game_helpers87	compiles	game	confirmed	decomp/tests/0x000dd164.json	docs/compiler-abi.md; Same lookup as dcc98 with code 0xa5 remapped to 0x4e and the second table set.; callers dd1b0@dd203; guest pending
 0x000dd1b0	95	draw_text_5_dd1b0	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd1b0.json	docs/compiler-abi.md; Draw a string in the 5-pixel-blank font, advancing by each glyph width.; callers a8578@a8605; guest pending
 0x000dd210	89	text_width_6_dd210	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd210.json	docs/compiler-abi.md; Pixel width of a string in the font with 6-pixel blanks and 2-pixel gaps.; callers a82f0@a84d8; guest pending
-0x000dd26c	133			unknown	unclassified	unverified		
+0x000dd26c	133	draw_text_upper_dd26c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd26c.json	docs/compiler-abi.md; Draw a string through the glyph routine 0xdcf28 (upper-cased, spaces and tabs advance by 6). ORIGINAL BUG: the character; callers a8578@a85f1; guest pending
 0x000dd2f4	122	text_width_dd2f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd2f4.json	docs/compiler-abi.md; Measure the pixel width of a zero-terminated string: spaces and tabs count 3, characters above 0x7f use the byte table a; callers 275e0@27658,275e0@276a8,275e0@276e5; guest pending
-0x000dd370	238			unknown	unclassified	unverified		
+0x000dd370	238	draw_text_font6_dd370	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd370.json	docs/compiler-abi.md; Draw a string with the narrow extended font (regular glyphs 0x15e4e8 / widths 0x15e31d, extended glyphs 0x15e898 / width; callers 275e0@27611,275e0@27631,275e0@2766d; guest pending
 0x000dd460	100	text_width_17_dd460	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd460.json	docs/compiler-abi.md; Width of a string in the 17-pixel-blank font minus the trailing gap.; callers a82f0@a84ed; guest pending
 0x000dd4c4	150	draw_text_large_dd4c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd4c4.json	docs/compiler-abi.md; Draw a string with the large font (glyphs 0x15e61c, widths 0x15e27e, space 0x11, spacing 2).; callers a8578@a862e; guest pending
 0x000dd55c	94	text_width_5_dd55c	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd55c.json	docs/compiler-abi.md; Width of a string in the 5-pixel-blank font minus the trailing gap.; callers a82f0@a84f4; guest pending
@@ -3249,7 +3249,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dd650	78	text_width_raw_dd650	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dd650.json	docs/compiler-abi.md; Pixel width of a string; blanks are tested before masking.; callers 27d18@27d9a,27d18@27de7,27fec@28192; guest pending
 0x000dd6a0	134	draw_text_small_dd6a0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd6a0.json	docs/compiler-abi.md; Draw a string with the small font (glyphs 0x15e73c, widths 0x15e2c6, space 5, spacing 1; 0xa5 is not remapped).; callers 27d18@27dc1,27d18@27e77,27fec@281b6; guest pending
 0x000dd728	94	text_width_6_dd728	game_helpers37	compiles	game	confirmed	decomp/tests/0x000dd728.json	docs/compiler-abi.md; Width of a string in the 6-pixel-blank font minus the trailing gap.; callers a82f0@a8458; guest pending
-0x000dd788	218			unknown	unclassified	unverified		
+0x000dd788	218	draw_text_font0_dd788	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dd788.json	docs/compiler-abi.md; Draw a string with the first extended font (regular glyphs 0x15e7cc / widths 0x15e2ea, extended glyphs 0x15ec70 / widths; callers a8578@a85a2; guest pending
 0x000dd870	80	restore_saved_block_dd870	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000dd870.json	docs/compiler-abi.md; If a screen area was saved under the parameter block (0x15ee94 != -1), put it back, then mark it unsaved.; callers dd8d0@dd8d0,dd9e4@dd9ff,f2ac0@f2b13; guest pending
 0x000dd8c0	14	redraw_if_unsaved_dd8c0	small_wrappers6	compiles	game	confirmed	decomp/tests/0x000dd8c0.json	docs/compiler-abi.md; Run 0xdd8dc when the saved width at 0x15ee94 is -1 (nothing saved yet); otherwise do nothing.; callers dd9e4@dda4a,f34cc@f352e; guest pending
 0x000dd8d0	12	run_shutdown_pair_dd8d0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000dd8d0.json	docs/compiler-abi.md; Run the two shutdown helpers in order.; callers 278c0@27b2d,27d18@27eb1,f3f84@f40f8; guest pending

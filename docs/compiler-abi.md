@@ -5792,3 +5792,17 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x14c5c` | EAX:int32_t,EDX:uint32_t | none | 589c0@58a1b,589c0@58a2a,589c0@58a39 | Set the state byte of the 19-byte record IDX at 0x1225d4 to STATE; when it changed and the current object is not locked  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdd788` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | a8578@a85a2 | Draw a string with the first extended font (regular glyphs 0x15e7cc / widths 0x15e2ea, extended glyphs 0x15ec70 / widths |
+| `0xdd370` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 275e0@27611,275e0@27631,275e0@2766d | Draw a string with the narrow extended font (regular glyphs 0x15e4e8 / widths 0x15e31d, extended glyphs 0x15e898 / width |
+| `0xdd26c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | a8578@a85f1 | Draw a string through the glyph routine 0xdcf28 (upper-cased, spaces and tabs advance by 6). ORIGINAL BUG: the character |
+| `0xa8578` | EAX:int32_t,EDX:int32_t,EBX:uint32_t,ECX:uint32_t | none | a8660@a86d6 | Draw the text at ECX with the font selected by the byte at [[0x4191d0] + 0x10] (0..9: 0xdd788, 0xf23ac, 0xf261c, 0xdccd8 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
