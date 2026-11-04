@@ -8093,3 +8093,33 @@ uint32_t build_ramp_table_e7ea4(int32_t lo, int32_t hi)
         EF_U8(0x00463f5fu + (uint32_t)i) = (uint8_t)(int32_t)truncate_9d72c((double)k / (double)step);
     return 1u;
 }
+
+/* 0xfe560, 174 bytes. High-resolution timer read. The first call (dword 0x17cf98 clear) points 0x485fc4 at the BIOS tick counter (0x120cc6 + 0x46c), programs PIT channel 0 for a full 16-bit count unless byte 0x15bac5 is set, records the tick in 0x485fc8, sets the flag and returns 0. Later calls latch the PIT count (ports 0x43/0x40, re-read until the tick is stable) and store ((ticks since 0x485fc8) : -(count)) << 16 divided by 0x5d380000 in 0x485fc0, also returning it. */
+uint32_t read_hires_timer_fe560(void)
+{
+    uint32_t tick1, tick2, lo, hi, count;
+    if (EF_U32(0x0017cf98u) == 0u) {
+        EF_U32(0x00485fc4u) = EF_U32(0x00120cc6u) + 0x46cu;
+        if (EF_U8(0x0015bac5u) == 0u) {
+            guest_fn_117b0c(0x43u, 0x34u);
+            guest_fn_117b0c(0x40u, 0u);
+            guest_fn_117b0c(0x40u, 0u);
+        }
+        EF_U32(0x0017cf98u) = 1u;
+        EF_U32(0x00485fc8u) = EF_U32(EF_U32(0x00485fc4u));
+        return 0u;
+    }
+    do {
+        tick1 = EF_U32(EF_U32(0x00485fc4u));
+        guest_fn_117b0c(0x43u, 0u);
+        lo = guest_fn_9c430(0x40u) & 0xffu;
+        hi = guest_fn_9c430(0x40u) & 0xffu;
+        tick2 = EF_U32(EF_U32(0x00485fc4u));
+    } while (tick2 != tick1);
+    count = (0u - ((hi << 8) | lo)) & 0xffffu;
+    {
+        int64_t num = (int64_t)(((uint64_t)(tick2 - EF_U32(0x00485fc8u)) << 32) | (uint64_t)(count << 16));
+        EF_U32(0x00485fc0u) = (uint32_t)(int32_t)(num / (int64_t)(int32_t)0x5d380000);
+    }
+    return EF_U32(0x00485fc0u);
+}

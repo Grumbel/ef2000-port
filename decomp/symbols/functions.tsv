@@ -3776,7 +3776,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fe380	284			unknown	unclassified	unverified		
 0x000fe49c	165			unknown	unclassified	unverified		
 0x000fe541	31	delete_file_fe541	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe541.json	docs/compiler-abi.md; DOS delete file (int 21h, AH = 0x41) NAME: 0 on success, otherwise the translated DOS error (0x1101e8) of the failing co; callers none direct; guest pending
-0x000fe560	174			unknown	unclassified	unverified		
+0x000fe560	174	read_hires_timer_fe560	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe560.json	docs/compiler-abi.md; High-resolution timer read. The first call (dword 0x17cf98 clear) points 0x485fc4 at the BIOS tick counter (0x120cc6 + 0; callers 10640@10640,34ca4@34d3f,34d50@34d6f; guest pending
 0x000fe610	15			unknown	unclassified	unverified		
 0x000fe700	14	get_video_mode_fe700	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe700.json	docs/compiler-abi.md; BIOS get video mode (int 10h, AH = 0xf): returns the current mode number in AL (EBX, ESI and EDI are preserved).; callers cdb20@cdb97,cdc64@cdc6c; guest pending
 0x000fe710	31	set_and_check_video_mode_fe710	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe710.json	docs/compiler-abi.md; Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low; callers cdb20@cdbae,cdc64@cdc83; guest pending
