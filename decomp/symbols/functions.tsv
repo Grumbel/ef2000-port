@@ -2499,10 +2499,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b2a2c	53			unknown	unclassified	unverified		
 0x000b2b00	515			unknown	unclassified	unverified		
 0x000b2d04	135			unknown	unclassified	unverified		
-0x000b2d8c	155			unknown	unclassified	unverified		
+0x000b2d8c	155	print_point_b2d8c	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b2d8c.json	docs/compiler-abi.md; Print one shape point record.; callers b2e98@b2f28; guest pending
 0x000b2e28	59			unknown	unclassified	unverified		
 0x000b2e64	50	count_active_entries	list_helpers	compiles	game	confirmed	decomp/tests/0x000b2e64.json	docs/compiler-abi.md; Count the 9-byte entries (pointer +0x4a, count word * +0x48) whose byte +3 is nonzero.; callers b2e98@b2ef5; guest pending
-0x000b2e98	176			unknown	unclassified	unverified		
+0x000b2e98	176	print_object_b2e98	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b2e98.json	docs/compiler-abi.md; Print an object record and its point list.; callers b2e28@b2e55; guest pending
 0x000b2f48	238			unknown	unclassified	unverified		
 0x000b3038	73			unknown	unclassified	unverified		
 0x000b3084	226			unknown	unclassified	unverified		
@@ -2517,13 +2517,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b39ec	235			unknown	unclassified	unverified		
 0x000b3ae0	57	ratio_lookup_b3ae0	game_helpers28	compiles	game	confirmed	decomp/tests/0x000b3ae0.json	docs/compiler-abi.md; Table-driven ratio of two unsigned values (a/b or complement).; callers b3b1c@b3b4a,b3b1c@b3b55,b3b1c@b3b67; guest pending
 0x000b3b1c	90	angle_of_b3b1c	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b3b1c.json	docs/compiler-abi.md; Quadrant-aware wrapper around 0xb3ae0 (angle of the vector EAX/EDX, 16-bit angle units).; callers 66fc@67c0,26744@268ab,26744@268bc; guest pending
-0x000b3b90	114			unknown	unclassified	unverified		
+0x000b3b90	114	read_file_payload_size_b3b90	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b3b90.json	docs/compiler-abi.md; Return the payload size of a file from its header.; callers 6b50@6b78,82e40@82e4e,830b8@830c6; guest pending
 0x000b3c04	252			unknown	unclassified	unverified		
 0x000b3d00	96	write_whole_file_b3d00	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000b3d00.json	docs/compiler-abi.md; Write a whole file; abort when it cannot be created or written.; callers 7a5bc@7a5e6,82e40@83014,830b8@83184; guest pending
 0x000b3d60	6	get_global_b3d60	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000b3d60.json	docs/compiler-abi.md; ; callers 3d4b0@3d72f; guest pending
 0x000b3d68	9	read_counter_b3d68	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000b3d68.json	docs/compiler-abi.md; ; callers 3d4b0@3d729; guest pending
 0x000b3d74	57	update_ring_b3d74	list_helpers	compiles	game	confirmed	decomp/tests/0x000b3d74.json	docs/compiler-abi.md; ; callers e4264@e42a9; guest pending
-0x000b3db0	150			unknown	unclassified	unverified		
+0x000b3db0	150	take_pool_block_b3db0	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b3db0.json	docs/compiler-abi.md; Take a block from the top of the stack pool and clear it.; callers 6b50@6b88,6b50@6bca,bc38@bc4a; guest pending
 0x000b3f48	6	get_global_b3f48	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000b3f48.json	docs/compiler-abi.md; ; callers a7b8c@a7b8c,a992c@a9988,a9e70@a9e74; guest pending
 0x000b3f50	6	get_global_b3f50	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000b3f50.json	docs/compiler-abi.md; ; callers a7bb0@a7bb0,a9990@a99ba,a9e70@aa02d; guest pending
 0x000b3f58	74	lookup_id_b3f58	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000b3f58.json	docs/compiler-abi.md; Look up a 1-based id in the table at [0x41f370] or abort.; callers 6b50@6b8e,6b50@6bd0,bc38@bc55; guest pending
@@ -2628,7 +2628,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bbdc4	106			unknown	unclassified	unverified		
 0x000bbf1c	447			unknown	unclassified	unverified		
 0x000bc0dc	247			unknown	unclassified	unverified		
-0x000bc1d3	180			unknown	unclassified	unverified		
+0x000bc1d3	180	parse_open_mode_bc1d3	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000bc1d3.json	docs/compiler-abi.md; Convert an fopen mode string to open flags.; callers bc287@bc291; guest pending
 0x000bc287	200			unknown	unclassified	unverified		
 0x000bc34f	27	run_if_available_bc34f	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc34f.json	docs/compiler-abi.md; When 0xfa6d3(0) returns nonzero, run 0xbc287(EAX).; callers bc36a@bc36d; guest pending
 0x000bc36a	10	run_if_available_bc36a	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc36a.json	docs/compiler-abi.md; Run 0xbc34f with EBX preserved as zero.; callers 9ea0@9fa4,a3dc@a3f7,357ec@3589f; guest pending
@@ -2665,7 +2665,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bd508	75	count_special_entries_bd508	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000bd508.json	docs/compiler-abi.md; Count the 10-byte entries of the record that are special and non-empty.; callers bd5a8@bd5d6; guest pending
 0x000bd554	82	count_entries_bd554	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000bd554.json	docs/compiler-abi.md; Count the special entries of a kind-0x15 record, 1 for other kinds.; callers bd5a8@bd5df; guest pending
 0x000bd5a8	78	slot_usable_bd5a8	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd5a8.json	docs/compiler-abi.md; ; callers bd5f8@bd655; guest pending
-0x000bd5f8	144			unknown	unclassified	unverified		
+0x000bd5f8	144	clear_unusable_slots_bd5f8	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000bd5f8.json	docs/compiler-abi.md; Clear the unusable entries of a record's slot table.; callers bdbf8@bdc8d,bdbf8@bdcd7,bdbf8@bdd26; guest pending
 0x000bd688	80	reset_slots_bd688	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd688.json	docs/compiler-abi.md; Mark all slots (10 bytes each) present and total their counts.; callers bdbf8@bdc0c,bf444@bf718; guest pending
 0x000bd6d8	78	count_slots_bd6d8	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bd6d8.json	docs/compiler-abi.md; Count the present slots and total their counts.; callers bdbf8@bdc84,bdbf8@bdc99,bdbf8@bdcce; guest pending
 0x000bd728	20	value_below_word_23	list_lookup	compiles	game	confirmed	decomp/tests/0x000bd728.json	docs/compiler-abi.md; DL (as a signed word) is below the signed word +0x23.; callers bdbf8@bdc65,f8b14@f8bb0; guest pending
@@ -2679,7 +2679,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bdd64	391			unknown	unclassified	unverified		
 0x000bdeec	780			unknown	unclassified	unverified		
 0x000be208	278			unknown	unclassified	unverified		
-0x000be320	210			unknown	unclassified	unverified		
+0x000be320	210	link_matching_entries_be320	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000be320.json	docs/compiler-abi.md; Link matching shape entries of two lists to their lookup value.; callers b0f5c@b15e4; guest pending
 0x000be3f4	68			unknown	unclassified	unverified		
 0x000be438	69	find_target_be438	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000be438.json	docs/compiler-abi.md; Find the kind-2 node of the list whose target matches the two keys and is valid.; callers be480@be526,c1438@c1781; guest pending
 0x000be480	281			unknown	unclassified	unverified		

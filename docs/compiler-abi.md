@@ -3555,3 +3555,15 @@ in EAX, format string address, one value).
 | `0xb2810` | EAX:ef_addr32,EDX:uint32_t | none | b2b00@b2cb9 | Dump a table entry and its sub-records (variant A names). |
 | `0xb28b8` | EAX:ef_addr32,EDX:uint32_t | none | b2b00@b2cd1 | Dump a table entry and its sub-records (variant B names). |
 | `0xb29a8` | EAX:ef_addr32,EDX:uint32_t | none | b2560@b26d2,b2560@b26ff,b2560@b272c | Dump a list of sub-lists. |
+
+## runtime_helpers34 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb2d8c` | EAX:ef_addr32,EDX:uint32_t | none | b2e98@b2f28 | Print one shape point record. |
+| `0xb2e98` | EAX:ef_addr32,EDX:uint32_t | none | b2e28@b2e55 | Print an object record and its point list. |
+| `0xb3b90` | EAX:ef_addr32 | EAX:uint32_t | 6b50@6b78,82e40@82e4e,830b8@830c6 | Return the payload size of a file from its header. |
+| `0xb3db0` | EAX:uint32_t | EAX:uint32_t | 6b50@6b88,6b50@6bca,bc38@bc4a | Take a block from the top of the stack pool and clear it. |
+| `0xbc1d3` | EAX:ef_addr32 | EAX:uint32_t | bc287@bc291 | Convert an fopen mode string to open flags. |
+| `0xbd5f8` | EAX:ef_addr32 | AL:uint8_t | bdbf8@bdc8d,bdbf8@bdcd7,bdbf8@bdd26 | Clear the unusable entries of a record's slot table. |
+| `0xbe320` | EAX:ef_addr32,EDX:ef_addr32 | none | b0f5c@b15e4 | Link matching shape entries of two lists to their lookup value. |
