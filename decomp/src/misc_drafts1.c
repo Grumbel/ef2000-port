@@ -9301,3 +9301,32 @@ void refresh_button_dialog_4f8a8(void)
     }
     fill_button_widgets_4f7d0();
 }
+
+/* 0xf41dc, 236 bytes. Show the splash picture NAME (EAX): clear byte 0x161e20, set byte 0x161e22, remember the request (0xf41a8), size the file "<0x191a7c with NAME>" with the hook at 0x132ab4 (falling back to the directory named by the environment variable 0x191a88 + 0x191a8c + NAME + 0x191a94, failure reported through 0x132a74 with 0x191a9c), allocate the data (0xc3f70, dword 0x485928, failure reported with 0x191ad0), load it with the hook at 0x132ab8, latch the 0x100 x 0xc8 picture rectangle (0xce328), reset the flags (0xf4178) and free the data. */
+void show_splash_picture_f41dc(uint32_t name)
+{
+    char path[0xc8];
+    uint32_t p = (uint32_t)(uintptr_t)path;
+    uint32_t size;
+    EF_U8(0x00161e20u) = 0u;
+    EF_U8(0x00161e22u) = 1u;
+    remember_request_f41a8();
+    (void)guest_sprintf_a4342(p, 0x00191a7cu, name);
+    size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), p);
+    if (size == 0u) {
+        copy_string_9d749(p, getenv_9c858(0x00191a88u));
+        strcat_9ca57(p, 0x00191a8cu);
+        strcat_9ca57(p, name);
+        strcat_9ca57(p, 0x00191a94u);
+        size = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), p);
+        if (size == 0u)
+            guest_callptr2_x(EF_U32(0x00132a74u), 0x00191a9cu, p);
+    }
+    EF_U32(0x00485928u) = guest_fn_c3f70(size);
+    if (EF_U32(0x00485928u) == 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00191ad0u);
+    guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), p, EF_U32(0x00485928u));
+    latch_values_ce328(0u, 0x13fu, 0u, 0xc7u);
+    reset_flags_f4178();
+    guest_fn_c3f80(EF_U32(0x00485928u));
+}

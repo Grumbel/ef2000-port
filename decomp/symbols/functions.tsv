@@ -3648,7 +3648,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f4178	47	reset_flags_f4178	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f4178.json	docs/compiler-abi.md; ; callers f41dc@f42af; guest pending
 0x000f41a8	27	remember_request_f41a8	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f41a8.json	docs/compiler-abi.md; With the flag set, remember the request value and refresh the cursor.; callers f41dc@f41f7; guest pending
 0x000f41c4	22	apply_request_f41c4	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f41c4.json	docs/compiler-abi.md; With the flag set, apply the saved request value.; callers a9d48@a9e20,f3f84@f3fa2; guest pending
-0x000f41dc	236			unknown	unclassified	unverified		
+0x000f41dc	236	show_splash_picture_f41dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f41dc.json	docs/compiler-abi.md; Show the splash picture NAME (EAX): clear byte 0x161e20, set byte 0x161e22, remember the request (0xf41a8), size the fil; callers a9bec@a9bf5; guest pending
 0x000f4347	367			unknown	unclassified	unverified		
 0x000f44b6	224			unknown	unclassified	unverified		
 0x000f45d8	104	read_buffered_char_f45d8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f45d8.json	docs/compiler-abi.md; Read one character from the buffer at 0x485e59 (see 0xe774).; callers f4640@f464e,f4640@f4665,f4640@f4696; guest pending

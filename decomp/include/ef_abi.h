@@ -5274,4 +5274,6 @@ void log_message_ea50c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint3
 
 void refresh_button_dialog_4f8a8(void);
 
+void show_splash_picture_f41dc(uint32_t name);
+
 #endif
