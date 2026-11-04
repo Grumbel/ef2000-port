@@ -7333,3 +7333,69 @@ void build_rotation_words_dc43e(uint32_t ebx, uint32_t esi, uint32_t edi)
     for (i = 0; i < 8u; i++)
         EF_U16(out + i * 2u) = (uint16_t)w[i];
 }
+
+/* 0xed5ea, 219 bytes. Format the 16.16 fixed-point VALUE as decimal text at BUF with the precision in dword +8 of the format record FMT (-1 selects 4): optional '-', the integer digits (0xcbd0f on the high word), '.', PREC fraction digits, then round up using bit 15 of the leftover fraction, propagating a carry through 9s. */
+void format_fixed_ed5ea(uint32_t buf, int32_t value, uint32_t fmt)
+{
+    uint32_t v = (uint32_t)value;
+    uint32_t p = buf, start, after, n;
+    uint8_t c;
+    if (value < 0) {
+        v = (uint32_t)-value;
+        EF_U8(p) = 0x2du;
+        p++;
+    }
+    if (EF_U32(fmt + 8u) == 0xffffffffu)
+        EF_U32(fmt + 8u) = 4u;
+    (void)signed_to_digits_cbd0f((int32_t)((v >> 16) & 0xffffu), p, 10u);
+    start = p;
+    while (EF_U8(p) != 0u)
+        p++;
+    after = p + 1u;
+    if (EF_U32(fmt + 8u) != 0u) {
+        EF_U8(p) = 0x2eu;
+        p = after;
+        for (n = 0; (int32_t)n < (int32_t)EF_U32(fmt + 8u); n++) {
+            v &= 0x0000ffffu;
+            v = v * 10u;
+            EF_U8(p) = (uint8_t)(((v >> 16) & 0xffu) + 0x30u);
+            p++;
+        }
+        EF_U8(p) = 0u;
+    }
+    if (v & 0x8000u) {
+        for (;;) {
+            if (p == start) {
+                EF_U8(start) = 0x31u;
+                p = start + 1u;
+                for (;;) {
+                    c = EF_U8(p);
+                    after = p + 1u;
+                    if (c != 0x30u)
+                        break;
+                    p = after;
+                }
+                if (c == 0x2eu) {
+                    EF_U8(p) = 0x30u;
+                    p = after + 1u;
+                    EF_U8(after) = c;
+                    while (EF_U8(p) == 0x30u)
+                        p++;
+                }
+                EF_U8(p) = 0x30u;
+                p++;
+                EF_U8(p) = 0u;
+                break;
+            }
+            p--;
+            if (EF_U8(p) == 0x2eu)
+                p--;
+            c = EF_U8(p);
+            if (c != 0x39u) {
+                EF_U8(p) = (uint8_t)(c + 1u);
+                break;
+            }
+            EF_U8(p) = 0x30u;
+        }
+    }
+}

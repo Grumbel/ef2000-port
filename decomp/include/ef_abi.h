@@ -5120,4 +5120,6 @@ void assign_table_slot_8fe4(uint32_t index, uint32_t table);
 
 void build_rotation_words_dc43e(uint32_t ebx, uint32_t esi, uint32_t edi);
 
+void format_fixed_ed5ea(uint32_t buf, int32_t value, uint32_t fmt);
+
 #endif

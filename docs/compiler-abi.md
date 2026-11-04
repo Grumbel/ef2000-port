@@ -6599,3 +6599,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xdc43e` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | dc519@dc528 | Implicit-register fragment (EBX, ESI, EDI = three angles; params in that order). Builds eight rotation-matrix words at 0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xed5ea` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t | none | ed6cc@ed817 | Format the 16.16 fixed-point VALUE as decimal text at BUF with the precision in dword +8 of the format record FMT (-1 se |
