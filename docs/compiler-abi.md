@@ -6319,3 +6319,13 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfe700` | none | EAX:uint32_t | cdb20@cdb97,cdc64@cdc6c | BIOS get video mode (int 10h, AH = 0xf): returns the current mode number in AL (EBX, ESI and EDI are preserved). |
 | `0xa45e4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 4050@405c,bfcc@c0f1,a9e70@a9e7e | Store the stack argument VALUE into the code-patch dword at 0xa45a4 (stdcall-style frame, ret 4). |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1111ca` | none | none | 101f44@101f67 | Set the dword at 0x17d7c0 to -1 (frame with saved registers, no arguments). |
+| `0x1111b1` | none | none | 101f08@101f38 | Compare the dword at 0x17d7c0 with -1 and do nothing either way (an empty check left over in the runtime). |
+| `0xeb2a8` | none | EAX:uint32_t | 9c1e0@9c1e3 | DOS allocate memory with the impossible request BX = 0xffff (int 21h, AH = 0x48), which fails and returns the size of th |
+| `0x111142` | EAX:uint32_t,EDX:uint32_t | none | 101ed4@101efe | DOS4G set real-mode interrupt vector (int 21h, AX = 0x2505) for interrupt number CL = NUM (low byte) with EBX = VALUE; c |
+| `0xdff4c` | none | none | none direct | Poll the serial line status register (port dword 0x15eed0 + 5): when its data-ready bit is set call the receive handler  |

@@ -6184,3 +6184,57 @@ void set_patch_dword_a45e4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
     (void)u0; (void)u1; (void)u2; (void)u3;
     EF_U32(0x000a45a4u) = value;
 }
+
+/* 0x1111ca, 23 bytes. Set the dword at 0x17d7c0 to -1 (frame with saved registers, no arguments). */
+void reset_marker_1111ca(void)
+{
+    EF_U32(0x0017d7c0u) = 0xffffffffu;
+}
+
+/* 0x1111b1, 25 bytes. Compare the dword at 0x17d7c0 with -1 and do nothing either way (an empty check left over in the runtime). */
+void check_marker_1111b1(void)
+{
+    (void)EF_U32(0x0017d7c0u);
+}
+
+/* 0xeb2a8, 24 bytes. DOS allocate memory with the impossible request BX = 0xffff (int 21h, AH = 0x48), which fails and returns the size of the largest free block in BX: returns that paragraph count. */
+uint32_t largest_free_block_eb2a8(void)
+{
+    uint32_t in[7];
+    uint32_t out[7];
+    uint8_t sregs[12];
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    in[0] = 0x4800u;
+    in[1] = 0xffffu;
+    in[2] = 0u;
+    in[3] = 0u;
+    in[4] = 0u;
+    in[5] = 0u;
+    in[6] = 0u;
+    guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+    return out[1] & 0xffffu;
+}
+
+/* 0x111142, 26 bytes. DOS4G set real-mode interrupt vector (int 21h, AX = 0x2505) for interrupt number CL = NUM (low byte) with EBX = VALUE; cdecl. */
+void set_rm_vector_111142(uint32_t num, uint32_t value)
+{
+    uint32_t in[7];
+    uint32_t out[7];
+    uint8_t sregs[12];
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    in[0] = 0x2505u;
+    in[1] = value;
+    in[2] = num & 0xffu;
+    in[3] = 0u;
+    in[4] = 0u;
+    in[5] = 0u;
+    in[6] = 0u;
+    guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+}
+
+/* 0xdff4c, 24 bytes. Poll the serial line status register (port dword 0x15eed0 + 5): when its data-ready bit is set call the receive handler 0xdfac8. */
+void poll_serial_dff4c(void)
+{
+    if (guest_fn_9c430(EF_U32(0x0015eed0u) + 5u) & 1u)
+        guest_fn_dfac8_x();
+}

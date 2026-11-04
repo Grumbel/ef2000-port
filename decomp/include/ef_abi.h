@@ -5004,4 +5004,11 @@ void init_event_record_bb324(uint32_t rec, uint32_t kind, uint32_t arg);
 uint32_t get_video_mode_fe700(void);
 void set_patch_dword_a45e4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
 
+void reset_marker_1111ca(void);
+void check_marker_1111b1(void);
+uint32_t largest_free_block_eb2a8(void);
+void set_rm_vector_111142(uint32_t num, uint32_t value);
+void poll_serial_dff4c(void);
+void guest_fn_dfac8_x(void); /* 0xdfac8 */
+
 #endif

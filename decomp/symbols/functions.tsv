@@ -3301,7 +3301,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000df7b4	786			unknown	unclassified	unverified		
 0x000dfac8	1008			unknown	unclassified	unverified		
 0x000dfeb8	145			unknown	unclassified	unverified		
-0x000dff4c	24			unknown	unclassified	unverified		
+0x000dff4c	24	poll_serial_dff4c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dff4c.json	docs/compiler-abi.md; Poll the serial line status register (port dword 0x15eed0 + 5): when its data-ready bit is set call the receive handler ; callers none direct; guest pending
 0x000e06ac	77			unknown	unclassified	unverified		
 0x000e0870	111	fill_channel_e0870	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e0870.json	docs/compiler-abi.md; Fill the channel record selected by byte 0x15f07f.; callers e1194@e1194; guest pending
 0x000e0930	81			unknown	unclassified	unverified		
@@ -3505,7 +3505,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb25a	24	switch_page_eb25a	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000eb25a.json	docs/compiler-abi.md; Run the two page callbacks, then the page switch for the argument.; callers 9bd20@9bd65,eb448@eb471; guest pending
 0x000eb272	22	switch_page_eb272	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000eb272.json	docs/compiler-abi.md; Run the page callback pair, then hand the argument to 0x20d.; callers eb25a@eb26b; guest pending
 0x000eb288	32			unknown	unclassified	unverified		
-0x000eb2a8	24			unknown	unclassified	unverified		
+0x000eb2a8	24	largest_free_block_eb2a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eb2a8.json	docs/compiler-abi.md; DOS allocate memory with the impossible request BX = 0xffff (int 21h, AH = 0x48), which fails and returns the size of th; callers 9c1e0@9c1e3; guest pending
 0x000eb2c0	99	format_and_enter_eb2c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eb2c0.json	docs/compiler-abi.md; Printf-style message (cdecl, FORMAT and varargs on the stack) formatted into a 0x280-byte buffer, then, if the counter b; callers 510@572,628@647,628@65a; guest pending
 0x000eb35c	24	check_error_flag_eb35c	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000eb35c.json	docs/compiler-abi.md; Abort with the stored message when the error flag is set.; callers dc250@dc250,dc280@dc281; guest pending
 0x000eb374	87	compare_nocase_eb374	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000eb374.json	docs/compiler-abi.md; Case-insensitive compare of up to n bytes.; callers 9c858@9c88a,103f04@104091,103f04@1040b9; guest pending
@@ -4062,9 +4062,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00110fd4	241			unknown	unclassified	unverified		
 0x001110c5	83			unknown	unclassified	unverified		
 0x00111118	42			unknown	unclassified	unverified		
-0x00111142	26			unknown	unclassified	unverified		
-0x001111b1	25			unknown	unclassified	unverified		
-0x001111ca	23			unknown	unclassified	unverified		
+0x00111142	26	set_rm_vector_111142	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00111142.json	docs/compiler-abi.md; DOS4G set real-mode interrupt vector (int 21h, AX = 0x2505) for interrupt number CL = NUM (low byte) with EBX = VALUE; c; callers 101ed4@101efe; guest pending
+0x001111b1	25	check_marker_1111b1	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111b1.json	docs/compiler-abi.md; Compare the dword at 0x17d7c0 with -1 and do nothing either way (an empty check left over in the runtime).; callers 101f08@101f38; guest pending
+0x001111ca	23	reset_marker_1111ca	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111ca.json	docs/compiler-abi.md; Set the dword at 0x17d7c0 to -1 (frame with saved registers, no arguments).; callers 101f44@101f67; guest pending
 0x001111e1	4			unknown	unclassified	unverified		
 0x001111e5	21			unknown	unclassified	unverified		
 0x0011124c	161			unknown	unclassified	unverified		
