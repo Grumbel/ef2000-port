@@ -5214,4 +5214,6 @@ uint32_t alloc_zeroed_cc6c0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
 
 void flush_pending_slots_112808(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj);
 
+void read_script_line_f4640(void);
+
 #endif

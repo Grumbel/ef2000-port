@@ -3652,7 +3652,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f4347	367			unknown	unclassified	unverified		
 0x000f44b6	224			unknown	unclassified	unverified		
 0x000f45d8	104	read_buffered_char_f45d8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f45d8.json	docs/compiler-abi.md; Read one character from the buffer at 0x485e59 (see 0xe774).; callers f4640@f464e,f4640@f4665,f4640@f4696; guest pending
-0x000f4640	138			unknown	unclassified	unverified		
+0x000f4640	138	read_script_line_f4640	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f4640.json	docs/compiler-abi.md; Read the next significant script line into the buffer at 0x4859e0: leading spaces/tabs are skipped, characters are store; callers none direct; guest pending
 0x000f46cc	190	read_next_command_token	unk_cli	typed	game	confirmed		docs/compiler-abi.md; token into 0x485e08; 16-bit cursor at 0x161eac
 0x000f478c	100	run_matching_handler_f478c	runtime_helpers29	compiles	game	confirmed	decomp/tests/0x000f478c.json	docs/compiler-abi.md; Run the handler of the table entry whose name matches the current one.; callers f4a88@f4b2a,f4bdc@f4c06,f4c60@f4c91; guest pending
 0x000f4a88	337	run_top_script_f4a88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f4a88.json	docs/compiler-abi.md; Start the script section at the top level: push a fresh node (0xf57d4), set its default view words (+0x4f/+0x51 = 0x14, ; callers f478c@f47bb; guest pending

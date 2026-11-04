@@ -8492,3 +8492,32 @@ void flush_pending_slots_112808(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
     if (posted != 0u && tail_jump_102020(0u) == 0u)
         trace_call_101ff4(3u);
 }
+
+/* 0xf4640, 138 bytes. Read the next significant script line into the buffer at 0x4859e0: leading spaces/tabs are skipped, characters are stored up to a NUL or newline (a line longer than 0x400 reports 0x191c38 through the pointer at 0x132a74), the line counter dword 0x161ea8 is advanced, and comment lines (first byte ';') and empty lines that did not end the input are skipped. Word 0x161eac is cleared first. */
+void read_script_line_f4640(void)
+{
+    uint32_t idx;
+    uint8_t c, first;
+    EF_U16(0x00161eacu) = 0u;
+    for (;;) {
+        idx = 0u;
+        c = read_buffered_char_f45d8();
+        while (c == 0x20u || c == 0x9u)
+            c = read_buffered_char_f45d8();
+        while (c != 0u && c != 0xau) {
+            if ((int32_t)idx >= 0x400)
+                guest_callptr1_x(EF_U32(0x00132a74u), 0x00191c38u);
+            EF_U8(0x004859e0u + idx) = c;
+            idx++;
+            c = read_buffered_char_f45d8();
+        }
+        EF_U8(0x004859e0u + idx) = 0u;
+        EF_U32(0x00161ea8u) = EF_U32(0x00161ea8u) + 1u;
+        first = EF_U8(0x004859e0u);
+        if (first == 0x3bu)
+            continue;
+        if (first == 0u && c != 0u)
+            continue;
+        break;
+    }
+}
