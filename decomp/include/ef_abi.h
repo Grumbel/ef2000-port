@@ -5877,4 +5877,6 @@ void assign_slot_68a60(int32_t slot, int32_t value);
 
 void copy_view_state_6b620(uint32_t ax);
 
+void age_effect_nodes_288c8(void);
+
 #endif

@@ -16668,3 +16668,38 @@ void copy_view_state_6b620(uint32_t ax)
 	EF_U32(unit + 0x148u) = EF_U32(0x001f7018u);
 	EF_U32(unit + 0x14cu) = EF_U32(0x001f701cu);
 }
+
+/* 0x288c8, 225 bytes. Age the list of effect nodes at dword 0x19b8c4 (next link +0xa; position words +0, +2, +4, kind word +6, age word +8). Each node's age is incremented and capped at 7; a node within 10000 (largest axis difference, 0x2888c) of the viewer position (dwords 0x21444c, 0x214448, 0x214450) is published in the effect globals 0x15bde0 (kind), 0x15bde4 (age), 0x15bde8, 0x15bdec, 0x15bdf0 (position), dword 0x15bddc is cleared, 0x15be0c set to 100 and the effect is started (0x15be10). Afterwards nodes at the head of the list whose age is 7 are freed (0x28a34). */
+void age_effect_nodes_288c8(void)
+{
+	uint32_t node, head;
+
+	node = EF_U32(0x0019b8c4u);
+	if (node == 0u)
+		return;
+	do {
+		EF_U16(node + 8u) = (uint16_t)(EF_U16(node + 8u) + 1u);
+		if (((int32_t)EF_U32(node + 6u) >> 16) > 7)
+			EF_U16(node + 8u) = 7u;
+		if ((int32_t)max_magnitude_2888c((uint32_t)((int32_t)(int16_t)EF_U16(node) - (int32_t)EF_U32(0x0021444cu)),
+		    (uint32_t)((int32_t)(int16_t)EF_U16(node + 2u) - (int32_t)EF_U32(0x00214448u)),
+		    (uint32_t)((int32_t)(int16_t)EF_U16(node + 4u) - (int32_t)EF_U32(0x00214450u))) < 10000) {
+			EF_U32(0x0015bde0u) = (uint32_t)(int32_t)(int16_t)EF_U16(node + 6u);
+			EF_U32(0x0015bde4u) = (uint32_t)(int32_t)(int16_t)EF_U16(node + 8u);
+			EF_U32(0x0015bde8u) = (uint32_t)(int32_t)(int16_t)EF_U16(node);
+			EF_U32(0x0015bdecu) = (uint32_t)(int32_t)(int16_t)EF_U16(node + 2u);
+			EF_U32(0x0015bdf0u) = (uint32_t)(int32_t)(int16_t)EF_U16(node + 4u);
+			EF_U32(0x0015bddcu) = 0u;
+			EF_U32(0x0015be0cu) = 100u;
+			guest_fn_15be10_x();
+		}
+		node = EF_U32(node + 0xau);
+	} while (node != 0u);
+	head = EF_U32(0x0019b8c4u);
+	if (((int32_t)EF_U32(head + 6u) >> 16) != 7)
+		return;
+	do {
+		free_list_node_28a34();
+		head = EF_U32(0x0019b8c4u);
+	} while (head != 0u && ((int32_t)EF_U32(head + 6u) >> 16) == 7);
+}

@@ -8344,3 +8344,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6b620` | EAX:uint32_t | none | 6b6c8@6bc73 | Copy the pending view state into unit AX (signed): dwords 0x1f71b0/0x1f71b4 to +0x91/+0x95, 0x12850c/0x128510 to +0x16f/ |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x288c8` | none | none | 3dd30@3e1e9 | Age the list of effect nodes at dword 0x19b8c4 (next link +0xa; position words +0, +2, +4, kind word +6, age word +8). E |

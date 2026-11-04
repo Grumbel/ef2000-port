@@ -412,7 +412,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000287bc	114	open_named_file_287bc	list_ops1	compiles	game	confirmed	decomp/tests/0x000287bc.json	docs/compiler-abi.md; Build a file name from a format (one of two, chosen by 0x15ee9a), open it, and if that succeeds run 0xab47c and close th; callers 284ec@28571; guest pending
 0x00028830	90	init_chain_28830	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00028830.json	docs/compiler-abi.md; Reset the ten 14-byte entries at 0x19b8d0 and chain them.; callers 3cfc0@3d1bb; guest pending
 0x0002888c	60	max_magnitude_2888c	game_helpers7	compiles	game	confirmed	decomp/tests/0x0002888c.json	docs/compiler-abi.md; Largest of three magnitudes (via cf94a).; callers 288c8@28917; guest pending
-0x000288c8	225			unknown	unclassified	unverified		
+0x000288c8	225	age_effect_nodes_288c8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000288c8.json	docs/compiler-abi.md; Age the list of effect nodes at dword 0x19b8c4 (next link +0xa; position words +0, +2, +4, kind word +6, age word +8). E; callers 3dd30@3e1e9; guest pending
 0x00028a34	57	free_list_node_28a34	game_helpers5	compiles	game	confirmed	decomp/tests/0x00028a34.json	docs/compiler-abi.md; Move the head of the used list to the free list.; callers 288c8@28988; guest pending
 0x00028a70	25	filtered_object_has_link	low_helpers	compiles	game	confirmed	decomp/tests/0x00028a70.json	docs/compiler-abi.md; filtered lookup; dword +0x1c nonzero; callers 28ed8@28f8a; guest pending
 0x00028a8c	25	object_has_link	low_helpers	compiles	game	confirmed	decomp/tests/0x00028a8c.json	docs/compiler-abi.md; 0x8ffe8 lookup; dword +0x1c nonzero; callers 291fc@292e2,291fc@29347; guest pending
