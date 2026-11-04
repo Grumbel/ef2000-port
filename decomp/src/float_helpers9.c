@@ -177,3 +177,34 @@ void fdiv_bug_probe_11016c(void)
             EF_U8(0x001631f0u) = (uint8_t)(EF_U8(0x001631f0u) | 1u);
     }
 }
+
+/* 0x10a078, 90 bytes. Build a segment record at EAX from the record at EDX: copy the doubles at +0x20/+0x30/+0x38, zero the first 8 bytes and linearly interpolate the doubles at +0x10 and +0x18 between the endpoints at +0x30 and +0x38 over the extent [+0, +0x20]. */
+void build_segment_record_10a078(uint32_t dst, uint32_t src)
+{
+    double x0 = EF_F64(src);
+    double x1 = EF_F64(src + 0x20u);
+    EF_U32(dst + 0x20u) = EF_U32(src + 0x20u);
+    EF_U32(dst + 0x24u) = EF_U32(src + 0x24u);
+    EF_U32(dst + 0x30u) = EF_U32(src + 0x30u);
+    EF_U32(dst + 0x34u) = EF_U32(src + 0x34u);
+    EF_F64(dst + 0x38u) = EF_F64(src + 0x38u);
+    EF_U32(dst) = 0u;
+    EF_U32(dst + 4u) = 0u;
+    EF_F64(dst + 0x10u) = ((EF_F64(src + 0x10u) - EF_F64(src + 0x30u)) * x1) / (x1 - x0) + EF_F64(src + 0x30u);
+    EF_F64(dst + 0x18u) = ((EF_F64(src + 0x18u) - EF_F64(src + 0x38u)) * x1) / (x1 - x0) + EF_F64(src + 0x38u);
+}
+
+/* 0x10a1c4, 86 bytes. Derive the coefficient record at EAX from the parameters at EDX (doubles s[0]=+0, s[1]=+8, s[2]=+0x10): +0 = s2 * k1, +8 = f(s2) * k2 (f = 0xb3fd0), +0x18 = k2 * s2 * s1 + s2 * k3 * s0, +0x20 = (s1 + s0) / [+0], +0x10 = [+8] * s0. */
+void derive_coefficients_10a1c4(uint32_t dst, uint32_t src)
+{
+    double s0 = EF_F64(src);
+    double s1 = EF_F64(src + 8u);
+    double s2 = EF_F64(src + 0x10u);
+    double r;
+    EF_F64(dst) = s2 * EF_F64(0x001950d0u);
+    r = guest_fn_b3fd0_x(s2);
+    EF_F64(dst + 8u) = r * EF_F64(0x001950d8u);
+    EF_F64(dst + 0x18u) = EF_F64(0x001950d8u) * s2 * s1 + s2 * EF_F64(0x001950e0u) * s0;
+    EF_F64(dst + 0x20u) = (s1 + s0) / EF_F64(dst);
+    EF_F64(dst + 0x10u) = EF_F64(dst + 8u) * s0;
+}

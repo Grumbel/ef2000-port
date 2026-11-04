@@ -4593,4 +4593,9 @@ void fdiv_bug_probe_11016c(void);
 double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
 double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
 
+void build_segment_record_10a078(uint32_t dst, uint32_t src);
+void derive_coefficients_10a1c4(uint32_t dst, uint32_t src);
+double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
+double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
+
 #endif

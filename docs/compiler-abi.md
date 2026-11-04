@@ -5508,3 +5508,10 @@ in EAX, format string address, one value).
 | `0x1198ec` | none | none | 1196a0@1196aa | Combine the double globals: 0x432a70 = g[432ae0] * g[432948] * g[432908] + g[432c48] * g[432ac8]; 0x432b38 = g[432da0] * |
 | `0x11af14` | EAX:double | EAX:double | 11b134@11b146,11b3c8@11b3dc,11bc40@11bc52 | (ret 8) r = f(a) (0xb3fd0); for /a/ > 1 add the constant at 0x1957fc, otherwise use 1 - r; return the 0xa4470 transform  |
 | `0x11016c` | none | none | none direct | Pentium FDIV bug probe: when the CPU level 0x13719d is at least 3, compute 4195835 - (4195835 / 3145727) * 3145727 and s |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10a078` | EAX:uint32_t,EDX:uint32_t | none | 109ec0@109ecc | Build a segment record at EAX from the record at EDX: copy the doubles at +0x20/+0x30/+0x38, zero the first 8 bytes and  |
+| `0x10a1c4` | EAX:uint32_t,EDX:uint32_t | none | 109ec0@10a025 | Derive the coefficient record at EAX from the parameters at EDX (doubles s[0]=+0, s[1]=+8, s[2]=+0x10): +0 = s2 * k1, +8 |
