@@ -9409,3 +9409,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc4565` | EAX:uint32_t | EAX:uint32_t | 16000c@16004f | Implicit-register fragment (ESI is an in/out pointer): save ESP at 0x159064, copy the camera state words and the 3x3 mat |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10dfec` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | none | eab44@eab8d,eac48@ead16 | Decode four byte planes from a run list: for each plane P (0..3, destination base DST + P) read a word run count, then p |

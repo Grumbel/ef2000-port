@@ -22791,3 +22791,30 @@ uint32_t setup_rotation_c4565(uint32_t *esi)
 	EF_U16(0x15912cu) = (uint16_t)((uint32_t)out[2] >> 16);
 	return dispatch_word_c5e56(esi);
 }
+
+/* 0x10dfec, 161 bytes. Decode four byte planes from a run list: for each plane P (0..3, destination base DST + P) read a word run count, then per run a skip (words, scaled by 4 bytes) and a word count, and split that many source words into DST with 0x10e08d (low byte at DST, high byte at DST + 4, 8 bytes per word). The destination and source pointers advance as in the original (EDI by 8 per word, ESI by 2 per word). */
+void decode_planes_10dfec(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 dst, ef_addr32 src)
+{
+	uint32_t plane;
+
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	for (plane = 0; plane < 4u; plane++) {
+		uint32_t edi = dst + plane;
+		uint32_t runs = EF_U16(src);
+
+		src += 2u;
+		while (runs != 0u) {
+			uint32_t skip = EF_U16(src);
+			uint32_t count;
+
+			src += 2u;
+			edi += skip << 2;
+			count = EF_U16(src);
+			src += 2u;
+			split_words_10e08d(src, edi, count);
+			src += count * 2u;
+			edi += count * 8u;
+			runs--;
+		}
+	}
+}
