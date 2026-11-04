@@ -4873,4 +4873,6 @@ void blend_palette_757bc(int32_t t, uint32_t to, uint32_t from, uint32_t dest, u
 
 void register_ranges_111c90(void);
 
+void randomize_pilot_779f4(uint32_t obj);
+
 #endif

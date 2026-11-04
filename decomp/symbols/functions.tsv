@@ -1410,7 +1410,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007775c	152	collect_marked_objects_7775c	game_helpers33	compiles	game	confirmed	decomp/tests/0x0007775c.json	docs/compiler-abi.md; Collect the level-0x20 objects into a new table when the marker word is -1.; callers 49228@49b48; guest pending
 0x000777f4	339			unknown	unclassified	unverified		
 0x00077950	41	lookup_by_word_checked	mid_helpers	compiles	game	confirmed	decomp/tests/0x00077950.json	docs/compiler-abi.md; 0xa1a90(sx DX, 0xa1a40()) unless null, 0 or 0xffff; callers 8748@8823,8748@8855,8748@88ec; guest pending
-0x000779f4	264			unknown	unclassified	unverified		
+0x000779f4	264	randomize_pilot_779f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000779f4.json	docs/compiler-abi.md; Randomise the pilot record OBJ: a random 1-in-3 (word / 0x3333 equal to 1) picks the first name table (flag +0x34 = 1) i; callers be48@be5f,be8c@beab,bed8@bef9; guest pending
 0x00077afc	36	lookup_table_by_quotient	marker_packets	compiles	game	confirmed	decomp/tests/0x00077afc.json	docs/compiler-abi.md; EAX = dword table 0x12a760[0xa45b3() word / 0x230]; sole direct caller 779f4@77a35; guest pending
 0x00077b20	36	random_table_77b20	mid_helpers	compiles	game	confirmed	decomp/tests/0x00077b20.json	docs/compiler-abi.md; dword table 0x12a934[selector word / 0x666]; callers 779f4@77a1c; guest pending
 0x00077b44	36	random_table_77b44	mid_helpers	compiles	game	confirmed	decomp/tests/0x00077b44.json	docs/compiler-abi.md; dword table 0x12a9d4[selector word / 0x333]; callers 779f4@77a51; guest pending

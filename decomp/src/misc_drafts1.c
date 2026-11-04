@@ -4745,3 +4745,31 @@ void register_ranges_111c90(void)
         stack_range_104908(words[i], 4u);
     EF_U32(0x0017e25cu) = 1u;
 }
+
+/* 0x779f4, 264 bytes. Randomise the pilot record OBJ: a random 1-in-3 (word / 0x3333 equal to 1) picks the first name table (flag +0x34 = 1) instead of the second, and the strings of the name tables are copied to +0, +0x24, +0xc and +0x18; +0x32 = 3, the counters +0x35/37/39 and bytes +0x3b/3c are cleared, +0x33 = 0x14 + random / 0xa3d and the words +0x3d/3f/41 get random / 0x1111. */
+void randomize_pilot_779f4(uint32_t obj)
+{
+    uint32_t t;
+    if ((guest_fn_a45b3() & 0xffffu) / 0x3333u == 1u) {
+        EF_U8(obj + 0x34u) = 1u;
+        copy_string_9d749(obj, random_table_77b20());
+        t = random_table_77bb0();
+    } else {
+        EF_U8(obj + 0x34u) = 0u;
+        copy_string_9d749(obj, lookup_table_by_quotient());
+        t = random_table_77b8c();
+    }
+    copy_string_9d749(obj + 0x24u, t);
+    copy_string_9d749(obj + 0xcu, random_table_77b44());
+    copy_string_9d749(obj + 0x18u, random_table_77b68());
+    EF_U8(obj + 0x32u) = 3u;
+    EF_U16(obj + 0x35u) = 0u;
+    EF_U16(obj + 0x37u) = 0u;
+    EF_U16(obj + 0x39u) = 0u;
+    EF_U8(obj + 0x3bu) = 0u;
+    EF_U8(obj + 0x3cu) = 0u;
+    EF_U8(obj + 0x33u) = (uint8_t)((guest_fn_a45b3() & 0xffffu) / 0xa3du + 0x14u);
+    EF_U16(obj + 0x3du) = (uint16_t)((guest_fn_a45b3() & 0xffffu) / 0x1111u);
+    EF_U16(obj + 0x3fu) = (uint16_t)((guest_fn_a45b3() & 0xffffu) / 0x1111u);
+    EF_U16(obj + 0x41u) = (uint16_t)((guest_fn_a45b3() & 0xffffu) / 0x1111u);
+}

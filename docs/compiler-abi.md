@@ -6062,3 +6062,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x111c90` | none | none | 1133f8@1133fe | One-time registration (flag 0x17e25c) of the data ranges of this module: the code range 0x111c90..0x114ad8 through 0x104 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x779f4` | EAX:uint32_t | none | be48@be5f,be8c@beab,bed8@bef9 | Randomise the pilot record OBJ: a random 1-in-3 (word / 0x3333 equal to 1) picks the first name table (flag +0x34 = 1) i |
