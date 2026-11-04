@@ -4618,3 +4618,11 @@ in EAX, format string address, one value).
 | `0x3d308` | [ESP+4]:int32_t,[ESP+8]:int32_t,[ESP+12]:ef_addr32 | none | 3d4b0@3d55e,3d4b0@3d576,3d4b0@3d592 | Draw a formatted string at character cell (col, row) with a one-pixel shadow: col * 8, row * 9 pixels (cdecl, variadic). |
 | `0xebb10` | EAX:uint32_t,EDX:ef_addr32,EBX:ef_addr32 | AL:uint8_t | 9cc28@9cc4a,9cc28@9cc6e | Read an entry's block: find the directory entry for the key in the context, seek the context's handle to the entry posit |
 | `0xbeebc` | EAX:ef_addr32,DX:int16_t,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t | EAX:uint32_t | bc610@bc793 | Run 0xbed1c once for every entry of a list (count from 0xbc5d0), passing the index as a byte in EBX and forwarding the other arguments; returns the last result|
+
+## game_helpers131 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x48bb0` | [ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:int32_t,[ESP+16]:int32_t,[ESP+20]:ef_addr32 | none | 11e7c@1212b,150d4@15175,1e7c0@1eab1 | Draw a formatted string at (x, y) with the renderer chosen by mode (1: 0x15a14, 2: 0xe5db4, otherwise 0xe605c); the firs |
+| `0x7e01c` | AX:int16_t,DX:int16_t | none | 7e0a4@7e13f,7e0a4@7e1b5 | Position the numbered child widgets of the container at 0x188034: hide children "0".."8" at (0, 0), then place children  |
+| `0x97d10` | AX:int16_t,DX:int16_t,BX:int16_t,CX:int16_t | none | 97dcc@97ea1 | Set the view origin to the centre of the box (x1, x2, y1, y2), latch its corners and run the 0xdc71b / 0xcdf48 box updat |

@@ -71,3 +71,53 @@ uint32_t for_each_entry_beebc(ef_addr32 a, int16_t arg2, ef_addr32 list, ef_addr
     }
     return result;
 }
+
+/* 0x48bb0, 131 bytes. Draw a formatted string at (x, y) with the renderer chosen by mode (1: 0x15a14, 2: 0xe5db4, otherwise 0xe605c); the first argument is a colour byte (cdecl, variadic). */
+void draw_formatted_text_mode_48bb0(uint32_t color, uint32_t mode, int32_t x, int32_t y, ef_addr32 fmt, ...)
+{
+    char buf[0x50];
+    va_list ap;
+
+    va_start(ap, fmt);
+    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    va_end(ap);
+    if ((uint8_t)mode == 1)
+        guest_fn_15a14_x(color & 0xffu, (int16_t)x, (int16_t)y, (uint32_t)(uintptr_t)buf);
+    else if ((uint8_t)mode == 2)
+        guest_fn_e5db4_x(color & 0xffu, (int16_t)x, (int16_t)y, (uint32_t)(uintptr_t)buf);
+    else
+        guest_fn_e605c_x(color & 0xffu, (int16_t)x, (int16_t)y, (uint32_t)(uintptr_t)buf);
+}
+
+/* 0x7e01c, 136 bytes. Position the numbered child widgets of the container at 0x188034: hide children "0".."8" at (0, 0), then place children "lo".."hi" at (0x15, 0xf). */
+void place_numbered_widgets_7e01c(int16_t lo, int16_t hi)
+{
+    ef_addr32 container = find_named_or_abort_a46cc(0x00188034u);
+    char name[8];
+    int16_t i;
+
+    for (i = 0; i <= 8; i++) {
+        signed_to_digits_cbd0f(i, (uint32_t)(uintptr_t)name, 10u);
+        move_widget_a74bc(find_widget_checked_a78bc(container, (uint32_t)(uintptr_t)name), 0, 0);
+    }
+    for (i = lo; hi >= i; i++) {
+        signed_to_digits_cbd0f(i, (uint32_t)(uintptr_t)name, 10u);
+        move_widget_a74bc(find_widget_checked_a78bc(container, (uint32_t)(uintptr_t)name), 0x15, 0xf);
+    }
+}
+
+/* 0x97d10, 125 bytes. Set the view origin to the centre of the box (x1, x2, y1, y2), latch its corners and run the 0xdc71b / 0xcdf48 box updates. */
+void update_box_view_97d10(int16_t x1, int16_t x2, int16_t y1, int16_t y2)
+{
+    int32_t a = x1;
+    int32_t b = x2;
+    int32_t c = y1;
+    int32_t d = y2;
+    int32_t mid_x = (a + b) / 2;
+    int32_t mid_y = (c + d) / 2;
+
+    set_view_origin_dc21c((uint32_t)d, (uint32_t)b, (uint32_t)(int32_t)(int16_t)mid_y, (uint32_t)(int32_t)(int16_t)mid_x);
+    guest_fn_ce328_w(a, b, c, d);
+    guest_fn_dc71b_x((uint32_t)(int32_t)(int16_t)mid_y, (uint32_t)d, (uint32_t)c, (uint32_t)b, (uint32_t)a);
+    guest_fn_cdf48((uint32_t)a, (uint32_t)b, (uint32_t)c, (uint32_t)d);
+}

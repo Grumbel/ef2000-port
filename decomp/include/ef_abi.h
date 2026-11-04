@@ -4024,4 +4024,12 @@ uint32_t for_each_entry_beebc(ef_addr32 a, int16_t arg2, ef_addr32 list, ef_addr
 ef_addr32 guest_fn_eb520_x(uint32_t key, ef_addr32 ctx); /* 0xeb520 EAX/EDX */
 uint32_t guest_fn_bed1c_x(ef_addr32 a, uint32_t arg2, uint32_t index, ef_addr32 list, ef_addr32 arg4, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0xbed1c EAX/EDX/EBX/ECX + 6 stack */
 
+void draw_formatted_text_mode_48bb0(uint32_t color, uint32_t mode, int32_t x, int32_t y, ef_addr32 fmt, ...);
+void place_numbered_widgets_7e01c(int16_t lo, int16_t hi);
+void update_box_view_97d10(int16_t x1, int16_t x2, int16_t y1, int16_t y2);
+void guest_fn_15a14_x(uint32_t color, int16_t x, int16_t y, ef_addr32 text); /* 0x15a14 EAX/EDX/EBX/ECX */
+void guest_fn_e5db4_x(uint32_t color, int16_t x, int16_t y, ef_addr32 text); /* 0xe5db4 EAX/EDX/EBX/ECX */
+void guest_fn_e605c_x(uint32_t color, int16_t x, int16_t y, ef_addr32 text); /* 0xe605c EAX/EDX/EBX/ECX */
+void guest_fn_dc71b_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0xdc71b stack */
+
 #endif

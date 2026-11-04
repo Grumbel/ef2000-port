@@ -829,7 +829,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00048848	175	share_link_48848	game_helpers38	compiles	game	confirmed	decomp/tests/0x00048848.json	docs/compiler-abi.md; Like 0x48798 with modes 6 and 7; the flag test comes first.; callers 46454@46de1,46454@46dfb; guest pending
 0x000488f8	99	set_unit_mode_488f8	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x000488f8.json	docs/compiler-abi.md; Store a mode byte in unit AX and send the matching request.; callers 857bc@85933; guest pending
 0x00048ae8	140	classify_entry_48ae8	game_helpers17	compiles	game	confirmed	decomp/tests/0x00048ae8.json	docs/compiler-abi.md; Classify an entry: 0/1 for ordinary, 2 for kind 2, logs unknown kinds.; callers 77c90@77dff; guest pending
-0x00048bb0	131			unknown	unclassified	unverified		
+0x00048bb0	131	draw_formatted_text_mode_48bb0	game_helpers131	compiles	game	confirmed	decomp/tests/0x00048bb0.json	docs/compiler-abi.md; Draw a formatted string at (x, y) with the renderer chosen by mode (1: 0x15a14, 2: 0xe5db4, otherwise 0xe605c); the firs; callers 11e7c@1212b,150d4@15175,1e7c0@1eab1; guest pending
 0x00048c34	91	formatted_text_width_48c34	game_helpers131	compiles	game	confirmed	decomp/tests/0x00048c34.json	docs/compiler-abi.md; Width of a formatted string: mode 1 uses the proportional font width, mode 2 six pixels per character, anything else eig; callers 11e7c@11f84,11e7c@12067,150d4@1513c; guest pending
 0x00048c90	201			unknown	unclassified	unverified		
 0x00048d5c	68			unknown	unclassified	unverified		
@@ -1497,7 +1497,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007d1f0	263	AcceptCustom		named	unclassified	unverified		
 0x0007d2f8	2916			unknown	unclassified	unverified		
 0x0007de5c	446	simSyncSlots		named	unclassified	unverified		
-0x0007e01c	136			unknown	unclassified	unverified		
+0x0007e01c	136	place_numbered_widgets_7e01c	game_helpers131	compiles	game	confirmed	decomp/tests/0x0007e01c.json	docs/compiler-abi.md; Position the numbered child widgets of the container at 0x188034: hide children "0".."8" at (0, 0), then place children ; callers 7e0a4@7e13f,7e0a4@7e1b5; guest pending
 0x0007e0a4	516	simNextFlight		named	unclassified	unverified		
 0x0007e2a8	749			unknown	unclassified	unverified		
 0x0007e5a0	205	claim_players_7e5a0	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e5a0.json	docs/compiler-abi.md; Mark unowned players as ours and resend until all players answer or time runs out.; callers 7e758@7e75a; guest pending
@@ -1963,7 +1963,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00097a94	131	apply_camera_record_97a94	game_helpers32	compiles	game	confirmed	decomp/tests/0x00097a94.json	docs/compiler-abi.md; Apply a 78-byte camera record through 0xa0ea8 and 0x9e0c4.; callers 97b18@97b51; guest pending
 0x00097b18	71			unknown	unclassified	unverified		
 0x00097ca8	102	read_camera_record_97ca8	game_helpers32	compiles	game	confirmed	decomp/tests/0x00097ca8.json	docs/compiler-abi.md; Copy the current 78-byte camera record to six output pointers.; callers 97064@970f1,97064@971c2; guest pending
-0x00097d10	125			unknown	unclassified	unverified		
+0x00097d10	125	update_box_view_97d10	game_helpers131	compiles	game	confirmed	decomp/tests/0x00097d10.json	docs/compiler-abi.md; Set the view origin to the centre of the box (x1, x2, y1, y2), latch its corners and run the 0xdc71b / 0xcdf48 box updat; callers 97dcc@97ea1; guest pending
 0x00097d90	48	draw_pair_97d90	scene_helpers	compiles	game	confirmed	decomp/tests/0x00097d90.json	docs/compiler-abi.md; 0xe30e0(0,x+1,y+1,EBX) and (6,x,y,EBX); callers 97dcc@97f1d; guest pending
 0x00097dc0	11	sample_tick_counter	misc_state	compiles	game	confirmed	decomp/tests/0x00097dc0.json	docs/compiler-abi.md; 0x10640 then return dword 0x197c14; callers 97dcc@97edb,97dcc@97f27; guest pending
 0x00097dcc	412			unknown	unclassified	unverified		
