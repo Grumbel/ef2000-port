@@ -4038,7 +4038,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011016c	82			unknown	unclassified	unverified		
 0x001101be	30			unknown	unclassified	unverified		
 0x001101e3	5			unknown	unclassified	unverified		
-0x001101e8	102			unknown	unclassified	unverified		
+0x001101e8	102	translate_key_1101e8	key_helpers1	compiles	game	confirmed	decomp/tests/0x001101e8.json	docs/compiler-abi.md; Store a key code, then translate it (via a table at 0x17d5a8 for plain keys, or its high byte for extended codes) and st; callers fa4a9@fa560,fa95f@fa98b,fe541@fe555; guest pending
 0x0011024e	85	lookup_slot_11024e	runtime_libc	compiles	game	confirmed	decomp/tests/0x0011024e.json	docs/compiler-abi.md; Look up dword table 0x17d614[index], marking the first six slots as seen.; callers fa4a9@fa5fa,10f26a@10f276,110393@1103a1; guest pending
 0x001102a3	21	store_flagged_value	runtime_libc	compiles	game	confirmed	decomp/tests/0x001102a3.json	docs/compiler-abi.md; Store value / 0x4000 in dword table 0x17d614[index].; callers fa4a9@fa65e,fa9a0@fa9b6; guest pending
 0x00110393	124			unknown	unclassified	unverified		

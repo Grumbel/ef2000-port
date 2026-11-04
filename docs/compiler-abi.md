@@ -4794,3 +4794,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xceccc` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:int32_t | none | 14d58@14e04,1e480@1e54c,1e480@1e5c2 | Fill the rectangle x0..x1, y0..y1 (coordinates swapped into order) with a colour byte, one row at a time. Callee pops th |
+
+## key_helpers1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1101e8` | EAX:uint32_t | EAX:int32_t | fa4a9@fa560,fa95f@fa98b,fe541@fe555 | Store a key code, then translate it (via a table at 0x17d5a8 for plain keys, or its high byte for extended codes) and st |
