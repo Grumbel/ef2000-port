@@ -3952,4 +3952,8 @@ int32_t set_serial_rate_117e0c(ef_addr32 obj, int32_t rate);
 int32_t stream_fputc_10f43b(uint32_t c, ef_addr32 stream);
 void destroy_record_104464(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
 
+/* runtime_helpers38.c */
+int32_t stream_flush_fa8a0(ef_addr32 stream);
+uint32_t guest_fn_110393_x(uint32_t handle, ef_addr32 buf, uint32_t count); /* 0x110393 EAX/EDX/EBX, DOS write */
+
 #endif

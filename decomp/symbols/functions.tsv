@@ -3721,7 +3721,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa7d2	49	update_flags_fa7d2	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fa7d2.json	docs/compiler-abi.md; ; callers bc287@bc345,f22af@f22e5,10f071@10f075; guest pending
 0x000fa815	133			unknown	unclassified	unverified		
 0x000fa89a	6	get_global_fa89a	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fa89a.json	docs/compiler-abi.md; ; callers bc471@bc479; guest pending
-0x000fa8a0	191			unknown	unclassified	unverified		
+0x000fa8a0	191	stream_flush_fa8a0	runtime_helpers38	compiles	game	confirmed	decomp/tests/0x000fa8a0.json	docs/compiler-abi.md; fflush: write out a dirty write buffer, or seek back over unread input; resets the buffer position and returns 0 or -1.; callers bc4da@bc4fe,f1f5a@f207d,f1f5a@f2112; guest pending
 0x000fa95f	65			unknown	unclassified	unverified		
 0x000fa9a0	50			unknown	unclassified	unverified		
 0x000fa9d2	94			unknown	unclassified	unverified		

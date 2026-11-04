@@ -4519,3 +4519,9 @@ in EAX, format string address, one value).
 | `0x117e0c` | EAX:ef_addr32,EDX:int32_t | EAX:int32_t | 106f10@106fcd,118290@11836f | Program the serial port at obj+0x1c with a divisor derived from the rate (clamped 300..115200); returns the actual rate, |
 | `0x10f43b` | EAX:uint32_t,EDX:ef_addr32 | EAX:int32_t | f1f5a@f20e3 | fputc: store a character in the stream buffer (expanding newline to CR LF on text streams), flushing when full or line b |
 | `0x104464` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 102488@1024ab | Destroy a record: run its field 0x24 callback with field 0x28, trace-call fields 0x20 and 0x1c, send message 0x306, free |
+
+## runtime_helpers38 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfa8a0` | EAX:ef_addr32 | EAX:int32_t | bc4da@bc4fe,f1f5a@f207d,f1f5a@f2112 | fflush: write out a dirty write buffer, or seek back over unread input; resets the buffer position and returns 0 or -1. |
