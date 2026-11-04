@@ -6460,3 +6460,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdf738` | none | none | none direct | Poll the modem status register (port dword 0x15eed0 + 6, saved in byte 0x15eed4): in mode 2 (byte 0x13579a) with the del |

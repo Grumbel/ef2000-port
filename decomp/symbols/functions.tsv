@@ -3297,7 +3297,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000df2e4	15	advance_counter_15f07d	math_string	compiles	game	confirmed	decomp/tests/0x000df2e4.json	docs/compiler-abi.md; Byte 0x15f07d = (byte + 1) & 7.; callers 3361c@33626; guest pending
 0x000df4f4	360	menu_step_back_df4f4	game_helpers68	compiles	game	confirmed	decomp/tests/0x000df4f4.json	docs/compiler-abi.md; Step the menu back one level; returns 1 when an earlier entry was re-latched.; callers dfac8@dfdec,dfac8@dfe2d; guest pending
 0x000df65c	218	latch_menu_entry_df65c	game_helpers65	compiles	game	confirmed	decomp/tests/0x000df65c.json	docs/compiler-abi.md; Latch the selected menu entry's geometry; returns 1 when an entry was latched.; callers dfac8@dfb73,dfac8@dfbf6,dfac8@dfe68; guest pending
-0x000df738	122			unknown	unclassified	unverified		
+0x000df738	122	poll_modem_status_df738	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000df738.json	docs/compiler-abi.md; Poll the modem status register (port dword 0x15eed0 + 6, saved in byte 0x15eed4): in mode 2 (byte 0x13579a) with the del; callers none direct; guest pending
 0x000df7b4	786			unknown	unclassified	unverified		
 0x000dfac8	1008			unknown	unclassified	unverified		
 0x000dfeb8	145			unknown	unclassified	unverified		

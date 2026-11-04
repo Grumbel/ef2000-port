@@ -5067,4 +5067,6 @@ void unpack_settings_3519c(ef_addr32 src);
 
 
 
+void poll_modem_status_df738(void);
+
 #endif

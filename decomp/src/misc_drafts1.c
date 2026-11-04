@@ -6694,3 +6694,20 @@ void unpack_settings_3519c(ef_addr32 src)
         EF_U32(0x0019bbf0u + i) = EF_U32(src + 0x3eu + i);
     EF_U16(0x0019bc00u) = EF_U16(src + 0x4eu);
 }
+
+/* 0xdf738, 122 bytes. Poll the modem status register (port dword 0x15eed0 + 6, saved in byte 0x15eed4): in mode 2 (byte 0x13579a) with the delta bit 0 set, mirror the CTS bit 4 onto bit 1 of the next register (clear it when CTS is low; set it when CTS is high and byte 0x15ef28 allows). Sets byte 0x13581e when carrier detect (bit 7) is low and byte 0x13578c is set. */
+void poll_modem_status_df738(void)
+{
+    uint32_t base = EF_U32(0x0015eed0u);
+    uint32_t st = guest_fn_9c430(base + 6u) & 0xffu;
+    EF_U8(0x0015eed4u) = (uint8_t)st;
+    if (EF_U8(0x0013579au) == 2u && (st & 1u)) {
+        if ((st & 0x10u) == 0u) {
+            guest_fn_117b0c(base + 1u, (guest_fn_9c430(base + 1u) & 0xfdu));
+        } else if (EF_U8(0x0015ef28u) != 0u) {
+            guest_fn_117b0c(base + 1u, (guest_fn_9c430(base + 1u) & 0xffu) | 2u);
+        }
+    }
+    if ((EF_U8(0x0015eed4u) & 0x80u) == 0u && EF_U8(0x0013578cu) != 0u)
+        EF_U8(0x0013581eu) = 1u;
+}
