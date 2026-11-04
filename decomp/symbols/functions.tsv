@@ -3070,7 +3070,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d6340	196			unknown	unclassified	unverified		
 0x000d6410	26	sum_three_bytes	code_predicates	compiles	game	confirmed	decomp/tests/0x000d6410.json	docs/compiler-abi.md; Sum of the first three bytes.; callers d6478@d64e0,d6478@d6532; guest pending
 0x000d642c	73	nearest_entry_index_d642c	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d642c.json	docs/compiler-abi.md; Index of the table entry closest to the given value (first minimum wins, limit 0x100).; callers d6478@d653d; guest pending
-0x000d6478	303			unknown	unclassified	unverified		
+0x000d6478	303	build_shade_tables_d6478	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6478.json	docs/compiler-abi.md; Builds the 256-entry remap tables (one per shade group, 0x100 bytes each, starting at [0x15b958]+0x100) from the 3-byte ; callers 3dd30@3de3b; guest pending
 0x000d65a8	62	remap_palette_d65a8	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d65a8.json	docs/compiler-abi.md; Remap a 256-entry RGB palette through three 64-byte tables.; callers d660c@d6620,d663c@d664b; guest pending
 0x000d65e8	34	set_black_palette_d65e8	game_helpers106	compiles	game	confirmed	decomp/tests/0x000d65e8.json	docs/compiler-abi.md; Upload an all-zero (black) 0x300-byte palette.; callers 284ec@284f2,39204@39211,3dccc@3dccf; guest pending
 0x000d660c	46	compare_remapped_palette_d660c	game_helpers120	compiles	game	confirmed	decomp/tests/0x000d660c.json	docs/compiler-abi.md; Remap the 256-entry palette at the stack argument and compare the result with the 0x300 bytes at 0x420a90 (cdecl; return; callers eac48@eacbc,eac48@ead32; guest pending

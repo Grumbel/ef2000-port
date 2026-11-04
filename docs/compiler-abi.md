@@ -8813,3 +8813,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd36c4` | EAX:uint32_t | EAX:uint32_t | none direct | (ret 4) Allocate the next 0x6ec byte entry (byte counter 0x17d2c0, table 0x486db0, at most 200) for the object s0: clear |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd6478` | none | none | 3dd30@3de3b | Builds the 256-entry remap tables (one per shade group, 0x100 bytes each, starting at [0x15b958]+0x100) from the 3-byte  |

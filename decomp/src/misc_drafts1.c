@@ -19941,3 +19941,48 @@ uint32_t alloc_object_entry_d36c4(uint32_t s0)
 	EF_U32(e + 0x6e8u) = EF_U32(0x00159144u);
 	return s0;
 }
+
+/* 0xd6478, 303 bytes. Builds the 256-entry remap tables (one per shade group, 0x100 bytes each, starting at [0x15b958]+0x100) from the 3-byte palette entries at 0x420a90 and the group sizes at 0x431ed0. */
+void build_shade_tables_d6478(void)
+{
+	uint32_t sums[256];
+	uint32_t base = EF_U32(0x0015b958u);
+	uint32_t first = 0;
+	uint32_t group = 0;
+	uint32_t dst;
+	uint32_t n;
+	uint32_t i;
+	uint32_t j;
+
+	if (base == 0u)
+		return;
+	dst = base + 0x100u;
+	while (EF_U8(0x00431ed0u + group) != 0) {
+		n = EF_U8(0x00431ed0u + group);
+		memset(sums, 2, sizeof sums);
+		for (j = 0; (int32_t)j < (int32_t)n; j++)
+			sums[j] = sum_three_bytes(0x00420a90u + (first + j) * 3u);
+		for (i = 0; i < 0x100u; i++) {
+			if (i < first || i >= first + n) {
+				int32_t v = (int32_t)sum_three_bytes(0x00420a90u + i * 3u);
+				uint32_t best = 0;
+				int32_t bestd = 0x100;
+				for (j = 0; (int32_t)j < (int32_t)n; j++) {
+					int32_t d = (int32_t)sums[j] - v;
+					if (d < 0)
+						d = -d;
+					if (d < bestd) {
+						best = j;
+						bestd = d;
+					}
+				}
+				EF_U8(dst + i) = (uint8_t)(best + first);
+			} else {
+				EF_U8(dst + i) = (uint8_t)i;
+			}
+		}
+		first += EF_U8(0x00431ed0u + group);
+		group++;
+		dst += 0x100u;
+	}
+}
