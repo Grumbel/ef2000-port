@@ -4481,3 +4481,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x113398` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Release a record container: trace each 0x718-byte element, trace field 0xc, free the element array and the 0x1d4-byte co |
 | `0x11580e` | EAX:ef_addr32,EDX:int32_t,EBX:ef_addr32 | EAX:ef_addr32 | 103f04@103f5c | fgets: read at most n-1 characters up to and including a newline into buf from stream; returns buf, or 0 on end of file  |
+
+## game_helpers122 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x69b70` | none | none | 69fac@69fe3 | Walk the widget chain starting at the named widget at 0x186320 under the object at 0x186314; for each entry whose weapon |
+| `0xfaafc` | EAX:ef_addr32 | EAX:uint32_t | fbad8@fbc73 | Count the active elite 0x15-byte entries of a group whose code is not in the set; the original then always returns 1. |

@@ -1255,7 +1255,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000699d4	29	onopenBigCurrentWeapon		named	unclassified	unverified		
 0x000699f4	73	find_named_record_699f4	game_helpers9	compiles	game	confirmed	decomp/tests/0x000699f4.json	docs/compiler-abi.md; Index of the 0x91-byte record whose name equals text, or 0.; callers 69bdc@69bfd; guest pending
 0x00069a40	301	weapon_flags_any_69a40	game_helpers66	compiles	game	confirmed	decomp/tests/0x00069a40.json	docs/compiler-abi.md; Test whether any of the low 13 flag bits of a weapon table entry is set.; callers 69b70@69ba4; guest pending
-0x00069b70	106			unknown	unclassified	unverified		
+0x00069b70	106	refresh_weapon_widgets_69b70	game_helpers122	compiles	game	confirmed	decomp/tests/0x00069b70.json	docs/compiler-abi.md; Walk the widget chain starting at the named widget at 0x186320 under the object at 0x186314; for each entry whose weapon; callers 69fac@69fe3; guest pending
 0x00069bdc	305	gpwRedrawCurrentWeaponWindow		named	unclassified	unverified		
 0x00069d10	524			unknown	unclassified	unverified		
 0x00069f1c	141	gpwRedrawPlaneWindow		named	unclassified	unverified		
@@ -3726,7 +3726,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa9a0	50			unknown	unclassified	unverified		
 0x000fa9d2	94			unknown	unclassified	unverified		
 0x000faa30	202	scan_code_class_faa30	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000faa30.json	docs/compiler-abi.md; Map a scan code to a key class, 0 if unmapped.; callers fbad8@fbc5b; guest pending
-0x000faafc	130			unknown	unclassified	unverified		
+0x000faafc	130	count_group_entries_faafc	game_helpers122	compiles	game	confirmed	decomp/tests/0x000faafc.json	docs/compiler-abi.md; Count the active elite 0x15-byte entries of a group whose code is not in the set; the original then always returns 1.; callers fbad8@fbc73; guest pending
 0x000fab80	112	half_active_entry_count_fab80	game_helpers89	compiles	game	confirmed	decomp/tests/0x000fab80.json	docs/compiler-abi.md; Half the number of non-type-1 sub-entries of an object, clamped to 1..2.; callers fbad8@fbbed; guest pending
 0x000fabf0	87	has_active_entry_fabf0	game_helpers30	compiles	game	confirmed	decomp/tests/0x000fabf0.json	docs/compiler-abi.md; 1 when the object has at least one active entry whose code passes the set test.; callers fbad8@fbcd1; guest pending
 0x000fac78	171			unknown	unclassified	unverified		
