@@ -4939,4 +4939,8 @@ void add_recent_file_ac2e4(uint32_t name, uint32_t flag);
 void tick_broadcast_ring_56318(void);
 void guest_fn_a3f74_x(uint32_t a, uint32_t b); /* 0xa3f74 EAX/EDX */
 
+uint8_t find_nearest_target_89698(uint32_t obj);
+uint32_t guest_fn_906b4_x(uint32_t v); /* 0x906b4 EAX -> AL */
+uint32_t guest_fn_89060_x(uint32_t obj, uint32_t unit); /* 0x89060 EAX/EDX -> AL */
+
 #endif

@@ -5260,3 +5260,43 @@ void tick_broadcast_ring_56318(void)
     if ((int16_t)EF_U16(0x00127daeu) < 0)
         EF_U16(0x00127daeu) = 0u;
 }
+
+/* 0x89698, 300 bytes. Pick the closest enemy for the unit OBJ: for every group of the table 0x1a14f8 (0x45-byte entries, 0x1a1506 of them) whose squared distance (position longs at +7, +0xb, +0xf scaled by >> 8 against the unit's position words) is inside the squared range taken from the unit-type table 0x12bca3[type * 0x91], test its ten member slots (words at +0x28): a live record (0x8ffe8) accepted by 0x906b4 that is not flagged 2 and closer than the current best (+0x63) and approved by 0x89060 becomes the new target (+0x5b) with its distance (+0x63). Returns whether a target was found. */
+uint8_t find_nearest_target_89698(uint32_t obj)
+{
+    int16_t g;
+    int16_t s;
+    EF_U32(obj + 0x5bu) = 0u;
+    for (g = 0; g < (int16_t)EF_U16(0x001a1506u); g++) {
+        uint32_t grp = EF_U32(0x001a14f8u) + (uint32_t)((int32_t)g * 0x45);
+        int32_t dx = (int32_t)(int16_t)EF_U16(obj + 2u) - (EF_S32(grp + 7u) >> 8);
+        int32_t dy = (int32_t)(int16_t)EF_U16(obj + 6u) - (EF_S32(grp + 0xbu) >> 8);
+        int32_t dz = (int32_t)(int16_t)EF_U16(obj + 0xau) - (EF_S32(grp + 0xfu) >> 8);
+        int32_t d2 = dx * dx + dy * dy + dz * dz;
+        int32_t range = EF_S32(0x0012bca3u + (uint32_t)EF_U8(obj + 0x18u) * 0x91u) >> 8;
+        if (g == 0xff)
+            continue;
+        if (d2 >= range * range)
+            continue;
+        for (s = 0; s < 10; s++) {
+            uint32_t slot = grp + (uint32_t)(int32_t)s * 2u;
+            uint32_t unit;
+            if (EF_U16(slot + 0x28u) == 0u)
+                continue;
+            unit = guest_lookup_object_8ffe8((int32_t)(int16_t)EF_U16(slot + 0x28u));
+            if (unit == 0u)
+                continue;
+            if ((guest_fn_906b4_x((uint32_t)(int32_t)(int16_t)EF_U16(unit + 0x16u)) & 0xffu) == 0u)
+                continue;
+            if ((EF_U8(unit + 0x30u) & 2u) != 0u)
+                continue;
+            if (d2 >= EF_S32(obj + 0x63u))
+                continue;
+            if ((guest_fn_89060_x(obj, unit) & 0xffu) == 0u)
+                continue;
+            EF_U32(obj + 0x5bu) = unit;
+            EF_U32(obj + 0x63u) = (uint32_t)d2;
+        }
+    }
+    return EF_U32(obj + 0x5bu) != 0u ? 1u : 0u;
+}

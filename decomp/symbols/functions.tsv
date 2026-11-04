@@ -1747,7 +1747,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000895bc	77	select_object_895bc	unit_flags	compiles	game	confirmed	decomp/tests/0x000895bc.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0008960c	79	select_object_8960c	unit_flags	compiles	game	confirmed	decomp/tests/0x0008960c.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x0008965c	59	activate_8965c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0008965c.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x00089698	300			unknown	unclassified	unverified		
+0x00089698	300	find_nearest_target_89698	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00089698.json	docs/compiler-abi.md; Pick the closest enemy for the unit OBJ: for every group of the table 0x1a14f8 (0x45-byte entries, 0x1a1506 of them) who; callers 897c4@8989e; guest pending
 0x000897c4	270			unknown	unclassified	unverified		
 0x000898d4	80	force_select_898d4	unit_flags	compiles	game	confirmed	decomp/tests/0x000898d4.json	docs/compiler-abi.md; ; callers 8935c@8936e,8935c@89410,8935c@89451; guest pending
 0x00089924	60	recalculate_object_temporarily	ui_secondary	compiles	game	confirmed	decomp/tests/0x00089924.json	docs/compiler-abi.md; host model; guest differential pending
