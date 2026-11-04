@@ -3125,7 +3125,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d7f0c	604			unknown	unclassified	unverified		
 0x000d8170	329			unknown	unclassified	unverified		
 0x000d8358	96	advance_position_d8358	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d8358.json	docs/compiler-abi.md; Advance the wrapping position at word 0x15bb3c by delta/4.; callers 95e58@97033; guest pending
-0x000d8528	231			unknown	unclassified	unverified		
+0x000d8528	231	compute_view_corners_d8528	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d8528.json	docs/compiler-abi.md; Compute the five projected corner words 0x15baf2/f6/fa/fe (and the constants 0x15baf4, 0x15bb00 = 0, 0x15baf8 = 0x15bafc; callers d86e0@d8912,d86e0@d8953,d86e0@d8c96; guest pending
 0x000d8610	140	rescale_window_d8610	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d8610.json	docs/compiler-abi.md; Rescale the pair of words at 0x15baf2/0x15baf6: save the old values to 0x15bafe/0x15bafa, then recompute them from the r; callers d86e0@d898d,d86e0@d89c5,d86e0@d89f6; guest pending
 0x000d86e0	2296			unknown	unclassified	unverified		
 0x000d8fd8	1243			unknown	unclassified	unverified		

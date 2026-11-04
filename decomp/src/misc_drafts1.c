@@ -4141,3 +4141,25 @@ void draw_planar_sprite_cdd18(uint32_t dst, uint32_t src, uint32_t xmin, uint32_
         }
     }
 }
+
+/* 0xd8528, 231 bytes. Compute the five projected corner words 0x15baf2/f6/fa/fe (and the constants 0x15baf4, 0x15bb00 = 0, 0x15baf8 = 0x15bafc = 0x15bdcc + 1) of the view rectangle from the window words at 0x420e76..0x420e7e, the scale pair 0x420eaa/0x420eac and the range 0x15bdcc. */
+void compute_view_corners_d8528(void)
+{
+    int32_t a = (int16_t)EF_U16(0x00420e7au);
+    int32_t b = (int16_t)EF_U16(0x00420eaau);
+    int32_t c = (int16_t)EF_U16(0x00420eacu);
+    int32_t d0 = (int16_t)EF_U16(0x00420e78u);
+    int32_t one = (int32_t)EF_U32(0x0015bdccu) + 1;
+    int32_t e = (int16_t)EF_U16(0x00420e7eu);
+    int32_t f = (int16_t)EF_U16(0x00420e7cu);
+    int32_t k;
+    EF_U16(0x0015bb00u) = 0u;
+    EF_U16(0x0015baf4u) = 0u;
+    EF_U16(0x0015bafcu) = (uint16_t)(EF_U16(0x0015bdccu) + 1u);
+    EF_U16(0x0015baf8u) = (uint16_t)(EF_U16(0x0015bdccu) + 1u);
+    k = (c * 5) >> 15;
+    EF_U16(0x0015baf2u) = (uint16_t)((a * b) / c + d0 - k);
+    EF_U16(0x0015baf6u) = (uint16_t)(d0 - ((one - a) * b) / c - k);
+    EF_U16(0x0015bafau) = (uint16_t)(f - ((one - e) * b) / c - k);
+    EF_U16(0x0015bafeu) = (uint16_t)((e * b) / c + f - k);
+}

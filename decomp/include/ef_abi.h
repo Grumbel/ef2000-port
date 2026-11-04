@@ -4820,4 +4820,6 @@ void show_splash_c90e0(void);
 
 void draw_planar_sprite_cdd18(uint32_t dst, uint32_t src, uint32_t xmin, uint32_t xmax, uint32_t ymin, uint32_t ymax);
 
+void compute_view_corners_d8528(void);
+
 #endif
