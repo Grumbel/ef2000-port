@@ -3240,3 +3240,23 @@ in EAX, format string address, one value).
 | `0xf0ec` | none | EAX:uint32_t | f13c@f14b | Parse a token and look it up in the 6-entry table at 0x132d1c. |
 | `0xf038` | EAX:ef_addr32 | EAX:uint32_t | f08c@f0d7 | Read a count and that many 17-byte parser records. |
 | `0xf08c` | EAX:ef_addr32 | EAX:uint32_t | f314@f588 | Read a count and that many 6-byte groups of 17-byte parser records. |
+
+## runtime_helpers20 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x27544` | EAX:ef_addr32,DX:int16_t,EBX:int32_t | none | 275a4@275d2 | Draw a null-terminated list of 6-byte text entries, centered at x=160. |
+| `0x2aef8` | AX:int16_t | none | 49228@495f9 | Allocate and zero the unit table for count+1 records of 0xca bytes. |
+| `0x34d50` | none | none | 34d94@34db2 | Show the 60-step progress sequence, waiting five clock ticks per step. |
+| `0x35748` | AL:uint8_t,DX:uint16_t,BL:uint8_t | none | 35590@3561e | Arm the timer record unless one is already active. |
+| `0x372d4` | AX:int16_t | none | 49228@49601 | Allocate and zero a table of count+1 records of 0x45 bytes. |
+| `0x38584` | none | EAX:uint32_t | 4aa4c@4ac7f | Take the next free slot index of the 2000-slot table. |
+| `0x3c410` | none | none | 7ab00@7ab0e | Allocate the 0x9202-byte work area. |
+| `0x3c6c0` | EAX:ef_addr32 | none | 7aa2c@7aa36 | Copy a string into a fresh buffer and register it. |
+| `0x3c730` | EAX:ef_addr32,DX:int16_t | EAX:ef_addr32 | 3c768@3c772,3c790@3c7a1 | Find a named entry in the scene or abort. |
+| `0x3ccec` | EAX:ef_addr32 | EAX:ef_addr32 | 3cd24@3cd25,3cd40@3cd41 | Duplicate a string into freshly allocated memory. |
+| `0x76b10` | AL:uint8_t | none | 76cc4@76cd7 | Allocate a table of count 25-byte records. |
+| `0x7a3e8` | none | none | 7ab00@7ab09 | Allocate (once) and clear the 0xc000-byte buffer. |
+| `0x82000` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint8_t | EAX:ef_addr32 | 4ae5c@4afbe | Build a 17-byte record from the arguments. |
+| `0x82024` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:ef_addr32 | 4ae5c@4afed | Build a 16-byte record from the arguments. |
+| `0x8c0c8` | AX:int16_t,EDX:uint32_t | none | 8c0f0@8c148 | Store a value in the 0x898-entry table, aborting on a bad index. |

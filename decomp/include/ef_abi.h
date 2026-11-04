@@ -2524,4 +2524,25 @@ uint32_t read_group_list_f08c(ef_addr32 list);
 uint32_t guest_fn_9c2d3(uint32_t name, uint32_t mode); /* 0x9c2d3 cdecl */
 void guest_fn_efe8(ef_addr32 entry); /* 0xefe8 EAX */
 
+/* runtime_helpers20.c */
+void draw_centered_entries_27544(ef_addr32 list, int16_t y, int32_t step);
+void alloc_unit_table_2aef8(int16_t count);
+void run_progress_delay_34d50(void);
+void arm_timer_record_35748(uint8_t kind, uint16_t duration, uint8_t flag);
+void alloc_record_table_372d4(int16_t count);
+uint32_t take_free_slot_38584(void);
+void alloc_work_area_3c410(void);
+void register_string_3c6c0(ef_addr32 text);
+ef_addr32 find_entry_or_abort_3c730(ef_addr32 name, int16_t page);
+ef_addr32 duplicate_string_3ccec(ef_addr32 text);
+void alloc_table_25_76b10(uint8_t count);
+void clear_buffer_7a3e8(void);
+ef_addr32 make_record_17_82000(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint8_t e);
+ef_addr32 make_record_16_82024(uint32_t a, uint32_t b, uint32_t unused_bx, uint32_t unused_cx,
+                               uint32_t c, uint32_t d);
+void set_table_value_8c0c8(int16_t index, uint32_t value);
+void guest_fn_a3eac_args(uint32_t a, uint32_t b); /* 0xa3eac EAX/EDX */
+uint32_t guest_fn_e2a94(uint32_t size); /* 0xe2a94 EAX -> EAX */
+void guest_fn_3c5b8(void); /* 0x3c5b8 */
+
 #endif
