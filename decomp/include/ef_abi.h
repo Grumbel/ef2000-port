@@ -4313,4 +4313,7 @@ void draw_indicator_22f28(uint32_t index);
 void guest_fn_387e0_x(uint32_t a, uint32_t b); /* 0x387e0 EAX/EDX */
 void guest_fn_38be8_x(uint32_t a, int32_t b, int32_t c); /* 0x38be8 EAX/EDX/EBX */
 
+uint32_t draw_trail_5c8e0(ef_addr32 out);
+uint32_t guest_fn_15c0ea_x(uint32_t a0, uint32_t a1, uint32_t a2, ef_addr32 out); /* 0x15c0ea four stack arguments, callee cleanup, result in AL */
+
 #endif

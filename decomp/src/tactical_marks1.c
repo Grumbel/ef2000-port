@@ -196,3 +196,29 @@ void draw_indicator_22f28(uint32_t index)
     py = (int32_t)EF_S16(rec + 0x127a9cu) * 3 / 8 + (int32_t)EF_S16(rec + 0x127a98u);
     guest_fn_38be8_x(EF_U32(rec + 0x127a9du) >> 24, (int32_t)(int16_t)py, (int32_t)(int16_t)px);
 }
+
+/* 0x5c8e0, 242 bytes. Walk the 12-byte point table at 0x1fd098 from the current index (0x20f19a) backwards in steps of n = remaining/50 + 1, projecting each point with 0x15c0ea and drawing a line between consecutive visible projections; stores the last projection at *out. Returns 0 when nothing is left to draw, else 1. */
+uint32_t draw_trail_5c8e0(ef_addr32 out)
+{
+    int16_t left = (int16_t)EF_U16(0x0020f19cu);
+    int16_t pos = (int16_t)EF_U16(0x0020f19au);
+    int32_t step = (int32_t)left / 50 + 1;
+    uint32_t cur = 0u, prev = 0u;
+    uint8_t flag = 0u, prev_flag = 0u;
+    if (left == 0)
+        return 0u;
+    while (left > 0) {
+        uint32_t ent = 0x001fd098u + (uint32_t)((int32_t)pos * 12);
+        flag = (uint8_t)guest_fn_15c0ea_x(EF_U32(ent + 8u) << 8, EF_U32(ent + 4u) << 8, EF_U32(ent) << 8, (uint32_t)(uintptr_t)&cur);
+        if ((uint16_t)left != EF_U16(0x0020f19cu) && flag != 0u && prev_flag != 0u)
+            draw_tactical_line((int16_t)(cur >> 16), (int16_t)cur, (int16_t)(prev >> 16), (int16_t)prev, EF_U8(0x00128148u));
+        prev = cur;
+        pos = (int16_t)(pos - step);
+        left = (int16_t)(left - step);
+        prev_flag = flag;
+        if (pos < 0)
+            pos = 0xc7;
+    }
+    EF_U32(out) = cur;
+    return 1u;
+}

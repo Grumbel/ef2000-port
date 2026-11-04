@@ -1139,7 +1139,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005c354	449			unknown	unclassified	unverified		
 0x0005c518	708			unknown	unclassified	unverified		
 0x0005c7dc	258			unknown	unclassified	unverified		
-0x0005c8e0	242			unknown	unclassified	unverified		
+0x0005c8e0	242	draw_trail_5c8e0	tactical_marks1	compiles	game	confirmed	decomp/tests/0x0005c8e0.json	docs/compiler-abi.md; Walk the 12-byte point table at 0x1fd098 from the current index (0x20f19a) backwards in steps of n = remaining/50 + 1, p; callers 5c518@5c5d3; guest pending
 0x0005c9d4	140			unknown	unclassified	unverified		
 0x0005ca60	38	apply_stream_value_5ca60	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x0005ca60.json	docs/compiler-abi.md; Read the 9th stream value into a local and apply it when valid.; callers 598e8@5997a; guest pending
 0x0005ca88	146			unknown	unclassified	unverified		
