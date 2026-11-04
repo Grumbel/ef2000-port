@@ -3312,3 +3312,27 @@ in EAX, format string address, one value).
 | `0xc3f1c` | none | none | cdb20@cdc2b,d1d40@d1d9d,dc250@dc25c | Blit the screen buffer through the driver callback. |
 | `0xca780` | EAX:ef_addr32 | EAX:uint32_t | aca14@aca48,acac0@acb26 | Find a name in the table of 25-byte entries at 0x13727e. |
 | `0xcc744` | EAX:uint32_t | EAX:uint32_t | 3cb2c@3cb84,3cb2c@3cb97,b3374@b339f | Allocate a block for a non-null request, aborting on failure. |
+
+## runtime_helpers24 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcd2a8` | EAX:uint32_t | none | 9e7bc@9f5ff | Store a half-word offset in the current table entry. |
+| `0xcd640` | AX:int16_t | none | cd724@cd745,cd754@cd78b | Allocate the 0xc000-byte text block of a slot when it has none. |
+| `0xcd67c` | AX:int16_t,EDX:ef_addr32 | none | cd724@cd74c,cd754@cd792 | Copy a text into the block of a slot; abort when empty or too long. |
+| `0xcd724` | AX:int16_t,EDX:ef_addr32 | none | e3e50@e3eda | Store a text in a fixed slot (0..99). |
+| `0xcd754` | EAX:ef_addr32 | EAX:uint32_t | e3cac@e3dbb | Store a text in the next dynamic slot and return its id. |
+| `0xcd7f0` | AX:int16_t | EAX:uint32_t | 11e7c@11ec3,11e7c@11eda,14d58@14da5 | Return the text block of a slot (0..599). |
+| `0xd16d0` | EAX:uint32_t,EDX:uint32_t | none | d16fc@d1702,d175c@d176a,d1860@d188a | Write to the log file and abort if the count is short. |
+| `0xd1774` | EAX:ef_addr32 | none | d1c54@d1c77 | Open the log file and write its header. |
+| `0xd1da8` | EAX:uint32_t,EDX:uint32_t | none | d1e50@d1ecd,d1e50@d1ede | Pick the 640x400 video mode if either mode is available. |
+| `0xd1de8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | d1e50@d1ee7 | Set up the 640x480 video mode; other modes abort but continue. |
+| `0xd6fa8` | EAX:ef_addr32 | none | 81230@812ed,81448@814d2,d6f90@d6f9a | Allocate the text buffer of an object and fill it from the default text. |
+| `0xd73b8` | AL:uint8_t | none | 7ef14@7f3ae,7ef14@7f3be,7f850@7f96d | Run channel call 0x102858 on the driver channel (0..13). |
+| `0xd7458` | AL:uint8_t | none | 7ef14@7f2ed,7ef14@7f376 | Run channel call 0x102824 on the driver channel (0..13). |
+| `0xd7490` | AL:uint8_t | none | 7fe18@7fe34 | Run channel call 0x1027a0 on the driver channel (0..13). |
+| `0xd74d0` | AL:uint8_t | none | 7ef14@7f43c,7ef14@7f4d6,7fe8c@7fe9e | Start the driver channel and queue its follow-up request. |
+| `0xd7530` | AL:uint8_t | none | 7fe4c@7fe71 | Run channel call 0x1027cc on the driver channel (0..13). |
+| `0xda190` | EAX:ef_addr32,EDX:ef_addr32 | none | d9e50@da06f | Select the table entry matching a name, store the key and run its handler. |
+| `0xdc250` | none | none | 277d8@2780d,27858@2788a,278c0@27afd | Toggle the page flag between 0 and 1 around the page callbacks. |
+| `0xdc280` | none | none | 1e480@1e514,1e480@1e58a,1e480@1e602 | Cycle the page flag through 0..2 around the page callbacks. |

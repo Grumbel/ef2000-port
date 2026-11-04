@@ -2612,4 +2612,38 @@ void guest_fn_c3a28(void); /* 0xc3a28 */
 uint32_t guest_fn_9d524(ef_addr32 a, ef_addr32 b); /* 0x9d524 EAX/EDX */
 uint32_t guest_fn_c3f78(uint32_t size); /* 0xc3f78 EAX */
 
+/* runtime_helpers24.c */
+void store_offset_cd2a8(uint32_t pointer);
+void ensure_text_block_cd640(int16_t slot);
+void copy_text_to_slot_cd67c(int16_t slot, ef_addr32 text);
+void set_text_slot_cd724(int16_t slot, ef_addr32 text);
+uint32_t add_text_slot_cd754(ef_addr32 text);
+uint32_t get_text_slot_cd7f0(int16_t slot);
+void write_log_d16d0(uint32_t buffer, uint32_t count);
+void open_log_d1774(ef_addr32 name);
+void set_mode_640x400_d1da8(uint32_t first, uint32_t second);
+void set_video_mode_d1de8(uint32_t mode, uint32_t mode_id, uint32_t height, uint32_t width);
+void alloc_object_text_d6fa8(ef_addr32 object);
+void channel_call_102858_d73b8(uint8_t channel);
+void channel_call_102824_d7458(uint8_t channel);
+void channel_call_1027a0_d7490(uint8_t channel);
+void channel_start_d74d0(uint8_t channel);
+void channel_call_1027cc_d7530(uint8_t channel);
+void run_named_handler_da190(ef_addr32 table, ef_addr32 name);
+void toggle_page_dc250(void);
+void cycle_page_dc280(void);
+void guest_fn_eb35c(void); /* 0xeb35c */
+void guest_fn_fc534(void); /* 0xfc534 */
+uint32_t guest_fn_fc600(uint32_t mode); /* 0xfc600 EAX -> AL */
+void guest_fn_d1d40(uint32_t width, uint32_t height); /* 0xd1d40 EAX/EDX */
+void guest_fn_d16fc(ef_addr32 text); /* 0xd16fc EAX */
+void guest_fn_d170c(uint32_t value); /* 0xd170c EAX */
+uint32_t guest_fn_d7070(void); /* 0xd7070 -> EAX */
+void guest_fn_104920(uint32_t a, uint32_t b); /* 0x104920 cdecl */
+void guest_fn_1027f8(uint32_t a); /* 0x1027f8 cdecl */
+void guest_fn_1027a0(uint32_t a); /* 0x1027a0 cdecl */
+void guest_fn_1027cc(uint32_t a); /* 0x1027cc cdecl */
+void guest_fn_102824(uint32_t a); /* 0x102824 cdecl */
+void guest_fn_102858(uint32_t a); /* 0x102858 cdecl */
+
 #endif
