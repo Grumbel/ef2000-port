@@ -15434,3 +15434,86 @@ uint32_t load_data_file_f6a8(ef_addr32 count_a, ef_addr32 owner_a, ef_addr32 cou
 	guest_fn_9ce84(EF_U32(0x00197ab0u));
 	return 1u;
 }
+
+/* 0x3527c, 682 bytes. Process the received packet list: the byte at [0x136b78] gives the packet count and the bytes at [0x136b74] index 32-byte descriptors (header pointer at 0x135878, payload pointer at 0x13587c, header word +7 is the type and word +9 the payload length). Byte 0x19f598 is set for each packet. Type 5 runs 0x35218, type 7 runs 0x34d94(0); type 4 with state byte 0x19f5a1 equal to 1 or 2 and byte 0x19f5a5 set sets byte 0x19f5a9 to 9. In state 2 a packet of the expected type (word 0x19f586) copies its payload to the buffer 0x19f370 (more than 0x1f6 bytes reports the error text 0x182f54), sets 0x19f5a5 and 0x19f5a9 = 7. In state 1 type 1 with expected type 1 sets 0x19f5a9 = 3, dword 0x19f344 from the payload and byte 0x19f59f; expected type 2 also sets 0x19f5a9 = 3; a type 2 packet with expected type 2 and a destination buffer at 0x19f354 is a numbered fragment: the payload byte 0 holds the fragment number (bits 0..5), a first-fragment flag (bit 6) and a last flag (bit 7), the sequence word is at payload +1 and compared with word 0x19f592; a matching fragment not yet seen (flag bytes at 0x19f310) is copied to destination + number * (high half of dword 0x1258fe), counters 0x19f584 and 0x19f33c are updated and, when all fragments have arrived, 0x19f592 advances and 0x19f59f (and, for the last-flag, 0x19f5a5) are set; an older sequence with the first-fragment flag sets 0x19f5a9 = 7. */
+void process_packets_3527c(void)
+{
+	uint32_t esi, count, idx, hdr, pay, type, st, b0, n, bit6, last, seq, e, off, len, dst;
+
+	count = EF_U8(EF_U32(0x00136b78u));
+	for (esi = 0; (int32_t)esi < (int32_t)count; esi++) {
+		EF_U8(0x0019f598u) = 1u;
+		idx = EF_U8(EF_U32(0x00136b74u) + esi);
+		hdr = EF_U32(0x00135878u + idx * 32u);
+		pay = EF_U32(0x0013587cu + idx * 32u);
+		type = EF_U16(hdr + 7u);
+		if (type == 5u) {
+			guest_fn_35218();
+			continue;
+		}
+		if (type == 7u) {
+			guest_fn_34d94(0u);
+			continue;
+		}
+		st = EF_U8(0x0019f5a1u);
+		if (type == 4u) {
+			if ((st == 2u || st == 1u) && EF_U8(0x0019f5a5u) != 0u)
+				EF_U8(0x0019f5a9u) = 9u;
+			continue;
+		}
+		if (st == 2u) {
+			if ((uint16_t)type != EF_U16(0x0019f586u))
+				continue;
+			if (EF_U32(0x0019f340u) == 0u) {
+				EF_U16(0x0019f58au) = EF_U16(hdr + 9u);
+				EF_U32(0x0019f340u) = 0x0019f370u;
+				if (EF_U16(0x0019f58au) > 0x1f6u)
+					guest_callptr1_x(EF_U32(0x00132a74u), 0x00182f54u);
+				memcpy_dc832(EF_U32(0x0019f340u), pay, EF_U16(0x0019f58au));
+				EF_U8(0x0019f5a5u) = 1u;
+			}
+			EF_U8(0x0019f5a9u) = 7u;
+		} else if (st == 1u) {
+			if (type == 1u) {
+				if (EF_U16(0x0019f586u) == 1u) {
+					EF_U8(0x0019f5a9u) = 3u;
+					EF_U32(0x0019f344u) = EF_U32(pay);
+					EF_U8(0x0019f59fu) = 1u;
+				}
+				if (EF_U16(0x0019f586u) == 2u)
+					EF_U8(0x0019f5a9u) = 3u;
+			}
+			if (type != 2u || EF_U16(0x0019f586u) != 2u || EF_U32(0x0019f354u) == 0u)
+				continue;
+			b0 = EF_U8(pay);
+			n = b0 & 0x3fu;
+			bit6 = (b0 >> 6) & 1u;
+			last = b0 >> 7;
+			seq = EF_U16(pay + 1u);
+			EF_U16(0x0019f590u) = (uint16_t)seq;
+			if (seq != EF_U16(0x0019f592u)) {
+				if (seq < EF_U16(0x0019f592u) && bit6 != 0u)
+					EF_U8(0x0019f5a9u) = 7u;
+				continue;
+			}
+			if (bit6 != 0u)
+				EF_U16(0x0019f588u) = (uint16_t)(n + 1u);
+			if (EF_U8(0x0019f310u + n) == 1u)
+				continue;
+			e = (uint32_t)((int32_t)EF_U32(0x001258feu) >> 16);
+			EF_U8(0x0019f310u + n) = 1u;
+			off = n * e;
+			len = EF_U16(hdr + 9u) - 3u;
+			dst = off + EF_U32(0x0019f354u);
+			EF_U16(0x0019f584u) = (uint16_t)(EF_U16(0x0019f584u) + 1u);
+			memcpy_dc832(dst, pay + 3u, len);
+			EF_U32(0x0019f33cu) += (uint32_t)(EF_U16(hdr + 9u) - 3u);
+			if (EF_U16(0x0019f584u) < EF_U16(0x0019f588u))
+				continue;
+			EF_U16(0x0019f592u) = (uint16_t)(EF_U16(0x0019f592u) + 1u);
+			EF_U8(0x0019f59fu) = 1u;
+			if (last != 0u)
+				EF_U8(0x0019f5a5u) = 1u;
+		}
+	}
+}

@@ -590,7 +590,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003519c	122	unpack_settings_3519c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003519c.json	docs/compiler-abi.md; Unpack the 0x4c-byte settings record at SRC into the game globals: copy the first 44 bytes to 0x125828, scatter the byte; callers 35590@3562d; guest pending
 0x00035218	8	constant_44_35218	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00035218.json	docs/compiler-abi.md; Constant 0x44.; callers 34f30@34f70,3527c@352b6; guest pending
 0x00035220	92	send_key_request_35220	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035220.json	docs/compiler-abi.md; Build a 3-byte request (the key byte plus a word: 0x19f592 - 1 for key 0x48, else 0xffff), mirror the word to 0x19f58c, ; callers 367f0@3685d,367f0@368b0,367f0@36906; guest pending
-0x0003527c	682			unknown	unclassified	unverified		
+0x0003527c	682	process_packets_3527c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003527c.json	docs/compiler-abi.md; Process the received packet list: the byte at [0x136b78] gives the packet count and the bytes at [0x136b74] index 32-byt; callers 367f0@36833,367f0@36844,36ad8@36b12; guest pending
 0x00035528	59	reset_state_35528	game_helpers5	compiles	game	confirmed	decomp/tests/0x00035528.json	docs/compiler-abi.md; ; callers 36ad8@36b47,36ad8@36bb4; guest pending
 0x00035590	438			unknown	unclassified	unverified		
 0x00035748	90	arm_timer_record_35748	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00035748.json	docs/compiler-abi.md; Arm the timer record unless one is already active.; callers 35590@3561e; guest pending

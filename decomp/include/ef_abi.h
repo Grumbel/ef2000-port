@@ -5802,4 +5802,6 @@ uint32_t load_data_file_f6a8(ef_addr32 count_a, ef_addr32 owner_a, ef_addr32 cou
 
 
 
+void process_packets_3527c(void);
+
 #endif
