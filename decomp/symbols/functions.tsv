@@ -2248,7 +2248,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a4e6c	41	clear_id_table_a4e6c	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a4e6c.json	docs/compiler-abi.md; Clear the 42-entry id table.; callers ac2e4@ac3dc,ac408@ac43d; guest pending
 0x000a4e98	40	clear_widget_table_a4e98	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4e98.json	docs/compiler-abi.md; clear dwords 0x41edfc..0x41ee9c (41 entries); callers ac16c@ac1a5; guest pending
 0x000a4ec0	43	init_widget_margins	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4ec0.json	docs/compiler-abi.md; words +0x5f=4 +0x63=2 +0x61=4 +0x5d=2 or 0x14 with flag; callers a59d8@a5a01; guest pending
-0x000a4eec	274			unknown	unclassified	unverified		
+0x000a4eec	274	update_loadout_maxima_a4eec	game_helpers116	compiles	game	confirmed	decomp/tests/0x000a4eec.json	docs/compiler-abi.md; Compute the current and maximum load figures of a loadout record from its flag bytes (+0x3a/+0x3b) and raise the stored ; callers a59d8@a5a08; guest pending
 0x000a5000	111	clamp_extents_a5000	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a5000.json	docs/compiler-abi.md; Clamp two word fields so that they fit inside the extents at +0x43 / +0x45.; callers a59d8@a5a0f; guest pending
 0x000a5070	361			unknown	unclassified	unverified		
 0x000a51dc	48	update_widget_child_a51dc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a51dc.json	docs/compiler-abi.md; child word +4 = word +0x45 (-0x44 with flag 0x40); callers a520c@a530a,a5484@a54e6,a59d8@a5a4e; guest pending
@@ -2514,7 +2514,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b3648	486			unknown	unclassified	unverified		
 0x000b3830	343	approx_distance3_16_b3830	game_helpers103	compiles	game	confirmed	decomp/tests/0x000b3830.json	docs/compiler-abi.md; Approximate 3D distance from three 16-bit components: 15/16 of the largest absolute value plus 3/8 of the other two.; callers cff64@cff75,cff80@d0209; guest pending
 0x000b3988	100	approx_length_b3988	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b3988.json	docs/compiler-abi.md; Approximate length from two components: max - max/32 - max/128 + 3/8 min + 3/128 min...; callers 67d4@687c,21654@21955,21654@219f0; guest pending
-0x000b39ec	235			unknown	unclassified	unverified		
+0x000b39ec	235	approx_distance3_b39ec	game_helpers116	compiles	game	confirmed	decomp/tests/0x000b39ec.json	docs/compiler-abi.md; Approximate 3D distance of three components (15/16 of the largest magnitude plus 3/8 of the other two).; callers 23760@23786,237c8@237ee,834e8@8363d; guest pending
 0x000b3ae0	57	ratio_lookup_b3ae0	game_helpers28	compiles	game	confirmed	decomp/tests/0x000b3ae0.json	docs/compiler-abi.md; Table-driven ratio of two unsigned values (a/b or complement).; callers b3b1c@b3b4a,b3b1c@b3b55,b3b1c@b3b67; guest pending
 0x000b3b1c	90	angle_of_b3b1c	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b3b1c.json	docs/compiler-abi.md; Quadrant-aware wrapper around 0xb3ae0 (angle of the vector EAX/EDX, 16-bit angle units).; callers 66fc@67c0,26744@268ab,26744@268bc; guest pending
 0x000b3b90	114	read_file_payload_size_b3b90	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b3b90.json	docs/compiler-abi.md; Return the payload size of a file from its header.; callers 6b50@6b78,82e40@82e4e,830b8@830c6; guest pending

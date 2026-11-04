@@ -3888,4 +3888,8 @@ uint8_t count_ready_entries_bcda0(ef_addr32 obj);
 /* game_helpers115.c */
 void shuffle_words_b0cfc(ef_addr32 array, int16_t n, uint8_t start, int16_t limit);
 
+/* game_helpers116.c */
+int32_t approx_distance3_b39ec(int32_t a, int32_t b, int32_t c);
+void update_loadout_maxima_a4eec(ef_addr32 rec);
+
 #endif

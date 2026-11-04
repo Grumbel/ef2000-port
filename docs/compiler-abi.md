@@ -4409,3 +4409,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xb0cfc` | EAX:ef_addr32,DX:int16_t,BL:uint8_t,CX:int16_t | none | b0f5c@b12c2 | Shuffle pass over a word array: for each iteration pick two random positions and swap them with the xor trick. |
+
+## game_helpers116 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb39ec` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | 23760@23786,237c8@237ee,834e8@8363d | Approximate 3D distance of three components (15/16 of the largest magnitude plus 3/8 of the other two). |
+| `0xa4eec` | EAX:ef_addr32 | none | a59d8@a5a08 | Compute the current and maximum load figures of a loadout record from its flag bytes (+0x3a/+0x3b) and raise the stored  |
