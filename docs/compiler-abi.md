@@ -5873,3 +5873,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe8484` | EAX:int32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 7b3fc@7b4c5 | Draw the outline boxes of the scene entry KEY at offset (X, Y, Z): the offset is stored in 0x464370/74/78, the entry kin |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8d330` | EAX:int32_t | none | 8d59c@8d6e7 | Retire the unit INDEX: skipped when its owner byte (+0x18) equals the current player byte 0x1a666b or the owner word is  |

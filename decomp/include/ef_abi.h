@@ -4793,4 +4793,7 @@ void fill_diamond_e2ba0(uint32_t color, uint32_t x, uint32_t y, uint32_t size);
 
 void draw_entry_boxes_e8484(int32_t key, uint32_t x, uint32_t y, uint32_t z);
 
+void retire_unit_8d330(int32_t index);
+void guest_fn_8ca24_x(uint32_t obj, int32_t value); /* 0x8ca24 EAX/EDX */
+
 #endif

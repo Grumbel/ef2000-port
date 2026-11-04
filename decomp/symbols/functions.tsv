@@ -1813,7 +1813,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008d030	176	check_cell_trigger_8d030	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008d030.json	docs/compiler-abi.md; Fire the cell trigger when the player's unit stands on a special terrain value.; callers 8dd48@8de90; guest pending
 0x0008d0e0	57	mark_ui_links_by_slot	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x0008d0e0.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0008d11c	531			unknown	unclassified	unverified		
-0x0008d330	161			unknown	unclassified	unverified		
+0x0008d330	161	retire_unit_8d330	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008d330.json	docs/compiler-abi.md; Retire the unit INDEX: skipped when its owner byte (+0x18) equals the current player byte 0x1a666b or the owner word is ; callers 8d59c@8d6e7; guest pending
 0x0008d3d4	384			unknown	unclassified	unverified		
 0x0008d554	70	maybe_retarget_8d554	game_helpers6	compiles	game	confirmed	decomp/tests/0x0008d554.json	docs/compiler-abi.md; ; callers 8dd48@8de76; guest pending
 0x0008d59c	1283			unknown	unclassified	unverified		

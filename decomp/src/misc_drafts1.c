@@ -3791,3 +3791,28 @@ void draw_entry_boxes_e8484(int32_t key, uint32_t x, uint32_t y, uint32_t z)
         node += (uint32_t)((int32_t)(int16_t)EF_U16(node) * 2);
     } while (EF_U16(node) != 0u);
 }
+
+/* 0x8d330, 161 bytes. Retire the unit INDEX: skipped when its owner byte (+0x18) equals the current player byte 0x1a666b or the owner word is 0xff; otherwise clears the UI links (0x8d0e0, when 0x127da8 is set, also zeroing +0x1c), runs the page texts 0 and 3 of the unit's page (word +0x20) around 0xcd150/0xcd20c, releases its named references (0x8ef38), clears flag bits 0x14 of +0x24 and re-applies the word at +0x28 through 0x8ca24. */
+void retire_unit_8d330(int32_t index)
+{
+    int16_t i = (int16_t)index;
+    uint32_t rec = guest_fn_7489c(i);
+    int16_t page;
+    if (EF_U8(0x001a666bu) == EF_U16(rec + 0x18u))
+        return;
+    if ((int16_t)EF_U16(rec + 0x18u) == 0xff)
+        return;
+    if (EF_U8(0x00127da8u) != 0u) {
+        mark_ui_links_by_slot(i);
+        EF_U32(rec + 0x1cu) = 0u;
+    }
+    page = (int16_t)EF_U16(rec + 0x20u);
+    select_page_9e3f8((uint32_t)(int32_t)page);
+    run_page_text_9e508((int32_t)page, 0u);
+    guest_fn_cd150((int32_t)page);
+    guest_fn_cd20c_w(0u);
+    run_page_text_9e508((int32_t)page, 3u);
+    clear_named_references_8ef38(rec);
+    EF_U8(rec + 0x24u) &= 0xebu;
+    guest_fn_8ca24_x(rec, (int32_t)(int16_t)EF_U16(rec + 0x28u));
+}
