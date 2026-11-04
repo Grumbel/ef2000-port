@@ -5370,4 +5370,7 @@ void queue_grid_node_2a8ac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
 void rebuild_page_c868(void);
 void guest_fn_cccc_x(ef_addr32 w); /* 0xcccc EAX */
 
+void apply_order_record_56890(ef_addr32 rec);
+void guest_fn_10a9c_x(int32_t a, int32_t b, int32_t c); /* 0x10a9c EAX/EDX/EBX */
+
 #endif

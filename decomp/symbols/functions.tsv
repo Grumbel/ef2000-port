@@ -1042,7 +1042,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000564f4	446			unknown	unclassified	unverified		
 0x000566b4	136	apply_params_message_566b4	game_helpers19	compiles	game	confirmed	decomp/tests/0x000566b4.json	docs/compiler-abi.md; Load the parameter block from a message and apply it for the local player.; callers 581b0@583a4; guest pending
 0x0005674c	321			unknown	unclassified	unverified		
-0x00056890	152			unknown	unclassified	unverified		
+0x00056890	152	apply_order_record_56890	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00056890.json	docs/compiler-abi.md; Apply the order record REC (EAX; unit id word +1) to its unit (0x8ffe8) unless the unit's word +0x18 equals byte 0x1a666; callers 581b0@58395; guest pending
 0x00056928	44	dispatch_event_triple	mid_helpers	compiles	game	confirmed	decomp/tests/0x00056928.json	docs/compiler-abi.md; copy 3 dwords, 0x1d5f4(triple, high word +0xd); callers 581b0@58368; guest pending
 0x00056954	31	notify_if_scene_pair	marker_packets	compiles	game	confirmed	decomp/tests/0x00056954.json	docs/compiler-abi.md; Query 0x87f9c with byte +0xd and signed high word of +0xc; nonzero calls 0x878c8; sole direct caller 581b0@58359; guest pending
 0x00056974	61	send_packet_2b	packet_status	compiles	game	confirmed	decomp/tests/0x00056974.json	docs/compiler-abi.md; host model; guest differential pending

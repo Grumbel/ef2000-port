@@ -10810,3 +10810,24 @@ void rebuild_page_c868(void)
     w = guest_fn_a46cc(0x00180728u);
     guest_fn_cccc_x(find_widget_checked_a78bc(w, 0x00180580u));
 }
+
+/* 0x56890, 152 bytes. Apply the order record REC (EAX; unit id word +1) to its unit (0x8ffe8) unless the unit's word +0x18 equals byte 0x1a666b: select the unit's cell (high half of dword +0x1e, 0xcd150), add the difference of the record word +6 and the cell value (0xcd258) to the progress (0xcd2e8), clear the unit's scene children (0x90074) when the record word +8 is 1, run 0x106b0 with the record word +0xa, the unit position >> 8 and the record byte +0xc, and finally 0x10a9c with the unit id, record word +8 and word +6. */
+void apply_order_record_56890(ef_addr32 rec)
+{
+    int32_t id = (int16_t)EF_U16(rec + 1u);
+    ef_addr32 obj = guest_fn_8ffe8(id);
+    uint32_t v;
+    if (obj == 0u)
+        return;
+    if ((uint16_t)EF_U8(0x001a666bu) == EF_U16(obj + 0x18u))
+        return;
+    (void)guest_fn_cd150((int32_t)EF_U32(obj + 0x1eu) >> 16);
+    v = guest_fn_cd258() & 0xffffu;
+    guest_fn_cd2e8((int16_t)(EF_U16(rec + 6u) - v));
+    if (((int32_t)EF_U32(rec + 6u) >> 16) == 1)
+        clear_scene_node_children((int16_t)EF_U16(rec + 1u));
+    guest_fn_106b0_x((uint32_t)((int32_t)EF_U32(rec + 8u) >> 16), (uint32_t)((int32_t)EF_U32(obj) >> 8),
+                     (uint32_t)((int32_t)EF_U32(obj + 4u) >> 8), (uint32_t)((int32_t)EF_U32(obj + 8u) >> 8),
+                     EF_U8(rec + 0xcu));
+    guest_fn_10a9c_x((int16_t)EF_U16(rec + 1u), (int32_t)EF_U32(rec + 6u) >> 16, (int32_t)EF_U32(rec + 4u) >> 16);
+}
