@@ -4259,4 +4259,10 @@ void reset_page_record_2ce18(uint32_t page);
 
 void draw_object_entries_46168(uint32_t key, uint32_t b, uint32_t c, uint32_t d, uint32_t s0);
 
+/* load_planes1.c */
+void interleave_planes_cdc90(ef_addr32 dst, ef_addr32 src);
+uint32_t load_text_file_e94ec(ef_addr32 name, uint32_t flag);
+uint32_t guest_callptr_eax_ret_x(ef_addr32 fn, uint32_t a); /* indirect call, argument in EAX, result in EAX */
+void guest_callptr_eaxedx_x(ef_addr32 fn, uint32_t a, uint32_t b); /* indirect call, arguments in EAX and EDX */
+
 #endif

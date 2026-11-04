@@ -4935,3 +4935,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x46168` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 257d0@2584f,257d0@25aee,257d0@25b4e | For the object found by guest_fn_7489c, call 0x46254 for each of its page record's seven 16-bit entries (+0x50) that dif |
+
+## load_planes1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcdc90` | EAX:ef_addr32,EDX:ef_addr32 | none | cde00@cdf14 | Interleave four planes of rows x width bytes from a packed source into every fourth byte of the destination (non-zero so |
+| `0xe94ec` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | 80058@80095,81230@8126e,82cec@82d29 | Load a text file through the size/read handlers at 0x132ab4/0x132ab8 into a new buffer at 0x1600a0, trimming a trailing  |

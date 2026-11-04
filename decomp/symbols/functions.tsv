@@ -2950,7 +2950,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cdb20	277			unknown	unclassified	unverified		
 0x000cdc38	44	release_buffer_cdc38	code_predicates	compiles	game	confirmed	decomp/tests/0x000cdc38.json	docs/compiler-abi.md; Run 0xc37ec, then release dword 0x15b758 as 0xc3a48 does.; callers cdc64@cdc67,d1e50@d1ea8; guest pending
 0x000cdc64	40	restore_video_mode_cdc64	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000cdc64.json	docs/compiler-abi.md; Re-apply the stored video mode if it differs from the current one.; callers 8b2d8@8b31a,aaee8@aafdb; guest pending
-0x000cdc90	134			unknown	unclassified	unverified		
+0x000cdc90	134	interleave_planes_cdc90	load_planes1	compiles	game	confirmed	decomp/tests/0x000cdc90.json	docs/compiler-abi.md; Interleave four planes of rows x width bytes from a packed source into every fourth byte of the destination (non-zero so; callers cde00@cdf14; guest pending
 0x000cdd18	230			unknown	unclassified	unverified		
 0x000cde00	327			unknown	unclassified	unverified		
 0x000cdf48	24	store_four_dwords_17cf9c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cdf48.json	docs/compiler-abi.md; Dwords 0x17cf9c..a8 = EAX, EDX, EBX, ECX.; callers 11e7c@11f78,11e7c@12059,1e7c0@1e8e4; guest pending
@@ -3447,7 +3447,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e8784	105			unknown	unclassified	unverified		
 0x000e882c	2990			unknown	unclassified	unverified		
 0x000e93dc	272			unknown	unclassified	unverified		
-0x000e94ec	134			unknown	unclassified	unverified		
+0x000e94ec	134	load_text_file_e94ec	load_planes1	compiles	game	confirmed	decomp/tests/0x000e94ec.json	docs/compiler-abi.md; Load a text file through the size/read handlers at 0x132ab4/0x132ab8 into a new buffer at 0x1600a0, trimming a trailing ; callers 80058@80095,81230@8126e,82cec@82d29; guest pending
 0x000e9574	70	release_buffer_e9574	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000e9574.json	docs/compiler-abi.md; Release the buffer at 0x1600a0 once and mark it released.; callers 80058@800d0,81230@812a9,82cec@82d3e; guest pending
 0x000e95c0	444			unknown	unclassified	unverified		
 0x000e977c	463			unknown	unclassified	unverified		
