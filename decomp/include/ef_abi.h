@@ -6206,4 +6206,11 @@ double math_error_edb2d(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, doub
 double sqrt_checked_a4472(double x, uint32_t code, uint32_t *flag);
 double sqrt_checked_a4472(double x, uint32_t code, uint32_t *flag); /* 0xa4472 */
 
+double acos_neg_e7df4(double x);
+double one_minus_pow_11b4bc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg);
+double clamped_sin_acos_11b4e0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg);
+double acos_neg_e7df4(double x); /* 0xe7df4 */
+double one_minus_pow_11b4bc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg); /* 0x11b4bc */
+double clamped_sin_acos_11b4e0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg); /* 0x11b4e0 */
+
 #endif

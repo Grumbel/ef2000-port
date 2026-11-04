@@ -9047,3 +9047,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa4472` | EAX:double,EDX:uint32_t,EBX:uint32_t | EAX:double | deb1a@deb24,e7df4@e7dfe | Implicit-register fragment (x87 ST0 = X, AL = math error code on entry). Checked square root: for X >= 0 returns sqrt(X) |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe7df4` | EAX:double | EAX:double | 6d948@6db1a,6d948@6db2b,6ebe0@6ee3d | Implicit-register fragment (x87 ST0 = X). Computes S = sqrt(1 - X*X) with 0xa4472 (error code 1); when the square root s |
+| `0x11b4bc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | EAX:double | 11b5a8@11b5bc,11b5a8@11b5d0 | Returns 1 - pow(1 - ARG, 1.4) (ret 8, one stack double). |
+| `0x11b4e0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double | EAX:double | 11b5a8@11b5f0 | Returns -sin(acos_neg(T)) where T = 1 - ARG clamped to [-1, 1] (lower bound read from the double at 0x195894; ret 8, one |

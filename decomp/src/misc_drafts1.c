@@ -20789,3 +20789,32 @@ double sqrt_checked_a4472(double x, uint32_t code, uint32_t *flag)
 	if (flag) *flag = 1u;
 	return math_error_edb2d(0u, 0u, 0u, 0u, x, code & 0xffu);
 }
+
+/* 0xe7df4, 36 bytes. Implicit-register fragment (x87 ST0 = X). Computes S = sqrt(1 - X*X) with 0xa4472 (error code 1); when the square root succeeds returns atan2(X, S) - pi/2 (the constant is the 80-bit value at cs:0xe7dea, 0xc90fdaa22168c000 x 2^0), otherwise returns the error result unchanged. */
+double acos_neg_e7df4(double x)
+{
+	uint32_t flag = 0u;
+	double s = sqrt_checked_a4472(1.0 - x * x, 1u, &flag);
+	if (flag != 0u)
+		return s;
+	return atan2_dc1e9(x, s) - 1.5707963267948966;
+}
+
+/* 0x11b4bc, 36 bytes. Returns 1 - pow(1 - ARG, 1.4) (ret 8, one stack double). */
+double one_minus_pow_11b4bc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg)
+{
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	return 1.0 - pow_b3fec(1.0 - arg, 1.4);
+}
+
+/* 0x11b4e0, 95 bytes. Returns -sin(acos_neg(T)) where T = 1 - ARG clamped to [-1, 1] (lower bound read from the double at 0x195894; ret 8, one stack double). */
+double clamped_sin_acos_11b4e0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg)
+{
+	double t = 1.0 - arg;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	if (1.0 < t)
+		t = 1.0;
+	if (t < md_rd_f64(0x00195894u))
+		t = -1.0;
+	return -sin_b45ac(acos_neg_e7df4(t));
+}

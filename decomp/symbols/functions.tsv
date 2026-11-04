@@ -3426,7 +3426,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e7cd0	28	append_two_e7cd0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000e7cd0.json	docs/compiler-abi.md; Append a fixed string and then second to first.; callers e7cec@e7d1f; guest pending
 0x000e7cec	59	build_path_with_name_e7cec	game_helpers91	compiles	game	confirmed	decomp/tests/0x000e7cec.json	docs/compiler-abi.md; Build a path from the default directory plus two parts, appending the third part unless it equals the string at 0x190c50; callers 69094@691c8,8b2d8@8b2f9,d9e50@d9fad; guest pending
 0x000e7d27	194	strstr_e7d27	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e7d27.json	docs/compiler-abi.md; strstr(HAY = EAX, NEEDLE = EDX): the first occurrence of NEEDLE in HAY, or 0. An empty needle returns HAY; a one-charact; callers 69094@69264,c3364@c337d; guest pending
-0x000e7df4	36			unknown	unclassified	unverified		
+0x000e7df4	36	acos_neg_e7df4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e7df4.json	docs/compiler-abi.md; Implicit-register fragment (x87 ST0 = X). Computes S = sqrt(1 - X*X) with 0xa4472 (error code 1); when the square root s; callers 6d948@6db1a,6d948@6db2b,6ebe0@6ee3d; guest pending
 0x000e7e30	113	rebuild_remap_table_e7e30	page_rotate1	compiles	game	confirmed	decomp/tests/0x000e7e30.json	docs/compiler-abi.md; Rebuild the 0x8000-byte remap table at [0x164604] by looking each byte of its upper half up in the 0x433f34 tables, unle; callers 759b8@75c6c,c8e58@c8f0d,c8f38@c8fc4; guest pending
 0x000e7ea4	177	build_ramp_table_e7ea4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e7ea4.json	docs/compiler-abi.md; Build the 256-entry brightness ramp at 0x463f60 for the range LO..HI (EAX, EDX; LO >= 0 and HI < 256, else return 0): en; callers da224@da284; guest pending
 0x000e7fa4	19	install_handler_e7fa4	math_string	compiles	game	confirmed	decomp/tests/0x000e7fa4.json	docs/compiler-abi.md; Dword 0x464360 = EAX, dword 0x15b268 = 0xe7f60.; callers 7a38c@7a397; guest pending
@@ -4185,8 +4185,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b1b0	36	forward_to_11b134_11b1b0	small_wrappers6	compiles	game	confirmed	decomp/tests/0x0011b1b0.json	docs/compiler-abi.md; Forward four stack arguments to 0x11b134.; callers 11b6bc@11b6eb,11b6bc@11b71c,11bb80@11bb9e; guest pending
 0x0011b3c0	7	constant_double_11b3c0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b3c0.json	docs/compiler-abi.md; Constant double at 0x195864.; callers 11c584@11c6e4; guest pending
 0x0011b3c8	149			unknown	unclassified	unverified		
-0x0011b4bc	36			unknown	unclassified	unverified		
-0x0011b4e0	95			unknown	unclassified	unverified		
+0x0011b4bc	36	one_minus_pow_11b4bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b4bc.json	docs/compiler-abi.md; Returns 1 - pow(1 - ARG, 1.4) (ret 8, one stack double).; callers 11b5a8@11b5bc,11b5a8@11b5d0; guest pending
+0x0011b4e0	95	clamped_sin_acos_11b4e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011b4e0.json	docs/compiler-abi.md; Returns -sin(acos_neg(T)) where T = 1 - ARG clamped to [-1, 1] (lower bound read from the double at 0x195894; ret 8, one; callers 11b5a8@11b5f0; guest pending
 0x0011b540	69	scaled_call_11b540	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b540.json	docs/compiler-abi.md; (ret 8) f(x * k4) * 0.53 with f = 0x11b3fec's sibling 0xb3fec; the intermediate x * k1 * k2 + k3 is computed and discard; callers 11b588@11b595; guest pending
 0x0011b588	30	scaled_call_11b588	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b588.json	docs/compiler-abi.md; (ret 8) Call 0x11b540 with the double argument and scale its result by the constant at 0x1958bc.; callers 11b5a8@11b608; guest pending
 0x0011b5a8	156			unknown	unclassified	unverified		
