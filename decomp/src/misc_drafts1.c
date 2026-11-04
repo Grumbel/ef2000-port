@@ -20074,3 +20074,9 @@ void open_devices_e0b6c(void)
 	wait_ticks_or_press_e115c(0x96u);
 	open_device_e0b88(0x15f5bdu);
 }
+
+/* 0x1204b6, 21 bytes. Debugger hook: when the flag byte at 0x17ee30 is set the original executes INT 3 (a debugger-only breakpoint call) and returns its result; otherwise returns 0. Without a debugger attached the result is 0, so this draft always returns 0. */
+uint32_t debugger_hook_1204b6(void)
+{
+	return 0u;
+}

@@ -8854,3 +8854,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc4680` | EAX:ef_addr32 | none | 95e58@96269 | Stack argument SRC (callee cleanup): shift the three triples at SRC left by 9 into the table at 0x1590c0. |
 | `0xe0b6c` | none | none | none direct | Opens the device named at 0x15f4fd, waits 0x96 ticks, then falls through into 0xe0b88 with EAX = 0x15f5bd (a second devi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1204b6` | none | EAX:uint32_t | 11d258@11d260 | Debugger hook: when the flag byte at 0x17ee30 is set the original executes INT 3 (a debugger-only breakpoint call) and r |

@@ -6088,4 +6088,7 @@ void open_devices_e0b6c(void);
 void shift_triples_to_1590c0_c4680(ef_addr32 src);
 void open_devices_e0b6c(void);
 
+uint32_t debugger_hook_1204b6(void);
+uint32_t debugger_hook_1204b6(void);
+
 #endif

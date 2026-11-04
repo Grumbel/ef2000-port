@@ -4249,7 +4249,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011fd90	1703			unknown	unclassified	unverified		
 0x00120451	52	dos_int21_vector_bridge	unk_runtime	named	asm	unverified		docs/compiler-abi.md; AH=0x25/0x35 INT 21h, returns ES selector in DX and original EAX; interrupt clobbers unresolved
 0x00120485	49	install_runtime_hook_120485	game_helpers78	compiles	game	confirmed	decomp/tests/0x00120485.json	docs/compiler-abi.md; Install the runtime hook once.; callers none direct; guest pending
-0x001204b6	21			unknown	unclassified	unverified		
+0x001204b6	21	debugger_hook_1204b6	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001204b6.json	docs/compiler-abi.md; Debugger hook: when the flag byte at 0x17ee30 is set the original executes INT 3 (a debugger-only breakpoint call) and r; callers 11d258@11d260; guest pending
 0x001204dc	132	format_nonfinite_double	unk_runtime	typed	unclassified	confirmed		ABI only; two stack dwords of FP bits plus dest pointer, EAX Boolean, ret 12
 0x00120560	486			unknown	unclassified	unverified		
 0x00120746	93			unknown	unclassified	unverified		
