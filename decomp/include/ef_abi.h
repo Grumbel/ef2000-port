@@ -4321,4 +4321,11 @@ void redraw_if_unsaved_dd8c0(void);
 void forward_to_1111e5_101f78(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
 void guest_fn_1111e5_x(uint32_t a); /* 0x1111e5 cdecl, one stack argument, caller cleanup */
 
+uint32_t release_ref_108ffa(ef_addr32 obj);
+void expect_byte_109328(ef_addr32 cursor, uint32_t expected);
+void forward_to_11b134_11b1b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3);
+void run_with_hook_9e094(uint32_t value, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t arg);
+void guest_fn_11b134_x(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3); /* 0x11b134 four stack arguments, callee cleanup */
+void guest_fn_9e0c4_x(int32_t value); /* 0x9e0c4 EAX */
+
 #endif

@@ -5064,3 +5064,12 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xdd8c0` | none | none | dd9e4@dda4a,f34cc@f352e | Run 0xdd8dc when the saved width at 0x15ee94 is -1 (nothing saved yet); otherwise do nothing. |
 | `0x101f78` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 103e0c@103e4a,105648@1056a8,105648@1056f0 | Forward a stack argument to 0x1111e5. |
+
+## small_wrappers6 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x108ffa` | EAX:ef_addr32 | EAX:uint32_t | 108888@10892f,108afd@108b5f,108afd@108bd0 | Decrement a use counter (+0xc) and, while it was non-zero, call the object's handler (first dword); returns the handler  |
+| `0x109328` | EAX:ef_addr32,EDX:uint32_t | none | e3e50@e3e7c,e3f00@e3f1c | Check that the byte at *cursor equals expected (printing a message through 0x132a74 if not) and advance the cursor. |
+| `0x11b1b0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | 11b6bc@11b6eb,11b6bc@11b71c,11bb80@11bb9e | Forward four stack arguments to 0x11b134. |
+| `0x9e094` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 8e5f0@8e639 | Run 0x9e0c4 with the hook at 0x132b14 pointing to 0x9e08c and the stack argument saved at 0x41714c, then restore the def |

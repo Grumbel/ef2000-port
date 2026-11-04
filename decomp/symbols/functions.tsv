@@ -2088,7 +2088,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009ddfc	10	call_9de08_9ddfc	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x0009ddfc.json	docs/compiler-abi.md; Call 0x9de08 with a zero second argument.; callers 9820@9ace,2a720@2a76e,2a7ac@2a7d1; guest pending
 0x0009de08	440			unknown	unclassified	unverified		
 0x0009dfc0	165	select_page_layout_9dfc0	game_helpers36	compiles	game	confirmed	decomp/tests/0x0009dfc0.json	docs/compiler-abi.md; Select a page and its layout; refresh each cell when the layout is active.; callers 161d4@164d8,1e28c@1e391,95e58@96311; guest pending
-0x0009e094	45			unknown	unclassified	unverified		
+0x0009e094	45	run_with_hook_9e094	small_wrappers6	compiles	game	confirmed	decomp/tests/0x0009e094.json	docs/compiler-abi.md; Run 0x9e0c4 with the hook at 0x132b14 pointing to 0x9e08c and the stack argument saved at 0x41714c, then restore the def; callers 8e5f0@8e639; guest pending
 0x0009e0c4	466			unknown	unclassified	unverified		
 0x0009e3f8	155	select_page_9e3f8	tactical_marks1	compiles	game	confirmed	decomp/tests/0x0009e3f8.json	docs/compiler-abi.md; Make a page current: record it at 0x41722a/0x417174/0x41717c and, when its table entry has flag 1, clear the eight words; callers 7775c@77790,87a20@87c57,8c49c@8c55b; guest pending
 0x0009e494	116	run_text_on_page_9e494	list_ops1	compiles	game	confirmed	decomp/tests/0x0009e494.json	docs/compiler-abi.md; Run the 0x9e7bc text routine with the current-page globals (0x417174/0x417178/0x41717c/0x41722a) temporarily pointed at ; callers a0c04@a0d37,cd2e8@cd378; guest pending
@@ -3936,7 +3936,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00108afd	734			unknown	unclassified	unverified		
 0x00108ddb	504			unknown	unclassified	unverified		
 0x00108fd3	39	hex_digit_value	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00108fd3.json	docs/compiler-abi.md; Hex digit value of a character, or 0x10.; callers 108ddb@108ef6,108ddb@108f32; guest pending
-0x00108ffa	35			unknown	unclassified	unverified		
+0x00108ffa	35	release_ref_108ffa	small_wrappers6	compiles	game	confirmed	decomp/tests/0x00108ffa.json	docs/compiler-abi.md; Decrement a use counter (+0xc) and, while it was non-zero, call the object's handler (first dword); returns the handler ; callers 108888@10892f,108afd@108b5f,108afd@108bd0; guest pending
 0x0010901d	83	compare_nocase_10901d	game_helpers99	compiles	game	confirmed	decomp/tests/0x0010901d.json	docs/compiler-abi.md; Case-insensitive compare of up to n bytes (does not stop at NUL); returns the first difference of the lower-cased bytes.; callers e0b10@e0b39; guest pending
 0x00109070	19	reset_with_saved_byte_109070	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00109070.json	docs/compiler-abi.md; Reset via 0xe6120 then continue with the saved byte.; callers e1958@e1b2d; guest pending
 0x001091e0	28	strip_cr_inplace	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001091e0.json	docs/compiler-abi.md; Remove carriage returns in place; returns the end pointer.; callers 1093d8@1093ea; guest pending
@@ -3944,7 +3944,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010922c	85	select_table_entry_10922c	small_wrappers3	compiles	game	confirmed	decomp/tests/0x0010922c.json	docs/compiler-abi.md; Lowercase a name, plant it as a sentinel entry of the 8-byte table at 0x4dd898 and store the value of the first matching; callers 1093d8@109428; guest pending
 0x00109284	41	skip_class_chars	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00109284.json	docs/compiler-abi.md; Advance *pointer over characters whose class-table entry (0x195af0[c+1]) has bit 2.; callers e3e50@e3e88,1092b0@1092bf,1092b0@109314; guest pending
 0x001092b0	119	parse_decimal_1092b0	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x001092b0.json	docs/compiler-abi.md; Skip blanks, parse a decimal number at *cursor, skip blanks again and store the new cursor.; callers e3e50@e3e6c,e3fbc@e3fc5; guest pending
-0x00109328	36			unknown	unclassified	unverified		
+0x00109328	36	expect_byte_109328	small_wrappers6	compiles	game	confirmed	decomp/tests/0x00109328.json	docs/compiler-abi.md; Check that the byte at *cursor equals expected (printing a message through 0x132a74 if not) and advance the cursor.; callers e3e50@e3e7c,e3f00@e3f1c; guest pending
 0x0010934c	138	copy_identifier_10934c	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x0010934c.json	docs/compiler-abi.md; Skip blanks and copy an identifier (class bits 0xe0 or '_') at *cursor into dest, NUL-terminated.; callers e3f00@e3f0e; guest pending
 0x001093d8	95	run_text_script_1093d8	script_helpers1	compiles	game	confirmed	decomp/tests/0x001093d8.json	docs/compiler-abi.md; Run a line-oriented text script: each non-empty line not starting with ';' is passed to the current handler (0x4dd890), ; callers e4010@e40cf; guest pending
 0x00109440	10	run_pair_109440	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00109440.json	docs/compiler-abi.md; Run 0x10944c then 0x118b60.; callers e474c@e4763; guest pending
@@ -4182,7 +4182,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b040	172			unknown	unclassified	unverified		
 0x0011b0ec	40			unknown	unclassified	unverified		
 0x0011b134	122			unknown	unclassified	unverified		
-0x0011b1b0	36			unknown	unclassified	unverified		
+0x0011b1b0	36	forward_to_11b134_11b1b0	small_wrappers6	compiles	game	confirmed	decomp/tests/0x0011b1b0.json	docs/compiler-abi.md; Forward four stack arguments to 0x11b134.; callers 11b6bc@11b6eb,11b6bc@11b71c,11bb80@11bb9e; guest pending
 0x0011b3c0	7	constant_double_11b3c0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011b3c0.json	docs/compiler-abi.md; Constant double at 0x195864.; callers 11c584@11c6e4; guest pending
 0x0011b3c8	149			unknown	unclassified	unverified		
 0x0011b4bc	36			unknown	unclassified	unverified		
