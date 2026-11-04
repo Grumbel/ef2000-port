@@ -2991,3 +2991,14 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xaafe8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:uint32_t | ab060@ab07e,ab324@ab395,ab324@ab418 | Find a node in the nested group lists; report its index and group index. |
 | `0xab840` | EAX:uint32_t | EAX:uint32_t | 371b0@371f2,a7510@a7536,e1e6c@e1eee | Bump-allocate a zeroed block from the arena; 0 when it does not fit. |
+
+## game_helpers27 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x65410` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,CL:uint8_t,[ESP+4]:uint16_t,[ESP+8]:uint8_t,[ESP+12]:uint8_t | none | 65030@65276,65030@652a9,65030@652f4 | Move a node from the free list to the head of the active list and fill it. |
+| `0x6583c` | none | none | 654b8@6555f | Advance the vertical countdown; step to the next frame when it expires. |
+| `0x658cc` | none | none | 654b8@6555a | Advance the horizontal countdown; step to the next frame when it expires. |
+| `0x7aa3c` | none | none | 7ab00@7abc4 | Pick two random table values for the current stream slot. |
+| `0x82168` | AX:int16_t,DX:int16_t,BL:uint8_t | none | 4a210@4a818,4aa4c@4ae37 | Claim the first free (0xff) slot in a row of eight and link both tables. |
+| `0x833a0` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | 83424@834c3,83424@834d0,834e8@83527 | Compute a*b/c, saturating to +/-0x7fffffff-ish when the product overflows. |

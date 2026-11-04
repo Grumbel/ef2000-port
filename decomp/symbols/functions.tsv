@@ -1200,15 +1200,15 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00065030	813			unknown	unclassified	unverified		
 0x00065360	118	release_entry_65360	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00065360.json	docs/compiler-abi.md; Find the active entry with type AL and id DX, unlink it and return it to the free list.; callers 654b8@6554b,73924@73948; guest pending
 0x000653d8	53	find_node_653d8	game_helpers9	compiles	game	confirmed	decomp/tests/0x000653d8.json	docs/compiler-abi.md; Find the node with this kind and id in the list at 0x1a7c54.; callers 6563c@65681; guest pending
-0x00065410	135			unknown	unclassified	unverified		
+0x00065410	135	activate_node_65410	game_helpers27	compiles	game	confirmed	decomp/tests/0x00065410.json	docs/compiler-abi.md; Move a node from the free list to the head of the active list and fill it.; callers 65030@65276,65030@652a9,65030@652f4; guest pending
 0x00065498	14	record_field_16_or_default	mid_helpers	compiles	game	confirmed	decomp/tests/0x00065498.json	docs/compiler-abi.md; dword +0x16 or dword 0x1a7c54 when null; callers 646d4@64d88; guest pending
 0x000654b8	181			unknown	unclassified	unverified		
 0x00065570	204			unknown	unclassified	unverified		
 0x0006563c	267			unknown	unclassified	unverified		
 0x00065748	124	check_range_65748	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00065748.json	docs/compiler-abi.md; Flag 4 or 1 in byte 0x1a81de when the object is within range of the viewpoint (positions scaled by 256).; callers 654b8@654f4; guest pending
 0x000657c4	120	check_range_657c4	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x000657c4.json	docs/compiler-abi.md; As 0x65748 without the second shift, flags in byte 0x1a81dd.; callers 654b8@654fd; guest pending
-0x0006583c	143			unknown	unclassified	unverified		
-0x000658cc	143			unknown	unclassified	unverified		
+0x0006583c	143	advance_countdown_y_6583c	game_helpers27	compiles	game	confirmed	decomp/tests/0x0006583c.json	docs/compiler-abi.md; Advance the vertical countdown; step to the next frame when it expires.; callers 654b8@6555f; guest pending
+0x000658cc	143	advance_countdown_x_658cc	game_helpers27	compiles	game	confirmed	decomp/tests/0x000658cc.json	docs/compiler-abi.md; Advance the horizontal countdown; step to the next frame when it expires.; callers 654b8@6555a; guest pending
 0x00065960	202			unknown	unclassified	unverified		
 0x00065a50	56			unknown	unclassified	unverified		
 0x00065a88	402			unknown	unclassified	unverified		
@@ -1461,7 +1461,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a844	375			unknown	unclassified	unverified		
 0x0007a9bc	111			unknown	unclassified	unverified		
 0x0007aa2c	15			unknown	unclassified	unverified		
-0x0007aa3c	132			unknown	unclassified	unverified		
+0x0007aa3c	132	pick_random_pair_7aa3c	game_helpers27	compiles	game	confirmed	decomp/tests/0x0007aa3c.json	docs/compiler-abi.md; Pick two random table values for the current stream slot.; callers 7ab00@7abc4; guest pending
 0x0007aac0	61	select_plane_source	plane_sources	compiles	game	confirmed	decomp/tests/0x0007aac0.json	docs/compiler-abi.md
 0x0007ab00	369			unknown	unclassified	unverified		
 0x0007ac74	405			unknown	unclassified	unverified		
@@ -1568,7 +1568,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082024	37			unknown	unclassified	unverified		
 0x0008204c	18			unknown	unclassified	unverified		
 0x00082060	125			unknown	unclassified	unverified		
-0x00082168	142			unknown	unclassified	unverified		
+0x00082168	142	claim_slot_82168	game_helpers27	compiles	game	confirmed	decomp/tests/0x00082168.json	docs/compiler-abi.md; Claim the first free (0xff) slot in a row of eight and link both tables.; callers 4a210@4a818,4aa4c@4ae37; guest pending
 0x000821f8	70	find_row_slot_821f8	game_helpers20	compiles	game	confirmed	decomp/tests/0x000821f8.json	docs/compiler-abi.md; Index of the last 16-bit slot of row b (17 bytes per row) equal to a.; callers 426a4@42758; guest pending
 0x00082478	628			unknown	unclassified	unverified		
 0x00082720	26	write_status_byte_1fcb30	status_values	compiles	game	confirmed	decomp/tests/0x00082720.json	docs/compiler-abi.md; sprintf-style 0xa4342(dest, fmt 0x188b24, byte 0x1fcb30); sole direct caller 82e40@82f78; guest pending
@@ -1592,7 +1592,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00083200	145			unknown	unclassified	unverified		
 0x00083294	34	ui_point_near_reference	ui_secondary	compiles	game	confirmed	decomp/tests/0x00083294.json	docs/compiler-abi.md; host model; guest differential pending
 0x000832b8	232			unknown	unclassified	unverified		
-0x000833a0	131			unknown	unclassified	unverified		
+0x000833a0	131	muldiv_saturate_833a0	game_helpers27	compiles	game	confirmed	decomp/tests/0x000833a0.json	docs/compiler-abi.md; Compute a*b/c, saturating to +/-0x7fffffff-ish when the product overflows.; callers 83424@834c3,83424@834d0,834e8@83527; guest pending
 0x00083424	194			unknown	unclassified	unverified		
 0x000834e8	541			unknown	unclassified	unverified		
 0x00083708	42	compose_ui_relative_vector	ui_secondary	compiles	game	confirmed	decomp/tests/0x00083708.json	docs/compiler-abi.md; host model; guest differential pending

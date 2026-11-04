@@ -2238,4 +2238,15 @@ uint32_t find_node_position_aafe8(ef_addr32 out_index, ef_addr32 out_group, ef_a
 uint32_t alloc_zeroed_ab840(uint32_t size);
 
 
+/* game_helpers27.c */
+void activate_node_65410(uint32_t a, uint32_t b, uint32_t c, uint8_t kind,
+                         uint16_t stack_word, uint8_t stack_b, uint8_t stack_c);
+void advance_countdown_y_6583c(void);
+void advance_countdown_x_658cc(void);
+void pick_random_pair_7aa3c(void);
+void claim_slot_82168(int16_t owner, int16_t row, uint8_t kind);
+int32_t muldiv_saturate_833a0(int32_t a, int32_t b, int32_t c);
+void guest_fn_29dd0(int32_t value); /* 0x29dd0 EAX */
+void guest_fn_29b14(int32_t value); /* 0x29b14 EAX */
+
 #endif
