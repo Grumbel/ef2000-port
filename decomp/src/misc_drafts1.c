@@ -5794,3 +5794,48 @@ void draw_table_sprite_cde00(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
                                  (uint32_t)(int32_t)(int16_t)ry0, (uint32_t)(int32_t)(int16_t)ry1);
     }
 }
+
+/* 0x6abac, 331 bytes. Pick a free object for the unit ID (16-bit) from candidate list K (word index into the 69-byte table at dword 0x1a14f8, ten object IDs at +0x28): the first object that exists, has flags 1 and 2 clear in byte +0x30, no owner (dword +0x1c) is stored in the unit's word +0x16a (the object's word +0x16); in the first pass the choice is undone (word 0xff) when one of the seven peers listed in the 202-byte table at dword 0x19bb58 (indexed by the unit's word +0x28, IDs at +0x50) already uses the same value, and the scan continues; a second pass without the peer check follows when nothing was chosen. Returns 1 when an object was assigned, 0 otherwise (also when the unit does not exist). */
+uint32_t assign_unit_object_6abac(uint32_t id, uint32_t k)
+{
+    uint32_t unit = guest_fn_7489c((int16_t)id);
+    int16_t i, j;
+    uint16_t found = 0u;
+    if (unit == 0u)
+        return 0u;
+    for (i = 0; i < 10; i++) {
+        uint32_t tbl = EF_U32(0x001a14f8u) + (uint32_t)((int32_t)(int16_t)k * 0x45);
+        uint32_t p = guest_lookup_object_8ffe8((int16_t)EF_U16(tbl + 0x28u + (uint32_t)i * 2u));
+        if (p == 0u)
+            continue;
+        if ((EF_U8(p + 0x30u) & 1u) || (EF_U8(p + 0x30u) & 2u))
+            continue;
+        if (EF_U32(p + 0x1cu) != 0u || found != 0u)
+            continue;
+        found = 1u;
+        EF_U16(unit + 0x16au) = EF_U16(p + 0x16u);
+        for (j = 0; j < 7; j++) {
+            uint32_t t2 = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)EF_U16(unit + 0x28u) * 0xca);
+            uint32_t peer = guest_fn_7489c((int16_t)EF_U16(t2 + 0x50u + (uint32_t)j * 2u));
+            if (peer != 0u && peer != unit && EF_U16(peer + 0x16au) == EF_U16(p + 0x16u)) {
+                EF_U16(unit + 0x16au) = 0xffu;
+                found = 0u;
+            }
+        }
+    }
+    if (found == 0u) {
+        for (i = 0; i < 10; i++) {
+            uint32_t tbl = EF_U32(0x001a14f8u) + (uint32_t)((int32_t)(int16_t)k * 0x45);
+            uint32_t p = guest_lookup_object_8ffe8((int16_t)EF_U16(tbl + 0x28u + (uint32_t)i * 2u));
+            if (p == 0u)
+                continue;
+            if ((EF_U8(p + 0x30u) & 1u) || (EF_U8(p + 0x30u) & 2u))
+                continue;
+            if (EF_U32(p + 0x1cu) != 0u || found != 0u)
+                continue;
+            EF_U16(unit + 0x16au) = EF_U16(p + 0x16u);
+            found = 1u;
+        }
+    }
+    return found;
+}

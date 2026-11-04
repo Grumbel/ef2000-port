@@ -1280,7 +1280,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a82c	207	is_valid_target_6a82c	game_helpers40	compiles	game	confirmed	decomp/tests/0x0006a82c.json	docs/compiler-abi.md; True when the second unit is a valid hostile target for the first.; callers 6a8fc@6a95b,6aeb4@6af2b,6aeb4@6afa6; guest pending
 0x0006a8fc	369			unknown	unclassified	unverified		
 0x0006aa70	316			unknown	unclassified	unverified		
-0x0006abac	331			unknown	unclassified	unverified		
+0x0006abac	331	assign_unit_object_6abac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006abac.json	docs/compiler-abi.md; Pick a free object for the unit ID (16-bit) from candidate list K (word index into the 69-byte table at dword 0x1a14f8, ; callers 6ae30@6aea1; guest pending
 0x0006ae30	130	indexed_object_has_grid_link	scene_indexed	compiles	game	confirmed	decomp/tests/0x0006ae30.json	docs/compiler-abi.md
 0x0006aeb4	1165			unknown	unclassified	unverified		
 0x0006b344	137	unit_owner_update_6b344	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006b344.json	docs/compiler-abi.md; For unit id, look up its object; if the table entry (0xca bytes at 0x19bb58) of the object's owner still points back at ; callers 6c488@6c702; guest pending

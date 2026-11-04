@@ -6247,3 +6247,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xcde00` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | none | dd8dc@dd97b | Draw sprite number IDX from the sprite table TABLE (byte count, then word offsets from the table) centred at (X, Y): the |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6abac` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 6ae30@6aea1 | Pick a free object for the unit ID (16-bit) from candidate list K (word index into the 69-byte table at dword 0x1a14f8,  |
