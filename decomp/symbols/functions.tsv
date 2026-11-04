@@ -2581,7 +2581,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b59a8	995			unknown	unclassified	unverified		
 0x000b5d8c	579			unknown	unclassified	unverified		
 0x000b5fe8	2179			unknown	unclassified	unverified		
-0x000b686c	216			unknown	unclassified	unverified		
+0x000b686c	216	fill_slots_from_nearest_b686c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b686c.json	docs/compiler-abi.md; Fill the slots of the record A (EAX; slot table pointer at +0x13, slot count byte at +0x12, 0x7c byte slots) from the ne; callers b47e4@b4834,b47e4@b485d,b47e4@b4895; guest pending
 0x000b69e4	4965			unknown	unclassified	unverified		
 0x000b7d4c	864			unknown	unclassified	unverified		
 0x000b80ac	1121			unknown	unclassified	unverified		

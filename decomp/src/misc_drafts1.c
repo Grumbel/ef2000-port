@@ -11900,3 +11900,33 @@ void spawn_at_selected_872c8(uint32_t a, uint32_t b)
                      (uint32_t)(int32_t)(int16_t)a, b, obj);
     EF_U16(0x0020f194u) = 0u;
 }
+
+/* 0xb686c, 216 bytes. Fill the slots of the record A (EAX; slot table pointer at +0x13, slot count byte at +0x12, 0x7c byte slots) from the nearest node: walk the node list whose head pointer is at *LISTHEAD (EBX) for a type 0x31 node (+0xc) other than OBJ (EDX) that passes the group test 0xcc22c(OBJ.+0xb, node.+0xb, MASK = ECX) and is closer than 100000.0 by 0xf83d0 (positions at +0x11 and +0x15); the nearest, or OBJ itself when none, then fills every slot: +0x24 gets a copy (0xcc744) of the pointer at node+0xd, +0x28 the 18 bytes at node+0x11. */
+void fill_slots_from_nearest_b686c(ef_addr32 rec, ef_addr32 obj, ef_addr32 listhead, uint32_t mask)
+{
+    ef_addr32 node = EF_U32(listhead);
+    ef_addr32 best = 0u;
+    double bestd = 100000.0;
+    ef_addr32 src;
+    int16_t i;
+    while (node != 0u) {
+        if ((uint16_t)group_flag_positive_cc22c(EF_U8(obj + 0xbu), EF_U8(node + 0xbu), mask) != 0u && node != obj &&
+            EF_U8(node + 0xcu) == 0x31u) {
+            double d = int_distance_2d_f83d0((int32_t)EF_U32(obj + 0x11u), (int32_t)EF_U32(node + 0x11u),
+                                             (int32_t)EF_U32(obj + 0x15u), (int32_t)EF_U32(node + 0x15u));
+            if (d < bestd) {
+                bestd = d;
+                best = node;
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+    src = best != 0u ? best : obj;
+    for (i = 0; i < (int32_t)EF_U8(rec + 0x12u); i++) {
+        ef_addr32 name = EF_U32(src + 0xdu);
+        uint32_t copy = name != 0u ? alloc_checked_cc744(name) : 0u;
+        ef_addr32 slot = EF_U32(rec + 0x13u) + (uint32_t)((int32_t)i * 0x7c);
+        EF_U32(slot + 0x24u) = copy;
+        memcpy(ef_guest_memory_ptr(slot + 0x28u), ef_guest_memory_ptr(src + 0x11u), 18u);
+    }
+}

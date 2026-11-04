@@ -7539,3 +7539,9 @@ in EAX, format string address, one value).
 
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb686c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:uint32_t | none | b47e4@b4834,b47e4@b485d,b47e4@b4895 | Fill the slots of the record A (EAX; slot table pointer at +0x13, slot count byte at +0x12, 0x7c byte slots) from the ne |
