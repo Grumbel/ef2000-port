@@ -7128,3 +7128,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xbe208` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | bd92c@bdb85 | Assign free nodes to the request record REC (ECX; node count in byte +3, kind byte +8): walk the node list whose head po |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcaea0` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | b0f5c@b132a | Refresh the cached 18-byte blocks of a node list from a table of COUNT (EBX, signed 16 bits) 0x1b-byte entries at TABLE  |

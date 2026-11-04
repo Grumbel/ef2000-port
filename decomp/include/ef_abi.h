@@ -5312,4 +5312,6 @@ void uncount_side_tallies_9b780(void);
 
 void claim_idle_nodes_be208(uint32_t owner, uint32_t target, uint32_t value, ef_addr32 rec, ef_addr32 headptr);
 
+void refresh_node_blocks_caea0(ef_addr32 headptr, ef_addr32 table, uint32_t count);
+
 #endif

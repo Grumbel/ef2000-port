@@ -9916,3 +9916,28 @@ void claim_idle_nodes_be208(uint32_t owner, uint32_t target, uint32_t value, ef_
         node = EF_U32(node + 4u);
     }
 }
+
+/* 0xcaea0, 296 bytes. Refresh the cached 18-byte blocks of a node list from a table of COUNT (EBX, signed 16 bits) 0x1b-byte entries at TABLE (EDX): for every node of the list whose head pointer is stored at HEADPTR (EAX) and every entry, test the word pairs (node +0x1f/+0x27, +0x1d/+0x25, +0x1b/+0x23, +0x19/+0x21) against the entry words +3/+5 in that order; the first pair that matches and whose cached block at node +0x3b differs from the entry's block at +9 gets the block copied over, matching blocks leave it alone and the search continues. */
+void refresh_node_blocks_caea0(ef_addr32 headptr, ef_addr32 table, uint32_t count)
+{
+    static const uint8_t pa[4] = { 0x1fu, 0x1du, 0x1bu, 0x19u };
+    static const uint8_t pb[4] = { 0x27u, 0x25u, 0x23u, 0x21u };
+    ef_addr32 node = EF_U32(headptr);
+    int16_t i;
+    int j;
+    uint32_t n;
+    for (; node != 0u; node = EF_U32(node + 4u)) {
+        for (i = 0; (int16_t)count > 0 && i < (int16_t)count; i++) {
+            ef_addr32 e = table + (uint32_t)((int32_t)i * 0x1b);
+            for (j = 0; j < 4; j++) {
+                if (EF_U16(node + pa[j]) != EF_U16(e + 3u) || EF_U16(node + pb[j]) != EF_U16(e + 5u))
+                    continue;
+                if (EF_U32(node + 0x3bu) != EF_U32(e + 9u) || EF_U32(node + 0x3fu) != EF_U32(e + 0xdu)) {
+                    for (n = 0u; n < 18u; n++)
+                        EF_U8(node + 0x3bu + n) = EF_U8(e + 9u + n);
+                    break;
+                }
+            }
+        }
+    }
+}
