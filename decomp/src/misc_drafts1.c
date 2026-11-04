@@ -3760,3 +3760,34 @@ void fill_diamond_e2ba0(uint32_t color, uint32_t x, uint32_t y, uint32_t size)
     }
     EF_U32(0x001631f4u) = pitch;
 }
+
+/* 0xe8484, 159 bytes. Draw the outline boxes of the scene entry KEY at offset (X, Y, Z): the offset is stored in 0x464370/74/78, the entry kind byte in 0x46437c, and for every record in the entry's list (stride in words at +0, vertex index word at +4) a box is outlined with 0xe853c from the vertex table. */
+void draw_entry_boxes_e8484(int32_t key, uint32_t x, uint32_t y, uint32_t z)
+{
+    int16_t k = (int16_t)key;
+    uint32_t group = find_scene_named_group(0x00190c7cu, (int32_t)x);
+    uint32_t entry;
+    uint32_t verts;
+    uint32_t base;
+    uint32_t node;
+    if (group == 0u)
+        return;
+    entry = find_scene_named_entry(k, group);
+    if (entry == 0u)
+        return;
+    EF_U32(0x00464370u) = x;
+    EF_U32(0x00464374u) = y;
+    EF_U32(0x00464378u) = z;
+    EF_U8(0x0046437cu) = record_flag_bits56(k);
+    verts = select_page_slot_a0de0(k, 0);
+    base = record_entry_address(k);
+    node = entry;
+    if (EF_U16(entry) == 0u)
+        return;
+    do {
+        int32_t idx = (int16_t)EF_U16(node + 4u);
+        int32_t v = (int32_t)(int16_t)EF_U16(verts + (uint32_t)idx * 2u + 2u) * 2;
+        draw_box_outline_e853c(base + (uint32_t)v, base + (uint32_t)v + 6u);
+        node += (uint32_t)((int32_t)(int16_t)EF_U16(node) * 2);
+    } while (EF_U16(node) != 0u);
+}

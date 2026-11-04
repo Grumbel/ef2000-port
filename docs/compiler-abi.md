@@ -5867,3 +5867,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xe3b7c` | EAX:uint32_t | AL:uint8_t | 97dcc@97dd9 | Check a data file: open NAME, read a 2-byte header into 0x15f900 and a 4-byte length, and succeed (1) only when the leng |
 | `0xe2ba0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | e2c40@e2ceb | Fill a diamond of colour COLOR (byte) into the 8-bit frame buffer: top row at Y - SIZE, starting 1 pixel wide at column  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe8484` | EAX:int32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 7b3fc@7b4c5 | Draw the outline boxes of the scene entry KEY at offset (X, Y, Z): the offset is stored in 0x464370/74/78, the entry kin |

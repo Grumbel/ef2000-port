@@ -4791,4 +4791,6 @@ uint32_t guest_fn_89b58_x(uint32_t obj); /* 0x89b58 EAX -> AL */
 uint8_t check_data_file_e3b7c(uint32_t name);
 void fill_diamond_e2ba0(uint32_t color, uint32_t x, uint32_t y, uint32_t size);
 
+void draw_entry_boxes_e8484(int32_t key, uint32_t x, uint32_t y, uint32_t z);
+
 #endif
