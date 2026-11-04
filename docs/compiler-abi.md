@@ -3525,3 +3525,15 @@ in EAX, format string address, one value).
 | `0xa4138` | none | none | 34f94@34f95,35590@355ac,36f84@36f94 | Update the frame delta (clamped to 100) and clear the frame counters. |
 | `0xa41dc` | none | AL:uint8_t | 34f94@34fa3 | Start the device; returns true when it is running. |
 | `0xa4cb4` | AX:uint16_t | none | 94fc@979a,9820@99aa,9820@99c1 | Activate widget slot idx: run its callback and queue it for redraw. |
+
+## runtime_helpers32 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa6c20` | EAX:ef_addr32 | none | a6d00@a7082 | Draw a widget's text when its rectangle lies inside the clip box. |
+| `0xa713c` | EAX:ef_addr32 | none | a6d00@a70be | Draw a widget's frame rectangle when it is visible. |
+| `0xa7510` | EAX:ef_addr32,EDX:ef_addr32 | none | a7588@a758f | Store a name in a record, allocating its buffer on first use. |
+| `0xa7ec4` | EAX:ef_addr32 | EAX:ef_addr32 | 4738@47ec,4bf8@4c41,5488@55fd | Look up a key name; unknown names return a fallback slot. |
+| `0xa7f64` | EAX:ef_addr32 | EAX:ef_addr32 | 27fec@27ffe | Look up a key name that must exist and be of kind 1. |
+| `0xa9bfc` | none | none | aaee8@aafb4 | Reset the key table state and its buffer pointers. |
+| `0xaa350` | none | none | aad7c@aae42 | Walk every scene group and resolve its child nodes. |

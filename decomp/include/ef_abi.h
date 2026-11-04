@@ -2880,4 +2880,18 @@ void guest_fn_a1cb4(void); /* 0xa1cb4 */
 void guest_fn_a4104(void); /* 0xa4104 */
 uint32_t guest_fn_a2f70(void); /* 0xa2f70 -> AL */
 
+/* runtime_helpers32.c */
+void draw_widget_text_a6c20(ef_addr32 widget);
+void draw_widget_frame_a713c(ef_addr32 widget);
+void set_record_name_a7510(ef_addr32 record, ef_addr32 name);
+ef_addr32 lookup_key_a7ec4(ef_addr32 name);
+ef_addr32 find_key_checked_a7f64(ef_addr32 name);
+void reset_key_tables_a9bfc(void);
+void resolve_scene_groups_aa350(void);
+void guest_fn_e26bc(uint32_t a, int32_t x, int32_t y, ef_addr32 text, uint32_t color); /* 0xe26bc */
+void guest_fn_c92e4(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, uint32_t color); /* 0xc92e4 */
+uint16_t guest_fn_aa2f8(ef_addr32 node); /* 0xaa2f8 */
+void guest_fn_aa198(ef_addr32 node); /* 0xaa198 */
+void guest_fn_aa1c0(ef_addr32 node); /* 0xaa1c0 */
+
 #endif

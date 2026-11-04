@@ -2283,10 +2283,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a6998	53	refresh_children_a6998	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a6998.json	docs/compiler-abi.md; Refresh every child of a widget that is not of kind 9.; callers a59d8@a5a32; guest pending
 0x000a69d0	145			unknown	unclassified	unverified		
 0x000a6a64	44	walk_children_a6a64	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a6a64.json	docs/compiler-abi.md; children without those bits: 0xa69d0; callers a59d8@a5a39; guest pending
-0x000a6c20	203			unknown	unclassified	unverified		
+0x000a6c20	203	draw_widget_text_a6c20	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a6c20.json	docs/compiler-abi.md; Draw a widget's text when its rectangle lies inside the clip box.; callers a6d00@a7082; guest pending
 0x000a6d00	1025			unknown	unclassified	unverified		
 0x000a7104	54	redraw_children_a7104	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a7104.json	docs/compiler-abi.md; Redraw the kind 1..3 children of a widget, stopping at the first kind 0.; callers a6d00@a70f3; guest pending
-0x000a713c	199			unknown	unclassified	unverified		
+0x000a713c	199	draw_widget_frame_a713c	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a713c.json	docs/compiler-abi.md; Draw a widget's frame rectangle when it is visible.; callers a6d00@a70be; guest pending
 0x000a7204	90	tidy_chain_a7204	game_helpers30	compiles	game	confirmed	decomp/tests/0x000a7204.json	docs/compiler-abi.md; Walk a chain of children and tidy each one that is not a basic kind.; callers a60a8@a618c; guest pending
 0x000a7260	57	redraw_all_children_a7260	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a7260.json	docs/compiler-abi.md; Redraw all children of a widget (both original branches are identical).; callers a5ef8@a5fbf; guest pending
 0x000a729c	60	notify_group_a729c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a729c.json	docs/compiler-abi.md; Call a7380 on enabled siblings of the same group as other.; callers a72d8@a72fd,a7328@a7364; guest pending
@@ -2299,7 +2299,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a7408	44	set_children_bit6	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a7408.json	docs/compiler-abi.md; apply 0xa739c to children without the low five bits; callers 34a98@34abb; guest pending
 0x000a7434	37	clear_children_dirty	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a7434.json	docs/compiler-abi.md; 0xa7380 on children with bit 0 of +0x1d; callers 35e68@35e7b,35e90@35ea3,362c4@36313; guest pending
 0x000a74bc	83	move_widget_a74bc	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a74bc.json	docs/compiler-abi.md; Move a widget (negative coordinates clamp to 0) and relayout it.; callers c768@c7b7,c768@c7ee,c768@c829; guest pending
-0x000a7510	119			unknown	unclassified	unverified		
+0x000a7510	119	set_record_name_a7510	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a7510.json	docs/compiler-abi.md; Store a name in a record, allocating its buffer on first use.; callers a7588@a758f; guest pending
 0x000a7588	42	show_widget_a7588	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a7588.json	docs/compiler-abi.md; Show a widget.; callers 40dc@4115,40dc@4163,40dc@4171; guest pending
 0x000a75b4	23			unknown	unclassified	unverified		
 0x000a75cc	46	set_object_name_a75cc	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000a75cc.json	docs/compiler-abi.md; Copy a name of at most 16 characters into an object.; callers 69b70@69bc2; guest pending
@@ -2331,8 +2331,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a7e20	41	restore_table_418e38	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7e20.json	docs/compiler-abi.md; Copy 100 dwords from 0x418fc8 back to 0x418e38.; callers a9d48@a9dff; guest pending
 0x000a7e4c	60	save_table_a7e4c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a7e4c.json	docs/compiler-abi.md; Copy table 0x418708 to 0x418690 for unlocked entries.; callers a9d48@a9d9c; guest pending
 0x000a7e88	60	restore_table_a7e88	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a7e88.json	docs/compiler-abi.md; Copy table 0x418690 back to 0x418708 for unlocked entries.; callers a9d48@a9dfa; guest pending
-0x000a7ec4	158			unknown	unclassified	unverified		
-0x000a7f64	173			unknown	unclassified	unverified		
+0x000a7ec4	158	lookup_key_a7ec4	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a7ec4.json	docs/compiler-abi.md; Look up a key name; unknown names return a fallback slot.; callers 4738@47ec,4bf8@4c41,5488@55fd; guest pending
+0x000a7f64	173	find_key_checked_a7f64	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a7f64.json	docs/compiler-abi.md; Look up a key name that must exist and be of kind 1.; callers 27fec@27ffe; guest pending
 0x000a8060	80	fill_entries_a8060	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a8060.json	docs/compiler-abi.md; Write the fill byte to every live entry of the table, clear dead ones.; callers 283c8@2840f; guest pending
 0x000a80b0	308			unknown	unclassified	unverified		
 0x000a81e4	225			unknown	unclassified	unverified		
@@ -2368,7 +2368,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a9bbc	17	clear_latch_if_idle	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9bbc.json	docs/compiler-abi.md; When byte 0x1371ff is zero clear byte 0x1371ee.; callers a9e70@a9fd2; guest pending
 0x000a9bd0	25	request_by_state	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9bd0.json	docs/compiler-abi.md; Byte 0x137200 = 1 when 0x1371ff is set, else byte 0x1371f8 = 1.; callers a9e70@a9fcb; guest pending
 0x000a9bec	16	clear_latch_and_notify	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9bec.json	docs/compiler-abi.md; Clear byte 0x1371ee, then call 0xf41dc.; callers a9e70@a9f97; guest pending
-0x000a9bfc	209			unknown	unclassified	unverified		
+0x000a9bfc	209	reset_key_tables_a9bfc	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000a9bfc.json	docs/compiler-abi.md; Reset the key table state and its buffer pointers.; callers aaee8@aafb4; guest pending
 0x000a9cd0	58	update_mouse_request_a9cd0	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a9cd0.json	docs/compiler-abi.md; Track a mouse request and refresh the cursor when its value changed.; callers a9e70@a9ff3; guest pending
 0x000a9d0c	60	select_list_node_a9d0c	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a9d0c.json	docs/compiler-abi.md; Select the list node at position count (1-based) and return its payload.; callers a9e70@aa0f9; guest pending
 0x000a9d48	231	toggle_view_state_a9d48	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000a9d48.json	docs/compiler-abi.md; Toggle between the live view state and the saved copy at 0x4195b0..; callers a9e70@a9f23,a9e70@aa13e; guest pending
@@ -2380,7 +2380,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aa270	66	append_node_aa270	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa270.json	docs/compiler-abi.md; ; callers aa5c4@aa696,aaa50@aab14; guest pending
 0x000aa2b4	68	resolve_child_aa2b4	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa2b4.json	docs/compiler-abi.md; Resolve the (parent index, child index) pair of node to the child pointer.; callers aa350@aa395; guest pending
 0x000aa2f8	85			unknown	unclassified	unverified		
-0x000aa350	140			unknown	unclassified	unverified		
+0x000aa350	140	resolve_scene_groups_aa350	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000aa350.json	docs/compiler-abi.md; Walk every scene group and resolve its child nodes.; callers aad7c@aae42; guest pending
 0x000aa3dc	176			unknown	unclassified	unverified		
 0x000aa4b8	26	walk_chain_from_8	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa4b8.json	docs/compiler-abi.md; Step AX (signed word) times along the chain starting at * dword +8 of EDX (next pointer at +1); returns the node reached; callers aa4d4@aa50b,aa4d4@aa524,aa4d4@aa53d; guest pending
 0x000aa4d4	175			unknown	unclassified	unverified		
