@@ -19047,3 +19047,34 @@ void predict_unit_position_72f68(int32_t unit, double dt, ef_addr32 out)
 	}
 	memcpy(ef_guest_memory_ptr(out), r, sizeof r);
 }
+
+/* 0x1db08, 280 bytes. Slew the two aim angles of object CTX (EAX), at +0x81 and +0x89, toward their targets. The first target is the offset from 0x1d844; the step is limited to rate(+0x69)*dt (dt is the double at 0x19af70) and applied only when larger than 5e-05. The second target is -atan(sign*step*(+0x71)/dt*0.10194) with a step limit of rate*dt*10. */
+void slew_aim_angles_1db08(ef_addr32 ctx)
+{
+	double dt, rate, a81, a89, d1, a1, lim, d2, a2, v71;
+
+	d1 = report_waypoint_offset_1d844(ctx);
+	memcpy(&a81, ef_guest_memory_ptr(ctx + 0x81u), 8);
+	memcpy(&a89, ef_guest_memory_ptr(ctx + 0x89u), 8);
+	memcpy(&rate, ef_guest_memory_ptr(ctx + 0x69u), 8);
+	memcpy(&v71, ef_guest_memory_ptr(ctx + 0x71u), 8);
+	memcpy(&dt, ef_guest_memory_ptr(0x0019af70u), 8);
+	d1 = d1 - a81;
+	a1 = fabs(d1);
+	if (a1 > 5e-05) {
+		lim = rate * dt;
+		if (a1 > lim)
+			a1 = lim;
+		a81 = (0.0 >= d1) ? a81 - a1 : a81 + a1;
+		memcpy(ef_guest_memory_ptr(ctx + 0x81u), &a81, 8);
+	}
+	d2 = -atan_dc1d4(sign_double_b42b0(d1) * a1 * v71 / dt * 0.1019367991845056) - a89;
+	a2 = fabs(d2);
+	if (a2 > 5e-05) {
+		lim = rate * dt * 10.0;
+		if (a2 > lim)
+			a2 = lim;
+		a89 = (0.0 >= d2) ? a89 - a2 : a89 + a2;
+		memcpy(ef_guest_memory_ptr(ctx + 0x89u), &a89, 8);
+	}
+}
