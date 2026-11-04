@@ -5743,4 +5743,7 @@ void draw_status_overlay_59334(void);
 
 void track_closest_link_88574(ef_addr32 rec);
 
+uint32_t land_object_9775c(ef_addr32 u);
+double guest_fn_ea884_x(ef_addr32 vec); /* 0xea884 EAX -> ST0, length of the integer vector */
+
 #endif

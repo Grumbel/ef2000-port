@@ -1952,7 +1952,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000974b8	121			unknown	unclassified	unverified		
 0x00097534	163	object_faces_camera_97534	float_helpers4	compiles	game	confirmed	decomp/tests/0x00097534.json	docs/compiler-abi.md; True when an object faces the camera closely enough and is active.; callers 97860@978ad,97860@978c6; guest pending
 0x000975f0	363			unknown	unclassified	unverified		
-0x0009775c	222			unknown	unclassified	unverified		
+0x0009775c	222	land_object_9775c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009775c.json	docs/compiler-abi.md; Settle a falling object U (EAX) onto the ground: t = ~(cell distance (0x7b16c, plane 0) of its x/y (+0xc, +0x14 >> 8) <<; callers 97860@978d8; guest pending
 0x0009783c	16	reset_record_range	misc_state	compiles	game	confirmed	decomp/tests/0x0009783c.json	docs/compiler-abi.md; word+6=0 word+8=EDX-1 tail 0x975f0; callers 9775c@9782c,97860@978bd; guest pending
 0x00097860	135	step_animation_97860	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00097860.json	docs/compiler-abi.md; Step the animation record: bump its frame word (+6), restart it through 0x975f0 when the frame reaches the limit table e; callers 974b8@9750c; guest pending
 0x000978e8	44	update_record_978e8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000978e8.json	docs/compiler-abi.md; if word +0xa: high word +6 <= 2 -> 0x979c8,0x97914; then 0x97950; callers 97464@974a0; guest pending

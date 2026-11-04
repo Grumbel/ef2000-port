@@ -8061,3 +8061,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x88574` | EAX:ef_addr32 | none | 8846c@884c1 | Track the closest candidate for the current target link: for the record REC (EAX) of class other than 1, 0x1f or 0x20 wh |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9775c` | EAX:ef_addr32 | EAX:uint32_t | 97860@978d8 | Settle a falling object U (EAX) onto the ground: t = ~(cell distance (0x7b16c, plane 0) of its x/y (+0xc, +0x14 >> 8) << |

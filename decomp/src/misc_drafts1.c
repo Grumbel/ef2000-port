@@ -14640,3 +14640,34 @@ void track_closest_link_88574(ef_addr32 rec)
     if ((uint8_t)store_scaled_vectors_7b08c((uint32_t)(uintptr_t)(buf + 0x18), (uint32_t)(uintptr_t)buf) == 0u)
         EF_U32(0x0020f154u) = rec;
 }
+
+/* 0x9775c, 222 bytes. Settle a falling object U (EAX) onto the ground: t = ~(cell distance (0x7b16c, plane 0) of its x/y (+0xc, +0x14 >> 8) << 8). A drop of more than 10000 below the stored height +0x10 raises word 0x12dc76; when t lies below +0x10 the object lands: clear word +0xa, store t in +0x10, run 0x975f0, clear the vector at +0x24 (0xea864), start the effect 0x44 (0x801e4), and depending on the speed (0xea884 of +0x18 against the float 0x18ac6a) send tactical code 4 or 5 for the word 0x21448c (5 also clears byte 0x132ac2). A zero timer 0x2143e8 becomes 0xfa; finally 0x9783c(U, 4) supplies the return value. Returns 0 when nothing landed. */
+uint32_t land_object_9775c(ef_addr32 u)
+{
+    uint32_t d = cell_distance_at_7b16c(0u, (int32_t)EF_U32(u + 0xcu) >> 8, (int32_t)EF_U32(u + 0x14u) >> 8);
+    int32_t t = (int32_t)(0xffffffffu - (d << 8));
+    float lim;
+    double speed;
+    uint32_t result = 0u;
+    if ((int32_t)EF_U32(u + 0x10u) - t > (int32_t)0xffffd8f0)
+        EF_U16(0x0012dc76u) = 1u;
+    if (t >= (int32_t)EF_U32(u + 0x10u))
+        return result;
+    EF_U16(u + 0xau) = 0u;
+    EF_U32(u + 0x10u) = (uint32_t)t;
+    guest_fn_975f0_x(u);
+    guest_fn_ea864(u + 0x24u, 0u, 0u, 0u);
+    guest_fn_801e4(0x44u, 1u, 1u);
+    speed = guest_fn_ea884_x(u + 0x18u);
+    memcpy(&lim, ef_guest_memory_ptr(0x0018ac6au), sizeof lim);
+    if (speed < (double)lim) {
+        guest_fn_9e508((int32_t)EF_U32(0x0021448au) >> 16, 4u);
+    } else {
+        guest_fn_9e508((int32_t)EF_U32(0x0021448au) >> 16, 5u);
+        EF_U8(0x00132ac2u) = 0u;
+    }
+    if (EF_U32(0x002143e8u) == 0u)
+        EF_U32(0x002143e8u) = 0xfau;
+    result = guest_fn_9783c_ret_x(u, 4u);
+    return result;
+}
