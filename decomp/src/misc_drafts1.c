@@ -8400,3 +8400,13 @@ uint32_t checksum_bytes_fa2e4(uint32_t p, uint32_t count)
     }
     return ((uint32_t)bh << 8) | bl;
 }
+
+/* 0xc4654, 44 bytes. Stack (ret 0xc): store the three arguments in dwords 0x1590b0 (first), 0x1590ac (second), 0x1590a8 (third) and run 0xe7a7c. */
+void set_params_and_run_c4654(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b, uint32_t c)
+{
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    EF_U32(0x001590a8u) = c;
+    EF_U32(0x001590acu) = b;
+    EF_U32(0x001590b0u) = a;
+    guest_fn_e7a7c_x();
+}

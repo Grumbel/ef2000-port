@@ -2772,7 +2772,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c4412	121			unknown	unclassified	unverified		
 0x000c448b	191	install_graphics_dispatch_c448b	game_helpers75	compiles	game	confirmed	decomp/tests/0x000c448b.json	docs/compiler-abi.md; Install the graphics dispatch pointers (including the patched code words).; callers c8c34@c4555; guest pending
 0x000c4565	183			unknown	unclassified	unverified		
-0x000c4654	44			unknown	unclassified	unverified		
+0x000c4654	44	set_params_and_run_c4654	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4654.json	docs/compiler-abi.md; Stack (ret 0xc): store the three arguments in dwords 0x1590b0 (first), 0x1590ac (second), 0x1590a8 (third) and run 0xe7a; callers b69c@b836,b69c@b8c5,b69c@b961; guest pending
 0x000c4680	27			unknown	unclassified	unverified		
 0x000c469b	33	copy_constants_c469b	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000c469b.json	docs/compiler-abi.md; Copy three constant dwords from the code area into the work area.; callers 39744@3975c; guest pending
 0x000c46bc	60			unknown	unclassified	unverified		

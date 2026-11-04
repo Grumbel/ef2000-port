@@ -6827,3 +6827,9 @@ in EAX, format string address, one value).
 | `0xc89cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | c8820@c8931,c8820@c8946 | Implicit-register fragment (params EBX = source point, ESI = output vector, EDI = screen destination): ESI = EBX - camer |
 | `0xc89f4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | c8820@c8936,c8820@c8941 | As 0xc89cc but ESI = EBX + camera position. |
 | `0xfa2e4` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | fa02c@fa14e | Implicit-register fragment (ESI = data pointer, EDX = byte count; params in that order): the two-byte running checksum ( |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc4654` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | b69c@b836,b69c@b8c5,b69c@b961 | Stack (ret 0xc): store the three arguments in dwords 0x1590b0 (first), 0x1590ac (second), 0x1590a8 (third) and run 0xe7a |
