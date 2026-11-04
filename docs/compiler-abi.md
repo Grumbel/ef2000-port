@@ -7461,3 +7461,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x6be28` | none | none | 6bd88@6be1c | Follow-up for the current ship (record at [0x1f71bc]) when its mode byte at +0x16c is 6: look up the object named by the |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5414c` | none | none | 54110@5412d | Frame tick of the first cycling list: when the signed count word 0x19bb5c is nonzero, add the step byte 0x127d92 to the  |
+| `0x54274` | none | none | 54110@54137 | Twin of 0x5414c for the second list: count word 0x1a1506 (double 0x185bb4), accumulator byte 0x127da2 and cursor word 0x |

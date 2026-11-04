@@ -971,9 +971,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00054010	191	reset_flight_state_54010	game_helpers38	compiles	game	confirmed	decomp/tests/0x00054010.json	docs/compiler-abi.md; Reset the flight-control state words and floats.; callers 3ea0c@3edba; guest pending
 0x000540d0	64	reset_selection_540d0	game_helpers11	compiles	game	confirmed	decomp/tests/0x000540d0.json	docs/compiler-abi.md; ; callers 3dd30@3de01; guest pending
 0x00054110	58	refresh_frame_tables_54110	float_helpers2	compiles	game	confirmed	decomp/tests/0x00054110.json	docs/compiler-abi.md; Store the scaled frame step and refresh the dependent tables.; callers 3dd30@3dfa4; guest pending
-0x0005414c	195			unknown	unclassified	unverified		
+0x0005414c	195	tick_cycle_list_5414c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005414c.json	docs/compiler-abi.md; Frame tick of the first cycling list: when the signed count word 0x19bb5c is nonzero, add the step byte 0x127d92 to the ; callers 54110@5412d; guest pending
 0x00054210	98	cycle_frame_54210	game_helpers31	compiles	game	confirmed	decomp/tests/0x00054210.json	docs/compiler-abi.md; Cycle a frame counter every other tick and pass the frame to 0x8f4c.; callers 54110@54132; guest pending
-0x00054274	180			unknown	unclassified	unverified		
+0x00054274	180	tick_cycle_list_54274	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00054274.json	docs/compiler-abi.md; Twin of 0x5414c for the second list: count word 0x1a1506 (double 0x185bb4), accumulator byte 0x127da2 and cursor word 0x; callers 54110@54137; guest pending
 0x00054328	82	step_sequence_54328	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00054328.json	docs/compiler-abi.md; ; callers 54110@5413c; guest pending
 0x0005437c	134	update_records_5437c	game_helpers31	compiles	game	confirmed	decomp/tests/0x0005437c.json	docs/compiler-abi.md; Update every record of the 171-byte list: arm ready ones and refresh active ones.; callers 54110@54141; guest pending
 0x00054410	174	reset_unit_teams_54410	game_helpers38	compiles	game	confirmed	decomp/tests/0x00054410.json	docs/compiler-abi.md; Reset every unit's team word, the owner flags and the 8 counters.; callers 49228@49b5b; guest pending

@@ -11530,3 +11530,65 @@ void follow_target_6be28(void)
     vec[2] = (double)(int32_t)EF_U32(obj + 4u) * c1 * c2;
     guest_fn_2461c_x(target, (ef_addr32)(uintptr_t)vec);
 }
+
+/* 0x5414c, 195 bytes. Frame tick of the first cycling list: when the signed count word 0x19bb5c is nonzero, add the step byte 0x127d92 to the accumulator byte 0x127da0; once it exceeds 5 subtract 5 and run up to 1 (5 when byte 0x1a3647 is set) steps, each advancing the cursor word 0x1a5c18 (wrapping to 0 at the count), storing it as a double at 0x1a3148 and calling 0x2e740 with the cursor, count * double 0x185bac and 0. */
+void tick_cycle_list_5414c(void)
+{
+    double scale;
+    double c;
+    int32_t n;
+    int32_t j;
+    uint8_t sum;
+    int16_t count = (int16_t)EF_U16(0x0019bb5cu);
+    memcpy(&c, ef_guest_memory_ptr(0x00185bacu), sizeof c);
+    scale = (double)count * c;
+    if (count == 0)
+        return;
+    n = EF_U8(0x001a3647u) != 0u ? 5 : 1;
+    sum = (uint8_t)(EF_U8(0x00127da0u) + EF_U8(0x00127d92u));
+    EF_U8(0x00127da0u) = sum;
+    if ((int32_t)sum <= 5)
+        return;
+    EF_U8(0x00127da0u) = (uint8_t)(sum - 5u);
+    for (j = 1; j <= n; j++) {
+        double cur;
+        uint16_t pos = (uint16_t)(EF_U16(0x001a5c18u) + 1u);
+        EF_U16(0x001a5c18u) = pos;
+        if ((int16_t)pos >= (int16_t)EF_U16(0x0019bb5cu))
+            EF_U16(0x001a5c18u) = 0u;
+        cur = (double)(int16_t)EF_U16(0x001a5c18u);
+        memcpy(ef_guest_memory_ptr(0x001a3148u), &cur, sizeof cur);
+        guest_fn_2e740_x((int32_t)(int16_t)EF_U16(0x001a5c18u), scale, 0u);
+    }
+}
+
+/* 0x54274, 180 bytes. Twin of 0x5414c for the second list: count word 0x1a1506 (double 0x185bb4), accumulator byte 0x127da2 and cursor word 0x1a5c1c, calling 0x37eac with the cursor, count * scale and 0 for each step. */
+void tick_cycle_list_54274(void)
+{
+    double scale;
+    double c;
+    int32_t n;
+    int32_t j;
+    uint8_t sum;
+    uint16_t pos = EF_U16(0x001a5c1cu);
+    int16_t count = (int16_t)EF_U16(0x001a1506u);
+    memcpy(&c, ef_guest_memory_ptr(0x00185bb4u), sizeof c);
+    scale = (double)count * c;
+    if (count == 0)
+        return;
+    n = EF_U8(0x001a3647u) != 0u ? 5 : 1;
+    sum = (uint8_t)(EF_U8(0x00127da2u) + EF_U8(0x00127d92u));
+    EF_U8(0x00127da2u) = sum;
+    if ((int32_t)sum <= 5)
+        return;
+    EF_U8(0x00127da2u) = (uint8_t)(sum - 5u);
+    for (j = 1; j <= n; j++) {
+        pos = (uint16_t)(pos + 1u);
+        if ((int16_t)pos >= (int16_t)EF_U16(0x001a1506u))
+            pos = 0u;
+        EF_U16(0x001a5c1cu) = pos;
+        guest_fn_37eac_x((int32_t)(int16_t)pos, scale, 0u);
+        pos = EF_U16(0x001a5c1cu);
+    }
+    EF_U16(0x001a5c1cu) = pos;
+}

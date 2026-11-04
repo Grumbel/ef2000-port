@@ -5465,4 +5465,9 @@ void follow_target_6be28(void);
 uint32_t guest_fn_6ae30_x(int32_t a); /* 0x6ae30 EAX -> AL */
 void guest_fn_2461c_x(int32_t a, ef_addr32 vec); /* 0x2461c EAX/EDX */
 
+void tick_cycle_list_5414c(void);
+void tick_cycle_list_54274(void);
+void guest_fn_2e740_x(int32_t a, double x, uint32_t z); /* 0x2e740 EAX + stack double and dword, ret 0xc */
+void guest_fn_37eac_x(int32_t a, double x, uint32_t z); /* 0x37eac EAX + stack double and dword, ret 0xc */
+
 #endif
