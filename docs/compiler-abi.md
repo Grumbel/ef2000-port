@@ -5817,3 +5817,13 @@ in EAX, format string address, one value).
 | `0xdc832` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | 1f994@1fbc8,233c4@235f1,233c4@2364f | memcpy: copy COUNT bytes from SRC to DST (dwords first, then the tail bytes); returns DST. |
 | `0x9c858` | EAX:ef_addr32 | EAX:ef_addr32 | e20@f2a,28224@28259,283c8@28473 | getenv: search the environment table at [0x160a18] (null terminated array of "NAME=value" strings) for NAME, ignoring ca |
 | `0xd099c` | EAX:ef_addr32,EDX:ef_addr32 | none | 91df4@91e04,91df4@91e75,91f30@91f3c | Transpose the 3x3 matrix of dwords at SRC into DST. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdc2e0` | none | none | 1e480@1e551,1e480@1e5c7,1e480@1e65e | Wait for the vertical retrace: poll the VGA status port 0x3da (at most 100000 reads each) until the display-enable bit ( |
+| `0xfa95f` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | bc4da@bc518,f2183@f21d9,f2183@f2216 | DOS lseek (int 21h, AH = 0x42): move the file HANDLE to OFFSET relative to WHENCE. Returns the new position (DX:AX), or  |
+| `0x2b0` | EAX:uint32_t,EDX:uint32_t | none | 324@33b,3d0@3ee,880@892 | intdos: run DOS interrupt 0x21 with the registers from the block IN (EAX, EBX, ECX, EDX, ESI, EDI at +0..+0x14) and the  |
+| `0x104840` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 101a90@101aaa,103d80@103d96,104908@104914 | Run DOS service 0x252b / 0x501 over the address range [min(FIRST, LAST), max(...)] (cdecl). Returns 1 when the carry fla |
+| `0x1048b4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 103d48@103d5e,1046c4@1046da,104920@10492c | Like 0x104840 for the service 0x252b / 0x61, issued through intdos (0x2b0). ORIGINAL BUG: 0x2b0 does not store the carry |

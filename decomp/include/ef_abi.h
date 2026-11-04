@@ -4760,4 +4760,12 @@ void transpose_matrix3_d099c(ef_addr32 dst, ef_addr32 src);
 void guest_outp_x(uint32_t port, uint32_t value); /* OUT DX, AL */
 uint32_t guest_inp_x(uint32_t port); /* IN AL, DX */
 
+void wait_vsync_dc2e0(void);
+uint32_t lseek_fa95f(uint32_t handle, uint32_t offset, uint32_t whence);
+void intdos_2b0(uint32_t in, uint32_t out);
+uint32_t dos_range_104840(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t first, uint32_t last);
+uint32_t dos_range_1048b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t first, uint32_t last);
+void guest_fn_1101e8_x(uint32_t a); /* 0x1101e8 EAX */
+void guest_dos_intdos_x(uint32_t in, uint32_t out, uint32_t sregs); /* int 21h without storing the flags */
+
 #endif

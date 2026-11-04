@@ -3457,3 +3457,84 @@ void transpose_matrix3_d099c(ef_addr32 dst, ef_addr32 src)
     for (i = 0; i < 9; i++)
         EF_U32(dst + (uint32_t)i * 4u) = t[i];
 }
+
+/* 0xdc2e0, 49 bytes. Wait for the vertical retrace: poll the VGA status port 0x3da (at most 100000 reads each) until the display-enable bit (1) clears and then until the retrace bit (8) is set. */
+void wait_vsync_dc2e0(void)
+{
+    int32_t n = 100000;
+    do {
+        if ((guest_inp_x(0x3dau) & 1u) == 0u)
+            break;
+        n--;
+    } while (n > 0);
+    n = 100000;
+    do {
+        if ((guest_inp_x(0x3dau) & 8u) != 0u)
+            break;
+        n--;
+    } while (n > 0);
+}
+
+/* 0xfa95f, 65 bytes. DOS lseek (int 21h, AH = 0x42): move the file HANDLE to OFFSET relative to WHENCE. Returns the new position (DX:AX), or -1 after reporting the DOS error through 0x1101e8 when the carry flag is set. */
+uint32_t lseek_fa95f(uint32_t handle, uint32_t offset, uint32_t whence)
+{
+    uint32_t in[7];
+    uint32_t out[7];
+    uint8_t sregs[12];
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    in[0] = 0x4200u | (whence & 0xffu);
+    in[1] = handle;
+    in[2] = offset >> 16;
+    in[3] = offset & 0xffffu;
+    in[4] = 0u;
+    in[5] = 0u;
+    in[6] = 0u;
+    guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+    if (out[6] != 0u) {
+        guest_fn_1101e8_x(out[0] & 0xffffu);
+        return 0xffffffffu;
+    }
+    return ((out[3] & 0xffffu) << 16) | (out[0] & 0xffffu);
+}
+
+/* 0x2b0, 116 bytes. intdos: run DOS interrupt 0x21 with the registers from the block IN (EAX, EBX, ECX, EDX, ESI, EDI at +0..+0x14) and the current segment registers, storing the resulting registers into OUT (+0..+0x14; unlike 0x9c47a the carry flag word at +0x18 is not written). */
+void intdos_2b0(uint32_t in, uint32_t out)
+{
+    uint8_t sregs[12];
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    guest_dos_intdos_x(in, out, (uint32_t)(uintptr_t)sregs);
+}
+
+/* 0x104840, 113 bytes. Run DOS service 0x252b / 0x501 over the address range [min(FIRST, LAST), max(...)] (cdecl). Returns 1 when the carry flag in the result is clear. */
+uint32_t dos_range_104840(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t first, uint32_t last)
+{
+    uint32_t in[4];
+    uint32_t out[7];
+    uint8_t sregs[12];
+    uint32_t lo = (first < last) ? first : last;
+    uint32_t hi = (first < last) ? last : first;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    in[0] = 0x252bu;
+    in[1] = 0x501u;
+    in[2] = lo;
+    in[3] = hi - lo + 1u;
+    int386x_9c461(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+    return out[6] == 0u;
+}
+
+/* 0x1048b4, 82 bytes. Like 0x104840 for the service 0x252b / 0x61, issued through intdos (0x2b0). ORIGINAL BUG: 0x2b0 does not store the carry word, so the result tests an uninitialised stack word (always taken as "carry clear" here). */
+uint32_t dos_range_1048b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t first, uint32_t last)
+{
+    uint32_t in[4];
+    uint32_t out[7] = { 0, 0, 0, 0, 0, 0, 0 };
+    uint32_t lo = (first < last) ? first : last;
+    uint32_t hi = (first < last) ? last : first;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    in[0] = 0x252bu;
+    in[1] = 0x61u;
+    in[2] = lo;
+    in[3] = hi - lo + 1u;
+    intdos_2b0((uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out);
+    return out[6] == 0u;
+}

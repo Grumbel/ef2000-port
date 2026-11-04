@@ -4,7 +4,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00000222	9			unknown	unclassified	unverified		
 0x00000235	6			unknown	unclassified	unverified		
 0x0000023b	44			unknown	unclassified	unverified		
-0x000002b0	116			unknown	unclassified	unverified		
+0x000002b0	116	intdos_2b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000002b0.json	docs/compiler-abi.md; intdos: run DOS interrupt 0x21 with the registers from the block IN (EAX, EBX, ECX, EDX, ESI, EDI at +0..+0x14) and the ; callers 324@33b,3d0@3ee,880@892; guest pending
 0x00000324	35	dos_call_2503_324	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x00000324.json	docs/compiler-abi.md; DOS call 0x2503 with one argument; returns the result word.; callers 734@77a; guest pending
 0x00000348	135			unknown	unclassified	unverified		
 0x000003d0	37	dos_call_2505_3d0	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000003d0.json	docs/compiler-abi.md; DOS call 0x2505 with two arguments.; callers 7b4@7db; guest pending
@@ -3210,7 +3210,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc250	46	toggle_page_dc250	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000dc250.json	docs/compiler-abi.md; Toggle the page flag between 0 and 1 around the page callbacks.; callers 277d8@2780d,27858@2788a,278c0@27afd; guest pending
 0x000dc280	60	cycle_page_dc280	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000dc280.json	docs/compiler-abi.md; Cycle the page flag through 0..2 around the page callbacks.; callers 1e480@1e514,1e480@1e58a,1e480@1e602; guest pending
 0x000dc2c0	23	clear_buffer_dc2c0	math_string	compiles	game	confirmed	decomp/tests/0x000dc2c0.json	docs/compiler-abi.md; 0xb3fb0(dword 0x15b754, 0, dword 0x164600).; callers 1e480@1e51c,1e480@1e58f,1e480@1e636; guest pending
-0x000dc2e0	49			unknown	unclassified	unverified		
+0x000dc2e0	49	wait_vsync_dc2e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dc2e0.json	docs/compiler-abi.md; Wait for the vertical retrace: poll the VGA status port 0x3da (at most 100000 reads each) until the display-enable bit (; callers 1e480@1e551,1e480@1e5c7,1e480@1e65e; guest pending
 0x000dc314	32	update_view_scale_dc314	math_string	compiles	game	confirmed	decomp/tests/0x000dc314.json	docs/compiler-abi.md; Unless both dwords 0x15bdd4 and 0x15bdd8 equal 0x100, * run 0xdc3d5 and 0xce354.; callers 3dd30@3e044,3dd30@3e054,63d5c@64057; guest pending
 0x000dc334	26			unknown	unclassified	unverified		
 0x000dc34e	135			unknown	unclassified	unverified		
@@ -3722,7 +3722,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa815	133	stream_vprintf_fa815	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000fa815.json	docs/compiler-abi.md; vfprintf: format into a stream through 0xed133 with the putc callback at 0xfa804, temporarily making an unbuffered-flagg; callers bc400@bc416,cd12e@cd145; guest pending
 0x000fa89a	6	get_global_fa89a	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fa89a.json	docs/compiler-abi.md; ; callers bc471@bc479; guest pending
 0x000fa8a0	191	stream_flush_fa8a0	runtime_helpers38	compiles	game	confirmed	decomp/tests/0x000fa8a0.json	docs/compiler-abi.md; fflush: write out a dirty write buffer, or seek back over unread input; resets the buffer position and returns 0 or -1.; callers bc4da@bc4fe,f1f5a@f207d,f1f5a@f2112; guest pending
-0x000fa95f	65			unknown	unclassified	unverified		
+0x000fa95f	65	lseek_fa95f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa95f.json	docs/compiler-abi.md; DOS lseek (int 21h, AH = 0x42): move the file HANDLE to OFFSET relative to WHENCE. Returns the new position (DX:AX), or ; callers bc4da@bc518,f2183@f21d9,f2183@f2216; guest pending
 0x000fa9a0	50			unknown	unclassified	unverified		
 0x000fa9d2	94			unknown	unclassified	unverified		
 0x000faa30	202	scan_code_class_faa30	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000faa30.json	docs/compiler-abi.md; Map a scan code to a key class, 0 if unmapped.; callers fbad8@fbc5b; guest pending
@@ -3874,8 +3874,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001047c4	32	free_block_1047c4	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001047c4.json	docs/compiler-abi.md; For a non-null block run 0x104920(block, size) then free it with 0xc3f80.; callers 104200@104267,104200@1042e4,104200@10434c; guest pending
 0x001047e4	88			unknown	unclassified	unverified		
 0x0010483c	1	nop_10483c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0010483c.json	docs/compiler-abi.md; Empty stub (single ret).; callers 104200@1042d9,104200@104341,104200@104416; guest pending
-0x00104840	113			unknown	unclassified	unverified		
-0x001048b4	82			unknown	unclassified	unverified		
+0x00104840	113	dos_range_104840	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00104840.json	docs/compiler-abi.md; Run DOS service 0x252b / 0x501 over the address range [min(FIRST, LAST), max(...)] (cdecl). Returns 1 when the carry fla; callers 101a90@101aaa,103d80@103d96,104908@104914; guest pending
+0x001048b4	82	dos_range_1048b4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001048b4.json	docs/compiler-abi.md; Like 0x104840 for the service 0x252b / 0x61, issued through intdos (0x2b0). ORIGINAL BUG: 0x2b0 does not store the carry; callers 103d48@103d5e,1046c4@1046da,104920@10492c; guest pending
 0x00104908	21	stack_range_104908	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00104908.json	docs/compiler-abi.md; 0x104840(base, base + length).; callers d5e0c@d5e5e,d6df0@d6e03,d6df0@d6e15; guest pending
 0x00104920	21	stack_range_104920	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00104920.json	docs/compiler-abi.md; 0x1048b4(base, base + length).; callers d5ec0@d5ee7,d6ffc@d701d,d710c@d7123; guest pending
 0x00105024	76	file_size_by_name_105024	small_wrappers2	compiles	game	confirmed	decomp/tests/0x00105024.json	docs/compiler-abi.md; Open a file and return its size; the error code is left at 0x17d2d8 (3 open failed, 5 size failed).; callers 105070@105080,106464@106491,113a40@113a6d; guest pending
