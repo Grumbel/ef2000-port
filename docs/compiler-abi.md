@@ -4364,3 +4364,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xcfa24` | EAX:uint32_t,EDX:ef_addr32,EBX:int32_t,ECX:int32_t | EAX:ef_addr32 | cfa9c@cfb21,cfc68@cfd02 | Return the first of count 0x4a-byte entries whose bounding box contains (x,y) and which passes the cf960 test, else 0. |
 | `0xcbf20` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | b0f5c@b1693 | Concatenate the data blocks (length at +9, bytes at *(+0xc)) of a record list into one new buffer; the first block's len |
+
+## game_helpers109 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdcf28` | AL:uint8_t,DX:int16_t,BX:int16_t,CX:int16_t | AL:uint8_t | dd26c@dd2de | Draw the glyph for a character code (0xa5 maps to 0x4e, codes above 0x7f use the extended tables) through cf7c4; returns |

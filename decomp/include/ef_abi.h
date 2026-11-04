@@ -3864,4 +3864,7 @@ ef_addr32 flatten_record_blocks_cbf20(ef_addr32 out, ef_addr32 list);
 uint32_t guest_fn_cf960_x(ef_addr32 entry, int32_t x, int32_t y); /* 0xcf960 EAX EDX EBX -> EAX */
 uint32_t guest_fn_cc6c0_z(uint32_t size, ef_addr32 tag, uint32_t n); /* 0xcc6c0 cdecl, three stack args */
 
+/* game_helpers109.c */
+uint8_t draw_glyph_dcf28(uint8_t code, int16_t dx_val, int16_t bx_val, int16_t cx_val);
+
 #endif
