@@ -1987,3 +1987,14 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0011d24e	tail_jump_11d24e	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0011d24e (5 bytes); tail jump. Forward to 0x120485.; callers 10dc7f@10dcef; docs/compiler-abi.md
 0x000c9ec4	tail_jump_c9ec4	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c9ec4 (5 bytes); tail jump. Forward to 0xdc2c0.; callers a6038@a606f,ac5f8@ac610; docs/compiler-abi.md
 0x0009c23d	tail_jump_9c23d	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009c23d (6 bytes); tail jump. Forward to 0x9c224.; callers 6b8@6eb; docs/compiler-abi.md
+0x000a37c4	send_byte_request_8_a37c4	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a37c4 (31 bytes); Send a one-byte request with code 8.; callers a3824@a389d; docs/compiler-abi.md
+0x000a37e4	send_byte_request_9_a37e4	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a37e4 (31 bytes); Send a one-byte request with code 9.; callers a3824@a38bd; docs/compiler-abi.md
+0x000a3804	send_byte_request_10_a3804	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a3804 (31 bytes); Send a one-byte request with code 10.; callers a3824@a3883; docs/compiler-abi.md
+0x000a3f0c	send_zero_request_5_a3f0c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a3f0c (33 bytes); Send a zero byte request with code 5.; callers 34f94@3502d; docs/compiler-abi.md
+0x000bbae4	map_code_9_10_bbae4	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bbae4 (26 bytes); Map a code 0..26 to 9 or 10 (0 when out of range).; callers bbdc4@bbdf3; docs/compiler-abi.md
+0x000bbb34	map_code_5_6_bbb34	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bbb34 (26 bytes); Map a code 0..12 to 5 or 6 (0 when out of range).; callers bbdc4@bbde6; docs/compiler-abi.md
+0x000bbbe4	map_code_flag_bbbe4	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bbbe4 (23 bytes); Map a code 0..36 to a flag.; callers bbdc4@bbdd9; docs/compiler-abi.md
+0x000bbd8c	map_code_class_bbd8c	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bbd8c (37 bytes); Map a code 1..100 to a class 0..8 (0 when out of range).; callers bbdc4@bbe00; docs/compiler-abi.md
+0x000940e0	scene_record_unset_940e0		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000940e0 (8 bytes); Whether the scene record pointer is unset.; callers 94a74@94cdf; docs/compiler-abi.md
+0x0009c1bb	real_mode_to_linear_9c1bb	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	4	Original 0x0009c1bb (37 bytes); Convert a real-mode segment:offset dword to a linear address.; callers 9be38@9be69,9be38@9be83,9be38@9be99; docs/compiler-abi.md
+0x0005ca60	apply_stream_value_5ca60			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0005ca60 (38 bytes); Read the 9th stream value into a local and apply it when valid.; callers 598e8@5997a; docs/compiler-abi.md

@@ -3620,4 +3620,19 @@ void transform_by_global_matrix_ea038(ef_addr32 out, ef_addr32 vec);
 void update_tick_rate_e3120(void);
 uint32_t guest_fn_f8248_x(void); /* 0xf8248 -> EAX */
 
+/* leaf_helpers7.c */
+void send_byte_request_8_a37c4(uint8_t value);
+void send_byte_request_9_a37e4(uint8_t value);
+void send_byte_request_10_a3804(uint8_t value);
+void send_zero_request_5_a3f0c(void);
+uint8_t map_code_9_10_bbae4(uint8_t code);
+uint8_t map_code_5_6_bbb34(uint8_t code);
+uint8_t map_code_flag_bbbe4(uint8_t code);
+uint8_t map_code_class_bbd8c(uint8_t code);
+uint8_t scene_record_unset_940e0(void);
+uint32_t real_mode_to_linear_9c1bb(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t seg_off);
+void apply_stream_value_5ca60(void);
+int32_t guest_fn_86f7c_x(uint32_t a, uint32_t b); /* 0x86f7c EAX/EDX -> EAX */
+void guest_fn_5c9d4_x(uint32_t a, uint32_t b); /* 0x5c9d4 EAX/EDX */
+
 #endif

@@ -4073,3 +4073,19 @@ in EAX, format string address, one value).
 | `0x11d24e` | EAX:uint32_t | EAX:uint32_t | 10dc7f@10dcef | tail jump. Forward to 0x120485. |
 | `0xc9ec4` | EAX:uint32_t | EAX:uint32_t | a6038@a606f,ac5f8@ac610 | tail jump. Forward to 0xdc2c0. |
 | `0x9c23d` | EAX:uint32_t | EAX:uint32_t | 6b8@6eb | tail jump. Forward to 0x9c224. |
+
+## leaf_helpers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa37c4` | AL:uint8_t | none | a3824@a389d | Send a one-byte request with code 8. |
+| `0xa37e4` | AL:uint8_t | none | a3824@a38bd | Send a one-byte request with code 9. |
+| `0xa3804` | AL:uint8_t | none | a3824@a3883 | Send a one-byte request with code 10. |
+| `0xa3f0c` | none | none | 34f94@3502d | Send a zero byte request with code 5. |
+| `0xbbae4` | AL:uint8_t | AL:uint8_t | bbdc4@bbdf3 | Map a code 0..26 to 9 or 10 (0 when out of range). |
+| `0xbbb34` | AL:uint8_t | AL:uint8_t | bbdc4@bbde6 | Map a code 0..12 to 5 or 6 (0 when out of range). |
+| `0xbbbe4` | AL:uint8_t | AL:uint8_t | bbdc4@bbdd9 | Map a code 0..36 to a flag. |
+| `0xbbd8c` | AL:uint8_t | AL:uint8_t | bbdc4@bbe00 | Map a code 1..100 to a class 0..8 (0 when out of range). |
+| `0x940e0` | none | AL:uint8_t | 94a74@94cdf | Whether the scene record pointer is unset. |
+| `0x9c1bb` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 9be38@9be69,9be38@9be83,9be38@9be99 | Convert a real-mode segment:offset dword to a linear address. |
+| `0x5ca60` | none | none | 598e8@5997a | Read the 9th stream value into a local and apply it when valid. |

@@ -1141,7 +1141,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005c7dc	258			unknown	unclassified	unverified		
 0x0005c8e0	242			unknown	unclassified	unverified		
 0x0005c9d4	140			unknown	unclassified	unverified		
-0x0005ca60	38			unknown	unclassified	unverified		
+0x0005ca60	38	apply_stream_value_5ca60	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x0005ca60.json	docs/compiler-abi.md; Read the 9th stream value into a local and apply it when valid.; callers 598e8@5997a; guest pending
 0x0005ca88	146			unknown	unclassified	unverified		
 0x0005cb1c	126			unknown	unclassified	unverified		
 0x0005cb9c	42	position_within_tactical_bounds	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005cb9c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
@@ -1916,7 +1916,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00093e58	234	init_scene_angles_93e58	game_helpers54	compiles	game	confirmed	decomp/tests/0x00093e58.json	docs/compiler-abi.md; Compute the scene angles from the stored vector (variant with heading latch).; callers 95e58@960f5; guest pending
 0x00093f44	185	reset_angle_limits_93f44	game_helpers50	compiles	game	confirmed	decomp/tests/0x00093f44.json	docs/compiler-abi.md; Reset the angle record from the current limits and flag out-of-range limits.; callers 95e58@96106; guest pending
 0x00094000	222	init_scene_angles_94000	game_helpers53	compiles	game	confirmed	decomp/tests/0x00094000.json	docs/compiler-abi.md; Compute the scene angles from the stored vector and flag out-of-range input.; callers 95e58@96117; guest pending
-0x000940e0	8			unknown	unclassified	unverified		
+0x000940e0	8	scene_record_unset_940e0	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000940e0.json	docs/compiler-abi.md; Whether the scene record pointer is unset.; callers 94a74@94cdf; guest pending
 0x00094194	39	reset_scene_update_94194	scene_helpers	compiles	game	confirmed	decomp/tests/0x00094194.json	docs/compiler-abi.md; clear words 0x12dba0/a6; 0x91df4 0x9202c 0x93a8c; scene refresh; callers 95e58@961d5,95e58@96217; guest pending
 0x000941bc	39	reset_scene_update_941bc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000941bc.json	docs/compiler-abi.md; identical body to 0x94194; callers 95e58@96240; guest pending
 0x000941e4	229	update_scene_roll_941e4	game_helpers74	compiles	game	confirmed	decomp/tests/0x000941e4.json	docs/compiler-abi.md; Fold the view roll into the scene angles and request a refresh at the limits.; callers 95e58@96182; guest pending
@@ -2025,7 +2025,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009c024	23	far_to_linear_9c024	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c024.json	docs/compiler-abi.md; Real-mode segment:offset style conversion of a dword (cdecl).; callers none direct; guest pending
 0x0009c1a1	16	high_word_9c1a1	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c1a1.json	docs/compiler-abi.md; High word of a dword (cdecl).; callers none direct; guest pending
 0x0009c1b1	10	identity_9c1b1	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c1b1.json	docs/compiler-abi.md; Identity (cdecl).; callers none direct; guest pending
-0x0009c1bb	37			unknown	unclassified	unverified		
+0x0009c1bb	37	real_mode_to_linear_9c1bb	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x0009c1bb.json	docs/compiler-abi.md; Convert a real-mode segment:offset dword to a linear address.; callers 9be38@9be69,9be38@9be83,9be38@9be99; guest pending
 0x0009c1e0	63			unknown	unclassified	unverified		
 0x0009c220	29			unknown	unclassified	unverified		
 0x0009c23d	6	tail_jump_9c23d	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0009c23d.json	docs/compiler-abi.md; tail jump. Forward to 0x9c224.; callers 6b8@6eb; guest pending
@@ -2182,9 +2182,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a35bc	242			unknown	unclassified	unverified		
 0x000a36b0	156	accumulate_offsets_a36b0	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a36b0.json	docs/compiler-abi.md; Accumulate clamped timing offsets of the listed entries.; callers a410c@a39de; guest pending
 0x000a374c	118			unknown	unclassified	unverified		
-0x000a37c4	31			unknown	unclassified	unverified		
-0x000a37e4	31			unknown	unclassified	unverified		
-0x000a3804	31			unknown	unclassified	unverified		
+0x000a37c4	31	send_byte_request_8_a37c4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a37c4.json	docs/compiler-abi.md; Send a one-byte request with code 8.; callers a3824@a389d; guest pending
+0x000a37e4	31	send_byte_request_9_a37e4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a37e4.json	docs/compiler-abi.md; Send a one-byte request with code 9.; callers a3824@a38bd; guest pending
+0x000a3804	31	send_byte_request_10_a3804	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a3804.json	docs/compiler-abi.md; Send a one-byte request with code 10.; callers a3824@a3883; guest pending
 0x000a3824	164	dispatch_entry_ratio_a3824	float_helpers6	compiles	game	confirmed	decomp/tests/0x000a3824.json	docs/compiler-abi.md; Dispatch on the balance ratio of a table entry.; callers a33a4@a33e6; guest pending
 0x000a38c8	48	clear_tables_a38c8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a38c8.json	docs/compiler-abi.md; clear 8 words 0x1357d8, 8 words 0x13580a, 8 dwords 0x1357e8; callers a3c18@a3d81; guest pending
 0x000a38f8	225			unknown	unclassified	unverified		
@@ -2199,7 +2199,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a3e04	46	close_device_a3e04	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3e04.json	docs/compiler-abi.md; Close the device through its callback when it is armed but not running.; callers 34a98@34a9e,34e18@34e95,35128@3512f; guest pending
 0x000a3e50	91	issue_request_a3e50	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3e50.json	docs/compiler-abi.md; Issue a request through the callback and account for it.; callers a2ef4@a2f4b,a2f70@a30ee,a3280@a32c0; guest pending
 0x000a3eac	96	issue_request_ready_a3eac	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3eac.json	docs/compiler-abi.md; Issue a request with a zero flag if the device is ready.; callers 34d50@34d6a,35220@3526a,3617c@3623f; guest pending
-0x000a3f0c	33			unknown	unclassified	unverified		
+0x000a3f0c	33	send_zero_request_5_a3f0c	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a3f0c.json	docs/compiler-abi.md; Send a zero byte request with code 5.; callers 34f94@3502d; guest pending
 0x000a3f30	67	flush_pending_bytes_a3f30	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x000a3f30.json	docs/compiler-abi.md; Flush the pending byte buffer through 0xa3eac.; callers 56bdc@56c55,56c90@56cb0,56ed0@56ef0; guest pending
 0x000a3f74	105	append_packet_a3f74	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a3f74.json	docs/compiler-abi.md; Append a packet to the outgoing buffer, flushing first when it would overflow.; callers 545b8@545d9,545e4@545f4,54600@54618; guest pending
 0x000a3fe0	78	poll_device_a3fe0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a3fe0.json	docs/compiler-abi.md; Poll the device and accumulate its two status bytes.; callers a3da0@a3dda,a3da0@a3ddf,a4030@a4052; guest pending
@@ -2621,10 +2621,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bb1ac	225			unknown	unclassified	unverified		
 0x000bb324	353			unknown	unclassified	unverified		
 0x000bb7c0	693			unknown	unclassified	unverified		
-0x000bbae4	26			unknown	unclassified	unverified		
-0x000bbb34	26			unknown	unclassified	unverified		
-0x000bbbe4	23			unknown	unclassified	unverified		
-0x000bbd8c	37			unknown	unclassified	unverified		
+0x000bbae4	26	map_code_9_10_bbae4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbae4.json	docs/compiler-abi.md; Map a code 0..26 to 9 or 10 (0 when out of range).; callers bbdc4@bbdf3; guest pending
+0x000bbb34	26	map_code_5_6_bbb34	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbb34.json	docs/compiler-abi.md; Map a code 0..12 to 5 or 6 (0 when out of range).; callers bbdc4@bbde6; guest pending
+0x000bbbe4	23	map_code_flag_bbbe4	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbbe4.json	docs/compiler-abi.md; Map a code 0..36 to a flag.; callers bbdc4@bbdd9; guest pending
+0x000bbd8c	37	map_code_class_bbd8c	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000bbd8c.json	docs/compiler-abi.md; Map a code 1..100 to a class 0..8 (0 when out of range).; callers bbdc4@bbe00; guest pending
 0x000bbdc4	106			unknown	unclassified	unverified		
 0x000bbf1c	447			unknown	unclassified	unverified		
 0x000bc0dc	247			unknown	unclassified	unverified		
