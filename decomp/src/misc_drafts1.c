@@ -10147,3 +10147,38 @@ void draw_arc_by_length_fe49c(uint32_t colour, uint32_t cy, uint32_t cx, uint32_
     EF_U32(0x00485fb0u) = depth;
     draw_arc_fe380(colour, cy, cx, (uint32_t)l, (uint32_t)h, radius);
 }
+
+/* 0x654b8, 181 bytes. Per-frame update of the notice list headed by dword 0x1a7c54 (link at +0x16): clear the notice count word 0x1a81b2, then for every record by its kind byte +0xc: kinds 1 and 2 insert it into the nearest list (0x65570) unless byte +0x10 is 1, kind 3 runs the range check 0x657c4, kind 4 inserts it and runs 0x65748; every record then ages its word +0x1a by word 0x127d92, clears byte +0xd and is released (0x65360, kind and the id word +0xe) once the age reaches 250. Afterwards advance both countdowns (0x658cc, 0x6583c) and apply the pending notices (0x6563c). */
+void update_notice_list_654b8(void)
+{
+    ef_addr32 node;
+    ef_addr32 next;
+    uint8_t kind;
+    EF_U16(0x001a81b2u) = 0u;
+    for (node = EF_U32(0x001a7c54u); node != 0u; node = next) {
+        kind = EF_U8(node + 0xcu);
+        next = EF_U32(node + 0x16u);
+        switch ((uint8_t)(kind - 1u)) {
+        case 0: case 1:
+            if (EF_U8(node + 0x10u) != 1u)
+                insert_nearest_65570(node);
+            break;
+        case 2:
+            check_range_657c4(node);
+            break;
+        case 3:
+            insert_nearest_65570(node);
+            check_range_65748(node);
+            break;
+        default:
+            break;
+        }
+        EF_U16(node + 0x1au) = (uint16_t)(EF_U16(node + 0x1au) + EF_U16(0x00127d92u));
+        EF_U8(node + 0xdu) = 0u;
+        if ((int16_t)EF_U16(node + 0x1au) >= 0xfa)
+            release_entry_65360(EF_U8(node + 0xcu), EF_U16(node + 0xeu));
+    }
+    advance_countdown_x_658cc();
+    advance_countdown_y_6583c();
+    apply_pending_notices_6563c();
+}
