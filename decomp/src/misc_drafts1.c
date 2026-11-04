@@ -7731,3 +7731,29 @@ void open_named_data_a81e4(uint32_t name, uint32_t src)
     guest_fn_a82f0_w(0x00418678u);
     EF_U8(0x001371fau) = 1u;
 }
+
+/* 0x80c3c, 226 bytes. Reset the 16 twelve-byte slots at 0x1fc8a0 (word +0 = 0xffff), then walk the 256 fifty-six-byte effect records at 0x1f90a0: clear byte +1; for each active record (byte +0) draw it with 0x9e0c4(signed word +2, X, Y, Z) where X, Y, Z are the floats at +0x24, +0x28, +0x2c truncated and shifted left 8. Unless byte 0x122c5c is set, age the record (dword +8) and deactivate it once the age passes 15. */
+void draw_effect_records_80c3c(void)
+{
+    uint32_t i, rec;
+    for (i = 0; i < 16u; i++)
+        EF_U16(0x001fc8a0u + i * 12u) = 0xffffu;
+    for (i = 0; i < 256u; i++) {
+        int32_t x, y, z;
+        rec = 0x001f90a0u + i * 0x38u;
+        EF_U8(rec + 1u) = 0u;
+        if (EF_U8(rec) == 0u)
+            continue;
+        z = (int32_t)truncate_9d72c((double)*(float *)ef_guest_memory_ptr(rec + 0x2cu));
+        y = (int32_t)truncate_9d72c((double)*(float *)ef_guest_memory_ptr(rec + 0x28u));
+        x = (int32_t)truncate_9d72c((double)*(float *)ef_guest_memory_ptr(rec + 0x24u));
+        guest_fn_9e0c4((int32_t)EF_U32(rec) >> 16, (uint32_t)x << 8, (uint32_t)y << 8, (uint32_t)z << 8);
+        if (EF_U8(0x00122c5cu) != 0u)
+            continue;
+        EF_U32(rec + 8u) = EF_U32(rec + 8u) + 1u;
+        if ((int32_t)EF_U32(rec + 8u) > 0xf) {
+            EF_U32(rec + 8u) = 0xfu;
+            EF_U8(rec) = 0u;
+        }
+    }
+}

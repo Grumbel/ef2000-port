@@ -5144,4 +5144,6 @@ void load_dataset_files_c8e58(void);
 
 void open_named_data_a81e4(uint32_t name, uint32_t src);
 
+void draw_effect_records_80c3c(void);
+
 #endif

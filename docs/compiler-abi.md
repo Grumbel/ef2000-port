@@ -6671,3 +6671,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa81e4` | EAX:uint32_t,EDX:uint32_t | none | a82f0@a83a3 | Open a named script/data file: take the first whitespace-delimited token of NAME (EAX), format "<fmt 0x18d668>" from the |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x80c3c` | none | none | 3dd30@3e1fd | Reset the 16 twelve-byte slots at 0x1fc8a0 (word +0 = 0xffff), then walk the 256 fifty-six-byte effect records at 0x1f90 |
