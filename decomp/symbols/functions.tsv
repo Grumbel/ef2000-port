@@ -3274,7 +3274,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000de7d0	147	tree_find_or_insert_de7d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000de7d0.json	docs/compiler-abi.md; Look up the hash of the name in the binary tree whose keys are at 0x426150 and child word pairs at 0x4270f0 (left/right ; callers de864@de958; guest pending
 0x000de864	620			unknown	unclassified	unverified		
 0x000dead0	74	find_table_entry_dead0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000dead0.json	docs/compiler-abi.md; Find a key in the 1-based id table (stack argument) or abort.; callers a1d50@a1e67,c5d8f@c5df0,c74bc@c7509; guest pending
-0x000deb1a	27			unknown	unclassified	unverified		
+0x000deb1a	27	asin_deb1a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000deb1a.json	docs/compiler-abi.md; Implicit-register fragment (x87 ST0 = X). Computes S = sqrt(1 - X*X) with 0xa4472 (error code 2); when the square root s; callers 28b80@28ea9,7bb00@7bba3,8a318@8a62b; guest pending
 0x000deb50	49	fill_pattern_deb50	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x000deb50.json	docs/compiler-abi.md; Fill a block with a repeating four-byte pattern.; callers 2af20@2af31,2af20@2af45,2af20@2af59; guest pending
 0x000deb87	108	fill_dwords_deb87	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000deb87.json	docs/compiler-abi.md; Fill count dwords at dst with value.; callers a3b48@a3b59,deb50@deb67; guest pending
 0x000dec00	21	plot_byte	math_string	compiles	game	confirmed	decomp/tests/0x000dec00.json	docs/compiler-abi.md; Byte at dword 0x15b754 + EDX + dword 0x163200[EBX] = AL.; callers none direct; guest pending

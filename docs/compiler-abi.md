@@ -9068,3 +9068,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfa362` | EAX:double,EDX:uint32_t | EAX:double | b3fec@b401a | Implicit-register fragment (x87 ST0 = X; the entry forces AL=0x0a, so the natural-log path is taken; the AL=9/0x0b paths |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdeb1a` | EAX:double | EAX:double | 28b80@28ea9,7bb00@7bba3,8a318@8a62b | Implicit-register fragment (x87 ST0 = X). Computes S = sqrt(1 - X*X) with 0xa4472 (error code 2); when the square root s |

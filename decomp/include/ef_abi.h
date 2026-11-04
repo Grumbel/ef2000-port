@@ -6221,4 +6221,7 @@ double profile_term_ratio_11b9ac(uint32_t a, uint32_t d, uint32_t b, uint32_t c,
 double ln_checked_fa362(double x, uint32_t *flag);
 double ln_checked_fa362(double x, uint32_t *flag); /* 0xfa362 */
 
+double asin_deb1a(double x);
+double asin_deb1a(double x); /* 0xdeb1a */
+
 #endif

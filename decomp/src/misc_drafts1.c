@@ -20854,3 +20854,13 @@ double ln_checked_fa362(double x, uint32_t *flag)
 	if (flag) *flag = 1u;
 	return 0.0;
 }
+
+/* 0xdeb1a, 27 bytes. Implicit-register fragment (x87 ST0 = X). Computes S = sqrt(1 - X*X) with 0xa4472 (error code 2); when the square root succeeds returns atan2(X, S) (arcsine), otherwise returns the error result unchanged. */
+double asin_deb1a(double x)
+{
+	uint32_t flag = 0u;
+	double s = sqrt_checked_a4472(1.0 - x * x, 2u, &flag);
+	if (flag != 0u)
+		return s;
+	return atan2_dc1e9(x, s);
+}
