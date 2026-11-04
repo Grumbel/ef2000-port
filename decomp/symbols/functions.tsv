@@ -2857,19 +2857,19 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c9f28	153			unknown	unclassified	unverified		
 0x000c9fc4	439			unknown	unclassified	unverified		
 0x000ca17c	74	redraw_ca17c	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ca17c.json	docs/compiler-abi.md; ; callers ac5f8@ac621,ac780@ac7a0; guest pending
-0x000ca1c8	53			unknown	unclassified	unverified		
+0x000ca1c8	53	set_record_links_ca1c8	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000ca1c8.json	docs/compiler-abi.md; Store position words and optionally the two link pointers in a record.; callers bc38@bc8f; guest pending
 0x000ca200	142			unknown	unclassified	unverified		
 0x000ca290	474			unknown	unclassified	unverified		
 0x000ca5e4	60	clear_record_flags_ca5e4	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ca5e4.json	docs/compiler-abi.md; Clear the flag bytes of records from the start index upward.; callers ac16c@ac177; guest pending
 0x000ca620	349			unknown	unclassified	unverified		
 0x000ca780	85			unknown	unclassified	unverified		
 0x000ca7e0	88	rebuild_tables_ca7e0	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ca7e0.json	docs/compiler-abi.md; ; callers ba5c@baaf,bfcc@c0c1; guest pending
-0x000ca838	58			unknown	unclassified	unverified		
+0x000ca838	58	free_kind2_nodes_ca838	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000ca838.json	docs/compiler-abi.md; Unlink and free every kind-2 node of the list.; callers b0f5c@b115d,b0f5c@b1516; guest pending
 0x000ca874	391			unknown	unclassified	unverified		
 0x000ca9fc	43	grid_index_ca9fc	list_lookup	compiles	game	confirmed	decomp/tests/0x000ca9fc.json	docs/compiler-abi.md; EAX / 40 + 10 * (EDX / 40), signed.; callers b0554@b0564,b8510@b8534,caa28@caace; guest pending
 0x000caa28	392			unknown	unclassified	unverified		
-0x000cabb0	56			unknown	unclassified	unverified		
-0x000cabe8	98			unknown	unclassified	unverified		
+0x000cabb0	56	translate_bytes_cabb0	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cabb0.json	docs/compiler-abi.md; Translate 400 bytes through the lookup routine at 0xcbef4.; callers 49228@494d5; guest pending
+0x000cabe8	98	copy_matching_fields_cabe8	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cabe8.json	docs/compiler-abi.md; Copy fields from the first node of list A into every matching node of list B.; callers b0f5c@b15d5; guest pending
 0x000cac4c	270			unknown	unclassified	unverified		
 0x000caea0	296			unknown	unclassified	unverified		
 0x000cafc8	443			unknown	unclassified	unverified		
@@ -2878,7 +2878,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cb55c	155			unknown	unclassified	unverified		
 0x000cb5f8	26	find_node_by_word_cb5f8	list_lookup	compiles	game	confirmed	decomp/tests/0x000cb5f8.json	docs/compiler-abi.md; Identical body to 0xc1b8c.; callers cb800@cb876,cb800@cb897; guest pending
 0x000cb614	116			unknown	unclassified	unverified		
-0x000cb688	90			unknown	unclassified	unverified		
+0x000cb688	90	tick_slot_timers_cb688	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cb688.json	docs/compiler-abi.md; Count down the per-slot timers of every node and reload expired ones.; callers b0f5c@b136a; guest pending
 0x000cb6fc	235			unknown	unclassified	unverified		
 0x000cb800	385			unknown	unclassified	unverified		
 0x000cb984	110			unknown	unclassified	unverified		

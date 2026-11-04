@@ -2161,4 +2161,13 @@ uint32_t count_valid_entries_becc0(ef_addr32 object);
 uint32_t guest_fn_cc22c(uint32_t a, uint32_t b, uint32_t c); /* 0xcc22c EAX/EDX/EBX -> AX */
 uint32_t guest_fn_bd7cc(ef_addr32 entry, uint32_t kind); /* 0xbd7cc EAX/EDX -> AX */
 
+/* runtime_helpers14.c */
+void set_record_links_ca1c8(ef_addr32 record, uint32_t link, uint16_t word_a, uint16_t word_b,
+                            uint32_t stack_word_c, uint8_t stack_set_first, uint8_t stack_set_second);
+void free_kind2_nodes_ca838(ef_addr32 head, ef_addr32 other);
+void translate_bytes_cabb0(ef_addr32 destination, ef_addr32 source);
+void copy_matching_fields_cabe8(ef_addr32 list_a, ef_addr32 list_b);
+void tick_slot_timers_cb688(ef_addr32 head);
+uint32_t guest_fn_cbef4(uint32_t value); /* 0xcbef4 EAX -> AL */
+
 #endif

@@ -2912,3 +2912,13 @@ in EAX, format string address, one value).
 | `0xbd86c` | EAX:ef_addr32 | EAX:uint32_t | bdbf8@bdc78,bdbf8@bdcc2,bdbf8@bdd11 | True when a non-kind-2 record has a filled entry (scanned from the end) that passes the check. |
 | `0xbd8c8` | AL:uint8_t,DX:int16_t,BL:uint8_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | EAX:uint32_t | bd92c@bda20 | True when the list's index-th node matching the criteria exists. |
 | `0xbecc0` | EAX:ef_addr32 | EAX:uint32_t | becf8@bed07,fac78@facb1,fac78@facd1 | Count the 21-byte entries of the object that pass the check. |
+
+## runtime_helpers14 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xca1c8` | EAX:ef_addr32,EDX:uint32_t,BX:uint16_t,CX:uint16_t,[ESP+4]:uint32_t,[ESP+8]:uint8_t,[ESP+12]:uint8_t | none | bc38@bc8f | Store position words and optionally the two link pointers in a record. |
+| `0xca838` | EAX:ef_addr32,EDX:ef_addr32 | none | b0f5c@b115d,b0f5c@b1516 | Unlink and free every kind-2 node of the list. |
+| `0xcabb0` | EAX:ef_addr32,EDX:ef_addr32 | none | 49228@494d5 | Translate 400 bytes through the lookup routine at 0xcbef4. |
+| `0xcabe8` | EAX:ef_addr32,EDX:ef_addr32 | none | b0f5c@b15d5 | Copy fields from the first node of list A into every matching node of list B. |
+| `0xcb688` | EAX:ef_addr32 | none | b0f5c@b136a | Count down the per-slot timers of every node and reload expired ones. |
