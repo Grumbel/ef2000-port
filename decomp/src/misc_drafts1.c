@@ -20938,3 +20938,16 @@ void set_view_shift_dc334(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ui
 	patch_view_shift_dc34e(b, a);
 	rebuild_clip_planes_ce354();
 }
+
+/* 0xdc71b, 73 bytes. (ret 0x14: a, b, c, d, e) Patches 16-bit immediates in the code at 0xdc717 (= b), 0xdc719 (= b - c + 1), 0xdc715 (= c), 0xdc6ff and 0xdc63e (= a), 0xdc6bc and 0xdc606 (= (d + e) >> 1, arithmetic). */
+void patch_span_dc71b(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e)
+{
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	EF_U16(0xdc717u) = (uint16_t)b;
+	EF_U16(0xdc719u) = (uint16_t)(b - c + 1u);
+	EF_U16(0xdc715u) = (uint16_t)c;
+	EF_U16(0xdc6ffu) = (uint16_t)a;
+	EF_U16(0xdc63eu) = (uint16_t)a;
+	EF_U16(0xdc6bcu) = (uint16_t)((int16_t)(d + e) >> 1);
+	EF_U16(0xdc606u) = (uint16_t)((int16_t)(d + e) >> 1);
+}

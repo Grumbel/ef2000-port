@@ -6233,4 +6233,7 @@ void view_plane_ce268(uint32_t dst, float p1, float p2, float p3, float p4); /* 
 void rebuild_clip_planes_ce354(void); /* 0xce354 */
 void set_view_shift_dc334(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b); /* 0xdc334 */
 
+void patch_span_dc71b(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e);
+void patch_span_dc71b(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0xdc71b */
+
 #endif
