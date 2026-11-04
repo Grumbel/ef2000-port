@@ -6641,3 +6641,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7b08c` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 239ac@23c42,239ac@23d2f,26b60@27056 | Scale two 3-double vectors (A = EAX, B = EDX; components used in the order +8, +0x10, +0) by the double at 0x187c60, tru |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe6d78` | none | none | e6990@e6c44 | Fuel/energy-style update on the double globals: 0x4327e8 = 0x4327d8*0x432770*0x432da0/0x432da8*0x4327e0 + 0x432808*0x432 |

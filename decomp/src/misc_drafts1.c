@@ -7593,3 +7593,24 @@ uint32_t store_scaled_vectors_7b08c(uint32_t a, uint32_t b)
     EF_U16(0x0042093au) = (uint16_t)i5;
     return guest_fn_7b7d8();
 }
+
+/* 0xe6d78, 221 bytes. Fuel/energy-style update on the double globals: 0x4327e8 = 0x4327d8*0x432770*0x432da0/0x432da8*0x4327e0 + 0x432808*0x4327b8*0x4327f8; then 0x4327e8 = (0x432800 + 0x432810) * 0x190be4 * 0x4327e8 and 0x432f58 -= 0x4327e8 * 0x4330d0, clamped at 0. When the stock reaches 0 the rates 0x4327f8, 0x432800 and 0x432810 are zeroed. */
+void update_stock_e6d78(void)
+{
+#define EF_D(a) (*(double *)ef_guest_memory_ptr(a))
+    double t1 = EF_D(0x004327d8u) * EF_D(0x00432770u) * EF_D(0x00432da0u) / EF_D(0x00432da8u) * EF_D(0x004327e0u);
+    double t2 = EF_D(0x00432808u) * EF_D(0x004327b8u) * EF_D(0x004327f8u);
+    double v;
+    EF_D(0x004327e8u) = t1 + t2;
+    v = (EF_D(0x00432800u) + EF_D(0x00432810u)) * EF_D(0x00190be4u) * EF_D(0x004327e8u);
+    EF_D(0x004327e8u) = v;
+    EF_D(0x00432f58u) = EF_D(0x00432f58u) - v * EF_D(0x004330d0u);
+    if (0.0 > EF_D(0x00432f58u))
+        EF_D(0x00432f58u) = 0.0;
+    if ((EF_U32(0x00432f5cu) & 0x7fffffffu) == 0u && EF_U32(0x00432f58u) == 0u) {
+        EF_D(0x004327f8u) = 0.0;
+        EF_D(0x00432800u) = 0.0;
+        EF_D(0x00432810u) = 0.0;
+    }
+#undef EF_D
+}

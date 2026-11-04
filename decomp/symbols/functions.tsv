@@ -3410,7 +3410,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e6848	326	sort_nodes_by_order_e6848	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e6848.json	docs/compiler-abi.md; Reorder the payload (bytes +9..+0x33) of the list whose head pointer is *HEAD_PTR (link +4) so that the node types (byte; callers 49228@4939f,b0f5c@b1020,b0f5c@b1220; guest pending
 0x000e6990	706			unknown	unclassified	unverified		
 0x000e6c54	289			unknown	unclassified	unverified		
-0x000e6d78	221			unknown	unclassified	unverified		
+0x000e6d78	221	update_stock_e6d78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e6d78.json	docs/compiler-abi.md; Fuel/energy-style update on the double globals: 0x4327e8 = 0x4327d8*0x432770*0x432da0/0x432da8*0x4327e0 + 0x432808*0x432; callers e6990@e6c44; guest pending
 0x000e6e58	674			unknown	unclassified	unverified		
 0x000e70fc	784			unknown	unclassified	unverified		
 0x000e740c	698			unknown	unclassified	unverified		
