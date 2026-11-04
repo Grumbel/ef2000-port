@@ -4832,4 +4832,6 @@ uint32_t guest_fn_b0954_x(uint32_t a, uint32_t b, uint32_t c); /* 0xb0954 EAX/ED
 void guest_fn_cc188_x(uint32_t a, uint32_t b, uint32_t c); /* 0xcc188 EAX/EDX/EBX */
 void guest_fn_cc164_x(uint32_t a, uint32_t b, uint32_t c); /* 0xcc164 EAX/EDX/EBX */
 
+void draw_entry_list_78848(void);
+
 #endif

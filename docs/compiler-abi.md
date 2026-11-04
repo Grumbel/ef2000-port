@@ -5959,3 +5959,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xcb6fc` | EAX:uint32_t,EDX:uint32_t | none | b0f5c@b139a | Walk the list whose head pointer is at HEAD (links at +4); for every node of kind 0 (byte +0xb) with all four group flag |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x78848` | none | none | 79128@79162 | Draw the numbered entry list kept at 0x1a521c (byte ids terminated by 0xff, at most 0x7f): unless the mode byte 0x127da8 |

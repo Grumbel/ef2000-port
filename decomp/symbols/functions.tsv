@@ -1422,7 +1422,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00077c28	10	set_timer_77c28	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x00077c28.json	docs/compiler-abi.md; Set the 0x118 timer word.; callers 77c90@77d94; guest pending
 0x00077c34	89	redraw_message_line_77c34	small_wrappers4	compiles	game	confirmed	decomp/tests/0x00077c34.json	docs/compiler-abi.md; Shrink the pending line count at 0x1f8d52 to the limit at 0x127d92 and redraw the uppercased message line.; callers 79128@79171; guest pending
 0x00077c90	2997			unknown	unclassified	unverified		
-0x00078848	235			unknown	unclassified	unverified		
+0x00078848	235	draw_entry_list_78848	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00078848.json	docs/compiler-abi.md; Draw the numbered entry list kept at 0x1a521c (byte ids terminated by 0xff, at most 0x7f): unless the mode byte 0x127da8; callers 79128@79162; guest pending
 0x00078934	153	draw_clock_text_78934	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00078934.json	docs/compiler-abi.md; Unless 0x127da8 is set: count the timer 0x1f8d58 down by the step 0x127d92 (clearing it above 0xdc), format the hour-lik; callers 79128@7918f; guest pending
 0x000789d0	58	set_owner_name_789d0	game_helpers28	compiles	game	confirmed	decomp/tests/0x000789d0.json	docs/compiler-abi.md; Store a 122-byte name entry for an owner slot, skipping the local owner.; callers 56e94@56ec2; guest pending
 0x00078a0c	155	update_slot_texts_78a0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00078a0c.json	docs/compiler-abi.md; For each of the 8 slots (0x7a bytes at 0x1f8930, countdown word at +0x78): count it down by the frame step 0x127d92 (cla; callers 79128@79194; guest pending

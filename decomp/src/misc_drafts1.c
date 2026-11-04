@@ -4243,3 +4243,27 @@ void update_group_flags_cb6fc(uint32_t head, uint32_t arg)
         node = EF_U32(node + 4u);
     }
 }
+
+/* 0x78848, 235 bytes. Draw the numbered entry list kept at 0x1a521c (byte ids terminated by 0xff, at most 0x7f): unless the mode byte 0x127da8 is set, wrap the cursor byte 0x1a5229 to 0 when above 12 or when it points at the terminator, then print each entry as "<number mod 10> <name from the table 0x126a5c>" (format 0x187b1c) at x = 10, y = 0x32 + 10 * row, in colour 12 for the cursor row and 15 otherwise. */
+void draw_entry_list_78848(void)
+{
+    char buf[0x50];
+    int16_t i;
+    int32_t y;
+    if (EF_U8(0x00127da8u) != 0u)
+        return;
+    if (EF_U8(0x001a5229u) > 12u)
+        EF_U8(0x001a5229u) = 0u;
+    if (EF_U8(0x001a521cu + EF_U8(0x001a5229u)) == 0xffu)
+        EF_U8(0x001a5229u) = 0u;
+    y = 0x32;
+    for (i = 0; i < 0x7f; i++) {
+        uint32_t id = EF_U8(0x001a521cu + (uint32_t)(int32_t)i);
+        if (id == 0xffu)
+            break;
+        format_ui_status_pair((uint32_t)(uintptr_t)buf, 0x00187b1cu, (uint32_t)(((int32_t)i + 1) % 10), EF_U32(0x00126a5cu + id * 7u));
+        EF_U8(0x00127b1au) = 1u;
+        draw_shadowed_text_48c90(EF_U8(0x001a5229u) == (uint16_t)i ? 12u : 15u, 10, (int16_t)y, (uint32_t)(uintptr_t)buf);
+        y += 10;
+    }
+}
