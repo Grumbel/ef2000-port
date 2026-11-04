@@ -4163,3 +4163,31 @@ void compute_view_corners_d8528(void)
     EF_U16(0x0015bafau) = (uint16_t)(f - ((one - e) * b) / c - k);
     EF_U16(0x0015bafeu) = (uint16_t)((e * b) / c + f - k);
 }
+
+/* 0xdde80, 231 bytes. Issue the DOS call 0x2f for the date/time request with the low byte of VALUE: fills the request block 0x4260b0 (bytes 0xb, VALUE) and the register block 0x426098 (0x1a, fields +0x10/+0xe from the block address, +0x12 = 7), stores the converted address in 0x4260c4/0x4260d6 and the call parameters 0x4260c8..0x4260d0, runs 0x8b8 on 0x4260b4 and returns the packed result 4500 * word(+4) + 75 * byte(+3) + byte(+2) - 150 of the reply block. */
+int32_t dos_date_request_dde80(uint32_t value)
+{
+    uint32_t blk = EF_U32(0x004260b0u);
+    uint32_t regs;
+    uint32_t r = guest_fn_604();
+    int32_t v;
+    EF_U8(blk) = 0x0bu;
+    EF_U8(blk + 1u) = (uint8_t)value;
+    regs = EF_U32(0x00426098u);
+    EF_U8(regs) = 0x1au;
+    EF_U16(regs + 0x12u) = 7u;
+    EF_U8(regs + 2u) = 3u;
+    EF_U8(regs + 1u) = EF_U8(0x0015ee98u);
+    EF_U16(regs + 0x10u) = (uint16_t)(r >> 16);
+    EF_U16(regs + 0x0eu) = (uint16_t)(r & 0xfu);
+    r = guest_fn_604();
+    EF_U16(0x004260d6u) = (uint16_t)(r >> 16);
+    EF_U32(0x004260c4u) = r & 0xffffu;
+    EF_U32(0x004260d0u) = 0x1510u;
+    EF_U32(0x004260ccu) = (uint32_t)(int32_t)(int16_t)EF_U16(0x00426120u);
+    EF_U32(0x004260c8u) = 0u;
+    guest_fn_8b8(0x2fu, 0x004260b4u);
+    blk = EF_U32(0x004260b0u);
+    v = (int16_t)EF_U16(blk + 4u);
+    return v * 4500 + (int32_t)EF_U8(blk + 3u) * 75 + (int32_t)EF_U8(blk + 2u) - 150;
+}

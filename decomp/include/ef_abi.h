@@ -4822,4 +4822,6 @@ void draw_planar_sprite_cdd18(uint32_t dst, uint32_t src, uint32_t xmin, uint32_
 
 void compute_view_corners_d8528(void);
 
+int32_t dos_date_request_dde80(uint32_t value);
+
 #endif
