@@ -20270,3 +20270,59 @@ uint8_t shade_lookup_store_c64d0(uint32_t *esi)
 	al = (uint8_t)(al + EF_U8(0x159140u));
 	return EF_U8(EF_U32(0x159084u) + al);
 }
+
+/* 0x9bdbb, 79 bytes. Run the registered exit handlers with priority between MIN (AL) and MAX (DL): the 6-byte records at 0x195ade..0x195af0 hold a state byte (2 = already run), a priority byte and a handler pointer (dword at +2). Repeatedly pick the pending record chosen by the scan (each candidate whose priority is not below the running value replaces the choice), call its handler if the chosen priority is not above MAX and the pointer is non-zero, mark it done, and rescan until nothing is pending. */
+void run_exit_handlers_9bdbb(uint32_t eax, uint32_t edx)
+{
+	uint8_t max = (uint8_t)edx;
+	uint8_t min = (uint8_t)eax;
+
+	for (;;) {
+		uint32_t esi = 0x195adeu;
+		uint32_t edi = 0x195af0u;
+		uint32_t ebx = edi;
+		uint8_t al = min;
+
+		while (esi < edi) {
+			if (EF_U8(esi) != 2u && !(al > EF_U8(esi + 1u))) {
+				ebx = esi;
+				al = EF_U8(esi + 1u);
+			}
+			esi += 6u;
+		}
+		if (ebx == edi)
+			return;
+		if (!(al > max)) {
+			uint32_t fn = EF_U32(ebx + 2u);
+			if (fn != 0u)
+				guest_callptr0_x(fn);
+		}
+		EF_U8(ebx) = 2u;
+	}
+}
+
+/* 0x1e9, 57 bytes. Fatal exit with a message: STRING (EDX, zero-terminated) is written to the file opened by name 0x120d1b (INT 21h AX=3D01h) with AH=40h and the string length, then the exit handlers run for priorities 0..0xff and the program terminates through INT 21h AH=4Ch with the exit code EAX (cdecl-less register convention: EAX = code, EDX = message). */
+void fatal_exit_1e9(uint32_t code, uint32_t message)
+{
+	uint32_t in[7], out[7];
+	uint8_t sregs[12];
+	uint32_t len = 0u;
+
+	segread_9be0d((uint32_t)(uintptr_t)sregs);
+	in[0] = 0x3d01u; in[1] = 0u; in[2] = 0u; in[3] = 0x120d1bu; in[4] = 0u; in[5] = 0u; in[6] = 0u;
+	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+	while (EF_U8(message + len) != 0u)
+		len++;
+	in[0] = 0x4000u; in[1] = out[0] & 0xffffu; in[2] = len; in[3] = message; in[4] = 0u; in[5] = 0u; in[6] = 0u;
+	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+	run_exit_handlers_9bdbb(0u, 0xffu);
+	in[0] = 0x4c00u | (code & 0xffu); in[1] = 0u; in[2] = 0u; in[3] = 0u; in[4] = 0u; in[5] = 0u; in[6] = 0u;
+	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+}
+
+/* 0x11d258, 29 bytes. Report an error: if the debugger hook (0x1204b6) returns zero, call the fatal exit 0x1e9 with the same two register arguments (EAX = code, EDX = message). */
+void report_error_11d258(uint32_t code, uint32_t message)
+{
+	if (debugger_hook_1204b6() == 0u)
+		fatal_exit_1e9(code, message);
+}

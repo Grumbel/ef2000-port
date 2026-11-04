@@ -8906,3 +8906,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc6428` | EAX:uint32_t | AL:uint8_t | c6370@c6370 | Implicit-register fragment (ESI is an in/out pointer; result in AL): load the word at ESI (advancing ESI by 2), add the  |
 | `0xc64d0` | EAX:uint32_t | AL:uint8_t | c6800@c6805,c71dc@c71e1,c75d4@c75d9 | Implicit-register fragment (ESI is an in/out pointer; result in AL): like 0xc6428 but also stores the loaded low byte to |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9bdbb` | EAX:uint32_t,EDX:uint32_t | none | 1e9@218 | Run the registered exit handlers with priority between MIN (AL) and MAX (DL): the 6-byte records at 0x195ade..0x195af0 h |
+| `0x1e9` | EAX:uint32_t,EDX:uint32_t | none | 11d258@11d26d | Fatal exit with a message: STRING (EDX, zero-terminated) is written to the file opened by name 0x120d1b (INT 21h AX=3D01 |
+| `0x11d258` | EAX:uint32_t,EDX:uint32_t | none | 10e438@10e443,11d695@11d69f | Report an error: if the debugger hook (0x1204b6) returns zero, call the fatal exit 0x1e9 with the same two register argu |

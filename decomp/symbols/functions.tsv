@@ -1,6 +1,6 @@
 addr	size	name	module	state	kind	sig_status	test	notes
 0x00000086	355	x386_startup		library	x32	unverified		docs/loader.md and docs/startup-symbols.md; code sequence matches FlashTek X-32 Watcom cstrtx32.asm, selector and startup setup
-0x000001e9	57			unknown	unclassified	unverified		
+0x000001e9	57	fatal_exit_1e9	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000001e9.json	docs/compiler-abi.md; Fatal exit with a message: STRING (EDX, zero-terminated) is written to the file opened by name 0x120d1b (INT 21h AX=3D01; callers 11d258@11d26d; guest pending
 0x00000222	9	load_ds_from_120cd4_222	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000222.json	docs/compiler-abi.md; Load the data segment register from the word at code-segment offset 0x120cd4. Segments are flat in this port, so there i; callers ee22c@ee28d,ee22c@ee318; guest pending
 0x00000235	6			unknown	unclassified	unverified		
 0x0000023b	44			unknown	unclassified	unverified		
@@ -2017,7 +2017,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009bca4	83	draw_bar_9bca4	screen_clip1	compiles	game	confirmed	decomp/tests/0x0009bca4.json	docs/compiler-abi.md; Draw a bar of height h (when non-zero) at x: a coloured strip via 0xc99ac and a highlight via 0xc9a98.; callers 98eac@98ecd,98eac@98eea,98eac@98f07; guest pending
 0x0009bd20	79	watcom_cmain		library	clib	unverified		Watcom C entry: startup command buffer and EBP initialization, calls candidate game main 0x8b274; docs/startup-symbols.md
 0x0009bd70	75	watcom_init_routines		library	clib	unverified		Watcom initializer dispatcher: called with EAX=0xff and walks init table; docs/startup-symbols.md
-0x0009bdbb	79			unknown	unclassified	unverified		
+0x0009bdbb	79	run_exit_handlers_9bdbb	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009bdbb.json	docs/compiler-abi.md; Run the registered exit handlers with priority between MIN (AL) and MAX (DL): the 6-byte records at 0x195ade..0x195af0 h; callers 1e9@218; guest pending
 0x0009be0c	1	nop_9be0c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0009be0c.json	docs/compiler-abi.md; Empty stub (single ret).; callers ee43c@ee463; guest pending
 0x0009be0d	40	segread_9be0d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009be0d.json	docs/compiler-abi.md; Store the current segment registers into the 12-byte record at OUT (ES, CS, SS, DS, FS, GS as words, like segread).; callers 2b0@2bb,9c446@9c44e,104840@10486d; guest pending
 0x0009be38	427			unknown	unclassified	unverified		
@@ -4228,7 +4228,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011d01c	281			unknown	unclassified	unverified		
 0x0011d135	281			unknown	unclassified	unverified		
 0x0011d24e	5	tail_jump_11d24e	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011d24e.json	docs/compiler-abi.md; tail jump. Forward to 0x120485.; callers 10dc7f@10dcef; guest pending
-0x0011d258	29			unknown	unclassified	unverified		
+0x0011d258	29	report_error_11d258	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d258.json	docs/compiler-abi.md; Report an error: if the debugger hook (0x1204b6) returns zero, call the fatal exit 0x1e9 with the same two register argu; callers 10e438@10e443,11d695@11d69f; guest pending
 0x0011d27b	167	format_signed_11d27b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d27b.json	docs/compiler-abi.md; Format a signed value as a sign character plus zero padded decimal digits (at most 3 digits are produced; no terminator ; callers 11d3f0@11d5c3; guest pending
 0x0011d322	99	layout_digits_11d322	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d322.json	docs/compiler-abi.md; Lay out a decimal digit string as "intdigits.fracdigits" at out: copy up to intdigits digits from src, pad with zeros, a; callers 11d3f0@11d57f,11d3f0@11d5ec; guest pending
 0x0011d385	107	right_align_number_11d385	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d385.json	docs/compiler-abi.md; Right-align the len-byte text at buf inside width bytes: move it to the end, then fix a leading "." or sign+"." by inser; callers 11d3f0@11d606; guest pending
