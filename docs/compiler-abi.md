@@ -5771,3 +5771,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x66fc` | none | EAX:uint32_t | 6460@669f | Heading from the view origin (0x1a5bec, 0x1a5be8) to the current object: the object (word 0x1f71ca) is looked up, its po |
 | `0x7ae88` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t,ECX:int32_t | EAX:uint32_t | 161d4@164a7,1df90@1e040,56084@56141 | Look up the cell of the plane map for the position (X, Z) (both in units of 2048; wrapped to 400 with the original off-b |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x28aa8` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | AL:uint8_t | 28ed8@291b5 | Set up the line-of-sight query between the fixed point positions A and B (both 24.8) for an object of KIND: the clearanc |
+| `0x11014` | EAX:ef_addr32 | EAX:uint32_t | 110ec@1119b | Find the entry of OBJ's list (count word at +0x2a, pointer at +0x2c, 21-byte entries with the word pair at +7/+9) that m |

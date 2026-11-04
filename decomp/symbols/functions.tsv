@@ -238,7 +238,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00010a9c	1163			unknown	unclassified	unverified		
 0x00010f28	71	transform_runtime_word_pair	runtime_small_ops	compiles	game	confirmed	decomp/tests/0x0010f28.json	AX mode 1/2/3 rotates and negates two words; callers 10f70@10fb5/11014@11092; guest pending
 0x00010f70	164			unknown	unclassified	unverified		
-0x00011014	216			unknown	unclassified	unverified		
+0x00011014	216	find_entry_at_cursor_11014	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00011014.json	docs/compiler-abi.md; Find the entry of OBJ's list (count word at +0x2a, pointer at +0x2c, 21-byte entries with the word pair at +7/+9) that m; callers 110ec@1119b; guest pending
 0x000110ec	1140			unknown	unclassified	unverified		
 0x00011560	527			unknown	unclassified	unverified		
 0x00011770	100	find_entry_11770	game_helpers7	compiles	game	confirmed	decomp/tests/0x00011770.json	docs/compiler-abi.md; Is there an entry with these three words and kind 1?; callers 494c@4990; guest pending
@@ -416,7 +416,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00028a34	57	free_list_node_28a34	game_helpers5	compiles	game	confirmed	decomp/tests/0x00028a34.json	docs/compiler-abi.md; Move the head of the used list to the free list.; callers 288c8@28988; guest pending
 0x00028a70	25	filtered_object_has_link	low_helpers	compiles	game	confirmed	decomp/tests/0x00028a70.json	docs/compiler-abi.md; filtered lookup; dword +0x1c nonzero; callers 28ed8@28f8a; guest pending
 0x00028a8c	25	object_has_link	low_helpers	compiles	game	confirmed	decomp/tests/0x00028a8c.json	docs/compiler-abi.md; 0x8ffe8 lookup; dword +0x1c nonzero; callers 291fc@292e2,291fc@29347; guest pending
-0x00028aa8	214			unknown	unclassified	unverified		
+0x00028aa8	214	setup_line_query_28aa8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00028aa8.json	docs/compiler-abi.md; Set up the line-of-sight query between the fixed point positions A and B (both 24.8) for an object of KIND: the clearanc; callers 28ed8@291b5; guest pending
 0x00028b80	854			unknown	unclassified	unverified		
 0x00028ed8	803			unknown	unclassified	unverified		
 0x000291fc	435			unknown	unclassified	unverified		

@@ -3132,3 +3132,68 @@ uint32_t lookup_plane_cell_7ae88(uint32_t mode, int32_t x, uint32_t y, int32_t z
     EF_U16(0x001f8ec2u) = (uint16_t)v;
     return guest_fn_d0470((int16_t)v, (int32_t)((uint32_t)(gx * 2 + 1) << 10), (int32_t)y, (int32_t)((uint32_t)((0x18f - gz) * 2 + 1) << 10));
 }
+
+/* 0x28aa8, 214 bytes. Set up the line-of-sight query between the fixed point positions A and B (both 24.8) for an object of KIND: the clearance depends on the kind (0x3c for 5 and 0x12, 0x1e for 4 and 0x13, else 5). When both positions exist the endpoints (B raised by the clearance, A raised by 2) are stored at 0x420904..0x42093a and 0x7b7d8 decides; otherwise the result is 1. Returns the result byte. */
+uint8_t setup_line_query_28aa8(ef_addr32 a, ef_addr32 b, uint32_t kind)
+{
+    uint8_t result = 1u;
+    uint8_t k = (uint8_t)kind;
+    int32_t clearance;
+    int32_t xa, ya, za, xb, yb, zb;
+    if (k == 5u || k == 0x12u)
+        clearance = 0x3c;
+    else if (k == 4u || k == 0x13u)
+        clearance = 0x1e;
+    else
+        clearance = 5;
+    if (a == 0u || b == 0u)
+        return result;
+    xb = (int32_t)EF_U32(b) >> 8;
+    yb = (int32_t)EF_U32(b + 4u) >> 8;
+    zb = (int32_t)EF_U32(b + 8u) >> 8;
+    EF_U32(0x00420910u) = (uint32_t)xb;
+    EF_U32(0x00420918u) = (uint32_t)zb;
+    xa = (int32_t)EF_U32(a) >> 8;
+    yb += (int16_t)clearance;
+    EF_U32(0x00420914u) = (uint32_t)xa;
+    ya = (int32_t)EF_U32(a + 4u) >> 8;
+    za = (int32_t)EF_U32(a + 8u) >> 8;
+    EF_U32(0x00420904u) = (uint32_t)yb;
+    EF_U16(0x00420932u) = (uint16_t)yb;
+    EF_U32(0x0042091cu) = (uint32_t)za;
+    EF_U16(0x00420930u) = (uint16_t)xb;
+    ya += 2;
+    EF_U16(0x00420934u) = (uint16_t)zb;
+    EF_U32(0x00420908u) = (uint32_t)ya;
+    EF_U16(0x00420936u) = (uint16_t)xa;
+    EF_U16(0x00420938u) = (uint16_t)ya;
+    EF_U16(0x0042093au) = (uint16_t)za;
+    result = (uint8_t)guest_fn_7b7d8();
+    return result;
+}
+
+/* 0x11014, 216 bytes. Find the entry of OBJ's list (count word at +0x2a, pointer at +0x2c, 21-byte entries with the word pair at +7/+9) that matches the cursor: with the runtime view active (0x125847 set, 0x121ec6 clear) the pair is transformed for the current orientation and tested against the window at the script cursor data, otherwise it is compared with the saved point 0x197c24/0x197c26. Returns the entry index, 0 when none matches. */
+uint32_t find_entry_at_cursor_11014(ef_addr32 obj)
+{
+    uint16_t orient = 0u;
+    uint32_t win = 0u;
+    int16_t i;
+    if (EF_U8(0x00125847u) != 0u && EF_U8(0x00121ec6u) == 0u) {
+        orient = record_flag_bits56((int16_t)EF_U16(0x001f8ec2u));
+        win = script_cursor_data_cd29c();
+    }
+    for (i = 0; i < (int16_t)EF_U16(obj + 0x2au); i++) {
+        uint32_t e = EF_U32(obj + 0x2cu) + (uint32_t)(int32_t)i * 0x15u;
+        uint32_t px = EF_U16(e + 7u);
+        uint32_t py = EF_U16(e + 9u);
+        if (EF_U8(0x00125847u) != 0u && EF_U8(0x00121ec6u) == 0u) {
+            transform_runtime_word_pair(orient, (uint32_t)(uintptr_t)&px, (uint32_t)(uintptr_t)&py);
+            if ((int16_t)px > (int16_t)EF_U16(win) && (int16_t)px < (int16_t)EF_U16(win + 6u)
+                && (int16_t)py > (int16_t)EF_U16(win + 4u) && (int16_t)py < (int16_t)EF_U16(win + 0xau))
+                return (uint32_t)(int32_t)i;
+        } else if ((uint16_t)px == EF_U16(0x00197c24u) && (uint16_t)py == EF_U16(0x00197c26u)) {
+            return (uint32_t)(int32_t)i;
+        }
+    }
+    return 0u;
+}

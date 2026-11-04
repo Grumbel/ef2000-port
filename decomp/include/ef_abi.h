@@ -4733,4 +4733,7 @@ uint32_t heading_to_current_object_66fc(void);
 uint32_t lookup_plane_cell_7ae88(uint32_t mode, int32_t x, uint32_t y, int32_t z);
 void guest_fn_84e3c_x(uint32_t a, uint32_t b, uint32_t c); /* 0x84e3c EAX/EDX/EBX */
 
+uint8_t setup_line_query_28aa8(ef_addr32 a, ef_addr32 b, uint32_t kind);
+uint32_t find_entry_at_cursor_11014(ef_addr32 obj);
+
 #endif
