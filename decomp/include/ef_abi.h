@@ -5190,4 +5190,6 @@ void draw_shaded_span_d44b0(void);
 
 uint32_t project_if_outside_c46f8(uint32_t margin, uint32_t rec);
 
+void send_guarded_message_103e0c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj);
+
 #endif

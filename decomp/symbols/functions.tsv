@@ -3860,7 +3860,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00103c28	81	trace_call_103c28	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00103c28.json	docs/compiler-abi.md; AIL trace wrapper for 0x1149e0 (cdecl, all arguments on the stack).; callers d605c@d6069; guest pending
 0x00103d48	42	shutdown_103d48	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00103d48.json	docs/compiler-abi.md; If dword 0x17d2cc is set, run 0x1048b4(0x101a90, 0x103d48) and clear it.; callers none direct; guest pending
 0x00103d80	138	init_locked_ranges_103d80	state_reset1	compiles	game	confirmed	decomp/tests/0x00103d80.json	docs/compiler-abi.md; One-time setup of the runtime's locked ranges: register the code range 0x103d80..0x1046c4 and the six data ranges below,; callers 104580@104580; guest pending
-0x00103e0c	79			unknown	unclassified	unverified		
+0x00103e0c	79	send_guarded_message_103e0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00103e0c.json	docs/compiler-abi.md; cdecl (OBJ): one-shot guarded notification. When the guard dword 0x17d2d0 is clear, set it, take the handle from 0x101f7; callers none direct; guest pending
 0x00103e5c	166	parse_number_103e5c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00103e5c.json	docs/compiler-abi.md; Parse a number from the string STR in base BASE (digit characters are looked up case insensitively in the table at 0x194; callers 103f04@1040e9,103f04@104117,103f04@104145; guest pending
 0x00103f04	733			unknown	unclassified	unverified		
 0x001041e4	25	exchange_slot_1041e4	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001041e4.json	docs/compiler-abi.md; Exchange dword 0x4dd7cc[index] with value; return the old one.; callers 101e14@101e40; guest pending

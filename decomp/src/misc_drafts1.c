@@ -8296,3 +8296,18 @@ uint32_t project_if_outside_c46f8(uint32_t margin, uint32_t rec)
     }
     return 0u;
 }
+
+/* 0x103e0c, 79 bytes. cdecl (OBJ): one-shot guarded notification. When the guard dword 0x17d2d0 is clear, set it, take the handle from 0x101f70 (stored in 0x4dd7c8), send message 0x302 to OBJ (0x101f88), release the handle with 0x101f78 and clear the guard again. */
+void send_guarded_message_103e0c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj)
+{
+    uint32_t h;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if (EF_U32(0x0017d2d0u) != 0u)
+        return;
+    EF_U32(0x0017d2d0u) = 1u;
+    h = tail_jump_101f70(0u); /* EAX is not set by the original; the callee ignores it */
+    EF_U32(0x004dd7c8u) = h;
+    guest_fn_101f88(obj, 0x302u, 0u, 0u);
+    forward_to_1111e5_101f78(0u, 0u, 0u, 0u, EF_U32(0x004dd7c8u));
+    EF_U32(0x0017d2d0u) = 0u;
+}
