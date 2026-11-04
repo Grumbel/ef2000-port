@@ -17430,3 +17430,56 @@ void handle_unit_state_packet_564f4(ef_addr32 rec)
 	EF_U16(0x001a6378u + player * 2u) = (uint16_t)(EF_U16(0x001a6378u + player * 2u) + 1u);
 	EF_U16(0x00127daeu) = 0x5dcu;
 }
+
+/* 0x3c790, 441 bytes. Load the placement list of page AX (signed 16-bit) from the table at 0x1836d8 (0x3c730): allocate (0xcc6c0, tag 0x1836e0) one 21-byte record per count entry (word +0x2a of the record at dword 0x1264c8) into dword 0x1a2e84 and fill them from the 16-bit word stream. Each entry starts with its marker string (0x1836f4 is compared, 0x9d524, and a mismatch reports 0x1836fc with the entry number through the error hook); the zero words after the string are skipped, then a kind byte (+0), three coordinate words and an angle word follow. The coordinates are stored at +7, +0x9, +0xb rotated according to the view angle word 0x1a2ea4 (0x5a: +9 = -w1, +0xb = w2, +7 = w3; 0xb4: +7 = -w1, +0xb = w2, +9 = -w3; 0x10e: +9 = w1, +0xb = w2, +7 = -w3; otherwise +7 = w1, +0xb = w2, +9 = w3). The record's angle (+0x11) is the last word plus the view angle, wrapped by 0x168. */
+void load_placement_list_3c790(uint32_t ax)
+{
+	uint32_t rec = EF_U32(0x001264c8u);
+	uint32_t p = guest_table_entry_3c730(0x001836d8u, (int32_t)(int16_t)ax);
+	uint32_t base, dest, p0, p1;
+	int32_t cnt;
+	int16_t i;
+	uint16_t mode, w1, w2, w3;
+
+	cnt = (int32_t)EF_U32(rec + 0x28u) >> 16;
+	base = guest_fn_cc6c0_x((uint32_t)(cnt * 21), 0x001836e0u);
+	EF_U32(0x001a2e84u) = base;
+	for (i = 0; (int16_t)i < (int16_t)EF_U16(EF_U32(0x001264c8u) + 0x2au); i++) {
+		if (guest_fn_9d524(0x001836f4u, p) != 0u)
+			guest_callptr3_x(EF_U32(0x00132a74u), 0x001836fcu, EF_U32(0x001a2e80u), (uint32_t)((int32_t)i + 1));
+		while (EF_U16(p) != 0u)
+			p += 2u;
+		while (EF_U16(p) == 0u)
+			p += 2u;
+		p0 = p;
+		p1 = p0 + 2u;
+		dest = base + (uint32_t)((int32_t)i * 21);
+		EF_U8(dest) = EF_U8(p0);
+		mode = EF_U16(0x001a2ea4u);
+		w1 = EF_U16(p1);
+		w2 = EF_U16(p1 + 2u);
+		w3 = EF_U16(p1 + 4u);
+		if (mode == 0x5au) {
+			EF_U16(dest + 9u) = (uint16_t)(0u - (uint32_t)w1);
+			EF_U16(dest + 0xbu) = w2;
+			EF_U16(dest + 7u) = w3;
+		} else if (mode == 0xb4u) {
+			EF_U16(dest + 7u) = (uint16_t)(0u - (uint32_t)w1);
+			EF_U16(dest + 0xbu) = w2;
+			EF_U16(dest + 9u) = (uint16_t)(0u - (uint32_t)w3);
+		} else if (mode == 0x10eu) {
+			EF_U16(dest + 9u) = w1;
+			EF_U16(dest + 0xbu) = w2;
+			EF_U16(dest + 7u) = (uint16_t)(0u - (uint32_t)w3);
+		} else {
+			EF_U16(dest + 7u) = w1;
+			EF_U16(dest + 0xbu) = w2;
+			EF_U16(dest + 9u) = w3;
+		}
+		p = p1 + 6u;
+		EF_U16(dest + 0x11u) = (uint16_t)(EF_U16(0x001a2ea4u) + EF_U16(p));
+		p += 2u;
+		if ((int32_t)(int16_t)EF_U16(dest + 0x11u) >= 0x168)
+			EF_U16(dest + 0x11u) = (uint16_t)(EF_U16(dest + 0x11u) - 0x168u);
+	}
+}

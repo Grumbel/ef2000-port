@@ -8439,3 +8439,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x564f4` | EAX:ef_addr32 | none | 581b0@58386 | Handle an incoming unit state packet REC (EAX; signed unit id word +1, kind byte +3, reply code byte +4, words +5, +7, + |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3c790` | EAX:uint32_t | none | 3cb2c@3cc05 | Load the placement list of page AX (signed 16-bit) from the table at 0x1836d8 (0x3c730): allocate (0xcc6c0, tag 0x1836e0 |

@@ -5913,4 +5913,6 @@ void update_effect_entries_90f50(void);
 
 void handle_unit_state_packet_564f4(ef_addr32 rec);
 
+void load_placement_list_3c790(uint32_t ax);
+
 #endif
