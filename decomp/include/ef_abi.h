@@ -3555,4 +3555,11 @@ void guest_fn_842b4_x(void); /* 0x842b4 */
 void guest_fn_84394_x(uint32_t vec, uint32_t dx, uint32_t bx); /* 0x84394 EAX/EDX/EBX */
 void guest_fn_c8d30_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0xc8d30 EAX/EDX/EBX/ECX + stack */
 
+/* game_helpers73.c */
+void step_letter_table_11d44(void);
+void refresh_group_entries_12210(int16_t group);
+void guest_fn_11e7c_x(int32_t a); /* 0x11e7c EAX */
+void guest_fn_12140_x(void); /* 0x12140 */
+void guest_fn_11d20_x(int32_t a, int32_t b); /* 0x11d20 EAX/EDX */
+
 #endif

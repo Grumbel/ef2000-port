@@ -3983,3 +3983,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x845c0` | none | AL:uint8_t | none direct | Forward the cursor vector, redoing it once when the hit test accepts the position. |
 | `0x944f4` | none | none | 95e58@96bcb | Latch the camera position and place the scene with the negated view angles. |
+
+## game_helpers73 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11d44` | none | none | 601c@60aa,11de0@11e70 | Advance the letter table walk; emits up to 18 letters per step for the active mode. |
+| `0x12210` | AX:int16_t | none | 12d90@12de7 | Refresh a group's entries: its flagged head, then every member from the cx-th list on. |
