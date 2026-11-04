@@ -2485,7 +2485,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1b8b	25	strlen_ds	unk_runtime	typed	unclassified	confirmed		docs/compiler-abi.md; repnz scasb uses ES=DS and assumes DF clear; classification deferred to 3.6
 0x000b1bb0	70	print_to_handle_b1bb0	game_helpers126	compiles	game	confirmed	decomp/tests/0x000b1bb0.json	docs/compiler-abi.md; printf to a handle (100..105): format into a 0x7c-byte buffer and write it (cdecl, variadic; all arguments on the stack); callers 5630@56e0,5630@56ee,5630@56fc; guest pending
 0x000b1bf8	57			unknown	unclassified	unverified		
-0x000b1c34	77			unknown	unclassified	unverified		
+0x000b1c34	77	dump_entry_list_b1c34	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b1c34.json	docs/compiler-abi.md; Dump a numbered entry list: the format string, the entry count, then each entry (numbered from 0 in word +0x13) via 0xb1; callers b3084@b310c; guest pending
 0x000b1f80	618			unknown	unclassified	unverified		
 0x000b21ec	140	print_record_b21ec	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b21ec.json	docs/compiler-abi.md; Print one record to a text handle.; callers b1f80@b21c7,b2758@b27d0; guest pending
 0x000b23bc	226			unknown	unclassified	unverified		
@@ -2500,11 +2500,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b2b00	515			unknown	unclassified	unverified		
 0x000b2d04	135			unknown	unclassified	unverified		
 0x000b2d8c	155	print_point_b2d8c	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b2d8c.json	docs/compiler-abi.md; Print one shape point record.; callers b2e98@b2f28; guest pending
-0x000b2e28	59			unknown	unclassified	unverified		
+0x000b2e28	59	dump_point_list_b2e28	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b2e28.json	docs/compiler-abi.md; Dump a point list: the format string, a value, then each entry via 0xb2e98.; callers b3168@b31d3; guest pending
 0x000b2e64	50	count_active_entries	list_helpers	compiles	game	confirmed	decomp/tests/0x000b2e64.json	docs/compiler-abi.md; Count the 9-byte entries (pointer +0x4a, count word * +0x48) whose byte +3 is nonzero.; callers b2e98@b2ef5; guest pending
 0x000b2e98	176	print_object_b2e98	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b2e98.json	docs/compiler-abi.md; Print an object record and its point list.; callers b2e28@b2e55; guest pending
-0x000b2f48	238			unknown	unclassified	unverified		
-0x000b3038	73			unknown	unclassified	unverified		
+0x000b2f48	238	dump_group_b2f48	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b2f48.json	docs/compiler-abi.md; Dump one group record: its id, type name, extent words and, when any member byte at +5 is not 0x64, the member bytes.; callers b3038@b3072; guest pending
+0x000b3038	73	dump_group_list_b3038	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b3038.json	docs/compiler-abi.md; Dump a group list: heading with a title, the entry count, then each group via 0xb2f48.; callers b3084@b30ee; guest pending
 0x000b3084	226			unknown	unclassified	unverified		
 0x000b3168	136			unknown	unclassified	unverified		
 0x000b31f0	388			unknown	unclassified	unverified		

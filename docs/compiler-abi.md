@@ -4531,3 +4531,12 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xb1bb0` | [ESP+4]:uint32_t,[ESP+8]:ef_addr32 | none | 5630@56e0,5630@56ee,5630@56fc | printf to a handle (100..105): format into a 0x7c-byte buffer and write it (cdecl, variadic; all arguments on the stack) |
+
+## game_helpers127 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb2f48` | EAX:ef_addr32,EDX:uint32_t | none | b3038@b3072 | Dump one group record: its id, type name, extent words and, when any member byte at +5 is not 0x64, the member bytes. |
+| `0xb3038` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | b3084@b30ee | Dump a group list: heading with a title, the entry count, then each group via 0xb2f48. |
+| `0xb1c34` | EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32 | none | b3084@b310c | Dump a numbered entry list: the format string, the entry count, then each entry (numbered from 0 in word +0x13) via 0xb1 |
+| `0xb2e28` | EAX:uint32_t,EDX:ef_addr32,BX:int16_t,ECX:ef_addr32 | none | b3168@b31d3 | Dump a point list: the format string, a value, then each entry via 0xb2e98. |

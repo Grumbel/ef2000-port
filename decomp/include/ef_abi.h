@@ -3960,4 +3960,12 @@ uint32_t guest_fn_110393_x(uint32_t handle, ef_addr32 buf, uint32_t count); /* 0
 /* game_helpers126.c */
 void print_to_handle_b1bb0(uint32_t handle, ef_addr32 fmt, ...);
 
+/* game_helpers127.c */
+void dump_group_b2f48(ef_addr32 group, uint32_t handle);
+void dump_group_list_b3038(ef_addr32 list_head, uint32_t handle, uint32_t title);
+void dump_entry_list_b1c34(ef_addr32 list_head, uint32_t handle, ef_addr32 fmt);
+void dump_point_list_b2e28(uint32_t handle, ef_addr32 list_ptr, int16_t value, ef_addr32 fmt);
+void guest_fn_b1f80_x(ef_addr32 node, uint32_t handle); /* 0xb1f80 EAX/EDX */
+void guest_fn_b2e98_x(ef_addr32 node, uint32_t handle); /* 0xb2e98 EAX/EDX */
+
 #endif
