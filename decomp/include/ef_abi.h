@@ -6031,4 +6031,6 @@ uint8_t load_file_unpacked_b3c04(ef_addr32 name, ef_addr32 dest);
 ef_addr32 guest_fn_cfc68_x(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e); /* 0xcfc68 EAX,EDX,EBX,ECX + 1 stack, callee cleanup */
 void guest_fn_fa02c_x(uint32_t handle, uint32_t dest); /* 0xfa02c 2 stack, callee cleanup */
 
+uint32_t read_device_angles_d9cb4(ef_addr32 out1, ef_addr32 out2, ef_addr32 out3);
+
 #endif

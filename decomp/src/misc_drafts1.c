@@ -19436,3 +19436,31 @@ uint8_t load_file_unpacked_b3c04(ef_addr32 name, ef_addr32 dest)
 	guest_fn_a7990(h);
 	return 1u;
 }
+
+/* 0xd9cb4, 256 bytes. Poll the attached device and convert its latest position sample to three scaled integers. */
+uint32_t read_device_angles_d9cb4(ef_addr32 out1, ef_addr32 out2, ef_addr32 out3)
+{
+	const double f = 6.103515625e-05;
+	double a, b, c;
+	int32_t base1, base2, base3;
+
+	if (EF_S32(0x0015bb4cu) == 0x7fffffff)
+		read_stream_header_d9dc0();
+	EF_U8(0x00420f54u) = guest_fn_107070_w(0x00420f00u, (uint32_t)times_100(1));
+	if (EF_U8(0x00420f54u) != 0u) {
+		EF_U8(0x00420f54u) = guest_fn_106d34_w(0x00420f00u, (uint32_t)times_100_div_10(1));
+		if (EF_U8(0x00420f54u) != 0u)
+			return 0u;
+	}
+	send_command_107060(0x00420f00u);
+	base1 = EF_S32(0x0015bb50u);
+	base2 = EF_S32(0x0015bb4cu);
+	base3 = EF_S32(0x0015bb54u);
+	a = (double)(EF_S32(0x00420f1cu) - base1) * f;
+	EF_S32(out1) = (int32_t)truncate_9d72c((360.0 - a) * 182.0);
+	b = (double)(EF_S32(0x00420f18u) - base2) * f;
+	EF_S32(out2) = (int32_t)truncate_9d72c((360.0 - b) * 192.0);
+	c = (double)(EF_S32(0x00420f20u) - base3);
+	EF_S32(out3) = (int32_t)truncate_9d72c(192.0 * (f * c));
+	return 1u;
+}

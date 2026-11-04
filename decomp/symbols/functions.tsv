@@ -3132,7 +3132,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d9b30	112	probe_service_d9b30	probe_helpers1	compiles	game	confirmed	decomp/tests/0x000d9b30.json	docs/compiler-abi.md; Probe base values 0x6000 + n*0x100 (n = 0..16) with the 0x8b8 service 0x33 and return the first value whose reply echoes; callers 919d4@91a87,e9ac0@e9ad9; guest pending
 0x000d9ba0	106	query_device_d9ba0	runtime_helpers9	compiles	game	confirmed	decomp/tests/0x000d9ba0.json	docs/compiler-abi.md; Mouse-style call 0x33 (entry value ORed with 0x70); results through four pointers.; callers 93e58@93e89,94000@94031; guest pending
 0x000d9c30	129	open_stream_formats_d9c30	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000d9c30.json	docs/compiler-abi.md; Open the stream in either format; 0 on success, 1 on failure.; callers e9ac0@e9af3; guest pending
-0x000d9cb4	256			unknown	unclassified	unverified		
+0x000d9cb4	256	read_device_angles_d9cb4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d9cb4.json	docs/compiler-abi.md; Poll the attached device and convert its latest position sample to three scaled integers.; callers 93f44@93f64; guest pending
 0x000d9dc0	139	read_stream_header_d9dc0	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000d9dc0.json	docs/compiler-abi.md; Read the stream header and latch the heading and position values.; callers d9cb4@d9ccb; guest pending
 0x000d9e50	829			unknown	unclassified	unverified		
 0x000da190	36	run_named_handler_da190	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000da190.json	docs/compiler-abi.md; Select the table entry matching a name, store the key and run its handler.; callers d9e50@da06f; guest pending
