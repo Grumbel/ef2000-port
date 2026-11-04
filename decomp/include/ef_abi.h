@@ -5352,4 +5352,9 @@ void draw_outline_5af50(uint32_t n);
 
 ef_addr32 find_group_node_b4aec(ef_addr32 a, ef_addr32 b, uint32_t group, ef_addr32 list);
 
+void open_resource_by_name_ad440(ef_addr32 name, ef_addr32 out);
+uint32_t write_page_record_a1d50(void);
+void select_page_a1d00(uint32_t id);
+uint32_t guest_fn_3cd40_x(ef_addr32 name); /* 0x3cd40 EAX -> EAX */
+
 #endif

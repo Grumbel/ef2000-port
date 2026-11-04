@@ -2144,8 +2144,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a1b54	157	create_state_file_a1b54	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a1b54.json	docs/compiler-abi.md; Create the state file and write its 12-byte header.; callers 7a9bc@7a9db; guest pending
 0x000a1bf4	189	open_state_file_a1bf4	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a1bf4.json	docs/compiler-abi.md; Open the state file and validate its 12-byte header.; callers 7a844@7a871; guest pending
 0x000a1cb4	76	close_log_handle_a1cb4	small_wrappers2	compiles	game	confirmed	decomp/tests/0x000a1cb4.json	docs/compiler-abi.md; Close the log handle at 0x132b18 (writing a -1 marker first when 0x132b1c is 1) and mark it closed.; callers 7a844@7a9a5,7a9bc@7aa22,a1bf4@a1c82; guest pending
-0x000a1d00	80			unknown	unclassified	unverified		
-0x000a1d50	376			unknown	unclassified	unverified		
+0x000a1d00	80	select_page_a1d00	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a1d00.json	docs/compiler-abi.md; Select the record ID (AX, signed) as the current page: store the id in word 0x41722a, look the record up (0xb3f58), set ; callers 7a9bc@7aa06; guest pending
+0x000a1d50	376	write_page_record_a1d50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a1d50.json	docs/compiler-abi.md; Write the current page record (pointer 0x417174, entry table 0x41717c) to the save stream with 0xa1b28: first the 13-byt; callers a1d00@a1d3d; guest pending
 0x000a1ec8	405			unknown	unclassified	unverified		
 0x000a207c	266	step_animation_script_a207c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a207c.json	docs/compiler-abi.md; Step the animation script of OBJ (script pointer +0, time +4, wait +6): once the time word is at least 0x4000 the wait i; callers a2634@a268f,a2698@a271a; guest pending
 0x000a2188	186	blend_linear_a2188	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a2188.json	docs/compiler-abi.md; Blend two 3-word keys by a 14-bit weight (linear).; callers none direct; guest pending
@@ -2441,7 +2441,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000acb68	124	latch_previous_acb68	entity_helpers	compiles	game	confirmed	decomp/tests/0x000acb68.json	docs/compiler-abi.md; Latch "previous" copies of the fields and shift flag bits 0..2 to 3..5 of byte +0x1e.; callers ac5f8@ac67c; guest pending
 0x000acbe4	980			unknown	unclassified	unverified		
 0x000acfb8	1158			unknown	unclassified	unverified		
-0x000ad440	81			unknown	unclassified	unverified		
+0x000ad440	81	open_resource_by_name_ad440	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ad440.json	docs/compiler-abi.md; Open the resource NAME (EAX) from the default directory plus the subdirectory 0x18dc8c: build the path (0x9c980, strcat ; callers 49228@49390,b0f5c@b1011,b0f5c@b120c; guest pending
 0x000afc5c	902			unknown	unclassified	unverified		
 0x000b0018	184	allocate_weighted_node_records	unk_records	typed	game	confirmed		docs/compiler-abi.md; linked node +0x4f weights, 0x36-byte allocation elements
 0x000b00d0	103	allocate_tagged_node_records	unk_records	typed	game	confirmed		docs/compiler-abi.md; linked node +0x09/+0x12 tags, 0x36-byte allocation elements

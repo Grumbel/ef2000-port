@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include <stdarg.h>
+#include <string.h>
 #include "ef_abi.h"
 #include "ef_globals.h"
 #include "ef_mem.h"
@@ -10621,4 +10622,78 @@ ef_addr32 find_group_node_b4aec(ef_addr32 a, ef_addr32 b, uint32_t group, ef_add
             return node;
     }
     return 0u;
+}
+
+/* 0xad440, 81 bytes. Open the resource NAME (EAX) from the default directory plus the subdirectory 0x18dc8c: build the path (0x9c980, strcat 0x9ca57), switch the engine state on first (0xe4188, while byte 0x15f930 is clear), activate the file (0x3cd40), store the handle at OUT (EDX) and reset the engine state (0xe4264) when byte 0x15f930 was clear. */
+void open_resource_by_name_ad440(ef_addr32 name, ef_addr32 out)
+{
+    char path[0x50];
+    uint32_t p = (uint32_t)(uintptr_t)path;
+    uint32_t h;
+    build_default_path_9c980(p);
+    (void)strcat_9ca57(p, 0x0018dc8cu);
+    (void)strcat_9ca57(p, name);
+    if (EF_U8(0x0015f930u) == 0u)
+        guest_fn_e4188();
+    h = guest_fn_3cd40_x(p);
+    EF_U32(out) = h;
+    if (EF_U8(0x0015f930u) == 0u)
+        reset_engine_e4264();
+}
+
+/* 0xa1d50, 376 bytes. Write the current page record (pointer 0x417174, entry table 0x41717c) to the save stream with 0xa1b28: first the 13-byte header (name hash of the record's name from the pointer table 0x411080, the table's two leading bytes, the flag byte holding the low five bits of record byte +0xa, and the record words +2, +4 and +6), then for every entry of the table (count = table byte 1) a 43-byte block (8 bytes from +0x14, byte +0x1c, the 16-byte name of the entry's word +0 from 0xdead0, 16 bytes from +2 and word +0x12), and finally the table's first-byte count of bytes of entry data from record + 0xb + 29 * count. Returns that count (left in EDX by the original). */
+uint32_t write_page_record_a1d50(void)
+{
+    uint8_t buf[0x3c];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    ef_addr32 rec = EF_U32(0x00417174u);
+    ef_addr32 tab = EF_U32(0x0041717cu);
+    ef_addr32 ent;
+    ef_addr32 name;
+    uint32_t hash;
+    uint32_t n;
+    uint32_t cnt;
+    int16_t i;
+    memset(buf, 0, sizeof(buf));
+    hash = name_hash_ebfd0(EF_U32(0x00411080u + (uint32_t)EF_U16(rec) * 4u));
+    memcpy(&buf[0x2c], &hash, 4);
+    buf[0x30] = EF_U8(tab);
+    buf[0x31] = EF_U8(tab + 1u);
+    buf[0x32] = (uint8_t)(EF_U8(rec + 0xau) & 0x1fu);
+    { uint16_t w = EF_U16(rec + 2u); memcpy(&buf[0x33], &w, 2); }
+    { uint16_t w = EF_U16(rec + 4u); memcpy(&buf[0x35], &w, 2); }
+    { uint16_t w = EF_U16(rec + 6u); memcpy(&buf[0x37], &w, 2); }
+    write_checked_a1b28(b + 0x2cu, 0xdu);
+    for (i = 0; (int16_t)i < (int16_t)EF_U8(EF_U32(0x0041717cu) + 1u); i++) {
+        ent = rec + 0xbu + (uint32_t)((int32_t)i * 0x1d);
+        (void)memcpy_dc832(b, ent + 0x14u, 8u);
+        buf[8] = EF_U8(ent + 0x1cu);
+        (void)memcpy_dc832(b + 0x19u, ent + 2u, 0x10u);
+        { uint16_t w = EF_U16(ent + 0x12u); memcpy(&buf[0x29], &w, 2); }
+        name = find_table_entry_dead0(0u, 0u, 0u, 0u, (uint32_t)(int32_t)(int16_t)EF_U16(ent));
+        (void)memcpy_dc832(b + 9u, name, 0x10u);
+        write_checked_a1b28(b, 0x2bu);
+    }
+    tab = EF_U32(0x0041717cu);
+    n = EF_U8(tab + 1u);
+    cnt = EF_U8(tab);
+    write_checked_a1b28(rec + 0xbu + n * 29u, cnt);
+    return cnt;
+}
+
+/* 0xa1d00, 80 bytes. Select the record ID (AX, signed) as the current page: store the id in word 0x41722a, look the record up (0xb3f58), set the page cells 0x41717c (dword table 0x40d200 indexed by the record's first word) and 0x417174 (the record); when the record's byte +0xa has its top bit set write 4 bytes of state at 0x417160 (0xa1b28), reset the value (0xa1d50) and store it, then increment dword 0x417160. */
+void select_page_a1d00(uint32_t id)
+{
+    ef_addr32 rec;
+    uint32_t v;
+    EF_U16(0x0041722au) = (uint16_t)id;
+    rec = guest_fn_b3f58((int16_t)id);
+    EF_U32(0x0041717cu) = EF_U32(0x0040d200u + (uint32_t)EF_U16(rec) * 4u);
+    EF_U32(0x00417174u) = rec;
+    if ((EF_U8(rec + 0xau) & 0x80u) != 0u) {
+        write_checked_a1b28(0x00417160u, 4u);
+        v = write_page_record_a1d50();
+        EF_U32(0x00417160u) = v;
+    }
+    EF_U32(0x00417160u) = EF_U32(0x00417160u) + 1u;
 }
