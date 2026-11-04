@@ -3942,3 +3942,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x7222c` | AX:int16_t | none | 8d3d4@8d420 | Copy the player's tracked state block into a unit record and refresh it. |
 | `0x6697c` | none | none | 66548@665d7 | Pick the cursor mode from the player's selected station kind and the panel mode. |
+
+## game_helpers68 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdf4f4` | none | AL:uint8_t | dfac8@dfdec,dfac8@dfe2d | Step the menu back one level; returns 1 when an earlier entry was re-latched. |
+| `0xe393c` | none | none | e3ad0@e3add | Stream the saved table blocks (sizes scale with the count at 0x146e50). |

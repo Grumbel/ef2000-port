@@ -3295,7 +3295,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000df26f	33			unknown	unclassified	unverified		
 0x000df2b0	51	rate_divisor_df2b0	game_helpers29	compiles	game	confirmed	decomp/tests/0x000df2b0.json	docs/compiler-abi.md; Divide 115200 by the table entry for the current rate index.; callers 33888@338be; guest pending
 0x000df2e4	15	advance_counter_15f07d	math_string	compiles	game	confirmed	decomp/tests/0x000df2e4.json	docs/compiler-abi.md; Byte 0x15f07d = (byte + 1) & 7.; callers 3361c@33626; guest pending
-0x000df4f4	360			unknown	unclassified	unverified		
+0x000df4f4	360	menu_step_back_df4f4	game_helpers68	compiles	game	confirmed	decomp/tests/0x000df4f4.json	docs/compiler-abi.md; Step the menu back one level; returns 1 when an earlier entry was re-latched.; callers dfac8@dfdec,dfac8@dfe2d; guest pending
 0x000df65c	218	latch_menu_entry_df65c	game_helpers65	compiles	game	confirmed	decomp/tests/0x000df65c.json	docs/compiler-abi.md; Latch the selected menu entry's geometry; returns 1 when an entry was latched.; callers dfac8@dfb73,dfac8@dfbf6,dfac8@dfe68; guest pending
 0x000df738	122			unknown	unclassified	unverified		
 0x000df7b4	786			unknown	unclassified	unverified		
@@ -3360,7 +3360,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e378c	220			unknown	unclassified	unverified		
 0x000e3868	160			unknown	unclassified	unverified		
 0x000e3908	51	find_word_backwards_e3908	game_helpers25	compiles	game	confirmed	decomp/tests/0x000e3908.json	docs/compiler-abi.md; Search a word table backwards for a value, using slot 0 as the sentinel.; callers e3ad0@e3afd; guest pending
-0x000e393c	401			unknown	unclassified	unverified		
+0x000e393c	401	stream_saved_tables_e393c	game_helpers68	compiles	game	confirmed	decomp/tests/0x000e393c.json	docs/compiler-abi.md; Stream the saved table blocks (sizes scale with the count at 0x146e50).; callers e3ad0@e3add; guest pending
 0x000e3ad0	134	reload_halfword_table_e3ad0	game_helpers65	compiles	game	confirmed	decomp/tests/0x000e3ad0.json	docs/compiler-abi.md; Reload the halfword table one step at a time; returns whether more steps remain.; callers 97dcc@97ee7; guest pending
 0x000e3b58	34	release_saved_handle_e3b58	game_helpers29	compiles	game	confirmed	decomp/tests/0x000e3b58.json	docs/compiler-abi.md; Release the saved handle, if any.; callers 97dcc@97f4b; guest pending
 0x000e3b7c	158			unknown	unclassified	unverified		

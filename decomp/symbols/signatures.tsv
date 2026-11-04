@@ -1931,3 +1931,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00017f10	switch_player_mode_17f10			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00017f10 (289 bytes); Switch the player unit's mode when no blocking state is active.; callers 601c@60d3; docs/compiler-abi.md
 0x0007222c	snapshot_unit_state_7222c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007222c (354 bytes); Copy the player's tracked state block into a unit record and refresh it.; callers 8d3d4@8d420; docs/compiler-abi.md
 0x0006697c	select_cursor_mode_6697c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006697c (330 bytes); Pick the cursor mode from the player's selected station kind and the panel mode.; callers 66548@665d7; docs/compiler-abi.md
+0x000df4f4	menu_step_back_df4f4		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000df4f4 (360 bytes); Step the menu back one level; returns 1 when an earlier entry was re-latched.; callers dfac8@dfdec,dfac8@dfe2d; docs/compiler-abi.md
+0x000e393c	stream_saved_tables_e393c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e393c (401 bytes); Stream the saved table blocks (sizes scale with the count at 0x146e50).; callers e3ad0@e3add; docs/compiler-abi.md

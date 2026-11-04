@@ -3511,4 +3511,10 @@ void snapshot_unit_state_7222c(int16_t unit);
 void select_cursor_mode_6697c(void);
 void guest_fn_73d50_w(int32_t a); /* 0x73d50 EAX */
 
+/* game_helpers68.c */
+uint8_t menu_step_back_df4f4(void);
+void stream_saved_tables_e393c(void);
+void guest_fn_e3170_w(uint32_t addr, uint32_t size); /* 0xe3170 EAX/EDX */
+void guest_fn_e330c_w(uint32_t flag, uint32_t addr, uint32_t size); /* 0xe330c EAX/EDX/EBX */
+
 #endif
