@@ -3753,4 +3753,11 @@ uint32_t parse_decimal_1092b0(ef_addr32 cursor);
 void copy_identifier_10934c(ef_addr32 dest, ef_addr32 cursor);
 void decode_rle_rows_110894(ef_addr32 src, ef_addr32 dst, int16_t stride, int16_t rows);
 
+/* game_helpers91.c */
+void fade_palette_in_slow_de5f4(ef_addr32 palette);
+void build_path_with_name_e7cec(ef_addr32 part_a, ef_addr32 part_b, ef_addr32 name, ef_addr32 buffer);
+void build_path_from_record_ea17c(ef_addr32 buffer, ef_addr32 record, ef_addr32 extra);
+void draw_glyph_string_eb008(uint32_t ctx, uint32_t x, uint32_t y, ef_addr32 text);
+void guest_fn_eaf80_x(uint32_t ctx, uint32_t x, uint32_t y, uint32_t glyph); /* 0xeaf80 EAX EDX EBX ECX */
+
 #endif

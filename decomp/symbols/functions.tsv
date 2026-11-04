@@ -3268,7 +3268,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000de3b4	251			unknown	unclassified	unverified		
 0x000de4b0	125	mouse_request_de4b0	engine_helpers	compiles	game	confirmed	decomp/tests/0x000de4b0.json	docs/compiler-abi.md; ; callers 984b4@984c1,a9aa8@a9b91,a9d48@a9daf; guest pending
 0x000de580	113	fade_palette_in_de580	game_helpers89	compiles	game	confirmed	decomp/tests/0x000de580.json	docs/compiler-abi.md; Fade the palette in from black over 40 steps.; callers 284ec@2851f,39204@39244,97dcc@97e2a; guest pending
-0x000de5f4	84			unknown	unclassified	unverified		
+0x000de5f4	84	fade_palette_in_slow_de5f4	game_helpers91	compiles	game	confirmed	decomp/tests/0x000de5f4.json	docs/compiler-abi.md; Fade the palette in from black over 80 steps.; callers a8a38@a8afa,a8bd4@a8d6d; guest pending
 0x000de648	121	fade_palette_out_de648	game_helpers89	compiles	game	confirmed	decomp/tests/0x000de648.json	docs/compiler-abi.md; Fade the palette out to black over 40 steps, then clear and reset it.; callers 284ec@285ac,a8958@a89e5,a8a38@a8ba9; guest pending
 0x000de6c4	121	fade_palette_out_slow_de6c4	game_helpers89	compiles	game	confirmed	decomp/tests/0x000de6c4.json	docs/compiler-abi.md; Same as de648 but over 80 steps.; callers a8a38@a8bba,a8bd4@a8f3a; guest pending
 0x000de7d0	147			unknown	unclassified	unverified		
@@ -3424,7 +3424,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e7c50	63	set_page_word_e7c50	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c50.json	docs/compiler-abi.md; Store a word into the 0x190c3c page table entry.; callers 68a2c@68a58,68a60@68ace,68a60@68b3a; guest pending
 0x000e7c90	64	get_page_word_e7c90	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c90.json	docs/compiler-abi.md; Read a word from the 0x190c3c page table entry, or 0.; callers 68e84@68e9e; guest pending
 0x000e7cd0	28	append_two_e7cd0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000e7cd0.json	docs/compiler-abi.md; Append a fixed string and then second to first.; callers e7cec@e7d1f; guest pending
-0x000e7cec	59			unknown	unclassified	unverified		
+0x000e7cec	59	build_path_with_name_e7cec	game_helpers91	compiles	game	confirmed	decomp/tests/0x000e7cec.json	docs/compiler-abi.md; Build a path from the default directory plus two parts, appending the third part unless it equals the string at 0x190c50; callers 69094@691c8,8b2d8@8b2f9,d9e50@d9fad; guest pending
 0x000e7d27	194			unknown	unclassified	unverified		
 0x000e7df4	36			unknown	unclassified	unverified		
 0x000e7e30	113			unknown	unclassified	unverified		
@@ -3465,7 +3465,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ea100	46	alloc_zeroed_checked_ea100	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000ea100.json	docs/compiler-abi.md; Allocate and zero a block, aborting on failure.; callers ea270@ea2b9,ea270@ea2e2,ea270@ea34d; guest pending
 0x000ea130	35	strip_carriage_returns	math_string	compiles	game	confirmed	decomp/tests/0x000ea130.json	docs/compiler-abi.md; Remove carriage returns in place; returns the number removed.; callers ea270@ea2d5; guest pending
 0x000ea154	38	split_line	math_string	compiles	game	confirmed	decomp/tests/0x000ea154.json	docs/compiler-abi.md; Advance to the next newline, replace it with NUL and * return the pointer after it (or the end of string).; callers ea270@ea2fb; guest pending
-0x000ea17c	36			unknown	unclassified	unverified		
+0x000ea17c	36	build_path_from_record_ea17c	game_helpers91	compiles	game	confirmed	decomp/tests/0x000ea17c.json	docs/compiler-abi.md; Build a path from a record's first name, an extra part and the record's second name.; callers ea270@ea306,ea270@ea37a; guest pending
 0x000ea1a0	70	read_chunk_header_ea1a0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000ea1a0.json	docs/compiler-abi.md; Read a header into an object and take its chunk size when tagged 'RA'.; callers ea270@ea398; guest pending
 0x000ea1e8	33	compare_dwords	math_string	compiles	game	confirmed	decomp/tests/0x000ea1e8.json	docs/compiler-abi.md; Signed compare of the dwords at EAX and EDX: -1, 0 or 1.; callers none direct; guest pending
 0x000ea20c	51			unknown	unclassified	unverified		
@@ -3495,7 +3495,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eac48	453			unknown	unclassified	unverified		
 0x000eae10	54	release_pending_handle_eae10	game_helpers57	compiles	game	confirmed	decomp/tests/0x000eae10.json	docs/compiler-abi.md; Release the pending handle and the status message.; callers 97dcc@97e45,97dcc@97e89,a8bd4@a8e61; guest pending
 0x000eaf80	136			unknown	unclassified	unverified		
-0x000eb008	61			unknown	unclassified	unverified		
+0x000eb008	61	draw_glyph_string_eb008	game_helpers91	compiles	game	confirmed	decomp/tests/0x000eb008.json	docs/compiler-abi.md; Draw a NUL-terminated string glyph by glyph (6 pixels apart, 6-bit codes).; callers 98658@986b1,98658@9884d,98658@988da; guest pending
 0x000eb050	94			unknown	unclassified	unverified		
 0x000eb0b0	89			unknown	unclassified	unverified		
 0x000eb174	123			unknown	unclassified	unverified		
