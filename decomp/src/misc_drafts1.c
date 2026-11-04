@@ -18955,3 +18955,37 @@ void mix_word_block_d7cb8(void)
 	guest_fn_d7bf0();
 }
 #undef W_D7CB8
+
+/* 0xfcd20, 402 bytes. Variant of 0xe7a7c (angles in EBX, ESI, EDI) that stops after the nine matrix entries, written to 0x1590e4..0x159104, with the halved table offsets kept as words at 0x17bf80/82/84 and sin(A) at 0x17bf7c. */
+void build_rotation_matrix_fcd20(uint32_t ebx, uint32_t esi, uint32_t edi)
+{
+	uint32_t x0 = (ebx >> 1) & 0x7ffcu, x1 = (esi >> 1) & 0x7ffcu, x2 = (edi >> 1) & 0x7ffcu;
+	int32_t p0, s, d, t0, t1, c0, c1;
+
+	EF_U16(0x0017bf80u) = (uint16_t)x0;
+	EF_U16(0x0017bf82u) = (uint16_t)x1;
+	EF_U16(0x0017bf84u) = (uint16_t)x2;
+	p0 = sin32_e7a7c(x0);
+	EF_U32(0x0017bf7cu) = (uint32_t)p0;
+	s = sin32_e7a7c(x1 + x2);
+	d = sin32_e7a7c(x1 - x2);
+	EF_U32(0x001590f0u) = (uint32_t)((-mulshift24_e7a7c(s + d, p0) + s - d) >> 1);
+	EF_U32(0x001590ecu) = (uint32_t)((mulshift24_e7a7c(s - d, p0) - s - d) >> 1);
+	s = cos32_e7a7c(x1 + x2);
+	d = cos32_e7a7c(x1 - x2);
+	EF_U32(0x001590f8u) = (uint32_t)(-((mulshift24_e7a7c(s + d, p0) + d - s) >> 1));
+	EF_U32(0x001590e4u) = (uint32_t)((mulshift24_e7a7c(d - s, p0) + s + d) >> 1);
+	t0 = sin32_e7a7c(x0 - x2);
+	c0 = cos32_e7a7c(x0 - x2);
+	t1 = sin32_e7a7c(x0 + x2);
+	c1 = cos32_e7a7c(x0 + x2);
+	EF_U32(0x001590e8u) = (uint32_t)((-(t1 - t0)) >> 1);
+	EF_U32(0x001590f4u) = (uint32_t)((c1 + c0) >> 1);
+	t0 = sin32_e7a7c(x0 - x1);
+	c0 = cos32_e7a7c(x0 - x1);
+	t1 = sin32_e7a7c(x0 + x1);
+	c1 = cos32_e7a7c(x0 + x1);
+	EF_U32(0x001590fcu) = (uint32_t)((t1 - t0) >> 1);
+	EF_U32(0x00159100u) = (uint32_t)p0;
+	EF_U32(0x00159104u) = (uint32_t)((c0 + c1) >> 1);
+}

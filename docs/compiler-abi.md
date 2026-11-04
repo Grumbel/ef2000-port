@@ -8657,3 +8657,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd7cb8` | none | none | d86e0@d89fc,d86e0@d8a25,d86e0@d8a56 | Run a fixed XOR-mixing pass over the word block at 0x420e80 (words at +2..+0x10), load the extra words at 0x420e92..0x42 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfcd20` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | c5cd3@c5ce6,e9b38@e9b47 | Variant of 0xe7a7c (angles in EBX, ESI, EDI) that stops after the nine matrix entries, written to 0x1590e4..0x159104, wi |

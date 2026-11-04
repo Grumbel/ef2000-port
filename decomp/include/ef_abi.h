@@ -5993,4 +5993,6 @@ void build_rotation_matrix_e7a7c(uint32_t ebx, uint32_t esi, uint32_t edi);
 
 void mix_word_block_d7cb8(void);
 
+void build_rotation_matrix_fcd20(uint32_t ebx, uint32_t esi, uint32_t edi);
+
 #endif

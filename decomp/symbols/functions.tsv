@@ -3758,7 +3758,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fc9f8	37	update_fc9f8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fc9f8.json	docs/compiler-abi.md; ; callers c4a50@c4acd,c4aeb@c4b68,c4b95@c4c12; guest pending
 0x000fcc01	31			unknown	unclassified	unverified		
 0x000fcc6f	45			unknown	unclassified	unverified		
-0x000fcd20	402			unknown	unclassified	unverified		
+0x000fcd20	402	build_rotation_matrix_fcd20	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fcd20.json	docs/compiler-abi.md; Variant of 0xe7a7c (angles in EBX, ESI, EDI) that stops after the nine matrix entries, written to 0x1590e4..0x159104, wi; callers c5cd3@c5ce6,e9b38@e9b47; guest pending
 0x000fceb4	327	matrix_mul_transposed_fceb4	matrix_fixed	compiles	game	confirmed	decomp/tests/0x000fceb4.json	docs/compiler-abi.md; out = a * transpose(b); inputs in ESI (a), EBX (b), output EDI.; callers c6b80@c6bda; guest pending
 0x000fcffb	327	matrix_mul_fcffb	matrix_fixed	compiles	game	confirmed	decomp/tests/0x000fcffb.json	docs/compiler-abi.md; out = a * b; inputs in ESI (a), EBX (b), output EDI.; callers c5cd3@c5cfa; guest pending
 0x000fd162	1	nop_fd162	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fd162.json	docs/compiler-abi.md; Empty stub (single ret).; callers none direct; guest pending
