@@ -6528,4 +6528,7 @@ void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c); /* 0x484 */
 void draw_textured_span_ff3bc(void);
 void draw_textured_span_ff3bc(void); /* 0xff3bc */
 
+uint32_t process_name_table_7a738(void);
+uint32_t process_name_table_7a738(void); /* 0x7a738 */
+
 #endif

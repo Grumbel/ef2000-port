@@ -23530,3 +23530,39 @@ void draw_textured_span_ff3bc(void)
 		v += dv;
 	} while (dst <= (int32_t)EF_U32(0x486010u));
 }
+
+/* 0x7a738, 265 bytes. Read or write the entry count of the 0x1a2e78 table, then for each entry record its word, format its 0x49-byte name (format 0x187bd4), load the directory list for it and report a missing one through the handler at 0x132a74. Returns 0. */
+uint32_t process_name_table_7a738(void)
+{
+	uint8_t buf[0x50];
+	int32_t i;
+	int32_t off;
+	init_status_text_7a4a4();
+	(void)copy_active_buffer_pointer();
+	EF_U16(EF_U32(0x1f8ea4u)) = 0u;
+	if (EF_U32(0x12afc8u) != 0u)
+		EF_U16(EF_U32(0x1a2e78u)) = (uint16_t)buffer_read_word();
+	else
+		buffer_write_word((int16_t)EF_S16(EF_U32(0x1a2e78u)));
+	off = 0;
+	for (i = 0; i < (int32_t)EF_S16(EF_U32(0x1a2e78u)); i++) {
+		uint32_t base = EF_U32(0x1f8ea4u);
+		uint32_t rec = base + (uint32_t)((int32_t)EF_S16(base) * 6);
+		EF_U16(rec + 2u) = EF_U16(0x1f8e98u);
+		EF_U16(rec + 4u) = 0u;
+		record_word_7a5f0((uint32_t)i);
+		guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x187bd4u, EF_U32(0x1a2e78u) + 2u + (uint32_t)off);
+		load_directory_list_7a66c((ef_addr32)(uintptr_t)buf);
+		base = EF_U32(0x1f8ea4u);
+		if (EF_U16(base + (uint32_t)((int32_t)EF_S16(base) * 6) + 4u) == 0u)
+			guest_callptr2_x(EF_U32(0x132a74u), 0x187bd8u, (uint32_t)(uintptr_t)buf);
+		base = EF_U32(0x1f8ea4u);
+		EF_U16(base) = (uint16_t)(EF_U16(base) + 1u);
+		off += 0x49;
+	}
+	flush_pool_7a5bc();
+	if (EF_U32(0x12afccu) != 0u)
+		guest_callptr1_x(EF_U32(0x132a74u), 0x187be8u);
+	(void)forward_value_1f8e90();
+	return 0u;
+}

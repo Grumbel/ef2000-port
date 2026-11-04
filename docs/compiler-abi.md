@@ -9537,3 +9537,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xff3bc` | none | none | none direct | Textured horizontal span: from X0 (0x485fe8>>16) to X1 (0x485fd0>>16) on the row at table 0x163200[0x485fec>>16] into th |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7a738` | none | EAX:uint32_t | 7ab00@7ab9f | Read or write the entry count of the 0x1a2e78 table, then for each entry record its word, format its 0x49-byte name (for |
