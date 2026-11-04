@@ -5348,4 +5348,6 @@ void refresh_unit_roster_76e2c(uint32_t a, uint32_t b);
 
 void poll_pointer_device_ac854(void);
 
+void draw_outline_5af50(uint32_t n);
+
 #endif

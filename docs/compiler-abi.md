@@ -7236,3 +7236,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xac854` | none | none | acbe4@acc07,e1958@e19a7,e1958@e1cab | Poll the pointer device: when byte 0x41f2e1 is set read the motion counters and the button bits (copied to 0x41f2f1, wit |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5af50` | EAX:uint32_t | none | 5a8d0@5a8ef | Draw the closed outline number N (AL, looked up in the pointer table 0x1281a4; nothing is drawn for N = 0) as 24 line se |

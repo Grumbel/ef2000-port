@@ -10540,3 +10540,39 @@ void poll_pointer_device_ac854(void)
         select_default_video_aca14();
     clamp_cursor_ac7f0();
 }
+
+/* 0x5af50, 302 bytes. Draw the closed outline number N (AL, looked up in the pointer table 0x1281a4; nothing is drawn for N = 0) as 24 line segments between its 4-byte points (two words each): after building the rings once (0x5ae70, while byte 0x1281a0 is clear) every segment is written to the line record at 0x4208e4 (colour byte 0x128148, end points shifted left by byte 0x12b369 and offset by the words 0x1a6cfc and 0x1a6cfa) and drawn with 0xcf78c; the last segment joins the final point back to the first. */
+void draw_outline_5af50(uint32_t n)
+{
+    uint8_t nn = (uint8_t)n;
+    uint16_t sx = EF_U16(0x001a6cfau);
+    ef_addr32 tab = EF_U32(0x001281a4u + (uint32_t)nn * 4u);
+    uint16_t sy = EF_U16(0x001a6cfcu);
+    uint32_t sh;
+    ef_addr32 p;
+    int16_t i;
+    if (EF_U8(0x001281a0u) == 0u)
+        build_offset_rings_5ae70();
+    if (nn < 1u)
+        return;
+    for (i = 0; i < 0x18; i++) {
+        if (i != 0) {
+            p = tab + (uint32_t)((int32_t)i * 4);
+            sh = EF_U8(0x0012b369u);
+            EF_U16(0x004208e4u) = EF_U8(0x00128148u);
+            EF_U16(0x004208e6u) = (uint16_t)(((uint32_t)EF_U16(p - 4u) << sh) + sy);
+            EF_U16(0x004208e8u) = (uint16_t)(((uint32_t)EF_U16(p - 2u) << sh) + sx);
+            EF_U16(0x004208eau) = (uint16_t)(((uint32_t)EF_U16(p) << sh) + sy);
+            EF_U16(0x004208ecu) = (uint16_t)(((uint32_t)EF_U16(p + 2u) << sh) + sx);
+            forward_record_cf78c();
+        }
+    }
+    p = tab + 0x18u * 4u;
+    sh = EF_U8(0x0012b369u);
+    EF_U16(0x004208e4u) = EF_U8(0x00128148u);
+    EF_U16(0x004208e6u) = (uint16_t)(((uint32_t)EF_U16(p - 4u) << sh) + sy);
+    EF_U16(0x004208e8u) = (uint16_t)(((uint32_t)EF_U16(p - 2u) << sh) + sx);
+    EF_U16(0x004208eau) = (uint16_t)(((uint32_t)EF_U16(tab) << sh) + sy);
+    EF_U16(0x004208ecu) = (uint16_t)(((uint32_t)EF_U16(tab + 2u) << sh) + sx);
+    forward_record_cf78c();
+}
