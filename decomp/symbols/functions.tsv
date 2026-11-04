@@ -2489,14 +2489,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1f80	618			unknown	unclassified	unverified		
 0x000b21ec	140	print_record_b21ec	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b21ec.json	docs/compiler-abi.md; Print one record to a text handle.; callers b1f80@b21c7,b2758@b27d0; guest pending
 0x000b23bc	226			unknown	unclassified	unverified		
-0x000b2504	89			unknown	unclassified	unverified		
+0x000b2504	89	print_move_record_b2504	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2504.json	docs/compiler-abi.md; Print a movement record with its kind name.; callers b2560@b261a,b2810@b2898,b28b8@b2940; guest pending
 0x000b2560	504			unknown	unclassified	unverified		
 0x000b2758	183			unknown	unclassified	unverified		
 0x000b2810	166	dump_table_a_b2810	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b2810.json	docs/compiler-abi.md; Dump a table entry and its sub-records (variant A names).; callers b2b00@b2cb9; guest pending
 0x000b28b8	166	dump_table_b_b28b8	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b28b8.json	docs/compiler-abi.md; Dump a table entry and its sub-records (variant B names).; callers b2b00@b2cd1; guest pending
-0x000b2960	71			unknown	unclassified	unverified		
+0x000b2960	71	print_class_record_b2960	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2960.json	docs/compiler-abi.md; Print a classified record with its class name.; callers b29a8@b2a08; guest pending
 0x000b29a8	129	dump_group_list_b29a8	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b29a8.json	docs/compiler-abi.md; Dump a list of sub-lists.; callers b2560@b26d2,b2560@b26ff,b2560@b272c; guest pending
-0x000b2a2c	53			unknown	unclassified	unverified		
+0x000b2a2c	53	print_coordinate_record_b2a2c	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2a2c.json	docs/compiler-abi.md; Print a plain coordinate record.; callers b1f80@b21df,b2560@b25d9,b2560@b268b; guest pending
 0x000b2b00	515			unknown	unclassified	unverified		
 0x000b2d04	135			unknown	unclassified	unverified		
 0x000b2d8c	155	print_point_b2d8c	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000b2d8c.json	docs/compiler-abi.md; Print one shape point record.; callers b2e98@b2f28; guest pending

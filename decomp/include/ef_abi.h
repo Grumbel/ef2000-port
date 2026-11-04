@@ -3692,4 +3692,9 @@ uint32_t guest_fn_a7b70_x(void); /* 0xa7b70 -> EAX */
 void guest_fn_cd554_x(void); /* 0xcd554 */
 void guest_fn_cd4d4_x(void); /* 0xcd4d4 */
 
+/* game_helpers82.c */
+void print_move_record_b2504(ef_addr32 rec, int16_t value, uint32_t handle);
+void print_class_record_b2960(ef_addr32 rec, uint32_t handle);
+void print_coordinate_record_b2a2c(ef_addr32 rec, uint32_t handle);
+
 #endif

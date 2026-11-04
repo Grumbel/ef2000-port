@@ -4128,3 +4128,11 @@ in EAX, format string address, one value).
 | `0x9bfe3` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:int32_t | EAX:uint32_t | 9be38@9bebb,9be38@9bf12,9be38@9bf34 | Add an offset to a segment:offset pair, renormalising so the offset stays in 0..0xffff. |
 | `0x9fdd4` | none | EAX:int32_t | 9fea8@9feb6 | Select the entry with the smallest rating below 10 and activate it; -1 slot ends early. |
 | `0xa9878` | EAX:ef_addr32 | none | a9e70@a9fab | Build a status line from three fragments, store the title, and refresh. |
+
+## game_helpers82 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb2504` | EAX:ef_addr32,DX:int16_t,EBX:uint32_t | none | b2560@b261a,b2810@b2898,b28b8@b2940 | Print a movement record with its kind name. |
+| `0xb2960` | EAX:ef_addr32,EDX:uint32_t | none | b29a8@b2a08 | Print a classified record with its class name. |
+| `0xb2a2c` | EAX:ef_addr32,EDX:uint32_t | none | b1f80@b21df,b2560@b25d9,b2560@b268b | Print a plain coordinate record. |
