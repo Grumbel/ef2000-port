@@ -3622,3 +3622,39 @@ void copy_rows_eb174(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
         count--;
     } while ((uint16_t)count != 0u);
 }
+
+/* 0x5c9d4, 140 bytes. Draw the horizontal tick marks of a cursor at the point stored in OBJ (x word, y word): refresh through 0x39a0c, plot the centre via 0xdec18, then two short lines left and right of it (gaps 2 and 6, scaled by the shift byte 0x12b369) with 0xc8ccc in the colour byte 0x128148. */
+void draw_cursor_ticks_5c9d4(uint32_t obj, uint32_t arg)
+{
+    int32_t x;
+    int32_t y;
+    uint32_t color = EF_U8(0x00128148u);
+    uint32_t s;
+    guest_fn_39a0c_x(obj, (uint32_t)(int32_t)(int16_t)arg);
+    x = (int16_t)EF_U16(obj);
+    y = (int16_t)EF_U16(obj + 2u);
+    guest_fn_dec18_x(color, (uint32_t)x, (uint32_t)y);
+    s = EF_U8(0x0012b369u);
+    guest_fn_c8ccc_x((uint32_t)y, (uint32_t)(x - (int32_t)(2u << s)), (uint32_t)y, (uint32_t)(x - (int32_t)(6u << s)), color);
+    s = EF_U8(0x0012b369u);
+    guest_fn_c8ccc_x((uint32_t)y, (uint32_t)(x + (int32_t)(2u << s)), (uint32_t)y, (uint32_t)(x + (int32_t)(6u << s)), color);
+}
+
+/* 0xca200, 142 bytes. Load the record file NAME: build the default path with NAME appended and the suffix 0x18f058, open it through the indirect 0x132ab4 (error 0x18f05c on failure), read it into an arena block (0x41eea8, error 0x18f084 when empty) and validate it through 0x132ab8 (error 0x18f0c0 unless it returns 1). */
+void load_record_file_ca200(uint32_t name)
+{
+    char buf[0x90];
+    uint32_t b = (uint32_t)(uintptr_t)buf;
+    uint32_t h;
+    build_default_path_abaf0(b);
+    strcat_9ca57(b, name);
+    strcat_9ca57(b, 0x0018f058u);
+    h = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), b);
+    if (h == 0u)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x0018f05cu, b);
+    EF_U32(0x0041eea8u) = arena_take_e29e8(h);
+    if (EF_U32(0x0041eea8u) == 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f084u);
+    if ((guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), b, EF_U32(0x0041eea8u)) & 0xffu) != 1u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f0c0u);
+}

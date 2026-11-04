@@ -5841,3 +5841,10 @@ in EAX, format string address, one value).
 | `0xbef2c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:int32_t | bf444@bf4b2 | Sum, over up to 8 leading characters of the string returned by 0xfb87c (stopping at '%'), of the difference of two per-c |
 | `0xeb2c0` | [ESP+4]:ef_addr32 | none | 510@572,628@647,628@65a | Printf-style message (cdecl, FORMAT and varargs on the stack) formatted into a 0x280-byte buffer, then, if the counter b |
 | `0xeb174` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:uint32_t,[ESP+28]:uint32_t,[ESP+32]:uint32_t | none | c92e4@c9350 | Copy COUNT rows through 0xe9a24: the destination starts at base 0x15b754 + row-offset table 0x163200[Y] + X and advances |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5c9d4` | EAX:uint32_t,EDX:uint32_t | none | 5c518@5c7cf,5ca60@5ca7b | Draw the horizontal tick marks of a cursor at the point stored in OBJ (x word, y word): refresh through 0x39a0c, plot th |
+| `0xca200` | EAX:uint32_t | none | ac0e0@ac108 | Load the record file NAME: build the default path with NAME appended and the suffix 0x18f058, open it through the indire |

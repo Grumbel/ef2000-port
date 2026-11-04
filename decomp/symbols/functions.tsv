@@ -1140,7 +1140,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005c518	708			unknown	unclassified	unverified		
 0x0005c7dc	258			unknown	unclassified	unverified		
 0x0005c8e0	242	draw_trail_5c8e0	tactical_marks1	compiles	game	confirmed	decomp/tests/0x0005c8e0.json	docs/compiler-abi.md; Walk the 12-byte point table at 0x1fd098 from the current index (0x20f19a) backwards in steps of n = remaining/50 + 1, p; callers 5c518@5c5d3; guest pending
-0x0005c9d4	140			unknown	unclassified	unverified		
+0x0005c9d4	140	draw_cursor_ticks_5c9d4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005c9d4.json	docs/compiler-abi.md; Draw the horizontal tick marks of a cursor at the point stored in OBJ (x word, y word): refresh through 0x39a0c, plot th; callers 5c518@5c7cf,5ca60@5ca7b; guest pending
 0x0005ca60	38	apply_stream_value_5ca60	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x0005ca60.json	docs/compiler-abi.md; Read the 9th stream value into a local and apply it when valid.; callers 598e8@5997a; guest pending
 0x0005ca88	146	project_position_5ca88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ca88.json	docs/compiler-abi.md; Convert a fixed-point position (words at +0,+4,+8, 8 fractional bits) to be camera relative (origin at 0x21444c/214448/2; callers 5a220@5a284,5c354@5c3e6,5c518@5c5f6; guest pending
 0x0005cb1c	126	project_position_5cb1c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005cb1c.json	docs/compiler-abi.md; Variant of 0x5ca88 taking the position in EDX/EBX/ECX (fixed point already shifted) and the extra argument in EAX: make ; callers 5a2d0@5a3e5,5a468@5a6bb; guest pending
@@ -2858,7 +2858,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c9fc4	439			unknown	unclassified	unverified		
 0x000ca17c	74	redraw_ca17c	engine_helpers	compiles	game	confirmed	decomp/tests/0x000ca17c.json	docs/compiler-abi.md; ; callers ac5f8@ac621,ac780@ac7a0; guest pending
 0x000ca1c8	53	set_record_links_ca1c8	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000ca1c8.json	docs/compiler-abi.md; Store position words and optionally the two link pointers in a record.; callers bc38@bc8f; guest pending
-0x000ca200	142			unknown	unclassified	unverified		
+0x000ca200	142	load_record_file_ca200	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ca200.json	docs/compiler-abi.md; Load the record file NAME: build the default path with NAME appended and the suffix 0x18f058, open it through the indire; callers ac0e0@ac108; guest pending
 0x000ca290	474			unknown	unclassified	unverified		
 0x000ca5e4	60	clear_record_flags_ca5e4	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000ca5e4.json	docs/compiler-abi.md; Clear the flag bytes of records from the start index upward.; callers ac16c@ac177; guest pending
 0x000ca620	349			unknown	unclassified	unverified		

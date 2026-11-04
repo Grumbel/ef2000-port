@@ -4777,4 +4777,10 @@ void copy_rows_eb174(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
                      uint32_t step, uint32_t x0, uint32_t rows, uint32_t base);
 uint32_t guest_fn_fb87c_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xfb87c EAX/EDX/EBX/ECX */
 
+void draw_cursor_ticks_5c9d4(uint32_t obj, uint32_t arg);
+void load_record_file_ca200(uint32_t name);
+void guest_fn_39a0c_x(uint32_t a, uint32_t b); /* 0x39a0c EAX/EDX */
+void guest_fn_dec18_x(uint32_t a, uint32_t b, uint32_t c); /* 0xdec18 EAX/EDX/EBX */
+uint32_t guest_callptr_eaxedx_ret_x(ef_addr32 fn, uint32_t a, uint32_t b); /* indirect call, arguments in EAX and EDX, result in EAX */
+
 #endif
