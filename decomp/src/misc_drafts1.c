@@ -10316,3 +10316,35 @@ void select_mode_byte_9338(uint32_t kind)
     }
     EF_U32(lookup_key_a7ec4(0x00180548u)) = EF_U8(0x0012583bu);
 }
+
+/* 0xd72b4, 259 bytes. Start the sample OBJ (EDX; data pointer at +0x1c) of SIZE bytes (EBX) on voice IDX (AL): nothing happens (returns 0) unless byte 0x15bac4 is set, OBJ is non-null and 0xd7594 accepts the voice. Touch one byte per 0x1000 of the data, lock the range (0x104908), then program the voice handle from dword table 0x420dd0 (0x102670 reset, 0x102738 clear, 0x102824 rate 0x5622, 0x102858 volume 0x78, 0x102dbc callback 0xd7138, 0x1026fc data and length, 0x102774 start) and return 1. */
+uint32_t start_voice_sample_d72b4(uint32_t idx, ef_addr32 obj, uint32_t size)
+{
+    uint32_t voice = idx & 0xffu;
+    uint32_t off;
+    uint32_t p;
+    volatile uint8_t touch;
+    if (EF_U8(0x0015bac4u) == 0u || obj == 0u)
+        return 0u;
+    if ((uint8_t)guest_fn_d7594(voice) == 0u)
+        return 0u;
+    off = 0u;
+    if ((int32_t)size > 0) {
+        p = EF_U32(obj + 0x1cu);
+        do {
+            touch = EF_U8(p);
+            off += 0x1000u;
+            p += 0x1000u;
+        } while ((int32_t)off < (int32_t)size);
+    }
+    (void)touch;
+    stack_range_104908(obj, size - 1u);
+    trace_call_102670(EF_U32(0x00420dd0u + voice * 4u));
+    (void)trace_call_102738(0u, 0u, 0u, 0u, EF_U32(0x00420dd0u + voice * 4u), 0u, 0u);
+    trace_call_102824(EF_U32(0x00420dd0u + voice * 4u), 0x5622u);
+    trace_call_102858(EF_U32(0x00420dd0u + voice * 4u), 0x78u);
+    (void)trace_call_102dbc(0u, 0u, 0u, 0u, EF_U32(0x00420dd0u + voice * 4u), 0x000d7138u);
+    (void)trace_call_1026fc(0u, 0u, 0u, 0u, EF_U32(0x00420dd0u + voice * 4u), EF_U32(obj + 0x1cu), size);
+    trace_call_102774(EF_U32(0x00420dd0u + voice * 4u));
+    return 1u;
+}

@@ -5336,4 +5336,6 @@ uint32_t start_stream_ebb58(uint32_t key, ef_addr32 obj);
 
 void select_mode_byte_9338(uint32_t kind);
 
+uint32_t start_voice_sample_d72b4(uint32_t idx, ef_addr32 obj, uint32_t size);
+
 #endif
