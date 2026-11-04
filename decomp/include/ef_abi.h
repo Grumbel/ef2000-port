@@ -4276,4 +4276,7 @@ void draw_diamond_5d48c(uint32_t x, uint32_t y);
 
 void relink_random_objects_8873c(int32_t chance, ef_addr32 link, uint32_t kind, ef_addr32 new_link);
 
+void draw_path_segments_f3610(uint32_t index);
+void guest_fn_e7a34_x(uint32_t p0, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4, uint32_t p5); /* 0xe7a34 six stack arguments, callee cleanup */
+
 #endif

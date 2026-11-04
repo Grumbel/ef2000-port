@@ -38,3 +38,24 @@ void relink_random_objects_8873c(int32_t chance, ef_addr32 link, uint32_t kind, 
         node = EF_U32(node + 0x34u);
     }
 }
+
+/* 0xf3610, 148 bytes. Draw the segments of path record index (42-byte records at 0x484be0, count in the first word): one 0xe7a34 call per segment but the last, with the colour byte selected from 0x161e10. */
+void draw_path_segments_f3610(uint32_t index)
+{
+    uint32_t rec = (uint32_t)((int32_t)(int16_t)index * 0x2a);
+    int16_t i;
+    guest_fn_c39ac();
+    call_e9a24_c386c();
+    for (i = 0; (int32_t)i < (int32_t)EF_S16(rec + 0x484be0u) - 1; i++) {
+        uint32_t p = rec + (uint32_t)(int32_t)i * 4u;
+        guest_fn_e7a34_x((uint32_t)(int32_t)EF_S16(p + 0x484be8u),
+                         (uint32_t)(int32_t)EF_S16(p + 0x484be6u),
+                         (uint32_t)(int32_t)EF_S16(p + 0x484be4u),
+                         (uint32_t)(int32_t)EF_S16(p + 0x484be2u),
+                         EF_U8(0x00161e10u + (uint32_t)(int32_t)EF_S16(0x00161e16u)),
+                         (uint32_t)(int32_t)EF_S16(0x00161e1cu));
+    }
+    guest_fn_dc250();
+    guest_fn_c3990();
+    guest_fn_dd8dc();
+}

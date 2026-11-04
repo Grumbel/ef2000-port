@@ -3633,7 +3633,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f34cc	266			unknown	unclassified	unverified		
 0x000f35d8	22	load_path_value_f35d8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f35d8.json	docs/compiler-abi.md; Word 0x161e1c = 0x9d4cd(0x48592c) after 0xf2cd0().; callers f3b78@f3c2b; guest pending
 0x000f35f0	32	refresh_f35f0	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f35f0.json	docs/compiler-abi.md; ; callers f36a4@f36f2; guest pending
-0x000f3610	148			unknown	unclassified	unverified		
+0x000f3610	148	draw_path_segments_f3610	tactical_marks1	compiles	game	confirmed	decomp/tests/0x000f3610.json	docs/compiler-abi.md; Draw the segments of path record index (42-byte records at 0x484be0, count in the first word): one 0xe7a34 call per segm; callers f36a4@f36b0; guest pending
 0x000f36a4	109	step_animation_f36a4	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x000f36a4.json	docs/compiler-abi.md; Advance the animation counter and wrap it.; callers f3f84@f4079; guest pending
 0x000f3714	495			unknown	unclassified	unverified		
 0x000f3904	277			unknown	unclassified	unverified		
