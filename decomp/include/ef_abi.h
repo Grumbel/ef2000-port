@@ -5967,4 +5967,8 @@ void focus_camera_on_unit_24c40(uint32_t ax);
 
 void focus_camera_side_2611c(uint32_t ax);
 
+void update_record_speed_26960(ef_addr32 rec);
+
+
+
 #endif

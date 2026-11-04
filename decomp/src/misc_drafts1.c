@@ -18487,3 +18487,64 @@ void focus_camera_side_2611c(uint32_t ax)
 	}
 	guest_fn_6ebe0_x(0u, 0x40140000u, 0u, 0x40040000u, 0x33333333u, 0x3fd33333u, 0u, 0u, 0u, 0x408f4000u);
 }
+
+/* 0x26960, 483 bytes. Update the speed (dword +0x12) of the moving record REC (EAX) towards its target and advance it. The limit L is the signed word at 0x123813 + 164 * byte +0x3a. Three cases: when the owner's controller (dword owner +0x18, byte +0xc) is set and byte +0x3a is below 0x1b the speed is reduced by ticks * L / 100 (not below 0); when byte +0x3b is zero it grows by ticks * L / 100 up to 3 * L / 5; otherwise the position error to the target (dwords +0x54 - +0, +0x5c - +8, clamped to +-0x3fff) is projected onto the mount record's heading (word +0xe, sine/cosine tables 0x141e08 / 0x142e08), scaled (>> 15, / 64, clamped to +-L) and added to the mount record's speed (dword +0x12) with the result capped at L and floored at 0. Finally the record is advanced by speed * ticks (0xcef3c with +0xc). */
+void update_record_speed_26960(ef_addr32 rec)
+{
+	uint32_t owner = EF_U32(rec + 0x34u);
+	uint32_t n = EF_U8(rec + 0x3au);
+	uint32_t m = EF_U8(rec + 0x3bu);
+	uint32_t t, ctl, idx;
+	int32_t lim, q, a, b, x, speed, ticks;
+	uint32_t fid;
+
+	if (EF_U8(0x00125996u + (uint32_t)EF_U8(owner + 0x25u) * 70u + m * 7u) == 0u)
+		fid = EF_U32(owner + 0x26u) >> 16;
+	else
+		fid = EF_U32(owner + m * 2u + 0x24u) >> 16;
+	t = guest_fn_8ffe8((int32_t)fid);
+	lim = (int32_t)EF_U32(n * 164u + 0x00123811u) >> 16;
+	ctl = EF_U32(EF_U32(rec + 0x34u) + 0x18u);
+	ticks = (int32_t)EF_U16(0x00127d92u);
+	if (EF_U8(ctl + 0xcu) != 0u && (int32_t)n < 0x1b) {
+		q = (ticks * lim) / 100;
+		speed = (int32_t)EF_U32(rec + 0x12u) - q;
+		EF_U32(rec + 0x12u) = (uint32_t)speed;
+		if (speed < 0)
+			EF_U32(rec + 0x12u) = 0u;
+	} else if (EF_U8(rec + 0x3bu) == 0u) {
+		q = (ticks * lim) / 100;
+		speed = (int32_t)EF_U32(rec + 0x12u) + q;
+		EF_U32(rec + 0x12u) = (uint32_t)speed;
+		if (lim * 3 / 5 < speed)
+			EF_U32(rec + 0x12u) = (uint32_t)(lim * 3 / 5);
+	} else {
+		a = (int32_t)EF_U32(rec + 0x5cu) - (int32_t)EF_U32(rec + 8u);
+		b = (int32_t)EF_U32(rec + 0x54u) - (int32_t)EF_U32(rec);
+		EF_U32(0x0019b384u) = (uint32_t)a;
+		EF_U32(0x0019b380u) = (uint32_t)b;
+		if ((int32_t)EF_U32(0x0019b384u) > 0x3fff)
+			EF_U32(0x0019b384u) = 0x3fffu;
+		if ((int32_t)EF_U32(0x0019b384u) < -0x3fff)
+			EF_U32(0x0019b384u) = (uint32_t)-0x3fff;
+		if ((int32_t)EF_U32(0x0019b380u) > 0x3fff)
+			EF_U32(0x0019b380u) = 0x3fffu;
+		if ((int32_t)EF_U32(0x0019b380u) < -0x3fff)
+			EF_U32(0x0019b380u) = (uint32_t)-0x3fff;
+		idx = (uint32_t)EF_U16(t + 0xeu) >> 3;
+		x = (((int32_t)(int16_t)EF_U16(0x00141e08u + idx * 2u) * (int32_t)EF_U32(0x0019b380u)) +
+		     ((int32_t)(int16_t)EF_U16(0x00142e08u + idx * 2u) * (int32_t)EF_U32(0x0019b384u))) >> 15;
+		q = x / 64;
+		if (q > lim)
+			q = lim;
+		if (q < -lim)
+			q = -lim;
+		speed = (int32_t)EF_U32(t + 0x12u) + q;
+		EF_U32(rec + 0x12u) = (uint32_t)speed;
+		if (lim < speed)
+			EF_U32(rec + 0x12u) = (uint32_t)lim;
+		if (0 > (int32_t)EF_U32(rec + 0x12u))
+			EF_U32(rec + 0x12u) = 0u;
+	}
+	advance_position_cef3c(rec, rec + 0xcu, (uint32_t)((int32_t)EF_U16(0x00127d92u) * (int32_t)EF_U32(rec + 0x12u)));
+}
