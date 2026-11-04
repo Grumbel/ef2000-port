@@ -3490,7 +3490,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ea9ec	184	transform_vector_by_matrix_ea9ec	game_helpers96	compiles	game	confirmed	decomp/tests/0x000ea9ec.json	docs/compiler-abi.md; Transform a 3-vector in place by a 3x3 1.15 matrix (each product divided by 0x8000 separately).; callers 97534@97595; guest pending
 0x000eaab0	65	open_data_file_eaab0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000eaab0.json	docs/compiler-abi.md; Open the data file and read its 0x306-byte header.; callers eac48@eac83; guest pending
 0x000eaaf4	79	read_data_block_eaaf4	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000eaaf4.json	docs/compiler-abi.md; Read the data file's size-prefixed block into 0x474368.; callers eab44@eab6d,eac48@eaccb; guest pending
-0x000eab44	162			unknown	unclassified	unverified		
+0x000eab44	162	pump_records_eab44	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000eab44.json	docs/compiler-abi.md; Timed record pump: when the clock 0x10dfe0 has advanced by at least the interval word 0x484466 since 0x484154, re-reads ; callers 97dcc@97e2f,97dcc@97e73,a8bd4@a8dba; guest pending
 0x000eabe8	93	build_data_path_eabe8	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000eabe8.json	docs/compiler-abi.md; Build the data file path from the default path, a name and a suffix.; callers eac48@eac7e; guest pending
 0x000eac48	453			unknown	unclassified	unverified		
 0x000eae10	54	release_pending_handle_eae10	game_helpers57	compiles	game	confirmed	decomp/tests/0x000eae10.json	docs/compiler-abi.md; Release the pending handle and the status message.; callers 97dcc@97e45,97dcc@97e89,a8bd4@a8e61; guest pending

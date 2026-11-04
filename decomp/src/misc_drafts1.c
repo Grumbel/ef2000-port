@@ -3816,3 +3816,29 @@ void retire_unit_8d330(int32_t index)
     EF_U8(rec + 0x24u) &= 0xebu;
     guest_fn_8ca24_x(rec, (int32_t)(int16_t)EF_U16(rec + 0x28u));
 }
+
+/* 0xeab44, 162 bytes. Timed record pump: when the clock 0x10dfe0 has advanced by at least the interval word 0x484466 since 0x484154, re-reads the data block (0xeaaf4), hands the record buffers to 0xf9ee0 and 0x10dfec, and then either steps the pass counter word 0x484468, or, when it reaches the limit word 0x484162, resets it to 2 and rewinds the stream by the position held in 0x484150. Returns 1 while running, 0 after the rewind. */
+uint32_t pump_records_eab44(void)
+{
+    int32_t now = (int32_t)field_10dfe0();
+    uint32_t ctx;
+    uint32_t pos;
+    uint16_t pass;
+    EF_U32(0x00484158u) = (uint32_t)now;
+    if (now - EF_S32(0x00484154u) < (int32_t)EF_U16(0x00484466u))
+        return 1u;
+    EF_U32(0x00484154u) = (uint32_t)now;
+    read_data_block_eaaf4();
+    guest_fn_f9ee0_x(0x00464580u, 0x00474360u);
+    guest_fn_10dfec_x(EF_U32(0x0048415cu), 0x00464580u);
+    pass = EF_U16(0x00484468u);
+    if (pass != EF_U16(0x00484162u)) {
+        EF_U16(0x00484468u) = (uint16_t)(pass + 1u);
+        return 1u;
+    }
+    EF_U16(0x00484468u) = 2u;
+    ctx = EF_U32(0x00160644u);
+    pos = seek_context_9cee8(0u, ctx);
+    seek_context_9cee8(EF_U32(0x00484150u) - pos, ctx);
+    return 0u;
+}

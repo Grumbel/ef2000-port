@@ -4796,4 +4796,8 @@ void draw_entry_boxes_e8484(int32_t key, uint32_t x, uint32_t y, uint32_t z);
 void retire_unit_8d330(int32_t index);
 void guest_fn_8ca24_x(uint32_t obj, int32_t value); /* 0x8ca24 EAX/EDX */
 
+uint32_t pump_records_eab44(void);
+void guest_fn_f9ee0_x(uint32_t a, uint32_t b); /* 0xf9ee0 2 stack, callee cleanup */
+void guest_fn_10dfec_x(uint32_t a, uint32_t b); /* 0x10dfec 2 stack, callee cleanup */
+
 #endif
