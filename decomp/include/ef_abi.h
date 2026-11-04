@@ -2334,4 +2334,41 @@ int32_t has_active_entry_fabf0(ef_addr32 object);
 void guest_fn_56a4c(void); /* 0x56a4c */
 ef_addr32 guest_fn_9d060(uint32_t size); /* 0x9d060 EAX -> EAX */
 
+/* game_helpers31.c */
+uint8_t request_returns_cf_a00(uint32_t argument);
+void run_owner_action_15af0(uint32_t slot, uint8_t arg);
+void fire_idle_action_1851c(void);
+void update_current_mode_2546c(void);
+void pop_triple_2a970(void);
+void reset_list_view_3711c(void);
+void build_ring_table_3a2d0(void);
+void probe_cursor_cell_3cd9c(void);
+void tick_countdown_47fbc(void);
+void cycle_frame_54210(void);
+void update_records_5437c(void);
+void emit_and_advance_d628(void);
+void guest_fn_2b0(ef_addr32 request); /* 0x2b0 EAX */
+void guest_fn_15b7c(uint32_t slot, uint32_t extra); /* 0x15b7c EAX/EDX */
+uint32_t guest_fn_169b4(uint32_t slot); /* 0x169b4 EAX -> AX */
+uint32_t guest_fn_16a04(uint32_t slot); /* 0x16a04 EAX -> AX */
+uint32_t guest_fn_16a3c(uint32_t slot); /* 0x16a3c EAX -> AX */
+void guest_fn_16034(uint32_t slot, uint32_t extra); /* 0x16034 EAX/EDX */
+void guest_fn_161d4(uint32_t slot, uint32_t extra); /* 0x161d4 EAX/EDX */
+void guest_fn_16588(uint32_t slot, uint32_t extra); /* 0x16588 EAX/EDX */
+void guest_fn_1d420(void); /* 0x1d420 */
+void guest_fn_801e4(uint32_t a, uint32_t b, uint32_t c); /* 0x801e4 EAX/EDX/EBX */
+uint32_t guest_fn_6aeb4(int32_t index); /* 0x6aeb4 EAX -> AL */
+void guest_fn_abe44(ef_addr32 text); /* 0xabe44 EAX */
+void guest_fn_a42f4(void); /* 0xa42f4 */
+void guest_fn_a4030(void); /* 0xa4030 */
+uint32_t guest_fn_7b2f4(uint32_t a, int32_t b, int32_t c); /* 0x7b2f4 EAX/EDX/EBX -> AX */
+uint32_t guest_fn_a17e8(void); /* 0xa17e8 -> AX */
+void guest_fn_47f9c(void); /* 0x47f9c */
+void guest_fn_8f4c(uint32_t frame); /* 0x8f4c EAX */
+uint32_t guest_fn_40820(ef_addr32 address); /* 0x40820 EAX -> AL */
+void guest_fn_1d700(int32_t index); /* 0x1d700 EAX */
+void guest_fn_1e130(void); /* 0x1e130 */
+void guest_fn_a78bc_name(ef_addr32 root, ef_addr32 name); /* 0xa78bc EAX/EDX */
+void guest_fn_43020(void); /* 0x43020 */
+
 #endif

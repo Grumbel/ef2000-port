@@ -3066,3 +3066,20 @@ in EAX, format string address, one value).
 | `0xf8acc` | EAX:ef_addr32 | EAX:uint32_t | f8b14@f8bc3,f8b14@f8c0d,f8b14@f8c5c | Decrement the last set entry that accepts it; report if one did. |
 | `0xf8e14` | EAX:ef_addr32 | EAX:uint32_t | f8e44@f8e9b | Count the entries whose first word is nonzero. |
 | `0xfabf0` | EAX:ef_addr32 | EAX:int32_t | fbad8@fbcd1 | 1 when the object has at least one active entry whose code passes the set test. |
+
+## game_helpers31 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa00` | EAX:uint32_t | AL:uint8_t | a60@a68,a60@a81 | Issue request 0x2503 and report whether the returned code byte is 0xcf. |
+| `0x15af0` | EAX:uint32_t,DL:uint8_t | none | 2ced4@2d42e,7e8c0@7e994 | Drive the per-owner action chain for a player's slot. |
+| `0x1851c` | none | none | 72944@72ce2,72944@72d3f | Fire the one-shot action when the idle conditions hold. |
+| `0x2546c` | none | none | 239ac@23a6b,255f0@256ac,255f0@256e9 | Reset or advance the current object's mode after a transition test. |
+| `0x2a970` | none | none | 3dd30@3e250 | Pop one entry of the 6-byte stack at 0x125262 into the current triple. |
+| `0x3711c` | none | none | none direct | Reset the list view and load the heading string for the current page. |
+| `0x3a2d0` | none | none | 3a3a8@3a499 | Build a 36-entry table of scaled sine/cosine pairs (radius 60). |
+| `0x3cd9c` | none | none | 3cfc0@3d2e6 | Convert the 11-bit fixed-point cursor and probe the cell under it. |
+| `0x47fbc` | none | none | 48064@4808a | Decrease the second countdown word unless device 0xb is in state 4. |
+| `0x54210` | none | none | 54110@54132 | Cycle a frame counter every other tick and pass the frame to 0x8f4c. |
+| `0x5437c` | none | none | 54110@54141 | Update every record of the 171-byte list: arm ready ones and refresh active ones. |
+| `0xd628` | none | none | none direct | Emit the pending message and, when idle, open the dialog and advance the page. |
