@@ -19710,3 +19710,54 @@ ef_addr32 queue_effect_slot_d35b0(ef_addr32 p)
 	EF_U32(slot + 0x6e8u) = EF_U32(0x00159144u);
 	return p;
 }
+
+/* 0xbe480, 281 bytes. Build a 0x78-byte record DST from SRC1 (EDX), SRC2 (EBX) and SRC3 (ECX): copy header bytes and 18 bytes from SRC2+0x11, then fill the type-specific part (types 2/10 via 0xbdeec, 1 via 0xbe438, 11, 5/0, others) and finish with 0xbb324(DST+0x55, kind, DST[0]) (ret 4, s0 = extra argument). */
+void build_record_be480(ef_addr32 dst, ef_addr32 src1, ef_addr32 src2, ef_addr32 src3, uint32_t s0)
+{
+	uint32_t type, kind, i;
+	ef_addr32 t;
+
+	EF_U8(dst) = EF_U8(src1 + 8u);
+	EF_U8(dst + 1u) = EF_U8(src1 + 3u);
+	type = EF_U8(src1 + 9u);
+	EF_U8(dst + 3u) = 0u;
+	EF_U8(dst + 2u) = (uint8_t)type;
+	for (i = 0; i < 18u; i++)
+		EF_U8(dst + 8u + i) = EF_U8(src2 + 0x11u + i);
+	type = EF_U8(dst + 2u);
+	EF_U32(dst + 0x69u) = 0u;
+	if (type == 2u || type == 0xau) {
+		EF_U8(dst + 0x3au) = EF_U8(src3 + 0xbu);
+		EF_U32(dst + 0x3bu) = EF_U32(src3 + 0xcu);
+		for (i = 0; i < 18u; i++)
+			EF_U8(dst + 0x3fu + i) = EF_U8(src3 + 0x16u + i);
+		kind = guest_fn_bdeec_x(src3, dst, s0, EF_U32(src3 + 0xcu)) & 0xffu;
+	} else if (type == 1u) {
+		EF_U8(dst + 0x3au) = EF_U8(src3 + 0xbu);
+		for (i = 0; i < 18u; i++)
+			EF_U8(dst + 0x3fu + i) = EF_U8(src3 + 0x16u + i);
+		EF_U32(dst + 0x3bu) = EF_U32(src3 + 0xcu);
+		EF_U32(dst + 0x51u) = 0u;
+		EF_U32(dst + 0x74u) = 0u;
+		EF_U8(dst + 0x6du) = 2u;
+		t = find_target_be438(EF_U32(src3 + 0x16u), EF_U32(src3 + 0x1au), s0);
+		EF_U16(dst + 0x6eu) = EF_U16(t + 0x10u);
+		EF_U16(dst + 0x70u) = 0u;
+		kind = 6u;
+	} else if (type == 0xbu) {
+		EF_U32(dst + 0x3bu) = 0u;
+		kind = 5u;
+		EF_U32(dst + 0x51u) = 0u;
+	} else {
+		if (type == 5u || type == 0u) {
+			if (src3 != 0u)
+				EF_U32(dst + 0x3bu) = EF_U32(src3 + 0xcu);
+		} else {
+			EF_U32(dst + 0x3bu) = 0u;
+		}
+		EF_U32(dst + 0x51u) = 0u;
+		kind = 4u;
+		EF_U32(dst + 0x74u) = 0u;
+	}
+	init_event_record_bb324(dst + 0x55u, kind, EF_U8(dst));
+}

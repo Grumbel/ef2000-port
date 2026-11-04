@@ -2682,7 +2682,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000be320	210	link_matching_entries_be320	runtime_helpers34	compiles	game	confirmed	decomp/tests/0x000be320.json	docs/compiler-abi.md; Link matching shape entries of two lists to their lookup value.; callers b0f5c@b15e4; guest pending
 0x000be3f4	68	copy_ids_of_colocated_records_be3f4	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be3f4.json	docs/compiler-abi.md; For each flag-less record of the first list copy the id of every record of the second list that shares its position.; callers b0f5c@b118f,b0f5c@b147c; guest pending
 0x000be438	69	find_target_be438	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000be438.json	docs/compiler-abi.md; Find the kind-2 node of the list whose target matches the two keys and is valid.; callers be480@be526,c1438@c1781; guest pending
-0x000be480	281			unknown	unclassified	unverified		
+0x000be480	281	build_record_be480	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000be480.json	docs/compiler-abi.md; Build a 0x78-byte record DST from SRC1 (EDX), SRC2 (EBX) and SRC3 (ECX): copy header bytes and 18 bytes from SRC2+0x11, ; callers be59c@be691; guest pending
 0x000be59c	477			unknown	unclassified	unverified		
 0x000be77c	104	transfer_entry_weights_be77c	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be77c.json	docs/compiler-abi.md; Find the record whose id matches the object's and move its entries' weights from field 0x23 to field 0x25.; callers be59c@be74e,f8e44@f908d; guest pending
 0x000be7e4	827			unknown	unclassified	unverified		
