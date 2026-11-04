@@ -5754,4 +5754,6 @@ void integrate_drift_53aec(void);
 
 void measure_view_range_67d4(void);
 
+void refresh_node_progress_1e28c(void);
+
 #endif

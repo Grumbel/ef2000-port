@@ -14793,3 +14793,43 @@ void measure_view_range_67d4(void)
     if (row > 10.0)
         EF_U32(0x0019721cu) = (uint32_t)(int32_t)truncate_9d72c(range * 1854.0 / row);
 }
+
+/* 0x1e28c, 311 bytes. Walk the list at [0x137988] (next link at +4) and set flag byte 0x137a00. For every node read the plane cell for (+0x16, +0x1a) through 0x7b2f4; when 0xcd150 rejects it, report both values through the error hook with format 0x181a18. Then for each of the node's entries (count = high half of +0x28, 0x15-byte records from pointer +0x2c) other than kinds 0xff, 0xfe, 0x38 and 0x37 that the entry boxes test 0x1e214 accepts, compare the value of 0xcd258 with 100 minus the entry's byte +5 (capped at 100); when they differ add the difference to the progress counter (0xcd2e8) and select page layout 0x9dfc0 for the cell. */
+void refresh_node_progress_1e28c(void)
+{
+    uint32_t node, esi, cell;
+    int32_t i, count;
+    int16_t w, cur, want, cnt;
+    uint32_t b;
+
+    node = EF_U32(0x00137988u);
+    EF_U8(0x00137a00u) = 1u;
+    while (node != 0u) {
+        w = (int16_t)guest_fn_7b2f4(0u, (int32_t)EF_U32(node + 0x16u), (int32_t)EF_U32(node + 0x1au));
+        if (guest_fn_cd150((int32_t)w) == 0u)
+            guest_callptr3_x(EF_U32(0x00132a74u), 0x00181a18u, EF_U32(node + 0x16u), EF_U32(node + 0x1au));
+        esi = EF_U32(node + 0x2cu);
+        for (i = 0; ; i++, esi += 0x15u) {
+            count = (int32_t)EF_U32(node + 0x28u) >> 16;
+            if (i >= count)
+                break;
+            b = EF_U8(esi);
+            if (b == 0xffu || b == 0xfeu || b == 0x38u || b == 0x37u)
+                continue;
+            cell = (uint32_t)(int32_t)w;
+            if (guest_fn_1e214((int32_t)cell, (int32_t)EF_U32(esi + 5u) >> 16, (int32_t)EF_U32(esi + 9u) >> 16,
+                               (int32_t)EF_U32(esi + 7u) >> 16) == 0u)
+                continue;
+            cur = (int16_t)guest_fn_cd258();
+            cnt = (int16_t)EF_U8(esi + 5u);
+            if (cnt >= 100)
+                cnt = 100;
+            want = (int16_t)(100 - cnt);
+            if (want == cur)
+                continue;
+            guest_fn_cd2e8((int32_t)(int16_t)(want - cur));
+            select_page_layout_9dfc0(w, 0u, 0u, 0u);
+        }
+        node = EF_U32(node + 4u);
+    }
+}

@@ -335,7 +335,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001e130	53	forget_record_1e130	game_helpers5	compiles	game	confirmed	decomp/tests/0x0001e130.json	docs/compiler-abi.md; Forget the cached record pointer if it equals record index.; callers 5437c@543eb; guest pending
 0x0001e1c0	68	point_in_box_1e1c0	game_helpers7	compiles	game	confirmed	decomp/tests/0x0001e1c0.json	docs/compiler-abi.md; Is the point inside the 16-bit box at box?; callers 1e214@1e268; guest pending
 0x0001e214	117	point_in_entry_boxes_1e214	probe_helpers1	compiles	game	confirmed	decomp/tests/0x0001e214.json	docs/compiler-abi.md; For an open entry, rotate the query point (x, y, z) by the entry's orientation (0..3) and walk the script cursor until o; callers 1e28c@1e334,1e3c4@1e432; guest pending
-0x0001e28c	311			unknown	unclassified	unverified		
+0x0001e28c	311	refresh_node_progress_1e28c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0001e28c.json	docs/compiler-abi.md; Walk the list at [0x137988] (next link at +4) and set flag byte 0x137a00. For every node read the plane cell for (+0x16,; callers 3dd30@3dd77; guest pending
 0x0001e3c4	176	reroll_list_entries_1e3c4	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x0001e3c4.json	docs/compiler-abi.md; Re-roll the strength of every entry whose spot is occupied, per list node.; callers 3dd30@3e886; guest pending
 0x0001e480	499			unknown	unclassified	unverified		
 0x0001e684	107	age_timers_1e684	game_helpers7	compiles	game	confirmed	decomp/tests/0x0001e684.json	docs/compiler-abi.md; Age the twelve timers; those in state 0xe expire back to state 2.; callers 3dd30@3dfb8; guest pending
