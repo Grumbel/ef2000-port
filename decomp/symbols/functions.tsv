@@ -4164,7 +4164,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00119938	141	combine_globals_119938	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119938.json	docs/compiler-abi.md; Combine globals: Z = A*B*C-chain terms stored at 0x432b50, then 0x432af8 = J*C*K*M*N*Z.; callers 1196a0@1196af; guest pending
 0x001199c8	139	combine_globals_1199c8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001199c8.json	docs/compiler-abi.md; Sibling of 0x119a54: X = (A+B+C)*g + D*h*k is stored at 0x432b58 and k*m*g*h*p*X at 0x432b00.; callers 1196a0@1196b4; guest pending
 0x00119a54	117	combine_globals_119a54	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119a54.json	docs/compiler-abi.md; Combine globals: M = a*b*c*d + e*f*g + i*j*k*g is stored at 0x432a48 and c*d*n*g*p*M at 0x432920.; callers 1196a0@1196b9; guest pending
-0x00119acc	265			unknown	unclassified	unverified		
+0x00119acc	265	rotate_view_pair_119acc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119acc.json	docs/compiler-abi.md; Rotate the double pair at 0x432ab8 / 0x432ad0 by the angle at 0x432c28 into 0x432950 (-(X*cos - Y*sin)) and 0x432960 (-Y; callers 1196a0@1196be; guest pending
 0x00119be0	813			unknown	unclassified	unverified		
 0x00119f10	119	accum_cross_119f10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00119f10.json	docs/compiler-abi.md; Accumulate vector b (EDX) into the sum at 0x432a28 and the cross product a x b (EAX, EDX) into 0x4329c0.; callers 119f88@11a5ab,11a5c0@11a6d8; guest pending
 0x00119f88	1591			unknown	unclassified	unverified		

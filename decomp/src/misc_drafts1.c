@@ -23274,3 +23274,34 @@ int32_t calendar_day_index_10e872(ef_addr32 p, int32_t year)
 	base = (int32_t)tm[7] + rem;
 	return week * 7 + base;
 }
+
+static void md_wr_f64(uint32_t addr, double v)
+{
+	*(double *)ef_guest_memory_ptr((ef_addr32)addr) = v;
+}
+
+/* 0x119acc, 265 bytes. Rotate the double pair at 0x432ab8 / 0x432ad0 by the angle at 0x432c28 into 0x432950 (-(X*cos - Y*sin)) and 0x432960 (-Y*cos - X*sin), copy the qword 0x432b38 to 0x432958 and the qwords 0x432af8 / 0x432b00 to 0x432918 / 0x432910; when byte 0x43397c is set and the double 0x432218 is below the double 0x1956d4, clear 0x432950..0x432964 and 0x432910..0x432924. */
+void rotate_view_pair_119acc(void)
+{
+	double a = md_rd_f64(0x432c28u);
+	double c = cos_b45a2(a);
+	double s = sin_b45ac(a);
+	double x = md_rd_f64(0x432ab8u);
+	double y = md_rd_f64(0x432ad0u);
+	uint32_t i;
+
+	md_wr_f64(0x432950u, -(x * c - y * s));
+	EF_U32(0x432958u) = EF_U32(0x432b38u);
+	EF_U32(0x43295cu) = EF_U32(0x432b3cu);
+	md_wr_f64(0x432960u, -y * c - x * s);
+	EF_U32(0x432910u) = EF_U32(0x432b00u);
+	EF_U32(0x432914u) = EF_U32(0x432b04u);
+	EF_U32(0x432918u) = EF_U32(0x432af8u);
+	EF_U32(0x43291cu) = EF_U32(0x432afcu);
+	if (EF_U8(0x43397cu) != 0u && md_rd_f64(0x432218u) < md_rd_f64(0x1956d4u)) {
+		for (i = 0; i < 6u; i++)
+			EF_U32(0x432950u + i * 4u) = 0u;
+		for (i = 0; i < 6u; i++)
+			EF_U32(0x432910u + i * 4u) = 0u;
+	}
+}

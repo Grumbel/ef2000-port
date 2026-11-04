@@ -6503,4 +6503,7 @@ void init_pattern_display_e4188(void); /* 0xe4188 */
 int32_t calendar_day_index_10e872(ef_addr32 p, int32_t year);
 int32_t calendar_day_index_10e872(ef_addr32 p, int32_t year); /* 0x10e872 */
 
+void rotate_view_pair_119acc(void);
+void rotate_view_pair_119acc(void); /* 0x119acc */
+
 #endif

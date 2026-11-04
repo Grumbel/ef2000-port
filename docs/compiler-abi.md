@@ -9493,3 +9493,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10e872` | EAX:ef_addr32,EDX:int32_t | EAX:int32_t | 10e957@10e95e,10e957@10e96b | Day-of-year index of a calendar slot: for the record at P (EAX; +0x10 month, +0xc week-of-month, +0x18 weekday, +0x1c da |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x119acc` | none | none | 1196a0@1196be | Rotate the double pair at 0x432ab8 / 0x432ad0 by the angle at 0x432c28 into 0x432950 (-(X*cos - Y*sin)) and 0x432960 (-Y |
