@@ -5148,4 +5148,6 @@ void draw_effect_records_80c3c(void);
 
 void prepare_briefing_file_35cfc(void);
 
+void update_proximity_39874(uint32_t x, uint32_t y, uint32_t z);
+
 #endif

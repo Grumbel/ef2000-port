@@ -7786,3 +7786,27 @@ void prepare_briefing_file_35cfc(void)
     }
     EF_U8(0x0019f5a8u) = 0u;
 }
+
+/* 0x39874, 227 bytes. Proximity level of the point (X = EAX word, Y = EDX word signed, Z = EBX word) to the reference position (dwords 0x19e5b5, 0x19e5b9, 0x19e5bd, each >> 8): take the largest axis distance (capped at 250), turn it into a percentage 100*(250-d)/250 (low byte, capped at 100) and raise the maximum in word 0x12651c to it. */
+void update_proximity_39874(uint32_t x, uint32_t y, uint32_t z)
+{
+    uint32_t rx = (uint32_t)((int32_t)EF_U32(0x0019e5b5u) >> 8);
+    uint32_t ry = (uint32_t)((int32_t)EF_U32(0x0019e5b9u) >> 8);
+    uint32_t rz = (uint32_t)((int32_t)EF_U32(0x0019e5bdu) >> 8);
+    uint32_t best = abs_a28f2((int32_t)((x & 0xffffu) - (rx & 0xffffu)));
+    int32_t e, q;
+    uint8_t al;
+    if (abs_a28f2((int32_t)(int16_t)y - (int32_t)(ry & 0xffffu)) > (uint32_t)(int32_t)(int16_t)best)
+        best = abs_a28f2((int32_t)(int16_t)y - (int32_t)(ry & 0xffffu));
+    if (abs_a28f2((int32_t)((z & 0xffffu) - (rz & 0xffffu))) > (uint32_t)(int32_t)(int16_t)best)
+        best = abs_a28f2((int32_t)((z & 0xffffu) - (rz & 0xffffu)));
+    if ((int32_t)(int16_t)best > 0xfa)
+        best = 0xfau;
+    e = 0xfa - (int32_t)(int16_t)best;
+    q = (e * 100) / 0xfa;
+    al = (uint8_t)q;
+    if (al > 0x64u)
+        al = 0x64u;
+    if ((int16_t)al > (int16_t)EF_U16(0x0012651cu))
+        EF_U16(0x0012651cu) = al;
+}

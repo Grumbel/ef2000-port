@@ -667,7 +667,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000394e0	104	apply_pending_394e0	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x000394e0.json	docs/compiler-abi.md; Consume the pending request at 0x1a3608 and apply it through 0x1d5cc.; callers 3dcb0@3dcb0; guest pending
 0x00039548	507			unknown	unclassified	unverified		
 0x00039744	303			unknown	unclassified	unverified		
-0x00039874	227			unknown	unclassified	unverified		
+0x00039874	227	update_proximity_39874	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00039874.json	docs/compiler-abi.md; Proximity level of the point (X = EAX word, Y = EDX word signed, Z = EBX word) to the reference position (dwords 0x19e5b; callers 39548@395d6,39548@396fd,39548@39726; guest pending
 0x00039960	170	build_circle_39960	game_helpers17	compiles	game	confirmed	decomp/tests/0x00039960.json	docs/compiler-abi.md; Build the 0x1a17c0/0x1a1810 ellipse tables (radii 10 and 8).; callers 39a0c@39a1f; guest pending
 0x00039a0c	677			unknown	unclassified	unverified		
 0x00039cb4	238	compute_unit_distance_39cb4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00039cb4.json	docs/compiler-abi.md; Distance between the player unit (word 0x1f71ca) and the unit named by 0x1a823e, from the position longs (+0, +4, +8) sc; callers 5c518@5c5ca; guest pending
