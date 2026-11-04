@@ -5188,4 +5188,6 @@ uint32_t extended_to_float_f0034(uint32_t ptr);
 uint32_t double_bits_to_float_118b10(uint32_t lo, uint32_t hi);
 void draw_shaded_span_d44b0(void);
 
+uint32_t project_if_outside_c46f8(uint32_t margin, uint32_t rec);
+
 #endif

@@ -8282,3 +8282,17 @@ void draw_shaded_span_d44b0(void)
         dst++;
     }
 }
+
+/* 0xc46f8, 67 bytes. Implicit-register fragment (EAX = MARGIN, EBX = vertex record pointer; params in that order). Remember the record in dword 0x158f40; when its dword +8 is at least 0x10000 and the point (dwords +0, +4, +8) is not inside the view volume (0xceb40 with MARGIN), project it (0xfc8cc, count 1, list 0x158f40) and report whether bit 0 of the word at +0x20 of the (reloaded) record is set. The original returns this in the zero flag: the result here is 1 for "flag set" (NZ) and 0 otherwise. */
+uint32_t project_if_outside_c46f8(uint32_t margin, uint32_t rec)
+{
+    EF_U32(0x00158f40u) = rec;
+    if ((int32_t)EF_U32(rec + 8u) >= 0x10000) {
+        if ((point_in_view_volume_ceb40(0u, 0u, 0u, 0u, (int32_t)margin, (int32_t)EF_U32(rec + 8u),
+                                        (int32_t)EF_U32(rec + 4u), (int32_t)EF_U32(rec)) & 0xffu) == 0u) {
+            project_vertices_fc8cc(0u, 0u, 0u, 0u, 1u, 0x00158f40u);
+            return (EF_U16(EF_U32(0x00158f40u) + 0x20u) & 1u) != 0u;
+        }
+    }
+    return 0u;
+}

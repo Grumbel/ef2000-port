@@ -6793,3 +6793,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x118b10` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 108afd@108dc8 | Convert the double whose bits are EDX:EAX (EAX = low dword, EDX = high dword) to the bits of a float (returned in EAX):  |
 | `0xd44b0` | none | none | none direct | Draw one shaded span: from the signed word 0x485fea to the signed word 0x485fd2 (nothing unless the end is after the sta |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc46f8` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | c680b@c6820,c73b0@c73b8,c73b0@c73c7 | Implicit-register fragment (EAX = MARGIN, EBX = vertex record pointer; params in that order). Remember the record in dwo |

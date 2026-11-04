@@ -2776,7 +2776,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c4680	27			unknown	unclassified	unverified		
 0x000c469b	33	copy_constants_c469b	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000c469b.json	docs/compiler-abi.md; Copy three constant dwords from the code area into the work area.; callers 39744@3975c; guest pending
 0x000c46bc	60			unknown	unclassified	unverified		
-0x000c46f8	67			unknown	unclassified	unverified		
+0x000c46f8	67	project_if_outside_c46f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c46f8.json	docs/compiler-abi.md; Implicit-register fragment (EAX = MARGIN, EBX = vertex record pointer; params in that order). Remember the record in dwo; callers c680b@c6820,c73b0@c73b8,c73b0@c73c7; guest pending
 0x000c473c	15			unknown	unclassified	unverified		
 0x000c474c	9			unknown	unclassified	unverified		
 0x000c4755	136			unknown	unclassified	unverified		
