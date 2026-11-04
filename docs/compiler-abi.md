@@ -7055,3 +7055,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x84e3c` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 601c@621b,66fc@677e,67d4@685f | Fetch two packed words for sub-entry SUB (BL) of the class record owned by unit UNIT (DX, signed) into OUT[0..1] (EAX):  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9f850` | EAX:uint32_t | none | 9e7bc@9e817 | Queue the 29-byte record INDEX (AX, signed; table at [0x417174] + 0xb) as a table entry: run the hook at 0x132af4 with ( |

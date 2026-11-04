@@ -9495,3 +9495,26 @@ void fetch_entry_pair_84e3c(ef_addr32 out, uint32_t unit, uint32_t sub)
     EF_U32(out) = (uint32_t)(((int32_t)EF_U32(p2) >> 16) << 11) + 0x400u
                 + (uint32_t)((int32_t)EF_U32(p2 + b * 6u + 0x18u) >> 16);
 }
+
+/* 0x9f850, 240 bytes. Queue the 29-byte record INDEX (AX, signed; table at [0x417174] + 0xb) as a table entry: run the hook at 0x132af4 with (0, 0), copy the words 0x41718e/0x417190 (+ word 0x417222)/0x417192 to 0x417188..8c, fill the descriptor 0x1600a8..b8 (record word, record + 0x14, scratch 0x417154, position 0x417188, count 1) and, when the record byte +0x1c is non-zero, add the first point of its list (at [0x41717c] + 2 * (dword +0x10 >> 16)) to the position and use that byte as the count; then append the entry (0x16018a). */
+void queue_record_entry_9f850(uint32_t index)
+{
+    ef_addr32 rec = EF_U32(0x00417174u) + 0xbu + (uint32_t)((int32_t)(int16_t)index * 29);
+    ef_addr32 list = EF_U32(0x0041717cu) + (uint32_t)(((int32_t)EF_U32(rec + 0x10u) >> 16) * 2);
+    guest_callptr2r_x(EF_U32(0x00132af4u), 0, 0);
+    EF_U16(0x00417188u) = EF_U16(0x0041718eu);
+    EF_U16(0x0041718au) = (uint16_t)(EF_U16(0x00417190u) + EF_U16(0x00417222u));
+    EF_U16(0x0041718cu) = EF_U16(0x00417192u);
+    EF_U32(0x001600b4u) = 0x00417188u;
+    EF_U32(0x001600b8u) = 1u;
+    EF_U32(0x001600a8u) = (uint32_t)(int32_t)(int16_t)EF_U16(rec);
+    EF_U32(0x001600acu) = rec + 0x14u;
+    EF_U32(0x001600b0u) = 0x00417154u;
+    if (EF_U8(rec + 0x1cu) != 0u) {
+        EF_U16(0x00417188u) = (uint16_t)(EF_U16(0x00417188u) + EF_U16(list));
+        EF_U16(0x0041718au) = (uint16_t)(EF_U16(0x0041718au) + EF_U16(list + 2u));
+        EF_U16(0x0041718cu) = (uint16_t)(EF_U16(0x0041718cu) + EF_U16(list + 4u));
+        EF_U32(0x001600b8u) = EF_U8(rec + 0x1cu);
+    }
+    append_table_entry_16018a();
+}

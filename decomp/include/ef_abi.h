@@ -5287,4 +5287,6 @@ void build_mode_label_326d8(void);
 
 void fetch_entry_pair_84e3c(ef_addr32 out, uint32_t unit, uint32_t sub);
 
+void queue_record_entry_9f850(uint32_t index);
+
 #endif
