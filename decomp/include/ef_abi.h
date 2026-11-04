@@ -5577,4 +5577,7 @@ void guest_fn_58d44_x(void); /* 0x58d44 */
 
 void hail_next_unit_73c38(uint32_t unit);
 
+void maybe_radio_call_6f48(ef_addr32 a, ef_addr32 b);
+double guest_fn_2bab0_x(ef_addr32 p, int32_t aux); /* 0x2bab0 EAX/EDX -> ST0 */
+
 #endif

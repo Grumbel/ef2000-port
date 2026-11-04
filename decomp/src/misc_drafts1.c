@@ -12547,3 +12547,37 @@ void hail_next_unit_73c38(uint32_t unit)
         return;
     guest_fn_46254((uint32_t)sid, (int32_t)EF_U8(obj + 0x142u), 0x72u, EF_U8(obj + 0x140u), 0u, 0u);
 }
+
+/* 0x6f48, 229 bytes. Maybe fire a radio call from unit A (EAX) in answer to B (EDX): B's owner record is the one named by the high word of B+0x20 (nothing when missing); it must have the same side word (+0x15) as A. If the word 0x197264 differs from its word +0x24 or its byte +0x26 is set, B's word +0x22 is set to 0xff and nothing is sent. Otherwise, with probability 1/byte(0x197269), send message 0x3c with 0x46254(A's id, owner's id, 0x3c, angle from the distance 0x2bab0, the rounded value 0x2bae0 * double 0x18039c, the byte derived from the double at B+0x71). */
+void maybe_radio_call_6f48(ef_addr32 a, ef_addr32 b)
+{
+    ef_addr32 owner = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)EF_U32(b + 0x20u) >> 16) * 0xcau;
+    ef_addr32 pos;
+    int32_t angle;
+    int32_t hw;
+    double v;
+    double k;
+    double b71;
+    int32_t rounded;
+    uint32_t ctl;
+    if (owner == 0u)
+        return;
+    if (EF_U16(owner + 0x15u) != EF_U16(a + 0x15u))
+        return;
+    if (EF_U16(0x00197264u) != EF_U16(owner + 0x24u) || EF_U8(owner + 0x26u) != 0u) {
+        EF_U16(b + 0x22u) = 0xffu;
+        return;
+    }
+    hw = (int32_t)EF_U32(0x00197262u) >> 16;
+    pos = owner + 0x61u;
+    angle = (int16_t)scale_to_angle_45fc4(guest_fn_2bab0_x(pos, hw));
+    memcpy(&k, ef_guest_memory_ptr(0x0018039cu), sizeof k);
+    v = guest_fn_2bae0_x(pos, (int32_t)EF_U32(0x00197262u) >> 16) * k;
+    rounded = (int32_t)truncate_9d72c(v);
+    memcpy(&b71, ef_guest_memory_ptr(b + 0x71u), sizeof b71);
+    ctl = scale_to_byte_4600c(b71);
+    if ((guest_fn_9c960() & 0xffffu) % EF_U8(0x00197269u) != 0u)
+        return;
+    guest_fn_46254((uint32_t)((int32_t)EF_U32(a + 0x4eu) >> 16), (int32_t)EF_U32(owner + 0x4eu) >> 16, 0x3cu,
+                   (uint32_t)angle, (uint32_t)rounded, ctl & 0xffu);
+}

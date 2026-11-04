@@ -94,7 +94,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00006df0	38	alloc_zero_5x_6df0	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00006df0.json	docs/compiler-abi.md; Allocate and zero five bytes per unit.; callers 6e18@6e35; guest pending
 0x00006e18	89	reset_slots_6e18	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00006e18.json	docs/compiler-abi.md; ; callers 49228@495bc; guest pending
 0x00006e74	211	bind_object_slot_6e74	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00006e74.json	docs/compiler-abi.md; Bind the object ID (looked up with 0x7489c) to the first free entry of the 5-byte table at [0x197260] (0x121e55 entries;; callers 8c49c@8c88c; guest pending
-0x00006f48	229			unknown	unclassified	unverified		
+0x00006f48	229	maybe_radio_call_6f48	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00006f48.json	docs/compiler-abi.md; Maybe fire a radio call from unit A (EAX) in answer to B (EDX): B's owner record is the one named by the high word of B+; callers 73ec@758c; guest pending
 0x00007030	459			unknown	unclassified	unverified		
 0x000071fc	266			unknown	unclassified	unverified		
 0x00007308	201	maybe_fire_message_7308	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00007308.json	docs/compiler-abi.md; Occasionally fire a message from object B (EDX) at the nearest record of the owner of A (EAX; owner word at +0x15 of... ; callers 73ec@7563; guest pending

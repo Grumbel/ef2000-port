@@ -7664,3 +7664,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x73c38` | EAX:uint32_t | none | 6c8e0@6c913 | Round-robin hail: for the unit UNIT (AX) advance its cursor byte +0x142 (wrapping to 0 at the signed word 0x2119f4) and  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6f48` | EAX:ef_addr32,EDX:ef_addr32 | none | 73ec@758c | Maybe fire a radio call from unit A (EAX) in answer to B (EDX): B's owner record is the one named by the high word of B+ |
