@@ -5971,4 +5971,8 @@ void update_record_speed_26960(ef_addr32 rec);
 
 
 
+void camera_follow_target_255f0(void);
+
+
+
 #endif

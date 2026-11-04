@@ -18548,3 +18548,59 @@ void update_record_speed_26960(ef_addr32 rec)
 	}
 	advance_position_cef3c(rec, rec + 0xcu, (uint32_t)((int32_t)EF_U16(0x00127d92u) * (int32_t)EF_U32(rec + 0x12u)));
 }
+
+/* 0x255f0, 461 bytes. Chase camera for the player unit's (dword 0x1f71bc) wingman: the unit named by word +0x146 is looked up (0x7489c; nothing if missing), registered with 0x2479c (word 0x1f71c8, id, 0) and the weight 0x1f7068 = exp(-distance * 0.0025) (0xb415c, 0xdcb96) is stored. The heading 0x1f70f8 is the wrapped bearing to that unit plus weight * pi. The unit named by the high word of dword +0x41 (word +0x43) is then looked up; if it is missing, is not of mode 2 (byte +0x16c) with sub-mode 1 or 2 (byte +0x16d) or has flags 2, 4 or 8 set the current mode is updated (0x2546c) instead. Otherwise the height 0x1f7088 is that unit's double +0x59 (limited to [0x1284d4] - 200.0), the distance 0x1f7100 comes from the aircraft table (double 0x128591 + 0xe5 * byte +0xe9), the player's wingman word +0x146 is replaced when its double +0x15a is negative, 0x1f7050 = 1.0 and the camera starts via 0x6ebe0 (2.5, 1.3, 0.0 x4, double 0x1f70a0). */
+void camera_follow_target_255f0(void)
+{
+	uint32_t p = EF_U32(0x001f71bcu);
+	uint32_t t = guest_fn_7489c((int32_t)EF_U32(p + 0x144u) >> 16);
+	uint32_t u, k;
+	double dist, wgt, dx, dy, c, h, lim, base;
+	uint8_t kind, sub, fl;
+
+	if (t == 0u)
+		return;
+	guest_fn_2479c_x((int32_t)EF_U32(0x001f71c6u) >> 16, (int32_t)EF_U32(p + 0x144u) >> 16, 0u);
+	dist = distance_2d_b415c(p + 0x49u, t + 0x49u);
+	wgt = guest_fn_dcb96_x(-dist * 0.0025);
+	memcpy(ef_guest_memory_ptr(0x001f7068u), &wgt, 8);
+	p = EF_U32(0x001f71bcu);
+	memcpy(&dx, ef_guest_memory_ptr(t + 0x49u), 8);
+	memcpy(&c, ef_guest_memory_ptr(p + 0x49u), 8);
+	dx = dx - c;
+	memcpy(&dy, ef_guest_memory_ptr(t + 0x51u), 8);
+	memcpy(&c, ef_guest_memory_ptr(p + 0x51u), 8);
+	dy = dy - c;
+	h = wrap_angle_b42f0(atan2_b4620(dy, dx) + wgt * 3.1415926536);
+	memcpy(ef_guest_memory_ptr(0x001f70f8u), &h, 8);
+	u = guest_fn_7489c((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x41u) >> 16);
+	if (u == 0u) {
+		update_current_mode_2546c();
+		return;
+	}
+	kind = EF_U8(u + 0x16cu);
+	sub = EF_U8(u + 0x16du);
+	fl = EF_U8(u + 0x24u);
+	if (kind != 2u || (sub != 2u && sub != 1u) || (fl & 2u) != 0u || (fl & 4u) != 0u || (fl & 8u) != 0u) {
+		update_current_mode_2546c();
+		return;
+	}
+	EF_U32(0x001f7088u) = EF_U32(u + 0x59u);
+	EF_U32(0x001f708cu) = EF_U32(u + 0x5du);
+	memcpy(&base, ef_guest_memory_ptr(0x001284d4u), 8);
+	lim = base + -200.0;
+	memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
+	if (h > lim)
+		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
+	p = EF_U32(0x001f71bcu);
+	k = EF_U8(p + 0xe9u);
+	memcpy(ef_guest_memory_ptr(0x001f7100u), ef_guest_memory_ptr(0x00128591u + k * 0xe5u), 8);
+	if (EF_U16(p + 0x146u) != EF_U16(u + 0x146u)) {
+		memcpy(&c, ef_guest_memory_ptr(p + 0x15au), 8);
+		if (0.0 > c)
+			EF_U16(p + 0x146u) = EF_U16(u + 0x146u);
+	}
+	EF_U32(0x001f7050u) = 0u;
+	EF_U32(0x001f7054u) = 0x3ff00000u;
+	guest_fn_6ebe0_x(0u, 0x40040000u, 0xcccccccdu, 0x3ff4ccccu, 0u, 0u, 0u, 0u, EF_U32(0x001f70a0u), EF_U32(0x001f70a4u));
+}
