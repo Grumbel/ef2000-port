@@ -3922,7 +3922,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010703c	33	release_object_10703c	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010703c.json	docs/compiler-abi.md; Release the object stored at *slot.; callers d9c30@d9c69,d9c30@d9c9d,106f10@106f22; guest pending
 0x00107060	15	send_command_107060	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00107060.json	docs/compiler-abi.md; 0x118428(*EAX, 0x53).; callers d9cb4@d9d1a,d9dc0@d9e01; guest pending
 0x00107070	281			unknown	unclassified	unverified		
-0x00107310	246			unknown	unclassified	unverified		
+0x00107310	246	load_colour_table_107310	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00107310.json	docs/compiler-abi.md; Load the 0x4000-byte colour table from the file named at 0x17d368: on first use allocate 0x10100 bytes (dword 0x4dd860, ; callers dbff8@dc07f,e3ffc@e4009; guest pending
 0x0010848c	52			unknown	unclassified	unverified		
 0x001084c0	19			unknown	unclassified	unverified		
 0x001084d3	545			unknown	unclassified	unverified		
@@ -4126,7 +4126,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00114878	284			unknown	unclassified	unverified		
 0x00114994	52	set_owner_slot_114994	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00114994.json	docs/compiler-abi.md; Record slot b of owner a as value c-1 (cdecl).; callers 103b90@103bc0; guest pending
 0x001149e0	178	dispatch_midi_event_1149e0	runtime_helpers41	compiles	game	confirmed	decomp/tests/0x001149e0.json	docs/compiler-abi.md; Dispatch a MIDI event for a sound record (cdecl: record, port, status, data1, data2): with a non-zero port forward it to; callers 103c28@103c6d; guest pending
-0x00114ad8	244			unknown	unclassified	unverified		
+0x00114ad8	244	release_locked_ranges_114ad8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00114ad8.json	docs/compiler-abi.md; Release state when dword 0x17e25c is set: unregister the range 0x111c90..0x114ad8 (0x1048b4), unlock the data blocks 0x1; callers none direct; guest pending
 0x0011580e	99	stream_fgets_11580e	runtime_helpers36	compiles	game	confirmed	decomp/tests/0x0011580e.json	docs/compiler-abi.md; fgets: read at most n-1 characters up to and including a newline into buf from stream; returns buf, or 0 on end of file ; callers 103f04@103f5c; guest pending
 0x00115871	275			unknown	unclassified	unverified		
 0x00115984	5	tail_jump_115984	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00115984.json	docs/compiler-abi.md; tail jump. Forward to 0xfa9a0.; callers 105024@105068,105070@10511c; guest pending

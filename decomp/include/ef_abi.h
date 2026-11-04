@@ -5297,4 +5297,7 @@ void send_mouse_requests_de3b4(uint32_t start);
 
 void draw_framed_panel_38be8(uint32_t id, uint32_t y, uint32_t x);
 
+void load_colour_table_107310(void);
+void release_locked_ranges_114ad8(void);
+
 #endif

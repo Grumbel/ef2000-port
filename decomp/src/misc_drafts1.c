@@ -9677,3 +9677,49 @@ void draw_framed_panel_38be8(uint32_t id, uint32_t y, uint32_t x)
     }
     leave_scroll_mode_c39ac();
 }
+
+/* 0x107310, 246 bytes. Load the 0x4000-byte colour table from the file named at 0x17d368: on first use allocate 0x10100 bytes (dword 0x4dd860, failure reported with 0x194c18), register the cleanup 0x1072f0 (0x9c3cf) and set the 256-aligned table base words 0x164604/0x164608; then fill the first 0x4000 bytes with 64 identity ramps, build the path (0x9c9c0), size it with the hook at 0x132ab4 (above 0x4000 reported with 0x194c30), load it over the ramps with the hook at 0x132ab8, and duplicate the table to base + 0x4000 and then the first 0x8000 bytes to base + 0x8000. */
+void load_colour_table_107310(void)
+{
+    char path[0x50];
+    uint32_t p = (uint32_t)(uintptr_t)path;
+    uint32_t base;
+    uint32_t blk;
+    uint32_t i;
+    if (EF_U32(0x004dd860u) == 0u) {
+        EF_U32(0x004dd860u) = guest_fn_c3f70(0x10100u);
+        if (EF_U32(0x004dd860u) == 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x00194c18u);
+        guest_fn_9c3cf(0x001072f0u);
+        EF_U32(0x00164604u) = (EF_U32(0x004dd860u) + 0xffu) & 0xffffff00u;
+        EF_U32(0x00164608u) = EF_U32(0x00164604u);
+    }
+    base = EF_U32(0x00164604u);
+    for (blk = base; blk != base + 0x4000u; blk += 0x100u)
+        for (i = 0u; i < 0x100u; i++)
+            EF_U8(blk + i) = (uint8_t)i;
+    build_path_9c9c0(p, 0x0017d368u);
+    if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), p) > 0x4000u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00194c30u);
+    guest_callptr_eaxedx_ret_x(EF_U32(0x00132ab8u), p, base);
+    for (i = 0u; i < 0x4000u; i++)
+        EF_U8(base + 0x4000u + i) = EF_U8(base + i);
+    (void)memcpy_dc832(EF_U32(0x00164604u) + 0x8000u, EF_U32(0x00164604u), 0x8000u);
+}
+
+/* 0x114ad8, 244 bytes. Release state when dword 0x17e25c is set: unregister the range 0x111c90..0x114ad8 (0x1048b4), unlock the data blocks 0x17e1d8 (0x80 bytes) and the 4-byte cells 0x17e258, 0x4ddccc, 0x4ddcd0, 0x4ddcd8, 0x4ddcdc, 0x4ddcb8, 0x4ddcbc, 0x4ddcb4, 0x4ddcc0, 0x4ddcc8, 0x4ddcc4 and 0x4ddcb0 (0x104920), then clear the flag. */
+void release_locked_ranges_114ad8(void)
+{
+    static const uint32_t cell[12] = {
+        0x0017e258u, 0x004ddcccu, 0x004ddcd0u, 0x004ddcd8u, 0x004ddcdcu, 0x004ddcb8u,
+        0x004ddcbcu, 0x004ddcb4u, 0x004ddcc0u, 0x004ddcc8u, 0x004ddcc4u, 0x004ddcb0u
+    };
+    uint32_t i;
+    if (EF_U32(0x0017e25cu) == 0u)
+        return;
+    guest_fn_1048b4(0x00111c90u, 0x00114ad8u);
+    guest_fn_104920(0x0017e1d8u, 0x80u);
+    for (i = 0u; i < 12u; i++)
+        guest_fn_104920(cell[i], 4u);
+    EF_U32(0x0017e25cu) = 0u;
+}

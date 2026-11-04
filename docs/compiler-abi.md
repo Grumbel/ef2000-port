@@ -7085,3 +7085,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x38be8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 22f28@2300f | Draw the framed text panel for slot ID (AX, signed), vertical position Y (EDX) and X (EBX): fetch the panel image of the |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x107310` | none | none | dbff8@dc07f,e3ffc@e4009 | Load the 0x4000-byte colour table from the file named at 0x17d368: on first use allocate 0x10100 bytes (dword 0x4dd860,  |
+| `0x114ad8` | none | none | none direct | Release state when dword 0x17e25c is set: unregister the range 0x111c90..0x114ad8 (0x1048b4), unlock the data blocks 0x1 |
