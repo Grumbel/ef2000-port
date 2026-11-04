@@ -3886,7 +3886,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010535c	747			unknown	unclassified	unverified		
 0x00105648	499			unknown	unclassified	unverified		
 0x0010585c	1079			unknown	unclassified	unverified		
-0x00105c94	266			unknown	unclassified	unverified		
+0x00105c94	266	apply_defaults_105c94	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00105c94.json	docs/compiler-abi.md; Fill negative fields of a 24-byte block from defaults, store it, send message 0x304.; callers 105e38@105f61,105e38@105fae,105e38@106033; guest pending
 0x00105da0	149	destroy_sound_object_105da0	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00105da0.json	docs/compiler-abi.md; Destroy a sound object: if it was started, stop it, clear its buffer, run 0x117a0f twice, trace 0xa; then trace its fiel; callers none direct; guest pending
 0x00105e38	1580			unknown	unclassified	unverified		
 0x00106464	115	load_resource_106464	trace_loaders1	compiles	game	confirmed	decomp/tests/0x00106464.json	docs/compiler-abi.md; Load and parse a resource by name; on a missing file install the 23-byte default block at 0x194a04.; callers 102508@102534; guest pending

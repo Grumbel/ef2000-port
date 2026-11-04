@@ -23726,3 +23726,47 @@ double record_term_2ccf0(uint32_t sel, uint32_t idx, uint32_t u2, uint32_t u3, d
 	}
 	return acc * md_rd_f64(0x00182582u);
 }
+
+/* 0x105c94, 266 bytes. Fill negative fields of a 24-byte block from defaults, store it, send message 0x304. */
+void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 pobj, ef_addr32 src)
+{
+	uint16_t w[4];
+	uint32_t d[4];
+	uint32_t blk[3];
+	uint8_t buf[24];
+	ef_addr32 a;
+	ef_addr32 base;
+	uint32_t v;
+	uint32_t i;
+	uint32_t obj;
+
+	(void)u0;
+	(void)u1;
+	(void)u2;
+	(void)u3;
+	memcpy(buf, ef_guest_memory_ptr(src), 24);
+	memcpy(w, buf, 8);
+	memcpy(d, buf + 8, 16);
+	a = EF_U32(EF_U32(pobj) + 0x10u);
+	if (EF_U16(a + 0x10u) != 0) {
+		v = EF_U32(a + 0xcu);
+		base = (v & 0xffffu) + ((v >> 16) << 4) + EF_U32(0x00120cc6u);
+		for (i = 0; i < 4; i++) {
+			if ((int16_t)w[i] < 0) {
+				w[i] = EF_U16(base + 2u * i);
+			}
+		}
+		for (i = 0; i < 4; i++) {
+			if ((int32_t)d[i] < 0) {
+				d[i] = EF_U32(base + 8u + 4u * i);
+			}
+		}
+	}
+	memcpy(buf, w, 8);
+	memcpy(buf + 8, d, 16);
+	memcpy(ef_guest_memory_ptr(EF_U32(EF_U32(pobj) + 0x10u) + 0x16u), buf, 24);
+	memset(blk, 0, sizeof(blk));
+	obj = EF_U32(pobj);
+	blk[1] = ((EF_U32(0x004dd7f0u) == 0 ? 1u : 3u) << 16) | (blk[1] & 0xffffu);
+	guest_fn_101f88(obj, 0x304u, (ef_addr32)(uintptr_t)blk, 0);
+}

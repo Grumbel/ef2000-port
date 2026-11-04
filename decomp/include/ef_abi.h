@@ -6543,4 +6543,7 @@ void accum_depth_force_11a5c0(ef_addr32 obj); /* 0x11a5c0 */
 double record_term_2ccf0(uint32_t sel, uint32_t idx, uint32_t u2, uint32_t u3, double a, double b);
 double record_term_2ccf0(uint32_t sel, uint32_t idx, uint32_t u2, uint32_t u3, double a, double b); /* 0x2ccf0 */
 
+void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 pobj, ef_addr32 src);
+void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 pobj, ef_addr32 src); /* 0x105c94 */
+
 #endif
