@@ -5739,4 +5739,6 @@ void derive_view_angles_e9dcc(void);
 void derive_view_angles_e9f84(void);
 double guest_fn_deb1a_x(double x); /* 0xdeb1a ST0 -> ST0, arcsine */
 
+void draw_status_overlay_59334(void);
+
 #endif

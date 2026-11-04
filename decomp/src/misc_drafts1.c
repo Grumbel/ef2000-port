@@ -14577,3 +14577,30 @@ void derive_view_angles_e9f84(void)
     r = guest_fn_deb1a_x(-v);
     memcpy(ef_guest_memory_ptr(0x00432298u), &r, sizeof r);
 }
+
+/* 0x59334, 234 bytes. Status overlay: unless word 0x126516 is set, latch the full screen (0xcdf48 with 0..width-1, 0..height-1), print the dword 0x197238 with format 0x185e48 (0x185e54 when byte 0x197255 is set) at (0, 0xaa), then, with byte 0x127b1a set, either the scaled double (0x1a3078 * 0x185e78, format 0x185e60) when the double 0x1a30a8 is below 1.0, or 0x1a30a8 itself (format 0x185e6c), together with the string 0x12f43e at (0, 0xb4). */
+void draw_status_overlay_59334(void)
+{
+    char buf[64];
+    double lim, a, b, v;
+    if (EF_U16(0x00126516u) != 0u)
+        return;
+    guest_fn_cdf48(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    if (EF_U8(0x00197255u) == 0u)
+        guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185e48u, EF_U32(0x00197238u));
+    else
+        guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185e54u, EF_U32(0x00197238u));
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(0xfu, 0, 0xaa, (ef_addr32)(uintptr_t)buf);
+    memcpy(&lim, ef_guest_memory_ptr(0x001a30a8u), sizeof lim);
+    if (1.0 > lim) {
+        memcpy(&a, ef_guest_memory_ptr(0x001a3078u), sizeof a);
+        memcpy(&b, ef_guest_memory_ptr(0x00185e78u), sizeof b);
+        v = a * b;
+        guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185e60u, 0x0012f43eu, v);
+    } else {
+        guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185e6cu, 0x0012f43eu, lim);
+    }
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(0xfu, 0, 0xb4, (ef_addr32)(uintptr_t)buf);
+}

@@ -8049,3 +8049,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe9f84` | none | none | e9c00@e9c45 | Second set of view angles (sibling of 0xe9dcc): 0x4321f8 = atan2(double 0x4644b8, double 0x4644c0), 0x432230 = atan2(dou |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x59334` | none | none | none direct | Status overlay: unless word 0x126516 is set, latch the full screen (0xcdf48 with 0..width-1, 0..height-1), print the dwo |
