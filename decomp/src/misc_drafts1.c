@@ -5037,3 +5037,43 @@ void draw_tactical_header_3b58(void)
     EF_U8(0x00127b1au) = 1u;
     draw_shadowed_text_48c90(7u, (int16_t)(0x13bu - w), 0x12, b);
 }
+
+/* 0x45574, 285 bytes. Run the enabled stages of the cockpit update for the view object A (EAX) with the secondary values S (EDX) and B (EBX): nothing happens unless one of the words 0x126554/56/58 is set; then each stage word (0x126560, 62, 64, 66, 5e, 5a, 5c) enables its group of 0x43xxx/0x44xxx/0x45xxx routines. */
+void update_view_stages_45574(uint32_t a, uint32_t s, uint32_t b)
+{
+    if (EF_U16(0x00126554u) == 0u && EF_U16(0x00126556u) == 0u && EF_U16(0x00126558u) == 0u)
+        return;
+    if (EF_U16(0x00126560u) != 0u) {
+        guest_fn_447ec_x(a, s);
+        guest_fn_44c68_x(a, s);
+        guest_fn_453f4_x(a, s);
+    }
+    if (EF_U16(0x00126562u) != 0u) {
+        guest_fn_43f48_x(a, b);
+        guest_fn_44f68_x(a, s);
+    }
+    if (EF_U16(0x00126564u) != 0u) {
+        guest_fn_450f4_x(a, s);
+        guest_fn_44aec_x(a, s);
+        guest_fn_4496c_x(a, s);
+    }
+    if (EF_U16(0x00126566u) != 0u) {
+        guest_fn_44de8_x(a, s);
+        guest_fn_443fc_x(a, s);
+    }
+    if (EF_U16(0x0012655eu) != 0u) {
+        guest_fn_436dc_x(a, b);
+        guest_fn_43b14_x(a, b);
+        guest_fn_45274_x(a, s);
+    }
+    if (EF_U16(0x0012655au) != 0u) {
+        guest_fn_4357c_x(a, b);
+        guest_fn_44aec_x(a, s);
+    }
+    if (EF_U16(0x0012655cu) != 0u) {
+        guest_fn_433fc_x(a, b);
+        guest_fn_43c84_x(a, b);
+        guest_fn_43df4_x(a, b);
+        guest_fn_441fc_x(a, s);
+    }
+}

@@ -797,7 +797,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000450f4	382	draw_hotspots_450f4	hotspot_draw	compiles	game	confirmed	decomp/tests/0x000450f4.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x5.; callers 45574@455eb; guest pending
 0x00045274	382	draw_hotspots_45274	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00045274.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x49.; callers 45574@4563e,4bf1c@4bfe3; guest pending
 0x000453f4	382	draw_hotspots_453f4	hotspot_draw	compiles	game	confirmed	decomp/tests/0x000453f4.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x4f.; callers 45574@455bc,4bf1c@4bf8e; guest pending
-0x00045574	285			unknown	unclassified	unverified		
+0x00045574	285	update_view_stages_45574	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00045574.json	docs/compiler-abi.md; Run the enabled stages of the cockpit update for the view object A (EAX) with the secondary values S (EDX) and B (EBX): ; callers 426a4@426d6; guest pending
 0x00045694	82	reset_words_45694	game_helpers8	compiles	game	confirmed	decomp/tests/0x00045694.json	docs/compiler-abi.md; ; callers bfcc@c0cd; guest pending
 0x000456e8	625			unknown	unclassified	unverified		
 0x0004595c	245	GenGUIHelp		named	unclassified	unverified		

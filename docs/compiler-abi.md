@@ -6122,3 +6122,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x3b58` | none | none | 3dd30@3e30b | Draw the three status lines of the tactical header: the caption 0x1320d7 (colour 12, x = 0x112, y = 1), the target/mode  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x45574` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 426a4@426d6 | Run the enabled stages of the cockpit update for the view object A (EAX) with the secondary values S (EDX) and B (EBX):  |

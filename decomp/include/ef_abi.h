@@ -4900,4 +4900,26 @@ void draw_tactical_header_3b58(void);
 void guest_fn_3ea8_x(void); /* 0x3ea8 */
 void guest_fn_a4342_va(ef_addr32 dest, ef_addr32 format, ...); /* 0xa4342 cdecl, variadic */
 
+void update_view_stages_45574(uint32_t a, uint32_t s, uint32_t b);
+
+
+void guest_fn_433fc_x(uint32_t a, uint32_t b); /* 0x433fc EAX/EDX */
+void guest_fn_4357c_x(uint32_t a, uint32_t b); /* 0x4357c EAX/EDX */
+void guest_fn_436dc_x(uint32_t a, uint32_t b); /* 0x436dc EAX/EDX */
+void guest_fn_43b14_x(uint32_t a, uint32_t b); /* 0x43b14 EAX/EDX */
+void guest_fn_43c84_x(uint32_t a, uint32_t b); /* 0x43c84 EAX/EDX */
+void guest_fn_43df4_x(uint32_t a, uint32_t b); /* 0x43df4 EAX/EDX */
+void guest_fn_43f48_x(uint32_t a, uint32_t b); /* 0x43f48 EAX/EDX */
+void guest_fn_441fc_x(uint32_t a, uint32_t b); /* 0x441fc EAX/EDX */
+void guest_fn_443fc_x(uint32_t a, uint32_t b); /* 0x443fc EAX/EDX */
+void guest_fn_447ec_x(uint32_t a, uint32_t b); /* 0x447ec EAX/EDX */
+void guest_fn_4496c_x(uint32_t a, uint32_t b); /* 0x4496c EAX/EDX */
+void guest_fn_44aec_x(uint32_t a, uint32_t b); /* 0x44aec EAX/EDX */
+void guest_fn_44c68_x(uint32_t a, uint32_t b); /* 0x44c68 EAX/EDX */
+void guest_fn_44de8_x(uint32_t a, uint32_t b); /* 0x44de8 EAX/EDX */
+void guest_fn_44f68_x(uint32_t a, uint32_t b); /* 0x44f68 EAX/EDX */
+void guest_fn_450f4_x(uint32_t a, uint32_t b); /* 0x450f4 EAX/EDX */
+void guest_fn_45274_x(uint32_t a, uint32_t b); /* 0x45274 EAX/EDX */
+void guest_fn_453f4_x(uint32_t a, uint32_t b); /* 0x453f4 EAX/EDX */
+
 #endif
