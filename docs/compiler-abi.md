@@ -8208,3 +8208,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x35590` | none | none | none direct | Menu-screen state machine in byte 0x19f5a7, the client twin of 0x36f84. Stores word 0x1357ac - 3 in word 0x125900, updat |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x36ad8` | none | none | 35590@355cb | Transfer-side connection state machine in byte 0x19f5a9 (states 2..11 through a jump table; 6 and 8 do nothing). 2 recom |

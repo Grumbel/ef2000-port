@@ -15707,3 +15707,83 @@ void step_menu_screen_35590(void)
 		}
 	}
 }
+
+/* 0x36ad8, 564 bytes. Transfer-side connection state machine in byte 0x19f5a9 (states 2..11 through a jump table; 6 and 8 do nothing). 2 recomputes the total (0xa4030), processes the packets (0x3527c) and moves to 3 once byte 0x19f59f is set; 3 sends request 0x47 and moves to 5; 4 recomputes, processes the packets and, when byte 0x19f59f is exactly 1, moves to 7, writes the received block to the handle in dword 0x19f35c (0xa7a1c; length dword 0x19f33c, buffer dword 0x19f354), adds the length to dword 0x19f32c, resets the transfer state (0x35528) and rescales the progress widgets (0x35de0) by 0x19f32c / dword 0x19f344; 5 resets the transfer state, clears word 0x19f592, goes to 4 and sets word 0x19f586 = 2; 7 sends request 0x48 and moves to 4; 9 clears the progress (0x35de0 with 0), closes the handle in dword 0x19f35c (0xa7990) when byte 0x19f59e is set, then starts the retry timer exactly as 0x367f0; 10 is the retry step of 0x367f0; 11 resets the state, byte 0x19f5a1, copies 0x19f5a0 to 0x19f5a7 and refreshes the buttons (0x369ac). The state widget is refreshed (0x36340) when the state or byte 0x19f598 changed. */
+void step_transfer_36ad8(void)
+{
+	uint8_t state = EF_U8(0x0019f5a9u);
+	uint8_t flag = EF_U8(0x0019f598u);
+	uint32_t r;
+	double ratio, d;
+
+	switch (state) {
+	case 2:
+		recompute_total_a4030();
+		process_packets_3527c();
+		if (EF_U8(0x0019f59fu) != 0u)
+			EF_U8(0x0019f5a9u) = 3u;
+		break;
+	case 3:
+		send_key_request_35220(0x47u);
+		EF_U8(0x0019f5a9u) = 5u;
+		break;
+	case 4:
+		recompute_total_a4030();
+		process_packets_3527c();
+		if (EF_U8(0x0019f59fu) == 1u) {
+			EF_U8(0x0019f5a9u) = 7u;
+			guest_fn_a7a1c(EF_U32(0x0019f35cu), EF_U32(0x0019f33cu), EF_U32(0x0019f354u));
+			EF_U32(0x0019f32cu) += EF_U32(0x0019f33cu);
+			reset_state_35528();
+			ratio = (double)(int32_t)EF_U32(0x0019f32cu) / (double)(int32_t)EF_U32(0x0019f344u);
+			rescale_dialog_widgets_35de0(0u, 0u, 0u, 0u, ratio);
+		}
+		break;
+	case 5:
+		reset_state_35528();
+		EF_U16(0x0019f592u) = 0u;
+		EF_U8(0x0019f5a9u) = 4u;
+		EF_U16(0x0019f586u) = 2u;
+		break;
+	case 7:
+		send_key_request_35220(0x48u);
+		EF_U8(0x0019f5a9u) = 4u;
+		break;
+	case 9:
+		d = 0.0;
+		rescale_dialog_widgets_35de0(0u, 0u, 0u, 0u, d);
+		if (EF_U8(0x0019f59eu) != 0u) {
+			EF_U8(0x0019f59eu) = 0u;
+			guest_fn_a7990(EF_U32(0x0019f35cu));
+		}
+		EF_U8(0x0019f5a9u) = 0xau;
+		EF_U16(0x0019f58eu) = 10u;
+		EF_U32(0x0019f338u) = guest_read_runtime_tick();
+		r = guest_fn_a45b3() & 0xffffu;
+		EF_U32(0x0019f328u) = r % 10u + 0x12u;
+		send_key_request_35220(0x46u);
+		break;
+	case 10:
+		recompute_total_a4030();
+		if (guest_read_runtime_tick() - EF_U32(0x0019f338u) > EF_U32(0x0019f328u)) {
+			EF_U32(0x0019f338u) = guest_read_runtime_tick();
+			r = guest_fn_a45b3() & 0xffffu;
+			EF_U32(0x0019f328u) = r % 10u + 0x12u;
+			send_key_request_35220(0x46u);
+			EF_U16(0x0019f58eu) = (uint16_t)(EF_U16(0x0019f58eu) - 1u);
+			if (EF_U16(0x0019f58eu) == 0u)
+				EF_U8(0x0019f5a9u) = 0xbu;
+		}
+		break;
+	case 11:
+		EF_U8(0x0019f5a9u) = 0u;
+		EF_U8(0x0019f5a1u) = 0u;
+		EF_U8(0x0019f5a7u) = EF_U8(0x0019f5a0u);
+		set_buttons_369ac();
+		break;
+	default:
+		break;
+	}
+	if (state != EF_U8(0x0019f5a9u) || flag != EF_U8(0x0019f598u))
+		enable_state_widget_36340();
+}
