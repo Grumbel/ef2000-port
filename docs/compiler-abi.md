@@ -8214,3 +8214,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x36ad8` | none | none | 35590@355cb | Transfer-side connection state machine in byte 0x19f5a9 (states 2..11 through a jump table; 6 and 8 do nothing). 2 recom |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x36d30` | none | none | 36f84@36fc3 | Host-lobby state machine in byte 0x19f5aa (states 1..9 through a jump table; 2, 3 and 4 do nothing). 1 -> 5; 5 marks the |

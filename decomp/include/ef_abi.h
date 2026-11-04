@@ -5815,4 +5815,6 @@ void guest_fn_36ad8_x(void); /* 0x36ad8 */
 
 void step_transfer_36ad8(void);
 
+void step_lobby_36d30(void);
+
 #endif
