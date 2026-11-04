@@ -9554,3 +9554,54 @@ void handle_event_record_a348c(uint32_t index)
         return;
     }
 }
+
+/* 0x7a194, 251 bytes. Full-screen choice prompt: clip to the screen (0xce328, 0xcdf48), draw the page chosen by byte 0x125846 (1: 0x12aeb8, 2: 0x12aef0, else 0x12af28) with 0x79ff0, then wait for a key code in byte 0x41f833 (reset to 0 before every wait): 0x01 or 0x2e gives 0, 0x10 gives 1, 0x12 gives 3 unless 0x125846 is 1, 0x1e gives 3 only when 0x125846 is 1; any other key is ignored. Returns the choice in AL. */
+uint32_t run_choice_prompt_7a194(void)
+{
+    uint8_t result = 0u;
+    uint8_t done = 0u;
+    uint32_t w = EF_U32(0x0015b744u) - 1u;
+    uint32_t h = EF_U32(0x0015b748u) - 1u;
+    uint32_t page;
+    uint8_t key;
+    latch_values_ce328(0u, w, 0u, h);
+    guest_fn_cdf48(0u, w, 0u, h);
+    if (EF_U8(0x00125846u) == 1u)
+        page = 0x0012aeb8u;
+    else if (EF_U8(0x00125846u) == 2u)
+        page = 0x0012aef0u;
+    else
+        page = 0x0012af28u;
+    (void)guest_fn_79ff0(page);
+    while (!done) {
+        EF_U8(0x0041f833u) = 0u;
+        do {
+            key = EF_U8(0x0041f833u);
+        } while (key == 0u);
+        switch (key) {
+        case 0x01: case 0x2e:
+            done = 1u;
+            result = 0u;
+            break;
+        case 0x12:
+            if (EF_U8(0x00125846u) != 1u) {
+                done = 1u;
+                result = 3u;
+            }
+            break;
+        case 0x1e:
+            if (EF_U8(0x00125846u) == 1u) {
+                done = 1u;
+                result = 3u;
+            }
+            break;
+        case 0x10:
+            done = 1u;
+            result = 1u;
+            break;
+        default:
+            break;
+        }
+    }
+    return result;
+}

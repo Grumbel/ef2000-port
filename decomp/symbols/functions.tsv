@@ -1438,7 +1438,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000799d4	835			unknown	unclassified	unverified		
 0x00079d18	719			unknown	unclassified	unverified		
 0x00079ff0	420			unknown	unclassified	unverified		
-0x0007a194	251			unknown	unclassified	unverified		
+0x0007a194	251	run_choice_prompt_7a194	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007a194.json	docs/compiler-abi.md; Full-screen choice prompt: clip to the screen (0xce328, 0xcdf48), draw the page chosen by byte 0x125846 (1: 0x12aeb8, 2:; callers 7a290@7a290; guest pending
 0x0007a290	8	low_byte_7a290	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0007a290.json	docs/compiler-abi.md; Low byte of 0x7a194's result.; callers 19a80@19a86; guest pending
 0x0007a298	10	call_79ff0_12af60	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007a298.json	docs/compiler-abi.md; tail 0x79ff0 with EAX=0x12af60; callers 3dd30@3e877; guest pending
 0x0007a38c	24	register_handler_7a38c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0007a38c.json	docs/compiler-abi.md; Register the 0x7a2b0 handler and remember 0x7a338.; callers 3ea0c@3ee46; guest pending

@@ -7067,3 +7067,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa348c` | EAX:uint32_t | none | a410c@a3591 | Handle the event record INDEX (EAX; low 16 bits index the 32-byte records at 0x135878) by the type in the low nibble of  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7a194` | none | EAX:uint32_t | 7a290@7a290 | Full-screen choice prompt: clip to the screen (0xce328, 0xcdf48), draw the page chosen by byte 0x125846 (1: 0x12aeb8, 2: |
