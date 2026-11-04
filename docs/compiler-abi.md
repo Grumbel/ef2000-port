@@ -7871,3 +7871,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x83200` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | 83708@8370b | Convert the world point (EDX, EBX, ECX) to camera-relative 8.8 fixed point for OUT (EAX): subtract the camera dwords 0x1 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x89b58` | EAX:ef_addr32 | AL:uint8_t | 89ac0@89ad5 | Is the unit U (EAX) still pointing at its target? Take the target word at [[U+0x30]+0x4b] (0 gives 0), convert the navig |

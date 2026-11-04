@@ -13504,3 +13504,27 @@ void to_camera_space_83200(ef_addr32 out, int32_t x, int32_t y, int32_t z)
                       (uint32_t)((dy + (int32_t)EF_U32(0x001fcc18u)) << 8),
                       (uint32_t)((dx + (int32_t)EF_U32(0x001fcc14u)) << 8), out);
 }
+
+/* 0x89b58, 151 bytes. Is the unit U (EAX) still pointing at its target? Take the target word at [[U+0x30]+0x4b] (0 gives 0), convert the navigation vector with 0x8fa58, subtract it from 0x1fcf58, normalise and compare the angle to the aim vector 0x1fcfd8 against the double at 0x12bcd5 + 145 * (byte U+0x18) scaled by 0x18a5c0 and 0x18a5c8. A degenerate vector counts as aligned (1); within the limit returns 1; outside it clears byte U+0x59 and returns 0. */
+uint8_t still_aligned_89b58(ef_addr32 u)
+{
+    uint8_t v0[0x18];
+    uint8_t v1[0x18];
+    uint8_t v2[0x18];
+    ef_addr32 t = EF_U32(EF_U32(u + 0x30u) + 0x4bu);
+    double k1, k2, lim;
+    if (t == 0u)
+        return 0u;
+    guest_fn_8fa58_x(t, (ef_addr32)(uintptr_t)v0, (ef_addr32)(uintptr_t)v0);
+    subtract_scene_vectors((ef_addr32)(uintptr_t)v2, 0x001fcf58u, (ef_addr32)(uintptr_t)v0);
+    if (normalize_vector_b4424((ef_addr32)(uintptr_t)v1, (ef_addr32)(uintptr_t)v2) == 0u)
+        return 1u;
+    memcpy(&lim, ef_guest_memory_ptr(0x0012bcd5u + (uint32_t)EF_U8(u + 0x18u) * 145u), sizeof lim);
+    memcpy(&k1, ef_guest_memory_ptr(0x0018a5c0u), sizeof k1);
+    memcpy(&k2, ef_guest_memory_ptr(0x0018a5c8u), sizeof k2);
+    lim = lim * k1 * k2;
+    if (angle_between_88ff8(0x001fcfd8u, (ef_addr32)(uintptr_t)v1) < lim)
+        return 1u;
+    EF_U8(u + 0x59u) = 0u;
+    return 0u;
+}
