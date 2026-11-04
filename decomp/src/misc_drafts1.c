@@ -19797,3 +19797,65 @@ void register_update_message_80b14(ef_addr32 p)
 	EF_U16(ent + 4u) = (uint16_t)(((int32_t)idx + 1) % 16);
 	EF_U16(ent + 8u) = EF_U16(p + 0xeu);
 }
+
+/* 0x49e00, 294 bytes. Rebuild the word map at 0x1a5290. In mode 1 (byte 0x125849) clear 0x20 bytes, then for each of the (word 0x1357b0) entries store its 1-based number at the slot given by the sum of the first B[0x19bbf2+i] words of 0x1a53b0 plus B[0x19bbfa+i]. Otherwise walk the record list 0x137960 (node selected by the high word of 0x125833): for each group, a flagged group (byte at P[0x13] + 0x7c * group) is zero filled for W[0x1a53b0+2*group] slots, an unflagged group is filled with the running number 1, 2, ... (zero once it exceeds word 0x1357b0). Registers are preserved. */
+void rebuild_word_map_49e00(void)
+{
+	int16_t si, cx, ax, dx, bx;
+	int32_t acc, n;
+	ef_addr32 p;
+
+	if (EF_U8(0x00125849u) == 1u) {
+		fill_bytes_b3fb0(0x001a5290u, 0u, 0x20u);
+		n = (int16_t)EF_U16(0x001357b0u);
+		si = 0;
+		if (n <= 0)
+			return;
+		do {
+			acc = 0;
+			ax = 0;
+			while (ax < (int16_t)EF_U8(0x0019bbf2u + (uint32_t)(int32_t)si)) {
+				acc += EF_U16(0x001a53b0u + (uint32_t)(int32_t)ax * 2u);
+				ax++;
+			}
+			acc += EF_U8(0x0019bbfau + (uint32_t)(int32_t)si);
+			dx = (int16_t)acc;
+			EF_U16(0x001a5290u + (uint32_t)(int32_t)dx * 2u) = (uint16_t)(si + 1);
+			si++;
+		} while (si < (int16_t)EF_U16(0x001357b0u));
+		return;
+	}
+	p = list_nth(0x00137960u, (uint32_t)((int32_t)EF_U32(0x00125833u) >> 16));
+	ax = 0;
+	cx = 0;
+	bx = 1;
+	for (;;) {
+		if (EF_U8(EF_U32(p + 0x13u) + (uint32_t)((int32_t)cx * 0x7c)) != 0u) {
+			dx = 0;
+			while (dx < (int16_t)EF_U16(0x001a53b0u + (uint32_t)(int32_t)cx * 2u)) {
+				EF_U16(0x001a5290u + (uint32_t)(int32_t)ax * 2u) = 0u;
+				ax++;
+				dx++;
+			}
+			cx++;
+			continue;
+		}
+		if (cx >= (int16_t)EF_U8(p + 0x12u))
+			return;
+		dx = 0;
+		while (dx < (int16_t)EF_U16(0x001a53b0u + (uint32_t)(int32_t)cx * 2u)) {
+			if (bx > (int16_t)EF_U16(0x001357b0u)) {
+				EF_U16(0x001a5290u + (uint32_t)(int32_t)ax * 2u) = 0u;
+				ax++;
+			} else {
+				EF_U16(0x001a5290u + (uint32_t)(int32_t)ax * 2u) = (uint16_t)bx;
+				ax++;
+				bx++;
+			}
+			dx++;
+		}
+		cx++;
+		if (cx >= (int16_t)EF_U8(p + 0x12u))
+			return;
+	}
+}

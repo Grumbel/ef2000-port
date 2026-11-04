@@ -6053,4 +6053,6 @@ uint32_t guest_fn_bdeec_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x
 
 void register_update_message_80b14(ef_addr32 p);
 
+void rebuild_word_map_49e00(void);
+
 #endif

@@ -843,7 +843,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00049bdc	245	rebuild_group_tables_49bdc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00049bdc.json	docs/compiler-abi.md; Rebuild the group tables from the list node reached by following the next links (+4) of P up to the word 0x125835 times:; callers 49228@49939,49228@499f9; guest pending
 0x00049cd4	86	copy_row_words_49cd4	game_helpers30	compiles	game	confirmed	decomp/tests/0x00049cd4.json	docs/compiler-abi.md; Copy the row words selected by an object's count into the 0x1a5280 list.; callers 49bdc@49c4c; guest pending
 0x00049d2c	210	seek_segment_49d2c	game_helpers44	compiles	game	confirmed	decomp/tests/0x00049d2c.json	docs/compiler-abi.md; Walk the segment list to the node holding the budget in 0x1a666b.; callers 357ec@35852; guest pending
-0x00049e00	294			unknown	unclassified	unverified		
+0x00049e00	294	rebuild_word_map_49e00	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00049e00.json	docs/compiler-abi.md; Rebuild the word map at 0x1a5290. In mode 1 (byte 0x125849) clear 0x20 bytes, then for each of the (word 0x1357b0) entri; callers 49228@49947; guest pending
 0x00049f28	171	grid_cell_word_49f28	game_helpers44	compiles	game	confirmed	decomp/tests/0x00049f28.json	docs/compiler-abi.md; Look up a word of the unit record owning grid cell (a, b); abort on a bad cell.; callers 49228@4988b,49228@4990d,49228@49970; guest pending
 0x00049fd4	237	assign_group_slots_49fd4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00049fd4.json	docs/compiler-abi.md; For every member I (byte +0x12 of the group record P = EAX) look up the object index in the row table at 0x1fcb40 (rows ; callers 49228@49799; guest pending
 0x0004a210	2020			unknown	unclassified	unverified		

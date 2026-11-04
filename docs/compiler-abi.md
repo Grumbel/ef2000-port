@@ -8795,3 +8795,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x80b14` | EAX:ef_addr32 | none | 8846c@88529,8d3d4@8d523 | Register the update message P (EAX) in the 16-entry table at 0x1fc8a2 (12-byte entries keyed by word P[0] % 16): when th |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x49e00` | none | none | 49228@49947 | Rebuild the word map at 0x1a5290. In mode 1 (byte 0x125849) clear 0x20 bytes, then for each of the (word 0x1357b0) entri |
