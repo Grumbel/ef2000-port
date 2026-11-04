@@ -3778,3 +3778,15 @@ in EAX, format string address, one value).
 | `0xa334c` | AX:uint16_t | none | a33a4@a33da | Request the details of an entry when its table flag is set. |
 | `0xa5abc` | none | none | ac240@ac2cb | Run and clear the pending callbacks of every registered widget. |
 | `0xa9490` | EAX:ef_addr32,DX:int16_t | none | a94e4@a9505,a94e4@a9530,a94e4@a959a | Step a list cursor n rows forward and latch the result. |
+
+## leaf_helpers5 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa2948` | AL:uint8_t | AL:uint8_t | a29cc@a29da | Probe the data file; returns a status code (8, 9, 0xc or 0). |
+| `0xabc34` | none | none | ac5f8@ac706 | Re-label the named widget when its owner record changed. |
+| `0xabc98` | none | none | 84afc@84afc,ac408@ac556 | Draw the named widget's label and activate its page. |
+| `0xd7b6c` | none | none | d86e0@d87e6,d8fd8@d911f | Initialise the camera table from the mode handle, or copy the default. |
+| `0xd9c30` | none | EAX:uint32_t | e9ac0@e9af3 | Open the stream in either format; 0 on success, 1 on failure. |
+| `0xd9dc0` | none | none | d9cb4@d9ccb | Read the stream header and latch the heading and position values. |
+| `0xe5088` | none | none | 42b04@42b1c,4bec0@4bed6,4e80c@4e815 | Draw the active unit's marker, then flag it as refreshed. |

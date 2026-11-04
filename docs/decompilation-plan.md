@@ -1147,6 +1147,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  136  Drafted and Watcom-compiled 15 more functions in leaf_helpers2 (1818 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  137  Drafted and Watcom-compiled 10 more functions in leaf_helpers3 (1828 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  138  Drafted and Watcom-compiled 10 more functions in leaf_helpers4 (1838 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  139  Drafted and Watcom-compiled 7 more functions in leaf_helpers5 (1845 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---

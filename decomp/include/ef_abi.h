@@ -3299,4 +3299,24 @@ void guest_fn_ac408_w(uint32_t text); /* 0xac408 EAX */
 uint32_t guest_fn_ac5f8_w(uint32_t a); /* 0xac5f8 EAX -> EAX */
 void guest_fn_e9a24_w(uint32_t a, uint32_t b); /* 0xe9a24 cdecl */
 
+/* leaf_helpers5.c */
+uint8_t probe_data_file_a2948(uint8_t key);
+void relabel_named_widget_abc34(void);
+void draw_named_widget_abc98(void);
+void init_camera_table_d7b6c(void);
+uint32_t open_stream_formats_d9c30(void);
+void read_stream_header_d9dc0(void);
+void draw_active_marker_e5088(void);
+uint8_t guest_fn_e93dc_r(uint32_t a, uint32_t b); /* 0xe93dc EAX/EDX -> AL */
+uint32_t guest_fn_106be8_w(uint32_t a, uint32_t b, uint32_t c); /* 0x106be8 EAX/EDX/EBX -> EAX */
+uint8_t guest_fn_107004_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x107004 EAX/EDX/EBX/ECX -> AL */
+void guest_fn_10703c_w(uint32_t a); /* 0x10703c EAX */
+uint8_t guest_fn_106e2c_w(uint32_t a, uint32_t b, uint32_t c); /* 0x106e2c EAX/EDX/EBX -> AL */
+uint8_t guest_fn_107070_w(uint32_t a, uint32_t b); /* 0x107070 EAX/EDX -> AL */
+uint8_t guest_fn_106d34_w(uint32_t a, uint32_t b); /* 0x106d34 EAX/EDX -> AL */
+uint32_t guest_fn_106bfc_w(uint32_t a); /* 0x106bfc EAX -> EAX */
+void guest_fn_107060_w(uint32_t a); /* 0x107060 EAX */
+void guest_fn_e4c9c_w(ef_addr32 unit); /* 0xe4c9c EAX */
+void guest_fn_c91c8_w(uint32_t color, uint32_t x, uint32_t y, uint32_t x2); /* 0xc91c8 EAX/EDX/EBX/ECX */
+
 #endif
