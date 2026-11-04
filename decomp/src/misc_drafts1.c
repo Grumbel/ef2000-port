@@ -8410,3 +8410,19 @@ void set_params_and_run_c4654(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
     EF_U32(0x001590b0u) = a;
     guest_fn_e7a7c_x();
 }
+
+/* 0xc473c, 15 bytes. Implicit-register fragment (EAX = MARGIN word, ESI = x, EDI = y, EBP = z; params in that order): run the view-volume test 0xceb40 on the point and return its result halved. */
+uint32_t view_volume_half_c473c(uint32_t margin, uint32_t x, uint32_t y, uint32_t z)
+{
+    return point_in_view_volume_ceb40(0u, 0u, 0u, 0u, (int32_t)(margin & 0xffffu), (int32_t)z, (int32_t)y, (int32_t)x) >> 1;
+}
+
+/* 0x10e08d, 17 bytes. Implicit-register fragment (ESI = source words, EDI = destination, ECX = count; params in that order): split each source word into its low byte at DEST and its high byte at DEST + 4, advancing the destination by 8 per word. */
+void split_words_10e08d(uint32_t src, uint32_t dst, uint32_t count)
+{
+    uint32_t i;
+    for (i = 0; i < count; i++) {
+        EF_U8(dst + i * 8u) = EF_U8(src + i * 2u);
+        EF_U8(dst + i * 8u + 4u) = EF_U8(src + i * 2u + 1u);
+    }
+}

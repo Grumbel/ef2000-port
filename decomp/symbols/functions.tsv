@@ -2777,7 +2777,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c469b	33	copy_constants_c469b	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000c469b.json	docs/compiler-abi.md; Copy three constant dwords from the code area into the work area.; callers 39744@3975c; guest pending
 0x000c46bc	60			unknown	unclassified	unverified		
 0x000c46f8	67	project_if_outside_c46f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c46f8.json	docs/compiler-abi.md; Implicit-register fragment (EAX = MARGIN, EBX = vertex record pointer; params in that order). Remember the record in dwo; callers c680b@c6820,c73b0@c73b8,c73b0@c73c7; guest pending
-0x000c473c	15			unknown	unclassified	unverified		
+0x000c473c	15	view_volume_half_c473c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c473c.json	docs/compiler-abi.md; Implicit-register fragment (EAX = MARGIN word, ESI = x, EDI = y, EBP = z; params in that order): run the view-volume tes; callers 15be10@15be2e,160122@160147,160156@16017b; guest pending
 0x000c474c	9			unknown	unclassified	unverified		
 0x000c4755	136			unknown	unclassified	unverified		
 0x000c47e0	66	select_shade_table_c47e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c47e0.json	docs/compiler-abi.md; Select the shade table for table index EDI (implicit register): take the signed word 0x14fe58[index] >> 5 clamped to 0..; callers none direct; guest pending
@@ -4000,7 +4000,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010ddfc	47	count_matching_streams	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010ddfc.json	docs/compiler-abi.md; Count list entries (list at dword 0x485f9f) whose flags in +0xc match the mask; flush those with bit 0x10 in +0xd via 0x; callers 10f1bf@10f1e2; guest pending
 0x0010dfe0	12	field_10dfe0	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010dfe0.json	docs/compiler-abi.md; Dword +0x46c of the object pointed to by dword 0x120cc6.; callers eab44@eab47,eac48@eadfa; guest pending
 0x0010dfec	161			unknown	unclassified	unverified		
-0x0010e08d	17			unknown	unclassified	unverified		
+0x0010e08d	17	split_words_10e08d	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e08d.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source words, EDI = destination, ECX = count; params in that order): split each source; callers 10dfec@10e017,10dfec@10e039,10dfec@10e05b; guest pending
 0x0010e250	58			unknown	unclassified	unverified		
 0x0010e28a	107	round_double_to_int64_10e28a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e28a.json	docs/compiler-abi.md; Convert the positive double at P in place to a 64-bit integer: restore the hidden mantissa bit, shift left for large exp; callers ebea3@ebece; guest pending
 0x0010e2f5	106	u64_to_digits_10e2f5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e2f5.json	docs/compiler-abi.md; Convert the unsigned 64-bit value at VALUE_PTR to exactly N decimal digits (zero padded, high digits truncated) at BUF, ; callers 120560@120715; guest pending

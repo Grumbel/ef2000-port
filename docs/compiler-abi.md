@@ -6833,3 +6833,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc4654` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | none | b69c@b836,b69c@b8c5,b69c@b961 | Stack (ret 0xc): store the three arguments in dwords 0x1590b0 (first), 0x1590ac (second), 0x1590a8 (third) and run 0xe7a |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc473c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | 15be10@15be2e,160122@160147,160156@16017b | Implicit-register fragment (EAX = MARGIN word, ESI = x, EDI = y, EBP = z; params in that order): run the view-volume tes |
+| `0x10e08d` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 10dfec@10e017,10dfec@10e039,10dfec@10e05b | Implicit-register fragment (ESI = source words, EDI = destination, ECX = count; params in that order): split each source |

@@ -5205,4 +5205,7 @@ uint32_t checksum_bytes_fa2e4(uint32_t p, uint32_t count);
 void set_params_and_run_c4654(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a, uint32_t b, uint32_t c);
 void guest_fn_e7a7c_x(void); /* 0xe7a7c */
 
+uint32_t view_volume_half_c473c(uint32_t margin, uint32_t x, uint32_t y, uint32_t z);
+void split_words_10e08d(uint32_t src, uint32_t dst, uint32_t count);
+
 #endif
