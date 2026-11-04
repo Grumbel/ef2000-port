@@ -113,3 +113,24 @@ void select_page_9e3f8(uint32_t page)
     EF_U32(0x0041717cu) = entry;
     notify_tactical_action((int32_t)(int16_t)page, 0u);
 }
+
+/* 0x110790, 156 bytes. Load run-length palette blocks into the 768-byte table at 0x4dd9b0: a count byte, then per block a start delta and an entry count (0 means 256) followed by 3 bytes per entry. Calls the hook at 0x17d61c afterwards if set. */
+void load_palette_blocks_110790(ef_addr32 data)
+{
+    uint32_t blocks = EF_U8(data);
+    uint32_t p = data + 2u;
+    uint32_t b;
+    uint8_t cur = 0u;
+    for (b = 0; (int16_t)b < (int16_t)blocks; b++) {
+        int16_t n = (int16_t)EF_U8(p + 1u);
+        int16_t k;
+        cur = (uint8_t)(cur + EF_U8(p));
+        p += 2u;
+        if (n == 0)
+            n = 0x100;
+        for (k = 0; (int32_t)k < (int32_t)n * 3; k++)
+            EF_U8(0x004dd9b0u + (uint32_t)cur * 3u + (uint32_t)(int32_t)k) = EF_U8(p++);
+    }
+    if (EF_U32(0x0017d61cu) != 0u)
+        guest_callptr_eax_x(EF_U32(0x0017d61cu), 0x004dd9b0u);
+}

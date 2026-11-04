@@ -4283,4 +4283,6 @@ uint32_t next_matching_slot_85f78(uint32_t key);
 
 void select_page_9e3f8(uint32_t page);
 
+void load_palette_blocks_110790(ef_addr32 data);
+
 #endif
