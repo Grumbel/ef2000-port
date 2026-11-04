@@ -674,7 +674,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00039db0	20	alloc_slot_table_39db0	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x00039db0.json	docs/compiler-abi.md; Allocate the four-byte slot table of the given length.; callers 39dc4@39dd4; guest pending
 0x00039dc4	72	reset_table_39dc4	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00039dc4.json	docs/compiler-abi.md; Reset the ten-entry table at dword 0x1a1860.; callers 49228@495b7; guest pending
 0x00039e0c	208	claim_unit_slot_39e0c	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00039e0c.json	docs/compiler-abi.md; Claim a free slot in the 4-byte slot table for a unit and mark its owner.; callers 8c49c@8c85f; guest pending
-0x00039edc	289			unknown	unclassified	unverified		
+0x00039edc	289	report_nearest_object_39edc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00039edc.json	docs/compiler-abi.md; Let class row A (EAX, rows of 0xca bytes at dword 0x19bb58) with object entry B (EDX, 69-byte entries at dword 0x1a14f8); callers 3a148@3a254; guest pending
 0x0003a000	328			unknown	unclassified	unverified		
 0x0003a148	288	advance_follow_slot_3a148	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003a148.json	docs/compiler-abi.md; Occasionally (1 in 100, or always in mode 3 of 0x125846) advance the follow slot of the unit A's owner target: the targe; callers 2d488@2d6f8; guest pending
 0x0003a268	94	cell_changed_3a268	search_helpers1	compiles	game	confirmed	decomp/tests/0x0003a268.json	docs/compiler-abi.md; Return 1 when the cell found for the 69-byte record's coordinates (dwords at +7/+0xf divided by 2048) differs from the r; callers 3a148@3a238; guest pending

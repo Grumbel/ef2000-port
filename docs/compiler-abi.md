@@ -8711,3 +8711,14 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9fea8` | EAX:uint32_t,EDX:int32_t,EBX:uint32_t | none | 9e7bc@9e89c | Claim the lowest rated 78-byte slot of the table at 0x416e40 (0x9fdd4) for a new record: word +2 = A (EAX), +0 = word 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x39edc` | EAX:uint32_t,EDX:uint32_t | none | 3a148@3a254 | Let class row A (EAX, rows of 0xca bytes at dword 0x19bb58) with object entry B (EDX, 69-byte entries at dword 0x1a14f8) |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

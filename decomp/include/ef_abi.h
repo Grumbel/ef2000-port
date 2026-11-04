@@ -6017,4 +6017,8 @@ void fire_object_effects_882b0(ef_addr32 obj, int32_t arg);
 
 void init_record_slot_9fea8(uint32_t a, int32_t b, uint32_t c);
 
+void report_nearest_object_39edc(uint32_t a, uint32_t b);
+
+
+
 #endif

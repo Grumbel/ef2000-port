@@ -19273,3 +19273,35 @@ void init_record_slot_9fea8(uint32_t a, int32_t b, uint32_t c)
 	clear_vector3(r + 0xcu);
 	clear_vector3(r + 0x24u);
 }
+
+/* 0x39edc, 289 bytes. Let class row A (EAX, rows of 0xca bytes at dword 0x19bb58) with object entry B (EDX, 69-byte entries at dword 0x1a14f8) look for the nearest object of side 6 and type 1: the entry position (dwords +7/+0xb/+0xf scaled by 2.4384) is passed to 0x2c454 with the row's id (+0x13 high word). When one is found (not 0xff) the countdown dword 0x126354 is reduced by word 0x127d92 and, once it goes negative, reset to 0x226 and a message with the bearing (0x37c0c -> 0x45fc4) and the scaled distance (0x37bc8, factor 0.00053937) between the two rows is sent through 0x46254. */
+void report_nearest_object_39edc(uint32_t a, uint32_t b)
+{
+	ef_addr32 rows, entry, row_a, row_b;
+	double pos[3], k = 2.4384, dist;
+	uint32_t found, angle;
+	int32_t d;
+	int32_t ia = (int32_t)(int16_t)a, ib = (int32_t)(int16_t)b;
+
+	entry = EF_U32(0x001a14f8u) + (uint32_t)(ib * 69);
+	pos[0] = (double)(int32_t)EF_U32(entry + 0xfu) * k;
+	pos[1] = (double)(int32_t)EF_U32(entry + 7u) * k;
+	pos[2] = (double)(int32_t)EF_U32(entry + 0xbu) * k;
+	rows = EF_U32(0x0019bb58u);
+	row_a = rows + (uint32_t)(ia * 0xca);
+	found = (uint32_t)(int32_t)(int16_t)find_nearest_object_2c454((uint32_t)(uintptr_t)pos, (uint32_t)((int32_t)EF_U32(row_a + 0x13u) >> 16), 6u, 1u);
+	if (found == 0xffu)
+		return;
+	EF_U32(0x00126354u) = EF_U32(0x00126354u) - (uint32_t)EF_U16(0x00127d92u);
+	if ((int32_t)EF_U32(0x00126354u) >= 0)
+		return;
+	row_b = EF_U32(0x0019bb58u) + found * 0xcau;
+	EF_U32(0x00126354u) = 0x226u;
+	angle = (uint32_t)scale_to_angle_45fc4(report_point_offset_37c0c(row_b + 0x61u, (int16_t)ib));
+	dist = scaled_pair_distance_37bc8(EF_U32(0x0019bb58u) + found * 0xcau + 0x61u, (int16_t)ib);
+	d = (int32_t)truncate_9d72c(dist * 0.0005393743257820927);
+	rows = EF_U32(0x0019bb58u);
+	guest_fn_46254((uint32_t)((int32_t)EF_U32(row_a + 0x4eu) >> 16),
+	               (int32_t)((int32_t)EF_U32(rows + found * 0xcau + 0x4eu) >> 16), 0x64u, (uint32_t)ib,
+	               (uint32_t)(int32_t)(int16_t)angle, (uint32_t)(int32_t)(int16_t)d);
+}
