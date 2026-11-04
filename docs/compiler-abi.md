@@ -7771,3 +7771,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x539e0` | none | none | 53c80@53cb0 | Variant of 0x538e4 for the second drift mode: the tick counter 0x1a5b5c advances by DT (word 0x127d92), the positions an |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x71fc` | EAX:ef_addr32,EDX:ef_addr32 | none | 73ec@74e2 | Hand a task to the nearest record for object B (EDX) of unit A (EAX): search with 0x2c454 at B+0x61 (owner word from A's |

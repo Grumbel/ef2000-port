@@ -13044,3 +13044,37 @@ void integrate_drift_539e0(void)
         EF_U32(0x001a5b38u) = 1u;
     }
 }
+
+/* 0x71fc, 266 bytes. Hand a task to the nearest record for object B (EDX) of unit A (EAX): search with 0x2c454 at B+0x61 (owner word from A's +0x13 high half, modes 0xd and 0xc), skip when none (0xff), its flag byte +0x1a is clear or its grid distance (0x2bb3c from the word 0x197262) exceeds the double 0x1803ac. Otherwise fill its task block (pointer at +0x8a): byte +0x18 = 1, words +0x10..+0x16 from 0x12583c, 0x12583e, 0x125840 + 3 and 0x125842, advance the clock at +0x10 by ((word 0x121e82 * 0x1e + 3) * 0x32) with 0x407c4, set the record's words +0x24 = word 0x197264 and byte +0x26 = 0, mark B (+0x22 = id, only when byte 0x127da9 is clear or byte 0x1a666b equals B's first byte) and finish with 0x2b634(id). */
+void assign_task_71fc(ef_addr32 a, ef_addr32 b)
+{
+    int32_t id = (int16_t)guest_fn_2c454(b + 0x61u, (int32_t)EF_U32(a + 0x13u) >> 16, 0xdu, 0xcu);
+    uint32_t idw = (uint32_t)id;
+    ef_addr32 rec;
+    ef_addr32 task;
+    int16_t amount;
+    if (id == 0xff)
+        return;
+    rec = EF_U32(0x0019bb58u) + idw * 0xcau;
+    if (rec == 0u || EF_U8(rec + 0x1au) == 0u)
+        return;
+    {
+        double lim;
+        memcpy(&lim, ef_guest_memory_ptr(0x001803acu), sizeof lim);
+        if (grid_cell_distance((int16_t)((int32_t)EF_U32(0x00197262u) >> 16), (int16_t)id) > lim)
+            return;
+    }
+    task = EF_U32(rec + 0x8au);
+    EF_U8(task + 0x18u) = 1u;
+    EF_U16(EF_U32(rec + 0x8au) + 0x10u) = EF_U16(0x0012583cu);
+    EF_U16(EF_U32(rec + 0x8au) + 0x12u) = EF_U16(0x0012583eu);
+    EF_U16(EF_U32(rec + 0x8au) + 0x14u) = (uint16_t)(EF_U16(0x00125840u) + 3u);
+    EF_U16(EF_U32(rec + 0x8au) + 0x16u) = EF_U16(0x00125842u);
+    amount = (int16_t)((((int16_t)(EF_U16(0x00121e82u) * 0x1eu)) + 3) * 0x32);
+    guest_fn_407c4_x(EF_U32(rec + 0x8au) + 0x10u, amount);
+    EF_U8(rec + 0x26u) = 0u;
+    EF_U16(rec + 0x24u) = EF_U16(0x00197264u);
+    if (EF_U8(0x00127da9u) == 0u || EF_U8(0x001a666bu) == EF_U8(b))
+        EF_U16(b + 0x22u) = (uint16_t)idw;
+    guest_fn_2b634_x(id);
+}
