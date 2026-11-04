@@ -1113,7 +1113,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00059484	30	draw_tactical_item_mode	packet_status	compiles	game	confirmed	decomp/tests/0x00059484.json	docs/compiler-abi.md; host model; guest differential pending
 0x000594a4	41	draw_tactical_item_metric	record_transitions	compiles	game	confirmed	decomp/tests/0x000594a4.json	docs/compiler-abi.md; host model; guest differential pending
 0x000597d8	237			unknown	unclassified	unverified		
-0x000598e8	175			unknown	unclassified	unverified		
+0x000598e8	175	refresh_current_object_598e8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000598e8.json	docs/compiler-abi.md; Per-mode refresh of the current object (selected by the signed word at 0x1f71ca; nothing happens when it does not exist); callers none direct; guest pending
 0x00059998	321			unknown	unclassified	unverified		
 0x00059adc	1222			unknown	unclassified	unverified		
 0x00059fa4	633			unknown	unclassified	unverified		
@@ -2568,7 +2568,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b513c	358			unknown	unclassified	unverified		
 0x000b52bc	477			unknown	unclassified	unverified		
 0x000b549c	49	divisor_for_rate	list_helpers	compiles	game	confirmed	decomp/tests/0x000b549c.json	docs/compiler-abi.md; q = AX / 8 truncated; 60 when q <= 0 else 60 / q.; callers b54d0@b54e1,b56d0@b56dc,b5fe8@b64e8; guest pending
-0x000b54d0	173			unknown	unclassified	unverified		
+0x000b54d0	173	add_time_offset_b54d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b54d0.json	docs/compiler-abi.md; Compute the clock time that lies RATE steps (scaled by the divisor for the rate S0, ret 4) after the stored time hours a; callers 4fa64@4fb36,b5640@b567f,b9c68@b9d98; guest pending
 0x000b5580	34	random_modulo_high_word	list_helpers	compiles	game	confirmed	decomp/tests/0x000b5580.json	docs/compiler-abi.md; Random 16-bit value modulo the signed high word of dword +0x1c.; callers b7d4c@b7d75,b7d4c@b7d83,b8510@b858d; guest pending
 0x000b55a4	34	random_modulo_b55a4	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000b55a4.json	docs/compiler-abi.md; Random number modulo the signed high word at +0x2 of the record.; callers b7d4c@b7da2,b7d4c@b7dbf,b8510@b85c5; guest pending
 0x000b55c8	47	find_node_by_key	list_lookup	compiles	game	confirmed	decomp/tests/0x000b55c8.json	docs/compiler-abi.md; Walk the list at *head (next at +4) for a node whose * dwords +9/+0xd equal the record's +0x11/+0x15, word +0x1c equals ; callers b7d4c@b7d6b,b80ac@b80cc,b8510@b857a; guest pending
@@ -3731,11 +3731,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fabf0	87	has_active_entry_fabf0	game_helpers30	compiles	game	confirmed	decomp/tests/0x000fabf0.json	docs/compiler-abi.md; 1 when the object has at least one active entry whose code passes the set test.; callers fbad8@fbcd1; guest pending
 0x000fac78	171	select_slot_count_fac78	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fac78.json	docs/compiler-abi.md; Slot count for a selector with a cap of 4.; callers fb1a0@fb1cb; guest pending
 0x000fad54	171	select_slot_count_fad54	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fad54.json	docs/compiler-abi.md; Same as 0xfac78 with a cap of 6.; callers fb1a0@fb1e2; guest pending
-0x000fae30	171			unknown	unclassified	unverified		
+0x000fae30	171	select_wide_slot_count_fae30	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fae30.json	docs/compiler-abi.md; Wide slot-count selector without the special case for class 0x15 (class 2 and 0x19 give 6).; callers fb1a0@fb1f9; guest pending
 0x000faf0c	178	select_wide_slot_count_faf0c	script_helpers2	compiles	game	confirmed	decomp/tests/0x000faf0c.json	docs/compiler-abi.md; Slot count for a selector, wide variant (cap 6).; callers fb1a0@fb210; guest pending
 0x000faff0	178	select_wide_slot_count_faff0	script_helpers2	compiles	game	confirmed	decomp/tests/0x000faff0.json	docs/compiler-abi.md; Identical to 0xfaf0c.; callers fb1a0@fb227; guest pending
-0x000fb0d4	178			unknown	unclassified	unverified		
-0x000fb1a0	173			unknown	unclassified	unverified		
+0x000fb0d4	178	select_wide_slot_count_fb0d4	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fb0d4.json	docs/compiler-abi.md; Identical to 0xfaf0c.; callers fb1a0@fb23e; guest pending
+0x000fb1a0	173	select_slot_count_by_variant_fb1a0	script_helpers2	compiles	game	confirmed	decomp/tests/0x000fb1a0.json	docs/compiler-abi.md; Dispatch to one of the six slot-count selectors by VARIANT (BL): 0 fac78, 1 fad54, 2 fae30, 3 faf0c, 4 faff0, 5 fb0d4, e; callers fbad8@fbe49,fbad8@fbf05,fbad8@fbfd5; guest pending
 0x000fb87c	1649			unknown	unclassified	unverified		
 0x000fb954	254			unknown	unclassified	unverified		
 0x000fba54	24	call_fba6c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000fba54.json	docs/compiler-abi.md; 0xfba6c(dword +0x16, dword +0x1a) with EBX = EAX.; callers fbad8@fbb2b,fbad8@fbc83; guest pending

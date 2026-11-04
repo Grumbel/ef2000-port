@@ -5649,3 +5649,18 @@ in EAX, format string address, one value).
 | `0x113b78` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 1034b0@1034d5 | Classify the record pair CTX (cdecl): returns 3 when the name of the first record (+0xba, only when its size at +8 is at |
 | `0xf819c` | EAX:ef_addr32 | none | ac2e4@ac3d2 | Load the text file NAME from the default path: build the path in a 144-byte buffer, append NAME and the suffix at 0x1932 |
 | `0x9f664` | EAX:int32_t | none | 9e7bc@9f230,9e7bc@9f279,9e7bc@9f2c2 | For the 6-byte point entry INDEX of the current page (table at 0x41717c + 0xa) copy its Y word to 0x417226, let the hook |
+
+## script_helpers2 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfae30` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb1f9 | Wide slot-count selector without the special case for class 0x15 (class 2 and 0x19 give 6). |
+| `0xfb0d4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb23e | Identical to 0xfaf0c. |
+| `0xfb1a0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | fbad8@fbe49,fbad8@fbf05,fbad8@fbfd5 | Dispatch to one of the six slot-count selectors by VARIANT (BL): 0 fac78, 1 fad54, 2 fae30, 3 faf0c, 4 faff0, 5 fb0d4, e |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb54d0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:int32_t,[ESP+4]:uint32_t | none | 4fa64@4fb36,b5640@b567f,b9c68@b9d98 | Compute the clock time that lies RATE steps (scaled by the divisor for the rate S0, ret 4) after the stored time hours a |
+| `0x598e8` | none | none | none direct | Per-mode refresh of the current object (selected by the signed word at 0x1f71ca; nothing happens when it does not exist) |

@@ -129,3 +129,42 @@ uint32_t select_wide_slot_count_faff0(uint32_t sel, uint32_t cls, uint32_t divis
 {
     return select_wide_slot_count_common(sel, cls, divisor, list);
 }
+
+/* 0xfae30, 171 bytes. Wide slot-count selector without the special case for class 0x15 (class 2 and 0x19 give 6). */
+uint32_t select_wide_slot_count_fae30(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list)
+{
+    uint8_t c = (uint8_t)cls;
+    if (c == 0x19u || c == 2u)
+        return 6u;
+    return select_wide_slot_count_common(sel, 0u, divisor, list);
+}
+
+/* 0xfb0d4, 178 bytes. Identical to 0xfaf0c. */
+uint32_t select_wide_slot_count_fb0d4(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list)
+{
+    return select_wide_slot_count_common(sel, cls, divisor, list);
+}
+
+/* 0xfb1a0, 173 bytes. Dispatch to one of the six slot-count selectors by VARIANT (BL): 0 fac78, 1 fad54, 2 fae30, 3 faf0c, 4 faff0, 5 fb0d4, else 0. SEL and CLS are reduced to bytes, DIVISOR is sign extended from 16 bits; LIST is the stack argument (ret 4). */
+uint32_t select_slot_count_by_variant_fb1a0(uint32_t sel, uint32_t cls, uint32_t variant, uint32_t divisor, uint32_t list)
+{
+    sel &= 0xffu;
+    cls &= 0xffu;
+    divisor = (uint32_t)(int32_t)(int16_t)divisor;
+    switch (variant & 0xffu) {
+    case 0:
+        return select_slot_count_fac78(sel, cls, divisor, list);
+    case 1:
+        return select_slot_count_fad54(sel, cls, divisor, list);
+    case 2:
+        return select_wide_slot_count_fae30(sel, cls, divisor, list);
+    case 3:
+        return select_wide_slot_count_faf0c(sel, cls, divisor, list);
+    case 4:
+        return select_wide_slot_count_faff0(sel, cls, divisor, list);
+    case 5:
+        return select_wide_slot_count_fb0d4(sel, cls, divisor, list);
+    default:
+        return 0u;
+    }
+}

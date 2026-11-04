@@ -4666,4 +4666,18 @@ void reload_text_file_f819c(ef_addr32 name);
 void update_bearing_9f664(int32_t index);
 void guest_callptr3_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c); /* indirect cdecl call with three stack arguments */
 
+uint32_t select_wide_slot_count_fae30(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list);
+uint32_t select_wide_slot_count_fb0d4(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list);
+uint32_t select_slot_count_by_variant_fb1a0(uint32_t sel, uint32_t cls, uint32_t variant, uint32_t divisor, uint32_t list);
+
+void add_time_offset_b54d0(ef_addr32 hours, ef_addr32 minutes, ef_addr32 seconds, int32_t rate, uint32_t rate_code);
+void refresh_current_object_598e8(void);
+void guest_fn_5a2d0_x(void); /* 0x5a2d0 unknown, no arguments */
+void guest_fn_5a220_x(void); /* 0x5a220 unknown, no arguments */
+void guest_fn_5a468_x(void); /* 0x5a468 unknown, no arguments */
+void guest_fn_5e87c_x(uint32_t a); /* 0x5e87c EAX */
+void guest_fn_5c518_x(void); /* 0x5c518 unknown, no arguments */
+void guest_fn_59fa4_x(void); /* 0x59fa4 unknown, no arguments */
+void guest_fn_59998_x(void); /* 0x59998 unknown, no arguments */
+
 #endif

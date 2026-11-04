@@ -2265,3 +2265,57 @@ void update_bearing_9f664(int32_t index)
     from[2] = EF_U16(0x0015909cu);
     bearing_between_positions_dcaa4(0x00417150u, (uint32_t)(uintptr_t)from, (uint32_t)(uintptr_t)to);
 }
+
+/* 0xb54d0, 173 bytes. Compute the clock time that lies RATE steps (scaled by the divisor for the rate S0, ret 4) after the stored time hours at 0x1379a0 and minutes at 0x1379a2: stores hours (wrapped once at 24) at HOURS, the remaining minutes (signed remainder) at MINUTES and 0 at SECONDS. */
+void add_time_offset_b54d0(ef_addr32 hours, ef_addr32 minutes, ef_addr32 seconds, int32_t rate, uint32_t rate_code)
+{
+    int16_t step = (int16_t)divisor_for_rate((int16_t)rate_code);
+    int32_t base = (int16_t)EF_U16(0x001379a2u) + (int32_t)(int16_t)EF_U16(0x001379a0u) * 60;
+    int32_t total = (int32_t)(int16_t)rate * step + base;
+    EF_U16(hours) = (uint16_t)(total / 60);
+    if ((int16_t)EF_U16(hours) >= 0x18)
+        EF_U16(hours) = (uint16_t)(EF_U16(hours) - 0x18u);
+    total = (int32_t)(int16_t)EF_U16(0x001379a0u) * 60 + (int16_t)EF_U16(0x001379a2u) + step * (int32_t)(int16_t)rate;
+    EF_U16(minutes) = (uint16_t)(total % 60);
+    EF_U16(seconds) = 0u;
+}
+
+/* 0x598e8, 175 bytes. Per-mode refresh of the current object (selected by the signed word at 0x1f71ca; nothing happens when it does not exist): mode byte 0x1282c5 - 2 selects the sequence of update steps 0x5a2d0, 0x59fa4, 0x5e658, 0x5a220, 0x5a468, 0x5e87c, 0x5ca60 or 0x5c518, and 0x59998 always runs last (except for a missing object). */
+void refresh_current_object_598e8(void)
+{
+    uint32_t v;
+    if (lookup_filtered_indexed_object((int16_t)EF_U16(0x001f71cau)) == 0u)
+        return;
+    switch ((uint8_t)(EF_U8(0x001282c5u) - 2u)) {
+    case 0:
+        guest_fn_5a2d0_x();
+        reset_unit_counter();
+        guest_fn_5a220_x();
+        break;
+    case 1:
+        guest_fn_5a468_x();
+        v = EF_U32(0x0019721cu);
+        if ((int32_t)v <= 0x41 && (int32_t)v >= 0)
+            guest_fn_5e87c_x((int16_t)EF_U16(0x0019721cu));
+        break;
+    case 2:
+    case 3:
+        guest_fn_5a2d0_x();
+        break;
+    case 4:
+        guest_fn_5a2d0_x();
+        guest_fn_5c518_x();
+        break;
+    case 5:
+        guest_fn_5a2d0_x();
+        guest_fn_59fa4_x();
+        break;
+    case 7:
+        guest_fn_5a2d0_x();
+        apply_stream_value_5ca60();
+        break;
+    default:
+        break;
+    }
+    guest_fn_59998_x();
+}
