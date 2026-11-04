@@ -6901,3 +6901,25 @@ void init_weapon_slots_8ca24(uint32_t rec, uint32_t index)
     EF_U16(rec + 0x1dau) = 0x96u;
     guest_fn_8f07c(rec);
 }
+
+/* 0x369fc, 180 bytes. Open the stream file NAME for the player (flag byte MODE goes to 0x19f5a0): complain through the callback at 0x132a74 when one is already open (byte 0x19f5a9), reset the buttons (0x36964), initialise the stream state (bytes 0x19f5a1 = 1, 0x19f5a2 = 0x48, 0x19f5a5 = 0, 0x19f59f = 0, 0x19f59e = 1, word 0x19f586 = 1, state 0x19f5a9 = 2, name 0x19f330), run the setup 0x35de0 (its result goes to 0x19f32c), open the file (0xa7948 -> 0x19f35c, error 0x183220 on -1) and allocate the buffer of (signed word 0x125900) * 8 bytes into 0x19f354. */
+void open_stream_369fc(uint32_t name, uint32_t mode)
+{
+    if (EF_U8(0x0019f5a9u) != 0u)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x001831fcu);
+    set_buttons_36964();
+    EF_U32(0x0019f330u) = name;
+    EF_U8(0x0019f5a1u) = 1u;
+    EF_U8(0x0019f5a2u) = 0x48u;
+    EF_U8(0x0019f5a0u) = (uint8_t)mode;
+    EF_U8(0x0019f5a5u) = 0u;
+    EF_U16(0x0019f586u) = 1u;
+    EF_U8(0x0019f5a9u) = 2u;
+    guest_fn_35de0_x(0u, 0u); /* result in EDX is stored in 0x19f32c */
+    EF_U8(0x0019f59fu) = 0u;
+    EF_U32(0x0019f35cu) = (uint32_t)open_slot_a7948(0u, 0u, 0u, 0u, EF_U32(0x0019f330u));
+    if (EF_U32(0x0019f35cu) == 0xffffffffu)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x00183220u);
+    EF_U8(0x0019f59eu) = 1u;
+    EF_U32(0x0019f354u) = arena_alloc_e2a94((uint32_t)((int32_t)(int16_t)EF_U16(0x00125900u) << 3));
+}

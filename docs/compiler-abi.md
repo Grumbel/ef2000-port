@@ -6503,3 +6503,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8ca24` | EAX:uint32_t,EDX:uint32_t | none | 8c49c@8c770,8cb60@8cb90,8d330@8d3c7 | Initialise the 20 three-byte weapon slots of the unit REC from the loadout record INDEX (202-byte entries at dword 0x19b |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x369fc` | EAX:uint32_t,EDX:uint32_t | none | 35590@3568b,35590@3569c | Open the stream file NAME for the player (flag byte MODE goes to 0x19f5a0): complain through the callback at 0x132a74 wh |

@@ -619,7 +619,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000367f0	369			unknown	unclassified	unverified		
 0x00036964	71	set_buttons_36964	game_helpers7	compiles	game	confirmed	decomp/tests/0x00036964.json	docs/compiler-abi.md; ; callers 369fc@36a17; guest pending
 0x000369ac	77	set_buttons_369ac	game_helpers7	compiles	game	confirmed	decomp/tests/0x000369ac.json	docs/compiler-abi.md; ; callers 36ad8@36ce1; guest pending
-0x000369fc	180			unknown	unclassified	unverified		
+0x000369fc	180	open_stream_369fc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000369fc.json	docs/compiler-abi.md; Open the stream file NAME for the player (flag byte MODE goes to 0x19f5a0): complain through the callback at 0x132a74 wh; callers 35590@3568b,35590@3569c; guest pending
 0x00036ad8	564			unknown	unclassified	unverified		
 0x00036d30	543			unknown	unclassified	unverified		
 0x00036f84	406			unknown	unclassified	unverified		

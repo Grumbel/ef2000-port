@@ -5084,4 +5084,8 @@ uint32_t reserve_entries_81394(uint32_t unused, uint32_t list, uint32_t sum);
 
 void init_weapon_slots_8ca24(uint32_t rec, uint32_t index);
 
+void open_stream_369fc(uint32_t name, uint32_t mode);
+
+
+
 #endif
