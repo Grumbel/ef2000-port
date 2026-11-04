@@ -8730,3 +8730,53 @@ void draw_displaced_span_ffe78(void)
         u += (uint32_t)du;
     }
 }
+
+/* 0xd2500, 129 bytes. Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): fill the render object at 0x420970 (member table at 0x4209d0: count, then the object pointers; fields 0x42099c = 1, 0x420974 = 0, 0x4209bc = table, 0x420990 = 0x1016e0, 0x420994 = the dword 0x15b800[byte... dword 0x15918c]); for each listed object (base dword 0x17bf70 + word) clear flag bits 1 and 2 of byte +0x20, AND its flags dword into the render object's flags (+0x2c) and store its pointer in the table; then run 0xd23d8 on the render object. */
+void build_render_list_d2500(uint32_t list, uint32_t count)
+{
+    uint32_t ro = 0x00420970u, tbl = 0x004209d0u, i, obj, t = tbl;
+    EF_U32(tbl) = count;
+    EF_U32(0x00420990u) = 0x001016e0u;
+    EF_U32(0x0042099cu) = 1u;
+    EF_U32(0x00420974u) = 0u;
+    EF_U32(0x004209bcu) = tbl;
+    EF_U32(0x00420994u) = EF_U32(0x0015b800u + EF_U32(0x0015918cu) * 4u);
+    if ((int32_t)count > 0) {
+        for (i = 0; i < count; i++) {
+            obj = EF_U32(0x0017bf70u) + EF_U16(list);
+            EF_U8(obj + 0x20u) = (uint8_t)(EF_U8(obj + 0x20u) & 0xf9u);
+            list += 2u;
+            EF_U32(ro + 0x2cu) = EF_U32(ro + 0x2cu) & EF_U32(obj + 0x20u);
+            t += 4u;
+            EF_U32(t) = obj;
+        }
+    }
+    process_render_object_d23d8(ro);
+}
+
+/* 0xd2704, 191 bytes. Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): as 0xd2500 but with the fixed value 0xffdb0 in 0x420994, and each object also gets its fields +0x24 / +0x28 from the word pairs at 0x15997c[4 * i] / 0x15997e[4 * i] shifted left 9, and flag bit 1 set, bit 2 cleared. */
+void build_render_list_d2704(uint32_t list, uint32_t count)
+{
+    uint32_t ro = 0x00420970u, tbl = 0x004209d0u, i, obj, t = tbl;
+    EF_U32(0x0042099cu) = 1u;
+    EF_U32(0x00420974u) = 0u;
+    EF_U32(0x004209bcu) = tbl;
+    EF_U32(tbl) = count;
+    EF_U32(0x00420990u) = 0x001016e0u;
+    EF_U32(0x00420994u) = 0x000ffdb0u;
+    if ((int32_t)count > 0) {
+        for (i = 0; i < count; i++) {
+            uint8_t fl;
+            obj = EF_U32(0x0017bf70u) + EF_U16(list);
+            EF_U32(obj + 0x24u) = (uint32_t)EF_U16(0x0015997cu + i * 4u) << 9;
+            EF_U32(obj + 0x28u) = (uint32_t)EF_U16(0x0015997eu + i * 4u) << 9;
+            fl = (uint8_t)(EF_U8(obj + 0x20u) | 2u);
+            EF_U8(obj + 0x20u) = (uint8_t)(fl & 0xfbu);
+            EF_U32(ro + 0x2cu) = EF_U32(ro + 0x2cu) & EF_U32(obj + 0x20u);
+            list += 2u;
+            t += 4u;
+            EF_U32(t) = obj;
+        }
+    }
+    process_render_object_d23d8(ro);
+}

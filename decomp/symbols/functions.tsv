@@ -3034,10 +3034,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d22d0	80	triangle_is_clockwise_d22d0	game_helpers87	compiles	game	confirmed	decomp/tests/0x000d22d0.json	docs/compiler-abi.md; Return 1 when the three records' 16.16 (x,y) points form a clockwise triangle (negative cross product).; callers d23d8@d2459; guest pending
 0x000d2320	182	prepare_shape_list_d2320	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2320.json	docs/compiler-abi.md; Prepare the shape list of OBJ (list at +0x4c: count, then entry pointers): shift each entry's three coordinates (+0x24, ; callers d23d8@d243e; guest pending
 0x000d23d8	162	process_render_object_d23d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d23d8.json	docs/compiler-abi.md; Process a render object: count it (0x4209c8), prepare it with 0xd2130 unless 0x158ed8 is set, and when the object is act; callers d2500@d2576,d2584@d2626,d2634@d26f3; guest pending
-0x000d2500	129			unknown	unclassified	unverified		
+0x000d2500	129	build_render_list_d2500	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2500.json	docs/compiler-abi.md; Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): fill the render objec; callers c4d43@c4da7,c8c78@c8cab; guest pending
 0x000d2584	176	build_render_object_d2584	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2584.json	docs/compiler-abi.md; Build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit ESI; COUNT in ECX): set dword; callers c49c4@c4a3a; guest pending
 0x000d2634	205	build_textured_object_d2634	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2634.json	docs/compiler-abi.md; Textured variant of 0xd2584: build the render object at 0x420970 from COUNT vertex indices (word list at LIST, implicit ; callers c4a50@c4adf; guest pending
-0x000d2704	191			unknown	unclassified	unverified		
+0x000d2704	191	build_render_list_d2704	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d2704.json	docs/compiler-abi.md; Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): as 0xd2500 but with t; callers c4aeb@c4b89; guest pending
 0x000d299c	223			unknown	unclassified	unverified		
 0x000d2a7c	518			unknown	unclassified	unverified		
 0x000d2c84	245			unknown	unclassified	unverified		

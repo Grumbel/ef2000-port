@@ -6918,3 +6918,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xffe78` | none | none | none direct | Draw one texture-displaced span: from x = high word of dword 0x485fe8 to x = high word of dword 0x485fd0 (clipped to dwo |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd2500` | EAX:uint32_t,EDX:uint32_t | none | c4d43@c4da7,c8c78@c8cab | Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): fill the render objec |
+| `0xd2704` | EAX:uint32_t,EDX:uint32_t | none | c4aeb@c4b89 | Implicit-register fragment (ESI = list of object word offsets, ECX = count; params in that order): as 0xd2500 but with t |

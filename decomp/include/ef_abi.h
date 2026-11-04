@@ -5234,4 +5234,7 @@ void advance_position_cef3c(uint32_t v, uint32_t ang, uint32_t scale);
 
 void draw_displaced_span_ffe78(void);
 
+void build_render_list_d2500(uint32_t list, uint32_t count);
+void build_render_list_d2704(uint32_t list, uint32_t count);
+
 #endif
