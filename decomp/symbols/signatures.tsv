@@ -2225,3 +2225,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000450f4	draw_hotspots_450f4	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000450f4 (382 bytes); Draw the hotspot markers for list type 0x5.; callers 45574@455eb; docs/compiler-abi.md
 0x00045274	draw_hotspots_45274	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00045274 (382 bytes); Draw the hotspot markers for list type 0x49.; callers 45574@4563e,4bf1c@4bfe3; docs/compiler-abi.md
 0x000453f4	draw_hotspots_453f4	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000453f4 (382 bytes); Draw the hotspot markers for list type 0x4f.; callers 45574@455bc,4bf1c@4bf8e; docs/compiler-abi.md
+0x00099ee4	draw_box_rows_99ee4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00099ee4 (251 bytes); Draw the box rows for the table at 0x40cdf6 (count word at 0x40d02a).; callers none direct; docs/compiler-abi.md
+0x00099fe0	draw_box_rows_99fe0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00099fe0 (251 bytes); Draw the box rows for the table at 0x40cefe (count word at 0x40d02c).; callers none direct; docs/compiler-abi.md
+0x0009a0dc	draw_box_rows_9a0dc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009a0dc (251 bytes); Draw the box rows for the table at 0x40cd7e (count word at 0x40d026).; callers none direct; docs/compiler-abi.md
+0x0009a1d8	draw_box_rows_9a1d8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009a1d8 (251 bytes); Draw the box rows for the table at 0x40ce86 (count word at 0x40d02e).; callers none direct; docs/compiler-abi.md

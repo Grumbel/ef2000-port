@@ -4691,3 +4691,12 @@ in EAX, format string address, one value).
 | `0x450f4` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@455eb | Draw the hotspot markers for list type 0x5. |
 | `0x45274` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@4563e,4bf1c@4bfe3 | Draw the hotspot markers for list type 0x49. |
 | `0x453f4` | EAX:ef_addr32,EDX:ef_addr32 | none | 45574@455bc,4bf1c@4bf8e | Draw the hotspot markers for list type 0x4f. |
+
+## box_rows (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x99ee4` | none | none | none direct | Draw the box rows for the table at 0x40cdf6 (count word at 0x40d02a). |
+| `0x99fe0` | none | none | none direct | Draw the box rows for the table at 0x40cefe (count word at 0x40d02c). |
+| `0x9a0dc` | none | none | none direct | Draw the box rows for the table at 0x40cd7e (count word at 0x40d026). |
+| `0x9a1d8` | none | none | none direct | Draw the box rows for the table at 0x40ce86 (count word at 0x40d02e). |

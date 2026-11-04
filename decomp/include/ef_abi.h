@@ -4107,4 +4107,10 @@ void draw_hotspots_45274(ef_addr32 head, ef_addr32 holder);
 void draw_hotspots_453f4(ef_addr32 head, ef_addr32 holder);
 void guest_fn_440f4_x(uint32_t a, int32_t x, int32_t y, uint32_t w, uint32_t s0, uint32_t s1); /* 0x440f4 EAX/EDX/EBX/ECX + 2 stack */
 
+/* box_rows.c */
+void draw_box_rows_99ee4(void);
+void draw_box_rows_99fe0(void);
+void draw_box_rows_9a0dc(void);
+void draw_box_rows_9a1d8(void);
+
 #endif

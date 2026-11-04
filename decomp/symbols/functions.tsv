@@ -1991,10 +1991,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009921c	1091	sumstatbar		named	unclassified	unverified		
 0x00099660	1493	sumgroundbar		named	unclassified	unverified		
 0x00099c38	683	sumdrawkey		named	unclassified	unverified		
-0x00099ee4	251			unknown	unclassified	unverified		
-0x00099fe0	251			unknown	unclassified	unverified		
-0x0009a0dc	251			unknown	unclassified	unverified		
-0x0009a1d8	251			unknown	unclassified	unverified		
+0x00099ee4	251	draw_box_rows_99ee4	box_rows	compiles	game	confirmed	decomp/tests/0x00099ee4.json	docs/compiler-abi.md; Draw the box rows for the table at 0x40cdf6 (count word at 0x40d02a).; callers none direct; guest pending
+0x00099fe0	251	draw_box_rows_99fe0	box_rows	compiles	game	confirmed	decomp/tests/0x00099fe0.json	docs/compiler-abi.md; Draw the box rows for the table at 0x40cefe (count word at 0x40d02c).; callers none direct; guest pending
+0x0009a0dc	251	draw_box_rows_9a0dc	box_rows	compiles	game	confirmed	decomp/tests/0x0009a0dc.json	docs/compiler-abi.md; Draw the box rows for the table at 0x40cd7e (count word at 0x40d026).; callers none direct; guest pending
+0x0009a1d8	251	draw_box_rows_9a1d8	box_rows	compiles	game	confirmed	decomp/tests/0x0009a1d8.json	docs/compiler-abi.md; Draw the box rows for the table at 0x40ce86 (count word at 0x40d02e).; callers none direct; guest pending
 0x0009a348	400			unknown	unclassified	unverified		
 0x0009a4d8	108	clear_tables_9a4d8	camera_helpers	compiles	game	confirmed	decomp/tests/0x0009a4d8.json	docs/compiler-abi.md; ; callers 98bec@98bec; guest pending
 0x0009a544	221			unknown	unclassified	unverified		
