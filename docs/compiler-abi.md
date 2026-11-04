@@ -6689,3 +6689,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x39874` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 39548@395d6,39548@396fd,39548@39726 | Proximity level of the point (X = EAX word, Y = EDX word signed, Z = EBX word) to the reference position (dwords 0x19e5b |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x87fe4` | none | none | 3dd30@3e1d5,63d5c@6404d | Draw the nearby entries of the linked list whose head is dword 0x20f160 (sentinel 0x20f164, next link at +0x34): with th |

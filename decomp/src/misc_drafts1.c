@@ -7810,3 +7810,33 @@ void update_proximity_39874(uint32_t x, uint32_t y, uint32_t z)
     if ((int16_t)al > (int16_t)EF_U16(0x0012651cu))
         EF_U16(0x0012651cu) = al;
 }
+
+/* 0x87fe4, 227 bytes. Draw the nearby entries of the linked list whose head is dword 0x20f160 (sentinel 0x20f164, next link at +0x34): with the metric origin (0x1a5be8/0x1a5bec/0x1a5bf0) temporarily set from 0x214450/0x21444c/0x214448, call 0x866d4 on each entry, measure its position (dwords +0, +4, +8, each >> 8) with 0x23760 and, when closer than 10000, call 0xa0ea8 (signed words +0x2e, +0xa.. high halves) and 0x9e0c4 (position << 8). The origin is restored afterwards. */
+void draw_nearby_entries_87fe4(void)
+{
+    uint32_t save_a = EF_U32(0x001a5becu);
+    uint32_t save_b = EF_U32(0x001a5bf0u);
+    uint32_t save_c = EF_U32(0x001a5be8u);
+    uint32_t e = EF_U32(0x0020f160u);
+    uint32_t vec[3];
+    EF_U32(0x001a5becu) = EF_U32(0x0021444cu);
+    EF_U32(0x001a5bf0u) = EF_U32(0x00214448u);
+    EF_U32(0x001a5be8u) = EF_U32(0x00214450u);
+    for (;;) {
+        e = EF_U32(e + 0x34u);
+        if (e == EF_U32(0x0020f164u))
+            break;
+        nop_866d4();
+        vec[0] = (uint32_t)((int32_t)EF_U32(e) >> 8);
+        vec[1] = (uint32_t)((int32_t)EF_U32(e + 4u) >> 8);
+        vec[2] = (uint32_t)((int32_t)EF_U32(e + 8u) >> 8);
+        if (guest_fn_23760_x((uint32_t)(uintptr_t)vec) >= 10000)
+            continue;
+        guest_fn_a0ea8((int32_t)EF_U32(e + 0x2cu) >> 16, (uint32_t)((int32_t)EF_U32(e + 0xau) >> 16),
+                       (int32_t)EF_U32(e + 0xcu) >> 16, (uint32_t)((int32_t)EF_U32(e + 0xeu) >> 16));
+        guest_fn_9e0c4((int32_t)EF_U32(e + 0x2cu) >> 16, EF_U32(e) << 8, EF_U32(e + 4u) << 8, EF_U32(e + 8u) << 8);
+    }
+    EF_U32(0x001a5becu) = save_a;
+    EF_U32(0x001a5bf0u) = save_b;
+    EF_U32(0x001a5be8u) = save_c;
+}

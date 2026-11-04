@@ -5150,4 +5150,6 @@ void prepare_briefing_file_35cfc(void);
 
 void update_proximity_39874(uint32_t x, uint32_t y, uint32_t z);
 
+void draw_nearby_entries_87fe4(void);
+
 #endif
