@@ -4191,3 +4191,34 @@ int32_t dos_date_request_dde80(uint32_t value)
     v = (int16_t)EF_U16(blk + 4u);
     return v * 4500 + (int32_t)EF_U8(blk + 3u) * 75 + (int32_t)EF_U8(blk + 2u) - 150;
 }
+
+/* 0x73734, 234 bytes. Record that unit A now targets unit B (word +0x143 of A's record). When A is the player unit (word 0x1f71ca) the target's class byte (+0xe9, record stride 0xe5 in 0x128636) goes to 0x65030; otherwise, for unit types 1, 3, 4 and 6 that already had a target, an event 0x2a (different owner word +0x15 in the 0x19bb58 table) or 0x2b (same owner) is raised through 0x46168. */
+void set_unit_target_73734(int32_t a, int32_t b)
+{
+    int16_t ia = (int16_t)a;
+    int16_t ib = (int16_t)b;
+    uint32_t ra = guest_fn_7489c(ia);
+    uint32_t rb;
+    uint32_t t;
+    if (ra == 0u)
+        return;
+    rb = guest_fn_7489c(ib);
+    if (rb == 0u)
+        return;
+    if ((uint16_t)ia == EF_U16(0x001f71cau)) {
+        uint32_t cls = EF_U8(rb + 0xe9u) * 0xe5u;
+        guest_fn_65030(1u, (int32_t)ib, EF_U8(0x00128636u + cls));
+    } else {
+        t = EF_U8(ra + 0x16cu);
+        if ((t == 1u || t == 3u || t == 4u || t == 6u) && EF_U16(ra + 0x143u) != 0u) {
+            uint32_t base = EF_U32(0x0019bb58u);
+            uint32_t p = (uint32_t)((int32_t)(int16_t)EF_U16(rb + 0x28u) * 0xca);
+            uint32_t q = (uint32_t)((int32_t)(int16_t)EF_U16(ra + 0x28u) * 0xca);
+            if (EF_U16(base + p + 0x15u) != EF_U16(base + q + 0x15u))
+                guest_fn_46168((int32_t)ia, 0x2au, (uint32_t)(int32_t)ib, 0u, 0u);
+            else
+                guest_fn_46168((int32_t)ia, 0x2bu, (uint32_t)(int32_t)ib, 0u, 0u);
+        }
+    }
+    EF_U16(ra + 0x143u) = (uint16_t)ib;
+}

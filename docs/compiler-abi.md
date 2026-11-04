@@ -5947,3 +5947,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xdde80` | EAX:uint32_t | EAX:int32_t | ddce8@ddd13 | Issue the DOS call 0x2f for the date/time request with the low byte of VALUE: fills the request block 0x4260b0 (bytes 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x73734` | EAX:int32_t,EDX:int32_t | none | 46454@4674d | Record that unit A now targets unit B (word +0x143 of A's record). When A is the player unit (word 0x1f71ca) the target' |

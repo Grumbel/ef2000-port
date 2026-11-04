@@ -4824,4 +4824,6 @@ void compute_view_corners_d8528(void);
 
 int32_t dos_date_request_dde80(uint32_t value);
 
+void set_unit_target_73734(int32_t a, int32_t b);
+
 #endif

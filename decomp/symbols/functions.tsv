@@ -1349,7 +1349,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00073084	394			unknown	unclassified	unverified		
 0x00073210	749			unknown	unclassified	unverified		
 0x00073500	564			unknown	unclassified	unverified		
-0x00073734	234			unknown	unclassified	unverified		
+0x00073734	234	set_unit_target_73734	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00073734.json	docs/compiler-abi.md; Record that unit A now targets unit B (word +0x143 of A's record). When A is the player unit (word 0x1f71ca) the target'; callers 46454@4674d; guest pending
 0x00073820	260			unknown	unclassified	unverified		
 0x00073924	63	release_pending_73924	game_helpers29	compiles	game	confirmed	decomp/tests/0x00073924.json	docs/compiler-abi.md; Release a unit's current entry and clear its pending slot id if it matches.; callers 46454@46761; guest pending
 0x00073964	699			unknown	unclassified	unverified		
