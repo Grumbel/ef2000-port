@@ -9324,3 +9324,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x113af0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 102f60@102f85 | Resolve a lookup; returns 1 if the first lookup fails (error text copied to 0x4dd6b0), 2 if the second yields 0, else 0; |
 | `0x113c7c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 10303c@103061 | Under the lock, find the first 0x718-byte slot in obj[+0x18] (count at +0x1c) whose state [+4] is 1, mark it 2, reset it |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x104504` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 1023d8@1023fd | Resolve the far pointer at [[obj+0x10]+0x12]; if set and a current pointer exists, copy its name into [obj+0x10]+0x3a, s |

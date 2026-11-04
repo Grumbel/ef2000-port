@@ -6415,4 +6415,7 @@ uint32_t claim_slot_113c7c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 uint32_t lookup_pair_113af0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0); /* 0x113af0 */
 uint32_t claim_slot_113c7c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj); /* 0x113c7c */
 
+uint32_t send_303_104504(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj);
+uint32_t send_303_104504(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj); /* 0x104504 */
+
 #endif

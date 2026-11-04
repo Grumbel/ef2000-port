@@ -22459,3 +22459,23 @@ uint32_t claim_slot_113c7c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
     guest_fn_101e78();
     return slot;
 }
+
+/* 0x104504, 121 bytes. Resolve the far pointer at [[obj+0x10]+0x12]; if set and a current pointer exists, copy its name into [obj+0x10]+0x3a, send message 0x303 and return a copy of the 24-byte record at +0x16 in 0x4dd818 (0 on failure). */
+uint32_t send_303_104504(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj)
+{
+    uint32_t p = EF_U32(obj + 0x10u);
+    uint32_t v = EF_U32(p + 0x12u);
+    uint32_t cur;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    if ((v & 0xffffu) + ((v >> 16) << 4) + EF_U32(0x00120cc6u) == 0)
+        return 0;
+    cur = guest_current_pointer();
+    if (cur == 0)
+        return 0;
+    copy_padded(p + 0x3au, cur, 0x80u);
+    if (trace_call_101f88(0, 0, 0, 0, obj, 0x303u, 0, 0) == 0xffffffffu)
+        return 0;
+    memcpy(ef_guest_memory_ptr((ef_addr32)0x004dd818u),
+           ef_guest_memory_ptr((ef_addr32)(EF_U32(obj + 0x10u) + 0x16u)), 24);
+    return 0x004dd818u;
+}
