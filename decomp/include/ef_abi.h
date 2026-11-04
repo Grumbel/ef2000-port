@@ -6107,4 +6107,9 @@ void shift_left16_three_c474c(uint32_t *eax, uint32_t *ebx, uint32_t *ecx);
 uint8_t bitstream_read_bits_10dc0d(uint8_t count, uint8_t *buf, uint32_t *esi);
 void shift_left16_three_c474c(uint32_t *eax, uint32_t *ebx, uint32_t *ecx);
 
+void draw_patterned_line_10d040(uint32_t pattern, uint8_t color, ef_addr32 rect);
+void draw_patterned_line_10d188(ef_addr32 esi);
+void draw_patterned_line_10d040(uint32_t pattern, uint8_t color, ef_addr32 rect);
+void draw_patterned_line_10d188(ef_addr32 esi);
+
 #endif

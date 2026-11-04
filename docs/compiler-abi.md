@@ -8886,3 +8886,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x10dc0d` | AL:uint8_t,DL:uint8_t,EBX:uint32_t | AL:uint8_t | 10dbc1@10dbcf,10dbc1@10dbda,10dbc1@10dbee | Implicit-register fragment (CL = bit count, AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, params in that |
 | `0xc474c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 15be10@15be24,15c0c4@15c0d4,160122@160138 | Implicit-register fragment (EAX, EBX, ECX in that order, all updated): shift each left by 16. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10d040` | EAX:uint32_t,DL:uint8_t,EBX:ef_addr32 | none | 10d188@10d1ac | Register parameters PATTERN (EAX, 32-bit dash mask rotated right one bit per pixel), COLOR (DL) and RECT (EBX, four word |
+| `0x10d188` | EAX:ef_addr32 | none | e7a34@e7a6f | Implicit-register fragment (ESI = pointer just past a record whose byte at -4 is a color and byte at -2 is a pattern byt |

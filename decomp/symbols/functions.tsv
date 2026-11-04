@@ -3969,8 +3969,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010a580	3936			unknown	unclassified	unverified		
 0x0010b4e0	3274			unknown	unclassified	unverified		
 0x0010c1b0	3725			unknown	unclassified	unverified		
-0x0010d040	325			unknown	unclassified	unverified		
-0x0010d188	45			unknown	unclassified	unverified		
+0x0010d040	325	draw_patterned_line_10d040	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010d040.json	docs/compiler-abi.md; Register parameters PATTERN (EAX, 32-bit dash mask rotated right one bit per pixel), COLOR (DL) and RECT (EBX, four word; callers 10d188@10d1ac; guest pending
+0x0010d188	45	draw_patterned_line_10d188	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010d188.json	docs/compiler-abi.md; Implicit-register fragment (ESI = pointer just past a record whose byte at -4 is a color and byte at -2 is a pattern byt; callers e7a34@e7a6f; guest pending
 0x0010d1b5	37	copy_padded	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010d1b5.json	docs/compiler-abi.md; strncpy with NUL padding; returns the destination.; callers e7fc0@e8009,104504@104542,1133f8@113507; guest pending
 0x0010d1da	26	find_last_char	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010d1da.json	docs/compiler-abi.md; strrchr: last occurrence of the byte in the string including the terminator, or 0.; callers e7fc0@e8028,e7fc0@e8075,eb520@eb60a; guest pending
 0x0010d1f4	9	block_start_10d1f4	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0010d1f4.json	docs/compiler-abi.md; ; callers e8651@e867d; guest pending

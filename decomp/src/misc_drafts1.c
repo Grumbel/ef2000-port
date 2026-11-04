@@ -20191,3 +20191,57 @@ void shift_left16_three_c474c(uint32_t *eax, uint32_t *ebx, uint32_t *ecx)
 	*ebx <<= 16;
 	*ecx <<= 16;
 }
+
+/* 0x10d040, 325 bytes. Register parameters PATTERN (EAX, 32-bit dash mask rotated right one bit per pixel), COLOR (DL) and RECT (EBX, four words x0, y0, x1, y1). Bresenham line from (x0,y0) to (x1,y1) into the frame buffer whose base pointer is at 0x15b754 and whose row offsets are the dwords at 0x163200; a pixel is drawn only when the rotated pattern's low bit is set. */
+void draw_patterned_line_10d040(uint32_t pattern, uint8_t color, ef_addr32 rect)
+{
+	int32_t x = EF_U16(rect + 0u);
+	int32_t y = EF_U16(rect + 2u);
+	int32_t dx = (int32_t)(EF_U16(rect + 4u) - EF_U16(rect + 0u));
+	int32_t dy = (int32_t)(EF_U16(rect + 6u) - EF_U16(rect + 2u));
+	int32_t adx2 = 2 * (dx < 0 ? -dx : dx);
+	int32_t ady2 = 2 * (dy < 0 ? -dy : dy);
+	int32_t sx = (dx < 0) ? -1 : 1;
+	int32_t sy = (dy < 0) ? -1 : 1;
+	int32_t err;
+
+	if (adx2 > ady2) {
+		err = ady2 - (adx2 >> 1);
+		for (;;) {
+			pattern = (pattern >> 1) | (pattern << 31);
+			if (pattern & 1u)
+				EF_U8(EF_U32(0x15b754u) + EF_U32(0x163200u + (uint32_t)y * 4u) + (uint32_t)x) = color;
+			if ((uint32_t)x == EF_U16(rect + 4u))
+				break;
+			if (err >= 0) {
+				y += sy;
+				err -= adx2;
+			}
+			x += sx;
+			err += ady2;
+		}
+	} else {
+		err = adx2 - (ady2 >> 1);
+		for (;;) {
+			pattern = (pattern >> 1) | (pattern << 31);
+			if (pattern & 1u)
+				EF_U8(EF_U32(0x163200u + (uint32_t)y * 4u) + (uint32_t)x + EF_U32(0x15b754u)) = color;
+			if ((uint32_t)y == EF_U16(rect + 6u))
+				break;
+			if (err >= 0) {
+				x += sx;
+				err -= ady2;
+			}
+			y += sy;
+			err += adx2;
+		}
+	}
+}
+
+/* 0x10d188, 45 bytes. Implicit-register fragment (ESI = pointer just past a record whose byte at -4 is a color and byte at -2 is a pattern byte, rect at ESI-? passed in EBX = ESI): draws the line at rect EBX = ESI with pattern = byte[ESI-4] replicated in all four bytes and color = byte[ESI-2]. */
+void draw_patterned_line_10d188(ef_addr32 esi)
+{
+	uint32_t b = EF_U8(esi - 4u);
+	uint32_t pat = b | (b << 8) | (b << 16) | (b << 24);
+	draw_patterned_line_10d040(pat, EF_U8(esi - 2u), esi);
+}
