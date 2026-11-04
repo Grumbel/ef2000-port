@@ -4606,4 +4606,11 @@ void load_string_table_e3868(void);
 void circle_walk_down_fdec0(int32_t x, int32_t y, int32_t err, int32_t y_end, uint32_t fn, uint32_t ctx);
 void circle_walk_up_fde20(int32_t x, int32_t y, int32_t err, int32_t y_end, uint32_t fn, uint32_t ctx);
 
+void init_pattern_buffer_e40e4(void);
+void process_render_object_d23d8(uint32_t obj);
+void guest_fn_d2130_x(ef_addr32 obj); /* 0xd2130 EAX */
+void guest_fn_d2320_x(ef_addr32 obj); /* 0xd2320 EAX */
+
+
+
 #endif

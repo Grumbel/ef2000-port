@@ -5556,3 +5556,15 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfdec0` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | fdf60@fe0af | (ret 8) Bresenham circle quadrant walk: x = esi decreasing, y = edi increasing until it reaches the end row ebp, err = e |
 | `0xfde20` | EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | fdf60@fe09a | (ret 8) Mirror image of 0xfdec0: x = esi increasing, y = edi decreasing until it reaches the end row ebp. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe40e4` | none | none | e4010@e40d4,e4188@e425a | Allocate (once) the pattern buffer of ([0x15f93c] << 8) + 0x200 bytes, align it to 256 bytes (0x15b958) and fill consecu |
+| `0xd23d8` | EAX:uint32_t | none | d2500@d2576,d2584@d2626,d2634@d26f3 | Process a render object: count it (0x4209c8), prepare it with 0xd2130 unless 0x158ed8 is set, and when the object is act |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

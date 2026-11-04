@@ -1572,3 +1572,61 @@ void circle_walk_up_fde20(int32_t x, int32_t y, int32_t err, int32_t y_end, uint
         }
     }
 }
+
+/* 0xe40e4, 161 bytes. Allocate (once) the pattern buffer of ([0x15f93c] << 8) + 0x200 bytes, align it to 256 bytes (0x15b958) and fill consecutive runs of it with the values 1, 2, 3, ... whose lengths are the bytes of the list at 0x431ed0 (terminated by a zero). */
+void init_pattern_buffer_e40e4(void)
+{
+    uint32_t p;
+    uint32_t i;
+    if (EF_U32(0x0015f93cu) == 0u) {
+        EF_U8(0x00431ed0u) = 0xffu;
+        EF_U32(0x0015f93cu) = 1u;
+    }
+    if (EF_U32(0x0015f940u) == 0u) {
+        uint32_t block = guest_fn_c3f70((EF_U32(0x0015f93cu) << 8) + 0x200u);
+        EF_U32(0x0015f940u) = block;
+        if (block == 0u)
+            guest_callptr1_x(EF_U32(0x00132a74u), 0x00190af0u);
+        EF_U32(0x0015b958u) = (EF_U32(0x0015f940u) + 0xffu) & 0xffffff00u;
+    }
+    p = EF_U32(0x0015b958u);
+    if (EF_U8(0x00431ed0u) == 0u)
+        return;
+    i = 0u;
+    for (;;) {
+        uint8_t next;
+        fill_bytes_b3fb0(p, i + 1u, EF_U8(0x00431ed0u + i));
+        p += EF_U8(0x00431ed0u + i);
+        next = EF_U8(0x00431ed1u + i);
+        i++;
+        if (next == 0u)
+            break;
+    }
+}
+
+/* 0xd23d8, 162 bytes. Process a render object: count it (0x4209c8), prepare it with 0xd2130 unless 0x158ed8 is set, and when the object is active (flag 8 of +0x2c clear) and its mesh header has at least 3 entries, refresh it (0xd2110 unless flag 1, 0xd2320) and, if the word at +0x1e exceeds the word at +0x1a and the triangle is not clockwise, call the object's handler at +0x20. */
+void process_render_object_d23d8(uint32_t obj)
+{
+    uint32_t mesh;
+    EF_U32(0x004209c8u) = EF_U32(0x004209c8u) + 1u;
+    if (EF_U8(0x00158ed8u) == 0u)
+        guest_fn_d2130_x(obj);
+    if (EF_U8(obj + 0x2cu) & 8u)
+        return;
+    if (EF_U16(obj + 0x2cu) & 0x1f0u)
+        obj = apply_pending_events_ce944(obj);
+    mesh = EF_U32(obj + 0x4cu);
+    if (EF_S32(mesh) < 3)
+        return;
+    EF_U32(0x004209c4u) = EF_U32(0x004209c4u) + 1u;
+    if ((EF_U8(obj + 0x2cu) & 1u) == 0u)
+        forward_record_d2110(obj);
+    guest_fn_d2320_x(obj);
+    if ((int16_t)EF_U16(obj + 0x1eu) > (int16_t)EF_U16(obj + 0x1au)) {
+        uint32_t tri = (EF_U32(obj + 0xcu) - 1u) * 4u + mesh + 4u;
+        if (triangle_is_clockwise_d22d0(tri) == 0u) {
+            EF_U32(0x004209c0u) = EF_U32(0x004209c0u) + 1u;
+            guest_callptr_eax_x(EF_U32(obj + 0x20u), obj);
+        }
+    }
+}
