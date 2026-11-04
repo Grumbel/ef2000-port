@@ -4378,4 +4378,10 @@ uint32_t select_slot_count_fad54(uint32_t sel, uint32_t cls, uint32_t divisor, u
 uint32_t select_wide_slot_count_faf0c(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list);
 uint32_t select_wide_slot_count_faff0(uint32_t sel, uint32_t cls, uint32_t divisor, uint32_t list);
 
+/* page_lookup1.c */
+void lookup_entry_95660(ef_addr32 name);
+void lookup_entry_957c8(ef_addr32 name);
+void guest_fn_955c0_x(int32_t a, int32_t b, int32_t c, int32_t d, int32_t s0); /* 0x955c0 EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
+void guest_fn_95704_x(int32_t a, int32_t b, int32_t c, int32_t d, int32_t s0); /* 0x95704 EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
+
 #endif

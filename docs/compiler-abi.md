@@ -5154,3 +5154,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xfaf0c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb210 | Slot count for a selector, wide variant (cap 6). |
 | `0xfaff0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | fb1a0@fb227 | Identical to 0xfaf0c. |
+
+## page_lookup1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x95660` | EAX:ef_addr32 | none | 9596c@959e6,95e58@96d77,95e58@96de3 | Look up a named entry for the object at 0x214458 and pass it to 0x955c0. |
+| `0x957c8` | EAX:ef_addr32 | none | 95ae0@95be5 | Same for the object at 0x20f15c (page word at +0x2e), passing the entry to 0x95704. |
