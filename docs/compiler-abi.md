@@ -5168,3 +5168,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xe5c30` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e5db4@e5e4a | Draw a 7x7 glyph at (x, y). |
 | `0xf2320` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | f23ac@f23cc | Draw a 7x6 glyph from the second font at (x, y). |
+
+## trace_loaders1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x106464` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 102508@102534 | Load and parse a resource by name; on a missing file install the 23-byte default block at 0x194a04. |
+| `0x113a40` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 102fb4@102fe0 | Same with parser 0x1133f8 and default block 0x1954bc. |

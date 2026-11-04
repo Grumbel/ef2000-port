@@ -3889,7 +3889,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00105c94	266			unknown	unclassified	unverified		
 0x00105da0	149	destroy_sound_object_105da0	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00105da0.json	docs/compiler-abi.md; Destroy a sound object: if it was started, stop it, clear its buffer, run 0x117a0f twice, trace 0xa; then trace its fiel; callers none direct; guest pending
 0x00105e38	1580			unknown	unclassified	unverified		
-0x00106464	115			unknown	unclassified	unverified		
+0x00106464	115	load_resource_106464	trace_loaders1	compiles	game	confirmed	decomp/tests/0x00106464.json	docs/compiler-abi.md; Load and parse a resource by name; on a missing file install the 23-byte default block at 0x194a04.; callers 102508@102534; guest pending
 0x00106514	117			unknown	unclassified	unverified		
 0x001065c8	106			unknown	unclassified	unverified		
 0x00106634	16	set_state_1_106634	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00106634.json	docs/compiler-abi.md; Dword +4 = 1.; callers 102644@102667; guest pending
@@ -4107,7 +4107,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001132b8	221			unknown	unclassified	unverified		
 0x00113398	96	release_record_array_113398	runtime_helpers36	compiles	game	confirmed	decomp/tests/0x00113398.json	docs/compiler-abi.md; Release a record container: trace each 0x718-byte element, trace field 0xc, free the element array and the 0x1d4-byte co; callers none direct; guest pending
 0x001133f8	1608			unknown	unclassified	unverified		
-0x00113a40	115			unknown	unclassified	unverified		
+0x00113a40	115	load_resource_113a40	trace_loaders1	compiles	game	confirmed	decomp/tests/0x00113a40.json	docs/compiler-abi.md; Same with parser 0x1133f8 and default block 0x1954bc.; callers 102fb4@102fe0; guest pending
 0x00113af0	117			unknown	unclassified	unverified		
 0x00113b78	169			unknown	unclassified	unverified		
 0x00113c24	86	strip_extension_113c24	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00113c24.json	docs/compiler-abi.md; Copy a path to 0x17e1d8 and cut the extension (cdecl).; callers 103504@103527; guest pending

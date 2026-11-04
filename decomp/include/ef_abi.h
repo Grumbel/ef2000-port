@@ -4387,4 +4387,11 @@ void guest_fn_95704_x(int32_t a, int32_t b, int32_t c, int32_t d, int32_t s0); /
 void draw_glyph_e5c30(uint32_t x, uint32_t y, uint32_t glyph);
 void draw_glyph_f2320(uint32_t x, uint32_t y, uint32_t glyph);
 
+/* trace_loaders1.c */
+uint32_t load_resource_106464(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t name, uint32_t arg);
+uint32_t load_resource_113a40(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t name, uint32_t arg);
+uint32_t guest_fn_105070_x(uint32_t a0, uint32_t a1); /* 0x105070 cdecl, two stack arguments, caller cleanup */
+uint32_t guest_fn_105e38_x(uint32_t a0, uint32_t a1); /* 0x105e38 cdecl, two stack arguments, caller cleanup */
+uint32_t guest_fn_1133f8_x(uint32_t a0, uint32_t a1); /* 0x1133f8 cdecl, two stack arguments, caller cleanup */
+
 #endif
