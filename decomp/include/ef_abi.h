@@ -4961,4 +4961,6 @@ void nudge_view_orientation_91df4(void);
 void serial_interrupt_117bfc(uint32_t rec);
 void guest_fn_117b18_x(uint32_t rec); /* 0x117b18 EAX */
 
+void format_event_message_57820(uint32_t rec);
+
 #endif

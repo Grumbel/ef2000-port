@@ -5558,3 +5558,41 @@ void serial_interrupt_117bfc(uint32_t rec)
     }
     guest_fn_117b0c(0x20u, 0x20u);
 }
+
+/* 0x57820, 315 bytes. Build the status message for the event record REC (bytes: +1 first slot, +2 second slot, signed, -1 = none; +3/+4/+5 select the message form) into the text buffer 0x1a5d20 from the 17-byte names at 0x1a62f0 (an empty name shows as "UNKNOWN"), store the matching colour byte (table 0x12584c) at 0x1a6667 and set the message timers (word 0x127dac = 300, word 0x1a662c = 200). Does nothing when a slot is out of range of the word at 0x1357b0. */
+void format_event_message_57820(uint32_t rec)
+{
+    char unknown[8] = { 'U', 'N', 'K', 'N', 'O', 'W', 'N', 0 };
+    uint32_t n1, n2, name1, name2;
+    uint32_t colour;
+    int32_t limit = (int16_t)EF_U16(0x001357b0u);
+    EF_U8(0x001a5d20u) = 0u;
+    if ((int32_t)EF_U8(rec + 1u) >= limit)
+        return;
+    if ((int8_t)EF_U8(rec + 2u) < 0)
+        return;
+    if ((int32_t)(int8_t)EF_U8(rec + 2u) >= limit)
+        return;
+    n1 = 0x001a62f0u + EF_U8(rec + 1u) * 17u;
+    n2 = 0x001a62f0u + (uint32_t)((int32_t)(int8_t)EF_U8(rec + 2u) * 17);
+    name1 = EF_U8(n1) != 0u ? n1 : (uint32_t)(uintptr_t)unknown;
+    name2 = EF_U8(n2) != 0u ? n2 : (uint32_t)(uintptr_t)unknown;
+    if (EF_U8(rec + 3u) != 0u) {
+        guest_sprintf_a4342(0x001a5d20u, 0x00132727u, name2);
+        colour = EF_U8(0x0012584cu + (uint32_t)(int32_t)(int8_t)EF_U8(rec + 2u));
+    } else if (EF_U8(rec + 4u) != 0u) {
+        guest_sprintf_a4342(0x001a5d20u, 0x00132748u, name1);
+        colour = EF_U8(0x0012584cu + EF_U8(rec + 1u));
+    } else {
+        if (EF_U8(rec + 5u) != 0u) {
+            uint32_t s = EF_U8(0x0012584cu + EF_U8(rec + 1u)) != 0u ? 0x00185c68u : 0x00185c70u;
+            guest_sprintf_a4342(0x001a5d20u, 0x00132761u, name1, s);
+        } else {
+            guest_sprintf_a4342(0x001a5d20u, 0x0012fee7u, name2, name1);
+        }
+        colour = EF_U8(0x0012584cu + EF_U8(rec + 1u));
+    }
+    EF_U8(0x001a6667u) = (uint8_t)colour;
+    EF_U16(0x00127dacu) = 0x12cu;
+    EF_U16(0x001a662cu) = 0xc8u;
+}

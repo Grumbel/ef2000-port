@@ -6206,3 +6206,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x117bfc` | EAX:uint32_t | none | none direct | Serial port interrupt service for the channel record REC (port base at +0x1c, state block at +0x2c, receive ring descrip |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x57820` | EAX:uint32_t | none | 577ac@577da,577e8@57818 | Build the status message for the event record REC (bytes: +1 first slot, +2 second slot, signed, -1 = none; +3/+4/+5 sel |
