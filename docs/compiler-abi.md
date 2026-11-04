@@ -8278,3 +8278,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa99c0` | EAX:uint32_t | none | a9e70@a9fdc | Load the saved state named EAX (number). Reports the error text 0x18d798 when byte 0x1371ed is already set. Builds the f |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xaad7c` | EAX:ef_addr32 | EAX:uint32_t | aaee8@aafbb | Load the named saved state EAX: the name is cut at its first '.' (in place), formatted with 0x18d7e8 into a lookup buffe |

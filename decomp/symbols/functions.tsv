@@ -2386,7 +2386,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aa4d4	175	patch_group_pointers_aa4d4	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000aa4d4.json	docs/compiler-abi.md; Rewrite the pointer fields of every type 0xe node in each group.; callers aad7c@aae3d; guest pending
 0x000aa5c4	1098			unknown	unclassified	unverified		
 0x000aaa50	810			unknown	unclassified	unverified		
-0x000aad7c	238			unknown	unclassified	unverified		
+0x000aad7c	238	load_named_state_aad7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000aad7c.json	docs/compiler-abi.md; Load the named saved state EAX: the name is cut at its first '.' (in place), formatted with 0x18d7e8 into a lookup buffe; callers aaee8@aafbb; guest pending
 0x000aae6c	124	match_default_key_aae6c	game_helpers26	compiles	game	confirmed	decomp/tests/0x000aae6c.json	docs/compiler-abi.md; Set flag 0x137206 when the default key letter matches a slot in mode 5.; callers aaee8@aaf47; guest pending
 0x000aaee8	255	main_control_loop		named	unclassified	unverified		docs/ghidra-findings.md; purpose of callees provisional
 0x000aafe8	120	find_node_position_aafe8	runtime_helpers18	compiles	game	confirmed	decomp/tests/0x000aafe8.json	docs/compiler-abi.md; Find a node in the nested group lists; report its index and group index.; callers ab060@ab07e,ab324@ab395,ab324@ab418; guest pending

@@ -5842,4 +5842,10 @@ void guest_fn_42a4_x(void); /* 0x42a4 */
 void load_saved_state_a99c0(uint32_t number);
 void guest_fn_aaa50_x(uint32_t handle); /* 0xaaa50 EAX */
 
+uint32_t load_named_state_aad7c(ef_addr32 name);
+void guest_fn_aa5c4_x(uint32_t handle); /* 0xaa5c4 EAX */
+void guest_fn_aa3dc_x(void); /* 0xaa3dc */
+void guest_fn_aa4d4_x(void); /* 0xaa4d4 */
+void guest_fn_aa350_x(void); /* 0xaa350 */
+
 #endif
