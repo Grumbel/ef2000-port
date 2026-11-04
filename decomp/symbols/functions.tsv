@@ -2870,7 +2870,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000caa28	392			unknown	unclassified	unverified		
 0x000cabb0	56	translate_bytes_cabb0	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cabb0.json	docs/compiler-abi.md; Translate 400 bytes through the lookup routine at 0xcbef4.; callers 49228@494d5; guest pending
 0x000cabe8	98	copy_matching_fields_cabe8	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cabe8.json	docs/compiler-abi.md; Copy fields from the first node of list A into every matching node of list B.; callers b0f5c@b15d5; guest pending
-0x000cac4c	270			unknown	unclassified	unverified		
+0x000cac4c	270	recharge_sub_entries_cac4c	game_helpers113	compiles	game	confirmed	decomp/tests/0x000cac4c.json	docs/compiler-abi.md; Add a random amount (mod 35 for kinds 0x35/0x37, mod 10 for elite records, else mod 5) to every sub-entry counter below ; callers b0f5c@b12e5; guest pending
 0x000caea0	296			unknown	unclassified	unverified		
 0x000cafc8	443			unknown	unclassified	unverified		
 0x000cb184	111	mark_matching_records_cb184	game_helpers86	compiles	game	confirmed	decomp/tests/0x000cb184.json	docs/compiler-abi.md; Mark up to count pristine records matching type and position as used.; callers none direct; guest pending

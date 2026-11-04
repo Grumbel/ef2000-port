@@ -3879,4 +3879,7 @@ int32_t stream_fgetc_10f107(ef_addr32 stream);
 void reactivate_records_at_object_c08d4(uint8_t type, ef_addr32 object, ef_addr32 list);
 void refill_object_cell_c09e4(ef_addr32 object, ef_addr32 list);
 
+/* game_helpers113.c */
+void recharge_sub_entries_cac4c(ef_addr32 list);
+
 #endif

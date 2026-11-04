@@ -4391,3 +4391,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xc08d4` | AL:uint8_t,EDX:ef_addr32,EBX:ef_addr32 | none | c0b04@c0fba,c0b04@c0ff9 | For each record at the object's position with the given type, reactivate state-7 records (counting them in the object's  |
 | `0xc09e4` | EAX:ef_addr32,EDX:ef_addr32 | none | c0b04@c0fc3,c0b04@c100c,c0b04@c1020 | Refill an object's sub-entries of kind 0x35/0x37, then reactivate matching non-idle records up to the free capacity of i |
+
+## game_helpers113 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcac4c` | EAX:ef_addr32 | none | b0f5c@b12e5 | Add a random amount (mod 35 for kinds 0x35/0x37, mod 10 for elite records, else mod 5) to every sub-entry counter below  |
