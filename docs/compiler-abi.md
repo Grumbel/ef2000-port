@@ -7498,3 +7498,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x7a66c` | EAX:ef_addr32 | none | 7a738@7a7cd | Load or build a directory list for PATH (EAX) into the save buffer: with the flag 0x12afc8 set the count comes from the  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x322ac` | none | none | 3122c@3130c | Jitter the word 0x19e5cd (e.g. a shake offset) while the flags allow it (byte 0x19e557 is not 1, byte 0x19e5de is set, t |

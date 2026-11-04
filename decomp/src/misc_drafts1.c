@@ -11742,3 +11742,35 @@ void load_directory_list_7a66c(ef_addr32 path)
         src += 0xdu;
     }
 }
+
+/* 0x322ac, 207 bytes. Jitter the word 0x19e5cd (e.g. a shake offset) while the flags allow it (byte 0x19e557 is not 1, byte 0x19e5de is set, the object named by the high word of 0x1f71c8 exists and has +0x18d set). The amplitude is the double product 0x1a3078 * 0x182a31 * 0x182a39 rounded by 0x9d72c, plus 0x3c when byte 0x1a362e is set and plus 0x3c more when bit 0x20 of object+0x24 is set (16 bit); unless it is zero a random value (0xa45b3, 16 bit) modulo the amplitude minus half the amplitude is added to the word. */
+void jitter_offset_322ac(void)
+{
+    ef_addr32 obj;
+    double a, b, c;
+    int32_t amp;
+    uint16_t w;
+    int32_t ws;
+    int32_t r;
+    int32_t half;
+    if (EF_U8(0x0019e557u) == 1u || EF_U8(0x0019e5deu) == 0u)
+        return;
+    obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    if (obj == 0u || EF_U8(obj + 0x18du) == 0u)
+        return;
+    memcpy(&a, ef_guest_memory_ptr(0x001a3078u), sizeof a);
+    memcpy(&b, ef_guest_memory_ptr(0x00182a31u), sizeof b);
+    memcpy(&c, ef_guest_memory_ptr(0x00182a39u), sizeof c);
+    amp = (int32_t)truncate_9d72c(a * b * c);
+    w = (uint16_t)amp;
+    if (EF_U8(0x001a362eu) != 0u)
+        w = (uint16_t)(amp + 0x3c);
+    if ((EF_U8(obj + 0x24u) & 0x20u) != 0u)
+        w = (uint16_t)(w + 0x3c);
+    if (w == 0u)
+        return;
+    ws = (int16_t)w;
+    r = (int32_t)(guest_fn_a45b3() & 0xffffu) % ws;
+    half = (ws - (ws >> 31)) >> 1;
+    EF_U16(0x0019e5cdu) = (uint16_t)(EF_U16(0x0019e5cdu) + (uint32_t)(r - half));
+}

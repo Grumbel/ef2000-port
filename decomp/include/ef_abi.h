@@ -5488,4 +5488,6 @@ uint32_t guest_fn_28224_x(uint32_t mode); /* 0x28224 AL -> AX */
 void load_directory_list_7a66c(ef_addr32 path);
 int32_t guest_fn_df26f_x(ef_addr32 src, ef_addr32 fmt, ...); /* 0xdf26f cdecl, sscanf-like */
 
+void jitter_offset_322ac(void);
+
 #endif

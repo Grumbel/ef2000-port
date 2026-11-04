@@ -517,7 +517,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00031e2c	570			unknown	unclassified	unverified		
 0x00032068	502			unknown	unclassified	unverified		
 0x00032260	75	save_position_32260	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00032260.json	docs/compiler-abi.md; Save the current position and angles.; callers 3122c@3131d; guest pending
-0x000322ac	207			unknown	unclassified	unverified		
+0x000322ac	207	jitter_offset_322ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000322ac.json	docs/compiler-abi.md; Jitter the word 0x19e5cd (e.g. a shake offset) while the flags allow it (byte 0x19e557 is not 1, byte 0x19e5de is set, t; callers 3122c@3130c; guest pending
 0x0003237c	150	update_distance_minima_3237c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003237c.json	docs/compiler-abi.md; Update two running minima (0x19e5c5 with its companion word 0x19e5a5, and 0x19e5b9) from the distances computed by 0x7b1; callers 31e2c@32057; guest pending
 0x00032414	155	rotate_vector_by_angles_32414	game_helpers84	compiles	game	confirmed	decomp/tests/0x00032414.json	docs/compiler-abi.md; Rotate an integer vector by the angle triple (yaw/pitch/roll words) with a 1.15 matrix.; callers 316b8@316ca,3170c@3172e,31774@317bd; guest pending
 0x000324b0	488			unknown	unclassified	unverified		
