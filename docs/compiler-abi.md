@@ -9089,3 +9089,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xdc71b` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t | none | 63d5c@63edf,76620@766af,97d10@97d72 | (ret 0x14: a, b, c, d, e) Patches 16-bit immediates in the code at 0xdc717 (= b), 0xdc719 (= b - c + 1), 0xdc715 (= c),  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9c8b4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | e20@f38 | (stack arg: value) Saves the value at 0x132a9c and the caller's ESP / SS / DS at 0x132aa0 / 0x132aa4 / 0x132aa6, then wi |

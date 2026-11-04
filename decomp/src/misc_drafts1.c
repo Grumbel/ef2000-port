@@ -20951,3 +20951,15 @@ void patch_span_dc71b(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32
 	EF_U16(0xdc6bcu) = (uint16_t)((int16_t)(d + e) >> 1);
 	EF_U16(0xdc606u) = (uint16_t)((int16_t)(d + e) >> 1);
 }
+
+/* 0x9c8b4, 84 bytes. (stack arg: value) Saves the value at 0x132a9c and the caller's ESP / SS / DS at 0x132aa0 / 0x132aa4 / 0x132aa6, then with DS = CS installs handlers through DOS-extender int 21h AX=0x2533: CL = 3 gets 0x9c908, CL = 6, 9, 10, 11, 12, 13 and 14 get 0x9c909. */
+void install_trap_handlers_9c8b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value)
+{
+	static const uint8_t vec[8] = { 3u, 6u, 9u, 10u, 11u, 12u, 13u, 14u };
+	uint32_t i;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	EF_U32(0x132a9cu) = value;
+	EF_U32(0x132aa0u) = 0u; /* caller ESP, not modelled in C */
+	for (i = 0; i < 8u; i++)
+		md_int21_regs(0x2533u, 0u, vec[i], i == 0u ? 0x9c908u : 0x9c909u, 0u, 0);
+}

@@ -2040,7 +2040,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009c47a	56	int386x_core_9c47a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c47a.json	docs/compiler-abi.md; The software interrupt dispatcher behind int386x (registers ESI = interrupt number, EDI = input register block, EDX = ou; callers 9c461@9c46e; guest pending
 0x0009c4b2	37			unknown	unclassified	unverified		
 0x0009c858	90	getenv_9c858	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c858.json	docs/compiler-abi.md; getenv: search the environment table at [0x160a18] (null terminated array of "NAME=value" strings) for NAME, ignoring ca; callers e20@f2a,28224@28259,283c8@28473; guest pending
-0x0009c8b4	84			unknown	unclassified	unverified		
+0x0009c8b4	84	install_trap_handlers_9c8b4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009c8b4.json	docs/compiler-abi.md; (stack arg: value) Saves the value at 0x132a9c and the caller's ESP / SS / DS at 0x132aa0 / 0x132aa4 / 0x132aa6, then wi; callers e20@f38; guest pending
 0x0009c960	19	half_word_9c960	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009c960.json	docs/compiler-abi.md; ; callers f60@f6a,2e04@334f,2e04@337c; guest pending
 0x0009c980	63	build_default_path_9c980	engine_helpers3	compiles	game	confirmed	decomp/tests/0x0009c980.json	docs/compiler-abi.md; Build the default path string in buffer.; callers f80@1120,45a4@45ae,2ff44@2ff7d; guest pending
 0x0009c9c0	86	build_path_9c9c0	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x0009c9c0.json	docs/compiler-abi.md; Build a search path: default directory + separator + name.; callers 371b0@371c2,abaf0@abaf6,c8e58@c8e75; guest pending
