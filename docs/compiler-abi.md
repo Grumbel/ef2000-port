@@ -9163,3 +9163,10 @@ in EAX, format string address, one value).
 | `0xc5372` | EAX:uint32_t | EAX:uint32_t | none direct | Implicit-register fragment (EBX is an in/out pointer): byte-swap the word at EBX. Returns 1 when the swapped word is 0xc |
 | `0xc552e` | EAX:uint32_t | none | 16018a@16024f | Implicit-register fragment (ESI = index): scale the table entries at INDEX by the signed byte at 0x149e58 + INDEX; 1 and |
 | `0xc565e` | EAX:uint32_t | none | 16018a@16024f | Implicit-register fragment (ESI = index): identical to 0xc552e, the second copy of the scaling step. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc4e3b` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | c4db4@c4e15 | Implicit-register fragment (ESI = record, EBX is an out value): byte-swap the word at ESI+0x10, shift it left by two, st |
+| `0x23b` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 10e35f@10e3ba | Implicit-register fragment (EAX = new handler, SKIP = the condition flag of the preceding compare, CARRY is an out flag) |

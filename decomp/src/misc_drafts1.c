@@ -21324,3 +21324,40 @@ void scale_entry_c565e(uint32_t index)
 	else
 		multiply_table_entries_c5441((uint8_t)-s, index);
 }
+
+/* 0xc4e3b, 39 bytes. Implicit-register fragment (ESI = record, EBX is an out value): byte-swap the word at ESI+0x10, shift it left by two, store it and use it as the handler index; byte-swap the word at ESI+0x20 in place, add it to the pointer (EBX = ESI+0x20+word) and return the address of the handler, the dword at 0xc4e62 plus the index. */
+uint32_t dispatch_swapped_c4e3b(uint32_t esi, uint32_t *ebx)
+{
+	uint32_t p = esi + 0x10u;
+	uint32_t index = ((((EF_U16(p) & 0xffu) << 8) | (EF_U16(p) >> 8)) << 2) & 0xffffu;
+	uint32_t w;
+
+	EF_U16(p) = (uint16_t)index;
+	p += 0x10u;
+	w = ((EF_U16(p) & 0xffu) << 8) | (EF_U16(p) >> 8);
+	EF_U16(p) = (uint16_t)w;
+	*ebx = p + w;
+	return EF_U32(0xc4e62u + index);
+}
+
+/* 0x23b, 44 bytes. Implicit-register fragment (EAX = new handler, SKIP = the condition flag of the preceding compare, CARRY is an out flag): unless SKIP is set, read interrupt vector 8 (int 21h, AX = 0x3508), save it at 0x132a40 and the new handler at 0x120cd0; the old value at 0x132a30 is exchanged with EAX and returned. On a DOS error returns 0xffffffff with CARRY set. */
+uint32_t set_timer_vector_23b(uint32_t handler, uint32_t skip, uint32_t *carry)
+{
+	uint32_t old;
+
+	if (!skip) {
+		uint32_t out[7];
+
+		run_dos_int_ex(0x21u, 0x3508u, 0u, 0u, 0u, out);
+		if (out[6] != 0u) {
+			*carry = 1u;
+			return 0xffffffffu;
+		}
+		EF_U32(0x132a40u) = out[0];
+		EF_U32(0x120cd0u) = handler;
+	}
+	old = EF_U32(0x132a30u);
+	EF_U32(0x132a30u) = handler;
+	*carry = 0u;
+	return old;
+}

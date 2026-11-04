@@ -6309,4 +6309,9 @@ uint32_t swap_word_c5372(uint32_t *ebx); /* 0xc5372 */
 void scale_entry_c552e(uint32_t index); /* 0xc552e */
 void scale_entry_c565e(uint32_t index); /* 0xc565e */
 
+uint32_t dispatch_swapped_c4e3b(uint32_t esi, uint32_t *ebx);
+uint32_t set_timer_vector_23b(uint32_t handler, uint32_t skip, uint32_t *carry);
+uint32_t dispatch_swapped_c4e3b(uint32_t esi, uint32_t *ebx); /* 0xc4e3b */
+uint32_t set_timer_vector_23b(uint32_t handler, uint32_t skip, uint32_t *carry); /* 0x23b */
+
 #endif

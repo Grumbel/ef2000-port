@@ -3,7 +3,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000001e9	57	fatal_exit_1e9	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000001e9.json	docs/compiler-abi.md; Fatal exit with a message: STRING (EDX, zero-terminated) is written to the file opened by name 0x120d1b (INT 21h AX=3D01; callers 11d258@11d26d; guest pending
 0x00000222	9	load_ds_from_120cd4_222	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000222.json	docs/compiler-abi.md; Load the data segment register from the word at code-segment offset 0x120cd4. Segments are flat in this port, so there i; callers ee22c@ee28d,ee22c@ee318; guest pending
 0x00000235	6	compare_word_235	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000235.json	docs/compiler-abi.md; Implicit-register fragment: compare EAX with the dword at 0x120cd0; returns 1 when they are equal (ZF), else 0.; callers 10d80b@10d89d; guest pending
-0x0000023b	44			unknown	unclassified	unverified		
+0x0000023b	44	set_timer_vector_23b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000023b.json	docs/compiler-abi.md; Implicit-register fragment (EAX = new handler, SKIP = the condition flag of the preceding compare, CARRY is an out flag); callers 10e35f@10e3ba; guest pending
 0x000002b0	116	intdos_2b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000002b0.json	docs/compiler-abi.md; intdos: run DOS interrupt 0x21 with the registers from the block IN (EAX, EBX, ECX, EDX, ESI, EDI at +0..+0x14) and the ; callers 324@33b,3d0@3ee,880@892; guest pending
 0x00000324	35	dos_call_2503_324	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x00000324.json	docs/compiler-abi.md; DOS call 0x2503 with one argument; returns the result word.; callers 734@77a; guest pending
 0x00000348	135			unknown	unclassified	unverified		
@@ -2789,7 +2789,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c4b95	155			unknown	unclassified	unverified		
 0x000c4d43	112			unknown	unclassified	unverified		
 0x000c4db4	135			unknown	unclassified	unverified		
-0x000c4e3b	39			unknown	unclassified	unverified		
+0x000c4e3b	39	dispatch_swapped_c4e3b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4e3b.json	docs/compiler-abi.md; Implicit-register fragment (ESI = record, EBX is an out value): byte-swap the word at ESI+0x10, shift it left by two, st; callers c4db4@c4e15; guest pending
 0x000c5261	120			unknown	unclassified	unverified		
 0x000c5372	27	swap_word_c5372	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5372.json	docs/compiler-abi.md; Implicit-register fragment (EBX is an in/out pointer): byte-swap the word at EBX. Returns 1 when the swapped word is 0xc; callers none direct; guest pending
 0x000c5390	12	swap_word_c5390	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c5390.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
