@@ -10060,3 +10060,31 @@ void draw_shadow_box_f3904(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3)
     if (EF_U8(0x004859deu) != 0u)
         guest_fn_dc250();
 }
+
+/* 0xfe380, 284 bytes. Draw the arc from angle LO (ECX) to angle HI (stack, ret 8) of radius RADIUS (stack) around (CX = EBX added to the cosine term, CY = EDX added to the sine term) in colour COLOUR (EAX). The recursion depth counter dword 0x485fb0 is decremented; while it stays positive the arc is split at the midpoint angle (toward-zero average of HI and LO) and both halves are drawn, otherwise one line segment between the two end points (13-bit angle index into the word tables 0x141e08 and 0x142e08, product with the radius divided by 0x8000 truncating toward zero, cosine term negated) is drawn with 0xc8ccc. The counter is restored on exit. */
+void draw_arc_fe380(uint32_t colour, uint32_t cy, uint32_t cx, uint32_t lo, uint32_t hi, uint32_t radius)
+{
+    uint32_t d;
+    EF_U32(0x00485fb0u) = EF_U32(0x00485fb0u) - 1u;
+    d = EF_U32(0x00485fb0u);
+    if ((int32_t)d > 0) {
+        int32_t sum = (int32_t)hi + (int32_t)lo;
+        uint32_t mid = (uint32_t)((sum - (sum >> 31)) >> 1);
+        draw_arc_fe380(colour, cy, cx, lo, mid, radius);
+        draw_arc_fe380(colour, cy, cx, mid, hi, radius);
+    } else {
+        uint32_t i0 = ((uint32_t)(uint16_t)lo >> 3) * 2u;
+        uint32_t i1 = ((uint32_t)(uint16_t)hi >> 3) * 2u;
+        int32_t s0 = (int16_t)EF_U16(0x00141e08u + i0);
+        int32_t c0 = (int16_t)EF_U16(0x00142e08u + i0);
+        int32_t s1 = (int16_t)EF_U16(0x00141e08u + i1);
+        int32_t c1 = (int16_t)EF_U16(0x00142e08u + i1);
+        int32_t r = (int32_t)radius;
+        uint32_t y0 = (uint32_t)((int32_t)((int64_t)s0 * r / 0x8000)) + cy;
+        uint32_t x0 = (uint32_t)((int32_t)((int64_t)c0 * r / -0x8000)) + cx;
+        uint32_t y1 = (uint32_t)((int32_t)((int64_t)s1 * r / 0x8000)) + cy;
+        uint32_t x1 = (uint32_t)((int32_t)((int64_t)c1 * r / -0x8000)) + cx;
+        guest_fn_c8ccc_x(x1, y1, x0, y0, colour);
+    }
+    EF_U32(0x00485fb0u) = EF_U32(0x00485fb0u) + 1u;
+}

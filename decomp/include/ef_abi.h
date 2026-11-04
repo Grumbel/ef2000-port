@@ -5320,4 +5320,6 @@ void decode_column_sprite_110a08(ef_addr32 src, ef_addr32 dst, uint32_t stride);
 
 void draw_shadow_box_f3904(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3);
 
+void draw_arc_fe380(uint32_t colour, uint32_t cy, uint32_t cx, uint32_t lo, uint32_t hi, uint32_t radius);
+
 #endif

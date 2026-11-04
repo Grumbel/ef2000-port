@@ -7152,3 +7152,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf3904` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | f3aa8@f3af0 | Draw a box outline from the signed 16-bit coordinates A0 (EAX), A1 (EDX), A2 (EBX) and A3 (ECX): after saving the screen |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfe380` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | fe380@fe3bd,fe380@fe3d6,fe49c@fe52d | Draw the arc from angle LO (ECX) to angle HI (stack, ret 8) of radius RADIUS (stack) around (CX = EBX added to the cosin |

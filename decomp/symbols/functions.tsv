@@ -3773,7 +3773,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fde20	160	circle_walk_up_fde20	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fde20.json	docs/compiler-abi.md; (ret 8) Mirror image of 0xfdec0: x = esi increasing, y = edi decreasing until it reaches the end row ebp.; callers fdf60@fe09a; guest pending
 0x000fdec0	160	circle_walk_down_fdec0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fdec0.json	docs/compiler-abi.md; (ret 8) Bresenham circle quadrant walk: x = esi decreasing, y = edi increasing until it reaches the end row ebp, err = e; callers fdf60@fe0af; guest pending
 0x000fdf60	349			unknown	unclassified	unverified		
-0x000fe380	284			unknown	unclassified	unverified		
+0x000fe380	284	draw_arc_fe380	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe380.json	docs/compiler-abi.md; Draw the arc from angle LO (ECX) to angle HI (stack, ret 8) of radius RADIUS (stack) around (CX = EBX added to the cosin; callers fe380@fe3bd,fe380@fe3d6,fe49c@fe52d; guest pending
 0x000fe49c	165			unknown	unclassified	unverified		
 0x000fe541	31	delete_file_fe541	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe541.json	docs/compiler-abi.md; DOS delete file (int 21h, AH = 0x41) NAME: 0 on success, otherwise the translated DOS error (0x1101e8) of the failing co; callers none direct; guest pending
 0x000fe560	174	read_hires_timer_fe560	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fe560.json	docs/compiler-abi.md; High-resolution timer read. The first call (dword 0x17cf98 clear) points 0x485fc4 at the BIOS tick counter (0x120cc6 + 0; callers 10640@10640,34ca4@34d3f,34d50@34d6f; guest pending
