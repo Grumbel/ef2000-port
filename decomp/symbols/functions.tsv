@@ -1899,7 +1899,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091df4	314			unknown	unclassified	unverified		
 0x00091f30	249			unknown	unclassified	unverified		
 0x0009202c	65			unknown	unclassified	unverified		
-0x00092070	169			unknown	unclassified	unverified		
+0x00092070	169	classify_angle_92070	game_helpers36	compiles	game	confirmed	decomp/tests/0x00092070.json	docs/compiler-abi.md; Classify the signed angle word into a -2..1 step (kept when out of range).; callers 942cc@942f4,94370@94398,94484@944a9; guest pending
 0x00092254	59	prepare_navigation_component	ui_secondary	compiles	game	confirmed	decomp/tests/0x00092254.json	docs/compiler-abi.md; host model; guest differential pending
 0x00092290	928			unknown	unclassified	unverified		
 0x00092668	793			unknown	unclassified	unverified		
@@ -2087,7 +2087,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009dde0	27	store_table_entry_9dde0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x0009dde0.json	docs/compiler-abi.md; Store the converted table entry index into the 16-bit slot at destination.; callers 9e7bc@9f5d5,9f7d0@9f7f7,9f808@9f83d; guest pending
 0x0009ddfc	10	call_9de08_9ddfc	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x0009ddfc.json	docs/compiler-abi.md; Call 0x9de08 with a zero second argument.; callers 9820@9ace,2a720@2a76e,2a7ac@2a7d1; guest pending
 0x0009de08	440			unknown	unclassified	unverified		
-0x0009dfc0	165			unknown	unclassified	unverified		
+0x0009dfc0	165	select_page_layout_9dfc0	game_helpers36	compiles	game	confirmed	decomp/tests/0x0009dfc0.json	docs/compiler-abi.md; Select a page and its layout; refresh each cell when the layout is active.; callers 161d4@164d8,1e28c@1e391,95e58@96311; guest pending
 0x0009e094	45			unknown	unclassified	unverified		
 0x0009e0c4	466			unknown	unclassified	unverified		
 0x0009e3f8	155			unknown	unclassified	unverified		
@@ -2128,7 +2128,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a0ebc	142	fill_page_cell_a0ebc	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a0ebc.json	docs/compiler-abi.md; Fill a page row cell from a 9-word descriptor and mark it present.; callers 9e7bc@9f0cc; guest pending
 0x000a0f4c	56	clear_page_slot_a0f4c	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a0f4c.json	docs/compiler-abi.md; Clear slot index of the current page.; callers 9e7bc@9f0dc; guest pending
 0x000a0f84	1181			unknown	unclassified	unverified		
-0x000a1424	161			unknown	unclassified	unverified		
+0x000a1424	161	stamp_page_cell_a1424	game_helpers36	compiles	game	confirmed	decomp/tests/0x000a1424.json	docs/compiler-abi.md; Stamp a page cell with a scaled duration and a command code.; callers 9e7bc@9eab0; guest pending
 0x000a14c8	55	flag_page_slot_a14c8	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x000a14c8.json	docs/compiler-abi.md; Set the high flag of slot index of the current page.; callers 9e7bc@9eabd; guest pending
 0x000a1500	141			unknown	unclassified	unverified		
 0x000a1590	479			unknown	unclassified	unverified		
@@ -2348,7 +2348,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a8f80	73	script_if_equal_a8f80	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a8f80.json	docs/compiler-abi.md; Branch when the variable equals the operand.; callers a9130@a918c; guest pending
 0x000a8fcc	71	script_if_not_equal_a8fcc	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a8fcc.json	docs/compiler-abi.md; Branch when the variable differs.; callers a9130@a91b3; guest pending
 0x000a9014	71	script_if_not_greater_a9014	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a9014.json	docs/compiler-abi.md; Branch when the variable is not greater than the operand.; callers a9130@a91da; guest pending
-0x000a905c	122			unknown	unclassified	unverified		
+0x000a905c	122	latch_order_target_a905c	game_helpers36	compiles	game	confirmed	decomp/tests/0x000a905c.json	docs/compiler-abi.md; Latch the target of an incoming order message.; callers a9e70@a9fc4,ab47c@ab5e9; guest pending
 0x000a9130	794			unknown	unclassified	unverified		
 0x000a944c	28	pop_table_entry_4191dc	list_helpers	compiles	game	confirmed	decomp/tests/0x000a944c.json	docs/compiler-abi.md; Decrement word 0x4194ac; dword 0x4191dc = table * 0x418e38[signed high word of dword 0x4194aa].; callers a9e70@a9f80; guest pending
 0x000a9468	40	random_scaled	list_helpers	compiles	game	confirmed	decomp/tests/0x000a9468.json	docs/compiler-abi.md; Random 16-bit value times signed SI, divided by 65536 * rounding toward zero (the SBB sequence).; callers a94e4@a95cf; guest pending
@@ -2392,7 +2392,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aafe8	120	find_node_position_aafe8	runtime_helpers18	compiles	game	confirmed	decomp/tests/0x000aafe8.json	docs/compiler-abi.md; Find a node in the nested group lists; report its index and group index.; callers ab060@ab07e,ab324@ab395,ab324@ab418; guest pending
 0x000ab060	80			unknown	unclassified	unverified		
 0x000ab0b0	42	emit_record_pair_ab0b0	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab0b0.json	docs/compiler-abi.md; Two 0xa7a1c(EAX, ...) stack calls with record fields.; callers ab0dc@ab12a,ab0dc@ab138,ab0dc@ab148; guest pending
-0x000ab0dc	149			unknown	unclassified	unverified		
+0x000ab0dc	149	notify_group_links_ab0dc	game_helpers36	compiles	game	confirmed	decomp/tests/0x000ab0dc.json	docs/compiler-abi.md; Visit every kind-0xe node of every group and notify its three links.; callers ab324@ab45e; guest pending
 0x000ab174	233			unknown	unclassified	unverified		
 0x000ab260	42	emit_record_pair_ab260	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab260.json	docs/compiler-abi.md; As 0xab0b0 through 0xa79d4.; callers ab28c@ab2da,ab28c@ab2e8,ab28c@ab2f8; guest pending
 0x000ab28c	149			unknown	unclassified	unverified		

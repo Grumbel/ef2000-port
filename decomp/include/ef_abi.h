@@ -2427,4 +2427,14 @@ void guest_fn_78b4c(void); /* 0x78b4c */
 void guest_fn_78f3c(void); /* 0x78f3c */
 void guest_fn_a1770(void); /* 0xa1770 */
 
+/* game_helpers36.c */
+void classify_angle_92070(void);
+void select_page_layout_9dfc0(int16_t page, uint16_t b, uint16_t c, uint16_t d);
+void stamp_page_cell_a1424(int16_t column, int16_t value, uint32_t code, uint8_t flag);
+void latch_order_target_a905c(ef_addr32 message);
+void notify_group_links_ab0dc(uint32_t target);
+void guest_fn_a0c04(int32_t column, int32_t row); /* 0xa0c04 EAX/EDX */
+void guest_fn_ab0b0(uint32_t target, uint32_t link); /* 0xab0b0 EAX/EDX */
+void guest_fn_ab060(uint32_t target); /* 0xab060 EAX */
+
 #endif

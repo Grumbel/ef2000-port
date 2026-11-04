@@ -3132,3 +3132,13 @@ in EAX, format string address, one value).
 | `0x80a18` | none | none | 80d8c@80de7 | Reset the 256 name entries, register them in the page table and clear 16 slots. |
 | `0x878c8` | EAX:ef_addr32 | none | 56954@5696c,879c4@879d4,880c8@880e9 | Remove an object from the active list and put it on the free list. |
 | `0x90880` | EAX:ef_addr32,EDX:ef_addr32 | none | 8be3c@8be4b | Keep the nearest candidate in an object's +0x1c link (Chebyshev-like distance). |
+
+## game_helpers36 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x92070` | none | none | 942cc@942f4,94370@94398,94484@944a9 | Classify the signed angle word into a -2..1 step (kept when out of range). |
+| `0x9dfc0` | AX:int16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t | none | 161d4@164d8,1e28c@1e391,95e58@96311 | Select a page and its layout; refresh each cell when the layout is active. |
+| `0xa1424` | AX:int16_t,DX:int16_t,EBX:uint32_t,CL:uint8_t | none | 9e7bc@9eab0 | Stamp a page cell with a scaled duration and a command code. |
+| `0xa905c` | EAX:ef_addr32 | none | a9e70@a9fc4,ab47c@ab5e9 | Latch the target of an incoming order message. |
+| `0xab0dc` | EAX:uint32_t | none | ab324@ab45e | Visit every kind-0xe node of every group and notify its three links. |
