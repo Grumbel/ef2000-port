@@ -6874,3 +6874,30 @@ uint32_t reserve_entries_81394(uint32_t unused, uint32_t list, uint32_t sum)
             return sum;
     }
 }
+
+/* 0x8ca24, 194 bytes. Initialise the 20 three-byte weapon slots of the unit REC from the loadout record INDEX (202-byte entries at dword 0x19bb58, slot types at +0xa1): each slot's word +0x19c is 1, 0 for type 0 and 0x13 for types 9 and 0x14, and its type byte +0x19b is copied. Then set the unit's word +0x1d5 to 0 or 0x6e0 depending on its class byte (+0xe9 minus 0x18: 0..3 and 8..12 give 0, everything else 0x6e0), byte +0x1d4 = 1, words +0x1d8/+0x1da = 0x96 and refresh the unit (0x8f07c). */
+void init_weapon_slots_8ca24(uint32_t rec, uint32_t index)
+{
+    uint32_t i;
+    uint32_t cls;
+    for (i = 0u; (int16_t)i < 0x14; i++) {
+        uint32_t src = (uint32_t)((int32_t)(int16_t)index * 0xca) + EF_U32(0x0019bb58u) + i;
+        uint32_t slot = i * 3u + rec;
+        uint8_t type = EF_U8(src + 0xa1u);
+        EF_U16(slot + 0x19cu) = 1u;
+        EF_U8(slot + 0x19bu) = type;
+        if (type == 0u)
+            EF_U16(slot + 0x19cu) = 0u;
+        else if (type == 9u || type == 0x14u)
+            EF_U16(slot + 0x19cu) = 0x13u;
+    }
+    cls = (uint8_t)(EF_U8(rec + 0xe9u) - 0x18u);
+    if (cls <= 0xcu && (cls < 4u || cls >= 8u))
+        EF_U16(rec + 0x1d5u) = 0u;
+    else
+        EF_U16(rec + 0x1d5u) = 0x6e0u;
+    EF_U8(rec + 0x1d4u) = 1u;
+    EF_U16(rec + 0x1d8u) = 0x96u;
+    EF_U16(rec + 0x1dau) = 0x96u;
+    guest_fn_8f07c(rec);
+}

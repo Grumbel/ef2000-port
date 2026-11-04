@@ -5082,4 +5082,6 @@ void draw_count_icon_4d24c(uint32_t x, uint32_t y, uint32_t rec, uint32_t count)
 
 uint32_t reserve_entries_81394(uint32_t unused, uint32_t list, uint32_t sum);
 
+void init_weapon_slots_8ca24(uint32_t rec, uint32_t index);
+
 #endif

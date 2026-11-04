@@ -6497,3 +6497,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x81394` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 77c90@77ef3,77c90@77fc6,77c90@77ffa | Reserve cost from the budget dword 0x12b118 for the entries of the word list LIST (first word = count, then entry indice |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8ca24` | EAX:uint32_t,EDX:uint32_t | none | 8c49c@8c770,8cb60@8cb90,8d330@8d3c7 | Initialise the 20 three-byte weapon slots of the unit REC from the loadout record INDEX (202-byte entries at dword 0x19b |

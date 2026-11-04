@@ -1802,7 +1802,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008c49c	1169			unknown	unclassified	unverified		
 0x0008c930	52	select_slot_8c930	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008c930.json	docs/compiler-abi.md; Select the page slot for a page id, or 0 when the page table lacks it.; callers 8c49c@8c919; guest pending
 0x0008c988	103	notify_record_action_8c988	table_switches1	compiles	game	confirmed	decomp/tests/0x0008c988.json	docs/compiler-abi.md; Report a tactical action for a record whose mode word (+0x45) selects one of nine action codes.; callers 8c49c@8c780,8d11c@8d1aa; guest pending
-0x0008ca24	194			unknown	unclassified	unverified		
+0x0008ca24	194	init_weapon_slots_8ca24	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008ca24.json	docs/compiler-abi.md; Initialise the 20 three-byte weapon slots of the unit REC from the loadout record INDEX (202-byte entries at dword 0x19b; callers 8c49c@8c770,8cb60@8cb90,8d330@8d3c7; guest pending
 0x0008cae8	120	reset_slot_entries_8cae8	game_helpers32	compiles	game	confirmed	decomp/tests/0x0008cae8.json	docs/compiler-abi.md; Fill an object's 20 slot entries from the defaults table and reset its cursor.; callers 8cb60@8cb83; guest pending
 0x0008cb60	222	refresh_weapon_state_8cb60	game_helpers53	compiles	game	confirmed	decomp/tests/0x0008cb60.json	docs/compiler-abi.md; Refresh the player's weapon state and the activity display.; callers 9114@91c4,9114@9214,9114@926e; guest pending
 0x0008cc40	171	set_unit_speed_8cc40	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008cc40.json	docs/compiler-abi.md; Set a unit's base speed from its type and add 2 when the trigger fires.; callers 8c49c@8c807; guest pending
