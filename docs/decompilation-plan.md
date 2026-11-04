@@ -1140,6 +1140,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  129  Drafted and Watcom-compiled 11 more functions in float_helpers1 (1702 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  130  Drafted and Watcom-compiled 14 more functions in float_helpers2 (1716 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  131  Drafted and Watcom-compiled 12 more functions in float_helpers3 (1728 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  132  Drafted and Watcom-compiled 6 more functions in float_helpers4 (1734 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---

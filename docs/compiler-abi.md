@@ -3633,3 +3633,14 @@ in EAX, format string address, one value).
 | `0x84f60` | AX:int16_t,DL:uint8_t | EAX:double | 49228@49b86,55bf8@55c73,55bf8@55ccb | Double stored in a unit's slot table, or 0.0 when the unit is missing. |
 | `0x86720` | none | none | 86110@866c6,8cb60@8cc35 | Sum the weighted entries of the player's slot list into two doubles. |
 | `0x88d90` | EAX:ef_addr32,EDX:ef_addr32 | none | 89e08@89f41,8a318@8a67d | Scale a three-double vector in place and store its truncated components. |
+
+## float_helpers4 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x88ddc` | EAX:ef_addr32,EDX:double,EBX:double,ECX:double | none | 8a318@8a6ad | Store three scaled doubles as angle words in an output record. |
+| `0x88e50` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 89fbc@8a073 | Multiply a vector of three doubles by a 3x3 double matrix (column form). |
+| `0x88f6c` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 89fbc@8a184 | Multiply a vector of three doubles by a 3x3 double matrix (row form). |
+| `0x8bf58` | AX:int16_t,EDX:ef_addr32 | EAX:int32_t | 26b60@26c80,26b60@26e26,270d0@2726b | Scaled distance from a unit to an integer vector, truncated; 0 if the unit is missing. |
+| `0x92f10` | none | none | 95e58@96ce1 | Reset the scene record from the current object and the scene angle record. |
+| `0x97534` | EAX:ef_addr32 | AL:uint8_t | 97860@978ad,97860@978c6 | True when an object faces the camera closely enough and is active. |

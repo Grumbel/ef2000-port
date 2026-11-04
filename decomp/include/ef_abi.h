@@ -3029,4 +3029,20 @@ void guest_fn_6c2a4(void); /* 0x6c2a4 */
 void guest_fn_6bee8(void); /* 0x6bee8 */
 void guest_fn_6be28(void); /* 0x6be28 */
 
+/* float_helpers4.c */
+void store_scaled_angles_88ddc(ef_addr32 out, double a0, double a1, double a2);
+void matrix_vector_88e50(ef_addr32 out, ef_addr32 vec, ef_addr32 m);
+void matrix_vector_88f6c(ef_addr32 out, ef_addr32 vec, ef_addr32 m);
+int32_t unit_vector_distance_8bf58(int16_t unit, ef_addr32 vec);
+void reset_scene_record_92f10(void);
+uint8_t object_faces_camera_97534(ef_addr32 object);
+void guest_fn_18a68(void); /* 0x18a68 */
+void guest_fn_9357c(void); /* 0x9357c */
+void guest_fn_d0ebc(ef_addr32 record, uint32_t value); /* 0xd0ebc EAX/EDX */
+void guest_fn_d0dbc(ef_addr32 record, uint32_t value, uint32_t scale); /* 0xd0dbc EAX/EDX/EBX */
+void guest_fn_d0fb8(ef_addr32 record, uint32_t value, uint32_t flag); /* 0xd0fb8 EAX/EDX/ECX */
+void guest_fn_ea864(ef_addr32 vec, uint32_t a, uint32_t b, uint32_t c); /* 0xea864 EAX/EDX/EBX/ECX */
+void guest_fn_ea9ec(ef_addr32 a, ef_addr32 b); /* 0xea9ec EAX/EDX */
+int32_t guest_fn_ea9b8(ef_addr32 a, ef_addr32 b); /* 0xea9b8 EAX/EDX -> EAX */
+
 #endif

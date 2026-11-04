@@ -1733,10 +1733,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00088d4c	55	transform_signed_angle_pair	record_callers	compiles	game	confirmed	decomp/tests/0x00088d4c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00088d84	12	convert_scene_scalar	vector_math	compiles	game	confirmed	decomp/tests/0x00088d84.json	docs/compiler-abi.md; Signed dword at EAX+0x26 times double 0x18a498, stored to EDX; x87 precision pending; awaiting OMF guest differential
 0x00088d90	74	scale_vector_to_ints_88d90	float_helpers3	compiles	game	confirmed	decomp/tests/0x00088d90.json	docs/compiler-abi.md; Scale a three-double vector in place and store its truncated components.; callers 89e08@89f41,8a318@8a67d; guest pending
-0x00088ddc	115			unknown	unclassified	unverified		
-0x00088e50	71			unknown	unclassified	unverified		
+0x00088ddc	115	store_scaled_angles_88ddc	float_helpers4	compiles	game	confirmed	decomp/tests/0x00088ddc.json	docs/compiler-abi.md; Store three scaled doubles as angle words in an output record.; callers 8a318@8a6ad; guest pending
+0x00088e50	71	matrix_vector_88e50	float_helpers4	compiles	game	confirmed	decomp/tests/0x00088e50.json	docs/compiler-abi.md; Multiply a vector of three doubles by a 3x3 double matrix (column form).; callers 89fbc@8a073; guest pending
 0x00088e98	209			unknown	unclassified	unverified		
-0x00088f6c	71			unknown	unclassified	unverified		
+0x00088f6c	71	matrix_vector_88f6c	float_helpers4	compiles	game	confirmed	decomp/tests/0x00088f6c.json	docs/compiler-abi.md; Multiply a vector of three doubles by a 3x3 double matrix (row form).; callers 89fbc@8a184; guest pending
 0x00088fb4	67			unknown	unclassified	unverified		
 0x00088ff8	103			unknown	unclassified	unverified		
 0x00089060	221			unknown	unclassified	unverified		
@@ -1793,7 +1793,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008be54	23	update_object_with_link	ui_operations	compiles	game	confirmed	decomp/tests/0x0008be54.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008bf00	28	set_secondary_object_byte	scene_controls	compiles	game	confirmed	decomp/tests/0x0008bf00.json	docs/compiler-abi.md; Filtered lookup from signed high selector 0x1f71c8; set object+0x1d7 to incoming AL; awaiting OMF guest differential
 0x0008bf1c	57	scene_gate_allows	scene_controls	compiles	game	confirmed	decomp/tests/0x0008bf1c.json	docs/compiler-abi.md; Optional signed EAX>>8 threshold with direction switch at 0x214448; AL Boolean; awaiting OMF guest differential
-0x0008bf58	91			unknown	unclassified	unverified		
+0x0008bf58	91	unit_vector_distance_8bf58	float_helpers4	compiles	game	confirmed	decomp/tests/0x0008bf58.json	docs/compiler-abi.md; Scaled distance from a unit to an integer vector, truncated; 0 if the unit is missing.; callers 26b60@26c80,26b60@26e26,270d0@2726b; guest pending
 0x0008c064	55	table_contains_8c064	game_helpers6	compiles	game	confirmed	decomp/tests/0x0008c064.json	docs/compiler-abi.md; Is value present in the 0x898-entry table at 0x20f550?; callers 9596c@95a0d; guest pending
 0x0008c09c	32	indexed_object_is_canonical	object_table_queries	compiles	game	confirmed	decomp/tests/0x0008c09c.json	docs/compiler-abi.md
 0x0008c0bc	9	indexed_object_direct_slot	object_table_queries	compiles	game	confirmed	decomp/tests/0x0008c0bc.json	docs/compiler-abi.md
@@ -1906,7 +1906,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00092984	633			unknown	unclassified	unverified		
 0x00092c28	520			unknown	unclassified	unverified		
 0x00092e30	222			unknown	unclassified	unverified		
-0x00092f10	135			unknown	unclassified	unverified		
+0x00092f10	135	reset_scene_record_92f10	float_helpers4	compiles	game	confirmed	decomp/tests/0x00092f10.json	docs/compiler-abi.md; Reset the scene record from the current object and the scene angle record.; callers 95e58@96ce1; guest pending
 0x00092f98	98	update_viewpoint_92f98	camera_helpers	compiles	game	confirmed	decomp/tests/0x00092f98.json	docs/compiler-abi.md; ; callers 95e58@96cf0; guest pending
 0x00092ffc	99	step_list_92ffc	camera_helpers	compiles	game	confirmed	decomp/tests/0x00092ffc.json	docs/compiler-abi.md; Step byte 0x12dc34 through the list of words at +0x50 of the current record, skipping the player.; callers 93060@93098; guest pending
 0x00093060	269			unknown	unclassified	unverified		
@@ -1950,7 +1950,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00097064	620			unknown	unclassified	unverified		
 0x00097464	81	draw_chain_97464	game_helpers22	compiles	game	confirmed	decomp/tests/0x00097464.json	docs/compiler-abi.md; Walk the 0x4e-byte chain of records from 0x12dc74 and draw those of depth >= 2.; callers 3dd30@3e14f; guest pending
 0x000974b8	121			unknown	unclassified	unverified		
-0x00097534	163			unknown	unclassified	unverified		
+0x00097534	163	object_faces_camera_97534	float_helpers4	compiles	game	confirmed	decomp/tests/0x00097534.json	docs/compiler-abi.md; True when an object faces the camera closely enough and is active.; callers 97860@978ad,97860@978c6; guest pending
 0x000975f0	363			unknown	unclassified	unverified		
 0x0009775c	222			unknown	unclassified	unverified		
 0x0009783c	16	reset_record_range	misc_state	compiles	game	confirmed	decomp/tests/0x0009783c.json	docs/compiler-abi.md; word+6=0 word+8=EDX-1 tail 0x975f0; callers 9775c@9782c,97860@978bd; guest pending
