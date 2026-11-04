@@ -23419,3 +23419,46 @@ uint32_t shutdown_serial_port_e0a90(void)
 	EF_U32(0x15eed0) = 0;
 	return 1;
 }
+
+/* 0x11cda5, 139 bytes. Cached DPMI presence check: 1 when a DPMI host answers (int 2Fh AX=1686h then int 31h AX=0400h), else 0xffffffff. */
+uint32_t dpmi_present_11cda5(void)
+{
+	uint32_t out[7];
+	if (EF_U32(0x17e5fcu) == 0u) {
+		if (EF_U8(0x132a5eu) != 1u) {
+			run_dos_int_ex(0x2fu, 0x1686u, 0u, 0u, 0u, out);
+			if ((out[0] & 0xffffu) != 0u) {
+				EF_U32(0x17e5fcu) = 0xffffffffu;
+				return EF_U32(0x17e5fcu);
+			}
+		}
+		run_dos_int_ex(0x31u, 0x0400u, 0u, 0u, 0u, out);
+		if ((((out[0] >> 8) & 0xffu) + (out[0] & 0xffu)) > 0u)
+			EF_U32(0x17e5fcu) = 1u;
+		else
+			EF_U32(0x17e5fcu) = 0xffffffffu;
+	}
+	return EF_U32(0x17e5fcu);
+}
+
+/* 0x110393, 124 bytes. DOS write (int 21h AH=40h) of COUNT bytes from BUFFER to HANDLE, seeking to the end first (AX=4202h) for flagged slots. Returns the written count; errors go through 0x1101e8. */
+uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count)
+{
+	uint32_t out[7];
+	uint32_t flags = lookup_slot_11024e((int32_t)handle);
+	if ((flags & 0x80u) != 0u) {
+		run_dos_int_ex(0x21u, 0x4202u, handle, 0u, 0u, out);
+		if (out[6] != 0u) {
+			guest_fn_1101e8_x(out[0] & 0xffffu);
+			return out[0];
+		}
+	}
+	run_dos_int_ex(0x21u, 0x4000u, handle, count, buffer, out);
+	if (out[6] != 0u) {
+		guest_fn_1101e8_x(out[0] & 0xffffu);
+		return out[0];
+	}
+	if (out[0] != count)
+		guest_fn_ebe6d(0xcu);
+	return out[0];
+}

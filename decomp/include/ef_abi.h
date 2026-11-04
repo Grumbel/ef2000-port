@@ -6515,4 +6515,9 @@ ef_addr32 parse_time_string_10edda(ef_addr32 str, ef_addr32 buf, ef_addr32 out);
 uint32_t shutdown_serial_port_e0a90(void);
 uint32_t shutdown_serial_port_e0a90(void); /* 0xe0a90 */
 
+uint32_t dpmi_present_11cda5(void);
+uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count);
+uint32_t dpmi_present_11cda5(void); /* 0x11cda5 */
+uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count); /* 0x110393 */
+
 #endif

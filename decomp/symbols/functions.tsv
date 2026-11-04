@@ -4041,7 +4041,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001101e8	102	translate_key_1101e8	key_helpers1	compiles	game	confirmed	decomp/tests/0x001101e8.json	docs/compiler-abi.md; Store a key code, then translate it (via a table at 0x17d5a8 for plain keys, or its high byte for extended codes) and st; callers fa4a9@fa560,fa95f@fa98b,fe541@fe555; guest pending
 0x0011024e	85	lookup_slot_11024e	runtime_libc	compiles	game	confirmed	decomp/tests/0x0011024e.json	docs/compiler-abi.md; Look up dword table 0x17d614[index], marking the first six slots as seen.; callers fa4a9@fa5fa,10f26a@10f276,110393@1103a1; guest pending
 0x001102a3	21	store_flagged_value	runtime_libc	compiles	game	confirmed	decomp/tests/0x001102a3.json	docs/compiler-abi.md; Store value / 0x4000 in dword table 0x17d614[index].; callers fa4a9@fa65e,fa9a0@fa9b6; guest pending
-0x00110393	124			unknown	unclassified	unverified		
+0x00110393	124	dos_write_110393	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110393.json	docs/compiler-abi.md; DOS write (int 21h AH=40h) of COUNT bytes from BUFFER to HANDLE, seeking to the end first (AX=4202h) for flagged slots. ; callers fa8a0@fa8d7; guest pending
 0x00110410	163	heap_alloc_110410	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110410.json	docs/compiler-abi.md; First-fit allocation from a circular free list heap.; callers fc795@fc80c; guest pending
 0x001104b8	272	heap_free_1104b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001104b8.json	docs/compiler-abi.md; Free a heap block: coalesce with neighbouring free blocks and update the heap's free list and statistics.; callers fa9d2@faa03; guest pending
 0x001105c3	3	return_zero_1105c3	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001105c3.json	docs/compiler-abi.md; Return zero.; callers fc795@fc843; guest pending
@@ -4222,7 +4222,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011c484	101	project_triple_11c484	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011c484.json	docs/compiler-abi.md; Project the record at EDX into the coordinate triple at EAX: v = (s[0x50] - s[0x48] * tan(s[0x58])) / (1 + tan^2) - k80;; callers 11c20c@11c2b1,11c350@11c379; guest pending
 0x0011c4ec	152	build_matrix_11c4ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011c4ec.json	docs/compiler-abi.md; Builds a 3x3 double rotation matrix from two angles.; callers 11c20c@11c310,11c584@11c5a8; guest pending
 0x0011c584	1391			unknown	unclassified	unverified		
-0x0011cda5	139			unknown	unclassified	unverified		
+0x0011cda5	139	dpmi_present_11cda5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011cda5.json	docs/compiler-abi.md; Cached DPMI presence check: 1 when a DPMI host answers (int 2Fh AX=1686h then int 31h AX=0400h), else 0xffffffff.; callers 11ce30@11cebf,11cfe4@11cf7c,11d01c@11d097; guest pending
 0x0011ce30	242			unknown	unclassified	unverified		
 0x0011cfe4	245			unknown	unclassified	unverified		
 0x0011d01c	281			unknown	unclassified	unverified		

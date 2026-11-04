@@ -9517,3 +9517,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe0a90` | none | EAX:uint32_t | none direct | Shut down the serial port: restore the interrupt mask, release the hook slot and re-init. Returns 1 in AL. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11cda5` | none | EAX:uint32_t | 11ce30@11cebf,11cfe4@11cf7c,11d01c@11d097 | Cached DPMI presence check: 1 when a DPMI host answers (int 2Fh AX=1686h then int 31h AX=0400h), else 0xffffffff. |
+| `0x110393` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | fa8a0@fa8d7 | DOS write (int 21h AH=40h) of COUNT bytes from BUFFER to HANDLE, seeking to the end first (AX=4202h) for flagged slots.  |
