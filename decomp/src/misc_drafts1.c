@@ -11153,3 +11153,31 @@ void send_serial_text_e10a0(ef_addr32 text)
         p++;
     } while (EF_U8(p) != 0u);
 }
+
+/* 0xe0930, 81 bytes. Program the serial port at base dword 0x15eed0 (nothing when it is zero): clear the modem control (base + 4), set the interrupt enable from byte 0x15eeac, open the divisor latch (base + 3 = 0x80), write the divisor bytes 0x15eeae/0x15eeaf (base and base + 1), close the latch (base + 3 = 0x7f) and set the line control from byte 0x15eead. */
+void init_serial_port_e0930(void)
+{
+    uint32_t base = EF_U32(0x0015eed0u);
+    if (base == 0u)
+        return;
+    guest_fn_117b0c(base + 4u, 0u);
+    guest_fn_117b0c(EF_U32(0x0015eed0u) + 1u, EF_U8(0x0015eeacu));
+    guest_fn_117b0c(EF_U32(0x0015eed0u) + 3u, 0x80u);
+    base = EF_U32(0x0015eed0u);
+    guest_fn_117b0c(base, EF_U8(0x0015eeaeu));
+    guest_fn_117b0c(base + 1u, EF_U8(0x0015eeafu));
+    guest_fn_117b0c(base + 3u, 0x7fu);
+    guest_fn_117b0c(base + 3u, EF_U8(0x0015eeadu));
+}
+
+/* 0x1100d2, 81 bytes. localtime: break the time_t at TIMEP (EAX) into TM (EDX) relative to the epoch day 0x63df using the zone offset dword 0x17d554 (0x10eda1 sets the zone up), and again with the daylight saving shift dword 0x17d558 removed when 0x10e97f reports daylight time for the result. Returns TM. */
+ef_addr32 localtime_1100d2(ef_addr32 timep, ef_addr32 tm)
+{
+    uint32_t secs;
+    guest_fn_10eda1_x();
+    secs = EF_U32(timep);
+    (void)break_down_time_10ec62(0x63dfu, secs, (int32_t)EF_U32(0x0017d554u), tm);
+    if (guest_fn_10e97f_ret_x(tm) != 0u)
+        (void)break_down_time_10ec62(0x63dfu, secs, (int32_t)(EF_U32(0x0017d554u) - EF_U32(0x0017d558u)), tm);
+    return tm;
+}

@@ -5396,4 +5396,8 @@ void set_timer_divisor_110f0c(uint32_t divisor);
 
 void send_serial_text_e10a0(ef_addr32 text);
 
+void init_serial_port_e0930(void);
+ef_addr32 localtime_1100d2(ef_addr32 timep, ef_addr32 tm);
+uint32_t guest_fn_10e97f_ret_x(ef_addr32 tm); /* 0x10e97f EAX -> EAX */
+
 #endif

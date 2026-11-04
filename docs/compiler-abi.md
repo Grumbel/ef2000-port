@@ -7348,3 +7348,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe10a0` | EAX:ef_addr32 | none | e0b88@e0b92,e0b88@e0b9c,e0bcc@e0c23 | Send the text at TEXT (EAX) to the serial port at base dword 0x15eed0: remember the pointer in dword 0x15f690, set byte  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe0930` | none | none | e0a90@e0aee | Program the serial port at base dword 0x15eed0 (nothing when it is zero): clear the modem control (base + 4), set the in |
+| `0x1100d2` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 110123@110129 | localtime: break the time_t at TIMEP (EAX) into TM (EDX) relative to the epoch day 0x63df using the zone offset dword 0x |

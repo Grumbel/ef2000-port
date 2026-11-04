@@ -3304,7 +3304,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dff4c	24	poll_serial_dff4c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dff4c.json	docs/compiler-abi.md; Poll the serial line status register (port dword 0x15eed0 + 5): when its data-ready bit is set call the receive handler ; callers none direct; guest pending
 0x000e06ac	77			unknown	unclassified	unverified		
 0x000e0870	111	fill_channel_e0870	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e0870.json	docs/compiler-abi.md; Fill the channel record selected by byte 0x15f07f.; callers e1194@e1194; guest pending
-0x000e0930	81			unknown	unclassified	unverified		
+0x000e0930	81	init_serial_port_e0930	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e0930.json	docs/compiler-abi.md; Program the serial port at base dword 0x15eed0 (nothing when it is zero): clear the modem control (base + 4), set the in; callers e0a90@e0aee; guest pending
 0x000e0a90	116			unknown	unclassified	unverified		
 0x000e0b10	92	find_text_in_buffer_e0b10	search_helpers1	compiles	game	confirmed	decomp/tests/0x000e0b10.json	docs/compiler-abi.md; Search the buffer at 0x15f5fd (length byte at 0x15f684) for the text, ignoring case; on a hit remember its position at 0; callers e0b88@e0bbd,e115c@e1172,e1260@e1265; guest pending
 0x000e0b6c	28			unknown	unclassified	unverified		
@@ -4032,7 +4032,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010f4df	17	call_fa95f_from_start	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f4df.json	docs/compiler-abi.md; 0xfa95f(EAX, 0, 1).; callers f2183@f2227,f227f@f2287; guest pending
 0x0011004b	91	dos_time_hundredths_11004b	game_helpers107	compiles	game	confirmed	decomp/tests/0x0011004b.json	docs/compiler-abi.md; DOS get-time call (int 21h, AH=2Ch) converted to hundredths of a second since midnight.; callers 1100b1@1100b3; guest pending
 0x001100b1	33	elapsed_since_start	runtime_libc	compiles	game	confirmed	decomp/tests/0x001100b1.json	docs/compiler-abi.md; Elapsed value of 0x11004b relative to dword 0x4dd984, wrapping at 0x83d600.; callers none direct; guest pending
-0x001100d2	81			unknown	unclassified	unverified		
+0x001100d2	81	localtime_1100d2	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001100d2.json	docs/compiler-abi.md; localtime: break the time_t at TIMEP (EAX) into TM (EDX) relative to the epoch day 0x63df using the zone offset dword 0x; callers 110123@110129; guest pending
 0x00110123	13	call_1100d2_default	runtime_libc	compiles	game	confirmed	decomp/tests/0x00110123.json	docs/compiler-abi.md; 0x1100d2(EAX, 0x4dd988).; callers f9ecd@f9ecd,101c54@101ce1; guest pending
 0x00110130	60	classify_double_110130	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00110130.json	docs/compiler-abi.md; Wrapper for 0x10e4dd on the double (S0, S1): control word (S2 & 0x1f) with 0x1080 when S2 is not 8 and the value is +/-0; callers fa362@fa380; guest pending
 0x0011016c	82	fdiv_bug_probe_11016c	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011016c.json	docs/compiler-abi.md; Pentium FDIV bug probe: when the CPU level 0x13719d is at least 3, compute 4195835 - (4195835 / 3145727) * 3145727 and s; callers none direct; guest pending
