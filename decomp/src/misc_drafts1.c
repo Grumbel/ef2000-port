@@ -20777,3 +20777,15 @@ double math_error_edb2d(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, doub
 	}
 	return eval_binary_record_10e4dd(flags, (uint32_t)(uintptr_t)&v, (uint32_t)(uintptr_t)&v);
 }
+
+double sqrt(double);
+/* 0xa4472, 53 bytes. Implicit-register fragment (x87 ST0 = X, AL = math error code on entry). Checked square root: for X >= 0 returns sqrt(X) with AL=0 (*flag = 0). For X < 0 reports through 0xedb2d with the incoming AL as error code, returns its result and sets AL=1 (*flag = 1). When AL is 3 the ST0 operand is left on the x87 stack in the original; that stack imbalance is not modelled. */
+double sqrt_checked_a4472(double x, uint32_t code, uint32_t *flag)
+{
+	if (x >= 0.0) {
+		if (flag) *flag = 0u;
+		return sqrt(x);
+	}
+	if (flag) *flag = 1u;
+	return math_error_edb2d(0u, 0u, 0u, 0u, x, code & 0xffu);
+}

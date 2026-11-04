@@ -6203,4 +6203,7 @@ uint32_t extender_range_9c2d3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 double math_error_edb2d(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, uint32_t code);
 double math_error_edb2d(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x, uint32_t code); /* 0xedb2d */
 
+double sqrt_checked_a4472(double x, uint32_t code, uint32_t *flag);
+double sqrt_checked_a4472(double x, uint32_t code, uint32_t *flag); /* 0xa4472 */
+
 #endif
