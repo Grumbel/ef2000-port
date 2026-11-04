@@ -6171,4 +6171,7 @@ double scaled_pow_formula_11b9ec(uint32_t ref, uint32_t obj);
 double ratio_formula_11b134(uint32_t obj, double arg, double unused); /* 0x11b134 */
 double scaled_pow_formula_11b9ec(uint32_t ref, uint32_t obj); /* 0x11b9ec */
 
+void fill_free_slots_fd3ce(void);
+void fill_free_slots_fd3ce(void); /* 0xfd3ce */
+
 #endif

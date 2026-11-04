@@ -3764,7 +3764,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fd162	1	nop_fd162	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fd162.json	docs/compiler-abi.md; Empty stub (single ret).; callers none direct; guest pending
 0x000fd164	335			unknown	unclassified	unverified		
 0x000fd371	11	set_pointer_fd371	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000fd371.json	docs/compiler-abi.md; Set the 0x17bfea pointer to its default.; callers none direct; guest pending
-0x000fd3ce	52			unknown	unclassified	unverified		
+0x000fd3ce	52	fill_free_slots_fd3ce	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fd3ce.json	docs/compiler-abi.md; Walk the 10-byte slots from 0x17cf8e down towards the pointer at 0x17bfea; for each slot whose first word is zero, store; callers none direct; guest pending
 0x000fd404	276	alias_code_address_fd404	game_helpers62	compiles	game	confirmed	decomp/tests/0x000fd404.json	docs/compiler-abi.md; Redirect any of a fixed set of code addresses to the shared handler 0xfd52f.; callers c4310@c4333; guest pending
 0x000fd518	2197			unknown	unclassified	unverified		
 0x000fddb0	7	muldiv_fddb0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000fddb0.json	docs/compiler-abi.md; (a * b) / c with a 64-bit intermediate; EDX is preserved.; callers ce5f8@ce74e,ce5f8@ce766,ce5f8@ce77e; guest pending

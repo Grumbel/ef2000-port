@@ -8989,3 +8989,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x11b134` | EAX:uint32_t,EDX:double,EBX:double | EAX:double | 10a220@10a28f,11b1b0@11b1c8,11b3c8@11b43d | EAX = object pointer; stack: a double (the second 8 stack bytes are popped but unused). Computes q = tan(obj[0x30]) / he |
 | `0x11b9ec` | EAX:uint32_t,EDX:uint32_t | EAX:double | 11ba7c@11baa1 | EAX = pointer to a reference double (divisor), EDX = object pointer. Computes t = (C3 - exp(-(obj[0x20] + C1) * C2)) * C |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfd3ce` | none | none | none direct | Walk the 10-byte slots from 0x17cf8e down towards the pointer at 0x17bfea; for each slot whose first word is zero, store |

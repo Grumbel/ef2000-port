@@ -20606,3 +20606,24 @@ double scaled_pow_formula_11b9ec(uint32_t ref, uint32_t obj)
 	memcpy(ef_guest_memory_ptr(0x00432ac8u), &res, 8);
 	return res;
 }
+
+/* 0xfd3ce, 52 bytes. Walk the 10-byte slots from 0x17cf8e down towards the pointer at 0x17bfea; for each slot whose first word is zero, store the word 0x159142 into it and call the function pointer at 0xfc878 (the slot address is in ESI and EDI at that point; it is passed in EAX here), stopping once EDI equals the pointer. */
+void fill_free_slots_fd3ce(void)
+{
+	uint32_t edi = 0x0017cf8eu;
+
+	for (;;) {
+		if (edi == EF_U32(0x0017bfeau))
+			return;
+		edi -= 0xau;
+		while (EF_U16(edi) != 0) {
+			if (edi == EF_U32(0x0017bfeau))
+				return;
+			edi -= 0xau;
+		}
+		EF_U16(edi) = EF_U16(0x00159142u);
+		guest_callptr_eax_x(EF_U32(0x000fc878u), edi);
+		if (edi == EF_U32(0x0017bfeau))
+			return;
+	}
+}
