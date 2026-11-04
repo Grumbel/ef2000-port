@@ -4773,3 +4773,56 @@ void randomize_pilot_779f4(uint32_t obj)
     EF_U16(obj + 0x3fu) = (uint16_t)((guest_fn_a45b3() & 0xffffu) / 0x1111u);
     EF_U16(obj + 0x41u) = (uint16_t)((guest_fn_a45b3() & 0xffffu) / 0x1111u);
 }
+
+/* 0xa207c, 266 bytes. Step the animation script of OBJ (script pointer +0, time +4, wait +6): once the time word is at least 0x4000 the wait is cleared and opcodes are executed until one sets a wait: 0 loads the 3 words at +0xe, 1 copies the 6 bytes +0x14 to +0xe, 2 loads the 3 words at +0x14, 3 selects the frame handler +0x1a from the table 0x132b44, 4 restarts the time and loads the wait, 5 jumps by a signed word offset, 6 flags OTHER (+0x1c |= 0x40) and ends the step at once; unknown opcodes are skipped. Afterwards the handler is called and the wait is added to the time. */
+void step_animation_script_a207c(uint32_t obj, uint32_t other)
+{
+    uint32_t ptr;
+    uint16_t op;
+    if (EF_U16(obj + 4u) >= 0x4000u) {
+        EF_U16(obj + 6u) = 0u;
+        while (EF_U16(obj + 6u) == 0u) {
+            ptr = EF_U32(obj);
+            EF_U32(obj) = ptr + 2u;
+            op = EF_U16(ptr);
+            ptr += 2u;
+            switch (op) {
+            case 0:
+                EF_U16(obj + 0xeu) = EF_U16(ptr);
+                EF_U16(obj + 0x10u) = EF_U16(ptr + 2u);
+                EF_U16(obj + 0x12u) = EF_U16(ptr + 4u);
+                EF_U32(obj) = ptr + 6u;
+                break;
+            case 1:
+                EF_U32(obj + 0xeu) = EF_U32(obj + 0x14u);
+                EF_U16(obj + 0x12u) = EF_U16(obj + 0x18u);
+                break;
+            case 2:
+                EF_U16(obj + 0x14u) = EF_U16(ptr);
+                EF_U16(obj + 0x16u) = EF_U16(ptr + 2u);
+                EF_U16(obj + 0x18u) = EF_U16(ptr + 4u);
+                EF_U32(obj) = ptr + 6u;
+                break;
+            case 3:
+                EF_U32(obj) = ptr + 2u;
+                EF_U32(obj + 0x1au) = EF_U32(0x00132b44u + (uint32_t)(int32_t)(int16_t)EF_U16(ptr) * 4u);
+                break;
+            case 4:
+                EF_U16(obj + 4u) = 0u;
+                EF_U32(obj) = ptr + 2u;
+                EF_U16(obj + 6u) = EF_U16(ptr);
+                break;
+            case 5:
+                EF_U32(obj) = ptr + (uint32_t)((int32_t)(int16_t)EF_U16(ptr) * 2);
+                break;
+            case 6:
+                EF_U8(other + 0x1cu) |= 0x40u;
+                return;
+            default:
+                break;
+            }
+        }
+    }
+    guest_callptr_eax_x(EF_U32(obj + 0x1au), obj);
+    EF_U16(obj + 4u) = (uint16_t)(EF_U16(obj + 4u) + EF_U16(obj + 6u));
+}

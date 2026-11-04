@@ -6068,3 +6068,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x779f4` | EAX:uint32_t | none | be48@be5f,be8c@beab,bed8@bef9 | Randomise the pilot record OBJ: a random 1-in-3 (word / 0x3333 equal to 1) picks the first name table (flag +0x34 = 1) i |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa207c` | EAX:uint32_t,EDX:uint32_t | none | a2634@a268f,a2698@a271a | Step the animation script of OBJ (script pointer +0, time +4, wait +6): once the time word is at least 0x4000 the wait i |
