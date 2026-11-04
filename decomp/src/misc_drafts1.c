@@ -8035,3 +8035,18 @@ uint32_t strstr_e7d27(uint32_t hay, uint32_t needle)
         p++;
     }
 }
+
+/* 0xd4510, 197 bytes. Fill one horizontal span with the colour byte 0x159138: from the signed word 0x485fea to the signed word 0x485fd2 (inclusive; nothing when the end is before the start) on the row signed word 0x485fee, whose start offset is the dword at 0x163200[row] plus the frame base dword 0x15b754. The original uses aligned dword stores and a computed jump for short spans; the stored bytes are the same. */
+void fill_span_d4510(void)
+{
+    int32_t x0 = (int16_t)EF_U16(0x00485feau);
+    int32_t n = (int32_t)(int16_t)EF_U16(0x00485fd2u) - x0;
+    uint32_t dst, i;
+    uint8_t col = EF_U8(0x00159138u);
+    if (n < 0)
+        return;
+    n++;
+    dst = EF_U32(0x00163200u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00485feeu) * 4u) + EF_U32(0x0015b754u) + (uint32_t)x0;
+    for (i = 0; i < (uint32_t)n; i++)
+        EF_U8(dst + i) = col;
+}

@@ -6732,3 +6732,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe7d27` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 69094@69264,c3364@c337d | strstr(HAY = EAX, NEEDLE = EDX): the first occurrence of NEEDLE in HAY, or 0. An empty needle returns HAY; a one-charact |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd4510` | none | none | fddf0@fde0c | Fill one horizontal span with the colour byte 0x159138: from the signed word 0x485fea to the signed word 0x485fd2 (inclu |

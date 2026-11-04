@@ -5167,4 +5167,6 @@ double estimate_coefficient_6c1f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_
 
 uint32_t strstr_e7d27(uint32_t hay, uint32_t needle);
 
+void fill_span_d4510(void);
+
 #endif
