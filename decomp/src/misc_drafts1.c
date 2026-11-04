@@ -11668,3 +11668,43 @@ uint32_t fold_list_kinds_c02ec(uint32_t a, uint32_t list, uint32_t b, uint32_t c
     }
     return cur;
 }
+
+/* 0x284ec, 204 bytes. Startup of the data-file check: initialise the subsystems (0xd65e8, 0xc3980, 0xc34cc with 0x18235c, 0xc39ac, 0xc3888, 0xdc250, 0xde580 on 0x425c8c), then ask 0x27d18 about the request record {0x125200, word 2, dword 0}. If it answers 1 run 0x28224(1) and, for a nonnegative result, format it into 0x125208 with 0x1822ec; a negative result r runs 0x283c8 and formats -r - 1; then open the named file (0x287bc). Otherwise run 0x283c8, ask 0x28224(0), format its result likewise and use 0x28744. Finally release 0x425c8c with 0xde648. */
+void check_data_files_284ec(void)
+{
+    uint8_t req[16];
+    int16_t answer;
+    int16_t r;
+    guest_fn_d65e8();
+    select_buffer_146e44();
+    guest_fn_c34cc(0x0018235cu);
+    guest_fn_c39ac();
+    call_e9a24_c3888();
+    guest_fn_dc250();
+    guest_fn_de580(0x00425c8cu);
+    memset(req, 0, sizeof req);
+    {
+        uint32_t base = 0x00125200u;
+        uint16_t kind = 2u;
+        memcpy(req, &base, sizeof base);
+        memcpy(req + 8, &kind, sizeof kind);
+    }
+    answer = (int16_t)guest_fn_27d18_x((ef_addr32)(uintptr_t)req);
+    if (answer == 1) {
+        r = (int16_t)guest_fn_28224_x(1u);
+        if (r < 0) {
+            check_data_file_283c8();
+            r = (int16_t)(-r - 1);
+        }
+        guest_sprintf_a4342(0x00125208u, 0x001822ecu, (uint32_t)(int32_t)r);
+        open_named_file_287bc();
+    } else {
+        check_data_file_283c8();
+        r = (int16_t)guest_fn_28224_x(0u);
+        if (r < 0)
+            r = (int16_t)(-r - 1);
+        guest_sprintf_a4342(0x00125208u, 0x001822ecu, (uint32_t)(int32_t)r);
+        open_named_file_28744();
+    }
+    guest_fn_de648(0x00425c8cu, 0u);
+}

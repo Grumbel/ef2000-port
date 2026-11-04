@@ -404,7 +404,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00027fec	567			unknown	unclassified	unverified		
 0x00028224	418			unknown	unclassified	unverified		
 0x000283c8	289	check_data_file_283c8	game_helpers43	compiles	game	confirmed	decomp/tests/0x000283c8.json	docs/compiler-abi.md; Draw the splash buttons and probe the data file for its magic word.; callers 284ec@28553,284ec@28578; guest pending
-0x000284ec	204			unknown	unclassified	unverified		
+0x000284ec	204	check_data_files_284ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000284ec.json	docs/compiler-abi.md; Startup of the data-file check: initialise the subsystems (0xd65e8, 0xc3980, 0xc34cc with 0x18235c, 0xc39ac, 0xc3888, 0x; callers 3ea0c@3ec82; guest pending
 0x000285b8	132	write_save_header_285b8	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x000285b8.json	docs/compiler-abi.md; Write the save file header block for the current game file.; callers 3ea0c@3ec95; guest pending
 0x0002863c	130	read_save_header_2863c	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x0002863c.json	docs/compiler-abi.md; Read the save file header block of the current game file.; callers 3ea0c@3ecac; guest pending
 0x000286c0	131	write_marker_file_286c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000286c0.json	docs/compiler-abi.md; Sibling of 0x28744: build the file name (two formats chosen by 0x15ee9a), open it with 0xa7948, write the 2-byte value 0; callers 3ea0c@3ecda; guest pending
