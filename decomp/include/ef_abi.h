@@ -6582,4 +6582,7 @@ void advance_object_89e08(ef_addr32 obj); /* 0x89e08 */
 
 void guest_fn_8b8(uint32_t code, ef_addr32 block); /* 0x8b8 */
 
+void update_unit_vector_75344(int16_t unit);
+void update_unit_vector_75344(int16_t unit); /* 0x75344 */
+
 #endif

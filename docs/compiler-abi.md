@@ -9645,3 +9645,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8b8` | EAX:uint32_t,EDX:ef_addr32 | none | cdf60@cdf82,cdfe8@ce003,ce02c@ce047 | EAX = interrupt number word, EDX = register block. Fills the DOS/4GW real-mode call structure at 0x196170 from the block |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x75344` | AX:int16_t | none | 6a1d0@6a2dc | AX = unit index. Looks up the unit object and sets its integer vector fields at +0x1e8, +0x1ec and +0x1f0 (and zeroes +0 |

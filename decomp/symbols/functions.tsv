@@ -1371,7 +1371,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00074ed8	219	raise_random_counters_74ed8	tactical_marks1	compiles	game	confirmed	decomp/tests/0x00074ed8.json	docs/compiler-abi.md; Randomly raise the twelve 0..100 counters (+0x18e) of the object found for key by up to n, redrawing its entries first w; callers 2a4c8@2a669,74970@74d28; guest pending
 0x00074fb4	794			unknown	unclassified	unverified		
 0x000752d0	113	load_waypoint_752d0	game_helpers9	compiles	game	confirmed	decomp/tests/0x000752d0.json	docs/compiler-abi.md; Copy the waypoint selected by the unit's index into the unit.; callers 6a1d0@6a2c9,6a1d0@6a2d5; guest pending
-0x00075344	327			unknown	unclassified	unverified		
+0x00075344	327	update_unit_vector_75344	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00075344.json	docs/compiler-abi.md; AX = unit index. Looks up the unit object and sets its integer vector fields at +0x1e8, +0x1ec and +0x1f0 (and zeroes +0; callers 6a1d0@6a2dc; guest pending
 0x0007548c	221	build_unit_name_7548c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007548c.json	docs/compiler-abi.md; Build the display name of unit INDEX (16-bit, looked up with 0x7489c) into DEST. When the record's word +0x28 equals wor; callers 77c90@77e72,77c90@780c9,78f3c@78fc1; guest pending
 0x0007556c	90	unit_slot_value_7556c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0007556c.json	docs/compiler-abi.md; Return the pointer or value associated with the unit's slot.; callers 77c90@77e79; guest pending
 0x000755c8	85	sum_slot_weights_755c8	game_helpers9	compiles	game	confirmed	decomp/tests/0x000755c8.json	docs/compiler-abi.md; Sum the weights of the unit's slots whose class equals filter.; callers 2af78@2afb0; guest pending

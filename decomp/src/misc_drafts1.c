@@ -24228,3 +24228,35 @@ void guest_fn_8b8(uint32_t code, ef_addr32 block)
 	EF_U16(block + 0x26) = EF_U16(0x196176u);
 	EF_U16(block + 0x28) = EF_U16(0x196178u);
 }
+
+/* 0x75344, 327 bytes. AX = unit index. Looks up the unit object and sets its integer vector fields at +0x1e8, +0x1ec and +0x1f0 (and zeroes +0x1f4, +0x1f8, +0x1fc) from a per-type offset record, scaled by constants. */
+void update_unit_vector_75344(int16_t unit)
+{
+	ef_addr32 obj = guest_fn_7489c((int32_t)unit);
+	double d0 = 0.0, d8 = 0.0, d10 = 0.0;
+	double k1, k2;
+
+	if (obj == 0) return;
+	{
+		ef_addr32 rec = EF_U32(EF_U32(0x19bb58u) + (uint32_t)(EF_S32(obj + 0x26) >> 16) * 0xcau + 0xb5u);
+		if (rec != 0) {
+			ef_addr32 rec2;
+			uint32_t el;
+			d0 = guest_fn_b4230((int32_t)EF_S16(rec));
+			d8 = guest_fn_b4230(EF_S32(rec) >> 16);
+			d10 = 0.0;
+			rec2 = EF_U32(EF_U32(0x19bb58u) + (uint32_t)(EF_S32(obj + 0x26) >> 16) * 0xcau + 0xb5u);
+			el = (uint32_t)EF_U8(obj + 0x2a) * 3u;
+			d0 = (double)EF_S16(rec2 + 0x18u + el * 2u) * md_rd_f64(0x186bf6u) + d0;
+			d8 = (double)EF_S16(rec2 + 0x1au + el * 2u) * md_rd_f64(0x186bf6u) + d8;
+		}
+	}
+	k1 = md_rd_f64(0x186bfeu);
+	k2 = md_rd_f64(0x186c06u);
+	EF_S32(obj + 0x1e8) = (int32_t)truncate_9d72c(d8 * k1 * k2);
+	EF_U32(obj + 0x1f4) = 0;
+	EF_S32(obj + 0x1ec) = (int32_t)truncate_9d72c(d10 * k1 * k2);
+	EF_U32(obj + 0x1f8) = 0;
+	EF_U32(obj + 0x1fc) = 0;
+	EF_S32(obj + 0x1f0) = (int32_t)truncate_9d72c(k2 * (k1 * d0));
+}
