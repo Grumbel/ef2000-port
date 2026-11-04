@@ -3075,7 +3075,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d65e8	34	set_black_palette_d65e8	game_helpers106	compiles	game	confirmed	decomp/tests/0x000d65e8.json	docs/compiler-abi.md; Upload an all-zero (black) 0x300-byte palette.; callers 284ec@284f2,39204@39211,3dccc@3dccf; guest pending
 0x000d660c	46	compare_remapped_palette_d660c	game_helpers120	compiles	game	confirmed	decomp/tests/0x000d660c.json	docs/compiler-abi.md; Remap the 256-entry palette at the stack argument and compare the result with the 0x300 bytes at 0x420a90 (cdecl; return; callers eac48@eacbc,eac48@ead32; guest pending
 0x000d663c	53	apply_palette_d663c	game_helpers125	compiles	game	confirmed	decomp/tests/0x000d663c.json	docs/compiler-abi.md; Remap a 256-entry palette, upload it to the VGA DAC and keep a copy of the source at 0x420a90.; callers 1a358@1a385,1a390@1a3c0,1e480@1e4fc; guest pending
-0x000d6694	46			unknown	unclassified	unverified		
+0x000d6694	46	run_steps_d6694	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6694.json	docs/compiler-abi.md; Run the step 0xd66c2; when it succeeds (non-zero) run it five more times and return -1, otherwise return 0.; callers 1c60c@1c60f,82cec@82d03; guest pending
 0x000d66c2	358			unknown	unclassified	unverified		
 0x000d6960	541			unknown	unclassified	unverified		
 0x000d6b80	268			unknown	unclassified	unverified		
@@ -3468,7 +3468,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ea17c	36	build_path_from_record_ea17c	game_helpers91	compiles	game	confirmed	decomp/tests/0x000ea17c.json	docs/compiler-abi.md; Build a path from a record's first name, an extra part and the record's second name.; callers ea270@ea306,ea270@ea37a; guest pending
 0x000ea1a0	70	read_chunk_header_ea1a0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000ea1a0.json	docs/compiler-abi.md; Read a header into an object and take its chunk size when tagged 'RA'.; callers ea270@ea398; guest pending
 0x000ea1e8	33	compare_dwords	math_string	compiles	game	confirmed	decomp/tests/0x000ea1e8.json	docs/compiler-abi.md; Signed compare of the dwords at EAX and EDX: -1, 0 or 1.; callers none direct; guest pending
-0x000ea20c	51			unknown	unclassified	unverified		
+0x000ea20c	51	hash_and_run_ea20c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ea20c.json	docs/compiler-abi.md; Hash the name TEXT (0xebfd0), place the hash in a 16-byte block (a callback address 0xea1e8 sits just below it on the st; callers ea3ec@ea3fd; guest pending
 0x000ea240	48	release_record_ea240	math_string	compiles	game	confirmed	decomp/tests/0x000ea240.json	docs/compiler-abi.md; If dword +0xc is set, release dwords +0x14 and +0x10 * through 0xc3f80 and clear +0xc, +0x10 and +0x14.; callers ea270@ea281; guest pending
 0x000ea270	378	clump_load		named	unclassified	unverified		serclump error path; docs/ghidra-findings.md
 0x000ea3ec	40	refresh_cached_chunk_ea3ec	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x000ea3ec.json	docs/compiler-abi.md; Rebuild the cached chunk when the descriptor has one; true if present.; callers 9dcf8@9dd06,de864@de97c; guest pending
@@ -3918,7 +3918,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00106dc4	103	wait_ring_data_106dc4	dos_slots1	compiles	game	confirmed	decomp/tests/0x00106dc4.json	docs/compiler-abi.md; Wait on a ring record until its data arrives (0), the end marker 0x4f (0) or 0x45 (8) is popped, or the timeout expires ; callers 106e2c@106e38; guest pending
 0x00106e2c	19	run_pair_106e2c	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00106e2c.json	docs/compiler-abi.md; Run 106d00 on the object, then 106dc4 on it with the second argument.; callers d9c30@d9c8a; guest pending
 0x00106f10	244			unknown	unclassified	unverified		
-0x00107004	56			unknown	unclassified	unverified		
+0x00107004	56	try_open_slot_107004	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00107004.json	docs/compiler-abi.md; Try 0x106f10 with the object A and the current slot index [0x464470] - 1: on success (0) store the index through OUT and; callers d9c30@d9c56; guest pending
 0x0010703c	33	release_object_10703c	runtime_helpers	compiles	game	confirmed	decomp/tests/0x0010703c.json	docs/compiler-abi.md; Release the object stored at *slot.; callers d9c30@d9c69,d9c30@d9c9d,106f10@106f22; guest pending
 0x00107060	15	send_command_107060	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00107060.json	docs/compiler-abi.md; 0x118428(*EAX, 0x53).; callers d9cb4@d9d1a,d9dc0@d9e01; guest pending
 0x00107070	281			unknown	unclassified	unverified		

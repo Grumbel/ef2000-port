@@ -2166,3 +2166,36 @@ uint32_t int386_9c446(uint32_t intno, uint32_t in, uint32_t out)
     segread_9be0d((uint32_t)(uintptr_t)sregs);
     return int386x_9c461(intno, in, out, (uint32_t)(uintptr_t)sregs);
 }
+
+/* 0xd6694, 46 bytes. Run the step 0xd66c2; when it succeeds (non-zero) run it five more times and return -1, otherwise return 0. */
+uint32_t run_steps_d6694(void)
+{
+    if (guest_fn_d66c2_x() == 0u)
+        return 0u;
+    guest_fn_d66c2_x();
+    guest_fn_d66c2_x();
+    guest_fn_d66c2_x();
+    guest_fn_d66c2_x();
+    guest_fn_d66c2_x();
+    return 0xffffffffu;
+}
+
+/* 0x107004, 56 bytes. Try 0x106f10 with the object A and the current slot index [0x464470] - 1: on success (0) store the index through OUT and return 0, otherwise release the object and return 2. */
+uint8_t try_open_slot_107004(ef_addr32 a, ef_addr32 out)
+{
+    uint8_t r = (uint8_t)guest_fn_106f10_x(a, (uint8_t)(EF_U8(0x00464470u) - 1u));
+    if (r == 0u) {
+        EF_U8(out) = (uint8_t)(EF_U8(0x00464470u) - 1u);
+        return r;
+    }
+    release_object_10703c(a);
+    return 2u;
+}
+
+/* 0xea20c, 51 bytes. Hash the name TEXT (0xebfd0), place the hash in a 16-byte block (a callback address 0xea1e8 sits just below it on the stack) and run 0x10d9e3 on it with the object's fields at +0xc and +0x10. */
+void hash_and_run_ea20c(ef_addr32 obj, ef_addr32 text)
+{
+    uint32_t block[4];
+    block[0] = name_hash_ebfd0(text);
+    guest_fn_10d9e3_x((uint32_t)(uintptr_t)block, EF_U32(obj + 0x10u), EF_U32(obj + 0xcu), 0x10u);
+}
