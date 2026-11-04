@@ -2705,4 +2705,32 @@ void guest_fn_f13c(ef_addr32 entry); /* 0xf13c EAX */
 void guest_fn_f314(ef_addr32 entry, uint32_t value); /* 0xf314 EAX/EDX */
 void guest_fn_ed80(ef_addr32 point); /* 0xed80 EAX */
 
+/* runtime_helpers28.c */
+uint32_t read_four_words_105a4(ef_addr32 first, ef_addr32 second, ef_addr32 third, ef_addr32 fourth,
+                               ef_addr32 stack_name);
+void reroll_list_entries_1e3c4(void);
+void write_save_header_285b8(void);
+void read_save_header_2863c(void);
+void start_session_34ca4(void);
+void clear_session_34ea4(void);
+void end_session_34e18(void);
+void open_stream_36054(ef_addr32 name, uint8_t volume);
+uint32_t take_table_record_3730c(void);
+void claim_unit_slot_39e0c(int16_t unit_id);
+uint32_t guest_fn_cd150(int32_t cell); /* 0xcd150 EAX */
+uint32_t guest_fn_1e214(int32_t a, int32_t b, int32_t c, int32_t d); /* 0x1e214 EAX/EDX/EBX/ECX */
+uint32_t guest_fn_cd258(void); /* 0xcd258 -> AX */
+void guest_fn_ab324(uint32_t a, uint32_t b); /* 0xab324 EAX/EDX */
+void guest_fn_ab47c(uint32_t a); /* 0xab47c EAX */
+uint32_t guest_fn_a29cc(uint32_t a); /* 0xa29cc EAX -> AL */
+void guest_fn_a29f8(void); /* 0xa29f8 */
+void guest_fn_a2bdc(void); /* 0xa2bdc */
+void guest_fn_a41d0(void); /* 0xa41d0 */
+uint32_t guest_fn_e1780(void); /* 0xe1780 -> AL */
+uint32_t guest_fn_e1744(uint32_t a); /* 0xe1744 EAX -> AL */
+void guest_fn_a3da0(void); /* 0xa3da0 */
+void guest_fn_a3e04(void); /* 0xa3e04 */
+void guest_fn_35fbc(void); /* 0x35fbc */
+void guest_fn_9ce84(uint32_t handle); /* 0x9ce84 EAX */
+
 #endif

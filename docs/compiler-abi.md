@@ -3383,3 +3383,18 @@ in EAX, format string address, one value).
 | `0xfbcc` | EAX:ef_addr32 | EAX:uint32_t | fc54@fcd8 | Read a header and its list of point lists. |
 | `0xfc54` | EAX:ef_addr32 | EAX:uint32_t | fecc@ff70 | Read a group header and its list of 10-byte polyline records. |
 | `0xffb4` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 1001c@1022b | Find the node whose name matches; abort unless exactly one matches. |
+
+## runtime_helpers28 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x105a4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:ef_addr32 | EAX:uint32_t | 45a4@45f0,7c574@7c6a3 | Read four numbers from a parser file into the given words. |
+| `0x1e3c4` | none | none | 3dd30@3e886 | Re-roll the strength of every entry whose spot is occupied, per list node. |
+| `0x285b8` | none | none | 3ea0c@3ec95 | Write the save file header block for the current game file. |
+| `0x2863c` | none | none | 3ea0c@3ecac | Read the save file header block of the current game file. |
+| `0x34ca4` | none | none | none direct | Start a new session: clear the flags and open the device if needed. |
+| `0x34ea4` | none | none | 335c0@335c9,3361c@3361c,336c0@336c0 | Clear the session flags and check the device state in mode 3. |
+| `0x34e18` | none | none | none direct | Wait for the device to stop, then shut it down and clear the session. |
+| `0x36054` | EAX:ef_addr32,DL:uint8_t | none | 36f84@37066,36f84@37077 | Open the named stream for playback and arm the stream state. |
+| `0x3730c` | none | EAX:uint32_t | 37498@374b6 | Take the next 69-byte record of the table, linking it to the previous one. |
+| `0x39e0c` | AX:int16_t | none | 8c49c@8c85f | Claim a free slot in the 4-byte slot table for a unit and mark its owner. |
