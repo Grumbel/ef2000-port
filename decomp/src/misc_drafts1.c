@@ -17339,3 +17339,43 @@ void draw_unit_icons_44f68(uint32_t a, ef_addr32 head)
 		node = EF_U32(node + 4u);
 	}
 }
+
+/* 0x90f50, 419 bytes. When byte 0x125847 is set, walk the 40 effect entries of 0x30 bytes at 0x211af0 (skipping entries with flag 2 in byte +0x24). An entry whose position dwords (+0, +4, +8; >> 8) are each within 0x1000 of the viewer position (dwords 0x21444c, 0x214448, 0x214450) and whose +4 value passes the scene gate (0x8bf1c) is published as a segment in the globals at 0x420904..0x42091c (viewer and entry positions) and the words 0x420930..0x42093a. If the check 0x7b7d8 then returns zero the entry's three words (+0xa, +0xc, +0xe) are stored with 0xa0ea8 for the record in the high word at +0x1e and the entry position (<< 8) is passed to 0x9e0c4. */
+void update_effect_entries_90f50(void)
+{
+	int32_t i;
+	uint32_t e;
+
+	if (EF_U8(0x00125847u) == 0u)
+		return;
+	for (i = 0; i < 0x28; i++) {
+		e = 0x00211af0u + (uint32_t)(i * 0x30);
+		if ((EF_U8(e + 0x24u) & 2u) != 0u)
+			continue;
+		if ((int32_t)abs_cf94a(((int32_t)EF_U32(e) >> 8) - (int32_t)EF_U32(0x0021444cu)) > 0x1000)
+			continue;
+		if ((int32_t)abs_cf94a(((int32_t)EF_U32(e + 4u) >> 8) - (int32_t)EF_U32(0x00214448u)) > 0x1000)
+			continue;
+		if ((int32_t)abs_cf94a(((int32_t)EF_U32(e + 8u) >> 8) - (int32_t)EF_U32(0x00214450u)) > 0x1000)
+			continue;
+		if (scene_gate_allows((int32_t)EF_U32(e + 4u)) == 0u)
+			continue;
+		EF_U32(0x00420910u) = EF_U32(0x0021444cu);
+		EF_U32(0x00420904u) = EF_U32(0x00214448u);
+		EF_U32(0x00420918u) = EF_U32(0x00214450u);
+		EF_U32(0x00420914u) = (uint32_t)((int32_t)EF_U32(e) >> 8);
+		EF_U32(0x00420908u) = (uint32_t)((int32_t)EF_U32(e + 4u) >> 8);
+		EF_U32(0x0042091cu) = (uint32_t)((int32_t)EF_U32(e + 8u) >> 8);
+		EF_U16(0x00420930u) = (uint16_t)EF_U32(0x0021444cu);
+		EF_U16(0x00420932u) = (uint16_t)EF_U32(0x00214448u);
+		EF_U16(0x00420934u) = (uint16_t)EF_U32(0x00214450u);
+		EF_U16(0x00420936u) = (uint16_t)EF_U32(0x00420914u);
+		EF_U16(0x00420938u) = (uint16_t)EF_U32(0x00420908u);
+		EF_U16(0x0042093au) = (uint16_t)EF_U32(0x0042091cu);
+		if (guest_fn_7b7d8() != 0u)
+			continue;
+		guest_fn_a0ea8((int32_t)EF_U32(e + 0x1eu) >> 16, (uint32_t)((int32_t)EF_U32(e + 0xau) >> 16),
+		    (int32_t)EF_U32(e + 0xcu) >> 16, (uint32_t)((int32_t)EF_U32(e + 0xeu) >> 16));
+		guest_fn_9e0c4((int32_t)EF_U32(e + 0x1eu) >> 16, EF_U32(e) << 8, EF_U32(e + 4u) << 8, EF_U32(e + 8u) << 8);
+	}
+}

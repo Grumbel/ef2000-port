@@ -5909,4 +5909,6 @@ void draw_group_icons_433fc(uint32_t a, ef_addr32 head);
 
 void draw_unit_icons_44f68(uint32_t a, ef_addr32 head);
 
+void update_effect_entries_90f50(void);
+
 #endif

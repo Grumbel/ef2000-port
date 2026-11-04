@@ -1876,7 +1876,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00090ac4	357			unknown	unclassified	unverified		
 0x00090c2c	64	raise_gauge_90c2c	game_helpers29	compiles	game	confirmed	decomp/tests/0x00090c2c.json	docs/compiler-abi.md; Raise a 48-byte record's gauge by 0x41a, capped at 0x1400.; callers 90c6c@90e9b; guest pending
 0x00090c6c	739			unknown	unclassified	unverified		
-0x00090f50	419			unknown	unclassified	unverified		
+0x00090f50	419	update_effect_entries_90f50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00090f50.json	docs/compiler-abi.md; When byte 0x125847 is set, walk the 40 effect entries of 0x30 bytes at 0x211af0 (skipping entries with flag 2 in byte +0; callers 3dd30@3e1df; guest pending
 0x000910f4	284	hit_map_entry_910f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000910f4.json	docs/compiler-abi.md; Try to hit one of the 0x28 map entries (0x30 bytes each at 0x211af0: x dword +0, z +4, y +8, kind word +0x1e, flags byte; callers 888cc@88a8b; guest pending
 0x00091238	33	begin_mode_35	misc_state	compiles	game	confirmed	decomp/tests/0x00091238.json	docs/compiler-abi.md; byte 0x12db9e=0x35, word 0x21449c=1, 0xd0b68(0x12dbec); callers 92c28@92ceb,92c28@92daf; guest pending
 0x0009125c	60	scene_lookup_named_word	scene_state	compiles	game	confirmed	decomp/tests/0x0009125c.json	docs/compiler-abi.md

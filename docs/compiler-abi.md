@@ -8427,3 +8427,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x44f68` | EAX:uint32_t,EDX:ef_addr32 | none | 45574@455d8 | Sibling of 0x433fc for entries of kind 0x44, 0x45 and 0x46 (byte +0xb; index byte +0x9): walk the list at HEAD (EDX; lin |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x90f50` | none | none | 3dd30@3e1df | When byte 0x125847 is set, walk the 40 effect entries of 0x30 bytes at 0x211af0 (skipping entries with flag 2 in byte +0 |
