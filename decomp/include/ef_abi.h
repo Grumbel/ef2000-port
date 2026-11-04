@@ -6555,4 +6555,7 @@ uint32_t load_file_105070(ef_addr32 name, ef_addr32 buffer); /* 0x105070 */
 void restore_int23_11ce30(void);
 void restore_int23_11ce30(void); /* 0x11ce30 */
 
+void midpoint_offset_a2500(ef_addr32 p);
+void midpoint_offset_a2500(ef_addr32 p); /* 0xa2500 */
+
 #endif

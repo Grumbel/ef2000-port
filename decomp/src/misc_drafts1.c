@@ -23887,3 +23887,25 @@ void restore_int23_11ce30(void)
     EF_U16(0x0017e5e8u) = 0u;
     EF_U32(0x0017e5e4u) = 0u;
 }
+
+/* 0xa2500, 308 bytes. Computes the midpoint of two 3D points (words at +0xe..+0x18, overlapping stride-2 layout) and offsets it along a rotated vector scaled by the half-extent length; stores the three result words at +8,+0xa,+0xc. */
+void midpoint_offset_a2500(ef_addr32 p)
+{
+    int32_t mx = ((int32_t)EF_S16(p + 0x14u) + (int32_t)EF_S16(p + 0x0eu)) / 2;
+    int32_t my = ((int32_t)EF_S16(p + 0x16u) + (int32_t)EF_S16(p + 0x10u)) / 2;
+    int32_t mz = ((int32_t)EF_S16(p + 0x18u) + (int32_t)EF_S16(p + 0x12u)) / 2;
+    int16_t dx = (int16_t)(mx - (int32_t)EF_U16(p + 0x0eu));
+    int16_t dy = (int16_t)(my - (int32_t)EF_U16(p + 0x10u));
+    int16_t dz = (int16_t)(mz - (int32_t)EF_U16(p + 0x12u));
+    int32_t r = (int16_t)length_squared_dec90(dx, dy, dz);
+    int32_t idx = (int32_t)(((int32_t)EF_S16(p + 4u) * 0x400) / 0x4000) & 0xffff;
+    uint32_t off = (uint32_t)idx << 7;
+    int32_t c1 = (((int32_t)EF_S16(off + 0x141e08u)) * 0x4000) / 0x8000;
+    int32_t c2 = (((int32_t)EF_S16(off + 0x142e08u)) * 0x4000) / 0x8000;
+    int32_t a = ((int32_t)(int16_t)c1 * r) / 0x4000;
+    int32_t b = ((int32_t)(int16_t)c2 * r) / 0x4000;
+
+    EF_U16(p + 8u) = (uint16_t)(a + (int32_t)(int16_t)mx);
+    EF_U16(p + 0x0au) = (uint16_t)my;
+    EF_U16(p + 0x0cu) = (uint16_t)(b + (int32_t)(int16_t)mz);
+}

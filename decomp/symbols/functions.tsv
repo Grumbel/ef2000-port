@@ -2152,7 +2152,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a2244	240	blend_by_angle_weight_a2244	game_helpers100	compiles	game	confirmed	decomp/tests/0x000a2244.json	docs/compiler-abi.md; Blend two sets of three words into rec+8..0xc, weighted by the cosine of the record's angle (1.14 weights).; callers none direct; guest pending
 0x000a2334	254	blend_by_complement_weight_a2334	game_helpers101	compiles	game	confirmed	decomp/tests/0x000a2334.json	docs/compiler-abi.md; Like a2244 but the cosine weight is taken at the complementary angle and the weights are swapped.; callers none direct; guest pending
 0x000a2434	203	blend_quadratic_a2434	game_helpers51	compiles	game	confirmed	decomp/tests/0x000a2434.json	docs/compiler-abi.md; Blend two 3-word keys by a 9-bit weight (quadratic).; callers none direct; guest pending
-0x000a2500	308			unknown	unclassified	unverified		
+0x000a2500	308	midpoint_offset_a2500	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a2500.json	docs/compiler-abi.md; Computes the midpoint of two 3D points (words at +0xe..+0x18, overlapping stride-2 layout) and offsets it along a rotate; callers none direct; guest pending
 0x000a2634	100	set_page_entry_a2634	runtime_helpers7	compiles	game	confirmed	decomp/tests/0x000a2634.json	docs/compiler-abi.md; Fill one entry of the current page and refresh the page slot.; callers 9e7bc@9f498; guest pending
 0x000a2698	141	apply_page_cell_a2698	game_helpers34	compiles	game	confirmed	decomp/tests/0x000a2698.json	docs/compiler-abi.md; Apply a page cell to a slot unless the slot is locked, and refresh it.; callers 9e7bc@9f4b0; guest pending
 0x000a2728	399			unknown	unclassified	unverified		

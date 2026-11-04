@@ -9591,3 +9591,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x11ce30` | none | none | 10dc7f@10dcb1 | Restores the saved interrupt 0x23 handlers (DOS-extender int 21h/2504-2505h, or DPMI int 31h/0201,0205, or the vector se |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa2500` | EAX:ef_addr32 | none | none direct | Computes the midpoint of two 3D points (words at +0xe..+0x18, overlapping stride-2 layout) and offsets it along a rotate |
