@@ -6500,4 +6500,7 @@ void rotation_matrix_88e98(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, d
 void init_pattern_display_e4188(void);
 void init_pattern_display_e4188(void); /* 0xe4188 */
 
+int32_t calendar_day_index_10e872(ef_addr32 p, int32_t year);
+int32_t calendar_day_index_10e872(ef_addr32 p, int32_t year); /* 0x10e872 */
+
 #endif

@@ -9487,3 +9487,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe4188` | none | none | 3ea0c@3edb5,3ea0c@3ef5e,8b2d8@8b2e3 | One-time setup of the pattern display: set view origin, latch/patch the 320x200 span, reset runtime state, load the defa |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10e872` | EAX:ef_addr32,EDX:int32_t | EAX:int32_t | 10e957@10e95e,10e957@10e96b | Day-of-year index of a calendar slot: for the record at P (EAX; +0x10 month, +0xc week-of-month, +0x18 weekday, +0x1c da |

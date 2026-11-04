@@ -23240,3 +23240,37 @@ void init_pattern_display_e4188(void)
 		load_pattern_file_e4010(name);
 	init_pattern_buffer_e40e4();
 }
+
+/* 0x10e872, 229 bytes. Day-of-year index of a calendar slot: for the record at P (EAX; +0x10 month, +0xc week-of-month, +0x18 weekday, +0x1c day-of-year, +0x20 mode) and the year offset YEAR (EDX). Mode 0 builds the first of the month with 0xf118d, counts the days in the month from the leap or normal month tables and returns week*7 + first-day-of-year + weekday offset; mode 1 returns +0x1c minus one; otherwise +0x1c. */
+int32_t calendar_day_index_10e872(ef_addr32 p, int32_t year)
+{
+	uint32_t tm[9];
+	int32_t month_days, rem, week, base;
+	ef_addr32 mon;
+	if (EF_U32(p + 0x20u) != 0u) {
+		if (EF_U32(p + 0x20u) == 1u)
+			return (int32_t)EF_U32(p + 0x1cu) - 1;
+		return (int32_t)EF_U32(p + 0x1cu);
+	}
+	mon = EF_U32(p + 0x10u);
+	if (is_leap_year(year + 0x76c) != 0u)
+		month_days = (int32_t)EF_S16(0x195cc8u + mon * 2u + 4u) - (int32_t)EF_S16(0x195cc8u + mon * 2u + 2u);
+	else
+		month_days = (int32_t)EF_S16(0x195caeu + mon * 2u + 4u) - (int32_t)EF_S16(0x195caeu + mon * 2u + 2u);
+	memset(tm, 0, sizeof(tm));
+	tm[3] = 1u;
+	tm[4] = mon;
+	tm[5] = (uint32_t)year;
+	mktime_f118d((uint32_t)(uintptr_t)tm);
+	rem = ((int32_t)EF_U32(p + 0x18u) - (int32_t)tm[6] + 7) % 7;
+	if (EF_U32(p + 0xcu) == 5u) {
+		if (rem + 1 + 28 <= month_days)
+			week = 4;
+		else
+			week = (int32_t)EF_U32(p + 0xcu) - 2;
+	} else {
+		week = (int32_t)EF_U32(p + 0xcu) - 1;
+	}
+	base = (int32_t)tm[7] + rem;
+	return week * 7 + base;
+}

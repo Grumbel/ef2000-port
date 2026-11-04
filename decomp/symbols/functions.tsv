@@ -4013,7 +4013,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010e4dd	219	eval_binary_record_10e4dd	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e4dd.json	docs/compiler-abi.md; Evaluate a binary-operation record: FLAGS (EAX) selects the operation kind (bits 0x40, 0x80, then 0x100, 0x800, 0x200, 0; callers 10e4d3@10e4d6; guest pending
 0x0010e7b5	89			unknown	unclassified	unverified		
 0x0010e837	59	is_leap_year	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e837.json	docs/compiler-abi.md; Gregorian leap year.; callers f118d@f11e6,10e872@10e88d,10e97f@10e9d6; guest pending
-0x0010e872	229			unknown	unclassified	unverified		
+0x0010e872	229	calendar_day_index_10e872	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e872.json	docs/compiler-abi.md; Day-of-year index of a calendar slot: for the record at P (EAX; +0x10 month, +0xc week-of-month, +0x18 weekday, +0x1c da; callers 10e957@10e95e,10e957@10e96b; guest pending
 0x0010e957	40	compare_dates_10e957	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e957.json	docs/compiler-abi.md; 0x10e872(a, c) > 0x10e872(b, c).; callers 10e97f@10e9a8; guest pending
 0x0010e97f	691			unknown	unclassified	unverified		
 0x0010ec32	48	triple_less_than	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010ec32.json	docs/compiler-abi.md; Three-dword signed lexicographic less-than (most significant dword at +8).; callers 10e97f@10eb13,10e97f@10ec0e; guest pending
