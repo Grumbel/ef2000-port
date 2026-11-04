@@ -8633,3 +8633,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x73d50` | EAX:int32_t | none | 6d38c@6d68a,7222c@72386,72390@72499 | Convert the unit (AX, sign extended) record's floating point velocity/orientation fields to fixed point words using the  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe95c0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | e994c@e995e | Build the 3x3 rotation matrix for the angles A (EAX), B (EDX), C (EBX) from the sine/cosine tables at 0x141e06/0x142e06  |
