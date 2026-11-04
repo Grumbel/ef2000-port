@@ -3045,4 +3045,20 @@ void guest_fn_ea864(ef_addr32 vec, uint32_t a, uint32_t b, uint32_t c); /* 0xea8
 void guest_fn_ea9ec(ef_addr32 a, ef_addr32 b); /* 0xea9ec EAX/EDX */
 int32_t guest_fn_ea9b8(ef_addr32 a, ef_addr32 b); /* 0xea9b8 EAX/EDX -> EAX */
 
+/* float_helpers5.c */
+void convert_entry_vector_9ffc8(int16_t index, int16_t value);
+void set_record_offsets_a5508(ef_addr32 record, int16_t a, int16_t b);
+void set_record_scale_a56b0(ef_addr32 record, double scale);
+double distance_2d_b415c(ef_addr32 a, ef_addr32 b);
+double distance_3d_b41bc(ef_addr32 a, ef_addr32 b);
+double word_to_scaled_b4230(int16_t value);
+int32_t double_to_scaled_b4250(double value);
+double abs_double_b427c(double value);
+double sign_double_b42b0(double value);
+double wrap_angle_b42f0(double value);
+double vector_length_b4364(ef_addr32 vec);
+void guest_fn_ea9a0(ef_addr32 out, int32_t a, int32_t b, int32_t c); /* 0xea9a0 EAX/EDX/EBX/ECX */
+void guest_fn_a558c(ef_addr32 record); /* 0xa558c EAX */
+double guest_fn_b3fd0(double value); /* 0xb3fd0 stack -> ST0 */
+
 #endif

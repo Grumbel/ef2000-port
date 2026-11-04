@@ -3644,3 +3644,19 @@ in EAX, format string address, one value).
 | `0x8bf58` | AX:int16_t,EDX:ef_addr32 | EAX:int32_t | 26b60@26c80,26b60@26e26,270d0@2726b | Scaled distance from a unit to an integer vector, truncated; 0 if the unit is missing. |
 | `0x92f10` | none | none | 95e58@96ce1 | Reset the scene record from the current object and the scene angle record. |
 | `0x97534` | EAX:ef_addr32 | AL:uint8_t | 97860@978ad,97860@978c6 | True when an object faces the camera closely enough and is active. |
+
+## float_helpers5 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9ffc8` | AX:int16_t,DX:int16_t | none | 9e7bc@9e8b1 | Convert a table entry's vector and scale a word into a float. |
+| `0xa5508` | EAX:ef_addr32,DX:int16_t,BX:int16_t | none | a870@a901,4c6a0@4c6f2,4c718@4c766 | Set a record's offsets from two scaled values and refresh it. |
+| `0xa56b0` | EAX:ef_addr32,EDX:double | none | a870@a8fa,4c6a0@4c6eb,4c718@4c75f | Store a positive scale factor in a record and redraw it. |
+| `0xb415c` | EAX:ef_addr32,EDX:ef_addr32 | EAX:double | 73ec@7448,78c0@79c5,80f4@815d | Distance between two 2D double points, 0.0 when degenerate. |
+| `0xb41bc` | EAX:ef_addr32,EDX:ef_addr32 | EAX:double | 6a66c@6a6d3 | Distance between two 3D double points, 0.0 when degenerate. |
+| `0xb4230` | AX:int16_t | EAX:double | 78c0@790d,78c0@7929,7ca8@7cc7 | Convert a signed word to a scaled double. |
+| `0xb4250` | EAX:double | EAX:int32_t | 73ec@7426,73ec@743b,d290@d363 | Convert a double to a scaled integer. |
+| `0xb427c` | EAX:double | EAX:double | 7d20@7d9f,7d20@7dcf,2461c@24785 | Absolute value of a double. |
+| `0xb42b0` | EAX:double | EAX:double | 1db08@1db8b,5f698@5f6e0 | Sign of a double as +1.0 or -1.0 (zero gives -1.0). |
+| `0xb42f0` | EAX:double | EAX:double | 7e44@7eac,81ec@824a,8394@83f0 | Wrap an angle in degrees into its canonical range. |
+| `0xb4364` | EAX:ef_addr32 | EAX:double | 1d954@1dad2,772d0@77465,8a1dc@8a222 | Length of a 3D vector of doubles, 0.0 when degenerate. |
