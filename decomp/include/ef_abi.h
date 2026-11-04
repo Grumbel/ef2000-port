@@ -3840,4 +3840,8 @@ uint32_t object_has_ready_entry_bcc2c(ef_addr32 obj);
 ef_addr32 parse_output_spec_ed3b4(ef_addr32 fmt, ef_addr32 va_ptr, ef_addr32 spec);
 ef_addr32 guest_fn_ed4e7_x(ef_addr32 fmt, ef_addr32 spec); /* 0xed4e7 EAX EDX -> EAX */
 
+/* game_helpers105.c */
+ef_addr32 parse_output_flags_ed4e7(ef_addr32 fmt, ef_addr32 spec);
+uint32_t get_channel_value_112048(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 player, uint32_t status, uint32_t controller);
+
 #endif
