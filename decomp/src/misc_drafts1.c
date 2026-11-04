@@ -21653,3 +21653,41 @@ uint32_t decode_symbol_10db10(uint32_t *esi, uint32_t *eax, uint32_t ebp)
 	*esi += 1u;
 	return ecx + 0xffu;
 }
+
+/* 0xebe17, 81 bytes. Implicit-register fragment (EDX:EAX = 64-bit mantissa, EDI = exponent field in bits 20 and up, ESI = scratch/sticky): normalize a double mantissa so that its top set bit is at bit 52, adjusting the exponent in EDI by 0x100000 per shift, round using the bits shifted out, then merge the exponent into EDX. A zero mantissa is returned unchanged. */
+void normalize_double_ebe17(uint32_t *eax, uint32_t *edx, uint32_t *esi, uint32_t *edi)
+{
+	uint32_t lo = *eax;
+	uint32_t hi = *edx;
+	uint32_t st;
+	uint32_t carry;
+	uint32_t carry2;
+
+	st = lo | hi;
+	if (st == 0u) {
+		*esi = st;
+		return;
+	}
+	if ((hi & 0xfff00000u) == 0u) {
+		do {
+			*edi -= 0x100000u;
+			hi = (hi << 1) | (lo >> 31);
+			lo <<= 1;
+		} while ((hi & 0xfff00000u) == 0u);
+	} else if ((hi & 0xffe00000u) != 0u) {
+		do {
+			*edi += 0x100000u;
+			st = (st >> 1) | (lo << 31);
+			lo = (lo >> 1) | (hi << 31);
+			hi >>= 1;
+		} while ((hi & 0xffe00000u) != 0u);
+		carry = st >> 31;
+		st <<= 1;
+		carry2 = (lo + carry) < lo ? 1u : 0u;
+		lo += carry;
+		hi += carry2;
+	}
+	*eax = lo;
+	*esi = st;
+	*edx = (hi & 0xfffffu) | *edi;
+}

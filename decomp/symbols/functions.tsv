@@ -3527,7 +3527,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ebd30	6	get_address_ebd30	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000ebd30.json	docs/compiler-abi.md; ; callers ebe6d@ebe70,f4db8@f4ddf,f4db8@f4df6; guest pending
 0x000ebd36	6	get_address_ebd36	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000ebd36.json	docs/compiler-abi.md; ; callers ebe90@ebe93; guest pending
 0x000ebdcc	75	decimal_string_to_double_ebdcc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ebdcc.json	docs/compiler-abi.md; Convert the decimal digit string TEXT (digit characters only, low nibble used) to a double stored at OUT: the digits are; callers 9d55d@9d6a5; guest pending
-0x000ebe17	81			unknown	unclassified	unverified		
+0x000ebe17	81	normalize_double_ebe17	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ebe17.json	docs/compiler-abi.md; Implicit-register fragment (EDX:EAX = 64-bit mantissa, EDI = exponent field in bits 20 and up, ESI = scratch/sticky): no; callers ebdcc@ebe05; guest pending
 0x000ebe6d	12	store_through_ebd30	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebe6d.json	docs/compiler-abi.md; Store EAX through the pointer returned by 0xebd30.; callers bc1d3@bc1fa,ebe79@ebe7e,f1d90@f1da5; guest pending
 0x000ebe79	7	report_error_14_ebe79	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000ebe79.json	docs/compiler-abi.md; Report error code 14.; callers 9d55d@9d6b8,9d55d@9d6ea; guest pending
 0x000ebe90	12	store_through_ebd36	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000ebe90.json	docs/compiler-abi.md; As 0xebe6d with 0xebd36.; callers 1101e8@1101f2; guest pending

@@ -6351,4 +6351,7 @@ void decode_pair_table_10dbc1(uint32_t *esi, uint32_t *eax, uint32_t *edx, uint3
 uint32_t decode_symbol_10db10(uint32_t *esi, uint32_t *eax, uint32_t ebp);
 uint32_t decode_symbol_10db10(uint32_t *esi, uint32_t *eax, uint32_t ebp); /* 0x10db10 */
 
+void normalize_double_ebe17(uint32_t *eax, uint32_t *edx, uint32_t *esi, uint32_t *edi);
+void normalize_double_ebe17(uint32_t *eax, uint32_t *edx, uint32_t *esi, uint32_t *edi); /* 0xebe17 */
+
 #endif

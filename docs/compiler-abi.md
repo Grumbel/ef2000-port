@@ -9229,3 +9229,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10db10` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 10da50@10dac9 | Implicit-register fragment (ESI = source pointer in/out, AL = bit buffer in/out, EBP = frame with the code tables): walk |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xebe17` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | ebdcc@ebe05 | Implicit-register fragment (EDX:EAX = 64-bit mantissa, EDI = exponent field in bits 20 and up, ESI = scratch/sticky): no |
