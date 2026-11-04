@@ -21443,3 +21443,17 @@ uint64_t probe_vectors_9c243(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
 	}
 	return ((uint64_t)EF_U16(0x120cc4u) << 32) | ecx;
 }
+
+/* 0xc73b0, 85 bytes. Implicit-register fragment (no inputs; outputs EBX, EDI, EBP, EDX are not modelled). Runs project_if_outside_c46f8 with margin 0 on the vertex records whose pointers are stored at 0x15b558, 0x15b55c, 0x15b560 and 0x15b564, stopping at the first one that reports zero. Returns 1 when all four reported non-zero (the original then loads EBX, EDI, EBP and EDX with the four pointers) and 0 otherwise. */
+uint32_t project_four_vertices_c73b0(void)
+{
+	if (project_if_outside_c46f8(0u, EF_U32(0x0015b558u)) == 0u)
+		return 0u;
+	if (project_if_outside_c46f8(0u, EF_U32(0x0015b55cu)) == 0u)
+		return 0u;
+	if (project_if_outside_c46f8(0u, EF_U32(0x0015b560u)) == 0u)
+		return 0u;
+	if (project_if_outside_c46f8(0u, EF_U32(0x0015b564u)) == 0u)
+		return 0u;
+	return 1u;
+}
