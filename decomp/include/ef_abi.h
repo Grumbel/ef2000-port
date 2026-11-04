@@ -6479,4 +6479,7 @@ void heap_free_find_fa9d2(uint32_t ptr); /* 0xfa9d2 */
 void mantissa_div_f064b(uint32_t *r);
 void mantissa_div_f064b(uint32_t *r); /* 0xf064b */
 
+uint32_t ext_div_f05e5(ef_addr32 a, ef_addr32 b);
+uint32_t ext_div_f05e5(ef_addr32 a, ef_addr32 b); /* 0xf05e5 */
+
 #endif

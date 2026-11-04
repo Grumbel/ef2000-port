@@ -23072,3 +23072,29 @@ normalize:
 		edi = (uint32_t)(-(int32_t)edi);
 	r[0] = eax; r[1] = edx; r[2] = ebx; r[3] = ecx; r[4] = esi; r[5] = edi;
 }
+
+/* 0xf05e5, 102 bytes. 80-bit extended divide in place: [a] /= [b].
+ * Returns the quotient sign/overflow word left in EDI (0 for trivial cases). */
+uint32_t ext_div_f05e5(ef_addr32 a, ef_addr32 b)
+{
+	uint32_t r[6];
+	if (EF_U16(a + 8) == 0 && EF_U32(a + 4) == 0 && EF_U32(a) == 0)
+		return 0;
+	if (EF_U16(b + 8) == 0 && EF_U32(b + 4) == 0 && EF_U32(b) == 0) {
+		EF_U32(a) = 0;
+		EF_U32(a + 4) = 0;
+		EF_U16(a + 8) = 0;
+		return 0;
+	}
+	r[0] = EF_U32(a);
+	r[1] = EF_U32(a + 4);
+	r[2] = EF_U32(b);
+	r[3] = EF_U32(b + 4);
+	r[4] = EF_U16(a + 8);
+	r[5] = EF_U16(b + 8);
+	mantissa_div_f064b(r);
+	EF_U32(a) = r[0];
+	EF_U32(a + 4) = r[1];
+	EF_U16(a + 8) = (uint16_t)r[4];
+	return r[5];
+}

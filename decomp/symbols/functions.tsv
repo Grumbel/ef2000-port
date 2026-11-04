@@ -3578,7 +3578,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f023f	307			unknown	unclassified	unverified		
 0x000f03cc	182			unknown	unclassified	unverified		
 0x000f0482	355			unknown	unclassified	unverified		
-0x000f05e5	102			unknown	unclassified	unverified		
+0x000f05e5	102	ext_div_f05e5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f05e5.json	docs/compiler-abi.md; 80-bit extended divide in place: [a] /= [b]. * Returns the quotient sign/overflow word left in EDI (0 for trivial cases); callers none direct; guest pending
 0x000f064b	123	mantissa_div_f064b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f064b.json	docs/compiler-abi.md; Software mantissa division fragment. r[] holds * eax,edx,ebx,ecx,esi,edi in and out (dividend edx:eax, divisor ecx:ebx, ; callers f05e5@f0633,f0aa8@f0ae4; guest pending
 0x000f06c6	167			unknown	unclassified	unverified		
 0x000f07cd	67			unknown	unclassified	unverified		

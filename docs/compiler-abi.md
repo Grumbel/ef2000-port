@@ -9445,3 +9445,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf064b` | EAX:uint32_t | none | f05e5@f0633,f0aa8@f0ae4 | Software mantissa division fragment. r[] holds * eax,edx,ebx,ecx,esi,edi in and out (dividend edx:eax, divisor ecx:ebx,  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf05e5` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | none direct | 80-bit extended divide in place: [a] /= [b]. * Returns the quotient sign/overflow word left in EDI (0 for trivial cases) |
