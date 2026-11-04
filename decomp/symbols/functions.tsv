@@ -2379,7 +2379,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aa228	69	append_child_aa228	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa228.json	docs/compiler-abi.md; Append a child (links at +1/+5) to the list of the current owner.; callers aa5c4@aa9c9,aaa50@aad3e; guest pending
 0x000aa270	66	append_node_aa270	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa270.json	docs/compiler-abi.md; ; callers aa5c4@aa696,aaa50@aab14; guest pending
 0x000aa2b4	68	resolve_child_aa2b4	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa2b4.json	docs/compiler-abi.md; Resolve the (parent index, child index) pair of node to the child pointer.; callers aa350@aa395; guest pending
-0x000aa2f8	85			unknown	unclassified	unverified		
+0x000aa2f8	85	position_out_of_range_aa2f8	small_wrappers3	compiles	game	confirmed	decomp/tests/0x000aa2f8.json	docs/compiler-abi.md; Return 1 when the row (+0xb) or column (+0xc) bytes of a record fall outside the list limits, else 0.; callers aa350@aa375; guest pending
 0x000aa350	140	resolve_scene_groups_aa350	runtime_helpers32	compiles	game	confirmed	decomp/tests/0x000aa350.json	docs/compiler-abi.md; Walk every scene group and resolve its child nodes.; callers aad7c@aae42; guest pending
 0x000aa3dc	176			unknown	unclassified	unverified		
 0x000aa4b8	26	walk_chain_from_8	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa4b8.json	docs/compiler-abi.md; Step AX (signed word) times along the chain starting at * dword +8 of EDX (next pointer at +1); returns the node reached; callers aa4d4@aa50b,aa4d4@aa524,aa4d4@aa53d; guest pending
@@ -3941,7 +3941,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00109070	19	reset_with_saved_byte_109070	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00109070.json	docs/compiler-abi.md; Reset via 0xe6120 then continue with the saved byte.; callers e1958@e1b2d; guest pending
 0x001091e0	28	strip_cr_inplace	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001091e0.json	docs/compiler-abi.md; Remove carriage returns in place; returns the end pointer.; callers 1093d8@1093ea; guest pending
 0x001091fc	46	copy_line	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001091fc.json	docs/compiler-abi.md; Copy one line from EDX to EAX, consuming the newline; returns the source after it.; callers 1093d8@109405; guest pending
-0x0010922c	85			unknown	unclassified	unverified		
+0x0010922c	85	select_table_entry_10922c	small_wrappers3	compiles	game	confirmed	decomp/tests/0x0010922c.json	docs/compiler-abi.md; Lowercase a name, plant it as a sentinel entry of the 8-byte table at 0x4dd898 and store the value of the first matching; callers 1093d8@109428; guest pending
 0x00109284	41	skip_class_chars	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00109284.json	docs/compiler-abi.md; Advance *pointer over characters whose class-table entry (0x195af0[c+1]) has bit 2.; callers e3e50@e3e88,1092b0@1092bf,1092b0@109314; guest pending
 0x001092b0	119	parse_decimal_1092b0	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x001092b0.json	docs/compiler-abi.md; Skip blanks, parse a decimal number at *cursor, skip blanks again and store the new cursor.; callers e3e50@e3e6c,e3fbc@e3fc5; guest pending
 0x00109328	36			unknown	unclassified	unverified		

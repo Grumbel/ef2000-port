@@ -4153,4 +4153,8 @@ void close_log_handle_a1cb4(void);
 uint32_t file_size_by_name_105024(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 name);
 int32_t lookup_name_value_a1a40(ef_addr32 name);
 
+/* small_wrappers3.c */
+uint32_t position_out_of_range_aa2f8(ef_addr32 rec);
+void select_table_entry_10922c(ef_addr32 name);
+
 #endif

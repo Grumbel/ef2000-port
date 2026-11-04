@@ -4759,3 +4759,10 @@ in EAX, format string address, one value).
 | `0xa1cb4` | none | none | 7a844@7a9a5,7a9bc@7aa22,a1bf4@a1c82 | Close the log handle at 0x132b18 (writing a -1 marker first when 0x132b1c is 1) and mark it closed. |
 | `0x105024` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 105070@105080,106464@106491,113a40@113a6d | Open a file and return its size; the error code is left at 0x17d2d8 (3 open failed, 5 size failed). |
 | `0xa1a40` | EAX:ef_addr32 | EAX:int32_t | 2fbc4@2fc63,3c730@3c734,74228@74245 | Look a name up in the pointer table at 0x417180 (sentinel stored at the count slot) and return the matching 16-bit value |
+
+## small_wrappers3 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xaa2f8` | EAX:ef_addr32 | EAX:uint32_t | aa350@aa375 | Return 1 when the row (+0xb) or column (+0xc) bytes of a record fall outside the list limits, else 0. |
+| `0x10922c` | EAX:ef_addr32 | none | 1093d8@109428 | Lowercase a name, plant it as a sentinel entry of the 8-byte table at 0x4dd898 and store the value of the first matching |
