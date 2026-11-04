@@ -48,5 +48,5 @@ image, and compare behavior against the unmodified executable (plan §4).
 The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Status (2026-11-03): 4,277 inventoried functions, 3105 drafted and none verified
+Status (2026-11-03): 4,277 inventoried functions, 3107 drafted and none verified
 as a compiled-and-spliced C replacement. The tracker is authoritative.

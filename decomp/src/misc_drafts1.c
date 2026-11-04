@@ -20627,3 +20627,18 @@ void fill_free_slots_fd3ce(void)
 			return;
 	}
 }
+
+/* 0x11ba4c, 45 bytes. EAX = reference pointer, EDX = object pointer; stack: two doubles (arg, unused), callee cleanup. Result = ratio_formula_11b134(obj, arg, 6.0) * c(0x195924) * obj[0] / ref[0]. */
+double ratio_scaled_11ba4c(uint32_t ref, uint32_t obj, double arg, double unused)
+{
+	(void)unused;
+	return ratio_formula_11b134(obj, arg, 6.0) * md_rd_f64(0x00195924u) * md_rd_f64(obj) / md_rd_f64(ref);
+}
+
+/* 0x11bab4, 65 bytes. EAX = reference pointer, EDX = object pointer; stack: two doubles (a, b), callee cleanup. Result = ratio_scaled_11ba4c(ref, obj, a, b) * (obj[0x40] - c(0x433070)) / ref[8]. */
+double ratio_offset_11bab4(uint32_t ref, uint32_t obj, double a, double b)
+{
+	double local = md_rd_f64(obj + 0x40u) - md_rd_f64(0x00433070u);
+
+	return ratio_scaled_11ba4c(ref, obj, a, b) * local / md_rd_f64(ref + 8u);
+}

@@ -8995,3 +8995,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xfd3ce` | none | none | none direct | Walk the 10-byte slots from 0x17cf8e down towards the pointer at 0x17bfea; for each slot whose first word is zero, store |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11ba4c` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 11ba7c@11ba95,11bab4@11badf,11baf8@11bb69 | EAX = reference pointer, EDX = object pointer; stack: two doubles (arg, unused), callee cleanup. Result = ratio_formula_ |
+| `0x11bab4` | EAX:uint32_t,EDX:uint32_t,EBX:double,ECX:double | EAX:double | 10a220@10a434 | EAX = reference pointer, EDX = object pointer; stack: two doubles (a, b), callee cleanup. Result = ratio_scaled_11ba4c(r |

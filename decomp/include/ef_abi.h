@@ -6174,4 +6174,9 @@ double scaled_pow_formula_11b9ec(uint32_t ref, uint32_t obj); /* 0x11b9ec */
 void fill_free_slots_fd3ce(void);
 void fill_free_slots_fd3ce(void); /* 0xfd3ce */
 
+double ratio_scaled_11ba4c(uint32_t ref, uint32_t obj, double arg, double unused);
+double ratio_offset_11bab4(uint32_t ref, uint32_t obj, double a, double b);
+double ratio_scaled_11ba4c(uint32_t ref, uint32_t obj, double arg, double unused); /* 0x11ba4c */
+double ratio_offset_11bab4(uint32_t ref, uint32_t obj, double a, double b); /* 0x11bab4 */
+
 #endif
