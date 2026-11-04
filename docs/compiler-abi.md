@@ -8699,3 +8699,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x8935c` | EAX:ef_addr32 | none | none direct | Choose how to treat scene object OBJ (EAX) from its distance to the viewer. An object with +0x5a set is force-selected.  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x882b0` | EAX:ef_addr32,EDX:int32_t | none | 888cc@88c1d | Fire the placement effects of object OBJ (EAX) with parameter ARG (DX, sign extended). The object position >> 8 is copie |

@@ -19207,3 +19207,38 @@ void classify_scene_object_8935c(ef_addr32 obj)
 		activate_89990(obj);
 	}
 }
+
+/* 0x882b0, 282 bytes. Fire the placement effects of object OBJ (EAX) with parameter ARG (DX, sign extended). The object position >> 8 is copied to 0x20f16c..0x20f174. For kind 1 (+0x18) the result of 0x39548 (-1 = none) is dispatched through 0x1d5cc. For other kinds the map entry at the object's x/z is looked up (0x82b8) and, if found, its parameters are stored (0x10710) and 0x110ec run; afterwards kinds whose table byte (0x12bc94 + 145*kind) is 1, 2 or 3 dispatch the 0x39548 result for effect 0xf. */
+void fire_object_effects_882b0(ef_addr32 obj, int32_t arg)
+{
+	uint32_t kind = EF_U8(obj + 0x18u);
+	ef_addr32 e;
+	int32_t r;
+	uint32_t k;
+
+	EF_U32(0x0020f16cu) = (uint32_t)((int32_t)EF_U32(obj) >> 8);
+	EF_U32(0x0020f170u) = (uint32_t)((int32_t)EF_U32(obj + 4u) >> 8);
+	EF_U32(0x0020f174u) = (uint32_t)((int32_t)EF_U32(obj + 8u) >> 8);
+	if (kind == 1u) {
+		r = (int32_t)(int16_t)guest_fn_39548_x(obj, kind, (int32_t)(int16_t)arg);
+		if (r != -1)
+			guest_fn_1d5cc(0x0020f16cu, r);
+		return;
+	}
+	e = mark_entry_at_point_82b8((int32_t)EF_U32(obj), (int32_t)EF_U32(obj + 8u));
+	if (e != 0u) {
+		uint32_t b = guest_fn_8ac64_x((int32_t)kind) & 0xffu;
+		store_params_10710((uint16_t)((int32_t)EF_U32(EF_U32(obj + 0x4bu) + 0x14u) >> 16),
+		                   (uint16_t)(int16_t)EF_U16(e),
+		                   (uint16_t)((int32_t)EF_U32(e + 2u) >> 16),
+		                   (uint16_t)((int32_t)EF_U32(e + 6u) >> 16),
+		                   (uint16_t)((int32_t)EF_U32(e + 0xau) >> 16), (uint8_t)b);
+		guest_fn_110ec_x(1u, 0x64u);
+	}
+	k = EF_U8(0x0012bc94u + kind * 145u);
+	if (k == 1u || k == 2u || k == 3u) {
+		r = (int32_t)(int16_t)guest_fn_39548_x(obj, 0xfu, (int32_t)(int16_t)arg);
+		if (r != -1)
+			guest_fn_1d5cc(0x0020f16cu, r);
+	}
+}

@@ -1714,7 +1714,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00088100	50	refresh_object_child_slot	record_callers	compiles	game	confirmed	decomp/tests/0x00088100.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00088134	344			unknown	unclassified	unverified		
 0x0008828c	34	clear_input_state_block	misc_state	compiles	game	confirmed	decomp/tests/0x0008828c.json	docs/compiler-abi.md; clear bytes 0x12d7aa..ac and word 0x20f196; callers 8846c@8846f; guest pending
-0x000882b0	282			unknown	unclassified	unverified		
+0x000882b0	282	fire_object_effects_882b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000882b0.json	docs/compiler-abi.md; Fire the placement effects of object OBJ (EAX) with parameter ARG (DX, sign extended). The object position >> 8 is copie; callers 888cc@88c1d; guest pending
 0x000883cc	157	step_object_883cc	game_helpers48	compiles	game	confirmed	decomp/tests/0x000883cc.json	docs/compiler-abi.md; Step one object: run its handler when it is alive and has one.; callers 8846c@884b3; guest pending
 0x0008846c	217	step_objects_8846c	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008846c.json	docs/compiler-abi.md; Step every object of the ring and publish the visible ones.; callers 3dcb0@3dcb5; guest pending
 0x00088548	42	reset_target_search	scene_helpers	compiles	game	confirmed	decomp/tests/0x00088548.json	docs/compiler-abi.md; dwords 0x20f14c=0x7fffffff 0x20f154=0 0x20f150=filtered lookup; callers 8846c@88474; guest pending

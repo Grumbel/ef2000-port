@@ -6011,4 +6011,8 @@ void guest_fn_7ef14_x(void); /* 0x7ef14 */
 
 void classify_scene_object_8935c(ef_addr32 obj);
 
+void fire_object_effects_882b0(ef_addr32 obj, int32_t arg);
+
+
+
 #endif
