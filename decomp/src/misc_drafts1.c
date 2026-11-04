@@ -4677,3 +4677,30 @@ void find_letter_entry_11de0(uint32_t key)
     EF_U16(0x0012288au) = 1u;
     step_letter_table_11d44();
 }
+
+/* 0x74480, 259 bytes. Credit a hit by the unit A on the unit named by the word 0x197c28 (ignored when either is 0xff/-1, missing, or flagged 4 or 2 in byte +0x24): bumps the victim's owner counter byte (+0xc9 of its 0xca-byte owner record, owner word +0x28). Remote (non-local owner, 0x127da9 set) hits are reported through 0x571f0, local ones raise event 0x23 through 0x46168. */
+void credit_hit_74480(int32_t a)
+{
+    int16_t ia = (int16_t)a;
+    int16_t tgt = (int16_t)EF_U16(0x00197c28u);
+    uint32_t ra;
+    uint32_t rb;
+    uint32_t owner;
+    uint32_t flags;
+    if (tgt == -1 || tgt == 0xff || ia == 0xff)
+        return;
+    ra = guest_fn_7489c(ia);
+    rb = guest_fn_7489c(tgt);
+    if (ra == 0u || rb == 0u)
+        return;
+    flags = EF_U8(ra + 0x24u);
+    if ((flags & 4u) != 0u || (flags & 2u) != 0u)
+        return;
+    owner = (uint32_t)((int32_t)(int16_t)EF_U16(rb + 0x28u) * 0xca) + EF_U32(0x0019bb58u);
+    EF_U8(owner + 0xc9u)++;
+    if (EF_U8(0x00127da9u) != 0u && EF_U16(rb + 0x18u) != EF_U8(0x001a666bu)) {
+        guest_fn_571f0_x(EF_U8(rb + 0x18u), (uint32_t)(int32_t)(int16_t)EF_U16(rb + 0x16u), EF_U8(owner + 0xc9u));
+        return;
+    }
+    guest_fn_46168((int32_t)(int16_t)EF_U16(rb + 0x16u), 0x23u, EF_U8(owner + 0xc9u), 0u, 0u);
+}

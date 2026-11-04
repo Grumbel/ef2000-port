@@ -4867,4 +4867,7 @@ void guest_fn_11de0_x(uint32_t key); /* 0x11de0 EAX */
 
 void find_letter_entry_11de0(uint32_t key);
 
+void credit_hit_74480(int32_t a);
+void guest_fn_571f0_x(uint32_t a, uint32_t b, uint32_t c); /* 0x571f0 EAX/EDX/EBX */
+
 #endif
