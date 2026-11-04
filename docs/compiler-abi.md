@@ -9585,3 +9585,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x105070` | EAX:ef_addr32,EDX:ef_addr32 | EAX:uint32_t | 106464@10646d,113a40@113a49 | Load a whole file into a caller buffer (or a newly allocated one); returns the buffer or 0 with the error code at 0x17d2 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11ce30` | none | none | 10dc7f@10dcb1 | Restores the saved interrupt 0x23 handlers (DOS-extender int 21h/2504-2505h, or DPMI int 31h/0201,0205, or the vector se |

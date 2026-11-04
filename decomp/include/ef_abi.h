@@ -6552,4 +6552,7 @@ void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
 uint32_t load_file_105070(ef_addr32 name, ef_addr32 buffer);
 uint32_t load_file_105070(ef_addr32 name, ef_addr32 buffer); /* 0x105070 */
 
+void restore_int23_11ce30(void);
+void restore_int23_11ce30(void); /* 0x11ce30 */
+
 #endif

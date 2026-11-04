@@ -4223,7 +4223,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011c4ec	152	build_matrix_11c4ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011c4ec.json	docs/compiler-abi.md; Builds a 3x3 double rotation matrix from two angles.; callers 11c20c@11c310,11c584@11c5a8; guest pending
 0x0011c584	1391			unknown	unclassified	unverified		
 0x0011cda5	139	dpmi_present_11cda5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011cda5.json	docs/compiler-abi.md; Cached DPMI presence check: 1 when a DPMI host answers (int 2Fh AX=1686h then int 31h AX=0400h), else 0xffffffff.; callers 11ce30@11cebf,11cfe4@11cf7c,11d01c@11d097; guest pending
-0x0011ce30	242			unknown	unclassified	unverified		
+0x0011ce30	242	restore_int23_11ce30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011ce30.json	docs/compiler-abi.md; Restores the saved interrupt 0x23 handlers (DOS-extender int 21h/2504-2505h, or DPMI int 31h/0201,0205, or the vector se; callers 10dc7f@10dcb1; guest pending
 0x0011cfe4	245			unknown	unclassified	unverified		
 0x0011d01c	281			unknown	unclassified	unverified		
 0x0011d135	281			unknown	unclassified	unverified		

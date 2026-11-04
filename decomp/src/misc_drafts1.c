@@ -23859,3 +23859,31 @@ uint32_t load_file_105070(ef_addr32 name, ef_addr32 buffer)
 	tail_jump_115984(handle);
 	return buf;
 }
+
+/* 0x11ce30, 242 bytes. Restores the saved interrupt 0x23 handlers (DOS-extender int 21h/2504-2505h, or DPMI int 31h/0201,0205, or the vector setter) and clears the saved vector. */
+void restore_int23_11ce30(void)
+{
+    uint32_t out[7];
+
+    if (EF_U32(0x0017e5e4u) == 0u && EF_U16(0x0017e5e8u) == 0u) {
+        return;
+    }
+    if (EF_U32(0x0016078cu) == 0x0011cfdfu) {
+        EF_U32(0x0016078cu) = 0x0011cfe4u;
+    } else if (EF_U32(0x0016078cu) == 0x0011ce30u) {
+        EF_U32(0x0016078cu) = 0x000eb259u;
+    }
+    if (EF_U8(0x00132a5eu) >= 2u && EF_U8(0x00132a5eu) <= 8u) {
+        uint32_t dx = EF_U16(0x0017e5e8u);
+        uint32_t ebx = (EF_U32(0x0017e5e4u) << 16) | dx;
+        run_dos_int_ex(0x21u, 0x2505u, ebx, 0x23u, dx, out);
+        run_dos_int_ex(0x21u, 0x2504u, 0u, 0x23u, EF_U32(0x0017e5f0u), out);
+    } else if (dpmi_present_11cda5() == 1u) {
+        run_dos_int_ex(0x31u, 0x0201u, 0x23u, EF_U16(0x0017e5e8u), EF_U32(0x0017e5e4u), out);
+        run_dos_int_ex(0x31u, 0x0205u, 0x23u, EF_U16(0x0017e5f4u), EF_U32(0x0017e5f0u), out);
+    } else {
+        set_dos_vector_11d614(0x23u, EF_U32(0x0017e5e4u), EF_U16(0x0017e5e8u));
+    }
+    EF_U16(0x0017e5e8u) = 0u;
+    EF_U32(0x0017e5e4u) = 0u;
+}
