@@ -4422,4 +4422,6 @@ uint32_t lookup_mapped_code_bbdc4(uint32_t kind, uint32_t index, uint32_t row);
 
 ef_addr32 claim_page_slot_a1770(uint32_t page, uint32_t idx);
 
+void fill_record_f8da8(ef_addr32 dst, ef_addr32 src1, ef_addr32 src2, ef_addr32 owner, uint32_t extra);
+
 #endif

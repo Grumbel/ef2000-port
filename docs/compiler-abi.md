@@ -5227,3 +5227,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa1770` | EAX:uint32_t,EDX:uint32_t | EAX:ef_addr32 | 878c8@878e9 | Return the address of slot idx (16-bit entries after the 29-byte sub-records) in a page object, checking that its type b |
+
+## small_wrappers7 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf8da8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t | none | f8e44@f8f2a | Fill a 0x72-byte record from two source records and an optional third: bytes from src1 (+8, +3, +9), 18 bytes from src2  |

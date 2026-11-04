@@ -210,3 +210,27 @@ ef_addr32 claim_page_slot_a1770(uint32_t page, uint32_t idx)
     EF_U8(slot + 5u) = (uint8_t)(EF_U8(slot + 5u) + 1u);
     return slot;
 }
+
+/* 0xf8da8, 106 bytes. Fill a 0x72-byte record from two source records and an optional third: bytes from src1 (+8, +3, +9), 18 bytes from src2 + 0x11, and for type-2 records the owner's byte (+0xa), word (+0x10) and the stack argument; without an owner mark them unset. */
+void fill_record_f8da8(ef_addr32 dst, ef_addr32 src1, ef_addr32 src2, ef_addr32 owner, uint32_t extra)
+{
+    uint32_t i;
+    EF_U8(dst) = EF_U8(src1 + 8u);
+    EF_U8(dst + 1u) = EF_U8(src1 + 3u);
+    EF_U8(dst + 3u) = 0u;
+    EF_U8(dst + 2u) = EF_U8(src1 + 9u);
+    for (i = 0; i < 18u; i++)
+        EF_U8(dst + 8u + i) = EF_U8(src2 + 0x11u + i);
+    EF_U32(dst + 0x69u) = 0u;
+    if (owner == 0u) {
+        EF_U8(dst + 0x6du) = 0u;
+        EF_U16(dst + 0x6eu) = 0xffffu;
+        EF_U16(dst + 0x70u) = 0xffffu;
+        return;
+    }
+    if (EF_U8(dst + 2u) == 2u) {
+        EF_U8(dst + 0x6du) = EF_U8(owner + 0xau);
+        EF_U16(dst + 0x6eu) = EF_U16(owner + 0x10u);
+        EF_U16(dst + 0x70u) = (uint16_t)extra;
+    }
+}

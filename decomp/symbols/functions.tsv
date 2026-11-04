@@ -3693,7 +3693,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f8acc	71	decrement_last_entry_f8acc	game_helpers30	compiles	game	confirmed	decomp/tests/0x000f8acc.json	docs/compiler-abi.md; Decrement the last set entry that accepts it; report if one did.; callers f8b14@f8bc3,f8b14@f8c0d,f8b14@f8c5c; guest pending
 0x000f8b14	387			unknown	unclassified	unverified		
 0x000f8c98	270			unknown	unclassified	unverified		
-0x000f8da8	106			unknown	unclassified	unverified		
+0x000f8da8	106	fill_record_f8da8	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000f8da8.json	docs/compiler-abi.md; Fill a 0x72-byte record from two source records and an optional third: bytes from src1 (+8, +3, +9), 18 bytes from src2 ; callers f8e44@f8f2a; guest pending
 0x000f8e14	47	count_set_entries_f8e14	game_helpers30	compiles	game	confirmed	decomp/tests/0x000f8e14.json	docs/compiler-abi.md; Count the entries whose first word is nonzero.; callers f8e44@f8e9b; guest pending
 0x000f8e44	615			unknown	unclassified	unverified		
 0x000f90ac	921			unknown	unclassified	unverified		
