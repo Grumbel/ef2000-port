@@ -5702,4 +5702,8 @@ void update_follower_381a0(uint32_t index);
 void classify_view_axis_83a40(void);
 void guest_fn_83734_x(ef_addr32 out, int32_t x, int32_t z, int32_t y); /* 0x83734 EAX/EDX/EBX/ECX */
 
+void start_mission_step_1b70(void);
+void guest_fn_2e04_x(void); /* 0x2e04 */
+void guest_fn_20ec_x(void); /* 0x20ec */
+
 #endif

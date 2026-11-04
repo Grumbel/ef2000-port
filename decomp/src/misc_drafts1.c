@@ -13952,3 +13952,59 @@ void classify_view_axis_83a40(void)
     cond = ((int32_t)EF_U32(0x00143ee8u) >> 16) > q ? 1u : 0u;
     EF_U8(0x001fcbe2u) = (uint8_t)((EF_U8(0x001fcbe2u) & 0x7fu) | (uint8_t)(cond << 7));
 }
+
+/* 0x1b70, 359 bytes. Start the mission state machine step selected by byte 0x196fe8. Does nothing in network mode (byte 0x127da8) with phase 3. State 1 (running): wait until word 0x126516 and byte 0x132ac2 are clear, then reset the state byte and set the status byte 0x12db9e to 0x12. Otherwise initialise the request block (0x1a3649 = 0, 0x197080 = 0x1a, words 0x197089 = 0, 0x196fea = 0xfa, 0x196fec = 0x196fee = 1, dwords 0x197061 and 0x19708b = 0, byte 0x19707f = 0), set state 1 and run 0x2e04. If it produced no record (0x197061 still 0) outside play mode, set word 0x126518 = 1 and go idle; otherwise run 0x1f64 and 0x20ec (and 0x3cf0 when byte 0x196ff0), seed the camera blocks 0x19e5b5.. and 0x19e5c1.. from the record's position (y lowered by 0x493e0), mark them valid, hand 0x17f5c4 to 0x2fbc4 and set the status byte to 0x49. */
+void start_mission_step_1b70(void)
+{
+    ef_addr32 rec;
+    uint32_t x, y, z;
+    if (EF_U8(0x00127da8u) != 0u && EF_U8(0x0012584bu) == 3u)
+        return;
+    if (EF_U8(0x00196fe8u) == 1u) {
+        if (EF_U16(0x00126516u) != 0u)
+            return;
+        if (EF_U8(0x00132ac2u) != 0u)
+            return;
+        EF_U8(0x00196fe8u) = 0u;
+        EF_U8(0x0012db9eu) = 0x12u;
+        return;
+    }
+    EF_U8(0x001a3649u) = 0u;
+    EF_U8(0x00197080u) = 0x1au;
+    EF_U16(0x00197089u) = 0u;
+    EF_U16(0x00196feau) = 0xfau;
+    EF_U32(0x00197061u) = 0u;
+    EF_U8(0x0019707fu) = 0u;
+    EF_U8(0x00196fe8u) = 1u;
+    EF_U32(0x0019708bu) = 0u;
+    EF_U16(0x00196fecu) = 1u;
+    EF_U16(0x00196feeu) = 1u;
+    guest_fn_2e04_x();
+    if (EF_U32(0x00197061u) == 0u && EF_U8(0x00127da9u) == 0u) {
+        EF_U16(0x00126518u) = 1u;
+        EF_U8(0x00196fe8u) = 0u;
+        return;
+    }
+    select_active_entry_1f64();
+    guest_fn_20ec_x();
+    if (EF_U8(0x00196ff0u) != 0u)
+        reset_selection_3cf0();
+    rec = EF_U32(0x00197061u);
+    x = EF_U32(rec);
+    EF_U32(0x0019e5c1u) = x;
+    EF_U32(0x0019e5b5u) = x;
+    y = EF_U32(rec + 4u) - 0x493e0u;
+    EF_U32(0x0019e54du) = rec;
+    EF_U32(0x0019e5c5u) = y;
+    EF_U32(0x0019e5b9u) = y;
+    z = EF_U32(rec + 8u);
+    EF_U32(0x0019e551u) = 0u;
+    EF_U32(0x0019e5c9u) = z;
+    EF_U32(0x0019e5bdu) = z;
+    EF_U8(0x0019e5e1u) = 1u;
+    EF_U8(0x0019e5e2u) = 1u;
+    EF_U8(0x0019e555u) = 1u;
+    EF_U8(0x0019e5e3u) = 1u;
+    guest_fn_2fbc4(0x0017f5c4u);
+    EF_U8(0x0012db9eu) = 0x49u;
+}

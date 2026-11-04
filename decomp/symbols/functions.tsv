@@ -33,7 +33,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00000f60	32	random_modulo	low_helpers	compiles	game	confirmed	decomp/tests/0x00000f60.json	docs/compiler-abi.md; zero divisor returns 0 else low-word random (0x9c960) modulo divisor; callers 1ef8@1f58,1f64@1f87,1f64@20a0; guest pending
 0x00000f80	2904			unknown	unclassified	unverified		
 0x00001ad8	150	reset_selection_state_1ad8	game_helpers13	compiles	game	confirmed	decomp/tests/0x00001ad8.json	docs/compiler-abi.md; Reset the selection state block at 0x196fe8.; callers f80@1ac6; guest pending
-0x00001b70	359			unknown	unclassified	unverified		
+0x00001b70	359	start_mission_step_1b70	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00001b70.json	docs/compiler-abi.md; Start the mission state machine step selected by byte 0x196fe8. Does nothing in network mode (byte 0x127da8) with phase ; callers 8d59c@8d81a,8d59c@8d871; guest pending
 0x00001cd8	543			unknown	unclassified	unverified		
 0x00001ef8	108	tick_selector_1ef8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00001ef8.json	docs/compiler-abi.md; Every second call pick a byte from tables 0x1961f8 (stride 51) or 0x196191 (stride 52) * and store 0xf60 of it in byte 0; callers 1cd8@1ec6; guest pending
 0x00001f64	331	select_active_entry_1f64	game_helpers76	compiles	game	confirmed	decomp/tests/0x00001f64.json	docs/compiler-abi.md; Select the active entry: a direct code match first, else the best flagged candidate.; callers 1b70@1c4a,1cd8@1eb2,1cd8@1ed7; guest pending

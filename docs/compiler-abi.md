@@ -7954,3 +7954,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x83a40` | none | none | 848e0@8493e | Classify how directly the pick point 0x1fcc2c.. lies along the view axis: build the rotation from the three angle words  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1b70` | none | none | 8d59c@8d81a,8d59c@8d871 | Start the mission state machine step selected by byte 0x196fe8. Does nothing in network mode (byte 0x127da8) with phase  |
