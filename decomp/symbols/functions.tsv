@@ -388,7 +388,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00026424	586			unknown	unclassified	unverified		
 0x00026670	133	set_object_target_26670	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00026670.json	docs/compiler-abi.md; Set a target position (X = EDX, Y = EBX, Z = ECX) on the scene object INDEX (EAX, signed word, looked up with 0x8ffe8): ; callers 38284@3852f; guest pending
 0x000266f8	74	clear_part_flags_266f8	game_helpers7	compiles	game	confirmed	decomp/tests/0x000266f8.json	docs/compiler-abi.md; ; callers 26670@266ee; guest pending
-0x00026744	539			unknown	unclassified	unverified		
+0x00026744	539	steer_record_26744	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00026744.json	docs/compiler-abi.md; Steer the moving record REC (EAX): turn its heading word +0xe towards the target. The owner is entry (signed word +0x38); callers 266f8@266fe; guest pending
 0x00026960	483	update_record_speed_26960	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00026960.json	docs/compiler-abi.md; Update the speed (dword +0x12) of the moving record REC (EAX) towards its target and advance it. The limit L is the sign; callers 266f8@26705; guest pending
 0x00026b60	1390			unknown	unclassified	unverified		
 0x000270d0	631			unknown	unclassified	unverified		

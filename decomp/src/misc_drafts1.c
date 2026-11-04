@@ -18604,3 +18604,63 @@ void camera_follow_target_255f0(void)
 	EF_U32(0x001f7054u) = 0x3ff00000u;
 	guest_fn_6ebe0_x(0u, 0x40040000u, 0xcccccccdu, 0x3ff4ccccu, 0u, 0u, 0u, 0u, EF_U32(0x001f70a0u), EF_U32(0x001f70a4u));
 }
+
+/* 0x26744, 539 bytes. Steer the moving record REC (EAX): turn its heading word +0xe towards the target. The owner is entry (signed word +0x38) of the 69-byte table at dword 0x1a14f8 and the mount record M is found as in 0x26960 (0x8ffe8). The turn gain is the word at 0x123811 + 164 * byte +0x3a. With byte +0x3b zero the bearing (0xb3b1c) goes to the point (dwords 0x19b388 / 0x19b390 minus the record's +0 / +8, >> 8); otherwise the bearing is taken in the mount's frame from the clamped (+-0x3fff) offsets to the target (dwords +0x54 / +0x5c, 0x19b380 / 0x19b384) plus M's heading. The turn is (bearing - heading) * gain / 0x7fff, quartered when the new heading would be farther from M's heading than the current one, and zeroed for a controlled owner (dword owner +0x18 byte +0xc) when byte +0x3a is below 0x1b or both offsets are below 10. Word +0x24 receives the turn and word +0xe grows by turn * ticks (word 0x127d92). */
+void steer_record_26744(ef_addr32 rec)
+{
+	int32_t w = (int32_t)EF_U32(rec + 0x36u) >> 16;
+	uint32_t owner = EF_U32(0x001a14f8u) + (uint32_t)(w * 69);
+	uint32_t m = EF_U8(rec + 0x3bu);
+	uint32_t n = EF_U8(rec + 0x3au);
+	uint32_t fid, t, ctl, idx;
+	int32_t dx, dz, gain, turn, a, ang;
+	int16_t di;
+	uint32_t e1, e2;
+
+	if (EF_U8(0x00125996u + (uint32_t)EF_U8(owner + 0x25u) * 70u + m * 7u) == 0u)
+		fid = EF_U32(owner + 0x26u) >> 16;
+	else
+		fid = EF_U32(owner + m * 2u + 0x24u) >> 16;
+	t = guest_fn_8ffe8((int32_t)fid);
+	gain = (int16_t)EF_U16(n * 164u + 0x00123811u);
+	dx = ((int32_t)EF_U32(0x0019b388u) - (int32_t)EF_U32(rec)) >> 8;
+	dz = ((int32_t)EF_U32(0x0019b390u) - (int32_t)EF_U32(rec + 8u)) >> 8;
+	if (m == 0u) {
+		ang = (int32_t)(int16_t)guest_fn_b3b1c((uint32_t)(int32_t)(int16_t)dx, (uint32_t)(int32_t)(int16_t)dz);
+		ang = (int16_t)ang;
+	} else {
+		EF_U32(0x0019b384u) = EF_U32(rec + 0x5cu) - EF_U32(rec + 8u);
+		EF_U32(0x0019b380u) = EF_U32(rec + 0x54u) - EF_U32(rec);
+		if ((int32_t)EF_U32(0x0019b384u) > 0x3fff)
+			EF_U32(0x0019b384u) = 0x3fffu;
+		if ((int32_t)EF_U32(0x0019b384u) < -0x3fff)
+			EF_U32(0x0019b384u) = (uint32_t)-0x3fff;
+		if ((int32_t)EF_U32(0x0019b380u) > 0x3fff)
+			EF_U32(0x0019b380u) = 0x3fffu;
+		if ((int32_t)EF_U32(0x0019b380u) < -0x3fff)
+			EF_U32(0x0019b380u) = (uint32_t)-0x3fff;
+		idx = (uint32_t)EF_U16(t + 0xeu) >> 3;
+		a = (((int32_t)(int16_t)EF_U16(0x00142e08u + idx * 2u) * (int32_t)EF_U32(0x0019b380u)) -
+		     ((int32_t)(int16_t)EF_U16(0x00141e08u + idx * 2u) * (int32_t)EF_U32(0x0019b384u))) >> 15;
+		if (a > 0x3fff)
+			a = 0x3fff;
+		if (a < -0x3fff)
+			a = -0x3fff;
+		ang = (int32_t)(uint16_t)((uint16_t)guest_fn_b3b1c((uint32_t)a, 0x3fffu) + EF_U16(t + 0xeu));
+	}
+	di = (int16_t)(uint16_t)((uint16_t)ang - EF_U16(rec + 0xeu));
+	turn = ((int32_t)di * gain) / 0x7fff;
+	di = (int16_t)(EF_U16(rec + 0xeu) + (uint32_t)turn);
+	e1 = abs_a28f2(((int32_t)EF_U32(rec + 0xcu) >> 16) - ((int32_t)EF_U32(t + 0xcu) >> 16));
+	e2 = abs_a28f2((int32_t)di - ((int32_t)EF_U32(t + 0xcu) >> 16));
+	if ((int32_t)e1 < (int32_t)e2)
+		turn = turn / 4;
+	ctl = EF_U32(EF_U32(rec + 0x34u) + 0x18u);
+	if (EF_U8(ctl + 0xcu) != 0u) {
+		if ((int32_t)EF_U8(rec + 0x3au) < 0x1b ||
+		    ((int32_t)EF_U32(0x0019b380u) < 0xa && (int32_t)EF_U32(0x0019b384u) < 0xa))
+			turn = 0;
+	}
+	EF_U16(rec + 0x24u) = (uint16_t)turn;
+	EF_U16(rec + 0xeu) = (uint16_t)(EF_U16(rec + 0xeu) + (uint16_t)(turn * (int32_t)EF_U16(0x00127d92u)));
+}

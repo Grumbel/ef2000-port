@@ -5975,4 +5975,6 @@ void camera_follow_target_255f0(void);
 
 
 
+void steer_record_26744(ef_addr32 rec);
+
 #endif
