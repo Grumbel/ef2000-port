@@ -8584,3 +8584,17 @@ void load_fixed_files_c8f38(void)
         EF_U32(0x00160000u) = 0u;
     }
 }
+
+/* 0x41314, 155 bytes. Show the picture NAME (EAX) in the preview widget: when the name differs from the current one at 0x1a49d8 (0xa4380) or no preview buffer exists yet (dword 0x12656c, allocated here as pool block 0x3e800), draw it into the buffer (0xc36b4 with 0x190 x 0x200), then remember the name, look the widget up (name 0x1843f0, or 0x1843f4 when byte 0x1a53dc is set) and attach the buffer to it (0xa5b1c, 0x190 x 0x190, stack 0x200). */
+void show_preview_picture_41314(uint32_t name)
+{
+    uint32_t w;
+    if (guest_fn_a4380(0x001a49d8u, name) != 0u || EF_U32(0x0012656cu) == 0u) {
+        if (EF_U32(0x0012656cu) == 0u)
+            EF_U32(0x0012656cu) = guest_fn_b3f58((int16_t)guest_fn_b3db0(0x3e800u));
+        guest_fn_c36b4(name, 0u, 0u, 0x200u, 0x190u, EF_U32(0x0012656cu));
+    }
+    copy_string_9d749(0x001a49d8u, name);
+    w = guest_fn_a46cc(EF_U8(0x001a53dcu) == 0u ? 0x001843f0u : 0x001843f4u);
+    set_widget_params_a5b1c(w, EF_U32(0x0012656cu), 0x190u, 0x190u, 0x200u);
+}

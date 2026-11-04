@@ -6882,3 +6882,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc8f38` | none | none | ac408@ac503 | Load the two fixed data files: the path 0x18ef60 is loaded with the hook at 0x132ab8 into 0x425c8c (failure reported thr |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x41314` | EAX:uint32_t | none | a6fc@a718,a6fc@a73c,a6fc@a75e | Show the picture NAME (EAX) in the preview widget: when the name differs from the current one at 0x1a49d8 (0xa4380) or n |

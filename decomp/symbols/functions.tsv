@@ -749,7 +749,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00041028	167	setup_dialog_41028	line_of_sight	compiles	game	confirmed	decomp/tests/0x00041028.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000410d0	36	reset_world_state_410d0	low_helpers	compiles	game	confirmed	decomp/tests/0x000410d0.json	docs/compiler-abi.md; 0x53270, byte 0x125847=0, 0x8bd58(0x1a58b4,0x1a5a1c), 0x49228; callers 43020@430ef; guest pending
 0x0004110c	518			unknown	unclassified	unverified		
-0x00041314	155			unknown	unclassified	unverified		
+0x00041314	155	show_preview_picture_41314	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00041314.json	docs/compiler-abi.md; Show the picture NAME (EAX) in the preview widget: when the name differs from the current one at 0x1a49d8 (0xa4380) or n; callers a6fc@a718,a6fc@a73c,a6fc@a75e; guest pending
 0x000413b0	68	init_screen_413b0	game_helpers11	compiles	game	confirmed	decomp/tests/0x000413b0.json	docs/compiler-abi.md; ; callers bfcc@c110,41f24@41f5b; guest pending
 0x0004161c	678			unknown	unclassified	unverified		
 0x000418c4	210			unknown	unclassified	unverified		
