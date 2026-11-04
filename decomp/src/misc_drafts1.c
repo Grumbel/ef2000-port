@@ -2134,3 +2134,35 @@ void decimal_string_to_double_ebdcc(ef_addr32 text, ef_addr32 out)
     EF_U32(out + 4u) = hi;
     EF_U32(out) = lo;
 }
+
+/* 0x9be0d, 40 bytes. Store the current segment registers into the 12-byte record at OUT (ES, CS, SS, DS, FS, GS as words, like segread). */
+void segread_9be0d(ef_addr32 out)
+{
+    EF_U16(out + 2u) = (uint16_t)guest_seg_x(1u);
+    EF_U16(out + 6u) = (uint16_t)guest_seg_x(3u);
+    EF_U16(out) = (uint16_t)guest_seg_x(0u);
+    EF_U16(out + 4u) = (uint16_t)guest_seg_x(2u);
+    EF_U16(out + 8u) = (uint16_t)guest_seg_x(4u);
+    EF_U16(out + 0xau) = (uint16_t)guest_seg_x(5u);
+}
+
+/* 0x9c47a, 56 bytes. The software interrupt dispatcher behind int386x (registers ESI = interrupt number, EDI = input register block, EDX = output register block, EBX = segment register block): load the registers and the ES/DS selectors from the input blocks, run "int N" through the stub table at 0x9c558 (0x9c4b2), then store EAX..ESI/EDI and the carry flag (as 0/-1) into the output block at +0..+0x18 and the returned ES/DS back into the segment block. */
+void int386x_core_9c47a(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs)
+{
+    guest_dos_int_x(intno, in, out, sregs);
+}
+
+/* 0x9c461, 25 bytes. int386x: perform software interrupt INTNO with the register blocks IN/OUT and the segment block SREGS; returns the EAX the interrupt produced. */
+uint32_t int386x_9c461(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs)
+{
+    int386x_core_9c47a(intno, in, out, sregs);
+    return EF_U32(out);
+}
+
+/* 0x9c446, 27 bytes. int386: int386x with a freshly read segment block. */
+uint32_t int386_9c446(uint32_t intno, uint32_t in, uint32_t out)
+{
+    uint8_t sregs[12];
+    segread_9be0d((uint32_t)(uintptr_t)sregs);
+    return int386x_9c461(intno, in, out, (uint32_t)(uintptr_t)sregs);
+}

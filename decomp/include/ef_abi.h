@@ -4647,4 +4647,11 @@ void float_to_extended_f017a(uint32_t bits, ef_addr32 out);
 void decimal_string_to_double_ebdcc(ef_addr32 text, ef_addr32 out);
 void guest_fn_d1afc_x(void); /* 0xd1afc unknown, no arguments */
 
+void segread_9be0d(ef_addr32 out);
+void int386x_core_9c47a(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs);
+uint32_t int386x_9c461(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs);
+uint32_t int386_9c446(uint32_t intno, uint32_t in, uint32_t out);
+uint32_t guest_seg_x(uint32_t which); /* segment register selector: 0 ES, 1 CS, 2 SS, 3 DS, 4 FS, 5 GS */
+void guest_dos_int_x(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs); /* software interrupt through the stub table at 0x9c558 */
+
 #endif
