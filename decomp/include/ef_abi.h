@@ -3793,4 +3793,10 @@ void set_table_slot_value_1114c7(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
 uint32_t read_varlen_111f20(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 cursor);
 void guest_fn_110f6f_x(void); /* 0x110f6f */
 
+/* runtime_helpers33.c */
+uint32_t file_size_115989(uint32_t handle);
+void start_value_ramp_1141b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 obj, int32_t target, int32_t time);
+void send_channel_volumes_112bd8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 player);
+void guest_fn_1123a4_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0x1123a4 5 stack args, caller cleanup */
+
 #endif

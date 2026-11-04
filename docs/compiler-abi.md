@@ -4268,3 +4268,11 @@ in EAX, format string address, one value).
 | `0x111473` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 102330@102353 | Demote a table slot from state 2 to state 1. |
 | `0x1114c7` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 1021f4@10221e | Set a slot's field at 0x17d6e4, clear its field at 0x17d6a4 and run 110f6f. |
 | `0x111f20` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | EAX:uint32_t | 112c10@112db4,112c10@112f7b,112c10@1130f0 | Read a MIDI variable-length quantity (up to 4 bytes) and advance the cursor stored at the argument. |
+
+## runtime_helpers33 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x115989` | EAX:uint32_t | EAX:uint32_t | 105024@105050 | Size of an open file: remember the position, seek to the end, seek back; -1 when the position query fails. |
+| `0x1141b0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:int32_t,[ESP+12]:int32_t | none | 1031cc@1031fc | Start a ramp of the value at +0x48 to a target over time; sets the per-step delta at +0x54. |
+| `0x112bd8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 112c10@113222,1142cc@1142fd | Send controller 7 (volume) for each of the 16 channels whose stored value is not -1. |

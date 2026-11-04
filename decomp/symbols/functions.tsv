@@ -4102,7 +4102,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001128e4	567			unknown	unclassified	unverified		
 0x00112b1c	158	reset_table_record_112b1c	game_helpers58	compiles	game	confirmed	decomp/tests/0x00112b1c.json	docs/compiler-abi.md; Reset a table record: clear the slots, fill the index tables with -1 and set defaults.; callers 112bbc@112bc2,113c7c@113cdb; guest pending
 0x00112bbc	25	reset_table_record_and_link_112bbc	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00112bbc.json	docs/compiler-abi.md; Reset a table record and point its field 0x14 8 bytes past field 0x10.; callers 113d10@113e46,11402c@114045; guest pending
-0x00112bd8	54			unknown	unclassified	unverified		
+0x00112bd8	54	send_channel_volumes_112bd8	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x00112bd8.json	docs/compiler-abi.md; Send controller 7 (volume) for each of the 16 channels whose stored value is not -1.; callers 112c10@113222,1142cc@1142fd; guest pending
 0x00112c10	1704			unknown	unclassified	unverified		
 0x001132b8	221			unknown	unclassified	unverified		
 0x00113398	96			unknown	unclassified	unverified		
@@ -4118,7 +4118,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00114058	171			unknown	unclassified	unverified		
 0x00114170	47			unknown	unclassified	unverified		
 0x001141a0	16	set_record_field_1141a0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001141a0.json	docs/compiler-abi.md; Store a value at +0x2c of a record when the record exists.; callers 103244@10326e; guest pending
-0x001141b0	95			unknown	unclassified	unverified		
+0x001141b0	95	start_value_ramp_1141b0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x001141b0.json	docs/compiler-abi.md; Start a ramp of the value at +0x48 to a target over time; sets the per-step delta at +0x54.; callers 1031cc@1031fc; guest pending
 0x001142cc	75			unknown	unclassified	unverified		
 0x0011451c	110			unknown	unclassified	unverified		
 0x0011458c	138			unknown	unclassified	unverified		
@@ -4130,7 +4130,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011580e	99			unknown	unclassified	unverified		
 0x00115871	275			unknown	unclassified	unverified		
 0x00115984	5	tail_jump_115984	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00115984.json	docs/compiler-abi.md; tail jump. Forward to 0xfa9a0.; callers 105024@105068,105070@10511c; guest pending
-0x00115989	61			unknown	unclassified	unverified		
+0x00115989	61	file_size_115989	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x00115989.json	docs/compiler-abi.md; Size of an open file: remember the position, seek to the end, seek back; -1 when the position query fails.; callers 105024@105050; guest pending
 0x001177ad	71			unknown	unclassified	unverified		
 0x001177f4	539			unknown	unclassified	unverified		
 0x00117a0f	147			unknown	unclassified	unverified		
