@@ -4136,3 +4136,10 @@ in EAX, format string address, one value).
 | `0xb2504` | EAX:ef_addr32,DX:int16_t,EBX:uint32_t | none | b2560@b261a,b2810@b2898,b28b8@b2940 | Print a movement record with its kind name. |
 | `0xb2960` | EAX:ef_addr32,EDX:uint32_t | none | b29a8@b2a08 | Print a classified record with its class name. |
 | `0xb2a2c` | EAX:ef_addr32,EDX:uint32_t | none | b1f80@b21df,b2560@b25d9,b2560@b268b | Print a plain coordinate record. |
+
+## game_helpers83 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xb3580` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | b3084@b314b | Hex dump 0x640 bytes through the printf sink, 40 values per line. |
+| `0xbc471` | EAX:ef_addr32,EDX:uint32_t | none | bc4da@bc54d | Build a temp file name "t" + four hex digits + "_" + two hex digits + ".tmp". |

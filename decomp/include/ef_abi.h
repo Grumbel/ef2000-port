@@ -3697,4 +3697,10 @@ void print_move_record_b2504(ef_addr32 rec, int16_t value, uint32_t handle);
 void print_class_record_b2960(ef_addr32 rec, uint32_t handle);
 void print_coordinate_record_b2a2c(ef_addr32 rec, uint32_t handle);
 
+/* game_helpers83.c */
+void dump_buffer_b3580(ef_addr32 buffer, uint32_t handle, uint32_t title);
+void make_temp_name_bc471(ef_addr32 name, uint32_t index);
+uint32_t guest_fn_fa89a_x(void); /* 0xfa89a -> EAX */
+uint32_t guest_fn_bc465_x(uint32_t nibble); /* 0xbc465 EAX -> AL */
+
 #endif

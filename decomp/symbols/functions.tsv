@@ -2510,7 +2510,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b31f0	388			unknown	unclassified	unverified		
 0x000b3374	56			unknown	unclassified	unverified		
 0x000b33ac	22	latch_and_forward_b33ac	list_helpers	compiles	game	confirmed	decomp/tests/0x000b33ac.json	docs/compiler-abi.md; Dword 0x41f354 = 0xa4574(0); tail-call 0xf9ecd(0x41f354).; callers b3374@b337d; guest pending
-0x000b3580	96			unknown	unclassified	unverified		
+0x000b3580	96	dump_buffer_b3580	game_helpers83	compiles	game	confirmed	decomp/tests/0x000b3580.json	docs/compiler-abi.md; Hex dump 0x640 bytes through the printf sink, 40 values per line.; callers b3084@b314b; guest pending
 0x000b3648	486			unknown	unclassified	unverified		
 0x000b3830	343			unknown	unclassified	unverified		
 0x000b3988	100	approx_length_b3988	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b3988.json	docs/compiler-abi.md; Approximate length from two components: max - max/32 - max/128 + 3/8 min + 3/128 min...; callers 67d4@687c,21654@21955,21654@219f0; guest pending
@@ -2636,7 +2636,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bc421	47	open_list_node_bc421	game_helpers78	compiles	game	confirmed	decomp/tests/0x000bc421.json	docs/compiler-abi.md; Find the list node with the given key and open it; -1 when absent.; callers 9ea0@a3ca,a3dc@a5aa,357ec@35a99; guest pending
 0x000bc450	21	release_by_key_bc450	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000bc450.json	docs/compiler-abi.md; ; callers bc421@bc448; guest pending
 0x000bc465	12	digit_character	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc465.json	docs/compiler-abi.md; Digit character for a value: +0x30, then +0x27 past '9'.; callers bc471@bc491,bc471@bc4ac,bc471@bc4b9; guest pending
-0x000bc471	105			unknown	unclassified	unverified		
+0x000bc471	105	make_temp_name_bc471	game_helpers83	compiles	game	confirmed	decomp/tests/0x000bc471.json	docs/compiler-abi.md; Build a temp file name "t" + four hex digits + "_" + two hex digits + ".tmp".; callers bc4da@bc54d; guest pending
 0x000bc4da	137			unknown	unclassified	unverified		
 0x000bc570	36	list_insert_head	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc570.json	docs/compiler-abi.md; Insert EAX at the head of the doubly linked list whose * head pointer is EBX and tail pointer EDX (previous at +0, next ; callers f6a8@f810,f6a8@f86b,fecc@ff7f; guest pending
 0x000bc594	59	unlink_node_bc594	list_helpers	compiles	game	confirmed	decomp/tests/0x000bc594.json	docs/compiler-abi.md; Unlink node from a list whose head slot is *head_a (edx) / *head_b (ebx).; callers ca838@ca85c,cb9f4@cba68,cb9f4@cbb84; guest pending
