@@ -3209,3 +3209,10 @@ in EAX, format string address, one value).
 | `0x5488` | none | none | 5630@566e | Pick the mode value from which row/column button pair is pressed. |
 | `0x16d60` | EAX:ef_addr32,DL:uint8_t,BX:int16_t | none | 15b7c@15eab,16588@168a2,16e60@16f72 | Count down the 20 three-byte slots of the given kind by the given amount. |
 | `0x1c3d0` | none | none | 1cde8@1ce50 | Latch the raw input state, clearing it when a menu or pause is active. |
+
+## game_helpers42 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x45a4` | none | none | 4738@47da,4bf8@4c2f | Read the default record and derive the chord mode from its two fields. |
+| `0x4738` | none | none | none direct | Reset the menu: read the clicked mode widget, load the record and refresh. |

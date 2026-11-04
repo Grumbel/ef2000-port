@@ -2494,4 +2494,9 @@ void count_down_slots_16d60(ef_addr32 base, uint8_t kind, int16_t amount);
 void latch_input_state_1c3d0(void);
 ef_addr32 guest_fn_a7ec4_key(ef_addr32 text, uint32_t key); /* 0xa7ec4 EAX/EDX */
 
+/* game_helpers42.c */
+void select_mode_from_record_45a4(void);
+void reset_menu_state_4738(void);
+uint32_t guest_fn_105a4(ef_addr32 a, ef_addr32 b, ef_addr32 c, ef_addr32 d, ef_addr32 name); /* 0x105a4 EAX/EDX/EBX/ECX + stack */
+
 #endif

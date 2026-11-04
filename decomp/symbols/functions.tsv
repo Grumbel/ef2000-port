@@ -59,8 +59,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000432c	15	hiscore_qualifies	hiscore	compiles	game	confirmed	decomp/tests/0x000432c.json	docs/compiler-abi.md; C candidate and signed-boundary host test pass; awaiting OpenWatcom OMF compile, splice, differential and full replay
 0x0000433c	242	hiscore_insert	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; ties admitted, INT_MIN wraparound
 0x00004430	369			unknown	unclassified	unverified		
-0x000045a4	401			unknown	unclassified	unverified		
-0x00004738	321			unknown	unclassified	unverified		
+0x000045a4	401	select_mode_from_record_45a4	game_helpers42	compiles	game	confirmed	decomp/tests/0x000045a4.json	docs/compiler-abi.md; Read the default record and derive the chord mode from its two fields.; callers 4738@47da,4bf8@4c2f; guest pending
+0x00004738	321	reset_menu_state_4738	game_helpers42	compiles	game	confirmed	decomp/tests/0x00004738.json	docs/compiler-abi.md; Reset the menu: read the clicked mode widget, load the record and refresh.; callers none direct; guest pending
 0x0000487c	206			unknown	unclassified	unverified		
 0x0000494c	323			unknown	unclassified	unverified		
 0x00004a90	16	arcEndgameAccept		named	unclassified	unverified		
