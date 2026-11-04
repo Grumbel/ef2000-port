@@ -3871,4 +3871,8 @@ uint8_t draw_glyph_dcf28(uint8_t code, int16_t dx_val, int16_t bx_val, int16_t c
 void draw_widget_rect_49144(int16_t idx);
 void highlight_widget_22e98(int16_t idx);
 
+/* game_helpers111.c */
+void drop_target_if_far_3df8(ef_addr32 position, ef_addr32 current, uint32_t limit);
+int32_t stream_fgetc_10f107(ef_addr32 stream);
+
 #endif

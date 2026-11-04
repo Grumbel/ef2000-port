@@ -49,7 +49,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00003cd4	27	max3_signed	low_helpers	compiles	game	confirmed	decomp/tests/0x00003cd4.json	docs/compiler-abi.md; signed maximum of three; callers 2e04@304c,2e04@30d9,2e04@31a3; guest pending
 0x00003cf0	129	reset_selection_3cf0	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00003cf0.json	docs/compiler-abi.md; Reset the selection state from the record at dword 0x197061.; callers 1b70@1c5d,1cd8@1eea,3ea8@3f64; guest pending
 0x00003d74	131	refresh_selection_3d74	game_helpers13	compiles	game	confirmed	decomp/tests/0x00003d74.json	docs/compiler-abi.md; Refresh the selected state byte from the owner and report a change.; callers 1cd8@1e92; guest pending
-0x00003df8	91			unknown	unclassified	unverified		
+0x00003df8	91	drop_target_if_far_3df8	game_helpers111	compiles	game	confirmed	decomp/tests/0x00003df8.json	docs/compiler-abi.md; Forget the tracked target (*current = 0) when the new position is missing or farther than limit * 32 from it.; callers 3668@36de,3668@3718,3668@37a2; guest pending
 0x00003ea8	360			unknown	unclassified	unverified		
 0x00004050	138	hiscore_generate_defaults	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; differential-tested C++ model in runtime/ef2000_highscores.cpp
 0x000040dc	288	hiscore_refresh_display	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md #059; native model tested
@@ -4024,7 +4024,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010eef0	242			unknown	unclassified	unverified		
 0x0010f071	119	alloc_stream_buffer_10f071	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0010f071.json	docs/compiler-abi.md; Allocate the buffer of a stream record.; callers f1d90@f1dd0,f1f5a@f1f95,f22af@f230d; guest pending
 0x0010f0e8	31			unknown	unclassified	unverified		
-0x0010f107	137			unknown	unclassified	unverified		
+0x0010f107	137	stream_fgetc_10f107	game_helpers111	compiles	game	confirmed	decomp/tests/0x0010f107.json	docs/compiler-abi.md; fgetc: read the next byte of a stream (refilling when the count runs out); in text mode skip a CR and treat Ctrl-Z as en; callers 11580e@115831; guest pending
 0x0010f190	47	stream_getc	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f190.json	docs/compiler-abi.md; Read one byte from a counted buffer stream; -1 at the end.; callers 10f107@10f13a,10f107@10f165; guest pending
 0x0010f1bf	171			unknown	unclassified	unverified		
 0x0010f26a	465			unknown	unclassified	unverified		

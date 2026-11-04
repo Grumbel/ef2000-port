@@ -4377,3 +4377,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x49144` | AX:int16_t | none | 3a3a8@3a566,646d4@6479b | Draw the outline of widget record idx: its centre (x,y) and size (w,h) become a rectangle; mode 0 when the record's kind |
 | `0x22e98` | AX:int16_t | none | 1f960@1f968 | Highlight widget record idx: when its slot byte is set, look the text slot up and enter scroll mode, then draw the recta |
+
+## game_helpers111 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3df8` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | 3668@36de,3668@3718,3668@37a2 | Forget the tracked target (*current = 0) when the new position is missing or farther than limit * 32 from it. |
+| `0x10f107` | EAX:ef_addr32 | EAX:int32_t | 11580e@115831 | fgetc: read the next byte of a stream (refilling when the count runs out); in text mode skip a CR and treat Ctrl-Z as en |
