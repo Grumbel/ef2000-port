@@ -4409,3 +4409,35 @@ void rebuild_group_tables_49bdc(uint32_t p)
         groups = (int16_t)EF_U16(0x001a53c0u);
     }
 }
+
+/* 0xe5f64, 248 bytes. Draw one 7x9 monochrome glyph (CODE bit 7 selects the table 0x15feb0 with index & 0x1f, otherwise 0x15fc70 with index & 0x3f; 9 bytes per glyph, MSB first) at (X, Y) in colour 0x433ec0 into the 8-bit frame buffer, clipped to the rectangle 0x17cf9c/a0/a4/a8 pixel by pixel. */
+void draw_glyph_clipped_e5f64(int32_t x, int32_t y, uint32_t code)
+{
+    int32_t left = EF_S32(0x0017cf9cu);
+    uint32_t glyph;
+    uint32_t rowptr = 0u;
+    int32_t yend = y + 9;
+    if ((code & 0x80u) != 0u)
+        glyph = 0x0015feb0u + (code & 0x1fu) * 9u;
+    else
+        glyph = 0x0015fc70u + (code & 0x3fu) * 9u;
+    while (y != yend) {
+        uint32_t bits = EF_U8(glyph++);
+        if (y >= EF_S32(0x0017cfa4u) && y <= EF_S32(0x0017cfa8u)) {
+            uint32_t mask = 0x80u;
+            int32_t xx = x;
+            uint32_t px;
+            if (rowptr == 0u)
+                rowptr = EF_U32(0x0015b754u) + EF_U32(0x00163200u + (uint32_t)y * 4u) + (uint32_t)x;
+            for (px = rowptr; px != rowptr + 7u; px++, xx++) {
+                if (xx >= left && xx <= EF_S32(0x0017cfa0u) && (bits & mask) != 0u)
+                    EF_U8(px) = EF_U8(0x00433ec0u);
+                mask = (mask & 0xffu) >> 1;
+            }
+        }
+        if (rowptr != 0u)
+            rowptr += EF_U32(0x001631f4u);
+        y++;
+    }
+    EF_U32(0x0017cf9cu) = (uint32_t)left;
+}

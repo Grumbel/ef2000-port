@@ -5989,3 +5989,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x49bdc` | EAX:uint32_t | none | 49228@49939,49228@499f9 | Rebuild the group tables from the list node reached by following the next links (+4) of P up to the word 0x125835 times: |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe5f64` | EAX:int32_t,EDX:int32_t,EBX:uint32_t | none | e605c@e60b9,e605c@e6106 | Draw one 7x9 monochrome glyph (CODE bit 7 selects the table 0x15feb0 with index & 0x1f, otherwise 0x15fc70 with index &  |

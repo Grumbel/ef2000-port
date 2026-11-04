@@ -4844,4 +4844,6 @@ void guest_fn_a3e50_x(uint32_t buf, uint32_t code, uint32_t len); /* 0xa3e50 EAX
 
 void rebuild_group_tables_49bdc(uint32_t p);
 
+void draw_glyph_clipped_e5f64(int32_t x, int32_t y, uint32_t code);
+
 #endif
