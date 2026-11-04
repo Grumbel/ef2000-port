@@ -7694,3 +7694,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe9cd8` | EAX:ef_addr32,EDX:double,EBX:double,ECX:double | none | 8e940@8ea35,e9c00@e9ca1 | Build the 3x3 rotation matrix of three angles A1, A2, A3 (stack doubles, ret 0x18) into the nine doubles at OUT (EAX), r |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x2b0b4` | EAX:uint32_t,EDX:uint32_t | none | 161d4@16253,161d4@16317,16588@16619 | Switch the record ID (AX; 0xca byte table at [0x19bb58]) to the state MODE (DL): run 0x2afcc(ID, MODE) and then by MODE  |

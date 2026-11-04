@@ -5591,4 +5591,8 @@ uint32_t guest_fn_c0624_x(int32_t cur, uint32_t kind, uint32_t j, uint32_t list,
 
 void build_rotation_matrix_e9cd8(ef_addr32 out, double a1, double a2, double a3);
 
+void set_record_state_2b0b4(uint32_t id, uint32_t mode);
+void guest_fn_2afcc_x(int32_t id, uint32_t mode); /* 0x2afcc EAX/EDX */
+void guest_fn_2b95c_x(int32_t id); /* 0x2b95c EAX */
+
 #endif

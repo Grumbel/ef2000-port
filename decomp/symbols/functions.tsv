@@ -448,7 +448,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002af64	17	reset_flag_ranges_2af64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0002af64.json	docs/compiler-abi.md; ; callers 49228@49606; guest pending
 0x0002af78	81	sum_owner_weights_2af78	game_helpers23	compiles	game	confirmed	decomp/tests/0x0002af78.json	docs/compiler-abi.md; Sum the weights of the six linked units of an owner.; callers 8557c@855ad; guest pending
 0x0002afcc	171	detach_grid_link_on_mode_change	world_grid_links	compiles	game	confirmed	decomp/tests/0x0002afcc.json	AX/DL grid link cleanup; sentinel 0xff; host tested only
-0x0002b0b4	259			unknown	unclassified	unverified		
+0x0002b0b4	259	set_record_state_2b0b4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002b0b4.json	docs/compiler-abi.md; Switch the record ID (AX; 0xca byte table at [0x19bb58]) to the state MODE (DL): run 0x2afcc(ID, MODE) and then by MODE ; callers 161d4@16253,161d4@16317,16588@16619; guest pending
 0x0002b1f4	443			unknown	unclassified	unverified		
 0x0002b3b0	147	command_linked_units_2b3b0	game_helpers16	compiles	game	confirmed	decomp/tests/0x0002b3b0.json	docs/compiler-abi.md; Send a command to each of the owner's seven linked units that accept it.; callers 2b0b4@2b125,2b0b4@2b14a; guest pending
 0x0002b444	194	command_unit_and_peers_2b444	game_helpers16	compiles	game	confirmed	decomp/tests/0x0002b444.json	docs/compiler-abi.md; Send a command to a unit, then pair it with each accepting unit of its owner.; callers 2b1f4@2b253,2b1f4@2b2ce,2b1f4@2b319; guest pending

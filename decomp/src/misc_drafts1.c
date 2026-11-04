@@ -12696,3 +12696,45 @@ void build_rotation_matrix_e9cd8(ef_addr32 out, double a1, double a2, double a3)
     m[8] = c2 * c3;
     memcpy(ef_guest_memory_ptr(out), m, sizeof m);
 }
+
+/* 0x2b0b4, 259 bytes. Switch the record ID (AX; 0xca byte table at [0x19bb58]) to the state MODE (DL): run 0x2afcc(ID, MODE) and then by MODE (anything above 0xe does nothing): 0, 10 and 12 clear the dwords +0x71, +0x75, +0x79 and +0x7d; 2 runs 0x2b95c, clears byte +0xc9 and commands the linked units with 0x2b3b0(ID, 2); 3 does 0x2b3b0(ID, 3); 4 runs 0x2b95c; 6 sets byte +0xbb to 1 when the word +0xb9 is not 0xff and falls into the check shared with 5, 7 and 14, which sets byte 0x1f9011 when 0x2dba4(ID) holds. Finally the state byte +0x1a is set to MODE. */
+void set_record_state_2b0b4(uint32_t id, uint32_t mode)
+{
+    int32_t sid = (int16_t)id;
+    uint8_t m = (uint8_t)mode;
+    ef_addr32 rec;
+    guest_fn_2afcc_x(sid, m);
+    rec = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+    switch (m) {
+    case 0: case 10: case 12:
+        EF_U32(rec + 0x79u) = 0u;
+        EF_U32(rec + 0x7du) = 0u;
+        EF_U32(rec + 0x71u) = 0u;
+        EF_U32(rec + 0x75u) = 0u;
+        break;
+    case 2:
+        guest_fn_2b95c_x(sid);
+        EF_U8(EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau + 0xc9u) = 0u;
+        command_linked_units_2b3b0((int16_t)sid, 2u);
+        break;
+    case 3:
+        command_linked_units_2b3b0((int16_t)sid, 3u);
+        break;
+    case 4:
+        guest_fn_2b95c_x(sid);
+        break;
+    case 6:
+        if (((int32_t)EF_U32(rec + 0xb7u) >> 16) != 0xff)
+            EF_U8(rec + 0xbbu) = 1u;
+        if ((uint8_t)guest_fn_2dba4(sid) != 0u)
+            EF_U8(0x001f9011u) = 1u;
+        break;
+    case 5: case 7: case 14:
+        if ((uint8_t)guest_fn_2dba4(sid) != 0u)
+            EF_U8(0x001f9011u) = 1u;
+        break;
+    default:
+        break;
+    }
+    EF_U8(EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau + 0x1au) = m;
+}
