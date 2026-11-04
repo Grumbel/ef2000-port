@@ -7097,3 +7097,28 @@ uint32_t fopen_core_bc287(uint32_t name, uint32_t mode, uint32_t file, uint32_t 
     update_flags_fa7d2(file);
     return file;
 }
+
+/* 0x4dee0, 209 bytes. Hit test the 24 map icons (index 1..24) against the point (X, Y) (16-bit signed): icon I has its centre at the words 0x1a55a2[I] / 0x1a55d6[I] and half-size 8.0 / (float 0x1a53df); the first icon whose box contains the point and whose type byte 0x1a5672[I] is not 0x11 is returned, else -1. */
+int32_t find_icon_at_4dee0(uint32_t x, uint32_t y)
+{
+    int16_t i;
+    float half = *(float *)ef_guest_memory_ptr(0x00184d3fu) / *(float *)ef_guest_memory_ptr(0x001a53dfu);
+    float px = (float)(int16_t)x;
+    float py = (float)(int16_t)y;
+    for (i = 1; i < 0x19; i++) {
+        float cx = (float)EF_U16(0x001a55a2u + (uint32_t)i * 2u);
+        float cy = (float)EF_U16(0x001a55d6u + (uint32_t)i * 2u);
+        if ((double)cx - (double)half >= (double)px)
+            continue;
+        if ((double)cx + (double)half <= (double)px)
+            continue;
+        if ((double)cy - (double)half >= (double)py)
+            continue;
+        if ((double)cy + (double)half <= (double)py)
+            continue;
+        if (EF_U8(0x001a5672u + (uint32_t)i) == 0x11u)
+            continue;
+        return i;
+    }
+    return -1;
+}

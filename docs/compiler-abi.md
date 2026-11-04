@@ -6551,3 +6551,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xbc287` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | EAX:uint32_t | bc34f@bc362 | fopen core: open the file NAME with the mode string MODE into the stream record FILE (flags dword +0xc, handle +0x10, bu |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x4dee0` | EAX:uint32_t,EDX:uint32_t | EAX:int32_t | 4dcd8@4dd39,4dcd8@4de13 | Hit test the 24 map icons (index 1..24) against the point (X, Y) (16-bit signed): icon I has its centre at the words 0x1 |
