@@ -7243,3 +7243,37 @@ void add_dirty_rect_e51c4(uint32_t a, uint32_t c, uint32_t b, uint32_t d, uint32
     EF_U8(0x00433eaeu) = 1u;
     EF_U32(0x00433ea0u) = idx;
 }
+
+/* 0xa38f8, 225 bytes. Find the lowest rank (byte +5 of the entry record) among the flagged entries of two index lists: with byte 0x135798 set, scan the byte lists at dwords 0x136b84 (count byte at the pointer in 0x136b88; flag bit 0 of (byte +0xd of the record >> 5) &3) and 0x136b74 (count at the pointer in 0x136b78; same test), each index selecting a record pointer in the table at 0x135878 (32-byte stride); every entry whose rank is below the running minimum (word 0x1357b0) and whose flag is set updates the minimum and sets byte 0x13583c. */
+void find_lowest_rank_a38f8(void)
+{
+    int16_t best = (int16_t)EF_U16(0x001357b0u);
+    uint32_t list_b = EF_U32(0x00136b74u);
+    uint32_t list_a = EF_U32(0x00136b84u);
+    uint16_t i;
+    if (EF_U8(0x00135798u) != 0u) {
+        for (i = 0u; i < EF_U8(EF_U32(0x00136b88u)); i++) {
+            uint32_t rec = EF_U32(0x00135878u + ((uint32_t)EF_U8(list_a + i) << 5));
+            int16_t rank = (int16_t)EF_U8(rec + 5u);
+            if (best >= rank)
+                continue;
+            if ((((uint32_t)EF_U8(rec + 0xdu) * 2u) & 0xffu) >> 6 & 1u) {
+                EF_U8(0x0013583cu) = 1u;
+                best = rank;
+            }
+        }
+        for (i = 0u; i < EF_U8(EF_U32(0x00136b78u)); i++) {
+            uint32_t rec = EF_U32(0x00135878u + ((uint32_t)EF_U8(list_b + i) << 5));
+            int16_t rank = (int16_t)EF_U8(rec + 5u);
+            if (best >= rank)
+                continue;
+            if ((((uint32_t)EF_U8(rec + 0xdu) * 2u) & 0xffu) >> 6 & 1u) {
+                EF_U8(0x0013583cu) = 1u;
+                best = rank;
+            }
+        }
+    }
+    EF_U32(0x00136b84u) = list_a;
+    EF_U32(0x00136b74u) = list_b;
+    EF_U16(0x001357b0u) = (uint16_t)best;
+}

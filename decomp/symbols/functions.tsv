@@ -2187,7 +2187,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a3804	31	send_byte_request_10_a3804	leaf_helpers7	compiles	game	confirmed	decomp/tests/0x000a3804.json	docs/compiler-abi.md; Send a one-byte request with code 10.; callers a3824@a3883; guest pending
 0x000a3824	164	dispatch_entry_ratio_a3824	float_helpers6	compiles	game	confirmed	decomp/tests/0x000a3824.json	docs/compiler-abi.md; Dispatch on the balance ratio of a table entry.; callers a33a4@a33e6; guest pending
 0x000a38c8	48	clear_tables_a38c8	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a38c8.json	docs/compiler-abi.md; clear 8 words 0x1357d8, 8 words 0x13580a, 8 dwords 0x1357e8; callers a3c18@a3d81; guest pending
-0x000a38f8	225			unknown	unclassified	unverified		
+0x000a38f8	225	find_lowest_rank_a38f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a38f8.json	docs/compiler-abi.md; Find the lowest rank (byte +5 of the entry record) among the flagged entries of two index lists: with byte 0x135798 set,; callers a410c@a39d9; guest pending
 0x000a39ec	36	check_name_a39ec	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000a39ec.json	docs/compiler-abi.md; Abort unless the stored name matches the expected one.; callers a3c18@a3c47; guest pending
 0x000a3a10	24	string_short_enough	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a3a10.json	docs/compiler-abi.md; nonempty string with 0xb1b8b result <= 0x10; callers 34844@34858; guest pending
 0x000a3acc	122	install_handlers_a3acc	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a3acc.json	docs/compiler-abi.md; Install the table of ten handler addresses.; callers a3c18@a3c90; guest pending

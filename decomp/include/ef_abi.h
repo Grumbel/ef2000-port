@@ -5114,4 +5114,6 @@ void build_textured_object_d2634(ef_addr32 list, uint32_t count);
 
 void add_dirty_rect_e51c4(uint32_t a, uint32_t c, uint32_t b, uint32_t d, uint32_t add);
 
+void find_lowest_rank_a38f8(void);
+
 #endif
