@@ -7005,3 +7005,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xab174` | EAX:uint32_t | none | ab28c@ab312 | Read a (group, item, kind) selector from the stream HANDLE (EAX): word A, word B and byte C (0xa79d4). A kind above 2 or |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xddae0` | none | none | 27d18@27ef4,dd8d0@dd8d5,f3480@f348d | Poll the mouse: add the motion (0xce02c) to the pointer words 0x425fc8 (x) and 0x425fc6 (y), clamp x to the dword range  |
+| `0xea50c` | [ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t | none | 8b39c@8b469 | cdecl, variadic (FMT, ...): increment the nesting counter byte 0x160638; only when it becomes 1 format the message; when |

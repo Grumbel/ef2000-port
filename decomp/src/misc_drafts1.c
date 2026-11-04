@@ -9223,3 +9223,52 @@ void read_selector_ab174(uint32_t handle)
     }
     EF_U32(0x004191d4u) = node;
 }
+
+/* 0xddae0, 232 bytes. Poll the mouse: add the motion (0xce02c) to the pointer words 0x425fc8 (x) and 0x425fc6 (y), clamp x to the dword range 0x15bdc0..0x15bdc4 and y to 0x15bdc8..0x15bdcc (an out-of-range value is replaced by the limit), read the button word (0xce064) into 0x425fc4 and split bits 1, 2 and 4 into the bytes 0x425fcc, 0x425fca and 0x425fcb. */
+void poll_mouse_ddae0(void)
+{
+    int32_t d[2];
+    uint16_t x, y;
+    mouse_read_motion_ce02c((uint32_t)(uintptr_t)&d[0], (uint32_t)(uintptr_t)&d[1]);
+    x = (uint16_t)(EF_U16(0x00425fc8u) + (uint16_t)d[0]);
+    y = (uint16_t)(EF_U16(0x00425fc6u) + (uint16_t)d[1]);
+    EF_U16(0x00425fc8u) = x;
+    EF_U16(0x00425fc6u) = y;
+    if ((int32_t)(int16_t)EF_U16(0x00425fc8u) < (int32_t)EF_U32(0x0015bdc0u))
+        EF_U16(0x00425fc8u) = (uint16_t)EF_U32(0x0015bdc0u);
+    if ((int32_t)(int16_t)EF_U16(0x00425fc8u) > (int32_t)EF_U32(0x0015bdc4u))
+        EF_U16(0x00425fc8u) = (uint16_t)EF_U32(0x0015bdc4u);
+    if ((int32_t)(int16_t)EF_U16(0x00425fc6u) < (int32_t)EF_U32(0x0015bdc8u))
+        EF_U16(0x00425fc6u) = (uint16_t)EF_U32(0x0015bdc8u);
+    if ((int32_t)(int16_t)EF_U16(0x00425fc6u) > (int32_t)EF_U32(0x0015bdccu))
+        EF_U16(0x00425fc6u) = (uint16_t)EF_U32(0x0015bdccu);
+    EF_U16(0x00425fc4u) = (uint16_t)mouse_read_buttons_ce064();
+    EF_U8(0x00425fccu) = (uint8_t)(EF_U8(0x00425fc4u) & 1u);
+    EF_U8(0x00425fcau) = (uint8_t)(EF_U8(0x00425fc4u) & 2u);
+    EF_U8(0x00425fcbu) = (uint8_t)(EF_U8(0x00425fc4u) & 4u);
+}
+
+/* 0xea50c, 234 bytes. cdecl, variadic (FMT, ...): increment the nesting counter byte 0x160638; only when it becomes 1 format the message; when it is not empty and the log handle (dword 0x132a78) is open, rewrite the template (0xea4c0), build message + 0x19154c + 0x1329ec + 0x19154c and write it to the log (0xb3d00 with the handle, the text and its length). The formatted message is then handed to 0xeb448. */
+void log_message_ea50c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t fmt, ...)
+{
+    char msg[0x280];
+    char line[0x280];
+    va_list ap;
+    uint32_t m = (uint32_t)(uintptr_t)msg, l = (uint32_t)(uintptr_t)line;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    EF_U8(0x00160638u) = (uint8_t)(EF_U8(0x00160638u) + 1u);
+    if ((int8_t)EF_U8(0x00160638u) != 1)
+        return;
+    va_start(ap, fmt);
+    format_to_buffer_e3022(m, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    va_end(ap);
+    if (msg[0] != 0 && EF_U32(0x00132a78u) != 0u) {
+        rewrite_template_ea4c0();
+        copy_string_9d749(l, m);
+        strcat_9ca57(l, 0x0019154cu);
+        strcat_9ca57(l, 0x001329ecu);
+        strcat_9ca57(l, 0x0019154cu);
+        (void)write_whole_file_b3d00(EF_U32(0x00132a78u), l, guest_fn_b1b8b(l));
+    }
+    enter_handler_eb448(m);
+}

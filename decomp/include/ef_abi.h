@@ -5269,4 +5269,7 @@ void fill_button_widgets_4f7d0(void);
 
 void read_selector_ab174(uint32_t handle);
 
+void poll_mouse_ddae0(void);
+void log_message_ea50c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t fmt, ...);
+
 #endif
