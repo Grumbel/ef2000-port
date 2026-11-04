@@ -8332,3 +8332,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x69d10` | none | none | 69f1c@69f4a,69f1c@69f64 | Refresh the slot bytes of the list at dword 0x137960 (next link +4) and redraw it through 0xb3168. For every node that i |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x68a60` | EAX:int32_t,EDX:int32_t | none | 69374@694bd,69374@694f2 | Assign slot EAX (signed) of the three-byte slot table at 0x1f6ef1 (kind byte +3, word +4) to the mode byte of word 0x1f6 |

@@ -1228,7 +1228,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000689f0	56	copy_table_689f0	game_helpers5	compiles	game	confirmed	decomp/tests/0x000689f0.json	docs/compiler-abi.md; Copy the 20 three-byte entries of table 0x1f6eac to 0x1f6ef4.; callers 69fac@6a086,84b64@84b64; guest pending
 0x00068a28	1	nop_68a28	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00068a28.json	docs/compiler-abi.md; Empty stub (single ret).; callers 39254@392e6; guest pending
 0x00068a2c	52	request_68a2c	game_helpers5	compiles	game	confirmed	decomp/tests/0x00068a2c.json	docs/compiler-abi.md; ; callers 68a60@68b69; guest pending
-0x00068a60	401			unknown	unclassified	unverified		
+0x00068a60	401	assign_slot_68a60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00068a60.json	docs/compiler-abi.md; Assign slot EAX (signed) of the three-byte slot table at 0x1f6ef1 (kind byte +3, word +4) to the mode byte of word 0x1f6; callers 69374@694bd,69374@694f2; guest pending
 0x00068bf4	33	load_halfword_pair	marker_packets	compiles	game	confirmed	decomp/tests/0x00068bf4.json	docs/compiler-abi.md; Words 0x1f6f38/0x1f6f42 from 0xde864 on 0x186268/0x186270; sole direct caller 69fac@69fd9; guest pending
 0x00068c18	124	clear_paired_object_marks	scene_indexed	compiles	game	confirmed	decomp/tests/0x00068c18.json	docs/compiler-abi.md
 0x00068ccc	439	test_indexed_object_bit	unk_geometry	typed	game	confirmed		ABI only; AX signed slot, DX 0..12 bit, AL 0xff/0; CS jump table

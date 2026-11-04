@@ -5873,4 +5873,6 @@ void refresh_slot_list_69d10(void);
 uint32_t guest_fn_8ac64_x(int32_t a); /* 0x8ac64 EAX -> AL */
 void guest_fn_b3168_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0xb3168 EAX/EDX/EBX/ECX + 5 stack, callee cleanup */
 
+void assign_slot_68a60(int32_t slot, int32_t value);
+
 #endif

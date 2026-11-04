@@ -16612,3 +16612,33 @@ void refresh_slot_list_69d10(void)
 	}
 	guest_fn_b3168_x(0x00186348u, 0x00137960u, 0x00137970u, 0x00137958u, (uint32_t)((int32_t)EF_U32(0x0041f31eu) >> 16), w32, w2e, w30, w34);
 }
+
+/* 0x68a60, 401 bytes. Assign slot EAX (signed) of the three-byte slot table at 0x1f6ef1 (kind byte +3, word +4) to the mode byte of word 0x1f6f4a and attach it with value EDX (signed) through 0xe7c50. With word 0x1f6f4a clear both the slot and its partner (word at 0x1282e4 + 2 * slot) are marked with byte 0x1f6f4a, their words cleared and both detached (0xe7c50 with -1). Otherwise the slot is skipped when a special slot exists (0x6a090) and its kind is 0x22; else it is marked with the byte and word 1 and attached; the partner is then treated the same way (skipped for kind 0x22 when a special slot exists) and, after the partner is attached, 0x68a2c runs when the byte at 0x12bc97 + 145 * high half of dword 0x1f6f48 equals 3. */
+void assign_slot_68a60(int32_t slot, int32_t value)
+{
+	int32_t k = (int16_t)slot, j, unit = (int32_t)EF_U32(0x001282dau) >> 16;
+	int32_t v = (int16_t)value;
+
+	j = (int32_t)EF_U32(0x001282e2u + (uint32_t)(k * 2)) >> 16;
+	if (EF_U16(0x001f6f4au) == 0u) {
+		EF_U8(0x001f6ef4u + (uint32_t)(k * 3)) = EF_U8(0x001f6f4au);
+		EF_U8(0x001f6ef4u + (uint32_t)(j * 3)) = EF_U8(0x001f6f4au);
+		EF_U16(0x001f6ef5u + (uint32_t)(k * 3)) = 0u;
+		EF_U16(0x001f6ef5u + (uint32_t)(j * 3)) = 0u;
+		guest_fn_e7c50(unit, -1, (uint32_t)k);
+		guest_fn_e7c50(unit, -1, (uint32_t)j);
+		return;
+	}
+	if (any_special_slot_6a090() != 0u && ((int32_t)EF_U32(0x001f6ef1u + (uint32_t)(k * 3)) >> 24) == 0x22)
+		return;
+	EF_U8(0x001f6ef4u + (uint32_t)(k * 3)) = EF_U8(0x001f6f4au);
+	EF_U16(0x001f6ef5u + (uint32_t)(k * 3)) = 1u;
+	guest_fn_e7c50(unit, v, (uint32_t)k);
+	if (any_special_slot_6a090() != 0u && ((int32_t)EF_U32(0x001f6ef1u + (uint32_t)(j * 3)) >> 24) == 0x22)
+		return;
+	EF_U8(0x001f6ef4u + (uint32_t)(j * 3)) = EF_U8(0x001f6f4au);
+	EF_U16(0x001f6ef5u + (uint32_t)(j * 3)) = 1u;
+	guest_fn_e7c50(unit, v, (uint32_t)j);
+	if (EF_U8(0x0012bc97u + (uint32_t)(((int32_t)EF_U32(0x001f6f48u) >> 16) * 145)) == 3u)
+		request_68a2c();
+}
