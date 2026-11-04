@@ -4704,3 +4704,27 @@ void credit_hit_74480(int32_t a)
     }
     guest_fn_46168((int32_t)(int16_t)EF_U16(rb + 0x16u), 0x23u, EF_U8(owner + 0xc9u), 0u, 0u);
 }
+
+/* 0x757bc, 260 bytes. Blend COUNT palette triples starting at triple START between the palettes FROM and TO into DEST: each 6-bit component becomes (to - from) * T / 50 + from (T is the signed word in EAX); triples of exactly (63, 0, 63) in FROM are left untouched. Sets the palette-dirty byte 0x128548 (registers EAX/EDX/EBX/ECX plus two stack words, ret 8). */
+void blend_palette_757bc(int32_t t, uint32_t to, uint32_t from, uint32_t dest, uint32_t count, uint32_t start)
+{
+    int16_t tt = (int16_t)t;
+    int16_t i = (int16_t)start;
+    uint16_t n = (uint16_t)count;
+    while (n != 0u) {
+        uint32_t o = (uint32_t)((int32_t)i * 3);
+        uint32_t pf = from + o;
+        uint32_t pt = to + o;
+        if (!((int8_t)EF_U8(pf) == 0x3f && EF_U8(pf + 1u) == 0u && (int8_t)EF_U8(pf + 2u) == 0x3f)) {
+            int32_t c;
+            for (c = 0; c < 3; c++) {
+                int32_t a = (int8_t)EF_U8(pf + (uint32_t)c);
+                int32_t b = (int8_t)EF_U8(pt + (uint32_t)c);
+                EF_U8(dest + o + (uint32_t)c) = (uint8_t)(((b - a) * (int32_t)tt / 50 + a) & 0x3f);
+            }
+        }
+        i++;
+        n--;
+    }
+    EF_U8(0x00128548u) = 1u;
+}

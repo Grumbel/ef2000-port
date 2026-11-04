@@ -4869,4 +4869,6 @@ void find_letter_entry_11de0(uint32_t key);
 
 void credit_hit_74480(int32_t a);
 
+void blend_palette_757bc(int32_t t, uint32_t to, uint32_t from, uint32_t dest, uint32_t count, uint32_t start);
+
 #endif

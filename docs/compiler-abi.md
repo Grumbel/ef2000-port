@@ -6050,3 +6050,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x74480` | EAX:int32_t | none | 74970@74ad6,74970@74bc2 | Credit a hit by the unit A on the unit named by the word 0x197c28 (ignored when either is 0xff/-1, missing, or flagged 4 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x757bc` | EAX:int32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 759b8@75c19,76370@76407 | Blend COUNT palette triples starting at triple START between the palettes FROM and TO into DEST: each 6-bit component be |

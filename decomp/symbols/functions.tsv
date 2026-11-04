@@ -1378,7 +1378,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00075620	86	classify_object_percentage	scene_indexed	compiles	game	confirmed	decomp/tests/0x00075620.json	docs/compiler-abi.md
 0x0007574c	87	object_uses_secondary_grid	scene_indexed	compiles	game	confirmed	decomp/tests/0x0007574c.json	docs/compiler-abi.md
 0x000757b0	10	nonzero_or_one	mid_helpers	compiles	game	confirmed	decomp/tests/0x000757b0.json	docs/compiler-abi.md; zero becomes 1; callers 759b8@75bbf; guest pending
-0x000757bc	260			unknown	unclassified	unverified		
+0x000757bc	260	blend_palette_757bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000757bc.json	docs/compiler-abi.md; Blend COUNT palette triples starting at triple START between the palettes FROM and TO into DEST: each 6-bit component be; callers 759b8@75c19,76370@76407; guest pending
 0x000758c0	186	blend_palette_758c0	game_helpers39	compiles	game	confirmed	decomp/tests/0x000758c0.json	docs/compiler-abi.md; Blend a 256-entry RGB palette towards a target colour by factor/50.; callers 76370@7642a,76370@764f2; guest pending
 0x0007597c	58	reset_selection_7597c	game_helpers5	compiles	game	confirmed	decomp/tests/0x0007597c.json	docs/compiler-abi.md; ; callers 3dd30@3dd65; guest pending
 0x000759b8	714			unknown	unclassified	unverified		
