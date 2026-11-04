@@ -2391,3 +2391,59 @@ void load_list_names_aa3dc(void)
         node = EF_U32(node);
     }
 }
+
+/* 0xd3844, 178 bytes. Count how many of the four tiles around the object's cell (x, y)..(x+1, y+1), read with 0xc3f50, equal the value [0x159144] + 0xe0, add the count to 0x420a54 and the new total to 0x4209cc. */
+void count_matching_tiles_d3844(ef_addr32 obj)
+{
+    uint32_t rec = EF_U32(EF_U32(obj + 0x4cu) + 4u);
+    int32_t x = (int16_t)EF_U16(rec + 0x1au);
+    int32_t y = (int16_t)EF_U16(rec + 0x1eu);
+    uint32_t want = EF_U32(0x00159144u) + 0xe0u;
+    uint32_t n = 0u;
+    uint32_t total;
+    n += (guest_fn_c3f50(x, y) & 0xffu) == want;
+    n += (guest_fn_c3f50(x + 1, y) & 0xffu) == want;
+    n += (guest_fn_c3f50(x + 1, y + 1) & 0xffu) == want;
+    n += (guest_fn_c3f50(x, y + 1) & 0xffu) == want;
+    total = EF_U32(0x00420a54u) + n;
+    EF_U32(0x00420a54u) = total;
+    EF_U32(0x004209ccu) += total;
+}
+
+/* 0x2a7f8, 178 bytes. When the larger of the two coordinate distances between (0x125250, 0x125254) and (0x1a5bec, 0x1a5be8) is at most 0x7fff, run 0x9e0c4 for every node of the list at 0x19bb3c (next pointer at +0x12) with the node's four words (the first three scaled by 65536), add the step [0x127d92] to the counter word 0x125258 and recycle the oldest grid node when it exceeds 1000. */
+void update_grid_nodes_2a7f8(void)
+{
+    uint32_t dx = abs_cf94a((int32_t)(EF_U32(0x00125250u) - EF_U32(0x001a5becu)));
+    uint32_t dy = abs_cf94a((int32_t)(EF_U32(0x00125254u) - EF_U32(0x001a5be8u)));
+    uint32_t d = ((int32_t)dx > (int32_t)dy) ? abs_cf94a((int32_t)(EF_U32(0x00125250u) - EF_U32(0x001a5becu))) : abs_cf94a((int32_t)(EF_U32(0x00125254u) - EF_U32(0x001a5be8u)));
+    uint32_t p;
+    if ((int32_t)d > 0x7fff)
+        return;
+    for (p = EF_U32(0x0019bb3cu); p != 0u; p = EF_U32(p + 0x12u)) {
+        guest_fn_9e0c4((int16_t)EF_U16(p + 6u), (uint32_t)(int32_t)(int16_t)EF_U16(p) << 16, (uint32_t)(int32_t)(int16_t)EF_U16(p + 2u) << 16, (uint32_t)(int32_t)(int16_t)EF_U16(p + 4u) << 16);
+    }
+    EF_U16(0x00125258u) = (uint16_t)(EF_U16(0x00125258u) + EF_U16(0x00127d92u));
+    if ((int16_t)EF_U16(0x00125258u) > 0x3e8) {
+        recycle_oldest_grid_node();
+        EF_U16(0x00125258u) = 0u;
+    }
+}
+
+/* 0xd5e0c, 179 bytes. Register the block REC (size at +5, address at +9) with the trace layer: touch each of its pages, mark the range (0x104908), start tracing the handle 0x420a64 on it (error through 0x132a74 when that fails), and remember REC at 0x420a68. Returns 1 for a null REC, 0 otherwise (and when tracing is disabled via 0x15b968). */
+uint32_t register_trace_block_d5e0c(ef_addr32 rec)
+{
+    uint32_t off;
+    if (EF_U8(0x0015b968u) == 0u)
+        return 0u;
+    if (rec == 0u)
+        return 1u;
+    for (off = 0u; (int32_t)off < (int32_t)EF_U32(rec + 5u); off += 0x1000u)
+        (void)EF_U8(EF_U32(rec + 9u) + off);
+    stack_range_104908(EF_U32(rec + 9u), EF_U32(rec + 5u));
+    if ((int32_t)trace_call_1030bc(0u, 0u, 0u, 0u, EF_U32(0x00420a64u), EF_U32(rec + 9u), 0u) <= 0)
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x0018f880u);
+    trace_call_103244(EF_U32(0x00420a64u), 0u);
+    trace_call_10311c(EF_U32(0x00420a64u));
+    EF_U32(0x00420a68u) = rec;
+    return 0u;
+}

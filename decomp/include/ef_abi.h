@@ -4684,4 +4684,8 @@ void advance_object_vectors_a0174(ef_addr32 obj);
 void step_demo_script_1a3cc(void);
 void load_list_names_aa3dc(void);
 
+void count_matching_tiles_d3844(ef_addr32 obj);
+void update_grid_nodes_2a7f8(void);
+uint32_t register_trace_block_d5e0c(ef_addr32 rec);
+
 #endif

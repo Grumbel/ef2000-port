@@ -436,7 +436,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002a720	113	init_entries_2a720	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0002a720.json	docs/compiler-abi.md; Reset counters and link the twenty 22-byte entries at 0x19b980.; callers 3cfc0@3d1c5; guest pending
 0x0002a794	23	clear_dwords_19bb38	low_helpers	compiles	game	confirmed	decomp/tests/0x0002a794.json	docs/compiler-abi.md; clear dwords 0x19bb38/3c/40; callers db21c@db27b; guest pending
 0x0002a7ac	74	init_entries_2a7ac	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0002a7ac.json	docs/compiler-abi.md; As 0x2a720 but for string EAX into the word at +8+2*EDX.; callers db808@db882; guest pending
-0x0002a7f8	178			unknown	unclassified	unverified		
+0x0002a7f8	178	update_grid_nodes_2a7f8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0002a7f8.json	docs/compiler-abi.md; When the larger of the two coordinate distances between (0x125250, 0x125254) and (0x1a5bec, 0x1a5be8) is at most 0x7fff,; callers 3dd30@3e1f3; guest pending
 0x0002a8ac	136			unknown	unclassified	unverified		
 0x0002a934	57	recycle_oldest_grid_node	grid_node_pool	compiles	game	confirmed	decomp/tests/0x0002a934.json	linked queue head to free list; original assumes nonempty
 0x0002a970	104	pop_triple_2a970	game_helpers31	compiles	game	confirmed	decomp/tests/0x0002a970.json	docs/compiler-abi.md; Pop one entry of the 6-byte stack at 0x125262 into the current triple.; callers 3dd30@3e250; guest pending
@@ -3045,7 +3045,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d35b0	276			unknown	unclassified	unverified		
 0x000d36c4	302			unknown	unclassified	unverified		
 0x000d37f4	80	count_hit_d37f4	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d37f4.json	docs/compiler-abi.md; Count a hit when the cell under the object equals dword 0x159144 + 0xe0.; callers none direct; guest pending
-0x000d3844	178			unknown	unclassified	unverified		
+0x000d3844	178	count_matching_tiles_d3844	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d3844.json	docs/compiler-abi.md; Count how many of the four tiles around the object's cell (x, y)..(x+1, y+1), read with 0xc3f50, equal the value [0x1591; callers none direct; guest pending
 0x000d3900	839			unknown	unclassified	unverified		
 0x000d3c50	84	redraw_wide_span_d3c50	game_helpers64	compiles	game	confirmed	decomp/tests/0x000d3c50.json	docs/compiler-abi.md; Redraw when the tracked span is large enough and the two edge values differ by more than 0x800.; callers none direct; guest pending
 0x000d3cb0	248			unknown	unclassified	unverified		
@@ -3059,7 +3059,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d5a90	271			unknown	unclassified	unverified		
 0x000d5c84	22	remap_address_d5c84	game_helpers119	compiles	game	confirmed	decomp/tests/0x000d5c84.json	docs/compiler-abi.md; Map an address inside the range 0xd3900..0xd5c84 to 0xc454a; any other value is returned unchanged.; callers c4310@c4341; guest pending
 0x000d5d18	188			unknown	unclassified	unverified		
-0x000d5e0c	179			unknown	unclassified	unverified		
+0x000d5e0c	179	register_trace_block_d5e0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d5e0c.json	docs/compiler-abi.md; Register the block REC (size at +5, address at +9) with the trace layer: touch each of its pages, mark the range (0x1049; callers 98050@980af; guest pending
 0x000d5ec0	75	release_block_d5ec0	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000d5ec0.json	docs/compiler-abi.md; Tear down a loaded block record: trace-call 0x1031a0 with the handle at 0x420a64, release its range (+9 pointer, +5 leng; callers 980e8@98114; guest pending
 0x000d5f0c	154			unknown	unclassified	unverified		
 0x000d5fa8	31	call_103778_if_enabled	code_predicates	compiles	game	confirmed	decomp/tests/0x000d5fa8.json	docs/compiler-abi.md; When byte 0x15b968 is set call cdecl 0x103778(dword 0x420a64, EAX, EDX).; callers 98198@981d0; guest pending

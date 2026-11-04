@@ -5672,3 +5672,11 @@ in EAX, format string address, one value).
 | `0xa0174` | EAX:ef_addr32 | none | a0060@a008c | Advance the two vector pairs of the object OBJ: copy the vector at +0x3c to 0x132b28, then add the vector at +0x30 scale |
 | `0x1a3cc` | none | none | 1cde8@1ce46 | Step the demo script at 0x122c80: when the expected key code 0x41f833 matches the current script byte, clear it and adva |
 | `0xaa3dc` | none | none | aad7c@aae38 | Walk the linked list at 0x4191fc for as many entries as the signed word at 0x4194c4 says: copy each entry's name (+9) in |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd3844` | EAX:ef_addr32 | none | none direct | Count how many of the four tiles around the object's cell (x, y)..(x+1, y+1), read with 0xc3f50, equal the value [0x1591 |
+| `0x2a7f8` | none | none | 3dd30@3e1f3 | When the larger of the two coordinate distances between (0x125250, 0x125254) and (0x1a5bec, 0x1a5be8) is at most 0x7fff, |
+| `0xd5e0c` | EAX:ef_addr32 | EAX:uint32_t | 98050@980af | Register the block REC (size at +5, address at +9) with the trace layer: touch each of its pages, mark the range (0x1049 |
