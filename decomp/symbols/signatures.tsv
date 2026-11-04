@@ -1874,3 +1874,9 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000d9c30	open_stream_formats_d9c30		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d9c30 (129 bytes); Open the stream in either format; 0 on success, 1 on failure.; callers e9ac0@e9af3; docs/compiler-abi.md
 0x000d9dc0	read_stream_header_d9dc0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d9dc0 (139 bytes); Read the stream header and latch the heading and position values.; callers d9cb4@d9ccb; docs/compiler-abi.md
 0x000e5088	draw_active_marker_e5088			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e5088 (139 bytes); Draw the active unit's marker, then flag it as refreshed.; callers 42b04@42b1c,4bec0@4bed6,4e80c@4e815; docs/compiler-abi.md
+0x00039254	load_settings_39254			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00039254 (168 bytes); Load the numeric settings from their key names.; callers 3ea0c@3ee0e; docs/compiler-abi.md
+0x00042f7c	bind_page_widgets_42f7c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00042f7c (163 bytes); Point the page widgets at the current selection.; callers none direct; docs/compiler-abi.md
+0x0005cff0	redraw_panel_5cff0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0005cff0 (141 bytes); Redraw the panel frame, then the selection or the help text.; callers none direct; docs/compiler-abi.md
+0x00082cec	apply_options_82cec			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00082cec (183 bytes); Apply the saved options and refresh the display flags.; callers 8b39c@8b472; docs/compiler-abi.md
+0x000a8958	run_animation_loop_a8958	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a8958 (149 bytes); Run the animation loop of a list record until a key press.; callers a9e70@a9f69; docs/compiler-abi.md
+0x000cd554	restore_page_cd554			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cd554 (146 bytes); Drain the pending key table, release the buffers and restore the page.; callers 8b2d8@8b315,a9878@a98bd,aaee8@aafd6; docs/compiler-abi.md

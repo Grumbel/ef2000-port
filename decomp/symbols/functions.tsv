@@ -659,7 +659,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003918c	22	install_callback_53ecc	low_helpers	compiles	game	confirmed	decomp/tests/0x0003918c.json	docs/compiler-abi.md; dword 0x1a1780=0x53ecc and byte 0x1a363a=0; callers 3ea0c@3ee50; guest pending
 0x000391d0	52	init_list_391d0	game_helpers10	compiles	game	confirmed	decomp/tests/0x000391d0.json	docs/compiler-abi.md; ; callers 39204@39249; guest pending
 0x00039204	78	redraw_screen_39204	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00039204.json	docs/compiler-abi.md; ; callers 39254@392f4; guest pending
-0x00039254	168			unknown	unclassified	unverified		
+0x00039254	168	load_settings_39254	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x00039254.json	docs/compiler-abi.md; Load the numeric settings from their key names.; callers 3ea0c@3ee0e; guest pending
 0x000392fc	1	nop_392fc	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000392fc.json	docs/compiler-abi.md; Empty stub (single ret).; callers db114@db157; guest pending
 0x00039300	12	store_word_39300	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00039300.json	docs/compiler-abi.md; Store the result of 0x9ddfc as a word.; callers db16c@db1af; guest pending
 0x0003930c	1	nop_3930c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0003930c.json	docs/compiler-abi.md; Empty stub (single ret).; callers db1c4@db207; guest pending
@@ -773,7 +773,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00042a98	107	gpwMapModeSelected		named	unclassified	unverified		
 0x00042b04	131	WarWonLostStartup		named	unclassified	unverified		
 0x00042e8c	238			unknown	unclassified	unverified		
-0x00042f7c	163			unknown	unclassified	unverified		
+0x00042f7c	163	bind_page_widgets_42f7c	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x00042f7c.json	docs/compiler-abi.md; Point the page widgets at the current selection.; callers none direct; guest pending
 0x00043020	386	gpwClosePilots		named	unclassified	unverified		
 0x000431a4	597	gpwOnOpenTargetWindow		named	unclassified	unverified		
 0x000433fc	381			unknown	unclassified	unverified		
@@ -1146,7 +1146,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005cb1c	126			unknown	unclassified	unverified		
 0x0005cb9c	42	position_within_tactical_bounds	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005cb9c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0005cbc8	1062			unknown	unclassified	unverified		
-0x0005cff0	141			unknown	unclassified	unverified		
+0x0005cff0	141	redraw_panel_5cff0	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x0005cff0.json	docs/compiler-abi.md; Redraw the panel frame, then the selection or the help text.; callers none direct; guest pending
 0x0005d080	321			unknown	unclassified	unverified		
 0x0005d1c4	712			unknown	unclassified	unverified		
 0x0005d48c	148			unknown	unclassified	unverified		
@@ -1582,7 +1582,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082b6c	80			unknown	unclassified	unverified		
 0x00082bd4	27	write_ui_status_float	packet_status	compiles	game	confirmed	decomp/tests/0x00082bd4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082bf0	26	write_status_byte_15bdd0	status_values	compiles	game	confirmed	decomp/tests/0x00082bf0.json	docs/compiler-abi.md; 0xa4342(dest, fmt 0x188c10, byte 0x15bdd0); sole direct caller 82e40@82eb2; guest pending
-0x00082cec	183			unknown	unclassified	unverified		
+0x00082cec	183	apply_options_82cec	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x00082cec.json	docs/compiler-abi.md; Apply the saved options and refresh the display flags.; callers 8b39c@8b472; guest pending
 0x00082da4	43	next_ui_fragment	ui_secondary	compiles	game	confirmed	decomp/tests/0x00082da4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082dd0	45	compact_ui_fragment	ui_operations	compiles	game	confirmed	decomp/tests/0x00082dd0.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082e00	61	find_matching_ui_fragment	ui_operations	compiles	game	confirmed	decomp/tests/0x00082e00.json	docs/compiler-abi.md; host model; guest differential pending
@@ -2341,7 +2341,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a8660	129			unknown	unclassified	unverified		
 0x000a86e4	50	clamp_word_425fa6	list_helpers	compiles	game	confirmed	decomp/tests/0x000a86e4.json	docs/compiler-abi.md; When byte 0x41f833 is 0x39 and signed word 0x425fa6 is * below signed word 0x4194ae, copy the latter over it and clear t; callers a8718@a87b8; guest pending
 0x000a8718	574			unknown	unclassified	unverified		
-0x000a8958	149			unknown	unclassified	unverified		
+0x000a8958	149	run_animation_loop_a8958	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x000a8958.json	docs/compiler-abi.md; Run the animation loop of a list record until a key press.; callers a9e70@a9f69; guest pending
 0x000a89f0	72	wait_for_key_a89f0	entity_helpers	compiles	game	confirmed	decomp/tests/0x000a89f0.json	docs/compiler-abi.md; Wait up to 600 polls for key 0x19.; callers a8a38@a8b95,a8bd4@a8e57,a8bd4@a8f10; guest pending
 0x000a8a38	411			unknown	unclassified	unverified		
 0x000a8bd4	937			unknown	unclassified	unverified		
@@ -2934,7 +2934,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cd414	27			unknown	unclassified	unverified		
 0x000cd430	161	init_keys_cd430	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cd430.json	docs/compiler-abi.md; Clear the key state tables and set the default scan codes.; callers cd4d4@cd4ea; guest pending
 0x000cd4d4	125			unknown	unclassified	unverified		
-0x000cd554	146			unknown	unclassified	unverified		
+0x000cd554	146	restore_page_cd554	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x000cd554.json	docs/compiler-abi.md; Drain the pending key table, release the buffers and restore the page.; callers 8b2d8@8b315,a9878@a98bd,aaee8@aafd6; guest pending
 0x000cd5f4	69	queue_pop_cd5f4	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cd5f4.json	docs/compiler-abi.md; Pop the first byte of the 20-byte queue at 0x41f810, -1 if empty.; callers 48e7c@48fe3; guest pending
 0x000cd640	58	ensure_text_block_cd640	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000cd640.json	docs/compiler-abi.md; Allocate the 0xc000-byte text block of a slot when it has none.; callers cd724@cd745,cd754@cd78b; guest pending
 0x000cd67c	79	copy_text_to_slot_cd67c	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000cd67c.json	docs/compiler-abi.md; Copy a text into the block of a slot; abort when empty or too long.; callers cd724@cd74c,cd754@cd792; guest pending

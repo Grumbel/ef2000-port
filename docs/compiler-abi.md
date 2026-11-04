@@ -3790,3 +3790,14 @@ in EAX, format string address, one value).
 | `0xd9c30` | none | EAX:uint32_t | e9ac0@e9af3 | Open the stream in either format; 0 on success, 1 on failure. |
 | `0xd9dc0` | none | none | d9cb4@d9ccb | Read the stream header and latch the heading and position values. |
 | `0xe5088` | none | none | 42b04@42b1c,4bec0@4bed6,4e80c@4e815 | Draw the active unit's marker, then flag it as refreshed. |
+
+## leaf_helpers6 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x39254` | none | none | 3ea0c@3ee0e | Load the numeric settings from their key names. |
+| `0x42f7c` | none | none | none direct | Point the page widgets at the current selection. |
+| `0x5cff0` | none | none | none direct | Redraw the panel frame, then the selection or the help text. |
+| `0x82cec` | none | none | 8b39c@8b472 | Apply the saved options and refresh the display flags. |
+| `0xa8958` | EAX:ef_addr32 | none | a9e70@a9f69 | Run the animation loop of a list record until a key press. |
+| `0xcd554` | none | none | 8b2d8@8b315,a9878@a98bd,aaee8@aafd6 | Drain the pending key table, release the buffers and restore the page. |

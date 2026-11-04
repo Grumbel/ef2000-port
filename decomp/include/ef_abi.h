@@ -3319,4 +3319,30 @@ void guest_fn_107060_w(uint32_t a); /* 0x107060 EAX */
 void guest_fn_e4c9c_w(ef_addr32 unit); /* 0xe4c9c EAX */
 void guest_fn_c91c8_w(uint32_t color, uint32_t x, uint32_t y, uint32_t x2); /* 0xc91c8 EAX/EDX/EBX/ECX */
 
+/* leaf_helpers6.c */
+void load_settings_39254(void);
+void bind_page_widgets_42f7c(void);
+void redraw_panel_5cff0(void);
+void apply_options_82cec(void);
+void run_animation_loop_a8958(ef_addr32 record);
+void restore_page_cd554(void);
+uint32_t guest_fn_9ddfc_n(uint32_t name); /* 0x9ddfc EAX -> AX */
+void guest_fn_68a28_w(void); /* 0x68a28 */
+void guest_fn_39204_w(void); /* 0x39204 */
+void guest_fn_ce328_w(int32_t a, int32_t b, int32_t c, int32_t d); /* 0xce328 EAX/EDX/EBX/ECX */
+void guest_fn_5d48c_w(int32_t a, int32_t b); /* 0x5d48c EAX/EDX */
+void guest_fn_5d080_w(uint32_t a); /* 0x5d080 EAX */
+void guest_fn_9cfdc_w(uint32_t a); /* 0x9cfdc EAX */
+void guest_fn_30214_w(void); /* 0x30214 */
+void guest_fn_2ff44_w(void); /* 0x2ff44 */
+void guest_fn_f80_w(void); /* 0xf80 */
+void guest_fn_f2660_w(uint32_t a); /* 0xf2660 EAX */
+void guest_fn_a82f0_w(ef_addr32 a); /* 0xa82f0 EAX */
+void guest_fn_a8718_w(ef_addr32 a); /* 0xa8718 EAX */
+uint32_t guest_fn_a7be8_w(uint32_t a); /* 0xa7be8 EAX -> EAX */
+void guest_fn_de648_w(uint32_t a); /* 0xde648 EAX */
+void guest_fn_6b8_w(uint32_t a); /* 0x6b8 EAX */
+void guest_fn_7b4_w(uint32_t a); /* 0x7b4 EAX */
+void guest_fn_cd414_w(uint32_t a); /* 0xcd414 EAX */
+
 #endif
