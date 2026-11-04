@@ -3460,3 +3460,13 @@ in EAX, format string address, one value).
 | `0x8846c` | none | none | 3dcb0@3dcb5 | Step every object of the ring and publish the visible ones. |
 | `0x8cc40` | AX:int16_t | none | 8c49c@8c807 | Set a unit's base speed from its type and add 2 when the trigger fires. |
 | `0x8d030` | none | none | 8dd48@8de90 | Fire the cell trigger when the player's unit stands on a special terrain value. |
+
+## game_helpers49 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8f3f4` | EAX:ef_addr32,EDX:ef_addr32 | none | 8be3c@8be42 | Make the other object the tracked one if it is at least as close as the current one. |
+| `0x8f930` | none | none | 8f644@8f868 | Publish the current entry position of the player's unit through the 0x831a0 block. |
+| `0x8fc24` | none | none | 3dd30@3e1f8 | Fade the ten 24-byte effect slots and relink their records. |
+| `0x8fcec` | AX:int16_t | none | 4a210@4a806 | Name the units of a player's formation from the name table. |
+| `0x8fe58` | none | none | 8bd58@8bd70 | Load the table resource and index its 50 records. |

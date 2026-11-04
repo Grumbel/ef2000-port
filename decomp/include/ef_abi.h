@@ -2808,4 +2808,14 @@ void guest_fn_80b14(ef_addr32 record); /* 0x80b14 EAX */
 uint32_t guest_fn_7b2f4_4(int32_t a, int32_t b, int32_t c, uint32_t d); /* 0x7b2f4 EAX/EDX/EBX/ECX */
 void guest_fn_8cd78(int32_t unit); /* 0x8cd78 EAX */
 
+/* game_helpers49.c */
+void track_closer_object_8f3f4(ef_addr32 object, ef_addr32 other);
+void publish_entry_position_8f930(void);
+void fade_effect_slots_8fc24(void);
+void name_formation_units_8fcec(int16_t player);
+void load_record_table_8fe58(void);
+void guest_fn_8fd70(ef_addr32 buffer, ef_addr32 a, ef_addr32 b); /* 0x8fd70 EAX/EDX/EBX */
+uint32_t guest_fn_8fdb8(ef_addr32 record); /* 0x8fdb8 EAX -> AX */
+uint32_t guest_fn_81354(ef_addr32 text); /* 0x81354 EAX */
+
 #endif

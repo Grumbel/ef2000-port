@@ -1644,3 +1644,8 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0008846c	step_objects_8846c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008846c (217 bytes); Step every object of the ring and publish the visible ones.; callers 3dcb0@3dcb5; docs/compiler-abi.md
 0x0008cc40	set_unit_speed_8cc40	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008cc40 (171 bytes); Set a unit's base speed from its type and add 2 when the trigger fires.; callers 8c49c@8c807; docs/compiler-abi.md
 0x0008d030	check_cell_trigger_8d030			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008d030 (176 bytes); Fire the cell trigger when the player's unit stands on a special terrain value.; callers 8dd48@8de90; docs/compiler-abi.md
+0x0008f3f4	track_closer_object_8f3f4	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008f3f4 (218 bytes); Make the other object the tracked one if it is at least as close as the current one.; callers 8be3c@8be42; docs/compiler-abi.md
+0x0008f930	publish_entry_position_8f930			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008f930 (181 bytes); Publish the current entry position of the player's unit through the 0x831a0 block.; callers 8f644@8f868; docs/compiler-abi.md
+0x0008fc24	fade_effect_slots_8fc24			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008fc24 (180 bytes); Fade the ten 24-byte effect slots and relink their records.; callers 3dd30@3e1f8; docs/compiler-abi.md
+0x0008fcec	name_formation_units_8fcec	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008fcec (130 bytes); Name the units of a player's formation from the name table.; callers 4a210@4a806; docs/compiler-abi.md
+0x0008fe58	load_record_table_8fe58			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008fe58 (135 bytes); Load the table resource and index its 50 records.; callers 8bd58@8bd70; docs/compiler-abi.md

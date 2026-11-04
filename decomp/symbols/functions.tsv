@@ -1835,23 +1835,23 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008f07c	377			unknown	unclassified	unverified		
 0x0008f22c	341			unknown	unclassified	unverified		
 0x0008f3c0	3	return_zero_8f3c0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0008f3c0.json	docs/compiler-abi.md; ; callers 3f7fc@3f91c; guest pending
-0x0008f3f4	218			unknown	unclassified	unverified		
+0x0008f3f4	218	track_closer_object_8f3f4	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008f3f4.json	docs/compiler-abi.md; Make the other object the tracked one if it is at least as close as the current one.; callers 8be3c@8be42; guest pending
 0x0008f5d8	26	clear_matching_link_a	misc_state	compiles	game	confirmed	decomp/tests/0x0008f5d8.json	docs/compiler-abi.md; if 0x8c09c(record,value) and value==record+0x1c then clear it; callers 8be54@8be5a; guest pending
 0x0008f5f4	41	reset_ui_record_pool	record_transitions	compiles	game	confirmed	decomp/tests/0x0008f5f4.json	docs/compiler-abi.md; host model; guest differential pending
 0x0008f620	35	configure_scene_feature	scene_controls	compiles	game	confirmed	decomp/tests/0x0008f620.json	docs/compiler-abi.md; Three original 16-bit stores at 0x198442/0x19842e/0x198444; awaiting OMF guest differential
 0x0008f644	747			unknown	unclassified	unverified		
-0x0008f930	181			unknown	unclassified	unverified		
+0x0008f930	181	publish_entry_position_8f930	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008f930.json	docs/compiler-abi.md; Publish the current entry position of the player's unit through the 0x831a0 block.; callers 8f644@8f868; guest pending
 0x0008f9e8	111	install_handlers_8f9e8	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008f9e8.json	docs/compiler-abi.md; Install the table of nine handler addresses at 0x158f4c.; callers 3ea0c@3ee32; guest pending
 0x0008fa58	43	convert_navigation_vector	vector_math	compiles	game	confirmed	decomp/tests/0x0008fa58.json	docs/compiler-abi.md; Int32[8,0,4] to double[0,8,16] with unaligned 0x18aa0b/13 scales; x87 precision pending; awaiting OMF guest differential
 0x0008fa84	60	init_menu_entries_8fa84	game_helpers22	compiles	game	confirmed	decomp/tests/0x0008fa84.json	docs/compiler-abi.md; Clear ten 24-byte menu entries and load their string handles.; callers 3dd30@3de15; guest pending
 0x0008fbc8	91			unknown	unclassified	unverified		
-0x0008fc24	180			unknown	unclassified	unverified		
-0x0008fcec	130			unknown	unclassified	unverified		
+0x0008fc24	180	fade_effect_slots_8fc24	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fc24.json	docs/compiler-abi.md; Fade the ten 24-byte effect slots and relink their records.; callers 3dd30@3e1f8; guest pending
+0x0008fcec	130	name_formation_units_8fcec	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fcec.json	docs/compiler-abi.md; Name the units of a player's formation from the name table.; callers 4a210@4a806; guest pending
 0x0008fd70	55	build_path_8fd70	game_helpers22	compiles	game	confirmed	decomp/tests/0x0008fd70.json	docs/compiler-abi.md; Build a path from the default directory and three parts.; callers 8fe58@8fe71; guest pending
 0x0008fdb8	56			unknown	unclassified	unverified		
 0x0008fdf0	64	find_entry_by_id_8fdf0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008fdf0.json	docs/compiler-abi.md; Find the entry with the given id in the 50-entry table or abort.; callers 8ba30@8ba3a; guest pending
 0x0008fe30	39	clear_blocks_8fe30	scene_helpers	compiles	game	confirmed	decomp/tests/0x0008fe30.json	docs/compiler-abi.md; 0xb3fb0(0x211ac8,0,4) and (0x211a00,0,0xc8); callers 8fe58@8fe5e; guest pending
-0x0008fe58	135			unknown	unclassified	unverified		
+0x0008fe58	135	load_record_table_8fe58	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fe58.json	docs/compiler-abi.md; Load the table resource and index its 50 records.; callers 8bd58@8bd70; guest pending
 0x0008fee0	64	init_buffer_8fee0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008fee0.json	docs/compiler-abi.md; Reset the 0x5dc0-byte buffer state and allocate the buffer.; callers 49228@4962e; guest pending
 0x0008ff20	40	alloc_zero_68_8ff20	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x0008ff20.json	docs/compiler-abi.md; Allocate and zero a table of count 68-byte records.; callers 37498@37780; guest pending
 0x0008ff48	159			unknown	unclassified	unverified		
