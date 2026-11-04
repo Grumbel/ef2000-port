@@ -1917,3 +1917,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000e76c8	reset_working_state_e76c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e76c8 (365 bytes); Clear the 0x4322xx..0x432axx working state and set the 0.6 default scale.; callers 49228@49bca,8cd78@8cdd2,8cf10@8cf48; docs/compiler-abi.md
 0x000f2e74	read_plain_entry_f2e74			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2e74 (327 bytes); Read a plain entry record and bump the record count.; callers f2fbc@f2fc7,f3b78@f3bd0; docs/compiler-abi.md
 0x000f2fbc	read_entry_f2fbc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2fbc (399 bytes); Read an entry record, with a trailing value unless the plain flag is set.; callers f3b78@f3bed; docs/compiler-abi.md
+0x000fd404	alias_code_address_fd404	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fd404 (276 bytes); Redirect any of a fixed set of code addresses to the shared handler 0xfd52f.; callers c4310@c4333; docs/compiler-abi.md

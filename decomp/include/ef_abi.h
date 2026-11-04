@@ -3468,4 +3468,10 @@ void reset_working_state_e76c8(void);
 void read_plain_entry_f2e74(void);
 void read_entry_f2fbc(void);
 
+/* game_helpers62.c */
+uint32_t alias_code_address_fd404(uint32_t address);
+
+/* game_helpers62.c */
+uint32_t alias_code_address_fd404(uint32_t address);
+
 #endif

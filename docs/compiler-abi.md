@@ -3898,3 +3898,9 @@ in EAX, format string address, one value).
 | `0xe76c8` | none | none | 49228@49bca,8cd78@8cdd2,8cf10@8cf48 | Clear the 0x4322xx..0x432axx working state and set the 0.6 default scale. |
 | `0xf2e74` | none | none | f2fbc@f2fc7,f3b78@f3bd0 | Read a plain entry record and bump the record count. |
 | `0xf2fbc` | none | none | f3b78@f3bed | Read an entry record, with a trailing value unless the plain flag is set. |
+
+## game_helpers62 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xfd404` | EAX:uint32_t | EAX:uint32_t | c4310@c4333 | Redirect any of a fixed set of code addresses to the shared handler 0xfd52f. |
