@@ -3120,7 +3120,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d7b6c	129	init_camera_table_d7b6c	leaf_helpers5	compiles	game	confirmed	decomp/tests/0x000d7b6c.json	docs/compiler-abi.md; Initialise the camera table from the mode handle, or copy the default.; callers d86e0@d87e6,d8fd8@d911f; guest pending
 0x000d7bf0	77	shift_window_d7bf0	runtime_helpers16	compiles	game	confirmed	decomp/tests/0x000d7bf0.json	docs/compiler-abi.md; Shift four window words by ten.; callers d7c40@d7cad,d7cb8@d7e87; guest pending
 0x000d7c40	118	copy_block_d7c40	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d7c40.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x000d7cb8	474			unknown	unclassified	unverified		
+0x000d7cb8	474	mix_word_block_d7cb8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d7cb8.json	docs/compiler-abi.md; Run a fixed XOR-mixing pass over the word block at 0x420e80 (words at +2..+0x10), load the extra words at 0x420e92..0x42; callers d86e0@d89fc,d86e0@d8a25,d86e0@d8a56; guest pending
 0x000d7e94	118	permute_block_d7e94	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d7e94.json	docs/compiler-abi.md; ; callers d86e0@d8993,d86e0@d89cb,d86e0@d8cd2; guest pending
 0x000d7f0c	604			unknown	unclassified	unverified		
 0x000d8170	329			unknown	unclassified	unverified		

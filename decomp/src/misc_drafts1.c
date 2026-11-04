@@ -18918,3 +18918,40 @@ void build_rotation_matrix_e7a7c(uint32_t ebx, uint32_t esi, uint32_t edi)
 		EF_U32(0x0015ffe2u + i) = (uint32_t)((int32_t)EF_U32(0x001590c8u + i) >> 9);
 	}
 }
+
+#define W_D7CB8(a) EF_U16(0x00420e00u + (a))
+
+/* 0xd7cb8, 474 bytes. Run a fixed XOR-mixing pass over the word block at 0x420e80 (words at +2..+0x10), load the extra words at 0x420e92..0x420ea0 from 0x15baf2..0x15bb00, call 0xc4a50 on the block, mix the first eight words a second (different) way and finish with 0xd7bf0. All work is on 16-bit values. */
+void mix_word_block_d7cb8(void)
+{
+	uint16_t ax, bx, cx, dx, si, di;
+
+	ax = W_D7CB8(0x8e); dx = W_D7CB8(0x82); si = W_D7CB8(0x86);
+	bx = ax; dx ^= ax; ax = W_D7CB8(0x8a); W_D7CB8(0x82) = dx;
+	bx ^= dx; cx = dx; W_D7CB8(0x8e) = bx; di = ax; cx ^= bx; si ^= ax;
+	ax = W_D7CB8(0x90); bx = W_D7CB8(0x84); W_D7CB8(0x82) = cx; W_D7CB8(0x86) = si;
+	di ^= si; dx = si; W_D7CB8(0x8a) = di; cx = ax; dx ^= di; bx ^= ax;
+	ax = W_D7CB8(0x8c); di = W_D7CB8(0x88); W_D7CB8(0x86) = dx; W_D7CB8(0x84) = bx;
+	cx ^= bx; si = bx; W_D7CB8(0x90) = cx; dx = ax; di ^= ax;
+	ax = EF_U16(0x0015bafeu); si ^= cx; W_D7CB8(0x92) = ax;
+	ax = EF_U16(0x0015bb00u); W_D7CB8(0x84) = si; W_D7CB8(0x94) = ax;
+	ax = EF_U16(0x0015bafau); W_D7CB8(0x88) = di; W_D7CB8(0x96) = ax;
+	ax = EF_U16(0x0015bafcu); bx = di; W_D7CB8(0x98) = ax;
+	ax = EF_U16(0x0015baf6u); dx ^= di; W_D7CB8(0x9a) = ax;
+	ax = EF_U16(0x0015baf8u); W_D7CB8(0x8c) = dx; W_D7CB8(0x9c) = ax;
+	ax = EF_U16(0x0015baf2u); bx ^= dx; W_D7CB8(0x9e) = ax;
+	ax = EF_U16(0x0015baf4u); W_D7CB8(0x88) = bx; W_D7CB8(0xa0) = ax;
+	guest_fn_c4a50(0x00420e80u);
+
+	ax = W_D7CB8(0x8e); cx = W_D7CB8(0x82); dx = W_D7CB8(0x86);
+	si = ax; cx ^= ax; ax = W_D7CB8(0x8a); W_D7CB8(0x82) = cx;
+	si ^= cx; di = cx; W_D7CB8(0x8e) = si; bx = ax; di ^= si; dx ^= ax;
+	ax = W_D7CB8(0x90); si = W_D7CB8(0x84); W_D7CB8(0x82) = di; W_D7CB8(0x86) = dx;
+	bx ^= dx; cx = dx; W_D7CB8(0x8a) = bx; di = ax; cx ^= bx; si ^= ax;
+	ax = W_D7CB8(0x8c); bx = W_D7CB8(0x88); W_D7CB8(0x86) = cx; W_D7CB8(0x84) = si;
+	di ^= si; dx = si; W_D7CB8(0x90) = di; cx = ax; dx ^= di; bx ^= ax;
+	W_D7CB8(0x84) = dx; si = bx; cx ^= bx; W_D7CB8(0x88) = bx;
+	si ^= cx; W_D7CB8(0x8c) = cx; W_D7CB8(0x88) = si;
+	guest_fn_d7bf0();
+}
+#undef W_D7CB8

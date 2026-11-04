@@ -8651,3 +8651,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe7a7c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | c4654@c4675,c5261@c5277 | Higher precision rotation matrix builder: the angles in EBX, ESI, EDI (halved and masked to table offsets, kept as words |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd7cb8` | none | none | d86e0@d89fc,d86e0@d8a25,d86e0@d8a56 | Run a fixed XOR-mixing pass over the word block at 0x420e80 (words at +2..+0x10), load the extra words at 0x420e92..0x42 |
