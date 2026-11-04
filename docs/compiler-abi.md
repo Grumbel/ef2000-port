@@ -9361,3 +9361,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xdc519` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | 91afc@91b70,d86e0@d874b,d8fd8@d901e | Build the rotation words for the angles (EDI=a0, EBX=a1, ESI=0) and copy eight sign-extended words from the table at 0xd |
 | `0xc5cd3` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 8e494@8e505 | Build the rotation matrix for the three angle words at [a0] and multiply it with the matrix at 0x1590e4 / 0x159108, stor |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x119938` | none | none | 1196a0@1196af | Combine globals: Z = A*B*C-chain terms stored at 0x432b50, then 0x432af8 = J*C*K*M*N*Z. |

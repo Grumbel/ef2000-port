@@ -22586,3 +22586,23 @@ void rotate_matrix_c5cd3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_
 	for (i = 0; i < 9; i++)
 		EF_U32(0x159108 + 4 * i) = EF_U32(0x15b234 + 4 * i);
 }
+
+/* 0x119938, 141 bytes. Combine globals: Z = A*B*C-chain terms stored at 0x432b50, then 0x432af8 = J*C*K*M*N*Z. */
+void combine_globals_119938(void)
+{
+	double c = md_rd_f64(0x432200);
+	double k = md_rd_f64(0x1956bc);
+	double j = md_rd_f64(0x433068);
+	double q, t, u, v, w, z;
+
+	q = md_rd_f64(0x432c28) * md_rd_f64(0x432ba8) * c;
+	t = md_rd_f64(0x432c08) * md_rd_f64(0x432990) * md_rd_f64(0x432968) * c;
+	u = md_rd_f64(0x432c00) * c;
+	v = t + u;
+	w = md_rd_f64(0x432b80) * md_rd_f64(0x432340);
+	v += w * j * k;
+	z = v + q;
+	*(double *)ef_guest_memory_ptr((ef_addr32)0x432b50) = z;
+	*(double *)ef_guest_memory_ptr((ef_addr32)0x432af8) =
+		j * (c * (k * md_rd_f64(0x432da0)) * md_rd_f64(0x433058)) * z;
+}

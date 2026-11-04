@@ -6435,4 +6435,7 @@ void rotate_matrix_c5cd3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_
 void patch_rotation_immediates_dc519(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1); /* 0xdc519 */
 void rotate_matrix_c5cd3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 a0); /* 0xc5cd3 */
 
+void combine_globals_119938(void);
+void combine_globals_119938(void); /* 0x119938 */
+
 #endif
