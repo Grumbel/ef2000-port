@@ -8819,3 +8819,12 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd6478` | none | none | 3dd30@3de3b | Builds the 256-entry remap tables (one per shade group, 0x100 bytes each, starting at [0x15b958]+0x100) from the 3-byte  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcf788` | EAX:ef_addr32 | none | fd3ce@fd3f2 | Implicit-register fragment (ESI = record pointer): jumps into 0xcf794, the body of 0xcf78c, with EAX = ESI. Forward the  |
+| `0x1111e1` | none | EAX:uint32_t | none direct | Save the flags register and disable interrupts (PUSHF; POP EAX; CLI). The flags image is modelled as 0x202 (interrupts e |
+| `0x222` | none | none | ee22c@ee28d,ee22c@ee318 | Load the data segment register from the word at code-segment offset 0x120cd4. Segments are flat in this port, so there i |
+| `0x10e414` | none | none | 10e35f@10e35f | Epilogue fragment (POP EDI; RET) of the neighbouring routine; the register pop has no observable effect here. |

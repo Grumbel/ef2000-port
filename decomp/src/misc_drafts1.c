@@ -19986,3 +19986,26 @@ void build_shade_tables_d6478(void)
 		dst += 0x100u;
 	}
 }
+
+/* 0xcf788, 4 bytes. Implicit-register fragment (ESI = record pointer): jumps into 0xcf794, the body of 0xcf78c, with EAX = ESI. Forward the five words of the record at RECORD to cf3a4. */
+void forward_record_cf788(ef_addr32 record)
+{
+	guest_fn_cf3a4(EF_U16(record + 2u), EF_U16(record + 4u), EF_U16(record + 6u), EF_U16(record + 8u), EF_U16(record));
+}
+
+/* 0x1111e1, 4 bytes. Save the flags register and disable interrupts (PUSHF; POP EAX; CLI). The flags image is modelled as 0x202 (interrupts enabled), as the guest runs with them enabled. */
+uint32_t save_flags_disable_interrupts_1111e1(void)
+{
+	disable_interrupts_11f2d3();
+	return 0x202u;
+}
+
+/* 0x222, 9 bytes. Load the data segment register from the word at code-segment offset 0x120cd4. Segments are flat in this port, so there is no observable effect. */
+void load_ds_from_120cd4_222(void)
+{
+}
+
+/* 0x10e414, 2 bytes. Epilogue fragment (POP EDI; RET) of the neighbouring routine; the register pop has no observable effect here. */
+void pop_edi_ret_10e414(void)
+{
+}

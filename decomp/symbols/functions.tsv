@@ -1,7 +1,7 @@
 addr	size	name	module	state	kind	sig_status	test	notes
 0x00000086	355	x386_startup		library	x32	unverified		docs/loader.md and docs/startup-symbols.md; code sequence matches FlashTek X-32 Watcom cstrtx32.asm, selector and startup setup
 0x000001e9	57			unknown	unclassified	unverified		
-0x00000222	9			unknown	unclassified	unverified		
+0x00000222	9	load_ds_from_120cd4_222	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00000222.json	docs/compiler-abi.md; Load the data segment register from the word at code-segment offset 0x120cd4. Segments are flat in this port, so there i; callers ee22c@ee28d,ee22c@ee318; guest pending
 0x00000235	6			unknown	unclassified	unverified		
 0x0000023b	44			unknown	unclassified	unverified		
 0x000002b0	116	intdos_2b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000002b0.json	docs/compiler-abi.md; intdos: run DOS interrupt 0x21 with the registers from the block IN (EAX, EBX, ECX, EDX, ESI, EDI at +0..+0x14) and the ; callers 324@33b,3d0@3ee,880@892; guest pending
@@ -2982,7 +2982,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cef3c	264	advance_position_cef3c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cef3c.json	docs/compiler-abi.md; Advance the 3-dword position V (EAX) by SCALE (EBX) along the direction given by the two angle words at ANG (EDX; a = +0; callers 26960@26b37,87a20@87c1f,8de9c@8df70; guest pending
 0x000cf050	850			unknown	unclassified	unverified		
 0x000cf3a4	993			unknown	unclassified	unverified		
-0x000cf788	4			unknown	unclassified	unverified		
+0x000cf788	4	forward_record_cf788	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cf788.json	docs/compiler-abi.md; Implicit-register fragment (ESI = record pointer): jumps into 0xcf794, the body of 0xcf78c, with EAX = ESI. Forward the ; callers fd3ce@fd3f2; guest pending
 0x000cf78c	53	forward_record_cf78c	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cf78c.json	docs/compiler-abi.md; Forward the five words of the record at 0x4208e4 to cf3a4.; callers 14d58@14e3c,14d58@14e74,14d58@14ea5; guest pending
 0x000cf7c4	120			unknown	unclassified	unverified		
 0x000cf83c	270			unknown	unclassified	unverified		
@@ -4005,7 +4005,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010e28a	107	round_double_to_int64_10e28a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e28a.json	docs/compiler-abi.md; Convert the positive double at P in place to a 64-bit integer: restore the hidden mantissa bit, shift left for large exp; callers ebea3@ebece; guest pending
 0x0010e2f5	106	u64_to_digits_10e2f5	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e2f5.json	docs/compiler-abi.md; Convert the unsigned 64-bit value at VALUE_PTR to exactly N decimal digits (zero padded, high digits truncated) at BUF, ; callers 120560@120715; guest pending
 0x0010e35f	167			unknown	unclassified	unverified		
-0x0010e414	2			unknown	unclassified	unverified		
+0x0010e414	2	pop_edi_ret_10e414	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0010e414.json	docs/compiler-abi.md; Epilogue fragment (POP EDI; RET) of the neighbouring routine; the register pop has no observable effect here.; callers 10e35f@10e35f; guest pending
 0x0010e438	18	call_11d258_default	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e438.json	docs/compiler-abi.md; 0x11d258(0x195168, 1).; callers ed6c5@ed6c5,108afd@108d4e; guest pending
 0x0010e46f	73	unsigned_to_text	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e46f.json	docs/compiler-abi.md; Convert EAX to text in radix EBX at EDX using the digit table at 0x10e44a; * returns the destination start.; callers ed6cc@ed989,10e4b8@10e4ca; guest pending
 0x0010e4b8	27	signed_to_text	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010e4b8.json	docs/compiler-abi.md; Signed conversion: radix 10 negatives get a leading '-'.; callers ed6cc@ed855,ed6cc@ed88f; guest pending
@@ -4065,7 +4065,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00111142	26	set_rm_vector_111142	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00111142.json	docs/compiler-abi.md; DOS4G set real-mode interrupt vector (int 21h, AX = 0x2505) for interrupt number CL = NUM (low byte) with EBX = VALUE; c; callers 101ed4@101efe; guest pending
 0x001111b1	25	check_marker_1111b1	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111b1.json	docs/compiler-abi.md; Compare the dword at 0x17d7c0 with -1 and do nothing either way (an empty check left over in the runtime).; callers 101f08@101f38; guest pending
 0x001111ca	23	reset_marker_1111ca	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111ca.json	docs/compiler-abi.md; Set the dword at 0x17d7c0 to -1 (frame with saved registers, no arguments).; callers 101f44@101f67; guest pending
-0x001111e1	4			unknown	unclassified	unverified		
+0x001111e1	4	save_flags_disable_interrupts_1111e1	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001111e1.json	docs/compiler-abi.md; Save the flags register and disable interrupts (PUSHF; POP EAX; CLI). The flags image is modelled as 0x202 (interrupts e; callers none direct; guest pending
 0x001111e5	21			unknown	unclassified	unverified		
 0x0011124c	161			unknown	unclassified	unverified		
 0x001112ed	108			unknown	unclassified	unverified		

@@ -6063,4 +6063,13 @@ uint32_t alloc_object_entry_d36c4(uint32_t s0);
 
 void build_shade_tables_d6478(void);
 
+void forward_record_cf788(ef_addr32 record);
+uint32_t save_flags_disable_interrupts_1111e1(void);
+void load_ds_from_120cd4_222(void);
+void pop_edi_ret_10e414(void);
+void forward_record_cf788(ef_addr32 record);
+uint32_t save_flags_disable_interrupts_1111e1(void);
+void load_ds_from_120cd4_222(void);
+void pop_edi_ret_10e414(void);
+
 #endif
