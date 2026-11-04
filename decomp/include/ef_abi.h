@@ -3990,4 +3990,14 @@ ef_addr32 parse_tz_rule_10eef0(ef_addr32 text, ef_addr32 out);
 ef_addr32 find_chunk_111f84(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 data, int32_t n);
 ef_addr32 break_down_time_10ec62(uint32_t days, uint32_t secs, int32_t offset, ef_addr32 tm);
 
+/* runtime_helpers40.c */
+void clear_buffer_117aa2(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+void destroy_sound_object_105da0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+void reset_controllers_114058(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+int32_t stream_refill_10f1bf(ef_addr32 stream);
+void guest_fn_117a0f_x(ef_addr32 rec, uint32_t flag); /* 0x117a0f cdecl */
+void guest_fn_112808_x(ef_addr32 rec); /* 0x112808 cdecl */
+uint32_t guest_fn_11d63f_x(void); /* 0x11d63f: console getch with pushback (DOS int 21h) */
+int32_t guest_fn_10f0e8_x(uint32_t handle, ef_addr32 buf, uint32_t count); /* 0x10f0e8 EAX/EDX/EBX: DOS read */
+
 #endif

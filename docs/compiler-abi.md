@@ -4577,3 +4577,12 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x10ec62` | EAX:uint32_t,EDX:uint32_t,EBX:int32_t,ECX:ef_addr32 | EAX:ef_addr32 | f118d@f1257,1100d2@1100f0,1100d2@110117 | Break a day count and seconds-of-day (minus a zone offset) into a broken-down time record: +0 sec, +4 min, +8 hour, +0xc |
+
+## runtime_helpers40 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x117aa2` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 105648@105713,10585c@1058b3,10585c@105c60 | Zero the buffer at +0x50 (length at +0x4c) of a record (cdecl, record on the stack). |
+| `0x105da0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | none direct | Destroy a sound object: if it was started, stop it, clear its buffer, run 0x117a0f twice, trace 0xa; then trace its fiel |
+| `0x114058` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 103148@10316b | Reset the controllers of a state-4 sound record: set state 8, run 0x112808, then for each of its 16 channels send contro |
+| `0x10f1bf` | EAX:ef_addr32 | EAX:int32_t | f1d90@f1ec2,f1d90@f1ee2,f1d90@f1f0f | Refill a stream buffer (_filbuf): allocate it if missing, flush stdout-style linked streams, then read from the handle ( |

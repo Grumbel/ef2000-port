@@ -3887,7 +3887,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00105648	499			unknown	unclassified	unverified		
 0x0010585c	1079			unknown	unclassified	unverified		
 0x00105c94	266			unknown	unclassified	unverified		
-0x00105da0	149			unknown	unclassified	unverified		
+0x00105da0	149	destroy_sound_object_105da0	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00105da0.json	docs/compiler-abi.md; Destroy a sound object: if it was started, stop it, clear its buffer, run 0x117a0f twice, trace 0xa; then trace its fiel; callers none direct; guest pending
 0x00105e38	1580			unknown	unclassified	unverified		
 0x00106464	115			unknown	unclassified	unverified		
 0x00106514	117			unknown	unclassified	unverified		
@@ -4026,7 +4026,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010f0e8	31			unknown	unclassified	unverified		
 0x0010f107	137	stream_fgetc_10f107	game_helpers111	compiles	game	confirmed	decomp/tests/0x0010f107.json	docs/compiler-abi.md; fgetc: read the next byte of a stream (refilling when the count runs out); in text mode skip a CR and treat Ctrl-Z as en; callers 11580e@115831; guest pending
 0x0010f190	47	stream_getc	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f190.json	docs/compiler-abi.md; Read one byte from a counted buffer stream; -1 at the end.; callers 10f107@10f13a,10f107@10f165; guest pending
-0x0010f1bf	171			unknown	unclassified	unverified		
+0x0010f1bf	171	stream_refill_10f1bf	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x0010f1bf.json	docs/compiler-abi.md; Refill a stream buffer (_filbuf): allocate it if missing, flush stdout-style linked streams, then read from the handle (; callers f1d90@f1ec2,f1d90@f1ee2,f1d90@f1f0f; guest pending
 0x0010f26a	465			unknown	unclassified	unverified		
 0x0010f43b	164	stream_fputc_10f43b	runtime_helpers37	compiles	game	confirmed	decomp/tests/0x0010f43b.json	docs/compiler-abi.md; fputc: store a character in the stream buffer (expanding newline to CR LF on text streams), flushing when full or line b; callers f1f5a@f20e3; guest pending
 0x0010f4df	17	call_fa95f_from_start	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f4df.json	docs/compiler-abi.md; 0xfa95f(EAX, 0, 1).; callers f2183@f2227,f227f@f2287; guest pending
@@ -4115,7 +4115,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00113cf4	27	trace_and_mark_113cf4	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00113cf4.json	docs/compiler-abi.md; Trace-call a non-null record and mark its field 4 as 1.; callers none direct; guest pending
 0x00113d10	794			unknown	unclassified	unverified		
 0x0011402c	42			unknown	unclassified	unverified		
-0x00114058	171			unknown	unclassified	unverified		
+0x00114058	171	reset_controllers_114058	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00114058.json	docs/compiler-abi.md; Reset the controllers of a state-4 sound record: set state 8, run 0x112808, then for each of its 16 channels send contro; callers 103148@10316b; guest pending
 0x00114170	47	activate_record_114170	game_helpers120	compiles	game	confirmed	decomp/tests/0x00114170.json	docs/compiler-abi.md; Activate a record: trace it, set state 2 and run its field 0x28 callback (cdecl, record on the stack).; callers 1031a0@1031c3; guest pending
 0x001141a0	16	set_record_field_1141a0	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x001141a0.json	docs/compiler-abi.md; Store a value at +0x2c of a record when the record exists.; callers 103244@10326e; guest pending
 0x001141b0	95	start_value_ramp_1141b0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x001141b0.json	docs/compiler-abi.md; Start a ramp of the value at +0x48 to a target over time; sets the per-step delta at +0x54.; callers 1031cc@1031fc; guest pending
@@ -4134,7 +4134,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001177ad	71			unknown	unclassified	unverified		
 0x001177f4	539			unknown	unclassified	unverified		
 0x00117a0f	147			unknown	unclassified	unverified		
-0x00117aa2	44			unknown	unclassified	unverified		
+0x00117aa2	44	clear_buffer_117aa2	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00117aa2.json	docs/compiler-abi.md; Zero the buffer at +0x50 (length at +0x4c) of a record (cdecl, record on the stack).; callers 105648@105713,10585c@1058b3,10585c@105c60; guest pending
 0x00117ace	47			unknown	unclassified	unverified		
 0x00117b0c	10			unknown	unclassified	unverified		
 0x00117b18	198			unknown	unclassified	unverified		
