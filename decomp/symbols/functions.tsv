@@ -1519,7 +1519,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007f9e4	440	select_contact_icon_7f9e4	game_helpers70	compiles	game	confirmed	decomp/tests/0x0007f9e4.json	docs/compiler-abi.md; Pick the icon code for a unit record (0x47 for none).; callers 7ef14@7efeb,7ef14@7f02c,7ef14@7f09a; guest pending
 0x0007fb9c	77	object_glyph_7fb9c	unit_flags	compiles	game	confirmed	decomp/tests/0x0007fb9c.json	docs/compiler-abi.md; Character code for an object.; callers 7ef14@7f0f5,7ef14@7f122,7ef14@7f1b0; guest pending
 0x0007fbec	71	ui_dispatch_indexed_control	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fbec.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
-0x0007fc34	166			unknown	unclassified	unverified		
+0x0007fc34	166	remaining_share_7fc34	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007fc34.json	docs/compiler-abi.md; Remaining share of entry INDEX in the table at 0x1f9078: when the record's size (0xd7730) is 1 the value is the record's; callers 7ef14@7f21a,7fcdc@7fd79; guest pending
 0x0007fcdc	313			unknown	unclassified	unverified		
 0x0007fe18	51	ui_initialize_releases	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe18.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0007fe4c	62	ui_finalize_releases	ui_dispatch	compiles	game	confirmed	decomp/tests/0x0007fe4c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
@@ -3614,7 +3614,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2960	138	draw_glyph_6x6_f2960	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2960.json	docs/compiler-abi.md; Draw a 6x6 glyph (index ecx, 6 mask bytes at 0x16116c) in colour al at (x = edx, y row = ebx).; callers f29ec@f2a10; guest pending
 0x000f29ec	57	draw_text_f29ec	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f29ec.json	docs/compiler-abi.md; Draw a string with 6-pixel spacing, glyphs offset from the blank.; callers a9130@a9374; guest pending
 0x000f2a30	142	send_param_block_f2a30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2a30.json	docs/compiler-abi.md; Apply the palette at 0x425c8c, decrement the word 0x1616ee and send the parameter block built from 0x485920/0x48591c and; callers f2ac0@f2b32; guest pending
-0x000f2ac0	188			unknown	unclassified	unverified		
+0x000f2ac0	188	update_remote_view_f2ac0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f2ac0.json	docs/compiler-abi.md; Frame update of the remote view when either activity flag (0x41f7c6, 0x41f7ba) and the enable flag 0x41f7a0 are set: fet; callers f3f84@f4034; guest pending
 0x000f2b7c	250			unknown	unclassified	unverified		
 0x000f2c78	87	read_script_line_f2c78	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f2c78.json	docs/compiler-abi.md; Read the next script line (after leading blanks) from dword 0x485924 into 0x485956.; callers f2d74@f2d74,f3a1c@f3a36,f3a1c@f3a62; guest pending
 0x000f2cd0	131	read_script_token_f2cd0	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f2cd0.json	docs/compiler-abi.md; Copy the next token of the line at 0x485956 to 0x48592c.; callers f2d74@f2d94,f2dfc@f2e02,f2e54@f2e55; guest pending
@@ -3794,7 +3794,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00101688	85	pulse_delay_101688	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00101688.json	docs/compiler-abi.md; Run a short hardware delay loop: n pulses of the two callbacks at 0x486da4/0x486da0, one for the low bit and two per rem; callers 1016e0@101826; guest pending
 0x001016e0	439			unknown	unclassified	unverified		
 0x00101a90	169	init_once_101a90	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00101a90.json	docs/compiler-abi.md; One-time runtime init guarded by the flag at 0x17d2cc: register the exit handler pair (0x101a90, 0x103d48) and mark eigh; callers 101c54@101c5a; guest pending
-0x00101ba8	171			unknown	unclassified	unverified		
+0x00101ba8	171	write_status_lines_101ba8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00101ba8.json	docs/compiler-abi.md; Write the status line to the stream 0x4dd620: with the mode word 0x4dd634 equal to 1 one formatted line from the values ; callers 101c54@101db4; guest pending
 0x00101c54	392			unknown	unclassified	unverified		
 0x00101ddc	53	trace_call_101ddc	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101ddc.json	docs/compiler-abi.md; AIL trace wrapper for 0x104694 (cdecl, all arguments on the stack).; callers d5d18@d5d4f,d6e58@d6ef3; guest pending
 0x00101e14	92	trace_call_101e14	trace_wrappers1	compiles	game	confirmed	decomp/tests/0x00101e14.json	docs/compiler-abi.md; AIL trace wrapper for 0x1041e4 with result trace (cdecl, all arguments on the stack).; callers d6e58@d6eaa,d6e58@d6eb6,d6e58@d6ec2; guest pending

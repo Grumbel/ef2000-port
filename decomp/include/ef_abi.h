@@ -4805,4 +4805,9 @@ void guest_fn_e5f64_x(uint32_t x, uint32_t y, uint32_t code); /* 0xe5f64 EAX/EDX
 
 void reset_stream_block_106644(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t p);
 
+uint32_t remaining_share_7fc34(uint32_t scale, uint32_t index);
+uint32_t write_status_lines_101ba8(void);
+void update_remote_view_f2ac0(void);
+void guest_fn_a7bd4_x(void); /* 0xa7bd4 */
+
 #endif

@@ -5897,3 +5897,11 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x106644` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 102670@102693 | Reset the stream control block P (cdecl): fixed defaults in the fields up to +0x40 (the clock word 0x4dd7e0 goes into +0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7fc34` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 7ef14@7f21a,7fcdc@7fd79 | Remaining share of entry INDEX in the table at 0x1f9078: when the record's size (0xd7730) is 1 the value is the record's |
+| `0x101ba8` | none | EAX:uint32_t | 101c54@101db4 | Write the status line to the stream 0x4dd620: with the mode word 0x4dd634 equal to 1 one formatted line from the values  |
+| `0xf2ac0` | none | none | f3f84@f4034 | Frame update of the remote view when either activity flag (0x41f7c6, 0x41f7ba) and the enable flag 0x41f7a0 are set: fet |

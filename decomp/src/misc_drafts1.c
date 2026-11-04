@@ -3908,3 +3908,80 @@ void reset_stream_block_106644(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
     EF_U32(p + 0x850u) = 0u;
     guest_fn_10535c(p);
 }
+
+/* 0x7fc34, 166 bytes. Remaining share of entry INDEX in the table at 0x1f9078: when the record's size (0xd7730) is 1 the value is the record's own 0xd771c result; with a nonzero SCALE and a positive size the value is the own result minus SCALE * own / size (clamped at 0), otherwise the plain own result. */
+uint32_t remaining_share_7fc34(uint32_t scale, uint32_t index)
+{
+    uint32_t rec = EF_U32(EF_U32(0x001f9078u) + index * 4u);
+    uint32_t own;
+    uint32_t q;
+    if (get_dword_d7730(rec) == 1u)
+        return guest_fn_d771c(rec);
+    if (scale != 0u && (int32_t)get_dword_d7730(EF_U32(EF_U32(0x001f9078u) + index * 4u)) > 0) {
+        uint32_t prod = guest_fn_d771c(EF_U32(EF_U32(0x001f9078u) + index * 4u)) * scale;
+        uint32_t size = get_dword_d7730(EF_U32(EF_U32(0x001f9078u) + index * 4u));
+        q = prod / size;
+        own = guest_fn_d771c(EF_U32(EF_U32(0x001f9078u) + index * 4u));
+        if (q < own)
+            return guest_fn_d771c(EF_U32(EF_U32(0x001f9078u) + index * 4u)) - q;
+        return 0u;
+    }
+    return guest_fn_d771c(EF_U32(EF_U32(0x001f9078u) + index * 4u));
+}
+
+/* 0x101ba8, 171 bytes. Write the status line to the stream 0x4dd620: with the mode word 0x4dd634 equal to 1 one formatted line from the values at 0x4dd62c/3c/38/40 (format 0x19378c), otherwise 14 blank lines (0x1937a8) followed by mode-1 more separators (0x1937ac). Always returns 1. */
+uint32_t write_status_lines_101ba8(void)
+{
+    uint32_t value;
+    uint32_t b;
+    uint32_t c;
+    uint32_t d;
+    uint32_t n;
+    uint32_t i;
+    guest_tail_110dcc(0u);
+    value = EF_U32(0x004dd62cu);
+    b = EF_U32(0x004dd63cu);
+    c = EF_U32(0x004dd638u);
+    d = EF_U32(0x004dd640u);
+    guest_tail_110dd9(0u);
+    if (EF_U32(0x004dd634u) == 1u) {
+        guest_fn_bc400(EF_U32(0x004dd620u), 0x0019378cu, value, b, c, d);
+    } else {
+        for (i = 0u; i < 14u; i++)
+            guest_fn_bc400(EF_U32(0x004dd620u), 0x001937a8u);
+    }
+    n = EF_U32(0x004dd634u);
+    for (i = 1u; i < n; i++) {
+        guest_fn_bc400(EF_U32(0x004dd620u), 0x001937acu);
+        n = EF_U32(0x004dd634u);
+    }
+    return 1u;
+}
+
+/* 0xf2ac0, 188 bytes. Frame update of the remote view when either activity flag (0x41f7c6, 0x41f7ba) and the enable flag 0x41f7a0 are set: fetch the view state, run 0xdd870 and decode the 0x39180 result: 0 sends the parameter block (0xf2a30), 1 reports 0x1918e8, 2 reloads the palette 0x425c8c and sets 0x161e20. Unless 0x4859de is set the screen is then refreshed with 0xc386c, 0xdc250 and 0xc3990. */
+void update_remote_view_f2ac0(void)
+{
+    uint32_t r;
+    if (EF_U8(0x0041f7c6u) == 0u && EF_U8(0x0041f7bau) == 0u)
+        return;
+    if (EF_U8(0x0041f7a0u) == 0u)
+        return;
+    get_view_state_dd988(0x00485920u, 0x0048591cu, 0x0048594eu, 0x0048594au,
+                         0x00485954u, 0x00485952u, 0x00485950u, 0x0048594cu);
+    guest_fn_dd870_s();
+    r = tail_jump_39180(0u) & 0xffffu;
+    if (r == 0u) {
+        send_param_block_f2a30();
+    } else if (r == 1u) {
+        guest_callptr1_x(EF_U32(0x00132a74u), 0x001918e8u);
+    } else if (r == 2u) {
+        guest_fn_a7bd4_x();
+        apply_palette_d663c(0x00425c8cu);
+        EF_U8(0x00161e20u) = 1u;
+    }
+    if (EF_U8(0x004859deu) == 0u) {
+        guest_fn_c386c();
+        guest_fn_dc250();
+        guest_fn_c3990();
+    }
+}
