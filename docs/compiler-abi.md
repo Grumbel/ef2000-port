@@ -5189,3 +5189,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x485a8` | EAX:uint32_t,EDX:uint32_t | none | 46454@46e13 | Transfer the unit's link word (+0x158) from a to b. |
 | `0x486a0` | EAX:uint32_t,EDX:uint32_t | none | 46454@47097 | Transfer the unit's word at +0x146 from a to b. |
+
+## state_reset1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x8b2d8` | none | none | 8b274@8b290 | Reload the game data: tear down the video state, build the data file path, load it to 0x425190 through the handler at 0x |

@@ -137,3 +137,18 @@ void switch_display_mode_d1e50(uint32_t mode)
     }
     EF_U8(0x0015b7d0u) = (uint8_t)target;
 }
+
+/* 0x8b2d8, 78 bytes. Reload the game data: tear down the video state, build the data file path, load it to 0x425190 through the handler at 0x132ab8, then rebuild the engine, page and video mode. */
+void reload_game_data_8b2d8(void)
+{
+    uint8_t path[0x50];
+    ef_addr32 buf = (uint32_t)(uintptr_t)path;
+    guest_fn_cdb20_x();
+    guest_fn_e4188();
+    build_path_with_name_e7cec(0x0018a804u, 0x0018a7f8u, 0x0018a7f4u, buf);
+    guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), buf, 0x00425190u);
+    guest_fn_97dcc_x();
+    reset_engine_e4264();
+    restore_page_cd554();
+    restore_video_mode_cdc64();
+}

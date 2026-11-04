@@ -2363,3 +2363,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00048da0	formatted_width_48da0	[ESP+4]:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	4	Original 0x00048da0 (68 bytes); Same with length times 8 for the nonzero zoom.; callers 48e7c@48f35,5c354@5c43d,5c518@5c64d; docs/compiler-abi.md
 0x000485a8	transfer_link_485a8	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000485a8 (245 bytes); Transfer the unit's link word (+0x158) from a to b.; callers 46454@46e13; docs/compiler-abi.md
 0x000486a0	transfer_link_486a0	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000486a0 (245 bytes); Transfer the unit's word at +0x146 from a to b.; callers 46454@47097; docs/compiler-abi.md
+0x0008b2d8	reload_game_data_8b2d8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008b2d8 (78 bytes); Reload the game data: tear down the video state, build the data file path, load it to 0x425190 through the handler at 0x; callers 8b274@8b290; docs/compiler-abi.md

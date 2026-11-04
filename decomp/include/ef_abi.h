@@ -4401,4 +4401,7 @@ uint32_t formatted_width_48da0(ef_addr32 fmt, ...);
 void transfer_link_485a8(uint32_t a, uint32_t b);
 void transfer_link_486a0(uint32_t a, uint32_t b);
 
+void reload_game_data_8b2d8(void);
+void guest_fn_97dcc_x(void); /* 0x97dcc no arguments */
+
 #endif
