@@ -5598,4 +5598,7 @@ void guest_fn_2b95c_x(int32_t id); /* 0x2b95c EAX */
 void check_player_altitude_711f0(void);
 void guest_fn_6e8d8_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double arg); /* 0x6e8d8 stack double, ret 8 */
 
+void pick_nearest_unit_65c1c(void);
+uint32_t guest_fn_6acc_x(ef_addr32 unit); /* 0x6acc EAX -> AL */
+
 #endif

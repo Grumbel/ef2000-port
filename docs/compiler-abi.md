@@ -7706,3 +7706,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x711f0` | none | none | 6c488@6c4d6,6c488@6c58b | Altitude check of the player ship (record at [0x1f71bc]; altitude double at +0x59): below the double 0x1868d1 the ship i |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x65c1c` | none | none | 65a50@65a7b | Pick the nearest unit of kind 3 (0x6acc) to the viewpoint (dwords 0x1a5bec, 0x1a5bf0, 0x1a5be8 divided by 256) among the |

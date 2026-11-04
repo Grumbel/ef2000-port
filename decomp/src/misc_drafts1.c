@@ -12786,3 +12786,38 @@ void check_player_altitude_711f0(void)
     compute_turn_rate_6eaf4(0u, 0u, 0u, 0u, 1.3);
     guest_fn_6e8d8_x(0u, 0u, 0u, 0u, 2.5);
 }
+
+/* 0x65c1c, 249 bytes. Pick the nearest unit of kind 3 (0x6acc) to the viewpoint (dwords 0x1a5bec, 0x1a5bf0, 0x1a5be8 divided by 256) among the ring of units walked with 0x663a4(.., 1), starting from the first, and store its id in word 0x1a8242 (0xffff when there is none or the selected object, high word of 0x1f71c8, is missing). The squared distance uses the signed high words of the unit's first three dwords. */
+void pick_nearest_unit_65c1c(void)
+{
+    ef_addr32 sel = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    int32_t first = -1;
+    int32_t best = -1;
+    int32_t bestd = 0x7fffffff;
+    int32_t id;
+    EF_U16(0x001a8242u) = 0xffffu;
+    if (sel == 0u)
+        return;
+    id = (int16_t)find_next_unit_663a4((uint32_t)-1, 1u);
+    while (id != (int16_t)first) {
+        ef_addr32 u;
+        if (first == -1)
+            first = id;
+        u = guest_fn_7489c(id);
+        if ((uint8_t)guest_fn_6acc_x(u) == 3u) {
+            int32_t x = (int32_t)EF_U32(u) >> 16;
+            int32_t y = (int32_t)EF_U32(u + 4u) >> 16;
+            int32_t z = (int32_t)EF_U32(u + 8u) >> 16;
+            int32_t dy = y - ((int32_t)EF_U32(0x001a5bf0u) >> 8);
+            int32_t dx = x - ((int32_t)EF_U32(0x001a5becu) >> 8);
+            int32_t dz = z - ((int32_t)EF_U32(0x001a5be8u) >> 8);
+            int32_t d = dx * dx + dy * dy + dz * dz;
+            if (d <= bestd) {
+                bestd = d;
+                best = id;
+            }
+        }
+        id = (int16_t)find_next_unit_663a4((uint32_t)id, 1u);
+    }
+    EF_U16(0x001a8242u) = (uint16_t)best;
+}
