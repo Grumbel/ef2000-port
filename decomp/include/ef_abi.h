@@ -2672,4 +2672,14 @@ void guest_fn_10dc7f(uint32_t a, uint32_t b); /* 0x10dc7f EAX/EDX */
 void guest_fn_81c(void); /* 0x81c */
 uint32_t guest_fn_9ccb8(ef_addr32 name); /* 0x9ccb8 EAX -> EAX */
 
+/* runtime_helpers26.c */
+void build_data_path_eabe8(ef_addr32 name);
+uint32_t alloc_block_checked_eb4a0(uint32_t size);
+void select_entry_kind_f1850(ef_addr32 entry);
+void restart_driver_f2dfc(void);
+void guest_fn_f2cd0(void); /* 0xf2cd0 */
+void guest_fn_f2dcc(ef_addr32 path); /* 0xf2dcc EAX */
+uint32_t guest_fn_c34cc_ret(uint32_t request); /* 0xc34cc EAX -> EAX */
+void guest_fn_c3f80(uint32_t block); /* 0xc3f80 EAX */
+
 #endif

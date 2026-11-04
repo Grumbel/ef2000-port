@@ -3491,7 +3491,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eaab0	65	open_data_file_eaab0	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000eaab0.json	docs/compiler-abi.md; Open the data file and read its 0x306-byte header.; callers eac48@eac83; guest pending
 0x000eaaf4	79	read_data_block_eaaf4	runtime_helpers25	compiles	game	confirmed	decomp/tests/0x000eaaf4.json	docs/compiler-abi.md; Read the data file's size-prefixed block into 0x474368.; callers eab44@eab6d,eac48@eaccb; guest pending
 0x000eab44	162			unknown	unclassified	unverified		
-0x000eabe8	93			unknown	unclassified	unverified		
+0x000eabe8	93	build_data_path_eabe8	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000eabe8.json	docs/compiler-abi.md; Build the data file path from the default path, a name and a suffix.; callers eac48@eac7e; guest pending
 0x000eac48	453			unknown	unclassified	unverified		
 0x000eae10	54			unknown	unclassified	unverified		
 0x000eaf80	136			unknown	unclassified	unverified		
@@ -3511,7 +3511,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb374	87	compare_nocase_eb374	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000eb374.json	docs/compiler-abi.md; Case-insensitive compare of up to n bytes.; callers 9c858@9c88a,103f04@104091,103f04@1040b9; guest pending
 0x000eb448	48	enter_handler_eb448	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000eb448.json	docs/compiler-abi.md; ; callers ea50c@ea5e7,eb2c0@eb315; guest pending
 0x000eb478	31	lowercase_string	math_string	compiles	game	confirmed	decomp/tests/0x000eb478.json	docs/compiler-abi.md; Lowercase ASCII 'A'..'Z' in place; returns the pointer.; callers 9c980@9c9b6,9c9c0@9ca0d,a7ec4@a7ec9; guest pending
-0x000eb4a0	30			unknown	unclassified	unverified		
+0x000eb4a0	30	alloc_block_checked_eb4a0	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000eb4a0.json	docs/compiler-abi.md; Allocate a block or abort.; callers ebb58@ebbe0; guest pending
 0x000eb4c0	26	release_pointer_eb4c0	math_string	compiles	game	confirmed	decomp/tests/0x000eb4c0.json	docs/compiler-abi.md; Release the pointer stored at EAX through 0xc3f80 and clear it.; callers ebcd8@ebceb; guest pending
 0x000eb4dc	65	bsearch_entries_eb4dc	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000eb4dc.json	docs/compiler-abi.md; Binary search 12-byte entries sorted by their first signed dword.; callers eb520@eb684; guest pending
 0x000eb520	373			unknown	unclassified	unverified		
@@ -3593,7 +3593,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f13ac	27	refresh_object_f13ac	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000f13ac.json	docs/compiler-abi.md; ; callers a56f8@a5704; guest pending
 0x000f17d8	51	process_words_f17d8	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f17d8.json	docs/compiler-abi.md; Call 0xa4cb4 on up to five words starting at +0x59.; callers f18a4@f18fa,f18a4@f19a7,f1a70@f1b6f; guest pending
 0x000f180c	51	process_words_f180c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f180c.json	docs/compiler-abi.md; As 0xf17d8 with words at +0x63 and 0xa4b80.; callers f18a4@f18e2,f18a4@f197f,f1a70@f1b4d; guest pending
-0x000f1850	81			unknown	unclassified	unverified		
+0x000f1850	81	select_entry_kind_f1850	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000f1850.json	docs/compiler-abi.md; Copy an entry's name when its kind is 1 and publish the kind.; callers f18a4@f1912,f18a4@f1a13,f1a70@f1b94; guest pending
 0x000f18a4	457			unknown	unclassified	unverified		
 0x000f1a70	488			unknown	unclassified	unverified		
 0x000f1c58	249			unknown	unclassified	unverified		
@@ -3621,7 +3621,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2d54	31	path_ends_with_colon	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2d54.json	docs/compiler-abi.md; The string at 0x48592c ends with ':'.; callers f2d74@f2d99; guest pending
 0x000f2d74	86			unknown	unclassified	unverified		
 0x000f2dcc	46	strip_extension	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2dcc.json	docs/compiler-abi.md; Truncate the string at the last '.'.; callers f2dfc@f2e15; guest pending
-0x000f2dfc	86			unknown	unclassified	unverified		
+0x000f2dfc	86	restart_driver_f2dfc	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000f2dfc.json	docs/compiler-abi.md; Save the current path, restart the driver and abort when it fails.; callers f3b78@f3b99; guest pending
 0x000f2e54	30	copy_path_f2e54	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2e54.json	docs/compiler-abi.md; 0xf2cd0(), 0x9d749(0x485908, 0x48592c), byte 0x4859de = 1.; callers f3b78@f3bb3; guest pending
 0x000f2e74	327			unknown	unclassified	unverified		
 0x000f2fbc	399			unknown	unclassified	unverified		

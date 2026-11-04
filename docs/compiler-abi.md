@@ -3358,3 +3358,12 @@ in EAX, format string address, one value).
 | `0xea470` | EAX:uint32_t | none | 8b274@8b2a9 | Install the exit handler and restart; abort when called with a mode other than 1. |
 | `0xeaab0` | none | none | eac48@eac83 | Open the data file and read its 0x306-byte header. |
 | `0xeaaf4` | none | none | eab44@eab6d,eac48@eaccb | Read the data file's size-prefixed block into 0x474368. |
+
+## runtime_helpers26 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xeabe8` | EAX:ef_addr32 | none | eac48@eac7e | Build the data file path from the default path, a name and a suffix. |
+| `0xeb4a0` | EAX:uint32_t | EAX:uint32_t | ebb58@ebbe0 | Allocate a block or abort. |
+| `0xf1850` | EAX:ef_addr32 | none | f18a4@f1912,f18a4@f1a13,f1a70@f1b94 | Copy an entry's name when its kind is 1 and publish the kind. |
+| `0xf2dfc` | none | none | f3b78@f3b99 | Save the current path, restart the driver and abort when it fails. |

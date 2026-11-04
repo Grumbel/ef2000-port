@@ -1587,3 +1587,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000ea470	install_exit_handler_ea470	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000ea470 (42 bytes); Install the exit handler and restart; abort when called with a mode other than 1.; callers 8b274@8b2a9; docs/compiler-abi.md
 0x000eaab0	open_data_file_eaab0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eaab0 (65 bytes); Open the data file and read its 0x306-byte header.; callers eac48@eac83; docs/compiler-abi.md
 0x000eaaf4	read_data_block_eaaf4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eaaf4 (79 bytes); Read the data file's size-prefixed block into 0x474368.; callers eab44@eab6d,eac48@eaccb; docs/compiler-abi.md
+0x000eabe8	build_data_path_eabe8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eabe8 (93 bytes); Build the data file path from the default path, a name and a suffix.; callers eac48@eac7e; docs/compiler-abi.md
+0x000eb4a0	alloc_block_checked_eb4a0	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb4a0 (30 bytes); Allocate a block or abort.; callers ebb58@ebbe0; docs/compiler-abi.md
+0x000f1850	select_entry_kind_f1850	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f1850 (81 bytes); Copy an entry's name when its kind is 1 and publish the kind.; callers f18a4@f1912,f18a4@f1a13,f1a70@f1b94; docs/compiler-abi.md
+0x000f2dfc	restart_driver_f2dfc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f2dfc (86 bytes); Save the current path, restart the driver and abort when it fails.; callers f3b78@f3b99; docs/compiler-abi.md
