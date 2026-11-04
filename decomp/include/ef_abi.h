@@ -5961,4 +5961,6 @@ void guest_fn_6f758_x(ef_addr32 vec, uint32_t kind, uint32_t s0, uint32_t s1); /
 
 void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb);
 
+void update_chase_camera_6e3e0(double d1, double d2);
+
 #endif

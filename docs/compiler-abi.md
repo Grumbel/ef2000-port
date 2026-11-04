@@ -8564,3 +8564,8 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x74d98` | EAX:uint32_t,EDX:ef_addr32,EBX:ef_addr32 | none | 2a4c8@2a6fb,74970@74d8b | Apply an impulse to unit AX (signed 16-bit id) from the force vector pair A (EDX) and B (EBX) (pointers to three doubles |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
