@@ -4699,7 +4699,7 @@ void credit_hit_74480(int32_t a)
     owner = (uint32_t)((int32_t)(int16_t)EF_U16(rb + 0x28u) * 0xca) + EF_U32(0x0019bb58u);
     EF_U8(owner + 0xc9u)++;
     if (EF_U8(0x00127da9u) != 0u && EF_U16(rb + 0x18u) != EF_U8(0x001a666bu)) {
-        guest_fn_571f0_x(EF_U8(rb + 0x18u), (uint32_t)(int32_t)(int16_t)EF_U16(rb + 0x16u), EF_U8(owner + 0xc9u));
+        send_byte_word_byte_packet_3e(EF_U8(rb + 0x18u), (uint32_t)(int32_t)(int16_t)EF_U16(rb + 0x16u), EF_U8(owner + 0xc9u));
         return;
     }
     guest_fn_46168((int32_t)(int16_t)EF_U16(rb + 0x16u), 0x23u, EF_U8(owner + 0xc9u), 0u, 0u);
