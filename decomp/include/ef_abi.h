@@ -4950,4 +4950,6 @@ void guest_fn_a7ac8_x(uint32_t handle, uint32_t offset); /* 0xa7ac8 2 stack argu
 uint32_t count_typed_nodes_b0b00(uint32_t kind, uint32_t head, uint32_t arg);
 uint32_t guest_fn_bfcd8_x(uint32_t node, uint32_t arg); /* 0xbfcd8 EAX/EDX -> EAX */
 
+void skip_to_section_f3a1c(uint32_t name);
+
 #endif

@@ -6176,3 +6176,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xb0b00` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | b0c34@b0c57 | Count the nodes of the list whose head pointer is at HEAD (links +4) that are of type 0x31 (byte +0xc), pass the filter  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xf3a1c` | EAX:uint32_t | none | f3aa8@f3b10,f3b1c@f3b36 | Skip script lines until the token buffer 0x48592c matches NAME (0xa4380 == 0) or the end marker string 0x1919c8; if the  |

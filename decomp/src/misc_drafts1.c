@@ -5367,3 +5367,23 @@ uint32_t count_typed_nodes_b0b00(uint32_t kind, uint32_t head, uint32_t arg)
     }
     return count;
 }
+
+/* 0xf3a1c, 139 bytes. Skip script lines until the token buffer 0x48592c matches NAME (0xa4380 == 0) or the end marker string 0x1919c8; if the end marker was reached, format the "section not found" message (format 0x1919cc, NAME) into a 100-byte stack buffer and pass it to the error callback at 0x132a74. Remembers the previous script position (0x485928 -> 0x485924) and clears byte 0x1616ec first. */
+void skip_to_section_f3a1c(uint32_t name)
+{
+    uint8_t buf[0x64];
+    EF_U32(0x00485924u) = EF_U32(0x00485928u);
+    EF_U8(0x001616ecu) = 0u;
+    read_script_line_f2c78();
+    read_script_token_f2cd0();
+    while (guest_fn_a4380(name, 0x0048592cu) != 0u) {
+        if (guest_fn_a4380(0x0048592cu, 0x001919c8u) == 0u)
+            break;
+        read_script_line_f2c78();
+        read_script_token_f2cd0();
+    }
+    if (guest_fn_a4380(0x0048592cu, 0x001919c8u) == 0u) {
+        guest_sprintf_a4342((uint32_t)(uintptr_t)buf, 0x001919ccu, name);
+        guest_callptr1_x(EF_U32(0x00132a74u), (uint32_t)(uintptr_t)buf);
+    }
+}
