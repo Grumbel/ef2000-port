@@ -3928,11 +3928,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001084d3	545			unknown	unclassified	unverified		
 0x001086f4	217	parse_format_modifiers_1086f4	game_helpers102	compiles	game	confirmed	decomp/tests/0x001086f4.json	docs/compiler-abi.md; Parse the width and size modifiers of a printf conversion ('*', digits, N/F, h/l/w/L) into the spec record; returns the ; callers 1084d3@108552,1084d3@1086bc; guest pending
 0x001087cd	53	skip_and_dispatch_1087cd	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001087cd.json	docs/compiler-abi.md; Pull characters through the reader at [obj] until one is not in the class-2 skip set (table 0x195af0, indexed by char+1); callers 1084d3@10851d; guest pending
-0x00108802	134			unknown	unclassified	unverified		
-0x00108888	238			unknown	unclassified	unverified		
-0x00108976	94			unknown	unclassified	unverified		
+0x00108802	134	scanf_char_108802	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00108802.json	docs/compiler-abi.md; scanf %c: read up to width (default 1) characters through [obj], storing bytes (words with flag 0x20) at the destination; callers 1084d3@10866d; guest pending
+0x00108888	238	scanf_string_108888	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00108888.json	docs/compiler-abi.md; scanf %s: skip leading whitespace, then copy non-whitespace characters (bytes, or words with flag 0x20) and NUL-terminat; callers 1084d3@108655; guest pending
+0x00108976	94	scanf_store_count_108976	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00108976.json	docs/compiler-abi.md; Store the running character count in EBX through the next destination pointer (16-bit when flag 0x10, else 32-bit) when ; callers 1084d3@10868c,1084d3@1086cf; guest pending
 0x001089d4	67	build_char_set	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001089d4.json	docs/compiler-abi.md; Build a 256-bit set at EDX from the bytes of the string at EAX up to ']'.; callers 108a17@108a3e; guest pending
-0x00108a17	230			unknown	unclassified	unverified		
+0x00108a17	230	scanf_set_108a17	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00108a17.json	docs/compiler-abi.md; scanf %[...]: EBX points at the format cursor just past '['; build the (optionally '^'-negated) set, then copy matching ; callers 1084d3@108662; guest pending
 0x00108afd	734			unknown	unclassified	unverified		
 0x00108ddb	504			unknown	unclassified	unverified		
 0x00108fd3	39	hex_digit_value	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00108fd3.json	docs/compiler-abi.md; Hex digit value of a character, or 0x10.; callers 108ddb@108ef6,108ddb@108f32; guest pending

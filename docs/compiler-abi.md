@@ -9255,3 +9255,12 @@ in EAX, format string address, one value).
 | `0xc4310` | EAX:uint32_t | EAX:uint32_t | fcc01@fcc15,fcc6f@fcc91 | Map a code address to its replacement handler; unmatched addresses are recorded and routed to 0xc4377. |
 | `0xfcc01` | EAX:uint32_t | none | none direct | Far-call thunk: remap the return address in the caller frame when its segment matches. |
 | `0xfcc6f` | EAX:uint32_t | none | none direct | Interrupt handler: remap the saved return address in the interrupt frame. |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x108976` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 1084d3@10868c,1084d3@1086cf | Store the running character count in EBX through the next destination pointer (16-bit when flag 0x10, else 32-bit) when  |
+| `0x108802` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 1084d3@10866d | scanf %c: read up to width (default 1) characters through [obj], storing bytes (words with flag 0x20) at the destination |
+| `0x108888` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 1084d3@108655 | scanf %s: skip leading whitespace, then copy non-whitespace characters (bytes, or words with flag 0x20) and NUL-terminat |
+| `0x108a17` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | 1084d3@108662 | scanf %[...]: EBX points at the format cursor just past '['; build the (optionally '^'-negated) set, then copy matching  |

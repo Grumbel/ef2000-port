@@ -6367,4 +6367,13 @@ uint32_t remap_handler_c4310(uint32_t eax); /* 0xc4310 */
 void remap_frame_fcc01(uint32_t ebp); /* 0xfcc01 */
 void remap_iret_frame_fcc6f(uint32_t ebp); /* 0xfcc6f */
 
+void scanf_store_count_108976(uint32_t eax, uint32_t edx, uint32_t ebx);
+uint32_t scanf_char_108802(uint32_t eax, uint32_t edx);
+uint32_t scanf_string_108888(uint32_t eax, uint32_t edx);
+uint32_t scanf_set_108a17(uint32_t eax, uint32_t edx, uint32_t ebx);
+void scanf_store_count_108976(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0x108976 */
+uint32_t scanf_char_108802(uint32_t eax, uint32_t edx); /* 0x108802 */
+uint32_t scanf_string_108888(uint32_t eax, uint32_t edx); /* 0x108888 */
+uint32_t scanf_set_108a17(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0x108a17 */
+
 #endif

@@ -21789,3 +21789,151 @@ void remap_iret_frame_fcc6f(uint32_t ebp)
     if (EF_U16(f + 0xe) == 2 && EF_U16(f + 0x14) == EF_U16(0x17bf74))
         EF_U32(f + 0x10) = remap_handler_c4310(EF_U32(f + 0x10));
 }
+
+/* Fetch the next destination pointer (offset only; segment dropped) from the va_list cell at vap, advancing it by 8 for far (flag 4) or 4 otherwise. */
+static uint32_t scanf_fetch_dest(uint32_t flags, uint32_t vap)
+{
+    uint32_t va = EF_U32(vap);
+    uint32_t step = (flags & 4u) ? 8u : 4u;
+    EF_U32(vap) = va + step;
+    return EF_U32(va);
+}
+
+/* 0x108976, 94 bytes. Store the running character count in EBX through the next destination pointer (16-bit when flag 0x10, else 32-bit) when the store flag (obj+0x10 bit 0) is set. */
+void scanf_store_count_108976(uint32_t eax, uint32_t edx, uint32_t ebx)
+{
+    uint32_t flags = EF_U8(eax + 0x10u);
+    uint32_t dest;
+    if ((flags & 1u) == 0u)
+        return;
+    dest = scanf_fetch_dest(flags, edx);
+    if (EF_U8(eax + 0x10u) & 0x10u)
+        EF_U16(dest) = (uint16_t)ebx;
+    else
+        EF_U32(dest) = ebx;
+}
+
+/* 0x108802, 134 bytes. scanf %c: read up to width (default 1) characters through [obj], storing bytes (words with flag 0x20) at the destination; returns the number read. */
+uint32_t scanf_char_108802(uint32_t eax, uint32_t edx)
+{
+    uint32_t obj = eax;
+    uint32_t dest = 0u;
+    uint32_t width;
+    uint32_t count = 0u;
+    uint32_t c;
+    if (EF_U8(obj + 0x10u) & 1u)
+        dest = scanf_fetch_dest(EF_U8(obj + 0x10u), edx);
+    width = EF_U32(obj + 0xcu);
+    if (width == 0xffffffffu)
+        width = 1u;
+    while ((int32_t)width > 0) {
+        c = guest_callptr_eax_ret_x(EF_U32(obj), obj);
+        if (EF_U8(obj + 0x10u) & 2u)
+            break;
+        count++;
+        width--;
+        if (EF_U8(obj + 0x10u) & 1u) {
+            if (EF_U8(obj + 0x10u) & 0x20u) {
+                EF_U16(dest) = (uint16_t)c;
+                dest += 2u;
+            } else {
+                EF_U8(dest) = (uint8_t)c;
+                dest += 1u;
+            }
+        }
+    }
+    return count;
+}
+
+/* 0x108888, 238 bytes. scanf %s: skip leading whitespace, then copy non-whitespace characters (bytes, or words with flag 0x20) and NUL-terminate; returns the count. */
+uint32_t scanf_string_108888(uint32_t eax, uint32_t edx)
+{
+    uint32_t obj = eax;
+    uint32_t size = (EF_U8(obj + 0x10u) & 0x20u) ? 2u : 1u;
+    uint32_t dest = 0u;
+    uint32_t count = 0u;
+    uint32_t c;
+    uint32_t w;
+    if (EF_U8(obj + 0x10u) & 1u)
+        dest = scanf_fetch_dest(EF_U8(obj + 0x10u), edx);
+    for (;;) {
+        c = guest_callptr_eax_ret_x(EF_U32(obj), obj);
+        if ((EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 2u) == 0u)
+            break;
+        /* ORIGINAL BUG: skipped whitespace is counted in the result. */
+        count++;
+    }
+    if (EF_U8(obj + 0x10u) & 2u) {
+        count = 0u;
+    } else {
+        w = EF_U32(obj + 0xcu);
+        EF_U32(obj + 0xcu) = w - 1u;
+        for (;;) {
+            if (w == 0u) {
+                guest_callptr_eaxedx_x(EF_U32(obj + 4u), c, obj);
+                break;
+            }
+            count++;
+            if (EF_U8(obj + 0x10u) & 1u) {
+                if (size == 1u)
+                    EF_U8(dest) = (uint8_t)c;
+                else
+                    EF_U16(dest) = (uint16_t)c;
+                dest += size;
+            }
+            c = release_ref_108ffa(obj);
+            if (c == 0xffffffffu)
+                break;
+            if (EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 2u) {
+                guest_callptr_eaxedx_x(EF_U32(obj + 4u), c, obj);
+                break;
+            }
+            w = 1u;
+        }
+    }
+    if ((EF_U8(obj + 0x10u) & 1u) && (int32_t)count > 0) {
+        if (size == 1u)
+            EF_U8(dest) = 0u;
+        else
+            EF_U16(dest) = 0u;
+    }
+    return count;
+}
+
+/* 0x108a17, 230 bytes. scanf %[...]: EBX points at the format cursor just past '['; build the (optionally '^'-negated) set, then copy matching characters to the destination and NUL-terminate; returns the count. */
+uint32_t scanf_set_108a17(uint32_t eax, uint32_t edx, uint32_t ebx)
+{
+    uint32_t obj = eax;
+    uint8_t set[0x20];
+    uint32_t neg = (EF_U8(EF_U32(ebx)) == 0x5eu) ? 1u : 0u;
+    uint32_t dest = 0u;
+    uint32_t count = 0u;
+    uint32_t width;
+    uint32_t c;
+    if (neg)
+        EF_U32(ebx) = EF_U32(ebx) + 1u;
+    EF_U32(ebx) = build_char_set(EF_U32(ebx), (uint32_t)(uintptr_t)set);
+    if (EF_U8(obj + 0x10u) & 1u)
+        dest = scanf_fetch_dest(EF_U8(obj + 0x10u), edx);
+    width = EF_U32(obj + 0xcu);
+    while (width != 0u) {
+        uint32_t absent;
+        c = guest_callptr_eax_ret_x(EF_U32(obj), obj);
+        if (EF_U8(obj + 0x10u) & 2u)
+            break;
+        absent = ((set[(c >> 3) & 0x1fu] & EF_U8(0x00195c58u + (c & 7u))) == 0u) ? 1u : 0u;
+        if (absent != neg) {
+            guest_callptr_eaxedx_x(EF_U32(obj + 4u), c, obj);
+            break;
+        }
+        count++;
+        width--;
+        if (EF_U8(obj + 0x10u) & 1u) {
+            EF_U8(dest) = (uint8_t)c;
+            dest++;
+        }
+    }
+    if ((EF_U8(obj + 0x10u) & 1u) && (int32_t)count > 0)
+        EF_U8(dest) = 0u;
+    return count;
+}
