@@ -5400,4 +5400,7 @@ void init_serial_port_e0930(void);
 ef_addr32 localtime_1100d2(ef_addr32 timep, ef_addr32 tm);
 uint32_t guest_fn_10e97f_ret_x(ef_addr32 tm); /* 0x10e97f EAX -> EAX */
 
+void set_serial_divisor_e06ac(void);
+void push_ring_record_8fbc8(ef_addr32 src);
+
 #endif

@@ -1844,7 +1844,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008f9e8	111	install_handlers_8f9e8	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008f9e8.json	docs/compiler-abi.md; Install the table of nine handler addresses at 0x158f4c.; callers 3ea0c@3ee32; guest pending
 0x0008fa58	43	convert_navigation_vector	vector_math	compiles	game	confirmed	decomp/tests/0x0008fa58.json	docs/compiler-abi.md; Int32[8,0,4] to double[0,8,16] with unaligned 0x18aa0b/13 scales; x87 precision pending; awaiting OMF guest differential
 0x0008fa84	60	init_menu_entries_8fa84	game_helpers22	compiles	game	confirmed	decomp/tests/0x0008fa84.json	docs/compiler-abi.md; Clear ten 24-byte menu entries and load their string handles.; callers 3dd30@3de15; guest pending
-0x0008fbc8	91			unknown	unclassified	unverified		
+0x0008fbc8	91	push_ring_record_8fbc8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008fbc8.json	docs/compiler-abi.md; Append the 24-byte record at SRC (EAX) to the ring of ten records at 0x20f460 (index word 0x2119f0), announce the high h; callers 56a44@56a45; guest pending
 0x0008fc24	180	fade_effect_slots_8fc24	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fc24.json	docs/compiler-abi.md; Fade the ten 24-byte effect slots and relink their records.; callers 3dd30@3e1f8; guest pending
 0x0008fcec	130	name_formation_units_8fcec	game_helpers49	compiles	game	confirmed	decomp/tests/0x0008fcec.json	docs/compiler-abi.md; Name the units of a player's formation from the name table.; callers 4a210@4a806; guest pending
 0x0008fd70	55	build_path_8fd70	game_helpers22	compiles	game	confirmed	decomp/tests/0x0008fd70.json	docs/compiler-abi.md; Build a path from the default directory and three parts.; callers 8fe58@8fe71; guest pending
@@ -3302,7 +3302,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dfac8	1008			unknown	unclassified	unverified		
 0x000dfeb8	145	serial_status_dfeb8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dfeb8.json	docs/compiler-abi.md; Serial line status handler: store (line status (port 0x15eed0 + 5) >> 1) & 0xf in byte 0x15eed5; when bit 3 of that is s; callers none direct; guest pending
 0x000dff4c	24	poll_serial_dff4c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000dff4c.json	docs/compiler-abi.md; Poll the serial line status register (port dword 0x15eed0 + 5): when its data-ready bit is set call the receive handler ; callers none direct; guest pending
-0x000e06ac	77			unknown	unclassified	unverified		
+0x000e06ac	77	set_serial_divisor_e06ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e06ac.json	docs/compiler-abi.md; Set the serial divisor for the state record at dword 0x15eec0: take the divisor word from the table at 0xdf290 indexed b; callers e1194@e1199; guest pending
 0x000e0870	111	fill_channel_e0870	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000e0870.json	docs/compiler-abi.md; Fill the channel record selected by byte 0x15f07f.; callers e1194@e1194; guest pending
 0x000e0930	81	init_serial_port_e0930	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e0930.json	docs/compiler-abi.md; Program the serial port at base dword 0x15eed0 (nothing when it is zero): clear the modem control (base + 4), set the in; callers e0a90@e0aee; guest pending
 0x000e0a90	116			unknown	unclassified	unverified		

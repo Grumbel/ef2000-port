@@ -7355,3 +7355,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xe0930` | none | none | e0a90@e0aee | Program the serial port at base dword 0x15eed0 (nothing when it is zero): clear the modem control (base + 4), set the in |
 | `0x1100d2` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 110123@110129 | localtime: break the time_t at TIMEP (EAX) into TM (EDX) relative to the epoch day 0x63df using the zone offset dword 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe06ac` | none | none | e1194@e1199 | Set the serial divisor for the state record at dword 0x15eec0: take the divisor word from the table at 0xdf290 indexed b |
+| `0x8fbc8` | EAX:ef_addr32 | none | 56a44@56a45 | Append the 24-byte record at SRC (EAX) to the ring of ten records at 0x20f460 (index word 0x2119f0), announce the high h |

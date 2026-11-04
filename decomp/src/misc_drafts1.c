@@ -11181,3 +11181,32 @@ ef_addr32 localtime_1100d2(ef_addr32 timep, ef_addr32 tm)
         (void)break_down_time_10ec62(0x63dfu, secs, (int32_t)(EF_U32(0x0017d554u) - EF_U32(0x0017d558u)), tm);
     return tm;
 }
+
+/* 0xe06ac, 77 bytes. Set the serial divisor for the state record at dword 0x15eec0: take the divisor word from the table at 0xdf290 indexed by byte +0xa, store it at +0xc, set byte +5 = 3, open the divisor latch (base + 3 = 0x80), write the low and high divisor bytes to base and base + 1 and set the line control (base + 3) to 3. */
+void set_serial_divisor_e06ac(void)
+{
+    ef_addr32 st = EF_U32(0x0015eec0u);
+    uint32_t div = EF_U16(0x000df290u + (uint32_t)EF_U8(st + 0xau) * 2u);
+    uint32_t base;
+    EF_U8(st + 5u) = 3u;
+    EF_U16(st + 0xcu) = (uint16_t)div;
+    guest_fn_117b0c(EF_U32(0x0015eed0u) + 3u, 0x80u);
+    base = EF_U32(0x0015eed0u);
+    guest_fn_117b0c(base, div & 0xffu);
+    guest_fn_117b0c(base + 1u, (div >> 8) & 0xffu);
+    guest_fn_117b0c(base + 3u, 3u);
+}
+
+/* 0x8fbc8, 91 bytes. Append the 24-byte record at SRC (EAX) to the ring of ten records at 0x20f460 (index word 0x2119f0), announce the high half of its dword +0x14 with 0x9e508 and advance the index, wrapping to 0 at ten. */
+void push_ring_record_8fbc8(ef_addr32 src)
+{
+    int32_t idx = (int32_t)EF_U32(0x002119eeu) >> 16;
+    ef_addr32 dst = 0x0020f460u + (uint32_t)(idx * 24);
+    uint32_t i;
+    for (i = 0u; i < 24u; i++)
+        EF_U8(dst + i) = EF_U8(src + i);
+    guest_fn_9e508((int32_t)EF_U32(dst + 0x14u) >> 16, 0u);
+    EF_U16(0x002119f0u) = (uint16_t)(EF_U16(0x002119f0u) + 1u);
+    if (((int32_t)EF_U32(0x002119eeu) >> 16) >= 10)
+        EF_U16(0x002119f0u) = 0u;
+}
