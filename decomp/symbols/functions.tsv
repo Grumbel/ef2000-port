@@ -1894,7 +1894,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091c20	19	clear_scene_event_counters	scene_state	compiles	game	confirmed	decomp/tests/0x00091c20.json	docs/compiler-abi.md
 0x00091c34	17	scene_words_differ	misc_state	compiles	game	confirmed	decomp/tests/0x00091c34.json	docs/compiler-abi.md; word 0x2144ae != word 0x2144ac; callers 1c780@1cb47,1c780@1cc61; guest pending
 0x00091c48	80	record_scene_event	scene_state	compiles	game	confirmed	decomp/tests/0x00091c48.json	docs/compiler-abi.md
-0x00091c98	257			unknown	unclassified	unverified		
+0x00091c98	257	advance_view_queue_91c98	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00091c98.json	docs/compiler-abi.md; Advance the camera-preset queue: when the read index (word 0x2144ae) has not caught up with the write index (word 0x2144; callers 3dd30@3e802; guest pending
 0x00091d9c	85	configure_scene_angle_triplet	scene_controls	compiles	game	confirmed	decomp/tests/0x00091d9c.json	docs/compiler-abi.md; Init 0x214404 then callbacks for DX/AX/BX low words; mirror at 0x2144b6/b4/b0; awaiting OMF guest differential
 0x00091df4	314	nudge_view_orientation_91df4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00091df4.json	docs/compiler-abi.md; Apply the key-driven orientation nudges (byte flags 0x2144aa: 1/2 adjust the scratch matrix 0x21439c by +/-0x800, 4/8 ro; callers 1c780@1cc33,1c780@1cd71,94194@941a5; guest pending
 0x00091f30	249	apply_orientation_input_91f30	game_helpers54	compiles	game	confirmed	decomp/tests/0x00091f30.json	docs/compiler-abi.md; Apply the pending yaw and roll input to the scene orientation.; callers 9357c@935c6,9357c@935de; guest pending

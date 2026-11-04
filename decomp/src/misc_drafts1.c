@@ -8820,3 +8820,36 @@ void build_render_list_d2d7c(uint32_t list, uint32_t count)
 {
     build_render_list_shifted(list, count, EF_U32(0x00158f0cu) != 0u ? EF_U32(0x0015b884u) : EF_U32(0x0015b888u));
 }
+
+/* 0x91c98, 257 bytes. Advance the camera-preset queue: when the read index (word 0x2144ae) has not caught up with the write index (word 0x2144ac), switch the viewpoint byte 0x12db9e to the queued entry (byte table 0x214428, 2 bytes per entry; the previous value is remembered in 0x214486), set byte 0x1f88fc to 3, move the pending words 0x122c7a / 0x122c7c to 0x1f88f4 / 0x1f88f2 (unless -1), reset them to -1 and set word 0x2144b2 to 0xfa; otherwise reset both indices. Then apply a pending roll (word 0x122c54 into 0x12dba0) and, if word 0x2144a2 is set, copy the record 0x12dc10 over 0x12dbec; finally clear 0x2144a2, 0x122c54 and byte 0x12dbc4. */
+void advance_view_queue_91c98(void)
+{
+    uint16_t roll;
+    if (EF_U16(0x002144aeu) == EF_U16(0x002144acu)) {
+        EF_U16(0x002144acu) = 0u;
+        EF_U16(0x002144aeu) = 0u;
+    } else {
+        int16_t idx;
+        if (EF_U8(0x00214486u) != EF_U8(0x0012db9eu))
+            EF_U16(0x00214486u) = EF_U8(0x0012db9eu);
+        idx = (int16_t)EF_U16(0x002144aeu);
+        EF_U8(0x0012db9eu) = EF_U8(0x00214428u + (uint32_t)(int32_t)idx * 2u);
+        EF_U8(0x001f88fcu) = 3u;
+        EF_U16(0x002144aeu) = (uint16_t)(idx + 1);
+        if ((int16_t)EF_U16(0x00122c7au) != -1)
+            EF_U16(0x001f88f4u) = EF_U16(0x00122c7au);
+        if ((int16_t)EF_U16(0x00122c7cu) != -1)
+            EF_U16(0x001f88f2u) = EF_U16(0x00122c7cu);
+        EF_U16(0x00122c7au) = 0xffffu;
+        EF_U16(0x00122c7cu) = 0xffffu;
+        EF_U16(0x002144b2u) = 0xfau;
+    }
+    roll = EF_U16(0x00122c54u);
+    if (roll != 0u)
+        EF_U16(0x0012dba0u) = roll;
+    if (EF_U16(0x002144a2u) != 0u)
+        copy_record9_d0858(0x0012dbecu, 0x0012dc10u);
+    EF_U16(0x002144a2u) = 0u;
+    EF_U16(0x00122c54u) = 0u;
+    EF_U8(0x0012dbc4u) = 0u;
+}

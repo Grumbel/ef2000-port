@@ -5240,4 +5240,6 @@ void build_render_list_d2704(uint32_t list, uint32_t count);
 void build_render_list_d2c84(uint32_t list, uint32_t count);
 void build_render_list_d2d7c(uint32_t list, uint32_t count);
 
+void advance_view_queue_91c98(void);
+
 #endif
