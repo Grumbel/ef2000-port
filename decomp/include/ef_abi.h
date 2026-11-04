@@ -5165,4 +5165,6 @@ void compute_turn_rate_6eaf4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
 
 double estimate_coefficient_6c1f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double x);
 
+uint32_t strstr_e7d27(uint32_t hay, uint32_t needle);
+
 #endif

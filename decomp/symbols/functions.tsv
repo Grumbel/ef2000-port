@@ -3425,7 +3425,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e7c90	64	get_page_word_e7c90	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c90.json	docs/compiler-abi.md; Read a word from the 0x190c3c page table entry, or 0.; callers 68e84@68e9e; guest pending
 0x000e7cd0	28	append_two_e7cd0	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000e7cd0.json	docs/compiler-abi.md; Append a fixed string and then second to first.; callers e7cec@e7d1f; guest pending
 0x000e7cec	59	build_path_with_name_e7cec	game_helpers91	compiles	game	confirmed	decomp/tests/0x000e7cec.json	docs/compiler-abi.md; Build a path from the default directory plus two parts, appending the third part unless it equals the string at 0x190c50; callers 69094@691c8,8b2d8@8b2f9,d9e50@d9fad; guest pending
-0x000e7d27	194			unknown	unclassified	unverified		
+0x000e7d27	194	strstr_e7d27	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e7d27.json	docs/compiler-abi.md; strstr(HAY = EAX, NEEDLE = EDX): the first occurrence of NEEDLE in HAY, or 0. An empty needle returns HAY; a one-charact; callers 69094@69264,c3364@c337d; guest pending
 0x000e7df4	36			unknown	unclassified	unverified		
 0x000e7e30	113	rebuild_remap_table_e7e30	page_rotate1	compiles	game	confirmed	decomp/tests/0x000e7e30.json	docs/compiler-abi.md; Rebuild the 0x8000-byte remap table at [0x164604] by looking each byte of its upper half up in the 0x433f34 tables, unle; callers 759b8@75c6c,c8e58@c8f0d,c8f38@c8fc4; guest pending
 0x000e7ea4	177			unknown	unclassified	unverified		

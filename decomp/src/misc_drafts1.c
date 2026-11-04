@@ -7997,3 +7997,41 @@ double estimate_coefficient_6c1f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_
     return r;
 #undef EF_D
 }
+
+/* 0xe7d27, 194 bytes. strstr(HAY = EAX, NEEDLE = EDX): the first occurrence of NEEDLE in HAY, or 0. An empty needle returns HAY; a one-character needle is a plain character scan (the terminator never matches). */
+uint32_t strstr_e7d27(uint32_t hay, uint32_t needle)
+{
+    uint32_t n, end, p, i;
+    uint8_t c0 = EF_U8(needle);
+    if (c0 == 0u)
+        return hay;
+    if (EF_U8(needle + 1u) == 0u) {
+        for (p = hay;; p++) {
+            uint8_t c = EF_U8(p);
+            if (c == c0)
+                return p;
+            if (c == 0u)
+                return 0u;
+        }
+    }
+    for (end = hay; EF_U8(end) != 0u; end++)
+        ;
+    for (n = 0; EF_U8(needle + n) != 0u; n++)
+        ;
+    p = hay;
+    for (;;) {
+        uint32_t left = end - p;
+        if ((int32_t)left < (int32_t)n)
+            return 0u;
+        for (i = 0; i < left && EF_U8(p + i) != c0; i++)
+            ;
+        if (i >= left)
+            return 0u;
+        p += i;
+        for (i = 0; i < n && EF_U8(p + i) == EF_U8(needle + i); i++)
+            ;
+        if (i == n)
+            return p;
+        p++;
+    }
+}
