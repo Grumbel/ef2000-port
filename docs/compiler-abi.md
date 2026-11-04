@@ -4178,3 +4178,12 @@ in EAX, format string address, one value).
 | `0xd6024` | none | none | d5ec0@d5eef | Send two controller messages on each of the 16 MIDI channels (reset sequence). |
 | `0xdcc98` | AL:uint8_t,DX:int16_t,BX:int16_t,CX:int16_t | AL:uint8_t | dccd8@dcd27 | Look up a 6-bit code in the table at 0x15e1be and dispatch it to cf7c4; returns the entry's count + 1. |
 | `0xdd164` | AL:uint8_t,DX:int16_t,BX:int16_t,CX:int16_t | AL:uint8_t | dd1b0@dd203 | Same lookup as dcc98 with code 0xa5 remapped to 0x4e and the second table set. |
+
+## game_helpers88 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc2f80` | EAX:ef_addr32 | none | c3584@c3608 | Fill a 512-byte table: for each of the 8 bit values and 16 nibble patterns write four bytes (the bit value where the pat |
+| `0xce578` | EAX:int32_t,EDX:int32_t,EBX:int32_t | EAX:int32_t | ce5f8@ce60f,ce5f8@ce62a | Approximate 3D distance: 15/16 of the largest absolute component plus 3/8 of the other two. |
+| `0xd1fc0` | EAX:ef_addr32 | none | d2130@d2144 | Compute (once) the 2D bounding box of an object's vertex list into fields 0x10..0x1c. |
+| `0xcb55c` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | none | b0f5c@b146d | Mark records whose map cell (position / 10, 40 cells per row) passes the cc1ac test as used. |

@@ -2725,7 +2725,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c1c24	151			unknown	unclassified	unverified		
 0x000c1e3c	136			unknown	unclassified	unverified		
 0x000c1ee8	4139			unknown	unclassified	unverified		
-0x000c2f80	125			unknown	unclassified	unverified		
+0x000c2f80	125	fill_bit_pattern_table_c2f80	game_helpers88	compiles	game	confirmed	decomp/tests/0x000c2f80.json	docs/compiler-abi.md; Fill a 512-byte table: for each of the 8 bit values and 16 nibble patterns write four bytes (the bit value where the pat; callers c3584@c3608; guest pending
 0x000c32dc	76	alloc_work_block_c32dc	runtime_helpers22	compiles	game	confirmed	decomp/tests/0x000c32dc.json	docs/compiler-abi.md; Allocate the work block from either pool depending on its size.; callers c3430@c345c; guest pending
 0x000c3328	58	release_mode_buffer_c3328	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000c3328.json	docs/compiler-abi.md; Release the buffer at 0x41f3bc according to its mode byte.; callers c34cc@c3501,c36b4@c3709,c3714@c375c; guest pending
 0x000c3364	203			unknown	unclassified	unverified		
@@ -2875,7 +2875,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cafc8	443			unknown	unclassified	unverified		
 0x000cb184	111	mark_matching_records_cb184	game_helpers86	compiles	game	confirmed	decomp/tests/0x000cb184.json	docs/compiler-abi.md; Mark up to count pristine records matching type and position as used.; callers none direct; guest pending
 0x000cb3c4	408			unknown	unclassified	unverified		
-0x000cb55c	155			unknown	unclassified	unverified		
+0x000cb55c	155	mark_records_by_map_cell_cb55c	game_helpers88	compiles	game	confirmed	decomp/tests/0x000cb55c.json	docs/compiler-abi.md; Mark records whose map cell (position / 10, 40 cells per row) passes the cc1ac test as used.; callers b0f5c@b146d; guest pending
 0x000cb5f8	26	find_node_by_word_cb5f8	list_lookup	compiles	game	confirmed	decomp/tests/0x000cb5f8.json	docs/compiler-abi.md; Identical body to 0xc1b8c.; callers cb800@cb876,cb800@cb897; guest pending
 0x000cb614	116	clear_indexed_subentry_flags_cb614	game_helpers86	compiles	game	confirmed	decomp/tests/0x000cb614.json	docs/compiler-abi.md; For type-3 table entries clear a flag byte of the indexed sub-entry of the n-th list record.; callers b0f5c@b12fb; guest pending
 0x000cb688	90	tick_slot_timers_cb688	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cb688.json	docs/compiler-abi.md; Count down the per-slot timers of every node and reload expired ones.; callers b0f5c@b136a; guest pending
@@ -2968,7 +2968,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ce498	68			unknown	unclassified	unverified		
 0x000ce4dc	64			unknown	unclassified	unverified		
 0x000ce550	39			unknown	unclassified	unverified		
-0x000ce578	125			unknown	unclassified	unverified		
+0x000ce578	125	approx_distance3_ce578	game_helpers88	compiles	game	confirmed	decomp/tests/0x000ce578.json	docs/compiler-abi.md; Approximate 3D distance: 15/16 of the largest absolute component plus 3/8 of the other two.; callers ce5f8@ce60f,ce5f8@ce62a; guest pending
 0x000ce5f8	553			unknown	unclassified	unverified		
 0x000ce824	11	counted_array_append	code_predicates	compiles	game	confirmed	decomp/tests/0x000ce824.json	docs/compiler-abi.md; Append EDX to the counted array at EAX (count dword at +0).; callers ce830@ce8c6,ce830@ce8dc,ce830@ce8f8; guest pending
 0x000ce830	275			unknown	unclassified	unverified		
@@ -3027,7 +3027,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d1f10	73	install_handlers_d1f10	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d1f10.json	docs/compiler-abi.md; Install the four handler pairs.; callers 69fac@69fbd; guest pending
 0x000d1f5c	41	copy_four_dwords_15b87c	code_predicates	compiles	game	confirmed	decomp/tests/0x000d1f5c.json	docs/compiler-abi.md; Copy dwords 0x15b88c..98 to 0x15b87c..88.; callers none direct; guest pending
 0x000d1f88	53			unknown	unclassified	unverified		
-0x000d1fc0	127			unknown	unclassified	unverified		
+0x000d1fc0	127	compute_vertex_bounds_d1fc0	game_helpers88	compiles	game	confirmed	decomp/tests/0x000d1fc0.json	docs/compiler-abi.md; Compute (once) the 2D bounding box of an object's vertex list into fields 0x10..0x1c.; callers d2130@d2144; guest pending
 0x000d2040	205			unknown	unclassified	unverified		
 0x000d2110	30	forward_record_d2110	code_predicates	compiles	game	confirmed	decomp/tests/0x000d2110.json	docs/compiler-abi.md; 0xfc8cc(dword [p], p+4) for p = dword +0x4c; set bit 0 of byte +0x2c.; callers d23d8@d2437,d299c@d2a3f; guest pending
 0x000d2130	416			unknown	unclassified	unverified		

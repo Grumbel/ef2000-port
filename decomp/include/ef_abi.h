@@ -3731,4 +3731,10 @@ uint8_t dispatch_code_table_b_dd164(uint8_t code, int16_t dx_val, int16_t bx_val
 void guest_fn_cf7c4_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcf7c4 4 stack, callee cleanup */
 void guest_fn_d605c_x(uint32_t a, uint32_t b, uint32_t c); /* 0xd605c EAX EDX EBX */
 
+/* game_helpers88.c */
+void fill_bit_pattern_table_c2f80(ef_addr32 table);
+int32_t approx_distance3_ce578(int32_t a, int32_t b, int32_t c);
+void compute_vertex_bounds_d1fc0(ef_addr32 object);
+void mark_records_by_map_cell_cb55c(ef_addr32 list, ef_addr32 map, uint32_t extra);
+
 #endif
