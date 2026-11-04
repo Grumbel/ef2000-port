@@ -5857,4 +5857,6 @@ void guest_fn_69094_x(uint32_t name); /* 0x69094 EAX */
 void latch_box_69540(ef_addr32 first, ef_addr32 second);
 uint32_t guest_fn_cd24c_x(void); /* 0xcd24c -> AX */
 
+uint32_t advance_to_nearby_object_6aa70(uint32_t ax);
+
 #endif

@@ -16383,3 +16383,44 @@ void latch_box_69540(ef_addr32 first, ef_addr32 second)
 		guest_fn_e7c50((int32_t)EF_U32(0x001282dau) >> 16, (int32_t)EF_U32(0x001f6f40u) >> 16, (uint32_t)((int32_t)EF_U32(0x001282deu) >> 16));
 	EF_U32(0x001282e0u) = 0xffffffffu;
 }
+
+/* 0x6aa70, 316 bytes. Advance the next-object link (word +0x16a, selected through the free-object finder 0x9075c) of unit AX (signed) until an object is found that is close to the unit. Returns 0 for a missing unit. The link is advanced once and the new value remembered; the loop then advances it again and, for a link other than 0xff, looks the object up (0x8ffe8) and, when the class test 0x2e910 (class byte +0x15 of the unit's record, kind byte +0x1d of the object's table row) accepts it and the scaled distance (0x37bc8) is below the double at 0x18638c, sets a found flag. It stops after twice the count in the high half of dword 0x211ade steps (returning 0), when the link wraps back to the remembered value, when the flag is set or when the link reaches 0xff; returns 1 unless the final link is 0xff. */
+uint32_t advance_to_nearby_object_6aa70(uint32_t ax)
+{
+	uint32_t unit, obj, remembered, cls, kind, rec;
+	int32_t steps = 0;
+	uint8_t found = 0;
+	double d, limit;
+	int16_t cur;
+
+	unit = guest_fn_7489c((int32_t)(int16_t)ax);
+	if (unit == 0u)
+		return 0u;
+	remembered = next_free_object_9075c((uint32_t)((int32_t)EF_U32(unit + 0x168u) >> 16));
+	EF_U16(unit + 0x16au) = (uint16_t)remembered;
+	for (;;) {
+		EF_U16(unit + 0x16au) = (uint16_t)next_free_object_9075c((uint32_t)((int32_t)EF_U32(unit + 0x168u) >> 16));
+		cur = (int16_t)((int32_t)EF_U32(unit + 0x168u) >> 16);
+		if (cur != 0xff) {
+			obj = guest_lookup_object_8ffe8(cur);
+			if (obj != 0u) {
+				kind = EF_U8(EF_U32(0x001a14f8u) + (uint32_t)(((int32_t)EF_U32(obj + 0x36u) >> 16) * 0x45) + 0x1du);
+				rec = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+				cls = EF_U8(rec + 0x15u);
+				if ((guest_fn_2e910_x(cls, kind) & 0xffu) != 0u) {
+					d = scaled_pair_distance_37bc8(unit + 0x49u, (int16_t)((int32_t)EF_U32(obj + 0x36u) >> 16));
+					memcpy(&limit, ef_guest_memory_ptr(0x0018638cu), sizeof limit);
+					if (d < limit)
+						found = 1u;
+				}
+			}
+		}
+		steps++;
+		if ((int32_t)(int16_t)steps > ((int32_t)EF_U32(0x00211adeu) >> 16) * 2)
+			return 0u;
+		if ((uint16_t)remembered == EF_U16(unit + 0x16au) || found != 0u
+		    || ((int32_t)EF_U32(unit + 0x168u) >> 16) == 0xff)
+			break;
+	}
+	return ((int32_t)EF_U32(unit + 0x168u) >> 16) == 0xff ? 0u : 1u;
+}

@@ -8302,3 +8302,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x69540` | EAX:ef_addr32,EDX:ef_addr32 | none | 69740@698f6 | Latch a box defined by two position triples (EAX: three words, EDX: three words) into the cursor state when word 0x1f6f4 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6aa70` | EAX:uint32_t | EAX:uint32_t | 6ae30@6ae60 | Advance the next-object link (word +0x16a, selected through the free-object finder 0x9075c) of unit AX (signed) until an |
