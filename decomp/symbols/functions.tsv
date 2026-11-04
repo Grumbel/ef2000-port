@@ -3865,7 +3865,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00103f04	733			unknown	unclassified	unverified		
 0x001041e4	25	exchange_slot_1041e4	runtime_helpers	compiles	game	confirmed	decomp/tests/0x001041e4.json	docs/compiler-abi.md; Exchange dword 0x4dd7cc[index] with value; return the old one.; callers 101e14@101e40; guest pending
 0x00104200	609			unknown	unclassified	unverified		
-0x00104464	158			unknown	unclassified	unverified		
+0x00104464	158	destroy_record_104464	runtime_helpers37	compiles	game	confirmed	decomp/tests/0x00104464.json	docs/compiler-abi.md; Destroy a record: run its field 0x24 callback with field 0x28, trace-call fields 0x20 and 0x1c, send message 0x306, free; callers 102488@1024ab; guest pending
 0x00104504	121			unknown	unclassified	unverified		
 0x00104580	273			unknown	unclassified	unverified		
 0x00104694	45	shutdown_104694	runtime_helpers	compiles	game	confirmed	decomp/tests/0x00104694.json	docs/compiler-abi.md; Call 0x102488 on each non-null dword 0x4dd670[0..15], then 0x1023b0 and 0x1110c5.; callers 101ddc@101df9; guest pending
@@ -4028,7 +4028,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010f190	47	stream_getc	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f190.json	docs/compiler-abi.md; Read one byte from a counted buffer stream; -1 at the end.; callers 10f107@10f13a,10f107@10f165; guest pending
 0x0010f1bf	171			unknown	unclassified	unverified		
 0x0010f26a	465			unknown	unclassified	unverified		
-0x0010f43b	164			unknown	unclassified	unverified		
+0x0010f43b	164	stream_fputc_10f43b	runtime_helpers37	compiles	game	confirmed	decomp/tests/0x0010f43b.json	docs/compiler-abi.md; fputc: store a character in the stream buffer (expanding newline to CR LF on text streams), flushing when full or line b; callers f1f5a@f20e3; guest pending
 0x0010f4df	17	call_fa95f_from_start	runtime_libc	compiles	game	confirmed	decomp/tests/0x0010f4df.json	docs/compiler-abi.md; 0xfa95f(EAX, 0, 1).; callers f2183@f2227,f227f@f2287; guest pending
 0x0011004b	91	dos_time_hundredths_11004b	game_helpers107	compiles	game	confirmed	decomp/tests/0x0011004b.json	docs/compiler-abi.md; DOS get-time call (int 21h, AH=2Ch) converted to hundredths of a second since midnight.; callers 1100b1@1100b3; guest pending
 0x001100b1	33	elapsed_since_start	runtime_libc	compiles	game	confirmed	decomp/tests/0x001100b1.json	docs/compiler-abi.md; Elapsed value of 0x11004b relative to dword 0x4dd984, wrapping at 0x83d600.; callers none direct; guest pending
@@ -4140,7 +4140,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00117b18	198			unknown	unclassified	unverified		
 0x00117bfc	314			unknown	unclassified	unverified		
 0x00117dd8	50			unknown	unclassified	unverified		
-0x00117e0c	153			unknown	unclassified	unverified		
+0x00117e0c	153	set_serial_rate_117e0c	runtime_helpers37	compiles	game	confirmed	decomp/tests/0x00117e0c.json	docs/compiler-abi.md; Program the serial port at obj+0x1c with a divisor derived from the rate (clamped 300..115200); returns the actual rate,; callers 106f10@106fcd,118290@11836f; guest pending
 0x00117ea8	44	clear_buffered_record_117ea8	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00117ea8.json	docs/compiler-abi.md; Free the buffer of a record and clear the record.; callers 118290@118384,118290@1183a5; guest pending
 0x00117ed4	62	attach_buffer_117ed4	runtime_helpers35	compiles	game	confirmed	decomp/tests/0x00117ed4.json	docs/compiler-abi.md; Attach an object to a holder, allocating the holder's block when missing, and reset the object's header words (last word; callers 117f68@11801d,117f68@118031; guest pending
 0x00117f14	82	alloc_serial_state_117f14	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x00117f14.json	docs/compiler-abi.md; Allocate the 0x1a-byte state block of a serial record.; callers 117f68@11800a; guest pending

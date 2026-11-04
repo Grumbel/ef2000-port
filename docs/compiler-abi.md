@@ -4511,3 +4511,11 @@ in EAX, format string address, one value).
 | `0xfeec8` | EAX:ef_addr32 | none | d663c@d6652 | Upload a 256-entry RGB palette to the VGA DAC (ports 0x3c8/0x3c9), sending only entries that differ from the shadow copy |
 | `0x1052f0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 10585c@105c7f,10683c@106870,106894@1068ac | Once per record: send message 0x401 with the two words at +0x14 and +0x18 (cdecl, record on the stack). |
 | `0x111df0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 111e40@111e65,111ed4@111eda,111ed4@111f16 | If a pending count is set at +0x1a8, send message 0x502 with it and clear the count and +0x1ac (cdecl, record on the sta |
+
+## runtime_helpers37 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x117e0c` | EAX:ef_addr32,EDX:int32_t | EAX:int32_t | 106f10@106fcd,118290@11836f | Program the serial port at obj+0x1c with a divisor derived from the rate (clamped 300..115200); returns the actual rate, |
+| `0x10f43b` | EAX:uint32_t,EDX:ef_addr32 | EAX:int32_t | f1f5a@f20e3 | fputc: store a character in the stream buffer (expanding newline to CR LF on text streams), flushing when full or line b |
+| `0x104464` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 102488@1024ab | Destroy a record: run its field 0x24 callback with field 0x28, trace-call fields 0x20 and 0x1c, send message 0x306, free |

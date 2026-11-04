@@ -1238,6 +1238,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  227  Drafted and Watcom-compiled 2 more functions in game_helpers123 (2110 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  228  Drafted and Watcom-compiled 2 more functions in game_helpers124 (2112 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  229  Drafted and Watcom-compiled 4 more functions in game_helpers125 (2116 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-03  230  Drafted and Watcom-compiled 3 more functions in runtime_helpers37 (2119 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 ```
 
 ---

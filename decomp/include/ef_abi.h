@@ -3947,4 +3947,9 @@ void upload_vga_palette_feec8(ef_addr32 palette);
 void send_record_size_message_1052f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
 void send_pending_count_message_111df0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
 
+/* runtime_helpers37.c */
+int32_t set_serial_rate_117e0c(ef_addr32 obj, int32_t rate);
+int32_t stream_fputc_10f43b(uint32_t c, ef_addr32 stream);
+void destroy_record_104464(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+
 #endif
