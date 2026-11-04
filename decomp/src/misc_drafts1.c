@@ -18755,3 +18755,54 @@ void load_placement_script_3cb2c(ef_addr32 text)
 		EF_U32(EF_U32(0x001264c8u) + 0x2cu) = EF_U32(0x001a2e84u);
 	} while (EF_U8(cur) != 0u);
 }
+
+static double rd_f64_73d50(ef_addr32 base, uint32_t off)
+{
+	double d;
+	memcpy(&d, ef_guest_memory_ptr(base + off), 8);
+	return d;
+}
+
+static uint32_t magic_low_73d50(double v)
+{
+	double t = v + 4503603922337792.0;
+	uint64_t bits;
+	memcpy(&bits, &t, 8);
+	return (uint32_t)bits;
+}
+
+/* 0x73d50, 397 bytes. Convert the unit (AX, sign extended) record's floating point velocity/orientation fields to fixed point words using the add-2^52 rounding trick; the low dwords land at +0x12 (dword), +0x0c, +0x0e, +0x10 (words), +0x00, +0x04, +0x08 (dwords). When the byte at +0xe9 is zero the positions include the +0xa1/+0xb1/+0xb9/+0xc9/+0xd1/+0xe1 offsets scaled by 3.4834 and -1.0683. */
+void store_fixed_point_state_73d50(int32_t unit)
+{
+	ef_addr32 u;
+	double t20, t28, t18, t10, t08, t30, t00;
+	const double c1 = 0.3183098861827565, c2 = 0.4101049868766404;
+	const double k1 = 3.483428571428572, k2 = -1.068251428571429;
+
+	u = guest_fn_7489c((int32_t)(int16_t)unit);
+	if (u == 0u)
+		return;
+	t20 = rd_f64_73d50(u, 0x91u) * 65536.0 * 1.942;
+	t28 = -rd_f64_73d50(u, 0x69u) * c1 * 32767.0;
+	t18 = rd_f64_73d50(u, 0x61u) * c1 * 32767.0;
+	t10 = -rd_f64_73d50(u, 0x71u) * c1 * 32767.0;
+	if (EF_U8(u + 0xe9u) == 0u) {
+		double x = rd_f64_73d50(u, 0x49u) + rd_f64_73d50(u, 0xa1u) * k1 + rd_f64_73d50(u, 0xb1u) * k2;
+		double y = rd_f64_73d50(u, 0x51u) + rd_f64_73d50(u, 0xb9u) * k1 + rd_f64_73d50(u, 0xc9u) * k2;
+		double z = rd_f64_73d50(u, 0x59u) + rd_f64_73d50(u, 0xd1u) * k1 + rd_f64_73d50(u, 0xe1u) * k2;
+		t08 = x * c2 * 256.0;
+		t30 = y * c2 * 256.0;
+		t00 = z * c2 * 256.0;
+	} else {
+		t08 = rd_f64_73d50(u, 0x49u) * c2 * 256.0;
+		t30 = rd_f64_73d50(u, 0x51u) * c2 * 256.0;
+		t00 = rd_f64_73d50(u, 0x59u) * c2 * 256.0;
+	}
+	EF_U32(u + 0x12u) = magic_low_73d50(t20);
+	EF_U16(u + 0x0cu) = (uint16_t)magic_low_73d50(t28);
+	EF_U16(u + 0x0eu) = (uint16_t)magic_low_73d50(t18);
+	EF_U16(u + 0x10u) = (uint16_t)magic_low_73d50(t10);
+	EF_U32(u) = magic_low_73d50(t30);
+	EF_U32(u + 4u) = magic_low_73d50(t00);
+	EF_U32(u + 8u) = magic_low_73d50(t08);
+}

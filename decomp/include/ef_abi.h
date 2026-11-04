@@ -5983,4 +5983,6 @@ void update_widget_extent_a558c(ef_addr32 obj);
 
 void load_placement_script_3cb2c(ef_addr32 text);
 
+void store_fixed_point_state_73d50(int32_t unit);
+
 #endif

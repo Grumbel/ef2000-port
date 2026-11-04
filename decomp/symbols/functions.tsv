@@ -1355,7 +1355,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00073964	699			unknown	unclassified	unverified		
 0x00073c38	228	hail_next_unit_73c38	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00073c38.json	docs/compiler-abi.md; Round-robin hail: for the unit UNIT (AX) advance its cursor byte +0x142 (wrapping to 0 at the signed word 0x2119f4) and ; callers 6c8e0@6c913; guest pending
 0x00073d1c	52	clear_unit_flag_73d1c	game_helpers5	compiles	game	confirmed	decomp/tests/0x00073d1c.json	docs/compiler-abi.md; Clear a unit flag one time in five.; callers 6c8e0@6c920,72944@72c4d; guest pending
-0x00073d50	397			unknown	unclassified	unverified		
+0x00073d50	397	store_fixed_point_state_73d50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00073d50.json	docs/compiler-abi.md; Convert the unit (AX, sign extended) record's floating point velocity/orientation fields to fixed point words using the ; callers 6d38c@6d68a,7222c@72386,72390@72499; guest pending
 0x00073ee0	513			unknown	unclassified	unverified		
 0x000740e4	267	assign_roster_slot_740e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000740e4.json	docs/compiler-abi.md; Assign the unit A to the slot SLOT (stack byte, 0xff = none) of its owner's roster: the unit's previous slot (byte +0x20; callers 7ae4@7b21,7bc0@7c96,2ced4@2d0b7; guest pending
 0x000741f0	53	report_tactical_object_action	record_transitions	compiles	game	confirmed	decomp/tests/0x000741f0.json	docs/compiler-abi.md; host model; guest differential pending
