@@ -5418,4 +5418,6 @@ void rescale_dialog_widgets_35de0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_
 void finish_trace_c594(void);
 void guest_fn_b3084_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6); /* 0xb3084 EAX/EDX/EBX/ECX, ret 0x1c */
 
+void rebuild_angle_record_942cc(void);
+
 #endif

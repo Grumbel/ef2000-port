@@ -11259,3 +11259,21 @@ void finish_trace_c594(void)
     EF_U8(0x00126577u) = 0u;
     set_pending_name_ac7a8(0x0018099cu);
 }
+
+/* 0x942cc, 162 bytes. Rebuild the 9-dword record at 0x21439c from the template 0x12dbec: set its word at +0x0e from 0xd13dc(0x400), classify the angle (0x92070), rotate by 0xd0ebc(0), and if the signed high word at 0x12db98 exceeds 0x6800 call 0x95018 and rotate again by 0xfc00. Then rotate by 0xf800 (0xd0dbc, EBX undefined in the original), back-copy the record to 0x12dbec, run 0x93a8c and finally store the record in the second buffer 0x2143c0 via 0xd099c. */
+void rebuild_angle_record_942cc(void)
+{
+    guest_fn_d099c(0x0021439cu, 0x0012dbecu);
+    EF_U16(0x0012db9au) = (uint16_t)guest_fn_d13dc(0x0021439cu, 0x400u);
+    guest_fn_92070();
+    guest_fn_d0ebc(0x0021439cu, 0u);
+    if (((int32_t)EF_U32(0x0012db98u) >> 16) > 0x6800) {
+        guest_fn_95018();
+        guest_fn_d0ebc(0x0021439cu, 0xfc00u);
+    }
+    memcpy_dc832(0x002143c0u, 0x0021439cu, 36u);
+    guest_fn_d0dbc(0x0021439cu, 0xf800u, 0u);
+    guest_fn_d099c(0x0012dbecu, 0x0021439cu);
+    guest_fn_93a8c();
+    guest_fn_d099c(0x0012dbecu, 0x002143c0u);
+}
