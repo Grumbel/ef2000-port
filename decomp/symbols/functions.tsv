@@ -304,7 +304,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001a3cc	176			unknown	unclassified	unverified		
 0x0001a47c	259			unknown	unclassified	unverified		
 0x0001a580	1595			unknown	unclassified	unverified		
-0x0001abbc	195			unknown	unclassified	unverified		
+0x0001abbc	195	try_fire_selected_weapon_1abbc	game_helpers53	compiles	game	confirmed	decomp/tests/0x0001abbc.json	docs/compiler-abi.md; Run the fire action when the selected weapon kind allows it.; callers 1cde8@1cf13; guest pending
 0x0001b4a4	441			unknown	unclassified	unverified		
 0x0001b52c	42	selected_unit_visible_1b52c	game_helpers4	compiles	game	confirmed	decomp/tests/0x0001b52c.json	docs/compiler-abi.md; ; callers 1b4a4@1b4ca,1b4a4@1b4d9; guest pending
 0x0001c16c	609			unknown	unclassified	unverified		
@@ -1804,7 +1804,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008c988	103			unknown	unclassified	unverified		
 0x0008ca24	194			unknown	unclassified	unverified		
 0x0008cae8	120	reset_slot_entries_8cae8	game_helpers32	compiles	game	confirmed	decomp/tests/0x0008cae8.json	docs/compiler-abi.md; Fill an object's 20 slot entries from the defaults table and reset its cursor.; callers 8cb60@8cb83; guest pending
-0x0008cb60	222			unknown	unclassified	unverified		
+0x0008cb60	222	refresh_weapon_state_8cb60	game_helpers53	compiles	game	confirmed	decomp/tests/0x0008cb60.json	docs/compiler-abi.md; Refresh the player's weapon state and the activity display.; callers 9114@91c4,9114@9214,9114@926e; guest pending
 0x0008cc40	171	set_unit_speed_8cc40	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008cc40.json	docs/compiler-abi.md; Set a unit's base speed from its type and add 2 when the trigger fires.; callers 8c49c@8c807; guest pending
 0x0008ccec	90	reset_unit_links_8ccec	game_helpers30	compiles	game	confirmed	decomp/tests/0x0008ccec.json	docs/compiler-abi.md; Reset a unit's link slots to 0xff.; callers 8c49c@8c800; guest pending
 0x0008cd48	46	select_object_8cd48	scene_helpers	compiles	game	confirmed	decomp/tests/0x0008cd48.json	docs/compiler-abi.md; word 0x12db60=1; 0x8c0f0(0); store signed word at 0x1f71d0 and obj+0x16 unless -1; callers 49228@4970e; guest pending
@@ -1915,7 +1915,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00093a8c	972			unknown	unclassified	unverified		
 0x00093e58	234			unknown	unclassified	unverified		
 0x00093f44	185	reset_angle_limits_93f44	game_helpers50	compiles	game	confirmed	decomp/tests/0x00093f44.json	docs/compiler-abi.md; Reset the angle record from the current limits and flag out-of-range limits.; callers 95e58@96106; guest pending
-0x00094000	222			unknown	unclassified	unverified		
+0x00094000	222	init_scene_angles_94000	game_helpers53	compiles	game	confirmed	decomp/tests/0x00094000.json	docs/compiler-abi.md; Compute the scene angles from the stored vector and flag out-of-range input.; callers 95e58@96117; guest pending
 0x000940e0	8			unknown	unclassified	unverified		
 0x00094194	39	reset_scene_update_94194	scene_helpers	compiles	game	confirmed	decomp/tests/0x00094194.json	docs/compiler-abi.md; clear words 0x12dba0/a6; 0x91df4 0x9202c 0x93a8c; scene refresh; callers 95e58@961d5,95e58@96217; guest pending
 0x000941bc	39	reset_scene_update_941bc	scene_helpers	compiles	game	confirmed	decomp/tests/0x000941bc.json	docs/compiler-abi.md; identical body to 0x94194; callers 95e58@96240; guest pending
@@ -2000,8 +2000,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009a544	221			unknown	unclassified	unverified		
 0x0009a624	213	update_records_9a624	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009a624.json	docs/compiler-abi.md; Dispatch every active 54-byte record by kind and sum the four counters.; callers 98bec@98bf1; guest pending
 0x0009a6fc	440			unknown	unclassified	unverified		
-0x0009a8b4	228			unknown	unclassified	unverified		
-0x0009a998	224			unknown	unclassified	unverified		
+0x0009a8b4	228	count_ground_kill_9a8b4	game_helpers53	compiles	game	confirmed	decomp/tests/0x0009a8b4.json	docs/compiler-abi.md; Count a destroyed ground object in the statistics table by its class.; callers 9a624@9a66e; guest pending
+0x0009a998	224	count_air_kill_9a998	game_helpers53	compiles	game	confirmed	decomp/tests/0x0009a998.json	docs/compiler-abi.md; Count a destroyed air object in the statistics table by its class.; callers 9a624@9a677; guest pending
 0x0009aa78	182	count_event_9aa78	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009aa78.json	docs/compiler-abi.md; Count an event kind in the counter row of the current slot.; callers 9a624@9a683; guest pending
 0x0009ab30	57	update_sound_chain_9ab30	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x0009ab30.json	docs/compiler-abi.md; Run the sound bank update chain on the object from 0x9a544.; callers bfcc@c0bc; guest pending
 0x0009ab6c	280			unknown	unclassified	unverified		

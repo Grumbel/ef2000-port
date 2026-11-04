@@ -3345,4 +3345,30 @@ void guest_fn_6b8_w(uint32_t a); /* 0x6b8 EAX */
 void guest_fn_7b4_w(uint32_t a); /* 0x7b4 EAX */
 void guest_fn_cd414_w(uint32_t a); /* 0xcd414 EAX */
 
+/* game_helpers53.c */
+void try_fire_selected_weapon_1abbc(void);
+void refresh_weapon_state_8cb60(void);
+void init_scene_angles_94000(void);
+void count_ground_kill_9a8b4(ef_addr32 record, uint32_t kind);
+void count_air_kill_9a998(ef_addr32 record);
+void guest_fn_17754_w(void); /* 0x17754 */
+void guest_fn_8cae8_w(void); /* 0x8cae8 */
+void guest_fn_8ca24_w(int32_t a); /* 0x8ca24 EDX */
+void guest_fn_86720_w(void); /* 0x86720 */
+void guest_fn_d9ba0_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0xd9ba0 EAX/EDX/EBX/ECX/stack */
+ef_addr32 guest_fn_c1b8c_w(int32_t a, ef_addr32 b); /* 0xc1b8c EAX/EDX -> EAX */
+uint32_t guest_fn_cc584_w(uint32_t a); /* 0xcc584 EAX -> AX */
+uint32_t guest_fn_cc5fc_w(uint32_t a); /* 0xcc5fc EAX -> AX */
+uint32_t guest_fn_cc628_w(uint32_t a); /* 0xcc628 EAX -> AX */
+uint32_t guest_fn_cc654_w(uint32_t a); /* 0xcc654 EAX -> AX */
+uint32_t guest_fn_cc67c_w(uint32_t a); /* 0xcc67c EAX -> AX */
+uint32_t guest_fn_cc694_w(uint32_t a); /* 0xcc694 EAX -> AX */
+uint32_t guest_fn_cc6ac_w(uint32_t a); /* 0xcc6ac EAX -> AX */
+uint32_t guest_fn_41e24_w(uint32_t a); /* 0x41e24 EAX -> EAX */
+uint32_t guest_fn_41f00_w(uint32_t a); /* 0x41f00 EAX -> EAX */
+uint32_t guest_fn_41ea0_w(uint32_t a); /* 0x41ea0 EAX -> EAX */
+uint32_t guest_fn_41df4_w(uint32_t a); /* 0x41df4 EAX -> EAX */
+uint32_t guest_fn_41ec8_w(uint32_t a); /* 0x41ec8 EAX -> EAX */
+uint32_t guest_fn_41e84_w(uint32_t a); /* 0x41e84 EAX -> EAX */
+
 #endif

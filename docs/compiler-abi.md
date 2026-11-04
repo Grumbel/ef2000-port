@@ -3801,3 +3801,13 @@ in EAX, format string address, one value).
 | `0x82cec` | none | none | 8b39c@8b472 | Apply the saved options and refresh the display flags. |
 | `0xa8958` | EAX:ef_addr32 | none | a9e70@a9f69 | Run the animation loop of a list record until a key press. |
 | `0xcd554` | none | none | 8b2d8@8b315,a9878@a98bd,aaee8@aafd6 | Drain the pending key table, release the buffers and restore the page. |
+
+## game_helpers53 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1abbc` | none | none | 1cde8@1cf13 | Run the fire action when the selected weapon kind allows it. |
+| `0x8cb60` | none | none | 9114@91c4,9114@9214,9114@926e | Refresh the player's weapon state and the activity display. |
+| `0x94000` | none | none | 95e58@96117 | Compute the scene angles from the stored vector and flag out-of-range input. |
+| `0x9a8b4` | EAX:ef_addr32,EDX:uint32_t | none | 9a624@9a66e | Count a destroyed ground object in the statistics table by its class. |
+| `0x9a998` | EAX:ef_addr32 | none | 9a624@9a677 | Count a destroyed air object in the statistics table by its class. |
