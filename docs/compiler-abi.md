@@ -8963,3 +8963,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa46f0` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:ef_addr32 | 35590@356f0,36f84@370c4 | Implicit-register fragment (ESI = destination pair, EAX = name, EDX = widget key; params in that order): look up NAME (a |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x160122` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 9f940@9fa11,a0704@a07d3,a0f84@a11e8 | Stack-argument wrapper (ret 0x14: OUT, Z, Y, X, MARGIN): shift X, Y, Z left by 16 and rotate them through 0xc474c/0xc475 |
+| `0x160156` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:int32_t | 9e0c4@9e140,9fc00@9fcd7,a0228@a0378 | Same as 0x160122 but without the left shift by 16 of X, Y, Z (enters 0xc4755 directly). |

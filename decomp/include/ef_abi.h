@@ -6155,4 +6155,9 @@ uint32_t rotate_project_15c0ea(uint32_t a, uint32_t b, uint32_t c, ef_addr32 out
 ef_addr32 lookup_named_widget_pair_a46f0(ef_addr32 dst, ef_addr32 name, ef_addr32 key);
 ef_addr32 lookup_named_widget_pair_a46f0(ef_addr32 dst, ef_addr32 name, ef_addr32 key);
 
+int32_t rotate_view_test_160122(ef_addr32 out, uint32_t z, uint32_t y, uint32_t x, uint32_t margin);
+int32_t rotate_view_test_160156(ef_addr32 out, uint32_t z, uint32_t y, uint32_t x, uint32_t margin);
+int32_t rotate_view_test_160122(ef_addr32 out, uint32_t z, uint32_t y, uint32_t x, uint32_t margin);
+int32_t rotate_view_test_160156(ef_addr32 out, uint32_t z, uint32_t y, uint32_t x, uint32_t margin);
+
 #endif

@@ -20447,3 +20447,29 @@ ef_addr32 lookup_named_widget_pair_a46f0(ef_addr32 dst, ef_addr32 name, ef_addr3
     EF_U32(dst + 4u) = widget;
     return dst;
 }
+
+/* 0x160122, 52 bytes. Stack-argument wrapper (ret 0x14: OUT, Z, Y, X, MARGIN): shift X, Y, Z left by 16 and rotate them through 0xc474c/0xc4755, store the three results at OUT, then run the view-volume test with MARGIN; the low bit shifted out of the test result drives the return (-1 if it was clear, else 0). */
+int32_t rotate_view_test_160122(ef_addr32 out, uint32_t z, uint32_t y, uint32_t x, uint32_t margin)
+{
+    int32_t r[3];
+    uint32_t t;
+    rotate_vector_c4755((int32_t)(x << 16), (int32_t)(y << 16), (int32_t)(z << 16), r);
+    EF_U32(out) = (uint32_t)r[0];
+    EF_U32(out + 4u) = (uint32_t)r[1];
+    EF_U32(out + 8u) = (uint32_t)r[2];
+    t = point_in_view_volume_ceb40(0u, 0u, 0u, 0u, (int32_t)(margin & 0xffffu), r[2], r[1], r[0]);
+    return (t & 1u) ? 0 : -1;
+}
+
+/* 0x160156, 52 bytes. Same as 0x160122 but without the left shift by 16 of X, Y, Z (enters 0xc4755 directly). */
+int32_t rotate_view_test_160156(ef_addr32 out, uint32_t z, uint32_t y, uint32_t x, uint32_t margin)
+{
+    int32_t r[3];
+    uint32_t t;
+    rotate_vector_c4755((int32_t)x, (int32_t)y, (int32_t)z, r);
+    EF_U32(out) = (uint32_t)r[0];
+    EF_U32(out + 4u) = (uint32_t)r[1];
+    EF_U32(out + 8u) = (uint32_t)r[2];
+    t = point_in_view_volume_ceb40(0u, 0u, 0u, 0u, (int32_t)(margin & 0xffffu), r[2], r[1], r[0]);
+    return (t & 1u) ? 0 : -1;
+}

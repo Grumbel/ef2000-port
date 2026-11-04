@@ -4271,8 +4271,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0016000c	80			unknown	unclassified	unverified		
 0x001600c4	74			unknown	unclassified	unverified		
 0x0016010e	20	record_word_16010e	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0016010e.json	docs/compiler-abi.md; Signed word at +0x10 of the record found by id.; callers 9fb00@9fbe8,9fc00@9fd8c,a0228@a046b; guest pending
-0x00160122	52			unknown	unclassified	unverified		
-0x00160156	52			unknown	unclassified	unverified		
+0x00160122	52	rotate_view_test_160122	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00160122.json	docs/compiler-abi.md; Stack-argument wrapper (ret 0x14: OUT, Z, Y, X, MARGIN): shift X, Y, Z left by 16 and rotate them through 0xc474c/0xc475; callers 9f940@9fa11,a0704@a07d3,a0f84@a11e8; guest pending
+0x00160156	52	rotate_view_test_160156	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00160156.json	docs/compiler-abi.md; Same as 0x160122 but without the left shift by 16 of X, Y, Z (enters 0xc4755 directly).; callers 9e0c4@9e140,9fc00@9fcd7,a0228@a0378; guest pending
 0x0016018a	203	append_table_entry_16018a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0016018a.json	docs/compiler-abi.md; Implicit-global fragment: append one entry to the table set indexed by word 0x146e52: bytes 0x149e58 (byte 0x1600b8), 0x; callers 9f850@9f935,9f940@9fac2; guest pending
 0x00160255	212			unknown	unclassified	unverified		
 0x00160329	200			unknown	unclassified	unverified		
