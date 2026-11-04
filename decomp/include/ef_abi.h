@@ -4929,4 +4929,9 @@ void guest_fn_a5ca4_x(uint32_t record); /* 0xa5ca4 EAX */
 
 void draw_mission_clock_78e1c(void);
 
+void advance_follow_slot_3a148(int32_t a);
+uint32_t guest_fn_3a268_x(uint32_t v); /* 0x3a268 EAX -> AL */
+void guest_fn_39edc_x(uint32_t a, uint32_t v); /* 0x39edc EAX/EDX */
+void guest_fn_3a000_x(uint32_t a); /* 0x3a000 EAX */
+
 #endif

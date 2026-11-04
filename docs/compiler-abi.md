@@ -6140,3 +6140,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x78e1c` | none | none | 78b4c@78dc3 | Draw the mission clock at (10, 0xbe) in colour 15: in mode 1 (byte 0x125846) the time is taken from the record at 0x1379 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x3a148` | EAX:int32_t | none | 2d488@2d6f8 | Occasionally (1 in 100, or always in mode 3 of 0x125846) advance the follow slot of the unit A's owner target: the targe |

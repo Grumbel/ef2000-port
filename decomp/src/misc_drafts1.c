@@ -5162,3 +5162,36 @@ void draw_mission_clock_78e1c(void)
     EF_U8(0x00127b1au) = 1u;
     draw_shadowed_text_48c90(15u, 10, 0xbe, b);
 }
+
+/* 0x3a148, 288 bytes. Occasionally (1 in 100, or always in mode 3 of 0x125846) advance the follow slot of the unit A's owner target: the target unit (record word +0x50 of the owner record) must exist and 0x1a1506 be nonzero; its counter word in the table 0x1a1860 (indexed by byte +0x187) is incremented and wraps to 0 at the limit 0x1a1506. For an active entry of the table 0x1a14f8 (byte +0x13) that belongs to another owner (word +0x1d against the owner word +0x15), an entry whose byte +1 is 0xff is taken over through 0x39edc when 0x3a268 allows, otherwise 0x3a000 is called. */
+void advance_follow_slot_3a148(int32_t a)
+{
+    int16_t ia = (int16_t)a;
+    uint32_t owner = (uint32_t)((int32_t)ia * 0xca) + EF_U32(0x0019bb58u);
+    uint32_t unit = guest_fn_7489c((int16_t)EF_U16(owner + 0x50u));
+    uint32_t r;
+    uint32_t cnt;
+    uint32_t e;
+    int32_t v;
+    if (unit == 0u || EF_U16(0x001a1506u) == 0u)
+        return;
+    r = guest_fn_9c960() & 0xffffu;
+    if (r % 100u == 0u && EF_U8(0x00125846u) != 3u)
+        return;
+    cnt = EF_U32(0x001a1860u) + (uint32_t)EF_U8(unit + 0x187u) * 4u;
+    EF_U16(cnt)++;
+    if ((int16_t)EF_U16(0x001a1506u) <= (int16_t)EF_U16(cnt))
+        EF_U16(cnt) = 0u;
+    v = (int16_t)EF_U16(cnt);
+    e = EF_U32(0x001a14f8u) + (uint32_t)(v * 0x45);
+    if (EF_U8(e + 0x13u) == 0u)
+        return;
+    if (EF_U16(owner + 0x15u) == EF_U16(e + 0x1du))
+        return;
+    if (EF_U8(e + 1u) == 0xffu) {
+        if ((guest_fn_3a268_x((uint32_t)v) & 0xffu) != 0u)
+            guest_fn_39edc_x((uint32_t)(int32_t)ia, (uint32_t)v);
+    } else {
+        guest_fn_3a000_x((uint32_t)(int32_t)ia);
+    }
+}

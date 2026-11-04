@@ -676,7 +676,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00039e0c	208	claim_unit_slot_39e0c	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x00039e0c.json	docs/compiler-abi.md; Claim a free slot in the 4-byte slot table for a unit and mark its owner.; callers 8c49c@8c85f; guest pending
 0x00039edc	289			unknown	unclassified	unverified		
 0x0003a000	328			unknown	unclassified	unverified		
-0x0003a148	288			unknown	unclassified	unverified		
+0x0003a148	288	advance_follow_slot_3a148	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003a148.json	docs/compiler-abi.md; Occasionally (1 in 100, or always in mode 3 of 0x125846) advance the follow slot of the unit A's owner target: the targe; callers 2d488@2d6f8; guest pending
 0x0003a268	94	cell_changed_3a268	search_helpers1	compiles	game	confirmed	decomp/tests/0x0003a268.json	docs/compiler-abi.md; Return 1 when the cell found for the 69-byte record's coordinates (dwords at +7/+0xf divided by 2048) differs from the r; callers 3a148@3a238; guest pending
 0x0003a2d0	117	build_ring_table_3a2d0	game_helpers31	compiles	game	confirmed	decomp/tests/0x0003a2d0.json	docs/compiler-abi.md; Build a 36-entry table of scaled sine/cosine pairs (radius 60).; callers 3a3a8@3a499; guest pending
 0x0003a3a8	6328			unknown	unclassified	unverified		
