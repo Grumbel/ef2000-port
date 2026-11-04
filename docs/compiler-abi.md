@@ -4321,3 +4321,10 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xa2334` | EAX:ef_addr32 | none | none direct | Like a2244 but the cosine weight is taken at the complementary angle and the weights are swapped. |
 | `0x9d278` | EAX:ef_addr32 | none | f80@117f,f80@1187,f80@11d2 | Read the next token (blank/comma separated, optionally quoted, at most 0x50 bytes) from the text at ctx using the cursor |
+
+## game_helpers102 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xbfb2c` | AX:int16_t,DX:int16_t,EBX:ef_addr32 | EAX:uint32_t | bfb88@bfca5,c09e4@c0a35,c09e4@c0a5a | Count the idle records at cell (x,y) that pass bcf18 and whose code is in the cc584 set or 10..15. |
+| `0x1086f4` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 1084d3@108552,1084d3@1086bc | Parse the width and size modifiers of a printf conversion ('*', digits, N/F, h/l/w/L) into the spec record; returns the  |

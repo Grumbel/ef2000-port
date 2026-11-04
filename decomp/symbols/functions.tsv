@@ -2701,7 +2701,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bf9d4	82	records_differ_bf9d4	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bf9d4.json	docs/compiler-abi.md; As 0xbf980 for the bytes at +0x23 and +0x24.; callers bf81c@bf8a2; guest pending
 0x000bfa28	48	linked_records_differ	list_lookup	compiles	game	confirmed	decomp/tests/0x000bfa28.json	docs/compiler-abi.md; Byte +0x22 of the records at dwords +0x33 and +0x37 * differ and the first is nonzero.; callers bf81c@bf8b6; guest pending
 0x000bfa58	212			unknown	unclassified	unverified		
-0x000bfb2c	91			unknown	unclassified	unverified		
+0x000bfb2c	91	count_records_at_cell_bfb2c	game_helpers102	compiles	game	confirmed	decomp/tests/0x000bfb2c.json	docs/compiler-abi.md; Count the idle records at cell (x,y) that pass bcf18 and whose code is in the cc584 set or 10..15.; callers bfb88@bfca5,c09e4@c0a35,c09e4@c0a5a; guest pending
 0x000bfb88	336			unknown	unclassified	unverified		
 0x000bfcd8	36	find_node_by_record_a	list_lookup	compiles	game	confirmed	decomp/tests/0x000bfcd8.json	docs/compiler-abi.md; Node in the list at *EDX with dwords +0x16/+0x1a equal * to the record's +0x11/+0x15.; callers b0b00@b0b3d,b0b00@b0bcd,c0b04@c0f1d; guest pending
 0x000bfcfc	34	find_node_by_record_b	list_lookup	compiles	game	confirmed	decomp/tests/0x000bfcfc.json	docs/compiler-abi.md; Node in the list at *EAX with dwords +0x11/+0x15 equal * to the record's +0x16/+0x1a.; callers 4ce4c@4cf86,50770@507ae,b47e4@b4970; guest pending
@@ -3926,7 +3926,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0010848c	52			unknown	unclassified	unverified		
 0x001084c0	19			unknown	unclassified	unverified		
 0x001084d3	545			unknown	unclassified	unverified		
-0x001086f4	217			unknown	unclassified	unverified		
+0x001086f4	217	parse_format_modifiers_1086f4	game_helpers102	compiles	game	confirmed	decomp/tests/0x001086f4.json	docs/compiler-abi.md; Parse the width and size modifiers of a printf conversion ('*', digits, N/F, h/l/w/L) into the spec record; returns the ; callers 1084d3@108552,1084d3@1086bc; guest pending
 0x001087cd	53			unknown	unclassified	unverified		
 0x00108802	134			unknown	unclassified	unverified		
 0x00108888	238			unknown	unclassified	unverified		

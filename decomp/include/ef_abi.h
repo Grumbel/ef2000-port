@@ -3827,4 +3827,9 @@ void blend_by_angle_weight_a2244(ef_addr32 rec);
 void blend_by_complement_weight_a2334(ef_addr32 rec);
 void read_next_token_9d278(ef_addr32 ctx);
 
+/* game_helpers102.c */
+uint32_t count_records_at_cell_bfb2c(int16_t x, int16_t y, ef_addr32 head);
+ef_addr32 parse_format_modifiers_1086f4(ef_addr32 fmt, ef_addr32 spec);
+uint32_t guest_fn_bcf18_x(ef_addr32 rec); /* 0xbcf18 EAX -> AX */
+
 #endif
