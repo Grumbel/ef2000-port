@@ -6475,3 +6475,24 @@ void select_shade_table_c47e0(uint32_t index)
     EF_U32(0x00159084u) = (b << 8) + EF_U32(0x00164604u);
     EF_U8(0x00159140u) = 0u;
 }
+
+/* 0xc48dc, 112 bytes. Load COUNT 2D vertices (word pairs) starting at SRC (implicit registers ESI = source, ECX = count) into the 48-byte vertex records at dword 0x17bf70: x and y are translated by the words 0x15bdb8/0x15bdbc and scaled left by 0x18 minus the bytes 0x164660/0x164664, depth +8 is set to 0x1000000, flag word +0x20 to 1 and the raw coordinates shifted left 16 stored at +0x18/+0x1c. Parameters in the order source, count. */
+void load_vertices_c48dc(ef_addr32 src, uint32_t count)
+{
+    ef_addr32 dst = EF_U32(0x0017bf70u);
+    ef_addr32 end = src + count * 4u;
+    int32_t bx = (int16_t)EF_U16(0x0015bdb8u);
+    int32_t dx = (int16_t)EF_U16(0x0015bdbcu);
+    uint32_t sx = (0x18u - EF_U8(0x00164660u)) & 0x1fu;
+    uint32_t sy = (0x18u - EF_U8(0x00164664u)) & 0x1fu;
+    while (src != end) {
+        EF_U32(dst) = (uint32_t)(((int32_t)(int16_t)EF_U16(src) - bx) << sx);
+        EF_U32(dst + 4u) = (uint32_t)(((int32_t)(int16_t)EF_U16(src + 2u) - dx) << sy);
+        EF_U32(dst + 8u) = 0x1000000u;
+        EF_U16(dst + 0x20u) = 1u;
+        EF_U32(dst + 0x18u) = (uint32_t)EF_U16(src) << 16;
+        EF_U32(dst + 0x1cu) = (uint32_t)EF_U16(src + 2u) << 16;
+        src += 4u;
+        dst += 0x30u;
+    }
+}

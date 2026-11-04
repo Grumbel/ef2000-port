@@ -2782,7 +2782,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c4755	136			unknown	unclassified	unverified		
 0x000c47e0	66	select_shade_table_c47e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c47e0.json	docs/compiler-abi.md; Select the shade table for table index EDI (implicit register): take the signed word 0x14fe58[index] >> 5 clamped to 0..; callers none direct; guest pending
 0x000c486c	112			unknown	unclassified	unverified		
-0x000c48dc	112			unknown	unclassified	unverified		
+0x000c48dc	112	load_vertices_c48dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c48dc.json	docs/compiler-abi.md; Load COUNT 2D vertices (word pairs) starting at SRC (implicit registers ESI = source, ECX = count) into the 48-byte vert; callers c49c4@c4a10,c4a50@c4aaf,c4aeb@c4b4a; guest pending
 0x000c49c4	140			unknown	unclassified	unverified		
 0x000c4a50	155			unknown	unclassified	unverified		
 0x000c4aeb	170			unknown	unclassified	unverified		
