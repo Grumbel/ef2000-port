@@ -5953,3 +5953,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x73734` | EAX:int32_t,EDX:int32_t | none | 46454@4674d | Record that unit A now targets unit B (word +0x143 of A's record). When A is the player unit (word 0x1f71ca) the target' |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xcb6fc` | EAX:uint32_t,EDX:uint32_t | none | b0f5c@b139a | Walk the list whose head pointer is at HEAD (links at +4); for every node of kind 0 (byte +0xb) with all four group flag |

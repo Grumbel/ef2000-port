@@ -2879,7 +2879,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cb5f8	26	find_node_by_word_cb5f8	list_lookup	compiles	game	confirmed	decomp/tests/0x000cb5f8.json	docs/compiler-abi.md; Identical body to 0xc1b8c.; callers cb800@cb876,cb800@cb897; guest pending
 0x000cb614	116	clear_indexed_subentry_flags_cb614	game_helpers86	compiles	game	confirmed	decomp/tests/0x000cb614.json	docs/compiler-abi.md; For type-3 table entries clear a flag byte of the indexed sub-entry of the n-th list record.; callers b0f5c@b12fb; guest pending
 0x000cb688	90	tick_slot_timers_cb688	runtime_helpers14	compiles	game	confirmed	decomp/tests/0x000cb688.json	docs/compiler-abi.md; Count down the per-slot timers of every node and reload expired ones.; callers b0f5c@b136a; guest pending
-0x000cb6fc	235			unknown	unclassified	unverified		
+0x000cb6fc	235	update_group_flags_cb6fc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cb6fc.json	docs/compiler-abi.md; Walk the list whose head pointer is at HEAD (links at +4); for every node of kind 0 (byte +0xb) with all four group flag; callers b0f5c@b139a; guest pending
 0x000cb800	385			unknown	unclassified	unverified		
 0x000cb984	110	list_has_matching_entry_cb984	game_helpers86	compiles	game	confirmed	decomp/tests/0x000cb984.json	docs/compiler-abi.md; Return 1 when a list record sits at the same position as the object's last table entry and cc1ac accepts the pair.; callers cb9f4@cba55; guest pending
 0x000cb9f4	608			unknown	unclassified	unverified		

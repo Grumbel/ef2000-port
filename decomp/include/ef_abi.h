@@ -4826,4 +4826,10 @@ int32_t dos_date_request_dde80(uint32_t value);
 
 void set_unit_target_73734(int32_t a, int32_t b);
 
+void update_group_flags_cb6fc(uint32_t head, uint32_t arg);
+uint32_t guest_fn_cc1ec_x(uint32_t a, uint32_t b, uint32_t c); /* 0xcc1ec EAX/EDX/EBX -> AX */
+uint32_t guest_fn_b0954_x(uint32_t a, uint32_t b, uint32_t c); /* 0xb0954 EAX/EDX/EBX -> AX */
+void guest_fn_cc188_x(uint32_t a, uint32_t b, uint32_t c); /* 0xcc188 EAX/EDX/EBX */
+void guest_fn_cc164_x(uint32_t a, uint32_t b, uint32_t c); /* 0xcc164 EAX/EDX/EBX */
+
 #endif

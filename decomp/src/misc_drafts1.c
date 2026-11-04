@@ -4222,3 +4222,24 @@ void set_unit_target_73734(int32_t a, int32_t b)
     }
     EF_U16(ra + 0x143u) = (uint16_t)ib;
 }
+
+/* 0xcb6fc, 235 bytes. Walk the list whose head pointer is at HEAD (links at +4); for every node of kind 0 (byte +0xb) with all four group flag tests passing (0xcc1ac/0xcc1ec), the word 0x13799e above 2 and a 0xb0954 result below 7, update the group flags with 0xcc188 (twice) and 0xcc164 (twice). */
+void update_group_flags_cb6fc(uint32_t head, uint32_t arg)
+{
+    uint32_t node = EF_U32(head);
+    while (node != 0u) {
+        if (EF_U8(node + 0xbu) == 0u &&
+            (guest_fn_cc1ac(0u, 1u, head) & 0xffffu) != 0u &&
+            (guest_fn_cc1ac(2u, 1u, head) & 0xffffu) != 0u &&
+            (guest_fn_cc1ec_x(0u, 2u, head) & 0xffffu) != 0u &&
+            (guest_fn_cc1ec_x(2u, 0u, head) & 0xffffu) != 0u &&
+            (int16_t)EF_U16(0x0013799eu) > 2 &&
+            (int16_t)guest_fn_b0954_x(0u, head, arg) < 7) {
+            guest_fn_cc188_x(0u, 2u, head);
+            guest_fn_cc188_x(2u, 0u, head);
+            guest_fn_cc164_x(2u, 1u, head);
+            guest_fn_cc164_x(1u, 2u, head);
+        }
+        node = EF_U32(node + 4u);
+    }
+}
