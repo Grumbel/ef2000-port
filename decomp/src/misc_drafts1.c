@@ -11478,3 +11478,55 @@ void parse_path_setting_e3f00(ef_addr32 text)
         copy_string_9d749(0x0015f920u, buf);
     }
 }
+
+/* 0x35c08, 189 bytes. Pack the game settings into the outgoing record at 0x19f370 (inverse of 0x3519c): copy the first 44 bytes from 0x125828, gather the bytes/words from 0x15b7e6, 0x1f88fa, 0x1f88f0, 0x1f88ee, 0x1f88fb, 0x1a3636, 0x1a3640 and 0x15b7e4 to +0x2c..+0x3d, widen the float at 0x128550 to a double at +0x33, copy the 18 bytes at 0x19bbf0 to +0x3e and queue the record as request 0x45 (0x36100, stack 3 and 1) with the high word of 0x1258fe. */
+void pack_settings_record_35c08(void)
+{
+    double d;
+    memcpy_dc832(0x0019f370u, 0x00125828u, 44u);
+    EF_U8(0x0019f39cu) = EF_U8(0x0015b7e6u);
+    EF_U8(0x0019f39du) = EF_U8(0x001f88fau);
+    EF_U16(0x0019f39eu) = EF_U16(0x001f88f0u);
+    EF_U16(0x0019f3a0u) = EF_U16(0x001f88eeu);
+    EF_U8(0x0019f3a2u) = EF_U8(0x001f88fbu);
+    d = (double)*(float *)ef_guest_memory_ptr(0x00128550u);
+    memcpy(ef_guest_memory_ptr(0x0019f3a3u), &d, sizeof d);
+    EF_U8(0x0019f3abu) = EF_U8(0x001a3636u);
+    EF_U8(0x0019f3acu) = EF_U8(0x001a3640u);
+    EF_U8(0x0019f3adu) = EF_U8(0x0015b7e4u);
+    memcpy_dc832(0x0019f3aeu, 0x0019bbf0u, 18u);
+    queue_request_36100(0x0019f370u, (uint32_t)((int32_t)EF_U32(0x001258feu) >> 16), 0x45u, 6u, 3u, 1u);
+}
+
+/* 0x6be28, 190 bytes. Follow-up for the current ship (record at [0x1f71bc]) when its mode byte at +0x16c is 6: look up the object named by the high word at +0x168 (0x8ffe8). Unless the lookup is empty or has a nonzero +0x1c or flags 1/2 at +0x30 clear and 0x6ae30(target) reports done, send the target (high word of 0x1f71c6) through 0x6a1d0(.., 1); then, if an object was found, scale its three dwords (+8, +0, +4) by the doubles 0x18640c and 0x186414 into a vector and pass it to 0x2461c with the target. */
+void follow_target_6be28(void)
+{
+    ef_addr32 cur = EF_U32(0x001f71bcu);
+    ef_addr32 obj;
+    int32_t target;
+    double vec[3];
+    double c1;
+    double c2;
+    if (EF_U8(cur + 0x16cu) != 6u)
+        return;
+    obj = guest_fn_8ffe8((int32_t)EF_U32(cur + 0x168u) >> 16);
+    target = (int32_t)EF_U32(0x001f71c6u) >> 16;
+    if (obj == 0u) {
+        if ((uint8_t)guest_fn_6ae30_x(target) == 0u)
+            guest_fn_6a1d0(target, 1u);
+    } else {
+        uint8_t fl = EF_U8(obj + 0x30u);
+        if (EF_U32(obj + 0x1cu) != 0u || (fl & 1u) != 0u || (fl & 2u) != 0u) {
+            if ((uint8_t)guest_fn_6ae30_x(target) == 0u)
+                guest_fn_6a1d0(target, 1u);
+        }
+    }
+    if (obj == 0u)
+        return;
+    memcpy(&c1, ef_guest_memory_ptr(0x0018640cu), sizeof c1);
+    memcpy(&c2, ef_guest_memory_ptr(0x00186414u), sizeof c2);
+    vec[0] = (double)(int32_t)EF_U32(obj + 8u) * c1 * c2;
+    vec[1] = (double)(int32_t)EF_U32(obj) * c1 * c2;
+    vec[2] = (double)(int32_t)EF_U32(obj + 4u) * c1 * c2;
+    guest_fn_2461c_x(target, (ef_addr32)(uintptr_t)vec);
+}

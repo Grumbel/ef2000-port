@@ -5459,4 +5459,10 @@ void parse_path_setting_e3f00(ef_addr32 text);
 
 
 
+void pack_settings_record_35c08(void);
+
+void follow_target_6be28(void);
+uint32_t guest_fn_6ae30_x(int32_t a); /* 0x6ae30 EAX -> AL */
+void guest_fn_2461c_x(int32_t a, ef_addr32 vec); /* 0x2461c EAX/EDX */
+
 #endif

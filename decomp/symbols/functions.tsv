@@ -599,7 +599,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00035ab8	113	select_screen_35ab8	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00035ab8.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x00035b2c	139	commit_mode_selection_35b2c	state_reset1	compiles	game	confirmed	decomp/tests/0x00035b2c.json	docs/compiler-abi.md; Commit the chosen game mode: copy the selection (0x1357ae) to the mode/slot bytes, format its name for mode 3, store the; callers 35590@35632; guest pending
 0x00035bb8	78	copy_counts_35bb8	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00035bb8.json	docs/compiler-abi.md; ; callers 35cfc@35d1e; guest pending
-0x00035c08	189			unknown	unclassified	unverified		
+0x00035c08	189	pack_settings_record_35c08	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035c08.json	docs/compiler-abi.md; Pack the game settings into the outgoing record at 0x19f370 (inverse of 0x3519c): copy the first 44 bytes from 0x125828,; callers 36f84@37015; guest pending
 0x00035cc8	49	mark_slot_35cc8	game_helpers5	compiles	game	confirmed	decomp/tests/0x00035cc8.json	docs/compiler-abi.md; ; callers 36438@36472,36438@3657e,36438@3669d; guest pending
 0x00035cfc	227	prepare_briefing_file_35cfc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035cfc.json	docs/compiler-abi.md; Prepare the briefing/mission screen: clear bytes 0x19f5aa and 0x19f5af, apply the key string 0x182f4c, refresh the statu; callers none direct; guest pending
 0x00035de0	136	rescale_dialog_widgets_35de0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00035de0.json	docs/compiler-abi.md; Rescale a pair of widgets of the dialog (name chosen by byte 0x1357c8: 0x1830f8 or 0x182fb0). The word at +4 of child 0x; callers 35e68@35e84,35e90@35eac,36100@36173; guest pending
@@ -1296,7 +1296,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006b6c8	1472			unknown	unclassified	unverified		
 0x0006bca8	221	normalise_angles_6bca8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006bca8.json	docs/compiler-abi.md; Normalise the three angle-like doubles of the current object (dword pointer 0x1f71bc; fields +0x69, +0x71, +0x61 = X, Y,; callers 6b620@6b666; guest pending
 0x0006bd88	157	update_camera_state_6bd88	float_helpers3	compiles	game	confirmed	decomp/tests/0x0006bd88.json	docs/compiler-abi.md; Copy the camera position and recompute the closing-speed state.; callers 6b6c8@6bbb8; guest pending
-0x0006be28	190			unknown	unclassified	unverified		
+0x0006be28	190	follow_target_6be28	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006be28.json	docs/compiler-abi.md; Follow-up for the current ship (record at [0x1f71bc]) when its mode byte at +0x16c is 6: look up the object named by the; callers 6bd88@6be1c; guest pending
 0x0006bee8	773			unknown	unclassified	unverified		
 0x0006c1f0	178	estimate_coefficient_6c1f0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006c1f0.json	docs/compiler-abi.md; Stack (ret 8): rational estimate of a coefficient from the double X. R = (X + k) / (k - X) * 1.2 with k = double 0x18641; callers 28b80@28c1f,2ccf0@2cd1d,89c64@89daa; guest pending
 0x0006c2a4	297			unknown	unclassified	unverified		
