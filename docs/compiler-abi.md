@@ -4788,3 +4788,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x1093d8` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | e4010@e40cf | Run a line-oriented text script: each non-empty line not starting with ';' is passed to the current handler (0x4dd890),  |
 | `0x9cbc4` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 6b50@6be1,371b0@37216,3c6c0@3c705 | Try the two optional handlers (0x40d1f0 gated by bit 0 and 0x40d1f4 gated by bit 1 of 0x132ab0); return 1 if one accepts |
+
+## fill_rects1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xceccc` | EAX:uint32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:int32_t | none | 14d58@14e04,1e480@1e54c,1e480@1e5c2 | Fill the rectangle x0..x1, y0..y1 (coordinates swapped into order) with a colour byte, one row at a time. Callee pops th |

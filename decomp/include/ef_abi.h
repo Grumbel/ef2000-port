@@ -4175,4 +4175,7 @@ void guest_callptr_eax_x(ef_addr32 fn, ef_addr32 arg); /* indirect call with the
 uint32_t guest_fn_eba64_x(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xeba64 EAX/EDX/EBX */
 uint32_t guest_fn_b3c04_x(uint32_t a, uint32_t b); /* 0xb3c04 EAX/EDX, returns EAX */
 
+/* fill_rects1.c */
+void fill_rect_ceccc(uint32_t colour, int32_t x0, int32_t y0, int32_t x1, int32_t y1);
+
 #endif

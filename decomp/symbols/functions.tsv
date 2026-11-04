@@ -2976,7 +2976,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ce9a4	203			unknown	unclassified	unverified		
 0x000ceb40	183	point_in_view_volume_ceb40	game_helpers124	compiles	game	confirmed	decomp/tests/0x000ceb40.json	docs/compiler-abi.md; Test a point (z, y, x on the stack after a margin) against the five planes at 0x15b79c: returns 1 when a coordinate is o; callers c46f8@c4710,c473c@c4743; guest pending
 0x000cec00	201			unknown	unclassified	unverified		
-0x000ceccc	99			unknown	unclassified	unverified		
+0x000ceccc	99	fill_rect_ceccc	fill_rects1	compiles	game	confirmed	decomp/tests/0x000ceccc.json	docs/compiler-abi.md; Fill the rectangle x0..x1, y0..y1 (coordinates swapped into order) with a colour byte, one row at a time. Callee pops th; callers 14d58@14e04,1e480@1e54c,1e480@1e5c2; guest pending
 0x000ceda0	231			unknown	unclassified	unverified		
 0x000cee88	180			unknown	unclassified	unverified		
 0x000cef3c	264			unknown	unclassified	unverified		
