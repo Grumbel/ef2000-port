@@ -5485,3 +5485,18 @@ in EAX, format string address, one value).
 | `0x11af60` | EAX:uint32_t | EAX:double | 10a0d4@10a0db,11afb4@11afba,11b040@11b0ce | /((p[3] - p[2]) + (p[7] - p[6])) * ((p[4] - p[0]) * k)/ for the doubles at EAX, with k at 0x195804. |
 | `0x11b0ec` | EAX:uint32_t | EAX:double | none direct | atan2(p[1] - p[5], /p[4] - p[0]/) for the doubles at EAX. |
 | `0xe86f7` | EAX:double | EAX:double | 7f850@7f87d,b59a8@b5b2e,b59a8@b5b69 | (ret 8) Floor-like: take the integral part with 0x10d9c6 and add the constant at 0x190c8c when the fractional part is ne |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x10a030` | EAX:uint32_t,EDX:uint32_t | none | 109ec0@109edb | Build a record at EAX from the one at EDX: zero the first 8 bytes, store the extent F64[+0x20] - F64[+0], and copy the d |
+| `0xea8cc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | 97914@9793c,97950@9797b,97950@97996 | (ret 4) Scale the three signed 32-bit components at EAX by the float whose bits are passed on the stack, truncating each |
+| `0x11aff4` | EAX:uint32_t,EDX:double | EAX:double | 10a0d4@10a106,10a0d4@10a117,10a0d4@10a128 | (ret 8) Blend two pairs of doubles by the fraction d and return atan2(a - b, /p[4] - p[0]/): a = p[3] * (1 - d) + p[2] * |
+| `0x11bfc8` | EAX:uint32_t,EDX:double,EBX:double | EAX:double | 10a220@10a40a | (ret 16) (((p[0] + k1) * k2 * k3 + k4) * (k5 / f(a0))) * k6 with f = 0x11af14 and the constants at 0x1959a4..0x1959cc. |
+| `0x11b540` | EAX:double | EAX:double | 11b588@11b595 | (ret 8) f(x * k4) * 0.53 with f = 0x11b3fec's sibling 0xb3fec; the intermediate x * k1 * k2 + k3 is computed and discard |
+
+## float_helpers9 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |

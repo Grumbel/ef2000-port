@@ -3483,7 +3483,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ea864	9	store_triple_ea864	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000ea864.json	docs/compiler-abi.md; Store three dwords.; callers 97534@97578,97534@9758a,975f0@97674; guest pending
 0x000ea870	19	copy_vector3	math_string	compiles	game	confirmed	decomp/tests/0x000ea870.json	docs/compiler-abi.md; Copy three dwords from EDX to EAX.; callers 97914@97929,97950@97968,97950@9798c; guest pending
 0x000ea884	71	int_vector_length_ea884	float_helpers7	compiles	game	confirmed	decomp/tests/0x000ea884.json	docs/compiler-abi.md; Length of an integer 3D vector as a float, 0.0 for a negative sum.; callers 9775c@977d4,979c8@97a03; guest pending
-0x000ea8cc	66			unknown	unclassified	unverified		
+0x000ea8cc	66	scale_vector3_ea8cc	float_helpers9	compiles	game	confirmed	decomp/tests/0x000ea8cc.json	docs/compiler-abi.md; (ret 4) Scale the three signed 32-bit components at EAX by the float whose bits are passed on the stack, truncating each; callers 97914@9793c,97950@9797b,97950@97996; guest pending
 0x000ea958	33	add_vector3	math_string	compiles	game	confirmed	decomp/tests/0x000ea958.json	docs/compiler-abi.md; Add three dwords of EDX to those at EAX.; callers 97914@97944,97950@97983,97950@979a0; guest pending
 0x000ea9a0	22	set_vector3_from_words	math_string	compiles	game	confirmed	decomp/tests/0x000ea9a0.json	docs/compiler-abi.md; Dwords at EAX = sign-extended DX, BX, CX.; callers 9ffc8@9fffe; guest pending
 0x000ea9b8	52	dot_product_fixed	math_string	compiles	game	confirmed	decomp/tests/0x000ea9b8.json	docs/compiler-abi.md; Fixed-point (16.16) dot product of two dword triples.; callers 97534@975a2; guest pending
@@ -3960,7 +3960,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00109e6c	3	return_zero_109e6c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00109e6c.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x00109e6f	76	guest_memmove_109e6f	game_helpers129	compiles	game	confirmed	decomp/tests/0x00109e6f.json	docs/compiler-abi.md; memmove: copy n bytes from src to dst, copying backwards when the ranges overlap with dst above src.; callers e6144@e639c,f4347@f4469,f44b6@f454a; guest pending
 0x00109ec0	365			unknown	unclassified	unverified		
-0x0010a030	72			unknown	unclassified	unverified		
+0x0010a030	72	build_extent_record_10a030	float_helpers9	compiles	game	confirmed	decomp/tests/0x0010a030.json	docs/compiler-abi.md; Build a record at EAX from the one at EDX: zero the first 8 bytes, store the extent F64[+0x20] - F64[+0], and copy the d; callers 109ec0@109edb; guest pending
 0x0010a078	90			unknown	unclassified	unverified		
 0x0010a0d4	144			unknown	unclassified	unverified		
 0x0010a164	94			unknown	unclassified	unverified		
@@ -4178,7 +4178,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011af9c	21	box_extent_sum_11af9c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011af9c.json	docs/compiler-abi.md; Scaled sum of two extents.; callers 10a0d4@10a0ee,11afb4@11afca; guest pending
 0x0011afb4	46			unknown	unclassified	unverified		
 0x0011afe4	15	box_extent_ratio_11afe4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011afe4.json	docs/compiler-abi.md; Ratio of two extents.; callers 10a0d4@10a158; guest pending
-0x0011aff4	74			unknown	unclassified	unverified		
+0x0011aff4	74	blend_angle_11aff4	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011aff4.json	docs/compiler-abi.md; (ret 8) Blend two pairs of doubles by the fraction d and return atan2(a - b, /p[4] - p[0]/): a = p[3] * (1 - d) + p[2] *; callers 10a0d4@10a106,10a0d4@10a117,10a0d4@10a128; guest pending
 0x0011b040	172			unknown	unclassified	unverified		
 0x0011b0ec	40	slope_angle_11b0ec	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b0ec.json	docs/compiler-abi.md; atan2(p[1] - p[5], /p[4] - p[0]/) for the doubles at EAX.; callers none direct; guest pending
 0x0011b134	122			unknown	unclassified	unverified		
@@ -4187,7 +4187,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011b3c8	149			unknown	unclassified	unverified		
 0x0011b4bc	36			unknown	unclassified	unverified		
 0x0011b4e0	95			unknown	unclassified	unverified		
-0x0011b540	69			unknown	unclassified	unverified		
+0x0011b540	69	scaled_call_11b540	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b540.json	docs/compiler-abi.md; (ret 8) f(x * k4) * 0.53 with f = 0x11b3fec's sibling 0xb3fec; the intermediate x * k1 * k2 + k3 is computed and discard; callers 11b588@11b595; guest pending
 0x0011b588	30	scaled_call_11b588	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011b588.json	docs/compiler-abi.md; (ret 8) Call 0x11b540 with the double argument and scale its result by the constant at 0x1958bc.; callers 11b5a8@11b608; guest pending
 0x0011b5a8	156			unknown	unclassified	unverified		
 0x0011b644	79			unknown	unclassified	unverified		
@@ -4212,7 +4212,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011bf00	37	combine_11bf00	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bf00.json	docs/compiler-abi.md; (ret 16) Linear combination: f(a0) * v[0] + v[1] * a1 with f computed by 0x11bf00's helper 0xb3fd0 and the pair of doubl; callers 11bf28@11bf64; guest pending
 0x0011bf28	78			unknown	unclassified	unverified		
 0x0011bf78	77			unknown	unclassified	unverified		
-0x0011bfc8	74			unknown	unclassified	unverified		
+0x0011bfc8	74	scaled_ratio_11bfc8	float_helpers9	compiles	game	confirmed	decomp/tests/0x0011bfc8.json	docs/compiler-abi.md; (ret 16) (((p[0] + k1) * k2 * k3 + k4) * (k5 / f(a0))) * k6 with f = 0x11af14 and the constants at 0x1959a4..0x1959cc.; callers 10a220@10a40a; guest pending
 0x0011c020	76	alloc_records_11c020	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011c020.json	docs/compiler-abi.md; Allocate and clear n records of 0xd5 bytes at 0x4ddee0.; callers 10a580@10a8ac,10c1b0@10c4d8; guest pending
 0x0011c06c	56	free_records_11c06c	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011c06c.json	docs/compiler-abi.md; Free the five records at 0x4ddee0 and their 0x69 sub-buffers.; callers 11c020@11c02d; guest pending
 0x0011c0a4	13	tail_jump_11c0a4	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011c0a4.json	docs/compiler-abi.md; tail jump. Forward to 0xc3f70.; callers 10a580@10a91d,10a580@10a96b; guest pending

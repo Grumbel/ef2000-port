@@ -96,3 +96,54 @@ double floor_e86f7(double x)
         whole += EF_F64(0x00190c8cu);
     return whole;
 }
+
+/* 0x10a030, 72 bytes. Build a record at EAX from the one at EDX: zero the first 8 bytes, store the extent F64[+0x20] - F64[+0], and copy the dword pairs at +0x10..0x1f and +0x30..0x3f. */
+void build_extent_record_10a030(uint32_t dst, uint32_t src)
+{
+    EF_U32(dst) = 0u;
+    EF_U32(dst + 4u) = 0u;
+    EF_F64(dst + 0x20u) = EF_F64(src + 0x20u) - EF_F64(src);
+    EF_U32(dst + 0x10u) = EF_U32(src + 0x10u);
+    EF_U32(dst + 0x14u) = EF_U32(src + 0x14u);
+    EF_U32(dst + 0x18u) = EF_U32(src + 0x18u);
+    EF_U32(dst + 0x1cu) = EF_U32(src + 0x1cu);
+    EF_U32(dst + 0x30u) = EF_U32(src + 0x30u);
+    EF_U32(dst + 0x34u) = EF_U32(src + 0x34u);
+    EF_U32(dst + 0x38u) = EF_U32(src + 0x38u);
+    EF_U32(dst + 0x3cu) = EF_U32(src + 0x3cu);
+}
+
+/* 0xea8cc, 66 bytes. (ret 4) Scale the three signed 32-bit components at EAX by the float whose bits are passed on the stack, truncating each product toward zero (0x9d72c). */
+void scale_vector3_ea8cc(uint32_t vec, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t scale_bits)
+{
+    float s;
+    uint32_t i;
+    (void)u1; (void)u2; (void)u3;
+    s = *(float *)&scale_bits;
+    for (i = 0u; i < 3u; i++)
+        EF_S32(vec + i * 4u) = (int32_t)trunc((double)EF_S32(vec + i * 4u) * (double)s);
+}
+
+/* 0x11aff4, 74 bytes. (ret 8) Blend two pairs of doubles by the fraction d and return atan2(a - b, |p[4] - p[0]|): a = p[3] * (1 - d) + p[2] * d, b = p[7] * (1 - d) + p[6] * d. */
+double blend_angle_11aff4(uint32_t p, double d)
+{
+    double a = EF_F64(p + 0x18u) * (1.0 - d) + EF_F64(p + 0x10u) * d;
+    double b = EF_F64(p + 0x38u) * (1.0 - d) + EF_F64(p + 0x30u) * d;
+    double dx = abs_double_b427c(EF_F64(p + 0x20u) - EF_F64(p));
+    return atan2_dc1e9(a - b, dx);
+}
+
+/* 0x11bfc8, 74 bytes. (ret 16) (((p[0] + k1) * k2 * k3 + k4) * (k5 / f(a0))) * k6 with f = 0x11af14 and the constants at 0x1959a4..0x1959cc. */
+double scaled_ratio_11bfc8(uint32_t p, double a0, double a1)
+{
+    double r = guest_fn_11af14_x(a0);
+    double x = (EF_F64(p) + EF_F64(0x001959a4u)) * EF_F64(0x001959acu) * EF_F64(0x001959b4u) + EF_F64(0x001959bcu);
+    (void)a1;
+    return x * (EF_F64(0x001959c4u) / r) * EF_F64(0x001959ccu);
+}
+
+/* 0x11b540, 69 bytes. (ret 8) f(x * k4) * 0.53 with f = 0xb3fec; the intermediate x * k1 * k2 + k3 is computed and discarded. */
+double scaled_call_11b540(double x)
+{
+    return guest_fn_b3fec_x(x * EF_F64(0x001958b4u)) * 0.53;
+}

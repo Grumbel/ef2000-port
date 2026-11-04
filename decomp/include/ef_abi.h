@@ -4575,4 +4575,16 @@ double abs_area_11af60(uint32_t p);
 double slope_angle_11b0ec(uint32_t p);
 double floor_e86f7(double x);
 
+void build_extent_record_10a030(uint32_t dst, uint32_t src);
+void scale_vector3_ea8cc(uint32_t vec, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t scale_bits);
+double blend_angle_11aff4(uint32_t p, double d);
+double scaled_ratio_11bfc8(uint32_t p, double a0, double a1);
+double scaled_call_11b540(double x);
+double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
+double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
+
+
+double guest_fn_11af14_x(double x); /* 0x11af14 one double on the stack, callee cleanup, result in ST0 */
+double guest_fn_b3fec_x(double x); /* 0xb3fec one double on the stack, callee cleanup, result in ST0 */
+
 #endif
