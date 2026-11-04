@@ -19583,3 +19583,39 @@ void claim_list_nodes_f8c98(uint32_t key, uint32_t owner, uint32_t slot_value, e
 		node = EF_U32(node + 4u);
 	}
 }
+
+/* 0xce830, 275 bytes. Clip the polygon at obj+0x4c against the test callback at ctx+0x14: build the clipped vertex list in the scratch pool at 0x4208b0 and clear bit 0 of obj+0x2c when any edge was cut. */
+void clip_polygon_ce830(ef_addr32 obj, ef_addr32 ctx)
+{
+	ef_addr32 out = EF_U32(0x004208b0u);
+	ef_addr32 in, prev, cur, slot;
+	int32_t n, i;
+	uint32_t state, newstate, changed = 0u;
+
+	EF_U32(out) = 0u;
+	EF_U32(0x004208b0u) = out + 0x84u;
+	in = EF_U32(obj + 0x4cu);
+	n = EF_S32(in);
+	prev = EF_U32(in + 4u);
+	EF_U32(in + (uint32_t)n * 4u + 4u) = prev;
+	state = guest_callptr4_ret_x(EF_U32(ctx + 0x14u), ctx, EF_U32(prev), EF_U32(prev + 4u), EF_U32(prev + 8u)) & 0xffu;
+	slot = in;
+	for (i = 0; i < n; i++) {
+		cur = EF_U32(slot + 8u);
+		newstate = guest_callptr4_ret_x(EF_U32(ctx + 0x14u), ctx, EF_U32(cur), EF_U32(cur + 4u), EF_U32(cur + 8u)) & 0xffu;
+		if ((state ^ newstate) != 0u) {
+			if (newstate != 0u)
+				counted_array_append(out, prev);
+			counted_array_append(out, guest_fn_ce5f8_x(ctx, prev, cur));
+			changed = 1u;
+		} else if (state == 0u) {
+			counted_array_append(out, prev);
+		}
+		state = newstate;
+		prev = cur;
+		slot += 4u;
+	}
+	EF_U32(obj + 0x4cu) = out;
+	if (changed != 0u)
+		EF_U8(obj + 0x2cu) = (uint8_t)(EF_U8(obj + 0x2cu) & 0xfeu);
+}

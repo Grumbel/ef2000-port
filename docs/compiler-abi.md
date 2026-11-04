@@ -8765,3 +8765,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xf8c98` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:ef_addr32 | none | f8624@f885c | (ret 4) Walk the node list, claim each unclaimed matching node for the next index of the request and record the owner in |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xce830` | EAX:ef_addr32,EDX:ef_addr32 | none | ce944@ce975 | Clip the polygon at obj+0x4c against the test callback at ctx+0x14: build the clipped vertex list in the scratch pool at |
