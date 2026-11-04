@@ -5879,4 +5879,6 @@ void copy_view_state_6b620(uint32_t ax);
 
 void age_effect_nodes_288c8(void);
 
+void propagate_target_record_242b8(uint32_t ax, uint32_t dx);
+
 #endif

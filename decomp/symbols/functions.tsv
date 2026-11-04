@@ -365,7 +365,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000238c0	161	can_support_238c0	line_of_sight	compiles	game	confirmed	decomp/tests/0x000238c0.json	docs/compiler-abi.md; Can unit AX attack the target of its own target?; callers 242b8@24376; guest pending
 0x000239ac	1128			unknown	unclassified	unverified		
 0x00024074	577			unknown	unclassified	unverified		
-0x000242b8	243			unknown	unclassified	unverified		
+0x000242b8	243	propagate_target_record_242b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000242b8.json	docs/compiler-abi.md; Propagate unit A's target record to unit B (AX, DX are signed 16-bit unit ids). Nothing happens if either unit is missin; callers 8d59c@8d993; guest pending
 0x000243ac	211	update_indexed_object_relation	unk_geometry	typed	game	confirmed		ABI only; AX signed index, void memory mutation, x87 compare
 0x00024480	409	test_indexed_spatial_overlap	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index, EDX triple-double pointer, qword threshold on stack, AL result, ret 8; caller sites 0x248b9/0x6b1aa
 0x0002461c	381	update_indexed_projection_globals	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX index and EDX triple-double pointer, x87 global outputs; caller sites 0x24557/0x24982

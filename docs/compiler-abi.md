@@ -8350,3 +8350,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x288c8` | none | none | 3dd30@3e1e9 | Age the list of effect nodes at dword 0x19b8c4 (next link +0xa; position words +0, +2, +4, kind word +6, age word +8). E |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x242b8` | EAX:uint32_t,EDX:uint32_t | none | 8d59c@8d993 | Propagate unit A's target record to unit B (AX, DX are signed 16-bit unit ids). Nothing happens if either unit is missin |

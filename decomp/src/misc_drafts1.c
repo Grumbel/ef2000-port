@@ -16703,3 +16703,37 @@ void age_effect_nodes_288c8(void)
 		head = EF_U32(0x0019b8c4u);
 	} while (head != 0u && ((int32_t)EF_U32(head + 6u) >> 16) == 7);
 }
+
+/* 0x242b8, 243 bytes. Propagate unit A's target record to unit B (AX, DX are signed 16-bit unit ids). Nothing happens if either unit is missing or both class rows (0xca bytes at dword 0x19bb58, indexed by the high word of unit+0x26) have the same word at +0x15. If B's word +0x158 equals the high word of A's dword +0x14, A's 8 bytes at +0x150 are copied to B's +0x15a. Otherwise, unless A's byte +0x16d is 3, B is only updated when its stored double at +0x15a plus the constant at 0x181c90 is below A's double at +0x150 or B cannot be supported (0x238c0); the update copies word +0x16 to B's +0x158 and the double +0x150 to +0x15a and notifies the unit (0x6b444). */
+void propagate_target_record_242b8(uint32_t ax, uint32_t dx)
+{
+	int32_t ua = (int32_t)(int16_t)ax;
+	int32_t ub = (int32_t)(int16_t)dx;
+	uint32_t a = guest_fn_7489c(ua);
+	uint32_t b = guest_fn_7489c(ub);
+	uint32_t rows, ra, rb;
+	double d1, d2, c;
+
+	if (a == 0u || b == 0u)
+		return;
+	rows = EF_U32(0x0019bb58u);
+	rb = (uint32_t)(((int32_t)EF_U32(b + 0x26u) >> 16) * 0xca) + rows;
+	ra = (uint32_t)(((int32_t)EF_U32(a + 0x26u) >> 16) * 0xca) + rows;
+	if (EF_U16(rb + 0x15u) == EF_U16(ra + 0x15u))
+		return;
+	if (EF_U16(b + 0x158u) == (uint32_t)(((int32_t)EF_U32(a + 0x14u) >> 16) & 0xffff)) {
+		EF_U32(b + 0x15au) = EF_U32(a + 0x150u);
+		EF_U32(b + 0x15eu) = EF_U32(a + 0x154u);
+		return;
+	}
+	if (EF_U8(a + 0x16du) == 3u)
+		return;
+	memcpy(&d1, ef_guest_memory_ptr(b + 0x15au), 8);
+	memcpy(&c, ef_guest_memory_ptr(0x00181c90u), 8);
+	memcpy(&d2, ef_guest_memory_ptr(a + 0x150u), 8);
+	if (!(d1 + c < d2) && can_support_238c0(ub) != 0u)
+		return;
+	EF_U16(b + 0x158u) = EF_U16(a + 0x16u);
+	memcpy(ef_guest_memory_ptr(b + 0x15au), ef_guest_memory_ptr(a + 0x150u), 8);
+	notify_unit_6b444((int16_t)ub);
+}
