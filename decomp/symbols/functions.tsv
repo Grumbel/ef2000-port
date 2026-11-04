@@ -409,7 +409,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002863c	130	read_save_header_2863c	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x0002863c.json	docs/compiler-abi.md; Read the save file header block of the current game file.; callers 3ea0c@3ecac; guest pending
 0x000286c0	131			unknown	unclassified	unverified		
 0x00028744	119			unknown	unclassified	unverified		
-0x000287bc	114			unknown	unclassified	unverified		
+0x000287bc	114	open_named_file_287bc	list_ops1	compiles	game	confirmed	decomp/tests/0x000287bc.json	docs/compiler-abi.md; Build a file name from a format (one of two, chosen by 0x15ee9a), open it, and if that succeeds run 0xab47c and close th; callers 284ec@28571; guest pending
 0x00028830	90	init_chain_28830	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00028830.json	docs/compiler-abi.md; Reset the ten 14-byte entries at 0x19b8d0 and chain them.; callers 3cfc0@3d1bb; guest pending
 0x0002888c	60	max_magnitude_2888c	game_helpers7	compiles	game	confirmed	decomp/tests/0x0002888c.json	docs/compiler-abi.md; Largest of three magnitudes (via cf94a).; callers 288c8@28917; guest pending
 0x000288c8	225			unknown	unclassified	unverified		

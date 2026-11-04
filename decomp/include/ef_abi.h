@@ -4225,4 +4225,6 @@ void remove_entry_and_children_a4a94(uint32_t id);
 void draw_record_text_f3aa8(uint32_t index);
 void guest_fn_f3904_x(int32_t a, int32_t b, int32_t c, int32_t d); /* 0xf3904 EAX/EDX/EBX/ECX */
 
+void open_named_file_287bc(void);
+
 #endif

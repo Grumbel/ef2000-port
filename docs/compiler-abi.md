@@ -4876,3 +4876,9 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xa4a94` | EAX:uint32_t | none | a4b08@a4b34,a4b5c@a4b6a,a4b80@a4bb8 | If entry id has flag 8 set, remove it and every entry whose owner byte (+0x11) is id. |
 | `0xf3aa8` | EAX:uint32_t | none | f3f84@f409e | For an 22-byte record at 0x485400 + index * 22, run the 0xf3904 call (unless 0x4859db is set), then format its text at + |
+
+## list_ops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x287bc` | none | none | 284ec@28571 | Build a file name from a format (one of two, chosen by 0x15ee9a), open it, and if that succeeds run 0xab47c and close th |

@@ -34,3 +34,20 @@ void draw_record_text_f3aa8(uint32_t index)
         guest_fn_f3904_x((int32_t)EF_S16(rec), (int32_t)EF_S16(rec + 2u), (int32_t)EF_S16(rec + 4u), (int32_t)EF_S16(rec + 6u));
     guest_fn_f3a1c(rec + 8u);
 }
+
+/* 0x287bc, 114 bytes. Build a file name from a format (one of two, chosen by 0x15ee9a), open it, and if that succeeds run 0xab47c and close the handle. */
+void open_named_file_287bc(void)
+{
+    uint8_t name[0x98];
+    int32_t handle;
+    ef_addr32 buf = (uint32_t)(uintptr_t)name;
+    if (EF_U16(0x0015ee9au) == 0u)
+        guest_sprintf_a4342(buf, 0x001823c0u, guest_fn_9c858(0x001822d8u), 0x00125208u);
+    else
+        guest_sprintf_a4342(buf, 0x001823c8u, 0x00125208u);
+    handle = open_slot_a7900(0u, 0u, 0u, 0u, buf);
+    if (handle != -1) {
+        guest_fn_ab47c((uint32_t)handle);
+        close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
+    }
+}
