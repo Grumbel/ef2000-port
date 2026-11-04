@@ -5227,3 +5227,36 @@ void add_recent_file_ac2e4(uint32_t name, uint32_t flag)
     EF_U8(0x00137255u) = 1u;
     EF_U16(0x0041eeccu) = (uint16_t)(EF_U16(0x0041eeccu) + 1u);
 }
+
+/* 0x56318, 298 bytes. Tick the broadcast ring entry 0x127db8 (55-byte entries from 0x1a63c0, at most 10): its countdown word (+8) falls by the frame step 0x127d92; on expiry it restarts at 20, the repeat counter (+0xa) drops by one and, while it was nonzero, every other player (below the count byte 0x12583a, not the local player 0x1a666b) whose flag byte in the entry is clear gets the message 0x2b through 0xa3f74 (the player is recorded in +0x31). The ring position advances (wrapping at 10) and the idle word 0x127dae counts down to 0. */
+void tick_broadcast_ring_56318(void)
+{
+    uint32_t e = (uint32_t)EF_S32(0x00127db8u) * 0x37u;
+    uint32_t base = 0x001a63c0u + e;
+    int16_t i;
+    if (EF_U16(base + 8u) != 0u || EF_U16(base + 0xau) != 0u) {
+        EF_U16(base + 8u) = (uint16_t)(EF_U16(base + 8u) - EF_U16(0x00127d92u));
+        if ((int16_t)EF_U16(base + 8u) < 0) {
+            uint16_t rep = EF_U16(base + 0xau);
+            EF_U16(base + 8u) = 0x14u;
+            if (rep != 0u) {
+                EF_U16(base + 0xau) = (uint16_t)(rep - 1u);
+                for (i = 0; i < (int16_t)EF_U8(0x0012583au); i++) {
+                    if ((uint16_t)i != EF_U8(0x001a666bu) && EF_U8(base + (uint32_t)(int32_t)i) == 0u) {
+                        EF_U16(0x001a63f1u + e) = (uint16_t)i;
+                        guest_fn_a3f74_x(base + 0xcu, 0x2bu);
+                    }
+                }
+            } else {
+                EF_U16(base + 8u) = rep;
+            }
+        }
+    }
+    EF_S32(0x00127db8u) = EF_S32(0x00127db8u) + 1;
+    if (EF_S32(0x00127db8u) >= 10)
+        EF_S32(0x00127db8u) = 0;
+    if (EF_U16(0x00127daeu) != 0u)
+        EF_U16(0x00127daeu) = (uint16_t)(EF_U16(0x00127daeu) - EF_U16(0x00127d92u));
+    if ((int16_t)EF_U16(0x00127daeu) < 0)
+        EF_U16(0x00127daeu) = 0u;
+}

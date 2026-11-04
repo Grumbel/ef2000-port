@@ -4936,4 +4936,7 @@ void guest_fn_3a000_x(uint32_t a); /* 0x3a000 EAX */
 
 void add_recent_file_ac2e4(uint32_t name, uint32_t flag);
 
+void tick_broadcast_ring_56318(void);
+void guest_fn_a3f74_x(uint32_t a, uint32_t b); /* 0xa3f74 EAX/EDX */
+
 #endif

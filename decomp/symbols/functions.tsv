@@ -1037,7 +1037,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00056208	94	clear_counters_56208	game_helpers32	compiles	game	confirmed	decomp/tests/0x00056208.json	docs/compiler-abi.md; Clear ten 55-byte record counters and the 80x8 ready-word grid.; callers 58028@58047; guest pending
 0x00056268	109			unknown	unclassified	unverified		
 0x000562d8	61	bump_counter_562d8	game_helpers8	compiles	game	confirmed	decomp/tests/0x000562d8.json	docs/compiler-abi.md; Bump the per-slot counter of the first record whose key equals value.; callers 561e4@56200; guest pending
-0x00056318	298			unknown	unclassified	unverified		
+0x00056318	298	tick_broadcast_ring_56318	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00056318.json	docs/compiler-abi.md; Tick the broadcast ring entry 0x127db8 (55-byte entries from 0x1a63c0, at most 10): its countdown word (+8) falls by the; callers 3dd30@3e70d; guest pending
 0x00056444	175	send_unit_options_56444	game_helpers18	compiles	game	confirmed	decomp/tests/0x00056444.json	docs/compiler-abi.md; Send the unit's twelve option bytes and flag bits (command 0x11).; callers 172b4@17344,74970@74d7b,74fb4@75296; guest pending
 0x000564f4	446			unknown	unclassified	unverified		
 0x000566b4	136	apply_params_message_566b4	game_helpers19	compiles	game	confirmed	decomp/tests/0x000566b4.json	docs/compiler-abi.md; Load the parameter block from a message and apply it for the local player.; callers 581b0@583a4; guest pending

@@ -6152,3 +6152,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xac2e4` | EAX:uint32_t,EDX:uint32_t | none | ac240@ac274,ac240@ac295 | Register the text file NAME in the recent-file list (21-byte names at 0x41e960, count word 0x41eecc, limit 16 with error |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x56318` | none | none | 3dd30@3e70d | Tick the broadcast ring entry 0x127db8 (55-byte entries from 0x1a63c0, at most 10): its countdown word (+8) falls by the |
