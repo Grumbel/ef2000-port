@@ -2908,7 +2908,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc67c	24	code_is_20_or_21	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc67c.json	docs/compiler-abi.md; AL is 0x20 or 0x21.; callers d68c@dfe0,d68c@e12c,d68c@e236; guest pending
 0x000cc694	24	code_is_23_or_24	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc694.json	docs/compiler-abi.md; AL is 0x23 or 0x24.; callers d68c@e00b,d68c@e157,d68c@e25f; guest pending
 0x000cc6ac	17	code_is_22	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc6ac.json	docs/compiler-abi.md; AL is 0x22.; callers d68c@e035,d68c@e288,9a8b4@9a97d; guest pending
-0x000cc6c0	132			unknown	unclassified	unverified		
+0x000cc6c0	132	alloc_zeroed_cc6c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cc6c0.json	docs/compiler-abi.md; cdecl, variadic (SIZE, FMT, ...): allocate SIZE bytes (0xc3f70); when that fails report through the pointer at 0x132a74 ; callers e764@e76a,3c790@3c7c9,3cb2c@3cb68; guest pending
 0x000cc744	34	alloc_checked_cc744	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000cc744.json	docs/compiler-abi.md; Allocate a block for a non-null request, aborting on failure.; callers 3cb2c@3cb84,3cb2c@3cb97,b3374@b339f; guest pending
 0x000cc768	5	tail_jump_cc768	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000cc768.json	docs/compiler-abi.md; tail jump. Forward to 0xc3f80.; callers e710@e728,e710@e734,f8f8@f906; guest pending
 0x000cc76d	87	parse_int_cc76d	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc76d.json	docs/compiler-abi.md; Same as 0x9d4cd.; callers e980@e98a,f3b58@f3b6f; guest pending

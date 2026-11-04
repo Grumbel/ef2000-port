@@ -8450,3 +8450,26 @@ void set_object_target_26670(uint32_t index, uint32_t x, uint32_t y, uint32_t z)
     }
     clear_part_flags_266f8(obj);
 }
+
+/* 0xcc6c0, 132 bytes. cdecl, variadic (SIZE, FMT, ...): allocate SIZE bytes (0xc3f70); when that fails report through the pointer at 0x132a74 either the formatted message FMT (with the following arguments) or, when FMT is 0, the default text at 0x18f408; then zero the SIZE bytes at the returned pointer (0xb3fb0) and return it. */
+uint32_t alloc_zeroed_cc6c0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t size, uint32_t fmt, ...)
+{
+    char msg[0x84];
+    uint32_t p, i;
+    va_list ap;
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    p = guest_fn_c3f70(size);
+    if (p == 0u) {
+        if (fmt != 0u) {
+            va_start(ap, fmt);
+            format_to_buffer_e3022((uint32_t)(uintptr_t)msg, fmt, (uint32_t)(uintptr_t)&ap[0]);
+            va_end(ap);
+        } else {
+            for (i = 0; i < 17u; i++)
+                msg[i] = (char)EF_U8(0x0018f408u + i);
+        }
+        guest_callptr1_x(EF_U32(0x00132a74u), (uint32_t)(uintptr_t)msg);
+    }
+    fill_bytes_b3fb0(p, 0u, size);
+    return p;
+}
