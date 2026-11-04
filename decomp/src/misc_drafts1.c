@@ -10465,3 +10465,42 @@ uint32_t find_object_near_90940(ef_addr32 pos)
     }
     return 0u;
 }
+
+/* 0x76e2c, 297 bytes. Refresh the roster of unit B (DX, signed) for class A (AX, signed): look the unit up (0x7489c) and take its roster table row (byte +0x187, 25-byte rows at [0x1f8918]) and the class record A (0xca-byte rows at [0x19bb58]); classes with byte +0x1a equal to 0xe are skipped. For every one of the class's count (byte +0x4f) entries find the first of the eight roster columns whose word (row +3 + 2 * column) is 0xff, bind it with 0x76b30 (column, entry word +0x50) and note whether that entry equals the high half of dword 0x1f71c8. Then redraw the record (0x461e8) with 0x84 when A matches word 0x19bb5e and no entry matched, otherwise with 0x42. */
+void refresh_unit_roster_76e2c(uint32_t a, uint32_t b)
+{
+    int32_t cls = (int16_t)a;
+    int32_t unit = (int16_t)b;
+    ef_addr32 u = guest_fn_7489c(unit);
+    ef_addr32 row;
+    ef_addr32 crec;
+    uint8_t matched = 0u;
+    uint8_t n;
+    uint8_t ch;
+    uint8_t cl;
+    uint8_t found;
+    if (u == 0u)
+        return;
+    row = EF_U32(0x001f8918u) + (uint32_t)EF_U8(u + 0x187u) * 25u;
+    crec = EF_U32(0x0019bb58u) + (uint32_t)(cls * 0xca);
+    if (EF_U8(crec + 0x1au) == 0xeu)
+        return;
+    n = EF_U8(crec + 0x4fu);
+    for (ch = 0u; ch < n; ch++) {
+        found = 0u;
+        for (cl = 0u; cl < 8u; cl++) {
+            if (found != 0u)
+                continue;
+            if ((int16_t)EF_U16(row + (uint32_t)cl * 2u + 3u) != 0xff)
+                continue;
+            guest_fn_76b30(u, cl, (uint32_t)(int32_t)(int16_t)EF_U16(crec + (uint32_t)ch * 2u + 0x50u));
+            found = 1u;
+            if (EF_U16(crec + (uint32_t)ch * 2u + 0x50u) == (uint32_t)((int32_t)EF_U32(0x001f71c8u) >> 16))
+                matched = 1u;
+        }
+    }
+    if ((uint16_t)a == EF_U16(0x0019bb5eu) && matched == 0u)
+        draw_record_entries_461e8((uint32_t)unit, (uint32_t)cls, 0x84u, 0u, 0u, 0u);
+    else
+        draw_record_entries_461e8((uint32_t)unit, (uint32_t)cls, 0x42u, 0u, 0u, 0u);
+}

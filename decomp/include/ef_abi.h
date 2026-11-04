@@ -5344,4 +5344,6 @@ void build_glyph_runs_e17f8(void);
 
 uint32_t find_object_near_90940(ef_addr32 pos);
 
+void refresh_unit_roster_76e2c(uint32_t a, uint32_t b);
+
 #endif

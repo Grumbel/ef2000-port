@@ -7224,3 +7224,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x90940` | EAX:ef_addr32 | EAX:uint32_t | 8de9c@8dffb | Find the id of the first object near POS (EAX; three dwords): scan the 0x45-byte records (count word 0x1a1506, table at  |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x76e2c` | EAX:uint32_t,EDX:uint32_t | none | 46454@4707f | Refresh the roster of unit B (DX, signed) for class A (AX, signed): look the unit up (0x7489c) and take its roster table |
