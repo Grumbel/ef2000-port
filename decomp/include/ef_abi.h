@@ -5094,4 +5094,6 @@ void build_render_object_d2584(ef_addr32 list, uint32_t count);
 
 void load_text_file_510d0(void);
 
+void draw_label_entries_150d4(void);
+
 #endif

@@ -260,7 +260,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00014d3c	26	read_event_slot_byte	low_helpers	compiles	game	confirmed	decomp/tests/0x00014d3c.json	docs/compiler-abi.md; byte 0x1225d4+19*AX; callers 589c0@58c62; guest pending
 0x00014d58	409			unknown	unclassified	unverified		
 0x00014ef4	29	refresh_all_event_slots	event_wrappers	compiles	game	confirmed	decomp/tests/0x0014ef4.json	Iterate signed index 0..33 through 0x14d58; callers 5f60@5fbf/5fd8@6008; guest pending
-0x000150d4	196			unknown	unclassified	unverified		
+0x000150d4	196	draw_label_entries_150d4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000150d4.json	docs/compiler-abi.md; Draw the 0x22 label entries of the table at 0x1225d4 (19 bytes each: kind byte +1, box words +2/+4/+6, height word +8, t; callers 5f60@5fc4,5fd8@600d,6c1c@6c90; guest pending
 0x000151a0	36	reset_dialog_latches	low_helpers	compiles	game	confirmed	decomp/tests/0x000151a0.json	docs/compiler-abi.md; bytes 0x12289e=1 0x12289f=0 0x1228a0=0 and 0x197c50=byte 0x181730; callers 58d64@58d69; guest pending
 0x000151c4	1	nop_151c4	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000151c4.json	docs/compiler-abi.md; Empty stub (single ret).; callers 3ce30@3ce4f,3d950@3d9c3,3db9c@3dbd4; guest pending
 0x000151c8	8	set_flag_151c8	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000151c8.json	docs/compiler-abi.md; ; callers none direct; guest pending

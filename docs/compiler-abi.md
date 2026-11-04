@@ -6527,3 +6527,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x510d0` | none | none | 52164@522a7 | Load the language text file: build the path (default directory + 0x18515c + the decimal word from the high half of dword |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x150d4` | none | none | 5f60@5fc4,5fd8@600d,6c1c@6c90 | Draw the 0x22 label entries of the table at 0x1225d4 (19 bytes each: kind byte +1, box words +2/+4/+6, height word +8, t |

@@ -6995,3 +6995,26 @@ void load_text_file_510d0(void)
         guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), (uint32_t)(uintptr_t)path, EF_U32(0x001a58b0u));
     reset_text_50c70();
 }
+
+/* 0x150d4, 196 bytes. Draw the 0x22 label entries of the table at 0x1225d4 (19 bytes each: kind byte +1, box words +2/+4/+6, height word +8, text at +0xa): for each entry whose kind has a text slot (0xcd7f0) enter scroll mode with the text pointer, measure the text (0x48c34) and draw it in colour 0xe centred in the box (x = box x + (box width - text width) / 2, y = box y + height / 2 - 2) with 0x48bb0; finally leave scroll mode (0xc39ac). Scroll mode is entered with EDX = 0x100 and EBX = 0xc0 (not modelled by the one-argument declaration). */
+void draw_label_entries_150d4(void)
+{
+    int16_t i;
+    for (i = 0; i < 0x22; i++) {
+        uint32_t ent = 0x001225d4u + (uint32_t)i * 0x13u;
+        int16_t bx = (int16_t)EF_U16(ent + 2u);
+        int16_t by = (int16_t)EF_U16(ent + 4u);
+        int16_t bw = (int16_t)EF_U16(ent + 6u);
+        int16_t bh = (int16_t)EF_U16(ent + 8u);
+        uint32_t text = ent + 0xau;
+        int32_t width, x, y;
+        if (get_text_slot_cd7f0((int16_t)EF_U8(ent + 1u)) == 0u)
+            continue;
+        enter_scroll_mode_c39f0(text);
+        width = (int16_t)formatted_text_width_48c34(1u, text);
+        y = (int16_t)(by + (bh >> 1) - 2);
+        x = (int16_t)(bx + (((int32_t)bw - width) >> 1));
+        draw_formatted_text_mode_48bb0(0xeu, 1u, x, y, text);
+    }
+    leave_scroll_mode_c39ac();
+}
