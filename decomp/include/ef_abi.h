@@ -4157,4 +4157,11 @@ int32_t lookup_name_value_a1a40(ef_addr32 name);
 uint32_t position_out_of_range_aa2f8(ef_addr32 rec);
 void select_table_entry_10922c(ef_addr32 name);
 
+/* small_wrappers4.c */
+void release_matching_slots_11288c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec, uint32_t id);
+void redraw_message_line_77c34(void);
+void copy_rows_to_screen_eb0b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t x, uint32_t y, uint32_t width, uint32_t rows, uint32_t src_stride, ef_addr32 src);
+
+
+
 #endif

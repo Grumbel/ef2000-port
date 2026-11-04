@@ -4766,3 +4766,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xaa2f8` | EAX:ef_addr32 | EAX:uint32_t | aa350@aa375 | Return 1 when the row (+0xb) or column (+0xc) bytes of a record fall outside the list limits, else 0. |
 | `0x10922c` | EAX:ef_addr32 | none | 1093d8@109428 | Lowercase a name, plant it as a sentinel entry of the 8-byte table at 0x4dd898 and store the value of the first matching |
+
+## small_wrappers4 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11288c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:uint32_t | none | 1123a4@11274e | Release every slot of a record whose id (+0x558) matches, then send the pending-count message. |
+| `0x77c34` | none | none | 79128@79171 | Shrink the pending line count at 0x1f8d52 to the limit at 0x127d92 and redraw the uppercased message line. |
+| `0xeb0b0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:ef_addr32 | none | e4c9c@e4f79 | Copy rows of bytes into the framebuffer at (x, y), advancing the destination by the row stride at 0x1631f4. |

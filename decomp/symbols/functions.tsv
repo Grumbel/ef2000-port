@@ -1420,7 +1420,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00077be0	54	reset_slots_77be0	game_helpers5	compiles	game	confirmed	decomp/tests/0x00077be0.json	docs/compiler-abi.md; ; callers 3dd30@3ddd2; guest pending
 0x00077c18	15	copy_and_sync_scene_marker	mid_helpers	compiles	game	confirmed	decomp/tests/0x00077c18.json	docs/compiler-abi.md; dword 0x12adf8=dword 0x126694 then 0x47f9c; callers 77c90@77ce7,77c90@77d02,77c90@77d2b; guest pending
 0x00077c28	10	set_timer_77c28	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x00077c28.json	docs/compiler-abi.md; Set the 0x118 timer word.; callers 77c90@77d94; guest pending
-0x00077c34	89			unknown	unclassified	unverified		
+0x00077c34	89	redraw_message_line_77c34	small_wrappers4	compiles	game	confirmed	decomp/tests/0x00077c34.json	docs/compiler-abi.md; Shrink the pending line count at 0x1f8d52 to the limit at 0x127d92 and redraw the uppercased message line.; callers 79128@79171; guest pending
 0x00077c90	2997			unknown	unclassified	unverified		
 0x00078848	235			unknown	unclassified	unverified		
 0x00078934	153			unknown	unclassified	unverified		
@@ -3497,7 +3497,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eaf80	136			unknown	unclassified	unverified		
 0x000eb008	61	draw_glyph_string_eb008	game_helpers91	compiles	game	confirmed	decomp/tests/0x000eb008.json	docs/compiler-abi.md; Draw a NUL-terminated string glyph by glyph (6 pixels apart, 6-bit codes).; callers 98658@986b1,98658@9884d,98658@988da; guest pending
 0x000eb050	94			unknown	unclassified	unverified		
-0x000eb0b0	89			unknown	unclassified	unverified		
+0x000eb0b0	89	copy_rows_to_screen_eb0b0	small_wrappers4	compiles	game	confirmed	decomp/tests/0x000eb0b0.json	docs/compiler-abi.md; Copy rows of bytes into the framebuffer at (x, y), advancing the destination by the row stride at 0x1631f4.; callers e4c9c@e4f79; guest pending
 0x000eb174	123			unknown	unclassified	unverified		
 0x000eb1f0	94			unknown	unclassified	unverified		
 0x000eb24e	11	set_limit_eb24e	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000eb24e.json	docs/compiler-abi.md; Set the 0x17d400 limit to 0x8000.; callers 9bd20@9bd50; guest pending
@@ -4098,7 +4098,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x001121e0	449			unknown	unclassified	unverified		
 0x001123a4	1122			unknown	unclassified	unverified		
 0x00112808	132			unknown	unclassified	unverified		
-0x0011288c	88			unknown	unclassified	unverified		
+0x0011288c	88	release_matching_slots_11288c	small_wrappers4	compiles	game	confirmed	decomp/tests/0x0011288c.json	docs/compiler-abi.md; Release every slot of a record whose id (+0x558) matches, then send the pending-count message.; callers 1123a4@11274e; guest pending
 0x001128e4	567			unknown	unclassified	unverified		
 0x00112b1c	158	reset_table_record_112b1c	game_helpers58	compiles	game	confirmed	decomp/tests/0x00112b1c.json	docs/compiler-abi.md; Reset a table record: clear the slots, fill the index tables with -1 and set defaults.; callers 112bbc@112bc2,113c7c@113cdb; guest pending
 0x00112bbc	25	reset_table_record_and_link_112bbc	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x00112bbc.json	docs/compiler-abi.md; Reset a table record and point its field 0x14 8 bytes past field 0x10.; callers 113d10@113e46,11402c@114045; guest pending
