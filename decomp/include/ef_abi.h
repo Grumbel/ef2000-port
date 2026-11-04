@@ -6485,4 +6485,7 @@ uint32_t ext_div_f05e5(ef_addr32 a, ef_addr32 b); /* 0xf05e5 */
 void box_record_fill_10a0d4(ef_addr32 dst, ef_addr32 src);
 void box_record_fill_10a0d4(ef_addr32 dst, ef_addr32 src); /* 0x10a0d4 */
 
+void rotate_add_words_e9b38(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 words, uint32_t ang_edi, uint32_t ang_esi, uint32_t ang_ebx, ef_addr32 vec);
+void rotate_add_words_e9b38(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 words, uint32_t ang_edi, uint32_t ang_esi, uint32_t ang_ebx, ef_addr32 vec); /* 0xe9b38 */
+
 #endif

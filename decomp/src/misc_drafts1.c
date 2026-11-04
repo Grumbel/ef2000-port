@@ -23114,3 +23114,30 @@ void box_record_fill_10a0d4(ef_addr32 dst, ef_addr32 src)
 	EF_U32(dst + 0x4c) = 0;
 	*(double *)ef_guest_memory_ptr(dst + 0x20) = box_extent_ratio_11afe4(src);
 }
+
+static uint32_t e9b38_mul24(uint32_t m, int32_t w)
+{
+	int64_t p = (int64_t)(int32_t)m * (int64_t)w;
+	return (uint32_t)(p >> 24);
+}
+
+/* 0xe9b38, 188 bytes. Builds the rotation matrix at 0x1590e4 (via 0xfcd20) from three angles, then adds the three signed words at the source pointer, each scaled by one matrix row, to the vector (x, y, z) at the last argument (fixed point, product >> 24). */
+void rotate_add_words_e9b38(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 words, uint32_t ang_edi, uint32_t ang_esi, uint32_t ang_ebx, ef_addr32 vec)
+{
+	uint32_t x, y, z;
+	uint32_t i;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	build_rotation_matrix_fcd20(ang_ebx, ang_esi, ang_edi);
+	x = EF_U32(vec);
+	y = EF_U32(vec + 4u);
+	z = EF_U32(vec + 8u);
+	for (i = 0; i < 3; i++) {
+		int32_t w = (int16_t)EF_U16(words + 2u * i);
+		x += e9b38_mul24(EF_U32(0x001590e4u + 12u * i), w);
+		y += e9b38_mul24(EF_U32(0x001590e8u + 12u * i), w);
+		z += e9b38_mul24(EF_U32(0x001590ecu + 12u * i), w);
+	}
+	EF_U32(vec) = x;
+	EF_U32(vec + 4u) = y;
+	EF_U32(vec + 8u) = z;
+}
