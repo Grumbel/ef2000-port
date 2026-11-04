@@ -3537,3 +3537,21 @@ in EAX, format string address, one value).
 | `0xa7f64` | EAX:ef_addr32 | EAX:ef_addr32 | 27fec@27ffe | Look up a key name that must exist and be of kind 1. |
 | `0xa9bfc` | none | none | aaee8@aafb4 | Reset the key table state and its buffer pointers. |
 | `0xaa350` | none | none | aad7c@aae42 | Walk every scene group and resolve its child nodes. |
+
+## runtime_helpers33 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xaa4d4` | none | none | aad7c@aae3d | Rewrite the pointer fields of every type 0xe node in each group. |
+| `0xab28c` | EAX:ef_addr32 | none | ab47c@ab5a8 | Visit the pointer fields of every type 0xe node, then finish the context. |
+| `0xaca14` | none | none | ac854@ac96a,aca94@acab5,acac0@acb0a | Pick the default video mode entry from the configured kind. |
+| `0xacac0` | EAX:ef_addr32 | none | ac16c@ac1fd,e1958@e19ee,e1958@e1b51 | Select the video mode named by the argument. |
+| `0xac16c` | none | none | ac0e0@ac158,ac780@ac791 | Clear the UI state tables and select the video mode. |
+| `0xac0e0` | none | none | 84c84@84c96,84c84@84cac | Reset the UI after a mode change and centre the cursor. |
+| `0xac240` | EAX:ef_addr32,DL:uint8_t | none | ac408@ac449,ac408@ac480,ac408@ac4dc | Run the registered page callbacks, then wait for the mouse buttons to clear. |
+| `0xb0138` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 49228@49461 | Allocate and initialise a pool sized from the shape list. |
+| `0xb1a68` | EAX:ef_addr32 | none | b1ae4@b1af5 | Free a record and all of its sub-tables. |
+| `0xb21ec` | EAX:ef_addr32,EDX:uint32_t | none | b1f80@b21c7,b2758@b27d0 | Print one record to a text handle. |
+| `0xb2810` | EAX:ef_addr32,EDX:uint32_t | none | b2b00@b2cb9 | Dump a table entry and its sub-records (variant A names). |
+| `0xb28b8` | EAX:ef_addr32,EDX:uint32_t | none | b2b00@b2cd1 | Dump a table entry and its sub-records (variant B names). |
+| `0xb29a8` | EAX:ef_addr32,EDX:uint32_t | none | b2560@b26d2,b2560@b26ff,b2560@b272c | Dump a list of sub-lists. |

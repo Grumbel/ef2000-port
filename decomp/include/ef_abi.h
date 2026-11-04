@@ -2894,4 +2894,37 @@ uint16_t guest_fn_aa2f8(ef_addr32 node); /* 0xaa2f8 */
 void guest_fn_aa198(ef_addr32 node); /* 0xaa198 */
 void guest_fn_aa1c0(ef_addr32 node); /* 0xaa1c0 */
 
+/* runtime_helpers33.c */
+void patch_group_pointers_aa4d4(void);
+void visit_group_nodes_ab28c(ef_addr32 context);
+void select_default_video_aca14(void);
+void select_video_mode_acac0(ef_addr32 name);
+void clear_ui_state_ac16c(void);
+void reset_ui_state_ac0e0(void);
+void run_page_callbacks_ac240(ef_addr32 arg, uint8_t flag);
+ef_addr32 alloc_record_pool_b0138(ef_addr32 listp, ef_addr32 countp);
+void free_record_tree_b1a68(ef_addr32 rec);
+void print_record_b21ec(ef_addr32 rec, uint32_t out);
+void dump_table_a_b2810(ef_addr32 rec, uint32_t out);
+void dump_table_b_b28b8(ef_addr32 rec, uint32_t out);
+void dump_group_list_b29a8(ef_addr32 list, uint32_t out);
+uint32_t guest_fn_aa4b8(int32_t value, ef_addr32 group); /* 0xaa4b8 */
+void guest_fn_ab260(ef_addr32 context, ef_addr32 pointer); /* 0xab260 */
+void guest_fn_ab174(ef_addr32 context); /* 0xab174 */
+uint8_t guest_fn_e4304(void); /* 0xe4304 -> AL */
+void guest_fn_e4264(void); /* 0xe4264 */
+void guest_fn_e4188(void); /* 0xe4188 */
+void guest_fn_ab8b0(void); /* 0xab8b0 */
+void guest_fn_ca200(ef_addr32 name); /* 0xca200 */
+void guest_fn_e17f8(uint32_t a, uint32_t b); /* 0xe17f8 */
+uint32_t guest_fn_ab8c4(void); /* 0xab8c4 -> EAX */
+void guest_fn_ca5e4(uint32_t a, uint32_t b); /* 0xca5e4 */
+void guest_fn_ac2e4(ef_addr32 a, uint32_t b); /* 0xac2e4 */
+void guest_fn_a5abc(void); /* 0xa5abc */
+uint32_t guest_fn_cc6c0(uint32_t size, ef_addr32 tag, uint32_t size2, uint32_t count); /* 0xcc6c0 cdecl */
+void guest_fn_b1bb0(uint32_t handle, ef_addr32 format, ...); /* 0xb1bb0 cdecl, variadic */
+void guest_fn_b2a2c(ef_addr32 pointer, uint32_t handle); /* 0xb2a2c */
+void guest_fn_b2504(ef_addr32 pointer, uint32_t index, uint32_t handle); /* 0xb2504 */
+void guest_fn_b2960(ef_addr32 pointer, uint32_t handle); /* 0xb2960 */
+
 #endif
