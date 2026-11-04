@@ -9015,3 +9015,11 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x120bc0` | none | none | 120746@12077b | Hook the interrupt vector whose number is the byte at 0x17f05c with the handler at 0x120822, remembering the old vector  |
 | `0x120c06` | none | none | 120746@12076b | Same as 0x120bc0 for the vector number at 0x17f05e; the handler is 0x120815 when the byte at 0x17f05f is 0x20 and 0x1208 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x9c220` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | 628@697 | cdecl (OFFSET, SELECTOR, EDX_ARG): DOS-extender int 21h AX=0x252B with EBX = 0x501, ECX = OFFSET, ES = SELECTOR, EDX = E |
+| `0x9c27c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | none direct | cdecl (ARG0, SELECTOR): returns -1 when SELECTOR equals the word at 0x120cc4. Otherwise any of ES, FS, GS that holds SEL |
+| `0x9c2bb` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | none direct | cdecl (ADDEND, SELECTOR): int 21h AX=0x3504 with EBX = SELECTOR; returns ECX + ADDEND, or -1 when the carry flag is set. |

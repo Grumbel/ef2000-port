@@ -6187,4 +6187,11 @@ void hook_interrupt_120c06(void);
 void hook_interrupt_120bc0(void); /* 0x120bc0 */
 void hook_interrupt_120c06(void); /* 0x120c06 */
 
+uint32_t extender_call_252b_9c220(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t offset, uint32_t selector, uint32_t edx_arg);
+uint32_t extender_call_3502_9c27c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t arg0, uint32_t selector);
+uint32_t extender_call_3504_9c2bb(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t addend, uint32_t selector);
+uint32_t extender_call_252b_9c220(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t offset, uint32_t selector, uint32_t edx_arg); /* 0x9c220 */
+uint32_t extender_call_3502_9c27c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t arg0, uint32_t selector); /* 0x9c27c */
+uint32_t extender_call_3504_9c2bb(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t addend, uint32_t selector); /* 0x9c2bb */
+
 #endif

@@ -20688,3 +20688,45 @@ void hook_interrupt_120c06(void)
 {
 	md_swap_int_vector(EF_U8(0x0017f05eu), EF_U8(0x0017f05fu) == 0x20u ? 0x00120815u : 0x00120822u);
 }
+
+/* Shared helper for the DOS-extender int 21h wrappers below: run int 21h with AX, EBX, ECX, EDX and an optional ES selector; the carry flag comes back in out[6]. */
+static uint32_t md_int21_regs(uint32_t ax, uint32_t ebx, uint32_t ecx, uint32_t edx, uint32_t es, uint32_t *ecx_out)
+{
+	uint32_t in[7];
+	uint32_t out[7];
+	uint8_t sregs[12];
+
+	segread_9be0d((uint32_t)(uintptr_t)sregs);
+	*(uint16_t *)sregs = (uint16_t)es;
+	in[0] = ax; in[1] = ebx; in[2] = ecx; in[3] = edx; in[4] = 0u; in[5] = 0u; in[6] = 0u;
+	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
+	if (ecx_out != 0)
+		*ecx_out = out[2];
+	return out[6] != 0u ? 0xffffffffu : 0u;
+}
+
+/* 0x9c220, 29 bytes. cdecl (OFFSET, SELECTOR, EDX_ARG): DOS-extender int 21h AX=0x252B with EBX = 0x501, ECX = OFFSET, ES = SELECTOR, EDX = EDX_ARG. Returns -1 when the carry flag is set, else 0. (ES is reloaded from DS afterwards.) */
+uint32_t extender_call_252b_9c220(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t offset, uint32_t selector, uint32_t edx_arg)
+{
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	return md_int21_regs(0x252bu, 0x501u, offset, edx_arg, selector, 0);
+}
+
+/* 0x9c27c, 63 bytes. cdecl (ARG0, SELECTOR): returns -1 when SELECTOR equals the word at 0x120cc4. Otherwise any of ES, FS, GS that holds SELECTOR is reset to 0 (not modelled: the harness has no segment-register writer) and int 21h AX=0x3502 is run with EBX = SELECTOR; the result is -1 when the carry flag is set, else 0. */
+uint32_t extender_call_3502_9c27c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t arg0, uint32_t selector)
+{
+	(void)u0; (void)u1; (void)u2; (void)u3; (void)arg0;
+	if ((selector & 0xffffu) == EF_U16(0x00120cc4u))
+		return 0xffffffffu;
+	return md_int21_regs(0x3502u, selector, 0u, 0u, 0u, 0);
+}
+
+/* 0x9c2bb, 24 bytes. cdecl (ADDEND, SELECTOR): int 21h AX=0x3504 with EBX = SELECTOR; returns ECX + ADDEND, or -1 when the carry flag is set. */
+uint32_t extender_call_3504_9c2bb(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t addend, uint32_t selector)
+{
+	uint32_t ecx;
+	(void)u0; (void)u1; (void)u2; (void)u3;
+	if (md_int21_regs(0x3504u, selector, 0u, 0u, 0u, &ecx) != 0u)
+		return 0xffffffffu;
+	return ecx + addend;
+}
