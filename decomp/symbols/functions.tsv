@@ -3226,7 +3226,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dc890	69	halve_triple_to_fit16_dc890	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc890.json	docs/compiler-abi.md; Halve three dwords until all fit in a signed 16-bit range.; callers dc91c@dc98f,dcaa4@dcb2a; guest pending
 0x000dc8d8	67			unknown	unclassified	unverified		
 0x000dc91c	180			unknown	unclassified	unverified		
-0x000dcaa4	207			unknown	unclassified	unverified		
+0x000dcaa4	207	bearing_between_positions_dcaa4	game_helpers95	compiles	game	confirmed	decomp/tests/0x000dcaa4.json	docs/compiler-abi.md; Pitch and yaw angles of the vector from position b to position a, stored as two words at out.; callers 9f664@9f702; guest pending
 0x000dcb74	9	stack_used_dcb74	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000dcb74.json	docs/compiler-abi.md; Stack bytes in use relative to the recorded stack base.; callers 233c4@2341e,9bd20@9bd30,c3584@c35a8; guest pending
 0x000dcb96	100			unknown	unclassified	unverified		
 0x000dcc10	67	reset_clip_dcc10	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000dcc10.json	docs/compiler-abi.md; Reset the 320x200 clip state.; callers a9e70@a9e8d; guest pending

@@ -4242,3 +4242,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xc10c4` | AX:int16_t,DX:int16_t,EBX:uint32_t,CL:uint8_t,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32 | EAX:uint32_t | c117c@c11ce | Reactivate up to count disabled (state 7) records at the given cell whose code passes the group and set tests; returns h |
+
+## game_helpers95 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdcaa4` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | none | 9f664@9f702 | Pitch and yaw angles of the vector from position b to position a, stored as two words at out. |

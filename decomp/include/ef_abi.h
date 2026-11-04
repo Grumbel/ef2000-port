@@ -3773,4 +3773,7 @@ void update_scene_angle_third(ef_addr32 record, uint16_t value);
 /* game_helpers94.c */
 uint32_t reactivate_records_at_cell_c10c4(int16_t x, int16_t y, uint32_t count, uint8_t type, ef_addr32 head_addr, ef_addr32 list);
 
+/* game_helpers95.c */
+void bearing_between_positions_dcaa4(ef_addr32 out, ef_addr32 a, ef_addr32 b);
+
 #endif
