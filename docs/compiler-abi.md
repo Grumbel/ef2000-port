@@ -4502,3 +4502,12 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xceb40` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:int32_t,[ESP+8]:int32_t,[ESP+12]:int32_t,[ESP+16]:int32_t | EAX:uint32_t | c46f8@c4710,c473c@c4743 | Test a point (z, y, x on the stack after a margin) against the five planes at 0x15b79c: returns 1 when a coordinate is o |
 | `0x111575` | none | none | 110fd4@110feb | Register the two code ranges 0x17d624..0x17e1d4 and 0x110dcc..0x111575 with the stack range tracker. |
+
+## game_helpers125 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1f7d4` | AX:int16_t,DX:int16_t,BX:int16_t,CX:int16_t,[ESP+4]:int16_t | none | 1ff0c@2011c,1ff0c@20491,2065c@20aef | Draw a rectangle outline with four tactical lines of marker a; x spans b..d, y spans c..e (e on the stack). |
+| `0xfeec8` | EAX:ef_addr32 | none | d663c@d6652 | Upload a 256-entry RGB palette to the VGA DAC (ports 0x3c8/0x3c9), sending only entries that differ from the shadow copy |
+| `0x1052f0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 10585c@105c7f,10683c@106870,106894@1068ac | Once per record: send message 0x401 with the two words at +0x14 and +0x18 (cdecl, record on the stack). |
+| `0x111df0` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:ef_addr32 | none | 111e40@111e65,111ed4@111eda,111ed4@111f16 | If a pending count is set at +0x1a8, send message 0x502 with it and clear the count and +0x1ac (cdecl, record on the sta |

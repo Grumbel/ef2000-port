@@ -3941,4 +3941,10 @@ void update_frame_slot_b5800(ef_addr32 owner, ef_addr32 obj, int16_t need);
 uint32_t point_in_view_volume_ceb40(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, int32_t margin, int32_t z, int32_t y, int32_t x);
 void register_code_ranges_111575(void);
 
+/* game_helpers125.c */
+void draw_tactical_rect_1f7d4(int16_t a, int16_t b, int16_t c, int16_t d, int16_t e);
+void upload_vga_palette_feec8(ef_addr32 palette);
+void send_record_size_message_1052f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+void send_pending_count_message_111df0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
+
 #endif
