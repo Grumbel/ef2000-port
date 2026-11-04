@@ -4869,3 +4869,10 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xe7e30` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 759b8@75c6c,c8e58@c8f0d,c8f38@c8fc4 | Rebuild the 0x8000-byte remap table at [0x164604] by looking each byte of its upper half up in the 0x433f34 tables, unle |
+
+## list_ops1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xa4a94` | EAX:uint32_t | none | a4b08@a4b34,a4b5c@a4b6a,a4b80@a4bb8 | If entry id has flag 8 set, remove it and every entry whose owner byte (+0x11) is id. |
+| `0xf3aa8` | EAX:uint32_t | none | f3f84@f409e | For an 22-byte record at 0x485400 + index * 22, run the 0xf3904 call (unless 0x4859db is set), then format its text at + |

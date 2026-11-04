@@ -2235,7 +2235,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a48ac	237			unknown	unclassified	unverified		
 0x000a499c	130			unknown	unclassified	unverified		
 0x000a4a20	116			unknown	unclassified	unverified		
-0x000a4a94	114			unknown	unclassified	unverified		
+0x000a4a94	114	remove_entry_and_children_a4a94	list_ops1	compiles	game	confirmed	decomp/tests/0x000a4a94.json	docs/compiler-abi.md; If entry id has flag 8 set, remove it and every entry whose owner byte (+0x11) is id.; callers a4b08@a4b34,a4b5c@a4b6a,a4b80@a4bb8; guest pending
 0x000a4b08	66	refresh_flagged_object_a4b08	game_helpers29	compiles	game	confirmed	decomp/tests/0x000a4b08.json	docs/compiler-abi.md; Refresh the list for an object that is flagged and not owned.; callers b5d0@b66f,b5d0@b68c,bfcc@c20f; guest pending
 0x000a4b5c	36	refresh_widget_a4b5c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a4b5c.json	docs/compiler-abi.md; when byte +0x11 clear: 0xa4a94 0xa4a20 on byte +0x10, 0xa6038; callers f1c58@f1d1f; guest pending
 0x000a4b80	259			unknown	unclassified	unverified		
@@ -3638,7 +3638,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f3714	495			unknown	unclassified	unverified		
 0x000f3904	277			unknown	unclassified	unverified		
 0x000f3a1c	139			unknown	unclassified	unverified		
-0x000f3aa8	114			unknown	unclassified	unverified		
+0x000f3aa8	114	draw_record_text_f3aa8	list_ops1	compiles	game	confirmed	decomp/tests/0x000f3aa8.json	docs/compiler-abi.md; For an 22-byte record at 0x485400 + index * 22, run the 0xf3904 call (unless 0x4859db is set), then format its text at +; callers f3f84@f409e; guest pending
 0x000f3b1c	33	load_path_f3b1c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3b1c.json	docs/compiler-abi.md; ; callers f3b78@f3cd5; guest pending
 0x000f3b40	22	load_path_value_f3b40	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3b40.json	docs/compiler-abi.md; As 0xf35d8, storing word 0x161e1e.; callers f3b78@f3cf6; guest pending
 0x000f3b58	32	load_path_pointer_f3b58	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3b58.json	docs/compiler-abi.md; ; callers f3b78@f3d43; guest pending

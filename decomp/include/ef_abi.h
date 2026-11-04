@@ -4220,4 +4220,9 @@ void rotate_page_entries_e8368(uint32_t page, uint32_t p0, uint32_t p1, uint32_t
 
 void rebuild_remap_table_e7e30(uint32_t a, uint32_t b, uint32_t c);
 
+/* list_ops1.c */
+void remove_entry_and_children_a4a94(uint32_t id);
+void draw_record_text_f3aa8(uint32_t index);
+void guest_fn_f3904_x(int32_t a, int32_t b, int32_t c, int32_t d); /* 0xf3904 EAX/EDX/EBX/ECX */
+
 #endif
