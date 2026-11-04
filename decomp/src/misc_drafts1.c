@@ -13264,3 +13264,38 @@ int32_t hit_test_markers_45a54(uint32_t x, uint32_t y)
         result = -1;
     return result;
 }
+
+/* 0x1d5f4, 266 bytes. In play mode (byte 0x125847) queue a sound/effect event for the vector VEC (EAX, three dwords; a positive second component is clamped to 0) and type TYPE (DX): look up an orientation record for VEC with 0x7bb00, take the next free slot from the ring pointed to by 0x425b24 (types in words 0x425bde, 0x425bea, 0x425bee, 0x425bd4) or by 0x425b88 (all other types) via its next-pointer at +0x6a, copy the vector into +0, +4, +8 and the orientation words (or zeros) into +0xc, +0xe, +0x10, load word +0x12 from the per-type table at +0x14 + 2 * TYPE, make the slot current and finally trigger 0x9e508 with that word. */
+void queue_effect_event_1d5f4(ef_addr32 vec, uint32_t type)
+{
+    int16_t t = (int16_t)type;
+    ef_addr32 orient;
+    ef_addr32 slot;
+    ef_addr32 ring;
+    if (EF_U8(0x00125847u) == 0u)
+        return;
+    if ((int32_t)EF_U32(vec + 4u) > 0)
+        EF_U32(vec + 4u) = 0u;
+    orient = guest_fn_7bb00_x(vec);
+    if (t == (int16_t)EF_U16(0x00425bdeu) || t == (int16_t)EF_U16(0x00425beau)
+        || t == (int16_t)EF_U16(0x00425beeu) || t == (int16_t)EF_U16(0x00425bd4u))
+        ring = 0x00425b24u;
+    else
+        ring = 0x00425b88u;
+    slot = EF_U32(EF_U32(ring) + 0x6au);
+    EF_U32(slot) = EF_U32(vec);
+    EF_U32(slot + 4u) = EF_U32(vec + 4u);
+    EF_U32(ring) = slot;
+    EF_U32(slot + 8u) = EF_U32(vec + 8u);
+    if (orient != 0u) {
+        EF_U16(slot + 0xcu) = EF_U16(orient);
+        EF_U16(slot + 0xeu) = EF_U16(orient + 2u);
+        EF_U16(slot + 0x10u) = EF_U16(orient + 4u);
+    } else {
+        EF_U16(slot + 0xcu) = 0u;
+        EF_U16(slot + 0xeu) = 0u;
+        EF_U16(slot + 0x10u) = 0u;
+    }
+    EF_U16(slot + 0x12u) = EF_U16(slot + (uint32_t)((int32_t)t * 2) + 0x14u);
+    guest_fn_9e508((int32_t)(int16_t)EF_U16(slot + 0x12u), 0u);
+}

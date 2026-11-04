@@ -5647,4 +5647,7 @@ void guest_fn_f3214_x(void); /* 0xf3214 */
 
 int32_t hit_test_markers_45a54(uint32_t x, uint32_t y);
 
+void queue_effect_event_1d5f4(ef_addr32 vec, uint32_t type);
+ef_addr32 guest_fn_7bb00_x(ef_addr32 vec); /* 0x7bb00 EAX -> EAX, preserves EDX */
+
 #endif

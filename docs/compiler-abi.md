@@ -7823,3 +7823,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x45a54` | EAX:uint32_t,EDX:uint32_t | EAX:int32_t | 4595c@459ce | Hit-test the point (x = EAX, y = EDX, both 16-bit) against the marker table of the current map record (pointer 0x1a4a9c, |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1d5f4` | EAX:ef_addr32,EDX:uint32_t | none | 1d5cc@1d5ea,56928@5694a | In play mode (byte 0x125847) queue a sound/effect event for the vector VEC (EAX, three dwords; a positive second compone |
