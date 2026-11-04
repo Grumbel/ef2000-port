@@ -134,3 +134,26 @@ void load_palette_blocks_110790(ef_addr32 data)
     if (EF_U32(0x0017d61cu) != 0u)
         guest_callptr_eax_x(EF_U32(0x0017d61cu), 0x004dd9b0u);
 }
+
+/* 0xc9238, 171 bytes. Store a clip rectangle (a, b, c-1, d-1) at 0x15b60e..0x15b61c, build the two 64-entry shade tables at 0x41f3f0 on first use, then select table s0 and run 0xc4b95 on the rectangle block. */
+void set_clip_and_shade_c9238(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t shade)
+{
+    uint32_t t, k;
+    EF_U16(0x0015b614u) = (uint16_t)b;
+    EF_U16(0x0015b610u) = (uint16_t)b;
+    EF_U16(0x0015b61au) = (uint16_t)a;
+    EF_U16(0x0015b60eu) = (uint16_t)a;
+    EF_U16(0x0015b61cu) = (uint16_t)(d - 1u);
+    EF_U16(0x0015b618u) = (uint16_t)(d - 1u);
+    EF_U16(0x0015b616u) = (uint16_t)(c - 1u);
+    EF_U16(0x0015b612u) = (uint16_t)(c - 1u);
+    if (EF_U8(0x0015b61eu) == 0u) {
+        EF_U8(0x0015b61eu) = 1u;
+        for (t = 0; t < 2u; t++)
+            for (k = 0; k < 0x40u; k++)
+                fill_bytes_b3fb0(0x0041f3f0u + t * 0x100u + k * 4u, (uint8_t)k, 4u);
+    }
+    EF_U32(0x00160000u) = 0u;
+    EF_U32(0x00159080u) = 0x0041f3f0u + (shade & 0xffu) * 4u;
+    guest_fn_c4b95_x(0x0015b5fcu);
+}

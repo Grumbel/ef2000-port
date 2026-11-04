@@ -4991,3 +4991,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x110790` | EAX:ef_addr32 | none | none direct | Load run-length palette blocks into the 768-byte table at 0x4dd9b0: a count byte, then per block a start delta and an en |
+
+## tactical_marks1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xc9238` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | none | a6d00@a6f9a | Store a clip rectangle (a, b, c-1, d-1) at 0x15b60e..0x15b61c, build the two 64-entry shade tables at 0x41f3f0 on first  |

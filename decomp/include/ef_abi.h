@@ -4285,4 +4285,7 @@ void select_page_9e3f8(uint32_t page);
 
 void load_palette_blocks_110790(ef_addr32 data);
 
+void set_clip_and_shade_c9238(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t shade);
+void guest_fn_c4b95_x(ef_addr32 block); /* 0xc4b95 one stack argument, callee cleanup */
+
 #endif
