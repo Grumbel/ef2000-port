@@ -3708,10 +3708,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000fa1d4	44			unknown	unclassified	unverified		
 0x000fa200	81			unknown	unclassified	unverified		
 0x000fa251	112			unknown	unclassified	unverified		
-0x000fa2ce	22			unknown	unclassified	unverified		
+0x000fa2ce	22	bitstream_read_bits_fa2ce	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa2ce.json	docs/compiler-abi.md; Implicit-register fragment (CL = bit count, AL = bit buffer with a trailing 1 sentinel, ESI, EDX as in 0xfa31b; AL/ESI/E; callers fa251@fa26b,fa251@fa27a,fa251@fa29e; guest pending
 0x000fa2e4	55	checksum_bytes_fa2e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa2e4.json	docs/compiler-abi.md; Implicit-register fragment (ESI = data pointer, EDX = byte count; params in that order): the two-byte running checksum (; callers fa02c@fa14e; guest pending
-0x000fa31b	23			unknown	unclassified	unverified		
-0x000fa332	35			unknown	unclassified	unverified		
+0x000fa31b	23	bitstream_read_word_fa31b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa31b.json	docs/compiler-abi.md; Implicit-register fragment (ESI = stream pointer, EDX = remaining bytes minus one; both updated): fetch the next two byt; callers fa02c@fa04b,fa02c@fa050,fa02c@fa055; guest pending
+0x000fa332	35	bitstream_refill_fa332	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa332.json	docs/compiler-abi.md; Implicit-register fragment (ESI, EDX out; EAX, EBX, ECX preserved; carry set on return): refill the bit-stream buffer. R; callers fa02c@fa0a7,fa02c@fa109,fa02c@fa133; guest pending
 0x000fa362	67			unknown	unclassified	unverified		
 0x000fa3d4	177			unknown	unclassified	unverified		
 0x000fa485	36	open_file_fa485	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000fa485.json	docs/compiler-abi.md; open: forward name, flags and the optional permission argument to 0xfa4a9 with share mode 0 (cdecl, variadic).; callers 105024@105036,105070@1050ce; guest pending

@@ -6073,9 +6073,14 @@ void load_ds_from_120cd4_222(void);
 void pop_edi_ret_10e414(void);
 
 void restore_flags_1111e5(uint32_t flags);
-void restore_flags_1111e5(uint32_t flags);
 
 
-void restore_flags_1111e5(uint32_t flags);
+
+void bitstream_refill_fa332(uint32_t *esi, int32_t *edx);
+uint16_t bitstream_read_word_fa31b(uint32_t *esi, int32_t *edx);
+uint8_t bitstream_read_bits_fa2ce(uint8_t count, uint8_t *buf, uint32_t *esi, int32_t *edx);
+void bitstream_refill_fa332(uint32_t *esi, int32_t *edx);
+uint16_t bitstream_read_word_fa31b(uint32_t *esi, int32_t *edx);
+uint8_t bitstream_read_bits_fa2ce(uint8_t count, uint8_t *buf, uint32_t *esi, int32_t *edx);
 
 #endif

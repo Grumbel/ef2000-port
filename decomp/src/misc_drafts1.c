@@ -20017,3 +20017,46 @@ void restore_flags_1111e5(uint32_t flags)
 	if (flags & 0x200u)
 		enable_interrupts_11f2d5();
 }
+
+/* 0xfa332, 35 bytes. Implicit-register fragment (ESI, EDX out; EAX, EBX, ECX preserved; carry set on return): refill the bit-stream buffer. Reads from the handle at 0x16278c into the 0x162fe0 buffer (size at 0x1631e0), points ESI at the buffer and sets EDX to bytes-read minus one. */
+void bitstream_refill_fa332(uint32_t *esi, int32_t *edx)
+{
+	uint32_t n = guest_fn_a79d4_ret(EF_U32(0x16278cu), EF_U32(0x1631e0u), 0x162fe0u);
+	*esi = 0x162fe0u;
+	*edx = (int32_t)n - 1;
+}
+
+/* 0xfa31b, 23 bytes. Implicit-register fragment (ESI = stream pointer, EDX = remaining bytes minus one; both updated): fetch the next two bytes of the buffered stream, refilling when empty; returns them as a little-endian word (first byte in AL). */
+uint16_t bitstream_read_word_fa31b(uint32_t *esi, int32_t *edx)
+{
+	uint8_t lo, hi;
+	if (--*edx < 0)
+		bitstream_refill_fa332(esi, edx);
+	lo = EF_U8((*esi)++);
+	if (--*edx < 0)
+		bitstream_refill_fa332(esi, edx);
+	hi = EF_U8((*esi)++);
+	return (uint16_t)(lo | (hi << 8));
+}
+
+/* 0xfa2ce, 22 bytes. Implicit-register fragment (CL = bit count, AL = bit buffer with a trailing 1 sentinel, ESI, EDX as in 0xfa31b; AL/ESI/EDX updated): read CL bits MSB first and return them in AH (starting from 0). */
+uint8_t bitstream_read_bits_fa2ce(uint8_t count, uint8_t *buf, uint32_t *esi, int32_t *edx)
+{
+	uint8_t acc = 0;
+	uint8_t al = *buf;
+	unsigned carry;
+	while (count--) {
+		carry = al >> 7;
+		al = (uint8_t)(al << 1);
+		if (al == 0) {
+			if (--*edx < 0)
+				bitstream_refill_fa332(esi, edx);
+			al = EF_U8((*esi)++);
+			carry = al >> 7;
+			al = (uint8_t)((al << 1) | 1u);
+		}
+		acc = (uint8_t)((acc << 1) | carry);
+	}
+	*buf = al;
+	return acc;
+}
