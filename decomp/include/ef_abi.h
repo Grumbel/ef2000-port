@@ -5903,4 +5903,6 @@ void draw_bearing_marker_5d080(ef_addr32 ptr);
 
 void draw_selected_unit_label_59998(void);
 
+void draw_target_readout_5acf0(void);
+
 #endif

@@ -1124,7 +1124,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005a998	117	draw_player_coordinates_5a998	game_helpers63	compiles	game	confirmed	decomp/tests/0x0005a998.json	docs/compiler-abi.md; Draw the tactical coordinates of the player unit from the current table row.; callers none direct; guest pending
 0x0005aa10	82	count_matching_activity_slots	tactical_io	compiles	game	confirmed	decomp/tests/0x0005aa10.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x0005aa64	651			unknown	unclassified	unverified		
-0x0005acf0	384			unknown	unclassified	unverified		
+0x0005acf0	384	draw_target_readout_5acf0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005acf0.json	docs/compiler-abi.md; Draw the three-line target readout of the tactical display. Skipped when the signed words 0x1a823e and 0x1a8238 are both; callers 5aa64@5ac8c; guest pending
 0x0005ae70	221	build_offset_rings_5ae70	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ae70.json	docs/compiler-abi.md; Build the three 24-entry offset rings (radii 25, 20 and 15 at 0x1a69e0, 0x1a6aa0 and 0x1a6a40; two words per entry: cos ; callers 5af50@5af80; guest pending
 0x0005af50	302	draw_outline_5af50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005af50.json	docs/compiler-abi.md; Draw the closed outline number N (AL, looked up in the pointer table 0x1281a4; nothing is drawn for N = 0) as 24 line se; callers 5a8d0@5a8ef; guest pending
 0x0005b080	519			unknown	unclassified	unverified		

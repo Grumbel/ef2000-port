@@ -17236,3 +17236,33 @@ void draw_selected_unit_label_59998(void)
 	}
 	guest_fn_59adc_w();
 }
+
+/* 0x5acf0, 384 bytes. Draw the three-line target readout of the tactical display. Skipped when the signed words 0x1a823e and 0x1a8238 are both -1, or when 0x1a823e is -1 and byte 0x1a81e1 is set. Latches the view words 0x1a6cf2, 0x1a6cf8, 0x1a6cf0, 0x1a6cf6 with 0xce328 and 0xcdf48, then draws three formatted texts (0xa4342) with 0x59420 at the entry's anchor X (word +2 of the 15-byte entry 0x128170 + 15 * byte 0x1a6d1b, minus the text metric) and Y = (3 * word +6) / 6, moved up by 6 for each following line: dword 0x19723c with 0x185ee8; table name dword 0x12818c[byte 0x197258] and dword 0x1971b0 with 0x185ef0; dword 0x197220 / 0x2aa with 0x185ef8. */
+void draw_target_readout_5acf0(void)
+{
+	uint8_t buf[0x0c];
+	ef_addr32 bufp = (ef_addr32)(uintptr_t)buf;
+	uint32_t row = (uint32_t)EF_U8(0x001a6d1bu) * 15u;
+	int32_t off = (int32_t)EF_U32(0x00128174u + row) >> 16;
+	uint16_t di = EF_U16(0x00128172u + row);
+	int32_t esi = (off * 3) / 6;
+	int32_t a = (int32_t)EF_U32(0x001a823cu) >> 16;
+	int32_t b = (int32_t)EF_U32(0x001a8236u) >> 16;
+
+	if (a == -1 && b == -1)
+		return;
+	if (a == -1 && EF_U8(0x001a81e1u) != 0u)
+		return;
+	guest_fn_ce328_w((int32_t)EF_U32(0x001a6cf0u) >> 16, (int32_t)EF_U32(0x001a6cf6u) >> 16,
+	    (int32_t)EF_U32(0x001a6ceeu) >> 16, (int32_t)EF_U32(0x001a6cf4u) >> 16);
+	guest_fn_cdf48((uint32_t)((int32_t)EF_U32(0x001a6cf0u) >> 16), (uint32_t)((int32_t)EF_U32(0x001a6cf6u) >> 16),
+	    (uint32_t)((int32_t)EF_U32(0x001a6ceeu) >> 16), (uint32_t)((int32_t)EF_U32(0x001a6cf4u) >> 16));
+	guest_fn_a4342_va(bufp, 0x00185ee8u, EF_U32(0x0019723cu));
+	draw_tactical_coordinates((int16_t)(di - (uint16_t)draw_tactical_item_metric(bufp)), (int16_t)esi, bufp);
+	guest_fn_a4342_va(bufp, 0x00185ef0u, EF_U32(0x0012818cu + (uint32_t)EF_U8(0x00197258u) * 4u), EF_U32(0x001971b0u));
+	esi -= 6;
+	draw_tactical_coordinates((int16_t)(di - (uint16_t)draw_tactical_item_metric(bufp)), (int16_t)esi, bufp);
+	guest_fn_a4342_va(bufp, 0x00185ef8u, (uint32_t)((int32_t)EF_U32(0x00197220u) / 0x2aa));
+	esi -= 6;
+	draw_tactical_coordinates((int16_t)(di - (uint16_t)draw_tactical_item_metric(bufp)), (int16_t)esi, bufp);
+}

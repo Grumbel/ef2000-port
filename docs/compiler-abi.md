@@ -8409,3 +8409,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x59998` | none | none | 598e8@5991f,598e8@59930,598e8@59946 | Draw the label of the selected tactical unit (unit id: signed word 0x1f71ca, via 0x7489c; nothing when missing). The anc |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x5acf0` | none | none | 5aa64@5ac8c | Draw the three-line target readout of the tactical display. Skipped when the signed words 0x1a823e and 0x1a8238 are both |
