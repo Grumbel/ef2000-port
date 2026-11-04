@@ -9644,3 +9644,36 @@ void send_mouse_requests_de3b4(uint32_t start)
         ecx++;
     }
 }
+
+/* 0x38be8, 251 bytes. Draw the framed text panel for slot ID (AX, signed), vertical position Y (EDX) and X (EBX): fetch the panel image of the slot in the top byte of dword 0x125acc (0xcd7f0, nothing is drawn when absent), enter scroll mode with it, clip to 0x100 x 0xc0 (0xcdf48, 0xce328), draw the title record 0x125a24 sized from the rectangle words 0x125ac4..0x125ac8 (0xcf7c4), fetch the image of slot ID and, when present, enter scroll mode with it and blit the three border pieces sized from word 0x125aca (0xcd82c); finally leave scroll mode (0xc39ac). */
+void draw_framed_panel_38be8(uint32_t id, uint32_t y, uint32_t x)
+{
+    uint32_t img = guest_fn_cd7f0((int32_t)EF_U32(0x00125accu) >> 24);
+    int32_t hi_c4;
+    int32_t hi_c8;
+    int32_t hi_c6;
+    uint32_t t;
+    uint32_t b;
+    uint32_t e1;
+    uint32_t e2;
+    uint32_t e3;
+    if (img == 0u)
+        return;
+    enter_scroll_mode_c39f0(img);
+    guest_fn_cdf48(0u, 0xffu, 0u, 0xbfu);
+    latch_values_ce328(0u, 0xffu, 0u, 0xbfu);
+    hi_c4 = (int32_t)EF_U32(0x00125ac4u) >> 16;
+    hi_c8 = (int32_t)EF_U32(0x00125ac8u) >> 16;
+    hi_c6 = (int32_t)EF_U32(0x00125ac6u) >> 16;
+    guest_fn_cf7c4_x(0x00125a24u, (uint32_t)(hi_c6 - hi_c8), (uint32_t)(hi_c4 - hi_c8), 0u);
+    t = guest_fn_cd7f0((int16_t)id);
+    if (t != 0u) {
+        enter_scroll_mode_c39f0(t);
+        b = EF_U16(0x00125acau);
+        e1 = (EF_U16(0x00125ac6u) - b) & 0xffffu;
+        e2 = (EF_U16(0x00125ac8u) - b) & 0xffffu;
+        e3 = (b + b) & 0xffffu;
+        blit_masked_cd82c(0u, 0u, 0u, 0u, (x - b) & 0xffffu, (y - b) & 0xffffu, e3, e3, e2, e1, img);
+    }
+    leave_scroll_mode_c39ac();
+}

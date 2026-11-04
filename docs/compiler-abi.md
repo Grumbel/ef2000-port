@@ -7079,3 +7079,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xde3b4` | EAX:uint32_t | none | 982d4@982fa,a9cd0@a9d03,f41c4@f41d5 | Send the queued mouse request blocks starting at index START (EAX, low 16 bits signed; dword table at 0x4260d0-0x100): w |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x38be8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 22f28@2300f | Draw the framed text panel for slot ID (AX, signed), vertical position Y (EDX) and X (EBX): fetch the panel image of the |

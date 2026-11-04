@@ -654,7 +654,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000386f8	80	node_position_386f8	game_helpers7	compiles	game	confirmed	decomp/tests/0x000386f8.json	docs/compiler-abi.md; Position of the entry's node in its list.; callers d290@d4ca; guest pending
 0x00038750	144	set_scaled_table_38750	game_helpers17	compiles	game	confirmed	decomp/tests/0x00038750.json	docs/compiler-abi.md; Store a scaled set of 18 percentages, or mark the slot unused.; callers 22f28@22f8d; guest pending
 0x000387e0	1030			unknown	unclassified	unverified		
-0x00038be8	251			unknown	unclassified	unverified		
+0x00038be8	251	draw_framed_panel_38be8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00038be8.json	docs/compiler-abi.md; Draw the framed text panel for slot ID (AX, signed), vertical position Y (EDX) and X (EBX): fetch the panel image of the; callers 22f28@2300f; guest pending
 0x00039180	5	tail_jump_39180	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00039180.json	docs/compiler-abi.md; tail jump. Forward to 0x7a290.; callers f2ac0@f2b18; guest pending
 0x0003918c	22	install_callback_53ecc	low_helpers	compiles	game	confirmed	decomp/tests/0x0003918c.json	docs/compiler-abi.md; dword 0x1a1780=0x53ecc and byte 0x1a363a=0; callers 3ea0c@3ee50; guest pending
 0x000391d0	52	init_list_391d0	game_helpers10	compiles	game	confirmed	decomp/tests/0x000391d0.json	docs/compiler-abi.md; ; callers 39204@39249; guest pending

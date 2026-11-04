@@ -5295,4 +5295,6 @@ uint32_t run_choice_prompt_7a194(void);
 
 void send_mouse_requests_de3b4(uint32_t start);
 
+void draw_framed_panel_38be8(uint32_t id, uint32_t y, uint32_t x);
+
 #endif
