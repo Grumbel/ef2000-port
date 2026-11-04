@@ -2389,7 +2389,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aad7c	238			unknown	unclassified	unverified		
 0x000aae6c	124	match_default_key_aae6c	game_helpers26	compiles	game	confirmed	decomp/tests/0x000aae6c.json	docs/compiler-abi.md; Set flag 0x137206 when the default key letter matches a slot in mode 5.; callers aaee8@aaf47; guest pending
 0x000aaee8	255	main_control_loop		named	unclassified	unverified		docs/ghidra-findings.md; purpose of callees provisional
-0x000aafe8	120			unknown	unclassified	unverified		
+0x000aafe8	120	find_node_position_aafe8	runtime_helpers18	compiles	game	confirmed	decomp/tests/0x000aafe8.json	docs/compiler-abi.md; Find a node in the nested group lists; report its index and group index.; callers ab060@ab07e,ab324@ab395,ab324@ab418; guest pending
 0x000ab060	80			unknown	unclassified	unverified		
 0x000ab0b0	42	emit_record_pair_ab0b0	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab0b0.json	docs/compiler-abi.md; Two 0xa7a1c(EAX, ...) stack calls with record fields.; callers ab0dc@ab12a,ab0dc@ab138,ab0dc@ab148; guest pending
 0x000ab0dc	149			unknown	unclassified	unverified		
@@ -2400,7 +2400,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ab47c	386			unknown	unclassified	unverified		
 0x000ab820	21			unknown	unclassified	unverified		
 0x000ab838	6	set_global_ab838	runtime_helpers6	compiles	game	confirmed	decomp/tests/0x000ab838.json	docs/compiler-abi.md; ; callers 84d94@84db1; guest pending
-0x000ab840	111			unknown	unclassified	unverified		
+0x000ab840	111	alloc_zeroed_ab840	runtime_helpers18	compiles	game	confirmed	decomp/tests/0x000ab840.json	docs/compiler-abi.md; Bump-allocate a zeroed block from the arena; 0 when it does not fit.; callers 371b0@371f2,a7510@a7536,e1e6c@e1eee; guest pending
 0x000ab8b0	17	latch_c382c	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab8b0.json	docs/compiler-abi.md; Dword 0x41ec14 = 0xc382c().; callers ac0e0@ac0fe; guest pending
 0x000ab8c4	28	clear_pool_ab8c4	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab8c4.json	docs/compiler-abi.md; Dword 0x137270 = dword 0x13726c; 0xb3fb0(that, 0, dword 0x41ecd4).; callers ab8e0@ab8ff,ac16c@ac170; guest pending
 0x000ab8e0	38	init_pool_ab8e0	list_helpers	compiles	game	confirmed	decomp/tests/0x000ab8e0.json	docs/compiler-abi.md; Allocate EAX bytes via 0xe29e8; record base, cursor, * size and end; then clear the pool.; callers ac0e0@ac0f9; guest pending

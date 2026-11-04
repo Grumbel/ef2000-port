@@ -2984,3 +2984,10 @@ in EAX, format string address, one value).
 | `0x68e84` | EAX:uint32_t | EAX:uint32_t | 69740@69889,69bdc@69cfc | Assign an object bit test to each of 20 page words; returns the number set. |
 | `0x7a5f0` | EAX:uint32_t | none | 7a738@7a7a9 | Append a word to the recorder table from the stream or a 73-byte record. |
 | `0xaae6c` | none | none | aaee8@aaf47 | Set flag 0x137206 when the default key letter matches a slot in mode 5. |
+
+## runtime_helpers18 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xaafe8` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32 | EAX:uint32_t | ab060@ab07e,ab324@ab395,ab324@ab418 | Find a node in the nested group lists; report its index and group index. |
+| `0xab840` | EAX:uint32_t | EAX:uint32_t | 371b0@371f2,a7510@a7536,e1e6c@e1eee | Bump-allocate a zeroed block from the arena; 0 when it does not fit. |

@@ -2233,4 +2233,9 @@ void record_word_7a5f0(uint32_t index);
 void match_default_key_aae6c(void);
 uint32_t guest_fn_68ccc(int16_t object, uint16_t index); /* 0x68ccc AX/DX -> AL */
 
+/* runtime_helpers18.c */
+uint32_t find_node_position_aafe8(ef_addr32 out_index, ef_addr32 out_group, ef_addr32 target);
+uint32_t alloc_zeroed_ab840(uint32_t size);
+
+
 #endif
