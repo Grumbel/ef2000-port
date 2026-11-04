@@ -23215,3 +23215,28 @@ void rotation_matrix_88e98(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, d
 	*(double *)ef_guest_memory_ptr(out + 0x38u) = cB * sC;
 	*(double *)ef_guest_memory_ptr(out + 0x40u) = cB * cC;
 }
+
+/* 0xe4188, 220 bytes. One-time setup of the pattern display: set view origin, latch/patch the 320x200 span, reset runtime state, load the default pattern file at 0x190b0c and init the pattern buffer. */
+void init_pattern_display_e4188(void)
+{
+	ef_addr32 name = 0x190b0cu;
+	if (EF_U8(0x15f930u) == 0)
+		guest_fn_9c3cf(0xe42d8u);
+	set_view_origin_dc21c(0xc7u, 0x13fu, 0x63u, 0x9fu);
+	latch_values_ce328(0u, 0x13fu, 0u, 0xc7u);
+	patch_span_dc71b(0u, 0u, 0u, 0u, 0x63u, 0xc7u, 0u, 0x13fu, 0u);
+	guest_fn_cdf48(0u, 0x13fu, 0u, 0xc7u);
+	update_view_scale_dc314();
+	EF_U32(0x15b268u) = 0xc58ccu;
+	init_arena_e29a0();
+	EF_U16(0x15eea0u) = 0;
+	init_runtime_globals_9d834();
+	EF_U32(0x15f938u) = 0;
+	reset_handler_cd6fc();
+	guest_fn_b3fb0(0x431ef0u, 0xffffffffu, 0xc8u);
+	set_pointer_e3c60();
+	EF_U8(0x15f930u) = 1;
+	if (name != 0 && EF_U8(name) != 0)
+		load_pattern_file_e4010(name);
+	init_pattern_buffer_e40e4();
+}

@@ -3374,7 +3374,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e3ffc	20	set_scratch_name_e3ffc	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000e3ffc.json	docs/compiler-abi.md; Copy a name to the scratch string and run 0x107310.; callers none direct; guest pending
 0x000e4010	211	load_pattern_file_e4010	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e4010.json	docs/compiler-abi.md; Load the text file NAME (EAX) into a local 0x400-byte buffer (default path + 0x190ad4 + name through the hooks 0x132ab4 ; callers dc094@dc111,e4188@e4255; guest pending
 0x000e40e4	161	init_pattern_buffer_e40e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e40e4.json	docs/compiler-abi.md; Allocate (once) the pattern buffer of ([0x15f93c] << 8) + 0x200 bytes, align it to 256 bytes (0x15b958) and fill consecu; callers e4010@e40d4,e4188@e425a; guest pending
-0x000e4188	220			unknown	unclassified	unverified		
+0x000e4188	220	init_pattern_display_e4188	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e4188.json	docs/compiler-abi.md; One-time setup of the pattern display: set view origin, latch/patch the 320x200 span, reset runtime state, load the defa; callers 3ea0c@3edb5,3ea0c@3ef5e,8b2d8@8b2e3; guest pending
 0x000e4264	116	reset_engine_e4264	runtime_helpers5	compiles	game	confirmed	decomp/tests/0x000e4264.json	docs/compiler-abi.md; Reset the engine state unless already in state 0 or 2.; callers 3ea0c@3edc9,3ea0c@3ee1d,3ea0c@3ef59; guest pending
 0x000e4304	14	flag_is_one_15f930	math_string	compiles	game	confirmed	decomp/tests/0x000e4304.json	docs/compiler-abi.md; Byte 0x15f930 equals 1.; callers ac0e0@ac0e1; guest pending
 0x000e4340	1034			unknown	unclassified	unverified		

@@ -9481,3 +9481,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x88e98` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:double,[ESP+8]:double,[ESP+12]:double,[ESP+16]:ef_addr32 | none | 89fbc@8a069 | Build the 3x3 rotation matrix for the three angles A, B, C (doubles on the stack) and store its nine doubles at OUT+0..0 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xe4188` | none | none | 3ea0c@3edb5,3ea0c@3ef5e,8b2d8@8b2e3 | One-time setup of the pattern display: set view origin, latch/patch the 320x200 span, reset runtime state, load the defa |
