@@ -5720,3 +5720,35 @@ void advance_playlist_a94e4(uint32_t list)
         EF_U16(list + 0xau) = (uint16_t)(EF_U16(list + 0xau) + 1u);
     }
 }
+
+/* 0xe6848, 326 bytes. Reorder the payload (bytes +9..+0x33) of the list whose head pointer is *HEAD_PTR (link +4) so that the node types (byte +0xb) follow the word array ORDER[0..COUNT-1]: the leading nodes of type KEY are skipped, then for each wanted type the first later node of that type is swapped into the current position. ORIGINAL BUG: when the current position already holds the wanted type it is not advanced, so later matches are swapped into the same node. */
+void sort_nodes_by_order_e6848(uint32_t order, uint32_t count, uint32_t head_ptr, uint32_t key)
+{
+    uint32_t cur = EF_U32(head_ptr);
+    int16_t i;
+    int16_t n = (int16_t)count;
+    key &= 0xffu;
+    if (EF_U8(cur + 0xbu) == key) {
+        do {
+            cur = EF_U32(cur + 4u);
+        } while (EF_U8(cur + 0xbu) == key);
+    }
+    for (i = 0; n > 0; ) {
+        uint32_t a = cur;
+        while (a != 0u) {
+            if (EF_U8(a + 0xbu) == EF_U16(order + (uint32_t)(int32_t)i * 2u) && a != cur) {
+                uint32_t k;
+                for (k = 9u; k <= 0x33u; k++) {
+                    uint8_t t = EF_U8(cur + k);
+                    EF_U8(cur + k) = EF_U8(a + k);
+                    EF_U8(a + k) = t;
+                }
+                cur = EF_U32(cur + 4u);
+            }
+            a = EF_U32(a + 4u);
+        }
+        i++;
+        if (!(i < n))
+            break;
+    }
+}

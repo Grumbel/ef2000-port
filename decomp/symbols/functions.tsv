@@ -3407,7 +3407,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e67a0	93	quicksort_range_e67a0	game_helpers92	compiles	game	confirmed	decomp/tests/0x000e67a0.json	docs/compiler-abi.md; Quicksort driver: partition [lo,hi] with e6684, recurse on the left part and loop on the right.; callers e67a0@e67e2,e6800@e680e; guest pending
 0x000e6800	23	call_e67a0	math_string	compiles	game	confirmed	decomp/tests/0x000e6800.json	docs/compiler-abi.md; 0xe67a0(EAX, signed DX, signed BX+DX, signed CX); returns EAX.; callers e6818@e6834; guest pending
 0x000e6818	48	adjust_list_e6818	math_string	compiles	game	confirmed	decomp/tests/0x000e6818.json	docs/compiler-abi.md; For each node of the list at *EAX call 0xe6800 on its * dword +0x2c with (0, word +0x2a minus 1, 1).; callers 49228@493ab,b0f5c@b1034,b0f5c@b1234; guest pending
-0x000e6848	326			unknown	unclassified	unverified		
+0x000e6848	326	sort_nodes_by_order_e6848	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e6848.json	docs/compiler-abi.md; Reorder the payload (bytes +9..+0x33) of the list whose head pointer is *HEAD_PTR (link +4) so that the node types (byte; callers 49228@4939f,b0f5c@b1020,b0f5c@b1220; guest pending
 0x000e6990	706			unknown	unclassified	unverified		
 0x000e6c54	289			unknown	unclassified	unverified		
 0x000e6d78	221			unknown	unclassified	unverified		

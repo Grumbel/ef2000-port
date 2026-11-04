@@ -4971,4 +4971,6 @@ void advance_playlist_a94e4(uint32_t list);
 
 
 
+void sort_nodes_by_order_e6848(uint32_t order, uint32_t count, uint32_t head_ptr, uint32_t key);
+
 #endif
