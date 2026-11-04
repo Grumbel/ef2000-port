@@ -11708,3 +11708,37 @@ void check_data_files_284ec(void)
     }
     guest_fn_de648(0x00425c8cu, 0u);
 }
+
+/* 0x7a66c, 204 bytes. Load or build a directory list for PATH (EAX) into the save buffer: with the flag 0x12afc8 set the count comes from the buffer (0x7a5a0), otherwise from listing PATH with the mask 0x187bc4 (0x32de8, 13 byte names at 0x19e5f0); the count is written back (0x7a584) and added to the word of the current section record ([0x1f8ea4]; 6 words per record, selected by its first word). For each entry take the name from the buffer (0x7a54c) or parse it from the listing with 0xdf26f(format 0x187bcc), append it to the pool (0x7a51c), copy it into the 0x11 byte slot [0x1f8e98] of the table at [0x1f8e9c], mark word +0xf of that slot with 1 and advance the slot counter. */
+void load_directory_list_7a66c(ef_addr32 path)
+{
+    char name[0x50];
+    ef_addr32 namep = (ef_addr32)(uintptr_t)name;
+    int32_t count;
+    int32_t i;
+    ef_addr32 sec;
+    ef_addr32 src = 0x0019e5f0u;
+    if (EF_U32(0x0012afc8u) != 0u)
+        count = buffer_read_word();
+    else
+        count = (int16_t)list_directory_names_32de8(path, 0x00187bc4u);
+    buffer_write_word((int16_t)count);
+    sec = EF_U32(0x001f8ea4u);
+    {
+        int32_t rec = (int32_t)(int16_t)EF_U16(sec) * 3;
+        EF_U16(sec + (uint32_t)(rec * 2) + 4u) = (uint16_t)(EF_U16(sec + (uint32_t)(rec * 2) + 4u) + (uint32_t)count);
+    }
+    for (i = 0; i < count; i++) {
+        uint32_t slot;
+        if (EF_U32(0x0012afc8u) != 0u)
+            copy_string_9d749(namep, pool_take_7a54c());
+        else
+            guest_fn_df26f_x(src, 0x00187bccu, namep);
+        pool_append_7a51c(namep);
+        copy_string_9d749(EF_U32(0x001f8e98u) * 0x11u + EF_U32(0x001f8e9cu), namep);
+        slot = EF_U32(0x001f8e98u);
+        EF_U16(slot * 0x11u + EF_U32(0x001f8e9cu) + 0xfu) = 1u;
+        EF_U32(0x001f8e98u) = slot + 1u;
+        src += 0xdu;
+    }
+}

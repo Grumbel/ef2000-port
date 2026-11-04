@@ -7492,3 +7492,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x284ec` | none | none | 3ea0c@3ec82 | Startup of the data-file check: initialise the subsystems (0xd65e8, 0xc3980, 0xc34cc with 0x18235c, 0xc39ac, 0xc3888, 0x |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x7a66c` | EAX:ef_addr32 | none | 7a738@7a7cd | Load or build a directory list for PATH (EAX) into the save buffer: with the flag 0x12afc8 set the count comes from the  |
