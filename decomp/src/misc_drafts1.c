@@ -18226,3 +18226,38 @@ uint8_t row_wins_over_neighbour_2bcb8(uint32_t ax)
 	}
 	return 0u;
 }
+
+/* 0x70278, 416 bytes. Per-frame update of the player unit's (dword 0x1f71bc) gun mount: look up the mount record M (0x8ffe8 with the signed word at unit +0x16a); nothing when missing. If M has flag 2 in byte +0x30 or a non-zero dword +0x1c and the unit has no grid link (0x6ae30 on the word at unit +0x16), the unit is released (0x6a1d0(word 0x1f71c8, 1)) and the function ends. For a row of kind 0xb (byte +0x1b) whose features 0xbc-byte, 6, 7, 9 and 0xf (0x2949c) all return 0x14 the unit is released the same way. Finally the vector (M dwords +8, +0, +4) * 2.4384 * (1/256) is passed with the row's byte +0xbc and its double +0xc1 to 0x6f758. */
+void update_gun_mount_70278(void)
+{
+	uint32_t unit = EF_U32(0x001f71bcu);
+	uint32_t m = guest_fn_8ffe8((int32_t)EF_U32(unit + 0x168u) >> 16);
+	uint32_t row;
+	double v[3];
+	int ok;
+	static const uint32_t feats[4] = { 6u, 7u, 9u, 0xfu };
+	int i;
+
+	if (m == 0u)
+		return;
+	if ((EF_U8(m + 0x30u) & 2u) != 0u || EF_U32(m + 0x1cu) != 0u) {
+		if (guest_fn_6ae30_x((int32_t)EF_U32(unit + 0x14u) >> 16) == 0u) {
+			guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
+			return;
+		}
+	}
+	unit = EF_U32(0x001f71bcu);
+	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+	if (EF_U8(row + 0x1bu) == 0xbu) {
+		ok = (guest_fn_2949c((int32_t)EF_U32(unit + 0x14u) >> 16, EF_U8(row + 0xbcu)) & 0xffu) == 0x14u;
+		for (i = 0; ok && i < 4; i++)
+			ok = (guest_fn_2949c((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x14u) >> 16, feats[i]) & 0xffu) == 0x14u;
+		if (ok)
+			guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
+	}
+	v[0] = (double)(int32_t)EF_U32(m + 8u) * 2.4384 * 0.00390625;
+	v[1] = (double)(int32_t)EF_U32(m) * 2.4384 * 0.00390625;
+	v[2] = (double)(int32_t)EF_U32(m + 4u) * 2.4384 * 0.00390625;
+	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+	guest_fn_6f758_x((ef_addr32)(uintptr_t)v, EF_U8(row + 0xbcu), EF_U32(row + 0xc1u), EF_U32(row + 0xc5u));
+}

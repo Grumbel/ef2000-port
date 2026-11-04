@@ -1326,7 +1326,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006f504	344			unknown	unclassified	unverified		
 0x0006f6b8	160	best_slot_kind_6f6b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0006f6b8.json	docs/compiler-abi.md; For the unit's 20 three-byte slot records (+0x198: type word area, +0x19b: kind byte) find the slot of rank-2 weapon typ; callers 6f758@6f891; guest pending
 0x0006f758	2845			unknown	unclassified	unverified		
-0x00070278	416			unknown	unclassified	unverified		
+0x00070278	416	update_gun_mount_70278	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00070278.json	docs/compiler-abi.md; Per-frame update of the player unit's (dword 0x1f71bc) gun mount: look up the mount record M (0x8ffe8 with the signed wo; callers 6c488@6c5c8; guest pending
 0x00070418	31	forward_object_level	mid_helpers	compiles	game	confirmed	decomp/tests/0x00070418.json	docs/compiler-abi.md; 0x6e390(byte obj+0x18c +2, 3) with obj dword 0x1f71bc; callers 6c488@6c5cf; guest pending
 0x00070438	606			unknown	unclassified	unverified		
 0x00070698	67	reset_motion_limits_70698	game_helpers56	compiles	game	confirmed	decomp/tests/0x00070698.json	docs/compiler-abi.md; Clear the motion accumulators and set the default scale limits.; callers 6c488@6c510; guest pending

@@ -5956,4 +5956,7 @@ void select_list_entry_by_kind_4c78c(uint32_t a, ef_addr32 head);
 uint8_t row_wins_over_neighbour_2bcb8(uint32_t ax);
 void guest_fn_8516c_x(int32_t id); /* 0x8516c EAX */
 
+void update_gun_mount_70278(void);
+void guest_fn_6f758_x(ef_addr32 vec, uint32_t kind, uint32_t s0, uint32_t s1); /* 0x6f758 EAX/EDX + 2 stack dwords (s0 last pushed), callee cleanup */
+
 #endif

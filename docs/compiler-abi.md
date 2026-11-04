@@ -8552,3 +8552,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x2bcb8` | EAX:uint32_t | AL:uint8_t | 2ced4@2d228,2ced4@2d25f,6e59c@6e6ee | Compare class row AX (signed 16-bit) with its neighbour row N (0x2bbd0; 0xff or a row with byte +0x1a zero: result 0). T |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x70278` | none | none | 6c488@6c5c8 | Per-frame update of the player unit's (dword 0x1f71bc) gun mount: look up the mount record M (0x8ffe8 with the signed wo |
