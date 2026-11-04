@@ -22181,3 +22181,121 @@ finish:
     }
     return count;
 }
+
+/* 0x1084d3, 545 bytes. scanf core: walk the format string (EDX) against the input stream object (EAX) with the va_list cursor in EBX, dispatching %d %i %o %u %x %X %p to the integer reader, %e %E %f %g %G to the float reader, %s %[ %c %n and %%; returns the number of assigned items, or -1 when nothing was assigned and the stream hit EOF. */
+int32_t scanf_core_1084d3(uint32_t eax, uint32_t edx, uint32_t ebx)
+{
+    uint32_t obj = eax;
+    uint32_t fmt = edx;
+    uint32_t vap = ebx;
+    uint32_t fmt_cell;
+    int32_t consumed = 0;
+    int32_t assigned = 0;
+    int32_t r;
+    uint32_t c;
+    uint32_t conv;
+
+    EF_U8(obj + 0x10u) &= 0xfdu;
+    for (;;) {
+        c = EF_U8(fmt);
+        fmt++;
+        if (c == 0u)
+            goto done;
+        if (EF_U8(0x00195af0u + ((c + 1u) & 0xffu)) & 2u) {
+            consumed += (int32_t)skip_and_dispatch_1087cd(obj);
+            goto next;
+        }
+        if (c != 0x25u) {
+            r = (int32_t)guest_callptr_eax_ret_x(EF_U32(obj), obj);
+            if ((uint32_t)r == c) {
+                consumed++;
+                goto next;
+            }
+            if (!(EF_U8(obj + 0x10u) & 2u))
+                guest_callptr_eaxedx_x(EF_U32(obj + 4u), (uint32_t)r, obj);
+            goto done;
+        }
+        fmt = parse_format_modifiers_1086f4(fmt, obj);
+        conv = EF_U8(fmt);
+        if (conv != 0u)
+            fmt++;
+        switch (conv) {
+        case 0x64: r = scanf_integer_108ddb(obj, vap, 10u, 1u); break;
+        case 0x69: r = scanf_integer_108ddb(obj, vap, 0u, 1u); break;
+        case 0x6f: r = scanf_integer_108ddb(obj, vap, 8u, 1u); break;
+        case 0x75: r = scanf_integer_108ddb(obj, vap, 10u, 0u); break;
+        case 0x70:
+        case 0x78:
+        case 0x58: r = scanf_integer_108ddb(obj, vap, 16u, 1u); break;
+        case 0x65:
+        case 0x66:
+        case 0x67:
+        case 0x45:
+        case 0x47: r = scanf_float_108afd(obj, vap); break;
+        case 0x73: r = (int32_t)scanf_string_108888(obj, vap); break;
+        case 0x5b:
+            fmt_cell = fmt;
+            r = (int32_t)scanf_set_108a17(obj, vap, (uint32_t)(uintptr_t)&fmt_cell);
+            fmt = fmt_cell;
+            break;
+        case 0x63: r = (int32_t)scanf_char_108802(obj, vap); break;
+        case 0x6e:
+            scanf_store_count_108976(obj, vap, (uint32_t)consumed);
+            goto next;
+        case 0x25:
+            r = (int32_t)guest_callptr_eax_ret_x(EF_U32(obj), obj);
+            if ((uint32_t)r != conv) {
+                if (!(EF_U8(obj + 0x10u) & 2u))
+                    guest_callptr_eaxedx_x(EF_U32(obj + 4u), (uint32_t)r, obj);
+                goto done;
+            }
+            consumed++;
+            goto next;
+        default:
+            goto next;
+        }
+        if (r <= 0)
+            goto done;
+        consumed += r;
+        if (EF_U8(obj + 0x10u) & 1u)
+            assigned++;
+next:
+        if (EF_U8(obj + 0x10u) & 2u)
+            break;
+    }
+    if (EF_U8(fmt) == 0x25u) {
+        fmt = parse_format_modifiers_1086f4(fmt + 1u, obj);
+        if (EF_U8(fmt) == 0x6eu)
+            scanf_store_count_108976(obj, vap, (uint32_t)consumed);
+    }
+done:
+    if (assigned == 0 && (EF_U8(obj + 0x10u) & 2u))
+        return -1;
+    return assigned;
+}
+
+/* 0xdf248, 39 bytes. sscanf core: build a string stream object (reader 0xdf21b, unget 0xdf244, string pointer at +8) on the stack and run the scanf core with EAX = string, EDX = format, EBX = va_list cursor. */
+int32_t sscanf_core_df248(uint32_t eax, uint32_t edx, uint32_t ebx)
+{
+    uint32_t stream[5];
+
+    stream[0] = 0x000df21bu;
+    stream[1] = 0x000df244u;
+    stream[2] = eax;
+    stream[3] = 0u;
+    stream[4] = 0u;
+    return scanf_core_1084d3((uint32_t)(uintptr_t)stream, edx, ebx);
+}
+
+/* 0xdf26f, 33 bytes. sscanf(str, fmt, ...) (cdecl, variadic; all arguments on the stack). */
+int32_t sscanf_df26f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 str, ef_addr32 fmt, ...)
+{
+    va_list ap;
+    int32_t r;
+
+    (void)u0; (void)u1; (void)u2; (void)u3;
+    va_start(ap, fmt);
+    r = sscanf_core_df248(str, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    va_end(ap);
+    return r;
+}

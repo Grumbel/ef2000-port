@@ -6382,4 +6382,12 @@ int32_t scanf_integer_108ddb(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t 
 int32_t scanf_float_108afd(uint32_t eax, uint32_t edx);
 int32_t scanf_float_108afd(uint32_t eax, uint32_t edx); /* 0x108afd */
 
+int32_t scanf_core_1084d3(uint32_t eax, uint32_t edx, uint32_t ebx);
+int32_t scanf_core_1084d3(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0x1084d3 */
+
+int32_t sscanf_core_df248(uint32_t eax, uint32_t edx, uint32_t ebx);
+int32_t sscanf_df26f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 str, ef_addr32 fmt, ...);
+int32_t sscanf_core_df248(uint32_t eax, uint32_t edx, uint32_t ebx); /* 0xdf248 */
+int32_t sscanf_df26f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 str, ef_addr32 fmt, ...); /* 0xdf26f */
+
 #endif

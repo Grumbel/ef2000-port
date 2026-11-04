@@ -9276,3 +9276,16 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x108afd` | EAX:uint32_t,EDX:uint32_t | EAX:int32_t | 1084d3@10864a | scanf floating-point conversion: skip whitespace, collect sign, integer digits, '.' fraction and e/E exponent into a loc |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x1084d3` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:int32_t | df248@df264 | scanf core: walk the format string (EDX) against the input stream object (EAX) with the va_list cursor in EBX, dispatchi |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xdf248` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:int32_t | df26f@df285 | sscanf core: build a string stream object (reader 0xdf21b, unget 0xdf244, string pointer at +8) on the stack and run the |
+| `0xdf26f` | [ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32,[ESP+24]:ef_addr32 | EAX:int32_t | 335c0@335df,33ee8@33f26,344bc@344fa | sscanf(str, fmt, ...) (cdecl, variadic; all arguments on the stack). |

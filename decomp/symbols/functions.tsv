@@ -3291,8 +3291,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000ded86	88	median_of_three_ded86	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ded86.json	docs/compiler-abi.md; Median of three: return whichever of A (EAX), B (EDX) and C (EBX) lies between the other two according to the comparison; callers dedde@def70,dedde@def87,dedde@def9d; guest pending
 0x000dedde	1085			unknown	unclassified	unverified		
 0x000df21b	41	read_stream_byte_df21b	game_helpers25	compiles	game	confirmed	decomp/tests/0x000df21b.json	docs/compiler-abi.md; Read the next byte from a stream, or -1 (setting flag 2) at its end.; callers none direct; guest pending
-0x000df248	39			unknown	unclassified	unverified		
-0x000df26f	33			unknown	unclassified	unverified		
+0x000df248	39	sscanf_core_df248	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000df248.json	docs/compiler-abi.md; sscanf core: build a string stream object (reader 0xdf21b, unget 0xdf244, string pointer at +8) on the stack and run the; callers df26f@df285; guest pending
+0x000df26f	33	sscanf_df26f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000df26f.json	docs/compiler-abi.md; sscanf(str, fmt, ...) (cdecl, variadic; all arguments on the stack).; callers 335c0@335df,33ee8@33f26,344bc@344fa; guest pending
 0x000df2b0	51	rate_divisor_df2b0	game_helpers29	compiles	game	confirmed	decomp/tests/0x000df2b0.json	docs/compiler-abi.md; Divide 115200 by the table entry for the current rate index.; callers 33888@338be; guest pending
 0x000df2e4	15	advance_counter_15f07d	math_string	compiles	game	confirmed	decomp/tests/0x000df2e4.json	docs/compiler-abi.md; Byte 0x15f07d = (byte + 1) & 7.; callers 3361c@33626; guest pending
 0x000df4f4	360	menu_step_back_df4f4	game_helpers68	compiles	game	confirmed	decomp/tests/0x000df4f4.json	docs/compiler-abi.md; Step the menu back one level; returns 1 when an earlier entry was re-latched.; callers dfac8@dfdec,dfac8@dfe2d; guest pending
@@ -3925,7 +3925,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00107310	246	load_colour_table_107310	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00107310.json	docs/compiler-abi.md; Load the 0x4000-byte colour table from the file named at 0x17d368: on first use allocate 0x10100 bytes (dword 0x4dd860, ; callers dbff8@dc07f,e3ffc@e4009; guest pending
 0x0010848c	52			unknown	unclassified	unverified		
 0x001084c0	19	translate_key_masked_1084c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001084c0.json	docs/compiler-abi.md; Implicit-register fragment (EAX = value, CF = carry on entry, passed as the second parameter): when the carry is clear, ; callers decde@deced,decfb@ded0b; guest pending
-0x001084d3	545			unknown	unclassified	unverified		
+0x001084d3	545	scanf_core_1084d3	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001084d3.json	docs/compiler-abi.md; scanf core: walk the format string (EDX) against the input stream object (EAX) with the va_list cursor in EBX, dispatchi; callers df248@df264; guest pending
 0x001086f4	217	parse_format_modifiers_1086f4	game_helpers102	compiles	game	confirmed	decomp/tests/0x001086f4.json	docs/compiler-abi.md; Parse the width and size modifiers of a printf conversion ('*', digits, N/F, h/l/w/L) into the spec record; returns the ; callers 1084d3@108552,1084d3@1086bc; guest pending
 0x001087cd	53	skip_and_dispatch_1087cd	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001087cd.json	docs/compiler-abi.md; Pull characters through the reader at [obj] until one is not in the class-2 skip set (table 0x195af0, indexed by char+1); callers 1084d3@10851d; guest pending
 0x00108802	134	scanf_char_108802	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00108802.json	docs/compiler-abi.md; scanf %c: read up to width (default 1) characters through [obj], storing bytes (words with flag 0x20) at the destination; callers 1084d3@10866d; guest pending
