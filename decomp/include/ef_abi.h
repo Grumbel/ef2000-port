@@ -5177,4 +5177,6 @@ uint32_t read_hires_timer_fe560(void);
 
 uint8_t store_inverse_ratio_d6cac(uint32_t out);
 
+void matrix_multiply_d08fc(uint32_t out, uint32_t a, uint32_t b);
+
 #endif

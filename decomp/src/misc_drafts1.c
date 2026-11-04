@@ -8140,3 +8140,20 @@ uint8_t store_inverse_ratio_d6cac(uint32_t out)
     *(float *)ef_guest_memory_ptr(out) = (float)(1.0 - t);
     return 1u;
 }
+
+/* 0xd08fc, 160 bytes. 3x3 fixed-point matrix product OUT = A * B (OUT = EAX, A = EDX, B = EBX; nine dwords each, row major, results arithmetically shifted right by 15). The product is built in a temporary so OUT may alias an input. */
+void matrix_multiply_d08fc(uint32_t out, uint32_t a, uint32_t b)
+{
+    int32_t t[9];
+    uint32_t r, c;
+    for (r = 0; r < 3u; r++) {
+        for (c = 0; c < 3u; c++) {
+            int32_t s = (int32_t)(EF_U32(a + r * 12u) * EF_U32(b + c * 4u))
+                      + (int32_t)(EF_U32(a + r * 12u + 4u) * EF_U32(b + 12u + c * 4u))
+                      + (int32_t)(EF_U32(a + r * 12u + 8u) * EF_U32(b + 24u + c * 4u));
+            t[r * 3u + c] = s >> 15;
+        }
+    }
+    for (r = 0; r < 9u; r++)
+        EF_U32(out + r * 4u) = (uint32_t)t[r];
+}

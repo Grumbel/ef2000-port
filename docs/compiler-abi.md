@@ -6762,3 +6762,9 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd6cac` | EAX:uint32_t | AL:uint8_t | 1c780@1c936,3d37c@3d3fc | When bit 0 of byte 0x15bac0 is set, store 1 - clamp(r, 0, 1) as a float at OUT (EAX), r being the float ratio dword 0x42 |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0xd08fc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 93170@9322c,9357c@93603,93a8c@93ae6 | 3x3 fixed-point matrix product OUT = A * B (OUT = EAX, A = EDX, B = EBX; nine dwords each, row major, results arithmetic |
