@@ -13339,3 +13339,38 @@ void check_contact_254e4(void)
     }
     guest_fn_46254((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), (int32_t)EF_U32(p + 0x41u) >> 16, code, 0u, 0u, 0u);
 }
+
+/* 0xd6b80, 268 bytes. Read an axis from the latched position 0x420dac against the calibration words 0x420db8 (centre), 0x420da8 (max) and 0x420dc0 (min) when bit 4 of byte 0x15bac0 is set (otherwise return 0): ratio = (centre - pos) / (pos <= centre ? max - pos : pos - min), squared with its sign kept (-ratio * |ratio|) times the double 0x18f914; if that float is not above the float 0x18f91c the value becomes -1.0, it is capped at 1.0, negated and stored as a float at OUT (EAX). Returns 1 when written. */
+uint8_t read_axis_d6b80(ef_addr32 out)
+{
+    int32_t pos = (int32_t)EF_U32(0x00420dacu);
+    int32_t centre = (int32_t)EF_U32(0x00420db8u);
+    int32_t a, b;
+    float ratio, shaped, thr;
+    double k, v, x;
+    if ((EF_U8(0x0015bac0u) & 0x4u) == 0u)
+        return 0u;
+    a = centre - pos;
+    if (centre >= pos)
+        b = (int32_t)EF_U32(0x00420da8u) - pos;
+    else
+        b = pos - (int32_t)EF_U32(0x00420dc0u);
+    ratio = (float)((double)a / (double)b);
+    memcpy(&k, ef_guest_memory_ptr(0x0018f914u), sizeof k);
+    memcpy(&thr, ef_guest_memory_ptr(0x0018f91cu), sizeof thr);
+    shaped = (float)((-(double)ratio * abs_double_b427c((double)ratio)) * k);
+    if (shaped > thr)
+        v = (double)shaped;
+    else
+        v = -1.0;
+    if (1.0 > v)
+        x = v;
+    else
+        x = 1.0;
+    {
+        float o = (float)(-x);
+        memcpy(ef_guest_memory_ptr(out), &o, sizeof o);
+    }
+    EF_U32(0x00420dacu) = (uint32_t)pos;
+    return 1u;
+}

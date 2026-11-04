@@ -5654,4 +5654,8 @@ void check_contact_254e4(void);
 
 
 
+uint8_t read_axis_d6b80(ef_addr32 out);
+
+
+
 #endif

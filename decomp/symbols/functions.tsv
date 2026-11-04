@@ -3078,7 +3078,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d6694	46	run_steps_d6694	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6694.json	docs/compiler-abi.md; Run the step 0xd66c2; when it succeeds (non-zero) run it five more times and return -1, otherwise return 0.; callers 1c60c@1c60f,82cec@82d03; guest pending
 0x000d66c2	358			unknown	unclassified	unverified		
 0x000d6960	541			unknown	unclassified	unverified		
-0x000d6b80	268			unknown	unclassified	unverified		
+0x000d6b80	268	read_axis_d6b80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6b80.json	docs/compiler-abi.md; Read an axis from the latched position 0x420dac against the calibration words 0x420db8 (centre), 0x420da8 (max) and 0x42; callers 1c780@1ca69,3d37c@3d3bb; guest pending
 0x000d6cac	176	store_inverse_ratio_d6cac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d6cac.json	docs/compiler-abi.md; When bit 0 of byte 0x15bac0 is set, store 1 - clamp(r, 0, 1) as a float at OUT (EAX), r being the float ratio dword 0x42; callers 1c780@1c936,3d37c@3d3fc; guest pending
 0x000d6d5c	26	store_handle_if_enabled	code_predicates	compiles	game	confirmed	decomp/tests/0x000d6d5c.json	docs/compiler-abi.md; When bit 1 of byte 0x15bac0 is set store dword 0x420da0 at EAX; return whether it was.; callers 1c780@1cb3a,3d37c@3d43b; guest pending
 0x000d6dc4	43	init_module_d6dc4	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d6dc4.json	docs/compiler-abi.md; One-time module init; registers the exit handler at 0xd6da0.; callers d5d18@d5d39,d6e58@d6e9e,e28e8@e28ff; guest pending
