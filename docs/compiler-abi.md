@@ -3047,3 +3047,22 @@ in EAX, format string address, one value).
 | `0xf41a8` | none | none | f41dc@f41f7 | With the flag set, remember the request value and refresh the cursor. |
 | `0xf41c4` | none | none | a9d48@a9e20,f3f84@f3fa2 | With the flag set, apply the saved request value. |
 | `0xf5e6c` | AX:uint16_t,DX:uint16_t,BX:uint16_t,CX:uint16_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | none | f5484@f5688 | Latch six words and install the 0xf5eac handler. |
+
+## game_helpers30 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x6330` | EAX:ef_addr32 | none | 601c@62e0 | Count down a timer for an active object; call 0x56a4c and rewind on underflow. |
+| `0x47f48` | none | none | 48064@4807c | Decrease the countdown word, by a third of the frame time when flagged. |
+| `0x49cd4` | EAX:ef_addr32 | none | 49bdc@49c4c | Copy the row words selected by an object's count into the 0x1a5280 list. |
+| `0x8ccec` | AX:int16_t | none | 8c49c@8c800 | Reset a unit's link slots to 0xff. |
+| `0x9d114` | EAX:uint32_t | EAX:ef_addr32 | f80@114f,2ff44@2ffb8,30214@30291 | Allocate and initialise a 0x56c-byte stream record bound to an owner. |
+| `0xa4e14` | none | none | ac2e4@ac3e1 | Rebuild the id table from the objects that are flagged and not kind 1. |
+| `0xa7204` | EAX:ef_addr32 | none | a60a8@a618c | Walk a chain of children and tidy each one that is not a basic kind. |
+| `0xc3a74` | none | none | cdb20@cdbd0 | Choose the drawing handlers from two mode flags. |
+| `0xf8988` | EAX:ef_addr32 | EAX:uint32_t | f8b14@f8bd8,f8b14@f8c22,f8b14@f8c71 | Find the last entry that is set and fails its check, clear it; report if found. |
+| `0xf89e0` | EAX:ef_addr32 | EAX:uint32_t | f88a0@f88d0 | Count matching entries of a kind-0x15 list; 1 for other kinds. |
+| `0xf8a30` | EAX:ef_addr32 | EAX:uint32_t | f88a0@f88c7 | Count the filled entries whose code passes the 0xbd4e0 test. |
+| `0xf8acc` | EAX:ef_addr32 | EAX:uint32_t | f8b14@f8bc3,f8b14@f8c0d,f8b14@f8c5c | Decrement the last set entry that accepts it; report if one did. |
+| `0xf8e14` | EAX:ef_addr32 | EAX:uint32_t | f8e44@f8e9b | Count the entries whose first word is nonzero. |
+| `0xfabf0` | EAX:ef_addr32 | EAX:int32_t | fbad8@fbcd1 | 1 when the object has at least one active entry whose code passes the set test. |

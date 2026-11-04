@@ -2316,4 +2316,22 @@ void latch_words_f5e6c(uint16_t a, uint16_t b, uint16_t c, uint16_t d, uint32_t 
 void guest_fn_f25b0(uint32_t color, uint32_t x, uint32_t y, uint32_t glyph); /* 0xf25b0 EAX/EDX/EBX/ECX */
 void guest_fn_f2960(uint32_t color, uint32_t x, uint32_t y, uint32_t glyph); /* 0xf2960 EAX/EDX/EBX/ECX */
 
+/* game_helpers30.c */
+void tick_object_timer_6330(ef_addr32 object);
+void tick_countdown_47f48(void);
+void copy_row_words_49cd4(ef_addr32 object);
+void reset_unit_links_8ccec(int16_t unit_id);
+ef_addr32 new_stream_9d114(uint32_t owner);
+void rebuild_id_table_a4e14(void);
+void tidy_chain_a7204(ef_addr32 object);
+void select_draw_handlers_c3a74(void);
+uint32_t clear_failed_entry_f8988(ef_addr32 object);
+uint32_t count_kind_entries_f89e0(ef_addr32 object);
+uint32_t count_filled_entries_f8a30(ef_addr32 object);
+uint32_t decrement_last_entry_f8acc(ef_addr32 object);
+uint32_t count_set_entries_f8e14(ef_addr32 object);
+int32_t has_active_entry_fabf0(ef_addr32 object);
+void guest_fn_56a4c(void); /* 0x56a4c */
+ef_addr32 guest_fn_9d060(uint32_t size); /* 0x9d060 EAX -> EAX */
+
 #endif
