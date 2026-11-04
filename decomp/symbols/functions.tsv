@@ -4230,7 +4230,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011d24e	5	tail_jump_11d24e	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011d24e.json	docs/compiler-abi.md; tail jump. Forward to 0x120485.; callers 10dc7f@10dcef; guest pending
 0x0011d258	29			unknown	unclassified	unverified		
 0x0011d27b	167			unknown	unclassified	unverified		
-0x0011d322	99			unknown	unclassified	unverified		
+0x0011d322	99	layout_digits_11d322	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d322.json	docs/compiler-abi.md; Lay out a decimal digit string as "intdigits.fracdigits" at out: copy up to intdigits digits from src, pad with zeros, a; callers 11d3f0@11d57f,11d3f0@11d5ec; guest pending
 0x0011d385	107			unknown	unclassified	unverified		
 0x0011d3f0	548			unknown	unclassified	unverified		
 0x0011d614	43			unknown	unclassified	unverified		

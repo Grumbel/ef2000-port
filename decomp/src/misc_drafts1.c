@@ -551,3 +551,45 @@ uint32_t queue_byte_118428(uint32_t obj, uint32_t ch)
     enable_interrupts_11f2d5();
     return 1u;
 }
+
+/* 0x11d322, 99 bytes. Lay out a decimal digit string as "intdigits.fracdigits" at out: copy up to intdigits digits from src, pad with zeros, add the point, pad leading fractional zeros when intdigits is negative, then copy and zero-pad frac digits. Returns the end pointer. */
+uint32_t layout_digits_11d322(uint32_t out, uint32_t src, int32_t intdigits, int32_t frac)
+{
+    int32_t n = intdigits;
+    if (frac == 0 && intdigits <= 0) {
+        EF_U8(out++) = '0';
+        EF_U8(out++) = '.';
+        return out;
+    }
+    while (n > 0) {
+        uint8_t c = EF_U8(src);
+        if (c == 0u)
+            break;
+        src++;
+        n--;
+        EF_U8(out++) = c;
+    }
+    while (n > 0) {
+        n--;
+        EF_U8(out++) = '0';
+    }
+    EF_U8(out++) = '.';
+    while (frac > 0 && n != 0) {
+        n++;
+        EF_U8(out++) = '0';
+        frac--;
+    }
+    while (frac > 0) {
+        uint8_t c = EF_U8(src);
+        if (c == 0u)
+            break;
+        src++;
+        EF_U8(out++) = c;
+        frac--;
+    }
+    while (frac != 0) {
+        frac--;
+        EF_U8(out++) = '0';
+    }
+    return out;
+}

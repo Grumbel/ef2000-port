@@ -4502,4 +4502,6 @@ void guest_fn_117b18_x(uint32_t obj); /* 0x117b18 EAX */
 
 void guest_fn_117b18_x(uint32_t obj); /* 0x117b18 EAX */
 
+uint32_t layout_digits_11d322(uint32_t out, uint32_t src, int32_t intdigits, int32_t frac);
+
 #endif

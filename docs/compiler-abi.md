@@ -5353,3 +5353,9 @@ in EAX, format string address, one value).
 | `0x7ca78` | none | none | 7cc5c@7ccc5 | Walk the widget chain (next at +0x21) starting at the widget found under 0x187f38/0x187dfc; the first n entries (n = 0x1 |
 | `0xc9ecc` | none | none | a5b70@a5c97,a60a8@a6179,ac408@ac522 | Set the view origin to the screen size (0x15b744 x 0x15b748) minus one with the half-size corner, and latch the full rec |
 | `0x118428` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 106d00@106d2a,107060@107068 | Queue byte ch into the ring buffer of an open device object (buffer at +4, head word at +2, tail word at +4 of the recor |
+
+## misc_drafts1 (2026-11-03)
+
+| Entry | Inputs | Outputs | Callers | Observed effect |
+| --- | --- | --- | --- | --- |
+| `0x11d322` | EAX:uint32_t,EDX:uint32_t,EBX:int32_t,ECX:int32_t | EAX:uint32_t | 11d3f0@11d57f,11d3f0@11d5ec | Lay out a decimal digit string as "intdigits.fracdigits" at out: copy up to intdigits digits from src, pad with zeros, a |
