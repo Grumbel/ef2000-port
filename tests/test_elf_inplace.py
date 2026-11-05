@@ -108,6 +108,10 @@ class ElfInplaceTests(unittest.TestCase):
         invalid[18] = 0x28  # e_machine != EM_386
         with self.assertRaisesRegex(ValueError, 'ELF32 i386'):
             elf_inplace.read_elf32(bytes(invalid))
+        excessive_sections = bytearray(fixture())
+        struct.pack_into('<H', excessive_sections, 48, 257)
+        with self.assertRaisesRegex(ValueError, 'bounded'):
+            elf_inplace.read_elf32(bytes(excessive_sections))
 
     def test_real_gcc_32bit_object_when_toolchain_is_available(self):
         compiler = shutil.which('gcc')
@@ -160,6 +164,32 @@ class ElfInplaceTests(unittest.TestCase):
         blob, _ = elf_inplace.build(object_bytes, bytes(0x2000), functions,
                                     globals_, 0x100, selected='sample')
         self.assertEqual(decode(blob, bytes(0x2000))[0][0], 0x100)
+
+    def test_many_function_sections_remain_bounded_and_selectable(self):
+        compiler = shutil.which('gcc')
+        if not compiler:
+            self.skipTest('gcc unavailable')
+        source = ('extern int g_fixture_a;\n'
+                  'unsigned sample(void) { return g_fixture_a != 0; }\n' +
+                  ''.join(f'unsigned unused_{i}(void) {{ return {i}; }}\n'
+                          for i in range(70)))
+        with tempfile.TemporaryDirectory() as directory:
+            obj = Path(directory) / 'many.o'
+            result = subprocess.run(
+                [compiler, '-m32', '-std=c99', '-Os', '-fno-pie', '-fno-pic',
+                 '-ffreestanding', '-ffunction-sections', '-x', 'c', '-c',
+                 '-o', str(obj), '-'], input=source, text=True,
+                capture_output=True, check=False)
+            if result.returncode:
+                self.skipTest('GCC -m32 -ffunction-sections unsupported')
+            object_bytes = obj.read_bytes()
+        self.assertGreater(struct.unpack_from('<H', object_bytes, 48)[0], 64)
+        name, code, _ = elf_inplace.read_elf32(object_bytes, selected='sample')
+        self.assertEqual(name, 'sample')
+        functions, globals_ = tracker(size=len(code))
+        patch, _ = elf_inplace.build(object_bytes, bytes(0x2000), functions,
+                                     globals_, 0x100, selected='sample')
+        self.assertEqual(decode(patch, bytes(0x2000))[0][0], 0x100)
 
 
 if __name__ == '__main__':

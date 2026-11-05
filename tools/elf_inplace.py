@@ -67,7 +67,9 @@ def read_elf32(blob, selected=None):
      shentsize, shnum, shstridx) = HEADER.unpack_from(blob)
     if (ident[:7] != b'\x7fELF\x01\x01\x01' or kind != 1 or machine != 3 or
             version != 1 or ehsize != HEADER.size or shentsize != SECTION.size or
-            not 1 < shnum <= 64 or shstridx >= shnum or
+            # -ffunction-sections on an existing multi-function module can
+            # exceed 64 sections even when only one function is selected.
+            not 1 < shnum <= 256 or shstridx >= shnum or
             shoff > len(blob) or shnum * SECTION.size > len(blob) - shoff):
         raise ElfPatchError('expected bounded little-endian ELF32 i386 ET_REL')
     sections = [SECTION.unpack_from(blob, shoff + i * SECTION.size)
