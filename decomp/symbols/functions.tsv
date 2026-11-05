@@ -257,11 +257,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00012ec8	80	sync_flag_12ec8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00012ec8.json	docs/compiler-abi.md; Mirror byte 0x123790 with the flag at 0x121fb4 + 29*index.; callers 12160@12188; guest pending
 0x00013950	55	run_12d90_pair_13950	game_helpers4	compiles	game	confirmed	decomp/tests/0x00013950.json	docs/compiler-abi.md; ; callers 848e0@849a0; guest pending
 0x00014c5c	224	set_record_state_14c5c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00014c5c.json	docs/compiler-abi.md; Set the state byte of the 19-byte record IDX at 0x1225d4 to STATE; when it changed and the current object is not locked ; callers 589c0@58a1b,589c0@58a2a,589c0@58a39; guest pending
-0x00014d3c	26	read_event_slot_byte	low_helpers	compiles	game	confirmed	decomp/tests/0x00014d3c.json	docs/compiler-abi.md; byte 0x1225d4+19*AX; callers 589c0@58c62; guest pending
+0x00014d3c	26	read_event_slot_byte	low_helpers	compiles	game	confirmed	decomp/tests/0x00014d3c.json	docs/compiler-abi.md; 64/64 isolated GCC32 full-register and memory guest cases pass; Watcom/OMF and replay pending
 0x00014d58	409			unknown	unclassified	unverified		
 0x00014ef4	29	refresh_all_event_slots	event_wrappers	compiles	game	confirmed	decomp/tests/0x0014ef4.json	Iterate signed index 0..33 through 0x14d58; callers 5f60@5fbf/5fd8@6008; guest pending
 0x000150d4	196	draw_label_entries_150d4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000150d4.json	docs/compiler-abi.md; Draw the 0x22 label entries of the table at 0x1225d4 (19 bytes each: kind byte +1, box words +2/+4/+6, height word +8, t; callers 5f60@5fc4,5fd8@600d,6c1c@6c90; guest pending
-0x000151a0	36	reset_dialog_latches	low_helpers	compiles	game	confirmed	decomp/tests/0x000151a0.json	docs/compiler-abi.md; bytes 0x12289e=1 0x12289f=0 0x1228a0=0 and 0x197c50=byte 0x181730; callers 58d64@58d69; guest pending
+0x000151a0	36	reset_dialog_latches	low_helpers	compiles	game	confirmed	decomp/tests/0x000151a0.json	docs/compiler-abi.md; 40/40 isolated GCC32 memory and preserved-register guest cases pass; scratch EAX differs; Watcom/OMF and replay pending
 0x000151c4	1	nop_151c4	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000151c4.json	docs/compiler-abi.md; Empty stub (single ret).; callers 3ce30@3ce4f,3d950@3d9c3,3db9c@3dbd4; guest pending
 0x000151c8	8	set_flag_151c8	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000151c8.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000159a0	115	text_width_159a0	game_helpers14	compiles	game	confirmed	decomp/tests/0x000159a0.json	docs/compiler-abi.md; Pixel width of a string: 3 for a space, glyph width + 1 otherwise.; callers 48c34@48c6b,48d5c@48d89,48da0@48dcd; guest pending
@@ -735,7 +735,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00040624	125	draw_ratio_text_40624	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00040624.json	docs/compiler-abi.md; Latch the full screen rectangle twice, optionally format "ratio" text (50 / 0x127d92) and print it at row 12, column 10,; callers 3dd30@3e451; guest pending
 0x00040774	54	clock_words_to_seconds	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00040774.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x000407c4	94			unknown	unclassified	unverified		
-0x00040820	78	reference_clock_reaches	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00040820.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
+0x00040820	78	reference_clock_reaches	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00040820.json	docs/compiler-abi.md; 96 isolated GCC32 guest cases AL and preserved registers pass; GCC loses original upper EAX; Watcom/OMF and replay pending
 0x00040870	77	clock_rate_difference_40870	float_helpers2	compiles	game	confirmed	decomp/tests/0x00040870.json	docs/compiler-abi.md; Rate between two clock readings and a distance, minus a divided distance.; callers 59adc@59d66; guest pending
 0x00040e20	47	reset_name_record_40e20	game_helpers132	compiles	game	confirmed	decomp/tests/0x00040e20.json	docs/compiler-abi.md; Copy the 12-byte record at 0x184358 to 0x41f30c, set the pending name to 0x184364, clear the word at 0x41eeda and store ; callers none direct; guest pending
 0x00040e50	107	gcSetDifficulty	campaign_callbacks	drafted	game	unverified		Original disassembly; campaign selector initialization with guest UI calls; host-tested batch 085
@@ -755,7 +755,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000418c4	210			unknown	unclassified	unverified		
 0x00041998	509			unknown	unclassified	unverified		
 0x00041b98	443			unknown	unclassified	unverified		
-0x00041da4	79	command_code_is_group_1b	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00041da4.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
+0x00041da4	79	command_code_is_group_1b	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00041da4.json	docs/compiler-abi.md; 256 isolated GCC32 guest cases full EAX and preserved registers pass; Watcom/OMF and replay pending
 0x00041df4	24	code_is_0b_or_0c	low_helpers	compiles	game	confirmed	decomp/tests/0x00041df4.json	docs/compiler-abi.md; AL is 0x0b or 0x0c; callers 9a998@9aa20; guest pending
 0x00041e0c	24	code_is_26_or_27	low_helpers	compiles	game	confirmed	decomp/tests/0x00041e0c.json	docs/compiler-abi.md; AL is 0x26 or 0x27; callers 41b98@41c78; guest pending
 0x00041e24	93	code_in_set_41e24	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00041e24.json	docs/compiler-abi.md; ; callers 9a998@9a9c2; guest pending
@@ -837,7 +837,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00048df8	132	draw_status_counter_48df8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00048df8.json	docs/compiler-abi.md; Clamp the counter 0x127b1c at zero; while it is non-zero draw the two status strings (0x1a524c) at (17, 17) with modes 0; callers 3dd30@3e759; guest pending
 0x00048e7c	464			unknown	unclassified	unverified		
 0x0004904c	6	get_byte_4904c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0004904c.json	docs/compiler-abi.md; ; callers 1cde8@1ce2f,1cde8@1cef7; guest pending
-0x00049054	61	clear_tactical_accumulators	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00049054.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
+0x00049054	61	clear_tactical_accumulators	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00049054.json	docs/compiler-abi.md; 40 isolated GCC32 guest cases memory and preserved registers pass; scratch EAX differs; Watcom/OMF and replay pending
 0x00049144	156	draw_widget_rect_49144	game_helpers110	compiles	game	confirmed	decomp/tests/0x00049144.json	docs/compiler-abi.md; Draw the outline of widget record idx: its centre (x,y) and size (w,h) become a rectangle; mode 0 when the record's kind; callers 3a3a8@3a566,646d4@6479b; guest pending
 0x00049228	2484			unknown	unclassified	unverified		
 0x00049bdc	245	rebuild_group_tables_49bdc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00049bdc.json	docs/compiler-abi.md; Rebuild the group tables from the list node reached by following the next links (+4) of P up to the word 0x125835 times:; callers 49228@49939,49228@499f9; guest pending
@@ -881,14 +881,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004d2fc	753	mpNextAssign		named	unclassified	unverified		
 0x0004d5f0	100	set_ranges_4d5f0	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0004d5f0.json	docs/compiler-abi.md; ; callers 4d2fc@4d505; guest pending
 0x0004d668	651			unknown	unclassified	unverified		
-0x0004d8f4	42	reset_tactical_slots	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0004d8f4.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
+0x0004d8f4	42	reset_tactical_slots	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0004d8f4.json	docs/compiler-abi.md; 40 isolated GCC32 guest cases memory and preserved registers pass; scratch EAX differs in 20; Watcom/OMF and replay pending
 0x0004d920	169	mpSamCoverage		named	unclassified	unverified		
 0x0004d9cc	95	mpPrevAssign	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x0004da2c	99	mpMakeAssign	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x0004da90	85	mpViewAssign	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x0004dae8	100	mpClearWPRoute	mission_map_callbacks	drafted	game	unverified		Original disassembly; route guard and selection reload across guest callback; host-tested in batch 084
 0x0004db60	309	fill_selection_dialog_4db60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004db60.json	docs/compiler-abi.md; Fill two text widgets of the dialog named at 0x184b0c (widgets 0x184cf8 and 0x184d38, or 0x184d30 for the second when by; callers 4b6a0@4bb11,4d9cc@4da23,4da2c@4da88; guest pending
-0x0004dc98	61	advance_first_tactical_status	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0004dc98.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
+0x0004dc98	61	advance_first_tactical_status	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0004dc98.json	docs/compiler-abi.md; 80 isolated GCC32 guest cases memory and preserved registers pass; Watcom/OMF and replay pending
 0x0004dcd8	520			unknown	unclassified	unverified		
 0x0004dee0	209	find_icon_at_4dee0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004dee0.json	docs/compiler-abi.md; Hit test the 24 map icons (index 1..24) against the point (X, Y) (16-bit signed): icon I has its centre at the words 0x1; callers 4dcd8@4dd39,4dcd8@4de13; guest pending
 0x0004dfb4	281	find_slot_at_point_4dfb4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004dfb4.json	docs/compiler-abi.md; Find the first slot 1..0x17 whose box contains the point (X = low word of EAX, Y = low word of EDX; signed): the slot ce; callers 4dcd8@4dd4c; guest pending
@@ -977,7 +977,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00054328	82	step_sequence_54328	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00054328.json	docs/compiler-abi.md; ; callers 54110@5413c; guest pending
 0x0005437c	134	update_records_5437c	game_helpers31	compiles	game	confirmed	decomp/tests/0x0005437c.json	docs/compiler-abi.md; Update every record of the 171-byte list: arm ready ones and refresh active ones.; callers 54110@54141; guest pending
 0x00054410	174	reset_unit_teams_54410	game_helpers38	compiles	game	confirmed	decomp/tests/0x00054410.json	docs/compiler-abi.md; Reset every unit's team word, the owner flags and the 8 counters.; callers 49228@49b5b; guest pending
-0x000544c0	53	count_external_grid_markers	runtime_predicates	compiles	game	confirmed	decomp/tests/0x000544c0.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
+0x000544c0	53	count_external_grid_markers	runtime_predicates	compiles	game	confirmed	decomp/tests/0x000544c0.json	docs/compiler-abi.md; 40 isolated GCC32 guest cases memory and preserved registers pass; scratch EAX differs; Watcom/OMF and replay pending
 0x000544f8	170	refresh_owner_entries_544f8	game_helpers18	compiles	game	confirmed	decomp/tests/0x000544f8.json	docs/compiler-abi.md; Copy six owner words into each 0x1b-byte entry of the table at 0x1a5c2e.; callers 7e8c0@7ebed; guest pending
 0x000545b8	42	send_grid_marker_packet	command_packets	compiles	game	confirmed	decomp/tests/0x000545b8.json	docs/compiler-abi.md; Five-byte opcode 0x0c packet AX little-endian, marker 0x1a666b then DL; original call 0xa3f74; guest dispatch unverified
 0x000545e4	26	send_command_1d	marker_packets	compiles	game	confirmed	decomp/tests/0x000545e4.json	docs/compiler-abi.md; One-byte packet 0x1d via 0xa3f74; sole direct caller 7e758@7e7b8; guest pending
@@ -1166,7 +1166,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005eaa4	276	scan_nearest_record_5eaa4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005eaa4.json	docs/compiler-abi.md; Advance the nearest-record scan: for the current index compute the squared distance to the view position and, when it be; callers 601c@62d9; guest pending
 0x0005ebb8	711			unknown	unclassified	unverified		
 0x0005ee80	198	find_entry_in_range_5ee80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ee80.json	docs/compiler-abi.md; Find the entry (0x54-byte records at 0x1a6b3c, count byte at [[0x1a6b08] + 0x13]) whose position is within 0x7fff of the; callers 9114@9160; guest pending
-0x0005f1ec	52	sample_active_coordinates	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005f1ec.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
+0x0005f1ec	52	sample_active_coordinates	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005f1ec.json	docs/compiler-abi.md; 80 isolated GCC32 guest cases memory and preserved registers pass; Watcom/OMF and replay pending
 0x0005f220	871			unknown	unclassified	unverified		
 0x0005f588	172	turn_direction_5f588	game_helpers38	compiles	game	confirmed	decomp/tests/0x0005f588.json	docs/compiler-abi.md; Turn direction of three points: 1, -1 (0xff) or 0, with a collinear tiebreak.; callers 5f220@5f467; guest pending
 0x0005f634	98	reset_menu_page_5f634	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x0005f634.json	docs/compiler-abi.md; Reset the page state and rebuild the menu.; callers 5f60@5f7a,5fd8@5fe8; guest pending
@@ -2912,19 +2912,19 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc468	74	node_has_negative_flag_cc468	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cc468.json	docs/compiler-abi.md; True when the first node of this kind has a negative flag byte.; callers befb8@bf2cc,c0b04@c0b86,ccdbc@cd0e0; guest pending
 0x000cc51c	103	find_node_matching_cc51c	table_switches1	compiles	game	confirmed	decomp/tests/0x000cc51c.json	docs/compiler-abi.md; Search a linked list (next at +4) for a node whose id byte (+0xb) equals id and whose state byte (+0x2e) satisfies the t; callers bed1c@bee18,bf444@bf498,bf81c@bf8db; guest pending
 0x000cc584	119	code_in_set_cc584	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc584.json	docs/compiler-abi.md; ; callers d68c@df3a,d68c@e07c,d68c@e187; guest pending
-0x000cc5fc	44	code_is_10_to_15	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc5fc.json	docs/compiler-abi.md; AL is 0x10..0x15.; callers d68c@df63,d68c@e0a8,d68c@e1b3; guest pending
-0x000cc628	44	code_is_18_to_1b_1d_1e	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc628.json	docs/compiler-abi.md; AL is 0x18, 0x19, 0x1a, 0x1b, 0x1d or 0x1e.; callers d68c@df8c,d68c@e0d4,d68c@e1df; guest pending
-0x000cc654	39	code_is_18_or_1c_to_1f	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc654.json	docs/compiler-abi.md; AL is 0x18 or 0x1c..0x1f.; callers d68c@dfb5,d68c@e100,d68c@e20a; guest pending
-0x000cc67c	24	code_is_20_or_21	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc67c.json	docs/compiler-abi.md; AL is 0x20 or 0x21.; callers d68c@dfe0,d68c@e12c,d68c@e236; guest pending
-0x000cc694	24	code_is_23_or_24	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc694.json	docs/compiler-abi.md; AL is 0x23 or 0x24.; callers d68c@e00b,d68c@e157,d68c@e25f; guest pending
-0x000cc6ac	17	code_is_22	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc6ac.json	docs/compiler-abi.md; AL is 0x22.; callers d68c@e035,d68c@e288,9a8b4@9a97d; guest pending
+0x000cc5fc	44	code_is_10_to_15	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc5fc.json	docs/compiler-abi.md; 256/256 isolated GCC32 full-register guest cases pass; Watcom/OMF and replay pending
+0x000cc628	44	code_is_18_to_1b_1d_1e	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc628.json	docs/compiler-abi.md; 256/256 isolated GCC32 full-register guest cases pass; Watcom/OMF and replay pending
+0x000cc654	39	code_is_18_or_1c_to_1f	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc654.json	docs/compiler-abi.md; 256/256 isolated GCC32 full-register guest cases pass; Watcom/OMF and replay pending
+0x000cc67c	24	code_is_20_or_21	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc67c.json	docs/compiler-abi.md; 256/256 isolated GCC32 full-register guest cases pass; Watcom/OMF and replay pending
+0x000cc694	24	code_is_23_or_24	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc694.json	docs/compiler-abi.md; 256/256 isolated GCC32 full-register guest cases pass; Watcom/OMF and replay pending
+0x000cc6ac	17	code_is_22	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc6ac.json	docs/compiler-abi.md; 256/256 isolated GCC32 full-register guest cases pass; Watcom/OMF and replay pending
 0x000cc6c0	132	alloc_zeroed_cc6c0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cc6c0.json	docs/compiler-abi.md; cdecl, variadic (SIZE, FMT, ...): allocate SIZE bytes (0xc3f70); when that fails report through the pointer at 0x132a74 ; callers e764@e76a,3c790@3c7c9,3cb2c@3cb68; guest pending
 0x000cc744	34	alloc_checked_cc744	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000cc744.json	docs/compiler-abi.md; Allocate a block for a non-null request, aborting on failure.; callers 3cb2c@3cb84,3cb2c@3cb97,b3374@b339f; guest pending
 0x000cc768	5	tail_jump_cc768	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000cc768.json	docs/compiler-abi.md; tail jump. Forward to 0xc3f80.; callers e710@e728,e710@e734,f8f8@f906; guest pending
 0x000cc76d	87	parse_int_cc76d	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc76d.json	docs/compiler-abi.md; Same as 0x9d4cd.; callers e980@e98a,f3b58@f3b6f; guest pending
 0x000cc7d0	23	forward_word_args_cc7d0	game_helpers106	compiles	game	confirmed	decomp/tests/0x000cc7d0.json	docs/compiler-abi.md; Forward two stack arguments to cc90c with the 16-bit register argument sign-extended.; callers b0f5c@b154b; guest pending
-0x000cc7e8	52	pair_matches_cc7e8	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc7e8.json	docs/compiler-abi.md; DL in {0x16, 0x17, 0x0e, 0x11, 0x13} and AL is 2.; callers bdeec@be17c,cc90c@cca5f,ccdbc@cce56; guest pending
-0x000cc81c	34	pair_matches_cc81c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc81c.json	docs/compiler-abi.md; DL is 8 or 0x1a and AL is 2.; callers f918@f946,f918@f9a7,b31f0@b321a; guest pending
+0x000cc7e8	52	pair_matches_cc7e8	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc7e8.json	docs/compiler-abi.md; 4096/4096 isolated GCC32 full-register guest cases pass; Watcom/OMF and replay pending
+0x000cc81c	34	pair_matches_cc81c	code_predicates	compiles	game	confirmed	decomp/tests/0x000cc81c.json	docs/compiler-abi.md; 4096/4096 isolated GCC32 guest cases EAX and preserved regs pass; original clobbers EDX unlike GCC in all cases; Watcom/OMF and replay pending
 0x000cc840	83	count_open_entries_cc840	runtime_helpers15	compiles	game	confirmed	decomp/tests/0x000cc840.json	docs/compiler-abi.md; Count the 21-byte entries that are free (0xff) or reserved (0xfe) for other kinds.; callers afc5c@afc90,cc90c@cc944; guest pending
 0x000cc894	74	pick_variant_cc894	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc894.json	docs/compiler-abi.md; ; callers afc5c@afca9; guest pending
 0x000cc8e0	3	return_esc_cc8e0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000cc8e0.json	docs/compiler-abi.md; Returns the ESC scan code.; callers bcf44@bcff2; guest pending
