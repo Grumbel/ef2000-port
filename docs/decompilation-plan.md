@@ -501,9 +501,11 @@ has been executed. See `docs/function-differential.md`.
 
 The first bounded original-vs-patched framebuffer/selected-memory replay checker
 and patch entry-hit instrumentation are implemented (`tools/replay_suite.py`;
-see `docs/golden-replay.md`). It does not yet record *multiple* timed
-checkpoints or palette hashes and has not passed an asset-backed, real-function
-patch replay.
+see `docs/golden-replay.md`). Batch 100 added independent reruns ending at
+multiple instruction checkpoints, including a RAM-hash-only allowance for
+early startup before VGA mode setup. The full suite still needs in-process
+state checkpoints, palette hashes and an asset-backed, real-function patch
+replay; the current identity-patch experiment is only a plumbing check.
 The full scope below remains outstanding.
 
 - Define 6–10 deterministic scenarios as files in `tests/replays/*.json`
@@ -2063,6 +2065,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-05  986  Drafted two more OPTIONS label table routines f4347 and f44b6: ASCII-folded name match through '=', append/replace/remove, pointer/flag array relocation and conditional allocation release. Tested synthetic resize-move, missing/empty labels, deletion of first/last entry and allocation failure; guest heap ABI remains unverified. Tracker: 4287 entries, 3257 compiles, 243 drafted. See docs/subsystems/decomp-batch-095-labels.md.
 2026-11-05  987  Drafted original OPTIONS reader f2d74 and formatter f6124. The reader reuses native f2c78/f2cd0/f2d54 and makes the previous 14-way f3b78 dispatcher test run from real script text, including skipped comments and labels; preserved f2da4 fallthrough into ASCII lowering. Formatter remains callback-adapted. Pinned original-byte audit and strict C host test; guest splice pending. Tracker: 4287 entries, 3257 compiles, 245 drafted. See docs/subsystems/decomp-batch-096.md.
 2026-11-05  988  Drafted original OPTIONS cursor timing/stepping f3d54 and display-event loop f3f84. Includes signed divide-by-eight, three velocity thresholds, tick repeat countdown, 320x200 clamping, 20-byte display record forwarding, pointer selection/release and fade/no-fade cleanup. Source-grounded GCC C11 tests and pinned original-byte audit; renderer, hit testing, polling and guest calling conventions remain adapters, with no Watcom splice. Tracker: 4287 entries, 3257 compiles, 247 drafted, 669 unknown. See docs/subsystems/decomp-batch-097.md.
+2026-11-05  3.9  Multi-checkpoint replays compare original and SHA-pinned identity-patched entry at four instruction budgets (12 runs total); early startup uses explicit RAM-only mode until a framebuffer exists. Synthetic x87 test isolates the local Unicorn host crash. No recovered C function verified. See docs/subsystems/decomp-batch-100.md.
 ```
 
 ---

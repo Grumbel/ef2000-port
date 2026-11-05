@@ -4,9 +4,9 @@
 
 """Bounded, asset-backed original-vs-EFPATCH1 framebuffer/RAM replay oracle.
 
-This is a deliberately narrow *first* golden suite: identical scripted inputs,
-instruction-counted clocks, exit/status counters, a final guest framebuffer,
-and optionally selected guest RAM regions. It does not compare full guest RAM.
+Each requested instruction checkpoint starts a fresh replay of the same script.
+This avoids taking nonportable runtime snapshots while providing intermediate
+framebuffer and selected guest-RAM comparisons. It does not compare full RAM.
 """
 
 import argparse
@@ -32,6 +32,8 @@ GUEST_HASH = re.compile(r'^guest_hash: addr=0x([0-9a-f]+) length=(\d+) sha256=([
 EVENT_ARITY = {'--mouse-event': 4, '--key-event': 4, '--joystick-event': (4, 6)}
 MAX_EVENTS = 128
 MAX_CASES = 32
+MAX_CHECKPOINTS = 8
+MAX_TOTAL_POINTS = 64
 
 
 def validate_manifest(manifest, patch_addresses, patch_intervals=()):
@@ -42,6 +44,7 @@ def validate_manifest(manifest, patch_addresses, patch_intervals=()):
         raise ValueError(f'manifest needs 1..{MAX_CASES} cases')
     result = []
     names = set()
+    total_points = 0
     for case in cases:
         if not isinstance(case, dict):
             raise ValueError('each case must be an object')
@@ -55,6 +58,16 @@ def validate_manifest(manifest, patch_addresses, patch_intervals=()):
         if (type(instructions) is not int or not 1000 <= instructions <= 2_000_000_000
                 or type(timer) is not int or not 1 <= timer <= 1_000_000):
             raise ValueError(f'{name}: invalid instruction limit or timer interval')
+        checkpoints = case.get('checkpoints', [])
+        if (not isinstance(checkpoints, list) or len(checkpoints) > MAX_CHECKPOINTS or
+                any(type(point) is not int or not 1000 <= point < instructions
+                    for point in checkpoints) or
+                checkpoints != sorted(set(checkpoints))):
+            raise ValueError(f'{name}: checkpoints must be ascending, unique instruction '
+                             f'limits below {instructions} (at most {MAX_CHECKPOINTS})')
+        total_points += len(checkpoints) + 1
+        if total_points > MAX_TOTAL_POINTS:
+            raise ValueError(f'too many replay checkpoints across cases (max {MAX_TOTAL_POINTS})')
         events = case.get('events', [])
         if not isinstance(events, list) or len(events) > MAX_EVENTS:
             raise ValueError(f'{name}: expected at most {MAX_EVENTS} events')
@@ -120,9 +133,14 @@ def validate_manifest(manifest, patch_addresses, patch_intervals=()):
                 any(a + length > b for (a, length), (b, _) in zip(hashes, hashes[1:])) or
                 sum(length for _, length in hashes) > 0x2000000):
             raise ValueError(f'{name}: duplicate/overlapping or oversized guest hashes')
+        allow_no_framebuffer = case.get('allow_no_framebuffer', False)
+        if type(allow_no_framebuffer) is not bool or (allow_no_framebuffer and not hashes):
+            raise ValueError(f'{name}: allow_no_framebuffer requires guest hashes and a boolean')
         result.append({'name': name, 'instructions': instructions,
                        'timer_instructions': timer, 'arguments': arguments,
-                       'must_hit': sorted(hits), 'guest_hashes': hashes})
+                       'must_hit': sorted(hits), 'guest_hashes': hashes,
+                       'checkpoints': checkpoints,
+                       'allow_no_framebuffer': allow_no_framebuffer})
     return result
 
 
@@ -187,11 +205,12 @@ def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, tim
                                        case.get('guest_hashes', []))
     if status['status'] not in ('instruction_limit', 'guest_exit'):
         raise ValueError(f'{case["name"]}: unexpected guest stop: {status["status"]}')
-    if not framebuffer.is_file():
+    if not framebuffer.is_file() and not case.get('allow_no_framebuffer', False):
         raise ValueError(f'{case["name"]}: guest framebuffer was not saved')
     return {'status': status, 'patch_hits': {f'0x{k:x}': v for k, v in hits.items()},
             'guest_hashes': {f'0x{k[0]:x}:{k[1]}': v for k, v in hashes.items()},
-            'frame_sha256': hashlib.sha256(framebuffer.read_bytes()).hexdigest()}
+            'frame_sha256': (hashlib.sha256(framebuffer.read_bytes()).hexdigest()
+                             if framebuffer.is_file() else None)}
 
 
 def differences(baseline, other):
@@ -200,7 +219,7 @@ def differences(baseline, other):
         if baseline['status'][key] != other['status'][key]:
             problems.append(f'{key}: {baseline["status"][key]} != {other["status"][key]}')
     if baseline['frame_sha256'] != other['frame_sha256']:
-        problems.append('final framebuffer SHA256 differs')
+        problems.append('framebuffer SHA256 differs')
     if baseline['guest_hashes'] != other['guest_hashes']:
         for region in sorted(set(baseline['guest_hashes']) | set(other['guest_hashes'])):
             if baseline['guest_hashes'].get(region) != other['guest_hashes'].get(region):
@@ -218,29 +237,48 @@ def run_suite(runner, executable, game_dir, cd_dir, patches, cases, output,
     summary = {'schema': SCHEMA, 'checks': [], 'passed': False,
                'limitations': ['A framebuffer comparison is not a full guest-RAM comparison.',
                                'A patch-entry hit is not proof of correct function behavior.',
-                               'One baseline run cannot establish cross-run determinism.']}
+                               'Each checkpoint replays from guest entry; it is not a '
+                               'snapshot of one continuous run.']}
+    if baseline_repeats == 1:
+        summary['limitations'].append('One baseline run cannot establish determinism.')
     try:
         for case in cases:
             directory = output / case['name']
             directory.mkdir()
-            baseline = run_one(runner, executable, game_dir, cd_dir, [], case,
-                               directory / 'original', timeout)
             checks = []
-            if baseline_repeats == 2:
-                second = run_one(runner, executable, game_dir, cd_dir, [], case,
-                                 directory / 'repeat-original', timeout)
-                checks.extend('baseline nondeterminism: ' + issue
-                              for issue in differences(baseline, second))
-            patched_case = dict(case, patch_addresses=patch_addresses)
-            patched = run_one(runner, executable, game_dir, cd_dir, patches, patched_case,
-                              directory / 'patched', timeout)
-            checks.extend(differences(baseline, patched))
-            for address in case['must_hit']:
-                if not patched['patch_hits'].get(f'0x{address:x}', 0):
-                    checks.append(f'patched entry 0x{address:x} not executed')
+            samples = []
+            points = [*case.get('checkpoints', []), case['instructions']]
+            for instructions in points:
+                last = instructions == case['instructions']
+                sample_dir = (directory / f'at-{instructions}'
+                              if len(points) > 1 else directory)
+                sample_case = dict(case, instructions=instructions)
+                baseline = run_one(runner, executable, game_dir, cd_dir, [], sample_case,
+                                   sample_dir / 'original', timeout)
+                failures = []
+                if baseline_repeats == 2:
+                    second = run_one(runner, executable, game_dir, cd_dir, [], sample_case,
+                                     sample_dir / 'repeat-original', timeout)
+                    failures.extend('baseline nondeterminism: ' + issue
+                                    for issue in differences(baseline, second))
+                patched_case = dict(sample_case, patch_addresses=patch_addresses)
+                patched = run_one(runner, executable, game_dir, cd_dir, patches, patched_case,
+                                  sample_dir / 'patched', timeout)
+                failures.extend(differences(baseline, patched))
+                if not last and baseline['status']['status'] != 'instruction_limit':
+                    failures.append('guest stopped before requested intermediate checkpoint')
+                if last:
+                    for address in case['must_hit']:
+                        if not patched['patch_hits'].get(f'0x{address:x}', 0):
+                            failures.append(f'patched entry 0x{address:x} not executed')
+                samples.append({'instructions': instructions, 'baseline': baseline,
+                                'patched': patched, 'failures': failures,
+                                'passed': not failures})
+                prefix = f'at {instructions} instructions: ' if len(points) > 1 else ''
+                checks.extend(prefix + failure for failure in failures)
             summary['checks'].append({'name': case['name'], 'baseline': baseline,
                                       'patched': patched, 'failures': checks,
-                                      'passed': not checks})
+                                      'checkpoints': samples, 'passed': not checks})
         summary['passed'] = all(check['passed'] for check in summary['checks'])
     except (OSError, ValueError) as error:
         summary['error'] = str(error)

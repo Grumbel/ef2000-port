@@ -8,9 +8,10 @@ oracle. It uses the **C++ Unicorn runner**, not the native64 backend. It runs
 each scenario twice **without** a patch by default to establish baseline
 repeatability, then once with SHA-pinned in-place EFPATCH1 patches.
 
-The three runs have the same instruction budget, instruction-counted PIT,
-scripted input and game/CD source folders. Each gets a **different empty
-copy-on-write DOS drive**. The original executable is treated as read-only,
+At each requested checkpoint, the three runs have the same instruction budget,
+instruction-counted PIT, scripted input and game/CD source folders. Each starts
+**from guest entry**, with a different empty copy-on-write DOS drive; this is
+not a snapshot of one continuous run. The original executable is treated as read-only,
 its SHA-256 is checked before and after the suite, and output directories
 must not be inside the original game/CD folders. The suite refuses to replace
 an existing output directory.
@@ -47,6 +48,7 @@ first be observed in the actual game):
     {
       "name": "highscore-menu",
       "instructions": 30000000,
+      "checkpoints": [10000000, 20000000],
       "timer_instructions": 23866,
       "events": [
         ["--mouse-event", "150:320:200:1"],
@@ -71,9 +73,26 @@ compiled implementation are expected there. Prefer mutable game data and
 BSS ranges whose meaning is understood. **The addresses above are only an
 illustration, not an established high-score-screen golden checkpoint.**
 
+The optional `checkpoints` list contains up to eight strictly ascending guest
+instruction limits smaller than the final `instructions` count. The suite
+replays from entry for *each* limit, twice unpatched and once patched, so the
+same memory/framebuffer comparisons are made at intermediate points. A
+manifest is limited to 64 total points across cases to prevent accidental
+explosions in runtime or disk usage. Each point has separate run directories
+and a record in the `checkpoints` array of `summary.json`. `must_hit` entries
+need to be reached by the **final** point, not necessarily each earlier point.
+Early termination before an intermediate checkpoint is a failure.
+
+If the executable has not yet selected a video mode, the C++ runner produces
+no PPM. Such pre-video diagnostics may set `"allow_no_framebuffer": true`,
+**but only when at least one guest RAM hash is requested**. A missing PPM is
+then recorded as `frame_sha256: null`; a missing image in one run and a present
+image in another still fails comparison. This exception must not be used to
+claim visual parity of a replacement. The default requires a framebuffer.
+
 ## How to read the results
 
-`summary.json`, per-run console logs, and the final PPM screenshots are
+`summary.json`, per-run console logs, and any PPM screenshots are
 written under the new result directory (normally `local/`, ignored by Git).
 The patched C++ runner prints one `patch_hit: addr=0x... count=N` for each
 in-place replacement, plus a `patch_hits: total=N` line. The suite rejects
@@ -102,9 +121,10 @@ those differences; do not bless a mismatch automatically.
 
 ## Not yet a complete §3.9 oracle
 
-This implementation compares the **last** framebuffer and selected guest
-memory ranges in each bounded run, not separate palette hashes or multiple
-intermediate checkpoints. It does not yet record immutable baseline hashes for all
+This implementation compares the framebuffer and selected guest-memory ranges
+at independent bounded runs ending at each requested instruction checkpoint,
+but does not yet implement in-process snapshot checkpoints, separate palette
+hashes or full-RAM comparison. It does not yet record immutable baseline hashes for all
 6–10 planned scenarios, or perform DOSBox-X cross-checks. The script requires
 an already compiled and safely spliced replacement; it does not produce an
 OpenWatcom object itself. A nonzero patch entry count proves the replacement
@@ -126,3 +146,15 @@ Those bounded original runs did not yet reach a drawable framebuffer or a
 target replacement. Until an actual full game-data installation, Watcom
 output and functioning patch are run through these steps, **zero functions
 have gained `verified` status**.
+
+Batch 100 added multi-checkpoint comparison and explicit pre-video handling.
+In the locally statically linked runner, a disposable identity EFPATCH1 at
+guest entry completed four checkpoint budgets (200k, 400k, 600k and 800k),
+with two original runs and one patched run per point. All 12 runs agreed on
+the selected RAM hash, status and PIT counters, and the patched entry was
+observed. This does **not** validate a recompiled function. The same supplied
+Unicorn library crashes the host on a minimal standalone 32-bit x87 `FLD` /
+`FSTP` test; the actual game enters x87 at guest `0x0fcca5` after approximately
+868,499 instructions. The immediate limit is the local Unicorn binary/runtime
+combination, not an established game defect. Runs with the owner's native Nix
+toolchain and complete game installation remain necessary.
