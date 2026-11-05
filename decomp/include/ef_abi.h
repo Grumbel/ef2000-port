@@ -6,6 +6,23 @@
 
 #include "ef_types.h"
 
+/* Batch 089: eleven nontrivial callback bodies plus two small control
+ * entries. Host C interfaces do not assert native guest splice ABIs. */
+uint32_t gui_guest_call_089(uint32_t entry, uint32_t eax, uint32_t edx);
+void gui_kots_init_4b54(ef_addr32 widget);
+void gui_campaign_warning_ok_4b1a4(void);
+void gui_draw_fuel_bar_50638(void);
+void gui_type2_click_5089c(ef_addr32 widget);
+void gui_type3_click_508fc(ef_addr32 widget);
+void gui_type4_click_5095c(ef_addr32 widget);
+void gui_previous_assignment_4d9cc(void);
+void gui_make_assignment_4da2c(void);
+void gui_view_assignment_4da90(void);
+void gui_show_summary_info_84ddc(ef_addr32 widget);
+void env_clouds_da2b0(void);
+void gui_open_credits_37260(void);
+void gui_new_socket_37254(void);
+
 /* Batch 088: eight original environment commands and twelve GUI callbacks.
  * Hooks are host-only boundaries for unresolved original guest calls. */
 void environment_report_normal_line_088(ef_addr32 source, uint32_t format,
