@@ -6,6 +6,32 @@
 
 #include "ef_types.h"
 
+/* Mission-planning GUI callback entries (batch 084). Guest UI callees are
+ * explicit register-call hooks; no guest splice ABI is claimed yet. */
+uint32_t mp_ui_guest_call_084(uint32_t address, uint32_t eax, uint32_t edx);
+void mp_ui_guest_map_select_084(uint32_t target, uint32_t eax,
+                                uint32_t edx, uint32_t ebx);
+void mp_zoom_in_map_4bc40(ef_addr32 widget);
+void mp_redraw_map_4bec0(ef_addr32 widget);
+void mp_map_select_4bef0(void);
+void mp_cycle_map_4c610(void);
+void mp_ewr_coverage_4c638(void);
+void mp_toggle_flags_4c66c(void);
+void mp_clear_wp_route_4dae8(void);
+void mp_redraw_wp_heights_4e768(void);
+void mp_inc_speed_4eb78(void);
+void mp_dec_speed_4ec14(void);
+void mp_mission_1_click_4ec44(void);
+void mp_click_v8_okay_4f2f8(void);
+void mp_warning_ok_click_4f36c(void);
+void mp_return_to_campaign_505e4(void);
+void mp_no_quit_50604(void);
+void mp_miss_plan_task_50750(void);
+void mp_set_role_507f4(void);
+void mp_set_ac_type_5080c(void);
+void mp_change_mode_50c2c(ef_addr32 widget);
+void mp_redraw_target_view_50c40(ef_addr32 widget);
+
 /* Renderer depth queue and endianness helpers, original entries c3fd4..c53cf.
  * The original EBX cursor and indirect frame callback are explicit in these
  * host-only drafts, until their guest ABI can be reproduced and spliced. */
