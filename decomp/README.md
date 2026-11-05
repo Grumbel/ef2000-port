@@ -50,7 +50,7 @@ The host-side emulator remains the validation oracle. See
 
 Status (2026-11-05): 4,277 Ghidra-inventoried functions plus 10 manually
 confirmed additional entry points (4,287 tracked); 3,257 marked `compiles`,
-222 additional host-tested `drafted` entry points, and none verified as a
+226 additional host-tested `drafted` entry points, and none verified as a
 compiled-and-spliced C replacement. The tracker is authoritative. See
 [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
 and [renderer/driver batch 083](../docs/subsystems/decomp-batch-083.md) for
@@ -76,3 +76,7 @@ The [palette, crater, and sky batch 091](../docs/subsystems/decomp-batch-091.md)
 adds twelve more nontrivial READCOLS host models, including two record layouts,
 linked texture allocation, signed bounds, and the two-stage SETSUN scanner;
 guest ABI and engine operations are still unresolved.
+The [READCOLS tail batch 092](../docs/subsystems/decomp-batch-092.md)
+adds palette dispatch, cockpit palette selection, lightning-point allocation,
+and the two smoke record rings; those four remain host-only drafts, with
+specific guest call boundaries and a documented unresolved flare parser.

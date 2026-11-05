@@ -3155,8 +3155,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000da4b0	102	ceiling	environment_values_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; parsed signed-word write modeled
 0x000da518	102	planet_number	environment_values_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; parsed signed-word write modeled
 0x000da580	74	game_type	environment_values_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; unsigned 16-bit parsed value modeled
-0x000da5cc	119	load_pal		named	unclassified	unverified		
-0x000da644	258	load_cock_pal		named	unclassified	unverified		
+0x000da5cc	119	load_pal	environment_palette_092	drafted	game	unverified		docs/subsystems/decomp-batch-092.md; fourteen-name dispatch and stack-pointer fallback
+0x000da644	258	load_cock_pal	environment_palette_092	drafted	game	unverified		docs/subsystems/decomp-batch-092.md; cockpit palette 768-byte bank selector and index warning
 0x000da748	158	load_darkside_pal	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; darkside palette check and load adapters
 0x000da7fc	197	load_missile_pal	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; five-way palette selector with guest loader boundary
 0x000da8c4	158	set_darkside_values	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; darkside values file check and load adapters
@@ -3165,10 +3165,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000daa5c	225	set_mmap_name	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; indexed filename and suffix copy hypothesized
 0x000dab40	136	ref_point	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; reference filename copy hypothesized
 0x000dabc8	97	set_map_name	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; unknown name transform remains guest hook
-0x000dac2c	286	lightning_point		named	unclassified	unverified		
+0x000dac2c	286	lightning_point	environment_dynamic_092	drafted	game	unverified		docs/subsystems/decomp-batch-092.md; nine-byte lightning records and heap name pointer
 0x000dad4c	244	set_nb_craters	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; 18-byte crater records and overlapping counter
 0x000dae40	179	load_craters	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; two 110-byte record array allocations
-0x000daef4	448	load_smoke		named	unclassified	unverified		
+0x000daef4	448	load_smoke	environment_dynamic_092	drafted	game	unverified		docs/subsystems/decomp-batch-092.md; two 110-byte record rings with per-line lookups
 0x000db0b4	93	load_player_virtual	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; DH result modeled behind guest engine adapter
 0x000db114	85	load_player_sort	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; parser and guest-call boundary
 0x000db16c	85	load_player	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; parser and guest-call boundary
