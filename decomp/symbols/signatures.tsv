@@ -1,5 +1,6 @@
 addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000432c	hiscore_qualifies		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x432c..0x433a; callers 0x49b2/0x4b64 test AL; docs/compiler-abi.md
+0x0000433c	hiscore_insert	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	0x433c..0x442d; original saves and restores six GPRs, ret0; one known direct caller 0x4886 loads EAX=0x17f6f0 and stores/tests returned AX at 0x488b/0x4891; docs/compiler-abi.md
 0x00023760	position_delta_metric	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	0x23760..0x2378f; callers 0x69de/0x92751 use EAX; docs/compiler-abi.md
 0x00023800	check_current_object_relation		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x23800..0x2389f; callers 0x25a97/0x25e8e test AL; docs/compiler-abi.md
 0x000238a0	sync_current_object_slot			ebx,ecx,edx,esi,edi,ebp	0	0x238a0..0x238be; callers 0x25aa0/0x26000 ignore return; docs/compiler-abi.md

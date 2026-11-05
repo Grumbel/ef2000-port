@@ -81,6 +81,7 @@ functions. The `watcom-omf` Nix check now rejects `__CHK` in its OMF listing.
 | `0x4050` high-score defaults | Saves EBX, ECX, EDX, ESI; restores them before `ret` on both exits; calls `0x9c960` with EDX zeroed; uses a 25-byte record stride | Caller expectations, return/clobber registers, called runtime ABI |
 | `0x41fc` high-score load | Saves EBX, ECX, EDX, ESI; reserves four stack bytes; passes EAX=`0x17f694` and EDX=0 to indirect call `[0x132ab4]` | Target ABI, stack cleanup, outputs |
 | `0x432c` score threshold | Loads score in EAX, compares against last record, executes `setg al`, then `ret` | Confirmed: no register/stack inputs; returns AL, stack cleanup zero. Upper EAX bytes are not a return value. |
+| `0x433c` score insertion | Saves EBX/ECX/EDX/ESI/EDI/EBP, takes incoming EAX as the guest name pointer and returns the slot in EAX, `ret` (no stack cleanup). | The sole direct caller found in the SHA-pinned payload is `0x4886`: loads EAX with name `0x17f6f0`, then stores/tests returned AX at `0x488b`/`0x4891`. The original's register preservation and branch exits were checked from `0x433c..0x442d`; see batch 102. |
 | `0x433c` high-score insert | Saves EBX, ECX, EDX, ESI, EDI, EBP and reserves eight stack bytes | Input ABI and full return behavior |
 | `0x24480` x87 spatial comparison | AX index, EDX pointer to three qwords, stack qword limit, AL predicate; saves/restores EBX/ECX/ESI/EDI, `ret 8` | Native FP behavioral equivalence, especially status/control word and exceptional values; see confirmed ABI below |
 

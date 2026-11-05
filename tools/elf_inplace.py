@@ -6,8 +6,9 @@
 
 This is deliberately *not* the Watcom/OMF verification pipeline. It makes
 isolated guest differential tests possible with a host GCC -m32 compiler.
-Accept exactly one reviewed, same-size C function, absolute 32-bit external
-relocations, and no allocatable private data or other executable sections.
+Accept exactly one reviewed function (optionally selected from an ELF object's
+function sections), absolute 32-bit external relocations, and no allocatable
+private data. Shorter code requires an explicit diagnostic-only NOP opt-in.
 """
 
 import argparse
@@ -58,8 +59,8 @@ def get_string(blob, start, label):
         raise ElfPatchError(f'non-ASCII {label} string') from error
 
 
-def read_elf32(blob):
-    """Parse only the ELF structures needed by one plain i386 C function."""
+def read_elf32(blob, selected=None):
+    """Parse one plain i386 C function, optionally from a -ffunction-sections object."""
     if len(blob) < HEADER.size:
         raise ElfPatchError('truncated ELF header')
     (ident, kind, machine, version, _, _, shoff, _, ehsize, _, _,
@@ -86,9 +87,10 @@ def read_elf32(blob):
         raise ElfPatchError('invalid section-name string table')
     section_names = section_bytes(shstridx)
     names = [get_string(section_names, sh[0], 'section') for sh in sections]
-    if names.count('.text') != 1:
-        raise ElfPatchError('exactly one .text section required')
-    code_index = names.index('.text')
+    code_name = '.text.' + selected if selected else '.text'
+    if names.count(code_name) != 1:
+        raise ElfPatchError(f'exactly one {code_name} section required')
+    code_index = names.index(code_name)
     code_section = sections[code_index]
     if (code_section[1] != SHT_PROGBITS or
             code_section[2] & (SHF_ALLOC | SHF_EXECINSTR) !=
@@ -96,12 +98,18 @@ def read_elf32(blob):
         raise ElfPatchError('invalid executable .text section')
     for i, sh in enumerate(sections):
         _, kind, flags, _, _, size, _, info, _, _ = sh
-        if i != code_index and flags & SHF_EXECINSTR and size:
+        ignored_function = bool(selected and names[i].startswith('.text.') and
+                                kind == SHT_PROGBITS and
+                                flags & (SHF_ALLOC | SHF_EXECINSTR) ==
+                                SHF_ALLOC | SHF_EXECINSTR)
+        if i != code_index and flags & SHF_EXECINSTR and size and not ignored_function:
             raise ElfPatchError(f'extra executable section {names[i]!r}')
-        if i != code_index and flags & SHF_ALLOC and size and names[i] != '.eh_frame':
+        if i != code_index and flags & SHF_ALLOC and size and not (
+                names[i] == '.eh_frame' or ignored_function):
             raise ElfPatchError(f'private allocatable data {names[i]!r} is unsupported')
         if kind in (SHT_REL, SHT_RELA) and (info >= shnum or
-                (info != code_index and names[info] != '.eh_frame')):
+                (info != code_index and names[info] != '.eh_frame' and
+                 not (selected and names[info].startswith('.text.')))):
             raise ElfPatchError('relocations outside code/unwind metadata are unsupported')
     tables = [(i, sh) for i, sh in enumerate(sections) if sh[1] == SHT_SYMTAB]
     if len(tables) != 1:
@@ -117,7 +125,8 @@ def read_elf32(blob):
         name, value, size, info, _, index = SYMBOL.unpack_from(symbols_data, offset)
         symbols.append((get_string(strings, name, 'symbol'), value, size, info & 15, index))
     functions = [s for s in symbols if s[3] == STT_FUNC and s[4] == code_index]
-    if len(functions) != 1 or functions[0][1:3] != (0, code_section[5]):
+    if (len(functions) != 1 or functions[0][1:3] != (0, code_section[5]) or
+            (selected is not None and functions[0][0] != selected)):
         raise ElfPatchError('one function must fill the entire .text section')
     relocs = []
     for i, sh in enumerate(sections):
@@ -140,18 +149,25 @@ def read_elf32(blob):
     return functions[0][0], bytearray(section_bytes(code_index)), relocs
 
 
-def build(object_bytes, image, functions, globals_, reviewed):
-    name, code, relocs = read_elf32(object_bytes)
-    matches = [row for row in functions if row.get('name') == name]
+def build(object_bytes, image, functions, globals_, reviewed,
+          selected=None, allow_nop_pad=False, allow_draft=False):
+    name, code, relocs = read_elf32(object_bytes, selected)
+    matches = [row for row in functions if name in (
+        row.get('name'),
+        f"{row.get('name')}_{int(row['addr'], 16):x}")]
     if len(matches) != 1:
         raise ElfPatchError(f'function {name!r} has no unique tracked address')
     row = matches[0]
     address = int(row['addr'], 16)
+    accepted_states = ('compiles', 'spliced', 'verified', 'drafted') if allow_draft else (
+        'compiles', 'spliced', 'verified')
     if (address != reviewed or row['sig_status'] != 'confirmed' or
-            row['state'] not in ('compiles', 'spliced', 'verified') or
+            row['state'] not in accepted_states or
             'noncontiguous' in row.get('notes', '').lower()):
         raise ElfPatchError('function needs explicitly reviewed contiguous flow and ABI')
-    if len(code) != int(row['size']) or address + len(code) > len(image):
+    original_size = int(row['size'])
+    if ((len(code) > original_size if allow_nop_pad else len(code) != original_size) or
+            address + original_size > len(image)):
         raise ElfPatchError('GCC C body must match the reviewed original extent exactly')
     for where, kind, symbol in relocs:
         name, value, _, _, index = symbol
@@ -160,6 +176,10 @@ def build(object_bytes, image, functions, globals_, reviewed):
         target = resolve_symbol(name, functions, globals_)
         addend = struct.unpack_from('<I', code, where)[0]
         struct.pack_into('<I', code, where, (target + addend) & 0xffffffff)
+    if allow_nop_pad:
+        # Diagnostic only. External jumps into the original function's interior
+        # must be ruled out separately before any whole-game replay.
+        code.extend(b'\x90' * (original_size - len(code)))
     plan = {'format': 'ef2000-patch-v1',
             'base_image_sha256': hashlib.sha256(image).hexdigest(),
             'writes': [{'kind': 'inline', 'offset': address, 'bytes': code.hex()}]}
@@ -173,6 +193,11 @@ def main(argv=None):
     source.add_argument('--executable', type=Path)
     source.add_argument('--payload', type=Path)
     parser.add_argument('--reviewed-flow', required=True, type=lambda value: int(value, 0))
+    parser.add_argument('--function', help='select .text.NAME from a -ffunction-sections object')
+    parser.add_argument('--allow-nop-pad', action='store_true',
+                        help='diagnostic only: pad a shorter body to its reviewed extent')
+    parser.add_argument('--allow-draft', action='store_true',
+                        help='diagnostic only: accept reviewed signature of drafted C')
     parser.add_argument('--functions', type=Path, default=ROOT / 'decomp/symbols/functions.tsv')
     parser.add_argument('--globals', type=Path, default=ROOT / 'decomp/symbols/globals.tsv')
     parser.add_argument('-o', '--output', required=True, type=Path)
@@ -181,7 +206,9 @@ def main(argv=None):
         original = load_image(executable=args.executable, payload_path=args.payload)
         blob, body = build(args.object.read_bytes(), original,
                            parse_symbols(args.functions), parse_symbols(args.globals),
-                           args.reviewed_flow)
+                           args.reviewed_flow, selected=args.function,
+                           allow_nop_pad=args.allow_nop_pad,
+                           allow_draft=args.allow_draft)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         with args.output.open('xb') as stream:
             stream.write(blob)

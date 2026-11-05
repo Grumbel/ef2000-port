@@ -80,6 +80,21 @@ class ElfInplaceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'reviewed'):
             elf_inplace.build(fixture(), image, functions, globals_, 0x100)
 
+    def test_reviewed_draft_nop_padding_is_explicitly_opt_in(self):
+        image = bytes(0x2000)
+        functions, globals_ = tracker(size=10)
+        functions[0]['state'] = 'drafted'
+        with self.assertRaisesRegex(ValueError, 'explicitly reviewed'):
+            elf_inplace.build(fixture(), image, functions, globals_, 0x100,
+                              allow_nop_pad=True)
+        with self.assertRaisesRegex(ValueError, 'reviewed original extent'):
+            elf_inplace.build(fixture(), image, functions, globals_, 0x100,
+                              allow_draft=True)
+        blob, code = elf_inplace.build(fixture(), image, functions, globals_, 0x100,
+                                       allow_draft=True, allow_nop_pad=True)
+        self.assertEqual(code, b'\xa1\x00\x05\x00\x00\xc3' + b'\x90' * 4)
+        self.assertEqual(decode(blob, image), [(0x100, bytes(code))])
+
     def test_rejects_unknown_symbol_unsupported_relocation_and_bad_elf(self):
         image = bytes(0x2000)
         functions, globals_ = tracker()
@@ -117,6 +132,34 @@ class ElfInplaceTests(unittest.TestCase):
         patch, _ = elf_inplace.build(object_bytes, bytes(0x2000),
                                      functions, globals_, 0x100)
         self.assertEqual(decode(patch, bytes(0x2000))[0][0], 0x100)
+
+    def test_select_one_function_from_real_gcc_function_sections(self):
+        compiler = shutil.which('gcc')
+        if not compiler:
+            self.skipTest('gcc unavailable')
+        source = ('extern int g_fixture_a;\n'
+                  'unsigned sample(void) { return g_fixture_a != 0; }\n'
+                  'unsigned other(void) { return g_fixture_a == 8; }\n')
+        with tempfile.TemporaryDirectory() as directory:
+            obj = Path(directory) / 'both.o'
+            result = subprocess.run(
+                [compiler, '-m32', '-std=c99', '-O2', '-fno-pie', '-fno-pic',
+                 '-ffreestanding', '-ffunction-sections', '-x', 'c', '-c',
+                 '-o', str(obj), '-'],
+                input=source, text=True, capture_output=True, check=False)
+            if result.returncode:
+                self.skipTest('GCC -m32 -ffunction-sections unsupported')
+            object_bytes = obj.read_bytes()
+        with self.assertRaisesRegex(ValueError, 'invalid executable .text section'):
+            elf_inplace.read_elf32(object_bytes)
+        name, code, relocs = elf_inplace.read_elf32(object_bytes, selected='sample')
+        self.assertEqual(name, 'sample')
+        self.assertTrue(code)
+        self.assertEqual({symbol[0] for _, _, symbol in relocs}, {'g_fixture_a'})
+        functions, globals_ = tracker(size=len(code))
+        blob, _ = elf_inplace.build(object_bytes, bytes(0x2000), functions,
+                                    globals_, 0x100, selected='sample')
+        self.assertEqual(decode(blob, bytes(0x2000))[0][0], 0x100)
 
 
 if __name__ == '__main__':

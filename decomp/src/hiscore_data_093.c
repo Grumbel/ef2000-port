@@ -45,8 +45,10 @@ void hiscore_generate_defaults_4050(void)
     }
 }
 
-/* 0x433c size 242. The DEC before signed JLE is intentional: INT_MIN in a
- * stored row wraps to INT_MAX, and equal scores normally enter before ties.
+/* 0x433c size 242. GCC32 diagnostic guest differential passes 100 cases;
+ * Watcom/OMF and whole-game replay remain unverified. The DEC before signed
+ * JLE is intentional: INT_MIN in a stored row wraps to INT_MAX, and equal
+ * scores normally enter before ties.
  * Shifting uses NUL-terminated strcpy, not a packed 25-byte memcpy. */
 int32_t hiscore_insert_433c(ef_addr32 guest_name)
 {
