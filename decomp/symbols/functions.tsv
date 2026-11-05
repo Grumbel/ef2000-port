@@ -738,14 +738,14 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00040820	78	reference_clock_reaches	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00040820.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00040870	77	clock_rate_difference_40870	float_helpers2	compiles	game	confirmed	decomp/tests/0x00040870.json	docs/compiler-abi.md; Rate between two clock readings and a distance, minus a divided distance.; callers 59adc@59d66; guest pending
 0x00040e20	47	reset_name_record_40e20	game_helpers132	compiles	game	confirmed	decomp/tests/0x00040e20.json	docs/compiler-abi.md; Copy the 12-byte record at 0x184358 to 0x41f30c, set the pending name to 0x184364, clear the word at 0x41eeda and store ; callers none direct; guest pending
-0x00040e50	107	gcSetDifficulty		named	unclassified	unverified		
-0x00040ebc	8	gcStartNewCampaign		named	unclassified	unverified		
-0x00040ec4	9	gcPerformanceYes		named	unclassified	unverified		
-0x00040ed0	19	gcPerformanceNo		named	unclassified	unverified		
-0x00040ee4	52	gcLoadOldCampaign		named	unclassified	unverified		
-0x00040f18	73	gcLoadfileAccepted		named	unclassified	unverified		
-0x00040f64	53	InitMainMenu		named	unclassified	unverified		
-0x00040f9c	140	gcSetCampaignDifficulty		named	unclassified	unverified		
+0x00040e50	107	gcSetDifficulty	campaign_callbacks	drafted	game	unverified		Original disassembly; campaign selector initialization with guest UI calls; host-tested batch 085
+0x00040ebc	8	gcStartNewCampaign	campaign_callbacks	drafted	game	unverified		Original disassembly; set campaign mode byte; host-tested batch 085
+0x00040ec4	9	gcPerformanceYes	campaign_callbacks	drafted	game	unverified		Original disassembly; clear campaign mode byte; host-tested batch 085
+0x00040ed0	19	gcPerformanceNo	campaign_callbacks	drafted	game	unverified		Original disassembly; parse widget string plus 0x3f and mirror AL; host-tested batch 085
+0x00040ee4	52	gcLoadOldCampaign	campaign_callbacks	drafted	game	unverified		Original disassembly; restore 12-byte campaign key and selector; host-tested batch 085
+0x00040f18	73	gcLoadfileAccepted	campaign_callbacks	drafted	game	unverified		Original disassembly; accept saved campaign and copy 12-byte key; host-tested batch 085
+0x00040f64	53	InitMainMenu	campaign_callbacks	drafted	game	unverified		Original disassembly; initialize menu with 12-byte key; host-tested batch 085
+0x00040f9c	140	gcSetCampaignDifficulty	campaign_callbacks	drafted	game	unverified		Original disassembly; callback guard and two dialog paths; host-tested batch 085
 0x00041028	167	setup_dialog_41028	line_of_sight	compiles	game	confirmed	decomp/tests/0x00041028.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x000410d0	36	reset_world_state_410d0	low_helpers	compiles	game	confirmed	decomp/tests/0x000410d0.json	docs/compiler-abi.md; 0x53270, byte 0x125847=0, 0x8bd58(0x1a58b4,0x1a5a1c), 0x49228; callers 43020@430ef; guest pending
 0x0004110c	518			unknown	unclassified	unverified		
@@ -1234,25 +1234,25 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00068ccc	439	test_indexed_object_bit	unk_geometry	typed	game	confirmed		ABI only; AX signed slot, DX 0..12 bit, AL 0xff/0; CS jump table
 0x00068e84	120	assign_page_words_68e84	game_helpers26	compiles	game	confirmed	decomp/tests/0x00068e84.json	docs/compiler-abi.md; Assign an object bit test to each of 20 page words; returns the number set.; callers 69740@69889,69bdc@69cfc; guest pending
 0x00068efc	66	resolve_weapon_names_68efc	game_helpers80	compiles	game	confirmed	decomp/tests/0x00068efc.json	docs/compiler-abi.md; Resolve the name of every populated weapon entry (from index 2) into its halfword id.; callers 69fac@69fde; guest pending
-0x00068f40	43	gpwPlaneSideOn		named	unclassified	unverified		
-0x00068f6c	43	gpwPlaneUnderneath		named	unclassified	unverified		
-0x00068f98	36	gpwPlaneAngled		named	unclassified	unverified		
-0x00068fbc	36	gpwUseDefaults		named	unclassified	unverified		
-0x00068fe0	43	gpwPlaceMissile		named	unclassified	unverified		
+0x00068f40	43	gpwPlaneSideOn	weapons_panel_callbacks	drafted	game	unverified		Original disassembly; three view halfword presets; host-tested batch 085
+0x00068f6c	43	gpwPlaneUnderneath	weapons_panel_callbacks	drafted	game	unverified		Original disassembly; underside view presets; host-tested batch 085
+0x00068f98	36	gpwPlaneAngled	weapons_panel_callbacks	drafted	game	unverified		Original disassembly; default angle presets; host-tested batch 085
+0x00068fbc	36	gpwUseDefaults	weapons_panel_callbacks	drafted	game	unverified		Original disassembly; separate entry with same angle presets; host-tested batch 085
+0x00068fe0	43	gpwPlaceMissile	weapons_panel_callbacks	drafted	game	unverified		Original disassembly; missile-placement view presets; host-tested batch 085
 0x0006900c	115	reset_view_6900c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0006900c.json	docs/compiler-abi.md; ; callers 69fac@69fcf; guest pending
 0x00069080	17	load_word_0x1282dc	marker_packets	compiles	game	confirmed	decomp/tests/0x00069080.json	docs/compiler-abi.md; Word 0x1282dc from low word of 0x9ddfc(0x186278); sole direct caller 69fac@69fd4; guest pending
 0x00069094	645			unknown	unclassified	unverified		
-0x0006931c	26	gpwSetClearMissile		named	unclassified	unverified		
-0x00069338	26	gpwSetClearAllMissiles		named	unclassified	unverified		
-0x00069354	29	gpwCheckHitPylon		named	unclassified	unverified		
+0x0006931c	26	gpwSetClearMissile	weapons_panel_callbacks	drafted	game	unverified		Original disassembly; missile-select flag pair 1 0; host-tested batch 085
+0x00069338	26	gpwSetClearAllMissiles	weapons_panel_callbacks	drafted	game	unverified		Original disassembly; missile-select flag pair 0 1; host-tested batch 085
+0x00069354	29	gpwCheckHitPylon	weapons_panel_actions	drafted	game	unverified		Original disassembly; 13 indexed guest callbacks; host-tested batch 085
 0x00069374	458	apply_selection_69374	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069374.json	docs/compiler-abi.md; Variant of 0x69540 that acts on the selection: latches the same two position triples into the cursor state (the latch is; callers 69740@698e9; guest pending
 0x00069540	317	latch_box_69540	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069540.json	docs/compiler-abi.md; Latch a box defined by two position triples (EAX: three words, EDX: three words) into the cursor state when word 0x1f6f4; callers 69740@698f6; guest pending
 0x00069680	189	transform_point_69680	game_helpers39	compiles	game	confirmed	decomp/tests/0x00069680.json	docs/compiler-abi.md; Transform (x, y) by the 3x3 matrix at 0x15ffda and add the translation pair.; callers 69740@69859; guest pending
 0x00069740	466	update_cursor_window_69740	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00069740.json	docs/compiler-abi.md; Per-frame update of the tactical cursor window. Updates the view scale (0xdc314), calls 0xdc334(2, 2) and resets the vie; callers none direct; guest pending
-0x00069914	10	gpwShowCurrent		named	unclassified	unverified		
-0x00069920	86	gpwTurnYPlane		named	unclassified	unverified		
-0x00069978	89	gpwArcadeAccepted		named	unclassified	unverified		
-0x000699d4	29	onopenBigCurrentWeapon		named	unclassified	unverified		
+0x00069914	10	gpwShowCurrent	weapons_panel_actions	drafted	game	unverified		Original disassembly; visibility latch word; host-tested batch 085
+0x00069920	86	gpwTurnYPlane	weapons_panel_actions	drafted	game	unverified		Original disassembly; conditional high-byte rotate and halfword subtract; host-tested batch 085
+0x00069978	89	gpwArcadeAccepted	weapons_panel_actions	drafted	game	unverified		Original disassembly; second-axis conditional rotate; host-tested batch 085
+0x000699d4	29	onopenBigCurrentWeapon	weapons_panel_actions	drafted	game	unverified		Original disassembly; clear selected weapon UI string and selection word; host-tested batch 085
 0x000699f4	73	find_named_record_699f4	game_helpers9	compiles	game	confirmed	decomp/tests/0x000699f4.json	docs/compiler-abi.md; Index of the 0x91-byte record whose name equals text, or 0.; callers 69bdc@69bfd; guest pending
 0x00069a40	301	weapon_flags_any_69a40	game_helpers66	compiles	game	confirmed	decomp/tests/0x00069a40.json	docs/compiler-abi.md; Test whether any of the low 13 flag bits of a weapon table entry is set.; callers 69b70@69ba4; guest pending
 0x00069b70	106	refresh_weapon_widgets_69b70	game_helpers122	compiles	game	confirmed	decomp/tests/0x00069b70.json	docs/compiler-abi.md; Walk the widget chain starting at the named widget at 0x186320 under the object at 0x186314; for each entry whose weapon; callers 69fac@69fe3; guest pending
