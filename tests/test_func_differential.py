@@ -105,8 +105,10 @@ class FunctionDifferentialTests(unittest.TestCase):
         self.assertEqual(differential.get_part({'eax': 0xabcd2345}, 'ax'), 0x2345)
         with self.assertRaisesRegex(ValueError, 'x87 not yet supported'):
             differential.read_signature(path, 0xf8250)
-        with self.assertRaisesRegex(ValueError, 'compiled function state'):
-            differential.read_function_extent(ROOT / 'decomp/symbols/functions.tsv', 0x432c)
+        # The high-score leaf has since advanced from a named candidate to
+        # a confirmed, compiled draft; this check must follow the tracker.
+        self.assertEqual(differential.read_function_extent(
+            ROOT / 'decomp/symbols/functions.tsv', 0x432c), 15)
         with tempfile.TemporaryDirectory() as directory:
             functions = Path(directory) / 'functions.tsv'
             functions.write_text('addr\tsize\tsig_status\tstate\n'
