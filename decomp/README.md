@@ -48,5 +48,9 @@ image, and compare behavior against the unmodified executable (plan §4).
 The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Status (2026-11-03): 4,277 inventoried functions, 3257 drafted and none verified
-as a compiled-and-spliced C replacement. The tracker is authoritative.
+Status (2026-11-05): 4,277 Ghidra-inventoried functions plus two manually
+confirmed renderer entry points (4,279 tracked); 3,257 marked `compiles`,
+seven additional host-tested `drafted` renderer stream functions, and none
+verified as a compiled-and-spliced C replacement. The tracker is authoritative.
+See [renderer stream findings](../docs/subsystems/renderer-streams.md) for the
+two Ghidra boundary repairs still needed.

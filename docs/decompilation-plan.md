@@ -2039,6 +2039,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-03  970  Drafted and Watcom-compiled 1 more functions in misc_drafts1 (3255 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  971  Drafted and Watcom-compiled 1 more functions in misc_drafts1 (3256 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
 2026-11-03  971  Drafted and Watcom-compiled 1 more functions in misc_drafts1 (3257 total drafted/compiling); callers and effects in compiler-abi.md. Host and guest differential tests not yet run (bulk drafting mode).
+2026-11-05  972  Recovered seven related renderer stream entry points as host-tested drafts (addresses 0xc49c4..0xc4d43), and identified two previously omitted Ghidra functions at 0xc4c30/0xc4ccb by original payload disassembly and direct caller evidence. Tracker: 4279 entries, 3257 compiles, 7 drafted; OpenWatcom compilation, stack ABI, Ghidra boundary repair and guest replay still pending. See docs/subsystems/renderer-streams.md.
 ```
 
 ---

@@ -608,6 +608,12 @@
           work/scene_indexed_host_test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
+            ${source}/tests/decomp_renderer_streams_test.c \
+            ${source}/decomp/src/renderer_streams.c \
+            -o work/renderer_streams_host_test
+          work/renderer_streams_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
             ${source}/tests/decomp_buffer_plane_test.c \
             ${source}/decomp/src/buffer_cursor.c \
             ${source}/decomp/src/plane_sources.c \

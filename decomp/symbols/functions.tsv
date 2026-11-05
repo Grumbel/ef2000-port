@@ -2783,11 +2783,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c47e0	66	select_shade_table_c47e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c47e0.json	docs/compiler-abi.md; Select the shade table for table index EDI (implicit register): take the signed word 0x14fe58[index] >> 5 clamped to 0..; callers none direct; guest pending
 0x000c486c	112	set_scale_pair_c486c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c486c.json	docs/compiler-abi.md; Set the scale pair from the stack argument VALUE (ret 4): for VALUE < 10 word 0x158ed0 = VALUE and word 0x158ed4 = 1 << ; callers d9e50@d9e6b,da1b4@da211; guest pending
 0x000c48dc	112	load_vertices_c48dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c48dc.json	docs/compiler-abi.md; Load COUNT 2D vertices (word pairs) starting at SRC (implicit registers ESI = source, ECX = count) into the 48-byte vert; callers c49c4@c4a10,c4a50@c4aaf,c4aeb@c4b4a; guest pending
-0x000c49c4	140			unknown	unclassified	unverified		
-0x000c4a50	155			unknown	unclassified	unverified		
-0x000c4aeb	170			unknown	unclassified	unverified		
-0x000c4b95	155			unknown	unclassified	unverified		
-0x000c4d43	112			unknown	unclassified	unverified		
+0x000c49c4	140	render_colour_stream_c49c4	renderer_streams	drafted	game	unverified		Seven-entry renderer stream family; original RET 4; host test only; saved ESP and guest ABI pending
+0x000c4a50	155	render_texture_stream_c4a50	renderer_streams	drafted	game	unverified		Packed texture words and vertex list; host test only; guest ABI pending
+0x000c4aeb	170	render_texture_stream_c4aeb	renderer_streams	drafted	game	unverified		Texture stream with 0x8000 depth bias; host test only; guest ABI pending
+0x000c4b95	155	render_texture_stream_c4b95	renderer_streams	drafted	game	unverified		Texture stream with alternate draw backend; host test only; guest ABI pending
+0x000c4c30	155	render_texture_stream_c4c30	renderer_streams	drafted	game	unverified		Manually recovered ENTER/RET 4 boundary absent from 4277-function Ghidra inventory; requires Ghidra boundary repair
+0x000c4ccb	120	render_index_stream_c4ccb	renderer_streams	drafted	game	unverified		Manually recovered ENTER/RET 4 boundary absent from 4277-function Ghidra inventory; requires Ghidra boundary repair
+0x000c4d43	112	render_index_stream_c4d43	renderer_streams	drafted	game	unverified		Mode/count stream followed by indexed vertex render; host test only; guest ABI pending
 0x000c4db4	135			unknown	unclassified	unverified		
 0x000c4e3b	39	dispatch_swapped_c4e3b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4e3b.json	docs/compiler-abi.md; Implicit-register fragment (ESI = record, EBX is an out value): byte-swap the word at ESI+0x10, shift it left by two, st; callers c4db4@c4e15; guest pending
 0x000c5261	120			unknown	unclassified	unverified		

@@ -5040,6 +5040,18 @@ void select_shade_table_c47e0(uint32_t index);
 
 void load_vertices_c48dc(ef_addr32 src, uint32_t count);
 
+/* Renderer stream entry points, all with one original stack argument and
+ * RET 4. A future splice shim supplies the actual saved ESP (the word in
+ * guest RAM at 0x159064); this remains a draft, not a drop-in guest ABI. */
+uint32_t renderer_stream_saved_esp(void);
+void render_colour_stream_c49c4(ef_addr32 stream);
+void render_texture_stream_c4a50(ef_addr32 stream);
+void render_texture_stream_c4aeb(ef_addr32 stream);
+void render_texture_stream_c4b95(ef_addr32 stream);
+void render_texture_stream_c4c30(ef_addr32 stream);
+void render_index_stream_c4ccb(ef_addr32 stream);
+void render_index_stream_c4d43(ef_addr32 stream);
+
 double box_shape_ratio_11afb4(uint32_t box);
 
 uint32_t project_point_pair_c737c(ef_addr32 p1, ef_addr32 p2, ef_addr32 dst);
