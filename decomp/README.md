@@ -50,7 +50,7 @@ The host-side emulator remains the validation oracle. See
 
 Status (2026-11-05): 4,277 Ghidra-inventoried functions plus 10 manually
 confirmed additional entry points (4,287 tracked); 3,257 marked `compiles`,
-127 additional host-tested `drafted` entry points, and none verified as a
+190 additional host-tested `drafted` entry points, and none verified as a
 compiled-and-spliced C replacement. The tracker is authoritative. See
 [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
 and [renderer/driver batch 083](../docs/subsystems/decomp-batch-083.md) for
@@ -64,3 +64,7 @@ which reconstructs twenty network configuration and status handlers, and
 which covers fifteen damage/fade line parsers and five mode flag handlers;
 and [environment and GUI batch 088](../docs/subsystems/decomp-batch-088.md),
 which covers eight additional environment handlers and twelve GUI callbacks.
+The [63-entry GUI dispatch and mission batch 089](../docs/subsystems/decomp-batch-089.md)
+separately reports 48 five-byte jump aliases, two small quit wrappers, and
+13 substantive callback/state bodies; jump aliases must not be mistaken
+for completed native game logic.

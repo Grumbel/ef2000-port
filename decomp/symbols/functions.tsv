@@ -65,7 +65,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000494c	323			unknown	unclassified	unverified		
 0x00004a90	16	arcEndgameAccept		named	unclassified	unverified		
 0x00004aa0	299			unknown	unclassified	unverified		
-0x00004b54	39	kotsInitKOTS		named	unclassified	unverified		
+0x00004b54	39	kotsInitKOTS	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x00004bf8	87	select_entry_4bf8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00004bf8.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x00004c50	162	InitArcade		named	unclassified	unverified		
 0x00004cf4	86	gpwChangeDifficulty	gui_callbacks_088	drafted	game	confirmed		Host callback draft; overlapping 121e46/121e44 and 76-byte row stride; guest replay pending
@@ -625,8 +625,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00036f84	406	step_setup_screen_36f84	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00036f84.json	docs/compiler-abi.md; Setup-screen state machine in byte 0x19f5a8. Updates the frame delta (0xa4138), stores word 0x1357ac - 3 in word 0x12590; callers none direct; guest pending
 0x0003711c	114	reset_list_view_3711c	game_helpers31	compiles	game	confirmed	decomp/tests/0x0003711c.json	docs/compiler-abi.md; Reset the list view and load the heading string for the current page.; callers none direct; guest pending
 0x000371b0	161	oncloseCredits		named	unclassified	unverified		
-0x00037254	12	gnNewSocket		named	unclassified	unverified		
-0x00037260	83	onopenCredits		named	unclassified	unverified		
+0x00037254	12	gnNewSocket	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
+0x00037260	83	onopenCredits	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x00037294	57	mirror_reference_state	tactical_io	compiles	game	confirmed	decomp/tests/0x00037294.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000372d4	53	alloc_record_table_372d4	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x000372d4.json	docs/compiler-abi.md; Allocate and zero a table of count+1 records of 0x45 bytes.; callers 49228@49601; guest pending
 0x0003730c	141	take_table_record_3730c	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x0003730c.json	docs/compiler-abi.md; Take the next 69-byte record of the table, linking it to the previous one.; callers 37498@374b6; guest pending
@@ -851,7 +851,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004ae5c	625			unknown	unclassified	unverified		
 0x0004b0d0	183	locate_segment_4b0d0	game_helpers44	compiles	game	confirmed	decomp/tests/0x0004b0d0.json	docs/compiler-abi.md; Find the segment holding the budget in 0x1357ae and publish its cell word.; callers 49228@4981a; guest pending
 0x0004b188	3	return_false_4b188	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0004b188.json	docs/compiler-abi.md; ; callers 4a210@4a990; guest pending
-0x0004b1a4	75	cgWarningOkClick		named	unclassified	unverified		
+0x0004b1a4	75	cgWarningOkClick	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x0004b1f0	1199	mpSetWindows		named	unclassified	unverified		
 0x0004b6a0	1437	mpUpdateMap		named	unclassified	unverified		
 0x0004bc40	62	mpZoomInMap	mission_map_callbacks	drafted	game	unverified		Original disassembly; mode 1/2/4 callback dispatch; host-tested in batch 084
@@ -883,9 +883,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004d668	651			unknown	unclassified	unverified		
 0x0004d8f4	42	reset_tactical_slots	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0004d8f4.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0004d920	169	mpSamCoverage		named	unclassified	unverified		
-0x0004d9cc	95	mpPrevAssign		named	unclassified	unverified		
-0x0004da2c	99	mpMakeAssign		named	unclassified	unverified		
-0x0004da90	85	mpViewAssign		named	unclassified	unverified		
+0x0004d9cc	95	mpPrevAssign	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
+0x0004da2c	99	mpMakeAssign	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
+0x0004da90	85	mpViewAssign	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x0004dae8	100	mpClearWPRoute	mission_map_callbacks	drafted	game	unverified		Original disassembly; route guard and selection reload across guest callback; host-tested in batch 084
 0x0004db60	309	fill_selection_dialog_4db60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004db60.json	docs/compiler-abi.md; Fill two text widgets of the dialog named at 0x184b0c (widgets 0x184cf8 and 0x184d38, or 0x184d30 for the second when by; callers 4b6a0@4bb11,4d9cc@4da23,4da2c@4da88; guest pending
 0x0004dc98	61	advance_first_tactical_status	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0004dc98.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
@@ -925,7 +925,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004fe50	546	mpClickCampaign		named	unclassified	unverified		
 0x000505e4	32	mpReturnToCampaign	mission_menu_callbacks	drafted	game	unverified		Original disassembly; dialog lookup/release/close; host-tested in batch 084
 0x00050604	52	mpNoQuit	mission_menu_callbacks	drafted	game	unverified		Original disassembly; restore three menu bytes into words and return to mode 6; host-tested in batch 084
-0x00050638	15	mpDrawFuelBar		named	unclassified	unverified		
+0x00050638	15	mpDrawFuelBar	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x00050658	248	tally_roster_kinds_50658	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00050658.json	docs/compiler-abi.md; Tally the roster kinds: for each of the 0x1a5531 entries (kind byte 0x1a5510[i], 1..4) count the kind in 0x1a5536[kind -; callers 4fa64@4fadc; guest pending
 0x00050750	32	mpMissPlanTask	mission_menu_callbacks	drafted	game	unverified		Original disassembly; task toggle and two refresh latches; host-tested in batch 084
 0x00050770	106	max_difference_50770	game_helpers8	compiles	game	confirmed	decomp/tests/0x00050770.json	docs/compiler-abi.md; Largest (second - first) byte difference over the list at 0x137988.; callers ba5c@bbe1,bfcc@c4ea,d628@d640; guest pending
@@ -933,9 +933,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000507f4	23	mpSetRole	mission_menu_callbacks	drafted	game	unverified		Original disassembly; widget byte selected as role; host-tested in batch 084
 0x0005080c	46	mpSetACtype	mission_menu_callbacks	drafted	game	unverified		Original disassembly; aircraft type selection and second dialog callback; host-tested in batch 084
 0x0005086c	273			unknown	unclassified	unverified		
-0x0005089c	96	mpType2Click		named	unclassified	unverified		
-0x000508fc	96	mpType3Click		named	unclassified	unverified		
-0x0005095c	96	mpType4Click		named	unclassified	unverified		
+0x0005089c	96	mpType2Click	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
+0x000508fc	96	mpType3Click	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
+0x0005095c	96	mpType4Click	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x000509bc	96	apply_tactical_code_509bc	game_helpers63	compiles	game	confirmed	decomp/tests/0x000509bc.json	docs/compiler-abi.md; Select the tactical code from a two-digit field and apply or bind it.; callers none direct; guest pending
 0x00050a1c	54	tactical_lookup_contains	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00050a1c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00050b68	193	set_slot_state_50b68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00050b68.json	docs/compiler-abi.md; Store the state code for KIND (0..11 -> 0, 1, 2, 3, 4, 5, 0x12, 7, 6, 0x10, 0x11, 0x16) in the byte at 0x1a553b + INDEX;; callers 5089c@508ef,508fc@5094f,5095c@509af; guest pending
@@ -1616,60 +1616,60 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00084788	342	latch_control_bits_84788	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00084788.json	docs/compiler-abi.md; Latch the control bits of the flight record REC into the global control word 0x1fcbe2: clear bits 0 and 7 of its low byt; callers 848e0@84939; guest pending
 0x000848e0	280	refresh_view_cursor_848e0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000848e0.json	docs/compiler-abi.md; Refresh the view cursor record REC (EDX) from the camera block SRC (EAX: 12 bytes copied to 0x1fcc14, 6 bytes from +0xc ; callers 601c@60a0; guest pending
 0x00084a80	60	unit_has_slot_84a80	game_helpers6	compiles	game	confirmed	decomp/tests/0x00084a80.json	docs/compiler-abi.md; Does the unit own a slot of kind 0x21 or 0x22?; callers 848e0@848ef; guest pending
-0x00084ac4	15	QuitEF2000Yes		named	unclassified	unverified		
-0x00084aec	15	QuitEF2000No		named	unclassified	unverified		
-0x00084afc	5	guiClosedownHelp		named	unclassified	unverified		
-0x00084b04	5	UpdateMagnify		named	unclassified	unverified		
-0x00084b0c	5	gnStartup		named	unclassified	unverified		
-0x00084b14	5	gnClosedown		named	unclassified	unverified		
-0x00084b1c	5	rxmissStartup		named	unclassified	unverified		
-0x00084b24	5	gnNetAbort		named	unclassified	unverified		
-0x00084b2c	5	rxmissMainloop		named	unclassified	unverified		
-0x00084b34	5	rxmissClosedown		named	unclassified	unverified		
-0x00084b3c	5	txmissStartup		named	unclassified	unverified		
-0x00084b44	5	txmissMainloop		named	unclassified	unverified		
-0x00084b4c	5	txmissClosedown		named	unclassified	unverified		
-0x00084b54	5	gnReadyToFly		named	unclassified	unverified		
-0x00084b5c	5	gpwWeaponsAccepted		named	unclassified	unverified		
-0x00084b64	5	gpwGenerateCampaign		named	unclassified	unverified		
-0x00084b6c	5	gpwClickCampaign		named	unclassified	unverified		
-0x00084b74	5	InitPickMiss		named	unclassified	unverified		
-0x00084b7c	5	InitSim2		named	unclassified	unverified		
-0x00084b84	5	simShowDebrief		named	unclassified	unverified		
-0x00084b8c	5	ChooseEnemy		named	unclassified	unverified		
-0x00084b94	5	gpwExitSimulator		named	unclassified	unverified		
-0x00084b9c	5	gpwSimTypeSelected		named	unclassified	unverified		
-0x00084ba4	5	onopenParams		named	unclassified	unverified		
-0x00084bac	5	gpwContinueArcade		named	unclassified	unverified		
-0x00084bb4	5	InitArcade2		named	unclassified	unverified		
-0x00084bbc	5	gpwSelectLevel		named	unclassified	unverified		
-0x00084bc4	5	arcNextDifficulty		named	unclassified	unverified		
-0x00084bcc	5	kotsClickTeam		named	unclassified	unverified		
-0x00084bd4	5	InitCampaign		named	unclassified	unverified		
-0x00084bdc	5	gpwLoadSaveCampaign		named	unclassified	unverified		
-0x00084be4	5	gpwRedrawMap		named	unclassified	unverified		
-0x00084bec	5	gpwExitCampaign		named	unclassified	unverified		
-0x00084bf4	5	gpwTestClicked		named	unclassified	unverified		
-0x00084bfc	5	gpwClickTimeAdjust		named	unclassified	unverified		
-0x00084c04	5	gpwCloseDebrief		named	unclassified	unverified		
-0x00084c0c	5	gpwNextFLight		named	unclassified	unverified		
-0x00084c14	5	gcClickMap		named	unclassified	unverified		
-0x00084c1c	5	QuitEF2000		named	unclassified	unverified		
-0x00084c24	5	onopenDirectPlaySettings		named	unclassified	unverified		
-0x00084c2c	5	sumaircraftgraph		named	unclassified	unverified		
-0x00084c34	5	sumgroundgraph		named	unclassified	unverified		
-0x00084c3c	5	sumstaticgraph		named	unclassified	unverified		
-0x00084c44	5	sumgenbar		named	unclassified	unverified		
-0x00084c54	5	sumgencamp		named	unclassified	unverified		
-0x00084c5c	5	openservicesell		named	unclassified	unverified		
-0x00084c64	5	entergamename		named	unclassified	unverified		
-0x00084c6c	5	simrecallmiss		named	unclassified	unverified		
-0x00084c74	5	gpwUpdateTime		named	unclassified	unverified		
-0x00084c7c	5	InitCustom		named	unclassified	unverified		
+0x00084ac4	15	QuitEF2000Yes	gui_jump_thunks_089	drafted	game	confirmed		Two guest CALL/JMP pairs mapped; guest forwarding/splice pending
+0x00084aec	15	QuitEF2000No	gui_jump_thunks_089	drafted	game	confirmed		Two guest CALL/JMP pairs mapped; guest forwarding/splice pending
+0x00084afc	5	guiClosedownHelp	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b04	5	UpdateMagnify	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b0c	5	gnStartup	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b14	5	gnClosedown	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b1c	5	rxmissStartup	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b24	5	gnNetAbort	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b2c	5	rxmissMainloop	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b34	5	rxmissClosedown	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b3c	5	txmissStartup	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b44	5	txmissMainloop	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b4c	5	txmissClosedown	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b54	5	gnReadyToFly	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b5c	5	gpwWeaponsAccepted	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b64	5	gpwGenerateCampaign	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b6c	5	gpwClickCampaign	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b74	5	InitPickMiss	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b7c	5	InitSim2	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b84	5	simShowDebrief	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b8c	5	ChooseEnemy	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b94	5	gpwExitSimulator	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b9c	5	gpwSimTypeSelected	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084ba4	5	onopenParams	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bac	5	gpwContinueArcade	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bb4	5	InitArcade2	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bbc	5	gpwSelectLevel	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bc4	5	arcNextDifficulty	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bcc	5	kotsClickTeam	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bd4	5	InitCampaign	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bdc	5	gpwLoadSaveCampaign	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084be4	5	gpwRedrawMap	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bec	5	gpwExitCampaign	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bf4	5	gpwTestClicked	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084bfc	5	gpwClickTimeAdjust	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c04	5	gpwCloseDebrief	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c0c	5	gpwNextFLight	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c14	5	gcClickMap	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c1c	5	QuitEF2000	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c24	5	onopenDirectPlaySettings	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c2c	5	sumaircraftgraph	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c34	5	sumgroundgraph	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c3c	5	sumstaticgraph	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c44	5	sumgenbar	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c54	5	sumgencamp	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c5c	5	openservicesell	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c64	5	entergamename	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c6c	5	simrecallmiss	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c74	5	gpwUpdateTime	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084c7c	5	InitCustom	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
 0x00084c84	120	play_queued_messages_84c84	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x00084c84.json	docs/compiler-abi.md; Play the queued message strings, then wait for a key.; callers none direct; guest pending
 0x00084cfc	151	dispatch_named_handler_84cfc	game_helpers47	compiles	game	confirmed	decomp/tests/0x00084cfc.json	docs/compiler-abi.md; Run the handler whose name matches the first argument of the list.; callers 3ea0c@3ecfa; guest pending
 0x00084d94	37	register_callback_84d94	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x00084d94.json	docs/compiler-abi.md; Register the 0x84dbc callback through 0xab838 after 0xabf8c.; callers aaee8@aafaf; guest pending
-0x00084ddc	13	gpwshowsummaryinfo		named	unclassified	unverified		
+0x00084ddc	13	gpwshowsummaryinfo	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x00084e3c	289	fetch_entry_pair_84e3c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00084e3c.json	docs/compiler-abi.md; Fetch two packed words for sub-entry SUB (BL) of the class record owned by unit UNIT (DX, signed) into OUT[0..1] (EAX): ; callers 601c@621b,66fc@677e,67d4@685f; guest pending
 0x00084f60	144	unit_slot_value_84f60	float_helpers3	compiles	game	confirmed	decomp/tests/0x00084f60.json	docs/compiler-abi.md; Double stored in a unit's slot table, or 0.0 when the unit is missing.; callers 49228@49b86,55bf8@55c73,55bf8@55ccb; guest pending
 0x00084ff0	180	fill_unit_entry_84ff0	game_helpers47	compiles	game	confirmed	decomp/tests/0x00084ff0.json	docs/compiler-abi.md; Fill one 25-byte entry of a unit's table (stack arguments).; callers 4a210@4a93f; guest pending
@@ -3148,7 +3148,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000da190	36	run_named_handler_da190	runtime_helpers24	compiles	game	confirmed	decomp/tests/0x000da190.json	docs/compiler-abi.md; Select the table entry matching a name, store the key and run its handler.; callers d9e50@da06f; guest pending
 0x000da1b4	112	darkside_fade		named	unclassified	unverified		
 0x000da224	138	coltab		named	unclassified	unverified		
-0x000da2b0	8	clouds		named	unclassified	unverified		
+0x000da2b0	8	clouds	gui_callbacks_089	drafted	game	confirmed		Host-reconstructed original instructions and callbacks; Watcom/guest replay pending
 0x000da2b8	168	altitude		named	unclassified	unverified		
 0x000da360	167	altitude2		named	unclassified	unverified		
 0x000da408	167	ground		named	unclassified	unverified		
