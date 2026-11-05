@@ -50,7 +50,7 @@ The host-side emulator remains the validation oracle. See
 
 Status (2026-11-05): 4,277 Ghidra-inventoried functions plus 10 manually
 confirmed additional entry points (4,287 tracked); 3,257 marked `compiles`,
-231 additional host-tested `drafted` entry points, and none verified as a
+238 additional host-tested `drafted` entry points, and none verified as a
 compiled-and-spliced C replacement. The tracker is authoritative. See
 [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
 and [renderer/driver batch 083](../docs/subsystems/decomp-batch-083.md) for
@@ -83,3 +83,7 @@ specific guest call boundaries and a documented unresolved flare parser.
 The [high-score C batch 093](../docs/subsystems/decomp-batch-093.md) adds five
 host-tested C bodies for existing high-score routines, checked against the
 previously guest-tested C++ model; they remain unspliced drafts.
+The [GUI script parser batch 094](../docs/subsystems/decomp-batch-094.md)
+adds seven source-grounded host C handlers for layout properties, string
+commands, resource paths and palette extrema; tokenizer and graphics-driver
+guest boundaries still require differential replay.

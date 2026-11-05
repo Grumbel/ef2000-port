@@ -146,6 +146,12 @@
             objects/hiscore_data_093.o objects/hiscore_io_093.o \
             objects/hiscore_display_093.o \
             -o objects/ef2000-decomp-hiscore-093-test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DEF_DECOMP_HOST_TEST=1 -Idecomp/include \
+            tests/decomp_gui_script_094_test.c \
+            decomp/src/gui_script_properties_094.c \
+            decomp/src/gui_script_assets_094.c \
+            -o objects/ef2000-decomp-gui-script-094-test
           runHook postBuild
         '';
 
@@ -160,6 +166,7 @@
           objects/ef2000-call-capture-test call-capture-fixture.efcap
           objects/ef2000-decomp-hiscore-test
           objects/ef2000-decomp-hiscore-093-test
+          objects/ef2000-decomp-gui-script-094-test
           objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
             --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
           objects/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'
