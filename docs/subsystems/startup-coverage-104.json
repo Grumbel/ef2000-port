@@ -1,0 +1,1106 @@
+{
+  "payload_sha256": "3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb",
+  "instruction_limit": 20000000,
+  "timing": "instruction",
+  "dos_clock": "guest",
+  "sound": "off",
+  "status": [
+    "guest_exit",
+    "56",
+    "43",
+    "0",
+    "0x222"
+  ],
+  "tracked": 4287,
+  "executed": [
+    {
+      "address": 134,
+      "name": "x386_startup",
+      "state": "library",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 355,
+      "calls": 1
+    },
+    {
+      "address": 565,
+      "name": "compare_word_235",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 6,
+      "calls": 4
+    },
+    {
+      "address": 571,
+      "name": "set_timer_vector_23b",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 44,
+      "calls": 4
+    },
+    {
+      "address": 688,
+      "name": "intdos_2b0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 116,
+      "calls": 9
+    },
+    {
+      "address": 1296,
+      "name": "alloc_aligned_510",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers27",
+      "size": 113,
+      "calls": 1
+    },
+    {
+      "address": 1540,
+      "name": "encode_runtime_segment_offset",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_indexed",
+      "size": 36,
+      "calls": 1
+    },
+    {
+      "address": 1576,
+      "name": "start_request_628",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers27",
+      "size": 144,
+      "calls": 9
+    },
+    {
+      "address": 2176,
+      "name": "dos_call_350b_880",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers19",
+      "size": 53,
+      "calls": 1
+    },
+    {
+      "address": 2560,
+      "name": "request_returns_cf_a00",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_helpers31",
+      "size": 95,
+      "calls": 1
+    },
+    {
+      "address": 2656,
+      "name": "find_pending_key_a60",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers3",
+      "size": 57,
+      "calls": 1
+    },
+    {
+      "address": 2716,
+      "name": "dos_call_2505_a9c",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers19",
+      "size": 60,
+      "calls": 2
+    },
+    {
+      "address": 2820,
+      "name": "init_far_stub_b04",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_state_helpers",
+      "size": 72,
+      "calls": 1
+    },
+    {
+      "address": 3188,
+      "name": "dos_call_3502_c74",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers19",
+      "size": 55,
+      "calls": 1
+    },
+    {
+      "address": 3616,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 292,
+      "calls": 1
+    },
+    {
+      "address": 569972,
+      "name": "candidate_game_main",
+      "state": "named",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 100,
+      "calls": 1
+    },
+    {
+      "address": 570152,
+      "name": "format_number_commas_8b328",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_helpers81",
+      "size": 99,
+      "calls": 1
+    },
+    {
+      "address": 570268,
+      "name": "tactcom_init",
+      "state": "named",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 402,
+      "calls": 1
+    },
+    {
+      "address": 638240,
+      "name": "watcom_cmain",
+      "state": "library",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 79,
+      "calls": 1
+    },
+    {
+      "address": 638320,
+      "name": "watcom_init_routines",
+      "state": "library",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 75,
+      "calls": 1
+    },
+    {
+      "address": 638395,
+      "name": "run_exit_handlers_9bdbb",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 79,
+      "calls": 1
+    },
+    {
+      "address": 638477,
+      "name": "segread_9be0d",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 40,
+      "calls": 9
+    },
+    {
+      "address": 638520,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 427,
+      "calls": 2
+    },
+    {
+      "address": 638947,
+      "name": "add_far_offset_9bfe3",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_helpers81",
+      "size": 65,
+      "calls": 3
+    },
+    {
+      "address": 639012,
+      "name": "far_to_linear_9c024",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "tiny_helpers",
+      "size": 23,
+      "calls": 4
+    },
+    {
+      "address": 639419,
+      "name": "real_mode_to_linear_9c1bb",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers7",
+      "size": 37,
+      "calls": 19
+    },
+    {
+      "address": 639520,
+      "name": "extender_call_252b_9c220",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 29,
+      "calls": 9
+    },
+    {
+      "address": 639951,
+      "name": "push_handler_9c3cf",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "ui_widget_helpers",
+      "size": 60,
+      "calls": 6
+    },
+    {
+      "address": 641112,
+      "name": "getenv_9c858",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 90,
+      "calls": 2
+    },
+    {
+      "address": 641204,
+      "name": "install_trap_handlers_9c8b4",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 84,
+      "calls": 1
+    },
+    {
+      "address": 641408,
+      "name": "build_default_path_9c980",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "engine_helpers3",
+      "size": 63,
+      "calls": 4
+    },
+    {
+      "address": 641472,
+      "name": "build_path_9c9c0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers7",
+      "size": 86,
+      "calls": 2
+    },
+    {
+      "address": 641623,
+      "name": "strcat_9ca57",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 55,
+      "calls": 8
+    },
+    {
+      "address": 641824,
+      "name": "find_in_archives_9cb20",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "entity_helpers",
+      "size": 78,
+      "calls": 2
+    },
+    {
+      "address": 641988,
+      "name": "try_handlers_9cbc4",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "script_helpers1",
+      "size": 98,
+      "calls": 1
+    },
+    {
+      "address": 644388,
+      "name": "ascii_stricmp",
+      "state": "named",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 57,
+      "calls": 1
+    },
+    {
+      "address": 644908,
+      "name": "truncate_9d72c",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "float_helpers10",
+      "size": 29,
+      "calls": 20480
+    },
+    {
+      "address": 644937,
+      "name": "copy_string_9d749",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "ui_widget_helpers",
+      "size": 31,
+      "calls": 11
+    },
+    {
+      "address": 673115,
+      "name": "call_edd49_a455b",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "tiny_helpers",
+      "size": 25,
+      "calls": 1
+    },
+    {
+      "address": 673203,
+      "name": "step_generator_a45b3",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_helpers28",
+      "size": 49,
+      "calls": 1682
+    },
+    {
+      "address": 686336,
+      "name": "open_slot_a7900",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_helpers57",
+      "size": 72,
+      "calls": 5
+    },
+    {
+      "address": 686408,
+      "name": "open_slot_a7948",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_helpers57",
+      "size": 72,
+      "calls": 1
+    },
+    {
+      "address": 727947,
+      "name": "strlen_ds",
+      "state": "typed",
+      "sig_status": "confirmed",
+      "module": "unk_runtime",
+      "size": 25,
+      "calls": 5
+    },
+    {
+      "address": 736144,
+      "name": "read_file_payload_size_b3b90",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers34",
+      "size": 114,
+      "calls": 3
+    },
+    {
+      "address": 736260,
+      "name": "load_file_unpacked_b3c04",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 252,
+      "calls": 1
+    },
+    {
+      "address": 736512,
+      "name": "write_whole_file_b3d00",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers22",
+      "size": 96,
+      "calls": 1
+    },
+    {
+      "address": 736628,
+      "name": "update_ring_b3d74",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "list_helpers",
+      "size": 57,
+      "calls": 2
+    },
+    {
+      "address": 737200,
+      "name": "fill_bytes_b3fb0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers1",
+      "size": 24,
+      "calls": 11
+    },
+    {
+      "address": 738732,
+      "name": "sin_b45ac",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "float_helpers8",
+      "size": 10,
+      "calls": 10240
+    },
+    {
+      "address": 738742,
+      "name": "reduce_angle_b45b6",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 44,
+      "calls": 10240
+    },
+    {
+      "address": 770515,
+      "name": "parse_open_mode_bc1d3",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers34",
+      "size": 180,
+      "calls": 6
+    },
+    {
+      "address": 770695,
+      "name": "fopen_core_bc287",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 200,
+      "calls": 6
+    },
+    {
+      "address": 770895,
+      "name": "run_if_available_bc34f",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "list_lookup",
+      "size": 27,
+      "calls": 6
+    },
+    {
+      "address": 770922,
+      "name": "run_if_available_bc36a",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "list_lookup",
+      "size": 10,
+      "calls": 6
+    },
+    {
+      "address": 771152,
+      "name": "release_by_key_bc450",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "tiny_helpers",
+      "size": 21,
+      "calls": 5
+    },
+    {
+      "address": 771290,
+      "name": "close_stream_record_bc4da",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 137,
+      "calls": 5
+    },
+    {
+      "address": 802672,
+      "name": "tail_jump_c3f70",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers1",
+      "size": 5,
+      "calls": 5
+    },
+    {
+      "address": 802688,
+      "name": "tail_jump_c3f80",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers1",
+      "size": 5,
+      "calls": 5
+    },
+    {
+      "address": 839982,
+      "name": "stdout_printf_cd12e",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers42",
+      "size": 34,
+      "calls": 1
+    },
+    {
+      "address": 903218,
+      "name": "memcpy_dc832",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 37,
+      "calls": 1
+    },
+    {
+      "address": 904052,
+      "name": "stack_used_dcb74",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers1",
+      "size": 9,
+      "calls": 1
+    },
+    {
+      "address": 912208,
+      "name": "fill_pattern_deb50",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers3",
+      "size": 49,
+      "calls": 11
+    },
+    {
+      "address": 912263,
+      "name": "fill_dwords_deb87",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers35",
+      "size": 108,
+      "calls": 11
+    },
+    {
+      "address": 928160,
+      "name": "init_arena_e29a0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers25",
+      "size": 72,
+      "calls": 1
+    },
+    {
+      "address": 928284,
+      "name": "reset_buffer_e2a1c",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "math_string",
+      "size": 50,
+      "calls": 2
+    },
+    {
+      "address": 929826,
+      "name": "format_to_buffer_e3022",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers1",
+      "size": 21,
+      "calls": 1
+    },
+    {
+      "address": 948277,
+      "name": "to_lower_ascii",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "math_string",
+      "size": 14,
+      "calls": 12
+    },
+    {
+      "address": 948784,
+      "name": "nop_e7a30",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "tiny_helpers2",
+      "size": 1,
+      "calls": 1
+    },
+    {
+      "address": 952139,
+      "name": "find_char",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "math_string",
+      "size": 26,
+      "calls": 3
+    },
+    {
+      "address": 959642,
+      "name": "divmod_store_ea49a",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 13,
+      "calls": 5
+    },
+    {
+      "address": 959655,
+      "name": "forward_or_clear_ea4a7",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "leaf_helpers1",
+      "size": 16,
+      "calls": 1
+    },
+    {
+      "address": 959680,
+      "name": "rewrite_template_ea4c0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers2",
+      "size": 75,
+      "calls": 1
+    },
+    {
+      "address": 959756,
+      "name": "log_message_ea50c",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 234,
+      "calls": 2
+    },
+    {
+      "address": 963150,
+      "name": "set_limit_eb24e",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "tiny_helpers3",
+      "size": 11,
+      "calls": 1
+    },
+    {
+      "address": 963161,
+      "name": "nop_eb259",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "tiny_helpers2",
+      "size": 1,
+      "calls": 3
+    },
+    {
+      "address": 963162,
+      "name": "switch_page_eb25a",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers30",
+      "size": 24,
+      "calls": 1
+    },
+    {
+      "address": 963186,
+      "name": "switch_page_eb272",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers30",
+      "size": 22,
+      "calls": 1
+    },
+    {
+      "address": 963208,
+      "name": "dos_alloc_eb288",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 32,
+      "calls": 1
+    },
+    {
+      "address": 963444,
+      "name": "compare_nocase_eb374",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers17",
+      "size": 87,
+      "calls": 3
+    },
+    {
+      "address": 963656,
+      "name": "enter_handler_eb448",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers4",
+      "size": 48,
+      "calls": 1
+    },
+    {
+      "address": 963704,
+      "name": "lowercase_string",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "math_string",
+      "size": 31,
+      "calls": 6
+    },
+    {
+      "address": 963744,
+      "name": "alloc_block_checked_eb4a0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers26",
+      "size": 30,
+      "calls": 2
+    },
+    {
+      "address": 963776,
+      "name": "release_pointer_eb4c0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "math_string",
+      "size": 26,
+      "calls": 2
+    },
+    {
+      "address": 965936,
+      "name": "get_address_ebd30",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "tiny_helpers2",
+      "size": 6,
+      "calls": 11
+    },
+    {
+      "address": 965942,
+      "name": "get_address_ebd36",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "tiny_helpers2",
+      "size": 6,
+      "calls": 11
+    },
+    {
+      "address": 966253,
+      "name": "store_through_ebd30",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_helpers2",
+      "size": 12,
+      "calls": 11
+    },
+    {
+      "address": 966288,
+      "name": "store_through_ebd36",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_helpers2",
+      "size": 12,
+      "calls": 11
+    },
+    {
+      "address": 971059,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 641,
+      "calls": 2
+    },
+    {
+      "address": 971700,
+      "name": "parse_output_spec_ed3b4",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_helpers104",
+      "size": 307,
+      "calls": 1
+    },
+    {
+      "address": 972007,
+      "name": "parse_format_flags",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers2",
+      "size": 91,
+      "calls": 1
+    },
+    {
+      "address": 972098,
+      "name": "strnlen_far_ed542",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 36,
+      "calls": 2
+    },
+    {
+      "address": 972492,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 1097,
+      "calls": 1
+    },
+    {
+      "address": 974153,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 122,
+      "calls": 1
+    },
+    {
+      "address": 991871,
+      "name": "file_position_f227f",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_helpers2",
+      "size": 48,
+      "calls": 5
+    },
+    {
+      "address": 1025193,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 453,
+      "calls": 6
+    },
+    {
+      "address": 1025747,
+      "name": "alloc_stream_slot_fa6d3",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 168,
+      "calls": 6
+    },
+    {
+      "address": 1025915,
+      "name": "release_list_node_fa77b",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers4",
+      "size": 57,
+      "calls": 11
+    },
+    {
+      "address": 1026002,
+      "name": "update_flags_fa7d2",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_helpers2",
+      "size": 49,
+      "calls": 1
+    },
+    {
+      "address": 1026069,
+      "name": "stream_vprintf_fa815",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers42",
+      "size": 133,
+      "calls": 1
+    },
+    {
+      "address": 1026208,
+      "name": "stream_flush_fa8a0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers38",
+      "size": 191,
+      "calls": 5
+    },
+    {
+      "address": 1026399,
+      "name": "lseek_fa95f",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 65,
+      "calls": 5
+    },
+    {
+      "address": 1026514,
+      "name": "heap_free_find_fa9d2",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 94,
+      "calls": 16
+    },
+    {
+      "address": 1034133,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 227,
+      "calls": 15
+    },
+    {
+      "address": 1078032,
+      "name": "load_colour_table_107310",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 246,
+      "calls": 1
+    },
+    {
+      "address": 1082560,
+      "name": "translate_key_masked_1084c0",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 19,
+      "calls": 1
+    },
+    {
+      "address": 1103303,
+      "name": "insert_heap_block_10d5c7",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers3",
+      "size": 116,
+      "calls": 1
+    },
+    {
+      "address": 1103419,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 78,
+      "calls": 4
+    },
+    {
+      "address": 1103883,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 324,
+      "calls": 4
+    },
+    {
+      "address": 1104207,
+      "name": "",
+      "state": "unknown",
+      "sig_status": "unverified",
+      "module": "",
+      "size": 119,
+      "calls": 4
+    },
+    {
+      "address": 1110129,
+      "name": "alloc_stream_buffer_10f071",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers3",
+      "size": 119,
+      "calls": 1
+    },
+    {
+      "address": 1111099,
+      "name": "stream_fputc_10f43b",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_helpers37",
+      "size": 164,
+      "calls": 40
+    },
+    {
+      "address": 1111263,
+      "name": "call_fa95f_from_start",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_libc",
+      "size": 17,
+      "calls": 5
+    },
+    {
+      "address": 1114187,
+      "name": "dos_time_hundredths_11004b",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "game_helpers107",
+      "size": 91,
+      "calls": 1
+    },
+    {
+      "address": 1114476,
+      "name": "fdiv_bug_probe_11016c",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "float_helpers9",
+      "size": 82,
+      "calls": 1
+    },
+    {
+      "address": 1114558,
+      "name": "is_device_handle_1101be",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 30,
+      "calls": 2
+    },
+    {
+      "address": 1114595,
+      "name": "translate_key_if_1101e3",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 5,
+      "calls": 1
+    },
+    {
+      "address": 1114600,
+      "name": "translate_key_1101e8",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "key_helpers1",
+      "size": 102,
+      "calls": 11
+    },
+    {
+      "address": 1114702,
+      "name": "lookup_slot_11024e",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "runtime_libc",
+      "size": 85,
+      "calls": 4
+    },
+    {
+      "address": 1115027,
+      "name": "dos_write_110393",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 124,
+      "calls": 4
+    },
+    {
+      "address": 1115152,
+      "name": "heap_alloc_110410",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 163,
+      "calls": 18
+    },
+    {
+      "address": 1115320,
+      "name": "heap_free_1104b8",
+      "state": "compiles",
+      "sig_status": "confirmed",
+      "module": "misc_drafts1",
+      "size": 272,
+      "calls": 16
+    },
+    {
+      "address": 1176199,
+      "name": "dos_regblock_int21_11f287",
+      "state": "drafted",
+      "sig_status": "unverified",
+      "module": "dos_regblock_bridge",
+      "size": 76,
+      "calls": 1
+    }
+  ]
+}
