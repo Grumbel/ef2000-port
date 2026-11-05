@@ -50,7 +50,7 @@ The host-side emulator remains the validation oracle. See
 
 Status (2026-11-05): 4,277 Ghidra-inventoried functions plus 10 manually
 confirmed additional entry points (4,287 tracked); 3,257 marked `compiles`,
-210 additional host-tested `drafted` entry points, and none verified as a
+222 additional host-tested `drafted` entry points, and none verified as a
 compiled-and-spliced C replacement. The tracker is authoritative. See
 [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
 and [renderer/driver batch 083](../docs/subsystems/decomp-batch-083.md) for
@@ -72,3 +72,7 @@ The [READCOLS environment batch 090](../docs/subsystems/decomp-batch-090.md)
 adds twenty nontrivial line parsers and global-state handlers as host drafts,
 with explicit guest scanf and engine-call boundaries. They require guest
 differential replay and OpenWatcom ABI verification before replacement.
+The [palette, crater, and sky batch 091](../docs/subsystems/decomp-batch-091.md)
+adds twelve more nontrivial READCOLS host models, including two record layouts,
+linked texture allocation, signed bounds, and the two-stage SETSUN scanner;
+guest ABI and engine operations are still unresolved.

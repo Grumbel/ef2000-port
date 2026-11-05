@@ -3157,33 +3157,33 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000da580	74	game_type	environment_values_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; unsigned 16-bit parsed value modeled
 0x000da5cc	119	load_pal		named	unclassified	unverified		
 0x000da644	258	load_cock_pal		named	unclassified	unverified		
-0x000da748	158	load_darkside_pal		named	unclassified	unverified		
+0x000da748	158	load_darkside_pal	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; darkside palette check and load adapters
 0x000da7fc	197	load_missile_pal	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; five-way palette selector with guest loader boundary
-0x000da8c4	158	set_darkside_values		named	unclassified	unverified		
+0x000da8c4	158	set_darkside_values	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; darkside values file check and load adapters
 0x000da964	112	set_world_name	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; four numeric outputs modeled
 0x000da9d4	136	set_xmap_name	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; filename and suffix copy hypothesized
 0x000daa5c	225	set_mmap_name	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; indexed filename and suffix copy hypothesized
 0x000dab40	136	ref_point	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; reference filename copy hypothesized
 0x000dabc8	97	set_map_name	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; unknown name transform remains guest hook
 0x000dac2c	286	lightning_point		named	unclassified	unverified		
-0x000dad4c	244	set_nb_craters		named	unclassified	unverified		
-0x000dae40	179	load_craters		named	unclassified	unverified		
+0x000dad4c	244	set_nb_craters	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; 18-byte crater records and overlapping counter
+0x000dae40	179	load_craters	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; two 110-byte record array allocations
 0x000daef4	448	load_smoke		named	unclassified	unverified		
 0x000db0b4	93	load_player_virtual	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; DH result modeled behind guest engine adapter
 0x000db114	85	load_player_sort	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; parser and guest-call boundary
 0x000db16c	85	load_player	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; parser and guest-call boundary
 0x000db1c4	85	set_nb_flak	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; parser and guest-call boundary
 0x000db21c	110	load_flak	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; signed threshold and load callback
-0x000db28c	157	sun_flare		named	unclassified	unverified		
+0x000db28c	157	sun_flare	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; flare parameters and unresolved texture lookup
 0x000db32c	244			unknown	unclassified	unverified		
 0x000db420	179	cloud_fade	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; five-field record writer and decrement
 0x000db4d4	383	tmsun_flare		named	unclassified	unverified		
-0x000db654	218	sun_texture		named	unclassified	unverified		
-0x000db730	214	cannon_hit		named	unclassified	unverified		
-0x000db808	158	fix_horizon		named	unclassified	unverified		
+0x000db654	218	sun_texture	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; 16-byte list node insertion and signed index warning
+0x000db730	214	cannon_hit	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; two 18-byte hit records and count guard
+0x000db808	158	fix_horizon	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; counted horizon line consumption and callback
 0x000db8a8	8	unfix_horizon	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; guest pending
 0x000db8b0	9	load_horizon	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; guest pending
-0x000db8bc	160	heavenly_body		named	unclassified	unverified		
+0x000db8bc	160	heavenly_body	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; 40 five-byte sky entries and guest type lookup
 0x000db95c	74	craft_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
 0x000db9a8	74	craft_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
 0x000db9f4	74	cannon_hit_concrete	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
@@ -3211,9 +3211,9 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dbeec	9	city	environment_mode_flags	drafted	game	confirmed		OR feature byte with 22; guest replay pending
 0x000dbef8	41	day	environment_mode_flags	drafted	game	confirmed		Clear day flag and OR high mask; guest replay pending
 0x000dbf3c	186	load_companion_files_dbf3c	load_planes1	compiles	game	confirmed	decomp/tests/0x000dbf3c.json	docs/compiler-abi.md; Load two companion files named from part b: the first into dest (complaining when missing), then, if the second exists, ; callers da644@da6a9,da644@da6fe,da7fc@da8a0; guest pending
-0x000dbff8	153	init3d_file		named	unclassified	unverified		
-0x000dc094	143	east_west_palettes		named	unclassified	unverified		
-0x000dc124	175	setsun		named	unclassified	unverified		
+0x000dbff8	153	init3d_file	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; short file name with suffix and init callback
+0x000dc094	143	east_west_palettes	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; palette name length check and loader
+0x000dc124	175	setsun	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; two-stage space and newline scanner with path adapters
 0x000dc1d4	21	atan_dc1d4	float_helpers9	compiles	game	confirmed	decomp/tests/0x000dc1d4.json	docs/compiler-abi.md; atan of ST0 (fld1; fpatan); the emulation path 0x10848c is used when bit 0 of 0x1631f0 is set.; callers 1db08@1dba3; guest pending
 0x000dc1e9	21	atan2_dc1e9	float_helpers9	compiles	game	confirmed	decomp/tests/0x000dc1e9.json	docs/compiler-abi.md; fpatan after an exchange: atan2(st0, st1) of the two x87 registers (ST0 = y, ST1 = x on entry); the emulation path 0x108; callers b4620@b4664,deb1a@deb2f,e6990@e6a41; guest pending
 0x000dc21c	52	set_view_origin_dc21c	game_helpers24	compiles	game	confirmed	decomp/tests/0x000dc21c.json	docs/compiler-abi.md; Store two 16.16 coordinates (with a half-unit bias) from stack arguments.; callers 1e480@1e4d8,3cfc0@3d26b,63d5c@63ec5; guest pending
