@@ -656,6 +656,13 @@
           work/campaign_weapon_callbacks_host_test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
+            ${source}/tests/decomp_network_callbacks_test.c \
+            ${source}/decomp/src/network_settings_callbacks.c \
+            ${source}/decomp/src/network_status_callbacks.c \
+            -o work/network_callbacks_host_test
+          work/network_callbacks_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
             ${source}/tests/decomp_buffer_plane_test.c \
             ${source}/decomp/src/buffer_cursor.c \
             ${source}/decomp/src/plane_sources.c \
