@@ -36,6 +36,9 @@
 
 ## Decompilation work
 
+- For a new GPT-6 Luna decompilation session, read the compact
+  `docs/handoffs/luna-decomp-2026-11-05.md` handoff first; the plan and
+  original code remain authoritative.
 - Follow `docs/decompilation-plan.md`: read its "Ground rules" and
   "Operating loop" sections at the start of every session, and update its
   status markers and progress log in the commits that complete steps.
