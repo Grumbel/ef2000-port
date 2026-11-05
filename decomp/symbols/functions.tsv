@@ -2064,7 +2064,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d524	57	ascii_stricmp		named	unclassified	unverified		case-folding compare; docs/ghidra-findings.md
 0x0009d55d	462			unknown	unclassified	unverified		
 0x0009d72c	29	truncate_9d72c	float_helpers10	compiles	game	confirmed	decomp/tests/0x0009d72c.json	docs/compiler-abi.md; Truncate ST0 toward zero (FPU control word temporarily set to round-to-zero).; callers f80@14eb,f80@1525,f80@1566; guest pending
-0x0009d749	31	copy_string_9d749	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d749.json	docs/compiler-abi.md; strcpy.; callers f80@15a5,f80@1a32,20ec@2646; guest pending
+0x0009d749	31	copy_string_9d749	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d749.json	docs/compiler-abi.md; strcpy.; callers f80@15a5,f80@1a32,20ec@2646; guest differential 512/512 with EDX scratch differences, EAX preserved (batch 104)
 0x0009d770	1	nop_9d770	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0009d770.json	docs/compiler-abi.md; Empty stub (single ret).; callers 9e0c4@9e285,9f940@9faf0,9fc00@9fdc5; guest pending
 0x0009d774	3	nop_9d774	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0009d774.json	docs/compiler-abi.md; Empty stub that pops two stack arguments (ret 8).; callers a0a2c@a0a6d; guest pending
 0x0009d778	4	return_zero_9d778	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0009d778.json	docs/compiler-abi.md; Return zero.; callers a1590@a175b; guest pending
@@ -2223,7 +2223,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a455b	25	call_edd49_a455b	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a455b.json	docs/compiler-abi.md; Run edd49 with the byte at 0x132a60 cleared, then restore the dword.; callers 9bdbb@9bdfd; guest pending
 0x000a4574	45	get_time_seconds_a4574	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a4574.json	docs/compiler-abi.md; Get the current time as seconds (0xf118d over the broken-down time from 0xf10ca, whose first field is bumped when the fr; callers 4050@4056,bfcc@c0e4,b33ac@b33ae; guest pending
 0x000a45a8	11	reseed_generator_a45a8	tiny_helpers3	compiles	game	confirmed	decomp/tests/0x000a45a8.json	docs/compiler-abi.md; Reseed the generator.; callers 3dd30@3dd60,3dd30@3de1f,7a844@7a876; guest pending
-0x000a45b3	49	step_generator_a45b3	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a45b3.json	docs/compiler-abi.md; Step a 32-bit generator held in two words; reseed when it reaches zero.; callers 6c1c@6cf3,6c1c@6d15,6c1c@6d2f; guest pending
+0x000a45b3	49	step_generator_a45b3	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a45b3.json	docs/compiler-abi.md; Step a 32-bit generator held in two words; reseed when it reaches zero.; callers 6c1c@6cf3,6c1c@6d15,6c1c@6d2f; original guest ABI and state 512/512, DX is scratch (batch 104)
 0x000a45e4	16	set_patch_dword_a45e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000a45e4.json	docs/compiler-abi.md; Store the stack argument VALUE into the code-patch dword at 0xa45a4 (stdcall-style frame, ret 4).; callers 4050@405c,bfcc@c0f1,a9e70@a9e7e; guest pending
 0x000a4640	53	find_id_a4640	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a4640.json	docs/compiler-abi.md; Find a word in the 0x41eda8 id table; returns its index, or a cleared low byte.; callers e52a4@e533f; guest pending
 0x000a4678	82	find_registered_a4678	runtime_helpers8	compiles	game	confirmed	decomp/tests/0x000a4678.json	docs/compiler-abi.md; Find the registered entry whose name equals key, or 0.; callers a46cc@a46d0; guest pending

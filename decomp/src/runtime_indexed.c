@@ -19,6 +19,21 @@ static uint32_t read32(ef_addr32 address)
     return (uint32_t)read16(address) | ((uint32_t)read16(address + 2u) << 16);
 }
 
+/* Keep the single original x86 dword load without misaligned C pointer
+ * access. GCC folds builtin memcpy to MOV; Watcom/other targets use the
+ * equivalent little-endian byte reader above. */
+static uint32_t read32_unaligned(ef_addr32 address)
+{
+#if defined(__GNUC__) && defined(__BYTE_ORDER__) && \
+    (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+    uint32_t value;
+    __builtin_memcpy(&value, ef_guest_memory_ptr(address), sizeof(value));
+    return value;
+#else
+    return read32(address);
+#endif
+}
+
 static void write8(ef_addr32 address, uint8_t value)
 {
     *(uint8_t *)ef_guest_memory_ptr(address) = value;
@@ -34,7 +49,8 @@ static void write16(ef_addr32 address, uint16_t value)
  * X-32 base as a segment:offset pair with a 16-bit segment and 4-bit offset. */
 uint32_t encode_runtime_segment_offset(ef_addr32 pointer)
 {
-    uint32_t delta = pointer - read32(0x00120cc6);
+    uint32_t base = read32_unaligned(0x00120cc6);
+    uint32_t delta = pointer - base;
     return ((delta >> 4) & 0xffffu) << 16 | (delta & 0x0fu);
 }
 

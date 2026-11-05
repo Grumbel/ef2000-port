@@ -20,15 +20,18 @@ int32_t push_handler_9c3cf(uint32_t handler)
     return 0;
 }
 
-/* 0x9d749, 31 bytes. strcpy. */
-void copy_string_9d749(ef_addr32 destination, ef_addr32 source)
+/* 0x9d749, 31 bytes. strcpy; the guest returns its original EAX destination
+ * and advances scratch EDX by two per copied byte pair. */
+ef_addr32 copy_string_9d749(ef_addr32 destination, ef_addr32 source)
 {
     uint8_t c;
+    ef_addr32 original = destination;
 
     do {
         c = EF_U8(source++);
         EF_U8(destination++) = c;
     } while (c != 0);
+    return original;
 }
 
 /* 0x9d7ac, 39 bytes. */

@@ -1726,7 +1726,7 @@ ef_addr32 guest_fn_e8733(uint32_t count, uint32_t size); /* 0xe8733 EAX/EDX -> E
 
 /* ui_widget_helpers.c */
 int32_t push_handler_9c3cf(uint32_t handler);
-void copy_string_9d749(ef_addr32 destination, ef_addr32 source);
+ef_addr32 copy_string_9d749(ef_addr32 destination, ef_addr32 source);
 void set_axis_9d7ac(uint32_t a, uint32_t b);
 void set_axis_9d80c(uint32_t a, uint32_t b);
 void reset_parser_state_9d938(void);
