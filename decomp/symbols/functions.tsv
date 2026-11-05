@@ -55,7 +55,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000040dc	288	hiscore_refresh_display	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md #059; native model tested
 0x000041fc	165	hiscore_load	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; differential-tested C++ model
 0x000042a4	114	hiscore_save	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; ORIGINAL BUG: checksum pointer never advances
-0x00004318	17	mdMainloop		named	unclassified	unverified		
+0x00004318	17	mdMainloop	gui_callbacks_088	drafted	game	confirmed		Host callback draft; 41fc then 40dc; guest replay pending
 0x0000432c	15	hiscore_qualifies	hiscore	compiles	game	confirmed	decomp/tests/0x000432c.json	docs/compiler-abi.md; C candidate and signed-boundary host test pass; awaiting OpenWatcom OMF compile, splice, differential and full replay
 0x0000433c	242	hiscore_insert	hiscore	named	unclassified	unverified		docs/highscores-reconstruction.md; ties admitted, INT_MIN wraparound
 0x00004430	369	apply_total_adjustment_4430	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00004430.json	docs/compiler-abi.md; Apply price/score adjustments to dword 0x1970a0. SEL (AX) 0: find every entry of the 26-byte table at 0x121654 (37 entri; callers 10750@10a66,10a9c@10ef2,110ec@1152d; guest pending
@@ -68,7 +68,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00004b54	39	kotsInitKOTS		named	unclassified	unverified		
 0x00004bf8	87	select_entry_4bf8	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00004bf8.json	docs/compiler-abi.md; ; callers none direct; guest pending
 0x00004c50	162	InitArcade		named	unclassified	unverified		
-0x00004cf4	86	gpwChangeDifficulty		named	unclassified	unverified		
+0x00004cf4	86	gpwChangeDifficulty	gui_callbacks_088	drafted	game	confirmed		Host callback draft; overlapping 121e46/121e44 and 76-byte row stride; guest replay pending
 0x00004d4c	199	gpwAcceptHiscore		named	unclassified	unverified		
 0x00004e14	260	enter_hiscore_screen_4e14	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00004e14.json	docs/compiler-abi.md; Enter the high-score screen: load the table, pick the arcade text file for the difficulty and enable the summary widgets; callers none direct; guest pending
 0x00004f18	502			unknown	unclassified	unverified		
@@ -140,8 +140,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000a5d8	292	gpwCampAccepted		named	unclassified	unverified		
 0x0000a6fc	371	gpwFlyMission		named	unclassified	unverified		
 0x0000a870	237	onopenHiscores		named	unclassified	unverified		
-0x0000a960	19	gcChangeMode		named	unclassified	unverified		
-0x0000a974	49	gcZoomMapInOut		named	unclassified	unverified		
+0x0000a960	19	gcChangeMode	gui_callbacks_088	drafted	game	confirmed		Two terminal branches; guest replay pending
+0x0000a974	49	gcZoomMapInOut	gui_callbacks_088	drafted	game	confirmed		Original 16-bit subtraction and label choice; guest replay pending
 0x0000a9a8	67	pick_count_a9a8	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000a9a8.json	docs/compiler-abi.md; Smaller of (table byte + 1) and (random % 3 + 2).; callers ab74@ad1f,ab74@adfd,ab74@af5d; guest pending
 0x0000a9fc	69	random_delay_a9fc	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0000a9fc.json	docs/compiler-abi.md; Pick a delay (0x28, 0x46, 0x78 or 0xc8) from a random number modulo 4.; callers ab74@ad18,ab74@adf6,ab74@af56; guest pending
 0x0000aa6c	85	random_code_aa6c	small_wrappers7	compiles	game	confirmed	decomp/tests/0x0000aa6c.json	docs/compiler-abi.md; Pick a code (9..14) from a random number modulo 10.; callers ab74@ad0f,ab74@aded,ab74@af4d; guest pending
@@ -151,26 +151,26 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000afbc	546			unknown	unclassified	unverified		
 0x0000b1e0	866			unknown	unclassified	unverified		
 0x0000b544	46	apply_two_a4b80_b544	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000b544.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x0000b574	89	gpwCloseTargetView		named	unclassified	unverified		
+0x0000b574	89	gpwCloseTargetView	gui_callbacks_088	drafted	game	confirmed		Original repeats exact same compare; guest replay pending
 0x0000b5d0	204	gpwRedrawTargetWindow		named	unclassified	unverified		
 0x0000b69c	959			unknown	unclassified	unverified		
 0x0000ba5c	445			unknown	unclassified	unverified		
 0x0000bc38	432			unknown	unclassified	unverified		
-0x0000bde8	93	gpwClickPilot1		named	unclassified	unverified		
-0x0000be48	67	gpwClickPilot2		named	unclassified	unverified		
-0x0000be8c	73	gpwClickPilot3		named	unclassified	unverified		
-0x0000bed8	75	gpwClickPilot4		named	unclassified	unverified		
-0x0000bf24	75	gpwSaveConflict		named	unclassified	unverified		
+0x0000bde8	93	gpwClickPilot1	gui_callbacks_088	drafted	game	confirmed		Four widget selector calls; guest replay pending
+0x0000be48	67	gpwClickPilot2	gui_callbacks_088	drafted	game	confirmed		Pilot row zero; original EDX at 779f4 unresolved; guest replay pending
+0x0000be8c	73	gpwClickPilot3	gui_callbacks_088	drafted	game	confirmed		Pilot row 43 and selector fallback; guest replay pending
+0x0000bed8	75	gpwClickPilot4	gui_callbacks_088	drafted	game	confirmed		Pilot row 86 and selector fallback; guest replay pending
+0x0000bf24	75	gpwSaveConflict	gui_callbacks_088	drafted	game	confirmed		Pilot row c9 and selector fallback; guest replay pending
 0x0000bf70	91	onleaveOptions		named	unclassified	unverified		
 0x0000bfcc	1449			unknown	unclassified	unverified		
 0x0000c594	155	finish_trace_c594	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000c594.json	docs/compiler-abi.md; Close out the current trace: unless byte 0x126576 or either word 0x137998/0x13799a is set, dump the pending record (0xb3; callers none direct; guest pending
 0x0000c630	311			unknown	unclassified	unverified		
 0x0000c768	207	layout_slot_widgets_c768	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000c768.json	docs/compiler-abi.md; Lay out the four numbered slot widgets of the dialog 0x180728 for the selection INDEX (EAX, signed word): the widget 0x1; callers bfcc@c264,c868@c88a,7bc00@7bc1d; guest pending
-0x0000c838	48	gpwShowDebrief		named	unclassified	unverified		
+0x0000c838	48	gpwShowDebrief	gui_callbacks_088	drafted	game	confirmed		Signed 16-bit wrap and redraw; guest replay pending
 0x0000c868	127	rebuild_page_c868	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0000c868.json	docs/compiler-abi.md; Rebuild the current page: clear the word tables (0x92f0), lay out the slots up to the count in word 0x121e98 (0xc768), d; callers a5bc@a5d1,c838@c85f; guest pending
 0x0000c8e8	122	draw_page_entries_c8e8	screen_clip1	compiles	game	confirmed	decomp/tests/0x0000c8e8.json	docs/compiler-abi.md; For the current page (word at 0x121e98) call 0x11560 once for each of its entries, passing per-entry slots of the tables; callers bfcc@c27a,c868@c88f; guest pending
 0x0000c964	218	update_match_ratio_c964	float_helpers9	compiles	game	confirmed	decomp/tests/0x0000c964.json	docs/compiler-abi.md; Recompute the ratio of matching entries and store it as a float.; callers bfcc@c27f; guest pending
-0x0000ca40	25	gpwAlterSize		named	unclassified	unverified		
+0x0000ca40	25	gpwAlterSize	gui_callbacks_088	drafted	game	confirmed		Copy two sizing words; guest replay pending
 0x0000ca5c	573			unknown	unclassified	unverified		
 0x0000cccc	1475	gpwRedrawRoute		named	unclassified	unverified		
 0x0000d290	671			unknown	unclassified	unverified		
@@ -3199,17 +3199,17 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dbcec	74	bomb_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
 0x000dbd38	74	bomb_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
 0x000dbd84	74	depth_fade	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbdd0	88	normal		named	unclassified	unverified		
+0x000dbdd0	88	normal	environment_normal	drafted	game	confirmed		Space-skip parser and print hook; guest formatting pending
 0x000dbe28	8	corridor	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 2; guest pending
 0x000dbe30	33	planet2	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 4 in two globals; guest pending
 0x000dbe54	8	space	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bits 0x42; guest pending
-0x000dbe5c	33	spacecorr		named	unclassified	unverified		
-0x000dbe80	41	rings		named	unclassified	unverified		
-0x000dbeac	46	moon		named	unclassified	unverified		
-0x000dbedc	8	inferno		named	unclassified	unverified		
-0x000dbee4	8	shield		named	unclassified	unverified		
-0x000dbeec	9	city		named	unclassified	unverified		
-0x000dbef8	41	day		named	unclassified	unverified		
+0x000dbe5c	33	spacecorr	environment_mode_flags	drafted	game	confirmed		Both mode masks updated and AH returned; guest replay pending
+0x000dbe80	41	rings	environment_mode_flags	drafted	game	confirmed		Both masks plus ring flag and AH return; guest replay pending
+0x000dbeac	46	moon	environment_mode_flags	drafted	game	confirmed		Word feature mask and moon flag; guest replay pending
+0x000dbedc	8	inferno	environment_mode_flags	drafted	game	confirmed		OR feature byte with 10; guest replay pending
+0x000dbee4	8	shield	environment_mode_flags	drafted	game	confirmed		OR feature byte with 01; guest replay pending
+0x000dbeec	9	city	environment_mode_flags	drafted	game	confirmed		OR feature byte with 22; guest replay pending
+0x000dbef8	41	day	environment_mode_flags	drafted	game	confirmed		Clear day flag and OR high mask; guest replay pending
 0x000dbf3c	186	load_companion_files_dbf3c	load_planes1	compiles	game	confirmed	decomp/tests/0x000dbf3c.json	docs/compiler-abi.md; Load two companion files named from part b: the first into dest (complaining when missing), then, if the second exists, ; callers da644@da6a9,da644@da6fe,da7fc@da8a0; guest pending
 0x000dbff8	153	init3d_file		named	unclassified	unverified		
 0x000dc094	143	east_west_palettes		named	unclassified	unverified		
