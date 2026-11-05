@@ -3653,8 +3653,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f3b40	22	load_path_value_f3b40	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3b40.json	docs/compiler-abi.md; As 0xf35d8, storing word 0x161e1e.; callers f3b78@f3cf6; guest pending
 0x000f3b58	32	load_path_pointer_f3b58	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3b58.json	docs/compiler-abi.md; ; callers f3b78@f3d43; guest pending
 0x000f3b78	476	process_command_dispatch_loop	gui_script_pipeline_095	drafted	game	confirmed		docs/subsystems/decomp-batch-095.md; OPTIONS keyword dispatcher, 14 command branches, host-adapted reader and handlers; no guest splice
-0x000f3d54	560			unknown	unclassified	unverified		
-0x000f3f84	497			unknown	unclassified	unverified		
+0x000f3d54	560	gui_cursor_step_f3d54	gui_cursor_097	drafted	game	unverified		docs/subsystems/decomp-batch-097.md; original cursor motion, tick repeat timers, 320x200 signed clamps, button output, indirect poll adapter; one identified caller f3f84, guest ABI unresolved
+0x000f3f84	497	gui_options_display_f3f84	gui_display_097	drafted	game	unverified		docs/subsystems/decomp-batch-097.md; OPTIONS display event loop, 20-byte parameter record and pointer selection/release, 21 external guest-call adapters; guest splice pending
 0x000f4178	47	reset_flags_f4178	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f4178.json	docs/compiler-abi.md; ; callers f41dc@f42af; guest pending
 0x000f41a8	27	remember_request_f41a8	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f41a8.json	docs/compiler-abi.md; With the flag set, remember the request value and refresh the cursor.; callers f41dc@f41f7; guest pending
 0x000f41c4	22	apply_request_f41c4	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f41c4.json	docs/compiler-abi.md; With the flag set, apply the saved request value.; callers a9d48@a9e20,f3f84@f3fa2; guest pending

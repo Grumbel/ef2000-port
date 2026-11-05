@@ -172,6 +172,20 @@
             decomp/src/misc_helpers2.c \
             -Wl,--gc-sections \
             -o objects/ef2000-decomp-gui-options-096-test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DEF_DECOMP_HOST_TEST=1 -ffunction-sections -fdata-sections \
+            -Idecomp/include \
+            tests/decomp_gui_cursor_097_test.c \
+            decomp/src/gui_cursor_097.c decomp/src/runtime_small_ops.c \
+            -Wl,--gc-sections \
+            -o objects/ef2000-decomp-gui-cursor-097-test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DEF_DECOMP_HOST_TEST=1 -ffunction-sections -fdata-sections \
+            -Idecomp/include \
+            tests/decomp_gui_display_097_test.c \
+            decomp/src/gui_display_097.c \
+            -Wl,--gc-sections \
+            -o objects/ef2000-decomp-gui-display-097-test
           runHook postBuild
         '';
 
@@ -190,6 +204,8 @@
           objects/ef2000-decomp-gui-script-095-test
           objects/ef2000-decomp-gui-options-095-test
           objects/ef2000-decomp-gui-options-096-test
+          objects/ef2000-decomp-gui-cursor-097-test
+          objects/ef2000-decomp-gui-display-097-test
           objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
             --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
           objects/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'

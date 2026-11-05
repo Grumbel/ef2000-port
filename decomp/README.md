@@ -50,9 +50,10 @@ The host-side emulator remains the validation oracle. See
 
 Status (2026-11-05): 4,277 Ghidra-inventoried functions plus 10 manually
 confirmed additional entry points (4,287 tracked); 3,257 marked `compiles`,
-245 additional host-tested `drafted` entry points, and none verified as a
+247 additional host-tested `drafted` entry points, and none verified as a
 compiled-and-spliced C replacement. The tracker is authoritative. See
-[renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
+[the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),
+as well as [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
 and [renderer/driver batch 083](../docs/subsystems/decomp-batch-083.md) for
 boundary repairs, and [mission callback batch 084](../docs/subsystems/decomp-batch-084.md)
 for its twenty named GUI entries, validation and pending guest work.
@@ -96,3 +97,6 @@ replacement, deletion and allocation.
 The [OPTIONS source reader batch 096](../docs/subsystems/decomp-batch-096.md)
 connects the dispatcher to the original line and token routines and models
 the indirect formatting wrapper, with pinned-byte audits for both entries.
+The [OPTIONS display batch 097](../docs/subsystems/decomp-batch-097.md)
+models the original cursor repeat timers, pointer selection loop and
+fade/no-fade cleanup; rendering, hit testing and device inputs remain adapters.
