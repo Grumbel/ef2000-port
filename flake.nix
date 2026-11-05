@@ -690,6 +690,14 @@
           work/gui_callbacks_089_host_test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
+            ${source}/tests/decomp_environment_090_test.c \
+            ${source}/decomp/src/environment_scanner_090.c \
+            ${source}/decomp/src/environment_values_090.c \
+            ${source}/decomp/src/environment_world_090.c \
+            -o work/environment_090_host_test
+          work/environment_090_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
             ${source}/tests/decomp_buffer_plane_test.c \
             ${source}/decomp/src/buffer_cursor.c \
             ${source}/decomp/src/plane_sources.c \
