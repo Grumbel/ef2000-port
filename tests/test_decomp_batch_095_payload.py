@@ -15,13 +15,15 @@ ROOT = Path(__file__).resolve().parents[1]
 SHA256 = "3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb"
 ENTRIES = {
     0xF3B78: (476, "process_command_dispatch_loop", "confirmed"),
+    0xF4347: (367, "store_option_assignment", "unverified"),
+    0xF44B6: (224, "find_or_delete_option_assignment", "unverified"),
     0xF46CC: (190, "read_next_command_token", "confirmed"),
     0xF5484: (531, "read_six_option_coordinates", "unverified"),
 }
 
 
 class Inventory095(unittest.TestCase):
-    def test_three_original_entries_are_drafted(self):
+    def test_five_original_entries_are_drafted(self):
         with (ROOT / "decomp/symbols/functions.tsv").open(newline="") as stream:
             rows = {int(row["addr"], 16): row
                     for row in csv.DictReader(stream, delimiter="\t")}
@@ -30,7 +32,9 @@ class Inventory095(unittest.TestCase):
                 row = rows[address]
                 self.assertEqual(int(row["size"]), size)
                 self.assertEqual(row["name"], name)
-                self.assertEqual(row["module"], "gui_script_pipeline_095")
+                module = ("gui_options_labels_095" if address in (0xF4347, 0xF44B6)
+                          else "gui_script_pipeline_095")
+                self.assertEqual(row["module"], module)
                 self.assertEqual(row["state"], "drafted")
                 self.assertEqual(row["sig_status"], signature_status)
 
@@ -92,6 +96,26 @@ class OriginalBytes095(unittest.TestCase):
                         0xF3B40, 0xF3B58):
             with self.subTest(handler=hex(handler)):
                 self.assertIn(handler, calls)
+
+    def test_option_label_table_storage_and_deletion(self):
+        store = self.body(0xF4347)
+        find = self.body(0xF44B6)
+        store_calls = self.calls(0xF4347)
+        find_calls = self.calls(0xF44B6)
+        self.assertEqual(store[:1], b"\x53")
+        self.assertEqual(find[:1], b"\x53")
+        self.assertIn(b"\x80\xfa\x3d", store)
+        self.assertIn(0xF44B6, store_calls)
+        self.assertIn(0xFC795, store_calls)
+        self.assertIn(0xE8651, store_calls)
+        self.assertIn(0x109E6F, store_calls)
+        self.assertIn(0xB3FB0, store_calls)
+        self.assertEqual(find_calls.count(0xDDBC8), 2)
+        self.assertIn(0xFA9D2, find_calls)
+        self.assertIn(0x109E6F, find_calls)
+        for body in (store, find):
+            for addr in (0x160A18, 0x160A1C):
+                self.assertIn(struct.pack("<I", addr), body)
 
 
 if __name__ == "__main__":
