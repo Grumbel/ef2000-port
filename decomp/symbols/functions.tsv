@@ -3629,7 +3629,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f2c78	87	read_script_line_f2c78	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f2c78.json	docs/compiler-abi.md; Read the next script line (after leading blanks) from dword 0x485924 into 0x485956.; callers f2d74@f2d74,f3a1c@f3a36,f3a1c@f3a62; guest pending
 0x000f2cd0	131	read_script_token_f2cd0	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f2cd0.json	docs/compiler-abi.md; Copy the next token of the line at 0x485956 to 0x48592c.; callers f2d74@f2d94,f2dfc@f2e02,f2e54@f2e55; guest pending
 0x000f2d54	31	path_ends_with_colon	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2d54.json	docs/compiler-abi.md; The string at 0x48592c ends with ':'.; callers f2d74@f2d99; guest pending
-0x000f2d74	86			unknown	unclassified	unverified		
+0x000f2d74	86	gui_options_read_command_f2d74	gui_options_reader_096	drafted	game	unverified		docs/subsystems/decomp-batch-096.md; original OPTIONS line reader and ASCII-lowercase token; reuses compiled f2c78/f2cd0/f2d54, guest splice pending
 0x000f2dcc	46	strip_extension	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2dcc.json	docs/compiler-abi.md; Truncate the string at the last '.'.; callers f2dfc@f2e15; guest pending
 0x000f2dfc	86	restart_driver_f2dfc	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000f2dfc.json	docs/compiler-abi.md; Save the current path, restart the driver and abort when it fails.; callers f3b78@f3b99; guest pending
 0x000f2e54	30	copy_path_f2e54	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f2e54.json	docs/compiler-abi.md; 0xf2cd0(), 0x9d749(0x485908, 0x48592c), byte 0x4859de = 1.; callers f3b78@f3bb3; guest pending
@@ -3679,7 +3679,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f5484	531	read_six_option_coordinates	gui_script_pipeline_095	drafted	game	unverified		docs/subsystems/decomp-batch-095.md; [FROM] xy [SIZE] wh [HOTSPOT] xy, six conversion errors and callback install
 0x000f57d4	78	push_node_f57d4	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f57d4.json	docs/compiler-abi.md; Take a node from the free list at 0x485df8 (or allocate one) and push it on the list at 0x485df4.; callers f4a88@f4a8d; guest pending
 0x000f5e6c	61	latch_words_f5e6c	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f5e6c.json	docs/compiler-abi.md; Latch six words and install the 0xf5eac handler.; callers f5484@f5688; guest pending
-0x000f6124	38	format_global_option_line	unk_parser	named	game	unverified		docs/compiler-abi.md; zero caller arguments, indirect format call [0x132a74], EDX saved; clobbers unresolved
+0x000f6124	38	format_global_option_line	gui_options_reader_096	drafted	game	unverified		docs/subsystems/decomp-batch-096.md; four-argument indirect formatter [0x132a74], EDX saved, callback ABI unresolved
 0x000f7518	98	merge_pending_flags2_f7518	game_helpers79	compiles	game	confirmed	decomp/tests/0x000f7518.json	docs/compiler-abi.md; Merge the pending flag word into the second flag field, or clear it (mode 2 skips the refresh).; callers none direct; guest pending
 0x000f75e0	119	merge_pending_flags_f75e0	game_helpers75	compiles	game	confirmed	decomp/tests/0x000f75e0.json	docs/compiler-abi.md; Merge the pending flag word into the active record, or clear it.; callers none direct; guest pending
 0x000f79b0	62	or_flag_mask_f79b0	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000f79b0.json	docs/compiler-abi.md; OR the mask at 0x46438c into the flag words.; callers none direct; guest pending

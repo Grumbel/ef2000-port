@@ -162,6 +162,16 @@
             tests/decomp_gui_options_095_test.c \
             decomp/src/gui_options_labels_095.c \
             -o objects/ef2000-decomp-gui-options-095-test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+            -DEF_DECOMP_HOST_TEST=1 -ffunction-sections -fdata-sections \
+            -Idecomp/include \
+            tests/decomp_gui_options_096_test.c \
+            decomp/src/gui_options_reader_096.c \
+            decomp/src/gui_script_pipeline_095.c \
+            decomp/src/runtime_helpers2.c \
+            decomp/src/misc_helpers2.c \
+            -Wl,--gc-sections \
+            -o objects/ef2000-decomp-gui-options-096-test
           runHook postBuild
         '';
 
@@ -179,6 +189,7 @@
           objects/ef2000-decomp-gui-script-094-test
           objects/ef2000-decomp-gui-script-095-test
           objects/ef2000-decomp-gui-options-095-test
+          objects/ef2000-decomp-gui-options-096-test
           objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
             --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
           objects/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'
