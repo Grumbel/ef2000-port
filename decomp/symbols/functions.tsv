@@ -3181,28 +3181,28 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000db654	218	sun_texture		named	unclassified	unverified		
 0x000db730	214	cannon_hit		named	unclassified	unverified		
 0x000db808	158	fix_horizon		named	unclassified	unverified		
-0x000db8a8	8	unfix_horizon		named	unclassified	unverified		
-0x000db8b0	9	load_horizon		named	unclassified	unverified		
+0x000db8a8	8	unfix_horizon	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; guest pending
+0x000db8b0	9	load_horizon	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; guest pending
 0x000db8bc	160	heavenly_body		named	unclassified	unverified		
-0x000db95c	74	craft_hit_water		named	unclassified	unverified		
-0x000db9a8	74	craft_hit_ground		named	unclassified	unverified		
-0x000db9f4	74	cannon_hit_concrete		named	unclassified	unverified		
-0x000dba40	74	missile_hit		named	unclassified	unverified		
-0x000dba8c	74	cannon_hit_water		named	unclassified	unverified		
-0x000dbad8	74	cannon_hit_ground		named	unclassified	unverified		
-0x000dbb24	74	missile_hit_concrete		named	unclassified	unverified		
-0x000dbb70	74	bomb_hit		named	unclassified	unverified		
-0x000dbbbc	74	missile_hit_water		named	unclassified	unverified		
-0x000dbc08	74	missile_hit_ground		named	unclassified	unverified		
-0x000dbc54	74	bomb_hit_concrete		named	unclassified	unverified		
-0x000dbca0	74	craft_hit_building		named	unclassified	unverified		
-0x000dbcec	74	bomb_hit_water		named	unclassified	unverified		
-0x000dbd38	74	bomb_hit_ground		named	unclassified	unverified		
-0x000dbd84	74	depth_fade		named	unclassified	unverified		
+0x000db95c	74	craft_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000db9a8	74	craft_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000db9f4	74	cannon_hit_concrete	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dba40	74	missile_hit	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dba8c	74	cannon_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbad8	74	cannon_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbb24	74	missile_hit_concrete	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbb70	74	bomb_hit	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbbbc	74	missile_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbc08	74	missile_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbc54	74	bomb_hit_concrete	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbca0	74	craft_hit_building	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbcec	74	bomb_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbd38	74	bomb_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000dbd84	74	depth_fade	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
 0x000dbdd0	88	normal		named	unclassified	unverified		
-0x000dbe28	8	corridor		named	unclassified	unverified		
-0x000dbe30	33	planet2		named	unclassified	unverified		
-0x000dbe54	8	space		named	unclassified	unverified		
+0x000dbe28	8	corridor	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 2; guest pending
+0x000dbe30	33	planet2	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 4 in two globals; guest pending
+0x000dbe54	8	space	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bits 0x42; guest pending
 0x000dbe5c	33	spacecorr		named	unclassified	unverified		
 0x000dbe80	41	rings		named	unclassified	unverified		
 0x000dbeac	46	moon		named	unclassified	unverified		
