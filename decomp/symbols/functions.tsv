@@ -3652,7 +3652,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f3b1c	33	load_path_f3b1c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3b1c.json	docs/compiler-abi.md; ; callers f3b78@f3cd5; guest pending
 0x000f3b40	22	load_path_value_f3b40	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3b40.json	docs/compiler-abi.md; As 0xf35d8, storing word 0x161e1e.; callers f3b78@f3cf6; guest pending
 0x000f3b58	32	load_path_pointer_f3b58	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f3b58.json	docs/compiler-abi.md; ; callers f3b78@f3d43; guest pending
-0x000f3b78	476	process_command_dispatch_loop	unk_parser	typed	game	confirmed		docs/compiler-abi.md; zero inputs, side effects on command globals, EBX/ECX/EDX saved; caller sites 0xf40a3/0xf41a0; indirect formatting through a helper
+0x000f3b78	476	process_command_dispatch_loop	gui_script_pipeline_095	drafted	game	confirmed		docs/subsystems/decomp-batch-095.md; OPTIONS keyword dispatcher, 14 command branches, host-adapted reader and handlers; no guest splice
 0x000f3d54	560			unknown	unclassified	unverified		
 0x000f3f84	497			unknown	unclassified	unverified		
 0x000f4178	47	reset_flags_f4178	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f4178.json	docs/compiler-abi.md; ; callers f41dc@f42af; guest pending
@@ -3663,7 +3663,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f44b6	224			unknown	unclassified	unverified		
 0x000f45d8	104	read_buffered_char_f45d8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f45d8.json	docs/compiler-abi.md; Read one character from the buffer at 0x485e59 (see 0xe774).; callers f4640@f464e,f4640@f4665,f4640@f4696; guest pending
 0x000f4640	138	read_script_line_f4640	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f4640.json	docs/compiler-abi.md; Read the next significant script line into the buffer at 0x4859e0: leading spaces/tabs are skipped, characters are store; callers none direct; guest pending
-0x000f46cc	190	read_next_command_token	unk_cli	typed	game	confirmed		docs/compiler-abi.md; token into 0x485e08; 16-bit cursor at 0x161eac
+0x000f46cc	190	read_next_command_token	gui_script_pipeline_095	drafted	game	confirmed		docs/subsystems/decomp-batch-095.md; native lexer, token buffer 0x485e08, signed word cursor 0x161eac, 80-byte cap
 0x000f478c	100	run_matching_handler_f478c	runtime_helpers29	compiles	game	confirmed	decomp/tests/0x000f478c.json	docs/compiler-abi.md; Run the handler of the table entry whose name matches the current one.; callers f4a88@f4b2a,f4bdc@f4c06,f4c60@f4c91; guest pending
 0x000f4a88	337	run_top_script_f4a88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f4a88.json	docs/compiler-abi.md; Start the script section at the top level: push a fresh node (0xf57d4), set its default view words (+0x4f/+0x51 = 0x14, ; callers f478c@f47bb; guest pending
 0x000f4bdc	131	run_command_loop_f4bdc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000f4bdc.json	docs/compiler-abi.md; Reset the command parser state (0x485dfc = 3, 0x485f70/71 = 0), read tokens and run handlers until 0x485e08 clears, repo; callers none direct; guest pending
@@ -3676,7 +3676,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f5180	145	POINTER	gui_script_properties_094	drafted	game	unverified		docs/subsystems/decomp-batch-094.md; node+29 token copy and pointer flag, host adapter
 0x000f5214	423	GADGETRY	gui_script_assets_094	drafted	game	unverified		docs/subsystems/decomp-batch-094.md; asset path adapters and 256-entry RGB brightest/darkest search
 0x000f53bc	200	NAME	gui_script_assets_094	drafted	game	unverified		docs/subsystems/decomp-batch-094.md; second-buffer asset path selection, host adapter
-0x000f5484	531			unknown	unclassified	unverified		
+0x000f5484	531	read_six_option_coordinates	gui_script_pipeline_095	drafted	game	unverified		docs/subsystems/decomp-batch-095.md; [FROM] xy [SIZE] wh [HOTSPOT] xy, six conversion errors and callback install
 0x000f57d4	78	push_node_f57d4	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000f57d4.json	docs/compiler-abi.md; Take a node from the free list at 0x485df8 (or allocate one) and push it on the list at 0x485df4.; callers f4a88@f4a8d; guest pending
 0x000f5e6c	61	latch_words_f5e6c	game_helpers29	compiles	game	confirmed	decomp/tests/0x000f5e6c.json	docs/compiler-abi.md; Latch six words and install the 0xf5eac handler.; callers f5484@f5688; guest pending
 0x000f6124	38	format_global_option_line	unk_parser	named	game	unverified		docs/compiler-abi.md; zero caller arguments, indirect format call [0x132a74], EDX saved; clobbers unresolved

@@ -50,7 +50,7 @@ The host-side emulator remains the validation oracle. See
 
 Status (2026-11-05): 4,277 Ghidra-inventoried functions plus 10 manually
 confirmed additional entry points (4,287 tracked); 3,257 marked `compiles`,
-238 additional host-tested `drafted` entry points, and none verified as a
+241 additional host-tested `drafted` entry points, and none verified as a
 compiled-and-spliced C replacement. The tracker is authoritative. See
 [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
 and [renderer/driver batch 083](../docs/subsystems/decomp-batch-083.md) for
@@ -87,3 +87,6 @@ The [GUI script parser batch 094](../docs/subsystems/decomp-batch-094.md)
 adds seven source-grounded host C handlers for layout properties, string
 commands, resource paths and palette extrema; tokenizer and graphics-driver
 guest boundaries still require differential replay.
+The [GUI script control batch 095](../docs/subsystems/decomp-batch-095.md)
+adds a native guest-RAM lexer, the six-number FROM/SIZE/HOTSPOT reader and
+the 14-command OPTIONS dispatcher. Its remaining helpers use host adapters.
