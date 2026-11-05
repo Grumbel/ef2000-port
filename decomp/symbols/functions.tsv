@@ -2760,11 +2760,11 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c3f70	5	tail_jump_c3f70	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c3f70.json	docs/compiler-abi.md; tail jump. Forward to 0xfc795.; callers d68c@d6df,7a3e8@7a3f8,9ccb8@9cd87; guest pending
 0x000c3f78	5	tail_jump_c3f78	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c3f78.json	docs/compiler-abi.md; tail jump. Forward to 0xfc354.; callers cc744@cc749; guest pending
 0x000c3f80	5	tail_jump_c3f80	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c3f80.json	docs/compiler-abi.md; tail jump. Forward to 0xfa9d2.; callers b1e0@b383,7a434@7a442,9ce84@9cecd; guest pending
-0x000c3fd4	200			unknown	unclassified	unverified		
-0x000c409c	103			unknown	unclassified	unverified		
+0x000c3fd4	200	renderer_partial_quicksort_c3fd4	renderer_sort_queue	drafted	game	unverified		Original partition with end-pivot and five-element cutoff; signed 16-bit key/index pair; host-tested; guest ABI pending
+0x000c409c	103	renderer_insertion_sort_c409c	renderer_sort_queue	drafted	game	unverified		Finishing insertion sort of signed depth keys and matching tags; sentinel required; host-tested; guest ABI pending
 0x000c4105	98	reset_view_c4105	engine_helpers	compiles	game	confirmed	decomp/tests/0x000c4105.json	docs/compiler-abi.md; ; callers b69c@b6c0,39744@3979d,3dd30@3e01f; guest pending
-0x000c4167	73			unknown	unclassified	unverified		
-0x000c41b0	131			unknown	unclassified	unverified		
+0x000c4167	73	renderer_finish_queue_c4167	renderer_sort_queue	drafted	game	unverified		Self-modified JGE-state sort guard and callback dispatch; host-tested; guest ABI pending
+0x000c41b0	170	renderer_enqueue_c41b0	renderer_sort_queue	drafted	game	unverified		Queue insertion and both 0x800-overflow paths; repaired omitted patched branch c4233..c4259; host-tested; guest ABI pending
 0x000c425a	17	run_handler_stack_c425a	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c425a.json	docs/compiler-abi.md; At the entry (the loop at 0xc4281 follows). Implicit-register fragment: walk the word stack at 0x147e56 from the top (wo; callers c4167@c41a2; guest pending
 0x000c4281	30			unknown	unclassified	unverified		
 0x000c4310	99	remap_handler_c4310	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4310.json	docs/compiler-abi.md; Map a code address to its replacement handler; unmatched addresses are recorded and routed to 0xc4377.; callers fcc01@fcc15,fcc6f@fcc91; guest pending
@@ -2790,16 +2790,24 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c4c30	155	render_texture_stream_c4c30	renderer_streams	drafted	game	unverified		Manually recovered ENTER/RET 4 boundary absent from 4277-function Ghidra inventory; requires Ghidra boundary repair
 0x000c4ccb	120	render_index_stream_c4ccb	renderer_streams	drafted	game	unverified		Manually recovered ENTER/RET 4 boundary absent from 4277-function Ghidra inventory; requires Ghidra boundary repair
 0x000c4d43	112	render_index_stream_c4d43	renderer_streams	drafted	game	unverified		Mode/count stream followed by indexed vertex render; host test only; guest ABI pending
-0x000c4db4	135			unknown	unclassified	unverified		
+0x000c4db4	135	renderer_normalize_scene_c4db4	graphics_driver_entries	drafted	game	unverified		Big-endian scene header and threaded-record loop, parser guest dependency; host-tested; guest ABI pending
 0x000c4e3b	39	dispatch_swapped_c4e3b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c4e3b.json	docs/compiler-abi.md; Implicit-register fragment (ESI = record, EBX is an out value): byte-swap the word at ESI+0x10, shift it left by two, st; callers c4db4@c4e15; guest pending
 0x000c5261	120			unknown	unclassified	unverified		
-0x000c5372	27	swap_word_c5372	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5372.json	docs/compiler-abi.md; Implicit-register fragment (EBX is an in/out pointer): byte-swap the word at EBX. Returns 1 when the swapped word is 0xc; callers none direct; guest pending
+0x000c5369	9	renderer_write_special_word_c5369	renderer_endian_helpers	drafted	game	unverified		Manually identified subroutine branch writing constant 0xbf; host-tested; guest implicit EBX pending
+0x000c5372	18	swap_word_c5372	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5372.json	docs/compiler-abi.md; Implicit-register fragment (EBX is an in/out pointer): byte-swap the word at EBX. Returns 1 when the swapped word is 0xc; callers none direct; guest pending; corrected overlap with omitted c5384 subroutine
+0x000c5384	12	renderer_swap_word_c5384	renderer_endian_helpers	drafted	game	unverified		Manually identified implicit EBX big-endian word converter missed in prior Ghidra function boundary; host-tested
 0x000c5390	12	swap_word_c5390	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c5390.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
 0x000c539c	12	swap_word_c539c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c539c.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
 0x000c53a8	12	swap_word_c53a8	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c53a8.json	docs/compiler-abi.md; Byte-swap a word in place; returns the advanced pointer (EBX).; callers none direct; guest pending
+0x000c53b4	27	renderer_index_biased_c53b4	renderer_endian_helpers	drafted	game	unverified		Manually identified biased 48-byte stride converter; host-tested; guest implicit EBX pending
+0x000c53cf	16	renderer_index_absolute_c53cf	renderer_endian_helpers	drafted	game	unverified		Manually identified absolute 48-byte stride converter; host-tested; guest implicit EBX pending
 0x000c53df	15	swap_dword_c53df	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c53df.json	docs/compiler-abi.md; Byte-swap a dword in place; returns the advanced pointer (EBX).; callers none direct; guest pending
 0x000c5409	56	divide_table_entries_c5409	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5409.json	docs/compiler-abi.md; Divide the three table entries at index ESI (dword arrays 0x150e58, 0x152e58 and 0x154e58) by the signed byte DIV (AL); ; callers c552e@c5540,c565e@c5670; guest pending
 0x000c5441	62	multiply_table_entries_c5441	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c5441.json	docs/compiler-abi.md; Multiply the three table entries at index ESI (arrays 0x150e58, 0x152e58, 0x154e58) by the signed byte MUL (AL, sign ext; callers c552e@c5549,c565e@c5679; guest pending
+0x000c547f	31	renderer_toggle_opcode_a_c547f	renderer_opcode_entries	drafted	game	unverified		Manually identified threaded opcode handler A toggle; c5551 remains guest callback; host-tested
+0x000c549e	25	renderer_reset_opcode_a_c549e	renderer_opcode_entries	drafted	game	unverified		Manually identified threaded opcode handler A reset; c5551 remains guest callback; host-tested
+0x000c54b7	31	renderer_toggle_opcode_b_c54b7	renderer_opcode_entries	drafted	game	unverified		Manually identified threaded opcode handler B toggle; c5681 remains guest callback; host-tested
+0x000c54d6	25	renderer_reset_opcode_b_c54d6	renderer_opcode_entries	drafted	game	unverified		Manually identified threaded opcode handler B reset; c5681 remains guest callback; host-tested
 0x000c54ef	41	fetch_scaled_value_c54ef	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c54ef.json	docs/compiler-abi.md; Fetch the scaled value for table index EDI (implicit register): clear byte 0x158ed8, take the signed word 0x14fe58[index; callers c5551@c5562,c5681@c5692; guest pending
 0x000c552e	35	scale_entry_c552e	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c552e.json	docs/compiler-abi.md; Implicit-register fragment (ESI = index): scale the table entries at INDEX by the signed byte at 0x149e58 + INDEX; 1 and; callers 16018a@16024f; guest pending
 0x000c5551	59			unknown	unclassified	unverified		
@@ -2833,7 +2841,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c89f4	40	project_offset_point_c89f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c89f4.json	docs/compiler-abi.md; As 0xc89cc but ESI = EBX + camera position.; callers c8820@c8936,c8820@c8941; guest pending
 0x000c8c34	60	add_patched_offsets_c8c34	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8c34.json	docs/compiler-abi.md; Implicit-register fragment (EDI = output record pointer, advanced by 0x30): add three patched 32-bit immediates (at 0xc8; callers none direct; guest pending
 0x000c8c78	63	render_vertex_list_c8c78	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8c78.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source vertex words, ECX = count; params in that order): temporarily point the vertex-; callers c71dc@c7305,c8820@c8955,fd164@fd2a7; guest pending
-0x000c8ccc	58			unknown	unclassified	unverified		
+0x000c8ccc	58	renderer_viewport_five_c8ccc	graphics_driver_entries	drafted	game	unverified		Packed five-word viewport argument order and carry-based flush; host-tested; guest ABI pending
 0x000c8d10	31	rotate_offset_shift_c8d10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8d10.json	docs/compiler-abi.md; (ret 8) Wrapper for 0xc8d30 that first shifts eax, edx and ebx left by 16.; callers b69c@b948; guest pending
 0x000c8d30	183	rotate_offset_c8d30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000c8d30.json	docs/compiler-abi.md; (ret 8) Offset a 16.16 vector (eax, edx, ebx) by the table-rotated displacement of length s1: two angles (-ecx and -s0, ; callers 69740@69800,7d1f0@7d291,944f4@94557; guest pending
 0x000c8e38	9	clear_byte_c8e38	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000c8e38.json	docs/compiler-abi.md; ; callers ac408@ac438; guest pending
@@ -3311,7 +3319,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e0b10	92	find_text_in_buffer_e0b10	search_helpers1	compiles	game	confirmed	decomp/tests/0x000e0b10.json	docs/compiler-abi.md; Search the buffer at 0x15f5fd (length byte at 0x15f684) for the text, ignoring case; on a hit remember its position at 0; callers e0b88@e0bbd,e115c@e1172,e1260@e1265; guest pending
 0x000e0b6c	28	open_devices_e0b6c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e0b6c.json	docs/compiler-abi.md; Opens the device named at 0x15f4fd, waits 0x96 ticks, then falls through into 0xe0b88 with EAX = 0x15f5bd (a second devi; callers none direct; guest pending
 0x000e0b88	65	open_device_e0b88	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000e0b88.json	docs/compiler-abi.md; Open the device selected by value and report success.; callers e0b6c@e0b71,e0bcc@e0c37,e1194@e11c6; guest pending
-0x000e0bcc	114			unknown	unclassified	unverified		
+0x000e0bcc	114	audio_maybe_restart_device_e0bcc	driver_aux_entries	drafted	game	unverified		Conditional hardware status-reset and device reopen with explicit I/O hooks; host-tested; guest I/O pending
 0x000e10a0	63	send_serial_text_e10a0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e10a0.json	docs/compiler-abi.md; Send the text at TEXT (EAX) to the serial port at base dword 0x15eed0: remember the pointer in dword 0x15f690, set byte ; callers e0b88@e0b92,e0b88@e0b9c,e0bcc@e0c23; guest pending
 0x000e10e0	48	reset_table_15f5fd	math_string	compiles	game	confirmed	decomp/tests/0x000e10e0.json	docs/compiler-abi.md; Byte 0x15f685 = 0, fill 0x80 bytes at 0x15f5fd with 0xff, * byte 0x15f684 = 0, byte 0x15f685 = 1.; callers e0b88@e0b8b,e1194@e11a8; guest pending
 0x000e1110	29	wait_ticks_e1110	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1110.json	docs/compiler-abi.md; Busy-wait for the given number of clock ticks.; callers e0b88@e0bb3,e0bcc@e0bfa,e0bcc@e0c2d; guest pending
@@ -3421,7 +3429,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e7850	97	init_time_constants_e7850	game_helpers37	compiles	game	confirmed	decomp/tests/0x000e7850.json	docs/compiler-abi.md; Store the double constants used by the time conversion.; callers e78b4@e7935; guest pending
 0x000e78b4	366			unknown	unclassified	unverified		
 0x000e7a30	1	nop_e7a30	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000e7a30.json	docs/compiler-abi.md; Empty stub (single ret).; callers 581b0@581d1,581b0@5862c,581b0@58651; guest pending
-0x000e7a34	71			unknown	unclassified	unverified		
+0x000e7a34	71	renderer_viewport_six_e7a34	graphics_driver_entries	drafted	game	unverified		Packed six-word viewport argument order and carry-based renderer dispatch; host-tested; guest ABI pending
 0x000e7a7c	459	build_rotation_matrix_e7a7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e7a7c.json	docs/compiler-abi.md; Higher precision rotation matrix builder: the angles in EBX, ESI, EDI (halved and masked to table offsets, kept as words; callers c4654@c4675,c5261@c5277; guest pending
 0x000e7c50	63	set_page_word_e7c50	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c50.json	docs/compiler-abi.md; Store a word into the 0x190c3c page table entry.; callers 68a2c@68a58,68a60@68ace,68a60@68b3a; guest pending
 0x000e7c90	64	get_page_word_e7c90	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000e7c90.json	docs/compiler-abi.md; Read a word from the 0x190c3c page table entry, or 0.; callers 68e84@68e9e; guest pending
@@ -3706,10 +3714,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000f9ed2	13	call_f9dcb	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000f9ed2.json	docs/compiler-abi.md; ; callers 101c54@101ce6; guest pending
 0x000f9ee0	331	decompress_bitstream_backrefs	unk_runtime	typed	asm	confirmed		ABI only; dest/source stack pointers, ret 8, ES output and DF clear
 0x000fa02c	310	decompress_ra_stream	unk_runtime	typed	asm	confirmed		ABI only; source/dest stack pointers, EAX Boolean, ret 8, INT3 on failure
-0x000fa16e	102			unknown	unclassified	unverified		
+0x000fa16e	102	bitstream_decode_extended_fa16e	bitstream_extended	drafted	game	unverified		Huffman extension escape decoder: 2-bit high group plus literal byte; host-tested; guest refill pending
 0x000fa1d4	44	bitstream_decode_symbol_fa1d4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa1d4.json	docs/compiler-abi.md; Implicit-register fragment (AL = bit buffer with trailing 1 sentinel, ESI = byte pointer, EDX = bytes left, params in th; callers fa02c@fa0ff; guest pending
 0x000fa200	81	decode_symbol_fa200	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa200.json	docs/compiler-abi.md; Implicit-register fragment (ESI = stream pointer, EDX = remaining bytes minus one, AL = bit buffer; all updated; ECX and; callers fa02c@fa118; guest pending
-0x000fa251	112			unknown	unclassified	unverified		
+0x000fa251	112	bitstream_decode_pair_streams_fa251	bitstream_extended	drafted	game	unverified		Dual-stream variable-width packet decoder, two outputs per pair; host-tested; guest refill pending
 0x000fa2ce	22	bitstream_read_bits_fa2ce	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa2ce.json	docs/compiler-abi.md; Implicit-register fragment (CL = bit count, AL = bit buffer with a trailing 1 sentinel, ESI, EDX as in 0xfa31b; AL/ESI/E; callers fa251@fa26b,fa251@fa27a,fa251@fa29e; guest pending
 0x000fa2e4	55	checksum_bytes_fa2e4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa2e4.json	docs/compiler-abi.md; Implicit-register fragment (ESI = data pointer, EDX = byte count; params in that order): the two-byte running checksum (; callers fa02c@fa14e; guest pending
 0x000fa31b	23	bitstream_read_word_fa31b	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000fa31b.json	docs/compiler-abi.md; Implicit-register fragment (ESI = stream pointer, EDX = remaining bytes minus one; both updated): fetch the next two byt; callers fa02c@fa04b,fa02c@fa050,fa02c@fa055; guest pending
@@ -4135,7 +4143,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00115989	61	file_size_115989	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x00115989.json	docs/compiler-abi.md; Size of an open file: remember the position, seek to the end, seek back; -1 when the position query fails.; callers 105024@105050; guest pending
 0x001177ad	71	mix_samples_1177ad	misc_drafts1	compiles	game	confirmed	decomp/tests/0x001177ad.json	docs/compiler-abi.md; Implicit-register fragment (ESI = source pointer, ECX = fractional step accumulator, EDX = gain table, EDI = destination; callers 1177f4@117949; guest pending
 0x001177f4	539			unknown	unclassified	unverified		
-0x00117a0f	147			unknown	unclassified	unverified		
+0x00117a0f	147	video_dispatch_scanline_117a0f	driver_aux_entries	drafted	game	unverified		Scanline converter flags, indexed/interleaved addresses and indirect callback; host-tested; guest ABI pending
 0x00117aa2	44	clear_buffer_117aa2	runtime_helpers40	compiles	game	confirmed	decomp/tests/0x00117aa2.json	docs/compiler-abi.md; Zero the buffer at +0x50 (length at +0x4c) of a record (cdecl, record on the stack).; callers 105648@105713,10585c@1058b3,10585c@105c60; guest pending
 0x00117ace	47	register_locked_ranges_117ace	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117ace.json	docs/compiler-abi.md; Register the two memory ranges 0x17e270..0x17e290 and 0x1159c8..0x117ace with the lock service (0x104840, cdecl) around ; callers 105230@1052dc; guest pending
 0x00117b0c	10	outp_117b0c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00117b0c.json	docs/compiler-abi.md; outp: write the byte VALUE to the I/O port PORT.; callers 117b18@117bc4,117bfc@117d2a,117e0c@117e67; guest pending
@@ -4238,7 +4246,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0011d614	43	set_dos_vector_11d614	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d614.json	docs/compiler-abi.md; Register parameters AL = interrupt vector, EBX = handler offset, ECX = handler selector. Sets a DOS interrupt vector (IN; callers 11ce30@11cf07,11cfe4@11cfc4,11d01c@11d0fe; guest pending
 0x0011d63f	29	read_console_char_11d63f	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0011d63f.json	docs/compiler-abi.md; Return the pending pushed-back character in dword 0x132a50 (clearing it) or, when none is pending, read one character fr; callers 10f1bf@10f210; guest pending
 0x0011d695	444			unknown	unclassified	unverified		
-0x0011f287	76			unknown	unclassified	unverified		
+0x0011f287	76	dos_regblock_int21_11f287	dos_regblock_bridge	drafted	game	unverified		Six-register DOS INT21 bridge with carry status forwarded to environment; host-tested; guest interrupt pending
 0x0011f2d3	2	disable_interrupts_11f2d3	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011f2d3.json	docs/compiler-abi.md; Disable interrupts (no-op on the host).; callers 117e0c@117e57,117f68@1180b7,118290@1182a2; guest pending
 0x0011f2d5	2	enable_interrupts_11f2d5	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0011f2d5.json	docs/compiler-abi.md; Enable interrupts (no-op on the host).; callers 117e0c@117e9a,117f68@11826c,118290@11841c; guest pending
 0x0011f308	79	trig_lookup_11f308	runtime_helpers3	compiles	game	confirmed	decomp/tests/0x0011f308.json	docs/compiler-abi.md; Interpolated table lookup (6-bit fraction, 0x17ea2c table), result >> 14.; callers 11f368@11f3c0,11f368@11f3d9,11f368@11f3f7; guest pending

@@ -6,6 +6,65 @@
 
 #include "ef_types.h"
 
+/* Renderer depth queue and endianness helpers, original entries c3fd4..c53cf.
+ * The original EBX cursor and indirect frame callback are explicit in these
+ * host-only drafts, until their guest ABI can be reproduced and spliced. */
+void renderer_partial_quicksort_c3fd4(int32_t low, int32_t high);
+void renderer_insertion_sort_c409c(void);
+void renderer_finish_queue_c4167(void);
+void renderer_enqueue_c41b0(uint16_t key);
+void renderer_frame_callback_c4167(ef_addr32 callback);
+uint16_t renderer_write_special_word_c5369(ef_addr32 *cursor);
+uint16_t renderer_swap_word_c5384(ef_addr32 *cursor);
+uint16_t renderer_index_biased_c53b4(ef_addr32 *cursor);
+uint16_t renderer_index_absolute_c53cf(ef_addr32 *cursor);
+
+/* Buffered Huffman and two-stream decoders (register ABI exposed as pointers). */
+void bitstream_refill_fa332(uint32_t *esi, int32_t *edx);
+uint32_t bitstream_decode_extended_fa16e(uint8_t *buffer,
+                                          ef_addr32 *source, int32_t *remaining);
+void bitstream_decode_pair_streams_fa251(uint8_t *buffer,
+                                        ef_addr32 *source, int32_t *remaining,
+                                        ef_addr32 out_a, ef_addr32 out_b);
+
+/* BE graphics stream / video driver entry points with injected guest calls. */
+void renderer_normalize_scene_c4db4(ef_addr32 scene);
+void renderer_scene_error_c4db4(ef_addr32 message);
+void renderer_scene_zero_c4db4(ef_addr32 location);
+void renderer_scene_record_c4db4(ef_addr32 record);
+void renderer_viewport_five_c8ccc(uint16_t a, uint16_t b, uint16_t c,
+                                 uint16_t d, uint16_t e);
+void renderer_viewport_six_e7a34(uint16_t a, uint16_t b, uint16_t c,
+                                uint16_t d, uint16_t e, uint16_t f);
+uint8_t renderer_viewport_check_c8ccc(ef_addr32 buffer);
+void renderer_viewport_flush_c8ccc(void);
+uint8_t renderer_viewport_check_e7a34(ef_addr32 buffer);
+void renderer_viewport_flush_e7a34(ef_addr32 buffer);
+void audio_maybe_restart_device_e0bcc(void);
+uint8_t audio_port_read_e0bcc(uint32_t port);
+void audio_port_write_e0bcc(uint32_t port, uint8_t value);
+void audio_wait_e0bcc(uint32_t ticks);
+void audio_open_e0bcc(ef_addr32 name);
+void audio_device_e0bcc(ef_addr32 name);
+void video_dispatch_scanline_117a0f(ef_addr32 record, uint32_t row);
+void video_scanline_callback_117a0f(ef_addr32 target, uint32_t ebx,
+                                    uint32_t ecx, uint32_t esi, uint32_t edi);
+
+/* Distinct threaded renderer opcode entries (the interpreters remain guest). */
+void renderer_toggle_opcode_a_c547f(uint32_t index);
+void renderer_reset_opcode_a_c549e(uint32_t index);
+void renderer_toggle_opcode_b_c54b7(uint32_t index);
+void renderer_reset_opcode_b_c54d6(uint32_t index);
+void renderer_opcode_setup_c54xx(uint32_t code);
+void renderer_opcode_dispatch_c54xx(ef_addr32 entry, uint32_t index);
+void renderer_opcode_install_c54xx(void);
+
+/* DOS INT 21 register-block adapter, native interrupt remains a guest hook. */
+uint32_t dos_regblock_int21_11f287(ef_addr32 regs, ef_addr32 environment);
+uint8_t dos_dispatch_int21_11f287(uint32_t *a, uint32_t *b, uint32_t *c,
+                                  uint32_t *d, uint32_t *s, uint32_t *i);
+void dos_status_bridge_11f287(uint32_t context, uint32_t carry_mask);
+
 /* Parser and tactical-activity helpers, host drafts pending guest proof. */
 uint32_t mirror_reference_state(void); /* 0x37294 */
 void normalize_script_line_endings(ef_addr32 text); /* 0x3cc28 */

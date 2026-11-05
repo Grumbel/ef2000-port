@@ -614,6 +614,33 @@
           work/renderer_streams_host_test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
+            ${source}/tests/decomp_renderer_sort_queue_test.c \
+            ${source}/decomp/src/renderer_sort_queue.c \
+            ${source}/decomp/src/renderer_endian_helpers.c \
+            -o work/renderer_sort_queue_host_test
+          work/renderer_sort_queue_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_bitstream_extended_test.c \
+            ${source}/decomp/src/bitstream_extended.c \
+            -o work/bitstream_extended_host_test
+          work/bitstream_extended_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_graphics_driver_entries_test.c \
+            ${source}/decomp/src/graphics_driver_entries.c \
+            ${source}/decomp/src/driver_aux_entries.c \
+            -o work/graphics_driver_entries_host_test
+          work/graphics_driver_entries_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
+            ${source}/tests/decomp_opcode_dos_bridge_test.c \
+            ${source}/decomp/src/renderer_opcode_entries.c \
+            ${source}/decomp/src/dos_regblock_bridge.c \
+            -o work/opcode_dos_bridge_host_test
+          work/opcode_dos_bridge_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
             ${source}/tests/decomp_buffer_plane_test.c \
             ${source}/decomp/src/buffer_cursor.c \
             ${source}/decomp/src/plane_sources.c \
