@@ -6,6 +6,31 @@
 
 #include "ef_types.h"
 
+/* Batch 087: 15 original damage/environment parameter readers. The parser
+ * hook represents the untouched guest sscanf, not a confirmed Watcom ABI. */
+uint32_t environment_scan_value_087(ef_addr32 source, ef_addr32 format,
+                                    ef_addr32 output);
+uint32_t env_craft_hit_water_db95c(void);
+uint32_t env_craft_hit_ground_db9a8(void);
+uint32_t env_cannon_hit_concrete_db9f4(void);
+uint32_t env_missile_hit_dba40(void);
+uint32_t env_cannon_hit_water_dba8c(void);
+uint32_t env_cannon_hit_ground_dbad8(void);
+uint32_t env_missile_hit_concrete_dbb24(void);
+uint32_t env_bomb_hit_dbb70(void);
+uint32_t env_missile_hit_water_dbbbc(void);
+uint32_t env_missile_hit_ground_dbc08(void);
+uint32_t env_bomb_hit_concrete_dbc54(void);
+uint32_t env_craft_hit_building_dbca0(void);
+uint32_t env_bomb_hit_water_dbcec(void);
+uint32_t env_bomb_hit_ground_dbd38(void);
+uint32_t env_depth_fade_dbd84(void);
+void env_unfix_horizon_db8a8(void);
+void env_load_horizon_db8b0(void);
+void env_corridor_dbe28(void);
+uint32_t env_planet2_dbe30(uint32_t eax);
+void env_space_dbe54(void);
+
 /* Batch 086 multiplayer configuration and network UI callbacks. The call
  * hooks describe unresolved guest callees; they are NOT the guest Watcom ABI.
  * The parser and formatter hooks represent the original stack-local output
