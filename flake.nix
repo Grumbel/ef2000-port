@@ -641,6 +641,13 @@
           work/opcode_dos_bridge_host_test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
+            ${source}/tests/decomp_mission_callbacks_test.c \
+            ${source}/decomp/src/mission_map_callbacks.c \
+            ${source}/decomp/src/mission_menu_callbacks.c \
+            -o work/mission_callbacks_host_test
+          work/mission_callbacks_host_test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+            -I${source}/decomp/include \
             ${source}/tests/decomp_buffer_plane_test.c \
             ${source}/decomp/src/buffer_cursor.c \
             ${source}/decomp/src/plane_sources.c \

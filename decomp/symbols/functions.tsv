@@ -854,19 +854,19 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004b1a4	75	cgWarningOkClick		named	unclassified	unverified		
 0x0004b1f0	1199	mpSetWindows		named	unclassified	unverified		
 0x0004b6a0	1437	mpUpdateMap		named	unclassified	unverified		
-0x0004bc40	62	mpZoomInMap		named	unclassified	unverified		
+0x0004bc40	62	mpZoomInMap	mission_map_callbacks	drafted	game	unverified		Original disassembly; mode 1/2/4 callback dispatch; host-tested in batch 084
 0x0004bc80	82	update_marker_4bc80	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0004bc80.json	docs/compiler-abi.md; ; callers 4bc40@4bc51; guest pending
 0x0004bcd4	434	mpTargetListSelected		named	unclassified	unverified		
 0x0004be88	56	check_flags_4be88	game_helpers5	compiles	game	confirmed	decomp/tests/0x0004be88.json	docs/compiler-abi.md; ; callers 4bc40@4bc64; guest pending
-0x0004bec0	45	mpRedrawMap		named	unclassified	unverified		
-0x0004bef0	42	mpMapSelect		named	unclassified	unverified		
+0x0004bec0	45	mpRedrawMap	mission_map_callbacks	drafted	game	unverified		Original disassembly; dirty redraw and latch reset; host-tested in batch 084
+0x0004bef0	42	mpMapSelect	mission_map_callbacks	drafted	game	unverified		Original disassembly; map layers and mode-4 height widgets; host-tested in batch 084
 0x0004bf1c	516			unknown	unclassified	unverified		
 0x0004c120	446			unknown	unclassified	unverified		
 0x0004c33c	126	mpClickMap		named	unclassified	unverified		
 0x0004c3bc	593			unknown	unclassified	unverified		
-0x0004c610	37	mpCycleMap		named	unclassified	unverified		
-0x0004c638	50	mpEWRCoverage		named	unclassified	unverified		
-0x0004c66c	50	mpToggleFlags		named	unclassified	unverified		
+0x0004c610	37	mpCycleMap	mission_map_callbacks	drafted	game	unverified		Original disassembly; 16-bit map-mode switch and dirty flags; host-tested in batch 084
+0x0004c638	50	mpEWRCoverage	mission_map_callbacks	drafted	game	unverified		Original disassembly; byte increment with reset on exactly 3; host-tested in batch 084
+0x0004c66c	50	mpToggleFlags	mission_map_callbacks	drafted	game	unverified		Original disassembly; independent byte increment with reset on exactly 3; host-tested in batch 084
 0x0004c6a0	119	mpZoomOutMap		named	unclassified	unverified		
 0x0004c718	115	mpStrikeListSelected		named	unclassified	unverified		
 0x0004c78c	371	select_list_entry_by_kind_4c78c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004c78c.json	docs/compiler-abi.md; Sibling of 0x4ce4c: hit-test the list at HEAD (EDX; link +4) for the group value A (EAX) and the kind in word 0x1a54f4 (; callers 4bc80@4bcba; guest pending
@@ -886,7 +886,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004d9cc	95	mpPrevAssign		named	unclassified	unverified		
 0x0004da2c	99	mpMakeAssign		named	unclassified	unverified		
 0x0004da90	85	mpViewAssign		named	unclassified	unverified		
-0x0004dae8	100	mpClearWPRoute		named	unclassified	unverified		
+0x0004dae8	100	mpClearWPRoute	mission_map_callbacks	drafted	game	unverified		Original disassembly; route guard and selection reload across guest callback; host-tested in batch 084
 0x0004db60	309	fill_selection_dialog_4db60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004db60.json	docs/compiler-abi.md; Fill two text widgets of the dialog named at 0x184b0c (widgets 0x184cf8 and 0x184d38, or 0x184d30 for the second when by; callers 4b6a0@4bb11,4d9cc@4da23,4da2c@4da88; guest pending
 0x0004dc98	61	advance_first_tactical_status	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0004dc98.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x0004dcd8	520			unknown	unclassified	unverified		
@@ -897,19 +897,19 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004e360	602			unknown	unclassified	unverified		
 0x0004e5bc	256	insert_midpoint_4e5bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004e5bc.json	docs/compiler-abi.md; Insert an interpolated entry into the 24-slot waypoint arrays when byte 0x1a568a is 0x11 and the entry kind at 0x1a5673[; callers 4dcd8@4dd6d; guest pending
 0x0004e6bc	169	shift_queue_4e6bc	game_helpers35	compiles	game	confirmed	decomp/tests/0x0004e6bc.json	docs/compiler-abi.md; Drop the oldest queued entry by shifting the 24-entry queue down.; callers 4dcd8@4decc; guest pending
-0x0004e768	79	mpRedrawWPHeights		named	unclassified	unverified		
+0x0004e768	79	mpRedrawWPHeights	mission_map_callbacks	drafted	game	unverified		Original disassembly; 24 height defaults and panel latches; host-tested in batch 084
 0x0004e7b8	83	update_counter_widget_4e7b8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004e7b8.json	docs/compiler-abi.md; Update the counter widget (0x184d4c) of the dialog named at 0x184b3c: with SHOW (AL) nonzero it shows the decimal value ; callers 4dcd8@4dd77,4dcd8@4ddec,4dcd8@4dea9; guest pending
 0x0004e80c	875	mpClickWPHeight		named	unclassified	unverified		
-0x0004eb78	19	mpIncSpeed		named	unclassified	unverified		
+0x0004eb78	19	mpIncSpeed	mission_map_callbacks	drafted	game	unverified		Original disassembly; zoom mode toggles 1 versus any other value; host-tested in batch 084
 0x0004eb8c	135	mpWPZoomToggle		named	unclassified	unverified		
-0x0004ec14	46	mpDecSpeed		named	unclassified	unverified		
-0x0004ec44	44	mpMission1Click		named	unclassified	unverified		
+0x0004ec14	46	mpDecSpeed	mission_map_callbacks	drafted	game	unverified		Original disassembly; speed adds 60 then unsigned 16-bit clamp to 900; host-tested in batch 084
+0x0004ec44	44	mpMission1Click	mission_menu_callbacks	drafted	game	unverified		Original disassembly; speed subtracts 60 then unsigned 16-bit clamp to 120; host-tested in batch 084
 0x0004ec70	591			unknown	unclassified	unverified		
 0x0004eec0	532	mpToggleIcons		named	unclassified	unverified		
 0x0004f0d4	547			unknown	unclassified	unverified		
-0x0004f2f8	28	mpClickV8Okay		named	unclassified	unverified		
+0x0004f2f8	28	mpClickV8Okay	mission_menu_callbacks	drafted	game	unverified		Original disassembly; dialog widget type then exit; host-tested in batch 084
 0x0004f314	88	update_dialog_bindings	event_wrappers	compiles	game	confirmed	decomp/tests/0x004f314.json	Open, find two named widgets, bind, emit flag and destroy; callers 4b6a0@4b761/4ca90@4cad5; guest pending
-0x0004f36c	28	mpWarningOkClick		named	unclassified	unverified		
+0x0004f36c	28	mpWarningOkClick	mission_menu_callbacks	drafted	game	unverified		Original disassembly; warning widget type then exit; host-tested in batch 084
 0x0004f388	88	bind_dialog_values_4f388	game_helpers80	compiles	game	confirmed	decomp/tests/0x0004f388.json	docs/compiler-abi.md; Bind two values into the named dialog's widgets, then emit its flag and close it.; callers 4b1a4@4b1b8,4b1a4@4b1d7; guest pending
 0x0004f3e0	180	mpMission2Click		named	unclassified	unverified		
 0x0004f494	180	mpMission3Click		named	unclassified	unverified		
@@ -923,15 +923,15 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004fa64	910			unknown	unclassified	unverified		
 0x0004fdf4	89	add_float_time_4fdf4	float_helpers2	compiles	game	confirmed	decomp/tests/0x0004fdf4.json	docs/compiler-abi.md; Add a float of minutes to a minutes/seconds pair, carrying seconds.; callers 4fa64@4fc46,4fa64@4fcda; guest pending
 0x0004fe50	546	mpClickCampaign		named	unclassified	unverified		
-0x000505e4	32	mpReturnToCampaign		named	unclassified	unverified		
-0x00050604	52	mpNoQuit		named	unclassified	unverified		
+0x000505e4	32	mpReturnToCampaign	mission_menu_callbacks	drafted	game	unverified		Original disassembly; dialog lookup/release/close; host-tested in batch 084
+0x00050604	52	mpNoQuit	mission_menu_callbacks	drafted	game	unverified		Original disassembly; restore three menu bytes into words and return to mode 6; host-tested in batch 084
 0x00050638	15	mpDrawFuelBar		named	unclassified	unverified		
 0x00050658	248	tally_roster_kinds_50658	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00050658.json	docs/compiler-abi.md; Tally the roster kinds: for each of the 0x1a5531 entries (kind byte 0x1a5510[i], 1..4) count the kind in 0x1a5536[kind -; callers 4fa64@4fadc; guest pending
-0x00050750	32	mpMissPlanTask		named	unclassified	unverified		
+0x00050750	32	mpMissPlanTask	mission_menu_callbacks	drafted	game	unverified		Original disassembly; task toggle and two refresh latches; host-tested in batch 084
 0x00050770	106	max_difference_50770	game_helpers8	compiles	game	confirmed	decomp/tests/0x00050770.json	docs/compiler-abi.md; Largest (second - first) byte difference over the list at 0x137988.; callers ba5c@bbe1,bfcc@c4ea,d628@d640; guest pending
 0x000507dc	23	refresh_widget_507dc	game_helpers11	compiles	game	confirmed	decomp/tests/0x000507dc.json	docs/compiler-abi.md; ; callers ba5c@bbef,bfcc@c4f8,d628@d64e; guest pending
-0x000507f4	23	mpSetRole		named	unclassified	unverified		
-0x0005080c	46	mpSetACtype		named	unclassified	unverified		
+0x000507f4	23	mpSetRole	mission_menu_callbacks	drafted	game	unverified		Original disassembly; widget byte selected as role; host-tested in batch 084
+0x0005080c	46	mpSetACtype	mission_menu_callbacks	drafted	game	unverified		Original disassembly; aircraft type selection and second dialog callback; host-tested in batch 084
 0x0005086c	273			unknown	unclassified	unverified		
 0x0005089c	96	mpType2Click		named	unclassified	unverified		
 0x000508fc	96	mpType3Click		named	unclassified	unverified		
@@ -939,8 +939,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000509bc	96	apply_tactical_code_509bc	game_helpers63	compiles	game	confirmed	decomp/tests/0x000509bc.json	docs/compiler-abi.md; Select the tactical code from a two-digit field and apply or bind it.; callers none direct; guest pending
 0x00050a1c	54	tactical_lookup_contains	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x00050a1c.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
 0x00050b68	193	set_slot_state_50b68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00050b68.json	docs/compiler-abi.md; Store the state code for KIND (0..11 -> 0, 1, 2, 3, 4, 5, 0x12, 7, 6, 0x10, 0x11, 0x16) in the byte at 0x1a553b + INDEX;; callers 5089c@508ef,508fc@5094f,5095c@509af; guest pending
-0x00050c2c	18	mpChangeMode		named	unclassified	unverified		
-0x00050c40	43	mpRedrawTargetView		named	unclassified	unverified		
+0x00050c2c	18	mpChangeMode	mission_menu_callbacks	drafted	game	unverified		Original disassembly; conditionally tail-dispatch map zoom or guest mode; host-tested in batch 084
+0x00050c40	43	mpRedrawTargetView	mission_menu_callbacks	drafted	game	unverified		Original disassembly; 8-bit view inversion and label switch; host-tested in batch 084
 0x00050c70	51	reset_text_50c70	game_helpers5	compiles	game	confirmed	decomp/tests/0x00050c70.json	docs/compiler-abi.md; ; callers 510d0@51175; guest pending
 0x00050ca4	95	copy_next_text_line	tactical_io	compiles	game	confirmed	decomp/tests/0x00050ca4.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x00050d04	152	next_token_50d04	game_helpers18	compiles	game	confirmed	decomp/tests/0x00050d04.json	docs/compiler-abi.md; Copy the next token of the command line (0x1a5986) to 0x1a5968.; callers 50e84@50ea4,50fcc@51006,50fcc@5104f; guest pending
