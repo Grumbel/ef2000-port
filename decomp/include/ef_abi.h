@@ -6,6 +6,34 @@
 
 #include "ef_types.h"
 
+/* Batch 088: eight original environment commands and twelve GUI callbacks.
+ * Hooks are host-only boundaries for unresolved original guest calls. */
+void environment_report_normal_line_088(ef_addr32 source, uint32_t format,
+                                        uint32_t sink);
+void env_normal_dbdd0(void);
+uint32_t env_spacecorr_dbe5c(uint32_t eax);
+uint32_t env_rings_dbe80(uint32_t eax);
+uint32_t env_moon_dbeac(uint32_t eax);
+void env_inferno_dbedc(void);
+void env_shield_dbee4(void);
+void env_city_dbeec(void);
+uint32_t env_day_dbef8(uint32_t eax);
+
+uint32_t gui_guest_call_088(uint32_t entry, uint32_t eax, uint32_t edx,
+                           uint32_t ebx);
+void gui_mainloop_4318(ef_addr32 widget);
+void gui_change_difficulty_4cf4(ef_addr32 widget);
+void gui_change_mode_a960(ef_addr32 widget);
+void gui_zoom_map_a974(ef_addr32 widget);
+void gui_close_target_view_b574(ef_addr32 widget);
+void gui_click_pilot1_bde8(void);
+void gui_click_pilot2_be48(ef_addr32 widget);
+void gui_click_pilot3_be8c(ef_addr32 widget);
+void gui_click_pilot4_bed8(ef_addr32 widget);
+void gui_save_conflict_bf24(ef_addr32 widget);
+void gui_show_debrief_c838(void);
+void gui_alter_size_ca40(void);
+
 /* Batch 087: 15 original damage/environment parameter readers. The parser
  * hook represents the untouched guest sscanf, not a confirmed Watcom ABI. */
 uint32_t environment_scan_value_087(ef_addr32 source, ef_addr32 format,

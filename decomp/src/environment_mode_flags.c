@@ -37,3 +37,56 @@ void env_space_dbe54(void)
 {
     EF_U8(0x425bc4u) |= 0x42u;
 }
+
+/* The seven adjacent named mode selectors were decoded from the original
+ * 0xdbe5c..0xdbf20 instruction stream. Each is a separate entry point.
+ * Their EAX models preserve everything except AH where the guest writes AH. */
+uint32_t env_spacecorr_dbe5c(uint32_t eax)
+{
+    uint8_t mask = (uint8_t)(EF_U8(0x425bc4u) | 0x08u);
+    EF_U8(0x425bc4u) = mask;
+    EF_U8(0x159130u) |= 0x84u;
+    return (eax & ~0xff00u) | ((uint32_t)mask << 8);
+}
+
+uint32_t env_rings_dbe80(uint32_t eax)
+{
+    uint8_t mask = (uint8_t)(EF_U8(0x425bc4u) | 0x08u);
+    EF_U8(0x159130u) |= 0x84u;
+    EF_U8(0x425bc4u) = mask;
+    EF_U8(0x425c89u) = 1u;
+    return (eax & ~0xff00u) | ((uint32_t)mask << 8);
+}
+
+uint32_t env_moon_dbeac(uint32_t eax)
+{
+    uint8_t mask = (uint8_t)(EF_U8(0x159130u) | 0x80u);
+    EF_U16(0x425bc4u) |= 0x0108u;
+    EF_U8(0x159130u) = mask;
+    EF_U8(0x425c89u) = 1u;
+    return (eax & ~0xff00u) | ((uint32_t)mask << 8);
+}
+
+void env_inferno_dbedc(void)
+{
+    EF_U8(0x425bc4u) |= 0x10u;
+}
+
+void env_shield_dbee4(void)
+{
+    EF_U8(0x425bc4u) |= 0x01u;
+}
+
+void env_city_dbeec(void)
+{
+    EF_U8(0x425bc4u) |= 0x22u;
+}
+
+uint32_t env_day_dbef8(uint32_t eax)
+{
+    uint8_t mask = (uint8_t)(EF_U8(0x159130u) | 0x80u);
+    EF_U8(0x15bb5fu) = 0u;
+    EF_U8(0x159130u) = mask;
+    EF_U8(0x425bc5u) |= 0x08u;
+    return (eax & ~0xff00u) | ((uint32_t)mask << 8);
+}
