@@ -14,14 +14,16 @@ from tools import replay_suite
 PATCHES = {0x20}
 
 
-def manifest(*, name='startup', hits=None, events=None, limit=10000):
+def manifest(*, name='startup', hits=None, events=None, limit=10000, guest_hashes=None):
     return {'schema': replay_suite.SCHEMA, 'cases': [
         {'name': name, 'instructions': limit, 'timer_instructions': 1000,
-         'events': events or [], 'must_hit': hits if hits is not None else ['0x20']} ]}
+         'events': events or [], 'must_hit': hits if hits is not None else ['0x20'],
+         'guest_hashes': guest_hashes or []} ]}
 
 
 def fake_runner(path):
     path.write_text('''#!/usr/bin/env python3
+import hashlib
 import pathlib
 import sys
 a = sys.argv
@@ -32,6 +34,14 @@ print('status=instruction_limit interrupts=19 ticks=12 irq0=10 ip=0x101 ax=0x0')
 if patched:
     print('patch_hit: addr=0x20 count=' + ('0' if '--no-hit' in a else '3'))
     print('patch_hits: total=' + ('0' if '--no-hit' in a else '3'))
+for i, flag in enumerate(a):
+    if flag == '--hash-guest':
+        addr, length = a[i + 1].split(':')
+        size = int(length)
+        data = bytes(size)
+        if patched and '--different-memory' in a:
+            data = b'\\x01' + data[1:]
+        print(f'guest_hash: addr=0x{int(addr, 0):x} length={size} sha256={hashlib.sha256(data).hexdigest()}')
 ''')
     path.chmod(0o755)
 
@@ -72,6 +82,22 @@ class ManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'instruction limit'):
             replay_suite.validate_manifest(bad, PATCHES)
 
+    def test_memory_ranges_fail_closed_before_guest_replay(self):
+        region = [{'address': '0x300', 'length': 128}]
+        cases = replay_suite.validate_manifest(manifest(guest_hashes=region),
+                                                PATCHES, [(0x20, 0x30)])
+        self.assertEqual(cases[0]['guest_hashes'], [(0x300, 128)])
+        with self.assertRaisesRegex(ValueError, 'overlaps replacement'):
+            replay_suite.validate_manifest(manifest(guest_hashes=[
+                {'address': '0x28', 'length': 8}]), PATCHES, [(0x20, 0x30)])
+        with self.assertRaisesRegex(ValueError, 'overlapping'):
+            replay_suite.validate_manifest(manifest(guest_hashes=[
+                {'address': '0x300', 'length': 16},
+                {'address': '0x308', 'length': 16}]), PATCHES)
+        with self.assertRaisesRegex(ValueError, 'outside mapped image'):
+            replay_suite.validate_manifest(manifest(guest_hashes=[
+                {'address': '0x3ffffff', 'length': 2}]), PATCHES)
+
     def test_fail_closed_patch_hit_parser(self):
         status = 'status=instruction_limit interrupts=3 ticks=4 irq0=5 ip=0xff ax=0x0\n'
         with self.assertRaisesRegex(ValueError, 'count reports'):
@@ -81,6 +107,8 @@ class ManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'counts disagree'):
             replay_suite.parse_output(status + 'patch_hit: addr=0x20 count=1\n'
                                       'patch_hits: total=2\n', PATCHES)
+        with self.assertRaisesRegex(ValueError, 'guest hash reports'):
+            replay_suite.parse_output(status, set(), [(0x300, 4)])
 
 
 class SyntheticReplayTests(unittest.TestCase):
@@ -102,10 +130,12 @@ class SyntheticReplayTests(unittest.TestCase):
                                       timeout=5, baseline_repeats=baseline_repeats)
 
     def test_identical_replay_and_patch_hit_pass(self):
-        case = replay_suite.validate_manifest(manifest(), PATCHES)[0]
+        case = replay_suite.validate_manifest(manifest(guest_hashes=[
+            {'address': '0x300', 'length': 4}]), PATCHES)[0]
         summary = self.run_case(case, baseline_repeats=2)
         self.assertTrue(summary['passed'])
         self.assertEqual(summary['checks'][0]['patched']['patch_hits'], {'0x20': 3})
+        self.assertEqual(len(summary['checks'][0]['patched']['guest_hashes']['0x300:4']), 64)
         self.assertTrue((self.root / 'result/startup/original/frame.ppm').exists())
         self.assertTrue((self.root / 'result/startup/patched/drive').is_dir())
         self.assertTrue(json.loads((self.root / 'result/summary.json').read_text())['passed'])
@@ -126,6 +156,15 @@ class SyntheticReplayTests(unittest.TestCase):
         summary = self.run_case(case)
         self.assertFalse(summary['passed'])
         self.assertIn('framebuffer SHA256 differs', summary['checks'][0]['failures'][0])
+
+    def test_guest_ram_divergence_is_detected_independently_of_framebuffer(self):
+        case = replay_suite.validate_manifest(manifest(guest_hashes=[
+            {'address': '0x300', 'length': 4}]), PATCHES)[0]
+        case['arguments'] = ['--different-memory']
+        summary = self.run_case(case)
+        self.assertFalse(summary['passed'])
+        self.assertEqual(summary['checks'][0]['failures'],
+                         ['guest RAM hash differs at 0x300:4'])
 
     def test_runner_failure_creates_report_and_refuses_overwrite(self):
         case = replay_suite.validate_manifest(manifest(), PATCHES)[0]

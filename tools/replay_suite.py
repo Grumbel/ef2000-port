@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
-"""Bounded, asset-backed original-vs-EFPATCH1 framebuffer replay oracle.
+"""Bounded, asset-backed original-vs-EFPATCH1 framebuffer/RAM replay oracle.
 
 This is a deliberately narrow *first* golden suite: identical scripted inputs,
-instruction-counted clocks, exit/status counters and a final guest framebuffer.
-It does not compare full guest RAM or prove gameplay/ABI equivalence.
+instruction-counted clocks, exit/status counters, a final guest framebuffer,
+and optionally selected guest RAM regions. It does not compare full guest RAM.
 """
 
 import argparse
@@ -28,12 +28,13 @@ SCHEMA = 'ef2000-golden-replay-v1'
 STATUS = re.compile(r'^status=(\w+) interrupts=(\d+) ticks=(\d+) irq0=(\d+) ip=0x([0-9a-f]+)\b', re.M)
 PATCH_HIT = re.compile(r'^patch_hit: addr=0x([0-9a-f]+) count=(\d+)$', re.M)
 PATCH_TOTAL = re.compile(r'^patch_hits: total=(\d+)$', re.M)
+GUEST_HASH = re.compile(r'^guest_hash: addr=0x([0-9a-f]+) length=(\d+) sha256=([0-9a-f]{64})$', re.M)
 EVENT_ARITY = {'--mouse-event': 4, '--key-event': 4, '--joystick-event': (4, 6)}
 MAX_EVENTS = 128
 MAX_CASES = 32
 
 
-def validate_manifest(manifest, patch_addresses):
+def validate_manifest(manifest, patch_addresses, patch_intervals=()):
     if not isinstance(manifest, dict) or manifest.get('schema') != SCHEMA:
         raise ValueError(f'manifest requires schema {SCHEMA}')
     cases = manifest.get('cases')
@@ -41,7 +42,6 @@ def validate_manifest(manifest, patch_addresses):
         raise ValueError(f'manifest needs 1..{MAX_CASES} cases')
     result = []
     names = set()
-    all_hits = set()
     for case in cases:
         if not isinstance(case, dict):
             raise ValueError('each case must be an object')
@@ -98,14 +98,35 @@ def validate_manifest(manifest, patch_addresses):
             hits.add(int(address, 16))
         if not hits.issubset(patch_addresses):
             raise ValueError(f'{name}: must_hit includes an address absent from EFPATCH1')
-        all_hits.update(hits)
+        regions = case.get('guest_hashes', [])
+        if not isinstance(regions, list) or len(regions) > 32:
+            raise ValueError(f'{name}: guest_hashes must contain at most 32 regions')
+        hashes = []
+        for region in regions:
+            if not isinstance(region, dict) or set(region) != {'address', 'length'}:
+                raise ValueError(f'{name}: guest hash requires address and length')
+            address, length = region['address'], region['length']
+            if (not isinstance(address, str) or not re.fullmatch(r'0x[0-9a-fA-F]{1,8}', address)
+                    or type(length) is not int or not 0 < length <= 0x1000000):
+                raise ValueError(f'{name}: invalid guest hash address or length')
+            start = int(address, 16)
+            if start >= 0x4000000 or length > 0x4000000 - start:
+                raise ValueError(f'{name}: guest hash outside mapped image')
+            if any(start < end and addr < start + length for addr, end in patch_intervals):
+                raise ValueError(f'{name}: guest hash overlaps replacement code')
+            hashes.append((start, length))
+        hashes.sort()
+        if (len(set(hashes)) != len(hashes) or
+                any(a + length > b for (a, length), (b, _) in zip(hashes, hashes[1:])) or
+                sum(length for _, length in hashes) > 0x2000000):
+            raise ValueError(f'{name}: duplicate/overlapping or oversized guest hashes')
         result.append({'name': name, 'instructions': instructions,
                        'timer_instructions': timer, 'arguments': arguments,
-                       'must_hit': sorted(hits)})
+                       'must_hit': sorted(hits), 'guest_hashes': hashes})
     return result
 
 
-def parse_output(output, expected_patches):
+def parse_output(output, expected_patches, expected_hashes=()):
     statuses = list(STATUS.finditer(output))
     if len(statuses) != 1:
         raise ValueError('runner must emit exactly one status line')
@@ -126,7 +147,15 @@ def parse_output(output, expected_patches):
             raise ValueError('patch entry counts disagree with reported total')
     elif hits or totals:
         raise ValueError('unpatched runner unexpectedly reported patch hits')
-    return status, hits
+    hashes = {}
+    for item in GUEST_HASH.finditer(output):
+        region = (int(item[1], 16), int(item[2]))
+        if region in hashes:
+            raise ValueError(f'duplicate guest_hash report at 0x{region[0]:x}')
+        hashes[region] = item[3]
+    if set(hashes) != set(expected_hashes):
+        raise ValueError('missing or unexpected guest hash reports')
+    return status, hits, hashes
 
 
 def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, timeout):
@@ -141,6 +170,8 @@ def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, tim
     if cd_dir:
         command.extend(['--cd-dir', str(cd_dir)])
     command.extend(case['arguments'])
+    for address, length in case.get('guest_hashes', []):
+        command.extend(['--hash-guest', f'0x{address:x}:{length}'])
     for patch in patch_files:
         command.extend(['--patch', str(patch)])
     try:
@@ -152,12 +183,14 @@ def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, tim
     (output / 'stderr.log').write_text(finished.stderr)
     if finished.returncode:
         raise ValueError(f'{case["name"]}: runner returned {finished.returncode}; see {output}')
-    status, hits = parse_output(finished.stdout, case.get('patch_addresses', set()))
+    status, hits, hashes = parse_output(finished.stdout, case.get('patch_addresses', set()),
+                                       case.get('guest_hashes', []))
     if status['status'] not in ('instruction_limit', 'guest_exit'):
         raise ValueError(f'{case["name"]}: unexpected guest stop: {status["status"]}')
     if not framebuffer.is_file():
         raise ValueError(f'{case["name"]}: guest framebuffer was not saved')
     return {'status': status, 'patch_hits': {f'0x{k:x}': v for k, v in hits.items()},
+            'guest_hashes': {f'0x{k[0]:x}:{k[1]}': v for k, v in hashes.items()},
             'frame_sha256': hashlib.sha256(framebuffer.read_bytes()).hexdigest()}
 
 
@@ -168,6 +201,10 @@ def differences(baseline, other):
             problems.append(f'{key}: {baseline["status"][key]} != {other["status"][key]}')
     if baseline['frame_sha256'] != other['frame_sha256']:
         problems.append('final framebuffer SHA256 differs')
+    if baseline['guest_hashes'] != other['guest_hashes']:
+        for region in sorted(set(baseline['guest_hashes']) | set(other['guest_hashes'])):
+            if baseline['guest_hashes'].get(region) != other['guest_hashes'].get(region):
+                problems.append(f'guest RAM hash differs at {region}')
     # EIP is intentionally diagnostic only: an instruction-counted boundary
     # may end at different instructions in equivalent functions.
     return problems
@@ -248,7 +285,8 @@ def main(argv=None):
             raise ValueError('patches contain overlapping guest writes')
         if not addresses:
             raise ValueError('no patch entry addresses supplied')
-        cases = validate_manifest(json.loads(args.manifest.read_text()), set(addresses))
+        cases = validate_manifest(json.loads(args.manifest.read_text()),
+                                  set(addresses), intervals)
         if args.output.exists():
             raise ValueError('output directory already exists (refusing overwrite)')
         game_dir = (args.game_dir or args.executable.parent).resolve()

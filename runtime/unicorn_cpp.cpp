@@ -1276,6 +1276,10 @@ public:
         }
     }
 
+    void enable_guest_hashes(const std::vector<std::pair<uint32_t, uint32_t>>& ranges) {
+        guest_hash_ranges_ = ranges;
+    }
+
     void enable_call_capture(const std::vector<std::pair<uint32_t, unsigned>>& targets,
                              const fs::path& directory,
                              const std::array<uint8_t, 32>& original_sha) {
@@ -1559,6 +1563,17 @@ public:
             }
             std::cout << "patch_hits: total=" << total << '\n';
         }
+        for (const auto& [address, length] : guest_hash_ranges_) {
+            std::vector<uint8_t> bytes(length);
+            check(uc_mem_read(cpu_, address, bytes.data(), bytes.size()),
+                  "read selected guest RAM for replay hash");
+            const auto digest = sha256_bytes(bytes);
+            std::cout << "guest_hash: addr=0x" << std::hex << address << std::dec
+                      << " length=" << length << " sha256=";
+            for (uint8_t byte : digest)
+                std::cout << std::hex << std::setw(2) << std::setfill('0') << unsigned(byte);
+            std::cout << std::dec << std::setfill(' ') << '\n';
+        }
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
         std::cout.flush();
         if (window.enabled()) {
@@ -1617,6 +1632,7 @@ private:
     std::vector<uc_hook> capture_hooks_;
     std::vector<uc_hook> patch_hooks_;
     std::map<uint32_t, uint64_t> patch_hit_counts_;
+    std::vector<std::pair<uint32_t, uint32_t>> guest_hash_ranges_;
     std::unordered_map<uint32_t, unsigned> capture_remaining_, capture_sequence_;
     std::filesystem::path capture_dir_;
     std::array<uint8_t, 32> capture_source_sha_{};
@@ -3035,6 +3051,7 @@ void usage(const char* program) {
               << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
               << "       [--patch FILE] (repeatable in-place EFPATCH1, no patch arenas yet)\n"
               << "       Patched runs report patch_hit entry counts (zero means unexercised)\n"
+              << "       [--hash-guest ADDR:LENGTH] (final guest SHA-256, repeatable; max 16 MiB)\n"
               << "       [--capture-calls ADDR[:N] --capture-dir DIR] (up to 4 guest-RAM call snapshots)\n"
               << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
               << "       --cd-dir DIR provides DOS disc files only; it does not enable music\n"
@@ -3043,7 +3060,7 @@ void usage(const char* program) {
               << "       Windows default: %LOCALAPPDATA%\\ef2000\\state\\unicorn\\drive\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
-              << "       " << program << " --self-test | --self-test-bda | --self-test-clock | --self-test-retrace | --self-test-fast-copy | --self-test-archive-lookup\n";
+              << "       " << program << " --self-test | --self-test-bda | --self-test-clock | --self-test-retrace | --self-test-fast-copy | --self-test-archive-lookup | --self-test-patch-hits\n";
 }
 } // namespace
 
@@ -3062,12 +3079,13 @@ int main(int argc, char** argv) {
         ControlSelection controls = ControlSelection::Auto;
         bool self_test = false, self_test_bda = false, self_test_clock = false;
         bool self_test_retrace = false, self_test_fast_copy = false;
-        bool self_test_archive_lookup = false;
+        bool self_test_archive_lookup = false, self_test_patch_hits = false;
         bool trace_interrupts = false, trace_archive_lookups = false;
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
         std::vector<JoystickEvent> joystick_events;
         std::vector<std::string> patch_paths;
+        std::vector<std::pair<uint32_t, uint32_t>> guest_hash_ranges;
         std::vector<std::pair<uint32_t, unsigned>> capture_targets;
         fs::path capture_dir;
         std::string framebuffer, wav_directory;
@@ -3083,6 +3101,21 @@ int main(int argc, char** argv) {
                 explicit_limit = true;
             } else if (!std::strcmp(argv[i], "--patch") && i + 1 < argc) {
                 patch_paths.emplace_back(argv[++i]);
+            } else if (!std::strcmp(argv[i], "--hash-guest") && i + 1 < argc) {
+                const std::string value = argv[++i];
+                const size_t colon = value.find(':');
+                if (colon == std::string::npos || colon == 0 || colon + 1 == value.size())
+                    throw std::runtime_error("--hash-guest expects ADDR:LENGTH");
+                size_t end{};
+                const uint64_t address = std::stoull(value.substr(0, colon), &end, 0);
+                if (end != colon) throw std::runtime_error("invalid guest hash address");
+                const auto size_field = value.substr(colon + 1);
+                const uint64_t length = std::stoull(size_field, &end, 0);
+                if (end != size_field.size() || !length || length > 0x1000000 ||
+                    address >= IMAGE_SIZE || length > IMAGE_SIZE - address ||
+                    guest_hash_ranges.size() >= 32)
+                    throw std::runtime_error("invalid guest hash range (max 16 MiB, 32 ranges)");
+                guest_hash_ranges.emplace_back(uint32_t(address), uint32_t(length));
             } else if (!std::strcmp(argv[i], "--capture-calls") && i + 1 < argc) {
                 const std::string value = argv[++i];
                 const size_t separator = value.find(':');
@@ -3231,6 +3264,8 @@ int main(int argc, char** argv) {
                 self_test_fast_copy = true;
             } else if (!std::strcmp(argv[i], "--self-test-archive-lookup")) {
                 self_test_archive_lookup = true;
+            } else if (!std::strcmp(argv[i], "--self-test-patch-hits")) {
+                self_test_patch_hits = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
                 framebuffer = argv[++i];
             } else if (!std::strcmp(argv[i], "--wav-capture") && i + 1 < argc) {
@@ -3321,10 +3356,10 @@ int main(int argc, char** argv) {
         if (!capture_targets.empty() && !patch_paths.empty())
             throw std::runtime_error("capture original calls in an unpatched run");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace ||
-            self_test_fast_copy || self_test_archive_lookup) {
+            self_test_fast_copy || self_test_archive_lookup || self_test_patch_hits) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
                 int(self_test_retrace) + int(self_test_fast_copy) +
-                int(self_test_archive_lookup) != 1)
+                int(self_test_archive_lookup) + int(self_test_patch_hits) != 1)
                 throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!patch_paths.empty()) throw std::runtime_error("self-test does not accept patches");
@@ -3376,6 +3411,12 @@ int main(int argc, char** argv) {
                 0xb8, 0x00, 0x20, 0x00, 0x00, // mov eax,0x2000: test filename
                 0xba, 0x00, 0x30, 0x00, 0x00, // mov edx,0x3000: archive handle
                 0xe8, 0x00, 0x00, 0x00, 0x00, // call 0xeb520: test tracepoint
+                0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
+            // Two calls to a synthetic replacement entry; both must be
+            // counted by the hook used by real in-place EFPATCH1 runs.
+            constexpr uint8_t patch_hits_guest[] = {
+                0xe8, 0x00, 0x00, 0x00, 0x00, // call 0x200
+                0xe8, 0x00, 0x00, 0x00, 0x00, // call 0x200 again
                 0xb8, 0x00, 0x4c, 0x00, 0x00, 0xcd, 0x21};
             // The 32-bit guest calls a deliberately invalid replacement
             // function at the original memcpy entry address. Passing this
@@ -3440,6 +3481,11 @@ int main(int argc, char** argv) {
                 image[0xeb520] = 0xc3; // test routine returns without touching registers
                 constexpr char pathname[] = "test.bbm";
                 std::copy(std::begin(pathname), std::end(pathname), image.begin() + 0x2000);
+            } else if (self_test_patch_hits) {
+                std::copy(std::begin(patch_hits_guest), std::end(patch_hits_guest), image.begin() + ENTRY);
+                put32(image, ENTRY + 1, 0x200 - (ENTRY + 5));
+                put32(image, ENTRY + 6, 0x200 - (ENTRY + 10));
+                image[0x200] = 0xc3; // ret
             }
             else
                 std::copy(std::begin(gameport_guest), std::end(gameport_guest), image.begin() + ENTRY);
@@ -3448,6 +3494,8 @@ int main(int argc, char** argv) {
             if (!capture_targets.empty())
                 machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));
             if (self_test_archive_lookup) machine.enable_archive_lookup_trace();
+            if (self_test_patch_hits) machine.enable_patch_hit_trace({0x200, ENTRY});
+            machine.enable_guest_hashes(guest_hash_ranges);
             const bool realtime_test = self_test_clock || self_test_retrace || self_test_fast_copy;
             performance.clock_loop_benchmark = self_test_clock;
             return machine.run(realtime_test ? 0 : 10000, window, 250000, "", "",
@@ -3514,6 +3562,7 @@ int main(int argc, char** argv) {
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
                         controls, cd_cue);
         if (!patch_entries.empty()) machine.enable_patch_hit_trace(patch_entries);
+        machine.enable_guest_hashes(guest_hash_ranges);
         if (!capture_targets.empty())
             machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));
         if (trace_archive_lookups) machine.enable_archive_lookup_trace();

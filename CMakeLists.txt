@@ -332,6 +332,13 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
            --joystick-event 0:0:0:0 --joystick-axes=0,1 --trace-joystick)
   set_tests_properties(unicorn-cpp-gameport PROPERTIES
                        PASS_REGULAR_EXPRESSION "gameport: axes=2 reads=1 writes=1")
+  add_test(NAME unicorn-cpp-patch-hits COMMAND ef2000-unicorn-cpp --self-test-patch-hits)
+  set_tests_properties(unicorn-cpp-patch-hits PROPERTIES
+                       PASS_REGULAR_EXPRESSION "patch_hit: addr=0x200 count=2")
+  add_test(NAME unicorn-cpp-guest-hash COMMAND ef2000-unicorn-cpp
+           --self-test-patch-hits --hash-guest 0x300:4)
+  set_tests_properties(unicorn-cpp-guest-hash PROPERTIES
+                       PASS_REGULAR_EXPRESSION "guest_hash: addr=0x300 length=4 sha256=df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119")
   add_test(NAME unicorn-cpp-bda COMMAND ef2000-unicorn-cpp --self-test-bda)
   set_tests_properties(unicorn-cpp-bda PROPERTIES
                        PASS_REGULAR_EXPRESSION "status=guest_exit interrupts=5")

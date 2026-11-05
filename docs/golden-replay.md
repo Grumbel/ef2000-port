@@ -52,7 +52,8 @@ first be observed in the actual game):
         ["--mouse-event", "150:320:200:1"],
         ["--mouse-event", "152:320:200:0"]
       ],
-      "must_hit": ["0x0000432c"]
+      "must_hit": ["0x0000432c"],
+      "guest_hashes": [{"address": "0x1970a0", "length": 256}]
     }
   ]
 }
@@ -63,6 +64,12 @@ must fit the case's instruction budget and timer interval. Each case must
 name at least one actual patch entry as `must_hit`; only mouse, key and
 joystick event arguments are allowed in the manifest. Other runtime options
 that could change timing or redirect outputs are fixed by the suite.
+`guest_hashes` is optional; each range is identified by a guest linear address
+and byte length (maximum 16 MiB per range, 32 MiB total). The suite refuses
+ranges overlapping any replacement's code bytes, because differences in the
+compiled implementation are expected there. Prefer mutable game data and
+BSS ranges whose meaning is understood. **The addresses above are only an
+illustration, not an established high-score-screen golden checkpoint.**
 
 ## How to read the results
 
@@ -78,7 +85,8 @@ The suite additionally checks that:
 
 - Both original runs (when requested) and the patched run have equal stop
   status, guest interrupt count, PIT tick count, IRQ0 count and final
-  framebuffer SHA-256.
+  framebuffer SHA-256. All requested guest-memory-range SHA-256s must also
+  match; missing, duplicate or unexpected hash reports are errors.
 - Each runner exits successfully, emits exactly one parseable status line,
   and produces a framebuffer.
 - A missing patch hit, nondeterministic baseline, guest stop/fault, missing
@@ -94,9 +102,9 @@ those differences; do not bless a mismatch automatically.
 
 ## Not yet a complete §3.9 oracle
 
-This implementation compares the **last** framebuffer in each bounded run,
-not palette hashes, selected guest RAM ranges or multiple intermediate
-checkpoints. It does not yet record immutable baseline golden hashes for all
+This implementation compares the **last** framebuffer and selected guest
+memory ranges in each bounded run, not separate palette hashes or multiple
+intermediate checkpoints. It does not yet record immutable baseline hashes for all
 6–10 planned scenarios, or perform DOSBox-X cross-checks. The script requires
 an already compiled and safely spliced replacement; it does not produce an
 OpenWatcom object itself. A nonzero patch entry count proves the replacement
@@ -109,6 +117,12 @@ Before changing a function tracker entry to `verified`, we still need:
    baseline repeat and a nonzero patch-hit count.
 3. Review of the actual guest call states, control flow and any differences.
 
-The current test coverage is **synthetic/asset-free**. Until an actual
-SHA-pinned original executable, Watcom output and functioning patch are run
-through these steps, **zero functions have gained `verified` status**.
+The memory hashing and patch-hit hooks have also been compiled and run in
+the native C++ synthetic guest: two calls to a test entry yield
+`patch_hit: addr=0x200 count=2`, and four zero guest bytes yield SHA-256
+`df3f6198…14b81119`. Two short original-executable runs, each limited to
+400,000 instructions, reported the same selected 256-byte guest memory hash.
+Those bounded original runs did not yet reach a drawable framebuffer or a
+target replacement. Until an actual full game-data installation, Watcom
+output and functioning patch are run through these steps, **zero functions
+have gained `verified` status**.

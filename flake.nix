@@ -463,6 +463,11 @@
           ${package}/bin/ef2000-unicorn-cpp --help > "$out"
           test -s "$out"
           ${package}/bin/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-patch-hits \
+            --hash-guest 0x300:4 > patch-hits.log
+          grep -q 'patch_hit: addr=0x200 count=2' patch-hits.log
+          grep -q 'patch_hits: total=3' patch-hits.log
+          grep -q 'guest_hash: addr=0x300 length=4 sha256=df3f619804a92fdb4057192dc43dd748ea778adc52bc498ce80524c014b81119' patch-hits.log
         '';
         ghidra-workflow = pkgs.runCommand "ef2000-ghidra-workflow-check" {
           nativeBuildInputs = [ pkgs.python3 ];
