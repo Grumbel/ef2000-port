@@ -135,6 +135,17 @@
           $CC -std=c11 -O2 -Wall -Wextra -Werror -Idecomp/include \
             tests/decomp_hiscore_test.c decomp/src/hiscore.c \
             -o objects/ef2000-decomp-hiscore-test
+          for unit in hiscore_data_093 hiscore_io_093 hiscore_display_093; do
+            $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
+              -DEF_DECOMP_HOST_TEST=1 -Idecomp/include \
+              -c "decomp/src/$unit.c" -o "objects/$unit.o"
+          done
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
+            -DEF_DECOMP_HOST_TEST=1 -Idecomp/include -Iruntime \
+            tests/decomp_hiscore_093_test.cpp runtime/ef2000_highscores.cpp \
+            objects/hiscore_data_093.o objects/hiscore_io_093.o \
+            objects/hiscore_display_093.o \
+            -o objects/ef2000-decomp-hiscore-093-test
           runHook postBuild
         '';
 
@@ -148,6 +159,7 @@
           objects/ef2000-efpatch-test
           objects/ef2000-call-capture-test call-capture-fixture.efcap
           objects/ef2000-decomp-hiscore-test
+          objects/ef2000-decomp-hiscore-093-test
           objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
             --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
           objects/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'

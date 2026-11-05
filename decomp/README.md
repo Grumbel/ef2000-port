@@ -50,7 +50,7 @@ The host-side emulator remains the validation oracle. See
 
 Status (2026-11-05): 4,277 Ghidra-inventoried functions plus 10 manually
 confirmed additional entry points (4,287 tracked); 3,257 marked `compiles`,
-226 additional host-tested `drafted` entry points, and none verified as a
+231 additional host-tested `drafted` entry points, and none verified as a
 compiled-and-spliced C replacement. The tracker is authoritative. See
 [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
 and [renderer/driver batch 083](../docs/subsystems/decomp-batch-083.md) for
@@ -80,3 +80,6 @@ The [READCOLS tail batch 092](../docs/subsystems/decomp-batch-092.md)
 adds palette dispatch, cockpit palette selection, lightning-point allocation,
 and the two smoke record rings; those four remain host-only drafts, with
 specific guest call boundaries and a documented unresolved flare parser.
+The [high-score C batch 093](../docs/subsystems/decomp-batch-093.md) adds five
+host-tested C bodies for existing high-score routines, checked against the
+previously guest-tested C++ model; they remain unspliced drafts.
