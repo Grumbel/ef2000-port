@@ -10,7 +10,8 @@ EF_STATIC_ASSERT(hiscore_table_size, sizeof(g_hiscore_table) == 250);
 EF_STATIC_ASSERT(hiscore_last_score_offset,
                  9 * sizeof(ef_hiscore_entry) + offsetof(ef_hiscore_entry, score) == 246);
 
-/* 0x000432c  size 0x0f  C candidate: not yet compiled/spliced/replay-verified.
+/* 0x000432c  size 0x0f  C candidate: GCC32 diagnostic guest splice tested;
+ * not yet OpenWatcom-compiled, OMF-spliced, or full-game replay-verified.
  * Both scores are signed int32_t. The callers use only AL, not all of EAX.
  * A tie does NOT qualify, unlike the separate insertion function. */
 uint8_t hiscore_qualifies(void)
