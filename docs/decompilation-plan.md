@@ -497,7 +497,13 @@ the unpatched `nix run .#unicorn-cpp -L ...` startup reaches its 30M
 instruction limit (42.3M guest instructions/s on that run); no real patch
 has been executed. See `docs/function-differential.md`.
 
-### 3.9 [ ] Golden replay suite
+### 3.9 [~] Golden replay suite
+
+The first bounded original-vs-patched framebuffer replay checker and patch
+entry-hit instrumentation are implemented (`tools/replay_suite.py`; see
+`docs/golden-replay.md`). It does not yet record multi-checkpoint guest RAM or
+palette hashes and has not passed an asset-backed, real-function replay.
+The full scope below remains outstanding.
 
 - Define 6–10 deterministic scenarios as files in `tests/replays/*.json`
   (input script + instruction limit + checkpoints). Minimum set:

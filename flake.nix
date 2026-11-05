@@ -354,6 +354,11 @@
         set -euo pipefail
         exec ${pkgs.python3}/bin/python3 ${source}/tools/omf_inplace.py "$@"
       '';
+      replaySuite = pkgs.writeShellScriptBin "ef2000-replay-suite" ''
+        set -euo pipefail
+        exec ${pkgs.python3}/bin/python3 ${source}/tools/replay_suite.py \
+          --runner ${package}/bin/ef2000-unicorn-cpp "$@"
+      '';
       # Asset decoding is pure Python; users supply DID archives and select a
       # writable output directory. Nothing proprietary enters the Nix store.
       guiAssetsWorkflow = pkgs.writeShellScriptBin "ef2000-gui-assets" ''
@@ -370,6 +375,7 @@
         ef2000-highscores-differential = highscoresDifferential;
         ef2000-func-differential = funcDifferential;
         ef2000-omf-inplace = omfInplace;
+        ef2000-replay-suite = replaySuite;
         ef2000-gui-assets = guiAssetsWorkflow;
         ef2000-win64 = win64.dist;
         ef2000-win64-zip = win64.zip;
@@ -420,6 +426,11 @@
              type = "app";
              program = "${omfInplace}/bin/ef2000-omf-inplace";
              meta.description = "Build a reviewed in-place EFPATCH1 from a compiled OpenWatcom OMF object";
+           };
+           replay-suite = {
+             type = "app";
+             program = "${replaySuite}/bin/ef2000-replay-suite";
+             meta.description = "Compare original and patched bounded guest game replays";
            };
            gui-assets = {
              type = "app";
@@ -999,6 +1010,15 @@
           cd ${source}
           PYTHONDONTWRITEBYTECODE=1 ${python}/bin/python3 -m unittest \
             tests.test_func_differential -q
+        '';
+        replay-suite = pkgs.runCommand "ef2000-replay-suite-check" {
+          nativeBuildInputs = [ pkgs.python3 ];
+        } ''
+          ${replaySuite}/bin/ef2000-replay-suite --help > "$out"
+          grep -q -- '--baseline-repeats' "$out"
+          cd ${source}
+          PYTHONDONTWRITEBYTECODE=1 python3 -m unittest \
+            tests.test_replay_suite -q
         '';
       devShells.${system}.default = pkgs.mkShell {
         inputsFrom = [ package ];

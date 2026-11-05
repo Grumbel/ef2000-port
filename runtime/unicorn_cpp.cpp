@@ -1265,6 +1265,17 @@ public:
               "install archive-lookup trace hook");
     }
 
+    void enable_patch_hit_trace(const std::vector<uint32_t>& addresses) {
+        for (uint32_t address : addresses) {
+            if (address >= image_size_ || !patch_hit_counts_.emplace(address, 0).second)
+                throw std::runtime_error("invalid or duplicated patch entry address");
+            uc_hook hook{};
+            check(uc_hook_add(cpu_, &hook, UC_HOOK_CODE, (void*)on_patch_hit,
+                              this, address, address), "install patch-entry trace hook");
+            patch_hooks_.push_back(hook);
+        }
+    }
+
     void enable_call_capture(const std::vector<std::pair<uint32_t, unsigned>>& targets,
                              const fs::path& directory,
                              const std::array<uint8_t, 32>& original_sha) {
@@ -1539,6 +1550,15 @@ public:
         if (performance_.fast_copy_vga)
             std::cout << "fast_copy_vga: calls=" << fast_copy_vga_calls_
                       << " bytes=" << fast_copy_vga_bytes_ << '\n';
+        if (!patch_hit_counts_.empty()) {
+            uint64_t total = 0;
+            for (const auto& [address, count] : patch_hit_counts_) {
+                std::cout << "patch_hit: addr=0x" << std::hex << address << std::dec
+                          << " count=" << count << '\n';
+                total += count;
+            }
+            std::cout << "patch_hits: total=" << total << '\n';
+        }
         if (!detail_.empty()) std::cout << "detail=" << detail_ << '\n';
         std::cout.flush();
         if (window.enabled()) {
@@ -1595,6 +1615,8 @@ private:
     uint32_t irq_return_sp_{}, irq_resume_ip_{};
     uc_hook eoi_hook_{};
     std::vector<uc_hook> capture_hooks_;
+    std::vector<uc_hook> patch_hooks_;
+    std::map<uint32_t, uint64_t> patch_hit_counts_;
     std::unordered_map<uint32_t, unsigned> capture_remaining_, capture_sequence_;
     std::filesystem::path capture_dir_;
     std::array<uint8_t, 32> capture_source_sha_{};
@@ -2477,6 +2499,11 @@ private:
     static void on_archive_lookup(uc_engine*, uint64_t, uint32_t, void* user) {
         static_cast<Machine*>(user)->trace_archive_lookup();
     }
+    static void on_patch_hit(uc_engine*, uint64_t address, uint32_t, void* user) {
+        auto* machine = static_cast<Machine*>(user);
+        const auto found = machine->patch_hit_counts_.find(static_cast<uint32_t>(address));
+        if (found != machine->patch_hit_counts_.end()) ++found->second;
+    }
     static void on_capture_call(uc_engine*, uint64_t address, uint32_t, void* user) {
         auto* machine = static_cast<Machine*>(user);
         try {
@@ -3007,6 +3034,7 @@ void usage(const char* program) {
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
               << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
               << "       [--patch FILE] (repeatable in-place EFPATCH1, no patch arenas yet)\n"
+              << "       Patched runs report patch_hit entry counts (zero means unexercised)\n"
               << "       [--capture-calls ADDR[:N] --capture-dir DIR] (up to 4 guest-RAM call snapshots)\n"
               << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
               << "       --cd-dir DIR provides DOS disc files only; it does not enable music\n"
@@ -3463,6 +3491,7 @@ int main(int argc, char** argv) {
         std::stable_sort(joystick_events.begin(), joystick_events.end(),
                          [](const JoystickEvent& a, const JoystickEvent& b) { return a.tick < b.tick; });
         auto image = payload_from_executable(path);
+        std::vector<uint32_t> patch_entries;
         if (!patch_paths.empty()) {
             const auto original_digest = sha256_bytes(image);
             std::vector<ef2000::PatchWrite> writes;
@@ -3471,6 +3500,7 @@ int main(int argc, char** argv) {
                 writes.insert(writes.end(), batch.begin(), batch.end());
             }
             ef2000::validate_patch_writes(writes, image.size());
+            for (const auto& write : writes) patch_entries.push_back(write.offset);
             for (const auto& write : writes)
                 std::cout << "patch: addr=0x" << std::hex << write.offset << std::dec
                           << " bytes=" << write.bytes.size() << '\n';
@@ -3483,6 +3513,7 @@ int main(int argc, char** argv) {
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
                         controls, cd_cue);
+        if (!patch_entries.empty()) machine.enable_patch_hit_trace(patch_entries);
         if (!capture_targets.empty())
             machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));
         if (trace_archive_lookups) machine.enable_archive_lookup_trace();
