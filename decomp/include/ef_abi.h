@@ -6,6 +6,36 @@
 
 #include "ef_types.h"
 
+/* Batch 086 multiplayer configuration and network UI callbacks. The call
+ * hooks describe unresolved guest callees; they are NOT the guest Watcom ABI.
+ * The parser and formatter hooks represent the original stack-local output
+ * buffers, which are not addressable in the independent host RAM model. */
+uint32_t net_ui_guest_call_086(uint32_t entry, uint32_t eax,
+                              uint32_t edx, uint32_t ebx);
+int net_ui_parse_decimal_086(ef_addr32 text, uint32_t format,
+                            int32_t *result);
+ef_addr32 net_ui_format_option_086(uint32_t format, uint32_t value);
+void net_new_baud_335c0(ef_addr32 widget);
+void net_new_parity_3361c(ef_addr32 widget);
+void net_new_fifo_len_336c0(ef_addr32 widget);
+void net_open_ipx_settings_336f0(ef_addr32 widget);
+void net_new_number_33720(ef_addr32 widget);
+void net_new_pt_33738(ef_addr32 widget);
+void net_open_loops_form_33ad8(ef_addr32 widget);
+void net_new_init_string_33760(ef_addr32 widget);
+void net_open_modem_status_337ac(ef_addr32 widget);
+void net_new_port_337c4(ef_addr32 widget);
+void net_directplay_game_selected_341d8(ef_addr32 widget);
+void net_start_arcade_34480(void);
+void net_new_channel_344a0(void);
+void net_new_end_string_345d4(void);
+void net_open_loops_347ac(ef_addr32 widget);
+void net_main_loop_349ec(ef_addr32 widget);
+void net_open_initialise_35128(void);
+void net_open_rx_status_35e68(ef_addr32 widget);
+void net_set_nonentry_flag_35e90(ef_addr32 widget);
+void net_new_type_35eb8(ef_addr32 widget);
+
 /* Batch 085 named campaign/aircraft GUI callbacks. This is a host-model
  * register hook, not a confirmed Watcom splice ABI. */
 uint32_t gc_ui_guest_call_085(uint32_t entry, uint32_t eax, uint32_t edx);
