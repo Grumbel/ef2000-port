@@ -63,24 +63,31 @@
             as --$width -I runtime "$entry" -o objects/$backend/entry.o
             as --$width -I runtime --defsym CHECK_SEGMENT_LIMIT=1 "$entry" -o objects/$backend/entry-limit.o
           done
-          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -DEF_UNICORN_SDL3 \
+          # Static Unicorn 2.1.4 needs GNU ld's GOTPCRELX relaxation disabled;
+          # keeping the flag with shared Unicorn avoids diverging link recipes.
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -Wl,--no-relax -DEF_UNICORN_SDL3 \
             runtime/unicorn_cpp.cpp runtime/dos_drive.cpp runtime/cd_audio.cpp runtime/real_mode_cpu.cpp \
             runtime/sb16_probe.cpp runtime/sound_blaster.cpp runtime/isa_audio.cpp \
             runtime/pcm_audio.cpp runtime/wav_capture.cpp \
             -lunicorn -lcrypto -lSDL3 \
             -o objects/ef2000-unicorn-cpp
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -Wl,--no-relax \
+            tests/unicorn_x87_smoke.cpp -lunicorn \
+            -o objects/ef2000-unicorn-x87-smoke
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+            tests/dos_clock_test.cpp -o objects/ef2000-dos-clock-test
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/dos_drive_test.cpp runtime/dos_drive.cpp \
             -o objects/ef2000-dos-drive-test
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
             tests/bios_disk_test.cpp \
             -o objects/ef2000-bios-disk-test
-          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -Wl,--no-relax \
             tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp \
             runtime/sound_blaster.cpp runtime/isa_audio.cpp \
             -lunicorn \
             -o objects/ef2000-real-mode-test
-          $CXX -std=c++17 -O2 -Wall -Wextra -Werror \
+          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -Wl,--no-relax \
             tests/original_sound_driver_test.cpp runtime/real_mode_cpu.cpp \
             runtime/sb16_probe.cpp runtime/sound_blaster.cpp runtime/isa_audio.cpp \
             -lunicorn -lcrypto \
@@ -196,6 +203,8 @@
           unset EF2000_DATA_DIR
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
           objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
+          objects/ef2000-unicorn-x87-smoke | grep -q '5/5 FLD/FSTP qword memory round-trips passed'
+          objects/ef2000-dos-clock-test | grep -q 'deterministic PIT calendar conversion passed'
           objects/ef2000-efpatch-test
           objects/ef2000-call-capture-test call-capture-fixture.efcap
           objects/ef2000-decomp-hiscore-test

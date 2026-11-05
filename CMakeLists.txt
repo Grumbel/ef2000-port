@@ -305,6 +305,20 @@ find_path(UNICORN_INCLUDE_DIR unicorn/unicorn.h)
 find_library(UNICORN_LIBRARY unicorn)
 find_package(OpenSSL QUIET COMPONENTS Crypto)
 if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
+  # GNU ld's GOTPCRELX relaxation can corrupt indirect QEMU helper calls in
+  # static Unicorn 2.1.4, causing recursive self-calls on an x87 memory read.
+  # Keep the linker fix for all Unicorn clients (static and shared builds).
+  function(ef2000_unicorn_link_guard target)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND
+       CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang)$")
+      target_link_options(${target} PRIVATE "LINKER:--no-relax")
+      if(UNICORN_LIBRARY MATCHES "\\.a$")
+        # The bundled static library uses 128-bit atomics in its MMU helpers.
+        target_link_libraries(${target} PRIVATE atomic pthread m)
+      endif()
+    endif()
+  endfunction()
+
   add_executable(ef2000-unicorn-cpp runtime/unicorn_cpp.cpp runtime/dos_drive.cpp
                                   runtime/cd_audio.cpp
                                   runtime/real_mode_cpu.cpp runtime/sb16_probe.cpp
@@ -314,6 +328,7 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
   target_compile_options(ef2000-unicorn-cpp PRIVATE -Wall -Wextra -Werror)
   target_include_directories(ef2000-unicorn-cpp PRIVATE ${UNICORN_INCLUDE_DIR})
   target_link_libraries(ef2000-unicorn-cpp PRIVATE ${UNICORN_LIBRARY})
+  ef2000_unicorn_link_guard(ef2000-unicorn-cpp)
   if(WIN32)
     target_link_libraries(ef2000-unicorn-cpp PRIVATE advapi32)
   else()
@@ -372,6 +387,21 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
            --self-test-clock --tcg-cache-mib 128)
   set_tests_properties(unicorn-cpp-tcg-cache PROPERTIES
                        PASS_REGULAR_EXPRESSION "status=wall_time_limit")
+  add_executable(ef2000-unicorn-x87-smoke tests/unicorn_x87_smoke.cpp)
+  target_compile_features(ef2000-unicorn-x87-smoke PRIVATE cxx_std_17)
+  target_compile_options(ef2000-unicorn-x87-smoke PRIVATE -Wall -Wextra -Werror)
+  target_include_directories(ef2000-unicorn-x87-smoke PRIVATE ${UNICORN_INCLUDE_DIR})
+  target_link_libraries(ef2000-unicorn-x87-smoke PRIVATE ${UNICORN_LIBRARY})
+  ef2000_unicorn_link_guard(ef2000-unicorn-x87-smoke)
+  add_test(NAME unicorn-x87-smoke COMMAND ef2000-unicorn-x87-smoke)
+  set_tests_properties(unicorn-x87-smoke PROPERTIES
+                       PASS_REGULAR_EXPRESSION "5/5 FLD/FSTP qword memory round-trips passed")
+  add_executable(ef2000-dos-clock-test tests/dos_clock_test.cpp)
+  target_compile_features(ef2000-dos-clock-test PRIVATE cxx_std_17)
+  target_compile_options(ef2000-dos-clock-test PRIVATE -Wall -Wextra -Werror)
+  add_test(NAME dos-clock COMMAND ef2000-dos-clock-test)
+  set_tests_properties(dos-clock PROPERTIES
+                       PASS_REGULAR_EXPRESSION "deterministic PIT calendar conversion passed")
   add_executable(ef2000-real-mode-test tests/real_mode_cpu_test.cpp runtime/real_mode_cpu.cpp
                                      runtime/sb16_probe.cpp runtime/sound_blaster.cpp
                                      runtime/isa_audio.cpp)
@@ -379,6 +409,7 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
   target_compile_options(ef2000-real-mode-test PRIVATE -Wall -Wextra -Werror)
   target_include_directories(ef2000-real-mode-test PRIVATE ${UNICORN_INCLUDE_DIR})
   target_link_libraries(ef2000-real-mode-test PRIVATE ${UNICORN_LIBRARY})
+  ef2000_unicorn_link_guard(ef2000-real-mode-test)
   add_test(NAME real-mode-cpu COMMAND ef2000-real-mode-test)
   if(NOT WIN32)
     add_executable(ef2000-original-sb16-test tests/original_sound_driver_test.cpp
@@ -388,6 +419,7 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
     target_compile_options(ef2000-original-sb16-test PRIVATE -Wall -Wextra -Werror)
     target_include_directories(ef2000-original-sb16-test PRIVATE ${UNICORN_INCLUDE_DIR})
     target_link_libraries(ef2000-original-sb16-test PRIVATE ${UNICORN_LIBRARY} OpenSSL::Crypto)
+    ef2000_unicorn_link_guard(ef2000-original-sb16-test)
     add_test(NAME original-sb16 COMMAND ef2000-original-sb16-test)
     set_tests_properties(original-sb16 PROPERTIES SKIP_REGULAR_EXPRESSION "original-sb16: skipped")
   endif()

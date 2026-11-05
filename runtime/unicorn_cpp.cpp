@@ -5,6 +5,7 @@
 // calls stop explicitly; the proprietary executable is only read at runtime
 // and is never linked into the program.
 #include "dos_drive.hpp"
+#include "dos_clock.hpp"
 #include "bios_disk.hpp"
 #include "gamepad_profile.hpp"
 #include "host_shortcuts.hpp"
@@ -1280,6 +1281,8 @@ public:
         guest_hash_ranges_ = ranges;
     }
 
+    void use_guest_dos_clock(bool enabled) { guest_dos_clock_ = enabled; }
+
     void enable_call_capture(const std::vector<std::pair<uint32_t, unsigned>>& targets,
                              const fs::path& directory,
                              const std::array<uint8_t, 32>& original_sha) {
@@ -1620,6 +1623,7 @@ private:
     uint64_t gameport_reads_{}, gameport_writes_{};
     uint64_t ticks_{}, irq0_{}, irq1_{};
     uint32_t pit_divisor_ = 65536, pit_low_{}, bios_accumulator_{};
+    bool guest_dos_clock_{};
     bool pit_high_next_{}, irq_in_service_{}, eoi_seen_{};
     bool keyboard_ack_{};
     uint8_t shift_flags_{};
@@ -2694,7 +2698,9 @@ private:
         } else if (ax == 0x2511) {
             if (!dos_realmode(before, after)) return;
         } else if ((before.ax >> 8 & 255) == 0x2c || (before.ax >> 8 & 255) == 0x2a) {
-            const auto instant = std::chrono::system_clock::now();
+            const auto instant = guest_dos_clock_ ?
+                ef2000::guest_dos_clock(ticks_, pit_divisor_) :
+                std::chrono::system_clock::now();
             const std::time_t seconds = std::chrono::system_clock::to_time_t(instant);
             std::tm utc{};
 #ifdef _WIN32
@@ -3018,6 +3024,7 @@ void usage(const char* program) {
               << " [--timer-instructions N] (instruction timing only)\n"
               << "       [--sound off|sb16-probe|sb16-dma] (SDL3 audio if available)\n"
               << "       [--timing auto|instruction|realtime] (auto uses real-time for unlimited windowed runs)\n"
+              << "       [--dos-clock host|guest] (guest uses deterministic PIT time, starting 2000-01-01 noon UTC)\n"
               << "       [--wall-seconds N] (bounded real-time/headless diagnostic)\n"
               << "       [--block-clock-check N] [--vga-clock-check N] (powers of two, 1..4096)\n"
               << "       [--tcg-cache-mib N] (32..1024 MiB; default Unicorn cache size)\n"
@@ -3072,6 +3079,7 @@ int main(int argc, char** argv) {
         bool explicit_limit = false;
         uint64_t timer_interval = 250000;
         ExecutionTiming timing = ExecutionTiming::Auto;
+        bool guest_dos_clock = false;
         double wall_seconds = 0;
         PerformanceOptions performance;
         WindowOptions window;
@@ -3146,6 +3154,11 @@ int main(int argc, char** argv) {
                 else if (choice == "instruction") timing = ExecutionTiming::Instruction;
                 else if (choice == "realtime") timing = ExecutionTiming::Realtime;
                 else throw std::runtime_error("--timing expects auto, instruction or realtime");
+            } else if (!std::strcmp(argv[i], "--dos-clock") && i + 1 < argc) {
+                const std::string choice = argv[++i];
+                if (choice == "host") guest_dos_clock = false;
+                else if (choice == "guest") guest_dos_clock = true;
+                else throw std::runtime_error("--dos-clock expects host or guest");
             } else if (!std::strcmp(argv[i], "--wall-seconds") && i + 1 < argc) {
                 size_t end{};
                 const std::string value = argv[++i];
@@ -3561,6 +3574,7 @@ int main(int argc, char** argv) {
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
                         controls, cd_cue);
+        machine.use_guest_dos_clock(guest_dos_clock);
         if (!patch_entries.empty()) machine.enable_patch_hit_trace(patch_entries);
         machine.enable_guest_hashes(guest_hash_ranges);
         if (!capture_targets.empty())
