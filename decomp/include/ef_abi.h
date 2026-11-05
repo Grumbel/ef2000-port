@@ -6,6 +6,31 @@
 
 #include "ef_types.h"
 
+/* Batch 085 named campaign/aircraft GUI callbacks. This is a host-model
+ * register hook, not a confirmed Watcom splice ABI. */
+uint32_t gc_ui_guest_call_085(uint32_t entry, uint32_t eax, uint32_t edx);
+uint32_t gpw_ui_guest_call_085(uint32_t entry, uint32_t eax, uint32_t edx);
+void gc_set_difficulty_40e50(void);
+void gc_start_new_campaign_40ebc(void);
+void gc_performance_yes_40ec4(void);
+void gc_performance_no_40ed0(ef_addr32 widget);
+void gc_load_old_campaign_40ee4(void);
+void gc_loadfile_accepted_40f18(void);
+void gc_init_main_menu_40f64(void);
+void gc_set_campaign_difficulty_40f9c(void);
+void gpw_plane_side_on_68f40(void);
+void gpw_plane_underneath_68f6c(void);
+void gpw_plane_angled_68f98(void);
+void gpw_use_defaults_68fbc(void);
+void gpw_place_missile_68fe0(void);
+void gpw_set_clear_missile_6931c(void);
+void gpw_set_clear_all_missiles_69338(void);
+void gpw_check_hit_pylon_69354(void);
+void gpw_show_current_69914(void);
+void gpw_turn_y_plane_69920(ef_addr32 widget);
+void gpw_arcade_accepted_69978(ef_addr32 widget);
+void gpw_open_big_current_weapon_699d4(ef_addr32 widget);
+
 /* Mission-planning GUI callback entries (batch 084). Guest UI callees are
  * explicit register-call hooks; no guest splice ABI is claimed yet. */
 uint32_t mp_ui_guest_call_084(uint32_t address, uint32_t eax, uint32_t edx);
