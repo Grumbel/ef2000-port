@@ -617,3 +617,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   This image was not replayed because Xvfb still cannot bind a private
   listener. M1/M2 remain unpassed and this image's first runtime failure is
   unknown.
+- M0 confirmed register-parameter lowering, 2026-11-07: for confirmed
+  register inputs, the generator now removes Ghidra's duplicate `in_REG`
+  local declaration and uses its recovered pointer type for the C parameter.
+  When a no-stack signature also has a referenced generic `param_N`, that
+  name is mapped to the corresponding confirmed register input. This fixes
+  three compile errors (`0xb00d0`, `0xb1b8b`, `0x11c0b4`); OpenWatcom `ok`
+  rises from 408 to 411/1,020 (124,581 to 125,051 body bytes), and compile
+  errors fall from 18 to 15. WDIS confirms the resulting `0xb1b8b` body reads
+  through EAX and `0x11c0b4` reads EDX and writes through EAX. Current rate
+  is 40.3% of functions and 23.0% of available export bytes; 594 remain
+  `manual`. This does not verify runtime behavior.
+- Relink with 411 mechanical `ok` objects, 2026-11-07: 2,448 functions
+  redirect (2,043 hand-written, 405 mechanical), patching 12,240 original
+  entry bytes and placing 584,852 bytes in the code arena (597,092 total
+  patch bytes). 697/759 modules link; 2,283 functions are excluded. The
+  private Xvfb listener failure prevents replay; M1/M2 remain unpassed and
+  this image's first runtime failure is unknown.

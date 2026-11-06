@@ -189,12 +189,19 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
     original_first = next((line for line in body.split('\n') if line.strip()), '')
     original = DEF.match(original_first)
     original_params = []
+    original_param_types = []
     if original and original.group('params').strip() not in ('', 'void'):
         for parameter in original.group('params').split(','):
-            name = re.search(r'([A-Za-z_]\w*)\s*(?:\[[^]]*\])?\s*$', parameter.strip())
+            parameter = parameter.strip()
+            name = re.search(r'([A-Za-z_]\w*)\s*(?:\[[^]]*\])?\s*$', parameter)
             original_params.append(name.group(1) if name else None)
+            original_param_types.append(
+                normalize_type(parameter[:name.start()].strip()) if name else None)
     if sig_in:
         # Watcom register arguments: Ghidra shows them as in_<REG>.
+        has_stack_inputs = any(
+            re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper()) for reg, _ in sig_in)
+        register_index = 0
         for reg, ctype in sig_in:
             stack = re.fullmatch(r'\[?ESP\+(\d+)\]?', reg.upper())
             if stack:
@@ -206,9 +213,24 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
                 extra.append('%s %s' % (ctype if ctype else 'uint32_t', parameter_name))
                 continue
             name = 'in_' + reg.upper()
+            parameter_type = None
             if re.search(r'\b' + name + r'\b', body):
+                declaration = re.search(
+                    r'(?m)^\s*([A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*)\s*(\*+)?\s*' +
+                    re.escape(name) + r'\s*;\s*$', body)
+                if declaration:
+                    parameter_type = (normalize_type(declaration.group(1)).strip() +
+                                      ' ' + (declaration.group(2) or '')).strip()
+                    body = body[:declaration.start()] + body[declaration.end():]
                 body = re.sub(r'\b' + name + r'\b', 'r_' + reg.lower(), body)
-            extra.append('%s r_%s' % (ctype if ctype else 'uint32_t', reg.lower()))
+            if not has_stack_inputs and register_index < len(original_params):
+                original_name = original_params[register_index]
+                if original_name and re.search(r'\b' + re.escape(original_name) + r'\b', body):
+                    parameter_type = parameter_type or original_param_types[register_index]
+                    body = re.sub(r'\b' + re.escape(original_name) + r'\b',
+                                  'r_' + reg.lower(), body)
+            extra.append('%s r_%s' % (parameter_type or ctype or 'uint32_t', reg.lower()))
+            register_index += 1
     elif sig_in is None:
         # No confirmed signature: infer register inputs from in_<REG> uses.
         # HYPOTHESIS ONLY (plan rule 4); the pragma is marked inferred.
