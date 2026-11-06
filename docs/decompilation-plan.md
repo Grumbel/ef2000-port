@@ -2103,6 +2103,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-06  3.34  `exchange_slot_1041e4` (`0x1041e4`, 25 bytes) is verified. The exact OpenWatcom body preserves the original cdecl stack ABI and EBX/EDX clobbers; four isolated and four captured startup calls pass. Repeated menu/setup/cockpit replay passes 3/3 with 19 hits per scenario. Corrected wrapper `0x101e14` and its two-argument call sites. See docs/subsystems/decomp-batch-136.md.
 2026-11-06  3.35  `find_last_char` (`0x10d1da`, 26 bytes) is verified with an exact OpenWatcom body, six isolated cases and four captured startup calls. Repeated menu/setup/cockpit replay passes 3/3 with 20,889, 20,933 and 278,507 hits; matching state/counters. Corrected the signature to record EDX clobber. See docs/subsystems/decomp-batch-137.md.
 2026-11-06  3.36  Corrected `exchange_callback_106938` (`0x106938`) and wrapper `0x102dbc` to caller-clean cdecl. Exact OpenWatcom body passes five isolated and four captured sound-channel calls. Sound-off paths do not hit it; SB16-DMA reaches six times but remains nondeterministic (42,342 vs. 42,372 interrupts, selected BSS differs), so keep `spliced`. See docs/subsystems/decomp-batch-138.md.
+2026-11-06  3.37  `strip_cr_inplace` (`0x1091e0`, 28 bytes) is verified with an exact OpenWatcom body, six isolated cases and one captured startup call (348 guest RAM bytes compared). Repeated menu/setup/cockpit replay passes 3/3 with 1/1/2 hits and matching state/counters. See docs/subsystems/decomp-batch-139.md.
 ```
 
 ---

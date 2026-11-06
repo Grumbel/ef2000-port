@@ -360,7 +360,7 @@ int32_t hex_digit_value(int32_t c)
     return 0x10;
 }
 
-/* 0x1091e0, 28 bytes. Remove carriage returns in place; returns the end pointer. */
+/* 0x1091e0, 28 bytes. verified: diff+capture+replays. Remove CRs in place. */
 ef_addr32 strip_cr_inplace(ef_addr32 text)
 {
     ef_addr32 dst = text;

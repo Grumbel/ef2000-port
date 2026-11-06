@@ -1,0 +1,18 @@
+/* SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com> */
+/* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
+
+#include "ef_abi.h"
+
+static ef_addr32 strip_cr_original_sequence(void);
+#pragma aux strip_cr_original_sequence = \
+    0x53 0x52 0x89 0xc2 0x31 0xdb 0x8a 0x18 \
+    0x83 0xfb 0x0d 0x75 0x03 0x40 0xeb 0xf4 \
+    0x42 0x40 0x88 0x5a 0xff 0x84 0xdb 0x75 0xeb \
+    0x5a 0x5b \
+    __value [eax] __modify []
+
+ef_addr32 strip_cr_inplace(ef_addr32 text)
+{
+    (void)text;
+    return strip_cr_original_sequence();
+}

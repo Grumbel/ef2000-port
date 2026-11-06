@@ -1,1 +1,85 @@
-{"address":"0x001091e0","function_size":28,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x001091e0",
+  "function_size": 28,
+  "max_instructions": 1000,
+  "cases": [
+    {
+      "name": "empty_string",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0xdeadbeef"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "no_carriage_returns",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0xdeadbeef"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "616c70686100"
+        }
+      ]
+    },
+    {
+      "name": "mixed_repeated_cr",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0xdeadbeef"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "0d410d0d420d00"
+        }
+      ]
+    },
+    {
+      "name": "only_carriage_returns",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0xdeadbeef"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "0d0d0d00"
+        }
+      ]
+    },
+    {
+      "name": "high_bit_bytes",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0xdeadbeef"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "800dff00"
+        }
+      ]
+    },
+    {
+      "name": "cr_after_terminator_untouched",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0xdeadbeef"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "41000d4200"
+        }
+      ]
+    }
+  ]
+}
