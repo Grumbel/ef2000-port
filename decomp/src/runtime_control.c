@@ -95,14 +95,26 @@ uint32_t copy_active_buffer_pointer(void)
 #endif
 }
 
-/* 0x7eea0, 0x19 bytes, two caller functions. With input disabled, the
+/* 0x7eea0, 0x19 bytes, verified: differential+replay. With input disabled, the
  * original starts DL at zero and disregards AL. It returns cleared-high
  * EAX, and also stores that byte to a separate output latch. */
-uint8_t set_control_mode_a(uint8_t value)
+#if defined(__WATCOMC__)
+static uint32_t set_control_mode_a_original_sequence(void);
+#pragma aux set_control_mode_a_original_sequence = \
+    0x52 0x8a 0x15 0xc6 0xba 0x15 0x00 0x84 0xd2 0x74 0x02 \
+    0x88 0xc2 0x31 0xc0 0x88 0xd0 0x88 0x15 0x70 0xb0 0x12 0x00 \
+    0x5a __value [eax] __modify [eax]
+#endif
+uint32_t set_control_mode_a(uint8_t value)
 {
+#if defined(__WATCOMC__)
+    (void)value;
+    return set_control_mode_a_original_sequence();
+#else
     uint8_t selected = (g_mode_input_enabled_a != 0) ? value : 0;
     g_mode_output_a = selected;
-    return selected;
+    return (uint32_t)selected;
+#endif
 }
 
 /* 0x810d0 and 0x810f4, each 0x19 bytes, two independent callers each.

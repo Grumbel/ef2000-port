@@ -600,7 +600,7 @@ void set_runtime_phase_five(void); /* 0x3dcc0 */
 void initialize_mode_limits(void); /* 0x58d24 */
 void reset_unit_counter(void); /* 0x5e658 */
 uint32_t copy_active_buffer_pointer(void); /* 0x7a428, EAX */
-uint8_t set_control_mode_a(uint8_t value); /* 0x7eea0, AL -> EAX zero-extended */
+uint32_t set_control_mode_a(uint8_t value); /* 0x7eea0, AL -> EAX zero-extended */
 uint8_t set_control_mode_b(uint8_t value); /* 0x810d0, AL -> EAX zero-extended */
 uint8_t set_control_mode_c(uint8_t value); /* 0x810f4, AL -> EAX zero-extended */
 

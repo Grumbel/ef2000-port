@@ -1,37 +1,819 @@
 {
   "address": "0x0007eea0",
   "function_size": 25,
-  "max_instructions": 180000,
+  "max_instructions": 1000,
   "cases": [
     {
-      "name": "input_disabled",
+      "name": "input_00_gate_00_00",
       "registers": {
-        "eax": "0xffffffab"
+        "eax": "0xa0f3d800",
+        "ebx": "0xcffa4c0f",
+        "ecx": "0x86422ca1",
+        "edx": "0x625b0d34",
+        "esi": "0xc5722cd2",
+        "edi": "0xa9a53b30",
+        "ebp": "0x977389e1"
       },
       "memory": [
         {
-          "address": "0x0015bac6",
-          "hex": "00"
+          "address": "0x0015bac4",
+          "hex": "e5ce00b8c298"
         },
         {
-          "address": "0x0012b070",
-          "hex": "ff"
+          "address": "0x0012b06e",
+          "hex": "01ea59b1199b"
         }
       ]
     },
     {
-      "name": "input_enabled",
+      "name": "input_01_gate_ff_01",
       "registers": {
-        "eax": "0xffffffab"
+        "eax": "0x38ef9b01",
+        "ebx": "0xe2950743",
+        "ecx": "0x2e692d4e",
+        "edx": "0x5db21c46",
+        "esi": "0x3e67268b",
+        "edi": "0xa88fdc77",
+        "ebp": "0x755eaabe"
       },
       "memory": [
         {
-          "address": "0x0015bac6",
-          "hex": "02"
+          "address": "0x0015bac4",
+          "hex": "b039ff804680"
         },
         {
-          "address": "0x0012b070",
-          "hex": "00"
+          "address": "0x0012b06e",
+          "hex": "1f1d86e98dba"
+        }
+      ]
+    },
+    {
+      "name": "input_7f_gate_00_02",
+      "registers": {
+        "eax": "0xec393d7f",
+        "ebx": "0x0e6394c5",
+        "ecx": "0xba48cad0",
+        "edx": "0x0fd2188c",
+        "esi": "0xb34320d1",
+        "edi": "0xae46e42e",
+        "ebp": "0x45370ff4"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "e08a0030990d"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "4885e2892a52"
+        }
+      ]
+    },
+    {
+      "name": "input_80_gate_01_03",
+      "registers": {
+        "eax": "0xc4f1c780",
+        "ebx": "0xc36c3d81",
+        "ecx": "0xe3eabac9",
+        "edx": "0x6d6a5b7a",
+        "esi": "0xfd490d92",
+        "edi": "0xdf65ea8d",
+        "ebp": "0x44d9b705"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "dc4a01e0a02b"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "ff2af90d224b"
+        }
+      ]
+    },
+    {
+      "name": "input_fe_gate_00_04",
+      "registers": {
+        "eax": "0xfc65a4fe",
+        "ebx": "0x9704a3c2",
+        "ecx": "0xcfa3f74b",
+        "edx": "0x28517952",
+        "esi": "0xd9100883",
+        "edi": "0xe4c27031",
+        "ebp": "0x6975ac62"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "d92c006f007b"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "bd1b6aac6991"
+        }
+      ]
+    },
+    {
+      "name": "input_ff_gate_80_05",
+      "registers": {
+        "eax": "0x16ed83ff",
+        "ebx": "0x0d50b835",
+        "ecx": "0xe5781c68",
+        "edx": "0x0acd2de0",
+        "esi": "0x983794a2",
+        "edi": "0xd264484d",
+        "ebp": "0x17409c1b"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "1e6a8008e888"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "fbd13de639cd"
+        }
+      ]
+    },
+    {
+      "name": "input_57_gate_00_06",
+      "registers": {
+        "eax": "0x1fb0ae57",
+        "ebx": "0xf69aa3af",
+        "ecx": "0xa4a7a007",
+        "edx": "0x0b4cf8dd",
+        "esi": "0x344c8476",
+        "edi": "0x9c266bf4",
+        "ebp": "0x1b556078"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "fb4200e894c8"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "ed845e9632d9"
+        }
+      ]
+    },
+    {
+      "name": "input_44_gate_ff_07",
+      "registers": {
+        "eax": "0xfa7d5444",
+        "ebx": "0x67387270",
+        "ecx": "0x478bbfb3",
+        "edx": "0x9deb4919",
+        "esi": "0xeeedf705",
+        "edi": "0x42125ce0",
+        "ebp": "0x264df3bc"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "5f3efff542cd"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "40896bcffa5b"
+        }
+      ]
+    },
+    {
+      "name": "input_69_gate_00_08",
+      "registers": {
+        "eax": "0xeb653c69",
+        "ebx": "0x59188f93",
+        "ecx": "0xa2816d7e",
+        "edx": "0x514f7edd",
+        "esi": "0x0d3ea84a",
+        "edi": "0xb1ff75e3",
+        "ebp": "0x0aebbd82"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "125c00dc39fc"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "2b5054a91ea5"
+        }
+      ]
+    },
+    {
+      "name": "input_7d_gate_80_09",
+      "registers": {
+        "eax": "0xb94f147d",
+        "ebx": "0x6b8efccb",
+        "ecx": "0xb2bf50ba",
+        "edx": "0x85b1ed0b",
+        "esi": "0x8c6ff9c5",
+        "edi": "0xb700e661",
+        "ebp": "0x80e06621"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "1ba180a915f8"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "e2a8eecc6054"
+        }
+      ]
+    },
+    {
+      "name": "input_b3_gate_00_10",
+      "registers": {
+        "eax": "0xf36c3db3",
+        "ebx": "0xd0b24860",
+        "ecx": "0x0510a124",
+        "edx": "0x0fd0880c",
+        "esi": "0xb58fea32",
+        "edi": "0x00100bb1",
+        "ebp": "0x9a2584b1"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "4c1a00d9186e"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "b27ba332069b"
+        }
+      ]
+    },
+    {
+      "name": "input_4e_gate_ff_11",
+      "registers": {
+        "eax": "0x0af3bc4e",
+        "ebx": "0xff951f83",
+        "ecx": "0x488f3c52",
+        "edx": "0x20896f2a",
+        "esi": "0x6275b6bb",
+        "edi": "0xedbb6048",
+        "ebp": "0xf4afebeb"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "0eddff80f76d"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "c1c27b928a01"
+        }
+      ]
+    },
+    {
+      "name": "input_a5_gate_00_12",
+      "registers": {
+        "eax": "0x1dbe37a5",
+        "ebx": "0x8be7d3ea",
+        "ecx": "0x4b3251b4",
+        "edx": "0x609af7cc",
+        "esi": "0x8431c2a2",
+        "edi": "0x54b717f4",
+        "ebp": "0x266edcc0"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "09e800bf9eb3"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "2bad783fbd42"
+        }
+      ]
+    },
+    {
+      "name": "input_12_gate_80_13",
+      "registers": {
+        "eax": "0x6c410312",
+        "ebx": "0xf7e954e4",
+        "ecx": "0x4d7a5fe4",
+        "edx": "0x46997504",
+        "esi": "0x0138eb07",
+        "edi": "0x49e86a87",
+        "ebp": "0x8d0071e1"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "77c980a4961f"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "5e806451a5d9"
+        }
+      ]
+    },
+    {
+      "name": "input_2e_gate_00_14",
+      "registers": {
+        "eax": "0x535fcf2e",
+        "ebx": "0xe7caca4a",
+        "ecx": "0x939e1bb1",
+        "edx": "0x21708256",
+        "esi": "0x70e005ee",
+        "edi": "0x0cacfb4d",
+        "ebp": "0x35f38b07"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "efde00823f94"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "2a31cf4711ae"
+        }
+      ]
+    },
+    {
+      "name": "input_72_gate_01_15",
+      "registers": {
+        "eax": "0xab9cae72",
+        "ebx": "0xd2fa911f",
+        "ecx": "0xfc7e895f",
+        "edx": "0xd9f96955",
+        "esi": "0x6ab56d0b",
+        "edi": "0x5be0bfc2",
+        "ebp": "0xcd4c7f00"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "248901c8c6b3"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "2e98704eabe2"
+        }
+      ]
+    },
+    {
+      "name": "input_35_gate_00_16",
+      "registers": {
+        "eax": "0x26975735",
+        "ebx": "0xe8accef8",
+        "ecx": "0xa0ff6c9a",
+        "edx": "0xcaea68cd",
+        "esi": "0xa4223d59",
+        "edi": "0x2e706d02",
+        "ebp": "0xd9cced61"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "d76b002c6d1d"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "4bf134beeb10"
+        }
+      ]
+    },
+    {
+      "name": "input_6f_gate_01_17",
+      "registers": {
+        "eax": "0x66b0386f",
+        "ebx": "0x89599168",
+        "ecx": "0x3068b69d",
+        "edx": "0xefa5db8a",
+        "esi": "0xfe914b80",
+        "edi": "0x4a5a1d89",
+        "ebp": "0x845f1fdf"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "31de019d9548"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "b32ee43912ff"
+        }
+      ]
+    },
+    {
+      "name": "input_02_gate_00_18",
+      "registers": {
+        "eax": "0x46a69b02",
+        "ebx": "0xfa20e35c",
+        "ecx": "0xd20d8311",
+        "edx": "0x473f9f0f",
+        "esi": "0xd1980d15",
+        "edi": "0xab584f97",
+        "ebp": "0x8b9a57c0"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "d05b002aa371"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "100cc6ccf63d"
+        }
+      ]
+    },
+    {
+      "name": "input_67_gate_80_19",
+      "registers": {
+        "eax": "0x130ba967",
+        "ebx": "0x8971fae3",
+        "ecx": "0x379a28db",
+        "edx": "0xb2e6d8c7",
+        "esi": "0xb4a147aa",
+        "edi": "0x8586a1ee",
+        "ebp": "0x99bf157a"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "a3358084d4d1"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "33ae70b090d5"
+        }
+      ]
+    },
+    {
+      "name": "input_3c_gate_00_20",
+      "registers": {
+        "eax": "0x6ca2da3c",
+        "ebx": "0x6162cf72",
+        "ecx": "0x86a21333",
+        "edx": "0xeb1f77cc",
+        "esi": "0xb53041b4",
+        "edi": "0xb6940ca6",
+        "ebp": "0xbe9f0c27"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "b37a005dd34c"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "b3e83e81d077"
+        }
+      ]
+    },
+    {
+      "name": "input_a8_gate_02_21",
+      "registers": {
+        "eax": "0x8b1586a8",
+        "ebx": "0x05533be6",
+        "ecx": "0xeccd118f",
+        "edx": "0x75f3d4b8",
+        "esi": "0x7c0e3c7e",
+        "edi": "0xd2304d07",
+        "ebp": "0x2c460f42"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "0e8402fb2dff"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "7e4298df26f0"
+        }
+      ]
+    },
+    {
+      "name": "input_2c_gate_00_22",
+      "registers": {
+        "eax": "0x4a6c382c",
+        "ebx": "0x857d08f6",
+        "ecx": "0x2ef8d36d",
+        "edx": "0xb436c3e9",
+        "esi": "0xda02ee85",
+        "edi": "0x726b03e2",
+        "ebp": "0x985c10cb"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "656500aebd8e"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "ea92a3abf21b"
+        }
+      ]
+    },
+    {
+      "name": "input_00_gate_80_23",
+      "registers": {
+        "eax": "0x387cdb00",
+        "ebx": "0x66038443",
+        "ecx": "0x90877a76",
+        "edx": "0x4ab5f720",
+        "esi": "0x32d81dbb",
+        "edi": "0x24ffb63a",
+        "ebp": "0x7fbbbbaf"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "a46b808c077e"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "8a246deeec29"
+        }
+      ]
+    },
+    {
+      "name": "input_a7_gate_00_24",
+      "registers": {
+        "eax": "0x8a3130a7",
+        "ebx": "0x425c077b",
+        "ecx": "0x08a63d21",
+        "edx": "0x7fd4584d",
+        "esi": "0xc9f7cffd",
+        "edi": "0x16f4e372",
+        "ebp": "0x20943574"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "d53600851fa0"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "e4e76784e34f"
+        }
+      ]
+    },
+    {
+      "name": "input_d2_gate_ff_25",
+      "registers": {
+        "eax": "0x7465a5d2",
+        "ebx": "0x360d5061",
+        "ecx": "0xb08f1057",
+        "edx": "0x6c25fcb2",
+        "esi": "0xe4f3c7c9",
+        "edi": "0x0c90b56b",
+        "ebp": "0x741cd4db"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "511fff668e99"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "bff6963a5347"
+        }
+      ]
+    },
+    {
+      "name": "input_54_gate_00_26",
+      "registers": {
+        "eax": "0x0c67fd54",
+        "ebx": "0x56b8ae66",
+        "ecx": "0x81bc3bb1",
+        "edx": "0xfbe19c67",
+        "esi": "0x478e7529",
+        "edi": "0x331993a9",
+        "ebp": "0x860e2600"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "b71700949db8"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "9c3cd6d00ee4"
+        }
+      ]
+    },
+    {
+      "name": "input_f4_gate_02_27",
+      "registers": {
+        "eax": "0x8c7a37f4",
+        "ebx": "0x40a1dffa",
+        "ecx": "0x573d1b68",
+        "edx": "0x3461f1c9",
+        "esi": "0x07583a77",
+        "edi": "0xa91c33a9",
+        "ebp": "0xce04eaf3"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "4268020bf8f4"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "e7eadc88f010"
+        }
+      ]
+    },
+    {
+      "name": "input_27_gate_00_28",
+      "registers": {
+        "eax": "0x39ba8727",
+        "ebx": "0x0b6e976b",
+        "ecx": "0x069b993d",
+        "edx": "0x058dd060",
+        "esi": "0x1e02ef24",
+        "edi": "0x8153c1f3",
+        "ebp": "0xac1c27d2"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "e40700b361fd"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "0d38e4a72dee"
+        }
+      ]
+    },
+    {
+      "name": "input_95_gate_02_29",
+      "registers": {
+        "eax": "0xbb94b395",
+        "ebx": "0x03958fff",
+        "ecx": "0xce348a8d",
+        "edx": "0x8b05ff3d",
+        "esi": "0x81c219ef",
+        "edi": "0xa45575c2",
+        "ebp": "0x8af1bd91"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "ed9102134626"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "0237d97b6b91"
+        }
+      ]
+    },
+    {
+      "name": "input_77_gate_00_30",
+      "registers": {
+        "eax": "0x95160277",
+        "ebx": "0x2c826528",
+        "ecx": "0xb6e7bf8c",
+        "edx": "0x90b04678",
+        "esi": "0x50734b6b",
+        "edi": "0x6f8a3e35",
+        "ebp": "0xed5409ad"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "6655005e3d49"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "c5e7423c766d"
+        }
+      ]
+    },
+    {
+      "name": "input_93_gate_ff_31",
+      "registers": {
+        "eax": "0xfbc97993",
+        "ebx": "0xe402c933",
+        "ecx": "0x5bd489c1",
+        "edx": "0xec186a74",
+        "esi": "0x25cf3226",
+        "edi": "0xe101582a",
+        "ebp": "0xbfcb36ff"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "8c3affe9fa21"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "7ae581147573"
+        }
+      ]
+    },
+    {
+      "name": "input_57_gate_00_32",
+      "registers": {
+        "eax": "0xf1017257",
+        "ebx": "0x691c619f",
+        "ecx": "0x3d9a1c7b",
+        "edx": "0x414d1194",
+        "esi": "0xe5d6bae0",
+        "edi": "0x6714b3dc",
+        "ebp": "0x72192324"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "5f5100aaf849"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "62f935968ab4"
+        }
+      ]
+    },
+    {
+      "name": "input_55_gate_ff_33",
+      "registers": {
+        "eax": "0xe9df5955",
+        "ebx": "0x2acbc011",
+        "ecx": "0x93377466",
+        "edx": "0x5d237d97",
+        "esi": "0xd7d5be15",
+        "edi": "0xd17fa5aa",
+        "ebp": "0x690dfb1f"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "12f8ff08d302"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "594ec6105e91"
+        }
+      ]
+    },
+    {
+      "name": "input_96_gate_00_34",
+      "registers": {
+        "eax": "0xf212a196",
+        "ebx": "0x0251f3f8",
+        "ecx": "0x8450b370",
+        "edx": "0xdd194b16",
+        "esi": "0x2cdab508",
+        "edi": "0x6a9dfb75",
+        "ebp": "0x991394b4"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "8fe70051d5d7"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "6e048605c6e8"
+        }
+      ]
+    },
+    {
+      "name": "input_8d_gate_02_35",
+      "registers": {
+        "eax": "0xdf31708d",
+        "ebx": "0xb46155a8",
+        "ecx": "0x7ccd95c0",
+        "edx": "0x1fe338b4",
+        "esi": "0x0a2ebdfe",
+        "edi": "0xeef137a1",
+        "ebp": "0xf222d4d2"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "879202645869"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "39e521f58e62"
+        }
+      ]
+    },
+    {
+      "name": "input_ec_gate_00_36",
+      "registers": {
+        "eax": "0x6b6ae3ec",
+        "ebx": "0xdc83f397",
+        "ecx": "0x695ca0eb",
+        "edx": "0x3e9a3b69",
+        "esi": "0x838bb70d",
+        "edi": "0xdbc00f1b",
+        "ebp": "0x4f1df106"
+      },
+      "memory": [
+        {
+          "address": "0x0015bac4",
+          "hex": "119300d9ac5c"
+        },
+        {
+          "address": "0x0012b06e",
+          "hex": "fd9dc712dc9b"
         }
       ]
     }
