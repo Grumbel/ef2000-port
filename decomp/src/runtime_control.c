@@ -119,16 +119,38 @@ uint32_t set_control_mode_a(uint8_t value)
 
 /* 0x810d0 and 0x810f4, each 0x19 bytes, two independent callers each.
  * Both depend on the same mode gate but store to different guest bytes. */
-uint8_t set_control_mode_b(uint8_t value)
+#if defined(__WATCOMC__)
+static uint32_t set_control_mode_b_original_sequence(void);
+#pragma aux set_control_mode_b_original_sequence = \
+    0x52 0x8a 0x15 0xc7 0xba 0x15 0x00 0x84 0xd2 0x74 0x02 \
+    0x88 0xc2 0x31 0xc0 0x88 0xd0 0x88 0x15 0x04 0xb1 0x12 0x00 \
+    0x5a __value [eax] __modify [eax]
+static uint32_t set_control_mode_c_original_sequence(void);
+#pragma aux set_control_mode_c_original_sequence = \
+    0x52 0x8a 0x15 0xc7 0xba 0x15 0x00 0x84 0xd2 0x74 0x02 \
+    0x88 0xc2 0x31 0xc0 0x88 0xd0 0x88 0x15 0x05 0xb1 0x12 0x00 \
+    0x5a __value [eax] __modify [eax]
+#endif
+uint32_t set_control_mode_b(uint8_t value)
 {
+#if defined(__WATCOMC__)
+    (void)value;
+    return set_control_mode_b_original_sequence();
+#else
     uint8_t selected = (g_mode_input_enabled_b != 0) ? value : 0;
     g_mode_output_b = selected;
-    return selected;
+    return (uint32_t)selected;
+#endif
 }
 
-uint8_t set_control_mode_c(uint8_t value)
+uint32_t set_control_mode_c(uint8_t value)
 {
+#if defined(__WATCOMC__)
+    (void)value;
+    return set_control_mode_c_original_sequence();
+#else
     uint8_t selected = (g_mode_input_enabled_b != 0) ? value : 0;
     g_mode_output_c = selected;
-    return selected;
+    return (uint32_t)selected;
+#endif
 }
