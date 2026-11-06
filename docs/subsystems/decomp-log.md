@@ -94,6 +94,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   (34,149 bytes) and 708 manual functions (462,568 bytes). Compilation used
   the pinned OpenWatcom binary directly because `nix develop` could not write
   the Nix fetcher cache; compile success does not establish ABI correctness.
+- M0 rule 11, Ghidra byte-offset fields, 2026-11-06: lower `base._N_M_` reads
+  and writes to width-specific accesses at the same address and byte offset;
+  three-byte fields stay manual. The OpenWatcom report rises to 271/1,022 ok
+  (26.5%, 68,495/544,429 bytes = 12.6%), from 207/1,022 (20.3%,
+  47,712/544,429 bytes = 8.8%). The remaining export has 157 compile errors
+  (65,523 bytes) and 594 manual functions (410,411 bytes). Mechanical lvalue
+  lowering is a draft translation; compiler acceptance is not behavioral
+  verification.
 - M1 structural assessment, 2026-11-06: all 334 `decomp/src/*.c` modules
   compile with OpenWatcom `-wx` and zero warnings into ignored
   `local/hybrid/obj/` (432,877 CODE bytes plus 4,388 DATA bytes). The OMF

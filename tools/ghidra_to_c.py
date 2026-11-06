@@ -208,7 +208,35 @@ def convert(text, entry, names, sig_in=None, globals_=None):
         for base in sorted(used, key=order.index):
             extra.append('uint32_t r_' + base)
             inferred.append(base)
-    if MANUAL.search(body) or re.search(r'\._\d_\d_', body):
+    # Materialise Ghidra's byte-offset field notation as an lvalue over the
+    # original storage. This preserves overlapping local/register fragments
+    # and writes; three-byte fields stay manual because they are not a C
+    # scalar access.
+    field_types = {1: 'uint8_t', 2: 'uint16_t', 4: 'uint32_t', 8: 'uint64_t'}
+    def subfield_repl(match):
+        base = match.group('base')
+        offset = int(match.group('offset'))
+        width = int(match.group('width'))
+        ctype = field_types.get(width)
+        if not ctype:
+            flags.add('manual')
+            return match.group(0)
+        address = None
+        if base.startswith(('DAT_', '_DAT_')):
+            address_match = re.search(r'([0-9a-fA-F]{8})$', base)
+            if address_match:
+                address = int(address_match.group(1), 16)
+        elif base.startswith('s_'):
+            address_match = re.search(r'_([0-9a-fA-F]{8})$', base)
+            if address_match:
+                address = int(address_match.group(1), 16)
+        if address is not None:
+            return '(*(%s *)ef_guest_memory_ptr(0x%08xu))' % (
+                ctype, address + offset)
+        return '(*(%s *)((char *)&%s + %d))' % (ctype, base, offset)
+    body = re.sub(r'(?P<base>[A-Za-z_]\w*)\._(?P<offset>\d+)_(?P<width>\d+)_',
+                  subfield_repl, body)
+    if MANUAL.search(body):
         flags.add('manual')
     # Ghidra's CONCATxy(a, b) joins x bytes from a and y bytes from b.
     # Keep the operation unsigned and wide while shifting, then narrow to the
