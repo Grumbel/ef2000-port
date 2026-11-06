@@ -490,3 +490,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   exclusions fall to 2,479. Runtime replay remains unavailable because Xvfb
   cannot bind, so M1/M2 remain unpassed and the first guest failure is
   unknown.
+- Hybrid OpenWatcom signed-64 divide/modulo bridge, 2026-11-06: added
+  `__I8D` with dividend EDX:EAX, divisor ECX:EBX, quotient EDX:EAX and
+  remainder ECX:EBX. The restoring unsigned divide core and sign handling
+  passed a helper-level Unicorn differential over 1,013 deterministic edge
+  and random vectors, including ESI/EDI/EBP and stack preservation; WDIS
+  confirms a compiled caller's register setup. The same harness passed 1,007
+  `__U8FD7` unsigned-to-double vectors and confirmed x87 control-word
+  restoration. Relinking resolves the `__I8D` class and grows to 2,417
+  redirects (12,085 entry bytes; 576,132 arena bytes), 673/740 modules, with
+  388 mechanical and 2,029 hand-written functions patched; exclusions fall
+  to 2,313. These helper checks do not substitute for game replay: Xvfb still
+  cannot bind, M1/M2 remain unpassed, and the first guest failure is unknown.
