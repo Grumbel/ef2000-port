@@ -1130,7 +1130,8 @@ Ten further functions were inspected directly in the pinned original
 executable with two **distinct original caller functions each**, recorded
 in `decomp/symbols/signatures.tsv`. Their C drafts in
 `link_resolution.c` and `runtime_control.c` have host-only tests and
-boundary differential fixtures, but no patched guest confirmation.
+boundary differential fixtures; `0x5e658` is now verified with an
+OpenWatcom splice and deterministic replay (batch 120).
 
 - `0x38658` accepts signed low AX as an unguarded index into the pointer
   table at `0x19f5b0`, and EDX as an optional guest candidate record. If

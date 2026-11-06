@@ -147,6 +147,17 @@ imbalance. See `docs/subsystems/decomp-batch-119.md`.
 Current tracker: 3,242 `compiles`, 7 `verified`, 3 `spliced`, 5 `blocked`,
 247 `drafted`, 669 `unknown`, and 3 `library`.
 
+
+**Batch-120 update (2026-11-06):** `reset_unit_counter` (`0x5e658`, 12
+bytes) is now the eighth verified OpenWatcom replacement. The 10-byte
+production body matches the focused fixture and preserves all GPRs; 37
+isolated cases and one captured actual call pass. Repeated-baseline
+menu/setup/cockpit replay reaches the candidate 22 times in cockpit and
+matches selected BSS/framebuffer, status, interrupt and tick state. Current
+tracker: 3,241 `compiles`, 8 `verified`, 3 `spliced`, 5 `blocked`, 247
+`drafted`, 669 `unknown`, and 3 `library`. See
+`docs/subsystems/decomp-batch-120.md`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -160,12 +171,12 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,242 | 363,143 |
+| `compiles` | 3,241 | 363,131 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
-| `verified` | 7 | 269 |
+| `verified` | 8 | 281 |
 | `spliced` | 3 | 107 |
 | `blocked` | 5 | 244 |
 | **Total** | **4,287** | **908,947** |

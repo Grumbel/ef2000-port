@@ -115,7 +115,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0003cd64	store_runtime_control_word	EAX:uint32_t		eax,ebx,ecx,edx,esi,edi,ebp	0	Six-byte dword store 0x1a35bc, EAX unchanged; callers 0xc630@0xc660/0x3cfc0@0x3d003; docs/compiler-abi.md
 0x0003dcc0	set_runtime_phase_five			eax,ebx,ecx,edx,esi,edi,ebp	0	Store word 5 at 0x1a35ec; callers 0x3dd30@0x3ddbe/0x8d11c@0x8d15d; docs/compiler-abi.md
 0x00058d24	initialize_mode_limits			eax,ebx,ecx,edx,esi,edi,ebp	0	Store word 8 at 0x1a6ce2 and word 10 at 0x1a6ce8; callers 0x58d64@0x58efc/0x597d8@0x598a6; docs/compiler-abi.md
-0x0005e658	reset_unit_counter			eax,ebx,ecx,edx,esi,edi,ebp	0	Clear word 0x12814e; callers 0x598e8@0x5993c/0x5e664@0x5e86c; docs/compiler-abi.md
+0x0005e658	reset_unit_counter			eax,ebx,ecx,edx,esi,edi,ebp	0	Clear word 0x12814e; four original call sites 0x596c8,0x5993c,0x5e86c,0x5f637; XOR flags are dead at all four callers; docs/compiler-abi.md
 0x0007a428	copy_active_buffer_pointer		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Copy dword 0x12afc4 to 0x1f8e9c and return the value in EAX; callers 0x7a738@0x7a744/0x7a844@0x7a911; docs/compiler-abi.md
 0x0007eea0	set_control_mode_a	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	If byte 0x15bac6 is nonzero select AL, else zero; store 0x12b070, return zero-extended; callers 0x3dd30@0x3dd98/0x7feb0@0x7fee9; docs/compiler-abi.md
 0x000810d0	set_control_mode_b	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	If byte 0x15bac7 is nonzero select AL, else zero; store 0x12b104; callers 0x3dd30@0x3dd9f/0x81110@0x8114c; docs/compiler-abi.md

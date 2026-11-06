@@ -1159,7 +1159,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005e1b0	106	draw_cell_text_5e1b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005e1b0.json	docs/compiler-abi.md; Draw the format string FMT at cell (A, B) (scaled by the shift at 0x12b369, offset by 0x1a6cfc/0x1a6cfa) and continue wi; callers 5bd8c@5beca; guest pending
 0x0005e21c	677			unknown	unclassified	unverified		
 0x0005e4c4	403			unknown	unclassified	unverified		
-0x0005e658	12	reset_unit_counter	runtime_control	compiles	game	confirmed	decomp/tests/0x0005e658.json	docs/compiler-abi.md; Clears word 0x12814e, preserves EDX; original guest replacement unverified
+0x0005e658	12	reset_unit_counter	runtime_control	verified	game	confirmed	decomp/tests/0x0005e658.json	docs/compiler-abi.md; Clear word 0x12814e; OpenWatcom direct-store body 10 bytes, preserves all GPRs; 37 isolated and 1 captured call differential pass; caller flags are overwritten before conditional use. Repeated menu/setup/cockpit replay passes; 22 cockpit hits, matching selected BSS/framebuffer/status/tick/interrupt state.
 0x0005e664	535			unknown	unclassified	unverified		
 0x0005e87c	485			unknown	unclassified	unverified		
 0x0005ea64	62	reset_range_5ea64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0005ea64.json	docs/compiler-abi.md; ; callers 5f634@5f688; guest pending

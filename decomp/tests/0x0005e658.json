@@ -1,25 +1,671 @@
 {
   "address": "0x0005e658",
   "function_size": 12,
-  "max_instructions": 180000,
+  "max_instructions": 1000,
   "cases": [
     {
-      "name": "zero_count",
-      "registers": {},
+      "name": "counter_0000",
+      "registers": {
+        "eax": "0xad5a865c",
+        "ebx": "0x4a013738",
+        "ecx": "0x706bcc49",
+        "edx": "0xea09224d",
+        "esi": "0x5e8cb630",
+        "edi": "0xfb570190",
+        "ebp": "0x6f0a0797"
+      },
       "memory": [
         {
-          "address": "0x0012814e",
-          "hex": "0000"
+          "address": "0x0012814c",
+          "hex": "5ee50000bb86"
         }
       ]
     },
     {
-      "name": "negative_count",
-      "registers": {},
+      "name": "counter_0001",
+      "registers": {
+        "eax": "0xfc2f6ba4",
+        "ebx": "0x008495d8",
+        "ecx": "0x8b7f1d86",
+        "edx": "0xc9f23ea5",
+        "esi": "0xf85510da",
+        "edi": "0x33dd2af8",
+        "ebp": "0x4e8ec91a"
+      },
       "memory": [
         {
-          "address": "0x0012814e",
-          "hex": "00fc"
+          "address": "0x0012814c",
+          "hex": "d6ed00010b6a"
+        }
+      ]
+    },
+    {
+      "name": "counter_7fff",
+      "registers": {
+        "eax": "0x0c794e57",
+        "ebx": "0x59db8c93",
+        "ecx": "0x39e4228c",
+        "edx": "0x3442163f",
+        "esi": "0x24e3eb47",
+        "edi": "0x1f5088b1",
+        "ebp": "0xf34a4868"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "1f867fffa0a2"
+        }
+      ]
+    },
+    {
+      "name": "counter_8000",
+      "registers": {
+        "eax": "0xb887def7",
+        "ebx": "0x8670052a",
+        "ecx": "0x113b7bd7",
+        "edx": "0xa75b3e20",
+        "esi": "0x6f8c82e9",
+        "edi": "0x9e05be20",
+        "ebp": "0x426133a9"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "a0f48000e6cd"
+        }
+      ]
+    },
+    {
+      "name": "counter_ffff",
+      "registers": {
+        "eax": "0x083f5d35",
+        "ebx": "0xaec4faae",
+        "ecx": "0x0e571ac2",
+        "edx": "0x85778228",
+        "esi": "0xcdf40e41",
+        "edi": "0xf0b4188f",
+        "ebp": "0xc71a54ca"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "4ea8ffff5a87"
+        }
+      ]
+    },
+    {
+      "name": "random_0",
+      "registers": {
+        "eax": "0x29b01d57",
+        "ebx": "0x9fb8cc4a",
+        "ecx": "0x804d4647",
+        "edx": "0x621116f9",
+        "esi": "0xe9872f95",
+        "edi": "0xb048df2c",
+        "ebp": "0xf2c41365"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "26c0a3efc035"
+        }
+      ]
+    },
+    {
+      "name": "random_1",
+      "registers": {
+        "eax": "0x475a2e53",
+        "ebx": "0x2fd7007b",
+        "ecx": "0x27450b36",
+        "edx": "0x6ef1ee29",
+        "esi": "0x29c5294b",
+        "edi": "0xf3fbcbc7",
+        "ebp": "0x9d23b159"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "bf223820fee8"
+        }
+      ]
+    },
+    {
+      "name": "random_2",
+      "registers": {
+        "eax": "0x40b1b0fb",
+        "ebx": "0x16192cd8",
+        "ecx": "0x901b4b75",
+        "edx": "0x9d3dc21e",
+        "esi": "0xcf645e82",
+        "edi": "0x1b1d92f4",
+        "ebp": "0x9c095ac4"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "ae7b8a37ec23"
+        }
+      ]
+    },
+    {
+      "name": "random_3",
+      "registers": {
+        "eax": "0x2bfef024",
+        "ebx": "0x8b77effa",
+        "ecx": "0xab15c0f1",
+        "edx": "0x6d4d320c",
+        "esi": "0x390be6a8",
+        "edi": "0x2d58f832",
+        "ebp": "0x22be4dd2"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "bbd5038d149d"
+        }
+      ]
+    },
+    {
+      "name": "random_4",
+      "registers": {
+        "eax": "0x3ea3842d",
+        "ebx": "0x65ed635d",
+        "ecx": "0xd124f28a",
+        "edx": "0x7611d730",
+        "esi": "0x1ce70ce9",
+        "edi": "0x8ca6acb4",
+        "ebp": "0x5a27e342"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "cde0c8d0cd16"
+        }
+      ]
+    },
+    {
+      "name": "random_5",
+      "registers": {
+        "eax": "0x346de087",
+        "ebx": "0x8ac7e2fa",
+        "ecx": "0xd85eea5b",
+        "edx": "0xb0c95078",
+        "esi": "0x1f0dc4c9",
+        "edi": "0x8d990030",
+        "ebp": "0xe1e35d1c"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "27a2f3b81750"
+        }
+      ]
+    },
+    {
+      "name": "random_6",
+      "registers": {
+        "eax": "0xe7c6c43d",
+        "ebx": "0xa3155914",
+        "ecx": "0xaa0b6d53",
+        "edx": "0x0ab2064d",
+        "esi": "0xf8b1021f",
+        "edi": "0x2e5aa5be",
+        "ebp": "0x7e40b42b"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "4ebc41613dad"
+        }
+      ]
+    },
+    {
+      "name": "random_7",
+      "registers": {
+        "eax": "0x08e5bad4",
+        "ebx": "0xfddd6c4c",
+        "ecx": "0x0e1e9be0",
+        "edx": "0x1089d6a5",
+        "esi": "0x101ab043",
+        "edi": "0x6bfb8056",
+        "ebp": "0x2938e045"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "6b08eb1403ba"
+        }
+      ]
+    },
+    {
+      "name": "random_8",
+      "registers": {
+        "eax": "0xbe99ddd3",
+        "ebx": "0xa8940475",
+        "ecx": "0x627515f7",
+        "edx": "0xf0d0fc91",
+        "esi": "0xe872dbec",
+        "edi": "0x33f5c034",
+        "ebp": "0x9240421e"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "b6cc21d3a166"
+        }
+      ]
+    },
+    {
+      "name": "random_9",
+      "registers": {
+        "eax": "0x3153d8aa",
+        "ebx": "0x6d863742",
+        "ecx": "0x3472ee3b",
+        "edx": "0xaed25bda",
+        "esi": "0x1e986d65",
+        "edi": "0xe5e8656c",
+        "ebp": "0x903a16bd"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "979be1ae3bca"
+        }
+      ]
+    },
+    {
+      "name": "random_10",
+      "registers": {
+        "eax": "0x4993159c",
+        "ebx": "0x49b4d2e3",
+        "ecx": "0x058c50fc",
+        "edx": "0x62d9e1fd",
+        "esi": "0x91fa1d66",
+        "edi": "0x641ddb19",
+        "ebp": "0x45127849"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "a582be14a527"
+        }
+      ]
+    },
+    {
+      "name": "random_11",
+      "registers": {
+        "eax": "0x72d56658",
+        "ebx": "0x328ecb90",
+        "ecx": "0x34a550d6",
+        "edx": "0x1d947abf",
+        "esi": "0x4003868c",
+        "edi": "0x48f7a5eb",
+        "ebp": "0x68c1d3db"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "a8b7f349ff5f"
+        }
+      ]
+    },
+    {
+      "name": "random_12",
+      "registers": {
+        "eax": "0x3b0fb35f",
+        "ebx": "0x1616ec3a",
+        "ecx": "0x7c255721",
+        "edx": "0xf35a94fa",
+        "esi": "0x2a974e82",
+        "edi": "0xca994837",
+        "ebp": "0x2d0107fe"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "fe7e9fd8106e"
+        }
+      ]
+    },
+    {
+      "name": "random_13",
+      "registers": {
+        "eax": "0xed68a903",
+        "ebx": "0xfcefa1ca",
+        "ecx": "0xae94ebf0",
+        "edx": "0xb19ea621",
+        "esi": "0x6071a221",
+        "edi": "0x2e59af9a",
+        "ebp": "0xc0d60b6b"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "5b77fccb1c9e"
+        }
+      ]
+    },
+    {
+      "name": "random_14",
+      "registers": {
+        "eax": "0x1ca8c718",
+        "ebx": "0x94d00e8d",
+        "ecx": "0x745fd2b0",
+        "edx": "0x083e206f",
+        "esi": "0x62fca1b1",
+        "edi": "0xf7913a64",
+        "ebp": "0xf23617ee"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "17c3acd7df31"
+        }
+      ]
+    },
+    {
+      "name": "random_15",
+      "registers": {
+        "eax": "0x4aa4d775",
+        "ebx": "0xd330926d",
+        "ecx": "0x000e2aeb",
+        "edx": "0xaeacd543",
+        "esi": "0x40ff959a",
+        "edi": "0x842d3413",
+        "ebp": "0x95e54de6"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "d55ff1d68680"
+        }
+      ]
+    },
+    {
+      "name": "random_16",
+      "registers": {
+        "eax": "0x1581419b",
+        "ebx": "0xe9e461b2",
+        "ecx": "0xe37d35da",
+        "edx": "0x4ce808f2",
+        "esi": "0x170fb3ad",
+        "edi": "0xe5ed13fd",
+        "ebp": "0x64f77916"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "8587a674a2a1"
+        }
+      ]
+    },
+    {
+      "name": "random_17",
+      "registers": {
+        "eax": "0xb594076b",
+        "ebx": "0x2f5d8818",
+        "ecx": "0xe57c9ff5",
+        "edx": "0x5dc5a550",
+        "esi": "0xc6873b92",
+        "edi": "0x71ea79e3",
+        "ebp": "0xaff4cdac"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "466349e28f05"
+        }
+      ]
+    },
+    {
+      "name": "random_18",
+      "registers": {
+        "eax": "0x01af6a76",
+        "ebx": "0xd86b0993",
+        "ecx": "0x184ade6e",
+        "edx": "0xdf342606",
+        "esi": "0x0bbb2b22",
+        "edi": "0xdcab6260",
+        "ebp": "0x1e290a74"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "57e186f3ff94"
+        }
+      ]
+    },
+    {
+      "name": "random_19",
+      "registers": {
+        "eax": "0x8f962b81",
+        "ebx": "0x65e01fd1",
+        "ecx": "0xdc04ed53",
+        "edx": "0xd897f3e9",
+        "esi": "0xfa4a52b8",
+        "edi": "0x03ac82b8",
+        "ebp": "0x443c54ea"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "983a15a4cf5d"
+        }
+      ]
+    },
+    {
+      "name": "random_20",
+      "registers": {
+        "eax": "0x2b47fabc",
+        "ebx": "0xc9e66a38",
+        "ecx": "0x30f7bf03",
+        "edx": "0x8fddb2df",
+        "esi": "0x1d7adeac",
+        "edi": "0x8b93f934",
+        "ebp": "0x3610a65e"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "c5a86ff1e1f1"
+        }
+      ]
+    },
+    {
+      "name": "random_21",
+      "registers": {
+        "eax": "0x35fef8de",
+        "ebx": "0x1a1e2c27",
+        "ecx": "0x3f5e9626",
+        "edx": "0x22bc6fb3",
+        "esi": "0xab2b58c3",
+        "edi": "0xf1f01603",
+        "ebp": "0x97334087"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "4d1accafcfb3"
+        }
+      ]
+    },
+    {
+      "name": "random_22",
+      "registers": {
+        "eax": "0xedb1f521",
+        "ebx": "0x8c1f8024",
+        "ecx": "0x4713996c",
+        "edx": "0xc30688fc",
+        "esi": "0xcb7e7783",
+        "edi": "0x3eb63ed2",
+        "ebp": "0x8886089c"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "7a4e69b87303"
+        }
+      ]
+    },
+    {
+      "name": "random_23",
+      "registers": {
+        "eax": "0x1ad5361e",
+        "ebx": "0x831fba9c",
+        "ecx": "0x42674eb1",
+        "edx": "0x0c2986ac",
+        "esi": "0x1201a079",
+        "edi": "0xc67c46a1",
+        "ebp": "0x2da4ddd7"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "bdef46870b6a"
+        }
+      ]
+    },
+    {
+      "name": "random_24",
+      "registers": {
+        "eax": "0x77e52f98",
+        "ebx": "0xac60c372",
+        "ecx": "0xee1e7378",
+        "edx": "0x2110b897",
+        "esi": "0xa010ec39",
+        "edi": "0x1ef01bc9",
+        "ebp": "0x79f8fd2c"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "11b369abd312"
+        }
+      ]
+    },
+    {
+      "name": "random_25",
+      "registers": {
+        "eax": "0x32ccd36c",
+        "ebx": "0x3a9c3bb5",
+        "ecx": "0xd4a30ab4",
+        "edx": "0x5164a897",
+        "esi": "0x273fffc4",
+        "edi": "0xd12fcf13",
+        "ebp": "0x3e6aff14"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "68b4bf740400"
+        }
+      ]
+    },
+    {
+      "name": "random_26",
+      "registers": {
+        "eax": "0xb0745434",
+        "ebx": "0xa38f3d35",
+        "ecx": "0xd0846a6a",
+        "edx": "0xe76021a4",
+        "esi": "0xb83afa9b",
+        "edi": "0x4e10621b",
+        "ebp": "0x466ab2e6"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "b443112593a4"
+        }
+      ]
+    },
+    {
+      "name": "random_27",
+      "registers": {
+        "eax": "0x75f386f5",
+        "ebx": "0x7674f911",
+        "ecx": "0x60cb8297",
+        "edx": "0xb43b9a0a",
+        "esi": "0x806bb24a",
+        "edi": "0xb5f01517",
+        "ebp": "0x8a0fd9ca"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "4927e3f1a0ec"
+        }
+      ]
+    },
+    {
+      "name": "random_28",
+      "registers": {
+        "eax": "0x3e7f6694",
+        "ebx": "0x4355e3a0",
+        "ecx": "0xf914947f",
+        "edx": "0xcb42d260",
+        "esi": "0xe85759f1",
+        "edi": "0x4a7155fe",
+        "ebp": "0x1c61e61b"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "518d9756f072"
+        }
+      ]
+    },
+    {
+      "name": "random_29",
+      "registers": {
+        "eax": "0xf6d1a479",
+        "ebx": "0xe0296d87",
+        "ecx": "0xd6eac15c",
+        "edx": "0x0bbf8baa",
+        "esi": "0x2932c9c0",
+        "edi": "0x81ff8fff",
+        "ebp": "0xbd4c78e4"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "0d0660655445"
+        }
+      ]
+    },
+    {
+      "name": "random_30",
+      "registers": {
+        "eax": "0x5137975c",
+        "ebx": "0x5cc6dee4",
+        "ecx": "0x7ee7c92b",
+        "edx": "0xae6a30e7",
+        "esi": "0x9d1cfdc5",
+        "edi": "0xef66003d",
+        "ebp": "0x41c355f1"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "02f8690e4619"
+        }
+      ]
+    },
+    {
+      "name": "random_31",
+      "registers": {
+        "eax": "0x8478fe57",
+        "ebx": "0x6738a2fa",
+        "ecx": "0xe621108f",
+        "edx": "0xdda82d1a",
+        "esi": "0xdc359934",
+        "edi": "0x01ca217b",
+        "ebp": "0xe6a0da1e"
+      },
+      "memory": [
+        {
+          "address": "0x0012814c",
+          "hex": "69fad9a81626"
         }
       ]
     }

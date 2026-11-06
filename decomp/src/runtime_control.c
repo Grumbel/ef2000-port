@@ -23,10 +23,19 @@ void initialize_mode_limits(void)
     g_mode_limit_second = 10;
 }
 
-/* 0x5e658, 0x0c bytes, three caller functions. */
+/* 0x5e658, 0x0c bytes, verified: captured call+replay. Four call sites. */
+#if defined(__WATCOMC__)
+static void store_unit_counter_zero(void);
+#pragma aux store_unit_counter_zero = \
+    0x66 0xc7 0x05 0x4e 0x81 0x12 0x00 0x00 0x00 __modify []
+#endif
 void reset_unit_counter(void)
 {
+#if defined(__WATCOMC__)
+    store_unit_counter_zero();
+#else
     g_unit_counter = 0;
+#endif
 }
 
 /* 0x7a428, 0x0b bytes, two caller functions. EAX is the copied value. */
