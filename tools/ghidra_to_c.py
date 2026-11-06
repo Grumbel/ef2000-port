@@ -47,6 +47,7 @@ TYPES = [
     (r'\bulonglong\b', 'uint64_t'), (r'\blonglong\b', 'int64_t'),
     (r'\bfloat10\b', 'long double'),
     (r'\bdword\b', 'uint32_t'),
+    (r'\bcode\b', 'ef_gen_code'),
     (r'\bushort\b', 'uint16_t'), (r'\buint\b', 'uint32_t'),
     (r'\bulong\b', 'uint32_t'), (r'\bbyte\b', 'uint8_t'),
     (r'\bbool\b', 'int'), (r'\bint3\b', 'int32_t'), (r'\bint5\b', 'int32_t'),
@@ -237,7 +238,8 @@ def main():
         count += 1
     (args.out / 'ef_gen_abi.h').write_text(
         '/* Generated; derived from Ghidra output. NEVER COMMIT. */\n'
-        '#include "ef_types.h"\n' + '\n'.join(dict.fromkeys(header)) + '\n')
+        '#include "ef_types.h"\n'
+        'typedef void ef_gen_code(void);\n' + '\n'.join(dict.fromkeys(header)) + '\n')
 
     if args.compile:
         include = ['-i=' + str(ROOT / 'decomp/include'), '-i=' + str(args.out)]

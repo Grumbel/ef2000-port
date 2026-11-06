@@ -26,3 +26,9 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   rerun advanced past the dword declarations; the report remains 0/287
   (0/66,726 bytes), now blocked by Ghidra's generic function type `code` at
   `0x000ed133`.
+- M0 rule 4, generic `code`, 2026-11-06: generated prototypes now use a
+  generic no-argument function type for Ghidra code pointers. The rerun
+  advanced past `code *` declarations; it remains 0/287 (0/66,726 bytes),
+  now blocked by `float10` in a signature-derived prototype at `0x00120a52`.
+  That exposed that the type rules currently normalize bodies but not the
+  signature table.
