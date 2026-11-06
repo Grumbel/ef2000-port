@@ -1,1 +1,15 @@
-{"address":"0x00106be8","function_size":18,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x00106be8",
+  "function_size": 18,
+  "max_instructions": 1000,
+  "cases": [
+    {"name": "zero", "registers": {"eax": 0, "edx": "0xdeadbeef"}},
+    {"name": "one", "registers": {"eax": 1, "edx": "0x12345678"}},
+    {"name": "negative_one", "registers": {"eax": "0xffffffff", "edx": "0x87654321"}},
+    {"name": "negative_small", "registers": {"eax": "0xfffffff9", "edx": "0x00ff00ff"}},
+    {"name": "signed_min", "registers": {"eax": "0x80000000", "edx": "0xa55aa55a"}},
+    {"name": "signed_max", "registers": {"eax": "0x7fffffff", "edx": "0x5aa55aa5"}},
+    {"name": "large_positive", "registers": {"eax": "0x12345678", "edx": "0x01020304"}},
+    {"name": "overflow_boundary", "registers": {"eax": "0x028f5c29", "edx": "0x89abcdef"}}
+  ]
+}

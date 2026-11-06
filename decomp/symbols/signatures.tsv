@@ -660,7 +660,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00106894	resume_object_106894	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106894 (33 bytes); State 8 becomes 4 and 0x1052f0 runs.; callers 1027cc@1027ef; docs/compiler-abi.md
 0x00106938	exchange_callback_106938	EAX:ef_addr32,EDX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106938 (28 bytes); Exchange dword +0x850; null object returns 0.; callers 102dbc@102de8; docs/compiler-abi.md
 0x00106988	set_and_notify_106988	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106988 (63 bytes); Store dword +0x68 and notify each of the +0x60 entries (0x894 bytes each) whose state is not 1.; callers 102a98@102ac2; docs/compiler-abi.md
-0x00106be8	times_100	EAX:int32_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106be8 (18 bytes); value * 100.; callers d9c30@d9c45,d9c30@d9c7e,d9cb4@d9cd5; docs/compiler-abi.md
+0x00106be8	times_100	EAX:int32_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106be8 (18 bytes); modulo-2^32 value * 100; push/pop preserves EDX.; callers d9c30@d9c45,d9c30@d9c7e,d9cb4@d9cd5; docs/compiler-abi.md
 0x00106bfc	times_100_div_10	EAX:int32_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106bfc (32 bytes); value * 100 / 10.; callers d9cb4@d9cf4,d9dc0@d9de6,106d34@106d9c; docs/compiler-abi.md
 0x00106c3c	elapsed_at_least	EAX:int32_t,EDX:int32_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106c3c (22 bytes); 0xf8248() - EAX >= EDX (signed).; callers 106cb0@106cec,106d34@106da5,106d34@106db2; docs/compiler-abi.md
 0x0010703c	release_object_10703c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010703c (33 bytes); Release the object stored at *slot.; callers d9c30@d9c69,d9c30@d9c9d,106f10@106f22; docs/compiler-abi.md

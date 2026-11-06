@@ -2061,7 +2061,7 @@ in EAX, format string address, one value).
 | `0x106894` | EAX:ef_addr32 | none | 1027cc@1027ef | State 8 becomes 4 and 0x1052f0 runs. |
 | `0x106938` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | 102dbc@102de8 | Exchange dword +0x850; null object returns 0. |
 | `0x106988` | EAX:ef_addr32,EDX:uint32_t | none | 102a98@102ac2 | Store dword +0x68 and notify each of the +0x60 entries (0x894 bytes each) whose state is not 1. |
-| `0x106be8` | EAX:int32_t | EAX:int32_t | d9c30@d9c45,d9c30@d9c7e,d9cb4@d9cd5 | value * 100. |
+| `0x106be8` | EAX:int32_t | EAX:int32_t | d9c30@d9c45,d9c30@d9c7e,d9cb4@d9cd5 | modulo-2^32 value * 100; preserves EDX. |
 | `0x106bfc` | EAX:int32_t | EAX:int32_t | d9cb4@d9cf4,d9dc0@d9de6,106d34@106d9c | value * 100 / 10. |
 | `0x106c3c` | EAX:int32_t,EDX:int32_t | AL:uint8_t | 106cb0@106cec,106d34@106da5,106d34@106db2 | 0xf8248() - EAX >= EDX (signed). |
 | `0x10703c` | EAX:ef_addr32 | none | d9c30@d9c69,d9c30@d9c9d,106f10@106f22 | Release the object stored at *slot. |

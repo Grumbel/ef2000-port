@@ -293,7 +293,7 @@ void set_and_notify_106988(ef_addr32 object, uint32_t value)
 /* 0x106be8, 18 bytes. value * 100. */
 int32_t times_100(int32_t value)
 {
-    return value * 100;
+    return (int32_t)((uint32_t)value * 100u);
 }
 
 /* 0x106bfc, 32 bytes. value * 100 / 10. */
