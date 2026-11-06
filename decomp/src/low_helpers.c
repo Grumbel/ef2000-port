@@ -18,9 +18,7 @@ int32_t random_modulo(int32_t divisor)
 int32_t max3_signed(int32_t a, int32_t b, int32_t c)
 {
     int32_t m = a > b ? a : b;
-    if (m <= c)
-        return c;
-    return a > b ? a : b;
+    return m > c ? m : c;
 }
 
 /* 0x6bf4, 40 bytes. Clear three words and two bytes of command state. */

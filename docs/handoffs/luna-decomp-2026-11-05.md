@@ -132,6 +132,20 @@ unresolved for OMF splicing. See `docs/subsystems/decomp-batch-118.md`.
 Current tracker: 3,245 `compiles`, 7 `verified`, 2 `spliced`, 3 `blocked`,
 247 `drafted`, 669 `unknown`, and 3 `library`.
 
+
+**Batch-119 update (2026-11-06):** `max3_signed` (`0x3cd4`, 27 bytes) has
+a 19-byte OpenWatcom body matching its fixture and passes 253 isolated guest
+cases. Menu and quick-fight setup replay pass. The cockpit replay still fails
+the selected 64 KiB BSS hash (`93aec9..` original, `fc7121..` patched) while
+frame, status and interrupt/tick counters match; the candidate entry hit
+count is zero. It remains `spliced`, not verified. A separate original-code
+audit found `0xa4470` (`mov al,3`) falls through into the x87 checked-square-
+root body at `0xa4472`; both entries are blocked pending overlapping-entry
+and x87 support. The `0xa4472` C model also omits the original AL=3 x87 stack
+imbalance. See `docs/subsystems/decomp-batch-119.md`.
+Current tracker: 3,242 `compiles`, 7 `verified`, 3 `spliced`, 5 `blocked`,
+247 `drafted`, 669 `unknown`, and 3 `library`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -145,14 +159,14 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,245 | 363,225 |
+| `compiles` | 3,242 | 363,143 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
 | `verified` | 7 | 269 |
-| `spliced` | 2 | 80 |
-| `blocked` | 3 | 189 |
+| `spliced` | 3 | 107 |
+| `blocked` | 5 | 244 |
 | **Total** | **4,287** | **908,947** |
 
 **At the Batch-112 state:** five routines are strictly verified as

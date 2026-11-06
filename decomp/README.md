@@ -49,8 +49,8 @@ The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
 Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,245 marked `compiles`,
-247 additional host-tested `drafted` entry points, 2 `spliced`, 3 `blocked`, and 7 `verified`.
+confirmed additional entry points (4,287 tracked); 3,242 marked `compiles`,
+247 additional host-tested `drafted` entry points, 3 `spliced`, 5 `blocked`, and 7 `verified`.
 Seven routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
 `to_upper_ascii`, `encode_runtime_segment_offset`, `read_runtime_slot_flag`,
 `initialize_runtime_probe_latch`, `init_bounds_d0b68` and `sync_flag_12ec8`.
@@ -117,3 +117,4 @@ Batch 115 verifies `init_bounds_d0b68`, an exact 63-byte OpenWatcom replacement 
 Batch 116 adds `find_node_by_byte_b` as a spliced OpenWatcom candidate. Its eight isolated cases pass, but available deterministic replay paths did not reach it; see [batch 116](../docs/subsystems/decomp-batch-116.md).
 
 Batch 118 verifies `sync_flag_12ec8` from a live indirect callback and blocks its parent `reinitialize_runtime_slots` on callback ABI and placement evidence; see [batch 118](../docs/subsystems/decomp-batch-118.md).
+Batch 119 records an OpenWatcom `max3_signed` candidate that passes 253 isolated cases and the first two replay checkpoints, but fails cockpit BSS equivalence with no candidate entry hit. It also blocks the overlapping x87 entries `0xa4470`/`0xa4472`; see [batch 119](../docs/subsystems/decomp-batch-119.md).
