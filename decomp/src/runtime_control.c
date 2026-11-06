@@ -11,9 +11,18 @@ void store_runtime_control_word(uint32_t value)
 }
 
 /* 0x3dcc0, 0x0a bytes, two caller functions. */
+#if defined(__WATCOMC__)
+static void write_runtime_phase_five(void);
+#pragma aux write_runtime_phase_five = \
+    0x66 0xc7 0x05 0xec 0x35 0x1a 0x00 0x05 0x00 __modify []
+#endif
 void set_runtime_phase_five(void)
 {
+#if defined(__WATCOMC__)
+    write_runtime_phase_five();
+#else
     g_runtime_phase_word = 5;
+#endif
 }
 
 /* 0x58d24, 0x1d bytes, two caller functions. Both limits are words. */
