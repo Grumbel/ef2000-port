@@ -75,11 +75,11 @@ first control-mode gate, [batch 126](../docs/subsystems/decomp-batch-126.md)
 verifies the paired mode B/C setters, and [batch 127](../docs/subsystems/decomp-batch-127.md)
 verifies the signed link-pointer lookup and its unaligned candidate override;
 [batch 128](../docs/subsystems/decomp-batch-128.md) verifies its record updater.
-M0 mechanically compiles 402/1,020 available unrecovered Ghidra exports
-(39.4%, 121,560/543,917 body bytes = 22.4%) with OpenWatcom v2; 594 exports
-remain `manual` and 24 have compile errors. Hand-written recovered C covers
+M0 mechanically compiles 405/1,020 available unrecovered Ghidra exports
+(39.7%, 123,186/543,917 body bytes = 22.7%) with OpenWatcom v2; 594 exports
+remain `manual` and 21 have compile errors. Hand-written recovered C covers
 364,031 body bytes (40.0%); together with mechanical `ok` exports, potential
-hybrid coverage is 485,591/908,947 tracked body bytes (53.4%). A focused
+hybrid coverage is 487,217/908,947 tracked body bytes (53.6%). A focused
 two-function image redirects `init_far_stub_b04` and `to_lower_ascii` and
 passes the main-menu and quick-fight-setup replay cases. The broader image
 with 2,433 redirects is not yet at M1: after excluding the linked

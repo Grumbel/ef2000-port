@@ -351,7 +351,7 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
     # of that pointer slot, matching Ghidra's pointer-to-pointer expression.
     body = re.sub(r'\bPTR_\w*?_?' + HEX + r'\b',
                   lambda m: '(*(char **)ef_guest_memory_ptr(0x%s))' % m.group(1).lower(), body)
-    body = re.sub(r'\b(?:s_|u_|BYTE_|WORD_|DWORD_)\w*?_?' + HEX + r'\b(?:\s*\+\s*\d+)?',
+    body = re.sub(r'\b(?:s_[\w>]*?_|u_|BYTE_|WORD_|DWORD_)\w*?_?' + HEX + r'\b(?:\s*\+\s*\d+)?',
                   lambda m: '((char *)ef_guest_memory_ptr(0x%s))' % m.group(1).lower(), body)
     # An address-of a translated guest global is the guest address itself;
     # taking the C address of EF_U* would instead point into the host mapping

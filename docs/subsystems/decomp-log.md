@@ -561,3 +561,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   22.4% of available export body bytes; 594 remain `manual`. This changes
   M0 only; no new hybrid replay was run, and the latest M1/M2 evidence above
   is unchanged.
+- M0 Ghidra string-label rule, 2026-11-07: string symbols can contain `>`
+  in their display-derived names before the final guest-address suffix.
+  The generator now recognizes that spelling and translates it to a guest
+  memory pointer. The OpenWatcom v2 compile pass accepts three additional
+  functions (`0x9ea0`, `0xdae40`, `0xdb21c`): `ok` is now 405/1,020
+  (123,186 bytes), up from 402/1,020 (121,560 bytes), and compile errors
+  fall from 24 to 21. Current M0 rate is 39.7% of functions and 22.7% of
+  available export body bytes; 594 remain `manual`. This is compile evidence,
+  not replay validation; M1/M2 status is unchanged.
