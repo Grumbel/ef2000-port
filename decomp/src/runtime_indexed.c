@@ -20,8 +20,9 @@ static uint32_t read32(ef_addr32 address)
 }
 
 /* Keep the single original x86 dword load without misaligned C pointer
- * access. GCC folds builtin memcpy to MOV; Watcom/other targets use the
- * equivalent little-endian byte reader above. */
+ * access in host builds. GCC folds builtin memcpy to MOV; other host
+ * compilers use the equivalent little-endian byte reader above. */
+#if !defined(__WATCOMC__)
 static uint32_t read32_unaligned(ef_addr32 address)
 {
 #if defined(__GNUC__) && defined(__BYTE_ORDER__) && \
@@ -33,6 +34,7 @@ static uint32_t read32_unaligned(ef_addr32 address)
     return read32(address);
 #endif
 }
+#endif
 
 static void write8(ef_addr32 address, uint8_t value)
 {
@@ -49,9 +51,18 @@ static void write16(ef_addr32 address, uint16_t value)
  * X-32 base as a segment:offset pair with a 16-bit segment and 4-bit offset. */
 uint32_t encode_runtime_segment_offset(ef_addr32 pointer)
 {
+#if defined(__WATCOMC__)
+#pragma pack(push, 1)
+    struct unaligned_u32 { uint32_t value; };
+#pragma pack(pop)
+    uint32_t base = ((const struct unaligned_u32 *)(uintptr_t)0x00120cc6u)->value;
+#else
     uint32_t base = read32_unaligned(0x00120cc6);
+#endif
     uint32_t delta = pointer - base;
-    return ((delta >> 4) & 0xffffu) << 16 | (delta & 0x0fu);
+    uint32_t encoded = delta & 0x0fu;
+    encoded += ((delta >> 4) & 0xffffu) << 16;
+    return encoded;
 }
 
 /* 0x12160, 84 bytes. Visit all 54 callback records (stride 29),
