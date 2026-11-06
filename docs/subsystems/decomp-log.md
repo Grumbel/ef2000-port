@@ -441,3 +441,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   at `0xf8600`, `0xf8b14` and `0xe7835` remain present. No replay ran because
   private Xvfb cannot bind; M1/M2 remain unpassed. The first remaining link
   failure class is `__CHP` (19 modules); first guest failure is unknown.
+- Hybrid OpenWatcom right-shift bridge, 2026-11-06: added the matching
+  `__U8RS` OMF helper with logical EDX:EAX shift semantics and EBX count
+  modulo 64; WDIS confirms the emitted register sequence. Relinking raises
+  coverage to 2,228 redirects (11,140 entry bytes; 575,316 arena bytes),
+  with 358 mechanical and 1,870 hand-written functions patched across
+  626/735 modules; exclusions fall to 2,691. The current leading unresolved
+  class is `__CHP` (19 modules). No replay ran because Xvfb cannot bind, so
+  M1/M2 remain unpassed and the first guest failure is unknown.
