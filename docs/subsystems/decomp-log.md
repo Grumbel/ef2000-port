@@ -252,3 +252,10 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   guest-RAM hash. It records 98 hits to `0xbc36a`. The full hybrid still
   exits at `IP=0x222` after 101 interrupts and 296 ticks, so this local fix
   does not resolve the first full-set failure.
+- M3 replay horizon/signature update, 2026-11-06: a 100M-instruction
+  manifest still observes the full-hybrid dataset exit (`IP=0x222`, 101
+  interrupts, 296 ticks) while the original reaches its instruction limit.
+  The bisector now buckets progress by 8 interrupts, 16 ticks and 8 IRQ0
+  events, retaining stop status/IP while tolerating small timing shifts. The
+  full run reduces the 62-entry exact-counter set to 31 candidates; it is
+  still unresolved.

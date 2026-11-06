@@ -47,12 +47,16 @@ def split(values, count):
 
 
 def failure_signature(result):
-    """Identify the guest stop and deterministic replay progress."""
+    """Identify the stop site and coarse replay progress.
+
+    Counter buckets tolerate small timing shifts caused by demoting unrelated
+    entries while keeping failures on materially different paths separate.
+    """
     if result is None:
         return None
     status = result['status']
-    return (status['status'], status['ip'], status['interrupts'],
-            status['ticks'], status['irq0'])
+    return (status['status'], status['ip'], status['interrupts'] // 8,
+            status['ticks'] // 16, status['irq0'] // 8)
 
 
 def main(argv=None):
