@@ -346,6 +346,20 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
                   lambda m: dat_expression(int(m.group(1), 16), globals_), body)
     body = re.sub(r'(?<![A-Za-z0-9_])_?DAT_' + HEX + r'\b',
                   lambda m: dat_expression(int(m.group(1), 16), globals_), body)
+    # Ghidra's cRam/dRam labels retain useful scalar-width information but
+    # do not use the DAT_ spelling handled above.  cRam is a byte access;
+    # dRam is an IEEE double at the label address.  Keep the all-ones
+    # cRam sentinel unresolved rather than turning it into an invalid guest
+    # memory access.
+    def ram_scalar_repl(match):
+        kind, address_text = match.groups()
+        address = int(address_text, 16)
+        if kind == 'cRam':
+            if address == 0xffffffff:
+                return match.group(0)
+            return 'EF_U8(0x%08xu)' % address
+        return '(*(double *)ef_guest_memory_ptr(0x%08xu))' % address
+    body = re.sub(r'\b(cRam|dRam)([0-9a-fA-F]{8})\b', ram_scalar_repl, body)
     # PTR_ names describe pointer-valued guest globals: dereference the slot
     # for reads/writes.  Taking &PTR then naturally yields the guest address
     # of that pointer slot, matching Ghidra's pointer-to-pointer expression.

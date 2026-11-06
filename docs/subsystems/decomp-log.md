@@ -588,3 +588,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   inside that namespace. `strace` is also denied ptrace by the environment,
   so the bind errno is unavailable. No replay of the new 2,443-entry image
   was attempted without a functioning private display.
+- M0 typed `cRam`/`dRam` globals, 2026-11-07: the generated `cRam` access
+  at `0xc41c4` is an 8-bit self-modified state byte, and `dRam` at `0xdcb7e`
+  and `0xdcb86` stores the adjacent binary64 constants `+709.7827128933839`
+  and `-709.7827128933839`. The generator now maps those labels to guest
+  byte/double accesses; it deliberately leaves the all-ones `cRam` sentinel
+  untouched. OpenWatcom `ok` rose from 405 to 407/1,020 (121,560 to 123,359
+  body bytes), and compile errors fell from 21 to 19. The new `cRam` and
+  `dRam` translations compile in `0xc4167` and `0xdcb96`; this is compiler
+  evidence, not guest behavior verification.
+- Relink with 407 mechanical `ok` objects, 2026-11-07: the latest hybrid
+  emits 2,444 redirects (2,043 hand-written, 401 mechanical), 12,220 entry
+  bytes, and a 582,996-byte arena (595,216 total patch bytes). 693/755
+  modules link, with 2,283 function exclusions. No replay was run: the
+  private Xvfb socket bind still fails in the isolated namespace. M1/M2
+  remain unpassed; the first failure for this image is unknown.
