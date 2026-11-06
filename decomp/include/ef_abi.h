@@ -6815,4 +6815,8 @@ void update_unit_vector_75344(int16_t unit); /* 0x75344 */
 void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, uint8_t type);
 void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, uint8_t type); /* 0xa2a90 */
 
+uint32_t guest_fn_f8624(ef_addr32 object, ef_addr32 list,
+                        ef_addr32 claim_context, int32_t packed_index); /* 0x000f8624 */
+#pragma aux guest_fn_f8624 parm [eax] [edx] [ebx] [ecx] value [eax] modify [eax ebx ecx edx]
+
 #endif

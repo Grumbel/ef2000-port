@@ -9694,3 +9694,15 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xa2a90` | EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,CL:uint8_t | none | a2bdc@a2c16,a2bdc@a2c26,a2bdc@a2c36 | Formats "<name><sep><value><end>" into a 96-byte host buffer and writes it to the handle at 0x136df8. type: 1 byte hex,  |
+
+## Menu-path validator at `0xf8b14`
+
+The recovered C replacement `validate_entry_slots_f8b14` uses EAX, EDX, EBX
+and ECX as its first four inputs, followed by three stack inputs. The original
+prologue saves EAX/EDX/EBX/CX into its local frame and reads the stack values
+at entry offsets `+4`, `+8` and `+12`; its epilogue is `ret 0xc`. OpenWatcom's
+`parm [eax] [edx] [ebx] [ecx] routine` emits this register/stack layout and
+callee cleanup. Caller instruction sequences at `0xf8b3d`, `0xf8b8f`,
+`0xf8bb0`, `0xf8bfa` and `0xf8c45` were used to supply explicit helper inputs
+in the C body. This is compile and ABI evidence only; menu replay remains
+pending.

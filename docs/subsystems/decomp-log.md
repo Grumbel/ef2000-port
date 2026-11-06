@@ -334,3 +334,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `ESP=0x401c791`, tick 172 (zero IRQs), versus the original 100M checkpoint.
   M1 remains unpassed; the next failure is stack/control-flow corruption. M0
   remains 391/1,021 exports (38.3%, 114,873/544,304 bytes).
+- Menu-path validator ABI recovery, 2026-11-06: disassembly at `0xf8b14`
+  confirms inputs in EAX/EDX/EBX/ECX plus three stack arguments and callee
+  cleanup of 12 bytes. Replaced its mechanical draft with explicit C helper
+  calls and the matching OpenWatcom `routine` ABI; WCC 2.0 reports zero
+  warnings/errors and WDIS confirms the generated `ret 0xc`, register setup,
+  and stack argument offsets. The hybrid linker selects this hand-written
+  body and resolves the call to original helper `0xf8624`: 1,984 redirects,
+  9,920 original-entry bytes, 572,164 arena bytes, 560/727 modules, and
+  3,169 exclusions. This variant has not yet been replayed. The previous
+  menu replay first faulted at `0xf8c25`; no M1/M2 milestone is passed. A
+  private Xvfb replay could not start because this environment's
+  `/tmp/.X11-unix` is owned by `nobody`, so Xvfb refuses the socket directory.
+  M0 remains 391/1,021 exports (38.3%, 114,873/544,304 bytes).
