@@ -390,3 +390,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   584/731 modules linked and 2,795 exclusions. This hybrid has not been
   replayed; M1/M2 remain unpassed, with no current-artifact guest failure
   yet available because the private Xvfb socket bind is denied.
+- Menu-path compile/link audit, 2026-11-06: rebuilt `menu_runtime.c` with
+  the pinned OpenWatcom v2 compiler (zero warnings/errors); its object is
+  byte-identical to the object used by `menu-path-callbridge2`. WDIS confirms
+  the validator's callee-clean `ret 0xc` and the EAX/EDX/EBX/ECX setup before
+  its call to original helper `0xf8624`. The hybrid redirects `0xf8b14`,
+  `0xf8600` and the `0xe7835` replay canary; `0xf9448` and `0xf8624` remain
+  original. A fresh private-Xvfb startup check fails because this environment
+  has `/tmp/.X11-unix` owned by `nobody` while Xvfb requires it root-owned;
+  user-scope `PrivateTmp` is unavailable, so the current hybrid has no new
+  replay result. M0 remains 393/1,020 functions and 115,359/543,917 bytes
+  (21.2%); M1/M2 remain unpassed.
