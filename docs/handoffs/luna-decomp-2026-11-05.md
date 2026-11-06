@@ -398,3 +398,11 @@ data externals and absolute offsets framed against the zero-base FLAT group,
 with synthetic regression tests. Tracker totals: 3,233 `compiles`, 16
 `verified`, 3 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3
 `library`. See `docs/subsystems/decomp-batch-127.md`.
+
+**Batch-128 update (2026-11-06):** `refresh_link_pointer` (`0x3856c`, 23
+bytes) is verified: its OpenWatcom body fits in place, two isolated cases and
+one captured caller call pass, and repeated-baseline menu/setup/cockpit replay
+passes with eight hits (the helper `resolve_link_pointer` is hit 16 times).
+Selected BSS, framebuffer and execution counters match. Tracker totals:
+3,232 `compiles`, 17 `verified`, 3 `spliced`, 5 `blocked`, 247 `drafted`, 669
+`unknown`, and 3 `library`. See `docs/subsystems/decomp-batch-128.md`.

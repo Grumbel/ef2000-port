@@ -49,15 +49,15 @@ The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
 Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,233 marked `compiles`,
-247 additional host-tested `drafted` entry points, 3 `spliced`, 5 `blocked`, and 16 `verified`.
-Sixteen routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
+confirmed additional entry points (4,287 tracked); 3,232 marked `compiles`,
+247 additional host-tested `drafted` entry points, 3 `spliced`, 5 `blocked`, and 17 `verified`.
+Seventeen routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
 `to_upper_ascii`, `encode_runtime_segment_offset`, `read_runtime_slot_flag`,
 `initialize_runtime_probe_latch`, `init_bounds_d0b68`, `sync_flag_12ec8`,
 `reset_unit_counter`, `set_runtime_phase_five`,
 `store_runtime_control_word`, `initialize_mode_limits`,
 `copy_active_buffer_pointer`, `set_control_mode_a`, `set_control_mode_b`,
-`set_control_mode_c` and `resolve_link_pointer`.
+`set_control_mode_c`, `resolve_link_pointer` and `refresh_link_pointer`.
 Their isolated differentials and deterministic guest replays pass. The encoder uses two flag-neutral nops to
 retain the original instruction count; its only isolated memory difference
 is the 8-byte callee stack scratch below incoming ESP. Replay determinism
@@ -72,7 +72,8 @@ requires the synthetic VGA retrace clock. See
 replacements; batch [125](../docs/subsystems/decomp-batch-125.md) verifies the
 first control-mode gate, [batch 126](../docs/subsystems/decomp-batch-126.md)
 verifies the paired mode B/C setters, and [batch 127](../docs/subsystems/decomp-batch-127.md)
-verifies the signed link-pointer lookup and its unaligned candidate override.
+verifies the signed link-pointer lookup and its unaligned candidate override;
+[batch 128](../docs/subsystems/decomp-batch-128.md) verifies its record updater.
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),
 as well as [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
