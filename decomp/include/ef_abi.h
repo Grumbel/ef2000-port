@@ -1241,7 +1241,7 @@ void trace_call_1037e0(uint32_t a, uint32_t b);
 void trace_call_103b5c(uint32_t a, uint32_t b);
 void trace_call_103b90(uint32_t a, uint32_t b, uint32_t c);
 void shutdown_103d48(void);
-uint32_t exchange_slot_1041e4(uint32_t index, uint32_t value);
+uint32_t EF_CDECL exchange_slot_1041e4(uint32_t index, uint32_t value);
 void shutdown_104694(void);
 uint32_t allocate_and_init_1047a4(uint32_t size);
 void free_block_1047c4(uint32_t block, uint32_t size);
@@ -4251,7 +4251,7 @@ void note_value_d5fc8(uint32_t value);
 
 /* trace_wrappers1.c */
 uint32_t trace_call_101ddc(void);
-uint32_t trace_call_101e14(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t EF_CDECL trace_call_101e14(uint32_t a0, uint32_t a1);
 uint32_t trace_call_101e80(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
 uint32_t trace_call_101f08(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
 uint32_t trace_call_101f88(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3);
@@ -4277,7 +4277,7 @@ uint32_t trace_call_103b08(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
 uint32_t trace_call_103c28(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4);
 uint32_t trace_call_1023b0(void);
 uint32_t guest_fn_104694_t(void); /* 0x104694 cdecl */
-uint32_t guest_fn_1041e4_t(uint32_t a0, uint32_t a1); /* 0x1041e4 cdecl */
+uint32_t EF_CDECL guest_fn_1041e4_t(uint32_t a0, uint32_t a1); /* 0x1041e4 cdecl */
 uint32_t guest_fn_111118_t(uint32_t a0); /* 0x111118 cdecl */
 uint32_t guest_fn_1111b1_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x1111b1 cdecl */
 uint32_t guest_fn_11124c_t(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3); /* 0x11124c cdecl */

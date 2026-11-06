@@ -2041,7 +2041,7 @@ in EAX, format string address, one value).
 | `0x103b5c` | EAX:uint32_t,EDX:uint32_t | none | 1123a4@112761,114058@1140ea | Trace wrapper for 0x114878. |
 | `0x103b90` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | none | 1123a4@112725,1123a4@11276c | Trace wrapper for 0x114994. |
 | `0x103d48` | none | none | none direct | If dword 0x17d2cc is set, run 0x1048b4(0x101a90, 0x103d48) and clear it. |
-| `0x1041e4` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 101e14@101e40 | Exchange dword 0x4dd7cc[index] with value; return the old one. |
+| `0x1041e4` | [ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 101e14@101e40 | cdecl caller-clean; clobbers EBX and EDX; exchange dword 0x4dd7cc[index] and return old value. |
 | `0x104694` | none | none | 101ddc@101df9 | Call 0x102488 on each non-null dword 0x4dd670[0..15], then 0x1023b0 and 0x1110c5. |
 | `0x1047a4` | EAX:uint32_t | EAX:uint32_t | 104200@104209,105e38@105e48,105e38@106209 | Allocate with 0xc3f70(size) and, if successful, run 0x104908(block, size). |
 | `0x1047c4` | EAX:uint32_t,EDX:uint32_t | none | 104200@104267,104200@1042e4,104200@10434c | For a non-null block run 0x104920(block, size) then free it with 0xc3f80. |
@@ -4690,7 +4690,7 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x101ddc` | none | EAX:uint32_t | d5d18@d5d4f,d6e58@d6ef3 | AIL trace wrapper for 0x104694 (cdecl, all arguments on the stack). |
-| `0x101e14` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | d6e58@d6eaa,d6e58@d6eb6,d6e58@d6ec2 | AIL trace wrapper for 0x1041e4 with result trace (cdecl, all arguments on the stack). |
+| `0x101e14` | [ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | d6e58@d6eaa,d6e58@d6eb6,d6e58@d6ec2,104580@10458c..10466a | cdecl caller-clean index/value wrapper for 0x1041e4; clobbers EBX and EDX. |
 | `0x101e80` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 104200@104373 | AIL trace wrapper for 0x111118 with result trace (cdecl, all arguments on the stack). |
 | `0x101f08` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | none direct | AIL trace wrapper for 0x1111b1 (cdecl, all arguments on the stack). |
 | `0x101f88` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t | EAX:uint32_t | 103e0c@103e39,104200@1043b3,104464@1044ad | AIL trace wrapper for 0x11124c with result trace (cdecl, all arguments on the stack). |

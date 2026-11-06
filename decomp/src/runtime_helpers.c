@@ -64,8 +64,8 @@ void shutdown_103d48(void)
     }
 }
 
-/* 0x1041e4, 25 bytes. Exchange dword 0x4dd7cc[index] with value; return the old one. */
-uint32_t exchange_slot_1041e4(uint32_t index, uint32_t value)
+/* 0x1041e4, 25 bytes. verified: diff+capture+replays. Exchange dword 0x4dd7cc[index]; return old value. */
+uint32_t EF_CDECL exchange_slot_1041e4(uint32_t index, uint32_t value)
 {
     uint32_t old = EF_U32(0x004dd7ccu + index * 4u);
     EF_U32(0x004dd7ccu + index * 4u) = value;

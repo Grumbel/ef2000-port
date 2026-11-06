@@ -464,3 +464,6 @@ Keep it `spliced`. See `docs/subsystems/decomp-batch-133.md`. Current tracker:
 
 
 **Batch-135 update (2026-11-06):** Corrected `pause_object_10687c` (`0x10687c`) and its trace wrapper `0x1027a0` to caller-clean cdecl. The 22-byte OpenWatcom body matches the original; five isolated cases pass. The SB16-DMA replay has zero target hits and nondeterministic baselines (42,279 vs. 42,324 interrupts), with a patched selected-BSS mismatch. Retain `spliced`. See `docs/subsystems/decomp-batch-135.md`. Current tracker: 3,225 `compiles`, 17 `verified`, 10 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`.
+
+
+**Batch-136 update (2026-11-06):** `exchange_slot_1041e4` (`0x1041e4`, 25 bytes) is verified. Its exact OpenWatcom body preserves the caller-clean cdecl arguments and original EBX/EDX clobbers. Four isolated cases and four captured startup calls pass; repeated menu/setup/cockpit replay passes 3/3 with 19 hits per scenario. Corrected wrapper `0x101e14` to two stack arguments and fixed source call sites. See `docs/subsystems/decomp-batch-136.md`. Current tracker: 3,224 `compiles`, 18 `verified`, 10 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`.

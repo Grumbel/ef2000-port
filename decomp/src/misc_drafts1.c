@@ -4894,7 +4894,7 @@ void reset_settings_104580(void)
     uint32_t i;
     init_locked_ranges_103d80();
     for (i = 0; i < 19u; i++)
-        trace_call_101e14(0u, 0u, 0u, 0u, i, defaults[i]);
+        trace_call_101e14(i, defaults[i]);
     for (i = 4u; i != 0x44u; i += 4u)
         EF_U32(0x004dd66cu + i) = 0u;
     EF_U8(0x004dd6b0u) = 0u;
@@ -11078,11 +11078,11 @@ uint32_t init_sound_driver_d6e58(void)
     if (EF_U8(0x0015bac4u) != 0u)
         return 0u;
     init_module_d6dc4();
-    (void)trace_call_101e14(0u, 0u, 0u, 0u, 1u, 0x5622u);
-    (void)trace_call_101e14(0u, 0u, 0u, 0u, 0u, 0x64u);
-    (void)trace_call_101e14(0u, 0u, 0u, 0u, 8u, 0u);
-    (void)trace_call_101e14(0u, 0u, 0u, 0u, 7u, 1u);
-    (void)trace_call_101e14(0u, 0u, 0u, 0u, 4u, 0xeu);
+    (void)trace_call_101e14(1u, 0x5622u);
+    (void)trace_call_101e14(0u, 0x64u);
+    (void)trace_call_101e14(8u, 0u);
+    (void)trace_call_101e14(7u, 1u);
+    (void)trace_call_101e14(4u, 0xeu);
     if (trace_call_1024b4(0u, 0u, 0u, 0u, 0x00420e0cu) != 0u) {
         (void)trace_call_101ddc();
         EF_U8(0x0015bac4u) = 0u;
