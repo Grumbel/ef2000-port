@@ -197,3 +197,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   fall from 45 to 42 (20,829 bytes); 594 functions (410,411 bytes) remain
   manual. The pointer-slot interpretation comes from Ghidra naming and use,
   and is not runtime verified.
+- M1 replay after M0 rule 17, 2026-11-06: the whole-set linker redirects
+  1,978 entries (9,890 original-image bytes) and places 569,028 bytes in
+  the guest arena; 556/721 modules link (316 mechanical and 1,661 hand-written
+  bodies patched). The current hand-written C modules were rebuilt with
+  OpenWatcom `-wx` first; all 335 compile without warnings. Private-Xvfb
+  replay still exits at the dataset check (`IP=0x222`, 101 interrupts,
+  296 ticks, `AX=0xffff4cff`); only `0xe7835` among the three required startup
+  entries executes before exit. The original baseline reaches the 500M
+  instruction checkpoint and saves a framebuffer. M1 remains unpassed.
