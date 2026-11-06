@@ -173,3 +173,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `AX=0xffff4cff`); only `0xe7835` among the three required startup entries
   executes before exit. M1 remains unpassed. The original baseline reaches
   its 500M-instruction checkpoint and saves a framebuffer.
+- M0 rule 15, generic indirect-call declarations, 2026-11-06: generated
+  `code *` expressions now use an unspecified argument list and integer
+  return type, allowing the varying argument counts and common EAX returns
+  present in the export. OpenWatcom reports 367/1,022 ok functions (35.9%,
+  101,974/544,429 bytes = 18.7%), up from 328/1,022 (32.1%,
+  89,263/544,429 bytes = 16.4%). Compile errors fall from 100 to 61
+  (32,044 bytes); 594 functions (410,411 bytes) remain manual. This is a
+  loose compile declaration, not a verified callback ABI.

@@ -437,7 +437,10 @@ def main():
     (args.out / 'ef_gen_abi.h').write_text(
         '/* Generated; derived from Ghidra output. NEVER COMMIT. */\n'
         '#include "ef_types.h"\n'
-        'typedef void ef_gen_code(void);\n' + concat_macros() + '\n' +
+        # Ghidra uses ``code *`` for heterogeneous callbacks.  An unspecified
+        # argument list keeps its varied call sites compilable; int models a
+        # common EAX return while still allowing callers to ignore it.
+        'typedef int ef_gen_code();\n' + concat_macros() + '\n' +
         '\n'.join(dict.fromkeys(header)) + '\n')
 
     if args.compile:
