@@ -189,3 +189,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   45 (22,061 bytes); 594 functions (410,411 bytes) remain manual. The
   pointer types are inferred from Ghidra expression context and remain
   unverified.
+- M0 rule 17, pointer-slot globals, 2026-11-06: lower Ghidra `PTR_*` names
+  as reads and writes of the 32-bit pointer stored at the guest address;
+  byte-offset subfields continue to address the slot's bytes. OpenWatcom
+  reports 386/1,022 ok functions (37.8%, 113,189/544,429 bytes = 20.8%), up
+  from 383/1,022 (37.5%, 111,957/544,429 bytes = 20.6%). Compile errors
+  fall from 45 to 42 (20,829 bytes); 594 functions (410,411 bytes) remain
+  manual. The pointer-slot interpretation comes from Ghidra naming and use,
+  and is not runtime verified.

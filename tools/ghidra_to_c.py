@@ -222,7 +222,7 @@ def convert(text, entry, names, sig_in=None, globals_=None):
             flags.add('manual')
             return match.group(0)
         address = None
-        if base.startswith(('DAT_', '_DAT_')):
+        if base.startswith(('DAT_', '_DAT_', 'PTR_')):
             address_match = re.search(r'([0-9a-fA-F]{8})$', base)
             if address_match:
                 address = int(address_match.group(1), 16)
@@ -308,7 +308,12 @@ def convert(text, entry, names, sig_in=None, globals_=None):
                   lambda m: dat_expression(int(m.group(1), 16), globals_), body)
     body = re.sub(r'(?<![A-Za-z0-9_])_?DAT_' + HEX + r'\b',
                   lambda m: dat_expression(int(m.group(1), 16), globals_), body)
-    body = re.sub(r'\b(?:PTR_|s_|u_|BYTE_|WORD_|DWORD_)\w*?_?' + HEX + r'\b(?:\s*\+\s*\d+)?',
+    # PTR_ names describe pointer-valued guest globals: dereference the slot
+    # for reads/writes.  Taking &PTR then naturally yields the guest address
+    # of that pointer slot, matching Ghidra's pointer-to-pointer expression.
+    body = re.sub(r'\bPTR_\w*?_?' + HEX + r'\b',
+                  lambda m: '(*(char **)ef_guest_memory_ptr(0x%s))' % m.group(1).lower(), body)
+    body = re.sub(r'\b(?:s_|u_|BYTE_|WORD_|DWORD_)\w*?_?' + HEX + r'\b(?:\s*\+\s*\d+)?',
                   lambda m: '((char *)ef_guest_memory_ptr(0x%s))' % m.group(1).lower(), body)
     # An address-of a translated guest global is the guest address itself;
     # taking the C address of EF_U* would instead point into the host mapping
