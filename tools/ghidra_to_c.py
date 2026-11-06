@@ -169,8 +169,16 @@ def convert(text, entry, names, sig_in=None, globals_=None):
         for reg, base in fam.items():
             name = 'in_' + reg
             if re.search(r'\b' + name + r'\b', body):
+                # Ghidra's declaration is only notation for a live-in
+                # register. A write cannot be represented by an input-only
+                # ABI parameter, so leave that function for manual handling.
+                if re.search(r'\b' + name + r'\s*(?:=|\+\+|--|\+=|-=)', body):
+                    flags.add('manual')
+                body = re.sub(r'^\s*[A-Za-z_]\w*(?:\s+|\s*\*)+%s\s*;\s*$' % name,
+                              '', body, flags=re.MULTILINE)
                 body = re.sub(r'\b' + name + r'\b',
-                              '((%s)r_%s)' % (cast[reg[-1] if reg[0] != 'E' else 'E'], base), body)
+                              'r_' + base if reg.startswith('E') else
+                              '((%s)r_%s)' % (cast[reg[-1]], base), body)
                 if base not in used:
                     used.append(base)
         order = ['eax', 'edx', 'ebx', 'ecx']
@@ -200,9 +208,13 @@ def convert(text, entry, names, sig_in=None, globals_=None):
         return None, body, flags, inferred
     ret = ' '.join(match.group('ret').split()) or 'int'
     params = match.group('params').strip() or 'void'
-    if extra:
-        # Signature inputs replace Ghidra's guessed parameter list.
+    if sig_in and extra:
+        # Confirmed signatures replace Ghidra's generic prototype.
         params = ', '.join(extra)
+    elif inferred:
+        # Keep Ghidra's non-register parameters; place inferred register
+        # inputs first so the pragma and the C declaration have the same ABI.
+        params = ', '.join(extra + ([] if params == 'void' else [params]))
     sig = '%s ef_fn_%08x(%s)' % (ret, entry, params)
     rest = body.split('\n', 1)[1] if '\n' in body else ''
     return sig, rest, flags, inferred

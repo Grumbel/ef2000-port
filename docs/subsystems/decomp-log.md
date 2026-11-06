@@ -54,3 +54,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   required 41, E1009 `r_eax` syntax 38, E1011 undeclared symbols 16, E1030
   address-of-rvalue 6, E1034 duplicate `r_eax` 3, E1045 subscript 3, E1084
   empty case 2, E1052 void expression 1.
+- M0 rule 7, inferred register live-ins, 2026-11-06: when an unrecovered
+  function reads Ghidra's `in_EAX`/`in_AX`/byte-register pseudo-variables,
+  translate them to inferred Watcom register parameters, retaining Ghidra's
+  other guessed parameters. Remove only the corresponding pseudo-local
+  declaration; functions that write an input register remain `manual`. The
+  OpenWatcom rerun produced 138/282 compilable generated functions (48.9%,
+  26,100/65,950 bytes = 39.6%). Across all 1,022 unrecovered functions this
+  is 13.5% by count and 4.8% by bytes. 144 generated functions remain compile
+  errors; first-error groups are parameter-count conflicts 66, pointer type
+  required 45, `true`/`false` 8, address-of-rvalue 6, `undefined6` 3,
+  duplicate `r_eax` 3, subscripting 3, empty `case` 2, and other individual
+  errors. 740 are manual (478,479 bytes); register writes account for the
+  increase from the previous report. The increase in successful output
+  verifies the translation rule, but inferred signatures remain hypotheses
+  and are not yet accepted for hybrid linking.
