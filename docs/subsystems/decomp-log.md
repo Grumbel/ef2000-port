@@ -111,11 +111,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   quick-fight-setup checkpoints with identical framebuffer and selected guest
   RAM hashes. Cockpit framebuffer matches, but the 64-KiB guest-RAM hash does
   not, so this isolated run is not a full replay pass. The complete hybrid
-  stops before startup; a redirect-set bisect narrowed its first observed
-  failure to mechanical entry `0x0009be38` (the unclassified 427-byte allocator).
-  Demoting that entry advances execution but still does not reach the menu
-  (`IP=0x0301afc5`, 7 interrupts at the 500M instruction checkpoint), so M1
-  remains unpassed and the next failure is not yet isolated. The runner now
+  stops before startup; a redirect-set probe implicated mechanical entry
+  `0x0009be38` (the unclassified 427-byte allocator). This is a suspect, not
+  a conclusive bisect: the probe removed entry redirects but retained the
+  linked arena and its cross-module calls. Demoting that entry advances
+  execution but still does not reach the menu (`IP=0x0301afc5`, 7 interrupts
+  at the 500M instruction checkpoint), so M1 remains unpassed and the next
+  failure is not yet isolated. The runner now
   preserves the BSS initialization pattern around the arena and only blocks
   heap/stack growth if it would overlap the arena; this keeps startup memory
   reporting unchanged. Unit checks pass for 33 Python patch/OMF/replay tests,
