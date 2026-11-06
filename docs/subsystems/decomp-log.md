@@ -365,3 +365,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   body bytes); 594 remain `manual` and 33 remain `compile-error`. This is
   compile acceptance only, not behavioral verification. The menu validator
   replacement still awaits private-Xvfb replay; M1/M2 remain unpassed.
+- Hybrid link callback bridge, 2026-11-06: original disassembly at
+  `0x104471` pushes the callback argument, calls the pointer at `[ESI+0x24]`,
+  then removes four bytes, confirming the cdecl one-stack-argument contract
+  declared for `guest_callptr1_x`. Added OpenWatcom C bridges for that call
+  and `ui_report_missing_record` (through the guest callback at `0x132a74`).
+  Both compile with zero warnings; WDIS shows `push EDX; call EAX; add ESP,4`
+  and the UI wrapper's pointer load and tail call. The fresh hybrid now
+  redirects 2,160 functions (10,800 original-entry bytes; 572,932 arena
+  bytes), linking 581/731 modules with 2,823 exclusions. This resolves the
+  `guest_callptr1_x_` and `ui_report_missing_record_` module failures and
+  adds 176 patched functions over the previous link. No compliant replay has
+  run on this artifact: Xvfb's private Unix-socket bind is denied with
+  `EPERM`, so M1/M2 remain unpassed and the current artifact's first guest
+  failure is unknown. The earlier `0xf8c25` fault came from a different
+  hybrid with `0xf8b14` demoted.
