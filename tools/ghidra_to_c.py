@@ -189,6 +189,8 @@ def convert(text, entry, names, sig_in=None, globals_=None):
         flags.add('manual')
     for pattern, repl in TYPES:
         body = re.sub(pattern, repl, body)
+    body = re.sub(r'\btrue\b', '1', body)
+    body = re.sub(r'\bfalse\b', '0', body)
     # Rename callees, referenced by auto name or by recovered name.
     body = re.sub(r'\b(?:thunk_)?FUN_' + HEX + r'\b',
                   lambda m: 'ef_fn_' + m.group(1).lower(), body)

@@ -69,3 +69,10 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   increase from the previous report. The increase in successful output
   verifies the translation rule, but inferred signatures remain hypotheses
   and are not yet accepted for hybrid linking.
+- M0 rule 8, boolean literals, 2026-11-06: normalize Ghidra's lowercase
+  `true`/`false` literals to C integer constants. The OpenWatcom rerun compiled
+  144/282 generated functions (51.1%, 27,633/65,950 bytes = 41.9%); six more
+  functions compiled, and all undeclared-boolean errors disappeared. Across
+  all 1,022 unrecovered functions this is 14.1% by count and 5.1% by bytes.
+  The remaining 138 compile errors are led by parameter-count conflicts 68
+  and pointer-type errors 45; the rest are smaller independent classes.
