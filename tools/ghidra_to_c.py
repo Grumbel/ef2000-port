@@ -236,6 +236,44 @@ def convert(text, entry, names, sig_in=None, globals_=None):
         return '(*(%s *)((char *)&%s + %d))' % (ctype, base, offset)
     body = re.sub(r'(?P<base>[A-Za-z_]\w*)\._(?P<offset>\d+)_(?P<width>\d+)_',
                   subfield_repl, body)
+    # Ghidra's export carries pointer types in the expression uses rather
+    # than in a separate global declaration.  An otherwise untyped DAT
+    # global used as a dereference/index base is a pointer value stored at
+    # that guest address, not an integer lvalue.  Preserve assignments to
+    # the global itself, while translating read uses through the stored
+    # 32-bit guest pointer.  Function-pointer globals need a callable cast;
+    # their concrete signature is not available in the export.
+    pointer_globals = set(re.findall(
+        r'(?<![A-Za-z0-9_])_?DAT_([0-9a-fA-F]{8})(?![A-Za-z0-9_])(?=\s*(?:\[|->))', body))
+    # A bare '*' before a DAT token is only a dereference when the preceding
+    # non-space character cannot end an operand (otherwise it is multiply).
+    for dereference in re.finditer(r'\*\s*_?DAT_([0-9a-fA-F]{8})\b', body):
+        prefix = body[:dereference.start()].rstrip()
+        previous = prefix[-1:] if prefix else ''
+        if not previous or previous in '([=,:!~?&|+-*/%<>':
+            pointer_globals.add(dereference.group(1))
+    for address_text in sorted(pointer_globals):
+        address = int(address_text, 16)
+        # A known global declaration can have a wider or non-pointer type;
+        # only infer a pointer for addresses absent from the reviewed table.
+        if address in (globals_ or {}):
+            continue
+        token = re.compile(r'(?<![A-Za-z0-9_])_?DAT_' + address_text + r'\b')
+        function_pointer = re.search(r'\(\s*\*\s*_?DAT_' + address_text + r'\s*\)\s*\(', body)
+        cast = 'int (*)()' if function_pointer else 'char *'
+        replacement = '((%s)(uintptr_t)EF_U32(0x%08xu))' % (cast, address)
+        def pointer_read(match):
+            end = match.end()
+            suffix = body[end:]
+            prefix = body[:match.start()]
+            # Keep the guest global as an lvalue when the variable itself is
+            # being assigned. A preceding unary '*' or following subscript
+            # makes this a write through the stored pointer instead.
+            if (re.match(r'\s*(?:=(?!=)|\+=|-=|\+\+|--)', suffix) and
+                    not re.search(r'\*\s*$', prefix)):
+                return 'EF_U32(0x%08xu)' % address
+            return replacement
+        body = token.sub(pointer_read, body)
     if MANUAL.search(body):
         flags.add('manual')
     # Ghidra's CONCATxy(a, b) joins x bytes from a and y bytes from b.
@@ -411,7 +449,8 @@ def main():
             source = args.out / 'src' / ('ef_fn_%08x.c' % int(item[0], 16))
             obj = args.out / 'obj' / (source.stem + '.obj')
             result = subprocess.run([args.compiler, *FLAGS, *include, '-fo=' + str(obj),
-                                     str(source)], capture_output=True, text=True)
+                                     str(source)], capture_output=True, text=True,
+                                    cwd=args.out)
             if result.returncode == 0:
                 item[3] = 'ok'
             else:

@@ -155,3 +155,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   heap/stack growth if it would overlap the arena; this keeps startup memory
   reporting unchanged. Unit checks pass for 33 Python patch/OMF/replay tests,
   the C++ EFPATCH test, and the OpenWatcom module compilation.
+- M0 rule 14, pointer-valued DAT globals, 2026-11-06: detect unknown
+  `DAT_<address>` globals used as pointer dereference, indexing, or indirect
+  call operands. Reads load the stored 32-bit guest pointer; writes to the
+  global itself remain guest-memory lvalues. A second compile pass corrected
+  an ambiguity between unary dereference and multiplication. OpenWatcom now
+  reports 328/1,022 ok functions (32.1%, 89,263/544,429 bytes = 16.4%), up
+  from 290/1,022 (28.4%, 83,196/544,429 bytes = 15.3%). Compile errors fall
+  from 138 to 100 (44,755 bytes); 594 functions (410,411 bytes) remain
+  manual. This is expression-context inference and does not validate the
+  recovered global's real type or runtime behavior.
+- M1 replay after M0 rule 14, 2026-11-06: the whole-set linker redirects
+  1,934 entries (9,670 original-image bytes) and places 541,108 bytes in the
+  guest arena; 512/663 modules link, including 273 mechanical and 1,661
+  hand-written entry bodies. The private-Xvfb main-menu replay still exits
+  at the original dataset check (`IP=0x222`, 101 interrupts, 296 ticks,
+  `AX=0xffff4cff`); only `0xe7835` among the three required startup entries
+  executes before exit. M1 remains unpassed. The original baseline reaches
+  its 500M-instruction checkpoint and saves a framebuffer.
