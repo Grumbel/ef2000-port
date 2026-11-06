@@ -86,3 +86,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   bytes. The remaining 93 compile errors are led by guest-pointer expressions
   45 and parameter-count conflicts 23. This relaxes compile-time call checking;
   it provides no ABI verification and those calls still require hybrid replay.
+- M1 structural assessment, 2026-11-06: all 334 `decomp/src/*.c` modules
+  compile with OpenWatcom `-wx` and zero warnings into ignored
+  `local/hybrid/obj/` (432,877 CODE bytes plus 4,388 DATA bytes). The OMF
+  parser accepts all modules; their 9,217 external and 685 segment fixups are
+  32-bit offsets framed against FLAT. No hybrid image has been produced and
+  no functions/bytes are patched. The current `omf_splice.py` planner only
+  accepts one CODE segment with one function public at offset zero;
+  `efpatch.py` and its C++ reader reject redirects/arena writes, cap patches
+  at 512 in-image writes, and the runner treats the initialized payload as
+  the whole patchable image. A whole-set linker therefore needs a distinct
+  multi-object symbol/relocation pass and a guest-arena loading path. The
+  arena must be above the startup-cleared BSS end `0x4de2f0`, below the
+  64-MiB guest limit, and reserved from the simulated heap; placing code in
+  BSS would erase it during startup. There are 41 eligible entry slots under
+  five bytes, which cannot take a direct `jmp rel32` and need explicit
+  exclusion or a proved trampoline. This is a tooling/segment-layout blocker,
+  not an OpenWatcom or unsupported-OMF-fixup failure; M1 remains unpassed.
