@@ -6,6 +6,10 @@ formats, and (3) a modern native build with widescreen and high frame rates.
 It is written to be executed step by step by an AI agent. **Read the whole
 "Ground rules" and "Operating loop" sections before every work session.**
 
+> **Revision 2 (2026-11-06): see `docs/decompilation-plan-rev2.md`.** It
+> supersedes §1 rules 5/6/9, §4 and the §7 precondition: working hybrid build
+> first, bisection and bulk verification later.
+
 Status markers used below: `[ ]` not started, `[~]` in progress, `[x]` done.
 Update them in this file as part of the commit that completes a step.
 
@@ -2104,6 +2108,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-06  3.35  `find_last_char` (`0x10d1da`, 26 bytes) is verified with an exact OpenWatcom body, six isolated cases and four captured startup calls. Repeated menu/setup/cockpit replay passes 3/3 with 20,889, 20,933 and 278,507 hits; matching state/counters. Corrected the signature to record EDX clobber. See docs/subsystems/decomp-batch-137.md.
 2026-11-06  3.36  Corrected `exchange_callback_106938` (`0x106938`) and wrapper `0x102dbc` to caller-clean cdecl. Exact OpenWatcom body passes five isolated and four captured sound-channel calls. Sound-off paths do not hit it; SB16-DMA reaches six times but remains nondeterministic (42,342 vs. 42,372 interrupts, selected BSS differs), so keep `spliced`. See docs/subsystems/decomp-batch-138.md.
 2026-11-06  3.37  `strip_cr_inplace` (`0x1091e0`, 28 bytes) is verified with an exact OpenWatcom body, six isolated cases and one captured startup call (348 guest RAM bytes compared). Repeated menu/setup/cockpit replay passes 3/3 with 1/1/2 hits and matching state/counters. See docs/subsystems/decomp-batch-139.md.
+2026-11-06  3.38  `times_100_div_10` (`0x106bfc`, 32 bytes) now models modulo-2^32 multiplication followed by signed division; OpenWatcom patch and 12 isolated cases pass. The repeated menu/setup/cockpit replay preserves checkpoints but has zero candidate hits because callers are in virtual-I/O/serial-tracker paths; retain `spliced`. See docs/subsystems/decomp-batch-140.md.
 ```
 
 ---
