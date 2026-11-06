@@ -523,3 +523,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   388 mechanical and 2,043 hand-written functions patched; exclusions fall
   to 2,285. M1/M2 remain unpassed because private Xvfb cannot bind, and the
   first guest failure is unknown.
+- Hybrid OpenWatcom double-to-unsigned-64 bridge, 2026-11-06: added
+  `__FDU87` for a binary64 input in EDX:EAX and uint64 output in EDX:EAX.
+  The conversion truncates the magnitude in range, returns zero below 1,
+  saturates non-finite values and magnitudes at least 2^64 to UINT64_MAX, and
+  negates in-range negative magnitudes as the OpenWatcom helper does. WDIS
+  confirms the caller setup; a helper-level Unicorn check passed 5,014 input
+  bit patterns and verified preserved non-result registers, control word, and
+  stack. Both dependent guest modules now link. The hybrid reaches 2,433
+  redirects (12,165 entry bytes; 576,292 arena bytes), 682/743 modules, with
+  390 mechanical and 2,043 hand-written functions patched; exclusions fall
+  to 2,281. This is runtime-helper ABI/model evidence, not differential proof
+  against the original guest. M1/M2 remain unpassed because private Xvfb
+  cannot bind; the first guest failure is unknown.
