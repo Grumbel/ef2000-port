@@ -225,9 +225,22 @@ void copy_record9_d0858(ef_addr32 destination, ef_addr32 source)
 #endif
 }
 
-/* 0xd0b68, 63 bytes. Reset a 9-dword bounds record (0x7fff limits). */
+/* 0xd0b68, 63 bytes. verified: exact-body+replay. Reset a 9-dword bounds record (0x7fff limits). */
 void init_bounds_d0b68(ef_addr32 record)
 {
+#if defined(__WATCOMC__)
+    volatile uint32_t *bounds = (volatile uint32_t *)(uintptr_t)record;
+
+    bounds[3] = 0;
+    bounds[6] = 0;
+    bounds[1] = 0;
+    bounds[7] = 0;
+    bounds[2] = 0;
+    bounds[5] = 0;
+    bounds[0] = 0x7fffu;
+    bounds[4] = 0x7fffu;
+    bounds[8] = 0x7fffu;
+#else
     EF_U32(record + 0xcu) = 0;
     EF_U32(record + 0x18u) = 0;
     EF_U32(record + 4u) = 0;
@@ -237,6 +250,7 @@ void init_bounds_d0b68(ef_addr32 record)
     EF_U32(record) = 0x7fff;
     EF_U32(record + 0x10u) = 0x7fff;
     EF_U32(record + 0x20u) = 0x7fff;
+#endif
 }
 
 /* 0xd65a8, 62 bytes. Remap a 256-entry RGB palette through three 64-byte tables. */

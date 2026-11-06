@@ -1,1 +1,151 @@
-{"address":"0x000d0b68","function_size":63,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x000d0b68",
+  "function_size": 63,
+  "max_instructions": 1000,
+  "cases": [
+    {
+      "name": "bounds_record_0",
+      "registers": {
+        "eax": "0x1000"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "e9618f1f3f841bfe705c224dc7ea53209a716a3160694ce36b826d9db6f38c6c9d31d2c187e3ded4"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_1",
+      "registers": {
+        "eax": "0x1001"
+      },
+      "memory": [
+        {
+          "address": "0x1001",
+          "hex": "a076e771d9c3d53df9ec6799feeda98696e0ca7c896385759f779befc15a9a2c29c1b0c1cc8fd30e"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_2",
+      "registers": {
+        "eax": "0x10fc"
+      },
+      "memory": [
+        {
+          "address": "0x10fc",
+          "hex": "6c362d540105a294a2f2efc79d7a0f4826f8c3c59622f3dd93556801528a1c04d4f19ddd49fac178"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_3",
+      "registers": {
+        "eax": "0x2003"
+      },
+      "memory": [
+        {
+          "address": "0x2003",
+          "hex": "939a73b47c0f6179f70ac3e24770a6828f440dc6ce0e301e60644420f0be818f4e8eac34c4747cdb"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_4",
+      "registers": {
+        "eax": "0x2ff8"
+      },
+      "memory": [
+        {
+          "address": "0x2ff8",
+          "hex": "e3981bda5b8d49768f5e55d8864c203c3bb997858e918cbec50aae77ddf5a3911b3cefc684f00b34"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_5",
+      "registers": {
+        "eax": "0x4000"
+      },
+      "memory": [
+        {
+          "address": "0x4000",
+          "hex": "aff03d27e4c076463227cafc7601140ac099818f4f6e836806227b4988a217f3a26ab276ed6233d2"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_6",
+      "registers": {
+        "eax": "0x4001"
+      },
+      "memory": [
+        {
+          "address": "0x4001",
+          "hex": "3885ace548e62ef941ed86e2744855f1dfc4ed5f4545ea0d97775ca7e7c6db591a145265e731a474"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_7",
+      "registers": {
+        "eax": "0x5008"
+      },
+      "memory": [
+        {
+          "address": "0x5008",
+          "hex": "a9ff22d17bc5d184ee7088301c5b47b64462310b26741656ec07379cf2eef7eec5d4ebfd9671a3ac"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_8",
+      "registers": {
+        "eax": "0x6000"
+      },
+      "memory": [
+        {
+          "address": "0x6000",
+          "hex": "3ea1fa1afa0262f7f9ca941f604dd84754e63cbcea98c3ce520e25323511b5d8f71e8a4dbabab6f8"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_9",
+      "registers": {
+        "eax": "0x7003"
+      },
+      "memory": [
+        {
+          "address": "0x7003",
+          "hex": "c2b4c7e1d0e5116e25f6e6a5658721acd3b98b526fb4814adabb33cd43c59dfe012d2abf6f3d82c4"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_10",
+      "registers": {
+        "eax": "0x7ffc"
+      },
+      "memory": [
+        {
+          "address": "0x7ffc",
+          "hex": "d3fa6ed77491dc183f5202e25e45685312ddd3e05a69524758bb577d84cc0519e70d00402f24a290"
+        }
+      ]
+    },
+    {
+      "name": "bounds_record_11",
+      "registers": {
+        "eax": "0x8000"
+      },
+      "memory": [
+        {
+          "address": "0x8000",
+          "hex": "68c91eb1fa2402785abd7e1f752e146d3629c4db6fcb3389a4725cf0df41540f9ce5b41a8279f383"
+        }
+      ]
+    }
+  ]
+}

@@ -87,6 +87,16 @@ so it remains `blocked`. Current tracker: 3,249 `compiles`, 5 `verified`, 1
 `spliced`, 2 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`. See
 `docs/subsystems/decomp-batch-114.md`.
 
+**Batch-115 update (2026-11-06):** `init_bounds_d0b68` (`0xd0b68`, 63
+bytes) is now the sixth strictly verified OpenWatcom replacement. The
+production body and fixture both equal the original 63 bytes. Twelve
+isolated cases, three captured caller-state differentials, and the repeated
+baseline 1.5B cockpit replay pass; the candidate is reached 155 times with
+matching selected BSS/framebuffer hashes and status/tick/interrupt counters.
+Current tracker: 3,248 `compiles`, 6 `verified`, 1 `spliced`, 2 `blocked`, 247
+`drafted`, 669 `unknown`, and 3 `library`. See
+`docs/subsystems/decomp-batch-115.md`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -100,12 +110,12 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,249 | 363,477 |
+| `compiles` | 3,248 | 363,414 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
-| `verified` | 5 | 126 |
+| `verified` | 6 | 189 |
 | `spliced` | 1 | 55 |
 | `blocked` | 2 | 105 |
 | **Total** | **4,287** | **908,947** |
