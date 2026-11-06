@@ -431,3 +431,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   patched. The new `0x5d1c4` body compiles but its module is excluded for
   unresolved OpenWatcom helper `__U8LS`; total exclusions rise to 2,797.
   No replay ran because Xvfb cannot bind; M1/M2 remain unpassed.
+- Hybrid OpenWatcom shift bridge, 2026-11-06: added a small 32-bit OMF
+  runtime helper for `__U8LS` (64-bit EDX:EAX value, EBX count modulo 64),
+  assembled with the pinned OpenWatcom `wasm` and confirmed in WDIS. The
+  fresh link resolves that helper class and grows from 2,175 to 2,202
+  redirected functions (11,010 entry bytes; 575,300 arena bytes), with
+  348 mechanical and 1,854 hand-written functions patched across 613/734
+  modules; exclusions fall from 2,797 to 2,743. The startup/menu redirects
+  at `0xf8600`, `0xf8b14` and `0xe7835` remain present. No replay ran because
+  private Xvfb cannot bind; M1/M2 remain unpassed. The first remaining link
+  failure class is `__CHP` (19 modules); first guest failure is unknown.
