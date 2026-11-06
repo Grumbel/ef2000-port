@@ -95,8 +95,8 @@ void reinitialize_runtime_slots(void)
     write8(0x00122882, 0);
 }
 
-/* 0x121cc, 33 bytes. A signed AX subindex and the signed high word
- * of an overlapping dword at 0x121ec6 + 2*DX select a 29-byte slot. */
+/* 0x121cc, 33 bytes, verified: replays+diff. A signed AX subindex and the
+ * signed high word of an overlapping dword at 0x121ec6 + 2*DX select a slot. */
 uint8_t read_runtime_slot_flag(int16_t subindex, int16_t group)
 {
 #if defined(__WATCOMC__)
