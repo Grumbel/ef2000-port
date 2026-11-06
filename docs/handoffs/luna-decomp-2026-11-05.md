@@ -415,3 +415,15 @@ the original function faults at `0x10dfe5` in the captured differential and
 cannot yet pass replay verification. See `docs/subsystems/decomp-batch-129.md`.
 Current tracker: 3,231 `compiles`, 17 `verified`, 4 `spliced`, 5 `blocked`,
 247 `drafted`, 669 `unknown`, and 3 `library`.
+
+**Batch-130 update (2026-11-06):** `get_state_106708` (`0x106708`, 13
+bytes) was corrected to its original caller-clean cdecl stack ABI. Its
+OpenWatcom body matches the original bytes; four isolated cases pass, and
+the repeated menu/setup/cockpit suite passes 3/3 with matching checkpoints.
+It remains `spliced` because none of those replays reaches the entry, and
+500M startup / 1.5B cockpit capture probes found no call. The differential
+harness now separates stack argument size from callee cleanup, and OMF
+matching handles cdecl leading-underscore code publics. See
+`docs/subsystems/decomp-batch-130.md`. Current tracker: 3,230 `compiles`, 17
+`verified`, 5 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3
+`library`.

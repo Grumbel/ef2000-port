@@ -1249,7 +1249,7 @@ void stack_range_104908(uint32_t base, uint32_t length);
 void stack_range_104920(uint32_t base, uint32_t length);
 void stop_object_105334(ef_addr32 object);
 void set_state_1_106634(ef_addr32 object);
-uint32_t get_state_106708(ef_addr32 object);
+uint32_t EF_CDECL get_state_106708(ef_addr32 object);
 void set_range_106718(ef_addr32 object, uint32_t first, uint32_t second);
 void set_pair_106740(ef_addr32 object, uint32_t first, uint32_t second);
 void set_field_10677c(ef_addr32 object, uint32_t value);

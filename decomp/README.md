@@ -49,8 +49,8 @@ The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
 Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,231 marked `compiles`,
-247 additional host-tested `drafted` entry points, 4 `spliced`, 5 `blocked`, and 17 `verified`.
+confirmed additional entry points (4,287 tracked); 3,230 marked `compiles`,
+247 additional host-tested `drafted` entry points, 5 `spliced`, 5 `blocked`, and 17 `verified`.
 Seventeen routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
 `to_upper_ascii`, `encode_runtime_segment_offset`, `read_runtime_slot_flag`,
 `initialize_runtime_probe_latch`, `init_bounds_d0b68`, `sync_flag_12ec8`,

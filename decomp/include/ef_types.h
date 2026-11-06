@@ -10,6 +10,14 @@
 /* Guest memory is 32-bit, even when host-side tools are 64-bit. */
 typedef uint32_t ef_addr32;
 
+/* Watcom's normal register convention is the guest default. Mark the few
+ * original stack-ABI bodies explicitly; host builds treat this as ordinary C. */
+#if defined(__WATCOMC__)
+#define EF_CDECL __cdecl
+#else
+#define EF_CDECL
+#endif
+
 /* OpenWatcom uses -zp1 (or explicit #pragma pack(1)) for proven packed
  * structures. Other compilers can annotate those declarations directly. */
 #if defined(__WATCOMC__)

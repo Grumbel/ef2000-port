@@ -132,11 +132,15 @@ void set_state_1_106634(ef_addr32 object)
 }
 
 /* 0x106708, 13 bytes. Dword +4, or 0 for null. */
-uint32_t get_state_106708(ef_addr32 object)
+uint32_t EF_CDECL get_state_106708(ef_addr32 object)
 {
     if (object == 0)
         return 0;
+#if defined(__WATCOMC__)
+    return *(uint32_t *)(uintptr_t)(object + 4u);
+#else
     return EF_U32(object + 4u);
+#endif
 }
 
 /* 0x106718, 37 bytes. Reset +0xc and +0x14, set +8 and +0x10. */

@@ -14,6 +14,7 @@ import argparse
 import csv
 from dataclasses import dataclass
 from pathlib import Path
+import re
 import struct
 
 try:
@@ -77,6 +78,11 @@ class Signature:
     outputs: tuple
     preserved: tuple
     stack_bytes: int
+    stack_args_bytes: int | None = None
+
+    def __post_init__(self):
+        if self.stack_args_bytes is None:
+            object.__setattr__(self, 'stack_args_bytes', self.stack_bytes)
 
 
 def read_signature(path, address):
@@ -93,7 +99,15 @@ def read_signature(path, address):
     stack_bytes = number(row['stack_bytes'], 'stack cleanup')
     if stack_bytes % 4 or stack_bytes > 256:
         raise ValueError('unsupported stack cleanup (expected at most 64 dwords)')
-    return Signature(address, row['name'], outputs, preserved, stack_bytes)
+    stack_offsets = [int(offset, 0) for offset in re.findall(
+        r'\[ESP\+([^]]+)\]:', row['inputs'])]
+    stack_args_bytes = max((offset for offset in (offset - 4 + 4
+                                                  for offset in stack_offsets)),
+                           default=stack_bytes)
+    if stack_args_bytes % 4 or stack_args_bytes > 256:
+        raise ValueError('unsupported stack argument size (expected at most 64 dwords)')
+    return Signature(address, row['name'], outputs, preserved, stack_bytes,
+                     stack_args_bytes)
 
 
 def read_function_extent(path, address):
@@ -118,7 +132,8 @@ def validate_spec(spec, signature, image_size, default_guest_size=0x4000000):
     budget = number(spec.get('max_instructions', 20000), 'instruction limit')
     function_size = number(spec['function_size'], 'function size')
     if (guest_size % 0x1000 or guest_size < image_size + 0x3000 or
-            stack < scratch + 0x100 or stack + 4 + signature.stack_bytes > guest_size or
+            stack < scratch + 0x100 or
+            stack + 4 + max(signature.stack_bytes, signature.stack_args_bytes) > guest_size or
             sentinel >= guest_size or sentinel == signature.address or budget == 0 or
             not 0 < function_size <= 0x10000 or
             signature.address + function_size > image_size):
@@ -137,8 +152,8 @@ def validate_spec(spec, signature, image_size, default_guest_size=0x4000000):
                 raise ValueError(f'case {name}: only full input GPRs are supported: {key}')
             registers[key] = number(value, key)
         args = [number(item, 'stack argument') for item in case.get('stack_args', [])]
-        if len(args) != signature.stack_bytes // 4:
-            raise ValueError(f'case {name}: expected {signature.stack_bytes // 4} stack arguments')
+        if len(args) != signature.stack_args_bytes // 4:
+            raise ValueError(f'case {name}: expected {signature.stack_args_bytes // 4} stack arguments')
         memory = []
         for item in case.get('memory', []):
             address = number(item['address'], 'memory address')
@@ -318,7 +333,8 @@ def main():
                 if len(captured.guest_ram) != 0x4000000:
                     raise ValueError('captured game calls require the complete 64 MiB guest RAM')
                 stack = captured.registers['esp']
-                if stack < 0x10100 or stack + 4 + signature.stack_bytes > 0x4000000:
+                if stack < 0x10100 or stack + 4 + max(
+                        signature.stack_bytes, signature.stack_args_bytes) > 0x4000000:
                     raise ValueError('captured stack outside replayable guest range')
                 left, right = scenarios_from_capture(captured, patch_writes)
                 cases.append((left, right, stack))

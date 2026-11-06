@@ -2049,7 +2049,7 @@ in EAX, format string address, one value).
 | `0x104920` | EAX:uint32_t,EDX:uint32_t | none | d5ec0@d5ee7,d6ffc@d701d,d710c@d7123 | 0x1048b4(base, base + length). |
 | `0x105334` | EAX:ef_addr32 | none | 105648@105803,10585c@1058aa,105da0@105dae | If dword +0x54 is set, send message 0x402 through 0x101f88 and clear it. |
 | `0x106634` | EAX:ef_addr32 | none | 102644@102667 | Dword +4 = 1. |
-| `0x106708` | EAX:ef_addr32 | EAX:uint32_t | 1028f4@102919 | Dword +4, or 0 for null. |
+| `0x106708` | [ESP+4]:ef_addr32 | EAX:uint32_t | 1028f4@102919 | cdecl, caller cleanup (RET 0); returns dword +4 when pointer is non-null, otherwise zero. |
 | `0x106718` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 1026fc@10272c | Reset +0xc and +0x14, set +8 and +0x10. |
 | `0x106740` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 102738@102768 | Update +0x34 / +0x38 and notify through 0x10535c when they change. |
 | `0x10677c` | EAX:ef_addr32,EDX:uint32_t | none | 102824@10284e | Dword +0x3c = value. |
@@ -4703,7 +4703,7 @@ in EAX, format string address, one value).
 | `0x102590` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d6e58@d6f41 | AIL trace wrapper for 0x1065c8 with result trace (cdecl, all arguments on the stack). |
 | `0x1026fc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | d7158@d7209,d72b4@d7388 | AIL trace wrapper for 0x106718 (cdecl, all arguments on the stack). |
 | `0x102738` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | d7158@d71f1,d72b4@d7337 | AIL trace wrapper for 0x106740 (cdecl, all arguments on the stack). |
-| `0x1028f4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d7594@d75ad,d75fc@d7615 | AIL trace wrapper for 0x106708 with result trace (cdecl, all arguments on the stack). |
+| `0x1028f4` | [ESP+4]:uint32_t | EAX:uint32_t | d7594@d75ad,d75c8@d75e1,d75fc@d7615 | AIL trace wrapper for 0x106708 with result trace; caller cleanup; ECX/EDX are scratch. |
 | `0x102dbc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | d7158@d7288,d72b4@d7373 | AIL trace wrapper for 0x106938 with result trace (cdecl, all arguments on the stack). |
 | `0x102f60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d5d18@d5d43 | AIL trace wrapper for 0x113af0 with result trace (cdecl, all arguments on the stack). |
 | `0x102fb4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 113af0@113b37 | AIL trace wrapper for 0x113a40 with result trace (cdecl, all arguments on the stack). |

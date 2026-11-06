@@ -20,7 +20,7 @@ def symbol(value):
     return bytes([len(value)]) + value.encode('ascii')
 
 
-def omf_object(code=b'\xa1\x00\x00\x00\x00\x40\xc3'):
+def omf_object(code=b'\xa1\x00\x00\x00\x00\x40\xc3', public_name='ef_foo_'):
     # A single USE32 CODE segment, one public and one external absolute
     # 32-bit relocation: mov eax, [g_score]; inc eax; ret.
     return b''.join((
@@ -28,7 +28,7 @@ def omf_object(code=b'\xa1\x00\x00\x00\x00\x40\xc3'):
         record(0x96, symbol('_TEXT') + symbol('CODE')),
         record(0x99, b'\x61' + len(code).to_bytes(4, 'little') + b'\x01\x02\x00'),
         record(0x8c, symbol('g_score_') + b'\x00'),
-        record(0x91, b'\x00\x01' + symbol('ef_foo_') + b'\x00\x00\x00\x00\x00'),
+        record(0x91, b'\x00\x01' + symbol(public_name) + b'\x00\x00\x00\x00\x00'),
         record(0xa1, b'\x01\x00\x00\x00\x00' + code),
         record(0x9d, b'\xe4\x01\x56\x01'),  # absolute 32-bit external fixup
         record(0x8a, b'\x00'),
@@ -46,6 +46,14 @@ def inputs():
 
 
 class InPlacePatchTests(unittest.TestCase):
+    def test_cdecl_leading_underscore_public_matches_canonical_function(self):
+        original, functions, globals_ = inputs()
+        blob, entry = omf_inplace.build(omf_object(public_name='_ef_foo'),
+                                        original, functions, globals_, {0x20})
+        self.assertEqual(entry['offset'], 0x20)
+        self.assertEqual(efpatch.decode(blob, original)[0][1][:7],
+                         bytes.fromhex('a1 00010000 40 c3'))
+
     def test_full_conversion_resolves_absolute_guest_global(self):
         original, functions, globals_ = inputs()
         blob, entry = omf_inplace.build(omf_object(), original, functions,

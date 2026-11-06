@@ -275,7 +275,11 @@ def plan_patch(module, image, functions, globals_, arena_base, reviewed):
     if len(candidates) != 1 or candidates[0].offset:
         raise OMFError('one code PUBDEF at offset zero is currently required')
     symbol = candidates[0].symbol
-    spellings = (symbol, symbol[:-1]) if symbol.endswith('_') else (symbol,)
+    spellings = {symbol}
+    if symbol.startswith('_'):
+        spellings.add(symbol[1:])
+    if symbol.endswith('_'):
+        spellings.add(symbol[:-1])
     rows = [r for r in functions if r['name'] and r['name'] in spellings]
     if len(rows) != 1:
         raise OMFError('code public must uniquely match a canonical function name')
