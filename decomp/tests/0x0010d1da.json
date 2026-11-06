@@ -1,1 +1,85 @@
-{"address":"0x0010d1da","function_size":26,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x0010d1da",
+  "function_size": 26,
+  "max_instructions": 1000,
+  "cases": [
+    {
+      "name": "empty_no_match",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0x78"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "00"
+        }
+      ]
+    },
+    {
+      "name": "last_of_repeated",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0x61"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "612f622f6100"
+        }
+      ]
+    },
+    {
+      "name": "terminator_match",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0x0"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "61626300"
+        }
+      ]
+    },
+    {
+      "name": "no_match",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0x7a"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "61626300"
+        }
+      ]
+    },
+    {
+      "name": "first_and_last",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0x78"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "78786162637800"
+        }
+      ]
+    },
+    {
+      "name": "high_byte",
+      "registers": {
+        "eax": "0x1000",
+        "edx": "0x80"
+      },
+      "memory": [
+        {
+          "address": "0x1000",
+          "hex": "80418000"
+        }
+      ]
+    }
+  ]
+}

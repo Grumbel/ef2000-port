@@ -467,3 +467,6 @@ Keep it `spliced`. See `docs/subsystems/decomp-batch-133.md`. Current tracker:
 
 
 **Batch-136 update (2026-11-06):** `exchange_slot_1041e4` (`0x1041e4`, 25 bytes) is verified. Its exact OpenWatcom body preserves the caller-clean cdecl arguments and original EBX/EDX clobbers. Four isolated cases and four captured startup calls pass; repeated menu/setup/cockpit replay passes 3/3 with 19 hits per scenario. Corrected wrapper `0x101e14` to two stack arguments and fixed source call sites. See `docs/subsystems/decomp-batch-136.md`. Current tracker: 3,224 `compiles`, 18 `verified`, 10 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`.
+
+
+**Batch-137 update (2026-11-06):** `find_last_char` (`0x10d1da`, 26 bytes) is verified with an exact OpenWatcom body, six isolated cases and four captured startup calls. Repeated menu/setup/cockpit replay passes 3/3 with 20,889, 20,933 and 278,507 hits and matching selected state/counters. Corrected the signature to record EDX clobber. See `docs/subsystems/decomp-batch-137.md`. Current tracker: 3,223 `compiles`, 19 `verified`, 10 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`.

@@ -2101,6 +2101,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-06  3.32  `times_100` (`0x106be8`, 18 bytes) compiles and splices with OpenWatcom; modulo-2^32 multiply and EDX preservation pass 8 isolated cases. Repeated menu/setup/cockpit checkpoints match, but none reaches the virtual-I/O caller path, so the required-hit gate fails and the candidate stays `spliced`. See docs/subsystems/decomp-batch-134.md.
 2026-11-06  3.33  Corrected `pause_object_10687c` (`0x10687c`, 22 bytes) and wrapper `0x1027a0` to caller-clean cdecl. The exact OpenWatcom body and five isolated cases pass; SB16-DMA replay reaches neither the target nor a stable baseline (42,279 vs. 42,324 interrupts, with patched RAM differing), so keep it `spliced`. See docs/subsystems/decomp-batch-135.md.
 2026-11-06  3.34  `exchange_slot_1041e4` (`0x1041e4`, 25 bytes) is verified. The exact OpenWatcom body preserves the original cdecl stack ABI and EBX/EDX clobbers; four isolated and four captured startup calls pass. Repeated menu/setup/cockpit replay passes 3/3 with 19 hits per scenario. Corrected wrapper `0x101e14` and its two-argument call sites. See docs/subsystems/decomp-batch-136.md.
+2026-11-06  3.35  `find_last_char` (`0x10d1da`, 26 bytes) is verified with an exact OpenWatcom body, six isolated cases and four captured startup calls. Repeated menu/setup/cockpit replay passes 3/3 with 20,889, 20,933 and 278,507 hits; matching state/counters. Corrected the signature to record EDX clobber. See docs/subsystems/decomp-batch-137.md.
 ```
 
 ---

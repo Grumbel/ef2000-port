@@ -423,7 +423,7 @@ ef_addr32 copy_padded(ef_addr32 destination, ef_addr32 source, uint32_t count)
     return start;
 }
 
-/* 0x10d1da, 26 bytes. strrchr: last occurrence of the byte in the string including the terminator, or 0. */
+/* 0x10d1da, 26 bytes. verified: diff+capture+replays. Last byte match includes the terminator. */
 ef_addr32 find_last_char(ef_addr32 text, uint8_t ch)
 {
     ef_addr32 found = 0;

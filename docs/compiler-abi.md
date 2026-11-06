@@ -2072,7 +2072,7 @@ in EAX, format string address, one value).
 | `0x1091fc` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 1093d8@109405 | Copy one line from EDX to EAX, consuming the newline; returns the source after it. |
 | `0x109284` | EAX:ef_addr32 | none | e3e50@e3e88,1092b0@1092bf,1092b0@109314 | Advance *pointer over characters whose class-table entry (0x195af0[c+1]) has bit 2. |
 | `0x10d1b5` | EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t | EAX:ef_addr32 | e7fc0@e8009,104504@104542,1133f8@113507 | strncpy with NUL padding; returns the destination. |
-| `0x10d1da` | EAX:ef_addr32,DL:uint8_t | EAX:ef_addr32 | e7fc0@e8028,e7fc0@e8075,eb520@eb60a | strrchr: last occurrence of the byte in the string including the terminator, or 0. |
+| `0x10d1da` | EAX:ef_addr32,DL:uint8_t | EAX:ef_addr32 | e7fc0@e8028,e7fc0@e8075,eb520@eb60a | Preserves EBX/ECX, clobbers EDX with scan pointer; last match including terminator, or 0. |
 | `0x10d427` | EAX:ef_addr32 | none | 10d466@10d48f,10d4c4@10d4fc | Unlink a node from the doubly linked list with heads at dwords 0x164650 and 0x16464c. |
 | `0x10ddfc` | EAX:uint32_t | EAX:int32_t | 10f1bf@10f1e2 | Count list entries (list at dword 0x485f9f) whose flags in +0xc match the mask; flush those with bit 0x10 in +0xd via 0x |
 | `0x10dfe0` | none | EAX:uint32_t | eab44@eab47,eac48@eadfa | Dword +0x46c of the object pointed to by dword 0x120cc6. |
