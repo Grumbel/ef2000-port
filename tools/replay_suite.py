@@ -176,14 +176,15 @@ def parse_output(output, expected_patches, expected_hashes=()):
     return status, hits, hashes
 
 
-def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, timeout):
+def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, timeout,
+            sound_mode):
     output.mkdir(parents=True, exist_ok=False)
     overlay = output / 'drive'
     overlay.mkdir()
     framebuffer = output / 'frame.ppm'
     command = [str(runner), str(executable), '--instruction-limit', str(case['instructions']),
                '--timing', 'instruction', '--timer-instructions', str(case['timer_instructions']),
-               '--dos-clock', 'guest', '--vga-clock', 'guest', '--sound', 'off', '--controls', 'keyboard',
+               '--dos-clock', 'guest', '--vga-clock', 'guest', '--sound', sound_mode, '--controls', 'keyboard',
                '--joystick', 'off', '--game-dir', str(game_dir),
                '--overlay-dir', str(overlay),
                '--framebuffer', str(framebuffer)]
@@ -232,11 +233,12 @@ def differences(baseline, other):
 
 
 def run_suite(runner, executable, game_dir, cd_dir, patches, cases, output,
-              patch_addresses, timeout=300, baseline_repeats=2):
+              patch_addresses, timeout=300, baseline_repeats=2, sound_mode='off'):
     if baseline_repeats not in (1, 2):
         raise ValueError('baseline repeats must be 1 or 2')
     output.mkdir(parents=True, exist_ok=False)
-    summary = {'schema': SCHEMA, 'checks': [], 'passed': False,
+    summary = {'schema': SCHEMA, 'sound_mode': sound_mode,
+               'checks': [], 'passed': False,
                'limitations': ['A framebuffer comparison is not a full guest-RAM comparison.',
                                'A patch-entry hit is not proof of correct function behavior.',
                                'Each checkpoint replays from guest entry; it is not a '
@@ -256,16 +258,16 @@ def run_suite(runner, executable, game_dir, cd_dir, patches, cases, output,
                               if len(points) > 1 else directory)
                 sample_case = dict(case, instructions=instructions)
                 baseline = run_one(runner, executable, game_dir, cd_dir, [], sample_case,
-                                   sample_dir / 'original', timeout)
+                                   sample_dir / 'original', timeout, sound_mode)
                 failures = []
                 if baseline_repeats == 2:
                     second = run_one(runner, executable, game_dir, cd_dir, [], sample_case,
-                                     sample_dir / 'repeat-original', timeout)
+                                     sample_dir / 'repeat-original', timeout, sound_mode)
                     failures.extend('baseline nondeterminism: ' + issue
                                     for issue in differences(baseline, second))
                 patched_case = dict(sample_case, patch_addresses=patch_addresses)
                 patched = run_one(runner, executable, game_dir, cd_dir, patches, patched_case,
-                                  sample_dir / 'patched', timeout)
+                                  sample_dir / 'patched', timeout, sound_mode)
                 failures.extend(differences(baseline, patched))
                 if not last and baseline['status']['status'] != 'instruction_limit':
                     failures.append('guest stopped before requested intermediate checkpoint')
@@ -301,6 +303,8 @@ def main(argv=None):
     parser.add_argument('--output', type=Path, required=True,
                         help='new result directory; never overwritten')
     parser.add_argument('--timeout', type=int, default=300, help='seconds per run')
+    parser.add_argument('--sound', choices=('off', 'sb16-probe', 'sb16-dma'),
+                        default='off', help='runner sound mode (default: off)')
     parser.add_argument('--baseline-repeats', type=int, choices=(1, 2), default=2,
                         help='default 2; use 1 only for faster diagnostics')
     args = parser.parse_args(argv)
@@ -345,7 +349,7 @@ def main(argv=None):
         summary = run_suite(args.runner.resolve(), args.executable.resolve(), game_dir,
                             args.cd_dir.resolve() if args.cd_dir else None,
                             patches, cases, output, set(addresses), args.timeout,
-                            args.baseline_repeats)
+                            args.baseline_repeats, args.sound)
         if hashlib.sha256(args.executable.read_bytes()).hexdigest() != original_hash:
             raise ValueError('original executable changed during replay')
         print(f'replay suite: {sum(c["passed"] for c in summary["checks"])}'

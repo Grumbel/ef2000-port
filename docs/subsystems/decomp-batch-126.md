@@ -34,21 +34,33 @@ typed C fallback.
 - The original-vs-patched isolated tests pass 37/37 for each function,
   varying AL, the gate byte, full GPR sentinels and destination memory.
 - Two independently captured original calls to B from repeated cockpit
-  baselines pass the captured-state differential (2/2). C was not called in
-  either capture.
+  baselines pass the captured-state differential (2/2). A separate sound-DMA
+  cockpit run captures a real original call to C; captured-state
+  differentials pass for B and C (1/1 each).
 - The repeated-baseline 500M menu / 700M setup / 1.5B cockpit replay passes
   3/3 with all preceding verified patches and both candidates. The 64 KiB
   BSS hashes, framebuffer hashes, status and execution counters match.
-  `0x810d0` is reached once in cockpit. `0x810f4` is never reached; the
-  manifest therefore does not require a C hit. Keep C `spliced` until a
-  deterministic run reaches one of its gated callers and yields a captured
-  original call.
+- In the `--sound off` cockpit case, B is reached once and C zero times.
+- The default `--sound off` cockpit case does not enter C's gated branch. The
+  replay harness now supports `--sound sb16-dma`. A repeated-baseline cockpit replay with
+  only the B/C patches passes 1/1: both original baselines match, the patched
+  run hits B four times and C three times, and the 64 KiB BSS hash,
+  framebuffer, status, interrupt, tick and IRQ0 counters match. This verifies
+  C on its live gated caller path.
+- A separate `--sound sb16-dma` replay with the entire preceding verified
+  patch set plus B/C reaches both entries but has a sound-service interaction:
+  the patched run services 40 more DMA blocks and differs by one interrupt
+  and the selected BSS hash, while its framebuffer matches. Keep that broad
+  sound-on combination unverified; it does not invalidate the isolated pair
+  replay, whose patch set only changes these two exact bodies. Sound-off full
+  replay remains the suite covering all previous verified replacements.
 - Full replay summary and call captures are under ignored
   `local/decomp-batch-126-control-bc/full-replay-rerun/`. The executable
   SHA-256 was verified as
   `f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd`.
 
-The tracker marks B `verified` and C `spliced`; no C live-hit claim is made.
+Both entries are `verified`; the broad sound-on full-patchset mismatch is
+recorded above as an unresolved harness/audio timing interaction.
 
 The following commands compiled the current production source and fixtures,
 regenerated both patches, ran isolated and captured-call differentials, and
@@ -112,6 +124,16 @@ python3 tools/replay_suite.py \
   --manifest local/decomp-batch-126-control-bc/full-manifest.json \
   --output local/decomp-batch-126-control-bc/full-replay-rerun \
   --baseline-repeats 2
+python3 -m unittest discover -s tests -p 'test_replay_suite.py' -v
+python3 tools/replay_suite.py \
+  --executable local/reference-01/drive/EF2000/_EF2000.EXE \
+  --runner local/decomp-batch-126-control-bc/capture-runner.sh \
+  --game-dir local/reference-01/drive/EF2000 --cd-dir local/cd-long/cd-audio \
+  --patch local/decomp-batch-126-control-bc/control-mode-b.efpatch \
+  --patch local/decomp-batch-126-control-bc/control-mode-c.efpatch \
+  --manifest local/decomp-batch-126-control-bc/sound-pair-manifest.json \
+  --output local/decomp-batch-126-control-bc/sound-replay-pair-only \
+  --baseline-repeats 2 --sound sb16-dma
 python3 tools/decomp_status.py check
 git diff --check
 ```

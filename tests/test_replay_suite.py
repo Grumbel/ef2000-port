@@ -31,6 +31,7 @@ import sys
 a = sys.argv
 if a[a.index('--dos-clock') + 1] != 'guest' or \
         a[a.index('--vga-clock') + 1] != 'guest' or \
+        a[a.index('--sound') + 1] not in ('off', 'sb16-probe', 'sb16-dma') or \
         a[a.index('--controls') + 1] != 'keyboard' or \
         a[a.index('--joystick') + 1] != 'off':
     raise SystemExit('replay suite must use the deterministic guest clock and keyboard-only input')
@@ -155,11 +156,12 @@ class SyntheticReplayTests(unittest.TestCase):
         self.patch = self.root / 'test.efpatch'
         self.patch.write_bytes(b'synthetic-patch')
 
-    def run_case(self, case, *, baseline_repeats=1):
+    def run_case(self, case, *, baseline_repeats=1, sound_mode='off'):
         output = self.root / 'result'
         return replay_suite.run_suite(self.runner, self.executable, self.root,
                                       None, [self.patch], [case], output, PATCHES,
-                                      timeout=5, baseline_repeats=baseline_repeats)
+                                      timeout=5, baseline_repeats=baseline_repeats,
+                                      sound_mode=sound_mode)
 
     def test_identical_replay_and_patch_hit_pass(self):
         case = replay_suite.validate_manifest(manifest(guest_hashes=[
@@ -171,6 +173,12 @@ class SyntheticReplayTests(unittest.TestCase):
         self.assertTrue((self.root / 'result/startup/original/frame.ppm').exists())
         self.assertTrue((self.root / 'result/startup/patched/drive').is_dir())
         self.assertTrue(json.loads((self.root / 'result/summary.json').read_text())['passed'])
+
+    def test_sound_mode_is_forwarded_and_recorded(self):
+        case = replay_suite.validate_manifest(manifest(), PATCHES)[0]
+        summary = self.run_case(case, sound_mode='sb16-dma')
+        self.assertTrue(summary['passed'])
+        self.assertEqual(summary['sound_mode'], 'sb16-dma')
 
     def test_multiple_checkpoints_compare_baselines_and_patch_from_entry(self):
         case = replay_suite.validate_manifest(manifest(checkpoints=[1000, 4000],

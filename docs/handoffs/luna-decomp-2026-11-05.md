@@ -376,12 +376,15 @@ control-flow or linker analysis, raise effort to **high** for the targeted
 session; return to medium after. Sandbox and approval controls intentionally
 remain user-owned.
 
-**Batch-126 update (2026-11-06):** `set_control_mode_b` (`0x810d0`, 25
-bytes) is verified: 37 isolated cases, two captured original cockpit calls,
-and repeated-baseline menu/setup/cockpit replay pass; the candidate is hit
-once in cockpit with matching selected state and execution counters.
-`set_control_mode_c` (`0x810f4`) passes 37 isolated cases and compiles/splices,
-but the deterministic suite reaches it zero times. Keep it `spliced` pending
-a caller path that exercises its gate. Current tracker totals: 3,234
-`compiles`, 14 `verified`, 4 `spliced`, 5 `blocked`, 247 `drafted`, 669
-`unknown`, and 3 `library`. See `docs/subsystems/decomp-batch-126.md`.
+**Batch-126 update (2026-11-06):** Both `set_control_mode_b` (`0x810d0`)
+and C (`0x810f4`, 25 bytes each) are verified: 37 isolated cases each,
+captured original calls pass, and repeated-baseline replays reach both with
+matching selected BSS/frame/counters. The default `--sound off` menu/setup/
+cockpit suite passes 3/3; a targeted `--sound sb16-dma` cockpit replay with
+only the B/C candidates passes and hits B four times and C three times.
+With the full patch set, `sb16-dma` services 40 additional DMA blocks and
+differs in selected state, so that combination is not considered verified.
+The replay suite now accepts `--sound` (default remains `off`) so gated
+hardware-config paths can be exercised. Tracker totals: 3,234 `compiles`,
+15 `verified`, 3 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3
+`library`. See `docs/subsystems/decomp-batch-126.md`.
