@@ -401,3 +401,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   user-scope `PrivateTmp` is unavailable, so the current hybrid has no new
   replay result. M0 remains 393/1,020 functions and 115,359/543,917 bytes
   (21.2%); M1/M2 remain unpassed.
+- Menu dispatch ABI inspection, 2026-11-06: original disassembly confirms
+  `0xf8600` pushes four copies of its stack inputs before calling `0xf9448`;
+  `0xf9448` reads three more words from the inherited outer stack, calls
+  `0xf8b14` with four registers and three stack arguments, then calls
+  `0xf8e44` with four registers and ten stack arguments. The epilogues are
+  `ret 0x10` at `0xf9448` and `ret 0x28` at `0xf8e44`. This inherited-stack
+  behavior is not represented by Ghidra's six-parameter pseudo-C prototype;
+  leave `0xf9448` and `0xf8e44` original until their stack layout is modeled.
