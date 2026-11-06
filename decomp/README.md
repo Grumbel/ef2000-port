@@ -82,10 +82,14 @@ remain `manual` and 21 have compile errors. Hand-written recovered C covers
 hybrid coverage is 487,217/908,947 tracked body bytes (53.6%). A focused
 two-function image redirects `init_far_stub_b04` and `to_lower_ascii` and
 passes the main-menu and quick-fight-setup replay cases. The broader image
-with 2,433 redirects is not yet at M1: after excluding the linked
-`original_memcpy` candidate, it faults at guest IP `0x4` on tick 469. The
-focused image has not been tested through the cockpit, and M2 is unpassed.
-See the latest replay and compiler evidence in
+was relinked with the current mechanical report: 2,443 functions (2,043
+hand-written, 400 mechanical), 12,215 entry bytes, 582,532 arena bytes, and
+2,281 exclusions across 692/753 modules. This new image has not been replayed.
+The previous 2,433-redirect image, after excluding its linked
+`original_memcpy` candidate, faults at guest IP `0x4` on tick 469. The
+focused image has not been tested through the cockpit, and M1/M2 remain
+unpassed. A private Xvfb replay is currently blocked because Xvfb rejects the
+non-root owner of `/tmp/.X11-unix`. See the latest replay and compiler evidence in
 [`decomp-log.md`](../docs/subsystems/decomp-log.md).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),

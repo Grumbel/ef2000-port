@@ -570,3 +570,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   fall from 24 to 21. Current M0 rate is 39.7% of functions and 22.7% of
   available export body bytes; 594 remain `manual`. This is compile evidence,
   not replay validation; M1/M2 status is unchanged.
+- Hybrid link with current M0 report, 2026-11-07: linking the 405 current
+  mechanical `ok` objects with the existing hand-written object set emits
+  2,443 redirects: 2,043 hand-written and 400 mechanical, 12,215 original
+  entry bytes, a 582,532-byte code arena, and 594,747 total patch bytes.
+  692/753 object modules link; 2,281 functions are listed as excluded. This
+  artifact has not been replayed. The prior 2,433-redirect image still has
+  the known IP `0x4` fault at tick 469 after excluding `original_memcpy`, but
+  that is not evidence about this new link. The required private Xvfb still
+  cannot start: `/tmp/.X11-unix` is owned by `nobody`, and Xvfb refuses to
+  create its socket. The focused two-function main-menu/quick-fight-setup
+  replay remains the highest replayed hybrid slice; formal M1/M2 are not
+  passed.
