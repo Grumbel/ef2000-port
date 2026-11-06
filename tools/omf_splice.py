@@ -142,6 +142,53 @@ def read_module(blob):
             seg.written[offset:offset + len(content)] = b'\x01' * len(content)
             last_data = (segment, offset, len(content))
             cursor = len(payload)
+        elif kind in (0xa2, 0xa3):  # LIDATA (iterated data)
+            segment, cursor = index(payload, cursor)
+            offset, cursor = field(payload, cursor, 4 if kind == 0xa3 else 2)
+            if not 0 < segment < len(module.segments):
+                raise OMFError('invalid LIDATA segment')
+
+            def decode_block(at, limit, depth=0):
+                if depth > 32:
+                    raise OMFError('LIDATA nesting exceeds 32 levels')
+                repeat, at = field(payload, at, 4 if kind == 0xa3 else 2)
+                blocks, at = field(payload, at, 2)
+                if blocks == 0:
+                    length, at = field(payload, at)
+                    end = at + length
+                    if end > limit:
+                        raise OMFError('truncated LIDATA leaf')
+                    unit = payload[at:end]
+                    at = end
+                else:
+                    parts = bytearray()
+                    for _ in range(blocks):
+                        child, at = decode_block(at, limit, depth + 1)
+                        if len(parts) + len(child) > limit:
+                            raise OMFError('LIDATA expansion exceeds segment size')
+                        parts.extend(child)
+                    unit = parts
+                if len(unit) and repeat > limit // len(unit):
+                    raise OMFError('LIDATA expansion exceeds segment size')
+                expanded = bytes(unit) * repeat
+                return expanded, at
+
+            segment_data = module.segments[segment]
+            remaining = segment_data.size - offset
+            if remaining < 0:
+                raise OMFError('LIDATA offset exceeds segment')
+            expanded = bytearray()
+            while cursor < len(payload):
+                block, cursor = decode_block(cursor, remaining - len(expanded))
+                if len(expanded) + len(block) > remaining:
+                    raise OMFError('LIDATA extends past segment')
+                expanded.extend(block)
+            end = offset + len(expanded)
+            if any(segment_data.written[offset:end]):
+                raise OMFError('overlapping LIDATA records')
+            segment_data.data[offset:end] = expanded
+            segment_data.written[offset:end] = b'\x01' * len(expanded)
+            last_data = (segment, offset, len(expanded))
         elif kind in (0x9c, 0x9d):  # FIXUPP
             while cursor < len(payload):
                 first, cursor = field(payload, cursor)
@@ -193,7 +240,7 @@ def read_module(blob):
                         frame_threads[number] = (method, datum)
                     else:
                         target_threads[number] = (method & 3, datum)
-        elif kind in (0xa2, 0xa3, 0xc2, 0xc3, 0xb2, 0xb3):
+        elif kind in (0xc2, 0xc3, 0xb2, 0xb3):
             raise OMFError(f'unsupported LIDATA/COMDAT/BAKPAT record 0x{kind:02x}')
         elif kind in (0x80, 0x88, 0x8a, 0x8b, 0x94, 0x95, 0x8e, 0x8f):
             pass  # metadata, end, or line numbers
@@ -201,7 +248,7 @@ def read_module(blob):
             raise OMFError(f'unrecognized OMF record 0x{kind:02x}')
         if kind not in (0x9c, 0x9d) and kind not in (0x88, 0x94, 0x95):
             # FIXUPP must refer to the most recent LEDATA, not older data.
-            if kind not in (0xa0, 0xa1):
+            if kind not in (0xa0, 0xa1, 0xa2, 0xa3):
                 last_data = None
         if cursor != len(payload) and kind not in (0x80, 0x88, 0x8a, 0x8b,
                                                    0x94, 0x95, 0x8e, 0x8f):
