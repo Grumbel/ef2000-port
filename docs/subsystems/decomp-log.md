@@ -233,3 +233,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `unsupported_interface` during keyboard I/O, so it cannot establish replay
   equivalence. The full patch still fails earlier at `IP=0x222` (101
   interrupts, 296 ticks); M1 remains unpassed.
+- M3 bisector correction, 2026-11-06: the preceding `0xcd4d4` minimal-set
+  result was a false attribution. The bisector compared only stop status and
+  IP, conflating different progress points (101 and 198 interrupts). Its
+  failure signature now includes interrupt, timer-tick and IRQ0 counts.
+  Re-running the full set for the original target (`guest_exit`, IP `0x222`,
+  101 interrupts, 296 ticks, IRQ0 0) leaves 62 candidates; focused reduction
+  leaves 10 (`0xbc36a`–`0xbc471` and `0xde6c4`–`0xdf21b`) and remains
+  unresolved. The focused two-entry trial for `0xcd4d4` instead stopped at
+  `unsupported_interface`. No culprit is confirmed; the full hybrid still
+  fails at the dataset check.
