@@ -120,7 +120,7 @@ overridden with `guest_size`, `stack_top`, `return_sentinel`,
 `stack_scratch_bytes`, `max_instructions`. Allocation outside the map,
 unmatched function return and instruction-budget exhaustion fail closed.
 
-## Limits before the first real function is verified
+## Remaining verification limits after the first OMF splices
 
 - **No x87 state capture** yet. Signatures using ST0 are rejected rather
   than pretending that EAX/EDX represent an 80-bit result.
@@ -129,10 +129,18 @@ unmatched function return and instruction-budget exhaustion fail closed.
 - **Live-call capture is available for simple flat-selector GPR functions**,
   but complex hardware/segment/x87 calls and callee-return stubs are not
   yet supported. Not all captured snapshots can be replayed successfully.
-- Real OpenWatcom OMF and a safely packed replacement are not available in
-  this checkout. The asset-free synthetic test executes two equivalent
-  machine-code implementations when Python Unicorn is installed; the other
-  tests verify ABI parsing, spec bounds and memory comparison boundaries.
+- OpenWatcom 2.0 OMF replacements now exist for `to_lower_ascii` and
+  `encode_runtime_segment_offset`; both have SHA-bound in-place patches and
+  have executed in the original guest. `to_lower_ascii` is `verified`: it
+  passes 263 isolated cases, a 3-original/2-patched 20M full-RAM startup
+  replay, and three repeatable original-versus-patched long gameplay cases.
+  The long replay fixes guest DOS time and synthetic VGA retrace. The encoder
+  passes 1,024 cases with full EFLAGS comparison and an 8-byte stack-scratch
+  allowance. A 500M main-menu replay passes, but the 20M full-RAM startup
+  replay still differs in active high-stack bytes; it remains `spliced`.
+  `to_upper_ascii` is also `verified`, with 267 isolated cases, a repeated
+  500M-instruction full-RAM menu replay, and matching hits/state in the long
+  menu/setup/cockpit suite.
 - A passing isolated comparison is **not** a `verified` tracker state.
   Per §1(5), a real replacement also needs OpenWatcom compilation, an
   in-game splice and the golden replay suite (§3.9).

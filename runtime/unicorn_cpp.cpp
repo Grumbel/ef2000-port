@@ -1282,6 +1282,7 @@ public:
     }
 
     void use_guest_dos_clock(bool enabled) { guest_dos_clock_ = enabled; }
+    void use_guest_vga_clock(bool enabled) { guest_vga_clock_ = enabled; }
 
     void enable_call_capture(const std::vector<std::pair<uint32_t, unsigned>>& targets,
                              const fs::path& directory,
@@ -1612,6 +1613,7 @@ private:
     std::vector<uint8_t> fast_copy_buffer_;
     unsigned vga_reads_until_check_{1};
     uint32_t vga_status_{};
+    uint64_t guest_vga_samples_{};
     StartupWindow* active_window_{};
     std::unique_ptr<ef2000::WavCapture> wav_capture_;
     std::unique_ptr<ef2000::WavCapture> cd_wav_capture_;
@@ -1624,6 +1626,7 @@ private:
     uint64_t ticks_{}, irq0_{}, irq1_{};
     uint32_t pit_divisor_ = 65536, pit_low_{}, bios_accumulator_{};
     bool guest_dos_clock_{};
+    bool guest_vga_clock_{};
     bool pit_high_next_{}, irq_in_service_{}, eoi_seen_{};
     bool keyboard_ack_{};
     uint8_t shift_flags_{};
@@ -2957,8 +2960,12 @@ private:
             if (--vga_reads_until_check_ == 0) {
                 if (performance_.profile) ++perf_stats_.vga_clock_checks;
                 vga_reads_until_check_ = performance_.vga_clock_check;
-                const auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                    std::chrono::steady_clock::now().time_since_epoch()).count();
+                // Replay mode advances a synthetic retrace clock on each
+                // sampled status read. Interactive mode follows host time.
+                const auto ns = guest_vga_clock_ ?
+                    static_cast<int64_t>(guest_vga_samples_++ * 100000) :
+                    std::chrono::duration_cast<std::chrono::nanoseconds>(
+                        std::chrono::steady_clock::now().time_since_epoch()).count();
                 vga_status_ = ns % 16666667 >= 15000000 ? 8 : 0;
             }
             return vga_status_;
@@ -3025,6 +3032,7 @@ void usage(const char* program) {
               << "       [--sound off|sb16-probe|sb16-dma] (SDL3 audio if available)\n"
               << "       [--timing auto|instruction|realtime] (auto uses real-time for unlimited windowed runs)\n"
               << "       [--dos-clock host|guest] (guest uses deterministic PIT time, starting 2000-01-01 noon UTC)\n"
+              << "       [--vga-clock host|guest] (guest advances synthetic retrace on sampled 3DAh reads)\n"
               << "       [--wall-seconds N] (bounded real-time/headless diagnostic)\n"
               << "       [--block-clock-check N] [--vga-clock-check N] (powers of two, 1..4096)\n"
               << "       [--tcg-cache-mib N] (32..1024 MiB; default Unicorn cache size)\n"
@@ -3080,6 +3088,7 @@ int main(int argc, char** argv) {
         uint64_t timer_interval = 250000;
         ExecutionTiming timing = ExecutionTiming::Auto;
         bool guest_dos_clock = false;
+        bool guest_vga_clock = false;
         double wall_seconds = 0;
         PerformanceOptions performance;
         WindowOptions window;
@@ -3159,6 +3168,11 @@ int main(int argc, char** argv) {
                 if (choice == "host") guest_dos_clock = false;
                 else if (choice == "guest") guest_dos_clock = true;
                 else throw std::runtime_error("--dos-clock expects host or guest");
+            } else if (!std::strcmp(argv[i], "--vga-clock") && i + 1 < argc) {
+                const std::string choice = argv[++i];
+                if (choice == "host") guest_vga_clock = false;
+                else if (choice == "guest") guest_vga_clock = true;
+                else throw std::runtime_error("--vga-clock expects host or guest");
             } else if (!std::strcmp(argv[i], "--wall-seconds") && i + 1 < argc) {
                 size_t end{};
                 const std::string value = argv[++i];
@@ -3575,6 +3589,7 @@ int main(int argc, char** argv) {
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
                         controls, cd_cue);
         machine.use_guest_dos_clock(guest_dos_clock);
+        machine.use_guest_vga_clock(guest_vga_clock);
         if (!patch_entries.empty()) machine.enable_patch_hit_trace(patch_entries);
         machine.enable_guest_hashes(guest_hash_ranges);
         if (!capture_targets.empty())

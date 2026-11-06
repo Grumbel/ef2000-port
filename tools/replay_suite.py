@@ -183,7 +183,9 @@ def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, tim
     framebuffer = output / 'frame.ppm'
     command = [str(runner), str(executable), '--instruction-limit', str(case['instructions']),
                '--timing', 'instruction', '--timer-instructions', str(case['timer_instructions']),
-               '--sound', 'off', '--game-dir', str(game_dir), '--overlay-dir', str(overlay),
+               '--dos-clock', 'guest', '--vga-clock', 'guest', '--sound', 'off', '--controls', 'keyboard',
+               '--joystick', 'off', '--game-dir', str(game_dir),
+               '--overlay-dir', str(overlay),
                '--framebuffer', str(framebuffer)]
     if cd_dir:
         command.extend(['--cd-dir', str(cd_dir)])

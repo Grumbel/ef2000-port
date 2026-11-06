@@ -13,8 +13,13 @@ instruction-counted PIT, scripted input and game/CD source folders. Each starts
 **from guest entry**, with a different empty copy-on-write DOS drive; this is
 not a snapshot of one continuous run. The original executable is treated as read-only,
 its SHA-256 is checked before and after the suite, and output directories
-must not be inside the original game/CD folders. The suite refuses to replace
-an existing output directory.
+must not be inside the original game/CD folders. DOS date/time calls use the
+deterministic guest clock (2000-01-01 noon UTC plus emulated PIT time), and
+the suite uses synthetic VGA retrace advanced by sampled 3DAh reads, so host
+wall-clock drift cannot change startup state between runs. It forces keyboard
+controls and disables the host joystick so external device state cannot alter
+the scripted run. The suite refuses
+to replace an existing output directory.
 
 ## Invocation
 
@@ -140,12 +145,15 @@ Before changing a function tracker entry to `verified`, we still need:
 The memory hashing and patch-hit hooks have also been compiled and run in
 the native C++ synthetic guest: two calls to a test entry yield
 `patch_hit: addr=0x200 count=2`, and four zero guest bytes yield SHA-256
-`df3f6198…14b81119`. Two short original-executable runs, each limited to
-400,000 instructions, reported the same selected 256-byte guest memory hash.
-Those bounded original runs did not yet reach a drawable framebuffer or a
-target replacement. Until an actual full game-data installation, Watcom
-output and functioning patch are run through these steps, **zero functions
-have gained `verified` status**.
+`df3f6198…14b81119`. Batch 105 supplied full game data and ran a scripted
+main-menu→quick-fight→cockpit path with an OpenWatcom replacement. The initial
+attempts sampled VGA retrace from host `steady_clock`, so repeated originals
+diverged. Batch 106 added `--vga-clock guest` and made the replay suite select
+it. The three long original/patched cases now repeat with matching status,
+interrupt counts, selected BSS hashes and framebuffer hashes. `to_lower_ascii`
+also passes its isolated differential and 20-million-instruction full-RAM
+startup replay, and is now the first `verified` function. Long gameplay checks
+hash selected BSS ranges rather than all guest RAM, so §3.9 remains partial.
 
 Batch 100 added multi-checkpoint comparison and explicit pre-video handling.
 In the locally statically linked runner, a disposable identity EFPATCH1 at

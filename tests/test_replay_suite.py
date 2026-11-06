@@ -29,6 +29,11 @@ import hashlib
 import pathlib
 import sys
 a = sys.argv
+if a[a.index('--dos-clock') + 1] != 'guest' or \
+        a[a.index('--vga-clock') + 1] != 'guest' or \
+        a[a.index('--controls') + 1] != 'keyboard' or \
+        a[a.index('--joystick') + 1] != 'off':
+    raise SystemExit('replay suite must use the deterministic guest clock and keyboard-only input')
 patched = '--patch' in a
 budget = int(a[a.index('--instruction-limit') + 1])
 output = pathlib.Path(a[a.index('--framebuffer') + 1])

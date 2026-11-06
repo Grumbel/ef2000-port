@@ -10,6 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from tools.compare_guest_replay import (complementary_hash_ranges, parse_replay,
+                                        replay_differences,
                                         run_replay)
 
 
@@ -46,12 +47,19 @@ class DeterministicGuestReplayTests(unittest.TestCase):
             parse_replay(status + memory + hashes + hashes, ranges, set(),
                          patched=False)
 
+    def test_replay_difference_names_guest_ram_region(self):
+        reference = ('status', 'memory', {(0x1000, 16): 'before'})
+        candidate = ('status', 'memory', {(0x1000, 16): 'after'})
+        self.assertEqual(replay_differences(reference, candidate),
+                         ['guest RAM hash differs at 0x1000+0x10'])
+
     def test_runner_invocation_is_fixed_clock_and_bounded(self):
         def fake_run(command, **kwargs):
             self.assertEqual(kwargs['timeout'], 12)
             self.assertEqual(command[0:2], ['runner', 'original.exe'])
             self.assertEqual(command.count('--patch'), 2)
             self.assertEqual(command[command.index('--dos-clock') + 1], 'guest')
+            self.assertEqual(command[command.index('--vga-clock') + 1], 'guest')
             self.assertEqual(command[command.index('--timing') + 1], 'instruction')
             self.assertEqual(command[command.index('--sound') + 1], 'off')
             self.assertEqual(command[command.index('--instruction-limit') + 1],

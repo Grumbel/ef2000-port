@@ -80,7 +80,8 @@ def run_replay(runner, exe, patches, ranges, timeout):
     for patch in patches:
         arguments += ['--patch', str(patch)]
     arguments += ['--instruction-limit', '20000000',
-                  '--timing', 'instruction', '--dos-clock', 'guest', '--sound', 'off']
+                  '--timing', 'instruction', '--dos-clock', 'guest',
+                  '--vga-clock', 'guest', '--sound', 'off']
     for address, length in ranges:
         arguments += ['--hash-guest', f'0x{address:x}:{length}']
     result = subprocess.run(arguments, stdout=subprocess.PIPE,
@@ -89,6 +90,18 @@ def run_replay(runner, exe, patches, ranges, timeout):
         raise ValueError(f'replay exited {result.returncode}: '
                          + result.stdout.decode(errors='replace')[-1600:])
     return result.stdout.decode(errors='replace')
+
+
+def replay_differences(reference, candidate):
+    problems = []
+    if reference[0] != candidate[0]:
+        problems.append('status differs')
+    if reference[1] != candidate[1]:
+        problems.append('memory statistics differ')
+    for region in sorted(set(reference[2]) | set(candidate[2])):
+        if reference[2].get(region) != candidate[2].get(region):
+            problems.append(f'guest RAM hash differs at 0x{region[0]:x}+0x{region[1]:x}')
+    return problems
 
 
 def main():
@@ -125,7 +138,8 @@ def main():
                               args.patch, ranges, args.timeout)
             current = parse_replay(text, ranges, entries, patched=True)
             if current != baseline:
-                raise ValueError(f'patched replay #{i + 1} differs from original')
+                detail = ', '.join(replay_differences(baseline, current))
+                raise ValueError(f'patched replay #{i + 1} differs from original: {detail}')
         print(f'replay: {args.baseline_runs} original and {args.candidate_runs} patched '
               f'runs identical; {len(ranges)} SHA-256 ranges, '
               f'{IMAGE_SIZE - excluded}/{IMAGE_SIZE} guest bytes compared '

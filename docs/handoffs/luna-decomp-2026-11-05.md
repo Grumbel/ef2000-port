@@ -9,6 +9,35 @@ short operational entry point for a fresh Codex context. It is not a
 replacement for the authoritative `AGENTS.md` and
 `docs/decompilation-plan.md` rules.
 
+**Batch-105 update (2026-11-06):** OpenWatcom 2.0 objects for
+`to_lower_ascii` (`0xe7835`) and `encode_runtime_segment_offset` (`0x604`)
+have been compiled, OMF-spliced and executed. Lowercase passes 263 isolated
+cases plus a 3-original/2-patched 20M full-RAM startup replay. The encoder
+passes 1,024 isolated cases, but its full-RAM replay differs in high-stack
+memory. Full installation data is now available locally; a menu→quick-fight→
+cockpit run was scripted, but long unpatched runs are not repeatable yet
+(interrupt count and BSS hash vary). Both tracker entries are `spliced`, and
+none is yet `verified`. See `docs/subsystems/decomp-batch-105.md`; stabilize
+the long replay baseline before advancing either entry.
+
+**Batch-106 update (2026-11-06):** The replay mismatch came from VGA retrace
+reads sampling host `steady_clock`, which the DOS guest-clock option did not
+control. `--vga-clock guest` now advances a synthetic retrace clock, and the
+replay suite fixes it alongside DOS time and input. The menu, quick-fight
+setup and cockpit suite now passes repeated original and patched runs, with
+matching framebuffer/BSS hashes and interrupt counts. `to_lower_ascii` is
+`verified`; `encode_runtime_segment_offset` remains `spliced` due its
+high-stack full-RAM startup mismatch. See batch 106; gameplay hashes selected
+guest ranges, while startup replay compares full RAM.
+
+**Batch-107 update (2026-11-06):** `to_upper_ascii` (`0xddbc8`) is now the
+second `verified` OpenWatcom replacement. Its 14-byte body matches the
+original, 267 isolated cases pass, and a 3-original/2-patched 500M main-menu
+replay matches 67,108,850 guest bytes with a nonzero entry hit. The combined
+lower/upper menu→setup→cockpit suite also passes and hits both entries. The
+encoder stays `spliced`; an exact 36-byte assembly probe passes full-RAM
+replay, while the current C-generated body does not. See batch 107.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -29,10 +58,11 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 | `library` | 3 | 509 |
 | **Total** | **4,287** | **908,947** |
 
-**Strictly verified/spliced OpenWatcom C replacements: zero.** The 3,257
-`compiles` entries have not passed the full ABI + differential + real-game
-replay gate. The 669 unknown functions hold approximately 54% of inventoried
-code *bytes*, so entry counts exaggerate completion.
+**At the Batch-104 baseline:** strictly verified/spliced OpenWatcom C
+replacements were zero. Batch 105 has since moved two candidates to
+`spliced`; neither has passed the complete replay gate, so there are still
+zero `verified` functions. The 669 unknown functions hold approximately 54%
+of inventoried code *bytes*, so entry counts exaggerate completion.
 
 ## Read in this order, and do not reread the full 2,000-line progress log
 

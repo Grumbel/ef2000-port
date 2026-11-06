@@ -1,1 +1,1848 @@
-{"address":"0x000e7835","function_size":14,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x000e7835",
+  "function_size": 14,
+  "max_instructions": 1000,
+  "cases": [
+    {
+      "name": "byte_00",
+      "registers": {
+        "eax": "0x00000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_01",
+      "registers": {
+        "eax": "0x00000001"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_02",
+      "registers": {
+        "eax": "0x00000002"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_03",
+      "registers": {
+        "eax": "0x00000003"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_04",
+      "registers": {
+        "eax": "0x00000004"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_05",
+      "registers": {
+        "eax": "0x00000005"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_06",
+      "registers": {
+        "eax": "0x00000006"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_07",
+      "registers": {
+        "eax": "0x00000007"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_08",
+      "registers": {
+        "eax": "0x00000008"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_09",
+      "registers": {
+        "eax": "0x00000009"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_0a",
+      "registers": {
+        "eax": "0x0000000a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_0b",
+      "registers": {
+        "eax": "0x0000000b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_0c",
+      "registers": {
+        "eax": "0x0000000c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_0d",
+      "registers": {
+        "eax": "0x0000000d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_0e",
+      "registers": {
+        "eax": "0x0000000e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_0f",
+      "registers": {
+        "eax": "0x0000000f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_10",
+      "registers": {
+        "eax": "0x00000010"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_11",
+      "registers": {
+        "eax": "0x00000011"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_12",
+      "registers": {
+        "eax": "0x00000012"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_13",
+      "registers": {
+        "eax": "0x00000013"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_14",
+      "registers": {
+        "eax": "0x00000014"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_15",
+      "registers": {
+        "eax": "0x00000015"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_16",
+      "registers": {
+        "eax": "0x00000016"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_17",
+      "registers": {
+        "eax": "0x00000017"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_18",
+      "registers": {
+        "eax": "0x00000018"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_19",
+      "registers": {
+        "eax": "0x00000019"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_1a",
+      "registers": {
+        "eax": "0x0000001a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_1b",
+      "registers": {
+        "eax": "0x0000001b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_1c",
+      "registers": {
+        "eax": "0x0000001c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_1d",
+      "registers": {
+        "eax": "0x0000001d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_1e",
+      "registers": {
+        "eax": "0x0000001e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_1f",
+      "registers": {
+        "eax": "0x0000001f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_20",
+      "registers": {
+        "eax": "0x00000020"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_21",
+      "registers": {
+        "eax": "0x00000021"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_22",
+      "registers": {
+        "eax": "0x00000022"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_23",
+      "registers": {
+        "eax": "0x00000023"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_24",
+      "registers": {
+        "eax": "0x00000024"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_25",
+      "registers": {
+        "eax": "0x00000025"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_26",
+      "registers": {
+        "eax": "0x00000026"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_27",
+      "registers": {
+        "eax": "0x00000027"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_28",
+      "registers": {
+        "eax": "0x00000028"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_29",
+      "registers": {
+        "eax": "0x00000029"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_2a",
+      "registers": {
+        "eax": "0x0000002a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_2b",
+      "registers": {
+        "eax": "0x0000002b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_2c",
+      "registers": {
+        "eax": "0x0000002c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_2d",
+      "registers": {
+        "eax": "0x0000002d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_2e",
+      "registers": {
+        "eax": "0x0000002e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_2f",
+      "registers": {
+        "eax": "0x0000002f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_30",
+      "registers": {
+        "eax": "0x00000030"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_31",
+      "registers": {
+        "eax": "0x00000031"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_32",
+      "registers": {
+        "eax": "0x00000032"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_33",
+      "registers": {
+        "eax": "0x00000033"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_34",
+      "registers": {
+        "eax": "0x00000034"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_35",
+      "registers": {
+        "eax": "0x00000035"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_36",
+      "registers": {
+        "eax": "0x00000036"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_37",
+      "registers": {
+        "eax": "0x00000037"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_38",
+      "registers": {
+        "eax": "0x00000038"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_39",
+      "registers": {
+        "eax": "0x00000039"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_3a",
+      "registers": {
+        "eax": "0x0000003a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_3b",
+      "registers": {
+        "eax": "0x0000003b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_3c",
+      "registers": {
+        "eax": "0x0000003c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_3d",
+      "registers": {
+        "eax": "0x0000003d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_3e",
+      "registers": {
+        "eax": "0x0000003e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_3f",
+      "registers": {
+        "eax": "0x0000003f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_40",
+      "registers": {
+        "eax": "0x00000040"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_41",
+      "registers": {
+        "eax": "0x00000041"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_42",
+      "registers": {
+        "eax": "0x00000042"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_43",
+      "registers": {
+        "eax": "0x00000043"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_44",
+      "registers": {
+        "eax": "0x00000044"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_45",
+      "registers": {
+        "eax": "0x00000045"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_46",
+      "registers": {
+        "eax": "0x00000046"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_47",
+      "registers": {
+        "eax": "0x00000047"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_48",
+      "registers": {
+        "eax": "0x00000048"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_49",
+      "registers": {
+        "eax": "0x00000049"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_4a",
+      "registers": {
+        "eax": "0x0000004a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_4b",
+      "registers": {
+        "eax": "0x0000004b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_4c",
+      "registers": {
+        "eax": "0x0000004c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_4d",
+      "registers": {
+        "eax": "0x0000004d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_4e",
+      "registers": {
+        "eax": "0x0000004e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_4f",
+      "registers": {
+        "eax": "0x0000004f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_50",
+      "registers": {
+        "eax": "0x00000050"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_51",
+      "registers": {
+        "eax": "0x00000051"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_52",
+      "registers": {
+        "eax": "0x00000052"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_53",
+      "registers": {
+        "eax": "0x00000053"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_54",
+      "registers": {
+        "eax": "0x00000054"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_55",
+      "registers": {
+        "eax": "0x00000055"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_56",
+      "registers": {
+        "eax": "0x00000056"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_57",
+      "registers": {
+        "eax": "0x00000057"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_58",
+      "registers": {
+        "eax": "0x00000058"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_59",
+      "registers": {
+        "eax": "0x00000059"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_5a",
+      "registers": {
+        "eax": "0x0000005a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_5b",
+      "registers": {
+        "eax": "0x0000005b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_5c",
+      "registers": {
+        "eax": "0x0000005c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_5d",
+      "registers": {
+        "eax": "0x0000005d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_5e",
+      "registers": {
+        "eax": "0x0000005e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_5f",
+      "registers": {
+        "eax": "0x0000005f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_60",
+      "registers": {
+        "eax": "0x00000060"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_61",
+      "registers": {
+        "eax": "0x00000061"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_62",
+      "registers": {
+        "eax": "0x00000062"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_63",
+      "registers": {
+        "eax": "0x00000063"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_64",
+      "registers": {
+        "eax": "0x00000064"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_65",
+      "registers": {
+        "eax": "0x00000065"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_66",
+      "registers": {
+        "eax": "0x00000066"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_67",
+      "registers": {
+        "eax": "0x00000067"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_68",
+      "registers": {
+        "eax": "0x00000068"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_69",
+      "registers": {
+        "eax": "0x00000069"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_6a",
+      "registers": {
+        "eax": "0x0000006a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_6b",
+      "registers": {
+        "eax": "0x0000006b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_6c",
+      "registers": {
+        "eax": "0x0000006c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_6d",
+      "registers": {
+        "eax": "0x0000006d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_6e",
+      "registers": {
+        "eax": "0x0000006e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_6f",
+      "registers": {
+        "eax": "0x0000006f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_70",
+      "registers": {
+        "eax": "0x00000070"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_71",
+      "registers": {
+        "eax": "0x00000071"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_72",
+      "registers": {
+        "eax": "0x00000072"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_73",
+      "registers": {
+        "eax": "0x00000073"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_74",
+      "registers": {
+        "eax": "0x00000074"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_75",
+      "registers": {
+        "eax": "0x00000075"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_76",
+      "registers": {
+        "eax": "0x00000076"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_77",
+      "registers": {
+        "eax": "0x00000077"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_78",
+      "registers": {
+        "eax": "0x00000078"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_79",
+      "registers": {
+        "eax": "0x00000079"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_7a",
+      "registers": {
+        "eax": "0x0000007a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_7b",
+      "registers": {
+        "eax": "0x0000007b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_7c",
+      "registers": {
+        "eax": "0x0000007c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_7d",
+      "registers": {
+        "eax": "0x0000007d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_7e",
+      "registers": {
+        "eax": "0x0000007e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_7f",
+      "registers": {
+        "eax": "0x0000007f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_80",
+      "registers": {
+        "eax": "0x00000080"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_81",
+      "registers": {
+        "eax": "0x00000081"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_82",
+      "registers": {
+        "eax": "0x00000082"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_83",
+      "registers": {
+        "eax": "0x00000083"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_84",
+      "registers": {
+        "eax": "0x00000084"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_85",
+      "registers": {
+        "eax": "0x00000085"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_86",
+      "registers": {
+        "eax": "0x00000086"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_87",
+      "registers": {
+        "eax": "0x00000087"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_88",
+      "registers": {
+        "eax": "0x00000088"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_89",
+      "registers": {
+        "eax": "0x00000089"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_8a",
+      "registers": {
+        "eax": "0x0000008a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_8b",
+      "registers": {
+        "eax": "0x0000008b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_8c",
+      "registers": {
+        "eax": "0x0000008c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_8d",
+      "registers": {
+        "eax": "0x0000008d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_8e",
+      "registers": {
+        "eax": "0x0000008e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_8f",
+      "registers": {
+        "eax": "0x0000008f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_90",
+      "registers": {
+        "eax": "0x00000090"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_91",
+      "registers": {
+        "eax": "0x00000091"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_92",
+      "registers": {
+        "eax": "0x00000092"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_93",
+      "registers": {
+        "eax": "0x00000093"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_94",
+      "registers": {
+        "eax": "0x00000094"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_95",
+      "registers": {
+        "eax": "0x00000095"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_96",
+      "registers": {
+        "eax": "0x00000096"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_97",
+      "registers": {
+        "eax": "0x00000097"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_98",
+      "registers": {
+        "eax": "0x00000098"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_99",
+      "registers": {
+        "eax": "0x00000099"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_9a",
+      "registers": {
+        "eax": "0x0000009a"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_9b",
+      "registers": {
+        "eax": "0x0000009b"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_9c",
+      "registers": {
+        "eax": "0x0000009c"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_9d",
+      "registers": {
+        "eax": "0x0000009d"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_9e",
+      "registers": {
+        "eax": "0x0000009e"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_9f",
+      "registers": {
+        "eax": "0x0000009f"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a0",
+      "registers": {
+        "eax": "0x000000a0"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a1",
+      "registers": {
+        "eax": "0x000000a1"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a2",
+      "registers": {
+        "eax": "0x000000a2"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a3",
+      "registers": {
+        "eax": "0x000000a3"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a4",
+      "registers": {
+        "eax": "0x000000a4"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a5",
+      "registers": {
+        "eax": "0x000000a5"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a6",
+      "registers": {
+        "eax": "0x000000a6"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a7",
+      "registers": {
+        "eax": "0x000000a7"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a8",
+      "registers": {
+        "eax": "0x000000a8"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_a9",
+      "registers": {
+        "eax": "0x000000a9"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_aa",
+      "registers": {
+        "eax": "0x000000aa"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ab",
+      "registers": {
+        "eax": "0x000000ab"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ac",
+      "registers": {
+        "eax": "0x000000ac"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ad",
+      "registers": {
+        "eax": "0x000000ad"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ae",
+      "registers": {
+        "eax": "0x000000ae"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_af",
+      "registers": {
+        "eax": "0x000000af"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b0",
+      "registers": {
+        "eax": "0x000000b0"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b1",
+      "registers": {
+        "eax": "0x000000b1"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b2",
+      "registers": {
+        "eax": "0x000000b2"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b3",
+      "registers": {
+        "eax": "0x000000b3"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b4",
+      "registers": {
+        "eax": "0x000000b4"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b5",
+      "registers": {
+        "eax": "0x000000b5"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b6",
+      "registers": {
+        "eax": "0x000000b6"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b7",
+      "registers": {
+        "eax": "0x000000b7"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b8",
+      "registers": {
+        "eax": "0x000000b8"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_b9",
+      "registers": {
+        "eax": "0x000000b9"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ba",
+      "registers": {
+        "eax": "0x000000ba"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_bb",
+      "registers": {
+        "eax": "0x000000bb"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_bc",
+      "registers": {
+        "eax": "0x000000bc"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_bd",
+      "registers": {
+        "eax": "0x000000bd"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_be",
+      "registers": {
+        "eax": "0x000000be"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_bf",
+      "registers": {
+        "eax": "0x000000bf"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c0",
+      "registers": {
+        "eax": "0x000000c0"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c1",
+      "registers": {
+        "eax": "0x000000c1"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c2",
+      "registers": {
+        "eax": "0x000000c2"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c3",
+      "registers": {
+        "eax": "0x000000c3"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c4",
+      "registers": {
+        "eax": "0x000000c4"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c5",
+      "registers": {
+        "eax": "0x000000c5"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c6",
+      "registers": {
+        "eax": "0x000000c6"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c7",
+      "registers": {
+        "eax": "0x000000c7"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c8",
+      "registers": {
+        "eax": "0x000000c8"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_c9",
+      "registers": {
+        "eax": "0x000000c9"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ca",
+      "registers": {
+        "eax": "0x000000ca"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_cb",
+      "registers": {
+        "eax": "0x000000cb"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_cc",
+      "registers": {
+        "eax": "0x000000cc"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_cd",
+      "registers": {
+        "eax": "0x000000cd"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ce",
+      "registers": {
+        "eax": "0x000000ce"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_cf",
+      "registers": {
+        "eax": "0x000000cf"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d0",
+      "registers": {
+        "eax": "0x000000d0"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d1",
+      "registers": {
+        "eax": "0x000000d1"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d2",
+      "registers": {
+        "eax": "0x000000d2"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d3",
+      "registers": {
+        "eax": "0x000000d3"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d4",
+      "registers": {
+        "eax": "0x000000d4"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d5",
+      "registers": {
+        "eax": "0x000000d5"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d6",
+      "registers": {
+        "eax": "0x000000d6"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d7",
+      "registers": {
+        "eax": "0x000000d7"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d8",
+      "registers": {
+        "eax": "0x000000d8"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_d9",
+      "registers": {
+        "eax": "0x000000d9"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_da",
+      "registers": {
+        "eax": "0x000000da"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_db",
+      "registers": {
+        "eax": "0x000000db"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_dc",
+      "registers": {
+        "eax": "0x000000dc"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_dd",
+      "registers": {
+        "eax": "0x000000dd"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_de",
+      "registers": {
+        "eax": "0x000000de"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_df",
+      "registers": {
+        "eax": "0x000000df"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e0",
+      "registers": {
+        "eax": "0x000000e0"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e1",
+      "registers": {
+        "eax": "0x000000e1"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e2",
+      "registers": {
+        "eax": "0x000000e2"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e3",
+      "registers": {
+        "eax": "0x000000e3"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e4",
+      "registers": {
+        "eax": "0x000000e4"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e5",
+      "registers": {
+        "eax": "0x000000e5"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e6",
+      "registers": {
+        "eax": "0x000000e6"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e7",
+      "registers": {
+        "eax": "0x000000e7"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e8",
+      "registers": {
+        "eax": "0x000000e8"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_e9",
+      "registers": {
+        "eax": "0x000000e9"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ea",
+      "registers": {
+        "eax": "0x000000ea"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_eb",
+      "registers": {
+        "eax": "0x000000eb"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ec",
+      "registers": {
+        "eax": "0x000000ec"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ed",
+      "registers": {
+        "eax": "0x000000ed"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ee",
+      "registers": {
+        "eax": "0x000000ee"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ef",
+      "registers": {
+        "eax": "0x000000ef"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f0",
+      "registers": {
+        "eax": "0x000000f0"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f1",
+      "registers": {
+        "eax": "0x000000f1"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f2",
+      "registers": {
+        "eax": "0x000000f2"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f3",
+      "registers": {
+        "eax": "0x000000f3"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f4",
+      "registers": {
+        "eax": "0x000000f4"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f5",
+      "registers": {
+        "eax": "0x000000f5"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f6",
+      "registers": {
+        "eax": "0x000000f6"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f7",
+      "registers": {
+        "eax": "0x000000f7"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f8",
+      "registers": {
+        "eax": "0x000000f8"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_f9",
+      "registers": {
+        "eax": "0x000000f9"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_fa",
+      "registers": {
+        "eax": "0x000000fa"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_fb",
+      "registers": {
+        "eax": "0x000000fb"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_fc",
+      "registers": {
+        "eax": "0x000000fc"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_fd",
+      "registers": {
+        "eax": "0x000000fd"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_fe",
+      "registers": {
+        "eax": "0x000000fe"
+      },
+      "memory": []
+    },
+    {
+      "name": "byte_ff",
+      "registers": {
+        "eax": "0x000000ff"
+      },
+      "memory": []
+    },
+    {
+      "name": "edge_7fffffff",
+      "registers": {
+        "eax": "0x7fffffff"
+      },
+      "memory": []
+    },
+    {
+      "name": "edge_80000000",
+      "registers": {
+        "eax": "0x80000000"
+      },
+      "memory": []
+    },
+    {
+      "name": "edge_ffffffff",
+      "registers": {
+        "eax": "0xffffffff"
+      },
+      "memory": []
+    },
+    {
+      "name": "edge_ffffffc0",
+      "registers": {
+        "eax": "0xffffffc0"
+      },
+      "memory": []
+    },
+    {
+      "name": "edge_00000040",
+      "registers": {
+        "eax": "0x00000040"
+      },
+      "memory": []
+    },
+    {
+      "name": "edge_0000005b",
+      "registers": {
+        "eax": "0x0000005b"
+      },
+      "memory": []
+    },
+    {
+      "name": "edge_00000060",
+      "registers": {
+        "eax": "0x00000060"
+      },
+      "memory": []
+    }
+  ]
+}

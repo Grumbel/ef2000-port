@@ -48,10 +48,17 @@ image, and compare behavior against the unmodified executable (plan §4).
 The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Status (2026-11-05): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,257 marked `compiles`,
-247 additional host-tested `drafted` entry points, and none verified as a
-compiled-and-spliced C replacement. The tracker is authoritative. See
+Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
+confirmed additional entry points (4,287 tracked); 3,254 marked `compiles`,
+1 `spliced`, 247 additional host-tested `drafted` entry points, and 2
+`verified`. `to_lower_ascii` and `to_upper_ascii` are the first verified
+OpenWatcom OMF replacements: isolated differentials, deterministic full-RAM
+replays and repeated menu/setup/cockpit replays pass. Replay determinism
+requires the synthetic VGA retrace clock. `encode_runtime_segment_offset`
+remains spliced: its isolated differential uses an 8-byte below-ESP scratch
+allowance and its full-RAM startup replay still differs in high-stack state.
+See [batch 109](../docs/subsystems/decomp-batch-109.md).
+See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),
 as well as [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
 and [renderer/driver batch 083](../docs/subsystems/decomp-batch-083.md) for

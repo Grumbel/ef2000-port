@@ -7,6 +7,37 @@ This is a working evidence log, **not** a verified global calling convention.
 The image is the SHA-pinned German TACTCOM X-32 payload. Ground signatures
 in original disassembly and caller behavior, not in Ghidra's guesses.
 
+## First OpenWatcom OMF guest replacements (2026-11-06)
+
+`to_lower_ascii` at `0xe7835` is the first replacement to pass its isolated
+OpenWatcom OMF differential, the 20-million-instruction full-RAM startup
+replay (three original and two patched runs), and repeated long menu→setup→
+cockpit original-versus-patched replays. Its 14-byte Watcom body is
+byte-for-byte identical to the original. The confirmed input is signed EAX;
+callers `0x50d9c`, `0xa80b0`, and `0xbc1d3` pass a byte in AL and consume AL.
+The original's signed comparisons and AL upper bits are preserved exactly by
+the generated instructions. It is now `verified`. Long replays use the
+runner's deterministic synthetic VGA retrace clock; they compare selected BSS
+and framebuffer state, while the full-memory comparison remains the shorter
+startup replay.
+
+`to_upper_ascii` at `0xddbc8` is also `verified`. Its 14-byte OpenWatcom body
+exactly matches the original signed comparisons and subtraction. All three
+callers were inspected; 267 isolated cases, three original plus two patched
+full-64MiB main-menu runs, and the repeated menu/setup/cockpit suite pass.
+
+`encode_runtime_segment_offset` at `0x604` is compiled and OMF-spliced.
+OpenWatcom emits a 33-byte body with no external calls or relocations; the
+remaining three bytes of its 36-byte extent are safe padding after `RET`. The
+original's unaligned dword read is preserved with a packed 32-bit member. The
+C expression uses addition for the disjoint segment and offset fields, so the
+final arithmetic flags match the original `ADD`. Its 1,024-case isolated
+differential passes with all EFLAGS checked and only the exact 8 bytes below
+incoming ESP treated as callee stack scratch. A 500M main-menu replay also
+matches status, selected guest RAM and framebuffer, with seven patch hits.
+The 20M full-RAM replay still differs in the active high-stack area; those
+bytes have not been proven dead, so the function remains `spliced`.
+
 ## Object and world-grid control cluster (2026-11-03)
 
 Six object-control ABIs were checked at their complete entries, exits and
