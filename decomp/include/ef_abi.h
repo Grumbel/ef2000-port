@@ -1061,6 +1061,7 @@ void guest_fn_9c3cf(uint32_t handler); /* 0x9c3cf EAX */
 void guest_fn_c37ec(void); /* 0xc37ec */
 uint32_t guest_fn_b3830(int32_t a, int32_t b, int32_t c); /* 0xb3830 EAX/EDX/EBX -> AX */
 uint32_t guest_fn_b3b1c(uint32_t a, uint32_t b); /* 0xb3b1c EAX/EDX -> EAX */
+#pragma aux guest_fn_a7990 parm []
 void guest_fn_a7990(uint32_t value); /* 0xa7990 stack, callee cleanup */
 void guest_fn_fc8cc(uint32_t first, uint32_t second); /* 0xfc8cc stack, callee cleanup */
 void guest_fn_103778(uint32_t a, uint32_t b, uint32_t c); /* 0x103778 cdecl */

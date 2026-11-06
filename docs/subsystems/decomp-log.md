@@ -214,3 +214,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   296 ticks, `AX=0xffff4cff`); only `0xe7835` among the three required startup
   entries executes before exit. The original baseline reaches the 500M
   instruction checkpoint and saves a framebuffer. M1 remains unpassed.
+- ABI correction for `0xa7990`, 2026-11-06: disassembly at `0xebcf3`
+  shows `push eax; call 0xa7990`, and the callee reads `[ESP+4]` and removes
+  that stack argument. Added `#pragma aux guest_fn_a7990 parm []`; an
+  OpenWatcom probe emits the required push and assumes callee cleanup. All
+  335 hand-written modules compile with `-wx`. The full hybrid still fails
+  at the dataset check (`IP=0x222`, 101 interrupts, 296 ticks). A new
+  bisector run narrowed no unique culprit (candidate set remains broad in
+  the `0xc1bd0`–`0xd13dc` region), so M1 remains unpassed.
