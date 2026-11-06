@@ -448,3 +448,13 @@ stops at unsupported real-mode IN port `0xa1` before reaching it. See
 `docs/subsystems/decomp-batch-132.md`. Current tracker: 3,228 `compiles`, 17
 `verified`, 7 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3
 `library`.
+
+**Batch-133 update (2026-11-06):** `set_field_10682c` (`0x10682c`, 16
+bytes) and trace wrapper `0x1028c0` were corrected to caller-clean stack
+ABIs. The exact OpenWatcom body passes four isolated cases and one captured
+sound-DMA call from `0x1028c0@0x1028ef`. The full sound-DMA replay reaches
+`0x10682c` four times but cannot pass its gate: repeated original baselines
+differ by 42 interrupts (42,314 vs. 42,272), and patched selected BSS differs.
+Keep it `spliced`. See `docs/subsystems/decomp-batch-133.md`. Current tracker:
+3,227 `compiles`, 17 `verified`, 8 `spliced`, 5 `blocked`, 247 `drafted`,
+669 `unknown`, and 3 `library`.

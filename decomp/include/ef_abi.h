@@ -1173,7 +1173,7 @@ void trace_call_10225c(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_102824(uint32_t a, uint32_t b);
 void trace_call_102858(uint32_t a, uint32_t b);
 void trace_call_10288c(uint32_t a, uint32_t b);
-void trace_call_1028c0(uint32_t a, uint32_t b);
+void EF_CDECL trace_call_1028c0(uint32_t a, uint32_t b);
 void trace_call_102a98(uint32_t a, uint32_t b);
 void guest_fn_1111ca(uint32_t a); /* 0x1111ca cdecl */
 void guest_fn_1112ed(uint32_t a); /* 0x1112ed cdecl */
@@ -1255,7 +1255,7 @@ void set_pair_106740(ef_addr32 object, uint32_t first, uint32_t second);
 void EF_CDECL set_field_10677c(ef_addr32 object, uint32_t value);
 void set_field_10679c(ef_addr32 object, uint32_t value);
 void set_field_1067cc(ef_addr32 object, uint32_t value);
-void set_field_10682c(ef_addr32 object, uint32_t value);
+void EF_CDECL set_field_10682c(ef_addr32 object, uint32_t value);
 void stop_selected_10683c(ef_addr32 object);
 void pause_object_10687c(ef_addr32 object);
 void resume_object_106894(ef_addr32 object);
