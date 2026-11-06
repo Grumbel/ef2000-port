@@ -1121,6 +1121,8 @@ ef_addr32 guest_fn_fc795(uint32_t size); /* 0xfc795 EAX -> EAX */
 
 /* misc_helpers2.c */
 uint32_t lookup_field_eba4c(uint32_t key, uint32_t index);
+#pragma aux initialize_input_services_cd4d4 parm caller [] modify [eax]
+void initialize_input_services_cd4d4(void);
 void release_or_forward_ebcd8(uint32_t flags, ef_addr32 object);
 uint32_t advance_cursor_ebcfc(uint32_t amount, uint32_t flags, ef_addr32 object);
 void store_through_ebd30(uint32_t value);

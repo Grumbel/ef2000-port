@@ -222,3 +222,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   at the dataset check (`IP=0x222`, 101 interrupts, 296 ticks). A new
   bisector run narrowed no unique culprit (candidate set remains broad in
   the `0xc1bd0`–`0xd13dc` region), so M1 remains unpassed.
+- M3 startup bisection, 2026-11-06: delta debugging isolated mechanical
+  entry `0xcd4d4` as a minimal cause in one reduced patch set. Its Ghidra
+  draft inferred two fastcall parameters and used dword accesses for the
+  byte state at `0x15b72e`; original disassembly shows a no-argument entry,
+  byte accesses, preserved EBX/ECX/EDX and explicit register setup at calls.
+  Replaced it with a C body using the original selector registers and call
+  values; OpenWatcom compiles the module with `-wx`. With only this entry and
+  the lowercase canary patched, the focused Unicorn replay stops at
+  `unsupported_interface` during keyboard I/O, so it cannot establish replay
+  equivalence. The full patch still fails earlier at `IP=0x222` (101
+  interrupts, 296 ticks); M1 remains unpassed.

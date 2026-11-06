@@ -1975,6 +1975,7 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0xeba4c` | EAX:uint32_t,EDX:uint32_t | EAX:uint32_t | 9cb70@9cb8a,9cb70@9cbaa | Zero when EDX is zero, else dword +8 of 0xeb520's result (or 0). |
 | `0xebcd8` | EAX:uint32_t,EDX:ef_addr32 | none | 9ce84@9cea5,9ce84@9ceb6 | Release the object's pointer at +0x154 for flag 0x80000, else defer to 0xa7990. |
+| `0xcd4d4` | none | none | 8b477@8b477,a9878@a98c2,aaee8@aaf90 | Initialize the keyboard state and request/timer slots; preserve EBX, ECX, EDX, ESI, EDI and EBP. |
 | `0xebcfc` | EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32 | EAX:uint32_t | 9cee8@9cf0a,9cee8@9cf1a | Advance the cursor at +0x158 by EAX and return the distance from +0x154. |
 | `0xebe6d` | EAX:uint32_t | none | bc1d3@bc1fa,ebe79@ebe7e,f1d90@f1da5 | Store EAX through the pointer returned by 0xebd30. |
 | `0xebe90` | EAX:uint32_t | none | 1101e8@1101f2 | As 0xebe6d with 0xebd36. |
