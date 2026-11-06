@@ -3006,7 +3006,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cff80	728			unknown	unclassified	unverified		
 0x000d0278	473			unknown	unclassified	unverified		
 0x000d0470	780			unknown	unclassified	unverified		
-0x000d0858	55	copy_record9_d0858	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d0858.json	docs/compiler-abi.md; Copy a 9-dword record.; callers 91c98@91d77,91df4@91e81,91df4@91ee6; guest pending
+0x000d0858	55	copy_record9_d0858	engine_helpers3	spliced	game	confirmed	decomp/tests/0x000d0858.json	docs/compiler-abi.md; Copies nine dwords in original order 0,3,6,1,4,7,2,5,8 using nested C loops. OpenWatcom emits 45 bytes in 55-byte extent; isolated 8/8 plus actual captured call 1/1 pass. 1.5B cockpit replay hits 42 times but selected BSS hash differs; framebuffer/status/ticks match. Leave unverified pending replay divergence analysis.
 0x000d08fc	160	matrix_multiply_d08fc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d08fc.json	docs/compiler-abi.md; 3x3 fixed-point matrix product OUT = A * B (OUT = EAX, A = EDX, B = EBX; nine dwords each, row major, results arithmetic; callers 93170@9322c,9357c@93603,93a8c@93ae6; guest pending
 0x000d099c	66	transpose_matrix3_d099c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000d099c.json	docs/compiler-abi.md; Transpose the 3x3 matrix of dwords at SRC into DST.; callers 91df4@91e04,91df4@91e75,91f30@91f3c; guest pending
 0x000d0b68	63	init_bounds_d0b68	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000d0b68.json	docs/compiler-abi.md; Reset a 9-dword bounds record (0x7fff limits).; callers 1b4a4@1b5e3,26b60@26f51,27348@27355; guest pending

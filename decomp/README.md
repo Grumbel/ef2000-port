@@ -49,8 +49,8 @@ The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
 Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,252 marked `compiles`,
-247 additional host-tested `drafted` entry points, and 5 `verified`.
+confirmed additional entry points (4,287 tracked); 3,250 marked `compiles`,
+247 additional host-tested `drafted` entry points, 1 `spliced`, 1 `blocked`, and 5 `verified`.
 Five routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
 `to_upper_ascii`, `encode_runtime_segment_offset`, `read_runtime_slot_flag`
 and `initialize_runtime_probe_latch`. Their isolated differentials and
@@ -110,3 +110,5 @@ the indirect formatting wrapper, with pinned-byte audits for both entries.
 The [OPTIONS display batch 097](../docs/subsystems/decomp-batch-097.md)
 models the original cursor repeat timers, pointer selection loop and
 fade/no-fade cleanup; rendering, hit testing and device inputs remain adapters.
+
+Batch 113 adds `copy_record9_d0858` as a spliced, unverified OpenWatcom candidate: function differential passes, but the deterministic cockpit replay has a selected BSS hash mismatch. `latch_values_ce328` is blocked because its current C lowering exceeds the original extent. See [batch 113](../docs/subsystems/decomp-batch-113.md).

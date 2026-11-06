@@ -67,6 +67,16 @@ Unicorn function runner cannot model. Current tracker totals: 3,252
 `compiles`, 5 `verified`, 247 `drafted`, 669 `unknown`, and 3 `library`.
 See `docs/subsystems/decomp-batch-112.md`.
 
+
+**Batch-113 update (2026-11-06):** `copy_record9_d0858` (`0xd0858`, 55
+bytes) compiles to a 45-byte OpenWatcom C loop preserving the original dword
+access order. Eight isolated cases and one captured actual call pass. Its
+1.5B cockpit replay reaches the candidate 42 times; framebuffer, status,
+interrupts and ticks match, but the selected 64 KiB BSS hash differs, so it
+remains `spliced`, not verified. `latch_values_ce328` is now `blocked`: the
+straightforward C lowering is 61 bytes for a 44-byte extent. Current tracker:
+3,250 `compiles`, 5 `verified`, 1 `spliced`, 1 `blocked`, 247 `drafted`, 669
+`unknown`, and 3 `library`. See `docs/subsystems/decomp-batch-113.md`.
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -80,13 +90,14 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,252 | 363,637 |
+| `compiles` | 3,250 | 363,538 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
 | `verified` | 5 | 126 |
-| `spliced` | 0 | 0 |
+| `spliced` | 1 | 55 |
+| `blocked` | 1 | 44 |
 | **Total** | **4,287** | **908,947** |
 
 **At the Batch-112 state:** five routines are strictly verified as

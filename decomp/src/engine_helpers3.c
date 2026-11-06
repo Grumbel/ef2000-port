@@ -204,6 +204,15 @@ void forward_record_cf78c(void)
 /* 0xd0858, 55 bytes. Copy a 9-dword record. */
 void copy_record9_d0858(ef_addr32 destination, ef_addr32 source)
 {
+#if defined(__WATCOMC__)
+    volatile uint32_t *dst = (volatile uint32_t *)(uintptr_t)destination;
+    volatile uint32_t *src = (volatile uint32_t *)(uintptr_t)source;
+    uint32_t row, column;
+
+    for (row = 0; row < 3u; ++row)
+        for (column = 0; column < 3u; ++column)
+            dst[column * 3u + row] = src[column * 3u + row];
+#else
     EF_U32(destination) = EF_U32(source);
     EF_U32(destination + 0xcu) = EF_U32(source + 0xcu);
     EF_U32(destination + 0x18u) = EF_U32(source + 0x18u);
@@ -213,6 +222,7 @@ void copy_record9_d0858(ef_addr32 destination, ef_addr32 source)
     EF_U32(destination + 8u) = EF_U32(source + 8u);
     EF_U32(destination + 0x14u) = EF_U32(source + 0x14u);
     EF_U32(destination + 0x20u) = EF_U32(source + 0x20u);
+#endif
 }
 
 /* 0xd0b68, 63 bytes. Reset a 9-dword bounds record (0x7fff limits). */
