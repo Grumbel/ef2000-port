@@ -502,3 +502,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   388 mechanical and 2,029 hand-written functions patched; exclusions fall
   to 2,313. These helper checks do not substitute for game replay: Xvfb still
   cannot bind, M1/M2 remain unpassed, and the first guest failure is unknown.
+- Hybrid OpenWatcom signed-64 arithmetic shift bridge, 2026-11-06: added
+  `__I8RS` for EDX:EAX shifted by EBX modulo 64. Its arithmetic SAR/RCR loop
+  assembles cleanly and passed 128,896 helper-level Unicorn vectors across
+  signed edge/random values and counts 0 through 127, including callee
+  register and stack preservation. Relinking resolves both `__I8RS` modules
+  and reaches 2,419 redirects (12,095 entry bytes; 576,148 arena bytes),
+  675/741 modules, 388 mechanical and 2,031 hand-written functions patched;
+  exclusions fall to 2,309. M1/M2 remain unpassed because private Xvfb cannot
+  bind, and the first guest failure is unknown.
