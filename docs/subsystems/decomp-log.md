@@ -421,3 +421,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   mechanical functions and 1,854 hand-written functions patched. No replay
   ran because private Xvfb cannot bind in this environment; M1/M2 remain
   unpassed and the current hybrid's first guest failure is unknown.
+- M0 three-byte/subfield rule, 2026-11-06: translate Ghidra `uint3` values
+  through a 32-bit carrier and recognize `_N_M_` subfields on array
+  elements, preserving the byte offset in the containing local. The full
+  OpenWatcom pass now reports 395/1,020 `ok` functions and 117,666/543,917
+  ok body bytes (21.6%); three asset-free translator tests pass. Relinking
+  keeps 2,175 redirects (10,875 entry bytes; 575,284 arena bytes), 585/733
+  modules, 321 mechanical functions and 1,854 hand-written functions
+  patched. The new `0x5d1c4` body compiles but its module is excluded for
+  unresolved OpenWatcom helper `__U8LS`; total exclusions rise to 2,797.
+  No replay ran because Xvfb cannot bind; M1/M2 remain unpassed.

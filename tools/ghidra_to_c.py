@@ -46,7 +46,8 @@ TYPES = [
     # the low 16 bits of EDX are significant.  uint64_t is the compiler's
     # available carrier; casts and consumers select the observed 48-bit parts.
     (r'\bundefined8\b', 'uint64_t'), (r'\bundefined6\b', 'uint64_t'),
-    (r'\buint6\b', 'uint64_t'), (r'\bundefined4\b', 'uint32_t'),
+    (r'\buint6\b', 'uint64_t'), (r'\buint3\b', 'uint32_t'),
+    (r'\bundefined4\b', 'uint32_t'),
     (r'\bundefined3\b', 'uint32_t'), (r'\bundefined2\b', 'uint16_t'),
     (r'\bundefined1\b', 'uint8_t'), (r'\bundefined\b', 'uint8_t'),
     (r'\bulonglong\b', 'uint64_t'), (r'\blonglong\b', 'int64_t'),
@@ -270,7 +271,8 @@ def convert(text, entry, names, sig_in=None, globals_=None):
             return '(*(%s *)ef_guest_memory_ptr(0x%08xu))' % (
                 ctype, address + offset)
         return '(*(%s *)((char *)&%s + %d))' % (ctype, base, offset)
-    body = re.sub(r'(?P<base>[A-Za-z_]\w*)\._(?P<offset>\d+)_(?P<width>\d+)_',
+    body = re.sub(r'(?P<base>[A-Za-z_]\w*(?:\[[^\]]+\])*)\._'
+                  r'(?P<offset>\d+)_(?P<width>\d+)_',
                   subfield_repl, body)
     # Ghidra's export carries pointer types in the expression uses rather
     # than in a separate global declaration.  An otherwise untyped DAT
