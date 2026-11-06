@@ -86,7 +86,8 @@ REG32 = {'EAX': 'eax', 'EDX': 'edx', 'EBX': 'ebx', 'ECX': 'ecx', 'ESI': 'esi',
 
 def pragma_for(name, sig):
     ins, outs = sig
-    regs = [REG32.get(reg.upper()) for reg, _ in ins]
+    regs = [REG32.get(reg.upper()) for reg, _ in ins
+            if not re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper())]
     if any(reg is None for reg in regs) or len(outs) > 1:
         return None
     text = '#pragma aux %s parm [%s]' % (name, '] ['.join(regs)) if regs else \
@@ -110,6 +111,10 @@ def convert(text, entry, names, sig_in=None):
     if sig_in:
         # Watcom register arguments: Ghidra shows them as in_<REG>.
         for reg, ctype in sig_in:
+            stack = re.fullmatch(r'\[?ESP\+(\d+)\]?', reg.upper())
+            if stack:
+                extra.append('%s stack_%s' % (ctype if ctype else 'uint32_t', stack.group(1)))
+                continue
             name = 'in_' + reg.upper()
             if re.search(r'\b' + name + r'\b', body):
                 body = re.sub(r'\b' + name + r'\b', 'r_' + reg.lower(), body)
