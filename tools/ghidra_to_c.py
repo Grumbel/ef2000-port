@@ -373,10 +373,13 @@ def main():
                           (entry, '] ['.join(inferred)))
         if sig:
             # Ghidra can assign different argument counts to the same callee
-            # at different call sites. Keep an unspecified argument list in
-            # the shared declaration until the ABI is confirmed; each source
-            # file still has its concrete decompiler-derived definition.
-            declaration = sig if entry in sigs else sig.split('(', 1)[0] + '()'
+            # at different call sites, even when signatures.tsv confirms the
+            # callee ABI. Keep the shared C declaration unspecified so each
+            # generated call site compiles as Ghidra emitted it. The aux
+            # pragma still maps explicit C arguments to the ABI registers;
+            # replay remains responsible for finding missing live-register
+            # arguments and other call-site mismatches.
+            declaration = sig.split('(', 1)[0] + '()'
             header.append(declaration + ';')
         if state == 'generated':
             labels = sorted(set(re.findall(r'\blab_[0-9a-f]{8}\b', body)))

@@ -102,6 +102,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   (65,523 bytes) and 594 manual functions (410,411 bytes). Mechanical lvalue
   lowering is a draft translation; compiler acceptance is not behavioral
   verification.
+- M0 rule 12, unspecified generated-call prototypes, 2026-11-06: the shared
+  generated header now leaves argument counts unspecified even for functions
+  with confirmed register signatures. Each function body still has its
+  signature-derived definition and `#pragma aux`; mismatched call arity is
+  deferred to replay. OpenWatcom reports 281/1,022 ok (27.5%,
+  77,005/544,429 bytes = 14.1%), up from 271/1,022 (26.5%,
+  68,495/544,429 bytes = 12.6%). There are 147 compile errors (57,013 bytes)
+  and 594 manual functions (410,411 bytes). This removes only ten rejections;
+  compiler acceptance still says nothing about live-register correctness.
 - M1 structural assessment, 2026-11-06: all 334 `decomp/src/*.c` modules
   compile with OpenWatcom `-wx` and zero warnings into ignored
   `local/hybrid/obj/` (432,877 CODE bytes plus 4,388 DATA bytes). The OMF
