@@ -49,19 +49,21 @@ The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
 Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,241 marked `compiles`,
-247 additional host-tested `drafted` entry points, 3 `spliced`, 5 `blocked`, and 8 `verified`.
-Eight routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
+confirmed additional entry points (4,287 tracked); 3,240 marked `compiles`,
+247 additional host-tested `drafted` entry points, 3 `spliced`, 5 `blocked`, and 9 `verified`.
+Nine routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
 `to_upper_ascii`, `encode_runtime_segment_offset`, `read_runtime_slot_flag`,
-`initialize_runtime_probe_latch`, `init_bounds_d0b68`, `sync_flag_12ec8` and
-`reset_unit_counter`.
+`initialize_runtime_probe_latch`, `init_bounds_d0b68`, `sync_flag_12ec8`,
+`reset_unit_counter` and `set_runtime_phase_five`.
 Their isolated differentials and deterministic guest replays pass. The encoder uses two flag-neutral nops to
 retain the original instruction count; its only isolated memory difference
 is the 8-byte callee stack scratch below incoming ESP. Replay determinism
 requires the synthetic VGA retrace clock. See
 [batch 110](../docs/subsystems/decomp-batch-110.md),
 [batch 111](../docs/subsystems/decomp-batch-111.md) and
-[batch 112](../docs/subsystems/decomp-batch-112.md).
+[batch 112](../docs/subsystems/decomp-batch-112.md), plus
+[batch 121](../docs/subsystems/decomp-batch-121.md) for the ninth verified
+replacement.
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),
 as well as [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)

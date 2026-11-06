@@ -10,7 +10,7 @@ void store_runtime_control_word(uint32_t value)
     g_runtime_control_word = value;
 }
 
-/* 0x3dcc0, 0x0a bytes, two caller functions. */
+/* 0x3dcc0, 0x0a bytes, verified: differential+replay. */
 #if defined(__WATCOMC__)
 static void write_runtime_phase_five(void);
 #pragma aux write_runtime_phase_five = \

@@ -721,7 +721,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003db9c	84	run_timed_events_3db9c	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0003db9c.json	docs/compiler-abi.md; Fire due events from the 9-byte table at 0x1a5a28.; callers 3dd30@3dfa9; guest pending
 0x0003dbf0	189	check_unit_leaves_map_3dbf0	game_helpers63	compiles	game	confirmed	decomp/tests/0x0003dbf0.json	docs/compiler-abi.md; Flag the player unit as out of the map when its cell leaves the valid range.; callers 3dd30@3dfb3; guest pending
 0x0003dcb0	15	run_reset_sequence_3dcb0	low_helpers	compiles	game	confirmed	decomp/tests/0x0003dcb0.json	docs/compiler-abi.md; 0x394e0, 0x8846c, tail 0x888cc; callers 3dd30@3e015; guest pending
-0x0003dcc0	10	set_runtime_phase_five	runtime_control	compiles	game	confirmed	decomp/tests/0x0003dcc0.json	docs/compiler-abi.md; Literal five written to word 0x1a35ec; original guest replacement unverified
+0x0003dcc0	10	set_runtime_phase_five	runtime_control	verified	game	confirmed	decomp/tests/0x0003dcc0.json	OpenWatcom OMF matches original; 37 isolated + 1 captured call and repeated menu/setup/cockpit replay pass; one cockpit hit
 0x0003dccc	56	reset_channels_3dccc	game_helpers78	compiles	game	confirmed	decomp/tests/0x0003dccc.json	docs/compiler-abi.md; Reset the drivers and step the four channels, then refresh the matching table.; callers 3dd30@3de1a; guest pending
 0x0003dd30	2924			unknown	unclassified	unverified		
 0x0003ea0c	1425			unknown	unclassified	unverified		
