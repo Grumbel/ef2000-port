@@ -39,9 +39,20 @@ void mark_list_entry_64(uint8_t node_index, uint8_t slot, ef_addr32 head)
     EF_U8(EF_U32(node + 0x10u) + slot) = 0x7f;
 }
 
-/* 0xcc26c, 25 bytes. Node in the list at *EDX whose byte +0xb equals AL. */
+/* 0xcc26c, 25 bytes. Node in the list at *EDX whose byte +0xb equals AL; spliced, gameplay hit pending. */
 ef_addr32 find_node_by_byte_b(uint8_t key, ef_addr32 head)
 {
+#if defined(__WATCOMC__)
+    volatile uint8_t *node = (volatile uint8_t *)(uintptr_t)
+        *(volatile uint32_t *)(uintptr_t)head;
+    while (node != 0) {
+        if (node[0xbu] == key)
+            return (ef_addr32)(uintptr_t)node;
+        node = (volatile uint8_t *)(uintptr_t)
+            *(volatile uint32_t *)(uintptr_t)(node + 4u);
+    }
+    return 0;
+#else
     ef_addr32 node = EF_U32(head);
     while (node != 0) {
         if (EF_U8(node + 0xbu) == key)
@@ -49,6 +60,7 @@ ef_addr32 find_node_by_byte_b(uint8_t key, ef_addr32 head)
         node = EF_U32(node + 4u);
     }
     return 0;
+#endif
 }
 
 /* 0xcc5fc, 44 bytes. AL is 0x10..0x15. */

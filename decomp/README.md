@@ -49,8 +49,8 @@ The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
 Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,248 marked `compiles`,
-247 additional host-tested `drafted` entry points, 1 `spliced`, 2 `blocked`, and 6 `verified`.
+confirmed additional entry points (4,287 tracked); 3,247 marked `compiles`,
+247 additional host-tested `drafted` entry points, 2 `spliced`, 2 `blocked`, and 6 `verified`.
 Five routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
 `to_upper_ascii`, `encode_runtime_segment_offset`, `read_runtime_slot_flag`
 and `initialize_runtime_probe_latch`. Their isolated differentials and
@@ -114,3 +114,4 @@ fade/no-fade cleanup; rendering, hit testing and device inputs remain adapters.
 Batch 113 adds `copy_record9_d0858` as a spliced, unverified OpenWatcom candidate: function differential passes, but the deterministic cockpit replay has a selected BSS hash mismatch. `latch_values_ce328` is blocked because its current C lowering exceeds the original extent. See [batch 113](../docs/subsystems/decomp-batch-113.md).
 Batch 114 corrects the `group_flag_negative_cc1ac` ABI record: original disassembly masks EDX, so it is not preserved. Its 72-byte OpenWatcom C lowering cannot fit the 61-byte body; see [batch 114](../docs/subsystems/decomp-batch-114.md).
 Batch 115 verifies `init_bounds_d0b68`, an exact 63-byte OpenWatcom replacement with 12 isolated cases, three captured caller states and a passing cockpit replay (155 hits). See [batch 115](../docs/subsystems/decomp-batch-115.md).
+Batch 116 adds `find_node_by_byte_b` as a spliced OpenWatcom candidate. Its eight isolated cases pass, but available deterministic replay paths did not reach it; see [batch 116](../docs/subsystems/decomp-batch-116.md).

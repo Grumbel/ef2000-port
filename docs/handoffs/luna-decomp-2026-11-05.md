@@ -97,6 +97,15 @@ Current tracker: 3,248 `compiles`, 6 `verified`, 1 `spliced`, 2 `blocked`, 247
 `drafted`, 669 `unknown`, and 3 `library`. See
 `docs/subsystems/decomp-batch-115.md`.
 
+**Batch-116 update (2026-11-06):** `find_node_by_byte_b` (`0xcc26c`, 25
+bytes) has a 21-byte OpenWatcom C body and passes eight isolated linked-list
+cases; the safe patch fills the original 25-byte extent. Unpatched entry
+captures during 500M main-menu, 700M quick-fight setup and 1.5B cockpit runs
+did not reach it. It remains `spliced`, not verified, until an actual caller
+path is replayed. Current tracker: 3,247 `compiles`, 6 `verified`, 2
+`spliced`, 2 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`. See
+`docs/subsystems/decomp-batch-116.md`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -110,13 +119,13 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,248 | 363,414 |
+| `compiles` | 3,247 | 363,389 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
 | `verified` | 6 | 189 |
-| `spliced` | 1 | 55 |
+| `spliced` | 2 | 80 |
 | `blocked` | 2 | 105 |
 | **Total** | **4,287** | **908,947** |
 
