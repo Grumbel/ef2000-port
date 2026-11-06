@@ -38,6 +38,7 @@ EXPORT = ROOT / 'local/ghidra/full-export'
 OUT = ROOT / 'local/mechanical'
 SIGNATURES = ROOT / 'decomp/symbols/signatures.tsv'
 FUNCTIONS = ROOT / 'decomp/symbols/functions.tsv'
+GLOBALS = ROOT / 'decomp/symbols/globals.tsv'
 FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-fp3', '-ob', '-ot', '-za99', '-w1')
 
 TYPES = [
@@ -92,6 +93,30 @@ def load_signatures():
     return sigs
 
 
+def load_globals():
+    return {int(row['addr'], 16): row for row in read_tsv(GLOBALS)}
+
+
+def dat_expression(address, globals_):
+    row = globals_.get(address)
+    ctype = normalize_type(row['type']) if row else ''
+    raw = '0x%08x' % address
+    access = {
+        'uint8_t': 'EF_U8(%s)' % raw,
+        'int8_t': '(*(int8_t *)ef_guest_memory_ptr(%s))' % raw,
+        'uint16_t': 'EF_U16(%s)' % raw,
+        'int16_t': 'EF_S16(%s)' % raw,
+        'uint32_t': 'EF_U32(%s)' % raw,
+        'ef_addr32': 'EF_U32(%s)' % raw,
+        'int32_t': 'EF_S32(%s)' % raw,
+        'float': '(*(float *)ef_guest_memory_ptr(%s))' % raw,
+        'double': '(*(double *)ef_guest_memory_ptr(%s))' % raw,
+        'uint64_t': '(*(uint64_t *)ef_guest_memory_ptr(%s))' % raw,
+        'int64_t': '(*(int64_t *)ef_guest_memory_ptr(%s))' % raw,
+    }
+    return access.get(ctype, 'EF_U32(%s)' % raw)
+
+
 REG32 = {'EAX': 'eax', 'EDX': 'edx', 'EBX': 'ebx', 'ECX': 'ecx', 'ESI': 'esi',
          'EDI': 'edi', 'AL': 'al', 'AX': 'ax', 'DL': 'dl', 'DX': 'dx',
          'BL': 'bl', 'BX': 'bx', 'CL': 'cl', 'CX': 'cx'}
@@ -113,7 +138,7 @@ def pragma_for(name, sig):
     return text
 
 
-def convert(text, entry, names, sig_in=None):
+def convert(text, entry, names, sig_in=None, globals_=None):
     """Return (definition_signature, body_c, flags) for one pseudo-C file."""
     lines = text.split('\n')
     lines = [line for line in lines if not line.startswith(('/*', ' *'))]
@@ -161,8 +186,9 @@ def convert(text, entry, names, sig_in=None):
                   lambda m: 'ef_fn_' + m.group(1).lower(), body)
     for old, new in names.items():
         body = re.sub(r'\b' + re.escape(old) + r'\b', new, body)
-    body = re.sub(r'\bDAT_' + HEX + r'\b',
-                  lambda m: 'EF_U32(0x%s)' % m.group(1).lower(), body)
+    globals_ = globals_ or {}
+    body = re.sub(r'(?<![A-Za-z0-9_])_?DAT_' + HEX + r'\b',
+                  lambda m: dat_expression(int(m.group(1), 16), globals_), body)
     body = re.sub(r'\b(?:PTR_|s_|u_|BYTE_|WORD_|DWORD_)\w*?_?' + HEX + r'\b(?:\s*\+\s*\d+)?',
                   lambda m: '((char *)ef_guest_memory_ptr(0x%s))' % m.group(1).lower(), body)
     body = re.sub(r'\bLAB_' + HEX + r'\b', lambda m: 'lab_' + m.group(1).lower(), body)
@@ -209,6 +235,7 @@ def main():
     only = {int(a, 16) for a in args.only.split(',')} if args.only else None
     skip = recovered_addresses() if args.skip_recovered else set()
     sigs = load_signatures()
+    globals_ = load_globals()
     names = {}
     for row in rows:
         entry = int(row['entry'], 16)
@@ -229,7 +256,7 @@ def main():
         if not path.is_file():
             continue
         sig, body, flags, inferred = convert(path.read_text(errors='replace'), entry, names,
-                                   sigs[entry][0] if entry in sigs else None)
+                                   sigs[entry][0] if entry in sigs else None, globals_)
         state = 'manual' if flags else 'generated'
         if sig and entry in sigs:
             pragma = pragma_for('ef_fn_%08x' % entry, sigs[entry])

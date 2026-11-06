@@ -45,3 +45,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   Manual causes overlap: `extraout_*` 467, `CONCATn` 322, `_N_M_` fields 334,
   `in_*` registers 310, `unaff_*` 173, warnings/halt markers 380, software
   interrupts 22, and SUB/ZEXT/SEXT 21.
+- M0 rule 6, DAT widths, 2026-11-06: translate both `DAT_x` and leading-
+  underscore `_DAT_x`, using exact scalar widths/types from `globals.tsv`
+  where known and the planned 32-bit fallback otherwise. 126/287 generated
+  functions compile (43.9%, 22,659/66,726 bytes = 34.0%). Across all 1,022
+  unrecovered functions this is 12.3% by count and 4.2% by bytes. Remaining
+  161 compile errors: E1151 parameter-count conflicts 51, E1029 pointer type
+  required 41, E1009 `r_eax` syntax 38, E1011 undeclared symbols 16, E1030
+  address-of-rvalue 6, E1034 duplicate `r_eax` 3, E1045 subscript 3, E1084
+  empty case 2, E1052 void expression 1.
