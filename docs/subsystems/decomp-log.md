@@ -311,3 +311,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   still original. The new bisector reduction retains 371 candidates after two
   resumes and is unresolved. M0 remains 391/1,021 exports (38.3%,
   114,873/544,304 bytes); M1 remains unpassed.
+- M3 fill-wrapper call ABI correction, 2026-11-06: original disassembly at
+  `0xb3fb0` loads the fill count from EBX into ECX before calling `0xdeb50`,
+  whose callers pass the count in ECX. The recovered wrapper called the
+  `guest_fn_deb50_f` alias without an OpenWatcom pragma, so WDIS showed the
+  count left in EBX. Added the alias pragma for EAX/EDX/ECX; a fresh WCC build
+  now emits `mov ecx,ebx` before the call. The full hybrid still exits at
+  `0x222` after three ticks with `datfile: not enuff memory` (51 interrupts,
+  no IRQ0), so this fixes a verified call ABI but does not resolve M1. The
+  latest full link patches 1,984 entries (9,920 bytes), links 559/726 modules,
+  and uses a 571,620-byte arena. M0 remains 391/1,021 exports (38.3%,
+  114,873/544,304 bytes); M1 is unpassed.

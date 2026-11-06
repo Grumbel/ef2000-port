@@ -3396,6 +3396,7 @@ void guest_fn_e7fa4_h(uint32_t a, uint32_t b); /* 0xe7fa4 EAX/EDX */
 void guest_fn_a3fe0_p(void); /* 0xa3fe0 */
 void guest_fn_a7588_v(ef_addr32 widget, uint32_t value); /* 0xa7588 EAX/EDX */
 uint32_t guest_fn_a7a64_r(uint32_t handle, uint32_t mode, uint32_t offset); /* 0xa7a64 EAX/EDX/EBX -> EAX */
+#pragma aux guest_fn_deb50_f parm [eax edx ecx] modify [eax ecx edx]
 void guest_fn_deb50_f(ef_addr32 dst, uint32_t value, uint32_t count); /* 0xdeb50 EAX/EDX/ECX */
 void guest_fn_dd870_s(void); /* 0xdd870 */
 void guest_fn_ddae0_s(void); /* 0xddae0 */
