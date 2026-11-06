@@ -259,3 +259,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   events, retaining stop status/IP while tolerating small timing shifts. The
   full run reduces the 62-entry exact-counter set to 31 candidates; it is
   still unresolved.
+- M0 rule 19, terminal empty switch cases, 2026-11-06: when Ghidra emits a
+  final `case`/`default` label immediately before a switch close, the
+  translator now inserts an empty statement. This keeps terminal cases from
+  falling through while making the draft valid C. The pinned OpenWatcom run
+  rises from 388/1,021 to 391/1,021 generated exports (38.3%, 114,873/544,304
+  bytes = 21.1%) and removes three `E1084: Statement required after 'case'`
+  failures. There are now 36 compile errors (19,020 bytes) and 594 manual
+  functions (410,411 bytes); `CONCATn`/register-related manual causes still
+  overlap. One manifest entry is marked `reused` and has no export file, so
+  it is outside this report. `nix develop` could not write its fetcher-cache
+  database in this session; the pinned OpenWatcom executable was invoked
+  directly. M1 remains unpassed: the latest linked hybrid has 1,979 entry
+  redirects (9,895 original bytes), 570,772 arena bytes, and 557/724 modules
+  linked; replay exits at `IP=0x222` (`AX=0xffff4cff`, 101 interrupts, 296
+  ticks).

@@ -49,15 +49,16 @@ The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
 Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,227 marked `compiles`,
-247 additional host-tested `drafted` entry points, 8 `spliced`, 5 `blocked`, and 17 `verified`.
-Seventeen routines are verified OpenWatcom OMF replacements: `to_lower_ascii`,
-`to_upper_ascii`, `encode_runtime_segment_offset`, `read_runtime_slot_flag`,
-`initialize_runtime_probe_latch`, `init_bounds_d0b68`, `sync_flag_12ec8`,
-`reset_unit_counter`, `set_runtime_phase_five`,
+confirmed additional entry points (4,287 tracked); 3,222 marked `compiles`,
+247 additional host-tested `drafted` entry points, 11 `spliced`, 5 `blocked`,
+and 20 `verified`. The verified OpenWatcom OMF replacements are
+`to_lower_ascii`, `to_upper_ascii`, `encode_runtime_segment_offset`,
+`read_runtime_slot_flag`, `initialize_runtime_probe_latch`, `init_bounds_d0b68`,
+`sync_flag_12ec8`, `reset_unit_counter`, `set_runtime_phase_five`,
 `store_runtime_control_word`, `initialize_mode_limits`,
 `copy_active_buffer_pointer`, `set_control_mode_a`, `set_control_mode_b`,
-`set_control_mode_c`, `resolve_link_pointer` and `refresh_link_pointer`.
+`set_control_mode_c`, `resolve_link_pointer`, `refresh_link_pointer`,
+`exchange_slot_1041e4`, `strip_cr_inplace` and `find_last_char`.
 Their isolated differentials and deterministic guest replays pass. The encoder uses two flag-neutral nops to
 retain the original instruction count; its only isolated memory difference
 is the 8-byte callee stack scratch below incoming ESP. Replay determinism
@@ -74,6 +75,13 @@ first control-mode gate, [batch 126](../docs/subsystems/decomp-batch-126.md)
 verifies the paired mode B/C setters, and [batch 127](../docs/subsystems/decomp-batch-127.md)
 verifies the signed link-pointer lookup and its unaligned candidate override;
 [batch 128](../docs/subsystems/decomp-batch-128.md) verifies its record updater.
+M0 currently compiles 391/1,021 available unrecovered Ghidra exports (38.3%,
+114,873/544,304 bytes = 21.1%) mechanically. Hand-written recovered C covers
+363,644 body bytes (40.0%); combined with the mechanical `ok` exports, the
+potential hybrid coverage is 478,517/908,947 tracked body bytes (52.6%).
+The latest linked image patches 1,979 functions (9,895 original entry bytes)
+and places 570,772 bytes in its code arena, but M1 is not passed: replay exits
+at the dataset check (`IP=0x222`, `AX=0xffff4cff`, 101 interrupts, 296 ticks).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),
 as well as [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)

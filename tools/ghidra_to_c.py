@@ -339,6 +339,12 @@ def convert(text, entry, names, sig_in=None, globals_=None):
         r'((char **)ef_guest_memory_ptr(\1))', body)
     body = re.sub(r'\bLAB_' + HEX + r'\b', lambda m: 'lab_' + m.group(1).lower(), body)
     body = re.sub(r'\bfunc_0x' + HEX + r'\b', lambda m: 'ef_fn_' + m.group(1).lower(), body)
+    # Ghidra emits an empty terminal case as a label immediately followed by
+    # the switch's closing brace. C requires a statement after that label;
+    # an empty statement preserves the original path (fall-through is only
+    # preserved for labels followed by another case label).
+    body = re.sub(r'(?m)^([ \t]*(?:case\b[^\n]*|default)[ \t]*:)[ \t]*(?=\n[ \t]*})',
+                  r'\1\n;', body)
     first = next((line for line in body.split('\n') if line.strip()), '')
     match = DEF.match(first)
     if not match:
