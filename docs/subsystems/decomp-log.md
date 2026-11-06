@@ -22,3 +22,7 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `long double`, preserving the x87 extended type. The rerun advanced past
   that declaration; the report remains 0/287 (0/66,726 bytes), now blocked by
   the unconverted Ghidra `dword` type at `0x000b3084`.
+- M0 rule 3, `dword`, 2026-11-06: Ghidra `dword` now maps to `uint32_t`. The
+  rerun advanced past the dword declarations; the report remains 0/287
+  (0/66,726 bytes), now blocked by Ghidra's generic function type `code` at
+  `0x000ed133`.
