@@ -16,3 +16,16 @@ void guest_callptr1_x(ef_addr32 fn, ef_addr32 arg)
 {
     call_cdecl_stack1(fn, arg);
 }
+
+static void call_cdecl_stack2(uint32_t fn, uint32_t arg0, uint32_t arg1);
+#pragma aux call_cdecl_stack2 parm [eax] [edx] [ebx] modify [eax ecx edx] = \
+    "push ebx" \
+    "push edx" \
+    "call eax" \
+    "add esp,8"
+
+#pragma aux guest_callptr2_x parm [eax] [edx] [ebx] modify [eax ecx edx]
+void guest_callptr2_x(ef_addr32 fn, uint32_t arg0, uint32_t arg1)
+{
+    call_cdecl_stack2(fn, arg0, arg1);
+}

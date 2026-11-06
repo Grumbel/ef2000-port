@@ -380,3 +380,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `EPERM`, so M1/M2 remain unpassed and the current artifact's first guest
   failure is unknown. The earlier `0xf8c25` fault came from a different
   hybrid with `0xf8b14` demoted.
+- Two-argument callback bridge, 2026-11-06: original disassembly at
+  `0x956cc` pushes the format and name arguments, calls the callback at
+  `0x132a74`, and removes eight bytes. Added `guest_callptr2_x` with the
+  cdecl right-to-left stack layout and caller cleanup; WCC reports zero
+  warnings and WDIS confirms `push EBX; push EDX; call EAX; add ESP,8`.
+  Relinking resolves three more modules and raises coverage to 2,174
+  redirected functions (10,870 original-entry bytes; 572,932 arena bytes),
+  584/731 modules linked and 2,795 exclusions. This hybrid has not been
+  replayed; M1/M2 remain unpassed, with no current-artifact guest failure
+  yet available because the private Xvfb socket bind is denied.
