@@ -38,7 +38,7 @@
 
 - For a new GPT-6 Luna decompilation session, read
   `docs/handoffs/luna-hybrid-2026-11-06.md` and
-  `docs/decompilation-plan-rev2.md` first (they supersede
+  `docs/decompilation-plan-rev2.md` and `docs/decompilation-plan-rev3.md` first (they supersede
   `docs/handoffs/luna-decomp-2026-11-05.md`); the plan and
   original code remain authoritative.
 - Follow `docs/decompilation-plan.md`: read its "Ground rules" and

@@ -8,7 +8,8 @@ It is written to be executed step by step by an AI agent. **Read the whole
 
 > **Revision 2 (2026-11-06): see `docs/decompilation-plan-rev2.md`.** It
 > supersedes §1 rules 5/6/9, §4 and the §7 precondition: working hybrid build
-> first, bisection and bulk verification later.
+> first, bisection and bulk verification later. Revision 3
+> (`docs/decompilation-plan-rev3.md`) adds M0, mechanical Ghidra-to-C generation.
 
 Status markers used below: `[ ]` not started, `[~]` in progress, `[x]` done.
 Update them in this file as part of the commit that completes a step.
