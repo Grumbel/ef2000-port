@@ -99,10 +99,22 @@ void reinitialize_runtime_slots(void)
  * of an overlapping dword at 0x121ec6 + 2*DX select a 29-byte slot. */
 uint8_t read_runtime_slot_flag(int16_t subindex, int16_t group)
 {
+#if defined(__WATCOMC__)
+#pragma pack(push, 1)
+    struct unaligned_u32 { uint32_t value; };
+#pragma pack(pop)
+    uint32_t packed = ((const struct unaligned_u32 *)(uintptr_t)
+                       (0x00121ec6u + (uint32_t)(int32_t)group * 2u))->value;
+    int32_t base = (int32_t)packed >> 16;
+    int32_t index = base + subindex;
+    return *(const volatile uint8_t *)(uintptr_t)
+           (0x00121fb4u + (uint32_t)index * 29u);
+#else
     uint32_t packed = read32(0x00121ec6u + (uint32_t)(int32_t)group * 2u);
     int32_t base = (int32_t)packed >> 16;
     int32_t index = base + subindex;
     return read8(0x00121fb4u + (uint32_t)index * 29u);
+#endif
 }
 
 /* 0x121f0, 29 bytes. Guest dependency writes two scratch dwords;
