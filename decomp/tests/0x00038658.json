@@ -32,6 +32,162 @@
           "hex": "00102a00"
         }
       ]
+    },
+    {
+      "name": "signed_index_minus_one",
+      "registers": {
+        "eax": "0x0001ffff",
+        "ebx": "0x10203041",
+        "ecx": "0x55667789",
+        "edx": "0x00000000",
+        "esi": "0x89abccee",
+        "edi": "0xdead0001",
+        "ebp": "0x7654320f"
+      },
+      "memory": [
+        {
+          "address": "0x0019f5ac",
+          "hex": "cdab0031"
+        }
+      ]
+    },
+    {
+      "name": "signed_index_minus_two",
+      "registers": {
+        "eax": "0x0002fffe",
+        "ebx": "0x10203042",
+        "ecx": "0x5566778a",
+        "edx": "0x00000000",
+        "esi": "0x89abcfed",
+        "edi": "0xdead0002",
+        "ebp": "0x7654320e"
+      },
+      "memory": [
+        {
+          "address": "0x0019f5a8",
+          "hex": "98badcfe"
+        }
+      ]
+    },
+    {
+      "name": "index_zero",
+      "registers": {
+        "eax": "0x00030000",
+        "ebx": "0x10203043",
+        "ecx": "0x5566778b",
+        "edx": "0x00000000",
+        "esi": "0x89abceec",
+        "edi": "0xdead0003",
+        "ebp": "0x7654320d"
+      },
+      "memory": [
+        {
+          "address": "0x0019f5b0",
+          "hex": "05040302"
+        }
+      ]
+    },
+    {
+      "name": "index_one",
+      "registers": {
+        "eax": "0x00040001",
+        "ebx": "0x10203044",
+        "ecx": "0x5566778c",
+        "edx": "0x00000000",
+        "esi": "0x89abc9eb",
+        "edi": "0xdead0004",
+        "ebp": "0x7654320c"
+      },
+      "memory": [
+        {
+          "address": "0x0019f5b4",
+          "hex": "55667788"
+        }
+      ]
+    },
+    {
+      "name": "candidate_alternate_zero_falls_back",
+      "registers": {
+        "eax": "0x0005fffd",
+        "ebx": "0x10203045",
+        "ecx": "0x5566778d",
+        "edx": "0x002a1000",
+        "esi": "0x89abc8ea",
+        "edi": "0xdead0005",
+        "ebp": "0x7654320b"
+      },
+      "memory": [
+        {
+          "address": "0x0019f5a4",
+          "hex": "40302010"
+        },
+        {
+          "address": "0x002a1015",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "candidate_alternate_overrides_table",
+      "registers": {
+        "eax": "0x00060002",
+        "ebx": "0x10203046",
+        "ecx": "0x5566778e",
+        "edx": "0x002a2000",
+        "esi": "0x89abcbe9",
+        "edi": "0xdead0006",
+        "ebp": "0x7654320a"
+      },
+      "memory": [
+        {
+          "address": "0x0019f5b8",
+          "hex": "efbeadde"
+        },
+        {
+          "address": "0x002a2015",
+          "hex": "fecaa131"
+        }
+      ]
+    },
+    {
+      "name": "candidate_alternate_all_ones",
+      "registers": {
+        "eax": "0x00070001",
+        "ebx": "0x10203047",
+        "ecx": "0x5566778f",
+        "edx": "0x002a3000",
+        "esi": "0x89abcae8",
+        "edi": "0xdead0007",
+        "ebp": "0x76543209"
+      },
+      "memory": [
+        {
+          "address": "0x0019f5b4",
+          "hex": "44556677"
+        },
+        {
+          "address": "0x002a3015",
+          "hex": "ffffffff"
+        }
+      ]
+    },
+    {
+      "name": "minimum_signed_index",
+      "registers": {
+        "eax": "0x00088000",
+        "ebx": "0x10203048",
+        "ecx": "0x55667790",
+        "edx": "0x00000000",
+        "esi": "0x89abc5e7",
+        "edi": "0xdead0008",
+        "ebp": "0x76543208"
+      },
+      "memory": [
+        {
+          "address": "0x0017f5b0",
+          "hex": "a5a55a5a"
+        }
+      ]
     }
   ]
 }

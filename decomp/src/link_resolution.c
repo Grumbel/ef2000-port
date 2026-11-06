@@ -3,7 +3,15 @@
 
 #include "ef_abi.h"
 #include "ef_globals.h"
+#if defined(EF_DECOMP_HOST_TEST)
 #include "ef_guest_memory.h"
+#endif
+
+#if defined(EF_DECOMP_HOST_TEST)
+#define LINK_GUEST_MEMORY_PTR(address) ef_guest_memory_ptr(address)
+#else
+#define LINK_GUEST_MEMORY_PTR(address) ((void *)(uintptr_t)(address))
+#endif
 
 /* 0x38658, 0x1a bytes, two independent caller functions. EDX optionally
  * carries a candidate record with a 32-bit alternate at +0x15. The table
@@ -12,7 +20,7 @@ ef_addr32 resolve_link_pointer(int16_t index, ef_addr32 candidate)
 {
     if (candidate != 0) {
         const ef_link_candidate *entry =
-            (const ef_link_candidate *)ef_guest_memory_ptr(candidate);
+            (const ef_link_candidate *)LINK_GUEST_MEMORY_PTR(candidate);
         if (entry->alternate != 0) { return entry->alternate; }
     }
     return g_link_pointer_table[index];
@@ -24,8 +32,10 @@ ef_addr32 resolve_link_pointer(int16_t index, ef_addr32 candidate)
 ef_addr32 refresh_link_pointer(ef_addr32 reference)
 {
     ef_link_reference *record =
-        (ef_link_reference *)ef_guest_memory_ptr(reference);
+        (ef_link_reference *)LINK_GUEST_MEMORY_PTR(reference);
     ef_addr32 found = resolve_link_pointer(record->index, record->current);
     record->current = found;
     return found;
 }
+
+#undef LINK_GUEST_MEMORY_PTR

@@ -13,7 +13,7 @@ import tempfile
 import unittest
 
 from tools.flirt_match import OMFError
-from tools.omf_splice import inspection, plan_patch, read_module
+from tools.omf_splice import inspection, plan_patch, read_module, resolve_symbol
 
 
 def record(kind, payload):
@@ -59,6 +59,11 @@ def code(length=12):
 
 
 class OMFSplicerTests(unittest.TestCase):
+    def test_resolves_watcom_data_external_leading_underscore(self):
+        globals_ = [{'addr': '0x0019f5b0', 'name': 'g_link_pointer_table'}]
+        self.assertEqual(resolve_symbol('_g_link_pointer_table', [], globals_),
+                         0x0019f5b0)
+
     def test_inspect_tracks_code_data_externals_and_both_fixups(self):
         module = read_module(fixture(code()))
         report = inspection(module)
@@ -94,6 +99,17 @@ class OMFSplicerTests(unittest.TestCase):
         patch = plan_patch(module, bytes(128), functions, globals_, 0x100, {0x20})
         inline = bytes.fromhex(patch['writes'][0]['bytes'])
         self.assertEqual(int.from_bytes(inline[1:5], 'little'), 0x70 - (0x20 + 5))
+
+    def test_flat_group_absolute_external_data_offset(self):
+        module = read_module(fixture(code()))
+        module.groups = [None, {'name': 'DGROUP', 'segments': [2]},
+                         {'name': 'FLAT', 'segments': []}]
+        module.fixups[0] = replace(module.fixups[0], mode='segment',
+                                   frame_method=1, frame_index=2)
+        functions, globals_ = rows()
+        patch = plan_patch(module, bytes(128), functions, globals_, 0x100, {0x20})
+        inline = bytes.fromhex(patch['writes'][0]['bytes'])
+        self.assertEqual(int.from_bytes(inline[1:5], 'little'), 0x70)
 
     def test_arena_redirect_and_source_relative_fixup(self):
         module = read_module(fixture(code(40)))

@@ -388,3 +388,13 @@ The replay suite now accepts `--sound` (default remains `off`) so gated
 hardware-config paths can be exercised. Tracker totals: 3,234 `compiles`,
 15 `verified`, 3 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3
 `library`. See `docs/subsystems/decomp-batch-126.md`.
+
+**Batch-127 update (2026-11-06):** `resolve_link_pointer` (`0x38658`, 26
+bytes) is verified: the 23-byte OpenWatcom body fits in place; 10 isolated
+cases, one captured live cockpit call, and the repeated-baseline menu/setup/
+cockpit suite pass. It is hit 16 times in cockpit with matching selected
+BSS/frame/counters. The OMF splicer now handles leading-underscore Watcom
+data externals and absolute offsets framed against the zero-base FLAT group,
+with synthetic regression tests. Tracker totals: 3,233 `compiles`, 16
+`verified`, 3 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3
+`library`. See `docs/subsystems/decomp-batch-127.md`.

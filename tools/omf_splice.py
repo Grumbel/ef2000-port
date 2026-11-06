@@ -246,9 +246,15 @@ def parse_symbols(path, address_key='addr'):
 
 
 def resolve_symbol(symbol, functions, globals_):
-    # Watcom __cdecl exports gain a trailing underscore; only normalize if
-    # the normalized spelling resolves to exactly one canonical symbol.
-    spellings = (symbol, symbol[:-1]) if symbol.endswith('_') else (symbol,)
+    # Watcom C functions gain a trailing underscore and data externals gain a
+    # leading underscore. Normalize either decoration only when it resolves
+    # to exactly one canonical symbol.
+    spellings = {symbol}
+    if symbol.startswith('_'):
+        spellings.add(symbol[1:])
+    for spelling in tuple(spellings):
+        if spelling.endswith('_'):
+            spellings.add(spelling[:-1])
     matched = []
     for row in functions + globals_:
         if row['name'] in spellings and row['name']:
@@ -327,16 +333,15 @@ def plan_patch(module, image, functions, globals_, arena_base, reviewed):
             target = resolve_symbol(module.externs[fixup.target_index], functions, globals_)
         else:
             raise OMFError('unsupported group or explicit-frame target fixup')
-        # OpenWatcom frames USE32 external near calls against FLAT. For an
-        # inline splice, the guest code and external target both have known
-        # flat linear addresses, so the self-relative displacement is direct.
-        flat_self_relative = (
-            fixup.mode == 'self' and fixup.target_method == 2 and
+        # A FLAT frame has a proven zero base in this fixed image. It therefore
+        # supports both self-relative external calls and absolute external
+        # offsets; other frame-specific near offsets remain unsupported.
+        flat_group_frame = (
             fixup.frame_method == 1 and fixup.frame_index is not None and
             0 < fixup.frame_index < len(module.groups) and
             module.groups[fixup.frame_index]['name'].upper() == 'FLAT'
         )
-        if fixup.frame_method not in (4, 5) and not flat_self_relative:
+        if fixup.frame_method not in (4, 5) and not flat_group_frame:
             raise OMFError('frame-specific near offset relocation requires group-base proof')
         key = (fixup.segment, fixup.offset)
         if key in touched:
