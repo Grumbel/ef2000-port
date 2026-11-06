@@ -47,6 +47,11 @@ static void write16(ef_addr32 address, uint16_t value)
     write8(address + 1u, (uint8_t)(value >> 8));
 }
 
+#if defined(__WATCOMC__)
+static void encoder_timing_nop(void);
+#pragma aux encoder_timing_nop = 0x90 __modify []
+#endif
+
 /* 0x604, 36 bytes. Encode a byte pointer relative to the 0x120cc6
  * X-32 base as a segment:offset pair with a 16-bit segment and 4-bit offset. */
 uint32_t encode_runtime_segment_offset(ef_addr32 pointer)
@@ -62,6 +67,11 @@ uint32_t encode_runtime_segment_offset(ef_addr32 pointer)
     uint32_t delta = pointer - base;
     uint32_t encoded = delta & 0x0fu;
     encoded += ((delta >> 4) & 0xffffu) << 16;
+#if defined(__WATCOMC__)
+    /* The original EBX save/restore occupies two instruction slots. */
+    encoder_timing_nop();
+    encoder_timing_nop();
+#endif
     return encoded;
 }
 

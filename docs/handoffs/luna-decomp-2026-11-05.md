@@ -38,6 +38,15 @@ lower/upper menu→setup→cockpit suite also passes and hits both entries. The
 encoder stays `spliced`; an exact 36-byte assembly probe passes full-RAM
 replay, while the current C-generated body does not. See batch 107.
 
+**Batch-110 update (2026-11-06):** `encode_runtime_segment_offset` (`0x604`)
+is now the third `verified` OpenWatcom replacement. Two flag-neutral inline
+nops restore the original instruction count and remove the late replay state
+offset. Its 34-byte C body safely fits the 36-byte extent; 1,024 isolated
+cases, 3+2 full-RAM startup runs and the repeated menu/setup/cockpit suite all
+pass. The current tracker totals are 4,287 entries: 3,254 `compiles`, 247
+`drafted`, 111 `typed`/`named`, 669 `unknown`, 3 `library` and 3 `verified`;
+none remain `spliced`. See `docs/subsystems/decomp-batch-110.md`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -51,26 +60,28 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,257 | 363,763 |
+| `compiles` | 3,254 | 363,699 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
+| `verified` | 3 | 64 |
+| `spliced` | 0 | 0 |
 | **Total** | **4,287** | **908,947** |
 
-**At the Batch-104 baseline:** strictly verified/spliced OpenWatcom C
-replacements were zero. Batch 105 has since moved two candidates to
-`spliced`; neither has passed the complete replay gate, so there are still
-zero `verified` functions. The 669 unknown functions hold approximately 54%
-of inventoried code *bytes*, so entry counts exaggerate completion.
+**At the Batch-110 state:** three routines are strictly verified as
+OpenWatcom C replacements: the two ASCII case helpers and the segment
+encoder. The 669 unknown functions still hold approximately 54% of
+inventoried code *bytes*, so entry counts exaggerate completion.
 
 ## Read in this order, and do not reread the full 2,000-line progress log
 
 1. `AGENTS.md` (commits, ownership, licensing, asset restrictions).
 2. `docs/decompilation-plan.md` **§1, §2.2, §2.4, §4 and §11** (rules,
    correctness target, verification order and per-function loop).
-3. `docs/subsystems/decomp-batch-104.md` (latest actual experiment and exact
-   reproduction commands).
+3. `docs/subsystems/decomp-batch-110.md` (latest actual experiment and exact
+   verification evidence); consult batch 104 for its historical startup
+   survey and baseline experiments.
 4. `docs/decompilation-status-2026-11-05.md` (the quantitative gap; written
    after batch 097, counts remain current at batch 104).
 5. `docs/compiler-abi.md`, `docs/function-differential.md`,
@@ -107,9 +118,18 @@ over its inferred signatures. Never paste or commit generated pseudo-C.
   passed (one intentionally skipped). `nix flake check` could not be run on
   that host; rerun it on NixOS.
 
-## First assignment: earn one genuinely verified function
+## Next assignment: continue the per-function loop
 
-Work in one coherent batch; don't resume mass-drafting unknown functions.
+The first three OpenWatcom guest replacements now pass the strict §4 gate.
+Continue in bounded 1–5-function clusters, following the plan's work order;
+do not resume mass-drafting unknown functions. The next candidate reported
+by `python3 tools/decomp_status.py next --module runtime_indexed` is
+`read_runtime_slot_flag` at `0x121cc` (33 bytes). Start with its original
+disassembly, input/output/clobber analysis and at least two callers. Keep
+`copy_string_9d749` blocked pending EDX-liveness evidence and do not splice
+`step_generator_a45b3` until its placement/ABI is solved. Promote functions
+only after OpenWatcom compilation, safe splice, isolated differential and
+appropriate golden replay all pass.
 
 1. Confirm the clean ancestor chain and the private `_EF2000.EXE` SHA in
    `docs/executable.md`. Locate data/CD files on the owner's machine. Keep

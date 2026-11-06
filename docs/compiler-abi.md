@@ -26,17 +26,20 @@ exactly matches the original signed comparisons and subtraction. All three
 callers were inspected; 267 isolated cases, three original plus two patched
 full-64MiB main-menu runs, and the repeated menu/setup/cockpit suite pass.
 
-`encode_runtime_segment_offset` at `0x604` is compiled and OMF-spliced.
-OpenWatcom emits a 33-byte body with no external calls or relocations; the
-remaining three bytes of its 36-byte extent are safe padding after `RET`. The
-original's unaligned dword read is preserved with a packed 32-bit member. The
-C expression uses addition for the disjoint segment and offset fields, so the
-final arithmetic flags match the original `ADD`. Its 1,024-case isolated
+`encode_runtime_segment_offset` at `0x604` is now `verified`. OpenWatcom emits
+34 bytes of C body in the original 36-byte extent, with no external calls or
+relocations. The original's unaligned dword read is preserved with a packed
+32-bit member. The C expression uses addition for the disjoint segment and
+offset fields, so the final arithmetic flags match the original `ADD`. Two
+flag-neutral `#pragma aux` inline nops retain the original's 15-instruction
+count; the earlier 13-instruction C body let instruction-count-timed replays
+advance past the same guest events at a fixed budget. Its 1,024-case isolated
 differential passes with all EFLAGS checked and only the exact 8 bytes below
-incoming ESP treated as callee stack scratch. A 500M main-menu replay also
-matches status, selected guest RAM and framebuffer, with seven patch hits.
-The 20M full-RAM replay still differs in the active high-stack area; those
-bytes have not been proven dead, so the function remains `spliced`.
+incoming ESP treated as the function's stack scratch. Three original plus two
+patched 20M full-RAM startup runs match 67,108,828 of 67,108,864 bytes (the 36
+replacement bytes are excluded). Repeated original and patched menu, quick-
+fight setup and cockpit replays also match status, selected BSS and
+framebuffer, with seven encoder hits in every patched case. See batch 110.
 
 ## Object and world-grid control cluster (2026-11-03)
 

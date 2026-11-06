@@ -50,14 +50,14 @@ The host-side emulator remains the validation oracle. See
 
 Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
 confirmed additional entry points (4,287 tracked); 3,254 marked `compiles`,
-1 `spliced`, 247 additional host-tested `drafted` entry points, and 2
-`verified`. `to_lower_ascii` and `to_upper_ascii` are the first verified
-OpenWatcom OMF replacements: isolated differentials, deterministic full-RAM
-replays and repeated menu/setup/cockpit replays pass. Replay determinism
-requires the synthetic VGA retrace clock. `encode_runtime_segment_offset`
-remains spliced: its isolated differential uses an 8-byte below-ESP scratch
-allowance and its full-RAM startup replay still differs in high-stack state.
-See [batch 109](../docs/subsystems/decomp-batch-109.md).
+247 additional host-tested `drafted` entry points, and 3 `verified`.
+`to_lower_ascii`, `to_upper_ascii`, and `encode_runtime_segment_offset` are
+verified OpenWatcom OMF replacements: isolated differentials, deterministic
+full-RAM startup replays and repeated menu/setup/cockpit replays pass. The
+encoder uses two flag-neutral nops to retain the original instruction count;
+its only isolated memory difference is the 8-byte callee stack scratch below
+incoming ESP. Replay determinism requires the synthetic VGA retrace clock.
+See [batch 110](../docs/subsystems/decomp-batch-110.md).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),
 as well as [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)
