@@ -54,24 +54,22 @@ void fill_four_bytes_2233(ef_addr32 destination)
     EF_U8(destination + 3u) = 3;
 }
 
-/* 0xbc34f, 27 bytes. When 0xfa6d3(0) returns nonzero, run 0xbc287(EAX). */
-void run_if_available_bc34f(ef_addr32 argument)
+/* 0xbc34f, 27 bytes. Allocate a stream record and pass NAME (EAX), MODE
+ * (EDX), FLAGS (EBX), and the allocated record (ECX) to 0xbc287. */
+uint32_t run_if_available_bc34f(ef_addr32 name, ef_addr32 mode, uint32_t flags)
 {
-    if (guest_fn_fa6d3(0) != 0)
-        guest_fn_bc287(argument);
+    uint32_t stream;
+
+    stream = guest_fn_fa6d3(0);
+    if (stream != 0)
+        stream = guest_fn_bc287(name, mode, flags, stream);
+    return stream;
 }
 
 /* 0xbc36a, 10 bytes. Run 0xbc34f with EBX preserved as zero. */
-void run_if_available_bc36a(ef_addr32 argument)
+uint32_t run_if_available_bc36a(ef_addr32 name, ef_addr32 mode)
 {
-    __asm {
-        push ebx
-        xor ebx, ebx
-    }
-    run_if_available_bc34f(argument);
-    __asm {
-        pop ebx
-    }
+    return run_if_available_bc34f(name, mode, 0);
 }
 
 /* 0xbc465, 12 bytes. Digit character for a value: +0x30, then +0x27 past '9'. */

@@ -322,3 +322,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   latest full link patches 1,984 entries (9,920 bytes), links 559/726 modules,
   and uses a 571,620-byte arena. M0 remains 391/1,021 exports (38.3%,
   114,873/544,304 bytes); M1 is unpassed.
+- M3 list-stream wrapper ABI correction, 2026-11-06: rebuilt
+  `list_lookup.c` with the pinned OpenWatcom 2.0 compiler (zero warnings or
+  errors) and confirmed in WDIS that `0xbc34f` allocates the stream in EAX,
+  passes NAME/MODE/FLAGS/STREAM in EAX/EDX/EBX/ECX to `0xbc287`, and returns
+  its EAX result. `0xbc36a` saves EBX, passes zero for FLAGS, and restores EBX,
+  matching the original disassembly. The fresh whole-image link contains
+  1,984 redirects (9,920 original-entry bytes; 571,540 arena bytes; 559/726
+  modules). Its replay no longer exits at `0x222` with `datfile: not enuff
+  memory`; it now reaches a later invalid stack write at `IP=0x22`,
+  `ESP=0x401c791`, tick 172 (zero IRQs), versus the original 100M checkpoint.
+  M1 remains unpassed; the next failure is stack/control-flow corruption. M0
+  remains 391/1,021 exports (38.3%, 114,873/544,304 bytes).
