@@ -375,3 +375,13 @@ model offered by an account or Codex client. For unusual ABI, x87, indirect
 control-flow or linker analysis, raise effort to **high** for the targeted
 session; return to medium after. Sandbox and approval controls intentionally
 remain user-owned.
+
+**Batch-126 update (2026-11-06):** `set_control_mode_b` (`0x810d0`, 25
+bytes) is verified: 37 isolated cases, two captured original cockpit calls,
+and repeated-baseline menu/setup/cockpit replay pass; the candidate is hit
+once in cockpit with matching selected state and execution counters.
+`set_control_mode_c` (`0x810f4`) passes 37 isolated cases and compiles/splices,
+but the deterministic suite reaches it zero times. Keep it `spliced` pending
+a caller path that exercises its gate. Current tracker totals: 3,234
+`compiles`, 14 `verified`, 4 `spliced`, 5 `blocked`, 247 `drafted`, 669
+`unknown`, and 3 `library`. See `docs/subsystems/decomp-batch-126.md`.
