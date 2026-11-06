@@ -88,8 +88,9 @@ hand-written, 400 mechanical), 12,215 entry bytes, 582,532 arena bytes, and
 The previous 2,433-redirect image, after excluding its linked
 `original_memcpy` candidate, faults at guest IP `0x4` on tick 469. The
 focused image has not been tested through the cockpit, and M1/M2 remain
-unpassed. A private Xvfb replay is currently blocked because Xvfb rejects the
-non-root owner of `/tmp/.X11-unix`. See the latest replay and compiler evidence in
+unpassed. A private Xvfb replay is currently blocked: even with a private
+mount namespace providing a root-owned `/tmp/.X11-unix`, Xvfb cannot bind its
+local/unix listeners. See the latest replay and compiler evidence in
 [`decomp-log.md`](../docs/subsystems/decomp-log.md).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),

@@ -582,3 +582,9 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   create its socket. The focused two-function main-menu/quick-fight-setup
   replay remains the highest replayed hybrid slice; formal M1/M2 are not
   passed.
+- Xvfb isolation probe, 2026-11-07: a user+mount namespace can overlay a
+  root-owned private tmpfs at `/tmp/.X11-unix` without changing the host
+  directory, but Xvfb still fails to bind its `local` and `unix` listeners
+  inside that namespace. `strace` is also denied ptrace by the environment,
+  so the bind errno is unavailable. No replay of the new 2,443-entry image
+  was attempted without a functioning private display.
