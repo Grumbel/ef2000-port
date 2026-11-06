@@ -406,3 +406,12 @@ passes with eight hits (the helper `resolve_link_pointer` is hit 16 times).
 Selected BSS, framebuffer and execution counters match. Tracker totals:
 3,232 `compiles`, 17 `verified`, 3 `spliced`, 5 `blocked`, 247 `drafted`, 669
 `unknown`, and 3 `library`. See `docs/subsystems/decomp-batch-128.md`.
+
+**Batch-129 update (2026-11-06):** `field_10dfe0` (`0x10dfe0`, 12 bytes)
+compiles cleanly with OpenWatcom and splices in place. Five isolated cases
+pass. It remains `spliced`: the captured live caller state sets
+`g_runtime_segment_base` to `0x05000000`, outside the runner's 64 MiB map, so
+the original function faults at `0x10dfe5` in the captured differential and
+cannot yet pass replay verification. See `docs/subsystems/decomp-batch-129.md`.
+Current tracker: 3,231 `compiles`, 17 `verified`, 4 `spliced`, 5 `blocked`,
+247 `drafted`, 669 `unknown`, and 3 `library`.

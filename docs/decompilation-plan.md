@@ -2093,6 +2093,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-06  3.24  Verified paired setters `set_control_mode_b/c` (`0x810d0`/`0x810f4`): 37 isolated cases each; B passes two captured calls and C one sound-DMA captured call; repeated-baseline cockpit replays hit B and C and match selected BSS/frame/counters. The three-case `--sound off` suite passes 3/3. See docs/subsystems/decomp-batch-126.md.
 2026-11-06  3.25  Verified `resolve_link_pointer` (`0x38658`): 10 isolated cases and one captured cockpit call pass; repeated-baseline menu/setup/cockpit replay hits the replacement 16 times and matches selected BSS, framebuffer and execution counters. Added bounded OMF resolution for Watcom's leading-underscore data externals and proven-zero-base FLAT absolute offsets. See docs/subsystems/decomp-batch-127.md.
 2026-11-06  3.26  Verified `refresh_link_pointer` (`0x3856c`): two isolated cases and one captured call from `0x381a0` pass; repeated-baseline menu/setup/cockpit replay reaches it eight times, reaches its verified resolver 16 times, and matches selected BSS/frame/counters. See docs/subsystems/decomp-batch-128.md.
+2026-11-06  3.27  `field_10dfe0` (`0x10dfe0`, 12 bytes) compiles warning-free and splices; five isolated cases pass. Keep it `spliced`: its live capture points to `0x05000000`, outside the runner's 64 MiB guest mapping, and captured differential faults on the original read at `0x10dfe5`. See docs/subsystems/decomp-batch-129.md.
 ```
 
 ---

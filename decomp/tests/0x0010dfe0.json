@@ -92,7 +92,7 @@
       ]
     },
     {
-      "name": "near_ram_end",
+      "name": "distant_base",
       "registers": {
         "eax": "0xdea8bbea",
         "ebx": "0x10253545",
