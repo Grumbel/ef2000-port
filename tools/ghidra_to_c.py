@@ -42,7 +42,11 @@ GLOBALS = ROOT / 'decomp/symbols/globals.tsv'
 FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-fp3', '-ob', '-ot', '-s', '-za99', '-w1')
 
 TYPES = [
-    (r'\bundefined8\b', 'uint64_t'), (r'\bundefined4\b', 'uint32_t'),
+    # Ghidra uses undefined6/uint6 for values returned in EDX:EAX where only
+    # the low 16 bits of EDX are significant.  uint64_t is the compiler's
+    # available carrier; casts and consumers select the observed 48-bit parts.
+    (r'\bundefined8\b', 'uint64_t'), (r'\bundefined6\b', 'uint64_t'),
+    (r'\buint6\b', 'uint64_t'), (r'\bundefined4\b', 'uint32_t'),
     (r'\bundefined3\b', 'uint32_t'), (r'\bundefined2\b', 'uint16_t'),
     (r'\bundefined1\b', 'uint8_t'), (r'\bundefined\b', 'uint8_t'),
     (r'\bulonglong\b', 'uint64_t'), (r'\blonglong\b', 'int64_t'),
@@ -65,6 +69,27 @@ DEF = re.compile(r'^(?P<ret>[A-Za-z_][\w\s\*]*?)\s*\b(?P<name>\w+)\((?P<params>[
 def read_tsv(path):
     with open(path, newline='') as handle:
         return list(csv.DictReader(handle, delimiter='\t'))
+
+
+def manual_cause(token):
+    """Group an unsupported Ghidra token into a reportable manual cause."""
+    if token == 'swi':
+        return 'software interrupt'
+    if token.startswith('in_'):
+        return 'register live-in'
+    if token.startswith('unaff_'):
+        return 'unpreserved register'
+    if token.startswith('extraout_'):
+        return 'extra return register'
+    if token.startswith(('SUB', 'ZEXT', 'SEXT')):
+        return 'bitfield/extract operation'
+    if token.startswith(('CARRY', 'SBORROW')):
+        return 'flag arithmetic'
+    if token.startswith('halt_') or token == '__halt':
+        return 'unimplemented control flow'
+    if token in ('WARNING', 'bad_instruction'):
+        return 'unsupported instruction/decompiler warning'
+    return 'unsupported construct'
 
 
 def normalize_type(ctype):
@@ -197,7 +222,7 @@ def convert(text, entry, names, sig_in=None, globals_=None):
                 # register. A write cannot be represented by an input-only
                 # ABI parameter, so leave that function for manual handling.
                 if re.search(r'\b' + name + r'\s*(?:=|\+\+|--|\+=|-=)', body):
-                    flags.add('manual')
+                    flags.add('manual: write to live-in register ' + name)
                 declaration = re.search(
                     r'(?m)^\s*([A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*)\s*(\*+)?\s*' +
                     re.escape(name) + r'\s*;\s*$', body)
@@ -227,7 +252,7 @@ def convert(text, entry, names, sig_in=None, globals_=None):
         width = int(match.group('width'))
         ctype = field_types.get(width)
         if not ctype:
-            flags.add('manual')
+            flags.add('manual: unsupported %d-byte subfield' % width)
             return match.group(0)
         address = None
         if base.startswith(('DAT_', '_DAT_', 'PTR_')):
@@ -282,8 +307,8 @@ def convert(text, entry, names, sig_in=None, globals_=None):
                 return 'EF_U32(0x%08xu)' % address
             return replacement
         body = token.sub(pointer_read, body)
-    if MANUAL.search(body):
-        flags.add('manual')
+    for token in {match.group(0) for match in MANUAL.finditer(body)}:
+        flags.add('manual: ' + manual_cause(token))
     # Ghidra's CONCATxy(a, b) joins x bytes from a and y bytes from b.
     # Keep the operation unsigned and wide while shifting, then narrow to the
     # width Ghidra assigns to the combined value. Values wider than 64 bits
@@ -291,7 +316,7 @@ def convert(text, entry, names, sig_in=None, globals_=None):
     def concat_repl(match):
         high_bytes, low_bytes = map(int, match.groups())
         if high_bytes + low_bytes > 8:
-            flags.add('manual')
+            flags.add('manual: CONCAT wider than 8 bytes')
             return match.group(0)
         return 'EF_CONCAT_%d_%d(' % (high_bytes, low_bytes)
     body = re.sub(r'\bCONCAT([1-8])([1-8])\s*\(', concat_repl, body)
@@ -348,7 +373,7 @@ def convert(text, entry, names, sig_in=None, globals_=None):
     first = next((line for line in body.split('\n') if line.strip()), '')
     match = DEF.match(first)
     if not match:
-        flags.add('manual')
+        flags.add('manual: no function definition recognized')
         return None, body, flags, inferred
     ret = ' '.join(match.group('ret').split()) or 'int'
     params = match.group('params').strip() or 'void'
@@ -465,7 +490,8 @@ def main():
             labels = sorted(set(re.findall(r'\blab_[0-9a-f]{8}\b', body)))
             (args.out / 'src' / ('ef_fn_%08x.c' % entry)).write_text(
                 PREAMBLE + '\n' + sig + '\n' + body + '\n')
-        report.append([row['entry'], row['name'], row['body_bytes'], state, ''])
+        report.append([row['entry'], row['name'], row['body_bytes'], state,
+                       '; '.join(sorted(flags)) if state == 'manual' else ''])
         count += 1
     (args.out / 'ef_gen_abi.h').write_text(
         '/* Generated; derived from Ghidra output. NEVER COMMIT. */\n'

@@ -357,3 +357,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   a concrete candidate explanation, not a replay confirmation. Prepared an
   ignored trace manifest for `0xf8600`, `0xf9448`, `0xf8b14`, `0xf8624` and
   the relevant slot helpers; rerun it when private Xvfb is available.
+- M0 `undefined6` carrier rule, 2026-11-06: mapped Ghidra's `undefined6`
+  and `uint6` value forms to a 64-bit C carrier. The four affected generated
+  bodies consume the returned value as EDX:EAX, explicitly selecting the low
+  16 bits of EDX where needed. The pinned OpenWatcom compile pass increased
+  from 390 to 393 `ok` functions (115,359/543,917 bytes, 21.2% of exported
+  body bytes); 594 remain `manual` and 33 remain `compile-error`. This is
+  compile acceptance only, not behavioral verification. The menu validator
+  replacement still awaits private-Xvfb replay; M1/M2 remain unpassed.
