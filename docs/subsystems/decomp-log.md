@@ -18,3 +18,7 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   rerun advanced past the shared-header stack-name errors, but remains 0/287
   (0/66,726 bytes): the next shared-header error is unsupported `float10` at
   generated ABI declaration `0x00028b80`.
+- M0 rule 2, `float10`, 2026-11-06: Ghidra `float10` now maps to OpenWatcom
+  `long double`, preserving the x87 extended type. The rerun advanced past
+  that declaration; the report remains 0/287 (0/66,726 bytes), now blocked by
+  the unconverted Ghidra `dword` type at `0x000b3084`.

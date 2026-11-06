@@ -45,6 +45,7 @@ TYPES = [
     (r'\bundefined3\b', 'uint32_t'), (r'\bundefined2\b', 'uint16_t'),
     (r'\bundefined1\b', 'uint8_t'), (r'\bundefined\b', 'uint8_t'),
     (r'\bulonglong\b', 'uint64_t'), (r'\blonglong\b', 'int64_t'),
+    (r'\bfloat10\b', 'long double'),
     (r'\bushort\b', 'uint16_t'), (r'\buint\b', 'uint32_t'),
     (r'\bulong\b', 'uint32_t'), (r'\bbyte\b', 'uint8_t'),
     (r'\bbool\b', 'int'), (r'\bint3\b', 'int32_t'), (r'\bint5\b', 'int32_t'),
