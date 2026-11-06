@@ -467,3 +467,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   evidence, not a successful menu replay. Both local Unix and TCP Xvfb
   listeners fail in the sandbox, so M1/M2 remain unpassed and the first guest
   failure is unknown.
+- M0 / hybrid `ROUND`, 2026-11-06: declared Ghidra's `ROUND` as a `double`
+  input/output operation in the generated ABI header, avoiding Watcom's
+  implicit int-returning call. The regenerated `0x1cd8` object now calls
+  `ROUND_`, then `__CHP` and `fistp`, matching the separate floating-point
+  rounding and integer-truncation operations. Added an OMF `ROUND_` bridge
+  implementing nearest-integral rounding with halfway values away from zero
+  while preserving the x87 control word. Existing translator tests pass; the
+  full compiler pass remains 395/1,020 ok (117,666/543,917 bytes, 21.6%). The
+  hybrid grows to 2,325 redirects (11,625 entry bytes; 575,860 arena bytes),
+  655/738 modules, with 377 mechanical and 1,948 hand-written functions
+  patched; exclusions fall to 2,497. This is compile/link evidence only; no
+  private Xvfb listener can start in the sandbox, so M1/M2 remain unpassed
+  and the first guest failure is unknown.

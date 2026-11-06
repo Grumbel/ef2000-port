@@ -502,6 +502,9 @@ def main():
     (args.out / 'ef_gen_abi.h').write_text(
         '/* Generated; derived from Ghidra output. NEVER COMMIT. */\n'
         '#include "ef_types.h"\n'
+        # Ghidra FLOAT_ROUND is a floating-point operation, not an implicit
+        # C int-returning call.  ROUND_ is supplied by the hybrid runtime.
+        'double ROUND(double);\n'
         # Ghidra uses ``code *`` for heterogeneous callbacks.  An unspecified
         # argument list keeps its varied call sites compilable; int models a
         # common EAX return while still allowing callers to ignore it.
