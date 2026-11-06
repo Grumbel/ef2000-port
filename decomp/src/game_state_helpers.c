@@ -287,6 +287,18 @@ uint8_t has_free_entry_117d4(void)
 /* 0x12ec8, 80 bytes. Mirror byte 0x123790 with the flag at 0x121fb4 + 29*index. */
 void sync_flag_12ec8(void)
 {
+#if defined(__WATCOMC__)
+    int32_t index = *(volatile const int32_t *)(uintptr_t)0x0012287eu >> 16;
+    volatile uint8_t *record = (volatile uint8_t *)(uintptr_t)
+        (0x00121fb4u + (uint32_t)index * 29u);
+    volatile uint8_t *mirror = (volatile uint8_t *)(uintptr_t)0x00123790u;
+    if (*(volatile const uint8_t *)(uintptr_t)0x00122882u == 0) {
+        *mirror = *record;
+    } else {
+        *mirror = 1;
+        *record = 1;
+    }
+#else
     int32_t index = EF_S32(0x0012287eu) >> 16;
     uint32_t address = 0x00121fb4u + (uint32_t)index * 29u;
     if (EF_U8(0x00122882u) == 0) {
@@ -295,6 +307,7 @@ void sync_flag_12ec8(void)
         EF_U8(0x00123790u) = 1;
         EF_U8(address) = 1;
     }
+#endif
 }
 
 /* 0x169b4, 79 bytes. */

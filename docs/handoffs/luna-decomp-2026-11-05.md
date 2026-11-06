@@ -119,6 +119,19 @@ The causal path remains unresolved; see
 3,247 `compiles`, 6 `verified`, 2 `spliced`, 2 `blocked`, 247 `drafted`,
 669 `unknown`, and 3 `library`.
 
+
+**Batch-118 update (2026-11-06):** `sync_flag_12ec8` (`0x12ec8`, 80
+bytes) is the seventh strictly verified OpenWatcom replacement. Its 52-byte
+production body matches the fixture; five isolated cases and one captured
+callback differential pass. The repeated-baseline menu/setup/cockpit suite
+passes with one cockpit hit and matching selected BSS/framebuffer and
+execution counters. `reinitialize_runtime_slots` (`0x12160`) is now blocked:
+49 of 54 callback slots are populated in the live capture, its current Watcom
+body is 124 bytes for an 84-byte extent, and callback/helper ABI symbols are
+unresolved for OMF splicing. See `docs/subsystems/decomp-batch-118.md`.
+Current tracker: 3,245 `compiles`, 7 `verified`, 2 `spliced`, 3 `blocked`,
+247 `drafted`, 669 `unknown`, and 3 `library`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -132,14 +145,14 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,247 | 363,389 |
+| `compiles` | 3,245 | 363,225 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
-| `verified` | 6 | 189 |
+| `verified` | 7 | 269 |
 | `spliced` | 2 | 80 |
-| `blocked` | 2 | 105 |
+| `blocked` | 3 | 189 |
 | **Total** | **4,287** | **908,947** |
 
 **At the Batch-112 state:** five routines are strictly verified as
