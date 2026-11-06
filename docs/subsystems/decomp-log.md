@@ -480,3 +480,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   patched; exclusions fall to 2,497. This is compile/link evidence only; no
   private Xvfb listener can start in the sandbox, so M1/M2 remain unpassed
   and the first guest failure is unknown.
+- Hybrid OpenWatcom unsigned-64-to-double bridge, 2026-11-06: added
+  `__U8FD7` for input EDX:EAX and double result EDX:EAX. The implementation
+  forms both unsigned 32-bit halves in x87 extended precision, restores the
+  caller's x87 control word, and stores the final double once. WDIS confirms
+  the OMF body and data relocations; relinking resolves ten dependent modules
+  and grows to 2,334 redirects (11,670 entry bytes; 575,972 arena bytes),
+  665/739 modules, 386 mechanical and 1,948 hand-written functions patched;
+  exclusions fall to 2,479. Runtime replay remains unavailable because Xvfb
+  cannot bind, so M1/M2 remain unpassed and the first guest failure is
+  unknown.
