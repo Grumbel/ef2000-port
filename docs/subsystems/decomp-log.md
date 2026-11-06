@@ -76,3 +76,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   all 1,022 unrecovered functions this is 14.1% by count and 5.1% by bytes.
   The remaining 138 compile errors are led by parameter-count conflicts 68
   and pointer-type errors 45; the rest are smaller independent classes.
+- M0 rule 9, unspecified unconfirmed call prototypes, 2026-11-06: Ghidra
+  sometimes emits different argument counts for calls to the same function.
+  Shared declarations for functions without confirmed signatures now use an
+  unspecified C argument list; their generated definitions retain the
+  decompiler's concrete parameters, and confirmed declarations remain strict.
+  The OpenWatcom report rises to 189/282 ok (67.0%, 37,460/65,950 bytes =
+  56.8%). Across all unrecovered functions this is 18.5% by count and 6.9% by
+  bytes. The remaining 93 compile errors are led by guest-pointer expressions
+  45 and parameter-count conflicts 23. This relaxes compile-time call checking;
+  it provides no ABI verification and those calls still require hybrid replay.
