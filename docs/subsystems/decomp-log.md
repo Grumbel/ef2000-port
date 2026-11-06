@@ -197,6 +197,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   fall from 45 to 42 (20,829 bytes); 594 functions (410,411 bytes) remain
   manual. The pointer-slot interpretation comes from Ghidra naming and use,
   and is not runtime verified.
+- M0 rule 18, inferred register pointer types, 2026-11-06: retain Ghidra's
+  declared pointee type for inferred `in_EAX`/other live-in registers, while
+  keeping the same 32-bit register parameter ABI. This fixes dereferences
+  emitted as `*in_EAX` without a cast. OpenWatcom reports 389/1,022 ok
+  functions (38.1%, 114,296/544,429 bytes = 21.0%), up from 386/1,022
+  (37.8%, 113,189/544,429 bytes = 20.8%). Compile errors fall from 42 to
+  39 (19,722 bytes); 594 functions (410,411 bytes) remain manual. These
+  register parameter types are Ghidra-derived, not verified against callers.
 - M1 replay after M0 rule 17, 2026-11-06: the whole-set linker redirects
   1,978 entries (9,890 original-image bytes) and places 569,028 bytes in
   the guest arena; 556/721 modules link (316 mechanical and 1,661 hand-written

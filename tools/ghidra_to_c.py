@@ -189,6 +189,7 @@ def convert(text, entry, names, sig_in=None, globals_=None):
                'ECX': 'ecx', 'CX': 'ecx', 'CL': 'ecx', 'CH': 'ecx'}
         cast = {'E': 'uint32_t', 'X': 'uint16_t', 'L': 'uint8_t', 'H': 'uint8_t'}
         used = []
+        inferred_types = {}
         for reg, base in fam.items():
             name = 'in_' + reg
             if re.search(r'\b' + name + r'\b', body):
@@ -197,6 +198,13 @@ def convert(text, entry, names, sig_in=None, globals_=None):
                 # ABI parameter, so leave that function for manual handling.
                 if re.search(r'\b' + name + r'\s*(?:=|\+\+|--|\+=|-=)', body):
                     flags.add('manual')
+                declaration = re.search(
+                    r'(?m)^\s*([A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*)\s*(\*+)?\s*' +
+                    re.escape(name) + r'\s*;\s*$', body)
+                if declaration:
+                    declared_type = normalize_type(declaration.group(1)).strip()
+                    pointer_stars = declaration.group(2) or ''
+                    inferred_types[base] = (declared_type + ' ' + pointer_stars).strip()
                 body = re.sub(r'^\s*[A-Za-z_]\w*(?:\s+|\s*\*)+%s\s*;\s*$' % name,
                               '', body, flags=re.MULTILINE)
                 body = re.sub(r'\b' + name + r'\b',
@@ -206,7 +214,7 @@ def convert(text, entry, names, sig_in=None, globals_=None):
                     used.append(base)
         order = ['eax', 'edx', 'ebx', 'ecx']
         for base in sorted(used, key=order.index):
-            extra.append('uint32_t r_' + base)
+            extra.append(inferred_types.get(base, 'uint32_t') + ' r_' + base)
             inferred.append(base)
     # Materialise Ghidra's byte-offset field notation as an lvalue over the
     # original storage. This preserves overlapping local/register fragments
