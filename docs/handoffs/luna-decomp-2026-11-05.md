@@ -177,6 +177,15 @@ repeated-baseline menu/setup/cockpit suite passes and reaches the candidate
 tracker: 3,239 `compiles`, 10 `verified`, 3 `spliced`, 5 `blocked`, 247
 `drafted`, 669 `unknown`, and 3 `library`.
 
+**Batch-123 update (2026-11-06):** `initialize_mode_limits` (`0x58d24`, 29
+bytes) is now the eleventh strictly verified OpenWatcom replacement. The
+body preserves the original two word writes' order and instruction positions
+while retaining all registers and flags; 37 isolated cases and one captured
+cockpit call pass. The repeated-baseline menu/setup/cockpit suite passes with
+one cockpit hit. See `docs/subsystems/decomp-batch-123.md`. Current tracker:
+3,238 `compiles`, 11 `verified`, 3 `spliced`, 5 `blocked`, 247 `drafted`,
+669 `unknown`, and 3 `library`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -190,12 +199,12 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,239 | 363,115 |
+| `compiles` | 3,238 | 363,086 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
-| `verified` | 10 | 297 |
+| `verified` | 11 | 326 |
 | `spliced` | 3 | 107 |
 | `blocked` | 5 | 244 |
 | **Total** | **4,287** | **908,947** |
@@ -211,7 +220,7 @@ completion.
 1. `AGENTS.md` (commits, ownership, licensing, asset restrictions).
 2. `docs/decompilation-plan.md` **§1, §2.2, §2.4, §4 and §11** (rules,
    correctness target, verification order and per-function loop).
-3. `docs/subsystems/decomp-batch-122.md` (latest actual experiment and exact
+3. `docs/subsystems/decomp-batch-123.md` (latest actual experiment and exact
    verification evidence); consult batch 104 for its historical startup
    survey and baseline experiments.
 4. `docs/decompilation-status-2026-11-05.md` (the quantitative gap; written

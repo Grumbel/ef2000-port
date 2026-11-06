@@ -35,11 +35,32 @@ void set_runtime_phase_five(void)
 #endif
 }
 
-/* 0x58d24, 0x1d bytes, two caller functions. Both limits are words. */
+/* 0x58d24, 0x1d bytes, verified: differential+replay. Both limits are words. */
+#if defined(__WATCOMC__)
+#pragma aux mode_limit_timing_nop = 0x90 __modify []
+static void mode_limit_timing_nop(void);
+#pragma aux write_first_mode_limit = \
+    0x66 0xc7 0x05 0xe2 0x6c 0x1a 0x00 0x08 0x00 __modify []
+static void write_first_mode_limit(void);
+#pragma aux write_second_mode_limit = \
+    0x66 0xc7 0x05 0xe8 0x6c 0x1a 0x00 0x0a 0x00 __modify []
+static void write_second_mode_limit(void);
+#endif
 void initialize_mode_limits(void)
 {
+#if defined(__WATCOMC__)
+    mode_limit_timing_nop();
+    mode_limit_timing_nop();
+    mode_limit_timing_nop();
+    mode_limit_timing_nop();
+    write_first_mode_limit();
+    write_second_mode_limit();
+    mode_limit_timing_nop();
+    mode_limit_timing_nop();
+#else
     g_mode_limit_first = 8;
     g_mode_limit_second = 10;
+#endif
 }
 
 /* 0x5e658, 0x0c bytes, verified: captured call+replay. Four call sites. */

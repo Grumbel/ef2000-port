@@ -1105,7 +1105,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00058714	610			unknown	unclassified	unverified		
 0x000589c0	741			unknown	unclassified	unverified		
 0x00058d04	29	set_mode_limits_4_5	marker_packets	compiles	game	confirmed	decomp/tests/0x00058d04.json	docs/compiler-abi.md; Words 0x1a6ce2=4 and 0x1a6ce8=5; sole direct caller 597d8@5986c,597d8@598b5; guest pending
-0x00058d24	29	initialize_mode_limits	runtime_control	compiles	game	confirmed	decomp/tests/0x00058d24.json	docs/compiler-abi.md; Literal 8/10 stored to words 0x1a6ce2/0x1a6ce8; original guest replacement unverified
+0x00058d24	29	initialize_mode_limits	runtime_control	verified	game	confirmed	decomp/tests/0x00058d24.json	OpenWatcom stores match original; 37 isolated + 1 captured call pass; 9-instruction cadence retained; repeated replay passes with one cockpit hit
 0x00058d44	29	set_mode_limits_8_10	marker_packets	compiles	game	confirmed	decomp/tests/0x00058d44.json	docs/compiler-abi.md; Words 0x1a6ce2=8 and 0x1a6ce8=10; sole direct caller 597d8@59895; guest pending
 0x00058d64	437			unknown	unclassified	unverified		
 0x00059334	234	draw_status_overlay_59334	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00059334.json	docs/compiler-abi.md; Status overlay: unless word 0x126516 is set, latch the full screen (0xcdf48 with 0..width-1, 0..height-1), print the dwo; callers none direct; guest pending

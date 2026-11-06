@@ -1,33 +1,819 @@
 {
   "address": "0x00058d24",
   "function_size": 29,
-  "max_instructions": 180000,
+  "max_instructions": 1000,
   "cases": [
     {
-      "name": "empty_words",
-      "registers": {},
+      "name": "random_00",
+      "registers": {
+        "eax": "0xec6bb9aa",
+        "ebx": "0xf8f6fcf8",
+        "ecx": "0x8a8f98fe",
+        "edx": "0xb4627122",
+        "esi": "0xd2275bd1",
+        "edi": "0x21bb2f6a",
+        "ebp": "0xad9e683f"
+      },
       "memory": [
         {
-          "address": "0x001a6ce2",
-          "hex": "0000"
+          "address": "0x001a6ce0",
+          "hex": "656f7598ef08"
         },
         {
-          "address": "0x001a6ce8",
-          "hex": "0000"
+          "address": "0x001a6ce7",
+          "hex": "640f432a4277"
         }
       ]
     },
     {
-      "name": "existing_limits",
-      "registers": {},
+      "name": "random_01",
+      "registers": {
+        "eax": "0xbe0c906d",
+        "ebx": "0xd530be9f",
+        "ecx": "0xe4b39f34",
+        "edx": "0xe1f5bd12",
+        "esi": "0xacacd028",
+        "edi": "0x5f41207d",
+        "ebp": "0x83c9cba1"
+      },
       "memory": [
         {
-          "address": "0x001a6ce2",
-          "hex": "f4ff"
+          "address": "0x001a6ce0",
+          "hex": "ac2608410530"
         },
         {
-          "address": "0x001a6ce8",
-          "hex": "2c01"
+          "address": "0x001a6ce7",
+          "hex": "985b6597293c"
+        }
+      ]
+    },
+    {
+      "name": "random_02",
+      "registers": {
+        "eax": "0x7103dc91",
+        "ebx": "0x2ae4edae",
+        "ecx": "0xb870fc27",
+        "edx": "0x47a1fd7d",
+        "esi": "0xe65e3dd2",
+        "edi": "0xead8a4dd",
+        "ebp": "0xcd57df3c"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "956b4901337b"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "9134c9800369"
+        }
+      ]
+    },
+    {
+      "name": "random_03",
+      "registers": {
+        "eax": "0x9d58b1b5",
+        "ebx": "0x209f32a7",
+        "ecx": "0xb55b9fdc",
+        "edx": "0x1099890f",
+        "esi": "0x3d2484f6",
+        "edi": "0x02077def",
+        "ebp": "0xd159f07d"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "5d37297273c0"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "8fda010c2f10"
+        }
+      ]
+    },
+    {
+      "name": "random_04",
+      "registers": {
+        "eax": "0x3e97f3e6",
+        "ebx": "0x289a3655",
+        "ecx": "0x91d23821",
+        "edx": "0xd5c157d9",
+        "esi": "0x6f21e7e7",
+        "edi": "0x8342cea4",
+        "ebp": "0x35bf8af7"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "c2089a573307"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "e17e60d3ae7f"
+        }
+      ]
+    },
+    {
+      "name": "random_05",
+      "registers": {
+        "eax": "0x2423e942",
+        "ebx": "0x242d7a5e",
+        "ecx": "0x09f1be5c",
+        "edx": "0x54b1da12",
+        "esi": "0xa41ee8a1",
+        "edi": "0xfb4988a7",
+        "ebp": "0x7dbeb1f3"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "84b6b20d7d4d"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "faa8f8a55d1d"
+        }
+      ]
+    },
+    {
+      "name": "random_06",
+      "registers": {
+        "eax": "0xd913be90",
+        "ebx": "0x1f95bafa",
+        "ecx": "0x96c0d265",
+        "edx": "0xfb7fe6fc",
+        "esi": "0xdc03a801",
+        "edi": "0xc8cbd611",
+        "ebp": "0x11457727"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "8d629c1b7369"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "f9abf2e1ab27"
+        }
+      ]
+    },
+    {
+      "name": "random_07",
+      "registers": {
+        "eax": "0x293363d7",
+        "ebx": "0x3ed2821e",
+        "ecx": "0xcec76826",
+        "edx": "0xecb425e7",
+        "esi": "0x70490faf",
+        "edi": "0xf48452b7",
+        "ebp": "0x01bbe283"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "acbfd6abde75"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "484943920819"
+        }
+      ]
+    },
+    {
+      "name": "random_08",
+      "registers": {
+        "eax": "0x4228b982",
+        "ebx": "0x05821a1e",
+        "ecx": "0x888a12a0",
+        "edx": "0xa4ae28d8",
+        "esi": "0x5b2b0775",
+        "edi": "0xd3240587",
+        "ebp": "0xaf0a8a2a"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "6952d60a9c91"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "d8cbcf92c43a"
+        }
+      ]
+    },
+    {
+      "name": "random_09",
+      "registers": {
+        "eax": "0x78616a7f",
+        "ebx": "0x56237220",
+        "ecx": "0x637485da",
+        "edx": "0xf5df17f6",
+        "esi": "0x6df31eb4",
+        "edi": "0x4968a6fa",
+        "ebp": "0x00fd6d8e"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "629f59ec4365"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "d4d010ef191c"
+        }
+      ]
+    },
+    {
+      "name": "random_10",
+      "registers": {
+        "eax": "0x9cdb0f0f",
+        "ebx": "0x938490df",
+        "ecx": "0x9da26628",
+        "edx": "0x90f4358c",
+        "esi": "0x43c012c7",
+        "edi": "0xfa355b8d",
+        "ebp": "0xd71f43e0"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "fd82313e3dd6"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "a9ce558d9f6e"
+        }
+      ]
+    },
+    {
+      "name": "random_11",
+      "registers": {
+        "eax": "0xe26ad19b",
+        "ebx": "0x5035e141",
+        "ecx": "0x2f2262b1",
+        "edx": "0x506154ee",
+        "esi": "0x927f0845",
+        "edi": "0x3618a50a",
+        "ebp": "0xb0a27705"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "700b167299d7"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "c49dcc5bdc9b"
+        }
+      ]
+    },
+    {
+      "name": "random_12",
+      "registers": {
+        "eax": "0x9c661597",
+        "ebx": "0x04dc2b0b",
+        "ecx": "0x2754a305",
+        "edx": "0xd05a65ef",
+        "esi": "0x13f72fe9",
+        "edi": "0xef60b4fd",
+        "ebp": "0x30234a4f"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "224a928862c0"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "2b96e72d62c2"
+        }
+      ]
+    },
+    {
+      "name": "random_13",
+      "registers": {
+        "eax": "0xbf517cfd",
+        "ebx": "0x860cfc41",
+        "ecx": "0x286d8dc0",
+        "edx": "0xecb282f9",
+        "esi": "0x8c1fa0e9",
+        "edi": "0xc3ecc203",
+        "ebp": "0x37b74917"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "135bf9c32319"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "25489aaad3cf"
+        }
+      ]
+    },
+    {
+      "name": "random_14",
+      "registers": {
+        "eax": "0x9a9e0ac1",
+        "ebx": "0x21f39f8c",
+        "ecx": "0xe5c05620",
+        "edx": "0x1e432d7d",
+        "esi": "0x7d1ba193",
+        "edi": "0xa20edaa9",
+        "ebp": "0xc5195d40"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "775cf7c74824"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "7b666102c098"
+        }
+      ]
+    },
+    {
+      "name": "random_15",
+      "registers": {
+        "eax": "0x803b088f",
+        "ebx": "0x3c6b00bf",
+        "ecx": "0xcf4da081",
+        "edx": "0x190e4701",
+        "esi": "0xdef408d3",
+        "edi": "0xe4ad6788",
+        "ebp": "0x69c7530a"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "7c16942e5866"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "a3e2b063e5ef"
+        }
+      ]
+    },
+    {
+      "name": "random_16",
+      "registers": {
+        "eax": "0xdac3b169",
+        "ebx": "0x446eec7c",
+        "ecx": "0x727c277c",
+        "edx": "0x42f08800",
+        "esi": "0xdd366198",
+        "edi": "0x147a53fa",
+        "ebp": "0xcf0d68a0"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "7aedec999f51"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "b57bc6b6558f"
+        }
+      ]
+    },
+    {
+      "name": "random_17",
+      "registers": {
+        "eax": "0xa2edc7fb",
+        "ebx": "0x6f5176f6",
+        "ecx": "0xbd36b9d0",
+        "edx": "0x05952211",
+        "esi": "0xd5f69c68",
+        "edi": "0x19bab124",
+        "ebp": "0xb5ede7fe"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "fb8959a24aa6"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "97c87f2b174a"
+        }
+      ]
+    },
+    {
+      "name": "random_18",
+      "registers": {
+        "eax": "0x3bd332eb",
+        "ebx": "0x6865c66d",
+        "ecx": "0x99115316",
+        "edx": "0x2625e1b4",
+        "esi": "0xb20fc3d1",
+        "edi": "0x11805e4a",
+        "ebp": "0xbd4e247b"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "38462b0ff53d"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "e1a0f7e19306"
+        }
+      ]
+    },
+    {
+      "name": "random_19",
+      "registers": {
+        "eax": "0x114b9141",
+        "ebx": "0x22c02bf0",
+        "ecx": "0xaccbc124",
+        "edx": "0x1ff85061",
+        "esi": "0xc586356f",
+        "edi": "0x3322cc12",
+        "ebp": "0xa024cb5a"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "8edb994c1805"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "b43a715694a8"
+        }
+      ]
+    },
+    {
+      "name": "random_20",
+      "registers": {
+        "eax": "0x3790557a",
+        "ebx": "0x4c38a79e",
+        "ecx": "0x30e43ec8",
+        "edx": "0x2bcfea90",
+        "esi": "0x57af3cb8",
+        "edi": "0xb02233b5",
+        "ebp": "0x52e57d31"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "d134251472ce"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "39662a03c2a3"
+        }
+      ]
+    },
+    {
+      "name": "random_21",
+      "registers": {
+        "eax": "0xc5a3c5be",
+        "ebx": "0x3dc97dc9",
+        "ecx": "0xe6c9768e",
+        "edx": "0x59be1f87",
+        "esi": "0xf143f2dd",
+        "edi": "0x9589738c",
+        "ebp": "0x22b1299a"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "b90ca4cdb734"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "29efa6f9442a"
+        }
+      ]
+    },
+    {
+      "name": "random_22",
+      "registers": {
+        "eax": "0x92d12773",
+        "ebx": "0xf30b2dea",
+        "ecx": "0x6edbd326",
+        "edx": "0x78d73b43",
+        "esi": "0x9697e1f8",
+        "edi": "0xe273f517",
+        "ebp": "0x0b627a20"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "9bc8c109a550"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "729b0500c2af"
+        }
+      ]
+    },
+    {
+      "name": "random_23",
+      "registers": {
+        "eax": "0xedeebdc4",
+        "ebx": "0x941e26a0",
+        "ecx": "0xf8e803d1",
+        "edx": "0x55bfc426",
+        "esi": "0x48237e46",
+        "edi": "0x5d446ccc",
+        "ebp": "0xe5f95604"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "47e771a69e8f"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "2b6d95726cda"
+        }
+      ]
+    },
+    {
+      "name": "random_24",
+      "registers": {
+        "eax": "0xe3e44199",
+        "ebx": "0xb2845a8d",
+        "ecx": "0xd81d5c32",
+        "edx": "0x4dc800c0",
+        "esi": "0x8f375e76",
+        "edi": "0xcbaa01cb",
+        "ebp": "0x29e5fbf9"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "2ae8ae90a94d"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "065f898ad04a"
+        }
+      ]
+    },
+    {
+      "name": "random_25",
+      "registers": {
+        "eax": "0x797653e2",
+        "ebx": "0x4c3147ec",
+        "ecx": "0xbbbe3b1f",
+        "edx": "0xc8e3382a",
+        "esi": "0x702da1fb",
+        "edi": "0x67d97f23",
+        "ebp": "0x3c6af6c6"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "73fcad9420b3"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "e9051803657a"
+        }
+      ]
+    },
+    {
+      "name": "random_26",
+      "registers": {
+        "eax": "0x17bf1444",
+        "ebx": "0x564f36b6",
+        "ecx": "0x57e6bf6a",
+        "edx": "0x7ad064f2",
+        "esi": "0x62c97e95",
+        "edi": "0x325cbfbf",
+        "ebp": "0x1cb4e69d"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "205d295a8050"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "9660b09bb82f"
+        }
+      ]
+    },
+    {
+      "name": "random_27",
+      "registers": {
+        "eax": "0xfca4204d",
+        "ebx": "0x86d6a6aa",
+        "ecx": "0xb564f48f",
+        "edx": "0x5e525138",
+        "esi": "0xe2b92ed0",
+        "edi": "0x50bc0943",
+        "ebp": "0x62fbc473"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "ce7650ff71b9"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "0722de1aa177"
+        }
+      ]
+    },
+    {
+      "name": "random_28",
+      "registers": {
+        "eax": "0x9c72cc63",
+        "ebx": "0x034cbf3d",
+        "ecx": "0xabc52329",
+        "edx": "0x78b149b9",
+        "esi": "0xa5e8a6e4",
+        "edi": "0x43cebeb9",
+        "ebp": "0x8932219f"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "94f26f384b61"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "82ffc5b04e7e"
+        }
+      ]
+    },
+    {
+      "name": "random_29",
+      "registers": {
+        "eax": "0x922f4a64",
+        "ebx": "0x61c30843",
+        "ecx": "0xa1bec36b",
+        "edx": "0xe0218228",
+        "esi": "0x695f5e69",
+        "edi": "0xdd7874e1",
+        "ebp": "0x0d93d732"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "5f9e9a17ef44"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "0c4480a42642"
+        }
+      ]
+    },
+    {
+      "name": "random_30",
+      "registers": {
+        "eax": "0x5fbb4ced",
+        "ebx": "0x00897118",
+        "ecx": "0xc0c7c06a",
+        "edx": "0xfb88be0d",
+        "esi": "0xf676bb1c",
+        "edi": "0xf3ae262a",
+        "ebp": "0xc4ba2df3"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "f19c51fdfdb1"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "5bc41c8b7621"
+        }
+      ]
+    },
+    {
+      "name": "random_31",
+      "registers": {
+        "eax": "0x5a84dfbd",
+        "ebx": "0x289eba95",
+        "ecx": "0x79446aad",
+        "edx": "0x3678620e",
+        "esi": "0x4972470e",
+        "edi": "0xa9b3493f",
+        "ebp": "0x418f68e9"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "5b1b241322b4"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "7b88ab5d857a"
+        }
+      ]
+    },
+    {
+      "name": "random_32",
+      "registers": {
+        "eax": "0x9b1d4c3c",
+        "ebx": "0xd33501e1",
+        "ecx": "0x3fe65f01",
+        "edx": "0x98a0a669",
+        "esi": "0x73834abd",
+        "edi": "0x3b7224ca",
+        "ebp": "0xad0d75b2"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "7898cd05bafe"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "bcc2d2a80884"
+        }
+      ]
+    },
+    {
+      "name": "random_33",
+      "registers": {
+        "eax": "0xc61d07ee",
+        "ebx": "0xd9608c80",
+        "ecx": "0x9aca1d24",
+        "edx": "0xcbc8bf21",
+        "esi": "0x54f72914",
+        "edi": "0xcaff2c6a",
+        "ebp": "0xf562f0a0"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "ad4861876d98"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "8d22fc2d5733"
+        }
+      ]
+    },
+    {
+      "name": "random_34",
+      "registers": {
+        "eax": "0x261d745d",
+        "ebx": "0xa79bd18f",
+        "ecx": "0xa97b4c21",
+        "edx": "0x7a6161ab",
+        "esi": "0x9e6b4947",
+        "edi": "0x2c742a69",
+        "ebp": "0x1050279c"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "5607a2965428"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "aca5351c69ce"
+        }
+      ]
+    },
+    {
+      "name": "random_35",
+      "registers": {
+        "eax": "0xe7973f32",
+        "ebx": "0x42e09934",
+        "ecx": "0x4d6ff17f",
+        "edx": "0xf024261c",
+        "esi": "0xbf13a871",
+        "edi": "0x2601a09a",
+        "ebp": "0x60e34056"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "3c9c8082ae39"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "88bdc16c369d"
+        }
+      ]
+    },
+    {
+      "name": "random_36",
+      "registers": {
+        "eax": "0x8d1b4ae7",
+        "ebx": "0x33b6f82a",
+        "ecx": "0x2a54dcfb",
+        "edx": "0x70b6dee3",
+        "esi": "0xa4e2246c",
+        "edi": "0xba82178d",
+        "ebp": "0x698224da"
+      },
+      "memory": [
+        {
+          "address": "0x001a6ce0",
+          "hex": "14e751e5a09d"
+        },
+        {
+          "address": "0x001a6ce7",
+          "hex": "28b6191f7d91"
         }
       ]
     }
