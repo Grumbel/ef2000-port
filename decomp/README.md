@@ -75,16 +75,16 @@ first control-mode gate, [batch 126](../docs/subsystems/decomp-batch-126.md)
 verifies the paired mode B/C setters, and [batch 127](../docs/subsystems/decomp-batch-127.md)
 verifies the signed link-pointer lookup and its unaligned candidate override;
 [batch 128](../docs/subsystems/decomp-batch-128.md) verifies its record updater.
-M0 mechanically compiles 407/1,020 available unrecovered Ghidra exports
-(39.9%, 123,359/543,917 body bytes = 22.7%) with OpenWatcom v2; 594 exports
-remain `manual` and 19 have compile errors. Hand-written recovered C covers
+M0 mechanically compiles 408/1,020 available unrecovered Ghidra exports
+(40.0%, 124,581/543,917 body bytes = 22.9%) with OpenWatcom v2; 594 exports
+remain `manual` and 18 have compile errors. Hand-written recovered C covers
 364,031 body bytes (40.0%); together with mechanical `ok` exports, potential
-hybrid coverage is 487,390/908,947 tracked body bytes (53.6%). A focused
+hybrid coverage is 488,612/908,947 tracked body bytes (53.8%). A focused
 two-function image redirects `init_far_stub_b04` and `to_lower_ascii` and
 passes the main-menu and quick-fight-setup replay cases. The broader image
-was relinked with the current mechanical report: 2,444 functions (2,043
-hand-written, 401 mechanical), 12,220 entry bytes, 582,996 arena bytes, and
-2,283 exclusions across 693/755 modules. This new image has not been replayed.
+was relinked with the current mechanical report: 2,445 functions (2,043
+hand-written, 402 mechanical), 12,225 entry bytes, 584,292 arena bytes, and
+2,283 exclusions across 694/756 modules. This new image has not been replayed.
 The previous 2,433-redirect image, after excluding its linked
 `original_memcpy` candidate, faults at guest IP `0x4` on tick 469. The
 focused image has not been tested through the cockpit, and M1/M2 remain

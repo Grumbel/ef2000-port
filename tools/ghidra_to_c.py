@@ -314,6 +314,12 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
         body = token.sub(pointer_read, body)
     for token in {match.group(0) for match in MANUAL.finditer(body)}:
         flags.add('manual: ' + manual_cause(token))
+    # A uRam label has no reliable width by itself. CONCAT22 does: the first
+    # operand is specifically the high 16-bit half, so read that guest word
+    # directly instead of treating it as an undeclared C identifier.
+    body = re.sub(
+        r'\bCONCAT22\(\s*uRam([0-9a-fA-F]{8})\s*,',
+        lambda m: 'CONCAT22(EF_U16(0x%s),' % m.group(1).lower(), body)
     # Ghidra's CONCATxy(a, b) joins x bytes from a and y bytes from b.
     # Keep the operation unsigned and wide while shifting, then narrow to the
     # width Ghidra assigns to the combined value. Values wider than 64 bits

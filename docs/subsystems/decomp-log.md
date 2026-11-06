@@ -603,3 +603,17 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   modules link, with 2,283 function exclusions. No replay was run: the
   private Xvfb socket bind still fails in the isolated namespace. M1/M2
   remain unpassed; the first failure for this image is unknown.
+- M0 width from `CONCAT22`, 2026-11-07: `uRam0019721e` is the high 16-bit
+  operand of `CONCAT22`, so the generator now reads it as `EF_U16` at its
+  guest address. This avoids assigning a blanket width to other `uRam`
+  labels, many of which are self-modified code immediates. OpenWatcom accepts
+  `0x59adc`; `ok` rises from 407 to 408/1,020 (123,359 to 124,581 body
+  bytes), and compile errors fall from 19 to 18. Current rate is 40.0% of
+  functions and 22.9% of available export bytes; 594 remain `manual`.
+- Relink with 408 mechanical `ok` objects, 2026-11-07: 2,445 functions
+  redirect (2,043 hand-written, 402 mechanical), patching 12,225 original
+  entry bytes and placing 584,292 bytes in the code arena (596,517 total
+  patch bytes). 694/756 object modules link; 2,283 functions are excluded.
+  This image was not replayed because Xvfb still cannot bind a private
+  listener. M1/M2 remain unpassed and this image's first runtime failure is
+  unknown.
