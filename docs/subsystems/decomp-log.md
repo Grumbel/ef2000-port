@@ -347,3 +347,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   private Xvfb replay could not start because this environment's
   `/tmp/.X11-unix` is owned by `nobody`, so Xvfb refuses the socket directory.
   M0 remains 391/1,021 exports (38.3%, 114,873/544,304 bytes).
+- Follow-up menu-path evidence, 2026-11-06: the earlier bisector's trial 12
+  still redirected `0xf8b14` to its mechanical body (the trial exclusion
+  file does not demote it) and failed with an unmapped fetch at
+  `0x4e0f8624` while that path calls original helper `0xf8624`. The
+  mechanical draft calls this helper without arguments. Hand C supplies
+  EAX/EDX/EBX/ECX from the original call setup and keeps `0xf8b14`'s 12-byte
+  callee cleanup. This is
+  a concrete candidate explanation, not a replay confirmation. Prepared an
+  ignored trace manifest for `0xf8600`, `0xf9448`, `0xf8b14`, `0xf8624` and
+  the relevant slot helpers; rerun it when private Xvfb is available.
