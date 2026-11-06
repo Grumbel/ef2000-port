@@ -449,3 +449,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   626/735 modules; exclusions fall to 2,691. The current leading unresolved
   class is `__CHP` (19 modules). No replay ran because Xvfb cannot bind, so
   M1/M2 remain unpassed and the first guest failure is unknown.
+- Hybrid OpenWatcom signed multiply bridge, 2026-11-06: added `__I8M` for
+  64-bit operands EDX:EAX and ECX:EBX, returning EDX:EAX. Its OMF body uses
+  32-bit partial products; WDIS confirms the helper and the generated caller
+  register setup. Relinking reaches 2,235 redirects (11,175 entry bytes;
+  575,364 arena bytes), 630/736 modules, with 360 mechanical and 1,875
+  hand-written functions patched; exclusions fall to 2,677. The first
+  remaining link failure class is `__CHP` (19 modules). No replay ran because
+  private Xvfb cannot bind; M1/M2 remain unpassed and the first guest failure
+  is unknown.
