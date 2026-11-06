@@ -181,3 +181,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   89,263/544,429 bytes = 16.4%). Compile errors fall from 100 to 61
   (32,044 bytes); 594 functions (410,411 bytes) remain manual. This is a
   loose compile declaration, not a verified callback ABI.
+- M0 rule 16, address-of guest globals, 2026-11-06: lower address-taking of
+  `EF_U*`/`EF_S*` lvalues to the guest address and `&PTR_*` expressions to
+  a pointer to the guest pointer slot. OpenWatcom reports 383/1,022 ok
+  functions (37.5%, 111,957/544,429 bytes = 20.6%), up from 367/1,022
+  (35.9%, 101,974/544,429 bytes = 18.7%). Compile errors fall from 61 to
+  45 (22,061 bytes); 594 functions (410,411 bytes) remain manual. The
+  pointer types are inferred from Ghidra expression context and remain
+  unverified.

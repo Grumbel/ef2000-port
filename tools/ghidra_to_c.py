@@ -310,6 +310,20 @@ def convert(text, entry, names, sig_in=None, globals_=None):
                   lambda m: dat_expression(int(m.group(1), 16), globals_), body)
     body = re.sub(r'\b(?:PTR_|s_|u_|BYTE_|WORD_|DWORD_)\w*?_?' + HEX + r'\b(?:\s*\+\s*\d+)?',
                   lambda m: '((char *)ef_guest_memory_ptr(0x%s))' % m.group(1).lower(), body)
+    # An address-of a translated guest global is the guest address itself;
+    # taking the C address of EF_U* would instead point into the host mapping
+    # expression (and OpenWatcom does not treat that macro as addressable).
+    guest_scalar_types = {'U8': 'uint8_t', 'U16': 'uint16_t', 'U32': 'uint32_t',
+                          'S16': 'int16_t', 'S32': 'int32_t'}
+    body = re.sub(
+        r'&EF_(U8|U16|U32|S16|S32)\((0x[0-9a-fA-F]+)u?\)',
+        lambda m: '((%s *)ef_guest_memory_ptr(%s))' %
+        (guest_scalar_types[m.group(1)], m.group(2)), body)
+    # PTR_ globals are pointer-valued slots.  Their address is a pointer to
+    # that slot, which can be indexed or passed where Ghidra emitted &PTR.
+    body = re.sub(
+        r'&\(\(char \*\)ef_guest_memory_ptr\((0x[0-9a-fA-F]+)\)\)',
+        r'((char **)ef_guest_memory_ptr(\1))', body)
     body = re.sub(r'\bLAB_' + HEX + r'\b', lambda m: 'lab_' + m.group(1).lower(), body)
     body = re.sub(r'\bfunc_0x' + HEX + r'\b', lambda m: 'ef_fn_' + m.group(1).lower(), body)
     first = next((line for line in body.split('\n') if line.strip()), '')
