@@ -39,7 +39,7 @@ OUT = ROOT / 'local/mechanical'
 SIGNATURES = ROOT / 'decomp/symbols/signatures.tsv'
 FUNCTIONS = ROOT / 'decomp/symbols/functions.tsv'
 GLOBALS = ROOT / 'decomp/symbols/globals.tsv'
-FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-fp3', '-ob', '-ot', '-za99', '-w1')
+FLAGS = ('-bt=dos', '-3r', '-zp1', '-fpi87', '-fp3', '-ob', '-ot', '-s', '-za99', '-w1')
 
 TYPES = [
     (r'\bundefined8\b', 'uint64_t'), (r'\bundefined4\b', 'uint32_t'),

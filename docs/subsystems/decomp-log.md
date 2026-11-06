@@ -103,3 +103,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   five bytes, which cannot take a direct `jmp rel32` and need explicit
   exclusion or a proved trampoline. This is a tooling/segment-layout blocker,
   not an OpenWatcom or unsupported-OMF-fixup failure; M1 remains unpassed.
+- M1 hybrid-link prototype, 2026-11-06: added a whole-set OMF linker and
+  guest-arena patch path. The initial link redirects 1,835 entries (9,175
+  original-image bytes) and loads 475,316 bytes of compiled code/data in the
+  arena; 411/524 hand/mechanical modules link, with 3,061 function exclusions.
+  An isolated OpenWatcom `to_lower_ascii` object reaches the main-menu and
+  quick-fight-setup checkpoints with identical framebuffer and selected guest
+  RAM hashes. Cockpit framebuffer matches, but the 64-KiB guest-RAM hash does
+  not, so this isolated run is not a full replay pass. The complete hybrid
+  stops before startup; a redirect-set bisect narrowed its first observed
+  failure to mechanical entry `0x0009be38` (the unclassified 427-byte allocator).
+  Demoting that entry advances execution but still does not reach the menu
+  (`IP=0x0301afc5`, 7 interrupts at the 500M instruction checkpoint), so M1
+  remains unpassed and the next failure is not yet isolated. The runner now
+  preserves the BSS initialization pattern around the arena and only blocks
+  heap/stack growth if it would overlap the arena; this keeps startup memory
+  reporting unchanged. Unit checks pass for 33 Python patch/OMF/replay tests,
+  the C++ EFPATCH test, and the OpenWatcom module compilation.

@@ -41,6 +41,7 @@ class Public:
     symbol: str
     segment: int
     offset: int
+    local: bool = False
 
 
 @dataclass(frozen=True)
@@ -118,6 +119,7 @@ def read_module(blob):
                 _, cursor = index(payload, cursor)
                 module.externs.append(symbol)
         elif kind in (0x90, 0x91, 0xb6, 0xb7):  # PUBDEF/LPUBDEF
+            local = kind in (0xb6, 0xb7)
             _, cursor = index(payload, cursor)
             segment, cursor = index(payload, cursor)
             if not segment:
@@ -126,7 +128,7 @@ def read_module(blob):
                 symbol, cursor = name(payload, cursor)
                 offset, cursor = field(payload, cursor, 4 if kind & 1 else 2)
                 _, cursor = index(payload, cursor)
-                module.publics.append(Public(symbol, segment, offset))
+                module.publics.append(Public(symbol, segment, offset, local))
         elif kind in (0xa0, 0xa1):  # LEDATA
             segment, cursor = index(payload, cursor)
             offset, cursor = field(payload, cursor, 4 if kind & 1 else 2)
@@ -283,6 +285,7 @@ def inspection(module):
                          for i, seg in enumerate(module.segments) if i],
             'externals': module.externs[1:],
             'publics': [{'symbol': p.symbol, 'segment': p.segment, 'offset': p.offset}
+                        | {'local': p.local}
                         for p in module.publics],
             'fixups': [vars(fixup) for fixup in module.fixups]}
 

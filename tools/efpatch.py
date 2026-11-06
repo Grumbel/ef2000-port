@@ -21,7 +21,7 @@ import struct
 MAGIC = b'EF2000P1'
 HEADER = struct.Struct('<8s32sI')
 ENTRY = struct.Struct('<II')
-MAX_WRITES = 512
+MAX_WRITES = 4096
 MAX_PATCH_BYTES = 16 * 1024 * 1024
 
 
@@ -29,16 +29,17 @@ class PatchError(ValueError):
     pass
 
 
-def _validate_writes(writes, image_size):
+def _validate_writes(writes, image_size, address_limit=None):
+    address_limit = image_size if address_limit is None else address_limit
     if not 1 <= len(writes) <= MAX_WRITES:
-        raise PatchError('patch must contain 1..512 writes')
+        raise PatchError('patch must contain 1..4096 writes')
     intervals = []
     total = 0
     for offset, payload in writes:
-        if not isinstance(offset, int) or offset < 0 or offset >= image_size:
-            raise PatchError('write begins outside initialized payload')
-        if not payload or len(payload) > image_size - offset:
-            raise PatchError('write extends beyond initialized payload')
+        if not isinstance(offset, int) or offset < 0 or offset >= address_limit:
+            raise PatchError('write begins outside initialized payload or guest address space')
+        if not payload or len(payload) > address_limit - offset:
+            raise PatchError('write extends beyond initialized payload or guest address space')
         total += len(payload)
         if total > MAX_PATCH_BYTES:
             raise PatchError('patch exceeds 16 MiB limit')
@@ -72,8 +73,20 @@ def pack(plan, image):
     return bytes(out)
 
 
-def decode(contents, image):
-    if len(contents) < HEADER.size or len(contents) > MAX_PATCH_BYTES + 8192:
+def pack_writes(writes, image, address_limit):
+    """Encode SHA-bound writes, including writes into a reserved guest arena."""
+    if address_limit < len(image):
+        raise PatchError('guest address limit is smaller than initialized payload')
+    _validate_writes(writes, len(image), address_limit)
+    out = bytearray(HEADER.pack(MAGIC, hashlib.sha256(image).digest(), len(writes)))
+    for offset, data in writes:
+        out.extend(ENTRY.pack(offset, len(data)))
+        out.extend(data)
+    return bytes(out)
+
+
+def decode(contents, image, address_limit=None):
+    if len(contents) < HEADER.size or len(contents) > MAX_PATCH_BYTES + 65536:
         raise PatchError('invalid EFPATCH1 file size')
     magic, digest, count = HEADER.unpack_from(contents)
     if magic != MAGIC:
@@ -95,11 +108,11 @@ def decode(contents, image):
         cursor += size
     if cursor != len(contents):
         raise PatchError('trailing EFPATCH1 bytes')
-    _validate_writes(writes, len(image))
+    _validate_writes(writes, len(image), address_limit)
     return writes
 
 
-def apply_patches(image, paths):
+def apply_patches(image, paths, address_limit=None):
     """Return modified initialized image and ordered patch digests.
 
     The original image is used for *every* patch identity check. File writes
@@ -110,11 +123,14 @@ def apply_patches(image, paths):
     digests = []
     for path in paths:
         blob = Path(path).read_bytes()
-        writes.extend(decode(blob, originals))
+        writes.extend(decode(blob, originals, address_limit))
         digests.append(hashlib.sha256(blob).hexdigest())
     if writes:
-        _validate_writes(writes, len(originals))
+        _validate_writes(writes, len(originals), address_limit)
     patched = bytearray(originals)
+    required = max((offset + len(data) for offset, data in writes), default=len(originals))
+    if required > len(patched):
+        patched.extend(bytes(required - len(patched)))
     for offset, data in writes:
         patched[offset:offset + len(data)] = data
     return bytes(patched), digests

@@ -1225,8 +1225,10 @@ public:
                      std::vector<TimedKeyEvent> key_events = {},
                      std::vector<JoystickEvent> joystick_events = {},
                      ControlSelection controls = ControlSelection::Auto,
-                     fs::path cd_cue = {})
-        : image_size_(image.size()), trace_interrupts_(trace_interrupts),
+                     fs::path cd_cue = {}, size_t original_image_size = 0,
+                     uint32_t arena_start = 0, uint32_t arena_end = 0)
+        : image_size_(original_image_size ? original_image_size : image.size()),
+          trace_interrupts_(trace_interrupts),
           mouse_events_(std::move(mouse_events)), key_events_(std::move(key_events)),
           joystick_events_(std::move(joystick_events)), controls_(controls),
           dos_drive_(std::move(game_dir), std::move(cd_dir), std::move(overlay_dir)),
@@ -1234,6 +1236,17 @@ public:
         if (!cd_cue.empty()) cd_audio_ = std::make_unique<ef2000::CdAudio>(cd_cue);
         if (image.size() < ENTRY + 2 || image.size() > IMAGE_SIZE)
             throw std::runtime_error("invalid initialized image length");
+        if (arena_start || arena_end) {
+            constexpr uint32_t HEAP_BASE = 0x4e1000;
+            constexpr uint32_t BSS_END = 0x4de2f0;
+            if (arena_start <= BSS_END || arena_end <= arena_start ||
+                arena_end > stack_end_ || image.size() < arena_end)
+                throw std::runtime_error("invalid hybrid code arena range");
+            if (arena_start <= HEAP_BASE)
+                throw std::runtime_error("hybrid code arena overlaps the initial guest heap");
+            arena_start_ = arena_start;
+            arena_end_ = arena_end;
+        }
         check(uc_open(UC_ARCH_X86, UC_MODE_32, &cpu_), "uc_open");
         check(uc_mem_map(cpu_, 0, IMAGE_SIZE, UC_PROT_ALL), "map guest image");
         check(uc_mem_map(cpu_, DOS_BASE, 0x100000, UC_PROT_ALL), "map DOS RAM");
@@ -1268,7 +1281,7 @@ public:
 
     void enable_patch_hit_trace(const std::vector<uint32_t>& addresses) {
         for (uint32_t address : addresses) {
-            if (address >= image_size_ || !patch_hit_counts_.emplace(address, 0).second)
+            if (address >= IMAGE_SIZE || !patch_hit_counts_.emplace(address, 0).second)
                 throw std::runtime_error("invalid or duplicated patch entry address");
             uc_hook hook{};
             check(uc_hook_add(cpu_, &hook, UC_HOOK_CODE, (void*)on_patch_hit,
@@ -1649,6 +1662,8 @@ private:
     bool trace_interrupts_{};
     bool reported_missing_bios_disk_{};
     uint32_t heap_end_ = 0x4df000;
+    uint32_t heap_ceiling_ = IMAGE_SIZE;
+    uint32_t arena_start_ = IMAGE_SIZE, arena_end_ = IMAGE_SIZE;
     uint32_t stack_end_ = (0x3fff000 - 0x126a) & 0xfffff000;
     uint32_t free_bytes_ = stack_end_ - 0x4e1000;
     uint32_t heap_peak_ = heap_end_, stack_low_ = stack_end_;
@@ -2369,8 +2384,17 @@ private:
         // This is the loader's initialized BSS pattern; guest startup clears it.
         std::array<uint8_t, 4096> poison;
         poison.fill(0xa5);
-        for (uint32_t cursor = 0x195fb0; cursor < 0x4de2f0; cursor += poison.size())
-            write(cursor, poison.data(), std::min<size_t>(poison.size(), 0x4de2f0 - cursor));
+        auto poison_range = [&](uint32_t begin, uint32_t end) {
+            for (uint32_t cursor = begin; cursor < end; cursor += poison.size())
+                write(cursor, poison.data(), std::min<size_t>(poison.size(), end - cursor));
+        };
+        const uint32_t bss_begin = 0x195fb0, bss_end = 0x4de2f0;
+        if (arena_start_ < bss_end && arena_end_ > bss_begin) {
+            poison_range(bss_begin, std::max(bss_begin, arena_start_));
+            poison_range(std::min(bss_end, arena_end_), bss_end);
+        } else {
+            poison_range(bss_begin, bss_end);
+        }
         for (auto& vector : protected_vectors_) vector = {IMAGE_SIZE + 0x100, 0x2f};
         for (auto& vector : exception_vectors_) vector = {IMAGE_SIZE + 0x100, 0x2f};
     }
@@ -2626,7 +2650,8 @@ private:
         } else if (ip == 0x19a && ax == 0x3509) {
             if (before.bx < before.cx) return fail("stack reserve below zero");
             const uint32_t boundary = (before.bx - before.cx) & 0xfffff000;
-            if (boundary < 0x4e1000 || boundary > stack_end_ || stack_end_ - boundary > free_bytes_)
+            if (boundary < 0x4e1000 || boundary > stack_end_ || stack_end_ - boundary > free_bytes_ ||
+                (arena_start_ < stack_end_ && arena_end_ > boundary))
                 return fail("stack reserve exhausted");
             free_bytes_ -= stack_end_ - boundary;
             stack_end_ = boundary;
@@ -2637,7 +2662,9 @@ private:
             after.flags = dec_flags(old, after.dx, before.flags);
         } else if (ip == 0x245 && ax == 0x3508) {
             const uint32_t rounded = (before.cx + 0xfff) & 0xfffff000;
-            if (rounded >= IMAGE_SIZE || (rounded > heap_end_ && rounded - heap_end_ > free_bytes_))
+            if (rounded > heap_ceiling_ ||
+                (heap_end_ < arena_end_ && rounded > arena_start_) ||
+                (rounded > heap_end_ && rounded - heap_end_ > free_bytes_))
                 return fail("heap growth exhausted");
             if (rounded > heap_end_) { free_bytes_ -= rounded - heap_end_; heap_end_ = rounded; }
             ++heap_calls_;
@@ -2647,7 +2674,7 @@ private:
             after.cx = heap_end_;
             after.flags = sub_flags(floor, 0x4e1000, floor - 0x4e1000, before.flags);
         } else if (ax == 0x350b) {
-            after.ax = std::min(IMAGE_SIZE - heap_end_, free_bytes_);
+            after.ax = std::min(heap_ceiling_ - heap_end_, free_bytes_);
             after.flags &= ~1u;
         } else if (ax == 0x3501 || ax == 0x3502 || ax == 0x3503 || ax == 0x3504 || ax == 0x3505) {
             if (!selector_service(ax, before, after)) return;
@@ -2880,7 +2907,7 @@ private:
             destination >= VGA_COPY_BASE && dst_end <= VGA_COPY_END;
         if (bytes < 1024 || bytes > 1024 * 1024 || source < 0x1000 ||
             src_end > IMAGE_SIZE || (!guest_data && !vga_bank) ||
-            return_ip < ENTRY || return_ip >= image_size_ ||
+            return_ip < ENTRY || return_ip >= IMAGE_SIZE ||
             (source < dst_end && destination < src_end) ||
             uc_reg_read(cpu, UC_X86_REG_DS, &ds) != UC_ERR_OK || ds != 7) {
             ++fast_copy_skipped_;
@@ -3061,6 +3088,7 @@ void usage(const char* program) {
               << "       [--controls auto|keyboard|joystick] (virtual EF2000.CFG)\n"
               << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
+              << "       [--trace-patch-entry ADDR] (repeatable, trace selected patched entries)\n"
               << "       [--trace-archive-lookups] (unique DID pathname requests on stderr)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
               << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
@@ -3102,6 +3130,7 @@ int main(int argc, char** argv) {
         std::vector<TimedKeyEvent> key_events;
         std::vector<JoystickEvent> joystick_events;
         std::vector<std::string> patch_paths;
+        std::vector<uint32_t> trace_patch_entries;
         std::vector<std::pair<uint32_t, uint32_t>> guest_hash_ranges;
         std::vector<std::pair<uint32_t, unsigned>> capture_targets;
         fs::path capture_dir;
@@ -3118,6 +3147,13 @@ int main(int argc, char** argv) {
                 explicit_limit = true;
             } else if (!std::strcmp(argv[i], "--patch") && i + 1 < argc) {
                 patch_paths.emplace_back(argv[++i]);
+            } else if (!std::strcmp(argv[i], "--trace-patch-entry") && i + 1 < argc) {
+                size_t end{};
+                const std::string value = argv[++i];
+                const auto address = std::stoull(value, &end, 0);
+                if (end != value.size() || address >= IMAGE_SIZE)
+                    throw std::runtime_error("--trace-patch-entry expects a guest address");
+                trace_patch_entries.push_back(uint32_t(address));
             } else if (!std::strcmp(argv[i], "--hash-guest") && i + 1 < argc) {
                 const std::string value = argv[++i];
                 const size_t colon = value.find(':');
@@ -3566,20 +3602,43 @@ int main(int argc, char** argv) {
         std::stable_sort(joystick_events.begin(), joystick_events.end(),
                          [](const JoystickEvent& a, const JoystickEvent& b) { return a.tick < b.tick; });
         auto image = payload_from_executable(path);
+        const size_t original_image_size = image.size();
         std::vector<uint32_t> patch_entries;
+        std::pair<uint32_t, uint32_t> reserved_arena{};
         if (!patch_paths.empty()) {
             const auto original_digest = sha256_bytes(image);
             std::vector<ef2000::PatchWrite> writes;
             for (const auto& patch_path : patch_paths) {
-                const auto batch = ef2000::load_efpatch(patch_path, original_digest, image.size());
+                const auto batch = ef2000::load_efpatch(patch_path, original_digest,
+                                                        original_image_size, IMAGE_SIZE);
                 writes.insert(writes.end(), batch.begin(), batch.end());
             }
-            ef2000::validate_patch_writes(writes, image.size());
+            ef2000::validate_patch_writes(writes, original_image_size, IMAGE_SIZE);
+            uint32_t arena_start = IMAGE_SIZE, arena_end = 0;
             for (const auto& write : writes) patch_entries.push_back(write.offset);
+            if (!trace_patch_entries.empty()) {
+                const std::set<uint32_t> available(patch_entries.begin(), patch_entries.end());
+                for (uint32_t address : trace_patch_entries)
+                    if (!available.contains(address))
+                        throw std::runtime_error("traced address is not a patch write entry");
+                patch_entries = trace_patch_entries;
+            }
+            for (const auto& write : writes) {
+                if (write.offset >= original_image_size) {
+                    arena_start = std::min(arena_start, write.offset);
+                    arena_end = std::max(arena_end,
+                                         write.offset + uint32_t(write.bytes.size()));
+                }
+            }
             for (const auto& write : writes)
                 std::cout << "patch: addr=0x" << std::hex << write.offset << std::dec
                           << " bytes=" << write.bytes.size() << '\n';
             ef2000::apply_efpatches(image, writes);
+            if (arena_end) {
+                if (arena_start == IMAGE_SIZE)
+                    throw std::runtime_error("hybrid arena range is invalid");
+                reserved_arena = {arena_start, arena_end};
+            }
             std::cout << "patches: applied " << patch_paths.size()
                       << " in-place EFPATCH1 file(s), " << writes.size() << " writes\n";
         }
@@ -3587,7 +3646,8 @@ int main(int argc, char** argv) {
         if (cd_dir.empty()) cd_dir = game_dir;
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,
                         std::move(mouse_events), std::move(key_events), std::move(joystick_events),
-                        controls, cd_cue);
+                        controls, cd_cue, original_image_size,
+                        reserved_arena.first, reserved_arena.second);
         machine.use_guest_dos_clock(guest_dos_clock);
         machine.use_guest_vga_clock(guest_vga_clock);
         if (!patch_entries.empty()) machine.enable_patch_hit_trace(patch_entries);

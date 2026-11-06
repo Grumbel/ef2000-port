@@ -26,7 +26,8 @@ def symbol(value):
     return bytes([len(value)]) + value.encode('ascii')
 
 
-def fixture(code, fixups=b'\xa4\x01\x56\x01\xe4\x06\x54\x02'):
+def fixture(code, fixups=b'\xa4\x01\x56\x01\xe4\x06\x54\x02',
+            public_kind=0x91):
     # __CHK() is an external near CALL at code byte 1; byte 6 is an
     # absolute DS-relative address of local 4-byte initialized data.
     return b''.join((
@@ -36,7 +37,7 @@ def fixture(code, fixups=b'\xa4\x01\x56\x01\xe4\x06\x54\x02'):
         record(0x99, b'\x61' + len(code).to_bytes(4, 'little') + b'\x01\x02\x00'),
         record(0x99, b'\x61\x04\x00\x00\x00\x03\x04\x00'),
         record(0x8c, symbol('__CHK') + b'\x00'),
-        record(0x91, b'\x00\x01' + symbol('ef_foo_') + b'\x00\x00\x00\x00\x00'),
+        record(public_kind, b'\x00\x01' + symbol('ef_foo_') + b'\x00\x00\x00\x00\x00'),
         record(0xa1, b'\x01\x00\x00\x00\x00' + code),
         # First: self-rel L9 32-bit, target external index 1, frame from target.
         # Second: segment-rel L9 32-bit, target segment index 2.
@@ -73,6 +74,12 @@ class OMFSplicerTests(unittest.TestCase):
         self.assertEqual(report['publics'][0]['symbol'], 'ef_foo_')
         self.assertEqual([(f['mode'], f['offset']) for f in report['fixups']],
                          [('self', 1), ('segment', 6)])
+
+    def test_lpubdef_is_scoped_to_its_object(self):
+        module = read_module(fixture(code(), public_kind=0xb7))
+        self.assertTrue(module.publics[0].local)
+        report = inspection(module)
+        self.assertTrue(report['publics'][0]['local'])
 
     def test_inline_placement_and_relocations(self):
         module = read_module(fixture(code()))

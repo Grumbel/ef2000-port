@@ -9,7 +9,7 @@ import struct
 import tempfile
 import unittest
 
-from tools.efpatch import PatchError, apply_patches, decode, pack, MAGIC
+from tools.efpatch import PatchError, apply_patches, decode, pack, pack_writes, MAGIC
 
 
 class EFPatchTests(unittest.TestCase):
@@ -72,6 +72,19 @@ class EFPatchTests(unittest.TestCase):
             self.assertEqual(result[20:22], b'\xcc\x90')
             self.assertEqual(result[40:42], b'\xcc\x90')
             self.assertEqual(len(hashes), 2)
+
+    def test_reserved_guest_arena_writes_expand_only_the_disposable_image(self):
+        binary = pack_writes([(160, b'\x90\xc3')], self.image, 256)
+        with self.assertRaisesRegex(PatchError, 'guest address space'):
+            decode(binary, self.image)
+        self.assertEqual(decode(binary, self.image, 256), [(160, b'\x90\xc3')])
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'arena.efpatch'
+            path.write_bytes(binary)
+            output, _ = apply_patches(self.image, [path], address_limit=256)
+            self.assertEqual(len(output), 162)
+            self.assertEqual(output[160:162], b'\x90\xc3')
+            self.assertEqual(self.image[32:34], bytes((32, 33)))
 
 
 if __name__ == '__main__':

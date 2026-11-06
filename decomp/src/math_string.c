@@ -42,14 +42,6 @@ int32_t to_upper_ascii(int32_t c)
     return c;
 }
 
-/* 0xe7835, 14 bytes. Signed 'A'..'Z' to lowercase. */
-int32_t to_lower_ascii(int32_t c)
-{
-    if (c >= 0x41 && c <= 0x5a)
-        c += 0x20;
-    return c;
-}
-
 /* 0xdec00, 21 bytes. Byte at dword 0x15b754 + EDX + dword 0x163200[EBX] = AL. */
 void plot_byte(uint8_t value, uint32_t x, uint32_t y)
 {

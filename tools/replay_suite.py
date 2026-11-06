@@ -34,6 +34,7 @@ MAX_EVENTS = 128
 MAX_CASES = 32
 MAX_CHECKPOINTS = 8
 MAX_TOTAL_POINTS = 64
+GUEST_SIZE = 0x4000000
 
 
 def validate_manifest(manifest, patch_addresses, patch_intervals=()):
@@ -195,6 +196,9 @@ def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, tim
         command.extend(['--hash-guest', f'0x{address:x}:{length}'])
     for patch in patch_files:
         command.extend(['--patch', str(patch)])
+    if patch_files:
+        for address in sorted(case.get('must_hit', [])):
+            command.extend(['--trace-patch-entry', '0x%x' % address])
     try:
         finished = subprocess.run(command, cwd=output, capture_output=True,
                                   text=True, timeout=timeout, check=False)
@@ -265,7 +269,8 @@ def run_suite(runner, executable, game_dir, cd_dir, patches, cases, output,
                                      sample_dir / 'repeat-original', timeout, sound_mode)
                     failures.extend('baseline nondeterminism: ' + issue
                                     for issue in differences(baseline, second))
-                patched_case = dict(sample_case, patch_addresses=patch_addresses)
+                patched_case = dict(sample_case,
+                                    patch_addresses=set(case['must_hit']))
                 patched = run_one(runner, executable, game_dir, cd_dir, patches, patched_case,
                                   sample_dir / 'patched', timeout, sound_mode)
                 failures.extend(differences(baseline, patched))
@@ -321,7 +326,7 @@ def main(argv=None):
         addresses = []
         intervals = []
         for patch in patches:
-            for address, data in decode_patch(patch.read_bytes(), original):
+            for address, data in decode_patch(patch.read_bytes(), original, GUEST_SIZE):
                 addresses.append(address)
                 intervals.append((address, address + len(data)))
         intervals.sort()

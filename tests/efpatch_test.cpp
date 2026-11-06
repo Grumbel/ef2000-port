@@ -37,6 +37,18 @@ int main() {
     ef2000::apply_efpatches(image, writes);
     expect(image[16] == 0xcc && image[17] == 0x90 && image[18] == 0);
 
+    std::vector<uint8_t> arena_blob = {'E', 'F', '2', '0', '0', '0', 'P', '1'};
+    arena_blob.insert(arena_blob.end(), sha.begin(), sha.end());
+    append_u32(arena_blob, 1);
+    append_u32(arena_blob, 160);
+    append_u32(arena_blob, 2);
+    arena_blob.push_back(0x90);
+    arena_blob.push_back(0xc3);
+    const auto arena_writes = ef2000::decode_efpatch(arena_blob, sha, 128, 256);
+    std::vector<uint8_t> expanded(128, 0);
+    ef2000::apply_efpatches(expanded, arena_writes);
+    expect(expanded.size() == 162 && expanded[160] == 0x90 && expanded[161] == 0xc3);
+
     auto bad = blob;
     bad[8] = 1;  // incorrect source payload identity
     expect(fails(bad, sha));
