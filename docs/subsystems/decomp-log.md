@@ -409,3 +409,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `ret 0x10` at `0xf9448` and `ret 0x28` at `0xf8e44`. This inherited-stack
   behavior is not represented by Ghidra's six-parameter pseudo-C prototype;
   leave `0xf9448` and `0xf8e44` original until their stack layout is modeled.
+- M0 recovered-alias rule, 2026-11-06: mechanically declare recovered
+  callees with no register inputs (including no-argument and stack-only
+  signatures) so generated callers and function-table initializers resolve.
+  Where no return is confirmed but Ghidra consumes EAX, the generated alias
+  uses the generic `uint32_t` carrier; this is compile-enabling evidence, not
+  a behavioral ABI claim. The OpenWatcom pass increased from 393 to 394 `ok`
+  functions and from 115,359 to 116,954 ok body bytes (21.5% of exported
+  bytes). Relinking added `0x1a580`, bringing the hybrid to 2,175 redirects
+  (10,875 entry bytes; 574,596 arena bytes), 585/732 modules, with 321
+  mechanical functions and 1,854 hand-written functions patched. No replay
+  ran because private Xvfb cannot bind in this environment; M1/M2 remain
+  unpassed and the current hybrid's first guest failure is unknown.

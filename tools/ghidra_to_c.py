@@ -164,10 +164,13 @@ def pragma_for(name, sig):
 
 
 def confirmed_alias_declarations(address, sig):
-    """Declare a recovered stack-only guest callee under its generated name."""
+    """Declare a recovered guest callee under its generated name."""
     _, outputs = sig
     name = 'ef_fn_%08x' % address
-    result = outputs[0][1] if outputs else 'void'
+    # A recovered callee can have no confirmed return in signatures.tsv while
+    # Ghidra call sites still consume EAX. Keep those drafts compilable with
+    # the compiler's ordinary integer return carrier; replay must validate it.
+    result = outputs[0][1] if outputs else 'uint32_t'
     pragma = pragma_for(name, sig)
     declarations = [pragma] if pragma else []
     declarations.append('%s %s();' % (result, name))
@@ -448,13 +451,14 @@ def main():
     (args.out / 'src').mkdir(exist_ok=True)
     header, report = [], []
     if args.skip_recovered:
-        # Recovered stack-only callees still need an ABI alias for Ghidra's
-        # ef_fn_<address> spelling. Do not synthesize aliases for register
-        # inputs here: decompiler call arity may not describe live-in regs.
+        # Recovered no-register-input and stack-only callees still need an
+        # ABI alias for Ghidra's ef_fn_<address> spelling. Do not synthesize
+        # aliases for register inputs: decompiler call arity may not describe
+        # live-in regs.
         for entry in sorted(skip & sigs.keys()):
             inputs, _ = sigs[entry]
-            if inputs and all(re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper())
-                              for reg, _ in inputs):
+            if not inputs or all(re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper())
+                                 for reg, _ in inputs):
                 header.extend(confirmed_alias_declarations(entry, sigs[entry]))
     count = 0
     for row in rows:
