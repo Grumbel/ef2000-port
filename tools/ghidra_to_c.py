@@ -178,7 +178,7 @@ def confirmed_alias_declarations(address, sig):
     return declarations
 
 
-def convert(text, entry, names, sig_in=None, globals_=None):
+def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
     """Return (definition_signature, body_c, flags) for one pseudo-C file."""
     lines = text.split('\n')
     lines = [line for line in lines if not line.startswith(('/*', ' *'))]
@@ -381,6 +381,13 @@ def convert(text, entry, names, sig_in=None, globals_=None):
         flags.add('manual: no function definition recognized')
         return None, body, flags, inferred
     ret = ' '.join(match.group('ret').split()) or 'int'
+    # Ghidra may model a narrow Watcom return register (AL/AX) using a wider
+    # carrier type.  OpenWatcom validates `#pragma aux ... value [...]`
+    # against the declared C return type, so use the confirmed ABI type as
+    # the C carrier.  The implicit return conversion retains the low bits
+    # that the caller observes.
+    if sig_out and len(sig_out) == 1:
+        ret = sig_out[0][1]
     params = match.group('params').strip() or 'void'
     if sig_in and extra:
         # Confirmed signatures replace Ghidra's generic prototype.
@@ -472,8 +479,10 @@ def main():
         path = args.export / row['file']
         if not path.is_file():
             continue
-        sig, body, flags, inferred = convert(path.read_text(errors='replace'), entry, names,
-                                   sigs[entry][0] if entry in sigs else None, globals_)
+        sig, body, flags, inferred = convert(
+            path.read_text(errors='replace'), entry, names,
+            sigs[entry][0] if entry in sigs else None, globals_,
+            sigs[entry][1] if entry in sigs else None)
         state = 'manual' if flags else 'generated'
         if sig and entry in sigs:
             pragma = pragma_for('ef_fn_%08x' % entry, sigs[entry])

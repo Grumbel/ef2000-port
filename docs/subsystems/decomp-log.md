@@ -550,3 +550,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   before the menu: after these ABI fixes it faults at tick 604 in linked
   mechanical `original_memcpy` (`0x030856e2`); demoting that unverified entry
   moves the fault to guest IP `0x4` at tick 469. Formal M1/M2 remain unpassed.
+- M0 confirmed return-register type rule, 2026-11-07: when a recovered
+  signature names one output register, mechanical C now uses that output's
+  confirmed type as its return carrier. This resolves OpenWatcom's invalid
+  return-register errors for narrow results (for example `0x23800`, whose
+  callers observe `AL`; WDIS confirms the compiled body writes the low byte
+  before return). Recompiled with the cached OpenWatcom v2 `wcc386`: `ok`
+  rose from 395/1,020 (117,666 bytes) to 402/1,020 (121,560 bytes), and
+  compile errors fell from 31 to 24. Current rate is 39.4% of functions and
+  22.4% of available export body bytes; 594 remain `manual`. This changes
+  M0 only; no new hybrid replay was run, and the latest M1/M2 evidence above
+  is unchanged.

@@ -48,8 +48,8 @@ image, and compare behavior against the unmodified executable (plan §4).
 The host-side emulator remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Status (2026-11-06): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,222 marked `compiles`,
+Status (2026-11-07): 4,277 Ghidra-inventoried functions plus 10 manually
+confirmed additional entry points (4,287 tracked); 3,223 marked `compiles`,
 247 additional host-tested `drafted` entry points, 11 `spliced`, 5 `blocked`,
 and 20 `verified`. The verified OpenWatcom OMF replacements are
 `to_lower_ascii`, `to_upper_ascii`, `encode_runtime_segment_offset`,
@@ -75,17 +75,17 @@ first control-mode gate, [batch 126](../docs/subsystems/decomp-batch-126.md)
 verifies the paired mode B/C setters, and [batch 127](../docs/subsystems/decomp-batch-127.md)
 verifies the signed link-pointer lookup and its unaligned candidate override;
 [batch 128](../docs/subsystems/decomp-batch-128.md) verifies its record updater.
-M0 currently compiles 391/1,021 available unrecovered Ghidra exports (38.3%,
-114,873/544,304 bytes = 21.1%) mechanically. Hand-written recovered C covers
-363,644 body bytes (40.0%); combined with the mechanical `ok` exports, the
-potential hybrid coverage is 478,517/908,947 tracked body bytes (52.6%).
-The latest linked image patches 1,982 functions (9,910 original entry bytes)
-and places 571,524 bytes in its code arena. M1 is not passed: after correcting
-the table-wrapper cdecl ABIs and `fill_pattern_deb50`'s `ECX` count input,
-replay faults at original heap code `0x110487` on an unmapped write to
-`0x90909008` at tick 228, before the lowercase canary executes. The heap
-allocator module remains original because `misc_drafts1.obj` has an unresolved
-`guest_callptr1_x_` external. See the latest replay and bisector evidence in
+M0 mechanically compiles 402/1,020 available unrecovered Ghidra exports
+(39.4%, 121,560/543,917 body bytes = 22.4%) with OpenWatcom v2; 594 exports
+remain `manual` and 24 have compile errors. Hand-written recovered C covers
+364,031 body bytes (40.0%); together with mechanical `ok` exports, potential
+hybrid coverage is 485,591/908,947 tracked body bytes (53.4%). A focused
+two-function image redirects `init_far_stub_b04` and `to_lower_ascii` and
+passes the main-menu and quick-fight-setup replay cases. The broader image
+with 2,433 redirects is not yet at M1: after excluding the linked
+`original_memcpy` candidate, it faults at guest IP `0x4` on tick 469. The
+focused image has not been tested through the cockpit, and M2 is unpassed.
+See the latest replay and compiler evidence in
 [`decomp-log.md`](../docs/subsystems/decomp-log.md).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),
