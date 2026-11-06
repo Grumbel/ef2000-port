@@ -511,3 +511,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   675/741 modules, 388 mechanical and 2,031 hand-written functions patched;
   exclusions fall to 2,309. M1/M2 remain unpassed because private Xvfb cannot
   bind, and the first guest failure is unknown.
+- Hybrid OpenWatcom double-square-root bridge, 2026-11-06: added
+  `IF@DSQRT` as an x87 ST(0)-in/ST(0)-out `FSQRT` helper. Original callsite
+  disassembly shows ST(0) is a sum of squared coordinate differences in all
+  three dependent geometry modules; one caller also guards nonpositive
+  values. A helper-level Unicorn test passed 1,013 nonnegative 80-bit ST(0)
+  inputs, preserving the x87 control word and stack. The bridge does not
+  reproduce OpenWatcom's math-error reporting for negative inputs, which are
+  outside these observed caller paths. Relinking adds 12 redirects and reaches
+  2,431 functions (12,155 entry bytes; 576,148 arena bytes), 679/742 modules,
+  388 mechanical and 2,043 hand-written functions patched; exclusions fall
+  to 2,285. M1/M2 remain unpassed because private Xvfb cannot bind, and the
+  first guest failure is unknown.
