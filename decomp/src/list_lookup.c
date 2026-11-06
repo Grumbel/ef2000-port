@@ -64,7 +64,14 @@ void run_if_available_bc34f(ef_addr32 argument)
 /* 0xbc36a, 10 bytes. Run 0xbc34f with EBX preserved as zero. */
 void run_if_available_bc36a(ef_addr32 argument)
 {
+    __asm {
+        push ebx
+        xor ebx, ebx
+    }
     run_if_available_bc34f(argument);
+    __asm {
+        pop ebx
+    }
 }
 
 /* 0xbc465, 12 bytes. Digit character for a value: +0x30, then +0x27 past '9'. */

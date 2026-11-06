@@ -243,3 +243,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   unresolved. The focused two-entry trial for `0xcd4d4` instead stopped at
   `unsupported_interface`. No culprit is confirmed; the full hybrid still
   fails at the dataset check.
+- M3 correction at `0xbc36a`, 2026-11-06: original disassembly pushes EBX,
+  zeroes EBX for the `0xbc34f` call and restores EBX. The recovered C omitted
+  that temporary value. Added the register sequence around the C call; the
+  OpenWatcom output preserves the surrounding ABI. With only `0xbc36a` and
+  `0xe7835` patched, replay reaches the 500M-instruction checkpoint and
+  matches baseline interrupt/tick/IRQ0 counts, framebuffer hash and selected
+  guest-RAM hash. It records 98 hits to `0xbc36a`. The full hybrid still
+  exits at `IP=0x222` after 101 interrupts and 296 ticks, so this local fix
+  does not resolve the first full-set failure.
