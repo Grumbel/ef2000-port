@@ -78,11 +78,21 @@ void reset_unit_counter(void)
 #endif
 }
 
-/* 0x7a428, 0x0b bytes, two caller functions. EAX is the copied value. */
+/* 0x7a428, 0x0b bytes, verified: differential+replay. EAX is the copied value. */
+#if defined(__WATCOMC__)
+static uint32_t copy_active_buffer_pointer_direct(void);
+#pragma aux copy_active_buffer_pointer_direct = \
+    0xa1 0xc4 0xaf 0x12 0x00 0xa3 0x9c 0x8e 0x1f 0x00 \
+    __value [eax] __modify [eax]
+#endif
 uint32_t copy_active_buffer_pointer(void)
 {
+#if defined(__WATCOMC__)
+    return copy_active_buffer_pointer_direct();
+#else
     g_buffer_pointer_copy = g_buffer_pointer_source;
     return g_buffer_pointer_source;
+#endif
 }
 
 /* 0x7eea0, 0x19 bytes, two caller functions. With input disabled, the

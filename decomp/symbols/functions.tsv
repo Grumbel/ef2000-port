@@ -1444,7 +1444,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007a38c	24	register_handler_7a38c	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0007a38c.json	docs/compiler-abi.md; Register the 0x7a2b0 handler and remember 0x7a338.; callers 3ea0c@3ee46; guest pending
 0x0007a3b0	54	build_status_description	record_transitions	compiles	game	confirmed	decomp/tests/0x0007a3b0.json	docs/compiler-abi.md; host model; guest differential pending
 0x0007a3e8	64	clear_buffer_7a3e8	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x0007a3e8.json	docs/compiler-abi.md; Allocate (once) and clear the 0xc000-byte buffer.; callers 7ab00@7ab09; guest pending
-0x0007a428	11	copy_active_buffer_pointer	runtime_control	compiles	game	confirmed	decomp/tests/0x0007a428.json	docs/compiler-abi.md; Copies full dword 0x12afc4 to 0x1f8e9c; EAX holds source value; original guest replacement unverified
+0x0007a428	11	copy_active_buffer_pointer	runtime_control	verified	game	confirmed	decomp/tests/0x0007a428.json	OpenWatcom OMF matches original; 37 isolated + 1 captured call and repeated menu/setup/cockpit replay pass; 320002 cockpit hits
 0x0007a434	30	release_block_12afc4	status_values	compiles	game	confirmed	decomp/tests/0x0007a434.json	docs/compiler-abi.md; Release pointer 0x12afc4 via 0xc3f80 if nonzero then clear; sole direct caller 7ab00@7ac5c; guest pending
 0x0007a454	44	reset_sound_state_7a454	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007a454.json	docs/compiler-abi.md; 0x7a9bc if dword 0x12afd0; clear 0x1f8ea0,0x12afd0; 0x12afc0=-1; callers 3ea0c@3eeca; guest pending
 0x0007a480	33	check_buffer_capacity	buffer_cursor	compiles	game	confirmed	decomp/tests/0x0007a480.json	docs/compiler-abi.md
