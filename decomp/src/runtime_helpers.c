@@ -432,5 +432,9 @@ int32_t count_matching_streams(uint32_t mask)
 /* 0x10dfe0, 12 bytes. Dword +0x46c of the object pointed to by dword 0x120cc6. */
 uint32_t field_10dfe0(void)
 {
+#if defined(__WATCOMC__)
+    return *(uint32_t *)(uintptr_t)(g_runtime_segment_base + 0x46cu);
+#else
     return EF_U32(EF_U32(0x00120cc6u) + 0x46cu);
+#endif
 }

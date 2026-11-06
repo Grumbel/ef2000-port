@@ -105,6 +105,7 @@ extern double g_navigation_vector_scale_a; /* 0x0018aa0b, unaligned */
 extern double g_navigation_vector_scale_b; /* 0x0018aa13, unaligned */
 
 /* 0x3856c/0x38658 link resolution and short state-control cluster. */
+extern uint32_t g_runtime_segment_base; /* 0x00120cc6 */
 extern ef_addr32 g_link_pointer_table[]; /* 0x0019f5b0, raw 4-byte slots */
 extern uint32_t g_runtime_control_word; /* 0x001a35bc */
 extern int16_t g_runtime_phase_word; /* 0x001a35ec */

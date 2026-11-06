@@ -1,1 +1,117 @@
-{"address":"0x0010dfe0","function_size":12,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{},"memory":[]}]}
+{
+  "address": "0x0010dfe0",
+  "function_size": 12,
+  "max_instructions": 1000,
+  "cases": [
+    {
+      "name": "zero_value",
+      "registers": {
+        "eax": "0xdeacbfee",
+        "ebx": "0x10213141",
+        "ecx": "0x55677689",
+        "edx": "0x89aaccee",
+        "esi": "0x13569ade",
+        "edi": "0xfeddbb99",
+        "ebp": "0x76553311"
+      },
+      "memory": [
+        {
+          "address": "0x00120cc6",
+          "hex": "00002a00"
+        },
+        {
+          "address": "0x002a046c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "nonzero_value",
+      "registers": {
+        "eax": "0xdeafbced",
+        "ebx": "0x10223242",
+        "ecx": "0x5564758a",
+        "edx": "0x89a9cfed",
+        "esi": "0x135599dd",
+        "edi": "0xfedeb89a",
+        "ebp": "0x76563012"
+      },
+      "memory": [
+        {
+          "address": "0x00120cc6",
+          "hex": "00102a00"
+        },
+        {
+          "address": "0x002a146c",
+          "hex": "44332211"
+        }
+      ]
+    },
+    {
+      "name": "all_one_value",
+      "registers": {
+        "eax": "0xdeaebdec",
+        "ebx": "0x10233343",
+        "ecx": "0x5565748b",
+        "edx": "0x89a8ceec",
+        "esi": "0x135498dc",
+        "edi": "0xfedfb99b",
+        "ebp": "0x76573113"
+      },
+      "memory": [
+        {
+          "address": "0x00120cc6",
+          "hex": "00002b00"
+        },
+        {
+          "address": "0x002b046c",
+          "hex": "ffffffff"
+        }
+      ]
+    },
+    {
+      "name": "zero_base",
+      "registers": {
+        "eax": "0xdea9baeb",
+        "ebx": "0x10243444",
+        "ecx": "0x5562738c",
+        "edx": "0x89afc9eb",
+        "esi": "0x13539fdb",
+        "edi": "0xfed8be9c",
+        "ebp": "0x76503614"
+      },
+      "memory": [
+        {
+          "address": "0x00120cc6",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x0000046c",
+          "hex": "5a5aa5a5"
+        }
+      ]
+    },
+    {
+      "name": "near_ram_end",
+      "registers": {
+        "eax": "0xdea8bbea",
+        "ebx": "0x10253545",
+        "ecx": "0x5563728d",
+        "edx": "0x89aec8ea",
+        "esi": "0x13529eda",
+        "edi": "0xfed9bf9d",
+        "ebp": "0x76513715"
+      },
+      "memory": [
+        {
+          "address": "0x00120cc6",
+          "hex": "00001003"
+        },
+        {
+          "address": "0x0310046c",
+          "hex": "efcdab89"
+        }
+      ]
+    }
+  ]
+}
