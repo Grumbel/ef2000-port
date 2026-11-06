@@ -77,6 +77,16 @@ remains `spliced`, not verified. `latch_values_ce328` is now `blocked`: the
 straightforward C lowering is 61 bytes for a 44-byte extent. Current tracker:
 3,250 `compiles`, 5 `verified`, 1 `spliced`, 1 `blocked`, 247 `drafted`, 669
 `unknown`, and 3 `library`. See `docs/subsystems/decomp-batch-113.md`.
+**Batch-114 update (2026-11-06):** Original disassembly and three callers
+confirm `group_flag_negative_cc1ac` (`0xcc1ac`, 61 bytes): AL selects the
+node group, EBX points to the list head, EDX supplies the index, and EAX
+returns the sign predicate. The original masks EDX and does not preserve it;
+the signature row is corrected. An inline OpenWatcom C lowering compiles
+without warnings but is 72 bytes, and the next function starts at `0xcc1ec`,
+so it remains `blocked`. Current tracker: 3,249 `compiles`, 5 `verified`, 1
+`spliced`, 2 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`. See
+`docs/subsystems/decomp-batch-114.md`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -90,14 +100,14 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,250 | 363,538 |
+| `compiles` | 3,249 | 363,477 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
 | `verified` | 5 | 126 |
 | `spliced` | 1 | 55 |
-| `blocked` | 1 | 44 |
+| `blocked` | 2 | 105 |
 | **Total** | **4,287** | **908,947** |
 
 **At the Batch-112 state:** five routines are strictly verified as
