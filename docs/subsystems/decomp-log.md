@@ -458,3 +458,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   remaining link failure class is `__CHP` (19 modules). No replay ran because
   private Xvfb cannot bind; M1/M2 remain unpassed and the first guest failure
   is unknown.
+- Hybrid OpenWatcom x87 chop bridge, 2026-11-06: added `__CHP`, which rounds
+  ST(0) toward zero with FRNDINT while restoring the original x87 control
+  word, EAX, EFLAGS, and stack. WDIS confirms the 32-bit OMF body; relinking
+  resolves the `__CHP` failures and grows to 2,315 redirects (11,575 entry
+  bytes; 575,396 arena bytes), 644/737 modules, with 367 mechanical and 1,948
+  hand-written functions patched; exclusions fall to 2,517. This is link
+  evidence, not a successful menu replay. Both local Unix and TCP Xvfb
+  listeners fail in the sandbox, so M1/M2 remain unpassed and the first guest
+  failure is unknown.
