@@ -368,7 +368,7 @@ void trace_call_101ff4(uint32_t a)
 }
 
 /* 0x1022dc, 44 bytes. Trace wrapper for 0x11141f. */
-void trace_call_1022dc(uint32_t a)
+void EF_CDECL trace_call_1022dc(uint32_t a)
 {
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193b24u, a);
@@ -376,7 +376,7 @@ void trace_call_1022dc(uint32_t a)
 }
 
 /* 0x102330, 44 bytes. Trace wrapper for 0x111473. */
-void trace_call_102330(uint32_t a)
+void EF_CDECL trace_call_102330(uint32_t a)
 {
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193b54u, a);
@@ -384,7 +384,7 @@ void trace_call_102330(uint32_t a)
 }
 
 /* 0x102384, 44 bytes. Trace wrapper for 0x1113d4. */
-void trace_call_102384(uint32_t a)
+void EF_CDECL trace_call_102384(uint32_t a)
 {
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193b80u, a);
@@ -480,7 +480,7 @@ void trace_call_101ed4(uint32_t a, uint32_t b)
 }
 
 /* 0x1021f4, 52 bytes. Trace wrapper for 0x1114c7. */
-void trace_call_1021f4(uint32_t a, uint32_t b)
+void EF_CDECL trace_call_1021f4(uint32_t a, uint32_t b)
 {
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193aa8u, a, b);
@@ -488,7 +488,7 @@ void trace_call_1021f4(uint32_t a, uint32_t b)
 }
 
 /* 0x102228, 52 bytes. Trace wrapper for 0x1114f7. */
-void trace_call_102228(uint32_t a, uint32_t b)
+void EF_CDECL trace_call_102228(uint32_t a, uint32_t b)
 {
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193ac8u, a, b);
@@ -496,7 +496,7 @@ void trace_call_102228(uint32_t a, uint32_t b)
 }
 
 /* 0x10225c, 52 bytes. Trace wrapper for 0x111527. */
-void trace_call_10225c(uint32_t a, uint32_t b)
+void EF_CDECL trace_call_10225c(uint32_t a, uint32_t b)
 {
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193ae8u, a, b);

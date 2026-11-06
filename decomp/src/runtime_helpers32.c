@@ -20,11 +20,10 @@ void clear_rows_110b70(ef_addr32 dest, int16_t stride, int16_t len, int16_t coun
 }
 
 /* 0x111365, 71 bytes. Claim a free slot of the 15-entry table at 0x17d664, store the argument in 0x17d624 and return the slot offset (-1 when full). */
-uint32_t claim_table_slot_111365(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value)
+uint32_t EF_CDECL claim_table_slot_111365(uint32_t value)
 {
     uint32_t slot = 0;
 
-    (void)u0; (void)u1; (void)u2; (void)u3;
     guest_fn_101e70();
     for (;;) {
         if (EF_U32(0x0017d664u + slot) == 0) {
@@ -43,9 +42,8 @@ uint32_t claim_table_slot_111365(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
 }
 
 /* 0x11141f, 48 bytes. Promote a table slot from state 1 to state 2. */
-void table_slot_1_to_2_11141f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot)
+void EF_CDECL table_slot_1_to_2_11141f(uint32_t slot)
 {
-    (void)u0; (void)u1; (void)u2; (void)u3;
     guest_fn_101e70();
     if (slot != 0xffffffffu && EF_U32(0x0017d664u + slot) == 1)
         EF_U32(0x0017d664u + slot) = 2;
@@ -53,9 +51,8 @@ void table_slot_1_to_2_11141f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 }
 
 /* 0x111473, 48 bytes. Demote a table slot from state 2 to state 1. */
-void table_slot_2_to_1_111473(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot)
+void EF_CDECL table_slot_2_to_1_111473(uint32_t slot)
 {
-    (void)u0; (void)u1; (void)u2; (void)u3;
     guest_fn_101e70();
     if (slot != 0xffffffffu && EF_U32(0x0017d664u + slot) == 2)
         EF_U32(0x0017d664u + slot) = 1;
@@ -63,9 +60,8 @@ void table_slot_2_to_1_111473(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 }
 
 /* 0x1114c7, 48 bytes. Set a slot's field at 0x17d6e4, clear its field at 0x17d6a4 and run 110f6f. */
-void set_table_slot_value_1114c7(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot, uint32_t value)
+void EF_CDECL set_table_slot_value_1114c7(uint32_t slot, uint32_t value)
 {
-    (void)u0; (void)u1; (void)u2; (void)u3;
     guest_fn_101e70();
     EF_U32(0x0017d6e4u + slot) = value;
     EF_U32(0x0017d6a4u + slot) = 0;

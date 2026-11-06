@@ -293,3 +293,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   A broad trace over all 1,982 entries was manually stopped because of tracing
   overhead; the next culprit remains unresolved. M0 remains 391/1,021 exports
   (38.3%, 114,873/544,304 bytes); M1 is unpassed.
+- M3 cdecl table-wrapper and fill-pattern ABI corrections, 2026-11-06:
+  original disassembly shows the `0x102144`–`0x102384` trace wrappers and
+  callees `0x111365`, `0x1113ac`, `0x1113d4`, `0x11141f`, `0x111473`,
+  `0x1114c7`, `0x1114f7`, and `0x111527` use stack arguments with caller
+  cleanup. Their recovered prototypes described register arguments instead.
+  Changed the C declarations and definitions to `EF_CDECL`; OpenWatcom builds
+  all 335 hand-written modules with `-wx`. Separately, caller disassembly at
+  `0x2af20` shows `fill_pattern_deb50` receives destination in EAX, pattern in
+  EDX, and byte count in ECX (not EBX); its header pragma and ABI row now match.
+  With the cdecl corrections but before the ECX correction, the full hybrid
+  reached `IP=0x110de6` at 100M but differed in interrupt/IRQ0 counts and RAM.
+  With both corrections, replay instead faults in original heap code at
+  `0x110487`, trying to write `0x90909008` at tick 228, before canary
+  `0xe7835` is hit. `misc_drafts1.obj` is excluded from the hybrid because it
+  has an unresolved `guest_callptr1_x_` external, so `heap_alloc_110410` is
+  still original. The new bisector reduction retains 371 candidates after two
+  resumes and is unresolved. M0 remains 391/1,021 exports (38.3%,
+  114,873/544,304 bytes); M1 remains unpassed.

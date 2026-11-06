@@ -177,7 +177,7 @@ uint32_t value_17d7ae(void)
 }
 
 /* 0x1113ac, 40 bytes. Exchange dword 0x17d764[index] under the lock 0x101e70/0x101e78. */
-uint32_t exchange_slot_1113ac(uint32_t index, uint32_t value)
+uint32_t EF_CDECL exchange_slot_1113ac(uint32_t index, uint32_t value)
 {
     uint32_t result = guest_fn_101e70();
     if (index != 0xffffffffu) {
@@ -219,7 +219,7 @@ void for_each_slot_1114a3(void)
 }
 
 /* 0x1114f7, 48 bytes. 0x1021f4(a, 1000000 / b) under the lock. */
-void set_rate_1114f7(uint32_t slot, uint32_t divisor)
+void EF_CDECL set_rate_1114f7(uint32_t slot, uint32_t divisor)
 {
     guest_fn_101e70();
     trace_call_1021f4(slot, 1000000u / divisor);
@@ -227,7 +227,7 @@ void set_rate_1114f7(uint32_t slot, uint32_t divisor)
 }
 
 /* 0x111527, 66 bytes. 0x1021f4(a, b == 0 ? 0xd68d : 10000 * b / 0x2e9c) under the lock. */
-void set_period_111527(uint32_t slot, uint32_t value)
+void EF_CDECL set_period_111527(uint32_t slot, uint32_t value)
 {
     uint32_t scaled;
     guest_fn_101e70();

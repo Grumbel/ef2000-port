@@ -1156,9 +1156,9 @@ void fill_table_fef26(void);
 void update_fc9f8(int32_t value);
 void trace_call_101f44(uint32_t a);
 void trace_call_101ff4(uint32_t a);
-void trace_call_1022dc(uint32_t a);
-void trace_call_102330(uint32_t a);
-void trace_call_102384(uint32_t a);
+void EF_CDECL trace_call_1022dc(uint32_t a);
+void EF_CDECL trace_call_102330(uint32_t a);
+void EF_CDECL trace_call_102384(uint32_t a);
 void trace_call_102488(uint32_t a);
 void trace_call_102644(uint32_t a);
 void trace_call_102670(uint32_t a);
@@ -1170,9 +1170,9 @@ void trace_call_10311c(uint32_t a);
 void trace_call_103148(uint32_t a);
 void trace_call_1031a0(uint32_t a);
 void trace_call_101ed4(uint32_t a, uint32_t b);
-void trace_call_1021f4(uint32_t a, uint32_t b);
-void trace_call_102228(uint32_t a, uint32_t b);
-void trace_call_10225c(uint32_t a, uint32_t b);
+void EF_CDECL trace_call_1021f4(uint32_t a, uint32_t b);
+void EF_CDECL trace_call_102228(uint32_t a, uint32_t b);
+void EF_CDECL trace_call_10225c(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_102824(uint32_t a, uint32_t b);
 void trace_call_102858(uint32_t a, uint32_t b);
 void trace_call_10288c(uint32_t a, uint32_t b);
@@ -1180,9 +1180,9 @@ void EF_CDECL trace_call_1028c0(uint32_t a, uint32_t b);
 void trace_call_102a98(uint32_t a, uint32_t b);
 void guest_fn_1111ca(uint32_t a); /* 0x1111ca cdecl */
 void guest_fn_1112ed(uint32_t a); /* 0x1112ed cdecl */
-void guest_fn_11141f(uint32_t a); /* 0x11141f cdecl */
-void guest_fn_111473(uint32_t a); /* 0x111473 cdecl */
-void guest_fn_1113d4(uint32_t a); /* 0x1113d4 cdecl */
+void EF_CDECL guest_fn_11141f(uint32_t a); /* 0x11141f cdecl */
+void EF_CDECL guest_fn_111473(uint32_t a); /* 0x111473 cdecl */
+void EF_CDECL guest_fn_1113d4(uint32_t a); /* 0x1113d4 cdecl */
 void guest_fn_104464(uint32_t a); /* 0x104464 cdecl */
 void guest_fn_106634(uint32_t a); /* 0x106634 cdecl */
 void guest_fn_106644(uint32_t a); /* 0x106644 cdecl */
@@ -1194,9 +1194,9 @@ void guest_fn_11402c(uint32_t a); /* 0x11402c cdecl */
 void guest_fn_114058(uint32_t a); /* 0x114058 cdecl */
 void guest_fn_114170(uint32_t a); /* 0x114170 cdecl */
 void guest_fn_111142(uint32_t a, uint32_t b); /* 0x111142 cdecl */
-void guest_fn_1114c7(uint32_t a, uint32_t b); /* 0x1114c7 cdecl */
-void guest_fn_1114f7(uint32_t a, uint32_t b); /* 0x1114f7 cdecl */
-void guest_fn_111527(uint32_t a, uint32_t b); /* 0x111527 cdecl */
+void EF_CDECL guest_fn_1114c7(uint32_t a, uint32_t b); /* 0x1114c7 cdecl */
+void EF_CDECL guest_fn_1114f7(uint32_t a, uint32_t b); /* 0x1114f7 cdecl */
+void EF_CDECL guest_fn_111527(uint32_t a, uint32_t b); /* 0x111527 cdecl */
 void guest_fn_10677c(uint32_t a, uint32_t b); /* 0x10677c cdecl */
 void guest_fn_10679c(uint32_t a, uint32_t b); /* 0x10679c cdecl */
 void guest_fn_1067cc(uint32_t a, uint32_t b); /* 0x1067cc cdecl */
@@ -1318,12 +1318,12 @@ void decrement_17d7ba(void);
 uint32_t scale_110f3c(uint32_t value);
 uint32_t value_17d7b6(void);
 uint32_t value_17d7ae(void);
-uint32_t exchange_slot_1113ac(uint32_t index, uint32_t value);
+uint32_t EF_CDECL exchange_slot_1113ac(uint32_t index, uint32_t value);
 void for_each_slot_1113fb(void);
 void for_each_slot_11144f(void);
 void for_each_slot_1114a3(void);
-void set_rate_1114f7(uint32_t slot, uint32_t divisor);
-void set_period_111527(uint32_t slot, uint32_t value);
+void EF_CDECL set_rate_1114f7(uint32_t slot, uint32_t divisor);
+void EF_CDECL set_period_111527(uint32_t slot, uint32_t value);
 void guest_fn_11d258(uint32_t a, uint32_t b); /* 0x11d258 EAX/EDX */
 uint32_t guest_fn_10e872(uint32_t a, uint32_t b); /* 0x10e872 EAX/EDX */
 uint32_t guest_fn_10f1bf(ef_addr32 stream); /* 0x10f1bf EAX */
@@ -3461,6 +3461,7 @@ void fill_pattern_deb50(ef_addr32 dst, uint32_t pattern, uint32_t count);
 void store_args_and_shutdown_e474c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_a,
                                    uint32_t stack_b);
 void guest_fn_22e98_w(uint32_t a, uint32_t b); /* 0x22e98 EAX/EDX */
+#pragma aux fill_pattern_deb50 parm [eax edx ecx] modify [eax ecx edx]
 uint8_t guest_fn_843b0_w(void); /* 0x843b0 -> AL */
 void guest_fn_84370_w(void); /* 0x84370 */
 uint32_t guest_fn_d13ac_w(ef_addr32 a); /* 0xd13ac EAX -> AX */
@@ -3989,17 +3990,16 @@ void bearing_between_positions_dcaa4(ef_addr32 out, ef_addr32 a, ef_addr32 b);
 void run_pair_106e2c(uint32_t object, uint32_t u1, uint32_t second);
 void reset_table_record_and_link_112bbc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
 void trace_and_mark_113cf4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 rec);
-void clear_table_entry_1113d4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t index);
+void EF_CDECL clear_table_entry_1113d4(uint32_t index);
 void guest_fn_106d00_x(uint32_t a); /* 0x106d00 EAX */
 void guest_fn_106dc4_x(uint32_t a, uint32_t b); /* 0x106dc4 EAX EDX */
 
 /* runtime_helpers32.c */
 void clear_rows_110b70(ef_addr32 dest, int16_t stride, int16_t len, int16_t count);
-uint32_t claim_table_slot_111365(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
-void table_slot_1_to_2_11141f(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot);
-void table_slot_2_to_1_111473(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot);
-#pragma aux set_table_slot_value_1114c7 parm caller [eax edx ebx ecx]
-void set_table_slot_value_1114c7(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t slot, uint32_t value);
+uint32_t EF_CDECL claim_table_slot_111365(uint32_t value);
+void EF_CDECL table_slot_1_to_2_11141f(uint32_t slot);
+void EF_CDECL table_slot_2_to_1_111473(uint32_t slot);
+void EF_CDECL set_table_slot_value_1114c7(uint32_t slot, uint32_t value);
 uint32_t read_varlen_111f20(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 cursor);
 void guest_fn_110f6f_x(void); /* 0x110f6f */
 
@@ -4259,8 +4259,8 @@ uint32_t EF_CDECL trace_call_101e14(uint32_t a0, uint32_t a1);
 uint32_t trace_call_101e80(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
 uint32_t trace_call_101f08(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
 uint32_t trace_call_101f88(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3);
-uint32_t trace_call_102144(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
-uint32_t trace_call_102198(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t EF_CDECL trace_call_102144(uint32_t a0);
+uint32_t EF_CDECL trace_call_102198(uint32_t a0, uint32_t a1);
 uint32_t trace_call_1023d8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
 uint32_t trace_call_10242c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
 uint32_t trace_call_1024b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
@@ -4285,8 +4285,8 @@ uint32_t EF_CDECL guest_fn_1041e4_t(uint32_t a0, uint32_t a1); /* 0x1041e4 cdecl
 uint32_t guest_fn_111118_t(uint32_t a0); /* 0x111118 cdecl */
 uint32_t guest_fn_1111b1_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x1111b1 cdecl */
 uint32_t guest_fn_11124c_t(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3); /* 0x11124c cdecl */
-uint32_t guest_fn_111365_t(uint32_t a0); /* 0x111365 cdecl */
-uint32_t guest_fn_1113ac_t(uint32_t a0, uint32_t a1); /* 0x1113ac cdecl */
+uint32_t EF_CDECL guest_fn_111365_t(uint32_t a0); /* 0x111365 cdecl */
+uint32_t EF_CDECL guest_fn_1113ac_t(uint32_t a0, uint32_t a1); /* 0x1113ac cdecl */
 uint32_t guest_fn_104504_t(uint32_t a0); /* 0x104504 cdecl */
 uint32_t guest_fn_104200_t(uint32_t a0, uint32_t a1); /* 0x104200 cdecl */
 uint32_t guest_fn_106514_t(uint32_t a0); /* 0x106514 cdecl */

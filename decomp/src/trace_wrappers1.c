@@ -67,10 +67,9 @@ uint32_t trace_call_101f88(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
 }
 
 /* 0x102144, 84 bytes. AIL trace wrapper for 0x111365 with result trace (cdecl, all arguments on the stack). */
-uint32_t trace_call_102144(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0)
+uint32_t EF_CDECL trace_call_102144(uint32_t a0)
 {
     uint32_t result;
-    (void)u0; (void)u1; (void)u2; (void)u3;
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a70u, a0);
     result = guest_fn_111365_t(a0);
@@ -80,10 +79,9 @@ uint32_t trace_call_102144(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
 }
 
 /* 0x102198, 92 bytes. AIL trace wrapper for 0x1113ac with result trace (cdecl, all arguments on the stack). */
-uint32_t trace_call_102198(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1)
+uint32_t EF_CDECL trace_call_102198(uint32_t a0, uint32_t a1)
 {
     uint32_t result;
-    (void)u0; (void)u1; (void)u2; (void)u3;
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a8cu, a0, a1);
     result = guest_fn_1113ac_t(a0, a1);

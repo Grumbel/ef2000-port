@@ -34,9 +34,8 @@ void trace_and_mark_113cf4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 }
 
 /* 0x1113d4, 39 bytes. Between the 101e70/101e78 bracket clear one table dword (index from the stack) unless it is -1. */
-void clear_table_entry_1113d4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t index)
+void EF_CDECL clear_table_entry_1113d4(uint32_t index)
 {
-    (void)u0; (void)u1; (void)u2; (void)u3;
     guest_fn_101e70();
     if (index != 0xffffffffu)
         EF_U32(0x0017d664u + index) = 0;

@@ -81,10 +81,11 @@ M0 currently compiles 391/1,021 available unrecovered Ghidra exports (38.3%,
 potential hybrid coverage is 478,517/908,947 tracked body bytes (52.6%).
 The latest linked image patches 1,982 functions (9,910 original entry bytes)
 and places 571,524 bytes in its code arena. M1 is not passed: after correcting
-the startup stack-cleanup mismatch at `0x1114c7`, replay reaches its 100M
-instruction limit but diverges from the original (`IP=0x0` vs `0x110de6`,
-202 vs 13,766 interrupts, 1 vs 356 IRQ0 events, and a different selected RAM
-hash). See the latest replay and bisector evidence in
+the table-wrapper cdecl ABIs and `fill_pattern_deb50`'s `ECX` count input,
+replay faults at original heap code `0x110487` on an unmapped write to
+`0x90909008` at tick 228, before the lowercase canary executes. The heap
+allocator module remains original because `misc_drafts1.obj` has an unresolved
+`guest_callptr1_x_` external. See the latest replay and bisector evidence in
 [`decomp-log.md`](../docs/subsystems/decomp-log.md).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),

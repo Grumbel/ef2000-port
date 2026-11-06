@@ -8610,7 +8610,7 @@ void start_timer_service_e28e8(void)
     init_module_d6dc4();
     stack_range_104908(0x000e28c4u, 0x000e28d8u - 0x000e28c0u);
     stack_range_104908(0x0015f73cu, 0x0015f750u - 0x0015f73cu);
-    EF_U32(0x0015f74cu) = trace_call_102144(0u, 0u, 0u, 0u, 0x000e28c4u);
+    EF_U32(0x0015f74cu) = trace_call_102144(0x000e28c4u);
     if (EF_U32(0x0015f74cu) == 0xffffffffu)
         guest_callptr1_x(EF_U32(0x00132a74u), 0x00190860u);
     trace_call_102228(EF_U32(0x0015f74cu), 0x32u);
