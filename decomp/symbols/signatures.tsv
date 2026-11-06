@@ -618,7 +618,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00102644	trace_call_102644	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102644 (44 bytes); Trace wrapper for 0x106634.; callers 1115fc@11161e; docs/compiler-abi.md
 0x00102670	trace_call_102670	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102670 (44 bytes); Trace wrapper for 0x106644.; callers d6e58@d6f6b,d72b4@d7323,1065c8@106620; docs/compiler-abi.md
 0x00102774	trace_call_102774	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102774 (44 bytes); Trace wrapper for 0x10683c.; callers d7158@d72a5,d72b4@d7398; docs/compiler-abi.md
-0x001027a0	trace_call_1027a0	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027a0 (44 bytes); Trace wrapper for 0x10687c.; callers d7490@d74c1; docs/compiler-abi.md
+0x001027a0	trace_call_1027a0	[ESP+4]:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027a0 (44 bytes); cdecl caller-clean trace wrapper for 0x10687c.; caller d7490@d74c1; docs/compiler-abi.md
 0x001027cc	trace_call_1027cc	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027cc (44 bytes); Trace wrapper for 0x106894.; callers d7530@d7561; docs/compiler-abi.md
 0x001027f8	trace_call_1027f8	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027f8 (44 bytes); Trace wrapper for 0x1068b8.; callers d74d0@d7501; docs/compiler-abi.md
 0x0010311c	trace_call_10311c	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010311c (44 bytes); Trace wrapper for 0x11402c.; callers d5e0c@d5ea5; docs/compiler-abi.md
@@ -656,7 +656,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x001067cc	set_field_1067cc	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001067cc (30 bytes); As 0x10679c for +0x44.; callers d710c@d712e,10288c@1028b6; docs/compiler-abi.md
 0x0010682c	set_field_10682c	[ESP+4]:ef_addr32,[ESP+8]:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x0010682c (16 bytes); cdecl, two caller-clean stack arguments; if pointer non-null store value at +0x30.; caller 1028c0@1028ea; docs/compiler-abi.md
 0x0010683c	stop_selected_10683c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010683c (62 bytes); ; callers 102774@102797; docs/compiler-abi.md
-0x0010687c	pause_object_10687c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010687c (22 bytes); State 4 becomes 8.; callers 1027a0@1027c3; docs/compiler-abi.md
+0x0010687c	pause_object_10687c	[ESP+4]:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010687c (22 bytes); cdecl caller-clean pointer; if non-null and state at +4 is 4, store 8.; sole known direct caller 1027a0@1027c3; docs/compiler-abi.md
 0x00106894	resume_object_106894	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106894 (33 bytes); State 8 becomes 4 and 0x1052f0 runs.; callers 1027cc@1027ef; docs/compiler-abi.md
 0x00106938	exchange_callback_106938	EAX:ef_addr32,EDX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106938 (28 bytes); Exchange dword +0x850; null object returns 0.; callers 102dbc@102de8; docs/compiler-abi.md
 0x00106988	set_and_notify_106988	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00106988 (63 bytes); Store dword +0x68 and notify each of the +0x60 entries (0x894 bytes each) whose state is not 1.; callers 102a98@102ac2; docs/compiler-abi.md

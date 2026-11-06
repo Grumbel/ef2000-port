@@ -392,7 +392,7 @@ void trace_call_102774(uint32_t a)
 }
 
 /* 0x1027a0, 44 bytes. Trace wrapper for 0x10687c. */
-void trace_call_1027a0(uint32_t a)
+void EF_CDECL trace_call_1027a0(uint32_t a)
 {
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193d8cu, a);

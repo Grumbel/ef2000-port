@@ -251,7 +251,7 @@ void stop_selected_10683c(ef_addr32 object)
 }
 
 /* 0x10687c, 22 bytes. State 4 becomes 8. */
-void pause_object_10687c(ef_addr32 object)
+void EF_CDECL pause_object_10687c(ef_addr32 object)
 {
     if (object != 0 && EF_U32(object + 4u) == 4)
         EF_U32(object + 4u) = 8;

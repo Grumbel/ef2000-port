@@ -461,3 +461,6 @@ Keep it `spliced`. See `docs/subsystems/decomp-batch-133.md`. Current tracker:
 
 
 **Batch-134 update (2026-11-06):** `times_100` (`0x106be8`, 18 bytes) now has a modulo-2^32 C model and OpenWatcom in-place patch. The emitted `imul eax,100; ret` preserves EDX; eight isolated cases pass. Repeated menu/setup/cockpit replay matches existing checkpoints but has zero calls to the candidate, whose callers are behind the virtual-I/O selector. Keep it `spliced` until a caller path is exercised. See `docs/subsystems/decomp-batch-134.md`. Current tracker: 3,226 `compiles`, 17 `verified`, 9 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`.
+
+
+**Batch-135 update (2026-11-06):** Corrected `pause_object_10687c` (`0x10687c`) and its trace wrapper `0x1027a0` to caller-clean cdecl. The 22-byte OpenWatcom body matches the original; five isolated cases pass. The SB16-DMA replay has zero target hits and nondeterministic baselines (42,279 vs. 42,324 interrupts), with a patched selected-BSS mismatch. Retain `spliced`. See `docs/subsystems/decomp-batch-135.md`. Current tracker: 3,225 `compiles`, 17 `verified`, 10 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`.
