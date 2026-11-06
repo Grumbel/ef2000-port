@@ -4,10 +4,20 @@
 #include "ef_abi.h"
 #include "ef_globals.h"
 
-/* 0x3cd64, 0x06 bytes, six caller functions. Full EAX store. */
+/* 0x3cd64, 0x06 bytes, verified: differential+replay. Full EAX store. */
+#if defined(__WATCOMC__)
+static void store_runtime_control_word_direct(void);
+#pragma aux store_runtime_control_word_direct = \
+    0xa3 0xbc 0x35 0x1a 0x00 __modify []
+#endif
 void store_runtime_control_word(uint32_t value)
 {
+#if defined(__WATCOMC__)
+    (void)value;
+    store_runtime_control_word_direct();
+#else
     g_runtime_control_word = value;
+#endif
 }
 
 /* 0x3dcc0, 0x0a bytes, verified: differential+replay. */

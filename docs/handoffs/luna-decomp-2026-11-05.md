@@ -168,6 +168,15 @@ counters. See `docs/subsystems/decomp-batch-121.md`. Current tracker:
 3,240 `compiles`, 9 `verified`, 3 `spliced`, 5 `blocked`, 247 `drafted`,
 669 `unknown`, and 3 `library`.
 
+**Batch-122 update (2026-11-06):** `store_runtime_control_word`
+(`0x3cd64`, 6 bytes) is now the tenth strictly verified OpenWatcom
+replacement. The OMF body matches the original `mov [0x1a35bc],eax; ret`;
+37 isolated cases and two separately captured cockpit calls pass. The
+repeated-baseline menu/setup/cockpit suite passes and reaches the candidate
+2,435 times in cockpit. See `docs/subsystems/decomp-batch-122.md`. Current
+tracker: 3,239 `compiles`, 10 `verified`, 3 `spliced`, 5 `blocked`, 247
+`drafted`, 669 `unknown`, and 3 `library`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -181,12 +190,12 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,240 | 363,121 |
+| `compiles` | 3,239 | 363,115 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
-| `verified` | 9 | 291 |
+| `verified` | 10 | 297 |
 | `spliced` | 3 | 107 |
 | `blocked` | 5 | 244 |
 | **Total** | **4,287** | **908,947** |
@@ -202,7 +211,7 @@ completion.
 1. `AGENTS.md` (commits, ownership, licensing, asset restrictions).
 2. `docs/decompilation-plan.md` **§1, §2.2, §2.4, §4 and §11** (rules,
    correctness target, verification order and per-function loop).
-3. `docs/subsystems/decomp-batch-121.md` (latest actual experiment and exact
+3. `docs/subsystems/decomp-batch-122.md` (latest actual experiment and exact
    verification evidence); consult batch 104 for its historical startup
    survey and baseline experiments.
 4. `docs/decompilation-status-2026-11-05.md` (the quantitative gap; written
