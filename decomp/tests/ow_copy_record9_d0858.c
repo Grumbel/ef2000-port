@@ -2,13 +2,23 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 #include "ef_abi.h"
 
-void copy_record9_d0858(ef_addr32 destination, ef_addr32 source)
+#if defined(__WATCOMC__)
+static void copy_record9_save_flags(void);
+#pragma aux copy_record9_save_flags = 0x9c __modify []
+static void copy_record9_restore_flags(void);
+#pragma aux copy_record9_restore_flags = 0x9d __modify []
+#endif
+
+ef_addr32 copy_record9_d0858(ef_addr32 destination, ef_addr32 source)
 {
     volatile uint32_t *dst = (volatile uint32_t *)(uintptr_t)destination;
     volatile uint32_t *src = (volatile uint32_t *)(uintptr_t)source;
     uint32_t row, column;
 
+    copy_record9_save_flags();
     for (row = 0; row < 3u; ++row)
         for (column = 0; column < 3u; ++column)
             dst[column * 3u + row] = src[column * 3u + row];
+    copy_record9_restore_flags();
+    return (ef_addr32)(uintptr_t)dst;
 }

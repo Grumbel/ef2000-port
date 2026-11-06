@@ -1781,7 +1781,7 @@ uint32_t mouse_read_buttons_ce064(void);
 void latch_values_ce328(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
 ef_addr32 apply_pending_events_ce944(ef_addr32 object);
 void forward_record_cf78c(void);
-void copy_record9_d0858(ef_addr32 destination, ef_addr32 source);
+ef_addr32 copy_record9_d0858(ef_addr32 destination, ef_addr32 source);
 void init_bounds_d0b68(ef_addr32 record);
 void remap_palette_d65a8(ef_addr32 destination, ef_addr32 source);
 void init_module_d6dc4(void);

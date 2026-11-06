@@ -51,3 +51,33 @@ call sites, but a straightforward OpenWatcom C fixture compiles to 61 bytes
 and saves ESI. The next function begins at `0xce354`; the in-place splicer
 correctly rejects the oversized object. The tracker is `blocked` pending a C
 lowering that fits safely or an independently reviewed placement strategy.
+
+
+## Batch 117 re-audit (2026-11-06)
+
+The production C now explicitly preserves the original EAX destination return
+and the incoming arithmetic flags. Two small OpenWatcom helpers emit
+`PUSHFD`/`POPFD`; the nested C loops preserve the unusual dword order. The
+production object body is 49 bytes (the next public begins after three
+alignment bytes), and its first 49 bytes equal the focused fixture exactly.
+The SHA-bound patch spans the 55-byte original extent. The ABI record now
+includes EAX as an output, and the test spec checks EFLAGS mask `0x8d5`.
+
+Eight synthetic cases and the saved live call pass, comparing EAX, preserved
+registers, selected EFLAGS, and all 36 copied bytes. With all six verified
+patches applied, the 1.5B cockpit replay reaches this function 42 times;
+framebuffer SHA, final IP, stop status, interrupts, ticks, and IRQ0 count match
+the repeated original baseline. The selected BSS hash still differs:
+`93aec90671d6ae27204af5dbba82a1da835a7a4c20d27aa1fb38b4698df32ab7`
+original versus
+`d8521a5f3d08cf9cdcb9dc1768b4e1b3919d201f321d3da5a8ac7b7ed8e37903`
+patched.
+
+Address-sliced replay identified the changed region around `0x1a34b0`. A
+follow-up hash of the exact four-byte `g_filtered_object_lookup_calls` global
+at `0x1a3580` confirms its value changes from `0x8efe` to `0x8ef9`; this
+lookup counter is incremented by `0x7489c` and is read for display at
+`0x3d4b0`. This is a concrete guest-state difference, so it cannot be excluded as
+incidental. It is consistent with
+a timing-driven shift in later lookup calls, but the causal path is not yet
+proven. Keep the candidate `spliced`, not `verified`.

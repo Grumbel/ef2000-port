@@ -2409,7 +2409,7 @@ in EAX, format string address, one value).
 | `0xce328` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 1e480@1e4a7,1e7c0@1e8d5,1f0fc@1f1de | Latch four values and the current pair at 0x15b744/0x15b748. |
 | `0xce944` | EAX:ef_addr32 | EAX:ef_addr32 | d23d8@d2411 | Apply pending event bits of an object through the 5-entry table at 0x15b798. |
 | `0xcf78c` | none | none | 14d58@14e3c,14d58@14e74,14d58@14ea5 | Forward the five words of the record at 0x4208e4 to cf3a4. |
-| `0xd0858` | EAX:ef_addr32,EDX:ef_addr32 | none | 91c98@91d77,91df4@91e81,91df4@91ee6 | Copy a 9-dword record. |
+| `0xd0858` | EAX:ef_addr32,EDX:ef_addr32 | EAX:ef_addr32 | 91c98@91d77,91df4@91e81,91df4@91ee6 | Copy a 9-dword record in offsets 0,12,24,4,16,28,8,20,32 order; EAX returns unchanged destination, EDX is source[8], EFLAGS are unchanged. |
 | `0xd0b68` | EAX:ef_addr32 | none | 1b4a4@1b5e3,26b60@26f51,27348@27355 | Reset a 9-dword bounds record (0x7fff limits). |
 | `0xd65a8` | EAX:ef_addr32,EDX:ef_addr32 | none | d660c@d6620,d663c@d664b | Remap a 256-entry RGB palette through three 64-byte tables. |
 | `0xd6dc4` | none | none | d5d18@d5d39,d6e58@d6e9e,e28e8@e28ff | One-time module init; registers the exit handler at 0xd6da0. |

@@ -106,6 +106,19 @@ path is replayed. Current tracker: 3,247 `compiles`, 6 `verified`, 2
 `spliced`, 2 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`. See
 `docs/subsystems/decomp-batch-116.md`.
 
+
+**Batch-117 update (2026-11-06):** Re-audited `copy_record9_d0858`
+(`0xd0858`). The 49-byte production OpenWatcom body now matches the fixture
+and preserves original EAX and EFLAGS; eight isolated cases and one captured
+live call pass. A correct full patch-set cockpit replay still differs in BSS
+while matching framebuffer, stop point and interrupt/tick counters. The
+exact changed field is `g_filtered_object_lookup_calls` at `0x1a3580`
+(`0x8efe` original, `0x8ef9` patched); retain `spliced`, not `verified`.
+The causal path remains unresolved; see
+`docs/subsystems/decomp-batch-113.md`. Current tracker totals are unchanged:
+3,247 `compiles`, 6 `verified`, 2 `spliced`, 2 `blocked`, 247 `drafted`,
+669 `unknown`, and 3 `library`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
