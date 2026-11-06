@@ -86,6 +86,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   bytes. The remaining 93 compile errors are led by guest-pointer expressions
   45 and parameter-count conflicts 23. This relaxes compile-time call checking;
   it provides no ABI verification and those calls still require hybrid replay.
+- M0 rule 10, byte-pair concatenation lowering, 2026-11-06: translate
+  `CONCATxy(a, b)` to width-masked unsigned shifts for values up to 64 bits;
+  wider forms stay manual. The OpenWatcom report rises to 207/1,022 ok
+  (20.3%, 47,712/544,429 bytes = 8.8%), from 190/1,022 (18.6%,
+  37,479/544,429 bytes = 6.9%). The remaining export has 107 compile errors
+  (34,149 bytes) and 708 manual functions (462,568 bytes). Compilation used
+  the pinned OpenWatcom binary directly because `nix develop` could not write
+  the Nix fetcher cache; compile success does not establish ABI correctness.
 - M1 structural assessment, 2026-11-06: all 334 `decomp/src/*.c` modules
   compile with OpenWatcom `-wx` and zero warnings into ignored
   `local/hybrid/obj/` (432,877 CODE bytes plus 4,388 DATA bytes). The OMF

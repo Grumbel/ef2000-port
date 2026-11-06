@@ -56,7 +56,7 @@ TYPES = [
 ]
 # Anything matching these cannot be translated mechanically.
 MANUAL = re.compile(r'\b(?:swi|in_[A-Za-z]+|unaff_[A-Za-z0-9]+|extraout_[A-Za-z0-9]+|'
-                    r'CONCAT\d+|SUB\d+|ZEXT\d+|SEXT\d+|halt_baddata|halt_unimplemented|'
+                    r'SUB\d+|ZEXT\d+|SEXT\d+|halt_baddata|halt_unimplemented|'
                     r'WARNING|bad_instruction|CARRY\d|SBORROW\d|__halt)\b')
 HEX = r'([0-9a-fA-F]{8})'
 DEF = re.compile(r'^(?P<ret>[A-Za-z_][\w\s\*]*?)\s*\b(?P<name>\w+)\((?P<params>[^()]*)\)\s*$')
@@ -129,13 +129,24 @@ def pragma_for(name, sig):
     if any(reg is None for reg in regs) or len(outs) > 1:
         return None
     text = '#pragma aux %s parm [%s]' % (name, '] ['.join(regs)) if regs else \
-           '#pragma aux %s parm []' % name
+           '#pragma aux %s parm caller []' % name
     if outs:
         out = REG32.get(outs[0][0].upper())
         if out is None:
             return None
         text += ' value [%s]' % out
     return text
+
+
+def confirmed_alias_declarations(address, sig):
+    """Declare a recovered stack-only guest callee under its generated name."""
+    _, outputs = sig
+    name = 'ef_fn_%08x' % address
+    result = outputs[0][1] if outputs else 'void'
+    pragma = pragma_for(name, sig)
+    declarations = [pragma] if pragma else []
+    declarations.append('%s %s();' % (result, name))
+    return declarations
 
 
 def convert(text, entry, names, sig_in=None, globals_=None):
@@ -146,12 +157,24 @@ def convert(text, entry, names, sig_in=None, globals_=None):
     flags = set()
     extra = []
     inferred = []
+    original_first = next((line for line in body.split('\n') if line.strip()), '')
+    original = DEF.match(original_first)
+    original_params = []
+    if original and original.group('params').strip() not in ('', 'void'):
+        for parameter in original.group('params').split(','):
+            name = re.search(r'([A-Za-z_]\w*)\s*(?:\[[^]]*\])?\s*$', parameter.strip())
+            original_params.append(name.group(1) if name else None)
     if sig_in:
         # Watcom register arguments: Ghidra shows them as in_<REG>.
         for reg, ctype in sig_in:
             stack = re.fullmatch(r'\[?ESP\+(\d+)\]?', reg.upper())
             if stack:
-                extra.append('%s stack_%s' % (ctype if ctype else 'uint32_t', stack.group(1)))
+                stack_index = max(0, (int(stack.group(1)) - 4) // 4)
+                parameter_name = (original_params[stack_index]
+                                  if stack_index < len(original_params) else None)
+                if not parameter_name:
+                    parameter_name = 'stack_%s' % stack.group(1)
+                extra.append('%s %s' % (ctype if ctype else 'uint32_t', parameter_name))
                 continue
             name = 'in_' + reg.upper()
             if re.search(r'\b' + name + r'\b', body):
@@ -187,6 +210,17 @@ def convert(text, entry, names, sig_in=None, globals_=None):
             inferred.append(base)
     if MANUAL.search(body) or re.search(r'\._\d_\d_', body):
         flags.add('manual')
+    # Ghidra's CONCATxy(a, b) joins x bytes from a and y bytes from b.
+    # Keep the operation unsigned and wide while shifting, then narrow to the
+    # width Ghidra assigns to the combined value. Values wider than 64 bits
+    # remain for manual handling.
+    def concat_repl(match):
+        high_bytes, low_bytes = map(int, match.groups())
+        if high_bytes + low_bytes > 8:
+            flags.add('manual')
+            return match.group(0)
+        return 'EF_CONCAT_%d_%d(' % (high_bytes, low_bytes)
+    body = re.sub(r'\bCONCAT([1-8])([1-8])\s*\(', concat_repl, body)
     for pattern, repl in TYPES:
         body = re.sub(pattern, repl, body)
     body = re.sub(r'\btrue\b', '1', body)
@@ -233,6 +267,27 @@ PREAMBLE = '''/* Mechanical draft derived from Ghidra output. NEVER COMMIT. */
 '''
 
 
+def concat_macros():
+    """Emit the finite CONCAT macros used by the current Ghidra export."""
+    widths = range(1, 9)
+    macros = []
+    for high_bytes in widths:
+        for low_bytes in widths:
+            if high_bytes + low_bytes > 8:
+                continue
+            shift = low_bytes * 8
+            high_mask = '0xffffffffffffffffULL' if high_bytes == 8 else \
+                '0x%xULL' % ((1 << (high_bytes * 8)) - 1)
+            low_mask = '0xffffffffffffffffULL' if low_bytes == 8 else \
+                '0x%xULL' % ((1 << (low_bytes * 8)) - 1)
+            result_type = 'uint32_t' if high_bytes + low_bytes <= 4 else 'uint64_t'
+            expression = ('((((uint64_t)(a) & %s) << %d) | '
+                          '((uint64_t)(b) & %s))' % (high_mask, shift, low_mask))
+            macros.append('#define EF_CONCAT_%d_%d(a,b) ((%s)(%s))' %
+                          (high_bytes, low_bytes, result_type, expression))
+    return '\n'.join(macros)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
     parser.add_argument('--export', type=Path, default=EXPORT)
@@ -259,6 +314,15 @@ def main():
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / 'src').mkdir(exist_ok=True)
     header, report = [], []
+    if args.skip_recovered:
+        # Recovered stack-only callees still need an ABI alias for Ghidra's
+        # ef_fn_<address> spelling. Do not synthesize aliases for register
+        # inputs here: decompiler call arity may not describe live-in regs.
+        for entry in sorted(skip & sigs.keys()):
+            inputs, _ = sigs[entry]
+            if inputs and all(re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper())
+                              for reg, _ in inputs):
+                header.extend(confirmed_alias_declarations(entry, sigs[entry]))
     count = 0
     for row in rows:
         entry = int(row['entry'], 16)
@@ -295,7 +359,8 @@ def main():
     (args.out / 'ef_gen_abi.h').write_text(
         '/* Generated; derived from Ghidra output. NEVER COMMIT. */\n'
         '#include "ef_types.h"\n'
-        'typedef void ef_gen_code(void);\n' + '\n'.join(dict.fromkeys(header)) + '\n')
+        'typedef void ef_gen_code(void);\n' + concat_macros() + '\n' +
+        '\n'.join(dict.fromkeys(header)) + '\n')
 
     if args.compile:
         include = ['-i=' + str(ROOT / 'decomp/include'), '-i=' + str(args.out)]
