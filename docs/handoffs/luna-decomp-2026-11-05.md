@@ -437,3 +437,14 @@ startup / 1.5B cockpit capture probes found no call. Keep it `spliced`.
 See `docs/subsystems/decomp-batch-131.md`. Current tracker: 3,229
 `compiles`, 17 `verified`, 6 `spliced`, 5 `blocked`, 247 `drafted`, 669
 `unknown`, and 3 `library`.
+
+**Batch-132 update (2026-11-06):** `set_field_10677c` (`0x10677c`, 16
+bytes) and its trace wrapper `0x102824` were corrected to caller-clean stack
+ABIs. OpenWatcom emits the exact original setter body; four isolated cases
+and one captured sound-DMA call from `0x102824@0x102853` pass. Keep the
+candidate `spliced`: the sound-DMA repeated original baselines differ by two
+interrupts and the patched checkpoint RAM hash also differs; SB16-probe
+stops at unsupported real-mode IN port `0xa1` before reaching it. See
+`docs/subsystems/decomp-batch-132.md`. Current tracker: 3,228 `compiles`, 17
+`verified`, 7 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3
+`library`.

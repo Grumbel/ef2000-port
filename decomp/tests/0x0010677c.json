@@ -1,1 +1,17 @@
-{"address":"0x0010677c","function_size":16,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x0010677c",
+  "function_size": 16,
+  "max_instructions": 1000,
+  "stack_top": "0x0000f000",
+  "return_sentinel": "0x0000e000",
+  "stack_scratch_bytes": "0x00001000",
+  "cases": [
+    {"name": "null_pointer", "stack_args": [0, "0xdeadbeef"]},
+    {"name": "zero_field", "stack_args": ["0x00008000", 0],
+     "memory": [{"address": "0x0000803c", "hex": "ffffffff"}]},
+    {"name": "replace_value", "stack_args": ["0x00009000", "0x12345678"],
+     "memory": [{"address": "0x0000903c", "hex": "78563412"}]},
+    {"name": "unaligned_object", "stack_args": ["0x0000a001", "0xffffffff"],
+     "memory": [{"address": "0x0000a03d", "hex": "00000000"}]}
+  ]
+}

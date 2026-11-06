@@ -179,10 +179,23 @@ void set_pair_106740(ef_addr32 object, uint32_t first, uint32_t second)
 }
 
 /* 0x10677c, 16 bytes. Dword +0x3c = value. */
-void set_field_10677c(ef_addr32 object, uint32_t value)
+#if defined(__WATCOMC__)
+static void set_field_10677c_original_sequence(void);
+#pragma aux set_field_10677c_original_sequence = \
+    0x8b 0x44 0x24 0x04 0x85 0xc0 0x74 0x07 \
+    0x8b 0x54 0x24 0x08 0x89 0x50 0x3c \
+    __modify [eax edx]
+#endif
+void EF_CDECL set_field_10677c(ef_addr32 object, uint32_t value)
 {
+#if defined(__WATCOMC__)
+    (void)object;
+    (void)value;
+    set_field_10677c_original_sequence();
+#else
     if (object != 0)
         EF_U32(object + 0x3cu) = value;
+#endif
 }
 
 /* 0x10679c, 30 bytes. Update +0x40 and notify when it changes. */

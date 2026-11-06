@@ -2024,7 +2024,7 @@ in EAX, format string address, one value).
 | `0x1021f4` | EAX:uint32_t,EDX:uint32_t | none | 110fd4@1110ab,1114f7@111515,111527@111557 | Trace wrapper for 0x1114c7. |
 | `0x102228` | EAX:uint32_t,EDX:uint32_t | none | e28e8@e2962,104200@104447,105e38@106418 | Trace wrapper for 0x1114f7. |
 | `0x10225c` | EAX:uint32_t,EDX:uint32_t | none | none direct | Trace wrapper for 0x111527. |
-| `0x102824` | EAX:uint32_t,EDX:uint32_t | none | d7158@d721e,d7158@d725f,d72b4@d734c | Trace wrapper for 0x10677c. |
+| `0x102824` | [ESP+4]:uint32_t,[ESP+8]:uint32_t | none | d7158@d721e,d7158@d725f,d72b4@d734c | Trace wrapper for 0x10677c; caller cleanup. |
 | `0x102858` | EAX:uint32_t,EDX:uint32_t | none | d7158@d7248,d72b4@d735e,d73b8@d73e4 | Trace wrapper for 0x10679c. |
 | `0x10288c` | EAX:uint32_t,EDX:uint32_t | none | none direct | Trace wrapper for 0x1067cc. |
 | `0x1028c0` | EAX:uint32_t,EDX:uint32_t | none | d7158@d7273 | Trace wrapper for 0x10682c. |
@@ -2052,7 +2052,7 @@ in EAX, format string address, one value).
 | `0x106708` | [ESP+4]:ef_addr32 | EAX:uint32_t | 1028f4@102919 | cdecl, caller cleanup (RET 0); returns dword +4 when pointer is non-null, otherwise zero. |
 | `0x106718` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 1026fc@10272c | Reset +0xc and +0x14, set +8 and +0x10. |
 | `0x106740` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 102738@102768 | Update +0x34 / +0x38 and notify through 0x10535c when they change. |
-| `0x10677c` | EAX:ef_addr32,EDX:uint32_t | none | 102824@10284e | Dword +0x3c = value. |
+| `0x10677c` | [ESP+4]:ef_addr32,[ESP+8]:uint32_t | none | 102824@10284e | cdecl, caller cleanup (`RET`); if pointer non-null, store value at +0x3c. |
 | `0x10679c` | EAX:ef_addr32,EDX:uint32_t | none | 102858@102882 | Update +0x40 and notify when it changes. |
 | `0x1067cc` | EAX:ef_addr32,EDX:uint32_t | none | d710c@d712e,10288c@1028b6 | As 0x10679c for +0x44. |
 | `0x10682c` | EAX:ef_addr32,EDX:uint32_t | none | 1028c0@1028ea | Dword +0x30 = value. |
