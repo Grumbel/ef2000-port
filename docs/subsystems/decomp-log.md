@@ -32,3 +32,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   now blocked by `float10` in a signature-derived prototype at `0x00120a52`.
   That exposed that the type rules currently normalize bodies but not the
   signature table.
+- M0 rule 5, signature type normalization, 2026-11-06: apply the same Ghidra
+  type rules to the confirmed signature table as to function bodies. The
+  shared header now compiles and 104/287 generated functions compile (36.2%,
+  16,484/66,726 bytes = 24.7%). Across all 1,022 unrecovered functions this
+  is 10.2% by count and 3.0% by bytes (16,484/544,429). There are 183
+  compile errors (50,242 bytes) and 735 manual functions (477,703 bytes).
+  First-error groups: E1011 undeclared symbols 49, E1151 parameter-count
+  conflicts 43, E1029 pointer type required 41, E1009 malformed `r_eax`
+  parameters 38, E1030 address-of-rvalue 5, E1034 duplicate `r_eax` 3,
+  E1045 subscript errors 2, E1052 void expression 1, E1084 empty case 1.
+  Manual causes overlap: `extraout_*` 467, `CONCATn` 322, `_N_M_` fields 334,
+  `in_*` registers 310, `unaff_*` 173, warnings/halt markers 380, software
+  interrupts 22, and SUB/ZEXT/SEXT 21.

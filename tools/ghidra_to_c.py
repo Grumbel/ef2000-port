@@ -66,6 +66,12 @@ def read_tsv(path):
         return list(csv.DictReader(handle, delimiter='\t'))
 
 
+def normalize_type(ctype):
+    for pattern, replacement in TYPES:
+        ctype = re.sub(pattern, replacement, ctype)
+    return ctype
+
+
 def recovered_addresses():
     """Addresses that already have hand-written bodies (state compiles+)."""
     skip = {'unknown', 'named', 'typed', 'drafted', 'blocked', 'compiles-bad', ''}
@@ -76,8 +82,12 @@ def recovered_addresses():
 def load_signatures():
     sigs = {}
     for row in read_tsv(SIGNATURES):
-        ins = [item.split(':', 1) for item in row['inputs'].split(',') if ':' in item]
-        outs = [item.split(':', 1) for item in row['outputs'].split(',') if ':' in item]
+        ins = [(reg, normalize_type(ctype))
+               for item in row['inputs'].split(',') if ':' in item
+               for reg, ctype in [item.split(':', 1)]]
+        outs = [(reg, normalize_type(ctype))
+                for item in row['outputs'].split(',') if ':' in item
+                for reg, ctype in [item.split(':', 1)]]
         sigs[int(row['addr'], 16)] = (ins, outs)
     return sigs
 
