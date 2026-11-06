@@ -135,10 +135,11 @@ Current tracker: 3,245 `compiles`, 7 `verified`, 2 `spliced`, 3 `blocked`,
 
 **Batch-119 update (2026-11-06):** `max3_signed` (`0x3cd4`, 27 bytes) has
 a 19-byte OpenWatcom body matching its fixture and passes 253 isolated guest
-cases. Menu and quick-fight setup replay pass. The cockpit replay still fails
-the selected 64 KiB BSS hash (`93aec9..` original, `fc7121..` patched) while
-frame, status and interrupt/tick counters match; the candidate entry hit
-count is zero. It remains `spliced`, not verified. A separate original-code
+cases. The first replay used a stale pre-nop encoder patch and was invalid.
+With the current fixture-derived encoder patch, repeated menu/setup/cockpit
+replay matches selected BSS/framebuffer and execution counters, but the
+candidate entry hit count is zero. It remains `spliced`, not verified. A
+separate original-code
 audit found `0xa4470` (`mov al,3`) falls through into the x87 checked-square-
 root body at `0xa4472`; both entries are blocked pending overlapping-entry
 and x87 support. The `0xa4472` C model also omits the original AL=3 x87 stack
