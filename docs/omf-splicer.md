@@ -130,20 +130,23 @@ Current fail-closed restrictions:
   (`FIXUPP` Location 9). Segment-relative and self-relative displacements
   are resolved, including target threads; external addresses must uniquely
   resolve through the two canonical symbol tables.
-- Frame methods F4/F5 only in generated patches. Other group/frame methods,
-  short/selector/far relocations, LIDATA, COMDAT, BAKPAT, unsupported record
-  forms and overlapping data/fixups stop the entire module. No guessing.
+- Frame methods F4/F5 are supported. Also supported are self-relative,
+  external OFFSET32 calls framed against the OMF `FLAT` group in USE32 code;
+  their call displacement is resolved from the reviewed guest address and the
+  canonical target address. Other group/frame methods, short/selector/far
+  relocations, LIDATA, COMDAT, BAKPAT, unsupported record forms and
+  overlapping data/fixups stop the entire module. No guessing.
 - One source object per plan; no multi-object linker, no actual arena
   reservation, and no differential/replay verification. Those are subsequent
   steps. Only explicitly reviewed *in-place* patches reach the guest.
 
 The implementation is exercised with *synthetic OMF records* in
-`tests/test_omf_splice.py`: external near-call relocations, internal absolute
-data references, inline and redirected placement, fixup threads, malformed
-references, and CLI inspect/build. It has **not** yet passed an end-to-end
-test using a real OpenWatcom-emitted `.obj`; unsupported structures can be
-discovered once that fixture is available in the test environment. Four
-additional asset-free tests validate binary packing, digest binding,
+`tests/test_omf_splice.py`: external near-call relocations including a FLAT
+group frame, internal absolute data references, inline and redirected
+placement, fixup threads, malformed references, and CLI inspect/build. An
+OpenWatcom-emitted runtime latch object also passed `omf_inplace.py`; its
+resolved 29-byte replacement matched the original routine byte-for-byte.
+Four additional asset-free tests validate binary packing, digest binding,
 corruption detection and cross-patch overlaps; an independent C++ test
 exercises the same wire layout.
 

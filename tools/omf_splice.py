@@ -327,7 +327,16 @@ def plan_patch(module, image, functions, globals_, arena_base, reviewed):
             target = resolve_symbol(module.externs[fixup.target_index], functions, globals_)
         else:
             raise OMFError('unsupported group or explicit-frame target fixup')
-        if fixup.frame_method not in (4, 5):
+        # OpenWatcom frames USE32 external near calls against FLAT. For an
+        # inline splice, the guest code and external target both have known
+        # flat linear addresses, so the self-relative displacement is direct.
+        flat_self_relative = (
+            fixup.mode == 'self' and fixup.target_method == 2 and
+            fixup.frame_method == 1 and fixup.frame_index is not None and
+            0 < fixup.frame_index < len(module.groups) and
+            module.groups[fixup.frame_index]['name'].upper() == 'FLAT'
+        )
+        if fixup.frame_method not in (4, 5) and not flat_self_relative:
             raise OMFError('frame-specific near offset relocation requires group-base proof')
         key = (fixup.segment, fixup.offset)
         if key in touched:

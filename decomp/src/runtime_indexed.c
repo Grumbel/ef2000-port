@@ -50,6 +50,9 @@ static void write16(ef_addr32 address, uint16_t value)
 #if defined(__WATCOMC__)
 static void encoder_timing_nop(void);
 #pragma aux encoder_timing_nop = 0x90 __modify []
+static void set_runtime_probe_latch(void);
+#pragma aux set_runtime_probe_latch = \
+    0x66 0xc7 0x05 0xd0 0x1e 0x12 0x00 0x96 0x00 __modify []
 #endif
 
 /* 0x604, 36 bytes. Encode a byte pointer relative to the 0x120cc6
@@ -117,12 +120,20 @@ uint8_t read_runtime_slot_flag(int16_t subindex, int16_t group)
 #endif
 }
 
-/* 0x121f0, 29 bytes. Guest dependency writes two scratch dwords;
- * the original discards them, retaining only the global latch write. */
+/* 0x121f0, 29 bytes, verified: exact-body+replay. The mouse helper writes
+ * two scratch words; the original discards them and sets the global latch. */
 void initialize_runtime_probe_latch(void)
 {
+#if defined(__WATCOMC__)
+    uint16_t output_at_esp;
+    uint16_t output_at_esp_plus_4;
+    mouse_read_motion_ce02c((ef_addr32)(uintptr_t)&output_at_esp_plus_4,
+                            (ef_addr32)(uintptr_t)&output_at_esp);
+    set_runtime_probe_latch();
+#else
     uint32_t output_at_esp_plus_4;
     uint32_t output_at_esp;
     guest_query_runtime_pair(&output_at_esp_plus_4, &output_at_esp);
     write16(0x00121ed0, 0x96);
+#endif
 }

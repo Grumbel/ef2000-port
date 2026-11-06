@@ -56,6 +56,17 @@ BSS/framebuffer hashes. Tracker totals: 3,253 `compiles`, 4 `verified`,
 247 `drafted`, 669 `unknown`, and 3 `library`. See
 `docs/subsystems/decomp-batch-111.md`.
 
+**Batch-112 update (2026-11-06):** `initialize_runtime_probe_latch`
+(`0x121f0`, 29 bytes) is the fifth strictly verified OpenWatcom replacement.
+The in-place OMF patch is byte-for-byte identical to the original, including
+the resolved call to `mouse_read_motion_ce02c` at `0xce02c`. Eight isolated
+cases and repeated-baseline menu/setup/cockpit replays pass; the cockpit run
+hits this entry once. The captured-state differential reaches the real-mode
+mouse interrupt path and stops at `POP ES` (`0x972`), which the isolated
+Unicorn function runner cannot model. Current tracker totals: 3,252
+`compiles`, 5 `verified`, 247 `drafted`, 669 `unknown`, and 3 `library`.
+See `docs/subsystems/decomp-batch-112.md`.
+
 ## Mission and boundaries
 
 Recover EF2000's **original game logic in behavior-faithful C**, with the
@@ -69,18 +80,18 @@ to a decompiled working game.** Current tracker (`decomp/symbols/functions.tsv`)
 
 | State | Entries | Original body bytes |
 | --- | ---: | ---: |
-| `compiles` | 3,253 | 363,666 |
+| `compiles` | 3,252 | 363,637 |
 | `drafted` | 247 | 19,916 |
 | `typed` / `named` | 111 | 35,109 |
 | `unknown` | 669 | 489,650 |
 | `library` | 3 | 509 |
-| `verified` | 4 | 97 |
+| `verified` | 5 | 126 |
 | `spliced` | 0 | 0 |
 | **Total** | **4,287** | **908,947** |
 
-**At the Batch-111 state:** four routines are strictly verified as
-OpenWatcom C replacements: the two ASCII case helpers, the segment encoder,
-and runtime slot flag lookup. The 669 unknown functions still hold
+**At the Batch-112 state:** five routines are strictly verified as
+OpenWatcom replacements: the two ASCII case helpers, the segment encoder,
+runtime slot flag lookup and runtime probe latch. The 669 unknown functions still hold
 approximately 54% of inventoried code *bytes*, so entry counts exaggerate
 completion.
 
@@ -130,13 +141,12 @@ over its inferred signatures. Never paste or commit generated pseudo-C.
 
 ## Next assignment: continue the per-function loop
 
-Four OpenWatcom guest replacements now pass the strict §4 gate. Continue in
+Five OpenWatcom guest replacements now pass the strict §4 gate. Continue in
 bounded 1–5-function clusters, following the plan's work order; do not resume
 mass-drafting unknown functions. Run
 `python3 tools/decomp_status.py next --module runtime_indexed`; if it reports
-no eligible leaf because of unresolved dependencies, inspect
-`initialize_runtime_probe_latch` at `0x121f0` and resolve its guest-call
-boundary before compiling. Keep
+no eligible leaf because of unresolved dependencies, select a nearby small
+function and resolve its guest-call boundary before compiling. Keep
 `copy_string_9d749` blocked pending EDX-liveness evidence and do not splice
 `step_generator_a45b3` until its placement/ABI is solved. Promote functions
 only after OpenWatcom compilation, safe splice, isolated differential and

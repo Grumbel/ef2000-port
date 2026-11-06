@@ -5,6 +5,7 @@
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 import subprocess
 import sys
@@ -80,6 +81,19 @@ class OMFSplicerTests(unittest.TestCase):
         self.assertEqual(int.from_bytes(inline[6:10], 'little'), 0x100)
         self.assertEqual(inline[12:], b'\xcc' * 12)
         self.assertEqual(bytes.fromhex(patch['writes'][1]['bytes']), b'\x78\x56\x34\x12')
+
+    def test_flat_group_self_relative_external_call(self):
+        # OpenWatcom emits external near calls framed against the FLAT group.
+        # An inline replacement stays at its reviewed guest address, so the
+        # call displacement is target - (guest address + fixup + width).
+        module = read_module(fixture(code()))
+        module.groups = [None, {'name': 'DGROUP', 'segments': [2]},
+                         {'name': 'FLAT', 'segments': []}]
+        module.fixups[0] = replace(module.fixups[0], frame_method=1, frame_index=2)
+        functions, globals_ = rows()
+        patch = plan_patch(module, bytes(128), functions, globals_, 0x100, {0x20})
+        inline = bytes.fromhex(patch['writes'][0]['bytes'])
+        self.assertEqual(int.from_bytes(inline[1:5], 'little'), 0x70 - (0x20 + 5))
 
     def test_arena_redirect_and_source_relative_fixup(self):
         module = read_module(fixture(code(40)))
