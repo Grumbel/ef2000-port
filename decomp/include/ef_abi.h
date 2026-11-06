@@ -2560,7 +2560,8 @@ void tick_countdown_47fbc(void);
 void cycle_frame_54210(void);
 void update_records_5437c(void);
 void emit_and_advance_d628(void);
-void guest_fn_2b0(ef_addr32 request); /* 0x2b0 EAX */
+#pragma aux guest_fn_2b0 parm [eax] [edx] modify []
+void guest_fn_2b0(ef_addr32 request, ef_addr32 result); /* 0x2b0 EAX/EDX */
 void guest_fn_15b7c(uint32_t slot, uint32_t extra); /* 0x15b7c EAX/EDX */
 uint32_t guest_fn_169b4(uint32_t slot); /* 0x169b4 EAX -> AX */
 uint32_t guest_fn_16a04(uint32_t slot); /* 0x16a04 EAX -> AX */
@@ -2908,8 +2909,8 @@ uint32_t read_polyline_list_fbcc(ef_addr32 record);
 uint32_t read_group_header_fc54(ef_addr32 group);
 ef_addr32 find_unique_node_ffb4(ef_addr32 name, ef_addr32 head);
 uint32_t guest_fn_9be38(uint32_t size); /* 0x9be38 cdecl */
-uint32_t guest_fn_9c220(uint32_t a, uint32_t b, uint32_t c); /* 0x9c220 cdecl */
-uint32_t guest_fn_9c23d(uint32_t a, uint32_t b, uint32_t c); /* 0x9c23d cdecl */
+uint32_t EF_CDECL guest_fn_9c220(uint32_t a, uint32_t b, uint32_t c); /* 0x9c220 cdecl */
+uint32_t EF_CDECL guest_fn_9c23d(uint32_t a, uint32_t b, uint32_t c); /* 0x9c23d cdecl */
 uint32_t guest_fn_324(uint32_t a); /* 0x324 EAX */
 uint64_t guest_fn_348(uint32_t a); /* 0x348 EAX -> EDX:EAX */
 void guest_fn_484(uint32_t a, uint32_t b, uint32_t c); /* 0x484 EAX/EDX/EBX */

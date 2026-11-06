@@ -536,3 +536,17 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   to 2,281. This is runtime-helper ABI/model evidence, not differential proof
   against the original guest. M1/M2 remain unpassed because private Xvfb
   cannot bind; the first guest failure is unknown.
+- Menu-path ABI corrections, 2026-11-07: original callers and disassembly
+  show `intdos_2b0` receives its register block in both EAX (input) and EDX
+  (output); the recovered wrappers had supplied only EAX. The C ABI and all
+  recovered wrapper calls now pass both pointers. The original `0x9c220` and
+  `0x9c23d` helpers read three caller-stack arguments, so their declarations
+  now explicitly use `EF_CDECL`; WDIS confirms the rebuilt `0x628` caller
+  pushes those arguments. Four affected OpenWatcom modules compile with zero
+  warnings. A focused hybrid with only `init_far_stub_b04` and
+  `to_lower_ascii` redirected passes repeated-baseline main-menu and
+  quick-fight-setup replays: 2 functions, 10 entry bytes, 576,340 arena bytes
+  (576,350 total bytes written). The broad 2,433-entry hybrid still fails
+  before the menu: after these ABI fixes it faults at tick 604 in linked
+  mechanical `original_memcpy` (`0x030856e2`); demoting that unverified entry
+  moves the fault to guest IP `0x4` at tick 469. Formal M1/M2 remain unpassed.

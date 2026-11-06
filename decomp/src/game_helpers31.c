@@ -14,7 +14,7 @@ uint8_t request_returns_cf_a00(uint32_t argument)
 
     EF_U32(0x00196148u) = 0x2503u;
     EF_U32(0x00196150u) = argument;
-    guest_fn_2b0(0x00196148u);
+    guest_fn_2b0(0x00196148u, 0x00196148u);
     result = EF_U32(0x0019614cu);
     if (result == 0)
         return 1;

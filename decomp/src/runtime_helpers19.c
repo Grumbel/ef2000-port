@@ -17,7 +17,7 @@ static uint32_t call_allocator_12dd9c(uint32_t bytes, uint32_t flags)
 uint32_t dos_call_350b_880(void)
 {
     EF_U32(0x00196148u) = 0x350b;
-    guest_fn_2b0(0x00196148u);
+    guest_fn_2b0(0x00196148u, 0x00196148u);
     if (EF_U32(0x00196160u) != 0)
         ui_report_missing_record(0x0017f128u);
     return EF_U32(0x00196148u);
@@ -29,7 +29,7 @@ void dos_call_2505_a9c(uint32_t first, uint32_t second)
     EF_U32(0x0019614cu) = second;
     EF_U32(0x00196150u) = first;
     EF_U32(0x00196148u) = 0x2505;
-    guest_fn_2b0(0x00196148u);
+    guest_fn_2b0(0x00196148u, 0x00196148u);
     if (EF_U32(0x00196160u) != 0)
         ui_report_missing_record(0x0017f140u);
 }
@@ -39,7 +39,7 @@ void dos_call_3502_c74(int16_t value)
 {
     EF_U32(0x00196148u) = 0x3502;
     EF_U32(0x0019614cu) = (uint32_t)(int32_t)value;
-    guest_fn_2b0(0x00196148u);
+    guest_fn_2b0(0x00196148u, 0x00196148u);
     if (EF_U32(0x00196160u) != 0)
         ui_report_missing_record(0x0017f188u);
 }

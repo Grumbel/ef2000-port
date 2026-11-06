@@ -12,7 +12,7 @@ uint32_t dos_call_2503_324(uint32_t a)
 {
     EF_U32(0x00196148u) = 0x2503;
     EF_U32(0x00196150u) = a;
-    guest_fn_2b0(0x00196148u);
+    guest_fn_2b0(0x00196148u, 0x00196148u);
     return EF_U32(0x0019614cu);
 }
 
@@ -22,7 +22,7 @@ void dos_call_2505_3d0(uint32_t a, uint32_t b)
     EF_U32(0x0019614cu) = b;
     EF_U32(0x00196150u) = a;
     EF_U32(0x00196148u) = 0x2505;
-    guest_fn_2b0(0x00196148u);
+    guest_fn_2b0(0x00196148u, 0x00196148u);
 }
 
 /* 0xc24, 38 bytes. DOS call 0x3503 with a signed word and a second argument. */
@@ -31,7 +31,7 @@ void dos_call_3503_c24(int16_t a, uint32_t b)
     EF_U32(0x00196150u) = b;
     EF_U32(0x0019614cu) = (uint32_t)(int32_t)a;
     EF_U32(0x00196148u) = 0x3503;
-    guest_fn_2b0(0x00196148u);
+    guest_fn_2b0(0x00196148u, 0x00196148u);
 }
 
 /* 0xa5bc, 28 bytes. Find a named widget and hand it to 0xc868. */
