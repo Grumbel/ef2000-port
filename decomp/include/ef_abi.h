@@ -1259,7 +1259,7 @@ void EF_CDECL set_field_10682c(ef_addr32 object, uint32_t value);
 void stop_selected_10683c(ef_addr32 object);
 void EF_CDECL pause_object_10687c(ef_addr32 object);
 void resume_object_106894(ef_addr32 object);
-uint32_t exchange_callback_106938(ef_addr32 object, uint32_t value);
+uint32_t EF_CDECL exchange_callback_106938(ef_addr32 object, uint32_t value);
 void set_and_notify_106988(ef_addr32 object, uint32_t value);
 int32_t times_100(int32_t value);
 int32_t times_100_div_10(int32_t value);
@@ -4265,7 +4265,7 @@ uint32_t trace_call_102590(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
 uint32_t trace_call_1026fc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
 uint32_t trace_call_102738(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
 uint32_t trace_call_1028f4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
-uint32_t trace_call_102dbc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
+uint32_t EF_CDECL trace_call_102dbc(uint32_t a0, uint32_t a1);
 uint32_t trace_call_102f60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
 uint32_t trace_call_102fb4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
 uint32_t trace_call_10303c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
@@ -4291,7 +4291,7 @@ uint32_t guest_fn_1065c8_t(uint32_t a0); /* 0x1065c8 cdecl */
 uint32_t guest_fn_106718_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x106718 cdecl */
 uint32_t guest_fn_106740_t(uint32_t a0, uint32_t a1, uint32_t a2); /* 0x106740 cdecl */
 uint32_t guest_fn_106708_t(uint32_t a0); /* 0x106708 cdecl */
-uint32_t guest_fn_106938_t(uint32_t a0, uint32_t a1); /* 0x106938 cdecl */
+uint32_t EF_CDECL guest_fn_106938_t(uint32_t a0, uint32_t a1); /* 0x106938 cdecl */
 uint32_t guest_fn_113af0_t(uint32_t a0); /* 0x113af0 cdecl */
 uint32_t guest_fn_113a40_t(uint32_t a0, uint32_t a1); /* 0x113a40 cdecl */
 uint32_t guest_fn_113c7c_t(uint32_t a0); /* 0x113c7c cdecl */

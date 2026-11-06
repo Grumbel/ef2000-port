@@ -6063,7 +6063,7 @@ void start_sample_d7158(uint32_t chan, uint32_t pan, uint32_t rec, uint32_t vol)
     trace_call_102858(h, v & 0xffu);
     trace_call_102824(h, EF_U16(r + 0xfu));
     trace_call_1028c0(h, pan);
-    trace_call_102dbc(0u, 0u, 0u, 0u, h, 0x000d710cu);
+    trace_call_102dbc(h, 0x000d710cu);
     EF_U32(0x0015bad0u) = EF_U32(0x0015bad0u) + 1u;
     trace_call_102774(h);
 }
@@ -10345,7 +10345,7 @@ uint32_t start_voice_sample_d72b4(uint32_t idx, ef_addr32 obj, uint32_t size)
     (void)trace_call_102738(0u, 0u, 0u, 0u, EF_U32(0x00420dd0u + voice * 4u), 0u, 0u);
     trace_call_102824(EF_U32(0x00420dd0u + voice * 4u), 0x5622u);
     trace_call_102858(EF_U32(0x00420dd0u + voice * 4u), 0x78u);
-    (void)trace_call_102dbc(0u, 0u, 0u, 0u, EF_U32(0x00420dd0u + voice * 4u), 0x000d7138u);
+    (void)trace_call_102dbc(EF_U32(0x00420dd0u + voice * 4u), 0x000d7138u);
     (void)trace_call_1026fc(0u, 0u, 0u, 0u, EF_U32(0x00420dd0u + voice * 4u), EF_U32(obj + 0x1cu), size);
     trace_call_102774(EF_U32(0x00420dd0u + voice * 4u));
     return 1u;

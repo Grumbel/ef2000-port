@@ -267,8 +267,8 @@ void resume_object_106894(ef_addr32 object)
     }
 }
 
-/* 0x106938, 28 bytes. Exchange dword +0x850; null object returns 0. */
-uint32_t exchange_callback_106938(ef_addr32 object, uint32_t value)
+/* 0x106938, 28 bytes. cdecl: exchange +0x850; null object returns 0. */
+uint32_t EF_CDECL exchange_callback_106938(ef_addr32 object, uint32_t value)
 {
     uint32_t old;
     if (object == 0)

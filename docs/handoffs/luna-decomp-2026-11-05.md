@@ -470,3 +470,6 @@ Keep it `spliced`. See `docs/subsystems/decomp-batch-133.md`. Current tracker:
 
 
 **Batch-137 update (2026-11-06):** `find_last_char` (`0x10d1da`, 26 bytes) is verified with an exact OpenWatcom body, six isolated cases and four captured startup calls. Repeated menu/setup/cockpit replay passes 3/3 with 20,889, 20,933 and 278,507 hits and matching selected state/counters. Corrected the signature to record EDX clobber. See `docs/subsystems/decomp-batch-137.md`. Current tracker: 3,223 `compiles`, 19 `verified`, 10 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`.
+
+
+**Batch-138 update (2026-11-06):** `exchange_callback_106938` (`0x106938`) and wrapper `0x102dbc` now use the confirmed caller-clean cdecl object/value ABI; the target intentionally clobbers EBX/EDX. The exact OpenWatcom body passes five isolated and four captured calls. Sound-off replay has no hits; SB16-DMA reaches six times but repeated baselines differ (42,342 vs. 42,372 interrupts) and patched BSS differs. Keep `spliced`. See `docs/subsystems/decomp-batch-138.md`. Current tracker: 3,222 `compiles`, 19 `verified`, 11 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3 `library`.

@@ -1,1 +1,27 @@
-{"address":"0x00102dbc","function_size":92,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000","ebx":"0x00001000","ecx":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x00102dbc",
+  "function_size": 92,
+  "max_instructions": 180000,
+  "stack_top": "0x0000f000",
+  "return_sentinel": "0x0000e000",
+  "stack_scratch_bytes": "0x00001000",
+  "cases": [
+    {
+      "name": "callback_exchange",
+      "stack_args": [
+        "0x00008000",
+        "0x000d710c"
+      ],
+      "memory": [
+        {
+          "address": "0x00008850",
+          "hex": "78563412"
+        },
+        {
+          "address": "0x0017d2c8",
+          "hex": "00000000"
+        }
+      ]
+    }
+  ]
+}

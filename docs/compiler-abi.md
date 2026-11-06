@@ -2059,7 +2059,7 @@ in EAX, format string address, one value).
 | `0x10683c` | EAX:ef_addr32 | none | 102774@102797 |  |
 | `0x10687c` | [ESP+4]:ef_addr32 | none | 1027a0@1027c3 | cdecl caller-clean; if non-null and state at +4 is 4, store 8. |
 | `0x106894` | EAX:ef_addr32 | none | 1027cc@1027ef | State 8 becomes 4 and 0x1052f0 runs. |
-| `0x106938` | EAX:ef_addr32,EDX:uint32_t | EAX:uint32_t | 102dbc@102de8 | Exchange dword +0x850; null object returns 0. |
+| `0x106938` | [ESP+4]:ef_addr32,[ESP+8]:uint32_t | EAX:uint32_t | 102dbc@102de8 | cdecl caller-clean; clobbers EBX/EDX on non-null path; exchange +0x850, null returns 0. |
 | `0x106988` | EAX:ef_addr32,EDX:uint32_t | none | 102a98@102ac2 | Store dword +0x68 and notify each of the +0x60 entries (0x894 bytes each) whose state is not 1. |
 | `0x106be8` | EAX:int32_t | EAX:int32_t | d9c30@d9c45,d9c30@d9c7e,d9cb4@d9cd5 | modulo-2^32 value * 100; preserves EDX. |
 | `0x106bfc` | EAX:int32_t | EAX:int32_t | d9cb4@d9cf4,d9dc0@d9de6,106d34@106d9c | value * 100 / 10. |
@@ -4704,7 +4704,7 @@ in EAX, format string address, one value).
 | `0x1026fc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | d7158@d7209,d72b4@d7388 | AIL trace wrapper for 0x106718 (cdecl, all arguments on the stack). |
 | `0x102738` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t | EAX:uint32_t | d7158@d71f1,d72b4@d7337 | AIL trace wrapper for 0x106740 (cdecl, all arguments on the stack). |
 | `0x1028f4` | [ESP+4]:uint32_t | EAX:uint32_t | d7594@d75ad,d75c8@d75e1,d75fc@d7615 | AIL trace wrapper for 0x106708 with result trace; caller cleanup; ECX/EDX are scratch. |
-| `0x102dbc` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | d7158@d7288,d72b4@d7373 | AIL trace wrapper for 0x106938 with result trace (cdecl, all arguments on the stack). |
+| `0x102dbc` | [ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | d7158@d7288,d72b4@d7373 | cdecl caller-clean object/value wrapper for 0x106938; clobbers EBX/EDX. |
 | `0x102f60` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d5d18@d5d43 | AIL trace wrapper for 0x113af0 with result trace (cdecl, all arguments on the stack). |
 | `0x102fb4` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t | EAX:uint32_t | 113af0@113b37 | AIL trace wrapper for 0x113a40 with result trace (cdecl, all arguments on the stack). |
 | `0x10303c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | d5d18@d5d7e | AIL trace wrapper for 0x113c7c with result trace (cdecl, all arguments on the stack). |
