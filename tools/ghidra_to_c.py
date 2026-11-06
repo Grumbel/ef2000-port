@@ -259,6 +259,15 @@ def convert(text, entry, names, sig_in=None, globals_=None):
     for old, new in names.items():
         body = re.sub(r'\b' + re.escape(old) + r'\b', new, body)
     globals_ = globals_ or {}
+    # Ghidra emits ram0x names for referenced addresses that lack a data
+    # symbol, and adds numeric suffixes for overlapping byte globals. The
+    # latter are byte aliases at base+offset, as shown by their read/write
+    # uses beside the corresponding DAT_<address> symbol.
+    body = re.sub(r'(?<![A-Za-z0-9_])_?DAT_([0-9a-fA-F]{8})_(\d+)\b',
+                  lambda m: 'EF_U8(0x%08xu)' %
+                  (int(m.group(1), 16) + int(m.group(2))), body)
+    body = re.sub(r'\bram0x([0-9a-fA-F]{8})\b',
+                  lambda m: dat_expression(int(m.group(1), 16), globals_), body)
     body = re.sub(r'(?<![A-Za-z0-9_])_?DAT_' + HEX + r'\b',
                   lambda m: dat_expression(int(m.group(1), 16), globals_), body)
     body = re.sub(r'\b(?:PTR_|s_|u_|BYTE_|WORD_|DWORD_)\w*?_?' + HEX + r'\b(?:\s*\+\s*\d+)?',

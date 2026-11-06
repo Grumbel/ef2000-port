@@ -111,6 +111,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   68,495/544,429 bytes = 12.6%). There are 147 compile errors (57,013 bytes)
   and 594 manual functions (410,411 bytes). This removes only ten rejections;
   compiler acceptance still says nothing about live-register correctness.
+- M0 rule 13, address-only global aliases, 2026-11-06: translate Ghidra
+  `ram0x<address>` names through the global-width table and byte-offset
+  `DAT_<address>_<n>` aliases to guest byte accesses. OpenWatcom reports
+  290/1,022 ok (28.4%, 83,196/544,429 bytes = 15.3%), up from 281/1,022
+  (27.5%, 77,005/544,429 bytes = 14.1%). The remaining export has 138
+  compile errors (50,822 bytes) and 594 manual functions (410,411 bytes).
+  These aliases address storage but do not prove the inferred widths or
+  behavior.
 - M1 structural assessment, 2026-11-06: all 334 `decomp/src/*.c` modules
   compile with OpenWatcom `-wx` and zero warnings into ignored
   `local/hybrid/obj/` (432,877 CODE bytes plus 4,388 DATA bytes). The OMF
