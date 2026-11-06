@@ -272,6 +272,11 @@ def main(argv=None):
                   'baseline': baseline, 'outcome': outcome,
                   'target_failure_signature': list(target_signature),
                   'trace_addresses': [f'0x{x:08x}' for x in trace_addresses],
+                  'initial_redirect_addresses': [f'0x{x:08x}'
+                                                for x in sorted(initial_addresses)],
+                  'persistent_excludes': [
+                      {'address': f'0x{x:08x}', 'reason': persistent_excludes[x]}
+                      for x in sorted(persistent_excludes)],
                   'candidate_addresses': [f'0x{x:08x}' for x in current],
                   'candidate_sets': [[f'0x{x:08x}' for x in group]
                                      for group in candidate_sets],

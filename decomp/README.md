@@ -79,9 +79,13 @@ M0 currently compiles 391/1,021 available unrecovered Ghidra exports (38.3%,
 114,873/544,304 bytes = 21.1%) mechanically. Hand-written recovered C covers
 363,644 body bytes (40.0%); combined with the mechanical `ok` exports, the
 potential hybrid coverage is 478,517/908,947 tracked body bytes (52.6%).
-The latest linked image patches 1,979 functions (9,895 original entry bytes)
-and places 570,772 bytes in its code arena, but M1 is not passed: replay exits
-at the dataset check (`IP=0x222`, `AX=0xffff4cff`, 101 interrupts, 296 ticks).
+The latest linked image patches 1,982 functions (9,910 original entry bytes)
+and places 571,524 bytes in its code arena. M1 is not passed: after correcting
+the startup stack-cleanup mismatch at `0x1114c7`, replay reaches its 100M
+instruction limit but diverges from the original (`IP=0x0` vs `0x110de6`,
+202 vs 13,766 interrupts, 1 vs 356 IRQ0 events, and a different selected RAM
+hash). See the latest replay and bisector evidence in
+[`decomp-log.md`](../docs/subsystems/decomp-log.md).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),
 as well as [renderer stream findings](../docs/subsystems/renderer-streams.md) (batch 082)

@@ -274,3 +274,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   redirects (9,895 original bytes), 570,772 arena bytes, and 557/724 modules
   linked; replay exits at `IP=0x222` (`AX=0xffff4cff`, 101 interrupts, 296
   ticks).
+- M3 ABI repair at `0x1114c7`, 2026-11-06: trace-enabled reduction isolated
+  the replacement as the decisive entry in a five-entry reproducer. Original
+  disassembly shows the caller pushes two arguments and cleans them with
+  `add esp,8`, while the callee returns with plain `ret`. OpenWatcom had emitted
+  `ret 8` for the recovered C function, causing double stack cleanup. Declaring
+  `parm caller [eax edx ebx ecx]` keeps the four register inputs and makes the
+  generated body leave caller-owned stack arguments untouched. WDIS now shows
+  the original `[ESP+4]`/`[ESP+8]` argument accesses and a tail jump to the
+  release helper, which returns to the caller without popping those arguments.
+  In the five-entry pre-fix reproducer, demoting `0x1114c7` reaches the 100M
+  instruction checkpoint; the fixed object also compiles with the corrected
+  stack accesses and cleanup. The complete hybrid now patches 1,982 entries
+  (9,910 original bytes) and links 559/726
+  modules with a 571,524-byte arena. It no longer faults at the startup stack
+  write, but M1 still fails at 100M: `IP=0x0` vs original `0x110de6`, 202 vs
+  13,766 interrupts, 1 vs 356 IRQ0 events, and a different selected RAM hash.
+  A broad trace over all 1,982 entries was manually stopped because of tracing
+  overhead; the next culprit remains unresolved. M0 remains 391/1,021 exports
+  (38.3%, 114,873/544,304 bytes); M1 is unpassed.
