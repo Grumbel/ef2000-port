@@ -2048,7 +2048,7 @@ in EAX, format string address, one value).
 | `0x104908` | EAX:uint32_t,EDX:uint32_t | none | d5e0c@d5e5e,d6df0@d6e03,d6df0@d6e15 | 0x104840(base, base + length). |
 | `0x104920` | EAX:uint32_t,EDX:uint32_t | none | d5ec0@d5ee7,d6ffc@d701d,d710c@d7123 | 0x1048b4(base, base + length). |
 | `0x105334` | EAX:ef_addr32 | none | 105648@105803,10585c@1058aa,105da0@105dae | If dword +0x54 is set, send message 0x402 through 0x101f88 and clear it. |
-| `0x106634` | EAX:ef_addr32 | none | 102644@102667 | Dword +4 = 1. |
+| `0x106634` | [ESP+4]:ef_addr32 | none | 102644@102667 | cdecl, caller cleanup (`RET`); if non-null, store dword 1 at +4. |
 | `0x106708` | [ESP+4]:ef_addr32 | EAX:uint32_t | 1028f4@102919 | cdecl, caller cleanup (RET 0); returns dword +4 when pointer is non-null, otherwise zero. |
 | `0x106718` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 1026fc@10272c | Reset +0xc and +0x14, set +8 and +0x10. |
 | `0x106740` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | 102738@102768 | Update +0x34 / +0x38 and notify through 0x10535c when they change. |

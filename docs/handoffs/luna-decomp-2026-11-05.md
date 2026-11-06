@@ -427,3 +427,13 @@ matching handles cdecl leading-underscore code publics. See
 `docs/subsystems/decomp-batch-130.md`. Current tracker: 3,230 `compiles`, 17
 `verified`, 5 `spliced`, 5 `blocked`, 247 `drafted`, 669 `unknown`, and 3
 `library`.
+
+**Batch-131 update (2026-11-06):** `set_state_1_106634` (`0x106634`, 16
+bytes) now has a caller-clean cdecl signature and exact OpenWatcom in-place
+body. A C behavior model uses an inline `#pragma aux` sequence because the
+ordinary C lowering was 17 bytes. Four isolated cases pass; the repeated
+menu/setup/cockpit suite passes 3/3, but the target is not hit and 500M
+startup / 1.5B cockpit capture probes found no call. Keep it `spliced`.
+See `docs/subsystems/decomp-batch-131.md`. Current tracker: 3,229
+`compiles`, 17 `verified`, 6 `spliced`, 5 `blocked`, 247 `drafted`, 669
+`unknown`, and 3 `library`.

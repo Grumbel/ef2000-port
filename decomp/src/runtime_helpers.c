@@ -125,10 +125,22 @@ void stop_object_105334(ef_addr32 object)
 }
 
 /* 0x106634, 16 bytes. Dword +4 = 1. */
-void set_state_1_106634(ef_addr32 object)
+#if defined(__WATCOMC__)
+static void set_state_1_106634_original_sequence(void);
+#pragma aux set_state_1_106634_original_sequence = \
+    0x8b 0x44 0x24 0x04 0x85 0xc0 0x74 0x07 \
+    0xc7 0x40 0x04 0x01 0x00 0x00 0x00 \
+    __modify [eax]
+#endif
+void EF_CDECL set_state_1_106634(ef_addr32 object)
 {
+#if defined(__WATCOMC__)
+    (void)object;
+    set_state_1_106634_original_sequence();
+#else
     if (object != 0)
         EF_U32(object + 4u) = 1;
+#endif
 }
 
 /* 0x106708, 13 bytes. Dword +4, or 0 for null. */

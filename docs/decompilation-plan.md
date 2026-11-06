@@ -2095,6 +2095,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-06  3.26  Verified `refresh_link_pointer` (`0x3856c`): two isolated cases and one captured call from `0x381a0` pass; repeated-baseline menu/setup/cockpit replay reaches it eight times, reaches its verified resolver 16 times, and matches selected BSS/frame/counters. See docs/subsystems/decomp-batch-128.md.
 2026-11-06  3.27  `field_10dfe0` (`0x10dfe0`, 12 bytes) compiles warning-free and splices; five isolated cases pass. Keep it `spliced`: its live capture points to `0x05000000`, outside the runner's 64 MiB guest mapping, and captured differential faults on the original read at `0x10dfe5`. See docs/subsystems/decomp-batch-129.md.
 2026-11-06  3.28  Corrected `get_state_106708` (`0x106708`) from EAX input to one caller-clean cdecl stack argument; OpenWatcom emits the original 13 bytes and four isolated cases pass. The repeated 3-case replay passes but has zero target hits; leave `spliced`. Differential runner now separates stack argument size from callee cleanup, and OMF matching covers cdecl leading-underscore code publics. See docs/subsystems/decomp-batch-130.md.
+2026-11-06  3.29  `set_state_1_106634` (`0x106634`, 16 bytes) uses a C behavior model with inline OpenWatcom sequence because ordinary C emits 17 bytes. The 16-byte patch matches the original and four isolated cases pass; repeated menu/setup/cockpit replay passes 3/3 but reaches the entry zero times, so retain `spliced`. See docs/subsystems/decomp-batch-131.md.
 ```
 
 ---
