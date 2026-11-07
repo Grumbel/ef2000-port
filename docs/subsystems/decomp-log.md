@@ -667,3 +667,17 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   1,531 candidate entries and do not isolate the full-image failure. M1/M2
   remain unpassed; next checkpoint is a private-Xvfb replay with menu input
   against the passing reduced image.
+- Quick-fight menu-input checkpoint, 2026-11-07: the 1,227-entry partial image
+  exits at guest IP `0x222`, tick 904, when the replay's main-menu key events
+  enter quick-fight. A four-round bisect finds a 154-entry composition that
+  passes the 700M `quick-fight-setup` replay. A repeated-baseline strict replay
+  confirms matching status/counters, framebuffer hash, and 64 KiB guest hash;
+  this composition contains 142 hand-written `compiles`, 11 mechanical `ok`,
+  and one previously verified replacement. Further bisection isolates
+  `InitPickMiss` (`0x84b74`) as sufficient for the guest exit: its original
+  five-byte body is a `JMP` to `0x41028`, while the mechanical C body does not
+  preserve the thunk's register-forwarding ABI. Added it to the persistent
+  hybrid exclusion list. Demoting only this entry from the 1,227-entry patch
+  avoids the guest exit but still diverges in interrupts, IRQ0, framebuffer,
+  and guest RAM, so the fix is necessary for that path but not sufficient for
+  the larger subset. M2 remains incomplete because cockpit is not reached.

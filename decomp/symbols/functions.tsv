@@ -1633,7 +1633,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00084b5c	5	gpwWeaponsAccepted	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
 0x00084b64	5	gpwGenerateCampaign	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
 0x00084b6c	5	gpwClickCampaign	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
-0x00084b74	5	InitPickMiss	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
+0x00084b74	5	InitPickMiss	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP to 0x41028; mechanical replacement is ABI-incompatible and causes quick-fight guest_exit (see hybrid-exclude.tsv); guest forwarding/splice pending
 0x00084b7c	5	InitSim2	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
 0x00084b84	5	simShowDebrief	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
 0x00084b8c	5	ChooseEnemy	gui_jump_thunks_089	drafted	thunk	confirmed		Original five-byte JMP mapped and audited; guest forwarding/splice pending
