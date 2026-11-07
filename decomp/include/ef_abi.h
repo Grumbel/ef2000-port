@@ -535,7 +535,7 @@ int32_t scene_metric_remaining(void); /* 0x91298, no arguments, EAX */
 uint8_t scene_metric_reaches_threshold(int32_t ignored, int32_t threshold); /* 0x918f0, EAX/EDX -> AL */
 void set_scene_input_triplet(int32_t x, int32_t y, int32_t z); /* 0x91910, EAX/EDX/EBX */
 void set_scene_angles(int16_t x, int16_t y, int16_t z); /* 0x9195c, AX/DX/BX */
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux set_scene_angles parm [eax] [edx] [ebx] modify [eax edx ebx]
 #endif
 void request_scene_pair(int32_t left, int32_t right); /* 0x91acc, EAX/EDX */
@@ -894,7 +894,7 @@ ef_addr32 guest_fn_b3f58(int32_t index); /* 0xb3f58 EAX -> EAX */
 void guest_fn_e9a24(uint32_t a, uint32_t b, uint32_t c); /* 0xe9a24 stack, callee cleanup */
 uint32_t guest_fn_ec0ec(uint32_t first, uint32_t second); /* 0xec0ec EAX/EDX tail */
 uint32_t guest_fn_b1b8b(ef_addr32 text); /* 0xb1b8b EAX -> EAX */
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_deb87 parm [eax edx ecx] modify [eax ecx]
 #endif
 void guest_fn_deb87(uint32_t destination, uint32_t value, uint32_t count); /* 0xdeb87 EAX/EDX/ECX */
@@ -1068,7 +1068,7 @@ void guest_fn_9c3cf(uint32_t handler); /* 0x9c3cf EAX */
 void guest_fn_c37ec(void); /* 0xc37ec */
 uint32_t guest_fn_b3830(int32_t a, int32_t b, int32_t c); /* 0xb3830 EAX/EDX/EBX -> AX */
 uint32_t guest_fn_b3b1c(uint32_t a, uint32_t b); /* 0xb3b1c EAX/EDX -> EAX */
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_a7990 parm []
 #endif
 void guest_fn_a7990(uint32_t value); /* 0xa7990 stack, callee cleanup */
@@ -1130,11 +1130,11 @@ ef_addr32 guest_fn_fc795(uint32_t size); /* 0xfc795 EAX -> EAX */
 
 /* misc_helpers2.c */
 uint32_t lookup_field_eba4c(uint32_t key, uint32_t index);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux initialize_input_services_cd4d4 parm caller [] modify [eax]
 #endif
 void initialize_input_services_cd4d4(void);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux release_or_forward_ebcd8 parm [eax] [edx] modify [eax]
 #endif
 void release_or_forward_ebcd8(uint32_t flags, ef_addr32 object);
@@ -1149,7 +1149,7 @@ void process_words_f17d8(ef_addr32 record);
 void process_words_f180c(ef_addr32 record);
 int32_t file_position_f227f(ef_addr32 file);
 void draw_text_f23ac(uint8_t color, int32_t x, int32_t y, ef_addr32 text);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux result_f2800 parm caller [] value [eax] modify []
 #endif
 uint32_t result_f2800(void);
@@ -1222,7 +1222,7 @@ void guest_fn_106988(uint32_t a, uint32_t b); /* 0x106988 cdecl */
 void guest_fn_bc400(uint32_t stream, uint32_t format, ...); /* 0xbc400 cdecl varargs */
 ef_addr32 guest_fn_eb520(uint32_t key, uint32_t index); /* 0xeb520 EAX/EDX */
 void guest_fn_a7990(uint32_t flags); /* 0xa7990 stack */
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_a7ac8 parm [] value [eax]
 #endif
 uint32_t guest_fn_a7ac8(uint32_t stack_a, uint32_t stack_b); /* 0xa7ac8 stack, callee cleanup */
@@ -1233,7 +1233,7 @@ void guest_fn_a4b80(uint32_t value); /* 0xa4b80 EAX */
 uint32_t guest_fn_10f4df(uint32_t handle); /* 0x10f4df EAX */
 void guest_fn_f2320(int32_t x, int32_t y, uint32_t ch); /* 0xf2320 EAX/EDX/EBX */
 uint32_t guest_fn_b1b8b(ef_addr32 text); /* 0xb1b8b EAX -> AX */
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_f2819 modify [eax ebx ecx edx esi edi]
 #endif
 void guest_fn_f2819(void); /* 0xf2819 */
@@ -2582,7 +2582,7 @@ void tick_countdown_47fbc(void);
 void cycle_frame_54210(void);
 void update_records_5437c(void);
 void emit_and_advance_d628(void);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_2b0 parm [eax] [edx] modify []
 #endif
 void guest_fn_2b0(ef_addr32 request, ef_addr32 result); /* 0x2b0 EAX/EDX */
@@ -2932,7 +2932,7 @@ uint32_t read_point_list_fb10(ef_addr32 list);
 uint32_t read_polyline_list_fbcc(ef_addr32 record);
 uint32_t read_group_header_fc54(ef_addr32 group);
 ef_addr32 find_unique_node_ffb4(ef_addr32 name, ef_addr32 head);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_9be38 parm caller [] value [eax]
 #endif
 uint32_t guest_fn_9be38(uint32_t size); /* 0x9be38 stack argument, EAX result */
@@ -3424,7 +3424,7 @@ void guest_fn_e7fa4_h(uint32_t a, uint32_t b); /* 0xe7fa4 EAX/EDX */
 void guest_fn_a3fe0_p(void); /* 0xa3fe0 */
 void guest_fn_a7588_v(ef_addr32 widget, uint32_t value); /* 0xa7588 EAX/EDX */
 uint32_t guest_fn_a7a64_r(uint32_t handle, uint32_t mode, uint32_t offset); /* 0xa7a64 EAX/EDX/EBX -> EAX */
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_deb50_f parm [eax edx ecx] modify [eax ecx edx]
 #endif
 void guest_fn_deb50_f(ef_addr32 dst, uint32_t value, uint32_t count); /* 0xdeb50 EAX/EDX/ECX */
@@ -3488,7 +3488,7 @@ void recompute_scene_extents_9202c(void);
 void update_sound_chain_9ab30(void);
 void flush_pending_bytes_a3f30(void);
 void refresh_named_widget_abce8(void);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux fill_pattern_deb50 parm [eax edx ecx] modify [eax ecx edx]
 #endif
 void fill_pattern_deb50(ef_addr32 dst, uint32_t pattern, uint32_t count);
@@ -3877,7 +3877,7 @@ uint8_t map_code_5_6_bbb34(uint8_t code);
 uint8_t map_code_flag_bbbe4(uint8_t code);
 uint8_t map_code_class_bbd8c(uint8_t code);
 uint8_t scene_record_unset_940e0(void);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux real_mode_to_linear_9c1bb parm caller [] value [eax]
 #endif
 uint32_t real_mode_to_linear_9c1bb(uint32_t seg_off);
@@ -3923,7 +3923,7 @@ void guest_fn_dedde_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xdedd
 /* game_helpers81.c */
 ef_addr32 format_number_commas_8b328(ef_addr32 dest, int32_t width, int32_t value);
 uint8_t scan_directory_entry_8b684(int16_t mode, ef_addr32 name, ef_addr32 suffix, ef_addr32 buf);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux add_far_offset_9bfe3 parm caller [] value [eax]
 #endif
 uint32_t add_far_offset_9bfe3(uint32_t far_ptr, int32_t delta);
@@ -5272,7 +5272,7 @@ uint32_t is_device_handle_1101be(uint32_t handle);
 uint32_t delete_file_fe541(uint32_t name);
 uint32_t dos_read_10f0e8(uint32_t handle, uint32_t buffer, uint32_t count);
 uint32_t set_and_check_video_mode_fe710(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t mode);
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux dos_alloc_eb288 parm caller [] value [eax]
 #endif
 uint32_t dos_alloc_eb288(uint32_t paragraphs);
@@ -6858,7 +6858,7 @@ void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, u
 
 uint32_t guest_fn_f8624(ef_addr32 object, ef_addr32 list,
                         ef_addr32 claim_context, int32_t packed_index); /* 0x000f8624 */
-#if defined(__WATCOMC__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_f8624 parm [eax] [edx] [ebx] [ecx] value [eax] modify [eax ebx ecx edx]
 #endif
 
