@@ -9,3 +9,4 @@ addr	reason
 0x0015c0c4	Focused menu-accept bisector: the mechanically compiled replacement is sufficient for an invalid-write path at guest address 0x19655800. Keeping original bytes reaches the instruction limit without a crash; RAM/framebuffer equivalence remains unresolved.
 0x000002b0	The guest DOS bridge delegates intdos to the original X-32 dispatcher to preserve its INT 21h path and unwritten carry-word quirk; patching this replacement would recurse.
 0x0009c47a	The guest DOS bridge delegates int386x to the original X-32 interrupt thunk; patching this replacement would recurse and lose the original thunk behavior.
+0x0000023b	M1 replay bisector isolates this replacement as sufficient for startup failure at INT 0 (IP 0x9c55a); keep the original flag-dependent interrupt-vector fragment until its DOS interrupt bridge is recovered.
