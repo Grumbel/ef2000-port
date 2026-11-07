@@ -1397,7 +1397,8 @@ def main(argv=None, *, interactive=False):
                                      description=__doc__)
     version = os.environ.get('EF2000_VERSION') or (Path(__file__).resolve().parent.parent / 'VERSION').read_text().strip()
     parser.add_argument('-v', '--version', action='version', version=f'ef2000-unicorn {version}')
-    parser.add_argument('executable', type=Path, nargs='?', help='original _EF2000.EXE')
+    parser.add_argument('executable', type=Path, nargs='?',
+                        help='EF2000 installation directory or original _EF2000.EXE')
     parser.add_argument('--data-dir', type=Path, metavar='DIR',
                         help='original EF2000 game data containing _EF2000.EXE')
     parser.add_argument('--user-data-dir', type=Path, metavar='DIR',
@@ -1466,6 +1467,8 @@ def main(argv=None, *, interactive=False):
                         help='also save a PNG at guest instruction N (repeatable; requires --framebuffer)')
     parser.add_argument('--report', type=Path, help='optional JSON diagnostic output')
     args = parser.parse_args(argv)
+    if args.executable and args.executable.is_dir():
+        args.executable = args.executable / '_EF2000.EXE'
     if args.instruction_limit is not None and args.instruction_limit < 0:
         parser.error('--instruction-limit must be nonnegative (0 = unlimited)')
     if args.timer_instructions <= 0:

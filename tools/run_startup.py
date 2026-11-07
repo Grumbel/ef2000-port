@@ -117,12 +117,12 @@ def main():
     version = os.environ.get('EF2000_VERSION') or version_file.read_text().strip()
     parser.add_argument('-v', '--version', action='version', version=f'ef2000 {version}')
     parser.add_argument('executable', type=Path, nargs='?',
-                        help='path to the original DOS _EF2000.EXE')
+                        help='EF2000 installation directory or original _EF2000.EXE')
     parser.add_argument('--output', type=Path, metavar='DIR',
                         help='create DIR for the extracted game payload, compiled startup '
                              'harness, logs, report.json, and framebuffer.png; '
                              'DIR/drive holds local game-file changes '
-                             '(required; must not already exist; e.g. local/startup-01)')
+                             '(default: a unique directory under the EF2000 cache)')
     parser.add_argument('--backend', choices=['native64', 'qemu'], default='native64',
                         help='execution backend: native64 requires x86-64 Linux; '
                              'qemu uses qemu-i386 (default: %(default)s)')
@@ -183,6 +183,8 @@ def main():
     parser.add_argument('-d', '--debug', action='store_true', help='enable verbose debug diagnostics')
     parser.add_argument('--verbose', action='store_true', help='print detailed guest file and bridge activity')
     args = parser.parse_args()
+    if args.executable and args.executable.is_dir():
+        args.executable = args.executable / '_EF2000.EXE'
     match = re.fullmatch(r'([1-9][0-9]*)x([1-9][0-9]*)', args.geometry)
     if not match or any(int(value) > 16384 for value in match.groups()):
         parser.error('--geometry requires WxH with dimensions from 1 to 16384')

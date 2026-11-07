@@ -30,7 +30,9 @@ On x86-64 Linux, build and run with Nix:
 ```sh
 nix build -L .                 # Precompile the native and QEMU harness objects
 nix flake check                # Unit tests, app/help/version checks, REUSE
-nix run . -- ../EF2000/c/EF2000/_EF2000.EXE --output local/nix-startup
+nix run .#ef2000-native -- ../EF2000/c/EF2000
+nix run .#ef2000-unicorn -- ../EF2000/c/EF2000
+nix run .#ef2000-decomp -- ../EF2000/c/EF2000
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
 
@@ -135,12 +137,15 @@ in the run's output directory. `--gdb` is also available on the Python runner
 for `native64` with Unicorn real-mode services; QEMU is not supported.
 The shell greeting lists these commands, usage examples and the active paths.
 
-`packages.default` and `packages.ef2000` are the same native package;
-`packages.ef2000-startup` is an alias. `apps.default` and `apps.ef2000` run the
-native `ef2000` launcher; `ef2000-startup` remains available as a command
-alias. `apps.unicorn` (also `apps.ef2000-unicorn`) launches the experimental
-SDL3/Unicorn window, while `apps.unicorn-probe` retains its bounded headless
-diagnostic behavior.
+`apps.ef2000-native`, `apps.ef2000-unicorn` and `apps.ef2000-decomp` are the
+three game launchers. Each accepts an EF2000 installation directory and finds
+`_EF2000.EXE` inside it; passing the executable path directly remains valid.
+The native launcher creates a unique cache run directory by default, so
+`--output` is optional. The decomp launcher compiles tracked recovered C into
+OpenWatcom objects when built, links a disposable hybrid patch at startup, and
+then runs it through the native backend. `apps.default`/`apps.ef2000` remain
+native aliases, `apps.unicorn` remains an alias for `apps.ef2000-unicorn`, and
+`apps.unicorn-probe` retains its bounded headless diagnostic behavior.
 `packages.ef2000-win64-zip` and `packages.ef2000-win32-zip` cross-compile the
 C++ Unicorn/SDL3 frontend with MinGW-w64 and package Windows EXE/DLLs;
 they do not contain the proprietary game files. See the
@@ -208,8 +213,9 @@ headless diagnostic probe:
 
 ```sh
 # Launch the original menu/flight with SDL3 (experimental and slow):
-nix run .#unicorn -- --data-dir /path/to/EF2000
-# Equivalent: nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE
+nix run .#ef2000-unicorn -- /path/to/EF2000
+# Equivalent alias:
+nix run .#unicorn -- /path/to/EF2000
 # Continue without a window for a limited diagnostic run:
 nix run .#unicorn -- --data-dir /path/to/EF2000 --headless --instruction-limit 30000000
 # Low-level headless probe, unchanged:

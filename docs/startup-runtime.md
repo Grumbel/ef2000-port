@@ -5,21 +5,21 @@
 On x86-64 Linux:
 
 ```sh
-nix run .#ef2000 -- ../EF2000/c/EF2000/_EF2000.EXE --output local/menu-01
+nix run .#ef2000-native -- ../EF2000/c/EF2000
 ```
 
 The original German TACTCOM main menu renders in a 640×400 indexed VBE mode,
 with an SDL window and mouse input. The screenshot in a completed run is
-`framebuffer.png`. Close the window to stop. Output directories must be new;
-the executable's parent directory must contain the original game installation.
+`framebuffer.png`. Close the window to stop. Output defaults to a unique
+directory under the EF2000 cache. The executable's parent directory must
+contain the original game installation.
 Audio is disabled in a local `drive/EF2000/EF2000.CFG` copy. Original assets and
 configuration remain unchanged. Gameplay beyond the menu is not validated.
 
 For a bounded capture, or original-file regression checks:
 
 ```sh
-nix run . -- ../EF2000/c/EF2000/_EF2000.EXE \
-  --output local/menu-capture --headless --seconds 25
+nix run .#ef2000-native -- ../EF2000/c/EF2000 --headless --seconds 25
 nix develop -c env EF2000_EXE=../EF2000/c/EF2000/_EF2000.EXE \
   python3 -m unittest discover -s tests -v
 ```

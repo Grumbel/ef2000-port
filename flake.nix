@@ -264,6 +264,12 @@
           cp LICENSES/GPL-3.0-or-later.txt "$out/share/licenses/ef2000/"
           cp LICENSES/GPL-3.0-linking-exception.txt "$out/share/licenses/ef2000/"
           cp LICENSES/CC0-1.0.txt "$out/share/licenses/ef2000/"
+          cp LICENSES/LicenseRef-EF2000-Derived.txt "$out/share/licenses/ef2000/"
+          mkdir -p "$out/libexec/ef2000/decomp/include" \
+            "$out/libexec/ef2000/decomp/symbols"
+          cp decomp/include/ef_abi.h "$out/libexec/ef2000/decomp/include/"
+          cp decomp/symbols/functions.tsv decomp/symbols/globals.tsv \
+            decomp/symbols/hybrid-exclude.tsv "$out/libexec/ef2000/decomp/symbols/"
           cp data/ef2000.desktop "$out/share/applications/ef2000.desktop"
           cp data/io.github.grumbel.ef2000.metainfo.xml \
             "$out/share/metainfo/io.github.grumbel.ef2000.metainfo.xml"
@@ -315,6 +321,36 @@
           mainProgram = "ef2000";
           license = lib.licenses.gpl3Plus;
         };
+      };
+      # Compile the tracked recovered C once as part of the optional decomp
+      # launcher. The original executable remains caller-supplied and is only
+      # read at runtime when hybrid_link builds the disposable patch.
+      decompObjects = pkgs.stdenv.mkDerivation {
+        pname = "ef2000-decomp-objects";
+        inherit version;
+        src = source;
+        nativeBuildInputs = [ pkgs.python3 watcom ];
+        dontConfigure = true;
+        buildPhase = ''
+          runHook preBuild
+          mkdir -p objects
+          for module in decomp/src/*.c; do
+            name="$(basename "$module" .c)"
+            ${pkgs.python3}/bin/python3 tools/ef2000_wcc.py \
+              --compiler ${watcom}/bin/wcc386 \
+              --output "$PWD/objects/$name.obj" "$PWD/$module"
+          done
+          runHook postBuild
+        '';
+        installPhase = ''
+          runHook preInstall
+          mkdir -p "$out/lib/ef2000" "$out/share/licenses/ef2000"
+          cp -r objects "$out/lib/ef2000/decomp-objects"
+          cp LICENSES/LicenseRef-EF2000-Derived.txt \
+            "$out/share/licenses/ef2000/LicenseRef-EF2000-Derived.txt"
+          cp decomp/LICENSE-NOTE.md "$out/share/licenses/ef2000/"
+          runHook postInstall
+        '';
       };
       devCommand = name: script: pkgs.writeShellScriptBin name ''
         set -euo pipefail
@@ -374,10 +410,19 @@
         set -euo pipefail
         exec ${pkgs.python3}/bin/python3 ${source}/tools/ef2000_gui_assets.py "$@"
       '';
+      decompWorkflow = pkgs.writeShellScriptBin "ef2000-decomp" ''
+        set -euo pipefail
+        exec ${python}/bin/python3 ${package}/libexec/ef2000/tools/decomp_app.py \
+          --objects ${decompObjects}/lib/ef2000/decomp-objects \
+          --launcher ${package}/bin/ef2000 "$@"
+      '';
     in {
       packages.${system} = {
         default = package;
         ef2000 = package;
+        ef2000-native = package;
+        ef2000-unicorn = package;
+        ef2000-decomp = decompWorkflow;
         ef2000-startup = package;
         ef2000-ghidra = ghidraWorkflow;
         ef2000-wcc = watcomWorkflow;
@@ -412,61 +457,80 @@
           program = "${pkgs.ghidra}/bin/ghidra";
           meta.description = "Open Ghidra to inspect the extracted EF2000 X-32 image";
         };
-      in { default = native; ef2000 = native;
-           inherit unicorn;
-           inherit unicorn-cpp;
-           inherit ghidra;
-           ghidra-ef2000 = {
-             type = "app";
-             program = "${ghidraWorkflow}/bin/ef2000-ghidra";
-             meta.description = "Import, audit, repair, and export the EF2000 Ghidra project";
-           };
-           highscores-differential = {
-             type = "app";
-             program = "${highscoresDifferential}/bin/ef2000-highscores-differential";
-             meta.description = "Compare original high-score guest routines with native C++ reconstruction";
-           };
-           func-differential = {
-             type = "app";
-             program = "${funcDifferential}/bin/ef2000-func-differential";
-             meta.description = "Compare an original EF2000 function with its in-place EFPATCH1 replacement";
-           };
-           omf-inplace = {
-             type = "app";
-             program = "${omfInplace}/bin/ef2000-omf-inplace";
-             meta.description = "Build a reviewed in-place EFPATCH1 from a compiled OpenWatcom OMF object";
-           };
-           replay-suite = {
-             type = "app";
-             program = "${replaySuite}/bin/ef2000-replay-suite";
-             meta.description = "Compare original and patched bounded guest game replays";
-           };
-           gui-assets = {
-             type = "app";
-             program = "${guiAssetsWorkflow}/bin/ef2000-gui-assets";
-             meta.description = "Inventory and extract original EF2000 menu artwork and GUI scripts";
-           };
-           ghidra-headless = {
-             type = "app";
-             program = "${ghidraHome}/support/analyzeHeadless";
-             meta.description = "Run the Ghidra headless analyzer";
-           };
-           ef2000-unicorn = unicorn;
-           unicorn-probe = {
-             type = "app";
-             program = "${package}/bin/ef2000-unicorn-probe";
-             meta.description = "Probe the original EF2000 executable with portable Unicorn emulation";
-           }; };
+        decomp = {
+          type = "app";
+          program = "${decompWorkflow}/bin/ef2000-decomp";
+          meta.description = "Run EF2000 with compiled recovered C replacements";
+        };
+      in {
+        default = native;
+        ef2000 = native;
+        ef2000-native = native;
+        unicorn = unicorn;
+        ef2000-unicorn = unicorn;
+        ef2000-decomp = decomp;
+        unicorn-cpp = unicorn-cpp;
+        ghidra = ghidra;
+        ghidra-ef2000 = {
+          type = "app";
+          program = "${ghidraWorkflow}/bin/ef2000-ghidra";
+          meta.description = "Import, audit, repair, and export the EF2000 Ghidra project";
+        };
+        highscores-differential = {
+          type = "app";
+          program = "${highscoresDifferential}/bin/ef2000-highscores-differential";
+          meta.description = "Compare original high-score guest routines with native C++ reconstruction";
+        };
+        func-differential = {
+          type = "app";
+          program = "${funcDifferential}/bin/ef2000-func-differential";
+          meta.description = "Compare an original EF2000 function with its in-place EFPATCH1 replacement";
+        };
+        omf-inplace = {
+          type = "app";
+          program = "${omfInplace}/bin/ef2000-omf-inplace";
+          meta.description = "Build a reviewed in-place EFPATCH1 from a compiled OpenWatcom OMF object";
+        };
+        replay-suite = {
+          type = "app";
+          program = "${replaySuite}/bin/ef2000-replay-suite";
+          meta.description = "Compare original and patched bounded guest game replays";
+        };
+        gui-assets = {
+          type = "app";
+          program = "${guiAssetsWorkflow}/bin/ef2000-gui-assets";
+          meta.description = "Inventory and extract original EF2000 menu artwork and GUI scripts";
+        };
+        ghidra-headless = {
+          type = "app";
+          program = "${ghidraHome}/support/analyzeHeadless";
+          meta.description = "Run the Ghidra headless analyzer";
+        };
+        unicorn-probe = {
+          type = "app";
+          program = "${package}/bin/ef2000-unicorn-probe";
+          meta.description = "Probe the original EF2000 executable with portable Unicorn emulation";
+        };
+      };
       checks.${system} = self.packages.${system} // {
         app-default = pkgs.runCommand "ef2000-app-check" {} ''
           test -x ${package}/bin/ef2000
           touch "$out"
         '';
         app-ef2000 = self.checks.${system}.app-default;
+        app-native-cli = pkgs.runCommand "ef2000-native-cli-check" {} ''
+          ${package}/bin/ef2000 --help > "$out"
+          grep -q 'EF2000 installation directory or original _EF2000.EXE' "$out"
+          grep -q 'unique directory under the EF2000 cache' "$out"
+        '';
         app-unicorn = pkgs.runCommand "ef2000-unicorn-app-check" {} ''
           test -x ${package}/bin/ef2000-unicorn
           ${package}/bin/ef2000-unicorn --help > "$out"
           test "$(${package}/bin/ef2000-unicorn --version)" = ${lib.escapeShellArg "ef2000-unicorn ${version}"}
+        '';
+        app-decomp = pkgs.runCommand "ef2000-decomp-app-check" {} ''
+          ${decompWorkflow}/bin/ef2000-decomp --help > "$out"
+          grep -q 'EF2000 installation directory or original _EF2000.EXE' "$out"
         '';
         app-unicorn-cpp = pkgs.runCommand "ef2000-unicorn-cpp-app-check" {} ''
           ${package}/bin/ef2000-unicorn-cpp --help > "$out"
