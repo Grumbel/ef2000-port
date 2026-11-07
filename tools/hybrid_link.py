@@ -424,6 +424,9 @@ def main(argv=None):
                         default=DEFAULT_ARENA)
     parser.add_argument('--exclude-address', action='append', default=[],
                         help='leave this recovered entry original (repeatable, ADDR[:REASON])')
+    parser.add_argument('--exclude-list', type=Path,
+                        default=ROOT / 'decomp/symbols/hybrid-exclude.tsv',
+                        help='TSV of guest entries that must keep their original bytes')
     parser.add_argument('-o', '--output', type=Path, required=True,
                         help='ignored local EFPATCH1 hybrid patch file')
     parser.add_argument('--report', type=Path,
@@ -433,15 +436,28 @@ def main(argv=None):
     args = parser.parse_args(argv)
     report_path = args.mechanical_report or args.mechanical_dir / 'report.tsv'
     try:
-        objects, selected = load_objects(args.hand_objects, args.mechanical_dir,
+        source = args.image.read_bytes()
+        hand_object_dirs = args.hand_objects or [ROOT / 'local/hybrid/obj']
+        objects, selected = load_objects(hand_object_dirs, args.mechanical_dir,
                                          report_path)
         explicit_excludes = {}
+        if args.exclude_list.is_file():
+            exclude_lines = [line for line in args.exclude_list.read_text().splitlines()
+                             if line.strip() and not line.lstrip().startswith('#')]
+            reader = csv.DictReader(exclude_lines, delimiter='\t')
+            if reader.fieldnames != ['addr', 'reason']:
+                raise ValueError('hybrid exclude list requires addr and reason columns')
+            for row in reader:
+                address = int(row['addr'], 0)
+                if not 0 <= address < len(source):
+                    raise ValueError('hybrid exclusion address outside initialized payload')
+                explicit_excludes[address] = row['reason']
         for value in args.exclude_address:
             address_text, separator, reason = value.partition(':')
             explicit_excludes[int(address_text, 0)] = (
                 reason if separator else 'explicitly demoted after hybrid replay failure')
         blob, report = link(objects, read_tsv(args.functions), read_tsv(args.globals),
-                            selected, args.image.read_bytes(),
+                            selected, source,
                             load_abi_aliases(args.abi_header), args.arena_base,
                             explicit_excludes)
         args.output.parent.mkdir(parents=True, exist_ok=True)

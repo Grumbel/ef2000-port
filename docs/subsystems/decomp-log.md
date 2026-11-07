@@ -634,3 +634,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   patch bytes). 697/759 modules link; 2,283 functions are excluded. The
   private Xvfb listener failure prevents replay; M1/M2 remain unpassed and
   this image's first runtime failure is unknown.
+- Menu replay with the current local M0 report, 2026-11-07: OpenWatcom accepts
+  416/1,020 mechanical functions (125,300 body bytes; 589 manual, 15 compile
+  errors). Original disassembly confirms `0xe9a24` has three stack arguments,
+  callee cleanup via `ret 0xc`, and EAX/EDX pointer advances; its mechanical
+  C lowering faults at arena IP `0x03087882` on tick 695. Added a persistent
+  hybrid exclusion for this unresolved ABI. With it, the hybrid links 2,452
+  entries (2,043 hand-written and 409 mechanical), 12,260 entry bytes and a
+  585,684-byte code arena (597,944 patch bytes; 702/764 modules). The 500M
+  main-menu replay then faults at guest IP `0x4` on tick 560. M1/M2 remain
+  unpassed; menu navigation is not yet reached by this image.

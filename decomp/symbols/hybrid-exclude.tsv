@@ -1,0 +1,4 @@
+# SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
+# SPDX-License-Identifier: LicenseRef-EF2000-Derived
+addr	reason
+0x000e9a24	Mechanical translation does not preserve the original ret 0x0c ABI; main-menu replay faults in its body at tick 695. Keep original bytes pending manual ABI recovery.
