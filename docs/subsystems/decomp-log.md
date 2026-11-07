@@ -749,3 +749,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   compiled `to_lower_ascii` entry is hit 686 times. This verifies a focused
   main-menu-to-simulator-selection path, not M1: the full hybrid still faults
   during startup before the menu.
+- M0 external code-label addresses, 2026-11-07: for `&LAB_<address>` with no
+  matching label definition in the current pseudo-C body, emit a guest-memory
+  code pointer; local `LAB_` labels and `goto` targets remain C labels. This
+  fixes three OpenWatcom declaration errors (`0xc4db4`, `0xdc5a9`, `0x101c54`)
+  after checking the referenced addresses as code targets. Using the pinned
+  OpenWatcom v2 wrapper directly (the Nix dev-shell invocation could not
+  connect to the sandbox-denied daemon socket), the M0 report improves from
+  418/1,020 `ok` (127,079/543,917 body bytes) to 421/1,020 (127,764 bytes;
+  41.3% of functions and 23.5% of bytes); compile errors fall from 13 to 10
+  and 589 remain `manual`. Relinking gives 2,455 redirects (12,275 entry
+  bytes, 588,388 arena bytes; 600,663 total patch bytes; 706/769 modules).
+  The repeated-baseline 500M main-menu replay still faults at IP `0x190`,
+  tick 561, on the same unmapped read `0x358be389` (size 4, code
+  `093589e38b35302a1300cd2172308935`); this is M0 compile evidence, not an M1
+  pass.

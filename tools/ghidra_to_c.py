@@ -523,6 +523,18 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
     body = re.sub(
         r'&\(\(char \*\)ef_guest_memory_ptr\((0x[0-9a-fA-F]+)\)\)',
         r'((char **)ef_guest_memory_ptr(\1))', body)
+    # Address-taken LAB symbols without a label definition in this function
+    # are guest code addresses, not C labels. Ghidra uses this form for
+    # callback pointers and code selectors. Keep locally defined labels for
+    # the goto lowering below, and represent external targets in guest space.
+    local_labels = {address.lower() for address in
+                    re.findall(r'(?m)^\s*LAB_([0-9a-fA-F]{8})\s*:', body)}
+    def label_address_repl(match):
+        address_text = match.group(1).lower()
+        if address_text in local_labels:
+            return match.group(0)
+        return '((char *)ef_guest_memory_ptr(0x%su))' % address_text
+    body = re.sub(r'&\s*LAB_([0-9a-fA-F]{8})\b', label_address_repl, body)
     body = re.sub(r'\bLAB_' + HEX + r'\b', lambda m: 'lab_' + m.group(1).lower(), body)
     body = re.sub(r'\bfunc_0x' + HEX + r'\b', lambda m: 'ef_fn_' + m.group(1).lower(), body)
     # Ghidra emits an empty terminal case as a label immediately followed by
