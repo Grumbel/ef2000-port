@@ -1006,3 +1006,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   unsupported real-mode BIOS INT 0. A temporary register trace at that stop
   showed ESI=`0x21`, but this is after the thunk loaded the interrupt input
   block and does not establish the interrupt number used to select the stub.
+- M0 segment-register live-ins, 2026-11-07: translate read-only Ghidra live-ins
+  `in_CS`, `in_DS`, `in_ES`, `in_SS`, `in_FS`, and `in_GS` through the existing
+  `guest_seg_x` selector helper; writes remain manual. The full OpenWatcom pass
+  moves seven functions out of `manual`: 434/1,020 `ok` (135,401/543,917 body
+  bytes; 42.5% of functions, 24.9% of bytes), 584 `manual`, and two
+  `compile-error`. Five newly generated functions compile. The two remaining
+  compiler failures expose Ghidra's undeclared `curbrk` alias for the reviewed
+  `_curbrk` global at `0x132a30`; no hybrid replay was run.

@@ -435,6 +435,21 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
                 return 'EF_U32(0x%08xu)' % address
             return replacement
         body = token.sub(pointer_read, body)
+    # Segment-register live-ins are ambient X-32 state, not Watcom register
+    # parameters. Read them through the existing selector helper. Keep writes
+    # manual: a C expression cannot assign back to the segment register.
+    segment_registers = {'CS': 1, 'DS': 3, 'ES': 0, 'SS': 2, 'FS': 4, 'GS': 5}
+    for register, selector in segment_registers.items():
+        name = 'in_' + register
+        if not re.search(r'\b' + name + r'\b', body):
+            continue
+        if re.search(r'\b' + name + r'\s*(?:=(?!=)|\+\+|--|\+=|-=)', body):
+            flags.add('manual: write to live-in register ' + name)
+            continue
+        body = re.sub(r'(?m)^\s*[A-Za-z_]\w*(?:\s+|\s*\*)+' + name +
+                      r'\s*;\s*$', '', body)
+        body = re.sub(r'\b' + name + r'\b',
+                      '((uint16_t)guest_seg_x(%du))' % selector, body)
     for token in {match.group(0) for match in MANUAL.finditer(body)}:
         flags.add('manual: ' + manual_cause(token))
     # A uRam label has no reliable width by itself. CONCAT22 does: the first
