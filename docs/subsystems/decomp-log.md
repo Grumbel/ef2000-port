@@ -680,4 +680,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   hybrid exclusion list. Demoting only this entry from the 1,227-entry patch
   avoids the guest exit but still diverges in interrupts, IRQ0, framebuffer,
   and guest RAM, so the fix is necessary for that path but not sufficient for
-  the larger subset. M2 remains incomplete because cockpit is not reached.
+  the larger subset. Cockpit evidence is recorded below.
+- Cockpit checkpoint, 2026-11-07: the same 154-entry composition passes the
+  strict repeated-baseline 700M quick-fight setup replay, then runs the 1.5B
+  cockpit input replay to the instruction limit in 320x200 mode. The original
+  frame shows the cockpit; the patched frame is black. Patched counters are
+  39,060 interrupts / 5,386 IRQ0 versus 39,982 / 5,952 in the repeatable
+  original, and the 64 KiB guest hash differs (patched IP `0x0`, original
+  `0x110de6`). The cockpit bisector ran seven trials over two resumed passes,
+  reducing 154 suspects to 38 but not isolating a single cause; remaining
+  candidates are concentrated in scene state/nodes, camera, and scene helpers.
+  Current highest passing state is menu -> quick-fight setup on the partial
+  hybrid; M2 is still unpassed. The full hybrid's earlier main-menu failure at
+  IP `0x4`, tick 560 remains unchanged.
