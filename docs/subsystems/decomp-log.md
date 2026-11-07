@@ -1022,3 +1022,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   436/1,020 `ok` functions (135,803/543,917 body bytes; 42.7% of functions,
   25.0% of bytes), 584 `manual`, zero `compile-error`; no hybrid replay was
   run.
+- M0 multi-line function headers, 2026-11-07: normalize Ghidra declarations
+  through the opening brace before matching prototypes, so signatures split
+  across lines are recognized. Confirmed stack-only ABIs whose argument
+  count disagrees with the Ghidra prototype stay `manual` rather than
+  producing a malformed C declaration. The full OpenWatcom pass is now
+  438/1,020 `ok` functions (137,248/543,917 body bytes; 42.9% of functions,
+  25.2% of bytes), 582 `manual`, zero `compile-error`; no hybrid replay was
+  run.

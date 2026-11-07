@@ -99,6 +99,16 @@ def normalize_type(ctype):
     return ctype
 
 
+def function_header(body):
+    """Return a whitespace-normalized prototype and its body from Ghidra C."""
+    brace = body.find('{')
+    if brace < 0:
+        first = body.split('\n', 1)
+        return first[0].strip(), body[len(first[0]):]
+    header = ' '.join(body[:brace].split())
+    return header, body[brace:]
+
+
 def recovered_addresses():
     """Addresses that already have hand-written bodies (state compiles+)."""
     skip = {'unknown', 'named', 'typed', 'drafted', 'blocked', 'compiles-bad', ''}
@@ -218,8 +228,8 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
     flags = set()
     extra = []
     inferred = []
-    original_first = next((line for line in body.split('\n') if line.strip()), '')
-    original = DEF.match(original_first)
+    original_header, _ = function_header(body)
+    original = DEF.match(original_header)
     original_params = []
     original_param_types = []
     if original and original.group('params').strip() not in ('', 'void'):
@@ -229,11 +239,19 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
             original_params.append(name.group(1) if name else None)
             original_param_types.append(
                 normalize_type(parameter[:name.start()].strip()) if name else None)
+    if (sig_in and original and original_params and
+            all(re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper())
+                for reg, _ in sig_in) and
+            len(original_params) != len(sig_in)):
+        # A confirmed stack-only ABI and Ghidra's prototype disagree about
+        # the number of arguments. Do not emit C with undeclared formals or
+        # guess that Ghidra's extra __fastcall parameters are real inputs.
+        flags.add('manual: confirmed stack parameter count mismatch')
     if sig_in:
         # Watcom register arguments: Ghidra shows them as in_<REG>.
         has_stack_inputs = any(
             re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper()) for reg, _ in sig_in)
-        generic_fastcall = bool(original and '__fastcall' in original_first)
+        generic_fastcall = bool(original and '__fastcall' in original_header)
         register_parameter_indices = {}
         for reg, ctype in sig_in:
             stack = re.fullmatch(r'\[?ESP\+(\d+)\]?', reg.upper())
@@ -672,8 +690,8 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
     if (set(re.findall(r'\bstack0x[0-9a-fA-F]{8}\b', body)) -
             set(stack_address_args)):
         flags.add('manual: stack-frame base access')
-    first = next((line for line in body.split('\n') if line.strip()), '')
-    match = DEF.match(first)
+    header, rest = function_header(body)
+    match = DEF.match(header)
     if not match:
         flags.add('manual: no function definition recognized')
         return None, body, flags, inferred
@@ -694,7 +712,6 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
         # inputs first so the pragma and the C declaration have the same ABI.
         params = ', '.join(extra + ([] if params == 'void' else [params]))
     sig = '%s ef_fn_%08x(%s)' % (ret, entry, params)
-    rest = body.split('\n', 1)[1] if '\n' in body else ''
     return sig, rest, flags, inferred
 
 
