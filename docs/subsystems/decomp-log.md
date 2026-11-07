@@ -848,3 +848,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   and a stack-frame placeholder at `0x1177f4`; the latter's pointer arithmetic
   is not treated as a safe generic local. These pointer-width conversions
   lower the generated type model but do not verify the address globals.
+- M0 rule 18, reject untyped RAM and caller-frame placeholders, 2026-11-07:
+  leave unresolved `uRam`/`iRam` symbols and non-address-only `stack0x...`
+  references as `manual`. Disassembly confirms `0xc41b0` writes into its own
+  instruction stream; `0x1177f4` forms a pointer into the caller's stack
+  frame. The complete OpenWatcom pass now reports 429/1,020 `ok` (133,085 /
+  543,917 body bytes; 42.1% by function and 24.5% by bytes), 591 `manual`,
+  and zero compiler errors. The 467 `extra return register` and 165
+  `unpreserved register` manual cases remain the largest classes. The new
+  manual classifications prevent unsupported placeholders from being
+  mistaken for mechanical C; they do not increase the ok-rate.

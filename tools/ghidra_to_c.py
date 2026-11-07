@@ -473,6 +473,8 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
         access = 'EF_S32' if kind == 'iRam' else 'EF_U32'
         return '%s(0x%08xu)' % (access, address)
     body = re.sub(r'\b(iRam|uRam)([0-9a-fA-F]{8})\b', ram_int_repl, body)
+    if re.search(r'\b(?:iRam|uRam)[0-9a-fA-F]{8}\b', body):
+        flags.add('manual: untyped RAM symbol')
     # Recovered callees have public semantic names in ef_abi.h. Use those
     # names for non-call references (usually callback addresses), casting to
     # Ghidra's generic code-pointer type. Keep calls under ef_fn_ aliases:
@@ -612,6 +614,9 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
         declarations = ''.join('  uint32_t %s;\n' % name
                                for name in stack_address_args)
         body = body[:opening_brace + 1] + '\n' + declarations + body[opening_brace + 1:]
+    if (set(re.findall(r'\bstack0x[0-9a-fA-F]{8}\b', body)) -
+            set(stack_address_args)):
+        flags.add('manual: stack-frame base access')
     first = next((line for line in body.split('\n') if line.strip()), '')
     match = DEF.match(first)
     if not match:
