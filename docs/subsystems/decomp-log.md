@@ -801,3 +801,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   on the established unmapped read `0x358be389`; M1 remains unpassed. The
   previously recorded 160-function focused menu build remains the last passing
   menu-navigation composition.
+- Focused menu-to-quick-fight replay and cockpit bisect, 2026-11-07: using
+  the canonical `decomp/include/ef_abi.h`, current hand objects (including
+  two pending ABI edits compiled with zero OpenWatcom warnings) and the
+  424-function mechanical report links a 161-function menu subset (805 entry
+  bytes, 591,060 arena bytes, 709/772 modules). The replay narrowed this to
+  160 redirects after demoting `0xc4db4`; repeated-baseline main-menu and
+  quick-fight-setup both pass with matching status/counters, framebuffer and
+  guest hash (33,351 interrupts, 2,800 ticks, 2,754 IRQ0s and IP `0x110de6`
+  for quick-fight setup). The 161-function cockpit run faults with an
+  unmapped fetch at IP `0x15918c05`, tick 3,188. The automatic bisector
+  isolates `renderer_normalize_scene_c4db4` as necessary for that failure;
+  retaining its original bytes removes the fetch, but the cockpit run still
+  reaches the instruction limit with divergent counters (39,060 interrupts,
+  5,386 IRQ0s), framebuffer and guest RAM. Two residual bisector stages leave
+  `0x8fe58` and `0x9195c` as a joint candidate set; demoting all three causes
+  an `unsupported_interface` stop, so those are not yet validated fixes.
+  Mark `0xc4db4` `compiles-bad` and exclude it from future hybrids pending an
+  ABI/behavior correction. Main menu and quick-fight setup pass; M2 cockpit
+  remains unpassed.

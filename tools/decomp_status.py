@@ -31,7 +31,7 @@ DEFAULT_WORKSPACE = Path(os.environ.get('EF2000_GHIDRA_WORKSPACE', str(ROOT / 'l
 COLUMNS = ('addr', 'size', 'name', 'module', 'state', 'kind', 'sig_status', 'test', 'notes')
 # Ordered: a function moves left to right through the pipeline.
 PIPELINE = ('unknown', 'named', 'typed', 'drafted', 'compiles', 'spliced', 'verified')
-SIDE_STATES = ('blocked', 'library', 'data', 'dead')
+SIDE_STATES = ('blocked', 'compiles-bad', 'library', 'data', 'dead')
 STATES = PIPELINE + SIDE_STATES
 KINDS = ('unclassified', 'game', 'asm', 'thunk', 'clib', 'x32', 'ail', 'vbe')
 LIBRARY_KINDS = ('clib', 'x32', 'ail', 'vbe')
@@ -236,7 +236,13 @@ def check(rows, root=ROOT):
                 errors.append(f'{where}: verified functions need a test path')
             elif not (root / row['test']).is_file():
                 errors.append(f'{where}: test file not found: {row["test"]}')
-        if state in ('blocked', 'dead', 'data') and not row['notes']:
+        if state == 'compiles-bad':
+            if not row['module']:
+                errors.append(f'{where}: state compiles-bad requires a module')
+            elif not (root / 'decomp/src' / f'{row["module"]}.c').is_file() and \
+                    not (root / 'decomp/src' / f'{row["module"]}.asm').is_file():
+                errors.append(f'{where}: missing decomp/src/{row["module"]}.c')
+        if state in ('blocked', 'compiles-bad', 'dead', 'data') and not row['notes']:
             errors.append(f'{where}: state {state} requires notes with the evidence')
         if state == 'library' and row['kind'] not in LIBRARY_KINDS:
             errors.append(f'{where}: state library requires a library kind')
