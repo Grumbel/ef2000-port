@@ -783,3 +783,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   selected guest hash
   (`7d8931aaf9b6c03514c14258260489d68da529a53770edf20bb83a62a8306817`).
   This confirms the focused menu path remains working; full M1 is unpassed.
+- M0 recovered callback references and relative output paths, 2026-11-07:
+  generated callers now cast references to already hand-recovered functions
+  through their semantic declarations, while unresolved/manual callees get
+  generic declarations for compilation and remain original in the hybrid.
+  This allows `0x105e38` to compile when assigning recovered callback
+  `destroy_sound_object_105da0` and passing still-original
+  `0x105648`. The OpenWatcom driver also resolves `--out` before compiling;
+  this fixes duplicated relative paths caused by invoking the compiler with
+  the output directory as its working directory. The pinned compiler run
+  improves M0 from 423/1,020 to 424/1,020 `ok` (129,717/543,917 body bytes;
+  41.6% of functions and 23.8% of bytes); 589 remain `manual` and 7 have
+  compiler errors. A full link from the available hand-object directory and
+  current mechanical batch redirects 1,714 functions (8,570 entry bytes,
+  591,060 arena bytes; 636/772 modules). Its repeated-baseline
+  `simulator-menu-key-choice` replay still faults at IP `0x190`, tick 560,
+  on the established unmapped read `0x358be389`; M1 remains unpassed. The
+  previously recorded 160-function focused menu build remains the last passing
+  menu-navigation composition.

@@ -196,7 +196,8 @@ def confirmed_alias_declarations(address, sig):
     return declarations
 
 
-def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
+def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
+            recovered_names=None):
     """Return (definition_signature, body_c, flags) for one pseudo-C file."""
     lines = text.split('\n')
     lines = [line for line in lines if not line.startswith(('/*', ' *'))]
@@ -472,11 +473,28 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
         access = 'EF_S32' if kind == 'iRam' else 'EF_U32'
         return '%s(0x%08xu)' % (access, address)
     body = re.sub(r'\b(iRam|uRam)([0-9a-fA-F]{8})\b', ram_int_repl, body)
-    # Rename callees, referenced by auto name or by recovered name.
+    # Recovered callees have public semantic names in ef_abi.h. Use those
+    # names for non-call references (usually callback addresses), casting to
+    # Ghidra's generic code-pointer type. Keep calls under ef_fn_ aliases:
+    # their pseudo-C arity may not match the confirmed ABI declaration.
+    recovered_names = recovered_names or {}
+    def function_reference_repl(match):
+        address = int(match.group(1), 16)
+        name = recovered_names.get(address)
+        if name and not re.match(r'\s*\(', body[match.end():]):
+            return '((ef_gen_code *)%s)' % name
+        return 'ef_fn_' + match.group(1).lower()
     body = re.sub(r'\b(?:thunk_)?FUN_' + HEX + r'\b',
-                  lambda m: 'ef_fn_' + m.group(1).lower(), body)
+                  function_reference_repl, body)
     for old, new in names.items():
         body = re.sub(r'\b' + re.escape(old) + r'\b', new, body)
+    # The export may spell an auto-named entry as candidate_orphan_<addr>
+    # rather than FUN_<addr>; after the normal alias rewrite, resolve its
+    # non-call code-pointer uses the same way.
+    for address, name in recovered_names.items():
+        alias = 'ef_fn_%08x' % address
+        body = re.sub(r'\b' + alias + r'\b(?!\s*\()',
+                      '((ef_gen_code *)%s)' % name, body)
     # Ghidra emits ram0x names for referenced addresses that lack a data
     # symbol, and adds numeric suffixes for overlapping byte globals. The
     # latter are byte aliases at base+offset, as shown by their read/write
@@ -630,9 +648,20 @@ def main():
     parser.add_argument('--limit', type=int)
     args = parser.parse_args()
 
+    # The compiler runs with cwd=args.out, so all paths passed to it must be
+    # rooted outside that working directory.  In particular, a relative
+    # --out such as local/mechanical otherwise becomes a duplicated path.
+    args.out = args.out.resolve()
+
     rows = read_tsv(args.export / 'functions.tsv')
     only = {int(a, 16) for a in args.only.split(',')} if args.only else None
     skip = recovered_addresses() if args.skip_recovered else set()
+    recovered_names = {
+        int(row['addr'], 16): row['name']
+        for row in read_tsv(FUNCTIONS)
+        if int(row['addr'], 16) in skip and
+        re.fullmatch(r'[A-Za-z_]\w*', row['name'])
+    }
     sigs = load_signatures()
     globals_ = load_globals()
     names = {}
@@ -667,7 +696,7 @@ def main():
         sig, body, flags, inferred = convert(
             path.read_text(errors='replace'), entry, names,
             sigs[entry][0] if entry in sigs else None, globals_,
-            sigs[entry][1] if entry in sigs else None)
+            sigs[entry][1] if entry in sigs else None, recovered_names)
         state = 'manual' if flags else 'generated'
         if sig and entry in sigs:
             pragma = pragma_for('ef_fn_%08x' % entry, sigs[entry])
@@ -686,6 +715,11 @@ def main():
             # arguments and other call-site mismatches.
             declaration = sig.split('(', 1)[0] + '()'
             header.append(declaration + ';')
+        else:
+            # Manual/untranslated callees stay at their original addresses in
+            # the hybrid. Declare the generated spelling so compiled callers
+            # can still link to that guest entry without requiring its body.
+            header.append('int ef_fn_%08x();' % entry)
         if state == 'generated':
             labels = sorted(set(re.findall(r'\blab_[0-9a-f]{8}\b', body)))
             (args.out / 'src' / ('ef_fn_%08x.c' % entry)).write_text(
