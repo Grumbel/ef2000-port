@@ -690,6 +690,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `0x110de6`). The cockpit bisector ran seven trials over two resumed passes,
   reducing 154 suspects to 38 but not isolating a single cause; remaining
   candidates are concentrated in scene state/nodes, camera, and scene helpers.
-  Current highest passing state is menu -> quick-fight setup on the partial
-  hybrid; M2 is still unpassed. The full hybrid's earlier main-menu failure at
-  IP `0x4`, tick 560 remains unchanged.
+  A 20-entry trial from the retained cockpit candidates renders a framebuffer
+  byte-identical to the original cockpit (100 redirected entry bytes; 585,784
+  total patch-write bytes). Its status, IP, ticks, IRQ0 count, and final
+  framebuffer match; interrupts are 39,973 versus 39,982 and the selected
+  64 KiB guest hash differs. This subset contains 19 hand-written `compiles`
+  replacements plus verified `to_lower_ascii`; it is close but not a strict
+  M2 pass. The current checkpoint is quick-fight setup with strict equivalence
+  and cockpit with matching pixels but a small control/state delta. The full
+  hybrid's earlier main-menu failure at IP `0x4`, tick 560 remains unchanged.
