@@ -269,6 +269,7 @@
             "$out/libexec/ef2000/decomp/symbols"
           cp decomp/include/ef_abi.h "$out/libexec/ef2000/decomp/include/"
           cp decomp/symbols/functions.tsv decomp/symbols/globals.tsv \
+            decomp/symbols/signatures.tsv \
             decomp/symbols/hybrid-exclude.tsv "$out/libexec/ef2000/decomp/symbols/"
           cp data/ef2000.desktop "$out/share/applications/ef2000.desktop"
           cp data/io.github.grumbel.ef2000.metainfo.xml \
@@ -416,6 +417,10 @@
           --objects ${decompObjects}/lib/ef2000/decomp-objects \
           --launcher ${package}/bin/ef2000 "$@"
       '';
+      nativeSb16Workflow = pkgs.writeShellScriptBin "ef2000-native-sb16" ''
+        set -euo pipefail
+        exec ${package}/bin/ef2000 --sound sb16 "$@"
+      '';
     in {
       packages.${system} = {
         default = package;
@@ -444,6 +449,8 @@
         };
         native = app "${package}/bin/ef2000"
           "Run the original EF2000 game with the native Linux backend";
+        nativeSb16 = app "${nativeSb16Workflow}/bin/ef2000-native-sb16"
+          "Run the original EF2000 game with SB16 digital audio enabled";
         unicorn = app "${package}/bin/ef2000-unicorn"
           "Run the original EF2000 game with the Unicorn and SDL3 backend";
         unicorn-cpp = app "${package}/bin/ef2000-unicorn-cpp"
@@ -455,7 +462,7 @@
       in {
         default = native;
         ef2000 = native;
-        ef2000-native = native;
+        ef2000-native = nativeSb16;
         unicorn = unicorn;
         ef2000-unicorn = unicorn;
         ef2000-decomp = decomp;
@@ -521,6 +528,7 @@
         app-decomp = pkgs.runCommand "ef2000-decomp-app-check" {} ''
           ${decompWorkflow}/bin/ef2000-decomp --help > "$out"
           grep -q 'EF2000 installation directory or original _EF2000.EXE' "$out"
+          test -s ${package}/libexec/ef2000/decomp/symbols/signatures.tsv
         '';
         app-unicorn-cpp = pkgs.runCommand "ef2000-unicorn-cpp-app-check" {} ''
           ${package}/bin/ef2000-unicorn-cpp --help > "$out"

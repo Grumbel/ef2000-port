@@ -28,7 +28,7 @@ class UnicornAppTests(unittest.TestCase):
                             interactive=True)
             self.assertEqual(code, 0)
             self.assertIn('window_closed', output.getvalue())
-            self.assertEqual(runner.call_args.args, (b'payload', None))
+            self.assertEqual(runner.call_args.args, (b'payload', 0))
             self.assertTrue(runner.call_args.kwargs['windowed'])
             self.assertTrue(runner.call_args.kwargs['fast_execution'])
             self.assertEqual(runner.call_args.kwargs['timer_instructions'], 100000)

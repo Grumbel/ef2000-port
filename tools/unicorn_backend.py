@@ -1410,6 +1410,7 @@ def main(argv=None, *, interactive=False):
     parser.add_argument('--show-paths', action='store_true',
                         help='print resolved game, state, and user-data paths and exit')
     parser.add_argument('--instruction-limit', type=int,
+                        default=0 if interactive else None,
                         help='guest instruction budget (headless default 30000000; '
                              'windowed default unlimited; 0 = unlimited)')
     parser.add_argument('--timer-instructions', type=int, default=100000 if interactive else 250000,
