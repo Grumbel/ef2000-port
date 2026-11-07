@@ -437,31 +437,21 @@
         ef2000-win32-zip = win32.zip;
       };
       apps.${system} = let
-        native = {
+        app = program: description: {
           type = "app";
-          program = "${package}/bin/ef2000";
-          meta.description = "Run the original EF2000 game with the native Linux backend";
+          inherit program;
+          meta.description = description;
         };
-        unicorn = {
-          type = "app";
-          program = "${package}/bin/ef2000-unicorn";
-          meta.description = "Experiment with original EF2000 menu and flight using Unicorn and SDL3";
-        };
-        unicorn-cpp = {
-          type = "app";
-          program = "${package}/bin/ef2000-unicorn-cpp";
-          meta.description = "Experiment with original EF2000 menu and flight in native C++ Unicorn/SDL3";
-        };
-        ghidra = {
-          type = "app";
-          program = "${pkgs.ghidra}/bin/ghidra";
-          meta.description = "Open Ghidra to inspect the extracted EF2000 X-32 image";
-        };
-        decomp = {
-          type = "app";
-          program = "${decompWorkflow}/bin/ef2000-decomp";
-          meta.description = "Run EF2000 with compiled recovered C replacements";
-        };
+        native = app "${package}/bin/ef2000"
+          "Run the original EF2000 game with the native Linux backend";
+        unicorn = app "${package}/bin/ef2000-unicorn"
+          "Run the original EF2000 game with the Unicorn and SDL3 backend";
+        unicorn-cpp = app "${package}/bin/ef2000-unicorn-cpp"
+          "Run EF2000 in the native C++ Unicorn and SDL3 backend";
+        ghidra = app "${pkgs.ghidra}/bin/ghidra"
+          "Open Ghidra to inspect the extracted EF2000 X-32 image";
+        decomp = app "${decompWorkflow}/bin/ef2000-decomp"
+          "Run EF2000 with compiled recovered C replacements";
       in {
         default = native;
         ef2000 = native;
