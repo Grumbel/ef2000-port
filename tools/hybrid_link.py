@@ -94,8 +94,11 @@ def load_abi_aliases(path):
         r'(?m)^[ \t]*[A-Za-z_][\w \t\*]*?\b([A-Za-z_]\w*)\s*'
         r'\([^;]*\)\s*;\s*/\*([^*]*(?:\*(?!/)[^*]*)*)\*/')
     for match in declaration.finditer(path.read_text()):
-        address = re.search(r'\b0x([0-9a-fA-F]{1,8})\b', match.group(2))
-        if address and 'indirect' not in match.group(2).lower():
+        # The address annotation is an alias only when it leads the comment.
+        # Other hexadecimal values may describe an indirect function pointer,
+        # global, or helper used by the declaration rather than its entry.
+        address = re.match(r'\s*0x([0-9a-fA-F]{1,8})\b', match.group(2))
+        if address:
             aliases[match.group(1)] = int(address.group(1), 16)
     return aliases
 

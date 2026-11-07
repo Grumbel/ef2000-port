@@ -1075,3 +1075,23 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   442/1,020 `ok` functions (138,459/543,917 body bytes; 43.3% of functions,
   25.5% of bytes), 578 `manual`, zero `compile-error`; no hybrid replay was
   run.
+- M1 dispatcher trace, 2026-11-08: paired the original and hybrid under the
+  same instruction-timed C++ Unicorn setup. The failing full-image trace
+  reached redirected entry `0x0b04` (original caller `0x0e2a`); its recovered
+  path reached `run_dos_int_ex` and the call at arena address `0x03032418`.
+  The emitted call targeted `0x9c558`, the `INT 0` stub, although the helper
+  intended to call the original dispatcher at `0x9c47a`. `load_abi_aliases()`
+  had mistaken the explanatory `0x9c558` in `guest_dos_int_x`'s header comment
+  for that helper's entry address. Disassembly confirms the dispatcher scales
+  ESI by three before selecting the interrupt stub; the wrong binding entered
+  the table base and produced INT 0 while the register block held interrupt
+  `0x21`. Alias parsing now accepts only a leading explicit entry annotation;
+  the deliberate `emit_command_packet` entry annotation was normalized to
+  that form. The two asset-free alias tests pass. A rebuilt image from the
+  available object set patches 2,078 functions (10,390 entry bytes; 659,030
+  arena bytes; 596/783 modules); its replay advances beyond INT 0, then stops
+  at unsupported real-mode INT 13 (`EIP=0x4dc`, `AX=0x2506`, 158 interrupts).
+  This rebuild is not coverage-equivalent to the prior 3,449-function image:
+  the stricter alias rule exposes unresolved helper modules. M1 remains
+  unpassed. Mechanical status remains 442/1,020 `ok` (138,459/543,917 bytes),
+  578 `manual`, zero `compile-error`.

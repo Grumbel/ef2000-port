@@ -608,7 +608,7 @@ uint32_t set_control_mode_b(uint8_t value); /* 0x810d0, AL -> EAX zero-extended 
 uint32_t set_control_mode_c(uint8_t value); /* 0x810f4, AL -> EAX zero-extended */
 
 /* Binary command-packet emission through guest helper 0xa3f74. */
-void emit_command_packet(const uint8_t *bytes, uint32_t size); /* guest-only 0xa3f74, EAX/EDX */
+void emit_command_packet(const uint8_t *bytes, uint32_t size); /* 0x000a3f74 guest-only entry, EAX/EDX */
 void send_object_state_packet(int16_t index, uint8_t value); /* 0x56f0c, AX/DL */
 void send_object_code_39(int16_t index); /* 0x57140, AX */
 void send_object_code_3a(int16_t index); /* 0x57198, AX */
