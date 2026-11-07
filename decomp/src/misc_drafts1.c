@@ -21267,10 +21267,14 @@ uint32_t translate_key_masked_1084c0(uint32_t value, uint32_t carry)
 	return value;
 }
 
-/* 0x235, 6 bytes. Implicit-register fragment: compare EAX with the dword at 0x120cd0; returns 1 when they are equal (ZF), else 0. */
-uint32_t compare_word_235(uint32_t value)
+/* 0x235, 50 bytes through the shared return paths at 0x25d and 0x266. This
+ * entry is also the taken target of the JAE at 0x231. Its first compare
+ * chooses whether to fetch vector 8 before exchanging the active vector. */
+uint32_t install_timer_vector_235(uint32_t value)
 {
-	return value == EF_U32(0x120cd0u) ? 1u : 0u;
+	uint32_t carry;
+	uint32_t skip = value <= EF_U32(0x120cd0u);
+	return set_timer_vector_23b(value, skip, &carry);
 }
 
 /* 0xdecfb, 28 bytes. DOS find next (int 21h, AH = 0x4f): set the DTA to DTA (EAX), load the search state from it, step the search, translate the result (0x1084c0) and copy the DTA back out. Returns the translated result. */

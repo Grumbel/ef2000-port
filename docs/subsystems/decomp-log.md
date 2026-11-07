@@ -983,3 +983,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   The four-register callback adapter's emitted code exposed and fixed an
   incorrect stack offset; the fresh 340-module link and replay still stop at
   the same IP. The bisect must be rerun against that refreshed image.
+- Timer-vector entry recovery, 2026-11-07: the M1 bisector's reduced trials
+  produced unrelated early exits and did not reach its `0x222` canary, so its
+  `0x1e9`/`0x235` candidates are not treated as culprits. Original payload
+  disassembly shows `0x235` compares the requested handler and then enters the
+  shared update path at `0x23b`; the old C body returned a Boolean and skipped
+  the vector update. Replaced it with a C entry that composes the comparison
+  with `set_timer_vector_23b`. OpenWatcom compiles the module with zero
+  warnings and the emitted entry calls the shared implementation. The rebuilt
+  hybrid redirects 3,449 functions (17,245 entry bytes; 601,460 arena bytes;
+  740/810 modules). Its 500M main-menu replay still stops at unsupported
+  real-mode BIOS INT 0, IP `0x9c55a`, before any required patch entry is hit;
+  M1 remains unpassed and this function's runtime behavior is not yet reached
+  by the menu replay.

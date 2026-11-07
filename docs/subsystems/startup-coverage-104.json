@@ -24,7 +24,7 @@
     },
     {
       "address": 565,
-      "name": "compare_word_235",
+      "name": "install_timer_vector_235",
       "state": "compiles",
       "sig_status": "confirmed",
       "module": "misc_drafts1",
