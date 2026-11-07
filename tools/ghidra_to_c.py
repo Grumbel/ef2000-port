@@ -474,6 +474,33 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
     body = re.sub(r'\btrue\b', '1', body)
     body = re.sub(r'\bfalse\b', '0', body)
     globals_ = globals_ or {}
+    # Ghidra may refer to source-level runtime globals by name instead of
+    # their DAT address. Use only unique aliases from the reviewed globals
+    # table, and leave a same-named parameter or local untouched.
+    global_aliases = {}
+    for address, row in globals_.items():
+        global_name = row['name']
+        if global_name.startswith('_'):
+            global_aliases.setdefault(global_name[1:], set()).add(address)
+    declaration_type = (r'(?:void|char|short|int|long|float|double|bool|byte|'
+                        r'undefined\d*|u?int(?:8|16|32|64)_t|s?byte|ushort|'
+                        r'uint|ulong|longlong|ulonglong|dword|struct\s+\w+)')
+    for alias, addresses in global_aliases.items():
+        if (len(addresses) != 1 or
+                not re.search(r'\b' + re.escape(alias) + r'\b', body)):
+            continue
+        if original and re.search(r'\b' + re.escape(alias) + r'\b',
+                                  original.group('params')):
+            continue
+        local_declaration = re.compile(
+            r'(?m)^\s*(?:(?:signed|unsigned|const|volatile|static|register)\s+)*' +
+            declaration_type +
+            r'(?:\s*\*+\s*|\s+)' + re.escape(alias) + r'\b')
+        if local_declaration.search(body):
+            continue
+        address = next(iter(addresses))
+        body = re.sub(r'\b' + re.escape(alias) + r'\b',
+                      dat_expression(address, globals_), body)
     # Ghidra sometimes assigns a function symbol to an overlaid immediate
     # operand when the original program modifies its own code. Treat a
     # non-call use as data only when a reviewed global starts at the byte

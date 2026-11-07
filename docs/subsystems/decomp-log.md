@@ -1014,3 +1014,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `compile-error`. Five newly generated functions compile. The two remaining
   compiler failures expose Ghidra's undeclared `curbrk` alias for the reviewed
   `_curbrk` global at `0x132a30`; no hybrid replay was run.
+- M0 reviewed global-name aliases, 2026-11-07: resolve a leading-underscore
+  source symbol spelling only when its alias is unique in `globals.tsv` and
+  is not declared as a function parameter or local. This lowers Ghidra's
+  `curbrk` references to the reviewed `_curbrk` location and clears both
+  compiler errors from the prior tranche. The full OpenWatcom pass is now
+  436/1,020 `ok` functions (135,803/543,917 body bytes; 42.7% of functions,
+  25.0% of bytes), 584 `manual`, zero `compile-error`; no hybrid replay was
+  run.
