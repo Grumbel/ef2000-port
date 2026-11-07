@@ -1205,14 +1205,15 @@ std::array<uint8_t, 8> segment(uint32_t base, uint32_t limit, uint8_t access,
 
 struct Registers {
     uint32_t ax{}, bx{}, cx{}, dx{}, si{}, di{}, bp{}, sp{}, ip{}, flags{};
-    uint32_t ds{}, es{}, ss{};
+    uint32_t ds{}, es{}, ss{}, fs{}, gs{}, cs{};
 };
 // Unicorn 2.1.3's batch API takes int* (newer headers may accept const int*).
 // Keep the stable register ID list writable to compile against both variants.
 int REG_IDS[] = {UC_X86_REG_EAX, UC_X86_REG_EBX, UC_X86_REG_ECX,
     UC_X86_REG_EDX, UC_X86_REG_ESI, UC_X86_REG_EDI, UC_X86_REG_EBP,
     UC_X86_REG_ESP, UC_X86_REG_EIP, UC_X86_REG_EFLAGS,
-    UC_X86_REG_DS, UC_X86_REG_ES, UC_X86_REG_SS};
+    UC_X86_REG_DS, UC_X86_REG_ES, UC_X86_REG_SS,
+    UC_X86_REG_FS, UC_X86_REG_GS, UC_X86_REG_CS};
 static_assert(sizeof(Registers) == sizeof(REG_IDS) / sizeof(int) * sizeof(uint32_t));
 
 class Machine {
@@ -1289,6 +1290,8 @@ public:
             patch_hooks_.push_back(hook);
         }
     }
+
+    void trace_patch_entry_state(bool enabled) { trace_patch_entry_state_ = enabled; }
 
     void enable_guest_hashes(const std::vector<std::pair<uint32_t, uint32_t>>& ranges) {
         guest_hash_ranges_ = ranges;
@@ -1742,6 +1745,7 @@ private:
     std::string status_ = "instruction_limit";
     std::string detail_;
     bool trace_interrupts_{};
+    bool trace_patch_entry_state_{};
     bool reported_missing_bios_disk_{};
     uint32_t heap_end_ = 0x4df000;
     uint32_t heap_ceiling_ = IMAGE_SIZE;
@@ -2637,6 +2641,24 @@ private:
             if (machine->patch_hit_sequence_.size() == trace_limit)
                 machine->patch_hit_sequence_.erase(machine->patch_hit_sequence_.begin());
             machine->patch_hit_sequence_.push_back(static_cast<uint32_t>(address));
+            if (machine->trace_patch_entry_state_) {
+                const Registers regs = machine->read_regs();
+                uint32_t stack[12]{};
+                const bool stack_read = uc_mem_read(machine->cpu_, regs.sp,
+                                                     stack, sizeof(stack)) == UC_ERR_OK;
+                std::cerr << "cpp-entry-state: addr=" << std::hex << address
+                          << " eax=" << regs.ax << " ebx=" << regs.bx
+                          << " ecx=" << regs.cx << " edx=" << regs.dx
+                          << " cs=" << regs.cs << " ss=" << regs.ss
+                          << " ds=" << regs.ds << " es=" << regs.es
+                          << " fs=" << regs.fs << " gs=" << regs.gs
+                          << " esp=" << regs.sp << " stack=";
+                if (stack_read) {
+                    for (size_t i = 0; i < std::size(stack); ++i)
+                        std::cerr << (i ? "," : "") << stack[i];
+                } else std::cerr << "unreadable";
+                std::cerr << std::dec << '\n';
+            }
         }
     }
     static void on_capture_call(uc_engine*, uint64_t address, uint32_t, void* user) {
@@ -2724,6 +2746,18 @@ private:
             std::cerr << "cpp-int: n=" << interrupts_ << " ip=" << std::hex << ip
                       << " vec=" << vector << " ax=" << before.ax << " bx=" << before.bx
                       << " cx=" << before.cx << " dx=" << before.dx << std::dec << '\n';
+            if (vector != 0x21 || ax == 0x3502) {
+                uint32_t stack[3]{};
+                const bool stack_read = uc_mem_read(cpu_, before.sp, stack, sizeof(stack)) == UC_ERR_OK;
+                std::cerr << "cpp-int-state: cs=" << std::hex << before.cs
+                          << " ss=" << before.ss << " ds=" << before.ds
+                          << " es=" << before.es << " fs=" << before.fs
+                          << " gs=" << before.gs << " esp=" << before.sp
+                          << " stack=";
+                if (stack_read) std::cerr << stack[0] << ',' << stack[1] << ',' << stack[2];
+                else std::cerr << "unreadable";
+                std::cerr << std::dec << '\n';
+            }
         }
         if (vector != 0x21) {
             if (!bios(vector, after)) return;
@@ -3221,6 +3255,7 @@ int main(int argc, char** argv) {
         bool self_test_retrace = false, self_test_fast_copy = false;
         bool self_test_archive_lookup = false, self_test_patch_hits = false;
         bool trace_interrupts = false, trace_archive_lookups = false;
+        bool trace_entry_state = false;
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
         std::vector<JoystickEvent> joystick_events;
@@ -3430,6 +3465,8 @@ int main(int argc, char** argv) {
                 wav_directory = argv[++i];
             } else if (!std::strcmp(argv[i], "--trace-interrupts")) {
                 trace_interrupts = true;
+            } else if (!std::strcmp(argv[i], "--trace-entry-state")) {
+                trace_entry_state = true;
             } else if (!std::strcmp(argv[i], "--trace-archive-lookups")) {
                 trace_archive_lookups = true;
             } else if (!std::strcmp(argv[i], "--mouse-event") && i + 1 < argc) {
@@ -3738,7 +3775,10 @@ int main(int argc, char** argv) {
                         reserved_arena.first, reserved_arena.second);
         machine.use_guest_dos_clock(guest_dos_clock);
         machine.use_guest_vga_clock(guest_vga_clock);
-        if (!patch_entries.empty()) machine.enable_patch_hit_trace(patch_entries);
+        if (!patch_entries.empty()) {
+            machine.enable_patch_hit_trace(patch_entries);
+            machine.trace_patch_entry_state(trace_entry_state);
+        }
         machine.enable_guest_hashes(guest_hash_ranges);
         if (!capture_targets.empty())
             machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));

@@ -6,6 +6,25 @@
 Append M0 mechanical translation, hybrid milestone, and bulk recovery progress
 here. Ghidra-derived function bodies remain only under ignored `local/`.
 
+- Menu-focused hybrid diagnostic, 2026-11-07: rebuilt the 160-entry menu
+  patch from 143 hand-written and 17 mechanical functions, then used the
+  automatic bisector to isolate `0x8e494` as the single candidate that
+  triggers the protected-mode selector free / #GP path (keep-canary
+  `0xe7835`). `0x8e494` remains `unknown` and its generated ABI is
+  unconfirmed, so it was demoted to original bytes for the follow-up replay.
+  The resulting partial patch contains 159 redirects (795 entry bytes) and
+  450,484 bytes of new code; total patch payload is 451,279 bytes. Under
+  private Xvfb, main menu, quick-fight setup, and simulator-menu key-choice
+  checkpoints pass (3/3). Mission accept still fails: the demoted build runs
+  to tick 4,663, then makes an unmapped 16-bit write to `0x19655800` at guest
+  IP `0x15bbbd`; the prior build
+  with the candidate replacement instead reaches the selector restore #GP at
+  IP `0x31a`, tick 4,557. Thus menu navigation is usable through setup in
+  this partial diagnostic image, but M1's full `compiles` hybrid and M2 are
+  not passed. Added opt-in Unicorn entry/interrupt register-and-stack tracing
+  to support the next bisector investigation; this trace change was compiled
+  and exercised locally.
+
 - M0 baseline, 2026-11-06: `ghidra_to_c.py --skip-recovered --compile` examined
   1,022 unrecovered functions. 287 generated (66,726 bytes), 735 manual
   (477,703 bytes), 0/287 compiled (0 bytes). All first errors came from five
