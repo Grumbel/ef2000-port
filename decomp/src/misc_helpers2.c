@@ -137,18 +137,12 @@ int32_t file_position_f227f(ef_addr32 file)
  * timer; install the restore-page callback on the first initialization. */
 void initialize_input_services_cd4d4(void)
 {
-    uint16_t code_selector = 0;
-    uint16_t data_selector = 0;
+    uint16_t code_selector = (uint16_t)guest_seg_x(1u);
+    uint16_t data_selector = (uint16_t)guest_seg_x(3u);
 
-    __asm {
-        mov ax, cs
-        mov code_selector, ax
-    }
-    __asm {
-        mov ax, ds
-        mov data_selector, ax
-    }
+#if defined(__WATCOMC__)
     __asm { push ecx }
+#endif
     if (EF_U8(0x0015b72eu) != 1u) {
         set_keyboard_leds_cd414(0u);
         init_keys_cd430();
@@ -162,7 +156,9 @@ void initialize_input_services_cd4d4(void)
             guest_fn_9c3cf(0x000cd554u);
         EF_U8(0x0015b72eu) = 1u;
     }
+#if defined(__WATCOMC__)
     __asm { pop ecx }
+#endif
 }
 
 /* 0xf23ac, 49 bytes. For each byte of the string at ECX call 0xf2320(x, y, byte & 0x3f), x += 8. */

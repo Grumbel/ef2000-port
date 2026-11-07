@@ -272,7 +272,7 @@ uint8_t query_video_mode_fc478(uint32_t mode)
     guest_fn_b3fb0(EF_U32(0x00164610u), 0, 0x100);
     EF_U32(0x00164630u) = mode;
     EF_U32(0x00164634u) = 0x4f01;
-    regs = guest_fn_604();
+    regs = guest_fn_604_x(EF_U32(0x00164610u));
     EF_U32(0x00164618u) = regs & 0xffffu;
     EF_U16(0x0016463au) = (uint16_t)(regs >> 16);
     guest_fn_8b8(0x10, 0x00164618u);

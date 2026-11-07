@@ -234,7 +234,7 @@ static void mouse_request_tail(uint32_t cursor)
 /* 0xde12c, 141 bytes. */
 void mouse_request_de12c(void)
 {
-    uint32_t cursor = guest_fn_604();
+    uint32_t cursor = guest_fn_604_x(EF_U32(0x004260a4u));
     ef_addr32 reply = EF_U32(0x004260a4u);
     ef_addr32 request;
     EF_U8(reply) = 2;
@@ -245,13 +245,13 @@ void mouse_request_de12c(void)
     EF_U8(request + 1u) = EF_U8(0x0015ee98u);
     EF_U16(request + 0x10u) = (uint16_t)(cursor >> 16);
     EF_U16(request + 0xeu) = (uint16_t)cursor;
-    mouse_request_tail(guest_fn_604());
+    mouse_request_tail(guest_fn_604_x(request));
 }
 
 /* 0xde2d8, 153 bytes. */
 uint32_t mouse_request_de2d8(void)
 {
-    uint32_t cursor = guest_fn_604();
+    uint32_t cursor = guest_fn_604_x(EF_U32(0x004260a4u));
     ef_addr32 reply = EF_U32(0x004260a4u);
     ef_addr32 request;
     EF_U8(reply) = 0x0c;
@@ -262,7 +262,7 @@ uint32_t mouse_request_de2d8(void)
     EF_U8(request + 1u) = EF_U8(0x0015ee98u);
     EF_U16(request + 0x10u) = (uint16_t)(cursor >> 16);
     EF_U16(request + 0xeu) = (uint16_t)cursor;
-    mouse_request_tail(guest_fn_604());
+    mouse_request_tail(guest_fn_604_x(request));
     return EF_U8(EF_U32(0x004260a4u));
 }
 
@@ -276,5 +276,5 @@ void mouse_request_de4b0(void)
     EF_U8(request + 2u) = 0x85;
     EF_U8(request) = 0x16;
     EF_U8(request + 1u) = EF_U8(0x0015ee98u);
-    mouse_request_tail(guest_fn_604());
+    mouse_request_tail(guest_fn_604_x(request));
 }

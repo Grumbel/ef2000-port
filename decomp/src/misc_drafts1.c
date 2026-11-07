@@ -4177,7 +4177,7 @@ int32_t dos_date_request_dde80(uint32_t value)
 {
     uint32_t blk = EF_U32(0x004260b0u);
     uint32_t regs;
-    uint32_t r = guest_fn_604();
+    uint32_t r = guest_fn_604_x(blk);
     int32_t v;
     EF_U8(blk) = 0x0bu;
     EF_U8(blk + 1u) = (uint8_t)value;
@@ -4188,7 +4188,7 @@ int32_t dos_date_request_dde80(uint32_t value)
     EF_U8(regs + 1u) = EF_U8(0x0015ee98u);
     EF_U16(regs + 0x10u) = (uint16_t)(r >> 16);
     EF_U16(regs + 0x0eu) = (uint16_t)(r & 0xfu);
-    r = guest_fn_604();
+    r = guest_fn_604_x(regs);
     EF_U16(0x004260d6u) = (uint16_t)(r >> 16);
     EF_U32(0x004260c4u) = r & 0xffffu;
     EF_U32(0x004260d0u) = 0x1510u;
