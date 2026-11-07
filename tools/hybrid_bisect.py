@@ -55,8 +55,11 @@ def failure_signature(result):
     if result is None:
         return None
     status = result['status']
+    fault = status.get('fault')
+    fault_signature = None if fault is None else (
+        fault['type'], fault['address'], fault['size'], fault['code'])
     return (status['status'], status['ip'], status['interrupts'] // 8,
-            status['ticks'] // 16, status['irq0'] // 8)
+            status['ticks'] // 16, status['irq0'] // 8, fault_signature)
 
 
 def main(argv=None):

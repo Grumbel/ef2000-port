@@ -32,6 +32,9 @@ GUEST_HASH = re.compile(r'^guest_hash: addr=0x([0-9a-f]+) length=(\d+) sha256=([
 GUEST_FAULT = re.compile(
     r'instruction-counted guest execution:\s*(.*?)\s+ip=0x([0-9a-f]+)\s+'
     r'sp=0x[0-9a-f]+\s+ticks=(\d+)\s+irqs=(\d+)')
+GUEST_FAULT_DETAIL = re.compile(
+    r'\bfault=type=(\d+)\s+address=0x([0-9a-f]+)\s+size=(\d+)\s+'
+    r'code=([0-9a-f]+)')
 FAULT_PATCH_HITS = re.compile(r'patch_hits=([^\s]+)')
 FAULT_PATCH_HIT = re.compile(r'0x([0-9a-f]+):(\d+)')
 EVENT_ARITY = {'--mouse-event': 4, '--key-event': 4, '--joystick-event': (4, 6)}
@@ -194,6 +197,10 @@ def parse_guest_fault(output, expected_patches=()):
     status = {'status': 'guest_fault:' + match[1], 'interrupts': 0,
               'ticks': int(match[3]), 'irq0': int(match[4]),
               'ip': int(match[2], 16)}
+    detail = GUEST_FAULT_DETAIL.search(output)
+    if detail:
+        status['fault'] = {'type': int(detail[1]), 'address': int(detail[2], 16),
+                           'size': int(detail[3]), 'code': detail[4]}
     hits = {address: 0 for address in expected_patches}
     hit_list = FAULT_PATCH_HITS.search(output)
     if hit_list:

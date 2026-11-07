@@ -725,3 +725,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   unmapped read at `0x358be389`; 48 calls to `to_lower_ascii` occurred before
   the fault. M1/M2 remain unpassed; the focused 154-function menu/setup image
   remains the highest passing replay checkpoint.
+- M1 hand-only control and fault-signature detail, 2026-11-07: linked a
+  hand-written-only control image with 2,043 redirected functions (10,215
+  entry bytes, 441,492 arena bytes). Its repeated-baseline main-menu replay
+  stops at tick 559 on unsupported real-mode BIOS INT 13, while the full
+  2,453-function hybrid faults at tick 561. Neither reaches the menu. Replay
+  fault parsing and bisector signatures now retain Unicorn fault type, address,
+  size, and instruction bytes. Parsing the prior full-hybrid bisect artifacts
+  shows the same unmapped read (`0x358be389`, size 4, code
+  `093589e38b35302a1300cd2172308935`) across trials, so that detail does not
+  separate the present failure; the bisector's prior 50 trials remain
+  unresolved and `to_lower_ascii` remains independently verified.
