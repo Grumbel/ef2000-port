@@ -838,3 +838,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `0x41fc` now compiles. The compiler was invoked directly from the Nix store
   because `nix develop` could not connect to the Nix daemon socket. Compiler
   acceptance does not establish the callee's ABI or behavior.
+- M0 rule 17, 32-bit guest-address comparisons, 2026-11-07: make pointer
+  comparisons explicit when a guest `EF_U32` value is compared with a known
+  pointer local, a null pointer constant, or a generated callback address.
+  The four targeted type-mismatch bodies compile, and the full pinned
+  OpenWatcom pass rises to 429/1,020 `ok` (133,085/543,917 bytes, 42.1% of
+  functions and 24.5% of bytes); 589 remain `manual` and two have compiler
+  errors. Those remaining errors are an unclassified `uRam` label at `0xc41b0`
+  and a stack-frame placeholder at `0x1177f4`; the latter's pointer arithmetic
+  is not treated as a safe generic local. These pointer-width conversions
+  lower the generated type model but do not verify the address globals.

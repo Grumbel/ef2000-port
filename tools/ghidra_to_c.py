@@ -555,6 +555,40 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
     body = re.sub(r'&\s*LAB_([0-9a-fA-F]{8})\b', label_address_repl, body)
     body = re.sub(r'\bLAB_' + HEX + r'\b', lambda m: 'lab_' + m.group(1).lower(), body)
     body = re.sub(r'\bfunc_0x' + HEX + r'\b', lambda m: 'ef_fn_' + m.group(1).lower(), body)
+    # Guest pointers and callback addresses are 32-bit values in the image,
+    # while Ghidra's expression typing can mix them with integer globals.
+    # Make only those address comparisons explicit: preserve null comparisons
+    # as integer zero, compare known pointer locals through uintptr_t, and
+    # compare callback pointers through uintptr_t.  This is a type lowering
+    # rule, not evidence that either global has a reviewed pointer type.
+    body = re.sub(
+        r'(EF_U32\(0x[0-9a-fA-F]+u?\))\s*(==|!=)\s*'
+        r'\(\s*[A-Za-z_]\w*\s*\*\s*\)\s*0x0\b',
+        r'\1 \2 0', body)
+    body = re.sub(
+        r'\(\s*[A-Za-z_]\w*\s*\*\s*\)\s*0x0\b\s*(==|!=)\s*'
+        r'(EF_U32\(0x[0-9a-fA-F]+u?\))',
+        r'0 \1 \2', body)
+    pointer_names = set(re.findall(
+        r'(?m)^\s*[A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*\s*\*+\s*'
+        r'([A-Za-z_]\w*)\s*(?:\[[^]]*\])?\s*;', body))
+    for name in sorted(pointer_names):
+        body = re.sub(
+            r'(?<![A-Za-z0-9_])' + re.escape(name) +
+            r'\s*(==|!=)\s*(EF_U32\(0x[0-9a-fA-F]+u?\))',
+            r'((uintptr_t)' + name + r') \1 ((uintptr_t)\2)', body)
+        body = re.sub(
+            r'(EF_U32\(0x[0-9a-fA-F]+u?\))\s*(==|!=)\s*'
+            r'(?<![A-Za-z0-9_])' + re.escape(name) + r'\b',
+            r'((uintptr_t)\1) \2 ((uintptr_t)' + name + r')', body)
+    body = re.sub(
+        r'(EF_U32\(0x[0-9a-fA-F]+u?\))\s*(==|!=)\s*'
+        r'(\(\(ef_gen_code\s*\*\)\s*[A-Za-z_]\w*\))',
+        r'((uintptr_t)\1) \2 ((uintptr_t)\3)', body)
+    body = re.sub(
+        r'(\(\(ef_gen_code\s*\*\)\s*[A-Za-z_]\w*\))\s*(==|!=)\s*'
+        r'(EF_U32\(0x[0-9a-fA-F]+u?\))',
+        r'((uintptr_t)\1) \2 ((uintptr_t)\3)', body)
     # Ghidra emits an empty terminal case as a label immediately followed by
     # the switch's closing brace. C requires a statement after that label;
     # an empty statement preserves the original path (fall-through is only
