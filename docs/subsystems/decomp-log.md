@@ -699,3 +699,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   M2 pass. The current checkpoint is quick-fight setup with strict equivalence
   and cockpit with matching pixels but a small control/state delta. The full
   hybrid's earlier main-menu failure at IP `0x4`, tick 560 remains unchanged.
+- Menu navigation focused replay, 2026-11-07: replayed the retained
+  154-function patch (770 redirected original entry bytes) against both the
+  event-free main menu and the existing quick-fight key sequence into setup,
+  with repeated original baselines under private Xvfb. Both cases match
+  status, interrupt/tick/IRQ0 counters, framebuffer SHA-256, and the selected
+  64 KiB guest hash; `to_lower_ascii` is hit 460 times at the menu checkpoint
+  and 686 times in setup. This verifies the focused menu-to-setup slice, not
+  the full M1 hybrid: the 2,452-entry image still fails during startup at IP
+  `0x4`, tick 560.
