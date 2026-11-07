@@ -61,6 +61,7 @@ TYPES = [
 ]
 # Anything matching these cannot be translated mechanically.
 MANUAL = re.compile(r'\b(?:swi|in_[A-Za-z]+|unaff_[A-Za-z0-9]+|extraout_[A-Za-z0-9]+|'
+                    r'in_ST[0-7]|'
                     r'SUB\d+|ZEXT\d+|SEXT\d+|halt_baddata|halt_unimplemented|'
                     r'WARNING|bad_instruction|CARRY\d|SBORROW\d|__halt)\b')
 HEX = r'([0-9a-fA-F]{8})'

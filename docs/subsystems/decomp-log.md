@@ -1037,3 +1037,10 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   (138,559/543,917 body bytes; 43.4% of functions, 25.5% of bytes), 576
   `manual`, and one `compile-error`. The newly exposed error is an unmapped
   `unkbyte10` local in a sixth carry-only body. No hybrid replay was run.
+- M0 x87 stack live-ins, 2026-11-07: classify `in_ST0` through `in_ST7` as
+  unsupported register live-ins, rather than emitting locals with no source
+  for the guest x87 stack state. This keeps the carry-only body at `0xfa3d4`
+  manual and clears its misleading compile error. The refreshed full pass is
+  442/1,020 `ok` functions (138,459/543,917 body bytes; 43.3% of functions,
+  25.5% of bytes), 578 `manual`, zero `compile-error`; no hybrid replay was
+  run.
