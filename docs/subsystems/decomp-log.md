@@ -828,3 +828,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   tick 561, on the unmapped read `0x358be389` (size 4, code
   `093589e38b35302a1300cd2172308935`). This supersedes the preceding
   1,714-function link count; M1 remains unpassed.
+- M0 rule 16, generic EAX declarations for manual callees, 2026-11-07:
+  generated callers now see an integer return carrier when Ghidra marks an
+  unconfirmed callee `manual` for extra live-out registers. The excluded
+  callee body remains original, and the declaration is only enough to compile
+  callers that consume EAX. The pinned OpenWatcom v2 compile rises from
+  424/1,020 to 425/1,020 `ok` (129,882/543,917 body bytes, 41.7% of functions
+  and 23.9% of bytes); 589 remain `manual`, and six have compiler errors.
+  `0x41fc` now compiles. The compiler was invoked directly from the Nix store
+  because `nix develop` could not connect to the Nix daemon socket. Compiler
+  acceptance does not establish the callee's ABI or behavior.

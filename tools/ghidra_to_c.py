@@ -714,6 +714,16 @@ def main():
             # replay remains responsible for finding missing live-register
             # arguments and other call-site mismatches.
             declaration = sig.split('(', 1)[0] + '()'
+            # Ghidra can mark a callee manual because its live-out registers
+            # cannot be represented by the decompiled return type.  It still
+            # commonly records callers that consume EAX as if the call were
+            # void.  Use a generic 32-bit carrier for those declarations so
+            # such callers compile; the callee body remains original in the
+            # hybrid, and this does not assert a confirmed ABI.
+            if (state == 'manual' and entry not in sigs and
+                    any(flag.startswith('manual: extra return register')
+                        for flag in flags)):
+                declaration = 'uint32_t ef_fn_%08x()' % entry
             header.append(declaration + ';')
         else:
             # Manual/untranslated callees stay at their original addresses in
