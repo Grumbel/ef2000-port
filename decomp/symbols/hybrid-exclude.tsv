@@ -4,3 +4,4 @@ addr	reason
 0x000e9a24	Mechanical translation does not preserve the original ret 0x0c ABI; main-menu replay faults in its body at tick 695. Keep original bytes pending manual ABI recovery.
 0x00084b74	Mechanical body for this 5-byte JMP thunk is not ABI-equivalent; quick-fight bisector isolates it as sufficient for guest_exit at IP 0x222/tick 904. Keep original tail-jump bytes.
 0x000c4db4	Cockpit replay bisector: compiled replacement causes unmapped fetch at IP 0x15918c05/tick 3188. Original bytes avoid the fetch but cockpit counters, framebuffer and guest RAM still diverge; leave original pending ABI/behavior fix.
+0x000c36b4	Mechanical replacement loses the EAX/EDX/EBX/ECX plus two-stack-argument ABI; automatic M1 bisector identifies this entry alone as sufficient for the startup read fault. Keep original bytes pending manual recovery.

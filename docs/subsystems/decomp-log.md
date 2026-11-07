@@ -858,3 +858,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `unpreserved register` manual cases remain the largest classes. The new
   manual classifications prevent unsupported placeholders from being
   mistaken for mechanical C; they do not increase the ok-rate.
+
+- M1 updated full-hybrid bisect, 2026-11-07: with 429 mechanical `ok` bodies
+  and the current hand-object set, the linker redirects 2,462 functions
+  (12,310 entry bytes, 594,500 arena bytes; 714/777 modules). The
+  repeated-baseline main-menu replay faults at IP `0x190`, tick 561, on an
+  unmapped read of `0x358be389` (size 4, code
+  `093589e38b35302a1300cd2172308935`). The bisector preserves that exact
+  fault signature despite tick shifts and reduces it to one replacement:
+  `0xc36b4`. Original disassembly shows inputs in EAX/EDX/EBX/ECX, two stack
+  arguments, and `ret 8`; Ghidra emits only two ordinary parameters and omits
+  the register/stack arguments passed to `0xc3584`. Mark it `compiles-bad` and
+  exclude it. This identifies the target failure culprit; M1 still requires
+  replaying the hybrid with the original entry restored.
