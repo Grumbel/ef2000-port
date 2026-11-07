@@ -1030,3 +1030,10 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   438/1,020 `ok` functions (137,248/543,917 body bytes; 42.9% of functions,
   25.2% of bytes), 582 `manual`, zero `compile-error`; no hybrid replay was
   run.
+- M0 unsigned carry flags, 2026-11-07: lower Ghidra `CARRY1`, `CARRY2`, and
+  `CARRY4` to widened unsigned sums and extract the carry bit at the
+  corresponding 8-, 16-, or 32-bit boundary. The full OpenWatcom pass moves
+  five functions out of `manual`; 443/1,020 `ok` functions
+  (138,559/543,917 body bytes; 43.4% of functions, 25.5% of bytes), 576
+  `manual`, and one `compile-error`. The newly exposed error is an unmapped
+  `unkbyte10` local in a sixth carry-only body. No hybrid replay was run.

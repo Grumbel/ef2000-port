@@ -468,6 +468,9 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None,
                       r'\s*;\s*$', '', body)
         body = re.sub(r'\b' + name + r'\b',
                       '((uint16_t)guest_seg_x(%du))' % selector, body)
+    # Ghidra emits CARRY<n> for the unsigned carry out of an n-byte add.
+    # Use a widened unsigned sum so the original carry bit is retained.
+    body = re.sub(r'\bCARRY([124])\s*\(', r'EF_CARRY_\1(', body)
     for token in {match.group(0) for match in MANUAL.finditer(body)}:
         flags.add('manual: ' + manual_cause(token))
     # A uRam label has no reliable width by itself. CONCAT22 does: the first
@@ -747,6 +750,20 @@ def concat_macros():
     return '\n'.join(macros)
 
 
+def carry_macros():
+    """Emit unsigned carry-out helpers for Ghidra's byte-width ADD flags."""
+    macros = []
+    for byte_width in (1, 2, 4):
+        input_type = 'uint%d_t' % (byte_width * 8)
+        wide_type = 'uint%d_t' % (byte_width * 16)
+        shift = byte_width * 8
+        macros.append(
+            '#define EF_CARRY_%d(a,b) '
+            '((uint32_t)(((%s)(%s)(a) + (%s)(%s)(b)) >> %d))' %
+            (byte_width, wide_type, input_type, wide_type, input_type, shift))
+    return '\n'.join(macros)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
     parser.add_argument('--export', type=Path, default=EXPORT)
@@ -858,6 +875,7 @@ def main():
         # argument list keeps its varied call sites compilable; int models a
         # common EAX return while still allowing callers to ignore it.
         'typedef int ef_gen_code();\n' + concat_macros() + '\n' +
+        carry_macros() + '\n' +
         '\n'.join(dict.fromkeys(header)) + '\n')
 
     if args.compile:
