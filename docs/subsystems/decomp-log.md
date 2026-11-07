@@ -820,3 +820,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   Mark `0xc4db4` `compiles-bad` and exclude it from future hybrids pending an
   ABI/behavior correction. Main menu and quick-fight setup pass; M2 cockpit
   remains unpassed.
+- M0 full-link count correction, 2026-11-07: the preceding M0 link entry used
+  `ef_gen_abi.h` as the hybrid linker's ABI alias source. Re-linking with its
+  canonical `decomp/include/ef_abi.h` produces 2,457 redirects (12,285 entry
+  bytes, 591,060 arena bytes; 709/772 modules; 603,345 total patch bytes).
+  The repeated-baseline 500M main-menu replay still faults at guest IP `0x190`,
+  tick 561, on the unmapped read `0x358be389` (size 4, code
+  `093589e38b35302a1300cd2172308935`). This supersedes the preceding
+  1,714-function link count; M1 remains unpassed.
