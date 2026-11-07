@@ -543,6 +543,23 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
     # preserved for labels followed by another case label).
     body = re.sub(r'(?m)^([ \t]*(?:case\b[^\n]*|default)[ \t]*:)[ \t]*(?=\n[ \t]*})',
                   r'\1\n;', body)
+    # Ghidra occasionally turns a caller's saved EBP slot into an undeclared
+    # stack0... address argument. Give these address-only placeholders local
+    # storage so the draft compiles; do not guess a stack-frame base when the
+    # pseudo-C later performs pointer arithmetic on it.
+    stack_address_args = []
+    for name in sorted(set(re.findall(r'\bstack0x[0-9a-fA-F]{8}\b', body))):
+        occurrences = list(re.finditer(r'\b' + re.escape(name) + r'\b', body))
+        if occurrences and all(
+                body[:match.start()].rstrip().endswith('&') and
+                re.match(r'\s*\)', body[match.end():])
+                for match in occurrences):
+            stack_address_args.append(name)
+    if stack_address_args:
+        opening_brace = body.find('{')
+        declarations = ''.join('  uint32_t %s;\n' % name
+                               for name in stack_address_args)
+        body = body[:opening_brace + 1] + '\n' + declarations + body[opening_brace + 1:]
     first = next((line for line in body.split('\n') if line.strip()), '')
     match = DEF.match(first)
     if not match:

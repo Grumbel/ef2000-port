@@ -764,3 +764,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   tick 561, on the same unmapped read `0x358be389` (size 4, code
   `093589e38b35302a1300cd2172308935`); this is M0 compile evidence, not an M1
   pass.
+- M0 address-only stack placeholders, 2026-11-07: synthesize a 32-bit local
+  only when an undeclared `stack0...` symbol is used exclusively as an
+  address-taken call argument. The two affected original callers (`0xfd164`
+  and `0x15c0c4`) push EBP around register-only helper calls; the separate
+  `0x1177f4` stack-frame-base use stays a compile error rather than receiving
+  a guessed local layout. The pinned OpenWatcom rerun advances from 421 to
+  423/1,020 `ok` (128,137/543,917 body bytes, 41.5% of functions and 23.6% of
+  bytes); compile errors fall from 10 to 8 and 589 remain `manual`. The full
+  relink has 2,457 redirects (12,285 entry bytes, 588,852 arena bytes;
+  708/771 modules), but its 500M main-menu replay still faults at IP `0x190`,
+  tick 561, on read `0x358be389`. Re-linking the retained menu subset with the
+  current M0 objects yields 160 redirects (143 hand-written, 17 mechanical;
+  800 entry bytes; 589,652 total patch bytes). Its repeated-baseline 700M
+  simulator-selection replay passes at 33,348 interrupts, 2,800 ticks, 2,752
+  IRQ0s and IP `0x110de6`, with matching framebuffer SHA-256
+  (`e19e27fcf72127a56a6b413c8fe7140282b9572a07c148af6c5a83daa2c95768`) and
+  selected guest hash
+  (`7d8931aaf9b6c03514c14258260489d68da529a53770edf20bb83a62a8306817`).
+  This confirms the focused menu path remains working; full M1 is unpassed.
