@@ -2372,7 +2372,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a9cd0	58	update_mouse_request_a9cd0	game_helpers28	compiles	game	confirmed	decomp/tests/0x000a9cd0.json	docs/compiler-abi.md; Track a mouse request and refresh the cursor when its value changed.; callers a9e70@a9ff3; guest pending
 0x000a9d0c	60	select_list_node_a9d0c	runtime_helpers10	compiles	game	confirmed	decomp/tests/0x000a9d0c.json	docs/compiler-abi.md; Select the list node at position count (1-based) and return its payload.; callers a9e70@aa0f9; guest pending
 0x000a9d48	231	toggle_view_state_a9d48	ui_state_helpers	compiles	game	confirmed	decomp/tests/0x000a9d48.json	docs/compiler-abi.md; Toggle between the live view state and the saved copy at 0x4195b0..; callers a9e70@a9f23,a9e70@aa13e; guest pending
-0x000a9e70	768			unknown	unclassified	unverified		
+0x000a9e70	768			compiles-bad	unclassified	unverified		M1 bisector isolates the mechanical GUI dispatch loop as the sole cause of invalid instruction at IP 0x4df015 (tick 650); original entry restored pending C reconstruction.
 0x000aa198	39	resolve_link_at_1	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa198.json	docs/compiler-abi.md; Follow the singly linked list from dword 0x4191fc as * many steps as the dword at +1 says (at least none) and store the ; callers aa350@aa39d; guest pending
 0x000aa1c0	36	resolve_link_at_0	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa1c0.json	docs/compiler-abi.md; As 0xaa198 for the dword at +0.; callers aa350@aa3ac; guest pending
 0x000aa1e4	66	append_node_aa1e4	list_helpers	compiles	game	confirmed	decomp/tests/0x000aa1e4.json	docs/compiler-abi.md; ; callers aa5c4@aa612; guest pending

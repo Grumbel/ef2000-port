@@ -871,3 +871,19 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   the register/stack arguments passed to `0xc3584`. Mark it `compiles-bad` and
   exclude it. This identifies the target failure culprit; M1 still requires
   replaying the hybrid with the original entry restored.
+- M0 preserved-register ABI rule and M1 startup follow-up, 2026-11-07:
+  confirmed `preserved` registers now become the complement `modify` set in
+  generated OpenWatcom pragmas. The full M0 compile remains 429/1,020 `ok`
+  (133,085/543,917 body bytes), 591 `manual`, zero compiler errors. A full
+  hybrid with 2,461 redirects (12,305 entry bytes; 594,692 arena bytes)
+  faults at invalid instruction `0x4df015`, tick 650; the updated bisector
+  isolates `0xa9e70`. Demoting its mechanical GUI dispatch body changes the
+  first stop to unsupported BIOS INT 13 at guest IP `0x318`, tick 650.
+  Disassembly of `0xebcfc` shows that its fallback calls `0xa7ac8` with two
+  stack arguments, while the existing declaration let OpenWatcom pass them
+  in registers. Add the stack-only pragma and pass flags then amount, matching
+  the original pushes; the object compiles with zero warnings. The corrected
+  hybrid advances to an unmapped read at IP `0x3ffe6e7`, address `0x3d80c3c0`,
+  tick 682. A 106-trial bisector run remains unresolved with 1,070 candidate
+  redirects. Current hybrid status is below M1; the main-menu checkpoint is
+  still the target.

@@ -115,7 +115,9 @@ def load_signatures():
         outs = [(reg, normalize_type(ctype))
                 for item in row['outputs'].split(',') if ':' in item
                 for reg, ctype in [item.split(':', 1)]]
-        sigs[int(row['addr'], 16)] = (ins, outs)
+        preserved = [reg.strip().lower()
+                     for reg in row['preserved'].split(',') if reg.strip()]
+        sigs[int(row['addr'], 16)] = (ins, outs, preserved)
     return sigs
 
 
@@ -167,7 +169,7 @@ RETURN_REG = {'EAX': 'eax', 'EDX': 'edx', 'EBX': 'ebx', 'ECX': 'ecx',
 
 
 def pragma_for(name, sig):
-    ins, outs = sig
+    ins, outs, preserved = sig
     regs = [REG32.get(reg.upper()) for reg, _ in ins
             if not re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper())]
     if any(reg is None for reg in regs) or len(outs) > 1:
@@ -179,12 +181,19 @@ def pragma_for(name, sig):
         if out is None:
             return None
         text += ' value [%s]' % out
+    # `preserved` is part of the recovered X-32 ABI. Without an explicit
+    # modify set, Watcom may clobber a register that original callers expect
+    # to survive the call.
+    gprs = ('eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'ebp')
+    modify = [reg for reg in gprs if reg not in preserved]
+    if modify:
+        text += ' modify [%s]' % ' '.join(modify)
     return text
 
 
 def confirmed_alias_declarations(address, sig):
     """Declare a recovered guest callee under its generated name."""
-    _, outputs = sig
+    _, outputs, _ = sig
     name = 'ef_fn_%08x' % address
     # A recovered callee can have no confirmed return in signatures.tsv while
     # Ghidra call sites still consume EAX. Keep those drafts compilable with
@@ -718,7 +727,7 @@ def main():
         # aliases for register inputs: decompiler call arity may not describe
         # live-in regs.
         for entry in sorted(skip & sigs.keys()):
-            inputs, _ = sigs[entry]
+            inputs, _, _ = sigs[entry]
             if not inputs or all(re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper())
                                  for reg, _ in inputs):
                 header.extend(confirmed_alias_declarations(entry, sigs[entry]))

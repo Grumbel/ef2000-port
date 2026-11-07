@@ -1209,7 +1209,8 @@ void guest_fn_106988(uint32_t a, uint32_t b); /* 0x106988 cdecl */
 void guest_fn_bc400(uint32_t stream, uint32_t format, ...); /* 0xbc400 cdecl varargs */
 ef_addr32 guest_fn_eb520(uint32_t key, uint32_t index); /* 0xeb520 EAX/EDX */
 void guest_fn_a7990(uint32_t flags); /* 0xa7990 stack */
-uint32_t guest_fn_a7ac8(uint32_t amount, uint32_t flags); /* 0xa7ac8 stack */
+#pragma aux guest_fn_a7ac8 parm [] value [eax]
+uint32_t guest_fn_a7ac8(uint32_t stack_a, uint32_t stack_b); /* 0xa7ac8 stack, callee cleanup */
 ef_addr32 guest_fn_ebd30(uint32_t value); /* 0xebd30 */
 ef_addr32 guest_fn_ebd36(uint32_t value); /* 0xebd36 */
 void guest_fn_a4cb4(uint32_t value); /* 0xa4cb4 EAX */

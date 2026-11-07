@@ -47,19 +47,22 @@ def split(values, count):
 
 
 def failure_signature(result):
-    """Identify the stop site and coarse replay progress.
+    """Identify a replay failure independently of timing-only shifts.
 
-    Counter buckets tolerate small timing shifts caused by demoting unrelated
-    entries while keeping failures on materially different paths separate.
+    Faulting instruction and access details are stable across unrelated
+    demotions even when interrupt and tick counters move. For non-fault stops,
+    retain the observable output hashes so same-stop visual or RAM divergence
+    remains a distinct target.
     """
     if result is None:
         return None
     status = result['status']
     fault = status.get('fault')
-    fault_signature = None if fault is None else (
-        fault['type'], fault['address'], fault['size'], fault['code'])
-    return (status['status'], status['ip'], status['interrupts'] // 8,
-            status['ticks'] // 16, status['irq0'] // 8, fault_signature)
+    if fault is not None:
+        return (status['status'], status['ip'], fault['type'],
+                fault['address'], fault['size'], fault['code'])
+    return (status['status'], status['ip'], result.get('frame_sha256'),
+            tuple(sorted(result.get('guest_hashes', {}).items())))
 
 
 def main(argv=None):

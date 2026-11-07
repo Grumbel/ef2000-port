@@ -39,7 +39,8 @@ uint32_t advance_cursor_ebcfc(uint32_t amount, uint32_t flags, ef_addr32 object)
         EF_U32(object + 0x158u) = cursor;
         return cursor - EF_U32(object + 0x154u);
     }
-    return guest_fn_a7ac8(amount, flags);
+    /* 0xa7ac8 reads flags at [ESP+4] and amount at [ESP+8]. */
+    return guest_fn_a7ac8(flags, amount);
 }
 
 /* 0xebe6d, 12 bytes. Store EAX through the pointer returned by 0xebd30. */
