@@ -35,6 +35,10 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   framebuffer hash, and different selected-RAM hash. The first crash was
   removed, but menu acceptance and cockpit entry are not yet behaviorally
   verified.
+- Menu regression check, 2026-11-07: the exact 158-entry demoted patch also
+  passes all three earlier private-Xvfb checkpoints: main menu, quick-fight
+  setup, and simulator-menu key choice (3/3). This confirms the two demotions
+  preserve that partial navigation path.
 - Demotion recorded, 2026-11-07: marked `0x15c0c4` `compiles-bad` and added
   it to `decomp/symbols/hybrid-exclude.tsv`, so future hybrid links retain its
   original body. A five-round bisect of the remaining no-crash mismatch did
