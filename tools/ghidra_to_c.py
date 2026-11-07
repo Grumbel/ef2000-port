@@ -123,6 +123,18 @@ def load_globals():
     return {int(row['addr'], 16): row for row in read_tsv(GLOBALS)}
 
 
+def global_containing(address, globals_):
+    """Return a reviewed scalar-sized global range containing ADDRESS."""
+    for base, row in globals_.items():
+        size_text = row['size'].strip()
+        if not re.fullmatch(r'(?:0x[0-9a-fA-F]+|[0-9]+)', size_text):
+            continue
+        size = int(size_text, 0)
+        if base <= address < base + size:
+            return row
+    return None
+
+
 def dat_expression(address, globals_):
     row = globals_.get(address)
     ctype = normalize_type(row['type']) if row else ''
@@ -432,12 +444,39 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
         body = re.sub(pattern, repl, body)
     body = re.sub(r'\btrue\b', '1', body)
     body = re.sub(r'\bfalse\b', '0', body)
+    globals_ = globals_ or {}
+    # Ghidra sometimes assigns a function symbol to an overlaid immediate
+    # operand when the original program modifies its own code. Treat a
+    # non-call use as data only when a reviewed global starts at the byte
+    # after the function entry (opcode at entry, writable immediate at +1).
+    def function_overlay_repl(match):
+        address = int(match.group(1), 16)
+        row = globals_.get(address + 1)
+        if row is None or re.match(r'\s*\(', body[match.end():]):
+            return match.group(0)
+        size_text = row['size'].strip()
+        if (not re.fullmatch(r'(?:0x[0-9a-fA-F]+|[0-9]+)', size_text) or
+                int(size_text, 0) < 4):
+            return match.group(0)
+        return 'EF_U32(0x%08xu)' % (address + 1)
+    body = re.sub(r'\b(?:thunk_)?FUN_(' + HEX + r')\b',
+                  function_overlay_repl, body)
+    # iRam/uRam are Ghidra's signed/unsigned dword spellings for ambiguous
+    # RAM symbols. Lower them only inside a reviewed global range so an
+    # untyped byte alias (including self-modifying code) is not widened.
+    def ram_int_repl(match):
+        kind, address_text = match.groups()
+        address = int(address_text, 16)
+        if global_containing(address, globals_) is None:
+            return match.group(0)
+        access = 'EF_S32' if kind == 'iRam' else 'EF_U32'
+        return '%s(0x%08xu)' % (access, address)
+    body = re.sub(r'\b(iRam|uRam)([0-9a-fA-F]{8})\b', ram_int_repl, body)
     # Rename callees, referenced by auto name or by recovered name.
     body = re.sub(r'\b(?:thunk_)?FUN_' + HEX + r'\b',
                   lambda m: 'ef_fn_' + m.group(1).lower(), body)
     for old, new in names.items():
         body = re.sub(r'\b' + re.escape(old) + r'\b', new, body)
-    globals_ = globals_ or {}
     # Ghidra emits ram0x names for referenced addresses that lack a data
     # symbol, and adds numeric suffixes for overlapping byte globals. The
     # latter are byte aliases at base+offset, as shown by their read/write

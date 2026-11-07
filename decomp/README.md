@@ -75,21 +75,18 @@ first control-mode gate, [batch 126](../docs/subsystems/decomp-batch-126.md)
 verifies the paired mode B/C setters, and [batch 127](../docs/subsystems/decomp-batch-127.md)
 verifies the signed link-pointer lookup and its unaligned candidate override;
 [batch 128](../docs/subsystems/decomp-batch-128.md) verifies its record updater.
-M0 mechanically compiles 416/1,020 available unrecovered Ghidra exports
-(40.8%, 125,300/543,917 body bytes = 23.0%) with OpenWatcom v2; 589 exports
-remain `manual` and 15 have compile errors. Hand-written recovered C covers
+M0 mechanically compiles 418/1,020 available unrecovered Ghidra exports
+(41.0%, 127,079/543,917 body bytes = 23.4%) with OpenWatcom v2; 589 exports
+remain `manual` and 13 have compile errors. Hand-written recovered C covers
 364,031 body bytes (40.0%); together with mechanical `ok` exports, potential
-hybrid coverage is 489,331/908,947 tracked body bytes (53.8%). A focused
-two-function image redirects `init_far_stub_b04` and `to_lower_ascii` and
-passes the main-menu and quick-fight-setup replay cases. The broader image
-was relinked with 2,452 functions (2,043 hand-written, 409 mechanical),
-12,260 entry bytes, a 585,684-byte arena and 597,944 total patch bytes, with
-2,285 exclusions across 702/764 modules. The main-menu replay, with the
-mechanically generated `original_memcpy` kept original due its callee-clean
-stack ABI, faults at guest IP `0x4` on tick 560. The focused image has not
-been tested through the cockpit, and M1/M2 remain unpassed. The private-Xvfb
-bisector is still blocked because Xvfb cannot bind its private listeners in
-this environment. See the latest replay and compiler evidence in
+hybrid coverage is 491,110/908,947 tracked body bytes (54.0%). A focused
+154-function image passes repeated-baseline main-menu and quick-fight-setup
+replays. The broad image was relinked with 2,453 functions (2,043
+hand-written, 410 mechanical), 12,265 entry bytes, a 587,348-byte arena and
+599,613 total patch bytes, with 2,287 exclusions across 704/766 modules. Its
+500M main-menu replay still faults at guest IP `0x190` on tick 561 with an
+unmapped read at `0x358be389`; M1/M2 remain unpassed. See the latest replay
+and compiler evidence in
 [`decomp-log.md`](../docs/subsystems/decomp-log.md).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),

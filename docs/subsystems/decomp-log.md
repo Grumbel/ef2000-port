@@ -708,3 +708,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   and 686 times in setup. This verifies the focused menu-to-setup slice, not
   the full M1 hybrid: the 2,452-entry image still fails during startup at IP
   `0x4`, tick 560.
+- M0 rule 17, self-modifying function-symbol aliases, 2026-11-07: when a
+  non-call `FUN_<address>` use overlaps a reviewed global beginning at
+  `address+1`, lower it as a guest-memory value; lower `iRam`/`uRam` dwords
+  only when they fall within a reviewed global range. Original disassembly
+  shows callers `0xb69c` and `0x63d5c` writing the 32-bit immediate at
+  `0xc4756`, immediately after the `sub eax, imm32` opcode at `0xc4755`;
+  their other camera-origin values are dwords at `0xc475c` and `0xc4762`.
+  Both generated bodies compile. OpenWatcom now reports 418/1,020 `ok`
+  (127,079/543,917 body bytes; 41.0% of functions, 23.4% of bytes), up from
+  416 (125,300 bytes); compile errors fall from 15 to 13 and 589 remain
+  `manual`. This is compile evidence only. Relinking patches 2,453 functions
+  (2,043 hand-written, 410 mechanical), 12,265 entry bytes and 587,348 arena
+  bytes (599,613 total patch bytes; 704/766 modules). The repeated-baseline
+  500M main-menu replay still faults at guest IP `0x190`, tick 561, on an
+  unmapped read at `0x358be389`; 48 calls to `to_lower_ascii` occurred before
+  the fault. M1/M2 remain unpassed; the focused 154-function menu/setup image
+  remains the highest passing replay checkpoint.
