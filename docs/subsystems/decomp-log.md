@@ -996,3 +996,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   real-mode BIOS INT 0, IP `0x9c55a`, before any required patch entry is hit;
   M1 remains unpassed and this function's runtime behavior is not yet reached
   by the menu replay.
+- Replay trace correction, 2026-11-07: the preceding sentence is too broad.
+  On a repeat of the same 500M Unicorn run under private Xvfb, the hybrid
+  reports 16 patch hits, including `0x235` once and `0xb04` once. The three
+  main-menu canaries (`0xe7835`, `0x106bfc`, `0x10d1da`) remain unhit, so M1
+  is still unpassed; the trace establishes entry reachability, not behavioral
+  equivalence of those patched functions. Execution stops at the original
+  `0x9c558` thunk (`INT 0`, next IP `0x9c55a`), reported by the runner as
+  unsupported real-mode BIOS INT 0. A temporary register trace at that stop
+  showed ESI=`0x21`, but this is after the thunk loaded the interrupt input
+  block and does not establish the interrupt number used to select the stub.
