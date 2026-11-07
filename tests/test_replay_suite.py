@@ -5,6 +5,7 @@
 
 import json
 from pathlib import Path
+import sys
 import tempfile
 import unittest
 
@@ -24,7 +25,7 @@ def manifest(*, name='startup', hits=None, events=None, limit=10000,
 
 
 def fake_runner(path):
-    path.write_text('''#!/usr/bin/env python3
+    script = '''
 import hashlib
 import pathlib
 import sys
@@ -54,7 +55,8 @@ for i, flag in enumerate(a):
                 ('--early-memory-difference' in a and budget < 5000)):
             data = b'\\x01' + data[1:]
         print(f'guest_hash: addr=0x{int(addr, 0):x} length={size} sha256={hashlib.sha256(data).hexdigest()}')
-''')
+'''
+    path.write_text('#!' + sys.executable + '\n' + script)
     path.chmod(0o755)
 
 

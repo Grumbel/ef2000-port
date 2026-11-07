@@ -169,7 +169,11 @@ RETURN_REG = {'EAX': 'eax', 'EDX': 'edx', 'EBX': 'ebx', 'ECX': 'ecx',
 
 
 def pragma_for(name, sig):
-    ins, outs, preserved = sig
+    if len(sig) == 2:
+        ins, outs = sig
+        preserved = None
+    else:
+        ins, outs, preserved = sig
     regs = [REG32.get(reg.upper()) for reg, _ in ins
             if not re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper())]
     if any(reg is None for reg in regs) or len(outs) > 1:
@@ -185,15 +189,15 @@ def pragma_for(name, sig):
     # modify set, Watcom may clobber a register that original callers expect
     # to survive the call.
     gprs = ('eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'ebp')
-    modify = [reg for reg in gprs if reg not in preserved]
-    if modify:
+    modify = [reg for reg in gprs if reg not in preserved] if preserved is not None else []
+    if modify and preserved is not None:
         text += ' modify [%s]' % ' '.join(modify)
     return text
 
 
 def confirmed_alias_declarations(address, sig):
     """Declare a recovered guest callee under its generated name."""
-    _, outputs, _ = sig
+    outputs = sig[1]
     name = 'ef_fn_%08x' % address
     # A recovered callee can have no confirmed return in signatures.tsv while
     # Ghidra call sites still consume EAX. Keep those drafts compilable with

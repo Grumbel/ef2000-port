@@ -38,6 +38,7 @@ SHT_SYMTAB = 2
 SHT_STRTAB = 3
 SHT_RELA = 4
 SHT_NOBITS = 8
+SHT_NOTE = 7
 SHT_REL = 9
 R_386_32 = 1
 STT_FUNC = 2
@@ -104,10 +105,11 @@ def read_elf32(blob, selected=None):
                                 kind == SHT_PROGBITS and
                                 flags & (SHF_ALLOC | SHF_EXECINSTR) ==
                                 SHF_ALLOC | SHF_EXECINSTR)
+        ignored_note = kind == SHT_NOTE and names[i].startswith('.note.')
         if i != code_index and flags & SHF_EXECINSTR and size and not ignored_function:
             raise ElfPatchError(f'extra executable section {names[i]!r}')
         if i != code_index and flags & SHF_ALLOC and size and not (
-                names[i] == '.eh_frame' or ignored_function):
+                names[i] == '.eh_frame' or ignored_function or ignored_note):
             raise ElfPatchError(f'private allocatable data {names[i]!r} is unsupported')
         if kind in (SHT_REL, SHT_RELA) and (info >= shnum or
                 (info != code_index and names[info] != '.eh_frame' and
