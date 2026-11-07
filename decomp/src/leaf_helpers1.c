@@ -124,7 +124,14 @@ void build_default_path_abaf0(ef_addr32 buffer)
 /* 0xb3fb0, 24 bytes. Fill bytes of a block with one value. */
 void fill_bytes_b3fb0(ef_addr32 dst, uint8_t value, uint32_t count)
 {
+#if defined(__WATCOMC__)
+    /* The original entry preserves EAX around 0xdeb50. */
+    __asm { push eax }
+#endif
     guest_fn_deb50_f(dst, (uint32_t)value * 0x01010101u, count);
+#if defined(__WATCOMC__)
+    __asm { pop eax }
+#endif
 }
 
 /* 0xb3fd0, 9 bytes. Square of a double. */

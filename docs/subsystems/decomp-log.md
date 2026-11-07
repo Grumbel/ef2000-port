@@ -6,6 +6,37 @@
 Append M0 mechanical translation, hybrid milestone, and bulk recovery progress
 here. Ghidra-derived function bodies remain only under ignored `local/`.
 
+- Full-hybrid trace comparison, 2026-11-07: instruction traces from the same
+  deterministic headless Unicorn setup first diverge after untouched caller
+  `0x10e206` calls redirected entry `fill_bytes_b3fb0` (`0xb3fb0`). The caller
+  enters with EAX=`0x4df090`, EBX=2, ECX=0xc, ESP=`0x3ffeebc`, and selectors
+  CS=0x2f, DS=SS=7, ES=FS=0x17, GS=0. At return site `0x10e20b`, original
+  code preserves EAX=`0x4df090`; the hybrid returned EAX=`0x4df091`. ESP,
+  EBX, ECX, EDX and selectors matched. EFLAGS were `0x3246` original and
+  `0x3202` hybrid. Original code saves/restores EAX around `0xdeb50`; the
+  hand-written C wrapper did not. This is the first confirmed ABI divergence
+  in the captured parser trace, preceding the later `0x9c558` INT 0 symptom.
+  The trace run was headless because private Xvfb could not create its X11
+  socket in this environment. M1 remains unpassed. Current full mechanical
+  report: 442/1,020 `ok` (138,459/543,917 body bytes), 578 `manual`, zero
+  compile errors.
+- M0 trace fix and full-startup recheck, 2026-11-07: preserve EAX around
+  `guest_fn_deb50_f` in `fill_bytes_b3fb0` and correct the ABI tracker: the
+  original saves EAX and ECX, but EDX is volatile and is not saved. OpenWatcom
+  1.9 compiles the module with zero warnings/errors; disassembly confirms a
+  `push eax` before the helper and `pop eax` after it. In paired Unicorn traces,
+  the return at `0x10e20b` now has matching EAX=`0x4df090`, ESP=`0x3ffeec0`,
+  EBX, ECX, and selectors; subsequent caller instruction addresses align.
+  The volatile EDX and EFLAGS still differ. The current 2,244-entry full
+  hybrid (11,220 redirect bytes plus a 608,516-byte arena; 619,736 total
+  patched bytes) still does not reach the menu: it stops at unsupported BIOS
+  INT 13, IP `0x4dc`, after 13,749,992 counted guest instructions. The same
+  original image reaches its 500M instruction budget at IP `0x110de6` after
+  26,308,809 counted guest instructions, so the remaining startup divergence
+  is not resolved. Private Xvfb remains unavailable (`SDL_Init: No available
+  video device`). Mechanical report remains 442/1,020 `ok` (138,459/543,917
+  bytes), 578 `manual`, zero compile errors.
+
 - Menu-focused hybrid diagnostic, 2026-11-07: rebuilt the 160-entry menu
   patch from 143 hand-written and 17 mechanical functions, then used the
   automatic bisector to isolate `0x8e494` as the single candidate that

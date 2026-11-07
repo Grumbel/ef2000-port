@@ -1,4 +1,5 @@
 __pycache__/
+*.err
 build/
 local/
 decomp/build/

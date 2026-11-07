@@ -1293,6 +1293,36 @@ public:
 
     void trace_patch_entry_state(bool enabled) { trace_patch_entry_state_ = enabled; }
 
+    void enable_block_state_trace(const fs::path& path, uint64_t block_limit) {
+        if (path.empty() || !block_limit)
+            throw std::runtime_error("block-state trace needs a path and positive limit");
+        trace_stream_.open(path, std::ios::out | std::ios::trunc);
+        if (!trace_stream_)
+            throw std::runtime_error("cannot open block-state trace: " + path.string());
+        trace_stream_ << "block,address,size,eip,esp,eax,ebx,ecx,edx,esi,edi,ebp,eflags,cs,ds,es,ss,fs,gs,stack0,stack1,stack2,stack3,stack4,stack5,stack6,stack7\n";
+        trace_block_limit_ = block_limit;
+        trace_started_ = true;
+        check(uc_hook_add(cpu_, &trace_block_hook_, UC_HOOK_BLOCK,
+                          (void*)on_block_state, this, 1, 0),
+              "install block-state trace hook");
+    }
+
+    void enable_instruction_state_trace(const fs::path& path, uint32_t start_address,
+                                        uint64_t instruction_limit) {
+        if (path.empty() || !instruction_limit || start_address >= IMAGE_SIZE)
+            throw std::runtime_error("instruction-state trace needs a path, guest start and positive limit");
+        trace_stream_.open(path, std::ios::out | std::ios::trunc);
+        if (!trace_stream_)
+            throw std::runtime_error("cannot open instruction-state trace: " + path.string());
+        trace_stream_ << "sequence,address,size,eip,esp,eax,ebx,ecx,edx,esi,edi,ebp,eflags,cs,ds,es,ss,fs,gs,stack0,stack1,stack2,stack3,stack4,stack5,stack6,stack7\n";
+        trace_block_limit_ = instruction_limit;
+        trace_start_address_ = start_address;
+        trace_started_ = false;
+        check(uc_hook_add(cpu_, &trace_block_hook_, UC_HOOK_CODE,
+                          (void*)on_block_state, this, 1, 0),
+              "install instruction-state trace hook");
+    }
+
     void enable_guest_hashes(const std::vector<std::pair<uint32_t, uint32_t>>& ranges) {
         guest_hash_ranges_ = ranges;
     }
@@ -1317,6 +1347,10 @@ public:
                               this, address, address), "install function-entry capture hook");
             capture_hooks_.push_back(hook);
         }
+    }
+
+    void set_capture_memory_ranges(std::vector<std::pair<uint32_t, uint32_t>> ranges) {
+        capture_memory_ranges_ = std::move(ranges);
     }
 
     int run(uint64_t limit, WindowOptions window_options, uint64_t timer_interval,
@@ -1380,6 +1414,7 @@ public:
                                   std::chrono::milliseconds(10);
                 const uc_err result = uc_emu_start(cpu_, ip, 0, 0, 0);
                 if (!capture_error_.empty()) throw std::runtime_error(capture_error_);
+                if (!trace_error_.empty()) throw std::runtime_error(trace_error_);
                 if (result != UC_ERR_OK) {
                     const auto regs = read_regs();
                     std::ostringstream message;
@@ -1428,6 +1463,7 @@ public:
                 amount = std::min(amount, timer_interval - completed % timer_interval);
                 const uc_err result = uc_emu_start(cpu_, ip, 0, 0, amount);
                 if (!capture_error_.empty()) throw std::runtime_error(capture_error_);
+                if (!trace_error_.empty()) throw std::runtime_error(trace_error_);
                 if (result != UC_ERR_OK) {
                     const auto regs = read_regs();
                     std::ostringstream message;
@@ -1735,7 +1771,15 @@ private:
     uc_hook eoi_hook_{};
     std::vector<uc_hook> capture_hooks_;
     std::vector<uc_hook> patch_hooks_;
+    std::vector<std::pair<uint32_t, uint32_t>> capture_memory_ranges_;
+    uc_hook trace_block_hook_{};
+    std::ofstream trace_stream_;
+    uint64_t trace_block_limit_{}, trace_block_count_{};
+    uint32_t trace_start_address_{};
+    bool trace_started_{};
+    std::string trace_error_;
     std::map<uint32_t, uint64_t> patch_hit_counts_;
+    std::map<uint32_t, unsigned> trace_entry_state_counts_;
     std::vector<uint32_t> patch_hit_sequence_;
     std::vector<std::pair<uint32_t, uint32_t>> guest_hash_ranges_;
     std::unordered_map<uint32_t, unsigned> capture_remaining_, capture_sequence_;
@@ -2641,7 +2685,8 @@ private:
             if (machine->patch_hit_sequence_.size() == trace_limit)
                 machine->patch_hit_sequence_.erase(machine->patch_hit_sequence_.begin());
             machine->patch_hit_sequence_.push_back(static_cast<uint32_t>(address));
-            if (machine->trace_patch_entry_state_) {
+            if (machine->trace_patch_entry_state_ &&
+                machine->trace_entry_state_counts_[static_cast<uint32_t>(address)]++ < 8) {
                 const Registers regs = machine->read_regs();
                 uint32_t stack[12]{};
                 const bool stack_read = uc_mem_read(machine->cpu_, regs.sp,
@@ -2659,6 +2704,37 @@ private:
                 } else std::cerr << "unreadable";
                 std::cerr << std::dec << '\n';
             }
+        }
+    }
+    static void on_block_state(uc_engine*, uint64_t address, uint32_t size, void* user) {
+        auto* machine = static_cast<Machine*>(user);
+        if (machine->trace_block_count_ >= machine->trace_block_limit_) return;
+        if (!machine->trace_started_) {
+            if (static_cast<uint32_t>(address) != machine->trace_start_address_) return;
+            machine->trace_started_ = true;
+        }
+        try {
+            const Registers regs = machine->read_regs();
+            std::array<uint32_t, 8> stack{};
+            const bool stack_read = uc_mem_read(machine->cpu_, regs.sp, stack.data(),
+                                                sizeof(stack)) == UC_ERR_OK;
+            auto& out = machine->trace_stream_;
+            out << std::dec << machine->trace_block_count_++ << ','
+                << std::hex << address << ',' << size << ',' << regs.ip << ',' << regs.sp
+                << ',' << regs.ax << ',' << regs.bx << ',' << regs.cx << ',' << regs.dx
+                << ',' << regs.si << ',' << regs.di << ',' << regs.bp << ',' << regs.flags
+                << ',' << regs.cs << ',' << regs.ds << ',' << regs.es << ',' << regs.ss
+                << ',' << regs.fs << ',' << regs.gs;
+            for (uint32_t word : stack)
+                out << ',' << (stack_read ? word : 0xffffffffu);
+            out << '\n';
+            if (!out) machine->trace_error_ = "failed writing block-state trace";
+            if (machine->trace_block_count_ == machine->trace_block_limit_) {
+                machine->status_ = "trace_limit";
+                uc_emu_stop(machine->cpu_);
+            }
+        } catch (const std::exception& error) {
+            machine->trace_error_ = error.what();
         }
     }
     static void on_capture_call(uc_engine*, uint64_t address, uint32_t, void* user) {
@@ -2693,6 +2769,33 @@ private:
              << ".efcap";
         const auto path = capture_dir_ / name.str();
         ef2000::write_call_capture(path, capture);
+        for (size_t i = 0; i < capture_memory_ranges_.size(); ++i) {
+            const auto [range_address, range_size] = capture_memory_ranges_[i];
+            std::vector<uint8_t> bytes(range_size);
+            const uc_err read_result = uc_mem_read(cpu_, range_address, bytes.data(), bytes.size());
+            if (read_result != UC_ERR_OK) {
+                std::ostringstream message;
+                message << "snapshot selected guest RAM range at 0x" << std::hex
+                        << range_address << ": " << uc_strerror(read_result);
+                throw std::runtime_error(message.str());
+            }
+            std::ostringstream range_name;
+            range_name << "0x" << std::hex << std::setw(7) << std::setfill('0') << address
+                       << '-' << std::dec << std::setw(4) << std::setfill('0') << index
+                       << "-mem-" << std::hex << std::setw(8) << std::setfill('0')
+                       << range_address << '-' << std::setw(8) << range_size << ".bin";
+            const auto range_path = capture_dir_ / range_name.str();
+            if (fs::exists(range_path))
+                throw std::runtime_error("guest RAM range capture already exists: " +
+                                         range_path.string());
+            std::ofstream range_stream(range_path, std::ios::binary | std::ios::out);
+            if (!range_stream) throw std::runtime_error("cannot create guest RAM range capture: " +
+                                                        range_path.string());
+            range_stream.write(reinterpret_cast<const char*>(bytes.data()),
+                               static_cast<std::streamsize>(bytes.size()));
+            if (!range_stream) throw std::runtime_error("failed to write guest RAM range capture: " +
+                                                        range_path.string());
+        }
         std::cout << "capture_call: addr=0x" << std::hex << address << std::dec
                   << " index=" << index << " file=" << path.string() << '\n';
     }
@@ -3218,6 +3321,8 @@ void usage(const char* program) {
               << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
               << "       [--trace-patch-entry ADDR] (repeatable, trace guest code addresses)\n"
+              << "       [--trace-block-state FILE] [--trace-block-limit N] (CSV basic-block registers/segments/stack)\n"
+              << "       [--trace-instruction-state FILE --trace-instruction-start ADDR] [--trace-instruction-limit N]\n"
               << "       [--trace-archive-lookups] (unique DID pathname requests on stderr)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
               << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
@@ -3225,6 +3330,7 @@ void usage(const char* program) {
               << "       Patched runs report patch_hit entry counts (zero means unexercised)\n"
               << "       [--hash-guest ADDR:LENGTH] (final guest SHA-256, repeatable; max 16 MiB)\n"
               << "       [--capture-calls ADDR[:N] --capture-dir DIR] (up to 4 guest-RAM call snapshots)\n"
+              << "       [--capture-memory ADDR:LENGTH] (repeatable selected-memory sidecars at captured calls)\n"
               << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
               << "       --cd-dir DIR provides DOS disc files only; it does not enable music\n"
               << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
@@ -3263,7 +3369,13 @@ int main(int argc, char** argv) {
         std::vector<uint32_t> trace_patch_entries;
         std::vector<std::pair<uint32_t, uint32_t>> guest_hash_ranges;
         std::vector<std::pair<uint32_t, unsigned>> capture_targets;
+        std::vector<std::pair<uint32_t, uint32_t>> capture_memory_ranges;
         fs::path capture_dir;
+        fs::path trace_block_state;
+        uint64_t trace_block_limit = 250000;
+        fs::path trace_instruction_state;
+        uint32_t trace_instruction_start{};
+        uint64_t trace_instruction_limit = 10000;
         std::string framebuffer, wav_directory;
         for (int i = 1; i < argc; ++i) {
             if (!std::strcmp(argv[i], "--help") || !std::strcmp(argv[i], "-h")) {
@@ -3284,6 +3396,29 @@ int main(int argc, char** argv) {
                 if (end != value.size() || address >= IMAGE_SIZE)
                     throw std::runtime_error("--trace-patch-entry expects a guest address");
                 trace_patch_entries.push_back(uint32_t(address));
+            } else if (!std::strcmp(argv[i], "--trace-block-state") && i + 1 < argc) {
+                trace_block_state = argv[++i];
+            } else if (!std::strcmp(argv[i], "--trace-block-limit") && i + 1 < argc) {
+                size_t end{};
+                const std::string value = argv[++i];
+                trace_block_limit = std::stoull(value, &end);
+                if (end != value.size() || !trace_block_limit)
+                    throw std::runtime_error("--trace-block-limit expects a positive integer");
+            } else if (!std::strcmp(argv[i], "--trace-instruction-state") && i + 1 < argc) {
+                trace_instruction_state = argv[++i];
+            } else if (!std::strcmp(argv[i], "--trace-instruction-start") && i + 1 < argc) {
+                size_t end{};
+                const std::string value = argv[++i];
+                const uint64_t address = std::stoull(value, &end, 0);
+                if (end != value.size() || address >= IMAGE_SIZE)
+                    throw std::runtime_error("--trace-instruction-start expects a guest address");
+                trace_instruction_start = uint32_t(address);
+            } else if (!std::strcmp(argv[i], "--trace-instruction-limit") && i + 1 < argc) {
+                size_t end{};
+                const std::string value = argv[++i];
+                trace_instruction_limit = std::stoull(value, &end);
+                if (end != value.size() || !trace_instruction_limit)
+                    throw std::runtime_error("--trace-instruction-limit expects a positive integer");
             } else if (!std::strcmp(argv[i], "--hash-guest") && i + 1 < argc) {
                 const std::string value = argv[++i];
                 const size_t colon = value.find(':');
@@ -3317,6 +3452,21 @@ int main(int argc, char** argv) {
                 capture_targets.emplace_back(static_cast<uint32_t>(address), count);
             } else if (!std::strcmp(argv[i], "--capture-dir") && i + 1 < argc) {
                 capture_dir = argv[++i];
+            } else if (!std::strcmp(argv[i], "--capture-memory") && i + 1 < argc) {
+                const std::string value = argv[++i];
+                const size_t colon = value.find(':');
+                if (colon == std::string::npos || !colon || colon + 1 == value.size())
+                    throw std::runtime_error("--capture-memory expects ADDR:LENGTH");
+                size_t end{};
+                const uint64_t address = std::stoull(value.substr(0, colon), &end, 0);
+                if (end != colon) throw std::runtime_error("invalid --capture-memory address");
+                const std::string length_field = value.substr(colon + 1);
+                const uint64_t length = std::stoull(length_field, &end, 0);
+                if (end != length_field.size() || !length || length > 0x100000 ||
+                    address > 0xffffffffu || address + length > 0x100000000ull ||
+                    capture_memory_ranges.size() >= 16)
+                    throw std::runtime_error("invalid --capture-memory range (max 1 MiB, 16 ranges)");
+                capture_memory_ranges.emplace_back(uint32_t(address), uint32_t(length));
             } else if (!std::strcmp(argv[i], "--timer-instructions") && i + 1 < argc) {
                 size_t end{};
                 const std::string value = argv[++i];
@@ -3529,6 +3679,10 @@ int main(int argc, char** argv) {
         }
         if (window.profile_video_frames && !window.enabled)
             throw std::runtime_error("--profile-video-frames requires --windowed or --fullscreen");
+        if (!trace_block_state.empty() && !trace_instruction_state.empty())
+            throw std::runtime_error("choose either block-state or instruction-state tracing");
+        if (!trace_instruction_state.empty() && !trace_instruction_start)
+            throw std::runtime_error("--trace-instruction-state requires --trace-instruction-start");
         if (!window.overlay_frame_bmp.empty() && !window.enabled)
             throw std::runtime_error("--overlay-frame-bmp requires --windowed or --fullscreen");
         if (!window.overlay_font_bmp.empty() && !window.enabled)
@@ -3775,11 +3929,18 @@ int main(int argc, char** argv) {
                         reserved_arena.first, reserved_arena.second);
         machine.use_guest_dos_clock(guest_dos_clock);
         machine.use_guest_vga_clock(guest_vga_clock);
+        if (!trace_block_state.empty())
+            machine.enable_block_state_trace(trace_block_state, trace_block_limit);
+        else if (!trace_instruction_state.empty())
+            machine.enable_instruction_state_trace(trace_instruction_state,
+                trace_instruction_start, trace_instruction_limit);
         if (!patch_entries.empty()) {
             machine.enable_patch_hit_trace(patch_entries);
             machine.trace_patch_entry_state(trace_entry_state);
         }
         machine.enable_guest_hashes(guest_hash_ranges);
+        if (!capture_targets.empty())
+            machine.set_capture_memory_ranges(std::move(capture_memory_ranges));
         if (!capture_targets.empty())
             machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));
         if (trace_archive_lookups) machine.enable_archive_lookup_trace();
