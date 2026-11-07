@@ -120,6 +120,16 @@ def validate_manifest(manifest, patch_addresses, patch_intervals=()):
             hits.add(int(address, 16))
         if not hits.issubset(patch_addresses):
             raise ValueError(f'{name}: must_hit includes an address absent from EFPATCH1')
+        trace_values = case.get('trace_addresses', [])
+        if not isinstance(trace_values, list) or len(trace_values) > 4096:
+            raise ValueError(f'{name}: trace_addresses must contain at most 4096 entries')
+        traces = set()
+        for address in trace_values:
+            if not isinstance(address, str) or not re.fullmatch(r'0x[0-9a-fA-F]{1,8}', address):
+                raise ValueError(f'{name}: invalid traced patch entry address')
+            traces.add(int(address, 16))
+        if not traces.issubset(patch_addresses):
+            raise ValueError(f'{name}: trace_addresses includes an address absent from EFPATCH1')
         regions = case.get('guest_hashes', [])
         if not isinstance(regions, list) or len(regions) > 32:
             raise ValueError(f'{name}: guest_hashes must contain at most 32 regions')
@@ -148,6 +158,7 @@ def validate_manifest(manifest, patch_addresses, patch_intervals=()):
         result.append({'name': name, 'instructions': instructions,
                        'timer_instructions': timer, 'arguments': arguments,
                        'must_hit': sorted(hits), 'guest_hashes': hashes,
+                       'trace_addresses': sorted(traces),
                        'checkpoints': checkpoints,
                        'allow_no_framebuffer': allow_no_framebuffer})
     return result
@@ -231,7 +242,9 @@ def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, tim
         command.extend(['--hash-guest', f'0x{address:x}:{length}'])
     for patch in patch_files:
         command.extend(['--patch', str(patch)])
-    trace_addresses = set(case.get('trace_addresses', []))
+    # Patch-entry tracing is diagnostic for the replacement run. Installing
+    # thousands of hooks on the original baseline adds cost without evidence.
+    trace_addresses = set(case.get('trace_addresses', [])) if patch_files else set()
     if patch_files:
         trace_addresses.update(case.get('must_hit', []))
     for address in sorted(trace_addresses):

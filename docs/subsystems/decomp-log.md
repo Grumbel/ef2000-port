@@ -887,3 +887,9 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   tick 682. A 106-trial bisector run remains unresolved with 1,070 candidate
   redirects. Current hybrid status is below M1; the main-menu checkpoint is
   still the target.
+- M1 replay tracing, 2026-11-07: `replay_suite.py` now preserves and validates
+  optional manifest `trace_addresses`, and installs those hooks only for
+  patched runs. A focused trace before the tick-682 fault records 0xebcfc
+  once, 0xf227f 13 times, and the verified 0xe7835 72 times; traced entries
+  0x9cfdc, 0xa7ac8 and 0xa7a64 are not reached. The fault remains the unmapped
+  read at IP 0x3ffe6e7, address 0x3d80c3c0. M1 is still unpassed.
