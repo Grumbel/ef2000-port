@@ -920,3 +920,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   unsupported real-mode BIOS INT 13, IP `0x31a`, tick 4,557 (29,964
   interrupts / 4,504 IRQ0s). This is beyond the passing menu checkpoint; M1
   and cockpit remain unpassed.
+- Mission-accept stop classification, 2026-11-07: traced the 160-redirect
+  menu patch through the stop at IP `0x31a`. The C++ interrupt transcript
+  records vector `0x0d` (decimal 13) at reported IP `0x318`, immediately after
+  X-32 INT 21h AX=`0x3502`; the original payload bytes at `0x318` and `0x31a`
+  are `pop gs` and `pop fs`. `Machine::interrupt` subtracts two from every
+  interrupt IP and routes every vector except `0x21` through the BIOS handler,
+  whose decimal diagnostic therefore mislabeled this protected-mode #GP as
+  “BIOS INT 13”. The stop is a segment-restore exception, not a disk request;
+  exception delivery/selector state is now the next M1 investigation. Menu
+  checkpoints remain passing; M1 and cockpit remain unpassed.
