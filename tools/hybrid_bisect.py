@@ -5,9 +5,9 @@
 """Bisect hybrid redirects using the asset-backed replay oracle.
 
 Each trial relinks the complete object set with a subset of guest entries
-demoted to their original bodies. Run this tool with the pinned runner and
-game data available; it starts every guest run in a private Xvfb server.
-Artifacts and reports belong under ignored local/.
+demoted to their original bodies. Event-free Unicorn replays run headlessly;
+cases that inject input use a private Xvfb server. Artifacts and reports
+belong under ignored local/.
 """
 
 import argparse
@@ -71,6 +71,9 @@ def main(argv=None):
     parser.add_argument('--output', type=Path, required=True,
                         help='new ignored local/ directory; never overwritten')
     parser.add_argument('--timeout', type=int, default=300)
+    parser.add_argument('--exclude-list', type=Path,
+                        default=ROOT / 'decomp/symbols/hybrid-exclude.tsv',
+                        help='persistent TSV of entries to keep original')
     parser.add_argument('--keep', action='append', default=[],
                         help='entry that must remain patched and hit (repeatable, default 0xe7835)')
     parser.add_argument('--trace-address', action='append', default=[],
@@ -93,9 +96,6 @@ def main(argv=None):
                             (args.runner, 'runner'), (args.manifest, 'manifest')):
             if not path.is_file():
                 raise ValueError(f'{label} does not exist: {path}')
-        xvfb = shutil.which('xvfb-run')
-        if not xvfb:
-            raise ValueError('xvfb-run is required; the user display is never used')
         output = args.output.resolve()
         if output.exists():
             raise ValueError('output already exists (refusing overwrite)')
@@ -114,7 +114,7 @@ def main(argv=None):
         globals_ = hybrid_link.read_tsv(args.globals)
         source = args.image.read_bytes()
         aliases = hybrid_link.load_abi_aliases(args.abi_header)
-        persistent_excludes = {}
+        persistent_excludes = hybrid_link.load_exclusions(args.exclude_list, len(source))
         for item in args.exclude_address:
             address_text, separator, reason = item.partition(':')
             address = int(address_text, 0)
@@ -147,26 +147,32 @@ def main(argv=None):
         trace_addresses = sorted({int(value, 0) for value in args.trace_address})
         case['trace_addresses'] = trace_addresses
 
-        wrapper = output / 'private-xvfb-runner'
-        wrapper.write_text(
-            '#!/bin/sh\n'
-            'out=$(mktemp) || exit 125\n'
-            'err=$(mktemp) || { rm -f "$out"; exit 125; }\n'
-            '%s -a %s "$@" >"$out" 2>"$err"\n'
-            'result=$?\n'
-            'cat "$out"\n'
-            'cat "$err" >&2\n'
-            'if grep -q "^status=" "$out"; then result=0; fi\n'
-            'rm -f "$out" "$err"\n'
-            'exit "$result"\n' %
-            (shlex.quote(xvfb), shlex.quote(str(args.runner.resolve()))))
-        wrapper.chmod(0o755)
+        replay_runner = args.runner.resolve()
+        if case['arguments']:
+            xvfb = shutil.which('xvfb-run')
+            if not xvfb:
+                raise ValueError('xvfb-run is required for replay cases that inject input')
+            wrapper = output / 'private-xvfb-runner'
+            wrapper.write_text(
+                '#!/bin/sh\n'
+                'out=$(mktemp) || exit 125\n'
+                'err=$(mktemp) || { rm -f "$out"; exit 125; }\n'
+                '%s -a %s "$@" >"$out" 2>"$err"\n'
+                'result=$?\n'
+                'cat "$out"\n'
+                'cat "$err" >&2\n'
+                'if grep -q "^status=" "$out"; then result=0; fi\n'
+                'rm -f "$out" "$err"\n'
+                'exit "$result"\n' %
+                (shlex.quote(xvfb), shlex.quote(str(args.runner.resolve()))))
+            wrapper.chmod(0o755)
+            replay_runner = wrapper
         baseline_case = dict(case)
         baseline_case.pop('must_hit', None)
         baseline_case.pop('patch_addresses', None)
         baseline_case['patch_addresses'] = set()
         baseline = replay_suite.run_one(
-            wrapper, args.executable.resolve(), game_dir, cd_dir, [], baseline_case,
+            replay_runner, args.executable.resolve(), game_dir, cd_dir, [], baseline_case,
             output / 'baseline', args.timeout, 'off')
 
         trial_log = []
@@ -197,7 +203,7 @@ def main(argv=None):
                               patch_addresses=set(must_hit))
             try:
                 result = replay_suite.run_one(
-                    wrapper, args.executable.resolve(), game_dir, cd_dir, [patch_path],
+                    replay_runner, args.executable.resolve(), game_dir, cd_dir, [patch_path],
                     trial_case, output / f'trial-{run_number:02d}', args.timeout, 'off')
                 failures = replay_suite.differences(baseline, result)
                 missing_hits = [address for address in must_hit

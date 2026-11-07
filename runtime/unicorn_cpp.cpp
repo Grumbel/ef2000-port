@@ -1391,6 +1391,32 @@ public:
                             << " es=0x" << regs.es << std::dec
                             << " irq_active=" << irq_in_service_
                             << " fault=" << invalid_memory_;
+                    std::array<uint32_t, 8> stack_words{};
+                    if (uc_mem_read(cpu_, regs.sp, stack_words.data(),
+                                    sizeof(stack_words)) == UC_ERR_OK) {
+                        message << " stack=";
+                        for (size_t i = 0; i < stack_words.size(); ++i) {
+                            if (i) message << ',';
+                            message << "0x" << std::hex << stack_words[i];
+                        }
+                        message << std::dec;
+                    }
+                    if (!patch_hit_counts_.empty()) {
+                        message << " patch_hits=";
+                        bool first = true;
+                        for (const auto& [address, count] : patch_hit_counts_) {
+                            if (!count) continue;
+                            if (!first) message << ',';
+                            first = false;
+                            message << "0x" << std::hex << address << std::dec
+                                    << ':' << count;
+                        }
+                        message << " patch_sequence=";
+                        for (size_t i = 0; i < patch_hit_sequence_.size(); ++i) {
+                            if (i) message << ',';
+                            message << "0x" << std::hex << patch_hit_sequence_[i] << std::dec;
+                        }
+                    }
                     throw std::runtime_error(message.str());
                 }
             } else {
@@ -1399,7 +1425,58 @@ public:
                 amount = std::min(amount, timer_interval - completed % timer_interval);
                 const uc_err result = uc_emu_start(cpu_, ip, 0, 0, amount);
                 if (!capture_error_.empty()) throw std::runtime_error(capture_error_);
-                check(result, "instruction-counted guest execution");
+                if (result != UC_ERR_OK) {
+                    const auto regs = read_regs();
+                    std::ostringstream message;
+                    message << "instruction-counted guest execution: " << uc_strerror(result)
+                            << " ip=0x" << std::hex << regs.ip
+                            << " sp=0x" << regs.sp << std::dec << " ticks=" << ticks_
+                            << " irqs=" << irq0_ << " ax=0x" << std::hex << regs.ax
+                            << " bx=0x" << regs.bx << " cx=0x" << regs.cx
+                            << " dx=0x" << regs.dx << " si=0x" << regs.si
+                            << " di=0x" << regs.di << " ds=0x" << regs.ds
+                            << " es=0x" << regs.es << std::dec
+                            << " irq_active=" << irq_in_service_
+                            << " fault=" << invalid_memory_;
+                    std::array<uint8_t, 16> code_bytes{};
+                    uint32_t pointer_base{};
+                    if (uc_mem_read(cpu_, regs.ip, code_bytes.data(), code_bytes.size()) == UC_ERR_OK) {
+                        message << " code=";
+                        for (uint8_t byte : code_bytes)
+                            message << std::hex << std::setw(2) << std::setfill('0')
+                                    << unsigned(byte);
+                        message << std::dec << std::setfill(' ');
+                    }
+                    if (uc_mem_read(cpu_, 0x120cc6, &pointer_base, sizeof(pointer_base)) == UC_ERR_OK)
+                        message << " pointer_base=0x" << std::hex << pointer_base << std::dec;
+                    std::array<uint32_t, 8> stack_words{};
+                    if (uc_mem_read(cpu_, regs.sp, stack_words.data(),
+                                    sizeof(stack_words)) == UC_ERR_OK) {
+                        message << " stack=";
+                        for (size_t i = 0; i < stack_words.size(); ++i) {
+                            if (i) message << ',';
+                            message << "0x" << std::hex << stack_words[i];
+                        }
+                        message << std::dec;
+                    }
+                    if (!patch_hit_counts_.empty()) {
+                        message << " patch_hits=";
+                        bool first = true;
+                        for (const auto& [address, count] : patch_hit_counts_) {
+                            if (!count) continue;
+                            if (!first) message << ',';
+                            first = false;
+                            message << "0x" << std::hex << address << std::dec
+                                    << ':' << count;
+                        }
+                        message << " patch_sequence=";
+                        for (size_t i = 0; i < patch_hit_sequence_.size(); ++i) {
+                            if (i) message << ',';
+                            message << "0x" << std::hex << patch_hit_sequence_[i] << std::dec;
+                        }
+                    }
+                    throw std::runtime_error(message.str());
+                }
                 completed += amount;
             }
             if (pending_copy_) finish_fast_copy();
@@ -1447,7 +1524,7 @@ public:
         const double seconds = std::chrono::duration<double>(
             std::chrono::steady_clock::now() - start).count();
         const Registers regs = read_regs();
-        std::cout << "status=" << status_ << " interrupts=" << interrupts_
+        std::cout << "\nstatus=" << status_ << " interrupts=" << interrupts_
                   << " ticks=" << ticks_ << " irq0=" << irq0_
                   << " ip=0x" << std::hex << regs.ip << " ax=0x" << regs.ax
                   << std::dec << "\n";
@@ -1579,6 +1656,10 @@ public:
                 total += count;
             }
             std::cout << "patch_hits: total=" << total << '\n';
+            std::cout << "patch_sequence:";
+            for (uint32_t address : patch_hit_sequence_)
+                std::cout << " 0x" << std::hex << address << std::dec;
+            std::cout << '\n';
         }
         for (const auto& [address, length] : guest_hash_ranges_) {
             std::vector<uint8_t> bytes(length);
@@ -1652,6 +1733,7 @@ private:
     std::vector<uc_hook> capture_hooks_;
     std::vector<uc_hook> patch_hooks_;
     std::map<uint32_t, uint64_t> patch_hit_counts_;
+    std::vector<uint32_t> patch_hit_sequence_;
     std::vector<std::pair<uint32_t, uint32_t>> guest_hash_ranges_;
     std::unordered_map<uint32_t, unsigned> capture_remaining_, capture_sequence_;
     std::filesystem::path capture_dir_;
@@ -2549,7 +2631,13 @@ private:
     static void on_patch_hit(uc_engine*, uint64_t address, uint32_t, void* user) {
         auto* machine = static_cast<Machine*>(user);
         const auto found = machine->patch_hit_counts_.find(static_cast<uint32_t>(address));
-        if (found != machine->patch_hit_counts_.end()) ++found->second;
+        if (found != machine->patch_hit_counts_.end()) {
+            ++found->second;
+            constexpr size_t trace_limit = 128;
+            if (machine->patch_hit_sequence_.size() == trace_limit)
+                machine->patch_hit_sequence_.erase(machine->patch_hit_sequence_.begin());
+            machine->patch_hit_sequence_.push_back(static_cast<uint32_t>(address));
+        }
     }
     static void on_capture_call(uc_engine*, uint64_t address, uint32_t, void* user) {
         auto* machine = static_cast<Machine*>(user);
@@ -2679,7 +2767,8 @@ private:
         } else if (ax == 0x3501 || ax == 0x3502 || ax == 0x3503 || ax == 0x3504 || ax == 0x3505) {
             if (!selector_service(ax, before, after)) return;
         } else if (ax == 0x2502 || ax == 0x2503 || ax == 0x2504 || ax == 0x2505 ||
-                   ax == 0x2506 || ax == 0x250c || ax == 0x2532 || ax == 0x2533) {
+                   ax == 0x2506 || ax == 0x2507 || ax == 0x250c ||
+                   ax == 0x2532 || ax == 0x2533) {
             uint32_t vec = before.cx & 255;
             if (ax == 0x2502) {
                 after.bx = protected_vectors_[vec].first;
@@ -2690,6 +2779,12 @@ private:
             else if (ax == 0x2506) {
                 protected_vectors_[vec] = {before.dx, before.ds};
                 real_vectors_[vec] = 0xf0000000 | (vec << 2);
+            } else if (ax == 0x2507) {
+                // X-32 restores a paired real/protected vector. Startup uses
+                // CL for the vector, EBX for its real-mode target, and DS:EDX
+                // for the protected-mode target (see 0x120b93/0x120bbc).
+                protected_vectors_[vec] = {before.dx, before.ds};
+                real_vectors_[vec] = before.bx;
             } else if (ax == 0x2532 && vec < 16) {
                 const auto [target, selector] = vec < 8 ? protected_vectors_[vec] : exception_vectors_[vec];
                 after.bx = target;
@@ -3088,7 +3183,7 @@ void usage(const char* program) {
               << "       [--controls auto|keyboard|joystick] (virtual EF2000.CFG)\n"
               << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
-              << "       [--trace-patch-entry ADDR] (repeatable, trace selected patched entries)\n"
+              << "       [--trace-patch-entry ADDR] (repeatable, trace guest code addresses)\n"
               << "       [--trace-archive-lookups] (unique DID pathname requests on stderr)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
               << "       [--wav-capture DIR] (lossless SB16 and/or CD PCM WAV segments)\n"
@@ -3416,8 +3511,6 @@ int main(int argc, char** argv) {
         }
         if (captures > 4)
             throw std::runtime_error("--capture-calls supports at most four snapshots per run");
-        if (!capture_targets.empty() && !patch_paths.empty())
-            throw std::runtime_error("capture original calls in an unpatched run");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace ||
             self_test_fast_copy || self_test_archive_lookup || self_test_patch_hits) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
@@ -3605,6 +3698,9 @@ int main(int argc, char** argv) {
         const size_t original_image_size = image.size();
         std::vector<uint32_t> patch_entries;
         std::pair<uint32_t, uint32_t> reserved_arena{};
+        for (uint32_t address : trace_patch_entries)
+            if (address >= IMAGE_SIZE)
+                throw std::runtime_error("traced code address exceeds guest memory");
         if (!patch_paths.empty()) {
             const auto original_digest = sha256_bytes(image);
             std::vector<ef2000::PatchWrite> writes;
@@ -3615,24 +3711,14 @@ int main(int argc, char** argv) {
             }
             ef2000::validate_patch_writes(writes, original_image_size, IMAGE_SIZE);
             uint32_t arena_start = IMAGE_SIZE, arena_end = 0;
-            for (const auto& write : writes) patch_entries.push_back(write.offset);
-            if (!trace_patch_entries.empty()) {
-                const std::set<uint32_t> available(patch_entries.begin(), patch_entries.end());
-                for (uint32_t address : trace_patch_entries)
-                    if (!available.contains(address))
-                        throw std::runtime_error("traced address is not a patch write entry");
-                patch_entries = trace_patch_entries;
-            }
             for (const auto& write : writes) {
+                patch_entries.push_back(write.offset);
                 if (write.offset >= original_image_size) {
                     arena_start = std::min(arena_start, write.offset);
                     arena_end = std::max(arena_end,
                                          write.offset + uint32_t(write.bytes.size()));
                 }
             }
-            for (const auto& write : writes)
-                std::cout << "patch: addr=0x" << std::hex << write.offset << std::dec
-                          << " bytes=" << write.bytes.size() << '\n';
             ef2000::apply_efpatches(image, writes);
             if (arena_end) {
                 if (arena_start == IMAGE_SIZE)
@@ -3642,6 +3728,8 @@ int main(int argc, char** argv) {
             std::cout << "patches: applied " << patch_paths.size()
                       << " in-place EFPATCH1 file(s), " << writes.size() << " writes\n";
         }
+        if (!trace_patch_entries.empty())
+            patch_entries = trace_patch_entries;
         if (game_dir.empty()) game_dir = fs::path(path).parent_path().string();
         if (cd_dir.empty()) cd_dir = game_dir;
         Machine machine(image, game_dir, cd_dir, overlay_dir, sound_mode, trace_interrupts,

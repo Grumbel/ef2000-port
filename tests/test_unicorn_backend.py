@@ -373,6 +373,15 @@ class UnicornStartupServiceTests(unittest.TestCase):
         self.assertEqual((query['bx'], query['es']), (0x12345, 0x2c))
         self.assertEqual(vectors.protected[8][0], IMAGE_SIZE + 0x100)
 
+    def test_x32_paired_vector_restore(self):
+        vectors = VectorState()
+        regs = dict(self.regs, ax=0x2507, cx=0x68, bx=0x24680,
+                    dx=0x13579, ds=0x2c, flags=0x203)
+        result = vectors.service(regs)
+        self.assertEqual(vectors.protected[0x68], (0x13579, 0x2c))
+        self.assertEqual(vectors.real[0x68], 0x24680)
+        self.assertEqual(result['flags'] & 1, 0)
+
     def test_conventional_memory_bounds(self):
         ram = ConventionalMemory()
         allocated = ram.allocate(dict(self.regs, bx=0x100))

@@ -143,6 +143,20 @@ class ManifestTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'guest hash reports'):
             replay_suite.parse_output(status, set(), [(0x300, 4)])
 
+    def test_guest_fault_parser_keeps_bisection_stop_and_progress(self):
+        stderr = ('ef2000-unicorn-cpp: instruction-counted guest execution: '
+                  'Invalid memory write (UC_ERR_WRITE_UNMAPPED) ip=0x22 '
+                  'sp=0x401c791 ticks=172 irqs=0 ax=0x0 '
+                  'patch_hits=0x20:3,0x40:1 patch_sequence=0x20,0x40\n')
+        result = replay_suite.parse_guest_fault(stderr, {0x20, 0x40, 0x60})
+        self.assertEqual(result['status'], {
+            'status': 'guest_fault:Invalid memory write (UC_ERR_WRITE_UNMAPPED)',
+            'interrupts': 0, 'ticks': 172, 'irq0': 0, 'ip': 0x22})
+        self.assertEqual(result['patch_hits'], {'0x20': 3, '0x40': 1, '0x60': 0})
+        self.assertEqual(result['runner_fault'],
+                         'Invalid memory write (UC_ERR_WRITE_UNMAPPED)')
+        self.assertIsNone(replay_suite.parse_guest_fault('runner crashed before guest'))
+
 
 class SyntheticReplayTests(unittest.TestCase):
     def setUp(self):

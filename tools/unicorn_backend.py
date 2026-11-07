@@ -586,6 +586,9 @@ class VectorState:
         elif function == 0x2506:
             self.protected[vector] = (regs['dx'], regs['ds'])
             self.real[vector] = 0xf0000000 | (vector << 2)
+        elif function == 0x2507:
+            self.protected[vector] = (regs['dx'], regs['ds'])
+            self.real[vector] = regs['bx']
         elif function == 0x2532 and vector < 16:
             result['bx'], result['es'] = (self.protected[vector] if vector < 8
                                            else self.exceptions[vector])

@@ -655,3 +655,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   functions (125,300 bytes), 589 `manual`, and 15 compile errors: 40.8% of
   functions and 23.0% of report body bytes. This is compile and ABI evidence;
   it does not pass the menu replay.
+- Menu-focused hybrid checkpoint, 2026-11-07: an event-free 200M-instruction
+  `main-menu` replay passes with a reduced 1,227-entry hybrid (6,135 redirected
+  entry bytes; 591,819 total patch-write bytes). The replay reaches the same
+  `instruction_limit` state as the original at IP `0x110de6`, with 14,547
+  interrupts, 800 ticks, 756 IRQ0s, matching framebuffer output, and matching
+  guest RAM hash at `0x195fb0:65536`; canary `0xe7835` is hit. This proves the
+  reduced hybrid preserves the event-free main-menu replay through its budget,
+  but does not yet prove interactive menu navigation. The full 2,452-entry
+  hybrid still faults at guest IP `0x4`, tick 560. Four bisection rounds leave
+  1,531 candidate entries and do not isolate the full-image failure. M1/M2
+  remain unpassed; next checkpoint is a private-Xvfb replay with menu input
+  against the passing reduced image.

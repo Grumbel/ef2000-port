@@ -29,6 +29,11 @@ STATUS = re.compile(r'^status=(\w+) interrupts=(\d+) ticks=(\d+) irq0=(\d+) ip=0
 PATCH_HIT = re.compile(r'^patch_hit: addr=0x([0-9a-f]+) count=(\d+)$', re.M)
 PATCH_TOTAL = re.compile(r'^patch_hits: total=(\d+)$', re.M)
 GUEST_HASH = re.compile(r'^guest_hash: addr=0x([0-9a-f]+) length=(\d+) sha256=([0-9a-f]{64})$', re.M)
+GUEST_FAULT = re.compile(
+    r'instruction-counted guest execution:\s*(.*?)\s+ip=0x([0-9a-f]+)\s+'
+    r'sp=0x[0-9a-f]+\s+ticks=(\d+)\s+irqs=(\d+)')
+FAULT_PATCH_HITS = re.compile(r'patch_hits=([^\s]+)')
+FAULT_PATCH_HIT = re.compile(r'0x([0-9a-f]+):(\d+)')
 EVENT_ARITY = {'--mouse-event': 4, '--key-event': 4, '--joystick-event': (4, 6)}
 MAX_EVENTS = 128
 MAX_CASES = 32
@@ -177,6 +182,29 @@ def parse_output(output, expected_patches, expected_hashes=()):
     return status, hits, hashes
 
 
+def parse_guest_fault(output, expected_patches=()):
+    """Parse a Unicorn guest memory/instruction fault as a replay stop.
+
+    The runner exits nonzero for these guest faults, but the stop address and
+    timer counters remain useful evidence for hybrid bisection.
+    """
+    match = GUEST_FAULT.search(output)
+    if not match:
+        return None
+    status = {'status': 'guest_fault:' + match[1], 'interrupts': 0,
+              'ticks': int(match[3]), 'irq0': int(match[4]),
+              'ip': int(match[2], 16)}
+    hits = {address: 0 for address in expected_patches}
+    hit_list = FAULT_PATCH_HITS.search(output)
+    if hit_list:
+        for hit in FAULT_PATCH_HIT.finditer(hit_list[1]):
+            hits[int(hit[1], 16)] = int(hit[2])
+    return {'status': status,
+            'patch_hits': {f'0x{address:x}': count for address, count in hits.items()},
+            'guest_hashes': {}, 'frame_sha256': None,
+            'runner_fault': match[1]}
+
+
 def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, timeout,
             sound_mode):
     output.mkdir(parents=True, exist_ok=False)
@@ -196,21 +224,32 @@ def run_one(runner, executable, game_dir, cd_dir, patch_files, case, output, tim
         command.extend(['--hash-guest', f'0x{address:x}:{length}'])
     for patch in patch_files:
         command.extend(['--patch', str(patch)])
+    trace_addresses = set(case.get('trace_addresses', []))
     if patch_files:
-        for address in sorted(case.get('must_hit', [])):
-            command.extend(['--trace-patch-entry', '0x%x' % address])
+        trace_addresses.update(case.get('must_hit', []))
+    for address in sorted(trace_addresses):
+        command.extend(['--trace-patch-entry', '0x%x' % address])
+    expected_patches = set(case.get('patch_addresses', set())) | trace_addresses
     try:
         finished = subprocess.run(command, cwd=output, capture_output=True,
-                                  text=True, timeout=timeout, check=False)
+                                  text=True, encoding='utf-8', errors='replace',
+                                  timeout=timeout, check=False)
     except subprocess.TimeoutExpired as error:
         raise ValueError(f'{case["name"]}: runner timed out after {timeout} seconds') from error
     (output / 'stdout.log').write_text(finished.stdout)
     (output / 'stderr.log').write_text(finished.stderr)
     if finished.returncode:
-        raise ValueError(f'{case["name"]}: runner returned {finished.returncode}; see {output}')
-    status, hits, hashes = parse_output(finished.stdout, case.get('patch_addresses', set()),
+        fault = parse_guest_fault(finished.stderr, expected_patches)
+        if fault:
+            return fault
+        if not STATUS.search(finished.stdout):
+            raise ValueError(f'{case["name"]}: runner returned {finished.returncode}; see {output}')
+    status, hits, hashes = parse_output(finished.stdout, expected_patches,
                                        case.get('guest_hashes', []))
-    if status['status'] not in ('instruction_limit', 'guest_exit'):
+    allowed_stops = ('instruction_limit', 'guest_exit')
+    if case.get('allow_no_framebuffer', False):
+        allowed_stops += ('unsupported_interface',)
+    if status['status'] not in allowed_stops:
         raise ValueError(f'{case["name"]}: unexpected guest stop: {status["status"]}')
     if not framebuffer.is_file() and not case.get('allow_no_framebuffer', False):
         raise ValueError(f'{case["name"]}: guest framebuffer was not saved')

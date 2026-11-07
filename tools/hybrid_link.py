@@ -46,6 +46,28 @@ def read_tsv(path):
         return list(csv.DictReader(stream, delimiter='\t'))
 
 
+def load_exclusions(path, image_size):
+    """Load persistent guest-entry exclusions from an optional TSV file."""
+    if not path.is_file():
+        return {}
+    lines = [line for line in path.read_text().splitlines()
+             if line.strip() and not line.lstrip().startswith('#')]
+    reader = csv.DictReader(lines, delimiter='\t')
+    if reader.fieldnames != ['addr', 'reason']:
+        raise ValueError('hybrid exclude list requires addr and reason columns')
+    exclusions = {}
+    for row in reader:
+        address = int(row['addr'], 0)
+        if not 0 <= address < image_size:
+            raise ValueError('hybrid exclusion address outside initialized payload')
+        if not row['reason'].strip():
+            raise ValueError('hybrid exclusion requires a reason')
+        if address in exclusions:
+            raise ValueError('duplicate address in hybrid exclude list')
+        exclusions[address] = row['reason']
+    return exclusions
+
+
 def symbol_spellings(value):
     values = {value}
     if value.startswith('_'):
@@ -409,7 +431,7 @@ def main(argv=None):
     parser.add_argument('--image', type=Path, required=True,
                         help='SHA-pinned initialized EF2000 payload.bin')
     parser.add_argument('--hand-objects', type=Path, action='append',
-                        default=[ROOT / 'local/hybrid/obj'],
+                        default=None,
                         help='directory containing OpenWatcom hand-written objects')
     parser.add_argument('--mechanical-dir', type=Path,
                         default=ROOT / 'local/mechanical')
@@ -440,18 +462,7 @@ def main(argv=None):
         hand_object_dirs = args.hand_objects or [ROOT / 'local/hybrid/obj']
         objects, selected = load_objects(hand_object_dirs, args.mechanical_dir,
                                          report_path)
-        explicit_excludes = {}
-        if args.exclude_list.is_file():
-            exclude_lines = [line for line in args.exclude_list.read_text().splitlines()
-                             if line.strip() and not line.lstrip().startswith('#')]
-            reader = csv.DictReader(exclude_lines, delimiter='\t')
-            if reader.fieldnames != ['addr', 'reason']:
-                raise ValueError('hybrid exclude list requires addr and reason columns')
-            for row in reader:
-                address = int(row['addr'], 0)
-                if not 0 <= address < len(source):
-                    raise ValueError('hybrid exclusion address outside initialized payload')
-                explicit_excludes[address] = row['reason']
+        explicit_excludes = load_exclusions(args.exclude_list, len(source))
         for value in args.exclude_address:
             address_text, separator, reason = value.partition(':')
             explicit_excludes[int(address_text, 0)] = (
