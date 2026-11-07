@@ -1293,7 +1293,8 @@ public:
 
     void trace_patch_entry_state(bool enabled) { trace_patch_entry_state_ = enabled; }
 
-    void enable_block_state_trace(const fs::path& path, uint64_t block_limit) {
+    void enable_block_state_trace(const fs::path& path, uint64_t block_limit,
+                                  uint32_t start_address = 0) {
         if (path.empty() || !block_limit)
             throw std::runtime_error("block-state trace needs a path and positive limit");
         trace_stream_.open(path, std::ios::out | std::ios::trunc);
@@ -1301,7 +1302,8 @@ public:
             throw std::runtime_error("cannot open block-state trace: " + path.string());
         trace_stream_ << "block,address,size,eip,esp,eax,ebx,ecx,edx,esi,edi,ebp,eflags,cs,ds,es,ss,fs,gs,stack0,stack1,stack2,stack3,stack4,stack5,stack6,stack7\n";
         trace_block_limit_ = block_limit;
-        trace_started_ = true;
+        trace_start_address_ = start_address;
+        trace_started_ = start_address == 0;
         check(uc_hook_add(cpu_, &trace_block_hook_, UC_HOOK_BLOCK,
                           (void*)on_block_state, this, 1, 0),
               "install block-state trace hook");
@@ -2851,13 +2853,20 @@ private:
                       << " cx=" << before.cx << " dx=" << before.dx << std::dec << '\n';
             if (vector != 0x21 || ax == 0x3502) {
                 uint32_t stack[3]{};
+                uint32_t frame[3]{};
                 const bool stack_read = uc_mem_read(cpu_, before.sp, stack, sizeof(stack)) == UC_ERR_OK;
+                const bool frame_read = before.bp <= UINT32_MAX - 20 &&
+                    uc_mem_read(cpu_, before.bp + 8, frame, sizeof(frame)) == UC_ERR_OK;
                 std::cerr << "cpp-int-state: cs=" << std::hex << before.cs
                           << " ss=" << before.ss << " ds=" << before.ds
                           << " es=" << before.es << " fs=" << before.fs
                           << " gs=" << before.gs << " esp=" << before.sp
+                          << " ebp=" << before.bp
                           << " stack=";
                 if (stack_read) std::cerr << stack[0] << ',' << stack[1] << ',' << stack[2];
+                else std::cerr << "unreadable";
+                std::cerr << " frame=";
+                if (frame_read) std::cerr << frame[0] << ',' << frame[1] << ',' << frame[2];
                 else std::cerr << "unreadable";
                 std::cerr << std::dec << '\n';
             }
@@ -3321,7 +3330,7 @@ void usage(const char* program) {
               << "       [--trace-joystick] (selected SDL device and sampled input)\n"
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
               << "       [--trace-patch-entry ADDR] (repeatable, trace guest code addresses)\n"
-              << "       [--trace-block-state FILE] [--trace-block-limit N] (CSV basic-block registers/segments/stack)\n"
+              << "       [--trace-block-state FILE] [--trace-block-start ADDR] [--trace-block-limit N] (CSV basic-block registers/segments/stack)\n"
               << "       [--trace-instruction-state FILE --trace-instruction-start ADDR] [--trace-instruction-limit N]\n"
               << "       [--trace-archive-lookups] (unique DID pathname requests on stderr)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
@@ -3372,6 +3381,7 @@ int main(int argc, char** argv) {
         std::vector<std::pair<uint32_t, uint32_t>> capture_memory_ranges;
         fs::path capture_dir;
         fs::path trace_block_state;
+        uint32_t trace_block_start{};
         uint64_t trace_block_limit = 250000;
         fs::path trace_instruction_state;
         uint32_t trace_instruction_start{};
@@ -3398,6 +3408,13 @@ int main(int argc, char** argv) {
                 trace_patch_entries.push_back(uint32_t(address));
             } else if (!std::strcmp(argv[i], "--trace-block-state") && i + 1 < argc) {
                 trace_block_state = argv[++i];
+            } else if (!std::strcmp(argv[i], "--trace-block-start") && i + 1 < argc) {
+                size_t end{};
+                const std::string value = argv[++i];
+                const uint64_t address = std::stoull(value, &end, 0);
+                if (end != value.size() || address >= IMAGE_SIZE)
+                    throw std::runtime_error("--trace-block-start expects a guest address");
+                trace_block_start = uint32_t(address);
             } else if (!std::strcmp(argv[i], "--trace-block-limit") && i + 1 < argc) {
                 size_t end{};
                 const std::string value = argv[++i];
@@ -3681,6 +3698,8 @@ int main(int argc, char** argv) {
             throw std::runtime_error("--profile-video-frames requires --windowed or --fullscreen");
         if (!trace_block_state.empty() && !trace_instruction_state.empty())
             throw std::runtime_error("choose either block-state or instruction-state tracing");
+        if (trace_block_state.empty() && trace_block_start)
+            throw std::runtime_error("--trace-block-start requires --trace-block-state");
         if (!trace_instruction_state.empty() && !trace_instruction_start)
             throw std::runtime_error("--trace-instruction-state requires --trace-instruction-start");
         if (!window.overlay_frame_bmp.empty() && !window.enabled)
@@ -3930,7 +3949,8 @@ int main(int argc, char** argv) {
         machine.use_guest_dos_clock(guest_dos_clock);
         machine.use_guest_vga_clock(guest_vga_clock);
         if (!trace_block_state.empty())
-            machine.enable_block_state_trace(trace_block_state, trace_block_limit);
+            machine.enable_block_state_trace(trace_block_state, trace_block_limit,
+                                             trace_block_start);
         else if (!trace_instruction_state.empty())
             machine.enable_instruction_state_trace(trace_instruction_state,
                 trace_instruction_start, trace_instruction_limit);

@@ -2924,7 +2924,8 @@ void guest_fn_c3f80(uint32_t block); /* 0xc3f80 EAX */
 uint32_t alloc_aligned_510(uint32_t size);
 uint32_t start_request_628(uint32_t first, uint32_t second, int32_t third);
 void finish_request_6b8(uint32_t index);
-uint32_t start_timer_734(uint32_t source, uint32_t unused_dx, uint32_t flags);
+uint32_t start_timer_734(uint32_t source, uint32_t unused_dx, uint32_t flags,
+                         uint32_t selector);
 void copy_pending_name_6b50(void);
 uint32_t read_header_list_f198(void);
 uint32_t read_record_header_f604(ef_addr32 record);
@@ -2940,7 +2941,8 @@ uint32_t EF_CDECL guest_fn_9c220(uint32_t a, uint32_t b, uint32_t c); /* 0x9c220
 uint32_t EF_CDECL guest_fn_9c23d(uint32_t a, uint32_t b, uint32_t c); /* 0x9c23d cdecl */
 uint32_t guest_fn_324(uint32_t a); /* 0x324 EAX */
 uint64_t guest_fn_348(uint32_t a); /* 0x348 EAX -> EDX:EAX */
-void guest_fn_484(uint32_t a, uint32_t b, uint32_t c); /* 0x484 EAX/EDX/EBX */
+void guest_fn_484(uint32_t a, uint32_t b, uint32_t c,
+                  uint32_t selector); /* 0x484 EAX/EDX/EBX/ECX */
 void guest_fn_b3c04(uint32_t a, uint32_t b); /* 0xb3c04 EAX/EDX */
 void guest_fn_f13c(ef_addr32 entry); /* 0xf13c EAX */
 void guest_fn_f314(ef_addr32 entry, uint32_t value); /* 0xf314 EAX/EDX */
@@ -4902,6 +4904,11 @@ void guest_fn_d1afc_x(void); /* 0xd1afc unknown, no arguments */
 
 void segread_9be0d(ef_addr32 out);
 void int386x_core_9c47a(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+/* The entry consumes the interrupt number and input block in ESI/EDI. */
+#pragma aux int386x_core_9c47a parm [esi] [edi] [edx] [ebx] \
+    modify [eax ecx esi edi]
+#endif
 uint32_t int386x_9c461(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs);
 uint32_t int386_9c446(uint32_t intno, uint32_t in, uint32_t out);
 uint32_t guest_seg_x(uint32_t which); /* segment register selector: 0 ES, 1 CS, 2 SS, 3 DS, 4 FS, 5 GS */
@@ -6789,9 +6796,10 @@ uint32_t dpmi_present_11cda5(void); /* 0x11cda5 */
 uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count); /* 0x110393 */
 
 void dosx_int21_2502_3f8(uint32_t a, uint32_t b, uint32_t c);
-void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c);
+void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c, uint32_t selector);
 void dosx_int21_2502_3f8(uint32_t a, uint32_t b, uint32_t c); /* 0x3f8 */
-void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c); /* 0x484 */
+void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c,
+                         uint32_t selector); /* 0x484 */
 
 void draw_textured_span_ff3bc(void);
 void draw_textured_span_ff3bc(void); /* 0xff3bc */

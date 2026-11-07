@@ -23504,9 +23504,10 @@ void dosx_int21_2502_3f8(uint32_t a, uint32_t b, uint32_t c)
 }
 
 /* 0x484, 140 bytes. DOS-extender int 21h AX=2506h through the register block at 0x196148. */
-void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c)
+void dosx_int21_2506_484(uint32_t a, uint32_t b, uint32_t c, uint32_t selector)
 {
-	dosx_call_196148(0x2506u, a, b, c);
+	(void)c;
+    dosx_call_196148(0x2506u, a, b, selector);
 }
 
 /* 0xff3bc, 217 bytes. Textured horizontal span: from X0 (0x485fe8>>16) to X1 (0x485fd0>>16) on the row at table 0x163200[0x485fec>>16] into the screen base 0x15b754, stepping the 8.8 texture coordinates (0x485ff0/0x485ff4 to 0x485fd8/0x485fdc) through the colour map at 0x159084 (mask 0x158f20). Writes width+1 pixels. */

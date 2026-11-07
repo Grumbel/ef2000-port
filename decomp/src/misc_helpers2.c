@@ -140,9 +140,6 @@ void initialize_input_services_cd4d4(void)
     uint16_t code_selector = (uint16_t)guest_seg_x(1u);
     uint16_t data_selector = (uint16_t)guest_seg_x(3u);
 
-#if defined(__WATCOMC__)
-    __asm { push ecx }
-#endif
     if (EF_U8(0x0015b72eu) != 1u) {
         set_keyboard_leds_cd414(0u);
         init_keys_cd430();
@@ -151,14 +148,12 @@ void initialize_input_services_cd4d4(void)
                                                    code_selector, 0xd5);
         EF_U32(0x0041f82cu) = start_request_628(0x0041f833u,
                                                    data_selector, 0x118);
-        EF_U32(0x0041f824u) = start_timer_734(9u, 0u, 0x000fe61fu);
+        EF_U32(0x0041f824u) = start_timer_734(9u, 0u, 0x000fe61fu,
+                                               code_selector);
         if (EF_U8(0x0015b72eu) == 0u)
             guest_fn_9c3cf(0x000cd554u);
         EF_U8(0x0015b72eu) = 1u;
     }
-#if defined(__WATCOMC__)
-    __asm { pop ecx }
-#endif
 }
 
 /* 0xf23ac, 49 bytes. For each byte of the string at ECX call 0xf2320(x, y, byte & 0x3f), x += 8. */

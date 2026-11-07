@@ -28,12 +28,13 @@ def build_patch(executable, object_dir, output):
         raise ValueError(f'no recovered OpenWatcom objects in {object_dir}')
     functions = hybrid_link.read_tsv(ROOT / 'decomp/symbols/functions.tsv')
     globals_ = hybrid_link.read_tsv(ROOT / 'decomp/symbols/globals.tsv')
+    signatures = hybrid_link.read_tsv(ROOT / 'decomp/symbols/signatures.tsv')
     exclusions = hybrid_link.load_exclusions(
         ROOT / 'decomp/symbols/hybrid-exclude.tsv', len(image))
     blob, report = hybrid_link.link(
         objects, functions, globals_, {}, image,
         hybrid_link.load_abi_aliases(ROOT / 'decomp/include/ef_abi.h'),
-        explicit_excludes=exclusions)
+        explicit_excludes=exclusions, signatures=signatures)
     output.write_bytes(blob)
     print('ef2000-decomp: %d recovered C functions, %d redirect bytes, '
           '%d arena bytes; %d/%d modules linked' % (

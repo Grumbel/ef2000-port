@@ -22,10 +22,21 @@ uint32_t guest_inp_x(uint32_t port)
 
 /* The hybrid keeps these DOS dispatchers in the original image: they execute
  * the X-32 interrupt thunk and preserve its flags/register-block quirks. */
+static void call_int386x_original(uint32_t intno, uint32_t in,
+                                  uint32_t out, uint32_t sregs);
+#pragma aux call_int386x_original parm [eax] [edx] [ebx] [ecx] \
+    modify [eax ecx edx esi edi] = \
+    "mov esi,eax" \
+    "mov edi,edx" \
+    "mov edx,ebx" \
+    "mov ebx,ecx" \
+    "mov eax,0x0009c47a" \
+    "call eax"
+
 void guest_dos_int_x(uint32_t intno, uint32_t in, uint32_t out,
                      uint32_t sregs)
 {
-    int386x_core_9c47a(intno, in, out, sregs);
+    call_int386x_original(intno, in, out, sregs);
 }
 
 void guest_dos_intdos_x(uint32_t in, uint32_t out, uint32_t sregs)

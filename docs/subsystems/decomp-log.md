@@ -37,6 +37,31 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   video device`). Mechanical report remains 442/1,020 `ok` (138,459/543,917
   bytes), 578 `manual`, zero compile errors.
 
+- M1 trace diagnosis, 2026-11-07: a paired deterministic headless C++ Unicorn
+  trace (guest DOS/VGA clocks, 100,000 instructions per timer tick, separate
+  fresh overlays) places the first confirmed preserved-register divergence at
+  `apply_options_82cec` (`0x82cec`), called from `0x8b472`. Both images enter
+  with ECX=`0xc9c0`; the original body explicitly saves/restores EBX, ECX and
+  EDX, as recorded in `signatures.tsv`. At the following caller boundary
+  (`0x8b477`, immediately before the call to `0xcd4d4`), the original retains
+  ECX=`0xc9c0`, while the hybrid has ECX=0. The OpenWatcom listing for the
+  compiled body has a `push edx` but no `push ecx`: the aux pragma describes
+  caller-visible effects but does not make this C body save the extra original
+  callee-preserved register. This is a systemic arena/C ABI gap, not evidence
+  for blind single-function demotion. The subsequent X-32 thunk trace shows
+  ECX=`0x2f` at `0x734` in the original and 0 in the hybrid; at `0x4dc` the
+  original's `pop ds` restores selector `0x2f`, while the hybrid restores 0,
+  before the following `int 0x21` at `0x4e0`. Thus `0x4dc` is the DS-pop
+  symptom, not the interrupt instruction itself. A linker-level
+  preserved-register trampoline and generated OpenWatcom ABI pragmas are now
+  implemented. Relinking the currently available 341-object set redirects
+  1,744 functions (8,720 entry bytes) into a 492,036-byte arena, including
+  2,828 trampolines (50,256 bytes); 257 modules link. This is link evidence
+  only: the local OpenWatcom toolchain could not be invoked because Nix
+  attempted to write its read-only fetcher cache, so the changed C sources
+  have not been recompiled and the patched image has not been replayed. M1
+  remains unpassed.
+
 - Menu-focused hybrid diagnostic, 2026-11-07: rebuilt the 160-entry menu
   patch from 143 hand-written and 17 mechanical functions, then used the
   automatic bisector to isolate `0x8e494` as the single candidate that

@@ -69,7 +69,8 @@ void finish_request_6b8(uint32_t index)
 }
 
 /* 0x734, 120 bytes. Take a free 14-byte timer slot, fill it from the source and start it. */
-uint32_t start_timer_734(uint32_t source, uint32_t unused_dx, uint32_t flags)
+uint32_t start_timer_734(uint32_t source, uint32_t unused_dx, uint32_t flags,
+                         uint32_t selector)
 {
     uint32_t free_index;
     uint32_t slot;
@@ -86,7 +87,7 @@ uint32_t start_timer_734(uint32_t source, uint32_t unused_dx, uint32_t flags)
     result = guest_fn_348(source);
     EF_U16(0x001960d0u + slot * 2u) = (uint16_t)(result >> 32);
     EF_U32(0x001960ccu + slot * 2u) = (uint32_t)result;
-    guest_fn_484(source, (uint32_t)(result >> 32), flags);
+    guest_fn_484(source, (uint32_t)(result >> 32), flags, selector);
     return free_index;
 }
 

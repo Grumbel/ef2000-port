@@ -62,9 +62,13 @@ def load_exclusions(path, image_size):
             raise ValueError('hybrid exclusion address outside initialized payload')
         if not row['reason'].strip():
             raise ValueError('hybrid exclusion requires a reason')
+        reason = row['reason'].strip()
         if address in exclusions:
-            raise ValueError('duplicate address in hybrid exclude list')
-        exclusions[address] = row['reason']
+            existing = exclusions[address]
+            if reason not in existing.split('; '):
+                exclusions[address] = existing + '; ' + reason
+        else:
+            exclusions[address] = reason
     return exclusions
 
 
@@ -133,9 +137,11 @@ def load_objects(hand_dirs, mechanical_dir, report_path):
 
 
 def link(objects, functions, globals_, mechanical_selected, image,
-         abi_aliases, arena_base=DEFAULT_ARENA, explicit_excludes=None):
+         abi_aliases, arena_base=DEFAULT_ARENA, explicit_excludes=None,
+         signatures=None):
     explicit_excludes = explicit_excludes or {}
     function_by_addr = {int(row['addr'], 16): row for row in functions}
+    signature_by_addr = {int(row['addr'], 16): row for row in signatures or []}
     function_by_name = {}
     for row in functions:
         if row['name']:
@@ -234,7 +240,60 @@ def link(objects, functions, globals_, mechanical_selected, image,
             cursor = align(cursor, segment.align)
             record['addresses'][index] = cursor
             cursor += segment.size
-    arena_end = cursor
+    code_arena_end = cursor
+
+    # C-generated bodies use OpenWatcom's normal callee-save set. Original
+    # EF2000 callers also expect several functions to preserve ECX/EDX (and
+    # occasionally other GPRs). Route every eligible external call and entry
+    # through a small ABI trampoline that saves exactly those additional
+    # registers. The trampoline calls the compiled body, so register inputs
+    # and the declared return register pass through unchanged.
+    trampoline_targets = {}
+    trampoline_records = []
+    trampoline_cursor = code_arena_end
+    register_codes = {'eax': 0, 'ecx': 1, 'edx': 2, 'ebx': 3,
+                      'ebp': 5, 'esi': 6, 'edi': 7}
+    signature_skip_reasons = {}
+    for address, (record, public) in sorted(eligible_entries.items()):
+        signature = signature_by_addr.get(address)
+        if not signature:
+            signature_skip_reasons[address] = 'confirmed signature row missing'
+            continue
+        if signature['stack_bytes'] not in ('', '0'):
+            signature_skip_reasons[address] = 'stack arguments need a stack-aware trampoline'
+            continue
+        preserved = {item.strip().lower() for item in signature['preserved'].split(',')
+                     if item.strip()}
+        if not preserved <= set(register_codes):
+            signature_skip_reasons[address] = 'unsupported preserved-register set'
+            continue
+        outputs = [item.strip() for item in signature['outputs'].split(',') if item.strip()]
+        if len(outputs) > 1:
+            signature_skip_reasons[address] = 'multiple return registers need a custom trampoline'
+            continue
+        if outputs:
+            output_reg = outputs[0].split(':', 1)[0].lower()
+            output_reg = {'al': 'eax', 'ax': 'eax', 'bl': 'ebx', 'bx': 'ebx',
+                          'cl': 'ecx', 'cx': 'ecx', 'dl': 'edx', 'dx': 'edx'}.get(
+                              output_reg, output_reg)
+            preserved.discard(output_reg)
+        regs = [reg for reg in register_codes if reg in preserved]
+        body = record['addresses'][public.segment] + public.offset
+        start = trampoline_cursor
+        code = bytearray(0x50 + register_codes[reg] for reg in regs)
+        call_next = start + len(code) + 5
+        displacement = body - call_next
+        if not -(1 << 31) <= displacement < (1 << 31):
+            signature_skip_reasons[address] = 'trampoline call target is out of range'
+            continue
+        code.extend(b'\xe8' + (displacement & 0xffffffff).to_bytes(4, 'little'))
+        code.extend(0x58 + register_codes[reg] for reg in reversed(regs))
+        code.append(0xc3)
+        trampoline_records.append((start, bytes(code), address))
+        trampoline_targets[address] = start
+        trampoline_cursor += len(code)
+
+    arena_end = trampoline_cursor
     if arena_end >= STACK_TOP:
         raise OMFError('linked arena overlaps the guest stack region')
     arena = bytearray(arena_end - arena_base)
@@ -245,6 +304,9 @@ def link(objects, functions, globals_, mechanical_selected, image,
                 continue
             offset = record['addresses'][index] - arena_base
             arena[offset:offset + segment.size] = segment.data
+    for address, code, _guest_address in trampoline_records:
+        offset = address - arena_base
+        arena[offset:offset + len(code)] = code
 
     def original_symbol(symbol):
         guest_entry = parse_guest_entry(symbol)
@@ -273,7 +335,8 @@ def link(objects, functions, globals_, mechanical_selected, image,
             if address in eligible_entries:
                 record, public = eligible_entries[address]
                 if record in active_modules:
-                    return record['addresses'][public.segment] + public.offset
+                    return trampoline_targets.get(
+                        address, record['addresses'][public.segment] + public.offset)
             return address
         local_definitions = {
             (public.segment, public.offset): public
@@ -314,9 +377,17 @@ def link(objects, functions, globals_, mechanical_selected, image,
                     if fixup.location != 9:
                         raise OMFError('unsupported fixup width %d' % fixup.location)
                     if fixup.frame_method == 1:
-                        if (fixup.frame_index is None or
-                                module.groups[fixup.frame_index]['name'].upper() != 'FLAT'):
-                            raise OMFError('fixup frame is not FLAT')
+                        if fixup.frame_index is None:
+                            raise OMFError('fixup group frame is missing')
+                        group = module.groups[fixup.frame_index]
+                        group_name = group['name'].upper()
+                        if group_name == 'DGROUP':
+                            if any(module.segments[index].cls.upper() not in
+                                   ('DATA', 'BSS')
+                                   for index in group['segments']):
+                                raise OMFError('DGROUP contains a non-data segment')
+                        elif group_name != 'FLAT':
+                            raise OMFError('unsupported fixup group %r' % group['name'])
                     elif fixup.frame_method not in (4, 5):
                         raise OMFError('unsupported fixup frame method %d' %
                                        fixup.frame_method)
@@ -360,7 +431,8 @@ def link(objects, functions, globals_, mechanical_selected, image,
         if record not in active_modules:
             excluded.append((address, 'module link failed: ' + record['excluded']))
             continue
-        target = record['addresses'][public.segment] + public.offset
+        target = trampoline_targets.get(
+            address, record['addresses'][public.segment] + public.offset)
         displacement = target - (address + 5)
         if not -(1 << 31) <= displacement < (1 << 31):
             excluded.append((address, 'rel32 target is out of range'))
@@ -407,6 +479,9 @@ def link(objects, functions, globals_, mechanical_selected, image,
         'arena_base': arena_base,
         'arena_end': arena_end,
         'arena_bytes': len(arena),
+        'compiled_code_bytes': code_arena_end - arena_base,
+        'abi_trampolines': len(trampoline_records),
+        'abi_trampoline_bytes': sum(len(code) for _, code, _ in trampoline_records),
         'object_modules': len(modules),
         'linked_modules': len(active_modules),
         'functions_redirected': redirect_count,
@@ -422,6 +497,8 @@ def link(objects, functions, globals_, mechanical_selected, image,
         'excluded_functions': len(excluded),
         'excluded': [{'addr': '0x%08x' % address, 'reason': reason}
                      for address, reason in sorted(set(excluded))],
+        'unwrapped_abi': [{'addr': '0x%08x' % address, 'reason': reason}
+                          for address, reason in sorted(signature_skip_reasons.items())],
         'module_exclusions': [{'module': record['path'].name,
                                'reason': record['excluded']}
                               for record in modules if record['excluded']],
@@ -444,6 +521,8 @@ def main(argv=None):
                         default=ROOT / 'decomp/symbols/functions.tsv')
     parser.add_argument('--globals', type=Path,
                         default=ROOT / 'decomp/symbols/globals.tsv')
+    parser.add_argument('--signatures', type=Path,
+                        default=ROOT / 'decomp/symbols/signatures.tsv')
     parser.add_argument('--abi-header', type=Path, default=ABI_HEADER)
     parser.add_argument('--arena-base', type=lambda value: int(value, 0),
                         default=DEFAULT_ARENA)
@@ -473,7 +552,7 @@ def main(argv=None):
         blob, report = link(objects, read_tsv(args.functions), read_tsv(args.globals),
                             selected, source,
                             load_abi_aliases(args.abi_header), args.arena_base,
-                            explicit_excludes)
+                            explicit_excludes, read_tsv(args.signatures))
         args.output.parent.mkdir(parents=True, exist_ok=True)
         with args.output.open('xb') as stream:
             stream.write(blob)
