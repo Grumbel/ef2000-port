@@ -893,3 +893,17 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   once, 0xf227f 13 times, and the verified 0xe7835 72 times; traced entries
   0x9cfdc, 0xa7ac8 and 0xa7a64 are not reached. The fault remains the unmapped
   read at IP 0x3ffe6e7, address 0x3d80c3c0. M1 is still unpassed.
+- Focused menu launch exploration, 2026-11-07: the saved 154-function menu
+  hybrid was replayed again under private Xvfb. Main menu and quick-fight
+  setup still match their repeated original baselines in status, timing
+  counters, framebuffer and selected guest RAM. From the simulator mission
+  selection screen, clicking the rendered “Akzeptieren” button reaches the
+  mission loading screen. At 900M instructions, original and patched runs
+  match status/counters and selected guest RAM; the framebuffer differs in
+  eight pixels during the loading animation. At 1.5B, the original continues
+  to IP 0x110de6 (32,175 interrupts / 5,952 IRQ0s), while the patched image
+  reaches IP 0 (29,924 interrupts / 4,485 IRQ0s) with different guest RAM.
+  The exact 154-entry composition was bisected for this launch case; after
+  11 trials, 95 candidates remain in the 0x8bb50..0x944f4 scene/UI cluster.
+  This does not change the passing menu-to-setup checkpoint or M1/M2 status;
+  simulator launch remains unresolved.
