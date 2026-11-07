@@ -7,3 +7,5 @@ addr	reason
 0x000c36b4	Mechanical replacement loses the EAX/EDX/EBX/ECX plus two-stack-argument ABI; automatic M1 bisector identifies this entry alone as sufficient for the startup read fault. Keep original bytes pending manual recovery.
 0x000a9e70	Mechanical GUI dispatch loop causes invalid instruction at IP 0x4df015 (tick 650); bisector isolates this entry. Keep original body pending hand recovery.
 0x0015c0c4	Focused menu-accept bisector: the mechanically compiled replacement is sufficient for an invalid-write path at guest address 0x19655800. Keeping original bytes reaches the instruction limit without a crash; RAM/framebuffer equivalence remains unresolved.
+0x000002b0	The guest DOS bridge delegates intdos to the original X-32 dispatcher to preserve its INT 21h path and unwritten carry-word quirk; patching this replacement would recurse.
+0x0009c47a	The guest DOS bridge delegates int386x to the original X-32 interrupt thunk; patching this replacement would recurse and lose the original thunk behavior.

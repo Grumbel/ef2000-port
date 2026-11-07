@@ -970,3 +970,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   “BIOS INT 13”. The stop is a segment-restore exception, not a disk request;
   exception delivery/selector state is now the next M1 investigation. Menu
   checkpoints remain passing; M1 and cockpit remain unpassed.
+- M1 hybrid link refresh, 2026-11-07: rebuilt all 340 current `decomp/src`
+  modules with OpenWatcom, zero warnings/errors. Added shared protected-mode
+  segment and port-I/O helpers, DOS dispatch bridges that preserve the
+  original X-32 interrupt entries, and missing indirect-call adapters. The
+  full link redirects 2,551 functions (12,755 entry bytes; 597,188 arena
+  bytes; 718/796 modules; 609,943 total bytes changed), including 406 of 429
+  mechanical `ok` bodies. The private-Xvfb 500M main-menu replay still fails
+  at invalid instruction IP `0x155034`, tick 651, before `0x106bfc`; M1 remains
+  unpassed. A 31-trial full-set bisect did not isolate a stable minimal set:
+  demotions led to several different early failures and 637 candidates remain.
+  The four-register callback adapter's emitted code exposed and fixed an
+  incorrect stack offset; the fresh 340-module link and replay still stop at
+  the same IP. The bisect must be rerun against that refreshed image.
