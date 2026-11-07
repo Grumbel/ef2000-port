@@ -75,22 +75,21 @@ first control-mode gate, [batch 126](../docs/subsystems/decomp-batch-126.md)
 verifies the paired mode B/C setters, and [batch 127](../docs/subsystems/decomp-batch-127.md)
 verifies the signed link-pointer lookup and its unaligned candidate override;
 [batch 128](../docs/subsystems/decomp-batch-128.md) verifies its record updater.
-M0 mechanically compiles 411/1,020 available unrecovered Ghidra exports
-(40.3%, 125,051/543,917 body bytes = 23.0%) with OpenWatcom v2; 594 exports
+M0 mechanically compiles 416/1,020 available unrecovered Ghidra exports
+(40.8%, 125,300/543,917 body bytes = 23.0%) with OpenWatcom v2; 589 exports
 remain `manual` and 15 have compile errors. Hand-written recovered C covers
 364,031 body bytes (40.0%); together with mechanical `ok` exports, potential
-hybrid coverage is 489,082/908,947 tracked body bytes (53.8%). A focused
+hybrid coverage is 489,331/908,947 tracked body bytes (53.8%). A focused
 two-function image redirects `init_far_stub_b04` and `to_lower_ascii` and
 passes the main-menu and quick-fight-setup replay cases. The broader image
-was relinked with the current mechanical report: 2,448 functions (2,043
-hand-written, 405 mechanical), 12,240 entry bytes, 584,852 arena bytes, and
-2,283 exclusions across 697/759 modules. This new image has not been replayed.
-The previous 2,433-redirect image, after excluding its linked
-`original_memcpy` candidate, faults at guest IP `0x4` on tick 469. The
-focused image has not been tested through the cockpit, and M1/M2 remain
-unpassed. A private Xvfb replay is currently blocked: even with a private
-mount namespace providing a root-owned `/tmp/.X11-unix`, Xvfb cannot bind its
-local/unix listeners. See the latest replay and compiler evidence in
+was relinked with 2,452 functions (2,043 hand-written, 409 mechanical),
+12,260 entry bytes, a 585,684-byte arena and 597,944 total patch bytes, with
+2,285 exclusions across 702/764 modules. The main-menu replay, with the
+mechanically generated `original_memcpy` kept original due its callee-clean
+stack ABI, faults at guest IP `0x4` on tick 560. The focused image has not
+been tested through the cockpit, and M1/M2 remain unpassed. The private-Xvfb
+bisector is still blocked because Xvfb cannot bind its private listeners in
+this environment. See the latest replay and compiler evidence in
 [`decomp-log.md`](../docs/subsystems/decomp-log.md).
 See also
 [the quantitative status and remaining-work report](../docs/decompilation-status-2026-11-05.md),

@@ -103,10 +103,30 @@ void refresh_named_widget_abce8(void)
 /* 0xdeb50, 49 bytes. Fill a block with a repeating four-byte pattern. */
 void fill_pattern_deb50(ef_addr32 dst, uint32_t pattern, uint32_t count)
 {
-    uint32_t i;
+    uint32_t dword_count;
 
-    for (i = 0; i < count; i++)
-        EF_U8(dst + i) = (uint8_t)(pattern >> (8u * (i & 3u)));
+    if (count == 0)
+        return;
+
+    while ((dst & 3u) != 0) {
+        EF_U8(dst) = (uint8_t)pattern;
+        ++dst;
+        pattern = (pattern >> 8) | (pattern << 24);
+        if (--count == 0)
+            return;
+    }
+
+    dword_count = count >> 2;
+    guest_fn_deb87(dst, pattern, dword_count);
+    dst += dword_count << 2;
+    count &= 3u;
+
+    if (count > 0)
+        EF_U8(dst) = (uint8_t)pattern;
+    if (count > 1)
+        EF_U8(dst + 1u) = (uint8_t)(pattern >> 8);
+    if (count > 2)
+        EF_U8(dst + 2u) = (uint8_t)pattern;
 }
 
 /* 0xe474c, 56 bytes. Store two arguments and run the shutdown call chain. */

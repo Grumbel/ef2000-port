@@ -11,8 +11,10 @@
 static uint32_t formatted_width_common(ef_addr32 fmt, va_list ap, uint32_t shift)
 {
     char buf[0x50];
+    uint32_t arg_cursor = (uint32_t)(uintptr_t)&ap[0];
     uint32_t w;
-    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt,
+                           (uint32_t)(uintptr_t)&arg_cursor);
     if (EF_U8(0x0012b369u) == 0u)
         return text_width_159a0((uint32_t)(uintptr_t)buf);
     w = guest_fn_b1b8b((uint32_t)(uintptr_t)buf);

@@ -83,9 +83,8 @@ uint8_t scene_record_unset_940e0(void)
 }
 
 /* 0x9c1bb, 37 bytes. Convert a real-mode segment:offset dword to a linear address. */
-uint32_t real_mode_to_linear_9c1bb(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t seg_off)
+uint32_t real_mode_to_linear_9c1bb(uint32_t seg_off)
 {
-    (void)u0; (void)u1; (void)u2; (void)u3;
     return (seg_off >> 16) * 16u + EF_U32(0x00120cc6u) + (seg_off & 0xffffu);
 }
 

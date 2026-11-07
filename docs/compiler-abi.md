@@ -3610,7 +3610,7 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0xd1d40` | EAX:uint32_t,EDX:uint32_t | none | d1da8@d1dde,d1de8@d1e31 | Set the screen size and run the video start-up sequence. |
-| `0xdeb87` | EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t | none | a3b48@a3b59,deb50@deb67 | Fill count dwords at dst with value. |
+| `0xdeb87` | EAX:ef_addr32,EDX:uint32_t,ECX:uint32_t | none | a3b48@a3b59,deb50@deb67 | Fill count dwords at dst with value; both callers load the count in ECX. |
 | `0xe284c` | EAX:ef_addr32,DX:uint16_t | EAX:uint32_t | a63c0@a63d4 | Width in pixels of a string in the given font. |
 | `0xe994c` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t | none | 80b14@80b95,83a40@83a66,a04b4@a0511 | Build a rotation matrix and optionally mirror it. |
 | `0xe99b8` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t,ECX:int32_t | none | 80b14@80ba5,83734@83737,a04b4@a0526 | Transform a vector by the current matrix (result doubled). |
@@ -4124,7 +4124,7 @@ in EAX, format string address, one value).
 | `0xbbbe4` | AL:uint8_t | AL:uint8_t | bbdc4@bbdd9 | Map a code 0..36 to a flag. |
 | `0xbbd8c` | AL:uint8_t | AL:uint8_t | bbdc4@bbe00 | Map a code 1..100 to a class 0..8 (0 when out of range). |
 | `0x940e0` | none | AL:uint8_t | 94a74@94cdf | Whether the scene record pointer is unset. |
-| `0x9c1bb` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 9be38@9be69,9be38@9be83,9be38@9be99 | Convert a real-mode segment:offset dword to a linear address. |
+| `0x9c1bb` | [ESP+4]:uint32_t | EAX:uint32_t | 9be38@9be69,9be38@9be83,9be38@9be99 | Reads the segment:offset argument from [EBP+8]; callers push it. |
 | `0x5ca60` | none | none | 598e8@5997a | Read the 9th stream value into a local and apply it when valid. |
 
 ## game_helpers78 (2026-11-03)
@@ -4162,7 +4162,8 @@ in EAX, format string address, one value).
 | --- | --- | --- | --- | --- |
 | `0x8b328` | EAX:ef_addr32,EDX:int32_t,EBX:int32_t | EAX:ef_addr32 | 8b39c@8b3c5,8b39c@8b3f8,8b39c@8b40c | Format a number right-aligned into a field of the given width, with ',' every 3 digits. |
 | `0x8b684` | AX:int16_t,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32 | AL:uint8_t | 8b7e8@8b84d | Start (mode 1) or continue a directory scan; returns 1 when no more entries. |
-| `0x9bfe3` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:int32_t | EAX:uint32_t | 9be38@9bebb,9be38@9bf12,9be38@9bf34 | Add an offset to a segment:offset pair, renormalising so the offset stays in 0..0xffff. |
+| `0x9be38` | [ESP+4]:uint32_t | EAX:uint32_t | 510@516 | Read the allocation size from [EBP+8]; caller pushes the argument. |
+| `0x9bfe3` | [ESP+4]:uint32_t,[ESP+8]:int32_t | EAX:uint32_t | 9be38@9bebb,9be38@9bf12,9be38@9bf34 | Add an offset to a segment:offset pair, renormalising so the offset stays in 0..0xffff. Original instructions read both arguments from the stack; no register inputs. |
 | `0x9fdd4` | none | EAX:int32_t | 9fea8@9feb6 | Select the entry with the smallest rating below 10 and activate it; -1 slot ends early. |
 | `0xa9878` | EAX:ef_addr32 | none | a9e70@a9fab | Build a status line from three fragments, store the title, and refresh. |
 
@@ -6383,7 +6384,7 @@ in EAX, format string address, one value).
 | `0xfe541` | EAX:uint32_t | EAX:uint32_t | none direct | DOS delete file (int 21h, AH = 0x41) NAME: 0 on success, otherwise the translated DOS error (0x1101e8) of the failing co |
 | `0x10f0e8` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t | EAX:uint32_t | f1d90@f1e7d,10f1bf@10f23c | DOS read (int 21h, AH = 0x3f): read COUNT bytes from HANDLE into BUFFER. Returns the byte count, or the translated DOS e |
 | `0xfe710` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | cdb20@cdbae,cdc64@cdc83 | Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low |
-| `0xeb288` | EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t | EAX:uint32_t | 9be38@9bf6d | DOS allocate memory (int 21h, AH = 0x48) for PARAGRAPHS (16-bit): returns the segment/selector, or 0 when the allocation |
+| `0xeb288` | [ESP+4]:uint32_t | EAX:uint32_t | 9be38@9bf6d | Reads the paragraph count from [EBP+8]; caller pushes it at 0x9bf6c. |
 | `0xded1a` | EAX:uint32_t,EDX:uint32_t | none | decde@decf4,decfb@ded10 | When the file-search mode byte 0x132a5e is 9, copy the 0x2b-byte DOS DTA (address from int 21h, AH = 0x2f) to the buffer |
 | `0xded3d` | EAX:uint32_t,EDX:uint32_t | none | decfb@ded02 | The reverse of 0xded1a: copy the 0x2b bytes at SRC into the DOS DTA. |
 

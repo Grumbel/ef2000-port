@@ -12,10 +12,13 @@ void print_to_handle_b1bb0(uint32_t handle, ef_addr32 fmt, ...)
 {
     char buf[0x7c];
     va_list ap;
+    uint32_t arg_cursor;
     uint32_t len;
 
     va_start(ap, fmt);
-    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt,
+                           (uint32_t)(uintptr_t)&arg_cursor);
     len = guest_fn_b1b8b((uint32_t)(uintptr_t)buf);
     write_handle_a7a1c(0, 0, 0, 0, handle, len, (uint32_t)(uintptr_t)buf);
     va_end(ap);

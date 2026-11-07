@@ -2889,8 +2889,11 @@ void draw_shadowed_text_48c90(uint32_t color, int32_t x, int32_t y, ef_addr32 fm
 {
     char buf[0x78];
     va_list ap;
+    uint32_t arg_cursor;
     va_start(ap, fmt);
-    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt,
+                           (uint32_t)(uintptr_t)&arg_cursor);
     va_end(ap);
     if (EF_U8(0x0012b369u) == 1u) {
         if (EF_U8(0x00127b1au) != 0u)
@@ -3595,10 +3598,13 @@ void format_and_enter_eb2c0(ef_addr32 fmt, ...)
 {
     char buf[0x284];
     va_list ap;
+    uint32_t arg_cursor;
     EF_U8(0x00160794u)++;
     if (EF_U8(0x00160794u) == 1u) {
         va_start(ap, fmt);
-        format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+        arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+        format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt,
+                               (uint32_t)(uintptr_t)&arg_cursor);
         va_end(ap);
         strcat_9ca57((uint32_t)(uintptr_t)buf, 0x001915e0u);
         enter_handler_eb448((uint32_t)(uintptr_t)buf);
@@ -6341,10 +6347,9 @@ uint32_t set_and_check_video_mode_fe710(uint32_t u0, uint32_t u1, uint32_t u2, u
 }
 
 /* 0xeb288, 32 bytes. DOS allocate memory (int 21h, AH = 0x48) for PARAGRAPHS (16-bit): returns the segment/selector, or 0 when the allocation failed. Cdecl, one stack argument. */
-uint32_t dos_alloc_eb288(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t paragraphs)
+uint32_t dos_alloc_eb288(uint32_t paragraphs)
 {
     uint32_t out[7];
-    (void)u0; (void)u1; (void)u2; (void)u3;
     run_dos_int_ex(0x21u, 0x4800u, paragraphs & 0xffffu, 0u, 0u, out);
     if (out[6] != 0u)
         return 0u;
@@ -6587,8 +6592,11 @@ uint32_t report_formatted_e8784(ef_addr32 fmt, ...)
     if (EF_U8(0x001600a6u) != 0u) {
         char buf[0x140];
         va_list ap;
+        uint32_t arg_cursor;
         va_start(ap, fmt);
-        format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+        arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+        format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt,
+                               (uint32_t)(uintptr_t)&arg_cursor);
         va_end(ap);
         guest_callptr4c_x(EF_U32(0x00132a74u), 0x00190cc0u, EF_U32(0x00464390u), EF_U16(0x0016007cu), (uint32_t)(uintptr_t)buf);
     }
@@ -8463,8 +8471,11 @@ uint32_t alloc_zeroed_cc6c0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, 
     p = guest_fn_c3f70(size);
     if (p == 0u) {
         if (fmt != 0u) {
+            uint32_t arg_cursor;
             va_start(ap, fmt);
-            format_to_buffer_e3022((uint32_t)(uintptr_t)msg, fmt, (uint32_t)(uintptr_t)&ap[0]);
+            arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+            format_to_buffer_e3022((uint32_t)(uintptr_t)msg, fmt,
+                                   (uint32_t)(uintptr_t)&arg_cursor);
             va_end(ap);
         } else {
             for (i = 0; i < 17u; i++)
@@ -9256,13 +9267,15 @@ void log_message_ea50c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint3
     char msg[0x280];
     char line[0x280];
     va_list ap;
+    uint32_t arg_cursor;
     uint32_t m = (uint32_t)(uintptr_t)msg, l = (uint32_t)(uintptr_t)line;
     (void)u0; (void)u1; (void)u2; (void)u3;
     EF_U8(0x00160638u) = (uint8_t)(EF_U8(0x00160638u) + 1u);
     if ((int8_t)EF_U8(0x00160638u) != 1)
         return;
     va_start(ap, fmt);
-    format_to_buffer_e3022(m, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    format_to_buffer_e3022(m, fmt, (uint32_t)(uintptr_t)&arg_cursor);
     va_end(ap);
     if (msg[0] != 0 && EF_U32(0x00132a78u) != 0u) {
         rewrite_template_ea4c0();

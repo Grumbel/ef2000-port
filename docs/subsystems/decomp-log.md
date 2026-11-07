@@ -644,3 +644,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   585,684-byte code arena (597,944 patch bytes; 702/764 modules). The 500M
   main-menu replay then faults at guest IP `0x4` on tick 560. M1/M2 remain
   unpassed; menu navigation is not yet reached by this image.
+- M0 confirmed register lowering, 2026-11-07: OpenWatcom `parm` inputs now
+  name the containing register for narrow inputs (`DL` uses `EDX`, `BL` uses
+  `EBX`), while narrow output carriers retain `value [al]`/`[ax]` as confirmed.
+  WDIS for generated `0xb0208` reads the expected `DL` and `BL` bytes without
+  stack arguments; the `0x15c071` listing uses EBX/ECX/ESI/EDI as confirmed.
+  Generic fastcall formals are matched to confirmed live-in registers only
+  when their use and width agree, and exact `unaff_REG` live-ins are lowered
+  to those inputs. The full OpenWatcom report now has 416/1,020 `ok`
+  functions (125,300 bytes), 589 `manual`, and 15 compile errors: 40.8% of
+  functions and 23.0% of report body bytes. This is compile and ABI evidence;
+  it does not pass the menu replay.

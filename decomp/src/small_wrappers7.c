@@ -23,9 +23,9 @@ uint32_t sum_list_9c1e0(void)
     uint32_t total = guest_fn_eb2a8_x() << 4;
     uint32_t seg = EF_U32(0x00132a70u);
     while (seg != 0u) {
-        uint32_t node = real_mode_to_linear_9c1bb(0u, 0u, 0u, 0u, seg);
+        uint32_t node = real_mode_to_linear_9c1bb(seg);
         total += EF_U32(node + 4u);
-        node = real_mode_to_linear_9c1bb(0u, 0u, 0u, 0u, seg);
+        node = real_mode_to_linear_9c1bb(seg);
         seg = EF_U32(node);
     }
     return total;

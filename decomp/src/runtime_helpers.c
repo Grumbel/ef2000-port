@@ -296,10 +296,11 @@ int32_t times_100(int32_t value)
     return (int32_t)((uint32_t)value * 100u);
 }
 
-/* 0x106bfc, 32 bytes. value * 100 / 10. */
+/* 0x106bfc, 32 bytes. modulo-2^32 product, signed divide by 10. */
 int32_t times_100_div_10(int32_t value)
 {
-    return (value * 100) / 10;
+    int32_t product = (int32_t)((uint32_t)value * 100u);
+    return product / 10;
 }
 
 /* 0x106c3c, 22 bytes. 0xf8248() - EAX >= EDX (signed). */

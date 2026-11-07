@@ -58,12 +58,11 @@ uint8_t scan_directory_entry_8b684(int16_t mode, ef_addr32 name, ef_addr32 suffi
 }
 
 /* 0x9bfe3, 65 bytes. Add an offset to a segment:offset pair, renormalising so the offset stays in 0..0xffff. */
-uint32_t add_far_offset_9bfe3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t far_ptr, int32_t delta)
+uint32_t add_far_offset_9bfe3(uint32_t far_ptr, int32_t delta)
 {
     uint32_t seg = far_ptr >> 16;
     int32_t off = (int32_t)((far_ptr & 0xffffu) + (uint32_t)delta);
 
-    (void)u0; (void)u1; (void)u2; (void)u3;
     /* ORIGINAL BUG: the unsigned test also loops for negative offsets, so a negative delta walks the offset down through the 32-bit wrap. */
     while ((uint32_t)off > 0xffffu) {
         seg++;

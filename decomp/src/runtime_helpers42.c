@@ -39,10 +39,12 @@ int32_t stream_vprintf_fa815(ef_addr32 stream, ef_addr32 fmt, ef_addr32 args)
 int32_t stream_printf_bc400(ef_addr32 stream, ef_addr32 fmt, ...)
 {
     va_list ap;
+    uint32_t arg_cursor;
     int32_t result;
 
     va_start(ap, fmt);
-    result = stream_vprintf_fa815(stream, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    result = stream_vprintf_fa815(stream, fmt, (uint32_t)(uintptr_t)&arg_cursor);
     va_end(ap);
     return result;
 }
@@ -51,10 +53,12 @@ int32_t stream_printf_bc400(ef_addr32 stream, ef_addr32 fmt, ...)
 int32_t stdout_printf_cd12e(ef_addr32 fmt, ...)
 {
     va_list ap;
+    uint32_t arg_cursor;
     int32_t result;
 
     va_start(ap, fmt);
-    result = stream_vprintf_fa815(0x0016043eu, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    result = stream_vprintf_fa815(0x0016043eu, fmt, (uint32_t)(uintptr_t)&arg_cursor);
     va_end(ap);
     return result;
 }

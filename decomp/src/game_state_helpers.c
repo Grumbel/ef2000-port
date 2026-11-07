@@ -15,7 +15,7 @@ void init_far_stub_b04(void)
     ef_addr32 stub;
     EF_U32(0x00120d24u) = guest_fn_a60();
     EF_U32(0x0019613cu) = guest_fn_510(6);
-    selector = guest_fn_604();
+    selector = guest_fn_604_x(EF_U32(0x0019613cu));
     block = EF_U32(0x00120d24u);
     guest_fn_a9c(block, selector);
     stub = EF_U32(0x0019613cu);

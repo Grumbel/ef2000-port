@@ -13,9 +13,12 @@ int32_t formatted_text_width_48c34(uint32_t mode, ef_addr32 fmt, ...)
 {
     char buf[0x50];
     va_list ap;
+    uint32_t arg_cursor;
 
     va_start(ap, fmt);
-    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt,
+                           (uint32_t)(uintptr_t)&arg_cursor);
     va_end(ap);
     if ((uint8_t)mode == 1)
         return (int32_t)text_width_159a0((uint32_t)(uintptr_t)buf);
@@ -29,11 +32,14 @@ void draw_formatted_text_3d308(int32_t col, int32_t row, ef_addr32 fmt, ...)
 {
     char buf[0x50];
     va_list ap;
+    uint32_t arg_cursor;
     int32_t x;
     int32_t y;
 
     va_start(ap, fmt);
-    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt,
+                           (uint32_t)(uintptr_t)&arg_cursor);
     va_end(ap);
     x = (int16_t)(col << 3);
     y = (int16_t)(row * 9);
@@ -77,9 +83,12 @@ void draw_formatted_text_mode_48bb0(uint32_t color, uint32_t mode, int32_t x, in
 {
     char buf[0x50];
     va_list ap;
+    uint32_t arg_cursor;
 
     va_start(ap, fmt);
-    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt, (uint32_t)(uintptr_t)&ap[0]);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    format_to_buffer_e3022((uint32_t)(uintptr_t)buf, fmt,
+                           (uint32_t)(uintptr_t)&arg_cursor);
     va_end(ap);
     if ((uint8_t)mode == 1)
         guest_fn_15a14_x(color & 0xffu, (int16_t)x, (int16_t)y, (uint32_t)(uintptr_t)buf);

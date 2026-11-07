@@ -32,10 +32,12 @@ void reset_name_record_40e20(void)
 int32_t guest_sprintf_a4342(ef_addr32 buf, ef_addr32 fmt, ...)
 {
     va_list ap;
+    uint32_t arg_cursor;
     uint32_t length;
 
     va_start(ap, fmt);
-    length = guest_fn_ed133_f(buf, fmt, (uint32_t)(uintptr_t)&ap[0], 0x000a432fu);
+    arg_cursor = (uint32_t)(uintptr_t)&ap[0];
+    length = guest_fn_ed133_f(buf, fmt, (uint32_t)(uintptr_t)&arg_cursor, 0x000a432fu);
     va_end(ap);
     EF_U8(buf + length) = 0;
     return (int32_t)length;

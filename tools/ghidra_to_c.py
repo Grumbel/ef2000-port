@@ -143,9 +143,15 @@ def dat_expression(address, globals_):
     return access.get(ctype, 'EF_U32(%s)' % raw)
 
 
+# OpenWatcom pragma parameters name the containing register even for narrow
+# C values; a char in EDX is read from DL and a short in EAX from AX.
 REG32 = {'EAX': 'eax', 'EDX': 'edx', 'EBX': 'ebx', 'ECX': 'ecx', 'ESI': 'esi',
-         'EDI': 'edi', 'AL': 'al', 'AX': 'ax', 'DL': 'dl', 'DX': 'dx',
-         'BL': 'bl', 'BX': 'bx', 'CL': 'cl', 'CX': 'cx'}
+         'EDI': 'edi', 'AL': 'eax', 'AX': 'eax', 'DL': 'edx', 'DX': 'edx',
+         'BL': 'ebx', 'BX': 'ebx', 'CL': 'ecx', 'CX': 'ecx'}
+RETURN_REG = {'EAX': 'eax', 'EDX': 'edx', 'EBX': 'ebx', 'ECX': 'ecx',
+              'ESI': 'esi', 'EDI': 'edi', 'AL': 'al', 'AX': 'ax',
+              'DL': 'dl', 'DX': 'dx', 'BL': 'bl', 'BX': 'bx',
+              'CL': 'cl', 'CX': 'cx'}
 
 
 def pragma_for(name, sig):
@@ -157,7 +163,7 @@ def pragma_for(name, sig):
     text = '#pragma aux %s parm [%s]' % (name, '] ['.join(regs)) if regs else \
            '#pragma aux %s parm caller []' % name
     if outs:
-        out = REG32.get(outs[0][0].upper())
+        out = RETURN_REG.get(outs[0][0].upper())
         if out is None:
             return None
         text += ' value [%s]' % out
@@ -201,7 +207,8 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
         # Watcom register arguments: Ghidra shows them as in_<REG>.
         has_stack_inputs = any(
             re.fullmatch(r'\[?ESP\+\d+\]?', reg.upper()) for reg, _ in sig_in)
-        register_index = 0
+        generic_fastcall = bool(original and '__fastcall' in original_first)
+        register_parameter_indices = {}
         for reg, ctype in sig_in:
             stack = re.fullmatch(r'\[?ESP\+(\d+)\]?', reg.upper())
             if stack:
@@ -223,14 +230,82 @@ def convert(text, entry, names, sig_in=None, globals_=None, sig_out=None):
                                       ' ' + (declaration.group(2) or '')).strip()
                     body = body[:declaration.start()] + body[declaration.end():]
                 body = re.sub(r'\b' + name + r'\b', 'r_' + reg.lower(), body)
-            if not has_stack_inputs and register_index < len(original_params):
-                original_name = original_params[register_index]
-                if original_name and re.search(r'\b' + re.escape(original_name) + r'\b', body):
-                    parameter_type = parameter_type or original_param_types[register_index]
-                    body = re.sub(r'\b' + re.escape(original_name) + r'\b',
-                                  'r_' + reg.lower(), body)
             extra.append('%s r_%s' % (parameter_type or ctype or 'uint32_t', reg.lower()))
-            register_index += 1
+            register_parameter_indices[reg.upper()] = len(extra) - 1
+        # Ghidra's generic __fastcall formals are not necessarily listed in
+        # the same order as the confirmed Watcom register inputs. Prefer the
+        # conventional ECX/EDX fastcall slots for the first two formals;
+        # otherwise bind only a unique width-compatible confirmed input,
+        # excluding registers already represented by in_/unaff_ live-ins.
+        if generic_fastcall and not has_stack_inputs:
+            def type_width(ctype):
+                ctype = normalize_type(ctype or '').strip()
+                if '*' in ctype:
+                    return 32
+                if ctype in ('char', 'signed char', 'unsigned char', 'int8_t', 'uint8_t'):
+                    return 8
+                if ctype in ('short', 'unsigned short', 'int16_t', 'uint16_t'):
+                    return 16
+                if ctype in ('double', 'int64_t', 'uint64_t', 'long long', 'unsigned long long'):
+                    return 64
+                if ctype in ('long double', 'float10'):
+                    return 80
+                return 32
+            preferred = {0: 'ECX', 1: 'EDX'}
+            function_body = body.split('\n', 1)[1] if '\n' in body else ''
+            for parameter_index, original_name in enumerate(original_params):
+                if (not original_name or not re.fullmatch(r'param_\d+', original_name) or
+                        not re.search(r'\b' + re.escape(original_name) + r'\b', function_body)):
+                    continue
+                register = preferred.get(parameter_index)
+                if (register not in register_parameter_indices or
+                        re.search(r'\b(?:in|unaff)_' + register + r'\b', body)):
+                    register = None
+                if register is None:
+                    candidates = []
+                    for reg, ctype in sig_in:
+                        reg = reg.upper()
+                        if (reg not in register_parameter_indices or
+                                re.search(r'\b(?:in|unaff)_' + reg + r'\b', body)):
+                            continue
+                        if type_width(original_param_types[parameter_index]) == type_width(ctype):
+                            candidates.append(reg)
+                    if len(candidates) == 1:
+                        register = candidates[0]
+                if register is None:
+                    continue
+                index = register_parameter_indices[register]
+                extra[index] = '%s r_%s' % (
+                    original_param_types[parameter_index] or sig_in[index][1],
+                    register.lower())
+                body = re.sub(r'\b' + re.escape(original_name) + r'\b',
+                              'r_' + register.lower(), body)
+        # Ghidra uses unaff_REG for values it could not associate with a
+        # prototype.  Only lower one when the exact register is a confirmed
+        # input and the body does not write the register itself.
+        for register in sorted(set(re.findall(r'\bunaff_([A-Za-z0-9]+)\b', body))):
+            register = register.upper()
+            if register not in register_parameter_indices:
+                continue
+            name = 'unaff_' + register
+            if re.search(r'(?m)^\s*' + name +
+                         r'\s*(?:=(?!=)|\+\+|--|\+=|-=)', body):
+                continue
+            declaration = re.search(
+                r'(?m)^\s*([A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*)\s*(\*+)?\s*' +
+                re.escape(name) + r'\s*;\s*$', body)
+            parameter_type = None
+            if declaration:
+                parameter_type = (normalize_type(declaration.group(1)).strip() +
+                                  ' ' + (declaration.group(2) or '')).strip()
+                if (declaration.group(2) and
+                        re.search(r'\b' + name + r'\s*(?:<<|>>)', body)):
+                    continue
+                body = body[:declaration.start()] + body[declaration.end():]
+            index = register_parameter_indices[register]
+            extra[index] = '%s r_%s' % (
+                parameter_type or sig_in[index][1] or 'uint32_t', register.lower())
+            body = re.sub(r'\b' + name + r'\b', 'r_' + register.lower(), body)
     elif sig_in is None:
         # No confirmed signature: infer register inputs from in_<REG> uses.
         # HYPOTHESIS ONLY (plan rule 4); the pragma is marked inferred.
