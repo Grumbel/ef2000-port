@@ -35,6 +35,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   framebuffer hash, and different selected-RAM hash. The first crash was
   removed, but menu acceptance and cockpit entry are not yet behaviorally
   verified.
+- Demotion recorded, 2026-11-07: marked `0x15c0c4` `compiles-bad` and added
+  it to `decomp/symbols/hybrid-exclude.tsv`, so future hybrid links retain its
+  original body. A five-round bisect of the remaining no-crash mismatch did
+  not converge: 58 candidate entries remain. The current first failure is
+  selected RAM/framebuffer divergence (interrupt count differs by nine); M1
+  and M2 remain open.
 
 - M0 baseline, 2026-11-06: `ghidra_to_c.py --skip-recovered --compile` examined
   1,022 unrecovered functions. 287 generated (66,726 bytes), 735 manual

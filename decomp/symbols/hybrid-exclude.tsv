@@ -6,3 +6,4 @@ addr	reason
 0x000c4db4	Cockpit replay bisector: compiled replacement causes unmapped fetch at IP 0x15918c05/tick 3188. Original bytes avoid the fetch but cockpit counters, framebuffer and guest RAM still diverge; leave original pending ABI/behavior fix.
 0x000c36b4	Mechanical replacement loses the EAX/EDX/EBX/ECX plus two-stack-argument ABI; automatic M1 bisector identifies this entry alone as sufficient for the startup read fault. Keep original bytes pending manual recovery.
 0x000a9e70	Mechanical GUI dispatch loop causes invalid instruction at IP 0x4df015 (tick 650); bisector isolates this entry. Keep original body pending hand recovery.
+0x0015c0c4	Focused menu-accept bisector: the mechanically compiled replacement is sufficient for an invalid-write path at guest address 0x19655800. Keeping original bytes reaches the instruction limit without a crash; RAM/framebuffer equivalence remains unresolved.
