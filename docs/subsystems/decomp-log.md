@@ -736,3 +736,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `093589e38b35302a1300cd2172308935`) across trials, so that detail does not
   separate the present failure; the bisector's prior 50 trials remain
   unresolved and `to_lower_ascii` remains independently verified.
+- Focused simulator-menu navigation, 2026-11-07: the retained 154-function
+  hybrid (143 hand-written, 11 mechanical; 770 redirected entry bytes) passes
+  the repeated-baseline `simulator-menu-key-choice` replay. The scripted Q
+  and Enter input reaches the simulator difficulty and mission-selection
+  screen. Original and patched runs match at the 700M instruction limit
+  (33,348 interrupts, 2,800 ticks, 2,752 IRQ0s, IP `0x110de6`), with identical
+  framebuffer SHA-256
+  (`e19e27fcf72127a56a6b413c8fe7140282b9572a07c148af6c5a83daa2c95768`)
+  and selected 64 KiB guest hash
+  (`7d8931aaf9b6c03514c14258260489d68da529a53770edf20bb83a62a8306817`); the
+  compiled `to_lower_ascii` entry is hit 686 times. This verifies a focused
+  main-menu-to-simulator-selection path, not M1: the full hybrid still faults
+  during startup before the menu.
