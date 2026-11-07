@@ -24,6 +24,17 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   not passed. Added opt-in Unicorn entry/interrupt register-and-stack tracing
   to support the next bisector investigation; this trace change was compiled
   and exercised locally.
+- Menu accept follow-up, 2026-11-07: the bisector narrowed the unmapped-write
+  path to `0x15c0c4` as a minimal failure-inducing candidate (alone it causes
+  a selected-RAM mismatch). Its tracker entry is `typed/asm`, but M0 marked
+  the mechanical draft `ok` and the focused linker included it. Keeping both
+  `0x8e494` and `0x15c0c4` original produced a 158-entry patch (790 redirect
+  bytes; 450,484 arena bytes; 451,274 total patch bytes). The accept replay
+  now reaches its 6,000-tick instruction limit, matching baseline status and
+  tick count. It remains divergent: 32,166 vs 32,175 interrupts, different
+  framebuffer hash, and different selected-RAM hash. The first crash was
+  removed, but menu acceptance and cockpit entry are not yet behaviorally
+  verified.
 
 - M0 baseline, 2026-11-06: `ghidra_to_c.py --skip-recovered --compile` examined
   1,022 unrecovered functions. 287 generated (66,726 bytes), 735 manual
