@@ -7,6 +7,18 @@
 
 /* Rectangle outline, VGA palette upload and record message helpers. */
 
+/* 0xe9a24 takes three stack arguments and removes them on return. */
+static void palette_copy_e9a24(uint32_t length, ef_addr32 source, ef_addr32 destination)
+{
+    __asm {
+        push destination
+        push source
+        push length
+        mov eax, 0x000e9a24
+        call eax
+    }
+}
+
 /* 0x1f7d4, 102 bytes. Draw a rectangle outline with four tactical lines of marker a; x spans b..d, y spans c..e (e on the stack). */
 void draw_tactical_rect_1f7d4(int16_t a, int16_t b, int16_t c, int16_t d, int16_t e)
 {
@@ -76,7 +88,7 @@ void apply_palette_d663c(ef_addr32 palette)
     uint8_t buf[0x300];
     remap_palette_d65a8((uint32_t)(uintptr_t)buf, palette);
     upload_vga_palette_feec8((uint32_t)(uintptr_t)buf);
-    guest_fn_e9a24(0x300u, palette, 0x00420a90u);
+    palette_copy_e9a24(0x300u, palette, 0x00420a90u);
 }
 
 /* 0xd710c, 44 bytes. If a record's mode (+0x30) is 1, register its stack range (+8, length +0x10 minus 1) and set its field to 0x40 (cdecl, record on the stack). */

@@ -119,12 +119,17 @@ void load_record_table_8fe58(void)
 
     clear_blocks_8fe30();
     guest_fn_8fd70(buf, 0x0012db7cu, 0x0018aa98u);
-    if ((uint16_t)((uint32_t (*)(ef_addr32))EF_U32(0x00132ab4u))(buf) == 0)
-        return;
-    block = arena_take_e29e8((uint32_t)(int32_t)(int16_t)((uint32_t (*)(ef_addr32))EF_U32(0x00132ab4u))(buf));
+    {
+        int16_t size = (int16_t)guest_callptr_eax_ret_x(
+            EF_U32(0x00132ab4u), buf);
+        if (size == 0)
+            return;
+        block = arena_take_e29e8((uint32_t)(int32_t)size);
+    }
     if (block == 0)
         return;
-    if ((((uint32_t (*)(ef_addr32, ef_addr32))EF_U32(0x00132ab8u))(buf, block) & 0xffu) == 0)
+    if ((uint8_t)guest_callptr_eaxedx_ret_x(
+            EF_U32(0x00132ab8u), buf, block) == 0)
         return;
     EF_U16(0x00211ac8u) = EF_U16(block);
     EF_U16(0x00211acau) = EF_U16(block + 2u);

@@ -907,3 +907,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   11 trials, 95 candidates remain in the 0x8bb50..0x944f4 scene/UI cluster.
   This does not change the passing menu-to-setup checkpoint or M1/M2 status;
   simulator launch remains unresolved.
+- Focused menu ABI refresh, 2026-11-07: rebuilt seven OpenWatcom modules
+  against the current `ef_abi.h`: the five changed implementation modules
+  and both callers of `set_scene_angles`. All compile with zero warnings or
+  errors. The refreshed hybrid has 160 redirects (143 hand-written, 17
+  mechanical; 800 entry bytes, 594,740 arena bytes; 715/777 modules). Its
+  repeated-baseline main-menu, quick-fight-setup, and simulator-menu-key-choice
+  cases all pass with matching status, timing counters, framebuffer and
+  selected guest RAM. A 1.5B-instruction mission-accept replay proceeds beyond
+  menu selection; the original reaches its instruction limit at IP `0x110de6`
+  (32,175 interrupts / 5,952 IRQ0s), while the refreshed hybrid stops at
+  unsupported real-mode BIOS INT 13, IP `0x31a`, tick 4,557 (29,964
+  interrupts / 4,504 IRQ0s). This is beyond the passing menu checkpoint; M1
+  and cockpit remain unpassed.

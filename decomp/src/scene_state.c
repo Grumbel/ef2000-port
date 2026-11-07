@@ -5,6 +5,15 @@
 #include "ef_globals.h"
 #include "ef_guest_memory.h"
 
+static void call_c4654_stack3(uint32_t first, uint32_t second, uint32_t third);
+#pragma aux call_c4654_stack3 parm [eax] [edx] [ebx] \
+    modify [eax ebx ecx edx] = \
+    "mov ecx,0x000c4654" \
+    "push ebx" \
+    "push edx" \
+    "push eax" \
+    "call ecx"
+
 /* 0x0009125c, size 0x3c, 16 distinct caller functions. 0x18ab30 is
  * passed as the *address* of the directory name, never dereferenced here.
  * AX=0 and AX=-1 are explicit missing-key sentinels. */
@@ -60,7 +69,9 @@ void set_scene_input_triplet(int32_t x, int32_t y, int32_t z)
  * copies the low 16 bits of its three incoming values to 0x2144a4..a8. */
 void set_scene_angles(int16_t x, int16_t y, int16_t z)
 {
-    configure_scene_angles(z, y, x);
+    call_c4654_stack3((uint32_t)(int32_t)z,
+                      (uint32_t)(int32_t)y,
+                      (uint32_t)(int32_t)x);
     g_scene_last_angles[0] = x;
     g_scene_last_angles[1] = y;
     g_scene_last_angles[2] = z;

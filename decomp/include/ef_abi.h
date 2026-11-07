@@ -535,6 +535,7 @@ int32_t scene_metric_remaining(void); /* 0x91298, no arguments, EAX */
 uint8_t scene_metric_reaches_threshold(int32_t ignored, int32_t threshold); /* 0x918f0, EAX/EDX -> AL */
 void set_scene_input_triplet(int32_t x, int32_t y, int32_t z); /* 0x91910, EAX/EDX/EBX */
 void set_scene_angles(int16_t x, int16_t y, int16_t z); /* 0x9195c, AX/DX/BX */
+#pragma aux set_scene_angles parm [eax] [edx] [ebx] modify [eax edx ebx]
 void request_scene_pair(int32_t left, int32_t right); /* 0x91acc, EAX/EDX */
 void clear_scene_event_counters(void); /* 0x91c20 */
 void record_scene_event(int32_t packed_event); /* 0x91c48, EAX */

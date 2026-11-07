@@ -7,6 +7,8 @@
 
 /* Driver query, screen blit and name lookup helpers, 0xc3714..0xcc744. */
 
+typedef void (__stdcall *screen_blit_callback_t)(uint32_t, uint32_t, uint32_t);
+
 /* 0xc3714, 81 bytes. Query the driver and return its two 16-bit status words. */
 uint8_t query_driver_words_c3714(uint32_t request, ef_addr32 first, ef_addr32 second)
 {
@@ -23,7 +25,7 @@ uint8_t query_driver_words_c3714(uint32_t request, ef_addr32 first, ef_addr32 se
 /* 0xc3f1c, 52 bytes. Blit the screen buffer through the driver callback. */
 void blit_screen_c3f1c(void)
 {
-    ((void (*)(uint32_t, uint32_t, uint32_t))EF_U32(0x0041f3d0u))(
+    ((screen_blit_callback_t)EF_U32(0x0041f3d0u))(
         EF_U32(0x00164600u), EF_U32(0x0015b754u), EF_U32(0x00120cc6u) + 0xa0000u);
     if (EF_U8(0x00146e49u) != 0)
         guest_fn_c3a28();

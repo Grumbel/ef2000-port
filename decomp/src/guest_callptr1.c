@@ -29,3 +29,32 @@ void guest_callptr2_x(ef_addr32 fn, uint32_t arg0, uint32_t arg1)
 {
     call_cdecl_stack2(fn, arg0, arg1);
 }
+
+static uint32_t call_register_eax(uint32_t fn, uint32_t arg);
+#pragma aux call_register_eax parm [eax] [edx] modify [eax ecx edx] = \
+    "mov ecx,eax" \
+    "mov eax,edx" \
+    "call ecx"
+
+#pragma aux guest_callptr_eax_ret_x parm [eax] [edx] modify [eax ecx edx]
+uint32_t guest_callptr_eax_ret_x(ef_addr32 fn, uint32_t arg)
+{
+    return call_register_eax(fn, arg);
+}
+
+static uint32_t call_register_eaxedx(uint32_t fn, uint32_t arg0,
+                                     uint32_t arg1);
+#pragma aux call_register_eaxedx parm [eax] [edx] [ebx] \
+    modify [eax ecx edx] = \
+    "mov ecx,eax" \
+    "mov eax,edx" \
+    "mov edx,ebx" \
+    "call ecx"
+
+#pragma aux guest_callptr_eaxedx_ret_x parm [eax] [edx] [ebx] \
+    modify [eax ecx edx]
+uint32_t guest_callptr_eaxedx_ret_x(ef_addr32 fn, uint32_t arg0,
+                                    uint32_t arg1)
+{
+    return call_register_eaxedx(fn, arg0, arg1);
+}
