@@ -1192,3 +1192,12 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   but the guest then exits `0xff` parsing `supergui/System.gui` (`String "0" not
   recognised as a Variable`). The entry is marked `compiles-bad` pending a
   stack-aware thunk; menu remains unpassed.
+- Startup follow-up, 2026-11-08: retaining the original `0xe94ec` text loader
+  removes the `System.gui` parser error. With `0xe94ec` original, the next
+  fault is an invalid read in original `0xe9a24`; its caller frame is `0xe4f31`
+  and supplies a corrupt source pointer. The call path crosses `0xc92e4`, whose
+  confirmed ABI has four register inputs, four stack inputs, and `ret 0x10`.
+  The hybrid cannot build a stack-aware thunk, so restoring original `0xc92e4`
+  advances farther to the next invalid read. Both replacements are excluded:
+  `0xe94ec` for the observed parser behavior, `0xc92e4` for its unsupported
+  stack ABI. The main menu remains unpassed.
