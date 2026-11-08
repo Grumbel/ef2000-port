@@ -415,7 +415,7 @@ sequence selects Quick Combat, a mission and Accept through the guest BIOS
 mouse, then captures a real in-flight VGA frame:
 
 ```sh
-nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+nix run .#unicorn -- /path/to/_EF2000.EXE \
   --timer-instructions 100000 --instruction-limit 920000000 \
   --mouse-event 1400:165:110:0 --mouse-event 1450:165:110:1 \
   --mouse-event 1470:165:110:0 \
@@ -465,7 +465,7 @@ must be retimed. Using a full installation and a `--cd-dir` containing the
 game's expected CD marker, the sound-enabled script was:
 
 ```sh
-nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+nix run .#unicorn -- /path/to/_EF2000.EXE \
   --game-dir /path/to/EF2000 --cd-dir /path/to/cd-root \
   --sound sb16-dma --timer-instructions 100000 \
   --instruction-limit 1500000000 \
@@ -527,7 +527,7 @@ for other joysticks, and retries enumeration on hotplug. It offers the same
 For a reproduction on actual hardware:
 
 ```sh
-nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+nix run .#unicorn -- /path/to/_EF2000.EXE \
   --windowed --sound sb16-dma --controls joystick \
   --joystick auto --joystick-axes 0,1 --trace-joystick
 ```
@@ -695,10 +695,10 @@ For a repeatable menu comparison, run the same wall-time interval twice and
 compare the `video_frames:` output:
 
 ```sh
-nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+nix run .#unicorn -- /path/to/_EF2000.EXE \
   --windowed --joystick off --sound off --timing realtime \
   --wall-seconds 10 --profile-video-frames --fast-copy
-nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+nix run .#unicorn -- /path/to/_EF2000.EXE \
   --windowed --joystick off --sound off --timing realtime \
   --wall-seconds 10 --profile-video-frames --fast-copy-vga
 ```

@@ -22,7 +22,7 @@ The C++ runner now independently implements the read-only MSCDEX and CUE/BIN
 reader. Enable it explicitly (a directory by itself is not sufficient):
 
 ```sh
-nix run .#unicorn-cpp -- ../EF2000/c/EF2000/_EF2000.EXE \
+nix run .#unicorn -- ../EF2000/c/EF2000/_EF2000.EXE \
   --windowed --sound sb16-dma \
   --cd-dir ../EF2000_ISO/ --cd-cue ../EF2000_ISO/EF_DIR.cue
 ```

@@ -258,6 +258,7 @@
             "$out/share/man/man6" "$out/share/icons/hicolor/scalable/apps"
           cp -r objects/native64 objects/qemu "$out/lib/ef2000/"
           cp objects/ef2000-unicorn-cpp "$out/bin/ef2000-unicorn-cpp"
+          ln -s ef2000-unicorn-cpp "$out/bin/ef2000-unicorn"
           cp -r runtime tools probes "$out/libexec/ef2000/"
           cp VERSION "$out/libexec/ef2000/"
           cp -r docs README.md TODO.md VERSION "$out/share/doc/ef2000/"
@@ -295,7 +296,7 @@
             --add-flags "$out/libexec/ef2000/tools/unicorn_backend.py" \
             --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
             --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp"
-          makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn" \
+          makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn-py" \
             --add-flags "$out/libexec/ef2000/tools/unicorn_app.py" \
             --set EF2000_VERSION ${lib.escapeShellArg version} \
             --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
@@ -452,9 +453,9 @@
         nativeSb16 = app "${nativeSb16Workflow}/bin/ef2000-native-sb16"
           "Run the original EF2000 game with SB16 digital audio enabled";
         unicorn = app "${package}/bin/ef2000-unicorn"
-          "Run the original EF2000 game with the Unicorn and SDL3 backend";
-        unicorn-cpp = app "${package}/bin/ef2000-unicorn-cpp"
           "Run EF2000 in the native C++ Unicorn and SDL3 backend";
+        unicorn-py = app "${package}/bin/ef2000-unicorn-py"
+          "Run EF2000 with the slow, deprecated Python Unicorn and SDL3 backend";
         ghidra = app "${pkgs.ghidra}/bin/ghidra"
           "Open Ghidra to inspect the extracted EF2000 X-32 image";
         decomp = app "${decompWorkflow}/bin/ef2000-decomp"
@@ -466,7 +467,9 @@
         unicorn = unicorn;
         ef2000-unicorn = unicorn;
         ef2000-decomp = decomp;
-        unicorn-cpp = unicorn-cpp;
+        ef2000-unicorn-py = unicorn-py;
+        unicorn-py = unicorn-py;
+        unicorn-cpp = unicorn;
         ghidra = ghidra;
         ghidra-ef2000 = {
           type = "app";
@@ -520,10 +523,10 @@
           grep -q 'EF2000 installation directory or original _EF2000.EXE' "$out"
           grep -q 'unique directory under the EF2000 cache' "$out"
         '';
-        app-unicorn = pkgs.runCommand "ef2000-unicorn-app-check" {} ''
-          test -x ${package}/bin/ef2000-unicorn
-          ${package}/bin/ef2000-unicorn --help > "$out"
-          test "$(${package}/bin/ef2000-unicorn --version)" = ${lib.escapeShellArg "ef2000-unicorn ${version}"}
+        app-unicorn-py = pkgs.runCommand "ef2000-unicorn-py-app-check" {} ''
+          test -x ${package}/bin/ef2000-unicorn-py
+          ${package}/bin/ef2000-unicorn-py --help > "$out"
+          test "$(${package}/bin/ef2000-unicorn-py --version)" = ${lib.escapeShellArg "ef2000-unicorn ${version}"}
         '';
         app-decomp = pkgs.runCommand "ef2000-decomp-app-check" {} ''
           ${decompWorkflow}/bin/ef2000-decomp --help > "$out"
@@ -1120,12 +1123,12 @@
           printf '  ef2000-run [GAME_ARGS]          Build and run the original DOS game on Linux\n'
           printf '  ef2000-run-gdb [GAME_ARGS]      Build and debug the native game ELF in GDB\n\n'
           printf 'Portable original-code emulator (experimental, slower than native):\n'
-          printf '  nix run .#unicorn -- --data-dir /path/to/EF2000\n'
-          printf '                                  Start windowed Unicorn/SDL3 game frontend\n'
+          printf '  nix run .#unicorn -- /path/to/_EF2000.EXE --windowed\n'
+          printf '                                  Native C++ Unicorn/SDL3 menu and flight frontend\n'
+          printf '  nix run .#unicorn-py -- --data-dir /path/to/EF2000\n'
+          printf '                                  Deprecated slow Python frontend\n'
           printf '  nix run .#unicorn-probe -- /path/to/_EF2000.EXE\n'
           printf '                                  Run bounded headless startup diagnostics\n\n'
-          printf '  nix run .#unicorn-cpp -- /path/to/_EF2000.EXE --windowed\n'
-          printf '                                  Native C++ Unicorn/SDL3 menu and flight frontend\n\n'
           printf 'Windows MinGW cross-builds (original game assets are not included):\n'
           printf '  nix build .#ef2000-win64-zip    Windows x64 executable plus SDL3/Unicorn DLLs\n'
           printf '  nix build .#ef2000-win32-zip    Windows x86 executable plus SDL3/Unicorn DLLs\n\n'
