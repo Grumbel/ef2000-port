@@ -1201,3 +1201,11 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   advances farther to the next invalid read. Both replacements are excluded:
   `0xe94ec` for the observed parser behavior, `0xc92e4` for its unsupported
   stack ABI. The main menu remains unpassed.
+- Main-menu milestone, 2026-11-08: original disassembly for
+  `0xeb050`/`0xeb1f0` shows five caller-clean stack arguments; the recovered
+  declarations incorrectly add four register parameters. Restoring both
+  original entries removes the invalid framebuffer source read. A 20-second
+  headless native64 run with the fixed DOS clock renders the German main menu
+  at 640x400 without a guest fault. The patch redirects 1,737 functions,
+  8,685 entry bytes, and has a 493,338-byte arena across 257/341 modules. The
+  menu is reached, but the scripted quick-fight click remains unverified.

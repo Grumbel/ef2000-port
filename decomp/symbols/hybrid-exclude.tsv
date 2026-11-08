@@ -15,3 +15,5 @@ addr	reason
 0x000dc21c	Original callers pass four stack arguments and expect ret 0x10. The compiled body reads Watcom register arguments and returns with plain ret, corrupting stack during logo setup; keep original bytes until a stack-aware ABI thunk is available.
 0x000e94ec	Recovered loader causes `System.gui` line 1 to fail with `String "0" not recognised as a Variable`; original bytes remove the parser error and advance startup. Keep original pending behavioral recovery.
 0x000c92e4	Original uses four register and four stack arguments and returns with ret 0x10. Current hybrid has no stack-aware trampoline for this ABI; restore original bytes pending support.
+0x000eb050	Original uses five caller-clean stack arguments. The recovered body expects four register arguments plus five stack arguments, producing a wrong buffer pointer during logo/menu drawing; keep original bytes.
+0x000eb1f0	Original uses five caller-clean stack arguments. The recovered body expects four register arguments plus five stack arguments; keep original bytes for ABI consistency with 0xeb050.
