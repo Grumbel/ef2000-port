@@ -20,7 +20,8 @@ int x32_stack_reserve(struct x32_allocation *state, u32 sp, u32 size,
     state->free_bytes -= consumed;
     u32 before_dec = boundary - state->free_bytes;
     u32 limit = before_dec - 1;
-    if (state->arena_start < state->stack_end && state->arena_end - 1 > limit)
+    if (state->arena_end > state->arena_start &&
+        state->arena_start < state->stack_end && state->arena_end - 1 > limit)
         limit = state->arena_end - 1;
     /* Reproduce flags from DEC EDX, followed by the common success CLC. */
     flags &= ~0x8d5u; /* OF, SF, ZF, AF, PF, CF */
