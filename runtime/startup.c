@@ -722,6 +722,24 @@ static void guest_fault(u32 signal, struct context *r) {
                 field(stack_names[i], *(u32 *)guest(r->sp + i * 4));
             text("\n", 1);
         }
+        text("FAULT_CONTEXT ", 14);
+        field("CS", r->cs);
+        if (r->ip >= 16 && r->ip <= IMAGE_SIZE - 16) {
+            static char const *const code_names[] = {
+                "C-16", "C-12", "C-8", "C-4", "C+0", "C+4", "C+8", "C+12"
+            };
+            for (u32 i = 0; i < 8; ++i)
+                field(code_names[i], *(u32 *)guest(r->ip - 16 + i * 4));
+        }
+        if (r->sp > 0x270 && r->sp <= IMAGE_SIZE - 48) {
+            static char const *const near_stack_names[] = {
+                "P-16", "P-12", "P-8", "P-4", "P+0", "P+4", "P+8", "P+12",
+                "P+16", "P+20", "P+24", "P+28", "P+32"
+            };
+            for (u32 i = 0; i < 13; ++i)
+                field(near_stack_names[i], *(u32 *)guest(r->sp - 16 + i * 4));
+        }
+        text("\n", 1);
         record("FAULT ", 6, r);
         finish(21);
     }
