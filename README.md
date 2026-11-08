@@ -33,6 +33,7 @@ nix flake check                # Unit tests, app/help/version checks, REUSE
 nix run .#ef2000-native -- ../EF2000/c/EF2000
 nix run .#ef2000-unicorn -- ../EF2000/c/EF2000
 nix run .#ef2000-decomp             # GCC Linux standalone bootstrap
+nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE
 nix run .#ef2000-decomp-watcom      # OpenWatcom DOS bootstrap in DOSBox-X
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
@@ -151,7 +152,10 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
   recovered C, along with an archive and individual GCC object files for 338
   of the 341 recovered C modules. Three remaining modules use unsupported
   Watcom-specific constructs. `nix run .#ef2000-decomp` directly executes the
-  Linux binary.
+  Linux binary. With `--image /path/to/_EF2000.EXE`, it verifies the known
+  executable SHA-256 and maps the X-32 initialized image and zeroed BSS into
+  bounded, 64 MiB guest RAM. The executable is read locally; its bytes are not
+  part of the Nix package.
 - `packages.ef2000-decomp-watcom` compiles all recovered C modules to
   OpenWatcom OMF and links a 32-bit DOS/CauseWay `EFDECOMP.EXE` from the
   recovered high-score module. `nix run .#ef2000-decomp-watcom` starts that
@@ -162,6 +166,11 @@ actually invoke recovered C (`hiscore_qualifies`), but the game's original
 entry point, global-data definitions, and hardware platform layer have not
 been recovered. The GCC archive and Watcom objects are incremental build
 inputs; their unresolved references prevent linking the complete game today.
+On Linux, asset-free tests additionally execute recovered stream-reading and
+8x6 glyph-drawing functions against synthetic guest RAM. The game image is
+**loaded but not executed**: several compiled C routines still cast 32-bit
+guest callback offsets to host function pointers, so those paths require a
+native callback binding layer before they are safe to call.
 
 The previous hybrid game launcher is now `apps.ef2000-hybrid`. It uses the
 original game code for unrecovered functions, takes precompiled Watcom OMF

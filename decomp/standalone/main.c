@@ -10,6 +10,9 @@
 
 #include "ef_abi.h"
 #include "ef_globals.h"
+#if !defined(__WATCOMC__)
+#include "decomp_image.h"
+#endif
 
 int32_t g_hiscore_current;
 ef_hiscore_entry g_hiscore_table[10];
@@ -42,10 +45,30 @@ static int self_test(void)
 int main(int argc, char **argv)
 {
     if (argc == 2 && strcmp(argv[1], "--help") == 0) {
+#if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
+#else
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE]");
+#endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
     }
+#if !defined(__WATCOMC__)
+    if (argc == 3 && strcmp(argv[1], "--image") == 0) {
+        ef_decomp_image_info info;
+        char reason[128];
+        if (ef_decomp_load_executable(argv[2], &info, reason, sizeof(reason)) != 0) {
+            fprintf(stderr, "ef2000-decomp: %s: %s\n", argv[2], reason);
+            return 1;
+        }
+        printf("EF2000 decomp bootstrap (%s)\n", EF_BUILD_PLATFORM);
+        printf("Original image mapped: %u initialized bytes, BSS through 0x%08x\n",
+               info.initialized_size, info.bss_end);
+        puts("Recovered game entry and first-screen initialization are not yet linked.");
+        ef_decomp_memory_release();
+        return 0;
+    }
+#endif
     if (argc > 1 && (argc != 2 || strcmp(argv[1], "--self-test") != 0)) {
         fputs("Unsupported argument (try --help).\n", stderr);
         return 2;

@@ -332,6 +332,7 @@
         pname = "ef2000-decomp";
         inherit version;
         src = source;
+        buildInputs = [ pkgs.openssl ];
         dontConfigure = true;
         buildPhase = ''
           runHook preBuild
@@ -341,14 +342,21 @@
             case "$name" in
               game_helpers125|runtime_helpers23|runtime_helpers42) continue ;;
             esac
-            $CC -std=c11 -O2 -fno-strict-aliasing -fwrapv \
+            $CC -std=c11 -O2 -DEF_DECOMP_NATIVE=1 \
+              -fno-strict-aliasing -fwrapv \
               -Idecomp/include -c "$module" -o "objects/$name.o"
           done
           $AR rcs libef2000-decomp.a objects/*.o
-          $CC -std=c11 -O2 -Wall -Wextra -Werror \
-            -fno-strict-aliasing -fwrapv -Idecomp/include \
-            decomp/standalone/main.c -L. -lef2000-decomp -o ef2000-decomp
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
+            -fno-strict-aliasing -fwrapv -Idecomp/include -Iruntime \
+            decomp/standalone/main.c runtime/decomp_image.c \
+            -L. -lef2000-decomp -lcrypto -o ef2000-decomp
           ./ef2000-decomp --self-test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
+            -fno-strict-aliasing -fwrapv -Idecomp/include -Iruntime \
+            tests/decomp_image_test.c decomp/src/game_helpers25.c \
+            runtime/decomp_image.c -lcrypto -o decomp-image-test
+          ./decomp-image-test
           runHook postBuild
         '';
         installPhase = ''

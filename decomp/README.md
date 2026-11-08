@@ -52,6 +52,14 @@ contain Watcom-specific or non-portable C. The DOS package retains all OMF
 objects for hybrid splicing. The bootstrap uses synthetic high-score data;
 it cannot enter the game. Original globals, game startup, external function
 bindings and platform services are not yet reconstructed for standalone use.
+`nix run .#ef2000-decomp -- --image /path/to/_EF2000.EXE` now validates the
+known original executable and maps its initialized X-32 payload and zeroed BSS
+into host-owned, bounded 64 MiB guest memory. No original instructions run;
+the first-screen startup call graph still needs recovery. The standalone Linux
+tests prove that recovered C stream and 8x6 glyph functions can use the
+translated guest offsets with synthetic data. This does not make the whole
+archive safe to invoke: remaining 32-bit callback pointers and guest function
+bindings must be adapted for a 64-bit Linux process.
 
 Use `.#ef2000-hybrid` to combine OpenWatcom OMF replacements with the
 original executable through the native64 harness until the source is complete.

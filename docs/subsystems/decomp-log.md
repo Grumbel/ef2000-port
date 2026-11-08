@@ -1273,3 +1273,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   OpenWatcom are unavailable. **Neither build plays the game**: recovered
   startup, global definitions, engine bindings and platform services are
   prerequisites. This does not complete plan M1, §7 or §8.
+- Native GCC image-mapping foundation, 2026-11-09: added an explicit 64 MiB
+  guest-address translation for `EF_DECOMP_NATIVE` instead of dereferencing
+  32-bit offsets as Linux pointers. The Linux bootstrap accepts `--image`,
+  SHA-256-verifies the supported `_EF2000.EXE` without distributing it,
+  extracts the initialized X-32 application payload from its documented
+  two-stage envelope and allocates zeroed BSS. Synthetic envelope/bounds tests
+  pass, as do recovered stream-reader and 8x6-glyph routines operating on
+  synthetic guest RAM. All 338 previously portable C modules compile with
+  `EF_DECOMP_NATIVE` (warnings remain for guest callback offsets cast to host
+  function pointers). No game instructions execute and no first-screen output
+  is presented. Still required: initialization of original game globals,
+  recovery of the main entry at `0x8b274`, native binding of callbacks and
+  enough recovered video/platform services to display a real frame.
