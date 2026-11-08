@@ -17,3 +17,4 @@ addr	reason
 0x000c92e4	Original uses four register and four stack arguments and returns with ret 0x10. Current hybrid has no stack-aware trampoline for this ABI; restore original bytes pending support.
 0x000eb050	Original uses five caller-clean stack arguments. The recovered body expects four register arguments plus five stack arguments, producing a wrong buffer pointer during logo/menu drawing; keep original bytes.
 0x000eb1f0	Original uses five caller-clean stack arguments. The recovered body expects four register arguments plus five stack arguments; keep original bytes for ABI consistency with 0xeb050.
+0x000c4e3b	This is a threaded-dispatch tail-jump, not a returning helper: it selects and jumps to a record handler that returns to the caller. The C draft returns the handler address instead, so normalization skips the handler and corrupts the stream. Keep original dispatch bytes.

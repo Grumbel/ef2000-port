@@ -157,48 +157,68 @@ double cube_double_b3fdc(double x)
     return x * x * x;
 }
 
-/* 0xc5390, 12 bytes. Byte-swap a word in place; returns the advanced pointer (EBX). */
-ef_addr32 swap_word_c5390(uint32_t u0, uint32_t u1, ef_addr32 ptr)
+/* 0xc5390, 12 bytes. Return the swapped AX and advance EBX by two. */
+uint16_t swap_word_c5390(ef_addr32 cursor)
 {
-    (void)u0;
-    (void)u1;
-    uint16_t v = EF_U16(ptr);
+    uint16_t v = EF_U16(cursor);
 
-    EF_U16(ptr) = (uint16_t)((v << 8) | (v >> 8));
-    return ptr + 2u;
+    EF_U16(cursor) = (uint16_t)((v << 8) | (v >> 8));
+    v = EF_U16(cursor);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+    __asm {
+        mov ebx, cursor
+        add ebx, 2
+    }
+#endif
+    return v;
 }
 
-/* 0xc539c, 12 bytes. Byte-swap a word in place; returns the advanced pointer (EBX). */
-ef_addr32 swap_word_c539c(uint32_t u0, uint32_t u1, ef_addr32 ptr)
+/* 0xc539c, 12 bytes. Return the swapped AX and advance EBX by two. */
+uint16_t swap_word_c539c(ef_addr32 cursor)
 {
-    (void)u0;
-    (void)u1;
-    uint16_t v = EF_U16(ptr);
+    uint16_t v = EF_U16(cursor);
 
-    EF_U16(ptr) = (uint16_t)((v << 8) | (v >> 8));
-    return ptr + 2u;
+    EF_U16(cursor) = (uint16_t)((v << 8) | (v >> 8));
+    v = EF_U16(cursor);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+    __asm {
+        mov ebx, cursor
+        add ebx, 2
+    }
+#endif
+    return v;
 }
 
-/* 0xc53a8, 12 bytes. Byte-swap a word in place; returns the advanced pointer (EBX). */
-ef_addr32 swap_word_c53a8(uint32_t u0, uint32_t u1, ef_addr32 ptr)
+/* 0xc53a8, 12 bytes. Return the swapped AX and advance EBX by two. */
+uint16_t swap_word_c53a8(ef_addr32 cursor)
 {
-    (void)u0;
-    (void)u1;
-    uint16_t v = EF_U16(ptr);
+    uint16_t v = EF_U16(cursor);
 
-    EF_U16(ptr) = (uint16_t)((v << 8) | (v >> 8));
-    return ptr + 2u;
+    EF_U16(cursor) = (uint16_t)((v << 8) | (v >> 8));
+    v = EF_U16(cursor);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+    __asm {
+        mov ebx, cursor
+        add ebx, 2
+    }
+#endif
+    return v;
 }
 
-/* 0xc53df, 15 bytes. Byte-swap a dword in place; returns the advanced pointer (EBX). */
-ef_addr32 swap_dword_c53df(uint32_t u0, uint32_t u1, ef_addr32 ptr)
+/* 0xc53df, 15 bytes. Return the swapped EAX and advance EBX by four. */
+uint32_t swap_dword_c53df(ef_addr32 cursor)
 {
-    (void)u0;
-    (void)u1;
-    uint32_t v = EF_U32(ptr);
+    uint32_t v = EF_U32(cursor);
 
-    EF_U32(ptr) = (v << 24) | ((v & 0xff00u) << 8) | ((v >> 8) & 0xff00u) | (v >> 24);
-    return ptr + 4u;
+    EF_U32(cursor) = (v << 24) | ((v & 0xff00u) << 8) | ((v >> 8) & 0xff00u) | (v >> 24);
+    v = EF_U32(cursor);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+    __asm {
+        mov ebx, cursor
+        add ebx, 4
+    }
+#endif
+    return v;
 }
 
 /* 0xd175c, 24 bytes. Log a single value through the 0xd16d0 helper. */

@@ -1237,3 +1237,26 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `+0x0c`, so this path skips the cache lookup; the ABI correction does not
   resolve the observed failure. Main menu remains reachable. Next trace the
   redirected file callbacks `0x9cb20` and `0x9cbc4` used by the Norway load.
+- Campaign renderer stream ABI fix, 2026-11-08: the fault context points into
+  threaded renderer handler `0xc4e9d`. Original disassembly confirms the four
+  `0xc5390`/`0xc539c`/`0xc53a8`/`0xc53df` helpers advance implicit EBX by 2 or 4;
+  their C replacements instead leave EBX untouched and return the advanced
+  pointer in EAX. The `0xc4e3b` entry is also a tail-jump into the handler table,
+  which its C replacement cannot model. Excluding only `0xc4e3b` while leaving
+  the four stream helpers compiled still faults at `IP=0xffffffff`; restoring all four EBX
+  stream helpers prevents the fault and loads campaign and navigation data in
+  private Xvfb. The run reaches the Kampagne choice dialog, but the original
+  build proceeds to the campaign map after the same input, so the subsequent
+  callback transition remains unresolved. Hybrid count: 1,733 functions,
+  8,665 redirect bytes, 493,242-byte arena across 257/341 modules. Main-menu
+  startup path remains unchanged.
+- Campaign renderer stream return registers, 2026-11-08: a disassembly review
+  of `0xc4f0d` showed `movzx ecx,ax` immediately after the `0xc53a8` handler,
+  so the word helpers must return the swapped word in AX as well as advancing
+  EBX. The dword helper similarly returns EAX and advances EBX. The prior C
+  replacements modeled EBX but left the return register unspecified. OpenWatcom
+  now emits the swapped value into AX/EAX and updates EBX for all four helpers;
+  the rebuilt campaign replay reads both campaign and navigation files without
+  fault, but remains on the campaign-choice dialog and does not issue the final
+  campaign-file read observed in the original. Thus this fixes the helper ABI
+  mismatch, but the create-screen transition still needs a separate UI trace.

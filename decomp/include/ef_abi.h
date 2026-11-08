@@ -3351,10 +3351,16 @@ void build_default_path_abaf0(ef_addr32 buffer);
 void fill_bytes_b3fb0(ef_addr32 dst, uint8_t value, uint32_t count);
 double square_double_b3fd0(double x);
 double cube_double_b3fdc(double x);
-ef_addr32 swap_word_c5390(uint32_t u0, uint32_t u1, ef_addr32 ptr);
-ef_addr32 swap_word_c539c(uint32_t u0, uint32_t u1, ef_addr32 ptr);
-ef_addr32 swap_word_c53a8(uint32_t u0, uint32_t u1, ef_addr32 ptr);
-ef_addr32 swap_dword_c53df(uint32_t u0, uint32_t u1, ef_addr32 ptr);
+uint16_t swap_word_c5390(ef_addr32 ptr);
+uint16_t swap_word_c539c(ef_addr32 ptr);
+uint16_t swap_word_c53a8(ef_addr32 ptr);
+uint32_t swap_dword_c53df(ef_addr32 ptr);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux swap_word_c5390 parm [ebx] value [ax] modify [eax ebx]
+#pragma aux swap_word_c539c parm [ebx] value [ax] modify [eax ebx]
+#pragma aux swap_word_c53a8 parm [ebx] value [ax] modify [eax ebx]
+#pragma aux swap_dword_c53df parm [ebx] value [eax] modify [eax ebx]
+#endif
 void log_value_d175c(uint32_t value);
 uint32_t stack_used_dcb74(void);
 void run_shutdown_pair_dd8d0(void);
