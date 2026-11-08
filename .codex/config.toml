@@ -1,9 +1,0 @@
-# SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
-# SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
-
-# Project defaults for the focused EF2000 decompilation handoff.
-# Override at launch when a particular ABI/x87 investigation needs a stronger
-# model. Sandbox and approval policy remain the user's own choice.
-model = "gpt-6-luna"
-model_reasoning_effort = "medium"
-model_verbosity = "low"
