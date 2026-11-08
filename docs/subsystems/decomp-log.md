@@ -1286,3 +1286,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   is presented. Still required: initialization of original game globals,
   recovery of the main entry at `0x8b274`, native binding of callbacks and
   enough recovered video/platform services to display a real frame.
+- Standalone GCC first startup call, 2026-11-09: linked the actual recovered
+  `init_arena_e29a0` (0xe29a0) and `reset_buffer_e2a1c` (0xe2a1c) through
+  native `guest_fn_c3f70`, `guest_fn_9c3cf`, `guest_fn_e2a1c` and bounded
+  `guest_fn_b3fb0` bindings, with separate-function linker sections to discard
+  unrelated/unresolved guest paths. The new optional Linux `--image ...
+  --probe-arena` path executes just this first game-owned startup step after
+  SHA-pinned image loading and reports its arena pointer/size and cleanup
+  callback. Synthetic data tests validate allocation, reset, globals, hook,
+  refusal on repeated or uninitialized calls, and memory-span bounds. This is
+  not a guest differential, does not promote either function to `verified`,
+  and still stops before TACTCOM init (`0x8b39c`) or video setup.

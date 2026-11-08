@@ -73,15 +73,24 @@ void ef_decomp_memory_release(void)
     guest_ram = NULL;
 }
 
+void *ef_decomp_memory_span(uint32_t address, size_t length)
+{
+    if (!guest_ram || address > EF_DECOMP_RAM_SIZE ||
+        length > (size_t)EF_DECOMP_RAM_SIZE - address)
+        return NULL;
+    return guest_ram + address;
+}
+
 void *ef_guest_memory_ptr(ef_addr32 address)
 {
     /* EF_U32's lvalue access needs four bytes. Reject the final few bytes
      * even for byte accesses; current game data resides far below this. */
-    if (!guest_ram || address > EF_DECOMP_RAM_SIZE - 8u) {
+    void *pointer = ef_decomp_memory_span(address, 8u);
+    if (!pointer) {
         fprintf(stderr, "ef2000-decomp: invalid guest RAM offset 0x%08x\n", address);
         abort();
     }
-    return guest_ram + address;
+    return pointer;
 }
 
 static void set_reason(char *reason, size_t capacity, const char *message)

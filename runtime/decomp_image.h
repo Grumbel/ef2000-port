@@ -25,6 +25,10 @@ int ef_decomp_decode_layout(const uint8_t *exe, size_t length,
 int ef_decomp_memory_load(const uint8_t *bytes, size_t length, uint32_t bss_end);
 void ef_decomp_memory_release(void);
 
+/* A checked host span for native service bindings that access more than one
+ * guest byte (e.g. the original memset wrapper). NULL on invalid bounds. */
+void *ef_decomp_memory_span(uint32_t address, size_t length);
+
 /* SHA-pinned, read-only loader. Returns zero on success and sets a reason on
  * failure; does not execute original machine code. */
 int ef_decomp_load_executable(const char *path, ef_decomp_image_info *info,

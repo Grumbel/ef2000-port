@@ -60,6 +60,13 @@ tests prove that recovered C stream and 8x6 glyph functions can use the
 translated guest offsets with synthetic data. This does not make the whole
 archive safe to invoke: remaining 32-bit callback pointers and guest function
 bindings must be adapted for a 64-bit Linux process.
+The optional `--probe-arena` attempts the first recovered game-owned startup
+call, `init_arena_e29a0`, and its `reset_buffer_e2a1c` callee, with a bounded
+host allocator and the minimum required Watcom/X-32 service bindings. A
+synthetic execution test verifies the game globals, 0xe2a50 cleanup hook and
+zeroed arena. This is a startup **probe**, not a verified reproduction of the
+original executable's entire C-runtime startup; its execution against real
+game data still needs local verification.
 
 Use `.#ef2000-hybrid` to combine OpenWatcom OMF replacements with the
 original executable through the native64 harness until the source is complete.

@@ -34,6 +34,7 @@ nix run .#ef2000-native -- ../EF2000/c/EF2000
 nix run .#ef2000-unicorn -- ../EF2000/c/EF2000
 nix run .#ef2000-decomp             # GCC Linux standalone bootstrap
 nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE
+nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE --probe-arena
 nix run .#ef2000-decomp-watcom      # OpenWatcom DOS bootstrap in DOSBox-X
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
@@ -155,7 +156,10 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
   Linux binary. With `--image /path/to/_EF2000.EXE`, it verifies the known
   executable SHA-256 and maps the X-32 initialized image and zeroed BSS into
   bounded, 64 MiB guest RAM. The executable is read locally; its bytes are not
-  part of the Nix package.
+  part of the Nix package. The optional `--probe-arena` continues into the
+  first known game-owned initialization routine (`0xe29a0`) and the recovered
+  arena reset (`0xe2a1c`) using narrowly scoped native allocator, memory-fill
+  and cleanup-registration bindings. It stops immediately afterward.
 - `packages.ef2000-decomp-watcom` compiles all recovered C modules to
   OpenWatcom OMF and links a 32-bit DOS/CauseWay `EFDECOMP.EXE` from the
   recovered high-score module. `nix run .#ef2000-decomp-watcom` starts that
@@ -167,8 +171,11 @@ entry point, global-data definitions, and hardware platform layer have not
 been recovered. The GCC archive and Watcom objects are incremental build
 inputs; their unresolved references prevent linking the complete game today.
 On Linux, asset-free tests additionally execute recovered stream-reading and
-8x6 glyph-drawing functions against synthetic guest RAM. The game image is
-**loaded but not executed**: several compiled C routines still cast 32-bit
+8x6 glyph-drawing functions against synthetic guest RAM, and exercise that
+first arena initialization and reset with synthetic input. The ordinary
+`--image` path **loads but does not run the game**; `--probe-arena` executes
+only the two recovered startup routines, not the game's main control path.
+Several compiled C routines still cast 32-bit
 guest callback offsets to host function pointers, so those paths require a
 native callback binding layer before they are safe to call.
 

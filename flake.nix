@@ -343,20 +343,29 @@
               game_helpers125|runtime_helpers23|runtime_helpers42) continue ;;
             esac
             $CC -std=c11 -O2 -DEF_DECOMP_NATIVE=1 \
-              -fno-strict-aliasing -fwrapv \
+              -fno-strict-aliasing -fwrapv -ffunction-sections -fdata-sections \
               -Idecomp/include -c "$module" -o "objects/$name.o"
           done
           $AR rcs libef2000-decomp.a objects/*.o
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
-            -fno-strict-aliasing -fwrapv -Idecomp/include -Iruntime \
-            decomp/standalone/main.c runtime/decomp_image.c \
-            -L. -lef2000-decomp -lcrypto -o ef2000-decomp
+            -fno-strict-aliasing -fwrapv -ffunction-sections -fdata-sections \
+            -Idecomp/include -Iruntime decomp/standalone/main.c \
+            runtime/decomp_image.c runtime/decomp_startup.c \
+            -L. -lef2000-decomp -lcrypto -Wl,--gc-sections -o ef2000-decomp
           ./ef2000-decomp --self-test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
             -fno-strict-aliasing -fwrapv -Idecomp/include -Iruntime \
             tests/decomp_image_test.c decomp/src/game_helpers25.c \
             runtime/decomp_image.c -lcrypto -o decomp-image-test
           ./decomp-image-test
+          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
+            -fno-strict-aliasing -fwrapv -ffunction-sections -fdata-sections \
+            -Wno-error=int-to-pointer-cast \
+            -Idecomp/include -Iruntime tests/decomp_startup_test.c \
+            runtime/decomp_image.c runtime/decomp_startup.c \
+            decomp/src/runtime_helpers25.c decomp/src/math_string.c \
+            -lcrypto -Wl,--gc-sections -o decomp-startup-test
+          ./decomp-startup-test
           runHook postBuild
         '';
         installPhase = ''

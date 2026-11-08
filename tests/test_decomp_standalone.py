@@ -21,11 +21,17 @@ class DecompStandaloneTests(unittest.TestCase):
             subprocess.run([
                 'gcc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
                 '-DEF_DECOMP_NATIVE=1', '-fno-strict-aliasing', '-fwrapv',
+                '-ffunction-sections', '-fdata-sections',
+                '-Wno-error=int-to-pointer-cast',
                 '-I' + str(ROOT / 'decomp/include'),
                 '-I' + str(ROOT / 'runtime'),
                 str(ROOT / 'decomp/standalone/main.c'),
                 str(ROOT / 'decomp/src/hiscore.c'),
-                str(ROOT / 'runtime/decomp_image.c'), '-lcrypto',
+                str(ROOT / 'decomp/src/runtime_helpers25.c'),
+                str(ROOT / 'decomp/src/math_string.c'),
+                str(ROOT / 'runtime/decomp_image.c'),
+                str(ROOT / 'runtime/decomp_startup.c'),
+                '-lcrypto', '-Wl,--gc-sections',
                 '-o', str(executable),
             ], check=True, capture_output=True)
             result = subprocess.run([str(executable), '--self-test'],
@@ -48,6 +54,11 @@ class DecompStandaloneTests(unittest.TestCase):
             self.assertEqual(rejected.returncode, 1)
             self.assertIn('unsupported executable SHA-256', rejected.stderr)
 
+            unsupported = subprocess.run([
+                str(executable), '--image', str(bad_image), '--probe-arena',
+            ], capture_output=True, text=True)
+            self.assertEqual(unsupported.returncode, 1)
+
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
     def test_guest_memory_and_x32_envelope(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -61,6 +72,26 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/game_helpers25.c'),
                 str(ROOT / 'runtime/decomp_image.c'), '-lcrypto',
                 '-o', str(executable),
+            ], check=True, capture_output=True)
+            subprocess.run([str(executable)], capture_output=True, check=True)
+
+    @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
+    def test_first_recovered_game_startup_stage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            executable = Path(directory) / 'decomp-startup-test'
+            subprocess.run([
+                'gcc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
+                '-DEF_DECOMP_NATIVE=1', '-fno-strict-aliasing', '-fwrapv',
+                '-ffunction-sections', '-fdata-sections',
+                '-Wno-error=int-to-pointer-cast',
+                '-I' + str(ROOT / 'decomp/include'),
+                '-I' + str(ROOT / 'runtime'),
+                str(ROOT / 'tests/decomp_startup_test.c'),
+                str(ROOT / 'decomp/src/runtime_helpers25.c'),
+                str(ROOT / 'decomp/src/math_string.c'),
+                str(ROOT / 'runtime/decomp_image.c'),
+                str(ROOT / 'runtime/decomp_startup.c'),
+                '-lcrypto', '-Wl,--gc-sections', '-o', str(executable),
             ], check=True, capture_output=True)
             subprocess.run([str(executable)], capture_output=True, check=True)
 

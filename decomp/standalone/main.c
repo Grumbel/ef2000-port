@@ -12,6 +12,7 @@
 #include "ef_globals.h"
 #if !defined(__WATCOMC__)
 #include "decomp_image.h"
+#include "decomp_startup.h"
 #endif
 
 int32_t g_hiscore_current;
@@ -48,13 +49,14 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--probe-arena]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
     }
 #if !defined(__WATCOMC__)
-    if (argc == 3 && strcmp(argv[1], "--image") == 0) {
+    if ((argc == 3 || (argc == 4 && strcmp(argv[3], "--probe-arena") == 0)) &&
+        strcmp(argv[1], "--image") == 0) {
         ef_decomp_image_info info;
         char reason[128];
         if (ef_decomp_load_executable(argv[2], &info, reason, sizeof(reason)) != 0) {
@@ -64,6 +66,16 @@ int main(int argc, char **argv)
         printf("EF2000 decomp bootstrap (%s)\n", EF_BUILD_PLATFORM);
         printf("Original image mapped: %u initialized bytes, BSS through 0x%08x\n",
                info.initialized_size, info.bss_end);
+        if (argc == 4) {
+            ef_decomp_arena_probe probe;
+            if (ef_decomp_probe_arena(info.bss_end, &probe, reason, sizeof(reason)) != 0) {
+                fprintf(stderr, "ef2000-decomp: arena probe: %s\n", reason);
+                ef_decomp_memory_release();
+                return 1;
+            }
+            printf("Recovered 0xe29a0 + 0xe2a1c: arena 0x%08x (%u bytes), release hook 0x%08x\n",
+                   probe.base, probe.size, probe.release_hook);
+        }
         puts("Recovered game entry and first-screen initialization are not yet linked.");
         ef_decomp_memory_release();
         return 0;
