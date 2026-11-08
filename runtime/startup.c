@@ -713,6 +713,15 @@ static void guest_fault(u32 signal, struct context *r) {
     }
     if (signal != 11 || r->ip < 0x86 || r->ip > 0x195fae ||
         *(u8 *)guest(r->ip) != 0xcd || *(u8 *)guest(r->ip + 1) != 0x21) {
+        if (r->sp > 0x260 && r->sp <= IMAGE_SIZE - 32) {
+            static char const *const stack_names[] = {
+                "S0", "S1", "S2", "S3", "S4", "S5", "S6", "S7"
+            };
+            text("FAULT_STACK ", 12);
+            for (u32 i = 0; i < 8; ++i)
+                field(stack_names[i], *(u32 *)guest(r->sp + i * 4));
+            text("\n", 1);
+        }
         record("FAULT ", 6, r);
         finish(21);
     }
