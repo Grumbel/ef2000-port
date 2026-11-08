@@ -324,11 +324,10 @@
           license = lib.licenses.gpl3Plus;
         };
       };
-      # Compile the tracked recovered C once as part of the optional decomp
-      # launcher. The original executable remains caller-supplied and is only
-      # read at runtime when hybrid_link builds the disposable patch.
-      decompObjects = pkgs.stdenv.mkDerivation {
-        pname = "ef2000-decomp-objects";
+      # Build recovered C to OpenWatcom OMF independently of the Linux game.
+      # The decomp launcher accepts this output at runtime via --objects.
+      decompWatcom = pkgs.stdenv.mkDerivation {
+        pname = "ef2000-decomp-watcom";
         inherit version;
         src = source;
         nativeBuildInputs = [ pkgs.python3 watcom ];
@@ -415,7 +414,6 @@
       decompWorkflow = pkgs.writeShellScriptBin "ef2000-decomp" ''
         set -euo pipefail
         exec ${python}/bin/python3 ${package}/libexec/ef2000/tools/decomp_app.py \
-          --objects ${decompObjects}/lib/ef2000/decomp-objects \
           --launcher ${package}/bin/ef2000 "$@"
       '';
       nativeSb16Workflow = pkgs.writeShellScriptBin "ef2000-native-sb16" ''
@@ -429,6 +427,7 @@
         ef2000-native = package;
         ef2000-unicorn = package;
         ef2000-decomp = decompWorkflow;
+        ef2000-decomp-watcom = decompWatcom;
         ef2000-startup = package;
         ef2000-ghidra = ghidraWorkflow;
         ef2000-wcc = watcomWorkflow;
@@ -452,9 +451,9 @@
           "Run the original EF2000 game with the native Linux backend";
         nativeSb16 = app "${nativeSb16Workflow}/bin/ef2000-native-sb16"
           "Run the original EF2000 game with SB16 digital audio enabled";
-        unicorn = app "${package}/bin/ef2000-unicorn"
+        unicornCpp = app "${package}/bin/ef2000-unicorn"
           "Run EF2000 in the native C++ Unicorn and SDL3 backend";
-        unicorn-py = app "${package}/bin/ef2000-unicorn-py"
+        unicornPy = app "${package}/bin/ef2000-unicorn-py"
           "Run EF2000 with the slow, deprecated Python Unicorn and SDL3 backend";
         ghidra = app "${pkgs.ghidra}/bin/ghidra"
           "Open Ghidra to inspect the extracted EF2000 X-32 image";
@@ -464,12 +463,9 @@
         default = native;
         ef2000 = native;
         ef2000-native = nativeSb16;
-        unicorn = unicorn;
-        ef2000-unicorn = unicorn;
+        ef2000-unicorn = unicornCpp;
         ef2000-decomp = decomp;
-        ef2000-unicorn-py = unicorn-py;
-        unicorn-py = unicorn-py;
-        unicorn-cpp = unicorn;
+        ef2000-unicorn-py = unicornPy;
         ghidra = ghidra;
         ghidra-ef2000 = {
           type = "app";
@@ -531,6 +527,7 @@
         app-decomp = pkgs.runCommand "ef2000-decomp-app-check" {} ''
           ${decompWorkflow}/bin/ef2000-decomp --help > "$out"
           grep -q 'EF2000 installation directory or original _EF2000.EXE' "$out"
+          grep -q -- '--objects OBJECTS' "$out"
           test -s ${package}/libexec/ef2000/decomp/symbols/signatures.tsv
         '';
         app-unicorn-cpp = pkgs.runCommand "ef2000-unicorn-cpp-app-check" {} ''
@@ -1123,9 +1120,9 @@
           printf '  ef2000-run [GAME_ARGS]          Build and run the original DOS game on Linux\n'
           printf '  ef2000-run-gdb [GAME_ARGS]      Build and debug the native game ELF in GDB\n\n'
           printf 'Portable original-code emulator (experimental, slower than native):\n'
-          printf '  nix run .#unicorn -- /path/to/EF2000\n'
+          printf '  nix run .#ef2000-unicorn -- /path/to/EF2000\n'
           printf '                                  Native C++ Unicorn/SDL3 menu and flight frontend\n'
-          printf '  nix run .#unicorn-py -- --data-dir /path/to/EF2000\n'
+          printf '  nix run .#ef2000-unicorn-py -- --data-dir /path/to/EF2000\n'
           printf '                                  Deprecated slow Python frontend\n'
           printf '  nix run .#unicorn-probe -- /path/to/_EF2000.EXE\n'
           printf '                                  Run bounded headless startup diagnostics\n\n'

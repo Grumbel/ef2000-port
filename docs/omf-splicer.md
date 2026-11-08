@@ -96,7 +96,7 @@ python3 tools/efpatch.py local/patches/recovered.efpatch.json \
   -o local/patches/recovered.efpatch
 
 # C++ Unicorn backend:
-nix run .#unicorn-cpp -- /path/to/_EF2000.EXE \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE \
   --patch local/patches/recovered.efpatch --windowed
 
 # Native64 backend:

@@ -498,7 +498,7 @@ Allocation-watermark instrumentation (2026-11-03): C++ Unicorn reports
 `memory_watermark` to the launcher report. Both track `3508h` heap growth,
 `3509h` stack reserve and call counts, without changing the 64 MiB layout.
 They are observations, not yet proof of a safe arena. The owner confirmed
-the unpatched `nix run .#unicorn-cpp -L ...` startup reaches its 30M
+the unpatched `nix run .#ef2000-unicorn -L ...` startup reaches its 30M
 instruction limit (42.3M guest instructions/s on that run); no real patch
 has been executed. See `docs/function-differential.md`.
 

@@ -31,7 +31,7 @@ Extract the original textures from a local copy of the DOS game:
 
 ```sh
 nix run .#gui-assets -- skin /path/to/EF2000 --out local/gui-skin
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --overlay-skin-dir local/gui-skin
 ```
 
@@ -255,7 +255,7 @@ To use the recovered font as an optional SDL3 overlay font:
 
 ```sh
 ef2000-gui-assets font /path/to/EF2000 --out local/menu-font
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --overlay-font-bmp local/menu-font/menu-font.bmp
 ```
 
@@ -290,7 +290,7 @@ pixels, plausible visual names, and coordinates.
 
 ```sh
 nix run .#gui-assets -- symbols /path/to/EF2000 --out local/menu-symbols
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --overlay-symbols-bmp local/menu-symbols/menu-symbols.bmp
 ```
 

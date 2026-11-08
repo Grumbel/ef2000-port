@@ -80,8 +80,8 @@ the plan (such as deferring the mission parser), the plan wins.
    editor or write-back workflow yet. See
    `docs/existing-tools-and-releases.md`.
 7. Validate **portable Unicorn flight controls and longer gameplay**. The
-   flake exposes `nix run .#unicorn-py` (formerly `.#unicorn`; now deprecated,
-   the C++ frontend took over `.#unicorn`) as a separate experimental windowed
+   flake exposes `nix run .#ef2000-unicorn-py` (deprecated Python frontend;
+   `.#ef2000-unicorn` is the C++ frontend) as a separate experimental windowed
    launcher with standard game-data discovery and a writable state overlay;
    it is **not** the native default or a real-time-playability claim.
    `.#unicorn-probe` remains the bounded headless diagnostic interface. The
@@ -306,8 +306,8 @@ Sound discovery has an independent DOSBox-X probe and captured reference values.
 - [ ] Verify audible SDL3 SB16 and original-disc CD music using a full original
   installation and physical audio device; improve
   streaming latency if required and port remaining OS services before
-  switching `.#unicorn` over to C++ (done: `.#unicorn` is now the C++ frontend;
-  the Python one is `.#unicorn-py`, slated for removal).
+  switching to C++ (done: `.#ef2000-unicorn` is the C++ frontend;
+  the Python one is `.#ef2000-unicorn-py`, slated for removal).
 `--sound sb16` runs the unchanged SB16.DIG against the implemented DSP/PIC/DMA
 model and plays captured digital PCM through SDL. FM music remains disabled in
 this mode. Failed real-mode calls retain mutated memory and CPU state for

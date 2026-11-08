@@ -6,6 +6,7 @@
 
 import argparse
 import csv
+import os
 import subprocess
 import sys
 import tempfile
@@ -47,10 +48,15 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('game', type=Path,
                         help='EF2000 installation directory or original _EF2000.EXE')
-    parser.add_argument('--objects', type=Path, required=True,
-                        help=argparse.SUPPRESS)
+    parser.add_argument('--objects', type=Path,
+                        default=os.environ.get('EF2000_DECOMP_OBJECTS'),
+                        help='directory of compiled OpenWatcom .obj files '
+                             '(or set EF2000_DECOMP_OBJECTS)')
     parser.add_argument('--launcher', required=True, help=argparse.SUPPRESS)
     args, runner_args = parser.parse_known_args(argv)
+    if args.objects is None:
+        parser.error('provide --objects (build .#ef2000-decomp-watcom first) '
+                     'or set EF2000_DECOMP_OBJECTS')
     if runner_args[:1] == ['--']:
         runner_args = runner_args[1:]
     executable = args.game / '_EF2000.EXE' if args.game.is_dir() else args.game

@@ -32,7 +32,9 @@ nix build -L .                 # Precompile the native and QEMU harness objects
 nix flake check                # Unit tests, app/help/version checks, REUSE
 nix run .#ef2000-native -- ../EF2000/c/EF2000
 nix run .#ef2000-unicorn -- ../EF2000/c/EF2000
-nix run .#ef2000-decomp -- ../EF2000/c/EF2000
+nix build .#ef2000-decomp-watcom
+nix run .#ef2000-decomp -- ../EF2000/c/EF2000 \
+  --objects "$(nix build --no-link --print-out-paths .#ef2000-decomp-watcom)/lib/ef2000/decomp-objects"
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
 
@@ -142,12 +144,19 @@ three game launchers. The native and decomp launchers accept an EF2000
 installation directory and find `_EF2000.EXE` inside it; the C++ Unicorn
 launcher takes the executable path.
 The native launcher creates a unique cache run directory by default, so
-`--output` is optional. The decomp launcher compiles tracked recovered C into
-OpenWatcom objects when built, links a disposable hybrid patch at startup, and
-then runs it through the native backend. `apps.default`/`apps.ef2000` remain
-native aliases, `apps.unicorn` and `apps.unicorn-cpp` are aliases for `apps.ef2000-unicorn`
-(the C++ frontend), `apps.unicorn-py` is the deprecated, slow Python frontend
-(also `apps.ef2000-unicorn-py`), and
+`--output` is optional. `packages.ef2000-decomp-watcom` independently compiles
+the recovered C into OpenWatcom OMF objects, without building the Linux game.
+`apps.ef2000-decomp` builds only the Linux launcher and accepts the compiled
+objects via `--objects DIR` or `EF2000_DECOMP_OBJECTS`; it links a disposable
+hybrid patch at startup and runs it through the native backend. For example:
+
+```sh
+objects="$(nix build --no-link --print-out-paths .#ef2000-decomp-watcom)/lib/ef2000/decomp-objects"
+nix run .#ef2000-decomp -- /path/to/EF2000 --objects "$objects"
+```
+
+`apps.default`/`apps.ef2000` remain native aliases; `apps.ef2000-unicorn` is
+the C++ frontend, `apps.ef2000-unicorn-py` is the deprecated Python frontend, and
 `apps.unicorn-probe` retains its bounded headless diagnostic behavior.
 `packages.ef2000-win64-zip` and `packages.ef2000-win32-zip` cross-compile the
 C++ Unicorn/SDL3 frontend with MinGW-w64 and package Windows EXE/DLLs;
@@ -216,12 +225,10 @@ headless diagnostic probe:
 
 ```sh
 # Launch the original menu/flight with the deprecated, slow Python frontend
-# (use `nix run .#unicorn`, the C++ frontend, for normal play):
+# (use `nix run .#ef2000-unicorn`, the C++ frontend, for normal play):
 nix run .#ef2000-unicorn-py -- /path/to/EF2000
-# Equivalent alias:
-nix run .#unicorn-py -- /path/to/EF2000
 # Continue without a window for a limited diagnostic run:
-nix run .#unicorn-py -- --data-dir /path/to/EF2000 --headless --instruction-limit 30000000
+nix run .#ef2000-unicorn-py -- --data-dir /path/to/EF2000 --headless --instruction-limit 30000000
 # Low-level headless probe, unchanged:
 nix run .#unicorn-probe -- /path/to/_EF2000.EXE
 # The probe can still show a window explicitly:
@@ -261,7 +268,7 @@ playability or equivalence of every flight simulation state.
 
 ### Native C++ Unicorn migration
 
-`nix run .#unicorn -- /path/to/EF2000` (alias `ef2000-unicorn`) starts the game
+`nix run .#ef2000-unicorn -- /path/to/EF2000` starts the game
 in an SDL window with unlimited, real-time timing. It takes the installation
 directory or `_EF2000.EXE`. `--headless`, `--framebuffer`, `--wall-seconds`
 or a nonzero `--instruction-limit` instead run a windowless bounded diagnostic
@@ -284,48 +291,48 @@ draws its own graphics. Windowed runs have no instruction limit unless one is
 explicitly requested; close the window to stop emulation.
 
 ```sh
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed --geometry 1280x960 \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed --geometry 1280x960 \
   --aspect-ratio 4:3 --smooth-scaling
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --overlay-dir /path/to/writable-state
 # Sound-hardware discovery only; does not yet play digital audio
-nix run .#unicorn -- /path/to/_EF2000.EXE --sound sb16-probe \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --sound sb16-probe \
   --instruction-limit 100000000
 # Experimental DMA/PIC/IRQ emulation with SDL3 PCM output in windowed runs
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed --sound sb16-dma
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed --sound sb16-dma
 # Optional original-game memory-copy acceleration (experimental)
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed --sound sb16-dma --fast-copy
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed --sound sb16-dma --fast-copy
 # Real-time PIT scheduler (automatically selected for unlimited windowed runs)
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --instruction-limit 0 --timing realtime
 # Original CD music alongside SB16 effects (CUE and BIN remain read-only)
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed --sound sb16-dma \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed --sound sb16-dma \
   --cd-dir /path/to/EF2000_ISO --cd-cue /path/to/EF2000_ISO/EF_DIR.cue
 # Flight-controller diagnostics; SDL3 gamepads use mapped stick axes (not triggers)
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed --sound sb16-dma \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed --sound sb16-dma \
   --controls joystick --joystick auto --trace-joystick
 # Expose a classic two-axis PC joystick instead of four analog axes:
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed --joystick-axes 0,1
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed --joystick-axes 0,1
 # Capture the original guest DMA audio without an SDL3 sound device
-nix run .#unicorn -- /path/to/_EF2000.EXE --sound sb16-dma \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --sound sb16-dma \
   --instruction-limit 300000000 --wav-capture /tmp/ef2000-pcm
 # Capture CD music separately as /tmp/ef2000-audio/cd-audio/audio-NNN.wav
-nix run .#unicorn -- /path/to/_EF2000.EXE --sound off \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --sound off \
   --cd-cue /path/to/EF2000_ISO/EF_DIR.cue --wav-capture /tmp/ef2000-audio
-nix run .#unicorn -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
-nix run .#unicorn -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --instruction-limit 30000000 --timer-instructions 100000
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --instruction-limit 30000000 --framebuffer /tmp/ef2000-vga.ppm
 # Reproducible instruction-counted debugger mode, including in a window:
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --instruction-limit 30000000 --timing instruction
 # Bounded real-time/headless run for wall-clock pacing diagnostics:
-nix run .#unicorn -- /path/to/_EF2000.EXE --timing realtime --wall-seconds 10
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --timing realtime --wall-seconds 10
 nix develop -c ef2000-build --target ef2000-unicorn-cpp
 # The same executable has a self-contained synthetic CPU test:
-nix run .#unicorn -- --self-test
+nix run .#ef2000-unicorn -- --self-test
 # Also tests a live X-32 DOS-memory selector and BIOS CRT-base lookup:
-nix run .#unicorn -- --self-test-bda
-nix run .#unicorn -- --self-test-clock
+nix run .#ef2000-unicorn -- --self-test-bda
+nix run .#ef2000-unicorn -- --self-test-clock
 ```
 
 The C++ runner was independently replayed from the original assets through
@@ -396,7 +403,7 @@ these in the movable F12 overlay, keeping original copyrighted assets local:
 
 ```sh
 nix run .#gui-assets -- skin /path/to/EF2000 --out local/gui-skin
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --overlay-skin-dir local/gui-skin
 ```
 
@@ -432,7 +439,7 @@ original archives:
 
 ```sh
 nix run .#gui-assets -- font /path/to/EF2000 --out local/menu-font
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --overlay-font-bmp local/menu-font/menu-font.bmp
 ```
 
@@ -461,7 +468,7 @@ the complete skin:
 
 ```sh
 nix run .#gui-assets -- symbols /path/to/EF2000 --out local/menu-symbols
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --overlay-symbols-bmp local/menu-symbols/menu-symbols.bmp
 ```
 
@@ -474,7 +481,7 @@ additionally export BMPs for SDL3 (with `--bmp`). A carefully cropped BMP
 can be supplied as a nine-slice texture:
 
 ```sh
-nix run .#unicorn -- /path/to/_EF2000.EXE --windowed \
+nix run .#ef2000-unicorn -- /path/to/_EF2000.EXE --windowed \
   --overlay-frame-bmp local/ef2000-frame.bmp --overlay-frame-border 12
 ```
 
@@ -637,7 +644,7 @@ for the Python app. Real SDL3 window/gamepad operation has not been exercised
 in this build environment, and real-device sound playback, original-driver
 integration beyond the tested path, additional DOS calls and
 extensive flight-control/playability validation remain open. The working
-Python backend remains available at `nix run .#unicorn-py` for comparison.
+Python backend remains available at `nix run .#ef2000-unicorn-py` for comparison.
 
 The original `_EF2000.EXE` remains external and SHA-256 validated. The Python probe
 implements the observed X-32 stack/heap allocator, selectors, vector services,
@@ -699,7 +706,7 @@ sites, internal GUI cursor positions, control hit-tests, generated events, and
 dispatch codes by timer tick, without dumping every individual poll.
 Experimental Python `--windowed` mode now uses the shared SDL3
 renderer and input layer; headless remains the default for the probe and the
-window is the default for the new `unicorn` app. Windowed sessions
+window is the default for the `ef2000-unicorn` app. Windowed sessions
 now run until closed (or the guest stops), instead of terminating at the
 headless 30-million-instruction budget. Use `--instruction-limit N` to set
 an explicit budget (0 = unlimited). SDL3 events are

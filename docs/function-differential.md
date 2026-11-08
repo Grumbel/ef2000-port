@@ -54,7 +54,7 @@ In an **unpatched** C++ Unicorn run, record function entry at the first two
 calls to `0x432c` (once it is actually reached):
 
 ~~~sh
-nix run -L .#unicorn-cpp -- ../EF2000/c/EF2000/_EF2000.EXE \
+nix run -L .#ef2000-unicorn -- ../EF2000/c/EF2000/_EF2000.EXE \
   --windowed --instruction-limit 0 \
   --capture-calls 0x432c:2 \
   --capture-dir local/function-captures
