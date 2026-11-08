@@ -821,7 +821,13 @@ def run(image, instruction_limit=None, game_dir=None,
         if sound == 'off' or joystick_script.axis_count:
             try:
                 original_config = DosFiles._walk(files.root, ['EF2000.CFG'], must_exist=True)
-                lines = original_config.read_bytes().splitlines()
+                config_source = original_config
+                if files.overlay_root is not None:
+                    overlay_config = DosFiles._walk(files.overlay_root / 'EF2000',
+                                                    ['EF2000.CFG'], must_exist=False)
+                    if overlay_config.is_file():
+                        config_source = overlay_config
+                lines = config_source.read_bytes().splitlines()
             except (DosFileError, OSError):
                 # Keep an explicit DOS missing-file result for absent configs.
                 pass

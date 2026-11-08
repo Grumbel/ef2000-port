@@ -89,7 +89,7 @@ class DosFiles:
             raise DosFileError(2)
         try:
             data = bytearray(self.config_data if (self.config_data is not None and
-                             source == original and source.name.upper() == 'EF2000.CFG')
+                             source.name.upper() == 'EF2000.CFG')
                              else source.read_bytes())
         except OSError:
             raise DosFileError(5) from None
