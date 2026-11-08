@@ -85,7 +85,7 @@ void restore_video_mode_cdc64(void)
 {
     guest_fn_cdc38_w();
     if ((uint16_t)guest_fn_fe700_w() != EF_U16(0x0015b75cu))
-        guest_fn_fe710_w(EF_S32(0x0015b75au) >> 16);
+        guest_fn_fe710_s(EF_S32(0x0015b75au) >> 16);
 }
 
 /* 0xea3ec, 40 bytes. Rebuild the cached chunk when the descriptor has one; true if present. */

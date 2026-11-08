@@ -892,6 +892,9 @@ void guest_fn_de4b0(void); /* 0xde4b0 */
 void guest_fn_de3b4(int32_t value); /* 0xde3b4 EAX tail */
 ef_addr32 guest_fn_b3f58(int32_t index); /* 0xb3f58 EAX -> EAX */
 void guest_fn_e9a24(uint32_t a, uint32_t b, uint32_t c); /* 0xe9a24 stack, callee cleanup */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_fn_e9a24 parm routine []
+#endif
 uint32_t guest_fn_ec0ec(uint32_t first, uint32_t second); /* 0xec0ec EAX/EDX tail */
 uint32_t guest_fn_b1b8b(ef_addr32 text); /* 0xb1b8b EAX -> EAX */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
@@ -2941,6 +2944,11 @@ uint32_t EF_CDECL guest_fn_9c220(uint32_t a, uint32_t b, uint32_t c); /* 0x9c220
 uint32_t EF_CDECL guest_fn_9c23d(uint32_t a, uint32_t b, uint32_t c); /* 0x9c23d cdecl */
 uint32_t guest_fn_324(uint32_t a); /* 0x324 EAX */
 uint64_t guest_fn_348(uint32_t a); /* 0x348 EAX -> EDX:EAX */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+/* The original helper uses EBP as its temporary register-block pointer and
+ * returns without restoring it.  C callers must treat that as a clobber. */
+#pragma aux guest_fn_348 parm [eax] value [eax edx] modify [ebp]
+#endif
 void guest_fn_484(uint32_t a, uint32_t b, uint32_t c,
                   uint32_t selector); /* 0x484 EAX/EDX/EBX/ECX */
 void guest_fn_b3c04(uint32_t a, uint32_t b); /* 0xb3c04 EAX/EDX */
@@ -4440,7 +4448,7 @@ uint32_t find_node_matching_cc51c(uint32_t id, uint32_t list, uint32_t kind);
 
 /* dos_slots1.c */
 void release_hook_slot_7b4(uint32_t idx);
-void guest_fn_3f8_x(uint32_t a, uint32_t unused_edx, uint32_t b, uint32_t c); /* 0x3f8 EAX/EDX/EBX/ECX, EDX ignored */
+void guest_fn_3f8_x(uint32_t vector, uint32_t offset, uint32_t selector); /* 0x3f8 EAX/EBX/ECX */
 
 uint32_t wait_ring_data_106dc4(ef_addr32 rec, uint32_t timeout);
 
@@ -5146,6 +5154,9 @@ void guest_fn_110fd4_x(void); /* 0x110fd4 (tail jump) */
 
 void init_video_mode_cdb20(void);
 void guest_fn_fe710_s(uint32_t mode); /* 0xfe710 1 stack argument, callee cleanup */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_fn_fe710_s parm routine []
+#endif
 void guest_fn_fc39c_s(uint32_t a, uint32_t b); /* 0xfc39c 2 stack arguments, callee cleanup */
 
 void dump_page_header_9ab6c(uint32_t stream);

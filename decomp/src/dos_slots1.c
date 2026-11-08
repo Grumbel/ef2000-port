@@ -15,7 +15,7 @@ void release_hook_slot_7b4(uint32_t idx)
     if (EF_U32(rec) == 0u)
         return;
     dos_call_2505_3d0(EF_U32(rec), EF_U32(rec + 4u));
-    guest_fn_3f8_x(EF_U32(rec), 0u, EF_U32(rec + 8u), EF_U16(rec + 0xcu));
+    guest_fn_3f8_x(EF_U32(rec), EF_U32(rec + 8u), EF_U16(rec + 0xcu));
     count = EF_U32(0x00196140u) + 1u;
     EF_U32(rec) = 0u;
     EF_U8(0x00196133u + count) = (uint8_t)idx;

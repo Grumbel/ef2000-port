@@ -23498,9 +23498,9 @@ static void dosx_call_196148(uint32_t func, uint32_t ecx_in, uint32_t edx_in, ui
 }
 
 /* 0x3f8, 140 bytes. DOS-extender int 21h AX=2502h (get protected-mode interrupt vector) through the register block at 0x196148. */
-void dosx_int21_2502_3f8(uint32_t a, uint32_t b, uint32_t c)
+void dosx_int21_2502_3f8(uint32_t vector, uint32_t offset, uint32_t selector)
 {
-	dosx_call_196148(0x2502u, a, b, c);
+	dosx_call_196148(0x2502u, vector, offset, selector);
 }
 
 /* 0x484, 140 bytes. DOS-extender int 21h AX=2506h through the register block at 0x196148. */

@@ -1130,3 +1130,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `0xfa9a0` handle close. Updated both declarations and forwarded EDX.
   This is a static ABI correction; runtime replay remains pending. M1 is
   still unpassed, and no mechanical-generation numbers changed.
+- Native64 hook-slot replay, 2026-11-08: corrected the original `0x348`
+  helper ABI to declare its EBP clobber. OpenWatcom had kept the recovered
+  `start_timer_734` table offset in EBP across that guest call; the original
+  helper returns with EBP pointing at `0x196148`, so the recovered body wrote
+  the selector outside the slot. Also corrected the `0x3f8` register inputs
+  from the original caller/disassembly. The private-Xvfb decomp launch now
+  reaches the menu and gets past the former `DS=0x6118` fault. It later exits
+  to startup and faults at `0x9c231` (`AX=0x252b`, `ERROR=0xe834`); M1 remains
+  unpassed. This image reports 1,744 recovered functions, 8,720 redirect
+  bytes, 493,408 arena bytes and 257/341 modules linked.

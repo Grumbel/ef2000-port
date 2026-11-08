@@ -724,6 +724,23 @@ static void guest_fault(u32 signal, struct context *r) {
         }
         text("FAULT_CONTEXT ", 14);
         field("CS", r->cs);
+        field("BP", r->bp);
+        u32 frame = r->bp;
+        for (u32 depth = 0; depth < 8; ++depth) {
+            if (frame < r->sp || frame > IMAGE_SIZE - 8) break;
+            u32 previous = *(u32 *)guest(frame);
+            u32 return_ip = *(u32 *)guest(frame + 4);
+            static char const *const frame_bp_names[] = {
+                "FBP0", "FBP1", "FBP2", "FBP3", "FBP4", "FBP5", "FBP6", "FBP7"
+            };
+            static char const *const frame_ip_names[] = {
+                "FIP0", "FIP1", "FIP2", "FIP3", "FIP4", "FIP5", "FIP6", "FIP7"
+            };
+            field(frame_bp_names[depth], frame);
+            field(frame_ip_names[depth], return_ip);
+            if (previous <= frame || previous > IMAGE_SIZE - 8) break;
+            frame = previous;
+        }
         field("PAGE", *(u8 *)guest(0x0015bdd1u));
         field("PAGE_CB0", *(u32 *)guest(0x0015b74cu));
         field("PAGE_CB1", *(u32 *)guest(0x0015b750u));
