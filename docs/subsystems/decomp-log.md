@@ -1140,3 +1140,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   to startup and faults at `0x9c231` (`AX=0x252b`, `ERROR=0xe834`); M1 remains
   unpassed. This image reports 1,744 recovered functions, 8,720 redirect
   bytes, 493,408 arena bytes and 257/341 modules linked.
+- Native64 startup fault trace, 2026-11-08: the `0x9c231` frame's return
+  address `0x030720ab` maps exactly to the ABI trampoline for `0x9c23d`.
+  Original `0x9c23d` is a stack-preserving tail jump to `0x9c224`; the C
+  replacement enters through a trampoline that pushes six preserved registers
+  before tail-jumping into the X-32 wrapper. Its stack arguments are therefore
+  read as saved EDI/ESI/EBP (`0x67`, `0x03ffe834`, `0x80`), producing the bad
+  selector at `LES` in `0x9c231`. Added `0x9c23d` to the hybrid exclusion list;
+  rebuilding yields 1,743 redirects, 8,715 redirect bytes, 493,390 arena
+  bytes and 257/341 modules linked. The exclusion's runtime effect is still
+  unverified: sandboxed Xvfb cannot bind its required X11 socket and `nix run`
+  cannot access the Nix daemon. M1 and the interactive menu remain unpassed.
