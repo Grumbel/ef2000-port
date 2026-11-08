@@ -1151,3 +1151,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   bytes and 257/341 modules linked. The exclusion's runtime effect is still
   unverified: sandboxed Xvfb cannot bind its required X11 socket and `nix run`
   cannot access the Nix daemon. M1 and the interactive menu remain unpassed.
+
+- Fill-helper stack fix, 2026-11-08: tracing the cleanup fault at `0x1104c7`
+  back to its source showed `fill_bytes_b3fb0` (`0xb3fb0`) had filled an
+  archive context with `0xf0` bytes. The function wrapped a C call to original
+  helper `0xdeb50` in inline `push eax`/`pop eax`; OpenWatcom then read the
+  fill-value parameter from the shifted stack slot, so a pointer ending in
+  `0xf0` became the repeated fill value. Replaced that sequence with a small
+  Watcom `#pragma aux` helper that saves ESI/EAX, invokes `0xdeb50` with the
+  confirmed EAX/EDX/ECX helper ABI, then restores both registers. OpenWatcom
+  2.0 compiles `leaf_helpers1.c` with zero warnings/errors. A differential probe
+  with destination `0x03000000`, fill `0x5a`, count 32 passes 1/1 and compares
+  all 32 guest RAM bytes. A patch containing only this replacement reaches
+  startup, loading, and the main menu in a 20-second headless replay without a
+  fault. This isolates and fixes the observed poison-fill crash; the broader
+  hybrid still faults at `0x4dc`, so M1 is not passed. UI interaction is not
+  reverified: private Xvfb cannot bind its X11 socket in this environment.
+  For the next quick-fight interaction replay, the click target is the
+  rectangle below “Schnelles Gefecht” at `(165, 110)`, not the label text.
