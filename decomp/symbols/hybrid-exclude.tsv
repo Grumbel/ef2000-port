@@ -12,3 +12,4 @@ addr	reason
 0x0009c23d	Original entry is a stack-preserving tail jump to 0x9c224; the C replacement trampoline pushes preserved registers ahead of its stack arguments and faults at 0x9c231 with a shifted selector. Keep the original JMP bytes.
 0x0000023b	M1 replay bisector isolates this replacement as sufficient for startup failure at INT 0 (IP 0x9c55a); keep the original flag-dependent interrupt-vector fragment until its DOS interrupt bridge is recovered.
 0x001093d8	Recovered dispatcher produces `ini: expected '='` while parsing extracted INIT3D.TXT and guest exits with code 0xff; keep original text-script dispatcher pending ABI/behavior recovery.
+0x000dc21c	Original callers pass four stack arguments and expect ret 0x10. The compiled body reads Watcom register arguments and returns with plain ret, corrupting stack during logo setup; keep original bytes until a stack-aware ABI thunk is available.

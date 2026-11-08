@@ -1180,3 +1180,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   call and is not the cause. Main menu remains unpassed; private Xvfb could
   not bind because `/tmp/.X11-unix` is owned by `nobody`, so UI input was not
   tested.
+- Logo startup stack fix, 2026-11-08: replay with current metadata patches
+  1,742 functions (8,710 redirect bytes, 493,356 arena bytes; 257/341 modules)
+  and no longer exits with `0xff` in the recovered INIT3D dispatcher. Its
+  first remaining fault is a stack fetch at `EIP=0x03ffee9e` while the DIC logo
+  is displayed. The original `0xe4188` caller pushes four arguments before
+  calling `0xdc21c`; the original callee reads `[EBP+0x10..0x1c]` and ends in
+  `ret 0x10`. The replacement body consumes OpenWatcom register arguments and
+  ends in plain `ret`, leaving those stack arguments in place. Excluding
+  `0xdc21c` restores the original call ABI and advances past the stack fault,
+  but the guest then exits `0xff` parsing `supergui/System.gui` (`String "0" not
+  recognised as a Variable`). The entry is marked `compiles-bad` pending a
+  stack-aware thunk; menu remains unpassed.
