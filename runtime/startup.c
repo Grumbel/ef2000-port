@@ -50,6 +50,10 @@ typedef unsigned short u16;
 typedef unsigned char u8;
 #define IMAGE_SIZE 0x4000000u
 #define INITIAL_SP (IMAGE_SIZE - 0x1000u)
+#ifdef EF_RESERVED_ARENA_START
+#define RESERVED_ARENA_START EF_RESERVED_ARENA_START
+#define RESERVED_ARENA_END EF_RESERVED_ARENA_END
+#endif
 #define DOS_BASE 0x01000000u
 #define INPUT_BASE (DOS_BASE + 0xf1400u)
 #define JOYSTICK_BASE (DOS_BASE + 0xf1600u)
@@ -1126,9 +1130,14 @@ void setup(uptr *initial_stack) {
      */
     allocation.heap_end = 0x4df000;
     allocation.stack_end = (INITIAL_SP - 0x126a) & 0xfffff000u;
+#ifdef EF_RESERVED_ARENA_START
+    allocation.minimum_stack = (RESERVED_ARENA_END + 0xfffu) & 0xfffff000u;
+    allocation.heap_ceiling = RESERVED_ARENA_START;
+#else
     allocation.minimum_stack = allocation.heap_end + 0x2000;
-    allocation.free_bytes = allocation.stack_end - allocation.minimum_stack;
     allocation.heap_ceiling = IMAGE_SIZE;
+#endif
+    allocation.free_bytes = allocation.stack_end - allocation.minimum_stack;
     heap_peak = allocation.heap_end;
     stack_low = allocation.stack_end;
     /* Prove that ORIGINAL startup clears BSS rather than relying on ELF zeros. */

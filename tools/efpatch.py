@@ -7,8 +7,9 @@ EFPATCH1 binary format (little endian):
     magic[8], original initialized-payload SHA256[32], count:u32,
     repeated { offset:u32, length:u32, data[length] }
 
-Only original initialized payload bytes are writable. Arena writes are
-explicitly unsupported until guest allocation high-water is established.
+``pack`` accepts in-place writes to the initialized payload. ``pack_writes``
+can also encode writes into a caller-reserved guest arena by supplying its
+address limit; consumers must reserve those ranges from heap and stack growth.
 """
 
 import argparse

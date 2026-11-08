@@ -25,6 +25,12 @@ except ImportError:
     from input_devices import flight_control_settings
     from paths import resolve_paths, format_paths
 
+IMAGE_SIZE = 0x4000000
+BSS_END = 0x4de2f0
+HEAP_START = (BSS_END + 0xfff) & 0xfffff000
+INITIAL_SP = IMAGE_SIZE - 0x1000
+STACK_LOW = (INITIAL_SP - 0x126a) & 0xfffff000
+
 
 def analyze_calls(log):
     calls = []
@@ -159,7 +165,7 @@ def main():
                         help='debug the native original-code ELF under GDB; Python serves guest hardware requests')
     parser.add_argument('--load-state', type=Path, metavar='FILE', help='restore a native save-state bundle at startup')
     parser.add_argument('--patch', action='append', type=Path, default=[], metavar='FILE',
-                        help='apply a verified in-place EFPATCH1 binary to the disposable guest image; repeatable')
+                        help='apply a verified EFPATCH1 binary, including a bounded guest arena, to the disposable image; repeatable')
     parser.add_argument('--data-dir', type=Path, metavar='DIR', help='directory containing original EF2000 game data')
     parser.add_argument('--config-dir', type=Path, metavar='DIR', help='user configuration directory')
     parser.add_argument('--state-dir', type=Path, metavar='DIR', help='save states (default: XDG_STATE_HOME/ef2000)')
@@ -257,10 +263,25 @@ def main():
         except ImportError:
             from efpatch import apply_patches, decode
         original_image = images['payload.bin']
-        images['payload.bin'], patch_hashes = apply_patches(original_image, args.patch)
+        patch_writes = [write for path in args.patch
+                        for write in decode(path.read_bytes(), original_image,
+                                            address_limit=IMAGE_SIZE)]
+        images['payload.bin'], patch_hashes = apply_patches(
+            original_image, args.patch, address_limit=IMAGE_SIZE)
+        arena_writes = [(offset, data) for offset, data in patch_writes
+                        if offset + len(data) > len(original_image)]
+        reserved_arena = None
+        if arena_writes:
+            arena_start = min(offset for offset, _data in arena_writes)
+            arena_end = max(offset + len(data) for offset, data in arena_writes)
+            if arena_start < HEAP_START or arena_end > STACK_LOW:
+                raise ValueError('hybrid arena must be above initial heap and below guest stack')
+            reserved_arena = (arena_start, arena_end)
         patch_report = [{'file': str(path.resolve()), 'sha256': sha,
                          'writes': [{'offset': address, 'bytes': len(data)}
-                                    for address, data in decode(path.read_bytes(), original_image)]}
+                                    for address, data in decode(
+                                        path.read_bytes(), original_image,
+                                        address_limit=IMAGE_SIZE)]}
                         for path, sha in zip(args.patch, patch_hashes)]
         if patch_hashes:
             print(f'patches: {len(patch_hashes)} in-place EFPATCH1 file(s)', flush=True)
@@ -292,11 +313,13 @@ def main():
             if directory.is_dir():
                 (overlay / directory.relative_to(args.executable.resolve().parent)).mkdir(parents=True, exist_ok=True)
         (output / 'payload.bin').write_bytes(images['payload.bin'])
-        (output / 'payload.S').write_text('.section .guest,"awx",@progbits\n'
-                                         '.incbin "payload.bin"\n'
-                                         '.section .guest_bss,"aw",@nobits\n'
-                                         '.zero 0x4000000-0x195fb0\n'
-                                         '.section .note.GNU-stack,"",@progbits\n')
+        payload_assembly = ('.section .guest,"awx",@progbits\n'
+                            '.incbin "payload.bin"\n'
+                            '.section .guest_bss,"aw",@nobits\n'
+                            '.zero 0x%x-0x%x\n'
+                            '.section .note.GNU-stack,"",@progbits\n' %
+                            (IMAGE_SIZE, len(images['payload.bin'])))
+        (output / 'payload.S').write_text(payload_assembly)
         native = args.backend == 'native64'
         width = '64' if native else '32'
         compiler = ['gcc', '-m' + width, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
@@ -304,13 +327,17 @@ def main():
                     '-fno-asynchronous-unwind-tables', '-fno-builtin']
         if native:
             compiler += ['-D_GNU_SOURCE', '-DEF_NATIVE64']
+        startup_compiler = compiler.copy()
+        if reserved_arena:
+            startup_compiler += ['-DEF_RESERVED_ARENA_START=0x%x' % reserved_arena[0],
+                                 '-DEF_RESERVED_ARENA_END=0x%x' % reserved_arena[1]]
         entry = source / ('native64.S' if native else 'entry.S')
         linker = source / ('native64.ld' if native else 'startup.ld')
         assembler = ['as', '--' + width, '-I', str(source)]
         if args.check_segment_limit:
             assembler += ['--defsym', 'CHECK_SEGMENT_LIMIT=1']
         commands = [
-            compiler + ['-c', str(source / 'startup.c'), '-o', 'startup.o'],
+            startup_compiler + ['-c', str(source / 'startup.c'), '-o', 'startup.o'],
             compiler + ['-c', str(source / 'x32.c'), '-o', 'x32.o'],
             assembler + [str(entry), '-o', 'entry.o'],
             ['as', '--' + width, 'payload.S', '-o', 'payload.o'],
@@ -319,12 +346,15 @@ def main():
         ]
         if args.runtime_objects:
             objects = args.runtime_objects.resolve() / args.backend
-            for name in ('startup.o', 'x32.o'):
-                shutil.copyfile(objects / name, output / name)
+            shutil.copyfile(objects / 'x32.o', output / 'x32.o')
             entry_object = 'entry-limit.o' if args.check_segment_limit else 'entry.o'
             shutil.copyfile(objects / entry_object, output / 'entry.o')
-            # Only payload assembly and linking depend on the external game.
-            commands = commands[-2:]
+            if reserved_arena:
+                commands = [commands[0], *commands[-2:]]
+            else:
+                shutil.copyfile(objects / 'startup.o', output / 'startup.o')
+                # Only payload assembly and linking depend on the external game.
+                commands = commands[-2:]
         with (output / 'build.log').open('w') as log:
             for command in commands:
                 subprocess.run(command, cwd=output, stdout=log, stderr=subprocess.STDOUT,
