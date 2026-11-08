@@ -1130,12 +1130,14 @@ void setup(uptr *initial_stack) {
      */
     allocation.heap_end = 0x4df000;
     allocation.stack_end = (INITIAL_SP - 0x126a) & 0xfffff000u;
-#ifdef EF_RESERVED_ARENA_START
-    allocation.minimum_stack = (RESERVED_ARENA_END + 0xfffu) & 0xfffff000u;
-    allocation.heap_ceiling = RESERVED_ARENA_START;
-#else
     allocation.minimum_stack = allocation.heap_end + 0x2000;
     allocation.heap_ceiling = IMAGE_SIZE;
+#ifdef EF_RESERVED_ARENA_START
+    allocation.arena_start = RESERVED_ARENA_START;
+    allocation.arena_end = RESERVED_ARENA_END;
+#else
+    allocation.arena_start = IMAGE_SIZE;
+    allocation.arena_end = IMAGE_SIZE;
 #endif
     allocation.free_bytes = allocation.stack_end - allocation.minimum_stack;
     heap_peak = allocation.heap_end;

@@ -13,12 +13,15 @@ int x32_stack_reserve(struct x32_allocation *state, u32 sp, u32 size,
     if (sp < size) return 0;
     u32 boundary = (sp - size) & 0xfffff000u;
     if (boundary < state->minimum_stack) return 0;
+    if (state->arena_start < state->stack_end && state->arena_end > boundary) return 0;
     u32 consumed = state->stack_end - boundary;
     if (state->free_bytes < consumed) return 0;
     state->stack_end = boundary;
     state->free_bytes -= consumed;
     u32 before_dec = boundary - state->free_bytes;
     u32 limit = before_dec - 1;
+    if (state->arena_start < state->stack_end && state->arena_end - 1 > limit)
+        limit = state->arena_end - 1;
     /* Reproduce flags from DEC EDX, followed by the common success CLC. */
     flags &= ~0x8d5u; /* OF, SF, ZF, AF, PF, CF */
     if (limit & 0x80000000u) flags |= 0x80;
@@ -40,6 +43,7 @@ int x32_heap_grow(struct x32_allocation *state, u32 requested, u32 flags,
                   struct x32_heap_result *result) {
     u32 rounded = (requested + 0xfff) & 0xfffff000u;
     if (rounded >= state->heap_ceiling) return 0;
+    if (state->heap_end < state->arena_end && rounded > state->arena_start) return 0;
     if (rounded > state->heap_end) {
         u32 growth = rounded - state->heap_end;
         if (growth > state->free_bytes) return 0;

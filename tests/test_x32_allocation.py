@@ -11,7 +11,9 @@ import unittest
 
 
 class Allocation(ctypes.Structure):
-    _fields_ = [(name, ctypes.c_uint32) for name in ('heap_end', 'stack_end', 'free_bytes', 'minimum_stack', 'heap_ceiling')]
+    _fields_ = [(name, ctypes.c_uint32) for name in (
+        'heap_end', 'stack_end', 'free_bytes', 'minimum_stack', 'heap_ceiling',
+        'arena_start', 'arena_end')]
 
 
 class Result(ctypes.Structure):

@@ -5,7 +5,10 @@
 #ifndef EF2000_X32_H
 #define EF2000_X32_H
 typedef unsigned int u32;
-struct x32_allocation { u32 heap_end, stack_end, free_bytes, minimum_stack, heap_ceiling; };
+struct x32_allocation {
+    u32 heap_end, stack_end, free_bytes, minimum_stack, heap_ceiling;
+    u32 arena_start, arena_end;
+};
 struct x32_stack_result { u32 low_limit, flags; };
 int x32_stack_reserve(struct x32_allocation *, u32 sp, u32 size, u32 flags,
                       struct x32_stack_result *);

@@ -346,12 +346,12 @@ def main():
         ]
         if args.runtime_objects:
             objects = args.runtime_objects.resolve() / args.backend
-            shutil.copyfile(objects / 'x32.o', output / 'x32.o')
             entry_object = 'entry-limit.o' if args.check_segment_limit else 'entry.o'
             shutil.copyfile(objects / entry_object, output / 'entry.o')
             if reserved_arena:
-                commands = [commands[0], *commands[-2:]]
+                commands = [*commands[:2], *commands[-2:]]
             else:
+                shutil.copyfile(objects / 'x32.o', output / 'x32.o')
                 shutil.copyfile(objects / 'startup.o', output / 'startup.o')
                 # Only payload assembly and linking depend on the external game.
                 commands = commands[-2:]
