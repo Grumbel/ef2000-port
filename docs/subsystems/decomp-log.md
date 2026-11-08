@@ -1169,3 +1169,14 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   reverified: private Xvfb cannot bind its X11 socket in this environment.
   For the next quick-fight interaction replay, the click target is the
   rectangle below “Schnelles Gefecht” at `(165, 110)`, not the label text.
+- INIT3D dispatcher failure, 2026-11-08: replaying the current 1,743-function
+  hybrid with the fixed DOS clock in headless native64 mode reproduces the
+  `ini: expected '='` message and guest exit `0xff` after video mode `0x100`.
+  The triggering recovered entry is `run_text_script_1093d8`; leaving that
+  entry original removes the parser message and exit, but exposes a separate
+  stack-fetch fault at `EIP=0x03ffee9e` while the framebuffer still shows the
+  DIC logo. The entry is excluded from redirects and marked `compiles-bad`.
+  The paired X-32 vector restore at `0x2507` was handled before the parser
+  call and is not the cause. Main menu remains unpassed; private Xvfb could
+  not bind because `/tmp/.X11-unix` is owned by `nobody`, so UI input was not
+  tested.
