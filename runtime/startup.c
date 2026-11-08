@@ -929,6 +929,16 @@ static void guest_fault(u32 signal, struct context *r) {
          */
         real_vectors[vector] = 0xf0000000u | (vector << 2);
         r->flags &= ~1u;
+    } else if ((r->ax & 0xffff) == 0x2507) {
+        /* X-32 paired-vector restore: CL selects the vector, EBX is its
+         * real-mode target, and DS:EDX is its protected-mode target.
+         * Startup uses this after the legacy PIC-base query (0x250c).
+         */
+        u32 vector = r->cx & 255;
+        protected_vectors[vector].offset = r->dx;
+        protected_vectors[vector].selector = r->ds;
+        real_vectors[vector] = r->bx;
+        r->flags &= ~1u;
     } else if (((r->ax >> 8) & 255) == 0x48 && (r->bx & 0xffff)) {
         u32 size = (r->bx & 0xffff) << 4;
         if (size > 0x90000 - conventional_end) {
