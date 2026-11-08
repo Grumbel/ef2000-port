@@ -31,7 +31,7 @@ On x86-64 Linux, build and run with Nix:
 nix build -L .                 # Precompile the native and QEMU harness objects
 nix flake check                # Unit tests, app/help/version checks, REUSE
 nix run .#ef2000-native -- ../EF2000/c/EF2000
-nix run .#ef2000-unicorn -- ../EF2000/c/EF2000/_EF2000.EXE --windowed
+nix run .#ef2000-unicorn -- ../EF2000/c/EF2000
 nix run .#ef2000-decomp -- ../EF2000/c/EF2000
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
@@ -260,6 +260,12 @@ with 8,090 protected timer interrupts. Neither result establishes real-time
 playability or equivalence of every flight simulation state.
 
 ### Native C++ Unicorn migration
+
+`nix run .#unicorn -- /path/to/EF2000` (alias `ef2000-unicorn`) starts the game
+in an SDL window with unlimited, real-time timing. It takes the installation
+directory or `_EF2000.EXE`. `--headless`, `--framebuffer`, `--wall-seconds`
+or a nonzero `--instruction-limit` instead run a windowless bounded diagnostic
+unless `--windowed` is also given.
 
 The new `ef2000-unicorn-cpp` binary executes the original X-32 image directly
 through Unicorn's **C API**, without launching a Python interpreter. The

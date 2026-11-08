@@ -3294,7 +3294,7 @@ private:
 };
 
 void usage(const char* program) {
-    std::cout << "Usage: " << program << " _EF2000.EXE [--instruction-limit N]"
+    std::cout << "Usage: " << program << " GAME [--instruction-limit N]"
               << " [--game-dir DIR] [--cd-dir DIR] [--cd-cue FILE] [--overlay-dir DIR] [--windowed]"
               << " [--timer-instructions N] (instruction timing only)\n"
               << "       [--sound off|sb16-probe|sb16-dma] (SDL3 audio if available)\n"
@@ -3345,6 +3345,10 @@ void usage(const char* program) {
               << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
               << "       Windowed default: $XDG_STATE_HOME/ef2000/unicorn/drive\n"
               << "       Windows default: %LOCALAPPDATA%\\ef2000\\state\\unicorn\\drive\n"
+              << "       GAME may be the EF2000 directory or _EF2000.EXE. By default the game runs\n"
+              << "       in an SDL window with no instruction limit; --headless, --framebuffer or a\n"
+              << "       nonzero --instruction-limit (unless --windowed) run a bounded diagnostic.\n"
+              << "       [--headless] (no window; bounded diagnostic, default 30000000 instructions)\n"
               << "Experimental native C++ Unicorn X-32 game frontend.\n"
               << "Stops explicitly at unsupported DOS/BIOS interfaces.\n"
               << "       " << program << " --self-test | --self-test-bda | --self-test-clock | --self-test-retrace | --self-test-fast-copy | --self-test-archive-lookup | --self-test-patch-hits\n";
@@ -3357,6 +3361,7 @@ int main(int argc, char** argv) {
         std::string game_dir, cd_dir, cd_cue, overlay_dir;
         uint64_t limit = 30000000;
         bool explicit_limit = false;
+        bool headless = false, explicit_window = false;
         uint64_t timer_interval = 250000;
         ExecutionTiming timing = ExecutionTiming::Auto;
         bool guest_dos_clock = false;
@@ -3397,6 +3402,8 @@ int main(int argc, char** argv) {
                 limit = std::stoull(value, &end);
                 if (end != value.size()) throw std::runtime_error("invalid instruction limit");
                 explicit_limit = true;
+            } else if (!std::strcmp(argv[i], "--headless")) {
+                headless = true;
             } else if (!std::strcmp(argv[i], "--patch") && i + 1 < argc) {
                 patch_paths.emplace_back(argv[++i]);
             } else if (!std::strcmp(argv[i], "--trace-patch-entry") && i + 1 < argc) {
@@ -3567,9 +3574,9 @@ int main(int argc, char** argv) {
                 else if (mode == "off") sound_mode = ef2000::SoundMode::Off;
                 else throw std::runtime_error("invalid --sound (off, sb16-probe, sb16-dma)");
             } else if (!std::strcmp(argv[i], "--windowed")) {
-                window.enabled = true;
+                window.enabled = explicit_window = true;
             } else if (!std::strcmp(argv[i], "--fullscreen")) {
-                window.enabled = window.fullscreen = true;
+                window.enabled = window.fullscreen = explicit_window = true;
             } else if (!std::strcmp(argv[i], "--geometry") && i + 1 < argc) {
                 int width{}, height{};
                 char trailing{};
@@ -3694,6 +3701,18 @@ int main(int argc, char** argv) {
             } else if (argv[i][0] != '-' && path.empty()) path = argv[i];
             else throw std::runtime_error("unrecognized option: " + std::string(argv[i]));
         }
+        if (headless && explicit_window)
+            throw std::runtime_error("--headless conflicts with --windowed/--fullscreen");
+        // Playing is the default for a game run. A bounded run (explicit
+        // nonzero --instruction-limit), --headless, real-time wall limits
+        // and the self-tests stay windowless diagnostics unless a window
+        // was requested explicitly.
+        const bool any_self_test = self_test || self_test_bda || self_test_clock ||
+            self_test_retrace || self_test_fast_copy || self_test_archive_lookup ||
+            self_test_patch_hits;
+        if (!explicit_window && !headless && !any_self_test && wall_seconds <= 0 &&
+            !(explicit_limit && limit) && framebuffer.empty() && !path.empty())
+            window.enabled = true;
         if (window.profile_video_frames && !window.enabled)
             throw std::runtime_error("--profile-video-frames requires --windowed or --fullscreen");
         if (!trace_block_state.empty() && !trace_instruction_state.empty())
@@ -3904,6 +3923,19 @@ int main(int argc, char** argv) {
                          [](const TimedKeyEvent& a, const TimedKeyEvent& b) { return a.tick < b.tick; });
         std::stable_sort(joystick_events.begin(), joystick_events.end(),
                          [](const JoystickEvent& a, const JoystickEvent& b) { return a.tick < b.tick; });
+        // Accept the EF2000 installation directory like the other launchers.
+        std::error_code directory_error;
+        if (fs::is_directory(path, directory_error)) {
+            fs::path found;
+            for (const auto& entry : fs::directory_iterator(path)) {
+                std::string name = entry.path().filename().string();
+                for (char& c : name) c = char(std::tolower((unsigned char)c));
+                if (name == "_ef2000.exe") { found = entry.path(); break; }
+            }
+            if (found.empty())
+                throw std::runtime_error("no _EF2000.EXE in directory: " + path);
+            path = found.string();
+        }
         auto image = payload_from_executable(path);
         const size_t original_image_size = image.size();
         std::vector<uint32_t> patch_entries;

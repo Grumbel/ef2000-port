@@ -1123,7 +1123,7 @@
           printf '  ef2000-run [GAME_ARGS]          Build and run the original DOS game on Linux\n'
           printf '  ef2000-run-gdb [GAME_ARGS]      Build and debug the native game ELF in GDB\n\n'
           printf 'Portable original-code emulator (experimental, slower than native):\n'
-          printf '  nix run .#unicorn -- /path/to/_EF2000.EXE --windowed\n'
+          printf '  nix run .#unicorn -- /path/to/EF2000\n'
           printf '                                  Native C++ Unicorn/SDL3 menu and flight frontend\n'
           printf '  nix run .#unicorn-py -- --data-dir /path/to/EF2000\n'
           printf '                                  Deprecated slow Python frontend\n'
