@@ -32,9 +32,8 @@ nix build -L .                 # Precompile the native and QEMU harness objects
 nix flake check                # Unit tests, app/help/version checks, REUSE
 nix run .#ef2000-native -- ../EF2000/c/EF2000
 nix run .#ef2000-unicorn -- ../EF2000/c/EF2000
-nix build .#ef2000-decomp-watcom
-nix run .#ef2000-decomp -- ../EF2000/c/EF2000 \
-  --objects "$(nix build --no-link --print-out-paths .#ef2000-decomp-watcom)/lib/ef2000/decomp-objects"
+nix run .#ef2000-decomp             # GCC Linux standalone bootstrap
+nix run .#ef2000-decomp-watcom      # OpenWatcom DOS bootstrap in DOSBox-X
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
 
@@ -139,20 +138,39 @@ in the run's output directory. `--gdb` is also available on the Python runner
 for `native64` with Unicorn real-mode services; QEMU is not supported.
 The shell greeting lists these commands, usage examples and the active paths.
 
-`apps.ef2000-native`, `apps.ef2000-unicorn` and `apps.ef2000-decomp` are the
-three game launchers. The native and decomp launchers accept an EF2000
-installation directory and find `_EF2000.EXE` inside it; the C++ Unicorn
-launcher takes the executable path.
-The native launcher creates a unique cache run directory by default, so
-`--output` is optional. `packages.ef2000-decomp-watcom` independently compiles
-the recovered C into OpenWatcom OMF objects, without building the Linux game.
-`apps.ef2000-decomp` builds only the Linux launcher and accepts the compiled
-objects via `--objects DIR` or `EF2000_DECOMP_OBJECTS`; it links a disposable
-hybrid patch at startup and runs it through the native backend. For example:
+`apps.ef2000-native` and `apps.ef2000-unicorn` run the original game through
+the native64 and C++ Unicorn backends. The native launcher accepts an EF2000
+installation directory and finds `_EF2000.EXE` inside it; the C++ Unicorn
+launcher accepts either the installation directory or executable path. The
+native launcher creates a unique cache run directory by default, so `--output`
+is optional.
+
+The *standalone decomp builds* now have distinct compilers, binaries, and apps:
+
+- `packages.ef2000-decomp` uses GCC to build a native Linux ELF from the
+  recovered C, along with an archive and individual GCC object files for 338
+  of the 341 recovered C modules. Three remaining modules use unsupported
+  Watcom-specific constructs. `nix run .#ef2000-decomp` directly executes the
+  Linux binary.
+- `packages.ef2000-decomp-watcom` compiles all recovered C modules to
+  OpenWatcom OMF and links a 32-bit DOS/CauseWay `EFDECOMP.EXE` from the
+  recovered high-score module. `nix run .#ef2000-decomp-watcom` starts that
+  executable inside DOSBox-X.
+
+**These are executable bootstrap programs, not yet playable games.** Both
+actually invoke recovered C (`hiscore_qualifies`), but the game's original
+entry point, global-data definitions, and hardware platform layer have not
+been recovered. The GCC archive and Watcom objects are incremental build
+inputs; their unresolved references prevent linking the complete game today.
+
+The previous hybrid game launcher is now `apps.ef2000-hybrid`. It uses the
+original game code for unrecovered functions, takes precompiled Watcom OMF
+objects with `--objects DIR` or `EF2000_DECOMP_OBJECTS`, and links a
+disposable patch at startup. To keep using that path:
 
 ```sh
 objects="$(nix build --no-link --print-out-paths .#ef2000-decomp-watcom)/lib/ef2000/decomp-objects"
-nix run .#ef2000-decomp -- /path/to/EF2000 --objects "$objects"
+nix run .#ef2000-hybrid -- /path/to/EF2000 --objects "$objects"
 ```
 
 `apps.default`/`apps.ef2000` remain native aliases; `apps.ef2000-unicorn` is

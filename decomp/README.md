@@ -42,10 +42,20 @@ Layout:
 - `tests/`: per-function differential test specifications.
 - `build/`: ignored OpenWatcom object files and other generated outputs.
 
-There is no standalone game build yet. The intended workflow is to compile
-individual functions with OpenWatcom, splice them into the original guest
-image, and compare behavior against the unmodified executable (plan §4).
-The host-side emulator remains the validation oracle. See
+There is no standalone **playable game** build yet. The flake now produces
+two executable bootstraps from `standalone/main.c` and recovered
+`src/hiscore.c`: `.#ef2000-decomp` (native GCC/Linux) and
+`.#ef2000-decomp-watcom` (OpenWatcom/CauseWay DOS, launched via DOSBox-X).
+The Linux package also compiles 338 portable modules into a GCC archive;
+`game_helpers125.c`, `runtime_helpers23.c`, and `runtime_helpers42.c` still
+contain Watcom-specific or non-portable C. The DOS package retains all OMF
+objects for hybrid splicing. The bootstrap uses synthetic high-score data;
+it cannot enter the game. Original globals, game startup, external function
+bindings and platform services are not yet reconstructed for standalone use.
+
+Use `.#ef2000-hybrid` to combine OpenWatcom OMF replacements with the
+original executable through the native64 harness until the source is complete.
+The original-code runtime remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
 Status (2026-11-07): 4,277 Ghidra-inventoried functions plus 10 manually

@@ -324,8 +324,52 @@
           license = lib.licenses.gpl3Plus;
         };
       };
-      # Build recovered C to OpenWatcom OMF independently of the Linux game.
-      # The decomp launcher accepts this output at runtime via --objects.
+      # Native decomp bootstrap: GCC objects for every currently portable
+      # recovered module, plus a small runnable ELF linked from recovered C.
+      # A full game cannot link yet: guest globals and the game entry point
+      # are still missing. The remaining three files need GCC portability work.
+      decompLinux = pkgs.stdenv.mkDerivation {
+        pname = "ef2000-decomp";
+        inherit version;
+        src = source;
+        dontConfigure = true;
+        buildPhase = ''
+          runHook preBuild
+          mkdir -p objects
+          for module in decomp/src/*.c; do
+            name="$(basename "$module" .c)"
+            case "$name" in
+              game_helpers125|runtime_helpers23|runtime_helpers42) continue ;;
+            esac
+            $CC -std=c11 -O2 -fno-strict-aliasing -fwrapv \
+              -Idecomp/include -c "$module" -o "objects/$name.o"
+          done
+          $AR rcs libef2000-decomp.a objects/*.o
+          $CC -std=c11 -O2 -Wall -Wextra -Werror \
+            -fno-strict-aliasing -fwrapv -Idecomp/include \
+            decomp/standalone/main.c -L. -lef2000-decomp -o ef2000-decomp
+          ./ef2000-decomp --self-test
+          runHook postBuild
+        '';
+        installPhase = ''
+          runHook preInstall
+          mkdir -p "$out/bin" "$out/lib/ef2000" "$out/share/licenses/ef2000"
+          cp ef2000-decomp "$out/bin/"
+          cp libef2000-decomp.a "$out/lib/ef2000/"
+          cp -r objects "$out/lib/ef2000/gcc-objects"
+          cp LICENSES/LicenseRef-EF2000-Derived.txt \
+            "$out/share/licenses/ef2000/LicenseRef-EF2000-Derived.txt"
+          cp decomp/LICENSE-NOTE.md "$out/share/licenses/ef2000/"
+          runHook postInstall
+        '';
+        meta = {
+          description = "GCC native Linux recovered-code bootstrap (game not yet linked)";
+          platforms = [ system ];
+          mainProgram = "ef2000-decomp";
+        };
+      };
+      # OpenWatcom build: retained OMF objects for hybrid splicing and an
+      # independently linked 32-bit DOS/CauseWay bootstrap executable.
       decompWatcom = pkgs.stdenv.mkDerivation {
         pname = "ef2000-decomp-watcom";
         inherit version;
@@ -341,12 +385,21 @@
               --compiler ${watcom}/bin/wcc386 \
               --output "$PWD/objects/$name.obj" "$PWD/$module"
           done
+          ${watcom}/bin/wcc386 -bt=dos -3r -zp1 -za99 \
+            -i="$PWD/decomp/include" -fo="$PWD/objects/standalone.obj" \
+            "$PWD/decomp/standalone/main.c"
+          ${watcom}/bin/wlink system causeway \
+            name "$PWD/EFDECOMP.EXE" \
+            file "$PWD/objects/standalone.obj" \
+            file "$PWD/objects/hiscore.obj"
           runHook postBuild
         '';
         installPhase = ''
           runHook preInstall
-          mkdir -p "$out/lib/ef2000" "$out/share/licenses/ef2000"
+          mkdir -p "$out/lib/ef2000" "$out/share/ef2000/dos" \
+            "$out/share/licenses/ef2000"
           cp -r objects "$out/lib/ef2000/decomp-objects"
+          cp EFDECOMP.EXE "$out/share/ef2000/dos/"
           cp LICENSES/LicenseRef-EF2000-Derived.txt \
             "$out/share/licenses/ef2000/LicenseRef-EF2000-Derived.txt"
           cp decomp/LICENSE-NOTE.md "$out/share/licenses/ef2000/"
@@ -411,10 +464,18 @@
         set -euo pipefail
         exec ${pkgs.python3}/bin/python3 ${source}/tools/ef2000_gui_assets.py "$@"
       '';
-      decompWorkflow = pkgs.writeShellScriptBin "ef2000-decomp" ''
+      # Until all game code and data are recovered, keep the original-byte
+      # hybrid as a separate tool; neither standalone bootstrap runs gameplay.
+      hybridWorkflow = pkgs.writeShellScriptBin "ef2000-hybrid" ''
         set -euo pipefail
         exec ${python}/bin/python3 ${package}/libexec/ef2000/tools/decomp_app.py \
           --launcher ${package}/bin/ef2000 "$@"
+      '';
+      dosDecompWorkflow = pkgs.writeShellScriptBin "ef2000-decomp-watcom" ''
+        set -euo pipefail
+        exec ${pkgs.dosbox-x}/bin/dosbox-x \
+          -c "mount c ${decompWatcom}/share/ef2000/dos" \
+          -c "c:" -c "EFDECOMP.EXE" "$@"
       '';
       nativeSb16Workflow = pkgs.writeShellScriptBin "ef2000-native-sb16" ''
         set -euo pipefail
@@ -426,8 +487,9 @@
         ef2000 = package;
         ef2000-native = package;
         ef2000-unicorn = package;
-        ef2000-decomp = decompWorkflow;
+        ef2000-decomp = decompLinux;
         ef2000-decomp-watcom = decompWatcom;
+        ef2000-hybrid = hybridWorkflow;
         ef2000-startup = package;
         ef2000-ghidra = ghidraWorkflow;
         ef2000-wcc = watcomWorkflow;
@@ -457,14 +519,20 @@
           "Run EF2000 with the slow, deprecated Python Unicorn and SDL3 backend";
         ghidra = app "${pkgs.ghidra}/bin/ghidra"
           "Open Ghidra to inspect the extracted EF2000 X-32 image";
-        decomp = app "${decompWorkflow}/bin/ef2000-decomp"
-          "Run EF2000 with compiled recovered C replacements";
+        decomp = app "${decompLinux}/bin/ef2000-decomp"
+          "Run the native GCC recovered-code bootstrap (gameplay incomplete)";
+        decompDos = app "${dosDecompWorkflow}/bin/ef2000-decomp-watcom"
+          "Run the OpenWatcom recovered-code DOS bootstrap in DOSBox-X";
+        hybrid = app "${hybridWorkflow}/bin/ef2000-hybrid"
+          "Run the original EF2000 game with recovered C hybrid patches";
       in {
         default = native;
         ef2000 = native;
         ef2000-native = nativeSb16;
         ef2000-unicorn = unicornCpp;
         ef2000-decomp = decomp;
+        ef2000-decomp-watcom = decompDos;
+        ef2000-hybrid = hybrid;
         ef2000-unicorn-py = unicornPy;
         ghidra = ghidra;
         ghidra-ef2000 = {
@@ -525,7 +593,23 @@
           test "$(${package}/bin/ef2000-unicorn-py --version)" = ${lib.escapeShellArg "ef2000-unicorn ${version}"}
         '';
         app-decomp = pkgs.runCommand "ef2000-decomp-app-check" {} ''
-          ${decompWorkflow}/bin/ef2000-decomp --help > "$out"
+          ${decompLinux}/bin/ef2000-decomp --self-test > "$out"
+          grep -q 'Linux / GCC' "$out"
+          grep -q 'high-score comparison: passed' "$out"
+          test -s ${decompLinux}/lib/ef2000/libef2000-decomp.a
+        '';
+        app-decomp-watcom = pkgs.runCommand "ef2000-decomp-watcom-app-check" {} ''
+          exe=${decompWatcom}/share/ef2000/dos/EFDECOMP.EXE
+          test -s "$exe"
+          test -s ${decompWatcom}/lib/ef2000/decomp-objects/hiscore.obj
+          test "$(od -An -N2 -tx1 "$exe" | tr -d ' ')" = '4d5a'
+          le_offset="$(od -An -N4 -j60 -tu4 "$exe" | tr -d ' ')"
+          test "$le_offset" -ge 64
+          test "$(od -An -N2 -j"$le_offset" -tx1 "$exe" | tr -d ' ')" = '4c45'
+          touch "$out"
+        '';
+        app-hybrid = pkgs.runCommand "ef2000-hybrid-app-check" {} ''
+          ${hybridWorkflow}/bin/ef2000-hybrid --help > "$out"
           grep -q 'EF2000 installation directory or original _EF2000.EXE' "$out"
           grep -q -- '--objects OBJECTS' "$out"
           test -s ${package}/libexec/ef2000/decomp/symbols/signatures.tsv
@@ -1154,6 +1238,11 @@
           printf 'OpenWatcom (v2 default, 1.9 available for comparison):\n'
           printf '  ef2000-wcc decomp/src/MODULE.c  Compile recovered C to decomp/build/MODULE.obj\n'
           printf '  wdis decomp/build/MODULE.obj    Disassemble OpenWatcom OMF\n\n'
+          printf 'Standalone decomp bootstraps (not playable yet):\n'
+          printf '  nix run .#ef2000-decomp        GCC-built Linux recovered-C executable\n'
+          printf '  nix run .#ef2000-decomp-watcom OpenWatcom DOS executable in DOSBox-X\n'
+          printf '  nix run .#ef2000-hybrid -- /path/to/EF2000 --objects DIR\n'
+          printf '                                  Original-game hybrid with recovered OMF\n\n'
           printf '  ef2000-omf-inplace --help       Pack a reviewed, in-place-only OMF patch\n\n'
           printf 'Original/native high-score differential replay (requires your EF2000.EXE):\n'
           printf '  ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300\n'

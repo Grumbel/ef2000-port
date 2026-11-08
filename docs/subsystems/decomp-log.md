@@ -1260,3 +1260,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   fault, but remains on the campaign-choice dialog and does not issue the final
   campaign-file read observed in the original. Thus this fixes the helper ABI
   mismatch, but the create-screen transition still needs a separate UI trace.
+- Standalone build bootstrap, 2026-11-09: the flake now separates a GCC Linux
+  ELF (`ef2000-decomp`) from a 32-bit OpenWatcom/CauseWay DOS executable
+  (`ef2000-decomp-watcom`) launched through DOSBox-X. Both link the recovered
+  `hiscore_qualifies` source to a minimal common `main` with synthetic data,
+  while the existing original-byte hybrid is retained under `ef2000-hybrid`.
+  GCC successfully compiled 338/341 recovered C modules to native objects;
+  three Watcom-specific/nonportable modules remain excluded, and all 338
+  objects are archived for future linking. The GCC bootstrap compiles and
+  passes its recovered-C self-test. The DOS link is defined using OpenWatcom's
+  documented `system causeway`, but is not locally verified because Nix and
+  OpenWatcom are unavailable. **Neither build plays the game**: recovered
+  startup, global definitions, engine bindings and platform services are
+  prerequisites. This does not complete plan M1, §7 or §8.

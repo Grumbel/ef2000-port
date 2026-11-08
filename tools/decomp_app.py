@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
-"""Run EF2000 with the currently compilable recovered C hybrid."""
+"""Run the original EF2000 code with compiled recovered C hybrid patches."""
 
 import argparse
 import csv
@@ -37,7 +37,7 @@ def build_patch(executable, object_dir, output):
         hybrid_link.load_abi_aliases(ROOT / 'decomp/include/ef_abi.h'),
         explicit_excludes=exclusions, signatures=signatures)
     output.write_bytes(blob)
-    print('ef2000-decomp: %d recovered C functions, %d redirect bytes, '
+    print('ef2000-hybrid: %d recovered C functions, %d redirect bytes, '
           '%d arena bytes; %d/%d modules linked' % (
               report['functions_redirected'], report['redirect_bytes'],
               report['arena_bytes'], report['linked_modules'],
