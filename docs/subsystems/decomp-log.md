@@ -1225,3 +1225,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `0xc4bdd`. Added the Watcom-only `parm []` declaration. The OpenWatcom Nix
   build and its package check phase pass; the private-Xvfb run now reaches the
   main menu and Quick Fight setup without that fault.
+- Campaign resource ABI audit, 2026-11-08: original callers and disassembly
+  confirm `0xea3ec` receives its descriptor in EAX and lookup text in EDX,
+  forwards both to `0xea20c`, and returns the bsearch result's presence in AL.
+  Corrected that ABI and replaced the drafted `0xea20c` four-register call
+  with the local five-argument bsearch call, which supplies the comparator on
+  the stack and returns EAX. OpenWatcom compiles both modules with zero
+  warnings; disassembly confirms those argument locations. The exact private
+  Xvfb campaign-create replay still faults at `IP=0xffffffff`, opcode
+  `0x8603`. The original descriptors `0x1603f4` and `0x16040c` have zero at
+  `+0x0c`, so this path skips the cache lookup; the ABI correction does not
+  resolve the observed failure. Main menu remains reachable. Next trace the
+  redirected file callbacks `0x9cb20` and `0x9cbc4` used by the Norway load.

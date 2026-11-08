@@ -2196,11 +2196,13 @@ uint8_t try_open_slot_107004(ef_addr32 a, ef_addr32 out)
 }
 
 /* 0xea20c, 51 bytes. Hash the name TEXT (0xebfd0), place the hash in a 16-byte block (a callback address 0xea1e8 sits just below it on the stack) and run 0x10d9e3 on it with the object's fields at +0xc and +0x10. */
-void hash_and_run_ea20c(ef_addr32 obj, ef_addr32 text)
+uint32_t hash_and_run_ea20c(ef_addr32 obj, ef_addr32 text)
 {
     uint32_t block[4];
     block[0] = name_hash_ebfd0(text);
-    guest_fn_10d9e3_x((uint32_t)(uintptr_t)block, EF_U32(obj + 0x10u), EF_U32(obj + 0xcu), 0x10u);
+    return bsearch_10d9e3((uint32_t)(uintptr_t)block,
+                          EF_U32(obj + 0x10u), EF_U32(obj + 0xcu),
+                          0x10u, 0x000ea1e8u);
 }
 
 /* 0x113b78, 169 bytes. Classify the record pair CTX (cdecl): returns 3 when the name of the first record (+0xba, only when its size at +8 is at least 0x112) matches neither string at 0x1954fc nor 0x195510, otherwise looks up the name referenced by the second record's far pointer (segment base table 0x120cc6): 1 when it equals the string at 0x19552c and the size at +0xc is at most 0x5000, 2 when it equals the string at 0x195530, else 0. */
@@ -7869,7 +7871,7 @@ void setup_viewport_window_76620(void)
 uint32_t register_resource_9dcf8(uint32_t name, uint32_t text)
 {
     uint32_t size, data, key, slot, off;
-    if (refresh_cached_chunk_ea3ec(0x0016040cu) & 0xffu) {
+    if (refresh_cached_chunk_ea3ec(0x0016040cu, text) & 0xffu) {
         size = read_link_ea414();
         data = arena_take_e29e8(size);
         decode_chunk_ea420(data);

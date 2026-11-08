@@ -89,11 +89,11 @@ void restore_video_mode_cdc64(void)
 }
 
 /* 0xea3ec, 40 bytes. Rebuild the cached chunk when the descriptor has one; true if present. */
-uint8_t refresh_cached_chunk_ea3ec(ef_addr32 descriptor)
+uint8_t refresh_cached_chunk_ea3ec(ef_addr32 descriptor, ef_addr32 text)
 {
     EF_U32(0x004644d0u) = 0;
     if (EF_U32(descriptor + 0xcu) != 0)
-        EF_U32(0x004644d0u) = guest_fn_ea20c_w(descriptor);
+        EF_U32(0x004644d0u) = guest_fn_ea20c_w(descriptor, text);
     return EF_U32(0x004644d0u) != 0;
 }
 

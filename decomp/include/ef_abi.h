@@ -3463,7 +3463,7 @@ void latch_decoded_key_a29cc(uint8_t key);
 void issue_state_request_a32c8(uint8_t value);
 void copy_constants_c469b(void);
 void restore_video_mode_cdc64(void);
-uint8_t refresh_cached_chunk_ea3ec(ef_addr32 descriptor);
+uint8_t refresh_cached_chunk_ea3ec(ef_addr32 descriptor, ef_addr32 text);
 int32_t set_default_file_buffer_11159a(ef_addr32 file, ef_addr32 buffer);
 uint32_t entry_empty_118520(ef_addr32 record);
 void run_table_initialisers_1196a0(void);
@@ -3478,7 +3478,7 @@ uint8_t guest_fn_a2948_w(uint32_t key, uint32_t flag); /* 0xa2948 EAX/EDX -> AL 
 void guest_fn_cdc38_w(void); /* 0xcdc38 */
 uint32_t guest_fn_fe700_w(void); /* 0xfe700 -> AX */
 void guest_fn_fe710_w(int32_t mode); /* 0xfe710 EAX */
-uint32_t guest_fn_ea20c_w(ef_addr32 descriptor); /* 0xea20c EAX -> EAX */
+uint32_t guest_fn_ea20c_w(ef_addr32 descriptor, ef_addr32 text); /* 0xea20c EAX/EDX -> EAX */
 void guest_fn_1196c8_w(void); /* 0x1196c8 */
 void guest_fn_119844_w(void); /* 0x119844 */
 void guest_fn_1198ec_w(void); /* 0x1198ec */
@@ -4927,7 +4927,7 @@ void guest_dos_int_x(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs);
 
 uint32_t run_steps_d6694(void);
 uint8_t try_open_slot_107004(ef_addr32 a, ef_addr32 out);
-void hash_and_run_ea20c(ef_addr32 obj, ef_addr32 text);
+uint32_t hash_and_run_ea20c(ef_addr32 obj, ef_addr32 text);
 uint32_t guest_fn_d66c2_x(void); /* 0xd66c2 unknown, no arguments, result in EAX */
 uint32_t guest_fn_106f10_x(uint32_t a, uint32_t b); /* 0x106f10 EAX/EDX -> AL */
 void guest_fn_10d9e3_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x10d9e3 EAX/EDX/EBX/ECX */
