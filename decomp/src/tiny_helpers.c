@@ -148,9 +148,9 @@ void clear_pair_baf24(ef_addr32 pair)
 }
 
 /* 0xbc450, 21 bytes. */
-uint32_t release_by_key_bc450(ef_addr32 key)
+uint32_t release_by_key_bc450(ef_addr32 key, uint32_t extra)
 {
-    uint32_t result = guest_fn_bc4da(key);
+    uint32_t result = guest_fn_bc4da(key, extra);
 
     release_list_node_fa77b(key);
     return result;

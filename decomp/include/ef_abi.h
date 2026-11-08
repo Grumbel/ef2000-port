@@ -1859,7 +1859,7 @@ uint32_t first_link_a75fc(ef_addr32 object);
 ef_addr32 default_path_a7b70(void);
 uint32_t read_counter_b3d68(void);
 void clear_pair_baf24(ef_addr32 pair);
-uint32_t release_by_key_bc450(ef_addr32 key);
+uint32_t release_by_key_bc450(ef_addr32 key, uint32_t extra);
 void clear_byte_c8e38(void);
 void clear_byte_c8fdc(void);
 void clear_byte_c90c0(void);
@@ -1876,7 +1876,7 @@ void store_triple_ea864(ef_addr32 destination, uint32_t a, uint32_t b, uint32_t 
 void refresh_object_f13ac(ef_addr32 object);
 void guest_fn_edd49(void); /* 0xedd49 */
 ef_addr32 guest_fn_a78bc(ef_addr32 key); /* 0xa78bc EAX -> EAX */
-uint32_t guest_fn_bc4da(ef_addr32 key); /* 0xbc4da EAX -> EAX */
+uint32_t guest_fn_bc4da(ef_addr32 key, uint32_t extra); /* 0xbc4da EAX/EDX -> EAX */
 void guest_fn_cbcc5(uint32_t value, ef_addr32 buffer, uint32_t base); /* 0xcbcc5 EAX/EDX/EBX */
 void guest_fn_d16d0(uint32_t value, uint32_t mode); /* 0xd16d0 EAX/EDX */
 

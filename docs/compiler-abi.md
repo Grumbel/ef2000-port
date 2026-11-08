@@ -2457,7 +2457,7 @@ in EAX, format string address, one value).
 | `0xa7b70` | none | EAX:ef_addr32 | a81e4@a8243,a9878@a9882,a99c0@a99f2 |  |
 | `0xb3d68` | none | EAX:uint32_t | 3d4b0@3d729 |  |
 | `0xbaf24` | EAX:ef_addr32 | none | bb324@bb47d |  |
-| `0xbc450` | EAX:ef_addr32 | EAX:uint32_t | bc421@bc448 |  |
+| `0xbc450` | EAX:ef_addr32, EDX:uint32_t | EAX:uint32_t | bc421@bc448 | EDX is forwarded to 0xbc4da as its second argument. |
 | `0xc8e38` | none | none | ac408@ac438 |  |
 | `0xc8fdc` | none | none | ac408@ac42e |  |
 | `0xc90c0` | none | none | ac408@ac433 |  |

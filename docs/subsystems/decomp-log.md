@@ -1120,3 +1120,13 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   the stricter alias rule exposes unresolved helper modules. M1 remains
   unpassed. Mechanical status remains 442/1,020 `ok` (138,459/543,917 bytes),
   578 `manual`, zero `compile-error`.
+- M1 native64 fault trace, 2026-11-08: startup reaches and closes
+  `EF2000.CFG`, then faults at guest IP `0x13`. Disassembly of original
+  `0xa7990` shows it calls `0xbc421` and resumes at `0xa79c7`; `0xbc421`
+  sets `EDX=1` before calling `0xbc450`, and original `0xbc450` forwards
+  that register to `0xbc4da` as its second argument. The recovered
+  `release_by_key_bc450` prototype had only the EAX input and called
+  `guest_fn_bc4da` without EDX, losing the `extra` flag that controls
+  `0xfa9a0` handle close. Updated both declarations and forwarded EDX.
+  This is a static ABI correction; runtime replay remains pending. M1 is
+  still unpassed, and no mechanical-generation numbers changed.

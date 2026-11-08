@@ -971,7 +971,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000a7b70	default_path_a7b70		EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7b70 (16 bytes); ; callers a81e4@a8243,a9878@a9882,a99c0@a99f2; docs/compiler-abi.md
 0x000b3d68	read_counter_b3d68		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000b3d68 (9 bytes); ; callers 3d4b0@3d729; docs/compiler-abi.md
 0x000baf24	clear_pair_baf24	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000baf24 (8 bytes); ; callers bb324@bb47d; docs/compiler-abi.md
-0x000bc450	release_by_key_bc450	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bc450 (21 bytes); ; callers bc421@bc448; docs/compiler-abi.md
+0x000bc450	release_by_key_bc450	EAX:ef_addr32,EDX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bc450 (21 bytes); EDX is forwarded to 0xbc4da as its second argument; callers bc421@bc448; docs/compiler-abi.md
 0x000c8e38	clear_byte_c8e38			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c8e38 (9 bytes); ; callers ac408@ac438; docs/compiler-abi.md
 0x000c8fdc	clear_byte_c8fdc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c8fdc (9 bytes); ; callers ac408@ac42e; docs/compiler-abi.md
 0x000c90c0	clear_byte_c90c0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c90c0 (9 bytes); ; callers ac408@ac433; docs/compiler-abi.md
