@@ -729,6 +729,10 @@ static void guest_fault(u32 signal, struct context *r) {
         field("PAGE_CB1", *(u32 *)guest(0x0015b750u));
         field("DRAW_CB", *(u32 *)guest(0x0041f3d0u));
         field("SCREEN_BUF", *(u32 *)guest(0x0015b758u));
+        field("BLIT_COUNT", *(u32 *)guest(0x00164600u));
+        field("BLIT_SOURCE", *(u32 *)guest(0x0015b754u));
+        field("BLIT_OFFSET", *(u32 *)guest(0x00120cc6u));
+        field("BLIT_DEST", *(u32 *)guest(0x00120cc6u) + 0xa0000u);
         if (r->ip >= 16 && r->ip <= IMAGE_SIZE - 16) {
             static char const *const code_names[] = {
                 "C-16", "C-12", "C-8", "C-4", "C+0", "C+4", "C+8", "C+12"
