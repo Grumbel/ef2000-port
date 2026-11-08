@@ -1209,3 +1209,19 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   at 640x400 without a guest fault. The patch redirects 1,737 functions,
   8,685 entry bytes, and has a 493,338-byte arena across 257/341 modules. The
   menu is reached, but the scripted quick-fight click remains unverified.
+- Menu interaction follow-up, 2026-11-08: a fresh native64 run of the
+  `84d38cd1` tree reaches video mode `0x100` and remains at the main menu; it
+  does not reproduce the `0xff` exit from the older `g7f97d8c` run. On private
+  Xvfb, clicking the gray rectangle below “Schnelles Gefecht” (guest mouse
+  position `0xa3,0x6b`) opens the Quick Fight setup page. The page remains
+  stable, but clicking its “Akzeptieren” control (guest mouse position
+  `0x122,0x16f`) has not advanced to the cockpit. The build redirects 1,737
+  functions, 8,685 entry bytes, and has a 493,338-byte arena across 257/341
+  modules. Cockpit milestone remains unpassed.
+- Mouse-call ABI fix, 2026-11-08: original `0xc4b95` reads one stack argument
+  and returns with `ret 4`; its caller at `0xc9238` passes the block address
+  through `guest_fn_c4b95_x`. OpenWatcom had passed the declared parameter in
+  EAX, causing the original routine to read unrelated stack data and fault at
+  `0xc4bdd`. Added the Watcom-only `parm []` declaration. The OpenWatcom Nix
+  build and its package check phase pass; the private-Xvfb run now reaches the
+  main menu and Quick Fight setup without that fault.

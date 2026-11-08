@@ -4545,6 +4545,9 @@ void select_page_9e3f8(uint32_t page);
 void load_palette_blocks_110790(ef_addr32 data);
 
 void set_clip_and_shade_c9238(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t shade);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_fn_c4b95_x parm []
+#endif
 void guest_fn_c4b95_x(ef_addr32 block); /* 0xc4b95 one stack argument, callee cleanup */
 
 void save_and_draw_block_dd8dc(void);
