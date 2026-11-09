@@ -2101,3 +2101,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   it does not make the full game startup or an audio driver playable.
   SHA-pinned original/synthetic tests cover the recovered source-C path;
   guest x86 differential and Watcom splice remain pending.
+- GCC/Linux synthetic warm game-main exit-handler entry, 2026-11-09:
+  `--probe-main-exit` reuses the full source-C `candidate_game_main(1,0)`
+  sequence with read-only test-only DOS resources, preinitialized input/timer
+  flags and disconnected gameport mode zero. The recovered TACTCOM function
+  returns to its actual caller for this opt-in mode; the next original main
+  call invokes source-C `install_exit_handler_ea470(1)`. Its first channel
+  switch `guest_fn_10dc7f(2,0x10dc40)` remains a strict stop at `0x10dc7f`.
+  Sentinel tests assert no mode-change global (`0x17e5e0`) or channel-2
+  slot (`0x17d3d4`) mutation, and the selected-hardware mode-1 route cannot
+  reach this stop. Ordinary `--probe-main` retains its earlier boundary.
+  This is a synthetic warm-state integration test, not a real cold-to-main
+  run: no channel state transition, exit registration, following clump
+  resource loads, guest instruction differential or Watcom splice is claimed.

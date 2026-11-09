@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom | --probe-x32-tactcom-timer | --probe-x32-tactcom-ail | --probe-x32-tactcom-ail-irq | --probe-x32-tactcom-ail-vectors | --probe-x32-tactcom-ail-callback | --probe-x32-tactcom-ail-module | --probe-x32-tactcom-ail-slot | --probe-x32-tactcom-ail-rate | --probe-x32-tactcom-ail-start | --probe-x32-tactcom-ail-finish]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-main-exit | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom | --probe-x32-tactcom-timer | --probe-x32-tactcom-ail | --probe-x32-tactcom-ail-irq | --probe-x32-tactcom-ail-vectors | --probe-x32-tactcom-ail-callback | --probe-x32-tactcom-ail-module | --probe-x32-tactcom-ail-slot | --probe-x32-tactcom-ail-rate | --probe-x32-tactcom-ail-start | --probe-x32-tactcom-ail-finish]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
@@ -68,6 +68,7 @@ int main(int argc, char **argv)
                 data_dir = argv[++i];
             } else if ((strcmp(argv[i], "--probe-arena") == 0 ||
                         strcmp(argv[i], "--probe-main") == 0 ||
+                        strcmp(argv[i], "--probe-main-exit") == 0 ||
                         strcmp(argv[i], "--probe-x32") == 0 ||
                         strcmp(argv[i], "--probe-x32-vectors") == 0 ||
                         strcmp(argv[i], "--probe-x32-traps") == 0 ||
@@ -425,7 +426,13 @@ int main(int argc, char **argv)
                 ef_decomp_arena_probe probe;
                 uint32_t stopped = 0;
                 int main_probe = strcmp(probe_type, "--probe-main") == 0;
-                int status = main_probe
+                int main_exit_probe = strcmp(probe_type, "--probe-main-exit") == 0;
+                int status = main_exit_probe
+                    ? ef_decomp_probe_main_exit_handler(info.bss_end, 1u, 0u,
+                                                        data_dir ? data_dir : image_dir,
+                                                        &probe, &stopped,
+                                                        reason, sizeof(reason))
+                    : main_probe
                     ? ef_decomp_probe_main(info.bss_end, 1u, 0u,
                                            data_dir ? data_dir : image_dir, &probe, &stopped,
                                            reason, sizeof(reason))
@@ -438,7 +445,11 @@ int main(int argc, char **argv)
                 }
                 printf("Recovered 0xe29a0 + 0xe2a1c: arena 0x%08x (%u bytes), release hook 0x%08x\n",
                        probe.base, probe.size, probe.release_hook);
-                if (main_probe)
+                if (main_exit_probe)
+                    printf("Recovered game main passed TACTCOM and entered exit handler "
+                           "0xea470; stopped before channel-mode service 0x%08x "
+                           "(no handler installed)\n", stopped);
+                else if (main_probe)
                     printf("Recovered game main 0x8b274 entered TACTCOM prefix; "
                            "stopped at unimplemented call 0x%08x\n", stopped);
             }

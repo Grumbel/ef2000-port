@@ -238,4 +238,15 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
                          ef_decomp_arena_probe *probe, uint32_t *stop_address,
                          char *reason, size_t reason_capacity);
 
+/* Opt-in warm path: after the recovered TACTCOM no-device return, enter
+ * the next recovered game-main call, install_exit_handler_ea470(1).
+ * Stops before its first unbound channel-mode service at 0x10dc7f.
+ * Requires a prepared synthetic no-device/timer-initialized memory state;
+ * does not install an exit handler or modify a real channel. */
+int ef_decomp_probe_main_exit_handler(uint32_t bss_end, uint32_t argc,
+                                      uint32_t argv, const char *data_dir,
+                                      ef_decomp_arena_probe *probe,
+                                      uint32_t *stop_address,
+                                      char *reason, size_t reason_capacity);
+
 #endif

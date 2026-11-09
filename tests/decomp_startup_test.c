@@ -1941,6 +1941,43 @@ int main(void)
                         }
                     }
 
+                    /* Main really calls the recovered exit-handler installer
+                     * immediately after the full, warm TACTCOM return.
+                     * Stop at its first unbound channel-mode call, before
+                     * mutating any channel or running the exit service. */
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    EF_U8(0x0015b72eu) = 1u;
+                    EF_U8(0x0015f751u) = 1u;
+                    EF_U16(0x00464472u) = 0u;
+                    EF_U32(0x0017e5e0u) = 0x1234abcdu;
+                    EF_U32(0x0017d3d4u) = 0xabcd1234u;
+                    stop = 0;
+                    assert(ef_decomp_probe_main_exit_handler(bss_end, 1, 0, dirname,
+                                                              &probe, &stop, reason,
+                                                              sizeof(reason)) == 0);
+                    assert(stop == 0x0010dc7fu);
+                    assert(EF_U16(0x00464472u) == 0u);
+                    assert(EF_U32(0x0019840cu) == 0u);
+                    assert(EF_U32(0x00198410u) == 0u);
+                    assert(EF_U32(0x0017e5e0u) == 0x1234abcdu);
+                    assert(EF_U32(0x0017d3d4u) == 0xabcd1234u);
+                    ef_decomp_memory_release();
+
+                    /* The opt-in continuation cannot silently pass a
+                     * selected hardware input mode into the exit handler. */
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    EF_U8(0x0015b72eu) = 1u;
+                    EF_U8(0x0015f751u) = 1u;
+                    EF_U16(0x00464472u) = 1u;
+                    stop = 0;
+                    assert(ef_decomp_probe_main_exit_handler(bss_end, 1, 0, dirname,
+                                                              &probe, &stop, reason,
+                                                              sizeof(reason)) == -1);
+                    assert(strstr(reason, "before the exit-handler service") != NULL);
+                    ef_decomp_memory_release();
+
                     /* A source-enabled page branch must stop at its own
                      * handler before reaching 0xe28e8; no side effects are
                      * silently bypassed to reach the timer boundary. */

@@ -31,6 +31,7 @@ static int keyboard_ack_pending;
 static jmp_buf main_boundary;
 static uint32_t main_boundary_address;
 static int main_probe_active;
+static int main_probe_exit_handler;
 static int x32_probe_active;
 static int x32_virtual_vectors;
 static int x32_virtual_traps;
@@ -1584,6 +1585,14 @@ void guest_fn_8b39c(void)
         !ef_decomp_memory_span(TACTCOM_PROBE_FRAME, 0xf0u))
         fatal_unexpected("TACTCOM prefix outside startup probe");
     tactcom_prefix_8b39c(TACTCOM_PROBE_FRAME);
+    if (main_probe_exit_handler) {
+        if (EF_U8(0x0015f751u) != 1u ||
+            EF_U16(0x00464472u) != 0u ||
+            EF_U32(0x0019840cu) != 0u ||
+            EF_U32(0x00198410u) != 0u)
+            fatal_unexpected("TACTCOM did not return in no-device warm mode");
+        return;
+    }
     /* The recovered 402-byte TACTCOM body has returned on a synthetic
      * already-initialized path. Continue into main only after its separate
      * initialization and file/graphics services have been recovered. */
@@ -1595,8 +1604,24 @@ void guest_fn_8b2d8(void) { stop_at_guest_boundary(0x8b2d8u); }
  * services. Reaching them before TACTCOM has been recovered is an error. */
 void guest_fn_ea470(uint32_t mode)
 {
-    (void)mode;
-    fatal_unexpected("exit handler before TACTCOM (0xea470)");
+    if (!probing || !main_probe_active || !main_probe_exit_handler ||
+        mode != 1u || EF_U8(0x0015f751u) != 1u)
+        fatal_unexpected("exit handler before TACTCOM (0xea470)");
+    install_exit_handler_ea470(mode);
+    fatal_unexpected("exit handler returned before service boundary (0xea470)");
+}
+
+void guest_fn_10dc7f(uint32_t channel, uint32_t mode)
+{
+    if (!probing || !main_probe_active || !main_probe_exit_handler ||
+        channel != 2u || mode != 0x0010dc40u)
+        fatal_unexpected("unbound channel-mode service (0x10dc7f)");
+    stop_at_guest_boundary(0x0010dc7fu);
+}
+
+void guest_fn_81c(void)
+{
+    fatal_unexpected("unbound exit service (0x81c)");
 }
 
 void guest_fn_ea270(ef_addr32 descriptor)
@@ -2111,10 +2136,11 @@ int ef_decomp_probe_x32_tactcom_ail_finish(uint32_t bss_end,
                          reason, reason_capacity);
 }
 
-int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
-                         const char *data_dir,
-                         ef_decomp_arena_probe *probe, uint32_t *stop_address,
-                         char *reason, size_t reason_capacity)
+static int run_main_probe(uint32_t bss_end, uint32_t argc, uint32_t argv,
+                          const char *data_dir,
+                          ef_decomp_arena_probe *probe, uint32_t *stop_address,
+                          char *reason, size_t reason_capacity,
+                          int continue_to_exit_handler)
 {
     uint32_t stopped;
     int result;
@@ -2127,13 +2153,21 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
         return -1;
     }
     main_probe_active = 1;
+    main_probe_exit_handler = continue_to_exit_handler;
     main_boundary_address = 0;
     if (setjmp(main_boundary) == 0)
         (void)candidate_game_main(argc, argv);
     stopped = main_boundary_address;
+    main_probe_exit_handler = 0;
     main_probe_active = 0;
     probing = 0;
     ef_decomp_files_end();
+    if (continue_to_exit_handler && stopped != 0x0010dc7fu) {
+        if (reason && reason_capacity)
+            snprintf(reason, reason_capacity,
+                     "warm game main stopped before the exit-handler service (0x10dc7f)");
+        return -1;
+    }
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x9ccb8u && stopped != 0x9cd53u &&
         stopped != 0x30407u && stopped != 0x3053du && stopped != 0x30577u &&
@@ -2160,6 +2194,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
         stopped != 0x98000u && stopped != 0xe28e8u &&
         stopped != 0xd9b30u && stopped != 0xd9c30u &&
         stopped != 0x10d9e0u && stopped != 0x8b52du &&
+        stopped != 0x10dc7fu &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");
@@ -2177,4 +2212,23 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     if (result != 0)
         return -1;
     return 0;
+}
+
+int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
+                         const char *data_dir,
+                         ef_decomp_arena_probe *probe, uint32_t *stop_address,
+                         char *reason, size_t reason_capacity)
+{
+    return run_main_probe(bss_end, argc, argv, data_dir, probe, stop_address,
+                          reason, reason_capacity, 0);
+}
+
+int ef_decomp_probe_main_exit_handler(uint32_t bss_end, uint32_t argc,
+                                      uint32_t argv, const char *data_dir,
+                                      ef_decomp_arena_probe *probe,
+                                      uint32_t *stop_address,
+                                      char *reason, size_t reason_capacity)
+{
+    return run_main_probe(bss_end, argc, argv, data_dir, probe, stop_address,
+                          reason, reason_capacity, 1);
 }

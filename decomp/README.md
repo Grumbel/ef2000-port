@@ -290,9 +290,21 @@ original's no-device branch would. The probe now executes recovered
   `0x1d3c4` C body, and executes the existing `0x1c60c` input scaler using
   the explicitly disconnected-gameport model. This warm, unconnected-mode
   path reaches the original TACTCOM return at `0x8b52d`.
+  A further **synthetic-warm only** opt-in `--probe-main-exit` follows that
+  return into the original `candidate_game_main` call sequence. With the
+  already-initialized input/timer flags, read-only synthetic options/resources
+  and mode-zero disconnected gameport, it calls the existing recovered C
+  `install_exit_handler_ea470(1)` and stops at its first unbound
+  `guest_fn_10dc7f(2, 0x10dc40)` channel-mode service. Sentinels verify
+  that the channel slot and mode-change global are unmodified. A hardware
+  mode 1 request is rejected before reaching the exit handler. This mode
+  requires prepared synthetic guest RAM (as exercised by the C test); a
+  bare original executable on the command line cannot supply that state.
+  No channel switch, exit handler or following resource load is performed.
   A mapping-only file stops at the missing association heading `0x120e`;
   missing files stop at `0xea50c` after the original table initialization.
-  Main's *next* call after TACTCOM remains a hard boundary. This warm-path
+  Main's first channel-mode service inside the next call remains a hard
+  boundary. This warm-path
   result does not imply that first-time timer registration, connected
   gameport input or subsequent graphical startup is operational.
   Packed resources, malformed/exceptional numbers and unrestricted strings
