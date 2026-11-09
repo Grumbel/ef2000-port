@@ -154,7 +154,14 @@ original's no-device branch would. The probe now executes recovered
   recovered `0x9c8b4` with an explicitly synthetic ESP/SS/DS snapshot.
   It validates all eight AX=2533h vector/handler descriptions in an inert
   registry (3 → `0x9c908`; 6, 9–14 → `0x9c909`), saves the context
-  fields in guest RAM, and stops at the `0xe20` return (`0xf43`).
+  fields in guest RAM, and stops at the `0xe20` return (`0xf43`). A fourth
+  opt-in `--probe-x32-input` mode continues through recovered keyboard
+  LED initialization (`0xcd414`/`0xcd3c0`), key-table setup (`0xcd430`),
+  data selector capture (`0xfe610`), two more request allocations (`0x628`),
+  and the first timer pool write (`0x734`). The request free count is then
+  five, timer free count seven; the timer source 9 is staged in slot 7.
+  It halts at `0x324` before the first actual timer service
+  `INT 21h AX=2503h` and leaves the input initialized flag unset.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

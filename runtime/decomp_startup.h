@@ -42,6 +42,11 @@ typedef struct ef_decomp_x32_probe {
     uint32_t first_trap_handler;
     uint32_t last_trap_vector;
     uint32_t last_trap_handler;
+    uint32_t keyboard_led_bytes;
+    uint32_t keyboard_code_slot;
+    uint32_t keyboard_data_slot;
+    uint32_t pending_timer_source;
+    uint32_t stored_data_selector;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -57,6 +62,14 @@ int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
  * Captures synthetic ESP/SS/DS and stops at return 0xf43, without invoking
  * a DOS interrupt or installing anything on the host. */
 int ef_decomp_probe_x32_traps(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                              char *reason, size_t reason_capacity);
+
+/* Continue after the recovered pre-main initializer into keyboard setup,
+ * two additional X-32 request records and the original 0x734 timer pool.
+ * Stop at the first unsupported INT 21h AX=2503h call at 0x324, with only
+ * the timer source field staged. Keyboard port and vector services are
+ * strictly bounded virtual hardware doubles. */
+int ef_decomp_probe_x32_input(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The

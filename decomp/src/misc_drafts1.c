@@ -21667,10 +21667,15 @@ void run_handler_stack_c425a(void)
 	}
 }
 
-/* 0xfe610, 15 bytes. Store the current data selector in word 0xfe624 and return 0xd5 (the data selector is modelled as 0). */
+/* 0xfe610, 15 bytes. Store the current data selector in word 0xfe624
+ * and return 0xd5. Native mode uses its explicitly synthetic selector. */
 uint32_t store_selector_fe610(void)
 {
+#if defined(EF_DECOMP_NATIVE)
+	EF_U16(0xfe624u) = (uint16_t)guest_seg_x(3u);
+#else
 	EF_U16(0xfe624u) = 0u;
+#endif
 	return 0xd5u;
 }
 

@@ -198,6 +198,25 @@ int main(void)
     assert(EF_U32(0x00132aa0u) == x32.saved_trap_esp);
     assert(EF_U16(0x00132aa4u) == x32.saved_trap_ss);
     assert(EF_U16(0x00132aa6u) == x32.saved_trap_ds);
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    assert(ef_decomp_probe_x32_input(bss_end, &x32, reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0x324u);
+    assert(x32.registered_requests == 11u && x32.registered_traps == 8u);
+    assert(x32.request_free == 5u && x32.timer_free == 7u);
+    assert(x32.last_address == 0x41f833u);
+    assert(x32.last_selector == 0x5678u && x32.last_length == 0x118u);
+    assert(x32.keyboard_led_bytes == 2u);
+    assert(x32.keyboard_code_slot == 6u && x32.keyboard_data_slot == 5u);
+    assert(x32.stored_data_selector == 0x5678u);
+    assert(x32.pending_timer_source == 9u);
+    assert(EF_U32(0x0041f828u) == 6u && EF_U32(0x0041f82cu) == 5u);
+    assert(EF_U16(0x000fe624u) == 0x5678u);
+    assert(EF_U8(0x0041f72cu) == 0x1cu);
+    assert(EF_U8(0x0041f72du) == 0x1du);
+    assert(EF_U8(0x0041f748u) == 0x38u);
+    assert(EF_U32(0x00196140u) == 7u);
+    assert(EF_U8(0x001960c4u + 7u * 14u) == 9u);
+    assert(EF_U32(0x00132a9cu) == 0xd68u);
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);

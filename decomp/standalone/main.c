@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
@@ -70,7 +70,8 @@ int main(int argc, char **argv)
                         strcmp(argv[i], "--probe-main") == 0 ||
                         strcmp(argv[i], "--probe-x32") == 0 ||
                         strcmp(argv[i], "--probe-x32-vectors") == 0 ||
-                        strcmp(argv[i], "--probe-x32-traps") == 0) && !probe_type) {
+                        strcmp(argv[i], "--probe-x32-traps") == 0 ||
+                        strcmp(argv[i], "--probe-x32-input") == 0) && !probe_type) {
                 probe_type = argv[i];
             } else {
                 fputs("Unsupported argument (try --help).\n", stderr);
@@ -100,14 +101,20 @@ int main(int argc, char **argv)
         if (probe_type) {
             if (strcmp(probe_type, "--probe-x32") == 0 ||
                 strcmp(probe_type, "--probe-x32-vectors") == 0 ||
-                strcmp(probe_type, "--probe-x32-traps") == 0) {
+                strcmp(probe_type, "--probe-x32-traps") == 0 ||
+                strcmp(probe_type, "--probe-x32-input") == 0) {
                 ef_decomp_x32_probe x32;
-                int virtual_traps = strcmp(probe_type, "--probe-x32-traps") == 0;
+                int virtual_input = strcmp(probe_type, "--probe-x32-input") == 0;
+                int virtual_traps = virtual_input ||
+                                    strcmp(probe_type, "--probe-x32-traps") == 0;
                 int virtual_vectors = virtual_traps ||
                                       strcmp(probe_type, "--probe-x32-vectors") == 0;
-                int x32_status = virtual_traps
-                    ? ef_decomp_probe_x32_traps(info.bss_end, &x32,
+                int x32_status = virtual_input
+                    ? ef_decomp_probe_x32_input(info.bss_end, &x32,
                                                 reason, sizeof(reason))
+                    : virtual_traps
+                        ? ef_decomp_probe_x32_traps(info.bss_end, &x32,
+                                                    reason, sizeof(reason))
                     : virtual_vectors
                         ? ef_decomp_probe_x32_vectors(info.bss_end, &x32,
                                                       reason, sizeof(reason))
@@ -141,9 +148,21 @@ int main(int argc, char **argv)
                                "ESP 0x%08x SS 0x%04x DS 0x%04x\n",
                                x32.saved_trap_callback, x32.saved_trap_esp,
                                x32.saved_trap_ss, x32.saved_trap_ds);
-                        printf("Recovered X-32 initializer returned at 0x%08x "
-                               "(no DOS interrupts or host traps installed)\n",
-                               x32.stop_address);
+                        if (virtual_input) {
+                            printf("Recovered keyboard init: %u LED command bytes, "
+                                   "request slots %u/%u, data selector 0x%04x\n",
+                                   x32.keyboard_led_bytes,
+                                   x32.keyboard_code_slot, x32.keyboard_data_slot,
+                                   x32.stored_data_selector);
+                            printf("Timer slot 7 staged source %u; stopped at "
+                                   "DOS/X-32 timer service 0x%08x "
+                                   "(INT 21h AX=2503h; no timer installed)\n",
+                                   x32.pending_timer_source, x32.stop_address);
+                        } else {
+                            printf("Recovered X-32 initializer returned at 0x%08x "
+                                   "(no DOS interrupts or host traps installed)\n",
+                                   x32.stop_address);
+                        }
                     } else {
                         printf("Stopped before DOS/X-32 trap registration 0x%08x "
                                "(INT 21h AX=2533h; no vectors installed)\n",
@@ -178,7 +197,8 @@ int main(int argc, char **argv)
         }
         if (!probe_type || (strcmp(probe_type, "--probe-x32") != 0 &&
                             strcmp(probe_type, "--probe-x32-vectors") != 0 &&
-                            strcmp(probe_type, "--probe-x32-traps") != 0))
+                            strcmp(probe_type, "--probe-x32-traps") != 0 &&
+                            strcmp(probe_type, "--probe-x32-input") != 0))
             puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files parse multiple ordinary '#' records and END validation, but mode-two geometry, EOF cleanup, archives and the first screen remain unimplemented.");
         free(image_dir);
         ef_decomp_memory_release();

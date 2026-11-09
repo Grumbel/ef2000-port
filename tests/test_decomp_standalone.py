@@ -139,6 +139,22 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('initializer returned at 0x00000f43', trap_only.stdout)
                 self.assertIn('no DOS interrupts or host traps installed',
                               trap_only.stdout)
+                input_only = subprocess.run([
+                    str(executable), '--image', original, '--probe-x32-input',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('X-32 request free 5, timer free 7', input_only.stdout)
+                self.assertIn('Virtual-only X-32 requests: 11 accepted; final request '
+                              '0x0041f833 selector 0x5678 length 0x118',
+                              input_only.stdout)
+                self.assertIn('Virtual-only X-32 traps: 8 descriptions',
+                              input_only.stdout)
+                self.assertIn('Recovered keyboard init: 2 LED command bytes, '
+                              'request slots 6/5, data selector 0x5678',
+                              input_only.stdout)
+                self.assertIn('Timer slot 7 staged source 9; stopped at '
+                              'DOS/X-32 timer service 0x00000324',
+                              input_only.stdout)
+                self.assertIn('no timer installed', input_only.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)

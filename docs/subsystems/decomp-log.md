@@ -1894,3 +1894,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   original `0xe20` return at `0xf43`. There are **no actual DOS INT 21h
   calls, real interrupt handlers or verified CPU-register snapshots**.
   Earlier `--probe-x32`/`--probe-x32-vectors` boundaries are preserved.
+- GCC/Linux cold X-32 keyboard prefix, 2026-11-09: `--probe-x32-input`
+  resumes from the virtual-only `0xe20` return into recovered
+  `initialize_input_services_cd4d4` (`0xcd4d4`), with bounded keyboard
+  `0x60`/`0x64` port acknowledgements. Original recovered C resets the
+  0x80-key tables, programs LED bytes 0xed and 0x00, captures synthetic
+  DS `0x5678` at `0xfe624`, and uses `0x628` to allocate two further
+  X-32 request records (source `0xfe61f`, CS `0x1234`, length `0xd5`,
+  slot 6; source `0x41f833`, DS `0x5678`, length `0x118`, slot 5).
+  `0x734` decrements the timer free count from 8 to 7, stages source 9
+  in the packed 14-byte timer slot 7 and enters `0x324`, where the host
+  stops **before** the original INT 21h AX=2503h timer query. The
+  `0xcd554` cleanup callback and input initialized flag are not yet set.
+  Synthetic memory and SHA-pinned original-image tests verify the state;
+  no real hardware port, DOS timer result, IRQ or keyboard handler is
+  installed. Original DOS startup, Watcom splice and replay still pending.
