@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom | --probe-x32-tactcom-timer | --probe-x32-tactcom-ail | --probe-x32-tactcom-ail-irq]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom | --probe-x32-tactcom-timer | --probe-x32-tactcom-ail | --probe-x32-tactcom-ail-irq | --probe-x32-tactcom-ail-vectors]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
@@ -76,7 +76,8 @@ int main(int argc, char **argv)
                         strcmp(argv[i], "--probe-x32-tactcom") == 0 ||
                         strcmp(argv[i], "--probe-x32-tactcom-timer") == 0 ||
                         strcmp(argv[i], "--probe-x32-tactcom-ail") == 0 ||
-                        strcmp(argv[i], "--probe-x32-tactcom-ail-irq") == 0) && !probe_type) {
+                        strcmp(argv[i], "--probe-x32-tactcom-ail-irq") == 0 ||
+                        strcmp(argv[i], "--probe-x32-tactcom-ail-vectors") == 0) && !probe_type) {
                 probe_type = argv[i];
             } else {
                 fputs("Unsupported argument (try --help).\n", stderr);
@@ -112,9 +113,12 @@ int main(int argc, char **argv)
                 strcmp(probe_type, "--probe-x32-tactcom") == 0 ||
                 strcmp(probe_type, "--probe-x32-tactcom-timer") == 0 ||
                 strcmp(probe_type, "--probe-x32-tactcom-ail") == 0 ||
-                strcmp(probe_type, "--probe-x32-tactcom-ail-irq") == 0) {
+                strcmp(probe_type, "--probe-x32-tactcom-ail-irq") == 0 ||
+                strcmp(probe_type, "--probe-x32-tactcom-ail-vectors") == 0) {
                 ef_decomp_x32_probe x32;
-                int virtual_ail_irq =
+                int virtual_ail_vectors =
+                    strcmp(probe_type, "--probe-x32-tactcom-ail-vectors") == 0;
+                int virtual_ail_irq = virtual_ail_vectors ||
                     strcmp(probe_type, "--probe-x32-tactcom-ail-irq") == 0;
                 int virtual_ail_init = virtual_ail_irq ||
                     strcmp(probe_type, "--probe-x32-tactcom-ail") == 0;
@@ -130,7 +134,11 @@ int main(int argc, char **argv)
                                     strcmp(probe_type, "--probe-x32-traps") == 0;
                 int virtual_vectors = virtual_traps ||
                                       strcmp(probe_type, "--probe-x32-vectors") == 0;
-                int x32_status = virtual_ail_irq
+                int x32_status = virtual_ail_vectors
+                    ? ef_decomp_probe_x32_tactcom_ail_vectors(info.bss_end,
+                                                               &x32, reason,
+                                                               sizeof(reason))
+                    : virtual_ail_irq
                     ? ef_decomp_probe_x32_tactcom_ail_irq(info.bss_end, &x32,
                                                            reason, sizeof(reason))
                     : virtual_ail_init
@@ -228,9 +236,24 @@ int main(int argc, char **argv)
                                                        x32.ail_locked_ranges,
                                                        x32.ail_saved_ds_selector,
                                                        x32.ail_irq_critical_entered);
-                                                printf("Stopped at DOS/X-32 IRQ8 vector query "
-                                                       "0x%08x (no DOS IRQ or audio driver "
-                                                       "installed)\n", x32.stop_address);
+                                                if (virtual_ail_vectors) {
+                                                    printf("Virtual-only DOS IRQ8 vectors: "
+                                                           "%u reads, %u inert installation; "
+                                                           "saved protected %04x:%08x, "
+                                                           "real-mode 0x%08x\n",
+                                                           x32.ail_irq_vector_queries,
+                                                           x32.ail_irq_vector_registrations,
+                                                           x32.ail_irq_original_pm_selector,
+                                                           x32.ail_irq_original_pm_offset,
+                                                           x32.ail_irq_original_rm_offset);
+                                                    printf("Stopped before AIL timer setup "
+                                                           "0x%08x (no DOS IRQ or PIT "
+                                                           "installed)\n", x32.stop_address);
+                                                } else {
+                                                    printf("Stopped at DOS/X-32 IRQ8 vector query "
+                                                           "0x%08x (no DOS IRQ or audio driver "
+                                                           "installed)\n", x32.stop_address);
+                                                }
                                             } else {
                                                 printf("Stopped at interrupt-sensitive AIL "
                                                        "runtime initialization 0x%08x "
@@ -306,7 +329,8 @@ int main(int argc, char **argv)
                             strcmp(probe_type, "--probe-x32-tactcom") != 0 &&
                             strcmp(probe_type, "--probe-x32-tactcom-timer") != 0 &&
                             strcmp(probe_type, "--probe-x32-tactcom-ail") != 0 &&
-                            strcmp(probe_type, "--probe-x32-tactcom-ail-irq") != 0))
+                            strcmp(probe_type, "--probe-x32-tactcom-ail-irq") != 0 &&
+                            strcmp(probe_type, "--probe-x32-tactcom-ail-vectors") != 0))
             puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files parse multiple ordinary '#' records and END validation, but mode-two geometry, EOF cleanup, archives and the first screen remain unimplemented.");
         free(image_dir);
         ef_decomp_memory_release();

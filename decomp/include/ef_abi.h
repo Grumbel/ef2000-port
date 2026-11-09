@@ -1846,7 +1846,12 @@ void initialize_ail_trace_101c54(void); /* 0x101c54, cold no-debug branch */
 void guest_ail_trace_debug_path_101c87(uint32_t debug_file);
 void initialize_ail_irq_tables_110fd4(void); /* 0x110fd4, before INT 21h */
 uint16_t guest_ail_irq_enter_110fd9(void);
-void guest_ail_irq8_vector_query_11105b(void);
+uint64_t guest_ail_irq8_vector_query_11105b(uint32_t vector);
+uint32_t guest_ail_irq8_realmode_query_111065(uint32_t vector);
+uint16_t guest_ail_code_selector_111089(void);
+void guest_ail_irq8_install_111097(uint32_t vector, uint32_t handler,
+                                    uint16_t selector);
+void guest_ail_timer_setup_1110ab(uint32_t slot_offset, uint32_t callback);
 void guest_fn_d6df0(void); /* 0xd6df0 */
 void guest_fn_cdf48(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcdf48 EAX/EDX/EBX/ECX */
 

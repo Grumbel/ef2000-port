@@ -322,6 +322,9 @@ int main(void)
         EF_U32(0x0017d7bau) = 0x87654321u;
         EF_U32(0x0017d7b2u) = 0u;
         EF_U32(0x0017d7c0u) = 0u;
+        EF_U32(0x0017d7a4u) = 0xdecafbadU;
+        EF_U16(0x0017d7a8u) = 0xbeefu;
+        EF_U32(0x0017d7aau) = 0xfacecafeu;
         assert(ef_decomp_probe_x32_tactcom_ail_irq(bss_end, &x32,
                                                    reason, sizeof(reason)) == 0);
         assert(x32.stop_address == 0x0011105bu);
@@ -331,6 +334,8 @@ int main(void)
         assert(x32.ail_settings_ranges_initialized == 1u);
         assert(x32.ail_irq_critical_entered == 1u);
         assert(x32.ail_saved_ds_selector == 0x5678u);
+        assert(x32.ail_irq_vector_queries == 0u);
+        assert(x32.ail_irq_vector_registrations == 0u);
         assert(x32.registered_requests == 11u && x32.registered_traps == 8u);
         assert(x32.timer_registrations == 1u && x32.input_initialized == 1u);
         assert(x32.timer_service_initialized == 1u);
@@ -341,9 +346,51 @@ int main(void)
         assert(EF_U32(0x0017d7bau) == 0u);
         assert(EF_U32(0x0017d7b2u) == UINT32_MAX);
         assert(EF_U32(0x0017d7c0u) == UINT32_MAX);
+        assert(EF_U32(0x0017d7a4u) == 0xdecafbadu);
+        assert(EF_U16(0x0017d7a8u) == 0xbeefu);
+        assert(EF_U32(0x0017d7aau) == 0xfacecafeu);
         for (i = 0u; i < sizeof(tables) / sizeof(tables[0]); ++i)
             for (j = 0u; j < 16u; ++j)
                 assert(EF_U32(tables[i] + 4u * j) == 0u);
+    }
+    /* In a separate opt-in mode, the exact query/save/install order uses
+     * synthetic X-32 results and stops before the timer callback wrapper. */
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    {
+        static const uint32_t tables[] = {
+            0x0017d664u, 0x0017d6a4u, 0x0017d6e4u, 0x0017d724u,
+        };
+        uint32_t i, j;
+        for (i = 0u; i < sizeof(tables) / sizeof(tables[0]); ++i)
+            for (j = 0u; j < 16u; ++j)
+                EF_U32(tables[i] + 4u * j) = 0xbbbb0000u | (i << 8u) | j;
+        EF_U32(0x0017d7a4u) = 0xdeadc0deu;
+        EF_U16(0x0017d7a8u) = 0xeeeeu;
+        EF_U32(0x0017d7aau) = 0xcccc5555u;
+        EF_U32(0x0017d6a0u) = 0x77777777u;
+        assert(ef_decomp_probe_x32_tactcom_ail_vectors(bss_end, &x32,
+                                                       reason, sizeof(reason)) == 0);
+        assert(x32.stop_address == 0x001110abu);
+        assert(x32.ail_locked_ranges == 18u && x32.ail_settings_written == 19u);
+        assert(x32.ail_trace_ranges_initialized == 1u);
+        assert(x32.ail_settings_ranges_initialized == 1u);
+        assert(x32.ail_irq_critical_entered == 1u);
+        assert(x32.ail_saved_ds_selector == 0x5678u);
+        assert(x32.ail_irq_vector_queries == 2u);
+        assert(x32.ail_irq_vector_registrations == 1u);
+        assert(x32.ail_irq_original_pm_offset == 0x12345678u);
+        assert(x32.ail_irq_original_pm_selector == 0xabcdu);
+        assert(x32.ail_irq_original_rm_offset == 0x2468u);
+        assert(EF_U32(0x0017d7a4u) == 0x12345678u);
+        assert(EF_U16(0x0017d7a8u) == 0xabcdu);
+        assert(EF_U32(0x0017d7aau) == 0x2468u);
+        assert(EF_U32(0x0017d6a0u) == 2u);
+        assert(EF_U8(0x0015bac5u) == 0u);
+        assert(x32.timer_registrations == 1u && x32.sound_module_initialized == 0u);
+        for (i = 0u; i < sizeof(tables) / sizeof(tables[0]); ++i)
+            for (j = 0u; j < 16u; ++j)
+                assert(EF_U32(tables[i] + 4u * j) ==
+                       (i == 0u && j == 15u ? 2u : 0u));
     }
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */

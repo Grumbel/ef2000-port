@@ -1981,3 +1981,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `0x110fd4` stop and all lower-boundary opt-ins remain unchanged.
   Recovered C beyond `0x11105b`, guest differential verification and
   Watcom/x86 equivalence remain open.
+- GCC/Linux AIL IRQ vector state, 2026-11-09: follow-on disassembly of
+  `0x11105b..0x1110ab` identifies the original two DOS vector queries:
+  `AX=2502h` returns protected-mode `ES:EBX`, `AX=2503h` returns real-mode
+  `EBX`. The code saves these at `0x17d7a4` (32-bit protected offset),
+  `0x17d7a8` (16-bit selector) and `0x17d7aa` (32-bit real-mode vector),
+  then invokes `AX=2506h` for IRQ 8 with `CS:0x110de6`. The following
+  write marks `0x17d6a0 = 2` before the `0x1021f4` callback registration
+  for offset `0x3c`, function `0xd68d`. A new strict opt-in
+  `--probe-x32-tactcom-ail-vectors` uses synthetic DOS read results
+  (`0xabcd:0x12345678`, real-mode `0x2468`) and a synthetic `CS=0x1234`;
+  it records but **does not execute** the installation request. Synthetic
+  guest RAM sentinels prove all three saved-vector stores and the state
+  transition from a nonzero initial marker. `0x17d6a0` aliases entry 15
+  of the first 16-dword table at `0x17d664`, so this write replaces the
+  cleared value with `2` while the other 63 entries remain zero. The
+  strict stop moves to `0x1110ab`, before the timer
+  callback is registered. The two previous strict IRQ boundaries remain
+  available; no actual interrupt, PIT hardware, callback or guest x86
+  differential has been exercised.

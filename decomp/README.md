@@ -203,6 +203,20 @@ original's no-device branch would. The probe now executes recovered
   vector. No real `CLI`, interrupt-vector operation, PIT programming or
   IRQ handler installation happens. The rest of this routine, including
   hardware restoration, remains unrecovered in C.
+  A final independent `--probe-x32-tactcom-ail-vectors` mode continues that
+  same original C flow through the IRQ 8 protected-mode (`AX=2502h`) and
+  real-mode (`AX=2503h`) vector reads. Both return explicitly **synthetic**
+  values; the recovered C saves the protected offset/selector and real-mode
+  offset into `0x17d7a4`, `0x17d7a8`, `0x17d7aa` respectively, makes one inert
+  IRQ 8 vector installation request (`AX=2506h`, original handler `0x110de6`),
+  and writes state `2` at `0x17d6a0`. It stops at `0x1110ab` before the
+  `trace_call_1021f4` timer callback registration (`slot offset 0x3c`, callback
+  `0xd68d`). Note that `0x17d6a0` is also **slot 15** in the first
+  16-dword table previously cleared at `0x17d664`, so that slot is now `2`
+  while the other 63 table entries remain zero. Neither a real vector nor
+  a timer callback is installed; later
+  timer-divisor programming, flag restoration and guest differential tests
+  remain unsupported. The earlier stop modes retain their stricter bounds.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

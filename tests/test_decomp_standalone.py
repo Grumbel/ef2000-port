@@ -227,6 +227,17 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('Stopped at DOS/X-32 IRQ8 vector query '
                               '0x0011105b (no DOS IRQ or audio driver installed)',
                               irq_cold.stdout)
+                vectors_cold = subprocess.run([
+                    str(executable), '--image', original,
+                    '--probe-x32-tactcom-ail-vectors',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('Virtual-only DOS IRQ8 vectors: '
+                              '2 reads, 1 inert installation; '
+                              'saved protected abcd:12345678, '
+                              'real-mode 0x00002468', vectors_cold.stdout)
+                self.assertIn('Stopped before AIL timer setup '
+                              '0x001110ab (no DOS IRQ or PIT installed)',
+                              vectors_cold.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)
