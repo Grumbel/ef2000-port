@@ -1439,8 +1439,9 @@ int main(void)
                     ef_decomp_memory_release();
 
                     /* On the already-initialized path, 0xcd4d4 returns
-                     * without touching the keyboard/requests and the
-                     * original caller advances to its 0xce08c call. */
+                     * without touching the keyboard/requests. The caller
+                     * now executes 0xce08c and the zero-flag dispatch,
+                     * stopping before the timer service at 0xe28e8. */
                     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
                     setup_views_probe();
                     EF_U8(0x0015b72eu) = 1u;
@@ -1449,10 +1450,24 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0xce08cu);
+                    assert(stop == 0xe28e8u);
                     assert(EF_U8(0x0041f72cu) == 0x99u);
                     assert(EF_U16(0x000fe624u) == 0xbeefu);
                     assert(EF_U32(0x00196144u) == 0u);
+                    ef_decomp_memory_release();
+
+                    /* A source-enabled page branch must stop at its own
+                     * handler before reaching 0xe28e8; no side effects are
+                     * silently bypassed to reach the timer boundary. */
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    EF_U8(0x0015b72eu) = 1u;
+                    EF_U8(0x0015bac6u) = 1u;
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x7feb0u);
+                    assert(EF_U8(0x0015bac6u) == 1u);
                     ef_decomp_memory_release();
 
                     /* Alternate enum ordering, NONE second relationship,

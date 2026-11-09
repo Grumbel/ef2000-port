@@ -846,9 +846,23 @@ void guest_fn_cd4d4_x(void)
 
 void guest_tactcom_post_options_boundary_8b477(void)
 {
-    /* Caller has executed recovered 0xcd4d4. The original next call is
-     * 0xce08c, which still needs a bounded host binding. */
-    stop_at_guest_boundary(0x000ce08cu);
+    /* The recovered post-input slice reads the original 0xce08c global and
+     * dispatches the conditional page/input handlers in source order. */
+    if (!probing || !main_probe_active)
+        fatal_unexpected("TACTCOM post-input outside main probe");
+    tactcom_after_input_8b47c();
+}
+
+void guest_tactcom_unbound_service_8b47c(uint32_t address)
+{
+    /* The source body is recovered, but these call targets have unmodeled
+     * DOS, device, or timer effects in this native execution envelope. */
+    if (!probing || !main_probe_active ||
+        (address != 0x0007feb0u && address != 0x00081110u &&
+         address != 0x000982a0u && address != 0x00097f90u &&
+         address != 0x00098000u && address != 0x000e28e8u))
+        fatal_unexpected("unsupported TACTCOM post-input call");
+    stop_at_guest_boundary(address);
 }
 
 uint32_t guest_fn_eb9f8(uint32_t file, uint32_t archive)
@@ -1010,7 +1024,9 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
         stopped != 0x1a32u && stopped != 0x1a58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0x628u &&
-        stopped != 0xce08cu &&
+        stopped != 0x7feb0u && stopped != 0x81110u &&
+        stopped != 0x982a0u && stopped != 0x97f90u &&
+        stopped != 0x98000u && stopped != 0xe28e8u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");

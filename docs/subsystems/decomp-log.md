@@ -1810,3 +1810,19 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   The test exercises `0x6b8` release, idempotent release of a cleared entry,
   and reuse of request slot 6 with the original free-list order. The composed
   test now passes with UBSan alignment checks enabled.
+- GCC/Linux TACTCOM post-keyboard dispatch, 2026-11-09: extended the
+  `0x8b39c` source prefix through the original `0x8b47c..0x8b4c4` control
+  flow. After `0xcd4d4`, the caller discards the value read by recovered
+  `get_global_ce08c`, invokes page handlers `0x7feb0` and `0x81110` only
+  when their respective `0x15bac6`/`0x15bac7` flags are set, and inspects
+  device byte `0x420a72`. Nonzero device IDs invoke `0x97f90` and
+  `0x98000`; ID two first invokes `0x982a0`. A new independent host-memory
+  test links the actual recovered source functions and verifies eight
+  flag/device combinations, exact call order, and preserved guest bytes.
+  The synthetic and opt-in SHA-pinned executable startup tests still pass.
+  The native probe stops at the *first* unmodeled conditional handler,
+  or at the original timer-service entry `0xe28e8` if all flags are clear;
+  it never assumes that missing page/input/timer calls have no side effects.
+  Cold X-32 request registration remains bounded at `0x628`, and startup
+  after the timer call (`0x8b4c9..0x8b52d`), guest differential, and
+  OpenWatcom integration remain unimplemented.

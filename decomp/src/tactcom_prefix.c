@@ -4,7 +4,7 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
-/* Original 0x8b39c..0x8b47c: the TACTCOM memory diagnostic, logging setup,
+/* Original 0x8b39c..0x8b4c4: the TACTCOM memory diagnostic, logging setup,
  * first resource pathname, missing-file decision and options call. Not the
  * complete 402-byte initializer. A private guest-local frame substitutes
  * for the Watcom stack until native startup has been reconstructed. */
@@ -39,8 +39,33 @@ void tactcom_prefix_8b39c(ef_addr32 frame)
      * DOS hardware/initialization service; do not skip its side effects. */
     apply_options_82cec();
     /* 0x8b477: initialize the keyboard controller, key tables, request
-     * buffers and timer; the probe stops in the missing X-32 request pool.
-     * Original 0x8b47c next loads EAX=1 and calls 0xce08c. */
+     * buffers and timer; the cold probe stops in the missing X-32 pool. */
     guest_fn_cd4d4_x();
     guest_tactcom_post_options_boundary_8b477();
+}
+
+/* 0x8b47c..0x8b4c4: conditional page/input setup after 0xcd4d4.
+ * 0xce08c is a recovered six-byte global read; its result is discarded by
+ * this caller. The other handlers retain their original control-flow order,
+ * but are dispatched via a bounded host callback until their dependencies
+ * (notably DOS input/timer state) can be exercised in the native probe. */
+void tactcom_after_input_8b47c(void)
+{
+    uint32_t input_device;
+
+    (void)get_global_ce08c();
+    if (EF_U8(0x0015bac6u) != 0u)
+        guest_tactcom_unbound_service_8b47c(0x0007feb0u);
+    if (EF_U8(0x0015bac7u) != 0u)
+        guest_tactcom_unbound_service_8b47c(0x00081110u);
+
+    input_device = EF_U8(0x00420a72u);
+    if (input_device != 0u) {
+        if (input_device == 2u)
+            guest_tactcom_unbound_service_8b47c(0x000982a0u);
+        guest_tactcom_unbound_service_8b47c(0x00097f90u);
+        guest_tactcom_unbound_service_8b47c(0x00098000u);
+    }
+
+    guest_tactcom_unbound_service_8b47c(0x000e28e8u);
 }

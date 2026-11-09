@@ -140,12 +140,16 @@ original's no-device branch would. The probe now executes recovered
   same guest layout is valid under the native C alignment rules. It is
   **not yet wired into the native probe**: actual DOS/X-32
   request/vector/timer services cannot be safely simulated by a free-list
-  initialization alone. A synthetic
-  pre-initialized input-state test skips that setup as in the original and
-  reaches the subsequent TACTCOM `0xce08c` boundary.
+  initialization alone. A synthetic pre-initialized input-state test skips
+  that setup as in the original, then executes the recovered TACTCOM
+  `0x8b47c..0x8b4c4` control flow: the `0xce08c` global read and the
+  conditional page/input handlers. With no handler flags, it reaches the
+  `0xe28e8` timer-service boundary; enabled handlers stop at their actual
+  call targets rather than silently skipping their side effects.
   A mapping-only file stops at the missing association heading `0x120e`;
   missing files stop at `0xea50c` after the original table initialization.
-  The remainder of the outer TACTCOM startup has not been recovered.
+  The remainder of the outer TACTCOM startup (`0x8b4c9..0x8b52d`) has not
+  been connected to the native probe.
   Packed resources, malformed/exceptional numbers and unrestricted strings
   remain bounded. Neither reader is yet guest-differential verified.
 These are **bounded probes**: they do not implement the general variadic

@@ -38,6 +38,16 @@ target_compile_definitions(ef2000-decomp-x32-chain-test PRIVATE EF_DECOMP_HOST_T
 target_include_directories(ef2000-decomp-x32-chain-test PRIVATE decomp/include)
 target_link_options(ef2000-decomp-x32-chain-test PRIVATE -Wl,--gc-sections)
 add_test(NAME decomp-x32-chain-host-model COMMAND ef2000-decomp-x32-chain-test)
+add_executable(ef2000-decomp-tactcom-tail-test
+  tests/decomp_tactcom_tail_test.c
+  decomp/src/tactcom_prefix.c decomp/src/tiny_helpers2.c)
+target_compile_features(ef2000-decomp-tactcom-tail-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-tactcom-tail-test PRIVATE
+  -Wall -Wextra -Werror -ffunction-sections -fdata-sections)
+target_compile_definitions(ef2000-decomp-tactcom-tail-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-tactcom-tail-test PRIVATE decomp/include)
+target_link_options(ef2000-decomp-tactcom-tail-test PRIVATE -Wl,--gc-sections)
+add_test(NAME decomp-tactcom-tail-host-model COMMAND ef2000-decomp-tactcom-tail-test)
 add_executable(ef2000-decomp-spatial-test
   tests/decomp_spatial_test.c decomp/src/spatial.c)
 target_compile_features(ef2000-decomp-spatial-test PRIVATE c_std_11)
