@@ -41,6 +41,33 @@ int main(void)
     assert(ef_decomp_memory_span(EF_DECOMP_RAM_SIZE - 1, 2) == 0);
     ef_decomp_memory_release();
 
+    /* Views.c ReadGenSeqs initializes all forty 0xa1-byte slots before
+     * loading the external generic-sequence resource. It copies the name
+     * as one dword plus one byte, and stores the original default word. */
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    {
+        const uint8_t name[] = {'N', 'O', 'N', 'E', 0};
+        uint32_t i;
+        memset(ef_decomp_memory_span(0x0019cbb0u, 40u * 0xa1u),
+               0xcc, 40u * 0xa1u);
+        memcpy(ef_decomp_memory_span(0x00182708u, sizeof(name)),
+               name, sizeof(name));
+        EF_U16(0x00182710u) = 0x5f5fu;
+        init_gen_sequence_slots_30214();
+        for (i = 0; i < 40u; ++i) {
+            uint32_t base = 0x0019cbb0u + i * 0xa1u;
+            assert(EF_U16(base) == 0x5f5fu);
+            assert(EF_U8(base + 2u) == 0xccu);
+            assert(EF_U8(base + 0x3fu) == 0xccu);
+            assert(memcmp(ef_decomp_memory_span(base + 0x40u, 5u),
+                          name, sizeof(name)) == 0);
+            assert(EF_U8(base + 0x45u) == 0xccu);
+            assert(EF_U8(base + 0xa0u) == 0xccu);
+        }
+        assert(EF_U8(0x0019cbb0u + 40u * 0xa1u) == 0u);
+    }
+    ef_decomp_memory_release();
+
     /* Recovered type-3 parser reads real guest descriptor layout (18-byte
      * stride); use synthetic keys, not original executable bytes. Test
      * byte/word/dword stores, case folding and the 0x82710 CONTROL hook. */
@@ -326,6 +353,10 @@ int main(void)
         memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
         memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
         memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
+        memcpy(ef_decomp_memory_span(0x00182708u, 5), "NONE", 5);
+        EF_U16(0x00182710u) = 0x5fu;
+        memcpy(ef_decomp_memory_span(0x00182794u, sizeof("BG\\views\\views2.dat")),
+               "BG\\views\\views2.dat", sizeof("BG\\views\\views2.dat"));
         memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
         memcpy(ef_decomp_memory_span(0x0018d52cu, 3), "rb", 3);
         memcpy(ef_decomp_memory_span(0x3400u, 7), "german", 7);
@@ -380,6 +411,10 @@ int main(void)
             memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
             memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
             memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
+            memcpy(ef_decomp_memory_span(0x00182708u, 5), "NONE", 5);
+            EF_U16(0x00182710u) = 0x5fu;
+            memcpy(ef_decomp_memory_span(0x00182794u, sizeof("BG\\views\\views2.dat")),
+                   "BG\\views\\views2.dat", sizeof("BG\\views\\views2.dat"));
             memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
             memcpy(ef_decomp_memory_span(0x0018d52cu, 3), "rb", 3);
             memcpy(ef_decomp_memory_span(0x3400u, 7), "german", 7);
@@ -392,7 +427,12 @@ int main(void)
             EF_U32(0x1800u) = 0x1900u;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x30214u);
+            assert(stop == 0x9ccb8u);
+            assert(EF_U16(0x0019cbb0u) == 0x5fu);
+            assert(EF_U16(0x0019cbb0u + 39u * 0xa1u) == 0x5fu);
+            assert(strcmp(ef_decomp_memory_span(0x0019cbf0u, 5u), "NONE") == 0);
+            assert(strcmp(ef_decomp_memory_span(0x0019cbf0u + 39u * 0xa1u, 5u),
+                          "NONE") == 0);
             buffer = EF_U32(0x001600a0u);
             assert(buffer != 0u);
             assert(EF_U32(0x00464380u) == 0x0012b370u);

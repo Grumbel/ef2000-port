@@ -6912,4 +6912,8 @@ uint32_t guest_fn_f8624(ef_addr32 object, ef_addr32 list,
 #pragma aux guest_fn_f8624 parm [eax] [edx] [ebx] [ecx] value [eax] modify [eax ebx ecx edx]
 #endif
 
+/* views_sequences.c: recovered prefix of Views.c ReadGenSeqs at 0x30214. */
+void init_gen_sequence_slots_30214(void);
+void read_gen_sequences_prefix_30214(ef_addr32 frame);
+
 #endif

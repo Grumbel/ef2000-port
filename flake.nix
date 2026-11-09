@@ -373,7 +373,7 @@
             decomp/src/runtime_helpers4.c decomp/src/init_tables1.c \
             decomp/src/leaf_helpers6.c decomp/src/load_planes1.c \
             decomp/src/localized_file_handlers.c decomp/src/script_helpers1.c \
-            decomp/src/misc_drafts1.c \
+            decomp/src/misc_drafts1.c decomp/src/views_sequences.c \
             decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \
             decomp/src/tactcom_prefix.c decomp/src/game_main.c \
             decomp/src/ascii_stricmp.c \

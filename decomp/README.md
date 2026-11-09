@@ -106,7 +106,12 @@ original's no-device branch would. The probe now executes recovered
   joystick sampling, malformed values and diagnostic branches remain
   bounded. Missing, comment-only or entirely supported
   configs (including the unchanged shipped `EF2000.CFG`) run through
-  original `0xe9574` arena release to `0x30214`.
+  original `0xe9574` arena release and into the recovered prefix of
+  `ReadGenSeqs()` at `0x30214` (Views.c). That prefix initializes all forty
+  0xa1-byte sequence records from the default five-byte name and index,
+  then builds the guest path to `BG\\views\\views2.dat`. The probe stops at
+  the next original call, the unimplemented resource opener `0x9ccb8`.
+  The remainder of the 4,119-byte sequence file parser is not reconstructed.
 These are **bounded probes**: they do not implement the general variadic
 logger or connected-joystick input. The memory-shortage
 branch stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and

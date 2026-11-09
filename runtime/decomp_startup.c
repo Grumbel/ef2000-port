@@ -32,7 +32,8 @@ static int main_probe_active;
  * initial guest ESP, outside the loaded image, BSS and startup arena. */
 enum { TACTCOM_PROBE_FRAME = EF_DECOMP_RAM_SIZE - 0x2000u,
        TACTCOM_LOG_FRAME = TACTCOM_PROBE_FRAME + 0x200u,
-       TACTCOM_TEXT_FRAME = TACTCOM_PROBE_FRAME + 0x400u };
+       TACTCOM_TEXT_FRAME = TACTCOM_PROBE_FRAME + 0x400u,
+       TACTCOM_VIEW_FRAME = TACTCOM_PROBE_FRAME + 0x600u };
 
 static void fatal_unexpected(const char *service)
 {
@@ -196,7 +197,8 @@ uint32_t guest_fn_9c858_arg(uint32_t name)
 void guest_fn_eb478(ef_addr32 text)
 {
     if (!probing || !main_probe_active ||
-        text != TACTCOM_PROBE_FRAME + 0xa0u)
+        (text != TACTCOM_PROBE_FRAME + 0xa0u &&
+         text != TACTCOM_VIEW_FRAME))
         fatal_unexpected("TACTCOM pathname lowercase (0xeb478)");
     (void)lowercase_string(text);
 }
@@ -407,7 +409,49 @@ uint8_t guest_fn_e882c_x(void)
     return 0;
 }
 
-void guest_fn_30214_w(void) { stop_at_guest_boundary(0x00030214u); }
+/* ReadGenSeqs() first initializes forty records, then builds the path for
+ * BG\views\views2.dat. Keep its resource opener as the next hard boundary;
+ * the 4,119-byte original parser and archive handle layer are not linked. */
+uint32_t guest_fn_9ccb8(ef_addr32 path)
+{
+    const char *name;
+    const char *suffix;
+    size_t length, suffix_length;
+    if (!probing || !main_probe_active || path != TACTCOM_VIEW_FRAME ||
+        !(name = (const char *)ef_decomp_memory_span(path, 0x94u)) ||
+        !(suffix = (const char *)ef_decomp_memory_span(0x00182794u, 0x30u)) ||
+        !memchr(name, 0, 0x94u) || !memchr(suffix, 0, 0x30u))
+        fatal_unexpected("Views.c resource-open path (0x9ccb8)");
+    length = strlen(name);
+    suffix_length = strlen(suffix);
+    if (length < suffix_length ||
+        memcmp(name + length - suffix_length, suffix, suffix_length) != 0)
+        fatal_unexpected("Views.c resource-open suffix (0x9ccb8)");
+    printf("TACTCOM sequence resource pathname: %s\n", name);
+    stop_at_guest_boundary(0x0009ccb8u);
+    return UINT32_MAX;
+}
+
+void guest_fn_30214_w(void)
+{
+    const char *source;
+    const char *base = NULL;
+    uint32_t base_addr;
+    if (!probing || !main_probe_active ||
+        !ef_decomp_memory_span(TACTCOM_VIEW_FRAME, 0x94u))
+        fatal_unexpected("ReadGenSeqs outside TACTCOM main probe");
+    /* Keep the original unchecked string append bounded in this host probe. */
+    source = (const char *)ef_decomp_memory_span(0x00182794u, 0x30u);
+    base_addr = EF_U32(0x00132aa8u);
+    if (base_addr != 0u)
+        base = (const char *)ef_decomp_memory_span(base_addr, 0x60u);
+    if (!source || !memchr(source, 0, 0x30u) ||
+        (base_addr != 0u && (!base || !memchr(base, 0, 0x60u))) ||
+        strlen(source) + (base ? strlen(base) : 0u) >= 0x94u)
+        fatal_unexpected("ReadGenSeqs pathname bounds");
+    read_gen_sequences_prefix_30214(TACTCOM_VIEW_FRAME);
+    fatal_unexpected("ReadGenSeqs returned from unbound resource open");
+}
 void guest_fn_2ff44_w(void) { stop_at_guest_boundary(0x0002ff44u); }
 void guest_fn_f80_w(void) { stop_at_guest_boundary(0x00000f80u); }
 
@@ -552,7 +596,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     probing = 0;
     ef_decomp_files_end();
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
-        stopped != 0x30214u && stopped != 0xb3c04u &&
+        stopped != 0x9ccb8u && stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)

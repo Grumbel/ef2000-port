@@ -1468,3 +1468,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   its buffer, rather than stopping at `0xe882c`. The next milestone is
   recovering `0x30214` (4,119 bytes) to progress toward the first screen;
   no original-guest differential or Watcom splice for these parser paths.
+- GCC/Linux generic-sequence loader prefix, 2026-11-09: identified original
+  `0x30214` (4,119 bytes) as `ReadGenSeqs()` in `Views.c`, corroborated by
+  its embedded error string after the resource path. The initial instructions
+  `0x30214..0x3024d` copy five bytes from `0x182708` and the default word
+  `0x182710` into all forty 0xa1-byte slots at `0x19cbb0` (names at +0x40).
+  `0x3024e..0x30271` initializes a private 0x94-byte path frame with the
+  original recovered default-path helper `0x9c980`, zeroes the word at
+  frame +0x90, and appends the original `0x182794` DOS resource name
+  (`BG\\views\\views2.dat`) with `0x9ca57`. It next calls `0x9ccb8` to open
+  the resource. A new derived-source prefix under `decomp/src/views_sequences.c`
+  reproduces these writes without running any original machine code. Synthetic
+  RAM tests check all forty records and untouched bytes; the SHA-pinned
+  startup test confirms the path and the next `0x9ccb8` boundary. No archive
+  opener, file parser, original-guest replay, Watcom splice or first screen
+  is claimed; the 4,119-byte function remains `named`, not `compiles`.

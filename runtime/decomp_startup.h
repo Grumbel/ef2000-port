@@ -27,8 +27,9 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * its read-only logger adapter and stops at the 0xeb25a page switch; a
  * found file enters recovered 0x82cec options, samples a synthetic detached
  * joystick (0xd66c2), and executes the 0xe94ec text loader and 0xe93dc
- * line parser. A settings assignment stops at token handler 0xe882c;
- * blank/comment-only or missing config reaches 0x30214. The host
+ * line parser. Unrecognized setting syntax stops at token handler 0xe882c;
+ * blank/comment-only or supported config enters ReadGenSeqs at 0x30214,
+ * initializes its 40 slots and stops at resource opener 0x9ccb8. The host
  * supports read-only plain text only. Without a directory the legacy
  * boundary remains at 0xb3b90. Low memory stops
  * at 0x8b417, and playvideo at 0x8b2d8.

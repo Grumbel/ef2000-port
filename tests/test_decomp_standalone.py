@@ -48,6 +48,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/localized_file_handlers.c'),
                 str(ROOT / 'decomp/src/script_helpers1.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
+                str(ROOT / 'decomp/src/views_sequences.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
@@ -93,7 +94,7 @@ class DecompStandaloneTests(unittest.TestCase):
                               real.stdout)
                 self.assertIn('TACTCOM first resource payload size:', real.stdout)
                 self.assertRegex(real.stdout,
-                                 r'stopped at unimplemented call 0x(?:000eb25a|00030214)')
+                                 r'stopped at unimplemented call 0x(?:000eb25a|0009ccb8)')
                 if 'stopped at unimplemented call 0x000eb25a' in real.stdout:
                     self.assertIn('Datenset nicht gefunden.', real.stderr)
                     self.assertIn('Prüfen Sie', real.stderr)
@@ -105,8 +106,9 @@ class DecompStandaloneTests(unittest.TestCase):
                 ], capture_output=True, text=True, check=True)
                 self.assertIn('TACTCOM first resource payload size: 7 bytes',
                               present.stdout)
-                self.assertIn('stopped at unimplemented call 0x00030214',
+                self.assertIn('stopped at unimplemented call 0x0009ccb8',
                               present.stdout)
+                self.assertIn('BG\\views\\views2.dat', present.stdout)
                 self.assertFalse((Path(directory) / 'TACTCOM.$$$').exists())
                 (Path(directory) / 'EF2000.CFG').write_bytes(b'CONTROL=1\r\n')
                 configured = subprocess.run([
@@ -115,7 +117,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 ], capture_output=True, text=True)
                 self.assertEqual(configured.returncode, 0,
                                  configured.stdout + '\n' + configured.stderr)
-                self.assertIn('stopped at unimplemented call 0x00030214',
+                self.assertIn('stopped at unimplemented call 0x0009ccb8',
                               configured.stdout)
                 # The original full settings sequence exercises all the
                 # recovered type-3 and type-5 callbacks in order.
@@ -127,7 +129,7 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x00030214',
+                self.assertIn('stopped at unimplemented call 0x0009ccb8',
                               mixed.stdout)
                 (Path(directory) / 'EF2000.CFG').write_bytes(
                     b'MUSIC=1,127\r\nSOUNDFX=1,127\r\n')
@@ -135,7 +137,7 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x00030214',
+                self.assertIn('stopped at unimplemented call 0x0009ccb8',
                               sound_only.stdout)
                 (Path(directory) / 'EF2000.CFG').write_bytes(
                     b';ignored\r\n \t\r\n\r\n')
@@ -143,7 +145,7 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x00030214',
+                self.assertIn('stopped at unimplemented call 0x0009ccb8',
                               blank.stdout)
 
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
@@ -194,6 +196,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/localized_file_handlers.c'),
                 str(ROOT / 'decomp/src/script_helpers1.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
+                str(ROOT / 'decomp/src/views_sequences.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
