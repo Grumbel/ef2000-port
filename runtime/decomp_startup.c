@@ -6,6 +6,7 @@
  * implementation of the original X-32 heap and Watcom C runtime. */
 
 #include "decomp_startup.h"
+#include "decomp_files.h"
 #include "decomp_image.h"
 #include "ef_abi.h"
 #include "ef_mem.h"
@@ -170,9 +171,10 @@ void guest_fn_eb478(ef_addr32 text)
     (void)lowercase_string(text);
 }
 
-void guest_tactcom_file_probe_8b45a(ef_addr32 path)
+uint32_t guest_tactcom_file_probe_8b45a(ef_addr32 path)
 {
     const char *name;
+    uint32_t size;
     if (!probing || !main_probe_active || path != TACTCOM_PROBE_FRAME + 0xa0u ||
         !(name = (const char *)ef_decomp_memory_span(path, 0x50u)) ||
         !memchr(name, 0, 0x50u))
@@ -180,8 +182,21 @@ void guest_tactcom_file_probe_8b45a(ef_addr32 path)
     printf("TACTCOM first resource pathname: %s\n", name);
     if (EF_U32(0x00132ab4u) != 0x0009cb20u)
         fatal_unexpected("unexpected startup file callback at 0x132ab4");
-    (void)find_in_archives_9cb20(path);
-    fatal_unexpected("file lookup returned without a host file binding");
+    size = find_in_archives_9cb20(path);
+    printf("TACTCOM first resource payload size: %u bytes\n", size);
+    return size;
+}
+
+void guest_tactcom_missing_resource_8b464(ef_addr32 message)
+{
+    if (message != 0x00132884u || EF_U32(0x00132a74u) != 0x000ea50cu)
+        fatal_unexpected("unexpected TACTCOM missing-resource diagnostic");
+    stop_at_guest_boundary(0x000ea50cu);
+}
+
+void guest_tactcom_options_boundary_8b472(void)
+{
+    stop_at_guest_boundary(0x00082cecu);
 }
 
 uint32_t guest_fn_eb9f8(uint32_t file, uint32_t archive)
@@ -194,9 +209,9 @@ uint32_t guest_fn_eb9f8(uint32_t file, uint32_t archive)
 
 uint32_t guest_fn_b3b90(uint32_t path)
 {
-    (void)path;
-    stop_at_guest_boundary(0xb3b90u);
-    return 0;
+    if (!ef_decomp_files_enabled())
+        stop_at_guest_boundary(0xb3b90u);
+    return read_file_payload_size_b3b90(path);
 }
 
 void guest_fn_8b39c(void)
@@ -291,6 +306,7 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
 }
 
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
+                         const char *data_dir,
                          ef_decomp_arena_probe *probe, uint32_t *stop_address,
                          char *reason, size_t reason_capacity)
 {
@@ -298,6 +314,12 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     int result;
     if (!probe || !stop_address || prepare_arena(bss_end, reason, reason_capacity) != 0)
         return -1;
+    if (ef_decomp_files_begin(data_dir) != 0) {
+        if (reason && reason_capacity)
+            snprintf(reason, reason_capacity, "cannot open read-only data directory");
+        probing = 0;
+        return -1;
+    }
     main_probe_active = 1;
     main_boundary_address = 0;
     if (setjmp(main_boundary) == 0)
@@ -305,7 +327,9 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     stopped = main_boundary_address;
     main_probe_active = 0;
     probing = 0;
-    if (stopped != 0xb3b90u && stopped != 0x8b417u && stopped != 0x8b2d8u) {
+    ef_decomp_files_end();
+    if (stopped != 0xb3b90u && stopped != 0xea50cu && stopped != 0x82cecu &&
+        stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");
         return -1;

@@ -4,10 +4,10 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
-/* Original 0x8b39c..0x8b459 only: the TACTCOM memory diagnostic, logging
- * callback setup and first resource pathname.  This is NOT the complete
- * 402-byte 0x8b39c function.  The guest-local frame is supplied by the
- * native probe until its Watcom stack is implemented. */
+/* Original 0x8b39c..0x8b472: the TACTCOM memory diagnostic, logging setup,
+ * first resource pathname and missing-file decision. This is NOT the
+ * complete 402-byte initializer. A private guest-local frame substitutes
+ * for the Watcom stack until native startup has been reconstructed. */
 void tactcom_prefix_8b39c(ef_addr32 frame)
 {
     int32_t available_kb = (int32_t)dos_call_350b_880() / 1024;
@@ -30,8 +30,11 @@ void tactcom_prefix_8b39c(ef_addr32 frame)
     build_default_path_9c980(frame + 0xa0u);
     strcat_9ca57(frame + 0xa0u, 0x0018a848u);
 
-    /* The host binds the indirect 0x132ab4 callback to recovered 0x9cb20,
-     * then stops at its still-unbound disk-file routine.  No original
-     * installation file is opened or changed during this probe. */
-    guest_tactcom_file_probe_8b45a(frame + 0xa0u);
+    /* 0x8b45a: the installed indirect callback resolves through 0x9cb20
+     * and 0xb3b90, falling back to the read-only host filesystem. */
+    if (guest_tactcom_file_probe_8b45a(frame + 0xa0u) == 0)
+        guest_tactcom_missing_resource_8b464(0x00132884u);
+
+    /* 0x8b472: the next game-owned call is apply_options_82cec. */
+    guest_tactcom_options_boundary_8b472();
 }

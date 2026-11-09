@@ -5,6 +5,28 @@
 #include "ef_globals.h"
 #include "ef_mem.h"
 
+/* 0xb3b90, 114 bytes. Return a resource's payload length. JR includes its
+ * sixteen-byte wrapper; RA stores the payload length at header offset four.
+ * Other files use their actual length. The original ignores a short read. */
+uint32_t read_file_payload_size_b3b90(ef_addr32 name)
+{
+    int32_t handle = open_slot_a7900(0, 0, 0, 0, name);
+    uint32_t size = 0;
+
+    if (handle == -1)
+        return 0;
+    EF_U16(0x0041f360u) = 0;
+    (void)read_handle_a79d4(0, 0, 0, 0, (uint32_t)handle, 8u, 0x0041f360u);
+    if (EF_U16(0x0041f360u) == 0x524au)
+        size = EF_U32(0x0041f364u) + 16u;
+    else if (EF_U16(0x0041f360u) == 0x4152u)
+        size = EF_U32(0x0041f364u);
+    else
+        size = seek_end_a7ae0(0, 0, 0, 0, (uint32_t)handle, 0);
+    close_handle_a7990(0, 0, 0, 0, (uint32_t)handle);
+    return size;
+}
+
 /* asctime-style time formatting. */
 
 /* 0xf9d98, 51 bytes. Write a value (0..99) as two ASCII digits at buffer[pos]. */

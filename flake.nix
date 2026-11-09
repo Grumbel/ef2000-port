@@ -350,7 +350,7 @@
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
             -fno-strict-aliasing -fwrapv -ffunction-sections -fdata-sections \
             -Idecomp/include -Iruntime decomp/standalone/main.c \
-            runtime/decomp_image.c runtime/decomp_startup.c \
+            runtime/decomp_image.c runtime/decomp_startup.c runtime/decomp_files.c \
             -L. -lef2000-decomp -lcrypto -Wl,--gc-sections -o ef2000-decomp
           ./ef2000-decomp --self-test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
@@ -362,11 +362,13 @@
             -fno-strict-aliasing -fwrapv -ffunction-sections -fdata-sections \
             -Wno-error=int-to-pointer-cast \
             -Idecomp/include -Iruntime tests/decomp_startup_test.c \
-            runtime/decomp_image.c runtime/decomp_startup.c \
+            runtime/decomp_image.c runtime/decomp_startup.c runtime/decomp_files.c \
             decomp/src/runtime_helpers25.c decomp/src/runtime_helpers19.c \
             decomp/src/runtime_helpers17.c decomp/src/math_string.c \
             decomp/src/game_helpers81.c decomp/src/engine_helpers3.c \
             decomp/src/entity_helpers.c \
+            decomp/src/game_helpers57.c decomp/src/runtime_helpers22.c \
+            decomp/src/runtime_helpers34.c \
             decomp/src/misc_drafts1.c \
             decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \
             decomp/src/tactcom_prefix.c decomp/src/game_main.c \

@@ -77,10 +77,17 @@ prints the memory diagnostic from the original image and flushes the output
 stream. The prefix then sets two logging callback globals, uses the recovered
 `0x9c980` default-directory path builder and `0x9c858` DOS environment
 lookup, appends the game's first resource pathname and dispatches through
-recovered `0x9cb20` to a boundary before the `0xb3b90` disk-file reader.
-The memory-shortage branch stops at `0x8b417`. The remainder of the 402-byte
-TACTCOM entry and actual
-first-screen services are **not yet linked**. The alternate `playvideo`
+recovered `0x9cb20` to the recovered `0xb3b90` resource-size reader. On Linux,
+`--probe-main` now maps DOS paths into a **read-only** data directory, by
+default the original executable's directory or the explicit `--data-dir DIR`.
+The reader recognizes JR and RA header lengths and falls back to seeking to
+the actual file end. The original file-open/read/seek/close paths are bound
+to five host-owned handles; no data is written or added to the repository.
+For the supplied original executable without a `check.cd`, the normal branch
+stops at the unimplemented `0xea50c` missing-resource diagnostic; with a
+synthetic `check.cd` it reaches the subsequent `0x82cec` options call. The
+memory-shortage branch stops at `0x8b417`. The remainder of the 402-byte
+TACTCOM entry and actual first-screen services are **not yet linked**. The alternate `playvideo`
 branch is exercised with synthetic guest argv. This is neither a native
 reproduction of the real DOS memory report nor Watcom/guest replay verified.
 

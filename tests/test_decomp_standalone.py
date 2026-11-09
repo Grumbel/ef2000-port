@@ -38,11 +38,15 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/game_helpers81.c'),
                 str(ROOT / 'decomp/src/engine_helpers3.c'),
                 str(ROOT / 'decomp/src/entity_helpers.c'),
+                str(ROOT / 'decomp/src/game_helpers57.c'),
+                str(ROOT / 'decomp/src/runtime_helpers22.c'),
+                str(ROOT / 'decomp/src/runtime_helpers34.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
                 str(ROOT / 'runtime/decomp_startup.c'),
+                str(ROOT / 'runtime/decomp_files.c'),
                 '-lcrypto', '-Wl,--gc-sections',
                 '-o', str(executable),
             ], check=True, capture_output=True)
@@ -81,8 +85,19 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('arena 0x004df000 (3000000 bytes)', real.stdout)
                 self.assertIn('TACTCOM\n\nfound 57,618K bytes of memory',
                               real.stdout)
-                self.assertIn('stopped at unimplemented call 0x000b3b90',
-                              real.stdout)
+                self.assertIn('TACTCOM first resource payload size:', real.stdout)
+                self.assertRegex(real.stdout,
+                                 r'stopped at unimplemented call 0x(?:000ea50c|00082cec)')
+                check_file = Path(directory) / 'check.cd'
+                check_file.write_bytes(b'RA\x00\x00\x07\x00\x00\x00')
+                present = subprocess.run([
+                    str(executable), '--image', original,
+                    '--data-dir', directory, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('TACTCOM first resource payload size: 7 bytes',
+                              present.stdout)
+                self.assertIn('stopped at unimplemented call 0x00082cec',
+                              present.stdout)
 
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
     def test_guest_memory_and_x32_envelope(self):
@@ -122,14 +137,21 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/game_helpers81.c'),
                 str(ROOT / 'decomp/src/engine_helpers3.c'),
                 str(ROOT / 'decomp/src/entity_helpers.c'),
+                str(ROOT / 'decomp/src/game_helpers57.c'),
+                str(ROOT / 'decomp/src/runtime_helpers22.c'),
+                str(ROOT / 'decomp/src/runtime_helpers34.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
                 str(ROOT / 'runtime/decomp_startup.c'),
+                str(ROOT / 'runtime/decomp_files.c'),
                 '-lcrypto', '-Wl,--gc-sections', '-o', str(executable),
             ], check=True, capture_output=True)
-            result = subprocess.run([str(executable)], capture_output=True, check=True)
+            result = subprocess.run([str(executable)], capture_output=True)
+            self.assertEqual(result.returncode, 0,
+                             result.stdout.decode(errors='replace') +
+                             result.stderr.decode(errors='replace'))
             self.assertIn(b'Memory: 60,415K', result.stdout)
 
 

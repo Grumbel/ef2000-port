@@ -1342,3 +1342,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   The host checks the original 0x132ab4 callback offset and refuses archive
   access before initialization; there is no file I/O in this probe. The
   remainder of 0x8b39c and the first screen are still unimplemented.
+- GCC/Linux first TACTCOM disk-file reader, 2026-11-09: recovered the 114-byte
+  `0xb3b90` file-size function from the original disassembly and connected it
+  to existing `0xa7900` open, `0xa79d4` read, `0xa7ae0` seek-end and `0xa7990`
+  close recovered-C helpers. It reads eight header bytes into guest address
+  `0x41f360`; JR returns length at +4 plus 16, RA returns length at +4, other
+  headers use the actual file length, and an open failure returns zero.
+  Added Linux-only, read-only `bc36a` / `f1d90` / `a7a64` / `bc421` adapters
+  backed by five host stream slots. Paths are rooted at the game executable's
+  containing directory or `--data-dir`, with DOS case-insensitive lookup and
+  explicit rejection of parent traversal and symlinks. The real callback at
+  `0x132ab4` now returns to the recovered TACTCOM prefix, which takes the
+  original `0x8b460..0x8b472` missing-versus-present branch. The probe stops
+  at diagnostic callback `0xea50c` if `\check.cd` is absent, or before options
+  call `0x82cec` if present; neither the diagnostic itself nor option/display
+  initialization is linked. The native adapter never writes original data.
+  Synthetic GCC tests cover JR, RA, ordinary files, missing files, mixed-case
+  DOS paths, blocked `..` paths, both TACTCOM branches and file-slot cleanup;
+  opt-in testing against the SHA-pinned original executable also passes.
+  Reached farther into the normal game-owned startup; no screen rendered yet.

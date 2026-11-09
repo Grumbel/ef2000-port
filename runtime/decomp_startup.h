@@ -22,11 +22,14 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
 
 /* Run recovered game main (0x8b274), its arena call and the first TACTCOM
  * memory diagnostic, using synthetic X-32 heap accounting.  The normal
- * path enters the 0x9cb20 archive/disk lookup callback and stops before
- * 0xb3b90 (DOS file header), with a low-memory
- * boundary at 0x8b417.  The optional playvideo branch stops at 0x8b2d8.
+ * path enters the 0x9cb20 archive/disk lookup callback and (when data_dir
+ * is supplied) its recovered 0xb3b90 file reader.  A missing file stops
+ * at diagnostic 0xea50c; a found file stops at options 0x82cec. Without
+ * a directory the legacy boundary remains at 0xb3b90. Low memory stops
+ * at 0x8b417, and playvideo at 0x8b2d8.
  * Never executes any original x86 or the full game main loop. */
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
+                         const char *data_dir,
                          ef_decomp_arena_probe *probe, uint32_t *stop_address,
                          char *reason, size_t reason_capacity);
 

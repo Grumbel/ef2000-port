@@ -36,6 +36,7 @@ nix run .#ef2000-decomp             # GCC Linux standalone bootstrap
 nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE
 nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE --probe-arena
 nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE --probe-main
+nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE --data-dir ../EF2000/c/EF2000 --probe-main
 nix run .#ef2000-decomp-watcom      # OpenWatcom DOS bootstrap in DOSBox-X
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
@@ -161,8 +162,11 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
   first known game-owned initialization routine (`0xe29a0`) and the recovered
   arena reset (`0xe2a1c`) using narrowly scoped native allocator, memory-fill
   and cleanup-registration bindings. `--probe-main` instead enters the
-  recovered game `main` at `0x8b274` and stops explicitly at the unimplemented
-  TACTCOM init `0x8b39c` (without running original x86 instructions).
+  recovered game `main` at `0x8b274`, the partial TACTCOM initializer at
+  `0x8b39c`, and the recovered `0xb3b90` file-header size lookup using a
+  read-only Linux directory adapter. It currently stops before missing-file
+  logging (`0xea50c`) or options initialization (`0x82cec`), without running
+  original x86 instructions or rendering the first screen.
 - `packages.ef2000-decomp-watcom` compiles all recovered C modules to
   OpenWatcom OMF and links a 32-bit DOS/CauseWay `EFDECOMP.EXE` from the
   recovered high-score module. `nix run .#ef2000-decomp-watcom` starts that

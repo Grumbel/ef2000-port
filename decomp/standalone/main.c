@@ -6,6 +6,7 @@
  * These two globals are fixture data, not the original game's initializers. */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "ef_abi.h"
@@ -49,35 +50,62 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--probe-arena | --probe-main]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
     }
 #if !defined(__WATCOMC__)
-    if ((argc == 3 || (argc == 4 &&
-                       (strcmp(argv[3], "--probe-arena") == 0 ||
-                        strcmp(argv[3], "--probe-main") == 0))) &&
-        strcmp(argv[1], "--image") == 0) {
+    if (argc >= 3 && strcmp(argv[1], "--image") == 0) {
         ef_decomp_image_info info;
         char reason[128];
+        char *image_dir;
+        const char *data_dir = NULL;
+        const char *probe_type = NULL;
+        int i;
+        for (i = 3; i < argc; i++) {
+            if (strcmp(argv[i], "--data-dir") == 0 && i + 1 < argc && !data_dir) {
+                data_dir = argv[++i];
+            } else if ((strcmp(argv[i], "--probe-arena") == 0 ||
+                        strcmp(argv[i], "--probe-main") == 0) && !probe_type) {
+                probe_type = argv[i];
+            } else {
+                fputs("Unsupported argument (try --help).\n", stderr);
+                return 2;
+            }
+        }
         if (ef_decomp_load_executable(argv[2], &info, reason, sizeof(reason)) != 0) {
             fprintf(stderr, "ef2000-decomp: %s: %s\n", argv[2], reason);
             return 1;
         }
+        image_dir = (char *)malloc(strlen(argv[2]) + 1);
+        if (!image_dir) {
+            ef_decomp_memory_release();
+            return 1;
+        }
+        strcpy(image_dir, argv[2]);
+        {
+            char *separator = strrchr(image_dir, '/');
+            if (separator)
+                separator[separator == image_dir ? 1 : 0] = 0;
+            else
+                strcpy(image_dir, ".");
+        }
         printf("EF2000 decomp bootstrap (%s)\n", EF_BUILD_PLATFORM);
         printf("Original image mapped: %u initialized bytes, BSS through 0x%08x\n",
                info.initialized_size, info.bss_end);
-        if (argc == 4) {
+        if (probe_type) {
             ef_decomp_arena_probe probe;
             uint32_t stopped = 0;
-            int main_probe = strcmp(argv[3], "--probe-main") == 0;
+            int main_probe = strcmp(probe_type, "--probe-main") == 0;
             int status = main_probe
-                ? ef_decomp_probe_main(info.bss_end, 1u, 0u, &probe, &stopped,
+                ? ef_decomp_probe_main(info.bss_end, 1u, 0u,
+                                       data_dir ? data_dir : image_dir, &probe, &stopped,
                                        reason, sizeof(reason))
                 : ef_decomp_probe_arena(info.bss_end, &probe, reason, sizeof(reason));
             if (status != 0) {
                 fprintf(stderr, "ef2000-decomp: startup probe: %s\n", reason);
+                free(image_dir);
                 ef_decomp_memory_release();
                 return 1;
             }
@@ -87,7 +115,8 @@ int main(int argc, char **argv)
                 printf("Recovered game main 0x8b274 entered TACTCOM prefix; "
                        "stopped at unimplemented call 0x%08x\n", stopped);
         }
-        puts("TACTCOM filesystem setup and first-screen initialization are not yet linked.");
+        puts("TACTCOM file-header lookup is bounded; options and first-screen initialization are not yet linked.");
+        free(image_dir);
         ef_decomp_memory_release();
         return 0;
     }
