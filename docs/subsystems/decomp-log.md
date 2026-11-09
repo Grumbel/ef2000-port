@@ -2084,3 +2084,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   This exercises **no real PIT OUT, IRQ delivery, timer tick, or audio**;
   the original guest x86 differential and DOS/Watcom integration remain
   untested. The pre-start `--probe-x32-tactcom-ail-rate` boundary remains.
+- GCC/Linux cold TACTCOM mode-zero return, 2026-11-09: new opt-in
+  `--probe-x32-tactcom-ail-finish` runs the same recovered cold X-32 input,
+  AIL initialization, six inert PIT requests, slot allocation, rate update,
+  and slot activation before proceeding beyond TACTCOM `0x8b4c9`.
+  For original hardware mode zero (no device selected), the bounded
+  `0xe9ac0` branch is inert as recovered from the game. The TACTCOM
+  mode remapping, recovered `select_tables_1d3c4(0)` and
+  `scale_words_1c60c` (synthetic disconnected gameport) execute, then
+  stop at the actual TACTCOM return `0x8b52d`. Both selector pointers
+  `0x19840c`/`0x198410` are cleared; the mode word remains zero, and
+  timer slot zero remains state 2 with period 20000 and reload `0x5d3a`.
+  The probe still refuses active hardware modes 1..3 at their original
+  call targets, and does not simulate any port OUT or IRQ delivery. As in
+  the prior cold continuation, this starts after the options/input phase;
+  it does not make the full game startup or an audio driver playable.
+  SHA-pinned original/synthetic tests cover the recovered source-C path;
+  guest x86 differential and Watcom splice remain pending.

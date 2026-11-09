@@ -183,6 +183,13 @@ int ef_decomp_probe_x32_tactcom_ail_start(uint32_t bss_end,
                                           ef_decomp_x32_probe *probe,
                                           char *reason, size_t reason_capacity);
 
+/* Continue the cold-start mode-zero tail past 0x8b4c9: run recovered
+ * no-device probe, remap the mode word, select tables and scale words,
+ * then stop at TACTCOM return 0x8b52d. No hardware probe is bypassed. */
+int ef_decomp_probe_x32_tactcom_ail_finish(uint32_t bss_end,
+                                           ef_decomp_x32_probe *probe,
+                                           char *reason, size_t reason_capacity);
+
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.
  * This does not initialize Watcom libc, game state or any video device. */

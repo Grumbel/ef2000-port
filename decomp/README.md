@@ -261,6 +261,16 @@ original's no-device branch would. The probe now executes recovered
   checks the unchanged 20000 period, `0x5d3a` reload, callback `0xe28c4`,
   module handler `0xe28e0`, completed critical depth, and the six inert
   PIT requests. No actual timer callback or IRQ is delivered.
+  The next separate `--probe-x32-tactcom-ail-finish` mode resumes at
+  `0x8b4c9` with cold slot zero running, takes the bounded no-device branch
+  of `run_probe_e9ac0` (mode zero), maps the mode word through
+  the original switch, and executes recovered `select_tables_1d3c4` and
+  `scale_words_1c60c` to the TACTCOM return at `0x8b52d`. Both table
+  pointers remain zero, the disconnected-gameport path does not alter the
+  scaled words, and earlier timer/AIL state is retained. Modes 1..3 still
+  stop at their actual unmodeled hardware probes. This bounded path starts
+  after options/input initialization and does **not** claim that the entire
+  file/options startup, subsequent game main, or audio playback works.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized
