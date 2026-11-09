@@ -40,9 +40,12 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/entity_helpers.c'),
                 str(ROOT / 'decomp/src/game_helpers57.c'),
                 str(ROOT / 'decomp/src/game_helpers30.c'),
+                str(ROOT / 'decomp/src/game_helpers33.c'),
+                str(ROOT / 'decomp/src/game_helpers101.c'),
                 str(ROOT / 'decomp/src/runtime_helpers21.c'),
                 str(ROOT / 'decomp/src/runtime_helpers22.c'),
                 str(ROOT / 'decomp/src/runtime_helpers34.c'),
+                str(ROOT / 'decomp/src/runtime_helpers31.c'),
                 str(ROOT / 'decomp/src/runtime_helpers4.c'),
                 str(ROOT / 'decomp/src/init_tables1.c'),
                 str(ROOT / 'decomp/src/leaf_helpers6.c'),
@@ -150,16 +153,16 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('stopped at unimplemented call 0x000ea50c',
                               blank.stdout)
 
-                # An invented plain resource verifies the recovered header
-                # rewind and advances to the parser context allocator.
+                # An invented plain resource verifies the recovered rewind,
+                # stream line/token reader and '#' record defaults.
                 views = Path(directory) / 'views' / 'views2.dat'
                 views.parent.mkdir(parents=True)
-                views.write_bytes(b'VEWS\0\0\0\0synthetic only')
+                views.write_bytes(b'# synthetic\r\n')
                 plain = subprocess.run([
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x0009d1e8',
+                self.assertIn('stopped at unimplemented call 0x000303f9',
                               plain.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([
@@ -209,9 +212,12 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/entity_helpers.c'),
                 str(ROOT / 'decomp/src/game_helpers57.c'),
                 str(ROOT / 'decomp/src/game_helpers30.c'),
+                str(ROOT / 'decomp/src/game_helpers33.c'),
+                str(ROOT / 'decomp/src/game_helpers101.c'),
                 str(ROOT / 'decomp/src/runtime_helpers21.c'),
                 str(ROOT / 'decomp/src/runtime_helpers22.c'),
                 str(ROOT / 'decomp/src/runtime_helpers34.c'),
+                str(ROOT / 'decomp/src/runtime_helpers31.c'),
                 str(ROOT / 'decomp/src/runtime_helpers4.c'),
                 str(ROOT / 'decomp/src/init_tables1.c'),
                 str(ROOT / 'decomp/src/leaf_helpers6.c'),

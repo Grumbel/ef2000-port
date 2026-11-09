@@ -27,6 +27,9 @@ static void setup_views_probe(void)
     memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
     memcpy(ef_decomp_memory_span(0x00182708u, 5), "NONE", 5);
     EF_U16(0x00182710u) = 0x5fu;
+    memcpy(ef_decomp_memory_span(0x0018274cu, 2), "#", 2);
+    EF_U32(0x001827d0u) = 0x76543210u;
+    EF_U32(0x001827d4u) = 0xfedcba98u;
     memcpy(ef_decomp_memory_span(0x00182794u, sizeof("BG\\views\\views2.dat")),
            "BG\\views\\views2.dat", sizeof("BG\\views\\views2.dat"));
     memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
@@ -459,11 +462,13 @@ int main(void)
         }
         /* With a synthetic plain sequence resource the recovered opener
          * returns game slot 100, with the file position rewound to zero.
-         * The recovered 0x9d114 allocates a 0x56c-byte stream record; the
-         * next boundary is the as-yet-unrecovered 0x9d1e8 line parser. */
+         * Recovered 0x9d114 allocates its stream record, and 0x9d170,
+         * 0x9d1e8 and 0x9d278 read the first physical line/token. The
+         * original '#' case initializes slot zero and stops at its first
+         * name-token request, before parsing sequence options. */
         {
             char bg_dir[160], views_dir[180], views_path[220];
-            const uint8_t plain[] = {'V', 'I', 'E', 'W', 0, 0, 0, 0, 'x'};
+            const uint8_t plain[] = {'#', ' ', 'x', '\n', 'y', '\n', 'z', '\n', 'q'};
             const uint8_t packed[] = {'J', 'R', 0, 0, 8, 0, 0, 0};
             const uint8_t packed_ra[] = {'R', 'A', 0, 0, 8, 0, 0, 0};
             uint32_t stop;
@@ -483,22 +488,135 @@ int main(void)
             stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x9d1e8u);
+            assert(stop == 0x303f9u);
             assert(EF_U32(0x001371a4u) == 1u);
             assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) == 100u);
             {
                 uint32_t stream = probe.base + probe.size;
-                assert(EF_U8(stream) == 0x63u);
-                assert(EF_U8(stream + 0x400u) == 0u);
-                assert(EF_U16(stream + 0x556u) == 0u);
-                assert(EF_U32(stream + 0x552u) == 0u);
-                assert(EF_U32(stream + 0x558u) == 0u);
-                assert(EF_U32(stream + 0x55cu) == 0u);
+                assert(strcmp(ef_decomp_memory_span(stream, 4u), "# x") == 0);
+                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 2u), "#") == 0);
+                assert(EF_U32(stream + 0x552u) == 1u);
+                assert(EF_U16(stream + 0x556u) == 1u);
+                assert(EF_U32(stream + 0x558u) == sizeof(plain));
+                assert(EF_U32(stream + 0x55cu) == 4u);
                 assert(EF_U32(stream + 0x560u) == 100u);
                 assert(EF_U32(stream + 0x564u) == 0u);
                 assert(EF_U32(stream + 0x568u) == 0x0009d084u);
             }
+            {
+                const uint32_t rec = 0x0019cbb0u;
+                assert(EF_U16(rec) == 0x5fu);
+                assert(EF_U32(rec + 0x1eu) == 0x76543210u);
+                assert(EF_U32(rec + 0x22u) == 0xfedcba98u);
+                assert(EF_U8(rec + 0x3du) == 0u);
+                assert(EF_U8(rec + 0x3eu) == 0x64u);
+                assert(EF_U8(rec + 0x3fu) == 0x64u);
+                assert(strcmp(ef_decomp_memory_span(rec + 0x40u, 5u), "NONE") == 0);
+                assert(EF_U32(rec + 0x4fu) == 0xfffffd00u);
+                assert(EF_U8(rec + 0x53u) == 3u);
+                assert(EF_U32(rec + 0x54u) == 0u);
+                assert(EF_U32(rec + 0x58u) == 0u);
+                assert(EF_U32(rec + 0x5cu) == 0u);
+                assert(EF_U32(rec + 0x60u) == 0u);
+                assert(EF_U32(rec + 0x64u) == 0u);
+                assert(EF_U32(rec + 0x68u) == 0u);
+                assert(EF_U32(rec + 0x78u) == 0u);
+                assert(EF_U8(rec + 0x7cu) == 0u);
+                assert(EF_U16(rec + 0x7du) == 0u);
+                assert(EF_U16(rec + 0x7fu) == 0u);
+                assert(EF_U16(rec + 0x81u) == 0u);
+                assert(EF_U16(rec + 0x83u) == 0u);
+                assert(EF_U16(rec + 0x85u) == 0u);
+                assert(EF_U16(rec + 0x87u) == 0x280u);
+                assert(EF_U16(rec + 0x89u) == 0x140u);
+                assert(EF_U16(rec + 0x8bu) == 0x640u);
+                assert(EF_U16(rec + 0x8du) == 0x40u);
+                assert(EF_U16(rec + 0x8fu) == 0u);
+                assert(EF_U16(rec + 0x95u) == 0u);
+                assert(EF_U8(rec + 0x9bu) == 0u);
+                assert(EF_U16(rec + 0x9cu) == 0x63u);
+                assert(EF_U16(rec + 0x9eu) == 0xc7u);
+                assert(EF_U8(rec + 0xa0u) == 1u);
+                assert(EF_U16(rec + 0xa1u) == 0x5fu);
+                assert(strcmp(ef_decomp_memory_span(rec + 0xa1u + 0x40u, 5u),
+                              "NONE") == 0);
+                assert(EF_U8(rec + 0xa1u + 0xa0u) == 0u);
+            }
             ef_decomp_memory_release();
+
+            /* A long ignored comment crosses the 0x100-byte refill, with
+             * the first CR and LF on opposite sides of that boundary.
+             * Whitespace-only lines still count toward the physical line
+             * number. The next record line starts with a '#' marker. */
+            {
+                const char rest[] = "\r\n \t\r\n  # alpha,beta\r\n";
+                uint8_t lines[255u + sizeof(rest) - 1u];
+                uint32_t stream;
+                lines[0] = ';';
+                memset(lines + 1u, 'x', 254u);
+                memcpy(lines + 255u, rest, sizeof(rest) - 1u);
+                file = fopen(views_path, "wb");
+                assert(file && fwrite(lines, 1, sizeof(lines), file) == sizeof(lines));
+                assert(fclose(file) == 0);
+                assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                setup_views_probe();
+                stop = 0;
+                assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
+                                            reason, sizeof(reason)) == 0);
+                assert(stop == 0x303f9u);
+                stream = probe.base + probe.size;
+                assert(strcmp(ef_decomp_memory_span(stream, 14u), "# alpha,beta") == 0);
+                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 2u), "#") == 0);
+                assert(EF_U32(stream + 0x552u) == 3u);
+                assert(EF_U16(stream + 0x556u) == 1u);
+                assert(EF_U32(stream + 0x558u) == sizeof(lines) - 0x100u);
+                assert(EF_U32(stream + 0x55cu) == sizeof(lines) - 0x100u);
+                assert(EF_U32(0x0019cbb0u + 0x1eu) == 0x76543210u);
+                ef_decomp_memory_release();
+            }
+
+            /* A non-marker line takes the original 0x31201 skip branch.
+             * It must not initialize the record-specific defaults. */
+            {
+                const char other[] = "  ordinary\r\n";
+                uint32_t stream;
+                file = fopen(views_path, "wb");
+                assert(file && fwrite(other, 1, sizeof(other) - 1u, file) ==
+                       sizeof(other) - 1u);
+                assert(fclose(file) == 0);
+                assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                setup_views_probe();
+                stop = 0;
+                assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
+                                            reason, sizeof(reason)) == 0);
+                assert(stop == 0x31201u);
+                stream = probe.base + probe.size;
+                assert(strcmp(ef_decomp_memory_span(stream, 10u), "ordinary") == 0);
+                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 9u),
+                              "ordinary") == 0);
+                assert(EF_U32(stream + 0x552u) == 1u);
+                assert(EF_U32(0x0019cbb0u + 0x1eu) == 0u);
+                ef_decomp_memory_release();
+            }
+
+            /* The original rejects a line over 0x400 bytes through its
+             * configured callback before touching the token buffer. */
+            {
+                uint8_t overlong[0x402u];
+                memset(overlong, 'a', sizeof(overlong));
+                file = fopen(views_path, "wb");
+                assert(file && fwrite(overlong, 1, sizeof(overlong), file) ==
+                       sizeof(overlong));
+                assert(fclose(file) == 0);
+                assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                setup_views_probe();
+                stop = 0;
+                assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
+                                            reason, sizeof(reason)) == 0);
+                assert(stop == 0xea50cu);
+                assert(EF_U8(probe.base + probe.size + 0x400u) == 0u);
+                ef_decomp_memory_release();
+            }
 
             file = fopen(views_path, "wb");
             assert(file && fwrite(packed, 1, sizeof(packed), file) == sizeof(packed));

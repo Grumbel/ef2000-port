@@ -32,8 +32,10 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * initializes its 40 slots and opens the Views resource through the bounded
  * plain-file portion of 0x9ccb8. An absent resource stops at the diagnostic
  * callback 0xea50c; a synthetic plain resource constructs the 0x9d114
- * stream context and stops at the 0x9d1e8 line parser. Packed resources
- * and archive lookups remain explicit boundaries. Without a directory the
+ * stream context, reads text lines and tokens with 0x9d170/0x9d1e8/0x9d278,
+ * and initializes one '#' record before stopping at 0x303f9. Non-record
+ * input stops at 0x31201. Packed resources and archive lookups remain
+ * explicit boundaries. Without a directory the
  * legacy boundary remains at 0xb3b90. Low memory stops
  * at 0x8b417, and playvideo at 0x8b2d8.
  * Never executes any original x86 or the full game main loop. */

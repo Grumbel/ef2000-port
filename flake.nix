@@ -369,8 +369,9 @@
             decomp/src/game_helpers81.c decomp/src/engine_helpers3.c \
             decomp/src/entity_helpers.c \
             decomp/src/game_helpers57.c decomp/src/game_helpers30.c \
+            decomp/src/game_helpers33.c decomp/src/game_helpers101.c \
             decomp/src/runtime_helpers21.c decomp/src/runtime_helpers22.c \
-            decomp/src/runtime_helpers34.c \
+            decomp/src/runtime_helpers34.c decomp/src/runtime_helpers31.c \
             decomp/src/runtime_helpers4.c decomp/src/init_tables1.c \
             decomp/src/leaf_helpers6.c decomp/src/load_planes1.c \
             decomp/src/localized_file_handlers.c decomp/src/script_helpers1.c \

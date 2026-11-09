@@ -1502,3 +1502,23 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   There is still no Views file parser, archive decoder, Watcom splice,
   original-guest differential, or playable first screen; `ReadGenSeqs`
   remains `named`, not `compiles`.
+- GCC/Linux Views line reader and first sequence-record defaults, 2026-11-09:
+  disassembled the original `0x9d1e8..0x9d274` non-comment text-line loop
+  and added its recovered C body in `runtime_helpers31.c` (the original
+  function's assigned module). Its `0x400`-byte guard, leading whitespace,
+  CR/LF and semicolon behavior, physical line counter, and fatal callback
+  are preserved. The original `0x9cde8` plain-handle read is supplied by a
+  read-only probe adapter, allowing the already recovered `0x9d170`
+  256-byte buffered character reader and `0x9d278` token reader to execute
+  unchanged. `ReadGenSeqs` now compares the first token against original
+  `0x18274c` ("#") through recovered `0x9d524`, executes the exact
+  `0x302e1..0x303f8` field writes for the first 0xa1-byte sequence record,
+  and stops at `0x303f9` before reading the record name. Non-`#` tokens
+  stop at the original `0x31201` skip branch rather than inventing its loop
+  and cleanup. Synthetic GCC tests cover the record's individual default
+  fields and next-slot isolation, comment/blank-line skipping, CRLF across
+  a 0x100-byte refill, unrecognized input, and overlong-line callback;
+  the SHA-pinned opt-in executable uses only a synthetic Views resource.
+  Packed/archive input, sequence options and subsequent records remain
+  unsupported. No original guest differential or Watcom splice; the 4,119-
+  byte `ReadGenSeqs` remains `named`, not `compiles`.

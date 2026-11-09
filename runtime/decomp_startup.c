@@ -486,17 +486,58 @@ uint32_t guest_fn_9d060(uint32_t size)
     return alloc_or_abort_9d060(size);
 }
 
-void guest_fn_9d1e8(uint32_t stream)
+uint32_t guest_fn_9cde8(ef_addr32 dest, uint32_t count, uint32_t owner)
+{
+    const uint32_t stream = next_allocation + requested_arena;
+    if (!probing || !main_probe_active || !stream_allocated ||
+        dest != stream + 0x451u || count != 0x100u || owner != 100u ||
+        !ef_decomp_memory_span(dest, count) ||
+        EF_U32(0x001371a4u) == 0u)
+        fatal_unexpected("Views.c uncompressed resource read (0x9cde8)");
+    if (EF_U32(stream + 0x552u) == 0u &&
+        EF_U32(stream + 0x558u) == 0u &&
+        guest_fn_a7a64_r(0u, 1u, owner) != 0u)
+        fatal_unexpected("Views.c resource was not rewound");
+    /* The original dispatches through 0xa79d4 when handle flags 16..18
+     * are clear; the recovered handle reader calls the read-only adapter. */
+    return read_handle_a79d4(0u, 0u, 0u, 0u, owner, count, dest);
+}
+
+static void check_view_parser_context(ef_addr32 stream)
 {
     const uint32_t expected = next_allocation + requested_arena;
+    const char *line, *token;
     if (!probing || !main_probe_active || !stream_allocated ||
-        stream != expected || EF_U8(stream) != 0x63u ||
+        stream != expected ||
         EF_U32(stream + 0x568u) != 0x0009d084u ||
         EF_U32(stream + 0x560u) != 100u)
-        fatal_unexpected("Views.c parser context (0x9d1e8)");
-    if (guest_fn_a7a64_r(0u, 1u, EF_U32(stream + 0x560u)) != 0u)
-        fatal_unexpected("Views.c resource was not rewound");
-    stop_at_guest_boundary(0x0009d1e8u);
+        fatal_unexpected("Views.c parser context");
+    line = (const char *)ef_decomp_memory_span(stream, 0x401u);
+    token = (const char *)ef_decomp_memory_span(stream + 0x400u, 0x51u);
+    if (!line || !token || !memchr(line, 0, 0x401u) ||
+        !memchr(token, 0, 0x51u))
+        fatal_unexpected("Views.c unterminated sequence line or token");
+}
+
+void guest_tactcom_view_record_boundary_303f9(ef_addr32 stream, uint32_t index)
+{
+    check_view_parser_context(stream);
+    if (index != 0u || EF_U8(stream + 0x400u) != '#' ||
+        EF_U8(stream + 0x401u) != 0u)
+        fatal_unexpected("Views.c first record marker or index");
+    stop_at_guest_boundary(0x000303f9u);
+}
+
+void guest_tactcom_view_nonrecord_boundary_31201(ef_addr32 stream)
+{
+    check_view_parser_context(stream);
+    stop_at_guest_boundary(0x00031201u);
+}
+
+void guest_tactcom_view_invalid_index_boundary_3120b(ef_addr32 stream)
+{
+    check_view_parser_context(stream);
+    stop_at_guest_boundary(0x0003120bu);
 }
 
 void guest_fn_30214_w(void)
@@ -665,7 +706,8 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     ef_decomp_files_end();
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x9ccb8u && stopped != 0x9cd53u &&
-        stopped != 0x9d1e8u && stopped != 0xebb58u &&
+        stopped != 0x303f9u && stopped != 0x31201u &&
+        stopped != 0x3120bu && stopped != 0xebb58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {

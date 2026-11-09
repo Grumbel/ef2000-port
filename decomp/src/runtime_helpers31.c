@@ -7,6 +7,36 @@
 
 /* Small runtime wrappers. */
 
+/* 0x9d1e8..0x9d274: Read one text line into the beginning of the 0x56c-byte
+ * stream. Leading spaces/tabs and CRs are removed. Semicolon comments and
+ * empty non-EOF lines are skipped, while the physical line count at +0x552
+ * advances even for skipped lines. Preserve the original 0x400-byte length
+ * check and its error callback before a too-long line is written. */
+void read_text_line_9d1e8(ef_addr32 stream)
+{
+    for (;;) {
+        uint32_t length = 0;
+        uint8_t c;
+
+        EF_U16(stream + 0x556u) = 0;
+        c = read_stream_char_9d170(stream);
+        while (c == ' ' || c == '\t')
+            c = read_stream_char_9d170(stream);
+        while (c != 0 && c != '\n') {
+            if (length >= 0x400u)
+                guest_callptr1_x(EF_U32(0x00132a74u), 0x0018b1f0u);
+            EF_U8(stream + length) = c;
+            ++length;
+            c = read_stream_char_9d170(stream);
+        }
+        EF_U8(stream + length) = 0;
+        EF_U32(stream + 0x552u)++;
+        if (EF_U8(stream) == ';' || (EF_U8(stream) == 0 && c != 0))
+            continue;
+        return;
+    }
+}
+
 /* 0x106e2c, 19 bytes. Run 106d00 on the object, then 106dc4 on it with the second argument. */
 void run_pair_106e2c(uint32_t object, uint32_t u1, uint32_t second)
 {
