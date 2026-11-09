@@ -4,7 +4,7 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
-/* Original 0x8b39c..0x8b4c4: the TACTCOM memory diagnostic, logging setup,
+/* Original 0x8b39c..0x8b52d: the TACTCOM memory diagnostic, logging setup,
  * first resource pathname, missing-file decision and options call. Not the
  * complete 402-byte initializer. A private guest-local frame substitutes
  * for the Watcom stack until native startup has been reconstructed. */
@@ -44,7 +44,7 @@ void tactcom_prefix_8b39c(ef_addr32 frame)
     guest_tactcom_post_options_boundary_8b477();
 }
 
-/* 0x8b47c..0x8b4c4: conditional page/input setup after 0xcd4d4.
+/* 0x8b47c..0x8b52d: conditional page/input setup and final mode selection.
  * 0xce08c is a recovered six-byte global read; its result is discarded by
  * this caller. The other handlers retain their original control-flow order,
  * but are dispatched via a bounded host callback until their dependencies
@@ -67,5 +67,28 @@ void tactcom_after_input_8b47c(void)
         guest_tactcom_unbound_service_8b47c(0x00098000u);
     }
 
+    /* The timer service has a real one-time initialization guard. An
+     * already-initialized instance can return; first-time hardware setup
+     * must remain an explicit host boundary. */
     guest_tactcom_unbound_service_8b47c(0x000e28e8u);
+
+    /* 0x8b4c9: probe according to the hardware mode word. Modes 0 and
+     * values above 3 do nothing; 1..3 require actual device probes. */
+    guest_tactcom_unbound_service_8b47c(0x000e9ac0u);
+
+    /* 0x8b4ce..0x8b511: the CS jump table at 0x8b38c maps modes
+     * 0/1/2/3 to 0/'0'/'F'/'G'; out-of-range modes reset to zero. */
+    switch (EF_U16(0x00464472u)) {
+    case 1u: EF_U16(0x00464472u) = 0x30u; break;
+    case 2u: EF_U16(0x00464472u) = 0x46u; break;
+    case 3u: EF_U16(0x00464472u) = 0x47u; break;
+    default: EF_U16(0x00464472u) = 0u; break;
+    }
+
+    /* 0x8b511..0x8b523: the signed high word of 0x464470 aliases the
+     * remapped mode word at 0x464472. Call the actual recovered C bodies.
+     * The second function calls 0xd6694 even with no joystick configured;
+     * the bounded native host has a disconnected-gameport reader. */
+    select_tables_1d3c4((uint16_t)(EF_S32(0x00464470u) >> 16));
+    scale_words_1c60c();
 }

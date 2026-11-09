@@ -142,14 +142,23 @@ original's no-device branch would. The probe now executes recovered
   request/vector/timer services cannot be safely simulated by a free-list
   initialization alone. A synthetic pre-initialized input-state test skips
   that setup as in the original, then executes the recovered TACTCOM
-  `0x8b47c..0x8b4c4` control flow: the `0xce08c` global read and the
+  `0x8b47c..0x8b52d` control flow: the `0xce08c` global read and the
   conditional page/input handlers. With no handler flags, it reaches the
   `0xe28e8` timer-service boundary; enabled handlers stop at their actual
-  call targets rather than silently skipping their side effects.
+  call targets rather than silently skipping their side effects. When the
+  timer has already been initialized, its original guard skips the hardware
+  setup. The following `0xe9ac0` dispatch stops at the original hardware
+  probe for modes 1–3; mode 0 or an invalid mode does not probe. The
+  recovered jump-table selection maps modes 1/2/3 to `0x30`/`0x46`/`0x47`,
+  clears other modes, selects the corresponding tables via the existing
+  `0x1d3c4` C body, and executes the existing `0x1c60c` input scaler using
+  the explicitly disconnected-gameport model. This warm, unconnected-mode
+  path reaches the original TACTCOM return at `0x8b52d`.
   A mapping-only file stops at the missing association heading `0x120e`;
   missing files stop at `0xea50c` after the original table initialization.
-  The remainder of the outer TACTCOM startup (`0x8b4c9..0x8b52d`) has not
-  been connected to the native probe.
+  Main's *next* call after TACTCOM remains a hard boundary. This warm-path
+  result does not imply that first-time timer registration, connected
+  gameport input or subsequent graphical startup is operational.
   Packed resources, malformed/exceptional numbers and unrestricted strings
   remain bounded. Neither reader is yet guest-differential verified.
 These are **bounded probes**: they do not implement the general variadic

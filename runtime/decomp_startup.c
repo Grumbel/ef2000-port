@@ -855,12 +855,28 @@ void guest_tactcom_post_options_boundary_8b477(void)
 
 void guest_tactcom_unbound_service_8b47c(uint32_t address)
 {
-    /* The source body is recovered, but these call targets have unmodeled
-     * DOS, device, or timer effects in this native execution envelope. */
-    if (!probing || !main_probe_active ||
-        (address != 0x0007feb0u && address != 0x00081110u &&
+    /* Do not bypass unmodeled device or timer effects. The recovered
+     * 0xe28e8 body immediately returns when its one-time guard is set;
+     * entering that no-op arm does not require linking its hardware deps. */
+    if (!probing || !main_probe_active)
+        fatal_unexpected("TACTCOM post-input service outside main probe");
+    if (address == 0x000e28e8u && EF_U8(0x0015f751u) != 0u) {
+        return;
+    }
+    /* Original 0xe9ac0 is side-effect-free for modes 0 and >3. For the
+     * other three modes stop before the actual hardware probe call. */
+    if (address == 0x000e9ac0u) {
+        uint16_t mode = EF_U16(0x00464472u);
+        if (mode == 0u || mode > 3u)
+            return;
+        address = (mode == 1u) ? 0x000d9b30u :
+                  (mode == 2u) ? 0x000d9c30u : 0x0010d9e0u;
+    }
+    if (address != 0x0007feb0u && address != 0x00081110u &&
          address != 0x000982a0u && address != 0x00097f90u &&
-         address != 0x00098000u && address != 0x000e28e8u))
+         address != 0x00098000u && address != 0x000e28e8u &&
+         address != 0x000d9b30u && address != 0x000d9c30u &&
+         address != 0x0010d9e0u)
         fatal_unexpected("unsupported TACTCOM post-input call");
     stop_at_guest_boundary(address);
 }
@@ -886,7 +902,10 @@ void guest_fn_8b39c(void)
         !ef_decomp_memory_span(TACTCOM_PROBE_FRAME, 0xf0u))
         fatal_unexpected("TACTCOM prefix outside startup probe");
     tactcom_prefix_8b39c(TACTCOM_PROBE_FRAME);
-    fatal_unexpected("unbounded return from TACTCOM prefix");
+    /* The recovered 402-byte TACTCOM body has returned on a synthetic
+     * already-initialized path. Continue into main only after its separate
+     * initialization and file/graphics services have been recovered. */
+    stop_at_guest_boundary(0x0008b52du);
 }
 void guest_fn_8b2d8(void) { stop_at_guest_boundary(0x8b2d8u); }
 
@@ -1027,6 +1046,8 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
         stopped != 0x7feb0u && stopped != 0x81110u &&
         stopped != 0x982a0u && stopped != 0x97f90u &&
         stopped != 0x98000u && stopped != 0xe28e8u &&
+        stopped != 0xd9b30u && stopped != 0xd9c30u &&
+        stopped != 0x10d9e0u && stopped != 0x8b52du &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");

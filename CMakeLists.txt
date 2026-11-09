@@ -40,7 +40,8 @@ target_link_options(ef2000-decomp-x32-chain-test PRIVATE -Wl,--gc-sections)
 add_test(NAME decomp-x32-chain-host-model COMMAND ef2000-decomp-x32-chain-test)
 add_executable(ef2000-decomp-tactcom-tail-test
   tests/decomp_tactcom_tail_test.c
-  decomp/src/tactcom_prefix.c decomp/src/tiny_helpers2.c)
+  decomp/src/tactcom_prefix.c decomp/src/tiny_helpers2.c
+  decomp/src/game_state_helpers.c decomp/src/line_of_sight.c)
 target_compile_features(ef2000-decomp-tactcom-tail-test PRIVATE c_std_11)
 target_compile_options(ef2000-decomp-tactcom-tail-test PRIVATE
   -Wall -Wextra -Werror -ffunction-sections -fdata-sections)

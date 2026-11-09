@@ -1456,6 +1456,52 @@ int main(void)
                     assert(EF_U32(0x00196144u) == 0u);
                     ef_decomp_memory_release();
 
+                    /* When the timer was already started, its recovered
+                     * guard returns without hardware calls. Mode 0 (and
+                     * invalid modes) select no tables, execute the
+                     * recovered disconnected-gameport model and return
+                     * from TACTCOM at 0x8b52d. Mode 1..3 stop before
+                     * their distinct hardware probes in 0xe9ac0. */
+                    {
+                        static const struct {
+                            uint16_t mode;
+                            uint32_t boundary;
+                            uint16_t mode_after;
+                        } cases[] = {
+                            {0u, 0x8b52du, 0u},
+                            {1u, 0xd9b30u, 1u},
+                            {2u, 0xd9c30u, 2u},
+                            {3u, 0x10d9e0u, 3u},
+                            {4u, 0x8b52du, 0u},
+                        };
+                        size_t ci;
+                        for (ci = 0; ci < sizeof(cases) / sizeof(cases[0]); ++ci) {
+                            assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                            setup_views_probe();
+                            EF_U8(0x0015b72eu) = 1u;
+                            EF_U8(0x0015f751u) = 1u;
+                            EF_U16(0x00464470u) = 0x5a5au;
+                            EF_U16(0x00464472u) = cases[ci].mode;
+                            stop = 0;
+                            assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                        &stop, reason, sizeof(reason)) == 0);
+                            if (stop != cases[ci].boundary)
+                                fprintf(stderr, "TACTCOM mode %u stop=0x%08x: %s\n",
+                                        (unsigned)cases[ci].mode, stop, reason);
+                            assert(stop == cases[ci].boundary);
+                            assert(EF_U16(0x00464472u) == cases[ci].mode_after);
+                            assert(EF_U16(0x00464470u) == 0x5a5au);
+                            assert(EF_U8(0x0015f751u) == 1u);
+                            if (cases[ci].boundary == 0x8b52du) {
+                                assert(EF_U32(0x0019840cu) == 0u);
+                                assert(EF_U32(0x00198410u) == 0u);
+                                assert(EF_U8(0x0015ba2cu) == 0u);
+                                assert(EF_U8(0x0015ba2fu) == 0u);
+                            }
+                            ef_decomp_memory_release();
+                        }
+                    }
+
                     /* A source-enabled page branch must stop at its own
                      * handler before reaching 0xe28e8; no side effects are
                      * silently bypassed to reach the timer boundary. */

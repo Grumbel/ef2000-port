@@ -19,7 +19,7 @@ class DecompStandaloneTests(unittest.TestCase):
     def test_gcc_executable_runs_recovered_highscore_code(self):
         with tempfile.TemporaryDirectory() as directory:
             executable = Path(directory) / 'ef2000-decomp'
-            subprocess.run([
+            build = subprocess.run([
                 'gcc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
                 '-DEF_DECOMP_NATIVE=1', '-fno-strict-aliasing', '-fwrapv',
                 '-ffunction-sections', '-fdata-sections',
@@ -38,6 +38,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/game_main.c'),
                 str(ROOT / 'decomp/src/tactcom_prefix.c'),
                 str(ROOT / 'decomp/src/tiny_helpers2.c'),
+                str(ROOT / 'decomp/src/game_state_helpers.c'),
+                str(ROOT / 'decomp/src/line_of_sight.c'),
                 str(ROOT / 'decomp/src/misc_helpers2.c'),
                 str(ROOT / 'decomp/src/engine_helpers.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
@@ -71,7 +73,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'runtime/decomp_files.c'),
                 '-lcrypto', '-Wl,--gc-sections',
                 '-o', str(executable),
-            ], check=True, capture_output=True)
+            ], capture_output=True, text=True)
+            self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
             result = subprocess.run([str(executable), '--self-test'],
                                     capture_output=True, text=True, check=True)
             self.assertIn('Linux / GCC', result.stdout)
@@ -268,7 +271,7 @@ class DecompStandaloneTests(unittest.TestCase):
     def test_first_recovered_game_startup_stage(self):
         with tempfile.TemporaryDirectory() as directory:
             executable = Path(directory) / 'decomp-startup-test'
-            subprocess.run([
+            build = subprocess.run([
                 'gcc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
                 '-DEF_DECOMP_NATIVE=1', '-fno-strict-aliasing', '-fwrapv',
                 '-ffunction-sections', '-fdata-sections',
@@ -286,6 +289,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/game_main.c'),
                 str(ROOT / 'decomp/src/tactcom_prefix.c'),
                 str(ROOT / 'decomp/src/tiny_helpers2.c'),
+                str(ROOT / 'decomp/src/game_state_helpers.c'),
+                str(ROOT / 'decomp/src/line_of_sight.c'),
                 str(ROOT / 'decomp/src/misc_helpers2.c'),
                 str(ROOT / 'decomp/src/engine_helpers.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
@@ -318,7 +323,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'runtime/decomp_startup.c'),
                 str(ROOT / 'runtime/decomp_files.c'),
                 '-lcrypto', '-Wl,--gc-sections', '-o', str(executable),
-            ], check=True, capture_output=True)
+            ], capture_output=True, text=True)
+            self.assertEqual(build.returncode, 0, build.stdout + build.stderr)
             result = subprocess.run([str(executable)], capture_output=True)
             self.assertEqual(result.returncode, 0,
                              result.stdout.decode(errors='replace') +

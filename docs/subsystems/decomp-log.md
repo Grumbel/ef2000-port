@@ -1826,3 +1826,25 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   Cold X-32 request registration remains bounded at `0x628`, and startup
   after the timer call (`0x8b4c9..0x8b52d`), guest differential, and
   OpenWatcom integration remain unimplemented.
+- GCC/Linux completed bounded TACTCOM warm path, 2026-11-09: reconstructed
+  the original 0x8b4c4..0x8b52d tail from raw pinned-image disassembly.
+  Timer function `0xe28e8` has a one-byte initialization guard at `0x15f751`:
+  an unset guard still stops before hardware, while a set guard takes its
+  immediate-return branch without writing memory or relinking the timer
+  system. Mode-probe function `0xe9ac0` is side-effect-free for mode zero or
+  >3; for modes 1, 2, 3 the bounded runtime stops at the actual nested probe
+  calls `0xd9b30`, `0xd9c30`, `0x10d9e0`. The `0x8b38c` CS jump table then
+  converts input modes 0/1/2/3 to word 0/0x30/0x46/0x47, with invalid
+  modes reset to zero. The signed high word of `0x464470` passed to the
+  existing recovered table selector `0x1d3c4` is exactly the updated mode
+  word at `0x464472` (overlapping address), so the source invokes the real
+  selector and the real scaler `0x1c60c`. The latter calls the already
+  available deterministic *disconnected* `0xd6694` gameport model. A warm
+  mode-zero path can now return from the whole 402-byte TACTCOM initializer
+  and stop at original return `0x8b52d`, before the next main call. The
+  expanded source-linked host test checks eight old conditional-device
+  cases and six mode/table cases; GCC standalone and SHA-pinned synthetic
+  original-image tests cover both the new guarded path and all hardware
+  probe boundaries. Cold X-32 vector registration, first-time timer setup,
+  connected input, graphical game startup, guest differential and Watcom
+  splice remain outstanding; `tactcom_init` stays `named`, not `verified`.
