@@ -84,10 +84,10 @@ int main(int argc, char **argv)
             printf("Recovered 0xe29a0 + 0xe2a1c: arena 0x%08x (%u bytes), release hook 0x%08x\n",
                    probe.base, probe.size, probe.release_hook);
             if (main_probe)
-                printf("Recovered game main 0x8b274 stopped at unimplemented TACTCOM 0x%08x\n",
-                       stopped);
+                printf("Recovered game main 0x8b274 entered TACTCOM prefix; "
+                       "stopped at unimplemented call 0x%08x\n", stopped);
         }
-        puts("TACTCOM and first-screen initialization are not yet linked.");
+        puts("TACTCOM filesystem setup and first-screen initialization are not yet linked.");
         ef_decomp_memory_release();
         return 0;
     }
@@ -103,6 +103,6 @@ int main(int argc, char **argv)
         return 1;
     }
     if (argc == 1)
-        puts("Game entry prefix is recovered; TACTCOM, globals and platform layer remain incomplete.");
+        puts("Game entry and TACTCOM memory prefix are recovered; filesystem and platform layer remain incomplete.");
     return 0;
 }

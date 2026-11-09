@@ -31,7 +31,12 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/runtime_helpers25.c'),
                 str(ROOT / 'decomp/src/math_string.c'),
                 str(ROOT / 'decomp/src/game_main.c'),
+                str(ROOT / 'decomp/src/tactcom_prefix.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
+                str(ROOT / 'decomp/src/runtime_helpers19.c'),
+                str(ROOT / 'decomp/src/game_helpers81.c'),
+                str(ROOT / 'decomp/src/ui_widget_helpers.c'),
+                str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
                 str(ROOT / 'runtime/decomp_startup.c'),
                 '-lcrypto', '-Wl,--gc-sections',
@@ -70,7 +75,9 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)
                 self.assertIn('arena 0x004df000 (3000000 bytes)', real.stdout)
-                self.assertIn('stopped at unimplemented TACTCOM 0x0008b39c',
+                self.assertIn('TACTCOM\n\nfound 57,618K bytes of memory',
+                              real.stdout)
+                self.assertIn('stopped at unimplemented call 0x0009c980',
                               real.stdout)
 
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
@@ -104,12 +111,18 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/runtime_helpers25.c'),
                 str(ROOT / 'decomp/src/math_string.c'),
                 str(ROOT / 'decomp/src/game_main.c'),
+                str(ROOT / 'decomp/src/tactcom_prefix.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
+                str(ROOT / 'decomp/src/runtime_helpers19.c'),
+                str(ROOT / 'decomp/src/game_helpers81.c'),
+                str(ROOT / 'decomp/src/ui_widget_helpers.c'),
+                str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
                 str(ROOT / 'runtime/decomp_startup.c'),
                 '-lcrypto', '-Wl,--gc-sections', '-o', str(executable),
             ], check=True, capture_output=True)
-            subprocess.run([str(executable)], capture_output=True, check=True)
+            result = subprocess.run([str(executable)], capture_output=True, check=True)
+            self.assertIn(b'Memory: 60,415K', result.stdout)
 
 
 if __name__ == '__main__':

@@ -1309,3 +1309,23 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   stops at unrecovered reset `0x8b2d8` without allocating an arena. Neither
   function is Watcom/guest-differential verified. The first screen remains
   blocked by TACTCOM's many library and platform dependencies.
+- GCC/Linux TACTCOM prefix, 2026-11-09: translated only the 0x8b39c..0x8b43c
+  memory/diagnostic part of the 402-byte TACTCOM initializer, leaving the
+  remaining initializer explicitly unrecovered. The `0x880` DOS 350Bh memory
+  wrapper, recovered 0x8b328 comma formatter, 0xea4a7 stdout flush wrapper,
+  guest string copy and native printf adapter are now wired into the bounded
+  game-main probe. The X-32 free-memory response is deliberately *synthetic*:
+  unused 64 MiB guest RAM after the recovered arena, not a claim of matching
+  original extender allocation state. With the supplied SHA-pinned executable,
+  `--probe-main` now prints TACTCOM's original memory diagnostic (57,618K in
+  that synthetic memory model), installs logging callback offsets 0xea50c and
+  0x18a838, and stops before configuration path initialization at `0x9c980`.
+  Synthetic high-memory and low-memory tests exercise the two boundaries;
+  there is still no game screen. Next: reconstruct 0x9c980's directory/path
+  dependency, the file-existence callback and the remaining TACTCOM setup
+  calls. The original executable remains external and read-only.
+  Validation: 410 asset-free Python tests pass (81 skipped), including GCC
+  synthetic normal/low-memory TACTCOM branches, and the opt-in SHA-pinned
+  real executable `--probe-main` run. Full original-asset suite still has
+  three unrelated save-state `legacy` keyword failures in the Python harness;
+  Nix/OpenWatcom are unavailable in this workspace.

@@ -39,11 +39,16 @@ int main(void)
      * missing TACTCOM initialization boundary. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
     EF_U32(0x001264d4u) = 0x400u;
+    memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
     {
         uint32_t stop = 0;
         assert(ef_decomp_probe_main(bss_end, 1, 0, &probe, &stop,
                                     reason, sizeof(reason)) == 0);
-        assert(stop == 0x8b39cu && probe.base == bss_end);
+        assert(stop == 0x9c980u && probe.base == bss_end);
+        assert(EF_U32(0x00196148u) == EF_DECOMP_RAM_SIZE - bss_end - 0x400u);
+        assert(EF_U32(0x00196160u) == 0);
+        assert(EF_U32(0x00132a74u) == 0x000ea50cu);
+        assert(EF_U32(0x00132a78u) == 0x0018a838u);
     }
     ef_decomp_memory_release();
 
@@ -51,6 +56,7 @@ int main(void)
      * arena allocation and a separate unimplemented reset boundary. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
     EF_U32(0x001264d4u) = 0x400u;
+    memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
     memcpy(ef_decomp_memory_span(0x0018a7e8u, 10), "playvideo", 10);
     memcpy(ef_decomp_memory_span(0x3000u, 10), "PLAYVIDEO", 10);
     EF_U32(0x2000u + 4u) = 0x3000u;
@@ -68,7 +74,21 @@ int main(void)
         uint32_t stop = 0;
         assert(ef_decomp_probe_main(bss_end, 2, 0x2000u, &probe, &stop,
                                     reason, sizeof(reason)) == 0);
-        assert(stop == 0x8b39cu && probe.size == 0x400u);
+        assert(stop == 0x9c980u && probe.size == 0x400u);
+    }
+    ef_decomp_memory_release();
+
+    /* Deliberately low synthetic X-32 free memory takes the original
+     * diagnostic callback path, which is still a bounded native boundary. */
+    assert(ef_decomp_memory_load(payload, sizeof(payload), 0x02500000u) == 0);
+    EF_U32(0x001264d4u) = 0x400u;
+    memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
+    {
+        uint32_t stop = 0;
+        assert(ef_decomp_probe_main(0x02500000u, 1, 0, &probe, &stop,
+                                    reason, sizeof(reason)) == 0);
+        assert(stop == 0x8b417u);
+        assert(EF_U32(0x00132a74u) == 0);
     }
     ef_decomp_memory_release();
 

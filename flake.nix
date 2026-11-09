@@ -363,8 +363,11 @@
             -Wno-error=int-to-pointer-cast \
             -Idecomp/include -Iruntime tests/decomp_startup_test.c \
             runtime/decomp_image.c runtime/decomp_startup.c \
-            decomp/src/runtime_helpers25.c decomp/src/math_string.c \
-            decomp/src/game_main.c decomp/src/ascii_stricmp.c \
+            decomp/src/runtime_helpers25.c decomp/src/runtime_helpers19.c \
+            decomp/src/math_string.c decomp/src/game_helpers81.c \
+            decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \
+            decomp/src/tactcom_prefix.c decomp/src/game_main.c \
+            decomp/src/ascii_stricmp.c \
             -lcrypto -Wl,--gc-sections -o decomp-startup-test
           ./decomp-startup-test
           runHook postBuild

@@ -7,7 +7,8 @@
 /* 0x8b274, 100 bytes. The original game's entry after Watcom __CMain.
  * Reconstructed from the actual x86 call sequence at 0x8b274..0x8b2d7.
  * Unrecovered callees remain explicit boundaries; the Linux startup probe
- * stops at the first one, 0x8b39c, rather than executing original bytes. */
+ * now enters the bounded TACTCOM memory prefix rather than executing any
+ * original bytes. */
 uint32_t candidate_game_main(uint32_t argc, ef_addr32 argv)
 {
     if (argc == 2u &&

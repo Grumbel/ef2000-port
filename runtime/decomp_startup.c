@@ -25,6 +25,11 @@ static jmp_buf main_boundary;
 static uint32_t main_boundary_address;
 static int main_probe_active;
 
+/* The native probe uses a private guest stack-shaped scratch frame, not an
+ * emulated Watcom stack.  Keep it below native64's documented 0x3fff000
+ * initial guest ESP, outside the loaded image, BSS and startup arena. */
+enum { TACTCOM_PROBE_FRAME = EF_DECOMP_RAM_SIZE - 0x2000u };
+
 static void fatal_unexpected(const char *service)
 {
     fprintf(stderr, "ef2000-decomp: unexpected startup service: %s\n", service);
@@ -83,7 +88,88 @@ static void stop_at_guest_boundary(uint32_t address)
     longjmp(main_boundary, 1);
 }
 
-void guest_fn_8b39c(void) { stop_at_guest_boundary(0x8b39cu); }
+/* Probe-only X-32 350Bh memory accounting.  This models the remaining
+ * bounded host-owned guest RAM after the recovered game arena; it is not
+ * claimed to match the original extender's total heap or swap policy. */
+void guest_fn_2b0(ef_addr32 request, ef_addr32 result)
+{
+    uint32_t used = next_allocation + requested_arena;
+    if (!probing || !main_probe_active || !arena_allocated ||
+        request != 0x00196148u || result != request ||
+        EF_U32(request) != 0x350bu || used > EF_DECOMP_RAM_SIZE)
+        fatal_unexpected("X-32 350Bh (0x2b0)");
+    EF_U32(result) = EF_DECOMP_RAM_SIZE - used;
+    EF_U32(0x00196160u) = 0;
+}
+
+void ui_report_missing_record(ef_addr32 message)
+{
+    (void)message;
+    fatal_unexpected("X-32 350Bh returned an error");
+}
+
+void guest_string_copy(ef_addr32 dest, ef_addr32 src)
+{
+    if (!probing || !main_probe_active)
+        fatal_unexpected("guest string copy outside TACTCOM probe");
+    (void)copy_string_9d749(dest, src);
+}
+
+void guest_fn_cd12e(ef_addr32 format, uint32_t string_arg, uint32_t unused)
+{
+    const char *fmt;
+    const char *arg;
+    const char *end;
+    const char *percent;
+    if (!probing || !main_probe_active || format != 0x0018a810u || unused != 0)
+        fatal_unexpected("TACTCOM memory diagnostic (0xcd12e)");
+    fmt = (const char *)ef_decomp_memory_span(format, 128);
+    arg = (const char *)ef_decomp_memory_span(string_arg, 40);
+    if (!fmt || !arg || !(end = memchr(fmt, 0, 128)) ||
+        !(percent = memchr(fmt, '%', (size_t)(end - fmt))) ||
+        percent + 1 >= end || percent[1] != 's' ||
+        memchr(percent + 2, '%', (size_t)(end - percent - 2)) ||
+        !memchr(arg, 0, 40))
+        fatal_unexpected("unsupported TACTCOM diagnostic format");
+    fwrite(fmt, 1, (size_t)(percent - fmt), stdout);
+    fputs(arg, stdout);
+    fwrite(percent + 2, 1, (size_t)(end - percent - 2), stdout);
+}
+
+uint32_t guest_tail_fa8a0(uint32_t stream)
+{
+    if (!probing || !main_probe_active || stream != 0x0016043eu)
+        fatal_unexpected("TACTCOM stdout flush (0xfa8a0)");
+    return fflush(stdout) == 0 ? 0 : UINT32_MAX;
+}
+
+void guest_fn_10ddf7_s(void)
+{
+    fatal_unexpected("TACTCOM unexpected stream reset (0x10ddf7)");
+}
+
+void guest_tactcom_low_memory_8b417(ef_addr32 required, ef_addr32 missing)
+{
+    (void)required;
+    (void)missing;
+    stop_at_guest_boundary(0x8b417u);
+}
+
+void guest_fn_9c980_sfx(ef_addr32 buffer, ef_addr32 suffix)
+{
+    (void)buffer;
+    (void)suffix;
+    stop_at_guest_boundary(0x9c980u);
+}
+
+void guest_fn_8b39c(void)
+{
+    if (!probing || !main_probe_active ||
+        !ef_decomp_memory_span(TACTCOM_PROBE_FRAME, 0xf0u))
+        fatal_unexpected("TACTCOM prefix outside startup probe");
+    tactcom_prefix_8b39c(TACTCOM_PROBE_FRAME);
+    fatal_unexpected("unbounded return from TACTCOM prefix");
+}
 void guest_fn_8b2d8(void) { stop_at_guest_boundary(0x8b2d8u); }
 
 /* These later entry points are deliberately *not* implemented as native
@@ -182,7 +268,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     stopped = main_boundary_address;
     main_probe_active = 0;
     probing = 0;
-    if (stopped != 0x8b39cu && stopped != 0x8b2d8u) {
+    if (stopped != 0x9c980u && stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");
         return -1;

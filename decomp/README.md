@@ -46,7 +46,7 @@ There is no standalone **playable game** build yet. The flake now produces
 two executable bootstraps from `standalone/main.c` and recovered
 `src/hiscore.c`: `.#ef2000-decomp` (native GCC/Linux) and
 `.#ef2000-decomp-watcom` (OpenWatcom/CauseWay DOS, launched via DOSBox-X).
-The Linux package also compiles 340 modules into a GCC archive;
+The Linux package also compiles 341 modules into a GCC archive;
 `game_helpers125.c`, `runtime_helpers23.c`, and `runtime_helpers42.c` still
 contain Watcom-specific or non-portable C. The DOS package retains all OMF
 objects for hybrid splicing. The bootstrap uses synthetic high-score data;
@@ -68,12 +68,18 @@ synthetic execution test verifies the game globals, 0xe2a50 cleanup hook and
 zeroed arena. This is a startup **probe**, not a verified reproduction of the
 original executable's entire C-runtime startup; its execution against real
 game data passed with the SHA-pinned German executable on 2026-11-09.
-`--probe-main` now runs the recovered 100-byte game entry at `0x8b274`
+`--probe-main` runs the recovered 100-byte game entry at `0x8b274`
 (including the native case-insensitive `0x9d524` comparison), invokes the
-recovered arena setup, and deliberately halts at the unrecovered TACTCOM
-`0x8b39c` call. The alternate `playvideo` branch is exercised with synthetic
-guest argv. These are still `drafted` C functions until OpenWatcom splice and
-guest replay validate them.
+recovered arena setup, and enters the **partial** TACTCOM `0x8b39c` prefix.
+It follows the recovered `0x880` DOS service wrapper via a native, synthetic
+X-32 350Bh available-memory response, calls the recovered comma formatter,
+prints the memory diagnostic from the original image and flushes the output
+stream. The prefix then sets the two logging callback globals and stops before
+`0x9c980` (filesystem/configuration path setup); the memory-shortage branch
+stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and actual
+first-screen services are **not yet linked**. The alternate `playvideo`
+branch is exercised with synthetic guest argv. This is neither a native
+reproduction of the real DOS memory report nor Watcom/guest replay verified.
 
 Use `.#ef2000-hybrid` to combine OpenWatcom OMF replacements with the
 original executable through the native64 harness until the source is complete.

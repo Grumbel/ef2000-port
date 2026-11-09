@@ -20,10 +20,11 @@ typedef struct ef_decomp_arena_probe {
 int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
                           char *reason, size_t reason_capacity);
 
-/* Run recovered game main (0x8b274) only up to its first missing call.
- * The normal path must stop before 0x8b39c (TACTCOM), and the optional
- * playvideo branch must stop before 0x8b2d8. Never returns from the game's
- * complete main loop or executes any original x86. */
+/* Run recovered game main (0x8b274), its arena call and the first TACTCOM
+ * memory diagnostic, using synthetic X-32 heap accounting.  The normal
+ * path stops before 0x9c980 (filesystem path setup), with a low-memory
+ * boundary at 0x8b417.  The optional playvideo branch stops at 0x8b2d8.
+ * Never executes any original x86 or the full game main loop. */
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
                          ef_decomp_arena_probe *probe, uint32_t *stop_address,
                          char *reason, size_t reason_capacity);
