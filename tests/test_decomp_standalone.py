@@ -154,16 +154,23 @@ class DecompStandaloneTests(unittest.TestCase):
                               blank.stdout)
 
                 # An invented plain resource verifies the recovered rewind,
-                # stream line/token reader, '#' record, camera selector and
-                # text options before the numeric-options boundary.
+                # stream line/token reader, '#' record, camera selector,
+                # text, scalar, enum and first vector options against the
+                # original image's embedded labels and float constants.
                 views = Path(directory) / 'views' / 'views2.dat'
                 views.parent.mkdir(parents=True)
-                views.write_bytes(b'# synthetic\r\nMODE REL_CAM\r\nEND\r\n')
+                views.write_bytes(
+                    b'# synthetic\r\nMODE REL_CAM\r\n'
+                    b'Name "Overhead View"\r\nKey V1\r\nLocation INSIDE\r\n'
+                    b'PosDamping 12.5\r\nAngDamping 80.125\r\n'
+                    b'MinAlt 2.25\r\nRollLock BANKING_HORIZON\r\n'
+                    b'OffSet 1.25 -2.5 0\r\nRandomOffset 3 0.5 -1.125\r\n'
+                    b'InitialOffSet -1 2.5 3.125\r\nEND\r\n')
                 plain = subprocess.run([
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x000305e1',
+                self.assertIn('stopped at unimplemented call 0x00030aaf',
                               plain.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([

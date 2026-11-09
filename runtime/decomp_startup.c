@@ -12,6 +12,7 @@
 #include "ef_mem.h"
 
 #include <iconv.h>
+#include <math.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -552,10 +553,62 @@ void guest_tactcom_view_string_guard_30577(ef_addr32 stream, uint32_t capacity)
         stop_at_guest_boundary(0x00030577u);
 }
 
-void guest_tactcom_view_numeric_boundary_305e1(ef_addr32 stream)
+/* Only the ordinary decimal syntax needed by the bounded Views probe is
+ * supported. The original 0x9d55d also has uncommon partial/overflow/error
+ * semantics; reject those cases at its address until that routine is fully
+ * reconstructed and tested against the guest. */
+static int view_ordinary_decimal(const char *p)
+{
+    int digits = 0;
+    if (*p == '+' || *p == '-')
+        ++p;
+    while (*p >= '0' && *p <= '9') {
+        ++digits;
+        ++p;
+    }
+    if (*p == '.') {
+        ++p;
+        while (*p >= '0' && *p <= '9') {
+            ++digits;
+            ++p;
+        }
+    }
+    if (digits == 0)
+        return 0;
+    if (*p == 'e' || *p == 'E') {
+        int exp_digits = 0;
+        ++p;
+        if (*p == '+' || *p == '-')
+            ++p;
+        while (*p >= '0' && *p <= '9') {
+            ++exp_digits;
+            ++p;
+        }
+        if (!exp_digits)
+            return 0;
+    }
+    return *p == 0;
+}
+
+double guest_tactcom_view_decimal_9d55d(ef_addr32 stream)
+{
+    const char *token;
+    char *end;
+    double value;
+    check_view_parser_context(stream);
+    token = (const char *)ef_decomp_memory_span(stream + 0x400u, 0x51u);
+    if (!token || !view_ordinary_decimal(token))
+        stop_at_guest_boundary(0x0009d55du);
+    value = strtod(token, &end);
+    if (*end != 0 || !isfinite(value))
+        stop_at_guest_boundary(0x0009d55du);
+    return value;
+}
+
+void guest_tactcom_view_lookat_boundary_30aaf(ef_addr32 stream)
 {
     check_view_parser_context(stream);
-    stop_at_guest_boundary(0x000305e1u);
+    stop_at_guest_boundary(0x00030aafu);
 }
 
 void guest_tactcom_view_nonrecord_boundary_31201(ef_addr32 stream)
@@ -737,7 +790,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x9ccb8u && stopped != 0x9cd53u &&
         stopped != 0x30407u && stopped != 0x3053du && stopped != 0x30577u &&
-        stopped != 0x305e1u && stopped != 0x31201u &&
+        stopped != 0x30aafu && stopped != 0x9d55du && stopped != 0x31201u &&
         stopped != 0x3120bu && stopped != 0xebb58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&

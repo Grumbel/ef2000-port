@@ -82,10 +82,81 @@ static void set_view_camera_mode_30423(ef_addr32 rec, ef_addr32 token)
         EF_U8(rec + 0x3cu) = 5u;
 }
 
-/* 0x304fc..0x305e1: The original option loop accepts Name, Key and Location
- * as textual options before testing numeric tuning fields. Each recognized
- * option returns to 0x304fc for the next physical line. All comparisons
- * use the embedded source strings rather than host-defined spellings. */
+/* 0x305e1..0x306e3: The first three numeric options use the original
+ * 0x9d55d decimal reader (bounded by a host adapter for this GCC probe),
+ * 0x9d72c truncation and x87 FISTP. Keep the original float constants
+ * resident in the loaded image rather than duplicating them here. */
+static int32_t view_fistp_305e1(long double value)
+{
+    if (!(value >= -2147483648.0L && value < 2147483648.0L))
+        return INT32_MIN;
+    return (int32_t)value;
+}
+
+static void read_view_numeric_token_305e1(ef_addr32 stream, ef_addr32 rec,
+                                          uint32_t option)
+{
+    float scale;
+    double value;
+    int32_t result;
+
+    read_next_token_9d278(stream);
+    value = guest_tactcom_view_decimal_9d55d(stream);
+    if (option == 0u || option == 1u) {
+        scale = *(const float *)ef_guest_memory_ptr(0x00182a0du);
+        result = view_fistp_305e1((long double)scale - (long double)value);
+        EF_U8(rec + 0x3eu + option) = (uint8_t)result;
+    } else {
+        scale = *(const float *)ef_guest_memory_ptr(0x00182a09u);
+        result = view_fistp_305e1(-(long double)value * (long double)scale);
+        EF_U32(rec + 0x4fu) = (uint32_t)result;
+    }
+}
+
+/* 0x306e3..0x307f2: RollLock compares six independent mode labels, all
+ * taken from the original embedded strings. An unknown value retains the
+ * already initialized record byte at +0x53. */
+static void read_view_roll_lock_306e3(ef_addr32 stream, ef_addr32 rec)
+{
+    ef_addr32 token;
+    read_next_token_9d278(stream);
+    token = stream + 0x400u;
+    if (ascii_stricmp_9d524(token, 0x00182708u) == 0)
+        EF_U8(rec + 0x53u) = 1u;
+    if (ascii_stricmp_9d524(token, 0x00182874u) == 0)
+        EF_U8(rec + 0x53u) = 3u;
+    if (ascii_stricmp_9d524(token, 0x0018287cu) == 0)
+        EF_U8(rec + 0x53u) = 2u;
+    if (ascii_stricmp_9d524(token, 0x0018288cu) == 0)
+        EF_U8(rec + 0x53u) = 4u;
+    if (ascii_stricmp_9d524(token, 0x00182894u) == 0)
+        EF_U8(rec + 0x53u) = 5u;
+    if (ascii_stricmp_9d524(token, 0x00182840u) == 0)
+        EF_U8(rec + 0x53u) = 0u;
+}
+
+/* 0x307f2..0x30aaf: OffSet, RandomOffset and InitialOffSet parse three
+ * decimal numbers through the 0x9d55d adapter, multiply by the source
+ * float constant 32, and truncate to signed dwords. InitialOffSet also
+ * increments the record's +0x78 dword by three after the last token. */
+static void read_view_vector_307f2(ef_addr32 stream, ef_addr32 rec,
+                                   uint32_t field, uint32_t increment)
+{
+    float scale = *(const float *)ef_guest_memory_ptr(0x00182a09u);
+    uint32_t i;
+    for (i = 0; i < 3u; ++i) {
+        double value;
+        read_next_token_9d278(stream);
+        value = guest_tactcom_view_decimal_9d55d(stream);
+        EF_U32(rec + field + 4u * i) =
+            (uint32_t)view_fistp_305e1((long double)value * (long double)scale);
+    }
+    if (increment)
+        EF_U32(rec + 0x78u) += 3u;
+}
+
+/* 0x304fc..0x30aaf: Each recognized option returns to the original
+ * 0x304fc physical-line loop. The next unsupported option is LookAtObj. */
 static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
 {
     for (;;) {
@@ -103,19 +174,33 @@ static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
             read_next_token_9d278(stream);
             EF_U8(rec + 0x3du) =
                 ascii_stricmp_9d524(stream + 0x400u, 0x00182840u) == 0 ? 0u : 1u;
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182848u) == 0) {
+            read_view_numeric_token_305e1(stream, rec, 0u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182854u) == 0) {
+            read_view_numeric_token_305e1(stream, rec, 1u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182860u) == 0) {
+            read_view_numeric_token_305e1(stream, rec, 2u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182868u) == 0) {
+            read_view_roll_lock_306e3(stream, rec);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x0018289cu) == 0) {
+            read_view_vector_307f2(stream, rec, 0x60u, 0u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828a4u) == 0) {
+            read_view_vector_307f2(stream, rec, 0x54u, 0u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828b4u) == 0) {
+            read_view_vector_307f2(stream, rec, 0x6cu, 1u);
         } else {
-            guest_tactcom_view_numeric_boundary_305e1(stream);
+            guest_tactcom_view_lookat_boundary_30aaf(stream);
         }
     }
 }
 
-/* 0x30214..0x305e1: Bounded ReadGenSeqs() prefix. The original opens the
+/* 0x30214..0x30aaf: Bounded ReadGenSeqs() prefix. The original opens the
  * constructed BG\\views\\views2.dat path at 0x9ccb8, reports a missing file
  * through the two-argument fatal callback at 0x132a74, or passes a successful
  * resource handle to the recovered 0x9d114 stream constructor. Its recovered
  * line/token helpers identify a '#' record start; this prefix initializes
  * that record, copies its bounded name, decodes its camera mode and handles
- * textual options before stopping at numeric option dispatch. */
+ * text, scalar and first vector options before stopping at LookAtObj. */
 void read_gen_sequences_prefix_30214(ef_addr32 frame)
 {
     uint32_t handle;

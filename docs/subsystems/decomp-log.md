@@ -1558,3 +1558,25 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   text. No numeric options, subsequent records, guest differential, packed
   resources, Watcom splice or playable screen is claimed; `ReadGenSeqs`
   remains `named`, not `compiles`.
+- GCC/Linux Views scalar and first vector options, 2026-11-09: inspected
+  original `0x305e1..0x30aae` and extended the first-record option loop with
+  `PosDamping` (record +0x3e), `AngDamping` (+0x3f), `MinAlt` (+0x4f),
+  `RollLock` (+0x53), `OffSet` (+0x60/+0x64/+0x68), `RandomOffset`
+  (+0x54/+0x58/+0x5c), and `InitialOffSet` (+0x6c/+0x70/+0x74, then
+  +0x78 += 3). All labels are compared at their original guest-image
+  addresses; `RollLock` matches the six values `NONE`, `HORIZON`,
+  `BANKING_HORIZON`, `DAMPED`, `RPLANE`, `INSIDE`, retaining the default
+  for unknown labels. The three scalar options use the original 100/32
+  float constants and truncation pattern (100 minus damping, negative
+  altitude multiplied by 32); the vectors scale each component by 32.
+  The 462-byte decimal converter `0x9d55d` is still not reconstructed:
+  a narrow host-only GCC adapter accepts ordinary finite decimals via
+  `strtod` and stops at `0x9d55d` on malformed/special forms rather than
+  claiming the original's error, overlong-mantissa, or x87 edge semantics.
+  Synthetic cases cover negative/exponent decimals, truncation, all six
+  RollLock values, unknown-value retention, vector field mapping and the
+  increment, plus invalid decimal input; SHA-pinned opt-in startup runs
+  with invented resource text. The boundary is now `0x30aaf` before
+  `LookAtObj`; later options, packed/archive resources, following records,
+  guest-state differential and Watcom splice remain pending. The whole
+  `ReadGenSeqs` remains `named`, not `compiles`.

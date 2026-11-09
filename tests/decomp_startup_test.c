@@ -50,6 +50,30 @@ static void setup_views_probe(void)
            "Location", sizeof("Location"));
     memcpy(ef_decomp_memory_span(0x00182840u, sizeof("INSIDE")),
            "INSIDE", sizeof("INSIDE"));
+    memcpy(ef_decomp_memory_span(0x00182848u, sizeof("PosDamping")),
+           "PosDamping", sizeof("PosDamping"));
+    memcpy(ef_decomp_memory_span(0x00182854u, sizeof("AngDamping")),
+           "AngDamping", sizeof("AngDamping"));
+    memcpy(ef_decomp_memory_span(0x00182860u, sizeof("MinAlt")),
+           "MinAlt", sizeof("MinAlt"));
+    memcpy(ef_decomp_memory_span(0x00182868u, sizeof("RollLock")),
+           "RollLock", sizeof("RollLock"));
+    memcpy(ef_decomp_memory_span(0x00182874u, sizeof("HORIZON")),
+           "HORIZON", sizeof("HORIZON"));
+    memcpy(ef_decomp_memory_span(0x0018287cu, sizeof("BANKING_HORIZON")),
+           "BANKING_HORIZON", sizeof("BANKING_HORIZON"));
+    memcpy(ef_decomp_memory_span(0x0018288cu, sizeof("DAMPED")),
+           "DAMPED", sizeof("DAMPED"));
+    memcpy(ef_decomp_memory_span(0x00182894u, sizeof("RPLANE")),
+           "RPLANE", sizeof("RPLANE"));
+    memcpy(ef_decomp_memory_span(0x0018289cu, sizeof("OffSet")),
+           "OffSet", sizeof("OffSet"));
+    memcpy(ef_decomp_memory_span(0x001828a4u, sizeof("RandomOffset")),
+           "RandomOffset", sizeof("RandomOffset"));
+    memcpy(ef_decomp_memory_span(0x001828b4u, sizeof("InitialOffSet")),
+           "InitialOffSet", sizeof("InitialOffSet"));
+    EF_U32(0x00182a09u) = 0x42000000u; /* original float 32 */
+    EF_U32(0x00182a0du) = 0x42c80000u; /* original float 100 */
     memcpy(ef_decomp_memory_span(0x00182794u, sizeof("BG\\views\\views2.dat")),
            "BG\\views\\views2.dat", sizeof("BG\\views\\views2.dat"));
     memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
@@ -510,7 +534,7 @@ int main(void)
             stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x305e1u);
+            assert(stop == 0x30aafu);
             assert(EF_U32(0x001371a4u) == 1u);
             assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) == 100u);
             {
@@ -590,7 +614,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                             reason, sizeof(reason)) == 0);
-                assert(stop == 0x305e1u);
+                assert(stop == 0x30aafu);
                 stream = probe.base + probe.size;
                 assert(strcmp(ef_decomp_memory_span(stream, 4u), "END") == 0);
                 assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 4u),
@@ -643,7 +667,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x305e1u);
+                    assert(stop == 0x30aafu);
                     stream = probe.base + probe.size;
                     assert(strcmp(ef_decomp_memory_span(0x0019cbb0u, 5u),
                                   "Test") == 0);
@@ -691,10 +715,140 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x305e1u);
+                assert(stop == 0x30aafu);
                 assert(EF_U8(0x0019cbb0u + 0x3du) == 1u);
                 assert(EF_U8(0x0019cbb0u + 0x3cu) == 0u);
                 ef_decomp_memory_release();
+            }
+
+            /* The original first three scalar options round toward zero
+             * after x87 arithmetic: 100 - damping and -32 * minimum
+             * altitude. Negative and exponent inputs exercise signs and
+             * the low-byte truncation of the two damping results. */
+            {
+                const struct {
+                    const char *options;
+                    uint8_t pos, ang;
+                    int32_t altitude;
+                    uint8_t roll;
+                } cases[] = {
+                    {"posdamping 12.5\nAngDamping 80.125\n"
+                     "MinAlt 2.25\nRollLock horizon\n", 87u, 19u, -72, 3u},
+                    {"PosDamping -1.25e1\nAngDamping 101.8\n"
+                     "MinAlt -0.25\nRollLock unknown\n", 112u, 255u, 8, 3u},
+                };
+                size_t i;
+                for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+                    char config[256];
+                    int written = snprintf(config, sizeof(config),
+                                           "# x\nMODE REL_CAM\n%sEND\n",
+                                           cases[i].options);
+                    assert(written > 0 && written < (int)sizeof(config));
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(config, 1, (size_t)written, file) ==
+                           (size_t)written);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x30aafu);
+                    assert(EF_U8(0x0019cbb0u + 0x3eu) == cases[i].pos);
+                    assert(EF_U8(0x0019cbb0u + 0x3fu) == cases[i].ang);
+                    assert(EF_S32(0x0019cbb0u + 0x4fu) == cases[i].altitude);
+                    assert(EF_U8(0x0019cbb0u + 0x53u) == cases[i].roll);
+                    ef_decomp_memory_release();
+                }
+            }
+
+            /* RollLock has six independent, case-insensitive comparisons;
+             * unrecognized values retain the default byte 3. */
+            {
+                const struct { const char *label; uint8_t expected; } rolls[] = {
+                    {"NONE", 1u}, {"HORIZON", 3u}, {"BANKING_HORIZON", 2u},
+                    {"DAMPED", 4u}, {"RPLANE", 5u}, {"inside", 0u},
+                    {"invalid", 3u},
+                };
+                size_t i;
+                for (i = 0; i < sizeof(rolls) / sizeof(rolls[0]); ++i) {
+                    char config[96];
+                    int written = snprintf(config, sizeof(config),
+                                           "# x\nMODE REL_CAM\nRollLock %s\nEND\n",
+                                           rolls[i].label);
+                    assert(written > 0 && written < (int)sizeof(config));
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(config, 1, (size_t)written, file) ==
+                           (size_t)written);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x30aafu);
+                    assert(EF_U8(0x0019cbb0u + 0x53u) == rolls[i].expected);
+                    ef_decomp_memory_release();
+                }
+            }
+
+            /* The three vector forms use the same source float multiplier
+             * (32.0f) and truncation, but write different record regions.
+             * InitialOffSet also increments the +0x78 coordinate count. */
+            {
+                const char vectors[] =
+                    "# x\nMODE REL_CAM\n"
+                    "offset 1.25 -2.5 0\n"
+                    "RandomOffset 3 +0.5 -1.125\n"
+                    "InitialOffSet -1 2.5 3.125\n"
+                    "END\n";
+                file = fopen(views_path, "wb");
+                assert(file && fwrite(vectors, 1, sizeof(vectors) - 1u, file) ==
+                       sizeof(vectors) - 1u);
+                assert(fclose(file) == 0);
+                assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                setup_views_probe();
+                stop = 0;
+                assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                            &stop, reason, sizeof(reason)) == 0);
+                assert(stop == 0x30aafu);
+                assert(EF_S32(0x0019cbb0u + 0x60u) == 40);
+                assert(EF_S32(0x0019cbb0u + 0x64u) == -80);
+                assert(EF_S32(0x0019cbb0u + 0x68u) == 0);
+                assert(EF_S32(0x0019cbb0u + 0x54u) == 96);
+                assert(EF_S32(0x0019cbb0u + 0x58u) == 16);
+                assert(EF_S32(0x0019cbb0u + 0x5cu) == -36);
+                assert(EF_S32(0x0019cbb0u + 0x6cu) == -32);
+                assert(EF_S32(0x0019cbb0u + 0x70u) == 80);
+                assert(EF_S32(0x0019cbb0u + 0x74u) == 100);
+                assert(EF_U32(0x0019cbb0u + 0x78u) == 3u);
+                ef_decomp_memory_release();
+            }
+
+            /* The bounded GCC decimal adapter does not claim support for
+             * the original's malformed-token and exceptional-number paths. */
+            {
+                const char *invalid[] = {"oops", "1e", "nan", "0xA"};
+                size_t i;
+                for (i = 0; i < sizeof(invalid) / sizeof(invalid[0]); ++i) {
+                    char config[96];
+                    int written = snprintf(config, sizeof(config),
+                                           "# x\nMODE REL_CAM\nPosDamping %s\n",
+                                           invalid[i]);
+                    assert(written > 0 && written < (int)sizeof(config));
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(config, 1, (size_t)written, file) ==
+                           (size_t)written);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x9d55du);
+                    assert(EF_U8(0x0019cbb0u + 0x3eu) == 0x64u);
+                    ef_decomp_memory_release();
+                }
             }
 
             /* The original copies Name and Key without bounds checks.

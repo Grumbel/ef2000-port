@@ -35,8 +35,11 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * stream context, reads text lines and tokens with 0x9d170/0x9d1e8/0x9d278,
  * initializes one '#' record, copies a bounded record name, dispatches
  * six first-line camera mode labels, and processes Name/Key/Location text
- * options before stopping at the numeric decoder 0x305e1. Oversized name
- * and key strings stop at guarded original copy sites. Non-record
+ * options, scalar damping/minimum-altitude values and RollLock before
+ * reading the three first vector options, then stops at the LookAtObj
+ * decoder 0x30aaf. The 0x9d55d numeric converter
+ * has a bounded ordinary-decimal host adapter; malformed input stops at
+ * 0x9d55d. Oversized name/key strings stop at guarded copy sites. Non-record
  * input stops at 0x31201. Packed resources and archive lookups remain
  * explicit boundaries. Without a directory the
  * legacy boundary remains at 0xb3b90. Low memory stops
