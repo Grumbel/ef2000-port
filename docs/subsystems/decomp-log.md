@@ -1541,3 +1541,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   runs with a synthetic Views resource. No packed/archive decoding, later
   options, multi-record loop, guest differential, Watcom splice or first
   screen is claimed; `ReadGenSeqs` stays `named`, not `compiles`.
+- GCC/Linux Views text options, 2026-11-09: extended the bounded first-record
+  parser through original `0x304fc..0x305e0`. The recovered line/token loop
+  compares embedded `Name` (0x182828), `Key` (0x182830), and `Location`
+  (0x182834) labels case-insensitively, copies Name at record +0x1e and Key
+  at +0x40 through the existing 0x9d749 helper, and writes record +0x3d as
+  zero for embedded `INSIDE` (0x182840), one for any other location. Each
+  recognized option loops to the next physical line; the first unsupported
+  field stops at original numeric-dispatch address `0x305e1`, before the
+  `PosDamping` x87/parser path. The original string copies at `0x3053d` and
+  `0x30577` are unchecked, so GCC host-only guards stop at those addresses
+  for tokens that would overrun the 30- and 15-byte destination regions.
+  Synthetic tests cover quoted names, Key, INSIDE/OUTSIDE, case-folded option
+  spelling, multiple lines crossing the 256-byte refill, and both overlong
+  writes; a SHA-pinned real-image opt-in GCC probe uses only invented Views
+  text. No numeric options, subsequent records, guest differential, packed
+  resources, Watcom splice or playable screen is claimed; `ReadGenSeqs`
+  remains `named`, not `compiles`.

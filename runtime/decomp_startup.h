@@ -33,8 +33,10 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * plain-file portion of 0x9ccb8. An absent resource stops at the diagnostic
  * callback 0xea50c; a synthetic plain resource constructs the 0x9d114
  * stream context, reads text lines and tokens with 0x9d170/0x9d1e8/0x9d278,
- * initializes one '#' record, copies a bounded record name, and dispatches
- * six first-line camera mode labels before stopping at 0x304fc. Non-record
+ * initializes one '#' record, copies a bounded record name, dispatches
+ * six first-line camera mode labels, and processes Name/Key/Location text
+ * options before stopping at the numeric decoder 0x305e1. Oversized name
+ * and key strings stop at guarded original copy sites. Non-record
  * input stops at 0x31201. Packed resources and archive lookups remain
  * explicit boundaries. Without a directory the
  * legacy boundary remains at 0xb3b90. Low memory stops

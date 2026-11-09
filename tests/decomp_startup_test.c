@@ -42,6 +42,14 @@ static void setup_views_probe(void)
            "TRACK_CAM", sizeof("TRACK_CAM"));
     memcpy(ef_decomp_memory_span(0x0018281cu, sizeof("CLOSURE_CAM")),
            "CLOSURE_CAM", sizeof("CLOSURE_CAM"));
+    memcpy(ef_decomp_memory_span(0x00182828u, sizeof("Name")),
+           "Name", sizeof("Name"));
+    memcpy(ef_decomp_memory_span(0x00182830u, sizeof("Key")),
+           "Key", sizeof("Key"));
+    memcpy(ef_decomp_memory_span(0x00182834u, sizeof("Location")),
+           "Location", sizeof("Location"));
+    memcpy(ef_decomp_memory_span(0x00182840u, sizeof("INSIDE")),
+           "INSIDE", sizeof("INSIDE"));
     memcpy(ef_decomp_memory_span(0x00182794u, sizeof("BG\\views\\views2.dat")),
            "BG\\views\\views2.dat", sizeof("BG\\views\\views2.dat"));
     memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
@@ -477,11 +485,11 @@ int main(void)
          * Recovered 0x9d114 allocates its stream record, and 0x9d170,
          * 0x9d1e8 and 0x9d278 read the first physical line/token. The
          * original '#' case initializes slot zero, reads the name and the
-         * second token of the next line as its camera mode, then stops
-         * before decoding the remaining options. */
+         * second token of the next line as its camera mode, then enters
+         * its line-oriented option parser. */
         {
             char bg_dir[160], views_dir[180], views_path[220];
-            const uint8_t plain[] = "# x\nMODE REL_CAM\n";
+            const uint8_t plain[] = "# x\nMODE REL_CAM\nEND\n";
             const uint8_t packed[] = {'J', 'R', 0, 0, 8, 0, 0, 0};
             const uint8_t packed_ra[] = {'R', 'A', 0, 0, 8, 0, 0, 0};
             uint32_t stop;
@@ -502,16 +510,16 @@ int main(void)
             stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x304fcu);
+            assert(stop == 0x305e1u);
             assert(EF_U32(0x001371a4u) == 1u);
             assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) == 100u);
             {
                 uint32_t stream = probe.base + probe.size;
-                assert(strcmp(ef_decomp_memory_span(stream, 14u), "MODE REL_CAM") == 0);
-                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 8u),
-                              "REL_CAM") == 0);
-                assert(EF_U32(stream + 0x552u) == 2u);
-                assert(EF_U16(stream + 0x556u) == 12u);
+                assert(strcmp(ef_decomp_memory_span(stream, 4u), "END") == 0);
+                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 4u),
+                              "END") == 0);
+                assert(EF_U32(stream + 0x552u) == 3u);
+                assert(EF_U16(stream + 0x556u) == 3u);
                 assert(EF_U32(stream + 0x558u) == sizeof(plain) - 1u);
                 assert(EF_U32(stream + 0x55cu) == sizeof(plain) - 1u);
                 assert(EF_U32(stream + 0x560u) == 100u);
@@ -563,11 +571,12 @@ int main(void)
             /* A long ignored comment crosses the 0x100-byte refill, with
              * the first CR and LF on opposite sides of that boundary.
              * Whitespace-only lines still count toward the physical line
-             * number. The next record line starts with a '#' marker and its
-             * following line selects the camera mode. */
+             * number. The next record selects a camera mode and processes
+             * Name, Key and Location options across multiple lines. */
             {
                 const char rest[] =
-                    "\r\n \t\r\n  # alpha,beta\r\nMODE FIXED_REL_CAM\r\n";
+                    "\r\n \t\r\n  # alpha,beta\r\nMODE FIXED_REL_CAM\r\n"
+                    "Name \"Overhead View\"\r\nKey V1\r\nLocation INSIDE\r\nEND\r\n";
                 uint8_t lines[255u + sizeof(rest) - 1u];
                 uint32_t stream;
                 lines[0] = ';';
@@ -581,20 +590,23 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                             reason, sizeof(reason)) == 0);
-                assert(stop == 0x304fcu);
+                assert(stop == 0x305e1u);
                 stream = probe.base + probe.size;
-                assert(strcmp(ef_decomp_memory_span(stream, 20u),
-                              "MODE FIXED_REL_CAM") == 0);
-                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 14u),
-                              "FIXED_REL_CAM") == 0);
-                assert(EF_U32(stream + 0x552u) == 4u);
-                assert(EF_U16(stream + 0x556u) == 18u);
+                assert(strcmp(ef_decomp_memory_span(stream, 4u), "END") == 0);
+                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 4u),
+                              "END") == 0);
+                assert(EF_U32(stream + 0x552u) == 8u);
+                assert(EF_U16(stream + 0x556u) == 3u);
                 assert(EF_U32(stream + 0x558u) == sizeof(lines) - 0x100u);
                 assert(EF_U32(stream + 0x55cu) == sizeof(lines) - 0x100u);
-                assert(EF_U32(0x0019cbb0u + 0x1eu) == 0x76543210u);
                 assert(strcmp(ef_decomp_memory_span(0x0019cbb0u, 6u),
                               "alpha") == 0);
                 assert(EF_U8(0x0019cbb0u + 0x3cu) == 1u);
+                assert(strcmp(ef_decomp_memory_span(0x0019cbb0u + 0x1eu, 14u),
+                              "Overhead View") == 0);
+                assert(strcmp(ef_decomp_memory_span(0x0019cbb0u + 0x40u, 3u),
+                              "V1") == 0);
+                assert(EF_U8(0x0019cbb0u + 0x3du) == 0u);
                 ef_decomp_memory_release();
             }
 
@@ -619,7 +631,7 @@ int main(void)
                     char config[96];
                     uint32_t stream;
                     int written = snprintf(config, sizeof(config),
-                                           "# Test\nMODE %s\n", modes[i].label);
+                                           "# Test\nMODE %s\nEND\n", modes[i].label);
                     assert(written > 0 && written < (int)sizeof(config));
                     file = fopen(views_path, "wb");
                     assert(file && fwrite(config, 1, (size_t)written, file) ==
@@ -631,14 +643,14 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x304fcu);
+                    assert(stop == 0x305e1u);
                     stream = probe.base + probe.size;
                     assert(strcmp(ef_decomp_memory_span(0x0019cbb0u, 5u),
                                   "Test") == 0);
                     assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 0x51u),
-                                  modes[i].label) == 0);
+                                  "END") == 0);
                     assert(EF_U8(0x0019cbb0u + 0x3cu) == modes[i].expected);
-                    assert(EF_U32(stream + 0x552u) == 2u);
+                    assert(EF_U32(stream + 0x552u) == 3u);
                     ef_decomp_memory_release();
                 }
             }
@@ -664,6 +676,63 @@ int main(void)
                 assert(EF_U16(0x0019cbb0u) == 0x5fu);
                 assert(EF_U32(0x0019cbb0u + 0x1eu) == 0x76543210u);
                 ef_decomp_memory_release();
+            }
+
+            /* A Location value other than INSIDE writes 1, regardless of
+             * whether it names a known location. Matching is ASCII folded. */
+            {
+                const char outside[] = "# x\nMODE REL_CAM\nlocation OUTSIDE\nEND\n";
+                file = fopen(views_path, "wb");
+                assert(file && fwrite(outside, 1, sizeof(outside) - 1u, file) ==
+                       sizeof(outside) - 1u);
+                assert(fclose(file) == 0);
+                assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                setup_views_probe();
+                stop = 0;
+                assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                            &stop, reason, sizeof(reason)) == 0);
+                assert(stop == 0x305e1u);
+                assert(EF_U8(0x0019cbb0u + 0x3du) == 1u);
+                assert(EF_U8(0x0019cbb0u + 0x3cu) == 0u);
+                ef_decomp_memory_release();
+            }
+
+            /* The original copies Name and Key without bounds checks.
+             * Stop at each original call site before a token can trample
+             * the following record fields. */
+            {
+                const struct {
+                    const char *key;
+                    uint32_t boundary;
+                } oversize[] = {
+                    {"Name", 0x3053du},
+                    {"Key", 0x30577u},
+                };
+                size_t i;
+                for (i = 0; i < sizeof(oversize) / sizeof(oversize[0]); ++i) {
+                    char long_value[36u], config[128u];
+                    int written;
+                    memset(long_value, 'n', sizeof(long_value) - 1u);
+                    long_value[sizeof(long_value) - 1u] = 0;
+                    written = snprintf(config, sizeof(config),
+                                       "# x\nMODE REL_CAM\n%s %s\n",
+                                       oversize[i].key, long_value);
+                    assert(written > 0 && written < (int)sizeof(config));
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(config, 1, (size_t)written, file) ==
+                           (size_t)written);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == oversize[i].boundary);
+                    assert(EF_U32(0x0019cbb0u + 0x1eu) == 0x76543210u);
+                    assert(strcmp(ef_decomp_memory_span(0x0019cbb0u + 0x40u, 5u),
+                                  "NONE") == 0);
+                    ef_decomp_memory_release();
+                }
             }
 
             /* A non-marker line takes the original 0x31201 skip branch.

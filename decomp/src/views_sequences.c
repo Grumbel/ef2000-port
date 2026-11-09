@@ -82,13 +82,40 @@ static void set_view_camera_mode_30423(ef_addr32 rec, ef_addr32 token)
         EF_U8(rec + 0x3cu) = 5u;
 }
 
-/* 0x30214..0x304fc: Bounded ReadGenSeqs() prefix. The original opens the
+/* 0x304fc..0x305e1: The original option loop accepts Name, Key and Location
+ * as textual options before testing numeric tuning fields. Each recognized
+ * option returns to 0x304fc for the next physical line. All comparisons
+ * use the embedded source strings rather than host-defined spellings. */
+static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
+{
+    for (;;) {
+        read_text_line_9d1e8(stream);
+        read_next_token_9d278(stream);
+        if (ascii_stricmp_9d524(stream + 0x400u, 0x00182828u) == 0) {
+            read_next_token_9d278(stream);
+            guest_tactcom_view_string_guard_3053d(stream, 0x1eu);
+            copy_string_9d749(rec + 0x1eu, stream + 0x400u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182830u) == 0) {
+            read_next_token_9d278(stream);
+            guest_tactcom_view_string_guard_30577(stream, 0x0fu);
+            copy_string_9d749(rec + 0x40u, stream + 0x400u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182834u) == 0) {
+            read_next_token_9d278(stream);
+            EF_U8(rec + 0x3du) =
+                ascii_stricmp_9d524(stream + 0x400u, 0x00182840u) == 0 ? 0u : 1u;
+        } else {
+            guest_tactcom_view_numeric_boundary_305e1(stream);
+        }
+    }
+}
+
+/* 0x30214..0x305e1: Bounded ReadGenSeqs() prefix. The original opens the
  * constructed BG\\views\\views2.dat path at 0x9ccb8, reports a missing file
  * through the two-argument fatal callback at 0x132a74, or passes a successful
  * resource handle to the recovered 0x9d114 stream constructor. Its recovered
  * line/token helpers identify a '#' record start; this prefix initializes
- * that record, copies its bounded name and decodes its camera mode before
- * stopping at the next options-line read. */
+ * that record, copies its bounded name, decodes its camera mode and handles
+ * textual options before stopping at numeric option dispatch. */
 void read_gen_sequences_prefix_30214(ef_addr32 frame)
 {
     uint32_t handle;
@@ -123,7 +150,7 @@ void read_gen_sequences_prefix_30214(ef_addr32 frame)
             read_next_token_9d278(stream);
             read_next_token_9d278(stream);
             set_view_camera_mode_30423(rec, stream + 0x400u);
-            guest_tactcom_view_camera_boundary_304fc(stream, (uint32_t)index);
+            read_view_text_options_304fc(stream, rec);
         }
     }
 }

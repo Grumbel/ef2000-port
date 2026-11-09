@@ -530,12 +530,32 @@ void guest_tactcom_view_name_guard_30407(ef_addr32 stream)
         stop_at_guest_boundary(0x00030407u);
 }
 
-void guest_tactcom_view_camera_boundary_304fc(ef_addr32 stream, uint32_t index)
+void guest_tactcom_view_string_guard_3053d(ef_addr32 stream, uint32_t capacity)
+{
+    const char *value;
+    check_view_parser_context(stream);
+    if (capacity != 0x1eu)
+        fatal_unexpected("Views.c Name field capacity");
+    value = (const char *)ef_decomp_memory_span(stream + 0x400u, 0x51u);
+    if (!value || strlen(value) >= capacity)
+        stop_at_guest_boundary(0x0003053du);
+}
+
+void guest_tactcom_view_string_guard_30577(ef_addr32 stream, uint32_t capacity)
+{
+    const char *value;
+    check_view_parser_context(stream);
+    if (capacity != 0x0fu)
+        fatal_unexpected("Views.c Key field capacity");
+    value = (const char *)ef_decomp_memory_span(stream + 0x400u, 0x51u);
+    if (!value || strlen(value) >= capacity)
+        stop_at_guest_boundary(0x00030577u);
+}
+
+void guest_tactcom_view_numeric_boundary_305e1(ef_addr32 stream)
 {
     check_view_parser_context(stream);
-    if (index != 0u)
-        fatal_unexpected("Views.c first camera-mode record index");
-    stop_at_guest_boundary(0x000304fcu);
+    stop_at_guest_boundary(0x000305e1u);
 }
 
 void guest_tactcom_view_nonrecord_boundary_31201(ef_addr32 stream)
@@ -716,7 +736,8 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     ef_decomp_files_end();
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x9ccb8u && stopped != 0x9cd53u &&
-        stopped != 0x30407u && stopped != 0x304fcu && stopped != 0x31201u &&
+        stopped != 0x30407u && stopped != 0x3053du && stopped != 0x30577u &&
+        stopped != 0x305e1u && stopped != 0x31201u &&
         stopped != 0x3120bu && stopped != 0xebb58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
