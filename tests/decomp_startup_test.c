@@ -21,11 +21,18 @@
  * the same ReadGenSeqs entry state for every file-format branch. */
 static void setup_views_probe(void)
 {
+    uint32_t ch;
+    /* Original atoi uses its resident ctype table, not libc's isdigit. */
+    for (ch = '0'; ch <= '9'; ++ch)
+        EF_U8(0x00195af0u + ch + 1u) = 0x20u;
     EF_U32(0x001264d4u) = 0x400u;
     memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
     memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
     memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
     memcpy(ef_decomp_memory_span(0x00182708u, 5), "NONE", 5);
+    memcpy(ef_decomp_memory_span(0x0017f3bcu, 5), "NONE", 5);
+    memcpy(ef_decomp_memory_span(0x0017f3c4u, sizeof("\\views\\aid2.dat")),
+           "\\views\\aid2.dat", sizeof("\\views\\aid2.dat"));
     EF_U16(0x00182710u) = 0x5fu;
     memcpy(ef_decomp_memory_span(0x00182714u, sizeof("\\views\\seq2.dat")),
            "\\views\\seq2.dat", sizeof("\\views\\seq2.dat"));
@@ -1260,7 +1267,24 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0xf80u);
+                /* The next original function is ReadAidData() in Aid.c.
+                 * Its defaults precede opening views/aid2.dat, which is
+                 * missing from this synthetic setup. */
+                assert(stop == 0xea50cu);
+                assert(EF_U8(0x00196fcau) == 0u);
+                assert(EF_U8(0x00196fcau + 26u) == 0u);
+                assert(EF_U8(0x00196390u + 7u) == 0u);
+                assert(strcmp(ef_decomp_memory_span(0x00196398u, 5u), "NONE") == 0);
+                assert(strcmp(ef_decomp_memory_span(0x00196398u + 49u * 0x3eu, 5u),
+                              "NONE") == 0);
+                assert(EF_U16(0x00196398u + 0x34u) == 0u);
+                assert(EF_U32(0x00196398u + 49u * 0x3eu + 0x3au) == 0u);
+                assert(EF_U8(0x001961f8u) == 0u);
+                assert(EF_U8(0x001961f9u) == 0xffu);
+                assert(EF_U8(0x001961f9u + 7u * 0x33u + 49u) == 0xffu);
+                assert(EF_U8(0x00196190u) == 0xffu);
+                assert(EF_U8(0x00196191u) == 0u);
+                assert(EF_U8(0x00196192u + 0x34u + 49u) == 0xffu);
                 assert(EF_U32(0x001371a4u) == 0u);
                 assert(strcmp(ef_decomp_memory_span(rec, 6u), "listA") == 0);
                 assert(strcmp(ef_decomp_memory_span(rec + 0x1eu, 6u), "alpha") == 0);
@@ -1287,6 +1311,52 @@ int main(void)
                 assert(EF_U8(0x001a53dcu) == 0u);
                 assert(EF_U16(0x0019e5e5u) == 0x34a5u);
                 ef_decomp_memory_release();
+
+                /* Aid.c skips the first line of each table, then reads
+                 * 27+8 two-token numeric mappings from the plain aid2.dat.
+                 * The still-unrecovered nested associations stop at 0x1202. */
+                {
+                    char aid_path[220];
+                    unsigned int j;
+                    assert(snprintf(aid_path, sizeof(aid_path), "%s/aid2.dat",
+                                    seq_dir) < (int)sizeof(aid_path));
+                    file = fopen(aid_path, "wb");
+                    assert(file);
+                    assert(fputs("AID_HEADER\n", file) >= 0);
+                    for (j = 0; j < 27u; ++j)
+                        assert(fprintf(file, "row%u %u\n", j, j + 130u) > 0);
+                    assert(fputs("AID_SECOND_HEADER\n", file) >= 0);
+                    for (j = 0; j < 8u; ++j)
+                        assert(fprintf(file, "row%u %u\n", j, j + 240u) > 0);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x1202u);
+                    assert(EF_U8(0x00196fcau) == 130u);
+                    assert(EF_U8(0x00196fcau + 26u) == 156u);
+                    assert(EF_U8(0x00196390u) == 240u);
+                    assert(EF_U8(0x00196390u + 7u) == 247u);
+                    assert(EF_U32(0x001371a4u) != 0u); /* still open at the boundary */
+                    ef_decomp_memory_release();
+
+                    /* Truncated mapping files must not let the host probe
+                     * read past EOF into unrelated startup-table writes. */
+                    file = fopen(aid_path, "wb");
+                    assert(file && fputs("AID_HEADER\n", file) >= 0);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x1171u);
+                    assert(EF_U8(0x00196fcau + 26u) == 0u);
+                    ef_decomp_memory_release();
+                    assert(remove(aid_path) == 0);
+                }
 
                 /* Unknown camera names invoke the original fatal callback
                  * before a numeric value or camera index is stored. */

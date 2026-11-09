@@ -114,7 +114,14 @@ original's no-device branch would. The probe now executes recovered
   `\\views\\seq2.dat` list of named cameras and scaled values, resolves
   references against the preceding forty records, and initializes the
   corresponding twenty-slot list table. With both synthetic plain files
-  present, the GCC probe stops at the next unbound call at `0xf80`.
+  present, it next enters `ReadAidData()` at `0xf80` (Aid.c). That loader
+  resets the 27+8 byte mapping arrays, 50 packed `0x3e`-byte objects, eight
+  `0x33`-byte grids and two `0x34`-byte grids. It opens the independent
+  `\\views\\aid2.dat` and processes 27+8 two-token integer mappings through
+  the original guest integer parser. The GCC probe stops at its nested
+  association reader `0x1202`; missing files stop at `0xea50c` after the
+  original table initialization. The second half of `ReadAidData()` and
+  eventual outer TACTCOM return have not been recovered.
   Packed resources, malformed/exceptional numbers and unrestricted strings
   remain bounded. Neither reader is yet guest-differential verified.
 These are **bounded probes**: they do not implement the general variadic

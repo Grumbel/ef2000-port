@@ -43,8 +43,12 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * Unknown options stop at 0x310d8, invalid coordinate counts at 0x31116,
  * and successful EOF releases the stream and closes the file, then the
  * original caller 0x82cec continues into the 0x2ff44 sequence-list parser.
- * With supported plain resources both readers return; the next unbound
- * stage is 0xf80, still before the outer TACTCOM caller resumes.
+ * With supported plain resources both readers return, then Aid.c's
+ * ReadAidData (0xf80) initializes 27/8 mapping bytes, 50 default objects,
+ * eight 0x33-byte records and two 0x34-byte records. Its plain-file reader
+ * opens \views\aid2.dat, parses the first 27+8 numeric mapping lines and
+ * stops at nested association parsing 0x1202. An absent aid2.dat stops at
+ * 0xea50c after initialization. TACTCOM has not yet resumed its outer caller.
  * The 0x9d55d numeric converter
  * has a bounded ordinary-decimal host adapter; malformed input stops at
  * 0x9d55d. Oversized name/key strings stop at guarded copy sites. Non-record

@@ -1696,3 +1696,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `0xf80` stop. No packed resource decoding, general x87 conversion, original
   guest-state differential, or Watcom splice is claimed. Both Views readers
   stay `named` in the tracker.
+- GCC/Linux Aid.c table initialization and first two mappings, 2026-11-09:
+  after the two Views readers, `apply_options_82cec` calls `0xf80`.
+  Embedded DOS strings at `0x17f3d4` and `0x17f3c4` identify the function
+  as `ReadAidData()` and its third, independent `\\views\\aid2.dat` resource.
+  Original disassembly `0xf80..0x1119` resets 27 byte entries at `0x196fca`,
+  eight at `0x196390`, fifty `0x3e`-stride records at `0x196398` (copying the
+  five bytes of `NONE` from `0x17f3bc`), eight `0x33`-stride grids at
+  `0x1961f8` and two `0x34`-stride grids at `0x196190`; each grid has five
+  ten-byte rows initially `0xff`. Its subsequent resource opener is the
+  already recovered plain-file `0x9ccb8` with callback `0xea50c` for missing
+  files. At `0x1158..0x1202`, the source skips the heading of each of two
+  mapping blocks and parses the second token of the next 27 and eight lines
+  with guest `parse_int_9d4cd`, narrowing to byte. A synthetic fixture sets
+  the guest digit-classification table and checks first/last results, all
+  initialized records, open handle and bounded stop at `0x1202`. The
+  opt-in original EXE test supplies invented plain aid2.dat, not original
+  game data. Deeper event/association decoding, EOF cleanup, packed archives,
+  guest differential and Watcom hybrid remain outstanding; tracker stays
+  `named`.

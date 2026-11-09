@@ -59,6 +59,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/script_helpers1.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/views_sequences.c'),
+                str(ROOT / 'decomp/src/aid_data.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
@@ -183,8 +184,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('stopped at unimplemented call 0x000ea50c',
                               plain.stdout)
                 # The next original caller loads \views\seq2.dat, resolves
-                # camera names against views2.dat and reaches the following
-                # unbound 0xf80 stage after closing both plain resources.
+                # camera names against views2.dat, then calls Aid.c's
+                # ReadAidData(), which opens a distinct aid2.dat resource.
                 seq = views.parent / 'seq2.dat'
                 seq.write_bytes(
                     b'# synthetic_list\r\n'
@@ -194,8 +195,20 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x00000f80',
+                self.assertIn('stopped at unimplemented call 0x000ea50c',
                               continued.stdout)
+                aid = views.parent / 'aid2.dat'
+                aid.write_bytes(
+                    b'AID_HEADER\n' +
+                    b''.join(f'row{i} {i + 130}\n'.encode() for i in range(27)) +
+                    b'AID_SECOND_HEADER\n' +
+                    b''.join(f'row{i} {i + 240}\n'.encode() for i in range(8)))
+                aid_continued = subprocess.run([
+                    str(executable), '--image', original,
+                    '--data-dir', directory, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('stopped at unimplemented call 0x00001202',
+                              aid_continued.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([
                     str(executable), '--image', original,
@@ -263,6 +276,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/script_helpers1.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/views_sequences.c'),
+                str(ROOT / 'decomp/src/aid_data.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),

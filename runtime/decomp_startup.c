@@ -36,7 +36,8 @@ enum { TACTCOM_PROBE_FRAME = EF_DECOMP_RAM_SIZE - 0x2000u,
        TACTCOM_LOG_FRAME = TACTCOM_PROBE_FRAME + 0x200u,
        TACTCOM_TEXT_FRAME = TACTCOM_PROBE_FRAME + 0x400u,
        TACTCOM_VIEW_FRAME = TACTCOM_PROBE_FRAME + 0x600u,
-       TACTCOM_SEQ_FRAME = TACTCOM_PROBE_FRAME + 0x800u };
+       TACTCOM_SEQ_FRAME = TACTCOM_PROBE_FRAME + 0x800u,
+       TACTCOM_AID_FRAME = TACTCOM_PROBE_FRAME + 0xa00u };
 
 static void fatal_unexpected(const char *service)
 {
@@ -212,7 +213,8 @@ void guest_fn_eb478(ef_addr32 text)
 {
     if (!probing || !main_probe_active ||
         (text != TACTCOM_PROBE_FRAME + 0xa0u &&
-         text != TACTCOM_VIEW_FRAME && text != TACTCOM_SEQ_FRAME))
+         text != TACTCOM_VIEW_FRAME && text != TACTCOM_SEQ_FRAME &&
+         text != TACTCOM_AID_FRAME))
         fatal_unexpected("TACTCOM pathname lowercase (0xeb478)");
     (void)lowercase_string(text);
 }
@@ -434,20 +436,23 @@ uint32_t guest_fn_9ccb8(ef_addr32 path)
     size_t length, suffix_length;
     int32_t handle;
     uint32_t read_count;
-    const ef_addr32 header = path + (path == TACTCOM_VIEW_FRAME ? 0x98u : 0x80u);
+    const ef_addr32 header = path + (path == TACTCOM_VIEW_FRAME ? 0x98u :
+                                    path == TACTCOM_AID_FRAME ? 0xa0u : 0x80u);
     const ef_addr32 suffix_addr = path == TACTCOM_VIEW_FRAME ? 0x00182794u :
+                                  path == TACTCOM_AID_FRAME ? 0x0017f3c4u :
                                   0x00182714u;
     if (!probing || !main_probe_active ||
-        (path != TACTCOM_VIEW_FRAME && path != TACTCOM_SEQ_FRAME) ||
+        (path != TACTCOM_VIEW_FRAME && path != TACTCOM_SEQ_FRAME &&
+         path != TACTCOM_AID_FRAME) ||
         !(name = (const char *)ef_decomp_memory_span(path, 0x94u)) ||
         !(suffix = (const char *)ef_decomp_memory_span(suffix_addr, 0x30u)) ||
         !memchr(name, 0, 0x94u) || !memchr(suffix, 0, 0x30u))
-        fatal_unexpected("Views.c resource-open path (0x9ccb8)");
+        fatal_unexpected("Views/Aid resource-open path (0x9ccb8)");
     length = strlen(name);
     suffix_length = strlen(suffix);
     if (length < suffix_length ||
         memcmp(name + length - suffix_length, suffix, suffix_length) != 0)
-        fatal_unexpected("Views.c resource-open suffix (0x9ccb8)");
+        fatal_unexpected("Views/Aid resource-open suffix (0x9ccb8)");
     printf("TACTCOM sequence resource pathname: %s\n", name);
     if (!ef_decomp_files_enabled())
         stop_at_guest_boundary(0x0009ccb8u);
@@ -480,8 +485,9 @@ void guest_callptr2_x(ef_addr32 fn, uint32_t format, uint32_t filename)
     if (!probing || !main_probe_active || fn != 0x000ea50cu ||
         EF_U32(0x00132a74u) != fn ||
         !((format == 0x001827a8u && filename == TACTCOM_VIEW_FRAME) ||
-          (format == 0x00182724u && filename == TACTCOM_SEQ_FRAME)))
-        fatal_unexpected("Views.c missing-file diagnostic callback");
+          (format == 0x00182724u && filename == TACTCOM_SEQ_FRAME) ||
+          (format == 0x0017f3d4u && filename == TACTCOM_AID_FRAME)))
+        fatal_unexpected("Views/Aid missing-file diagnostic callback");
     stop_at_guest_boundary(0x000ea50cu);
 }
 
@@ -705,7 +711,28 @@ void guest_fn_2ff44_w(void)
         fatal_unexpected("ReadSeqs outside TACTCOM main probe");
     read_sequence_lists_prefix_2ff44(TACTCOM_SEQ_FRAME);
 }
-void guest_fn_f80_w(void) { stop_at_guest_boundary(0x00000f80u); }
+void guest_tactcom_aid_row_guard_f80(ef_addr32 stream, uint32_t site)
+{
+    check_view_parser_context(stream);
+    if (site != 0x00001171u && site != 0x000011cbu)
+        fatal_unexpected("Aid.c row-guard caller");
+    if (EF_U8(stream) == 0u)
+        stop_at_guest_boundary(site);
+}
+
+void guest_tactcom_aid_next_section_1202(ef_addr32 stream)
+{
+    check_view_parser_context(stream);
+    stop_at_guest_boundary(0x00001202u);
+}
+
+void guest_fn_f80_w(void)
+{
+    if (!probing || !main_probe_active ||
+        !ef_decomp_memory_span(TACTCOM_AID_FRAME, 0xacu))
+        fatal_unexpected("ReadAidData outside TACTCOM main probe");
+    read_aid_data_prefix_f80(TACTCOM_AID_FRAME);
+}
 
 void guest_tactcom_post_options_boundary_8b477(void)
 {
@@ -856,6 +883,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
         stopped != 0x3001du && stopped != 0x3003cu && stopped != 0x3005bu &&
         stopped != 0x9d55du && stopped != 0x3120bu &&
         stopped != 0xebb58u && stopped != 0xf80u &&
+        stopped != 0x1171u && stopped != 0x11cbu && stopped != 0x1202u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
