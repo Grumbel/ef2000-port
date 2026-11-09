@@ -30,6 +30,7 @@ static int keyboard_ack_pending;
 static jmp_buf main_boundary;
 static uint32_t main_boundary_address;
 static int main_probe_active;
+static int x32_probe_active;
 static void stop_at_guest_boundary(uint32_t address);
 
 /* The native probe uses private guest stack-shaped scratch frames, not an
@@ -108,6 +109,14 @@ uint32_t guest_fn_c3f70(uint32_t size)
  * the guest offset, not a truncated host function pointer. */
 void guest_fn_9c3cf(uint32_t handler)
 {
+    if (x32_probe_active) {
+        if (!probing || !main_probe_active || handler != 0xad8u ||
+            hook_registrations)
+            fatal_unexpected("X-32 far-stub cleanup registration");
+        release_hook = handler;
+        ++hook_registrations;
+        return;
+    }
     if (!probing || handler != 0xe2a50u || hook_registrations)
         fatal_unexpected("cleanup registration (0x9c3cf)");
     release_hook = handler;
@@ -140,38 +149,106 @@ uint32_t guest_fn_9c430(uint32_t port)
     return 0xfau;
 }
 
-/* This probe has no protected-mode selectors. The 0xcd4d4 source passes
- * CS/DS to the request pool, which is intentionally left uninitialized. */
+/* The X-32 probe uses synthetic CS/DS selectors. Normal TACTCOM's pool is
+ * intentionally left uninitialized; these selectors are not real LDT IDs. */
 uint32_t guest_seg_x(uint32_t which)
 {
     if (!probing || !main_probe_active || (which != 1u && which != 3u))
         fatal_unexpected("unmodeled protected-mode selector");
-    return 0u;
+    return x32_probe_active ? (which == 1u ? 0x1234u : 0x5678u) : 0u;
 }
 
-uint32_t start_request_628(uint32_t first, uint32_t second, int32_t third)
+/* Called only by native GCC's recovered 0x628, *before* its first write.
+ * This preserves the normal main probe's pre-CRT halt at 0x628. */
+void ef_decomp_x32_request_guard(uint32_t first, uint32_t second, int32_t third)
 {
+    if (x32_probe_active)
+        return;
     if (!probing || !main_probe_active || first != 0x000fe61fu ||
         second != 0u || third != 0xd5 ||
         keyboard_led_bytes != 2u || keyboard_ack_pending ||
         EF_U32(0x00196144u) != 0u)
         fatal_unexpected("TACTCOM first request slot before CRT initialization");
-    /* The original 0xe20 initializes the free list and registers the DOS
-     * services before main(). Neither that startup nor real X-32 request
-     * installation is modeled, so stop *before* 0x628 decrements the pool. */
     stop_at_guest_boundary(0x00000628u);
+}
+
+/* Start of the real pre-main sequence: X-32's block selector and a six-byte
+ * far jump stub are represented by deterministic *guest* addresses. */
+uint32_t guest_fn_a60(void)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        EF_U8(0x00132a98u) != 1u)
+        fatal_unexpected("X-32 far-stub block selector (0xa60)");
+    return 0x80u;
+}
+
+uint32_t guest_fn_510(uint32_t size)
+{
+    if (!probing || !main_probe_active || !x32_probe_active || size != 6u ||
+        !ef_decomp_memory_span(0x00400100u, 6u))
+        fatal_unexpected("X-32 far-stub allocation (0x510)");
+    return 0x00400100u;
+}
+
+uint32_t guest_fn_604_x(uint32_t source)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        source != 0x00400100u)
+        fatal_unexpected("X-32 far-stub selector (0x604)");
+    return 0x00034000u;
+}
+
+void guest_fn_a9c(uint32_t block, uint32_t selector)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        block != 0x80u || selector != 0x00034000u)
+        fatal_unexpected("X-32 far-stub selector assignment (0xa9c)");
+}
+
+/* Real 0x9c220 dispatches INT 21h, AX=0x252B, EBX=0x501. It can alter
+ * interrupt routing: never return success without an X-32 backend.
+ * Halt after the *real* 0x628 has written the first packed request record. */
+uint32_t EF_CDECL guest_fn_9c220(uint32_t address, uint32_t selector,
+                                 uint32_t length)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        address != 0x000002b0u || selector != 0x1234u ||
+        length != 0xb70u || EF_U32(0x00196144u) != 15u ||
+        EF_U8(0x00195fb0u + 15u) != 15u ||
+        EF_U32(0x00196022u + 15u * 10u) != address ||
+        EF_U16(0x00196026u + 15u * 10u) != selector ||
+        EF_U32(0x00196028u + 15u * 10u) != length)
+        fatal_unexpected("first packed X-32 vector record (0x9c220)");
+    stop_at_guest_boundary(0x0009c220u);
     return 0u;
 }
 
-uint32_t start_timer_734(uint32_t source, uint32_t unused_dx, uint32_t flags,
-                         uint32_t selector)
+/* Timer installation also requires real X-32 services. The cold X-32 probe
+ * stops earlier, and normal TACTCOM cannot pass its request guard yet. */
+uint32_t guest_fn_324(uint32_t source)
 {
     (void)source;
-    (void)unused_dx;
-    (void)flags;
-    (void)selector;
-    fatal_unexpected("timer installation before X-32 startup reconstruction");
+    fatal_unexpected("X-32 timer source (0x324)");
     return 0u;
+}
+uint64_t guest_fn_348(uint32_t source)
+{
+    (void)source;
+    fatal_unexpected("X-32 timer source (0x348)");
+    return 0u;
+}
+void guest_fn_484(uint32_t source, uint32_t high,
+                  uint32_t flags, uint32_t selector)
+{
+    (void)source; (void)high; (void)flags; (void)selector;
+    fatal_unexpected("X-32 timer installation (0x484)");
+}
+
+void guest_dos_int_x(uint32_t interrupt, uint32_t in,
+                     uint32_t out, uint32_t sregs)
+{
+    (void)interrupt; (void)in; (void)out; (void)sregs;
+    fatal_unexpected("DOS interrupt services before X-32 reconstruction");
 }
 
 /* Bind the original call to the actually recovered C implementation. */
@@ -997,6 +1074,68 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
     probing = 0;
     result = check_arena(probe, reason, reason_capacity);
     return result;
+}
+
+int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                        char *reason, size_t reason_capacity)
+{
+    uint32_t stopped;
+    unsigned i;
+    if (!probe || bss_end <= 0x00400106u ||
+        !ef_decomp_memory_span(0x00400100u, 6u)) {
+        if (reason && reason_capacity)
+            snprintf(reason, reason_capacity, "guest RAM is not initialized for X-32");
+        return -1;
+    }
+    memset(probe, 0, sizeof(*probe));
+    release_hook = 0u;
+    hook_registrations = 0u;
+    probing = 1;
+    main_probe_active = 1;
+    x32_probe_active = 1;
+    main_boundary_address = 0u;
+    if (setjmp(main_boundary) == 0)
+        initialize_x32_services_e20();
+    stopped = main_boundary_address;
+    x32_probe_active = 0;
+    main_probe_active = 0;
+    probing = 0;
+
+    /* Preserve the first real 0x628's side effects. An INT 21h request
+     * registration must not be silently assumed successful. */
+    for (i = 0; i < 16u; ++i) {
+        if (EF_U8(0x00195fb0u + i) != i)
+            break;
+    }
+    if (stopped != 0x0009c220u || i != 16u ||
+        EF_U8(0x00132a98u) != 1u ||
+        EF_U32(0x00120d24u) != 0x80u ||
+        EF_U32(0x0019613cu) != 0x00400100u ||
+        EF_U8(0x00400100u) != 0x9au ||
+        EF_U8(0x00400105u) != 0xcfu ||
+        EF_U32(0x00196144u) != 15u ||
+        EF_U32(0x00196140u) != 8u ||
+        hook_registrations != 1u || release_hook != 0xad8u) {
+        if (reason && reason_capacity)
+            snprintf(reason, reason_capacity, "recovered X-32 pre-main state mismatch");
+        return -1;
+    }
+    for (i = 0; i < 8u; ++i) {
+        if (EF_U8(0x00196134u + i) != i) {
+            if (reason && reason_capacity)
+                snprintf(reason, reason_capacity, "recovered X-32 timer free list mismatch");
+            return -1;
+        }
+    }
+    probe->stop_address = stopped;
+    probe->request_free = EF_U32(0x00196144u);
+    probe->timer_free = EF_U32(0x00196140u);
+    probe->first_address = EF_U32(0x00196022u + 15u * 10u);
+    probe->first_selector = EF_U16(0x00196026u + 15u * 10u);
+    probe->first_length = EF_U32(0x00196028u + 15u * 10u);
+    probe->far_stub_address = EF_U32(0x0019613cu);
+    probe->cleanup_hook = release_hook;
+    return 0;
 }
 
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,

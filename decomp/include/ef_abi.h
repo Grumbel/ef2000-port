@@ -2945,7 +2945,7 @@ void guest_fn_f2dcc(ef_addr32 path); /* 0xf2dcc EAX */
 uint32_t guest_fn_c34cc_ret(uint32_t request); /* 0xc34cc EAX -> EAX */
 void guest_fn_c3f80(uint32_t block); /* 0xc3f80 EAX */
 
-/* runtime_helpers27.c */
+/* x32_pool.c: X-32 request/timer pools; runtime_helpers27.c: other helpers */
 uint32_t alloc_aligned_510(uint32_t size);
 uint32_t start_request_628(uint32_t first, uint32_t second, int32_t third);
 void finish_request_6b8(uint32_t index);

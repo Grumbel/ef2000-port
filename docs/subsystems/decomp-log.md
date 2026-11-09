@@ -1848,3 +1848,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   probe boundaries. Cold X-32 vector registration, first-time timer setup,
   connected input, graphical game startup, guest differential and Watcom
   splice remain outstanding; `tactcom_init` stays `named`, not `verified`.
+- GCC/Linux native cold X-32 boundary, 2026-11-09: split the recovered
+  `0x628`/`0x6b8`/`0x734` pool bodies into `decomp/src/x32_pool.c` so
+  they can link independently of parser helpers. The new
+  `--image _EF2000.EXE --probe-x32` mode invokes the actual `0xe20`
+  pre-main initializer, `0xb04` far-stub setup, and `0x628` request
+  allocator with a tightly bounded selector/far-allocation host model.
+  It validates both free-list setups (sixteen request indices and
+  eight timer indices), cleanup registration `0xad8`, far-call opcode
+  bytes `9a ... cf`, and the first 10-byte vector record at slot 15:
+  address `0x2b0`, synthetic CS `0x1234`, length `0xb70`, free count 15.
+  The source then reaches extender `0x9c220`, whose original 29-byte
+  wrapper uses DOS INT 21h AX=252Bh, EBX=501h. The host checks the packed
+  record and stops there; it never returns a fake success or installs a
+  vector. Normal `--probe-main` still stops at `0x628` **before** pool
+  mutation, because it has not run pre-main CRT startup. A fresh memory
+  load isolates the two modes in the synthetic test. This is evidence for
+  actual game-owned memory writes under GCC, **not** IRQ compatibility,
+  DOS/Watcom cold startup, complete vector setup or guest differential.

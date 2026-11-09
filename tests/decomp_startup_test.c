@@ -157,9 +157,20 @@ int main(void)
 {
     const uint8_t payload[1] = { 0 };
     const uint32_t bss_end = 0x00500000u;
+    ef_decomp_x32_probe x32;
     ef_decomp_arena_probe probe;
     char reason[128];
 
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    assert(ef_decomp_probe_x32(bss_end, &x32, reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0x9c220u);
+    assert(x32.request_free == 15u && x32.timer_free == 8u);
+    assert(x32.first_address == 0x2b0u);
+    assert(x32.first_selector == 0x1234u && x32.first_length == 0xb70u);
+    assert(x32.far_stub_address == 0x400100u && x32.cleanup_hook == 0xad8u);
+    assert(EF_U8(0x00400100u) == 0x9au && EF_U8(0x00400105u) == 0xcfu);
+    /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
+     * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
     EF_U32(0x001264d4u) = 0x400u;
     EF_U8(bss_end) = 0xa5u;

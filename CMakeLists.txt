@@ -29,7 +29,7 @@ add_test(NAME decomp-x32-startup-host-model COMMAND ef2000-decomp-x32-startup-te
 add_executable(ef2000-decomp-x32-chain-test
   tests/decomp_x32_chain_test.c
   decomp/src/x32_startup.c decomp/src/game_state_helpers.c
-  decomp/src/runtime_helpers27.c decomp/src/misc_helpers2.c)
+  decomp/src/x32_pool.c decomp/src/misc_helpers2.c)
 target_compile_features(ef2000-decomp-x32-chain-test PRIVATE c_std_11)
 target_compile_options(ef2000-decomp-x32-chain-test PRIVATE
   -Wall -Wextra -Werror -Wno-error=int-to-pointer-cast

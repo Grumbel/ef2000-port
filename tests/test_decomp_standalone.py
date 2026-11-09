@@ -39,6 +39,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/tactcom_prefix.c'),
                 str(ROOT / 'decomp/src/tiny_helpers2.c'),
                 str(ROOT / 'decomp/src/game_state_helpers.c'),
+                str(ROOT / 'decomp/src/x32_startup.c'),
+                str(ROOT / 'decomp/src/x32_pool.c'),
                 str(ROOT / 'decomp/src/line_of_sight.c'),
                 str(ROOT / 'decomp/src/misc_helpers2.c'),
                 str(ROOT / 'decomp/src/engine_helpers.c'),
@@ -104,6 +106,16 @@ class DecompStandaloneTests(unittest.TestCase):
             # The loader itself checks the SHA-pinned German executable.
             original = os.environ.get('EF2000_EXE')
             if original:
+                cold_x32 = subprocess.run([
+                    str(executable), '--image', original, '--probe-x32',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('Recovered pre-main 0xe20: far stub 0x00400100, cleanup 0x00000ad8',
+                              cold_x32.stdout)
+                self.assertIn('X-32 request free 15, timer free 8; first request '
+                              '0x000002b0 selector 0x1234 length 0xb70',
+                              cold_x32.stdout)
+                self.assertIn('Stopped at unimplemented DOS/X-32 call 0x0009c220',
+                              cold_x32.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)
@@ -290,6 +302,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/tactcom_prefix.c'),
                 str(ROOT / 'decomp/src/tiny_helpers2.c'),
                 str(ROOT / 'decomp/src/game_state_helpers.c'),
+                str(ROOT / 'decomp/src/x32_startup.c'),
+                str(ROOT / 'decomp/src/x32_pool.c'),
                 str(ROOT / 'decomp/src/line_of_sight.c'),
                 str(ROOT / 'decomp/src/misc_helpers2.c'),
                 str(ROOT / 'decomp/src/engine_helpers.c'),

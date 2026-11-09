@@ -377,6 +377,11 @@
             decomp/src/runtime_helpers34.c decomp/src/runtime_helpers31.c \
             decomp/src/runtime_helpers4.c decomp/src/init_tables1.c \
             decomp/src/leaf_helpers6.c decomp/src/load_planes1.c \
+            decomp/src/x32_startup.c decomp/src/x32_pool.c \
+            decomp/src/game_state_helpers.c decomp/src/misc_helpers2.c \
+            decomp/src/tiny_helpers2.c decomp/src/line_of_sight.c \
+            decomp/src/engine_helpers.c decomp/src/aid_data.c \
+            decomp/src/game_helpers13.c \
             decomp/src/localized_file_handlers.c decomp/src/script_helpers1.c \
             decomp/src/misc_drafts1.c decomp/src/views_sequences.c \
             decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \

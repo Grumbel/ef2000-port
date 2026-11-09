@@ -9,8 +9,9 @@
  *
  * This is game-owned startup code, not an implementation of X-32 interrupts.
  * Every request still goes through the original 0x628 allocator and its
- * extender call at 0x9c220. The native startup probe must not call this until
- * the extender services used by 0xb04 and 0x628 are modeled or available. */
+ * extender call at 0x9c220. The separate GCC --probe-x32 path uses bounded
+ * selector/far-allocation doubles and stops at that first real extender
+ * request without installing vectors; it does not imply a working CRT. */
 void initialize_x32_services_e20(void)
 {
     uint32_t i;

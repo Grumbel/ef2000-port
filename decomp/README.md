@@ -138,8 +138,16 @@ original's no-device branch would. The probe now executes recovered
   input path, plus request release/reuse through recovered `0x6b8`. Packed
   request and timer dwords use explicit little-endian byte accesses so the
   same guest layout is valid under the native C alignment rules. It is
-  **not yet wired into the native probe**: actual DOS/X-32
-  request/vector/timer services cannot be safely simulated by a free-list
+  **wired into a separate opt-in native cold-start probe**:
+  `--image _EF2000.EXE --probe-x32` executes the recovered pre-main
+  `0xe20`, far-stub `0xb04` and request allocator `0x628` in order.
+  The host supplies explicitly synthetic selectors and one six-byte
+  allocation, validates the initialized free lists and first packed vector
+  record, and stops at real extender call `0x9c220` *after* its game-owned
+  writes, **without installing any vector**. The normal `--probe-main`
+  intentionally still stops at `0x628` before mutating its uninitialized
+  pool; the two modes do not borrow each other's state. Actual DOS/X-32
+  request/vector/timer services cannot be safely inferred from free-list
   initialization alone. A synthetic pre-initialized input-state test skips
   that setup as in the original, then executes the recovered TACTCOM
   `0x8b47c..0x8b52d` control flow: the `0xce08c` global read and the

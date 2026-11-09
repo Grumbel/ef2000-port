@@ -14,6 +14,24 @@ typedef struct ef_decomp_arena_probe {
     uint32_t hook_registrations;
 } ef_decomp_arena_probe;
 
+/* Execute the original pre-main initializer 0xe20 with synthetic selectors
+ * and a bounded six-byte far-stub allocation. Stop at the first real X-32
+ * DOS INT 21h vector-registration call 0x9c220. No interrupts are installed.
+ * The fields capture the recovered guest-RAM writes *before* that call. */
+typedef struct ef_decomp_x32_probe {
+    uint32_t stop_address;
+    uint32_t request_free;
+    uint32_t timer_free;
+    uint32_t first_address;
+    uint32_t first_selector;
+    uint32_t first_length;
+    uint32_t far_stub_address;
+    uint32_t cleanup_hook;
+} ef_decomp_x32_probe;
+
+int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                        char *reason, size_t reason_capacity);
+
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.
  * This does not initialize Watcom libc, game state or any video device. */
