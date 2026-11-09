@@ -237,6 +237,13 @@ original's no-device branch would. The probe now executes recovered
   entry of the guest handler stack (`0x40d030`), count 1 at `0x40d0b0`.
   Execution stops in the no-debug AIL wrapper at `0x111365`, before the
   timer slot for `0xe28c4` is allocated; there is no working host timer.
+  The further independent `--probe-x32-tactcom-ail-slot` mode runs recovered
+  source-C `claim_table_slot_111365` after the virtual IRQ initializer has
+  returned. The first free table entry at `0x17d664` changes from 0 to
+  state 1, its paired callback at `0x17d624` becomes `0xe28c4`, and the
+  original handle at `0x15f74c` becomes offset 0. The existing IRQ slot
+  15 stays at state 2 with period `0xd68d`. This mode stops at `0x1114f7`
+  before programming the new interval; it does not start a host timer.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

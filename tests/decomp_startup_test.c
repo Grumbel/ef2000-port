@@ -462,6 +462,38 @@ int main(void)
     assert(x32.sound_module_initialized == 1u);
     assert(x32.timer_service_initialized == 1u);
     assert(EF_U8(0x0015bac5u) == 1u);
+    /* Recover the first available table slot through source-C 0x111365.
+     * The older module probe must still stop before making this change. */
+    assert(EF_U32(0x0017d664u) == 0u);
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    EF_U32(0x0040d030u) = 0xbaadf00du;
+    EF_U32(0x00160788u) = 0xbaadf00du;
+    EF_U32(0x0015f74cu) = 0xbaadf00du;
+    EF_U32(0x0017d664u) = 0xbaadf00du;
+    EF_U32(0x0017d624u) = 0xbaadf00du;
+    assert(ef_decomp_probe_x32_tactcom_ail_slot(bss_end, &x32,
+                                                 reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0x001114f7u);
+    assert(x32.ail_module_locked_ranges == 4u);
+    assert(x32.ail_module_cleanup_handler == 0x000d6da0u);
+    assert(x32.ail_module_cleanup_count == 1u);
+    assert(x32.ail_module_timer_slot == 0u);
+    assert(x32.ail_module_timer_handler == 0x000e28c4u);
+    assert(x32.ail_module_timer_slot_state == 1u);
+    assert(EF_U32(0x0015f74cu) == 0u);
+    assert(EF_U32(0x0017d664u) == 1u);
+    assert(EF_U32(0x0017d624u) == 0x000e28c4u);
+    assert(EF_U32(0x0017d668u) == 0u);
+    assert(EF_U32(0x0017d628u) == 0u);
+    assert(EF_U32(0x0017d6a0u) == 2u);
+    assert(EF_U32(0x0017d720u) == 0xd68du);
+    assert(EF_U32(0x0017d7b2u) == 0xd68du);
+    assert(EF_U32(0x0017d7bau) == 0u);
+    assert(EF_U32(0x0015b620u) == 0u);
+    assert(x32.ail_pit_port_writes == 3u);
+    assert(x32.ail_irq_critical_exited == 1u);
+    assert(x32.sound_module_initialized == 1u);
+    assert(x32.timer_service_initialized == 1u);
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);

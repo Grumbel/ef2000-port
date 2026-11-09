@@ -73,6 +73,9 @@ typedef struct ef_decomp_x32_probe {
     uint32_t ail_module_locked_ranges;
     uint32_t ail_module_cleanup_handler;
     uint32_t ail_module_cleanup_count;
+    uint32_t ail_module_timer_slot;
+    uint32_t ail_module_timer_handler;
+    uint32_t ail_module_timer_slot_state;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -154,6 +157,13 @@ int ef_decomp_probe_x32_tactcom_ail_callback(uint32_t bss_end,
 int ef_decomp_probe_x32_tactcom_ail_module(uint32_t bss_end,
                                            ef_decomp_x32_probe *probe,
                                            char *reason, size_t reason_capacity);
+
+/* Continue past the original 0x111365 timer slot allocator using its
+ * recovered source C. The free slot becomes state 1 with callback 0xe28c4;
+ * stop before 0x1114f7 programs the interval. No hardware is touched. */
+int ef_decomp_probe_x32_tactcom_ail_slot(uint32_t bss_end,
+                                         ef_decomp_x32_probe *probe,
+                                         char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.

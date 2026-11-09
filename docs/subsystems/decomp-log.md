@@ -2040,3 +2040,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   handle untouched; the previous strict stop at `0xd6df0` remains.
   This test model does not run a timer, allocate an AIL callback slot or
   execute a guest differential.
+- GCC/Linux cold AIL timer slot claim, 2026-11-09: the opt-in
+  `--probe-x32-tactcom-ail-slot` extends the previous sound-module probe by
+  executing recovered C `claim_table_slot_111365` via the existing no-debug
+  wrapper `trace_call_102144`. This call takes and releases the original
+  software critical-depth field at `0x17d7ba` after the *virtual* IRQ region
+  has exited. Cold slot offset zero is free: `0x17d664` changes 0 to 1,
+  `0x17d624` receives `0xe28c4`, and the caller stores offset 0 at
+  `0x15f74c`. Slot 15 remains state 2 with period `0xd68d`, the four
+  memory locks are inert, and the three earlier PIT requests are recorded
+  but never executed. Source-C wrapper `trace_call_102228` reaches the new
+  strict stop `0x1114f7` with rate argument `0x32`, **before** live interval
+  programming. The prior module probe still stops at `0x111365` and keeps
+  its timer-handle sentinel. Synthetic-state and SHA-pinned original tests
+  pass. Guest instruction differential, audio driver, live timer and Watcom
+  splice remain pending.
