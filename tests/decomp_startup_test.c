@@ -33,6 +33,15 @@ static void setup_views_probe(void)
     memcpy(ef_decomp_memory_span(0x0017f3bcu, 5), "NONE", 5);
     memcpy(ef_decomp_memory_span(0x0017f3c4u, sizeof("\\views\\aid2.dat")),
            "\\views\\aid2.dat", sizeof("\\views\\aid2.dat"));
+    memcpy(ef_decomp_memory_span(0x0017f3fcu, 7u), "PARENT", 7u);
+    memcpy(ef_decomp_memory_span(0x0017f404u, 6u), "CHILD", 6u);
+    memcpy(ef_decomp_memory_span(0x0017f40cu, 7u), "TARGET", 7u);
+    memcpy(ef_decomp_memory_span(0x0017f414u, 8u), "GTARGET", 8u);
+    memcpy(ef_decomp_memory_span(0x0017f41cu, 7u), "THREAT", 7u);
+    memcpy(ef_decomp_memory_span(0x0017f424u, 8u), "MTHREAT", 8u);
+    memcpy(ef_decomp_memory_span(0x0017f42cu, 8u), "WINGMAN", 8u);
+    EF_U32(0x0017f5b9u) = 0x42000000u; /* source float 32.0 */
+    EF_U32(0x0017f5bdu) = 0x42480000u; /* source float 50.0 */
     EF_U16(0x00182710u) = 0x5fu;
     memcpy(ef_decomp_memory_span(0x00182714u, sizeof("\\views\\seq2.dat")),
            "\\views\\seq2.dat", sizeof("\\views\\seq2.dat"));
@@ -1312,9 +1321,8 @@ int main(void)
                 assert(EF_U16(0x0019e5e5u) == 0x34a5u);
                 ef_decomp_memory_release();
 
-                /* Aid.c skips the first line of each table, then reads
-                 * 27+8 two-token numeric mappings from the plain aid2.dat.
-                 * The still-unrecovered nested associations stop at 0x1202. */
+                /* Aid.c skips the first line of each table, reads 27+8
+                 * mappings, then consumes one nested association object. */
                 {
                     char aid_path[220];
                     unsigned int j;
@@ -1328,18 +1336,62 @@ int main(void)
                     assert(fputs("AID_SECOND_HEADER\n", file) >= 0);
                     for (j = 0; j < 8u; ++j)
                         assert(fprintf(file, "row%u %u\n", j, j + 240u) > 0);
+                    assert(fputs("FIRST_ASSOC_HEADER\nSECOND_ASSOC_HEADER\n"
+                                 "Group 1\nOption 1\n"
+                                 "Relation parent CHILD\n"
+                                 "FixedPoint -1.25 ~\n"
+                                 "Weight 2.5\n"
+                                 "Name ALPHA\n", file) >= 0);
                     assert(fclose(file) == 0);
                     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
                     setup_views_probe();
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x1202u);
+                    assert(stop == 0x15cbu);
                     assert(EF_U8(0x00196fcau) == 130u);
                     assert(EF_U8(0x00196fcau + 26u) == 156u);
                     assert(EF_U8(0x00196390u) == 240u);
                     assert(EF_U8(0x00196390u + 7u) == 247u);
+                    assert(strcmp(ef_decomp_memory_span(0x00196398u, 6u), "ALPHA") == 0);
+                    assert(EF_U8(0x00196398u + 0x32u) == 1u);
+                    assert(EF_U8(0x00196398u + 0x33u) == 2u);
+                    assert(EF_U16(0x00196398u + 0x34u) == 125u);
+                    assert(EF_S32(0x00196398u + 0x36u) == -40);
+                    assert(EF_U32(0x00196398u + 0x3au) == 0u);
+                    assert(EF_U8(0x001961f8u + 0x33u + 1u) == 0u);
+                    assert(EF_U8(0x001961f8u + 0x33u + 2u) == 0xffu);
                     assert(EF_U32(0x001371a4u) != 0u); /* still open at the boundary */
+                    ef_decomp_memory_release();
+
+                    /* Alternate enum ordering, NONE second relationship,
+                     * signed fixed-point values, and the non-tilde path. */
+                    file = fopen(aid_path, "wb");
+                    assert(file && fputs("AID_HEADER\n", file) >= 0);
+                    for (j = 0; j < 27u; ++j)
+                        assert(fprintf(file, "row%u %u\n", j, j + 130u) > 0);
+                    assert(fputs("AID_SECOND_HEADER\n", file) >= 0);
+                    for (j = 0; j < 8u; ++j)
+                        assert(fprintf(file, "row%u %u\n", j, j + 240u) > 0);
+                    assert(fputs("FIRST_ASSOC_HEADER\nSECOND_ASSOC_HEADER\n"
+                                 "Group 1\nOption 1\n"
+                                 "Relation WINGMAN NONE\n"
+                                 "FixedPoint 1.5 -0.75\n"
+                                 "Weight -1.25\n"
+                                 "Name BRAVO\n", file) >= 0);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x15cbu);
+                    assert(strcmp(ef_decomp_memory_span(0x00196398u, 6u), "BRAVO") == 0);
+                    assert(EF_U8(0x00196398u + 0x32u) == 5u);
+                    assert(EF_U8(0x00196398u + 0x33u) == 0u);
+                    assert(EF_S16(0x00196398u + 0x34u) == -62);
+                    assert(EF_S32(0x00196398u + 0x36u) == 48);
+                    assert(EF_S32(0x00196398u + 0x3au) == -24);
                     ef_decomp_memory_release();
 
                     /* Truncated mapping files must not let the host probe

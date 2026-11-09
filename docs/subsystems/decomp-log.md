@@ -1715,3 +1715,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   game data. Deeper event/association decoding, EOF cleanup, packed archives,
   guest differential and Watcom hybrid remain outstanding; tracker stays
   `named`.
+- GCC/Linux Aid.c first nested association, 2026-11-09: source
+  `0x1202..0x15cb` consumes two association headings, the first group and
+  option headings, then decodes one `0x3e`-stride object into `0x196398`.
+  The two relationship enums at offsets `+0x32/+0x33` compare the embedded
+  `PARENT/CHILD/TARGET/GTARGET/THREAT/MTHREAT/WINGMAN` strings (values
+  1/2/3/4/6/7/5); the second also accepts `NONE=0`. Two dword values at
+  `+0x36/+0x3a` are decimals multiplied by the source's 32.0 float at
+  `0x17f5b9` and truncated by x87 `0x9d72c`, with `~` denoting zero for the
+  second. The word at `+0x34` instead uses the 50.0 float at `0x17f5bd`.
+  The object's second-token name is copied at offset zero, and its index
+  (zero) fills the first cell of the original group-1 `0x33`-stride grid
+  at `0x19622c`. Synthetic tests cover signed values, both second-enum
+  cases, byte/word fields and untouched surrounding grid cells. The probe
+  stops **before** the source's next line read at `0x15cb`, preserving the
+  open stream; mapping-only data now stop at the EOF guard `0x120e`. This
+  is one record, not a complete nested loop, resource cleanup or guest
+  differential. No Watcom replacement or playable hybrid is claimed.

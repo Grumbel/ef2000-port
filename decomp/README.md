@@ -118,9 +118,12 @@ original's no-device branch would. The probe now executes recovered
   resets the 27+8 byte mapping arrays, 50 packed `0x3e`-byte objects, eight
   `0x33`-byte grids and two `0x34`-byte grids. It opens the independent
   `\\views\\aid2.dat` and processes 27+8 two-token integer mappings through
-  the original guest integer parser. The GCC probe stops at its nested
-  association reader `0x1202`; missing files stop at `0xea50c` after the
-  original table initialization. The second half of `ReadAidData()` and
+  the original guest integer parser. With a complete synthetic first
+  association, the GCC probe decodes two relationship enums, three scaled
+  fields and the first grid cell, then stops at the next original line-read
+  site `0x15cb`; a mapping-only file stops at the first missing association
+  heading `0x120e`. Missing files stop at `0xea50c` after the
+  original table initialization. The remaining lists of `ReadAidData()` and
   eventual outer TACTCOM return have not been recovered.
   Packed resources, malformed/exceptional numbers and unrestricted strings
   remain bounded. Neither reader is yet guest-differential verified.

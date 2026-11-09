@@ -3621,7 +3621,9 @@ void guest_fn_f80_w(void); /* 0xf80 */
 void init_aid_data_tables_f80(void);
 void read_aid_data_prefix_f80(ef_addr32 frame);
 void guest_tactcom_aid_row_guard_f80(ef_addr32 stream, uint32_t site);
-void guest_tactcom_aid_next_section_1202(ef_addr32 stream);
+void guest_tactcom_aid_enum_boundary_f80(ef_addr32 stream, uint32_t site);
+void guest_tactcom_aid_name_guard_f80(ef_addr32 stream);
+void guest_tactcom_aid_next_section_15cb(ef_addr32 stream);
 void guest_fn_f2660_w(uint32_t a); /* 0xf2660 EAX */
 void guest_fn_a82f0_w(ef_addr32 a); /* 0xa82f0 EAX */
 void guest_fn_a8718_w(ef_addr32 a); /* 0xa8718 EAX */

@@ -714,16 +714,37 @@ void guest_fn_2ff44_w(void)
 void guest_tactcom_aid_row_guard_f80(ef_addr32 stream, uint32_t site)
 {
     check_view_parser_context(stream);
-    if (site != 0x00001171u && site != 0x000011cbu)
+    if (site != 0x00001171u && site != 0x000011cbu &&
+        site != 0x0000120eu && site != 0x00001217u &&
+        site != 0x00001238u && site != 0x00001244u &&
+        site != 0x00001254u && site != 0x000014c9u &&
+        site != 0x00001544u && site != 0x0000157cu)
         fatal_unexpected("Aid.c row-guard caller");
     if (EF_U8(stream) == 0u)
         stop_at_guest_boundary(site);
 }
 
-void guest_tactcom_aid_next_section_1202(ef_addr32 stream)
+void guest_tactcom_aid_enum_boundary_f80(ef_addr32 stream, uint32_t site)
 {
     check_view_parser_context(stream);
-    stop_at_guest_boundary(0x00001202u);
+    if (site != 0x00001365u && site != 0x000014a7u)
+        fatal_unexpected("Aid.c relationship error site");
+    stop_at_guest_boundary(site);
+}
+
+void guest_tactcom_aid_name_guard_f80(ef_addr32 stream)
+{
+    const char *name;
+    check_view_parser_context(stream);
+    name = (const char *)ef_decomp_memory_span(stream + 0x400u, 0x51u);
+    if (!name || strlen(name) >= 0x32u)
+        stop_at_guest_boundary(0x000015a5u);
+}
+
+void guest_tactcom_aid_next_section_15cb(ef_addr32 stream)
+{
+    check_view_parser_context(stream);
+    stop_at_guest_boundary(0x000015cbu);
 }
 
 void guest_fn_f80_w(void)
@@ -883,7 +904,12 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
         stopped != 0x3001du && stopped != 0x3003cu && stopped != 0x3005bu &&
         stopped != 0x9d55du && stopped != 0x3120bu &&
         stopped != 0xebb58u && stopped != 0xf80u &&
-        stopped != 0x1171u && stopped != 0x11cbu && stopped != 0x1202u &&
+        stopped != 0x1171u && stopped != 0x11cbu &&
+        stopped != 0x120eu && stopped != 0x1217u &&
+        stopped != 0x1238u && stopped != 0x1244u && stopped != 0x1254u &&
+        stopped != 0x1365u && stopped != 0x14a7u &&
+        stopped != 0x14c9u && stopped != 0x1544u &&
+        stopped != 0x157cu && stopped != 0x15a5u && stopped != 0x15cbu &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
