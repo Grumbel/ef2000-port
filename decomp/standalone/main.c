@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom | --probe-x32-tactcom-timer | --probe-x32-tactcom-ail | --probe-x32-tactcom-ail-irq | --probe-x32-tactcom-ail-vectors | --probe-x32-tactcom-ail-callback | --probe-x32-tactcom-ail-module | --probe-x32-tactcom-ail-slot]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom | --probe-x32-tactcom-timer | --probe-x32-tactcom-ail | --probe-x32-tactcom-ail-irq | --probe-x32-tactcom-ail-vectors | --probe-x32-tactcom-ail-callback | --probe-x32-tactcom-ail-module | --probe-x32-tactcom-ail-slot | --probe-x32-tactcom-ail-rate]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
@@ -80,7 +80,8 @@ int main(int argc, char **argv)
                         strcmp(argv[i], "--probe-x32-tactcom-ail-vectors") == 0 ||
                         strcmp(argv[i], "--probe-x32-tactcom-ail-callback") == 0 ||
                         strcmp(argv[i], "--probe-x32-tactcom-ail-module") == 0 ||
-                        strcmp(argv[i], "--probe-x32-tactcom-ail-slot") == 0) && !probe_type) {
+                        strcmp(argv[i], "--probe-x32-tactcom-ail-slot") == 0 ||
+                        strcmp(argv[i], "--probe-x32-tactcom-ail-rate") == 0) && !probe_type) {
                 probe_type = argv[i];
             } else {
                 fputs("Unsupported argument (try --help).\n", stderr);
@@ -120,9 +121,12 @@ int main(int argc, char **argv)
                 strcmp(probe_type, "--probe-x32-tactcom-ail-vectors") == 0 ||
                 strcmp(probe_type, "--probe-x32-tactcom-ail-callback") == 0 ||
                 strcmp(probe_type, "--probe-x32-tactcom-ail-module") == 0 ||
-                strcmp(probe_type, "--probe-x32-tactcom-ail-slot") == 0) {
+                strcmp(probe_type, "--probe-x32-tactcom-ail-slot") == 0 ||
+                strcmp(probe_type, "--probe-x32-tactcom-ail-rate") == 0) {
                 ef_decomp_x32_probe x32;
-                int virtual_ail_slot =
+                int virtual_ail_rate =
+                    strcmp(probe_type, "--probe-x32-tactcom-ail-rate") == 0;
+                int virtual_ail_slot = virtual_ail_rate ||
                     strcmp(probe_type, "--probe-x32-tactcom-ail-slot") == 0;
                 int virtual_ail_module = virtual_ail_slot ||
                     strcmp(probe_type, "--probe-x32-tactcom-ail-module") == 0;
@@ -146,7 +150,11 @@ int main(int argc, char **argv)
                                     strcmp(probe_type, "--probe-x32-traps") == 0;
                 int virtual_vectors = virtual_traps ||
                                       strcmp(probe_type, "--probe-x32-vectors") == 0;
-                int x32_status = virtual_ail_slot
+                int x32_status = virtual_ail_rate
+                    ? ef_decomp_probe_x32_tactcom_ail_rate(info.bss_end,
+                                                            &x32, reason,
+                                                            sizeof(reason))
+                    : virtual_ail_slot
                     ? ef_decomp_probe_x32_tactcom_ail_slot(info.bss_end,
                                                             &x32, reason,
                                                             sizeof(reason))
@@ -295,10 +303,25 @@ int main(int argc, char **argv)
                                                                        x32.ail_module_timer_slot,
                                                                        x32.ail_module_timer_handler,
                                                                        x32.ail_module_timer_slot_state);
-                                                                printf("Stopped before AIL timer interval "
-                                                                       "programming 0x%08x (no DOS IRQ, "
-                                                                       "PIT or audio driver installed)\n",
-                                                                       x32.stop_address);
+                                                                if (virtual_ail_rate) {
+                                                                    printf("Recovered AIL timer rate: "
+                                                                           "period %u, PIT reload 0x%08x, "
+                                                                           "%u inert cumulative port writes; "
+                                                                           "timer handler 0x%08x\n",
+                                                                           x32.ail_module_timer_period,
+                                                                           x32.ail_module_timer_reload,
+                                                                           x32.ail_module_timer_port_writes,
+                                                                           x32.ail_module_timer_callback_ptr);
+                                                                    printf("Stopped before AIL timer start "
+                                                                           "0x%08x (no DOS IRQ, PIT or "
+                                                                           "audio driver installed)\n",
+                                                                           x32.stop_address);
+                                                                } else {
+                                                                    printf("Stopped before AIL timer interval "
+                                                                           "programming 0x%08x (no DOS IRQ, "
+                                                                           "PIT or audio driver installed)\n",
+                                                                           x32.stop_address);
+                                                                }
                                                             } else {
                                                                 printf("Stopped before AIL timer-slot "
                                                                        "allocation 0x%08x (no DOS "
@@ -400,7 +423,8 @@ int main(int argc, char **argv)
                             strcmp(probe_type, "--probe-x32-tactcom-ail-vectors") != 0 &&
                             strcmp(probe_type, "--probe-x32-tactcom-ail-callback") != 0 &&
                             strcmp(probe_type, "--probe-x32-tactcom-ail-module") != 0 &&
-                            strcmp(probe_type, "--probe-x32-tactcom-ail-slot") != 0))
+                            strcmp(probe_type, "--probe-x32-tactcom-ail-slot") != 0 &&
+                            strcmp(probe_type, "--probe-x32-tactcom-ail-rate") != 0))
             puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files parse multiple ordinary '#' records and END validation, but mode-two geometry, EOF cleanup, archives and the first screen remain unimplemented.");
         free(image_dir);
         ef_decomp_memory_release();

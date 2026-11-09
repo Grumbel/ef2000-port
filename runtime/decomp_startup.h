@@ -76,6 +76,10 @@ typedef struct ef_decomp_x32_probe {
     uint32_t ail_module_timer_slot;
     uint32_t ail_module_timer_handler;
     uint32_t ail_module_timer_slot_state;
+    uint32_t ail_module_timer_period;
+    uint32_t ail_module_timer_reload;
+    uint32_t ail_module_timer_callback_ptr;
+    uint32_t ail_module_timer_port_writes;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -162,6 +166,13 @@ int ef_decomp_probe_x32_tactcom_ail_module(uint32_t bss_end,
  * recovered source C. The free slot becomes state 1 with callback 0xe28c4;
  * stop before 0x1114f7 programs the interval. No hardware is touched. */
 int ef_decomp_probe_x32_tactcom_ail_slot(uint32_t bss_end,
+                                         ef_decomp_x32_probe *probe,
+                                         char *reason, size_t reason_capacity);
+
+/* Run recovered source C 0x1114f7 through the nested slot/period selector,
+ * record the second three inert PIT requests, and stop before 0x11141f
+ * promotes the newly configured timer slot to running state. */
+int ef_decomp_probe_x32_tactcom_ail_rate(uint32_t bss_end,
                                          ef_decomp_x32_probe *probe,
                                          char *reason, size_t reason_capacity);
 

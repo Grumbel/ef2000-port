@@ -2055,3 +2055,19 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   its timer-handle sentinel. Synthetic-state and SHA-pinned original tests
   pass. Guest instruction differential, audio driver, live timer and Watcom
   splice remain pending.
+- GCC/Linux cold AIL rate programming, 2026-11-09: opt-in
+  `--probe-x32-tactcom-ail-rate` runs the already recovered C
+  `set_rate_1114f7(0,0x32)` and its wrapper chain. The rate is converted
+  to period 20000 (`1000000 / 50`), stored in the first slot at `0x17d6e4`;
+  the cached minimum at `0x17d7b2` changes from `0xd68d` to 20000 while
+  the existing slot-15 period `0xd68d` is preserved. Original nested
+  software critical-section depth reaches 3 and returns to 0. Recovered
+  `scale_110f3c` computes a 23866 (`0x5d3a`) PIT reload using its integer
+  arithmetic. The virtual-only adapter checks three further port requests
+  `(0x43,0x36)`, `(0x40,0x3a)`, `(0x40,0x5d)` with no OUT instruction
+  executed (six inert requests in total). The original caller writes
+  handler `0xe28e0` to `0x15b620` and reaches the next strict boundary
+  `0x11141f`, just before timer slot state 1 becomes 2. Prior stop sites
+  remain available. SHA-pinned original and synthetic tests run the same
+  recovered host C; there is no guest x86 differential, running PIT timer,
+  real IRQ/vector, audio playback or Watcom splice.

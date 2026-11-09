@@ -244,6 +244,15 @@ original's no-device branch would. The probe now executes recovered
   original handle at `0x15f74c` becomes offset 0. The existing IRQ slot
   15 stays at state 2 with period `0xd68d`. This mode stops at `0x1114f7`
   before programming the new interval; it does not start a host timer.
+  The subsequent `--probe-x32-tactcom-ail-rate` mode follows already
+  recovered `set_rate_1114f7`, `set_table_slot_value_1114c7` and
+  `timer_reprogram_110f6f`. The requested rate `0x32` selects period
+  `1000000 / 50 = 20000`, which replaces `0xd68d` as the cached minimum;
+  `scale_110f3c` converts it to channel-zero reload `0x5d3a` (23866).
+  Three more PIT port writes (`0x43:0x36`, `0x40:0x3a`, `0x40:0x5d`) are
+  strictly checked and **recorded but not sent**. Guest `0x15b620` becomes
+  callback `0xe28e0`. The new stop is at `0x11141f`, before the original
+  timer slot changes from state 1 to 2; earlier stops remain intact.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized
