@@ -32,12 +32,18 @@ static uint32_t main_boundary_address;
 static int main_probe_active;
 static int x32_probe_active;
 static int x32_virtual_vectors;
+static int x32_virtual_traps;
 static uint32_t x32_request_count;
 static struct {
     uint32_t address;
     uint32_t selector;
     uint32_t length;
 } x32_requests[9];
+static uint32_t x32_trap_count;
+static struct {
+    uint32_t vector;
+    uint32_t handler;
+} x32_traps[8];
 static void stop_at_guest_boundary(uint32_t address);
 
 /* The native probe uses private guest stack-shaped scratch frames, not an
@@ -267,7 +273,52 @@ void ef_decomp_x32_before_traps(void)
     if (!probing || !main_probe_active || !x32_probe_active ||
         !x32_virtual_vectors || x32_request_count != 9u)
         fatal_unexpected("unexpected X-32 trap setup entry");
-    stop_at_guest_boundary(0x0009c8b4u);
+    if (!x32_virtual_traps)
+        stop_at_guest_boundary(0x0009c8b4u);
+}
+
+/* Original 0x9c8bd..0x9c8d1 copies ESP, SS and DS before switching DS to
+ * CS. Native64 cannot obtain that 32-bit protected-mode caller context.
+ * Values below are deliberately synthetic and have no host side effects. */
+void ef_decomp_x32_trap_context(uint32_t *esp, uint16_t *ss, uint16_t *ds)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        !x32_virtual_vectors || !x32_virtual_traps ||
+        x32_request_count != 9u || x32_trap_count != 0u)
+        fatal_unexpected("X-32 trap context outside virtual-only probe");
+    *esp = EF_DECOMP_RAM_SIZE - 0x1000u;
+    *ss = 0x9abcu;
+    *ds = 0x5678u;
+}
+
+/* This records the eight original AX=2533h descriptions; it never performs
+ * INT 21h, changes the host's interrupt handlers, or reports DOS success. */
+void ef_decomp_x32_virtual_trap(uint32_t vector, uint32_t handler)
+{
+    static const uint8_t expected[8] = { 3u, 6u, 9u, 10u, 11u, 12u, 13u, 14u };
+    uint32_t index = x32_trap_count;
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        !x32_virtual_vectors || !x32_virtual_traps ||
+        x32_request_count != 9u || index >= 8u ||
+        vector != expected[index] ||
+        handler != (index == 0u ? 0x0009c908u : 0x0009c909u) ||
+        EF_U32(0x00132a9cu) != 0xd68u ||
+        EF_U32(0x00132aa0u) != EF_DECOMP_RAM_SIZE - 0x1000u ||
+        EF_U16(0x00132aa4u) != 0x9abcu ||
+        EF_U16(0x00132aa6u) != 0x5678u)
+        fatal_unexpected("X-32 virtual trap registration (0x9c8b4)");
+    x32_traps[index].vector = vector;
+    x32_traps[index].handler = handler;
+    ++x32_trap_count;
+}
+
+void ef_decomp_x32_after_initializer(void)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        !x32_virtual_vectors || !x32_virtual_traps ||
+        x32_request_count != 9u || x32_trap_count != 8u)
+        fatal_unexpected("X-32 initializer returned without eight trap requests");
+    stop_at_guest_boundary(0x00000f43u);
 }
 
 /* Timer installation also requires real X-32 services. The cold X-32 probe
@@ -1124,7 +1175,8 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
 }
 
 static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
-                         int virtual_vectors, char *reason, size_t reason_capacity)
+                         int virtual_vectors, int virtual_traps,
+                         char *reason, size_t reason_capacity)
 {
     uint32_t stopped;
     unsigned i;
@@ -1139,16 +1191,20 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     hook_registrations = 0u;
     x32_request_count = 0u;
     memset(x32_requests, 0, sizeof(x32_requests));
+    x32_trap_count = 0u;
+    memset(x32_traps, 0, sizeof(x32_traps));
     probing = 1;
     main_probe_active = 1;
     x32_probe_active = 1;
     x32_virtual_vectors = virtual_vectors;
+    x32_virtual_traps = virtual_traps;
     main_boundary_address = 0u;
     if (setjmp(main_boundary) == 0)
         initialize_x32_services_e20();
     stopped = main_boundary_address;
     x32_probe_active = 0;
     x32_virtual_vectors = 0;
+    x32_virtual_traps = 0;
     main_probe_active = 0;
     probing = 0;
 
@@ -1158,8 +1214,10 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         if (EF_U8(0x00195fb0u + i) != i)
             break;
     }
-    if (stopped != (virtual_vectors ? 0x0009c8b4u : 0x0009c220u) ||
+    if (stopped != (virtual_traps ? 0x00000f43u :
+                    virtual_vectors ? 0x0009c8b4u : 0x0009c220u) ||
         x32_request_count != (virtual_vectors ? 9u : 1u) || i != 16u ||
+        x32_trap_count != (virtual_traps ? 8u : 0u) ||
         EF_U8(0x00132a98u) != 1u ||
         EF_U32(0x00120d24u) != 0x80u ||
         EF_U32(0x0019613cu) != 0x00400100u ||
@@ -1191,19 +1249,36 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     probe->last_address = x32_requests[x32_request_count - 1u].address;
     probe->last_selector = x32_requests[x32_request_count - 1u].selector;
     probe->last_length = x32_requests[x32_request_count - 1u].length;
+    probe->registered_traps = x32_trap_count;
+    if (virtual_traps) {
+        probe->saved_trap_callback = EF_U32(0x00132a9cu);
+        probe->saved_trap_esp = EF_U32(0x00132aa0u);
+        probe->saved_trap_ss = EF_U16(0x00132aa4u);
+        probe->saved_trap_ds = EF_U16(0x00132aa6u);
+        probe->first_trap_vector = x32_traps[0].vector;
+        probe->first_trap_handler = x32_traps[0].handler;
+        probe->last_trap_vector = x32_traps[7].vector;
+        probe->last_trap_handler = x32_traps[7].handler;
+    }
     return 0;
 }
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
                         char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 0, reason, reason_capacity);
+}
+
+int ef_decomp_probe_x32_traps(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                              char *reason, size_t reason_capacity)
+{
+    return run_x32_probe(bss_end, probe, 1, 1, reason, reason_capacity);
 }
 
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,

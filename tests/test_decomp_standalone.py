@@ -126,6 +126,19 @@ class DecompStandaloneTests(unittest.TestCase):
                               vector_only.stdout)
                 self.assertIn('Stopped before DOS/X-32 trap registration 0x0009c8b4',
                               vector_only.stdout)
+                trap_only = subprocess.run([
+                    str(executable), '--image', original, '--probe-x32-traps',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('X-32 request free 7, timer free 8', trap_only.stdout)
+                self.assertIn('Virtual-only X-32 requests: 9 accepted', trap_only.stdout)
+                self.assertIn('Virtual-only X-32 traps: 8 descriptions; '
+                              'first vector 3 handler 0x0009c908, '
+                              'last vector 14 handler 0x0009c909', trap_only.stdout)
+                self.assertIn('Synthetic saved trap context: callback 0x00000d68 '
+                              'ESP 0x03fff000 SS 0x9abc DS 0x5678', trap_only.stdout)
+                self.assertIn('initializer returned at 0x00000f43', trap_only.stdout)
+                self.assertIn('no DOS interrupts or host traps installed',
+                              trap_only.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)

@@ -174,6 +174,7 @@ int main(void)
     assert(ef_decomp_probe_x32_vectors(bss_end, &x32, reason, sizeof(reason)) == 0);
     assert(x32.stop_address == 0x9c8b4u);
     assert(x32.registered_requests == 9u);
+    assert(x32.registered_traps == 0u);
     assert(x32.request_free == 7u && x32.timer_free == 8u);
     assert(x32.first_address == 0x2b0u && x32.first_length == 0xb70u);
     assert(x32.last_address == 0x120cd4u);
@@ -183,6 +184,20 @@ int main(void)
     assert(EF_U16(0x00196026u + 7u * 10u) == 0x5678u);
     assert(EF_U8(0x00196028u + 7u * 10u) == 2u);
     assert(EF_U32(0x00132a9cu) == 0u);
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    assert(ef_decomp_probe_x32_traps(bss_end, &x32, reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0xf43u);
+    assert(x32.request_free == 7u && x32.timer_free == 8u);
+    assert(x32.registered_requests == 9u && x32.registered_traps == 8u);
+    assert(x32.first_trap_vector == 3u && x32.first_trap_handler == 0x9c908u);
+    assert(x32.last_trap_vector == 14u && x32.last_trap_handler == 0x9c909u);
+    assert(x32.saved_trap_callback == 0xd68u);
+    assert(x32.saved_trap_esp == EF_DECOMP_RAM_SIZE - 0x1000u);
+    assert(x32.saved_trap_ss == 0x9abcu && x32.saved_trap_ds == 0x5678u);
+    assert(EF_U32(0x00132a9cu) == x32.saved_trap_callback);
+    assert(EF_U32(0x00132aa0u) == x32.saved_trap_esp);
+    assert(EF_U16(0x00132aa4u) == x32.saved_trap_ss);
+    assert(EF_U16(0x00132aa6u) == x32.saved_trap_ds);
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);

@@ -1881,3 +1881,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   boundary and the normal TACTCOM `--probe-main` boundary remain intact.
   These results test the recovered game's memory writes and request order;
   they do not validate real extender return codes or guest hardware state.
+- GCC/Linux virtual X-32 trap capture, 2026-11-09: pinned 0x9c8b4
+  disassembly confirms the stack callback at `[ESP+4]`, the entry ESP at
+  `0x132aa0`, SS at `0x132aa4`, DS at `0x132aa6`, the temporary DS=CS,
+  and eight INT 21h AX=2533h registrations: vector 3 at the `0x9c908`
+  IRET handler, 6/9/10/11/12/13/14 at `0x9c909`. Added a third,
+  explicitly opt-in `--probe-x32-traps` mode: recovered `0xe20` executes
+  all nine original request-pool calls then its source-C `0x9c8b4`
+  trap routine, while host-only hooks supply a named synthetic ESP/SS/DS
+  context and collect/validate all eight trap descriptions in an inert
+  table. Guest-RAM saved context is checked and execution stops at the
+  original `0xe20` return at `0xf43`. There are **no actual DOS INT 21h
+  calls, real interrupt handlers or verified CPU-register snapshots**.
+  Earlier `--probe-x32`/`--probe-x32-vectors` boundaries are preserved.

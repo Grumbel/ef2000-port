@@ -13,6 +13,8 @@
  * selector/far-allocation doubles and stops at that first real extender
  * request. --probe-x32-vectors uses an inert host request registry to get
  * through all nine registrations, stopping before trap installation.
+ * --probe-x32-traps additionally models the saved CPU context and eight
+ * interrupt descriptions, stopping at the return from this initializer.
  * Neither mode installs interrupts or implements a working CRT. */
 void initialize_x32_services_e20(void)
 {
@@ -51,11 +53,17 @@ void initialize_x32_services_e20(void)
 
     if (getenv_9c858(0x0017f3a8u) == 0u) {
 #if defined(EF_DECOMP_NATIVE)
-        /* The GCC virtual registry cannot reproduce the original
-         * INT 21h AX=2533 trap installation or captured ESP/SS/DS. */
+        /* The strict virtual-registry mode stops here. A separate opt-in
+         * trap probe supplies synthetic CPU context and a virtual table. */
         extern void ef_decomp_x32_before_traps(void);
         ef_decomp_x32_before_traps();
 #endif
         install_trap_handlers_9c8b4(0u, 0u, 0u, 0u, 0xd68u);
     }
+#if defined(EF_DECOMP_NATIVE)
+    {
+        extern void ef_decomp_x32_after_initializer(void);
+        ef_decomp_x32_after_initializer();
+    }
+#endif
 }

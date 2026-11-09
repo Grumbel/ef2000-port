@@ -33,6 +33,15 @@ typedef struct ef_decomp_x32_probe {
     uint32_t last_address;
     uint32_t last_selector;
     uint32_t last_length;
+    uint32_t registered_traps;
+    uint32_t saved_trap_callback;
+    uint32_t saved_trap_esp;
+    uint32_t saved_trap_ss;
+    uint32_t saved_trap_ds;
+    uint32_t first_trap_vector;
+    uint32_t first_trap_handler;
+    uint32_t last_trap_vector;
+    uint32_t last_trap_handler;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -43,6 +52,12 @@ int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
  * Stop before the next trap-installation service. No vector is activated. */
 int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity);
+
+/* Additional opt-in test-only model for the eight AX=2533h trap requests.
+ * Captures synthetic ESP/SS/DS and stops at return 0xf43, without invoking
+ * a DOS interrupt or installing anything on the host. */
+int ef_decomp_probe_x32_traps(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                              char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.

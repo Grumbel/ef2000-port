@@ -150,10 +150,15 @@ original's no-device branch would. The probe now executes recovered
   checking their order and packed records, then stops at `0x9c8b4`
   before DOS trap installation. The final request in slot 7 holds address
   `0x120cd4`, synthetic DS selector `0x5678`, and length 2; the free
-  count is seven. This is a test model, **not** live IRQ support or an
+  count is seven. An additional opt-in `--probe-x32-traps` mode executes
+  recovered `0x9c8b4` with an explicitly synthetic ESP/SS/DS snapshot.
+  It validates all eight AX=2533h vector/handler descriptions in an inert
+  registry (3 → `0x9c908`; 6, 9–14 → `0x9c909`), saves the context
+  fields in guest RAM, and stops at the `0xe20` return (`0xf43`).
+  This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized
-  pool; the two modes do not borrow each other's state. Actual DOS/X-32
+  pool; these modes do not borrow each other's state. Actual DOS/X-32
   request/vector/timer services cannot be safely inferred from free-list
   initialization alone. A synthetic pre-initialized input-state test skips
   that setup as in the original, then executes the recovered TACTCOM
