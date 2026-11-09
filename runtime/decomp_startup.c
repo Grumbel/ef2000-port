@@ -379,9 +379,9 @@ uint8_t guest_fn_e93dc_r(uint32_t source, uint32_t flags)
     return parse_script_text_e93dc(source, flags);
 }
 
-/* The original token/assignment interpreter at 0xe882c is substantially
- * larger than the recovered outer parser. Keep the first setting line as an
- * explicit boundary until its table-driven effects are reconstructed. */
+/* The original token interpreter at 0xe882c is substantially larger than
+ * the recovered scalar-assignment subset. Keep unsupported types, malformed
+ * tokens and diagnostic paths at the original entry-point boundary. */
 uint8_t guest_fn_e882c_x(void)
 {
     uint32_t cur = EF_U32(0x00464384u);
@@ -399,6 +399,8 @@ uint8_t guest_fn_e882c_x(void)
         if (length < 0x84u)
             return parse_comment_line_e882c();
     }
+    if (parse_scalar_setting_e882c())
+        return 1u;
     stop_at_guest_boundary(0x000e882cu);
     return 0;
 }

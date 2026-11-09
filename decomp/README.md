@@ -97,10 +97,12 @@ original's no-device branch would. The probe now executes recovered
   compressed files stop at `0xb3c04` pending decompression. If the config is
   present, it is allocated in guest arena RAM and processed by recovered
   `parse_script_text_e93dc`, including line counting and the source-recovered
-  semicolon-only branch of `0xe882c`. The rest of that token parser is still
-  unknown: an assignment line stops at `0xe882c` before its setting writes.
-  A blank/comment-only config runs through the original `0xe9574` arena
-  release and stops at `0x30214`, as does a missing config.
+  semicolon branch of `0xe882c`. A narrow type-3 scalar route decodes signed
+  decimal options with the original descriptor widths (1/2/4 bytes) and
+  performs the original `CONTROL` callback (`0x82710`). Complex type-5
+  settings (such as `MUSIC=1,127`), malformed scalar values, and diagnostic
+  branches still stop at `0xe882c`. Missing, comment-only or scalar-only
+  configs run through original `0xe9574` arena release to `0x30214`.
 These are **bounded probes**: they do not implement the general variadic
 logger or connected-joystick input. The memory-shortage
 branch stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and

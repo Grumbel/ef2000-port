@@ -115,8 +115,18 @@ class DecompStandaloneTests(unittest.TestCase):
                 ], capture_output=True, text=True)
                 self.assertEqual(configured.returncode, 0,
                                  configured.stdout + '\n' + configured.stderr)
-                self.assertIn('stopped at unimplemented call 0x000e882c',
+                self.assertIn('stopped at unimplemented call 0x00030214',
                               configured.stdout)
+                # Original scalar descriptors + CONTROL callback run; the
+                # following type-5 MUSIC list is still a parser boundary.
+                (Path(directory) / 'EF2000.CFG').write_bytes(
+                    b'DETAIL=2\r\nREZ=0\r\nCONTROL=1\r\nMUSIC=1,127\r\n')
+                mixed = subprocess.run([
+                    str(executable), '--image', original,
+                    '--data-dir', directory, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('stopped at unimplemented call 0x000e882c',
+                              mixed.stdout)
                 (Path(directory) / 'EF2000.CFG').write_bytes(
                     b';ignored\r\n \t\r\n\r\n')
                 blank = subprocess.run([

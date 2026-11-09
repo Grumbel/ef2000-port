@@ -41,6 +41,91 @@ int main(void)
     assert(ef_decomp_memory_span(EF_DECOMP_RAM_SIZE - 1, 2) == 0);
     ef_decomp_memory_release();
 
+    /* Recovered type-3 parser reads real guest descriptor layout (18-byte
+     * stride); use synthetic keys, not original executable bytes. Test
+     * byte/word/dword stores, case folding and the 0x82710 CONTROL hook. */
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    {
+        struct descriptor {
+            const char *key;
+            uint32_t destination;
+            uint8_t width;
+            uint32_t callback;
+            uint8_t type;
+        } descriptors[] = {
+            {"DETAIL", 0x0015b7e4u, 1u, 0u, 3u},
+            {"REZ", 0x0012b369u, 1u, 0u, 3u},
+            {"CONTROL", 0x001a5c0bu, 1u, 0x00082710u, 3u},
+            {"HUDCOL", 0x0012b366u, 2u, 0u, 3u},
+            {"JOY_FACTOR", 0x00122dc4u, 4u, 0u, 3u},
+            {"MUSIC", 0x001fcb50u, 0x50u, 0u, 5u},
+        };
+        size_t i;
+        const uint32_t table = 0x0012b370u;
+        const uint32_t key_base = 0x00017000u;
+        const uint32_t text = 0x00018000u;
+        EF_U32(0x00464380u) = table;
+        for (i = 0; i < sizeof(descriptors) / sizeof(descriptors[0]); i++) {
+            uint32_t entry = table + (uint32_t)i * 18u;
+            uint32_t name = key_base + (uint32_t)i * 32u;
+            memcpy(ef_decomp_memory_span(name, strlen(descriptors[i].key) + 1u),
+                   descriptors[i].key, strlen(descriptors[i].key) + 1u);
+            EF_U32(entry) = name;
+            EF_U8(entry + 4u) = descriptors[i].type;
+            EF_U32(entry + 5u) = descriptors[i].destination;
+            EF_U8(entry + 9u) = descriptors[i].width;
+            EF_U32(entry + 14u) = descriptors[i].callback;
+        }
+
+        memcpy(ef_decomp_memory_span(text, 11), "dEtAiL=2\r\n", 11);
+        EF_U32(0x00464384u) = text;
+        EF_U32(0x0046438cu) = 0xdeadbeefu;
+        assert(parse_scalar_setting_e882c() == 1u);
+        assert(EF_U8(0x0015b7e4u) == 2u);
+        assert(strcmp(ef_decomp_memory_span(0x00464396u, 8), "dEtAiL") == 0);
+        assert(EF_U32(0x00464384u) == text + 7u);
+        assert(EF_U32(0x0046438cu) == 2u);
+
+        memcpy(ef_decomp_memory_span(text, 8), "REZ=-1\r\n", 8);
+        EF_U32(0x00464384u) = text;
+        assert(parse_scalar_setting_e882c() == 1u);
+        assert(EF_U8(0x0012b369u) == 0xffu);
+        assert(EF_U32(0x0046438cu) == 0xffffffffu);
+
+        memcpy(ef_decomp_memory_span(text, 12), "CONTROL=1\r\n", 12);
+        EF_U32(0x00464384u) = text;
+        assert(parse_scalar_setting_e882c() == 1u);
+        assert(EF_U8(0x001a5c0bu) == 1u);
+        assert(EF_U8(0x001fcb30u) == 1u);
+        assert(EF_U8(0x00420960u) == 1u);
+
+        memcpy(ef_decomp_memory_span(text, 18), "HUDCOL = 65535\r\n", 17);
+        EF_U32(0x00464384u) = text;
+        assert(parse_scalar_setting_e882c() == 1u);
+        assert(EF_U16(0x0012b366u) == 65535u);
+
+        memcpy(ef_decomp_memory_span(text, 24), "JOY_FACTOR=-2147483648\r\n", 24);
+        EF_U32(0x00464384u) = text;
+        assert(parse_scalar_setting_e882c() == 1u);
+        assert(EF_U32(0x00122dc4u) == 0x80000000u);
+
+        memcpy(ef_decomp_memory_span(text, 14), "MUSIC=1,127\r\n", 13);
+        EF_U32(0x00464384u) = text;
+        assert(parse_scalar_setting_e882c() == 0u);
+        assert(EF_U32(0x00464384u) == text);
+        assert(EF_U8(0x001fcb50u) == 0u);
+
+        memcpy(ef_decomp_memory_span(text, 20), "DETAIL=2147483648\r\n", 20);
+        EF_U32(0x00464384u) = text;
+        assert(parse_scalar_setting_e882c() == 0u);
+        assert(EF_U8(0x0015b7e4u) == 2u);
+        memcpy(ef_decomp_memory_span(text, 16), "DETAIL=42junk\r\n", 16);
+        EF_U32(0x00464384u) = text;
+        assert(parse_scalar_setting_e882c() == 0u);
+        assert(EF_U8(0x0015b7e4u) == 2u);
+    }
+    ef_decomp_memory_release();
+
     /* Normal game main enters the real recovered arena setup, then the
      * missing TACTCOM initialization boundary. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);

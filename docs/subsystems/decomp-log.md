@@ -1419,3 +1419,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   formatter at `0xe8d7c`, then writes 1, 2 or 4 bytes by +9. This describes
   the next recovery target; the probe deliberately does not yet perform
   these assignments without validating numeric conversion/error behavior.
+- GCC/Linux scalar configuration assignment, 2026-11-09: recovered a bounded
+  path through original `0xe882c` for simple type-3 signed decimal values:
+  lex key in the original 0x84-byte line budget, match its 18-byte descriptor
+  in guest RAM, scan the `%ld` numeric format from `0x190ed8`, update parser
+  scratch/cursor, and write 1-, 2-, or 4-byte destination values. Only the
+  supported full-token decimal subset is accepted (including 32-bit minimum
+  and maximum); original permissive conversion/error paths are left as a
+  boundary. Recovered the original 16-byte `CONTROL` descriptor callback
+  `0x82710` independently: it copies byte `0x1a5c0b` to `0x1fcb30` and
+  `0x420960`. Synthetic tests assert each width, signed wrap/truncation,
+  callback mirrors, case folding, scratch fields and unsupported cases.
+  Opt-in SHA-pinned executable integration confirms `CONTROL=1` and other
+  scalar-only configs now pass arena release to unknown `0x30214`; a shipped
+  settings prefix (`DETAIL=2`, `REZ=0`, `CONTROL=1`) reaches the next
+  unimplemented complex `MUSIC=1,127` at `0xe882c`. This is a partial
+  route inside the 2,990-byte token interpreter, not a complete recovery;
+  no video first screen yet.

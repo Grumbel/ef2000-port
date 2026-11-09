@@ -13761,6 +13761,150 @@ uint8_t parse_comment_line_e882c(void)
     return 1u;
 }
 
+/* 0x82710, 16 bytes: callback for the CONTROL entry in the original
+ * 18-byte-stride options table at 0x12b370. */
+static void apply_control_setting_82710(void)
+{
+    uint8_t value = EF_U8(0x001a5c0bu);
+    EF_U8(0x001fcb30u) = value;
+    EF_U8(0x00420960u) = value;
+}
+
+/* 0xe882c (partial), the type-3 numeric-assignment route only. The original
+ * reads identifiers from 0x464384, compares against the 18-byte descriptor
+ * table at 0x464380, skips spaces/tabs/'=', scans a signed decimal with
+ * "%ld" (0x190ed8), stores 1/2/4 bytes at descriptor +5, then calls its
+ * optional callback. The unimplemented type-5 subtable parser, error reports
+ * and unusual sscanf input remain at the 0xe882c native probe boundary.
+ * Validate the entire supported input before mutating guest state. */
+uint8_t parse_scalar_setting_e882c(void)
+{
+    const uint32_t cursor = EF_U32(0x00464384u);
+    const uint32_t table = EF_U32(0x00464380u);
+    char key[0x85];
+    uint32_t length = 0u, key_length = 0u, offset, entry = 0u;
+    uint32_t destination, callback, value, magnitude = 0u;
+    uint8_t width;
+    uint32_t limit;
+    int negative = 0;
+
+    while (length < 0x84u && EF_U8(cursor + length) != 0u &&
+           EF_U8(cursor + length) != '\r')
+        length++;
+    if (length >= 0x84u)
+        return 0u;
+
+    while (key_length < length) {
+        uint8_t c = EF_U8(cursor + key_length);
+        if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+              (c >= '0' && c <= '9') || c == '_'))
+            break;
+        key[key_length++] = (char)c;
+    }
+    if (key_length == 0u)
+        return 0u;
+    key[key_length] = '\0';
+
+    /* No assumed descriptor ordering or hardcoded target addresses: both
+     * must come from the actual guest configuration table. */
+    for (offset = 0; offset < 0x100u; offset++) {
+        uint32_t candidate = table + offset * 18u;
+        uint32_t name = EF_U32(candidate);
+        uint32_t n;
+        if (name == 0u)
+            return 0u;
+        for (n = 0; n <= key_length; n++) {
+            uint8_t a = EF_U8(name + n);
+            uint8_t b = (uint8_t)key[n];
+            if (a >= 'A' && a <= 'Z')
+                a = (uint8_t)(a + ('a' - 'A'));
+            if (b >= 'A' && b <= 'Z')
+                b = (uint8_t)(b + ('a' - 'A'));
+            if (a != b)
+                break;
+            if (a == 0u) {
+                entry = candidate;
+                break;
+            }
+        }
+        if (entry)
+            break;
+    }
+    if (!entry || EF_U8(entry + 4u) != 3u)
+        return 0u;
+    destination = EF_U32(entry + 5u);
+    width = EF_U8(entry + 9u);
+    callback = EF_U32(entry + 14u);
+    /* Currently only the separately verified CONTROL callback is safe. */
+    if ((width != 1u && width != 2u && width != 4u) ||
+        destination == 0u ||
+        (callback != 0u &&
+         (callback != 0x00082710u || destination != 0x001a5c0bu)))
+        return 0u;
+
+    offset = key_length;
+    while (offset < length) {
+        uint8_t c = EF_U8(cursor + offset);
+        if (c != ' ' && c != '\t' && c != '=')
+            break;
+        offset++;
+    }
+    if (offset >= length)
+        return 0u;
+    if (EF_U8(cursor + offset) == '-' || EF_U8(cursor + offset) == '+') {
+        negative = EF_U8(cursor + offset) == '-';
+        offset++;
+    }
+    limit = negative ? 0x80000000u : 0x7fffffffu;
+    {
+        uint32_t digits = 0u;
+        while (offset < length) {
+            uint8_t c = EF_U8(cursor + offset);
+            uint32_t digit;
+            if (c < '0' || c > '9')
+                break;
+            digit = (uint32_t)c - (uint32_t)'0';
+            if (magnitude > (limit - digit) / 10u)
+                return 0u;
+            magnitude = magnitude * 10u + digit;
+            offset++;
+            digits++;
+        }
+        if (digits == 0u)
+            return 0u;
+    }
+    while (offset < length &&
+           (EF_U8(cursor + offset) == ' ' || EF_U8(cursor + offset) == '\t'))
+        offset++;
+    if (offset != length)
+        return 0u;
+
+    value = negative ? 0u - magnitude : magnitude;
+    EF_U32(0x0046438cu) = 0u;
+    EF_U8(0x004643b7u) = 0u;
+    EF_U16(0x00464394u) = 0u;
+    for (offset = 0u; offset <= key_length; offset++)
+        EF_U8(0x00464396u + offset) = (uint8_t)key[offset];
+    offset = key_length;
+    while (offset < length) {
+        uint8_t c = EF_U8(cursor + offset);
+        if (c != ' ' && c != '\t' && c != '=')
+            break;
+        offset++;
+    }
+    EF_U32(0x00464384u) = cursor + offset;
+    EF_U32(0x0046438cu) = value;
+    if (width == 1u)
+        EF_U8(destination) = (uint8_t)value;
+    else if (width == 2u)
+        EF_U16(destination) = (uint16_t)value;
+    else
+        EF_U32(destination) = value;
+    if (callback == 0x00082710u)
+        apply_control_setting_82710();
+    return 1u;
+}
+
 /* 0xe93dc, 272 bytes. Run the text parser over the script TEXT (EAX, stored at 0x464380; DL goes to byte 0x1600a6): the cursor 0x464384 starts at dword 0x1600a0, the line counter word 0x16007c at 1. Complains through the error hook when the parser mode byte 0x1600a4 is 0 (0x1912c0) or 2 (0x191304). Then loops: skip blanks and tabs, count CR LF pairs as lines, hand every other token to 0xe882c (a zero result makes the whole run fail) and skip the rest of its line. Returns 1 when all tokens parsed. */
 uint8_t parse_script_text_e93dc(ef_addr32 text, uint32_t flag)
 {
