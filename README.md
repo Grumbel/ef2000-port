@@ -173,11 +173,12 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
   and processed by recovered outer parser `0xe93dc`. A verified subset of
   type-3 scalar assignments in `0xe882c` now handles decimal options and the
   16-byte `CONTROL` callback (`0x82710`), as well as blank/semicolon-comment
-  lines. The type-5 text path now accepts the `MUSIC` and `SOUNDFX` pairs,
-  including the original 16-bit sound callbacks and volume clamps. The
-  shipped `JOYSTICK` list, other complex callbacks, malformed values and
-  parser diagnostics still stop at `0xe882c`. A missing or fully supported
-  configuration reaches the following `0x30214` initialization
+  lines. The type-5 path now accepts the shipped `MUSIC`, `SOUNDFX`,
+  `JOYSTICK`, `SPEECH` and `VRHELMET` settings, including the original sound
+  callbacks and the disconnected-gameport joystick calibration path.
+  Unsupported syntax, unmodeled connected devices, and parser diagnostics
+  remain bounded. The unchanged shipped `EF2000.CFG` now parses completely
+  and reaches the following `0x30214` initialization
   routine, after releasing the config buffer. The
   read-only file adapter handles plain text; JR/RA decompression is pending.
   Host-side diagnostic output uses UTF-8 stderr, not the game's logfile.

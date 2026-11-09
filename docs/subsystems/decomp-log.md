@@ -1451,3 +1451,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   through MUSIC and STICK to the unimplemented JOYSTICK callback at `0xe882c`.
   A sound-only config completes the parser and reaches unknown `0x30214`.
   No first screen or full interpreter recovery yet.
+- GCC/Linux remaining shipped config callbacks, 2026-11-09: recovered the
+  423-byte JOYSTICK list callback `0x828f8` for the existing unplugged
+  gameport model (ten `%d` values and a final `%hd` into `0x198432`). Its
+  guest calibration globals, clamped scale/threshold words, axis extrema,
+  overlapping 32-/16-bit fields and signed callback `0x1c548` are now updated
+  in the source-recovered order. Indirect `[0x15bab8]` resolves to `0xd6960`
+  in the pinned executable; the native model follows only its no-device
+  `0xd66c2` path, clearing button latches and clamping axes, with connected
+  sampling explicitly unmodeled. Recovered `0x826f0` SPEECH (nonzero string
+  becomes two enable bytes) and `0x82c34` VRHELMET (ten-way mode/submode
+  mapping) from original disassembly. Synthetic RAM tests cover calibration,
+  signed extrema, the sound callbacks, speech, VR modes and incomplete input.
+  Opt-in GCC/Linux startup test now runs the complete 146-byte shipped
+  `EF2000.CFG` in original option order and reaches `0x30214` after freeing
+  its buffer, rather than stopping at `0xe882c`. The next milestone is
+  recovering `0x30214` (4,119 bytes) to progress toward the first screen;
+  no original-guest differential or Watcom splice for these parser paths.

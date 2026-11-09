@@ -117,16 +117,17 @@ class DecompStandaloneTests(unittest.TestCase):
                                  configured.stdout + '\n' + configured.stderr)
                 self.assertIn('stopped at unimplemented call 0x00030214',
                               configured.stdout)
-                # Scalar descriptors, CONTROL and MUSIC run. The larger
-                # JOYSTICK callback is still a parser boundary.
+                # The original full settings sequence exercises all the
+                # recovered type-3 and type-5 callbacks in order.
                 (Path(directory) / 'EF2000.CFG').write_bytes(
                     b'DETAIL=2\r\nREZ=0\r\nCONTROL=1\r\nMUSIC=1,127\r\n'
-                    b'STICK=15\r\nJOYSTICK=4000,63,63,63,63,0,126,0,126,63,0\r\n')
+                    b'STICK=15\r\nJOYSTICK=4000,63,63,63,63,0,126,0,126,63,0\r\n'
+                    b'SOUNDFX=1,127\r\nSPEECH=1\r\nVRHELMET=0\r\nJOY_FACTOR=0\r\n')
                 mixed = subprocess.run([
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x000e882c',
+                self.assertIn('stopped at unimplemented call 0x00030214',
                               mixed.stdout)
                 (Path(directory) / 'EF2000.CFG').write_bytes(
                     b'MUSIC=1,127\r\nSOUNDFX=1,127\r\n')

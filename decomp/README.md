@@ -100,11 +100,13 @@ original's no-device branch would. The probe now executes recovered
   semicolon branch of `0xe882c`. A narrow type-3 scalar route decodes signed
   decimal options with the original descriptor widths (1/2/4 bytes) and
   performs the original `CONTROL` callback (`0x82710`). The type-5 scratch
-  text route supports `MUSIC` and `SOUNDFX` via their recovered `0x8289c`
-  and `0x82814` callbacks. Other complex settings (notably `JOYSTICK`),
-  malformed values and diagnostic branches still stop at `0xe882c`.
-  Missing, comment-only or entirely supported
-  configs run through original `0xe9574` arena release to `0x30214`.
+  text route supports `MUSIC`, `SOUNDFX`, `JOYSTICK`, `SPEECH` and `VRHELMET`
+  through their original callbacks. The joystick handling follows the
+  probe's disconnected-gameport branch (`0xd6960`, `0xd66c2`); connected
+  joystick sampling, malformed values and diagnostic branches remain
+  bounded. Missing, comment-only or entirely supported
+  configs (including the unchanged shipped `EF2000.CFG`) run through
+  original `0xe9574` arena release to `0x30214`.
 These are **bounded probes**: they do not implement the general variadic
 logger or connected-joystick input. The memory-shortage
 branch stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and

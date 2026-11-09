@@ -380,8 +380,8 @@ uint8_t guest_fn_e93dc_r(uint32_t source, uint32_t flags)
 }
 
 /* The original token interpreter at 0xe882c is substantially larger than
- * the recovered scalar-assignment subset. Keep unsupported types, malformed
- * tokens and diagnostic paths at the original entry-point boundary. */
+ * the recovered scalar and configuration-list subsets. Keep unsupported
+ * syntax, device paths and diagnostic calls at exact native boundaries. */
 uint8_t guest_fn_e882c_x(void)
 {
     uint32_t cur = EF_U32(0x00464384u);
@@ -401,7 +401,7 @@ uint8_t guest_fn_e882c_x(void)
     }
     if (parse_scalar_setting_e882c())
         return 1u;
-    if (parse_sound_setting_e882c())
+    if (parse_text_setting_e882c())
         return 1u;
     stop_at_guest_boundary(0x000e882cu);
     return 0;

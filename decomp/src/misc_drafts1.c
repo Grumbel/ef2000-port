@@ -13926,8 +13926,9 @@ uint8_t parse_scalar_setting_e882c(void)
  * only its unambiguous two-number subset; incomplete conversions (whose
  * uninitialized stack values are then read by the original callbacks) are
  * still unsupported by the native startup probe. */
-static uint8_t parse_setting_short_e882c(const char *source, uint32_t count,
-                                        uint32_t *position, int16_t *result)
+static uint8_t parse_setting_integer_e882c(const char *source, uint32_t count,
+                                          uint32_t *position, int32_t *result,
+                                          uint8_t width)
 {
     uint32_t pos = *position;
     uint32_t magnitude = 0u;
@@ -13940,7 +13941,8 @@ static uint8_t parse_setting_short_e882c(const char *source, uint32_t count,
         negative = source[pos] == '-';
         pos++;
     }
-    maximum = negative ? 0x8000u : 0x7fffu;
+    maximum = width == 2u ? (negative ? 0x8000u : 0x7fffu)
+                          : (negative ? 0x80000000u : 0x7fffffffu);
     while (pos < count && source[pos] >= '0' && source[pos] <= '9') {
         uint32_t digit = (uint32_t)source[pos++] - (uint32_t)'0';
         if (magnitude > (maximum - digit) / 10u)
@@ -13951,7 +13953,17 @@ static uint8_t parse_setting_short_e882c(const char *source, uint32_t count,
     if (!digits)
         return 0u;
     *position = pos;
-    *result = (int16_t)(negative ? 0u - magnitude : magnitude);
+    *result = (int32_t)(negative ? 0u - magnitude : magnitude);
+    return 1u;
+}
+
+static uint8_t parse_setting_short_e882c(const char *source, uint32_t count,
+                                        uint32_t *position, int16_t *result)
+{
+    int32_t value;
+    if (!parse_setting_integer_e882c(source, count, position, &value, 2u))
+        return 0u;
+    *result = (int16_t)value;
     return 1u;
 }
 
@@ -13977,18 +13989,114 @@ static void apply_sound_setting_82814_8289c(uint32_t callback,
     }
 }
 
+/* 0x826f0 (31 bytes): nonzero decimal SPEECH input enables two byte flags. */
+static void apply_speech_setting_826f0(int32_t value)
+{
+    uint8_t enabled = value != 0;
+    EF_U8(0x0015bac7u) = enabled;
+    EF_U8(0x001a8580u) = enabled;
+}
+
+/* 0x82c34 (183 bytes): the ten-case VRHELMET switch, selecting a mode
+ * and submode at 0x464470/0x464472. Index 0 maps both fields to zero. */
+static void apply_vrhelmet_setting_82c34(int32_t value)
+{
+    uint16_t mode = 0u, submode = 0u;
+    if (value == 1)
+        mode = 1u;
+    else if (value >= 2 && value <= 5) {
+        mode = 2u;
+        submode = (uint16_t)(value - 1);
+    } else if (value >= 6 && value <= 9) {
+        mode = 3u;
+        submode = (uint16_t)(value - 5);
+    }
+    EF_U16(0x00464470u) = submode;
+    EF_U16(0x00464472u) = mode;
+}
+
+/* 0x1c548, 40 bytes: compare signed 16-bit value +/- tolerance against
+ * dword 0x15ba78; 0x828f8 uses the result to update 0x198432. */
+static uint8_t joystick_center_matches_1c548(int16_t value, int16_t tolerance)
+{
+    int32_t center = (int32_t)EF_U32(0x0015ba78u);
+    int32_t x = (int32_t)value;
+    int32_t delta = (int32_t)tolerance;
+    return (x + delta > center && x - delta < center) ? 1u : 0u;
+}
+
+/* 0x828f8 (423 bytes), original JOYSTICK list callback, for the native
+ * unplugged-joystick device model only. The scanf format at 0x188b9c has
+ * ten signed %d fields and one %hd written directly to 0x198432. The
+ * indirect callback [0x15bab8] normally points at 0xd6960; its no-device
+ * branch samples 0xd66c2 and clamps existing axes without x87 operations. */
+static void apply_joystick_setting_828f8(const int32_t v[11])
+{
+    int32_t a, b;
+    uint32_t sensitivity = (uint32_t)v[6];
+    int32_t current;
+    int16_t stick, tolerance;
+
+    EF_U16(0x00198432u) = (uint16_t)v[10];
+    if (sensitivity == 0u)
+        sensitivity = 1u;
+    EF_U32(0x0015baacu) = sensitivity;
+    EF_U32(0x001fcba8u) = (uint32_t)v[8];
+    EF_U16(0x00420d9cu) = (uint16_t)v[8];
+    EF_U32(0x001fcba4u) = (uint32_t)v[6];
+    EF_U16(0x00420d9au) = (uint16_t)v[6];
+    EF_U16(0x00420d9eu) = (uint16_t)(v[7] > 1 ? v[7] : 1);
+    EF_U16(0x00420d96u) = (uint16_t)(v[5] > 1 ? v[5] : 1);
+
+    current = ((int32_t)EF_U32(0x00420d9cu) >> 16) * 2 / 100;
+    EF_U16(0x00420d90u) = (uint16_t)(current >= 1 ? current : 1);
+    current = ((int32_t)EF_U32(0x00420d94u) >> 16) * 2 / 100;
+    EF_U16(0x00420d94u) = (uint16_t)(current >= 1 ? current : 1);
+
+    EF_U16(0x00198450u) = (uint16_t)(v[4] < v[3] ? v[4] : v[3]);
+    EF_U16(0x00198448u) = (uint16_t)(v[4] > v[3] ? v[4] : v[3]);
+    a = v[0] - v[2];
+    b = v[1] - v[0];
+    EF_U16(0x00198446u) = (uint16_t)(a < b ? a : b);
+    EF_U32(0x001fcba0u) = (uint32_t)v[0];
+    EF_U16(0x0019844cu) = (uint16_t)v[0];
+
+    /* 0xd6960, no-joystick branch after 0xd66c2 returns zero: the
+     * deterministic port-0x201 value 0xff clears four button latches. */
+    EF_U8(0x0015ba2cu) = 0u;
+    EF_U8(0x0015ba2du) = 0u;
+    EF_U8(0x0015ba2eu) = 0u;
+    EF_U8(0x0015ba2fu) = 0u;
+    if (EF_S32(0x00420dc4u) < -0x200)
+        EF_U32(0x00420dc4u) = (uint32_t)-0x200;
+    if (EF_S32(0x00420dc4u) > 0x200)
+        EF_U32(0x00420dc4u) = 0x200u;
+    if (EF_S32(0x00420dc8u) < -0x200)
+        EF_U32(0x00420dc8u) = (uint32_t)-0x200;
+    if (EF_S32(0x00420dc8u) > 0x200)
+        EF_U32(0x00420dc8u) = 0x200u;
+    EF_U8(0x00425fccu) = EF_U8(0x0015ba2cu);
+    EF_U8(0x00425fcau) = EF_U8(0x0015ba2du);
+
+    stick = (int16_t)((int32_t)EF_U32(0x00198430u) >> 16);
+    tolerance = (int16_t)(stick / 11);
+    if (joystick_center_matches_1c548(stick, tolerance))
+        EF_U16(0x00198432u) = EF_U16(0x0015ba78u);
+}
+
 /* 0xe882c (partial), original type-5 text-copy path 0xe8e1d..0xe8f44,
- * 0xe935b and 0xe939d, plus only the two recovered sound callbacks.
- * The descriptor supplies width 0x50, string target 0x1fcb50 and callback.
- * Other type-5 callbacks, especially JOYSTICK, remain native boundaries. */
-uint8_t parse_sound_setting_e882c(void)
+ * 0xe935b and 0xe939d, with bounded callbacks for SOUND, SPEECH,
+ * VRHELMET and unplugged JOYSTICK. Error paths remain native boundaries. */
+uint8_t parse_text_setting_e882c(void)
 {
     const uint32_t cursor = EF_U32(0x00464384u);
     char key[0x85];
     char value[0x81];
     uint32_t length, key_length, offset, entry;
     uint32_t callback, destination, value_start, value_length = 0u, pos = 0u;
-    int16_t enabled, volume;
+    int16_t enabled = 0, volume = 0;
+    int32_t scalar = 0, joystick[11];
+    uint32_t i;
 
     if (!find_setting_descriptor_e882c(cursor, &length, &key_length, &entry, key) ||
         EF_U8(entry + 4u) != 5u || EF_U8(entry + 9u) != 0x50u ||
@@ -13996,7 +14104,11 @@ uint8_t parse_sound_setting_e882c(void)
         return 0u;
     destination = EF_U32(entry + 5u);
     callback = EF_U32(entry + 14u);
-    if (callback != 0x00082814u && callback != 0x0008289cu)
+    if (callback != 0x00082814u && callback != 0x0008289cu &&
+        callback != 0x000828f8u && callback != 0x000826f0u &&
+        callback != 0x00082c34u)
+        return 0u;
+    if (callback == 0x000828f8u && EF_U32(0x0015bab8u) != 0x000d6960u)
         return 0u;
 
     value_start = key_length;
@@ -14018,10 +14130,23 @@ uint8_t parse_sound_setting_e882c(void)
            (value[value_length - 1u] == ' ' || value[value_length - 1u] == '\t'))
         value_length--;
     value[value_length] = '\0';
-    if (!parse_setting_short_e882c(value, value_length, &pos, &enabled) ||
-        pos >= value_length || value[pos++] != ',' ||
-        !parse_setting_short_e882c(value, value_length, &pos, &volume))
+    if (callback == 0x00082814u || callback == 0x0008289cu) {
+        if (!parse_setting_short_e882c(value, value_length, &pos, &enabled) ||
+            pos >= value_length || value[pos++] != ',' ||
+            !parse_setting_short_e882c(value, value_length, &pos, &volume))
+            return 0u;
+    } else if (callback == 0x000828f8u) {
+        for (i = 0u; i < 11u; i++) {
+            if (!parse_setting_integer_e882c(value, value_length, &pos,
+                                             &joystick[i], i == 10u ? 2u : 4u))
+                return 0u;
+            if (i < 10u && (pos >= value_length || value[pos++] != ','))
+                return 0u;
+        }
+    } else if (!parse_setting_integer_e882c(value, value_length, &pos,
+                                            &scalar, 4u)) {
         return 0u;
+    }
     while (pos < value_length && (value[pos] == ' ' || value[pos] == '\t'))
         pos++;
     if (pos != value_length)
@@ -14037,7 +14162,14 @@ uint8_t parse_sound_setting_e882c(void)
         EF_U8(0x004643b7u + offset) = (uint8_t)value[offset];
     copy_string_9d749(destination, 0x004643b7u);
     EF_U16(0x00464394u) = (uint16_t)value_length;
-    apply_sound_setting_82814_8289c(callback, enabled, volume);
+    if (callback == 0x00082814u || callback == 0x0008289cu)
+        apply_sound_setting_82814_8289c(callback, enabled, volume);
+    else if (callback == 0x000828f8u)
+        apply_joystick_setting_828f8(joystick);
+    else if (callback == 0x000826f0u)
+        apply_speech_setting_826f0(scalar);
+    else
+        apply_vrhelmet_setting_82c34(scalar);
     return 1u;
 }
 
