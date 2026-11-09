@@ -1,0 +1,55 @@
+# SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
+# SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
+# Recovered C modules linked into the bounded Linux standalone startup.
+# Keep ABI trampolines such as guest_callptr1.c and guest_io.c out: the
+# host probe provides guarded replacements and must not invoke DOS code.
+decomp/src/hiscore.c
+decomp/src/runtime_helpers25.c
+decomp/src/math_string.c
+decomp/src/entity_helpers2.c
+decomp/src/game_helpers28.c
+decomp/src/game_helpers120.c
+decomp/src/game_helpers129.c
+decomp/src/runtime_helpers6.c
+decomp/src/game_main.c
+decomp/src/game_helpers75.c
+decomp/src/tactcom_prefix.c
+decomp/src/tiny_helpers2.c
+decomp/src/game_state_helpers.c
+decomp/src/x32_startup.c
+decomp/src/x32_pool.c
+decomp/src/line_of_sight.c
+decomp/src/misc_helpers2.c
+decomp/src/trace_wrappers1.c
+decomp/src/runtime_helpers.c
+decomp/src/state_reset1.c
+decomp/src/game_helpers124.c
+decomp/src/engine_helpers.c
+decomp/src/ascii_stricmp.c
+decomp/src/runtime_helpers19.c
+decomp/src/runtime_helpers17.c
+decomp/src/game_helpers81.c
+decomp/src/engine_helpers3.c
+decomp/src/entity_helpers.c
+decomp/src/game_helpers57.c
+decomp/src/game_helpers30.c
+decomp/src/game_helpers33.c
+decomp/src/game_helpers101.c
+decomp/src/runtime_helpers21.c
+decomp/src/runtime_helpers22.c
+decomp/src/runtime_helpers34.c
+decomp/src/runtime_helpers31.c
+decomp/src/runtime_helpers4.c
+decomp/src/init_tables1.c
+decomp/src/leaf_helpers6.c
+decomp/src/load_planes1.c
+decomp/src/localized_file_handlers.c
+decomp/src/script_helpers1.c
+decomp/src/misc_drafts1.c
+decomp/src/runtime_libc.c
+decomp/src/runtime_helpers32.c
+decomp/src/views_sequences.c
+decomp/src/aid_data.c
+decomp/src/game_helpers13.c
+decomp/src/ui_widget_helpers.c
+decomp/src/leaf_helpers1.c

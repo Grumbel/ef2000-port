@@ -348,11 +348,23 @@
               -Idecomp/include -c "$module" -o "objects/$name.o"
           done
           $AR rcs libef2000-decomp.a objects/*.o
+          # The full archive is an inventory of recovered C, not a safe
+          # standalone link unit: guest_callptr1/guest_io contain Watcom/DOS
+          # dispatchers whose symbols overlap the bounded Linux probe adapters.
+          # Link only the recovered source modules exercised by the host tests.
+          host_objects=""
+          while IFS= read -r module; do
+            test -n "$module" || continue
+            case "$module" in \#*) continue ;; esac
+            name="$(basename "$module" .c)"
+            host_objects="$host_objects objects/$name.o"
+          done < runtime/decomp_host_sources.txt
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
             -fno-strict-aliasing -fwrapv -ffunction-sections -fdata-sections \
             -Idecomp/include -Iruntime decomp/standalone/main.c \
             runtime/decomp_image.c runtime/decomp_startup.c runtime/decomp_files.c \
-            -L. -lef2000-decomp -lcrypto -Wl,--gc-sections -o ef2000-decomp
+            -Wno-error=int-to-pointer-cast -Wno-error=parentheses \
+            $host_objects -lcrypto -Wl,--gc-sections -o ef2000-decomp
           ./ef2000-decomp --self-test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
             -fno-strict-aliasing -fwrapv -Idecomp/include -Iruntime \
@@ -390,6 +402,7 @@
             decomp/src/runtime_helpers32.c decomp/src/views_sequences.c \
             decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \
             decomp/src/tactcom_prefix.c decomp/src/game_main.c \
+            decomp/src/game_helpers75.c \
             decomp/src/ascii_stricmp.c \
             -lcrypto -Wl,--gc-sections -o decomp-startup-test
           ./decomp-startup-test

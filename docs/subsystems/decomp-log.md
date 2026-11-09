@@ -2126,3 +2126,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   sentinel; active hardware input mode 1 cannot enter this continuation.
   Original channel-2 hook, register-level guest differential, Watcom splice,
   exit registration and following resource loads remain unverified.
+- GCC/Linux flake startup-link correction, 2026-11-09: the flake previously
+  linked standalone `runtime/decomp_startup.c` with the full recovered-source
+  `libef2000-decomp.a`. Object extraction pulled `guest_callptr1.o` and
+  `guest_io.o`, whose Watcom/DOS thunk definitions collided with the host
+  probe's guarded versions, producing multiple-definition link errors.
+  `runtime/decomp_host_sources.txt` now records the 50 recovered C modules
+  used by the existing successful GCC standalone test. Both Nix's native
+  executable link and the test consume that same list; the full archive
+  remains available separately for inspection. Nix's direct startup C test
+  also now includes `game_helpers75.c`, required for the channel-mode probe.
+  Local GCC compiled the selected modules as separate objects, linked them
+  with the host adapters, and ran `--self-test` successfully. Nix is absent
+  from this environment, so the actual `nix build .#ef2000-decomp` remains
+  unverified here. Warnings elsewhere in the archive still indicate missing
+  64-bit callback and Watcom-only function-thunk ports; they were not hidden.

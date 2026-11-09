@@ -46,6 +46,15 @@ There is no standalone **playable game** build yet. The flake now produces
 two executable bootstraps from `standalone/main.c` and recovered
 `src/hiscore.c`: `.#ef2000-decomp` (native GCC/Linux) and
 `.#ef2000-decomp-watcom` (OpenWatcom/CauseWay DOS, launched via DOSBox-X).
+The native flake also collects the GCC-compatible recovered modules into
+`libef2000-decomp.a`, an **inventory**, not yet a safely linkable complete
+game. The Linux bootstrap links the specific source modules listed in
+`runtime/decomp_host_sources.txt`; the standalone GCC regression uses the
+same manifest. Linking the entire inventory into the executable would pull
+unported Watcom/DOS adapter objects (`guest_callptr1`, `guest_io`) that define
+the same symbols as the host's guarded probe adapters. Other archived modules
+still warn about 32-bit guest pointers cast to host function pointers and
+Watcom-only call thunks; these are not functional Linux runtime services.
 The Linux package also compiles 342 modules into a GCC archive;
 `game_helpers125.c`, `runtime_helpers23.c`, and `runtime_helpers42.c` still
 contain Watcom-specific or non-portable C. The DOS package retains all OMF
