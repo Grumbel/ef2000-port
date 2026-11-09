@@ -115,8 +115,16 @@ class DecompStandaloneTests(unittest.TestCase):
                 ], capture_output=True, text=True)
                 self.assertEqual(configured.returncode, 0,
                                  configured.stdout + '\n' + configured.stderr)
-                self.assertIn('stopped at unimplemented call 0x000e93dc',
+                self.assertIn('stopped at unimplemented call 0x000e882c',
                               configured.stdout)
+                (Path(directory) / 'EF2000.CFG').write_bytes(
+                    b';ignored\r\n \t\r\n\r\n')
+                blank = subprocess.run([
+                    str(executable), '--image', original,
+                    '--data-dir', directory, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('stopped at unimplemented call 0x00030214',
+                              blank.stdout)
 
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
     def test_guest_memory_and_x32_envelope(self):

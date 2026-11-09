@@ -13749,6 +13749,18 @@ uint8_t hit_map_entry_910f4(uint32_t u0, int32_t x, uint32_t u2, int32_t y, uint
     return 0u;
 }
 
+/* 0xe882c, partial comment-only entry. The original routine initializes
+ * these three scratch globals before recognizing a leading semicolon and
+ * returning AL=1. The assignment parser following that branch is not yet
+ * recovered; its other entries remain an explicit native probe boundary. */
+uint8_t parse_comment_line_e882c(void)
+{
+    EF_U32(0x0046438cu) = 0u;
+    EF_U8(0x004643b7u) = 0u;
+    EF_U16(0x00464394u) = 0u;
+    return 1u;
+}
+
 /* 0xe93dc, 272 bytes. Run the text parser over the script TEXT (EAX, stored at 0x464380; DL goes to byte 0x1600a6): the cursor 0x464384 starts at dword 0x1600a0, the line counter word 0x16007c at 1. Complains through the error hook when the parser mode byte 0x1600a4 is 0 (0x1912c0) or 2 (0x191304). Then loops: skip blanks and tabs, count CR LF pairs as lines, hand every other token to 0xe882c (a zero result makes the whole run fail) and skip the rest of its line. Returns 1 when all tokens parsed. */
 uint8_t parse_script_text_e93dc(ef_addr32 text, uint32_t flag)
 {

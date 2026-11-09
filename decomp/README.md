@@ -93,10 +93,14 @@ DOS gameport returns `0xff` from port `0x201` during `0xd66c2`, as the
 original's no-device branch would. The probe now executes recovered
 `load_text_file_e94ec` for `EF2000.CFG`, using source-recovered `0x9cf2c`,
 `0x9cf74` and `0x9cfa4` language-path callbacks. The host reads uncompressed
-text only, under the same read-only DOS path rules as the earlier size reader;
-compressed files stop at `0xb3c04` pending decompression. If the config is
-present, it is allocated in guest arena RAM and the probe stops at `0xe93dc`
-before parsing; without config it bypasses parsing and stops at `0x30214`.
+  text only, under the same read-only DOS path rules as the earlier size reader;
+  compressed files stop at `0xb3c04` pending decompression. If the config is
+  present, it is allocated in guest arena RAM and processed by recovered
+  `parse_script_text_e93dc`, including line counting and the source-recovered
+  semicolon-only branch of `0xe882c`. The rest of that token parser is still
+  unknown: an assignment line stops at `0xe882c` before its setting writes.
+  A blank/comment-only config runs through the original `0xe9574` arena
+  release and stops at `0x30214`, as does a missing config.
 These are **bounded probes**: they do not implement the general variadic
 logger or connected-joystick input. The memory-shortage
 branch stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and

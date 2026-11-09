@@ -1398,3 +1398,24 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   config it is `0x30214`. Synthetic and SHA-pinned real-image GCC runs
   exercise these paths. The loader remains `compiles-bad` for the hybrid
   pending original-guest differential/parser verification. No graphics yet.
+- GCC/Linux outer configuration parser, 2026-11-09: connected recovered
+  `parse_script_text_e93dc` (original `0xe93dc`, 272 bytes) to the actual
+  game-owned startup path after loading `EF2000.CFG`. Its cursor, line counter,
+  source table, and parser flags remain guest-RAM state. At `0xe882c` the
+  source-recovered comment-only branch clears its three scratch globals and
+  returns success for a semicolon line shorter than the original 0x84-byte
+  line limit. Any real setting assignment still stops at the exact `0xe882c`
+  entry, rather than guessing the missing 2,990-byte table interpreter.
+  Synthetic and SHA-pinned real-image tests now cover this boundary as well
+  as a comment/whitespace-only file: that complete parse reaches recovered
+  `release_buffer_e9574`, resets the arena allocation, and stops at the next
+  unknown `0x30214` (4,119 bytes). No graphics or actual option decoding yet.
+  The original `0xe882c` disassembly identifies a 16-entry settings descriptor
+  table at `0x12b370` with an 18-byte stride: key pointer at +0, type at +4,
+  destination at +5, scalar width at +9 and callback pointer at +14.
+  `FULLSCREEN`, `CONTROL`, `DETAIL`, `MODEL`, `STICK`, `HUDCOL`, `NETMODE`,
+  `REZ`, `JOY_FACTOR` use type 3; the remaining seven keys use type 5 with
+  subhandlers. Type 3 dispatches through the original numeric conversion
+  formatter at `0xe8d7c`, then writes 1, 2 or 4 bytes by +9. This describes
+  the next recovery target; the probe deliberately does not yet perform
+  these assignments without validating numeric conversion/error behavior.

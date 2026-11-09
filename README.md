@@ -170,8 +170,10 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
   options, models a disconnected DOS joystick (`0xd66c2`, port `0x201`) and
   executes recovered `0xe94ec` and the language-aware size/read callbacks
   for `EF2000.CFG`. If configuration data is found, it is copied to guest RAM
-  and the probe stops at `0xe93dc` before the options parser; if absent,
-  the probe stops at the following `0x30214` initialization routine. The
+  and processed by recovered outer parser `0xe93dc`. Assignment lines stop at
+  unknown token handler `0xe882c`; blank and semicolon-comment lines are
+  handled, including arena release. A missing or comment-only configuration
+  reaches the following `0x30214` initialization routine. The
   read-only file adapter handles plain text; JR/RA decompression is pending.
   Host-side diagnostic output uses UTF-8 stderr, not the game's logfile.
   No original x86 instructions run, and neither path renders the first screen.

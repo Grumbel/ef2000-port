@@ -366,9 +366,40 @@ void guest_callptr1_x(ef_addr32 fn, ef_addr32 arg)
 
 uint8_t guest_fn_e93dc_r(uint32_t source, uint32_t flags)
 {
-    (void)source;
-    (void)flags;
-    stop_at_guest_boundary(0x000e93dcu);
+    uint32_t config = EF_U32(0x001600a0u);
+    uint32_t allocated;
+    const char *contents;
+    if (!probing || !main_probe_active || source != 0x0012b370u || flags != 0u ||
+        EF_U8(0x001600a4u) != 1u || config < 4u ||
+        !(allocated = EF_U32(config - 4u)) ||
+        allocated < 0x25u ||
+        !(contents = (const char *)ef_decomp_memory_span(config, allocated - 4u)) ||
+        !memchr(contents, 0, allocated - 4u))
+        fatal_unexpected("TACTCOM text parser input (0xe93dc)");
+    return parse_script_text_e93dc(source, flags);
+}
+
+/* The original token/assignment interpreter at 0xe882c is substantially
+ * larger than the recovered outer parser. Keep the first setting line as an
+ * explicit boundary until its table-driven effects are reconstructed. */
+uint8_t guest_fn_e882c_x(void)
+{
+    uint32_t cur = EF_U32(0x00464384u);
+    const char *text;
+    size_t length = 0;
+    if (!probing || !main_probe_active ||
+        !(text = (const char *)ef_decomp_memory_span(cur, 0x85u)))
+        fatal_unexpected("TACTCOM token parser cursor (0xe882c)");
+    if (text[0] == ';') {
+        /* At 0xe88ef the original directly skips a leading ';' after
+         * its bounded (0x84-byte) line scan, returning success without
+         * interpreting any setting. The larger function stays a boundary. */
+        while (length < 0x84u && text[length] != 0 && text[length] != '\r')
+            length++;
+        if (length < 0x84u)
+            return parse_comment_line_e882c();
+    }
+    stop_at_guest_boundary(0x000e882cu);
     return 0;
 }
 
@@ -516,7 +547,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     main_probe_active = 0;
     probing = 0;
     ef_decomp_files_end();
-    if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe93dcu &&
+    if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x30214u && stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
