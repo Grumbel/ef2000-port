@@ -155,7 +155,7 @@ class DecompStandaloneTests(unittest.TestCase):
 
                 # An invented plain resource verifies the recovered rewind,
                 # stream line/token reader, '#' record, camera selector,
-                # text, scalar, enum and first vector options against the
+                # text, scalar, enum, vector, look-at, clamp and HUD options against the
                 # original image's embedded labels and float constants.
                 views = Path(directory) / 'views' / 'views2.dat'
                 views.parent.mkdir(parents=True)
@@ -165,12 +165,16 @@ class DecompStandaloneTests(unittest.TestCase):
                     b'PosDamping 12.5\r\nAngDamping 80.125\r\n'
                     b'MinAlt 2.25\r\nRollLock BANKING_HORIZON\r\n'
                     b'OffSet 1.25 -2.5 0\r\nRandomOffset 3 0.5 -1.125\r\n'
-                    b'InitialOffSet -1 2.5 3.125\r\nEND\r\n')
+                    b'InitialOffSet -1 2.5 3.125\r\n'
+                    b'LookAtObj SOURCE\r\nLookAt 1.25 -2.5 0.5\r\n'
+                    b'Dist 0.25 1.5 10 2\r\n'
+                    b'XClamp 1.5 -2.25\r\nYClamp 0.5 3.25\r\n'
+                    b'HUDCenter -17.9\r\nHUDHeight 240.9\r\nEND\r\n')
                 plain = subprocess.run([
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x00030aaf',
+                self.assertIn('stopped at unimplemented call 0x00030f59',
                               plain.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([

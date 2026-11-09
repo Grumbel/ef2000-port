@@ -72,6 +72,23 @@ static void setup_views_probe(void)
            "RandomOffset", sizeof("RandomOffset"));
     memcpy(ef_decomp_memory_span(0x001828b4u, sizeof("InitialOffSet")),
            "InitialOffSet", sizeof("InitialOffSet"));
+    memcpy(ef_decomp_memory_span(0x001828c4u, sizeof("LookAtObj")),
+           "LookAtObj", sizeof("LookAtObj"));
+    memcpy(ef_decomp_memory_span(0x001828d0u, sizeof("SOURCE")),
+           "SOURCE", sizeof("SOURCE"));
+    memcpy(ef_decomp_memory_span(0x001828d8u, sizeof("LookAt")),
+           "LookAt", sizeof("LookAt"));
+    memcpy(ef_decomp_memory_span(0x001828e0u, sizeof("Dist")),
+           "Dist", sizeof("Dist"));
+    memcpy(ef_decomp_memory_span(0x001828e8u, sizeof("XClamp")),
+           "XClamp", sizeof("XClamp"));
+    memcpy(ef_decomp_memory_span(0x001828f0u, sizeof("YClamp")),
+           "YClamp", sizeof("YClamp"));
+    memcpy(ef_decomp_memory_span(0x001828f8u, sizeof("HUDCenter")),
+           "HUDCenter", sizeof("HUDCenter"));
+    memcpy(ef_decomp_memory_span(0x00182904u, sizeof("HUDHeight")),
+           "HUDHeight", sizeof("HUDHeight"));
+    EF_U32(0x00182a05u) = 0x43360000u; /* original float 182 */
     EF_U32(0x00182a09u) = 0x42000000u; /* original float 32 */
     EF_U32(0x00182a0du) = 0x42c80000u; /* original float 100 */
     memcpy(ef_decomp_memory_span(0x00182794u, sizeof("BG\\views\\views2.dat")),
@@ -534,7 +551,7 @@ int main(void)
             stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x30aafu);
+            assert(stop == 0x30f59u);
             assert(EF_U32(0x001371a4u) == 1u);
             assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) == 100u);
             {
@@ -614,7 +631,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                             reason, sizeof(reason)) == 0);
-                assert(stop == 0x30aafu);
+                assert(stop == 0x30f59u);
                 stream = probe.base + probe.size;
                 assert(strcmp(ef_decomp_memory_span(stream, 4u), "END") == 0);
                 assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 4u),
@@ -667,7 +684,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x30aafu);
+                    assert(stop == 0x30f59u);
                     stream = probe.base + probe.size;
                     assert(strcmp(ef_decomp_memory_span(0x0019cbb0u, 5u),
                                   "Test") == 0);
@@ -715,7 +732,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x30aafu);
+                assert(stop == 0x30f59u);
                 assert(EF_U8(0x0019cbb0u + 0x3du) == 1u);
                 assert(EF_U8(0x0019cbb0u + 0x3cu) == 0u);
                 ef_decomp_memory_release();
@@ -753,7 +770,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x30aafu);
+                    assert(stop == 0x30f59u);
                     assert(EF_U8(0x0019cbb0u + 0x3eu) == cases[i].pos);
                     assert(EF_U8(0x0019cbb0u + 0x3fu) == cases[i].ang);
                     assert(EF_S32(0x0019cbb0u + 0x4fu) == cases[i].altitude);
@@ -786,7 +803,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x30aafu);
+                    assert(stop == 0x30f59u);
                     assert(EF_U8(0x0019cbb0u + 0x53u) == rolls[i].expected);
                     ef_decomp_memory_release();
                 }
@@ -811,7 +828,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x30aafu);
+                assert(stop == 0x30f59u);
                 assert(EF_S32(0x0019cbb0u + 0x60u) == 40);
                 assert(EF_S32(0x0019cbb0u + 0x64u) == -80);
                 assert(EF_S32(0x0019cbb0u + 0x68u) == 0);
@@ -822,6 +839,74 @@ int main(void)
                 assert(EF_S32(0x0019cbb0u + 0x70u) == 80);
                 assert(EF_S32(0x0019cbb0u + 0x74u) == 100);
                 assert(EF_U32(0x0019cbb0u + 0x78u) == 3u);
+                ef_decomp_memory_release();
+            }
+
+            /* LookAtObj is a two-state selector: only SOURCE writes 0,
+             * including case-folded spelling; anything else writes 1.
+             * LookAt and Dist scale 3 and 4 values by 32 respectively,
+             * preserving only their low signed-word representation. */
+            {
+                const struct { const char *look_obj; uint8_t expected; } modes[] = {
+                    {"source", 0u}, {"RESOURCE", 1u}, {"EXTERNAL", 1u},
+                };
+                size_t i;
+                for (i = 0; i < sizeof(modes) / sizeof(modes[0]); ++i) {
+                    char config[180];
+                    int written = snprintf(config, sizeof(config),
+                                           "# x\nMODE REL_CAM\nLookAtObj %s\n"
+                                           "LookAt 1.25 -2.5 0.5\n"
+                                           "Dist 0.25 1.5 10 2\nEND\n",
+                                           modes[i].look_obj);
+                    assert(written > 0 && written < (int)sizeof(config));
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(config, 1, (size_t)written, file) ==
+                           (size_t)written);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x30f59u);
+                    assert(EF_U8(0x0019cbb0u + 0x7cu) == modes[i].expected);
+                    assert(EF_S16(0x0019cbb0u + 0x7du) == 40);
+                    assert(EF_S16(0x0019cbb0u + 0x7fu) == -80);
+                    assert(EF_S16(0x0019cbb0u + 0x81u) == 16);
+                    assert(EF_S16(0x0019cbb0u + 0x87u) == 8);
+                    assert(EF_S16(0x0019cbb0u + 0x89u) == 48);
+                    assert(EF_S16(0x0019cbb0u + 0x8bu) == 320);
+                    assert(EF_S16(0x0019cbb0u + 0x8du) == 64);
+                    ef_decomp_memory_release();
+                }
+            }
+
+            /* XClamp and YClamp each set an enable word and store two
+             * coordinates scaled by the original 182.0f. HUDCenter and
+             * HUDHeight store unscaled, truncated signed words. */
+            {
+                const char config[] =
+                    "# x\nMODE REL_CAM\n"
+                    "xclamp 1.5 -2.25\nYClamp 0.5 3.25\n"
+                    "HUDCenter -17.9\nHUDHeight 240.9\nEND\n";
+                file = fopen(views_path, "wb");
+                assert(file && fwrite(config, 1, sizeof(config) - 1u, file) ==
+                       sizeof(config) - 1u);
+                assert(fclose(file) == 0);
+                assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                setup_views_probe();
+                stop = 0;
+                assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                            &stop, reason, sizeof(reason)) == 0);
+                assert(stop == 0x30f59u);
+                assert(EF_U16(0x0019cbb0u + 0x8fu) == 1u);
+                assert(EF_S16(0x0019cbb0u + 0x91u) == 273);
+                assert(EF_S16(0x0019cbb0u + 0x93u) == -409);
+                assert(EF_U16(0x0019cbb0u + 0x95u) == 1u);
+                assert(EF_S16(0x0019cbb0u + 0x97u) == 91);
+                assert(EF_S16(0x0019cbb0u + 0x99u) == 591);
+                assert(EF_S16(0x0019cbb0u + 0x9cu) == -17);
+                assert(EF_S16(0x0019cbb0u + 0x9eu) == 240);
                 ef_decomp_memory_release();
             }
 

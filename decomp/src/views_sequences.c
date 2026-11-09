@@ -155,8 +155,47 @@ static void read_view_vector_307f2(ef_addr32 stream, ef_addr32 rec,
         EF_U32(rec + 0x78u) += 3u;
 }
 
-/* 0x304fc..0x30aaf: Each recognized option returns to the original
- * 0x304fc physical-line loop. The next unsupported option is LookAtObj. */
+/* 0x30b0f..0x30d55: LookAt and Dist use the same 0x9d55d decimal reader,
+ * floating-point scale by the image's 32.0 constant and 0x9d72c truncation
+ * as the previous vectors, but keep only the low 16 bits of each result.
+ * LookAt writes three words at +0x7d; Dist writes four at +0x87. */
+static void read_view_word_vector_30b0f(ef_addr32 stream, ef_addr32 rec,
+                                       uint32_t field, uint32_t count,
+                                       ef_addr32 scale_address)
+{
+    float scale = *(const float *)ef_guest_memory_ptr(scale_address);
+    uint32_t i;
+    for (i = 0; i < count; ++i) {
+        double value;
+        read_next_token_9d278(stream);
+        value = guest_tactcom_view_decimal_9d55d(stream);
+        EF_U16(rec + field + 2u * i) =
+            (uint16_t)view_fistp_305e1((long double)value * (long double)scale);
+    }
+}
+
+/* 0x30d55..0x30ead: each clamp enables its word flag and reads two
+ * coordinates scaled by the original 182.0 float at 0x182a05. */
+static void read_view_clamp_30d55(ef_addr32 stream, ef_addr32 rec,
+                                  uint32_t field)
+{
+    EF_U16(rec + field) = 1u;
+    read_view_word_vector_30b0f(stream, rec, field + 2u, 2u, 0x00182a05u);
+}
+
+/* 0x30ead..0x30f59: HUDCenter and HUDHeight use the original decimal
+ * converter and truncation, but no extra floating-point scale. */
+static void read_view_hud_word_30ead(ef_addr32 stream, ef_addr32 rec,
+                                    uint32_t field)
+{
+    double value;
+    read_next_token_9d278(stream);
+    value = guest_tactcom_view_decimal_9d55d(stream);
+    EF_U16(rec + field) = (uint16_t)view_fistp_305e1((long double)value);
+}
+
+/* 0x304fc..0x30f59: Each recognized option returns to the original
+ * 0x304fc physical-line loop. The next unsupported option is AInsts. */
 static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
 {
     for (;;) {
@@ -188,19 +227,35 @@ static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
             read_view_vector_307f2(stream, rec, 0x54u, 0u);
         } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828b4u) == 0) {
             read_view_vector_307f2(stream, rec, 0x6cu, 1u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828c4u) == 0) {
+            read_next_token_9d278(stream);
+            EF_U8(rec + 0x7cu) =
+                ascii_stricmp_9d524(stream + 0x400u, 0x001828d0u) == 0 ? 0u : 1u;
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828d8u) == 0) {
+            read_view_word_vector_30b0f(stream, rec, 0x7du, 3u, 0x00182a09u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828e0u) == 0) {
+            read_view_word_vector_30b0f(stream, rec, 0x87u, 4u, 0x00182a09u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828e8u) == 0) {
+            read_view_clamp_30d55(stream, rec, 0x8fu);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828f0u) == 0) {
+            read_view_clamp_30d55(stream, rec, 0x95u);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x001828f8u) == 0) {
+            read_view_hud_word_30ead(stream, rec, 0x9cu);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182904u) == 0) {
+            read_view_hud_word_30ead(stream, rec, 0x9eu);
         } else {
-            guest_tactcom_view_lookat_boundary_30aaf(stream);
+            guest_tactcom_view_instruments_boundary_30f59(stream);
         }
     }
 }
 
-/* 0x30214..0x30aaf: Bounded ReadGenSeqs() prefix. The original opens the
+/* 0x30214..0x30f59: Bounded ReadGenSeqs() prefix. The original opens the
  * constructed BG\\views\\views2.dat path at 0x9ccb8, reports a missing file
  * through the two-argument fatal callback at 0x132a74, or passes a successful
  * resource handle to the recovered 0x9d114 stream constructor. Its recovered
  * line/token helpers identify a '#' record start; this prefix initializes
  * that record, copies its bounded name, decodes its camera mode and handles
- * text, scalar and first vector options before stopping at LookAtObj. */
+ * text, scalar, vector, look-at, clamp and HUD options before AInsts. */
 void read_gen_sequences_prefix_30214(ef_addr32 frame)
 {
     uint32_t handle;

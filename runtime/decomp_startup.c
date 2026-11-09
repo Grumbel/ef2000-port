@@ -605,10 +605,10 @@ double guest_tactcom_view_decimal_9d55d(ef_addr32 stream)
     return value;
 }
 
-void guest_tactcom_view_lookat_boundary_30aaf(ef_addr32 stream)
+void guest_tactcom_view_instruments_boundary_30f59(ef_addr32 stream)
 {
     check_view_parser_context(stream);
-    stop_at_guest_boundary(0x00030aafu);
+    stop_at_guest_boundary(0x00030f59u);
 }
 
 void guest_tactcom_view_nonrecord_boundary_31201(ef_addr32 stream)
@@ -790,7 +790,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x9ccb8u && stopped != 0x9cd53u &&
         stopped != 0x30407u && stopped != 0x3053du && stopped != 0x30577u &&
-        stopped != 0x30aafu && stopped != 0x9d55du && stopped != 0x31201u &&
+        stopped != 0x30f59u && stopped != 0x9d55du && stopped != 0x31201u &&
         stopped != 0x3120bu && stopped != 0xebb58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&

@@ -1580,3 +1580,24 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `LookAtObj`; later options, packed/archive resources, following records,
   guest-state differential and Watcom splice remain pending. The whole
   `ReadGenSeqs` remains `named`, not `compiles`.
+- GCC/Linux Views look-at, clamp and HUD options, 2026-11-09: followed
+  original `ReadGenSeqs()` disassembly from `0x30aaf` through `0x30f58`,
+  extending the first-record line-option dispatch. `LookAtObj` compares its
+  argument to the embedded string **`SOURCE`** at `0x1828d0` (a substring of
+  stored `RESOURCE`) and stores record +0x7c as zero for SOURCE, one for any
+  other value. `LookAt` reads three 16-bit components at +0x7d/+0x7f/+0x81;
+  `Dist` reads four at +0x87/+0x89/+0x8b/+0x8d. Each value uses the original
+  guest-image float 32 and integer truncation, retaining the low word.
+  `XClamp` enables word +0x8f and reads two 182-scaled signed words at
+  +0x91/+0x93; `YClamp` enables +0x95 and reads two at +0x97/+0x99.
+  `HUDCenter` and `HUDHeight` read unscaled truncated words at +0x9c/+0x9e.
+  The 182.0f scale at `0x182a05`, 32.0f at `0x182a09`, embedded option
+  labels and record offsets all come from the SHA-pinned original image.
+  Synthetic GCC cases cover selector case-folding, nonmatching selectors,
+  16-bit signed values, both clamp flags, x87-like truncation and case-folded
+  option names. The opt-in GCC probe runs an invented text resource with
+  the real original image; no proprietary resource is committed. The next
+  explicit boundary is `AInsts` at `0x30f59`. The source guest decimal
+  converter `0x9d55d`, later options, repeat records, archive/packed
+  resources, guest-state differential and Watcom splice remain unimplemented;
+  do not promote `ReadGenSeqs()` beyond `named`.
