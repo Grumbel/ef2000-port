@@ -12,11 +12,11 @@ int32_t ascii_stricmp_9d524(ef_addr32 left, ef_addr32 right);
 uint32_t candidate_game_main(uint32_t argc, ef_addr32 argv);
 void guest_fn_8b2d8(void); /* 0x8b2d8: unresolved playvideo reset path */
 void guest_fn_8b39c(void); /* 0x8b39c: unresolved TACTCOM init */
-void tactcom_prefix_8b39c(ef_addr32 frame); /* 0x8b39c..0x8b459 only */
+void tactcom_prefix_8b39c(ef_addr32 frame); /* bounded 0x8b39c..0x8b477 */
 void guest_tactcom_low_memory_8b417(ef_addr32 required, ef_addr32 missing);
 uint32_t guest_tactcom_file_probe_8b45a(ef_addr32 path);
 void guest_tactcom_missing_resource_8b464(ef_addr32 message);
-void guest_tactcom_options_boundary_8b472(void);
+void guest_tactcom_post_options_boundary_8b477(void);
 void guest_fn_ea470(uint32_t mode); /* 0xea470: unresolved in main path */
 void guest_fn_ea270(ef_addr32 descriptor); /* 0xea270: clump loader */
 uint32_t guest_fn_aaee8(uint32_t argc, ef_addr32 argv); /* 0xaaee8 */

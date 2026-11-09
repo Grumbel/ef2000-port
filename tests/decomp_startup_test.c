@@ -124,6 +124,11 @@ int main(void)
         memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
         memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
         memcpy(ef_decomp_memory_span(0x0018d52cu, 3), "rb", 3);
+        memcpy(ef_decomp_memory_span(0x3400u, 7), "german", 7);
+        EF_U32(0x0012ddb0u) = 0x3400u;
+        EF_U8(0x0012ddb4u) = 0x5au;
+        EF_U8(0x0018b1b4u) = '\\';
+        memset(ef_decomp_memory_span(0x0015ba2cu, 4), 0xa5, 4);
         EF_U32(0x00160a18u) = 0x1800u;
         EF_U32(0x00132ab4u) = 0x0009cb20u;
         EF_U32(0x1800u) = 0x1900u;
@@ -131,8 +136,14 @@ int main(void)
             uint32_t stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x82cecu);
+            assert(stop == 0xe94ecu);
             assert(EF_U32(0x001371a4u) == 0);
+            assert(EF_U32(0x00132ab4u) == 0x0009cf74u);
+            assert(EF_U32(0x00132ab8u) == 0x0009cfa4u);
+            assert(strcmp(ef_decomp_memory_span(0x0040d150u, 16),
+                          "\\german") == 0);
+            assert(EF_U8(0x001371efu) == 0x5au);
+            assert(EF_U32(0x0015ba2cu) == 0);
         }
         ef_decomp_memory_release();
         assert(remove(filename) == 0);
@@ -141,6 +152,7 @@ int main(void)
         EF_U32(0x001264d4u) = 0x400u;
         memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
         memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
+        memcpy(ef_decomp_memory_span(0x00132884u, 13), "Missing data", 13);
         memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
         memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
         memcpy(ef_decomp_memory_span(0x0018d52cu, 3), "rb", 3);
@@ -151,8 +163,13 @@ int main(void)
             uint32_t stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0xea50cu);
+            assert(stop == 0xeb25au);
             assert(EF_U32(0x001371a4u) == 0);
+            assert(EF_U8(0x00160638u) == 1);
+            assert(EF_U8(0x0017d404u) == 1);
+            assert(EF_U32(0x00160a24u) != 0);
+            assert(strcmp(ef_decomp_memory_span(EF_U32(0x00160a24u), 16),
+                          "Missing data") == 0);
         }
         ef_decomp_memory_release();
         assert(rmdir(game_dir) == 0);

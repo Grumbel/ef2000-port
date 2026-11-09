@@ -41,6 +41,9 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/game_helpers57.c'),
                 str(ROOT / 'decomp/src/runtime_helpers22.c'),
                 str(ROOT / 'decomp/src/runtime_helpers34.c'),
+                str(ROOT / 'decomp/src/runtime_helpers4.c'),
+                str(ROOT / 'decomp/src/init_tables1.c'),
+                str(ROOT / 'decomp/src/leaf_helpers6.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
@@ -87,7 +90,10 @@ class DecompStandaloneTests(unittest.TestCase):
                               real.stdout)
                 self.assertIn('TACTCOM first resource payload size:', real.stdout)
                 self.assertRegex(real.stdout,
-                                 r'stopped at unimplemented call 0x(?:000ea50c|00082cec)')
+                                 r'stopped at unimplemented call 0x(?:000eb25a|000e94ec)')
+                if 'stopped at unimplemented call 0x000eb25a' in real.stdout:
+                    self.assertIn('Datenset nicht gefunden.', real.stderr)
+                    self.assertIn('Prüfen Sie', real.stderr)
                 check_file = Path(directory) / 'check.cd'
                 check_file.write_bytes(b'RA\x00\x00\x07\x00\x00\x00')
                 present = subprocess.run([
@@ -96,8 +102,9 @@ class DecompStandaloneTests(unittest.TestCase):
                 ], capture_output=True, text=True, check=True)
                 self.assertIn('TACTCOM first resource payload size: 7 bytes',
                               present.stdout)
-                self.assertIn('stopped at unimplemented call 0x00082cec',
+                self.assertIn('stopped at unimplemented call 0x000e94ec',
                               present.stdout)
+                self.assertFalse((Path(directory) / 'TACTCOM.$$$').exists())
 
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
     def test_guest_memory_and_x32_envelope(self):
@@ -140,6 +147,9 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/game_helpers57.c'),
                 str(ROOT / 'decomp/src/runtime_helpers22.c'),
                 str(ROOT / 'decomp/src/runtime_helpers34.c'),
+                str(ROOT / 'decomp/src/runtime_helpers4.c'),
+                str(ROOT / 'decomp/src/init_tables1.c'),
+                str(ROOT / 'decomp/src/leaf_helpers6.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),

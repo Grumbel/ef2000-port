@@ -83,11 +83,18 @@ default the original executable's directory or the explicit `--data-dir DIR`.
 The reader recognizes JR and RA header lengths and falls back to seeking to
 the actual file end. The original file-open/read/seek/close paths are bound
 to five host-owned handles; no data is written or added to the repository.
-For the supplied original executable without a `check.cd`, the normal branch
-stops at the unimplemented `0xea50c` missing-resource diagnostic; with a
-synthetic `check.cd` it reaches the subsequent `0x82cec` options call. The
-memory-shortage branch stops at `0x8b417`. The remainder of the 402-byte
-TACTCOM entry and actual first-screen services are **not yet linked**. The alternate `playvideo`
+For the SHA-pinned original executable without a `check.cd`, the normal branch
+now copies the `0xea50c` missing-resource message, emits it to host stderr as
+UTF-8 (instead of writing the original log file), executes the recovered
+`0xeb448` dispatcher, and stops before the `0xeb25a` page switch. With a
+synthetic `check.cd` it executes recovered `0x82cec` options initialization,
+including the language handler/path selection. A synthetic disconnected
+DOS gameport returns `0xff` from port `0x201` during `0xd66c2`, as the
+original's no-device branch would, and the probe stops before the `0xe94ec`
+text/GUI file loader. These are **bounded probes**: they do not
+implement the general variadic logger or connected-joystick input. The memory-shortage
+branch stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and
+actual first-screen services are **not yet linked**. The alternate `playvideo`
 branch is exercised with synthetic guest argv. This is neither a native
 reproduction of the real DOS memory report nor Watcom/guest replay verified.
 

@@ -1361,3 +1361,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   DOS paths, blocked `..` paths, both TACTCOM branches and file-slot cleanup;
   opt-in testing against the SHA-pinned original executable also passes.
   Reached farther into the normal game-owned startup; no screen rendered yet.
+- GCC/Linux missing-CD diagnostics and partial options, 2026-11-09: advanced
+  the bounded TACTCOM prefix through the `0x8b472` options call. The missing
+  `check.cd` path handles this specific no-argument `0xea50c` format using
+  recovered `copy_string_9d749` and `enter_handler_eb448`, preserves the guest
+  nesting/message globals (`0x160638`, `0x17d404`, `0x160a24`), converts DOS
+  CP437 to UTF-8 for a read-only Linux stderr diagnostic, and stops at the
+  unimplemented `0xeb25a` page switch. The presence path runs recovered
+  `apply_options_82cec`, `select_handlers_9cfdc`, `strcat_9ca57` and
+  `run_steps_d6694`. Synthetic tests confirm the `german` language handler
+  callbacks, constructed language subdirectory and copied option flag. This
+  branch uses a detached-gameport probe adapter for `0xd66c2`: repeated DOS
+  `IN AL,DX` samples on port `0x201` would all return `0xff`, clear the four
+  button latches and return zero after the original's 20-pass stability loop.
+  The next stop is `0xe94ec`, the still-unrecovered GUI/text file loader;
+  other later unimplemented options calls are also explicit stop boundaries.
+  The probe does not implement the full variadic `0xea50c` formatter, guest
+  log-file writing, `0xeb25a` screen switch or connected-joystick I/O. Synthetic and
+  opt-in SHA-pinned real-executable GCC tests pass; no first screen yet.

@@ -369,6 +369,8 @@
             decomp/src/entity_helpers.c \
             decomp/src/game_helpers57.c decomp/src/runtime_helpers22.c \
             decomp/src/runtime_helpers34.c \
+            decomp/src/runtime_helpers4.c decomp/src/init_tables1.c \
+            decomp/src/leaf_helpers6.c \
             decomp/src/misc_drafts1.c \
             decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \
             decomp/src/tactcom_prefix.c decomp/src/game_main.c \

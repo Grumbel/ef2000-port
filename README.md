@@ -164,25 +164,30 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
   and cleanup-registration bindings. `--probe-main` instead enters the
   recovered game `main` at `0x8b274`, the partial TACTCOM initializer at
   `0x8b39c`, and the recovered `0xb3b90` file-header size lookup using a
-  read-only Linux directory adapter. It currently stops before missing-file
-  logging (`0xea50c`) or options initialization (`0x82cec`), without running
-  original x86 instructions or rendering the first screen.
+  read-only Linux directory adapter. If `check.cd` is absent, it copies the
+  missing-file diagnostic and calls the recovered message dispatcher, stopping
+  at the `0xeb25a` page switch. If present, it enters recovered `0x82cec`
+  options, models a disconnected DOS joystick (`0xd66c2`, port `0x201`) and
+  stops before the `0xe94ec` GUI/text file loader.
+  Host-side diagnostic output uses UTF-8 stderr, not the game's logfile.
+  No original x86 instructions run, and neither path renders the first screen.
 - `packages.ef2000-decomp-watcom` compiles all recovered C modules to
   OpenWatcom OMF and links a 32-bit DOS/CauseWay `EFDECOMP.EXE` from the
   recovered high-score module. `nix run .#ef2000-decomp-watcom` starts that
   executable inside DOSBox-X.
 
 **These are executable bootstrap programs, not yet playable games.** Both
-actually invoke recovered C (`hiscore_qualifies`), but the game's original
-entry sequence is only recovered through the arena setup; TACTCOM, the
-global-data definitions and hardware platform layer remain incomplete.
+invoke recovered C (`hiscore_qualifies`), while the GCC probe additionally
+enters bounded sections of main, TACTCOM, the first disk-file reader,
+diagnostic dispatch and options. The rest of TACTCOM, global-data definitions
+and hardware platform layer remain incomplete.
 The GCC archive and Watcom objects are incremental build
 inputs; their unresolved references prevent linking the complete game today.
 On Linux, asset-free tests additionally execute recovered stream-reading and
 8x6 glyph-drawing functions against synthetic guest RAM, and exercise that
-first arena initialization and reset with synthetic input. The ordinary
-`--image` path **loads but does not run the game**; the two optional probes
-execute only recovered startup code, not the game's main control path.
+  first arena initialization and reset with synthetic input. The ordinary
+  `--image` path **loads but does not run the game**; the two optional probes
+  execute recovered startup fragments, not the complete game control path.
 Several compiled C routines still cast 32-bit
 guest callback offsets to host function pointers, so those paths require a
 native callback binding layer before they are safe to call.

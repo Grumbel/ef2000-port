@@ -11,6 +11,7 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
+#include <iconv.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,15 +27,43 @@ static jmp_buf main_boundary;
 static uint32_t main_boundary_address;
 static int main_probe_active;
 
-/* The native probe uses a private guest stack-shaped scratch frame, not an
+/* The native probe uses private guest stack-shaped scratch frames, not an
  * emulated Watcom stack.  Keep it below native64's documented 0x3fff000
  * initial guest ESP, outside the loaded image, BSS and startup arena. */
-enum { TACTCOM_PROBE_FRAME = EF_DECOMP_RAM_SIZE - 0x2000u };
+enum { TACTCOM_PROBE_FRAME = EF_DECOMP_RAM_SIZE - 0x2000u,
+       TACTCOM_LOG_FRAME = TACTCOM_PROBE_FRAME + 0x200u };
 
 static void fatal_unexpected(const char *service)
 {
     fprintf(stderr, "ef2000-decomp: unexpected startup service: %s\n", service);
     abort();
+}
+
+/* Original game strings are DOS CP437; diagnostics on Linux are UTF-8.
+ * Only the host output is converted; guest RAM retains the original bytes. */
+static void report_dos_message(const char *message)
+{
+    iconv_t converter = iconv_open("UTF-8", "CP437");
+    char utf8[1024];
+    char *src = (char *)message;
+    char *dst = utf8;
+    size_t from = strlen(message);
+    size_t to = sizeof(utf8) - 1;
+    if (converter != (iconv_t)-1) {
+        if (iconv(converter, &src, &from, &dst, &to) != (size_t)-1) {
+            *dst = 0;
+            fprintf(stderr, "TACTCOM diagnostic: %s\n", utf8);
+            iconv_close(converter);
+            return;
+        }
+        iconv_close(converter);
+    }
+    fputs("TACTCOM diagnostic: ", stderr);
+    while (*message) {
+        unsigned char c = (unsigned char)*message++;
+        fputc(c < 0x80 ? c : '?', stderr);
+    }
+    fputc('\n', stderr);
 }
 
 void guest_fatal_arg(ef_addr32 format, uint32_t value)
@@ -189,14 +218,98 @@ uint32_t guest_tactcom_file_probe_8b45a(ef_addr32 path)
 
 void guest_tactcom_missing_resource_8b464(ef_addr32 message)
 {
+    const char *format;
+    const char *end;
     if (message != 0x00132884u || EF_U32(0x00132a74u) != 0x000ea50cu)
         fatal_unexpected("unexpected TACTCOM missing-resource diagnostic");
-    stop_at_guest_boundary(0x000ea50cu);
+
+    /* Original 0xea50c is a variadic formatter backed by Watcom's 32-bit
+     * stack. This one call has no variadic arguments; copy the literal into
+     * guest RAM and route its would-be file log to stderr (read-only host).
+     * Preserve the original reentry latch and 0xeb448 message dispatcher. */
+    format = (const char *)ef_decomp_memory_span(message, 256u);
+    if (!probing || !main_probe_active || !format ||
+        !(end = memchr(format, 0, 256u)) ||
+        memchr(format, '%', (size_t)(end - format)) ||
+        !ef_decomp_memory_span(TACTCOM_LOG_FRAME, 256u))
+        fatal_unexpected("unsupported TACTCOM log format (0xea50c)");
+    EF_U8(0x00160638u)++;
+    if ((int8_t)EF_U8(0x00160638u) != 1)
+        return;
+    (void)copy_string_9d749(TACTCOM_LOG_FRAME, message);
+    report_dos_message((const char *)ef_decomp_memory_span(TACTCOM_LOG_FRAME, 256u));
+    enter_handler_eb448(TACTCOM_LOG_FRAME);
 }
 
-void guest_tactcom_options_boundary_8b472(void)
+void guest_fn_eb25a(uint32_t page)
 {
-    stop_at_guest_boundary(0x00082cecu);
+    if (!probing || !main_probe_active || page != UINT32_MAX ||
+        EF_U32(0x00160a24u) != TACTCOM_LOG_FRAME)
+        fatal_unexpected("TACTCOM diagnostic page switch (0xeb25a)");
+    stop_at_guest_boundary(0x000eb25au);
+}
+
+void guest_fn_9cfdc_w(uint32_t name)
+{
+    if (!probing || !main_probe_active)
+        fatal_unexpected("options handler selection outside main probe");
+    select_handlers_9cfdc(name);
+}
+
+void guest_fn_9ca57(ef_addr32 dst, ef_addr32 src)
+{
+    if (!probing || !main_probe_active || dst != 0x0040d150u ||
+        (src != 0x0018b1b4u && src != EF_U32(0x0012ddb0u)))
+        fatal_unexpected("options path concatenation (0x9ca57)");
+    (void)strcat_9ca57(dst, src);
+}
+
+uint32_t guest_fn_d6694(void)
+{
+    if (!probing || !main_probe_active)
+        fatal_unexpected("options input sampling outside main probe");
+    return run_steps_d6694();
+}
+
+uint32_t guest_fn_d66c2_x(void)
+{
+    /* Deterministic disconnected-gameport model for the Linux probe. The
+     * original 0xd66c2 first samples port 0x201 with IN AL,DX; 0xff clears
+     * the four active-low button latches. Its subsequent stability loop
+     * samples 0xff twenty times and returns zero (no analog sample).
+     * Attached controllers and pulse-timing are not modeled here. */
+    if (!probing || !main_probe_active)
+        fatal_unexpected("joystick sample outside main probe");
+    EF_U8(0x0015ba2cu) = 0;
+    EF_U8(0x0015ba2du) = 0;
+    EF_U8(0x0015ba2eu) = 0;
+    EF_U8(0x0015ba2fu) = 0;
+    return 0;
+}
+
+uint32_t guest_fn_e94ec(ef_addr32 path, uint32_t flags)
+{
+    (void)path;
+    (void)flags;
+    stop_at_guest_boundary(0x000e94ecu);
+    return 0;
+}
+
+uint8_t guest_fn_e93dc_r(uint32_t source, uint32_t flags)
+{
+    (void)source;
+    (void)flags;
+    stop_at_guest_boundary(0x000e93dcu);
+    return 0;
+}
+
+void guest_fn_30214_w(void) { stop_at_guest_boundary(0x00030214u); }
+void guest_fn_2ff44_w(void) { stop_at_guest_boundary(0x0002ff44u); }
+void guest_fn_f80_w(void) { stop_at_guest_boundary(0x00000f80u); }
+
+void guest_tactcom_post_options_boundary_8b477(void)
+{
+    stop_at_guest_boundary(0x000cd4d4u);
 }
 
 uint32_t guest_fn_eb9f8(uint32_t file, uint32_t archive)
@@ -328,7 +441,8 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     main_probe_active = 0;
     probing = 0;
     ef_decomp_files_end();
-    if (stopped != 0xb3b90u && stopped != 0xea50cu && stopped != 0x82cecu &&
+    if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe94ecu &&
+        stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");
