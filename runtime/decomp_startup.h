@@ -26,9 +26,10 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * is supplied) its recovered 0xb3b90 file reader. A missing file enters
  * its read-only logger adapter and stops at the 0xeb25a page switch; a
  * found file enters recovered 0x82cec options, samples a synthetic detached
- * joystick (0xd66c2) and stops before the 0xe94ec text loader. Without a
- * directory the legacy boundary remains at
- * 0xb3b90. Low memory stops
+ * joystick (0xd66c2), and executes the 0xe94ec text loader. A found config
+ * stops before parser 0xe93dc; missing config stops at 0x30214. The host
+ * supports read-only plain text only. Without a directory the legacy
+ * boundary remains at 0xb3b90. Low memory stops
  * at 0x8b417, and playvideo at 0x8b2d8.
  * Never executes any original x86 or the full game main loop. */
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,

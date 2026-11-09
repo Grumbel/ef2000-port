@@ -91,6 +91,7 @@ int main(void)
         memcpy(ef_decomp_memory_span(0x3000u, 18), "c:\\games\\File.Dat", 18);
         assert(ef_decomp_files_begin(dirname) == 0);
         assert(read_file_payload_size_b3b90(0x3000u) == 23u);
+        assert(ef_decomp_files_read_plain(0x3000u, 0x4100u, 8u) == -1);
         assert(EF_U32(0x001371a4u) == 0);
         header[0] = 'R'; header[1] = 'A';
         file = fopen(filename, "wb");
@@ -108,6 +109,8 @@ int main(void)
         assert(file && fwrite(header, 1, sizeof(header), file) == sizeof(header));
         assert(fclose(file) == 0);
         assert(read_file_payload_size_b3b90(0x3000u) == 8u);
+        assert(ef_decomp_files_read_plain(0x3000u, 0x4100u, 8u) == 1);
+        assert(memcmp(ef_decomp_memory_span(0x4100u, 8), header, 8) == 0);
         memcpy(ef_decomp_memory_span(0x3000u, 9), "..\\escape", 9);
         assert(read_file_payload_size_b3b90(0x3000u) == 0u);
         memcpy(ef_decomp_memory_span(0x3000u, 8), "NOTHERE", 8);
@@ -115,8 +118,34 @@ int main(void)
         ef_decomp_files_end();
         ef_decomp_memory_release();
 
-        /* Missing-file branch in the actual TACTCOM prefix reaches its
-         * diagnostic callback; when present, the next call is 0x82cec. */
+        /* The original callback concatenates the selected language prefix
+         * directly with NAME. For EF2000.CFG (no leading slash), its lookup
+         * misses german/EF2000.CFG and falls back to the base config. */
+        {
+            char localized_dir[128];
+            char localized_path[160];
+            char base_path[160];
+            const char localized_cfg[] = "LANGUAGE=DE";
+            const char base_cfg[] = "LANGUAGE=EN";
+            assert(snprintf(localized_dir, sizeof(localized_dir), "%s/german", dirname) <
+                   (int)sizeof(localized_dir));
+            assert(mkdir(localized_dir, 0700) == 0);
+            assert(snprintf(localized_path, sizeof(localized_path), "%s/EF2000.CFG",
+                            localized_dir) < (int)sizeof(localized_path));
+            file = fopen(localized_path, "wb");
+            assert(file && fwrite(localized_cfg, 1, sizeof(localized_cfg) - 1, file) ==
+                   sizeof(localized_cfg) - 1);
+            assert(fclose(file) == 0);
+            assert(snprintf(base_path, sizeof(base_path), "%s/EF2000.CFG", dirname) <
+                   (int)sizeof(base_path));
+            file = fopen(base_path, "wb");
+            assert(file && fwrite(base_cfg, 1, sizeof(base_cfg) - 1, file) ==
+                   sizeof(base_cfg) - 1);
+            assert(fclose(file) == 0);
+        }
+
+        /* Missing resource enters the diagnostic callback; with an initial
+         * resource the original configuration loader finds the base file. */
         assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
         EF_U32(0x001264d4u) = 0x400u;
         memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
@@ -125,6 +154,8 @@ int main(void)
         memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
         memcpy(ef_decomp_memory_span(0x0018d52cu, 3), "rb", 3);
         memcpy(ef_decomp_memory_span(0x3400u, 7), "german", 7);
+        memcpy(ef_decomp_memory_span(0x3600u, 11), "EF2000.CFG", 11);
+        EF_U32(0x0012b36cu) = 0x3600u;
         EF_U32(0x0012ddb0u) = 0x3400u;
         EF_U8(0x0012ddb4u) = 0x5au;
         EF_U8(0x0018b1b4u) = '\\';
@@ -136,7 +167,7 @@ int main(void)
             uint32_t stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0xe94ecu);
+            assert(stop == 0xe93dcu);
             assert(EF_U32(0x001371a4u) == 0);
             assert(EF_U32(0x00132ab4u) == 0x0009cf74u);
             assert(EF_U32(0x00132ab8u) == 0x0009cfa4u);
@@ -144,9 +175,26 @@ int main(void)
                           "\\german") == 0);
             assert(EF_U8(0x001371efu) == 0x5au);
             assert(EF_U32(0x0015ba2cu) == 0);
+            assert(EF_U32(0x00464390u) == 0x3600u);
+            assert(EF_U32(0x001600a0u) != 0);
+            assert(EF_U8(0x001600a4u) == 1);
+            assert(strcmp(ef_decomp_memory_span(EF_U32(0x001600a0u), 12),
+                          "LANGUAGE=EN") == 0);
         }
         ef_decomp_memory_release();
         assert(remove(filename) == 0);
+        {
+            char path[160];
+            assert(snprintf(path, sizeof(path), "%s/EF2000.CFG", dirname) <
+                   (int)sizeof(path));
+            assert(remove(path) == 0);
+            assert(snprintf(path, sizeof(path), "%s/german/EF2000.CFG", dirname) <
+                   (int)sizeof(path));
+            assert(remove(path) == 0);
+            assert(snprintf(path, sizeof(path), "%s/german", dirname) <
+                   (int)sizeof(path));
+            assert(rmdir(path) == 0);
+        }
 
         assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
         EF_U32(0x001264d4u) = 0x400u;

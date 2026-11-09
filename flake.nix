@@ -326,8 +326,9 @@
       };
       # Native decomp bootstrap: GCC objects for every currently portable
       # recovered module, plus a small runnable ELF linked from recovered C.
-      # A full game cannot link yet: guest globals and the game entry point
-      # are still missing. The remaining three files need GCC portability work.
+      # A full game cannot link yet: several guest globals, callbacks and
+      # first-screen platform services are still missing. Three modules
+      # need GCC portability work.
       decompLinux = pkgs.stdenv.mkDerivation {
         pname = "ef2000-decomp";
         inherit version;
@@ -370,7 +371,8 @@
             decomp/src/game_helpers57.c decomp/src/runtime_helpers22.c \
             decomp/src/runtime_helpers34.c \
             decomp/src/runtime_helpers4.c decomp/src/init_tables1.c \
-            decomp/src/leaf_helpers6.c \
+            decomp/src/leaf_helpers6.c decomp/src/load_planes1.c \
+            decomp/src/localized_file_handlers.c decomp/src/script_helpers1.c \
             decomp/src/misc_drafts1.c \
             decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \
             decomp/src/tactcom_prefix.c decomp/src/game_main.c \

@@ -46,7 +46,7 @@ There is no standalone **playable game** build yet. The flake now produces
 two executable bootstraps from `standalone/main.c` and recovered
 `src/hiscore.c`: `.#ef2000-decomp` (native GCC/Linux) and
 `.#ef2000-decomp-watcom` (OpenWatcom/CauseWay DOS, launched via DOSBox-X).
-The Linux package also compiles 341 modules into a GCC archive;
+The Linux package also compiles 342 modules into a GCC archive;
 `game_helpers125.c`, `runtime_helpers23.c`, and `runtime_helpers42.c` still
 contain Watcom-specific or non-portable C. The DOS package retains all OMF
 objects for hybrid splicing. The bootstrap uses synthetic high-score data;
@@ -90,9 +90,15 @@ UTF-8 (instead of writing the original log file), executes the recovered
 synthetic `check.cd` it executes recovered `0x82cec` options initialization,
 including the language handler/path selection. A synthetic disconnected
 DOS gameport returns `0xff` from port `0x201` during `0xd66c2`, as the
-original's no-device branch would, and the probe stops before the `0xe94ec`
-text/GUI file loader. These are **bounded probes**: they do not
-implement the general variadic logger or connected-joystick input. The memory-shortage
+original's no-device branch would. The probe now executes recovered
+`load_text_file_e94ec` for `EF2000.CFG`, using source-recovered `0x9cf2c`,
+`0x9cf74` and `0x9cfa4` language-path callbacks. The host reads uncompressed
+text only, under the same read-only DOS path rules as the earlier size reader;
+compressed files stop at `0xb3c04` pending decompression. If the config is
+present, it is allocated in guest arena RAM and the probe stops at `0xe93dc`
+before parsing; without config it bypasses parsing and stops at `0x30214`.
+These are **bounded probes**: they do not implement the general variadic
+logger or connected-joystick input. The memory-shortage
 branch stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and
 actual first-screen services are **not yet linked**. The alternate `playvideo`
 branch is exercised with synthetic guest argv. This is neither a native
@@ -103,10 +109,10 @@ original executable through the native64 harness until the source is complete.
 The original-code runtime remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Status (2026-11-07): 4,277 Ghidra-inventoried functions plus 10 manually
-confirmed additional entry points (4,287 tracked); 3,223 marked `compiles`,
-247 additional host-tested `drafted` entry points, 11 `spliced`, 5 `blocked`,
-and 20 `verified`. The verified OpenWatcom OMF replacements are
+Status (2026-11-09): 4,277 Ghidra-inventoried functions plus 13 manually
+confirmed additional entry points (4,290 tracked); 3,216 marked `compiles`,
+251 `drafted`, 11 `spliced`, 7 `blocked`, 9 `compiles-bad`, and 20 `verified`.
+The verified OpenWatcom OMF replacements are
 `to_lower_ascii`, `to_upper_ascii`, `encode_runtime_segment_offset`,
 `read_runtime_slot_flag`, `initialize_runtime_probe_latch`, `init_bounds_d0b68`,
 `sync_flag_12ec8`, `reset_unit_counter`, `set_runtime_phase_five`,

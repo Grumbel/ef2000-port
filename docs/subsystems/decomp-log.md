@@ -1379,3 +1379,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   The probe does not implement the full variadic `0xea50c` formatter, guest
   log-file writing, `0xeb25a` screen switch or connected-joystick I/O. Synthetic and
   opt-in SHA-pinned real-executable GCC tests pass; no first screen yet.
+- GCC/Linux initial options text loader, 2026-11-09: removed the `0xe94ec`
+  stop and executed the recovered `load_text_file_e94ec` via native bound
+  callbacks. Recovered the three previously untracked original routines
+  `0x9cf2c` (72 bytes), `0x9cf74` (48 bytes), and `0x9cfa4` (56 bytes),
+  using bounded guest scratch in place of Watcom-local stack buffers. They
+  construct the language-prefix pathname, size the localized candidate via
+  recovered `0x9cb20`, fall back to the original pathname, and read using
+  `try_handlers_9cbc4`. The Linux host reuses its existing secure read-only
+  DOS path resolution; plain files are copied byte-for-byte to guest arena
+  memory and compressed JR/RA files stop at `0xb3c04` instead of being
+  misinterpreted as text. Important original behavior: the localized path
+  builder does not insert an additional slash for the bare `EF2000.CFG`
+  name, so the checked synthetic `german/EF2000.CFG` fixture is not chosen;
+  the ordinary file is read. `check_arena` now verifies arena accounting
+  after the legitimate C `0xe2a94` text allocation. On successful config
+  load the next boundary is `0xe93dc`, the options parser; on a missing
+  config it is `0x30214`. Synthetic and SHA-pinned real-image GCC runs
+  exercise these paths. The loader remains `compiles-bad` for the hybrid
+  pending original-guest differential/parser verification. No graphics yet.

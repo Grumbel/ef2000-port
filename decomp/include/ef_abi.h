@@ -17,6 +17,10 @@ void guest_tactcom_low_memory_8b417(ef_addr32 required, ef_addr32 missing);
 uint32_t guest_tactcom_file_probe_8b45a(ef_addr32 path);
 void guest_tactcom_missing_resource_8b464(ef_addr32 message);
 void guest_tactcom_post_options_boundary_8b477(void);
+void build_localized_path_9cf2c(ef_addr32 frame, ef_addr32 name);
+uint32_t size_localized_file_9cf74(ef_addr32 name, ef_addr32 frame);
+uint32_t load_localized_file_9cfa4(ef_addr32 name, ef_addr32 dest,
+                                  ef_addr32 frame);
 void guest_fn_ea470(uint32_t mode); /* 0xea470: unresolved in main path */
 void guest_fn_ea270(ef_addr32 descriptor); /* 0xea270: clump loader */
 uint32_t guest_fn_aaee8(uint32_t argc, ef_addr32 argv); /* 0xaaee8 */

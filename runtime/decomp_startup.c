@@ -31,7 +31,8 @@ static int main_probe_active;
  * emulated Watcom stack.  Keep it below native64's documented 0x3fff000
  * initial guest ESP, outside the loaded image, BSS and startup arena. */
 enum { TACTCOM_PROBE_FRAME = EF_DECOMP_RAM_SIZE - 0x2000u,
-       TACTCOM_LOG_FRAME = TACTCOM_PROBE_FRAME + 0x200u };
+       TACTCOM_LOG_FRAME = TACTCOM_PROBE_FRAME + 0x200u,
+       TACTCOM_TEXT_FRAME = TACTCOM_PROBE_FRAME + 0x400u };
 
 static void fatal_unexpected(const char *service)
 {
@@ -289,10 +290,78 @@ uint32_t guest_fn_d66c2_x(void)
 
 uint32_t guest_fn_e94ec(ef_addr32 path, uint32_t flags)
 {
-    (void)path;
-    (void)flags;
-    stop_at_guest_boundary(0x000e94ecu);
+    if (!probing || !main_probe_active ||
+        path != EF_U32(0x0012b36cu) || flags != 0u ||
+        EF_U32(0x00132ab4u) != 0x0009cf74u ||
+        EF_U32(0x00132ab8u) != 0x0009cfa4u)
+        fatal_unexpected("options text-file loader (0xe94ec)");
+    return load_text_file_e94ec(path, flags);
+}
+
+/* Bind the game's localized size/read callbacks to recovered game C. The
+ * additional frame is a private 0x90-byte guest scratch area replacing the
+ * Watcom stack. Neither callback can access an arbitrary host pointer. */
+static void validate_localized_name(ef_addr32 name)
+{
+    const char *filename = (const char *)ef_decomp_memory_span(name, 0x90u);
+    const char *prefix = (const char *)ef_decomp_memory_span(0x0040d150u, 0x90u);
+    if (!probing || !main_probe_active || !ef_decomp_files_enabled() ||
+        !filename || !prefix || !memchr(filename, 0, 0x90u) ||
+        !memchr(prefix, 0, 0x90u) ||
+        strlen(filename) + strlen(prefix) >= 0x90u ||
+        EF_U32(0x0040d1e0u) > strlen(filename) ||
+        !ef_decomp_memory_span(TACTCOM_TEXT_FRAME, 0x90u))
+        fatal_unexpected("localized file callback path");
+}
+
+uint32_t guest_callptr_eax_ret_x(ef_addr32 fn, uint32_t name)
+{
+    if (fn != 0x0009cf74u || EF_U32(0x00132ab4u) != fn)
+        fatal_unexpected("unbound localized file-size callback");
+    validate_localized_name(name);
+    return size_localized_file_9cf74(name, TACTCOM_TEXT_FRAME);
+}
+
+void guest_callptr_eaxedx_x(ef_addr32 fn, uint32_t name, uint32_t dest)
+{
+    uint32_t result;
+    if (fn != 0x0009cfa4u || EF_U32(0x00132ab8u) != fn)
+        fatal_unexpected("unbound localized file-read callback");
+    validate_localized_name(name);
+    result = load_localized_file_9cfa4(name, dest, TACTCOM_TEXT_FRAME);
+    if (result != 1u)
+        stop_at_guest_boundary(0x000b3c04u);
+}
+
+uint32_t guest_fn_b3c04_x(uint32_t name, uint32_t dest)
+{
+    uint32_t bytes;
+    int result;
+    if (!probing || !main_probe_active)
+        fatal_unexpected("file loader outside startup probe");
+    bytes = read_file_payload_size_b3b90(name);
+    if (bytes == 0)
+        return 0;
+    result = ef_decomp_files_read_plain(name, dest, bytes);
+    if (result < 0)
+        stop_at_guest_boundary(0x000b3c04u);
+    return (uint32_t)result;
+}
+
+uint32_t guest_fn_eba64_x(ef_addr32 name, ef_addr32 dest, ef_addr32 archive)
+{
+    (void)name;
+    (void)dest;
+    (void)archive;
+    stop_at_guest_boundary(0x000eba64u);
     return 0;
+}
+
+void guest_callptr1_x(ef_addr32 fn, ef_addr32 arg)
+{
+    (void)fn;
+    (void)arg;
+    stop_at_guest_boundary(0x000ea50cu);
 }
 
 uint8_t guest_fn_e93dc_r(uint32_t source, uint32_t flags)
@@ -390,11 +459,17 @@ static int check_arena(ef_decomp_arena_probe *probe,
 {
     uint32_t base = next_allocation;
     uint32_t arena_size = requested_arena;
+    uint32_t live_bytes = EF_U32(0x0015f764u);
+    /* Startup may allocate the first config text after init_arena. Confirm
+     * the recovered allocator's accounting instead of requiring an unused
+     * arena at every later first-screen boundary. */
     if (!probe || !arena_allocated || hook_registrations != 1 ||
         release_hook != 0xe2a50u ||
         EF_U32(0x0015f75cu) != base || EF_U32(0x0015f760u) != arena_size ||
-        EF_U32(0x0015f754u) != base || EF_U32(0x0015f758u) != arena_size ||
-        EF_U32(0x0015f764u) != 0 || EF_U32(0x0015f768u) != 0) {
+        live_bytes > arena_size ||
+        EF_U32(0x0015f754u) != base + live_bytes ||
+        EF_U32(0x0015f758u) != arena_size - live_bytes ||
+        EF_U32(0x0015f768u) != live_bytes) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "recovered arena initialization mismatch");
         return -1;
@@ -441,8 +516,9 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     main_probe_active = 0;
     probing = 0;
     ef_decomp_files_end();
-    if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe94ecu &&
-        stopped != 0xcd4d4u &&
+    if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe93dcu &&
+        stopped != 0x30214u && stopped != 0xb3c04u &&
+        stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");

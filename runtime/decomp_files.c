@@ -163,6 +163,48 @@ static FILE *get_stream(uint32_t id)
     return streams[id - 1];
 }
 
+/* The first startup config file is plain text. Reuse the secure DOS path
+ * resolution, but explicitly stop at compressed formats rather than silently
+ * treating a JR/RA container as the requested text. Never create files. */
+int ef_decomp_files_read_plain(uint32_t name, uint32_t dest, uint32_t length)
+{
+    const char *path;
+    void *data;
+    uint8_t header[2];
+    size_t max_length, read_total = 0;
+    size_t header_length = length < sizeof(header) ? length : sizeof(header);
+    struct stat st;
+    int fd, result = -1;
+    if (root_fd < 0 || length > 0xffffu ||
+        name >= EF_DECOMP_RAM_SIZE ||
+        !(data = ef_decomp_memory_span(dest, length)))
+        invalid_file_service("invalid text-file read bounds");
+    max_length = EF_DECOMP_RAM_SIZE - name;
+    if (max_length > MAX_DOS_PATH)
+        max_length = MAX_DOS_PATH;
+    path = (const char *)ef_decomp_memory_span(name, max_length);
+    if (!path || !memchr(path, 0, max_length))
+        invalid_file_service("invalid text-file path");
+    fd = open_dos_path(path);
+    if (fd < 0)
+        return 0;
+    if (fstat(fd, &st) != 0 || st.st_size != (off_t)length ||
+        pread(fd, header, header_length, 0) != (ssize_t)header_length ||
+        (header_length == 2 && header[0] == 'J' && header[1] == 'R') ||
+        (header_length == 2 && header[0] == 'R' && header[1] == 'A'))
+        goto done;
+    while (read_total < length) {
+        ssize_t n = read(fd, (uint8_t *)data + read_total, length - read_total);
+        if (n <= 0)
+            goto done;
+        read_total += (size_t)n;
+    }
+    result = 1;
+done:
+    close(fd);
+    return result;
+}
+
 /* 0xbc36a: Watcom fopen wrapper, EAX pathname and EDX mode. The only
  * supported mode is 'rb' (at the game's read-mode constant 0x18d52c). */
 uint32_t guest_fn_bc36a_w(uint32_t name, uint32_t mode)

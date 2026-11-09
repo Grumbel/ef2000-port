@@ -152,8 +152,8 @@ is optional.
 The *standalone decomp builds* now have distinct compilers, binaries, and apps:
 
 - `packages.ef2000-decomp` uses GCC to build a native Linux ELF from the
-  recovered C, along with an archive and individual GCC object files for 340
-  of the 343 recovered C modules. Three remaining modules use unsupported
+  recovered C, along with an archive and individual GCC object files for 342
+  of the 345 recovered C modules. Three remaining modules use unsupported
   Watcom-specific constructs. `nix run .#ef2000-decomp` directly executes the
   Linux binary. With `--image /path/to/_EF2000.EXE`, it verifies the known
   executable SHA-256 and maps the X-32 initialized image and zeroed BSS into
@@ -168,7 +168,11 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
   missing-file diagnostic and calls the recovered message dispatcher, stopping
   at the `0xeb25a` page switch. If present, it enters recovered `0x82cec`
   options, models a disconnected DOS joystick (`0xd66c2`, port `0x201`) and
-  stops before the `0xe94ec` GUI/text file loader.
+  executes recovered `0xe94ec` and the language-aware size/read callbacks
+  for `EF2000.CFG`. If configuration data is found, it is copied to guest RAM
+  and the probe stops at `0xe93dc` before the options parser; if absent,
+  the probe stops at the following `0x30214` initialization routine. The
+  read-only file adapter handles plain text; JR/RA decompression is pending.
   Host-side diagnostic output uses UTF-8 stderr, not the game's logfile.
   No original x86 instructions run, and neither path renders the first screen.
 - `packages.ef2000-decomp-watcom` compiles all recovered C modules to
@@ -179,8 +183,8 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
 **These are executable bootstrap programs, not yet playable games.** Both
 invoke recovered C (`hiscore_qualifies`), while the GCC probe additionally
 enters bounded sections of main, TACTCOM, the first disk-file reader,
-diagnostic dispatch and options. The rest of TACTCOM, global-data definitions
-and hardware platform layer remain incomplete.
+  diagnostic dispatch, options and initial configuration loading. The rest of
+  TACTCOM, global-data definitions and hardware platform layer remain incomplete.
 The GCC archive and Watcom objects are incremental build
 inputs; their unresolved references prevent linking the complete game today.
 On Linux, asset-free tests additionally execute recovered stream-reading and
