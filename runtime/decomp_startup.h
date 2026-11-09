@@ -33,16 +33,18 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * plain-file portion of 0x9ccb8. An absent resource stops at the diagnostic
  * callback 0xea50c; a synthetic plain resource constructs the 0x9d114
  * stream context, reads text lines and tokens with 0x9d170/0x9d1e8/0x9d278,
- * initializes one '#' record, copies a bounded record name, dispatches
+ * initializes successive '#' records, copies bounded record names, dispatches
  * six first-line camera mode labels, and processes Name/Key/Location text
  * options, scalar damping/minimum-altitude values and RollLock before
  * reading three dword vectors, LookAtObj, LookAt/Dist word vectors, X/Y
- * clamps, two HUD coordinates, Insts and Cockpit. It stops at the END
- * decoder 0x310c8.
+ * clamps, two HUD coordinates, Insts and Cockpit. END validates coordinate
+ * counts, and non-geometry records advance to subsequent '#' records.
+ * Unknown options stop at 0x310d8, invalid coordinate counts at 0x31116,
+ * mode-two derived geometry at 0x3119b and final cleanup at 0x3120b.
  * The 0x9d55d numeric converter
  * has a bounded ordinary-decimal host adapter; malformed input stops at
  * 0x9d55d. Oversized name/key strings stop at guarded copy sites. Non-record
- * input stops at 0x31201. Packed resources and archive lookups remain
+ * input is skipped like the original. Packed resources and archive lookups remain
  * explicit boundaries. Without a directory the
  * legacy boundary remains at 0xb3b90. Low memory stops
  * at 0x8b417, and playvideo at 0x8b2d8.

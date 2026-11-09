@@ -605,16 +605,28 @@ double guest_tactcom_view_decimal_9d55d(ef_addr32 stream)
     return value;
 }
 
-void guest_tactcom_view_end_boundary_310c8(ef_addr32 stream)
+void guest_tactcom_view_unknown_option_boundary_310d8(ef_addr32 stream)
 {
     check_view_parser_context(stream);
-    stop_at_guest_boundary(0x000310c8u);
+    stop_at_guest_boundary(0x000310d8u);
 }
 
-void guest_tactcom_view_nonrecord_boundary_31201(ef_addr32 stream)
+void guest_tactcom_view_count_boundary_31116(ef_addr32 stream)
 {
     check_view_parser_context(stream);
-    stop_at_guest_boundary(0x00031201u);
+    stop_at_guest_boundary(0x00031116u);
+}
+
+void guest_tactcom_view_geometry_boundary_3119b(ef_addr32 stream)
+{
+    check_view_parser_context(stream);
+    stop_at_guest_boundary(0x0003119bu);
+}
+
+void guest_tactcom_view_close_boundary_3120b(ef_addr32 stream)
+{
+    check_view_parser_context(stream);
+    stop_at_guest_boundary(0x0003120bu);
 }
 
 void guest_tactcom_view_invalid_index_boundary_3120b(ef_addr32 stream)
@@ -790,8 +802,8 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x9ccb8u && stopped != 0x9cd53u &&
         stopped != 0x30407u && stopped != 0x3053du && stopped != 0x30577u &&
-        stopped != 0x310c8u && stopped != 0x9d55du && stopped != 0x31201u &&
-        stopped != 0x3120bu && stopped != 0xebb58u &&
+        stopped != 0x310d8u && stopped != 0x31116u && stopped != 0x3119bu &&
+        stopped != 0x9d55du && stopped != 0x3120bu && stopped != 0xebb58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {

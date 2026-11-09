@@ -175,7 +175,7 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x000310c8',
+                self.assertIn('stopped at unimplemented call 0x0003120b',
                               plain.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([

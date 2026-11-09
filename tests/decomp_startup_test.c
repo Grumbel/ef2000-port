@@ -571,18 +571,18 @@ int main(void)
             stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x310c8u);
+            assert(stop == 0x3120bu);
             assert(EF_U32(0x001371a4u) == 1u);
             assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) == 100u);
             {
                 uint32_t stream = probe.base + probe.size;
-                assert(strcmp(ef_decomp_memory_span(stream, 4u), "END") == 0);
-                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 4u),
-                              "END") == 0);
-                assert(EF_U32(stream + 0x552u) == 3u);
-                assert(EF_U16(stream + 0x556u) == 3u);
-                assert(EF_U32(stream + 0x558u) == sizeof(plain) - 1u);
-                assert(EF_U32(stream + 0x55cu) == sizeof(plain) - 1u);
+                assert(EF_U8(stream) == 0u);
+                assert(EF_U8(stream + 0x400u) == 0u);
+                assert(EF_U32(stream + 0x552u) == 4u);
+                assert(EF_U16(stream + 0x556u) == 0u);
+                /* The last probe read refills an empty buffer at EOF. */
+                assert(EF_U32(stream + 0x558u) == 0u);
+                assert(EF_U32(stream + 0x55cu) == 1u);
                 assert(EF_U32(stream + 0x560u) == 100u);
                 assert(EF_U32(stream + 0x564u) == 0u);
                 assert(EF_U32(stream + 0x568u) == 0x0009d084u);
@@ -651,15 +651,14 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                             reason, sizeof(reason)) == 0);
-                assert(stop == 0x310c8u);
+                assert(stop == 0x3120bu);
                 stream = probe.base + probe.size;
-                assert(strcmp(ef_decomp_memory_span(stream, 4u), "END") == 0);
-                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 4u),
-                              "END") == 0);
-                assert(EF_U32(stream + 0x552u) == 8u);
-                assert(EF_U16(stream + 0x556u) == 3u);
-                assert(EF_U32(stream + 0x558u) == sizeof(lines) - 0x100u);
-                assert(EF_U32(stream + 0x55cu) == sizeof(lines) - 0x100u);
+                assert(EF_U8(stream) == 0u);
+                assert(EF_U8(stream + 0x400u) == 0u);
+                assert(EF_U32(stream + 0x552u) == 9u);
+                assert(EF_U16(stream + 0x556u) == 0u);
+                assert(EF_U32(stream + 0x558u) == 0u);
+                assert(EF_U32(stream + 0x55cu) == 1u);
                 assert(strcmp(ef_decomp_memory_span(0x0019cbb0u, 6u),
                               "alpha") == 0);
                 assert(EF_U8(0x0019cbb0u + 0x3cu) == 1u);
@@ -704,14 +703,15 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x310c8u);
+                    assert(stop == (modes[i].expected == 2u ? 0x3119bu : 0x3120bu));
                     stream = probe.base + probe.size;
                     assert(strcmp(ef_decomp_memory_span(0x0019cbb0u, 5u),
                                   "Test") == 0);
                     assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 0x51u),
-                                  "END") == 0);
+                                  modes[i].expected == 2u ? "END" : "") == 0);
                     assert(EF_U8(0x0019cbb0u + 0x3cu) == modes[i].expected);
-                    assert(EF_U32(stream + 0x552u) == 3u);
+                    assert(EF_U32(stream + 0x552u) ==
+                           (modes[i].expected == 2u ? 3u : 4u));
                     ef_decomp_memory_release();
                 }
             }
@@ -752,7 +752,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x310c8u);
+                assert(stop == 0x3120bu);
                 assert(EF_U8(0x0019cbb0u + 0x3du) == 1u);
                 assert(EF_U8(0x0019cbb0u + 0x3cu) == 0u);
                 ef_decomp_memory_release();
@@ -790,7 +790,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x310c8u);
+                    assert(stop == 0x3120bu);
                     assert(EF_U8(0x0019cbb0u + 0x3eu) == cases[i].pos);
                     assert(EF_U8(0x0019cbb0u + 0x3fu) == cases[i].ang);
                     assert(EF_S32(0x0019cbb0u + 0x4fu) == cases[i].altitude);
@@ -823,7 +823,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x310c8u);
+                    assert(stop == 0x3120bu);
                     assert(EF_U8(0x0019cbb0u + 0x53u) == rolls[i].expected);
                     ef_decomp_memory_release();
                 }
@@ -848,7 +848,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x310c8u);
+                assert(stop == 0x3120bu);
                 assert(EF_S32(0x0019cbb0u + 0x60u) == 40);
                 assert(EF_S32(0x0019cbb0u + 0x64u) == -80);
                 assert(EF_S32(0x0019cbb0u + 0x68u) == 0);
@@ -888,7 +888,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x310c8u);
+                    assert(stop == 0x3120bu);
                     assert(EF_U8(0x0019cbb0u + 0x7cu) == modes[i].expected);
                     assert(EF_S16(0x0019cbb0u + 0x7du) == 40);
                     assert(EF_S16(0x0019cbb0u + 0x7fu) == -80);
@@ -918,7 +918,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x310c8u);
+                assert(stop == 0x3120bu);
                 assert(EF_U16(0x0019cbb0u + 0x8fu) == 1u);
                 assert(EF_S16(0x0019cbb0u + 0x91u) == 273);
                 assert(EF_S16(0x0019cbb0u + 0x93u) == -409);
@@ -966,7 +966,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x310c8u);
+                    assert(stop == 0x3120bu);
                     assert(EF_U8(0x0019cbb0u + 0x9bu) == cases[i].expected_layout);
                     assert(EF_U8(0x0019cbb0u + 0xa0u) == cases[i].expected_cockpit);
                     ef_decomp_memory_release();
@@ -985,9 +985,80 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x310c8u);
+                    assert(stop == 0x3120bu);
                     assert(EF_U8(0x0019cbb0u + 0x9bu) == 5u);
                     assert(EF_U8(0x0019cbb0u + 0xa0u) == 0u);
+                    ef_decomp_memory_release();
+                }
+            }
+
+            /* The END branch increments the record index, then scans past
+             * arbitrary non-marker text into a second sequence record.
+             * Both fields and the original slot stride must stay intact. */
+            {
+                const char config[] =
+                    "; leading comment\nignored outside record\n"
+                    "# first\nMODE REL_CAM\nInitialOffSet 1 2 3\nEND\n"
+                    "; gap\nnot a record\n"
+                    "# second\nMODE FIXED_REL_CAM\n"
+                    "Insts BottomInfoBar\nCockpit OFF\nEND\n";
+                const ef_addr32 first = 0x0019cbb0u;
+                const ef_addr32 second = first + 0xa1u;
+                const ef_addr32 frame = EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u;
+                file = fopen(views_path, "wb");
+                assert(file && fwrite(config, 1, sizeof(config) - 1u, file) ==
+                       sizeof(config) - 1u);
+                assert(fclose(file) == 0);
+                assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                setup_views_probe();
+                stop = 0;
+                assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                            &stop, reason, sizeof(reason)) == 0);
+                assert(stop == 0x3120bu);
+                assert(EF_U16(frame + 0x90u) == 2u);
+                assert(strcmp(ef_decomp_memory_span(first, 6u), "first") == 0);
+                assert(EF_U32(first + 0x78u) == 3u);
+                assert(EF_S32(first + 0x6cu) == 32);
+                assert(EF_S32(first + 0x70u) == 64);
+                assert(EF_S32(first + 0x74u) == 96);
+                assert(strcmp(ef_decomp_memory_span(second, 7u), "second") == 0);
+                assert(EF_U8(second + 0x3cu) == 1u);
+                assert(EF_U8(second + 0x9bu) == 2u);
+                assert(EF_U8(second + 0xa0u) == 0u);
+                assert(EF_U32(second + 0x78u) == 0u);
+                ef_decomp_memory_release();
+            }
+
+            /* END rejects counts other than 0 or 3 at the original error
+             * callback. Unknown options and mode-two derived geometry stay
+             * distinct hard boundaries, rather than silently succeeding. */
+            {
+                const struct { const char *config; uint32_t boundary; } cases[] = {
+                    {"# x\nMODE REL_CAM\nInitialOffSet 1 2 3\n"
+                     "InitialOffSet 4 5 6\nEND\n", 0x31116u},
+                    {"# x\nMODE REL_CAM\nUnsupportedOption 3\n", 0x310d8u},
+                    {"# x\nMODE DYNAMIC_CAM\nLookAt 1 2 3\nEND\n", 0x3119bu},
+                };
+                size_t i;
+                for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+                    size_t n = strlen(cases[i].config);
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(cases[i].config, 1, n, file) == n);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == cases[i].boundary);
+                    assert(EF_U16(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x90u) == 0u);
+                    if (i == 0u)
+                        assert(EF_U32(0x0019cbb0u + 0x78u) == 6u);
+                    if (i == 2u) {
+                        assert(EF_S16(0x0019cbb0u + 0x7du) == 32);
+                        assert(EF_S16(0x0019cbb0u + 0x7fu) == 64);
+                        assert(EF_S16(0x0019cbb0u + 0x81u) == 96);
+                    }
                     ef_decomp_memory_release();
                 }
             }
@@ -1056,8 +1127,9 @@ int main(void)
                 }
             }
 
-            /* A non-marker line takes the original 0x31201 skip branch.
-             * It must not initialize the record-specific defaults. */
+            /* A non-marker line takes the original 0x31201 skip branch,
+             * then reaches the EOF close boundary without initializing a
+             * record or changing any of the 40 default slots. */
             {
                 const char other[] = "  ordinary\r\n";
                 uint32_t stream;
@@ -1070,12 +1142,11 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                             reason, sizeof(reason)) == 0);
-                assert(stop == 0x31201u);
+                assert(stop == 0x3120bu);
                 stream = probe.base + probe.size;
-                assert(strcmp(ef_decomp_memory_span(stream, 10u), "ordinary") == 0);
-                assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 9u),
-                              "ordinary") == 0);
-                assert(EF_U32(stream + 0x552u) == 1u);
+                assert(EF_U8(stream) == 0u);
+                assert(EF_U8(stream + 0x400u) == 0u);
+                assert(EF_U32(stream + 0x552u) == 2u);
                 assert(EF_U32(0x0019cbb0u + 0x1eu) == 0u);
                 ef_decomp_memory_release();
             }

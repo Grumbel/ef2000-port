@@ -1621,3 +1621,24 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   remain unrecovered, as do later records, original guest decimal semantics,
   packed/archive sources, guest-state differential and Watcom linkage.
   `ReadGenSeqs()` stays `named`, not `compiles`.
+- GCC/Linux Views END and successive records, 2026-11-09: traced original
+  `0x310c8..0x3120b`. The option dispatcher recognizes the embedded `END`
+  label at `0x182754`, while an unknown option branches to the original
+  three-argument diagnostic call at `0x310d8` (host probe stops beforehand).
+  At `0x310f7`, record dword +0x78 must be 0 or 3, otherwise the original
+  count-error callback at `0x31116` is an explicit stop. For camera byte
+  +0x3c equal to 2, the original calls `direction_angles_dc91c` at
+  `0x3119b` and follows with derived direction/distance work, which remains
+  behind a hard geometry boundary. All other camera modes advance the source
+  stack-frame record index word +0x90 after END. The `0x31201` branch skips
+  non-`#` physical lines and resumes scanning; the EOF `0x3120b` file/stream
+  cleanup is another explicit boundary rather than a claimed guest call.
+  The EOF refill resets stream +0x558 to zero and advances +0x55c to one,
+  matching recovered `read_stream_char_9d170` behavior. Synthetic GCC tests
+  exercise two records separated by non-record text, the 0/3 count rule,
+  unknown-option rejection, mode-two geometry stop, stream EOF state and
+  original slot stride. Opt-in GCC startup again uses a SHA-pinned original
+  image with invented Views text; no original resource is committed. The
+  original numeric converter, mode-two geometry, stream/file cleanup,
+  packed/archive lookup, guest-state differential and Watcom splice remain
+  unrecovered. Keep `ReadGenSeqs()` at `named`, not `compiles`.
