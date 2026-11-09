@@ -2071,3 +2071,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   remain available. SHA-pinned original and synthetic tests run the same
   recovered host C; there is no guest x86 differential, running PIT timer,
   real IRQ/vector, audio playback or Watcom splice.
+- GCC/Linux cold AIL timer-slot activation, 2026-11-09: the independent
+  `--probe-x32-tactcom-ail-start` mode executes recovered source C
+  `table_slot_1_to_2_11141f(0)` after the complete rate-programming chain.
+  Its software critical-section bracket sees state 1 at `0x17d664`, writes
+  state 2 and exits with depth zero at `0x17d7ba`. The first TACTCOM
+  `start_timer_service_e28e8` call now returns to its original caller,
+  which is checked and stopped at `0x8b4c9` before the later hardware
+  dispatch. Guest-visible callbacks `0xe28c4`/`0xe28e0`, period 20000,
+  cached reload `0x5d3a`, the earlier slot-15 state 2, inert module locks
+  and cleanup registration, and all six virtual-only PIT requests persist.
+  This exercises **no real PIT OUT, IRQ delivery, timer tick, or audio**;
+  the original guest x86 differential and DOS/Watcom integration remain
+  untested. The pre-start `--probe-x32-tactcom-ail-rate` boundary remains.

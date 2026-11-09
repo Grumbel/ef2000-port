@@ -176,6 +176,13 @@ int ef_decomp_probe_x32_tactcom_ail_rate(uint32_t bss_end,
                                          ef_decomp_x32_probe *probe,
                                          char *reason, size_t reason_capacity);
 
+/* Promote the configured AIL timer slot 0 from state 1 to 2 using recovered
+ * 0x11141f source C, return from the first TACTCOM service initializer and
+ * stop at 0x8b4c9. PIT writes, locks and IRQs remain virtual/inert. */
+int ef_decomp_probe_x32_tactcom_ail_start(uint32_t bss_end,
+                                          ef_decomp_x32_probe *probe,
+                                          char *reason, size_t reason_capacity);
+
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.
  * This does not initialize Watcom libc, game state or any video device. */

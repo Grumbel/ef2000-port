@@ -253,6 +253,14 @@ original's no-device branch would. The probe now executes recovered
   strictly checked and **recorded but not sent**. Guest `0x15b620` becomes
   callback `0xe28e0`. The new stop is at `0x11141f`, before the original
   timer slot changes from state 1 to 2; earlier stops remain intact.
+  A distinct `--probe-x32-tactcom-ail-start` continuation executes recovered
+  `table_slot_1_to_2_11141f` (including the software critical-section
+  bracket) and observes slot zero change to state 2. The first TACTCOM
+  timer-service initializer then returns to the call site at `0x8b4c9`,
+  where this mode stops strictly before any later hardware dispatch. It
+  checks the unchanged 20000 period, `0x5d3a` reload, callback `0xe28c4`,
+  module handler `0xe28e0`, completed critical depth, and the six inert
+  PIT requests. No actual timer callback or IRQ is delivered.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

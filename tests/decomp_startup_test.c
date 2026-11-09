@@ -529,6 +529,38 @@ int main(void)
     assert(EF_U32(0x0015b620u) == 0x000e28e0u);
     assert(x32.ail_pit_port_writes == 6u);
     assert(x32.ail_irq_critical_exited == 1u);
+    /* Complete the recovered 0x11141f source-C state transition and return
+     * from 0xe28e8. The new timer slot is active in guest memory only; no
+     * actual timer tick, IRQ or port write is permitted in the probe. */
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    EF_U32(0x0015f74cu) = 0xbaadf00du;
+    EF_U32(0x0015b620u) = 0xbaadf00du;
+    EF_U32(0x0017d664u) = 0xbaadf00du;
+    EF_U32(0x0017d7bau) = 0xbaadf00du;
+    assert(ef_decomp_probe_x32_tactcom_ail_start(bss_end, &x32,
+                                                  reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0x0008b4c9u);
+    assert(x32.ail_module_timer_slot == 0u);
+    assert(x32.ail_module_timer_handler == 0x000e28c4u);
+    assert(x32.ail_module_timer_slot_state == 2u);
+    assert(x32.ail_module_timer_period == 20000u);
+    assert(x32.ail_module_timer_reload == 0x5d3au);
+    assert(x32.ail_module_timer_callback_ptr == 0x000e28e0u);
+    assert(x32.ail_module_timer_port_writes == 6u);
+    assert(x32.ail_module_locked_ranges == 4u);
+    assert(x32.ail_module_cleanup_handler == 0x000d6da0u);
+    assert(x32.ail_module_cleanup_count == 1u);
+    assert(x32.ail_irq_critical_exited == 1u);
+    assert(EF_U32(0x0015f74cu) == 0u);
+    assert(EF_U32(0x0015b620u) == 0x000e28e0u);
+    assert(EF_U32(0x0017d624u) == 0x000e28c4u);
+    assert(EF_U32(0x0017d664u) == 2u);
+    assert(EF_U32(0x0017d6a0u) == 2u);
+    assert(EF_U32(0x0017d720u) == 0xd68du);
+    assert(EF_U32(0x0017d7b2u) == 20000u);
+    assert(EF_U32(0x0017d7aeu) == 0x5d3au);
+    assert(EF_U32(0x0017d7bau) == 0u);
+    assert(EF_U8(0x0015f751u) == 1u);
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);

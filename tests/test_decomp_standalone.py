@@ -291,6 +291,22 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('Stopped before AIL timer start '
                               '0x0011141f (no DOS IRQ, PIT or audio driver '
                               'installed)', rate_cold.stdout)
+                start_cold = subprocess.run([
+                    str(executable), '--image', original,
+                    '--probe-x32-tactcom-ail-start',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('Recovered AIL timer slot: '
+                              'offset 0, callback 0x000e28c4, state 2',
+                              start_cold.stdout)
+                self.assertIn('Recovered AIL timer rate: '
+                              'period 20000, PIT reload 0x00005d3a, '
+                              '6 inert cumulative port writes; '
+                              'timer handler 0x000e28e0', start_cold.stdout)
+                self.assertIn('Recovered AIL timer start: '
+                              'slot 0 running (state 2); '
+                              'returned to TACTCOM 0x0008b4c9 '
+                              '(no DOS IRQ, PIT or audio driver installed)',
+                              start_cold.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)
