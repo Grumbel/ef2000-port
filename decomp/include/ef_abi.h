@@ -6915,7 +6915,8 @@ uint32_t guest_fn_f8624(ef_addr32 object, ef_addr32 list,
 /* views_sequences.c: recovered prefix of Views.c ReadGenSeqs at 0x30214. */
 void init_gen_sequence_slots_30214(void);
 void read_gen_sequences_prefix_30214(ef_addr32 frame);
-void guest_tactcom_view_record_boundary_303f9(ef_addr32 stream, uint32_t index);
+void guest_tactcom_view_name_guard_30407(ef_addr32 stream);
+void guest_tactcom_view_camera_boundary_304fc(ef_addr32 stream, uint32_t index);
 void guest_tactcom_view_nonrecord_boundary_31201(ef_addr32 stream);
 void guest_tactcom_view_invalid_index_boundary_3120b(ef_addr32 stream);
 

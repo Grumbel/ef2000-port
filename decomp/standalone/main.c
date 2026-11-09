@@ -115,7 +115,7 @@ int main(int argc, char **argv)
                 printf("Recovered game main 0x8b274 entered TACTCOM prefix; "
                        "stopped at unimplemented call 0x%08x\n", stopped);
         }
-        puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files reach the recovered line/token reader and first '#' record defaults, but record options, archives and the first screen remain unimplemented.");
+        puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files reach the first '#' record name and camera mode, but remaining options, archives and the first screen remain unimplemented.");
         free(image_dir);
         ef_decomp_memory_release();
         return 0;

@@ -1522,3 +1522,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   Packed/archive input, sequence options and subsequent records remain
   unsupported. No original guest differential or Watcom splice; the 4,119-
   byte `ReadGenSeqs` remains `named`, not `compiles`.
+- GCC/Linux Views record name and camera mode, 2026-11-09: inspected the
+  original `0x303f9..0x304fb` instructions after the first '#' record
+  defaults. The 0x9d278 token reader supplies the remaining header token
+  as the record name, copied through the existing 0x9d749 implementation
+  into record offset +0x00. The 0x9d1e8 line reader advances to the next
+  physical line; the original then discards its first token and compares
+  the second token case-insensitively against six embedded labels at
+  0x1827d8/0x1827e0/0x1827f0/0x1827fc/0x182810/0x18281c. The matching
+  value 0..5 is stored at record +0x3c, or that byte is untouched if no
+  label matches. The bounded native probe stops at original `0x304fc`
+  before the remaining option records. Because the original 0x30407
+  `strcpy` does not check its destination, the host probe explicitly stops
+  at that call for names of 30 or more bytes; shorter strings preserve
+  original behavior. Synthetic GCC tests exercise all six labels (including
+  lowercase), unknown token retention, name copying, a long-name guard,
+  and the multi-line 256-byte refill; the pinned original executable also
+  runs with a synthetic Views resource. No packed/archive decoding, later
+  options, multi-record loop, guest differential, Watcom splice or first
+  screen is claimed; `ReadGenSeqs` stays `named`, not `compiles`.

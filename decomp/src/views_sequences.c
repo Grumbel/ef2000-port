@@ -63,12 +63,32 @@ static void init_view_record_302e1(uint32_t index)
     EF_U16(rec + 0x85u) = 0u;
 }
 
-/* 0x30214..0x303f9: Bounded ReadGenSeqs() prefix. The original opens the
+/* 0x30423..0x304fc: The six independent, case-insensitive camera-mode
+ * comparisons from the first option line. They use the second token of
+ * that line, leaving the +0x3c field alone when none match. */
+static void set_view_camera_mode_30423(ef_addr32 rec, ef_addr32 token)
+{
+    if (ascii_stricmp_9d524(token, 0x001827d8u) == 0)
+        EF_U8(rec + 0x3cu) = 0u;
+    if (ascii_stricmp_9d524(token, 0x001827e0u) == 0)
+        EF_U8(rec + 0x3cu) = 1u;
+    if (ascii_stricmp_9d524(token, 0x001827f0u) == 0)
+        EF_U8(rec + 0x3cu) = 2u;
+    if (ascii_stricmp_9d524(token, 0x001827fcu) == 0)
+        EF_U8(rec + 0x3cu) = 3u;
+    if (ascii_stricmp_9d524(token, 0x00182810u) == 0)
+        EF_U8(rec + 0x3cu) = 4u;
+    if (ascii_stricmp_9d524(token, 0x0018281cu) == 0)
+        EF_U8(rec + 0x3cu) = 5u;
+}
+
+/* 0x30214..0x304fc: Bounded ReadGenSeqs() prefix. The original opens the
  * constructed BG\\views\\views2.dat path at 0x9ccb8, reports a missing file
  * through the two-argument fatal callback at 0x132a74, or passes a successful
  * resource handle to the recovered 0x9d114 stream constructor. Its recovered
  * line/token helpers identify a '#' record start; this prefix initializes
- * only that record before stopping at the next name-token read. */
+ * that record, copies its bounded name and decodes its camera mode before
+ * stopping at the next options-line read. */
 void read_gen_sequences_prefix_30214(ef_addr32 frame)
 {
     uint32_t handle;
@@ -91,10 +111,19 @@ void read_gen_sequences_prefix_30214(ef_addr32 frame)
             guest_tactcom_view_nonrecord_boundary_31201(stream);
         else {
             int32_t index = EF_S16(frame + 0x90u);
+            ef_addr32 rec;
             if (index < 0 || index >= 40)
                 guest_tactcom_view_invalid_index_boundary_3120b(stream);
             init_view_record_302e1((uint32_t)index);
-            guest_tactcom_view_record_boundary_303f9(stream, (uint32_t)index);
+            rec = 0x0019cbb0u + (uint32_t)index * 0xa1u;
+            read_next_token_9d278(stream);
+            guest_tactcom_view_name_guard_30407(stream);
+            copy_string_9d749(rec, stream + 0x400u);
+            read_text_line_9d1e8(stream);
+            read_next_token_9d278(stream);
+            read_next_token_9d278(stream);
+            set_view_camera_mode_30423(rec, stream + 0x400u);
+            guest_tactcom_view_camera_boundary_304fc(stream, (uint32_t)index);
         }
     }
 }

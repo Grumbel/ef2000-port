@@ -154,15 +154,15 @@ class DecompStandaloneTests(unittest.TestCase):
                               blank.stdout)
 
                 # An invented plain resource verifies the recovered rewind,
-                # stream line/token reader and '#' record defaults.
+                # stream line/token reader, '#' record and camera selector.
                 views = Path(directory) / 'views' / 'views2.dat'
                 views.parent.mkdir(parents=True)
-                views.write_bytes(b'# synthetic\r\n')
+                views.write_bytes(b'# synthetic\r\nMODE REL_CAM\r\n')
                 plain = subprocess.run([
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x000303f9',
+                self.assertIn('stopped at unimplemented call 0x000304fc',
                               plain.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([

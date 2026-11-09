@@ -519,13 +519,23 @@ static void check_view_parser_context(ef_addr32 stream)
         fatal_unexpected("Views.c unterminated sequence line or token");
 }
 
-void guest_tactcom_view_record_boundary_303f9(ef_addr32 stream, uint32_t index)
+void guest_tactcom_view_name_guard_30407(ef_addr32 stream)
+{
+    const char *name;
+    check_view_parser_context(stream);
+    name = (const char *)ef_decomp_memory_span(stream + 0x400u, 0x51u);
+    /* The original strcpy at 0x30407 is unchecked. Limit this host-only
+     * probe to the 0x1e-byte name field, preserving its safe cases. */
+    if (!name || strlen(name) >= 0x1eu)
+        stop_at_guest_boundary(0x00030407u);
+}
+
+void guest_tactcom_view_camera_boundary_304fc(ef_addr32 stream, uint32_t index)
 {
     check_view_parser_context(stream);
-    if (index != 0u || EF_U8(stream + 0x400u) != '#' ||
-        EF_U8(stream + 0x401u) != 0u)
-        fatal_unexpected("Views.c first record marker or index");
-    stop_at_guest_boundary(0x000303f9u);
+    if (index != 0u)
+        fatal_unexpected("Views.c first camera-mode record index");
+    stop_at_guest_boundary(0x000304fcu);
 }
 
 void guest_tactcom_view_nonrecord_boundary_31201(ef_addr32 stream)
@@ -706,7 +716,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     ef_decomp_files_end();
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x9ccb8u && stopped != 0x9cd53u &&
-        stopped != 0x303f9u && stopped != 0x31201u &&
+        stopped != 0x30407u && stopped != 0x304fcu && stopped != 0x31201u &&
         stopped != 0x3120bu && stopped != 0xebb58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
