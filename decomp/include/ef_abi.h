@@ -6924,5 +6924,11 @@ void guest_tactcom_view_count_boundary_31116(ef_addr32 stream);
 void guest_tactcom_view_release_stream_9d088(ef_addr32 stream);
 void guest_tactcom_view_close_handle_9ce84(uint32_t handle);
 void guest_tactcom_view_invalid_index_boundary_3120b(ef_addr32 stream);
+void init_sequence_list_slots_2ff44(void);
+void read_sequence_lists_prefix_2ff44(ef_addr32 frame);
+void guest_tactcom_sequence_missing_camera_300e6(ef_addr32 stream);
+void guest_tactcom_sequence_entry_boundary_3010e(ef_addr32 stream);
+void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
+                                                uint32_t capacity, uint32_t site);
 
 #endif

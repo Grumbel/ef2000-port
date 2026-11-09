@@ -107,11 +107,16 @@ original's no-device branch would. The probe now executes recovered
   bounded. Missing, comment-only or entirely supported
   configs (including the unchanged shipped `EF2000.CFG`) run through
   original `0xe9574` arena release and into the recovered prefix of
-  `ReadGenSeqs()` at `0x30214` (Views.c). That prefix initializes all forty
-  0xa1-byte sequence records from the default five-byte name and index,
-  then builds the guest path to `BG\\views\\views2.dat`. The probe stops at
-  the next original call, the unimplemented resource opener `0x9ccb8`.
-  The remainder of the 4,119-byte sequence file parser is not reconstructed.
+  `ReadGenSeqs()` at `0x30214` (Views.c). The bounded source version parses
+  ordinary `BG\\views\\views2.dat` text records, including camera modes,
+  derived geometry, and resource cleanup, then continues through the next
+  original call at `0x2ff44`. That second Views reader loads the separate
+  `\\views\\seq2.dat` list of named cameras and scaled values, resolves
+  references against the preceding forty records, and initializes the
+  corresponding twenty-slot list table. With both synthetic plain files
+  present, the GCC probe stops at the next unbound call at `0xf80`.
+  Packed resources, malformed/exceptional numbers and unrestricted strings
+  remain bounded. Neither reader is yet guest-differential verified.
 These are **bounded probes**: they do not implement the general variadic
 logger or connected-joystick input. The memory-shortage
 branch stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and

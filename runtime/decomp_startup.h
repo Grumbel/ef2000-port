@@ -41,8 +41,10 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * counts, computes mode-two angles and distance, then advances through
  * subsequent '#' records.
  * Unknown options stop at 0x310d8, invalid coordinate counts at 0x31116,
- * and successful EOF releases the stream and closes the file, stopping at
- * the original return 0x3122a; the outer TACTCOM caller is not resumed.
+ * and successful EOF releases the stream and closes the file, then the
+ * original caller 0x82cec continues into the 0x2ff44 sequence-list parser.
+ * With supported plain resources both readers return; the next unbound
+ * stage is 0xf80, still before the outer TACTCOM caller resumes.
  * The 0x9d55d numeric converter
  * has a bounded ordinary-decimal host adapter; malformed input stops at
  * 0x9d55d. Oversized name/key strings stop at guarded copy sites. Non-record

@@ -501,8 +501,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002e910	57	grid_event_matches	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002e910.json	AL/DL truth table tested across all 65536 byte pairs
 0x0002f740	160	draw_markers_2f740	game_helpers17	compiles	game	confirmed	decomp/tests/0x0002f740.json	docs/compiler-abi.md; Draw every marker of the 16-byte table that is in range.; callers 3dd30@3e1e4; guest pending
 0x0002fbc4	895			unknown	unclassified	unverified		
-0x0002ff44	720			unknown	unclassified	unverified		
-0x00030214	4119	read_gen_sequences_30214	views_sequences	named	game	unverified		docs/subsystems/decomp-log.md; Views.c ReadGenSeqs(): first 0x5e bytes reset forty 0xa1-byte records and construct BG\\views\\views2.dat; later parser remains unrecovered; GCC probe stops at original resource opener 0x9ccb8
+0x0002ff44	720	read_sequence_lists_2ff44	views_sequences	named	game	unverified		docs/subsystems/decomp-log.md; bounded GCC parser for seq2.dat camera-name references, fields, scaled values, EOF close and globals; original-image and synthetic tests; guest differential and Watcom splice pending
+0x00030214	4119	read_gen_sequences_30214	views_sequences	named	game	unverified		docs/subsystems/decomp-log.md; bounded GCC Views parser for plain views2.dat, mode-two geometry and EOF cleanup; guest differential, archive decoder and Watcom splice pending
 0x0003122c	742			unknown	unclassified	unverified		
 0x00031514	420			unknown	unclassified	unverified		
 0x000316b8	84	advance_position_316b8	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x000316b8.json	docs/compiler-abi.md; Run 0x32414 and add the three deltas at 0x19e560 to the position at 0x19e5c1.; callers 2fbc4@2ff14,3122c@3129c; guest pending

@@ -1668,3 +1668,31 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   committed. No guest-state differential, exceptional-decimal equivalence,
   packed/archive resource handling, later TACTCOM continuation or Watcom
   hybrid execution is claimed; `ReadGenSeqs()` remains `named`.
+- GCC/Linux second Views resource and caller continuation, 2026-11-09:
+  original `apply_options_82cec` calls `ReadGenSeqs` at `0x30214` and then
+  the separate 720-byte reader at `0x2ff44`, followed by `0xf80`. The first
+  plain-file return now releases its one `0x56c` stream and closes the DOS
+  slot without terminating the probe at `0x3122a`. The next reader first
+  initializes twenty `0x9c`-stride slots at `0x19bf80`, copying the five
+  default name bytes to offset +0x3c and the word from `0x182710` to +0.
+  Its filename comes from the distinct `0x182714` source suffix
+  `\\views\\seq2.dat` (not `BG\\views\\views2.dat`). It uses the same
+  read-only plain-file opener and `0x9d114` token stream. After a `#` marker,
+  it copies three name fields (+0/+0x1e/+0x3c), sets the ON selector at
+  +0x4b, and resolves each following camera name against the forty generic
+  camera names at `0x19cbb0` (stride `0xa1`). It records the matching word
+  index at +0x4c, a decimal scaled by the original float 50 at +0x60, and a
+  decimal scaled by the original float 32 at +0x74; END writes a `0xffff`
+  index sentinel, increments the parsed-list index and resumes outer input.
+  An unknown camera stops at the original error callback `0x300e6`; host
+  guards stop before oversized strings, lists exceeding eight camera entries,
+  malformed decimals and missing END loops. At EOF, original `0x301b8..0x30213`
+  releases the stream, closes the file slot and initializes bytes at
+  `0x19e5e0`, `0x12db9e`, `0x19e555`, `0x19e5e3`, `0x19e5df`, `0x1a53dc`,
+  words at `0x19e543`, `0x19e5e5` (the last copied from `0x1f71ca`).
+  Synthetic GCC tests cover a referenced camera, scaled values, END sentinel,
+  default remaining slots and missing-camera boundary; the opt-in SHA-pinned
+  original-image probe with invented plain files reaches the subsequent
+  `0xf80` stop. No packed resource decoding, general x87 conversion, original
+  guest-state differential, or Watcom splice is claimed. Both Views readers
+  stay `named` in the tracker.

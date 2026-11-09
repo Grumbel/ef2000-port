@@ -324,8 +324,8 @@ static void read_view_text_options_304fc(ef_addr32 frame, ef_addr32 stream,
  * that record, copies its bounded name, decodes its camera mode and handles
  * text, scalar, vector, look-at, clamp, HUD, instrument and cockpit options.
  * END validates and advances the slot index; non-'#' lines are skipped.
- * EOF calls the 0x9d088 stream release then the 0x9ce84 handle close;
- * the host probe stops at the original return before its outer caller. */
+ * EOF calls the 0x9d088 stream release then the 0x9ce84 handle close,
+ * returning to the next reader in apply_options_82cec. */
 void read_gen_sequences_prefix_30214(ef_addr32 frame)
 {
     uint32_t handle;
@@ -372,4 +372,128 @@ void read_gen_sequences_prefix_30214(ef_addr32 frame)
             EF_U16(frame + 0x90u) = (uint16_t)(index + 1);
         }
     }
+}
+
+/* 0x2ff44..0x2ff7b: Initialize the twenty 0x9c-byte sequence-list slots.
+ * This is a separate table from the forty 0xa1-byte generic camera records.
+ * The original copies the five-byte default name to field +0x3c and writes
+ * the default index word to +0x00, leaving all other bytes untouched. */
+void init_sequence_list_slots_2ff44(void)
+{
+    uint16_t default_index = EF_U16(0x00182710u);
+    uint32_t i;
+
+    for (i = 0u; i < 20u; ++i) {
+        ef_addr32 rec = 0x0019bf80u + i * 0x9cu;
+        EF_U32(rec + 0x3cu) = EF_U32(0x00182708u);
+        EF_U8(rec + 0x40u) = EF_U8(0x0018270cu);
+        EF_U16(rec) = default_index;
+    }
+}
+
+/* 0x300b0..0x300f5: Resolve a list entry against the forty generic camera
+ * names. The original fatal callback at 0x300e6 handles missing names. */
+static uint16_t lookup_sequence_camera_300b0(ef_addr32 stream)
+{
+    uint32_t i;
+    for (i = 0u; i < 40u; ++i)
+        if (ascii_stricmp_9d524(stream + 0x400u,
+                                0x0019cbb0u + i * 0xa1u) == 0)
+            return (uint16_t)i;
+    guest_tactcom_sequence_missing_camera_300e6(stream);
+    return UINT16_MAX;
+}
+
+/* 0x2ff44..0x30213: The second Views resource reader, reached immediately
+ * after ReadGenSeqs() in apply_options_82cec. A '#' record has three string
+ * lines, an ON/other line, and up to eight camera-name/scale/length lines
+ * terminated by END. Each camera name resolves against the already loaded
+ * 0xa1-byte camera records. Unsupported malformed input remains a boundary
+ * in the host probe; the original does not bound these field copies. */
+void read_sequence_lists_prefix_2ff44(ef_addr32 frame)
+{
+    uint32_t handle;
+    ef_addr32 stream;
+    uint16_t index = 0u;
+
+    init_sequence_list_slots_2ff44();
+    build_default_path_9c980(frame);
+    EF_U16(frame + 0x78u) = 0u;
+    strcat_9ca57(frame, 0x00182714u);
+    handle = guest_fn_9ccb8(frame);
+    EF_U32(frame + 0x64u) = handle;
+    if (handle == UINT32_MAX)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x00182724u, frame);
+    stream = new_stream_9d114(handle);
+    EF_U8(stream) = 0x63u;
+    while (EF_U8(stream) != 0u && (int16_t)index < 20) {
+        ef_addr32 rec;
+        uint16_t entry = 0u;
+        read_text_line_9d1e8(stream);
+        read_next_token_9d278(stream);
+        if (ascii_stricmp_9d524(stream + 0x400u, 0x0018274cu) != 0)
+            continue;
+
+        rec = 0x0019bf80u + (uint32_t)index * 0x9cu;
+        read_next_token_9d278(stream);
+        guest_tactcom_sequence_string_guard_3001d(stream, 0x1eu, 0x3001du);
+        copy_string_9d749(rec, stream + 0x400u);
+        read_text_line_9d1e8(stream);
+        read_next_token_9d278(stream);
+        read_next_token_9d278(stream);
+        guest_tactcom_sequence_string_guard_3001d(stream, 0x1eu, 0x3003cu);
+        copy_string_9d749(rec + 0x1eu, stream + 0x400u);
+        read_text_line_9d1e8(stream);
+        read_next_token_9d278(stream);
+        read_next_token_9d278(stream);
+        guest_tactcom_sequence_string_guard_3001d(stream, 0x0fu, 0x3005bu);
+        copy_string_9d749(rec + 0x3cu, stream + 0x400u);
+        read_text_line_9d1e8(stream);
+        read_next_token_9d278(stream);
+        EF_U8(rec + 0x4bu) =
+            ascii_stricmp_9d524(stream + 0x400u, 0x00182750u) == 0 ? 1u : 0u;
+
+        for (;;) {
+            double value;
+            float scale;
+            read_text_line_9d1e8(stream);
+            read_next_token_9d278(stream);
+            if (ascii_stricmp_9d524(stream + 0x400u, 0x00182754u) == 0) {
+                if (entry >= 8u)
+                    guest_tactcom_sequence_entry_boundary_3010e(stream);
+                EF_U16(rec + 0x4cu + (uint32_t)entry * 2u) = UINT16_MAX;
+                ++index;
+                EF_U16(frame + 0x78u) = index;
+                break;
+            }
+            if (EF_U8(stream) == 0u)
+                guest_tactcom_sequence_entry_boundary_3010e(stream);
+            if (entry >= 8u)
+                guest_tactcom_sequence_entry_boundary_3010e(stream);
+            EF_U16(rec + 0x4cu + (uint32_t)entry * 2u) =
+                lookup_sequence_camera_300b0(stream);
+            read_next_token_9d278(stream);
+            value = guest_tactcom_view_decimal_9d55d(stream);
+            scale = *(const float *)ef_guest_memory_ptr(0x0018278bu);
+            EF_U16(rec + 0x60u + (uint32_t)entry * 2u) =
+                (uint16_t)view_fistp_305e1((long double)value * (long double)scale);
+            read_next_token_9d278(stream);
+            value = guest_tactcom_view_decimal_9d55d(stream);
+            scale = *(const float *)ef_guest_memory_ptr(0x0018278fu);
+            EF_U32(rec + 0x74u + (uint32_t)entry * 4u) =
+                (uint32_t)view_fistp_305e1((long double)value * (long double)scale);
+            ++entry;
+        }
+    }
+
+    guest_tactcom_view_release_stream_9d088(stream);
+    guest_tactcom_view_close_handle_9ce84(handle);
+    EF_U8(0x0019e5e0u) = 1u;
+    EF_U8(0x0012db9eu) = 0x49u;
+    EF_U16(0x0019e543u) = UINT16_MAX;
+    EF_U8(0x0019e555u) = 1u;
+    EF_U8(0x0019e5e3u) = 0u;
+    EF_U8(0x0019e5dfu) = 0u;
+    EF_U8(0x001a53dcu) = 0u;
+    EF_U16(0x0019e5e5u) = EF_U16(0x001f71cau);
 }

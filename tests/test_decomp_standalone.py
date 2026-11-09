@@ -180,8 +180,22 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x0003122a',
+                self.assertIn('stopped at unimplemented call 0x000ea50c',
                               plain.stdout)
+                # The next original caller loads \views\seq2.dat, resolves
+                # camera names against views2.dat and reaches the following
+                # unbound 0xf80 stage after closing both plain resources.
+                seq = views.parent / 'seq2.dat'
+                seq.write_bytes(
+                    b'# synthetic_list\r\n'
+                    b'Name primary\r\nName secondary\r\nON\r\n'
+                    b'synthetic 1.5 2.25\r\nEND\r\n')
+                continued = subprocess.run([
+                    str(executable), '--image', original,
+                    '--data-dir', directory, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('stopped at unimplemented call 0x00000f80',
+                              continued.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([
                     str(executable), '--image', original,
