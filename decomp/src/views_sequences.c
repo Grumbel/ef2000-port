@@ -194,8 +194,38 @@ static void read_view_hud_word_30ead(ef_addr32 stream, ef_addr32 rec,
     EF_U16(rec + field) = (uint16_t)view_fistp_305e1((long double)value);
 }
 
-/* 0x304fc..0x30f59: Each recognized option returns to the original
- * 0x304fc physical-line loop. The next unsupported option is AInsts. */
+/* 0x30f59..0x31068: Insts checks six independent layout labels. An
+ * unrecognized value preserves the initialized +0x9b byte. These source
+ * pointers include substrings of adjacent embedded string literals. */
+static void read_view_instruments_30f59(ef_addr32 stream, ef_addr32 rec)
+{
+    ef_addr32 token;
+    read_next_token_9d278(stream);
+    token = stream + 0x400u;
+    if (ascii_stricmp_9d524(token, 0x00182918u) == 0)
+        EF_U8(rec + 0x9bu) = 5u;
+    if (ascii_stricmp_9d524(token, 0x0018292cu) == 0)
+        EF_U8(rec + 0x9bu) = 2u;
+    if (ascii_stricmp_9d524(token, 0x0018293cu) == 0)
+        EF_U8(rec + 0x9bu) = 3u;
+    if (ascii_stricmp_9d524(token, 0x00182948u) == 0)
+        EF_U8(rec + 0x9bu) = 4u;
+    if (ascii_stricmp_9d524(token, 0x0018295cu) == 0)
+        EF_U8(rec + 0x9bu) = 1u;
+    if (ascii_stricmp_9d524(token, 0x0018296cu) == 0)
+        EF_U8(rec + 0x9bu) = 0u;
+}
+
+/* 0x31068..0x310c8: Cockpit has an ON/other selector at +0xa0. */
+static void read_view_cockpit_31068(ef_addr32 stream, ef_addr32 rec)
+{
+    read_next_token_9d278(stream);
+    EF_U8(rec + 0xa0u) =
+        ascii_stricmp_9d524(stream + 0x400u, 0x00182750u) == 0 ? 1u : 0u;
+}
+
+/* 0x304fc..0x310c8: Each recognized option returns to the original
+ * 0x304fc physical-line loop. The next unhandled branch recognizes END. */
 static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
 {
     for (;;) {
@@ -243,19 +273,24 @@ static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
             read_view_hud_word_30ead(stream, rec, 0x9cu);
         } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182904u) == 0) {
             read_view_hud_word_30ead(stream, rec, 0x9eu);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182910u) == 0) {
+            read_view_instruments_30f59(stream, rec);
+        } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182974u) == 0) {
+            read_view_cockpit_31068(stream, rec);
         } else {
-            guest_tactcom_view_instruments_boundary_30f59(stream);
+            guest_tactcom_view_end_boundary_310c8(stream);
         }
     }
 }
 
-/* 0x30214..0x30f59: Bounded ReadGenSeqs() prefix. The original opens the
+/* 0x30214..0x310c8: Bounded ReadGenSeqs() prefix. The original opens the
  * constructed BG\\views\\views2.dat path at 0x9ccb8, reports a missing file
  * through the two-argument fatal callback at 0x132a74, or passes a successful
  * resource handle to the recovered 0x9d114 stream constructor. Its recovered
  * line/token helpers identify a '#' record start; this prefix initializes
  * that record, copies its bounded name, decodes its camera mode and handles
- * text, scalar, vector, look-at, clamp and HUD options before AInsts. */
+ * text, scalar, vector, look-at, clamp, HUD, instrument and cockpit options
+ * before the END/unknown-option branch. */
 void read_gen_sequences_prefix_30214(ef_addr32 frame)
 {
     uint32_t handle;

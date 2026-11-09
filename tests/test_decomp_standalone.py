@@ -169,12 +169,13 @@ class DecompStandaloneTests(unittest.TestCase):
                     b'LookAtObj SOURCE\r\nLookAt 1.25 -2.5 0.5\r\n'
                     b'Dist 0.25 1.5 10 2\r\n'
                     b'XClamp 1.5 -2.25\r\nYClamp 0.5 3.25\r\n'
-                    b'HUDCenter -17.9\r\nHUDHeight 240.9\r\nEND\r\n')
+                    b'HUDCenter -17.9\r\nHUDHeight 240.9\r\n'
+                    b'Insts FrontInternalCock\r\nCockpit ON\r\nEND\r\n')
                 plain = subprocess.run([
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x00030f59',
+                self.assertIn('stopped at unimplemented call 0x000310c8',
                               plain.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([

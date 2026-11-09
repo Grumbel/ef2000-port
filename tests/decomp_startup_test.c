@@ -88,6 +88,26 @@ static void setup_views_probe(void)
            "HUDCenter", sizeof("HUDCenter"));
     memcpy(ef_decomp_memory_span(0x00182904u, sizeof("HUDHeight")),
            "HUDHeight", sizeof("HUDHeight"));
+    memcpy(ef_decomp_memory_span(0x00182910u, sizeof("Insts")),
+           "Insts", sizeof("Insts"));
+    memcpy(ef_decomp_memory_span(0x00182918u, sizeof("FrontInternalCock")),
+           "FrontInternalCock", sizeof("FrontInternalCock"));
+    memcpy(ef_decomp_memory_span(0x0018292cu, sizeof("BottomInfoBar")),
+           "BottomInfoBar", sizeof("BottomInfoBar"));
+    memcpy(ef_decomp_memory_span(0x0018293cu, sizeof("FullViewHUD")),
+           "FullViewHUD", sizeof("FullViewHUD"));
+    memcpy(ef_decomp_memory_span(0x00182948u, sizeof("DisplayFullTarget")),
+           "DisplayFullTarget", sizeof("DisplayFullTarget"));
+    memcpy(ef_decomp_memory_span(0x0018295cu, sizeof("InternalFullHUD")),
+           "InternalFullHUD", sizeof("InternalFullHUD"));
+    memcpy(ef_decomp_memory_span(0x0018296cu, sizeof("None")),
+           "None", sizeof("None"));
+    memcpy(ef_decomp_memory_span(0x00182974u, sizeof("Cockpit")),
+           "Cockpit", sizeof("Cockpit"));
+    memcpy(ef_decomp_memory_span(0x00182750u, sizeof("ON")),
+           "ON", sizeof("ON"));
+    memcpy(ef_decomp_memory_span(0x00182754u, sizeof("END")),
+           "END", sizeof("END"));
     EF_U32(0x00182a05u) = 0x43360000u; /* original float 182 */
     EF_U32(0x00182a09u) = 0x42000000u; /* original float 32 */
     EF_U32(0x00182a0du) = 0x42c80000u; /* original float 100 */
@@ -551,7 +571,7 @@ int main(void)
             stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x30f59u);
+            assert(stop == 0x310c8u);
             assert(EF_U32(0x001371a4u) == 1u);
             assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) == 100u);
             {
@@ -631,7 +651,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                             reason, sizeof(reason)) == 0);
-                assert(stop == 0x30f59u);
+                assert(stop == 0x310c8u);
                 stream = probe.base + probe.size;
                 assert(strcmp(ef_decomp_memory_span(stream, 4u), "END") == 0);
                 assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 4u),
@@ -684,7 +704,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x30f59u);
+                    assert(stop == 0x310c8u);
                     stream = probe.base + probe.size;
                     assert(strcmp(ef_decomp_memory_span(0x0019cbb0u, 5u),
                                   "Test") == 0);
@@ -732,7 +752,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x30f59u);
+                assert(stop == 0x310c8u);
                 assert(EF_U8(0x0019cbb0u + 0x3du) == 1u);
                 assert(EF_U8(0x0019cbb0u + 0x3cu) == 0u);
                 ef_decomp_memory_release();
@@ -770,7 +790,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x30f59u);
+                    assert(stop == 0x310c8u);
                     assert(EF_U8(0x0019cbb0u + 0x3eu) == cases[i].pos);
                     assert(EF_U8(0x0019cbb0u + 0x3fu) == cases[i].ang);
                     assert(EF_S32(0x0019cbb0u + 0x4fu) == cases[i].altitude);
@@ -803,7 +823,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x30f59u);
+                    assert(stop == 0x310c8u);
                     assert(EF_U8(0x0019cbb0u + 0x53u) == rolls[i].expected);
                     ef_decomp_memory_release();
                 }
@@ -828,7 +848,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x30f59u);
+                assert(stop == 0x310c8u);
                 assert(EF_S32(0x0019cbb0u + 0x60u) == 40);
                 assert(EF_S32(0x0019cbb0u + 0x64u) == -80);
                 assert(EF_S32(0x0019cbb0u + 0x68u) == 0);
@@ -868,7 +888,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x30f59u);
+                    assert(stop == 0x310c8u);
                     assert(EF_U8(0x0019cbb0u + 0x7cu) == modes[i].expected);
                     assert(EF_S16(0x0019cbb0u + 0x7du) == 40);
                     assert(EF_S16(0x0019cbb0u + 0x7fu) == -80);
@@ -898,7 +918,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x30f59u);
+                assert(stop == 0x310c8u);
                 assert(EF_U16(0x0019cbb0u + 0x8fu) == 1u);
                 assert(EF_S16(0x0019cbb0u + 0x91u) == 273);
                 assert(EF_S16(0x0019cbb0u + 0x93u) == -409);
@@ -908,6 +928,68 @@ int main(void)
                 assert(EF_S16(0x0019cbb0u + 0x9cu) == -17);
                 assert(EF_S16(0x0019cbb0u + 0x9eu) == 240);
                 ef_decomp_memory_release();
+            }
+
+            /* Insts recognizes six literal layouts, including pointer-
+             * into-string labels at 0x18292c and 0x18293c, and leaves the
+             * default field alone on an unrecognized value. Cockpit sets
+             * its byte for ON (case-insensitively) and clears it otherwise. */
+            {
+                const struct {
+                    const char *layout;
+                    uint8_t expected_layout;
+                    const char *cockpit;
+                    uint8_t expected_cockpit;
+                } cases[] = {
+                    {"FrontInternalCock", 5u, "ON", 1u},
+                    {"BottomInfoBar", 2u, "off", 0u},
+                    {"FullViewHUD", 3u, "oN", 1u},
+                    {"DisplayFullTarget", 4u, "OFF", 0u},
+                    {"InternalFullHUD", 1u, "ON", 1u},
+                    {"None", 0u, "bad", 0u},
+                    {"unknown", 0u, "ON", 1u},
+                    {"frontinternalcock", 5u, "OFF", 0u},
+                };
+                size_t i;
+                for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+                    char config[160];
+                    int written = snprintf(config, sizeof(config),
+                                           "# x\nMODE REL_CAM\nInsts %s\nCockpit %s\nEND\n",
+                                           cases[i].layout, cases[i].cockpit);
+                    assert(written > 0 && written < (int)sizeof(config));
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(config, 1, (size_t)written, file) ==
+                           (size_t)written);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x310c8u);
+                    assert(EF_U8(0x0019cbb0u + 0x9bu) == cases[i].expected_layout);
+                    assert(EF_U8(0x0019cbb0u + 0xa0u) == cases[i].expected_cockpit);
+                    ef_decomp_memory_release();
+                }
+                /* An unknown layout after a recognized one is a no-op. */
+                {
+                    const char config[] =
+                        "# x\nMODE REL_CAM\nInsts FrontInternalCock\n"
+                        "Insts bogus\nCockpit ON\nCockpit OFF\nEND\n";
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(config, 1, sizeof(config) - 1u, file) ==
+                           sizeof(config) - 1u);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x310c8u);
+                    assert(EF_U8(0x0019cbb0u + 0x9bu) == 5u);
+                    assert(EF_U8(0x0019cbb0u + 0xa0u) == 0u);
+                    ef_decomp_memory_release();
+                }
             }
 
             /* The bounded GCC decimal adapter does not claim support for

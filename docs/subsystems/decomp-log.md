@@ -1601,3 +1601,23 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   converter `0x9d55d`, later options, repeat records, archive/packed
   resources, guest-state differential and Watcom splice remain unimplemented;
   do not promote `ReadGenSeqs()` beyond `named`.
+- GCC/Linux Views instrument and cockpit selectors, 2026-11-09: examined
+  original `0x30f59..0x310c7`. The `Insts` option at `0x182910` was called
+  `AInsts` in the previous boundary notes, but its actual pointer begins at
+  `I` within that adjacent text; the accepted spelling is `Insts`. It reads
+  one token and compares six independent, case-insensitive embedded strings,
+  writing record byte +0x9b as 5 for `FrontInternalCock` (0x182918), 2 for
+  `BottomInfoBar` (0x18292c), 3 for `FullViewHUD` (0x18293c), 4 for
+  `DisplayFullTarget` (0x182948), 1 for `InternalFullHUD` (0x18295c), and
+  0 for `None` (0x18296c). An unrecognized value retains the existing byte;
+  the middle two pointers start within neighboring stored literals. The
+  `Cockpit` option label at 0x182974 checks value `ON` at 0x182750, setting
+  record byte +0xa0 to 1 for ON and 0 for any other token. Synthetic GCC
+  cases check every layout, case-folding, repeated enum fields, unknown
+  values and both cockpit states; opt-in GCC startup also reads invented
+  resource text with the SHA-pinned original image. The explicit boundary
+  advances to `0x310c8`, which branches on `END` and performs record
+  finalization, an error callback and conditional derived geometry. These
+  remain unrecovered, as do later records, original guest decimal semantics,
+  packed/archive sources, guest-state differential and Watcom linkage.
+  `ReadGenSeqs()` stays `named`, not `compiles`.
