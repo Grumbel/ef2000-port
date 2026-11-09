@@ -4928,6 +4928,32 @@ void reset_settings_104580(void)
     guest_fn_110fd4_x();
 }
 
+/* 0x110fd4, 241 bytes. Source-C prefix through the first INT 21h AX=2502h
+ * (0x11105b) vector query. The actual pushf/CLI/ES operations are represented
+ * by a strict host boundary that supplies the already captured DS selector;
+ * this never disables interrupts on Linux. The original 0x111575 lock helper
+ * and the four 16-dword table clears are preserved in their original order.
+ * IRQ reads, installation, PIT setup and interrupt restoration are pending. */
+void initialize_ail_irq_tables_110fd4(void)
+{
+    uint32_t i;
+    EF_U16(0x0017d7beu) = guest_ail_irq_enter_110fd9();
+    register_code_ranges_111575();
+    EF_U32(0x0017d7b6u) = 0u;
+    EF_U32(0x0017d7bau) = 0u;
+    EF_U32(0x0017d7b2u) = UINT32_MAX;
+    EF_U32(0x0017d7c0u) = UINT32_MAX;
+    for (i = 0u; i < 16u; i++)
+        EF_U32(0x0017d664u + i * 4u) = 0u;
+    for (i = 0u; i < 16u; i++)
+        EF_U32(0x0017d6a4u + i * 4u) = 0u;
+    for (i = 0u; i < 16u; i++)
+        EF_U32(0x0017d6e4u + i * 4u) = 0u;
+    for (i = 0u; i < 16u; i++)
+        EF_U32(0x0017d724u + i * 4u) = 0u;
+    guest_ail_irq8_vector_query_11105b();
+}
+
 /* 0xcdb20, 277 bytes. Set up the 320x200 video mode: on the first call read the environment string at 0x18f620, flag the options named 0x18f62c, 0x18f634 and 0x18f644 in the bytes 0x146e48..4a, store the driver word 0xfe700 in 0x15b75c and register the exit handler 0xcdc64. Every call selects mode 0x13 (0xfe710), sets the size words 0x15b744/48 to 320 x 200, applies it with 0xfc39c, picks the draw handlers, points the frame base 0x15b758 at 0xa0000 + the DOS base (option 0x146e4a) or at a fresh 0xfc84-byte block (error 0x18f64c), initialises the work buffers and finally calls the two driver hooks 0x15b750 and 0x15b74c (clearing the screen in between). */
 void init_video_mode_cdb20(void)
 {

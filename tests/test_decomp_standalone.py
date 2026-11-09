@@ -46,6 +46,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/trace_wrappers1.c'),
                 str(ROOT / 'decomp/src/runtime_helpers.c'),
                 str(ROOT / 'decomp/src/state_reset1.c'),
+                str(ROOT / 'decomp/src/game_helpers124.c'),
                 str(ROOT / 'decomp/src/engine_helpers.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'decomp/src/runtime_helpers19.c'),
@@ -212,6 +213,20 @@ class DecompStandaloneTests(unittest.TestCase):
                               'runtime initialization 0x00110fd4 '
                               '(no audio driver installed)',
                               ail_cold.stdout)
+                irq_cold = subprocess.run([
+                    str(executable), '--image', original,
+                    '--probe-x32-tactcom-ail-irq',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('Recovered cold no-debug AIL setup: '
+                              '18 inert memory-lock requests, 19 default settings; '
+                              'trace/settings range flags 1/1', irq_cold.stdout)
+                self.assertIn('Recovered AIL IRQ table prefix: '
+                              '18 inert memory-lock requests, '
+                              'saved DS selector 0x5678; '
+                              'virtual IRQ region entered 1', irq_cold.stdout)
+                self.assertIn('Stopped at DOS/X-32 IRQ8 vector query '
+                              '0x0011105b (no DOS IRQ or audio driver installed)',
+                              irq_cold.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)
@@ -405,6 +420,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/trace_wrappers1.c'),
                 str(ROOT / 'decomp/src/runtime_helpers.c'),
                 str(ROOT / 'decomp/src/state_reset1.c'),
+                str(ROOT / 'decomp/src/game_helpers124.c'),
                 str(ROOT / 'decomp/src/engine_helpers.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'decomp/src/runtime_helpers19.c'),

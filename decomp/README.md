@@ -192,6 +192,17 @@ original's no-device branch would. The probe now executes recovered
   `exchange_slot_1041e4`. The next strict stop is `0x110fd4`, whose
   original instructions begin interrupt-sensitive initialization (`CLI`).
   No DOS interrupt or sound device is initialized by this probe.
+  The further opt-in `--probe-x32-tactcom-ail-irq` runs the recovered
+  source-C prefix of `initialize_ail_irq_tables_110fd4` under an inert,
+  strictly checked *virtual* interrupt-disabled region. It saves the synthetic
+  X-32 data selector `0x5678` at `0x17d7be`, registers the two original
+  code/data locks through recovered `0x111575` (eighteen locks total), resets
+  four AIL state dwords and zeroes four sixteen-dword tables at
+  `0x17d664`, `0x17d6a4`, `0x17d6e4` and `0x17d724`. It stops at
+  `0x11105b`, immediately **before** `INT 21h AX=2502h` queries the IRQ 8
+  vector. No real `CLI`, interrupt-vector operation, PIT programming or
+  IRQ handler installation happens. The rest of this routine, including
+  hardware restoration, remains unrecovered in C.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

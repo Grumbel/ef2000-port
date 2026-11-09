@@ -1963,3 +1963,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   (`CLI`) and hardware initialization. Synthetic nonzero-to-zero sentinel checks and the pinned
   original executable pass in GCC. This is not an AIL driver or timer,
   not the debug-file branch, and not an original guest differential test.
+- GCC/Linux cold AIL IRQ table prefix, 2026-11-09: pinned-image disassembly
+  of `0x110fd4..0x1110c4` identifies the original saved registers/flags,
+  `CLI`, saved `DS` word at `0x17d7be`, and call to the already recovered
+  `register_code_ranges_111575`. A new separately opt-in
+  `--probe-x32-tactcom-ail-irq` composes this prefix into the existing
+  source-C cold trace/settings startup. The host adapter records the
+  interrupt-disabled region but **never executes `CLI`**, and checks two
+  additional precisely bounded, inert memory-lock requests (18 total).
+  Source-C then sets `0x17d7b6/0x17d7ba` to zero,
+  `0x17d7b2/0x17d7c0` to `0xffffffff`, and zeroes the four
+  16-dword tables at `0x17d664`, `0x17d6a4`, `0x17d6e4`, `0x17d724`.
+  Independent nonzero sentinels in synthetic guest RAM prove these writes
+  are executed. The new strict boundary is `0x11105b`, the *first*
+  `INT 21h AX=2502h` IRQ 8 vector query; no DOS service, interrupt
+  handler, real memory lock, PIT or audio driver is installed. The prior
+  `0x110fd4` stop and all lower-boundary opt-ins remain unchanged.
+  Recovered C beyond `0x11105b`, guest differential verification and
+  Watcom/x86 equivalence remain open.

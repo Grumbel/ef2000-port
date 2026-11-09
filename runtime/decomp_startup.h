@@ -59,6 +59,8 @@ typedef struct ef_decomp_x32_probe {
     uint32_t ail_settings_written;
     uint32_t ail_trace_ranges_initialized;
     uint32_t ail_settings_ranges_initialized;
+    uint32_t ail_irq_critical_entered;
+    uint32_t ail_saved_ds_selector;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -110,6 +112,13 @@ int ef_decomp_probe_x32_tactcom_timer(uint32_t bss_end,
 int ef_decomp_probe_x32_tactcom_ail(uint32_t bss_end,
                                     ef_decomp_x32_probe *probe,
                                     char *reason, size_t reason_capacity);
+
+/* Additional opt-in table initialization under a virtual-only IRQ-disabled
+ * region. Record two more code/data locks, clear AIL timer tables, then stop
+ * before the first live INT 21h AX=2502h vector query for IRQ 8. */
+int ef_decomp_probe_x32_tactcom_ail_irq(uint32_t bss_end,
+                                        ef_decomp_x32_probe *probe,
+                                        char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.

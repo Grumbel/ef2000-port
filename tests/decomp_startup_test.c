@@ -306,6 +306,45 @@ int main(void)
             assert(EF_U32(0x004dd670u + i * 4u) == 0u);
         assert(EF_U8(0x004dd6b0u) == 0u);
     }
+    /* Preserve the older 0x110fd4 boundary and separately opt in to the
+     * recovered critical-section table prefix; all IRQs are still inert. */
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    {
+        static const uint32_t tables[] = {
+            0x0017d664u, 0x0017d6a4u, 0x0017d6e4u, 0x0017d724u,
+        };
+        uint32_t i, j;
+        for (i = 0u; i < sizeof(tables) / sizeof(tables[0]); ++i)
+            for (j = 0u; j < 16u; ++j)
+                EF_U32(tables[i] + 4u * j) = 0xa5a50000u | (i << 8u) | j;
+        EF_U16(0x0017d7beu) = 0xfaceu;
+        EF_U32(0x0017d7b6u) = 0x12345678u;
+        EF_U32(0x0017d7bau) = 0x87654321u;
+        EF_U32(0x0017d7b2u) = 0u;
+        EF_U32(0x0017d7c0u) = 0u;
+        assert(ef_decomp_probe_x32_tactcom_ail_irq(bss_end, &x32,
+                                                   reason, sizeof(reason)) == 0);
+        assert(x32.stop_address == 0x0011105bu);
+        assert(x32.ail_locked_ranges == 18u);
+        assert(x32.ail_settings_written == 19u);
+        assert(x32.ail_trace_ranges_initialized == 1u);
+        assert(x32.ail_settings_ranges_initialized == 1u);
+        assert(x32.ail_irq_critical_entered == 1u);
+        assert(x32.ail_saved_ds_selector == 0x5678u);
+        assert(x32.registered_requests == 11u && x32.registered_traps == 8u);
+        assert(x32.timer_registrations == 1u && x32.input_initialized == 1u);
+        assert(x32.timer_service_initialized == 1u);
+        assert(x32.sound_module_initialized == 0u);
+        assert(EF_U8(0x0015bac5u) == 0u);
+        assert(EF_U16(0x0017d7beu) == 0x5678u);
+        assert(EF_U32(0x0017d7b6u) == 0u);
+        assert(EF_U32(0x0017d7bau) == 0u);
+        assert(EF_U32(0x0017d7b2u) == UINT32_MAX);
+        assert(EF_U32(0x0017d7c0u) == UINT32_MAX);
+        for (i = 0u; i < sizeof(tables) / sizeof(tables[0]); ++i)
+            for (j = 0u; j < 16u; ++j)
+                assert(EF_U32(tables[i] + 4u * j) == 0u);
+    }
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
