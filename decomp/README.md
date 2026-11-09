@@ -169,6 +169,12 @@ original's no-device branch would. The probe now executes recovered
   then installs its second cleanup callback in the virtual table, sets
   the input flag and reaches the original return `0xcd550`. These values
   are deliberately synthetic, not measurements of the DOS extender.
+  `--probe-x32-tactcom` separately continues *that same cold source-C state*
+  through the original TACTCOM `0x8b47c` post-input dispatch, validating
+  the zero-page-flag/no-device route before stopping at the uninitialized
+  `0xe28e8` timer/sound service. Unlike the previously supported warm path,
+  it does not preseed the timer guard, and it does not claim to exercise
+  TACTCOM's preceding file/options phase or a complete game main startup.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

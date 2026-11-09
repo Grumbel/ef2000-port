@@ -1921,3 +1921,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   `0x9c220`, `0x9c8b4`, `0xf43`, `0x324` are unchanged. Synthetic and
   original-image tests cover the new mode; no real extender response,
   interrupt/timer/IRQ, differential guest validation or Watcom splice.
+- GCC/Linux X-32 to TACTCOM handoff, 2026-11-09: an additional opt-in
+  `--probe-x32-tactcom` keeps the exact same recovered `0xe20`, `0xcd4d4`
+  and virtual-only X-32 service path, but allows the completed input
+  initializer to return before invoking the recovered TACTCOM post-input
+  body `0x8b47c..0x8b52d`. With the original zero page/device flags,
+  this reads the `0xce08c` global and reaches the uninitialized first-time
+  timer/sound entry at `0xe28e8` instead of taking the previously tested
+  warm timer-guard shortcut. Strict and timer-only probes still halt at
+  their previous addresses; original-image and synthetic GCC tests cover
+  the handoff and verify that no first-time timer state was set. The
+  preceding TACTCOM resource/options phase is deliberately not included;
+  no DOS interrupt, sound timer, real input device or full game execution.

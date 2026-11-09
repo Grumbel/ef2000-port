@@ -168,6 +168,20 @@ class DecompStandaloneTests(unittest.TestCase):
                               '0x000cd550; state 1, cleanup callback 0x000cd554',
                               timer_only.stdout)
                 self.assertIn('no DOS timer installed', timer_only.stdout)
+                tactcom_cold = subprocess.run([
+                    str(executable), '--image', original, '--probe-x32-tactcom',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('X-32 request free 5, timer free 7',
+                              tactcom_cold.stdout)
+                self.assertIn('Virtual-only X-32 timer slot 7: source 9',
+                              tactcom_cold.stdout)
+                self.assertIn('Recovered cold input initializer returned to '
+                              'TACTCOM 0x8b47c; state 1, cleanup callback 0x000cd554',
+                              tactcom_cold.stdout)
+                self.assertIn('TACTCOM post-input C reached first-time '
+                              'timer/sound service 0x000e28e8',
+                              tactcom_cold.stdout)
+                self.assertIn('no DOS timer installed', tactcom_cold.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)

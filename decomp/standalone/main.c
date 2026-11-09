@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
@@ -72,7 +72,8 @@ int main(int argc, char **argv)
                         strcmp(argv[i], "--probe-x32-vectors") == 0 ||
                         strcmp(argv[i], "--probe-x32-traps") == 0 ||
                         strcmp(argv[i], "--probe-x32-input") == 0 ||
-                        strcmp(argv[i], "--probe-x32-timer") == 0) && !probe_type) {
+                        strcmp(argv[i], "--probe-x32-timer") == 0 ||
+                        strcmp(argv[i], "--probe-x32-tactcom") == 0) && !probe_type) {
                 probe_type = argv[i];
             } else {
                 fputs("Unsupported argument (try --help).\n", stderr);
@@ -104,17 +105,23 @@ int main(int argc, char **argv)
                 strcmp(probe_type, "--probe-x32-vectors") == 0 ||
                 strcmp(probe_type, "--probe-x32-traps") == 0 ||
                 strcmp(probe_type, "--probe-x32-input") == 0 ||
-                strcmp(probe_type, "--probe-x32-timer") == 0) {
+                strcmp(probe_type, "--probe-x32-timer") == 0 ||
+                strcmp(probe_type, "--probe-x32-tactcom") == 0) {
                 ef_decomp_x32_probe x32;
-                int virtual_timer = strcmp(probe_type, "--probe-x32-timer") == 0;
+                int virtual_tactcom = strcmp(probe_type, "--probe-x32-tactcom") == 0;
+                int virtual_timer = virtual_tactcom ||
+                                    strcmp(probe_type, "--probe-x32-timer") == 0;
                 int virtual_input = virtual_timer ||
                                     strcmp(probe_type, "--probe-x32-input") == 0;
                 int virtual_traps = virtual_input ||
                                     strcmp(probe_type, "--probe-x32-traps") == 0;
                 int virtual_vectors = virtual_traps ||
                                       strcmp(probe_type, "--probe-x32-vectors") == 0;
-                int x32_status = virtual_timer
-                    ? ef_decomp_probe_x32_timer(info.bss_end, &x32,
+                int x32_status = virtual_tactcom
+                    ? ef_decomp_probe_x32_tactcom(info.bss_end, &x32,
+                                                   reason, sizeof(reason))
+                    : virtual_timer
+                        ? ef_decomp_probe_x32_timer(info.bss_end, &x32,
                                                 reason, sizeof(reason))
                     : virtual_input
                         ? ef_decomp_probe_x32_input(info.bss_end, &x32,
@@ -170,11 +177,23 @@ int main(int argc, char **argv)
                                        x32.timer_2502_result_high,
                                        x32.timer_2502_result_low,
                                        x32.timer_registrations);
-                                printf("Recovered cold input initializer returned at 0x%08x; "
-                                       "state %u, cleanup callback 0x%08x "
-                                       "(no DOS timer installed)\n",
-                                       x32.stop_address, x32.input_initialized,
-                                       x32.input_cleanup_hook);
+                                if (virtual_tactcom) {
+                                    printf("Recovered cold input initializer returned to "
+                                           "TACTCOM 0x8b47c; state %u, "
+                                           "cleanup callback 0x%08x\n",
+                                           x32.input_initialized,
+                                           x32.input_cleanup_hook);
+                                    printf("TACTCOM post-input C reached first-time "
+                                           "timer/sound service 0x%08x "
+                                           "(no DOS timer installed)\n",
+                                           x32.stop_address);
+                                } else {
+                                    printf("Recovered cold input initializer returned at 0x%08x; "
+                                           "state %u, cleanup callback 0x%08x "
+                                           "(no DOS timer installed)\n",
+                                           x32.stop_address, x32.input_initialized,
+                                           x32.input_cleanup_hook);
+                                }
                             } else {
                                 printf("Timer slot 7 staged source %u; stopped at "
                                        "DOS/X-32 timer service 0x%08x "
@@ -222,7 +241,8 @@ int main(int argc, char **argv)
                             strcmp(probe_type, "--probe-x32-vectors") != 0 &&
                             strcmp(probe_type, "--probe-x32-traps") != 0 &&
                             strcmp(probe_type, "--probe-x32-input") != 0 &&
-                            strcmp(probe_type, "--probe-x32-timer") != 0))
+                            strcmp(probe_type, "--probe-x32-timer") != 0 &&
+                            strcmp(probe_type, "--probe-x32-tactcom") != 0))
             puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files parse multiple ordinary '#' records and END validation, but mode-two geometry, EOF cleanup, archives and the first screen remain unimplemented.");
         free(image_dir);
         ef_decomp_memory_release();

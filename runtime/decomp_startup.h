@@ -84,6 +84,13 @@ int ef_decomp_probe_x32_input(uint32_t bss_end, ef_decomp_x32_probe *probe,
 int ef_decomp_probe_x32_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity);
 
+/* Resume the recovered TACTCOM 0x8b47c post-input source after the complete
+ * virtual-only cold X-32 keyboard/timer initializer. Stop at first-time
+ * timer/sound service 0xe28e8, before installing a real OS timer. This
+ * deliberately does not simulate the preceding TACTCOM file/options phase. */
+int ef_decomp_probe_x32_tactcom(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                                char *reason, size_t reason_capacity);
+
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.
  * This does not initialize Watcom libc, game state or any video device. */
