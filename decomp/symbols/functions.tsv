@@ -1767,7 +1767,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008ac64	370			unknown	unclassified	unverified		
 0x0008ae6c	251	map_key_to_command_8ae6c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008ae6c.json	docs/compiler-abi.md; Map the key code 1..36 to its command number through a jump table (0 and anything above 36 report 0x18a7a4 through the e; callers 69094@690e8,69094@69190,69094@692c4; guest pending
 0x0008af68	749			unknown	unclassified	unverified		
-0x0008b274	100	candidate_game_main		named	unclassified	unverified		candidate game main; docs/ghidra-findings.md
+0x0008b274	100	candidate_game_main	game_main	drafted	game	unverified		disassembled 0x8b274..0x8b2d7 from pinned EXE; GCC native main-prefix probe reaches TACTCOM 0x8b39c, playvideo branch reaches 0x8b2d8; Watcom/guest replay pending
 0x0008b2d8	78	reload_game_data_8b2d8	state_reset1	compiles	game	confirmed	decomp/tests/0x0008b2d8.json	docs/compiler-abi.md; Reload the game data: tear down the video state, build the data file path, load it to 0x425190 through the handler at 0x; callers 8b274@8b290; guest pending
 0x0008b328	99	format_number_commas_8b328	game_helpers81	compiles	game	confirmed	decomp/tests/0x0008b328.json	docs/compiler-abi.md; Format a number right-aligned into a field of the given width, with ',' every 3 digits.; callers 8b39c@8b3c5,8b39c@8b3f8,8b39c@8b40c; guest pending
 0x0008b39c	402	tactcom_init		named	unclassified	unverified		TACTCOM init diagnostic string; docs/ghidra-findings.md
@@ -2061,7 +2061,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009d1e8	141	read_text_line_9d1e8	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009d1e8.json	docs/compiler-abi.md; Read the next non-comment text line of a stream into its buffer.; callers f80@1158,f80@1171,f80@11b4; guest pending
 0x0009d278	263	read_next_token_9d278	game_helpers101	compiles	game	confirmed	decomp/tests/0x0009d278.json	docs/compiler-abi.md; Read the next token (blank/comma separated, optionally quoted, at most 0x50 bytes) from the text at ctx using the cursor; callers f80@117f,f80@1187,f80@11d2; guest pending
 0x0009d4cd	87	parse_int	entity_helpers	compiles	game	confirmed	decomp/tests/0x0009d4cd.json	docs/compiler-abi.md; atoi: skip class-2 characters, optional sign, class-0x20 digits.; callers f80@1196,f80@11e0,4cf4@4cf9; guest pending
-0x0009d524	57	ascii_stricmp		named	unclassified	unverified		case-folding compare; docs/ghidra-findings.md
+0x0009d524	57	ascii_stricmp_9d524	ascii_stricmp	drafted	unclassified	unverified		disassembled 0x9d524..0x9d55c from pinned EXE; ASCII folding/difference GCC synthetic tests pass; Watcom/guest replay pending
 0x0009d55d	462			unknown	unclassified	unverified		
 0x0009d72c	29	truncate_9d72c	float_helpers10	compiles	game	confirmed	decomp/tests/0x0009d72c.json	docs/compiler-abi.md; Truncate ST0 toward zero (FPU control word temporarily set to round-to-zero).; callers f80@14eb,f80@1525,f80@1566; guest pending
 0x0009d749	31	copy_string_9d749	ui_widget_helpers	compiles	game	confirmed	decomp/tests/0x0009d749.json	docs/compiler-abi.md; strcpy.; callers f80@15a5,f80@1a32,20ec@2646; guest differential 512/512 with EDX scratch differences, EAX preserved (batch 104)

@@ -4,6 +4,7 @@
 """The Linux decomp bootstrap must actually link and execute recovered C."""
 
 from pathlib import Path
+import os
 import shutil
 import subprocess
 import tempfile
@@ -29,6 +30,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/hiscore.c'),
                 str(ROOT / 'decomp/src/runtime_helpers25.c'),
                 str(ROOT / 'decomp/src/math_string.c'),
+                str(ROOT / 'decomp/src/game_main.c'),
+                str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
                 str(ROOT / 'runtime/decomp_startup.c'),
                 '-lcrypto', '-Wl,--gc-sections',
@@ -41,7 +44,7 @@ class DecompStandaloneTests(unittest.TestCase):
 
             default = subprocess.run([str(executable)], capture_output=True,
                                      text=True, check=True)
-            self.assertIn('Game entry point', default.stdout)
+            self.assertIn('TACTCOM', default.stdout)
 
             invalid = subprocess.run([str(executable), '--data-dir', '/unused'],
                                      capture_output=True, text=True)
@@ -58,6 +61,17 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(executable), '--image', str(bad_image), '--probe-arena',
             ], capture_output=True, text=True)
             self.assertEqual(unsupported.returncode, 1)
+
+            # Opt-in only: proprietary game bytes are never a test fixture.
+            # The loader itself checks the SHA-pinned German executable.
+            original = os.environ.get('EF2000_EXE')
+            if original:
+                real = subprocess.run([
+                    str(executable), '--image', original, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('arena 0x004df000 (3000000 bytes)', real.stdout)
+                self.assertIn('stopped at unimplemented TACTCOM 0x0008b39c',
+                              real.stdout)
 
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
     def test_guest_memory_and_x32_envelope(self):
@@ -89,6 +103,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'tests/decomp_startup_test.c'),
                 str(ROOT / 'decomp/src/runtime_helpers25.c'),
                 str(ROOT / 'decomp/src/math_string.c'),
+                str(ROOT / 'decomp/src/game_main.c'),
+                str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
                 str(ROOT / 'runtime/decomp_startup.c'),
                 '-lcrypto', '-Wl,--gc-sections', '-o', str(executable),

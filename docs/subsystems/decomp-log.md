@@ -1297,3 +1297,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   refusal on repeated or uninitialized calls, and memory-span bounds. This is
   not a guest differential, does not promote either function to `verified`,
   and still stops before TACTCOM init (`0x8b39c`) or video setup.
+- Native GCC game-main prefix, 2026-11-09: the supplied German game archive
+  contains the expected 1,684,561-byte `_EF2000.EXE` (SHA-256 matches
+  `docs/executable.md`). The existing native arena probe passes directly on
+  the real initialized payload: 3,000,000 bytes at 0x4df000 and cleanup
+  address 0xe2a50. Disassembled and reconstructed the 100-byte game entry
+  `0x8b274`, plus its ASCII case-insensitive comparator at `0x9d524`.
+  `--image ... --probe-main` executes the C main prefix on the real executable,
+  initializes the recovered arena, and halts explicitly at the first missing
+  TACTCOM call `0x8b39c`; the synthetic alternate argc=2 `playvideo` branch
+  stops at unrecovered reset `0x8b2d8` without allocating an arena. Neither
+  function is Watcom/guest-differential verified. The first screen remains
+  blocked by TACTCOM's many library and platform dependencies.

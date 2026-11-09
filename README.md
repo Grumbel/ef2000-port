@@ -35,6 +35,7 @@ nix run .#ef2000-unicorn -- ../EF2000/c/EF2000
 nix run .#ef2000-decomp             # GCC Linux standalone bootstrap
 nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE
 nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE --probe-arena
+nix run .#ef2000-decomp -- --image ../EF2000/c/EF2000/_EF2000.EXE --probe-main
 nix run .#ef2000-decomp-watcom      # OpenWatcom DOS bootstrap in DOSBox-X
 nix develop                    # Python, GCC/binutils, QEMU, DOSBox-X, GDB, Ghidra
 ```
@@ -150,8 +151,8 @@ is optional.
 The *standalone decomp builds* now have distinct compilers, binaries, and apps:
 
 - `packages.ef2000-decomp` uses GCC to build a native Linux ELF from the
-  recovered C, along with an archive and individual GCC object files for 338
-  of the 341 recovered C modules. Three remaining modules use unsupported
+  recovered C, along with an archive and individual GCC object files for 340
+  of the 343 recovered C modules. Three remaining modules use unsupported
   Watcom-specific constructs. `nix run .#ef2000-decomp` directly executes the
   Linux binary. With `--image /path/to/_EF2000.EXE`, it verifies the known
   executable SHA-256 and maps the X-32 initialized image and zeroed BSS into
@@ -159,7 +160,9 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
   part of the Nix package. The optional `--probe-arena` continues into the
   first known game-owned initialization routine (`0xe29a0`) and the recovered
   arena reset (`0xe2a1c`) using narrowly scoped native allocator, memory-fill
-  and cleanup-registration bindings. It stops immediately afterward.
+  and cleanup-registration bindings. `--probe-main` instead enters the
+  recovered game `main` at `0x8b274` and stops explicitly at the unimplemented
+  TACTCOM init `0x8b39c` (without running original x86 instructions).
 - `packages.ef2000-decomp-watcom` compiles all recovered C modules to
   OpenWatcom OMF and links a 32-bit DOS/CauseWay `EFDECOMP.EXE` from the
   recovered high-score module. `nix run .#ef2000-decomp-watcom` starts that
@@ -167,14 +170,15 @@ The *standalone decomp builds* now have distinct compilers, binaries, and apps:
 
 **These are executable bootstrap programs, not yet playable games.** Both
 actually invoke recovered C (`hiscore_qualifies`), but the game's original
-entry point, global-data definitions, and hardware platform layer have not
-been recovered. The GCC archive and Watcom objects are incremental build
+entry sequence is only recovered through the arena setup; TACTCOM, the
+global-data definitions and hardware platform layer remain incomplete.
+The GCC archive and Watcom objects are incremental build
 inputs; their unresolved references prevent linking the complete game today.
 On Linux, asset-free tests additionally execute recovered stream-reading and
 8x6 glyph-drawing functions against synthetic guest RAM, and exercise that
 first arena initialization and reset with synthetic input. The ordinary
-`--image` path **loads but does not run the game**; `--probe-arena` executes
-only the two recovered startup routines, not the game's main control path.
+`--image` path **loads but does not run the game**; the two optional probes
+execute only recovered startup code, not the game's main control path.
 Several compiled C routines still cast 32-bit
 guest callback offsets to host function pointers, so those paths require a
 native callback binding layer before they are safe to call.

@@ -10,6 +10,7 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,6 +21,9 @@ static uint32_t release_hook;
 static uint32_t hook_registrations;
 static int probing;
 static int arena_allocated;
+static jmp_buf main_boundary;
+static uint32_t main_boundary_address;
+static int main_probe_active;
 
 static void fatal_unexpected(const char *service)
 {
@@ -71,11 +75,43 @@ void guest_fn_b3fb0(uint32_t destination, uint32_t value, uint32_t count)
     memset(span, (int)(uint8_t)value, count);
 }
 
-int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
-                          char *reason, size_t reason_capacity)
+static void stop_at_guest_boundary(uint32_t address)
+{
+    if (!main_probe_active)
+        fatal_unexpected("game entry boundary outside a main probe");
+    main_boundary_address = address;
+    longjmp(main_boundary, 1);
+}
+
+void guest_fn_8b39c(void) { stop_at_guest_boundary(0x8b39cu); }
+void guest_fn_8b2d8(void) { stop_at_guest_boundary(0x8b2d8u); }
+
+/* These later entry points are deliberately *not* implemented as native
+ * services. Reaching them before TACTCOM has been recovered is an error. */
+void guest_fn_ea470(uint32_t mode)
+{
+    (void)mode;
+    fatal_unexpected("exit handler before TACTCOM (0xea470)");
+}
+
+void guest_fn_ea270(ef_addr32 descriptor)
+{
+    (void)descriptor;
+    fatal_unexpected("resource loader before TACTCOM (0xea270)");
+}
+
+uint32_t guest_fn_aaee8(uint32_t argc, ef_addr32 argv)
+{
+    (void)argc;
+    (void)argv;
+    fatal_unexpected("main control before TACTCOM (0xaaee8)");
+    return 0;
+}
+
+static int prepare_arena(uint32_t bss_end, char *reason, size_t reason_capacity)
 {
     uint32_t arena_size, base;
-    if (!probe || bss_end < 0x0015f76cu ||
+    if (bss_end < 0x0015f76cu ||
         !ef_decomp_memory_span(0x001264d4u, sizeof(uint32_t))) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "guest RAM is not initialized");
@@ -95,9 +131,16 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
     release_hook = 0;
     arena_allocated = 0;
     probing = 1;
-    init_arena_e29a0();
-    probing = 0;
-    if (!arena_allocated || hook_registrations != 1 ||
+    return 0;
+}
+
+static int check_arena(ef_decomp_arena_probe *probe,
+                       char *reason, size_t reason_capacity)
+{
+    uint32_t base = next_allocation;
+    uint32_t arena_size = requested_arena;
+    if (!probe || !arena_allocated || hook_registrations != 1 ||
+        release_hook != 0xe2a50u ||
         EF_U32(0x0015f75cu) != base || EF_U32(0x0015f760u) != arena_size ||
         EF_U32(0x0015f754u) != base || EF_U32(0x0015f758u) != arena_size ||
         EF_U32(0x0015f764u) != 0 || EF_U32(0x0015f768u) != 0) {
@@ -109,5 +152,51 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
     probe->size = arena_size;
     probe->release_hook = release_hook;
     probe->hook_registrations = hook_registrations;
+    return 0;
+}
+
+int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
+                          char *reason, size_t reason_capacity)
+{
+    int result;
+    if (!probe || prepare_arena(bss_end, reason, reason_capacity) != 0)
+        return -1;
+    init_arena_e29a0();
+    probing = 0;
+    result = check_arena(probe, reason, reason_capacity);
+    return result;
+}
+
+int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
+                         ef_decomp_arena_probe *probe, uint32_t *stop_address,
+                         char *reason, size_t reason_capacity)
+{
+    uint32_t stopped;
+    int result;
+    if (!probe || !stop_address || prepare_arena(bss_end, reason, reason_capacity) != 0)
+        return -1;
+    main_probe_active = 1;
+    main_boundary_address = 0;
+    if (setjmp(main_boundary) == 0)
+        (void)candidate_game_main(argc, argv);
+    stopped = main_boundary_address;
+    main_probe_active = 0;
+    probing = 0;
+    if (stopped != 0x8b39cu && stopped != 0x8b2d8u) {
+        if (reason && reason_capacity)
+            snprintf(reason, reason_capacity, "game main did not reach an expected boundary");
+        return -1;
+    }
+    *stop_address = stopped;
+    if (stopped == 0x8b2d8u) {
+        /* The original playvideo branch skips arena initialization. */
+        if (arena_allocated || hook_registrations)
+            return -1;
+        memset(probe, 0, sizeof(*probe));
+        return 0;
+    }
+    result = check_arena(probe, reason, reason_capacity);
+    if (result != 0)
+        return -1;
     return 0;
 }

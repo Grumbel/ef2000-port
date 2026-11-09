@@ -49,13 +49,15 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--probe-arena]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--probe-arena | --probe-main]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
     }
 #if !defined(__WATCOMC__)
-    if ((argc == 3 || (argc == 4 && strcmp(argv[3], "--probe-arena") == 0)) &&
+    if ((argc == 3 || (argc == 4 &&
+                       (strcmp(argv[3], "--probe-arena") == 0 ||
+                        strcmp(argv[3], "--probe-main") == 0))) &&
         strcmp(argv[1], "--image") == 0) {
         ef_decomp_image_info info;
         char reason[128];
@@ -68,15 +70,24 @@ int main(int argc, char **argv)
                info.initialized_size, info.bss_end);
         if (argc == 4) {
             ef_decomp_arena_probe probe;
-            if (ef_decomp_probe_arena(info.bss_end, &probe, reason, sizeof(reason)) != 0) {
-                fprintf(stderr, "ef2000-decomp: arena probe: %s\n", reason);
+            uint32_t stopped = 0;
+            int main_probe = strcmp(argv[3], "--probe-main") == 0;
+            int status = main_probe
+                ? ef_decomp_probe_main(info.bss_end, 1u, 0u, &probe, &stopped,
+                                       reason, sizeof(reason))
+                : ef_decomp_probe_arena(info.bss_end, &probe, reason, sizeof(reason));
+            if (status != 0) {
+                fprintf(stderr, "ef2000-decomp: startup probe: %s\n", reason);
                 ef_decomp_memory_release();
                 return 1;
             }
             printf("Recovered 0xe29a0 + 0xe2a1c: arena 0x%08x (%u bytes), release hook 0x%08x\n",
                    probe.base, probe.size, probe.release_hook);
+            if (main_probe)
+                printf("Recovered game main 0x8b274 stopped at unimplemented TACTCOM 0x%08x\n",
+                       stopped);
         }
-        puts("Recovered game entry and first-screen initialization are not yet linked.");
+        puts("TACTCOM and first-screen initialization are not yet linked.");
         ef_decomp_memory_release();
         return 0;
     }
@@ -92,6 +103,6 @@ int main(int argc, char **argv)
         return 1;
     }
     if (argc == 1)
-        puts("Game entry point, global data and platform layer are not recovered yet.");
+        puts("Game entry prefix is recovered; TACTCOM, globals and platform layer remain incomplete.");
     return 0;
 }

@@ -6,6 +6,16 @@
 
 #include "ef_types.h"
 
+/* Game entry path from the SHA-pinned original, recovered from instruction
+ * flow. These C interfaces are not yet Watcom splice-verified. */
+int32_t ascii_stricmp_9d524(ef_addr32 left, ef_addr32 right);
+uint32_t candidate_game_main(uint32_t argc, ef_addr32 argv);
+void guest_fn_8b2d8(void); /* 0x8b2d8: unresolved playvideo reset path */
+void guest_fn_8b39c(void); /* 0x8b39c: unresolved TACTCOM init */
+void guest_fn_ea470(uint32_t mode); /* 0xea470: unresolved in main path */
+void guest_fn_ea270(ef_addr32 descriptor); /* 0xea270: clump loader */
+uint32_t guest_fn_aaee8(uint32_t argc, ef_addr32 argv); /* 0xaaee8 */
+
 /* Batch 089: eleven nontrivial callback bodies plus two small control
  * entries. Host C interfaces do not assert native guest splice ABIs. */
 uint32_t gui_guest_call_089(uint32_t entry, uint32_t eax, uint32_t edx);

@@ -46,12 +46,13 @@ There is no standalone **playable game** build yet. The flake now produces
 two executable bootstraps from `standalone/main.c` and recovered
 `src/hiscore.c`: `.#ef2000-decomp` (native GCC/Linux) and
 `.#ef2000-decomp-watcom` (OpenWatcom/CauseWay DOS, launched via DOSBox-X).
-The Linux package also compiles 338 portable modules into a GCC archive;
+The Linux package also compiles 340 modules into a GCC archive;
 `game_helpers125.c`, `runtime_helpers23.c`, and `runtime_helpers42.c` still
 contain Watcom-specific or non-portable C. The DOS package retains all OMF
 objects for hybrid splicing. The bootstrap uses synthetic high-score data;
-it cannot enter the game. Original globals, game startup, external function
-bindings and platform services are not yet reconstructed for standalone use.
+it cannot enter a playable game. The game entry's initial arena call has now
+been recovered, but TACTCOM, external function bindings, global initialization
+and platform services are not yet reconstructed for standalone use.
 `nix run .#ef2000-decomp -- --image /path/to/_EF2000.EXE` now validates the
 known original executable and maps its initialized X-32 payload and zeroed BSS
 into host-owned, bounded 64 MiB guest memory. No original instructions run;
@@ -66,7 +67,13 @@ host allocator and the minimum required Watcom/X-32 service bindings. A
 synthetic execution test verifies the game globals, 0xe2a50 cleanup hook and
 zeroed arena. This is a startup **probe**, not a verified reproduction of the
 original executable's entire C-runtime startup; its execution against real
-game data still needs local verification.
+game data passed with the SHA-pinned German executable on 2026-11-09.
+`--probe-main` now runs the recovered 100-byte game entry at `0x8b274`
+(including the native case-insensitive `0x9d524` comparison), invokes the
+recovered arena setup, and deliberately halts at the unrecovered TACTCOM
+`0x8b39c` call. The alternate `playvideo` branch is exercised with synthetic
+guest argv. These are still `drafted` C functions until OpenWatcom splice and
+guest replay validate them.
 
 Use `.#ef2000-hybrid` to combine OpenWatcom OMF replacements with the
 original executable through the native64 harness until the source is complete.

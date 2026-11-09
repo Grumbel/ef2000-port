@@ -364,6 +364,7 @@
             -Idecomp/include -Iruntime tests/decomp_startup_test.c \
             runtime/decomp_image.c runtime/decomp_startup.c \
             decomp/src/runtime_helpers25.c decomp/src/math_string.c \
+            decomp/src/game_main.c decomp/src/ascii_stricmp.c \
             -lcrypto -Wl,--gc-sections -o decomp-startup-test
           ./decomp-startup-test
           runHook postBuild
