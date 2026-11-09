@@ -58,7 +58,9 @@ int main(void)
             {"CONTROL", 0x001a5c0bu, 1u, 0x00082710u, 3u},
             {"HUDCOL", 0x0012b366u, 2u, 0u, 3u},
             {"JOY_FACTOR", 0x00122dc4u, 4u, 0u, 3u},
-            {"MUSIC", 0x001fcb50u, 0x50u, 0u, 5u},
+            {"MUSIC", 0x001fcb50u, 0x50u, 0x0008289cu, 5u},
+            {"SOUNDFX", 0x001fcb50u, 0x50u, 0x00082814u, 5u},
+            {"JOYSTICK", 0x001fcb50u, 0x50u, 0x000828f8u, 5u},
         };
         size_t i;
         const uint32_t table = 0x0012b370u;
@@ -112,8 +114,49 @@ int main(void)
         memcpy(ef_decomp_memory_span(text, 14), "MUSIC=1,127\r\n", 13);
         EF_U32(0x00464384u) = text;
         assert(parse_scalar_setting_e882c() == 0u);
+        assert(parse_sound_setting_e882c() == 1u);
+        assert(EF_U8(0x00420a72u) == 1u);
+        assert(EF_U8(0x00420a71u) == 127u);
+        assert(EF_U16(0x00464394u) == 5u);
+        assert(strcmp(ef_decomp_memory_span(0x001fcb50u, 6), "1,127") == 0);
+        assert(strcmp(ef_decomp_memory_span(0x004643b7u, 6), "1,127") == 0);
+        assert(EF_U32(0x00464384u) == text + 6u);
+
+        memcpy(ef_decomp_memory_span(text, sizeof("SOUNDFX=0,200\r\n")),
+               "SOUNDFX=0,200\r\n", sizeof("SOUNDFX=0,200\r\n"));
+        EF_U32(0x00464384u) = text;
+        assert(parse_sound_setting_e882c() == 1u);
+        assert(EF_U8(0x00420e10u) == 127u);
+        assert(EF_U8(0x0015bac6u) == 0u);
+        assert(EF_U8(0x001a8581u) == 0u);
+        assert(EF_U8(0x0015b7e5u) == 0xffu);
+
+        memcpy(ef_decomp_memory_span(text, sizeof("SOUNDFX=2,-10\r\n")),
+               "SOUNDFX=2,-10\r\n", sizeof("SOUNDFX=2,-10\r\n"));
+        EF_U32(0x00464384u) = text;
+        assert(parse_sound_setting_e882c() == 1u);
+        assert(EF_U8(0x00420e10u) == 0u);
+        assert(EF_U8(0x0015bac6u) == 2u);
+        assert(EF_U8(0x001a8581u) == 2u);
+        assert(EF_U8(0x0015b7e5u) == 1u);
+
+        memcpy(ef_decomp_memory_span(text, sizeof("MUSIC=1,32768\r\n")),
+               "MUSIC=1,32768\r\n", sizeof("MUSIC=1,32768\r\n"));
+        EF_U32(0x00464384u) = text;
+        assert(parse_sound_setting_e882c() == 0u);
+        assert(EF_U8(0x00420a71u) == 127u);
+
+        memcpy(ef_decomp_memory_span(text, sizeof("MUSIC=invalid\r\n")),
+               "MUSIC=invalid\r\n", sizeof("MUSIC=invalid\r\n"));
+        EF_U32(0x00464384u) = text;
+        assert(parse_sound_setting_e882c() == 0u);
+
+        memcpy(ef_decomp_memory_span(text, sizeof("JOYSTICK=4000,63\r\n")),
+               "JOYSTICK=4000,63\r\n", sizeof("JOYSTICK=4000,63\r\n"));
+        EF_U32(0x00464384u) = text;
+        assert(parse_sound_setting_e882c() == 0u);
         assert(EF_U32(0x00464384u) == text);
-        assert(EF_U8(0x001fcb50u) == 0u);
+        assert(strcmp(ef_decomp_memory_span(0x001fcb50u, 6), "2,-10") == 0);
 
         memcpy(ef_decomp_memory_span(text, 20), "DETAIL=2147483648\r\n", 20);
         EF_U32(0x00464384u) = text;

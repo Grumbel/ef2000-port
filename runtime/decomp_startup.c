@@ -401,6 +401,8 @@ uint8_t guest_fn_e882c_x(void)
     }
     if (parse_scalar_setting_e882c())
         return 1u;
+    if (parse_sound_setting_e882c())
+        return 1u;
     stop_at_guest_boundary(0x000e882cu);
     return 0;
 }

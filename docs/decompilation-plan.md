@@ -2111,6 +2111,7 @@ Append one line per completed step or every ~20 verified functions:
 2026-11-06  3.37  `strip_cr_inplace` (`0x1091e0`, 28 bytes) is verified with an exact OpenWatcom body, six isolated cases and one captured startup call (348 guest RAM bytes compared). Repeated menu/setup/cockpit replay passes 3/3 with 1/1/2 hits and matching state/counters. See docs/subsystems/decomp-batch-139.md.
 2026-11-06  3.38  `times_100_div_10` (`0x106bfc`, 32 bytes) now models modulo-2^32 multiplication followed by signed division; OpenWatcom patch and 12 isolated cases pass. The repeated menu/setup/cockpit replay preserves checkpoints but has zero candidate hits because callers are in virtual-I/O/serial-tracker paths; retain `spliced`. See docs/subsystems/decomp-batch-140.md.
 2026-11-09  native-startup  Recovered the strict decimal type-3 route of configuration interpreter 0xe882c and 16-byte CONTROL callback 0x82710. Synthetic width/callback tests and opt-in SHA-pinned real-image startup pass. MUSIC (type 5), diagnostics and first-screen 0x30214 remain explicit boundaries; not Watcom-spliced/verified. See docs/subsystems/decomp-log.md.
+2026-11-09  native-startup  Extended 0xe882c through verified type-5 text copying and original MUSIC/SOUNDFX callbacks (0x8289c/0x82814) for strict two-short-number settings. Shipped prefix now stops at JOYSTICK; an all-supported sound configuration reaches 0x30214. Original diagnostic/error routes and non-sound callbacks remain unsupported. See docs/subsystems/decomp-log.md.
 ```
 
 ---

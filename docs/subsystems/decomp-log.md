@@ -1436,3 +1436,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   unimplemented complex `MUSIC=1,127` at `0xe882c`. This is a partial
   route inside the 2,990-byte token interpreter, not a complete recovery;
   no video first screen yet.
+- GCC/Linux MUSIC/SOUNDFX list settings, 2026-11-09: recovered the
+  text-copy case of original `0xe882c` (jump at `0xe8e1d`, string copy at
+  `0xe935b`, scratch length at `0xe939d`) for two type-5 descriptors. Their
+  source descriptor fields are width 0x50, destination `0x1fcb50`, and
+  per-setting callbacks. Recovered `MUSIC` callback `0x8289c` and
+  `SOUNDFX` callback `0x82814`: both scan `%hd,%hd` from `0x188b94`, clamp
+  signed 16-bit volume to 0..127, and update runtime enable/volume fields.
+  `SOUNDFX` preserves the original overlapping high-byte test for its
+  quality flag `0x15b7e5`. Only complete, valid numeric pairs are accepted;
+  malformed/incomplete `sscanf` and other type-5 callbacks remain boundaries.
+  Synthetic tests verify scratch text/length, callbacks, volume limits and
+  unsupported cases; opt-in SHA-pinned startup advances the shipped prefix
+  through MUSIC and STICK to the unimplemented JOYSTICK callback at `0xe882c`.
+  A sound-only config completes the parser and reaches unknown `0x30214`.
+  No first screen or full interpreter recovery yet.

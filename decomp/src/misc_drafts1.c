@@ -13749,10 +13749,9 @@ uint8_t hit_map_entry_910f4(uint32_t u0, int32_t x, uint32_t u2, int32_t y, uint
     return 0u;
 }
 
-/* 0xe882c, partial comment-only entry. The original routine initializes
- * these three scratch globals before recognizing a leading semicolon and
- * returning AL=1. The assignment parser following that branch is not yet
- * recovered; its other entries remain an explicit native probe boundary. */
+/* 0xe882c, semicolon-only entry. The original routine initializes these
+ * three scratch globals before recognizing a leading semicolon and returning
+ * AL=1. Scalar and two sound-setting paths are recovered separately. */
 uint8_t parse_comment_line_e882c(void)
 {
     EF_U32(0x0046438cu) = 0u;
@@ -13770,23 +13769,19 @@ static void apply_control_setting_82710(void)
     EF_U8(0x00420960u) = value;
 }
 
-/* 0xe882c (partial), the type-3 numeric-assignment route only. The original
- * reads identifiers from 0x464384, compares against the 18-byte descriptor
- * table at 0x464380, skips spaces/tabs/'=', scans a signed decimal with
- * "%ld" (0x190ed8), stores 1/2/4 bytes at descriptor +5, then calls its
- * optional callback. The unimplemented type-5 subtable parser, error reports
- * and unusual sscanf input remain at the 0xe882c native probe boundary.
- * Validate the entire supported input before mutating guest state. */
-uint8_t parse_scalar_setting_e882c(void)
+/* Shared identifier/descriptor selection at the start of original 0xe882c.
+ * The game uses its 0x195af0 classification table; all shipped identifiers
+ * are ASCII letters, numbers or underscores. Other classes remain outside
+ * this native subset, and unsupported tokens cause no state mutations. */
+static uint8_t find_setting_descriptor_e882c(uint32_t cursor,
+                                            uint32_t *line_length,
+                                            uint32_t *key_length,
+                                            uint32_t *entry,
+                                            char key[0x85])
 {
-    const uint32_t cursor = EF_U32(0x00464384u);
     const uint32_t table = EF_U32(0x00464380u);
-    char key[0x85];
-    uint32_t length = 0u, key_length = 0u, offset, entry = 0u;
-    uint32_t destination, callback, value, magnitude = 0u;
-    uint8_t width;
-    uint32_t limit;
-    int negative = 0;
+    uint32_t length = 0u, nkey = 0u, offset;
+    *entry = 0u;
 
     while (length < 0x84u && EF_U8(cursor + length) != 0u &&
            EF_U8(cursor + length) != '\r')
@@ -13794,16 +13789,16 @@ uint8_t parse_scalar_setting_e882c(void)
     if (length >= 0x84u)
         return 0u;
 
-    while (key_length < length) {
-        uint8_t c = EF_U8(cursor + key_length);
+    while (nkey < length) {
+        uint8_t c = EF_U8(cursor + nkey);
         if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
               (c >= '0' && c <= '9') || c == '_'))
             break;
-        key[key_length++] = (char)c;
+        key[nkey++] = (char)c;
     }
-    if (key_length == 0u)
+    if (nkey == 0u)
         return 0u;
-    key[key_length] = '\0';
+    key[nkey] = '\0';
 
     /* No assumed descriptor ordering or hardcoded target addresses: both
      * must come from the actual guest configuration table. */
@@ -13813,7 +13808,7 @@ uint8_t parse_scalar_setting_e882c(void)
         uint32_t n;
         if (name == 0u)
             return 0u;
-        for (n = 0; n <= key_length; n++) {
+        for (n = 0; n <= nkey; n++) {
             uint8_t a = EF_U8(name + n);
             uint8_t b = (uint8_t)key[n];
             if (a >= 'A' && a <= 'Z')
@@ -13823,14 +13818,36 @@ uint8_t parse_scalar_setting_e882c(void)
             if (a != b)
                 break;
             if (a == 0u) {
-                entry = candidate;
+                *entry = candidate;
                 break;
             }
         }
-        if (entry)
+        if (*entry)
             break;
     }
-    if (!entry || EF_U8(entry + 4u) != 3u)
+    if (*entry == 0u)
+        return 0u;
+    *line_length = length;
+    *key_length = nkey;
+    return 1u;
+}
+
+/* 0xe882c (partial), the type-3 numeric-assignment route only. The original
+ * skips spaces/tabs/'=', scans signed decimal with "%ld" (0x190ed8), stores
+ * 1/2/4 bytes at descriptor +5, then invokes the optional callback. The
+ * unusual sscanf input and diagnostic branches remain an explicit boundary.
+ * Validate the entire supported input before mutating guest state. */
+uint8_t parse_scalar_setting_e882c(void)
+{
+    const uint32_t cursor = EF_U32(0x00464384u);
+    char key[0x85];
+    uint32_t length, key_length, offset, entry;
+    uint32_t destination, callback, value, magnitude = 0u;
+    uint8_t width;
+    uint32_t limit;
+    int negative = 0;
+    if (!find_setting_descriptor_e882c(cursor, &length, &key_length, &entry, key) ||
+        EF_U8(entry + 4u) != 3u)
         return 0u;
     destination = EF_U32(entry + 5u);
     width = EF_U8(entry + 9u);
@@ -13902,6 +13919,125 @@ uint8_t parse_scalar_setting_e882c(void)
         EF_U32(destination) = value;
     if (callback == 0x00082710u)
         apply_control_setting_82710();
+    return 1u;
+}
+
+/* Watcom's scanf("%hd,%hd") uses 16-bit signed destinations here. Accept
+ * only its unambiguous two-number subset; incomplete conversions (whose
+ * uninitialized stack values are then read by the original callbacks) are
+ * still unsupported by the native startup probe. */
+static uint8_t parse_setting_short_e882c(const char *source, uint32_t count,
+                                        uint32_t *position, int16_t *result)
+{
+    uint32_t pos = *position;
+    uint32_t magnitude = 0u;
+    uint32_t maximum;
+    uint32_t digits = 0u;
+    int negative = 0;
+    while (pos < count && (source[pos] == ' ' || source[pos] == '\t'))
+        pos++;
+    if (pos < count && (source[pos] == '+' || source[pos] == '-')) {
+        negative = source[pos] == '-';
+        pos++;
+    }
+    maximum = negative ? 0x8000u : 0x7fffu;
+    while (pos < count && source[pos] >= '0' && source[pos] <= '9') {
+        uint32_t digit = (uint32_t)source[pos++] - (uint32_t)'0';
+        if (magnitude > (maximum - digit) / 10u)
+            return 0u;
+        magnitude = magnitude * 10u + digit;
+        digits++;
+    }
+    if (!digits)
+        return 0u;
+    *position = pos;
+    *result = (int16_t)(negative ? 0u - magnitude : magnitude);
+    return 1u;
+}
+
+/* 0x8289c and 0x82814, the original MUSIC/SOUNDFX callbacks: parse two
+ * signed shorts, clamp volume to [0,127], then update their runtime flags.
+ * SOUNDFX additionally clamps its own just-written byte 0x15b7e5 via the
+ * signed high byte of overlapping dword 0x15b7e2 (original aliasing). */
+static void apply_sound_setting_82814_8289c(uint32_t callback,
+                                            int16_t enabled, int16_t volume)
+{
+    uint8_t first = (uint8_t)enabled;
+    uint8_t clamped = (uint8_t)(volume < 0 ? 0 : volume > 127 ? 127 : volume);
+    if (callback == 0x0008289cu) {
+        EF_U8(0x00420a72u) = first;
+        EF_U8(0x00420a71u) = clamped;
+    } else {
+        EF_U8(0x00420e10u) = clamped;
+        EF_U8(0x0015bac6u) = first;
+        EF_U8(0x001a8581u) = first;
+        EF_U8(0x0015b7e5u) = first ? first : 0xffu;
+        if ((int32_t)EF_U32(0x0015b7e2u) >> 24 > 1)
+            EF_U8(0x0015b7e5u) = 1u;
+    }
+}
+
+/* 0xe882c (partial), original type-5 text-copy path 0xe8e1d..0xe8f44,
+ * 0xe935b and 0xe939d, plus only the two recovered sound callbacks.
+ * The descriptor supplies width 0x50, string target 0x1fcb50 and callback.
+ * Other type-5 callbacks, especially JOYSTICK, remain native boundaries. */
+uint8_t parse_sound_setting_e882c(void)
+{
+    const uint32_t cursor = EF_U32(0x00464384u);
+    char key[0x85];
+    char value[0x81];
+    uint32_t length, key_length, offset, entry;
+    uint32_t callback, destination, value_start, value_length = 0u, pos = 0u;
+    int16_t enabled, volume;
+
+    if (!find_setting_descriptor_e882c(cursor, &length, &key_length, &entry, key) ||
+        EF_U8(entry + 4u) != 5u || EF_U8(entry + 9u) != 0x50u ||
+        EF_U32(entry + 5u) != 0x001fcb50u)
+        return 0u;
+    destination = EF_U32(entry + 5u);
+    callback = EF_U32(entry + 14u);
+    if (callback != 0x00082814u && callback != 0x0008289cu)
+        return 0u;
+
+    value_start = key_length;
+    while (value_start < length) {
+        uint8_t c = EF_U8(cursor + value_start);
+        if (c != ' ' && c != '\t' && c != '=')
+            break;
+        value_start++;
+    }
+    for (offset = value_start; offset < length; offset++) {
+        uint8_t c = EF_U8(cursor + offset);
+        if (c == ';')
+            break;
+        if (value_length >= 0x4fu)
+            return 0u;
+        value[value_length++] = (char)c;
+    }
+    while (value_length &&
+           (value[value_length - 1u] == ' ' || value[value_length - 1u] == '\t'))
+        value_length--;
+    value[value_length] = '\0';
+    if (!parse_setting_short_e882c(value, value_length, &pos, &enabled) ||
+        pos >= value_length || value[pos++] != ',' ||
+        !parse_setting_short_e882c(value, value_length, &pos, &volume))
+        return 0u;
+    while (pos < value_length && (value[pos] == ' ' || value[pos] == '\t'))
+        pos++;
+    if (pos != value_length)
+        return 0u;
+
+    EF_U32(0x0046438cu) = 0u;
+    EF_U8(0x004643b7u) = 0u;
+    EF_U16(0x00464394u) = 0u;
+    for (offset = 0u; offset <= key_length; offset++)
+        EF_U8(0x00464396u + offset) = (uint8_t)key[offset];
+    EF_U32(0x00464384u) = cursor + value_start;
+    for (offset = 0u; offset <= value_length; offset++)
+        EF_U8(0x004643b7u + offset) = (uint8_t)value[offset];
+    copy_string_9d749(destination, 0x004643b7u);
+    EF_U16(0x00464394u) = (uint16_t)value_length;
+    apply_sound_setting_82814_8289c(callback, enabled, volume);
     return 1u;
 }
 
