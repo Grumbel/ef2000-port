@@ -1791,3 +1791,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   vector installation, protected-mode selectors or DOS/IRQ behavior;
   therefore TACTCOM's native cold path still stops before `0x628`, and no
   standalone DOS program, full game or guest differential is claimed.
+- X-32 startup and keyboard request-pool composition, 2026-11-09: added a
+  second host-memory test that links the actual recovered source bodies of
+  `0xe20`, far-stub setup `0xb04`, request allocator `0x628`, keyboard
+  initializer `0xcd4d4` and timer allocator `0x734`. Test doubles are used
+  only for the external DOS/X-32 calls, selectors, keyboard subroutines and
+  timer hardware. The test inspects the far-stub opcode bytes `0x9a/0xcf`,
+  all eleven vector registrations and their ten-byte guest records, seven
+  remaining timer free slots, the two allocated input requests (indices 6
+  and 5), timer index 7 and its fourteen-byte guest record, both teardown
+  registrations, and warm-init idempotence. It runs with and without the
+  environment variable that suppresses trap installation. This validates
+  composition of recovered C, **not** an actual extender or a DOS interrupt;
+  no native startup wiring, guest differential or Watcom splice is claimed.
+  UBSan also caught misaligned dword accesses in the original ten- and
+  fourteen-byte packed pool structures; `0x628`, `0x6b8` and `0x734` now
+  read and write these exact little-endian bytes without misaligned C lvalues.
+  The test exercises `0x6b8` release, idempotent release of a cleared entry,
+  and reuse of request slot 6 with the original free-list order. The composed
+  test now passes with UBSan alignment checks enabled.

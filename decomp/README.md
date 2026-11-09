@@ -131,8 +131,14 @@ original's no-device branch would. The probe now executes recovered
   at `0xe20` is now recovered separately as source in `x32_startup.c`,
   including its nine vector registrations, request/timer free-list setup,
   selector-dependent final vector and optional trap-handler registration.
-  It has a synthetic host-memory test, but is **not yet wired into the native
-  probe**: the original `0xb04` far-stub setup and the actual DOS/X-32
+  It has a synthetic host-memory test plus an isolated composed test that
+  executes recovered C for `0xe20`, `0xb04`, `0x628`, `0xcd4d4`, and `0x734`
+  with test-only DOS/X-32 call doubles. That test verifies eleven requests,
+  one timer, the far-stub bytes, and two cleanup callbacks after the cold
+  input path, plus request release/reuse through recovered `0x6b8`. Packed
+  request and timer dwords use explicit little-endian byte accesses so the
+  same guest layout is valid under the native C alignment rules. It is
+  **not yet wired into the native probe**: actual DOS/X-32
   request/vector/timer services cannot be safely simulated by a free-list
   initialization alone. A synthetic
   pre-initialized input-state test skips that setup as in the original and
