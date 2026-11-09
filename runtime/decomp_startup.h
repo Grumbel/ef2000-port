@@ -29,9 +29,12 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * joystick (0xd66c2), and executes the 0xe94ec text loader and 0xe93dc
  * line parser. Unrecognized setting syntax stops at token handler 0xe882c;
  * blank/comment-only or supported config enters ReadGenSeqs at 0x30214,
- * initializes its 40 slots and stops at resource opener 0x9ccb8. The host
- * supports read-only plain text only. Without a directory the legacy
- * boundary remains at 0xb3b90. Low memory stops
+ * initializes its 40 slots and opens the Views resource through the bounded
+ * plain-file portion of 0x9ccb8. An absent resource stops at the diagnostic
+ * callback 0xea50c; a synthetic plain resource constructs the 0x9d114
+ * stream context and stops at the 0x9d1e8 line parser. Packed resources
+ * and archive lookups remain explicit boundaries. Without a directory the
+ * legacy boundary remains at 0xb3b90. Low memory stops
  * at 0x8b417, and playvideo at 0x8b2d8.
  * Never executes any original x86 or the full game main loop. */
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,

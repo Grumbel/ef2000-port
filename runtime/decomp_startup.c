@@ -23,6 +23,7 @@ static uint32_t release_hook;
 static uint32_t hook_registrations;
 static int probing;
 static int arena_allocated;
+static int stream_allocated;
 static jmp_buf main_boundary;
 static uint32_t main_boundary_address;
 static int main_probe_active;
@@ -76,9 +77,20 @@ void guest_fatal_arg(ef_addr32 format, uint32_t value)
 }
 
 /* Original 0xc3f70 is a jump to the extender-backed allocator. During this
- * narrowly bounded probe only its single arena allocation is expected. */
+ * narrowly bounded probe only the arena and one Views stream record are
+ * modeled. The latter lives beyond the initial arena, not inside its
+ * accounting structure. This is not a general X-32 heap implementation. */
 uint32_t guest_fn_c3f70(uint32_t size)
 {
+    uint32_t stream_address;
+    if (probing && main_probe_active && arena_allocated && !stream_allocated &&
+        size == 0x56cu && requested_arena <= UINT32_MAX - next_allocation) {
+        stream_address = next_allocation + requested_arena;
+        if (!ef_decomp_memory_span(stream_address, size))
+            fatal_unexpected("Views stream allocation outside guest RAM");
+        stream_allocated = 1;
+        return stream_address;
+    }
     if (!probing || arena_allocated || size != requested_arena ||
         !ef_decomp_memory_span(next_allocation, size))
         fatal_unexpected("arena allocation (0xc3f70)");
@@ -409,14 +421,18 @@ uint8_t guest_fn_e882c_x(void)
     return 0;
 }
 
-/* ReadGenSeqs() first initializes forty records, then builds the path for
- * BG\views\views2.dat. Keep its resource opener as the next hard boundary;
- * the 4,119-byte original parser and archive handle layer are not linked. */
+/* Probe-only adapter for the plain-file branch of 0x9ccb8. The slot
+ * allocation, eight-byte read and relative rewind use recovered guest C;
+ * only their read-only stream operations are provided by decomp_files.c.
+ * Archive lookup and packed JR/RA decoding remain hard boundaries. */
 uint32_t guest_fn_9ccb8(ef_addr32 path)
 {
     const char *name;
     const char *suffix;
     size_t length, suffix_length;
+    int32_t handle;
+    uint32_t read_count;
+    const ef_addr32 header = TACTCOM_VIEW_FRAME + 0x98u;
     if (!probing || !main_probe_active || path != TACTCOM_VIEW_FRAME ||
         !(name = (const char *)ef_decomp_memory_span(path, 0x94u)) ||
         !(suffix = (const char *)ef_decomp_memory_span(0x00182794u, 0x30u)) ||
@@ -428,8 +444,59 @@ uint32_t guest_fn_9ccb8(ef_addr32 path)
         memcmp(name + length - suffix_length, suffix, suffix_length) != 0)
         fatal_unexpected("Views.c resource-open suffix (0x9ccb8)");
     printf("TACTCOM sequence resource pathname: %s\n", name);
-    stop_at_guest_boundary(0x0009ccb8u);
-    return UINT32_MAX;
+    if (!ef_decomp_files_enabled())
+        stop_at_guest_boundary(0x0009ccb8u);
+    if ((EF_U32(0x0040d1f0u) && (EF_U8(0x00132ab0u) & 1u)) ||
+        (EF_U32(0x0040d1f4u) && (EF_U8(0x00132ab0u) & 2u)))
+        stop_at_guest_boundary(0x000ebb58u);
+
+    handle = open_slot_a7900(0u, 0u, 0u, 0u, path);
+    if (handle == -1)
+        return UINT32_MAX;
+    if (!ef_decomp_memory_span(header, 8u))
+        fatal_unexpected("Views.c resource header buffer");
+    read_count = read_handle_a79d4(0u, 0u, 0u, 0u, (uint32_t)handle, 8u, header);
+    /* The original does not check short header reads and uses stack bytes
+     * that may be uninitialized. No defined compressed/plain branch exists
+     * for a short file, so stop rather than manufacture one. */
+    if (read_count != 8u)
+        stop_at_guest_boundary(0x0009ccb8u);
+    if (EF_U16(header) == 0x524au || EF_U16(header) == 0x4152u) {
+        close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
+        stop_at_guest_boundary(0x0009cd53u);
+    }
+    if (seek_current_a7ac8(0u, 0u, 0u, 0u, (uint32_t)handle, (uint32_t)-8) != 0u)
+        fatal_unexpected("Views.c plain-file rewind");
+    return (uint32_t)handle;
+}
+
+void guest_callptr2_x(ef_addr32 fn, uint32_t format, uint32_t filename)
+{
+    if (!probing || !main_probe_active || fn != 0x000ea50cu ||
+        EF_U32(0x00132a74u) != fn || format != 0x001827a8u ||
+        filename != TACTCOM_VIEW_FRAME)
+        fatal_unexpected("Views.c missing-file diagnostic callback");
+    stop_at_guest_boundary(0x000ea50cu);
+}
+
+uint32_t guest_fn_9d060(uint32_t size)
+{
+    if (!probing || !main_probe_active || size != 0x56cu)
+        fatal_unexpected("Views.c stream allocator request (0x9d060)");
+    return alloc_or_abort_9d060(size);
+}
+
+void guest_fn_9d1e8(uint32_t stream)
+{
+    const uint32_t expected = next_allocation + requested_arena;
+    if (!probing || !main_probe_active || !stream_allocated ||
+        stream != expected || EF_U8(stream) != 0x63u ||
+        EF_U32(stream + 0x568u) != 0x0009d084u ||
+        EF_U32(stream + 0x560u) != 100u)
+        fatal_unexpected("Views.c parser context (0x9d1e8)");
+    if (guest_fn_a7a64_r(0u, 1u, EF_U32(stream + 0x560u)) != 0u)
+        fatal_unexpected("Views.c resource was not rewound");
+    stop_at_guest_boundary(0x0009d1e8u);
 }
 
 void guest_fn_30214_w(void)
@@ -450,7 +517,7 @@ void guest_fn_30214_w(void)
         strlen(source) + (base ? strlen(base) : 0u) >= 0x94u)
         fatal_unexpected("ReadGenSeqs pathname bounds");
     read_gen_sequences_prefix_30214(TACTCOM_VIEW_FRAME);
-    fatal_unexpected("ReadGenSeqs returned from unbound resource open");
+    fatal_unexpected("ReadGenSeqs returned from unbound resource parser");
 }
 void guest_fn_2ff44_w(void) { stop_at_guest_boundary(0x0002ff44u); }
 void guest_fn_f80_w(void) { stop_at_guest_boundary(0x00000f80u); }
@@ -529,6 +596,7 @@ static int prepare_arena(uint32_t bss_end, char *reason, size_t reason_capacity)
     hook_registrations = 0;
     release_hook = 0;
     arena_allocated = 0;
+    stream_allocated = 0;
     probing = 1;
     return 0;
 }
@@ -596,7 +664,9 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     probing = 0;
     ef_decomp_files_end();
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
-        stopped != 0x9ccb8u && stopped != 0xb3c04u &&
+        stopped != 0x9ccb8u && stopped != 0x9cd53u &&
+        stopped != 0x9d1e8u && stopped != 0xebb58u &&
+        stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)

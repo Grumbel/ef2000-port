@@ -1483,3 +1483,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   startup test confirms the path and the next `0x9ccb8` boundary. No archive
   opener, file parser, original-guest replay, Watcom splice or first screen
   is claimed; the 4,119-byte function remains `named`, not `compiles`.
+- GCC/Linux Views resource opener and stream context, 2026-11-09: checked the
+  original `0x9ccb8..0x9cde6` disassembly and reused recovered game-handle
+  primitives `0xa7900`, `0xa79d4`, `0xa7ac8`, and `0xa7990` through the
+  existing read-only DOS-path adapter. The native probe handles absent
+  resources by returning `-1` to the recovered `ReadGenSeqs` two-argument
+  diagnostic call (`0x1827a8`, pathname), stopping at its original callback
+  `0xea50c`. A synthetic, uncompressed resource exercises the eight-byte
+  magic check and rewind, then allocates a bounded 0x56c-byte guest stream
+  record through recovered `0x9d060`/`0x9d114`, sets its leading byte to
+  `0x63`, and stops at original line parser `0x9d1e8`. JR/RA resources stop
+  at the packed branch `0x9cd53`; configured archive contexts stop before
+  `0xebb58`. The separate 0x56c guest allocation is a tightly constrained
+  host probe, not a general X-32 heap. Header reads shorter than eight bytes
+  remain unsupported because the original tests uninitialized stack bytes.
+  SHA-pinned original executable and synthetic filesystem fixtures validate
+  these boundaries without adding proprietary assets to the repository.
+  There is still no Views file parser, archive decoder, Watcom splice,
+  original-guest differential, or playable first screen; `ReadGenSeqs`
+  remains `named`, not `compiles`.

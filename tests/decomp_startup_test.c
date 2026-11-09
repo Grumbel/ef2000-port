@@ -17,6 +17,30 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+/* Keep all the fixture's configuration and memory data synthetic. Recreate
+ * the same ReadGenSeqs entry state for every file-format branch. */
+static void setup_views_probe(void)
+{
+    EF_U32(0x001264d4u) = 0x400u;
+    memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
+    memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
+    memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
+    memcpy(ef_decomp_memory_span(0x00182708u, 5), "NONE", 5);
+    EF_U16(0x00182710u) = 0x5fu;
+    memcpy(ef_decomp_memory_span(0x00182794u, sizeof("BG\\views\\views2.dat")),
+           "BG\\views\\views2.dat", sizeof("BG\\views\\views2.dat"));
+    memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
+    memcpy(ef_decomp_memory_span(0x0018d52cu, 3), "rb", 3);
+    memcpy(ef_decomp_memory_span(0x3400u, 7), "german", 7);
+    memcpy(ef_decomp_memory_span(0x3600u, 11), "EF2000.CFG", 11);
+    EF_U32(0x0012b36cu) = 0x3600u;
+    EF_U32(0x0012ddb0u) = 0x3400u;
+    EF_U8(0x0018b1b4u) = '\\';
+    EF_U32(0x00160a18u) = 0x1800u;
+    EF_U32(0x00132ab4u) = 0x0009cb20u;
+    EF_U32(0x1800u) = 0x1900u;
+}
+
 int main(void)
 {
     const uint8_t payload[1] = { 0 };
@@ -407,27 +431,12 @@ int main(void)
                    sizeof(whitespace) - 1);
             assert(fclose(file) == 0);
             assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
-            EF_U32(0x001264d4u) = 0x400u;
-            memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
-            memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
-            memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
-            memcpy(ef_decomp_memory_span(0x00182708u, 5), "NONE", 5);
-            EF_U16(0x00182710u) = 0x5fu;
-            memcpy(ef_decomp_memory_span(0x00182794u, sizeof("BG\\views\\views2.dat")),
-                   "BG\\views\\views2.dat", sizeof("BG\\views\\views2.dat"));
-            memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
-            memcpy(ef_decomp_memory_span(0x0018d52cu, 3), "rb", 3);
-            memcpy(ef_decomp_memory_span(0x3400u, 7), "german", 7);
-            memcpy(ef_decomp_memory_span(0x3600u, 11), "EF2000.CFG", 11);
-            EF_U32(0x0012b36cu) = 0x3600u;
-            EF_U32(0x0012ddb0u) = 0x3400u;
-            EF_U8(0x0018b1b4u) = '\\';
-            EF_U32(0x00160a18u) = 0x1800u;
-            EF_U32(0x00132ab4u) = 0x0009cb20u;
-            EF_U32(0x1800u) = 0x1900u;
+            setup_views_probe();
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x9ccb8u);
+            assert(stop == 0xea50cu);
+            assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) ==
+                   UINT32_MAX);
             assert(EF_U16(0x0019cbb0u) == 0x5fu);
             assert(EF_U16(0x0019cbb0u + 39u * 0xa1u) == 0x5fu);
             assert(strcmp(ef_decomp_memory_span(0x0019cbf0u, 5u), "NONE") == 0);
@@ -447,6 +456,88 @@ int main(void)
             assert(EF_U32(0x0015f768u) == 0u);
             assert(EF_U32(0x0015f754u) == bss_end);
             ef_decomp_memory_release();
+        }
+        /* With a synthetic plain sequence resource the recovered opener
+         * returns game slot 100, with the file position rewound to zero.
+         * The recovered 0x9d114 allocates a 0x56c-byte stream record; the
+         * next boundary is the as-yet-unrecovered 0x9d1e8 line parser. */
+        {
+            char bg_dir[160], views_dir[180], views_path[220];
+            const uint8_t plain[] = {'V', 'I', 'E', 'W', 0, 0, 0, 0, 'x'};
+            const uint8_t packed[] = {'J', 'R', 0, 0, 8, 0, 0, 0};
+            const uint8_t packed_ra[] = {'R', 'A', 0, 0, 8, 0, 0, 0};
+            uint32_t stop;
+            assert(snprintf(bg_dir, sizeof(bg_dir), "%s/BG", game_dir) <
+                   (int)sizeof(bg_dir));
+            assert(snprintf(views_dir, sizeof(views_dir), "%s/views", bg_dir) <
+                   (int)sizeof(views_dir));
+            assert(snprintf(views_path, sizeof(views_path), "%s/views2.dat", views_dir) <
+                   (int)sizeof(views_path));
+            assert(mkdir(bg_dir, 0700) == 0);
+            assert(mkdir(views_dir, 0700) == 0);
+            file = fopen(views_path, "wb");
+            assert(file && fwrite(plain, 1, sizeof(plain), file) == sizeof(plain));
+            assert(fclose(file) == 0);
+            assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+            setup_views_probe();
+            stop = 0;
+            assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
+                                        reason, sizeof(reason)) == 0);
+            assert(stop == 0x9d1e8u);
+            assert(EF_U32(0x001371a4u) == 1u);
+            assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) == 100u);
+            {
+                uint32_t stream = probe.base + probe.size;
+                assert(EF_U8(stream) == 0x63u);
+                assert(EF_U8(stream + 0x400u) == 0u);
+                assert(EF_U16(stream + 0x556u) == 0u);
+                assert(EF_U32(stream + 0x552u) == 0u);
+                assert(EF_U32(stream + 0x558u) == 0u);
+                assert(EF_U32(stream + 0x55cu) == 0u);
+                assert(EF_U32(stream + 0x560u) == 100u);
+                assert(EF_U32(stream + 0x564u) == 0u);
+                assert(EF_U32(stream + 0x568u) == 0x0009d084u);
+            }
+            ef_decomp_memory_release();
+
+            file = fopen(views_path, "wb");
+            assert(file && fwrite(packed, 1, sizeof(packed), file) == sizeof(packed));
+            assert(fclose(file) == 0);
+            assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+            setup_views_probe();
+            stop = 0;
+            assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
+                                        reason, sizeof(reason)) == 0);
+            assert(stop == 0x9cd53u);
+            assert(EF_U32(0x001371a4u) == 0u);
+            ef_decomp_memory_release();
+
+            file = fopen(views_path, "wb");
+            assert(file && fwrite(packed_ra, 1, sizeof(packed_ra), file) ==
+                   sizeof(packed_ra));
+            assert(fclose(file) == 0);
+            assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+            setup_views_probe();
+            stop = 0;
+            assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
+                                        reason, sizeof(reason)) == 0);
+            assert(stop == 0x9cd53u);
+            ef_decomp_memory_release();
+
+            file = fopen(views_path, "wb");
+            assert(file && fwrite("XYZ", 1, 3u, file) == 3u);
+            assert(fclose(file) == 0);
+            assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+            setup_views_probe();
+            stop = 0;
+            assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
+                                        reason, sizeof(reason)) == 0);
+            assert(stop == 0x9ccb8u);
+            ef_decomp_memory_release();
+
+            assert(remove(views_path) == 0);
+            assert(rmdir(views_dir) == 0);
+            assert(rmdir(bg_dir) == 0);
         }
         assert(remove(filename) == 0);
         {

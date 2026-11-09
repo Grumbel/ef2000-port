@@ -20,14 +20,27 @@ void init_gen_sequence_slots_30214(void)
     }
 }
 
-/* 0x30214..0x30272: Bounded ReadGenSeqs() prefix. The original then opens
- * the constructed BG\\views\\views2.dat path at 0x9ccb8 and parses a
- * sequence file into its per-slot records. No such parser is recovered here. */
+/* 0x30214..0x3029c: Bounded ReadGenSeqs() prefix. The original opens the
+ * constructed BG\\views\\views2.dat path at 0x9ccb8, reports a missing file
+ * through the two-argument fatal callback at 0x132a74, or passes a successful
+ * resource handle to the recovered 0x9d114 stream constructor. The original
+ * next enters its sequence-line parser at 0x9d1e8, still unrecovered. */
 void read_gen_sequences_prefix_30214(ef_addr32 frame)
 {
+    uint32_t handle;
+    ef_addr32 stream;
+
     init_gen_sequence_slots_30214();
     build_default_path_9c980(frame);
     EF_U16(frame + 0x90u) = 0u;
     strcat_9ca57(frame, 0x00182794u);
-    (void)guest_fn_9ccb8(frame);
+    handle = guest_fn_9ccb8(frame);
+    EF_U32(frame + 0x84u) = handle;
+    if (handle == UINT32_MAX)
+        guest_callptr2_x(EF_U32(0x00132a74u), 0x001827a8u, frame);
+    else {
+        stream = new_stream_9d114(handle);
+        EF_U8(stream) = 0x63u;
+        guest_fn_9d1e8(stream);
+    }
 }

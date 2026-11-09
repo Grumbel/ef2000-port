@@ -39,6 +39,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/engine_helpers3.c'),
                 str(ROOT / 'decomp/src/entity_helpers.c'),
                 str(ROOT / 'decomp/src/game_helpers57.c'),
+                str(ROOT / 'decomp/src/game_helpers30.c'),
+                str(ROOT / 'decomp/src/runtime_helpers21.c'),
                 str(ROOT / 'decomp/src/runtime_helpers22.c'),
                 str(ROOT / 'decomp/src/runtime_helpers34.c'),
                 str(ROOT / 'decomp/src/runtime_helpers4.c'),
@@ -106,9 +108,9 @@ class DecompStandaloneTests(unittest.TestCase):
                 ], capture_output=True, text=True, check=True)
                 self.assertIn('TACTCOM first resource payload size: 7 bytes',
                               present.stdout)
-                self.assertIn('stopped at unimplemented call 0x0009ccb8',
+                self.assertIn('stopped at unimplemented call 0x000ea50c',
                               present.stdout)
-                self.assertIn('BG\\views\\views2.dat', present.stdout)
+                self.assertIn('views\\views2.dat', present.stdout)
                 self.assertFalse((Path(directory) / 'TACTCOM.$$$').exists())
                 (Path(directory) / 'EF2000.CFG').write_bytes(b'CONTROL=1\r\n')
                 configured = subprocess.run([
@@ -117,7 +119,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 ], capture_output=True, text=True)
                 self.assertEqual(configured.returncode, 0,
                                  configured.stdout + '\n' + configured.stderr)
-                self.assertIn('stopped at unimplemented call 0x0009ccb8',
+                self.assertIn('stopped at unimplemented call 0x000ea50c',
                               configured.stdout)
                 # The original full settings sequence exercises all the
                 # recovered type-3 and type-5 callbacks in order.
@@ -129,7 +131,7 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x0009ccb8',
+                self.assertIn('stopped at unimplemented call 0x000ea50c',
                               mixed.stdout)
                 (Path(directory) / 'EF2000.CFG').write_bytes(
                     b'MUSIC=1,127\r\nSOUNDFX=1,127\r\n')
@@ -137,7 +139,7 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x0009ccb8',
+                self.assertIn('stopped at unimplemented call 0x000ea50c',
                               sound_only.stdout)
                 (Path(directory) / 'EF2000.CFG').write_bytes(
                     b';ignored\r\n \t\r\n\r\n')
@@ -145,8 +147,27 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x0009ccb8',
+                self.assertIn('stopped at unimplemented call 0x000ea50c',
                               blank.stdout)
+
+                # An invented plain resource verifies the recovered header
+                # rewind and advances to the parser context allocator.
+                views = Path(directory) / 'views' / 'views2.dat'
+                views.parent.mkdir(parents=True)
+                views.write_bytes(b'VEWS\0\0\0\0synthetic only')
+                plain = subprocess.run([
+                    str(executable), '--image', original,
+                    '--data-dir', directory, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('stopped at unimplemented call 0x0009d1e8',
+                              plain.stdout)
+                views.write_bytes(b'JR\0\0\x08\0\0\0')
+                packed = subprocess.run([
+                    str(executable), '--image', original,
+                    '--data-dir', directory, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('stopped at unimplemented call 0x0009cd53',
+                              packed.stdout)
 
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
     def test_guest_memory_and_x32_envelope(self):
@@ -187,6 +208,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/engine_helpers3.c'),
                 str(ROOT / 'decomp/src/entity_helpers.c'),
                 str(ROOT / 'decomp/src/game_helpers57.c'),
+                str(ROOT / 'decomp/src/game_helpers30.c'),
+                str(ROOT / 'decomp/src/runtime_helpers21.c'),
                 str(ROOT / 'decomp/src/runtime_helpers22.c'),
                 str(ROOT / 'decomp/src/runtime_helpers34.c'),
                 str(ROOT / 'decomp/src/runtime_helpers4.c'),

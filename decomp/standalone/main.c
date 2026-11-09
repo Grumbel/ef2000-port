@@ -115,7 +115,7 @@ int main(int argc, char **argv)
                 printf("Recovered game main 0x8b274 entered TACTCOM prefix; "
                        "stopped at unimplemented call 0x%08x\n", stopped);
         }
-        puts("TACTCOM configuration and the 40-slot Views sequence prefix are bounded; the 0x9ccb8 resource opener and first screen are not yet linked.");
+        puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files reach the recovered 0x9d114 stream constructor, but sequence parsing, archives and the first screen remain unimplemented.");
         free(image_dir);
         ef_decomp_memory_release();
         return 0;
