@@ -58,14 +58,23 @@ void direction_angles_dc91c(ef_addr32 out, ef_addr32 a, ef_addr32 b)
     int32_t d[3];
     int32_t len;
 
-    d[0] = EF_S32(a) - EF_S32(b);
-    d[1] = EF_S32(a + 4u) - EF_S32(b + 4u);
-    d[2] = EF_S32(a + 8u) - EF_S32(b + 8u);
-    if (d[0] < -0x8000 || d[0] > 0x7fff || d[1] < -0x8000 || d[1] > 0x7fff || d[2] < -0x8000 || d[2] > 0x7fff)
-        halve_triple_to_fit16_dc890((uint32_t)(uintptr_t)&d[0], (uint32_t)(uintptr_t)&d[1], (uint32_t)(uintptr_t)&d[2]);
+    d[0] = (int32_t)(EF_U32(a) - EF_U32(b));
+    d[1] = (int32_t)(EF_U32(a + 4u) - EF_U32(b + 4u));
+    d[2] = (int32_t)(EF_U32(a + 8u) - EF_U32(b + 8u));
+    /* 0xdc890 halves all three local stack values together until every
+     * component fits; use locals to avoid native-pointer/guest aliasing. */
+    while (d[0] < -0x8000 || d[0] > 0x7fff ||
+           d[1] < -0x8000 || d[1] > 0x7fff ||
+           d[2] < -0x8000 || d[2] > 0x7fff) {
+        d[0] >>= 1;
+        d[1] >>= 1;
+        d[2] >>= 1;
+    }
     len = (int32_t)length_2d_decb0(d[2], d[0]);
-    EF_U16(out) = (uint16_t)angle_of_b3b1c(d[1], len);
-    EF_U16(out + 2u) = (uint16_t)angle_of_b3b1c(EF_S32(a) - EF_S32(b), EF_S32(a + 8u) - EF_S32(b + 8u));
+    EF_U16(out) = (uint16_t)angle_of_fitted_pair_dc8d8(d[1], len);
+    EF_U16(out + 2u) = (uint16_t)angle_of_fitted_pair_dc8d8(
+        (int32_t)(EF_U32(a) - EF_U32(b)),
+        (int32_t)(EF_U32(a + 8u) - EF_U32(b + 8u)));
 }
 
 /* 0xc117c, 124 bytes. Whether the record may be reactivated: its cell holds more than 12 records and reactivating at most 0x30 - count of them fails, with the count between 7 and 24. */

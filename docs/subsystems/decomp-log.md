@@ -1642,3 +1642,29 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   original numeric converter, mode-two geometry, stream/file cleanup,
   packed/archive lookup, guest-state differential and Watcom splice remain
   unrecovered. Keep `ReadGenSeqs()` at `named`, not `compiles`.
+- GCC/Linux Views geometry and EOF resource release, 2026-11-09: original
+  `0x31147..0x311f9` loads the three signed words at record +0x7d/+0x7f/+0x81
+  as dwords, pairs them against the three OffSet dwords at +0x60/+0x64/+0x68,
+  and calls `direction_angles_dc91c` at `0x3119b`. It copies the two angle
+  words to +0x83/+0x85. Three `abs_a28f2` calls at `0x311c6`, `0x311d7`,
+  `0x311e8` feed `length_3d_decc4` at `0x311ed`; its low word overwrites +0x87
+  (the first Dist word) at `0x311f2`. The recovered `0xdc91c` previously
+  handed native stack addresses to guest-memory helpers on GCC; it now shifts
+  its three local differences without losing the original arithmetic-right-
+  shift behavior, and calls `angle_of_fitted_pair_dc8d8` like the disassembly.
+  That pair helper also shifts local values; `angle_of_b3b1c` dispatches
+  directly to the already recovered ratio lookup at `0xb3ae0`. GCC startup
+  links these derived helpers and tests axis-aligned pitch/heading values,
+  a 45-degree lookup using a synthetic ratio-table entry,
+  negative offsets, a 64000-unit distance requiring halving, and LookAt's
+  signed-word wrap at 65536.
+  On EOF, original `0x3120b` calls the stream free tail at `0x9d088` ->
+  `0xc3f80` and dispatches the unflagged DOS handle through `0x9ce84` ->
+  `0xa7990` at `0x31219`. A narrowly scoped host adapter releases its one
+  stream allocation and invokes the existing read-only file-slot close;
+  synthetic tests confirm handle slot +0x1371a4 clears. The probe stops at
+  the original return instruction `0x3122a`, not inside the outer caller.
+  The source-image SHA-256 guard remains mandatory and original data is not
+  committed. No guest-state differential, exceptional-decimal equivalence,
+  packed/archive resource handling, later TACTCOM continuation or Watcom
+  hybrid execution is claimed; `ReadGenSeqs()` remains `named`.

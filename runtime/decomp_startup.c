@@ -617,16 +617,28 @@ void guest_tactcom_view_count_boundary_31116(ef_addr32 stream)
     stop_at_guest_boundary(0x00031116u);
 }
 
-void guest_tactcom_view_geometry_boundary_3119b(ef_addr32 stream)
+/* 0x3120b: the original releases the stream via 0x9d088 -> 0xc3f80.
+ * This host probe owns only one stream allocation; memory remains readable
+ * after free, as in the original allocator, until a subsequent allocation. */
+void guest_tactcom_view_release_stream_9d088(ef_addr32 stream)
 {
     check_view_parser_context(stream);
-    stop_at_guest_boundary(0x0003119bu);
+    stream_allocated = 0;
 }
 
-void guest_tactcom_view_close_boundary_3120b(ef_addr32 stream)
+/* 0x31219: the unflagged 0x9ce84 path uses 0xa7990 to close the DOS
+ * handle, clearing its game slot. Stop at the original function return
+ * instead of claiming to have resumed the outer TACTCOM caller. */
+void guest_tactcom_view_close_handle_9ce84(uint32_t handle)
 {
-    check_view_parser_context(stream);
-    stop_at_guest_boundary(0x0003120bu);
+    if (!probing || !main_probe_active || stream_allocated || handle != 100u ||
+        EF_U32(TACTCOM_VIEW_FRAME + 0x84u) != handle ||
+        EF_U32(0x001371a4u) == 0u)
+        fatal_unexpected("Views.c completed resource close");
+    close_handle_a7990(0u, 0u, 0u, 0u, handle);
+    if (EF_U32(0x001371a4u) != 0u)
+        fatal_unexpected("Views.c handle remains open after close");
+    stop_at_guest_boundary(0x0003122au);
 }
 
 void guest_tactcom_view_invalid_index_boundary_3120b(ef_addr32 stream)
@@ -802,8 +814,9 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     if (stopped != 0xb3b90u && stopped != 0xeb25au && stopped != 0xe882cu &&
         stopped != 0x9ccb8u && stopped != 0x9cd53u &&
         stopped != 0x30407u && stopped != 0x3053du && stopped != 0x30577u &&
-        stopped != 0x310d8u && stopped != 0x31116u && stopped != 0x3119bu &&
-        stopped != 0x9d55du && stopped != 0x3120bu && stopped != 0xebb58u &&
+        stopped != 0x310d8u && stopped != 0x31116u &&
+        stopped != 0x9d55du && stopped != 0x3120bu && stopped != 0x3122au &&
+        stopped != 0xebb58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {

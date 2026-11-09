@@ -38,9 +38,11 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
  * options, scalar damping/minimum-altitude values and RollLock before
  * reading three dword vectors, LookAtObj, LookAt/Dist word vectors, X/Y
  * clamps, two HUD coordinates, Insts and Cockpit. END validates coordinate
- * counts, and non-geometry records advance to subsequent '#' records.
+ * counts, computes mode-two angles and distance, then advances through
+ * subsequent '#' records.
  * Unknown options stop at 0x310d8, invalid coordinate counts at 0x31116,
- * mode-two derived geometry at 0x3119b and final cleanup at 0x3120b.
+ * and successful EOF releases the stream and closes the file, stopping at
+ * the original return 0x3122a; the outer TACTCOM caller is not resumed.
  * The 0x9d55d numeric converter
  * has a bounded ordinary-decimal host adapter; malformed input stops at
  * 0x9d55d. Oversized name/key strings stop at guarded copy sites. Non-record

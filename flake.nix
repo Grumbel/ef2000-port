@@ -366,6 +366,9 @@
             runtime/decomp_image.c runtime/decomp_startup.c runtime/decomp_files.c \
             decomp/src/runtime_helpers25.c decomp/src/runtime_helpers19.c \
             decomp/src/runtime_helpers17.c decomp/src/math_string.c \
+            decomp/src/entity_helpers2.c decomp/src/game_helpers28.c \
+            decomp/src/game_helpers120.c decomp/src/game_helpers129.c \
+            decomp/src/runtime_helpers6.c \
             decomp/src/game_helpers81.c decomp/src/engine_helpers3.c \
             decomp/src/entity_helpers.c \
             decomp/src/game_helpers57.c decomp/src/game_helpers30.c \

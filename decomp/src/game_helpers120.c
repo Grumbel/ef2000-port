@@ -51,10 +51,11 @@ void register_stack_ranges_d6df0(void)
 /* 0xdc8d8, 67 bytes. Angle of the vector (x, y) after halving it until both components fit in 16 bits. */
 int32_t angle_of_fitted_pair_dc8d8(int32_t x, int32_t y)
 {
-    int32_t pair[2];
-    pair[0] = x;
-    pair[1] = y;
-    if (x < -0x8000 || x > 0x7fff || y < -0x8000 || y > 0x7fff)
-        halve_pair_to_fit16((uint32_t)(uintptr_t)&pair[0], (uint32_t)(uintptr_t)&pair[1]);
-    return angle_of_b3b1c(pair[0], pair[1]);
+    /* 0xdc860 operates on its caller's stack dwords. Shift the local values
+     * directly: native stack addresses are not guest offsets on GCC/64. */
+    while (x < -0x8000 || x > 0x7fff || y < -0x8000 || y > 0x7fff) {
+        x >>= 1;
+        y >>= 1;
+    }
+    return angle_of_b3b1c(x, y);
 }

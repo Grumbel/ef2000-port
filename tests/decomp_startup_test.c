@@ -571,8 +571,9 @@ int main(void)
             stop = 0;
             assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                         reason, sizeof(reason)) == 0);
-            assert(stop == 0x3120bu);
-            assert(EF_U32(0x001371a4u) == 1u);
+            assert(stop == 0x3122au);
+            /* EOF passes through both original release/close call sites. */
+            assert(EF_U32(0x001371a4u) == 0u);
             assert(EF_U32(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x84u) == 100u);
             {
                 uint32_t stream = probe.base + probe.size;
@@ -651,7 +652,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                             reason, sizeof(reason)) == 0);
-                assert(stop == 0x3120bu);
+                assert(stop == 0x3122au);
                 stream = probe.base + probe.size;
                 assert(EF_U8(stream) == 0u);
                 assert(EF_U8(stream + 0x400u) == 0u);
@@ -703,15 +704,18 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == (modes[i].expected == 2u ? 0x3119bu : 0x3120bu));
+                    assert(stop == 0x3122au);
                     stream = probe.base + probe.size;
                     assert(strcmp(ef_decomp_memory_span(0x0019cbb0u, 5u),
                                   "Test") == 0);
-                    assert(strcmp(ef_decomp_memory_span(stream + 0x400u, 0x51u),
-                                  modes[i].expected == 2u ? "END" : "") == 0);
+                    assert(EF_U8(stream + 0x400u) == 0u);
                     assert(EF_U8(0x0019cbb0u + 0x3cu) == modes[i].expected);
-                    assert(EF_U32(stream + 0x552u) ==
-                           (modes[i].expected == 2u ? 3u : 4u));
+                    assert(EF_U32(stream + 0x552u) == 4u);
+                    if (modes[i].expected == 2u) {
+                        assert(EF_U16(0x0019cbb0u + 0x83u) == 0u);
+                        assert(EF_U16(0x0019cbb0u + 0x85u) == 0u);
+                        assert(EF_U16(0x0019cbb0u + 0x87u) == 0u);
+                    }
                     ef_decomp_memory_release();
                 }
             }
@@ -752,7 +756,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x3120bu);
+                assert(stop == 0x3122au);
                 assert(EF_U8(0x0019cbb0u + 0x3du) == 1u);
                 assert(EF_U8(0x0019cbb0u + 0x3cu) == 0u);
                 ef_decomp_memory_release();
@@ -790,7 +794,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x3120bu);
+                    assert(stop == 0x3122au);
                     assert(EF_U8(0x0019cbb0u + 0x3eu) == cases[i].pos);
                     assert(EF_U8(0x0019cbb0u + 0x3fu) == cases[i].ang);
                     assert(EF_S32(0x0019cbb0u + 0x4fu) == cases[i].altitude);
@@ -823,7 +827,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x3120bu);
+                    assert(stop == 0x3122au);
                     assert(EF_U8(0x0019cbb0u + 0x53u) == rolls[i].expected);
                     ef_decomp_memory_release();
                 }
@@ -848,7 +852,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x3120bu);
+                assert(stop == 0x3122au);
                 assert(EF_S32(0x0019cbb0u + 0x60u) == 40);
                 assert(EF_S32(0x0019cbb0u + 0x64u) == -80);
                 assert(EF_S32(0x0019cbb0u + 0x68u) == 0);
@@ -888,7 +892,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x3120bu);
+                    assert(stop == 0x3122au);
                     assert(EF_U8(0x0019cbb0u + 0x7cu) == modes[i].expected);
                     assert(EF_S16(0x0019cbb0u + 0x7du) == 40);
                     assert(EF_S16(0x0019cbb0u + 0x7fu) == -80);
@@ -918,7 +922,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x3120bu);
+                assert(stop == 0x3122au);
                 assert(EF_U16(0x0019cbb0u + 0x8fu) == 1u);
                 assert(EF_S16(0x0019cbb0u + 0x91u) == 273);
                 assert(EF_S16(0x0019cbb0u + 0x93u) == -409);
@@ -966,7 +970,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x3120bu);
+                    assert(stop == 0x3122au);
                     assert(EF_U8(0x0019cbb0u + 0x9bu) == cases[i].expected_layout);
                     assert(EF_U8(0x0019cbb0u + 0xa0u) == cases[i].expected_cockpit);
                     ef_decomp_memory_release();
@@ -985,7 +989,7 @@ int main(void)
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x3120bu);
+                    assert(stop == 0x3122au);
                     assert(EF_U8(0x0019cbb0u + 0x9bu) == 5u);
                     assert(EF_U8(0x0019cbb0u + 0xa0u) == 0u);
                     ef_decomp_memory_release();
@@ -1014,7 +1018,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                             &stop, reason, sizeof(reason)) == 0);
-                assert(stop == 0x3120bu);
+                assert(stop == 0x3122au);
                 assert(EF_U16(frame + 0x90u) == 2u);
                 assert(strcmp(ef_decomp_memory_span(first, 6u), "first") == 0);
                 assert(EF_U32(first + 0x78u) == 3u);
@@ -1030,14 +1034,12 @@ int main(void)
             }
 
             /* END rejects counts other than 0 or 3 at the original error
-             * callback. Unknown options and mode-two derived geometry stay
-             * distinct hard boundaries, rather than silently succeeding. */
+             * callback. Unknown options remain an explicit boundary. */
             {
                 const struct { const char *config; uint32_t boundary; } cases[] = {
                     {"# x\nMODE REL_CAM\nInitialOffSet 1 2 3\n"
                      "InitialOffSet 4 5 6\nEND\n", 0x31116u},
                     {"# x\nMODE REL_CAM\nUnsupportedOption 3\n", 0x310d8u},
-                    {"# x\nMODE DYNAMIC_CAM\nLookAt 1 2 3\nEND\n", 0x3119bu},
                 };
                 size_t i;
                 for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
@@ -1054,11 +1056,53 @@ int main(void)
                     assert(EF_U16(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x90u) == 0u);
                     if (i == 0u)
                         assert(EF_U32(0x0019cbb0u + 0x78u) == 6u);
-                    if (i == 2u) {
-                        assert(EF_S16(0x0019cbb0u + 0x7du) == 32);
-                        assert(EF_S16(0x0019cbb0u + 0x7fu) == 64);
-                        assert(EF_S16(0x0019cbb0u + 0x81u) == 96);
-                    }
+                    ef_decomp_memory_release();
+                }
+            }
+
+            /* The 0x31147..0x311f9 mode-two branch promotes signed LookAt
+             * words to dwords and compares them with the dword OffSet. The
+             * angles use the original quadrant helper and distance uses the
+             * original low-word integer square root. The non-axis case
+             * supplies a synthetic 45-degree table entry (quotient 512). */
+            {
+                const struct {
+                    const char *options;
+                    uint16_t pitch, heading, distance;
+                } cases[] = {
+                    {"LookAt 0 0 0\n", 0u, 0u, 0u},
+                    {"LookAt 0 1 0\n", 0x4000u, 0u, 32u},
+                    /* 45 degrees exercises the original 0x137a04
+                     * angle-ratio table at quotient 512. */
+                    {"LookAt 1 0 1\n", 0u, 0x2000u, 45u},
+                    {"LookAt 0 0 -2\n", 0u, 0x8000u, 64u},
+                    {"OffSet 1 0 0\nLookAt 0 0 0\n", 0u, 0xc000u, 32u},
+                    {"OffSet -2000 0 0\nLookAt 0 0 0\n", 0u, 0x4000u, 64000u},
+                    {"LookAt 2048 0 0\n", 0u, 0u, 0u},
+                };
+                const ef_addr32 rec = 0x0019cbb0u;
+                size_t i;
+                for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i) {
+                    char config[160];
+                    int written = snprintf(config, sizeof(config),
+                                           "# geometry\nMODE DYNAMIC_CAM\n%sEND\n",
+                                           cases[i].options);
+                    assert(written > 0 && written < (int)sizeof(config));
+                    file = fopen(views_path, "wb");
+                    assert(file && fwrite(config, 1, (size_t)written, file) ==
+                           (size_t)written);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    EF_U16(0x00137a04u + 512u * 2u) = 0x2000u;
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x3122au);
+                    assert(EF_U16(rec + 0x83u) == cases[i].pitch);
+                    assert(EF_U16(rec + 0x85u) == cases[i].heading);
+                    assert(EF_U16(rec + 0x87u) == cases[i].distance);
+                    assert(EF_U16(EF_DECOMP_RAM_SIZE - 0x2000u + 0x600u + 0x90u) == 1u);
                     ef_decomp_memory_release();
                 }
             }
@@ -1128,7 +1172,7 @@ int main(void)
             }
 
             /* A non-marker line takes the original 0x31201 skip branch,
-             * then reaches the EOF close boundary without initializing a
+             * then completes stream release and file close without initializing a
              * record or changing any of the 40 default slots. */
             {
                 const char other[] = "  ordinary\r\n";
@@ -1142,7 +1186,7 @@ int main(void)
                 stop = 0;
                 assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe, &stop,
                                             reason, sizeof(reason)) == 0);
-                assert(stop == 0x3120bu);
+                assert(stop == 0x3122au);
                 stream = probe.base + probe.size;
                 assert(EF_U8(stream) == 0u);
                 assert(EF_U8(stream + 0x400u) == 0u);

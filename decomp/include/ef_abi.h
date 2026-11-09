@@ -6921,8 +6921,8 @@ void guest_tactcom_view_string_guard_30577(ef_addr32 stream, uint32_t capacity);
 double guest_tactcom_view_decimal_9d55d(ef_addr32 stream);
 void guest_tactcom_view_unknown_option_boundary_310d8(ef_addr32 stream);
 void guest_tactcom_view_count_boundary_31116(ef_addr32 stream);
-void guest_tactcom_view_geometry_boundary_3119b(ef_addr32 stream);
-void guest_tactcom_view_close_boundary_3120b(ef_addr32 stream);
+void guest_tactcom_view_release_stream_9d088(ef_addr32 stream);
+void guest_tactcom_view_close_handle_9ce84(uint32_t handle);
 void guest_tactcom_view_invalid_index_boundary_3120b(ef_addr32 stream);
 
 #endif

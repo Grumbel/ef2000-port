@@ -88,12 +88,12 @@ int32_t angle_of_b3b1c(int32_t x, int32_t y)
         return x < 0 ? 0xc000 : 0x4000;
     if (x < 0) {
         if (y < 0)
-            return (int32_t)guest_fn_b3ae0(-x, -y) - 0x8000;
-        return -(int32_t)guest_fn_b3ae0(-x, y);
+            return (int32_t)ratio_lookup_b3ae0((uint32_t)-x, (uint32_t)-y) - 0x8000;
+        return -(int32_t)ratio_lookup_b3ae0((uint32_t)-x, (uint32_t)y);
     }
     if (y >= 0)
-        return (int32_t)guest_fn_b3ae0(x, y);
-    return 0x8000 - (int32_t)guest_fn_b3ae0(x, -y);
+        return (int32_t)ratio_lookup_b3ae0((uint32_t)x, (uint32_t)y);
+    return 0x8000 - (int32_t)ratio_lookup_b3ae0((uint32_t)x, (uint32_t)-y);
 }
 
 /* 0xbcb50, 111 bytes. */

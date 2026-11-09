@@ -224,22 +224,39 @@ static void read_view_cockpit_31068(ef_addr32 stream, ef_addr32 rec)
         ascii_stricmp_9d524(stream + 0x400u, 0x00182750u) == 0 ? 1u : 0u;
 }
 
-/* 0x310c8..0x31141: END checks the InitialOffSet coordinate count; the
- * source accepts exactly zero or three. Camera mode two then computes
- * derived angles/distance, deferred to its original 0x3119b call site. */
-static void finish_view_record_310f7(ef_addr32 stream, ef_addr32 rec)
+/* 0x310c8..0x311f9: END checks the InitialOffSet coordinate count (zero or
+ * three). Camera mode two builds two 3-dword stack vectors, then computes
+ * angle words +0x83/+0x85 and an unsigned 3D distance word at +0x87. */
+static void finish_view_record_310f7(ef_addr32 frame, ef_addr32 stream,
+                                     ef_addr32 rec)
 {
+    uint32_t i;
     uint32_t count = EF_U32(rec + 0x78u);
     if (count != 0u && count != 3u)
         guest_tactcom_view_count_boundary_31116(stream);
-    if (EF_U8(rec + 0x3cu) == 2u)
-        guest_tactcom_view_geometry_boundary_3119b(stream);
+    if (EF_U8(rec + 0x3cu) == 2u) {
+        uint32_t distances[3];
+        for (i = 0; i < 3u; ++i) {
+            EF_S32(frame + 0x70u + i * 4u) =
+                (int32_t)EF_S16(rec + 0x7du + i * 2u);
+            EF_U32(frame + 0x64u + i * 4u) = EF_U32(rec + 0x60u + i * 4u);
+        }
+        direction_angles_dc91c(frame + 0x80u, frame + 0x70u, frame + 0x64u);
+        EF_U16(rec + 0x83u) = EF_U16(frame + 0x80u);
+        EF_U16(rec + 0x85u) = EF_U16(frame + 0x82u);
+        for (i = 0; i < 3u; ++i)
+            distances[i] = abs_a28f2((int32_t)(EF_U32(frame + 0x70u + i * 4u) -
+                                                    EF_U32(frame + 0x64u + i * 4u)));
+        EF_U16(rec + 0x87u) = (uint16_t)length_3d_decc4(
+            (int32_t)distances[0], (int32_t)distances[1], (int32_t)distances[2]);
+    }
 }
 
 /* 0x304fc..0x311f9: Each recognized option returns to the original
  * 0x304fc physical-line loop. END finishes the record; unknown tokens
  * take the original three-argument error call at 0x310d8. */
-static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
+static void read_view_text_options_304fc(ef_addr32 frame, ef_addr32 stream,
+                                         ef_addr32 rec)
 {
     for (;;) {
         read_text_line_9d1e8(stream);
@@ -291,7 +308,7 @@ static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
         } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182974u) == 0) {
             read_view_cockpit_31068(stream, rec);
         } else if (ascii_stricmp_9d524(stream + 0x400u, 0x00182754u) == 0) {
-            finish_view_record_310f7(stream, rec);
+            finish_view_record_310f7(frame, stream, rec);
             return;
         } else {
             guest_tactcom_view_unknown_option_boundary_310d8(stream);
@@ -299,7 +316,7 @@ static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
     }
 }
 
-/* 0x30214..0x3120b: Bounded ReadGenSeqs() prefix. The original opens the
+/* 0x30214..0x3122b: Bounded ReadGenSeqs() prefix. The original opens the
  * constructed BG\\views\\views2.dat path at 0x9ccb8, reports a missing file
  * through the two-argument fatal callback at 0x132a74, or passes a successful
  * resource handle to the recovered 0x9d114 stream constructor. Its recovered
@@ -307,7 +324,8 @@ static void read_view_text_options_304fc(ef_addr32 stream, ef_addr32 rec)
  * that record, copies its bounded name, decodes its camera mode and handles
  * text, scalar, vector, look-at, clamp, HUD, instrument and cockpit options.
  * END validates and advances the slot index; non-'#' lines are skipped.
- * Cleanup and mode-two derived geometry remain explicit boundaries. */
+ * EOF calls the 0x9d088 stream release then the 0x9ce84 handle close;
+ * the host probe stops at the original return before its outer caller. */
 void read_gen_sequences_prefix_30214(ef_addr32 frame)
 {
     uint32_t handle;
@@ -332,8 +350,11 @@ void read_gen_sequences_prefix_30214(ef_addr32 frame)
             read_text_line_9d1e8(stream);
             read_next_token_9d278(stream);
             if (ascii_stricmp_9d524(stream + 0x400u, 0x0018274cu) != 0) {
-                if (EF_U8(stream) == 0u)
-                    guest_tactcom_view_close_boundary_3120b(stream);
+                if (EF_U8(stream) == 0u) {
+                    guest_tactcom_view_release_stream_9d088(stream);
+                    guest_tactcom_view_close_handle_9ce84(handle);
+                    return;
+                }
                 continue;
             }
             if (index < 0 || index >= 40)
@@ -347,7 +368,7 @@ void read_gen_sequences_prefix_30214(ef_addr32 frame)
             read_next_token_9d278(stream);
             read_next_token_9d278(stream);
             set_view_camera_mode_30423(rec, stream + 0x400u);
-            read_view_text_options_304fc(stream, rec);
+            read_view_text_options_304fc(frame, stream, rec);
             EF_U16(frame + 0x90u) = (uint16_t)(index + 1);
         }
     }
