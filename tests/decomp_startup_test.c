@@ -40,11 +40,20 @@ int main(void)
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
     EF_U32(0x001264d4u) = 0x400u;
     memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
+    memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
+    memcpy(ef_decomp_memory_span(0x0018b154u, 4), "DID", 4);
+    memcpy(ef_decomp_memory_span(0x1900u, 14), "DID=C:\\GAMES\\", 14);
+    EF_U32(0x00160a18u) = 0x1800u;
+    EF_U32(0x00132ab4u) = 0x0009cb20u;
+    EF_U32(0x1800u) = 0x1900u;
+    EF_U32(0x1804u) = 0;
     {
         uint32_t stop = 0;
         assert(ef_decomp_probe_main(bss_end, 1, 0, &probe, &stop,
                                     reason, sizeof(reason)) == 0);
-        assert(stop == 0x9c980u && probe.base == bss_end);
+        assert(stop == 0xb3b90u && probe.base == bss_end);
+        assert(strcmp(ef_decomp_memory_span(EF_DECOMP_RAM_SIZE - 0x1f60u, 80),
+                      "c:\\games\\File.Dat") == 0);
         assert(EF_U32(0x00196148u) == EF_DECOMP_RAM_SIZE - bss_end - 0x400u);
         assert(EF_U32(0x00196160u) == 0);
         assert(EF_U32(0x00132a74u) == 0x000ea50cu);
@@ -57,6 +66,8 @@ int main(void)
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
     EF_U32(0x001264d4u) = 0x400u;
     memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
+    memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
+    EF_U32(0x00132ab4u) = 0x0009cb20u;
     memcpy(ef_decomp_memory_span(0x0018a7e8u, 10), "playvideo", 10);
     memcpy(ef_decomp_memory_span(0x3000u, 10), "PLAYVIDEO", 10);
     EF_U32(0x2000u + 4u) = 0x3000u;
@@ -74,7 +85,7 @@ int main(void)
         uint32_t stop = 0;
         assert(ef_decomp_probe_main(bss_end, 2, 0x2000u, &probe, &stop,
                                     reason, sizeof(reason)) == 0);
-        assert(stop == 0x9c980u && probe.size == 0x400u);
+        assert(stop == 0xb3b90u && probe.size == 0x400u);
     }
     ef_decomp_memory_release();
 
@@ -83,6 +94,7 @@ int main(void)
     assert(ef_decomp_memory_load(payload, sizeof(payload), 0x02500000u) == 0);
     EF_U32(0x001264d4u) = 0x400u;
     memcpy(ef_decomp_memory_span(0x0018a810u, 12), "Memory: %sK", 12);
+    memcpy(ef_decomp_memory_span(0x0018a848u, 9), "File.Dat", 9);
     {
         uint32_t stop = 0;
         assert(ef_decomp_probe_main(0x02500000u, 1, 0, &probe, &stop,

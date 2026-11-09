@@ -23,7 +23,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 'gcc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
                 '-DEF_DECOMP_NATIVE=1', '-fno-strict-aliasing', '-fwrapv',
                 '-ffunction-sections', '-fdata-sections',
-                '-Wno-error=int-to-pointer-cast',
+                '-Wno-error=int-to-pointer-cast', '-Wno-error=parentheses',
                 '-I' + str(ROOT / 'decomp/include'),
                 '-I' + str(ROOT / 'runtime'),
                 str(ROOT / 'decomp/standalone/main.c'),
@@ -34,7 +34,11 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/tactcom_prefix.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'decomp/src/runtime_helpers19.c'),
+                str(ROOT / 'decomp/src/runtime_helpers17.c'),
                 str(ROOT / 'decomp/src/game_helpers81.c'),
+                str(ROOT / 'decomp/src/engine_helpers3.c'),
+                str(ROOT / 'decomp/src/entity_helpers.c'),
+                str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
@@ -77,7 +81,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('arena 0x004df000 (3000000 bytes)', real.stdout)
                 self.assertIn('TACTCOM\n\nfound 57,618K bytes of memory',
                               real.stdout)
-                self.assertIn('stopped at unimplemented call 0x0009c980',
+                self.assertIn('stopped at unimplemented call 0x000b3b90',
                               real.stdout)
 
     @unittest.skipUnless(shutil.which('gcc'), 'requires GCC')
@@ -104,7 +108,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 'gcc', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
                 '-DEF_DECOMP_NATIVE=1', '-fno-strict-aliasing', '-fwrapv',
                 '-ffunction-sections', '-fdata-sections',
-                '-Wno-error=int-to-pointer-cast',
+                '-Wno-error=int-to-pointer-cast', '-Wno-error=parentheses',
                 '-I' + str(ROOT / 'decomp/include'),
                 '-I' + str(ROOT / 'runtime'),
                 str(ROOT / 'tests/decomp_startup_test.c'),
@@ -114,7 +118,11 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/tactcom_prefix.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'decomp/src/runtime_helpers19.c'),
+                str(ROOT / 'decomp/src/runtime_helpers17.c'),
                 str(ROOT / 'decomp/src/game_helpers81.c'),
+                str(ROOT / 'decomp/src/engine_helpers3.c'),
+                str(ROOT / 'decomp/src/entity_helpers.c'),
+                str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),

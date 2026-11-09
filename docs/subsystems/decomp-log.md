@@ -1329,3 +1329,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   real executable `--probe-main` run. Full original-asset suite still has
   three unrelated save-state `legacy` keyword failures in the Python harness;
   Nix/OpenWatcom are unavailable in this workspace.
+- GCC/Linux first TACTCOM resource pathname, 2026-11-09: extended the bounded
+  0x8b39c prefix through 0x8b459. It executes already-recovered
+  `build_default_path_9c980`, `getenv_9c858` (environment table),
+  `lowercase_string` 0xeb478, `strcat_9ca57` and callback 0x132ab4 to
+  `find_in_archives_9cb20`, rather than stopping before the path builder.
+  The SHA-pinned original image has no DOS environment table yet because the
+  native C-runtime setup is incomplete; it therefore generates the relative
+  first resource pathname `\\check.cd` and stops before the original
+  `read_file_payload_size_b3b90` disk reader. A synthetic DOS `DID` env
+  directory validates case folding, concatenation and the callback dispatch.
+  The host checks the original 0x132ab4 callback offset and refuses archive
+  access before initialization; there is no file I/O in this probe. The
+  remainder of 0x8b39c and the first screen are still unimplemented.

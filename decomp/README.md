@@ -74,9 +74,12 @@ recovered arena setup, and enters the **partial** TACTCOM `0x8b39c` prefix.
 It follows the recovered `0x880` DOS service wrapper via a native, synthetic
 X-32 350Bh available-memory response, calls the recovered comma formatter,
 prints the memory diagnostic from the original image and flushes the output
-stream. The prefix then sets the two logging callback globals and stops before
-`0x9c980` (filesystem/configuration path setup); the memory-shortage branch
-stops at `0x8b417`. The remainder of the 402-byte TACTCOM entry and actual
+stream. The prefix then sets two logging callback globals, uses the recovered
+`0x9c980` default-directory path builder and `0x9c858` DOS environment
+lookup, appends the game's first resource pathname and dispatches through
+recovered `0x9cb20` to a boundary before the `0xb3b90` disk-file reader.
+The memory-shortage branch stops at `0x8b417`. The remainder of the 402-byte
+TACTCOM entry and actual
 first-screen services are **not yet linked**. The alternate `playvideo`
 branch is exercised with synthetic guest argv. This is neither a native
 reproduction of the real DOS memory report nor Watcom/guest replay verified.

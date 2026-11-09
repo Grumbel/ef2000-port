@@ -4,8 +4,8 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
-/* Original 0x8b39c..0x8b43c only: the TACTCOM memory diagnostic and its
- * following logging callback setup.  This is deliberately NOT the complete
+/* Original 0x8b39c..0x8b459 only: the TACTCOM memory diagnostic, logging
+ * callback setup and first resource pathname.  This is NOT the complete
  * 402-byte 0x8b39c function.  The guest-local frame is supplied by the
  * native probe until its Watcom stack is implemented. */
 void tactcom_prefix_8b39c(ef_addr32 frame)
@@ -27,7 +27,11 @@ void tactcom_prefix_8b39c(ef_addr32 frame)
     EF_U32(0x00132a74u) = 0x000ea50cu;
     EF_U32(0x00132a78u) = 0x0018a838u;
 
-    /* Next original call is 0x9c980: construct the configuration path.
-     * Stop there until the native filesystem/path bindings are ready. */
-    guest_fn_9c980_sfx(frame + 0xa0u, 0);
+    build_default_path_9c980(frame + 0xa0u);
+    strcat_9ca57(frame + 0xa0u, 0x0018a848u);
+
+    /* The host binds the indirect 0x132ab4 callback to recovered 0x9cb20,
+     * then stops at its still-unbound disk-file routine.  No original
+     * installation file is opened or changed during this probe. */
+    guest_tactcom_file_probe_8b45a(frame + 0xa0u);
 }

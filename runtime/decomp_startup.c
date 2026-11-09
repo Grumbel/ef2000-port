@@ -155,11 +155,48 @@ void guest_tactcom_low_memory_8b417(ef_addr32 required, ef_addr32 missing)
     stop_at_guest_boundary(0x8b417u);
 }
 
-void guest_fn_9c980_sfx(ef_addr32 buffer, ef_addr32 suffix)
+uint32_t guest_fn_9c858_arg(uint32_t name)
 {
-    (void)buffer;
-    (void)suffix;
-    stop_at_guest_boundary(0x9c980u);
+    if (!probing || !main_probe_active || name != 0x0018b154u)
+        fatal_unexpected("TACTCOM getenv (0x9c858)");
+    return getenv_9c858(name);
+}
+
+void guest_fn_eb478(ef_addr32 text)
+{
+    if (!probing || !main_probe_active ||
+        text != TACTCOM_PROBE_FRAME + 0xa0u)
+        fatal_unexpected("TACTCOM pathname lowercase (0xeb478)");
+    (void)lowercase_string(text);
+}
+
+void guest_tactcom_file_probe_8b45a(ef_addr32 path)
+{
+    const char *name;
+    if (!probing || !main_probe_active || path != TACTCOM_PROBE_FRAME + 0xa0u ||
+        !(name = (const char *)ef_decomp_memory_span(path, 0x50u)) ||
+        !memchr(name, 0, 0x50u))
+        fatal_unexpected("TACTCOM resource pathname before file probe");
+    printf("TACTCOM first resource pathname: %s\n", name);
+    if (EF_U32(0x00132ab4u) != 0x0009cb20u)
+        fatal_unexpected("unexpected startup file callback at 0x132ab4");
+    (void)find_in_archives_9cb20(path);
+    fatal_unexpected("file lookup returned without a host file binding");
+}
+
+uint32_t guest_fn_eb9f8(uint32_t file, uint32_t archive)
+{
+    (void)file;
+    (void)archive;
+    fatal_unexpected("archive lookup before archives open (0xeb9f8)");
+    return 0;
+}
+
+uint32_t guest_fn_b3b90(uint32_t path)
+{
+    (void)path;
+    stop_at_guest_boundary(0xb3b90u);
+    return 0;
 }
 
 void guest_fn_8b39c(void)
@@ -268,7 +305,7 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
     stopped = main_boundary_address;
     main_probe_active = 0;
     probing = 0;
-    if (stopped != 0x9c980u && stopped != 0x8b417u && stopped != 0x8b2d8u) {
+    if (stopped != 0xb3b90u && stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");
         return -1;

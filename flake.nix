@@ -364,7 +364,10 @@
             -Idecomp/include -Iruntime tests/decomp_startup_test.c \
             runtime/decomp_image.c runtime/decomp_startup.c \
             decomp/src/runtime_helpers25.c decomp/src/runtime_helpers19.c \
-            decomp/src/math_string.c decomp/src/game_helpers81.c \
+            decomp/src/runtime_helpers17.c decomp/src/math_string.c \
+            decomp/src/game_helpers81.c decomp/src/engine_helpers3.c \
+            decomp/src/entity_helpers.c \
+            decomp/src/misc_drafts1.c \
             decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \
             decomp/src/tactcom_prefix.c decomp/src/game_main.c \
             decomp/src/ascii_stricmp.c \
