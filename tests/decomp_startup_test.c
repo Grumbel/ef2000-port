@@ -40,6 +40,14 @@ static void setup_views_probe(void)
     memcpy(ef_decomp_memory_span(0x0017f41cu, 7u), "THREAT", 7u);
     memcpy(ef_decomp_memory_span(0x0017f424u, 8u), "MTHREAT", 8u);
     memcpy(ef_decomp_memory_span(0x0017f42cu, 8u), "WINGMAN", 8u);
+    memcpy(ef_decomp_memory_span(0x0017f4d4u, sizeof("Seqs")),
+           "Seqs", sizeof("Seqs"));
+    memcpy(ef_decomp_memory_span(0x0017f4dcu, sizeof("Option")),
+           "Option", sizeof("Option"));
+    memcpy(ef_decomp_memory_span(0x00120d31u, sizeof("CRUISING")),
+           "CRUISING", sizeof("CRUISING"));
+    memcpy(ef_decomp_memory_span(0x00120d31u + 0x1eu, sizeof("DOGFIGHTING")),
+           "DOGFIGHTING", sizeof("DOGFIGHTING"));
     EF_U32(0x0017f5b9u) = 0x42000000u; /* source float 32.0 */
     EF_U32(0x0017f5bdu) = 0x42480000u; /* source float 50.0 */
     EF_U16(0x00182710u) = 0x5fu;
@@ -1321,8 +1329,8 @@ int main(void)
                 assert(EF_U16(0x0019e5e5u) == 0x34a5u);
                 ef_decomp_memory_release();
 
-                /* Aid.c skips the first line of each table, reads 27+8
-                 * mappings, then consumes one nested association object. */
+                /* Aid.c reads 27+8 mappings, seven ordinary option grids,
+                 * and two special option grids before stream cleanup. */
                 {
                     char aid_path[220];
                     unsigned int j;
@@ -1341,14 +1349,46 @@ int main(void)
                                  "Relation parent CHILD\n"
                                  "FixedPoint -1.25 ~\n"
                                  "Weight 2.5\n"
-                                 "Name ALPHA\n", file) >= 0);
+                                 "Name ALPHA\n"
+                                 "Seqs\n"
+                                 "Relation THREAT GTARGET\n"
+                                 "FixedPoint 2 3\n"
+                                 "Weight 1\n"
+                                 "Name BETA\n"
+                                 "Option\nOption 2\n"
+                                 "Relation MTHREAT WINGMAN\n"
+                                 "FixedPoint 4 5\n"
+                                 "Weight 2\n"
+                                 "Name CHARLIE\nEND\n", file) >= 0);
+                    for (j = 2u; j < 8u; ++j) {
+                        assert(fprintf(file,
+                                       "Group %u\nOption 1\n"
+                                       "Relation TARGET NONE\n"
+                                       "FixedPoint %u ~\n"
+                                       "Weight 1\nName GROUP%u\nEND\n",
+                                       j, j, j) > 0);
+                    }
+                    assert(fputs("Special CRUISING\n"
+                                 "SpecialGroup 1\nOption 1\n"
+                                 "Relation PARENT NONE\n"
+                                 "FixedPoint 0.5 1\n"
+                                 "Weight 2\n"
+                                 "Name SPECIAL_A\n"
+                                 "END DOGFIGHTING\n"
+                                 "SpecialGroup 2\nOption 1\n"
+                                 "Relation CHILD TARGET\n"
+                                 "FixedPoint -1.5 ~\n"
+                                 "Weight 3\n"
+                                 "Name SPECIAL_B\nEND\n", file) >= 0);
                     assert(fclose(file) == 0);
                     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
                     setup_views_probe();
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    assert(stop == 0x15cbu);
+                    if (stop != 0xcd4d4u)
+                        fprintf(stderr, "full Aid.c stop=0x%08x: %s\n", stop, reason);
+                    assert(stop == 0xcd4d4u);
                     assert(EF_U8(0x00196fcau) == 130u);
                     assert(EF_U8(0x00196fcau + 26u) == 156u);
                     assert(EF_U8(0x00196390u) == 240u);
@@ -1360,8 +1400,30 @@ int main(void)
                     assert(EF_S32(0x00196398u + 0x36u) == -40);
                     assert(EF_U32(0x00196398u + 0x3au) == 0u);
                     assert(EF_U8(0x001961f8u + 0x33u + 1u) == 0u);
-                    assert(EF_U8(0x001961f8u + 0x33u + 2u) == 0xffu);
-                    assert(EF_U32(0x001371a4u) != 0u); /* still open at the boundary */
+                    assert(EF_U8(0x001961f8u + 0x33u + 2u) == 1u);
+                    assert(EF_U8(0x001961f8u + 0x33u + 11u) == 2u);
+                    assert(EF_U8(0x001961f8u + 0x33u) == 2u);
+                    assert(EF_U8(0x001961f8u + 2u * 0x33u) == 1u);
+                    assert(EF_U8(0x001961f8u + 2u * 0x33u + 1u) == 3u);
+                    assert(EF_U8(0x001961f8u + 7u * 0x33u + 1u) == 8u);
+                    assert(EF_U8(0x001961f8u + 7u * 0x33u + 2u) == 0xffu);
+                    assert(strcmp(ef_decomp_memory_span(0x00196398u + 0x3eu, 5u),
+                                  "BETA") == 0);
+                    assert(EF_U8(0x00196398u + 0x3eu + 0x32u) == 6u);
+                    assert(EF_U8(0x00196398u + 0x3eu + 0x33u) == 4u);
+                    assert(EF_U8(0x00196398u + 2u * 0x3eu + 0x32u) == 7u);
+                    assert(EF_U8(0x00196398u + 2u * 0x3eu + 0x33u) == 5u);
+                    assert(EF_U8(0x00196190u) == 0u); /* CRUISING */
+                    assert(EF_U8(0x00196191u) == 1u);
+                    assert(EF_U8(0x00196192u) == 9u);
+                    assert(EF_U8(0x00196190u + 0x34u) == 1u); /* DOGFIGHTING */
+                    assert(EF_U8(0x00196191u + 0x34u) == 1u);
+                    assert(EF_U8(0x00196192u + 0x34u) == 10u);
+                    assert(strcmp(ef_decomp_memory_span(0x00196398u + 9u * 0x3eu,
+                                                        10u), "SPECIAL_A") == 0);
+                    assert(EF_S32(0x00196398u + 10u * 0x3eu + 0x36u) == -48);
+                    assert(EF_U8(0x00196fe9u) == 5u); /* 0x1ad8 reset */
+                    assert(EF_U32(0x001371a4u) == 0u); /* stream and file closed */
                     ef_decomp_memory_release();
 
                     /* Alternate enum ordering, NONE second relationship,
@@ -1392,6 +1454,35 @@ int main(void)
                     assert(EF_S16(0x00196398u + 0x34u) == -62);
                     assert(EF_S32(0x00196398u + 0x36u) == 48);
                     assert(EF_S32(0x00196398u + 0x3au) == -24);
+                    ef_decomp_memory_release();
+
+                    /* A special group must resolve against the original
+                     * 27-name table, not a made-up index. The first seven
+                     * ordinary groups are required to reach that lookup. */
+                    file = fopen(aid_path, "wb");
+                    assert(file && fputs("AID_HEADER\n", file) >= 0);
+                    for (j = 0; j < 27u; ++j)
+                        assert(fprintf(file, "row%u %u\n", j, j + 130u) > 0);
+                    assert(fputs("AID_SECOND_HEADER\n", file) >= 0);
+                    for (j = 0; j < 8u; ++j)
+                        assert(fprintf(file, "row%u %u\n", j, j + 240u) > 0);
+                    assert(fputs("FIRST_ASSOC_HEADER\nSECOND_ASSOC_HEADER\n",
+                                 file) >= 0);
+                    for (j = 1u; j < 8u; ++j)
+                        assert(fprintf(file, "Group %u\nOption 1\n"
+                                       "Relation PARENT NONE\n"
+                                       "FixedPoint 1 ~\nWeight 1\n"
+                                       "Name OBJ%u\nEND\n", j, j) > 0);
+                    assert(fputs("Special NOT_A_KNOWN_STATE\n", file) >= 0);
+                    assert(fclose(file) == 0);
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0x1687u);
+                    assert(EF_U8(0x00196190u) == 0xffu);
+                    assert(EF_U8(0x001961f8u + 7u * 0x33u + 1u) == 6u);
                     ef_decomp_memory_release();
 
                     /* Truncated mapping files must not let the host probe

@@ -60,6 +60,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/views_sequences.c'),
                 str(ROOT / 'decomp/src/aid_data.c'),
+                str(ROOT / 'decomp/src/game_helpers13.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),
@@ -209,6 +210,33 @@ class DecompStandaloneTests(unittest.TestCase):
                 ], capture_output=True, text=True, check=True)
                 self.assertIn('stopped at unimplemented call 0x0000120e',
                               aid_continued.stdout)
+                # The complete synthetic Aid.c layout contains seven
+                # ordinary grids and two special grids; original code/data
+                # supply the relationship literals and 27 special labels.
+                aid_full = (
+                    b'AID_HEADER\n' +
+                    b''.join(f'row{i} {i + 130}\n'.encode() for i in range(27)) +
+                    b'AID_SECOND_HEADER\n' +
+                    b''.join(f'row{i} {i + 240}\n'.encode() for i in range(8)) +
+                    b'FIRST_ASSOC_HEADER\nSECOND_ASSOC_HEADER\n' +
+                    b''.join(
+                        f'Group {i}\nOption 1\nRelation PARENT NONE\n'
+                        f'FixedPoint {i} ~\nWeight 1\nName OBJ{i}\nEND\n'.encode()
+                        for i in range(1, 8)
+                    ) +
+                    b'Special CRUISING\nSpecialGroup 1\nOption 1\n'
+                    b'Relation CHILD TARGET\nFixedPoint 0.5 1\n'
+                    b'Weight 2\nName SPECIAL_A\nEND DOGFIGHTING\n'
+                    b'SpecialGroup 2\nOption 1\nRelation THREAT NONE\n'
+                    b'FixedPoint -1.5 ~\nWeight 3\nName SPECIAL_B\nEND\n'
+                )
+                aid.write_bytes(aid_full)
+                aid_complete = subprocess.run([
+                    str(executable), '--image', original,
+                    '--data-dir', directory, '--probe-main',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('stopped at unimplemented call 0x000cd4d4',
+                              aid_complete.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([
                     str(executable), '--image', original,
@@ -277,6 +305,7 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
                 str(ROOT / 'decomp/src/views_sequences.c'),
                 str(ROOT / 'decomp/src/aid_data.c'),
+                str(ROOT / 'decomp/src/game_helpers13.c'),
                 str(ROOT / 'decomp/src/ui_widget_helpers.c'),
                 str(ROOT / 'decomp/src/leaf_helpers1.c'),
                 str(ROOT / 'runtime/decomp_image.c'),

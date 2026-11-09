@@ -1732,3 +1732,27 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   open stream; mapping-only data now stop at the EOF guard `0x120e`. This
   is one record, not a complete nested loop, resource cleanup or guest
   differential. No Watcom replacement or playable hybrid is claimed.
+- GCC/Linux Aid.c association loops and cleanup, 2026-11-09: completed
+  the normal input control flow of `0x1202..0x1ad7` from original
+  disassembly. Seven ordinary groups (indices 1..7) use `0x33`-stride
+  grids; the original `Seqs` terminator advances a column, `Option` closes
+  that row and begins the next, and any other token advances a group.
+  Every accepted association advances the shared 50-entry object index;
+  the source's five rows and ten columns per grid are bounded in the GCC
+  host before they can overwrite adjacent tables. The next two `0x34`-
+  stride special grids resolve a name against 27 source strings in the
+  `0x1e`-stride table at `0x120d31`. Unusually, the second special name
+  is read from the remaining tokens of the first group's terminating
+  line. The object decoder and source numeric scales are shared between
+  both copies in the original, but their exceptional callback sites are
+  kept distinct. At EOF after both special grids, source `0x1ab6..0x1ad7`
+  releases the stream, closes the read-only handle, calls the recovered
+  `reset_selection_state_1ad8`, and returns to its caller. The synthetic
+  GCC fixture traverses two `Seqs` entries, two `Option` rows, seven group
+  transitions and two special names, checking object payloads, grid
+  references/counts and cleanup. An opt-in test with the SHA-pinned
+  original EXE and synthetic plain `aid2.dat` also reaches the subsequent
+  TACTCOM boundary `0xcd4d4`; malformed special names stop at the source
+  fatal callback `0x1687`. No packed archive support, real asset replay,
+  guest-state differential, Watcom splice or general DOS execution is
+  claimed; the single function remains `named` in the tracker.

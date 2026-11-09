@@ -644,7 +644,8 @@ void guest_tactcom_view_close_handle_9ce84(uint32_t handle)
 {
     if (!probing || !main_probe_active || stream_allocated || handle != 100u ||
         (EF_U32(TACTCOM_VIEW_FRAME + 0x84u) != handle &&
-         EF_U32(TACTCOM_SEQ_FRAME + 0x64u) != handle) ||
+         EF_U32(TACTCOM_SEQ_FRAME + 0x64u) != handle &&
+         EF_U32(TACTCOM_AID_FRAME + 0x70u) != handle) ||
         EF_U32(0x001371a4u) == 0u)
         fatal_unexpected("Views.c completed resource close");
     close_handle_a7990(0u, 0u, 0u, 0u, handle);
@@ -718,7 +719,12 @@ void guest_tactcom_aid_row_guard_f80(ef_addr32 stream, uint32_t site)
         site != 0x0000120eu && site != 0x00001217u &&
         site != 0x00001238u && site != 0x00001244u &&
         site != 0x00001254u && site != 0x000014c9u &&
-        site != 0x00001544u && site != 0x0000157cu)
+        site != 0x00001544u && site != 0x0000157cu &&
+        site != 0x000015cbu && site != 0x00001633u &&
+        site != 0x000016c2u && site != 0x000016ceu &&
+        site != 0x000016deu && site != 0x00001953u &&
+        site != 0x000019d4u && site != 0x00001a0cu &&
+        site != 0x00001a58u)
         fatal_unexpected("Aid.c row-guard caller");
     if (EF_U8(stream) == 0u)
         stop_at_guest_boundary(site);
@@ -727,24 +733,37 @@ void guest_tactcom_aid_row_guard_f80(ef_addr32 stream, uint32_t site)
 void guest_tactcom_aid_enum_boundary_f80(ef_addr32 stream, uint32_t site)
 {
     check_view_parser_context(stream);
-    if (site != 0x00001365u && site != 0x000014a7u)
+    if (site != 0x00001365u && site != 0x000014a7u &&
+        site != 0x000017efu && site != 0x00001931u)
         fatal_unexpected("Aid.c relationship error site");
     stop_at_guest_boundary(site);
 }
 
-void guest_tactcom_aid_name_guard_f80(ef_addr32 stream)
+void guest_tactcom_aid_name_guard_f80(ef_addr32 stream, uint32_t site)
 {
     const char *name;
     check_view_parser_context(stream);
+    if (site != 0x000015a5u && site != 0x00001a32u)
+        fatal_unexpected("Aid.c string-copy caller");
     name = (const char *)ef_decomp_memory_span(stream + 0x400u, 0x51u);
     if (!name || strlen(name) >= 0x32u)
-        stop_at_guest_boundary(0x000015a5u);
+        stop_at_guest_boundary(site);
 }
 
-void guest_tactcom_aid_next_section_15cb(ef_addr32 stream)
+void guest_tactcom_aid_count_guard_f80(ef_addr32 stream, uint32_t object_index,
+                                      uint32_t row, uint32_t column, uint32_t site)
 {
     check_view_parser_context(stream);
-    stop_at_guest_boundary(0x000015cbu);
+    if (site != 0x00001252u && site != 0x000016dcu)
+        fatal_unexpected("Aid.c table-count caller");
+    if (object_index >= 50u || row >= 5u || column >= 10u)
+        stop_at_guest_boundary(site);
+}
+
+void guest_tactcom_aid_unknown_special_f80(ef_addr32 stream)
+{
+    check_view_parser_context(stream);
+    stop_at_guest_boundary(0x00001687u);
 }
 
 void guest_fn_f80_w(void)
@@ -910,6 +929,11 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
         stopped != 0x1365u && stopped != 0x14a7u &&
         stopped != 0x14c9u && stopped != 0x1544u &&
         stopped != 0x157cu && stopped != 0x15a5u && stopped != 0x15cbu &&
+        stopped != 0x1252u && stopped != 0x16dcu && stopped != 0x1687u &&
+        stopped != 0x1633u && stopped != 0x16c2u && stopped != 0x16ceu &&
+        stopped != 0x16deu && stopped != 0x17efu && stopped != 0x1931u &&
+        stopped != 0x1953u && stopped != 0x19d4u && stopped != 0x1a0cu &&
+        stopped != 0x1a32u && stopped != 0x1a58u &&
         stopped != 0xb3c04u &&
         stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
