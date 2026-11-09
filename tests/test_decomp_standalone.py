@@ -69,6 +69,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/localized_file_handlers.c'),
                 str(ROOT / 'decomp/src/script_helpers1.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
+                str(ROOT / 'decomp/src/runtime_libc.c'),
+                str(ROOT / 'decomp/src/runtime_helpers32.c'),
                 str(ROOT / 'decomp/src/views_sequences.c'),
                 str(ROOT / 'decomp/src/aid_data.c'),
                 str(ROOT / 'decomp/src/game_helpers13.c'),
@@ -238,6 +240,21 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('Stopped before AIL timer setup '
                               '0x001110ab (no DOS IRQ or PIT installed)',
                               vectors_cold.stdout)
+                callback_cold = subprocess.run([
+                    str(executable), '--image', original,
+                    '--probe-x32-tactcom-ail-callback',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('Virtual-only DOS IRQ8 vectors: '
+                              '2 reads, 1 inert installation; '
+                              'saved protected abcd:12345678, '
+                              'real-mode 0x00002468', callback_cold.stdout)
+                self.assertIn('Recovered AIL timer callback: '
+                              'slot 15 value 0x0000d68d, '
+                              'PIT reload 0x00000000, 3 inert port writes; '
+                              'virtual IRQ region exited 1', callback_cold.stdout)
+                self.assertIn('Stopped at sound module lock 0x000d6df0 '
+                              '(no DOS IRQ, PIT or audio driver installed)',
+                              callback_cold.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)
@@ -454,6 +471,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/localized_file_handlers.c'),
                 str(ROOT / 'decomp/src/script_helpers1.c'),
                 str(ROOT / 'decomp/src/misc_drafts1.c'),
+                str(ROOT / 'decomp/src/runtime_libc.c'),
+                str(ROOT / 'decomp/src/runtime_helpers32.c'),
                 str(ROOT / 'decomp/src/views_sequences.c'),
                 str(ROOT / 'decomp/src/aid_data.c'),
                 str(ROOT / 'decomp/src/game_helpers13.c'),

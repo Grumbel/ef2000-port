@@ -1852,6 +1852,7 @@ uint16_t guest_ail_code_selector_111089(void);
 void guest_ail_irq8_install_111097(uint32_t vector, uint32_t handler,
                                     uint16_t selector);
 void guest_ail_timer_setup_1110ab(uint32_t slot_offset, uint32_t callback);
+void guest_ail_irq_exit_1110b3(void);
 void guest_fn_d6df0(void); /* 0xd6df0 */
 void guest_fn_cdf48(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcdf48 EAX/EDX/EBX/ECX */
 

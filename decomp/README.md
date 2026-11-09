@@ -201,8 +201,8 @@ original's no-device branch would. The probe now executes recovered
   `0x17d664`, `0x17d6a4`, `0x17d6e4` and `0x17d724`. It stops at
   `0x11105b`, immediately **before** `INT 21h AX=2502h` queries the IRQ 8
   vector. No real `CLI`, interrupt-vector operation, PIT programming or
-  IRQ handler installation happens. The rest of this routine, including
-  hardware restoration, remains unrecovered in C.
+  IRQ handler installation happens. The remainder of this routine is
+  accessible only through the later opt-in callback mode.
   A final independent `--probe-x32-tactcom-ail-vectors` mode continues that
   same original C flow through the IRQ 8 protected-mode (`AX=2502h`) and
   real-mode (`AX=2503h`) vector reads. Both return explicitly **synthetic**
@@ -214,9 +214,20 @@ original's no-device branch would. The probe now executes recovered
   `0xd68d`). Note that `0x17d6a0` is also **slot 15** in the first
   16-dword table previously cleared at `0x17d664`, so that slot is now `2`
   while the other 63 table entries remain zero. Neither a real vector nor
-  a timer callback is installed; later
-  timer-divisor programming, flag restoration and guest differential tests
-  remain unsupported. The earlier stop modes retain their stricter bounds.
+  a timer callback is installed by this mode.
+  The further independent `--probe-x32-tactcom-ail-callback` mode executes
+  the already recovered 0x1021f4/0x1114c7/0x110f6f/0x110f3c/0x110f0c
+  source-C timer chain: slot 15's value at `0x17d720` becomes `0xd68d`,
+  the cached minimum at `0x17d7b2` becomes `0xd68d`, all active-time counters
+  are zero, and the nested critical depth at `0x17d7ba` returns to zero.
+  This value selects divisor zero (the standard 65536-count PIT reload).
+  The three `OUT` requests (`0x43:0x36`, `0x40:0`, `0x40:0`) are checked and
+  **recorded**, never executed on the host. After virtual interrupt-flag
+  restoration at `0x1110b3..0x1110c4`, the original `0x110fd4` function
+  returns naturally. The original module then marks `0x15bac5=1` and stops
+  at its next unimplemented sound lock (`0xd6df0`). This does **not**
+  register a working callback or audio driver. The earlier stop modes retain
+  their stricter bounds; guest differential tests remain pending.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

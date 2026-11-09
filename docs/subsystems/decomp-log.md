@@ -2000,3 +2000,24 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   callback is registered. The two previous strict IRQ boundaries remain
   available; no actual interrupt, PIT hardware, callback or guest x86
   differential has been exercised.
+- GCC/Linux full cold AIL IRQ initializer return, 2026-11-09: the
+  `--probe-x32-tactcom-ail-callback` opt-in continues from `0x1110ab`
+  through the original `0x110fd4` return at `0x1110c4`. Its wrapper
+  `0x1021f4` delegates to previously recovered source-C `0x1114c7`,
+  the nested critical-section tails `0x101e70`/`0x101e78`, the smallest
+  active-period selector `0x110f6f` and PIT scaler `0x110f3c`/`0x110f0c`.
+  The single active slot (index 15, first state table offset `0x3c`)
+  keeps state 2 at `0x17d6a0`, receives callback period `0xd68d` at
+  `0x17d720`, and updates the minimum cached period at `0x17d7b2`.
+  The scale routine maps exactly `0xd68d` to divisor 0, stored at
+  `0x17d7ae`. The restricted adapter records the three original
+  PIT requests `(0x43,0x36)`, `(0x40,0)` and `(0x40,0)` without sending
+  any host port IO. Both nested software critical-depth increments are
+  balanced by decrements, leaving `0x17d7ba=0`; the outer original
+  `pushf`/`CLI` region is exited **virtually**, with no host flag change.
+  The original caller then marks sound module state `0x15bac5=1` before
+  stopping at the still-unimplemented real sound lock `0xd6df0`.
+  Nonzero sentinels in all four timer tables and the divisor/critical
+  fields prove their exact overwrites; prior opt-in boundaries remain
+  unchanged. This is not a guest x86 instruction-differential run, a
+  running timer callback, or a replacement for X-32/DOS hardware services.

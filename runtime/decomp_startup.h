@@ -66,6 +66,10 @@ typedef struct ef_decomp_x32_probe {
     uint32_t ail_irq_original_pm_offset;
     uint32_t ail_irq_original_pm_selector;
     uint32_t ail_irq_original_rm_offset;
+    uint32_t ail_timer_slot_value;
+    uint32_t ail_timer_reload;
+    uint32_t ail_pit_port_writes;
+    uint32_t ail_irq_critical_exited;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -131,6 +135,14 @@ int ef_decomp_probe_x32_tactcom_ail_irq(uint32_t bss_end,
 int ef_decomp_probe_x32_tactcom_ail_vectors(uint32_t bss_end,
                                             ef_decomp_x32_probe *probe,
                                             char *reason, size_t reason_capacity);
+
+/* Continue the original AIL timer registration, including its recovered
+ * source-C nested lock/reprogram routines and three *inert* PIT write
+ * requests. Restore virtual IRQ flags and stop at the next sound module
+ * lock setup 0xd6df0. No host port IO or IRQ changes are performed. */
+int ef_decomp_probe_x32_tactcom_ail_callback(uint32_t bss_end,
+                                             ef_decomp_x32_probe *probe,
+                                             char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.
