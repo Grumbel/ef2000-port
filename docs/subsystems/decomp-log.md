@@ -1909,3 +1909,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   Synthetic memory and SHA-pinned original-image tests verify the state;
   no real hardware port, DOS timer result, IRQ or keyboard handler is
   installed. Original DOS startup, Watcom splice and replay still pending.
+- GCC/Linux virtual X-32 timer completion, 2026-11-09: disassembly of
+  `0x324`, `0x348` and `0x484` confirms the AX=2503h, AX=2502h and
+  AX=2506h DOS calls around the original `0x734` 14-byte timer record.
+  An additional opt-in `--probe-x32-timer` supplies explicit test values
+  `0x2468` and `0xabcd:12345678`, checks the staged timer source/result
+  fields and accepts exactly one *inert* callback registration. The real
+  recovered `0xcd4d4` source then writes handle 7 at `0x41f824`, registers
+  its `0xcd554` cleanup callback and sets the byte at `0x15b72e` to 1,
+  reaching the original return `0xcd550`. Previous strict stops at
+  `0x9c220`, `0x9c8b4`, `0xf43`, `0x324` are unchanged. Synthetic and
+  original-image tests cover the new mode; no real extender response,
+  interrupt/timer/IRQ, differential guest validation or Watcom splice.

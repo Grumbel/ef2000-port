@@ -155,6 +155,19 @@ class DecompStandaloneTests(unittest.TestCase):
                               'DOS/X-32 timer service 0x00000324',
                               input_only.stdout)
                 self.assertIn('no timer installed', input_only.stdout)
+                timer_only = subprocess.run([
+                    str(executable), '--image', original, '--probe-x32-timer',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('X-32 request free 5, timer free 7', timer_only.stdout)
+                self.assertIn('Virtual-only X-32 requests: 11 accepted',
+                              timer_only.stdout)
+                self.assertIn('Virtual-only X-32 timer slot 7: source 9; '
+                              'synthetic AX=2503h 0x2468, AX=2502h 0xabcd:12345678; '
+                              '1 inert AX=2506h registration', timer_only.stdout)
+                self.assertIn('Recovered cold input initializer returned at '
+                              '0x000cd550; state 1, cleanup callback 0x000cd554',
+                              timer_only.stdout)
+                self.assertIn('no DOS timer installed', timer_only.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)

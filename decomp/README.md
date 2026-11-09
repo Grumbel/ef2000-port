@@ -162,6 +162,13 @@ original's no-device branch would. The probe now executes recovered
   five, timer free count seven; the timer source 9 is staged in slot 7.
   It halts at `0x324` before the first actual timer service
   `INT 21h AX=2503h` and leaves the input initialized flag unset.
+  A separate `--probe-x32-timer` mode supplies test-only `0x2468` and
+  `0xabcd:12345678` returns for original `0x324`/`0x348`, validates the
+  packed 14-byte timer slot and accepts exactly one inert registration
+  corresponding to original `0x484` (AX=2506h). Recovered `0xcd4d4`
+  then installs its second cleanup callback in the virtual table, sets
+  the input flag and reaches the original return `0xcd550`. These values
+  are deliberately synthetic, not measurements of the DOS extender.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

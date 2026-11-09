@@ -22,6 +22,7 @@ static uint32_t next_allocation;
 static uint32_t requested_arena;
 static uint32_t release_hook;
 static uint32_t hook_registrations;
+static uint32_t input_cleanup_hook;
 static int probing;
 static int arena_allocated;
 static int stream_allocated;
@@ -34,6 +35,8 @@ static int x32_probe_active;
 static int x32_virtual_vectors;
 static int x32_virtual_traps;
 static int x32_virtual_input;
+static int x32_virtual_timer;
+static uint32_t x32_timer_registrations;
 static uint32_t x32_request_count;
 static struct {
     uint32_t address;
@@ -124,10 +127,16 @@ uint32_t guest_fn_c3f70(uint32_t size)
 void guest_fn_9c3cf(uint32_t handler)
 {
     if (x32_probe_active) {
-        if (!probing || !main_probe_active || handler != 0xad8u ||
-            hook_registrations)
+        if (!probing || !main_probe_active)
             fatal_unexpected("X-32 far-stub cleanup registration");
-        release_hook = handler;
+        if (hook_registrations == 0u && handler == 0xad8u)
+            release_hook = handler;
+        else if (x32_virtual_timer && hook_registrations == 1u &&
+                 release_hook == 0xad8u && x32_timer_registrations == 1u &&
+                 handler == 0x000cd554u && input_cleanup_hook == 0u)
+            input_cleanup_hook = handler;
+        else
+            fatal_unexpected("X-32 far-stub cleanup registration");
         ++hook_registrations;
         return;
     }
@@ -326,10 +335,9 @@ void ef_decomp_x32_after_initializer(void)
         stop_at_guest_boundary(0x00000f43u);
 }
 
-/* The optional cold input continuation crosses the recovered keyboard and
- * request code but stops at the first DOS-backed timer read, 0x324. The
- * 14-byte timer slot and its source field have already been written by the
- * original 0x734 C body. No INT 21h AX=2503h is simulated. */
+/* The strict cold-input continuation stops before the DOS AX=2503h call.
+ * A separately opt-in timer probe feeds synthetic return values to the
+ * recovered 0x734 source, without emulating an X-32 interrupt. */
 uint32_t guest_fn_324(uint32_t source)
 {
     if (probing && main_probe_active && x32_probe_active &&
@@ -341,22 +349,55 @@ uint32_t guest_fn_324(uint32_t source)
         EF_U32(0x0041f828u) == 6u &&
         EF_U32(0x0041f82cu) == 5u &&
         EF_U16(0x000fe624u) == 0x5678u &&
-        keyboard_led_bytes == 2u && !keyboard_ack_pending)
+        keyboard_led_bytes == 2u && !keyboard_ack_pending) {
+        if (x32_virtual_timer)
+            return 0x2468u; /* synthetic AX=2503h result */
         stop_at_guest_boundary(0x00000324u);
+    }
     fatal_unexpected("X-32 timer source (0x324)");
     return 0u;
 }
 uint64_t guest_fn_348(uint32_t source)
 {
-    (void)source;
+    if (probing && main_probe_active && x32_probe_active &&
+        x32_virtual_timer && x32_virtual_input && source == 9u &&
+        read_x32_packed_dword(0x001960c8u + 7u * 14u) == 0x2468u &&
+        x32_timer_registrations == 0u)
+        return UINT64_C(0xabcd12345678); /* synthetic AX=2502h return */
     fatal_unexpected("X-32 timer source (0x348)");
     return 0u;
 }
 void guest_fn_484(uint32_t source, uint32_t high,
                   uint32_t flags, uint32_t selector)
 {
-    (void)source; (void)high; (void)flags; (void)selector;
+    if (probing && main_probe_active && x32_probe_active &&
+        x32_virtual_timer && x32_virtual_input &&
+        x32_timer_registrations == 0u && source == 9u &&
+        high == 0xabcdu && flags == 0x000fe61fu && selector == 0x1234u &&
+        EF_U32(0x00196140u) == 7u &&
+        read_x32_packed_dword(0x001960c4u + 7u * 14u) == 9u &&
+        read_x32_packed_dword(0x001960c8u + 7u * 14u) == 0x2468u &&
+        read_x32_packed_dword(0x001960ccu + 7u * 14u) == 0x12345678u &&
+        EF_U16(0x001960d0u + 7u * 14u) == 0xabcdu) {
+        ++x32_timer_registrations;
+        return;
+    }
     fatal_unexpected("X-32 timer installation (0x484)");
+}
+
+/* The real 0xcd4d4 returns at 0xcd550. Check its final guest writes only
+ * in the virtual-timer mode; the other probes still stop at their original
+ * unsupported guest boundaries. */
+void ef_decomp_x32_after_input(void)
+{
+    if (!x32_probe_active)
+        return;
+    if (!probing || !main_probe_active || !x32_virtual_timer ||
+        x32_timer_registrations != 1u || hook_registrations != 2u ||
+        release_hook != 0xad8u || input_cleanup_hook != 0x000cd554u ||
+        EF_U8(0x0015b72eu) != 1u || EF_U32(0x0041f824u) != 7u)
+        fatal_unexpected("completed X-32 cold input initializer");
+    stop_at_guest_boundary(0x000cd550u);
 }
 
 void guest_dos_int_x(uint32_t interrupt, uint32_t in,
@@ -1193,6 +1234,7 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
 
 static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
                          int virtual_vectors, int virtual_traps, int virtual_input,
+                         int virtual_timer,
                          char *reason, size_t reason_capacity)
 {
     uint32_t stopped;
@@ -1206,6 +1248,8 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     memset(probe, 0, sizeof(*probe));
     release_hook = 0u;
     hook_registrations = 0u;
+    input_cleanup_hook = 0u;
+    x32_timer_registrations = 0u;
     x32_request_count = 0u;
     memset(x32_requests, 0, sizeof(x32_requests));
     x32_trap_count = 0u;
@@ -1216,6 +1260,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     x32_virtual_vectors = virtual_vectors;
     x32_virtual_traps = virtual_traps;
     x32_virtual_input = virtual_input;
+    x32_virtual_timer = virtual_timer;
     keyboard_led_bytes = 0u;
     keyboard_ack_pending = 0;
     main_boundary_address = 0u;
@@ -1229,6 +1274,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     x32_virtual_vectors = 0;
     x32_virtual_traps = 0;
     x32_virtual_input = 0;
+    x32_virtual_timer = 0;
     main_probe_active = 0;
     probing = 0;
 
@@ -1238,7 +1284,8 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         if (EF_U8(0x00195fb0u + i) != i)
             break;
     }
-    if (stopped != (virtual_input ? 0x00000324u :
+    if (stopped != (virtual_timer ? 0x000cd550u :
+                    virtual_input ? 0x00000324u :
                     virtual_traps ? 0x00000f43u :
                     virtual_vectors ? 0x0009c8b4u : 0x0009c220u) ||
         x32_request_count != (virtual_input ? 11u : virtual_vectors ? 9u : 1u) ||
@@ -1252,7 +1299,10 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         EF_U32(0x00196144u) != (virtual_input ? 5u : virtual_vectors ? 7u : 15u) ||
         EF_U32(0x00196140u) != (virtual_input ? 7u : 8u) ||
         keyboard_led_bytes != (virtual_input ? 2u : 0u) || keyboard_ack_pending ||
-        hook_registrations != 1u || release_hook != 0xad8u) {
+        hook_registrations != (virtual_timer ? 2u : 1u) ||
+        release_hook != 0xad8u ||
+        x32_timer_registrations != (virtual_timer ? 1u : 0u) ||
+        input_cleanup_hook != (virtual_timer ? 0x000cd554u : 0u)) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "recovered X-32 pre-main state mismatch");
         return -1;
@@ -1294,31 +1344,53 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         probe->pending_timer_source = read_x32_packed_dword(0x001960c4u + 7u * 14u);
         probe->stored_data_selector = EF_U16(0x000fe624u);
     }
+    if (virtual_timer) {
+        probe->timer_2503_result = read_x32_packed_dword(0x001960c8u + 7u * 14u);
+        probe->timer_2502_result_low = read_x32_packed_dword(0x001960ccu + 7u * 14u);
+        probe->timer_2502_result_high = EF_U16(0x001960d0u + 7u * 14u);
+        probe->timer_registrations = x32_timer_registrations;
+        probe->input_cleanup_hook = input_cleanup_hook;
+        probe->input_initialized = EF_U8(0x0015b72eu);
+        if (probe->timer_2503_result != 0x2468u ||
+            probe->timer_2502_result_low != 0x12345678u ||
+            probe->timer_2502_result_high != 0xabcdu ||
+            probe->input_initialized != 1u || EF_U32(0x0041f824u) != 7u) {
+            if (reason && reason_capacity)
+                snprintf(reason, reason_capacity, "recovered cold timer/input state mismatch");
+            return -1;
+        }
+    }
     return 0;
 }
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
                         char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_traps(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_input(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 0, reason, reason_capacity);
+}
+
+int ef_decomp_probe_x32_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                              char *reason, size_t reason_capacity)
+{
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, reason, reason_capacity);
 }
 
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,

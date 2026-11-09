@@ -47,6 +47,12 @@ typedef struct ef_decomp_x32_probe {
     uint32_t keyboard_data_slot;
     uint32_t pending_timer_source;
     uint32_t stored_data_selector;
+    uint32_t timer_2503_result;
+    uint32_t timer_2502_result_low;
+    uint32_t timer_2502_result_high;
+    uint32_t timer_registrations;
+    uint32_t input_cleanup_hook;
+    uint32_t input_initialized;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -70,6 +76,12 @@ int ef_decomp_probe_x32_traps(uint32_t bss_end, ef_decomp_x32_probe *probe,
  * the timer source field staged. Keyboard port and vector services are
  * strictly bounded virtual hardware doubles. */
 int ef_decomp_probe_x32_input(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                              char *reason, size_t reason_capacity);
+
+/* Complete the same recovered cold input C path after opt-in synthetic
+ * AX=2503h/2502h results and an inert AX=2506h registration receipt.
+ * Stop at the original 0xcd550 return. No DOS call or timer is executed. */
+int ef_decomp_probe_x32_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The

@@ -154,6 +154,12 @@ void initialize_input_services_cd4d4(void)
             guest_fn_9c3cf(0x000cd554u);
         EF_U8(0x0015b72eu) = 1u;
     }
+#if defined(EF_DECOMP_NATIVE)
+    {
+        extern void ef_decomp_x32_after_input(void);
+        ef_decomp_x32_after_input();
+    }
+#endif
 }
 
 /* 0xf23ac, 49 bytes. For each byte of the string at ECX call 0xf2320(x, y, byte & 0x3f), x += 8. */
