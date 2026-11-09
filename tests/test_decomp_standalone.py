@@ -116,6 +116,16 @@ class DecompStandaloneTests(unittest.TestCase):
                               cold_x32.stdout)
                 self.assertIn('Stopped at unimplemented DOS/X-32 call 0x0009c220',
                               cold_x32.stdout)
+                vector_only = subprocess.run([
+                    str(executable), '--image', original, '--probe-x32-vectors',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('X-32 request free 7, timer free 8',
+                              vector_only.stdout)
+                self.assertIn('Virtual-only X-32 requests: 9 accepted; final request '
+                              '0x00120cd4 selector 0x5678 length 0x2',
+                              vector_only.stdout)
+                self.assertIn('Stopped before DOS/X-32 trap registration 0x0009c8b4',
+                              vector_only.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)

@@ -169,6 +169,20 @@ int main(void)
     assert(x32.first_selector == 0x1234u && x32.first_length == 0xb70u);
     assert(x32.far_stub_address == 0x400100u && x32.cleanup_hook == 0xad8u);
     assert(EF_U8(0x00400100u) == 0x9au && EF_U8(0x00400105u) == 0xcfu);
+    assert(x32.registered_requests == 1u);
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    assert(ef_decomp_probe_x32_vectors(bss_end, &x32, reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0x9c8b4u);
+    assert(x32.registered_requests == 9u);
+    assert(x32.request_free == 7u && x32.timer_free == 8u);
+    assert(x32.first_address == 0x2b0u && x32.first_length == 0xb70u);
+    assert(x32.last_address == 0x120cd4u);
+    assert(x32.last_selector == 0x5678u && x32.last_length == 2u);
+    assert(EF_U8(0x00196022u + 7u * 10u) == 0xd4u);
+    assert(EF_U8(0x00196023u + 7u * 10u) == 0x0cu);
+    assert(EF_U16(0x00196026u + 7u * 10u) == 0x5678u);
+    assert(EF_U8(0x00196028u + 7u * 10u) == 2u);
+    assert(EF_U32(0x00132a9cu) == 0u);
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);

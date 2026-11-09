@@ -11,7 +11,9 @@
  * Every request still goes through the original 0x628 allocator and its
  * extender call at 0x9c220. The separate GCC --probe-x32 path uses bounded
  * selector/far-allocation doubles and stops at that first real extender
- * request without installing vectors; it does not imply a working CRT. */
+ * request. --probe-x32-vectors uses an inert host request registry to get
+ * through all nine registrations, stopping before trap installation.
+ * Neither mode installs interrupts or implements a working CRT. */
 void initialize_x32_services_e20(void)
 {
     uint32_t i;
@@ -47,6 +49,13 @@ void initialize_x32_services_e20(void)
      * A different binary needs its own verified displacement. */
     (void)start_request_628(0x00120cd4u, ds, 2);
 
-    if (getenv_9c858(0x0017f3a8u) == 0u)
+    if (getenv_9c858(0x0017f3a8u) == 0u) {
+#if defined(EF_DECOMP_NATIVE)
+        /* The GCC virtual registry cannot reproduce the original
+         * INT 21h AX=2533 trap installation or captured ESP/SS/DS. */
+        extern void ef_decomp_x32_before_traps(void);
+        ef_decomp_x32_before_traps();
+#endif
         install_trap_handlers_9c8b4(0u, 0u, 0u, 0u, 0xd68u);
+    }
 }

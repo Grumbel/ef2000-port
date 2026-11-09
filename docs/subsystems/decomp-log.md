@@ -1866,3 +1866,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   load isolates the two modes in the synthetic test. This is evidence for
   actual game-owned memory writes under GCC, **not** IRQ compatibility,
   DOS/Watcom cold startup, complete vector setup or guest differential.
+- GCC/Linux virtual X-32 request registration, 2026-11-09: the explicitly
+  opt-in `--probe-x32-vectors` mode runs original C `0xe20`, `0xb04`
+  and all nine calls through `0x628`, acknowledging the `0x9c220`
+  services only in a bounded, inert host record table. For each request,
+  the host checks the pinned original sequence and packed 10-byte guest
+  record, with the free-list index descending from 15 to 7. The ninth
+  request holds offset `0x120cd4`, synthetic DS `0x5678`, length 2,
+  leaving seven free request slots and eight free timer slots. The recovered
+  `0x9c858` environment check then runs and, on the absent-variable branch,
+  the host halts **before** `0x9c8b4` would save a trap context and call
+  DOS INT 21h AX=2533h eight times. No vectors, IRQs, or trap handlers
+  are actually installed. Both the strict first-request `--probe-x32`
+  boundary and the normal TACTCOM `--probe-main` boundary remain intact.
+  These results test the recovered game's memory writes and request order;
+  they do not validate real extender return codes or guest hardware state.

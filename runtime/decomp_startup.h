@@ -17,7 +17,9 @@ typedef struct ef_decomp_arena_probe {
 /* Execute the original pre-main initializer 0xe20 with synthetic selectors
  * and a bounded six-byte far-stub allocation. Stop at the first real X-32
  * DOS INT 21h vector-registration call 0x9c220. No interrupts are installed.
- * The fields capture the recovered guest-RAM writes *before* that call. */
+ * The fields capture the recovered guest-RAM writes *before* that call.
+ * In virtual mode, they instead include all nine request records and the
+ * stop address of the next unsupported trap-installation service. */
 typedef struct ef_decomp_x32_probe {
     uint32_t stop_address;
     uint32_t request_free;
@@ -27,10 +29,20 @@ typedef struct ef_decomp_x32_probe {
     uint32_t first_length;
     uint32_t far_stub_address;
     uint32_t cleanup_hook;
+    uint32_t registered_requests;
+    uint32_t last_address;
+    uint32_t last_selector;
+    uint32_t last_length;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
                         char *reason, size_t reason_capacity);
+
+/* Opt-in registry-only continuation: store nine X-32 request descriptions
+ * in an inert host table and return success to the game-owned allocator.
+ * Stop before the next trap-installation service. No vector is activated. */
+int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                                char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.

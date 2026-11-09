@@ -31,6 +31,13 @@ static jmp_buf main_boundary;
 static uint32_t main_boundary_address;
 static int main_probe_active;
 static int x32_probe_active;
+static int x32_virtual_vectors;
+static uint32_t x32_request_count;
+static struct {
+    uint32_t address;
+    uint32_t selector;
+    uint32_t length;
+} x32_requests[9];
 static void stop_at_guest_boundary(uint32_t address);
 
 /* The native probe uses private guest stack-shaped scratch frames, not an
@@ -205,22 +212,62 @@ void guest_fn_a9c(uint32_t block, uint32_t selector)
         fatal_unexpected("X-32 far-stub selector assignment (0xa9c)");
 }
 
-/* Real 0x9c220 dispatches INT 21h, AX=0x252B, EBX=0x501. It can alter
- * interrupt routing: never return success without an X-32 backend.
- * Halt after the *real* 0x628 has written the first packed request record. */
+/* Real 0x9c220 dispatches INT 21h, AX=0x252B, EBX=0x501. The default
+ * probe halts after the first packed request write. Only the explicitly
+ * selected virtual-registry probe acknowledges the remaining eight requests
+ * in a private table; no DOS or host vectors are installed. */
+static uint32_t read_x32_packed_dword(uint32_t address)
+{
+    return (uint32_t)EF_U8(address)
+         | ((uint32_t)EF_U8(address + 1u) << 8)
+         | ((uint32_t)EF_U8(address + 2u) << 16)
+         | ((uint32_t)EF_U8(address + 3u) << 24);
+}
+
 uint32_t EF_CDECL guest_fn_9c220(uint32_t address, uint32_t selector,
                                  uint32_t length)
 {
+    static const uint32_t expected[9][3] = {
+        { 0x000002b0u, 0x1234u, 0xb70u },
+        { 0x0009be0du, 0x1234u, 0x1fu },
+        { 0x0009c430u, 0x1234u, 0x1fu },
+        { 0x0009c438u, 0x1234u, 0x1fu },
+        { 0x0009c446u, 0x1234u, 0x1fu },
+        { 0x0009c461u, 0x1234u, 0x1fu },
+        { 0x0009c47au, 0x1234u, 0x1ffu },
+        { 0x00000222u, 0x1234u, 0xfu },
+        { 0x00120cd4u, 0x5678u, 2u },
+    };
+    uint32_t index = x32_request_count;
+    uint32_t slot;
     if (!probing || !main_probe_active || !x32_probe_active ||
-        address != 0x000002b0u || selector != 0x1234u ||
-        length != 0xb70u || EF_U32(0x00196144u) != 15u ||
-        EF_U8(0x00195fb0u + 15u) != 15u ||
-        EF_U32(0x00196022u + 15u * 10u) != address ||
-        EF_U16(0x00196026u + 15u * 10u) != selector ||
-        EF_U32(0x00196028u + 15u * 10u) != length)
-        fatal_unexpected("first packed X-32 vector record (0x9c220)");
-    stop_at_guest_boundary(0x0009c220u);
+        index >= 9u || address != expected[index][0] ||
+        selector != expected[index][1] || length != expected[index][2])
+        fatal_unexpected("X-32 vector request sequence (0x9c220)");
+    slot = 15u - index;
+    if (EF_U32(0x00196144u) != slot ||
+        EF_U8(0x00195fb0u + slot) != slot ||
+        read_x32_packed_dword(0x00196022u + slot * 10u) != address ||
+        EF_U16(0x00196026u + slot * 10u) != selector ||
+        read_x32_packed_dword(0x00196028u + slot * 10u) != length)
+        fatal_unexpected("packed X-32 vector record (0x9c220)");
+    x32_requests[index].address = address;
+    x32_requests[index].selector = selector;
+    x32_requests[index].length = length;
+    ++x32_request_count;
+    if (!x32_virtual_vectors)
+        stop_at_guest_boundary(0x0009c220u);
+    /* Explicitly opt-in virtual registry: no host IRQ/vector hook exists.
+     * This is not evidence that DOS would accept AX=252Bh with these args. */
     return 0u;
+}
+
+void ef_decomp_x32_before_traps(void)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        !x32_virtual_vectors || x32_request_count != 9u)
+        fatal_unexpected("unexpected X-32 trap setup entry");
+    stop_at_guest_boundary(0x0009c8b4u);
 }
 
 /* Timer installation also requires real X-32 services. The cold X-32 probe
@@ -1076,8 +1123,8 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
     return result;
 }
 
-int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
-                        char *reason, size_t reason_capacity)
+static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                         int virtual_vectors, char *reason, size_t reason_capacity)
 {
     uint32_t stopped;
     unsigned i;
@@ -1090,14 +1137,18 @@ int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
     memset(probe, 0, sizeof(*probe));
     release_hook = 0u;
     hook_registrations = 0u;
+    x32_request_count = 0u;
+    memset(x32_requests, 0, sizeof(x32_requests));
     probing = 1;
     main_probe_active = 1;
     x32_probe_active = 1;
+    x32_virtual_vectors = virtual_vectors;
     main_boundary_address = 0u;
     if (setjmp(main_boundary) == 0)
         initialize_x32_services_e20();
     stopped = main_boundary_address;
     x32_probe_active = 0;
+    x32_virtual_vectors = 0;
     main_probe_active = 0;
     probing = 0;
 
@@ -1107,13 +1158,14 @@ int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
         if (EF_U8(0x00195fb0u + i) != i)
             break;
     }
-    if (stopped != 0x0009c220u || i != 16u ||
+    if (stopped != (virtual_vectors ? 0x0009c8b4u : 0x0009c220u) ||
+        x32_request_count != (virtual_vectors ? 9u : 1u) || i != 16u ||
         EF_U8(0x00132a98u) != 1u ||
         EF_U32(0x00120d24u) != 0x80u ||
         EF_U32(0x0019613cu) != 0x00400100u ||
         EF_U8(0x00400100u) != 0x9au ||
         EF_U8(0x00400105u) != 0xcfu ||
-        EF_U32(0x00196144u) != 15u ||
+        EF_U32(0x00196144u) != (virtual_vectors ? 7u : 15u) ||
         EF_U32(0x00196140u) != 8u ||
         hook_registrations != 1u || release_hook != 0xad8u) {
         if (reason && reason_capacity)
@@ -1135,7 +1187,23 @@ int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
     probe->first_length = EF_U32(0x00196028u + 15u * 10u);
     probe->far_stub_address = EF_U32(0x0019613cu);
     probe->cleanup_hook = release_hook;
+    probe->registered_requests = x32_request_count;
+    probe->last_address = x32_requests[x32_request_count - 1u].address;
+    probe->last_selector = x32_requests[x32_request_count - 1u].selector;
+    probe->last_length = x32_requests[x32_request_count - 1u].length;
     return 0;
+}
+
+int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                        char *reason, size_t reason_capacity)
+{
+    return run_x32_probe(bss_end, probe, 0, reason, reason_capacity);
+}
+
+int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                                char *reason, size_t reason_capacity)
+{
+    return run_x32_probe(bss_end, probe, 1, reason, reason_capacity);
 }
 
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,

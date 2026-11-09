@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
@@ -68,7 +68,8 @@ int main(int argc, char **argv)
                 data_dir = argv[++i];
             } else if ((strcmp(argv[i], "--probe-arena") == 0 ||
                         strcmp(argv[i], "--probe-main") == 0 ||
-                        strcmp(argv[i], "--probe-x32") == 0) && !probe_type) {
+                        strcmp(argv[i], "--probe-x32") == 0 ||
+                        strcmp(argv[i], "--probe-x32-vectors") == 0) && !probe_type) {
                 probe_type = argv[i];
             } else {
                 fputs("Unsupported argument (try --help).\n", stderr);
@@ -96,10 +97,16 @@ int main(int argc, char **argv)
         printf("Original image mapped: %u initialized bytes, BSS through 0x%08x\n",
                info.initialized_size, info.bss_end);
         if (probe_type) {
-            if (strcmp(probe_type, "--probe-x32") == 0) {
+            if (strcmp(probe_type, "--probe-x32") == 0 ||
+                strcmp(probe_type, "--probe-x32-vectors") == 0) {
                 ef_decomp_x32_probe x32;
-                if (ef_decomp_probe_x32(info.bss_end, &x32,
-                                        reason, sizeof(reason)) != 0) {
+                int virtual_vectors = strcmp(probe_type, "--probe-x32-vectors") == 0;
+                int x32_status = virtual_vectors
+                    ? ef_decomp_probe_x32_vectors(info.bss_end, &x32,
+                                                  reason, sizeof(reason))
+                    : ef_decomp_probe_x32(info.bss_end, &x32,
+                                          reason, sizeof(reason));
+                if (x32_status != 0) {
                     fprintf(stderr, "ef2000-decomp: X-32 probe: %s\n", reason);
                     free(image_dir);
                     ef_decomp_memory_release();
@@ -111,9 +118,19 @@ int main(int argc, char **argv)
                        "0x%08x selector 0x%04x length 0x%x\n",
                        x32.request_free, x32.timer_free,
                        x32.first_address, x32.first_selector, x32.first_length);
-                printf("Stopped at unimplemented DOS/X-32 call 0x%08x "
-                       "(INT 21h AX=252Bh; no vector installed)\n",
-                       x32.stop_address);
+                if (virtual_vectors) {
+                    printf("Virtual-only X-32 requests: %u accepted; final request "
+                           "0x%08x selector 0x%04x length 0x%x\n",
+                           x32.registered_requests, x32.last_address,
+                           x32.last_selector, x32.last_length);
+                    printf("Stopped before DOS/X-32 trap registration 0x%08x "
+                           "(INT 21h AX=2533h; no vectors installed)\n",
+                           x32.stop_address);
+                } else {
+                    printf("Stopped at unimplemented DOS/X-32 call 0x%08x "
+                           "(INT 21h AX=252Bh; no vector installed)\n",
+                           x32.stop_address);
+                }
             } else {
                 ef_decomp_arena_probe probe;
                 uint32_t stopped = 0;
@@ -136,7 +153,8 @@ int main(int argc, char **argv)
                            "stopped at unimplemented call 0x%08x\n", stopped);
             }
         }
-        if (!probe_type || strcmp(probe_type, "--probe-x32") != 0)
+        if (!probe_type || (strcmp(probe_type, "--probe-x32") != 0 &&
+                            strcmp(probe_type, "--probe-x32-vectors") != 0))
             puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files parse multiple ordinary '#' records and END validation, but mode-two geometry, EOF cleanup, archives and the first screen remain unimplemented.");
         free(image_dir);
         ef_decomp_memory_release();

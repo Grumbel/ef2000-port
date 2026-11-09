@@ -144,7 +144,14 @@ original's no-device branch would. The probe now executes recovered
   The host supplies explicitly synthetic selectors and one six-byte
   allocation, validates the initialized free lists and first packed vector
   record, and stops at real extender call `0x9c220` *after* its game-owned
-  writes, **without installing any vector**. The normal `--probe-main`
+  writes, **without installing any vector**. An explicitly virtual
+  `--probe-x32-vectors` mode acknowledges these requests in a private
+  host-only registry and executes all nine recovered `0x628` calls,
+  checking their order and packed records, then stops at `0x9c8b4`
+  before DOS trap installation. The final request in slot 7 holds address
+  `0x120cd4`, synthetic DS selector `0x5678`, and length 2; the free
+  count is seven. This is a test model, **not** live IRQ support or an
+  emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized
   pool; the two modes do not borrow each other's state. Actual DOS/X-32
   request/vector/timer services cannot be safely inferred from free-list
