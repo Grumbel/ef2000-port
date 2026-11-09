@@ -70,6 +70,9 @@ typedef struct ef_decomp_x32_probe {
     uint32_t ail_timer_reload;
     uint32_t ail_pit_port_writes;
     uint32_t ail_irq_critical_exited;
+    uint32_t ail_module_locked_ranges;
+    uint32_t ail_module_cleanup_handler;
+    uint32_t ail_module_cleanup_count;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -143,6 +146,14 @@ int ef_decomp_probe_x32_tactcom_ail_vectors(uint32_t bss_end,
 int ef_decomp_probe_x32_tactcom_ail_callback(uint32_t bss_end,
                                              ef_decomp_x32_probe *probe,
                                              char *reason, size_t reason_capacity);
+
+/* In a separate opt-in continuation execute recovered 0xd6df0 and its
+ * caller's two additional timer-service memory locks. Confirm the
+ * original module cleanup registration; stop before 0x111365 allocates a
+ * callback slot. All locks are inert and no audio/timer is activated. */
+int ef_decomp_probe_x32_tactcom_ail_module(uint32_t bss_end,
+                                           ef_decomp_x32_probe *probe,
+                                           char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.

@@ -434,6 +434,34 @@ int main(void)
                        (i == 0u && j == 15u ? 2u :
                         i == 2u && j == 15u ? 0xd68du : 0u));
     }
+    /* The next separately opt-in C-only slice exercises the recovered
+     * module's two lock requests, registers its actual cleanup handler,
+     * and executes two more timer-service locks before stopping at the
+     * original audio-slot allocation. The locks remain virtual. */
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    EF_U32(0x0040d030u) = 0xbaadf00du;
+    EF_U32(0x00160788u) = 0xbaadf00du;
+    EF_U32(0x0015f74cu) = 0xbaadf00du;
+    assert(EF_U32(0x0040d0b0u) == 0u);
+    assert(ef_decomp_probe_x32_tactcom_ail_module(bss_end, &x32,
+                                                   reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0x00111365u);
+    assert(x32.ail_locked_ranges == 18u);
+    assert(x32.ail_module_locked_ranges == 4u);
+    assert(x32.ail_module_cleanup_handler == 0x000d6da0u);
+    assert(x32.ail_module_cleanup_count == 1u);
+    assert(EF_U32(0x0040d0b0u) == 1u);
+    assert(EF_U32(0x0040d030u) == 0x000d6da0u);
+    assert(EF_U32(0x00160788u) == 0x0009c398u);
+    assert(EF_U32(0x0015f74cu) == 0xbaadf00du);
+    assert(EF_U32(0x0017d720u) == 0xd68du);
+    assert(EF_U32(0x0017d7b2u) == 0xd68du);
+    assert(EF_U32(0x0017d7bau) == 0u);
+    assert(x32.ail_irq_critical_exited == 1u);
+    assert(x32.ail_pit_port_writes == 3u);
+    assert(x32.sound_module_initialized == 1u);
+    assert(x32.timer_service_initialized == 1u);
+    assert(EF_U8(0x0015bac5u) == 1u);
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);

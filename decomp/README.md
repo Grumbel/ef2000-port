@@ -228,6 +228,15 @@ original's no-device branch would. The probe now executes recovered
   at its next unimplemented sound lock (`0xd6df0`). This does **not**
   register a working callback or audio driver. The earlier stop modes retain
   their stricter bounds; guest differential tests remain pending.
+  An independent `--probe-x32-tactcom-ail-module` mode continues through
+  the already recovered source-C `register_stack_ranges_d6df0` and the
+  original module's `push_handler_9c3cf` cleanup registration, followed by
+  two more code/data locks in `start_timer_service_e28e8`. All four lock
+  requests are validated against the exact original exclusive-end ranges
+  and remain **inert**. The cleanup handler `0xd6da0` occupies the first
+  entry of the guest handler stack (`0x40d030`), count 1 at `0x40d0b0`.
+  Execution stops in the no-debug AIL wrapper at `0x111365`, before the
+  timer slot for `0xe28c4` is allocated; there is no working host timer.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

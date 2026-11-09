@@ -2021,3 +2021,22 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   fields prove their exact overwrites; prior opt-in boundaries remain
   unchanged. This is not a guest x86 instruction-differential run, a
   running timer callback, or a replacement for X-32/DOS hardware services.
+- GCC/Linux cold AIL module locking, 2026-11-09: next opt-in
+  `--probe-x32-tactcom-ail-module` continues *existing* recovered source-C
+  `register_stack_ranges_d6df0` (49 bytes at `0xd6df0`), which calls
+  `stack_range_104908` for exactly `[0xd7108,0xd7150)` and
+  `[0x1048b4,0x104cb4)`. The original `init_module_d6dc4` then uses
+  recovered `push_handler_9c3cf(0xd6da0)`, writing the first cleanup
+  stack entry at `0x40d030`, count 1 at `0x40d0b0` and its original
+  book-keeping pointer `0x160788=0x9c398`. Back in recovered
+  `start_timer_service_e28e8`, two further `stack_range_104908` calls
+  request `[0xe28c4,0xe28dc)` and `[0x15f73c,0x15f750)`. The first
+  interval intentionally uses length `0xe28d8-0xe28c0` (24 bytes), as in
+  the original, not `0xe28d8-0xe28c4`. A strict host adapter checks all
+  four requests and does not lock physical or virtual host memory.
+  The no-debug `trace_call_102144` wrapper then stops at its first
+  unmodeled `0x111365` slot-allocation call, with `0x15f74c` unchanged.
+  A sentinel test checks the original cleanup-stack writes and timer
+  handle untouched; the previous strict stop at `0xd6df0` remains.
+  This test model does not run a timer, allocate an AIL callback slot or
+  execute a guest differential.

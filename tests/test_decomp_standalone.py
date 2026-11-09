@@ -255,6 +255,17 @@ class DecompStandaloneTests(unittest.TestCase):
                 self.assertIn('Stopped at sound module lock 0x000d6df0 '
                               '(no DOS IRQ, PIT or audio driver installed)',
                               callback_cold.stdout)
+                module_cold = subprocess.run([
+                    str(executable), '--image', original,
+                    '--probe-x32-tactcom-ail-module',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('Recovered AIL sound module: '
+                              '4 inert code/data lock requests; '
+                              'cleanup 0x000d6da0 registered (1 entry)',
+                              module_cold.stdout)
+                self.assertIn('Stopped before AIL timer-slot allocation '
+                              '0x00111365 (no DOS IRQ, PIT or audio driver '
+                              'installed)', module_cold.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)

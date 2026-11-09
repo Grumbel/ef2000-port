@@ -42,6 +42,7 @@ static int x32_virtual_ail_init;
 static int x32_virtual_ail_irq;
 static int x32_virtual_ail_vectors;
 static int x32_virtual_ail_callback;
+static int x32_virtual_ail_module;
 static uint32_t ail_lock_count;
 static uint32_t ail_setting_count;
 static uint32_t ail_irq_critical_count;
@@ -49,6 +50,7 @@ static uint32_t ail_irq_vector_queries;
 static uint32_t ail_irq_vector_registrations;
 static uint32_t ail_pit_port_writes;
 static uint32_t ail_irq_critical_exited;
+static uint32_t ail_module_lock_count;
 enum { AIL_DEFAULT_LOCK_COUNT = 16u, AIL_IRQ_LOCK_COUNT = 18u };
 /* Cold AIL setup locks code and data before trying its first setting.
  * These exact exclusive-end arguments come from the recovered 0x101a90,
@@ -75,6 +77,17 @@ static const struct {
     { 0x004dd7c8u, 0x004dd7ccu },
     { 0x0017d624u, 0x0017e1d4u },
     { 0x00110dccu, 0x00111575u },
+};
+/* Two module locks in recovered 0xd6df0, then two timer-service locks in
+ * recovered 0xe28e8. These are original 0x104908 exclusive-end requests. */
+static const struct {
+    uint32_t first;
+    uint32_t last;
+} ail_module_lock_ranges[] = {
+    { 0x000d7108u, 0x000d7150u },
+    { 0x001048b4u, 0x00104cb4u },
+    { 0x000e28c4u, 0x000e28dcu },
+    { 0x0015f73cu, 0x0015f750u },
 };
 static uint32_t x32_timer_registrations;
 static uint32_t x32_input_returns;
@@ -1350,7 +1363,14 @@ void guest_fn_d6df0(void)
     if (probing && x32_probe_active && x32_virtual_ail_callback &&
         ail_irq_critical_exited == 1u && ail_pit_port_writes == 3u &&
         EF_U8(0x0015bac5u) == 1u && EF_U8(0x0015f751u) == 1u) {
-        stop_at_guest_boundary(0x000d6df0u);
+        if (!x32_virtual_ail_module)
+            stop_at_guest_boundary(0x000d6df0u);
+        if (ail_module_lock_count != 0u)
+            fatal_unexpected("AIL sound module locks entered twice (0xd6df0)");
+        register_stack_ranges_d6df0();
+        if (ail_module_lock_count != 2u)
+            fatal_unexpected("AIL sound module lock order (0xd6df0)");
+        return;
     }
     fatal_unexpected("unimplemented sound module lock setup (0xd6df0)");
 }
@@ -1369,12 +1389,32 @@ void guest_fn_104840(uint32_t first, uint32_t last)
         ail_lock_count++;
         return;
     }
+    if (probing && main_probe_active && x32_probe_active &&
+        x32_virtual_ail_module && ail_irq_critical_exited == 1u &&
+        ail_lock_count == AIL_IRQ_LOCK_COUNT &&
+        ail_module_lock_count < sizeof(ail_module_lock_ranges) /
+                                 sizeof(ail_module_lock_ranges[0]) &&
+        first == ail_module_lock_ranges[ail_module_lock_count].first &&
+        last == ail_module_lock_ranges[ail_module_lock_count].last &&
+        first < last && ef_decomp_memory_span(first, last - first)) {
+        ++ail_module_lock_count;
+        return;
+    }
     fatal_unexpected("unimplemented DOS memory lock (0x104840)");
 }
 
 uint32_t EF_CDECL guest_fn_111365_t(uint32_t callback)
 {
-    (void)callback;
+    if (probing && main_probe_active && x32_probe_active &&
+        x32_virtual_ail_module && ail_irq_critical_exited == 1u &&
+        ail_module_lock_count == 4u && callback == 0x000e28c4u &&
+        EF_U32(0x0040d0b0u) == 1u &&
+        EF_U32(0x0040d030u) == 0x000d6da0u &&
+        EF_U32(0x00160788u) == 0x0009c398u &&
+        EF_U8(0x0015bac5u) == 1u &&
+        EF_U8(0x0015f751u) == 1u &&
+        EF_U32(0x0017d2c8u) == 0u)
+        stop_at_guest_boundary(0x00111365u);
     fatal_unexpected("unimplemented audio callback installation (0x111365)");
     return 0;
 }
@@ -1556,7 +1596,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
                          int virtual_timer, int virtual_tactcom,
                          int virtual_sound_timer, int virtual_ail_init,
                          int virtual_ail_irq, int virtual_ail_vectors,
-                         int virtual_ail_callback,
+                         int virtual_ail_callback, int virtual_ail_module,
                          char *reason, size_t reason_capacity)
 {
     uint32_t stopped;
@@ -1579,6 +1619,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     ail_irq_vector_registrations = 0u;
     ail_pit_port_writes = 0u;
     ail_irq_critical_exited = 0u;
+    ail_module_lock_count = 0u;
     x32_input_returns = 0u;
     x32_request_count = 0u;
     memset(x32_requests, 0, sizeof(x32_requests));
@@ -1597,6 +1638,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     x32_virtual_ail_irq = virtual_ail_irq;
     x32_virtual_ail_vectors = virtual_ail_vectors;
     x32_virtual_ail_callback = virtual_ail_callback;
+    x32_virtual_ail_module = virtual_ail_module;
     keyboard_led_bytes = 0u;
     keyboard_ack_pending = 0;
     main_boundary_address = 0u;
@@ -1622,6 +1664,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     x32_virtual_ail_irq = 0;
     x32_virtual_ail_vectors = 0;
     x32_virtual_ail_callback = 0;
+    x32_virtual_ail_module = 0;
     main_probe_active = 0;
     probing = 0;
 
@@ -1631,7 +1674,8 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         if (EF_U8(0x00195fb0u + i) != i)
             break;
     }
-    if (stopped != (virtual_ail_callback ? 0x000d6df0u :
+    if (stopped != (virtual_ail_module ? 0x00111365u :
+                    virtual_ail_callback ? 0x000d6df0u :
                     virtual_ail_vectors ? 0x001110abu :
                     virtual_ail_irq ? 0x0011105bu :
                     virtual_ail_init ? 0x00110fd4u :
@@ -1789,6 +1833,20 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
                         probe->ail_timer_reload = EF_U32(0x0017d7aeu);
                         probe->ail_pit_port_writes = ail_pit_port_writes;
                         probe->ail_irq_critical_exited = ail_irq_critical_exited;
+                        if (virtual_ail_module) {
+                            if (ail_module_lock_count != 4u ||
+                                EF_U32(0x0040d0b0u) != 1u ||
+                                EF_U32(0x0040d030u) != 0x000d6da0u ||
+                                EF_U32(0x00160788u) != 0x0009c398u) {
+                                if (reason && reason_capacity)
+                                    snprintf(reason, reason_capacity,
+                                             "recovered AIL sound module lock state mismatch");
+                                return -1;
+                            }
+                            probe->ail_module_locked_ranges = ail_module_lock_count;
+                            probe->ail_module_cleanup_handler = EF_U32(0x0040d030u);
+                            probe->ail_module_cleanup_count = EF_U32(0x0040d0b0u);
+                        }
                     }
                 }
             }
@@ -1800,62 +1858,62 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
                         char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_traps(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_input(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_tactcom(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_tactcom_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                       char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_tactcom_ail(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                      char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_tactcom_ail_irq(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                          char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_tactcom_ail_vectors(uint32_t bss_end,
                                              ef_decomp_x32_probe *probe,
                                              char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
                          reason, reason_capacity);
 }
 
@@ -1863,7 +1921,15 @@ int ef_decomp_probe_x32_tactcom_ail_callback(uint32_t bss_end,
                                              ef_decomp_x32_probe *probe,
                                              char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+                         reason, reason_capacity);
+}
+
+int ef_decomp_probe_x32_tactcom_ail_module(uint32_t bss_end,
+                                           ef_decomp_x32_probe *probe,
+                                           char *reason, size_t reason_capacity)
+{
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                          reason, reason_capacity);
 }
 
