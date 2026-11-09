@@ -361,7 +361,7 @@
           ./decomp-image-test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_NATIVE=1 \
             -fno-strict-aliasing -fwrapv -ffunction-sections -fdata-sections \
-            -Wno-error=int-to-pointer-cast \
+            -Wno-error=int-to-pointer-cast -Wno-error=parentheses \
             -Idecomp/include -Iruntime tests/decomp_startup_test.c \
             runtime/decomp_image.c runtime/decomp_startup.c runtime/decomp_files.c \
             decomp/src/runtime_helpers25.c decomp/src/runtime_helpers19.c \
@@ -379,6 +379,7 @@
             decomp/src/leaf_helpers6.c decomp/src/load_planes1.c \
             decomp/src/x32_startup.c decomp/src/x32_pool.c \
             decomp/src/game_state_helpers.c decomp/src/misc_helpers2.c \
+            decomp/src/trace_wrappers1.c decomp/src/runtime_helpers.c \
             decomp/src/tiny_helpers2.c decomp/src/line_of_sight.c \
             decomp/src/engine_helpers.c decomp/src/aid_data.c \
             decomp/src/game_helpers13.c \

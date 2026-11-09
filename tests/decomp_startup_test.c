@@ -252,6 +252,22 @@ int main(void)
     assert(x32.timer_2502_result_high == 0xabcdu);
     assert(x32.input_initialized == 1u);
     assert(EF_U8(0x0015f751u) == 0u);
+    assert(x32.timer_service_initialized == 0u);
+    assert(x32.sound_module_initialized == 0u);
+    assert(EF_U8(0x0015bac6u) == 0u && EF_U8(0x0015bac7u) == 0u);
+    assert(EF_U8(0x00420a72u) == 0u);
+    assert(EF_U32(0x0041f824u) == 7u);
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    assert(ef_decomp_probe_x32_tactcom_timer(bss_end, &x32,
+                                             reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0x101c54u);
+    assert(x32.registered_requests == 11u && x32.registered_traps == 8u);
+    assert(x32.request_free == 5u && x32.timer_free == 7u);
+    assert(x32.pending_timer_source == 9u && x32.timer_registrations == 1u);
+    assert(x32.timer_service_initialized == 1u);
+    assert(x32.sound_module_initialized == 0u);
+    assert(x32.input_initialized == 1u && x32.input_cleanup_hook == 0xcd554u);
+    assert(EF_U8(0x0015f751u) == 1u && EF_U8(0x0015bac5u) == 0u);
     assert(EF_U8(0x0015bac6u) == 0u && EF_U8(0x0015bac7u) == 0u);
     assert(EF_U8(0x00420a72u) == 0u);
     assert(EF_U32(0x0041f824u) == 7u);

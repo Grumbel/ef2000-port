@@ -1933,3 +1933,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   the handoff and verify that no first-time timer state was set. The
   preceding TACTCOM resource/options phase is deliberately not included;
   no DOS interrupt, sound timer, real input device or full game execution.
+- GCC/Linux recovered cold sound timer entry, 2026-11-09: disassembly
+  confirms `0xe28e8` first tests byte `0x15f751`, writes one, and calls
+  `0xd6dc4`. The latter tests `0x15bac5`, calls `0x101c54`, and only then
+  marks the sound module initialized before locking/registering its
+  cleanup handler. The opt-in `--probe-x32-tactcom-timer` extends the cold
+  X-32/keyboard/TACTCOM probe using existing recovered source-C for both
+  functions, and stops at the real `0x101c54` call before assuming sound
+  initialization succeeded. Synthetic guest-memory checks verify the
+  one-time guard is now one, module-ready is still zero, and the earlier
+  input/timer-pool state is unchanged. Original SHA-pinned Linux GCC
+  startup passes too. Other audio/lock externals are hard-fail link stubs;
+  no device initialized, IRQ installed, guest differential or Watcom splice.

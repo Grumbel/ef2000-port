@@ -53,6 +53,8 @@ typedef struct ef_decomp_x32_probe {
     uint32_t timer_registrations;
     uint32_t input_cleanup_hook;
     uint32_t input_initialized;
+    uint32_t timer_service_initialized;
+    uint32_t sound_module_initialized;
 } ef_decomp_x32_probe;
 
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
@@ -90,6 +92,13 @@ int ef_decomp_probe_x32_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
  * deliberately does not simulate the preceding TACTCOM file/options phase. */
 int ef_decomp_probe_x32_tactcom(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity);
+
+/* Enter original source-C 0xe28e8/0xd6dc4 on first-time cold TACTCOM
+ * startup. Observe the 0x15f751 guard write and stop before sound-system
+ * service 0x101c54. No actual sound driver or timer is installed. */
+int ef_decomp_probe_x32_tactcom_timer(uint32_t bss_end,
+                                      ef_decomp_x32_probe *probe,
+                                      char *reason, size_t reason_capacity);
 
 /* First recovered game-owned startup call (0xe29a0), in isolation. The
  * subset of X-32 services required by this call is implemented in the host.

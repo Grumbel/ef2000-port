@@ -43,6 +43,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/x32_pool.c'),
                 str(ROOT / 'decomp/src/line_of_sight.c'),
                 str(ROOT / 'decomp/src/misc_helpers2.c'),
+                str(ROOT / 'decomp/src/trace_wrappers1.c'),
+                str(ROOT / 'decomp/src/runtime_helpers.c'),
                 str(ROOT / 'decomp/src/engine_helpers.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'decomp/src/runtime_helpers19.c'),
@@ -182,6 +184,18 @@ class DecompStandaloneTests(unittest.TestCase):
                               'timer/sound service 0x000e28e8',
                               tactcom_cold.stdout)
                 self.assertIn('no DOS timer installed', tactcom_cold.stdout)
+                timer_cold = subprocess.run([
+                    str(executable), '--image', original,
+                    '--probe-x32-tactcom-timer',
+                ], capture_output=True, text=True, check=True)
+                self.assertIn('X-32 request free 5, timer free 7',
+                              timer_cold.stdout)
+                self.assertIn('Recovered first-time timer initializer '
+                              '0xe28e8 set guard 1; sound module initialized 0',
+                              timer_cold.stdout)
+                self.assertIn('Stopped at unimplemented sound service '
+                              '0x00101c54 (no sound timer installed)',
+                              timer_cold.stdout)
                 real = subprocess.run([
                     str(executable), '--image', original, '--probe-main',
                 ], capture_output=True, text=True, check=True)
@@ -372,6 +386,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/x32_pool.c'),
                 str(ROOT / 'decomp/src/line_of_sight.c'),
                 str(ROOT / 'decomp/src/misc_helpers2.c'),
+                str(ROOT / 'decomp/src/trace_wrappers1.c'),
+                str(ROOT / 'decomp/src/runtime_helpers.c'),
                 str(ROOT / 'decomp/src/engine_helpers.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'decomp/src/runtime_helpers19.c'),

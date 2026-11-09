@@ -175,6 +175,13 @@ original's no-device branch would. The probe now executes recovered
   `0xe28e8` timer/sound service. Unlike the previously supported warm path,
   it does not preseed the timer guard, and it does not claim to exercise
   TACTCOM's preceding file/options phase or a complete game main startup.
+  Another opt-in mode, `--probe-x32-tactcom-timer`, enters the real recovered
+  `start_timer_service_e28e8` and `init_module_d6dc4` C bodies from that
+  same cold state. It confirms the original one-time guard write
+  (`0x15f751 = 1`) and stops at the first unimplemented external sound
+  initialization call `0x101c54`, before the module-ready flag at
+  `0x15bac5` is set. Later audio callbacks and memory-lock services remain
+  fail-closed, not synthetic successes.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized

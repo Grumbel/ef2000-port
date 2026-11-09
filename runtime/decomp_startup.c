@@ -37,6 +37,7 @@ static int x32_virtual_traps;
 static int x32_virtual_input;
 static int x32_virtual_timer;
 static int x32_virtual_tactcom;
+static int x32_virtual_sound_timer;
 static uint32_t x32_timer_registrations;
 static uint32_t x32_input_returns;
 static uint32_t x32_request_count;
@@ -1090,6 +1091,61 @@ void guest_tactcom_post_options_boundary_8b477(void)
     tactcom_after_input_8b47c();
 }
 
+/* 0xe28e8 has set its one-time flag and entered original module initializer
+ * 0xd6dc4. The latter calls 0x101c54 before installing its module handler.
+ * This external sound/runtime service is deliberately not simulated. */
+void guest_fn_101c54(void)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        !x32_virtual_sound_timer || !x32_virtual_tactcom ||
+        EF_U8(0x0015f751u) != 1u || EF_U8(0x0015bac5u) != 0u)
+        fatal_unexpected("first sound module startup service (0x101c54)");
+    stop_at_guest_boundary(0x00101c54u);
+}
+
+/* These references are emitted by the recovered timer/audio source-C, but
+ * execution cannot reach them before the 0x101c54 boundary above. Keep them
+ * as fail-closed host interfaces so the standalone probe links without
+ * accidentally treating any audio or DOS memory operation as successful. */
+void guest_fn_d6df0(void)
+{
+    fatal_unexpected("unimplemented sound module lock setup (0xd6df0)");
+}
+
+void guest_fn_104840(uint32_t first, uint32_t last)
+{
+    (void)first;
+    (void)last;
+    fatal_unexpected("unimplemented DOS memory lock (0x104840)");
+}
+
+uint32_t EF_CDECL guest_fn_111365_t(uint32_t callback)
+{
+    (void)callback;
+    fatal_unexpected("unimplemented audio callback installation (0x111365)");
+    return 0;
+}
+
+void EF_CDECL guest_fn_1114f7(uint32_t a, uint32_t b)
+{
+    (void)a;
+    (void)b;
+    fatal_unexpected("unimplemented audio service (0x1114f7)");
+}
+
+void EF_CDECL guest_fn_11141f(uint32_t a)
+{
+    (void)a;
+    fatal_unexpected("unimplemented audio service (0x11141f)");
+}
+
+void guest_fn_bc400(uint32_t stream, uint32_t format, ...)
+{
+    (void)stream;
+    (void)format;
+    fatal_unexpected("unimplemented audio stream service (0xbc400)");
+}
+
 void guest_tactcom_unbound_service_8b47c(uint32_t address)
 {
     /* Do not bypass unmodeled device or timer effects. The recovered
@@ -1097,6 +1153,12 @@ void guest_tactcom_unbound_service_8b47c(uint32_t address)
      * entering that no-op arm does not require linking its hardware deps. */
     if (!probing || !main_probe_active)
         fatal_unexpected("TACTCOM post-input service outside main probe");
+    if (address == 0x000e28e8u && x32_probe_active &&
+        x32_virtual_tactcom && x32_virtual_sound_timer &&
+        EF_U8(0x0015f751u) == 0u) {
+        start_timer_service_e28e8();
+        return;
+    }
     if (address == 0x000e28e8u && EF_U8(0x0015f751u) != 0u) {
         return;
     }
@@ -1239,6 +1301,7 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
 static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
                          int virtual_vectors, int virtual_traps, int virtual_input,
                          int virtual_timer, int virtual_tactcom,
+                         int virtual_sound_timer,
                          char *reason, size_t reason_capacity)
 {
     uint32_t stopped;
@@ -1267,6 +1330,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     x32_virtual_input = virtual_input;
     x32_virtual_timer = virtual_timer;
     x32_virtual_tactcom = virtual_tactcom;
+    x32_virtual_sound_timer = virtual_sound_timer;
     keyboard_led_bytes = 0u;
     keyboard_ack_pending = 0;
     main_boundary_address = 0u;
@@ -1287,6 +1351,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     x32_virtual_input = 0;
     x32_virtual_timer = 0;
     x32_virtual_tactcom = 0;
+    x32_virtual_sound_timer = 0;
     main_probe_active = 0;
     probing = 0;
 
@@ -1296,7 +1361,8 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         if (EF_U8(0x00195fb0u + i) != i)
             break;
     }
-    if (stopped != (virtual_tactcom ? 0x000e28e8u :
+    if (stopped != (virtual_sound_timer ? 0x00101c54u :
+                    virtual_tactcom ? 0x000e28e8u :
                     virtual_timer ? 0x000cd550u :
                     virtual_input ? 0x00000324u :
                     virtual_traps ? 0x00000f43u :
@@ -1381,12 +1447,15 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         if (EF_U8(0x0015bac6u) != 0u ||
             EF_U8(0x0015bac7u) != 0u ||
             EF_U8(0x00420a72u) != 0u ||
-            EF_U8(0x0015f751u) != 0u ||
+            EF_U8(0x0015f751u) != (virtual_sound_timer ? 1u : 0u) ||
+            EF_U8(0x0015bac5u) != 0u ||
             EF_U32(0x0041f824u) != 7u) {
             if (reason && reason_capacity)
                 snprintf(reason, reason_capacity, "recovered cold TACTCOM tail state mismatch");
             return -1;
         }
+        probe->timer_service_initialized = EF_U8(0x0015f751u);
+        probe->sound_module_initialized = EF_U8(0x0015bac5u);
     }
     return 0;
 }
@@ -1394,37 +1463,43 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
                         char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_traps(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_input(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_tactcom(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 0, reason, reason_capacity);
+}
+
+int ef_decomp_probe_x32_tactcom_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                                      char *reason, size_t reason_capacity)
+{
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, reason, reason_capacity);
 }
 
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
