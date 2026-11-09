@@ -1964,6 +1964,30 @@ int main(void)
                     assert(EF_U32(0x0017d3d4u) == 0xabcd1234u);
                     ef_decomp_memory_release();
 
+                    /* Continue one more recovered function: channel 2
+                     * installs the mode-change pointer and then takes
+                     * the 0x11d24e hook tail, where the probe stops.
+                     * The channel-2 slot remains untouched until that
+                     * nested hook is actually recovered. */
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    EF_U8(0x0015b72eu) = 1u;
+                    EF_U8(0x0015f751u) = 1u;
+                    EF_U16(0x00464472u) = 0u;
+                    EF_U32(0x0017e5e0u) = 0x1234abcdu;
+                    EF_U32(0x0017d3d4u) = 0xabcd1234u;
+                    stop = 0;
+                    assert(ef_decomp_probe_main_channel(bss_end, 1, 0, dirname,
+                                                         &probe, &stop, reason,
+                                                         sizeof(reason)) == 0);
+                    assert(stop == 0x0011d24eu);
+                    assert(EF_U32(0x0017e5e0u) == 0x0010dc41u);
+                    assert(EF_U32(0x0017d3d4u) == 0xabcd1234u);
+                    assert(EF_U16(0x00464472u) == 0u);
+                    assert(EF_U32(0x0019840cu) == 0u);
+                    assert(EF_U32(0x00198410u) == 0u);
+                    ef_decomp_memory_release();
+
                     /* The opt-in continuation cannot silently pass a
                      * selected hardware input mode into the exit handler. */
                     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
@@ -1976,6 +2000,20 @@ int main(void)
                                                               &probe, &stop, reason,
                                                               sizeof(reason)) == -1);
                     assert(strstr(reason, "before the exit-handler service") != NULL);
+                    ef_decomp_memory_release();
+
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    EF_U8(0x0015b72eu) = 1u;
+                    EF_U8(0x0015f751u) = 1u;
+                    EF_U16(0x00464472u) = 1u;
+                    EF_U32(0x0017e5e0u) = 0x1234abcdu;
+                    stop = 0;
+                    assert(ef_decomp_probe_main_channel(bss_end, 1, 0, dirname,
+                                                         &probe, &stop, reason,
+                                                         sizeof(reason)) == -1);
+                    assert(strstr(reason, "before the runtime-hook tail") != NULL);
+                    assert(EF_U32(0x0017e5e0u) == 0x1234abcdu);
                     ef_decomp_memory_release();
 
                     /* A source-enabled page branch must stop at its own

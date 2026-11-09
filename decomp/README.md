@@ -301,9 +301,16 @@ original's no-device branch would. The probe now executes recovered
   requires prepared synthetic guest RAM (as exercised by the C test); a
   bare original executable on the command line cannot supply that state.
   No channel switch, exit handler or following resource load is performed.
+  New `--probe-main-channel` keeps all those guards and executes recovered
+  source-C `set_channel_mode_10dc7f(2, 0x10dc40)` through its mode-change
+  pointer write (`0x17e5e0 = 0x10dc41`). Because channel 2 requires the
+  nested runtime-hook tail for this mode, it stops at `0x11d24e` **before**
+  running that handler or updating channel-2 slot `0x17d3d4`. Distinct
+  sentinels assert the write and the untouched slot; an active hardware-mode
+  probe still fails before either write. Previous stops remain available.
   A mapping-only file stops at the missing association heading `0x120e`;
   missing files stop at `0xea50c` after the original table initialization.
-  Main's first channel-mode service inside the next call remains a hard
+  The nested `0x11d24e` channel-specific runtime hook is still a hard
   boundary. This warm-path
   result does not imply that first-time timer registration, connected
   gameport input or subsequent graphical startup is operational.

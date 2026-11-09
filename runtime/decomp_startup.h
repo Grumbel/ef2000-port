@@ -249,4 +249,14 @@ int ef_decomp_probe_main_exit_handler(uint32_t bss_end, uint32_t argc,
                                       uint32_t *stop_address,
                                       char *reason, size_t reason_capacity);
 
+/* Resume the same synthetic warm path one source-C function further:
+ * set_channel_mode_10dc7f(2, 0x10dc40) writes the original mode-change
+ * callback pointer, then stops before channel-2's 0x11d24e tail helper.
+ * No channel slot or actual runtime hook is changed. */
+int ef_decomp_probe_main_channel(uint32_t bss_end, uint32_t argc,
+                                 uint32_t argv, const char *data_dir,
+                                 ef_decomp_arena_probe *probe,
+                                 uint32_t *stop_address,
+                                 char *reason, size_t reason_capacity);
+
 #endif

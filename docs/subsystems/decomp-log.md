@@ -2114,3 +2114,15 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   This is a synthetic warm-state integration test, not a real cold-to-main
   run: no channel state transition, exit registration, following clump
   resource loads, guest instruction differential or Watcom splice is claimed.
+- GCC/Linux synthetic warm channel-mode prefix, 2026-11-09:
+  New `--probe-main-channel` advances the full read-only, synthetic-warm
+  `candidate_game_main` path through already recovered source-C
+  `set_channel_mode_10dc7f(2,0x10dc40)` from module `game_helpers75`.
+  The mode-change global `0x17e5e0` becomes `0x10dc41`, and channel 2
+  takes its original branch into the nested `0x11d24e` tail, where a strict
+  boundary protects the not-yet-linked runtime hook. The previous
+  `--probe-main-exit` still stops at `0x10dc7f` before that global changes.
+  The channel-2 slot at `0x17d3d4` remains untouched, with a seeded
+  sentinel; active hardware input mode 1 cannot enter this continuation.
+  Original channel-2 hook, register-level guest differential, Watcom splice,
+  exit registration and following resource loads remain unverified.
