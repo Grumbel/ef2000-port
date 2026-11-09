@@ -127,8 +127,14 @@ original's no-device branch would. The probe now executes recovered
   initializer at `0xcd4d4`. The GCC probe supplies a bounded 0xed/zero
   keyboard-LED acknowledgement model, runs the original key-table reset
   (`0xcd430`) and selector write (`0xfe610`), then stops at `0x628`, **before**
-  the first X-32 request-pool mutation. The real pre-main initializer at
-  `0xe20` and DOS request/vector/timer services are still absent. A synthetic
+  the first X-32 request-pool mutation. The original pre-main initializer
+  at `0xe20` is now recovered separately as source in `x32_startup.c`,
+  including its nine vector registrations, request/timer free-list setup,
+  selector-dependent final vector and optional trap-handler registration.
+  It has a synthetic host-memory test, but is **not yet wired into the native
+  probe**: the original `0xb04` far-stub setup and the actual DOS/X-32
+  request/vector/timer services cannot be safely simulated by a free-list
+  initialization alone. A synthetic
   pre-initialized input-state test skips that setup as in the original and
   reaches the subsequent TACTCOM `0xce08c` boundary.
   A mapping-only file stops at the missing association heading `0x120e`;

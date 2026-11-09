@@ -1381,6 +1381,7 @@ void guest_fn_101e78(void); /* 0x101e78 */
 
 /* game_state_helpers.c */
 void init_far_stub_b04(void);
+void initialize_x32_services_e20(void); /* 0xe20, pre-main X-32 startup */
 ef_addr32 record_for_kind(int32_t kind);
 void tick_selector_1ef8(void);
 void reset_selection_3cf0(void);

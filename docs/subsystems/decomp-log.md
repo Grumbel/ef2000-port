@@ -1774,3 +1774,20 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   branches. Real IRQ/timer services, DOS setup, first screen, OpenWatcom
   splice and guest differential are still outstanding; `0x8b39c` stays
   `named` and `0xcd4d4` stays `compiles`.
+- X-32 pre-main startup reconstruction, 2026-11-09: original bytes
+  `0xe20..0xf43` establish the X-32 request service before game entry.
+  Recovered `initialize_x32_services_e20` first sets byte `0x132a98`, calls
+  existing recovered `init_far_stub_b04`, initializes indices 0..15 at
+  `0x195fb0` with count 16 at `0x196144` and indices 0..7 at `0x196134`
+  with count eight at `0x196140`, then makes nine `start_request_628`
+  registrations. The last request uses DS as its selector and the address
+  `0x120cd4` read by the original from the immutable CS:0x226 displacement
+  in the verified `0x222` handler; others use CS. The first request's length
+  is `0xe20-0x2b0`, and the setup ends by conditionally invoking the trap
+  initializer based on environment variable `0x17f3a8`. The isolated GCC
+  model checks both environment branches, registration order/arguments,
+  free-list contents, seven remaining slots, and execution order of the
+  far-stub prerequisite. It does not model original `0xb04` allocator,
+  vector installation, protected-mode selectors or DOS/IRQ behavior;
+  therefore TACTCOM's native cold path still stops before `0x628`, and no
+  standalone DOS program, full game or guest differential is claimed.

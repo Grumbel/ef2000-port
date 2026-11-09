@@ -19,6 +19,13 @@ add_executable(ef2000-decomp-hiscore-test
 target_compile_features(ef2000-decomp-hiscore-test PRIVATE c_std_11)
 target_include_directories(ef2000-decomp-hiscore-test PRIVATE decomp/include)
 add_test(NAME decomp-hiscore-host-model COMMAND ef2000-decomp-hiscore-test)
+add_executable(ef2000-decomp-x32-startup-test
+  tests/decomp_x32_startup_test.c decomp/src/x32_startup.c)
+target_compile_features(ef2000-decomp-x32-startup-test PRIVATE c_std_11)
+target_compile_options(ef2000-decomp-x32-startup-test PRIVATE -Wall -Wextra -Werror)
+target_compile_definitions(ef2000-decomp-x32-startup-test PRIVATE EF_DECOMP_HOST_TEST=1)
+target_include_directories(ef2000-decomp-x32-startup-test PRIVATE decomp/include)
+add_test(NAME decomp-x32-startup-host-model COMMAND ef2000-decomp-x32-startup-test)
 add_executable(ef2000-decomp-spatial-test
   tests/decomp_spatial_test.c decomp/src/spatial.c)
 target_compile_features(ef2000-decomp-spatial-test PRIVATE c_std_11)
