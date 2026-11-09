@@ -380,6 +380,7 @@
             decomp/src/x32_startup.c decomp/src/x32_pool.c \
             decomp/src/game_state_helpers.c decomp/src/misc_helpers2.c \
             decomp/src/trace_wrappers1.c decomp/src/runtime_helpers.c \
+            decomp/src/state_reset1.c \
             decomp/src/tiny_helpers2.c decomp/src/line_of_sight.c \
             decomp/src/engine_helpers.c decomp/src/aid_data.c \
             decomp/src/game_helpers13.c \

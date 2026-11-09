@@ -38,6 +38,33 @@ static int x32_virtual_input;
 static int x32_virtual_timer;
 static int x32_virtual_tactcom;
 static int x32_virtual_sound_timer;
+static int x32_virtual_ail_init;
+static uint32_t ail_lock_count;
+static uint32_t ail_setting_count;
+/* Cold AIL setup locks code and data before trying its first setting.
+ * These exact exclusive-end arguments come from the recovered 0x101a90,
+ * 0x103d80 and their 0x104908 wrapper, not an assumed extender result. */
+static const struct {
+    uint32_t first;
+    uint32_t last;
+} ail_cold_lock_ranges[] = {
+    { 0x00101a90u, 0x00103d48u },
+    { 0x004dd624u, 0x004dd628u },
+    { 0x004dd628u, 0x004dd62cu },
+    { 0x004dd620u, 0x004dd624u },
+    { 0x004dd62cu, 0x004dd630u },
+    { 0x004dd63cu, 0x004dd640u },
+    { 0x004dd638u, 0x004dd63cu },
+    { 0x004dd640u, 0x004dd644u },
+    { 0x004dd630u, 0x004dd634u },
+    { 0x00103d80u, 0x001046c4u },
+    { 0x004dd670u, 0x004dd6b0u },
+    { 0x004dd7ccu, 0x004dd818u },
+    { 0x004dd6b0u, 0x004dd7b0u },
+    { 0x004dd7b0u, 0x004dd7c8u },
+    { 0x0017d2d0u, 0x0017d2d4u },
+    { 0x004dd7c8u, 0x004dd7ccu },
+};
 static uint32_t x32_timer_registrations;
 static uint32_t x32_input_returns;
 static uint32_t x32_request_count;
@@ -1100,13 +1127,47 @@ void guest_fn_101c54(void)
         !x32_virtual_sound_timer || !x32_virtual_tactcom ||
         EF_U8(0x0015f751u) != 1u || EF_U8(0x0015bac5u) != 0u)
         fatal_unexpected("first sound module startup service (0x101c54)");
+    if (x32_virtual_ail_init) {
+        initialize_ail_trace_101c54();
+        fatal_unexpected("AIL debug initializer returned without AIL settings boundary");
+    }
     stop_at_guest_boundary(0x00101c54u);
 }
 
-/* These references are emitted by the recovered timer/audio source-C, but
- * execution cannot reach them before the 0x101c54 boundary above. Keep them
- * as fail-closed host interfaces so the standalone probe links without
- * accidentally treating any audio or DOS memory operation as successful. */
+void guest_ail_trace_debug_path_101c87(uint32_t debug_file)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        !x32_virtual_ail_init || debug_file == 0u)
+        fatal_unexpected("AIL debug file branch (0x101c87)");
+    stop_at_guest_boundary(0x00101c87u);
+}
+
+uint32_t EF_CDECL guest_fn_1041e4_t(uint32_t index, uint32_t value)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        !x32_virtual_ail_init || index != ail_setting_count || index >= 19u ||
+        ail_lock_count != sizeof(ail_cold_lock_ranges) / sizeof(ail_cold_lock_ranges[0]) ||
+        EF_U32(0x0017d2ccu) != 1u || EF_U32(0x0017d2d4u) != 1u ||
+        EF_U32(0x004dd624u) != 0u || EF_U32(0x004dd628u) != 0u)
+        fatal_unexpected("AIL default-setting service (0x1041e4)");
+    ail_setting_count++;
+    return exchange_slot_1041e4(index, value);
+}
+
+void guest_fn_110fd4_x(void)
+{
+    if (!probing || !main_probe_active || !x32_probe_active ||
+        !x32_virtual_ail_init || ail_setting_count != 19u ||
+        EF_U32(0x0017d2ccu) != 1u || EF_U32(0x0017d2d4u) != 1u ||
+        EF_U8(0x004dd6b0u) != 0u)
+        fatal_unexpected("unimplemented AIL default-settings tail service (0x110fd4)");
+    stop_at_guest_boundary(0x00110fd4u);
+}
+
+/* Other references from recovered timer/audio C are deliberately fail-closed.
+ * The 0x104840 memory-lock adapter below is the sole exception: its exact
+ * inert cold AIL probe sequence is checked explicitly. No sound/IRQ service
+ * is assumed to succeed merely because the recovered source links. */
 void guest_fn_d6df0(void)
 {
     fatal_unexpected("unimplemented sound module lock setup (0xd6df0)");
@@ -1114,8 +1175,17 @@ void guest_fn_d6df0(void)
 
 void guest_fn_104840(uint32_t first, uint32_t last)
 {
-    (void)first;
-    (void)last;
+    /* Only the precisely recovered page-lock sequence of the no-debug
+     * cold AIL path is accepted, with no host memory lock installed. */
+    if (probing && main_probe_active && x32_probe_active &&
+        x32_virtual_ail_init &&
+        ail_lock_count < sizeof(ail_cold_lock_ranges) / sizeof(ail_cold_lock_ranges[0]) &&
+        first == ail_cold_lock_ranges[ail_lock_count].first &&
+        last == ail_cold_lock_ranges[ail_lock_count].last &&
+        first < last && ef_decomp_memory_span(first, last - first)) {
+        ail_lock_count++;
+        return;
+    }
     fatal_unexpected("unimplemented DOS memory lock (0x104840)");
 }
 
@@ -1301,7 +1371,7 @@ int ef_decomp_probe_arena(uint32_t bss_end, ef_decomp_arena_probe *probe,
 static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
                          int virtual_vectors, int virtual_traps, int virtual_input,
                          int virtual_timer, int virtual_tactcom,
-                         int virtual_sound_timer,
+                         int virtual_sound_timer, int virtual_ail_init,
                          char *reason, size_t reason_capacity)
 {
     uint32_t stopped;
@@ -1317,6 +1387,8 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     hook_registrations = 0u;
     input_cleanup_hook = 0u;
     x32_timer_registrations = 0u;
+    ail_lock_count = 0u;
+    ail_setting_count = 0u;
     x32_input_returns = 0u;
     x32_request_count = 0u;
     memset(x32_requests, 0, sizeof(x32_requests));
@@ -1331,6 +1403,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     x32_virtual_timer = virtual_timer;
     x32_virtual_tactcom = virtual_tactcom;
     x32_virtual_sound_timer = virtual_sound_timer;
+    x32_virtual_ail_init = virtual_ail_init;
     keyboard_led_bytes = 0u;
     keyboard_ack_pending = 0;
     main_boundary_address = 0u;
@@ -1352,6 +1425,7 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
     x32_virtual_timer = 0;
     x32_virtual_tactcom = 0;
     x32_virtual_sound_timer = 0;
+    x32_virtual_ail_init = 0;
     main_probe_active = 0;
     probing = 0;
 
@@ -1361,7 +1435,8 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         if (EF_U8(0x00195fb0u + i) != i)
             break;
     }
-    if (stopped != (virtual_sound_timer ? 0x00101c54u :
+    if (stopped != (virtual_ail_init ? 0x00110fd4u :
+                    virtual_sound_timer ? 0x00101c54u :
                     virtual_tactcom ? 0x000e28e8u :
                     virtual_timer ? 0x000cd550u :
                     virtual_input ? 0x00000324u :
@@ -1456,6 +1531,21 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
         }
         probe->timer_service_initialized = EF_U8(0x0015f751u);
         probe->sound_module_initialized = EF_U8(0x0015bac5u);
+        if (virtual_ail_init) {
+            if (ail_lock_count != sizeof(ail_cold_lock_ranges) / sizeof(ail_cold_lock_ranges[0]) ||
+                ail_setting_count != 19u ||
+                EF_U32(0x0017d2ccu) != 1u || EF_U32(0x0017d2d4u) != 1u ||
+                EF_U32(0x004dd624u) != 0u || EF_U32(0x004dd628u) != 0u ||
+                EF_U32(0x004dd620u) != 0u) {
+                if (reason && reason_capacity)
+                    snprintf(reason, reason_capacity, "recovered cold AIL debug state mismatch");
+                return -1;
+            }
+            probe->ail_locked_ranges = ail_lock_count;
+            probe->ail_settings_written = ail_setting_count;
+            probe->ail_trace_ranges_initialized = EF_U32(0x0017d2ccu);
+            probe->ail_settings_ranges_initialized = EF_U32(0x0017d2d4u);
+        }
     }
     return 0;
 }
@@ -1463,43 +1553,49 @@ static int run_x32_probe(uint32_t bss_end, ef_decomp_x32_probe *probe,
 int ef_decomp_probe_x32(uint32_t bss_end, ef_decomp_x32_probe *probe,
                         char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 0, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_vectors(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 0, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 0, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_traps(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 0, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 0, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_input(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 0, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 0, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
                               char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 0, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 0, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_tactcom(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                 char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 0, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 0, 0, reason, reason_capacity);
 }
 
 int ef_decomp_probe_x32_tactcom_timer(uint32_t bss_end, ef_decomp_x32_probe *probe,
                                       char *reason, size_t reason_capacity)
 {
-    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, reason, reason_capacity);
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 0, reason, reason_capacity);
+}
+
+int ef_decomp_probe_x32_tactcom_ail(uint32_t bss_end, ef_decomp_x32_probe *probe,
+                                     char *reason, size_t reason_capacity)
+{
+    return run_x32_probe(bss_end, probe, 1, 1, 1, 1, 1, 1, 1, reason, reason_capacity);
 }
 
 int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,

@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 #if defined(__WATCOMC__)
         puts("Usage: ef2000-decomp [--help | --self-test]");
 #else
-        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom | --probe-x32-tactcom-timer]]");
+        puts("Usage: ef2000-decomp [--help | --self-test | --image _EF2000.EXE [--data-dir DIR] [--probe-arena | --probe-main | --probe-x32 | --probe-x32-vectors | --probe-x32-traps | --probe-x32-input | --probe-x32-timer | --probe-x32-tactcom | --probe-x32-tactcom-timer | --probe-x32-tactcom-ail]]");
 #endif
         puts("Standalone recovered-source bootstrap; gameplay is not implemented.");
         return 0;
@@ -74,7 +74,8 @@ int main(int argc, char **argv)
                         strcmp(argv[i], "--probe-x32-input") == 0 ||
                         strcmp(argv[i], "--probe-x32-timer") == 0 ||
                         strcmp(argv[i], "--probe-x32-tactcom") == 0 ||
-                        strcmp(argv[i], "--probe-x32-tactcom-timer") == 0) && !probe_type) {
+                        strcmp(argv[i], "--probe-x32-tactcom-timer") == 0 ||
+                        strcmp(argv[i], "--probe-x32-tactcom-ail") == 0) && !probe_type) {
                 probe_type = argv[i];
             } else {
                 fputs("Unsupported argument (try --help).\n", stderr);
@@ -108,9 +109,12 @@ int main(int argc, char **argv)
                 strcmp(probe_type, "--probe-x32-input") == 0 ||
                 strcmp(probe_type, "--probe-x32-timer") == 0 ||
                 strcmp(probe_type, "--probe-x32-tactcom") == 0 ||
-                strcmp(probe_type, "--probe-x32-tactcom-timer") == 0) {
+                strcmp(probe_type, "--probe-x32-tactcom-timer") == 0 ||
+                strcmp(probe_type, "--probe-x32-tactcom-ail") == 0) {
                 ef_decomp_x32_probe x32;
-                int virtual_sound_timer =
+                int virtual_ail_init =
+                    strcmp(probe_type, "--probe-x32-tactcom-ail") == 0;
+                int virtual_sound_timer = virtual_ail_init ||
                     strcmp(probe_type, "--probe-x32-tactcom-timer") == 0;
                 int virtual_tactcom = virtual_sound_timer ||
                     strcmp(probe_type, "--probe-x32-tactcom") == 0;
@@ -122,8 +126,11 @@ int main(int argc, char **argv)
                                     strcmp(probe_type, "--probe-x32-traps") == 0;
                 int virtual_vectors = virtual_traps ||
                                       strcmp(probe_type, "--probe-x32-vectors") == 0;
-                int x32_status = virtual_sound_timer
-                    ? ef_decomp_probe_x32_tactcom_timer(info.bss_end, &x32,
+                int x32_status = virtual_ail_init
+                    ? ef_decomp_probe_x32_tactcom_ail(info.bss_end, &x32,
+                                                       reason, sizeof(reason))
+                    : virtual_sound_timer
+                        ? ef_decomp_probe_x32_tactcom_timer(info.bss_end, &x32,
                                                          reason, sizeof(reason))
                     : virtual_tactcom
                         ? ef_decomp_probe_x32_tactcom(info.bss_end, &x32,
@@ -197,9 +204,24 @@ int main(int argc, char **argv)
                                                "sound module initialized %u\n",
                                                x32.timer_service_initialized,
                                                x32.sound_module_initialized);
-                                        printf("Stopped at unimplemented sound service "
-                                               "0x%08x (no sound timer installed)\n",
-                                               x32.stop_address);
+                                        if (virtual_ail_init) {
+                                            printf("Recovered cold no-debug AIL setup: "
+                                                   "%u inert memory-lock requests, "
+                                                   "%u default settings; "
+                                                   "trace/settings range flags %u/%u\n",
+                                                   x32.ail_locked_ranges,
+                                                   x32.ail_settings_written,
+                                                   x32.ail_trace_ranges_initialized,
+                                                   x32.ail_settings_ranges_initialized);
+                                            printf("Stopped at interrupt-sensitive AIL "
+                                                   "runtime initialization 0x%08x "
+                                                   "(no audio driver installed)\n",
+                                                   x32.stop_address);
+                                        } else {
+                                            printf("Stopped at unimplemented sound service "
+                                                   "0x%08x (no sound timer installed)\n",
+                                                   x32.stop_address);
+                                        }
                                     } else {
                                         printf("TACTCOM post-input C reached first-time "
                                                "timer/sound service 0x%08x "
@@ -262,7 +284,8 @@ int main(int argc, char **argv)
                             strcmp(probe_type, "--probe-x32-input") != 0 &&
                             strcmp(probe_type, "--probe-x32-timer") != 0 &&
                             strcmp(probe_type, "--probe-x32-tactcom") != 0 &&
-                            strcmp(probe_type, "--probe-x32-tactcom-timer") != 0))
+                            strcmp(probe_type, "--probe-x32-tactcom-timer") != 0 &&
+                            strcmp(probe_type, "--probe-x32-tactcom-ail") != 0))
             puts("TACTCOM settings and Views sequence prefix are bounded; plain resource files parse multiple ordinary '#' records and END validation, but mode-two geometry, EOF cleanup, archives and the first screen remain unimplemented.");
         free(image_dir);
         ef_decomp_memory_release();

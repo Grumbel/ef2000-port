@@ -1863,6 +1863,25 @@ void init_once_101a90(void)
     }
 }
 
+/* 0x101c54, 392 bytes. The cold no-debug branch of the AIL trace setup:
+ * lock the original trace state, clear its trace flags and, when AIL_DEBUG
+ * is absent from the DOS environment, initialize the default AIL settings.
+ * The nonempty AIL_DEBUG branch (file/log formatting) is still a strict
+ * host boundary at 0x101c87, not a reconstructed path. */
+void initialize_ail_trace_101c54(void)
+{
+    uint32_t debug_file;
+    init_once_101a90();
+    EF_U32(0x004dd624u) = 0u;
+    EF_U32(0x004dd628u) = 0u;
+    debug_file = getenv_9c858(0x001937b0u);
+    if (debug_file == 0u) {
+        reset_settings_104580();
+        return;
+    }
+    guest_ail_trace_debug_path_101c87(debug_file);
+}
+
 /* 0xfa6d3, 168 bytes. Allocate a stream slot (26 bytes): reuse a node from the free list at 0x4644e0 (keeping its 0x4000 flag), else take an unused slot of the table 0x160424..0x16062c (flags & 3 clear) with a fresh 8-byte list node, else allocate node and slot together (flag 0x4003). The slot is cleared, flagged 3 and linked into the list at 0x485f9c. Returns the slot, or 0 after reporting error 5. */
 ef_addr32 alloc_stream_slot_fa6d3(void)
 {

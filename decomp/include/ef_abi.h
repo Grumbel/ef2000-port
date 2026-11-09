@@ -1842,6 +1842,8 @@ void guest_fn_eb478(ef_addr32 text); /* 0xeb478 EAX */
 void guest_fn_ce830(ef_addr32 object, uint32_t value); /* 0xce830 EAX/EDX */
 void guest_fn_cf3a4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0xcf3a4 EAX/EDX/EBX/ECX/stack */
 void guest_fn_101c54(void); /* 0x101c54 */
+void initialize_ail_trace_101c54(void); /* 0x101c54, cold no-debug branch */
+void guest_ail_trace_debug_path_101c87(uint32_t debug_file);
 void guest_fn_d6df0(void); /* 0xd6df0 */
 void guest_fn_cdf48(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcdf48 EAX/EDX/EBX/ECX */
 

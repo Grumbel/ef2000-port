@@ -1945,3 +1945,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   input/timer-pool state is unchanged. Original SHA-pinned Linux GCC
   startup passes too. Other audio/lock externals are hard-fail link stubs;
   no device initialized, IRQ installed, guest differential or Watcom splice.
+- GCC/Linux cold AIL trace/defaults entry, 2026-11-09: original instructions
+  at `0x101c54..0x101c86` call `0x101a90`, zero trace globals
+  `0x4dd624/0x4dd628`, inspect `AIL_DEBUG` at `0x1937b0`, and branch to
+  recovered `reset_settings_104580` when no debug filename is present.
+  Added this exact no-debug prefix as derived source-C; the alternative
+  logging path remains a strict host stop at `0x101c87`. In the separately
+  opt-in `--probe-x32-tactcom-ail`, both one-time lock initializers now run
+  from recovered C: the narrow test adapter checks nine trace and seven
+  default-setting locks with their exact start/end pointers and merely
+  records them, without locking host pages. The probe confirms both init
+  flags (`0x17d2cc` and `0x17d2d4`) and the cleared trace flags. The
+  nineteen default values pass through the already verified recovered
+  `exchange_slot_1041e4`; tests check the entire settings table at
+  `0x4dd7cc`, the cleared 16 dwords at `0x4dd670` and byte `0x4dd6b0`.
+  Execution stops at `0x110fd4` before its original interrupt-disable
+  (`CLI`) and hardware initialization. Synthetic nonzero-to-zero sentinel checks and the pinned
+  original executable pass in GCC. This is not an AIL driver or timer,
+  not the debug-file branch, and not an original guest differential test.

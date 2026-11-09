@@ -271,6 +271,41 @@ int main(void)
     assert(EF_U8(0x0015bac6u) == 0u && EF_U8(0x0015bac7u) == 0u);
     assert(EF_U8(0x00420a72u) == 0u);
     assert(EF_U32(0x0041f824u) == 7u);
+    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+    /* Nonzero sentinels demonstrate that the recovered AIL trace entry
+     * actually clears its two flags before setting default parameters. */
+    EF_U32(0x004dd624u) = 0x12345678u;
+    EF_U32(0x004dd628u) = 0x87654321u;
+    EF_U32(0x004dd670u) = 0x1234abcdu;
+    EF_U8(0x004dd6b0u) = 0x7fu;
+    assert(ef_decomp_probe_x32_tactcom_ail(bss_end, &x32,
+                                           reason, sizeof(reason)) == 0);
+    assert(x32.stop_address == 0x110fd4u);
+    assert(x32.ail_locked_ranges == 16u);
+    assert(x32.ail_settings_written == 19u);
+    assert(x32.ail_trace_ranges_initialized == 1u);
+    assert(x32.ail_settings_ranges_initialized == 1u);
+    assert(x32.timer_service_initialized == 1u);
+    assert(x32.sound_module_initialized == 0u);
+    assert(x32.registered_requests == 11u && x32.registered_traps == 8u);
+    assert(x32.request_free == 5u && x32.timer_free == 7u);
+    assert(x32.input_initialized == 1u && x32.timer_registrations == 1u);
+    assert(EF_U8(0x0015f751u) == 1u && EF_U8(0x0015bac5u) == 0u);
+    assert(EF_U32(0x0017d2ccu) == 1u && EF_U32(0x0017d2d4u) == 1u);
+    assert(EF_U32(0x004dd624u) == 0u && EF_U32(0x004dd628u) == 0u);
+    assert(EF_U32(0x004dd620u) == 0u);
+    {
+        static const uint32_t expected_defaults[19] = {
+            0xc8u, 1u, 0x8000u, 0x64u, 0x10u, 0x64u, 0x28fu, 0u, 0u,
+            1u, 0u, 0x78u, 8u, 0x7fu, 1u, 0u, 2u, 1u, 1u,
+        };
+        uint32_t i;
+        for (i = 0u; i < 19u; ++i)
+            assert(EF_U32(0x004dd7ccu + i * 4u) == expected_defaults[i]);
+        for (i = 0u; i < 16u; ++i)
+            assert(EF_U32(0x004dd670u + i * 4u) == 0u);
+        assert(EF_U8(0x004dd6b0u) == 0u);
+    }
     /* Cold X-32 probing is isolated; restore fresh BSS for the ordinary
      * game-main/TACTCOM startup probes below. */
     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);

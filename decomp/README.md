@@ -181,7 +181,17 @@ original's no-device branch would. The probe now executes recovered
   (`0x15f751 = 1`) and stops at the first unimplemented external sound
   initialization call `0x101c54`, before the module-ready flag at
   `0x15bac5` is set. Later audio callbacks and memory-lock services remain
-  fail-closed, not synthetic successes.
+  fail-closed, not synthetic successes. A separate opt-in
+  `--probe-x32-tactcom-ail` mode then enters the **cold no-debug branch**
+  of recovered AIL trace initializer `0x101c54`. The original `AIL_DEBUG`
+  environment variable is absent in this probe; the debugger/logfile route
+  remains a strict unsupported branch at `0x101c87`. Original recovered
+  `0x101a90`, `0x103d80`, `0x104580` and `0x104908` issue sixteen exactly
+  checked inert code/data memory-lock requests, clear the AIL trace flags,
+  and pass all nineteen default values through previously verified
+  `exchange_slot_1041e4`. The next strict stop is `0x110fd4`, whose
+  original instructions begin interrupt-sensitive initialization (`CLI`).
+  No DOS interrupt or sound device is initialized by this probe.
   This is a test model, **not** live IRQ support or an
   emulation of `INT 21h`. The normal `--probe-main`
   intentionally still stops at `0x628` before mutating its uninitialized
