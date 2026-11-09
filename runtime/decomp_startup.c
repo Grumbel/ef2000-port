@@ -25,9 +25,12 @@ static uint32_t hook_registrations;
 static int probing;
 static int arena_allocated;
 static int stream_allocated;
+static uint32_t keyboard_led_bytes;
+static int keyboard_ack_pending;
 static jmp_buf main_boundary;
 static uint32_t main_boundary_address;
 static int main_probe_active;
+static void stop_at_guest_boundary(uint32_t address);
 
 /* The native probe uses private guest stack-shaped scratch frames, not an
  * emulated Watcom stack.  Keep it below native64's documented 0x3fff000
@@ -109,6 +112,66 @@ void guest_fn_9c3cf(uint32_t handler)
         fatal_unexpected("cleanup registration (0x9c3cf)");
     release_hook = handler;
     hook_registrations++;
+}
+
+/* The original 0xcd414 sends 0xed and then the LED mask to the keyboard
+ * controller, waiting for a 0xfa response after each byte. This strictly
+ * bounded probe has no real keyboard controller or installed IRQ1 handler. */
+void guest_fn_117b0c(uint32_t port, uint32_t value)
+{
+    if (!probing || !main_probe_active || port != 0x60u ||
+        keyboard_ack_pending || keyboard_led_bytes >= 2u ||
+        value != (keyboard_led_bytes == 0u ? 0xedu : 0u))
+        fatal_unexpected("keyboard LED command during TACTCOM init");
+    ++keyboard_led_bytes;
+    keyboard_ack_pending = 1;
+}
+
+uint32_t guest_fn_9c430(uint32_t port)
+{
+    if (!probing || !main_probe_active ||
+        (port != 0x64u && port != 0x60u))
+        fatal_unexpected("keyboard controller read during TACTCOM init");
+    if (port == 0x64u)
+        return keyboard_ack_pending ? 1u : 0u;
+    if (!keyboard_ack_pending)
+        fatal_unexpected("keyboard acknowledgement without pending byte");
+    keyboard_ack_pending = 0;
+    return 0xfau;
+}
+
+/* This probe has no protected-mode selectors. The 0xcd4d4 source passes
+ * CS/DS to the request pool, which is intentionally left uninitialized. */
+uint32_t guest_seg_x(uint32_t which)
+{
+    if (!probing || !main_probe_active || (which != 1u && which != 3u))
+        fatal_unexpected("unmodeled protected-mode selector");
+    return 0u;
+}
+
+uint32_t start_request_628(uint32_t first, uint32_t second, int32_t third)
+{
+    if (!probing || !main_probe_active || first != 0x000fe61fu ||
+        second != 0u || third != 0xd5 ||
+        keyboard_led_bytes != 2u || keyboard_ack_pending ||
+        EF_U32(0x00196144u) != 0u)
+        fatal_unexpected("TACTCOM first request slot before CRT initialization");
+    /* The original 0xe20 initializes the free list and registers the DOS
+     * services before main(). Neither that startup nor real X-32 request
+     * installation is modeled, so stop *before* 0x628 decrements the pool. */
+    stop_at_guest_boundary(0x00000628u);
+    return 0u;
+}
+
+uint32_t start_timer_734(uint32_t source, uint32_t unused_dx, uint32_t flags,
+                         uint32_t selector)
+{
+    (void)source;
+    (void)unused_dx;
+    (void)flags;
+    (void)selector;
+    fatal_unexpected("timer installation before X-32 startup reconstruction");
+    return 0u;
 }
 
 /* Bind the original call to the actually recovered C implementation. */
@@ -774,9 +837,18 @@ void guest_fn_f80_w(void)
     read_aid_data_prefix_f80(TACTCOM_AID_FRAME);
 }
 
+void guest_fn_cd4d4_x(void)
+{
+    if (!probing || !main_probe_active)
+        fatal_unexpected("keyboard input initializer outside TACTCOM");
+    initialize_input_services_cd4d4();
+}
+
 void guest_tactcom_post_options_boundary_8b477(void)
 {
-    stop_at_guest_boundary(0x000cd4d4u);
+    /* Caller has executed recovered 0xcd4d4. The original next call is
+     * 0xce08c, which still needs a bounded host binding. */
+    stop_at_guest_boundary(0x000ce08cu);
 }
 
 uint32_t guest_fn_eb9f8(uint32_t file, uint32_t archive)
@@ -849,6 +921,8 @@ static int prepare_arena(uint32_t bss_end, char *reason, size_t reason_capacity)
     release_hook = 0;
     arena_allocated = 0;
     stream_allocated = 0;
+    keyboard_led_bytes = 0;
+    keyboard_ack_pending = 0;
     probing = 1;
     return 0;
 }
@@ -935,7 +1009,8 @@ int ef_decomp_probe_main(uint32_t bss_end, uint32_t argc, uint32_t argv,
         stopped != 0x1953u && stopped != 0x19d4u && stopped != 0x1a0cu &&
         stopped != 0x1a32u && stopped != 0x1a58u &&
         stopped != 0xb3c04u &&
-        stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0xcd4d4u &&
+        stopped != 0xeba64u && stopped != 0xea50cu && stopped != 0x628u &&
+        stopped != 0xce08cu &&
         stopped != 0x8b417u && stopped != 0x8b2d8u) {
         if (reason && reason_capacity)
             snprintf(reason, reason_capacity, "game main did not reach an expected boundary");

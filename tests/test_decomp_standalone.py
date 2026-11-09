@@ -37,6 +37,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/runtime_helpers6.c'),
                 str(ROOT / 'decomp/src/game_main.c'),
                 str(ROOT / 'decomp/src/tactcom_prefix.c'),
+                str(ROOT / 'decomp/src/misc_helpers2.c'),
+                str(ROOT / 'decomp/src/engine_helpers.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'decomp/src/runtime_helpers19.c'),
                 str(ROOT / 'decomp/src/runtime_helpers17.c'),
@@ -235,7 +237,7 @@ class DecompStandaloneTests(unittest.TestCase):
                     str(executable), '--image', original,
                     '--data-dir', directory, '--probe-main',
                 ], capture_output=True, text=True, check=True)
-                self.assertIn('stopped at unimplemented call 0x000cd4d4',
+                self.assertIn('stopped at unimplemented call 0x00000628',
                               aid_complete.stdout)
                 views.write_bytes(b'JR\0\0\x08\0\0\0')
                 packed = subprocess.run([
@@ -282,6 +284,8 @@ class DecompStandaloneTests(unittest.TestCase):
                 str(ROOT / 'decomp/src/runtime_helpers6.c'),
                 str(ROOT / 'decomp/src/game_main.c'),
                 str(ROOT / 'decomp/src/tactcom_prefix.c'),
+                str(ROOT / 'decomp/src/misc_helpers2.c'),
+                str(ROOT / 'decomp/src/engine_helpers.c'),
                 str(ROOT / 'decomp/src/ascii_stricmp.c'),
                 str(ROOT / 'decomp/src/runtime_helpers19.c'),
                 str(ROOT / 'decomp/src/runtime_helpers17.c'),

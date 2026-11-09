@@ -4,7 +4,7 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
-/* Original 0x8b39c..0x8b477: the TACTCOM memory diagnostic, logging setup,
+/* Original 0x8b39c..0x8b47c: the TACTCOM memory diagnostic, logging setup,
  * first resource pathname, missing-file decision and options call. Not the
  * complete 402-byte initializer. A private guest-local frame substitutes
  * for the Watcom stack until native startup has been reconstructed. */
@@ -38,5 +38,9 @@ void tactcom_prefix_8b39c(ef_addr32 frame)
     /* 0x8b472: proceed through recovered 0x82cec until the first unbound
      * DOS hardware/initialization service; do not skip its side effects. */
     apply_options_82cec();
+    /* 0x8b477: initialize the keyboard controller, key tables, request
+     * buffers and timer; the probe stops in the missing X-32 request pool.
+     * Original 0x8b47c next loads EAX=1 and calls 0xce08c. */
+    guest_fn_cd4d4_x();
     guest_tactcom_post_options_boundary_8b477();
 }

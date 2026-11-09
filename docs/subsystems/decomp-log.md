@@ -1756,3 +1756,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   fatal callback `0x1687`. No packed archive support, real asset replay,
   guest-state differential, Watcom splice or general DOS execution is
   claimed; the single function remains `named` in the tracker.
+- GCC/Linux TACTCOM keyboard initialization, 2026-11-09: disassembly of
+  `0x8b477..0x8b486` calls recovered `initialize_input_services_cd4d4`
+  (`0xcd4d4`), whose cold branch checks byte `0x15b72e`, programs keyboard
+  LEDs via `0xcd414`, clears 128 key entries and maps default scan codes via
+  recovered `0xcd430`, and writes a selector via `0xfe610`. The native probe
+  now binds a strictly sequential two-byte virtual controller exchange
+  (`0xed`, `0x00`, both acknowledged `0xfa`), and verifies the cold path's
+  key table, selector and untouched request pool. It stops *before* the
+  first `0x628` allocation because the original pre-main `0xe20` routine
+  constructs 16 request slots and eight timer slots and registers X-32
+  handlers, none of which the Linux bootstrap has executed. Faking those
+  vector hooks would not preserve guest state or hardware effects. A
+  synthetic already-initialized byte `0x15b72e=1` takes the original return
+  branch and reaches the subsequent `0xce08c` call. The SHA-pinned EXE plus
+  invented `aid2.dat` integration and asset-free startup tests cover both
+  branches. Real IRQ/timer services, DOS setup, first screen, OpenWatcom
+  splice and guest differential are still outstanding; `0x8b39c` stays
+  `named` and `0xcd4d4` stays `compiles`.

@@ -123,7 +123,14 @@ original's no-device branch would. The probe now executes recovered
   the source's `Seqs`/`Option` transitions, 50-object record table and
   27-name lookup. Successful plain-text input releases the stream, closes
   the file and calls `reset_selection_state_1ad8()`, returning through the
-  recovered options caller to the next original TACTCOM boundary `0xcd4d4`.
+  recovered options caller and then executes the already recovered keyboard
+  initializer at `0xcd4d4`. The GCC probe supplies a bounded 0xed/zero
+  keyboard-LED acknowledgement model, runs the original key-table reset
+  (`0xcd430`) and selector write (`0xfe610`), then stops at `0x628`, **before**
+  the first X-32 request-pool mutation. The real pre-main initializer at
+  `0xe20` and DOS request/vector/timer services are still absent. A synthetic
+  pre-initialized input-state test skips that setup as in the original and
+  reaches the subsequent TACTCOM `0xce08c` boundary.
   A mapping-only file stops at the missing association heading `0x120e`;
   missing files stop at `0xea50c` after the original table initialization.
   The remainder of the outer TACTCOM startup has not been recovered.

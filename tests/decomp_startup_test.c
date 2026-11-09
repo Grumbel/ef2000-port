@@ -1383,12 +1383,24 @@ int main(void)
                     assert(fclose(file) == 0);
                     assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
                     setup_views_probe();
+                    EF_U8(0x0041f72cu) = 0x99u;
+                    EF_U16(0x000fe624u) = 0xbeefu;
                     stop = 0;
                     assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
                                                 &stop, reason, sizeof(reason)) == 0);
-                    if (stop != 0xcd4d4u)
+                    if (stop != 0x628u)
                         fprintf(stderr, "full Aid.c stop=0x%08x: %s\n", stop, reason);
-                    assert(stop == 0xcd4d4u);
+                    assert(stop == 0x628u);
+                    /* 0xcd4d4 has reset the key tables, programmed the
+                     * virtual keyboard LEDs, and saved the selector before
+                     * trying the first missing CRT-initialized request. */
+                    assert(EF_U8(0x0015b72eu) == 0u);
+                    assert(EF_U8(0x0041f72cu) == 0x1cu);
+                    assert(EF_U8(0x0041f72du) == 0x1du);
+                    assert(EF_U8(0x0041f748u) == 0x38u);
+                    assert(EF_U16(0x000fe624u) == 0u);
+                    assert(EF_U32(0x00196144u) == 0u);
+                    assert(EF_U32(0x0041f828u) == 0u);
                     assert(EF_U8(0x00196fcau) == 130u);
                     assert(EF_U8(0x00196fcau + 26u) == 156u);
                     assert(EF_U8(0x00196390u) == 240u);
@@ -1424,6 +1436,23 @@ int main(void)
                     assert(EF_S32(0x00196398u + 10u * 0x3eu + 0x36u) == -48);
                     assert(EF_U8(0x00196fe9u) == 5u); /* 0x1ad8 reset */
                     assert(EF_U32(0x001371a4u) == 0u); /* stream and file closed */
+                    ef_decomp_memory_release();
+
+                    /* On the already-initialized path, 0xcd4d4 returns
+                     * without touching the keyboard/requests and the
+                     * original caller advances to its 0xce08c call. */
+                    assert(ef_decomp_memory_load(payload, sizeof(payload), bss_end) == 0);
+                    setup_views_probe();
+                    EF_U8(0x0015b72eu) = 1u;
+                    EF_U8(0x0041f72cu) = 0x99u;
+                    EF_U16(0x000fe624u) = 0xbeefu;
+                    stop = 0;
+                    assert(ef_decomp_probe_main(bss_end, 1, 0, dirname, &probe,
+                                                &stop, reason, sizeof(reason)) == 0);
+                    assert(stop == 0xce08cu);
+                    assert(EF_U8(0x0041f72cu) == 0x99u);
+                    assert(EF_U16(0x000fe624u) == 0xbeefu);
+                    assert(EF_U32(0x00196144u) == 0u);
                     ef_decomp_memory_release();
 
                     /* Alternate enum ordering, NONE second relationship,
