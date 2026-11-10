@@ -18,3 +18,8 @@ addr	reason
 0x000eb050	Original uses five caller-clean stack arguments. The recovered body expects four register arguments plus five stack arguments, producing a wrong buffer pointer during logo/menu drawing; keep original bytes.
 0x000eb1f0	Original uses five caller-clean stack arguments. The recovered body expects four register arguments plus five stack arguments; keep original bytes for ABI consistency with 0xeb050.
 0x000c4e3b	This is a threaded-dispatch tail-jump, not a returning helper: it selects and jumps to a record handler that returns to the caller. The C draft returns the handler address instead, so normalization skips the handler and corrupts the stream. Keep original dispatch bytes.
+0x00000e20	initialize_x32_services_e20 is a Linux-startup-probe reconstruction; as a hybrid redirect it faults on an unmapped read in the cockpit replay (bisect m2-bisect-002). Keep original pre-main X-32 setup.
+0x0000081c	Hybrid redirect breaks cockpit replay (bisect m2-bisect-003); keep original bytes.
+0x000fc534	Hybrid redirect breaks cockpit replay (bisect m2-bisect-004); keep original bytes.
+0x000ce328	Hybrid redirect breaks cockpit replay (bisect m2-bisect-005); keep original bytes.
+0x000a6438	Hybrid redirect breaks cockpit replay (bisect m2-bisect-006); keep original bytes.
