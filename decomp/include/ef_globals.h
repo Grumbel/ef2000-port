@@ -24,6 +24,9 @@ extern uint32_t _dynend;              /* 0x00132a2c */
 extern uint32_t _curbrk;              /* 0x00132a30 */
 extern ef_addr32 _LpCmdLine;          /* 0x00132a34 */
 extern ef_addr32 _LpPgmName;          /* 0x00132a38 */
+#ifdef __WATCOMC__
+#define _psp ef_game_psp /* avoid clash with <stdlib.h> _psp */
+#endif
 extern uint16_t _psp;                 /* 0x00132a3c */
 extern uint8_t _Envptr[6];           /* 0x00132a61, overlaps _Envseg */
 extern uint16_t _Envseg;              /* 0x00132a65 */
