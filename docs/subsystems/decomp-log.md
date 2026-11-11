@@ -2171,3 +2171,27 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   eligible; two of them (0x120746, 0xf9ee0) broke the main menu. All mechanical
   entries are now excluded until hand-verified. Result: 1,872 hand-written
   redirects, main-menu and quick-fight-setup replays pass frame-identical.
+
+## 2026-11-11 (later): cockpit ABI bugs, ABI gates, state of the hybrid
+
+- Cockpit replay (`--match frame`) culprits found and fixed by comparing against
+  the original asm, not by guessing: `guest_fn_a4470`/`guest_fn_b45fa` take
+  their double in ST0 (the C pushed it on the stack; `#pragma aux ... parm
+  [8087] value [8087]`), the fixed-point matrix products take ESI/EBX/EDI (not
+  EAX/EDX/EBX), and `dot3_fixed` must keep bits 24..55 of the 64-bit sum
+  (original `shld edx,eax,8`), not `>> 8`.
+- `tools/abi_check.py` gained `--stack-clobbers` (original preserves registers
+  of a stack-cleaning function that the C clobbers; Watcom cannot save EAX) and
+  `--inputs` (C and original read different entry registers; 59 functions, now
+  excluded until their declaration is fixed).
+- Open: the cockpit frame still differs in ~20 % of pixels with 1,850
+  redirects and no guest fault; unresolved, likely mostly timing (the
+  instruction-counted clock shifts by ~2 s), but not proven. The excluded
+  x87 helpers of `float_helpers5` (0xb415c-0xb4364) are unmatched: the C stores
+  double intermediates, the original keeps extended precision.
+- Main-menu frame replays at 300M, 400M and 500M guest instructions pass
+  pixel-identical with 1,850 redirects (100M has no VGA frame; at 200M the
+  hybrid is a few frames off a video-mode transition, a timing artefact).
+- The `asm_match.py` fingerprint diffs are mostly noise (constant folding,
+  helper factoring such as `fade_step`); of 52 diffs on functions the main
+  menu executes, 6 sampled were equivalent. Not exhaustively triaged.
