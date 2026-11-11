@@ -1,5 +1,17 @@
 {
   "nodes": {
+    "ef2000": {
+      "flake": false,
+      "locked": {
+        "path": "./nix/no-game",
+        "type": "path"
+      },
+      "original": {
+        "path": "./nix/no-game",
+        "type": "path"
+      },
+      "parent": []
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1792094642,
@@ -18,6 +30,7 @@
     },
     "root": {
       "inputs": {
+        "ef2000": "ef2000",
         "nixpkgs": "nixpkgs"
       }
     }

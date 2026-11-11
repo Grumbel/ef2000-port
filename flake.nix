@@ -5,8 +5,13 @@
   description = "EF2000 Linux original-code main-menu port and reverse-engineering tools";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  # Optional user-supplied EF2000 installation (directory with _EF2000.EXE).
+  # The placeholder is used unless overridden:
+  #   nix run .#ef2000-hybrid --override-input ef2000 path:/path/to/EF2000
+  # Note: a flake input is copied into the (world-readable) Nix store.
+  inputs.ef2000 = { url = "path:./nix/no-game"; flake = false; };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, ef2000 }:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
@@ -525,6 +530,14 @@
       # hybrid as a separate tool; neither standalone bootstrap runs gameplay.
       hybridWorkflow = pkgs.writeShellScriptBin "ef2000-hybrid" ''
         set -euo pipefail
+        export EF2000_DECOMP_OBJECTS="''${EF2000_DECOMP_OBJECTS:-${decompWatcom}/lib/ef2000/decomp-objects}"
+        if [ -z "''${EF2000_GAME_DIR:-}" ] && [ -e ${ef2000}/_EF2000.EXE ]; then
+          EF2000_GAME_DIR=${ef2000}
+        fi
+        # Insert the game directory unless the caller gave one first.
+        if [ -n "''${EF2000_GAME_DIR:-}" ] && { [ "$#" -eq 0 ] || [ "''${1#-}" != "$1" ]; }; then
+          set -- "$EF2000_GAME_DIR" "$@"
+        fi
         exec ${python}/bin/python3 ${package}/libexec/ef2000/tools/decomp_app.py \
           --launcher ${package}/bin/ef2000 "$@"
       '';
@@ -1299,7 +1312,8 @@
           printf '  nix run .#ef2000-decomp        GCC-built Linux recovered-C executable\n'
           printf '  nix run .#ef2000-decomp-watcom OpenWatcom DOS executable in DOSBox-X\n'
           printf '  nix run .#ef2000-hybrid -- /path/to/EF2000 --objects DIR\n'
-          printf '                                  Original-game hybrid with recovered OMF\n\n'
+          printf '                                  Original-game hybrid with recovered OMF\n'
+          printf '                                  (--override-input ef2000 path:/path/to/EF2000 for no args)\n\n'
           printf '  ef2000-omf-inplace --help       Pack a reviewed, in-place-only OMF patch\n\n'
           printf 'Original/native high-score differential replay (requires your EF2000.EXE):\n'
           printf '  ef2000-highscores-differential /path/to/_EF2000.EXE --random-cases 300\n'

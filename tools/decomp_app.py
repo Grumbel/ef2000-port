@@ -46,8 +46,10 @@ def build_patch(executable, object_dir, output):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('game', type=Path,
-                        help='EF2000 installation directory or original _EF2000.EXE')
+    parser.add_argument('game', type=Path, nargs='?',
+                        default=os.environ.get('EF2000_GAME_DIR'),
+                        help='EF2000 installation directory or original _EF2000.EXE '
+                             '(or set EF2000_GAME_DIR)')
     parser.add_argument('--objects', type=Path,
                         default=os.environ.get('EF2000_DECOMP_OBJECTS'),
                         help='directory of compiled OpenWatcom .obj files '
@@ -57,6 +59,8 @@ def main(argv=None):
     if args.objects is None:
         parser.error('provide --objects (build .#ef2000-decomp-watcom first) '
                      'or set EF2000_DECOMP_OBJECTS')
+    if args.game is None:
+        parser.error('provide the EF2000 installation directory or set EF2000_GAME_DIR')
     if runner_args[:1] == ['--']:
         runner_args = runner_args[1:]
     executable = args.game / '_EF2000.EXE' if args.game.is_dir() else args.game

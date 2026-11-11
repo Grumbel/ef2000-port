@@ -1,0 +1,5 @@
+Placeholder for the `ef2000` flake input.
+
+Replace it with your own game directory:
+
+    nix run .#ef2000-hybrid --override-input ef2000 path:/path/to/EF2000
