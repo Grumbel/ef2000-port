@@ -7138,5 +7138,10 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
  * EAX/ECX/EDX/EBP like the original (found by the cockpit bisect: 0xfcffb). */
 #pragma aux matrix_mul_fcffb parm [esi] [ebx] [edi] modify exact [eax ecx edx ebp]
 #pragma aux matrix_mul_transposed_fceb4 parm [esi] [ebx] [edi] modify exact [eax ecx edx ebp]
+/* Value-only register-convention fragments (abi_check --inputs). */
+#pragma aux build_rotation_words_dc43e parm [ebx] [esi] [edi] modify exact [ebx ecx edi edx esi]
+#pragma aux build_rotation_matrix_e7a7c parm [ebx] [esi] [edi] modify exact [eax ebx ecx edi edx esi]
+#pragma aux build_rotation_matrix_fcd20 parm [ebx] [esi] [edi] modify exact [eax ebx ecx edi edx esi]
+#pragma aux draw_patterned_line_10d188 parm [esi] modify exact [eax esi]
 #endif
 #endif

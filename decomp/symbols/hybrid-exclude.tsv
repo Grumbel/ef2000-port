@@ -563,17 +563,13 @@ addr	reason
 0x000d2704	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,edx); fix the register declaration before linking
 0x000d2d7c	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax); fix the register declaration before linking
 0x000dc34e	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx, C reads eax,edx); fix the register declaration before linking
-0x000dc43e	abi_check --inputs: C reads different entry registers than the original (reads ebx,edi,esi, C reads eax,ebx,edx); fix the register declaration before linking
 0x000ded60	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,ebx,edx); fix the register declaration before linking
-0x000e7a7c	abi_check --inputs: C reads different entry registers than the original (reads ebx,edi,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
 0x000ea49a	abi_check --inputs: C reads different entry registers than the original (reads eax,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
 0x000ebe17	abi_check --inputs: C reads different entry registers than the original (reads eax,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
 0x000ef41f	abi_check --inputs: C reads different entry registers than the original (reads edi, C reads eax); fix the register declaration before linking
 0x000f064b	abi_check --inputs: C reads different entry registers than the original (reads edi,esi, C reads eax); fix the register declaration before linking
-0x000fcd20	abi_check --inputs: C reads different entry registers than the original (reads ebx,edi,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
 0x000fedcc	abi_check --inputs: C reads different entry registers than the original (reads ebx,ecx,esi, C reads eax,ebx,edx); fix the register declaration before linking
 0x000feddc	abi_check --inputs: C reads different entry registers than the original (reads ebx,ecx,esi, C reads eax,edx); fix the register declaration before linking
-0x0010d188	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
 0x0010e08d	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,ebx,edx); fix the register declaration before linking
 0x001104b8	abi_check --inputs: C reads different entry registers than the original (reads eax,edx, C reads eax,ebx); fix the register declaration before linking
 0x00115871	abi_check --inputs: C reads different entry registers than the original (reads ebx,edx, C reads eax,ebx); fix the register declaration before linking
