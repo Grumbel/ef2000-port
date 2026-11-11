@@ -386,3 +386,11 @@ addr	reason
 0x00094194	Pair culprit for cockpit replay (bisect m2-bisect-053, unresolved 2-candidate set); cause unreviewed; keep original.
 0x0011b694	Single-redirect culprit for cockpit replay (bisect m2-bisect-054); cause unreviewed; keep original.
 0x0002d894	Static ABI check: original ends ret 8, recovered C ends ret 0 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x000106b0	Static ABI check (tools/abi_check.py): original ends ret 4, C ends ret 0 (mixed register/stack arguments); fix the declaration, then re-enable.
+0x00055b44	Static ABI check (tools/abi_check.py): original ends ret 4, C ends ret 0 (mixed register/stack arguments); fix the declaration, then re-enable.
+0x0009d72c	Static ABI check (tools/abi_check.py): original takes ST0 and cleans nothing, C takes a stack double (ret 8); fix the declaration, then re-enable.
+0x000b45a2	Static ABI check (tools/abi_check.py): original takes ST0, C takes a stack double (ret 8); fix the declaration, then re-enable.
+0x000b45ac	Static ABI check (tools/abi_check.py): original takes ST0, C takes a stack double (ret 8); fix the declaration, then re-enable.
+0x000b45fa	Static ABI check (tools/abi_check.py): original takes ST0, C takes a stack double (ret 8); fix the declaration, then re-enable.
+0x000dc1d4	Static ABI check (tools/abi_check.py): original takes ST0, C takes a stack double (ret 8); fix the declaration, then re-enable.
+0x000dc1e9	Static ABI check (tools/abi_check.py): original takes ST0/ST1, C takes stack doubles (ret 16); fix the declaration, then re-enable.
