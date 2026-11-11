@@ -7030,5 +7030,31 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux set_owner_pair_2d894 parm routine [eax] /* 0x2d894, AX + 2 stack, ret 8 */
 #pragma aux pack_runtime_position parm routine [eax] [edx] [ecx] /* 0x106b0, ret 4 */
 #pragma aux send_packet_41 parm routine [edx] [ebx] [ecx] /* 0x55b44, ret 4 */
+/* Original returns with a plain ret: stack arguments are caller-cleaned (abi_check.py, 2026-11-11). */
+#pragma aux extender_call_252b_9c220 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux probe_vectors_9c243 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux extender_call_3502_9c27c parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux extender_call_3504_9c2bb parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux extender_range_9c2d3 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux install_trap_handlers_9c8b4 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux unpack_planes_c38cc parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux copy_rows_eb174 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux traced_lookup_102028 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux send_guarded_message_103e0c parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux parse_number_103e5c parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux send_303_104504 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux dos_alloc_block_1047e4 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux dos_range_104840 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux dos_range_1048b4 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux apply_defaults_105c94 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux lookup_pair_106514 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux reset_stream_block_106644 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux flush_pending_slots_112808 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux apply_default_record_1132b8 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux lookup_pair_113af0 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux classify_record_113b78 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux claim_slot_113c7c parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux advance_text_cursor_11451c parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux select_animation_11458c parm caller [eax] [edx] [ebx] [ecx]
 #endif
 #endif

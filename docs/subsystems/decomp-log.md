@@ -2156,3 +2156,18 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   offsets `abi_check.py` reports 39 `ret N` mismatches that were hidden before
   (listed by running the tool); they must be fixed or excluded before those
   modules are linked.
+
+## 2026-11-11 Watcom runtime helpers, ABI pragmas, mechanical exclusions
+
+- `abi_check.py` (now covering the whole module) found 39 `ret N` mismatches; 25
+  are fixed with `#pragma aux ... parm caller [eax] [edx] [ebx] [ecx]` (stack
+  arguments caller-cleaned in the original), 14 stack/x87 conventions that
+  need a proper declaration are listed in `hybrid-exclude.tsv`.
+- New `decomp/src/watcom_rt_helpers.c`: `__U8LS/__U8RS/__I8RS/__U8M/__I8M/
+  __U8D/__I8D/__CHP`, the OpenWatcom 1.9 runtime calls that the original
+  (older compiler) inlined. This lets 81 more modules link
+  (601 -> 682 of 794).
+- With those modules linked, 100 unreviewed mechanical `ok` bodies became
+  eligible; two of them (0x120746, 0xf9ee0) broke the main menu. All mechanical
+  entries are now excluded until hand-verified. Result: 1,872 hand-written
+  redirects, main-menu and quick-fight-setup replays pass frame-identical.
