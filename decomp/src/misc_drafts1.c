@@ -1863,14 +1863,19 @@ void init_once_101a90(void)
     }
 }
 
-/* 0x101c54, 392 bytes. The cold no-debug branch of the AIL trace setup:
- * lock the original trace state, clear its trace flags and, when AIL_DEBUG
- * is absent from the DOS environment, initialize the default AIL settings.
- * The nonempty AIL_DEBUG branch (file/log formatting) is still a strict
- * host boundary at 0x101c87, not a reconstructed path. */
+/* 0x101c54, 392 bytes. AIL trace setup. With AIL_DEBUG absent from the DOS
+ * environment the default AIL settings are initialized (0x104580). Otherwise
+ * the named file (mode "w+t") becomes the trace stream 0x4dd620: a header
+ * (usage-script banner, version, start time) is written, the settings are
+ * reset, the 100 Hz timer slot 0x4dd630 running 0x101b3c is claimed and
+ * started, and "AIL_startup()" is logged with the trace mode word 0x4dd634
+ * set to 1 around the status line. AIL_SYS_DEBUG selects flag 0x4dd628. */
 void initialize_ail_trace_101c54(void)
 {
     uint32_t debug_file;
+    uint32_t stream;
+    uint32_t now;
+    uint32_t slot;
     init_once_101a90();
     EF_U32(0x004dd624u) = 0u;
     EF_U32(0x004dd628u) = 0u;
@@ -1879,7 +1884,38 @@ void initialize_ail_trace_101c54(void)
         reset_settings_104580();
         return;
     }
-    guest_ail_trace_debug_path_101c87(debug_file);
+    if (getenv_9c858(0x001937bcu) != 0u)
+        EF_U32(0x004dd628u) = 1u;
+    stream = run_if_available_bc36a(debug_file, 0x001937ccu);
+    EF_U32(0x004dd620u) = stream;
+    if (stream == 0u) {
+        reset_settings_104580();
+        return;
+    }
+    if (is_device_handle_1101be(EF_U32(stream + 0x10u)) != 0u)
+        set_default_file_buffer_11159a(EF_U32(0x004dd620u), 0u);
+    get_time_seconds_a4574((ef_addr32)(uintptr_t)&now);
+    copy_string_9d749(0x004dd644u,
+        call_f9dcb(call_1100d2_default((uint32_t)(uintptr_t)&now)));
+    EF_U8(0x004dd65cu) = 0u;
+    stream_printf_bc400(EF_U32(0x004dd620u), 0x001937d0u);
+    stream_printf_bc400(EF_U32(0x004dd620u), 0x0019382cu, 0x00193824u);
+    stream_printf_bc400(EF_U32(0x004dd620u), 0x00193874u, 0x004dd644u);
+    stream_printf_bc400(EF_U32(0x004dd620u), 0x00193884u);
+    reset_settings_104580();
+    EF_U32(0x004dd62cu) = 0u;
+    EF_U32(0x004dd63cu) = 0u;
+    EF_U32(0x004dd638u) = 0u;
+    slot = claim_table_slot_111365(0x00101b3cu);
+    EF_U32(0x004dd640u) = 0u;
+    EF_U32(0x004dd630u) = slot;
+    set_rate_1114f7(slot, 100u);
+    table_slot_1_to_2_11141f(EF_U32(0x004dd630u));
+    EF_U32(0x004dd624u) = 1u;
+    EF_U32(0x004dd634u) = 1u;
+    write_status_lines_101ba8();
+    EF_U32(0x004dd634u) = 0u;
+    stream_printf_bc400(EF_U32(0x004dd620u), 0x001938d8u);
 }
 
 /* 0xfa6d3, 168 bytes. Allocate a stream slot (26 bytes): reuse a node from the free list at 0x4644e0 (keeping its 0x4000 flag), else take an unused slot of the table 0x160424..0x16062c (flags & 3 clear) with a fresh 8-byte list node, else allocate node and slot together (flag 0x4003). The slot is cleared, flagged 3 and linked into the list at 0x485f9c. Returns the slot, or 0 after reporting error 5. */

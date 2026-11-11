@@ -81,14 +81,14 @@ def original_lines(image, address, size, objdump):
 def compiled_lines(listing, name):
     out, inside = [], False
     for line in listing:
-        if re.match(r'^[0-9A-F]{4}\s+%s_:' % re.escape(name), line):
+        if re.match(r'^[0-9A-F]{4,8}\s+%s_:' % re.escape(name), line):
             inside = True
             continue
         if not inside:
             continue
-        if 'Routine Size' in line or re.match(r'^[0-9A-F]{4}\s+(?!L\$)\w+_:', line):
+        if 'Routine Size' in line or re.match(r'^[0-9A-F]{4,8}\s+(?!L\$)\w+_:', line):
             break
-        match = re.match(r'^[0-9A-F]{4}\s+(?:[0-9A-F]{2}\s)+\s*(\w+)\s*(.*)$', line)
+        match = re.match(r'^[0-9A-F]{4,8}\s+(?:[0-9A-F]{2}\s)+\s*(\w+)\s*(.*)$', line)
         if match:
             out.append((match.group(1).lower(), match.group(2).strip().replace('0x0000', '0x')))
     return out

@@ -285,9 +285,9 @@ void reset_flags_f4178(void)
 }
 
 /* 0xf9ed2, 13 bytes. */
-void call_f9dcb(uint32_t value)
+ef_addr32 call_f9dcb(uint32_t value)
 {
-    guest_fn_f9dcb(value, 0x00485f80u);
+    return format_time_f9dcb(value, 0x00485f80u);
 }
 
 /* 0xf9d98, 51 bytes. Store the two decimal digits of EAX at EBX+EDX. */

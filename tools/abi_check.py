@@ -97,15 +97,15 @@ def original_lines(image, address, size, objdump):
 def compiled_lines(listing, name):
     lines, inside = [], False
     for line in listing:
-        if re.match(r'^[0-9A-F]{4}\s+%s_:' % re.escape(name), line):
+        if re.match(r'^[0-9A-F]{4,8}\s+%s_:' % re.escape(name), line):
             inside = True
             continue
         if not inside:
             continue
         # A routine ends at its "Routine Size" line or at the next non-local label.
-        if 'Routine Size' in line or re.match(r'^[0-9A-F]{4}\s+(?!L\$)\w+_:', line):
+        if 'Routine Size' in line or re.match(r'^[0-9A-F]{4,8}\s+(?!L\$)\w+_:', line):
             break
-        match = re.match(r'^[0-9A-F]{4}\s+(?:[0-9A-F]{2}\s)+\s*(\w+)\s*(.*)$', line)
+        match = re.match(r'^[0-9A-F]{4,8}\s+(?:[0-9A-F]{2}\s)+\s*(\w+)\s*(.*)$', line)
         if match:
             lines.append((match.group(1), match.group(2).strip().replace('0x0000', '').replace('0x', '')))
     return lines

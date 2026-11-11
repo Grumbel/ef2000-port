@@ -1193,7 +1193,7 @@ void load_path_f3b1c(void);
 void load_path_value_f3b40(void);
 void load_path_pointer_f3b58(void);
 void reset_flags_f4178(void);
-void call_f9dcb(uint32_t value);
+ef_addr32 call_f9dcb(uint32_t value);
 void store_two_digits(int32_t value, ef_addr32 base, int32_t offset);
 void update_flags_fa7d2(ef_addr32 file);
 void call_fba6c(uint32_t first, ef_addr32 record);
@@ -1848,7 +1848,6 @@ void guest_fn_ce830(ef_addr32 object, uint32_t value); /* 0xce830 EAX/EDX */
 void guest_fn_cf3a4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0xcf3a4 EAX/EDX/EBX/ECX/stack */
 void guest_fn_101c54(void); /* 0x101c54 */
 void initialize_ail_trace_101c54(void); /* 0x101c54, cold no-debug branch */
-void guest_ail_trace_debug_path_101c87(uint32_t debug_file);
 void initialize_ail_irq_tables_110fd4(void); /* 0x110fd4, before INT 21h */
 uint16_t guest_ail_irq_enter_110fd9(void);
 uint64_t guest_ail_irq8_vector_query_11105b(uint32_t vector);
