@@ -14,7 +14,8 @@ OpenWatcom object (`wdis`) and reports
   of mismatch is fatal in the hybrid image.
 * ``clobber`` (with --clobbers): GPRs the C writes (not saved/restored) that the
   original never writes.  Informational: the hybrid trampoline covers most.
-* ``x87``: only one of the two uses the FPU.
+* ``x87`` (with --x87): only one of the two uses the FPU.  Informational: the
+  original often calls a helper that the C inlines.
 
 Exit status is 1 when any ``ret`` mismatch is found among functions that are
 not listed in the exclude file.  Needs no game executable; the flat image is
@@ -121,6 +122,8 @@ def main():
     parser.add_argument('--exclude', type=Path, default=ROOT / 'decomp/symbols/hybrid-exclude.tsv')
     parser.add_argument('--states', default='compiles,spliced,verified')
     parser.add_argument('--clobbers', action='store_true', help='also report extra clobbered registers')
+    parser.add_argument('--x87', action='store_true',
+                        help='also report FPU-use differences (usually the original calls an x87 helper that the C inlines)')
     parser.add_argument('--include-excluded', action='store_true')
     args = parser.parse_args()
 
@@ -162,7 +165,7 @@ def main():
                 failures += 1
             if args.clobbers and c_writes - o_writes:
                 issues.append('clobber ' + ','.join(sorted(c_writes - o_writes)))
-            if o_x87 != c_x87:
+            if args.x87 and o_x87 != c_x87:
                 issues.append('x87 original %s, compiled %s' % (o_x87, c_x87))
             if issues:
                 print('%#x %s: %s' % (address, name, '; '.join(issues)))

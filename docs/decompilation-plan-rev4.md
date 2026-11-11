@@ -56,5 +56,7 @@ minutes, needs the local Ghidra payload) after every tranche. Exit 1 means a
 `ret N` differs from the original: add the address to
 `decomp/symbols/hybrid-exclude.tsv` or fix the declaration (`#pragma aux` in
 `decomp/include/ef_abi.h`) before replaying. x87 lines are informational.
-Open: mixed register/stack functions (0x2d894, 0x106b0, 0x55b44) and
-ST0-argument math helpers (cos/sin/tan/atan/atan2) still need conventions.
+The mixed register/stack functions (0x2d894, 0x106b0, 0x55b44) are fixed with
+`#pragma aux parm routine [regs]`. The remaining x87 differences (0x2bb3c,
+0xf8278, ...) only mean the original calls an x87 helper that the C inlines;
+`--x87` lists them, they are not ABI errors.
