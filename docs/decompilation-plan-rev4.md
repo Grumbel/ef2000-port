@@ -9,7 +9,14 @@ legal rules and `AGENTS.md` are unchanged.
 ## Status (2026-11-10)
 
 - Hybrid image: ~1,737 functions redirected; main menu and Quick Fight setup
-  pass. **M2 (Accept -> cockpit) is unpassed.** This is the critical path.
+  pass. **M2 (Accept -> cockpit): reached 2026-11-11** with ~1,707 redirects: the
+  hybrid renders the full cockpit. Pixel-exact frame match fails (30 %) only
+  because instruction-counted timing shifts game time by ~2 s; compare with a
+  tolerance or a state hash, not the raw frame. Root cause of the long hunt:
+  recovered C whose stack cleanup (`ret N`) or argument registers differ from
+  the original; `hybrid_link` adds no trampoline for stack-argument functions.
+  Gate new links with a static `ret`/clobber check against the original
+  disassembly instead of bisecting.
 - M0 mechanical: 442 `ok` / 578 `manual` of 1,020 (138 KB ok, 405 KB manual).
 - Tracker: `compiles` 3,217, `unknown` 659 (480 KB, 53 % of bytes), rest small.
 - Side track since 2026-11-09: GCC/Linux "standalone" startup probe
