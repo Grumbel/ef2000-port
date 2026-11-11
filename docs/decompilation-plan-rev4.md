@@ -48,3 +48,13 @@ legal rules and `AGENTS.md` are unchanged.
 - Never invent ABI: take register/stack convention from `signatures.tsv` or
   the disassembly; unsure -> leave `drafted`, do not link.
 - One commit per tranche, trailer per `AGENTS.md`, never push.
+
+## Gate before linking new functions (2026-11-11)
+
+Run `tools/abi_check.py --objects <decomp-objects> --wdis <wdis>` (about 3
+minutes, needs the local Ghidra payload) after every tranche. Exit 1 means a
+`ret N` differs from the original: add the address to
+`decomp/symbols/hybrid-exclude.tsv` or fix the declaration (`#pragma aux` in
+`decomp/include/ef_abi.h`) before replaying. x87 lines are informational.
+Open: mixed register/stack functions (0x2d894, 0x106b0, 0x55b44) and
+ST0-argument math helpers (cos/sin/tan/atan/atan2) still need conventions.
