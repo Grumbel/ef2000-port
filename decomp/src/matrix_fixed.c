@@ -11,7 +11,8 @@ static int32_t dot3_fixed(int32_t a0, int32_t b0, int32_t a1, int32_t b1, int32_
 {
     int64_t sum = (int64_t)a0 * b0 + (int64_t)a1 * b1 + (int64_t)a2 * b2;
 
-    return (int32_t)(sum >> 8);
+    /* The original keeps `shld edx,eax,8` of the 64-bit sum: bits 24..55. */
+    return (int32_t)(sum >> 24);
 }
 
 /* 0xfceb4, 327 bytes. out = a * transpose(b); inputs in ESI (a), EBX (b), output EDI. */

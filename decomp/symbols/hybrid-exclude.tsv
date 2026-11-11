@@ -506,3 +506,85 @@ addr	reason
 0x00118b60	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x0015c071	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00120746	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2: broke the main menu with 0x120485)
+0x0002a8ac	abi_check --stack-clobbers: stack-cleaning original preserves edi,esi, which the C clobbers and Watcom cannot save; keep original
+0x0002d894	abi_check --stack-clobbers: stack-cleaning original preserves edi,esi, which the C clobbers and Watcom cannot save; keep original
+0x00035de0	abi_check --stack-clobbers: stack-cleaning original preserves esi, which the C clobbers and Watcom cannot save; keep original
+0x00088ddc	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x00088fb4	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x0009e094	abi_check --stack-clobbers: stack-cleaning original preserves ecx,edi, which the C clobbers and Watcom cannot save; keep original
+0x000a5b1c	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x000c4654	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x000c58cc	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x000ca1c8	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x000dc519	abi_check --stack-clobbers: stack-cleaning original preserves edi,esi, which the C clobbers and Watcom cannot save; keep original
+0x000ea8cc	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x000f8da8	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x00110130	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x0011b4bc	abi_check --stack-clobbers: stack-cleaning original preserves eax, which the C clobbers and Watcom cannot save; keep original
+0x000b42f0	Original preserves EAX/EDX around fnstsw ax; Watcom C clobbers EAX (cockpit replay culprit, r6-cockpit); keep original
+0x000b427c	Cockpit replay culprit (r10-cockpit bisect: guest fault only with it redirected); compiled code and callers look equivalent, cause not yet found; keep original
+0x00000484	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx,ecx, C reads eax,edx); fix the register declaration before linking
+0x000169b4	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx, C reads eax,edx); fix the register declaration before linking
+0x0001e214	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx,ecx, C reads eax,ebx,edx); fix the register declaration before linking
+0x0002b508	abi_check --inputs: C reads different entry registers than the original (reads eax,edx, C reads eax,ecx); fix the register declaration before linking
+0x000571f0	abi_check --inputs: C reads different entry registers than the original (reads ebx,edx, C reads eax,edx); fix the register declaration before linking
+0x0006e0b0	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx,edx, C reads eax,ecx,edx); fix the register declaration before linking
+0x000748f4	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx,edx, C reads eax,ecx,edx); fix the register declaration before linking
+0x0007af60	abi_check --inputs: C reads different entry registers than the original (reads ebx,ecx,edx, C reads eax); fix the register declaration before linking
+0x0008018c	abi_check --inputs: C reads different entry registers than the original (reads edx, C reads eax); fix the register declaration before linking
+0x00085420	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx, C reads eax,esi); fix the register declaration before linking
+0x00092254	abi_check --inputs: C reads different entry registers than the original (reads edx, C reads eax); fix the register declaration before linking
+0x000a46f0	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000b2e28	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx,edx, C reads eax,ecx,edx); fix the register declaration before linking
+0x000c4565	abi_check --inputs: C reads different entry registers than the original (reads ebx,ecx, C reads eax); fix the register declaration before linking
+0x000c46f8	abi_check --inputs: C reads different entry registers than the original (reads ebx, C reads eax,edx); fix the register declaration before linking
+0x000c474c	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx,ecx, C reads eax,ebx,edx); fix the register declaration before linking
+0x000c47e0	abi_check --inputs: C reads different entry registers than the original (reads ecx,edi, C reads eax); fix the register declaration before linking
+0x000c48dc	abi_check --inputs: C reads different entry registers than the original (reads ecx,esi, C reads eax,edx); fix the register declaration before linking
+0x000c5372	abi_check --inputs: C reads different entry registers than the original (reads ebx, C reads eax); fix the register declaration before linking
+0x000c5409	abi_check --inputs: C reads different entry registers than the original (reads eax,esi, C reads eax,edx); fix the register declaration before linking
+0x000c5441	abi_check --inputs: C reads different entry registers than the original (reads eax,esi, C reads eax,edx); fix the register declaration before linking
+0x000c54ef	abi_check --inputs: C reads different entry registers than the original (reads edi, C reads eax); fix the register declaration before linking
+0x000c552e	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
+0x000c565e	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
+0x000c59b7	abi_check --inputs: C reads different entry registers than the original (reads edi,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000c5e56	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
+0x000c5f08	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
+0x000c737c	abi_check --inputs: C reads different entry registers than the original (reads ebx,edi,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000c8720	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
+0x000c89cc	abi_check --inputs: C reads different entry registers than the original (reads ebx,esi, C reads eax,edx); fix the register declaration before linking
+0x000c89f4	abi_check --inputs: C reads different entry registers than the original (reads ebx,esi, C reads eax,edx); fix the register declaration before linking
+0x000c8c34	abi_check --inputs: C reads different entry registers than the original (reads edi, C reads eax); fix the register declaration before linking
+0x000c8c78	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,edx); fix the register declaration before linking
+0x000cf788	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
+0x000d2500	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,edx); fix the register declaration before linking
+0x000d2584	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,edx); fix the register declaration before linking
+0x000d2634	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,edx); fix the register declaration before linking
+0x000d2704	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,edx); fix the register declaration before linking
+0x000d2d7c	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax); fix the register declaration before linking
+0x000dc34e	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx, C reads eax,edx); fix the register declaration before linking
+0x000dc43e	abi_check --inputs: C reads different entry registers than the original (reads ebx,edi,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000ded60	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,ebx,edx); fix the register declaration before linking
+0x000e7a7c	abi_check --inputs: C reads different entry registers than the original (reads ebx,edi,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000ea49a	abi_check --inputs: C reads different entry registers than the original (reads eax,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000ebe17	abi_check --inputs: C reads different entry registers than the original (reads eax,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000ef41f	abi_check --inputs: C reads different entry registers than the original (reads edi, C reads eax); fix the register declaration before linking
+0x000f064b	abi_check --inputs: C reads different entry registers than the original (reads edi,esi, C reads eax); fix the register declaration before linking
+0x000fcd20	abi_check --inputs: C reads different entry registers than the original (reads ebx,edi,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000fedcc	abi_check --inputs: C reads different entry registers than the original (reads ebx,ecx,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000feddc	abi_check --inputs: C reads different entry registers than the original (reads ebx,ecx,esi, C reads eax,edx); fix the register declaration before linking
+0x0010d188	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
+0x0010e08d	abi_check --inputs: C reads different entry registers than the original (reads ecx, C reads eax,ebx,edx); fix the register declaration before linking
+0x001104b8	abi_check --inputs: C reads different entry registers than the original (reads eax,edx, C reads eax,ebx); fix the register declaration before linking
+0x00115871	abi_check --inputs: C reads different entry registers than the original (reads ebx,edx, C reads eax,ebx); fix the register declaration before linking
+0x001177ad	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax,ebx); fix the register declaration before linking
+0x0011d27b	abi_check --inputs: C reads different entry registers than the original (reads eax,ebx,edx, C reads eax,ecx,edx); fix the register declaration before linking
+0x0011d614	abi_check --inputs: C reads different entry registers than the original (reads ebx, C reads eax,edx); fix the register declaration before linking
+0x00120a2d	abi_check --inputs: C reads different entry registers than the original (reads ebx, C reads eax); fix the register declaration before linking
+0x001600c4	abi_check --inputs: C reads different entry registers than the original (reads edi,edx,esi, C reads eax,ebx,edx); fix the register declaration before linking
+0x000b415c	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched
+0x000b41bc	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched
+0x000b4230	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched
+0x000b4250	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched
+0x000b42b0	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched
+0x000b4364	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched

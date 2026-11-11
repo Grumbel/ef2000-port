@@ -76,6 +76,41 @@ def analyze(lines):
     return writes - (set(pushed) & set(popped)), ret, x87
 
 
+REGTOKEN = re.compile(r'\b(e?[abcd]x|[abcd][lh]|e?si|e?di)\b')
+MOVLIKE = ('mov', 'lea', 'movzx', 'movsx', 'pop')
+STOPS = re.compile(r'^(j\w+|call|ret\w*|loop\w*|int|iret\w*)$')
+
+
+def entry_inputs(lines):
+    """Registers read before they are written in the straight-line entry block."""
+    written, reads = set(), set()
+    for mnemonic, operands in lines:
+        mnemonic = mnemonic.lower()
+        if STOPS.match(mnemonic):
+            break
+        if mnemonic in ('push', 'nop') or mnemonic.startswith('f'):
+            continue
+        parts = operands.lower().split(',') if operands.strip() else []
+        destination = reg(parts[0]) if parts else ''
+        dest_is_reg = destination in GPR and '[' not in parts[0]
+        sources = parts[1:] if dest_is_reg and mnemonic in MOVLIKE else parts
+        if mnemonic == 'xor' and len(parts) == 2 and reg(parts[0]) == reg(parts[1]):
+            sources = []
+        if mnemonic in ('cdq', 'cwde', 'cbw'):
+            sources = ['eax']
+        for part in sources:
+            for token in REGTOKEN.findall(part):
+                if reg(token) not in written:
+                    reads.add(reg(token))
+        if dest_is_reg and mnemonic in MOVLIKE + ('xor',) and not (mnemonic != 'mov' and mnemonic != 'movzx' and mnemonic != 'movsx' and mnemonic != 'lea' and mnemonic != 'pop' and mnemonic != 'xor'):
+            written.add(destination)
+        elif dest_is_reg:
+            if destination not in written:
+                reads.add(destination)
+            written.add(destination)
+    return reads
+
+
 def original_lines(image, address, size, objdump):
     text = subprocess.run(
         [objdump, '-b', 'binary', '-m', 'i386', '-M', 'intel', '-D',
@@ -122,6 +157,11 @@ def main():
     parser.add_argument('--exclude', type=Path, default=ROOT / 'decomp/symbols/hybrid-exclude.tsv')
     parser.add_argument('--states', default='compiles,spliced,verified')
     parser.add_argument('--clobbers', action='store_true', help='also report extra clobbered registers')
+    parser.add_argument('--stack-clobbers', action='store_true',
+                        help='fail on extra clobbered registers in functions that clean stack arguments '
+                             '(hybrid_link adds no register-saving trampoline for them)')
+    parser.add_argument('--inputs', action='store_true',
+                        help='fail when the C reads entry registers the original does not (and vice versa): different register conventions')
     parser.add_argument('--x87', action='store_true',
                         help='also report FPU-use differences (usually the original calls an x87 helper that the C inlines)')
     parser.add_argument('--include-excluded', action='store_true')
@@ -157,14 +197,27 @@ def main():
             compiled = compiled_lines(listings[module], name)
             if not compiled:
                 continue
-            o_writes, o_ret, o_x87 = analyze(original_lines(args.image, address, size, args.objdump))
+            o_lines = original_lines(args.image, address, size, args.objdump)
+            o_writes, o_ret, o_x87 = analyze(o_lines)
             c_writes, c_ret, c_x87 = analyze(compiled)
             issues = []
             if o_ret is not None and c_ret is not None and o_ret != c_ret:
                 issues.append('ret original %d, compiled %d' % (o_ret, c_ret))
                 failures += 1
+            if args.stack_clobbers and o_ret and c_writes - o_writes:
+                issues.append('stack-clobber ' + ','.join(sorted(c_writes - o_writes)))
+                failures += 1
             if args.clobbers and c_writes - o_writes:
                 issues.append('clobber ' + ','.join(sorted(c_writes - o_writes)))
+            if args.inputs:
+                o_in, c_in = entry_inputs(o_lines), entry_inputs(compiled)
+                missing, extra = o_in - c_in, c_in - o_in
+                # An unused parameter is harmless; a register the C reads that the
+                # original never sets up means the two disagree on the convention.
+                if missing and extra:
+                    issues.append('inputs original reads %s, C reads %s' % (
+                        ','.join(sorted(o_in)), ','.join(sorted(c_in))))
+                    failures += 1
             if args.x87 and o_x87 != c_x87:
                 issues.append('x87 original %s, compiled %s' % (o_x87, c_x87))
             if issues:

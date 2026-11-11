@@ -7025,9 +7025,9 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
  * signature stay register arguments. Found by tools/abi_check.py. */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux select_page_e3c6c parm routine [] /* 0xe3c6c, ret 4 */
-#pragma aux reset_clip_bounds_c58cc parm routine [] /* 0xc58cc, ret 8 */
+#pragma aux reset_clip_bounds_c58cc parm routine [] modify exact [] /* 0xc58cc, ret 8 */
 #pragma aux nop_9d774 parm routine [] /* 0x9d774, ret 8 */
-#pragma aux set_owner_pair_2d894 parm routine [eax] /* 0x2d894, AX + 2 stack, ret 8 */
+#pragma aux set_owner_pair_2d894 parm routine [eax] modify exact [] /* 0x2d894, AX + 2 stack, ret 8 */
 #pragma aux pack_runtime_position parm routine [eax] [edx] [ecx] /* 0x106b0, ret 4 */
 #pragma aux send_packet_41 parm routine [edx] [ebx] [ecx] /* 0x55b44, ret 4 */
 /* Original returns with a plain ret: stack arguments are caller-cleaned (abi_check.py, 2026-11-11). */
@@ -7056,5 +7056,87 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux claim_slot_113c7c parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux advance_text_cursor_11451c parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux select_animation_11458c parm caller [eax] [edx] [ebx] [ecx]
+/* Stack-cleaning originals preserve every register but the result; hybrid_link adds no
+ * register-saving trampoline for them (abi_check.py --stack-clobbers). */
+#pragma aux read_four_words_105a4 modify exact []
+#pragma aux store_params_10710 modify exact []
+#pragma aux enter_mode_1a358 modify exact []
+#pragma aux queue_grid_node_2a8ac modify exact []
+#pragma aux record_term_2ccf0 modify exact []
+#pragma aux rescale_dialog_widgets_35de0 modify exact []
+#pragma aux queue_request_36100 modify exact []
+#pragma aux add_float_time_4fdf4 modify exact []
+#pragma aux scale_float_52eb0 modify exact []
+#pragma aux send_command_packet_55f54 modify exact []
+#pragma aux activate_node_65410 modify exact []
+#pragma aux estimate_coefficient_6c1f0 modify exact []
+#pragma aux compute_turn_rate_6eaf4 modify exact []
+#pragma aux append_entry_7ff0c modify exact []
+#pragma aux make_record_17_82000 modify exact []
+#pragma aux fill_unit_entry_84ff0 modify exact []
+#pragma aux store_scaled_angles_88ddc modify exact []
+#pragma aux rotation_matrix_88e98 modify exact []
+#pragma aux direction_vector_88fb4 modify exact []
+#pragma aux setup_camera_955c0 modify exact []
+#pragma aux setup_external_view_95704 modify exact []
+#pragma aux read_camera_record_97ca8 modify exact []
+#pragma aux run_with_hook_9e094 modify exact []
+#pragma aux set_patch_dword_a45e4 modify exact []
+#pragma aux set_widget_params_a5b1c modify exact []
+#pragma aux file_size_a7b3c modify exact []
+#pragma aux pow_b3fec modify exact []
+#pragma aux abs_double_b427c modify exact []
+#pragma aux sign_double_b42b0 modify exact []
+#pragma aux wrap_angle_b42f0 modify exact []
+#pragma aux nth_match_exists_bd8c8 modify exact []
+#pragma aux set_params_and_run_c4654 modify exact []
+#pragma aux rotate_add_patch_c5c24 modify exact []
+#pragma aux rotate_matrix_c5cd3 modify exact []
+#pragma aux draw_arc_scaled_c98f8 modify exact []
+#pragma aux set_record_links_ca1c8 modify exact []
+#pragma aux build_curve_tables_d6340 modify exact []
+#pragma aux set_view_shift_dc334 modify exact []
+#pragma aux patch_rotation_immediates_dc519 modify exact []
+#pragma aux patch_span_dc71b modify exact []
+#pragma aux find_table_entry_dead0 modify exact []
+#pragma aux store_args_and_shutdown_e474c modify exact []
+#pragma aux set_settings_e6120 modify exact []
+#pragma aux floor_e86f7 modify exact []
+#pragma aux rotate_add_words_e9b38 modify exact []
+#pragma aux scale_vector3_ea8cc modify exact []
+#pragma aux scale_by_table_ebee4 modify exact []
+#pragma aux math_error_edb2d modify exact []
+#pragma aux combine_record_value_ef97a modify exact []
+#pragma aux sin_scaled_f8278 modify exact []
+#pragma aux cos_scaled_f8298 modify exact []
+#pragma aux divide_by_scaled_word_f8314 modify exact []
+#pragma aux fill_record_f8da8 modify exact []
+#pragma aux build_row_table_fc39c modify exact []
+#pragma aux project_vertices_fc8cc modify exact []
+#pragma aux set_and_check_video_mode_fe710 modify exact []
+#pragma aux modf_10d9c6 modify exact []
+#pragma aux decode_planes_10dfec modify exact []
+#pragma aux classify_double_110130 modify exact []
+#pragma aux blend_angle_11aff4 modify exact []
+#pragma aux ratio_formula_11b134 modify exact []
+#pragma aux one_minus_pow_11b4bc modify exact []
+#pragma aux clamped_sin_acos_11b4e0 modify exact []
+#pragma aux scaled_call_11b540 modify exact []
+#pragma aux scaled_call_11b588 modify exact []
+#pragma aux profile_term_11b5a8 modify exact []
+#pragma aux ratio_offset_11bab4 modify exact []
+#pragma aux falloff_11bbdc modify exact []
+#pragma aux combine_11bf00 modify exact []
+#pragma aux scaled_ratio_11bfc8 modify exact []
+#pragma aux frexp_120a60 modify exact []
+#pragma aux setup_rotation_args_16000c modify exact []
+/* ST0-argument x87 helpers: Watcom would otherwise pass the double on the stack
+ * (found by the cockpit bisect: 0xb41bc, 0xb427c). */
+#pragma aux guest_fn_a4470 parm [8087] value [8087] modify [eax]
+#pragma aux guest_fn_b45fa parm [8087] value [8087] modify [eax]
+/* Fixed-point matrix products take a in ESI, b in EBX, out in EDI and clobber
+ * EAX/ECX/EDX/EBP like the original (found by the cockpit bisect: 0xfcffb). */
+#pragma aux matrix_mul_fcffb parm [esi] [ebx] [edi] modify exact [eax ecx edx ebp]
+#pragma aux matrix_mul_transposed_fceb4 parm [esi] [ebx] [edi] modify exact [eax ecx edx ebp]
 #endif
 #endif
