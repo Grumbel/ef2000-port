@@ -6958,4 +6958,75 @@ void guest_tactcom_sequence_entry_boundary_3010e(ef_addr32 stream);
 void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
                                                 uint32_t capacity, uint32_t site);
 
+/* Original callers clean the stack (plain `ret`); keep Watcom register
+ * arguments in EAX/EDX/EBX/ECX but let the caller pop the rest. Found by the
+ * static ret-immediate check (tools/abi_check.py). */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux reset_loop_state_1d318 parm caller [eax] [edx] [ebx] [ecx] /* 0x1d318 */
+#pragma aux draw_linked_pages_2c600 parm caller [eax] [edx] [ebx] [ecx] /* 0x2c600 */
+#pragma aux draw_hotspots_453f4 parm caller [eax] [edx] [ebx] [ecx] /* 0x453f4 */
+#pragma aux convert_scene_scalar parm caller [eax] [edx] [ebx] [ecx] /* 0x88d84 */
+#pragma aux finish_record_range_d710c parm caller [eax] [edx] [ebx] [ecx] /* 0xd710c */
+#pragma aux restore_rect_list_e516c parm caller [eax] [edx] [ebx] [ecx] /* 0xe516c */
+#pragma aux copy_rows_to_screen_eb0b0 parm caller [eax] [edx] [ebx] [ecx] /* 0xeb0b0 */
+#pragma aux run_section_two_f4d0c parm caller [eax] [edx] [ebx] [ecx] /* 0xf4d0c */
+#pragma aux trace_call_101e80 parm caller [eax] [edx] [ebx] [ecx] /* 0x101e80 */
+#pragma aux trace_call_101f08 parm caller [eax] [edx] [ebx] [ecx] /* 0x101f08 */
+#pragma aux forward_to_1111e5_101f78 parm caller [eax] [edx] [ebx] [ecx] /* 0x101f78 */
+#pragma aux trace_call_101f88 parm caller [eax] [edx] [ebx] [ecx] /* 0x101f88 */
+#pragma aux trace_call_1023d8 parm caller [eax] [edx] [ebx] [ecx] /* 0x1023d8 */
+#pragma aux trace_call_10242c parm caller [eax] [edx] [ebx] [ecx] /* 0x10242c */
+#pragma aux trace_call_1024b4 parm caller [eax] [edx] [ebx] [ecx] /* 0x1024b4 */
+#pragma aux trace_call_102508 parm caller [eax] [edx] [ebx] [ecx] /* 0x102508 */
+#pragma aux trace_call_102590 parm caller [eax] [edx] [ebx] [ecx] /* 0x102590 */
+#pragma aux trace_call_1026fc parm caller [eax] [edx] [ebx] [ecx] /* 0x1026fc */
+#pragma aux trace_call_102738 parm caller [eax] [edx] [ebx] [ecx] /* 0x102738 */
+#pragma aux trace_call_1028f4 parm caller [eax] [edx] [ebx] [ecx] /* 0x1028f4 */
+#pragma aux trace_call_102f60 parm caller [eax] [edx] [ebx] [ecx] /* 0x102f60 */
+#pragma aux trace_call_102fb4 parm caller [eax] [edx] [ebx] [ecx] /* 0x102fb4 */
+#pragma aux trace_call_10303c parm caller [eax] [edx] [ebx] [ecx] /* 0x10303c */
+#pragma aux trace_call_1030bc parm caller [eax] [edx] [ebx] [ecx] /* 0x1030bc */
+#pragma aux trace_call_1031cc parm caller [eax] [edx] [ebx] [ecx] /* 0x1031cc */
+#pragma aux trace_call_1034b0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1034b0 */
+#pragma aux trace_call_103778 parm caller [eax] [edx] [ebx] [ecx] /* 0x103778 */
+#pragma aux trace_call_103b08 parm caller [eax] [edx] [ebx] [ecx] /* 0x103b08 */
+#pragma aux trace_call_103c28 parm caller [eax] [edx] [ebx] [ecx] /* 0x103c28 */
+#pragma aux destroy_record_104464 parm caller [eax] [edx] [ebx] [ecx] /* 0x104464 */
+#pragma aux file_size_by_name_105024 parm caller [eax] [edx] [ebx] [ecx] /* 0x105024 */
+#pragma aux send_record_size_message_1052f0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1052f0 */
+#pragma aux destroy_sound_object_105da0 parm caller [eax] [edx] [ebx] [ecx] /* 0x105da0 */
+#pragma aux load_resource_106464 parm caller [eax] [edx] [ebx] [ecx] /* 0x106464 */
+#pragma aux find_open_entry_1065c8 parm caller [eax] [edx] [ebx] [ecx] /* 0x1065c8 */
+#pragma aux deactivate_record_1068b8 parm caller [eax] [edx] [ebx] [ecx] /* 0x1068b8 */
+#pragma aux dword_shr8_1115f0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1115f0 */
+#pragma aux teardown_record_1115fc parm caller [eax] [edx] [ebx] [ecx] /* 0x1115fc */
+#pragma aux send_pending_count_message_111df0 parm caller [eax] [edx] [ebx] [ecx] /* 0x111df0 */
+#pragma aux append_midi_event_111e40 parm caller [eax] [edx] [ebx] [ecx] /* 0x111e40 */
+#pragma aux append_midi_block_111ed4 parm caller [eax] [edx] [ebx] [ecx] /* 0x111ed4 */
+#pragma aux read_varlen_111f20 parm caller [eax] [edx] [ebx] [ecx] /* 0x111f20 */
+#pragma aux find_chunk_111f84 parm caller [eax] [edx] [ebx] [ecx] /* 0x111f84 */
+#pragma aux get_channel_value_112048 parm caller [eax] [edx] [ebx] [ecx] /* 0x112048 */
+#pragma aux release_matching_slots_11288c parm caller [eax] [edx] [ebx] [ecx] /* 0x11288c */
+#pragma aux reset_table_record_112b1c parm caller [eax] [edx] [ebx] [ecx] /* 0x112b1c */
+#pragma aux reset_table_record_and_link_112bbc parm caller [eax] [edx] [ebx] [ecx] /* 0x112bbc */
+#pragma aux send_channel_volumes_112bd8 parm caller [eax] [edx] [ebx] [ecx] /* 0x112bd8 */
+#pragma aux release_record_array_113398 parm caller [eax] [edx] [ebx] [ecx] /* 0x113398 */
+#pragma aux load_resource_113a40 parm caller [eax] [edx] [ebx] [ecx] /* 0x113a40 */
+#pragma aux trace_and_mark_113cf4 parm caller [eax] [edx] [ebx] [ecx] /* 0x113cf4 */
+#pragma aux start_record_11402c parm caller [eax] [edx] [ebx] [ecx] /* 0x11402c */
+#pragma aux reset_controllers_114058 parm caller [eax] [edx] [ebx] [ecx] /* 0x114058 */
+#pragma aux activate_record_114170 parm caller [eax] [edx] [ebx] [ecx] /* 0x114170 */
+#pragma aux set_record_field_1141a0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1141a0 */
+#pragma aux start_value_ramp_1141b0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1141b0 */
+#pragma aux refresh_player_channels_1142cc parm caller [eax] [edx] [ebx] [ecx] /* 0x1142cc */
+#pragma aux dispatch_midi_event_1149e0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1149e0 */
+#pragma aux clear_buffer_117aa2 parm caller [eax] [edx] [ebx] [ecx] /* 0x117aa2 */
+#endif
+/* Original callee pops stack arguments (`ret N`); the registers named in the
+ * signature stay register arguments. Found by tools/abi_check.py. */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux select_page_e3c6c parm routine [] /* 0xe3c6c, ret 4 */
+#pragma aux reset_clip_bounds_c58cc parm routine [] /* 0xc58cc, ret 8 */
+#pragma aux nop_9d774 parm routine [] /* 0x9d774, ret 8 */
+#endif
 #endif
