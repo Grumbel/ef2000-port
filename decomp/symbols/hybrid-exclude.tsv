@@ -544,9 +544,6 @@ addr	reason
 0x000c5372	abi_check --inputs: C reads different entry registers than the original (reads ebx, C reads eax); fix the register declaration before linking
 0x000c5409	abi_check --inputs: C reads different entry registers than the original (reads eax,esi, C reads eax,edx); fix the register declaration before linking
 0x000c5441	abi_check --inputs: C reads different entry registers than the original (reads eax,esi, C reads eax,edx); fix the register declaration before linking
-0x000c54ef	abi_check --inputs: C reads different entry registers than the original (reads edi, C reads eax); fix the register declaration before linking
-0x000c552e	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
-0x000c565e	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
 0x000c59b7	abi_check --inputs: C reads different entry registers than the original (reads edi,esi, C reads eax,ebx,edx); fix the register declaration before linking
 0x000c5e56	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
 0x000c5f08	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
@@ -584,3 +581,116 @@ addr	reason
 0x000b4250	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched
 0x000b42b0	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched
 0x000b4364	float_helpers5 x87 helper: successive cockpit bisects (r8-r13) blamed this module; the C keeps double intermediates in memory/rounds differently from the original extended-precision x87 sequence; keep original until matched
+0x000df26f	main-menu replay bisect (round 1) isolates this replacement as sufficient to break the replay
+0x000bbd8c	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bbdc4	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc0dc	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc287	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc34f	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc36a	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc400	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc421	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc450	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc465	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x000bc471	main-menu replay bisect (round 2) isolates this replacement as sufficient to break the replay
+0x00053330	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x0002b634	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x0002bb3c	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x00045a54	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x00055f54	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x0006b620	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x00088c54	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x0008fa58	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x000b58a8	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x000cbfa0	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x000f8278	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x000f8298	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x000fde20	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x000fdec0	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x0010db58	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x0010e4dd	abi_check --x87/--stack-clobbers: original and C disagree on x87 register-stack use or clobber an extra register on a stack-cleaning function; unreviewed
+0x00000f60	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00001b70	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000080f4	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000081ec	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0000a9a8	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0000a9fc	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0000aa6c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0000aaec	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0001d8a8	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000293b0	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0002949c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0002a7f8	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0002c358	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0002dee4	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00037d88	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00037e00	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00037e60	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00055884	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00057620	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00058094	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00064524	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0006454c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00066ac8	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000685ac	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00069374	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00076f58	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00077088	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000779f4	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00077b20	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00077b44	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00077b68	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00077b8c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00077bb0	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0007ae88	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0007e89c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00083734	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0008557c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00085f78	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000860c0	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0008c09c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0008f3f4	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000900c0	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000940e0	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0009c024	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0009c1b1	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0009c960	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000a0018	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000a0d58	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000a9640	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000b038c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000b0448	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000b43dc	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000b55a4	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000c469b	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000c473c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000c4755	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000ca7e0	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000cc894	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000cd150	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000d13ec	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000d7704	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000d7e94	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000dcb74	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000dd2f4	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000dd650	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000e0a90	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000e0b10	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000f2c78	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000fad54	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x000fc08c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00101e70	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00101e78	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x001023b0	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00106718	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0010ddf7	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00110f0c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00110f3c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x00111f50	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0011af60	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0011af9c	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0011afb4	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0011afe4	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0011b3c0	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+0x0011d24e	func_differential: recovered C returns a different result or writes different guest RAM than the original on the generated probe; unreviewed
+

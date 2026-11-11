@@ -2271,3 +2271,66 @@ int ef_decomp_probe_main_channel(uint32_t bss_end, uint32_t argc,
     return run_main_probe(bss_end, argc, argv, data_dir, probe, stop_address,
                           reason, reason_capacity, 2);
 }
+
+/* Recovered modules that the standalone host build links but whose callees
+ * are original guest code (or modules deliberately kept out of the host
+ * build) are not available here; reaching one is a probe failure. */
+ef_addr32 break_down_time_10ec62(uint32_t days, uint32_t secs, int32_t offset, ef_addr32 tm)
+{
+    (void)days; (void)secs; (void)offset; (void)tm;
+    fatal_unexpected("break_down_time (0x10ec62)");
+    return 0u;
+}
+
+void guest_fn_10e97f_x(ef_addr32 tm)
+{
+    (void)tm;
+    fatal_unexpected("guest time service (0x10e97f)");
+}
+
+void guest_fn_10eda1_x(void)
+{
+    fatal_unexpected("guest time service (0x10eda1)");
+}
+
+uint32_t guest_fn_1100d2(uint32_t value, ef_addr32 buffer)
+{
+    (void)value; (void)buffer;
+    fatal_unexpected("guest number formatter (0x1100d2)");
+    return 0u;
+}
+
+uint32_t guest_tail_110dcc(uint32_t a)
+{
+    (void)a;
+    fatal_unexpected("guest AIL tail (0x110dcc)");
+    return 0u;
+}
+
+uint32_t guest_tail_110dd9(uint32_t a)
+{
+    (void)a;
+    fatal_unexpected("guest AIL tail (0x110dd9)");
+    return 0u;
+}
+
+uint32_t run_if_available_bc36a(ef_addr32 name, ef_addr32 mode)
+{
+    (void)name; (void)mode;
+    fatal_unexpected("run_if_available (0xbc36a)");
+    return 0u;
+}
+
+int32_t set_default_file_buffer_11159a(ef_addr32 file, ef_addr32 buffer)
+{
+    (void)file; (void)buffer;
+    fatal_unexpected("set_default_file_buffer (0x11159a)");
+    return 0;
+}
+
+int32_t stream_printf_bc400(ef_addr32 stream, ef_addr32 fmt, ...)
+{
+    (void)stream; (void)fmt;
+    fatal_unexpected("stream_printf (0xbc400)");
+    return 0;
+}

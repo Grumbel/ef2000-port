@@ -2195,3 +2195,35 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
 - The `asm_match.py` fingerprint diffs are mostly noise (constant folding,
   helper factoring such as `fade_step`); of 52 diffs on functions the main
   menu executes, 6 sampled were equivalent. Not exhaustively triaged.
+
+## 2026-11-11 (evening): unlinked modules, static-first verification
+
+- Root cause of many "never exercised" functions: `misc_drafts1` was left out
+  of the hybrid link because `initialize_ail_irq_tables_110fd4` calls
+  host-boundary externals (`guest_ail_irq_*`) that the hybrid linker cannot
+  resolve. The function now lives in `ail_irq_init.c`; the link went from
+  1,850 to ~2,850 redirected functions (718 of 794 modules). Earlier replay
+  PASS results did not cover those functions.
+- New Watcom runtime helpers in `watcom_rt_helpers.c`: `__I8LS`, `memset`,
+  `memcpy`, inline-8087 stubs (`IF@DSQRT`, sin/cos/log/tan/atan/fmod/atan2),
+  `ceil/floor/trunc`, and register-to-original-convention thunks for the
+  guest fatal/parser-error/callback entries. `guest_read_candidate_record_`
+  (7 modules) and `guest_invoke_runtime_slot_` (3 modules) stay unlinked until
+  their conventions are verified against the original.
+- Direction from the owner: verify by static comparison of the recovered C
+  against the original asm over all functions at once, not by replay
+  bisecting. Tools: `abi_check.py` (`--inputs`, `--clobbers`,
+  `--stack-clobbers`, `--x87`), `asm_match.py`, and `func_differential.py`
+  run over every redirected function (it now accepts arena-based hybrid
+  patches). Over 2,902 candidates: 1,164 pass, 310 real diffs (226 are only
+  non-result registers, kept), 1,428 harness errors (missing stack-argument
+  specs, probe faults); the 84 with EAX/RAM diffs are excluded in
+  `hybrid-exclude.tsv` pending triage, as are 16 static-gate failures and 12
+  replay-bisect culprits (e.g. variadic `sscanf_df26f`).
+- First triage result: `step_generator_a45b3` returned void, but callers
+  (`half_word_9c960`, `random_modulo`, ...) use the new low word in AX; it now
+  returns it. Remaining triage list: the other EAX diffs, then RAM diffs.
+- Standalone host build: it was already failing at HEAD (misc_drafts1 pulled
+  in functions whose callees are guest code); `decomp_startup.c` now defines
+  fatal-on-call stubs for those nine symbols. `nix build .#ef2000-hybrid
+  --override-input ef2000 path:<EF2000 dir>` builds again with all 411 tests.

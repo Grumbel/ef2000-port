@@ -320,7 +320,7 @@ def main():
         if args.captured and args.spec:
             raise ValueError('use either --captured inputs or an explicit --spec')
         original = load_image(executable=args.executable, payload_path=args.payload)
-        patched, hashes = apply_patches(original, args.patch)
+        patched, hashes = apply_patches(original, args.patch, 0x4000000)
         if args.captured:
             if args.max_instructions <= 0:
                 raise ValueError('captured-call instruction budget must be positive')

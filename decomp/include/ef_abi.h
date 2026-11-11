@@ -2537,7 +2537,7 @@ uint8_t history_contains_631fc(uint16_t value);
 void count_pending_77748(void);
 void set_owner_name_789d0(uint8_t owner, ef_addr32 name);
 void latch_mode_word_8b5f0(ef_addr32 pointer);
-void step_generator_a45b3(void);
+uint32_t step_generator_a45b3(void);
 uint32_t find_id_a4640(uint16_t id);
 void clear_id_table_a4e6c(void);
 void update_mouse_request_a9cd0(void);
@@ -2561,7 +2561,7 @@ uint8_t history_contains_631fc(uint16_t value);
 void count_pending_77748(void);
 void set_owner_name_789d0(uint8_t owner, ef_addr32 name);
 void latch_mode_word_8b5f0(ef_addr32 pointer);
-void step_generator_a45b3(void);
+uint32_t step_generator_a45b3(void);
 uint32_t find_id_a4640(uint16_t id);
 void clear_id_table_a4e6c(void);
 void update_mouse_request_a9cd0(void);
@@ -7138,10 +7138,15 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
  * EAX/ECX/EDX/EBP like the original (found by the cockpit bisect: 0xfcffb). */
 #pragma aux matrix_mul_fcffb parm [esi] [ebx] [edi] modify exact [eax ecx edx ebp]
 #pragma aux matrix_mul_transposed_fceb4 parm [esi] [ebx] [edi] modify exact [eax ecx edx ebp]
+/* Indirect call through the runtime clock pointer at 0x15b620. */
+#pragma aux guest_read_runtime_tick = "call dword ptr ds:[0x15b620]" value [eax] modify [eax ebx ecx edx esi edi]
 /* Value-only register-convention fragments (abi_check --inputs). */
 #pragma aux build_rotation_words_dc43e parm [ebx] [esi] [edi] modify exact [ebx ecx edi edx esi]
 #pragma aux build_rotation_matrix_e7a7c parm [ebx] [esi] [edi] modify exact [eax ebx ecx edi edx esi]
 #pragma aux build_rotation_matrix_fcd20 parm [ebx] [esi] [edi] modify exact [eax ebx ecx edi edx esi]
 #pragma aux draw_patterned_line_10d188 parm [esi] modify exact [eax esi]
+#pragma aux fetch_scaled_value_c54ef parm [edi] modify exact [eax ecx edx esi edi]
+#pragma aux scale_entry_c552e parm [esi] modify exact [eax]
+#pragma aux scale_entry_c565e parm [esi] modify exact [eax]
 #endif
 #endif

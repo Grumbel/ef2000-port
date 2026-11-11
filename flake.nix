@@ -403,7 +403,7 @@
             decomp/src/engine_helpers.c decomp/src/aid_data.c \
             decomp/src/game_helpers13.c \
             decomp/src/localized_file_handlers.c decomp/src/script_helpers1.c \
-            decomp/src/misc_drafts1.c decomp/src/runtime_libc.c \
+            decomp/src/misc_drafts1.c decomp/src/ail_irq_init.c decomp/src/runtime_libc.c \
             decomp/src/runtime_helpers32.c decomp/src/views_sequences.c \
             decomp/src/ui_widget_helpers.c decomp/src/leaf_helpers1.c \
             decomp/src/tactcom_prefix.c decomp/src/game_main.c \

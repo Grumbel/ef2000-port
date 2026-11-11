@@ -135,7 +135,7 @@ void latch_mode_word_8b5f0(ef_addr32 pointer)
 }
 
 /* 0xa45b3, 49 bytes. Step a 32-bit generator held in two words; reseed when it reaches zero. */
-void step_generator_a45b3(void)
+uint32_t step_generator_a45b3(void)
 {
     uint32_t add = (uint32_t)EF_U16(0x000a45a6u) + (uint32_t)EF_U16(0x000a45a4u);
     uint16_t new_lo = (uint16_t)add;
@@ -145,6 +145,7 @@ void step_generator_a45b3(void)
     EF_U16(0x000a45a4u) = new_hi;
     if ((uint16_t)(new_hi | new_lo) == 0)
         EF_U32(0x000a45a4u) = 0x31415926u;
+    return new_lo;
 }
 
 /* 0xa4640, 53 bytes. Find a word in the 0x41eda8 id table; returns its index, or a cleared low byte. */
