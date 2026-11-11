@@ -7028,5 +7028,8 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux select_page_e3c6c parm routine [] /* 0xe3c6c, ret 4 */
 #pragma aux reset_clip_bounds_c58cc parm routine [] /* 0xc58cc, ret 8 */
 #pragma aux nop_9d774 parm routine [] /* 0x9d774, ret 8 */
+#pragma aux set_owner_pair_2d894 parm routine [eax] /* 0x2d894, AX + 2 stack, ret 8 */
+#pragma aux pack_runtime_position parm routine [eax] [edx] [ecx] /* 0x106b0, ret 4 */
+#pragma aux send_packet_41 parm routine [edx] [ebx] [ecx] /* 0x55b44, ret 4 */
 #endif
 #endif
