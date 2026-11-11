@@ -82,7 +82,12 @@ def original_lines(image, address, size, objdump):
         check=True, capture_output=True, text=True).stdout
     lines = []
     for line in text.splitlines():
-        match = re.match(r'^\s*[0-9a-f]+:\s+(?:[0-9a-f]{2}\s)+\s*(\w+)\s*(.*)$', line)
+        # "addr:<TAB>bytes<TAB>mnemonic operands"; byte-only continuation lines of
+        # long instructions have no third field and must be skipped.
+        fields = line.split('\t')
+        if len(fields) < 3 or not re.match(r'^\s*[0-9a-f]+:$', fields[0]):
+            continue
+        match = re.match(r'^(\w+)\s*(.*)$', fields[2].strip())
         if match:
             lines.append((match.group(1), re.sub(r'\s*;.*', '', match.group(2)).replace('0x', '')))
     return lines
