@@ -65,6 +65,52 @@ def failure_signature(result):
             tuple(sorted(result.get('guest_hashes', {}).items())))
 
 
+def frame_difference(path_a, path_b):
+    """Fraction of differing pixels between two binary PPM frames (1.0 if unreadable)."""
+    def load(path):
+        data = path.read_bytes()
+        fields, position = [], 0
+        while len(fields) < 4:
+            while data[position:position + 1].isspace():
+                position += 1
+            end = position
+            while not data[end:end + 1].isspace():
+                end += 1
+            fields.append(data[position:end])
+            position = end
+        return fields, data[position + 1:]
+    try:
+        head_a, pixels_a = load(path_a)
+        head_b, pixels_b = load(path_b)
+    except (OSError, IndexError):
+        return 1.0
+    if head_a != head_b or len(pixels_a) != len(pixels_b) or not pixels_a:
+        return 1.0
+    differing = sum(1 for index in range(0, len(pixels_a), 3)
+                    if pixels_a[index:index + 3] != pixels_b[index:index + 3])
+    return differing / (len(pixels_a) // 3)
+
+
+FRAME_DIFF_LIMIT = 0.2
+
+
+def crash_class(result, baseline):
+    """Coarse crash identity: abnormal stop kind and fault type only.
+
+    Fault addresses, instruction pointers and RAM/frame hashes move whenever
+    an unrelated redirect is demoted, so exact matching never reduces a set
+    with interacting culprits. Returns None for stops that look like the
+    baseline (benign state differences are deliberately ignored).
+    """
+    if result is None:
+        return None
+    status = result['status']
+    if status['status'] == baseline['status']['status']:
+        return None
+    fault = status.get('fault')
+    return (status['status'], fault['type'] if fault is not None else None)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--image', type=Path, default=ROOT / 'local/initial-image/payload.bin')
@@ -93,6 +139,12 @@ def main(argv=None):
     parser.add_argument('--globals', type=Path, default=ROOT / 'decomp/symbols/globals.tsv')
     parser.add_argument('--abi-header', type=Path, default=hybrid_link.ABI_HEADER)
     parser.add_argument('--max-rounds', type=int, default=16)
+    parser.add_argument('--match', choices=('crash', 'exact', 'frame'), default='crash',
+                        help='how a trial reproduces the failure: same abnormal stop '
+                             'class (default, ignores benign RAM/counter differences) '
+                             'or the exact failure signature; frame also fails a trial whose '
+                             'final framebuffer differs from the original run by more '
+                             'than 20%% of the pixels (e.g. stuck on the setup screen)')
     args = parser.parse_args(argv)
 
     try:
@@ -214,6 +266,14 @@ def main(argv=None):
                     replay_runner, args.executable.resolve(), game_dir, cd_dir, [patch_path],
                     trial_case, output / f'trial-{run_number:02d}', args.timeout, 'off')
                 failures = replay_suite.differences(baseline, result)
+                if args.match == 'frame':
+                    failures = [] if result['status']['status'] == baseline['status']['status'] \
+                        else [f"status: {baseline['status']['status']} != {result['status']['status']}"]
+                    difference = frame_difference(
+                        output / 'baseline' / 'frame.ppm',
+                        output / f'trial-{run_number:02d}' / 'frame.ppm')
+                    if difference > FRAME_DIFF_LIMIT:
+                        failures.append(f'framebuffer differs in {difference:.0%} of pixels')
                 missing_hits = [address for address in must_hit
                                 if result['patch_hits'].get(f'0x{address:x}', 0) == 0]
                 failures.extend(f'canary 0x{address:x} was not hit'
@@ -237,17 +297,28 @@ def main(argv=None):
                   ('' if not failures else ': ' + '; '.join(failures)))
             return passed, result, failures
 
+        match_mode = [args.match]
+
         def match_signature(result):
             if trace_addresses:
                 if result is None:
                     return None
                 return tuple(result['patch_hits'].get(f'0x{address:x}', 0)
                              for address in trace_addresses)
+            if match_mode[0] == 'frame':
+                if result is None or trial_log[-1]['passed']:
+                    return None
+                return crash_class(result, baseline) or ('frame-mismatch',)
+            if match_mode[0] == 'crash':
+                return crash_class(result, baseline)
             return failure_signature(result)
 
         initial_pass, initial_result, _ = trial(set())
         if initial_pass:
             raise ValueError('complete hybrid passes this replay case; no culprit to bisect')
+        if match_mode[0] == 'crash' and crash_class(initial_result, baseline) is None:
+            print('initial failure is not an abnormal stop; using exact matching')
+            match_mode[0] = 'exact'
         target_signature = match_signature(initial_result)
         if target_signature is None:
             raise ValueError('initial hybrid failure has no parsed target signature')

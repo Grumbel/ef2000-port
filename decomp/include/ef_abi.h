@@ -323,6 +323,11 @@ void guest_packet_after_send(const uint8_t *packet); /* 0x57820 EAX */
 void draw_tactical_cross(int16_t x, int16_t y); /* 0x5dbc8 AX/DX */
 void draw_tactical_line(int32_t y1, int32_t x1, int32_t y2,
                         int32_t x2, uint32_t marker); /* 0xc8ccc cdecl */
+#ifdef __WATCOMC__
+/* Watcom's default register convention would pass y1..x2 in registers; the
+ * original 0xc8ccc takes five stack arguments and pops them itself. */
+#define draw_tactical_line guest_fn_c8ccc_x
+#endif
 void update_ui_record_from_template(int16_t index, ef_addr32 record); /* 0x80d40 AX/EDX */
 ef_addr32 lookup_ui_record_template(ef_addr32 table, int32_t index); /* 0x80d20 EAX/EDX */
 void update_ui_composite(void); /* 0x84370 */

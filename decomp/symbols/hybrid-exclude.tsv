@@ -24,3 +24,426 @@ addr	reason
 0x000ce328	Hybrid redirect breaks cockpit replay (bisect m2-bisect-005); keep original bytes.
 0x000a6438	Hybrid redirect breaks cockpit replay (bisect m2-bisect-006); keep original bytes.
 0x000a6d00	Mechanical widget redraw body suspected of corrupting the stack (return lands in heap at 0xd6b6fa in cockpit replay, bisect m2-bisect-007); keep original.
+0x000a5ca4	Mechanical body drops the colour byte and three of four coordinates of each set_clip_rect_c94f4 call (bisect m2-bisect-009); keep original.
+0x000c9fc4	Mechanical body has uninitialised stack locals and guessed call args (bisect m2-bisect-010); keep original.
+0x00160255	Mechanical body mis-scales uint32_t* array indices (bisect m2-bisect-011); keep original.
+0x0011c20c	Mechanical body treats 64-bit float fields as uint64_t integers and guesses call args (bisect m2-bisect-012); keep original.
+0x0011b1b0	Hand wrapper forwards 11b134 without EAX object pointer and discards the st0 double result (bisect m2-bisect-013); fix signature, then re-enable.
+0x000ebea3	Mechanical body guesses a uint64_t stack parameter and call args (bisect m2-bisect-014); keep original.
+0x000e2374	Bisect-implicated mechanical body (m2-bisect-015); stack-parameter ABI (param_1, param_2) unverified; keep original until reviewed.
+0x000e5830	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
+0x000e5960	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
+0x000e59cc	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
+0x000e5bfe	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
+0x000e5c03	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
+0x000e5c30	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
+0x0003bc60	Single-redirect culprit for cockpit replay (bisect m2-bisect-019/020); logic matches original, cause unreviewed; keep original.
+0x0000e774	Single-redirect culprit for cockpit replay (bisect m2-bisect-021, late-Accept manifest); cause unreviewed; keep original.
+0x0002a720	Single-redirect culprit: replay ends executing data at 0x17f73d (bisect m2-bisect-022); logic matches original on inspection, cause unreviewed; keep original.
+0x00004738	Single-redirect culprit for cockpit replay (bisect m2-bisect-023); cause unreviewed; keep original.
+0x000da8c4	Single-redirect culprit for cockpit replay (bisect m2-bisect-024); cause unreviewed; keep original.
+0x000da5cc	Single-redirect culprit for cockpit replay (bisect m2-bisect-025); cause unreviewed; keep original.
+0x000da360	Single-redirect culprit for cockpit replay (bisect m2-bisect-026); cause unreviewed; keep original.
+0x000c39f0	Single-redirect culprit for cockpit replay (bisect m2-bisect-027); cause unreviewed; keep original.
+0x000db28c	Single-redirect culprit for cockpit replay (bisect m2-bisect-028); cause unreviewed; keep original.
+0x000da224	Single-redirect culprit for cockpit replay (bisect m2-bisect-029); cause unreviewed; keep original.
+0x000daa5c	Single-redirect culprit for cockpit replay (bisect m2-bisect-030); cause unreviewed; keep original.
+0x000da9d4	Single-redirect culprit for cockpit replay (bisect m2-bisect-031); cause unreviewed; keep original.
+0x000dae40	Single-redirect culprit for cockpit replay (bisect m2-bisect-031); cause unreviewed; keep original.
+0x000db8bc	Single-redirect culprit for cockpit replay (bisect m2-bisect-032); cause unreviewed; keep original.
+0x000dab40	Single-redirect culprit for cockpit replay (bisect m2-bisect-033); cause unreviewed; keep original.
+0x000d2110	Single-redirect culprit for cockpit replay (bisect m2-bisect-034); cause unreviewed; keep original.
+0x000c39ac	Single-redirect culprit for cockpit replay (bisect m2-bisect-035); cause unreviewed; keep original.
+0x00090a70	Single-redirect culprit for cockpit replay (bisect m2-bisect-036); cause unreviewed; keep original.
+0x00080d40	Single-redirect culprit for cockpit replay (bisect m2-bisect-037); cause unreviewed; keep original.
+0x0007aac0	Single-redirect culprit for cockpit replay (bisect m2-bisect-038); cause unreviewed; keep original.
+0x000c409c	Single-redirect culprit for cockpit replay (bisect m2-bisect-039); cause unreviewed; keep original.
+0x000b4620	Single-redirect culprit for cockpit replay (bisect m2-bisect-040); cause unreviewed; keep original.
+0x000cd81c	Single-redirect culprit for cockpit replay (bisect m2-bisect-041); cause unreviewed; keep original.
+0x000bc570	Single-redirect culprit for cockpit replay (bisect m2-bisect-042); cause unreviewed; keep original.
+0x000b3fdc	Single-redirect culprit for cockpit replay (bisect m2-bisect-043); cause unreviewed; keep original.
+0x000b3fd0	Single-redirect culprit for cockpit replay (bisect m2-bisect-044); cause unreviewed; keep original.
+0x0007a38c	Single-redirect culprit for cockpit replay (bisect m2-bisect-045); cause unreviewed; keep original.
+0x00073500	Single-redirect culprit for cockpit replay (bisect m2-bisect-046); cause unreviewed; keep original.
+0x0005f634	Single-redirect culprit for cockpit replay (bisect m2-bisect-047); cause unreviewed; keep original.
+0x00022e98	Single-redirect culprit for cockpit replay (bisect m2-bisect-048); cause unreviewed; keep original.
+0x0001f960	Single-redirect culprit for cockpit replay (bisect m2-bisect-049); cause unreviewed; keep original.
+0x00003ea8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00004318	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000494c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00004a90	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00004aa0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00004c50	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00004cf4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00004d4c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00004f18	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000051d4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000073ec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00009114	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000b574	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000b5d0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000ba5c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000bc38	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000bde8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000be48	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000be8c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000bed8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000bf24	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000bf70	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000c838	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0000ca40	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00014d58	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00016e60	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00019a80	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0001a580	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00023760	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000298f0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0003122c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00031514	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00031b40	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00032b90	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00032c04	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000336c0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000336f0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00033720	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00033738	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00033760	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000337ac	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000337c4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000337ec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00033888	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0003396c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00033ad8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00033b5c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00033c64	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00033ee8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000340a4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00034140	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000341d8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00034218	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0003444c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00034480	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000344a0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000344bc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000345d4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000347ac	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000349ec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00034bcc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00034d94	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00035128	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00035e68	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00035e90	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00035eb8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000371b0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00037254	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00037260	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0003a000	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0003efa8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0003f7fc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00040ebc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00040ec4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00040ed0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00040f18	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00040f64	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000418c4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00042004	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000421c0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00042a98	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00042b04	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00043020	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000431a4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000456e8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004b1a4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004bc40	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004bcd4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004bec0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004bef0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004bf1c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004c120	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004c33c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004c3bc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004c610	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004c638	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004c66c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004d9cc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004da2c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004da90	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004dae8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004e360	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004e768	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004e80c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004eb78	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004eb8c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004ec14	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004ec44	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004eec0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004f2f8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004f36c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004f3e0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004f494	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004f548	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0004f608	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000505e4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00050604	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00050638	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00050750	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000507f4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005080c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005086c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005089c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000508fc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005095c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00050c2c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00050c40	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000548e0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005674c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00058d64	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005a468	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005b080	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005df08	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0005e87c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000633ac	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00068f40	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00068f6c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00068f98	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00068fbc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00068fe0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0006931c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00069338	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00069914	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00069920	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00069978	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000699d4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00069f1c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0006c710	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0006f15c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0006f504	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0007c574	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0007cb70	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0007d138	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0007e0a4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0007e2a8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000834e8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084ac4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084aec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084afc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b04	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b0c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b24	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b2c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b3c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b44	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b4c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b54	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b64	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b7c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b84	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084b9c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084bbc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084bcc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084be4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084bec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084bf4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084bfc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c04	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c0c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c14	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c24	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c2c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c34	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c3c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c44	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c54	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c5c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c64	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c6c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c74	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084c7c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00084ddc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00086110	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00089164	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0008ac64	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00092984	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0009596c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000979c8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00097dcc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00098bec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00098eac	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0009921c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00099660	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00099c38	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0009b8a0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0009be38	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0009f940	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0009fc00	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000a04b4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000a0704	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000a08c8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000a0c04	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000a8a38	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000aaa50	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000ab324	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000ab47c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000ab908	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000ab95c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000b00d0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000b0208	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000b0c34	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000b1b8b	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000b3168	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000b9aa4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000bdbf8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000cc1ac	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000cd4d4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000cd9a6	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000cfc68	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000d2130	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000d7f0c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000d8170	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da1b4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da2b0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da2b8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da408	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da4b0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da518	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da580	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da748	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da7fc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000da964	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dabc8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db114	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db16c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db1c4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db21c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db32c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db420	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db8a8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db8b0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db95c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db9a8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000db9f4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dba40	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dba8c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbad8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbb24	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbb70	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbbbc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbc08	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbc54	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbca0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbcec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbd38	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbd84	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbe28	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbe30	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbe54	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbe5c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbe80	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbeac	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbedc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbee4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbeec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbef8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dbff8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dc094	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dc124	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000dc5a9	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000e70fc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000e81b0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f0cb6	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f3714	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f3f84	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f46cc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f50ec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f5180	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f53bc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f6124	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f8b14	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000fd164	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00101c54	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0010535c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00105648	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00105e38	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0010848c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0010958c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00109ec0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0010a580	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0010d1fd	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x001121e0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x001123a4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x001128e4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00113d10	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x001146ec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00114878	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00117a0f	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x001196c8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0011c0b4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00120800	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00120a52	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00160329	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x0011b6a8	Single-redirect culprit for cockpit replay (bisect m2-bisect-051; invalid fetch); cause unreviewed; keep original.
+0x000e3c6c	Single-redirect culprit for cockpit replay (bisect m2-bisect-052); cause unreviewed; keep original.
+0x0009202c	Pair culprit for cockpit replay (bisect m2-bisect-053, unresolved 2-candidate set); cause unreviewed; keep original.
+0x00094194	Pair culprit for cockpit replay (bisect m2-bisect-053, unresolved 2-candidate set); cause unreviewed; keep original.
+0x0011b694	Single-redirect culprit for cockpit replay (bisect m2-bisect-054); cause unreviewed; keep original.
+0x0001d318	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x0002c600	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x0002d894	Static ABI check: original ends ret 8, recovered C ends ret 0 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x000453f4	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00088d84	Static ABI check: original ends ret 0, recovered C ends ret 16 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x000c58cc	Static ABI check: original ends ret 8, recovered C ends ret 0 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x000d710c	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x000e516c	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x000eb0b0	Static ABI check: original ends ret 0, recovered C ends ret 24 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x000f4d0c	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00101e80	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00101f08	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00101f78	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00101f88	Static ABI check: original ends ret 0, recovered C ends ret 16 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001023d8	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x0010242c	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001024b4	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00102508	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00102590	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001026fc	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00102738	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001028f4	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00102f60	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00102fb4	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x0010303c	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001030bc	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001031cc	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001034b0	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00103778	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00103b08	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00103c28	Static ABI check: original ends ret 0, recovered C ends ret 20 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00104464	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00105024	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001052f0	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00105da0	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00106464	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001065c8	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001068b8	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001115f0	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001115fc	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00111df0	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00111e40	Static ABI check: original ends ret 0, recovered C ends ret 16 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00111ed4	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00111f20	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00111f84	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00112048	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x0011288c	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00112b1c	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00112bbc	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00112bd8	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00113398	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00113a40	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00113cf4	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x0011402c	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00114058	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00114170	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001141a0	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001141b0	Static ABI check: original ends ret 0, recovered C ends ret 12 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001142cc	Static ABI check: original ends ret 0, recovered C ends ret 8 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x001149e0	Static ABI check: original ends ret 0, recovered C ends ret 20 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
+0x00117aa2	Static ABI check: original ends ret 0, recovered C ends ret 4 (callee-cleanup mismatch corrupts the stack; hybrid_link adds no trampoline for stack-argument functions). Fix the declaration, then re-enable.
