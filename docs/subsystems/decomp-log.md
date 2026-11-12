@@ -2269,3 +2269,11 @@ ECX across `cf7c4` and looped forever). All 33 guest-external pragmas lacking
 of the 214 prior failures: 4 PASS (0x3bcc0, 0x5d48c, 0xa3424, 0xc1e3c,
 re-included), 18 SOFT, 192 FAIL (mostly patched faults / RAM diffs, other
 causes; still excluded).
+
+25 signatures whose original ends in `ret N` (double/stack args) had
+`stack_bytes` 0, so the register-saving trampoline wrapped them and the
+isolated fuzz returned to address 0. `stack_bytes` now matches the original
+`ret N`; the trampoline is skipped for these. 11 now PASS and are re-included
+(0x4fdf4, 0x52eb0, 0x72f68, 0xa56b0, 0xe86f7, 0x11b540, 0x11b588, 0x11b8d8,
+0x11b950, 0x11bf00, 0x11bfc8); 14 stay excluded with their remaining fuzz
+diffs (e.g. EAX returning a stack address at 0x11b040/0x11b3c8/0x11bb80).

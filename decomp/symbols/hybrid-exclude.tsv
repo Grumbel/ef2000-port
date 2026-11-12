@@ -621,10 +621,8 @@ addr	reason
 0x0002ccf0	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff00c, got 0x3fff014/0x3fff014; keep original pending triage
 0x00034e18	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: instruction budget 20000 exceeded (ip=0x30638de); keep original pending triage
 0x00040870	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: instruction budget 20000 exceeded (ip=0x174); keep original pending triage
-0x00045fc4	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0004600c	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0004fdf4	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x00052eb0	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x00045fc4	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 2: guest RAM 0x3fff004: original 0xb8, patched 0xb9; 11: guest RAM 0x3fff004: original 0xeb, patched 0xec; 19: guest RAM 0x3fff004: original; keep original pending triage
+0x0004600c	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 11: guest RAM 0x3fff004: original 0x97, patched 0x98; 15: guest RAM 0x3fff004: original 0x5b, patched 0x5a; 16: guest RAM 0x3fff004: origina; keep original pending triage
 0x0005331c	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x7fff: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x0005a220	tools/func_fuzz.py isolated run (only this redirect): 0: guest RAM 0x1a3580: original 0x01, patched 0x00; keep original pending triage
 0x0005c9d4	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
@@ -632,25 +630,24 @@ addr	reason
 0x0005cb1c	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0xf6a0ef29: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x0005dbc8	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x0005de14	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0xcf74b: Invalid memory write (UC_ERR_WRITE_UNMAPPED); keep original pending triage
-0x00072f68	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x00076620	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x00076620	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x4: Invalid memory read (UC_ERR_READ_UNMAPPED); 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU ex; keep original pending triage
 0x0007b040	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0xb2: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x0007b08c	tools/func_fuzz.py isolated run (only this redirect): 7: patched: fuzz7: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x0007b08c	tools/func_fuzz.py isolated run (only this redirect): 7: patched: fuzz7: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 8: patched: fuzz8: guest fault at 0x26: Invalid memory ; keep original pending triage
 0x0007bb00	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x2008efb: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x00083200	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x201440b: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x00083b50	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0xedb11: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x000842b4	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x000842b4	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 1: patched: fuzz1: guest fault at 0x200e343: Invalid me; keep original pending triage
 0x000843b0	tools/func_fuzz.py isolated run (only this redirect): 0: guest RAM 0x159064: original 0x74, patched 0x50; keep original pending triage
 0x000844b0	tools/func_fuzz.py isolated run (only this redirect): 0: guest RAM 0x159064: original 0x80, patched 0x5c; keep original pending triage
 0x000845c0	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x2015a6d: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x00086e44	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x0: Invalid instruction (UC_ERR_INSN_INVALID); keep original pending triage
 0x00088e98	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: instruction budget 20000 exceeded (ip=0x174); keep original pending triage
-0x00088ff8	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x00088ff8	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 2: patched: fuzz2: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x00089060	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x15026c: Invalid instruction (UC_ERR_INSN_INVALID); keep original pending triage
 0x00089b58	tools/func_fuzz.py isolated run (only this redirect): 2: patched: fuzz2: guest fault at 0x110ccc: Invalid instruction (UC_ERR_INSN_INVALID); keep original pending triage
 0x00089c64	tools/func_fuzz.py isolated run (only this redirect): 2: patched: fuzz2: guest fault at 0x88d7c: Invalid memory write (UC_ERR_WRITE_UNMAPPED); keep original pending triage
-0x00089e08	tools/func_fuzz.py isolated run (only this redirect): 5: patched: fuzz5: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x00089f50	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x00089e08	tools/func_fuzz.py isolated run (only this redirect): 5: patched: fuzz5: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 16: patched: fuzz16: guest fault at 0x1f7: Unhandled CP; keep original pending triage
+0x00089f50	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x0008b6e0	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x30389f8: Invalid memory write (UC_ERR_WRITE_UNMAPPED); keep original pending triage
 0x0008bde8	tools/func_fuzz.py isolated run (only this redirect): 2: patched: fuzz2: guest fault at 0x80000000: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x0008f5d8	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x201b5bf: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
@@ -658,7 +655,7 @@ addr	reason
 0x00090924	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x8930304a: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x0009125c	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x7fff: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x00091acc	tools/func_fuzz.py isolated run (only this redirect): 1: guest RAM 0x159064: original 0x94, patched 0x74; keep original pending triage
-0x00092e30	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x00092e30	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x00092f10	tools/func_fuzz.py isolated run (only this redirect): 0: guest RAM 0x159064: original 0x70, patched 0x4c; keep original pending triage
 0x00092f98	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x20137f3: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x000941e4	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x200b628: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
@@ -677,13 +674,12 @@ addr	reason
 0x0009c1bb	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff008, got 0x3fff004/0x3fff004; keep original pending triage
 0x0009c27c	tools/func_fuzz.py isolated run (only this redirect): 8: ESP cleanup expected 0x3fff00c, got 0x3fff004/0x3fff004; keep original pending triage
 0x0009c2d3	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff00c, got 0x3fff004/0x3fff004; keep original pending triage
-0x000a56b0	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x000a7204	tools/func_fuzz.py isolated run (only this redirect): 13: patched: fuzz13: guest fault at 0x300fff8: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x000a788c	tools/func_fuzz.py isolated run (only this redirect): 11: patched: fuzz11: guest fault at 0x9d525: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x000abb00	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x80000000: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x000b0718	tools/func_fuzz.py isolated run (only this redirect): 3: EAX: original 0x0, patched 0x168614; keep original pending triage
 0x000b07b4	tools/func_fuzz.py isolated run (only this redirect): 15: EAX: original 0x0, patched 0x169ff0; keep original pending triage
-0x000b3fec	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x000b3fec	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 0: patched: fuzz0: guest fault at 0xedb11: Unhandled CPU exception (UC_ERR_EXCEPTION); 2: patched: fuzz2: guest fault at 0xedb11: Unhandled ; keep original pending triage
 0x000b5640	tools/func_fuzz.py isolated run (only this redirect): 9: patched: fuzz9: guest fault at 0xb58ed: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x000be480	tools/func_fuzz.py isolated run (only this redirect): 1: guest RAM 0x5c: original 0x00, patched 0x12; keep original pending triage
 0x000beebc	tools/func_fuzz.py isolated run (only this redirect): 38: EAX: original 0x2004504, patched 0x4504; keep original pending triage
@@ -704,10 +700,10 @@ addr	reason
 0x000ce0e8	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0xffc00000: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x000ce9a4	tools/func_fuzz.py isolated run (only this redirect): 0: EAX: original 0x2017401, patched 0x1; keep original pending triage
 0x000cec00	tools/func_fuzz.py isolated run (only this redirect): 0: guest RAM 0x3fff004: original 0x0c, patched 0x05; keep original pending triage
-0x000d2c84	tools/func_fuzz.py isolated run (only this redirect): 17: patched: fuzz17: guest fault at 0x3038427: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
+0x000d2c84	tools/func_fuzz.py isolated run (only this redirect): 17: patched: fuzz17: guest fault at 0x3038787: Invalid memory read (UC_ERR_READ_UNMAPPED); 38: patched: fuzz38: guest fault at 0x1f7: Unhand; keep original pending triage
 0x000d6340	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x26: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
 0x000d710c	tools/func_fuzz.py isolated run (only this redirect): 1: ESP cleanup expected 0x3fff008, got 0x3fff004/0x3fff004; keep original pending triage
-0x000d9c30	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x000d9c30	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x000dc334	tools/func_fuzz.py isolated run (only this redirect): 4: patched: fuzz4: guest fault at 0xedb11: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x000dc43e	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x44289ff: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x000dcc98	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1d63efd6: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
@@ -721,11 +717,10 @@ addr	reason
 0x000dd8dc	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: instruction budget 20000 exceeded (ip=0xcdd94); keep original pending triage
 0x000e7a7c	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x44289ff: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x000e8484	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: instruction budget 20000 exceeded (ip=0x174); keep original pending triage
-0x000e86f7	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x000e9c00	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x8b2645e: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
-0x000e9cd8	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0xe0: Invalid instruction (UC_ERR_INSN_INVALID); keep original pending triage
+0x000e9cd8	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 2: patched: fuzz2: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x000e9dcc	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x200e348: Invalid instruction (UC_ERR_INSN_INVALID); keep original pending triage
-0x000e9e7c	tools/func_fuzz.py isolated run (only this redirect): 2: patched: fuzz2: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x000e9e7c	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 2: patched: fuzz2: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 3: patched: fuzz3: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x000e9f84	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: instruction budget 20000 exceeded (ip=0x174); keep original pending triage
 0x000eb0b0	tools/func_fuzz.py isolated run (only this redirect): 5: patched: fuzz5: guest fault at 0xe9a82: Invalid memory write (UC_ERR_WRITE_UNMAPPED); keep original pending triage
 0x000eb174	tools/func_fuzz.py isolated run (only this redirect): 15: ESP cleanup expected 0x3fff024, got 0x3fff004/0x3fff004; keep original pending triage
@@ -826,35 +821,29 @@ addr	reason
 0x0011451c	tools/func_fuzz.py isolated run (only this redirect): 1: ESP cleanup expected 0x3fff010, got 0x3fff004/0x3fff004; keep original pending triage
 0x0011458c	tools/func_fuzz.py isolated run (only this redirect): 5: ESP cleanup expected 0x3fff00c, got 0x3fff004/0x3fff004; keep original pending triage
 0x00114994	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x3063f1d: Invalid memory write (UC_ERR_WRITE_UNMAPPED); keep original pending triage
-0x00119acc	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x00119acc	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x0011ac3c	tools/func_fuzz.py isolated run (only this redirect): 2: EAX: original 0x7, patched 0x773a; keep original pending triage
 0x0011aff4	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x26: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x0011b040	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x0011b040	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 0: EAX: original 0x1, patched 0x3ffef90; 1: EAX: original 0x200afd0, patched 0x3ffef90; 4: EAX: original 0x183dbc, patched 0x3ffef90; keep original pending triage
 0x0011b0ec	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x20199ed: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x0011b134	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011b3c8	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x0011b134	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 0: EAX: original 0x2003800, patched 0x200be94; 2: EAX: original 0x2013800, patched 0x2010da4; 3: EAX: original 0x2013800, patched 0x201bc54; keep original pending triage
+0x0011b3c8	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 0: EAX: original 0x2000000, patched 0x3ffefb0; 1: EAX: original 0x2003800, patched 0x3ffefb0; 2: EAX: original 0x3800, patched 0x3ffefb0; keep original pending triage
 0x0011b4e0	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x3ff00000: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
-0x0011b540	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011b588	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x0011b5a8	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff00c, got 0x3fff014/0x3fff014 | EAX: original 0xffff8000, patched 0x2017760; keep original pending triage
 0x0011b644	tools/func_fuzz.py isolated run (only this redirect): 7: ESP cleanup expected 0x3fff010, got 0x3fff018/0x3fff018 | EAX: original 0x113800, patched 0x3ffefc8; keep original pending triage
 0x0011b6bc	tools/func_fuzz.py isolated run (only this redirect): 1: EAX: original 0x2, patched 0x800; keep original pending triage
-0x0011b73c	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011b8d8	tools/func_fuzz.py isolated run (only this redirect): 2: patched: fuzz2: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011b950	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011b9ec	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x188095: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x0011ba4c	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011bab4	tools/func_fuzz.py isolated run (only this redirect): 3: patched: fuzz3: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x0011b73c	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 2: patched: fuzz2: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
+0x0011b9ec	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x188095: Invalid memory read (UC_ERR_READ_UNMAPPED); 1: patched: fuzz1: guest fault at 0x161c35: Invalid ; keep original pending triage
+0x0011ba4c	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 1: EAX: original 0x3800, patched 0x3ffefe0; 5: EAX: original 0x133800, patched 0x3ffefe0; 8: EAX: original 0x3800, patched 0x3ffefe0; keep original pending triage
+0x0011bab4	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 3: EAX: original 0x2003800, patched 0x20114cc; 4: EAX: original 0x2013800, patched 0x20163f0; 5: EAX: original 0x3800, patched 0x200aba8; keep original pending triage
 0x0011baf8	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x13a0e564: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
-0x0011bb80	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011bbdc	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011bc40	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x90a09090: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
-0x0011be48	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
-0x0011bf00	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x0011bb80	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 0: EAX: original 0x3800, patched 0x3ffefc8; 1: EAX: original 0x800, patched 0x3ffefc8; 2: EAX: original 0x2003800, patched 0x3ffefc8; keep original pending triage
+0x0011bbdc	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 0: EAX: original 0x9c520100, patched 0x9c52f89b; 1: EAX: original 0x4500, patched 0x2; 2: EAX: original 0x25930100, patched 0x25939352; keep original pending triage
+0x0011bc40	tools/func_fuzz.py isolated run (stack signature corrected to ret N): 0: patched: fuzz0: guest fault at 0x90a09090: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); 1: patched: fuzz1: instruction budget 20000 exce; keep original pending triage
+0x0011be48	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 4: patched: fuzz4: guest fault at 0x79706f43: Invalid m; keep original pending triage
 0x0011bf28	tools/func_fuzz.py isolated run (only this redirect): 1: ESP cleanup expected 0x3fff014, got 0x3fff028/0x3fff028; keep original pending triage
 0x0011bf78	tools/func_fuzz.py isolated run (only this redirect): 2: ESP cleanup expected 0x3fff010, got 0x3fff018/0x3fff018 | EAX: original 0x201b800, patched 0x3ffefc8; keep original pending triage
-0x0011bfc8	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x0011c484	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0xb2: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x0011c4ec	tools/func_fuzz.py isolated run (only this redirect): 3: patched: fuzz3: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
+0x0011c4ec	tools/func_fuzz.py isolated run (only this redirect): 3: patched: fuzz3: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 6: patched: fuzz6: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x0011f7ef	tools/func_fuzz.py isolated run (only this redirect): 16: EAX: original 0x7, patched 0x11f821; keep original pending triage
 0x00120a60	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff00c, got 0x3fff010/0x3fff010 | guest RAM 0x3fff00a: original 0x00, patched 0xe0; keep original pending triage
