@@ -2245,3 +2245,16 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   isolation 253+ functions still differ; they are excluded in
   `hybrid-exclude.tsv` ("isolated run") pending per-function triage. Weak
   functions remain unverified.
+
+### 2026-11-12 (later): isolated fuzz rerun correction
+
+The first isolated rerun after the exclusions were committed was vacuous:
+`hybrid_link.py --only-address X` still honours the exclude list, and X itself
+was now excluded, so zero functions were patched and everything passed.
+`isofuzz.py` must use an exclude list without the `func_fuzz.py isolated`
+entries. With that fixed, and with `func_fuzz.py` ignoring ESP-cleanup
+differences where original and patched agree (a wrong signature, not a C
+defect), the 264 isolated failures split into 215 FAIL, 35 SOFT, 12 PASS and
+2 weak. The 12 PASS functions were re-included. `enter_mode_1a358` was fixed
+(flag stored before the call, register arguments passed through) and still
+needs a recompile and fuzz run.

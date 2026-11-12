@@ -10,11 +10,12 @@
 /* 0x1a358, 54 bytes. Enter the mode once: apply the argument to the driver and refresh its table. */
 void enter_mode_1a358(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t stack_arg)
 {
-    (void)u0; (void)u1; (void)u2; (void)u3;
+    (void)u2;
     if (EF_U16(0x00122c78u) != 0)
         return;
-    guest_fn_d6340_x(0, 0, 0, 0, stack_arg, stack_arg, stack_arg);
+    /* The flag is stored before the call; EAX/EDX/ECX pass through and EBX is 1. */
     EF_U16(0x00122c78u) = 1;
+    guest_fn_d6340_x(u0, u1, 1, u3, stack_arg, stack_arg, stack_arg);
     guest_fn_d663c(0x001f74e0u);
 }
 
