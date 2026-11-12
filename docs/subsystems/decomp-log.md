@@ -2287,3 +2287,10 @@ signature output as an x87 ST0 result and compares it (stored through a
 `fstp qword [esp-8]` stub at the sentinel) instead of an incidental EAX.
 Isolated fuzz of the 181 remaining failures: 6 PASS re-included (0xe9dcc,
 0xe9f84, 0x11b644, 0x11bbdc, 0x11bf78, 0x120a60), 169 FAIL, 4 SOFT, 2 weak.
+
+Pragma sweep: 35 prototypes whose original ends in `ret 4*nargs` had no
+`#pragma aux` (stack arguments passed in registers by Watcom): 21 external
+guest calls got `parm routine [] modify [...]`, 14 locally declared ones
+`parm routine []` (e.g. `set_view_origin_dc21c`, which broke 0x76620).
+Isolated fuzz: 0x76620, 0xc9ecc, 0xc9f28 now PASS and are re-included;
+165 FAIL, 5 SOFT, 2 weak remain.
