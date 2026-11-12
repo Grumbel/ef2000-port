@@ -297,6 +297,10 @@ void format_ui_status_float(ef_addr32 destination, ef_addr32 format,
                             double value); /* 0xa4342 */
 int32_t draw_tactical_mode_item(uint32_t mode, ef_addr32 item); /* 0x48c34 */
 void read_tactical_indicator_callback(void); /* indirect 0x15bab8 */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+/* call dword ptr ds:[0x15bab8]; an out-of-line thunk would need a prologue that corrupts the tail jump. */
+#pragma aux read_tactical_indicator_callback = 0xff 0x15 0xb8 0xba 0x15 0x00 parm [] modify [eax ebx ecx edx esi edi ebp]
+#endif
 
 /* Runtime record and tactical display operations, separate original sinks. */
 void draw_tactical_coordinate_marker(uint8_t mark, uint32_t mode,
@@ -427,6 +431,10 @@ void guest_release_parser_buffer(ef_addr32 buffer); /* 0xcc768 EAX */
 uint32_t guest_convert_parser_decimal(ef_addr32 text); /* 0xcc76d EAX */
 int32_t guest_convert_parser_integer(ef_addr32 text); /* 0x9d4cd EAX */
 ef_addr32 guest_allocate_parser_text(uint32_t bytes, ef_addr32 source); /* [0x121ebc] */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+/* call dword ptr ds:[0x121ebc] with bytes in EAX and source in EDX. */
+#pragma aux guest_allocate_parser_text = 0xff 0x15 0xbc 0x1e 0x12 0x00 parm [eax] [edx] value [eax] modify [eax ebx ecx edx esi edi ebp]
+#endif
 int32_t guest_compare_parser_token(ef_addr32 token, ef_addr32 candidate); /* 0xa4380 */
 void guest_report_parser_enum_error(ef_addr32 format, ef_addr32 token,
                                     uint32_t context); /* [0x132a74], cdecl */
@@ -7148,5 +7156,36 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux fetch_scaled_value_c54ef parm [edi] modify exact [eax ecx edx esi edi]
 #pragma aux scale_entry_c552e parm [esi] modify exact [eax]
 #pragma aux scale_entry_c565e parm [esi] modify exact [eax]
+#endif
+
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+/* Pure stack-argument guest functions: the default register convention would pass the first four arguments in registers. */
+#pragma aux guest_fn_cf7c4_x parm routine []
+#pragma aux guest_fn_1123a4_x parm caller []
+#pragma aux guest_fn_cc6c0_x parm caller []
+#pragma aux guest_fn_117a0f_x parm caller []
+#pragma aux guest_fn_112808_x parm caller []
+#pragma aux guest_fn_fa4a9_x parm caller []
+#pragma aux guest_fn_dc71b_x parm routine []
+#pragma aux guest_fn_48d5c_x parm caller []
+#pragma aux guest_fn_e7a34_x parm routine []
+#pragma aux guest_fn_cde00_x parm routine []
+#pragma aux guest_fn_15c0ea_x parm routine []
+#pragma aux guest_fn_1111e5_x parm caller []
+#pragma aux guest_fn_11b134_x parm routine []
+#pragma aux guest_fn_105070_x parm caller []
+#pragma aux guest_fn_105e38_x parm caller []
+#pragma aux guest_fn_1133f8_x parm caller []
+#pragma aux guest_fn_35de0_x parm routine []
+#pragma aux guest_fn_15c0c4_x parm routine []
+#pragma aux guest_fn_c8ccc_x parm routine []
+#pragma aux guest_fn_f9ee0_x parm routine []
+#pragma aux guest_fn_10dfec_x parm routine []
+#pragma aux guest_fn_103f04_x parm caller []
+#pragma aux guest_fn_a7ac8_x parm routine []
+#pragma aux guest_fn_df26f_x parm caller []
+#pragma aux guest_fn_e9b38_x parm routine []
+#pragma aux guest_fn_6ebe0_x parm routine []
+#pragma aux guest_fn_fa02c_x parm routine []
 #endif
 #endif

@@ -35,8 +35,6 @@ void thunk_guest_fatal_arg3(void);
 void thunk_guest_report_parser_enum_error(void);
 void thunk_guest_parser_line_overflow(void);
 void thunk_report_buffer_capacity_exceeded(void);
-void thunk_guest_allocate_parser_text(void);
-void thunk_read_tactical_indicator_callback(void);
 void thunk_guest_callptr4s2_x(void);
 void ceil(void);
 void floor(void);
@@ -65,8 +63,6 @@ void *memcpy(void *dest, const void *src, unsigned count);
 #pragma aux thunk_guest_report_parser_enum_error "guest_report_parser_enum_error_" parm [] modify []
 #pragma aux thunk_guest_parser_line_overflow "guest_parser_line_overflow_" parm [] modify []
 #pragma aux thunk_report_buffer_capacity_exceeded "report_buffer_capacity_exceeded_" parm [] modify []
-#pragma aux thunk_guest_allocate_parser_text "guest_allocate_parser_text_" parm [] modify []
-#pragma aux thunk_read_tactical_indicator_callback "read_tactical_indicator_callback_" parm [] modify []
 #pragma aux thunk_guest_callptr4s2_x "guest_callptr4s2_x_" parm [] modify []
 #pragma aux if_datan2 "IF@DATAN2" parm [] modify []
 #pragma aux ceil "*" parm [] modify []
@@ -514,22 +510,6 @@ void thunk_report_buffer_capacity_exceeded(void)
         call dword ptr ds:[0x132a74]
         add esp, 4
         ret
-    }
-}
-
-/* Same register convention as the original indirect allocator [0x121ebc]
- * (bytes EAX, source EDX) and tactical callback [0x15bab8]: tail jumps. */
-void thunk_guest_allocate_parser_text(void)
-{
-    _asm {
-        jmp dword ptr ds:[0x121ebc]
-    }
-}
-
-void thunk_read_tactical_indicator_callback(void)
-{
-    _asm {
-        jmp dword ptr ds:[0x15bab8]
     }
 }
 
