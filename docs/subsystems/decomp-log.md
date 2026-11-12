@@ -2258,3 +2258,14 @@ defect), the 264 isolated failures split into 215 FAIL, 35 SOFT, 12 PASS and
 2 weak. The 12 PASS functions were re-included. `enter_mode_1a358` was fixed
 (flag stored before the call, register arguments passed through) and still
 needs a recompile and fuzz run.
+
+## 2026-11-12 — external-call `modify` clauses
+
+`#pragma aux` externals without `modify` made Watcom assume the guest callee
+preserves ECX/EDX/EBX etc. (e.g. `draw_prop_text_15a14` kept its loop index in
+ECX across `cf7c4` and looped forever). All 33 guest-external pragmas lacking
+`modify` now declare `modify [eax ebx ecx edx esi edi ebp]`; 27 pure-stack
+`guest_fn_*_x` prototypes also gained `parm routine/caller []`. Isolated fuzz
+of the 214 prior failures: 4 PASS (0x3bcc0, 0x5d48c, 0xa3424, 0xc1e3c,
+re-included), 18 SOFT, 192 FAIL (mostly patched faults / RAM diffs, other
+causes; still excluded).
