@@ -43,7 +43,7 @@ uint8_t any_device_e1260(void)
     static const uint32_t devices[6] = {0x190640u, 0x190648u, 0x190654u, 0x19065cu, 0x190668u, 0x190674u};
     uint32_t i;
     for (i = 0; i < 6; ++i) {
-        if (guest_fn_e0b10(devices[i]) != 0)
+        if ((uint8_t)guest_fn_e0b10(devices[i]) != 0)
             return 1;
     }
     return 0;

@@ -531,6 +531,9 @@ def main(argv=None):
     parser.add_argument('--exclude-list', type=Path,
                         default=ROOT / 'decomp/symbols/hybrid-exclude.tsv',
                         help='TSV of guest entries that must keep their original bytes')
+    parser.add_argument('--only-address', action='append', default=[],
+                        help='redirect only these guest entries (repeatable); every other '
+                             'tracked function keeps its original bytes (isolation runs)')
     parser.add_argument('-o', '--output', type=Path, required=True,
                         help='ignored local EFPATCH1 hybrid patch file')
     parser.add_argument('--report', type=Path,
@@ -549,6 +552,12 @@ def main(argv=None):
             address_text, separator, reason = value.partition(':')
             explicit_excludes[int(address_text, 0)] = (
                 reason if separator else 'explicitly demoted after hybrid replay failure')
+        if args.only_address:
+            keep = {int(value, 0) for value in args.only_address}
+            for row in read_tsv(args.functions):
+                address = int(row['addr'], 16)
+                if address not in keep:
+                    explicit_excludes.setdefault(address, 'isolation run: not selected')
         blob, report = link(objects, read_tsv(args.functions), read_tsv(args.globals),
                             selected, source,
                             load_abi_aliases(args.abi_header), args.arena_base,

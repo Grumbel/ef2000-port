@@ -2227,3 +2227,21 @@ here. Ghidra-derived function bodies remain only under ignored `local/`.
   in functions whose callees are guest code); `decomp_startup.c` now defines
   fatal-on-call stubs for those nine symbols. `nix build .#ef2000-hybrid
   --override-input ef2000 path:<EF2000 dir>` builds again with all 411 tests.
+
+## 2026-11-12: stale-object fix, randomised differential fuzzing
+
+- The 84 "EAX/RAM" differential failures were an artefact of linking stale
+  objects (`local/hybrid/obj`, Nov 6) instead of the current Watcom objects;
+  with fresh objects only `any_device_e1260` differed (it tested the full
+  EAX of `find_text_in_buffer_e0b10` instead of AL; fixed). The 84
+  exclusions were removed.
+- New `tools/func_fuzz.py`: seeded random register/stack/memory scenarios,
+  original vs patched, for functions with no hand-written spec. Over the
+  1,428 former harness errors: 130 PASS, 91 soft (preserved-register only),
+  879 weak (original faults on every random input: DOS/interrupt/x87-style
+  code), 307 FAIL.
+- `tools/hybrid_link.py --only-address` links a single redirect so a failure
+  can be attributed to that function and not to a patched callee. In
+  isolation 253+ functions still differ; they are excluded in
+  `hybrid-exclude.tsv` ("isolated run") pending per-function triage. Weak
+  functions remain unverified.
