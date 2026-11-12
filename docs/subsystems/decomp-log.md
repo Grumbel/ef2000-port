@@ -2277,3 +2277,13 @@ isolated fuzz returned to address 0. `stack_bytes` now matches the original
 (0x4fdf4, 0x52eb0, 0x72f68, 0xa56b0, 0xe86f7, 0x11b540, 0x11b588, 0x11b8d8,
 0x11b950, 0x11bf00, 0x11bfc8); 14 stay excluded with their remaining fuzz
 diffs (e.g. EAX returning a stack address at 0x11b040/0x11b3c8/0x11bb80).
+
+## 2026-11-13 — x87 ST0 arguments and results in the fuzz harness
+
+`guest_fn_{fa362,dcb96,e7df4,deb1a}_x` (ST0 -> ST0) had no pragma, so Watcom
+pushed the double on the stack; they now use `parm [8087] value [8087]`
+(fixes 0x88ff8/0xe9dcc callers). `func_differential.py` treats a `:double`
+signature output as an x87 ST0 result and compares it (stored through a
+`fstp qword [esp-8]` stub at the sentinel) instead of an incidental EAX.
+Isolated fuzz of the 181 remaining failures: 6 PASS re-included (0xe9dcc,
+0xe9f84, 0x11b644, 0x11bbdc, 0x11bf78, 0x120a60), 169 FAIL, 4 SOFT, 2 weak.

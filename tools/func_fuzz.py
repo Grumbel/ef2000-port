@@ -106,8 +106,6 @@ def _run(job):
         ran += 1
         diffs = [d for d in diffs if not (d.startswith('ESP cleanup') and
                  len(set(d.rsplit('got ', 1)[1].split('/'))) == 1)]
-        outs = {fd.register_part(part)[0] + str(fd.register_part(part)[1:])
-                for part in signature.outputs}
         hard = [d for d in diffs if d.startswith(('guest RAM', 'ESP', 'patched:')) or
                 (d.split(':')[0].lower() in {x.lower() for x in signature.outputs})]
         if hard:

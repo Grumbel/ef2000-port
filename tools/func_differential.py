@@ -92,10 +92,14 @@ def read_signature(path, address):
     if len(rows) != 1:
         raise ValueError(f'expected one confirmed signature at 0x{address:x}; got {len(rows)}')
     row = rows[0]
-    outputs = tuple(x.split(':', 1)[0] for x in row['outputs'].split(',') if x)
+    # A ``:double`` output is returned in x87 ST0 (not in the named GPR); compare
+    # ST0 instead of the incidental GPR.
+    outputs = tuple('ST0' if x.partition(':')[2] == 'double' else x.split(':', 1)[0]
+                    for x in row['outputs'].split(',') if x)
     preserved = tuple(x for x in row['preserved'].split(',') if x)
     for register in outputs + preserved:
-        register_part(register)
+        if register != 'ST0':
+            register_part(register)
     stack_bytes = number(row['stack_bytes'], 'stack cleanup')
     if stack_bytes % 4 or stack_bytes > 256:
         raise ValueError('unsupported stack cleanup (expected at most 64 dwords)')
@@ -245,6 +249,15 @@ def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
     regs = {reg: cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + reg.upper()))
             for reg in GENERAL_REGS}
     regs['eflags'] = cpu.reg_read(UC_X86_REG_EFLAGS)
+    if 'ST0' in signature.outputs:
+        # Store ST0 as a double through a stub at the sentinel (reg_read drops the
+        # exponent): fstp qword [esp-8].
+        cpu.mem_write(sentinel, b'\xdd\x5c\x24\xf8')
+        try:
+            cpu.emu_start(sentinel, sentinel + 4, count=1)
+            regs['st0'] = bytes(cpu.mem_read(regs['esp'] - 8, 8))
+        except Exception:
+            regs['st0'] = None
     return cpu, regs, writes, blocks
 
 
@@ -263,6 +276,10 @@ def compare_case(original, patched, signature, scenario, guest_size, stack,
         diffs.append(f'ESP cleanup expected 0x{expected_sp:x}, got '
                      f'0x{left_regs["esp"]:x}/0x{right_regs["esp"]:x}')
     for part in dict.fromkeys(signature.outputs + signature.preserved):
+        if part == 'ST0':
+            if left_regs.get('st0') != right_regs.get('st0'):
+                diffs.append(f'ST0: original {left_regs.get("st0")}, patched {right_regs.get("st0")}')
+            continue
         a, b = get_part(left_regs, part), get_part(right_regs, part)
         if a != b:
             diffs.append(f'{part}: original 0x{a:x}, patched 0x{b:x}')

@@ -7187,5 +7187,10 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_e9b38_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_6ebe0_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_fa02c_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
+/* x87 ST0-argument guest functions: Watcom would push the double on the stack. */
+#pragma aux guest_fn_fa362_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_dcb96_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_e7df4_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_deb1a_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
 #endif
 #endif
