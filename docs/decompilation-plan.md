@@ -2224,3 +2224,7 @@ nix flake check                                  # asset-free checks before comm
 
 Before committing: tracker updated, tests listed in the commit body, no
 files from `local/`, no pseudo-C, no game assets, attribution trailer.
+
+### 2026-11-13 assembly-focused continuation
+
+Current user direction prioritizes matching generated assembly over game runs, superseding the earlier instruction in section 2.2 to avoid instruction matching. Full C coverage remains primary; pure-C menu and cockpit are secondary milestones. Corrected the EAX/AH contract of campaign callback 0x40ec4; compilation and static assembly review recorded in docs/subsystems/decomp-log.md. This entry remains unspliced and is not counted as verified.

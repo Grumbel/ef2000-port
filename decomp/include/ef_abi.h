@@ -142,7 +142,7 @@ uint32_t gc_ui_guest_call_085(uint32_t entry, uint32_t eax, uint32_t edx);
 uint32_t gpw_ui_guest_call_085(uint32_t entry, uint32_t eax, uint32_t edx);
 void gc_set_difficulty_40e50(void);
 void gc_start_new_campaign_40ebc(void);
-void gc_performance_yes_40ec4(void);
+uint32_t gc_performance_yes_40ec4(uint32_t eax);
 void gc_performance_no_40ed0(ef_addr32 widget);
 void gc_load_old_campaign_40ee4(void);
 void gc_loadfile_accepted_40f18(void);
