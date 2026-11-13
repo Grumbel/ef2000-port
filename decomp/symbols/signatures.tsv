@@ -3319,3 +3319,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00082e40	rewrite_status_file_82e40			ebx,ecx,edx	0	Original 0x82e40 (483 bytes)
 0x000b3648	dump_node_list_b3648	EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t		ecx,esi,edi,ebp	0	Original 0xb3648 (486 bytes)
 0x00078f3c	draw_unit_info_78f3c			ebx,ecx,edx,esi	0	Original 0x78f3c (489 bytes)
+0x000275e0	draw_stat_row_275e0	AX:int16_t,EDX:int16_t,EBX:uint32_t,CX:int16_t,[ESP+4]:uint16_t		esi,edi,ebp	4	Original 0x275e0 (502 bytes)

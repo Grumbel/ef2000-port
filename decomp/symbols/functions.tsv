@@ -396,7 +396,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00027538	12	store_dword_pair_19b430	low_helpers	compiles	game	confirmed	decomp/tests/0x00027538.json	docs/compiler-abi.md; dword 0x19b430=EDX 0x19b434=EAX; callers 275a4@275c9; guest pending
 0x00027544	96	draw_centered_entries_27544	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x00027544.json	docs/compiler-abi.md; Draw a null-terminated list of 6-byte text entries, centered at x=160.; callers 275a4@275d2; guest pending
 0x000275a4	60	draw_fixed_text_list_275a4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000275a4.json	docs/compiler-abi.md; Draw the fixed centered text list: the 120-byte entry table at 0x274c0 is copied to the stack (read-only use, so the gue; callers 283c8@283fb; guest pending
-0x000275e0	502			unknown	game	unverified		
+0x000275e0	502	draw_stat_row_275e0	game_helpers130	compiles	game	confirmed	decomp/tests/0x000275e0.json	Original 0x275e0 (502 bytes)
 0x000277d8	127	confirm_dialog_277d8	game_helpers16	compiles	game	confirmed	decomp/tests/0x000277d8.json	docs/compiler-abi.md; Show the confirm dialog; Enter (0x15) marks the slot record.; callers 278c0@27aca; guest pending
 0x00027858	104	confirm_dialog_27858	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00027858.json	docs/compiler-abi.md; Show two panels and wait for key 0x15 or 0x31; true for 0x15.; callers 278c0@27adb; guest pending
 0x000278c0	1112			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.

@@ -1132,3 +1132,40 @@ void draw_unit_info_78f3c(void)
         }
     }
 }
+
+/* 0x275e0, 502 bytes. Draw one row of the statistics table at (X,Y) in COLOUR: when ROW is the selected row (stack word), draw the highlighted frame text and then either five dotted placeholders (when the byte at 0x19b438+row*0x73 is set) or the five formatted dwords at 0x19b48d..0x19b4a7 right-aligned at x 0x55; otherwise draw the plain row marker. */
+void draw_stat_row_275e0(int16_t x, int16_t y, uint32_t colour, int16_t row, uint16_t selected_row)
+{
+    char text[0x20];
+    ef_addr32 buf = (ef_addr32)(uintptr_t)text;
+    uint32_t base;
+    uint32_t i;
+    uint32_t py;
+
+    if ((uint16_t)row != selected_row) {
+        guest_fn_dd370(0x31u, (uint32_t)(int32_t)x, (uint32_t)(int32_t)y, colour);
+        return;
+    }
+    guest_fn_dd370(0u, (uint32_t)(int32_t)(int16_t)(x + 1), (uint32_t)(int32_t)(int16_t)(y + 1), colour);
+    guest_fn_dd370(0x9cu, (uint32_t)(int32_t)x, (uint32_t)(int32_t)y, colour);
+    base = (uint32_t)((int32_t)row * 0x73);
+    if (EF_U8(0x0019b438u + base) != 0u) {
+        py = 0x93u;
+        for (i = 0u; (int16_t)i < 5; i++) {
+            guest_fn_dd370(0x37u, (uint32_t)(int32_t)(int16_t)(0x55u - text_width_dd2f4(0x00182174u)),
+                           (uint32_t)(int32_t)(int16_t)py, 0x00182174u);
+            py += 8u;
+        }
+        return;
+    }
+    guest_sprintf_a4342(buf, 0x00182178u, EF_U32(0x0019b48du + base));
+    guest_fn_dd370(0x37u, (uint32_t)(int32_t)(int16_t)(0x55u - text_width_dd2f4(buf)), 0x93u, buf);
+    guest_sprintf_a4342(buf, 0x00182178u, EF_U32(0x0019b491u + base));
+    guest_fn_dd370(0x37u, (uint32_t)(int32_t)(int16_t)(0x55u - text_width_dd2f4(buf)), 0x9bu, buf);
+    guest_sprintf_a4342(buf, 0x00182178u, EF_U32(0x0019b495u + base));
+    guest_fn_dd370(0x37u, (uint32_t)(int32_t)(int16_t)(0x55u - text_width_dd2f4(buf)), 0xa3u, buf);
+    guest_sprintf_a4342(buf, 0x00182178u, EF_U32(0x0019b4a3u + base));
+    guest_fn_dd370(0x37u, (uint32_t)(int32_t)(int16_t)(0x55u - text_width_dd2f4(buf)), 0xabu, buf);
+    guest_sprintf_a4342(buf, 0x00182178u, EF_U32(0x0019b4a7u + base));
+    guest_fn_dd370(0x37u, (uint32_t)(int32_t)(int16_t)(0x55u - text_width_dd2f4(buf)), 0xb3u, buf);
+}

@@ -2380,3 +2380,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0xb3648 `dump_node_list_b3648`: node list text dump; fuzz weak (stream printf), argument order decoded from the push sequence.
 
 - 0x78f3c `draw_unit_info_78f3c`: unit info panel text (fuzz PASS 1000).
+
+- 0x275e0 `draw_stat_row_275e0`: statistics table row draw (fuzz PASS 696).
