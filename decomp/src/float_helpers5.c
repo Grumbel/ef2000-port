@@ -117,3 +117,29 @@ double vector_length_b4364(ef_addr32 vec)
         return 0.0;
     return guest_fn_a4470(sum);
 }
+
+/* 0x4c6a0, 119 bytes. Zoom the active map widget out by 0.2 while below 4.0
+ * and publish the resulting zoom level as a float. */
+void mp_zoom_out_map_4c6a0(void)
+{
+    ef_addr32 map = guest_fn_a46cc(EF_U8(0x1a53dcu) == 0u ? 0x00184c38u : 0x00184a40u);
+
+    if (EF_F64(map + 0x9fu) < EF_F64(0x00184c3cu)) {
+        set_record_scale_a56b0(map, EF_F64(map + 0x9fu) + EF_F64(0x00184c44u));
+        set_record_offsets_a5508(map, 0xc8, 0xc8);
+    }
+    *(float *)ef_guest_memory_ptr(0x001a53dfu) = (float)((EF_F64(map + 0x9fu) + EF_F64(0x00184c4cu)) * EF_F64(0x00184c54u) + 1.0);
+}
+
+/* 0x4c718, 115 bytes. Zoom the active map widget in by 0.2 while above 1.0
+ * and publish the resulting zoom level as a float. */
+void mp_strike_list_selected_4c718(void)
+{
+    ef_addr32 map = guest_fn_a46cc(EF_U8(0x1a53dcu) == 0u ? 0x00184c38u : 0x00184a40u);
+
+    if (1.0 < EF_F64(map + 0x9fu)) {
+        set_record_scale_a56b0(map, EF_F64(map + 0x9fu) + EF_F64(0x00184c5cu));
+        set_record_offsets_a5508(map, 0xc8, 0xc8);
+    }
+    *(float *)ef_guest_memory_ptr(0x001a53dfu) = (float)((EF_F64(map + 0x9fu) + EF_F64(0x00184c64u)) * EF_F64(0x00184c6cu) + 1.0);
+}

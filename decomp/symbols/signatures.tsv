@@ -3436,3 +3436,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00069338	gpw_set_clear_all_missiles_69338			ebx,ecx,edx,esi,edi,ebp	0	entry point of weapons-panel view/mode setter; only memory halfwords change; no stack args
 0x0009d524	ascii_stricmp_9d524	EAX:ef_addr32,EDX:ef_addr32	EAX:int32_t	ebx,ecx,esi,edi,ebp	0	case-insensitive ASCII compare; returns signed byte difference in EAX; EDX is clobbered
 0x0009cf2c	build_localized_path_9cf2c	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	builds localized candidate path in caller buffer EAX from name EDX; calls strncmp/strcpy/strcat; EAX and EDX clobbered
+0x0004c6a0	mp_zoom_out_map_4c6a0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004c6a0 (119 bytes); map zoom step; no register inputs
+0x0004c718	mp_strike_list_selected_4c718			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004c718 (115 bytes); map zoom step; no register inputs

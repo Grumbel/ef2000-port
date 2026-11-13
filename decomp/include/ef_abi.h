@@ -3359,6 +3359,8 @@ int32_t guest_fn_ea9b8(ef_addr32 a, ef_addr32 b); /* 0xea9b8 EAX/EDX -> EAX */
 void convert_entry_vector_9ffc8(int16_t index, int16_t value);
 void set_record_offsets_a5508(ef_addr32 record, int16_t a, int16_t b);
 void set_record_scale_a56b0(ef_addr32 record, double scale);
+void mp_zoom_out_map_4c6a0(void); /* 0x4c6a0 no args */
+void mp_strike_list_selected_4c718(void); /* 0x4c718 no args */
 double distance_2d_b415c(ef_addr32 a, ef_addr32 b);
 double distance_3d_b41bc(ef_addr32 a, ef_addr32 b);
 double word_to_scaled_b4230(int16_t value);
