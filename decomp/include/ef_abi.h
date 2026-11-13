@@ -3636,6 +3636,9 @@ void init_camera_table_d7b6c(void);
 uint32_t open_stream_formats_d9c30(void);
 void read_stream_header_d9dc0(void);
 void draw_active_marker_e5088(void);
+void WarWonLostStartup(uint32_t arg); /* 0x42b04 EAX */
+void guest_fn_426a4(uint32_t arg); /* 0x426a4 EAX */
+void guest_fn_456e8(void); /* 0x456e8 */
 uint8_t guest_fn_e93dc_r(uint32_t a, uint32_t b); /* 0xe93dc EAX/EDX -> AL */
 uint32_t guest_fn_106be8_w(uint32_t a, uint32_t b, uint32_t c); /* 0x106be8 EAX/EDX/EBX -> EAX */
 uint8_t guest_fn_107004_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x107004 EAX/EDX/EBX/ECX -> AL */
