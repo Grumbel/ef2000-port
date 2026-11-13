@@ -4298,6 +4298,9 @@ void append_midi_block_111ed4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 void direction_angles_dc91c(ef_addr32 out, ef_addr32 a, ef_addr32 b);
 int32_t can_reactivate_c117c(ef_addr32 rec, ef_addr32 list_a, ef_addr32 list_b);
 
+/* image_dump1.c */
+void write_planar_image_d1afc(void);
+
 /* game_helpers130.c */
 void init_sub_records_b4fb4(ef_addr32 obj, ef_addr32 tmpl);
 void dump_area_list_b31f0(ef_addr32 list_holder, uint32_t handle);

@@ -2318,3 +2318,14 @@ original returns the duplicated message buffer in EAX; it now returns it. The
 fuzz harness cannot exercise either function (file I/O: 0 completed cases), so
 the check is static: the compiled body matches the original's call sequence,
 stack offsets, push order and `ret 0x14`.
+
+`0xd1afc` (`write_planar_image_d1afc`, new module `image_dump1`) is recovered
+by hand: it takes its two row buffers from the stack with the original's bare
+`sub esp, eax` (an inline-asm `stack_take` pragma, because Watcom's `alloca`
+would add `stackavail`/`__GRO` externals that the hybrid link cannot resolve).
+The fuzz harness completes 0 cases (log-file I/O); the compiled body matches
+the original's frame, checks and call sequence.
+
+Goal (user, 2026-11-13): every function is either decompiled or skipped as too
+difficult. Functions skipped as too hard are marked `blocked` in the tracker
+with the reason in the notes column.
