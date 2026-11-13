@@ -4447,6 +4447,8 @@ void compute_view_marker_75f00(void);
 uint32_t guest_fn_dec4c(int32_t x, int32_t y); /* 0xdec4c EAX/EDX */
 void draw_object_marker_5d520(int32_t a, int32_t b, ef_addr32 obj);
 void guest_fn_5dc20(int32_t a, int32_t b, int32_t s, uint32_t obj); /* 0x5dc20 EAX/EDX/EBX/ECX */
+void update_flight_options_widgets_7e2a8(void);
+void guest_fn_7e0a4(uint32_t widget); /* 0x7e0a4 EAX */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

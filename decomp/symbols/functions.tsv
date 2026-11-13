@@ -1499,7 +1499,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007de5c	446	simSyncSlots		named	game	unverified		
 0x0007e01c	136	place_numbered_widgets_7e01c	game_helpers131	compiles	game	confirmed	decomp/tests/0x0007e01c.json	docs/compiler-abi.md; Position the numbered child widgets of the container at 0x188034: hide children "0".."8" at (0, 0), then place children ; callers 7e0a4@7e13f,7e0a4@7e1b5; guest pending
 0x0007e0a4	516	simNextFlight		named	game	unverified		
-0x0007e2a8	749			unknown	unclassified	unverified		
+0x0007e2a8	749	update_flight_options_widgets_7e2a8	game_helpers130	compiles	game	confirmed	decomp/tests/0x0007e2a8.json	Original 0x7e2a8 (749 bytes)
 0x0007e5a0	205	claim_players_7e5a0	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e5a0.json	docs/compiler-abi.md; Mark unowned players as ours and resend until all players answer or time runs out.; callers 7e758@7e75a; guest pending
 0x0007e670	229	run_unit_setup_7e670	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007e670.json	docs/compiler-abi.md; Run the unit setup passes for up to 0x4074 clock ticks (clock hook 0x15b620): after 0xe2988(0x1e), repeat { for every un; callers 7e758@7e767; guest pending
 0x0007e758	135	sync_players_7e758	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007e758.json	docs/compiler-abi.md; Claim the players, then send command 0x1d until the pending counter drains.; callers 7e8c0@7e9d6; guest pending

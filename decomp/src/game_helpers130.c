@@ -6100,3 +6100,89 @@ void draw_object_marker_5d520(int32_t a0, int32_t b0, ef_addr32 obj)
 			       (int16_t)(a - (w >> 1)), y2, esi);
 	}
 }
+
+/* 0x7e2a8, 749 bytes. Refresh the flight-options screen: copy the option
+ * byte groups, clamp the first value to the limit at 0x1357b0, format the five
+ * slot labels, then show the widget for each selected option and open the
+ * final page. */
+void update_flight_options_widgets_7e2a8(void)
+{
+	char b1[16];
+	char b2[0x74];
+	uint32_t p1 = (uint32_t)(uintptr_t)b1, p2 = (uint32_t)(uintptr_t)b2;
+	uint32_t esi, ecx = 0u, edx;
+	int32_t i;
+	uint32_t al, lim;
+	esi = guest_fn_a46cc_x(0x00188034u);
+	guest_fn_dc832_w(0x001f8fb4u, 0x001f8fbeu, 0xau);
+	guest_fn_dc832_w(0x001f8ff4u, 0x001f8fe0u, 5u);
+	guest_fn_dc832_w(0x001f8feau, 0x001f8fefu, 5u);
+	guest_fn_dc832_w(0x001f8ff9u, 0x001f8fe5u, 5u);
+	al = EF_U8(0x001f8ff4u);
+	lim = (uint32_t)(int32_t)(int16_t)EF_U16(0x001357b0u);
+	if ((int32_t)al < (int32_t)lim)
+		al = lim & 0xffu;
+	EF_U8(0x001f8ff4u) = (uint8_t)al;
+	for (i = 1; (int16_t)i <= 5; i++) {
+		uint32_t sidx, pstr, label;
+		int32_t ex;
+		guest_fn_a4342_va(p1, 0x00188618u, (uint32_t)i);
+		ecx = guest_fn_a78bc_x(esi, p1);
+		if (ecx == 0u)
+			continue;
+		label = EF_U8(0x001f8fe9u + (uint32_t)i) != 0u ? 0x00188620u : 0x0018862cu;
+		sidx = (uint32_t)(int32_t)(int16_t)EF_U16(0x001f8fb2u + (uint32_t)i * 2u);
+		ex = (int32_t)(int16_t)EF_U16(0x0012afdcu + sidx * 2u);
+		pstr = EF_U32(0x00132dd0u + (uint32_t)ex * 4u);
+		guest_fn_a4342_va(p2, 0x0018860cu, (uint32_t)EF_U8(0x001f8ff3u + (uint32_t)i), pstr, label,
+				  EF_U32(0x0012b028u + (uint32_t)EF_U8(0x001f8ff8u + (uint32_t)i) * 4u));
+		guest_fn_a7588_x(ecx, p2);
+	}
+	edx = 0u;
+	al = EF_U8(0x001f900au);
+	if (al == 0u) edx = 0x00187f9cu;
+	else if (al == 1u) edx = 0x001880c0u;
+	else if (al == 2u) edx = 0x001880c8u;
+	else if (al == 3u) edx = 0x001880d0u;
+	else if (al == 4u) edx = 0x001880d8u;
+	if (edx != 0u) ecx = guest_fn_a78bc_x(esi, edx);
+	guest_fn_a72d8(ecx);
+	edx = 0u;
+	al = EF_U8(0x001f9007u);
+	if (al == 0u) edx = 0x00187fb8u;
+	else if (al == 1u) edx = 0x001880f4u;
+	else if (al == 2u) edx = 0x00188100u;
+	if (edx != 0u) ecx = guest_fn_a78bc_x(esi, edx);
+	guest_fn_a72d8(ecx);
+	edx = 0u;
+	if (EF_U8(0x001f9000u) != 0u) edx = 0x00188048u;
+	else if (EF_U8(0x001f9001u) != 0u) edx = 0x00187facu;
+	else if (EF_U8(0x001f9002u) != 0u) edx = 0x00188054u;
+	if (edx != 0u) ecx = guest_fn_a78bc_x(esi, edx);
+	guest_fn_a72d8(ecx);
+	edx = 0u;
+	if (EF_U8(0x001f9003u) != 0u) edx = 0x00188064u;
+	else if (EF_U8(0x001f9005u) != 0u) edx = 0x0018805cu;
+	else if (EF_U8(0x001f8fffu) != 0u) edx = 0x00187fb0u;
+	if (edx != 0u) ecx = guest_fn_a78bc_x(esi, edx);
+	guest_fn_a72d8(ecx);
+	edx = 0u;
+	al = EF_U8(0x001f8ffeu);
+	if (al == 0x14u) edx = 0x001880e0u;
+	else if (al == 0xau) edx = 0x001880e8u;
+	else if (al == 4u) edx = 0x00187fa4u;
+	else if (al == 2u) edx = 0x001880f0u;
+	if (edx != 0u) ecx = guest_fn_a78bc_x(esi, edx);
+	guest_fn_a72d8(ecx);
+	edx = 0u;
+	al = EF_U8(0x001f9006u);
+	if (al == 0u) edx = 0x00187ed0u;
+	else if (al == 6u) edx = 0x0018863cu;
+	else if (al == 9u) edx = 0x00187ed8u;
+	if (edx != 0u) ecx = guest_fn_a78bc_x(esi, edx);
+	guest_fn_a72d8(ecx);
+	EF_U8(0x001f9004u) = 1u;
+	ecx = guest_fn_a78bc_x(esi, 0x00187fc8u);
+	guest_fn_a72d8(ecx);
+	guest_fn_7e0a4(ecx);
+}

@@ -2576,3 +2576,13 @@ differential with 0xc8ccc/0x5dc20/0x48da0/0x48bb0 stubbed (scripted width
 returns): 400/400 agree (326 non-faulting; 154 label draws); isolated
 isofuzz PASS 170/300; `functions_redirected` verified 1. New wrapper:
 `guest_fn_5dc20`. Harness note: reset the scripted-return counter per run.
+
+### 0x7e2a8 `update_flight_options_widgets_7e2a8`
+
+Recovered (749 bytes): copies the option byte groups (0xdc832), clamps
+0x1f8ff4 to the limit at 0x1357b0, formats the five slot labels with
+0xa4342/0xa78bc/0xa7588, then shows one widget per selected option group
+(0xa78bc + 0xa72d8) and opens the final page via 0x7e0a4. Controlled
+differential with all seven callees stubbed (scripted widget handles, sprintf
+writing a counter string, string contents logged): 400/400 agree, 15110 logged
+calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
