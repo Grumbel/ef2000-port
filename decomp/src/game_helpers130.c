@@ -4043,3 +4043,80 @@ void init_angle_tables_3bd50(void)
 		ang += 0x8000;
 	} while (i <= 0x24);
 }
+
+/* Original 0x3bf44: draw the compass ladder strip (outline boxes and labels) for 7 table rows. */
+void draw_compass_strip_3bf44(int16_t col, int16_t dy, int16_t ang)
+{
+	uint32_t tbl;
+	int32_t q, first, last, i;
+	uint32_t l44, l48;
+	uint16_t l50[2];
+
+	tbl = EF_U32(0x0012637cu + (uint32_t)EF_U8(0x0012b369u) * 4u);
+	if (EF_U8(0x001a2de0u) == 0u)
+		return;
+	load_sincos_dc7bc((uint32_t)(uint16_t)(0 - (int32_t)ang));
+	q = (0 - (int32_t)dy) / 0x38e;
+	first = q + 15;
+	last = q + 0x15;
+	l44 = (uint32_t)(first * 72);
+	l48 = tbl + l44;
+	if (last < first)
+		return;
+	i = first;
+	for (;;) {
+		if (i >= 0 && i <= 0x24) {
+			pair_word_dc5a9((int16_t)EF_U16(l48 + 0x42u), (int16_t)EF_U16(l48 + 0x40u),
+			                (ef_addr32)(uintptr_t)l50);
+			if (!(EF_U8(0x001a2de0u) == 2u && (i & 1) != 0)) {
+				uint16_t o1[16], o2[16];
+				uint32_t rec, name;
+				int16_t di;
+				int16_t c = col;
+
+				for (di = 0; di < 8; di++) {
+					rec = tbl + l44 + (uint32_t)di * 2u;
+					rotate_point_dc7e4((ef_addr32)(uintptr_t)&o1[2 * di],
+					                   (int16_t)EF_U16(rec), (int16_t)EF_U16(rec + 0x10u));
+					o1[2 * di] = (uint16_t)(o1[2 * di] + l50[0]);
+					o1[2 * di + 1] = (uint16_t)(o1[2 * di + 1] + l50[1]);
+					rotate_point_dc7e4((ef_addr32)(uintptr_t)&o2[2 * di],
+					                   (int16_t)EF_U16(rec + 0x20u), (int16_t)EF_U16(rec + 0x30u));
+					o2[2 * di] = (uint16_t)(o2[2 * di] + l50[0]);
+					o2[2 * di + 1] = (uint16_t)(o2[2 * di + 1] + l50[1]);
+				}
+				rec = tbl + l44;
+				name = EF_U32(rec + 0x44u);
+				if (EF_U8(name) == 0x2du) {
+					for (di = 1; di < 8; di++) {
+						if (di == 3)
+							continue;
+						renderer_viewport_five_c8ccc(o1[2 * di + 1], o1[2 * di], o1[2 * di - 1],
+						                             o1[2 * di - 2], (uint16_t)c);
+						renderer_viewport_five_c8ccc(o2[2 * di + 1], o2[2 * di], o2[2 * di - 1],
+						                             o2[2 * di - 2], (uint16_t)c);
+					}
+				} else {
+					renderer_viewport_five_c8ccc(o1[3], o1[2], o1[1], o1[0], (uint16_t)c);
+					renderer_viewport_five_c8ccc(o1[15], o1[14], o1[3], o1[2], (uint16_t)c);
+					renderer_viewport_five_c8ccc(o2[3], o2[2], o2[1], o2[0], (uint16_t)c);
+					renderer_viewport_five_c8ccc(o2[15], o2[14], o2[3], o2[2], (uint16_t)c);
+				}
+				if (guest_fn_9d524(EF_U32(l48 + 0x44u), 0x001835ecu) != 0u) {
+					uint32_t sh = EF_U8(0x0012b369u) & 31u;
+					int32_t x = (int16_t)((2u << sh) + o1[0]);
+					int32_t y = (int16_t)((0xfffffffeu << sh) + o1[1]);
+
+					draw_formatted_text_mode_48bb0((uint8_t)col,
+					                               (uint32_t)(1u - EF_U8(0x0012b369u)) & 0xffu,
+					                               x, y, EF_U32(l48 + 0x44u));
+				}
+			}
+		}
+		l48 += 0x48u;
+		l44 += 0x48u;
+		i++;
+		if (i > last)
+			break;
+	}
+}

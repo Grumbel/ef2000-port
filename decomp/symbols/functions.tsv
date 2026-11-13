@@ -685,7 +685,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003bcc0	101	draw_marked_box_3bcc0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003bcc0.json	docs/compiler-abi.md; Optionally (when the last stack argument is 1) draw through 0xc8ccc with the first and second words of PTR added to B an; callers 3a3a8@3b49f,3a3a8@3b509,3a3a8@3b564; guest pending
 0x0003bd28	34	grid_row_state_allowed	low_helpers	compiles	game	confirmed	decomp/tests/0x0003bd28.json	docs/compiler-abi.md; 0 when row byte +0x1a in 0x0a..0x0c else 1; callers 3a3a8@3b443; guest pending
 0x0003bd50	498	init_angle_tables_3bd50	game_helpers130	compiles	game	confirmed	decomp/tests/0x0003bd50.json	Original 0x3bd50 (498 bytes)
-0x0003bf44	780			unknown	game	unverified		
+0x0003bf44	780	draw_compass_strip_3bf44	game_helpers130	compiles	game	confirmed	decomp/tests/0x0003bf44.json	Original 0x3bf44 (780 bytes)
 0x0003c410	34	alloc_work_area_3c410	runtime_helpers20	compiles	game	confirmed	decomp/tests/0x0003c410.json	docs/compiler-abi.md; Allocate the 0x9202-byte work area.; callers 7ab00@7ab0e; guest pending
 0x0003c434	10	forward_value_1a2e78	low_helpers	compiles	game	confirmed	decomp/tests/0x0003c434.json	docs/compiler-abi.md; tail 0xe2af4(dword 0x1a2e78); callers 7ab00@7abbf; guest pending
 0x0003c558	93	read_line_3c558	game_helpers8	compiles	game	confirmed	decomp/tests/0x0003c558.json	docs/compiler-abi.md; Copy the next CR-terminated line from the input buffer to 0x1a2df0.; callers 3c5b8@3c5bd,3c5b8@3c5f9,3c5b8@3c611; guest pending
