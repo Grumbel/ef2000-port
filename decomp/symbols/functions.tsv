@@ -511,7 +511,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00031818	402			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x000319ac	318	update_camera_position_319ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000319ac.json	docs/compiler-abi.md; Update the camera position (dwords 0x19e5c1/5c5/5c9): rotate the offset (0, 0, -dword 0x19e597) by the angle pair at wor; callers 3122c@312ee; guest pending
 0x00031aec	84	advance_position_31aec	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00031aec.json	docs/compiler-abi.md; Identical to 0x316b8.; callers 3122c@312e7; guest pending
-0x00031b40	462			unknown	game	unverified		
+0x00031b40	462	update_view_angles_31b40	game_helpers130	compiles	game	confirmed	decomp/tests/0x00031b40.json	Original 0x31b40 (462 bytes)
 0x00031d10	108	update_angles_31d10	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00031d10.json	docs/compiler-abi.md; Update the angle words from mode byte 0x19e55f.; callers 3122c@3128e,3122c@312fd; guest pending
 0x00031d7c	173	recompute_bounds_31d7c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00031d7c.json	docs/compiler-abi.md; Recompute the cached bounds record: skipped when byte 0x19e557 is set, and then guarded by a test that compares the addr; callers 3122c@31302; guest pending
 0x00031e2c	570			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.

@@ -754,3 +754,56 @@ void update_damage_flags_6c1c(void)
     else
         EF_U8(0x00197254u) = 0u;
 }
+
+/* 0x31b40, 462 bytes. Rebuild the view-angle results at 0x19e5d3/0x19e5d5/0x19e5d7 from the camera state at 0x19e55f..0x19e5b5: rotate the offset vector by the camera angles, take the direction angles to the target (or the explicit target at 0x19e572), and for the tracking mode (0x19e558 != 2) or the 2 mode use a scratch scene built from the angle words to derive the angle results. */
+void update_view_angles_31b40(void)
+{
+    uint32_t frame[0x11];
+    uint32_t *a = &frame[9];
+    uint32_t *b = &frame[12];
+    uint16_t *out = (uint16_t *)&frame[15];
+    ef_addr32 scene = (ef_addr32)(uintptr_t)frame;
+    ef_addr32 aAddr = (ef_addr32)(uintptr_t)a;
+    ef_addr32 bAddr = (ef_addr32)(uintptr_t)b;
+    ef_addr32 outAddr = (ef_addr32)(uintptr_t)out;
+
+    init_bounds_d0b68(scene);
+    update_scene_angle_first(scene, EF_U16(0x0019e56eu));
+    update_scene_angle_second(scene, EF_U16(0x0019e56cu));
+    update_scene_angle_third(scene, EF_U16(0x0019e570u));
+    rotate_vector_by_angles_32414(0x0019e56cu, 0x0019e58bu, aAddr);
+    a[0] += EF_U32(0x0019e560u);
+    a[1] += EF_U32(0x0019e564u);
+    a[2] += EF_U32(0x0019e568u);
+    if (EF_U8(0x0019e58au) == 0u)
+        direction_angles_dc91c(outAddr, aAddr, 0x0019e5b5u);
+    else
+        direction_angles_dc91c(outAddr, 0x0019e572u, 0x0019e5b5u);
+    EF_U16(0x0019e5d3u) = out[0];
+    EF_U16(0x0019e5d5u) = out[1];
+    if (EF_U8(0x0019e55fu) == 0u && EF_U8(0x0019e558u) != 2u) {
+        a[0] = EF_U32(0x0019e58bu);
+        a[1] = EF_U32(0x0019e58fu);
+        a[2] = EF_U32(0x0019e593u);
+        b[0] = EF_U32(0x0019e57eu);
+        b[1] = EF_U32(0x0019e582u);
+        b[2] = EF_U32(0x0019e586u);
+        direction_angles_dc91c(outAddr, aAddr, bAddr);
+        update_scene_angle_first(scene, out[1]);
+        update_scene_angle_second(scene, out[0]);
+        EF_U16(0x0019e5d7u) = (uint16_t)angle_d13ec(scene);
+    }
+    if (EF_U8(0x0019e558u) == 2u) {
+        update_scene_angle_first(scene, EF_U16(0x0019e5a7u));
+        update_scene_angle_second(scene, EF_U16(0x0019e5a5u));
+        if (EF_U8(0x0019e557u) == 0u) {
+            EF_U16(0x0019e5d3u) = (uint16_t)angle_d13ac(scene);
+            EF_U16(0x0019e5d5u) = (uint16_t)forward_pair_d13dc(scene);
+            if (EF_U16(0x0019e5a5u) != 0u)
+                EF_U8(0x001a6d1fu) = 1u;
+            if (EF_U16(0x0019e5a7u) != 0u)
+                EF_U8(0x001a6d1fu) = 1u;
+        }
+        EF_U16(0x0019e5d7u) = (uint16_t)angle_d13ec(scene);
+    }
+}
