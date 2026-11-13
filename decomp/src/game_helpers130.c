@@ -4881,3 +4881,54 @@ void show_title_sequence_97dcc(void)
 	init_pattern_display_e4188();
 	update_view_scale_dc314();
 }
+
+/* Original 0xbed1c (415 bytes): walk the linked list at *list and, for every
+ * node matching `kind`/`ctx` that is pending, create one record per table
+ * entry (0xfbad8 / 0xbdd64) and, when a matching node exists, count it on the
+ * node and hand it to 0xbe59c with a random pick in [0, n-2].  Returns the last
+ * 0xbe59c result or `value` (six stack arguments, callee cleans up). */
+uint16_t scan_list_bed1c(ef_addr32 list, uint16_t value, uint8_t kind, uint32_t ctx,
+                         uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5)
+{
+	uint32_t cur;
+	uint32_t table;
+
+	cur = EF_U32(list);
+	table = find_node_by_byte_b(kind, ctx);
+	while (cur != 0) {
+		if ((uint16_t)guest_fn_cc1ac(kind, EF_U8(cur + 9u), ctx) != 0 &&
+		    (uint16_t)record_pending_becf8(cur) != 0 && table != 0) {
+			int32_t i = 0;
+
+			for (;;) {
+				uint32_t tp = EF_U32(table + 0x18u) +
+				              (uint32_t)((int32_t)(int16_t)scan_code_to_function_key_beb20(EF_U8(cur + 0xbu)) * 2);
+				uint32_t esi;
+				uint32_t ebp;
+				int32_t i16;
+
+				if ((int16_t)i >= EF_S16(tp))
+					break;
+				esi = guest_fn_fbad8_x(cur, kind, a2, 0, 0);
+				i16 = (int32_t)(int16_t)value;
+				ebp = guest_fn_bdd64_x(esi, a0, a1, EF_U32(cur + 0x16u), EF_U32(cur + 0x1au),
+				                       (uint32_t)i16, a4, ctx, a2);
+				if (ebp != 0 &&
+				    (uint16_t)find_node_matching_cc51c(EF_U8(ebp + 0xbu), ctx, EF_U8(esi + 1u)) != 0) {
+					int32_t n;
+					int32_t pick;
+
+					EF_U8(cur + 0x30u) = (uint8_t)(EF_U8(cur + 0x30u) + 1);
+					n = EF_S32(ebp + 0x46u) >> 16;
+					pick = (int32_t)(uint16_t)step_generator_a45b3() % (n - 1);
+					value = guest_fn_be59c(esi, cur, 0, ebp, (uint32_t)i16, 0, 1, a2, a3, a5, a4, a0, a1,
+					                       (uint32_t)(int32_t)(int16_t)pick, ctx);
+				}
+				free_entry_array_b16c0(esi);
+				i++;
+			}
+		}
+		cur = EF_U32(cur + 4u);
+	}
+	return value;
+}
