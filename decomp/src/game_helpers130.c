@@ -3525,3 +3525,57 @@ uint16_t process_group_nodes_c0624(uint16_t value, uint8_t type, uint8_t group, 
     }
     return value;
 }
+
+/* Original 0x74584 (404 bytes). Release object ID: drop the back-link of the
+ * object it was attached to, on first call mark it (bit 0x10 of +0x24) and
+ * publish its position / state, then run the one-off teardown (state word
+ * +0x22 counts down from 0x113 / 0x2d) and finally set bit 4. */
+void release_object_74584(int16_t id)
+{
+    ef_addr32 obj, other;
+    uint8_t flags;
+
+    obj = lookup_filtered_indexed_object(id);
+    if (obj == 0u)
+        return;
+    if (EF_U16(obj + 0x146u) != 0xffu) {
+        other = lookup_filtered_indexed_object((int16_t)((int32_t)EF_U32(obj + 0x144u) >> 16));
+        if (other != 0u && (uint32_t)EF_U16(other + 0x158u) == (uint32_t)(int32_t)id) {
+            EF_U32(other + 0x15au) = 0;
+            EF_U32(other + 0x15eu) = 0;
+            EF_U16(other + 0x158u) = 0xffu;
+        }
+    }
+    flags = EF_U8(obj + 0x24u);
+    if ((flags & 0x10u) == 0u) {
+        EF_U8(obj + 0x24u) = (uint8_t)(flags | 0x10u);
+        pack_runtime_position(-1, (int32_t)EF_U32(obj) >> 8, (int32_t)EF_U32(obj + 8u) >> 8, 0u);
+        guest_fn_10750_x((int32_t)id, 1, 0x64);
+        if (EF_U8(0x00127da9u) != 0u)
+            send_packet_2b(id, 1, 0x64);
+    }
+    if ((EF_U8(obj + 0x24u) & 2u) != 0u) {
+        EF_U16(obj + 0x22u) = 0;
+        EF_U8(obj + 0x24u) = (uint8_t)(EF_U8(obj + 0x24u) & 0xfdu);
+    }
+    if (EF_U16(obj + 0x22u) == 0u && (EF_U8(obj + 0x24u) & 4u) == 0u) {
+        if (EF_U8(0x00127da9u) != 0u) {
+            if ((uint32_t)EF_U8(0x001a666bu) == (uint32_t)EF_U16(obj + 0x18u) ||
+                ((int32_t)EF_U32(obj + 0x16u) >> 16) == 0xff)
+                send_word_packet_2e((uint16_t)id);
+        }
+        EF_U16(obj + 0x22u) = 0x113u;
+        if (object_uses_secondary_grid(id) != 0u && EF_U8(0x00127da8u) == 0u)
+            EF_U16(obj + 0x18u) = 0xffu;
+        report_tactical_object_action(obj);
+        if (EF_U16(0x001f71cau) == (uint16_t)id) {
+            if (EF_U8(0x00127da8u) == 0u)
+                EF_U16(0x00126516u) = 1u;
+            EF_U16(obj + 0x22u) = 0x2du;
+            EF_U8(0x001a3647u) = 0;
+            transform_by_attitude_74228(obj);
+            record_scene_event(EF_U32(obj + 0x12u) == 0u ? 0x45 : 0x42);
+        }
+    }
+    EF_U8(obj + 0x24u) = (uint8_t)(EF_U8(obj + 0x24u) | 4u);
+}
