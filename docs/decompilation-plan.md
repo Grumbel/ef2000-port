@@ -2274,3 +2274,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 per-heap allocation: 0x110410 isolated/audited, eleven flat-selector comparisons pass; outer/block composition passes nine cases. Real extender growth, heap lifecycle, native selector binding and source-only startup/menu remain incomplete.
 
 2026-11-13 full post-load comparison: twenty recovered C entries match original parser/name/fixup/scene sequence on both real gui.par resources with prepared heap/RAM. Ten name/real-heap cases pass; 0x1105c3 remains original on failure due to three-byte entry extent. Cold startup, real archive I/O and working main menu remain incomplete.
+
+2026-11-13 heap-initialization continuation: isolated descriptor insertion 0x10d5c7 passes five original comparisons. Growth 0x10d80b still requires DOS/selector-limit bindings and initial-block release; source-only startup/menu remains incomplete.
