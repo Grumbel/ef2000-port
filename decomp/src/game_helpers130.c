@@ -4120,3 +4120,48 @@ void draw_compass_strip_3bf44(int16_t col, int16_t dy, int16_t ang)
 			break;
 	}
 }
+
+/* Original 0x84b8: refresh an object's best sub-entry. ESI is an extra
+ * register input that is forwarded as ECX to the 0x46254 notification on the
+ * "no free slot" paths. */
+void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in)
+{
+	uint32_t off = (uint32_t)((int32_t)obj * 0xca);
+	uint32_t base = EF_U32(0x0019bb58u);
+	uint8_t best, slot;
+	uint32_t rec, ent;
+	int i;
+
+	best = find_min_metric_index_8184(base + off + 0x61u);
+	base = EF_U32(0x0019bb58u);
+	EF_U8(base + off + 0x5fu) = best;
+	if (EF_U8(0x001285a1u + (uint32_t)EF_U8(base + off + 0x19u) * 0xe5u) != 0u) {
+		for (i = 0; i < 6; i++)
+			guest_fn_46254(0x899u, (int32_t)EF_S16(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)obj * 0xca) + 0x50u + (uint32_t)(2 * i)),
+			               0x55u, 0u, 0u, 0u);
+		return;
+	}
+	slot = find_free_slot_825c(best);
+	if (slot == 0xfe) {
+		guest_fn_46254(0x899u, (int32_t)EF_S16(EF_U32(0x0019bb58u) + off + 0x50u), 0x57u, esi_in, 0xfeu, 0u);
+		return;
+	}
+	if (slot == 0xff) {
+		guest_fn_46254(0x899u, (int32_t)EF_S16(EF_U32(0x0019bb58u) + off + 0x50u), 0x56u, esi_in, 0xffu, 0u);
+		return;
+	}
+	rec = EF_U32(0x001972e0u) + (uint32_t)best * 34u;
+	ent = EF_U32(rec + 0x16u) + (uint32_t)slot * 56u;
+	if (EF_S16(ent + 0x20u) != 0xff && EF_U16(ent + 0x20u) != (uint16_t)obj)
+		return;
+	flag_sub_entry_side_8394(best, slot);
+	rec = EF_U32(0x001972e0u) + (uint32_t)best * 34u;
+	EF_U8(EF_U32(rec + 0x16u) + (uint32_t)slot * 56u + 0x25u) = 1;
+	EF_U16(EF_U32(rec + 0x16u) + (uint32_t)slot * 56u + 0x20u) = (uint16_t)obj;
+	EF_U8(EF_U32(rec + 0x16u) + (uint32_t)slot * 56u + 0x26u) = 1;
+	{
+		int32_t h = sub_entry_heading_8424(best, slot);
+		guest_fn_46254(0x899u, (int32_t)EF_S16(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)obj * 0xca) + 0x50u),
+		               0x54u, (uint32_t)(int32_t)(int16_t)h, (uint32_t)slot, 0u);
+	}
+}

@@ -119,7 +119,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000082b8	219	mark_entry_at_point_82b8	float_helpers8	compiles	game	confirmed	decomp/tests/0x000082b8.json	docs/compiler-abi.md; Find the first unmarked entry of the cell containing the scaled point and mark it.; callers 882b0@88304; guest pending
 0x00008394	144	flag_sub_entry_side_8394	float_helpers3	compiles	game	confirmed	decomp/tests/0x00008394.json	docs/compiler-abi.md; Flag a sub-entry as ahead (1) or behind (0xff) from a direction test.; callers 84b8@85df,8fe4@905d; guest pending
 0x00008424	145	sub_entry_heading_8424	float_helpers3	compiles	game	confirmed	decomp/tests/0x00008424.json	docs/compiler-abi.md; Scaled heading of a sub-entry as an integer angle, wrapped positive.; callers 84b8@861a,8cc4@8dbc; guest pending
-0x000084b8	410			unknown	game	unverified		
+0x000084b8	410	assign_object_sub_entry_84b8	game_helpers130	compiles	game	confirmed	decomp/tests/0x000084b8.json	Original 0x84b8 (410 bytes)
 0x00008654	242	step_activity_slot_8654	game_helpers55	compiles	game	confirmed	decomp/tests/0x00008654.json	docs/compiler-abi.md; Advance a unit's activity slot, nudging the object it refers to.; callers 8cc4@8d22; guest pending
 0x00008748	1401			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00008cc4	648			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).

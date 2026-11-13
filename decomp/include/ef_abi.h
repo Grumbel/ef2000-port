@@ -4393,6 +4393,8 @@ int16_t classify_view_sample_39548(ef_addr32 p, int16_t d, int16_t m); /* 0x3954
 void init_angle_tables_3bd50(void); /* 0x3bd50 */
 void draw_compass_strip_3bf44(int16_t col, int16_t dy, int16_t ang); /* 0x3bf44 */
 void pair_word_dc5a9(int32_t x, int32_t y, ef_addr32 dst); /* 0xdc5a9 stack-only, ret 0xc */
+void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in); /* 0x84b8 */
+#pragma aux assign_object_sub_entry_84b8 parm [eax] [esi]
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
