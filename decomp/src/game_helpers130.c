@@ -2436,3 +2436,97 @@ void collect_group_nodes_be7e4(ef_addr32 ctx, ef_addr32 headPtr, uint32_t value,
         }
     }
 }
+
+/* Original 0xccdbc (882 bytes). Gather up to COUNT matching nodes from the
+ * list whose head pointer is *HEADPTR (type B, unclaimed, same 64-bit key as
+ * KEY, kind not 1/2 and pair-matching), claim them for request A, then create
+ * the request object (type 2/0x14, 0x7c-byte group, 0x19-byte detail record),
+ * insert it into the list and return A + 1. */
+uint32_t build_group_request_ccdbc(uint32_t a, uint8_t b, uint8_t count, ef_addr32 key,
+                                   ef_addr32 owner, uint32_t arg1, ef_addr32 headPtr,
+                                   uint32_t arg3, uint32_t arg4)
+{
+    ef_addr32 table, node, req, grp, detail;
+    int16_t n = 0;
+    int16_t i;
+
+    (void)arg3;
+    table = guest_fn_cc6c0_x((uint32_t)count * 2u, 0x0018f454u);
+    node = EF_U32(headPtr);
+    while (node != 0u && n < (int16_t)count) {
+        if (EF_U8(node + 0xcu) == b && EF_U16(node + 9u) == 0u &&
+            EF_U32(node + 0x3bu) == EF_U32(key) && EF_U32(node + 0x3fu) == EF_U32(key + 4u) &&
+            EF_U8(node + 0xdu) != 1u && EF_U8(node + 0xdu) != 2u &&
+            ((uint16_t)pair_matches_cc7e8(EF_U8(node + 0xbu), EF_U8(node + 0xcu)) != 0u ||
+             (uint16_t)pair_matches_cc81c(EF_U8(node + 0xbu), EF_U8(node + 0xcu)) != 0u)) {
+            EF_U16(node + 0x21u) = 0u;
+            EF_U16(node + 9u) = 1u;
+            EF_U16(node + 0x19u) = (uint16_t)a;
+            EF_U16(owner + 0x32u) = (uint16_t)(EF_U16(owner + 0x32u) - 1u);
+            EF_U16(table + (uint32_t)((int32_t)n * 2)) = EF_U16(node + 0x13u);
+            n++;
+        }
+        node = EF_U32(node + 4u);
+    }
+
+    req = guest_fn_cc6c0_z(0x1bu, 0x0018f484u, 0x1bu);
+    EF_U8(req + 9u) = 2u;
+    EF_U8(req + 0xau) = 0x14u;
+    EF_U8(req + 0xcu) = 0u;
+    EF_U16(req + 0xeu) = 0xffffu;
+    EF_U8(req + 0x12u) = 1u;
+    EF_U16(req + 0x17u) = 0u;
+    EF_U16(req + 0x19u) = 0u;
+    EF_U8(req + 0xbu) = EF_U8(owner + 9u);
+    EF_U16(req + 0x10u) = (uint16_t)a;
+    grp = guest_fn_cc6c0_z(0x7cu, 0x0018f4c0u, 0x7cu);
+    EF_U32(req + 0x13u) = grp;
+    EF_U8(grp) = b;
+    EF_U8(grp + 1u) = count;
+    EF_U8(grp + 2u) = 3u;
+    EF_U8(grp + 3u) = 0u;
+    EF_U32(grp + 8u) = EF_U32(owner + 0x16u);
+    EF_U32(grp + 0xcu) = EF_U32(owner + 0x1au);
+    EF_U32(grp + 0x10u) = EF_U32(owner + 0x1eu);
+    EF_U16(grp + 0x14u) = EF_U16(key + 0xcu);
+    EF_U16(grp + 0x16u) = EF_U16(key + 0xeu);
+    EF_U16(grp + 0x18u) = EF_U16(key + 0x10u);
+    EF_U8(grp + 0x3au) = 0xffu;
+    EF_U32(grp + 0x3bu) = 0u;
+    fill_bytes_b3fb0(grp + 0x3fu, 0u, 0x12u);
+    EF_U32(grp + 0x69u) = 0u;
+    EF_U32(grp + 0x51u) = 0u;
+    fill_bytes_b3fb0(grp + 0x55u, 0u, 0x14u);
+    EF_U32(grp + 0x74u) = 0u;
+    EF_U8(grp + 0x6du) = 0xffu;
+    EF_U16(grp + 0x6eu) = 0xffffu;
+    EF_U16(grp + 0x70u) = 0xffffu;
+    EF_U16(grp + 0x72u) = 1u;
+    EF_U32(EF_U32(req + 0x13u) + 0x78u) = guest_fn_cc6c0_z((uint32_t)count * 2u, 0x0018f4f8u, 2u);
+    for (i = 0; i < (int16_t)count; i++)
+        EF_U16(EF_U32(EF_U32(req + 0x13u) + 0x78u) + (uint32_t)((int32_t)i * 2)) =
+            EF_U16(table + (uint32_t)((int32_t)i * 2));
+    grp = EF_U32(req + 0x13u);
+    EF_U16(grp + 0x1au) = 0u;
+    EF_U16(grp + 0x1cu) = 1u;
+    EF_U16(grp + 0x1eu) = 0u;
+    detail = guest_fn_cc6c0_z(0x19u, 0x0018f52cu, 0x19u);
+    EF_U32(EF_U32(req + 0x13u) + 0x20u) = detail;
+    EF_U32(detail) = EF_U32(owner + 0x16u);
+    EF_U32(detail + 4u) = EF_U32(owner + 0x1au);
+    EF_U16(detail + 8u) = EF_U16(key + 0xcu);
+    EF_U16(detail + 0xau) = EF_U16(key + 0xeu);
+    EF_U16(detail + 0xcu) = 0u;
+    EF_U16(detail + 0xeu) = 0u;
+    EF_U16(detail + 0x10u) = EF_U16(0x001379a0u);
+    EF_U16(detail + 0x12u) = EF_U16(0x001379a2u);
+    EF_U16(detail + 0x14u) = EF_U16(0x001379a4u);
+    EF_U16(detail + 0x16u) = 0u;
+    EF_U8(detail + 0x18u) =
+        ((uint16_t)node_has_negative_flag_cc468(EF_U8(owner + 9u), arg4) != 0u) ? 0xfu : 0xeu;
+    guest_fn_bc570_x(req, arg1, headPtr);
+    a++;
+    if (table != 0u)
+        guest_fn_cc768(table);
+    return a;
+}

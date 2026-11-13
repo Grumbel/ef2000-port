@@ -2422,3 +2422,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered `reserve_requirements_bd92c` (0xbd92c). Fuzz PASS on 245 completed cases.
 
 - 2026-11-13 `collect_group_nodes_be7e4` (0xbe7e4): group/node collection helper recovered; isolated fuzz PASS (387 completed of 1000).
+
+- 2026-11-13 `build_group_request_ccdbc` (0xccdbc): request builder recovered from disassembly; isolated fuzz weak (0 completed of 1000, random inputs fault in the original).

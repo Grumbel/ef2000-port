@@ -2932,7 +2932,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc894	74	pick_variant_cc894	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc894.json	docs/compiler-abi.md; ; callers afc5c@afca9; guest pending
 0x000cc8e0	3	return_esc_cc8e0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000cc8e0.json	docs/compiler-abi.md; Returns the ESC scan code.; callers bcf44@bcff2; guest pending
 0x000cc90c	1199			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x000ccdbc	882			unknown	game	unverified		
+0x000ccdbc	882	build_group_request_ccdbc	game_helpers130	compiles	game	confirmed	decomp/tests/0x000ccdbc.json	Original 0xccdbc (882 bytes)
 0x000cd12e	34	stdout_printf_cd12e	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000cd12e.json	docs/compiler-abi.md; printf to the standard output stream at 0x16043e (cdecl, variadic).; callers fecc@ff8b,1001c@1034d,1001c@10524; guest pending
 0x000cd150	113	open_entry_cd150	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cd150.json	docs/compiler-abi.md; ; callers 1e214@1e220,1e28c@1e2c6,1e3c4@1e3f3; guest pending
 0x000cd20c	63	script_store_step_cd20c	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cd20c.json	docs/compiler-abi.md; Store value into the output table and step the script cursor.; callers 57480@575f3,8d11c@8d18c,8d330@8d39f; guest pending
