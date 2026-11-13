@@ -4753,3 +4753,59 @@ void load_record_a1ec8(void)
 	p = EF_U32(0x0041717cu);
 	read_checked_a1afc(EF_U32(0x00417174u) + 0xbu + (uint32_t)EF_U8(p + 1u) * 0x1du, EF_U8(p));
 }
+
+/* Original 0x8cd78 (406 bytes): reposition object `id` (called with a unit
+ * index in AX).  Skipped unless the object belongs to the local side (or has
+ * the 0xff owner) and is not flagged 4.  For the local object it also resets
+ * the working state and updates the per-side counters; then it snapshots the
+ * object position, clears its link words and notifies the remote side. */
+void reset_object_position_8cd78(int16_t id)
+{
+	uint32_t obj;
+	int32_t x, y, z;
+	uint32_t result;
+
+	obj = lookup_filtered_indexed_object(id);
+	if (obj == 0)
+		return;
+	if (EF_U16(obj + 0x18u) != (uint16_t)EF_U8(0x001a666bu) && EF_S16(obj + 0x18u) != 0xff)
+		return;
+	if (EF_U8(obj + 0x24u) & 4u)
+		return;
+	if ((uint16_t)id == EF_U16(0x001f71ceu)) {
+		uint32_t side;
+
+		EF_U8(0x001a363au) = 1;
+		reset_working_state_e76c8();
+		side = EF_U8(0x001a666bu);
+		EF_U8(0x001a3638u) = 0;
+		EF_U8(0x001a363fu) = 0;
+		if ((int32_t)side < 8 && EF_U8(0x00127da8u) != 0) {
+			EF_U16(0x001a6378u + side * 2u) = (uint16_t)(EF_U16(0x001a6378u + side * 2u) + 1);
+			if (EF_U8(0x0012584bu) == 3)
+				EF_U16(0x001a6398u + side * 2u) = (uint16_t)(EF_U16(0x001a6398u + side * 2u) - 8);
+			else
+				EF_U16(0x001a6398u + side * 2u) = (uint16_t)(EF_U16(0x001a6398u + side * 2u) - 4);
+			send_owner_summary_56a4c();
+			send_packet_2c(0, (uint8_t)EF_U8(0x001a666bu), 1, 0, 0);
+		}
+	}
+	x = EF_S32(obj) >> 8;
+	y = EF_S32(obj + 4u) >> 8;
+	z = EF_S32(obj + 8u) >> 8;
+	result = read_plane_cell(0, EF_S32(obj) >> 0x13, EF_S32(obj + 8u) >> 0x13);
+	EF_U32(obj + 0x12u) = 0;
+	EF_U8(0x001a3608u) = 1;
+	EF_U32(obj + 0x91u) = 0;
+	EF_U16(0x001a3615u) = (uint16_t)result;
+	EF_U32(obj + 0x95u) = 0;
+	EF_U8(obj + 0x26u) &= 0xf7u;
+	EF_U32(0x001a3609u) = (uint32_t)x;
+	EF_U32(0x001a360du) = (uint32_t)y;
+	EF_U32(0x001a3611u) = (uint32_t)z;
+	guest_fn_7ef14_x();
+	guest_fn_106b0_x(0xffffffffu, (uint32_t)x, (uint32_t)y, (uint32_t)z, 0);
+	send_or_defer_748f4(id, 0, 0, 100);
+	if (EF_U8(obj + 0x22fu) != 0)
+		clear_panel_strip((int16_t)(EF_S32(obj + 0x20bu) >> 16));
+}

@@ -3373,3 +3373,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004e360	draw_route_overlay_4e360			ebx,ecx,edx,esi,edi,ebp	0	Original 0x4e360 (602 bytes); route polygon and leg markers
 0x00058d64	init_game_state_58d64			ebx,ecx,edx,esi,edi	0	Reset latches/links/tables then store mission/HUD scalar defaults; mode limits; probe 0x913dc(0xff,4,2,3)
 0x000a1ec8	load_record_a1ec8			ebx,ecx,edx,esi,edi	0	Read one record from the stream into 0x417174, or skip it on header mismatch
+0x0008cd78	reset_object_position_8cd78	AX:int16_t		ebx,ecx,edx,esi,edi	0	Snapshot object position, clear link words, update local counters and notify remote side
