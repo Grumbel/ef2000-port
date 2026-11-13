@@ -135,7 +135,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00009820	1560			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads edi on entry) or carry-flag results that the C ABI cannot express.
 0x00009e38	103	find_kind8_entry_9e38	game_helpers14	compiles	game	confirmed	decomp/tests/0x00009e38.json	docs/compiler-abi.md; Find the 25-byte entry of kind 8 (the last one) and copy its fields out.; callers 9ea0@a228,357ec@3599c; guest pending
 0x00009ea0	1337			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
-0x0000a3dc	477			unknown	unclassified	unverified		
+0x0000a3dc	477	dump_selected_group_a3dc	game_helpers130	compiles	game	confirmed	decomp/tests/0x0000a3dc.json	Original 0xa3dc (477 bytes)
 0x0000a5bc	28	run_named_widget_a5bc	leaf_helpers2	compiles	game	confirmed	decomp/tests/0x0000a5bc.json	docs/compiler-abi.md; Find a named widget and hand it to 0xc868.; callers ba5c@bb3b,bfcc@c284; guest pending
 0x0000a5d8	292	gpwCampAccepted		named	game	unverified		
 0x0000a6fc	371	gpwFlyMission		named	game	unverified		

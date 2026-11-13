@@ -912,3 +912,49 @@ void apply_camera_keys_3287c(void)
         EF_U16(0x0019e5a7u) = (d1 > d2) ? (uint16_t)lo : (uint16_t)hi;
     }
 }
+
+/* 0xa3dc, 477 bytes. Write a text report of the selected group (index 0x125833) and member (byte 0x125837) of the list at 0x137960 to the stream opened by 0xbc36a: group number, position words, a name looked up from the object type byte, member number, the member's name from table 0x13315c (or a placeholder), its first byte, whether any of its records has state 5, and whether the group's word at +0x17 is set, then close the stream. */
+void dump_selected_group_a3dc(void)
+{
+    int16_t member = (int16_t)EF_U8(0x00125837u);
+    uint32_t stream = run_if_available_bc36a(0x00180660u, 0x0018065cu);
+    uint16_t found = 0u;
+    ef_addr32 node;
+    ef_addr32 rec;
+    ef_addr32 data;
+    ef_addr32 name;
+    int16_t i;
+
+    if (stream == 0u)
+        return;
+    node = list_nth(0x00137960u, (uint32_t)(EF_S32(0x00125833u) >> 16));
+    if (node == 0u)
+        return;
+    guest_fn_bc400(stream, 0x0018066cu, (int32_t)(int16_t)EF_U16(0x00125835u) + 1);
+    rec = EF_U32(node + 0x13u) + (uint32_t)((int32_t)member * 124);
+    data = EF_U32(rec + 0x20u);
+    guest_fn_bc400(stream, 0x00180690u, (int32_t)EF_S16(data + 0x10u), (int32_t)EF_S16(data + 0x12u),
+                   (int32_t)EF_S16(data + 0x14u));
+    guest_fn_bc400(stream, 0x001806acu, EF_U32(0x00132ee4u + (uint32_t)EF_U8(node + 0xau) * 4u));
+    guest_fn_bc400(stream, 0x001806b8u, (uint32_t)EF_U8(0x00125837u) + 1u);
+    rec = EF_U32(node + 0x13u) + (uint32_t)((int32_t)member * 124);
+    name = EF_U32(rec + 0x51u);
+    if (name != 0u)
+        guest_fn_bc400(stream, 0x001806c4u, EF_U32(0x0013315cu + (uint32_t)EF_U8(name) * 4u));
+    else
+        guest_fn_bc400(stream, 0x001806d0u);
+    guest_fn_bc400(stream, 0x001806f8u,
+                   (uint32_t)EF_U8(EF_U32(node + 0x13u) + (uint32_t)((int32_t)member * 124) + 1u));
+    for (i = 0;; i++) {
+        rec = EF_U32(node + 0x13u) + (uint32_t)((int32_t)member * 124);
+        if (i >= (int16_t)EF_U16(rec + 0x1cu))
+            break;
+        if (EF_U8(EF_U32(rec + 0x20u) + (uint32_t)((int32_t)i * 25) + 0x18u) == 5u)
+            found++;
+    }
+    guest_fn_bc400(stream, 0x00180708u);
+    guest_fn_bc400(stream, found != 0u ? 0x00180714u : 0x0018071cu);
+    guest_fn_bc400(stream, 0x00180720u);
+    guest_fn_bc400(stream, EF_U16(node + 0x17u) != 0u ? 0x00180714u : 0x0018071cu);
+    guest_fn_bc421_w(stream);
+}

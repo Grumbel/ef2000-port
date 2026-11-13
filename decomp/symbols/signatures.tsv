@@ -3315,3 +3315,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00031b40	update_view_angles_31b40			ebx,ecx,edx	0	Original 0x31b40 (462 bytes)
 0x000324b0	aim_angles_to_point_324b0	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32		esi,edi,ebp	0	Original 0x324b0 (488 bytes)
 0x0003287c	apply_camera_keys_3287c			ebx,ecx,edx,esi,edi	0	Original 0x3287c (512 bytes)
+0x0000a3dc	dump_selected_group_a3dc			ebx,ecx,edx,esi,edi,ebp	0	Original 0xa3dc (477 bytes)

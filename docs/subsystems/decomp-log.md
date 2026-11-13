@@ -2372,3 +2372,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0x324b0 `aim_angles_to_point_324b0`: direction angles with clamp windows (fuzz PASS 381).
 
 - 0x3287c `apply_camera_keys_3287c`: key-driven camera zoom/angle steps with limit windows (fuzz PASS 1000).
+
+- 0xa3dc `dump_selected_group_a3dc`: text report of selected group; fuzz weak (stream/list globals), logic decoded from disassembly.
