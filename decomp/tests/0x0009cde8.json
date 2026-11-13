@@ -1,1 +1,252 @@
-{"address":"0x0009cde8","function_size":154,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000","ebx":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x0009cde8",
+  "function_size": 154,
+  "cases": [
+    {
+      "name": "memory_read_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 0,
+        "ebx": 262144
+      },
+      "memory": [
+        {
+          "address": "0x40d1e4",
+          "hex": "05001f00"
+        },
+        {
+          "address": "0x40d1ec",
+          "hex": "00001f00"
+        },
+        {
+          "address": "0x1f0000",
+          "hex": "6162636465"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0xdc832",
+          "hex": "51565789c789d689d9f3a45f5e59c3"
+        },
+        {
+          "address": "0xb3fb0",
+          "hex": "50515789c789d089d9f3aa5f5958c3"
+        }
+      ]
+    },
+    {
+      "name": "memory_read_3",
+      "registers": {
+        "eax": 1966080,
+        "edx": 3,
+        "ebx": 262144
+      },
+      "memory": [
+        {
+          "address": "0x40d1e4",
+          "hex": "05001f00"
+        },
+        {
+          "address": "0x40d1ec",
+          "hex": "00001f00"
+        },
+        {
+          "address": "0x1f0000",
+          "hex": "6162636465"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0xdc832",
+          "hex": "51565789c789d689d9f3a45f5e59c3"
+        },
+        {
+          "address": "0xb3fb0",
+          "hex": "50515789c789d089d9f3aa5f5958c3"
+        }
+      ]
+    },
+    {
+      "name": "memory_read_5",
+      "registers": {
+        "eax": 1966080,
+        "edx": 5,
+        "ebx": 262144
+      },
+      "memory": [
+        {
+          "address": "0x40d1e4",
+          "hex": "05001f00"
+        },
+        {
+          "address": "0x40d1ec",
+          "hex": "00001f00"
+        },
+        {
+          "address": "0x1f0000",
+          "hex": "6162636465"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0xdc832",
+          "hex": "51565789c789d689d9f3a45f5e59c3"
+        },
+        {
+          "address": "0xb3fb0",
+          "hex": "50515789c789d089d9f3aa5f5958c3"
+        }
+      ]
+    },
+    {
+      "name": "memory_read_8",
+      "registers": {
+        "eax": 1966080,
+        "edx": 8,
+        "ebx": 262144
+      },
+      "memory": [
+        {
+          "address": "0x40d1e4",
+          "hex": "05001f00"
+        },
+        {
+          "address": "0x40d1ec",
+          "hex": "00001f00"
+        },
+        {
+          "address": "0x1f0000",
+          "hex": "6162636465"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0xdc832",
+          "hex": "51565789c789d689d9f3a45f5e59c3"
+        },
+        {
+          "address": "0xb3fb0",
+          "hex": "50515789c789d089d9f3aa5f5958c3"
+        }
+      ]
+    },
+    {
+      "name": "route_10007",
+      "registers": {
+        "eax": 1966080,
+        "edx": 3,
+        "ebx": 65543
+      },
+      "memory": [
+        {
+          "address": "0x40d1f0",
+          "hex": "78563412efcdab89"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "00000000000000000000000000000000"
+        },
+        {
+          "address": "0xebc50",
+          "hex": "a300101e00891504101e00891d08101e00890d0c101e00b803000000c3"
+        }
+      ]
+    },
+    {
+      "name": "route_20007",
+      "registers": {
+        "eax": 1966080,
+        "edx": 3,
+        "ebx": 131079
+      },
+      "memory": [
+        {
+          "address": "0x40d1f0",
+          "hex": "78563412efcdab89"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "00000000000000000000000000000000"
+        },
+        {
+          "address": "0xebc50",
+          "hex": "a300101e00891504101e00891d08101e00890d0c101e00b803000000c3"
+        }
+      ]
+    },
+    {
+      "name": "route_30007",
+      "registers": {
+        "eax": 1966080,
+        "edx": 3,
+        "ebx": 196615
+      },
+      "memory": [
+        {
+          "address": "0x40d1f0",
+          "hex": "78563412efcdab89"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "00000000000000000000000000000000"
+        },
+        {
+          "address": "0xebc50",
+          "hex": "a300101e00891504101e00891d08101e00890d0c101e00b803000000c3"
+        }
+      ]
+    },
+    {
+      "name": "route_70007",
+      "registers": {
+        "eax": 1966080,
+        "edx": 3,
+        "ebx": 458759
+      },
+      "memory": [
+        {
+          "address": "0x40d1f0",
+          "hex": "78563412efcdab89"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "00000000000000000000000000000000"
+        },
+        {
+          "address": "0xebc50",
+          "hex": "a300101e00891504101e00891d08101e00890d0c101e00b803000000c3"
+        }
+      ]
+    },
+    {
+      "name": "route_65",
+      "registers": {
+        "eax": 1966080,
+        "edx": 3,
+        "ebx": 101
+      },
+      "memory": [
+        {
+          "address": "0x40d1f0",
+          "hex": "78563412efcdab89"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "00000000000000000000000000000000"
+        },
+        {
+          "address": "0xa79d4",
+          "hex": "8b442404a300101e008b442408a304101e008b44240ca308101e00b803000000c20c00"
+        }
+      ]
+    }
+  ]
+}
