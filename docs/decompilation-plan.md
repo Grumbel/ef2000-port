@@ -2582,3 +2582,36 @@ s_roundPackMToF128M, s_roundPackToF16/F32/F64). The raw arithmetic/conversion
 entry points compile. Exact diagnostics are in watcom-probe.json. This is
 not an integrated backend or precision/state equivalence proof; no third-party
 source, oracle dependency or floating-point approximation was committed.
+
+
+**2026-11-13 — Reproducible independent 80-bit arithmetic prerequisite.**
+Added tools/asm_softfloat.py: explicitly supplied official SoftFloat 3e archive,
+SHA-256 pinned, safe extraction and fresh ignored output directory, no network
+or vendored dependency source. Builds 237 sources in the non-FAST_INT64 8086
+specialization. Enable upstream SOFTFLOAT_ROUND_ODD so four conditional labels
+remain used; remove only the unreferenced roundPack label from s_addExtF80M
+with a no-incoming-goto check. License notices and statements remain intact.
+All 237 host objects (C99 -Werror, upstream warning profile) and all 237 Watcom
+objects (-w1 -we) compile; every compiler log is empty. Host shared-library link
+rejects unresolved symbols. Manifest binds archive/source/header/platform,
+commands, repaired source and compiled artifacts by hashes.
+Four focused tests pass, including digest/path/symlink/repair rejection and an
+opt-in synthetic arithmetic test. All 3,072 add/sub/mul/div cases match raw
+80-bit host x87 results and exception flags across three precision and four
+rounding modes. The independent hardware oracle executes synthetic opcodes,
+saving/restoring the entire x87 environment/register stack. Unicorn 2.1.4 raw
+results also match all 3,072; its observable FNSTSW flags disagree in 1,592
+cases (inexact/overflow/underflow flags absent, some invalid cases differ).
+This is a demonstrated oracle limitation, not a waived generated-C mismatch.
+No x87 instruction lifting, architectural-state ABI, stack/tags/environment,
+noncanonical/input-denormal handling, unmasked exceptions or transcendental
+coverage is claimed. Existing bulk gate remains nonzero. Integration must
+retain these gaps explicitly and use a suitable state oracle.
+Commands: tools/asm_softfloat.py --archive
+local/softfloat-probe-20261113/SoftFloat-3e.zip --output
+local/asm-softfloat-verified-build-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386;
+ASM_SOFTFLOAT_BUILD=local/asm-softfloat-verified-build-20261113 python3 -m unittest
+tests.test_asm_softfloat (Python 3.13.12/Unicorn 2.1.4). Build report and
+arithmetic-evidence.json are under that ignored directory; test log:
+local/asm-softfloat-verified-tests-20261113.log. No tracker promotion.

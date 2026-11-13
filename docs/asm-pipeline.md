@@ -334,3 +334,32 @@ and `local/asm-c-countshift-diff-20261113`. All 85 focused tests pass, with
 cross-body count-branch composition additionally rechecked. Full reliability
 still needs x87, runtime services, unresolved boundaries/targets and stronger
 application evidence; the CLI gate remains nonzero.
+
+The x87 arithmetic dependency can be built separately from a pinned official
+SoftFloat 3e archive. Third-party source and built artifacts stay ignored:
+
+```sh
+python3 tools/asm_softfloat.py --archive /path/to/SoftFloat-3e.zip \
+  --output local/asm-softfloat --watcom /path/to/wcc386
+ASM_SOFTFLOAT_BUILD=local/asm-softfloat python3 -m unittest tests.test_asm_softfloat
+```
+
+The builder verifies the archive SHA-256 before extraction, rejects unsafe
+members, requires a fresh output directory and records source/header/object/
+library digests and compiler commands. It builds the non-FAST_INT64 8086
+specialization, enables upstream round-to-odd support, and removes only an
+unreferenced `roundPack` label after checking for incoming gotos. Upstream
+license notices remain in the extracted files. Host compilation uses C99 and
+-Werror (upstream does not enable -Wall); Watcom uses -w1 -we. The shared host
+link rejects unresolved symbols. No dependency source is vendored or downloaded
+by the tool.
+
+The opt-in test requires x86-64, Unicorn and binutils. It compares add/sub/mul/div
+on canonical normal/zero operands in all three precision modes and four rounding
+modes. Raw 80-bit values are compared with both Unicorn and host x87; exception
+flags are compared with host x87. The hardware probe saves/restores the full x87
+environment and register stack. `arithmetic-evidence.json` records Unicorn status
+disagreements separately. This is an arithmetic prerequisite, not generated x87
+instruction support or an architectural-state equivalence claim. Noncanonical
+operands, input denormals, tag/stack/environment handling, unmasked exceptions,
+transcendentals, and application integration remain pending.
