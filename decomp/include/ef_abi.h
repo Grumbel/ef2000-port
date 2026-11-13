@@ -15,6 +15,8 @@ uint32_t count_positive_filtered_node_matches(uint8_t kind, ef_addr32 list_addr,
 ef_addr32 allocate_weighted_node_records(ef_addr32 list_addr, ef_addr32 count_addr); /* 0xb0018 EAX/EDX */
 int32_t guest_fn_b39ec_q(int32_t a, int32_t b, int32_t c); /* 0xb39ec EAX/EDX/EBX */
 int32_t position_delta_metric(ef_addr32 position); /* 0x23760 EAX */
+void mul_object_matrix_vector(ef_addr32 out, ef_addr32 vec, int16_t unit); /* 0x6a4c4 EAX/EDX/BX */
+void mul_object_matrix_transpose_vector(ef_addr32 vec, ef_addr32 out, int16_t unit); /* 0x6a538 EAX/EDX/BX */
 uint32_t list_has_matching_node(ef_addr32 head_addr, uint8_t a, uint8_t b); /* 0xb0208 EAX/DL/BL */
 uint32_t candidate_game_main(uint32_t argc, ef_addr32 argv);
 void guest_fn_8b2d8(void); /* 0x8b2d8: unresolved playvideo reset path */
