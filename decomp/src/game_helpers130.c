@@ -1704,3 +1704,85 @@ void draw_debug_overlay_58714(void)
         y += 8;
     }
 }
+
+/* Original 0x5e21c (677 bytes). Odometer-style number renderer.  Inputs are
+ * EAX=x offset, EDX=y offset (both shifted by the mode byte at 0x12b369) and
+ * EBX=string.  The original keeps its locals packed in overlapping stack
+ * words; the semantic locals below mirror them, including the stale "mode"
+ * dword that the minus branch overwrites with the 16-bit x position.  The
+ * string is truncated destructively one character at a time. */
+void odometer_text_5e21c(int32_t xOffset, int32_t yOffset, ef_addr32 text)
+{
+    uint32_t shift = EF_U8(0x0012b369u) & 31u;
+    int16_t x = (int16_t)(EF_U16(0x001a6cfcu) + ((uint32_t)xOffset << shift));
+    int16_t y = (int16_t)(EF_U16(0x001a6cfau) + ((uint32_t)yOffset << shift));
+    uint8_t buf[2];
+    uint8_t flag = 0u;
+    int16_t length, mode, digit, idx, width, firstWidth, X, yy, slot;
+    int32_t scaled;
+    uint32_t modeSlot;
+
+    buf[0] = (uint8_t)EF_U16(0x00058cb2u);
+    buf[1] = (uint8_t)(EF_U16(0x00058cb2u) >> 8);
+    if (text == 0u)
+        return;
+    length = (int16_t)guest_string_length(text);
+    if (length <= 1)
+        return;
+    mode = EF_U8(0x0012b369u) ? 8 : 6;
+    modeSlot = (uint32_t)(int32_t)mode;
+    scaled = ((int32_t)EF_U8(text + (uint32_t)(int32_t)length - 1u) - 0x30) * (int32_t)modeSlot;
+    digit = (int16_t)((int16_t)scaled / 10);
+    if (digit >= 10 || digit < 0)
+        return;
+    width = (int16_t)formatted_text_width_48c34(EF_U8(0x0012b369u) == 1u ? 0u : 1u, text);
+    firstWidth = width;
+    store_four_dwords_17cf9c((uint32_t)(int32_t)x, (uint32_t)((int32_t)width + x),
+                             (uint32_t)(int32_t)y, (uint32_t)((int32_t)(int16_t)modeSlot + y));
+    for (idx = (int16_t)(length - 2); idx >= 0; idx--) {
+        uint8_t c;
+        uint8_t bl;
+
+        c = EF_U8(text + (uint32_t)(int32_t)idx);
+        EF_U8(text + (uint32_t)(int32_t)idx) = 0u;
+        width = (int16_t)formatted_text_width_48c34(EF_U8(0x0012b369u) == 1u ? 0u : 1u, text);
+        X = (int16_t)(width + x);
+        bl = (uint8_t)(1u - EF_U8(0x0012b369u));
+        buf[0] = c;
+        if (c == 0x2eu) {
+            draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), bl, X, y, 0x00185fe4u);
+        } else if (c == 0x2bu) {
+            draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), bl, X, y, 0x00185fe8u);
+        } else if (c == 0x2du) {
+            yy = (int16_t)(y - digit);
+            draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), bl, X, yy,
+                                           (ef_addr32)(uintptr_t)buf);
+            modeSlot = (uint32_t)(int32_t)X;
+            slot = (int16_t)(yy + (int16_t)(uint16_t)modeSlot);
+            draw_formatted_text_mode_48bb0(EF_U8(0x00128148u),
+                                           (uint8_t)(1u - EF_U8(0x0012b369u)),
+                                           (int32_t)firstWidth,
+                                           (int16_t)slot, 0x00185fe8u);
+        } else {
+            yy = (int16_t)(y - digit);
+            draw_formatted_text_mode_48bb0(EF_U8(0x00128148u),
+                                           (uint8_t)(1u - EF_U8(0x0012b369u)), X, yy,
+                                           (ef_addr32)(uintptr_t)buf);
+            if (digit != 0) {
+                buf[0]++;
+                if (buf[0] > 0x39u) {
+                    buf[0] = 0x30u;
+                    flag = 1u;
+                } else {
+                    flag = 0u;
+                }
+                draw_formatted_text_mode_48bb0(EF_U8(0x00128148u),
+                                               (uint8_t)(1u - EF_U8(0x0012b369u)), X,
+                                               (int16_t)(yy + (int16_t)(uint16_t)modeSlot),
+                                               (ef_addr32)(uintptr_t)buf);
+            }
+            if (flag == 0u)
+                digit = 0;
+        }
+    }
+}

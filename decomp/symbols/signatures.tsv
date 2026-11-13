@@ -3327,3 +3327,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0001f994	draw_text_box_1f994	AX:int16_t,EDI:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x1f994 (1011 bytes)
 0x0002e494	record_track_sample_2e494			ebx,ecx,edx,esi,edi,ebp	0	Original 0x2e494 (681 bytes)
 0x00058714	draw_debug_overlay_58714			ebx,ecx,edx,esi,edi	0	Original 0x58714 (610 bytes)
+0x0005e21c	odometer_text_5e21c	EAX:int32_t,EDX:int32_t,EBX:ef_addr32		esi,edi,ebp,ecx	0	Original 0x5e21c (677 bytes); odometer number renderer; destructively truncates string

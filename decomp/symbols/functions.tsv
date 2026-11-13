@@ -1157,7 +1157,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005de14	243	draw_heading_marker_5de14	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005de14.json	docs/compiler-abi.md; Draw a small direction marker: with SIZE (EBX, signed word) the two points (0, 2 * SIZE) and (0, SIZE * 4 / 3) are rotat; callers 5d1c4@5d2d4,5d1c4@5d430; guest pending
 0x0005df08	678			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x0005e1b0	106	draw_cell_text_5e1b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005e1b0.json	docs/compiler-abi.md; Draw the format string FMT at cell (A, B) (scaled by the shift at 0x12b369, offset by 0x1a6cfc/0x1a6cfa) and continue wi; callers 5bd8c@5beca; guest pending
-0x0005e21c	677			unknown	game	unverified		
+0x0005e21c	677	odometer_text_5e21c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005e21c.json	Original 0x5e21c (677 bytes)
 0x0005e4c4	403			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
 0x0005e658	12	reset_unit_counter	runtime_control	verified	game	confirmed	decomp/tests/0x0005e658.json	docs/compiler-abi.md; Clear word 0x12814e; OpenWatcom direct-store body 10 bytes, preserves all GPRs; 37 isolated and 1 captured call differential pass; caller flags are overwritten before conditional use. Repeated menu/setup/cockpit replay passes; 22 cockpit hits, matching selected BSS/framebuffer/status/tick/interrupt state.
 0x0005e664	535			blocked	unclassified	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
