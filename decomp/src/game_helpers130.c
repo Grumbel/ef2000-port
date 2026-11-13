@@ -3166,3 +3166,52 @@ void draw_outline_segments_3d7b0(uint8_t a, uint8_t d, uint16_t b)
                          (uint32_t)(int32_t)(int16_t)b);
     }
 }
+
+/* Original 0x43df4 (338 bytes). Walk a node list and draw the map marker of
+ * every type-0x11 node whose group flag (positive / zero / negative) matches,
+ * using the cursor position of the matching panel as the framebuffer target. */
+void draw_group_markers_43df4(ef_addr32 head, ef_addr32 list)
+{
+    ef_addr32 node, ptr = 0;
+    uint8_t found;
+
+    node = EF_U32(list);
+    while (node != 0u) {
+        if (EF_U8(node + 0xau) == 0x11u) {
+            int32_t row, col;
+
+            found = 0;
+            if ((uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 0xbu), head) != 0u &&
+                EF_U16(0x00126554u) != 0u) {
+                row = (int32_t)EF_U32(0x0013436du) >> 16;
+                col = (int32_t)EF_U32(0x0013436bu);
+                ptr = EF_U32(0x00126570u) + (uint32_t)((col >> 16) + row * 0x280);
+                found = 1;
+            } else if ((uint16_t)group_flag_zero_cc1ec(0u, EF_U8(node + 0xbu), head) != 0u &&
+                       EF_U16(0x00126558u) != 0u) {
+                row = (int32_t)EF_U32(0x00134376u) >> 16;
+                col = (int32_t)EF_U32(0x00134374u);
+                ptr = EF_U32(0x00126570u) + (uint32_t)((col >> 16) + row * 0x280);
+                found = 1;
+            } else if ((uint16_t)group_flag_negative_cc1ac(0u, EF_U8(node + 0xbu), head) != 0u &&
+                       EF_U16(0x00126558u) != 0u) {
+                row = (int32_t)EF_U32(0x00134376u) >> 16;
+                col = (int32_t)EF_U32(0x00134374u);
+                ptr = EF_U32(0x00126570u) + (uint32_t)((col >> 16) + row * 0x280);
+                found = 1;
+            }
+            if (found != 0) {
+                ef_addr32 p13 = EF_U32(node + 0x13u);
+                uint16_t dx = EF_U16(p13 + 8u);
+                uint16_t cx = EF_U16(p13 + 0xcu);
+                int32_t x = (int16_t)(uint16_t)(dx - 0xau);
+                int32_t y = (int16_t)(uint16_t)(0x190u - cx - 0xau);
+
+                guest_fn_ca620((int32_t)ptr, x, y, 0x14u, 0x14u, 0x280u);
+                if (EF_U16(0x0012656au) != 0u)
+                    guest_fn_440f4_x(EF_U8(node + 0xbu), (uint32_t)x, (uint32_t)y, 0x14u, 0x1au, 0x280u);
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+}

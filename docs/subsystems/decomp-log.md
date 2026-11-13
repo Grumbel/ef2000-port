@@ -2438,3 +2438,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered `replay_elapsed_steps_c630` (0xc630) from disassembly; added `guest_fn_d68c_x` wrapper. Fuzz weak (0 of 1000 cases complete); disassembly-checked only.
 
 - 2026-11-13: recovered `draw_outline_segments_3d7b0` (0x3d7b0); fuzz PASS 222 completed. Clip results live in a local buffer mirroring the original unaligned stack frame.
+
+- 2026-11-13: recovered `draw_group_markers_43df4` (0x43df4). Fuzz: 98 of 100 completed cases agree; the 2 FAILs (cases 754, 822) are a harness artifact: the random list pointer 0x300132a lands inside the patched image's hand-object arena, whose bytes differ from the unpatched image's zeros (traced: next-node read hits code bytes, then faults). Callee conventions from disassembly (cc22c/cc1ec/cc1ac, ca620, 440f4).
