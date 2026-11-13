@@ -328,3 +328,11 @@ uint32_t node_position_386f8(int16_t index)
     }
     return position;
 }
+
+/* 0x23760, 48 bytes. Approximate 3D distance (b39ec) from the position record to the reference at 0x1a5bec/0x1a5bf0/0x1a5be8. */
+int32_t position_delta_metric(ef_addr32 position)
+{
+    return guest_fn_b39ec_q((int32_t)(EF_U32(position) - EF_U32(0x001a5becu)),
+                            (int32_t)(EF_U32(position + 4u) - EF_U32(0x001a5bf0u)),
+                            (int32_t)(EF_U32(position + 8u) - EF_U32(0x001a5be8u)));
+}
