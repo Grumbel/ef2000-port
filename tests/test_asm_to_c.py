@@ -46,7 +46,7 @@ class TranslationTests(unittest.TestCase):
     def test_rejects_unsupported_or_uncertain_input(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for source in ('call eax\nret', 'bswap eax\nret', 'jmp eax',
+            for source in ('call eax\nret', 'cpuid\nret', 'jmp eax',
                            'mov eax, fs:[4]\nret', 'push ax\nret', 'pop [eax]\nret',
                            'enter 8, 1\nleave\nret'):
                 with self.subTest(source=source):
@@ -92,8 +92,15 @@ class TranslationTests(unittest.TestCase):
             'imul eax, [esi], -17\nret', 'imul ax, [esi], -123\nret',
             'imul dl\nret', 'imul dx\nret', 'imul edx\nret',
             'mul dl\nret', 'mul dx\nret', 'mul edx\nret',
+            'ror eax, cl\nret', 'rcl ax, cl\nret', 'rcr al, cl\nret',
+            'rol dword ptr [esi], 16\nret', 'ror byte ptr [esi], 8\nret',
+            'bswap eax\nret', 'xchg ah, al\nret', 'xchg ax, dx\nret',
+            'xchg eax, [esi]\nret', 'xchg esi, [esi]\nret',
+            'xchg [esi], esi\nret', 'xchg word ptr [esi], dx\nret',
         ]
         sources += ['%s 1f\nmov eax, 0\nret\n1: mov eax, 1\nret' % branch
+                    for branch in asm_to_c.CONDITIONS]
+        sources += ['set%s al\nset%s byte ptr [esi]\nret' % (branch[1:], branch[1:])
                     for branch in asm_to_c.CONDITIONS]
         random_ = random.Random(0xEF2000)
         with tempfile.TemporaryDirectory() as temporary:
@@ -179,7 +186,7 @@ class TranslationTests(unittest.TestCase):
                             self.assertEqual(state.flags, cpu.reg_read(x86_const.UC_X86_REG_EFLAGS),
                                              (mnemonic, carry, a, b))
 
-    def scalar_grid(self, source, cases):
+    def scalar_grid(self, source, cases, *, allow_faults=False, oracle_unsafe=None):
         """Reuse one original CPU and native library for exhaustive small domains."""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -200,20 +207,45 @@ class TranslationTests(unittest.TestCase):
             cpu = unicorn.Uc(unicorn.UC_ARCH_X86, unicorn.UC_MODE_32)
             cpu.mem_map(0, len(memory))
             cpu.mem_write(0, bytes(memory))
-            for a, b, flags in cases:
-                initial = [a, b, b, 0x13572468, 0x800, 0x900, 0xa00, 0xb00]
+            for case in cases:
+                a, b, flags = case[:3]
+                high = case[3] if len(case) == 4 else b
+                initial = [a, b, high, 0x13572468, 0x800, 0x900, 0xa00, 0xb00]
                 for index, (name, value) in enumerate(zip(asm_to_c.REGS, initial)):
                     state.r[index] = value
                     cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
-                state.flags, state.pc = flags, 0x100
+                state.flags, state.pc, state.fault = flags, 0x100, 0
                 cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
-                cpu.emu_start(0x100, 0xf00, count=10)
-                self.assertEqual(function(ctypes.byref(state), 10), 0)
+                if oracle_unsafe and oracle_unsafe(case):
+                    # Checked against the architectural quotient bound here;
+                    # the crashing oracle case has a separate process test.
+                    self.assertEqual(function(ctypes.byref(state), 10), 5)
+                    self.assertEqual(list(state.r), initial)
+                    self.assertEqual(state.flags, flags)
+                    self.assertEqual(state.pc, 0x100)
+                    continue
+                expected_status = 0
+                try:
+                    cpu.emu_start(0x100, 0xf00, count=10)
+                except unicorn.UcError as error:
+                    if not allow_faults:
+                        raise
+                    self.assertEqual(error.errno, unicorn.UC_ERR_EXCEPTION)
+                    expected_status = 5
+                self.assertEqual(function(ctypes.byref(state), 10), expected_status, (source, case))
                 self.assertEqual(list(state.r), [cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + n.upper()))
                                                 for n in asm_to_c.REGS], (source, a, b))
                 self.assertEqual(state.flags, cpu.reg_read(x86_const.UC_X86_REG_EFLAGS),
                                  (source, a, b, hex(flags)))
-                self.assertEqual(state.pc, 0xf00)
+                self.assertEqual(state.pc, cpu.reg_read(x86_const.UC_X86_REG_EIP))
+                if expected_status == 0:
+                    self.assertEqual(state.pc, 0xf00)
+                else:
+                    # Unicorn retains pending exception state after #DE. A new
+                    # CPU is necessary before the next independent fault probe.
+                    cpu = unicorn.Uc(unicorn.UC_ARCH_X86, unicorn.UC_MODE_32)
+                    cpu.mem_map(0, len(memory))
+                    cpu.mem_write(0, bytes(memory))
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_shift_counts_all_byte_values_and_wide_boundaries(self):
@@ -239,6 +271,70 @@ class TranslationTests(unittest.TestCase):
             if operation == 'imul':
                 self.scalar_grid('imul eax, edx',
                                  ((a, b, 0xad7) for a in values for b in values))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_rotate_all_byte_values_counts_carries_and_wide_boundaries(self):
+        for operation in ('rol', 'ror', 'rcl', 'rcr'):
+            self.scalar_grid(operation + ' al, cl',
+                             ((0x12345600 | a, count, flags) for a in range(256)
+                              for count in range(256) for flags in (0x202, 0xad7)))
+            for register, width in [('ax', 16), ('eax', 32)]:
+                values = [0, 1, (1 << (width-1))-1, 1 << (width-1), (1 << width)-1]
+                self.scalar_grid(operation + ' ' + register + ', cl',
+                                 ((a, count, flags) for a in values for count in range(256)
+                                  for flags in (0x202, 0xad7)))
+            for count in (0, 1, 2, 7, 8, 9, 16, 17, 31, 32, 33, 255):
+                self.scalar_grid(operation + ' al, %d' % count,
+                                 ((a, 0, flags) for a in range(256) for flags in (0x202, 0xad7)))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_division_quotients_remainders_and_fault_boundaries(self):
+        for operation in ('div', 'idiv'):
+            self.scalar_grid(operation + ' cl',
+                             ((0x12340000 | a, b, 0xad7) for a in range(256) for b in range(256)),
+                             allow_faults=True)
+            values = [0, 1, 127, 128, 255, 256, 32767, 32768, 65408, 65535]
+            self.scalar_grid(operation + ' cl',
+                             ((0x12340000 | a, b, flags) for a in values for b in range(256)
+                              for flags in (0x202, 0xad7)), allow_faults=True)
+            for register, width in [('cx', 16), ('ecx', 32)]:
+                values = [0, 1, 2, (1 << (width-1))-1, 1 << (width-1), (1 << width)-1]
+                self.scalar_grid(operation + ' ' + register,
+                                 ((a, b, flags, high) for a in values for b in values for high in values
+                                  for flags in (0x202, 0xad7)), allow_faults=True,
+                                 oracle_unsafe=(lambda case: case[0] == 0 and case[1] == 0xffffffff and
+                                                case[3] == 0x80000000)
+                                 if operation == 'idiv' and width == 32 else None)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_worker_crashes_preserve_evidence_and_distinguish_original_from_c(self):
+        import os
+        import signal
+        from unittest.mock import patch
+        calls = 0
+        def crash_second_call(pointer, budget):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                os.kill(os.getpid(), signal.SIGSEGV)
+            state = ctypes.cast(pointer, ctypes.POINTER(asm_c_differential.State)).contents
+            state.pc = 0x3ff000
+            state.r[4] += 4
+            return 0
+        results = asm_c_differential.isolated_probes(crash_second_call, bytes(256) + b'\xc3',
+                                                    0x100, 3, 10, False)
+        self.assertEqual([r['state'] for r in results], ['pass', 'mismatch', 'inconclusive'])
+        self.assertIn('after original completed', results[1]['differences'][0])
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, _ = assemble(root, 'idiv ecx\nret')
+            registers = [0, 0xffffffff, 0x80000000, 0, 0x3f0000, 0, 0, 0]
+            with patch.object(asm_c_differential, 'probes', return_value=iter([(registers, 0x202)])):
+                results = asm_c_differential.isolated_probes(lambda pointer, budget: 5,
+                                                            image.read_bytes(), 0x100, 1, 10, False)
+            self.assertEqual(results[0]['state'], 'inconclusive')
+            self.assertTrue('original oracle worker exited' in results[0].get('reason', '') or
+                            'original fault' in results[0].get('reason', ''))
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_differential_rejects_wrong_translation_and_does_not_pass_original_fault(self):

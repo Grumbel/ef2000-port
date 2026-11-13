@@ -194,3 +194,41 @@ inconclusive outcomes and zero mismatches. 432 bodies pass all probes, including
 `local/asm-c-program-20261113` and `local/asm-c-program-diff-20261113`.
 Seventy focused tests pass; dispatcher tamper detection was additionally
 rechecked with the four program tests. No native ABI or full-coverage promotion.
+
+The next integer expansion includes ROL/ROR/RCL/RCR, DIV/IDIV, SETcc, BSWAP and
+XCHG. Rotate helpers use bounded one-bit steps and preserve zero-count flags;
+full-width ROL/ROR and effective-zero carry rotates are distinguished. Undefined
+multi-bit OF follows the measured Unicorn policy, including immediate-count
+forms. Division sign-extends without out-of-range unsigned-to-signed casts and
+checks zero divisors, quotient bounds and INT64_MIN/-1 before C division. Status
+5 reports a divide exception without modifying GPRs. SETcc reuses branch
+conditions; XCHG writes memory before changing a register used by that memory's
+address. All effects remain guest state operations, not native ABI guesses.
+
+The verifier now uses one forked worker per entry, reporting whether it is in
+original execution, C execution or comparison. Completed probes survive worker
+failure. A crash in original execution is explicitly inconclusive; a C crash
+after the original completes is a mismatch; remaining unexecuted probes are
+inconclusive. Unexpected setup/comparison failures abort the report. No failed
+probe is retried or counted as passing. Core dumps are disabled in workers.
+This runner requires a Unix Python environment with fork support; generated C
+continues to compile independently with the host compiler and OpenWatcom.
+
+Unicorn 2.1.4 SIGFPE was reproduced in a separate process for IDIV ECX with
+EDX:EAX = 0x80000000:0 and ECX = 0xffffffff. That oracle case is not claimed as
+matching evidence. The C divide-exception guard is checked separately against
+the quotient bound under UBSan, and the process-isolation regression executes
+the problematic original in a child. Repeated ordinary #DE probes also require
+a fresh Unicorn CPU after a fault to avoid retained pending exception state.
+The byte/count/carry rotate grids, immediate-count checks, byte division grids,
+wide quotient/fault boundaries and existing suites total 73 passing tests.
+
+2026-11-13 rotate/divide corpus: 2,815 syntax-supported bodies; dependency
+closure selects 1,178 (117,186 body bytes), including 439 with cross-body
+dependencies. All body objects and the dispatcher compile warning-free with
+OpenWatcom. The isolated 18,848 probes produce 12,410 passes, 6,438 original-
+fault/budget inconclusive outcomes, zero worker failures and zero mismatches.
+523 bodies pass all probes (172 with cross-body dependencies); 655 remain
+inconclusive. Artifacts: `local/asm-c-rotdiv-program-20261113` and
+`local/asm-c-rotdiv-diff-20261113`. Synthetic crash regressions are separate
+from these corpus counts. Full coverage and native integration remain unproven.

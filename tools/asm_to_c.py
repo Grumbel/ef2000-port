@@ -152,6 +152,64 @@ static uint64_t ef_multiply(ef_lift_state *s, uint32_t a, uint32_t b,
     if (overflow) s->flags |= 0x801u;
     return product;
 }
+static uint32_t ef_rotate(ef_lift_state *s, uint32_t value, uint32_t count,
+                          unsigned width, unsigned operation) {
+    uint32_t carry = s->flags & 1u, next_carry, overflow, original_sign;
+    value &= ef_mask(width); count &= 31u;
+    if (operation >= 2) count %= width + 1;
+    if (!count) return value;
+    original_sign = value >> (width-1);
+    while (count--) {
+        if (!(operation & 1u)) {
+            next_carry = value >> (width-1);
+            value = ((value << 1) | (operation == 2 ? carry : next_carry)) & ef_mask(width);
+        } else {
+            next_carry = value & 1u;
+            value = (value >> 1) | ((operation == 3 ? carry : next_carry) << (width-1));
+        }
+        carry = next_carry;
+    }
+    /* Include the oracle's undefined multi-bit OF policy in comparisons. */
+    overflow = operation >= 2 ? original_sign ^ (value >> (width-1)) :
+        operation == 0 ? (value >> (width-1)) ^ carry :
+        ((value >> (width-1)) ^ (value >> (width-2))) & 1u;
+    s->flags = (s->flags & ~0x801u) | carry | (overflow << 11);
+    return value;
+}
+static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
+                       unsigned signed_operation) {
+    uint64_t dividend, quotient, remainder;
+    int64_t numerator, denominator, signed_quotient, signed_remainder, limit;
+    uint32_t mask = ef_mask(width);
+    divisor &= mask;
+    if (!divisor) { s->fault = 5; return; }
+    dividend = width == 8 ? s->r[0] & 0xffffu :
+        ((uint64_t)(s->r[2] & mask) << width) | (s->r[0] & mask);
+    if (signed_operation) {
+        numerator = width == 32 ? ((dividend >> 63) ?
+            -1 - (int64_t)(~dividend) : (int64_t)dividend) :
+            ef_signed((uint32_t)dividend, width*2);
+        denominator = ef_signed(divisor, width);
+        if (numerator == INT64_MIN && denominator == -1) { s->fault = 5; return; }
+        signed_quotient = numerator / denominator;
+        signed_remainder = numerator % denominator;
+        limit = (int64_t)1 << (width-1);
+        if (signed_quotient < -limit || signed_quotient >= limit) { s->fault = 5; return; }
+        quotient = (uint64_t)signed_quotient;
+        remainder = (uint64_t)signed_remainder;
+    } else {
+        quotient = dividend / divisor; remainder = dividend % divisor;
+        if (quotient > mask) { s->fault = 5; return; }
+    }
+    /* Division's undefined flags are preserved by the Unicorn oracle. */
+    if (width == 8) {
+        s->r[0] = (s->r[0] & 0xffff0000u) | (uint32_t)(quotient & 255u) |
+            ((uint32_t)(remainder & 255u) << 8);
+    } else {
+        s->r[0] = (s->r[0] & ~mask) | (uint32_t)(quotient & mask);
+        s->r[2] = (s->r[2] & ~mask) | (uint32_t)(remainder & mask);
+    }
+}
 #endif
 '''
 
@@ -228,6 +286,13 @@ def write(op, value, width):
     raise Unsupported('immediate destination')
 
 
+def condition_c(mnemonic):
+    condition = CONDITIONS[mnemonic]
+    for flag, mask in [('z', 0x40), ('c', 1), ('n', 0x80), ('o', 0x800), ('p', 4)]:
+        condition = re.sub(r'\b' + flag + r'\b', '((s->flags & 0x%xu) != 0)' % mask, condition)
+    return condition
+
+
 def instruction_c(insn, starts):
     mnemonic, text = insn['mnemonic'], insn['operands']
     next_pc = insn['address'] + len(bytes.fromhex(insn['bytes']))
@@ -237,9 +302,7 @@ def instruction_c(insn, starts):
             raise Unsupported('unresolved or external branch')
         if mnemonic == 'jmp':
             return 's->pc = 0x%xu; break;' % target
-        condition = CONDITIONS[mnemonic]
-        for flag, mask in [('z', 0x40), ('c', 1), ('n', 0x80), ('o', 0x800), ('p', 4)]:
-            condition = re.sub(r'\b' + flag + r'\b', '((s->flags & 0x%xu) != 0)' % mask, condition)
+        condition = condition_c(mnemonic)
         if next_pc not in starts:
             raise Unsupported('fallthrough outside body')
         return 's->pc = (%s) ? 0x%xu : 0x%xu; break;' % (condition, target, next_pc)
@@ -258,6 +321,33 @@ def instruction_c(insn, starts):
     # implicit segment operations and partial architectural models fail closed.
     if mnemonic == 'nop' and not text:
         pass
+    elif mnemonic.startswith('set') and 'j' + mnemonic[3:] in CONDITIONS:
+        dst = operand(text)
+        if dst[0] not in ('reg', 'mem') or width_of(dst) not in (None, 8):
+            raise Unsupported('unsupported SETcc destination')
+        code.append(write(dst, '((%s) ? 1u : 0u)' % condition_c('j' + mnemonic[3:]), 8))
+    elif mnemonic == 'bswap':
+        dst = operand(text)
+        if dst[0] != 'reg' or width_of(dst) != 32:
+            raise Unsupported('unsupported BSWAP destination')
+        code += ['a = %s;' % read(dst, 32), write(dst,
+                 '((a & 255u) << 24) | ((a & 0xff00u) << 8) | ((a >> 8) & 0xff00u) | (a >> 24)', 32)]
+    elif mnemonic == 'xchg':
+        arguments = [operand(part) for part in text.split(',')]
+        if (len(arguments) != 2 or any(op[0] not in ('reg', 'mem') for op in arguments) or
+                all(op[0] == 'mem' for op in arguments)):
+            raise Unsupported('unsupported XCHG operands')
+        left, right = arguments
+        width = width_of(left) or width_of(right)
+        if width not in (8, 16, 32) or any(width_of(op) not in (None, width) for op in arguments):
+            raise Unsupported('unsupported XCHG widths')
+        code += ['a = %s; b = %s;' % (read(left, width), read(right, width)),
+                 'if (s->fault) return s->fault;']
+        # Write memory before changing a register used to calculate its address.
+        if right[0] == 'mem':
+            code += [write(right, 'a', width), 'if (s->fault) return s->fault;', write(left, 'b', width)]
+        else:
+            code += [write(left, 'b', width), 'if (s->fault) return s->fault;', write(right, 'a', width)]
     elif mnemonic in ('clc', 'stc', 'cmc') and not text:
         code.append({'clc': 's->flags &= ~1u;', 'stc': 's->flags |= 1u;',
                      'cmc': 's->flags ^= 1u;'}[mnemonic])
@@ -292,18 +382,27 @@ def instruction_c(insn, starts):
                      's->r[4] += 4u;', write(op, 'a', 32)]
         else:
             raise Unsupported('unsupported stack operand')
-    elif mnemonic in ('shl', 'sal', 'shr', 'sar'):
+    elif mnemonic in ('shl', 'sal', 'shr', 'sar', 'rol', 'ror', 'rcl', 'rcr'):
         arguments = [operand(part) for part in text.split(',')]
         if (len(arguments) != 2 or width_of(arguments[0]) not in (8, 16, 32) or
                 (arguments[1][0] != 'imm' and arguments[1] != operand('cl'))):
             raise Unsupported('unsupported shift operands')
         dst, count = arguments
         width = width_of(dst)
-        operation = {'shl': 0, 'sal': 0, 'shr': 1, 'sar': 2}[mnemonic]
+        rotate = mnemonic in ('rol', 'ror', 'rcl', 'rcr')
+        operation = ({'rol': 0, 'ror': 1, 'rcl': 2, 'rcr': 3} if rotate else
+                     {'shl': 0, 'sal': 0, 'shr': 1, 'sar': 2})[mnemonic]
         code += ['a = %s; b = %s;' % (read(dst, width), read(count, 32)),
                  'if (s->fault) return s->fault;',
-                 'result = ef_shift(s, a, b, %d, %d);' % (width, operation),
+                 'result = ef_%s(s, a, b, %d, %d);' % ('rotate' if rotate else 'shift', width, operation),
                  write(dst, 'result', width)]
+    elif mnemonic in ('div', 'idiv'):
+        divisor = operand(text)
+        width = width_of(divisor)
+        if divisor[0] not in ('reg', 'mem') or width not in (8, 16, 32):
+            raise Unsupported('unsupported divide operand')
+        code += ['a = %s; if (s->fault) return s->fault;' % read(divisor, width),
+                 'ef_divide(s, a, %d, %d);' % (width, mnemonic == 'idiv')]
     elif mnemonic in ('mul', 'imul'):
         arguments = [operand(part) for part in text.split(',')]
         if not 1 <= len(arguments) <= (3 if mnemonic == 'imul' else 1):

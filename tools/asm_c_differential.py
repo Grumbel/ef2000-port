@@ -15,8 +15,10 @@ from collections import Counter
 import ctypes
 import hashlib
 import json
+import multiprocessing
 from pathlib import Path
 import random
+import resource
 import subprocess
 
 try:
@@ -45,7 +47,7 @@ def probes(count, seed):
         yield registers, flags
 
 
-def compare(function, payload, address, registers, flags, *, budget=10000, program=False):
+def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError
     from unicorn import x86_const
 
@@ -63,6 +65,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     for name, value in zip(asm_to_c.REGS, registers):
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
+    if phase:
+        phase('original')
     try:
         cpu.emu_start(address, sentinel, count=budget)
     except UcError as error:
@@ -72,11 +76,15 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     native_memory = (ctypes.c_uint8 * memory_size).from_buffer(memory)
     state = State((ctypes.c_uint32 * 8)(*registers), flags, address, 0,
                   native_memory, memory_size)
+    if phase:
+        phase('c')
     status = (function(ctypes.byref(state), budget, sentinel) if program else
               function(ctypes.byref(state), budget))
     if status:
         return dict(state='mismatch', differences=[
-            'C status %d (budget/pc/memory) after original completed' % status])
+            'C status %d (budget/pc/memory/divide) at 0x%x after original completed' % (status, state.pc)])
+    if phase:
+        phase('comparison')
     differences = []
     expected = [cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + n.upper()))
                 for n in asm_to_c.REGS]
@@ -93,6 +101,68 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         first = next(i for i, (a, b) in enumerate(zip(memory, original_ram)) if a != b)
         differences.append('RAM first mismatch at 0x%x' % first)
     return dict(state='mismatch' if differences else 'pass', differences=differences)
+
+
+def isolated_probes(function, payload, address, scenarios, budget, program):
+    """Keep oracle/native crashes local and distinguish the failing phase.
+
+    No retry follows a crash: completed probes remain evidence and unexecuted
+    probes are explicitly inconclusive. fork keeps the compiled library and
+    payload immutable in the parent and avoids serializing ctypes pointers.
+    """
+    context = multiprocessing.get_context('fork')
+    receiver, sender = context.Pipe(duplex=False)
+
+    def work():
+        try:
+            resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+            for index, (registers, flags) in enumerate(probes(scenarios, address)):
+                sender.send(('phase', index, 'setup'))
+                result = compare(function, payload, address, registers, flags, budget=budget,
+                                 program=program, phase=lambda stage: sender.send(('phase', index, stage)))
+                sender.send(('result', index, result))
+        except Exception as error:
+            sender.send(('error', -1, repr(error)))
+        finally:
+            sender.close()
+
+    process = context.Process(target=work)
+    process.start()
+    sender.close()
+    results, stage, index, error = [], 'setup', 0, None
+    try:
+        while True:
+            kind, probe, value = receiver.recv()
+            if kind == 'phase':
+                index, stage = probe, value
+            elif kind == 'result':
+                if probe != len(results):
+                    error = 'out-of-order probe result'
+                results.append(value)
+                stage = 'between-probes'
+            else:
+                error = value
+    except EOFError:
+        pass
+    finally:
+        receiver.close()
+        process.join()
+    if error:
+        raise ValueError('comparison worker error: ' + error)
+    if process.exitcode:
+        if stage == 'original':
+            results.append(dict(state='inconclusive', reason='original oracle worker exited %d at probe %d' %
+                                (process.exitcode, index)))
+        elif stage == 'c':
+            results.append(dict(state='mismatch', differences=[
+                'C worker exited %d after original completed at probe %d' % (process.exitcode, index)]))
+        else:
+            raise ValueError('comparison worker exited %d during %s' % (process.exitcode, stage))
+        results.extend(dict(state='inconclusive', reason='not run after worker failure')
+                       for _ in range(scenarios-len(results)))
+    if len(results) != scenarios:
+        raise ValueError('comparison worker returned incomplete evidence')
+    return results
 
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
@@ -149,8 +219,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % address)
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
-        results = [compare(function, payload, address, registers, flags, budget=budget, program=program)
-                   for registers, flags in probes(scenarios, address)]
+        results = isolated_probes(function, payload, address, scenarios, budget, program)
         counts = Counter(item['state'] for item in results)
         entries.append(dict(address=address, counts=dict(counts), probes=results,
                             watcom_object_sha256=watcom_results.get('ef_lift_%08x' % address),
@@ -166,6 +235,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   library_sha256=hashlib.sha256(library.read_bytes()).hexdigest(),
                   dispatcher_watcom_object_sha256=watcom_results.get('ef_lift_program'),
                   scenarios=scenarios, instruction_budget=budget, entries=entries,
+                  process_isolation='fork-per-entry-with-phase-reporting',
                   limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     return report

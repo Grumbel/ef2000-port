@@ -2386,3 +2386,36 @@ helpers (0xed133: 283 dependent bodies), rotations (0xdeb50: 216), heap-selector
 operations (0xfc795: 181), indirect calls and DOS/runtime boundaries. Full
 reliable bulk coverage, x87, remaining ownership/boundary cases and native
 integration remain active work.
+
+2026-11-13 rotate/divide and oracle isolation: added ROL/ROR/RCL/RCR, DIV/IDIV,
+SETcc, BSWAP and XCHG with register-dependent memory addresses preserved.
+Division checks zero, quotient bounds and INT64_MIN/-1 before C arithmetic;
+rotate flags include the measured undefined-OF policy. Byte/count/carry grids,
+immediate rotations, quotient/remainder/fault boundaries and existing tests:
+73 pass, with UBSan scalar grids. Stress testing reproduced a Unicorn 2.1.4
+host SIGFPE for IDIV ECX at EDX:EAX=0x80000000:0, ECX=0xffffffff. That original
+case is isolated and explicitly inconclusive, not matching evidence; the C
+exception guard is separately checked against the quotient bound. The runner
+now forks per entry and reports original/C/comparison phase: original crashes
+are inconclusive, C crashes after original completion are mismatches, completed
+probes survive, and unexecuted probes are not counted as passes. Core dumps are
+disabled in children. A fresh CPU is used after ordinary #DE scalar probes to
+avoid Unicorn pending-exception state. Ghidra 12.1.4 corpus: 2,815 syntax-
+supported; 1,178 closed bodies (117,186 body bytes), 439 with cross-body
+dependencies; 1,637 syntax-supported remain excluded. All 1,178 bodies plus
+dispatcher compile under OpenWatcom v2 -we. Isolated corpus 18,848 probes:
+12,410 passes, 6,438 original-fault/budget inconclusive, zero worker failures,
+zero mismatches. 523 bodies pass all probes, including 172 with cross-body
+dependencies; 655 remain inconclusive. No tracker or native ABI promotion.
+Commands: python3 -m unittest tests.test_asm_to_c tests.test_asm_c_program
+tests.test_asm_inventory tests.test_asm_diff tests.test_ghidra_ef2000;
+tools/asm_c_program.py --inventory local/asm-body-inventory-20261113 --output
+local/asm-c-rotdiv-program-20261113; tools/asm_c_differential.py --translations
+local/asm-c-rotdiv-program-20261113 --output local/asm-c-rotdiv-diff-20261113
+--watcom /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386
+(Python 3.13.12/Unicorn 2.1.4). Current dependency frontiers include segment/
+formatter 0xed133 (330 dependent bodies), DOS service 0xfa95f (194), heap segment
+state 0xfc795 (192), and indirect callbacks. Segment/string state, service
+bindings, indirect transfers, x87, runtime enforcement of static-code assumptions,
+remaining body-boundary issues and native integration remain active work before
+reliable full bulk coverage can be claimed.
