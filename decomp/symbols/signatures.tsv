@@ -3427,3 +3427,11 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000dbee4	env_shield_dbee4			ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; only memory flags change; no stack args
 0x000dbeec	env_city_dbeec			ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; only memory flags change; no stack args
 0x000dbef8	env_day_dbef8	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; AH is rewritten, rest of EAX preserved; no stack args
+0x00068f40	gpw_plane_side_on_68f40			ebx,ecx,edx,esi,edi,ebp	0	entry point of weapons-panel view/mode setter; only memory halfwords change; no stack args
+0x00068f6c	gpw_plane_underneath_68f6c			ebx,ecx,edx,esi,edi,ebp	0	entry point of weapons-panel view/mode setter; only memory halfwords change; no stack args
+0x00068f98	gpw_plane_angled_68f98			ebx,ecx,edx,esi,edi,ebp	0	entry point of weapons-panel view/mode setter; only memory halfwords change; no stack args
+0x00068fbc	gpw_use_defaults_68fbc			ebx,ecx,edx,esi,edi,ebp	0	entry point of weapons-panel view/mode setter; only memory halfwords change; no stack args
+0x00068fe0	gpw_place_missile_68fe0			ebx,ecx,edx,esi,edi,ebp	0	entry point of weapons-panel view/mode setter; only memory halfwords change; no stack args
+0x0006931c	gpw_set_clear_missile_6931c			ebx,ecx,edx,esi,edi,ebp	0	entry point of weapons-panel view/mode setter; only memory halfwords change; no stack args
+0x00069338	gpw_set_clear_all_missiles_69338			ebx,ecx,edx,esi,edi,ebp	0	entry point of weapons-panel view/mode setter; only memory halfwords change; no stack args
+0x0009d524	ascii_stricmp_9d524	EAX:ef_addr32,EDX:ef_addr32	EAX:int32_t	ebx,ecx,esi,edi,ebp	0	case-insensitive ASCII compare; returns signed byte difference in EAX; EDX is clobbered
