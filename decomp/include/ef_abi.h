@@ -4410,6 +4410,7 @@ uint8_t guest_fn_291fc_x(uint8_t code); /* 0x291fc AL -> AL, preserves all */
 void draw_map_layers_4bf1c(uint32_t a, uint32_t b, uint32_t c);
 void guest_fn_4c120_x(uint32_t a, uint32_t b); /* 0x4c120 EAX/EDX */
 void draw_map_nodes_4c3bc(uint32_t a, ef_addr32 list);
+void draw_route_overlay_4e360(void);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

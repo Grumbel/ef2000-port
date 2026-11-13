@@ -3370,3 +3370,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000298f0	object_fire_request_298f0	AX:int16_t,DL:uint8_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	Original 0x298f0 (491 bytes); fire request; callers unknown
 0x0004bf1c	draw_map_layers_4bf1c	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x4bf1c (516 bytes); map layer redraw dispatcher
 0x0004c3bc	draw_map_nodes_4c3bc	EAX:uint32_t,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x4c3bc (593 bytes); map node marker drawing
+0x0004e360	draw_route_overlay_4e360			ebx,ecx,edx,esi,edi,ebp	0	Original 0x4e360 (602 bytes); route polygon and leg markers

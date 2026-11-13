@@ -4589,3 +4589,58 @@ void draw_map_nodes_4c3bc(uint32_t a, ef_addr32 list)
 		                       (uint32_t)(int32_t)w8, (uint32_t)(int32_t)(int16_t)(w10 + 5));
 	}
 }
+
+/* 0x4e360, 602 bytes. Draw the route overlay: the closed polygon through the points stored at 0x1a559e/0x1a55d2 (types at 0x1a5672, terminated by 0x11) with the mode colour, then one 0xca620 stamp per leg endpoint (type 8, 5 or default) and one at each leg midpoint. */
+void draw_route_overlay_4e360(void)
+{
+	int32_t i;
+	uint32_t col;
+	uint8_t type;
+	uint32_t dest;
+	int32_t ax, bx, cx, dx, mx, my;
+
+	col = (EF_U8(0x001a53ddu) == 2u || EF_U8(0x001a53ddu) == 3u) ? 0xeu : 0u;
+	i = 1;
+	while (i < 0x1a) {
+		if (EF_U8(0x001a5672u + (uint32_t)i) == 0x11u)
+			break;
+		draw_scaled_rect_c95ac(col & 0xffu, (uint32_t)(int32_t)EF_S16(0x001a55a0u + (uint32_t)i * 2u),
+		                       (uint32_t)(int32_t)EF_S16(0x001a55d4u + (uint32_t)i * 2u),
+		                       (uint32_t)(int32_t)EF_S16(0x001a55a2u + (uint32_t)i * 2u),
+		                       (uint32_t)(int32_t)EF_S16(0x001a55d6u + (uint32_t)i * 2u));
+		i++;
+	}
+	draw_scaled_rect_c95ac(col & 0xffu, (uint32_t)(int32_t)EF_S16(0x001a55a0u + (uint32_t)(int16_t)i * 2u),
+	                       (uint32_t)(int32_t)EF_S16(0x001a55d4u + (uint32_t)(int16_t)i * 2u),
+	                       (uint32_t)(int32_t)EF_S16(0x001a55a2u),
+	                       (uint32_t)(int32_t)EF_S16(0x001a55d6u));
+	i = 1;
+	while (i < 0x19) {
+		type = EF_U8(0x001a5672u + (uint32_t)i);
+		if (type == 0x11u)
+			break;
+		if (type == 8u) {
+			dest = EF_U32(0x00126570u) + (uint32_t)((int32_t)(EF_S32(0x0013470cu) >> 16) * 0x280 + (EF_S32(0x0013470au) >> 16));
+			guest_fn_ca620((int32_t)dest, (int32_t)(int16_t)(EF_S16(0x001a55a2u + (uint32_t)i * 2u) - 0xe),
+			               (int32_t)(int16_t)(EF_S16(0x001a55d6u + (uint32_t)i * 2u) - 0xa), 0x1cu, 0x14u, 0x280u);
+		} else if (type == 5u) {
+			dest = EF_U32(0x00126570u) + (uint32_t)((int32_t)(EF_S32(0x00134739u) >> 16) * 0x280 + (EF_S32(0x00134737u) >> 16));
+			guest_fn_ca620((int32_t)dest, (int32_t)(int16_t)(EF_S16(0x001a55a2u + (uint32_t)i * 2u) - 0xa),
+			               (int32_t)(int16_t)(EF_S16(0x001a55d6u + (uint32_t)i * 2u) - 0xa), 0x15u, 0x15u, 0x280u);
+		} else {
+			dest = EF_U32(0x00126570u) + (uint32_t)((int32_t)(EF_S32(0x001345adu) >> 16) * 0x280 +
+			                                       (EF_S32(0x001345abu) >> 16) + i * 0x14);
+			guest_fn_ca620((int32_t)dest, (int32_t)(int16_t)(EF_S16(0x001a55a2u + (uint32_t)i * 2u) - 0xa),
+			               (int32_t)(int16_t)(EF_S16(0x001a55d6u + (uint32_t)i * 2u) - 7), 0x14u, 0xdu, 0x280u);
+		}
+		ax = EF_S16(0x001a55a0u + (uint32_t)i * 2u);
+		bx = EF_S16(0x001a55a2u + (uint32_t)i * 2u);
+		cx = EF_S16(0x001a55d4u + (uint32_t)i * 2u);
+		dx = EF_S16(0x001a55d6u + (uint32_t)i * 2u);
+		mx = ax + (bx - ax) / 2;
+		my = cx + (dx - cx) / 2;
+		dest = EF_U32(0x00126570u) + (uint32_t)((int32_t)(EF_S32(0x00134703u) >> 16) * 0x280 + (EF_S32(0x00134701u) >> 16));
+		guest_fn_ca620((int32_t)dest, (int32_t)(int16_t)(mx - 0xa), (int32_t)(int16_t)(my - 7), 0x14u, 0xdu, 0x280u);
+		i++;
+	}
+}
