@@ -1586,7 +1586,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00082da4	43	next_ui_fragment	ui_secondary	compiles	game	confirmed	decomp/tests/0x00082da4.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082dd0	45	compact_ui_fragment	ui_operations	compiles	game	confirmed	decomp/tests/0x00082dd0.json	docs/compiler-abi.md; host model; guest differential pending
 0x00082e00	61	find_matching_ui_fragment	ui_operations	compiles	game	confirmed	decomp/tests/0x00082e00.json	docs/compiler-abi.md; host model; guest differential pending
-0x00082e40	483			unknown	game	unverified		
+0x00082e40	483	rewrite_status_file_82e40	game_helpers130	compiles	game	confirmed	decomp/tests/0x00082e40.json	Original 0x82e40 (483 bytes)
 0x000830b8	219	rewrite_settings_830b8	game_helpers46	compiles	game	confirmed	decomp/tests/0x000830b8.json	docs/compiler-abi.md; Rewrite the settings file with the status text lines appended.; callers 19a80@19adb,84aec@84aec; guest pending
 0x000831a4	89	store_scaled_vector_831a4	game_helpers20	compiles	game	confirmed	decomp/tests/0x000831a4.json	docs/compiler-abi.md; Store a vector, halved until every component fits in 16 bits.; callers 83a40@83aac; guest pending
 0x00083200	145	to_camera_space_83200	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00083200.json	docs/compiler-abi.md; Convert the world point (EDX, EBX, ECX) to camera-relative 8.8 fixed point for OUT (EAX): subtract the camera dwords 0x1; callers 83708@8370b; guest pending

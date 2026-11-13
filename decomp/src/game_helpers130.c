@@ -958,3 +958,45 @@ void dump_selected_group_a3dc(void)
     guest_fn_bc400(stream, EF_U16(node + 0x17u) != 0u ? 0x00180714u : 0x0018071cu);
     guest_fn_bc421_w(stream);
 }
+
+/* 0x82e40, 483 bytes. Load the small text file named by the pointer at 0x12b36c (1..0x400 bytes), blank its 0x1a bytes, rewrite eleven keyword lines in turn (find the keyword fragment, compact it and append the current status value written by the matching 0x827xx/0x82bxx writer) and save the buffer back to the same file. */
+void rewrite_status_file_82e40(void)
+{
+    char buffer[0x401];
+    ef_addr32 buf = (ef_addr32)(uintptr_t)buffer;
+    uint32_t name = EF_U32(0x0012b36cu);
+    uint32_t size = read_file_payload_size_b3b90(name);
+    int16_t i;
+
+    if (size == 0u || size > 0x400u)
+        return;
+    load_file_unpacked_b3c04(name, buf);
+    buffer[size] = 0;
+    for (i = 0; (int32_t)i < (int32_t)size; i++) {
+        if ((uint8_t)buffer[i] == 0x1au)
+            buffer[i] = 0;
+    }
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188a90u));
+    write_status_byte_15bdd0(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188ad8u));
+    format_state_bytes_82b6c(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188aa4u));
+    write_status_byte_15b7e4(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188ae0u));
+    write_ui_status_float(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188aecu));
+    write_status_high_word(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188aacu));
+    write_status_byte_1a5c0d(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188a9cu));
+    write_status_byte_1fcb30(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188ab4u));
+    write_ui_status_flags_a(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188b00u));
+    write_status_queried_value(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188abcu));
+    write_ui_status_flags_b(buf + guest_string_length(buf));
+    compact_ui_fragment(find_matching_ui_fragment(buf, 0x00188b14u));
+    write_status_dword_122dc4(buf + guest_string_length(buf));
+    write_whole_file_b3d00(EF_U32(0x0012b36cu), buf, guest_string_length(buf));
+}

@@ -2374,3 +2374,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0x3287c `apply_camera_keys_3287c`: key-driven camera zoom/angle steps with limit windows (fuzz PASS 1000).
 
 - 0xa3dc `dump_selected_group_a3dc`: text report of selected group; fuzz weak (stream/list globals), logic decoded from disassembly.
+
+- 0x82e40 `rewrite_status_file_82e40`: status text file rewrite; fuzz weak (file I/O), call sequence decoded from disassembly.
