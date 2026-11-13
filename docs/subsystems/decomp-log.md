@@ -2294,3 +2294,11 @@ guest calls got `parm routine [] modify [...]`, 14 locally declared ones
 `parm routine []` (e.g. `set_view_origin_dc21c`, which broke 0x76620).
 Isolated fuzz: 0x76620, 0xc9ecc, 0xc9f28 now PASS and are re-included;
 165 FAIL, 5 SOFT, 2 weak remain.
+
+Return widths: 119 external `guest_*` prototypes documented as returning in
+AL/AX now return `uint8_t`/`uint16_t` instead of `uint32_t`, so Watcom no
+longer tests stale upper EAX bits (0x90c0 now PASS and re-included).
+`guest_fn_2dba4` stays `uint32_t` because 0x17474 returns EAX with the
+callee's upper bits; `update_unit_90c0` casts explicitly. A full-link fuzz
+against a baseline build showed no other regressions (123 pre-existing
+FAILs unchanged).

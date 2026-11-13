@@ -612,7 +612,6 @@ addr	reason
 
 0x00000cac	tools/func_fuzz.py isolated run (only this redirect): 2: patched: fuzz2: guest fault at 0x9c2f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x00007d20	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x20174ee: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x000090c0	tools/func_fuzz.py isolated run (only this redirect): 8: guest RAM 0x1f9011: original 0x00, patched 0x01; keep original pending triage
 0x00015a14	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x0001db08	tools/func_fuzz.py isolated run (only this redirect): 13: patched: fuzz13: guest fault at 0x2cb70763: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x0001debc	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: instruction budget 20000 exceeded (ip=0x100ad02); keep original pending triage

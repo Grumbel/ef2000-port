@@ -156,7 +156,7 @@ void update_unit_90c0(int16_t index)
 {
     ef_addr32 record;
     uint32_t type;
-    if (guest_fn_2dba4(index) != 0)
+    if ((uint8_t)guest_fn_2dba4(index) != 0)
         EF_U8(0x001f9011u) = 1;
     record = EF_U32(0x0019bb58u) + (uint32_t)(int32_t)index * 0xcau;
     type = (uint32_t)EF_U8(record + 0x19u) * 0xe5u;
