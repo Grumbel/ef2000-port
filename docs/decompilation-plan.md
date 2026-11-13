@@ -2276,3 +2276,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 full post-load comparison: twenty recovered C entries match original parser/name/fixup/scene sequence on both real gui.par resources with prepared heap/RAM. Ten name/real-heap cases pass; 0x1105c3 remains original on failure due to three-byte entry extent. Cold startup, real archive I/O and working main menu remain incomplete.
 
 2026-11-13 heap-initialization continuation: isolated descriptor insertion 0x10d5c7 passes five original comparisons. Growth 0x10d80b still requires DOS/selector-limit bindings and initial-block release; source-only startup/menu remains incomplete.
+
+2026-11-13 heap lifecycle: corrected DS handling in release, six inner and five composed release cases pass. Descriptor initialization -> initial-block release -> allocation passes three no-stub cases from provisioned raw RAM. Extender provisioning, native selector bindings and working main menu remain incomplete.

@@ -47,6 +47,7 @@ decomp/src/localized_file_handlers.c
 decomp/src/script_helpers1.c
 decomp/src/misc_drafts1.c
 decomp/src/heap_block.c
+decomp/src/heap_release.c
 decomp/src/menu_state_load.c
 decomp/src/menu_list_names.c
 decomp/src/resource_read.c
