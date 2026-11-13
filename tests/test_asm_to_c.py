@@ -44,6 +44,7 @@ class TranslationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             for source in ('call eax\nret', 'cpuid\nret', 'jmp eax',
+                           'addr16 loop 1f\n1: ret',
                            'in eax,dx\nret', 'push ax\nret', 'pop [eax]\nret',
                            'enter 8, 1\nleave\nret'):
                 with self.subTest(source=source):
@@ -85,6 +86,8 @@ class TranslationTests(unittest.TestCase):
             'mov dword ptr [0x4000], eax\nret',
             'shl eax, cl\nret', 'shr ax, cl\nret', 'sar al, cl\nret',
             'sar dword ptr [esi], 31\nret', 'shl byte ptr [esi], 9\nret',
+            'shld [esi], edx, cl\nret', 'shrd word ptr [esi], dx, 17\nret',
+            'shld ecx, eax, cl\nret', 'shrd ax, ax, cl\nret',
             'imul eax, edx\nret', 'imul ax, dx\nret',
             'imul eax, [esi], -17\nret', 'imul ax, [esi], -123\nret',
             'imul dl\nret', 'imul dx\nret', 'imul edx\nret',
@@ -243,6 +246,27 @@ class TranslationTests(unittest.TestCase):
                     cpu = unicorn.Uc(unicorn.UC_ARCH_X86, unicorn.UC_MODE_32)
                     cpu.mem_map(0, len(memory))
                     cpu.mem_write(0, bytes(memory))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_count_branches_preserve_flags_and_wrap_the_counter(self):
+        for branch in ('loop', 'loope', 'loopne', 'jecxz', 'jcxz'):
+            # Distinct destinations expose both branch direction and counter
+            # changes. JCXZ must ignore the high word without modifying ECX.
+            self.scalar_grid(branch + ' 1f\nmov eax, 0\nret\n1: mov eax, 1',
+                             ((0x12345678, count, flags)
+                              for count in (0, 1, 2, 0xffff, 0x10000, 0x10001,
+                                            0x7fffffff, 0x80000000, 0xffffffff)
+                              for flags in (0x202, 0xad7)))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_double_shift_counts_and_wide_boundaries(self):
+        for operation in ('shld', 'shrd'):
+            for dst, src, bits in [('ax', 'dx', 16), ('eax', 'edx', 32)]:
+                values = [0, 1, (1 << (bits-1))-1, 1 << (bits-1), (1 << bits)-1,
+                          0x2345, 0xba98]
+                self.scalar_grid(operation + ' ' + dst + ', ' + src + ', cl',
+                                 ((a, count, flags, b) for a in values for b in values
+                                  for count in range(256) for flags in (0x202, 0xad7)))
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_shift_counts_all_byte_values_and_wide_boundaries(self):

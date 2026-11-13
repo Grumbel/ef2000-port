@@ -2535,3 +2535,50 @@ local/asm-c-observed-program-20261113 --output local/asm-c-observed-diff-2026111
 Reliable bulk translation remains active: x87 state/precision, runtime services,
 remaining integer patterns and boundaries, dynamic target coverage, and stronger
 application-level evidence remain unresolved.
+
+
+**2026-11-13 — Count branches and double shifts.**
+Added LOOP/LOOPE/LOOPNE, JCXZ/JECXZ and SHLD/SHRD to the explicit-state
+translator. Counter wraparound and flags preservation are compared at zero,
+one, high-word and signed boundaries; address-size-prefixed LOOP stays rejected.
+Double shifts use bounded one-bit concatenated-pair steps; 100,352 synthetic
+original-vs-C cases cover both widths, directions, all 256 count values and
+boundary source/destination pairs under undefined-behavior sanitization. Flags
+are compared including measured undefined OF/AF and count>16 word behavior.
+The full 85-test ASM/Ghidra suite passes; additional cross-body count-branch
+composition checks use the same dispatcher and dependency analysis as calls.
+New corpus: 3,598 syntax-supported, 2,090 selected bodies (269,778 body bytes),
+134 more selected bodies and 27,191 more body bytes than the previous corpus.
+All 2,090 bodies and dispatcher compile with Watcom warnings-as-errors.
+Commands: python3 -m unittest tests.test_asm_c_segments tests.test_asm_c_program
+tests.test_asm_to_c tests.test_asm_inventory tests.test_asm_diff
+tests.test_ghidra_ef2000; tools/asm_c_program.py --inventory
+local/asm-observed-body-inventory-20261113 --output
+local/asm-c-countshift-program-20261113. Unit evidence:
+local/asm-c-countshift-full-tests-20261113.log (Python 3.13.12/Unicorn 2.1.4).
+No tracker promotion or application integration claim.
+
+Final count/shift corpus: 33,440 probes, 18,500 matches, 14,935 original-fault/
+budget inconclusive and the same five missing-target failures across three
+bodies as before (0xded86, 0xed133, 0x11f7ef). All 1,956 previously selected
+bodies have unchanged probe counts; the 134 newly selected bodies contribute
+900 matches, 1,244 inconclusive, zero failures; 30 pass every probe and 104
+remain inconclusive. Overall 750 bodies pass all probes, 1,337 inconclusive,
+three fail. The command exits 1 and does not waive target gaps. Command:
+tools/asm_c_differential.py --translations local/asm-c-countshift-program-20261113
+--output local/asm-c-countshift-diff-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
+Additional program composition tests pass (8 tests, including cross-body LOOP
+and JECXZ). No reliable full-bulk or native/game integration claim.
+
+x87 backend feasibility only: official Berkeley SoftFloat 3e archive
+(https://www.jhauser.us/arithmetic/SoftFloat-3e.zip), SHA-256
+21130ce885d35c1fe73fc1e1bf2244178167e05c6747cad5f450cc991714c746,
+kept under local/softfloat-probe-20261113. Upstream documents extFloat80 and
+precision control (https://www.jhauser.us/arithmetic/SoftFloat-3/doc/SoftFloat.html).
+The non-FAST_INT64 8086 specialization compiles 232/237 library sources with
+Watcom -we; five fail only on unreferenced labels (s_addExtF80M,
+s_roundPackMToF128M, s_roundPackToF16/F32/F64). The raw arithmetic/conversion
+entry points compile. Exact diagnostics are in watcom-probe.json. This is
+not an integrated backend or precision/state equivalence proof; no third-party
+source, oracle dependency or floating-point approximation was committed.

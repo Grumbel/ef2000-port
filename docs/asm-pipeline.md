@@ -313,3 +313,24 @@ unowned x87 island). The gate remains nonzero. 720 bodies pass all 16 probes.
 Artifacts: `local/asm-c-observed-program-20261113` and
 `local/asm-c-observed-diff-20261113`; 83 focused tests pass. Direct closure is
 not dynamic target coverage or a native game integration proof.
+
+Counted branches now include LOOP/LOOPE/LOOPNE (with alias spellings),
+JECXZ and JCXZ. LOOP decrements ECX with 32-bit wraparound without changing
+EFLAGS; its conditional forms use the existing ZF. JCXZ tests only CX and
+preserves all of ECX. The separately decoded `addr16 loop` prefix form remains
+unsupported. SHLD/SHRD support 16/32-bit register or memory destinations,
+register sources, and immediate/CL counts. A bounded concatenated-pair helper
+avoids shifts by the C type width and matches the measured Unicorn policy for
+undefined OF/AF and oversized 16-bit counts; zero counts preserve flags.
+Synthetic tests cover all 256 count values across boundary operand pairs,
+with undefined-behavior sanitization, memory destinations and register aliases.
+
+2026-11-13 count/shift corpus: 2,090 bodies, 269,778 body bytes, all Watcom
+warning-free. 18,500 probes match, 14,935 are inconclusive and the same five
+uncovered-target failures remain. The 134 newly selected bodies contribute
+900 matches and no new failure; results for previous bodies are unchanged.
+750 bodies pass all 16 probes. Artifacts: `local/asm-c-countshift-program-20261113`
+and `local/asm-c-countshift-diff-20261113`. All 85 focused tests pass, with
+cross-body count-branch composition additionally rechecked. Full reliability
+still needs x87, runtime services, unresolved boundaries/targets and stronger
+application evidence; the CLI gate remains nonzero.

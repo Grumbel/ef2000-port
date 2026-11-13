@@ -206,6 +206,17 @@ call first
 2: ret
 .size second, .-second''',
         ]
+        for branch, count in [('loop', 2), ('jecxz', 0)]:
+            programs.append('''.type root,@function
+root: mov ecx, %d
+%s leaf
+ret
+.size root, .-root
+.org 0x140
+.type leaf,@function
+leaf: inc eax
+ret
+.size leaf, .-leaf''' % (count, branch))
         for index, source in enumerate(programs):
             with self.subTest(index=index), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)

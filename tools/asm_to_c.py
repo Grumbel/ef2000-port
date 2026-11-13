@@ -152,6 +152,30 @@ static uint32_t ef_shift(ef_lift_state *s, uint32_t value, uint32_t count,
     ef_szp(s, value, width);
     return value;
 }
+static uint32_t ef_double_shift(ef_lift_state *s, uint32_t value, uint32_t source,
+                                uint32_t count, unsigned width, unsigned right) {
+    uint32_t mask = ef_mask(width), sign = 1u << (width-1), carry = 0, overflow = 0, before;
+    value &= mask; source &= mask; count &= 31u;
+    if (!count) return value;
+    /* Rotate the concatenated pair in bounded one-bit steps. This also
+       preserves the oracle's undefined 16-bit count>16 results and OF/AF. */
+    while (count--) {
+        before = value;
+        if (right) {
+            carry = value & 1u;
+            value = (value >> 1) | ((source & 1u) << (width-1));
+            source = (source >> 1) | (carry << (width-1));
+        } else {
+            carry = (value & sign) != 0;
+            value = ((value << 1) | (source >> (width-1))) & mask;
+            source = ((source << 1) | carry) & mask;
+        }
+        overflow = ((before ^ value) & sign) != 0;
+    }
+    s->flags = (s->flags & ~0x811u) | carry | (overflow << 11);
+    ef_szp(s, value, width);
+    return value;
+}
 static uint64_t ef_multiply(ef_lift_state *s, uint32_t a, uint32_t b,
                             unsigned width, unsigned signed_operation) {
     uint64_t product;
@@ -430,6 +454,21 @@ def string_instruction_c(mnemonic, text, repeat, pc, next_pc):
 def instruction_c(insn, starts):
     mnemonic, text = insn['mnemonic'], insn['operands']
     next_pc = insn['address'] + len(bytes.fromhex(insn['bytes']))
+    if mnemonic in ('loop', 'loope', 'loopz', 'loopne', 'loopnz', 'jecxz', 'jcxz'):
+        target = insn.get('direct_target')
+        if target not in starts or next_pc not in starts:
+            raise Unsupported('unresolved count branch or fallthrough')
+        if mnemonic in ('jecxz', 'jcxz'):
+            prefix = ''
+            condition = '(s->r[1] & 0xffffu) == 0' if mnemonic == 'jcxz' else 's->r[1] == 0'
+        else:
+            prefix = 's->r[1] -= 1u; '
+            condition = 's->r[1] != 0'
+            if mnemonic in ('loope', 'loopz'):
+                condition += ' && (s->flags & 0x40u)'
+            elif mnemonic in ('loopne', 'loopnz'):
+                condition += ' && !(s->flags & 0x40u)'
+        return prefix + 's->pc = (%s) ? 0x%xu : 0x%xu; break;' % (condition, target, next_pc)
     if mnemonic in CONDITIONS or mnemonic == 'jmp':
         target = insn.get('direct_target')
         if target not in starts:
@@ -577,6 +616,21 @@ def instruction_c(insn, starts):
         code += ['a = %s; b = %s;' % (read(dst, width), immediate_expression(insn) or read(count, 32)),
                  'if (s->fault) return s->fault;',
                  'result = ef_%s(s, a, b, %d, %d);' % ('rotate' if rotate else 'shift', width, operation),
+                 write(dst, 'result', width)]
+    elif mnemonic in ('shld', 'shrd'):
+        arguments = [operand(part) for part in text.split(',')]
+        if len(arguments) != 3:
+            raise Unsupported('unsupported double shift operands')
+        dst, source, count = arguments
+        width = width_of(source)
+        if (source[0] != 'reg' or width not in (16, 32) or dst[0] not in ('reg', 'mem') or
+                width_of(dst) not in (None, width) or
+                (count[0] != 'imm' and count != operand('cl'))):
+            raise Unsupported('unsupported double shift operands')
+        code += ['a = %s; b = %s;' % (read(dst, width), read(source, width)),
+                 'if (s->fault) return s->fault;',
+                 'result = ef_double_shift(s, a, b, %s, %d, %d);' %
+                 (read(count, 32), width, mnemonic == 'shrd'),
                  write(dst, 'result', width)]
     elif mnemonic in ('div', 'idiv'):
         divisor = operand(text)
