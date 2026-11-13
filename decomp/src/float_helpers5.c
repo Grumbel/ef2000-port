@@ -143,3 +143,18 @@ void mp_strike_list_selected_4c718(void)
     }
     *(float *)ef_guest_memory_ptr(0x001a53dfu) = (float)((EF_F64(map + 0x9fu) + EF_F64(0x00184c64u)) * EF_F64(0x00184c6cu) + 1.0);
 }
+
+/* 0x51d4, 86 bytes. Cycle the toggle byte selected by the number parsed from
+ * widget+0x43 (0 or 1, wrapping at 2) and show the widget with the matching
+ * text from the 8-byte-stride table at 0x121e30. */
+void kots_click_play_type_51d4(ef_addr32 widget)
+{
+    int16_t idx = (int16_t)(parse_int(widget + 0x43u) - 1);
+    uint8_t *slot = (uint8_t *)ef_guest_memory_ptr(0x00197090u + (uint32_t)(int32_t)idx);
+
+    *slot = (uint8_t)(*slot + 1u);
+    if (*slot >= 2u) {
+        *slot = 0u;
+    }
+    show_widget_a7588(widget, EF_U32(0x00121e30u + (uint32_t)*slot * 8u));
+}
