@@ -2591,7 +2591,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b8510	2021			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x000b8cf8	1057			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000b914c	1623			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x000b97a4	768			unknown	game	unverified		
+0x000b97a4	768	build_slot_records_b97a4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b97a4.json	Original 0xb97a4 (768 bytes)
 0x000b9aa4	450			blocked	game	unverified		Skipped as too difficult: callees 0xb52bc (x87) and 0xb8cf8 (segment/port access) are blocked; 6-stack-arg loop untestable without them
 0x000b9c68	426	build_object_records_b9c68	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b9c68.json	Original 0xb9c68 (426 bytes)
 0x000b9e9c	164	class_selector_code_b9e9c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b9e9c.json	docs/compiler-abi.md; Map a (class, selector) pair to a code: the class byte comes from the record at [obj+0x51] through 0xba0e4 (4 when absen; callers 9820@9bf9; guest pending

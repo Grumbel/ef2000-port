@@ -2586,3 +2586,9 @@ Recovered (749 bytes): copies the option byte groups (0xdc832), clamps
 differential with all seven callees stubbed (scripted widget handles, sprintf
 writing a counter string, string contents logged): 400/400 agree, 15110 logged
 calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
+
+- 2026-11-13: recovered `build_slot_records_b97a4` (0xb97a4). Controlled differential
+  (10 stubbed callees, scripted returns, 400 random scenarios) agrees on all
+  call logs, stack args, end registers and written record/buffer memory
+  (400/400, 534 slot iterations). Wrappers added for b55f8/b5580/b55a4/cc6c0/
+  b8cf8/b5640/b52bc/b5800/b570c/b4e74.

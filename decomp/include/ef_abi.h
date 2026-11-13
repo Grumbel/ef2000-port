@@ -4449,6 +4449,17 @@ void draw_object_marker_5d520(int32_t a, int32_t b, ef_addr32 obj);
 void guest_fn_5dc20(int32_t a, int32_t b, int32_t s, uint32_t obj); /* 0x5dc20 EAX/EDX/EBX/ECX */
 void update_flight_options_widgets_7e2a8(void);
 void guest_fn_7e0a4(uint32_t widget); /* 0x7e0a4 EAX */
+void build_slot_records_b97a4(uint32_t obj, uint32_t edxin, uint32_t ebxin, uint32_t cxin, uint32_t arg);
+uint32_t guest_fn_b55f8(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xb55f8 EAX/EDX/EBX/CL */
+uint32_t guest_fn_b5580(uint32_t a); /* 0xb5580 EAX */
+uint32_t guest_fn_b55a4(uint32_t a); /* 0xb55a4 EAX */
+uint32_t guest_fn_cc6c0_q(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcc6c0 4 stack, caller cleanup */
+void guest_fn_b8cf8_x(uint32_t rec, uint32_t d, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xb8cf8 EAX/EDX/EBX/ECX + 6 stack */
+void guest_fn_b5640(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0xb5640 EAX/EDX/EBX/ECX + 1 stack */
+void guest_fn_b52bc_x(uint32_t a, uint32_t b, uint32_t c); /* 0xb52bc EAX/EDX/EBX */
+void guest_fn_b5800(uint32_t a, uint32_t b, uint32_t c); /* 0xb5800 EAX/EDX/EBX */
+void guest_fn_b570c(uint32_t a, uint32_t b, uint32_t c); /* 0xb570c EAX/EDX/EBX */
+void guest_fn_b4e74(int16_t a, uint8_t d, uint8_t b, uint16_t c, uint32_t s0, uint32_t s1); /* 0xb4e74 AX/DL/BL/CX + 2 stack */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
@@ -7340,6 +7351,9 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_440f4_e value [ecx] modify [eax ebx edx]
 #pragma aux guest_fn_dc519_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_c8ccc_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_cc6c0_q parm caller [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_b8cf8_x modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_b52bc_x modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_48da0 parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_48bb0 parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_f9ee0_x parm routine [] modify [eax ebx ecx edx esi edi ebp]

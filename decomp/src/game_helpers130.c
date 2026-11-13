@@ -6186,3 +6186,67 @@ void update_flight_options_widgets_7e2a8(void)
 	guest_fn_a72d8(ecx);
 	guest_fn_7e0a4(ecx);
 }
+
+/* 0xb97a4, 768 bytes. Build the per-slot records for a node found by
+ * 0xb55f8: derive the slot size from two random picks into its tables, then
+ * for each slot allocate its buffer, initialise the record and copy the
+ * leading fields back out of the buffer. */
+void build_slot_records_b97a4(uint32_t obj, uint32_t edxin, uint32_t ebxin, uint32_t cxin, uint32_t arg)
+{
+#define BASE() EF_U32(obj + 0x13u)
+	uint32_t node, arr, pa, pb;
+	int32_t ra, rb, r1, r2;
+	uint16_t w20, j;
+	node = guest_fn_b55f8(arg, edxin, ebxin, 0x49u);
+	if (node == 0u)
+		return;
+	ra = (int16_t)guest_fn_b5580(node);
+	rb = (int16_t)guest_fn_b5580(node);
+	r1 = (int16_t)guest_fn_b55a4(EF_U32(node + 0x20u) + (uint32_t)(ra * 10));
+	r2 = (int16_t)guest_fn_b55a4(EF_U32(node + 0x20u) + (uint32_t)(rb * 10));
+	arr = EF_U32(node + 0x20u);
+	pa = (uint32_t)(r1 * 6) + EF_U32(arr + (uint32_t)(ra * 10) + 6u);
+	pb = (uint32_t)(r2 * 6) + EF_U32(arr + (uint32_t)(rb * 10) + 6u);
+	w20 = (uint16_t)(EF_U16(pa) + EF_U16(pb) + 4u);
+	for (j = 0; (int32_t)EF_U8(obj + 0x12u) > (int16_t)j; j++) {
+		uint32_t rec = (uint32_t)((int32_t)(int16_t)j * 0x7c);
+		int32_t w;
+		uint32_t buf, e1, e2;
+		EF_U16(BASE() + rec + 0x1cu) = w20;
+		EF_U16(BASE() + rec + 0x1au) = 0u;
+		EF_U16(BASE() + rec + 0x1eu) = 0u;
+		w = (int16_t)w20;
+		{
+			uint32_t t = guest_fn_cc6c0_q((uint32_t)(w * 0x19), 0x0018eaecu, (uint32_t)(w * 0x19), (uint32_t)w);
+			EF_U32(BASE() + rec + 0x20u) = t;
+		}
+		e1 = EF_U32(EF_U32(node + 0x20u) + (uint32_t)(rb * 10) + 6u) + (uint32_t)(r2 * 6);
+		e2 = EF_U32(EF_U32(node + 0x20u) + (uint32_t)(ra * 10) + 6u) + (uint32_t)(r1 * 6);
+		guest_fn_b8cf8_x(BASE() + rec, e2, e1, EF_U32(ebxin + 0x11u),
+				 EF_U32(ebxin + 0x15u), (uint32_t)(((int32_t)EF_U32(ebxin + 0x1bu)) >> 16),
+				 (uint32_t)(((int32_t)EF_U32(ebxin + 0x1du)) >> 16), 0u, EF_U8(obj + 9u), 0u);
+		guest_fn_b5640(BASE() + rec, edxin, (uint32_t)(int32_t)(int16_t)cxin, 0x10u, EF_U8(obj + 0x12u));
+		guest_fn_b52bc_x(BASE() + rec, (uint32_t)(int32_t)(int16_t)(EF_U8(BASE() + rec + 2u) == 9u ? 0x19 : 0x23), 0u);
+		guest_fn_b5800(BASE() + rec, edxin, EF_U8(obj + 0x12u));
+		guest_fn_b570c(BASE() + rec, edxin, 2u);
+		buf = EF_U32(BASE() + rec + 0x20u);
+		guest_fn_b4e74((int16_t)EF_U16(buf + 0xeu), EF_U8(obj + 0xau), 0x10u, (uint16_t)(int32_t)(int16_t)j,
+			       (uint32_t)(((int32_t)EF_U32(obj + 0xeu)) >> 16), edxin);
+		w = (int16_t)EF_U16(BASE() + rec + 0x1cu);
+		buf = EF_U32(BASE() + rec + 0x20u);
+		guest_fn_b4e74((int16_t)EF_U16(buf + (uint32_t)((w - 1) * 0x19) + 0xeu), EF_U8(obj + 0xau), 2u,
+			       (uint16_t)(int32_t)(int16_t)j,
+			       (uint32_t)(((int32_t)EF_U32(obj + 0xeu)) >> 16), edxin);
+		buf = EF_U32(BASE() + rec + 0x20u);
+		EF_U32(BASE() + rec + 8u) = EF_U32(buf);
+		buf = EF_U32(BASE() + rec + 0x20u);
+		EF_U32(BASE() + rec + 0xcu) = EF_U32(buf + 4u);
+		EF_U32(BASE() + rec + 0x10u) = 0u;
+		buf = EF_U32(BASE() + rec + 0x20u);
+		EF_U16(BASE() + rec + 0x14u) = EF_U16(buf + 8u);
+		buf = EF_U32(BASE() + rec + 0x20u);
+		EF_U16(BASE() + rec + 0x16u) = EF_U16(buf + 0xau);
+		EF_U16(BASE() + rec + 0x18u) = 0u;
+	}
+#undef BASE
+}
