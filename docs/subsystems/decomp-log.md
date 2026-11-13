@@ -2646,3 +2646,5 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
 - 2026-11-13: individual attempts on 0x4a90 (falls through into 0x4aa0), 0x3444c (jumps into 0x34287), 0xf8248 (thunk to 0x1100b1) and 0xb00d0 (stack-arg callee 0xcc6c0): each stays blocked with that concrete difficulty in its note.
 
 - 2026-11-13: recovered count_filtered_node_matches (0xb0850, node_string_helpers.c): counts list nodes passing guest_fn_cc1ac whose type (high word of [node+7]) is in the kind-0 or kind-1 set. Targeted differential against the original passes 3/3 (kind 0, 1, 2); the first failure was a swapped EBX/EDX parameter order, not a logic error.
+
+- 2026-11-13: recovered count_positive_filtered_node_matches (0xb0954, node_string_helpers.c): sibling of 0xb0850 using guest_fn_cc22c and a wider type set (word at +9 zero always counts). Targeted differential 3/3 PASS against the original.
