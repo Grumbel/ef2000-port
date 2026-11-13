@@ -2603,3 +2603,11 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
   differential (7 stubbed callees, 15c0c4 writing scripted point words,
   400 random scenarios, 900 box draws) agrees on all call logs, stack args
   and end registers (400/400). Wrappers added for 5f588, 59420, 5c0cc.
+
+- 2026-11-13: recovered `select_view_target_92290` (0x92290). Controlled
+  differential (7 stubbed callees, 400 random scenarios covering the indexed
+  object, mode-2 table match and select_target paths, 150 direction-word
+  computations) agrees on call logs, end registers and the written
+  0x214454/0x2140e8/0x2143e4/0x1a6cfe memory (400/400). The existing
+  d0b68/d0dbc/d0fb8 prototypes compile with spurious stack pushes, so
+  register-only `_q` wrappers were added.

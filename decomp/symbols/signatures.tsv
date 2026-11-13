@@ -3395,3 +3395,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b97a4	build_slot_records_b97a4	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32,CX:uint16_t,[ESP+4]:uint32_t		esi,edi,ebp	4	Build the per-slot records for a found node.
 0x00063d5c	render_table_entry_63d5c	AX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Render one entry of the 0x127a98 table.
 0x0005f220	draw_waypoint_boxes_5f220			ebx,ecx,edx,esi,edi,ebp	0	Draw the interpolated waypoint boxes.
+0x00092290	select_view_target_92290	DX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Choose the view target and compute its direction words.

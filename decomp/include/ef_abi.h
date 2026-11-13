@@ -4473,6 +4473,11 @@ void draw_waypoint_boxes_5f220(void);
 uint32_t guest_fn_5f588(uint32_t a, uint32_t b, uint32_t c); /* 0x5f588 EAX/EDX/EBX -> AL */
 void guest_fn_59420_w(uint32_t a, uint32_t b, uint32_t c); /* 0x59420 EAX/EDX/EBX */
 void guest_fn_5c0cc(void); /* 0x5c0cc */
+void select_view_target_92290(uint32_t edxin);
+uint32_t guest_fn_92668(void); /* 0x92668 -> EAX */
+void guest_fn_d0fb8_q(uint32_t record, uint32_t value); /* 0xd0fb8 EAX/EDX */
+void guest_fn_d0b68_q(uint32_t record); /* 0xd0b68 EAX */
+void guest_fn_d0dbc_q(uint32_t record, uint32_t value); /* 0xd0dbc EAX/EDX */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
@@ -7364,6 +7369,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_440f4_e value [ecx] modify [eax ebx edx]
 #pragma aux guest_fn_dc519_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_c8ccc_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_92668 modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_5f588 modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_59420_w modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_5c0cc modify [eax ebx ecx edx esi edi ebp]

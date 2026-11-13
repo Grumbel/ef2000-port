@@ -6400,3 +6400,118 @@ void draw_waypoint_boxes_5f220(void)
 	guest_fn_59420_w((uint32_t)(int32_t)w1c, (uint32_t)(int32_t)w20, 0x00186014u);
 	guest_fn_5c0cc();
 }
+
+/* 0x92290, 928 bytes. Choose the current view target (0x214454) -- the
+ * indexed object's table entry, the entry matched through 0x1a6b2c, or the
+ * result of select_target_object -- and when one exists turn its offset
+ * from the camera position 0x214458 into the two inverted direction words
+ * at 0x2143e4. EDX is the incoming word used when no indexed object is
+ * found. */
+#define SMUL(a, b) ((int32_t)((uint32_t)(int32_t)(a) * (uint32_t)(int32_t)(b)))
+void select_view_target_92290(uint32_t edxin)
+{
+	uint16_t dx = (uint16_t)edxin;
+	uint16_t di;
+	uint32_t ecx, target = 0u;
+	uint32_t mode;
+	int go = 0;
+	ecx = guest_fn_7489c((int32_t)(int16_t)EF_U16(0x001f71cau));
+	if (ecx != 0u) {
+		int32_t b = (int8_t)EF_U8(ecx + 0x1d7u);
+		if (b == 0x14)
+			dx = 0u;
+		else
+			dx = (uint16_t)(int16_t)(int8_t)EF_U8(ecx + (uint32_t)(b * 3) + 0x19bu);
+	}
+	mode = EF_U8(0x0012814cu);
+	di = EF_U16(0x001a6cfeu);
+	if (mode != 2u) {
+		uint32_t h = EF_U8(0x0012db9eu);
+		if (h == 0x13u || h == 0x14u || h == 0x36u) {
+			if (dx >= 6u && dx <= 8u) {
+				target = EF_U32(0x001a821cu);
+			} else {
+				EF_U16(0x001a6cfeu) = di;
+				if (mode == 6u)
+					target = EF_U32(0x001a821cu);
+				else
+					target = guest_fn_92668();
+			}
+		} else {
+			target = guest_fn_92668();
+		}
+		EF_U32(0x00214454u) = target;
+		if (target == 0u)
+			goto done;
+		go = 1;
+	} else {
+		int16_t k, best, cnt;
+		uint32_t bs, p;
+		if ((int16_t)di == -1) {
+			EF_U32(0x00214454u) = 0u;
+			goto done;
+		}
+		if (ecx == 0u) {
+			EF_U32(0x00214454u) = 0u;
+			return;
+		}
+		best = 0;
+		for (k = 0;; k++) {
+			p = EF_U32(0x001972e0u) + (uint32_t)((int32_t)(int16_t)di * 0x22);
+			cnt = (int16_t)EF_U8(p + 0x13u);
+			if (!(k < cnt))
+				break;
+			if (EF_U16(EF_U32(p + 0x16u) + (uint32_t)((int32_t)k * 0x38) + 0x20u) == EF_U16(ecx + 0x28u))
+				best = k;
+		}
+		bs = (uint32_t)((int32_t)best * 0x2a);
+		{
+			int32_t e1 = (int16_t)(((int32_t)EF_U32(0x001a6b2cu + bs)) >> 11) - (((int32_t)EF_U32(ecx)) >> 19);
+			int32_t e2 = (int16_t)(((int32_t)EF_U32(0x001a6b34u + bs)) >> 11) - (((int32_t)EF_U32(ecx + 8u)) >> 19);
+			int32_t q1 = SMUL(e1, e1), q2 = SMUL(e2, e2);
+			if ((int32_t)(int16_t)q1 + (int32_t)(int16_t)q2 > 4) {
+				EF_U16(0x001a6cfeu) = di;
+				EF_U32(0x00214454u) = 0u;
+				return;
+			}
+		}
+		EF_U32(0x002140e8u) = EF_U32(0x001a6b2cu + bs) << 8;
+		EF_U32(0x002140ecu) = 0u;
+		EF_U16(0x001a6cfeu) = di;
+		EF_U32(0x00214454u) = 0x002140e8u;
+		EF_U32(0x002140f0u) = EF_U32(0x001a6b34u + bs) << 8;
+		go = 1;
+	}
+	if (go) {
+		uint32_t q = EF_U32(0x00214458u), r = EF_U32(0x00214454u);
+		int32_t dxv = ((int32_t)(EF_U32(r) - EF_U32(q))) >> 8;
+		int32_t dzv = ((int32_t)(EF_U32(r + 8u) - EF_U32(q + 8u))) >> 8;
+		int32_t dyv = ((int32_t)(EF_U32(r + 4u) - EF_U32(q + 4u))) >> 8;
+		uint32_t zero[3], v[3], out[1];
+		int16_t w24, w26;
+		zero[0] = zero[1] = zero[2] = 0u;
+		out[0] = 0u;
+		guest_fn_d0b68_q(0x002143c0u);
+		guest_fn_d0ebc(0x002143c0u, EF_U16(q + 0xeu));
+		guest_fn_d0dbc_q(0x002143c0u, EF_U16(q + 0xcu));
+		guest_fn_d0fb8_q(0x002143c0u, EF_U16(q + 0x10u));
+		v[0] = (uint32_t)((SMUL(dyv, EF_U32(0x002143ccu)) >> 15) + (SMUL(dxv, EF_U32(0x002143c0u)) >> 15)
+				  + (SMUL(dzv, EF_U32(0x002143d8u)) >> 15));
+		v[1] = (uint32_t)((SMUL(dyv, EF_U32(0x002143d0u)) >> 15) + (SMUL(dxv, EF_U32(0x002143c4u)) >> 15)
+				  + (SMUL(dzv, EF_U32(0x002143dcu)) >> 15));
+		v[2] = (uint32_t)((SMUL(dxv, EF_U32(0x002143c8u)) >> 15) + (SMUL(dyv, EF_U32(0x002143d4u)) >> 15)
+				  + (SMUL(dzv, EF_U32(0x002143e0u)) >> 15));
+		guest_fn_dc91c((uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)v, (uint32_t)(uintptr_t)zero);
+		w24 = (int16_t)(out[0] & 0xffffu);
+		w26 = (int16_t)(out[0] >> 16);
+		if (w24 > 0x1000)
+			w24 = 0x1000;
+		EF_U16(0x002143e4u) = (uint16_t)w24;
+		EF_U16(0x002143e6u) = (uint16_t)w26;
+		EF_U16(0x002143e4u) = (uint16_t)~w24;
+		EF_U16(0x002143e6u) = (uint16_t)~w26;
+	}
+done:
+	return;
+}
+#undef SMUL
