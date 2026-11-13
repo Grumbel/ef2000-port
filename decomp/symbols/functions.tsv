@@ -3343,7 +3343,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e1948	16	fatal_with_arg_e1948	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1948.json	docs/compiler-abi.md; Abort with a message that includes the argument.; callers e1e6c@e1efb,e1e6c@e1fc8,e1e6c@e20c5; guest pending
 0x000e1958	956			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.
 0x000e1df0	123	text_width_e1df0	game_helpers89	compiles	game	confirmed	decomp/tests/0x000e1df0.json	docs/compiler-abi.md; Pixel width of up to len characters of a string for the given font (spaces use the font's space width).; callers e1958@e1a87,e1958@e1baa,e1958@e1bee; guest pending
-0x000e1e6c	1257			unknown	game	unverified		
+0x000e1e6c	1257	wrap_text_lines_e1e6c	game_helpers130	compiles	game	confirmed	decomp/tests/0x000e1e6c.json	Original 0xe1e6c (1257 bytes)
 0x000e2374	493			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
 0x000e2564	186	visit_overlapping_nodes_e2564	list_ops1	compiles	game	confirmed	decomp/tests/0x000e2564.json	docs/compiler-abi.md; Walk the node list at obj+0xc7 (next at +0xa) and call 0xe2374 for every node whose position, widened by a per-kind marg; callers a5b70@a5c56; guest pending
 0x000e26bc	400			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads si on entry) or carry-flag results that the C ABI cannot express.

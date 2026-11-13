@@ -2611,3 +2611,222 @@ uint32_t nearest_segment_hit_cff80(ef_addr32 seg, uint32_t count, ef_addr32 plan
     } while (--count != 0u);
     return best != 0x7fffffff;
 }
+
+/* Original 0xe1e6c (1257 bytes). Word-wrap the NUL-terminated text TEXT for
+ * font FONT into the line-node chain hanging off OBJ+0xc7 (each 0x12-byte node:
+ * +0 x, +2 y, +4 char count, +6 text start, +0xa next, +0xe prev), handling
+ * spaces, newlines (0xd) and tabs (9), then flag the object and redraw it. */
+#define E1E6C_NEXT_NODE(node, obj)                                         \
+    do {                                                                   \
+        ef_addr32 next_ = EF_U32((node) + 0xau);                           \
+        if (next_ != 0u) {                                                 \
+            (node) = next_;                                                \
+        } else {                                                           \
+            next_ = alloc_zeroed_ab840(0x12u);                             \
+            if (next_ == 0u)                                               \
+                fatal_with_arg_e1948(obj);                                 \
+            EF_U32((node) + 0xau) = next_;                                 \
+            (node) = next_;                                                \
+        }                                                                  \
+    } while (0)
+
+void wrap_text_lines_e1e6c(ef_addr32 obj, ef_addr32 text, uint8_t font)
+{
+    ef_addr32 node, old;
+    uint16_t cdx, x0, xs, y, n, cnt9, savedX, savedN;
+    int16_t maxX;
+    ef_addr32 savedT;
+    uint32_t t10, c;
+    int32_t xv;
+
+    if (obj == 0u || font >= 10u || EF_U8(0x00419adau + ((uint32_t)font << 11)) == 0u)
+        return;
+    t10 = (uint32_t)font * 10u;
+    EF_U8(obj + 0xcbu) = (uint8_t)((EF_U8(obj + 0xcbu) & 0xe1u) | (uint8_t)(((uint32_t)font & 0xfu) * 2u));
+    if (text == 0u) {
+        EF_U8(obj + 0xcbu) = (uint8_t)(EF_U8(obj + 0xcbu) & 0xfeu);
+        if (EF_U8(0x0041f2e5u) != 0u)
+            return;
+        guest_fn_a5ef8(EF_U8(obj + 0x10u));
+        return;
+    }
+    node = EF_U32(obj + 0xc7u);
+    if (node == 0u) {
+        node = alloc_zeroed_ab840(0x12u);
+        if (node == 0u)
+            fatal_with_arg_e1948(obj);
+        EF_U32(obj + 0xc7u) = node;
+    }
+    maxX = (int16_t)(EF_U16(obj + 0x65u) - EF_U16(obj + 0xd0u));
+    x0 = EF_U16(obj + 0xd2u);
+    cdx = x0;
+    xs = x0;
+    y = EF_U16(obj + 0xd4u);
+    EF_U32(node + 6u) = text;
+    EF_U16(node) = cdx;
+    EF_U16(node + 2u) = y;
+    n = 0u;
+    cnt9 = 0u;
+    savedT = 0u;
+    savedX = 0u;
+    savedN = 0u;
+    if (EF_U8(text) == 0u)
+        goto post;
+main_loop:
+    c = EF_U8(text);
+    if (c == 0x20u) {
+        cdx = (uint16_t)(cdx + EF_U8(0x001378d9u + t10));
+        if ((int16_t)cdx < maxX) {
+            text++;
+            if (n == 0u) {
+                EF_U16(node) = cdx;
+                EF_U32(node + 6u) = text;
+                goto check;
+            }
+            n++;
+            goto check;
+        }
+        text++;
+        goto check;
+    }
+    if (c == 0xdu) {
+        if (n != 0u) {
+            old = node;
+            E1E6C_NEXT_NODE(node, obj);
+            EF_U16(old + 4u) = n;
+        }
+        text++;
+        n = 0u;
+        cnt9 = 0u;
+        EF_U16(node) = x0;
+        y = (uint16_t)(y + EF_U8(0x001378dbu + t10));
+        EF_U32(node + 6u) = text;
+        xs = x0;
+        cdx = x0;
+        EF_U16(node + 2u) = y;
+        goto check;
+    }
+    if (c == 9u) {
+        if (cnt9 == 0u) {
+            int32_t lim = (int32_t)(int16_t)EF_U16(obj + 0xd8u) + (int32_t)(int16_t)x0;
+
+            if (lim > (int32_t)(int16_t)cdx)
+                cdx = (uint16_t)(x0 + EF_U16(obj + 0xd8u));
+        } else {
+            int32_t tw = (int32_t)EF_U8(0x001378dcu + t10);
+            int32_t q = ((int32_t)(int16_t)cdx - (int32_t)(int16_t)x0) / tw;
+
+            cdx = (uint16_t)((q + 1) * tw + (int32_t)(int16_t)x0);
+        }
+        cnt9++;
+        if ((int16_t)cdx >= maxX) {
+            text++;
+            goto check;
+        }
+        if (n == 0u) {
+            text++;
+            EF_U16(node) = cdx;
+            EF_U32(node + 6u) = text;
+            goto check;
+        }
+        old = node;
+        EF_U16(node + 4u) = n;
+        E1E6C_NEXT_NODE(node, obj);
+        EF_U16(node) = cdx;
+        text++;
+        EF_U16(node + 2u) = y;
+        n = 0u;
+        EF_U32(node + 6u) = text;
+        goto check;
+    }
+    if (EF_U8(0x004198d2u + ((uint32_t)font << 11) + c * 8u) == 0u) {
+        if (EF_U8(text) != 0u) {
+            text++;
+            n++;
+        }
+        goto check;
+    }
+    savedX = cdx;
+    savedT = text;
+    savedN = n;
+    if (EF_U8(text) == 0u)
+        goto check;
+inner:
+    c = EF_U8(text);
+    if (EF_U8(0x004198d2u + ((uint32_t)font << 11) + c * 8u) == 0u)
+        goto check;
+    cdx = (uint16_t)(cdx + EF_U8(0x004198d2u + ((uint32_t)font << 11) + c * 8u) +
+                     EF_U8(0x001378dau + t10));
+    if ((int16_t)cdx < maxX) {
+        text++;
+        n++;
+        goto inner_tail;
+    }
+    if ((int32_t)(int16_t)savedX == (int32_t)xs) {
+        EF_U16(node + 4u) = n;
+        E1E6C_NEXT_NODE(node, obj);
+        xv = (int32_t)(int16_t)x0;
+        if ((int32_t)(int16_t)EF_U16(obj + 0xd6u) + xv < (int32_t)maxX - 0xc)
+            xv += (int32_t)(int16_t)EF_U16(obj + 0xd6u);
+        cdx = (uint16_t)xv;
+        xs = (uint16_t)xv;
+        y = (uint16_t)(y + EF_U8(0x001378dbu + t10));
+        savedX = cdx;
+        savedT = text;
+        EF_U16(node) = cdx;
+        EF_U16(node + 2u) = y;
+        n = 0u;
+        EF_U32(node + 6u) = text;
+        savedN = 0u;
+        if (EF_U8(text) != 0u)
+            goto inner;
+        goto check;
+    }
+    if (savedN != 0u) {
+        old = node;
+        EF_U16(node + 4u) = savedN;
+        E1E6C_NEXT_NODE(node, obj);
+        (void)old;
+    }
+    xv = (int32_t)(int16_t)x0;
+    if ((int32_t)(int16_t)EF_U16(obj + 0xd6u) + xv < (int32_t)maxX - 0xc)
+        xv += (int32_t)(int16_t)EF_U16(obj + 0xd6u);
+    cdx = (uint16_t)xv;
+    xs = (uint16_t)xv;
+    y = (uint16_t)(y + EF_U8(0x001378dbu + t10));
+    savedX = cdx;
+    text = savedT;
+    n = 0u;
+    EF_U16(node + 2u) = y;
+    EF_U16(node) = cdx;
+    EF_U32(node + 6u) = text;
+    savedN = 0u;
+inner_tail:
+    if (EF_U8(text) != 0u)
+        goto inner;
+check:
+    if (EF_U8(text) != 0u)
+        goto main_loop;
+post:
+    if (n != 0u) {
+        old = node;
+        EF_U16(node + 4u) = n;
+        E1E6C_NEXT_NODE(node, obj);
+        (void)old;
+    }
+    EF_U16(node) = 0u;
+    EF_U16(node + 2u) = 0u;
+    EF_U16(node + 4u) = 0u;
+    EF_U8(obj + 0xcbu) = (uint8_t)(EF_U8(obj + 0xcbu) | 1u);
+    old = EF_U32(obj + 0xc7u);
+    node = EF_U32(old + 0xau);
+    EF_U32(old + 0xeu) = 0u;
+    while (node != 0u) {
+        EF_U32(node + 0xeu) = old;
+        old = node;
+        node = EF_U32(node + 0xau);
+    }
+    if (EF_U8(0x0041f2e5u) != 0u)
+        return;
+    guest_fn_a5ef8(EF_U8(obj + 0x10u));
+}

@@ -2426,3 +2426,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13 `build_group_request_ccdbc` (0xccdbc): request builder recovered from disassembly; isolated fuzz weak (0 completed of 1000, random inputs fault in the original).
 
 - 2026-11-13 `nearest_segment_hit_cff80` (0xcff80): segment-vs-plane nearest hit recovered; isolated fuzz PASS (148 completed of 1000).
+
+- 2026-11-13 `wrap_text_lines_e1e6c` (0xe1e6c): text word-wrap into line nodes recovered with goto-structured C; isolated fuzz PASS 1000 (many cases likely exit early on the font/enable checks, so deep paths are covered mainly by disassembly review).
