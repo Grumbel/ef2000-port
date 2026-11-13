@@ -1902,7 +1902,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00092070	169	classify_angle_92070	game_helpers36	compiles	game	confirmed	decomp/tests/0x00092070.json	docs/compiler-abi.md; Classify the signed angle word into a -2..1 step (kept when out of range).; callers 942cc@942f4,94370@94398,94484@944a9; guest pending
 0x00092254	59	prepare_navigation_component	ui_secondary	compiles	game	confirmed	decomp/tests/0x00092254.json	docs/compiler-abi.md; host model; guest differential pending
 0x00092290	928			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
-0x00092668	793			unknown	game	unverified		
+0x00092668	793	select_target_object_92668	game_helpers130	compiles	game	confirmed	decomp/tests/0x00092668.json	Original 0x92668 (793 bytes)
 0x00092984	633			unknown	game	unverified		
 0x00092c28	520			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x00092e30	222	load_camera_92e30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00092e30.json	docs/compiler-abi.md; Load the camera record 0x214378 from the object UNIT (word in EDX, 0x7489c): convert the float 0x1a5bb8 to the dword 0x1; callers 92c28@92dcb,95e58@96a53,95e58@96b3b; guest pending

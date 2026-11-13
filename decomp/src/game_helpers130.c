@@ -1856,3 +1856,92 @@ int32_t update_screen_palette_76370(uint32_t xIndex, uint32_t yIndex)
     }
     return factor;
 }
+
+/* Original 0x92668 (793 bytes). Pick the current target object for the
+ * active display mode; returns its guest pointer or 0. */
+ef_addr32 select_target_object_92668(void)
+{
+    uint8_t mode;
+    int32_t id;
+    ef_addr32 own, target, other;
+    int32_t vec[3];
+    int32_t dist;
+
+    if (EF_U32(0x0020f154u) != 0u && EF_U8(0x0012db9eu) == 0x18u)
+        return EF_U32(0x0020f154u);
+    mode = EF_U8(0x0012db9eu);
+    if (mode == 0x14u || mode == 0x18u || mode == 0x36u) {
+        id = EF_S32(0x001a823cu) >> 16;
+        if (id == -1 || id == 0xff)
+            return 0u;
+        return lookup_filtered_indexed_object((int16_t)id);
+    }
+    if (mode >= 0x15u && mode <= 0x17u && (EF_S32(0x001f71c8u) >> 16) != 0xff &&
+        (EF_S32(0x0019bb5cu) >> 16) != 0xff) {
+        own = EF_U32(0x0019bb58u) + (uint32_t)((EF_S32(0x0019bb5cu) >> 16) * 0xca);
+        own = lookup_filtered_indexed_object(
+            (int16_t)(EF_S32(own + 0x4eu + (uint32_t)EF_U8(0x0012dc34u) * 2u) >> 16));
+        if (own != 0u && (EF_U8(own + 0x24u) & 8u) == 0u) {
+            if (mode == 0x15u) {
+                target = own;
+                vec[0] = EF_S32(target) >> 8;
+                vec[1] = EF_S32(target + 4u) >> 8;
+                vec[2] = EF_S32(target + 8u) >> 8;
+                dist = guest_fn_23760_x((ef_addr32)(uintptr_t)vec);
+                if (dist <= 0x5000) {
+                    EF_U16(0x001a823eu) = EF_U16(target + 0x16u);
+                    EF_U16(0x001a8238u) = EF_U16(target + 0x16u);
+                }
+                return target;
+            }
+            if (mode == 0x16u) {
+                uint32_t partner = EF_U16(own + 0x146u);
+
+                if (partner != 0xffu && partner != (uint32_t)(EF_S32(0x001f71c8u) >> 16)) {
+                    other = lookup_filtered_indexed_object(
+                        (int16_t)(EF_S32(own + 0x144u) >> 16));
+                    if (other != 0u) {
+                        vec[0] = EF_S32(other) >> 8;
+                        vec[1] = EF_S32(other + 4u) >> 8;
+                        vec[2] = EF_S32(other + 8u) >> 8;
+                        dist = guest_fn_23760_x((ef_addr32)(uintptr_t)vec);
+                        if (dist <= 0x2800) {
+                            EF_U16(0x001a823eu) = EF_U16(own + 0x146u);
+                            EF_U16(0x001a8238u) = EF_U16(own + 0x16u);
+                        }
+                        return other;
+                    }
+                }
+            } else {
+                if (EF_U16(own + 0x158u) != 0xffu) {
+                    other = lookup_filtered_indexed_object(
+                        (int16_t)(EF_S32(own + 0x156u) >> 16));
+                    if (other != 0u) {
+                        vec[0] = EF_S32(other) >> 8;
+                        vec[1] = EF_S32(other + 4u) >> 8;
+                        vec[2] = EF_S32(other + 8u) >> 8;
+                        dist = guest_fn_23760_x((ef_addr32)(uintptr_t)vec);
+                        if (dist <= 0x2800)
+                            EF_U16(0x001a823eu) = EF_U16(own + 0x158u);
+                        return other;
+                    }
+                }
+            }
+        }
+    }
+    id = EF_S32(0x001a8234u) >> 16;
+    if (id != 0xff) {
+        target = lookup_filtered_indexed_object((int16_t)id);
+        if (target != 0u)
+            return target;
+    }
+    id = EF_S32(0x001a823au) >> 16;
+    if (id != 0xff) {
+        target = lookup_filtered_indexed_object((int16_t)id);
+        if (target != 0u)
+            return target;
+    }
+    if (EF_U32(0x001a821cu) != 0u)
+        return EF_U32(0x001a821cu);
+    return EF_U32(EF_U32(0x002143f8u));
+}

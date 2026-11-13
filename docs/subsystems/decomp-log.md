@@ -2414,3 +2414,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered `odometer_text_5e21c` (0x5e21c). Fuzz PASS (19 completed cases of 1000). The original's packed stack locals (stale mode dword overwritten by x in the minus branch) are mirrored by semantic locals.
 
 - 2026-11-13: recovered `update_screen_palette_76370` (0x76370). Fuzz weak (0 of 1000 completed; callees fault on random state), so verified from the disassembly only.
+
+- 2026-11-13: recovered `select_target_object_92668` (0x92668). Fuzz PASS (1000/1000).
