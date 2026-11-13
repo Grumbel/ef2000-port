@@ -3442,3 +3442,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00042a98	gpw_map_mode_selected_42a98	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00042a98 (107 bytes); map-mode text via sprintf into stack buffer.
 0x0000bf70	onleaveOptions			ebx,ecx,edx,esi,edi,ebp	0	Original 0xbf70 (91 bytes); dumps pending record via 0xb3084
 0x000ab908	gnInitSettingsWindow	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0xab908 (54 bytes); formats 0x137278 into "number" widget
+0x0004c33c	mpClickMap			ebx,ecx,edx,esi,edi,ebp	0	Original 0x4c33c (126 bytes); cycles preview page byte 1a53dd, calls 41314 then 42548

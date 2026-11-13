@@ -276,6 +276,7 @@ void ui_release_matching_control(uint16_t code); /* 0x802ac */
 void ui_reset_active_panel(void); /* 0x803c4 */
 void ui_reset_panel_and_release(void); /* 0x80400 */
 void ui_emit_selected_message(void); /* 0x42548 */
+void mpClickMap(void); /* 0x4c33c */
 
 /* Original helper call interfaces, retained as guest dependencies. */
 void ui_control_activate(uint32_t index); /* 0xd7490, EAX */
