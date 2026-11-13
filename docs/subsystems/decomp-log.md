@@ -2334,3 +2334,10 @@ with the reason in the notes column.
 an unpushed hidden input forwarded to `0xbfb2c`. Fuzz with 1,500 cases: PASS
 (6 completed; random pointers make most scenarios fault in the original, use
 `--cases 1000+` for pointer-heavy functions).
+
+Skip policy: 28 unknown functions whose branches leave their own body (shared
+tails / Ghidra boundary splits) are marked `blocked` with that reason. Their
+neighbours must be recovered together; revisit after the plain functions.
+`0x10d94f` (`align_block_size_10d94f`, new module `memory_blocks1`) recovered;
+it calls the segment-limit helper `0x10d63b` as an external guest function
+(`guest_fn_10d63b`, value in EAX). Fuzz: PASS, 456 completed cases.

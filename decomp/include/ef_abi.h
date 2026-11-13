@@ -4301,6 +4301,10 @@ int32_t can_reactivate_c117c(ef_addr32 rec, ef_addr32 list_a, ef_addr32 list_b);
 /* image_dump1.c */
 void write_planar_image_d1afc(void);
 
+/* memory_blocks1.c */
+uint32_t guest_fn_10d63b(void); /* 0x10d63b: segment limit based size, EAX */
+uint32_t align_block_size_10d94f(uint32_t *size);
+
 /* game_helpers130.c */
 void init_sub_records_b4fb4(ef_addr32 obj, ef_addr32 tmpl);
 void dump_area_list_b31f0(ef_addr32 list_holder, uint32_t handle);
@@ -7234,5 +7238,6 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux render_index_stream_c4d43 parm routine []
 #pragma aux rotate_view_test_160122 parm routine []
 #pragma aux rotate_view_test_160156 parm routine []
+#pragma aux guest_fn_10d63b parm routine [] value [eax] modify [eax ebx ecx edx esi edi ebp]
 #endif
 #endif

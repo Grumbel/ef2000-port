@@ -3297,3 +3297,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b3168	dump_lists_to_file_b3168	EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t		ebx,ecx,edx,esi,edi,ebp	20	Original 0x000b3168 (136 bytes); debug dump of a list to a named file; callers 69d10; ret 0x14
 0x000d1afc	write_planar_image_d1afc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d1afc (237 bytes); write the image to the log file row by row
 0x000bfb88	position_in_box_bfb88	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0xbfb88 (336 bytes); box test of a record position
+0x0010d94f	align_block_size_10d94f	EAX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0x10d94f (119 bytes); round a block size up
