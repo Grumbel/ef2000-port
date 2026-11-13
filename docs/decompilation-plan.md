@@ -2244,3 +2244,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 composed menu-control validation: dispatcher now passes 27 synthetic-service cases including mode/exit tails; combined recovered main loop plus dispatcher passes one original-vs-C comparison. Real menu services and source-only startup remain incomplete.
 
 2026-11-13 GUI state-loader continuation: corrected 0xaad7c frame layout and isolated source module; six synthetic-service differentials pass. Actual GUI parser integration and source-only startup remain incomplete.
+
+2026-11-13 GUI binary-parser continuation: recovered 0xaa5c4 with 22 passing synthetic-service comparisons, including all payload opcodes and optional nested records. Real resource I/O, list-link integration and source-only startup/menu remain incomplete.

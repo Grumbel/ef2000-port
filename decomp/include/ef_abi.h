@@ -7509,4 +7509,6 @@ void menu_seed_a45e4(uint32_t seed); /* 0xa45e4 */
 #ifdef __WATCOMC__
 #pragma aux menu_seed_a45e4 parm routine [] modify [eax]
 #endif
+ef_addr32 menu_allocate_a7b98(uint32_t size); /* 0xa7b98 EAX */
+void load_menu_stream_aa5c4(uint32_t handle); /* 0xaa5c4 EAX */
 #endif
