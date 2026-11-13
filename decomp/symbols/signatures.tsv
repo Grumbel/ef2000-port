@@ -3439,3 +3439,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004c6a0	mp_zoom_out_map_4c6a0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004c6a0 (119 bytes); map zoom step; no register inputs
 0x0004c718	mp_strike_list_selected_4c718			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004c718 (115 bytes); map zoom step; no register inputs
 0x000051d4	kots_click_play_type_51d4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000051d4 (86 bytes); cycles play-type toggle byte and shows widget.
+0x00042a98	gpw_map_mode_selected_42a98	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00042a98 (107 bytes); map-mode text via sprintf into stack buffer.

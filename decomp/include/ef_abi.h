@@ -3362,6 +3362,7 @@ void set_record_scale_a56b0(ef_addr32 record, double scale);
 void mp_zoom_out_map_4c6a0(void); /* 0x4c6a0 no args */
 void mp_strike_list_selected_4c718(void); /* 0x4c718 no args */
 void kots_click_play_type_51d4(ef_addr32 widget); /* 0x51d4 EAX */
+void gpw_map_mode_selected_42a98(ef_addr32 root); /* 0x42a98 EAX */
 double distance_2d_b415c(ef_addr32 a, ef_addr32 b);
 double distance_3d_b41bc(ef_addr32 a, ef_addr32 b);
 double word_to_scaled_b4230(int16_t value);

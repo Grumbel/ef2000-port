@@ -158,3 +158,24 @@ void kots_click_play_type_51d4(ef_addr32 widget)
     }
     show_widget_a7588(widget, EF_U32(0x00121e30u + (uint32_t)*slot * 8u));
 }
+
+/* 0x42a98, 108 bytes. Find the checked widget "root/0x184510", format the
+ * map-mode text (position high words, 0) into a stack buffer and show it
+ * unless the formatted buffer starts with a non-zero byte at the widget's
+ * index (0x3d). */
+void gpw_map_mode_selected_42a98(ef_addr32 root)
+{
+    char buf[0x34];
+    ef_addr32 widget = find_widget_checked_a78bc(root, 0x00184510u);
+
+    if (widget != 0u) {
+        buf[EF_U16(widget + 0x3du)] = 0;
+        guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x0018451cu,
+                            (int32_t)((int32_t)EF_U32(0x0013799cu) >> 16) + 1,
+                            (int32_t)EF_U32(0x0013799eu) >> 16,
+                            (int32_t)EF_U32(0x001379a0u) >> 16, 0);
+        if (buf[EF_U16(widget + 0x3du)] == 0) {
+            show_widget_a7588(widget, (ef_addr32)(uintptr_t)buf);
+        }
+    }
+}
