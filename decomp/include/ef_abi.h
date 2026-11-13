@@ -4390,6 +4390,7 @@ uint32_t draw_marker_line_7b7d8(void); /* 0x7b7d8 */
 void update_tracked_pair_759c(int32_t id); /* 0x759c */
 void guest_fn_73ec_x(uint32_t a, uint32_t b); /* 0x73ec EAX/EDX */
 int16_t classify_view_sample_39548(ef_addr32 p, int16_t d, int16_t m); /* 0x39548 */
+void init_angle_tables_3bd50(void); /* 0x3bd50 */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

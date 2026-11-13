@@ -3998,3 +3998,48 @@ int16_t classify_view_sample_39548(ef_addr32 p, int16_t d, int16_t m)
 	}
 	return di;
 }
+
+/* Original 0x3bd50: build the 37 per-angle sin/cos marker tables (8 words each). */
+void init_angle_tables_3bd50(void)
+{
+	int32_t ang = (int32_t)0xfff70000u;
+	int32_t i = 0;
+	uint32_t lc = 0u, l14 = 0u;
+
+	do {
+		uint16_t out[2];
+		uint32_t e = (uint32_t)i * 0x48u;
+		uint32_t ecx, ptr, ebx;
+		int32_t scale;
+
+		load_sincos_dc7bc((uint32_t)(ang / 0x24) & 0xffffu);
+		rotate_point_dc7e4((ef_addr32)(uintptr_t)out, 0x1000, 0);
+		EF_U16(0x001a23bau + e) = out[0];
+		EF_U16(0x001a23b8u + e) = out[1];
+		EF_U16(0x001a1952u + e) = out[0];
+		EF_U16(0x001a1950u + e) = out[1];
+		EF_U32(0x001a23bcu + e) = EF_U32(0x00126384u + lc);
+		EF_U32(0x001a1954u + e) = EF_U32(0x00126384u + lc);
+		ecx = (guest_fn_9d524(EF_U32(0x001a23bcu + e), 0x001835ecu) == 0u) ? 0x0012643cu : 0x0012641cu;
+		scale = (int16_t)EF_U16(0x0012645cu + l14);
+		ptr = EF_U32(0x00126384u + lc);
+		for (ebx = e; ebx != e + 0x10u; ebx += 2u) {
+			EF_U16(0x001a2378u + ebx) = (uint16_t)(((int32_t)(int16_t)EF_U16(ecx) * scale) / 100);
+			ecx += 2u;
+			EF_U16(0x001a2388u + ebx) = EF_U16(ecx);
+			ecx += 2u;
+			if (EF_U8(ptr) != 0x2du)
+				EF_U16(0x001a2388u + ebx) = (uint16_t)(0u - EF_U16(0x001a2388u + ebx));
+			EF_U16(0x001a2398u + ebx) = (uint16_t)(0u - EF_U16(0x001a2378u + ebx));
+			EF_U16(0x001a23a8u + ebx) = EF_U16(0x001a2388u + ebx);
+			EF_U16(0x001a1910u + ebx) = (uint16_t)((int32_t)(int16_t)EF_U16(0x001a2378u + ebx) / 2);
+			EF_U16(0x001a1920u + ebx) = (uint16_t)((int32_t)(int16_t)EF_U16(0x001a2388u + ebx) / 2);
+			EF_U16(0x001a1930u + ebx) = (uint16_t)((int32_t)(int16_t)EF_U16(0x001a2398u + ebx) / 2);
+			EF_U16(0x001a1940u + ebx) = (uint16_t)((int32_t)(int16_t)EF_U16(0x001a23a8u + ebx) / 2);
+		}
+		lc += 4u;
+		l14 += 2u;
+		i++;
+		ang += 0x8000;
+	} while (i <= 0x24);
+}
