@@ -7511,4 +7511,6 @@ void menu_seed_a45e4(uint32_t seed); /* 0xa45e4 */
 #endif
 ef_addr32 menu_allocate_a7b98(uint32_t size); /* 0xa7b98 EAX */
 void load_menu_stream_aa5c4(uint32_t handle); /* 0xaa5c4 EAX */
+ef_addr32 allocate_heap_fc795(uint32_t size); /* 0xfc795 EAX */
+uint32_t heap_grow_10d80b(uint32_t size); /* 0x10d80b EAX */
 #endif

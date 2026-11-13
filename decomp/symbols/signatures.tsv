@@ -3454,3 +3454,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000ea270	clump_load	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0xea270..0xea3e9 saves six GPRs; callers 0x8b297/0x8b2a1 supply descriptors in EAX; 0x60-byte local frame.
 0x000aaee8	main_control_loop	EAX:int32_t,EDX:ef_addr32	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	Original 0xaaee8..0xaafe6 saves EBX ECX ESI EDI; EDX is scratch; caller 0x8b2d2 passes argc/argv, returns zero.
 0x000aa5c4	load_menu_stream_aa5c4	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0xaa5c4..0xaaa0d saves six GPRs; EAX file handle; caller 0xaae2c; read EAX/EDX/EBX and allocator EAX.
+0x000fc795	allocate_heap_fc795	EAX:uint32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original saves GPRs and segment registers; DS only read for heap_alloc; callers c3f70 tail and e8733; invalid size early return.

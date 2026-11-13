@@ -2268,3 +2268,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 list-name pass: isolated/audited 0xaa3dc, ten targeted comparisons pass, and native build/bootstrap checks pass. Heap/string-copy composition, actual post-load setup and source-only startup/menu remain incomplete.
 
 2026-11-13 name/copy integration: isolated pair-loop strcpy 0x9d749 passes 18 comparisons; composed name/copy passes ten cases. General heap 0xfc795 and actual post-load/startup/menu integration remain incomplete.
+
+2026-11-13 general-heap continuation: recovered outer allocator 0xfc795 with documented DS-read ASM adapter; nine instrumented-helper comparisons pass. Per-heap allocation, extender growth, native selector binding and source-only startup/menu remain incomplete.
