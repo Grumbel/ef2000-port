@@ -2466,7 +2466,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b0c34	102			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x000b0c9c	95			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x000b0cfc	245	shuffle_words_b0cfc	game_helpers115	compiles	game	confirmed	decomp/tests/0x000b0cfc.json	docs/compiler-abi.md; Shuffle pass over a word array: for each iteration pick two random positions and swap them with the xor trick.; callers b0f5c@b12c2; guest pending
-0x000b0df4	359			unknown	game	unverified		
+0x000b0df4	359	assign_slot_flags_b0df4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b0df4.json	Original 0xb0df4 (359 bytes)
 0x000b0f5c	1888	initialize_global_node_state	unk_nodes	typed	game	confirmed		docs/compiler-abi.md; zero inputs, all GPRs except EAX preserved, EAX=0, DS-to-ES movsd; callers 0xbab4/0xc0f6
 0x000b16c0	64	free_entry_array_b16c0	list_helpers	compiles	game	confirmed	decomp/tests/0x000b16c0.json	docs/compiler-abi.md; Free a record with 10-byte entries (count at +5, array at +6).; callers bed1c@bee8f,bf444@bf7f7,bf81c@bf963; guest pending
 0x000b1700	64	free_entry_array_b1700	list_helpers	compiles	game	confirmed	decomp/tests/0x000b1700.json	docs/compiler-abi.md; As above with count at +4 and array at +5.; callers f9448@f956f; guest pending

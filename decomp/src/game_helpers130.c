@@ -3373,3 +3373,58 @@ uint16_t process_pending_nodes_bf81c(uint16_t acc, ef_addr32 list, uint32_t p3, 
     }
     return acc;
 }
+
+/* Original 0xb0df4 (359 bytes). Pick a random free slot number (13 - v, v
+ * drawn from the cursor row plus 0..2 and clamped to 0..9, never 7, 8 or
+ * 10), mark that node of LIST and update its lookup tile, then for every
+ * type-0x31/0x49 node of LIST set the state byte (+0xd) of the matching
+ * entries of the list at *PTR: 7 when the negative group flag is set (and
+ * the state is 0), otherwise count the positive-flag matches: state 0 for the
+ * first 0x31 of them, 7 after that. */
+void assign_slot_flags_b0df4(ef_addr32 ptr, ef_addr32 list, ef_addr32 head)
+{
+    ef_addr32 node, c, rec;
+    int32_t v, d;
+    uint16_t count;
+
+    do {
+        uint32_t r = guest_fn_9c960();
+
+        v = (int32_t)EF_U8(0x001264e2u) + (int32_t)(r & 0xffffu) % 3 - 1;
+        if ((int16_t)v > 9) v = 9;
+        if ((int16_t)v < 0) v = 0;
+        d = (int16_t)(uint16_t)(13 - v);
+    } while (d == 7 || d == 10 || d == 8);
+    rec = list_nth(list, (uint32_t)d);
+    EF_U8(rec + 9u) = 1;
+    guest_fn_cb3c4_x(EF_U32(rec + 0x16u), EF_U32(rec + 0x1au), EF_U8(rec + 9u), 0x00134d8au, 0x00137980u);
+    lookup_tiles_cbc54(0x00134d8au, 0x00137988u);
+    node = EF_U32(list);
+    while (node != 0u) {
+        uint32_t type = EF_U8(node + 0xbu);
+
+        if (type == 0x31u || type == 0x49u) {
+            for (c = EF_U32(EF_U32(ptr)); c != 0u; c = EF_U32(c + 4u)) {
+                if (EF_U32(c + 0x3bu) == EF_U32(node + 0x16u) && EF_U32(c + 0x3fu) == EF_U32(node + 0x1au)) {
+                    if ((uint16_t)group_flag_negative_cc1ac(EF_U8(c + 0xeu), EF_U8(node + 9u), head) != 0u &&
+                        EF_U8(c + 0xdu) == 0u)
+                        EF_U8(c + 0xdu) = 7;
+                }
+            }
+            count = 0;
+            for (c = EF_U32(EF_U32(ptr)); c != 0u; c = EF_U32(c + 4u)) {
+                if (EF_U32(c + 0x3bu) == EF_U32(node + 0x16u) && EF_U32(c + 0x3fu) == EF_U32(node + 0x1au)) {
+                    if ((uint16_t)group_flag_positive_cc22c(EF_U8(c + 0xeu), EF_U8(node + 9u), head) != 0u) {
+                        if ((int16_t)count < 0x31) {
+                            count++;
+                            EF_U8(c + 0xdu) = 0;
+                        } else {
+                            EF_U8(c + 0xdu) = 7;
+                        }
+                    }
+                }
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+}

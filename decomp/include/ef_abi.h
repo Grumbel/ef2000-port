@@ -4375,6 +4375,8 @@ uint32_t guest_fn_ca620_e(int32_t address, int32_t x, int32_t y, uint32_t a, uin
 uint32_t guest_fn_440f4_e(uint32_t a, int32_t x, int32_t y, uint32_t w, uint32_t s0, uint32_t s1); /* 0x440f4, returns the ECX it leaves */
 void draw_group_markers3_441fc(ef_addr32 head, ef_addr32 list);
 uint16_t process_pending_nodes_bf81c(uint16_t acc, ef_addr32 list, uint32_t p3, uint32_t p4, uint32_t p5, uint32_t p6, uint32_t p7, uint32_t p8, uint32_t p9);
+void guest_fn_cb3c4_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0xcb3c4 EAX/EDX/EBX/ECX + 1 stack, ret 4 */
+void assign_slot_flags_b0df4(ef_addr32 ptr, ef_addr32 list, ef_addr32 head);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
