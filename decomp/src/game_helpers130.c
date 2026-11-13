@@ -2962,3 +2962,48 @@ next:
     }
     return EF_U8(0x00433eaeu);
 }
+
+/* Original 0x91afc (259 bytes). Look for the highest 5-byte record (index
+ * 0x27 down to 0) whose enable word is set and whose threshold exceeds the
+ * dword at 0x214448; apply view angles (YAW, 0, PITCH) and rotation patch for
+ * it, reset the angle words, call 0x9e0c4 with its value and flush the
+ * queue. When no record qualifies fall back to 0xd86e0(YAW, PITCH). */
+void select_view_angles_91afc(uint32_t yaw, uint32_t pitch)
+{
+    int16_t i;
+    uint16_t id = (uint16_t)pitch;
+
+    guest_fn_c4105_x();
+    for (i = 0x27; i >= 0; i--) {
+        uint32_t rec = (uint32_t)((int32_t)i * 5);
+
+        if (EF_U16(0x0042239bu + rec) == 0u)
+            continue;
+        if ((int32_t)(int16_t)EF_U16(0x00422398u + rec) <= (int32_t)EF_U32(0x00214448u))
+            continue;
+        {
+            int32_t v = ((int16_t)yaw >= 0) ? -(int32_t)(int16_t)yaw : (int32_t)(int16_t)yaw;
+            uint16_t a0 = id;
+            int32_t a1 = (int32_t)yaw;
+
+            v = (int16_t)v;
+            if (v <= -0x4000) {
+                a1 = (int32_t)(0x8000u - yaw);
+                a0 = (uint16_t)(a0 - 0x8000u);
+            }
+            guest_fn_dc519_x((uint32_t)(int32_t)(int16_t)a1, (uint32_t)(int32_t)(int16_t)a0);
+        }
+        set_scene_angles((int16_t)yaw, 0, (int16_t)id);
+        EF_U32(0x000c4756u) = 0u;
+        EF_U32(0x000c475cu) = 0u;
+        EF_U32(0x000c4762u) = 0u;
+        EF_U16(0x00159094u) = 0u;
+        EF_U16(0x00159098u) = 0u;
+        EF_U16(0x0015909cu) = 0u;
+        guest_fn_9e0c4((int32_t)(int16_t)EF_U16(0x0042239bu + rec), 0u, 0u, 0u);
+        guest_fn_c4167_x();
+        guest_fn_c4105_x();
+        return;
+    }
+    guest_fn_d86e0_x((uint16_t)yaw, id);
+}

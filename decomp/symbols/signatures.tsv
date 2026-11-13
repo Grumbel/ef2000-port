@@ -3340,3 +3340,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000cff80	nearest_segment_hit_cff80	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0xcff80 (728 bytes); nearest segment/plane hit
 0x000e1e6c	wrap_text_lines_e1e6c	EAX:ef_addr32,EDX:ef_addr32,BL:uint8_t		ecx,esi,edi,ebp	0	Original 0xe1e6c (1257 bytes); word-wrap text into line nodes
 0x000e52a4	clip_against_windows_e52a4	EAX:uint32_t,DL:uint8_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	Original 0xe52a4 (1417 bytes); window overlap / dirty rect clipping
+0x00091afc	select_view_angles_91afc	EAX:uint32_t,EDX:uint32_t		ebx,ecx,esi,edi	0	Original 0x91afc (259 bytes); select view angles from table

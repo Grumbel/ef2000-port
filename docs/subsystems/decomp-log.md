@@ -2430,3 +2430,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13 `wrap_text_lines_e1e6c` (0xe1e6c): text word-wrap into line nodes recovered with goto-structured C; isolated fuzz PASS 1000 (many cases likely exit early on the font/enable checks, so deep paths are covered mainly by disassembly review).
 
 - 2026-11-13 `clip_against_windows_e52a4` (0xe52a4): window overlap / dirty-rect clipping recovered; isolated fuzz PASS 1000, but the initial-image rectangle is empty so nearly all cases take the early "return 2" exit; the overlap and border paths are verified from disassembly only.
+
+- 2026-11-13 `select_view_angles_91afc` (0x91afc): reopened from the "unrecovered callees" block (all callees already had ABI wrappers; added `guest_fn_d86e0_x`, `guest_fn_dc519_x`). Isolated fuzz: only difference is guest RAM 0x159064, the renderer's saved-ESP slot written by the 0xc4105/c4167 callees (stack depth of the compiled frame differs); no other RAM/register difference in 3 completed cases (weak sample).
