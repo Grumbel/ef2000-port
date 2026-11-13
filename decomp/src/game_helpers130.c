@@ -364,3 +364,55 @@ uint8_t ray_hits_plane_cfde4(ef_addr32 out, ef_addr32 dir, ef_addr32 origin, ef_
     v = -v;
     return point_in_triangle_cf960(plane + 0x3eu, u >> 15, v >> 15) != 0u ? 1u : 0u;
 }
+
+/* 0xcaa28, 392 bytes. Initialise every node of the list whose head pointer is at HEAD (next at +4): when 0x137992 or 0x137994 is set swap the dwords at +0x1a and +0x1e, pick the words +0x32/+0x34 (random 1000..5000 for node types 0x31, 0x49, 0x0b, 0x56, else 1000/500), the word +0x28 from 0xca9fc and the byte +0xa from TABLE_A at the cell index (y/10*0x28 + x/10, y = 0x190 - dword +0x1a, x = dword +0x16); then always clear +0x30/+0x36, set the byte +9 from TABLE_B at the same index and reset the sub-records (count word +0x2a, array at +0x2c, stride 0x15: weight byte +6 from 0xcbd30, byte +5 = 100 when 0x137992 is set, dword +1 and byte +0x14 cleared). */
+void init_nodes_from_grids_caa28(ef_addr32 head, ef_addr32 table_a, ef_addr32 table_b)
+{
+    ef_addr32 node;
+
+    for (node = EF_U32(head); node != 0u; node = EF_U32(node + 4u)) {
+        int32_t cell;
+        int16_t count;
+        int16_t i;
+
+        if (EF_U16(0x00137992u) != 0u || EF_U16(0x00137994u) != 0u) {
+            uint32_t first = EF_U32(node + 0x1eu);
+            uint32_t second = EF_U32(node + 0x1au);
+            uint8_t type;
+
+            EF_U32(node + 0x1au) = first;
+            type = EF_U8(node + 0xbu);
+            EF_U32(node + 0x1eu) = second;
+            if (type == 0x31u || type == 0x49u || type == 0x0bu || type == 0x56u) {
+                uint32_t r = (uint16_t)step_generator_a45b3();
+                int32_t v;
+
+                EF_U16(node + 0x32u) = (uint16_t)(((int32_t)(r % 5u) + 1) * 1000);
+                v = EF_S16(node + 0x32u);
+                EF_U16(node + 0x34u) = (uint16_t)(v / 2);
+            } else {
+                EF_U16(node + 0x32u) = 0x3e8u;
+                EF_U16(node + 0x34u) = 0x1f4u;
+            }
+            EF_U16(node + 0x28u) = (uint16_t)grid_index_ca9fc((int32_t)EF_U32(node + 0x16u),
+                                                              0x190 - (int32_t)EF_U32(node + 0x1au));
+            cell = ((0x190 - (int32_t)EF_U32(node + 0x1au)) / 10) * 0x28 + (int32_t)EF_U32(node + 0x16u) / 10;
+            EF_U8(node + 0xau) = EF_U8(table_a + (uint32_t)cell);
+        }
+        cell = ((0x190 - (int32_t)EF_U32(node + 0x1au)) / 10) * 0x28 + (int32_t)EF_U32(node + 0x16u) / 10;
+        EF_U8(node + 0x30u) = 0u;
+        EF_U16(node + 0x36u) = 0u;
+        EF_U8(node + 9u) = EF_U8(table_b + (uint32_t)cell);
+        count = EF_S16(node + 0x2au);
+        for (i = 0; i < count; i = (int16_t)(i + 1)) {
+            uint32_t rec = EF_U32(node + 0x2cu) + (uint32_t)((int32_t)i * 0x15);
+
+            EF_U8(rec + 6u) = scan_code_weight_cbd30(EF_U8(rec));
+            if (EF_U16(0x00137992u) != 0u)
+                EF_U8(rec + 5u) = 0x64u;
+            EF_U32(rec + 1u) = 0u;
+            EF_U8(rec + 0x14u) = 0u;
+            count = EF_S16(node + 0x2au);
+        }
+    }
+}
