@@ -2236,3 +2236,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 resource-loader continuation: drafted original startup clump loader 0xea270 (378 bytes), with exact descriptor/index layouts and missing-file differential evidence. Populated paths remain unverified; source-only main menu remains incomplete.
 
 2026-11-13 populated resource validation: clump loader 0xea270 passes ten isolated synthetic-service comparisons, including both index-building loops and diagnostic dispatch. Marked compiles; real loading and pure-C main menu remain incomplete.
+
+2026-11-13 main-loop continuation: recovered 0xaaee8 main control loop; seven isolated synthetic-service differentials pass, including consumed environment argument and repeated GUI dispatch. GUI dispatcher 0xa9e70, real services and native startup boundaries remain unresolved; pure-C main menu is not achieved.

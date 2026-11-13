@@ -1,0 +1,773 @@
+{
+  "address": "0x000aaee8",
+  "function_size": 255,
+  "cases": [
+    {
+      "name": "argc_1_mouse_0_load_0",
+      "registers": {
+        "eax": 1,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0xaae6c",
+          "hex": "ff0500101e00c3"
+        },
+        {
+          "address": "0xcdb20",
+          "hex": "ff0504101e00c3"
+        },
+        {
+          "address": "0xd1e50",
+          "hex": "ff0508101e00c3"
+        },
+        {
+          "address": "0xd65e8",
+          "hex": "ff050c101e00c3"
+        },
+        {
+          "address": "0xcd4d4",
+          "hex": "ff0510101e00c3"
+        },
+        {
+          "address": "0x84d94",
+          "hex": "ff0514101e00c3"
+        },
+        {
+          "address": "0xa9bfc",
+          "hex": "ff0518101e00c3"
+        },
+        {
+          "address": "0xa9e70",
+          "hex": "ff051c101e00c3"
+        },
+        {
+          "address": "0xcd554",
+          "hex": "ff0520101e00c3"
+        },
+        {
+          "address": "0xcdc64",
+          "hex": "ff0524101e00c3"
+        },
+        {
+          "address": "0xf4347",
+          "hex": "ff0528101e00c3"
+        },
+        {
+          "address": "0xe874b",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x9d524",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xcdf60",
+          "hex": "b800000000c3"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "891500111e00c3"
+        },
+        {
+          "address": "0xaad7c",
+          "hex": "b800000000c3"
+        },
+        {
+          "address": "0xa4380",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x1e0800",
+          "hex": "ff0500121e00c3"
+        },
+        {
+          "address": "0x132a74",
+          "hex": "00081e00"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "00021e0010021e0020021e00"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "45463230303000"
+        },
+        {
+          "address": "0x1e0210",
+          "hex": "6d656e7500"
+        },
+        {
+          "address": "0x1e0220",
+          "hex": "6f7074696f6e00"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x1e1200",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "argc_2_mouse_1_load_0",
+      "registers": {
+        "eax": 2,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0xaae6c",
+          "hex": "ff0500101e00c3"
+        },
+        {
+          "address": "0xcdb20",
+          "hex": "ff0504101e00c3"
+        },
+        {
+          "address": "0xd1e50",
+          "hex": "ff0508101e00c3"
+        },
+        {
+          "address": "0xd65e8",
+          "hex": "ff050c101e00c3"
+        },
+        {
+          "address": "0xcd4d4",
+          "hex": "ff0510101e00c3"
+        },
+        {
+          "address": "0x84d94",
+          "hex": "ff0514101e00c3"
+        },
+        {
+          "address": "0xa9bfc",
+          "hex": "ff0518101e00c3"
+        },
+        {
+          "address": "0xa9e70",
+          "hex": "ff051c101e00c3"
+        },
+        {
+          "address": "0xcd554",
+          "hex": "ff0520101e00c3"
+        },
+        {
+          "address": "0xcdc64",
+          "hex": "ff0524101e00c3"
+        },
+        {
+          "address": "0xf4347",
+          "hex": "ff0528101e00c3"
+        },
+        {
+          "address": "0xe874b",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x9d524",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xcdf60",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "891500111e00c3"
+        },
+        {
+          "address": "0xaad7c",
+          "hex": "b800000000c3"
+        },
+        {
+          "address": "0xa4380",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x1e0800",
+          "hex": "ff0500121e00c3"
+        },
+        {
+          "address": "0x132a74",
+          "hex": "00081e00"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "00021e0010021e0020021e00"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "45463230303000"
+        },
+        {
+          "address": "0x1e0210",
+          "hex": "6d656e7500"
+        },
+        {
+          "address": "0x1e0220",
+          "hex": "6f7074696f6e00"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x1e1200",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "argc_2_mouse_2_load_1",
+      "registers": {
+        "eax": 2,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0xaae6c",
+          "hex": "ff0500101e00c3"
+        },
+        {
+          "address": "0xcdb20",
+          "hex": "ff0504101e00c3"
+        },
+        {
+          "address": "0xd1e50",
+          "hex": "ff0508101e00c3"
+        },
+        {
+          "address": "0xd65e8",
+          "hex": "ff050c101e00c3"
+        },
+        {
+          "address": "0xcd4d4",
+          "hex": "ff0510101e00c3"
+        },
+        {
+          "address": "0x84d94",
+          "hex": "ff0514101e00c3"
+        },
+        {
+          "address": "0xa9bfc",
+          "hex": "ff0518101e00c3"
+        },
+        {
+          "address": "0xa9e70",
+          "hex": "ff051c101e00c3"
+        },
+        {
+          "address": "0xcd554",
+          "hex": "ff0520101e00c3"
+        },
+        {
+          "address": "0xcdc64",
+          "hex": "ff0524101e00c3"
+        },
+        {
+          "address": "0xf4347",
+          "hex": "ff0528101e00c3"
+        },
+        {
+          "address": "0xe874b",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x9d524",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xcdf60",
+          "hex": "b802000000c3"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "891500111e00c3"
+        },
+        {
+          "address": "0xaad7c",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xa4380",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x1e0800",
+          "hex": "ff0500121e00c3"
+        },
+        {
+          "address": "0x132a74",
+          "hex": "00081e00"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "00021e0010021e0020021e00"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "45463230303000"
+        },
+        {
+          "address": "0x1e0210",
+          "hex": "6d656e7500"
+        },
+        {
+          "address": "0x1e0220",
+          "hex": "6f7074696f6e00"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x1e1200",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "argc_3_mouse_0_load_1",
+      "registers": {
+        "eax": 3,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0xaae6c",
+          "hex": "ff0500101e00c3"
+        },
+        {
+          "address": "0xcdb20",
+          "hex": "ff0504101e00c3"
+        },
+        {
+          "address": "0xd1e50",
+          "hex": "ff0508101e00c3"
+        },
+        {
+          "address": "0xd65e8",
+          "hex": "ff050c101e00c3"
+        },
+        {
+          "address": "0xcd4d4",
+          "hex": "ff0510101e00c3"
+        },
+        {
+          "address": "0x84d94",
+          "hex": "ff0514101e00c3"
+        },
+        {
+          "address": "0xa9bfc",
+          "hex": "ff0518101e00c3"
+        },
+        {
+          "address": "0xa9e70",
+          "hex": "ff051c101e00c3"
+        },
+        {
+          "address": "0xcd554",
+          "hex": "ff0520101e00c3"
+        },
+        {
+          "address": "0xcdc64",
+          "hex": "ff0524101e00c3"
+        },
+        {
+          "address": "0xf4347",
+          "hex": "ff0528101e00c3"
+        },
+        {
+          "address": "0xe874b",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x9d524",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xcdf60",
+          "hex": "b800000000c3"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "891500111e00c3"
+        },
+        {
+          "address": "0xaad7c",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xa4380",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x1e0800",
+          "hex": "ff0500121e00c3"
+        },
+        {
+          "address": "0x132a74",
+          "hex": "00081e00"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "00021e0010021e0020021e00"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "45463230303000"
+        },
+        {
+          "address": "0x1e0210",
+          "hex": "6d656e7500"
+        },
+        {
+          "address": "0x1e0220",
+          "hex": "6f7074696f6e00"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x1e1200",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "environment_assignment",
+      "registers": {
+        "eax": 3,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0xaae6c",
+          "hex": "ff0500101e00c3"
+        },
+        {
+          "address": "0xcdb20",
+          "hex": "ff0504101e00c3"
+        },
+        {
+          "address": "0xd1e50",
+          "hex": "ff0508101e00c3"
+        },
+        {
+          "address": "0xd65e8",
+          "hex": "ff050c101e00c3"
+        },
+        {
+          "address": "0xcd4d4",
+          "hex": "ff0510101e00c3"
+        },
+        {
+          "address": "0x84d94",
+          "hex": "ff0514101e00c3"
+        },
+        {
+          "address": "0xa9bfc",
+          "hex": "ff0518101e00c3"
+        },
+        {
+          "address": "0xa9e70",
+          "hex": "ff051c101e00c3"
+        },
+        {
+          "address": "0xcd554",
+          "hex": "ff0520101e00c3"
+        },
+        {
+          "address": "0xcdc64",
+          "hex": "ff0524101e00c3"
+        },
+        {
+          "address": "0xf4347",
+          "hex": "ff0528101e00c3"
+        },
+        {
+          "address": "0xe874b",
+          "hex": "80383d7506b801000000c331c0c3"
+        },
+        {
+          "address": "0x9d524",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xcdf60",
+          "hex": "b800000000c3"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "891500111e00c3"
+        },
+        {
+          "address": "0xaad7c",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xa4380",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x1e0800",
+          "hex": "ff0500121e00c3"
+        },
+        {
+          "address": "0x132a74",
+          "hex": "00081e00"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "00021e0010021e0020021e00"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "45463230303000"
+        },
+        {
+          "address": "0x1e0210",
+          "hex": "3d76616c756500"
+        },
+        {
+          "address": "0x1e0220",
+          "hex": "6f7074696f6e00"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x1e1200",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "matching_switch",
+      "registers": {
+        "eax": 3,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0xaae6c",
+          "hex": "ff0500101e00c3"
+        },
+        {
+          "address": "0xcdb20",
+          "hex": "ff0504101e00c3"
+        },
+        {
+          "address": "0xd1e50",
+          "hex": "ff0508101e00c3"
+        },
+        {
+          "address": "0xd65e8",
+          "hex": "ff050c101e00c3"
+        },
+        {
+          "address": "0xcd4d4",
+          "hex": "ff0510101e00c3"
+        },
+        {
+          "address": "0x84d94",
+          "hex": "ff0514101e00c3"
+        },
+        {
+          "address": "0xa9bfc",
+          "hex": "ff0518101e00c3"
+        },
+        {
+          "address": "0xa9e70",
+          "hex": "ff051c101e00c3"
+        },
+        {
+          "address": "0xcd554",
+          "hex": "ff0520101e00c3"
+        },
+        {
+          "address": "0xcdc64",
+          "hex": "ff0524101e00c3"
+        },
+        {
+          "address": "0xf4347",
+          "hex": "ff0528101e00c3"
+        },
+        {
+          "address": "0xe874b",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x9d524",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0xcdf60",
+          "hex": "b800000000c3"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "891500111e00c3"
+        },
+        {
+          "address": "0xaad7c",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xa4380",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x1e0800",
+          "hex": "ff0500121e00c3"
+        },
+        {
+          "address": "0x132a74",
+          "hex": "00081e00"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "00021e0010021e0020021e00"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "45463230303000"
+        },
+        {
+          "address": "0x1e0210",
+          "hex": "6d656e7500"
+        },
+        {
+          "address": "0x1e0220",
+          "hex": "6f7074696f6e00"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x1e1200",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "two_gui_iterations",
+      "registers": {
+        "eax": 3,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0xaae6c",
+          "hex": "ff0500101e00c3"
+        },
+        {
+          "address": "0xcdb20",
+          "hex": "ff0504101e00c3"
+        },
+        {
+          "address": "0xd1e50",
+          "hex": "ff0508101e00c3"
+        },
+        {
+          "address": "0xd65e8",
+          "hex": "ff050c101e00c3"
+        },
+        {
+          "address": "0xcd4d4",
+          "hex": "ff0510101e00c3"
+        },
+        {
+          "address": "0x84d94",
+          "hex": "ff0514101e00c3"
+        },
+        {
+          "address": "0xa9bfc",
+          "hex": "ff0518101e00c3"
+        },
+        {
+          "address": "0xa9e70",
+          "hex": "ff051c101e00c3"
+        },
+        {
+          "address": "0xcd554",
+          "hex": "ff0520101e00c3"
+        },
+        {
+          "address": "0xcdc64",
+          "hex": "ff0524101e00c3"
+        },
+        {
+          "address": "0xf4347",
+          "hex": "ff0528101e00c3"
+        },
+        {
+          "address": "0xe874b",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x9d524",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xcdf60",
+          "hex": "b800000000c3"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "891500111e00c3"
+        },
+        {
+          "address": "0xaad7c",
+          "hex": "b801000000c3"
+        },
+        {
+          "address": "0xa4380",
+          "hex": "ff0500131e00a100131e0083f8020f92c00fb6c0c3"
+        },
+        {
+          "address": "0x1e0800",
+          "hex": "ff0500121e00c3"
+        },
+        {
+          "address": "0x132a74",
+          "hex": "00081e00"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "00021e0010021e0020021e00"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "45463230303000"
+        },
+        {
+          "address": "0x1e0210",
+          "hex": "6d656e7500"
+        },
+        {
+          "address": "0x1e0220",
+          "hex": "6f7074696f6e00"
+        },
+        {
+          "address": "0x1e1000",
+          "hex": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x1e1200",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x1e1300",
+          "hex": "00000000"
+        }
+      ]
+    }
+  ]
+}
