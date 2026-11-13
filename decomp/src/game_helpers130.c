@@ -4222,3 +4222,42 @@ void scatter_probe_afbc(int16_t x, int16_t y, int16_t count, int16_t w, int16_t 
 		i++;
 	} while ((int16_t)i < count);
 }
+
+/* Original 0xbc38: fill the named dialog with the strings and numbers of the
+ * 67-byte record `idx` of the table at 0x197668. */
+void fill_record_dialog_bc38(ef_addr32 name, uint8_t idx)
+{
+	uint8_t buf[0x20];
+	ef_addr32 dlg, buffer, child, rec;
+	uint32_t off = (uint32_t)idx * 67u;
+
+	buffer = guest_fn_b3f58((int32_t)(int16_t)guest_fn_b3db0(0xe10u));
+	guest_fn_c36b4(0x001808a4u, 0u, 0u, 0x3cu, 0x3cu, buffer);
+	dlg = guest_fn_a46cc(name);
+	child = guest_fn_a78bc_x(dlg, 0x001808b0u);
+	set_record_links_ca1c8(child, buffer, 0x3cu, 0x3cu, 0x3cu, 1u, 1u);
+	child = guest_fn_a78bc_x(dlg, 0x001808b8u);
+	rec = EF_U32(0x00197668u) + off;
+	guest_fn_9d749((ef_addr32)(uintptr_t)buf, rec);
+	guest_fn_9ca57((ef_addr32)(uintptr_t)buf, 0x001808c0u);
+	guest_fn_9ca57((ef_addr32)(uintptr_t)buf, EF_U32(0x00197668u) + off + 0xcu);
+	guest_fn_a7588_x(child, (ef_addr32)(uintptr_t)buf);
+	child = guest_fn_a78bc_x(dlg, 0x001808c4u);
+	guest_fn_a7588_x(child, EF_U32(0x00197668u) + off + 0x18u);
+	child = guest_fn_a78bc_x(dlg, 0x001808d0u);
+	guest_fn_a4342_va((ef_addr32)(uintptr_t)buf, 0x00180608u,
+	                  (uint32_t)(int32_t)EF_S16(EF_U32(0x00197668u) + off + 0x3du));
+	guest_fn_a7588_x(child, (ef_addr32)(uintptr_t)buf);
+	child = guest_fn_a78bc_x(dlg, 0x001808d8u);
+	guest_fn_a4342_va((ef_addr32)(uintptr_t)buf, 0x00180608u,
+	                  (uint32_t)(int32_t)EF_S16(EF_U32(0x00197668u) + off + 0x35u));
+	guest_fn_a7588_x(child, (ef_addr32)(uintptr_t)buf);
+	child = guest_fn_a78bc_x(dlg, 0x001808e4u);
+	guest_fn_a4342_va((ef_addr32)(uintptr_t)buf, 0x00180608u,
+	                  (uint32_t)(int32_t)EF_S16(EF_U32(0x00197668u) + off + 0x37u));
+	guest_fn_a7588_x(child, (ef_addr32)(uintptr_t)buf);
+	child = guest_fn_a78bc_x(dlg, 0x001808ecu);
+	guest_fn_a4342_va((ef_addr32)(uintptr_t)buf, 0x00180608u,
+	                  (uint32_t)(int32_t)EF_S16(EF_U32(0x00197668u) + off + 0x39u));
+	guest_fn_a7588_x(child, (ef_addr32)(uintptr_t)buf);
+}

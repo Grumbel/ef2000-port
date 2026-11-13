@@ -1281,7 +1281,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000a63c0	update_widget_metrics_a63c0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a63c0 (60 bytes); Update a widget's position words from the colour nibble.; callers a66cc@a66e3,e1958@e1b58; docs/compiler-abi.md
 0x000a73cc	set_widget_bit6_a73cc	EAX:ef_addr32,EDX:uint32_t,BL:uint8_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a73cc (57 bytes); Set bit 6 of the located widget's flags and refresh it.; callers 33e78@33eb0,33e78@33ec5,34a98@34ac4; docs/compiler-abi.md
 0x000a74bc	move_widget_a74bc	EAX:ef_addr32,DX:int16_t,BX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a74bc (83 bytes); Move a widget (negative coordinates clamp to 0) and relayout it.; callers c768@c7b7,c768@c7ee,c768@c829; docs/compiler-abi.md
-0x000a7588	show_widget_a7588	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a7588 (42 bytes); Show a widget.; callers 40dc@4115,40dc@4163,40dc@4171; docs/compiler-abi.md
+0x000a7588	show_widget_a7588	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x000a7588 (42 bytes); Show a widget.; callers 40dc@4115,40dc@4163,40dc@4171; docs/compiler-abi.md
 0x000a788c	find_child_by_name_a788c	EAX:ef_addr32,EDX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a788c (45 bytes); Find the child control of a widget whose name equals key.; callers a59ac@a59b8,a78bc@a78d9; docs/compiler-abi.md
 0x000a8060	fill_entries_a8060			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a8060 (80 bytes); Write the fill byte to every live entry of the table, clear dead ones.; callers 283c8@2840f; docs/compiler-abi.md
 0x000a9d0c	select_list_node_a9d0c		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a9d0c (60 bytes); Select the list node at position count (1-based) and return its payload.; callers a9e70@aa0f9; docs/compiler-abi.md
@@ -3363,3 +3363,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0003bf44	draw_compass_strip_3bf44	EAX:int16_t,EDX:int16_t,EBX:int16_t		ecx,esi,edi,ebp	0	compass ladder strip
 0x000084b8	assign_object_sub_entry_84b8	EAX:int16_t,ESI:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x84b8 (410 bytes); ESI forwarded as ECX to 0x46254 on no-slot paths
 0x0000afbc	scatter_probe_afbc	EAX:int16_t,EDX:int16_t,EBX:int16_t,ECX:int16_t,[ESP+4]:int16_t		esi,edi,ebp	4	Original 0xafbc (546 bytes); random probes of a 3x3 map neighbourhood, spawns via 0xbefb8
+0x0000bc38	fill_record_dialog_bc38	EAX:ef_addr32,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	Original 0xbc38 (432 bytes); fills named dialog fields from a 67-byte record

@@ -2474,3 +2474,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 0x84b8 `assign_object_sub_entry_84b8`: recovered (ESI is an extra input forwarded as ECX to the 0x46254 notification on the no-slot paths; `parm [eax] [esi]`). Isolated fuzz 94/1000 completed, all agree.
 
 - 0xafbc `scatter_probe_afbc`: recovered; random-offset probes of a 3x3 map neighbourhood, spawning through the still-unrecovered 0xbefb8 (called via `guest_fn_befb8_x`, 10 stack args). Isolated fuzz 570/1000 completed, all agree (the all-ones spawn branch is rarely reached).
+
+- 0xbc38 `fill_record_dialog_bc38`: recovered. Isolated fuzz cannot complete (callees fault on random widgets); the controlled differential (`ctl8.py`: every callee stubbed, EAX/EDX/EBX/ECX and stack args logged and compared, 25 calls per case) agrees on 60/60 random records. Writing it exposed a defect in the earlier 0xa7588 recovery: the original forwards EDX (the text) to 0xa7510 but `show_widget_a7588(widget)` dropped it. It now takes `(widget, text)`, uses `set_record_name_a7510`, and its signature/test were corrected (EDX is an input and is clobbered).

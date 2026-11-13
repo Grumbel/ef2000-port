@@ -155,7 +155,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000b5d0	204	gpwRedrawTargetWindow		named	game	unverified		
 0x0000b69c	959			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x0000ba5c	445			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
-0x0000bc38	432			unknown	game	unverified		
+0x0000bc38	432	fill_record_dialog_bc38	game_helpers130	compiles	game	confirmed	decomp/tests/0x0000bc38.json	Original 0xbc38 (432 bytes)
 0x0000bde8	93	gpwClickPilot1	gui_callbacks_088	drafted	game	confirmed		Four widget selector calls; guest replay pending
 0x0000be48	67	gpwClickPilot2	gui_callbacks_088	drafted	game	confirmed		Pilot row zero; original EDX at 779f4 unresolved; guest replay pending
 0x0000be8c	73	gpwClickPilot3	gui_callbacks_088	drafted	game	confirmed		Pilot row 43 and selector fallback; guest replay pending

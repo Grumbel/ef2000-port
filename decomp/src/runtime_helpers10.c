@@ -46,12 +46,12 @@ void move_widget_a74bc(ef_addr32 widget, int16_t x, int16_t y)
         guest_fn_a6d00(widget);
 }
 
-/* 0xa7588, 42 bytes. Show a widget. */
-void show_widget_a7588(ef_addr32 widget)
+/* 0xa7588, 42 bytes. Set a widget's text (EDX, forwarded to 0xa7510) and show it. */
+void show_widget_a7588(ef_addr32 widget, ef_addr32 text)
 {
     if (widget == 0)
         return;
-    guest_fn_a7510(widget);
+    set_record_name_a7510(widget, text);
     guest_fn_a66cc(widget, 1);
     if (EF_U8(0x0041f2e5u) == 0)
         guest_fn_a6d00(widget);

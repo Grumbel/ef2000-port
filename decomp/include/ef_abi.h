@@ -2400,7 +2400,7 @@ uint32_t block_start_10d1f4(ef_addr32 block);
 void update_widget_metrics_a63c0(ef_addr32 widget);
 ef_addr32 set_widget_bit6_a73cc(ef_addr32 key, uint32_t unused_edx, uint8_t flag);
 void move_widget_a74bc(ef_addr32 widget, int16_t x, int16_t y);
-void show_widget_a7588(ef_addr32 widget);
+void show_widget_a7588(ef_addr32 widget, ef_addr32 text);
 ef_addr32 find_child_by_name_a788c(ef_addr32 widget, ef_addr32 key);
 void fill_entries_a8060(void);
 uint32_t select_list_node_a9d0c(void);
@@ -4397,6 +4397,8 @@ void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in); /* 0x84b8 */
 #pragma aux assign_object_sub_entry_84b8 parm [eax] [esi]
 void scatter_probe_afbc(int16_t x, int16_t y, int16_t count, int16_t w, int16_t s); /* 0xafbc */
 uint32_t guest_fn_befb8_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6, uint32_t s7, uint32_t s8, uint32_t s9); /* 0xbefb8 EAX/EDX/EBX/ECX + 10 stack */
+void fill_record_dialog_bc38(ef_addr32 name, uint8_t idx); /* 0xbc38 */
+ef_addr32 guest_fn_a78bc_x(ef_addr32 root, ef_addr32 name); /* 0xa78bc EAX/EDX -> EAX */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
