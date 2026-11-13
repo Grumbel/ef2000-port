@@ -4165,3 +4165,60 @@ void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in)
 		               0x54u, (uint32_t)(int32_t)(int16_t)h, (uint32_t)slot, 0u);
 	}
 }
+
+/* Original 0xafbc: scatter `count` random probes around (x, y) with spread
+ * w (x) and s (y); when the probed 3x3 neighbourhood of the read_buffer_byte
+ * map is all ones, spawn a record through 0xbefb8. */
+void scatter_probe_afbc(int16_t x, int16_t y, int16_t count, int16_t w, int16_t s)
+{
+	int32_t i = 0;
+	int16_t px = x, py = y;
+	int32_t xs, ys, cy, sum, nx;
+
+	if (count <= 0)
+		return;
+	do {
+		int32_t r = (int32_t)(uint16_t)step_generator_a45b3();
+		int32_t rem = r % (int32_t)w;
+		int32_t half = ((int32_t)w - ((int32_t)w >> 31)) >> 1;
+
+		px = (int16_t)(px + (rem - half));
+		r = (int32_t)(uint16_t)step_generator_a45b3();
+		rem = r % (int32_t)s;
+		half = ((int32_t)s - ((int32_t)s >> 31)) >> 1;
+		py = (int16_t)(py + (rem - half));
+		xs = px;
+		if (xs > 0x18b)
+			px = 0x18b;
+		else if (xs < 5)
+			px = 5;
+		ys = py;
+		if (ys > 0x18b)
+			py = 0x18b;
+		else if (ys < 5)
+			py = 5;
+		nx = px;
+		cy = 0x190 - (int32_t)py;
+		sum = 0;
+		sum += read_buffer_byte((uint32_t)nx, (uint32_t)cy);
+		sum += read_buffer_byte((uint32_t)nx, (uint32_t)(cy - 1));
+		sum += read_buffer_byte((uint32_t)nx, (uint32_t)(cy + 1));
+		sum += read_buffer_byte((uint32_t)(nx - 1), (uint32_t)cy);
+		sum += read_buffer_byte((uint32_t)(nx - 1), (uint32_t)(cy - 1));
+		sum += read_buffer_byte((uint32_t)(nx - 1), (uint32_t)(cy + 1));
+		sum += read_buffer_byte((uint32_t)(nx + 1), (uint32_t)cy);
+		sum += read_buffer_byte((uint32_t)(nx + 1), (uint32_t)(cy - 1));
+		sum += read_buffer_byte((uint32_t)(nx + 1), (uint32_t)(cy + 1));
+		if (sum == 9) {
+			int32_t v = (int32_t)(int16_t)EF_U16(0x0041f328u);
+			uint32_t rnd = guest_random_word();
+			int32_t k = (int32_t)(uint16_t)rnd % 2 + 1;
+
+			EF_U16(0x0041f328u) = (uint16_t)guest_fn_befb8_x(
+				0x00137960u, 0x00137964u, 0x00137988u, 0x00137980u,
+				0x1du, 6u, 1u, 3u, 4u, (uint32_t)(int32_t)(int16_t)k,
+				(uint32_t)nx, (uint32_t)(int32_t)py, 0u, (uint32_t)v);
+		}
+		i++;
+	} while ((int16_t)i < count);
+}

@@ -3362,3 +3362,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0003bd50	init_angle_tables_3bd50			ebx,ecx,edx,esi,edi,ebp	0	builds per-angle marker tables
 0x0003bf44	draw_compass_strip_3bf44	EAX:int16_t,EDX:int16_t,EBX:int16_t		ecx,esi,edi,ebp	0	compass ladder strip
 0x000084b8	assign_object_sub_entry_84b8	EAX:int16_t,ESI:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x84b8 (410 bytes); ESI forwarded as ECX to 0x46254 on no-slot paths
+0x0000afbc	scatter_probe_afbc	EAX:int16_t,EDX:int16_t,EBX:int16_t,ECX:int16_t,[ESP+4]:int16_t		esi,edi,ebp	4	Original 0xafbc (546 bytes); random probes of a 3x3 map neighbourhood, spawns via 0xbefb8

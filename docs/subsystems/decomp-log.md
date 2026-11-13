@@ -2472,3 +2472,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered 0x3bf44 `draw_compass_strip_3bf44` (adds prototype/pragma for the stack-only `pair_word_dc5a9`). Verified with a controlled differential (`ctl7`: 80 scenarios with synthetic 37-record tables, c8ccc/48bb0 stubbed and their stack args logged, table RAM compared): 80 agree, 2060 line calls and 213 text calls compared. Line-call args are compared as 16-bit (the original pushes sign-extended words, the C pushes zero-extended uint16; c8ccc stores only the low word).
 
 - 0x84b8 `assign_object_sub_entry_84b8`: recovered (ESI is an extra input forwarded as ECX to the 0x46254 notification on the no-slot paths; `parm [eax] [esi]`). Isolated fuzz 94/1000 completed, all agree.
+
+- 0xafbc `scatter_probe_afbc`: recovered; random-offset probes of a 3x3 map neighbourhood, spawning through the still-unrecovered 0xbefb8 (called via `guest_fn_befb8_x`, 10 stack args). Isolated fuzz 570/1000 completed, all agree (the all-ones spawn branch is rarely reached).
