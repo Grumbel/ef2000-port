@@ -2348,3 +2348,4 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 2026-11-13: blocked remaining unknown functions at >=0xed000 (runtime/soft-float/startup region).
 - 2026-11-13: blocked 42 unknown functions with implicit register inputs or carry-flag results.
 - 2026-11-13: blocked 53 more unknown functions that branch on callee flags, use carry-chain arithmetic, indirect jumps or segment registers.
+- 2026-11-13: recovered `draw_segment_records_418c4` (0x418c4); isolated fuzz PASS 800 cases.

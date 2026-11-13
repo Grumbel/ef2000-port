@@ -752,7 +752,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00041314	155	show_preview_picture_41314	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00041314.json	docs/compiler-abi.md; Show the picture NAME (EAX) in the preview widget: when the name differs from the current one at 0x1a49d8 (0xa4380) or n; callers a6fc@a718,a6fc@a73c,a6fc@a75e; guest pending
 0x000413b0	68	init_screen_413b0	game_helpers11	compiles	game	confirmed	decomp/tests/0x000413b0.json	docs/compiler-abi.md; ; callers bfcc@c110,41f24@41f5b; guest pending
 0x0004161c	678			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
-0x000418c4	210			unknown	game	unverified		
+0x000418c4	210	draw_segment_records_418c4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000418c4.json	Copies per-record words into the 0x1a4aa0 table and calls 0x4161c; guest differential pending
 0x00041998	509			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00041b98	443			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00041da4	79	command_code_is_group_1b	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00041da4.json	docs/compiler-abi.md; 256 isolated GCC32 guest cases full EAX and preserved registers pass; Watcom/OMF and replay pending

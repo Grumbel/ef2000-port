@@ -166,3 +166,41 @@ uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t ar
     }
     return value;
 }
+
+/* 0x418c4, 210 bytes. When the input-state copy (0xd530) leaves its flag byte zero and either 0x19769a or 0x126576 is set, walk the OBJ records (count word +0x1c, array at +0x20, stride 0x19): store each record's first word and 0x190 minus its word at +4 into the 5-byte table at 0x1a4aa0 (+0 previous record's byte at +0x18, +1/+3 the two words) and call 0x4161c with ARG, the index, the byte, the word and the second value. */
+void draw_segment_records_418c4(ef_addr32 obj, int16_t arg)
+{
+    uint16_t input_a;
+    uint16_t input_b;
+    uint8_t flag;
+    int16_t i;
+    int16_t count;
+
+    copy_runtime_input_state((ef_addr32)(uintptr_t)&input_a, (ef_addr32)(uintptr_t)&input_b,
+                             (ef_addr32)(uintptr_t)&flag);
+    if (flag != 0u)
+        return;
+    if (EF_U16(0x0019769au) == 0u && EF_U8(0x00126576u) == 0u)
+        return;
+    count = EF_S16(obj + 0x1cu);
+    EF_U16(0x001a4b9cu) = (uint16_t)count;
+    if (EF_U32(obj + 0x20u) == 0u || count <= 0)
+        return;
+    for (i = 0; i < count; i = (int16_t)(i + 1)) {
+        uint32_t rec = EF_U32(obj + 0x20u) + (uint32_t)((int32_t)i * 0x19);
+        uint16_t first = EF_U16(rec);
+        uint16_t second = (uint16_t)(0x190u - EF_U16(rec + 4u));
+        uint32_t slot = 0x001a4aa0u + (uint32_t)((int32_t)i * 5);
+        uint8_t byte;
+
+        EF_U16(slot + 1u) = first;
+        EF_U16(slot + 3u) = second;
+        if (i > 0)
+            byte = EF_U8(EF_U32(obj + 0x20u) + (uint32_t)(((int32_t)i - 1) * 0x19) + 0x18u);
+        else
+            byte = EF_U8(EF_U32(obj + 0x20u) + 0x18u);
+        EF_U8(slot) = byte;
+        guest_fn_4161c((int32_t)arg, (int32_t)i, byte, (int16_t)first, (int16_t)second);
+        count = EF_S16(obj + 0x1cu);
+    }
+}
