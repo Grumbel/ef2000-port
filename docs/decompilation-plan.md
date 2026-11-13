@@ -2696,3 +2696,50 @@ local/asm-observed-body-inventory-20261113 --output
 local/asm-c-x87-control-program-20261113. Logs: local/asm-c-x87-control-full-tests-20261113.log,
 local/asm-c-x87-control-current-tests-20261113.log,
 local/asm-c-x87-control-watcom-20261113/compile.log (Python 3.13.12/Unicorn 2.1.4).
+
+
+**2026-11-13 — Raw x87 stack instructions and hardware state grid.**
+Added shared primitives in tools/asm_x87.py, integrated in the generated runtime
+and renderer: FLD1/FLDZ, register FLD/FXCH/FST/FSTP/FFREE, FCHS/FABS and
+FINCSTP/FDECSTP. Model physical registers, tag classes, TOP and C1, masked
+underflow/overflow indefinite results, and deferred unmasked invalid exceptions.
+Pending delivery remains status 8 without mutation. Renderer records guest IP,
+CS and opcode independently; register operations preserve the data environment.
+No original-code fallback, native floating type or guessed function ABI.
+Hardware probes establish source-underflow precedence over destination overflow
+for FLD ST(i), including the case where both conditions apply. All 188,416
+stack-effect cases match hardware across eight TOPs, all occupancy masks,
+register indices and masked/unmasked IE. Payload classes: normal, both zeros,
+quiet/signaling NaN, infinity, denormal and unnormal, even in empty slots.
+2,944 generated-body comparisons also pass, including normalized instruction
+IP/CS and directly compared opcode/data environment, flags and return stack.
+C grids run with UBSan; native probes save/restore full host x87 state.
+All 93 ASM/Ghidra tests pass; all 46 rendered variants compile warning-free
+with Watcom. Corpus: 3,600 syntax-supported (+2), still 2,090 selected bodies,
+269,778 body bytes; all selected bodies plus dispatcher compile with Watcom.
+The newly syntax-supported 0x120928/0x1209b5 remain excluded by memory x87 and
+comparison dependencies (0x120a07/0x120a2d/0x120a52). This is not extra recovered
+bulk coverage or a complete x87 claim. Memory loads/stores, conversion,
+arithmetic/comparisons, pending delivery and known oracle gaps remain active.
+Commands: python3 -m unittest tests.test_asm_x87_stack tests.test_asm_c_x87
+tests.test_asm_c_segments tests.test_asm_c_program tests.test_asm_to_c
+tests.test_asm_inventory tests.test_asm_diff tests.test_ghidra_ef2000;
+python3 -m unittest tests.test_asm_x87_stack;
+tools/asm_c_program.py --inventory local/asm-observed-body-inventory-20261113
+--output local/asm-c-x87-stack-program-20261113. Evidence:
+local/asm-c-x87-stack-full-tests-20261113.log,
+local/asm-x87-stack-{special,final}-tests-20261113.log,
+local/asm-x87-stack-watcom-20261113/compile.log. Python 3.13.12/Unicorn 2.1.4;
+Watcom v2 -bt=dos -3r -za99 -w1 -we. No tracker promotion.
+
+Final expanded-runtime corpus run completes with every per-body outcome unchanged
+from ABI 2: 18,500 matches, 14,935 original-fault/budget inconclusive and the
+same five target failures across 0xded86, 0xed133, 0x11f7ef. 750 bodies pass all
+16 probes; 1,337 inconclusive; three fail. 33,440 probes total, CLI exit 1.
+This validates the previously selected integer corpus with the new shared
+runtime, not x87 application coverage. New stack instructions remain covered
+by the independent hardware/generated-body tests; the corpus dependency
+closure still excludes them. Command: tools/asm_c_differential.py --translations
+local/asm-c-x87-stack-program-20261113 --output local/asm-c-x87-stack-diff-20261113
+--watcom /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
+Final report exists. Full reliable translation remains active.

@@ -17,9 +17,10 @@ from pathlib import Path
 import re
 
 try:
-    from . import asm_inventory
+    from . import asm_inventory, asm_x87
 except ImportError:
     import asm_inventory
+    import asm_x87
 
 ROOT = Path(__file__).resolve().parents[1]
 REGS = ('eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi')
@@ -260,6 +261,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 }
 #endif
 '''
+RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + '\n#endif\n')
 
 
 class Unsupported(ValueError):
@@ -504,7 +506,16 @@ def instruction_c(insn, starts):
     code = []
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.
-    if mnemonic == 'fninit' and not text:
+    stack_operation = asm_x87.stack_operation(mnemonic, text)
+    if stack_operation is not None:
+        operation, argument = stack_operation
+        encoded = bytes.fromhex(insn['bytes'])
+        if len(encoded) != 2 or not 0xd8 <= encoded[0] <= 0xdf or encoded[1] < 0xc0:
+            raise Unsupported('unsupported x87 stack encoding')
+        code += ['a = ef_x87_stack(s, %d, %d); if (a) return a;' % (operation, argument),
+                 's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
+                 (insn['address'], ((encoded[0] & 7) << 8) | encoded[1])]
+    elif mnemonic == 'fninit' and not text:
         # FNINIT marks registers empty but preserves their physical contents.
         code += ['s->x87_control = 0x37fu; s->x87_status = 0; s->x87_tag = 0xffffu;',
                  's->x87_ip = 0; s->x87_cs = 0; s->x87_dp = 0; s->x87_ds = 0; s->x87_opcode = 0;']

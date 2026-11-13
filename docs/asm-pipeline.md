@@ -404,3 +404,32 @@ FNSTSW AX; hardware proves the C normalization and unchanged pointer. Seeded
 regressions keep those differences as explicit differential mismatches. They
 are not successful original-vs-C comparisons or masked fields. AH/flag tests
 cover all 256 AH values against every arithmetic-flag combination.
+
+Raw stack lifting now includes FLD1/FLDZ, FLD ST(i), FXCH, FST/FSTP ST(i),
+FFREE, FCHS/FABS and FINCSTP/FDECSTP. `tools/asm_x87.py` supplies shared
+physical-register/tag/TOP effects; the renderer separately updates guest
+instruction pointer, CS and opcode, retaining the data environment for these
+register instructions. Unsupported encodings/prefixes remain rejected.
+Stack underflow/overflow sets IE/SF and C1; masked faults produce the hardware
+indefinite result. Unmasked invalid operations preserve register/tag/TOP state
+and set the deferred exception summary. A later waiting operation stops with
+status 8 until exception delivery is implemented. For FLD ST(i), source
+underflow takes precedence over destination overflow.
+
+Hardware tests cover every TOP, every occupied-slot mask, all eight register
+indices, and masked/unmasked invalid operations: 188,416 stack-effect cases.
+Payloads include normal values, both zeros, infinities, quiet/signaling NaNs,
+denormals and unnormal encodings, including payloads retained in empty slots.
+Another 2,944 generated-body cases compare register/status/tag effects and
+instruction/data environment with hardware (host IP/CS relocated to the guest
+context); both grids run C with undefined-behavior sanitization. The hardware
+probe saves/restores full host x87 state. This proves the tested instruction
+families, not broader arithmetic, memory conversion or application equivalence.
+Known Unicorn environment/status differences remain explicit; no field is
+masked in the bulk verifier to get a pass.
+
+The stack-runtime corpus rerun (`local/asm-c-x87-stack-diff-20261113`) keeps all
+2,090 per-body counts unchanged: 18,500 matches, 14,935 inconclusive and the
+same five target failures. All 93 tests pass. Syntax support rises to 3,600;
+dependency closure and selected byte coverage remain unchanged. Full x87 and
+application-level reliability remain pending; the bulk gate stays nonzero.
