@@ -3358,3 +3358,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0007b5d4	trace_line_cells_7b5d4	EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t	EAX:uint32_t	esi,edi,ebp	0	walks tile cells along a line; jump table is cs-relative switch
 0x0007b7d8	draw_marker_line_7b7d8		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	draws marker line on tile map
 0x0000759c	update_tracked_pair_759c	EAX:int32_t		ebx,ecx,edx,esi,edi,ebp	0	tracked pair bookkeeping
+0x00039548	classify_view_sample_39548	EAX:ef_addr32,EDX:int16_t,EBX:int16_t	AX:int16_t	ecx,esi,edi,ebp	0	view-sample classification

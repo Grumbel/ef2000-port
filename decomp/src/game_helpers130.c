@@ -3937,3 +3937,64 @@ void update_tracked_pair_759c(int32_t id)
 	}
 	guest_fn_73ec_x(obj, obj2);
 }
+
+/* Original 0x39548: classify the view sample at a fixed-point position and return a table value. */
+int16_t classify_view_sample_39548(ef_addr32 p, int16_t d, int16_t m)
+{
+	int32_t x, z, cell;
+	int16_t y16, t, si, di;
+	uint16_t du = (uint16_t)d;
+
+	if (m == 1) {
+		if (d == 1)
+			return (int16_t)EF_U16(0x00425bdeu);
+		return -1;
+	}
+	x = (int32_t)EF_U32(p) >> 8;
+	y16 = (int16_t)((int32_t)EF_U32(p + 4u) >> 8);
+	z = (int32_t)EF_U32(p + 8u) >> 8;
+	if (m == 3) {
+		if (d == 1)
+			return (int16_t)EF_U16(0x00425bdeu);
+		update_proximity_39874((uint16_t)x, (uint32_t)(int32_t)y16, (uint16_t)z);
+		return (int16_t)EF_U16(0x00425be6u);
+	}
+	cell = (int16_t)guest_fn_7b2f4((uint32_t)((int32_t)EF_U32(0x001a35f8u) >> 16),
+	                               (int32_t)EF_U32(p) >> 19, (int32_t)EF_U32(p + 8u) >> 19);
+	if (cell == -1)
+		return -1;
+	t = (int16_t)guest_fn_39744(cell, (uint16_t)x, (int32_t)y16, (uint16_t)z);
+	si = -1;
+	di = -1;
+	if (t >= 0xb0 && t <= 0xdf)
+		si = 3;
+	if (t >= 0x20 && t <= 0x4f)
+		si = 0;
+	if (t >= 0x70 && t <= 0x8f)
+		si = 2;
+	if (du == 1u) {
+		if (si == 0)
+			di = (int16_t)EF_U16(0x00425beau);
+		if (si == 3)
+			di = (int16_t)EF_U16(0x00425beeu);
+		if (si == 2)
+			di = (int16_t)EF_U16(0x00425bd4u);
+	} else if (du == 4u) {
+		if (si == 0 || si == 3)
+			di = (int16_t)EF_U16(0x00425bdcu);
+		if (si == 2)
+			di = (int16_t)EF_U16(0x00425bdau);
+	} else {
+		if (si == 0) {
+			di = (int16_t)EF_U16(0x00425becu);
+			update_proximity_39874((uint16_t)x, (uint32_t)(int32_t)y16, (uint16_t)z);
+		}
+		if (si == 3) {
+			di = (int16_t)EF_U16(0x00425bd6u);
+			update_proximity_39874((uint16_t)x, (uint32_t)(int32_t)y16, (uint16_t)z);
+		}
+		if (si == 2)
+			di = (int16_t)EF_U16(0x00425bd8u);
+	}
+	return di;
+}

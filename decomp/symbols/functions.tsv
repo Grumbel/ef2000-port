@@ -665,7 +665,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003930c	1	nop_3930c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x0003930c.json	docs/compiler-abi.md; Empty stub (single ret).; callers db1c4@db207; guest pending
 0x00039310	7	set_global_39310	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00039310.json	docs/compiler-abi.md; ; callers 3dd30@3e17c,3dd30@3e188; guest pending
 0x000394e0	104	apply_pending_394e0	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x000394e0.json	docs/compiler-abi.md; Consume the pending request at 0x1a3608 and apply it through 0x1d5cc.; callers 3dcb0@3dcb0; guest pending
-0x00039548	507			unknown	game	unverified		
+0x00039548	507	classify_view_sample_39548	game_helpers130	compiles	game	confirmed	decomp/tests/0x00039548.json	Original 0x39548 (507 bytes)
 0x00039744	303	centre_view_sample_39744	game_helpers130	compiles	game	confirmed	decomp/tests/0x00039744.json	Original 0x39744 (303 bytes)
 0x00039874	227	update_proximity_39874	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00039874.json	docs/compiler-abi.md; Proximity level of the point (X = EAX word, Y = EDX word signed, Z = EBX word) to the reference position (dwords 0x19e5b; callers 39548@395d6,39548@396fd,39548@39726; guest pending
 0x00039960	170	build_circle_39960	game_helpers17	compiles	game	confirmed	decomp/tests/0x00039960.json	docs/compiler-abi.md; Build the 0x1a17c0/0x1a1810 ellipse tables (radii 10 and 8).; callers 39a0c@39a1f; guest pending
