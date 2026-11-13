@@ -1234,3 +1234,58 @@ void update_scene_camera_9457c(ef_addr32 object, uint32_t enabled)
     set_scene_input_triplet((int32_t)EF_U32(0x00214370u), (int32_t)EF_U32(0x0021436cu),
                             (int32_t)EF_U32(0x00214374u));
 }
+
+/* 0xc193c, 591 bytes. Walk the node list whose head pointer is at LISTHEAD and collect up to COLLECTION[1] unclaimed nodes whose keys at +0x3b/+0x3f equal KEYA/KEYB: allocate a word table (COLLECTION+0x78) and 22-byte record table (COLLECTION+0x69), claim each match (+9 = 1, +0x17 incremented, owner block +9 incremented), copy its owner block fields into the record and store its +0x13 id in the table. Returns the number of nodes collected. */
+int32_t collect_list_entries_c193c(ef_addr32 collection, ef_addr32 listHead, uint32_t keyA, uint32_t keyB)
+{
+    uint32_t n = EF_U8(collection + 1u);
+    ef_addr32 node;
+    int32_t count;
+
+    node = EF_U32(listHead);
+    EF_U32(collection + 0x78u) = guest_fn_cc6c0_x(n * 2u, 0x0018ed98u);
+    EF_U32(collection + 0x69u) = guest_fn_cc6c0_x(n * 22u, 0x0018ed98u);
+    count = 0;
+    while (node != 0u) {
+        if ((int16_t)count >= (int16_t)n)
+            break;
+        if (EF_U8(node + 0xbu) == 0u && EF_U16(node + 9u) == 0u) {
+            uint8_t flag = EF_U8(node + 0xdu);
+
+            EF_U16(node + 9u) = 1u;
+            if (flag == 0u && keyA == EF_U32(node + 0x3bu) && keyB == EF_U32(node + 0x3fu)) {
+                int32_t index = (int16_t)count;
+                ef_addr32 idTable = EF_U32(collection + 0x78u);
+                ef_addr32 rec;
+                ef_addr32 src;
+
+                EF_U16(idTable + (uint32_t)index * 2u) = EF_U16(node + 0x13u);
+                EF_U16(node + 0x17u) = (uint16_t)(EF_U16(node + 0x17u) + 1u);
+                EF_U8(EF_U32(node + 0x4du) + 9u) = (uint8_t)(EF_U8(EF_U32(node + 0x4du) + 9u) + 1u);
+                {
+                    uint32_t block = alloc_checked_cc744(EF_U32(EF_U32(node + 0x4du)));
+
+                    rec = EF_U32(collection + 0x69u) + (uint32_t)index * 0x16u;
+                    EF_U32(rec) = block;
+                }
+                src = EF_U32(node + 0x4du);
+                EF_U8(rec + 4u) = EF_U8(src + 4u);
+                EF_U8(rec + 5u) = EF_U8(src + 5u);
+                EF_U8(rec + 6u) = EF_U8(src + 6u);
+                EF_U8(rec + 7u) = EF_U8(src + 7u);
+                EF_U8(rec + 8u) = EF_U8(src + 8u);
+                EF_U16(rec + 0xau) = EF_U16(src + 0xau);
+                EF_U8(rec + 9u) = EF_U8(src + 9u);
+                EF_U16(rec + 0xcu) = EF_U16(src + 0xcu);
+                EF_U16(rec + 0xeu) = EF_U16(src + 0xeu);
+                EF_U16(rec + 0x10u) = EF_U16(src + 0x10u);
+                EF_U16(rec + 0x12u) = EF_U16(src + 0x12u);
+                EF_U16(rec + 0x14u) = EF_U16(src + 0x14u);
+                count++;
+                EF_U16(EF_U32(collection + 0x78u) + (uint32_t)index * 2u) = EF_U16(node + 0x13u);
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+    return count;
+}

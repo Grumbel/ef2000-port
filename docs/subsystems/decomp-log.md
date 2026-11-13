@@ -2386,3 +2386,7 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 ### 2026-11-13 update_scene_camera_9457c (0x9457c)
 
 Recovered the scene camera update (derive view angles from the navigation component, zoom keys, camera offset, scene metric fallback, angle/pair/input-triplet pushes). Fuzz reports only guest RAM 0x159064 differing (original 0x80, patched 0x6c): that word is the renderer's diagnostic saved ESP, written by a callee, so it reflects this function's stack frame depth (20 bytes difference), not behavior. All other RAM and registers matched in the completed cases.
+
+### 2026-11-13 collect_list_entries_c193c (0xc193c)
+
+Recovered from disassembly: allocates the id/record tables (COLLECTION+0x78/+0x69), walks the node list and claims nodes matching the two keys, copying owner-block fields into 22-byte records; returns the count in EAX/EBX. Fuzz is weak (0 completed cases: random list pointers always fault the original), so the result is verified by disassembly only.

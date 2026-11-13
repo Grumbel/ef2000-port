@@ -2721,7 +2721,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c117c	124	can_reactivate_c117c	game_helpers129	compiles	game	confirmed	decomp/tests/0x000c117c.json	docs/compiler-abi.md; Whether the record may be reactivated: its cell holds more than 12 records and reactivating at most 0x30 - count of them; callers c1210@c12a0; guest pending
 0x000c1210	550			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000c1438	1284			blocked	unclassified	unverified		Skipped as too difficult: touches segment registers.
-0x000c193c	591			unknown	game	unverified		
+0x000c193c	591	collect_list_entries_c193c	game_helpers130	compiles	game	confirmed	decomp/tests/0x000c193c.json	Original 0xc193c (591 bytes)
 0x000c1b8c	26	find_node_by_word_c1b8c	list_lookup	compiles	game	confirmed	decomp/tests/0x000c1b8c.json	docs/compiler-abi.md; Node in the list at *EDX whose word +0x13 equals AX.; callers 9a8b4@9a8c4,9a998@9a9a7,9b2a4@9b391; guest pending
 0x000c1ba8	30	list_nth_word	list_lookup	compiles	game	confirmed	decomp/tests/0x000c1ba8.json	docs/compiler-abi.md; Node number AX of the list at *EDX (16-bit compare), or 0.; callers 9b2a4@9b4ae; guest pending
 0x000c1bd0	76	byte_swap32_c1bd0	game_helpers86	compiles	game	confirmed	decomp/tests/0x000c1bd0.json	docs/compiler-abi.md; Reverse the byte order of a 32-bit word (xor-swap sequence).; callers c1c24@c1c6a; guest pending
