@@ -4414,6 +4414,7 @@ void draw_route_overlay_4e360(void);
 void init_game_state_58d64(void); /* 0x58d64 */
 void load_record_a1ec8(void); /* 0xa1ec8 */
 void reset_object_position_8cd78(int16_t id); /* 0x8cd78 */
+void show_title_sequence_97dcc(void); /* 0x97dcc */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

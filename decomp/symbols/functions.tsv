@@ -1966,7 +1966,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00097d10	125	update_box_view_97d10	game_helpers131	compiles	game	confirmed	decomp/tests/0x00097d10.json	docs/compiler-abi.md; Set the view origin to the centre of the box (x1, x2, y1, y2), latch its corners and run the 0xdc71b / 0xcdf48 box updat; callers 97dcc@97ea1; guest pending
 0x00097d90	48	draw_pair_97d90	scene_helpers	compiles	game	confirmed	decomp/tests/0x00097d90.json	docs/compiler-abi.md; 0xe30e0(0,x+1,y+1,EBX) and (6,x,y,EBX); callers 97dcc@97f1d; guest pending
 0x00097dc0	11	sample_tick_counter	misc_state	compiles	game	confirmed	decomp/tests/0x00097dc0.json	docs/compiler-abi.md; 0x10640 then return dword 0x197c14; callers 97dcc@97edb,97dcc@97f27; guest pending
-0x00097dcc	412			unknown	game	unverified		
+0x00097dcc	412	show_title_sequence_97dcc	game_helpers130	compiles	game	confirmed	decomp/tests/0x00097dcc.json	Original 0x97dcc (412 bytes)
 0x00097f70	21	pointer_or_default	misc_state	compiles	game	confirmed	decomp/tests/0x00097f70.json	docs/compiler-abi.md; 0x9c858 result or 0x18acb0; callers 3ea0c@3ed91,3ea0c@3ed9f; guest pending
 0x00097f90	110	install_input_tables_97f90	game_helpers33	compiles	game	confirmed	decomp/tests/0x00097f90.json	docs/compiler-abi.md; Pick the table for the detected input device and install the handlers.; callers 8b39c@8b4ba; guest pending
 0x00098000	19	forward_if_enabled	misc_state	compiles	game	confirmed	decomp/tests/0x00098000.json	docs/compiler-abi.md; if byte 0x420a72 tail 0xd5f0c(dword 0x12dd98); callers 8b39c@8b4bf; guest pending

@@ -4809,3 +4809,75 @@ void reset_object_position_8cd78(int16_t id)
 	if (EF_U8(obj + 0x22fu) != 0)
 		clear_panel_strip((int16_t)(EF_S32(obj + 0x20bu) >> 16));
 }
+
+/* Original 0x97dcc (412 bytes): play the data-file driven title sequence.
+ * Nothing happens unless the file at 0x15b7e7 checks out.  The two records
+ * read through 0xeac48 are pumped (0xeab44) until they finish, then the
+ * file is opened again and the frames are shown at a 4-tick pace until the
+ * key flag 0x41f833 or the frame callback 0xe3ad0 ends the loop. */
+void show_title_sequence_97dcc(void)
+{
+	uint32_t ticks;
+	uint32_t now;
+	uint16_t pending;
+	uint16_t toggle;
+	uint8_t running;
+
+	if (!check_data_file_e3b7c(0x0015b7e7u))
+		return;
+	reset_engine_e4264();
+	guest_fn_d65e8();
+	EF_U32(0x00214564u) = 0x0012dce6u;
+	EF_U32(0x00214568u) = 0x0012dceau;
+	EF_U32(0x00214570u) = 0x0012dcecu;
+	if ((uint16_t)guest_fn_eac48_x(5, 0x00214560u) == 0) {
+		guest_fn_de580(0x00425c8cu);
+		do {
+			pending = (uint16_t)pump_records_eab44();
+			guest_fn_c386c();
+			guest_fn_dc250();
+		} while (pending != 0);
+	}
+	release_pending_handle_eae10();
+	EF_U32(0x00214564u) = 0x0012dce0u;
+	if ((uint16_t)guest_fn_eac48_x(5, 0x00214560u) == 0) {
+		guest_fn_de580(0x00425c8cu);
+		do {
+			pending = (uint16_t)pump_records_eab44();
+			guest_fn_c386c();
+			guest_fn_dc250();
+		} while (pending != 0);
+	}
+	release_pending_handle_eae10();
+	init_pattern_display_e4188();
+	update_box_view_97d10(0, 0x13f, 0, 0xc7);
+	update_view_scale_dc314();
+	if (open_resource_file_e378c(0x0015b7e7u)) {
+		guest_fn_dc2c0();
+		guest_fn_dc250();
+		guest_fn_d663c(0x00425190u);
+		toggle = 0;
+		EF_U8(0x0041f833u) = 0;
+		ticks = sample_tick_counter();
+		do {
+			guest_fn_c4105_x();
+			running = reload_halfword_table_e3ad0();
+			guest_fn_d86e0_x(EF_U16(0x001590a8u), EF_U16(0x001590b0u));
+			toggle = (uint16_t)~toggle;
+			guest_fn_c4167_x();
+			if (toggle != 0)
+				draw_pair_97d90(0x11c, 0, 0x0012fc24u);
+			guest_fn_dc250();
+			do {
+				now = sample_tick_counter();
+			} while ((int32_t)(now - ticks) < 4);
+			ticks = now;
+			if (EF_U8(0x0041f833u) != 0)
+				running = 0;
+		} while (running != 0);
+		release_saved_handle_e3b58();
+	}
+	reset_engine_e4264();
+	init_pattern_display_e4188();
+	update_view_scale_dc314();
+}
