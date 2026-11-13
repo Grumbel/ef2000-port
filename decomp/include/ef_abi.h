@@ -1641,7 +1641,7 @@ void guest_fn_cf78c(void); /* 0xcf78c */
 uint32_t guest_fn_d6694(void); /* 0xd6694 */
 
 /* entity_helpers.c */
-uint32_t find_in_archives_9cb20(uint32_t key);
+uint32_t find_in_archives_9cb20(uint32_t key); /* 0x9cb20 EAX */
 uint32_t lookup_in_archives_9cb70(uint32_t key);
 void close_request_9ce84(uint32_t flags);
 int32_t parse_int(ef_addr32 text);
@@ -1789,7 +1789,7 @@ ef_addr32 guest_fn_e8733(uint32_t count, uint32_t size); /* 0xe8733 EAX/EDX -> E
 
 /* ui_widget_helpers.c */
 int32_t push_handler_9c3cf(uint32_t handler);
-ef_addr32 copy_string_9d749(ef_addr32 destination, ef_addr32 source);
+ef_addr32 copy_string_9d749(ef_addr32 destination, ef_addr32 source); /* 0x9d749 EAX/EDX */
 void set_axis_9d7ac(uint32_t a, uint32_t b);
 void set_axis_9d80c(uint32_t a, uint32_t b);
 void reset_parser_state_9d938(void);
@@ -1872,7 +1872,7 @@ void guest_fn_cdf48(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcdf48 
 uint32_t open_device_e0b88(ef_addr32 value);
 void refresh_slot_e5830(ef_addr32 object);
 void compute_rect_e5960(ef_addr32 record);
-int32_t compare_strings_e5c03(ef_addr32 a, ef_addr32 b, uint32_t count);
+int32_t compare_strings_e5c03(ef_addr32 a, ef_addr32 b, uint32_t count); /* 0xe5c03 EAX/EDX */
 void enter_handler_eb448(uint32_t value);
 void uint_to_extended_eff7f(uint32_t value, ef_addr32 destination);
 void or_flag_mask_f79b0(void);
@@ -4676,7 +4676,7 @@ void get_screen_rows_eb1f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
 
 /* script_helpers1.c */
 void run_text_script_1093d8(ef_addr32 text, uint32_t table, uint32_t count);
-uint32_t try_handlers_9cbc4(uint32_t a, uint32_t b);
+uint32_t try_handlers_9cbc4(uint32_t a, uint32_t b); /* 0x9cbc4 EAX/EDX */
 void guest_callptr_eax_x(ef_addr32 fn, ef_addr32 arg); /* indirect call with the argument in EAX */
 uint32_t guest_fn_eba64_x(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xeba64 EAX/EDX/EBX */
 uint32_t guest_fn_b3c04_x(uint32_t a, uint32_t b); /* 0xb3c04 EAX/EDX, returns EAX */
@@ -5269,7 +5269,7 @@ void draw_text_by_font_a8578(int32_t x, int32_t y, uint32_t colour, uint32_t tex
 
 
 
-ef_addr32 strcat_9ca57(ef_addr32 dst, ef_addr32 src);
+ef_addr32 strcat_9ca57(ef_addr32 dst, ef_addr32 src); /* 0x9ca57 EAX/EDX */
 void outp_117b0c(uint32_t port, uint32_t value);
 uint32_t inp_9c430(uint32_t port);
 ef_addr32 memcpy_dc832(ef_addr32 dst, ef_addr32 src, uint32_t count);
