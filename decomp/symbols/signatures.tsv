@@ -3330,3 +3330,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0005e21c	odometer_text_5e21c	EAX:int32_t,EDX:int32_t,EBX:ef_addr32		esi,edi,ebp,ecx	0	Original 0x5e21c (677 bytes); odometer number renderer; destructively truncates string
 0x00076370	update_screen_palette_76370	EAX:uint32_t,EDX:uint32_t	EAX:int32_t	ebx,ecx,esi	0	Original 0x76370 (688 bytes); palette fade/tint update
 0x00092668	select_target_object_92668		EAX:ef_addr32	ebx,ecx,edx	0	Original 0x92668 (793 bytes); target object selector
+0x00092984	update_scene_camera_node_92984			ebx,edx,esi,edi	0	Original 0x92984 (633 bytes); scene camera for selected node
+0x00098658	draw_progress_panel_98658	AL:uint8_t		ebx,ecx,edx,esi,edi	0	Original 0x98658 (1126 bytes); progress panel
+0x000acbe4	hit_test_pointer_acbe4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0xacbe4 (980 bytes); pointer hit test
+0x000b1f80	dump_record_b1f80	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0xb1f80 (618 bytes); record dump

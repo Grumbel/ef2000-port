@@ -1903,7 +1903,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00092254	59	prepare_navigation_component	ui_secondary	compiles	game	confirmed	decomp/tests/0x00092254.json	docs/compiler-abi.md; host model; guest differential pending
 0x00092290	928			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x00092668	793	select_target_object_92668	game_helpers130	compiles	game	confirmed	decomp/tests/0x00092668.json	Original 0x92668 (793 bytes)
-0x00092984	633			unknown	game	unverified		
+0x00092984	633	update_scene_camera_node_92984	game_helpers130	compiles	game	confirmed	decomp/tests/0x00092984.json	Original 0x92984 (633 bytes)
 0x00092c28	520			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x00092e30	222	load_camera_92e30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00092e30.json	docs/compiler-abi.md; Load the camera record 0x214378 from the object UNIT (word in EDX, 0x7489c): convert the float 0x1a5bb8 to the dword 0x1; callers 92c28@92dcb,95e58@96a53,95e58@96b3b; guest pending
 0x00092f10	135	reset_scene_record_92f10	float_helpers4	compiles	game	confirmed	decomp/tests/0x00092f10.json	docs/compiler-abi.md; Reset the scene record from the current object and the scene angle record.; callers 95e58@96ce1; guest pending
@@ -1982,7 +1982,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00098558	27	install_allocator_hooks	misc_state	compiles	game	confirmed	decomp/tests/0x00098558.json	docs/compiler-abi.md; dword 0x12dd9c=0x9850c, 0x408580=0x1f4000; callers 49228@494ef; guest pending
 0x000985b0	66	start_transfer_985b0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000985b0.json	docs/compiler-abi.md; Store a range and start the transfer; abort when the range is negative.; callers 49228@49737,7a844@7a88c,7e8c0@7ea77; guest pending
 0x000985f4	97	update_progress_985f4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000985f4.json	docs/compiler-abi.md; Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change.; callers 49228@49753,7a844@7a89a,7e8c0@7eac1; guest pending
-0x00098658	1126			unknown	game	unverified		
+0x00098658	1126	draw_progress_panel_98658	game_helpers130	compiles	game	confirmed	decomp/tests/0x00098658.json	Original 0x98658 (1126 bytes)
 0x00098ac0	166	restore_strip_98ac0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00098ac0.json	docs/compiler-abi.md; Restore the screen strip saved at 0x40cd72/0x40cd74: when a saved position exists, put the 0x23x0x1e strip at 0x12dda4 b; callers 98658@98666; guest pending
 0x00098b68	104	save_and_draw_strip_98b68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00098b68.json	docs/compiler-abi.md; Save the 0x23x0x1e screen strip at (X, Y) (negative values clamp to 0) into 0x12dda4, remember the position at 0x40cd74/; callers 98658@987f2,98658@98a19; guest pending
 0x00098bec	160			blocked	unclassified	unverified		Skipped as too difficult: mid-function entry/x87 region reached by jmp; not a clean function
@@ -2442,7 +2442,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aca94	41	set_word_41eeda	list_helpers	compiles	game	confirmed	decomp/tests/0x000aca94.json	docs/compiler-abi.md; Word 0x41eeda = 1; when word 0x41eedc is zero, clear * word 0x41eede and run 0xaca14.; callers bfcc@c4af,bfcc@c4d2,345e8@346bc; guest pending
 0x000acac0	166	select_video_mode_acac0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000acac0.json	docs/compiler-abi.md; Select the video mode named by the argument.; callers ac16c@ac1fd,e1958@e19ee,e1958@e1b51; guest pending
 0x000acb68	124	latch_previous_acb68	entity_helpers	compiles	game	confirmed	decomp/tests/0x000acb68.json	docs/compiler-abi.md; Latch "previous" copies of the fields and shift flag bits 0..2 to 3..5 of byte +0x1e.; callers ac5f8@ac67c; guest pending
-0x000acbe4	980			unknown	game	unverified		
+0x000acbe4	980	hit_test_pointer_acbe4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000acbe4.json	Original 0xacbe4 (980 bytes)
 0x000acfb8	1158			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
 0x000ad440	81	open_resource_by_name_ad440	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ad440.json	docs/compiler-abi.md; Open the resource NAME (EAX) from the default directory plus the subdirectory 0x18dc8c: build the path (0x9c980, strcat ; callers 49228@49390,b0f5c@b1011,b0f5c@b120c; guest pending
 0x000afc5c	902			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
@@ -2489,7 +2489,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1bb0	70	print_to_handle_b1bb0	game_helpers126	compiles	game	confirmed	decomp/tests/0x000b1bb0.json	docs/compiler-abi.md; printf to a handle (100..105): format into a 0x7c-byte buffer and write it (cdecl, variadic; all arguments on the stack); callers 5630@56e0,5630@56ee,5630@56fc; guest pending
 0x000b1bf8	57	print_status_lines_b1bf8	small_wrappers6	compiles	game	confirmed	decomp/tests/0x000b1bf8.json	docs/compiler-abi.md; Print the two status lines (0x1264e2; 0x1a364c and 0x1a364b) to a handle.; callers b3084@b3099; guest pending
 0x000b1c34	77	dump_entry_list_b1c34	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b1c34.json	docs/compiler-abi.md; Dump a numbered entry list: the format string, the entry count, then each entry (numbered from 0 in word +0x13) via 0xb1; callers b3084@b310c; guest pending
-0x000b1f80	618			unknown	game	unverified		
+0x000b1f80	618	dump_record_b1f80	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b1f80.json	Original 0xb1f80 (618 bytes)
 0x000b21ec	140	print_record_b21ec	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b21ec.json	docs/compiler-abi.md; Print one record to a text handle.; callers b1f80@b21c7,b2758@b27d0; guest pending
 0x000b23bc	226	dump_record_b23bc	game_helpers128	compiles	game	confirmed	decomp/tests/0x000b23bc.json	docs/compiler-abi.md; Dump one 0x13-byte record to a handle: an index or fallback value, its kind name, an optional dword and six signed words; callers b2560@b26a9; guest pending
 0x000b2504	89	print_move_record_b2504	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2504.json	docs/compiler-abi.md; Print a movement record with its kind name.; callers b2560@b261a,b2810@b2898,b28b8@b2940; guest pending

@@ -2416,3 +2416,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered `update_screen_palette_76370` (0x76370). Fuzz weak (0 of 1000 completed; callees fault on random state), so verified from the disassembly only.
 
 - 2026-11-13: recovered `select_target_object_92668` (0x92668). Fuzz PASS (1000/1000).
+
+- 2026-11-13: recovered `update_scene_camera_node_92984` (0x92984, fuzz PASS 1000), `hit_test_pointer_acbe4` (0xacbe4, fuzz PASS on 766 completed cases), `draw_progress_panel_98658` (0x98658, fuzz weak: 0 completed, checked against the disassembly only) and `dump_record_b1f80` (0xb1f80, fuzz weak: 0 completed, checked against the disassembly only).

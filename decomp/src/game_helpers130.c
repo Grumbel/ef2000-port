@@ -1945,3 +1945,323 @@ ef_addr32 select_target_object_92668(void)
         return EF_U32(0x001a821cu);
     return EF_U32(EF_U32(0x002143f8u));
 }
+
+/* Original 0x92984 (633 bytes). Scene camera update for the node selected by
+ * byte 0x12dc35: without a node reset the pending flag and mode byte, else
+ * apply the direction keys (0x2144aa bits 0-3) to the angle bytes/words at
+ * 0x21454e..0x214551, rebuild the angles, apply the zoom keys (bits 4/5),
+ * place the camera at the node position offset by the zoom-scaled basis, and
+ * push angles, pair and input triplet to the scene helpers. */
+void update_scene_camera_node_92984(void)
+{
+    ef_addr32 node = lookup_scene_node((int16_t)EF_U8(0x0012dc35u));
+    int32_t zoom;
+
+    if (node == 0u) {
+        EF_U16(0x0021449cu) = 1u;
+        EF_U8(0x0012db9eu) = EF_U8(0x00214486u);
+        return;
+    }
+    init_bounds_d0b68(0x00214404u);
+    if (EF_U8(0x002144aau) & 1u)
+        EF_U8(0x0021454fu) = (uint8_t)(EF_U8(0x0021454fu) + 2u);
+    if (EF_U8(0x002144aau) & 2u)
+        EF_U16(0x0021454eu) = (uint16_t)(EF_U16(0x0021454eu) - 0x200u);
+    if (EF_U8(0x002144aau) & 4u)
+        EF_U8(0x00214551u) = (uint8_t)(EF_U8(0x00214551u) + 2u);
+    if (EF_U8(0x002144aau) & 8u)
+        EF_U16(0x00214550u) = (uint16_t)(EF_U16(0x00214550u) - 0x200u);
+    EF_U16(0x0021454cu) = 0u;
+    update_scene_angle_first(0x00214404u, EF_U16(0x0021454eu));
+    update_scene_angle_second(0x00214404u, EF_U16(0x00214550u));
+    EF_U16(0x002144b6u) = (uint16_t)angle_d13ac(0x00214404u);
+    EF_U16(0x002144b4u) = (uint16_t)forward_pair_d13dc(0x00214404u);
+    EF_U16(0x002144b0u) = (uint16_t)angle_d13ec(0x00214404u);
+    if (EF_U8(0x002144aau) & 0x10u)
+        EF_U16(0x0012db9cu) = (uint16_t)(EF_U16(0x0012db9cu) - EF_U16(0x00127d92u));
+    if (EF_U8(0x002144aau) & 0x20u)
+        EF_U16(0x0012db9cu) = (uint16_t)(EF_U16(0x0012db9cu) + EF_U16(0x00127d92u));
+    if ((EF_S32(0x0012db9au) >> 16) < 10)
+        EF_U16(0x0012db9cu) = 10u;
+    if ((EF_S32(0x0012db9au) >> 16) > 0x3e8)
+        EF_U16(0x0012db9cu) = 0x3e8u;
+    zoom = -(EF_S32(0x0012db9au) >> 16);
+    EF_U32(0x0012dba8u) = (uint32_t)(EF_S32(0x0021440cu) * zoom);
+    EF_U32(0x0012dbacu) = (uint32_t)(EF_S32(0x00214418u) * zoom);
+    EF_U32(0x0012dbb0u) = (uint32_t)(EF_S32(0x00214424u) * zoom);
+    EF_U32(0x0021444cu) = (uint32_t)((EF_S32(node) >> 8) + (EF_S32(0x0012dba8u) >> 16));
+    EF_U32(0x00214448u) = (uint32_t)((EF_S32(node + 4u) >> 8) + (EF_S32(0x0012dbacu) >> 16));
+    EF_U32(0x00214450u) = (uint32_t)((EF_S32(node + 8u) >> 8) + (EF_S32(0x0012dbb0u) >> 16));
+    EF_U32(0x00214370u) = (EF_U32(node) << 8) + EF_U32(0x0012dba8u);
+    EF_U32(0x0021436cu) = (EF_U32(node + 4u) << 8) + EF_U32(0x0012dbacu);
+    EF_U32(0x00214374u) = (EF_U32(node + 8u) << 8) + EF_U32(0x0012dbb0u);
+    if (scene_metric_reaches_threshold((int32_t)EF_U32(0x0021444cu), (int32_t)EF_U32(0x00214448u)) == 0u) {
+        int32_t metric = scene_metric_remaining();
+
+        EF_U32(0x00214448u) = (uint32_t)metric;
+        EF_U32(0x0021436cu) = (uint32_t)metric << 16;
+    }
+    request_scene_pair((int16_t)(0u - EF_U16(0x002144b6u)), (int16_t)(0u - EF_U16(0x002144b0u)));
+    set_scene_angles((int16_t)(0u - EF_U16(0x002144b6u)), (int16_t)(0u - EF_U16(0x002144b4u)),
+                     (int16_t)(0u - EF_U16(0x002144b0u)));
+    set_scene_input_triplet((int32_t)EF_U32(0x00214370u), (int32_t)EF_U32(0x0021436cu),
+                            (int32_t)EF_U32(0x00214374u));
+}
+
+/* Original 0x98658 (1126 bytes). Draw the loading/progress panel: AL selects the
+ * low-resolution (0) or high-resolution (nonzero) layout.  Restores the strip
+ * saved by 0x98ac0, prints the message at 0x12dda0, draws a rectangular
+ * frame through the record at 0x4208e4..0x4208ec, fills the percentage bar
+ * from 0x40c11c, prints the percentage and saves the strips; at 100% the
+ * strip rows are copied back and the saved positions invalidated. */
+void draw_progress_panel_98658(uint8_t highRes)
+{
+    char buf[0x50];
+    ef_addr32 text = (ef_addr32)(uintptr_t)buf;
+    int32_t percent;
+    int32_t length;
+    int32_t filled;
+    uint32_t textX, textY;
+
+    restore_strip_98ac0(highRes);
+    guest_sprintf_a4342(text, 0x0018ad88u, EF_U32(0x0012dda0u));
+    length = (int32_t)guest_string_length(EF_U32(0x0012dda0u));
+    if (highRes == 0u) {
+        draw_glyph_string_eb008(0xfu, (uint32_t)(0x140 - (length * 4 + length)) >> 1, 0xa5u, text);
+        filled = (int32_t)((uint32_t)EF_S32(0x0040c11cu) * 0xdau) / 100;
+        put_screen_rows_eb050(0u, 0u, 0u, 0u, 0xfu, 0xa0u, 0x23u, 0x1eu, 0x0040c124u);
+        EF_U16(0x004208e6u) = 0xfu;
+        EF_U16(0x004208e4u) = 7u;
+        EF_U16(0x004208e8u) = 0xa0u;
+        EF_U16(0x004208eau) = 0x32u;
+        EF_U16(0x004208ecu) = 0xa0u;
+        forward_record_cf78c();
+        EF_U16(0x004208e6u) = 0x32u;
+        EF_U16(0x004208eau) = 0x32u;
+        EF_U16(0x004208e4u) = 7u;
+        EF_U16(0x004208e8u) = 0xa0u;
+        EF_U16(0x004208ecu) = 0xbeu;
+        forward_record_cf78c();
+        EF_U16(0x004208e6u) = 0x32u;
+        EF_U16(0x004208e4u) = 7u;
+        EF_U16(0x004208e8u) = 0xbeu;
+        EF_U16(0x004208eau) = 0xfu;
+        EF_U16(0x004208ecu) = 0xbeu;
+        forward_record_cf78c();
+        EF_U16(0x004208e6u) = 0xfu;
+        EF_U16(0x004208eau) = 0xfu;
+        EF_U16(0x004208e4u) = 7u;
+        EF_U16(0x004208e8u) = 0xbeu;
+        EF_U16(0x004208ecu) = 0xa0u;
+        forward_record_cf78c();
+        fill_rect_ceccc(7u, 0x32, 0xae, filled + 0x32, 0xaf);
+        filled += 0x32;
+        save_and_draw_strip_98b68((uint32_t)(int32_t)(int16_t)filled, 0xa0u);
+        textY = 0xadu;
+        textX = 0u;
+    } else {
+        draw_glyph_string_eb008(0xfu, (uint32_t)(0x280 - (length * 4 + length)) >> 1, 0x16du, text);
+        filled = (int32_t)((uint32_t)EF_S32(0x0040c11cu) * 0x1b6u) / 100;
+        put_screen_rows_eb050(0u, 0u, 0u, 0u, 0x41u, 0x168u, 0x23u, 0x1eu, 0x0040c124u);
+        EF_U16(0x004208eau) = 0x64u;
+        EF_U16(0x004208e4u) = 7u;
+        EF_U16(0x004208e6u) = 0x41u;
+        EF_U16(0x004208e8u) = 0x168u;
+        EF_U16(0x004208ecu) = 0x168u;
+        forward_record_cf78c();
+        EF_U16(0x004208e6u) = 0x64u;
+        EF_U16(0x004208eau) = 0x64u;
+        EF_U16(0x004208e4u) = 7u;
+        EF_U16(0x004208e8u) = 0x168u;
+        EF_U16(0x004208ecu) = 0x186u;
+        forward_record_cf78c();
+        EF_U16(0x004208eau) = 0x64u;
+        EF_U16(0x004208e4u) = 7u;
+        EF_U16(0x004208e6u) = 0x41u;
+        EF_U16(0x004208e8u) = 0x186u;
+        EF_U16(0x004208ecu) = 0x186u;
+        forward_record_cf78c();
+        EF_U16(0x004208e4u) = 7u;
+        EF_U16(0x004208e6u) = 0x41u;
+        EF_U16(0x004208e8u) = 0x168u;
+        EF_U16(0x004208eau) = 0x41u;
+        EF_U16(0x004208ecu) = 0x186u;
+        forward_record_cf78c();
+        fill_rect_ceccc(7u, 0x64, 0x176, filled + 0x64, 0x177);
+        filled += 0x64;
+        save_and_draw_strip_98b68((uint32_t)(int32_t)(int16_t)filled, 0x168u);
+        textY = 0x175u;
+        textX = 1u;
+    }
+    guest_sprintf_a4342(text, 0x0018ad8cu, (uint32_t)EF_S32(0x0040c11cu));
+    percent = EF_S32(0x0040c11cu);
+    if (percent < 10)
+        draw_glyph_string_eb008(0xfu, textX ? 0x4du : 0x1bu, textY, text);
+    else if (percent < 100)
+        draw_glyph_string_eb008(0xfu, textX ? 0x4au : 0x18u, textY, text);
+    else
+        draw_glyph_string_eb008(0xfu, textX ? 0x47u : 0x15u, textY, text);
+    toggle_page_dc250();
+    if (EF_S32(0x0040c11cu) == 100) {
+        if (textX)
+            put_screen_rows_eb050(0u, 0u, 0u, 0u, 0x41u, 0x168u, 0x1fcu, 0x1eu, 0x00408590u);
+        else
+            put_screen_rows_eb050(0u, 0u, 0u, 0u, 0xfu, 0xa0u, 0xfdu, 0x1eu, 0x00408590u);
+        EF_U16(0x0040cd72u) = 0xffffu;
+        EF_U16(0x0040cd74u) = 0xffffu;
+    }
+}
+
+/* Original 0xacbe4 (980 bytes). Pointer hit test: poll the pointer device
+ * (0xac854), store the position/button state in RESULT (+0x18..+0x1e), then
+ * either keep the captured target at RESULT+0x45/0x49 (when its button bit is
+ * held) or search the widget table at 0x41eda8 from the top for the first
+ * enabled widget under the pointer (corner 3x3 excluded) and, inside it, for
+ * the child (list head at +0x91, next at +0x21) under the pointer. */
+void hit_test_pointer_acbe4(ef_addr32 result)
+{
+    int16_t px, py;
+    uint8_t hitWidget = 0u;
+    uint8_t hitInner = 0u;
+    int16_t i;
+    ef_addr32 obj = 0u;
+    ef_addr32 child;
+    int32_t slot;
+
+    poll_pointer_device_ac854();
+    px = (int16_t)EF_U16(0x0013725eu);
+    py = (int16_t)EF_U16(0x00137260u);
+    EF_U16(result + 0x18u) = (uint16_t)px;
+    EF_U16(result + 0x1au) = (uint16_t)py;
+    EF_U8(result + 0x1cu) = EF_U8(0x0041f2f1u);
+    EF_U8(result + 0x1eu) = (uint8_t)((EF_U8(result + 0x1eu) & 0xfeu) | (EF_U8(0x0041f2f2u) != 0u));
+    EF_U8(result + 0x1eu) = (uint8_t)((EF_U8(result + 0x1eu) & 0xfdu) |
+                                      ((EF_U8(0x0041f2f0u) != 0u) << 1));
+    EF_U8(result + 0x1eu) = (uint8_t)((EF_U8(result + 0x1eu) & 0xfbu) |
+                                      ((EF_U8(0x0041f2f3u) != 0u) << 2));
+    if (EF_U32(result + 0x49u) != 0u && (EF_U8(result + 0x1eu) & 1u) != 0u) {
+        EF_U16(result) = EF_U16(result + 0x4du);
+        EF_U32(result + 4u) = EF_U32(result + 0x45u);
+        EF_U16(result + 0xcu) = EF_U16(result + 0x4fu);
+        EF_U32(result + 0x10u) = EF_U32(result + 0x49u);
+        goto done;
+    }
+    for (i = (int16_t)(EF_U16(0x0041eed8u) - 1u); i >= 0 && hitWidget == 0u; i--) {
+        uint16_t id = EF_U16(0x0041eda8u + (uint32_t)(int32_t)i * 2u);
+        int32_t x, y, w, h;
+
+        if (id == 0u)
+            continue;
+        obj = EF_U32(0x0041edfcu + (uint32_t)id * 4u);
+        if ((EF_U8(obj + 0x3bu) & 4u) == 0u)
+            continue;
+        if (EF_U8(obj + 0xc1u) < EF_U8(0x0041f2e0u))
+            continue;
+        x = EF_S16(obj + 0x41u);
+        y = EF_S16(obj + 0x43u);
+        w = EF_S16(obj + 0x45u);
+        h = EF_S16(obj + 0x47u);
+        if (px < x || x + w <= px || py < y || y + h <= py)
+            continue;
+        if (!(px >= x + 3 || py >= y + 3))
+            continue;
+        hitWidget = 1u;
+        EF_U32(result + 4u) = obj;
+        EF_U16(result) = id;
+        {
+            int32_t e = EF_S16(obj + 0x71u), g = EF_S16(obj + 0x73u);
+            int32_t f = EF_S16(obj + 0x75u), hh = EF_S16(obj + 0x77u);
+
+            if (px < x + e || px >= x + e + f)
+                continue;
+            if (py < y + g || py >= y + g + hh)
+                continue;
+            hitInner = 1u;
+        }
+    }
+    if (hitWidget == 0u) {
+        EF_U16(result) = 0u;
+        EF_U32(result + 4u) = 0u;
+        EF_U16(result + 0xcu) = 0u;
+        EF_U32(result + 0x10u) = 0u;
+        goto done;
+    }
+    EF_U16(result + 0xcu) = 0u;
+    EF_U32(result + 0x10u) = 0u;
+    slot = 1;
+    child = EF_U32(obj + 0x91u);
+    while (child != 0u) {
+        int32_t cx = EF_S16(child);
+        int32_t cy = EF_S16(child + 2u);
+        int32_t cw = EF_U16(child + 4u);
+        int32_t ch = EF_U16(child + 6u);
+        int32_t ox = EF_S16(obj + 0x41u);
+        int32_t oy = EF_S16(obj + 0x43u);
+        int32_t lo, top;
+
+        if ((EF_U8(child + 0x1du) & 0x40u) == 0u) {
+            if ((EF_U8(child + 0x8cu) & 0x1fu) != 0u) {
+                lo = ox + cx;
+                top = oy + cy;
+                if (px >= lo && px < lo + cw && py >= top && py < top + ch) {
+                    EF_U32(result + 0x10u) = child;
+                    EF_U16(result + 0xcu) = (uint16_t)slot;
+                    break;
+                }
+            } else if (hitInner != 0u) {
+                lo = EF_S16(obj + 0x71u) + ox - EF_S16(obj + 0x69u) + cx;
+                top = EF_S16(obj + 0x73u) + oy - EF_S16(obj + 0x6bu) + cy;
+                if (lo <= px && lo + cw > px && top <= py && top + ch > py) {
+                    EF_U32(result + 0x10u) = child;
+                    EF_U16(result + 0xcu) = (uint16_t)slot;
+                    break;
+                }
+            }
+        }
+        child = EF_U32(child + 0x21u);
+        slot++;
+    }
+done:
+    EF_U16(0x0041eefeu) = (uint16_t)px;
+    EF_U16(0x0041eefcu) = (uint16_t)py;
+}
+
+/* Original 0xb1f80 (618 bytes). Dump a record to HANDLE: the record type byte
+ * at +0xb (0..2) picks one of three format strings/name tables and prints the
+ * header fields, then the trailing records via 0xb21ec / 0xb2a2c. */
+void dump_record_b1f80(ef_addr32 rec, uint32_t handle)
+{
+    uint8_t type = EF_U8(rec + 0xbu);
+    uint32_t nameC, nameD, nameE, extra;
+    ef_addr32 fmt;
+
+    if (type <= 2u) {
+        nameD = EF_U32(0x0013336cu + (uint32_t)EF_U8(rec + 0xdu) * 4u);
+        nameE = EF_U32(0x00132f5cu + (uint32_t)EF_U8(rec + 0xeu) * 4u);
+        extra = EF_U32(rec + 0xfu);
+        if (type == 0u) {
+            fmt = 0x0018dee4u;
+            nameC = EF_U32(0x00132d34u + (uint32_t)EF_U8(rec + 0xcu) * 4u);
+        } else if (type == 1u) {
+            fmt = 0x0018df44u;
+            nameC = EF_U32(0x001333f8u + (uint32_t)EF_U8(rec + 0xcu) * 4u);
+        } else {
+            fmt = 0x0018dfa4u;
+            nameC = EF_U32(0x00133488u + (uint32_t)EF_U8(rec + 0xcu) * 4u);
+        }
+        guest_fn_b1bb0(handle, fmt, nameC, nameD, nameE, extra,
+                       (uint32_t)(EF_S32(rec + 0x11u) >> 16),
+                       (uint32_t)EF_U8(rec + 0x15u), (uint32_t)EF_U8(rec + 0x16u),
+                       (uint32_t)(EF_S32(rec + 0x15u) >> 16),
+                       (uint32_t)(EF_S32(rec + 0x27u) >> 16), (uint32_t)(EF_S32(rec + 0x29u) >> 16),
+                       (uint32_t)(EF_S32(rec + 0x2bu) >> 16), (uint32_t)(EF_S32(rec + 0x2du) >> 16),
+                       (uint32_t)(EF_S32(rec + 0x17u) >> 16), (uint32_t)(EF_S32(rec + 0x19u) >> 16),
+                       (uint32_t)(EF_S32(rec + 0x1bu) >> 16), (uint32_t)(EF_S32(rec + 0x1du) >> 16),
+                       (uint32_t)(EF_S32(rec + 0x1fu) >> 16), (uint32_t)(EF_S32(rec + 0x21u) >> 16),
+                       (uint32_t)(EF_S32(rec + 0x23u) >> 16), (uint32_t)(EF_S32(rec + 0x25u) >> 16),
+                       (uint32_t)(EF_S32(rec + 0x2fu) >> 16), (uint32_t)(EF_S32(rec + 0x4fu) >> 16));
+    }
+    print_record_b21ec(EF_U32(rec + 0x4du), handle);
+    guest_fn_b1bb0(handle, 0x0018e004u);
+    print_coordinate_record_b2a2c(rec + 0x3bu, handle);
+}
