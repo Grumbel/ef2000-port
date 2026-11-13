@@ -5105,3 +5105,58 @@ void draw_corner_table_5e87c(int16_t count)
 	                 color);
 #undef HI
 }
+
+/* Original 0x5b080 (519 bytes): project the viewpoint offset, clamp it to the
+ * latched clip box and draw the segment pairs of the 0x1281ae vertex table. */
+void draw_offset_frame_5b080(void)
+{
+	int16_t buf[8];
+	uint8_t mode;
+	int16_t i;
+	uint32_t sh, color, e1, e2, w0, w2;
+	int16_t t;
+
+#define HI(a) (((int32_t)EF_U32(a)) >> 16)
+	offset_project_86e44((ef_addr32)(uintptr_t)buf);
+	latch_values_ce328((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	                   (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	guest_fn_cdf48((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	               (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	mode = 0u;
+	t = (int16_t)EF_U16(0x001a6cf6u);
+	if (t < buf[1]) {
+		buf[1] = (int16_t)((uint32_t)t - (3u << (EF_U8(0x0012b369u) & 31u)));
+		mode = 2u;
+	}
+	if (HI(0x00128148u) < 0x1e && EF_U8(0x001a3632u) != 0u)
+		mode = 6u;
+	t = (int16_t)EF_U16(0x001a6cf0u);
+	if (buf[1] < t) {
+		buf[1] = (int16_t)((uint32_t)t + (5u << (EF_U8(0x0012b369u) & 31u)));
+		mode = 2u;
+	}
+	for (i = 0; i < (int32_t)mode + 0xe; i = (int16_t)(i + 2)) {
+		uint32_t pa, pb, pc, pd;
+		color = EF_U8(0x00128148u);
+		e1 = EF_U8(0x001281e0u + (uint32_t)(int32_t)i);
+		sh = EF_U8(0x0012b369u) & 31u;
+		w0 = (uint32_t)(int32_t)buf[0];
+		w2 = (uint32_t)(int32_t)buf[1];
+		e2 = EF_U8(0x001281e1u + (uint32_t)(int32_t)i);
+		pa = ((uint32_t)HI(0x001281aeu + e1 * 4u) << sh) + w0;
+		pb = ((uint32_t)HI(0x001281b0u + e1 * 4u) << sh) + w2;
+		pc = ((uint32_t)HI(0x001281aeu + e2 * 4u) << sh) + w0;
+		pd = ((uint32_t)HI(0x001281b0u + e2 * 4u) << sh) + w2;
+		guest_fn_c8ccc_x(pd, pc, pb, pa, color);
+		color = EF_U8(0x00128148u);
+		e1 = EF_U8(0x001281e0u + (uint32_t)(int32_t)i);
+		e2 = EF_U8(0x001281e1u + (uint32_t)(int32_t)i);
+		sh = EF_U8(0x0012b369u) & 31u;
+		pa = ((uint32_t)(-HI(0x001281aeu + e1 * 4u)) << sh) + w0;
+		pb = ((uint32_t)HI(0x001281b0u + e1 * 4u) << sh) + w2;
+		pc = ((uint32_t)(-HI(0x001281aeu + e2 * 4u)) << sh) + w0;
+		pd = ((uint32_t)HI(0x001281b0u + e2 * 4u) << sh) + w2;
+		guest_fn_c8ccc_x(pd, pc, pb, pa, color);
+	}
+#undef HI
+}

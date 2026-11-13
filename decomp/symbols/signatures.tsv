@@ -3379,3 +3379,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0005c354	refresh_selected_label_5c354			ebx,ecx,edx,esi,edi,ebp	0	Latch view, project selected object, draw tactical cross, label and (multiplayer) crossing lines
 0x00087700	init_record_tables_87700			ebx,ecx,edx,esi,edi,ebp	0	Resolve 0x91-byte record table text refs and link the 0x8f-byte node pool free list
 0x0005e87c	draw_corner_table_5e87c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Latch clip box from 0x1a6cee.. then draw segments of the 0x1a666a corner table and closing edges
+0x0005b080	draw_offset_frame_5b080			ebx,ecx,edx,esi,edi,ebp	0	Project viewpoint offset, clamp to clip box and draw the 0x1281ae vertex-table segment pairs

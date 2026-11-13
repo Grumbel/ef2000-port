@@ -4419,6 +4419,7 @@ uint16_t scan_list_bed1c(ef_addr32 list, uint16_t value, uint8_t kind, uint32_t 
 void refresh_selected_label_5c354(void); /* 0x5c354 */
 void init_record_tables_87700(void); /* 0x87700 */
 void draw_corner_table_5e87c(int16_t count); /* 0x5e87c */
+void draw_offset_frame_5b080(void); /* 0x5b080 */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
