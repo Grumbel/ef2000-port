@@ -4487,7 +4487,7 @@ void draw_map_layers_4bf1c(uint32_t a, uint32_t b, uint32_t c)
 	EF_U16(0x00126558u) = 1u;
 	EF_U16(0x00126556u) = 1u;
 	guest_fn_4c120_x(a, c);
-	guest_fn_4c3bc_x(a, b);
+	draw_map_nodes_4c3bc(a, b);
 	EF_U16(0x00126558u) = 1u;
 	EF_U16(0x00126556u) = 1u;
 	EF_U16(0x00126554u) = 0u;
@@ -4535,4 +4535,57 @@ void draw_map_layers_4bf1c(uint32_t a, uint32_t b, uint32_t c)
 	}
 	draw_sprite_4d114();
 	draw_sprite_4d180();
+}
+
+/* 0x4c3bc, 593 bytes. Draw the position markers of the map nodes in the list at `list` (node +4 = next, +9 = group, +0xb = type 0 only, +0x16/+0x1a = screen x/y): an arc or circle in the current display mode (byte 0x1a559e) plus a heading line, its mirror, and a small cross. `a` is the map record forwarded to the group-flag tests. */
+void draw_map_nodes_4c3bc(uint32_t a, ef_addr32 list)
+{
+	ef_addr32 node;
+	uint8_t mode, code;
+	int16_t w8, w10;
+	uint16_t v;
+	uint32_t i;
+	int32_t t1, t2;
+
+	mode = EF_U8(0x001a559eu);
+	node = EF_U32(list);
+	if (mode == 0u)
+		return;
+	for (; node != 0u; node = EF_U32(node + 4u)) {
+		if (EF_U8(node + 0xbu) != 0u)
+			continue;
+		code = 0u;
+		if (guest_fn_bc7ec(node) != 0u)
+			continue;
+		if ((uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 9u), a) != 0u && EF_U16(0x00126554u) != 0u)
+			code = 3u;
+		else if ((uint16_t)guest_fn_cc1ac(0u, EF_U8(node + 9u), a) != 0u && EF_U16(0x00126556u) != 0u)
+			code = 1u;
+		else if ((uint16_t)group_flag_zero_cc1ec(0u, EF_U8(node + 9u), a) != 0u && EF_U16(0x00126558u) != 0u)
+			code = 4u;
+		if (code == 0u)
+			continue;
+		w8 = (int16_t)EF_U16(node + 0x16u);
+		w10 = (int16_t)(0x190u - (uint32_t)EF_U16(node + 0x1au));
+		v = (uint16_t)((uint32_t)EF_U16(0x00127b30u) + 0x32u + (uint32_t)((int32_t)w8 * (int32_t)w10));
+		EF_U16(0x00127b30u) = (uint16_t)((uint32_t)EF_U16(0x00127b30u) + 0x32u);
+		if (mode == 2u)
+			draw_arc_scaled_c98f8(code, (uint32_t)(int32_t)w8, (uint32_t)(int32_t)w10, v, 0x4000u + v, 0x32u);
+		if (mode == 1u)
+			draw_circle_scaled_c9680(code, (uint32_t)(int32_t)w8, (uint32_t)(int32_t)w10, 0x32u);
+		i = (uint32_t)(v >> 3);
+		t1 = ((int32_t)EF_S16(0x00141e08u + i * 2u) * 0x32) >> 15;
+		t2 = ((int32_t)EF_S16(0x00142e08u + i * 2u) * 0x32) >> 15;
+		draw_scaled_rect_c95ac(code, (uint32_t)(int32_t)w8, (uint32_t)(int32_t)w10,
+		                       (uint32_t)(int32_t)(int16_t)(t2 + w8), (uint32_t)(int32_t)(int16_t)(t1 + w10));
+		i = (uint32_t)((uint16_t)(v - 0x4000u) >> 3);
+		t1 = ((int32_t)EF_S16(0x00141e08u + i * 2u) * 0x32) >> 15;
+		t2 = ((int32_t)EF_S16(0x00142e08u + i * 2u) * 0x32) >> 15;
+		draw_scaled_rect_c95ac(code, (uint32_t)(int32_t)w8, (uint32_t)(int32_t)w10,
+		                       (uint32_t)(int32_t)(int16_t)(t2 + w8), (uint32_t)(int32_t)(int16_t)(t1 + w10));
+		draw_scaled_rect_c95ac(code, (uint32_t)(int32_t)(int16_t)(w8 - 5), (uint32_t)(int32_t)w10,
+		                       (uint32_t)(int32_t)(int16_t)(w8 + 5), (uint32_t)(int32_t)w10);
+		draw_scaled_rect_c95ac(code, (uint32_t)(int32_t)w8, (uint32_t)(int32_t)(int16_t)(w10 - 5),
+		                       (uint32_t)(int32_t)w8, (uint32_t)(int32_t)(int16_t)(w10 + 5));
+	}
 }

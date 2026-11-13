@@ -863,7 +863,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004bf1c	516	draw_map_layers_4bf1c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0004bf1c.json	Original 0x4bf1c (516 bytes)
 0x0004c120	446			blocked	game	unverified		Skipped as too difficult: a branch leaves the function body (shared tail or Ghidra boundary split); needs the neighbouring code recovered together.
 0x0004c33c	126	mpClickMap		named	game	unverified		
-0x0004c3bc	593			unknown	game	unverified		
+0x0004c3bc	593	draw_map_nodes_4c3bc	game_helpers130	compiles	game	confirmed	decomp/tests/0x0004c3bc.json	Original 0x4c3bc (593 bytes)
 0x0004c610	37	mpCycleMap	mission_map_callbacks	drafted	game	unverified		Original disassembly; 16-bit map-mode switch and dirty flags; host-tested in batch 084
 0x0004c638	50	mpEWRCoverage	mission_map_callbacks	drafted	game	unverified		Original disassembly; byte increment with reset on exactly 3; host-tested in batch 084
 0x0004c66c	50	mpToggleFlags	mission_map_callbacks	drafted	game	unverified		Original disassembly; independent byte increment with reset on exactly 3; host-tested in batch 084
