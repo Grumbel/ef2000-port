@@ -3441,3 +3441,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000051d4	kots_click_play_type_51d4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000051d4 (86 bytes); cycles play-type toggle byte and shows widget.
 0x00042a98	gpw_map_mode_selected_42a98	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00042a98 (107 bytes); map-mode text via sprintf into stack buffer.
 0x0000bf70	onleaveOptions			ebx,ecx,edx,esi,edi,ebp	0	Original 0xbf70 (91 bytes); dumps pending record via 0xb3084
+0x000ab908	gnInitSettingsWindow	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0xab908 (54 bytes); formats 0x137278 into "number" widget

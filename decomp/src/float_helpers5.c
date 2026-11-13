@@ -188,3 +188,12 @@ void onleaveOptions(void)
 	                 (uint32_t)((int32_t)EF_U32(0x001379a0u) >> 16), (uint32_t)((int32_t)EF_U32(0x0041f32cu) >> 16),
 	                 (uint32_t)((int32_t)EF_U32(0x0041f328u) >> 16), (uint32_t)((int32_t)EF_U32(0x0041f32au) >> 16));
 }
+
+/* 0xab908, 54 bytes. gnInitSettingsWindow: format the dword at 0x137278 with "%d" (0x18da74) into a 0x18-byte stack buffer and apply it to the "number" widget (0x18da78) under the root in EAX. */
+void gnInitSettingsWindow(ef_addr32 root)
+{
+	char buf[0x18];
+
+	guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x0018da74u, EF_U32(0x00137278u));
+	apply_to_widget_a75b4(root, 0x0018da78u, (uint32_t)(uintptr_t)buf);
+}
