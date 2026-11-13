@@ -2356,3 +2356,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 2026-11-13: recovered `ray_hits_plane_cfde4` (0xcfde4); isolated fuzz PASS 380 completed cases. 0xc3ae8 blocked (VGA port output, indirect calls).
 - 2026-11-13: recovered `init_nodes_from_grids_caa28` (0xcaa28); isolated fuzz PASS 60 completed cases (940 skipped).
 - 2026-11-13: recovered `select_next_target_65a88` (0x65a88); isolated fuzz PASS 1000 cases.
+
+- 0x14d58 `draw_framed_box_14d58`: framed box from 19-byte record table (fuzz PASS 1000).

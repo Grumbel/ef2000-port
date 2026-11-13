@@ -4322,6 +4322,7 @@ void pick_target_at_4e204(int16_t x, int16_t y);
 uint8_t ray_hits_plane_cfde4(ef_addr32 out, ef_addr32 dir, ef_addr32 origin, ef_addr32 plane);
 void init_nodes_from_grids_caa28(ef_addr32 head, ef_addr32 table_a, ef_addr32 table_b);
 void select_next_target_65a88(void);
+void draw_framed_box_14d58(int16_t index);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

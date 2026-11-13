@@ -482,3 +482,53 @@ void select_next_target_65a88(void)
         EF_U16(0x001a823eu) = 0xffffu;
     EF_U16(0x001a8238u) = EF_U16(0x001a823eu);
 }
+
+/* 0x14d58, 409 bytes. Draw the framed box described by record INDEX of the 19-byte table at 0x1225d4 (byte +1 text slot, +2 x, +4 y, +6 width, +8 height, byte +0 colour pair index into the 3-byte table at 0x12285a): when 0xcd7f0 accepts the slot, enter scroll mode with its result, fill the interior with the first colour and draw the four edges with the second colour through the 0x4208e4.. line record (0xcf78c), then leave scroll mode. */
+void draw_framed_box_14d58(int16_t index)
+{
+    uint32_t rec = 0x001225d4u + (uint32_t)((int32_t)index * 19);
+    int32_t x = EF_S16(rec + 2u);
+    int32_t w = EF_S16(rec + 6u);
+    int32_t h = EF_S16(rec + 8u);
+    int32_t y = EF_S16(rec + 4u);
+    uint32_t colours;
+    uint32_t slot;
+    int32_t right;
+    int32_t bottom;
+
+    (void)y;
+    slot = get_text_slot_cd7f0((int16_t)EF_U8(rec + 1u));
+    if (slot == 0u)
+        return;
+    enter_scroll_mode_c39f0(slot);
+    colours = 0x0012285au + (uint32_t)EF_U8(rec) * 3u;
+    y = (int16_t)EF_U16(rec + 4u);
+    fill_rect_ceccc(EF_U8(colours), x + 1, y + 1, x + w - 2, y + h - 2);
+    right = x + w - 1;
+    bottom = y + h - 1;
+    EF_U16(0x004208e4u) = EF_U8(colours + 1u);
+    EF_U16(0x004208e6u) = (uint16_t)x;
+    EF_U16(0x004208e8u) = (uint16_t)y;
+    EF_U16(0x004208eau) = (uint16_t)right;
+    EF_U16(0x004208ecu) = (uint16_t)y;
+    forward_record_cf78c();
+    EF_U16(0x004208e4u) = EF_U8(colours + 1u);
+    EF_U16(0x004208e6u) = (uint16_t)x;
+    EF_U16(0x004208eau) = (uint16_t)x;
+    EF_U16(0x004208e8u) = (uint16_t)y;
+    EF_U16(0x004208ecu) = (uint16_t)bottom;
+    forward_record_cf78c();
+    EF_U16(0x004208e4u) = EF_U8(colours + 1u);
+    EF_U16(0x004208e6u) = (uint16_t)right;
+    EF_U16(0x004208eau) = (uint16_t)right;
+    EF_U16(0x004208e8u) = (uint16_t)y;
+    EF_U16(0x004208ecu) = (uint16_t)bottom;
+    forward_record_cf78c();
+    EF_U16(0x004208e4u) = EF_U8(colours + 1u);
+    EF_U16(0x004208e6u) = (uint16_t)x;
+    EF_U16(0x004208e8u) = (uint16_t)bottom;
+    EF_U16(0x004208eau) = (uint16_t)right;
+    EF_U16(0x004208ecu) = (uint16_t)bottom;
+    forward_record_cf78c();
+    leave_scroll_mode_c39ac();
+}
