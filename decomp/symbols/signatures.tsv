@@ -3317,3 +3317,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0003287c	apply_camera_keys_3287c			ebx,ecx,edx,esi,edi	0	Original 0x3287c (512 bytes)
 0x0000a3dc	dump_selected_group_a3dc			ebx,ecx,edx,esi,edi,ebp	0	Original 0xa3dc (477 bytes)
 0x00082e40	rewrite_status_file_82e40			ebx,ecx,edx	0	Original 0x82e40 (483 bytes)
+0x000b3648	dump_node_list_b3648	EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t		ecx,esi,edi,ebp	0	Original 0xb3648 (486 bytes)

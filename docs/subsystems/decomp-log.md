@@ -2376,3 +2376,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0xa3dc `dump_selected_group_a3dc`: text report of selected group; fuzz weak (stream/list globals), logic decoded from disassembly.
 
 - 0x82e40 `rewrite_status_file_82e40`: status text file rewrite; fuzz weak (file I/O), call sequence decoded from disassembly.
+
+- 0xb3648 `dump_node_list_b3648`: node list text dump; fuzz weak (stream printf), argument order decoded from the push sequence.

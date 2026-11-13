@@ -1000,3 +1000,74 @@ void rewrite_status_file_82e40(void)
     write_status_dword_122dc4(buf + guest_string_length(buf));
     write_whole_file_b3d00(EF_U32(0x0012b36cu), buf, guest_string_length(buf));
 }
+
+/* 0xb3648, 486 bytes. Print every node of the list whose head pointer is stored at LIST_HEAD to STREAM: a header with TAG and the list count, then per node its type byte, three signed byte arrays (+0xc/+0x10/+0x14, one entry per count), the 24 words of its block at +0x18 and a second line with 9 words at +0x1c.. and the bytes at +0x2e..+0x30. */
+void dump_node_list_b3648(ef_addr32 list_head, uint32_t stream, uint32_t tag)
+{
+    ef_addr32 node = EF_U32(list_head);
+    int16_t count = (int16_t)list_count(list_head);
+    int16_t i;
+
+    guest_fn_b1bb0(stream, 0x0018e678u, tag);
+    guest_fn_b1bb0(stream, 0x0018e680u, (int32_t)count);
+    while (node != 0u) {
+        ef_addr32 extra;
+
+        guest_fn_b1bb0(stream, 0x0018e698u, (uint32_t)EF_U8(node + 0xbu));
+        if (count > 0) {
+            i = 0;
+            do {
+                guest_fn_b1bb0(stream, 0x0018e4b0u, (int32_t)(int8_t)EF_U8(EF_U32(node + 0xcu) + (uint32_t)i));
+                i++;
+            } while (i < count);
+        }
+        if (count > 0) {
+            i = 0;
+            do {
+                guest_fn_b1bb0(stream, 0x0018e4b0u, (int32_t)(int8_t)EF_U8(EF_U32(node + 0x10u) + (uint32_t)i));
+                i++;
+            } while (i < count);
+        }
+        if (count > 0) {
+            i = 0;
+            do {
+                guest_fn_b1bb0(stream, 0x0018e4b0u, (int32_t)(int8_t)EF_U8(EF_U32(node + 0x14u) + (uint32_t)i));
+                i++;
+            } while (i < count);
+        }
+        extra = EF_U32(node + 0x18u);
+        guest_fn_b1bb0(stream, 0x0018e69cu,
+                           (int32_t)EF_S16(extra + 0x0u),
+                           (int32_t)EF_S16(extra + 0x2u),
+                           (int32_t)EF_S16(extra + 0x4u),
+                           (int32_t)EF_S16(extra + 0x6u),
+                           (int32_t)EF_S16(extra + 0x8u),
+                           (int32_t)EF_S16(extra + 0xau),
+                           (int32_t)EF_S16(extra + 0xcu),
+                           (int32_t)EF_S16(extra + 0xeu),
+                           (int32_t)EF_S16(extra + 0x10u),
+                           (int32_t)EF_S16(extra + 0x12u),
+                           (int32_t)EF_S16(extra + 0x14u),
+                           (int32_t)EF_S16(extra + 0x16u),
+                           (int32_t)EF_S16(extra + 0x18u),
+                           (int32_t)EF_S16(extra + 0x1au),
+                           (int32_t)EF_S16(extra + 0x1cu),
+                           (int32_t)EF_S16(extra + 0x1eu),
+                           (int32_t)EF_S16(extra + 0x20u),
+                           (int32_t)EF_S16(extra + 0x22u),
+                           (int32_t)EF_S16(extra + 0x24u),
+                           (int32_t)EF_S16(extra + 0x26u),
+                           (int32_t)EF_S16(extra + 0x28u),
+                           (int32_t)EF_S16(extra + 0x2au),
+                           (int32_t)EF_S16(extra + 0x2cu),
+                           (int32_t)EF_S16(extra + 0x2eu));
+        guest_fn_b1bb0(stream, 0x0018e700u,
+                       (int32_t)EF_S16(node + 0x1cu), (int32_t)EF_S16(node + 0x1eu),
+                       (int32_t)EF_S16(node + 0x20u), (int32_t)EF_S16(node + 0x22u),
+                       (int32_t)EF_S16(node + 0x24u), (int32_t)EF_S16(node + 0x26u),
+                       (int32_t)EF_S16(node + 0x28u), (int32_t)EF_S16(node + 0x2au),
+                       (int32_t)EF_S16(node + 0x2cu), (uint32_t)EF_U8(node + 0x2eu),
+                       (uint32_t)EF_U8(node + 0x2fu), (uint32_t)EF_U8(node + 0x30u));
+        node = EF_U32(node + 4u);
+    }
+}
