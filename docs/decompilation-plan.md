@@ -2272,3 +2272,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 general-heap continuation: recovered outer allocator 0xfc795 with documented DS-read ASM adapter; nine instrumented-helper comparisons pass. Per-heap allocation, extender growth, native selector binding and source-only startup/menu remain incomplete.
 
 2026-11-13 per-heap allocation: 0x110410 isolated/audited, eleven flat-selector comparisons pass; outer/block composition passes nine cases. Real extender growth, heap lifecycle, native selector binding and source-only startup/menu remain incomplete.
+
+2026-11-13 full post-load comparison: twenty recovered C entries match original parser/name/fixup/scene sequence on both real gui.par resources with prepared heap/RAM. Ten name/real-heap cases pass; 0x1105c3 remains original on failure due to three-byte entry extent. Cold startup, real archive I/O and working main menu remain incomplete.
