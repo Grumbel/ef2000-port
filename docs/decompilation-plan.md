@@ -2234,3 +2234,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 startup audit: corrected unconditional x87 helper dispatch in 0x120485; stubbed-callee differential passes all three hook-state cases. The native source-only startup boundary at 0x11d24e remains; neither this isolated check nor hybrid linkage establishes a source-only menu.
 
 2026-11-13 resource-loader continuation: drafted original startup clump loader 0xea270 (378 bytes), with exact descriptor/index layouts and missing-file differential evidence. Populated paths remain unverified; source-only main menu remains incomplete.
+
+2026-11-13 populated resource validation: clump loader 0xea270 passes ten isolated synthetic-service comparisons, including both index-building loops and diagnostic dispatch. Marked compiles; real loading and pure-C main menu remain incomplete.
