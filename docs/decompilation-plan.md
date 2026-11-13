@@ -2262,3 +2262,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 pointer-fixup continuation: recovered 0xaa4b8/0xaa4d4, passing eight synthetic comparisons and both real gui.par parse-plus-fixup comparisons. Remaining post-load passes and source-only startup/menu are incomplete.
 
 2026-11-13 scene-resolution continuation: recovered 0xaa350, six targeted synthetic-service comparisons pass, and two real-resource sequential parse/fixup/scene checks pass. Resolver helper replacements, names/resources and source-only startup/menu remain incomplete.
+
+2026-11-13 scene-helper composition: recovered missing 0xaa198/0xaa1c0, eight isolated cases pass; scene pass with four real C helpers passes three composed cases. Post-load resource/name setup and source-only startup/menu remain incomplete.
