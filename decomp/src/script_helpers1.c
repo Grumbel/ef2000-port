@@ -11,7 +11,8 @@
 void run_text_script_1093d8(ef_addr32 text, uint32_t table, uint32_t count)
 {
     uint8_t line[0x50];
-    uint32_t p = text;
+    /* Keep the cursor across callbacks with guest-specific register clobbers. */
+    volatile uint32_t p = text;
     EF_U32(0x004dd898u) = table;
     EF_U32(0x004dd894u) = count;
     strip_cr_inplace(text);

@@ -322,3 +322,16 @@ and fresh-process restore have an original-asset regression test. The default
 library now persists in `$XDG_DATA_HOME/ef2000/states` (fallback
 `~/.local/share/ef2000/states`), independently of disposable output directories.
 Older output-local libraries remain available with `--state-dir OUTPUT/states`.
+
+### Unfinished script-runner attempt reviewed (2026-11-13)
+
+`0x1093d8` remains blocked and excluded from normal hybrid builds. The
+volatile-cursor experiment compiles but fails three selector fixtures because
+the original selector publishes the temporary line-buffer address in its table
+sentinel. Empty and comment-only cases pass. ABI EBX/EDX preservation was
+incorrect and is now corrected against original ASM and caller 0xe40cf.
+The five-case fixture is diagnostic; it is not a passing regression suite.
+Next: resolve escaped-buffer lifetime/stack layout, then recheck real INIT3D
+parsing and golden replays before enabling this replacement.
+The cursor remains volatile: removing it makes the selector fixture exceed its
+180,000-instruction budget in copy_line, so the partial fix is retained.
