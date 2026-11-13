@@ -2248,3 +2248,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 GUI binary-parser continuation: recovered 0xaa5c4 with 22 passing synthetic-service comparisons, including all payload opcodes and optional nested records. Real resource I/O, list-link integration and source-only startup/menu remain incomplete.
 
 2026-11-13 parser/link integration: recovered parser now compares successfully with all three real C append helpers, including multi-list/group/child input. Synthetic read/allocation remain; source-only startup and rendered menu are incomplete.
+
+2026-11-13 GUI arena integration: corrected and recovered allocator 0xa7b98 (old-cursor EAX return), five isolated cases pass; composed parser, allocator and three linking helpers pass four cases. Resource reads, byte fill, startup and source-only main menu remain incomplete.

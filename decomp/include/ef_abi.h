@@ -966,7 +966,7 @@ uint32_t guest_fn_9c858_arg(uint32_t value); /* 0x9c858 EAX tail */
 uint32_t guest_fn_b3f48(void); /* 0xb3f48 -> EAX */
 
 /* list_helpers.c */
-void add_to_counter_4191c8(uint32_t delta);
+ef_addr32 add_to_counter_4191c8(uint32_t delta); /* 0xa7b98 returns previous cursor */
 void latch_b3f50(void);
 void add_to_counter_4191c4(uint32_t delta);
 void set_latches_1371fc(void);

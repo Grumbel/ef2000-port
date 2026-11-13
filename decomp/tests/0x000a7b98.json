@@ -1,1 +1,66 @@
-{"address":"0x000a7b98","function_size":21,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x000a7b98",
+  "function_size": 21,
+  "cases": [
+    {
+      "name": "cursor_200000_size_0",
+      "registers": {
+        "eax": 0
+      },
+      "memory": [
+        {
+          "address": "0x4191c8",
+          "hex": "00002000"
+        }
+      ]
+    },
+    {
+      "name": "cursor_200001_size_d",
+      "registers": {
+        "eax": 13
+      },
+      "memory": [
+        {
+          "address": "0x4191c8",
+          "hex": "01002000"
+        }
+      ]
+    },
+    {
+      "name": "cursor_ffffffff_size_1",
+      "registers": {
+        "eax": 1
+      },
+      "memory": [
+        {
+          "address": "0x4191c8",
+          "hex": "ffffffff"
+        }
+      ]
+    },
+    {
+      "name": "cursor_fffffff0_size_40",
+      "registers": {
+        "eax": 64
+      },
+      "memory": [
+        {
+          "address": "0x4191c8",
+          "hex": "f0ffffff"
+        }
+      ]
+    },
+    {
+      "name": "cursor_200000_size_ffffffff",
+      "registers": {
+        "eax": 4294967295
+      },
+      "memory": [
+        {
+          "address": "0x4191c8",
+          "hex": "00002000"
+        }
+      ]
+    }
+  ]
+}

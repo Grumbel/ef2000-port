@@ -2322,7 +2322,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000a7b70	16	default_path_a7b70	tiny_helpers	compiles	game	confirmed	decomp/tests/0x000a7b70.json	docs/compiler-abi.md; ; callers a81e4@a8243,a9878@a9882,a99c0@a99f2; guest pending
 0x000a7b80	10	call_9c858_18d57c	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a7b80.json	docs/compiler-abi.md; tail 0x9c858 with EAX=0x18d57c; callers a99c0@a99e2,a99c0@a99ec,aad7c@aadb4; guest pending
 0x000a7b8c	11	latch_b3f48	scene_helpers	compiles	game	confirmed	decomp/tests/0x000a7b8c.json	docs/compiler-abi.md; dword 0x4191c8 = 0xb3f48(); callers a9bfc@a9c9d; guest pending
-0x000a7b98	21	add_to_counter_4191c8	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7b98.json	docs/compiler-abi.md; Dword 0x4191c8 += EAX.; callers aa5c4@aa5f2,aa5c4@aa65c,aa5c4@aa6af; guest pending
+0x000a7b98	21	menu_allocate_a7b98	menu_arena	compiles	game	confirmed	decomp/tests/0x000a7b98.json	Recovered bump allocator returning previous cursor; corrected missing-return/missing-body tracker; isolated differential 5/5 PASS incl wraparound, composed parser/list/arena 4/4 PASS; no menu verification.
 0x000a7bb0	11	latch_b3f50	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7bb0.json	docs/compiler-abi.md; Dword 0x4191c4 = 0xb3f50().; callers a98d0@a98d0; guest pending
 0x000a7bbc	21	add_to_counter_4191c4	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7bbc.json	docs/compiler-abi.md; Dword 0x4191c4 += EAX.; callers aaa50@aaada,aaa50@aab28,aaa50@aab59; guest pending
 0x000a7bd4	19	set_latches_1371fc	list_helpers	compiles	game	confirmed	decomp/tests/0x000a7bd4.json	docs/compiler-abi.md; Byte 0x1371fc = 1, byte 0x1371ee = 0.; callers 19a80@19aff,f2ac0@f2b49; guest pending
