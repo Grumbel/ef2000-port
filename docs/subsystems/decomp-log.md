@@ -2424,3 +2424,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13 `collect_group_nodes_be7e4` (0xbe7e4): group/node collection helper recovered; isolated fuzz PASS (387 completed of 1000).
 
 - 2026-11-13 `build_group_request_ccdbc` (0xccdbc): request builder recovered from disassembly; isolated fuzz weak (0 completed of 1000, random inputs fault in the original).
+
+- 2026-11-13 `nearest_segment_hit_cff80` (0xcff80): segment-vs-plane nearest hit recovered; isolated fuzz PASS (148 completed of 1000).

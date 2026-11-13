@@ -4359,6 +4359,7 @@ void dump_record_b1f80(ef_addr32 rec, uint32_t handle);
 uint32_t reserve_requirements_bd92c(ef_addr32 obj, ef_addr32 desc, ef_addr32 owner, uint16_t cx);
 void collect_group_nodes_be7e4(ef_addr32 ctx, ef_addr32 headPtr, uint32_t value, uint8_t limit);
 uint32_t build_group_request_ccdbc(uint32_t a, uint8_t b, uint8_t count, ef_addr32 key, ef_addr32 owner, uint32_t arg1, ef_addr32 headPtr, uint32_t arg3, uint32_t arg4);
+uint32_t nearest_segment_hit_cff80(ef_addr32 seg, uint32_t count, ef_addr32 planes);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

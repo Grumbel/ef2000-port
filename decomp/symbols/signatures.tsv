@@ -3337,3 +3337,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000bd92c	reserve_requirements_bd92c	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,CX:uint16_t	EAX:uint32_t	esi,edi,ebp	0	Original 0xbd92c (666 bytes); requirement reservation
 0x000be7e4	collect_group_nodes_be7e4	EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,CL:uint8_t		esi,edi,ebp	0	Original 0xbe7e4 (827 bytes); group node collection
 0x000ccdbc	build_group_request_ccdbc	EAX:uint32_t,DL:uint8_t,BL:uint8_t,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:ef_addr32,[ESP+16]:uint32_t,[ESP+20]:uint32_t	EAX:uint32_t	esi,edi,ebp	20	Original 0xccdbc (882 bytes); build group request
+0x000cff80	nearest_segment_hit_cff80	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0xcff80 (728 bytes); nearest segment/plane hit

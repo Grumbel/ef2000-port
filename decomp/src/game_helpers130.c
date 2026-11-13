@@ -2530,3 +2530,84 @@ uint32_t build_group_request_ccdbc(uint32_t a, uint8_t b, uint8_t count, ef_addr
         guest_fn_cc768(table);
     return a;
 }
+
+/* Original 0xcff80 (728 bytes). Intersect the segment SEG (two 3-vectors at
+ * +0 and +0xc) with COUNT 0x4a-byte planes at PLANES; the nearest hit to the
+ * segment start (approximate distance) is stored at 0x4208f0..0x4208f8.
+ * Returns whether any plane was hit. */
+uint32_t nearest_segment_hit_cff80(ef_addr32 seg, uint32_t count, ef_addr32 planes)
+{
+    int32_t org[3], dir[3], out[3];
+    int32_t best = 0x7fffffff;
+    int32_t lo, hi, a, b;
+    ef_addr32 plane = planes;
+    int32_t s0, s1, s2, e0, e1, e2;
+
+    if (count == 0u)
+        return 0u;
+    s0 = (int32_t)EF_U32(seg);
+    s1 = (int32_t)EF_U32(seg + 4u);
+    s2 = (int32_t)EF_U32(seg + 8u);
+    e0 = (int32_t)EF_U32(seg + 0xcu);
+    e1 = (int32_t)EF_U32(seg + 0x10u);
+    e2 = (int32_t)EF_U32(seg + 0x14u);
+    lo = (s1 >= e1) ? e1 : s1;
+    hi = (s1 > e1) ? s1 : e1;
+    a = forward_triple_cff64(seg);
+    b = forward_triple_cff64(seg + 0xcu);
+    if (a > b) {
+        org[0] = s0; org[1] = s1; org[2] = s2;
+        dir[0] = e0 - s0; dir[1] = e1 - s1; dir[2] = e2 - s2;
+    } else {
+        org[0] = e0; org[1] = e1; org[2] = e2;
+        dir[0] = s0 - e0; dir[1] = s1 - e1; dir[2] = s2 - e2;
+    }
+    EF_U8(0x0015b7c9u) = 0xfu;
+    EF_U8(0x0015b7c8u) = 0xfu;
+    if (forward_triple_cff64((ef_addr32)(uintptr_t)dir) < 0x64) {
+        EF_U8(0x0015b7c9u) = 8u;
+        EF_U8(0x0015b7c8u) = 7u;
+    }
+    do {
+        int32_t p18 = (int32_t)EF_U32(plane + 0x18u) >> 16;
+        int32_t p1a = (int32_t)EF_U32(plane + 0x1au) >> 16;
+
+        if (p1a > lo && p18 < hi) {
+            int32_t p10 = (int32_t)EF_U32(plane + 0x10u) >> 16;
+            int32_t p12 = (int32_t)EF_U32(plane + 0x12u) >> 16;
+            int32_t p16 = (int32_t)EF_U32(plane + 0x16u) >> 16;
+            int32_t p14 = (int32_t)EF_U32(plane + 0x14u) >> 16;
+            uint32_t m1 = (uint32_t)(p10 > s0) | ((uint32_t)(p12 < s0) << 1) |
+                          ((uint32_t)(p16 < s2) << 2) | ((uint32_t)(p14 > s2) << 3);
+            uint32_t m2 = (uint32_t)(p10 > e0) | ((uint32_t)(p12 < e0) << 1) |
+                          ((uint32_t)(p16 < e2) << 2) | ((uint32_t)(p14 > e2) << 3);
+
+            if ((m1 & m2) == 0u) {
+                uint32_t h28 = (uint32_t)((int32_t)EF_U32(plane + 0x28u) >> 16);
+                uint32_t h2a = (uint32_t)((int32_t)EF_U32(plane + 0x2au) >> 16);
+                uint32_t h2c = (uint32_t)((int32_t)EF_U32(plane + 0x2cu) >> 16);
+                uint32_t h2e = (uint32_t)((int32_t)EF_U32(plane + 0x2eu) >> 16);
+                uint32_t k = h2e << 15;
+                uint32_t d1 = (uint32_t)s0 * h28 + (uint32_t)s1 * h2a + (uint32_t)s2 * h2c + k;
+                uint32_t d2 = (uint32_t)e0 * h28 + (uint32_t)e1 * h2a + (uint32_t)e2 * h2c + k;
+
+                if ((int32_t)(d1 ^ d2) < 0 &&
+                    ray_hits_plane_cfde4((ef_addr32)(uintptr_t)out, (ef_addr32)(uintptr_t)dir,
+                                         (ef_addr32)(uintptr_t)org, plane) != 0u) {
+                    int32_t dist = (int16_t)approx_distance3_16_b3830(
+                        (int16_t)(out[0] - (int16_t)s0), (int16_t)(out[1] - (int16_t)s1),
+                        (int16_t)((uint16_t)out[2] - (uint16_t)s2));
+
+                    if (dist < best) {
+                        best = dist;
+                        EF_U32(0x004208f0u) = (uint32_t)out[0];
+                        EF_U32(0x004208f4u) = (uint32_t)out[1];
+                        EF_U32(0x004208f8u) = (uint32_t)out[2];
+                    }
+                }
+            }
+        }
+        plane += 0x4au;
+    } while (--count != 0u);
+    return best != 0x7fffffff;
+}
