@@ -2688,7 +2688,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000be480	281	build_record_be480	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000be480.json	docs/compiler-abi.md; Build a 0x78-byte record DST from SRC1 (EDX), SRC2 (EBX) and SRC3 (ECX): copy header bytes and 18 bytes from SRC2+0x11, ; callers be59c@be691; guest pending
 0x000be59c	477			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x000be77c	104	transfer_entry_weights_be77c	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be77c.json	docs/compiler-abi.md; Find the record whose id matches the object's and move its entries' weights from field 0x23 to field 0x25.; callers be59c@be74e,f8e44@f908d; guest pending
-0x000be7e4	827			unknown	game	unverified		
+0x000be7e4	827	collect_group_nodes_be7e4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000be7e4.json	Original 0xbe7e4 (827 bytes)
 0x000beb20	353	scan_code_to_function_key_beb20	game_helpers60	compiles	game	confirmed	decomp/tests/0x000beb20.json	docs/compiler-abi.md; Map a keyboard scan code to the 1..23 index of the matching function key, 0 for none.; callers bed1c@bed9a; guest pending
 0x000bec84	59	is_active_bec84	list_helpers	compiles	game	confirmed	decomp/tests/0x000bec84.json	docs/compiler-abi.md; ; callers becc0@becde,faafc@fab1a,fabf0@fac0e; guest pending
 0x000becc0	55	count_valid_entries_becc0	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000becc0.json	docs/compiler-abi.md; Count the 21-byte entries of the object that pass the check.; callers becf8@bed07,fac78@facb1,fac78@facd1; guest pending

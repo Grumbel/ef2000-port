@@ -2351,3 +2351,88 @@ uint32_t reserve_requirements_bd92c(ef_addr32 obj, ef_addr32 desc, ef_addr32 own
         guest_fn_cc768(tableB);
     return 1u;
 }
+
+/* Original 0xbe7e4 (827 bytes). For each of the CTX+0x12 group records
+ * (0x7c bytes each at CTX+0x13) allocate a 22-byte-per-slot record table
+ * (+0x69) and a word table (+0x78) sized by the group's count (+1), then walk
+ * the node list whose head pointer is stored at HEADPTR and, for every node
+ * that matches the group (owner block byte +9 below LIMIT and the key words at
+ * +0x19..+0x27 matching the group index/CTX+0x10, or VALUE for CTX+0xa == 2),
+ * claim it (+0x17, owner +9 incremented), clone its owner block into the next
+ * slot and remember its +0x13 id, until the group's slots are full. */
+void collect_group_nodes_be7e4(ef_addr32 ctx, ef_addr32 headPtr, uint32_t value, uint8_t limit)
+{
+    int16_t j;
+
+    for (j = 0; (int16_t)EF_U8(ctx + 0x12u) > j; j++) {
+        ef_addr32 group = EF_U32(ctx + 0x13u) + (uint32_t)((int32_t)j * 0x7c);
+        uint32_t m = EF_U8(group + 1u);
+        ef_addr32 node, table, ids;
+        int16_t k = 0;
+
+        node = 0u;
+        node = EF_U32(headPtr);
+        EF_U32(group + 0x69u) = guest_fn_cc6c0_z(m * 0x16u, 0x0018ecbcu, m);
+        EF_U32(group + 0x78u) = guest_fn_cc6c0_z(m * 2u, 0x0018ecf0u, m);
+        if (node == 0u)
+            continue;
+        while (1) {
+            ef_addr32 owner, src, slot;
+            uint16_t match = 0u;
+
+            if ((int16_t)EF_U8(group + 1u) <= k)
+                break;
+            if (EF_U8(node + 0xbu) == 0u) {
+                owner = EF_U32(node + 0x4du);
+                if (EF_U8(owner + 9u) < limit) {
+                    if (EF_U8(ctx + 0xau) == 2u) {
+                        if (EF_U16(node + 0x19u) == (uint16_t)value && EF_U16(node + 0x21u) == 0u)
+                            match = 1u;
+                    } else if (EF_U16(node + 0x19u) == EF_U16(ctx + 0x10u) &&
+                               (uint16_t)j == EF_U16(node + 0x21u)) {
+                        match = 1u;
+                    } else if (EF_U16(node + 0x1bu) == EF_U16(ctx + 0x10u) &&
+                               (uint16_t)j == EF_U16(node + 0x23u)) {
+                        match = 1u;
+                    } else if (EF_U16(node + 0x1du) == EF_U16(ctx + 0x10u) &&
+                               (uint16_t)j == EF_U16(node + 0x25u)) {
+                        match = 1u;
+                    } else if (EF_U16(node + 0x1fu) == EF_U16(ctx + 0x10u) &&
+                               (uint16_t)j == EF_U16(node + 0x27u)) {
+                        match = 1u;
+                    }
+                }
+            }
+            if (match != 0u) {
+                uint32_t copy;
+
+                EF_U16(node + 0x17u) = (uint16_t)(EF_U16(node + 0x17u) + 1u);
+                owner = EF_U32(node + 0x4du);
+                EF_U8(owner + 9u) = (uint8_t)(EF_U8(owner + 9u) + 1u);
+                copy = alloc_checked_cc744(EF_U32(EF_U32(node + 0x4du)));
+                table = EF_U32(group + 0x69u);
+                slot = table + (uint32_t)((int32_t)k * 0x16);
+                EF_U32(slot) = copy;
+                src = EF_U32(node + 0x4du);
+                EF_U8(slot + 4u) = EF_U8(src + 4u);
+                EF_U8(slot + 5u) = EF_U8(src + 5u);
+                EF_U8(slot + 6u) = EF_U8(src + 6u);
+                EF_U8(slot + 7u) = EF_U8(src + 7u);
+                EF_U8(slot + 8u) = EF_U8(src + 8u);
+                EF_U16(slot + 0xau) = EF_U16(src + 0xau);
+                EF_U8(slot + 9u) = EF_U8(src + 9u);
+                EF_U16(slot + 0xcu) = EF_U16(src + 0xcu);
+                EF_U16(slot + 0xeu) = EF_U16(src + 0xeu);
+                EF_U16(slot + 0x10u) = EF_U16(src + 0x10u);
+                EF_U16(slot + 0x12u) = EF_U16(src + 0x12u);
+                EF_U16(slot + 0x14u) = EF_U16(src + 0x14u);
+                ids = EF_U32(group + 0x78u);
+                EF_U16(ids + (uint32_t)((int32_t)k * 2)) = EF_U16(node + 0x13u);
+                k++;
+            }
+            node = EF_U32(node + 4u);
+            if (node == 0u)
+                break;
+        }
+    }
+}
