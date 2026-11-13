@@ -423,7 +423,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000293b0	236	pick_weapon_slot_293b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000293b0.json	docs/compiler-abi.md; Choose which of the 19 three-byte slots (+0x198 of the unit UNIT, AX) to fire at the range D (double 0x1f7000): a slot q; callers 24f24@24f4a,294ec@295c9; guest pending
 0x0002949c	79	query_indexed_object_feature	record_callers	compiles	game	confirmed	decomp/tests/0x0002949c.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
 0x000294ec	1025			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
-0x000298f0	491			unknown	game	unverified		
+0x000298f0	491	object_fire_request_298f0	game_helpers130	compiles	game	confirmed	decomp/tests/0x000298f0.json	Original 0x298f0 (491 bytes)
 0x00029adc	55	scaled_rotation_29adc	float_helpers1	compiles	game	confirmed	decomp/tests/0x00029adc.json	docs/compiler-abi.md; Two scaled components from a record's rotation words.; callers 29b14@29c4d; guest pending
 0x00029b14	699			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00029dd0	386	unit_damage_tick_29dd0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00029dd0.json	docs/compiler-abi.md; Per-unit damage tick for unit AX (signed). Does nothing for a missing unit. A unit without a target (+0x1c) with a nonze; callers 29f54@2a159,6583c@6588c; guest pending

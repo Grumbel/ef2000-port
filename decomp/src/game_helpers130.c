@@ -4435,3 +4435,47 @@ void fire_object_slot_2a1fc(int16_t id, uint8_t slot, uint32_t arg)
 	if (EF_U8(0x00127da9u) != 0u)
 		send_object_state_packet(id, slot);
 }
+
+/* 0x298f0, 491 bytes. Fire request for the selected weapon slot of unit `id`: refuse while the line-of-sight check fails, fire the slot, announce it and update the per-weapon-class counters. Returns 1 when the request was accepted. */
+uint8_t object_fire_request_298f0(int16_t id, uint8_t slot)
+{
+	ef_addr32 obj, rec, ebxv;
+	int32_t idx, s, j;
+
+	obj = lookup_filtered_indexed_object(id);
+	if (obj == 0u)
+		return 0;
+	if (EF_U8(obj + 0x16cu) == 6u) {
+		ebxv = guest_lookup_object_8ffe8(EF_S32(obj + 0x168u) >> 16);
+		if (request_los_66cd4((int16_t)(EF_S32(EF_U32(0x001f71bcu) + 0x168u) >> 16), EF_U32(0x001f71bcu)) != 0u)
+			return 0;
+	} else {
+		ebxv = obj + 0x1e8u;
+	}
+	EF_U8(obj + 0x1d7u) = query_indexed_object_feature(id, slot);
+	idx = EF_S32(obj + 0x1d4u) >> 24;
+	if (idx == 0x14)
+		return 0;
+	if (guest_fn_291fc_x(EF_U8(obj + 0x19bu + (uint32_t)idx * 3u)) == 0u)
+		return 0;
+	if ((EF_S32(obj + 0x1d4u) >> 24) < 0x13) {
+		fire_object_slot_2a1fc(id, EF_U8(obj + 0x1d7u), ebxv);
+		draw_object_entries_46168((uint32_t)(int32_t)id, 0x61u, 0u, 0u, 0u);
+	}
+	if ((EF_S32(obj + 0x1d4u) >> 24) == 0x13)
+		fire_object_slot_2a1fc(id, EF_U8(obj + 0x1d7u), 0u);
+	rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(obj + 0x26u) >> 16) * 0xcau;
+	idx = EF_S32(obj + 0x1d4u) >> 24;
+	if (EF_U16(0x00125835u) == EF_U16(rec + 0x1cu) && EF_U8(0x00125846u) == 3u &&
+	    (EF_S32(obj + 0x198u + (uint32_t)idx * 3u) >> 24) == 6 && EF_U8(rec + 0x1bu) == 0xbu) {
+		for (s = 0; s < EF_S16(0x001a53c0u); s++) {
+			for (j = 0; j < EF_S16(0x001a53b0u + (uint32_t)s * 2u); j++) {
+				if (EF_U16(obj + 0x47u) == EF_U16(0x001a52b0u + (uint32_t)s * 16u + (uint32_t)j * 2u))
+					EF_U8(0x0019b960u + (uint32_t)j)++;
+			}
+		}
+		if (EF_U8(0x00125839u) == 1u && EF_U8(0x001357c8u) == 0u)
+			send_object_code_4a((int16_t)(EF_S32(obj + 0x45u) >> 16));
+	}
+	return 1;
+}
