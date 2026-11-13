@@ -1,0 +1,66 @@
+{
+  "address": "0x00040ec4",
+  "function_size": 9,
+  "cases": [
+    {
+      "name": "eax_00000000",
+      "registers": {
+        "eax": 0
+      },
+      "memory": [
+        {
+          "address": "0x1a364c",
+          "hex": "a5"
+        }
+      ]
+    },
+    {
+      "name": "eax_ffffffff",
+      "registers": {
+        "eax": 4294967295
+      },
+      "memory": [
+        {
+          "address": "0x1a364c",
+          "hex": "a5"
+        }
+      ]
+    },
+    {
+      "name": "eax_12345678",
+      "registers": {
+        "eax": 305419896
+      },
+      "memory": [
+        {
+          "address": "0x1a364c",
+          "hex": "a5"
+        }
+      ]
+    },
+    {
+      "name": "eax_abcdef01",
+      "registers": {
+        "eax": 2882400001
+      },
+      "memory": [
+        {
+          "address": "0x1a364c",
+          "hex": "a5"
+        }
+      ]
+    },
+    {
+      "name": "eax_80008000",
+      "registers": {
+        "eax": 2147516416
+      },
+      "memory": [
+        {
+          "address": "0x1a364c",
+          "hex": "a5"
+        }
+      ]
+    }
+  ]
+}

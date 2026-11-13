@@ -3449,3 +3449,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004f0d4	guest_fn_4f0d4				0	callee of 0x4eb8c@4ec09; registers unknown, assumed clobbered
 0x0004eb8c	mpWPZoomToggle			ebx,ecx,edx,esi	0	Original 0x0004eb8c (135 bytes); waypoint slot from cursor; pushes ebx,ecx,edx,esi
 0x00040ec4	gc_performance_yes_40ec4	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x40ec4 XOR AH,AH; store AH at 0x1a364c; RET. Callback entry; EAX upper/lower bytes retained.
+0x00040ebc	gc_start_new_campaign_40ebc			eax,ebx,ecx,edx,esi,edi,ebp	0	0x40ebc MOV byte [0x1a364c],1; RET; no register inputs or clobbers; GUI callback.

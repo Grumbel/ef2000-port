@@ -2228,3 +2228,5 @@ files from `local/`, no pseudo-C, no game assets, attribution trailer.
 ### 2026-11-13 assembly-focused continuation
 
 Current user direction prioritizes matching generated assembly over game runs, superseding the earlier instruction in section 2.2 to avoid instruction matching. Full C coverage remains primary; pure-C menu and cockpit are secondary milestones. Corrected the EAX/AH contract of campaign callback 0x40ec4; compilation and static assembly review recorded in docs/subsystems/decomp-log.md. This entry remains unspliced and is not counted as verified.
+
+2026-11-13 continuation: campaign flag callbacks 0x40ebc/0x40ec4 now independently arena-link and pass five isolated differential cases each; source-only menu remains incomplete.
