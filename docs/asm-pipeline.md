@@ -115,8 +115,9 @@ ABI recovery, precise exception emulation or source-only game integration.
 The differential runner executes original x86 without guest-service stubs and
 compares all eight GPRs, EFLAGS, return PC and all 4 MiB of RAM with the host C
 execution. Sixteen deterministic prepared probes per body include scalar edges
-and scratch objects. Original faults, fuel exhaustion and C faults are
-**inconclusive**, never passes. `probes-pass` means those probes passed; it does
+and scratch objects. Original faults and original fuel exhaustion are **inconclusive**, never
+passes. If the original completes, a C fault, invalid PC or exhausted C budget
+is a **mismatch**. `probes-pass` means those probes passed; it does
 not establish correctness for all possible inputs, instruction coverage or
 compatibility of generated OpenWatcom objects with original callers.
 
@@ -128,3 +129,21 @@ pass, including 1,568 synthetic program probes and exhaustive ADD/SUB byte pairs
 (131,072 comparisons). Main next blockers are calls, shifts, multiplication,
 external branches, ambiguous operand widths, sign-extension instructions and
 x87. No reliable full-coverage or native game replacement claim is made.
+
+The integer expansion supports SHL/SHR/SAR (counts masked to five bits), all
+MUL/IMUL operand forms, ADC/SBB, CBW/CWDE/CWD/CDQ and zero-nesting ENTER. A
+memory operand without a printed width can inherit its width from an encoded
+register operand; an immediate cannot supply that evidence. Shift helpers use
+bounded one-bit steps, preserving zero-count flags and avoiding undefined C
+shifts. Multiplication sign-extends into int64_t without implementation-defined
+unsigned-to-signed casts; all signed 32-bit products fit that carrier. Undefined
+multiply/shift flags follow the measured Unicorn 2.1.4 policy and are compared,
+not masked out. Synthetic tests cover every byte input/carry combination,
+every byte value/shift count, every byte multiply pair and wider boundaries;
+shift/multiply grids also run with undefined-behavior sanitization.
+
+2026-11-13 integer corpus: 662 generated, 3,615 unsupported; all generated bodies
+compile with OpenWatcom warnings-as-errors. Original-vs-C probes: 7,302 pass,
+3,290 inconclusive, zero mismatches; 315 bodies pass all 16 probes, 347 remain
+inconclusive. Artifacts: `local/asm-c-integer-20261113` and
+`local/asm-c-integer-diff-20261113`. No native or universal-equivalence claim.

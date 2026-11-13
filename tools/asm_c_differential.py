@@ -4,8 +4,9 @@
 
 """Compare generated explicit-state C with original x86 using deterministic probes.
 
-Reports evidence per probe, never claims universal equivalence. Original faults,
-C faults and fuel exhaustion are inconclusive, not passing tests. All generated
+Reports evidence per probe, never claims universal equivalence. Original faults
+and fuel exhaustion are inconclusive, not passing tests. A C failure after the
+original returns is a mismatch. All generated
 artifacts and proprietary RAM remain under ignored local/.
 """
 
@@ -73,7 +74,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000):
                   native_memory, memory_size)
     status = function(ctypes.byref(state), budget)
     if status:
-        return dict(state='inconclusive', reason='C status %d (budget/pc/memory)' % status)
+        return dict(state='mismatch', differences=[
+            'C status %d (budget/pc/memory) after original completed' % status])
     differences = []
     expected = [cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + n.upper()))
                 for n in asm_to_c.REGS]

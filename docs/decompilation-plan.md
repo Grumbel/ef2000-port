@@ -2332,3 +2332,27 @@ Reliable bulk coverage remains active: calls, shifts, multiplication, unresolved
 branches, ambiguous widths, x87, native ABI/integration and stronger state
 coverage remain. Generated explicit-state functions are not hybrid replacements
 and do not promote tracker states or establish a source-only menu.
+
+2026-11-13 ASM integer expansion: SHL/SHR/SAR, all MUL/IMUL forms, ADC/SBB,
+CBW/CWDE/CWD/CDQ, zero-nesting ENTER and encoded-register memory-width inference.
+Unsigned arithmetic and bounded shift steps avoid C overflow/shift UB; undefined
+flags retain the Unicorn oracle policy and remain checked. Tightened differential
+classification: any C failure after the original completes is a mismatch.
+Ten oracle/tool tests pass, including exhaustive byte arithmetic/carry, shift
+count and multiplication grids, wider boundaries and UBSan shift/multiply grids;
+56 inventory/Ghidra checks pass. Rechecked the stricter C-failure regression.
+Full Ghidra 12.1.4 body corpus: 662 generated (49,199 body bytes), 3,615 unsupported;
+662 OpenWatcom v2 -we objects; 10,592 probes: 7,302 passes, 3,290 original-fault/
+budget inconclusive, zero mismatches. 315 bodies pass all 16 probes; 347 remain
+inconclusive. No ABI/tracker promotion. Commands: python3 -m unittest
+tests.test_asm_to_c; python3 -m unittest tests.test_asm_inventory
+tests.test_asm_diff tests.test_ghidra_ef2000; tools/asm_to_c.py --inventory
+local/asm-body-inventory-20261113 --output local/asm-c-integer-20261113;
+tools/asm_c_differential.py --translations local/asm-c-integer-20261113 --output
+local/asm-c-integer-diff-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386
+(Python 3.13.12/Unicorn 2.1.4 for oracle commands). Direct calls remain the main
+blocker; a read-only graph check finds 2,549 syntactically translatable direct-
+call bodies and 958 closed over their direct dependencies, before implementation.
+Reliable bulk coverage, indirect control flow, x87 and native integration remain
+incomplete.
