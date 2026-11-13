@@ -2514,3 +2514,10 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 0x5e664 `animate_corner_table_5e664` recovered: while the unit counter 0x12814e is set, draws the 0x1a666a corner-table box (same pattern as 0x5e87c) and advances the animation counters 0x1a6cd0/0x1a6cd4, resetting the counter via 0x5e658 on wrap. Isolated fuzz PASS 300/300; callee-stubbed differential (ctl25, 400 cases, 4123 logged calls incl. counter RAM) matches 400/400. 0x8d11c blocked: stores ECX left by the 0x91c48 chain and passes leaked EBX/ECX/EDX into blocked 0x913dc; blocked callee 0x7ee8.
 
 - 0x8ecdc `scan_neighbours_8ecdc` recovered (ret 4, the single stack argument is unused; AL = hit count): walks the six object slots of each active record, filters by range/flags, calls blocked 0x8e940 (new wrapper `guest_fn_8e940_x`, 4 register + 1 stack argument) and bumps the per-kind counters at 0x1a6388. Isolated fuzz PASS 300/300; callee-stubbed differential (ctl26, 500 cases, 5820 logged calls incl. counter RAM) matches 500/500 after fixing the flag byte (+0x24, not +0x25).
+
+- 0xd7f0c `build_clip_records_d7f0c` recovered (604 bytes, void). Isolated fuzz only
+  shows the known saved-ESP global (0x159064) artifact from the wrapped call to
+  blocked 0xd8170; callee-stubbed differential (stub logs eax) agrees 400/400
+  (RAM 0x15bae0..0x15bb40 + call logs). Also re-blocked 0xb9aa4 (blocked x87/port
+  callees, 6-stack-arg loop untestable), 0xbe59c (11 stack args, 9 callees) and
+  0x8d11c (leaks ECX/EBX/EDX into blocked 0x913dc chain).

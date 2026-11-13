@@ -5362,3 +5362,93 @@ uint8_t scan_neighbours_8ecdc(uint32_t p0, uint32_t p1, uint32_t p2, uint32_t p3
 #undef HI
 	return (uint8_t)cnt;
 }
+
+/* Original 0xd7f0c (604 bytes): copy the clip rectangle words at 0x15baee..
+ * to 0x15bb02.., run 0xd8170 on it and, when the clipped extent is positive,
+ * build the one or two follow-up clip records at 0x15bb16/0x15bb2a. */
+void build_clip_records_d7f0c(void)
+{
+	int32_t a, b;
+#define W(a) EF_U16(a)
+#define S16W(a) ((int32_t)(int16_t)EF_U16(a))
+	W(0x0015bb02u) = W(0x0015baeeu);
+	W(0x0015bb06u) = W(0x0015bafeu);
+	W(0x0015bb08u) = W(0x0015bb00u);
+	W(0x0015bb0au) = W(0x0015bafau);
+	W(0x0015bb0cu) = W(0x0015bafcu);
+	W(0x0015bb0eu) = W(0x0015baf6u);
+	W(0x0015bb10u) = W(0x0015baf8u);
+	W(0x0015bb12u) = W(0x0015baf2u);
+	W(0x0015bb14u) = W(0x0015baf4u);
+	guest_fn_d8170(0x0015bb02u);
+	a = S16W(0x0015bb08u);
+	b = S16W(0x0015bb0cu);
+	if (!(a > b))
+		a = b;
+	if ((int16_t)a <= 0)
+		return;
+	if (EF_U32(0x00420e74u) == 0x00d8528u) {
+		W(0x0015bb18u) = 4u;
+		W(0x0015bb16u) = W(0x0015bb02u);
+		W(0x0015bb1au) = W(0x0015bb0au);
+		W(0x0015bb1cu) = W(0x0015bb0cu);
+		W(0x0015bb1eu) = W(0x0015bb06u);
+		W(0x0015bb20u) = W(0x0015bb08u);
+		a = S16W(0x0015bb1eu);
+		b = (int32_t)EF_U32(0x0015bdc4u);
+		if (a < b)
+			a = b;
+		W(0x0015bb22u) = (uint16_t)a;
+		a = S16W(0x0015bb20u);
+		b = (int32_t)EF_U32(0x0015bdc8u);
+		if (a > b)
+			a = b;
+		W(0x0015bb24u) = (uint16_t)a;
+		a = S16W(0x0015bb1au);
+		b = (int32_t)EF_U32(0x0015bdc4u);
+		if (a < b)
+			a = b;
+		W(0x0015bb26u) = (uint16_t)a;
+		a = S16W(0x0015bb1cu);
+		b = (int32_t)EF_U32(0x0015bdccu);
+		if (a > b)
+			a = b;
+		W(0x0015bb28u) = (uint16_t)a;
+		guest_fn_d8170(0x0015bb16u);
+		return;
+	}
+	W(0x0015bb16u) = W(0x0015bb02u);
+	W(0x0015bb1au) = W(0x0015bb0au);
+	W(0x0015bb1cu) = W(0x0015bb0cu);
+	W(0x0015bb1eu) = W(0x0015bb06u);
+	W(0x0015bb18u) = 4u;
+	W(0x0015bb20u) = W(0x0015bb08u);
+	if (S16W(0x0015bb1eu) > 0)
+		a = 0;
+	else
+		a = S16W(0x0015bb1eu);
+	W(0x0015bb22u) = (uint16_t)a;
+	a = S16W(0x0015bb20u);
+	b = (int32_t)EF_U32(0x0015bdccu);
+	if (a > b)
+		a = b;
+	W(0x0015bb24u) = (uint16_t)a;
+	a = S16W(0x0015bb1au);
+	b = (int32_t)EF_U32(0x0015bdc0u);
+	if (a > b)
+		a = b;
+	W(0x0015bb26u) = (uint16_t)a;
+	a = S16W(0x0015bb1cu);
+	b = (int32_t)EF_U32(0x0015bdc8u);
+	if (a > b)
+		a = b;
+	W(0x0015bb28u) = (uint16_t)a;
+	if ((int16_t)W(0x0015bb1cu) > 0) {
+		W(0x0015bb2au) = W(0x0015bdc4u);
+		W(0x0015bb18u) = 5u;
+		W(0x0015bb2cu) = W(0x0015bdc8u);
+	}
+	guest_fn_d8170(0x0015bb16u);
+#undef W
+#undef S16W
+}

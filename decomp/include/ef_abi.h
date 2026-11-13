@@ -4428,6 +4428,7 @@ void draw_view_box_5f698(void); /* 0x5f698 */
 void animate_corner_table_5e664(void); /* 0x5e664 */
 uint8_t scan_neighbours_8ecdc(uint32_t p0, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t unused); /* 0x8ecdc */
 void guest_fn_8e940_x(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t stack); /* 0x8e940 EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
+void build_clip_records_d7f0c(void); /* 0xd7f0c */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
