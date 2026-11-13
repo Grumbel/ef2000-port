@@ -2658,3 +2658,41 @@ local/asm-c-x87-state-diff-20261113 --watcom
 /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386
 (Python 3.13.12/Unicorn 2.1.4). Final report binds ABI 2 and explicitly records
 x87 oracle limitations. Full reliable translation remains active.
+
+
+**2026-11-13 — x87 control/status and AH flag transfer.**
+Added FNCLEX, FNSTCW, FNSTSW (memory/AX), FLDCW and SAHF/LAHF. Control/status
+stores and flag transfers preserve unrelated registers, x87 state and EFLAGS
+bits; FNCLEX retains TOP/condition codes. FLDCW normalizes reserved CW bits and
+updates pending exception ES/B from the new masks. Entry with a pending #MF
+returns explicit status 8 without state mutation; exception delivery/FWAIT and
+broader x87 stack/arithmetic lifting remain incomplete.
+Hardware tests execute all 65,536 control words with zero or IE/PE flags plus
+all 64 pending-flag/mask combinations: 135,040 C-vs-hardware cases pass. AH flag
+transfers compare all 256 AH values with 64 arithmetic-flag combinations in
+both directions (32,768 original-vs-C cases, UBSan enabled). Seeded state tests
+cover nonzero tags/TOP/payload/environment and all FNCLEX clear bits. Hardware
+FLDENV/FNSTSW AX/FNSTENV proves status-store leaves the environment unchanged;
+Unicorn 2.1.4 instead changes FIP. It also retains reserved CW bits that hardware
+normalizes. Negative differential regressions preserve those as mismatches;
+no fields are masked or reported as successful original-vs-C comparisons.
+All 92 ASM/Ghidra tests pass (128 s); the six latest x87 tests pass again after
+expanding the hardware grid/negative cases. A synthetic body containing every
+new operation compiles warning-free with Watcom -bt=dos -3r -za99 -w1 -we.
+Regeneration selects the same 2,090 bodies/269,778 bytes: every generated C file,
+header and complete translation manifest is byte-identical to the ABI 2 corpus.
+Verified original evidence/report/library hashes, retaining its 18,500 matches,
+14,935 inconclusive and same five target failures. No unnecessary rerun or
+new coverage claim. Identity proof:
+local/asm-c-x87-control-corpus-identity-20261113.json. This tranche establishes
+control primitives; integer dependencies and broader x87 instructions still
+prevent additional bodies from closing. Reliable full bulk translation is not
+complete; no tracker promotion.
+Commands: python3 -m unittest tests.test_asm_c_x87 tests.test_asm_c_segments
+tests.test_asm_c_program tests.test_asm_to_c tests.test_asm_inventory
+tests.test_asm_diff tests.test_ghidra_ef2000; python3 -m unittest
+tests.test_asm_c_x87; tools/asm_c_program.py --inventory
+local/asm-observed-body-inventory-20261113 --output
+local/asm-c-x87-control-program-20261113. Logs: local/asm-c-x87-control-full-tests-20261113.log,
+local/asm-c-x87-control-current-tests-20261113.log,
+local/asm-c-x87-control-watcom-20261113/compile.log (Python 3.13.12/Unicorn 2.1.4).

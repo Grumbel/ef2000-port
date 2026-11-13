@@ -388,3 +388,19 @@ per-body outcome: 18,500 matches, 14,935 inconclusive and the same five target
 coverage failures across 2,090 bodies. Added x87 comparison causes no new
 failure under the empty-stack probe profile; it does not prove broader x87
 support. The gate remains nonzero.
+
+Control/status lifting includes FNCLEX, FNSTCW, FNSTSW (memory or AX), FLDCW,
+and the SAHF/LAHF flag transfer used by x87 comparisons. FNCLEX preserves TOP
+and condition codes; stores preserve flags and all unrelated state. FLDCW
+normalizes reserved control bits and updates ES/B from pending flags and the
+new masks. Pending exception delivery at entry remains an explicit status 8;
+FWAIT and broader unmasked-exception handling remain unsupported.
+
+The hardware control test covers all 65,536 control words with zero or IE/PE
+flags, plus all 64 flag/mask combinations (135,040 cases). It saves/restores
+the full host x87 state and clears newly pending exceptions before restoring.
+Unicorn 2.1.4 retains reserved CW bits and changes the instruction pointer on
+FNSTSW AX; hardware proves the C normalization and unchanged pointer. Seeded
+regressions keep those differences as explicit differential mismatches. They
+are not successful original-vs-C comparisons or masked fields. AH/flag tests
+cover all 256 AH values against every arithmetic-flag combination.

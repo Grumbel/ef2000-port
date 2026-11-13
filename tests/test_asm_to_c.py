@@ -248,6 +248,15 @@ class TranslationTests(unittest.TestCase):
                     cpu.mem_write(0, bytes(memory))
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_flag_transfers_all_ah_values_and_arithmetic_flags(self):
+        positions = (0, 2, 4, 6, 7, 11)
+        flags = [0x202 | sum(((value >> index) & 1) << bit
+                            for index, bit in enumerate(positions)) for value in range(64)]
+        for source in ('sahf', 'lahf'):
+            self.scalar_grid(source, ((0x12340078 | (ah << 8), 0, status)
+                                      for ah in range(256) for status in flags))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_count_branches_preserve_flags_and_wrap_the_counter(self):
         for branch in ('loop', 'loope', 'loopne', 'jecxz', 'jcxz'):
             # Distinct destinations expose both branch direction and counter

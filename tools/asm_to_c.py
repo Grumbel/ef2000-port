@@ -508,6 +508,27 @@ def instruction_c(insn, starts):
         # FNINIT marks registers empty but preserves their physical contents.
         code += ['s->x87_control = 0x37fu; s->x87_status = 0; s->x87_tag = 0xffffu;',
                  's->x87_ip = 0; s->x87_cs = 0; s->x87_dp = 0; s->x87_ds = 0; s->x87_opcode = 0;']
+    elif mnemonic == 'fnclex' and not text:
+        code.append('s->x87_status &= 0x7f00u;')
+    elif mnemonic in ('fnstcw', 'fnstsw', 'fldcw'):
+        op = operand(text)
+        if mnemonic == 'fnstsw' and op == operand('ax'):
+            code.append(write(op, 's->x87_status', 16))
+        elif op[0] == 'mem' and width_of(op) in (None, 16):
+            if mnemonic == 'fldcw':
+                code += ['if (s->x87_status & 0x80u) return 8;',
+                         'a = %s; if (s->fault) return s->fault;' % read(op, 16),
+                         's->x87_control = (a & 0x1f3fu) | 0x40u;',
+                         's->x87_status = (s->x87_status & ~0x8080u) | '
+                         '((s->x87_status & ~s->x87_control & 0x3fu) ? 0x8080u : 0u);']
+            else:
+                code.append(write(op, 's->x87_' + ('control' if mnemonic == 'fnstcw' else 'status'), 16))
+        else:
+            raise Unsupported('unsupported x87 control operand')
+    elif mnemonic == 'sahf' and not text:
+        code.append('s->flags = (s->flags & ~0xd5u) | ((s->r[0] >> 8) & 0xd5u);')
+    elif mnemonic == 'lahf' and not text:
+        code.append(write(operand('ah'), '(s->flags & 0xd5u) | 2u', 8))
     elif mnemonic == 'nop' and not text:
         pass
     elif mnemonic == 'mov' and any(part.strip().lower() in SEGMENTS for part in text.split(',')):

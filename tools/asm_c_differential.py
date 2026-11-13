@@ -146,8 +146,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     status = (function(ctypes.byref(state), budget, sentinel) if program else
               function(ctypes.byref(state), budget))
     if status:
+        reason = ('pending x87 exception delivery unsupported' if status == 8 else
+                  'budget/pc/memory/divide')
         return dict(state='mismatch', differences=[
-            'C status %d (budget/pc/memory/divide) at 0x%x after original completed' % (status, state.pc)])
+            'C status %d (%s) at 0x%x after original completed' % (status, reason, state.pc)])
     if phase:
         phase('comparison')
     differences = []
