@@ -2341,3 +2341,5 @@ neighbours must be recovered together; revisit after the plain functions.
 `0x10d94f` (`align_block_size_10d94f`, new module `memory_blocks1`) recovered;
 it calls the segment-limit helper `0x10d63b` as an external guest function
 (`guest_fn_10d63b`, value in EAX). Fuzz: PASS, 456 completed cases.
+
+- 2026-11-13: recovered `loop_objects_c1034` (0xc1034, `game_helpers130.c`): loop over `0xbc5d0` count calling `0xcc51c` (kind 0x19) and `0xc1210` (4 register + 6 stack args, ret 0x18, declared as `guest_fn_c1210`). Compiled code matches the original instruction for instruction in structure. Isolated fuzz: 76 completed, 2 FAIL where the patched run faults inside `0xbc5d0` (reached via `0xc1210`); not yet attributed, but `0xcc51c` is already known to differ in the EDX residue (SOFT), which may be the cause. Recorded as `compiles`, not verified.
