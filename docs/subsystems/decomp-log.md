@@ -2533,3 +2533,9 @@ Recovered from disassembly: debug overlay printing the selected object's header 
   object: six c8ccc line draws, signed idiv scaling, flag byte 0x1a6d20). Isolated fuzz
   PASS 300; callee-stubbed differential (ce328, 7489c twice with scripted objects, c8ccc)
   agrees 400/400 incl. flag byte and 0x1a6cc4.
+
+- 0x5d1c4 `draw_contact_labels_5d1c4` recovered (712 bytes, void; letter labels for the
+  tracked contact list at 0x1a7c00 plus the selected contact). Isolated fuzz PASS 300;
+  callee-stubbed differential (12 stubs: cdf48, ce328, 7489c, 5ca88, 5d87c, 5de14, 5dbc8,
+  5d48c, 48da0, 48bb0, 5d520, 62548; label string bytes logged) agrees 400/400 with
+  4588 logged calls. New wrappers: guest_fn_5d87c, guest_fn_5de14, guest_fn_62548.

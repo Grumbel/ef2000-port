@@ -1148,7 +1148,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005cbc8	1062			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0005cff0	141	redraw_panel_5cff0	leaf_helpers6	compiles	game	confirmed	decomp/tests/0x0005cff0.json	docs/compiler-abi.md; Redraw the panel frame, then the selection or the help text.; callers none direct; guest pending
 0x0005d080	321	draw_bearing_marker_5d080	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005d080.json	docs/compiler-abi.md; Draw a marker for the map point PTR (EAX; signed words x at +0, y at +2): the bearing from the map centre (words 0x1a6cf; callers 59fa4@5a1e7,5cff0@5d05a; guest pending
-0x0005d1c4	712			unknown	game	unverified		
+0x0005d1c4	712	draw_contact_labels_5d1c4	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005d1c4.json	Original 0x5d1c4 (712 bytes)
 0x0005d48c	148	draw_diamond_5d48c	tactical_marks1	compiles	game	confirmed	decomp/tests/0x0005d48c.json	docs/compiler-abi.md; Draw a diamond of four lines around (x, y); the half-size is the word at 0x1a6ce8 shifted by the zoom byte 0x12b369 and ; callers 5cff0@5d074,5d1c4@5d30e,5d1c4@5d47d; guest pending
 0x0005d520	859			unknown	game	unverified		
 0x0005d87c	843			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads di on entry) or carry-flag results that the C ABI cannot express.

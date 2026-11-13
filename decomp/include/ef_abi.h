@@ -4436,6 +4436,10 @@ int32_t guest_fn_86f7c_b(int32_t a, uint32_t b, int32_t c); /* 0x86f7c EAX/EDX/E
 int32_t guest_fn_48da0(ef_addr32 fmt); /* 0x48da0 1 stack, caller cleanup -> EAX */
 void guest_fn_48bb0(uint32_t color, uint32_t mode, int32_t x, int32_t y, ef_addr32 fmt); /* 0x48bb0 5 stack, caller cleanup */
 void draw_range_marker_5df08(void); /* 0x5df08 */
+void draw_contact_labels_5d1c4(void); /* 0x5d1c4 */
+void guest_fn_5d87c(uint32_t x, uint32_t y, ef_addr32 obj); /* 0x5d87c EAX/EDX/EBX */
+void guest_fn_5de14(uint32_t a, uint32_t b, uint32_t c, ef_addr32 obj); /* 0x5de14 EAX/EDX/EBX/ECX */
+uint8_t guest_fn_62548(int32_t unit); /* 0x62548 AX -> AL */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

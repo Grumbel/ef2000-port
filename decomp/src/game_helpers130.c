@@ -5612,3 +5612,79 @@ void draw_range_marker_5df08(void)
 	e = 3 << cl;
 	guest_fn_c8ccc_x((uint32_t)(edi - e), (uint32_t)(esi - e), (uint32_t)edi, (uint32_t)esi, (uint32_t)c);
 }
+
+/* 0x5d1c4: tactical labels (letters) for tracked contacts plus the selected one. */
+void draw_contact_labels_5d1c4(void)
+{
+	uint8_t L[0x24];
+	uint32_t lp = (uint32_t)(uintptr_t)L;
+	int16_t i;
+	int16_t n;
+	ef_addr32 obj;
+#define LS(o) (*(int16_t *)(L + (o)))
+	*(uint16_t *)(L + 0x18) = EF_U16(0x00058cb0u);
+	guest_fn_cdf48((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	               (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	guest_fn_ce328_w(HI(0x001a6cf0u), HI(0x001a6cf6u), HI(0x001a6ceeu), HI(0x001a6cf4u));
+	n = (int16_t)EF_U16(0x001a81d6u);
+	if (n != 0) {
+		for (i = 0; i < n;) {
+			ef_addr32 ent = 0x001a7c00u + (uint32_t)((int32_t)i << 3);
+			if (EF_U8(ent) == 1u) {
+				obj = guest_fn_7489c(HI(ent));
+				if (obj != 0 && guest_fn_5ca88_ret_x(obj, lp) != 0) {
+					int32_t x, y, ex, half, ys, sh;
+					int16_t xs;
+					x = LS(0);
+					y = LS(2);
+					LS(0x14) = (int16_t)x;
+					guest_fn_5d87c((uint32_t)x, (uint32_t)y, obj);
+					ex = (int16_t)(((uint32_t)EF_U16(0x001a6ce2u) + 2u) << (EF_U8(0x0012b369u) & 31));
+					*(int32_t *)(L + 4) = x;
+					guest_fn_5de14((uint32_t)x, (uint32_t)y, (uint32_t)ex, obj);
+					if (EF_U32(obj + 0x1cu) != 0)
+						guest_fn_5dbc8_x(x, y);
+					if (obj == EF_U32(0x001a8210u) && EF_U8(0x001282c5u) == 1u)
+						guest_fn_5d48c_w(x, y);
+					L[0x18] = (uint8_t)((uint8_t)i + 0x41u);
+					half = ((int16_t)guest_fn_48da0(lp + 0x18u)) >> 1;
+					xs = (int16_t)(x - half);
+					LS(0x14) = xs;
+					sh = EF_U8(0x0012b369u) & 31;
+					ys = (int16_t)y - ((EF_U8(0x0012b369u) != 0 ? 9 : 7) +
+					                   (((int32_t)HI(0x001a6ce0u)) << sh));
+					guest_fn_48bb0(EF_U8(0x00128148u), (uint32_t)((1 - sh) & 0xff),
+					               xs, (int16_t)ys, lp + 0x18u);
+				}
+			}
+			i = (int16_t)(i + 1);
+			n = (int16_t)EF_U16(0x001a81d6u);
+			if (!(i < n))
+				break;
+		}
+	}
+	if (HI(0x001a8236u) == -1)
+		return;
+	obj = guest_fn_7489c(HI(0x001a8236u));
+	if (obj == 0)
+		return;
+	if (guest_fn_5ca88_ret_x(obj, lp) == 0)
+		return;
+	{
+		int32_t x = LS(0), y = LS(2);
+		guest_fn_5d520_x(x, y, obj);
+		guest_fn_5de14((uint32_t)x, (uint32_t)y,
+		               (uint32_t)(int16_t)(((uint32_t)EF_U16(0x001a6ce2u) + 2u) << (EF_U8(0x0012b369u) & 31)),
+		               obj);
+		if (EF_U32(obj + 0x1cu) != 0)
+			guest_fn_5dbc8_x(x, y);
+		if (guest_fn_62548(HI(0x001a8236u)) == 0)
+			return;
+		if (obj != EF_U32(0x001a8210u))
+			return;
+		if (EF_U8(0x001282c5u) != 1u)
+			return;
+		guest_fn_5d48c_w(x, y);
+	}
+#undef LS
+}
