@@ -229,3 +229,39 @@ static unsigned ef_x87_load_real(ef_lift_state *s, uint32_t address, unsigned wi
     return 0;
 }
 '''
+
+INTEGER_LOAD_RUNTIME = r'''
+static unsigned ef_x87_load_integer(ef_lift_state *s, uint32_t address, unsigned width) {
+    uint32_t value[3], exponent, negative;
+    uint64_t magnitude;
+    unsigned destination = (ef_x87_index(s, 0) + 7u) & 7u;
+    if (width != 16 && width != 32 && width != 64) return 9;
+    if (s->x87_status & 0x80u) return 8;
+    if (s->memory_size < width / 8u || address > s->memory_size - width / 8u) {
+        s->fault = 3; return 3;
+    }
+    if (!ef_x87_empty(s, destination)) {
+        if (!ef_x87_stack_fault(s, 1)) return 0;
+        value[0] = 0; value[1] = 0xc0000000u; value[2] = 0xffffu;
+    } else {
+        s->x87_status &= ~0x200u;
+        magnitude = ef_read(s, address, width == 64 ? 32 : width);
+        if (width == 64) magnitude |= (uint64_t)ef_read(s, address + 4u, 32) << 32;
+        negative = (unsigned)(magnitude >> (width-1));
+        if (negative) {
+            /* Unsigned negation also handles INT64_MIN without signed UB. */
+            magnitude = (uint64_t)0 - magnitude;
+            if (width != 64) magnitude &= ((uint64_t)1 << width) - 1u;
+        }
+        exponent = 0;
+        if (magnitude) {
+            exponent = 16446u;
+            while (!(magnitude & ((uint64_t)1 << 63))) { magnitude <<= 1; --exponent; }
+        }
+        value[0] = (uint32_t)magnitude; value[1] = (uint32_t)(magnitude >> 32);
+        value[2] = exponent | (negative ? 0x8000u : 0u);
+    }
+    ef_x87_put(s, destination, value); ef_x87_top(s, destination);
+    return 0;
+}
+'''

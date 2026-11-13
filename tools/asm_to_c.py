@@ -262,7 +262,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 #endif
 '''
 RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
-                          asm_x87.REAL_LOAD_RUNTIME + '\n#endif\n')
+                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + '\n#endif\n')
 
 
 class Unsupported(ValueError):
@@ -509,16 +509,24 @@ def instruction_c(insn, starts):
     # implicit segment operations and partial architectural models fail closed.
     stack_operation = asm_x87.stack_operation(mnemonic, text)
     real_load = mnemonic == 'fld' and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
-    if real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
+    integer_load = mnemonic == 'fild' and text.strip().lower().startswith(('word ptr ', 'dword ptr ', 'qword ptr '))
+    if integer_load or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
         op = operand(text)
         try:
-            segment, opcode = (asm_x87.memory_encoding(insn, 0xd9 if width_of(op) == 32 else 0xdd, 0)
-                               if real_load else asm_x87.memory80_encoding(insn))
+            if integer_load:
+                encoding, group = (0xdb if width_of(op) == 32 else 0xdf), (5 if width_of(op) == 64 else 0)
+                helper = 'ef_x87_load_integer(s, b, %d)' % width_of(op)
+            elif real_load:
+                encoding, group = (0xd9 if width_of(op) == 32 else 0xdd), 0
+                helper = 'ef_x87_load_real(s, b, %d)' % width_of(op)
+            else:
+                encoding, group = 0xdb, (5 if mnemonic == 'fld' else 7)
+                helper = 'ef_x87_memory80(s, b, %d)' % (mnemonic == 'fld')
+            segment, opcode = asm_x87.memory_encoding(insn, encoding, group)
         except ValueError as error:
             raise Unsupported(str(error)) from error
         code += ['b = %s;' % op[1],
-                 ('a = ef_x87_load_real(s, b, %d); if (a) return a;' % width_of(op) if real_load else
-                  'a = ef_x87_memory80(s, b, %d); if (a) return a;' % (mnemonic == 'fld')),
+                 'a = %s; if (a) return a;' % helper,
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], opcode),
                  's->x87_dp = b; s->x87_ds = s->segment[%d];' % segment]

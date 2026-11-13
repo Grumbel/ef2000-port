@@ -490,3 +490,27 @@ are unchanged; three new bodies add 48 saved-opcode-only mismatches (0x504/
 Two new bodies have only inconclusive probes. The bulk gate remains nonzero;
 none of these differences is waived. Artifacts:
 `local/asm-c-x87-real-load-diff-20261113`.
+
+FILD WORD/DWORD/QWORD loads signed 16/32/64-bit integers exactly into extended
+state. Unsigned magnitude/normalization avoids signed overflow at INT64_MIN
+and keeps all input bits regardless of precision/rounding control. Zero loads
+positive zero. Stack overflow follows the shared masked/deferred-invalid rules;
+no data inexact/denormal exceptions arise from integer widening. Bounds and
+pending delivery precede stack changes; environment metadata uses encoded
+operand addressing as for real loads.
+
+Hardware tests compare 879,096 generated-body cases under UBSan: all 65,536
+16-bit inputs in every standard precision/rounding mode; wider signed extrema
+and neighbors of powers of two (including values beyond 2^53); every TOP and
+occupancy mask with masked/unmasked IE. Full cases compare retained physical
+registers, status/tags, opcode, relocated pointers/selectors, flags and RAM.
+Bounds tests cover undersized/wrapping spans and the final valid span; isolated
+hardware fault-priority probes cover each width. Thirty addressing variants
+compile with Watcom warnings-as-errors. Later stores/arithmetic and dependent
+bodies remain unsupported; this does not imply new closed body coverage.
+
+Integer-load runtime rerun (`local/asm-c-x87-integer-load-diff-20261113`) keeps
+all 2,096 per-body outcomes unchanged: 18,500 matches, 14,969 inconclusive and
+67 existing mismatches. The host library is byte-identical to the preceding
+run because FILD does not yet enter selected bodies. All 98 tests pass. FILD's
+hardware coverage is separate from bulk/game coverage; the gate stays nonzero.

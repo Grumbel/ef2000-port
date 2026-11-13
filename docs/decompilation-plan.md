@@ -2861,3 +2861,50 @@ local/asm-c-x87-real-load-program-20261113 --output
 local/asm-c-x87-real-load-diff-20261113 --watcom
 /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
 Final report exists and binds the current runtime.
+
+
+**2026-11-13 — Exact signed integer x87 memory loads.**
+Added FILD WORD/DWORD/QWORD with unsigned magnitude and bounded normalization.
+Handle signed minima without UB and retain all 64-bit integer precision in every
+PC/RC setting. Preserve flags and unrelated raw registers/state; use existing
+bounds, pending delivery, stack-fault and encoded environment rules. Integer
+widening introduces no data inexact/denormal exception. No native floating type,
+original-code fallback or guessed guest ABI.
+879,096 generated-body hardware comparisons pass under UBSan: exhaustive signed
+16-bit values across twelve precision/rounding modes, 32/64-bit extrema and
+power-of-two boundaries, TOP/occupancy and masked/unmasked IE. Compare full raw
+FP/status/tag state in the stack grid, plus opcode, relocated context, flags,
+return stack and input RAM. Bounds tests include INT64_MIN at the final valid
+span. Thirty encoded address variants compile warning-free with Watcom.
+All 98 ASM/Ghidra tests pass (154 s). Latest integer-load tests additionally
+exercise child-process hardware fault priority for all three widths, with cores
+disabled. Corpus remains 3,606 syntax-supported, 2,096 selected bodies and
+270,162 bytes: integer-load bodies still meet later unsupported stores,
+arithmetic or dependencies. All corpus bodies and dispatcher compile warning-
+free with Watcom. No inflated coverage, tracker promotion or complete-bulk claim.
+Commands: python3 -m unittest tests.test_asm_x87_integer_load tests.test_asm_x87_load
+tests.test_asm_x87_memory tests.test_asm_x87_stack tests.test_asm_c_x87
+tests.test_asm_c_segments tests.test_asm_c_program tests.test_asm_to_c
+tests.test_asm_inventory tests.test_asm_diff tests.test_ghidra_ef2000;
+python3 -m unittest tests.test_asm_x87_integer_load;
+tools/asm_c_program.py --inventory local/asm-observed-body-inventory-20261113
+--output local/asm-c-x87-integer-load-program-20261113. Evidence:
+local/asm-c-x87-integer-load-full-tests-20261113.log,
+local/asm-x87-integer-load-final-tests-20261113.log,
+local/asm-x87-integer-load-watcom-20261113/compile.log. Full suite Python 3.13.12/
+Unicorn 2.1.4; standalone hardware test also Python 3.13.17. Watcom v2 -bt=dos
+-3r -za99 -w1 -we. Narrowing/rounding stores and arithmetic remain pending.
+
+Final expanded-runtime comparison completes: every 2,096 per-body probe count
+is unchanged from the real-load corpus. 33,536 probes: 18,500 matches, 14,969
+original-fault/budget inconclusive, 67 existing mismatches across seven bodies;
+750 bodies pass all probes, 1,339 inconclusive, seven fail. Host libraries are
+also byte-identical, confirming the unselected integer helper adds no executable
+behavior to this corpus. Hardware/synthetic coverage proves FILD separately;
+there is no added closed-body coverage claim. Known target gaps and x87 oracle
+differences stay explicit; CLI exits 1 and no mismatch is waived.
+Command: tools/asm_c_differential.py --translations
+local/asm-c-x87-integer-load-program-20261113 --output
+local/asm-c-x87-integer-load-diff-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
+Final report exists. Full reliable bulk translation remains active.
