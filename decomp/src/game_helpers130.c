@@ -5160,3 +5160,64 @@ void draw_offset_frame_5b080(void)
 	}
 #undef HI
 }
+
+#ifndef EF_F32
+#define EF_F32(a) (*(float *)ef_guest_memory_ptr((ef_addr32)(a)))
+#endif
+
+/* Original 0x5f698 (528 bytes): project the clamped view vector and draw the
+ * four edges of a box around it. */
+void draw_view_box_5f698(void)
+{
+	int16_t buf[8];
+	double d, k, a, k2;
+	int32_t bx, by, bz, x, y, z, e, s, w0, w1;
+	uint32_t sh, color;
+
+	sh = EF_U8(0x0012b369u) & 31u;
+	e = (int32_t)(0xau << sh);
+	s = (int32_t)(4u << sh);
+	d = EF_F64(0x001a2f28u);
+	if (guest_fn_b427c_x(d) > EF_F64(0x0018601cu))
+		d = guest_fn_b42b0_x(d) * EF_F64(0x0018601cu);
+	k = EF_F64(0x00186024u);
+	bx = (int32_t)guest_fn_9d72c_x((double)EF_F32(0x001a5c00u) * k);
+	EF_S32(0x002117b0u) = bx;
+	by = (int32_t)guest_fn_9d72c_x((double)EF_F32(0x001a5bb8u) * k);
+	EF_S32(0x002117b4u) = by;
+	bz = (int32_t)guest_fn_9d72c_x((double)EF_F32(0x001a5bbcu) * k);
+	EF_S32(0x002117b8u) = bz;
+	a = EF_F64(0x001a2fa0u);
+	k2 = EF_F64(0x0018602cu);
+	{
+		double sn = guest_fn_b45ac(a);
+		double cs = guest_fn_b45a2(a);
+		x = bx + (int32_t)guest_fn_9d72c_x(sn * k2);
+		y = by + (int32_t)guest_fn_9d72c_x(-guest_fn_b45fa(d) * k2);
+		z = bz + (int32_t)guest_fn_9d72c_x(cs * k2);
+	}
+	guest_fn_15c0ea_x((uint32_t)z << 8, (uint32_t)y << 8, (uint32_t)x << 8,
+	                  (ef_addr32)(uintptr_t)buf);
+#define HI(a) (((int32_t)EF_U32(a)) >> 16)
+	latch_values_ce328((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	                   (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	guest_fn_cdf48((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	               (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+#undef HI
+	e = (int16_t)e;
+	s = (int16_t)s;
+	w0 = buf[0];
+	w1 = buf[1];
+	color = EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)(w1 - s), (uint32_t)(w0 + e), (uint32_t)(w1 - s),
+	                 (uint32_t)(w0 - e), color);
+	color = EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)(w1 + s), (uint32_t)(w0 + e), (uint32_t)(w1 + s),
+	                 (uint32_t)(w0 - e), color);
+	color = EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)(w1 + s), (uint32_t)(w0 - e), (uint32_t)(w1 - s),
+	                 (uint32_t)(w0 - e), color);
+	color = EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)(w1 + s), (uint32_t)(w0 + e), (uint32_t)(w1 - s),
+	                 (uint32_t)(w0 + e), color);
+}

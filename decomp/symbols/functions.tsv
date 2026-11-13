@@ -1170,7 +1170,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005f220	871			unknown	unclassified	unverified		
 0x0005f588	172	turn_direction_5f588	game_helpers38	compiles	game	confirmed	decomp/tests/0x0005f588.json	docs/compiler-abi.md; Turn direction of three points: 1, -1 (0xff) or 0, with a collinear tiebreak.; callers 5f220@5f467; guest pending
 0x0005f634	98	reset_menu_page_5f634	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x0005f634.json	docs/compiler-abi.md; Reset the page state and rebuild the menu.; callers 5f60@5f7a,5fd8@5fe8; guest pending
-0x0005f698	528			unknown	unclassified	unverified		
+0x0005f698	528	draw_view_box_5f698	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005f698.json	Original 0x5f698 (528 bytes)
 0x0005f8a8	44	notify_selected_object	mid_helpers	compiles	game	confirmed	decomp/tests/0x0005f8a8.json	docs/compiler-abi.md; 0x9e508(high word obj+0x1e,0x24) for object from 0x1f71c8; clear byte 0x1a6d18; callers 5f60@5f89; guest pending
 0x0005f8d4	106	set_indicator_5f8d4	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0005f8d4.json	docs/compiler-abi.md; Switch indicator 0x1a6d18 on (mode 1) or off.; callers 5f60@5fa5,5fd8@5ff4,601c@60c5; guest pending
 0x0005f944	88	fill_sine_table_5f944	float_helpers2	compiles	game	confirmed	decomp/tests/0x0005f944.json	docs/compiler-abi.md; Fill a 90-entry scaled sine table.; callers 5f60@5f61; guest pending

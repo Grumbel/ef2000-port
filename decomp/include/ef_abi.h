@@ -3306,6 +3306,10 @@ void guest_fn_54274(void); /* 0x54274 */
 void guest_fn_54328(void); /* 0x54328 */
 void guest_fn_5437c(void); /* 0x5437c */
 double guest_fn_b45fa(double value); /* 0xb45fa ST0 -> ST0 */
+double guest_fn_b45ac(double value); /* 0xb45ac ST0 sin */
+double guest_fn_b45a2(double value); /* 0xb45a2 ST0 cos */
+double guest_fn_b427c_x(double value); /* 0xb427c stack double, callee cleanup, ST0 result */
+double guest_fn_b42b0_x(double value); /* 0xb42b0 stack double, callee cleanup, ST0 result */
 
 /* float_helpers3.c */
 double entry_distance_80f4(ef_addr32 context, uint32_t index);
@@ -4420,6 +4424,7 @@ void refresh_selected_label_5c354(void); /* 0x5c354 */
 void init_record_tables_87700(void); /* 0x87700 */
 void draw_corner_table_5e87c(int16_t count); /* 0x5e87c */
 void draw_offset_frame_5b080(void); /* 0x5b080 */
+void draw_view_box_5f698(void); /* 0x5f698 */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
@@ -7265,6 +7270,10 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_a4470 parm [8087] value [8087] modify [eax]
 #pragma aux guest_fn_9d72c_x parm [8087] value [8087] modify [eax]
 #pragma aux guest_fn_b45fa parm [8087] value [8087] modify [eax]
+#pragma aux guest_fn_b45ac parm [8087] value [8087] modify [eax]
+#pragma aux guest_fn_b45a2 parm [8087] value [8087] modify [eax]
+#pragma aux guest_fn_b427c_x modify exact []
+#pragma aux guest_fn_b42b0_x modify exact []
 /* Fixed-point matrix products take a in ESI, b in EBX, out in EDI and clobber
  * EAX/ECX/EDX/EBP like the original (found by the cockpit bisect: 0xfcffb). */
 #pragma aux matrix_mul_fcffb parm [esi] [ebx] [edi] modify exact [eax ecx edx ebp]
