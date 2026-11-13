@@ -2664,3 +2664,4 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
 - 2026-11-13: recovered onleaveOptions (0xbf70, float_helpers5.c): calls dump_state 0xb3084 with text 0x18086c, records 0x137988/0x137970/0x137980, text 0x134d8a and six signed high words (same call as finish_trace_c594). Builds and links (5 redirect bytes); no differential (callee does file I/O), disassembly review only.
 
 - 2026-11-13: recovered gnInitSettingsWindow (0xab908, float_helpers5.c): formats the dword at 0x137278 with "%d" into a 0x18-byte stack buffer and applies it to the "number" widget under the root in EAX via apply_to_widget_a75b4. Builds and links; no differential (guest sprintf faults in the harness), disassembly review only.
+- 2026-11-13: recovered set_view_origin_dc21c (0xdc21c) by removing its stale exclusion: the existing body and parm-routine pragma already match the stack-arg ret 0x10 original; differential 2/2 PASS (two stack-arg cases, 12 RAM bytes compared).
