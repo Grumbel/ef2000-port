@@ -204,3 +204,23 @@ void draw_segment_records_418c4(ef_addr32 obj, int16_t arg)
         count = EF_S16(obj + 0x1cu);
     }
 }
+
+/* 0xbfa58, 212 bytes. Walk the list whose head pointer is at HEAD (next at +4); for each node of type 0x31 (byte +0xc) with sign word +0x4e equal to 1 and count byte +0x32 above 4, create a slot record (0xfc0ec), and if 0xbdbf8 accepts it call 0xbe59c with the node and the arguments, replacing VALUE with its result; the slot record is then freed (0xb16c0). Returns VALUE. */
+uint16_t scan_nodes_bfa58(uint16_t value, ef_addr32 head, uint32_t arg_b, uint32_t arg_c, uint32_t s1, uint32_t s2, uint32_t s3)
+{
+    uint32_t node = EF_U32(head);
+
+    while (node != 0u) {
+        if (EF_U8(node + 0xcu) == 0x31u && ((int32_t)EF_U32(node + 0x4eu) >> 16) == 1 &&
+            EF_U8(node + 0x32u) > 4u) {
+            int32_t hi = (int32_t)(int16_t)value;
+            uint32_t rec = create_slot_record_fc0ec(EF_U8(node + 0xbu), 1u);
+
+            if (guest_fn_bdbf8(rec, node, hi, s3) != 0u)
+                value = guest_fn_be59c(rec, 0u, 0u, node, (uint32_t)hi, 0u, 1u, arg_c, s1, 0u, s2, head, arg_b, 0u, s3);
+            free_entry_array_b16c0(rec);
+        }
+        node = EF_U32(node + 4u);
+    }
+    return value;
+}

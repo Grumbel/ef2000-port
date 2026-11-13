@@ -3300,3 +3300,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0010d94f	align_block_size_10d94f	EAX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0x10d94f (119 bytes); round a block size up
 0x000c1034	loop_objects_c1034	EAX:int32_t,EDX:uint32_t,EBX:ef_addr32,ECX:uint32_t	EAX:uint32_t	esi,edi,ebp	20	Original 0xc1034 (142 bytes); per-index loop calling 0xc1210
 0x000418c4	draw_segment_records_418c4	EAX:ef_addr32,EDX:int16_t		ebx,ecx,esi,edi,ebp	0	Original 0x418c4 (210 bytes)
+0x000bfa58	scan_nodes_bfa58	AX:uint16_t,EDX:ef_addr32,EBX:uint32_t,ECX:uint32_t	AX:uint16_t	esi,edi,ebp	12	Original 0xbfa58 (212 bytes)
