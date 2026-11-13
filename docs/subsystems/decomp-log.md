@@ -2353,3 +2353,4 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 2026-11-13: recovered `dump_state_b3084` (0xb3084); call sequence and ret 0x1c match the original; isolated fuzz weak (file I/O, 0 completed cases).
 - 2026-11-13: recovered `parse_angle_line_db32c` (0xdb32c); builds; isolated fuzz weak (reads the global text cursor, the original faults on random pointers), no instruction-level comparison done.
 - 2026-11-13: recovered `pick_target_at_4e204` (0x4e204); isolated fuzz PASS 1000 cases.
+- 2026-11-13: recovered `ray_hits_plane_cfde4` (0xcfde4); isolated fuzz PASS 380 completed cases. 0xc3ae8 blocked (VGA port output, indirect calls).

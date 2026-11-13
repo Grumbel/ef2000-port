@@ -2757,7 +2757,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000c3a28	29	swap_buffers_c3a28	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3a28.json	docs/compiler-abi.md; When dword 0x146e40 is set, replace it with dword * 0x15b758 and store the old value at 0x15b758.; callers c3f1c@c3f47; guest pending
 0x000c3a48	41	release_buffer_c3a48	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3a48.json	docs/compiler-abi.md; When dword 0x15b758 is set and byte 0x146e4a clear, * release it through 0xc3f80 and clear it.; callers c3ae8@c3c11; guest pending
 0x000c3a74	79	select_draw_handlers_c3a74	game_helpers30	compiles	game	confirmed	decomp/tests/0x000c3a74.json	docs/compiler-abi.md; Choose the drawing handlers from two mode flags.; callers cdb20@cdbd0; guest pending
-0x000c3ae8	363			unknown	asm	unverified		
+0x000c3ae8	363			blocked	asm	unverified		Skipped as too difficult: VGA sequencer port output (out to 0x3c4) and indirect calls through function-pointer globals; needs inline assembly.
 0x000c3f1c	52	blit_screen_c3f1c	runtime_helpers23	compiles	game	confirmed	decomp/tests/0x000c3f1c.json	docs/compiler-abi.md; Blit the screen buffer through the driver callback.; callers cdb20@cdc2b,d1d40@d1d9d,dc250@dc25c; guest pending
 0x000c3f50	21	read_buffer_byte	list_lookup	compiles	game	confirmed	decomp/tests/0x000c3f50.json	docs/compiler-abi.md; Byte at dword 0x15b754 + EAX + dword 0x163200[EDX].; callers afbc@b0b2,afbc@b0c1,afbc@b0d4; guest pending
 0x000c3f70	5	tail_jump_c3f70	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x000c3f70.json	docs/compiler-abi.md; tail jump. Forward to 0xfc795.; callers d68c@d6df,7a3e8@7a3f8,9ccb8@9cd87; guest pending
@@ -3004,7 +3004,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cfa24	103	find_entry_at_point_cfa24	game_helpers108	compiles	game	confirmed	decomp/tests/0x000cfa24.json	docs/compiler-abi.md; Return the first of count 0x4a-byte entries whose bounding box contains (x,y) and which passes the cf960 test, else 0.; callers cfa9c@cfb21,cfc68@cfd02; guest pending
 0x000cfa9c	204	page_point_distance_cfa9c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000cfa9c.json	docs/compiler-abi.md; Distance of the point (XB = ECX, YB = stack, ret 4) from the entry found for the point (XA = EDX, YA = EBX) in the shape; callers 7b16c@7b21f; guest pending
 0x000cfc68	380			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x000cfde4	381			unknown	game	unverified		
+0x000cfde4	381	ray_hits_plane_cfde4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000cfde4.json	Ray/plane intersection plus polygon test via 0xcf960; guest differential pending
 0x000cff64	26	forward_triple_cff64	code_predicates	compiles	game	confirmed	decomp/tests/0x000cff64.json	docs/compiler-abi.md; 0xb3830(signed word +0, high words of +2 and +6), as signed 16.; callers cff80@cffc4,cff80@cffce,cff80@d0057; guest pending
 0x000cff80	728			unknown	game	unverified		
 0x000d0278	473			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.

@@ -3304,3 +3304,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b3084	dump_state_b3084	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:uint32_t		esi,edi,ebp	28	Original 0xb3084 (226 bytes)
 0x000db32c	parse_angle_line_db32c			ebx,ecx,edx,esi,edi,ebp	0	Original 0xdb32c (244 bytes)
 0x0004e204	pick_target_at_4e204	AX:int16_t,DX:int16_t		ebx,ecx,esi,edi,ebp	0	Original 0x4e204 (347 bytes)
+0x000cfde4	ray_hits_plane_cfde4	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32	AL:uint8_t	esi,edi,ebp	0	Original 0xcfde4 (381 bytes)

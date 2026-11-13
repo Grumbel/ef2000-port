@@ -321,3 +321,46 @@ void pick_target_at_4e204(int16_t x, int16_t y)
     EF_U32(0x001a560au + EF_U8(0x001a559fu) * 4u) = (uint32_t)value;
     EF_U8(0x001a5709u) = 1u;
 }
+
+/* 0xcfde4, 381 bytes. Intersect the ray ORIGIN + t*DIR (three dwords each) with the plane record PLANE (signed words: point at +0, normal at +0x2a..+0x2e, offset at +0x30, basis words from +0x32, polygon at +0x3e). The ray parameter is a fixed-point quotient (shifts from the bytes 0x15b7c8 and 0x15b7c9); when the plane is not parallel to the ray the hit point is stored at OUT and the hit is projected onto the basis and tested with 0xcf960. Returns 1 when that test succeeds, else 0. */
+uint8_t ray_hits_plane_cfde4(ef_addr32 out, ef_addr32 dir, ef_addr32 origin, ef_addr32 plane)
+{
+    int32_t pa = EF_S16(plane + 0x2cu);
+    int32_t pb = EF_S16(plane + 0x2au);
+    int32_t pc = EF_S16(plane + 0x2eu);
+    int32_t denom = (int32_t)((uint32_t)EF_S32(dir + 4u) * (uint32_t)pa + (uint32_t)EF_S32(dir) * (uint32_t)pb
+                              + (uint32_t)EF_S32(dir + 8u) * (uint32_t)pc);
+    int32_t numer;
+    int32_t t;
+    int32_t relx;
+    int32_t rely;
+    int32_t relz;
+    int32_t u;
+    int32_t v;
+
+    denom >>= (EF_U8(0x0015b7c8u) & 31u);
+    if (denom == 0)
+        return 0;
+    numer = (int32_t)((uint32_t)EF_S32(origin + 4u) * (uint32_t)pa + (uint32_t)pb * (uint32_t)EF_S32(origin)
+                      + (uint32_t)pc * (uint32_t)EF_S32(origin + 8u)
+                      + ((uint32_t)(int32_t)EF_S16(plane + 0x30u) << 15));
+    t = numer / denom;
+    {
+        uint32_t sh = EF_U8(0x0015b7c9u) & 31u;
+
+        EF_S32(out) = EF_S32(origin) - ((int32_t)((uint32_t)EF_S32(dir) * (uint32_t)t) >> sh);
+        EF_S32(out + 4u) = EF_S32(origin + 4u) - ((int32_t)((uint32_t)EF_S32(dir + 4u) * (uint32_t)t) >> sh);
+        EF_S32(out + 8u) = EF_S32(origin + 8u) - ((int32_t)((uint32_t)EF_S32(dir + 8u) * (uint32_t)t) >> sh);
+    }
+    relx = EF_S32(out) - EF_S16(plane);
+    rely = EF_S32(out + 4u) - EF_S16(plane + 2u);
+    relz = EF_S32(out + 8u) - EF_S16(plane + 4u);
+    u = (int32_t)((uint32_t)rely * (uint32_t)(int32_t)EF_S16(plane + 0x34u)
+                  + (uint32_t)EF_S16(plane + 0x32u) * (uint32_t)relx
+                  + (uint32_t)relz * (uint32_t)(int32_t)EF_S16(plane + 0x36u));
+    v = (int32_t)((uint32_t)EF_S16(plane + 0x3au) * (uint32_t)rely
+                  + (uint32_t)EF_S16(plane + 0x38u) * (uint32_t)relx
+                  + (uint32_t)EF_S16(plane + 0x3cu) * (uint32_t)relz);
+    v = -v;
+    return point_in_triangle_cf960(plane + 0x3eu, u >> 15, v >> 15) != 0u ? 1u : 0u;
+}
