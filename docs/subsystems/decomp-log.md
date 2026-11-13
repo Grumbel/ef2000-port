@@ -2621,3 +2621,5 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
 - 2026-11-13: recovered 0xbefb8 as `spawn_event_record_befb8` (event record kinds 0x1b/0x1c/0x1d, allocates record plus 0x7c sub-record, links via bc570; kind 0x1c builds a position block from find_node_by_pair). Isolated fuzz: 299 completed cases, PASS, redirected=1. Added register-only `guest_fn_b5d8c_x` prototype for the blocked callee 0xb5d8c.
 
 - 2026-11-13: recovered 0x86110 as `update_player_weapon_86110` (per-frame player weapon/muzzle update: creates the unit via 0x87db8, counts hits per kind, switches slot when ammo is gone). Relinked with functions_redirected=1; isolated fuzz 300 cases PASS.
+
+- 2026-11-13: recovered 0x5b2f0 as `draw_heading_tape_5b2f0` (HUD compass/heading tape: four labelled tick positions via sprintf 0x185f00, text width, boxes when the tick matches the heading, fallback side brackets otherwise). Verified with a stubbed-callee differential (cdf48, ce328, cf78c, a4342, 48c34, 48bb0, cec00, c8ccc; call args + ESP/preserved regs compared): 400/400 agree, 8839 logged calls. Plain isolated fuzz is weak (original faults without real state).

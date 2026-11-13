@@ -1129,7 +1129,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005af50	302	draw_outline_5af50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005af50.json	docs/compiler-abi.md; Draw the closed outline number N (AL, looked up in the pointer table 0x1281a4; nothing is drawn for N = 0) as 24 line se; callers 5a8d0@5a8ef; guest pending
 0x0005b080	519	draw_offset_frame_5b080	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005b080.json	Original 0x5b080 (519 bytes)
 0x0005b288	101	run_with_temp_state_5b288	game_helpers32	compiles	game	confirmed	decomp/tests/0x0005b288.json	docs/compiler-abi.md; Run 0x5b2f0 with temporary values for four globals, then restore them.; callers 5fc80@5fd1e; guest pending
-0x0005b2f0	1717			unknown	game	unverified		
+0x0005b2f0	1717	draw_heading_tape_5b2f0	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005b2f0.json	Original 0x5b2f0 (1717 bytes)
 0x0005b9a8	103	build_ring_table_5b9a8	game_helpers32	compiles	game	confirmed	decomp/tests/0x0005b9a8.json	docs/compiler-abi.md; Build a 10-entry table of scaled sine/cosine pairs (radius 12).; callers 5ba10@5ba28; guest pending
 0x0005ba10	891			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0005bd8c	750			blocked	unclassified	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).

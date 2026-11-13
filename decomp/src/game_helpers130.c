@@ -6818,3 +6818,75 @@ void update_player_weapon_86110(void)
     }
     sum_slot_weights_86720();
 }
+
+/* Original 0x5b2f0: heads-up-display heading tape (compass scale). */
+void draw_heading_tape_5b2f0(void)
+{
+    char buf[16];
+    int s = EF_U8(0x0012b369u);
+    int di = (int16_t)EF_U16(0x001a6cf0u);
+    int cx = (int32_t)EF_U32(0x001a6cfau) >> 16;
+    uint32_t col = EF_U8(0x00128148u);
+    int w32 = 0x20 << s;
+    int a = (int)(((int32_t)EF_U16(0x00127d3eu) * 3600) >> 16);
+    int b = (int)(((int32_t)EF_U16(0x0019724au) * 3600) >> 16);
+    int off, esi_b, x, i, t, wd, sx, v, found = 0;
+    int w, k, X, n;
+
+    guest_fn_cdf48((uint32_t)(cx - w32), (uint32_t)(cx + w32), (uint32_t)di, (uint32_t)(di + 0xf));
+    guest_fn_ce328_w(cx - w32, cx + w32, di, di + 0xf);
+
+    off = (int16_t)(-(((a % 100) * 24) / 100));
+    a = a / 100 - 2;
+    if (a < 0)
+        a += 0x24;
+    esi_b = ((b % 100) * 24) / 100;
+    b = b / 100;
+    if (b == 0)
+        b = 0x24;
+
+    EF_U16(0x004208e4u) = (uint16_t)col;
+    EF_U16(0x004208e6u) = EF_U16(0x001a6cfcu);
+    EF_U16(0x004208e8u) = (uint16_t)((s ? 0xb : 8) + di);
+    EF_U16(0x004208eau) = EF_U16(0x001a6cfcu);
+    EF_U16(0x004208ecu) = (uint16_t)((s ? 0xf : 0xa) + di);
+    guest_fn_cf78c();
+
+    x = off + esi_b - 0x30;
+    for (i = 0; (int16_t)i < 4; i++) {
+        t = a ? (int16_t)a : 0x24;
+        guest_fn_a4342_va((ef_addr32)(uintptr_t)buf, 0x00185f00u, t);
+        v = ((i - 2) * 0x18 + off) << s;
+        wd = (int16_t)formatted_text_width_48c34((uint8_t)(1 - s), (ef_addr32)(uintptr_t)buf);
+        sx = (int16_t)(cx - (wd >> 1) + v);
+        guest_fn_48bb0(col, (uint8_t)(1 - s), (int16_t)sx, (int16_t)di, (ef_addr32)(uintptr_t)buf);
+        sx = (int16_t)sx + (0x18 >> (1 - s));
+        guest_fn_cec00((int32_t)col, (int16_t)sx, di + 3 + (s != 0), (int16_t)sx + s + 1, di + (s ? 6 : 3));
+        sx = (x << s) + EF_U16(0x001a6cfcu);
+        if (t == b && i != 0) {
+            X = (int16_t)sx;
+            w = 2 << s;
+            k = s ? 9 : 6;
+            guest_fn_c8ccc_x(di + (s ? 14 : 9), X - w, di + k, X - w, col);
+            guest_fn_c8ccc_x(di + (s ? 14 : 9), X + w, di + k, X + w, col);
+            guest_fn_c8ccc_x(di + k, X + w, di + k, X - w, col);
+            found = 1;
+        }
+        a++;
+        if (a > 0x23)
+            a = 0;
+        x += 0x18;
+    }
+    if (found)
+        return;
+    n = s ? 3 : 1;
+    if ((uint16_t)(EF_U16(0x00127d3eu) - EF_U16(0x0019724au)) < 0x8000u) {
+        X = cx - w32;
+        guest_fn_c8ccc_x(di + (s ? 0xb : 7), X, di + (s ? 9 : 6), X + n, col);
+        guest_fn_c8ccc_x(di + (s ? 0xb : 7), X, di + (s ? 0xd : 8), X + n, col);
+    } else {
+        X = cx + w32;
+        guest_fn_c8ccc_x(di + (s ? 0xb : 7), X, di + (s ? 9 : 6), X - n, col);
+        guest_fn_c8ccc_x(di + (s ? 0xb : 7), X, di + (s ? 0xd : 8), X - n, col);
+    }
+}
