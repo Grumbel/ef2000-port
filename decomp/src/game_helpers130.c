@@ -4932,3 +4932,56 @@ uint16_t scan_list_bed1c(ef_addr32 list, uint16_t value, uint8_t kind, uint32_t 
 	}
 	return value;
 }
+
+/* Original 0x5c354 (449 bytes): like 0x5c7dc, refresh the map label of the
+ * selected object (word 0x1a823e) while the range 0x197220 is within 0x2800:
+ * latch the view, project the object, update it, draw the tactical cross when
+ * the object has a link at +0x1c, print the 0x185fac label centred below the
+ * point and, in multiplayer, bracket it with two crossing lines when flag
+ * 0x40 of +0x26 is set. */
+void refresh_selected_label_5c354(void)
+{
+	uint32_t a = (uint32_t)(EF_S32(0x001a6cf0u) >> 16);
+	uint32_t b = (uint32_t)(EF_S32(0x001a6cf6u) >> 16);
+	uint32_t c = (uint32_t)(EF_S32(0x001a6ceeu) >> 16);
+	uint32_t d = (uint32_t)(EF_S32(0x001a6cf4u) >> 16);
+	uint32_t obj;
+	char text[12];
+	int16_t pt[2];
+	ef_addr32 textp = (ef_addr32)(uintptr_t)text;
+	int32_t half;
+	uint32_t shift;
+	int32_t k;
+
+	guest_fn_cdf48(a, b, c, d);
+	latch_values_ce328(a, b, c, d);
+	if (EF_S32(0x00197220u) > 0x2800)
+		return;
+	if (EF_S16(0x001a823eu) < 0)
+		return;
+	obj = lookup_filtered_indexed_object((int16_t)(EF_S32(0x001a823cu) >> 16));
+	if (obj == 0)
+		return;
+	if ((uint8_t)guest_fn_5ca88_ret_x(obj, (ef_addr32)(uintptr_t)pt) == 0)
+		return;
+	guest_fn_5d520_x(pt[0], pt[1], obj);
+	if (EF_U32(obj + 0x1cu) != 0)
+		draw_tactical_cross(pt[0], pt[1]);
+	guest_sprintf_a4342(textp, 0x00185facu, EF_U32(0x001971b0u));
+	half = (int16_t)formatted_width_48da0(textp) >> 1;
+	shift = EF_U8(0x0012b369u);
+	draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), (1u - shift) & 0xffu,
+	                               (int16_t)((int32_t)pt[0] - half),
+	                               (int16_t)((((uint32_t)EF_U16(0x001a6ce2u) + 2u) << shift) + (uint32_t)(int32_t)pt[1]),
+	                               textp);
+	if (EF_U8(0x00127da8u) == 0)
+		return;
+	if ((EF_U8(obj + 0x26u) & 0x40u) == 0)
+		return;
+	k = (int32_t)(0xau << EF_U8(0x0012b369u));
+	guest_fn_c8ccc_x((uint32_t)(pt[1] + k), (uint32_t)(pt[0] + k), (uint32_t)(pt[1] - k),
+	                 (uint32_t)(pt[0] - k), EF_U8(0x00128148u));
+	k = (int32_t)(0xau << EF_U8(0x0012b369u));
+	guest_fn_c8ccc_x((uint32_t)(pt[1] + k), (uint32_t)(pt[0] - k), (uint32_t)(pt[1] - k),
+	                 (uint32_t)(pt[0] + k), EF_U8(0x00128148u));
+}

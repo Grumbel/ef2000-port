@@ -1136,7 +1136,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005c07c	77	adjust_level_5c07c	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x0005c07c.json	docs/compiler-abi.md; Move word 0x1281f6 towards 0 or 100 by word 0x127d92.; callers 601c@60af; guest pending
 0x0005c0cc	521			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0005c2d8	123	show_scaled_value_5c2d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005c2d8.json	docs/compiler-abi.md; Show the scaled value (double 0x1a2ef0 * 0x185f9a * 0x185fa2, rounded to float): format it into a 16 byte buffer with 0x; callers none direct; guest pending
-0x0005c354	449			unknown	game	unverified		
+0x0005c354	449	refresh_selected_label_5c354	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005c354.json	Original 0x5c354 (449 bytes)
 0x0005c518	708			unknown	game	unverified		
 0x0005c7dc	258	refresh_map_label_5c7dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005c7dc.json	docs/compiler-abi.md; Like 0x5a220 (apply 0xcdf48 then latch 0xce328 with the four signed high words at 0x1a6cf4/0x1a6cee/0x1a6cf6/0x1a6cf0; p; callers 5a998@5a9e2; guest pending
 0x0005c8e0	242	draw_trail_5c8e0	tactical_marks1	compiles	game	confirmed	decomp/tests/0x0005c8e0.json	docs/compiler-abi.md; Walk the 12-byte point table at 0x1fd098 from the current index (0x20f19a) backwards in steps of n = remaining/50 + 1, p; callers 5c518@5c5d3; guest pending

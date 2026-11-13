@@ -3371,8 +3371,9 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004bf1c	draw_map_layers_4bf1c	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x4bf1c (516 bytes); map layer redraw dispatcher
 0x0004c3bc	draw_map_nodes_4c3bc	EAX:uint32_t,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x4c3bc (593 bytes); map node marker drawing
 0x0004e360	draw_route_overlay_4e360			ebx,ecx,edx,esi,edi,ebp	0	Original 0x4e360 (602 bytes); route polygon and leg markers
-0x00058d64	init_game_state_58d64			ebx,ecx,edx,esi,edi	0	Reset latches/links/tables then store mission/HUD scalar defaults; mode limits; probe 0x913dc(0xff,4,2,3)
-0x000a1ec8	load_record_a1ec8			ebx,ecx,edx,esi,edi	0	Read one record from the stream into 0x417174, or skip it on header mismatch
-0x0008cd78	reset_object_position_8cd78	AX:int16_t		ebx,ecx,edx,esi,edi	0	Snapshot object position, clear link words, update local counters and notify remote side
-0x00097dcc	show_title_sequence_97dcc			ebx,ecx,edx,esi,edi	0	Data-file driven title sequence: pump two records, then show frames at a 4-tick pace
+0x00058d64	init_game_state_58d64			ebx,ecx,edx,esi,edi,ebp	0	Reset latches/links/tables then store mission/HUD scalar defaults; mode limits; probe 0x913dc(0xff,4,2,3)
+0x000a1ec8	load_record_a1ec8			ebx,ecx,edx,esi,edi,ebp	0	Read one record from the stream into 0x417174, or skip it on header mismatch
+0x0008cd78	reset_object_position_8cd78	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Snapshot object position, clear link words, update local counters and notify remote side
+0x00097dcc	show_title_sequence_97dcc			ebx,ecx,edx,esi,edi,ebp	0	Data-file driven title sequence: pump two records, then show frames at a 4-tick pace
 0x000bed1c	scan_list_bed1c	EAX:ef_addr32,DX:uint16_t,BL:uint8_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:uint32_t	AX:uint16_t	esi,edi,ebp	24	Walk the list; spawn records per table entry and hand them to 0xbe59c
+0x0005c354	refresh_selected_label_5c354			ebx,ecx,edx,esi,edi,ebp	0	Latch view, project selected object, draw tactical cross, label and (multiplayer) crossing lines
