@@ -45,7 +45,7 @@ def probes(count, seed):
         yield registers, flags
 
 
-def compare(function, payload, address, registers, flags, *, budget=10000):
+def compare(function, payload, address, registers, flags, *, budget=10000, program=False):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError
     from unicorn import x86_const
 
@@ -72,7 +72,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000):
     native_memory = (ctypes.c_uint8 * memory_size).from_buffer(memory)
     state = State((ctypes.c_uint32 * 8)(*registers), flags, address, 0,
                   native_memory, memory_size)
-    status = function(ctypes.byref(state), budget)
+    status = (function(ctypes.byref(state), budget, sentinel) if program else
+              function(ctypes.byref(state), budget))
     if status:
         return dict(state='mismatch', differences=[
             'C status %d (budget/pc/memory) after original completed' % status])
@@ -100,7 +101,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     manifest_path = directory / 'report.json'
     manifest_bytes = manifest_path.read_bytes()
     manifest = json.loads(manifest_bytes)
-    if (manifest.get('model') != 'flat-x86-explicit-state' or
+    program = manifest.get('model') == 'flat-x86-program-explicit-state'
+    if (manifest.get('model') not in ('flat-x86-explicit-state', 'flat-x86-program-explicit-state') or
             manifest.get('payload_sha256') != hashlib.sha256(payload).hexdigest()):
         raise ValueError('translation payload provenance mismatch')
     if scenarios < 1 or budget < 1:
@@ -108,13 +110,13 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     runtime = directory / 'ef_lift_state.h'
     if manifest.get('runtime_sha256') != hashlib.sha256(runtime.read_bytes()).hexdigest():
         raise ValueError('translation runtime digest mismatch')
-    for entry in manifest['entries']:
-        if entry['state'] == 'generated-unverified':
-            if entry.get('source_sha256') != hashlib.sha256((directory / entry['file']).read_bytes()).hexdigest():
-                raise ValueError('translation source digest mismatch')
-    sources = [directory / e['file'] for e in manifest['entries']
-               if e['state'] == 'generated-unverified']
-    if not sources:
+    generated = [e for e in manifest['entries'] if e['state'] == 'generated-unverified']
+    artifacts = generated + ([manifest['dispatcher']] if program else [])
+    for entry in artifacts:
+        if entry.get('source_sha256') != hashlib.sha256((directory / entry['file']).read_bytes()).hexdigest():
+            raise ValueError('translation source digest mismatch')
+    sources = [directory / e['file'] for e in artifacts]
+    if not generated:
         raise ValueError('no generated C sources to test')
     output.mkdir(parents=True, exist_ok=False)
     watcom_results = {}
@@ -144,10 +146,10 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         if entry['state'] != 'generated-unverified':
             continue
         address = entry['address']
-        function = getattr(loaded, 'ef_lift_%08x' % address)
-        function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32]
+        function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % address)
+        function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
-        results = [compare(function, payload, address, registers, flags, budget=budget)
+        results = [compare(function, payload, address, registers, flags, budget=budget, program=program)
                    for registers, flags in probes(scenarios, address)]
         counts = Counter(item['state'] for item in results)
         entries.append(dict(address=address, counts=dict(counts), probes=results,
@@ -157,11 +159,12 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         with progress.open('a') as stream:
             stream.write(json.dumps(entries[-1]) + '\n')
         if len(entries) % 25 == 0:
-            print('Compared %d/%d entries' % (len(entries), len(sources)), flush=True)
+            print('Compared %d/%d entries' % (len(entries), len(generated)), flush=True)
     report = dict(schema=1, model=manifest['model'],
                   payload_sha256=manifest['payload_sha256'],
                   translation_report_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
                   library_sha256=hashlib.sha256(library.read_bytes()).hexdigest(),
+                  dispatcher_watcom_object_sha256=watcom_results.get('ef_lift_program'),
                   scenarios=scenarios, instruction_budget=budget, entries=entries,
                   limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')

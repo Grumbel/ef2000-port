@@ -401,16 +401,17 @@ def instruction_c(insn, starts):
     return ' '.join(code)
 
 
-def translate(record):
+def translate(record, *, starts=None, renderer=instruction_c):
     if (record.get('boundary') != 'ghidra-body-ranges' or
             record.get('ghidra_instruction_layout_matches') is not True or
             record.get('overlapping_entries') or record.get('undecodable_addresses')):
         raise Unsupported('body or instruction layout not established')
     instructions = record['instructions']
-    starts = {i['address'] for i in instructions}
-    if record['address'] not in starts:
+    local_starts = {i['address'] for i in instructions}
+    if record['address'] not in local_starts:
         raise Unsupported('entry is not an instruction start')
-    cases = ['case 0x%xu: %s' % (i['address'], instruction_c(i, starts)) for i in instructions]
+    starts = local_starts if starts is None else starts
+    cases = ['case 0x%xu: %s' % (i['address'], renderer(i, starts)) for i in instructions]
     variables = [name for name in ('a', 'b', 'result', 'carry')
                  if re.search(r'\b' + name + r'\b', '\n'.join(cases))]
     declarations = 'uint32_t ' + ', '.join(variables) + ';' if variables else ''
@@ -432,15 +433,15 @@ unsigned ef_lift_%08x(ef_lift_state *s, uint32_t fuel) {
 ''' % (record['address'], declarations, '\n'.join(cases))
 
 
-def generate(inventory, output, image):
+def read_inventory(inventory, image):
+    """Validate payload bytes and independently decode every input record."""
     payload = image.read_bytes()
     manifest = json.loads((inventory / 'manifest.json').read_text())
     if (manifest.get('schema') != 3 or manifest.get('boundary') != 'ghidra-body-ranges' or
             manifest.get('payload_sha256') != hashlib.sha256(payload).hexdigest()):
         raise ValueError('invalid inventory provenance')
-    output.mkdir(parents=True, exist_ok=False)
-    (output / 'ef_lift_state.h').write_text(RUNTIME)
-    report = []
+    records = []
+    seen = set()
     for entry in manifest['entries']:
         path = inventory / entry['file']
         record = json.loads(path.read_text())
@@ -455,8 +456,21 @@ def generate(inventory, output, image):
         decoded = []
         for start, end in record['ranges']:
             decoded.extend(asm_inventory.decode_window(image, start, end-start))
-        if decoded != record['instructions'] or record['address'] != entry['address']:
+        if (decoded != record['instructions'] or record['address'] != entry['address'] or
+                record['address'] in seen):
             raise ValueError('instruction decode mismatch')
+        seen.add(record['address'])
+        records.append(record)
+    return manifest, records
+
+
+def generate(inventory, output, image):
+    manifest, records = read_inventory(inventory, image)
+    output.mkdir(parents=True, exist_ok=False)
+    (output / 'ef_lift_state.h').write_text(RUNTIME)
+    report = []
+    for record in records:
+        entry = {'address': record['address']}
         item = dict(address=entry['address'], state='unsupported', reason='')
         try:
             code = translate(record)

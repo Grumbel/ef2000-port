@@ -2356,3 +2356,33 @@ blocker; a read-only graph check finds 2,549 syntactically translatable direct-
 call bodies and 958 closed over their direct dependencies, before implementation.
 Reliable bulk coverage, indirect control flow, x87 and native integration remain
 incomplete.
+
+2026-11-13 direct-call ASM composition: tools/asm_c_program.py reuses validated
+inventory decoding, selects the greatest dependency-closed set of supported
+bodies, and emits a PC dispatcher with one shared guest instruction budget.
+Direct CALL/RET use original guest stack addresses/return PCs; tail jumps and
+owned interior targets are supported without host recursion or ABI inference.
+Unsupported callees exclude transitive callers; indirect calls and unknown
+continuations remain unsupported. Generated source/dispatcher/runtime hashes
+are checked by the differential runner. Ghidra 12.1.4 corpus: 2,549 syntax-
+supported bodies; 958 selected, 81,976 body bytes, 296 cross-body-dependency
+bodies; 1,591 syntax-supported bodies remain excluded by closure. All 958 body
+objects plus dispatcher compile with OpenWatcom v2 -we. 15,328 original-vs-C
+probes: 10,257 passes, 5,071 original-fault/budget inconclusive, zero mismatches.
+432 bodies pass all 16 probes, including 117 with cross-body dependencies;
+526 remain inconclusive. No original-code fallback, native ABI recovery,
+tracker promotion or game-integration claim. Seventy focused tests pass,
+including nested frames, recursion, mutual recursion, tail jumps, guest-stack
+observability, dependency exclusion and shared-budget resumption; four program
+tests rechecked after dispatcher-tamper regression was added. Commands:
+python3 -m unittest tests.test_asm_c_program tests.test_asm_to_c
+tests.test_asm_inventory tests.test_asm_diff tests.test_ghidra_ef2000;
+tools/asm_c_program.py --inventory local/asm-body-inventory-20261113 --output
+local/asm-c-program-20261113; tools/asm_c_differential.py --translations
+local/asm-c-program-20261113 --output local/asm-c-program-diff-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386
+(Python 3.13.12/Unicorn 2.1.4). Dependency-frontier audit points to segment/string
+helpers (0xed133: 283 dependent bodies), rotations (0xdeb50: 216), heap-selector
+operations (0xfc795: 181), indirect calls and DOS/runtime boundaries. Full
+reliable bulk coverage, x87, remaining ownership/boundary cases and native
+integration remain active work.

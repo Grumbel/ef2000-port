@@ -147,3 +147,50 @@ compile with OpenWatcom warnings-as-errors. Original-vs-C probes: 7,302 pass,
 3,290 inconclusive, zero mismatches; 315 bodies pass all 16 probes, 347 remain
 inconclusive. Artifacts: `local/asm-c-integer-20261113` and
 `local/asm-c-integer-diff-20261113`. No native or universal-equivalence claim.
+
+`tools/asm_c_program.py` extends the explicit-state path to direct calls and
+cross-body branches without guessing a C ABI:
+
+```sh
+python3 tools/asm_c_program.py --inventory local/asm-body-inventory-20261113 \
+  --output local/asm-c-program
+python3 tools/asm_c_differential.py --translations local/asm-c-program \
+  --output local/asm-c-program-evidence --watcom /path/to/wcc386
+```
+
+It checks the same byte/decoder provenance, then computes the greatest set of
+supported bodies closed over direct calls, jumps and fallthrough dependencies.
+Removing an unsupported callee removes all transitive callers, while supported
+recursive cycles remain eligible. Targets must be decoded instruction starts
+with unambiguous ownership. Indirect calls/jumps and unknown continuations are
+unsupported. The report distinguishes syntax support from the selected closed
+set and records each selected body's direct dependencies and instruction sites.
+
+CALL writes the original return PC onto the guest stack. The generated
+`ef_lift_run` dispatcher selects a body by guest PC and executes exactly one
+instruction per unit of a shared budget, including CALL and RET. This avoids
+host C recursion and preserves guest stack addresses even when a callee stores
+or otherwise observes them. Tail jumps and entry into an owned interior block
+use the same dispatcher. Unknown PCs are explicit failures; no untranslated
+original-code or emulator fallback exists. The per-body entry points are step
+implementation details; use the dispatcher to run a composed program.
+
+The verifier selects the dispatcher using the distinct
+`flat-x86-program-explicit-state` model tag. Its source digest is checked along
+with every body and runtime header before compilation. OpenWatcom must compile
+the dispatcher too. Synthetic tests compare nested frames, same-body recursion,
+mutual recursion, tail jumps and saved stack/return addresses against original
+x86, check transitive exclusion and ambiguous ownership, and test shared-budget
+resumption and dispatcher tamper detection. These are prepared-state comparisons;
+full game integration and universal equivalence remain unproven.
+
+2026-11-13 composed corpus: 2,549 bodies are syntactically supported; dependency
+closure selects 958 bodies (81,976 body bytes), including 296 with cross-body
+dependencies. The other 1,591 syntactically supported bodies remain excluded.
+All 958 body objects and the dispatcher compile with OpenWatcom warnings as
+errors. The 15,328 probes produce 10,257 passes, 5,071 original-fault/budget
+inconclusive outcomes and zero mismatches. 432 bodies pass all probes, including
+117 with cross-body dependencies; 526 remain inconclusive. Artifacts:
+`local/asm-c-program-20261113` and `local/asm-c-program-diff-20261113`.
+Seventy focused tests pass; dispatcher tamper detection was additionally
+rechecked with the four program tests. No native ABI or full-coverage promotion.
