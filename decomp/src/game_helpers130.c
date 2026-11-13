@@ -1430,3 +1430,154 @@ void draw_button_11e7c(int16_t index)
     draw_formatted_text_mode_48bb0(colour, 1u, x, y, fmt);
     leave_scroll_mode_c39ac();
 }
+
+/* 0x1f994, 1011 bytes. Advance the scrolling text box INDEX (10-byte records at 0x127a98: centre x, centre y, width, height, slot byte): when the record names a text slot, enter scroll mode on it, otherwise draw into FALLBACKBITMAP (the caller's EDI). Latch the box as the clip rectangle, then consume one character of the current text (0x1237f0, filled from the queue when empty) at the cursor (column 0x1237ec, row 0x1237ee): CR/# and end of text start a new line, LF only ends the character, '>' jumps to the next 70-pixel stop, TAB to the next 16-pixel stop, a space wraps the line when the following word would not fit, and any other glyph is drawn upper-cased in colour 0xf. When the cursor passes the bottom the bitmap is scrolled up by one 8-pixel row and the freed rows are filled with colour 3. */
+void draw_text_box_1f994(int16_t index, ef_addr32 fallbackBitmap)
+{
+    uint32_t rec = 0x00127a98u + (uint32_t)((int32_t)index * 10);
+    int16_t cx = (int16_t)EF_U16(rec);
+    int16_t yc = (int16_t)EF_U16(rec + 2u);
+    int16_t width = (int16_t)EF_U16(rec + 4u);
+    uint16_t heightWord = EF_U16(rec + 6u);
+    int8_t slotByte = (int8_t)EF_U8(rec + 8u);
+    int16_t left = (int16_t)(cx - (width >> 1));
+    int16_t top = (int16_t)(yc - ((int16_t)heightWord >> 1));
+    uint16_t strWord = EF_U16(0x0001e680u);
+    ef_addr32 dst = fallbackBitmap;
+    uint8_t glyph[4];
+    uint8_t wordBuf[0x60];
+    ef_addr32 text;
+    int32_t advance = 0;
+    int32_t x1;
+    int32_t x2;
+    int32_t y1;
+    int32_t y2;
+
+    if (slotByte != -1) {
+        uint32_t slot = get_text_slot_cd7f0((int16_t)slotByte);
+
+        if (slot == 0u)
+            return;
+        dst = slot;
+        enter_scroll_mode_c39f0(slot);
+    }
+    dst += (uint32_t)(((int32_t)top << 8) + (int32_t)left);
+    y1 = (int32_t)yc - ((int16_t)heightWord >> 1);
+    y2 = (int32_t)yc + ((int16_t)heightWord >> 1);
+    x1 = (int32_t)cx - (width >> 1);
+    x2 = (int32_t)cx + (width >> 1);
+    latch_values_ce328((uint32_t)x1, (uint32_t)x2, (uint32_t)y1, (uint32_t)y2);
+    store_four_dwords_17cf9c((uint32_t)x1, (uint32_t)x2, (uint32_t)y1, (uint32_t)y2);
+    left = (int16_t)(left + 4);
+
+    text = EF_U32(0x001237f0u);
+    if (text == 0u) {
+        EF_U32(0x001237f0u) = queue_pop_1f8c4();
+        return;
+    }
+    {
+        uint8_t c = EF_U8(text);
+
+        if (c == 0u) {
+            EF_U32(0x001237f0u) = 0u;
+            EF_U16(0x001237ecu) = 0u;
+            EF_U16(0x001237eeu) = (uint16_t)(EF_U16(0x001237eeu) + 8u);
+            goto after_char;
+        }
+        if (c == 0x0du || c == 0x23u) {
+            EF_U16(0x001237ecu) = 0u;
+            EF_U16(0x001237eeu) = (uint16_t)(EF_U16(0x001237eeu) + 8u);
+            advance = 0;
+        } else if (c == 0x3eu) {
+            int32_t col = (int16_t)EF_U16(0x001237ecu);
+
+            EF_U16(0x001237ecu) = (uint16_t)(col - col % 0x46 + 0x46);
+            advance = 0;
+        } else if (c == 0x09u) {
+            int32_t col = (int16_t)EF_U16(0x001237ecu);
+
+            EF_U16(0x001237ecu) = (uint16_t)(0x10 - col % 0x10 + col);
+            advance = 0;
+        } else if (c == 0x0au) {
+            advance = 0;
+        } else {
+            int draw = 1;
+
+            if (c == 0x20u) {
+                int16_t n = 1;
+                int16_t len;
+
+                for (;;) {
+                    uint8_t ch = EF_U8(EF_U32(0x001237f0u) + (uint32_t)(int32_t)n);
+
+                    if (ch == 0u || ch == 0x20u || ch == 0x23u || ch == 0x0du)
+                        break;
+                    n++;
+                }
+                len = (int16_t)(n - 1);
+                if (len != 0) {
+                    int32_t w;
+                    int32_t pos;
+
+                    (void)memcpy_dc832((ef_addr32)(uintptr_t)wordBuf, EF_U32(0x001237f0u), (uint32_t)(int32_t)len);
+                    wordBuf[len] = 0u;
+                    w = formatted_text_width_48c34(1u, (ef_addr32)(uintptr_t)wordBuf);
+                    pos = (int32_t)(int16_t)w + (int32_t)left + (int16_t)EF_U16(0x001237ecu);
+                    if (pos > (int32_t)width - 5) {
+                        EF_U16(0x001237ecu) = 0u;
+                        EF_U16(0x001237eeu) = (uint16_t)(EF_U16(0x001237eeu) + 8u);
+                        advance = 0;
+                        draw = 0;
+                    }
+                }
+            }
+            if (draw) {
+                uint8_t ch = EF_U8(EF_U32(0x001237f0u));
+
+                glyph[0] = ch;
+                glyph[1] = (uint8_t)(strWord >> 8);
+                glyph[2] = 0u;
+                glyph[3] = 0u;
+                if (ch >= 0x61u && ch <= 0x7au)
+                    glyph[0] = (uint8_t)(ch - 0x20u);
+                advance = formatted_text_width_48c34(1u, (ef_addr32)(uintptr_t)glyph);
+                draw_formatted_text_mode_48bb0(0x0fu, 1u,
+                                               (int16_t)((uint16_t)left + EF_U16(0x001237ecu)),
+                                               (int16_t)((uint16_t)top + EF_U16(0x001237eeu)),
+                                               (ef_addr32)(uintptr_t)glyph);
+            }
+        }
+        EF_U32(0x001237f0u) = EF_U32(0x001237f0u) + 1u;
+        EF_U16(0x001237ecu) = (uint16_t)(EF_U16(0x001237ecu) + (uint16_t)advance);
+    }
+after_char:
+    if ((int16_t)EF_U16(0x001237ecu) > (int32_t)width - 5) {
+        EF_U16(0x001237ecu) = 0u;
+        EF_U16(0x001237eeu) = (uint16_t)(EF_U16(0x001237eeu) + 8u);
+    }
+    if ((int16_t)EF_U16(0x001237eeu) <= (int32_t)(int16_t)heightWord - 10)
+        return;
+    {
+        int32_t row;
+        int32_t dx;
+
+        EF_U16(0x001237eeu) = (uint16_t)(EF_U16(0x001237eeu) - 8u);
+        for (row = 0; row < (int32_t)(int16_t)heightWord - 8; row++) {
+            ef_addr32 d = dst + ((uint32_t)row << 8);
+            ef_addr32 s = d + 0x800u;
+            int16_t i;
+
+            if (width > 0) {
+                for (i = 0; i < width; i++)
+                    EF_U8(d + (uint32_t)i) = EF_U8(s + (uint32_t)i);
+            }
+        }
+        for (dx = (int32_t)(int16_t)heightWord - 8; (int16_t)dx < (int16_t)heightWord; dx++) {
+            ef_addr32 d = dst + ((uint32_t)(int32_t)(int16_t)dx << 8);
+            int16_t i;
+
+            for (i = 0; i < width; i++)
+                EF_U8(d + (uint32_t)i) = 3u;
+        }
+    }
+}

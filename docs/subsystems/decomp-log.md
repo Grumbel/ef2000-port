@@ -2398,3 +2398,7 @@ Recovered: picks a target object for group record AX (0xca-byte records at 0x19b
 ### 2026-11-13 draw_button_11e7c (0x11e7c)
 
 Recovered: draws button AX (29-byte records at 0x121fb4) as a masked frame blit plus a centred label (colour 0xe/2/1 by state and label flag; label is the shared string 0x12288c or the record's pointer). Fuzz PASS 1000 completed cases.
+
+### 2026-11-13 draw_text_box_1f994 (0x1f994)
+
+Recovered the scrolling text box step (one character per call, wrapping, tab/`>` stops, scroll-up when the cursor passes the bottom). Quirk: when the record has no text slot the original draws into the caller's EDI, so the function takes EDI as a second register input (`#pragma aux ... parm [eax] [edi]`; a `modify exact` list made the build fault).

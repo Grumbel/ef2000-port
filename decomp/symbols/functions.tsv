@@ -347,7 +347,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001f878	74	push_event_1f878	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0001f878.json	docs/compiler-abi.md; Push an entry onto the ten-entry stack at 0x19b0d0 and request an event.; callers 14c5c@14d33,1a3cc@1a448,1a3cc@1a466; guest pending
 0x0001f8c4	75	queue_pop_1f8c4	game_helpers7	compiles	game	confirmed	decomp/tests/0x0001f8c4.json	docs/compiler-abi.md; Pop the head of the queue at 0x19b0d0.; callers 1f994@1fd73; guest pending
 0x0001f960	50	reset_scroll_state_1f960	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x0001f960.json	docs/compiler-abi.md; Reset the scroll state.; callers 5f60@5f7f; guest pending
-0x0001f994	1011			unknown	unclassified	unverified		
+0x0001f994	1011	draw_text_box_1f994	game_helpers130	compiles	game	confirmed	decomp/tests/0x0001f994.json	Original 0x1f994 (1011 bytes)
 0x0001fd88	195	build_circle_1fd88	game_helpers15	compiles	game	confirmed	decomp/tests/0x0001fd88.json	docs/compiler-abi.md; Build the 0x19b030/0x19b080 circle tables (full turn is 0xc000 steps).; callers 2065c@2067b; guest pending
 0x0001fe4c	192	build_circle_1fe4c	game_helpers15	compiles	game	confirmed	decomp/tests/0x0001fe4c.json	docs/compiler-abi.md; Build the 0x19afe0/0x19af90 circle tables from the two radius bytes.; callers 1ff0c@1ff6b; guest pending
 0x0001ff0c	1871			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.

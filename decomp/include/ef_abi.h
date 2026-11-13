@@ -4339,6 +4339,14 @@ void update_scene_camera_9457c(ef_addr32 object, uint32_t enabled);
 int32_t collect_list_entries_c193c(ef_addr32 collection, ef_addr32 listHead, uint32_t keyA, uint32_t keyB);
 void find_nearest_object_33b4(int16_t group);
 void draw_button_11e7c(int16_t index);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+/* The original also reads the caller's EDI as the destination bitmap when the record has no text slot. */
+#endif
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+/* The original also reads the caller's EDI as the destination bitmap when the record has no text slot. */
+#pragma aux draw_text_box_1f994 parm [eax] [edi]
+#endif
+void draw_text_box_1f994(int16_t index, ef_addr32 fallbackBitmap);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
