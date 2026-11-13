@@ -7,7 +7,7 @@
 
 /* Memory block size rounding. */
 
-/* 0x10d94f, 119 bytes. Round the requested block size at *SIZE (EAX) up to a multiple of 4; zero stays zero (returns 0). Depending on the bytes 0x132a5e/0x132a5f either 8 or the 0x10d63b value is taken off, the result is kept (and the call fails with 0 when adding 0x3c carries), raised to the dword at 0x17d400 (low bit cleared) and finally rounded up to a 4 KB multiple (a carry fails with 0). Returns 1 when the final size is non-zero. */
+/* 0x10d94f, 119 bytes. Round the requested block size at *SIZE (EAX) up to a multiple of 4; zero stays zero (returns 0). Depending on the bytes 0x132a5e/0x132a5f either 8 is added or the 0x10d63b value is subtracted, the result is kept (and the call fails with 0 when adding 0x3c carries), raised to the dword at 0x17d400 (low bit cleared) and finally rounded up to a 4 KB multiple (a carry fails with 0). Returns 1 when the final size is non-zero. */
 uint32_t align_block_size_10d94f(uint32_t *size)
 {
     uint32_t value = (*size + 3u) & ~3u;

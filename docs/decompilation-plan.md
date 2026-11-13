@@ -2278,3 +2278,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 heap-initialization continuation: isolated descriptor insertion 0x10d5c7 passes five original comparisons. Growth 0x10d80b still requires DOS/selector-limit bindings and initial-block release; source-only startup/menu remains incomplete.
 
 2026-11-13 heap lifecycle: corrected DS handling in release, six inner and five composed release cases pass. Descriptor initialization -> initial-block release -> allocation passes three no-stub cases from provisioned raw RAM. Extender provisioning, native selector bindings and working main menu remain incomplete.
+
+2026-11-13 growth sizing: recovered 0x10d63b with documented selector-limit adapter (eight comparisons pass); normalizer 0x10d94f with corrected preserved registers passes 25 composed cases. Growth entry, native selector bindings and working main menu remain incomplete.

@@ -3297,7 +3297,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b3168	dump_lists_to_file_b3168	EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t		ebx,ecx,edx,esi,edi,ebp	20	Original 0x000b3168 (136 bytes); debug dump of a list to a named file; callers 69d10; ret 0x14
 0x000d1afc	write_planar_image_d1afc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000d1afc (237 bytes); write the image to the log file row by row
 0x000bfb88	position_in_box_bfb88	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0xbfb88 (336 bytes); box test of a record position
-0x0010d94f	align_block_size_10d94f	EAX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0x10d94f (119 bytes); round a block size up
+0x0010d94f	align_block_size_10d94f	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x10d94f (119 bytes); round a block size up; confirmed PUSH/POP EBX EDX ESI, other GPRs untouched/preserved by 10d63b
 0x000c1034	loop_objects_c1034	EAX:int32_t,EDX:uint32_t,EBX:ef_addr32,ECX:uint32_t	EAX:uint32_t	esi,edi,ebp	20	Original 0xc1034 (142 bytes); per-index loop calling 0xc1210
 0x000418c4	draw_segment_records_418c4	EAX:ef_addr32,EDX:int16_t		ebx,ecx,esi,edi,ebp	0	Original 0x418c4 (210 bytes)
 0x000bfa58	scan_nodes_bfa58	AX:uint16_t,EDX:ef_addr32,EBX:uint32_t,ECX:uint32_t	AX:uint16_t	esi,edi,ebp	12	Original 0xbfa58 (212 bytes)
@@ -3455,3 +3455,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000aaee8	main_control_loop	EAX:int32_t,EDX:ef_addr32	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	Original 0xaaee8..0xaafe6 saves EBX ECX ESI EDI; EDX is scratch; caller 0x8b2d2 passes argc/argv, returns zero.
 0x000aa5c4	load_menu_stream_aa5c4	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0xaa5c4..0xaaa0d saves six GPRs; EAX file handle; caller 0xaae2c; read EAX/EDX/EBX and allocator EAX.
 0x000fc795	allocate_heap_fc795	EAX:uint32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original saves GPRs and segment registers; DS only read for heap_alloc; callers c3f70 tail and e8733; invalid size early return.
+0x0010d63b	guest_fn_10d63b		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original saves EBX/EDX, optional LSL DS, returns adjacent tail size or zero; callers 10d94f and 10d986.
