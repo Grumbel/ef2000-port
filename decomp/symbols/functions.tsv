@@ -1999,7 +1999,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009a4d8	108	clear_tables_9a4d8	camera_helpers	compiles	game	confirmed	decomp/tests/0x0009a4d8.json	docs/compiler-abi.md; ; callers 98bec@98bec; guest pending
 0x0009a544	221	open_numbered_log_9a544	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0009a544.json	docs/compiler-abi.md; Open the next numbered log file: build the name from the template at 0x98bd0, the running number (word 0x12dda8, post-in; callers 9ab30@9ab31; guest pending
 0x0009a624	213	update_records_9a624	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009a624.json	docs/compiler-abi.md; Dispatch every active 54-byte record by kind and sum the four counters.; callers 98bec@98bf1; guest pending
-0x0009a6fc	440			unknown	game	unverified		
+0x0009a6fc	440	classify_target_flags_9a6fc	game_helpers130	compiles	game	confirmed	decomp/tests/0x0009a6fc.json	Original 0x9a6fc (440 bytes)
 0x0009a8b4	228	count_ground_kill_9a8b4	game_helpers53	compiles	game	confirmed	decomp/tests/0x0009a8b4.json	docs/compiler-abi.md; Count a destroyed ground object in the statistics table by its class.; callers 9a624@9a66e; guest pending
 0x0009a998	224	count_air_kill_9a998	game_helpers53	compiles	game	confirmed	decomp/tests/0x0009a998.json	docs/compiler-abi.md; Count a destroyed air object in the statistics table by its class.; callers 9a624@9a677; guest pending
 0x0009aa78	182	count_event_9aa78	runtime_helpers31	compiles	game	confirmed	decomp/tests/0x0009aa78.json	docs/compiler-abi.md; Count an event kind in the counter row of the current slot.; callers 9a624@9a683; guest pending

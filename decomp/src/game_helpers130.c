@@ -634,3 +634,62 @@ ef_addr32 build_object_records_b9c68(uint8_t mode, uint8_t slot, uint8_t flag)
                           (uint32_t)(EF_S32(edx2 + 0xeu) >> 16), EF_U32(0x001a550au));
     return buf;
 }
+
+/* 0x9a6fc, 440 bytes. Recount the 0x31-typed nodes of the list at 0x137988 into the three counters at 0x40cfd8/da/dc by flag group, then for the request (selector word at +0x10) find the target node's flag byte and group, bump the matching counters at 0x40d00e/0x40d016/0x40d01e and the result mode at 0x40d028; returns the target's byte (upper word 0xffff when none found, as in the original). */
+uint32_t classify_target_flags_9a6fc(ef_addr32 request)
+{
+    uint32_t node;
+    uint32_t result = 0xffffffffu;
+    uint32_t flag;
+    uint16_t selector;
+    uint32_t index;
+
+    guest_fn_b3fb0(0x0040cfd8u, 0u, 6u);
+    for (node = EF_U32(0x00137988u); node != 0u; node = EF_U32(node + 4u)) {
+        if (EF_U8(node + 0xbu) != 0x31u)
+            continue;
+        if ((uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 9u), 0x00137980u))
+            EF_U16(0x0040cfd8u)++;
+        else if ((uint16_t)group_flag_negative_cc1ac(0u, EF_U8(node + 9u), 0x00137980u))
+            EF_U16(0x0040cfdcu)++;
+        else if ((uint16_t)group_flag_zero_cc1ec(0u, EF_U8(node + 9u), 0x00137980u))
+            EF_U16(0x0040cfdau)++;
+    }
+    selector = EF_U16(request + 0x10u);
+    if (selector <= 2u) {
+        ef_addr32 entry = list_nth(0x00137960u, (uint32_t)(EF_S32(request + 0x14u) >> 16));
+
+        flag = EF_U8(entry + 0xbu);
+        if ((EF_S32(request + 0x18u) >> 16) == -1)
+            result = (result & 0xffff0000u) | EF_U8(EF_U32(entry + 0x13u));
+    } else if (selector == 3u) {
+        uint32_t walk = EF_U32(0x00137988u);
+
+        if (EF_S16(request + 0x12u) > 0) {
+            int16_t n = 0;
+
+            do {
+                n++;
+                walk = EF_U32(walk + 4u);
+            } while (n < EF_S16(request + 0x12u));
+        }
+        flag = EF_U8(walk + 9u);
+        result = (result & 0xffff0000u) | EF_U8(walk + 0xbu);
+    } else {
+        return result;
+    }
+    if ((flag & 0xffu) == 0xffu)
+        return result;
+    index = (uint32_t)(EF_S32(request + 0xeu) >> 16);
+    if ((uint16_t)group_flag_positive_cc22c(0u, flag & 0xffu, 0x00137980u)) {
+        EF_U16(0x0040d028u) = 0u;
+        EF_U16(0x0040d00eu + index * 2u)++;
+    } else if ((uint16_t)group_flag_zero_cc1ec(0u, flag & 0xffu, 0x00137980u)) {
+        EF_U16(0x0040d028u) = 1u;
+        EF_U16(0x0040d016u + index * 2u)++;
+    } else if ((uint16_t)group_flag_negative_cc1ac(0u, flag & 0xffu, 0x00137980u)) {
+        EF_U16(0x0040d028u) = 2u;
+        EF_U16(0x0040d01eu + index * 2u)++;
+    }
+    return result;
+}

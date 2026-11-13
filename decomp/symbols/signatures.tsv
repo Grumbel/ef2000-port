@@ -3310,3 +3310,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00014d58	draw_framed_box_14d58	AX:int16_t		ebx,ecx,edx,esi,edi	0	Original 0x14d58 (409 bytes)
 0x000eb520	lookup_name_entry_eb520	EAX:ef_addr32,EDX:ef_addr32	EAX:ef_addr32	ebx,ecx,esi,edi,ebp	0	Original 0xeb520 (373 bytes)
 0x000b9c68	build_object_records_b9c68	AL:uint8_t,DL:uint8_t,BL:uint8_t	EAX:ef_addr32	ecx,esi,edi,ebp	0	Original 0xb9c68 (426 bytes)
+0x0009a6fc	classify_target_flags_9a6fc	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi	0	Original 0x9a6fc (440 bytes)

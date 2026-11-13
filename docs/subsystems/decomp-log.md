@@ -2362,3 +2362,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0xeb520 `lookup_name_entry_eb520`: name normalisation + hash bsearch (fuzz PASS 15 completed).
 
 - 0xb9c68 `build_object_records_b9c68`: object record builder; fuzz weak (0 completed, global pointers), logic decoded from disassembly.
+
+- 0x9a6fc `classify_target_flags_9a6fc`: flag-group counters over target list (fuzz PASS 769).
