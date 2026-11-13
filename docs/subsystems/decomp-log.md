@@ -2350,3 +2350,4 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 2026-11-13: blocked 53 more unknown functions that branch on callee flags, use carry-chain arithmetic, indirect jumps or segment registers.
 - 2026-11-13: recovered `draw_segment_records_418c4` (0x418c4); isolated fuzz PASS 800 cases.
 - 2026-11-13: recovered `scan_nodes_bfa58` (0xbfa58, calls 0xbe59c with 11 stack args and 0xbdbf8 as guest functions). Compiled pushes match the original. Isolated fuzz: 52 completed, 3 patched-only faults; its callees 0xfc0ec/0xb16c0 were never verified (weak), so the divergence is probably theirs but is not attributed. State `compiles`.
+- 2026-11-13: recovered `dump_state_b3084` (0xb3084); call sequence and ret 0x1c match the original; isolated fuzz weak (file I/O, 0 completed cases).

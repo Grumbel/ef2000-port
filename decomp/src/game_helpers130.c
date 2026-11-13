@@ -224,3 +224,28 @@ uint16_t scan_nodes_bfa58(uint16_t value, ef_addr32 head, uint32_t arg_b, uint32
     }
     return value;
 }
+
+/* 0xb3084, 226 bytes. (ret 0x1c) Write a debug dump to the file NAME: the status lines (0xb1bf8), a line with the six words S1..S6 (low halves, signed), then four sections each started by a header from 0xb3374 (0xb3038 for LIST_A, 0xb1c34 for LIST_B, 0xb3648 for BLOCK, 0xb3580 for S1), and close the file. S7 is not used. */
+void dump_state_b3084(ef_addr32 name, ef_addr32 list_a, ef_addr32 list_b, uint32_t block, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6, uint32_t s7)
+{
+    int32_t handle = open_slot_a7948(0u, 0u, 0u, 0u, name);
+    ef_addr32 header;
+
+    (void)s7;
+    print_status_lines_b1bf8((uint32_t)handle);
+    print_to_handle_b1bb0((uint32_t)handle, 0x0018e4fcu, (int32_t)(int16_t)s1, (int32_t)(int16_t)s2,
+                          (int32_t)(int16_t)s3, (int32_t)(int16_t)s4, (int32_t)(int16_t)s5, (int32_t)(int16_t)s6);
+    header = report_message_b3374(0x0018e524u);
+    dump_group_list_b3038(list_a, (uint32_t)handle, header);
+    guest_fn_cc768(header);
+    header = report_message_b3374(0x0018e534u);
+    dump_entry_list_b1c34(list_b, (uint32_t)handle, header);
+    guest_fn_cc768(header);
+    header = report_message_b3374(0x0018e544u);
+    guest_fn_b3648(block, (uint32_t)handle, header);
+    guest_fn_cc768(header);
+    header = report_message_b3374(0x0018e558u);
+    dump_buffer_b3580(s1, (uint32_t)handle, header);
+    guest_fn_cc768(header);
+    close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
+}
