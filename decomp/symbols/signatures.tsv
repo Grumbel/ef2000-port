@@ -3385,3 +3385,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0008ecdc	scan_neighbours_8ecdc	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t	AL:uint8_t	esi,edi,ebp	4	Count visible neighbour objects of each active record within 0x80000 of (EDX,ECX) and notify 0x8e940
 0x000d7f0c	build_clip_records_d7f0c			ebx,ecx,edx,esi,edi,ebp	0	Copy the clip rectangle words to 0x15bb02, run 0xd8170 and build follow-up clip records at 0x15bb16/0x15bb2a
 0x0005c518	draw_tactical_marker_5c518			ebx,ecx,edx,esi,edi,ebp	0	mode 3/4 tactical marker draw
+0x0005df08	draw_range_marker_5df08			ebx,ecx,edx,esi,edi,ebp	0	tracked-object range bar

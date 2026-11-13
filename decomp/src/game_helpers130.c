@@ -5541,3 +5541,74 @@ void draw_tactical_marker_5c518(void)
 	}
 #undef LS
 }
+
+/* 0x5df08: tactical range-bar for the tracked object (weapon range indicator). */
+void draw_range_marker_5df08(void)
+{
+	uint32_t row = (uint32_t)EF_U8(0x001a6d1bu) * 15u;
+	int32_t cl = EF_U8(0x0012b369u) & 31;
+	int32_t A, B, di, esi, edi, c, P4, Lc, L8, den, q, num, e;
+	ef_addr32 obj;
+	int32_t sel, slot;
+	A = (int16_t)((((int32_t)HI(0x00128172u + row) << cl) / 3) + HI(0x001a6cf8u));
+	B = (int16_t)((((int32_t)HI(0x00128174u + row) << cl) / 3) + HI(0x001a6cf8u));
+	di = ((((int32_t)HI(0x0012816eu + row)) / 2 - 10) << cl) + HI(0x001a6cfau);
+	obj = guest_fn_7489c(HI(0x001f71c8u));
+	if (obj == 0)
+		return;
+	sel = ((int32_t)EF_U32(obj + 0x1d4u)) >> 24;
+	if (sel == 0x14)
+		return;
+	EF_U8(0x001a6d20u) = 0;
+	slot = ((int32_t)EF_U32(obj + 0x198u + (uint32_t)(sel * 3))) >> 24;
+	L8 = (int32_t)EF_U32(0x0012bca3u + (uint32_t)(slot * 145));
+	P4 = (int32_t)EF_U32(0x00197234u);
+	Lc = (int32_t)EF_U32(0x00197240u);
+	if (EF_U32(0x001a821cu) == 0)
+		return;
+	guest_fn_ce328_w((int16_t)di - 8, (int16_t)di + 8, A, B);
+	if (L8 - Lc <= 0)
+		return;
+	EF_U32(0x001a6cc4u) = EF_U32(0x00197220u);
+	obj = guest_fn_7489c(HI(0x001a823cu));
+	if (obj != 0) {
+		ef_addr32 rec = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(obj + 0x26u)) >> 16) * 0xcau;
+		if (EF_U16(0x00197250u) != EF_U16(rec + 0x15u) && Lc > (int32_t)EF_U32(0x001a6cc4u))
+			EF_U8(0x001a6d20u) = 1;
+	}
+	esi = (int16_t)di;
+	c = EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)B, (uint32_t)esi, (uint32_t)A, (uint32_t)esi, (uint32_t)c);
+	c = EF_U8(0x00128148u);
+	cl = EF_U8(0x0012b369u) & 31;
+	e = 2 << cl;
+	guest_fn_c8ccc_x((uint32_t)A, (uint32_t)(esi - e), (uint32_t)A, (uint32_t)esi, (uint32_t)c);
+	c = EF_U8(0x00128148u);
+	edi = B;
+	num = (B - A);
+	den = L8 - Lc;
+	q = (num * P4) / den;
+	cl = EF_U8(0x0012b369u) & 31;
+	e = 2 << cl;
+	guest_fn_c8ccc_x((uint32_t)(edi - q), (uint32_t)(esi - e), (uint32_t)(edi - q),
+	                 (uint32_t)esi, (uint32_t)c);
+	c = EF_U8(0x00128148u);
+	cl = EF_U8(0x0012b369u) & 31;
+	e = 2 << cl;
+	guest_fn_c8ccc_x((uint32_t)edi, (uint32_t)(esi + e), (uint32_t)edi, (uint32_t)esi, (uint32_t)c);
+	q = (num * (int32_t)EF_U32(0x001a6cc4u)) / den;
+	edi -= q;
+	if ((int16_t)edi < (int16_t)A)
+		return;
+	if ((int16_t)edi > (int16_t)B)
+		return;
+	c = EF_U8(0x00128148u);
+	cl = EF_U8(0x0012b369u) & 31;
+	edi = (int16_t)edi;
+	e = 3 << cl;
+	guest_fn_c8ccc_x((uint32_t)(edi + e), (uint32_t)(esi - e), (uint32_t)edi, (uint32_t)esi, (uint32_t)c);
+	c = EF_U8(0x00128148u);
+	cl = EF_U8(0x0012b369u) & 31;
+	e = 3 << cl;
+	guest_fn_c8ccc_x((uint32_t)(edi - e), (uint32_t)(esi - e), (uint32_t)edi, (uint32_t)esi, (uint32_t)c);
+}

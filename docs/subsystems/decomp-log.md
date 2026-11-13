@@ -2528,3 +2528,8 @@ Recovered from disassembly: debug overlay printing the selected object's header 
   random mode/object/projection state) agrees 400/400 incl. stub-call logs. New
   wrappers: guest_fn_39cb4, guest_fn_5c8e0, guest_fn_86f7c_b (3 reg args),
   guest_fn_48da0 / guest_fn_48bb0 (caller-cleanup stack args).
+
+- 0x5df08 `draw_range_marker_5df08` recovered (678 bytes, void; range bar of the tracked
+  object: six c8ccc line draws, signed idiv scaling, flag byte 0x1a6d20). Isolated fuzz
+  PASS 300; callee-stubbed differential (ce328, 7489c twice with scripted objects, c8ccc)
+  agrees 400/400 incl. flag byte and 0x1a6cc4.
