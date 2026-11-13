@@ -3355,3 +3355,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0007ac74	draw_tile_window_7ac74	EAX:int32_t,EDX:int32_t,ECX:int32_t		esi,edi,ebp	4	Original 0x7ac74 (405 bytes); ret 4
 0x00079ff0	draw_menu_box_79ff0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x79ff0 (420 bytes)
 0x0007b3fc	draw_tile_cross_7b3fc	EAX:int32_t,EDX:int32_t	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	draws cross marker on tile map
+0x0007b5d4	trace_line_cells_7b5d4	EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t	EAX:uint32_t	esi,edi,ebp	0	walks tile cells along a line; jump table is cs-relative switch
+0x0007b7d8	draw_marker_line_7b7d8		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	draws marker line on tile map

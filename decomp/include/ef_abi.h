@@ -4385,6 +4385,8 @@ void release_object_74584(int16_t id);
 void draw_tile_window_7ac74(int32_t mode, int32_t x, uint32_t unused_ebx, int32_t y, uint32_t s0); /* EAX, EDX, (EBX unused), ECX + 1 stack, ret 4 */
 void draw_menu_box_79ff0(ef_addr32 menu);
 uint32_t draw_tile_cross_7b3fc(int32_t x, int32_t y); /* 0x7b3fc */
+uint32_t trace_line_cells_7b5d4(int32_t ax, int32_t ay, int32_t bx, int32_t by); /* 0x7b5d4 */
+uint32_t draw_marker_line_7b7d8(void); /* 0x7b7d8 */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

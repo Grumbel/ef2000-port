@@ -2460,3 +2460,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered `draw_menu_box_79ff0` (0x79ff0; centred text-menu box; callees 0xc4b95 via `guest_fn_c4b95_x`, 0x48c90, 0xb3fb0, 0xce328/0xcdf48, 0xdc280). Random fuzz never completes (0xb1b8b faults on random strings), so it was checked with a controlled differential: 40 menus (1-8 entries, random widths and the 0x12b369 flag), with the string-length, texture-stream, text and page-flip callees stubbed and every call's arguments logged in both images: all 40 agree, 800 calls compared, final box/background RAM identical (scratchpad script, not committed).
 
 - 2026-11-13: recovered 0x7b3fc `draw_tile_cross_7b3fc` (tile-map cross marker; calls d0278, two 0x16000c line setups). Fuzz 1000/1000 agree (mostly early-exit paths; deep path only lightly exercised).
+
+- 2026-11-13: recovered 0x7b5d4 `trace_line_cells_7b5d4` (previously blocked: the `jmp *%cs:table` was a plain 4-way switch) and 0x7b7d8 `draw_marker_line_7b7d8`. Fuzz: 0x7b5d4 PASS 56 completed (944 skipped by budget/faults), 0x7b7d8 PASS 1000 (mostly early-exit paths).

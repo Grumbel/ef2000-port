@@ -3752,3 +3752,116 @@ uint32_t draw_tile_cross_7b3fc(int32_t x, int32_t y)
 	}
 	return 1;
 }
+
+/* Original 0x7b5d4: walk the tile cells crossed by the line (ax,ay)-(bx,by),
+ * drawing each with 0x7b3fc until one draws (1) or the end cell is reached (0). */
+uint32_t trace_line_cells_7b5d4(int32_t ax, int32_t ay, int32_t bx, int32_t by)
+{
+	int32_t dx = bx - ax, dy = by - ay;
+	int32_t cx = ax >> 11, cy = ay >> 11;
+	int32_t endx = bx >> 11, endy = by >> 11;
+	int32_t ccy = 0x18f - cy;
+	int32_t px = cx << 11, py = cy << 11;
+	int32_t quad;
+	int32_t flag;
+
+	if (dx >= 0)
+		quad = (dy > 0) ? 1 : 4;
+	else
+		quad = (dy > 0) ? 2 : 3;
+	flag = abs_a28f2(dx) > abs_a28f2(dy);
+	quad -= 1;
+	for (;;) {
+		int32_t pa, pb, qa, qb;
+
+		if (draw_tile_cross_7b3fc(cx, ccy) != 0u)
+			return 1;
+		if (flag) {
+			if (cx == endx)
+				return 0;
+		} else if (cy == endy) {
+			return 0;
+		}
+		if ((uint32_t)quad > 3u)
+			continue;
+		pa = (px - ax) * dy;
+		qa = (py - ay) * dx;
+		pb = (px + 0x800 - ax) * dy;
+		qb = (py + 0x800 - ay) * dx;
+		switch (quad) {
+		case 0:
+			if (qb - pb > 0) { cx++; px += 0x800; }
+			else { cy++; ccy--; py += 0x800; }
+			break;
+		case 1:
+			if (qb - pa > 0) { cy++; ccy--; py += 0x800; }
+			else { cx--; px -= 0x800; }
+			break;
+		case 2:
+			if (qa - pa > 0) { cx--; px -= 0x800; }
+			else { cy--; ccy++; py -= 0x800; }
+			break;
+		default:
+			if (qa - pb > 0) { cx++; px += 0x800; }
+			else { cy--; ccy++; py -= 0x800; }
+			break;
+		}
+	}
+}
+
+/* Original 0x7b7d8: draw the marker line (endpoints at 0x420900..0x42091c) on the tile map. */
+uint32_t draw_marker_line_7b7d8(void)
+{
+	int32_t l4, ebx, esi, edi;
+	int32_t bx, by, a;
+	int32_t neg4, neg8;
+
+	if ((int32_t)EF_U32(0x00420904u) < -0x465 && (int32_t)EF_U32(0x00420908u) < -0x465)
+		return 0;
+	l4 = (int32_t)EF_U32(0x00420910u) >> 11;
+	ebx = 0x18f - ((int32_t)EF_U32(0x00420918u) >> 11);
+	esi = 0x18f - ((int32_t)EF_U32(0x0042091cu) >> 11);
+	edi = (int32_t)EF_U32(0x00420914u) >> 11;
+	if (EF_U8(0x00122c52u) == 1u) {
+		setup_rotation_args_16000c(0, 0, 0, 0,
+			(uint32_t)((int32_t)EF_U32(0x0042091au) >> 16),
+			(uint32_t)((int32_t)EF_U32(0x00420906u) >> 16),
+			(uint32_t)((int32_t)EF_U32(0x00420912u) >> 16),
+			(uint32_t)((int32_t)EF_U32(0x00420916u) >> 16),
+			(uint32_t)((int32_t)EF_U32(0x00420902u) >> 16),
+			(uint32_t)((int32_t)EF_U32(0x0042090eu) >> 16),
+			0xffu, 0xeu);
+		setup_rotation_args_16000c(0, 0, 0, 0,
+			(uint32_t)(int32_t)(int16_t)((((0x18f - esi) * 2 + 1) << 10)),
+			0u,
+			(uint32_t)(int32_t)(int16_t)((edi * 2 + 1) << 10),
+			(uint32_t)(int32_t)(int16_t)((((0x18f - ebx) * 2 + 1) << 10)),
+			0u,
+			(uint32_t)(int32_t)(int16_t)((l4 * 2 + 1) << 10),
+			0xffu, 0xcu);
+	}
+	if (trace_line_cells_7b5d4(EF_U32(0x00420910u), EF_U32(0x00420918u),
+	                           EF_U32(0x00420914u), EF_U32(0x0042091cu)) != 0u)
+		return 1;
+	neg4 = (int32_t)EF_U32(0x00420904u) < 0;
+	neg8 = (int32_t)EF_U32(0x00420908u) < 0;
+	if (neg4 == neg8)
+		return 0;
+	EF_U32(0x001f8eacu) = 0u;
+	interpolate_line_e85f0(0x001f8eb0u, 0x001f8ea8u);
+	if (EF_U8(0x00122c52u) == 1u) {
+		bx = (int16_t)EF_U16(0x001f8eb0u);
+		by = (int16_t)EF_U16(0x001f8eacu);
+		a = (int32_t)EF_U32(0x001f8ea6u) >> 16;
+		setup_rotation_args_16000c(0, 0, 0, 0, (uint32_t)a, (uint32_t)(int16_t)(by + 5),
+			(uint32_t)(int16_t)(bx + 5), (uint32_t)a, (uint32_t)(int16_t)(by - 5),
+			(uint32_t)(int16_t)(bx - 5), 0xffu, 0xfu);
+		bx = (int16_t)EF_U16(0x001f8eb0u);
+		by = (int16_t)EF_U16(0x001f8eacu);
+		a = (int32_t)EF_U32(0x001f8ea6u) >> 16;
+		setup_rotation_args_16000c(0, 0, 0, 0, (uint32_t)a, (uint32_t)(int16_t)(by + 5),
+			(uint32_t)(int16_t)(bx - 5), (uint32_t)a, (uint32_t)(int16_t)(by - 5),
+			(uint32_t)(int16_t)(bx + 5), 0xffu, 0xfu);
+	}
+	return 1;
+}
