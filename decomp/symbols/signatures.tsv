@@ -3347,3 +3347,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00043df4	draw_group_markers_43df4	EAX:head,EDX:list		ebx,ecx,esi,edi,ebp	0	draw map markers for matching group nodes
 0x00043f48	draw_group_markers2_43f48	EAX:head,EDX:list		ebx,ecx,esi,edi,ebp	0	draw map markers for type 0x18/0xd group nodes
 0x000441fc	draw_group_markers3_441fc	EAX:head,EDX:list		ebx,ecx,esi,edi,ebp	0	draw map markers and count icons for type-0x31 nodes
+0x000bf81c	process_pending_nodes_bf81c	AX:acc,EDX:list,EBX:p3,ECX:p4,[ESP+4]:p5,[ESP+8]:p6,[ESP+12]:p7,[ESP+16]:p8,[ESP+20]:p9	AX:acc	esi,edi,ebp	20	process pending type-0x31 nodes

@@ -3325,3 +3325,51 @@ void draw_group_markers3_441fc(ef_addr32 head, ef_addr32 list)
         node = EF_U32(node + 4u);
     }
 }
+
+/* Original 0xbf81c (356 bytes). Walk the node list LIST and, for every
+ * type-0x31 node with a pending state (+0x4e high word 1, +0x32 > 4) that
+ * passes the mode-K filter (K = low byte of P8), build a slot record via
+ * 0xfc0ec and run the 0xbdbf8 / 0xbe59c request pair for it; the record is
+ * freed again. Returns the running 16-bit accumulator ACC. */
+uint16_t process_pending_nodes_bf81c(uint16_t acc, ef_addr32 list, uint32_t p3, uint32_t p4,
+                                     uint32_t p5, uint32_t p6, uint32_t p7, uint32_t p8, uint32_t p9)
+{
+    ef_addr32 node, rec;
+    uint8_t k = (uint8_t)p8;
+
+    node = EF_U32(list);
+    while (node != 0u) {
+        if (EF_U8(node + 0xcu) == 0x31u && ((int32_t)EF_U32(node + 0x4eu) >> 16) == 1 &&
+            (int32_t)EF_U8(node + 0x32u) > 4) {
+            uint16_t ok = 1;
+
+            if (k < 0x10u) {
+                if (k == 0xfu) {
+                    if ((uint16_t)records_differ_bf9d4(node) == 0u)
+                        ok = 0;
+                }
+            } else if (k == 0x10u) {
+                if ((uint16_t)records_differ_bf980(node) == 0u)
+                    ok = 0;
+                else if (((int32_t)EF_U32(node + 0x4cu) >> 16) != 2)
+                    ok = 0;
+            } else if (k == 0x11u) {
+                if (EF_U8(node + 0xbu) != 0u)
+                    ok = 0;
+                else if ((uint16_t)linked_records_differ(node) == 0u)
+                    ok = 0;
+            }
+            if (ok != 0u && (uint16_t)find_node_matching_cc51c(EF_U8(node + 0xbu), p9, k) != 0u) {
+                int32_t acc32;
+
+                rec = create_slot_record_fc0ec(EF_U8(node + 0xbu), k);
+                acc32 = (int16_t)acc;
+                if (guest_fn_bdbf8(rec, node, acc32, p9) != 0u)
+                    acc = guest_fn_be59c(rec, 0u, 0u, node, (uint32_t)acc32, 0u, 1u, p4, p5, p7, p6, list, p3, 0u, p9);
+                free_entry_array_b16c0(rec);
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+    return acc;
+}

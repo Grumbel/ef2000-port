@@ -2699,7 +2699,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bef90	40	find_node_by_pair	list_lookup	compiles	game	confirmed	decomp/tests/0x000bef90.json	docs/compiler-abi.md; Find the node in the list at *EBX with dword +0x16 == * signed AX and dword +0x1a == signed DX.; callers befb8@bf1f2; guest pending
 0x000befb8	1145			unknown	game	unverified		
 0x000bf444	984			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x000bf81c	356			unknown	game	unverified		
+0x000bf81c	356	process_pending_nodes_bf81c	game_helpers130	compiles	game	confirmed	decomp/tests/0x000bf81c.json	Original 0xbf81c (356 bytes)
 0x000bf980	82	records_differ_bf980	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bf980.json	docs/compiler-abi.md; Do the records at +0x33 and +0x37 differ in the bytes at +0x20 or +0x21?; callers bf81c@bf889; guest pending
 0x000bf9d4	82	records_differ_bf9d4	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bf9d4.json	docs/compiler-abi.md; As 0xbf980 for the bytes at +0x23 and +0x24.; callers bf81c@bf8a2; guest pending
 0x000bfa28	48	linked_records_differ	list_lookup	compiles	game	confirmed	decomp/tests/0x000bfa28.json	docs/compiler-abi.md; Byte +0x22 of the records at dwords +0x33 and +0x37 * differ and the first is nonzero.; callers bf81c@bf8b6; guest pending
